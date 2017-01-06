@@ -1,0 +1,69 @@
+<html>
+	<head>
+		<title>{{title}}</title>
+		<link rel="stylesheet" href="{{url_for('static', filename='primer.css')}}">
+		<link rel="stylesheet" href="{{url_for('static', filename='style.css')}}">
+		<link rel="stylesheet" href="{{url_for('static', filename='font-awesome/css/font-awesome.min.css')}}">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.5.1/katex.min.css">
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.5.1/katex.min.js"></script>
+		<link rel="shortcut icon" href="{{url_for('static', filename='images/on.ico')}}">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+	</head>
+	<body>
+		<br>
+		<div class="one-fifth column">
+			<div id="top">
+				<a href="/" id="logo">{{logo}}</a>
+				<div>
+					<a href="/RecentChanges" id="RecentChanges"><i class="fa fa-refresh" aria-hidden="true"></i><span id="is_mobile">최근 변경</span></a>
+					<a href="/RecentChanges" id="RecentChanges"><i class="fa fa-comment" aria-hidden="true"></i><span id="is_mobile">최근 토론</span></a>
+					<a href="/random" id="log"><i class="fa fa-random" aria-hidden="true"></i></a>
+					<a href="/user" id="log"><i class="fa fa-user" aria-hidden="true"></i></a>
+					<a href="/other" id="log"><i class="fa fa-cogs" aria-hidden="true"></i></a>
+				</div>
+				<form method="POST" action="/search" id="search">
+					<div class="input-group">
+						<input class="form-control" name="name" type="text">
+						<span class="input-group-button"><button class="btn"><i class="fa fa-long-arrow-left" aria-hidden="true"></i></button></span>
+					</div>
+				</form>
+			</div>
+		</div>
+		<div class="scroll-buttons">
+			<a class="scroll-toc" href="#toc"><i class="fa fa-list-alt" aria-hidden="true"></i></a>
+			<a class="scroll-button" href="#top" id="left"><i class="fa fa-arrow-up" aria-hidden="true"></i></a>
+			<a class="scroll-bottom" href="#powered" id="right"><i class="fa fa-arrow-down" aria-hidden="true"></i></a>
+		</div>
+		<div id="left_bar">
+			<a href="#">맨 위로</a>
+			<br>
+			<br>
+			<!-- 내용 넣는 자리 -->
+		</div>
+		<div class="four-fifths column">
+			<div id="tool">
+				<nav class="menu">
+					<a class="menu-item selected" href="#">수정</a>
+					<a class="menu-item" href="/w/{{page}}">문서</a>
+				</nav>
+			</div>
+			<h1 class="title">{{title}}</h1>
+			<h2 class="title"><span style="margin-left:5px"></span>(수정)</h2>
+			<form id="usrform" name="f1" method="POST" action="/edit/{{page}}">
+				<textarea rows="30" cols="100" name="content" form="usrform">{{data}}</textarea>
+				<input name="send" style="margin-top:10px;width:100%" type="text">
+				<br>
+				<br>
+				<div class="form-actions">
+					<button class="btn btn-primary" type="submit" onclick="f1.action='/edit/{{page}}';">저장</button>
+					<button class="btn" type="submit" onclick="f1.action='/preview/{{page}}';">미리보기</button>
+				</div>
+			</form>
+			<hr id="last">
+			<p>{{license}}</p>
+			<div id="powered">
+				<a href="https://github.com/2DU/Ownet"><img src="{{url_for('static', filename='images/on2.png')}}" width="100px"></a>
+			</div>
+		</div>
+	</body>
+</html>
