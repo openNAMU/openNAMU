@@ -7,6 +7,9 @@ import pymysql
 json_data=open('set.json').read()
 data = json.loads(json_data)
 
+conn = pymysql.connect(host = data['host'], user = data['user'], password = data['pw'], db = data['db'], charset = 'utf8')
+curs = conn.cursor()
+
 @app.route('/')
 def redirect():
     return '<meta http-equiv="refresh" content="0;url=/w/" />'
