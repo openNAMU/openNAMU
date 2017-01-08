@@ -308,6 +308,10 @@ div.scroll-buttons {
     margin-left: 5px;
 }
 
+table {
+    font-size: 13px;
+}
+
 .scroll-buttons .fa {
     margin-top: 5px;
 }

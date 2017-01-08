@@ -5,7 +5,6 @@ from urllib import parse
 import json
 import pymysql
 import time
-import base64
 
 json_data=open('set.json').read()
 data = json.loads(json_data)
@@ -25,13 +24,24 @@ def getnow():
     s = "%04d-%02d-%02d %02d:%02d:%02d" % (now.tm_year, now.tm_mon, now.tm_mday, now.tm_hour, now.tm_min, now.tm_sec)
     return s
 
-def recent(title, ip, today, send):
-    curs.execute("insert into rc (title, date, ip, send, leng, back) value ('" + title + "', '" + today + "', '" + ip + "', '" + send + "', '', '')")
+def recent(title, ip, today, send, leng):
+    curs.execute("insert into rc (title, date, ip, send, leng, back) value ('" + title + "', '" + today + "', '" + ip + "', '" + send + "', '" + leng + "', '')")
     conn.commit()
 
 def history(number, title, data, date, ip, send, leng):
     curs.execute("insert into history (id, title, data, date, ip, send, leng) value ()")
     conn.commit()
+
+def getleng(existing, change):
+    if(existing < change):
+        leng = change - existing
+        leng = '+' + str(leng)
+    elif(change < existing):
+        leng = existing - change
+        leng = '-' + str(leng)
+    else:
+        leng = '0'
+    return leng;
 
 @app.route('/')
 @app.route('/w/')
@@ -44,9 +54,9 @@ def recentchanges():
     curs.execute("select * from rc order by date desc limit 50")
     rows = curs.fetchall()
     if(rows):
-        return render_template('index.html', logo = data['name'], rows = rows, tn = 3)
+        return render_template('index.html', logo = data['name'], rows = rows, tn = 3, title = '최근 변경내역')
     else:
-         return render_template('index.html', logo = data['name'], rows = '', tn = 3)
+         return render_template('index.html', logo = data['name'], rows = '', tn = 3, title = '최근 변경내역')
 
 @app.route('/search', methods=['POST', 'GET'])
 def search():
@@ -58,38 +68,38 @@ def search():
 
 @app.route('/w/<name>')
 def w(name = None):
-    curs.execute("select * from data where title = '" + parse.quote(name) + "'")
+    curs.execute("select * from data where title = '" + name + "'")
     rows = curs.fetchall()
     if(rows):
-        for row in rows:
-            return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = parse.unquote(row['data']), license = data['license'], tn = 1)
+        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = rows[0]['data'], license = data['license'], tn = 1)
     else:
         return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = '문서 없음', license = data['license'], tn = 1)
 
 @app.route('/edit/<name>', methods=['POST', 'GET'])
 def edit(name = None):
     if(request.method == 'POST'):
-        curs.execute("select * from data where title = '" + parse.quote(name) + "'")
+        curs.execute("select * from data where title = '" + name + "'")
         rows = curs.fetchall()
         if(rows):
             ip = getip(request)
             today = getnow()
-            recent(name, ip, today, request.form["send"])
-            curs.execute("update data set data = '" + parse.quote(request.form["content"]) + "' where title = '" + parse.quote(name) + "'")
+            leng = getleng(len(rows[0]['data']), len(request.form["content"]))
+            recent(name, ip, today, request.form["send"], leng)
+            curs.execute("update data set data = '" + request.form["content"] + "' where title = '" + name + "'")
             conn.commit()
         else:
             ip = getip(request)
             today = getnow()
-            recent(name, ip, today, request.form["send"])
-            curs.execute("insert into data (title, data, acl) value ('" + parse.quote(name) + "', '" + parse.quote(request.form["content"]) + "', '')")
+            leng = getleng(len(rows[0]['data']), len(request.form["content"]))
+            recent(name, ip, today, request.form["send"], leng)
+            curs.execute("insert into data (title, data, acl) value ('" + name + "', '" + request.form["content"] + "', '')")
             conn.commit()
         return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name) + '" />'
     else:
-        curs.execute("select * from data where title = '" + parse.quote(name) + "'")
+        curs.execute("select * from data where title = '" + name + "'")
         rows = curs.fetchall()
         if(rows):
-            for row in rows:
-                return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = parse.unquote(row['data']), tn = 2)
+            return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = rows[0]['data'], tn = 2)
         else:
             return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = '', tn = 2)
 
@@ -103,6 +113,36 @@ def setup():
     curs.execute("create table if not exists ban(block text not null, end text not null, why text not null, band text not null)")
     curs.execute("create table if not exists topic(id text not null, title text not null, sub text not null, data longtext not null, date text not null, ip text not null, block text not null)")
     return render_template('index.html', title = '설치 완료', logo = data['name'], data = '문제 없었음')
+
+@app.route('/other')
+def other():
+    return render_template('index.html', title = '기타 메뉴', logo = data['name'], data = '<li><a href="/titleindex">모든 문서</a><li><a href="/grammar">문법 설명</a></li><li><a href="/version">버전</a></li>')
+
+@app.route('/titleindex')
+def titleindex():
+    curs.execute("select * from data")
+    rows = curs.fetchall()
+    if(rows):
+        return render_template('index.html', logo = data['name'], rows = rows, tn = 4, title = '모든 문서')
+    else:
+        return render_template('index.html', logo = data['name'], rows = '', tn = 4, title = '모든 문서')
+
+@app.route('/grammar')
+def grammar():
+    return render_template('index.html', title = '문법 설명', logo = data['name'], data = '아직 없음')
+
+@app.route('/version')
+def version():
+    return render_template('index.html', title = '버전', logo = data['name'], data = '<h2 style="margin-top: -5px;">0.1</h2><li>문서 보기와 편집</li><li>기타 문서</li><li>랜덤 구현</li>')
+
+@app.route('/random')
+def random():
+    curs.execute("select * from data order by rand() limit 1;")
+    rows = curs.fetchall()
+    if(rows):
+        return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(rows[0]['title']) + '" />'
+    else:
+        return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(data['frontpage']) + '" />'
 
 if __name__ == '__main__':
     app.run(host = '0.0.0.0', port = 3000)

@@ -38,7 +38,9 @@
 			<a href="#">맨 위로</a>
 			<br>
 			<br>
-			<!-- 내용 넣는 자리 -->
+			{% autoescape false %}
+			{{left}}
+			{% endautoescape %}
 		</div>
 		<div class="four-fifths column">
 			{% if tn == 1 %}
@@ -58,7 +60,9 @@
 			<h2 class="titlee"><span style="margin-left:5px"></span></h2>
 			<div>
 				<br>
+				{% autoescape false %}
 				{{data}}
+				{% endautoescape %}
 			</div>
 			{% elif tn == 2 %}
 			<div id="tool">
@@ -80,13 +84,13 @@
 				</div>
 			</form>
 			{% elif tn == 3 %}
-			<h1 class="title">최근 변경내역</h1>
+			<h1 class="title">{{title}}</h1>
 			<table style="width: 100%;">
 				<tbody>
 					<tr>
-						<td style="text-align: center;width:33.33%;font-size: 13px;">문서명</td>
-						<td style="text-align: center;width:33.33%;font-size: 13px;">기여자</td>
-						<td style="text-align: center;width:33.33%;font-size: 13px;">시간</td>
+						<td style="text-align: center;width:33.33%;">문서명</td>
+						<td style="text-align: center;width:33.33%;">기여자</td>
+						<td style="text-align: center;width:33.33%;">시간</td>
 					</tr>
 				</tbody>
 			</table>
@@ -94,25 +98,36 @@
 			<table style="width: 100%;">
 				<tbody>
 					<tr>
-						<td style="text-align: center;width:33.33%;font-size: 13px;"><a href="/w/{{row['title']}}">{{row['title']}}</a></td>
-						<td style="text-align: center;width:33.33%;font-size: 13px;">{{row['ip']}}</td>
-						<td style="text-align: center;width:33.33%;font-size: 13px;">{{row['date']}}</td>
+						<td style="text-align: center;width:33.33%;"><a href="/w/{{row['title']}}">{{row['title']}}</a> ({{row['leng']}})</td>
+						<td style="text-align: center;width:33.33%;">{{row['ip']}}</td>
+						<td style="text-align: center;width:33.33%;">{{row['date']}}</td>
 					</tr>
 					<tr>
 						{% if row['send'] %}
-						<td colspan="3" style="text-align: center;width:100%;font-size: 13px;">{{row['send']}}</td>
+						<td colspan="3" style="text-align: center;width:100%;">{{row['send']}}</td>
 						{% else %}
-						<td colspan="3" style="text-align: center;width:100%;font-size: 13px;"><br></td>
+						<td colspan="3" style="text-align: center;width:100%;"><br></td>
 						{% endif %}
 					</tr>
 				</tbody>
 			</table>
 			{% endfor %}
+			{% elif tn == 4 %}
+			<h1 class="title">{{title}}</h1>
+			{% for row in rows %}
+			<div>
+				<li>
+					<a href="/w/{{row['title']}}">{{row['title']}}</a>
+				</li> 
+			</div>
+			{% endfor %}
 			{% else %}
 			<h1 class="title">{{title}}</h1>
 			<h2 class="title"><span style="margin-left:5px"></span></h2>
 			<div>
+				{% autoescape false %}
 				{{data}}
+				{% endautoescape %}
 			</div>
 			{% endif %}
 			<hr id="last">
