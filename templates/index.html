@@ -15,8 +15,8 @@
 			<div id="top">
 				<a href="/" id="logo">{{logo}}</a>
 				<div>
-					<a href="/RecentChanges" id="RecentChanges"><i class="fa fa-refresh" aria-hidden="true"></i><span id="is_mobile">최근 변경</span></a>
-					<a href="/RecentChanges" id="RecentChanges"><i class="fa fa-comment" aria-hidden="true"></i><span id="is_mobile">최근 토론</span></a>
+					<a href="/recentchanges" id="RecentChanges"><i class="fa fa-refresh" aria-hidden="true"></i><span id="is_mobile">최근 변경</span></a>
+					<a href="/recentdiscuss" id="RecentChanges"><i class="fa fa-comment" aria-hidden="true"></i><span id="is_mobile">최근 토론</span></a>
 					<a href="/random" id="log"><i class="fa fa-random" aria-hidden="true"></i></a>
 					<a href="/user" id="log"><i class="fa fa-user" aria-hidden="true"></i></a>
 					<a href="/other" id="log"><i class="fa fa-cogs" aria-hidden="true"></i></a>
@@ -108,6 +108,12 @@
 				</tbody>
 			</table>
 			{% endfor %}
+			{% else %}
+			<h1 class="title">{{title}}</h1>
+			<h2 class="title"><span style="margin-left:5px"></span></h2>
+			<div>
+				{{data}}
+			</div>
 			{% endif %}
 			<hr id="last">
 			<p>{{license}}</p>

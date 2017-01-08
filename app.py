@@ -38,7 +38,6 @@ def history(number, title, data, date, ip, send, leng):
 def redirect():
     return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(data['frontpage']) + '" />'
 
-@app.route('/RecentChanges')
 @app.route('/recentchanges')
 def recentchanges():
     i = 0
@@ -103,7 +102,7 @@ def setup():
     curs.execute("create table if not exists user(id text not null, pw text not null, acl text not null)")
     curs.execute("create table if not exists ban(block text not null, end text not null, why text not null, band text not null)")
     curs.execute("create table if not exists topic(id text not null, title text not null, sub text not null, data longtext not null, date text not null, ip text not null, block text not null)")
-    return '문제 없음'
+    return render_template('index.html', title = '설치 완료', logo = data['name'], data = '문제 없었음')
 
 if __name__ == '__main__':
     app.run(host = '0.0.0.0', port = 3000)
