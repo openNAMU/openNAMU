@@ -13,12 +13,13 @@
 #log {
     line-height: 32px;
     width: 20px;
-    height: 42.2px;
+    height: 36px;
     font-size: 16px;
     color: white;
     float: left;
     margin-right: 10px;
     padding: 5px;
+	margin-top: 9px;
 }
 #log:hover, #log:focus {
     color: #d1bd6b;
@@ -214,6 +215,7 @@ s:hover, strike:hover, del:hover {
     width: 250px;
     float: right;
 	padding: 5px;
+	margin-bottom: 0;
 }
 
 #logo {
@@ -228,6 +230,10 @@ s:hover, strike:hover, del:hover {
 	background: #867324;
 	z-index: 2;
 	position: relative;
+}
+
+.btn {
+    height: 34px;
 }
 
 .scroll-buttons a:link, .scroll-buttons a:visited {
@@ -298,6 +304,14 @@ div.scroll-buttons {
     position: relative;
 }
 
+#is_mobile {
+    margin-left: 5px;
+}
+
+.scroll-buttons .fa {
+    margin-top: 5px;
+}
+
 @media (max-width: 939px) {
 	#search {
 		float: right;
@@ -307,6 +321,7 @@ div.scroll-buttons {
 	#search {
 		float: left;
 		width: 100%;
+		margin-bottom: 5px;
 	}
 	.input-group {
 		width: 100%;
@@ -326,7 +341,7 @@ body {
 #RecentChanges {
 	line-height: 32px;
     width: 100px;
-    height: 42.2px;
+    height: 45px;
     font-size: 16px;
     color: white;
     float: left;
@@ -339,6 +354,8 @@ body {
 	#RecentChanges {
 		width: 20px;
 		margin-right: 10px;
+		margin-top: 9px;
+		height: 36px;
 	}
 }
 

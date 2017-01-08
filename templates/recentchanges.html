@@ -41,24 +41,34 @@
 			<!-- 내용 넣는 자리 -->
 		</div>
 		<div class="four-fifths column">
-			<div id="tool">
-				<nav class="menu">
-					<a class="menu-item selected" href="#" onclick="return false">문서</a>
-					<a class="menu-item" href="/edit/{{page}}">수정</a>
-					<a class="menu-item" href="/topic/{{page}}">토론</a>
-					<a class="menu-item" href="/delete/{{page}}">삭제</a>
-					<a class="menu-item" href="/move/{{page}}">이동</a>
-					<a class="menu-item" href="/raw/{{page}}">Raw</a>
-					<a class="menu-item" href="/history/{{page}}">역사</a>
-					<a class="menu-item" href="/xref/{{page}}">역링크</a>
-				</nav>
-			</div>
-			<h1 class="titlee">{{title}}</h1>
-			<h2 class="titlee"><span style="margin-left:5px"></span></h2>
-			<div>
-				<br>
-				{{data}}
-			</div>
+			<h1 class="title">최근 변경내역</h1>
+			<table style="width: 100%;">
+				<tbody>
+					<tr>
+						<td style="text-align: center;width:33.33%;font-size: 13px;">문서명</td>
+						<td style="text-align: center;width:33.33%;font-size: 13px;">기여자</td>
+						<td style="text-align: center;width:33.33%;font-size: 13px;">시간</td>
+					</tr>
+				</tbody>
+			</table>
+			{% for row in rows %}
+			<table style="width: 100%;">
+				<tbody>
+					<tr>
+						<td style="text-align: center;width:33.33%;font-size: 13px;"><a href="/w/{{row['title']}}">{{row['title']}}</a></td>
+						<td style="text-align: center;width:33.33%;font-size: 13px;">{{row['ip']}}</td>
+						<td style="text-align: center;width:33.33%;font-size: 13px;">{{row['date']}}</td>
+					</tr>
+					<tr>
+						{% if row['send'] %}
+						<td colspan="3" style="text-align: center;width:100%;font-size: 13px;">{{row['send']}}</td>
+						{% else %}
+						<td colspan="3" style="text-align: center;width:100%;font-size: 13px;"><br></td>
+						{% endif %}
+					</tr>
+				</tbody>
+			</table>
+			{% endfor %}
 			<hr id="last">
 			<p>{{license}}</p>
 			<div id="powered">
