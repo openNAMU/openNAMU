@@ -45,9 +45,9 @@ def recentchanges():
     curs.execute("select * from rc order by date desc limit 50")
     rows = curs.fetchall()
     if(rows):
-        return render_template('recentchanges.html', logo = data['name'], rows = rows)
+        return render_template('index.html', logo = data['name'], rows = rows, tn = 3)
     else:
-         return render_template('recentchanges.html', logo = data['name'], rows = '')
+         return render_template('index.html', logo = data['name'], rows = '', tn = 3)
 
 @app.route('/search', methods=['POST', 'GET'])
 def search():
@@ -63,9 +63,9 @@ def w(name = None):
     rows = curs.fetchall()
     if(rows):
         for row in rows:
-            return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = parse.unquote(row['data']), license = data['license'])
+            return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = parse.unquote(row['data']), license = data['license'], tn = 1)
     else:
-        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = '문서 없음', license = data['license'])
+        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = '문서 없음', license = data['license'], tn = 1)
 
 @app.route('/edit/<name>', methods=['POST', 'GET'])
 def edit(name = None):
@@ -90,9 +90,9 @@ def edit(name = None):
         rows = curs.fetchall()
         if(rows):
             for row in rows:
-                return render_template('edit.html', title = name, logo = data['name'], page = parse.quote(name), data = parse.unquote(row['data']))
+                return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = parse.unquote(row['data']), tn = 2)
         else:
-            return render_template('edit.html', title = name, logo = data['name'], page = parse.quote(name), data = '')
+            return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = '', tn = 2)
 
 @app.route('/setup')
 def setup():

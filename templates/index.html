@@ -41,6 +41,7 @@
 			<!-- 내용 넣는 자리 -->
 		</div>
 		<div class="four-fifths column">
+			{% if tn == 1 %}
 			<div id="tool">
 				<nav class="menu">
 					<a class="menu-item selected" href="#" onclick="return false">문서</a>
@@ -59,6 +60,55 @@
 				<br>
 				{{data}}
 			</div>
+			{% elif tn == 2 %}
+			<div id="tool">
+				<nav class="menu">
+					<a class="menu-item selected" href="#">수정</a>
+					<a class="menu-item" href="/w/{{page}}">문서</a>
+				</nav>
+			</div>
+			<h1 class="title">{{title}}</h1>
+			<h2 class="title"><span style="margin-left:5px"></span>(수정)</h2>
+			<form id="usrform" name="f1" method="POST" action="/edit/{{page}}">
+				<textarea rows="30" cols="100" name="content" form="usrform">{{data}}</textarea>
+				<input name="send" style="margin-top:10px;width:100%" type="text">
+				<br>
+				<br>
+				<div class="form-actions">
+					<button class="btn btn-primary" type="submit" onclick="f1.action='/edit/{{page}}';">저장</button>
+					<button class="btn" type="submit" onclick="f1.action='/preview/{{page}}';">미리보기</button>
+				</div>
+			</form>
+			{% elif tn == 3 %}
+			<h1 class="title">최근 변경내역</h1>
+			<table style="width: 100%;">
+				<tbody>
+					<tr>
+						<td style="text-align: center;width:33.33%;font-size: 13px;">문서명</td>
+						<td style="text-align: center;width:33.33%;font-size: 13px;">기여자</td>
+						<td style="text-align: center;width:33.33%;font-size: 13px;">시간</td>
+					</tr>
+				</tbody>
+			</table>
+			{% for row in rows %}
+			<table style="width: 100%;">
+				<tbody>
+					<tr>
+						<td style="text-align: center;width:33.33%;font-size: 13px;"><a href="/w/{{row['title']}}">{{row['title']}}</a></td>
+						<td style="text-align: center;width:33.33%;font-size: 13px;">{{row['ip']}}</td>
+						<td style="text-align: center;width:33.33%;font-size: 13px;">{{row['date']}}</td>
+					</tr>
+					<tr>
+						{% if row['send'] %}
+						<td colspan="3" style="text-align: center;width:100%;font-size: 13px;">{{row['send']}}</td>
+						{% else %}
+						<td colspan="3" style="text-align: center;width:100%;font-size: 13px;"><br></td>
+						{% endif %}
+					</tr>
+				</tbody>
+			</table>
+			{% endfor %}
+			{% endif %}
 			<hr id="last">
 			<p>{{license}}</p>
 			<div id="powered">
