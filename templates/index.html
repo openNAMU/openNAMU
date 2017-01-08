@@ -51,7 +51,7 @@
 					<a class="menu-item" href="/topic/{{page}}">토론</a>
 					<a class="menu-item" href="/delete/{{page}}">삭제</a>
 					<a class="menu-item" href="/move/{{page}}">이동</a>
-					<a class="menu-item" href="/raw/{{page}}">Raw</a>
+					<a class="menu-item" href="/raw/{{page}}">raw</a>
 					<a class="menu-item" href="/history/{{page}}">역사</a>
 					<a class="menu-item" href="/xref/{{page}}">역링크</a>
 				</nav>
@@ -120,6 +120,77 @@
 				</li> 
 			</div>
 			{% endfor %}
+			{% elif tn == 5 %}
+			<div id="tool">
+				<nav class="menu">
+					<a class="menu-item selected" href="#">역사</a>
+					<a class="menu-item" href="/w/{{page}}">문서</a>
+				</nav>
+			</div>
+			<h1 class="title">{{title}}</h1>
+			<table style="width: 100%;">
+				<tbody>
+					<tr>
+						<td style="text-align: center;width:33.33%;">판</td>
+						<td style="text-align: center;width:33.33%;">기여자</td>
+						<td style="text-align: center;width:33.33%;">시간</td>
+					</tr>
+				</tbody>
+			</table>
+			{% for row in rows %}
+			<table style="width: 100%;">
+				<tbody>
+					<tr>
+						<td style="text-align: center;width:33.33%;">r{{row['id']}} <a href="/w/{{page}}/r/{{row['id']}}">(w)</a> <a href="/w/{{page}}/raw/{{row['id']}}">(raw)</a> ({{row['leng']}})</td>
+						<td style="text-align: center;width:33.33%;">{{row['ip']}}</td>
+						<td style="text-align: center;width:33.33%;">{{row['date']}}</td>
+					</tr>
+					<tr>
+						{% if row['send'] %}
+						<td colspan="3" style="text-align: center;width:100%;">{{row['send']}}</td>
+						{% else %}
+						<td colspan="3" style="text-align: center;width:100%;"><br></td>
+						{% endif %}
+					</tr>
+				</tbody>
+			</table>
+			{% endfor %}
+			{% elif tn == 6 %}
+			<div id="tool">
+				<nav class="menu">
+					<a class="menu-item selected" href="#" onclick="return false">옛문서</a>
+					<a class="menu-item" href="/history/{{page}}">목록</a>
+				</nav>
+			</div>
+			<h1 class="titlee">{{title}}</h1>
+			<h2 class="titlee"><span style="margin-left:5px"></span></h2>
+			<div>
+				{% autoescape false %}
+				{{data}}
+				{% endautoescape %}
+			</div>
+			{% elif tn == 7 %}
+			<div id="tool">
+				<nav class="menu">
+					<a class="menu-item selected" href="#" onclick="return false">raw</a>
+					<a class="menu-item" href="/w/{{page}}">문서</a>
+				</nav>
+			</div>
+			<h1 class="title">{{title}}</h1>
+			<h2 class="title"><span style="margin-left:5px"></span></h2>
+			<div>
+				{% autoescape false %}
+				{{data}}
+				{% endautoescape %}
+			</div>
+			{% elif tn == 8 %}
+			<h1 class="title">{{title}}</h1>
+			<form id="usrform" method="POST" action="/delete/{{page}}">
+				{{plus}}
+				<br>
+				<br>
+				<button class="btn btn-primary" type="submit">삭제</button>
+			</form>
 			{% else %}
 			<h1 class="title">{{title}}</h1>
 			<h2 class="title"><span style="margin-left:5px"></span></h2>

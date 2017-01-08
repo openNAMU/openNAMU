@@ -19,6 +19,13 @@ def namumark(data):
     data = re.sub('<', '&lt;', data)
     data = re.sub('>', '&gt;', data)
 
+    data = re.sub("======\s?(?P<in>[^=]*)\s?======(?:\s+)?\n", '<h6>\g<in></h6>', data)
+    data = re.sub("=====\s?(?P<in>[^=]*)\s?=====(?:\s+)?\n", '<h5>\g<in></h5>', data)
+    data = re.sub("====\s?(?P<in>[^=]*)\s?====(?:\s+)?\n", '<h4>\g<in></h4>', data)
+    data = re.sub("===\s?(?P<in>[^=]*)\s?===(?:\s+)?\n", '<h3>\g<in></h3>', data)
+    data = re.sub("==\s?(?P<in>[^=]*)\s?==(?:\s+)?\n", '<h2>\g<in></h2>', data)
+    data = re.sub("=\s?(?P<in>[^=]*)\s?=(?:\s+)?\n", '<h1>\g<in></h1>', data)
+    
     data = re.sub("'''(?P<in>.+?)'''(?!')", '<strong>\g<in></strong>', data)
     data = re.sub("''(?P<in>.+?)''(?!')", '<i>\g<in></i>', data)
     data = re.sub('~~(?P<in>.+?)~~(?!~)', '<s>\g<in></s>', data)
@@ -46,9 +53,16 @@ def recent(title, ip, today, send, leng):
     curs.execute("insert into rc (title, date, ip, send, leng, back) value ('" + pymysql.escape_string(title) + "', '" + today + "', '" + ip + "', '" + pymysql.escape_string(send) + "', '" + leng + "', '')")
     conn.commit()
 
-def history(number, title, data, date, ip, send, leng):
-    curs.execute("insert into history (id, title, data, date, ip, send, leng) value ()")
-    conn.commit()
+def history(title, data, date, ip, send, leng):
+    curs.execute("select * from history where title = '" + pymysql.escape_string(title) + "' order by id+0 desc limit 1")
+    rows = curs.fetchall()
+    if(rows):
+        number = int(rows[0]['id']) + 1
+        curs.execute("insert into history (id, title, data, date, ip, send, leng) value ('" + str(number) + "', '" + pymysql.escape_string(title) + "', '" + pymysql.escape_string(data) + "', '" + date + "', '" + ip + "', '" + pymysql.escape_string(send) + "', '" + leng + "')")
+        conn.commit()
+    else:
+        curs.execute("insert into history (id, title, data, date, ip, send, leng) value ('1', '" + pymysql.escape_string(title) + "', '" + pymysql.escape_string(data) + "', '" + date + "', '" + ip + "', '" + pymysql.escape_string(send) + "', '" + leng + "')")
+        conn.commit()
 
 def getleng(existing, change):
     if(existing < change):
@@ -76,6 +90,16 @@ def recentchanges():
     else:
          return render_template('index.html', logo = data['name'], rows = '', tn = 3, title = '최근 변경내역')
 
+@app.route('/history/<name>')
+def gethistory(name = None):
+    i = 0
+    curs.execute("select * from history where title = '" + pymysql.escape_string(name) + "' order by date desc")
+    rows = curs.fetchall()
+    if(rows):
+        return render_template('index.html', logo = data['name'], rows = rows, tn = 5, title = name, page = parse.quote(name))
+    else:
+         return render_template('index.html', logo = data['name'], rows = '', tn = 5, title = name, page = parse.quote(name))
+
 @app.route('/search', methods=['POST', 'GET'])
 def search():
     if(request.method == 'POST'):
@@ -92,7 +116,37 @@ def w(name = None):
         enddata = namumark(rows[0]['data'])
         return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = enddata, license = data['license'], tn = 1)
     else:
-        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = '문서 없음', license = data['license'], tn = 1)
+        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = '<br>문서 없음', license = data['license'], tn = 1)
+
+@app.route('/w/<name>/r/<number>')
+def rew(name = None, number = None):
+    curs.execute("select * from history where title = '" + pymysql.escape_string(name) + "' and id = '" + number + "'")
+    rows = curs.fetchall()
+    if(rows):
+        enddata = namumark(rows[0]['data'])
+        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = enddata, license = data['license'], tn = 6)
+    else:
+        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = '<br>문서 없음', license = data['license'], tn = 6)
+
+@app.route('/w/<name>/raw/<number>')
+def reraw(name = None, number = None):
+    curs.execute("select * from history where title = '" + pymysql.escape_string(name) + "' and id = '" + number + "'")
+    rows = curs.fetchall()
+    if(rows):
+        enddata = re.sub("\n", '<br>', rows[0]['data'])
+        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = enddata, license = data['license'])
+    else:
+        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = '<br>문서 없음', license = data['license'])
+
+@app.route('/raw/<name>')
+def raw(name = None):
+    curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
+    rows = curs.fetchall()
+    if(rows):
+        enddata = re.sub("\n", '<br>', rows[0]['data'])
+        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = enddata, license = data['license'], tn = 7)
+    else:
+        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = '문서 없음', license = data['license'], tn = 7)
 
 @app.route('/edit/<name>', methods=['POST', 'GET'])
 def edit(name = None):
@@ -104,13 +158,15 @@ def edit(name = None):
             today = getnow()
             leng = getleng(len(rows[0]['data']), len(request.form["content"]))
             recent(name, ip, today, request.form["send"], leng)
+            history(name, request.form["content"], today, ip, request.form["send"], leng)
             curs.execute("update data set data = '" + pymysql.escape_string(request.form["content"]) + "' where title = '" + pymysql.escape_string(name) + "'")
             conn.commit()
         else:
             ip = getip(request)
             today = getnow()
-            leng = getleng(len(rows[0]['data']), len(request.form["content"]))
+            leng = '+' + str(len(request.form["content"]))
             recent(name, ip, today, request.form["send"], leng)
+            history(name, request.form["content"], today, ip, request.form["send"], leng)
             curs.execute("insert into data (title, data, acl) value ('" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(request.form["content"]) + "', '')")
             conn.commit()
         return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name) + '" />'
@@ -121,6 +177,30 @@ def edit(name = None):
             return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = rows[0]['data'], tn = 2)
         else:
             return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = '', tn = 2)
+
+@app.route('/delete/<name>', methods=['POST', 'GET'])
+def delete(name = None):
+    if(request.method == 'POST'):
+        curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
+        rows = curs.fetchall()
+        if(rows):
+            ip = getip(request)
+            today = getnow()
+            leng = '-' + str(len(rows[0]['data']))
+            recent(name, ip, today, '문서를 삭제 했습니다.', leng)
+            history(name, '', today, ip, '문서를 삭제 했습니다.', leng)
+            curs.execute("delete from data where title = '" + pymysql.escape_string(name) + "'")
+            conn.commit()
+            return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name) + '" />'
+        else:
+            return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name) + '" />'
+    else:
+        curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
+        rows = curs.fetchall()
+        if(rows):
+            return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), tn = 8, plus = '정말 삭제 하시겠습니까?')
+        else:
+            return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name) + '" />'
 
 @app.route('/setup')
 def setup():
