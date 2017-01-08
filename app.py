@@ -5,12 +5,30 @@ from urllib import parse
 import json
 import pymysql
 import time
+import re
 
 json_data=open('set.json').read()
 data = json.loads(json_data)
 
 conn = pymysql.connect(host = data['host'], user = data['user'], password = data['pw'], db = data['db'], charset = 'utf8')
 curs = conn.cursor(pymysql.cursors.DictCursor)
+
+def namumark(data):
+    data = '\n' + data + '\n'
+    
+    data = re.sub('<', '&lt;', data)
+    data = re.sub('>', '&gt;', data)
+
+    data = re.sub("'''(?P<in>.+?)'''(?!')", '<strong>\g<in></strong>', data)
+    data = re.sub("''(?P<in>.+?)''(?!')", '<i>\g<in></i>', data)
+    data = re.sub('~~(?P<in>.+?)~~(?!~)', '<s>\g<in></s>', data)
+    data = re.sub('--(?P<in>.+?)--(?!-)', '<s>\g<in></s>', data)
+    data = re.sub('__(?P<in>.+?)__(?!_)', '<u>\g<in></u>', data)
+    data = re.sub('\^\^(?P<in>.+?)\^\^(?!\^)', '<sup>\g<in></sup>', data)
+    data = re.sub(',,(?P<in>.+?),,(?!,)', '<sub>\g<in></sub>', data)
+
+    data = re.sub('\n', '<br>', data)
+    return data
 
 def getip(request):
     if request.headers.getlist("X-Forwarded-For"):
@@ -25,7 +43,7 @@ def getnow():
     return s
 
 def recent(title, ip, today, send, leng):
-    curs.execute("insert into rc (title, date, ip, send, leng, back) value ('" + title + "', '" + today + "', '" + ip + "', '" + send + "', '" + leng + "', '')")
+    curs.execute("insert into rc (title, date, ip, send, leng, back) value ('" + pymysql.escape_string(title) + "', '" + today + "', '" + ip + "', '" + pymysql.escape_string(send) + "', '" + leng + "', '')")
     conn.commit()
 
 def history(number, title, data, date, ip, send, leng):
@@ -68,35 +86,36 @@ def search():
 
 @app.route('/w/<name>')
 def w(name = None):
-    curs.execute("select * from data where title = '" + name + "'")
+    curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
     rows = curs.fetchall()
     if(rows):
-        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = rows[0]['data'], license = data['license'], tn = 1)
+        enddata = namumark(rows[0]['data'])
+        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = enddata, license = data['license'], tn = 1)
     else:
         return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = '문서 없음', license = data['license'], tn = 1)
 
 @app.route('/edit/<name>', methods=['POST', 'GET'])
 def edit(name = None):
     if(request.method == 'POST'):
-        curs.execute("select * from data where title = '" + name + "'")
+        curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
         rows = curs.fetchall()
         if(rows):
             ip = getip(request)
             today = getnow()
             leng = getleng(len(rows[0]['data']), len(request.form["content"]))
             recent(name, ip, today, request.form["send"], leng)
-            curs.execute("update data set data = '" + request.form["content"] + "' where title = '" + name + "'")
+            curs.execute("update data set data = '" + pymysql.escape_string(request.form["content"]) + "' where title = '" + pymysql.escape_string(name) + "'")
             conn.commit()
         else:
             ip = getip(request)
             today = getnow()
             leng = getleng(len(rows[0]['data']), len(request.form["content"]))
             recent(name, ip, today, request.form["send"], leng)
-            curs.execute("insert into data (title, data, acl) value ('" + name + "', '" + request.form["content"] + "', '')")
+            curs.execute("insert into data (title, data, acl) value ('" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(request.form["content"]) + "', '')")
             conn.commit()
         return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name) + '" />'
     else:
-        curs.execute("select * from data where title = '" + name + "'")
+        curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
         rows = curs.fetchall()
         if(rows):
             return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = rows[0]['data'], tn = 2)
