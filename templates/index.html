@@ -129,7 +129,7 @@
 				</nav>
 			</div>
 			<h1 class="titlee">{{title}}</h1>
-			<h2 class="titlee"><span style="margin-left:5px"></span></h2>
+			<h2 class="titlee"><span style="margin-left:5px"></span>(old)</h2>
 			<div>
 				{% autoescape false %}
 				{{data}}
@@ -143,7 +143,7 @@
 				</nav>
 			</div>
 			<h1 class="title">{{title}}</h1>
-			<h2 class="title"><span style="margin-left:5px"></span></h2>
+			<h2 class="title"><span style="margin-left:5px"></span>(raw)</h2>
 			<div>
 				{% autoescape false %}
 				{{data}}
@@ -151,6 +151,13 @@
 			</div>
 			{% elif tn == 8 %}
 			<h1 class="title">{{title}}</h1>
+			<h2 class="title"><span style="margin-left:5px"></span>(삭제)</h2>
+			<div id="tool">
+				<nav class="menu">
+					<a class="menu-item selected" href="#" onclick="return false">삭제</a>
+					<a class="menu-item" href="/w/{{page}}">문서</a>
+				</nav>
+			</div>
 			<form id="usrform" method="POST" action="/delete/{{page}}">
 				{{plus}}
 				<br>
@@ -159,6 +166,13 @@
 			</form>
 			{% elif tn == 9 %}
 			<h1 class="title">{{title}}</h1>
+			<h2 class="title"><span style="margin-left:5px"></span>(이동)</h2>
+			<div id="tool">
+				<nav class="menu">
+					<a class="menu-item selected" href="#" onclick="return false">이동</a>
+					<a class="menu-item" href="/w/{{page}}">문서</a>
+				</nav>
+			</div>
 			<form id="usrform" method="POST" action="/move/{{page}}">
 				{{plus}}
 				<br>
@@ -167,6 +181,63 @@
 				<br>
 				<br>
 				<button class="btn btn-primary" type="submit">이동</button>
+			</form>
+			{% elif tn == 10 %}
+			<h1 class="title">{{title}}</h1>
+			<h2 class="title"><span style="margin-left:5px"></span>(토론 목록)</h2>
+			<form id="usrform" method="POST" action="/topic/{{page}}">
+				{% autoescape false %}
+				{{plus}}
+				{% endautoescape %}
+				<br>
+				<input class="form-control" name="topic" style="width: 100%">
+				<br>
+				<br>
+				<button class="btn btn-primary" type="submit">새토론</button>
+			</form>
+			{% elif tn == 11 %}
+			<h1 class="titlee">{{title}}</h1>
+			<h2 class="titlee"><span style="margin-left:5px"></span>(토론)</h2>
+			<h2>{{sub}}</h2>
+			<br>
+			{% autoescape false %}
+			{{rows}}
+			{% endautoescape %}
+			<form id="usrform" method="POST" action="/topic/{{page}}/sub/{{suburl}}">
+				<br>
+				<textarea rows="10" cols="100" name="content" form="usrform"></textarea>
+				<br>
+				<br>
+				<button class="btn btn-primary" type="submit">전송</button>
+			</form>
+			{% elif tn == 12 %}
+			<h1 class="title">{{title}}</h1>
+			<table style="width: 100%;">
+				<tbody>
+					<tr>
+						<td style="text-align: center;width:33.33%;">토론명</td>
+						<td style="text-align: center;width:33.33%;">토론자</td>
+						<td style="text-align: center;width:33.33%;">시간</td>
+					</tr>
+				</tbody>
+			</table>
+			{% autoescape false %}
+			{{rows}}
+			{% endautoescape %}
+			{% elif tn == 13 %}
+			<h1 class="title">{{title}}</h1>
+			<h2 class="title"><span style="margin-left:5px"></span>(되돌리기)</h2>
+			<div id="tool">
+				<nav class="menu">
+					<a class="menu-item selected" href="#" onclick="return false">되돌리기</a>
+					<a class="menu-item" href="/w/{{page}}">문서</a>
+				</nav>
+			</div>
+			<form id="usrform" method="POST" action="/revert/{{page}}/r/{{r}}">
+				{{plus}}
+				<br>
+				<br>
+				<button class="btn btn-primary" type="submit">되돌리기</button>
 			</form>
 			{% else %}
 			<h1 class="title">{{title}}</h1>
