@@ -83,27 +83,58 @@ def redirect():
 @app.route('/recentchanges')
 def recentchanges():
     i = 0
+    div = '<div>'
     curs.execute("select * from rc order by date desc limit 50")
     rows = curs.fetchall()
     if(rows):
-        return render_template('index.html', logo = data['name'], rows = rows, tn = 3, title = '최근 변경내역')
+        while True:
+            try:
+                a = rows[i]
+            except:
+                div = div + '</div>'
+                break
+            if(rows[i]['send']):
+                send = rows[i]['send']
+                send = re.sub('<', '&lt;', send)
+                send = re.sub('>', '&gt;', send)
+                send = re.sub('&lt;a href="\/w\/(?P<in>[^"]*)"&gt;(?P<out>[^&]*)&lt;\/a&gt;', '<a href="/w/\g<in>">\g<out></a>', send)
+            else:
+                send = '<br>'
+            div = div + '<table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;"><a href="/w/' + parse.quote(rows[i]['title']) + '">' + rows[i]['title'] + '</a> <a href="/history/' + parse.quote(rows[i]['title']) + '">(역사)</a> (' + rows[i]['leng'] + ')</td><td style="text-align: center;width:33.33%;">' + rows[i]['ip'] + '</td><td style="text-align: center;width:33.33%;">' + rows[i]['date'] + '</td></tr><tr><td colspan="3" style="text-align: center;width:100%;">' + send + '</td></tr></tbody></table>'
+            i = i + 1
+        return render_template('index.html', logo = data['name'], rows = div, tn = 3, title = '최근 변경내역')
     else:
          return render_template('index.html', logo = data['name'], rows = '', tn = 3, title = '최근 변경내역')
 
 @app.route('/history/<name>')
 def gethistory(name = None):
     i = 0
+    div = '<div>'
     curs.execute("select * from history where title = '" + pymysql.escape_string(name) + "' order by date desc")
     rows = curs.fetchall()
     if(rows):
-        return render_template('index.html', logo = data['name'], rows = rows, tn = 5, title = name, page = parse.quote(name))
+        while True:
+            try:
+                a = rows[i]
+            except:
+                div = div + '</div>'
+                break
+            if(rows[i]['send']):
+                send = rows[i]['send']
+                send = re.sub('<', '&lt;', send)
+                send = re.sub('>', '&gt;', send)
+                send = re.sub('&lt;a href="\/w\/(?P<in>[^"]*)"&gt;(?P<out>[^&]*)&lt;\/a&gt;', '<a href="/w/\g<in>">\g<out></a>', send)
+            else:
+                send = '<br>'
+            div = div + '<table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;">r' + rows[i]['id'] + '</a> <a href="/w/' + parse.quote(rows[i]['title']) + '/r/' + rows[i]['id'] + '">(w)</a> <a href="/w/' + parse.quote(rows[i]['title']) + '/raw/' + rows[i]['id'] + '">(raw)</a> (' + rows[i]['leng'] + ')</td><td style="text-align: center;width:33.33%;">' + rows[i]['ip'] + '</td><td style="text-align: center;width:33.33%;">' + rows[i]['date'] + '</td></tr><tr><td colspan="3" style="text-align: center;width:100%;">' + send + '</td></tr></tbody></table>'
+            i = i + 1
+        return render_template('index.html', logo = data['name'], rows = div, tn = 5, title = name, page = parse.quote(name))
     else:
          return render_template('index.html', logo = data['name'], rows = '', tn = 5, title = name, page = parse.quote(name))
 
 @app.route('/search', methods=['POST', 'GET'])
 def search():
     if(request.method == 'POST'):
-        print(request.form["search"])
         return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(request.form["search"]) + '" />'
     else:
         return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(data['frontpage']) + '" />'
@@ -202,6 +233,43 @@ def delete(name = None):
         else:
             return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name) + '" />'
 
+@app.route('/move/<name>', methods=['POST', 'GET'])
+def move(name = None):
+    if(request.method == 'POST'):
+        curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
+        rows = curs.fetchall()
+        if(rows):
+            ip = getip(request)
+            today = getnow()
+            leng = '0'
+            curs.execute("select * from history where title = '" + pymysql.escape_string(request.form["title"]) + "'")
+            row = curs.fetchall()
+            if(row):
+                 return render_template('index.html', title = '이동 오류', logo = data['name'], data = '이동 하려는 곳에 문서가 이미 있습니다.')
+            else:
+                recent(name, ip, today, '문서를 <a href="/w/' + pymysql.escape_string(parse.quote(request.form["title"])) + '">' + pymysql.escape_string(request.form["title"]) + '</a> 문서로 이동 했습니다.', leng)
+                history(name, rows[0]['data'], today, ip, '<a href="/w/' + pymysql.escape_string(parse.quote(name)) + '">' + pymysql.escape_string(name) + '</a> 문서를 <a href="/w/' + pymysql.escape_string(parse.quote(request.form["title"])) + '">' + pymysql.escape_string(request.form["title"]) + '</a> 문서로 이동 했습니다.', leng)
+                curs.execute("update data set title = '" + pymysql.escape_string(request.form["title"]) + "' where title = '" + pymysql.escape_string(name) + "'")
+                curs.execute("update history set title = '" + pymysql.escape_string(request.form["title"]) + "' where title = '" + pymysql.escape_string(name) + "'")
+                conn.commit()
+                return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(request.form["title"]) + '" />'
+        else:
+            ip = getip(request)
+            today = getnow()
+            leng = '0'
+            curs.execute("select * from history where title = '" + pymysql.escape_string(request.form["title"]) + "'")
+            row = curs.fetchall()
+            if(row):
+                 return render_template('index.html', title = '이동 오류', logo = data['name'], data = '이동 하려는 곳에 문서가 이미 있습니다.')
+            else:
+                recent(name, ip, today, '문서를 <a href="/w/' + pymysql.escape_string(parse.quote(request.form["title"])) + '">' + pymysql.escape_string(request.form["title"]) + '</a> 문서로 이동 했습니다.', leng)
+                history(name, rows[0]['data'], today, ip, '<a href="/w/' + pymysql.escape_string(parse.quote(name)) + '">' + pymysql.escape_string(name) + '</a> 문서를 <a href="/w/' + pymysql.escape_string(parse.quote(request.form["title"])) + '">' + pymysql.escape_string(request.form["title"]) + '</a> 문서로 이동 했습니다.', leng)
+                curs.execute("update history set title = '" + pymysql.escape_string(request.form["title"]) + "' where title = '" + pymysql.escape_string(name) + "'")
+                conn.commit()
+                return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(request.form["title"]) + '" />'
+    else:
+        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), tn = 9, plus = '정말 이동 하시겠습니까?')
+
 @app.route('/setup')
 def setup():
     curs.execute("create table if not exists data(title text not null, data longtext not null, acl text not null)")
@@ -219,10 +287,20 @@ def other():
 
 @app.route('/titleindex')
 def titleindex():
+    i = 0
+    div = '<div>'
     curs.execute("select * from data")
     rows = curs.fetchall()
     if(rows):
-        return render_template('index.html', logo = data['name'], rows = rows, tn = 4, title = '모든 문서')
+        while True:
+            try:
+                a = rows[i]
+            except:
+                div = div + '</div>'
+                break
+            div = div + '<li><a href="/w/' + parse.quote(rows[i]['title']) + '">' + rows[i]['title'] + '</a></li>'
+            i = i + 1
+        return render_template('index.html', logo = data['name'], rows = div, tn = 4, title = '모든 문서')
     else:
         return render_template('index.html', logo = data['name'], rows = '', tn = 4, title = '모든 문서')
 
