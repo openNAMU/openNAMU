@@ -426,7 +426,12 @@ def grammar():
 
 @app.route('/version')
 def version():
-    return render_template('index.html', title = '버전', logo = data['name'], data = '<h2 style="margin-top: -5px;">0.1</h2><li>문서 보기와 편집</li><li>기타 문서</li><li>랜덤 구현</li>')
+    return render_template('index.html', title = '버전', logo = data['name'], tn = 14)
+
+@app.route('/user')
+def user():
+    ip = getip(request)
+    return render_template('index.html', title = '유저 메뉴', logo = data['name'], data = ip + '<br><br><li><a href="/login">로그인</a></li><li><a href="/logout">로그아웃</a></li>')
 
 @app.route('/random')
 def random():
