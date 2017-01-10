@@ -252,6 +252,23 @@
 				<h2>1.0</h2>
 				<li>로그인 구현 (예정)</li>
 			</div>
+			{% elif tn == 15 %}
+			<h1 class="title">{{title}}</h1>
+			<form id="usrform" method="POST" action="/register">
+				<span>아이디</span>
+				<br>
+				<br>
+				<input name="id" type="text">
+				<br>
+				<br>
+				<span>비밀번호</span>
+				<br>
+				<br>
+				<input name="pw" type="password">
+				<br>
+				<br>
+				<button class="btn btn-primary" type="submit">{{enter}}</button>
+			</form>
 			{% else %}
 			<h1 class="title">{{title}}</h1>
 			<h2 class="title"><span style="margin-left:5px"></span></h2>

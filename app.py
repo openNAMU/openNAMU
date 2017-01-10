@@ -6,6 +6,7 @@ import json
 import pymysql
 import time
 import re
+import bcrypt
 
 json_data=open('set.json').read()
 data = json.loads(json_data)
@@ -420,6 +421,33 @@ def sub(name = None, sub = None):
             i = i + 1
         return render_template('index.html', title = name, page = parse.quote(name), suburl = parse.quote(sub), sub = sub, logo = data['name'], rows = div, tn = 11)
 
+@app.route('/login', methods=['POST', 'GET'])
+def login():
+    return render_template('index.html', title = '로그인', enter = '로그인', logo = data['name'], tn = 15)
+
+@app.route('/register', methods=['POST', 'GET'])
+def register():
+    if(request.method == 'POST'):
+        p = re.compile('(?:[^A-Za-zㄱ-힣0-9 ])')
+        m = p.match(request.form["id"])
+        if(m):
+            return render_template('index.html', title = '회원가입 오류', logo = data['name'], data = '아이디에는 한글과 알파벳 공백만 허용 됩니다.')
+        else:
+            curs.execute("select * from user where title = '" + pymysql.escape_string(request.form["id"]) + "'")
+            rows = curs.fetchall()
+            if(rows):
+                return render_template('index.html', title = '회원가입 오류', logo = data['name'], data = '동일한 아이디의 유저가 있습니다.')
+            else:
+                hashed = bcrypt.hashpw(bytes(request.form["pw"], 'utf-8'), bcrypt.gensalt())
+                if(data['owner']):
+                    curs.execute("insert into user (id, pw, acl) value ('" + pymysql.escape_string(request.form["id"]) + "', '" + pymysql.escape_string(hashed.decode()) + "', 'owner')")
+                else:
+                    curs.execute("insert into user (id, pw, acl) value ('" + pymysql.escape_string(request.form["id"]) + "', '" + pymysql.escape_string(hashed.decode()) + "', 'user')")
+                conn.commit()
+                return '<meta http-equiv="refresh" content="0;url=/login" />'
+    else:
+        return render_template('index.html', title = '회원가입', enter = '회원가입', logo = data['name'], tn = 15)
+
 @app.route('/grammar')
 def grammar():
     return render_template('index.html', title = '문법 설명', logo = data['name'], data = '아직 없음')
@@ -431,7 +459,7 @@ def version():
 @app.route('/user')
 def user():
     ip = getip(request)
-    return render_template('index.html', title = '유저 메뉴', logo = data['name'], data = ip + '<br><br><li><a href="/login">로그인</a></li><li><a href="/logout">로그아웃</a></li>')
+    return render_template('index.html', title = '유저 메뉴', logo = data['name'], data = ip + '<br><br><li><a href="/login">로그인</a></li><li><a href="/logout">로그아웃</a></li><li><a href="/register">회원가입</a></li>')
 
 @app.route('/random')
 def random():
