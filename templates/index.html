@@ -248,7 +248,6 @@
 			</form>
 			{% elif tn == 14 %}
 			<h1 class="title">{{title}}</h1>
-			<h2 class="title"><span style="margin-left:5px"></span></h2>
 			<div>
 				<h2 style="margin-top: -5px;">0.1 (알파)</h2>
 				<li>문서 보기와 편집</li>
@@ -281,6 +280,8 @@
 				<button class="btn btn-primary" type="submit">{{enter}}</button>
 			</form>
 			{% elif tn == 16 %}
+			<h1 class="title">{{title}}</h1>
+			<h2 class="title"><span style="margin-left:5px"></span>(차단)</h2>
 			<form id="usrform" method="POST" action="/ban/{{page}}">
 				<input class="form-control" name="end" style="width: 100%">
 				{% if now == '차단' %}

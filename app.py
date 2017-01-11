@@ -505,6 +505,31 @@ def logout():
     session.pop('DREAMER', None)
     return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(data['frontpage']) + '" />'
 
+@app.route('/ban/<name>')
+def ban(name = None):
+    if(request.method == 'POST'):
+        return render_template('index.html', title = '권한 오류', logo = data['name'], data = '비 로그인 상태 입니다.')
+    else:
+        if(session.get('Now') == True):
+            ip = getip(request)
+            curs.execute("select * from user where id = '" + pymysql.escape_string(ip) + "'")
+            rows = curs.fetchall()
+            if(rows):
+                if(rows[0]['acl'] == 'owner' or 'admin'):
+                    curs.execute("select * from ban where block = '" + pymysql.escape_string(name) + "'")
+                    row = curs.fetchall()
+                    if(row):
+                        now = '차단 해제'
+                    else:
+                        now = '차단'
+                    return render_template('index.html', title = name, page = parse.quote(name), enter = '회원가입', logo = data['name'], tn = 16, now = now)
+                else:
+                    return render_template('index.html', title = '권한 오류', logo = data['name'], data = '권한이 모자랍니다.')
+            else:
+                return render_template('index.html', title = '권한 오류', logo = data['name'], data = '계정이 없습니다.')
+        else:
+            return render_template('index.html', title = '권한 오류', logo = data['name'], data = '비 로그인 상태 입니다.')
+
 @app.route('/grammar')
 def grammar():
     return render_template('index.html', title = '문법 설명', logo = data['name'], data = '아직 없음')
