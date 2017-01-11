@@ -257,11 +257,15 @@
 				<h2>0.2 ~ 0.9 (베타)</h2>
 				<li>그 외 엄청나게 많은 기능 구현 (기존 Ownet 기능에서 로그인 필요한 기능 빼고 구현)</li>
 				<h2>1.0</h2>
-				<li>로그인 구현 (예정)</li>
+				<li>로그인 구현</li>
 			</div>
 			{% elif tn == 15 %}
 			<h1 class="title">{{title}}</h1>
+			{% if title == '회원가입' %}
 			<form id="usrform" method="POST" action="/register">
+			{% else %}
+			<form id="usrform" method="POST" action="/login">
+			{% endif %}
 				<span>아이디</span>
 				<br>
 				<br>

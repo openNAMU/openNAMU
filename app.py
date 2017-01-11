@@ -14,6 +14,8 @@ data = json.loads(json_data)
 conn = pymysql.connect(host = data['host'], user = data['user'], password = data['pw'], db = data['db'], charset = 'utf8')
 curs = conn.cursor(pymysql.cursors.DictCursor)
 
+app.secret_key = data['key']
+
 def namumark(data):
     data = '\n' + data + '\n'
 
@@ -39,10 +41,13 @@ def namumark(data):
     return data
 
 def getip(request):
-    if request.headers.getlist("X-Forwarded-For"):
-        ip = request.headers.getlist("X-Forwarded-For")[0]
+    if(session.get('Now') == True):
+        ip = format(session['DREAMER'])
     else:
-        ip = request.remote_addr
+        if(request.headers.getlist("X-Forwarded-For")):
+            ip = request.headers.getlist("X-Forwarded-For")[0]
+        else:
+            ip = request.remote_addr
     return ip
 
 def getnow():
@@ -437,18 +442,34 @@ def sub(name = None, sub = None):
                 break
             if(i == 0):
                 start = rows[i]['ip']
+            indata = rows[i]['data']
+            indata = re.sub('<', '&lt;', indata)
+            indata = re.sub('>', '&gt;', indata)
             if(rows[i]['ip'] == start):
                 j = i + 1
-                div = div + '<table id="toron"><tbody><tr><td id="toroncolorgreen"><a href="javascript:void(0);" id="' + str(j) + '">#' + str(j) + '</a> ' + rows[i]['ip'] + ' <span style="float:right;">' + rows[i]['date'] + '</span></td></tr><tr><td>' + rows[i]['data'] + '</td></tr></tbody></table><br>'
+                div = div + '<table id="toron"><tbody><tr><td id="toroncolorgreen"><a href="javascript:void(0);" id="' + str(j) + '">#' + str(j) + '</a> ' + rows[i]['ip'] + ' <span style="float:right;">' + rows[i]['date'] + '</span></td></tr><tr><td>' + indata + '</td></tr></tbody></table><br>'
             else:
                 j = i + 1
-                div = div + '<table id="toron"><tbody><tr><td id="toroncolor"><a href="javascript:void(0);" id="' + str(j) + '">#' + str(j) + '</a> ' + rows[i]['ip'] + ' <span style="float:right;">' + rows[i]['date'] + '</span></td></tr><tr><td>' + rows[i]['data'] + '</td></tr></tbody></table><br>'
+                div = div + '<table id="toron"><tbody><tr><td id="toroncolor"><a href="javascript:void(0);" id="' + str(j) + '">#' + str(j) + '</a> ' + rows[i]['ip'] + ' <span style="float:right;">' + rows[i]['date'] + '</span></td></tr><tr><td>' + indata + '</td></tr></tbody></table><br>'
             i = i + 1
         return render_template('index.html', title = name, page = parse.quote(name), suburl = parse.quote(sub), sub = sub, logo = data['name'], rows = div, tn = 11)
 
 @app.route('/login', methods=['POST', 'GET'])
 def login():
-    return render_template('index.html', title = '로그인', enter = '로그인', logo = data['name'], tn = 15)
+    if(request.method == 'POST'):
+        curs.execute("select * from user where id = '" + pymysql.escape_string(request.form["id"]) + "'")
+        rows = curs.fetchall()
+        if(rows):
+            if(bcrypt.checkpw(bytes(request.form["pw"], 'utf-8'), bytes(rows[0]['pw'], 'utf-8'))):
+                session['Now'] = True
+                session['DREAMER'] = request.form["id"]
+                return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(data['frontpage']) + '" />'
+            else:
+                return render_template('index.html', title = '로그인 오류', logo = data['name'], data = '비밀번호가 다릅니다.')
+        else:
+            return render_template('index.html', title = '로그인 오류', logo = data['name'], data = '없는 계정 입니다.')
+    else:
+        return render_template('index.html', title = '로그인', enter = '로그인', logo = data['name'], tn = 15)
 
 @app.route('/register', methods=['POST', 'GET'])
 def register():
@@ -458,7 +479,7 @@ def register():
         if(m):
             return render_template('index.html', title = '회원가입 오류', logo = data['name'], data = '아이디에는 한글과 알파벳 공백만 허용 됩니다.')
         else:
-            curs.execute("select * from user where title = '" + pymysql.escape_string(request.form["id"]) + "'")
+            curs.execute("select * from user where id = '" + pymysql.escape_string(request.form["id"]) + "'")
             rows = curs.fetchall()
             if(rows):
                 return render_template('index.html', title = '회원가입 오류', logo = data['name'], data = '동일한 아이디의 유저가 있습니다.')
@@ -472,6 +493,12 @@ def register():
                 return '<meta http-equiv="refresh" content="0;url=/login" />'
     else:
         return render_template('index.html', title = '회원가입', enter = '회원가입', logo = data['name'], tn = 15)
+
+@app.route('/logout')
+def logout():
+    session['logFlag'] = False
+    session.pop('DREAMER', None)
+    return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(data['frontpage']) + '" />'
 
 @app.route('/grammar')
 def grammar():
