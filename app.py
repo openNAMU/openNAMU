@@ -505,10 +505,29 @@ def logout():
     session.pop('DREAMER', None)
     return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(data['frontpage']) + '" />'
 
-@app.route('/ban/<name>')
+@app.route('/ban/<name>', methods=['POST', 'GET'])
 def ban(name = None):
     if(request.method == 'POST'):
-        return render_template('index.html', title = '권한 오류', logo = data['name'], data = '비 로그인 상태 입니다.')
+        if(session.get('Now') == True):
+            ip = getip(request)
+            curs.execute("select * from user where id = '" + pymysql.escape_string(ip) + "'")
+            rows = curs.fetchall()
+            if(rows):
+                if(rows[0]['acl'] == 'owner' or 'admin'):
+                    curs.execute("select * from ban where block = '" + pymysql.escape_string(name) + "'")
+                    row = curs.fetchall()
+                    if(row):
+                        curs.execute("delete from ban where block = '" + pymysql.escape_string(name) + "'")
+                    else:
+                        curs.execute("insert into ban (block, end, why, band) value ('" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(request.form["end"]) + "', '" + pymysql.escape_string(request.form["why"]) + "', '')")
+                    conn.commit()
+                    return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(data['frontpage']) + '" />'
+                else:
+                    return render_template('index.html', title = '권한 오류', logo = data['name'], data = '권한이 모자랍니다.')
+            else:
+                return render_template('index.html', title = '권한 오류', logo = data['name'], data = '계정이 없습니다.')
+        else:
+            return render_template('index.html', title = '권한 오류', logo = data['name'], data = '비 로그인 상태 입니다.')
     else:
         if(session.get('Now') == True):
             ip = getip(request)
