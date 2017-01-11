@@ -280,6 +280,34 @@
 				<br>
 				<button class="btn btn-primary" type="submit">{{enter}}</button>
 			</form>
+			{% elif tn == 16 %}
+			<form id="usrform" method="POST" action="/ban/{{page}}">
+				<input class="form-control" name="end" style="width: 100%">
+				{% if now == '차단' %}
+				<br>
+				<br>
+				<span>아무것도 안 적으면 무기한 차단 입니다.</span>
+				<br>
+				<br>
+				<span>차단 일 지정시 형식은 YYYY-MM-DD로 기록 해야합니다.</span>
+				<br>
+				<br>
+				<input class="form-control" name="why" style="width: 100%">
+				<br>
+				<br>
+				<span>사유를 쓰는 곳 입니다.</span>
+				{% if allif == 1 %}
+				<br>
+				<br>
+				<input type="checkbox" name="band">
+					<span>대역 차단</span>
+				</input>
+				{% endif %}
+				<br>
+				<br>
+				{% endif %}
+				<button class="btn btn-primary" type="submit">{{now}}</button>
+			</form>
 			{% else %}
 			<h1 class="title">{{title}}</h1>
 			<h2 class="title"><span style="margin-left:5px"></span></h2>

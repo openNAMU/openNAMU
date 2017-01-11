@@ -460,7 +460,9 @@ def login():
         curs.execute("select * from user where id = '" + pymysql.escape_string(request.form["id"]) + "'")
         rows = curs.fetchall()
         if(rows):
-            if(bcrypt.checkpw(bytes(request.form["pw"], 'utf-8'), bytes(rows[0]['pw'], 'utf-8'))):
+            if(session.get('Now') == True):
+                return render_template('index.html', title = '로그인 오류', logo = data['name'], data = '이미 로그인 되어 있습니다.')
+            elif(bcrypt.checkpw(bytes(request.form["pw"], 'utf-8'), bytes(rows[0]['pw'], 'utf-8'))):
                 session['Now'] = True
                 session['DREAMER'] = request.form["id"]
                 return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(data['frontpage']) + '" />'
@@ -469,7 +471,10 @@ def login():
         else:
             return render_template('index.html', title = '로그인 오류', logo = data['name'], data = '없는 계정 입니다.')
     else:
-        return render_template('index.html', title = '로그인', enter = '로그인', logo = data['name'], tn = 15)
+        if(session.get('Now') == True):
+            return render_template('index.html', title = '로그인 오류', logo = data['name'], data = '이미 로그인 되어 있습니다.')
+        else:
+            return render_template('index.html', title = '로그인', enter = '로그인', logo = data['name'], tn = 15)
 
 @app.route('/register', methods=['POST', 'GET'])
 def register():
@@ -496,7 +501,7 @@ def register():
 
 @app.route('/logout')
 def logout():
-    session['logFlag'] = False
+    session['Now'] = False
     session.pop('DREAMER', None)
     return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(data['frontpage']) + '" />'
 
