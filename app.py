@@ -105,7 +105,10 @@ def recentchanges():
                 send = re.sub('&lt;a href="\/w\/(?P<in>[^"]*)"&gt;(?P<out>[^&]*)&lt;\/a&gt;', '<a href="/w/\g<in>">\g<out></a>', send)
             else:
                 send = '<br>'
-            div = div + '<table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;"><a href="/w/' + parse.quote(rows[i]['title']) + '">' + rows[i]['title'] + '</a> <a href="/history/' + parse.quote(rows[i]['title']) + '">(역사)</a> (' + rows[i]['leng'] + ')</td><td style="text-align: center;width:33.33%;">' + rows[i]['ip'] + '</td><td style="text-align: center;width:33.33%;">' + rows[i]['date'] + '</td></tr><tr><td colspan="3" style="text-align: center;width:100%;">' + send + '</td></tr></tbody></table>'
+            title = rows[i]['title']
+            title = re.sub('<', '&lt;', title)
+            title = re.sub('>', '&gt;', title)
+            div = div + '<table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;"><a href="/w/' + parse.quote(rows[i]['title']) + '">' + title + '</a> <a href="/history/' + parse.quote(rows[i]['title']) + '">(역사)</a> (' + rows[i]['leng'] + ')</td><td style="text-align: center;width:33.33%;">' + rows[i]['ip'] + '</td><td style="text-align: center;width:33.33%;">' + rows[i]['date'] + '</td></tr><tr><td colspan="3" style="text-align: center;width:100%;">' + send + '</td></tr></tbody></table>'
             i = i + 1
         return render_template('index.html', logo = data['name'], rows = div, tn = 3, title = '최근 변경내역')
     else:
@@ -124,7 +127,13 @@ def recentdiscuss():
             except:
                 div = div + '</div>'
                 break
-            div = div + '<table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;"><a href="/topic/' + parse.quote(rows[i]['title']) + '/sub/' + parse.quote(rows[i]['sub']) + '">' + rows[i]['title'] + '</a> (' + rows[i]['sub'] + ')</td><td style="text-align: center;width:33.33%;">' + rows[i]['ip'] + '</td><td style="text-align: center;width:33.33%;">' + rows[i]['date'] + '</td></tr></tbody></table>'
+            title = rows[i]['title']
+            title = re.sub('<', '&lt;', title)
+            title = re.sub('>', '&gt;', title)
+            sub = rows[i]['sub']
+            sub = re.sub('<', '&lt;', sub)
+            sub = re.sub('>', '&gt;', sub)
+            div = div + '<table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;"><a href="/topic/' + parse.quote(rows[i]['title']) + '/sub/' + parse.quote(rows[i]['sub']) + '">' + title + '</a> (' + sub + ')</td><td style="text-align: center;width:33.33%;">' + rows[i]['ip'] + '</td><td style="text-align: center;width:33.33%;">' + rows[i]['date'] + '</td></tr></tbody></table>'
             i = i + 1
         return render_template('index.html', logo = data['name'], rows = div, tn = 12, title = '최근 토론내역')
     else:
@@ -172,6 +181,22 @@ def w(name = None):
         return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = enddata, license = data['license'], tn = 1)
     else:
         return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = '<br>문서 없음', license = data['license'], tn = 1)
+
+@app.route('/w/<name>/redirect/<redirect>')
+def redirectw(name = None, redirect = None):
+    curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
+    rows = curs.fetchall()
+    if(rows):
+        enddata = namumark(rows[0]['data'])
+        test = redirect
+        redirect = re.sub('<', '&lt;', redirect)
+        redirect = re.sub('>', '&gt;', redirect)
+        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = enddata, license = data['license'], tn = 1, redirect = '<a href="/w/' + parse.quote(test) + '">' + redirect + '</a>에서 넘어 왔습니다.')
+    else:
+        test = redirect
+        redirect = re.sub('<', '&lt;', redirect)
+        redirect = re.sub('>', '&gt;', redirect)
+        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = '<br>문서 없음', license = data['license'], tn = 1, redirect = '<a href="/w/' + parse.quote(test) + '">' + redirect + '</a>에서 넘어 왔습니다.')
 
 @app.route('/w/<name>/r/<number>')
 def rew(name = None, number = None):

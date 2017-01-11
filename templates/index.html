@@ -58,6 +58,12 @@
 			</div>
 			<h1 class="titlee">{{title}}</h1>
 			<h2 class="titlee"><span style="margin-left:5px"></span></h2>
+			{% if redirect %}
+			{% autoescape false %}
+			<li>{{redirect}}</li>
+			<br>
+			{% endautoescape %}
+			{% endif %}
 			<div>
 				{% autoescape false %}
 				{{data}}
@@ -109,6 +115,7 @@
 				</nav>
 			</div>
 			<h1 class="title">{{title}}</h1>
+			<h2 class="titlee"><span style="margin-left:5px"></span>(역사)</h2>
 			<table style="width: 100%;">
 				<tbody>
 					<tr>
@@ -129,7 +136,7 @@
 				</nav>
 			</div>
 			<h1 class="titlee">{{title}}</h1>
-			<h2 class="titlee"><span style="margin-left:5px"></span>(old)</h2>
+			<h2 class="titlee"><span style="margin-left:5px"></span>(옛문서)</h2>
 			<div>
 				{% autoescape false %}
 				{{data}}
