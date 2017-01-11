@@ -260,6 +260,7 @@
 				<h2>1.1 (진행중)</h2>
 				<li>차단 구현</li>
 				<li>토론 목록 보강</li>
+				<li>ACL 기능 구현</li>
 				<h2>1.2</h2>
 				<li>대역 차단 구현</li>
 				<li>diff 구현</li>
@@ -324,6 +325,24 @@
 				{% endif %}
 				<button class="btn btn-primary" type="submit">{{now}}</button>
 			</form>
+			{% elif tn == 17 %}
+			<h1 class="title">{{title}}</h1>
+			<div>
+				<h2 style="margin-top: -5px;">기초 문법</h2>
+				<li>~~취소선~~ --취소선--</li>
+				<li>'''강조'''</li>
+				<li>''기울이기''</li>
+				<li>__언더 바__</li>
+				<li>^^윗 첨자^^</li>
+				<li>,,아랫 첨자,,</li>
+				<h2>문단 문법</h2>
+				<li>= 1단계 문단 =</li>
+				<li>== 2단계 문단 ==</li>
+				<li>=== 3단계 문단 ===</li>
+				<li>==== 4단계 문단 ====</li>
+				<li>===== 5단계 문단 =====</li>
+				<li>====== 6단계 문단 ======</li>
+			</div>
 			{% else %}
 			<h1 class="title">{{title}}</h1>
 			<h2 class="title"><span style="margin-left:5px"></span></h2>

@@ -551,7 +551,7 @@ def ban(name = None):
 
 @app.route('/grammar')
 def grammar():
-    return render_template('index.html', title = '문법 설명', logo = data['name'], data = '아직 없음')
+    return render_template('index.html', title = '문법 설명', logo = data['name'], tn = 17)
 
 @app.route('/version')
 def version():
