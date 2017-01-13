@@ -490,7 +490,7 @@ def register():
                 return render_template('index.html', title = '회원가입 오류', logo = data['name'], data = '동일한 아이디의 유저가 있습니다.')
             else:
                 hashed = bcrypt.hashpw(bytes(request.form["pw"], 'utf-8'), bcrypt.gensalt())
-                if(data['owner']):
+                if(request.form["id"] == data['owner']):
                     curs.execute("insert into user (id, pw, acl) value ('" + pymysql.escape_string(request.form["id"]) + "', '" + pymysql.escape_string(hashed.decode()) + "', 'owner')")
                 else:
                     curs.execute("insert into user (id, pw, acl) value ('" + pymysql.escape_string(request.form["id"]) + "', '" + pymysql.escape_string(hashed.decode()) + "', 'user')")
@@ -513,7 +513,7 @@ def ban(name = None):
             curs.execute("select * from user where id = '" + pymysql.escape_string(ip) + "'")
             rows = curs.fetchall()
             if(rows):
-                if(rows[0]['acl'] == 'owner' or 'admin'):
+                if(rows[0]['acl'] == 'owner' or rows[0]['acl'] == 'admin'):
                     curs.execute("select * from ban where block = '" + pymysql.escape_string(name) + "'")
                     row = curs.fetchall()
                     if(row):
@@ -534,14 +534,64 @@ def ban(name = None):
             curs.execute("select * from user where id = '" + pymysql.escape_string(ip) + "'")
             rows = curs.fetchall()
             if(rows):
-                if(rows[0]['acl'] == 'owner' or 'admin'):
+                if(rows[0]['acl'] == 'owner' or rows[0]['acl'] == 'admin'):
                     curs.execute("select * from ban where block = '" + pymysql.escape_string(name) + "'")
                     row = curs.fetchall()
                     if(row):
                         now = '차단 해제'
                     else:
                         now = '차단'
-                    return render_template('index.html', title = name, page = parse.quote(name), enter = '회원가입', logo = data['name'], tn = 16, now = now)
+                    return render_template('index.html', title = name, page = parse.quote(name), logo = data['name'], tn = 16, now = now)
+                else:
+                    return render_template('index.html', title = '권한 오류', logo = data['name'], data = '권한이 모자랍니다.')
+            else:
+                return render_template('index.html', title = '권한 오류', logo = data['name'], data = '계정이 없습니다.')
+        else:
+            return render_template('index.html', title = '권한 오류', logo = data['name'], data = '비 로그인 상태 입니다.')
+
+@app.route('/admin/<name>', methods=['POST', 'GET'])
+def admin(name = None):
+    if(request.method == 'POST'):
+        if(session.get('Now') == True):
+            ip = getip(request)
+            curs.execute("select * from user where id = '" + pymysql.escape_string(ip) + "'")
+            rows = curs.fetchall()
+            if(rows):
+                if(rows[0]['acl'] == 'owner' or rows[0]['acl'] == 'admin'):
+                    curs.execute("select * from user where id = '" + pymysql.escape_string(name) + "'")
+                    row = curs.fetchall()
+                    if(row):
+                        if(row[0]['acl'] == 'admin' or row[0]['acl'] == 'owner'):
+                            curs.execute("update user set acl = 'user' where id = '" + pymysql.escape_string(name) + "'")
+                        else:
+                            curs.execute("update user set acl = '" + pymysql.escape_string(request.form["select"]) + "' where id = '" + pymysql.escape_string(name) + "'")
+                        conn.commit()
+                        return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(data['frontpage']) + '" />'
+                    else:
+                        return render_template('index.html', title = '사용자 오류', logo = data['name'], data = '계정이 없습니다.')
+                else:
+                    return render_template('index.html', title = '권한 오류', logo = data['name'], data = '권한이 모자랍니다.')
+            else:
+                return render_template('index.html', title = '권한 오류', logo = data['name'], data = '계정이 없습니다.')
+        else:
+            return render_template('index.html', title = '권한 오류', logo = data['name'], data = '비 로그인 상태 입니다.')
+    else:
+        if(session.get('Now') == True):
+            ip = getip(request)
+            curs.execute("select * from user where id = '" + pymysql.escape_string(ip) + "'")
+            rows = curs.fetchall()
+            if(rows):
+                if(rows[0]['acl'] == 'owner'):
+                    curs.execute("select * from user where id = '" + pymysql.escape_string(name) + "'")
+                    row = curs.fetchall()
+                    if(row):
+                        if(row[0]['acl'] == 'admin' or row[0]['acl'] == 'owner'):
+                            now = '권한 해제'
+                        else:
+                            now = '권한 부여'
+                        return render_template('index.html', title = name, page = parse.quote(name), logo = data['name'], tn = 18, now = now)
+                    else:
+                        return render_template('index.html', title = '사용자 오류', logo = data['name'], data = '계정이 없습니다.')
                 else:
                     return render_template('index.html', title = '권한 오류', logo = data['name'], data = '권한이 모자랍니다.')
             else:

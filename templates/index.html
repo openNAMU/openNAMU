@@ -261,10 +261,13 @@
 				<li>차단 구현</li>
 				<li>토론 목록 보강</li>
 				<li>ACL 기능 구현</li>
+				<li>어드민 부여 구현 (완료)</li>
 				<h2>1.2</h2>
 				<li>대역 차단 구현</li>
 				<li>diff 구현</li>
 				<li>기초 파서 제작</li>
+				<h2>계속</h2>
+				<li>버그 수정</li>
 				<br>
 				<h2>파이나무 라이선스</h2>
 				<li>미정</li>
@@ -272,7 +275,7 @@
 				<li>인용문 아이콘 <a href="http://www.flaticon.com/free-icon/quote-left_25672">Dave Gandy</a> CC 3.0 BY</li>
 				<br>
 				<h2>기타</h2>
-				<li>현재 버전 1.1.1a - Beta</li>
+				<li>현재 버전 1.1.2 - Beta</li>
 			</div>
 			{% elif tn == 15 %}
 			<h1 class="title">{{title}}</h1>
@@ -343,6 +346,20 @@
 				<li>===== 5단계 문단 =====</li>
 				<li>====== 6단계 문단 ======</li>
 			</div>
+			{% elif tn == 18 %}
+			<h1 class="title">{{title}}</h1>
+			<h2 class="title"><span style="margin-left:5px"></span>(권한 부여)</h2>
+			<form id="usrform" method="POST" action="/admin/{{page}}">
+				{% if now == '권한 부여' %}
+				<select name="select">
+					<option value="admin" selected="selected">관리자</option>
+					<option value="ownet">소유자</option>
+				</select>
+				<br>
+				<br>
+				{% endif %}
+				<button class="btn btn-primary" type="submit">{{now}}</button>
+			</form>
 			{% else %}
 			<h1 class="title">{{title}}</h1>
 			<h2 class="title"><span style="margin-left:5px"></span></h2>
