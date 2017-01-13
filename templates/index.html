@@ -192,6 +192,12 @@
 			{% elif tn == 10 %}
 			<h1 class="title">{{title}}</h1>
 			<h2 class="title"><span style="margin-left:5px"></span>(토론 목록)</h2>
+			<div id="tool">
+				<nav class="menu">
+					<a class="menu-item selected" href="#" onclick="return false">토론 목록</a>
+					<a class="menu-item" href="/w/{{page}}">문서</a>
+				</nav>
+			</div>
 			<form id="usrform" method="POST" action="/topic/{{page}}">
 				{% autoescape false %}
 				{{plus}}
@@ -205,6 +211,12 @@
 			{% elif tn == 11 %}
 			<h1 class="titlee">{{title}}</h1>
 			<h2 class="titlee"><span style="margin-left:5px"></span>(토론)</h2>
+			<div id="tool">
+				<nav class="menu">
+					<a class="menu-item selected" href="#" onclick="return false">토론</a>
+					<a class="menu-item" href="/topic/{{page}}">토론 목록</a>
+				</nav>
+			</div>
 			<h2>{{sub}}</h2>
 			<br>
 			{% autoescape false %}
