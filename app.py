@@ -37,6 +37,29 @@ def namumark(data):
     data = re.sub('\^\^(?P<in>.+?)\^\^(?!\^)', '<sup>\g<in></sup>', data)
     data = re.sub(',,(?P<in>.+?),,(?!,)', '<sub>\g<in></sub>', data)
 
+    while True:
+        m = re.search("\[\[(((?!\]\]).)*)\]\]", data)
+        if(m):
+            result = m.groups()
+            a = re.search("(((?!\|).)*)\|(.*)", result[0])
+            if(a):
+                results = a.groups()
+                curs.execute("select * from data where title = '" + pymysql.escape_string(results[0]) + "'")
+                rows = curs.fetchall()
+                if(rows):
+                    data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a href="' + results[0] + '">' + results[2] + '</a>', data, 1)
+                else:
+                    data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a class="not_thing" href="' + results[0] + '">' + results[2] + '</a>', data, 1)
+            else:
+                curs.execute("select * from data where title = '" + pymysql.escape_string(result[0]) + "'")
+                rows = curs.fetchall()
+                if(rows):
+                    data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a href="' + result[0] + '">' + result[0] + '</a>', data, 1)
+                else:
+                    data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a class="not_thing" href="' + result[0] + '">' + result[0] + '</a>', data, 1)
+        else:
+            break
+
     data = re.sub('\n', '<br>', data)
     return data
 
@@ -480,7 +503,7 @@ def login():
 def register():
     if(request.method == 'POST'):
         p = re.compile('(?:[^A-Za-zㄱ-힣0-9 ])')
-        m = p.match(request.form["id"])
+        m = p.search(request.form["id"])
         if(m):
             return render_template('index.html', title = '회원가입 오류', logo = data['name'], data = '아이디에는 한글과 알파벳 공백만 허용 됩니다.')
         else:
