@@ -222,6 +222,8 @@
 			{% autoescape false %}
 			{{rows}}
 			{% endautoescape %}
+			{% if ban == 1 %}
+			{% else %}
 			<form id="usrform" method="POST" action="/topic/{{page}}/sub/{{suburl}}">
 				<br>
 				<textarea rows="10" cols="100" name="content" form="usrform"></textarea>
@@ -229,6 +231,7 @@
 				<br>
 				<button class="btn btn-primary" type="submit">전송</button>
 			</form>
+			{% endif %}
 			{% elif tn == 12 %}
 			<h1 class="title">{{title}}</h1>
 			<table style="width: 100%;">

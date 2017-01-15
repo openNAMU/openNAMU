@@ -73,6 +73,43 @@ def getip(request):
             ip = request.remote_addr
     return ip
 
+def getcan(ip, name):
+    curs.execute("select * from ban where block = '" + pymysql.escape_string(ip) + "'")
+    rows = curs.fetchall()
+    if(rows):
+        return 1
+    else:
+        curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
+        row = curs.fetchall()
+        if(row):
+            curs.execute("select * from user where id = '" + pymysql.escape_string(ip) + "'")
+            rows = curs.fetchall()
+            if(row[0]['acl'] == 'user'):
+                if(rows):
+                    return 0
+                else:
+                    return 1
+            elif(row[0]['acl'] == 'admin'):
+                if(rows):
+                    if(rows[0]['acl'] == 'admin' or rows[0]['acl'] == 'owner'):
+                        return 0
+                    else:
+                        return 1
+                else:
+                    return 1
+            else:
+                return 0
+        else:
+            return 0
+
+def getban(ip):
+    curs.execute("select * from ban where block = '" + pymysql.escape_string(ip) + "'")
+    rows = curs.fetchall()
+    if(rows):
+        return 1
+    else:
+        return 0
+
 def getnow():
     now = time.localtime()
     s = "%04d-%02d-%02d %02d:%02d:%02d" % (now.tm_year, now.tm_mon, now.tm_mday, now.tm_hour, now.tm_min, now.tm_sec)
@@ -263,29 +300,38 @@ def revert(name = None, number = None):
         rows = curs.fetchall()
         if(rows):
             ip = getip(request)
-            today = getnow()
-            curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
-            row = curs.fetchall()
-            if(row):
-                leng = getleng(len(row[0]['data']), len(rows[0]['data']))
-                curs.execute("update data set data = '" + pymysql.escape_string(rows[0]['data']) + "' where title = '" + pymysql.escape_string(name) + "'")
-                conn.commit()
+            can = getcan(ip, name)
+            if(can == 1):
+                return '<meta http-equiv="refresh" content="0;url=/ban" />'
             else:
-                leng = '+' + str(len(rows[0]['data']))
-                curs.execute("insert into data (title, data, acl) value ('" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(rows[0]['data']) + "', '')")
-                conn.commit()
-            recent(name, ip, today, '문서를 ' + number + '판으로 되돌렸습니다.', leng)
-            history(name, rows[0]['data'], today, ip, '문서를 ' + number + '판으로 되돌렸습니다.', leng)
-            return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name) + '" />'
+                today = getnow()
+                curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
+                row = curs.fetchall()
+                if(row):
+                    leng = getleng(len(row[0]['data']), len(rows[0]['data']))
+                    curs.execute("update data set data = '" + pymysql.escape_string(rows[0]['data']) + "' where title = '" + pymysql.escape_string(name) + "'")
+                    conn.commit()
+                else:
+                    leng = '+' + str(len(rows[0]['data']))
+                    curs.execute("insert into data (title, data, acl) value ('" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(rows[0]['data']) + "', '')")
+                    conn.commit()
+                recent(name, ip, today, '문서를 ' + number + '판으로 되돌렸습니다.', leng)
+                history(name, rows[0]['data'], today, ip, '문서를 ' + number + '판으로 되돌렸습니다.', leng)
+                return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name) + '" />'
         else:
             return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name) + '" />'
     else:
-        curs.execute("select * from history where title = '" + pymysql.escape_string(name) + "' and id = '" + number + "'")
-        rows = curs.fetchall()
-        if(rows):
-            return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), r = parse.quote(number), tn = 13, plus = '정말 되돌리시겠습니까?')
+        ip = getip(request)
+        can = getcan(ip, name)
+        if(can == 1):
+            return '<meta http-equiv="refresh" content="0;url=/ban" />'
         else:
-            return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name) + '" />'
+            curs.execute("select * from history where title = '" + pymysql.escape_string(name) + "' and id = '" + number + "'")
+            rows = curs.fetchall()
+            if(rows):
+                return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), r = parse.quote(number), tn = 13, plus = '정말 되돌리시겠습니까?')
+            else:
+                return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name) + '" />'
 
 @app.route('/edit/<name>', methods=['POST', 'GET'])
 def edit(name = None):
@@ -294,28 +340,41 @@ def edit(name = None):
         rows = curs.fetchall()
         if(rows):
             ip = getip(request)
-            today = getnow()
-            leng = getleng(len(rows[0]['data']), len(request.form["content"]))
-            recent(name, ip, today, request.form["send"], leng)
-            history(name, request.form["content"], today, ip, request.form["send"], leng)
-            curs.execute("update data set data = '" + pymysql.escape_string(request.form["content"]) + "' where title = '" + pymysql.escape_string(name) + "'")
-            conn.commit()
+            can = getcan(ip, name)
+            if(can == 1):
+                return '<meta http-equiv="refresh" content="0;url=/ban" />'
+            else:
+                today = getnow()
+                leng = getleng(len(rows[0]['data']), len(request.form["content"]))
+                recent(name, ip, today, request.form["send"], leng)
+                history(name, request.form["content"], today, ip, request.form["send"], leng)
+                curs.execute("update data set data = '" + pymysql.escape_string(request.form["content"]) + "' where title = '" + pymysql.escape_string(name) + "'")
+                conn.commit()
         else:
             ip = getip(request)
-            today = getnow()
-            leng = '+' + str(len(request.form["content"]))
-            recent(name, ip, today, request.form["send"], leng)
-            history(name, request.form["content"], today, ip, request.form["send"], leng)
-            curs.execute("insert into data (title, data, acl) value ('" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(request.form["content"]) + "', '')")
-            conn.commit()
+            can = getcan(ip, name)
+            if(can == 1):
+                return '<meta http-equiv="refresh" content="0;url=/ban" />'
+            else:
+                today = getnow()
+                leng = '+' + str(len(request.form["content"]))
+                recent(name, ip, today, request.form["send"], leng)
+                history(name, request.form["content"], today, ip, request.form["send"], leng)
+                curs.execute("insert into data (title, data, acl) value ('" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(request.form["content"]) + "', '')")
+                conn.commit()
         return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name) + '" />'
     else:
-        curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
-        rows = curs.fetchall()
-        if(rows):
-            return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = rows[0]['data'], tn = 2)
+        ip = getip(request)
+        can = getcan(ip, name)
+        if(can == 1):
+            return '<meta http-equiv="refresh" content="0;url=/ban" />'
         else:
-            return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = '', tn = 2)
+            curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
+            rows = curs.fetchall()
+            if(rows):
+                return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = rows[0]['data'], tn = 2)
+            else:
+                return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = '', tn = 2)
 
 @app.route('/delete/<name>', methods=['POST', 'GET'])
 def delete(name = None):
@@ -324,20 +383,29 @@ def delete(name = None):
         rows = curs.fetchall()
         if(rows):
             ip = getip(request)
-            today = getnow()
-            leng = '-' + str(len(rows[0]['data']))
-            recent(name, ip, today, '문서를 삭제 했습니다.', leng)
-            history(name, '', today, ip, '문서를 삭제 했습니다.', leng)
-            curs.execute("delete from data where title = '" + pymysql.escape_string(name) + "'")
-            conn.commit()
-            return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name) + '" />'
+            can = getcan(ip, name)
+            if(can == 1):
+                return '<meta http-equiv="refresh" content="0;url=/ban" />'
+            else:
+                today = getnow()
+                leng = '-' + str(len(rows[0]['data']))
+                recent(name, ip, today, '문서를 삭제 했습니다.', leng)
+                history(name, '', today, ip, '문서를 삭제 했습니다.', leng)
+                curs.execute("delete from data where title = '" + pymysql.escape_string(name) + "'")
+                conn.commit()
+                return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name) + '" />'
         else:
             return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name) + '" />'
     else:
         curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
         rows = curs.fetchall()
         if(rows):
-            return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), tn = 8, plus = '정말 삭제 하시겠습니까?')
+            ip = getip(request)
+            can = getcan(ip, name)
+            if(can == 1):
+                return '<meta http-equiv="refresh" content="0;url=/ban" />'
+            else:
+                return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), tn = 8, plus = '정말 삭제 하시겠습니까?')
         else:
             return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name) + '" />'
 
@@ -348,35 +416,48 @@ def move(name = None):
         rows = curs.fetchall()
         if(rows):
             ip = getip(request)
-            today = getnow()
-            leng = '0'
-            curs.execute("select * from history where title = '" + pymysql.escape_string(request.form["title"]) + "'")
-            row = curs.fetchall()
-            if(row):
-                 return render_template('index.html', title = '이동 오류', logo = data['name'], data = '이동 하려는 곳에 문서가 이미 있습니다.')
+            can = getcan(ip, name)
+            if(can == 1):
+                return '<meta http-equiv="refresh" content="0;url=/ban" />'
             else:
-                recent(name, ip, today, '문서를 <a href="/w/' + pymysql.escape_string(parse.quote(request.form["title"])) + '">' + pymysql.escape_string(request.form["title"]) + '</a> 문서로 이동 했습니다.', leng)
-                history(name, rows[0]['data'], today, ip, '<a href="/w/' + pymysql.escape_string(parse.quote(name)) + '">' + pymysql.escape_string(name) + '</a> 문서를 <a href="/w/' + pymysql.escape_string(parse.quote(request.form["title"])) + '">' + pymysql.escape_string(request.form["title"]) + '</a> 문서로 이동 했습니다.', leng)
-                curs.execute("update data set title = '" + pymysql.escape_string(request.form["title"]) + "' where title = '" + pymysql.escape_string(name) + "'")
-                curs.execute("update history set title = '" + pymysql.escape_string(request.form["title"]) + "' where title = '" + pymysql.escape_string(name) + "'")
-                conn.commit()
-                return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(request.form["title"]) + '" />'
+                today = getnow()
+                leng = '0'
+                curs.execute("select * from history where title = '" + pymysql.escape_string(request.form["title"]) + "'")
+                row = curs.fetchall()
+                if(row):
+                     return render_template('index.html', title = '이동 오류', logo = data['name'], data = '이동 하려는 곳에 문서가 이미 있습니다.')
+                else:
+                    recent(name, ip, today, '문서를 <a href="/w/' + pymysql.escape_string(parse.quote(request.form["title"])) + '">' + pymysql.escape_string(request.form["title"]) + '</a> 문서로 이동 했습니다.', leng)
+                    history(name, rows[0]['data'], today, ip, '<a href="/w/' + pymysql.escape_string(parse.quote(name)) + '">' + pymysql.escape_string(name) + '</a> 문서를 <a href="/w/' + pymysql.escape_string(parse.quote(request.form["title"])) + '">' + pymysql.escape_string(request.form["title"]) + '</a> 문서로 이동 했습니다.', leng)
+                    curs.execute("update data set title = '" + pymysql.escape_string(request.form["title"]) + "' where title = '" + pymysql.escape_string(name) + "'")
+                    curs.execute("update history set title = '" + pymysql.escape_string(request.form["title"]) + "' where title = '" + pymysql.escape_string(name) + "'")
+                    conn.commit()
+                    return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(request.form["title"]) + '" />'
         else:
             ip = getip(request)
-            today = getnow()
-            leng = '0'
-            curs.execute("select * from history where title = '" + pymysql.escape_string(request.form["title"]) + "'")
-            row = curs.fetchall()
-            if(row):
-                 return render_template('index.html', title = '이동 오류', logo = data['name'], data = '이동 하려는 곳에 문서가 이미 있습니다.')
+            can = getcan(ip, name)
+            if(can == 1):
+                return '<meta http-equiv="refresh" content="0;url=/ban" />'
             else:
-                recent(name, ip, today, '문서를 <a href="/w/' + pymysql.escape_string(parse.quote(request.form["title"])) + '">' + pymysql.escape_string(request.form["title"]) + '</a> 문서로 이동 했습니다.', leng)
-                history(name, rows[0]['data'], today, ip, '<a href="/w/' + pymysql.escape_string(parse.quote(name)) + '">' + pymysql.escape_string(name) + '</a> 문서를 <a href="/w/' + pymysql.escape_string(parse.quote(request.form["title"])) + '">' + pymysql.escape_string(request.form["title"]) + '</a> 문서로 이동 했습니다.', leng)
-                curs.execute("update history set title = '" + pymysql.escape_string(request.form["title"]) + "' where title = '" + pymysql.escape_string(name) + "'")
-                conn.commit()
-                return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(request.form["title"]) + '" />'
+                today = getnow()
+                leng = '0'
+                curs.execute("select * from history where title = '" + pymysql.escape_string(request.form["title"]) + "'")
+                row = curs.fetchall()
+                if(row):
+                     return render_template('index.html', title = '이동 오류', logo = data['name'], data = '이동 하려는 곳에 문서가 이미 있습니다.')
+                else:
+                    recent(name, ip, today, '문서를 <a href="/w/' + pymysql.escape_string(parse.quote(request.form["title"])) + '">' + pymysql.escape_string(request.form["title"]) + '</a> 문서로 이동 했습니다.', leng)
+                    history(name, rows[0]['data'], today, ip, '<a href="/w/' + pymysql.escape_string(parse.quote(name)) + '">' + pymysql.escape_string(name) + '</a> 문서를 <a href="/w/' + pymysql.escape_string(parse.quote(request.form["title"])) + '">' + pymysql.escape_string(request.form["title"]) + '</a> 문서로 이동 했습니다.', leng)
+                    curs.execute("update history set title = '" + pymysql.escape_string(request.form["title"]) + "' where title = '" + pymysql.escape_string(name) + "'")
+                    conn.commit()
+                    return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(request.form["title"]) + '" />'
     else:
-        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), tn = 9, plus = '정말 이동 하시겠습니까?')
+        ip = getip(request)
+        can = getcan(ip, name)
+        if(can == 1):
+            return '<meta http-equiv="refresh" content="0;url=/ban" />'
+        else:
+            return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), tn = 9, plus = '정말 이동 하시겠습니까?')
 
 @app.route('/setup')
 def setup():
@@ -447,12 +528,18 @@ def sub(name = None, sub = None):
         else:
             number = 1
         ip = getip(request)
-        today = getnow()
-        discuss(name, sub, ip, today)
-        curs.execute("insert into topic (id, title, sub, data, date, ip, block) value ('" + str(number) + "', '" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(sub) + "', '" + pymysql.escape_string(request.form["content"]) + "', '" + today + "', '" + ip + "', '')")
-        conn.commit()
-        return '<meta http-equiv="refresh" content="0;url=/topic/' + parse.quote(name) + '/sub/' + parse.quote(sub) + '" />'
+        ban = getban(ip)
+        if(ban == 1):
+            return '<meta http-equiv="refresh" content="0;url=/ban" />'
+        else:
+            today = getnow()
+            discuss(name, sub, ip, today)
+            curs.execute("insert into topic (id, title, sub, data, date, ip, block) value ('" + str(number) + "', '" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(sub) + "', '" + pymysql.escape_string(request.form["content"]) + "', '" + today + "', '" + ip + "', '')")
+            conn.commit()
+            return '<meta http-equiv="refresh" content="0;url=/topic/' + parse.quote(name) + '/sub/' + parse.quote(sub) + '" />'
     else:
+        ip = getip(request)
+        ban = getban(ip)
         div = '<div>'
         i = 0
         curs.execute("select * from topic where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' order by id+0 asc")
@@ -475,52 +562,72 @@ def sub(name = None, sub = None):
                 j = i + 1
                 div = div + '<table id="toron"><tbody><tr><td id="toroncolor"><a href="javascript:void(0);" id="' + str(j) + '">#' + str(j) + '</a> ' + rows[i]['ip'] + ' <span style="float:right;">' + rows[i]['date'] + '</span></td></tr><tr><td>' + indata + '</td></tr></tbody></table><br>'
             i = i + 1
-        return render_template('index.html', title = name, page = parse.quote(name), suburl = parse.quote(sub), sub = sub, logo = data['name'], rows = div, tn = 11)
+        return render_template('index.html', title = name, page = parse.quote(name), suburl = parse.quote(sub), sub = sub, logo = data['name'], rows = div, tn = 11, ban = ban)
 
 @app.route('/login', methods=['POST', 'GET'])
 def login():
     if(request.method == 'POST'):
-        curs.execute("select * from user where id = '" + pymysql.escape_string(request.form["id"]) + "'")
-        rows = curs.fetchall()
-        if(rows):
-            if(session.get('Now') == True):
-                return render_template('index.html', title = '로그인 오류', logo = data['name'], data = '이미 로그인 되어 있습니다.')
-            elif(bcrypt.checkpw(bytes(request.form["pw"], 'utf-8'), bytes(rows[0]['pw'], 'utf-8'))):
-                session['Now'] = True
-                session['DREAMER'] = request.form["id"]
-                return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(data['frontpage']) + '" />'
-            else:
-                return render_template('index.html', title = '로그인 오류', logo = data['name'], data = '비밀번호가 다릅니다.')
-        else:
-            return render_template('index.html', title = '로그인 오류', logo = data['name'], data = '없는 계정 입니다.')
-    else:
-        if(session.get('Now') == True):
-            return render_template('index.html', title = '로그인 오류', logo = data['name'], data = '이미 로그인 되어 있습니다.')
-        else:
-            return render_template('index.html', title = '로그인', enter = '로그인', logo = data['name'], tn = 15)
-
-@app.route('/register', methods=['POST', 'GET'])
-def register():
-    if(request.method == 'POST'):
-        p = re.compile('(?:[^A-Za-zㄱ-힣0-9 ])')
-        m = p.search(request.form["id"])
-        if(m):
-            return render_template('index.html', title = '회원가입 오류', logo = data['name'], data = '아이디에는 한글과 알파벳 공백만 허용 됩니다.')
+        ip = getip(request)
+        ban = getban(ip)
+        if(ban == 1):
+            return '<meta http-equiv="refresh" content="0;url=/ban" />'
         else:
             curs.execute("select * from user where id = '" + pymysql.escape_string(request.form["id"]) + "'")
             rows = curs.fetchall()
             if(rows):
-                return render_template('index.html', title = '회원가입 오류', logo = data['name'], data = '동일한 아이디의 유저가 있습니다.')
-            else:
-                hashed = bcrypt.hashpw(bytes(request.form["pw"], 'utf-8'), bcrypt.gensalt())
-                if(request.form["id"] == data['owner']):
-                    curs.execute("insert into user (id, pw, acl) value ('" + pymysql.escape_string(request.form["id"]) + "', '" + pymysql.escape_string(hashed.decode()) + "', 'owner')")
+                if(session.get('Now') == True):
+                    return render_template('index.html', title = '로그인 오류', logo = data['name'], data = '이미 로그인 되어 있습니다.')
+                elif(bcrypt.checkpw(bytes(request.form["pw"], 'utf-8'), bytes(rows[0]['pw'], 'utf-8'))):
+                    session['Now'] = True
+                    session['DREAMER'] = request.form["id"]
+                    return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(data['frontpage']) + '" />'
                 else:
-                    curs.execute("insert into user (id, pw, acl) value ('" + pymysql.escape_string(request.form["id"]) + "', '" + pymysql.escape_string(hashed.decode()) + "', 'user')")
-                conn.commit()
-                return '<meta http-equiv="refresh" content="0;url=/login" />'
+                    return render_template('index.html', title = '로그인 오류', logo = data['name'], data = '비밀번호가 다릅니다.')
+            else:
+                return render_template('index.html', title = '로그인 오류', logo = data['name'], data = '없는 계정 입니다.')
     else:
-        return render_template('index.html', title = '회원가입', enter = '회원가입', logo = data['name'], tn = 15)
+        ip = getip(request)
+        ban = getban(ip)
+        if(ban == 1):
+            return '<meta http-equiv="refresh" content="0;url=/ban" />'
+        else:
+            if(session.get('Now') == True):
+                return render_template('index.html', title = '로그인 오류', logo = data['name'], data = '이미 로그인 되어 있습니다.')
+            else:
+                return render_template('index.html', title = '로그인', enter = '로그인', logo = data['name'], tn = 15)
+
+@app.route('/register', methods=['POST', 'GET'])
+def register():
+    if(request.method == 'POST'):
+        ip = getip(request)
+        ban = getban(ip)
+        if(ban == 1):
+            return '<meta http-equiv="refresh" content="0;url=/ban" />'
+        else:
+            p = re.compile('(?:[^A-Za-zㄱ-힣0-9 ])')
+            m = p.search(request.form["id"])
+            if(m):
+                return render_template('index.html', title = '회원가입 오류', logo = data['name'], data = '아이디에는 한글과 알파벳 공백만 허용 됩니다.')
+            else:
+                curs.execute("select * from user where id = '" + pymysql.escape_string(request.form["id"]) + "'")
+                rows = curs.fetchall()
+                if(rows):
+                    return render_template('index.html', title = '회원가입 오류', logo = data['name'], data = '동일한 아이디의 유저가 있습니다.')
+                else:
+                    hashed = bcrypt.hashpw(bytes(request.form["pw"], 'utf-8'), bcrypt.gensalt())
+                    if(request.form["id"] == data['owner']):
+                        curs.execute("insert into user (id, pw, acl) value ('" + pymysql.escape_string(request.form["id"]) + "', '" + pymysql.escape_string(hashed.decode()) + "', 'owner')")
+                    else:
+                        curs.execute("insert into user (id, pw, acl) value ('" + pymysql.escape_string(request.form["id"]) + "', '" + pymysql.escape_string(hashed.decode()) + "', 'user')")
+                    conn.commit()
+                    return '<meta http-equiv="refresh" content="0;url=/login" />'
+    else:
+        ip = getip(request)
+        ban = getban(ip)
+        if(ban == 1):
+            return '<meta http-equiv="refresh" content="0;url=/ban" />'
+        else:
+            return render_template('index.html', title = '회원가입', enter = '회원가입', logo = data['name'], tn = 15)
 
 @app.route('/logout')
 def logout():
@@ -625,6 +732,10 @@ def admin(name = None):
 @app.route('/grammar')
 def grammar():
     return render_template('index.html', title = '문법 설명', logo = data['name'], tn = 17)
+
+@app.route('/ban')
+def aban():
+   return render_template('index.html', title = '권한 오류', logo = data['name'], data = '현재 차단 상태거나 ACL이 맞지 않습니다.')
 
 @app.route('/version')
 def version():
