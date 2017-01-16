@@ -242,8 +242,14 @@ def w(name = None):
     curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
     rows = curs.fetchall()
     if(rows):
+        if(rows[0]['acl'] == 'admin'):
+            acl = '(관리자)'
+        elif(rows[0]['acl'] == 'user'):
+            acl = '(유저)'
+        else:
+            acl = ''
         enddata = namumark(rows[0]['data'])
-        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = enddata, license = data['license'], tn = 1)
+        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = enddata, license = data['license'], tn = 1, acl = acl)
     else:
         return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = '<br>문서 없음', license = data['license'], tn = 1)
 
@@ -672,6 +678,58 @@ def ban(name = None):
                     else:
                         now = '차단'
                     return render_template('index.html', title = name, page = parse.quote(name), logo = data['name'], tn = 16, now = now)
+                else:
+                    return render_template('index.html', title = '권한 오류', logo = data['name'], data = '권한이 모자랍니다.')
+            else:
+                return render_template('index.html', title = '권한 오류', logo = data['name'], data = '계정이 없습니다.')
+        else:
+            return render_template('index.html', title = '권한 오류', logo = data['name'], data = '비 로그인 상태 입니다.')
+
+@app.route('/acl/<name>', methods=['POST', 'GET'])
+def acl(name = None):
+    if(request.method == 'POST'):
+        if(session.get('Now') == True):
+            ip = getip(request)
+            curs.execute("select * from user where id = '" + pymysql.escape_string(ip) + "'")
+            rows = curs.fetchall()
+            if(rows):
+                if(rows[0]['acl'] == 'owner' or rows[0]['acl'] == 'admin'):
+                    curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
+                    row = curs.fetchall()
+                    if(row):
+                        if(request.form["select"] == 'admin'):
+                           curs.execute("update data set acl = 'admin' where title = '" + pymysql.escape_string(name) + "'")
+                        elif(request.form["select"] == 'user'):
+                            curs.execute("update data set acl = 'user' where title = '" + pymysql.escape_string(name) + "'")
+                        else:
+                            curs.execute("update data set acl = '' where title = '" + pymysql.escape_string(name) + "'")
+                        conn.commit()
+                    return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name) + '" />' 
+                else:
+                    return render_template('index.html', title = '권한 오류', logo = data['name'], data = '권한이 모자랍니다.')
+            else:
+                return render_template('index.html', title = '권한 오류', logo = data['name'], data = '계정이 없습니다.')
+        else:
+            return render_template('index.html', title = '권한 오류', logo = data['name'], data = '비 로그인 상태 입니다.')
+    else:
+        if(session.get('Now') == True):
+            ip = getip(request)
+            curs.execute("select * from user where id = '" + pymysql.escape_string(ip) + "'")
+            rows = curs.fetchall()
+            if(rows):
+                if(rows[0]['acl'] == 'owner' or rows[0]['acl'] == 'admin'):
+                    curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
+                    row = curs.fetchall()
+                    if(row):
+                        if(row[0]['acl'] == 'admin'):
+                            now = '관리자만'
+                        elif(row[0]['acl'] == 'user'):
+                            now = '유저 이상'
+                        else:
+                            now = '일반'
+                        return render_template('index.html', title = name, page = parse.quote(name), logo = data['name'], tn = 19, now = '현재 ACL 상태는 ' + now)
+                    else:
+                        return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name) + '" />' 
                 else:
                     return render_template('index.html', title = '권한 오류', logo = data['name'], data = '권한이 모자랍니다.')
             else:

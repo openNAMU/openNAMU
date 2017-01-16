@@ -57,7 +57,7 @@
 				</nav>
 			</div>
 			<h1 class="titlee">{{title}}</h1>
-			<h2 class="titlee"><span style="margin-left:5px"></span></h2>
+			<h2 class="titlee"><span style="margin-left:5px">{{acl}}</span></h2>
 			{% if redirect %}
 			{% autoescape false %}
 			<li>{{redirect}}</li>
@@ -374,6 +374,20 @@
 				<br>
 				{% endif %}
 				<button class="btn btn-primary" type="submit">{{now}}</button>
+			</form>
+			{% elif tn == 19 %}
+			<h1 class="title">{{title}}</h1>
+			<h2 class="title"><span style="margin-left:5px"></span>(ACL)</h2>
+			<p>{{now}}</p>
+			<form id="usrform" method="POST" action="/acl/{{page}}">
+				<select name="select">
+					<option value="admin" selected="selected">관리자만</option>
+					<option value="user">유저 이상</option>
+					<option value="normal">일반</option>
+				</select>
+				<br>
+				<br>
+				<button class="btn btn-primary" type="submit">ACL 변경</button>
 			</form>
 			{% else %}
 			<h1 class="title">{{title}}</h1>
