@@ -561,14 +561,44 @@ def sub(name = None, sub = None):
             indata = rows[i]['data']
             indata = re.sub('<', '&lt;', indata)
             indata = re.sub('>', '&gt;', indata)
+            if(rows[i]['block'] == 'O'):
+                indata = '블라인드 되었습니다.'
+                block = 'style="background: gainsboro;"'
+            else:
+                block = ''
             if(rows[i]['ip'] == start):
                 j = i + 1
-                div = div + '<table id="toron"><tbody><tr><td id="toroncolorgreen"><a href="javascript:void(0);" id="' + str(j) + '">#' + str(j) + '</a> ' + rows[i]['ip'] + ' <span style="float:right;">' + rows[i]['date'] + '</span></td></tr><tr><td>' + indata + '</td></tr></tbody></table><br>'
+                div = div + '<table id="toron"><tbody><tr><td id="toroncolorgreen"><a href="javascript:void(0);" id="' + str(j) + '">#' + str(j) + '</a> ' + rows[i]['ip'] + ' <span style="float:right;">' + rows[i]['date'] + '</span></td></tr><tr><td ' + block + '>' + indata + '</td></tr></tbody></table><br>'
             else:
                 j = i + 1
-                div = div + '<table id="toron"><tbody><tr><td id="toroncolor"><a href="javascript:void(0);" id="' + str(j) + '">#' + str(j) + '</a> ' + rows[i]['ip'] + ' <span style="float:right;">' + rows[i]['date'] + '</span></td></tr><tr><td>' + indata + '</td></tr></tbody></table><br>'
+                div = div + '<table id="toron"><tbody><tr><td id="toroncolor"><a href="javascript:void(0);" id="' + str(j) + '">#' + str(j) + '</a> ' + rows[i]['ip'] + ' <span style="float:right;">' + rows[i]['date'] + '</span></td></tr><tr><td ' + block + '>' + indata + '</td></tr></tbody></table><br>'
             i = i + 1
         return render_template('index.html', title = name, page = parse.quote(name), suburl = parse.quote(sub), sub = sub, logo = data['name'], rows = div, tn = 11, ban = ban)
+
+@app.route('/topic/<name>/sub/<sub>/b/<number>')
+def blind(name = None, sub = None, number = None):
+    if(session.get('Now') == True):
+        ip = getip(request)
+        curs.execute("select * from user where id = '" + pymysql.escape_string(ip) + "'")
+        rows = curs.fetchall()
+        if(rows):
+            if(rows[0]['acl'] == 'owner' or rows[0]['acl'] == 'admin'):
+                curs.execute("select * from topic where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' and id = '" + number + "'")
+                row = curs.fetchall()
+                if(row):
+                    if(row[0]['block'] == 'O'):
+                        curs.execute("update topic set block = '' where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' and id = '" + number + "'")
+                    else:
+                        curs.execute("update topic set block = 'O' where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' and id = '" + number + "'")
+                    return '<meta http-equiv="refresh" content="0;url=/topic/' + name + '/sub/' + sub + '" />'
+                else:
+                    return '<meta http-equiv="refresh" content="0;url=/topic/' + name + '/sub/' + sub + '" />'
+            else:
+                return render_template('index.html', title = '권한 오류', logo = data['name'], data = '권한이 모자랍니다.')
+        else:
+            return render_template('index.html', title = '권한 오류', logo = data['name'], data = '계정이 없습니다.')
+    else:
+        return render_template('index.html', title = '권한 오류', logo = data['name'], data = '비 로그인 상태 입니다.')
 
 @app.route('/login', methods=['POST', 'GET'])
 def login():
