@@ -16,7 +16,7 @@ curs = conn.cursor(pymysql.cursors.DictCursor)
 
 app.secret_key = data['key']
 
-def namumark(data):
+def namumark(title, data):
     data = '\n' + data + '\n'
 
     data = re.sub('<', '&lt;', data)
@@ -29,7 +29,7 @@ def namumark(data):
     data = re.sub("==\s?(?P<in>[^=]*)\s?==(?:\s+)?\n", '<h2>\g<in></h2>', data)
     data = re.sub("=\s?(?P<in>[^=]*)\s?=(?:\s+)?\n", '<h1>\g<in></h1>', data)
 
-    data = re.sub("'''(?P<in>.+?)'''(?!')", '<strong>\g<in></strong>', data)
+    data = re.sub("'''(?P<in>.+?)'''(?!')", '<b>\g<in></b>', data)
     data = re.sub("''(?P<in>.+?)''(?!')", '<i>\g<in></i>', data)
     data = re.sub('~~(?P<in>.+?)~~(?!~)', '<s>\g<in></s>', data)
     data = re.sub('--(?P<in>.+?)--(?!-)', '<s>\g<in></s>', data)
@@ -48,23 +48,29 @@ def namumark(data):
                 if(b):
                     data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a class="out_link" href="' + results[0] + '">' + results[2] + '</a>', data, 1)
                 else:
-                    curs.execute("select * from data where title = '" + pymysql.escape_string(results[0]) + "'")
-                    rows = curs.fetchall()
-                    if(rows):
-                        data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a href="' + results[0] + '">' + results[2] + '</a>', data, 1)
+                    if(results[0] == title):
+                        data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<b>' + results[2] + '</b>', data, 1)
                     else:
-                        data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a class="not_thing" href="' + results[0] + '">' + results[2] + '</a>', data, 1)
+                        curs.execute("select * from data where title = '" + pymysql.escape_string(results[0]) + "'")
+                        rows = curs.fetchall()
+                        if(rows):
+                            data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a href="/w/' + parse.quote(results[0]) + '">' + results[2] + '</a>', data, 1)
+                        else:
+                            data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a class="not_thing" href="/w/' + parse.quote(results[0]) + '">' + results[2] + '</a>', data, 1)
             else:
                 b = re.search("^[Hh][Tt][Tt][Pp]([Ss])?:\/\/", result[0])
                 if(b):
                     data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a class="out_link" href="' + result[0] + '">' + result[0] + '</a>', data, 1)
                 else:
-                    curs.execute("select * from data where title = '" + pymysql.escape_string(result[0]) + "'")
-                    rows = curs.fetchall()
-                    if(rows):
-                        data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a href="' + result[0] + '">' + result[0] + '</a>', data, 1)
+                    if(result[0] == title):
+                        data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<b>' + result[0] + '</b>', data, 1)
                     else:
-                        data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a class="not_thing" href="' + result[0] + '">' + result[0] + '</a>', data, 1)
+                        curs.execute("select * from data where title = '" + pymysql.escape_string(result[0]) + "'")
+                        rows = curs.fetchall()
+                        if(rows):
+                            data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a href="/w/' + parse.quote(result[0]) + '">' + result[0] + '</a>', data, 1)
+                        else:
+                            data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a class="not_thing" href="/w/' + parse.quote(result[0]) + '">' + result[0] + '</a>', data, 1)
         else:
             break
 
@@ -274,7 +280,7 @@ def w(name = None):
             acl = '(유저)'
         else:
             acl = ''
-        enddata = namumark(rows[0]['data'])
+        enddata = namumark(name, rows[0]['data'])
         return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = enddata, license = data['license'], tn = 1, acl = acl)
     else:
         return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = '<br>문서 없음', license = data['license'], tn = 1)
@@ -284,7 +290,7 @@ def redirectw(name = None, redirect = None):
     curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
     rows = curs.fetchall()
     if(rows):
-        enddata = namumark(rows[0]['data'])
+        enddata = namumark(name, rows[0]['data'])
         test = redirect
         redirect = re.sub('<', '&lt;', redirect)
         redirect = re.sub('>', '&gt;', redirect)
@@ -300,7 +306,7 @@ def rew(name = None, number = None):
     curs.execute("select * from history where title = '" + pymysql.escape_string(name) + "' and id = '" + number + "'")
     rows = curs.fetchall()
     if(rows):
-        enddata = namumark(rows[0]['data'])
+        enddata = namumark(name, rows[0]['data'])
         return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = enddata, license = data['license'], tn = 6)
     else:
         return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = '<br>문서 없음', license = data['license'], tn = 6)
