@@ -192,21 +192,35 @@
 			{% elif tn == 10 %}
 			<h1 class="title">{{title}}</h1>
 			<h2 class="title"><span style="margin-left:5px"></span>(토론 목록)</h2>
+            {% if list == 1 %}
 			<div id="tool">
 				<nav class="menu">
 					<a class="menu-item selected" href="#" onclick="return false">토론 목록</a>
 					<a class="menu-item" href="/w/{{page}}">문서</a>
 				</nav>
 			</div>
+            {% else %}
+            <div id="tool">
+				<nav class="menu">
+					<a class="menu-item selected" href="#" onclick="return false">닫힌 토론 목록</a>
+					<a class="menu-item" href="/topic/{{page}}">토론 목록</a>
+				</nav>
+			</div>
+            {% endif %}
 			<form id="usrform" method="POST" action="/topic/{{page}}">
 				{% autoescape false %}
 				{{plus}}
 				{% endautoescape %}
+                {% if list == 1 %}
 				<br>
+                <a href="/topic/{{page}}/close">(닫힌 토론 보기)</a>
+                <br>
+                <br>
 				<input class="form-control" name="topic" style="width: 100%">
 				<br>
 				<br>
 				<button class="btn btn-primary" type="submit">새토론</button>
+                {% endif %}
 			</form>
 			{% elif tn == 11 %}
 			<h1 class="titlee">{{title}}</h1>
@@ -237,9 +251,8 @@
 			<table style="width: 100%;">
 				<tbody>
 					<tr>
-						<td style="text-align: center;width:33.33%;">토론명</td>
-						<td style="text-align: center;width:33.33%;">토론자</td>
-						<td style="text-align: center;width:33.33%;">시간</td>
+						<td style="text-align: center;width:50%;">토론명</td>
+						<td style="text-align: center;width:50%;">시간</td>
 					</tr>
 				</tbody>
 			</table>

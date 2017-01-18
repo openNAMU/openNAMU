@@ -132,8 +132,13 @@ def recent(title, ip, today, send, leng):
     curs.execute("insert into rc (title, date, ip, send, leng, back) value ('" + pymysql.escape_string(title) + "', '" + today + "', '" + ip + "', '" + pymysql.escape_string(send) + "', '" + leng + "', '')")
     conn.commit()
 
-def discuss(title, sub, ip, date):
-    curs.execute("insert into rd (title, sub, ip, date) value ('" + pymysql.escape_string(title) + "', '" + pymysql.escape_string(sub) + "', '" + ip + "', '" + date + "')")
+def discuss(title, sub, date):
+    curs.execute("select * from rd where title = '" + pymysql.escape_string(title) + "' and sub = '" + pymysql.escape_string(sub) + "'")
+    rows = curs.fetchall()
+    if(rows):
+        curs.execute("update rd set date = '" + pymysql.escape_string(date) + "' where title = '" + pymysql.escape_string(title) + "' and sub = '" + pymysql.escape_string(sub) + "'")
+    else:
+        curs.execute("insert into rd (title, sub, date) value ('" + pymysql.escape_string(title) + "', '" + pymysql.escape_string(sub) + "', '" + pymysql.escape_string(date) + "')")
     conn.commit()
 
 def history(title, data, date, ip, send, leng):
@@ -211,7 +216,7 @@ def recentdiscuss():
             sub = rows[i]['sub']
             sub = re.sub('<', '&lt;', sub)
             sub = re.sub('>', '&gt;', sub)
-            div = div + '<table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;"><a href="/topic/' + parse.quote(rows[i]['title']) + '/sub/' + parse.quote(rows[i]['sub']) + '">' + title + '</a> (' + sub + ')</td><td style="text-align: center;width:33.33%;">' + rows[i]['ip'] + '</td><td style="text-align: center;width:33.33%;">' + rows[i]['date'] + '</td></tr></tbody></table>'
+            div = div + '<table style="width: 100%;"><tbody><tr><td style="text-align: center;width:50%;"><a href="/topic/' + parse.quote(rows[i]['title']) + '/sub/' + parse.quote(rows[i]['sub']) + '">' + title + '</a> (' + sub + ')</td><td style="text-align: center;width:50%;">' + rows[i]['date'] + '</td></tr></tbody></table>'
             i = i + 1
         return render_template('index.html', logo = data['name'], rows = div, tn = 12, title = '최근 토론내역')
     else:
@@ -483,7 +488,7 @@ def setup():
     curs.execute("create table if not exists data(title text not null, data longtext not null, acl text not null)")
     curs.execute("create table if not exists history(id text not null, title text not null, data longtext not null, date text not null, ip text not null, send text not null, leng text not null)")
     curs.execute("create table if not exists rc(title text not null, date text not null, ip text not null, send text not null, leng text not null, back text not null)")
-    curs.execute("create table if not exists rd(title text not null, sub text not null, date text not null, ip text not null)")
+    curs.execute("create table if not exists rd(title text not null, sub text not null, date text not null)")
     curs.execute("create table if not exists user(id text not null, pw text not null, acl text not null)")
     curs.execute("create table if not exists ban(block text not null, end text not null, why text not null, band text not null)")
     curs.execute("create table if not exists topic(id text not null, title text not null, sub text not null, data longtext not null, date text not null, ip text not null, block text not null)")
@@ -520,7 +525,38 @@ def topic(name = None):
     else:
         div = '<div>'
         i = 0
-        curs.execute("select * from topic where title = '" + pymysql.escape_string(name) + "'")
+        curs.execute("select * from topic where title = '" + pymysql.escape_string(name) + "' order by sub asc")
+        rows = curs.fetchall()
+        while True:
+            try:
+                a = rows[i]
+            except:
+                div = div + '</div>'
+                break
+            if(i == 0):
+                sub = rows[i]['sub']
+                curs.execute("select * from stop where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' and close = 'O'")
+                row = curs.fetchall()
+                if(not row):
+                    div = div + '<li><a href="/topic/' + parse.quote(name) + '/sub/' + parse.quote(rows[i]['sub']) + '">' + rows[i]['sub'] + '</a></li>'
+            else:
+                if(not sub == rows[i]['sub']):
+                    sub = rows[i]['sub']
+                    curs.execute("select * from stop where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' and close = 'O'")
+                    row = curs.fetchall()
+                    if(not row):
+                        div = div + '<li><a href="/topic/' + parse.quote(name) + '/sub/' + parse.quote(rows[i]['sub']) + '">' + rows[i]['sub'] + '</a></li>'
+            i = i + 1
+        return render_template('index.html', title = name, page = parse.quote(name), logo = data['name'], plus = div, tn = 10, list = 1)
+        
+@app.route('/topic/<name>/close')
+def topicstoplist(name = None):
+    if(request.method == 'POST'):
+        return '<meta http-equiv="refresh" content="0;url=/topic/' + parse.quote(name) + '/sub/' + parse.quote(request.form["topic"]) + '" />'
+    else:
+        div = '<div>'
+        i = 0
+        curs.execute("select * from stop where title = '" + pymysql.escape_string(name) + "' and close = 'O' order by sub asc")
         rows = curs.fetchall()
         while True:
             try:
@@ -557,7 +593,7 @@ def sub(name = None, sub = None):
             if(rows[0]['acl'] == 'owner' or rows[0]['acl'] == 'admin'):
                 ip = ip + ' - Admin'
             today = getnow()
-            discuss(name, sub, ip, today)
+            discuss(name, sub, today)
             curs.execute("insert into topic (id, title, sub, data, date, ip, block) value ('" + str(number) + "', '" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(sub) + "', '" + pymysql.escape_string(request.form["content"]) + "', '" + today + "', '" + ip + "', '')")
             conn.commit()
             return '<meta http-equiv="refresh" content="0;url=/topic/' + parse.quote(name) + '/sub/' + parse.quote(sub) + '" />'
