@@ -44,19 +44,27 @@ def namumark(data):
             a = re.search("(((?!\|).)*)\|(.*)", result[0])
             if(a):
                 results = a.groups()
-                curs.execute("select * from data where title = '" + pymysql.escape_string(results[0]) + "'")
-                rows = curs.fetchall()
-                if(rows):
-                    data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a href="' + results[0] + '">' + results[2] + '</a>', data, 1)
+                b = re.search("^[Hh][Tt][Tt][Pp]([Ss])?:\/\/", results[0])
+                if(b):
+                    data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a class="out_link" href="' + results[0] + '">' + results[2] + '</a>', data, 1)
                 else:
-                    data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a class="not_thing" href="' + results[0] + '">' + results[2] + '</a>', data, 1)
+                    curs.execute("select * from data where title = '" + pymysql.escape_string(results[0]) + "'")
+                    rows = curs.fetchall()
+                    if(rows):
+                        data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a href="' + results[0] + '">' + results[2] + '</a>', data, 1)
+                    else:
+                        data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a class="not_thing" href="' + results[0] + '">' + results[2] + '</a>', data, 1)
             else:
-                curs.execute("select * from data where title = '" + pymysql.escape_string(result[0]) + "'")
-                rows = curs.fetchall()
-                if(rows):
-                    data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a href="' + result[0] + '">' + result[0] + '</a>', data, 1)
+                b = re.search("^[Hh][Tt][Tt][Pp]([Ss])?:\/\/", result[0])
+                if(b):
+                    data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a class="out_link" href="' + result[0] + '">' + result[0] + '</a>', data, 1)
                 else:
-                    data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a class="not_thing" href="' + result[0] + '">' + result[0] + '</a>', data, 1)
+                    curs.execute("select * from data where title = '" + pymysql.escape_string(result[0]) + "'")
+                    rows = curs.fetchall()
+                    if(rows):
+                        data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a href="' + result[0] + '">' + result[0] + '</a>', data, 1)
+                    else:
+                        data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a class="not_thing" href="' + result[0] + '">' + result[0] + '</a>', data, 1)
         else:
             break
 
