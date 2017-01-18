@@ -109,6 +109,19 @@ def getban(ip):
         return 1
     else:
         return 0
+        
+def getdiscuss(ip, name, sub):
+    curs.execute("select * from ban where block = '" + pymysql.escape_string(ip) + "'")
+    rows = curs.fetchall()
+    if(rows):
+        return 1
+    else:
+        curs.execute("select * from stop where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "'")
+        rows = curs.fetchall()
+        if(rows):
+            return 1
+        else:
+            return 0
 
 def getnow():
     now = time.localtime()
@@ -224,7 +237,7 @@ def gethistory(name = None):
                 send = re.sub('&lt;a href="\/w\/(?P<in>[^"]*)"&gt;(?P<out>[^&]*)&lt;\/a&gt;', '<a href="/w/\g<in>">\g<out></a>', send)
             else:
                 send = '<br>'
-            div = div + '<table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;">r' + rows[i]['id'] + '</a> <a href="/w/' + parse.quote(rows[i]['title']) + '/r/' + rows[i]['id'] + '">(w)</a> <a href="/w/' + parse.quote(rows[i]['title']) + '/raw/' + rows[i]['id'] + '">(raw)</a> <a href="/revert/' + parse.quote(rows[i]['title']) + '/r/' + rows[i]['id'] + '">(되돌리기)</a> (' + rows[i]['leng'] + ')</td><td style="text-align: center;width:33.33%;">' + rows[i]['ip'] + '</td><td style="text-align: center;width:33.33%;">' + rows[i]['date'] + '</td></tr><tr><td colspan="3" style="text-align: center;width:100%;">' + send + '</td></tr></tbody></table>'
+            div = div + '<table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;">r' + rows[i]['id'] + '</a> <a href="/w/' + parse.quote(rows[i]['title']) + '/r/' + rows[i]['id'] + '">(w)</a> <a href="/w/' + parse.quote(rows[i]['title']) + '/raw/' + rows[i]['id'] + '">(Raw)</a> <a href="/revert/' + parse.quote(rows[i]['title']) + '/r/' + rows[i]['id'] + '">(되돌리기)</a> (' + rows[i]['leng'] + ')</td><td style="text-align: center;width:33.33%;">' + rows[i]['ip'] + '</td><td style="text-align: center;width:33.33%;">' + rows[i]['date'] + '</td></tr><tr><td colspan="3" style="text-align: center;width:100%;">' + send + '</td></tr></tbody></table>'
             i = i + 1
         return render_template('index.html', logo = data['name'], rows = div, tn = 5, title = name, page = parse.quote(name))
     else:
@@ -474,6 +487,7 @@ def setup():
     curs.execute("create table if not exists user(id text not null, pw text not null, acl text not null)")
     curs.execute("create table if not exists ban(block text not null, end text not null, why text not null, band text not null)")
     curs.execute("create table if not exists topic(id text not null, title text not null, sub text not null, data longtext not null, date text not null, ip text not null, block text not null)")
+    curs.execute("create table if not exists stop(title text not null, sub text not null, close text not null)")
     return render_template('index.html', title = '설치 완료', logo = data['name'], data = '문제 없었음')
 
 @app.route('/other')
@@ -534,10 +548,14 @@ def sub(name = None, sub = None):
         else:
             number = 1
         ip = getip(request)
-        ban = getban(ip)
+        ban = getdiscuss(ip, name, sub)
         if(ban == 1):
             return '<meta http-equiv="refresh" content="0;url=/ban" />'
         else:
+            curs.execute("select * from user where id = '" + pymysql.escape_string(ip) + "'")
+            rows = curs.fetchall()
+            if(rows[0]['acl'] == 'owner' or rows[0]['acl'] == 'admin'):
+                ip = ip + ' - Admin'
             today = getnow()
             discuss(name, sub, ip, today)
             curs.execute("insert into topic (id, title, sub, data, date, ip, block) value ('" + str(number) + "', '" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(sub) + "', '" + pymysql.escape_string(request.form["content"]) + "', '" + today + "', '" + ip + "', '')")
@@ -545,7 +563,7 @@ def sub(name = None, sub = None):
             return '<meta http-equiv="refresh" content="0;url=/topic/' + parse.quote(name) + '/sub/' + parse.quote(sub) + '" />'
     else:
         ip = getip(request)
-        ban = getban(ip)
+        ban = getdiscuss(ip, name, sub)
         div = '<div>'
         i = 0
         curs.execute("select * from topic where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' order by id+0 asc")
@@ -590,6 +608,69 @@ def blind(name = None, sub = None, number = None):
                         curs.execute("update topic set block = '' where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' and id = '" + number + "'")
                     else:
                         curs.execute("update topic set block = 'O' where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' and id = '" + number + "'")
+                    conn.commit()
+                    return '<meta http-equiv="refresh" content="0;url=/topic/' + name + '/sub/' + sub + '" />'
+                else:
+                    return '<meta http-equiv="refresh" content="0;url=/topic/' + name + '/sub/' + sub + '" />'
+            else:
+                return render_template('index.html', title = '권한 오류', logo = data['name'], data = '권한이 모자랍니다.')
+        else:
+            return render_template('index.html', title = '권한 오류', logo = data['name'], data = '계정이 없습니다.')
+    else:
+        return render_template('index.html', title = '권한 오류', logo = data['name'], data = '비 로그인 상태 입니다.')
+        
+@app.route('/topic/<name>/sub/<sub>/stop')
+def topicstop(name = None, sub = None):
+    if(session.get('Now') == True):
+        ip = getip(request)
+        curs.execute("select * from user where id = '" + pymysql.escape_string(ip) + "'")
+        rows = curs.fetchall()
+        if(rows):
+            if(rows[0]['acl'] == 'owner' or rows[0]['acl'] == 'admin'):
+                curs.execute("select * from topic where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' order by id+0 desc limit 1")
+                row = curs.fetchall()
+                if(row):
+                    today = getnow()
+                    curs.execute("select * from stop where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' and close = ''")
+                    rows = curs.fetchall()
+                    if(rows):
+                        curs.execute("insert into topic (id, title, sub, data, date, ip, block) value ('" + pymysql.escape_string(str(int(row[0]['id']) + 1)) + "', '" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(sub) + "', 'Restart', '" + pymysql.escape_string(today) + "', '" + pymysql.escape_string(ip) + " - Restart', '')")
+                        curs.execute("delete from stop where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' and close = ''")
+                    else:
+                        curs.execute("insert into topic (id, title, sub, data, date, ip, block) value ('" + pymysql.escape_string(str(int(row[0]['id']) + 1)) + "', '" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(sub) + "', 'Stop', '" + pymysql.escape_string(today) + "', '" + pymysql.escape_string(ip) + " - Stop', '')")
+                        curs.execute("insert into stop (title, sub, close) value ('" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(sub) + "', '')")
+                    conn.commit()
+                    return '<meta http-equiv="refresh" content="0;url=/topic/' + name + '/sub/' + sub + '" />'
+                else:
+                    return '<meta http-equiv="refresh" content="0;url=/topic/' + name + '/sub/' + sub + '" />'
+            else:
+                return render_template('index.html', title = '권한 오류', logo = data['name'], data = '권한이 모자랍니다.')
+        else:
+            return render_template('index.html', title = '권한 오류', logo = data['name'], data = '계정이 없습니다.')
+    else:
+        return render_template('index.html', title = '권한 오류', logo = data['name'], data = '비 로그인 상태 입니다.')
+        
+@app.route('/topic/<name>/sub/<sub>/close')
+def topicclose(name = None, sub = None):
+    if(session.get('Now') == True):
+        ip = getip(request)
+        curs.execute("select * from user where id = '" + pymysql.escape_string(ip) + "'")
+        rows = curs.fetchall()
+        if(rows):
+            if(rows[0]['acl'] == 'owner' or rows[0]['acl'] == 'admin'):
+                curs.execute("select * from topic where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' order by id+0 desc limit 1")
+                row = curs.fetchall()
+                if(row):
+                    today = getnow()
+                    curs.execute("select * from stop where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' and close = 'O'")
+                    rows = curs.fetchall()
+                    if(rows):
+                        curs.execute("insert into topic (id, title, sub, data, date, ip, block) value ('" + pymysql.escape_string(str(int(row[0]['id']) + 1)) + "', '" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(sub) + "', 'Reopen', '" + pymysql.escape_string(today) + "', '" + pymysql.escape_string(ip) + " - Reopen', '')")
+                        curs.execute("delete from stop where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' and close = 'O'")
+                    else:
+                        curs.execute("insert into topic (id, title, sub, data, date, ip, block) value ('" + pymysql.escape_string(str(int(row[0]['id']) + 1)) + "', '" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(sub) + "', 'Close', '" + pymysql.escape_string(today) + "', '" + pymysql.escape_string(ip) + " - Close', '')")
+                        curs.execute("insert into stop (title, sub, close) value ('" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(sub) + "', 'O')")
+                    conn.commit()
                     return '<meta http-equiv="refresh" content="0;url=/topic/' + name + '/sub/' + sub + '" />'
                 else:
                     return '<meta http-equiv="refresh" content="0;url=/topic/' + name + '/sub/' + sub + '" />'
