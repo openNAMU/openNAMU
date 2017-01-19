@@ -21,6 +21,7 @@ def namumark(title, data):
 
     data = re.sub('<', '&lt;', data)
     data = re.sub('>', '&gt;', data)
+    data = re.sub('"', '&quot;', data)
 
     data = re.sub("======\s?(?P<in>[^=]*)\s?======(?:\s+)?\n", '<h6>\g<in></h6>', data)
     data = re.sub("=====\s?(?P<in>[^=]*)\s?=====(?:\s+)?\n", '<h5>\g<in></h5>', data)
@@ -82,9 +83,9 @@ def namumark(title, data):
                         curs.execute("select * from data where title = '" + pymysql.escape_string(results[0]) + "'")
                         rows = curs.fetchall()
                         if(rows):
-                            data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a href="/w/' + parse.quote(results[0]) + '">' + results[2] + '</a>', data, 1)
+                            data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a title="' + results[0] + '" href="/w/' + parse.quote(results[0]) + '">' + results[2] + '</a>', data, 1)
                         else:
-                            data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a class="not_thing" href="/w/' + parse.quote(results[0]) + '">' + results[2] + '</a>', data, 1)
+                            data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a title="' + results[0] + '" class="not_thing" href="/w/' + parse.quote(results[0]) + '">' + results[2] + '</a>', data, 1)
             else:
                 b = re.search("^[Hh][Tt][Tt][Pp]([Ss])?:\/\/", result[0])
                 if(b):
@@ -322,11 +323,13 @@ def redirectw(name = None, redirect = None):
         test = redirect
         redirect = re.sub('<', '&lt;', redirect)
         redirect = re.sub('>', '&gt;', redirect)
+        redirect = re.sub('"', '&quot;', redirect)
         return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = enddata, license = data['license'], tn = 1, redirect = '<a href="/w/' + parse.quote(test) + '">' + redirect + '</a>에서 넘어 왔습니다.')
     else:
         test = redirect
         redirect = re.sub('<', '&lt;', redirect)
         redirect = re.sub('>', '&gt;', redirect)
+        redirect = re.sub('"', '&quot;', redirect)
         return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = '<br>문서 없음', license = data['license'], tn = 1, redirect = '<a href="/w/' + parse.quote(test) + '">' + redirect + '</a>에서 넘어 왔습니다.')
 
 @app.route('/w/<name>/r/<number>')
@@ -642,8 +645,9 @@ def sub(name = None, sub = None):
         else:
             curs.execute("select * from user where id = '" + pymysql.escape_string(ip) + "'")
             rows = curs.fetchall()
-            if(rows[0]['acl'] == 'owner' or rows[0]['acl'] == 'admin'):
-                ip = ip + ' - Admin'
+            if(rows):
+                if(rows[0]['acl'] == 'owner' or rows[0]['acl'] == 'admin'):
+                    ip = ip + ' - Admin'
             today = getnow()
             discuss(name, sub, today)
             curs.execute("insert into topic (id, title, sub, data, date, ip, block) value ('" + str(number) + "', '" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(sub) + "', '" + pymysql.escape_string(request.form["content"]) + "', '" + today + "', '" + ip + "', '')")
@@ -667,6 +671,7 @@ def sub(name = None, sub = None):
             indata = rows[i]['data']
             indata = re.sub('<', '&lt;', indata)
             indata = re.sub('>', '&gt;', indata)
+            indata = re.sub('"', '&quot;', indata)
             if(rows[i]['block'] == 'O'):
                 indata = '블라인드 되었습니다.'
                 block = 'style="background: gainsboro;"'
