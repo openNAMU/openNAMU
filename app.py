@@ -365,7 +365,13 @@ def w(name = None):
         else:
             acl = ''
         enddata = namumark(name, rows[0]['data'])
-        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = enddata, license = data['license'], tn = 1, acl = acl)
+        m = re.search('<div id="toc">((?:(?!\/div>).)*)<\/div>', enddata)
+        if(m):
+            result = m.groups()
+            left = result[0]
+        else:
+            left = ''
+        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = enddata, license = data['license'], tn = 1, acl = acl, left = left)
     else:
         return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = '<br>문서 없음', license = data['license'], tn = 1)
 
@@ -375,11 +381,17 @@ def redirectw(name = None, redirect = None):
     rows = curs.fetchall()
     if(rows):
         enddata = namumark(name, rows[0]['data'])
+        m = re.search('<div id="toc">((?:(?!\/div>).)*)<\/div>', enddata)
+        if(m):
+            result = m.groups()
+            left = result[0]
+        else:
+            left = ''
         test = redirect
         redirect = re.sub('<', '&lt;', redirect)
         redirect = re.sub('>', '&gt;', redirect)
         redirect = re.sub('"', '&quot;', redirect)
-        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = enddata, license = data['license'], tn = 1, redirect = '<a href="/w/' + parse.quote(test) + '">' + redirect + '</a>에서 넘어 왔습니다.')
+        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = enddata, license = data['license'], tn = 1, redirect = '<a href="/w/' + parse.quote(test) + '">' + redirect + '</a>에서 넘어 왔습니다.', left = left)
     else:
         test = redirect
         redirect = re.sub('<', '&lt;', redirect)
@@ -393,7 +405,13 @@ def rew(name = None, number = None):
     rows = curs.fetchall()
     if(rows):
         enddata = namumark(name, rows[0]['data'])
-        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = enddata, license = data['license'], tn = 6)
+        m = re.search('<div id="toc">((?:(?!\/div>).)*)<\/div>', enddata)
+        if(m):
+            result = m.groups()
+            left = result[0]
+        else:
+            left = ''
+        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = enddata, license = data['license'], tn = 6, left = left)
     else:
         return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = '<br>문서 없음', license = data['license'], tn = 6)
 
@@ -508,7 +526,13 @@ def preview(name = None):
         return '<meta http-equiv="refresh" content="0;url=/ban" />'
     else:
         enddata = namumark(name, request.form["content"])
-        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = request.form["content"], tn = 2, preview = 1, enddata = enddata)
+        m = re.search('<div id="toc">((?:(?!\/div>).)*)<\/div>', enddata)
+        if(m):
+            result = m.groups()
+            left = result[0]
+        else:
+            left = ''
+        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = request.form["content"], tn = 2, preview = 1, enddata = enddata, left = left)
 
 @app.route('/delete/<name>', methods=['POST', 'GET'])
 def delete(name = None):
