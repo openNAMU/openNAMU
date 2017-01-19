@@ -1,0 +1,11 @@
+{
+	"db": "data",
+	"host": "localhost",
+	"user": "root",
+	"pw": "test",
+	"owner": "Admin",
+	"name": "Ownet",
+	"frontpage": "FrontPage",
+	"license": "CC 0",
+	"key": "test"
+}
