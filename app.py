@@ -23,12 +23,67 @@ def namumark(title, data):
     data = re.sub('>', '&gt;', data)
     data = re.sub('"', '&quot;', data)
 
-    data = re.sub("======\s?(?P<in>[^=]*)\s?======(?:\s+)?\n", '<h6>\g<in></h6>', data)
-    data = re.sub("=====\s?(?P<in>[^=]*)\s?=====(?:\s+)?\n", '<h5>\g<in></h5>', data)
-    data = re.sub("====\s?(?P<in>[^=]*)\s?====(?:\s+)?\n", '<h4>\g<in></h4>', data)
-    data = re.sub("===\s?(?P<in>[^=]*)\s?===(?:\s+)?\n", '<h3>\g<in></h3>', data)
-    data = re.sub("==\s?(?P<in>[^=]*)\s?==(?:\s+)?\n", '<h2>\g<in></h2>', data)
-    data = re.sub("=\s?(?P<in>[^=]*)\s?=(?:\s+)?\n", '<h1>\g<in></h1>', data)
+    h0c = 0;
+    h1c = 0;
+    h2c = 0;
+    h3c = 0;
+    h4c = 0;
+    h5c = 0;
+    last = 0;
+    rtoc = '<div id="toc"><span id="toc-name">목차</span><br><br>'
+    while True:
+        m = re.search('(={1,6})\s?([^=]*)\s?(?:={1,6})(?:\s+)?\n', data)
+        if(m):
+            result = m.groups()
+            wiki = len(result[0])
+            if(last < wiki):
+                last = wiki
+            else:
+                last = wiki;
+                if(wiki == 1):
+                    h1c = 0
+                    h2c = 0
+                    h3c = 0
+                    h4c = 0
+                    h5c = 0
+                elif(wiki == 2):
+                    h2c = 0
+                    h3c = 0
+                    h4c = 0
+                    h5c = 0
+                elif(wiki == 3):
+                    h3c = 0
+                    h4c = 0
+                    h5c = 0
+                elif(wiki == 4):
+                    h4c = 0
+                    h5c = 0
+                elif(wiki == 5):
+                    h5c = 0
+            if(wiki == 1):
+                h0c = h0c + 1
+            elif(wiki == 2):
+                h1c = h1c + 1
+            elif(wiki == 3):
+                h2c = h2c + 1
+            elif(wiki == 4):
+                h3c = h3c + 1
+            elif(wiki == 5):
+                h4c = h4c + 1
+            else:
+                h5c = h5c + 1
+            toc = str(h0c) + '.' + str(h1c) + '.' + str(h2c) + '.' + str(h3c) + '.' + str(h4c) + '.' + str(h5c) + '.'
+            toc = re.sub("(?P<in>[0-9]0(?:[0]*)?)\.", '\g<in>#.', toc)
+            toc = re.sub("0\.", '', toc)
+            toc = re.sub("#\.", '.', toc)
+            toc = re.sub("\.$", '', toc)
+            rtoc = rtoc + '<a href="#s-' + toc + '">' + toc + '</a>. ' + result[1] + '<br>'
+            data = re.sub('(={1,6})\s?([^=]*)\s?(?:={1,6})(?:\s+)?\r\n', '<h' + str(wiki) + '><a href="#toc" id="s-' + toc + '">' + toc + '.</a> ' + result[1] + '</h' + str(wiki) + '>', data, 1);
+        else:
+            rtoc = rtoc + '</div>'
+            break
+    
+    data = re.sub("\[목차\]", rtoc, data)
 
     data = re.sub("'''(?P<in>.+?)'''(?!')", '<b>\g<in></b>', data)
     data = re.sub("''(?P<in>.+?)''(?!')", '<i>\g<in></i>', data)
