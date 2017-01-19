@@ -672,6 +672,7 @@ def sub(name = None, sub = None):
             indata = re.sub('<', '&lt;', indata)
             indata = re.sub('>', '&gt;', indata)
             indata = re.sub('"', '&quot;', indata)
+            indata = re.sub('\n', '<br>', indata)
             if(rows[i]['block'] == 'O'):
                 indata = '블라인드 되었습니다.'
                 block = 'style="background: gainsboro;"'
