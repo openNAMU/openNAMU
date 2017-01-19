@@ -70,14 +70,27 @@
 				{% endautoescape %}
 			</div>
 			{% elif tn == 2 %}
+            {% if preview == 1 %}
+            <div id="tool">
+				<nav class="menu">
+					<a class="menu-item selected" href="#">미리보기</a>
+					<a class="menu-item" href="/w/{{page}}">문서</a>
+				</nav>
+			</div>
+            {% else %}
 			<div id="tool">
 				<nav class="menu">
 					<a class="menu-item selected" href="#">수정</a>
 					<a class="menu-item" href="/w/{{page}}">문서</a>
 				</nav>
 			</div>
+            {% endif %}
 			<h1 class="title">{{title}}</h1>
+            {% if preview == 1 %}
+            <h2 class="title"><span style="margin-left:5px"></span>(미리보기)</h2>
+            {% else %}
 			<h2 class="title"><span style="margin-left:5px"></span>(수정)</h2>
+            {% endif %}
 			<form id="usrform" name="f1" method="POST" action="/edit/{{page}}">
 				<textarea rows="30" cols="100" name="content" form="usrform">{{data}}</textarea>
 				<input name="send" style="margin-top:10px;width:100%" type="text">
@@ -88,6 +101,11 @@
 					<button class="btn" type="submit" onclick="f1.action='/preview/{{page}}';">미리보기</button>
 				</div>
 			</form>
+            {% if preview == 1 %}
+            {% autoescape false %}
+            {{enddata}}
+            {% endautoescape %}
+            {% endif %}
 			{% elif tn == 3 %}
 			<h1 class="title">{{title}}</h1>
 			<table style="width: 100%;">

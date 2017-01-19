@@ -441,6 +441,16 @@ def edit(name = None):
                 return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = rows[0]['data'], tn = 2)
             else:
                 return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = '', tn = 2)
+                
+@app.route('/preview/<name>', methods=['POST'])
+def preview(name = None):
+    ip = getip(request)
+    can = getcan(ip, name)
+    if(can == 1):
+        return '<meta http-equiv="refresh" content="0;url=/ban" />'
+    else:
+        enddata = namumark(name, request.form["content"])
+        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = request.form["content"], tn = 2, preview = 1, enddata = enddata)
 
 @app.route('/delete/<name>', methods=['POST', 'GET'])
 def delete(name = None):
