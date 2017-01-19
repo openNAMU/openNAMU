@@ -36,6 +36,33 @@ def namumark(title, data):
     data = re.sub('__(?P<in>.+?)__(?!_)', '<u>\g<in></u>', data)
     data = re.sub('\^\^(?P<in>.+?)\^\^(?!\^)', '<sup>\g<in></sup>', data)
     data = re.sub(',,(?P<in>.+?),,(?!,)', '<sub>\g<in></sub>', data)
+    
+    while True:
+        p = re.compile("\[youtube\(((?:(?!,|\)\]).)*)(?:,\s)?(?:width=((?:(?!,|\)\]).)*))?(?:,\s)?(?:height=((?:(?!,|\)\]).)*))?(?:,\s)?(?:width=((?:(?!,|\)\]).)*))?\)\]", re.I)
+        m = p.search(data)
+        if(m):
+            result = m.groups()
+            if(result[1]):
+                if(result[2]):
+                    width = result[1]
+                    height = result[2]
+                else:
+                    width = result[1]
+                    height = '315'
+            elif(result[2]):
+                if(result[3]):
+                    height = result[2]
+                    width = result[3]
+                else:
+                    height = result[2]
+                    width = '560'
+            else:
+                width = '560'
+                height = '315'
+            data = p.sub('<iframe width="' + width + '" height="' + height + '" src="https://www.youtube.com/embed/' + result[0] + '" frameborder="0" allowfullscreen></iframe>', data, 1)
+        else:
+            break
+                
 
     while True:
         m = re.search("\[\[(((?!\]\]).)*)\]\]", data)
@@ -44,7 +71,8 @@ def namumark(title, data):
             a = re.search("(((?!\|).)*)\|(.*)", result[0])
             if(a):
                 results = a.groups()
-                b = re.search("^[Hh][Tt][Tt][Pp]([Ss])?:\/\/", results[0])
+                p = re.compile("^http(?:s)?:\/\/", re.I)
+                b = p.search(results[0])
                 if(b):
                     data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a class="out_link" href="' + results[0] + '">' + results[2] + '</a>', data, 1)
                 else:
