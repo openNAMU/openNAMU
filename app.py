@@ -1098,7 +1098,16 @@ def version():
 @app.route('/user')
 def user():
     ip = getip(request)
-    return render_template('index.html', title = '유저 메뉴', logo = data['name'], data = ip + '<br><br><li><a href="/login">로그인</a></li><li><a href="/logout">로그아웃</a></li><li><a href="/register">회원가입</a></li>')
+    curs.execute("select * from user where id = '" + pymysql.escape_string(ip) + "'")
+    rows = curs.fetchall()
+    if(rows):
+        if(rows[0]['acl'] == 'admin' or rows[0]['acl'] == 'owner'):
+            acl = '관리자'
+        else:
+            acl = '유저'
+    else:
+        acl = '일반'
+    return render_template('index.html', title = '유저 메뉴', logo = data['name'], data = ip + '<br><br><span>권한 상태 : ' + acl + '<br><br><li><a href="/login">로그인</a></li><li><a href="/logout">로그아웃</a></li><li><a href="/register">회원가입</a></li>')
 
 @app.route('/random')
 def random():
