@@ -171,7 +171,7 @@ def namumark(title, data):
     data = re.sub("-{4,11}", "<hr>", data);
 
     data = re.sub('\n', '<br>', data)
-    return data
+    return str(data)
 
 def getip(request):
     if(session.get('Now') == True):
