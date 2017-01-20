@@ -973,7 +973,7 @@ def ban(name = None):
                         now = '차단 해제'
                     else:
                         now = '차단'
-                    return render_template('index.html', title = name, page = parse.quote(name), logo = data['name'], tn = 16, now = now)
+                    return render_template('index.html', title = name, page = parse.quote(name), logo = data['name'], tn = 16, now = now, today = getnow())
                 else:
                     return render_template('index.html', title = '권한 오류', logo = data['name'], data = '권한이 모자랍니다.')
             else:
