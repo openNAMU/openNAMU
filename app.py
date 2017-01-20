@@ -78,7 +78,7 @@ def namumark(title, data):
             toc = re.sub("#\.", '.', toc)
             toc = re.sub("\.$", '', toc)
             rtoc = rtoc + '<a href="#s-' + toc + '">' + toc + '</a>. ' + result[1] + '<br>'
-            data = re.sub('(={1,6})\s?([^=]*)\s?(?:={1,6})(?:\s+)?\r\n', '<h' + str(wiki) + '><a href="#toc" id="s-' + toc + '">' + toc + '.</a> ' + result[1] + '</h' + str(wiki) + '>', data, 1);
+            data = re.sub('(={1,6})\s?([^=]*)\s?(?:={1,6})(?:\s+)?\n', '<h' + str(wiki) + '><a href="#toc" id="s-' + toc + '">' + toc + '.</a> ' + result[1] + '</h' + str(wiki) + '>', data, 1);
         else:
             rtoc = rtoc + '</div>'
             break
