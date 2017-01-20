@@ -1089,7 +1089,33 @@ def grammar():
 
 @app.route('/ban')
 def aban():
-   return render_template('index.html', title = '권한 오류', logo = data['name'], data = '현재 차단 상태거나 ACL이 맞지 않습니다.')
+    ip = getip(request)
+    if(getban(ip) == 1):
+        curs.execute("select * from ban where block = '" + pymysql.escape_string(ip) + "'")
+        rows = curs.fetchall()
+        if(rows):
+            if(rows[0]['end']):
+                end = rows[0]['end'] + ' 까지 차단 상태 입니다. / 사유 : ' + rows[0]['why']
+                
+                now = getnow()
+                now = re.sub(':', '', now)
+                now = re.sub('\-', '', now)
+                now = re.sub(' ', '', now)
+                now = int(now)
+                
+                day = rows[0]['end']
+                day = re.sub('\-', '', day)
+                
+                if(now >= int(day + '000000')):
+                    curs.execute("delete from ban where block = '" + pymysql.escape_string(ip) + "'")
+                    conn.commit()
+                    end = '차단이 풀렸습니다. 다시 시도 해 보세요.'
+            else:
+                end = '영구 차단 상태 입니다. / 사유 : ' + rows[0]['why']
+    else:
+        end = '권한이 맞지 않는 상태 입니다.'
+    
+    return render_template('index.html', title = '권한 오류', logo = data['name'], data = end)
 
 @app.route('/version')
 def version():
@@ -1100,13 +1126,16 @@ def user():
     ip = getip(request)
     curs.execute("select * from user where id = '" + pymysql.escape_string(ip) + "'")
     rows = curs.fetchall()
-    if(rows):
-        if(rows[0]['acl'] == 'admin' or rows[0]['acl'] == 'owner'):
-            acl = '관리자'
+    if(getban(ip) == 0):
+        if(rows):
+            if(rows[0]['acl'] == 'admin' or rows[0]['acl'] == 'owner'):
+                acl = '관리자'
+            else:
+                acl = '유저'
         else:
-            acl = '유저'
+            acl = '일반'
     else:
-        acl = '일반'
+        acl = '차단'
     return render_template('index.html', title = '유저 메뉴', logo = data['name'], data = ip + '<br><br><span>권한 상태 : ' + acl + '<br><br><li><a href="/login">로그인</a></li><li><a href="/logout">로그아웃</a></li><li><a href="/register">회원가입</a></li>')
 
 @app.route('/random')
