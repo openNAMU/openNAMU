@@ -261,16 +261,20 @@ def discuss(title, sub, date):
     else:
         curs.execute("insert into rd (title, sub, date) value ('" + pymysql.escape_string(title) + "', '" + pymysql.escape_string(sub) + "', '" + pymysql.escape_string(date) + "')")
     conn.commit()
+    
+def block(block, end, today, blocker, why):
+    curs.execute("insert into rb (block, end, today, blocker, why) value ('" + pymysql.escape_string(block) + "', '" + pymysql.escape_string(end) + "', '" + today + "', '" + pymysql.escape_string(blocker) + "', '" + pymysql.escape_string(why) + "')")
+    conn.commit()
 
 def history(title, data, date, ip, send, leng):
     curs.execute("select * from history where title = '" + pymysql.escape_string(title) + "' order by id+0 desc limit 1")
     rows = curs.fetchall()
     if(rows):
         number = int(rows[0]['id']) + 1
-        curs.execute("insert into history (id, title, data, date, ip, send, leng) value ('" + str(number) + "', '" + pymysql.escape_string(title) + "', '" + pymysql.escape_string(data) + "', '" + date + "', '" + ip + "', '" + pymysql.escape_string(send) + "', '" + leng + "')")
+        curs.execute("insert into history (id, title, data, date, ip, send, leng) value ('" + str(number) + "', '" + pymysql.escape_string(title) + "', '" + pymysql.escape_string(data) + "', '" + date + "', '" + pymysql.escape_string(ip) + "', '" + pymysql.escape_string(send) + "', '" + leng + "')")
         conn.commit()
     else:
-        curs.execute("insert into history (id, title, data, date, ip, send, leng) value ('1', '" + pymysql.escape_string(title) + "', '" + pymysql.escape_string(data) + "', '" + date + "', '" + ip + "', '" + pymysql.escape_string(send) + "', '" + leng + "')")
+        curs.execute("insert into history (id, title, data, date, ip, send, leng) value ('1', '" + pymysql.escape_string(title) + "', '" + pymysql.escape_string(data) + "', '" + date + "', '" + pymysql.escape_string(ip) + "', '" + pymysql.escape_string(send) + "', '" + leng + "')")
         conn.commit()
 
 def getleng(existing, change):
@@ -342,6 +346,28 @@ def recentdiscuss():
         return render_template('index.html', logo = data['name'], rows = div, tn = 12, title = '최근 토론내역')
     else:
          return render_template('index.html', logo = data['name'], rows = '', tn = 12, title = '최근 토론내역')
+         
+@app.route('/recentblock')
+def recentblock():
+    i = 0
+    div = '<div>'
+    curs.execute("select * from rb order by today desc limit 50")
+    rows = curs.fetchall()
+    if(rows):
+        while True:
+            try:
+                a = rows[i]
+            except:
+                div = div + '</div>'
+                break
+            why = rows[i]['why']
+            why = re.sub('<', '&lt;', why)
+            why = re.sub('>', '&gt;', why)
+            div = div + '<table style="width: 100%;"><tbody><tr><td style="text-align: center;width:20%;">' + rows[i]['block'] + '</a></td><td style="text-align: center;width:20%;">' + rows[i]['blocker'] + '</td><td style="text-align: center;width:20%;">' + rows[i]['end'] + '</td><td style="text-align: center;width:20%;">' + rows[i]['why'] + '</td><td style="text-align: center;width:20%;">' + rows[i]['today'] + '</td></tr></tbody></table>'
+            i = i + 1
+        return render_template('index.html', logo = data['name'], rows = div, tn = 20, title = '최근 차단내역')
+    else:
+         return render_template('index.html', logo = data['name'], rows = '', tn = 20, title = '최근 차단내역')
 
 @app.route('/history/<name>')
 def gethistory(name = None):
@@ -650,11 +676,12 @@ def setup():
     curs.execute("create table if not exists ban(block text not null, end text not null, why text not null, band text not null)")
     curs.execute("create table if not exists topic(id text not null, title text not null, sub text not null, data longtext not null, date text not null, ip text not null, block text not null)")
     curs.execute("create table if not exists stop(title text not null, sub text not null, close text not null)")
+    curs.execute("create table if not exists rb(block text not null, end text not null, today text not null, blocker text not null, why text not null)")
     return render_template('index.html', title = '설치 완료', logo = data['name'], data = '문제 없었음')
 
 @app.route('/other')
 def other():
-    return render_template('index.html', title = '기타 메뉴', logo = data['name'], data = '<li><a href="/titleindex">모든 문서</a><li><a href="/grammar">문법 설명</a></li><li><a href="/version">버전</a></li>')
+    return render_template('index.html', title = '기타 메뉴', logo = data['name'], data = '<li><a href="/titleindex">모든 문서</a><li><a href="/grammar">문법 설명</a></li><li><a href="/version">버전</a></li><li><a href="/recentblock">최근 차단내역</a></li>')
 
 @app.route('/titleindex')
 def titleindex():
