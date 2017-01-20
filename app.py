@@ -149,7 +149,7 @@ def namumark(title, data):
                         else:
                             data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a title="' + results[0] + '" class="not_thing" href="/w/' + parse.quote(results[0]) + '">' + results[2] + '</a>', data, 1)
             else:
-                b = re.search("^[Hh][Tt][Tt][Pp]([Ss])?:\/\/", result[0])
+                b = re.search("^http(?:s)?:\/\/", result[0])
                 if(b):
                     data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a class="out_link" href="' + result[0] + '">' + result[0] + '</a>', data, 1)
                 else:
