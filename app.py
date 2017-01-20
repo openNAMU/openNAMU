@@ -22,6 +22,16 @@ def namumark(title, data):
     data = re.sub('<', '&lt;', data)
     data = re.sub('>', '&gt;', data)
     data = re.sub('"', '&quot;', data)
+    
+    while True:
+        m = re.search("\n&gt;\s?((?:[^\n]*)(?:(?:(?:(?:\n&gt;\s?)(?:[^\n]*))+)?))", data)
+        if(m):
+            result = m.groups()
+            blockquote = result[0]
+            blockquote = re.sub("\n&gt;\s?", "\n", blockquote)
+            data = re.sub("\n&gt;\s?((?:[^\n]*)(?:(?:(?:(?:\n&gt;\s?)(?:[^\n]*))+)?))", "\n<blockquote>" + blockquote + "</blockquote>", data, 1)
+        else:
+            break
 
     h0c = 0;
     h1c = 0;
@@ -94,8 +104,7 @@ def namumark(title, data):
     data = re.sub(',,(?P<in>.+?),,(?!,)', '<sub>\g<in></sub>', data)
     
     while True:
-        p = re.compile("\[youtube\(((?:(?!,|\)\]).)*)(?:,\s)?(?:width=((?:(?!,|\)\]).)*))?(?:,\s)?(?:height=((?:(?!,|\)\]).)*))?(?:,\s)?(?:width=((?:(?!,|\)\]).)*))?\)\]", re.I)
-        m = p.search(data)
+        m = re.search("\[youtube\(((?:(?!,|\)\]).)*)(?:,\s)?(?:width=((?:(?!,|\)\]).)*))?(?:,\s)?(?:height=((?:(?!,|\)\]).)*))?(?:,\s)?(?:width=((?:(?!,|\)\]).)*))?\)\]", data)
         if(m):
             result = m.groups()
             if(result[1]):
@@ -118,7 +127,6 @@ def namumark(title, data):
             data = p.sub('<iframe width="' + width + '" height="' + height + '" src="https://www.youtube.com/embed/' + result[0] + '" frameborder="0" allowfullscreen></iframe>', data, 1)
         else:
             break
-                
 
     while True:
         m = re.search("\[\[(((?!\]\]).)*)\]\]", data)
@@ -127,8 +135,7 @@ def namumark(title, data):
             a = re.search("(((?!\|).)*)\|(.*)", result[0])
             if(a):
                 results = a.groups()
-                p = re.compile("^http(?:s)?:\/\/", re.I)
-                b = p.search(results[0])
+                b = re.search("^http(?:s)?:\/\/")
                 if(b):
                     data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a class="out_link" href="' + results[0] + '">' + results[2] + '</a>', data, 1)
                 else:
@@ -157,6 +164,11 @@ def namumark(title, data):
                             data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a class="not_thing" href="/w/' + parse.quote(result[0]) + '">' + result[0] + '</a>', data, 1)
         else:
             break
+    
+    data = re.sub('\[date\]', getnow(), data)
+    data = re.sub("\[anchor\((?P<in>[^\[\]]*)\)\]", '<span id="\g<in>"></span>', data)
+    
+    data = re.sub("-{4,11}", "<hr>", data);
 
     data = re.sub('\n', '<br>', data)
     return data

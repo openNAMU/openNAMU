@@ -126,7 +126,7 @@ blockquote {
     display:table;
     border:2px dashed #ccc;
     border-left:5px solid #d1bd6b;
-    background-image: url('../images/quote.png');
+    background-image: url('../static/images/quote.png');
     background-position:calc(100% - 10px) 10px;
     background-repeat:no-repeat;
     background-size:25px;
