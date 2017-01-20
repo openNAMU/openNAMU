@@ -164,6 +164,17 @@ def namumark(title, data):
                             data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a class="not_thing" href="/w/' + parse.quote(result[0]) + '">' + result[0] + '</a>', data, 1)
         else:
             break
+            
+    while True:
+        m = re.search("((?:(?:\s\*\s[^\n]*)\n?)+)", data)
+        if(m):
+            result = m.groups()
+            end = str(result[0])
+            end = re.sub("\s\*\s(?P<in>[^\n]*)", "<li>\g<in></li>", end)
+            end = re.sub("\n", '', end)
+            data = re.sub("((?:(?:\s\*\s[^\n]*)\n?)+)", '<ul id="list">' + end + '</ul>', data, 1)
+        else:
+            break
     
     data = re.sub('\[date\]', getnow(), data)
     data = re.sub("\[anchor\((?P<in>[^\[\]]*)\)\]", '<span id="\g<in>"></span>', data)
