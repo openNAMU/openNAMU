@@ -987,8 +987,10 @@ def ban(name = None):
                     curs.execute("select * from ban where block = '" + pymysql.escape_string(name) + "'")
                     row = curs.fetchall()
                     if(row):
+                        block(name, '해제', getnow(), ip, '')
                         curs.execute("delete from ban where block = '" + pymysql.escape_string(name) + "'")
                     else:
+                        block(name, request.form["end"], getnow(), ip, request.form["why"])
                         curs.execute("insert into ban (block, end, why, band) value ('" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(request.form["end"]) + "', '" + pymysql.escape_string(request.form["why"]) + "', '')")
                     conn.commit()
                     return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(data['frontpage']) + '" />'
