@@ -12,3 +12,8 @@ set 폴더에 있는 set.json을 밖으로 꺼낸 다음 안에 있는 내용을
 
 ## 기타
  * [테스트 서버](https://namu.ml/)
+ 
+## 의존성
+ * [플라스크](https://pypi.python.org/pypi/Flask/0.12)
+ * [Bcript](https://pypi.python.org/pypi/bcrypt/3.1.0)
+ * [PYMySql](https://pypi.python.org/pypi/PyMySQL)
