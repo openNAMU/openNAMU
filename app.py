@@ -17,11 +17,13 @@ curs = conn.cursor(pymysql.cursors.DictCursor)
 app.secret_key = data['key']
 
 def namumark(title, data):
-    data = '\n' + data + '\n'
-
     data = re.sub('<', '&lt;', data)
     data = re.sub('>', '&gt;', data)
     data = re.sub('"', '&quot;', data)
+    
+    data = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', '<meta http-equiv="refresh" content="0;url=/w/\g<in>/redirect/' + title + '" />', data)
+    
+    data = '\n' + data + '\n'
     
     while True:
         m = re.search("\n&gt;\s?((?:[^\n]*)(?:(?:(?:(?:\n&gt;\s?)(?:[^\n]*))+)?))", data)
@@ -446,7 +448,9 @@ def redirectw(name = None, redirect = None):
     curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
     rows = curs.fetchall()
     if(rows):
-        enddata = namumark(name, rows[0]['data'])
+        newdata = rows[0]['data']
+        newdata = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', ' * \g<in> 문서로 넘겨주기', data)
+        enddata = namumark(name, newdata)
         m = re.search('<div id="toc">((?:(?!\/div>).)*)<\/div>', enddata)
         if(m):
             result = m.groups()
@@ -457,13 +461,13 @@ def redirectw(name = None, redirect = None):
         redirect = re.sub('<', '&lt;', redirect)
         redirect = re.sub('>', '&gt;', redirect)
         redirect = re.sub('"', '&quot;', redirect)
-        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = enddata, license = data['license'], tn = 1, redirect = '<a href="/w/' + parse.quote(test) + '">' + redirect + '</a>에서 넘어 왔습니다.', left = left)
+        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = enddata, license = data['license'], tn = 1, redirect = '<a href="/edit/' + parse.quote(test) + '">' + redirect + '</a>에서 넘어 왔습니다.', left = left)
     else:
         test = redirect
         redirect = re.sub('<', '&lt;', redirect)
         redirect = re.sub('>', '&gt;', redirect)
         redirect = re.sub('"', '&quot;', redirect)
-        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = '<br>문서 없음', license = data['license'], tn = 1, redirect = '<a href="/w/' + parse.quote(test) + '">' + redirect + '</a>에서 넘어 왔습니다.')
+        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = '<br>문서 없음', license = data['license'], tn = 1, redirect = '<a href="/edit/' + parse.quote(test) + '">' + redirect + '</a>에서 넘어 왔습니다.')
 
 @app.route('/w/<name>/r/<number>')
 def rew(name = None, number = None):
@@ -591,7 +595,9 @@ def preview(name = None):
     if(can == 1):
         return '<meta http-equiv="refresh" content="0;url=/ban" />'
     else:
-        enddata = namumark(name, request.form["content"])
+        newdata = request.form["content"]
+        newdata = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', ' * \g<in> 문서로 넘겨주기', newdata)
+        enddata = namumark(name, newdata)
         m = re.search('<div id="toc">((?:(?!\/div>).)*)<\/div>', enddata)
         if(m):
             result = m.groups()
