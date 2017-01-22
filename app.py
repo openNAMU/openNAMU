@@ -200,6 +200,22 @@ def namumark(title, data):
     
     data = re.sub("-{4,11}", "<hr>", data)
     
+    while True:
+        b = re.search("\r\n( +)", data)
+        if(b):
+            result = b.groups()
+            tp = len(result[0])
+            up = ''
+            i = 0
+            while True:
+                up = up + '<span id="in"></span>'
+                i = i + 1
+                if(i == tp):
+                    break
+            data = re.sub("\r\n( +)", '<br>' + up, data, 1)
+        else:
+            break
+    
     a = 1
     tou = "<hr id='footnote'><div class='wiki-macro-footnote'><br>"
     while True:
