@@ -196,10 +196,33 @@ def namumark(title, data):
     data = re.sub('\[date\]', getnow(), data)
     data = re.sub("\[anchor\((?P<in>[^\[\]]*)\)\]", '<span id="\g<in>"></span>', data)
     
-    data = re.sub("#(?P<in>jpg|png|gif|jpeg)#", ".\g<in>", data);
+    data = re.sub("#(?P<in>jpg|png|gif|jpeg)#", ".\g<in>", data)
     
-    data = re.sub("-{4,11}", "<hr>", data);
-
+    data = re.sub("-{4,11}", "<hr>", data)
+    
+    a = 1
+    tou = "<hr id='footnote'><div class='wiki-macro-footnote'><br>"
+    while True:
+        b = re.search("\[\*([^\s]*)\s((?:[^\[\]]+)*)\]", data)
+        if(b):
+            results = b.groups()
+            if(results[0]):
+                tou = tou + "<span class='footnote-list'><a href=\"#rfn-" + str(a) + "\" id=\"fn-" + str(a) + "\">[" + results[0] + "]</a> " + results[1] + "</span><br>"
+                data = re.sub("\[\*([^\s]*)\s((?:[^\[\]]+)*)\]", "<sup><a id=\"rfn-" + str(a) + "\" href=\"#fn-" + str(a) + "\">[" + results[0] + "]</a></sup>", data, 1)
+            else:
+                tou = tou + "<span class='footnote-list'><a href=\"#rfn-" + str(a) + "\" id=\"fn-" + str(a) + "\">[" + str(a) + "]</a> " + results[1] + "</span><br>"
+                data = re.sub("\[\*([^\s]*)\s((?:[^\[\]]+)*)\]", '<sup><a id="rfn-' + str(a) + '" href="#fn-' + str(a) + '">[' + str(a) + ']</a></sup>', data, 1)
+            a = a + 1
+        else:
+            tou = tou + '</div>'
+            if(tou == "<hr id='footnote'><div class='wiki-macro-footnote'><br></div>"):
+                tou = ""
+            break
+    
+    data = re.sub("\[각주\](?:(?:(?:<br>+)*(?:\s+)*(?:\r+)*(?:\n+))+)?$", "", data)
+    data = re.sub("\[각주\]", "<br>" + tou, data)
+    data = data + tou;
+    
     data = re.sub('\n', '<br>', data)
     return str(data)
 
