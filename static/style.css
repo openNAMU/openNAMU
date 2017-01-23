@@ -448,6 +448,14 @@ body {
 
 }
 
+.out_link::before {
+    padding: 0px 0.15em;
+    background: green;
+    color: white;
+    content: "외";
+    font-family: "Ionicons" !important;
+}
+
 textarea {
     width: 100%;
 }
