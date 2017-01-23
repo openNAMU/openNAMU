@@ -228,10 +228,10 @@ def namumark(title, data):
             results = b.groups()
             if(results[0]):
                 tou = tou + "<span class='footnote-list'><a href=\"#rfn-" + str(a) + "\" id=\"fn-" + str(a) + "\">[" + results[0] + "]</a> " + results[1] + "</span><br>"
-                data = re.sub("\[\*([^\s]*)\s((?:[^\[\]]+)*)\]", "<sup><a id=\"rfn-" + str(a) + "\" href=\"#fn-" + str(a) + "\">[" + results[0] + "]</a></sup>", data, 1)
+                data = re.sub("\[\*([^\s]*)\s((?:[^\[\]]+)*)\]", "<sup><a class=\"footnotes\" title=\"" + results[1] + "\" id=\"rfn-" + str(a) + "\" href=\"#fn-" + str(a) + "\">[" + results[0] + "]</a></sup>", data, 1)
             else:
                 tou = tou + "<span class='footnote-list'><a href=\"#rfn-" + str(a) + "\" id=\"fn-" + str(a) + "\">[" + str(a) + "]</a> " + results[1] + "</span><br>"
-                data = re.sub("\[\*([^\s]*)\s((?:[^\[\]]+)*)\]", '<sup><a id="rfn-' + str(a) + '" href="#fn-' + str(a) + '">[' + str(a) + ']</a></sup>', data, 1)
+                data = re.sub("\[\*([^\s]*)\s((?:[^\[\]]+)*)\]", '<sup><a class="footnotes" title="' + results[1] + '" id="rfn-' + str(a) + '" href="#fn-' + str(a) + '">[' + str(a) + ']</a></sup>', data, 1)
             a = a + 1
         else:
             tou = tou + '</div>'
