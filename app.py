@@ -11,6 +11,9 @@ import bcrypt
 json_data = open('set.json').read()
 data = json.loads(json_data)
 
+inter = open('inter.json').read()
+interwiki = json.loads(inter)
+
 conn = pymysql.connect(host = data['host'], user = data['user'], password = data['pw'], db = data['db'], charset = 'utf8')
 curs = conn.cursor(pymysql.cursors.DictCursor)
 
@@ -131,6 +134,23 @@ def namumark(title, data):
                 width = '560'
                 height = '315'
             data = p.sub('<iframe width="' + width + '" height="' + height + '" src="https://www.youtube.com/embed/' + result[0] + '" frameborder="0" allowfullscreen></iframe>', data, 1)
+        else:
+            break
+            
+    while True:
+        m = re.search("\[\[(?:((?:(?!:|http(?:s):\/\/).)*)\:((?:(?!\]\]|\|).)*))(\|(?:(?:(?!\]\]).)*))?\]\]", data)
+        if(m):
+            results = m.groups()
+            try:
+                if(results[2]):
+                    data = re.sub("\[\[(?:((?:(?!:|http(?:s):\/\/).)*)\:((?:(?!\]\]|\|).)*))(\|(?:(?:(?!\]\]).)*))?\]\]", "[[" + interwiki[results[0]] + results[1] + results[2] + "]]", data, 1)
+                else:
+                    data = re.sub("\[\[(?:((?:(?!:|http(?:s):\/\/).)*)\:((?:(?!\]\]|\|).)*))(\|(?:(?:(?!\]\]).)*))?\]\]", "[[" + interwiki[results[0]] + results[1] + "]]", data, 1)
+            except:
+                if(results[2]):
+                    data = re.sub("\[\[(?:((?:(?!:|http(?:s):\/\/).)*)\:((?:(?!\]\]|\|).)*))(\|(?:(?:(?!\]\]).)*))?\]\]", "[[" + results[1] + results[2] + "]]", data, 1)
+                else:
+                    data = re.sub("\[\[(?:((?:(?!:|http(?:s):\/\/).)*)\:((?:(?!\]\]|\|).)*))(\|(?:(?:(?!\]\]).)*))?\]\]", "[[" + results[1] + "]]", data, 1)
         else:
             break
             
