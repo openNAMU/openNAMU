@@ -1,4 +1,5 @@
-from flask import Flask, request, session, render_template
+from flask import Flask, request, session, render_template, send_file
+from werkzeug import secure_filename
 app = Flask(__name__)
 
 from urllib import parse
@@ -7,6 +8,7 @@ import pymysql
 import time
 import re
 import bcrypt
+import os
 
 json_data = open('set.json').read()
 data = json.loads(json_data)
@@ -15,6 +17,12 @@ conn = pymysql.connect(host = data['host'], user = data['user'], password = data
 curs = conn.cursor(pymysql.cursors.DictCursor)
 
 app.secret_key = data['key']
+
+ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
 def namumark(title, data):
     data = re.sub('<', '&lt;', data)
@@ -155,6 +163,8 @@ def namumark(title, data):
     data = re.sub('{{\|(?P<in>(?:(?!\|}}).)*)\|}}', '<table><tbody><tr><td>\g<in></td></tr></tbody></table>', data)
     
     data = re.sub("##\s?(?P<in>[^\n]*)\n", "<div style='display:none;'>\g<in></div>", data);
+    
+    data = re.sub("\[\[파일:(?P<in>(?:(?!\]\]).)*)\]\]", "<img src='/image/\g<in>'>", data)
     
     data = re.sub("\[br\]",'<br>', data);
     
@@ -398,7 +408,28 @@ def getleng(existing, change):
     else:
         leng = '0'
     return leng;
-
+    
+    
+@app.route('/upload', methods=['GET', 'POST'])
+def upload():
+    if(request.method == 'POST'):
+        file = request.files['file']
+        if(file and allowed_file(file.filename)):
+            filename = secure_filename(file.filename)
+            if(os.path.exists(os.path.join('image', filename))):
+                return render_template('index.html', logo = data['name'], title = '업로드', data = '<a href="/upload">동일한 이름 파일 있음</a>')
+            else:
+                file.save(os.path.join('image', filename))
+                return render_template('index.html', logo = data['name'], title = '업로드', data = '<a href="/upload">완료 됨</a>')
+        else:
+            return render_template('index.html', logo = data['name'], title = '업로드', data = '<a href="/upload">jpg gif jpeg png만 가능 합니다.</a>')
+    return render_template('index.html', logo = data['name'], title = '업로드', tn = 21)
+    
+@app.route('/image/<name>')
+def image(name = None):
+    filename = secure_filename(name)
+    return send_file(os.path.join('image', filename), mimetype='image')
+    
 @app.route('/')
 @app.route('/w/')
 def redirect():
@@ -431,7 +462,7 @@ def recentchanges():
             i = i + 1
         return render_template('index.html', logo = data['name'], rows = div, tn = 3, title = '최근 변경내역')
     else:
-         return render_template('index.html', logo = data['name'], rows = '', tn = 3, title = '최근 변경내역')
+        return render_template('index.html', logo = data['name'], rows = '', tn = 3, title = '최근 변경내역')
 
 @app.route('/recentdiscuss')
 def recentdiscuss():
@@ -796,7 +827,7 @@ def setup():
 
 @app.route('/other')
 def other():
-    return render_template('index.html', title = '기타 메뉴', logo = data['name'], data = '<li><a href="/titleindex">모든 문서</a><li><a href="/grammar">문법 설명</a></li><li><a href="/version">버전</a></li><li><a href="/recentblock">최근 차단내역</a></li>')
+    return render_template('index.html', title = '기타 메뉴', logo = data['name'], data = '<li><a href="/titleindex">모든 문서</a><li><a href="/grammar">문법 설명</a></li><li><a href="/version">버전</a></li><li><a href="/recentblock">최근 차단내역</a></li><li><a href="/upload">업로드</a></li>')
 
 @app.route('/titleindex')
 def titleindex():
