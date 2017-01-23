@@ -24,6 +24,21 @@ def namumark(title, data):
     data = re.sub('>', '&gt;', data)
     data = re.sub('"', '&quot;', data)
     
+    while True:
+        m = re.search("\[include\((((?!\)\]).)*)\)\]", data)
+        if(m):
+            results = m.groups()
+            curs.execute("select * from data where title = '" + pymysql.escape_string(results[0]) + "'")
+            rows = curs.fetchall()
+            if(rows):
+                enddata = rows[0]['data']
+                enddata = re.sub("\[include\((((?!\)\]).)*)\)\]", "", enddata)
+                data = re.sub("\[include\((((?!\)\]).)*)\)\]", enddata, data, 1)
+            else:
+                data = re.sub("\[include\((((?!\)\]).)*)\)\]", "[[" + results[0] + "]]", data, 1)
+        else:
+            break
+    
     data = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', '<meta http-equiv="refresh" content="0;url=/w/\g<in>/redirect/' + title + '" />', data)
     
     data = '\n' + data + '\n'
@@ -108,6 +123,8 @@ def namumark(title, data):
     data = re.sub('\^\^(?P<in>.+?)\^\^(?!\^)', '<sup>\g<in></sup>', data)
     data = re.sub(',,(?P<in>.+?),,(?!,)', '<sub>\g<in></sub>', data)
     
+    data = re.sub('{{\|(?P<in>(?:(?!\|}}).)*)\|}}', '<table><tbody><tr><td>\g<in></td></tr></tbody></table>', data)
+    
     data = re.sub("##\s?(?P<in>[^\n]*)\n", "<div style='display:none;'>\g<in></div>", data);
     
     data = re.sub("\[br\]",'<br>', data);
@@ -134,23 +151,6 @@ def namumark(title, data):
                 width = '560'
                 height = '315'
             data = p.sub('<iframe width="' + width + '" height="' + height + '" src="https://www.youtube.com/embed/' + result[0] + '" frameborder="0" allowfullscreen></iframe>', data, 1)
-        else:
-            break
-            
-    while True:
-        m = re.search("\[\[(?:((?:(?!:|http(?:s):\/\/).)*)\:((?:(?!\]\]|\|).)*))(\|(?:(?:(?!\]\]).)*))?\]\]", data)
-        if(m):
-            results = m.groups()
-            try:
-                if(results[2]):
-                    data = re.sub("\[\[(?:((?:(?!:|http(?:s):\/\/).)*)\:((?:(?!\]\]|\|).)*))(\|(?:(?:(?!\]\]).)*))?\]\]", "[[" + interwiki[results[0]] + results[1] + results[2] + "]]", data, 1)
-                else:
-                    data = re.sub("\[\[(?:((?:(?!:|http(?:s):\/\/).)*)\:((?:(?!\]\]|\|).)*))(\|(?:(?:(?!\]\]).)*))?\]\]", "[[" + interwiki[results[0]] + results[1] + "]]", data, 1)
-            except:
-                if(results[2]):
-                    data = re.sub("\[\[(?:((?:(?!:|http(?:s):\/\/).)*)\:((?:(?!\]\]|\|).)*))(\|(?:(?:(?!\]\]).)*))?\]\]", "[[" + results[1] + results[2] + "]]", data, 1)
-                else:
-                    data = re.sub("\[\[(?:((?:(?!:|http(?:s):\/\/).)*)\:((?:(?!\]\]|\|).)*))(\|(?:(?:(?!\]\]).)*))?\]\]", "[[" + results[1] + "]]", data, 1)
         else:
             break
             
