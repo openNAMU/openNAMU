@@ -8,7 +8,7 @@ import time
 import re
 import bcrypt
 
-json_data=open('set.json').read()
+json_data = open('set.json').read()
 data = json.loads(json_data)
 
 conn = pymysql.connect(host = data['host'], user = data['user'], password = data['pw'], db = data['db'], charset = 'utf8')
@@ -133,7 +133,7 @@ def namumark(title, data):
             data = p.sub('<iframe width="' + width + '" height="' + height + '" src="https://www.youtube.com/embed/' + result[0] + '" frameborder="0" allowfullscreen></iframe>', data, 1)
         else:
             break
-
+            
     while True:
         m = re.search("\[\[(((?!\]\]).)*)\]\]", data)
         if(m):
