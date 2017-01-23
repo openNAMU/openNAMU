@@ -11,9 +11,6 @@ import bcrypt
 json_data = open('set.json').read()
 data = json.loads(json_data)
 
-inter = open('inter.json').read()
-interwiki = json.loads(inter)
-
 conn = pymysql.connect(host = data['host'], user = data['user'], password = data['pw'], db = data['db'], charset = 'utf8')
 curs = conn.cursor(pymysql.cursors.DictCursor)
 
@@ -28,14 +25,17 @@ def namumark(title, data):
         m = re.search("\[include\((((?!\)\]).)*)\)\]", data)
         if(m):
             results = m.groups()
-            curs.execute("select * from data where title = '" + pymysql.escape_string(results[0]) + "'")
-            rows = curs.fetchall()
-            if(rows):
-                enddata = rows[0]['data']
-                enddata = re.sub("\[include\((((?!\)\]).)*)\)\]", "", enddata)
-                data = re.sub("\[include\((((?!\)\]).)*)\)\]", enddata, data, 1)
+            if(results[0] == title):
+                data = re.sub("\[include\((((?!\)\]).)*)\)\]", "<b>" + results[0] + "</b>", data, 1)
             else:
-                data = re.sub("\[include\((((?!\)\]).)*)\)\]", "[[" + results[0] + "]]", data, 1)
+                curs.execute("select * from data where title = '" + pymysql.escape_string(results[0]) + "'")
+                rows = curs.fetchall()
+                if(rows):
+                    enddata = rows[0]['data']
+                    enddata = re.sub("\[include\((((?!\)\]).)*)\)\]", "", enddata)
+                    data = re.sub("\[include\((((?!\)\]).)*)\)\]", enddata, data, 1)
+                else:
+                    data = re.sub("\[include\((((?!\)\]).)*)\)\]", "[[" + results[0] + "]]", data, 1)
         else:
             break
     
@@ -114,6 +114,35 @@ def namumark(title, data):
             break
     
     data = re.sub("\[목차\]", rtoc, data)
+    
+    while True:
+        m = re.search("{{{((?:(?!{{{)(?!}}}).)*)}}}", data)
+        if(m):
+            results = m.groups()
+            n = re.search("^\+([1-5])\s?(.*)$", results[0])
+            a = re.search("^\-([1-5])\s?(.*)$", results[0])
+            b = re.search("^(#[0-9a-f-A-F]{6})\s?(.*)$", results[0])
+            c = re.search("^(#[0-9a-f-A-F]{3})\s?(.*)$", results[0])
+            d = re.search("^#(\w+)\s?(.*)$", results[0])
+            if(n):
+                result = n.groups()
+                data = re.sub("{{{((?:(?!{{{)(?!}}}).)*)}}}", '<span class="font-size-' + result[0] + '">' + result[1] + '</span>', data, 1)
+            elif(a):
+                result = a.groups()
+                data = re.sub("{{{((?:(?!{{{)(?!}}}).)*)}}}", '<span class="font-size-small-' + result[0] + '">' + result[1] + '</span>', data, 1)
+            elif(b):
+                result = b.groups()
+                data = re.sub("{{{((?:(?!{{{)(?!}}}).)*)}}}", '<span style="color:' + result[0] + '">' + result[1] + '</span>', data, 1)
+            elif(c):
+                result = c.groups()
+                data = re.sub("{{{((?:(?!{{{)(?!}}}).)*)}}}", '<span style="color:' + result[0] + '">' + result[1] + '</span>', data, 1)
+            elif(d):
+                result = d.groups()
+                data = re.sub("{{{((?:(?!{{{)(?!}}}).)*)}}}", '<span style="color:' + result[0] + '">' + result[1] + '</span>', data, 1)
+            else:
+                data = re.sub("{{{((?:(?!{{{)(?!}}}).)*)}}}", results[0], 1)
+        else:
+            break
 
     data = re.sub("'''(?P<in>.+?)'''(?!')", '<b>\g<in></b>', data)
     data = re.sub("''(?P<in>.+?)''(?!')", '<i>\g<in></i>', data)
