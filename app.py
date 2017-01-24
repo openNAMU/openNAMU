@@ -1,7 +1,6 @@
 from flask import Flask, request, session, render_template, send_file
 from werkzeug import secure_filename
 app = Flask(__name__)
-app.config['MAX_CONTENT_LENGTH'] = 2 * 1024 * 1024
 
 from urllib import parse
 import json
@@ -13,6 +12,8 @@ import os
 
 json_data = open('set.json').read()
 data = json.loads(json_data)
+
+app.config['MAX_CONTENT_LENGTH'] = int(data['upload']) * 1024 * 1024
 
 conn = pymysql.connect(host = data['host'], user = data['user'], password = data['pw'], db = data['db'], charset = 'utf8')
 curs = conn.cursor(pymysql.cursors.DictCursor)
