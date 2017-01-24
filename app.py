@@ -1,6 +1,7 @@
 from flask import Flask, request, session, render_template, send_file
 from werkzeug import secure_filename
 app = Flask(__name__)
+app.config['MAX_CONTENT_LENGTH'] = 2 * 1024 * 1024
 
 from urllib import parse
 import json
