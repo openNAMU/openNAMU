@@ -263,8 +263,32 @@ def namumark(title, data):
             data = re.sub("((?:(?:\s\*\s[^\n]*)\n?)+)", '<ul id="list">' + end + '</ul>', data, 1)
         else:
             break
-            
-    data = re.sub('(?P<in>http(?:s)?:\/\/(?:(?:(?!\.jpg|\.png|\.gif|\.jpeg|#jpg#|#png#|#gif#|#jpeg#).)*)(?:\.jpg|\.png|\.gif|\.jpeg))', '<img src="\g<in>">', data)
+    
+    while True:
+        m = re.search("(http(?:s)?:\/\/(?:(?:(?!\.jpg|\.png|\.gif|\.jpeg|#jpg#|#png#|#gif#|#jpeg#).)*)(?:\.jpg|\.png|\.gif|\.jpeg))(?:\?([^ \n]*))?", data)
+        if(m):
+            c = m.groups()
+            print(c)
+            if(c[1]):
+                n = re.search("width=([^ \n&]*)", c[1])
+                e = re.search("height=([^ \n&]*)", c[1])
+                if(n):
+                    a = n.groups()
+                    width = a[0]
+                else:
+                    width = ''
+                if(e):
+                    b = e.groups()
+                    height = b[0]
+                else:
+                    height = ''
+                img = re.sub("\.(?P<in>jpg|png|gif|jpeg)", "#\g<in>#", c[0])
+                data = re.sub('(http(?:s)?:\/\/(?:(?:(?!\.jpg|\.png|\.gif|\.jpeg|#jpg#|#png#|#gif#|#jpeg#).)*)(?:\.jpg|\.png|\.gif|\.jpeg))(?:\?([^ \n]*))?', '<img src="' + img + '" style="width:' + width + ';height:' + height + ';">', data, 1)
+            else:
+                img = re.sub("\.(?P<in>jpg|png|gif|jpeg)", "#\g<in>#", c[0])
+                data = re.sub('(http(?:s)?:\/\/(?:(?:(?!\.jpg|\.png|\.gif|\.jpeg|#jpg#|#png#|#gif#|#jpeg#).)*)(?:\.jpg|\.png|\.gif|\.jpeg))(?:\?([^ \n]*))?', '<img src="' + img + '">', data, 1)
+        else:
+            break
     
     data = re.sub('\[date\]', getnow(), data)
     data = re.sub("\[anchor\((?P<in>[^\[\]]*)\)\]", '<span id="\g<in>"></span>', data)
