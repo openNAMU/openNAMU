@@ -174,7 +174,30 @@ def namumark(title, data):
     
     data = re.sub("##\s?(?P<in>[^\n]*)\n", "<div style='display:none;'>\g<in></div>", data);
     
-    data = re.sub("\[\[파일:(?P<in>(?:(?!\]\]).)*)\]\]", "<img src='/image/\g<in>'>", data)
+    while True:
+        m = re.search("\[\[파일:((?:(?!\]\]|\?).)*)(?:\?((?:(?!\]\]).)*))?\]\]", data)
+        if(m):
+            c = m.groups()
+            if(c[1]):
+                n = re.search("width=([^ \n&]*)", c[1])
+                e = re.search("height=([^ \n&]*)", c[1])
+                if(n):
+                    a = n.groups()
+                    width = a[0]
+                else:
+                    width = ''
+                if(e):
+                    b = e.groups()
+                    height = b[0]
+                else:
+                    height = ''
+                img = re.sub("\.(?P<in>jpg|png|gif|jpeg)", "#\g<in>#", c[0])
+                data = re.sub("\[\[파일:((?:(?!\]\]|\?).)*)(?:\?((?:(?!\]\]).)*))?\]\]", '<img src="/image/' + img + '" style="width:' + width + ';height:' + height + ';">', data, 1)
+            else:
+                img = re.sub("\.(?P<in>jpg|png|gif|jpeg)", "#\g<in>#", c[0])
+                data = re.sub("\[\[파일:((?:(?!\]\]|\?).)*)(?:\?((?:(?!\]\]).)*))?\]\]", "<img src='/image/" + img + "'>", data, 1)
+        else:
+            break
     
     data = re.sub("\[br\]",'<br>', data);
     
