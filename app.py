@@ -592,6 +592,12 @@ def redirectw(name = None, redirect = None):
     curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
     rows = curs.fetchall()
     if(rows):
+        if(rows[0]['acl'] == 'admin'):
+            acl = '(관리자)'
+        elif(rows[0]['acl'] == 'user'):
+            acl = '(유저)'
+        else:
+            acl = ''
         newdata = rows[0]['data']
         newdata = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', ' * \g<in> 문서로 넘겨주기', newdata)
         enddata = namumark(name, newdata)
@@ -605,7 +611,7 @@ def redirectw(name = None, redirect = None):
         redirect = re.sub('<', '&lt;', redirect)
         redirect = re.sub('>', '&gt;', redirect)
         redirect = re.sub('"', '&quot;', redirect)
-        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = enddata, license = data['license'], tn = 1, redirect = '<a href="/edit/' + parse.quote(test) + '">' + redirect + '</a>에서 넘어 왔습니다.', left = left)
+        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = enddata, license = data['license'], tn = 1, redirect = '<a href="/edit/' + parse.quote(test) + '">' + redirect + '</a>에서 넘어 왔습니다.', left = left, acl = acl)
     else:
         test = redirect
         redirect = re.sub('<', '&lt;', redirect)
