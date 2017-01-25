@@ -49,7 +49,15 @@ def namumark(title, data):
         else:
             break
     
-    data = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', '<meta http-equiv="refresh" content="0;url=/w/\g<in>/redirect/' + title + '" />', data)
+    while True:
+        m = re.search('^#(?:redirect|넘겨주기)\s([^\n]*)', data)
+        if(m):
+            results = m.groups()
+            data = re.sub('^#(?:redirect|넘겨주기)\s([^\n]*)', '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(results[0]) + '/redirect/' + parse.quote(title) + '" />', data, 1)
+        else:
+            break
+    
+    
     
     data = '\n' + data + '\n'
     
@@ -415,17 +423,28 @@ def getleng(existing, change):
 @app.route('/upload', methods=['GET', 'POST'])
 def upload():
     if(request.method == 'POST'):
-        file = request.files['file']
-        if(file and allowed_file(file.filename)):
-            filename = secure_filename(file.filename)
-            if(os.path.exists(os.path.join('image', filename))):
-                return render_template('index.html', logo = data['name'], title = '업로드', data = '<a href="/upload">동일한 이름 파일 있음</a>')
-            else:
-                file.save(os.path.join('image', filename))
-                return render_template('index.html', logo = data['name'], title = '업로드', data = '<a href="/upload">완료 됨</a>')
+        ip = getip(request)
+        ban = getban(ip)
+        if(ban == 1):
+            return '<meta http-equiv="refresh" content="0;url=/ban" />'
         else:
-            return render_template('index.html', logo = data['name'], title = '업로드', data = '<a href="/upload">jpg gif jpeg png만 가능 합니다.</a>')
-    return render_template('index.html', logo = data['name'], title = '업로드', tn = 21)
+            file = request.files['file']
+            if(file and allowed_file(file.filename)):
+                filename = secure_filename(file.filename)
+                if(os.path.exists(os.path.join('image', filename))):
+                    return render_template('index.html', logo = data['name'], title = '업로드', data = '<a href="/upload">동일한 이름 파일 있음</a>')
+                else:
+                    file.save(os.path.join('image', filename))
+                    return render_template('index.html', logo = data['name'], title = '업로드', data = '<a href="/upload">완료 됨</a>')
+            else:
+                return render_template('index.html', logo = data['name'], title = '업로드', data = '<a href="/upload">jpg gif jpeg png만 가능 합니다.</a>')
+    else:
+        ip = getip(request)
+        ban = getban(ip)
+        if(ban == 1):
+            return '<meta http-equiv="refresh" content="0;url=/ban" />'
+        else:
+            return render_template('index.html', logo = data['name'], title = '업로드', tn = 21)
     
 @app.route('/image/<name>')
 def image(name = None):
@@ -574,7 +593,7 @@ def redirectw(name = None, redirect = None):
     rows = curs.fetchall()
     if(rows):
         newdata = rows[0]['data']
-        newdata = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', ' * \g<in> 문서로 넘겨주기', data)
+        newdata = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', ' * \g<in> 문서로 넘겨주기', newdata)
         enddata = namumark(name, newdata)
         m = re.search('<div id="toc">((?:(?!\/div>).)*)<\/div>', enddata)
         if(m):
