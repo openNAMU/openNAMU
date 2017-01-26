@@ -222,7 +222,7 @@ def namumark(title, data):
             else:
                 width = '560'
                 height = '315'
-            data = p.sub('<iframe width="' + width + '" height="' + height + '" src="https://www.youtube.com/embed/' + result[0] + '" frameborder="0" allowfullscreen></iframe>', data, 1)
+            data = re.sub("\[youtube\(((?:(?!,|\)\]).)*)(?:,\s)?(?:width=((?:(?!,|\)\]).)*))?(?:,\s)?(?:height=((?:(?!,|\)\]).)*))?(?:,\s)?(?:width=((?:(?!,|\)\]).)*))?\)\]", '<iframe width="' + width + '" height="' + height + '" src="https://www.youtube.com/embed/' + result[0] + '" frameborder="0" allowfullscreen></iframe>', data, 1)
         else:
             break
             
@@ -583,7 +583,7 @@ def recentblock():
 def gethistory(name = None):
     i = 0
     div = '<div>'
-    curs.execute("select * from history where title = '" + pymysql.escape_string(name) + "' order by date desc")
+    curs.execute("select * from history where title = '" + pymysql.escape_string(name) + "' order by id+0 desc")
     rows = curs.fetchall()
     if(rows):
         while True:
