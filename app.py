@@ -897,6 +897,7 @@ def setup():
     curs.execute("create table if not exists topic(id text not null, title text not null, sub text not null, data longtext not null, date text not null, ip text not null, block text not null)")
     curs.execute("create table if not exists stop(title text not null, sub text not null, close text not null)")
     curs.execute("create table if not exists rb(block text not null, end text not null, today text not null, blocker text not null, why text not null)")
+    curs.execute("create table if not exists login(user text not null, ip text not null, today text not null)")
     return render_template('index.html', title = '설치 완료', logo = data['name'], data = '문제 없었음')
 
 @app.route('/other')
@@ -918,7 +919,9 @@ def titleindex():
                 break
             div = div + '<li><a href="/w/' + parse.quote(rows[i]['title']) + '">' + rows[i]['title'] + '</a></li>'
             i = i + 1
-        return render_template('index.html', logo = data['name'], rows = div, tn = 4, title = '모든 문서')
+        curs.execute("select TABLE_ROWS from information_schema.tables where table_name = 'data';")
+        row = curs.fetchall()
+        return render_template('index.html', logo = data['name'], rows = div + '<br><span>이 위키에는 총 ' + str(row[0]['TABLE_ROWS']) + '개의 문서가 있습니다.</span>', tn = 4, title = '모든 문서')
     else:
         return render_template('index.html', logo = data['name'], rows = '', tn = 4, title = '모든 문서')
 
@@ -1140,6 +1143,8 @@ def login():
                 elif(bcrypt.checkpw(bytes(request.form["pw"], 'utf-8'), bytes(rows[0]['pw'], 'utf-8'))):
                     session['Now'] = True
                     session['DREAMER'] = request.form["id"]
+                    curs.execute("insert into login (user, ip, today) value ('" + pymysql.escape_string(request.form["id"]) + "', '" + pymysql.escape_string(ip) + "', '" + pymysql.escape_string(getnow()) + "')")
+                    conn.commit()
                     return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(data['frontpage']) + '" />'
                 else:
                     return render_template('index.html', title = '로그인 오류', logo = data['name'], data = '비밀번호가 다릅니다.')
