@@ -296,7 +296,7 @@ def namumark(title, data):
             else:
                 b = re.search("^http(?:s)?:\/\/", result[0])
                 if(b):
-                    c = re.search("(?:\.jpg|\.png|\.gif|\.jpeg)", results[0])
+                    c = re.search("(?:\.jpg|\.png|\.gif|\.jpeg)", result[0])
                     if(c):
                         img = result[0]
                         img = re.sub("\.(?P<in>jpg|png|gif|jpeg)", "#\g<in>#", img)
