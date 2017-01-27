@@ -9,6 +9,7 @@ import time
 import re
 import bcrypt
 import os
+import difflib
 
 json_data = open('set.json').read()
 data = json.loads(json_data)
@@ -21,6 +22,17 @@ curs = conn.cursor(pymysql.cursors.DictCursor)
 app.secret_key = data['key']
 
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
+
+def show_diff(seqm):
+    output= []
+    for opcode, a0, a1, b0, b1 in seqm.get_opcodes():
+        if opcode == 'equal':
+            output.append(seqm.a[a0:a1])
+        elif opcode == 'insert':
+            output.append("<span style='background:#CFC;'>" + seqm.b[b0:b1] + "</span>")
+        elif opcode == 'delete':
+            output.append("<span style='background:#FDD;'>" + seqm.a[a0:a1] + "</span>")
+    return ''.join(output)
 
 def allowed_file(filename):
     return '.' in filename and \
@@ -534,7 +546,7 @@ def recentdiscuss():
             i = i + 1
         return render_template('index.html', logo = data['name'], rows = div, tn = 12, title = '최근 토론내역')
     else:
-         return render_template('index.html', logo = data['name'], rows = '', tn = 12, title = '최근 토론내역')
+        return render_template('index.html', logo = data['name'], rows = '', tn = 12, title = '최근 토론내역')
          
 @app.route('/recentblock')
 def recentblock():
@@ -556,33 +568,36 @@ def recentblock():
             i = i + 1
         return render_template('index.html', logo = data['name'], rows = div, tn = 20, title = '최근 차단내역')
     else:
-         return render_template('index.html', logo = data['name'], rows = '', tn = 20, title = '최근 차단내역')
+        return render_template('index.html', logo = data['name'], rows = '', tn = 20, title = '최근 차단내역')
 
-@app.route('/history/<name>')
+@app.route('/history/<name>', methods=['POST', 'GET'])
 def gethistory(name = None):
-    i = 0
-    div = '<div>'
-    curs.execute("select * from history where title = '" + pymysql.escape_string(name) + "' order by id+0 desc")
-    rows = curs.fetchall()
-    if(rows):
-        while True:
-            try:
-                a = rows[i]
-            except:
-                div = div + '</div>'
-                break
-            if(rows[i]['send']):
-                send = rows[i]['send']
-                send = re.sub('<', '&lt;', send)
-                send = re.sub('>', '&gt;', send)
-                send = re.sub('&lt;a href="\/w\/(?P<in>[^"]*)"&gt;(?P<out>[^&]*)&lt;\/a&gt;', '<a href="/w/\g<in>">\g<out></a>', send)
-            else:
-                send = '<br>'
-            div = div + '<table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;">r' + rows[i]['id'] + '</a> <a href="/w/' + parse.quote(rows[i]['title']) + '/r/' + rows[i]['id'] + '">(w)</a> <a href="/w/' + parse.quote(rows[i]['title']) + '/raw/' + rows[i]['id'] + '">(Raw)</a> <a href="/revert/' + parse.quote(rows[i]['title']) + '/r/' + rows[i]['id'] + '">(되돌리기)</a> (' + rows[i]['leng'] + ')</td><td style="text-align: center;width:33.33%;">' + rows[i]['ip'] + '</td><td style="text-align: center;width:33.33%;">' + rows[i]['date'] + '</td></tr><tr><td colspan="3" style="text-align: center;width:100%;">' + send + '</td></tr></tbody></table>'
-            i = i + 1
-        return render_template('index.html', logo = data['name'], rows = div, tn = 5, title = name, page = parse.quote(name))
+    if(request.method == 'POST'):
+        return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name) + '/r/' + request.form["a"] + '/diff/' + request.form["b"] + '" />'
     else:
-         return render_template('index.html', logo = data['name'], rows = '', tn = 5, title = name, page = parse.quote(name))
+        i = 0
+        div = '<div>'
+        curs.execute("select * from history where title = '" + pymysql.escape_string(name) + "' order by id+0 desc")
+        rows = curs.fetchall()
+        if(rows):
+            while True:
+                try:
+                    a = rows[i]
+                except:
+                    div = div + '</div>'
+                    break
+                if(rows[i]['send']):
+                    send = rows[i]['send']
+                    send = re.sub('<', '&lt;', send)
+                    send = re.sub('>', '&gt;', send)
+                    send = re.sub('&lt;a href="\/w\/(?P<in>[^"]*)"&gt;(?P<out>[^&]*)&lt;\/a&gt;', '<a href="/w/\g<in>">\g<out></a>', send)
+                else:
+                    send = '<br>'
+                div = div + '<table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;">r' + rows[i]['id'] + '</a> <a href="/w/' + parse.quote(rows[i]['title']) + '/r/' + rows[i]['id'] + '">(w)</a> <a href="/w/' + parse.quote(rows[i]['title']) + '/raw/' + rows[i]['id'] + '">(Raw)</a> <a href="/revert/' + parse.quote(rows[i]['title']) + '/r/' + rows[i]['id'] + '">(되돌리기)</a> (' + rows[i]['leng'] + ')</td><td style="text-align: center;width:33.33%;">' + rows[i]['ip'] + '</td><td style="text-align: center;width:33.33%;">' + rows[i]['date'] + '</td></tr><tr><td colspan="3" style="text-align: center;width:100%;">' + send + '</td></tr></tbody></table>'
+                i = i + 1
+            return render_template('index.html', logo = data['name'], rows = div, tn = 5, title = name, page = parse.quote(name))
+        else:
+            return render_template('index.html', logo = data['name'], rows = '', tn = 5, title = name, page = parse.quote(name))
 
 @app.route('/search', methods=['POST', 'GET'])
 def search():
@@ -1407,6 +1422,30 @@ def aban():
         end = '권한이 맞지 않는 상태 입니다.'
     
     return render_template('index.html', title = '권한 오류', logo = data['name'], data = end)
+   
+@app.route('/w/<name>/r/<a>/diff/<b>')
+def diff(name = None, a = None, b = None):
+    curs.execute("select * from history where id = '" + pymysql.escape_string(a) + "' and title = '" + pymysql.escape_string(name) + "'")
+    rows = curs.fetchall()
+    if(rows):
+        curs.execute("select * from history where id = '" + pymysql.escape_string(b) + "' and title = '" + pymysql.escape_string(name) + "'")
+        row = curs.fetchall()
+        if(row):
+            indata = re.sub('<', '&lt;', rows[0]['data'])
+            indata = re.sub('>', '&gt;', indata)
+            indata = re.sub('"', '&quot;', indata)
+            indata = re.sub('\n', '<br>', indata)
+            enddata = re.sub('<', '&lt;', row[0]['data'])
+            enddata = re.sub('>', '&gt;', enddata)
+            enddata = re.sub('"', '&quot;', enddata)
+            enddata = re.sub('\n', '<br>', enddata)
+            sm = difflib.SequenceMatcher(None, indata, enddata)
+            c = show_diff(sm)
+            return render_template('index.html', title = 'Diff', logo = data['name'], data = c)
+        else:
+            return render_template('index.html', title = 'Diff 오류', logo = data['name'], data = '<a href="/w/' + name + '">이 리비전이나 문서가 없습니다.</a>')
+    else:
+        return render_template('index.html', title = 'Diff 오류', logo = data['name'], data = '<a href="/w/' + name + '">이 리비전이나 문서가 없습니다.</a>')
 
 @app.route('/version')
 def version():
