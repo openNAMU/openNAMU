@@ -687,10 +687,10 @@ def reraw(name = None, number = None):
     curs.execute("select * from history where title = '" + pymysql.escape_string(name) + "' and id = '" + number + "'")
     rows = curs.fetchall()
     if(rows):
-        enddata = re.sub("\n", '<br>', rows[0]['data'])
-        enddata = re.sub('<', '&lt;', enddata)
+        enddata = re.sub('<', '&lt;', rows[0]['data'])
         enddata = re.sub('>', '&gt;', enddata)
         enddata = re.sub('"', '&quot;', enddata)
+        enddata = re.sub("\n", '<br>', enddata)
         return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = enddata, license = data['license'])
     else:
         return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = '<br>문서 없음', license = data['license'])
@@ -700,10 +700,10 @@ def raw(name = None):
     curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
     rows = curs.fetchall()
     if(rows):
-        enddata = re.sub("\n", '<br>', rows[0]['data'])
-        enddata = re.sub('<', '&lt;', enddata)
+        enddata = re.sub('<', '&lt;', rows[0]['data'])
         enddata = re.sub('>', '&gt;', enddata)
         enddata = re.sub('"', '&quot;', enddata)
+        enddata = re.sub("\n", '<br>', enddata)
         return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = enddata, license = data['license'], tn = 7)
     else:
         return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = '문서 없음', license = data['license'], tn = 7)
