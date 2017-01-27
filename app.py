@@ -206,7 +206,7 @@ def namumark(title, data):
                 else:
                     height = ''
                 img = re.sub("\.(?P<in>jpg|png|gif|jpeg)", "#\g<in>#", c[0])
-                data = re.sub("\[\[파일:((?:(?!\]\]|\?).)*)(?:\?((?:(?!\]\]).)*))?\]\]", '<img src="/image/' + img + '" style="width:' + width + ';height:' + height + ';">', data, 1)
+                data = re.sub("\[\[파일:((?:(?!\]\]|\?).)*)(?:\?((?:(?!\]\]).)*))?\]\]", '<img src="/image/' + img + '" width="' + width + '" height="' + height + '">', data, 1)
             else:
                 img = re.sub("\.(?P<in>jpg|png|gif|jpeg)", "#\g<in>#", c[0])
                 data = re.sub("\[\[파일:((?:(?!\]\]|\?).)*)(?:\?((?:(?!\]\]).)*))?\]\]", "<img src='/image/" + img + "'>", data, 1)
@@ -241,9 +241,8 @@ def namumark(title, data):
             break
             
     while True:
-        m = re.search("http(?:s)?:\/\/(?:(?:(?:(?!\.jpg|\.png|\.gif|\.jpeg|#jpg#|#png#|#gif#|#jpeg#).)*)(?:\.jpg|\.png|\.gif|\.jpeg))(?:(?:(?:\?)width=((?:[0-9]*)(?:px)?))?(?:(?:\?|&)height=((?:[0-9]*)(?:px)?))?(?:(?:&)width=((?:[0-9]*)(?:px)?))?)?", data)
+        m = re.search("(http(?:s)?:\/\/(?:(?:(?:(?!\.jpg|\.png|\.gif|\.jpeg|#jpg#|#png#|#gif#|#jpeg#).)*)(?:\.jpg|\.png|\.gif|\.jpeg)))(?:(?:(?:\?)width=((?:[0-9]*)(?:px)?))?(?:(?:\?|&)height=((?:[0-9]*)(?:px)?))?(?:(?:&)width=((?:[0-9]*)(?:px)?))?)?", data)
         if(m):
-            print(m)
             result = m.groups()
             if(result[1]):
                 if(result[2]):
@@ -264,7 +263,7 @@ def namumark(title, data):
                 height = ''
             c = result[0]
             c = re.sub("\.(?P<in>jpg|png|gif|jpeg)", "#\g<in>#", c)
-            data = re.sub("http(?:s)?:\/\/(?:(?:(?:(?!\.jpg|\.png|\.gif|\.jpeg|#jpg#|#png#|#gif#|#jpeg#).)*)(?:\.jpg|\.png|\.gif|\.jpeg))(?:(?:(?:\?)width=((?:[0-9]*)(?:px)?))?(?:(?:\?|&)height=((?:[0-9]*)(?:px)?))?(?:(?:&)width=((?:[0-9]*)(?:px)?))?)?", "<img style='width:" + width + ";height:" + height + ";' src='" + c + "'>", data, 1)
+            data = re.sub("(http(?:s)?:\/\/(?:(?:(?:(?!\.jpg|\.png|\.gif|\.jpeg|#jpg#|#png#|#gif#|#jpeg#).)*)(?:\.jpg|\.png|\.gif|\.jpeg)))(?:(?:(?:\?)width=((?:[0-9]*)(?:px)?))?(?:(?:\?|&)height=((?:[0-9]*)(?:px)?))?(?:(?:&)width=((?:[0-9]*)(?:px)?))?)?", "<img width='" + width + "' height='" + height + "' src='" + c + "'>", data, 1)
         else:
             break
             
