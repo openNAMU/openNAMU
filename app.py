@@ -241,6 +241,34 @@ def namumark(title, data):
             break
             
     while True:
+        m = re.search("http(?:s)?:\/\/(?:(?:(?:(?!\.jpg|\.png|\.gif|\.jpeg|#jpg#|#png#|#gif#|#jpeg#).)*)(?:\.jpg|\.png|\.gif|\.jpeg))(?:(?:(?:\?)width=((?:[0-9]*)(?:px)?))?(?:(?:\?|&)height=((?:[0-9]*)(?:px)?))?(?:(?:&)width=((?:[0-9]*)(?:px)?))?)?", data)
+        if(m):
+            print(m)
+            result = m.groups()
+            if(result[1]):
+                if(result[2]):
+                    width = result[1]
+                    height = result[2]
+                else:
+                    width = result[1]
+                    height = ''
+            elif(result[2]):
+                if(result[3]):
+                    height = result[2]
+                    width = result[3]
+                else:
+                    height = result[2]
+                    width = ''
+            else:
+                width = ''
+                height = ''
+            c = result[0]
+            c = re.sub("\.(?P<in>jpg|png|gif|jpeg)", "#\g<in>#", c)
+            data = re.sub("http(?:s)?:\/\/(?:(?:(?:(?!\.jpg|\.png|\.gif|\.jpeg|#jpg#|#png#|#gif#|#jpeg#).)*)(?:\.jpg|\.png|\.gif|\.jpeg))(?:(?:(?:\?)width=((?:[0-9]*)(?:px)?))?(?:(?:\?|&)height=((?:[0-9]*)(?:px)?))?(?:(?:&)width=((?:[0-9]*)(?:px)?))?)?", "<img style='width:" + width + ";height:" + height + ";' src='" + c + "'>", data, 1)
+        else:
+            break
+            
+    while True:
         m = re.search("\[\[(((?!\]\]).)*)\]\]", data)
         if(m):
             result = m.groups()
