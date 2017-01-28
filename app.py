@@ -391,54 +391,125 @@ def getip(request):
     return ip
 
 def getcan(ip, name):
-    curs.execute("select * from ban where block = '" + pymysql.escape_string(ip) + "'")
-    rows = curs.fetchall()
-    if(rows):
-        return 1
-    else:
-        curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
-        row = curs.fetchall()
-        if(row):
-            curs.execute("select * from user where id = '" + pymysql.escape_string(ip) + "'")
+    b = re.search("^([0-9](?:[0-9][0-9])?\.[0-9](?:[0-9][0-9])?)", ip)
+    if(b):
+        results = b.groups()
+        curs.execute("select * from ban where block = '" + pymysql.escape_string(results[0]) + "' and band = 'O'")
+        rowss = curs.fetchall()
+        if(rowss):
+            return 1
+        else:
+            curs.execute("select * from ban where block = '" + pymysql.escape_string(ip) + "'")
             rows = curs.fetchall()
-            if(row[0]['acl'] == 'user'):
-                if(rows):
-                    return 0
+            if(rows):
+                return 1
+            else:
+                curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
+                row = curs.fetchall()
+                if(row):
+                    curs.execute("select * from user where id = '" + pymysql.escape_string(ip) + "'")
+                    rows = curs.fetchall()
+                    if(row[0]['acl'] == 'user'):
+                        if(rows):
+                            return 0
+                        else:
+                            return 1
+                    elif(row[0]['acl'] == 'admin'):
+                        if(rows):
+                            if(rows[0]['acl'] == 'admin' or rows[0]['acl'] == 'owner'):
+                                return 0
+                            else:
+                                return 1
+                        else:
+                            return 1
+                    else:
+                        return 0
                 else:
-                    return 1
-            elif(row[0]['acl'] == 'admin'):
-                if(rows):
-                    if(rows[0]['acl'] == 'admin' or rows[0]['acl'] == 'owner'):
+                    return 0
+    else:
+        curs.execute("select * from ban where block = '" + pymysql.escape_string(ip) + "'")
+        rows = curs.fetchall()
+        if(rows):
+            return 1
+        else:
+            curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
+            row = curs.fetchall()
+            if(row):
+                curs.execute("select * from user where id = '" + pymysql.escape_string(ip) + "'")
+                rows = curs.fetchall()
+                if(row[0]['acl'] == 'user'):
+                    if(rows):
                         return 0
                     else:
                         return 1
+                elif(row[0]['acl'] == 'admin'):
+                    if(rows):
+                        if(rows[0]['acl'] == 'admin' or rows[0]['acl'] == 'owner'):
+                            return 0
+                        else:
+                            return 1
+                    else:
+                        return 1
                 else:
-                    return 1
+                    return 0
             else:
                 return 0
-        else:
-            return 0
 
 def getban(ip):
-    curs.execute("select * from ban where block = '" + pymysql.escape_string(ip) + "'")
-    rows = curs.fetchall()
-    if(rows):
-        return 1
+    b = re.search("^([0-9](?:[0-9][0-9])?\.[0-9](?:[0-9][0-9])?)", ip)
+    if(b):
+        results = b.groups()
+        curs.execute("select * from ban where block = '" + pymysql.escape_string(results[0]) + "' and band = 'O'")
+        rowss = curs.fetchall()
+        if(rowss):
+            return 1
+        else:
+            curs.execute("select * from ban where block = '" + pymysql.escape_string(ip) + "'")
+            rows = curs.fetchall()
+            if(rows):
+                return 1
+            else:
+                return 0
     else:
-        return 0
-        
-def getdiscuss(ip, name, sub):
-    curs.execute("select * from ban where block = '" + pymysql.escape_string(ip) + "'")
-    rows = curs.fetchall()
-    if(rows):
-        return 1
-    else:
-        curs.execute("select * from stop where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "'")
+        curs.execute("select * from ban where block = '" + pymysql.escape_string(ip) + "'")
         rows = curs.fetchall()
         if(rows):
             return 1
         else:
             return 0
+        
+def getdiscuss(ip, name, sub):
+    b = re.search("^([0-9](?:[0-9][0-9])?\.[0-9](?:[0-9][0-9])?)", ip)
+    if(b):
+        results = b.groups()
+        curs.execute("select * from ban where block = '" + pymysql.escape_string(results[0]) + "' and band = 'O'")
+        rowss = curs.fetchall()
+        if(rowss):
+            return 1
+        else:
+            curs.execute("select * from ban where block = '" + pymysql.escape_string(ip) + "'")
+            rows = curs.fetchall()
+            if(rows):
+                return 1
+            else:
+                curs.execute("select * from stop where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "'")
+                rows = curs.fetchall()
+                if(rows):
+                    return 1
+                else:
+                    return 0
+    else:
+        curs.execute("select * from ban where block = '" + pymysql.escape_string(ip) + "'")
+        rows = curs.fetchall()
+        if(rows):
+            return 1
+        else:
+            curs.execute("select * from stop where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "'")
+            rows = curs.fetchall()
+            if(rows):
+                return 1
+            else:
+                return 0
 
 def getnow():
     now = time.localtime()
@@ -1283,8 +1354,13 @@ def ban(name = None):
                         block(name, '해제', getnow(), ip, '')
                         curs.execute("delete from ban where block = '" + pymysql.escape_string(name) + "'")
                     else:
-                        block(name, request.form["end"], getnow(), ip, request.form["why"])
-                        curs.execute("insert into ban (block, end, why, band) value ('" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(request.form["end"]) + "', '" + pymysql.escape_string(request.form["why"]) + "', '')")
+                        b = re.search("^([0-9](?:[0-9][0-9])?\.[0-9](?:[0-9][0-9])?)$", name)
+                        if(b):
+                            block(name, request.form["end"], getnow(), ip, request.form["why"])
+                            curs.execute("insert into ban (block, end, why, band) value ('" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(request.form["end"]) + "', '" + pymysql.escape_string(request.form["why"]) + "', 'O')")
+                        else:
+                            block(name, request.form["end"], getnow(), ip, request.form["why"])
+                            curs.execute("insert into ban (block, end, why, band) value ('" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(request.form["end"]) + "', '" + pymysql.escape_string(request.form["why"]) + "', '')")
                     conn.commit()
                     return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(data['frontpage']) + '" />'
                 else:
@@ -1305,7 +1381,11 @@ def ban(name = None):
                     if(row):
                         now = '차단 해제'
                     else:
-                        now = '차단'
+                        b = re.search("^([0-9](?:[0-9][0-9])?\.[0-9](?:[0-9][0-9])?)$", name)
+                        if(b):
+                            now = '대역 차단'
+                        else:
+                            now = '차단'
                     return render_template('index.html', title = name, page = parse.quote(name), logo = data['name'], tn = 16, now = now, today = getnow())
                 else:
                     return render_template('index.html', title = '권한 오류', logo = data['name'], data = '권한이 모자랍니다.')
@@ -1445,6 +1525,32 @@ def aban():
                     end = '차단이 풀렸습니다. 다시 시도 해 보세요.'
             else:
                 end = '영구 차단 상태 입니다. / 사유 : ' + rows[0]['why']
+        else:
+            b = re.search("^([0-9](?:[0-9][0-9])?\.[0-9](?:[0-9][0-9])?)", ip)
+            if(b):
+                results = b.groups()
+                curs.execute("select * from ban where block = '" + pymysql.escape_string(results[0]) + "' and band = 'O'")
+                row = curs.fetchall()
+                if(row):
+                    if(row[0]['end']):
+                        end = row[0]['end'] + ' 까지 차단 상태 입니다. / 사유 : ' + rows[0]['why']
+                
+                        now = getnow()
+                        now = re.sub(':', '', now)
+                        now = re.sub('\-', '', now)
+                        now = re.sub(' ', '', now)
+                        now = int(now)
+                        
+                        day = row[0]['end']
+                        day = re.sub('\-', '', day)
+                        
+                        if(now >= int(day + '000000')):
+                            curs.execute("delete from ban where block = '" + pymysql.escape_string(results[0]) + "' and band = 'O'")
+                            conn.commit()
+                            end = '차단이 풀렸습니다. 다시 시도 해 보세요.'
+                    else:
+                        end = '영구 차단 상태 입니다. / 사유 : ' + row[0]['why']
+                
     else:
         end = '권한이 맞지 않는 상태 입니다.'
     

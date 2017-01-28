@@ -307,7 +307,7 @@
 				<li>어드민 부여 구현</li>
 				<h2>1.2 (진행중)</h2>
                 <li>미리보기 구현 (완료)</li>
-				<li>대역 차단 구현</li>
+				<li>대역 차단 구현 (완료)</li>
 				<li>diff 구현 (완료)</li>
                 <li>파일 업로드 개선 (완료)</li>
                 <li>파일 업로드 구현 (완료)</li>
@@ -330,7 +330,7 @@
 				<li>일부 파일 <a href="https://twitter.com/Basix1120">Basix</a></li>
 				<br>
 				<h2>기타</h2>
-				<li>현재 버전 1.2.9 - Beta</li>
+				<li>현재 버전 1.3.0 - Beta</li>
 			</div>
 			{% elif tn == 15 %}
 			<h1 class="title">{{title}}</h1>
@@ -356,7 +356,7 @@
 			{% elif tn == 16 %}
 			<h1 class="title">{{title}} <sub>(차단)</sub></h1>
 			<form id="usrform" method="POST" action="/ban/{{page}}">
-				{% if now == '차단' %}
+				{% if now == '차단' or now == '대역 차단' %}
 				<input class="form-control" name="end" style="width: 100%">
 				<br>
 				<br>
