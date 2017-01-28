@@ -509,7 +509,7 @@ def upload():
         if(ban == 1):
             return '<meta http-equiv="refresh" content="0;url=/ban" />'
         else:
-            return render_template('index.html', logo = data['name'], title = '업로드', tn = 21)
+            return render_template('index.html', logo = data['name'], title = '업로드', tn = 21, number = data['upload'])
     
 @app.route('/image/<name>')
 def image(name = None):
