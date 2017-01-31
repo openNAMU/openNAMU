@@ -1615,4 +1615,4 @@ def uncaughtError(error):
     return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(data['frontpage']) + '" />'
 
 if __name__ == '__main__':
-    app.run(host = '0.0.0.0', port = 3000)
+    app.run(host = '0.0.0.0', port = int(data['port']))

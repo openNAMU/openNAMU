@@ -8,5 +8,6 @@
 	"frontpage" : "FrontPage",
 	"license" : "CC 0",
 	"key" : "test",
-    "upload" : "2"
+	"upload" : "2",
+	"port" : "3000"
 }
