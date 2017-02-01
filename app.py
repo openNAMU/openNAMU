@@ -1405,7 +1405,7 @@ def logout():
 
 @app.route('/ban/<name>', methods=['POST', 'GET'])
 def ban(name = None):
-    curs.execute("select * from user where name = '" + pymysql.escape_string(name) + "'")
+    curs.execute("select * from user where id = '" + pymysql.escape_string(name) + "'")
     rows = curs.fetchall()
     if(rows[0]['acl'] == 'owner' or rows[0]['acl'] == 'admin'):
         return render_template('index.html', title = '차단 오류', logo = data['name'], data = '관리자는 차단 할 수 없습니다.')
