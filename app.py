@@ -1346,6 +1346,8 @@ def check(name = None, sub = None, number = None):
                         break
                     i = i + 1
                 return render_template('index.html', title = '다중 검사', logo = data['name'], tn = 22, rows = c)
+            else:
+                return render_template('index.html', title = '다중 검사', logo = data['name'], tn = 22, rows = '')
         else:
             curs.execute("select * from login where user = '" + pymysql.escape_string(name) + "' order by today desc")
             row = curs.fetchall()
@@ -1359,6 +1361,8 @@ def check(name = None, sub = None, number = None):
                         break
                     i = i + 1
                 return render_template('index.html', title = '다중 검사', logo = data['name'], tn = 22, rows = c)
+            else:
+                return render_template('index.html', title = '다중 검사', logo = data['name'], tn = 22, rows = '')
     else:
         return render_template('index.html', title = '권한 오류', logo = data['name'], data = '권한이 모자랍니다.')
 
