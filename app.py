@@ -615,7 +615,15 @@ def recentchanges():
             title = rows[i]['title']
             title = re.sub('<', '&lt;', title)
             title = re.sub('>', '&gt;', title)
-            div = div + '<table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;"><a href="/w/' + parse.quote(rows[i]['title']) + '">' + title + '</a> <a href="/history/' + parse.quote(rows[i]['title']) + '">(역사)</a> (' + rows[i]['leng'] + ')</td><td style="text-align: center;width:33.33%;">' + rows[i]['ip'] + '</td><td style="text-align: center;width:33.33%;">' + rows[i]['date'] + '</td></tr><tr><td colspan="3" style="text-align: center;width:100%;">' + send + '</td></tr></tbody></table>'
+            m = re.search("\+", rows[i]['leng'])
+            n = re.search("\-", rows[i]['leng'])
+            if(m):
+                leng = '<span style="color:green;">' + rows[i]['leng'] + '</span>'
+            elif(n):
+                leng = '<span style="color:red;">' + rows[i]['leng'] + '</span>'
+            else:
+                leng = '<span style="color:gray;">' + rows[i]['leng'] + '</span>'
+            div = div + '<table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;"><a href="/w/' + parse.quote(rows[i]['title']) + '">' + title + '</a> <a href="/history/' + parse.quote(rows[i]['title']) + '">(역사)</a> (' + leng + ')</td><td style="text-align: center;width:33.33%;">' + rows[i]['ip'] + '</td><td style="text-align: center;width:33.33%;">' + rows[i]['date'] + '</td></tr><tr><td colspan="3" style="text-align: center;width:100%;">' + send + '</td></tr></tbody></table>'
             i = i + 1
         return render_template('index.html', logo = data['name'], rows = div, tn = 3, title = '최근 변경내역')
     else:
@@ -691,7 +699,15 @@ def gethistory(name = None):
                     send = re.sub('&lt;a href="\/w\/(?P<in>[^"]*)"&gt;(?P<out>[^&]*)&lt;\/a&gt;', '<a href="/w/\g<in>">\g<out></a>', send)
                 else:
                     send = '<br>'
-                div = div + '<table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;">r' + rows[i]['id'] + '</a> <a href="/w/' + parse.quote(rows[i]['title']) + '/r/' + rows[i]['id'] + '">(w)</a> <a href="/w/' + parse.quote(rows[i]['title']) + '/raw/' + rows[i]['id'] + '">(Raw)</a> <a href="/revert/' + parse.quote(rows[i]['title']) + '/r/' + rows[i]['id'] + '">(되돌리기)</a> (' + rows[i]['leng'] + ')</td><td style="text-align: center;width:33.33%;">' + rows[i]['ip'] + '</td><td style="text-align: center;width:33.33%;">' + rows[i]['date'] + '</td></tr><tr><td colspan="3" style="text-align: center;width:100%;">' + send + '</td></tr></tbody></table>'
+                m = re.search("\+", rows[i]['leng'])
+                n = re.search("\-", rows[i]['leng'])
+                if(m):
+                    leng = '<span style="color:green;">' + rows[i]['leng'] + '</span>'
+                elif(n):
+                    leng = '<span style="color:red;">' + rows[i]['leng'] + '</span>'
+                else:
+                    leng = '<span style="color:gray;">' + rows[i]['leng'] + '</span>'
+                div = div + '<table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;">r' + rows[i]['id'] + '</a> <a href="/w/' + parse.quote(rows[i]['title']) + '/r/' + rows[i]['id'] + '">(w)</a> <a href="/w/' + parse.quote(rows[i]['title']) + '/raw/' + rows[i]['id'] + '">(Raw)</a> <a href="/revert/' + parse.quote(rows[i]['title']) + '/r/' + rows[i]['id'] + '">(되돌리기)</a> (' + leng + ')</td><td style="text-align: center;width:33.33%;">' + rows[i]['ip'] + '</td><td style="text-align: center;width:33.33%;">' + rows[i]['date'] + '</td></tr><tr><td colspan="3" style="text-align: center;width:100%;">' + send + '</td></tr></tbody></table>'
                 i = i + 1
             return render_template('index.html', logo = data['name'], rows = div, tn = 5, title = name, page = parse.quote(name))
         else:
