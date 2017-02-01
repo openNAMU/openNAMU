@@ -568,12 +568,12 @@ def upload():
             if(file and allowed_file(file.filename)):
                 filename = secure_filename(file.filename)
                 if(os.path.exists(os.path.join('image', filename))):
-                    return render_template('index.html', logo = data['name'], title = '업로드', data = '<a href="/upload">동일한 이름 파일 있음</a>')
+                    return render_template('index.html', logo = data['name'], title = '업로드', data = '동일한 이름의 파일이 있습니다.')
                 else:
                     file.save(os.path.join('image', filename))
-                    return render_template('index.html', logo = data['name'], title = '업로드', data = '<a href="/upload">완료 됨</a>')
+                    return render_template('index.html', logo = data['name'], title = '업로드', data = '완료 되었습니다.')
             else:
-                return render_template('index.html', logo = data['name'], title = '업로드', data = '<a href="/upload">jpg gif jpeg png만 가능 합니다.</a>')
+                return render_template('index.html', logo = data['name'], title = '업로드', data = 'jpg gif jpeg png만 가능 합니다.')
     else:
         ip = getip(request)
         ban = getban(ip)
@@ -1313,18 +1313,21 @@ def register():
             if(m):
                 return render_template('index.html', title = '회원가입 오류', logo = data['name'], data = '아이디에는 한글과 알파벳 공백만 허용 됩니다.')
             else:
-                curs.execute("select * from user where id = '" + pymysql.escape_string(request.form["id"]) + "'")
-                rows = curs.fetchall()
-                if(rows):
-                    return render_template('index.html', title = '회원가입 오류', logo = data['name'], data = '동일한 아이디의 유저가 있습니다.')
+                if(len(request.form["id"]) > 20):
+                    return render_template('index.html', title = '회원가입 오류', logo = data['name'], data = '아이디는 20글자보다 짧아야 합니다.')
                 else:
-                    hashed = bcrypt.hashpw(bytes(request.form["pw"], 'utf-8'), bcrypt.gensalt())
-                    if(request.form["id"] == data['owner']):
-                        curs.execute("insert into user (id, pw, acl) value ('" + pymysql.escape_string(request.form["id"]) + "', '" + pymysql.escape_string(hashed.decode()) + "', 'owner')")
+                    curs.execute("select * from user where id = '" + pymysql.escape_string(request.form["id"]) + "'")
+                    rows = curs.fetchall()
+                    if(rows):
+                        return render_template('index.html', title = '회원가입 오류', logo = data['name'], data = '동일한 아이디의 유저가 있습니다.')
                     else:
-                        curs.execute("insert into user (id, pw, acl) value ('" + pymysql.escape_string(request.form["id"]) + "', '" + pymysql.escape_string(hashed.decode()) + "', 'user')")
-                    conn.commit()
-                    return '<meta http-equiv="refresh" content="0;url=/login" />'
+                        hashed = bcrypt.hashpw(bytes(request.form["pw"], 'utf-8'), bcrypt.gensalt())
+                        if(request.form["id"] == data['owner']):
+                            curs.execute("insert into user (id, pw, acl) value ('" + pymysql.escape_string(request.form["id"]) + "', '" + pymysql.escape_string(hashed.decode()) + "', 'owner')")
+                        else:
+                            curs.execute("insert into user (id, pw, acl) value ('" + pymysql.escape_string(request.form["id"]) + "', '" + pymysql.escape_string(hashed.decode()) + "', 'user')")
+                        conn.commit()
+                        return '<meta http-equiv="refresh" content="0;url=/login" />'
     else:
         ip = getip(request)
         ban = getban(ip)

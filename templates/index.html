@@ -487,6 +487,12 @@
 			{{rows}}
 			{% endautoescape %}
             {% else %}
+            <div id="tool">
+				<nav class="menu">
+					<a class="menu-item selected" href="#" onclick="return false">{{title}}</a>
+					<a class="menu-item" href="javascript:history.back(-1);">뒤로가기</a>
+				</nav>
+			</div>
 			<h1 class="title">{{title}}</h1>
 			<div>
 				{% autoescape false %}
