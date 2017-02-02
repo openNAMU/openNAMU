@@ -16,7 +16,7 @@ data = json.loads(json_data)
 
 app.config['MAX_CONTENT_LENGTH'] = int(data['upload']) * 1024 * 1024
 
-conn = pymysql.connect(host = data['host'], user = data['user'], password = data['pw'], db = data['db'], charset = 'utf8')
+conn = pymysql.connect(host = data['host'], user = data['user'], password = data['pw'], db = data['db'], charset = 'utf8mb4')
 curs = conn.cursor(pymysql.cursors.DictCursor)
 
 app.secret_key = data['key']
