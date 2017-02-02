@@ -634,12 +634,25 @@ def recentchanges():
             else:
                 leng = '<span style="color:gray;">' + rows[i]['leng'] + '</span>'
             if(admin == 1):
-                curs.execute("select * from ban where block = '" + pymysql.escape_string(rows[i]['ip']) + "'")
+                curs.execute("select * from user where id = '" + pymysql.escape_string(rows[i]['ip']) + "'")
                 row = curs.fetchall()
                 if(row):
-                    ip = rows[i]['ip'] + ' <a href="/ban/' + parse.quote(rows[i]['ip']) + '">(해제)</a>'
+                    if(row[0]['acl'] == 'owner' or row[0]['acl'] == 'admin'):
+                        ip = rows[i]['ip']
+                    else:
+                        curs.execute("select * from ban where block = '" + pymysql.escape_string(rows[i]['ip']) + "'")
+                        row = curs.fetchall()
+                        if(row):
+                            ip = rows[i]['ip'] + ' <a href="/ban/' + parse.quote(rows[i]['ip']) + '">(해제)</a>'
+                        else:
+                            ip = rows[i]['ip'] + ' <a href="/ban/' + parse.quote(rows[i]['ip']) + '">(차단)</a>'
                 else:
-                    ip = rows[i]['ip'] + ' <a href="/ban/' + parse.quote(rows[i]['ip']) + '">(차단)</a>'
+                    curs.execute("select * from ban where block = '" + pymysql.escape_string(rows[i]['ip']) + "'")
+                    row = curs.fetchall()
+                    if(row):
+                        ip = rows[i]['ip'] + ' <a href="/ban/' + parse.quote(rows[i]['ip']) + '">(해제)</a>'
+                    else:
+                        ip = rows[i]['ip'] + ' <a href="/ban/' + parse.quote(rows[i]['ip']) + '">(차단)</a>'
             else:
                 ip = rows[i]['ip']
             div = div + '<table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;"><a href="/w/' + parse.quote(rows[i]['title']) + '">' + title + '</a> <a href="/history/' + parse.quote(rows[i]['title']) + '">(역사)</a> (' + leng + ')</td><td style="text-align: center;width:33.33%;">' + ip + '</td><td style="text-align: center;width:33.33%;">' + rows[i]['date'] + '</td></tr><tr><td colspan="3" style="text-align: center;width:100%;">' + send + '</td></tr></tbody></table>'
@@ -728,12 +741,25 @@ def gethistory(name = None):
                 else:
                     leng = '<span style="color:gray;">' + rows[i]['leng'] + '</span>'
                 if(admin == 1):
-                    curs.execute("select * from ban where block = '" + pymysql.escape_string(rows[i]['ip']) + "'")
+                    curs.execute("select * from user where id = '" + pymysql.escape_string(rows[i]['ip']) + "'")
                     row = curs.fetchall()
                     if(row):
-                        ip = rows[i]['ip'] + ' <a href="/ban/' + parse.quote(rows[i]['ip']) + '">(해제)</a>'
+                        if(row[0]['acl'] == 'owner' or row[0]['acl'] == 'admin'):
+                            ip = rows[i]['ip']
+                        else:
+                            curs.execute("select * from ban where block = '" + pymysql.escape_string(rows[i]['ip']) + "'")
+                            row = curs.fetchall()
+                            if(row):
+                                ip = rows[i]['ip'] + ' <a href="/ban/' + parse.quote(rows[i]['ip']) + '">(해제)</a>'
+                            else:
+                                ip = rows[i]['ip'] + ' <a href="/ban/' + parse.quote(rows[i]['ip']) + '">(차단)</a>'
                     else:
-                        ip = rows[i]['ip'] + ' <a href="/ban/' + parse.quote(rows[i]['ip']) + '">(차단)</a>'
+                        curs.execute("select * from ban where block = '" + pymysql.escape_string(rows[i]['ip']) + "'")
+                        row = curs.fetchall()
+                        if(row):
+                            ip = rows[i]['ip'] + ' <a href="/ban/' + parse.quote(rows[i]['ip']) + '">(해제)</a>'
+                        else:
+                            ip = rows[i]['ip'] + ' <a href="/ban/' + parse.quote(rows[i]['ip']) + '">(차단)</a>'
                 else:
                     ip = rows[i]['ip']
                 div = div + '<table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;">r' + rows[i]['id'] + '</a> <a href="/w/' + parse.quote(rows[i]['title']) + '/r/' + rows[i]['id'] + '">(w)</a> <a href="/w/' + parse.quote(rows[i]['title']) + '/raw/' + rows[i]['id'] + '">(Raw)</a> <a href="/revert/' + parse.quote(rows[i]['title']) + '/r/' + rows[i]['id'] + '">(되돌리기)</a> (' + leng + ')</td><td style="text-align: center;width:33.33%;">' + ip + '</td><td style="text-align: center;width:33.33%;">' + rows[i]['date'] + '</td></tr><tr><td colspan="3" style="text-align: center;width:100%;">' + send + '</td></tr></tbody></table>'
