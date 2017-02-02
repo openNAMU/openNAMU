@@ -1357,40 +1357,45 @@ def login():
                 
 @app.route('/check/<name>')
 def check(name = None, sub = None, number = None):
-    if(admincheck() == 1):
-        m = re.search('(?:[0-9](?:[0-9][0-9])?\.[0-9](?:[0-9][0-9])?\.[0-9](?:[0-9][0-9])?\.[0-9](?:[0-9][0-9])?)', name)
-        if(m):
-            curs.execute("select * from login where ip = '" + pymysql.escape_string(name) + "' order by today desc")
-            row = curs.fetchall()
-            if(row):
-                i = 0
-                c = ''
-                while True:
-                    try:
-                        c = c + '<table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;">' + row[i]['user'] + '</td><td style="text-align: center;width:33.33%;">' + row[i]['ip'] + '</td><td style="text-align: center;width:33.33%;">' + row[i]['today'] + '</td></tr></tbody></table>'
-                    except:
-                        break
-                    i = i + 1
-                return render_template('index.html', title = '다중 검사', logo = data['name'], tn = 22, rows = c)
-            else:
-                return render_template('index.html', title = '다중 검사', logo = data['name'], tn = 22, rows = '')
-        else:
-            curs.execute("select * from login where user = '" + pymysql.escape_string(name) + "' order by today desc")
-            row = curs.fetchall()
-            if(row):
-                i = 0
-                c = ''
-                while True:
-                    try:
-                        c = c + '<table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;">' + row[i]['user'] + '</td><td style="text-align: center;width:33.33%;">' + row[i]['ip'] + '</td><td style="text-align: center;width:33.33%;">' + row[i]['today'] + '</td></tr></tbody></table>'
-                    except:
-                        break
-                    i = i + 1
-                return render_template('index.html', title = '다중 검사', logo = data['name'], tn = 22, rows = c)
-            else:
-                return render_template('index.html', title = '다중 검사', logo = data['name'], tn = 22, rows = '')
+    curs.execute("select * from user where id = '" + pymysql.escape_string(name) + "'")
+    rows = curs.fetchall()
+    if(rows[0]['acl'] == 'owner' or rows[0]['acl'] == 'admin'):
+        return render_template('index.html', title = '차단 오류', logo = data['name'], data = '관리자는 검사 할 수 없습니다.')
     else:
-        return render_template('index.html', title = '권한 오류', logo = data['name'], data = '권한이 모자랍니다.')
+        if(admincheck() == 1):
+            m = re.search('(?:[0-9](?:[0-9][0-9])?\.[0-9](?:[0-9][0-9])?\.[0-9](?:[0-9][0-9])?\.[0-9](?:[0-9][0-9])?)', name)
+            if(m):
+                curs.execute("select * from login where ip = '" + pymysql.escape_string(name) + "' order by today desc")
+                row = curs.fetchall()
+                if(row):
+                    i = 0
+                    c = ''
+                    while True:
+                        try:
+                            c = c + '<table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;">' + row[i]['user'] + '</td><td style="text-align: center;width:33.33%;">' + row[i]['ip'] + '</td><td style="text-align: center;width:33.33%;">' + row[i]['today'] + '</td></tr></tbody></table>'
+                        except:
+                            break
+                        i = i + 1
+                    return render_template('index.html', title = '다중 검사', logo = data['name'], tn = 22, rows = c)
+                else:
+                    return render_template('index.html', title = '다중 검사', logo = data['name'], tn = 22, rows = '')
+            else:
+                curs.execute("select * from login where user = '" + pymysql.escape_string(name) + "' order by today desc")
+                row = curs.fetchall()
+                if(row):
+                    i = 0
+                    c = ''
+                    while True:
+                        try:
+                            c = c + '<table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;">' + row[i]['user'] + '</td><td style="text-align: center;width:33.33%;">' + row[i]['ip'] + '</td><td style="text-align: center;width:33.33%;">' + row[i]['today'] + '</td></tr></tbody></table>'
+                        except:
+                            break
+                        i = i + 1
+                    return render_template('index.html', title = '다중 검사', logo = data['name'], tn = 22, rows = c)
+                else:
+                    return render_template('index.html', title = '다중 검사', logo = data['name'], tn = 22, rows = '')
+        else:
+            return render_template('index.html', title = '권한 오류', logo = data['name'], data = '권한이 모자랍니다.')
 
 @app.route('/register', methods=['POST', 'GET'])
 def register():
