@@ -725,7 +725,8 @@ def gethistory(name = None, number = None):
                     a = rows[i]
                 except:
                     div = div + '</div>'
-                    div = div + '<br><a href="/history/' + parse.quote(name).replace('/','%2F') + '/n/' + str(number - 1) + '">(이전)'
+                    if(number != 1):
+                        div = div + '<br><a href="/history/' + parse.quote(name).replace('/','%2F') + '/n/' + str(number - 1) + '">(이전)'
                     break
                 if(rows[i]['send']):
                     send = rows[i]['send']
