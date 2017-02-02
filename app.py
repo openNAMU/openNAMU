@@ -708,12 +708,13 @@ def recentblock():
     else:
         return render_template('index.html', logo = data['name'], rows = '', tn = 20, title = '최근 차단내역')
 
-@app.route('/history/<path:name>', methods=['POST', 'GET'])
-def gethistory(name = None):
+@app.route('/history/<path:name>/n/<int:number>', methods=['POST', 'GET'])
+def gethistory(name = None, number = None):
     if(request.method == 'POST'):
         return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name).replace('/','%2F') + '/r/' + request.form["a"] + '/diff/' + request.form["b"] + '" />'
     else:
-        i = 0
+        v = number * 50
+        i = v - 49
         div = '<div>'
         curs.execute("select * from history where title = '" + pymysql.escape_string(name) + "' order by id+0 desc")
         rows = curs.fetchall()
@@ -724,6 +725,7 @@ def gethistory(name = None):
                     a = rows[i]
                 except:
                     div = div + '</div>'
+                    div = div + '<br><a href="/history/' + parse.quote(name).replace('/','%2F') + '/n/' + str(number - 1) + '">(이전)'
                     break
                 if(rows[i]['send']):
                     send = rows[i]['send']
@@ -763,7 +765,15 @@ def gethistory(name = None):
                 else:
                     ip = rows[i]['ip']
                 div = div + '<table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;">r' + rows[i]['id'] + '</a> <a href="/w/' + parse.quote(rows[i]['title']).replace('/','%2F') + '/r/' + rows[i]['id'] + '">(w)</a> <a href="/w/' + parse.quote(rows[i]['title']).replace('/','%2F') + '/raw/' + rows[i]['id'] + '">(Raw)</a> <a href="/revert/' + parse.quote(rows[i]['title']).replace('/','%2F') + '/r/' + rows[i]['id'] + '">(되돌리기)</a> (' + leng + ')</td><td style="text-align: center;width:33.33%;">' + ip + '</td><td style="text-align: center;width:33.33%;">' + rows[i]['date'] + '</td></tr><tr><td colspan="3" style="text-align: center;width:100%;">' + send + '</td></tr></tbody></table>'
-                i = i + 1
+                if(i == v):
+                    div = div + '</div>'
+                    if(number == 1):
+                        div = div + '<br><a href="/history/' + parse.quote(name).replace('/','%2F') + '/n/' + str(number + 1) + '">(다음)'
+                    else:
+                        div = div + '<br><a href="/history/' + parse.quote(name).replace('/','%2F') + '/n/' + str(number - 1) + '">(이전) <a href="/history/' + parse.quote(name).replace('/','%2F') + '/n/' + str(number + 1) + '">(다음)'
+                    break
+                else:
+                    i = i + 1
             return render_template('index.html', logo = data['name'], rows = div, tn = 5, title = name, page = parse.quote(name).replace('/','%2F'))
         else:
             return render_template('index.html', logo = data['name'], rows = '', tn = 5, title = name, page = parse.quote(name).replace('/','%2F'))
