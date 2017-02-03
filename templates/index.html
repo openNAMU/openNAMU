@@ -56,7 +56,7 @@
 					<a class="menu-item" href="/xref/{{page}}">역링크</a>
 				</nav>
 			</div>
-			<h1 class="titlee">{{title}} <sub>{{acl}}</sub></h1>
+			<h1 class="title">{{title}} <sub>{{acl}}</sub></h1>
 			{% if redirect %}
 			{% autoescape false %}
 			<li>{{redirect}}</li>
@@ -156,7 +156,7 @@
 					<a class="menu-item" href="javascript:history.back(-1);">뒤로가기</a>
 				</nav>
 			</div>
-			<h1 class="titlee">{{title}} <sub>(옛문서)</sub></h1>
+			<h1 class="title">{{title}} <sub>(옛문서)</sub></h1>
 			<div>
 				{% autoescape false %}
 				{{data}}
@@ -239,7 +239,7 @@
                 {% endif %}
 			</form>
 			{% elif tn == 11 %}
-			<h1 class="titlee">{{title}} <sub>(토론)</sub></h1>
+			<h1 class="title">{{title}} <sub>(토론)</sub></h1>
 			<div id="tool">
 				<nav class="menu">
 					<a class="menu-item selected" href="#" onclick="return false">토론</a>
@@ -314,6 +314,7 @@
 				<li>기본적인 다중 검사 기능</li>
                 <h2>1.3 (진행중)</h2>
                 <li>토론 목록 보강</li>
+                <li>토론에 문법 지원 (완료)</li>
                 <li>비 효율적으로 돌아가던거 수정 (완료)</li>
                 <li>하위 문서 지원 (완료)</li>
                 <li>관리자 기능의 접근성 향상 (완료)</li>
@@ -335,7 +336,7 @@
 				<li>일부 파일 <a class="out_link" href="https://twitter.com/Basix1120">Basix</a></li>
 				<br>
 				<h2>기타</h2>
-				<li>현재 버전 1.3.7 - Beta <s>정식 버전은 10.0이라더라.</s></li>
+				<li>현재 버전 1.3.9 - Beta <s>정식 버전은 10.0이라더라.</s></li>
 			</div>
 			{% elif tn == 15 %}
 			<h1 class="title">{{title}}</h1>
