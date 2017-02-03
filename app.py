@@ -14,6 +14,12 @@ import difflib
 json_data = open('set.json').read()
 data = json.loads(json_data)
 
+print('오픈나무 시작 포트 : ' + data['port'])
+
+import logging
+log = logging.getLogger('werkzeug')
+log.setLevel(logging.ERROR)
+
 app.config['MAX_CONTENT_LENGTH'] = int(data['upload']) * 1024 * 1024
 
 conn = pymysql.connect(host = data['host'], user = data['user'], password = data['pw'], db = data['db'], charset = 'utf8mb4')
