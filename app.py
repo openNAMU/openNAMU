@@ -807,7 +807,7 @@ def w(name = None):
             left = ''
         return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = enddata, license = data['license'], tn = 1, acl = acl, left = left)
     else:
-        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = '<br>문서 없음', license = data['license'], tn = 1)
+        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = '문서 없음', license = data['license'], tn = 1)
 
 @app.route('/w/<path:name>/redirect/<redirect>')
 def redirectw(name = None, redirect = None):
@@ -839,7 +839,7 @@ def redirectw(name = None, redirect = None):
         redirect = re.sub('<', '&lt;', redirect)
         redirect = re.sub('>', '&gt;', redirect)
         redirect = re.sub('"', '&quot;', redirect)
-        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = '<br>문서 없음', license = data['license'], tn = 1, redirect = '<a href="/edit/' + parse.quote(test).replace('/','%2F') + '">' + redirect + '</a>에서 넘어 왔습니다.')
+        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = '문서 없음', license = data['license'], tn = 1, redirect = '<a href="/edit/' + parse.quote(test).replace('/','%2F') + '">' + redirect + '</a>에서 넘어 왔습니다.')
 
 @app.route('/w/<path:name>/r/<number>')
 def rew(name = None, number = None):
@@ -855,7 +855,7 @@ def rew(name = None, number = None):
             left = ''
         return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = enddata, license = data['license'], tn = 6, left = left)
     else:
-        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = '<br>문서 없음', license = data['license'], tn = 6)
+        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = '문서 없음', license = data['license'], tn = 6)
 
 @app.route('/w/<path:name>/raw/<number>')
 def reraw(name = None, number = None):
@@ -868,7 +868,7 @@ def reraw(name = None, number = None):
         enddata = re.sub("\n", '<br>', enddata)
         return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = enddata, license = data['license'])
     else:
-        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = '<br>문서 없음', license = data['license'])
+        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = '문서 없음', license = data['license'])
 
 @app.route('/raw/<path:name>')
 def raw(name = None):
