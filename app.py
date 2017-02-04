@@ -725,11 +725,9 @@ def gethistory(name = None, number = None):
         div = '<div>'
         curs.execute("select * from history where title = '" + pymysql.escape_string(name) + "' order by id+0 desc")
         rows = curs.fetchall()
-        print(rows)
         if(rows):
             admin = admincheck()
             while True:
-                print(i)
                 try:
                     a = rows[i]
                 except:
@@ -1166,7 +1164,6 @@ def topicstoplist(name = None):
         while True:
             try:
                 a = rows[i]
-                print(rows[i])
             except:
                 div = div + '</div>'
                 break
