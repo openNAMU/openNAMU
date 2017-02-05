@@ -789,7 +789,26 @@ def gethistory(name = None, number = None):
 @app.route('/search', methods=['POST', 'GET'])
 def search():
     if(request.method == 'POST'):
-        return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(request.form["search"]).replace('/','%2F') + '" />'
+        curs.execute("select * from data where title = '" + pymysql.escape_string(request.form["search"]) + "'")
+        rows = curs.fetchall()
+        if(rows):
+            return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(request.form["search"]).replace('/','%2F') + '" />'
+        else:
+            curs.execute("select * from data where title like '%" + pymysql.escape_string(request.form["search"]) + "%'")
+            rows = curs.fetchall()
+            div = ''
+            if(rows):
+                i = 0
+                div = div + '<li>문서가 없습니다. <a href="/w/' + parse.quote(request.form["search"]).replace('/','%2F') + '">바로가기</a></li><br>'
+                while True:
+                    try:
+                        div = div + '<li><a href="/w/' + parse.quote(rows[i]['title']).replace('/','%2F') + '">' + rows[i]['title'] + '</a></li>'
+                    except:
+                        break
+                    i = i + 1
+            else:
+                div = div + '<li>문서가 없습니다. <a href="/w/' + parse.quote(request.form["search"]).replace('/','%2F') + '">바로가기</a></li>'
+            return render_template('index.html', logo = data['name'], data = div, title = '검색')
     else:
         return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(data['frontpage']).replace('/','%2F') + '" />'
 
