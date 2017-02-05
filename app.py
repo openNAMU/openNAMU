@@ -163,31 +163,49 @@ def namumark(title, data):
     data = re.sub("\[\[분류:(((?!\]\]).)*)\]\]", '', data)
     
     while True:
-        m = re.search("{{{((?:(?!{{{)(?!}}}).)*)}}}", data)
+        p = re.compile("{{{((?:(?!{{{)(?!}}}).)*)}}}", re.DOTALL)
+        m = p.search(data)
         if(m):
             results = m.groups()
-            n = re.search("^\+([1-5])\s?(.*)$", results[0])
-            a = re.search("^\-([1-5])\s?(.*)$", results[0])
-            b = re.search("^(#[0-9a-f-A-F]{6})\s?(.*)$", results[0])
-            c = re.search("^(#[0-9a-f-A-F]{3})\s?(.*)$", results[0])
-            d = re.search("^#(\w+)\s?(.*)$", results[0])
+            q = re.compile("^\+([1-5])\s(.*)$", re.DOTALL)
+            n = q.search(results[0])
+            
+            w = re.compile("^\-([1-5])\s(.*)$", re.DOTALL)
+            a = w.search(results[0])
+            
+            e = re.compile("^(#[0-9a-f-A-F]{6})\s(.*)$", re.DOTALL)
+            b = e.search(results[0])
+            
+            r = re.compile("^(#[0-9a-f-A-F]{3})\s(.*)$", re.DOTALL)
+            c = r.search(results[0])
+            
+            t = re.compile("^#(\w+)\s(.*)$", re.DOTALL)
+            d = t.search(results[0])
+            
+            y = re.compile("^#!wiki\sstyle=&quot;((?:(?!&quot;|\n).)*)&quot;\n?\s\n(.*)$", re.DOTALL)
+            l = y.search(results[0])
+            
             if(n):
                 result = n.groups()
-                data = re.sub("{{{((?:(?!{{{)(?!}}}).)*)}}}", '<span class="font-size-' + result[0] + '">' + result[1] + '</span>', data, 1)
+                data = p.sub('<span class="font-size-' + result[0] + '">' + result[1] + '</span>', data, 1)
             elif(a):
                 result = a.groups()
-                data = re.sub("{{{((?:(?!{{{)(?!}}}).)*)}}}", '<span class="font-size-small-' + result[0] + '">' + result[1] + '</span>', data, 1)
+                data = p.sub('<span class="font-size-small-' + result[0] + '">' + result[1] + '</span>', data, 1)
             elif(b):
                 result = b.groups()
-                data = re.sub("{{{((?:(?!{{{)(?!}}}).)*)}}}", '<span style="color:' + result[0] + '">' + result[1] + '</span>', data, 1)
+                data = p.sub('<span style="color:' + result[0] + '">' + result[1] + '</span>', data, 1)
             elif(c):
                 result = c.groups()
-                data = re.sub("{{{((?:(?!{{{)(?!}}}).)*)}}}", '<span style="color:' + result[0] + '">' + result[1] + '</span>', data, 1)
+                data = p.sub('<span style="color:' + result[0] + '">' + result[1] + '</span>', data, 1)
             elif(d):
                 result = d.groups()
-                data = re.sub("{{{((?:(?!{{{)(?!}}}).)*)}}}", '<span style="color:' + result[0] + '">' + result[1] + '</span>', data, 1)
+                data = p.sub('<span style="color:' + result[0] + '">' + result[1] + '</span>', data, 1)
+            elif(l):
+                result = l.groups()
+                print(result[1])
+                data = p.sub('<div style="' + result[0] + '">' + result[1] + '</div>', data, 1)
             else:
-                data = re.sub("{{{((?:(?!{{{)(?!}}}).)*)}}}", results[0], 1)
+                data = p.sub(results[0], data, 1)
         else:
             break
 
