@@ -70,6 +70,9 @@ def namumark(title, data):
                 if(rows):
                     enddata = rows[0]['data']
                     enddata = re.sub("\[include\((((?!\)\]).)*)\)\]", "", enddata)
+                    enddata = re.sub('<', '&lt;', enddata)
+                    enddata = re.sub('>', '&gt;', enddata)
+                    enddata = re.sub('"', '&quot;', enddata)
                     data = re.sub("\[include\((((?!\)\]).)*)\)\]", enddata, data, 1)
                 else:
                     data = re.sub("\[include\((((?!\)\]).)*)\)\]", "[[" + results[0] + "]]", data, 1)
