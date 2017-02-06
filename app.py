@@ -418,7 +418,7 @@ def namumark(title, data):
             results = m.groups()
             table = results[0]
             while True:
-                a = re.search("^\|\|((?:&lt;(?:(?:(?!&gt;).)*)&gt;)+)?", table)
+                a = re.search("^(\|\|(?:(?:\|\|)+)?)((?:&lt;(?:(?:(?!&gt;).)*)&gt;)+)?", table)
                 if(a):
                     row = ''
                     cel = ''
@@ -426,10 +426,10 @@ def namumark(title, data):
                     rowstyle = ''
                     alltable = ''
                     result = a.groups()
-                    if(result[0]):
-                        q = re.search("&lt;table\s?width=((?:(?!&gt;).)*)&gt;", result[0])
-                        w = re.search("&lt;table\s?height=((?:(?!&gt;).)*)&gt;", result[0])
-                        e = re.search("&lt;table\s?align=((?:(?!&gt;).)*)&gt;", result[0])
+                    if(result[1]):
+                        q = re.search("&lt;table\s?width=((?:(?!&gt;).)*)&gt;", result[1])
+                        w = re.search("&lt;table\s?height=((?:(?!&gt;).)*)&gt;", result[1])
+                        e = re.search("&lt;table\s?align=((?:(?!&gt;).)*)&gt;", result[1])
                         alltable = 'style="'
                         celstyle = 'style="'
                         rowstyle = 'style="'
@@ -448,18 +448,20 @@ def namumark(title, data):
                             else:
                                 alltable = alltable + 'margin-right:auto;'
                         
-                        r = re.search("&lt;-((?:(?!&gt;).)*)&gt;", result[0])
+                        r = re.search("&lt;-((?:(?!&gt;).)*)&gt;", result[1])
                         if(r):
                             resultss = r.groups()
-                            cel = 'colspan="' + resultss[0] + '"';
-                        t = re.search("&lt;\|((?:(?!&gt;).)*)&gt;", result[0])
+                            cel = 'colspan="' + resultss[0] + '"'
+                        else:
+                            cel = 'colspan="' + str(round(len(result[0]) / 2)) + '"'    
+                        t = re.search("&lt;\|((?:(?!&gt;).)*)&gt;", result[1])
                         if(t):
                             resultss = t.groups()
-                            row = 'rowspan="' + resultss[0] + '"';
+                            row = 'rowspan="' + resultss[0] + '"'
 
-                        ba = re.search("&lt;rowbgcolor=(#[0-9a-f-A-F]{6})&gt;", result[0])
-                        bb = re.search("&lt;rowbgcolor=(#[0-9a-f-A-F]{3})&gt;", result[0])
-                        bc = re.search("&lt;rowbgcolor=(\w+)&gt;", result[0])
+                        ba = re.search("&lt;rowbgcolor=(#[0-9a-f-A-F]{6})&gt;", result[1])
+                        bb = re.search("&lt;rowbgcolor=(#[0-9a-f-A-F]{3})&gt;", result[1])
+                        bc = re.search("&lt;rowbgcolor=(\w+)&gt;", result[1])
                         if(ba):
                             resultss = ba.groups()
                             rowstyle = rowstyle + 'background:' + resultss[0] + ';'
@@ -470,9 +472,9 @@ def namumark(title, data):
                             resultss = bc.groups()
                             rowstyle = rowstyle + 'background:' + resultss[0] + ';'
                             
-                        z = re.search("&lt;table\s?bordercolor=(#[0-9a-f-A-F]{6})&gt;", result[0])
-                        x = re.search("&lt;table\s?bordercolor=(#[0-9a-f-A-F]{3})&gt;", result[0])
-                        c = re.search("&lt;table\s?bordercolor=(\w+)&gt;", result[0])
+                        z = re.search("&lt;table\s?bordercolor=(#[0-9a-f-A-F]{6})&gt;", result[1])
+                        x = re.search("&lt;table\s?bordercolor=(#[0-9a-f-A-F]{3})&gt;", result[1])
+                        c = re.search("&lt;table\s?bordercolor=(\w+)&gt;", result[1])
                         if(z):
                             resultss = z.groups()
                             alltable = alltable + 'border:' + resultss[0] + ' 2px solid;'
@@ -483,9 +485,9 @@ def namumark(title, data):
                             resultss = c.groups()
                             alltable = alltable + 'border:' + resultss[0] + ' 2px solid;'
                             
-                        aq = re.search("&lt;table\s?bgcolor=(#[0-9a-f-A-F]{6})&gt;", result[0])
-                        aw = re.search("&lt;table\s?bgcolor=(#[0-9a-f-A-F]{3})&gt;", result[0])
-                        ae = re.search("&lt;table\s?bgcolor=(\w+)&gt;", result[0])
+                        aq = re.search("&lt;table\s?bgcolor=(#[0-9a-f-A-F]{6})&gt;", result[1])
+                        aw = re.search("&lt;table\s?bgcolor=(#[0-9a-f-A-F]{3})&gt;", result[1])
+                        ae = re.search("&lt;table\s?bgcolor=(\w+)&gt;", result[1])
                         if(aq):
                             resultss = aq.groups()
                             alltable = alltable + 'background:' + resultss[0] + ';'
@@ -496,9 +498,9 @@ def namumark(title, data):
                             resultss = ae.groups()
                             alltable = alltable + 'background:' + resultss[0] + ';'
                             
-                        j = re.search("&lt;bgcolor=(#[0-9a-f-A-F]{6})&gt;", result[0])
-                        k = re.search("&lt;bgcolor=(#[0-9a-f-A-F]{3})&gt;", result[0])
-                        l = re.search("&lt;bgcolor=(\w+)&gt;", result[0])
+                        j = re.search("&lt;bgcolor=(#[0-9a-f-A-F]{6})&gt;", result[1])
+                        k = re.search("&lt;bgcolor=(#[0-9a-f-A-F]{3})&gt;", result[1])
+                        l = re.search("&lt;bgcolor=(\w+)&gt;", result[1])
                         if(j):
                             resultss = j.groups()
                             celstyle = celstyle + 'background:' + resultss[0] + ';'
@@ -509,9 +511,9 @@ def namumark(title, data):
                             resultss = l.groups()
                             celstyle = celstyle + 'background:' + resultss[0] + ';'
                             
-                        aa = re.search("&lt;(#[0-9a-f-A-F]{6})&gt;", result[0])
-                        ab = re.search("&lt;(#[0-9a-f-A-F]{3})&gt;", result[0])
-                        ac = re.search("&lt;(\w+)&gt;", result[0])
+                        aa = re.search("&lt;(#[0-9a-f-A-F]{6})&gt;", result[1])
+                        ab = re.search("&lt;(#[0-9a-f-A-F]{3})&gt;", result[1])
+                        ac = re.search("&lt;(\w+)&gt;", result[1])
                         if(aa):
                             resultss = aa.groups()
                             celstyle = celstyle + 'background:' + resultss[0] + ';'
@@ -522,8 +524,8 @@ def namumark(title, data):
                             resultss = ac.groups()
                             celstyle = celstyle + 'background:' + resultss[0] + ';'
                             
-                        qa = re.search("&lt;width=((?:(?!&gt;).)*)&gt;", result[0])
-                        qb = re.search("&lt;height=((?:(?!&gt;).)*)&gt;", result[0])
+                        qa = re.search("&lt;width=((?:(?!&gt;).)*)&gt;", result[1])
+                        qb = re.search("&lt;height=((?:(?!&gt;).)*)&gt;", result[1])
                         if(qa):
                             resultss = qa.groups()
                             celstyle = celstyle + 'width:' + resultss[0] + ';'
@@ -531,9 +533,9 @@ def namumark(title, data):
                             resultss = qb.groups()
                             celstyle = celstyle + 'height:' + resultss[0] + ';'
                             
-                        i = re.search("&lt;\)&gt;", result[0])
-                        o = re.search("&lt;:&gt;", result[0])
-                        p = re.search("&lt;\(&gt;", result[0])
+                        i = re.search("&lt;\)&gt;", result[1])
+                        o = re.search("&lt;:&gt;", result[1])
+                        p = re.search("&lt;\(&gt;", result[1])
                         if(i):
                             celstyle = celstyle + 'text-align:right;'
                         elif(o):
@@ -545,38 +547,41 @@ def namumark(title, data):
                         celstyle = celstyle + '"'
                         rowstyle = rowstyle + '"'
                             
-                        table = re.sub("^\|\|((?:&lt;(?:(?:(?!&gt;).)*)&gt;)+)?", "<table " + alltable + "><tbody><tr " + rowstyle + "><td " + cel + " " + row + " " + celstyle + ">", table, 1)
+                        table = re.sub("^(\|\|(?:(?:\|\|)+)?)((?:&lt;(?:(?:(?!&gt;).)*)&gt;)+)?", "<table " + alltable + "><tbody><tr " + rowstyle + "><td " + cel + " " + row + " " + celstyle + ">", table, 1)
                     else:
-                        table = re.sub("^\|\|((?:<(?:[^>]*)>)+)?", "<table><tbody><tr><td>", table, 1)
+                        cel = 'colspan="' + str(round(len(result[0]) / 2)) + '"'
+                        table = re.sub("^(\|\|(?:(?:\|\|)+)?)((?:&lt;(?:(?:(?!&gt;).)*)&gt;)+)?", "<table><tbody><tr><td " + cel + ">", table, 1)
                 else:
                     break
                     
             table = re.sub("\|\|$", "</td></tr></tbody></table>", table)
             
             while True:
-                b = re.search("\|\|\r\n\|\|((?:&lt;(?:(?:(?!&gt;).)*)&gt;)+)?", table)
+                b = re.search("\|\|\r\n(\|\|(?:(?:\|\|)+)?)((?:&lt;(?:(?:(?!&gt;).)*)&gt;)+)?", table)
                 if(b):
                     row = ''
                     cel = ''
                     celstyle = ''
                     rowstyle = ''
                     result = b.groups()
-                    if(result[0]):
+                    if(result[1]):
                         celstyle = 'style="'
                         rowstyle = 'style="'
                         
-                        r = re.search("&lt;-((?:(?!&gt;).)*)&gt;", result[0])
+                        r = re.search("&lt;-((?:(?!&gt;).)*)&gt;", result[1])
                         if(r):
                             resultss = r.groups()
-                            cel = 'colspan="' + resultss[0] + '"';
-                        t = re.search("&lt;\|((?:(?!&gt;).)*)&gt;", result[0])
+                            cel = 'colspan="' + resultss[0] + '"'
+                        else:
+                            cel = 'colspan="' + str(round(len(result[0]) / 2)) + '"'
+                        t = re.search("&lt;\|((?:(?!&gt;).)*)&gt;", result[1])
                         if(t):
                             resultss = t.groups()
-                            row = 'rowspan="' + resultss[0] + '"';
+                            row = 'rowspan="' + resultss[0] + '"'
                             
-                        ba = re.search("&lt;rowbgcolor=(#[0-9a-f-A-F]{6})&gt;", result[0])
-                        bb = re.search("&lt;rowbgcolor=(#[0-9a-f-A-F]{3})&gt;", result[0])
-                        bc = re.search("&lt;rowbgcolor=(\w+)&gt;", result[0])
+                        ba = re.search("&lt;rowbgcolor=(#[0-9a-f-A-F]{6})&gt;", result[1])
+                        bb = re.search("&lt;rowbgcolor=(#[0-9a-f-A-F]{3})&gt;", result[1])
+                        bc = re.search("&lt;rowbgcolor=(\w+)&gt;", result[1])
                         if(ba):
                             resultss = ba.groups()
                             rowstyle = rowstyle + 'background:' + resultss[0] + ';'
@@ -587,9 +592,9 @@ def namumark(title, data):
                             resultss = bc.groups()
                             rowstyle = rowstyle + 'background:' + resultss[0] + ';'
                             
-                        j = re.search("&lt;bgcolor=(#[0-9a-f-A-F]{6})&gt;", result[0])
-                        k = re.search("&lt;bgcolor=(#[0-9a-f-A-F]{3})&gt;", result[0])
-                        l = re.search("&lt;bgcolor=(\w+)&gt;", result[0])
+                        j = re.search("&lt;bgcolor=(#[0-9a-f-A-F]{6})&gt;", result[1])
+                        k = re.search("&lt;bgcolor=(#[0-9a-f-A-F]{3})&gt;", result[1])
+                        l = re.search("&lt;bgcolor=(\w+)&gt;", result[1])
                         if(j):
                             resultss = j.groups()
                             celstyle = celstyle + 'background:' + resultss[0] + ';'
@@ -600,9 +605,9 @@ def namumark(title, data):
                             resultss = l.groups()
                             celstyle = celstyle + 'background:' + resultss[0] + ';'
 
-                        aa = re.search("&lt;(#[0-9a-f-A-F]{6})&gt;", result[0])
-                        ab = re.search("&lt;(#[0-9a-f-A-F]{3})&gt;", result[0])
-                        ac = re.search("&lt;(\w+)&gt;", result[0])
+                        aa = re.search("&lt;(#[0-9a-f-A-F]{6})&gt;", result[1])
+                        ab = re.search("&lt;(#[0-9a-f-A-F]{3})&gt;", result[1])
+                        ac = re.search("&lt;(\w+)&gt;", result[1])
                         if(aa):
                             resultss = aa.groups()
                             celstyle = celstyle + 'background:' + resultss[0] + ';'
@@ -613,8 +618,8 @@ def namumark(title, data):
                             resultss = ac.groups()
                             celstyle = celstyle + 'background:' + resultss[0] + ';'    
 
-                        qa = re.search("&lt;width=((?:(?!&gt;).)*)&gt;", result[0])
-                        qb = re.search("&lt;height=((?:(?!&gt;).)*)&gt;", result[0])
+                        qa = re.search("&lt;width=((?:(?!&gt;).)*)&gt;", result[1])
+                        qb = re.search("&lt;height=((?:(?!&gt;).)*)&gt;", result[1])
                         if(qa):
                             resultss = qa.groups()
                             celstyle = celstyle + 'width:' + resultss[0] + ';'
@@ -622,9 +627,9 @@ def namumark(title, data):
                             resultss = qb.groups()
                             celstyle = celstyle + 'height:' + resultss[0] + ';'
                             
-                        i = re.search("&lt;\)&gt;", result[0])
-                        o = re.search("&lt;:&gt;", result[0])
-                        p = re.search("&lt;\(&gt;", result[0])
+                        i = re.search("&lt;\)&gt;", result[1])
+                        o = re.search("&lt;:&gt;", result[1])
+                        p = re.search("&lt;\(&gt;", result[1])
                         if(i):
                             celstyle = celstyle + 'text-align:right;'
                         elif(o):
@@ -635,34 +640,37 @@ def namumark(title, data):
                         celstyle = celstyle + '"'
                         rowstyle = rowstyle + '"'
                         
-                        table = re.sub("\|\|\r\n\|\|((?:&lt;(?:(?:(?!&gt;).)*)&gt;)+)?", "</td></tr><tr " + rowstyle + "><td " + cel + " " + row + " " + celstyle + ">", table, 1)
+                        table = re.sub("\|\|\r\n(\|\|(?:(?:\|\|)+)?)((?:&lt;(?:(?:(?!&gt;).)*)&gt;)+)?", "</td></tr><tr " + rowstyle + "><td " + cel + " " + row + " " + celstyle + ">", table, 1)
                     else:
-                        table = re.sub("\|\|\r\n\|\|((?:&lt;(?:(?:(?!&gt;).)*)&gt;)+)?", "</td></tr><tr><td>", table, 1)
+                        cel = 'colspan="' + str(round(len(result[0]) / 2)) + '"'
+                        table = re.sub("\|\|\r\n(\|\|(?:(?:\|\|)+)?)((?:&lt;(?:(?:(?!&gt;).)*)&gt;)+)?", "</td></tr><tr><td " + cel + ">", table, 1)
                 else:
                     break
 
             while True:
-                c = re.search("\|\|((?:&lt;(?:(?:(?!&gt;).)*)&gt;)+)?", table)
+                c = re.search("(\|\|(?:(?:\|\|)+)?)((?:&lt;(?:(?:(?!&gt;).)*)&gt;)+)?", table)
                 if(c):
                     row = ''
                     cel = ''
                     celstyle = ''
                     result = c.groups()
-                    if(result[0]):
+                    if(result[1]):
                         celstyle = 'style="'
                         
-                        r = re.search("&lt;-((?:(?!&gt;).)*)&gt;", result[0])
+                        r = re.search("&lt;-((?:(?!&gt;).)*)&gt;", result[1])
                         if(r):
                             resultss = r.groups()
                             cel = 'colspan="' + resultss[0] + '"';
-                        t = re.search("&lt;\|((?:(?!&gt;).)*)&gt;", result[0])
+                        else:
+                            cel = 'colspan="' + str(round(len(result[0]) / 2)) + '"'
+                        t = re.search("&lt;\|((?:(?!&gt;).)*)&gt;", result[1])
                         if(t):
                             resultss = t.groups()
                             row = 'rowspan="' + resultss[0] + '"';
                             
-                        j = re.search("&lt;bgcolor=(#[0-9a-f-A-F]{6})&gt;", result[0])
-                        k = re.search("&lt;bgcolor=(#[0-9a-f-A-F]{3})&gt;", result[0])
-                        l = re.search("&lt;bgcolor=(\w+)&gt;", result[0])
+                        j = re.search("&lt;bgcolor=(#[0-9a-f-A-F]{6})&gt;", result[1])
+                        k = re.search("&lt;bgcolor=(#[0-9a-f-A-F]{3})&gt;", result[1])
+                        l = re.search("&lt;bgcolor=(\w+)&gt;", result[1])
                         if(j):
                             resultss = j.groups()
                             celstyle = celstyle + 'background:' + resultss[0] + ';'
@@ -673,9 +681,9 @@ def namumark(title, data):
                             resultss = l.groups()
                             celstyle = celstyle + 'background:' + resultss[0] + ';'
                             
-                        aa = re.search("&lt;(#[0-9a-f-A-F]{6})&gt;", result[0])
-                        ab = re.search("&lt;(#[0-9a-f-A-F]{3})&gt;", result[0])
-                        ac = re.search("&lt;(\w+)&gt;", result[0])
+                        aa = re.search("&lt;(#[0-9a-f-A-F]{6})&gt;", result[1])
+                        ab = re.search("&lt;(#[0-9a-f-A-F]{3})&gt;", result[1])
+                        ac = re.search("&lt;(\w+)&gt;", result[1])
                         if(aa):
                             resultss = aa.groups()
                             celstyle = celstyle + 'background:' + resultss[0] + ';'
@@ -686,8 +694,8 @@ def namumark(title, data):
                             resultss = ac.groups()
                             celstyle = celstyle + 'background:' + resultss[0] + ';'
                             
-                        qa = re.search("&lt;width=((?:(?!&gt;).)*)&gt;", result[0])
-                        qb = re.search("&lt;height=((?:(?!&gt;).)*)&gt;", result[0])
+                        qa = re.search("&lt;width=((?:(?!&gt;).)*)&gt;", result[1])
+                        qb = re.search("&lt;height=((?:(?!&gt;).)*)&gt;", result[1])
                         if(qa):
                             resultss = qa.groups()
                             celstyle = celstyle + 'width:' + resultss[0] + ';'
@@ -695,9 +703,9 @@ def namumark(title, data):
                             resultss = qb.groups()
                             celstyle = celstyle + 'height:' + resultss[0] + ';'
                             
-                        i = re.search("&lt;\)&gt;", result[0])
-                        o = re.search("&lt;:&gt;", result[0])
-                        p = re.search("&lt;\(&gt;", result[0])
+                        i = re.search("&lt;\)&gt;", result[1])
+                        o = re.search("&lt;:&gt;", result[1])
+                        p = re.search("&lt;\(&gt;", result[1])
                         if(i):
                             celstyle = celstyle + 'text-align:right;'
                         elif(o):
@@ -707,9 +715,10 @@ def namumark(title, data):
 
                         celstyle = celstyle + '"'
                             
-                        table = re.sub("\|\|((?:&lt;(?:(?:(?!&gt;).)*)&gt;)+)?", "</td><td " + cel + " " + row + " " + celstyle + ">", table, 1)
+                        table = re.sub("(\|\|(?:(?:\|\|)+)?)((?:&lt;(?:(?:(?!&gt;).)*)&gt;)+)?", "</td><td " + cel + " " + row + " " + celstyle + ">", table, 1)
                     else:
-                        table = re.sub("\|\|((?:&lt;(?:(?:(?!&gt;).)*)&gt;)+)?", "</td><td>", table, 1)
+                        cel = 'colspan="' + str(round(len(result[0]) / 2)) + '"'
+                        table = re.sub("(\|\|(?:(?:\|\|)+)?)((?:&lt;(?:(?:(?!&gt;).)*)&gt;)+)?", "</td><td " + cel + ">", table, 1)
                 else:
                     break
             
