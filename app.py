@@ -883,8 +883,9 @@ def getnow():
     return s
 
 def recent(title, ip, today, send, leng):
-    curs.execute("insert into rc (title, date, ip, send, leng, back) value ('" + pymysql.escape_string(title) + "', '" + today + "', '" + ip + "', '" + pymysql.escape_string(send) + "', '" + leng + "', '')")
-    conn.commit()
+    if(not re.search("^사용자:(.*)", title)):
+        curs.execute("insert into rc (title, date, ip, send, leng, back) value ('" + pymysql.escape_string(title) + "', '" + today + "', '" + ip + "', '" + pymysql.escape_string(send) + "', '" + leng + "', '')")
+        conn.commit()
 
 def discuss(title, sub, date):
     curs.execute("select * from rd where title = '" + pymysql.escape_string(title) + "' and sub = '" + pymysql.escape_string(sub) + "'")
