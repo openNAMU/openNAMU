@@ -1302,7 +1302,6 @@ def edit(name = None):
                         else:
                             today = getnow()
                             leng = getleng(len(rows[0]['data']), len(request.form["content"]))
-                            recent(name, ip, today, request.form["send"], leng)
                             history(name, request.form["content"], today, ip, request.form["send"], leng)
                             curs.execute("update data set data = '" + pymysql.escape_string(request.form["content"]) + "' where title = '" + pymysql.escape_string(name) + "'")
                             conn.commit()
@@ -1314,7 +1313,6 @@ def edit(name = None):
                         else:
                             today = getnow()
                             leng = '+' + str(len(request.form["content"]))
-                            recent(name, ip, today, request.form["send"], leng)
                             history(name, request.form["content"], today, ip, request.form["send"], leng)
                             curs.execute("insert into data (title, data, acl) value ('" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(request.form["content"]) + "', '')")
                             conn.commit()
