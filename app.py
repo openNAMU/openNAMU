@@ -1165,6 +1165,14 @@ def search():
 
 @app.route('/w/<path:name>')
 def w(name = None):
+    m = re.search("^(.*)\/(.*)$", name)
+    if(m):
+        g = m.groups()
+        uppage = g[0]
+        style = ""
+    else:
+        uppage = ""
+        style = "display:none;"
     curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
     rows = curs.fetchall()
     if(rows):
@@ -1181,12 +1189,20 @@ def w(name = None):
             left = result[0]
         else:
             left = ''
-        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = enddata, license = data['license'], tn = 1, acl = acl, left = left)
+        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = enddata, license = data['license'], tn = 1, acl = acl, left = left, uppage = uppage, style = style)
     else:
-        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = '문서 없음', license = data['license'], tn = 1)
+        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = '문서 없음', license = data['license'], tn = 1, uppage = uppage, style = style)
 
 @app.route('/w/<path:name>/redirect/<redirect>')
 def redirectw(name = None, redirect = None):
+    m = re.search("^(.*)\/(.*)$", name)
+    if(m):
+        g = m.groups()
+        uppage = g[0]
+        style = ""
+    else:
+        uppage = ""
+        style = "display:none;"
     curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
     rows = curs.fetchall()
     if(rows):
@@ -1209,13 +1225,13 @@ def redirectw(name = None, redirect = None):
         redirect = re.sub('<', '&lt;', redirect)
         redirect = re.sub('>', '&gt;', redirect)
         redirect = re.sub('"', '&quot;', redirect)
-        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = enddata, license = data['license'], tn = 1, redirect = '<a href="/edit/' + parse.quote(test).replace('/','%2F') + '">' + redirect + '</a>에서 넘어 왔습니다.', left = left, acl = acl)
+        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = enddata, license = data['license'], tn = 1, redirect = '<a href="/edit/' + parse.quote(test).replace('/','%2F') + '">' + redirect + '</a>에서 넘어 왔습니다.', left = left, acl = acl, uppage = uppage, style = style)
     else:
         test = redirect
         redirect = re.sub('<', '&lt;', redirect)
         redirect = re.sub('>', '&gt;', redirect)
         redirect = re.sub('"', '&quot;', redirect)
-        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = '문서 없음', license = data['license'], tn = 1, redirect = '<a href="/edit/' + parse.quote(test).replace('/','%2F') + '">' + redirect + '</a>에서 넘어 왔습니다.')
+        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = '문서 없음', license = data['license'], tn = 1, redirect = '<a href="/edit/' + parse.quote(test).replace('/','%2F') + '">' + redirect + '</a>에서 넘어 왔습니다.', uppage = uppage, style = style)
 
 @app.route('/w/<path:name>/r/<number>')
 def rew(name = None, number = None):
