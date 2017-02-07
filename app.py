@@ -1285,45 +1285,98 @@ def revert(name = None, number = None):
 @app.route('/edit/<path:name>', methods=['POST', 'GET'])
 def edit(name = None):
     if(request.method == 'POST'):
-        curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
-        rows = curs.fetchall()
-        if(rows):
+        m = re.search("^사용자:(.*)", name)
+        if(m):
+            g = m.groups()
             ip = getip(request)
-            can = getcan(ip, name)
-            if(can == 1):
-                return '<meta http-equiv="refresh" content="0;url=/ban" />'
+            if(ip == g[0]):
+                if(re.search("\.", g[0])):
+                    return render_template('index.html', title = '사문 오류', logo = data['name'], data = '사문을 사용하려면 로그인 해야 합니다.')
+                else:
+                    curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
+                    rows = curs.fetchall()
+                    if(rows):
+                        can = getcan(ip, name)
+                        if(can == 1):
+                            return '<meta http-equiv="refresh" content="0;url=/ban" />'
+                        else:
+                            today = getnow()
+                            leng = getleng(len(rows[0]['data']), len(request.form["content"]))
+                            recent(name, ip, today, request.form["send"], leng)
+                            history(name, request.form["content"], today, ip, request.form["send"], leng)
+                            curs.execute("update data set data = '" + pymysql.escape_string(request.form["content"]) + "' where title = '" + pymysql.escape_string(name) + "'")
+                            conn.commit()
+                    else:
+                        ip = getip(request)
+                        can = getcan(ip, name)
+                        if(can == 1):
+                            return '<meta http-equiv="refresh" content="0;url=/ban" />'
+                        else:
+                            today = getnow()
+                            leng = '+' + str(len(request.form["content"]))
+                            recent(name, ip, today, request.form["send"], leng)
+                            history(name, request.form["content"], today, ip, request.form["send"], leng)
+                            curs.execute("insert into data (title, data, acl) value ('" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(request.form["content"]) + "', '')")
+                            conn.commit()
+                    return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name).replace('/','%2F') + '" />'
             else:
-                today = getnow()
-                leng = getleng(len(rows[0]['data']), len(request.form["content"]))
-                recent(name, ip, today, request.form["send"], leng)
-                history(name, request.form["content"], today, ip, request.form["send"], leng)
-                curs.execute("update data set data = '" + pymysql.escape_string(request.form["content"]) + "' where title = '" + pymysql.escape_string(name) + "'")
-                conn.commit()
+                return render_template('index.html', title = '사문 오류', logo = data['name'], data = '본인 사문이 아닙니다.')
         else:
-            ip = getip(request)
-            can = getcan(ip, name)
-            if(can == 1):
-                return '<meta http-equiv="refresh" content="0;url=/ban" />'
+            curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
+            rows = curs.fetchall()
+            if(rows):
+                ip = getip(request)
+                can = getcan(ip, name)
+                if(can == 1):
+                    return '<meta http-equiv="refresh" content="0;url=/ban" />'
+                else:
+                    today = getnow()
+                    leng = getleng(len(rows[0]['data']), len(request.form["content"]))
+                    recent(name, ip, today, request.form["send"], leng)
+                    history(name, request.form["content"], today, ip, request.form["send"], leng)
+                    curs.execute("update data set data = '" + pymysql.escape_string(request.form["content"]) + "' where title = '" + pymysql.escape_string(name) + "'")
+                    conn.commit()
             else:
-                today = getnow()
-                leng = '+' + str(len(request.form["content"]))
-                recent(name, ip, today, request.form["send"], leng)
-                history(name, request.form["content"], today, ip, request.form["send"], leng)
-                curs.execute("insert into data (title, data, acl) value ('" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(request.form["content"]) + "', '')")
-                conn.commit()
-        return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name).replace('/','%2F') + '" />'
+                ip = getip(request)
+                can = getcan(ip, name)
+                if(can == 1):
+                    return '<meta http-equiv="refresh" content="0;url=/ban" />'
+                else:
+                    today = getnow()
+                    leng = '+' + str(len(request.form["content"]))
+                    recent(name, ip, today, request.form["send"], leng)
+                    history(name, request.form["content"], today, ip, request.form["send"], leng)
+                    curs.execute("insert into data (title, data, acl) value ('" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(request.form["content"]) + "', '')")
+                    conn.commit()
+            return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name).replace('/','%2F') + '" />'
     else:
         ip = getip(request)
         can = getcan(ip, name)
         if(can == 1):
             return '<meta http-equiv="refresh" content="0;url=/ban" />'
         else:
-            curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
-            rows = curs.fetchall()
-            if(rows):
-                return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = rows[0]['data'], tn = 2)
+            m = re.search("^사용자:(.*)", name)
+            if(m):
+                g = m.groups()
+                if(ip == g[0]):
+                    if(re.search("\.", g[0])):
+                        return render_template('index.html', title = '사문 오류', logo = data['name'], data = '사문을 사용하려면 로그인 해야 합니다.')
+                    else:
+                        curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
+                        rows = curs.fetchall()
+                        if(rows):
+                            return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = rows[0]['data'], tn = 2)
+                        else:
+                            return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = '', tn = 2)
+                else:
+                    return render_template('index.html', title = '사문 오류', logo = data['name'], data = '본인 사문이 아닙니다.')
             else:
-                return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = '', tn = 2)
+                curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
+                rows = curs.fetchall()
+                if(rows):
+                    return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = rows[0]['data'], tn = 2)
+                else:
+                    return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = '', tn = 2)
                 
 @app.route('/preview/<path:name>', methods=['POST'])
 def preview(name = None):
@@ -1341,7 +1394,18 @@ def preview(name = None):
             left = result[0]
         else:
             left = ''
-        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = request.form["content"], tn = 2, preview = 1, enddata = enddata, left = left)
+        m = re.search("^사용자:(.*)", name)
+        if(m):
+            g = m.groups()
+            if(ip == g[0]):
+                if(re.search("\.", g[0])):
+                    return render_template('index.html', title = '사문 오류', logo = data['name'], data = '사문을 사용하려면 로그인 해야 합니다.')
+                else:
+                    return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = request.form["content"], tn = 2, preview = 1, enddata = enddata, left = left)
+            else:
+                return render_template('index.html', title = '사문 오류', logo = data['name'], data = '본인 사문이 아닙니다.')
+        else:
+            return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = request.form["content"], tn = 2, preview = 1, enddata = enddata, left = left)
 
 @app.route('/delete/<path:name>', methods=['POST', 'GET'])
 def delete(name = None):
@@ -1392,7 +1456,7 @@ def move(name = None):
                 curs.execute("select * from history where title = '" + pymysql.escape_string(request.form["title"]) + "'")
                 row = curs.fetchall()
                 if(row):
-                     return render_template('index.html', title = '이동 오류', logo = data['name'], data = '이동 하려는 곳에 문서가 이미 있습니다.')
+                    return render_template('index.html', title = '이동 오류', logo = data['name'], data = '이동 하려는 곳에 문서가 이미 있습니다.')
                 else:
                     recent(name, ip, today, '문서를 <a href="/w/' + pymysql.escape_string(parse.quote(request.form["title"]).replace('/','%2F')) + '">' + pymysql.escape_string(request.form["title"]) + '</a> 문서로 이동 했습니다.', leng)
                     history(name, rows[0]['data'], today, ip, '<a href="/w/' + pymysql.escape_string(parse.quote(name).replace('/','%2F')) + '">' + pymysql.escape_string(name) + '</a> 문서를 <a href="/w/' + pymysql.escape_string(parse.quote(request.form["title"]).replace('/','%2F')) + '">' + pymysql.escape_string(request.form["title"]) + '</a> 문서로 이동 했습니다.', leng)
