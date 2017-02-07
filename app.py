@@ -741,13 +741,57 @@ def getip(request):
     return ip
 
 def getcan(ip, name):
-    b = re.search("^([0-9](?:[0-9][0-9])?\.[0-9](?:[0-9][0-9])?)", ip)
-    if(b):
-        results = b.groups()
-        curs.execute("select * from ban where block = '" + pymysql.escape_string(results[0]) + "' and band = 'O'")
-        rowss = curs.fetchall()
-        if(rowss):
+    m = re.search("^사용자:(.*)", name)
+    if(m):
+        g = m.groups()
+        if(ip == g[0]):
+            if(re.search("\.", g[0])):
+                return 1
+            else:
+                curs.execute("select * from ban where block = '" + pymysql.escape_string(ip) + "'")
+                rows = curs.fetchall()
+                if(rows):
+                    return 1
+                else:
+                    return 0
+        else:
             return 1
+    else:
+        b = re.search("^([0-9](?:[0-9][0-9])?\.[0-9](?:[0-9][0-9])?)", ip)
+        if(b):
+            results = b.groups()
+            curs.execute("select * from ban where block = '" + pymysql.escape_string(results[0]) + "' and band = 'O'")
+            rowss = curs.fetchall()
+            if(rowss):
+                return 1
+            else:
+                curs.execute("select * from ban where block = '" + pymysql.escape_string(ip) + "'")
+                rows = curs.fetchall()
+                if(rows):
+                    return 1
+                else:
+                    curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
+                    row = curs.fetchall()
+                    if(row):
+                        curs.execute("select * from user where id = '" + pymysql.escape_string(ip) + "'")
+                        rows = curs.fetchall()
+                        if(row[0]['acl'] == 'user'):
+                            if(rows):
+                                return 0
+                            else:
+                                return 1
+                        elif(row[0]['acl'] == 'admin'):
+                            if(rows):
+                                if(rows[0]['acl'] == 'admin' or rows[0]['acl'] == 'owner'):
+                                    return 0
+                                else:
+                                    return 1
+                            else:
+                                return 1
+                        else:
+                            return 0
+                    else:
+                        return 0
         else:
             curs.execute("select * from ban where block = '" + pymysql.escape_string(ip) + "'")
             rows = curs.fetchall()
@@ -776,34 +820,6 @@ def getcan(ip, name):
                         return 0
                 else:
                     return 0
-    else:
-        curs.execute("select * from ban where block = '" + pymysql.escape_string(ip) + "'")
-        rows = curs.fetchall()
-        if(rows):
-            return 1
-        else:
-            curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
-            row = curs.fetchall()
-            if(row):
-                curs.execute("select * from user where id = '" + pymysql.escape_string(ip) + "'")
-                rows = curs.fetchall()
-                if(row[0]['acl'] == 'user'):
-                    if(rows):
-                        return 0
-                    else:
-                        return 1
-                elif(row[0]['acl'] == 'admin'):
-                    if(rows):
-                        if(rows[0]['acl'] == 'admin' or rows[0]['acl'] == 'owner'):
-                            return 0
-                        else:
-                            return 1
-                    else:
-                        return 1
-                else:
-                    return 0
-            else:
-                return 0
 
 def getban(ip):
     b = re.search("^([0-9](?:[0-9][0-9])?\.[0-9](?:[0-9][0-9])?)", ip)
@@ -1285,96 +1301,45 @@ def revert(name = None, number = None):
 @app.route('/edit/<path:name>', methods=['POST', 'GET'])
 def edit(name = None):
     if(request.method == 'POST'):
-        m = re.search("^사용자:(.*)", name)
-        if(m):
-            g = m.groups()
+        curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
+        rows = curs.fetchall()
+        if(rows):
             ip = getip(request)
-            if(ip == g[0]):
-                if(re.search("\.", g[0])):
-                    return render_template('index.html', title = '사문 오류', logo = data['name'], data = '사문을 사용하려면 로그인 해야 합니다.')
-                else:
-                    curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
-                    rows = curs.fetchall()
-                    if(rows):
-                        can = getcan(ip, name)
-                        if(can == 1):
-                            return '<meta http-equiv="refresh" content="0;url=/ban" />'
-                        else:
-                            today = getnow()
-                            leng = getleng(len(rows[0]['data']), len(request.form["content"]))
-                            history(name, request.form["content"], today, ip, request.form["send"], leng)
-                            curs.execute("update data set data = '" + pymysql.escape_string(request.form["content"]) + "' where title = '" + pymysql.escape_string(name) + "'")
-                            conn.commit()
-                    else:
-                        ip = getip(request)
-                        can = getcan(ip, name)
-                        if(can == 1):
-                            return '<meta http-equiv="refresh" content="0;url=/ban" />'
-                        else:
-                            today = getnow()
-                            leng = '+' + str(len(request.form["content"]))
-                            history(name, request.form["content"], today, ip, request.form["send"], leng)
-                            curs.execute("insert into data (title, data, acl) value ('" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(request.form["content"]) + "', '')")
-                            conn.commit()
-                    return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name).replace('/','%2F') + '" />'
+            can = getcan(ip, name)
+            if(can == 1):
+                return '<meta http-equiv="refresh" content="0;url=/ban" />'
             else:
-                return render_template('index.html', title = '사문 오류', logo = data['name'], data = '본인 사문이 아닙니다.')
+                today = getnow()
+                leng = getleng(len(rows[0]['data']), len(request.form["content"]))
+                recent(name, ip, today, request.form["send"], leng)
+                history(name, request.form["content"], today, ip, request.form["send"], leng)
+                curs.execute("update data set data = '" + pymysql.escape_string(request.form["content"]) + "' where title = '" + pymysql.escape_string(name) + "'")
+                conn.commit()
         else:
-            curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
-            rows = curs.fetchall()
-            if(rows):
-                ip = getip(request)
-                can = getcan(ip, name)
-                if(can == 1):
-                    return '<meta http-equiv="refresh" content="0;url=/ban" />'
-                else:
-                    today = getnow()
-                    leng = getleng(len(rows[0]['data']), len(request.form["content"]))
-                    recent(name, ip, today, request.form["send"], leng)
-                    history(name, request.form["content"], today, ip, request.form["send"], leng)
-                    curs.execute("update data set data = '" + pymysql.escape_string(request.form["content"]) + "' where title = '" + pymysql.escape_string(name) + "'")
-                    conn.commit()
+            ip = getip(request)
+            can = getcan(ip, name)
+            if(can == 1):
+                return '<meta http-equiv="refresh" content="0;url=/ban" />'
             else:
-                ip = getip(request)
-                can = getcan(ip, name)
-                if(can == 1):
-                    return '<meta http-equiv="refresh" content="0;url=/ban" />'
-                else:
-                    today = getnow()
-                    leng = '+' + str(len(request.form["content"]))
-                    recent(name, ip, today, request.form["send"], leng)
-                    history(name, request.form["content"], today, ip, request.form["send"], leng)
-                    curs.execute("insert into data (title, data, acl) value ('" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(request.form["content"]) + "', '')")
-                    conn.commit()
-            return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name).replace('/','%2F') + '" />'
+                today = getnow()
+                leng = '+' + str(len(request.form["content"]))
+                recent(name, ip, today, request.form["send"], leng)
+                history(name, request.form["content"], today, ip, request.form["send"], leng)
+                curs.execute("insert into data (title, data, acl) value ('" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(request.form["content"]) + "', '')")
+                conn.commit()
+        return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name).replace('/','%2F') + '" />'
     else:
         ip = getip(request)
         can = getcan(ip, name)
         if(can == 1):
             return '<meta http-equiv="refresh" content="0;url=/ban" />'
         else:
-            m = re.search("^사용자:(.*)", name)
-            if(m):
-                g = m.groups()
-                if(ip == g[0]):
-                    if(re.search("\.", g[0])):
-                        return render_template('index.html', title = '사문 오류', logo = data['name'], data = '사문을 사용하려면 로그인 해야 합니다.')
-                    else:
-                        curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
-                        rows = curs.fetchall()
-                        if(rows):
-                            return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = rows[0]['data'], tn = 2)
-                        else:
-                            return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = '', tn = 2)
-                else:
-                    return render_template('index.html', title = '사문 오류', logo = data['name'], data = '본인 사문이 아닙니다.')
+            curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
+            rows = curs.fetchall()
+            if(rows):
+                return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = rows[0]['data'], tn = 2)
             else:
-                curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
-                rows = curs.fetchall()
-                if(rows):
-                    return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = rows[0]['data'], tn = 2)
-                else:
-                    return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = '', tn = 2)
+                return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = '', tn = 2)
                 
 @app.route('/preview/<path:name>', methods=['POST'])
 def preview(name = None):
