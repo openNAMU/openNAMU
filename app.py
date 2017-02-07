@@ -1158,7 +1158,7 @@ def search():
                         break
                     i = i + 1
             else:
-                div = div + '<li>문서가 없습니다. <a href="/w/' + parse.quote(request.form["search"]).replace('/','%2F') + '">바로가기</a></li>'
+                return div + '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(request.form["search"]).replace('/','%2F') + '" />'
             return render_template('index.html', logo = data['name'], data = div, title = '검색')
     else:
         return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(data['frontpage']).replace('/','%2F') + '" />'
