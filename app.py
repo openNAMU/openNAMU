@@ -217,7 +217,7 @@ def namumark(title, data):
     data = re.sub('--(?P<in>.+?)--(?!-)', '<s>\g<in></s>', data)
     data = re.sub('__(?P<in>.+?)__(?!_)', '<u>\g<in></u>', data)
     data = re.sub('\^\^(?P<in>.+?)\^\^(?!\^)', '<sup>\g<in></sup>', data)
-    data = re.sub(',,(?P<in>.+?),,(?!,)', '<path:sub>\g<in></sub>', data)
+    data = re.sub(',,(?P<in>.+?),,(?!,)', '<sub>\g<in></sub>', data)
     
     data = re.sub('{{\|(?P<in>(?:(?:(?:(?!\|}}).)*)(?:\n?))+)\|}}', '<table><tbody><tr><td>\g<in></td></tr></tbody></table>', data)
     
