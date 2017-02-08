@@ -1013,6 +1013,79 @@ def recentchanges():
         return render_template('index.html', logo = data['name'], rows = div, tn = 3, title = '최근 변경내역')
     else:
         return render_template('index.html', logo = data['name'], rows = '', tn = 3, title = '최근 변경내역')
+        
+@app.route('/record/<path:name>/n/<int:number>')
+def record(name = None, number = None):
+    v = number * 50
+    i = v - 50
+    div = '<div>'
+    curs.execute("select * from history where ip = '" + name + "' order by date desc")
+    rows = curs.fetchall()
+    if(rows):
+        admin = admincheck()
+        while True:
+            try:
+                a = rows[i]
+            except:
+                div = div + '</div>'
+                if(number == 1):
+                    div = div + '<br><a href="/record/' + parse.quote(name).replace('/','%2F') + '/n/' + str(number + 1) + '">(다음)'
+                else:
+                    div = div + '<br><a href="/record/' + parse.quote(name).replace('/','%2F') + '/n/' + str(number - 1) + '">(이전)'
+                break
+            if(rows[i]['send']):
+                send = rows[i]['send']
+                send = re.sub('<', '&lt;', send)
+                send = re.sub('>', '&gt;', send)
+                send = re.sub('&lt;a href="\/w\/(?P<in>[^"]*)"&gt;(?P<out>[^&]*)&lt;\/a&gt;', '<a href="/w/\g<in>">\g<out></a>', send)
+            else:
+                send = '<br>'
+            title = rows[i]['title']
+            title = re.sub('<', '&lt;', title)
+            title = re.sub('>', '&gt;', title)
+            m = re.search("\+", rows[i]['leng'])
+            n = re.search("\-", rows[i]['leng'])
+            if(m):
+                leng = '<span style="color:green;">' + rows[i]['leng'] + '</span>'
+            elif(n):
+                leng = '<span style="color:red;">' + rows[i]['leng'] + '</span>'
+            else:
+                leng = '<span style="color:gray;">' + rows[i]['leng'] + '</span>'
+            if(admin == 1):
+                curs.execute("select * from user where id = '" + pymysql.escape_string(rows[i]['ip']) + "'")
+                row = curs.fetchall()
+                if(row):
+                    if(row[0]['acl'] == 'owner' or row[0]['acl'] == 'admin'):
+                        ip = rows[i]['ip']
+                    else:
+                        curs.execute("select * from ban where block = '" + pymysql.escape_string(rows[i]['ip']) + "'")
+                        row = curs.fetchall()
+                        if(row):
+                            ip = rows[i]['ip'] + ' <a href="/ban/' + parse.quote(rows[i]['ip']).replace('/','%2F') + '">(해제)</a>'
+                        else:
+                            ip = rows[i]['ip'] + ' <a href="/ban/' + parse.quote(rows[i]['ip']).replace('/','%2F') + '">(차단)</a>'
+                else:
+                    curs.execute("select * from ban where block = '" + pymysql.escape_string(rows[i]['ip']) + "'")
+                    row = curs.fetchall()
+                    if(row):
+                        ip = rows[i]['ip'] + ' <a href="/ban/' + parse.quote(rows[i]['ip']).replace('/','%2F') + '">(해제)</a>'
+                    else:
+                        ip = rows[i]['ip'] + ' <a href="/ban/' + parse.quote(rows[i]['ip']).replace('/','%2F') + '">(차단)</a>'
+            else:
+                ip = rows[i]['ip']
+            div = div + '<table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;"><a href="/w/' + parse.quote(rows[i]['title']).replace('/','%2F') + '">' + title + '</a> r' + rows[i]['id'] + ' <a href="/history/' + parse.quote(rows[i]['title']).replace('/','%2F') + '/n/1">(역사)</a> <a href="/revert/' + parse.quote(rows[i]['title']).replace('/','%2F') + '/r/' + str(int(rows[i]['id']) - 1) + '">(되돌리기)</a> (' + leng + ')</td><td style="text-align: center;width:33.33%;">' + ip + '</td><td style="text-align: center;width:33.33%;">' + rows[i]['date'] + '</td></tr><tr><td colspan="3" style="text-align: center;width:100%;">' + send + '</td></tr></tbody></table>'
+            if(i == v):
+                div = div + '</div>'
+                if(number == 1):
+                    div = div + '<br><a href="/record/' + parse.quote(name).replace('/','%2F') + '/n/' + str(number + 1) + '">(다음)'
+                else:
+                    div = div + '<br><a href="/record/' + parse.quote(name).replace('/','%2F') + '/n/' + str(number - 1) + '">(이전) <a href="/record/' + parse.quote(name).replace('/','%2F') + '/n/' + str(number + 1) + '">(다음)'
+                break
+            else:
+                i = i + 1
+        return render_template('index.html', logo = data['name'], rows = div, tn = 3, title = '유저 기록')
+    else:
+        return render_template('index.html', logo = data['name'], rows = '', tn = 3, title = '유저 기록')
 
 @app.route('/recentdiscuss')
 def recentdiscuss():
