@@ -882,11 +882,6 @@ def getnow():
     s = "%04d-%02d-%02d %02d:%02d:%02d" % (now.tm_year, now.tm_mon, now.tm_mday, now.tm_hour, now.tm_min, now.tm_sec)
     return s
 
-def recent(title, ip, today, send, leng):
-    if(not re.search("^사용자:(.*)", title)):
-        curs.execute("insert into rc (title, date, ip, send, leng, back) value ('" + pymysql.escape_string(title) + "', '" + today + "', '" + ip + "', '" + pymysql.escape_string(send) + "', '" + leng + "', '')")
-        conn.commit()
-
 def discuss(title, sub, date):
     curs.execute("select * from rd where title = '" + pymysql.escape_string(title) + "' and sub = '" + pymysql.escape_string(sub) + "'")
     rows = curs.fetchall()
@@ -963,7 +958,7 @@ def redirect():
 def recentchanges():
     i = 0
     div = '<div>'
-    curs.execute("select * from rc order by date desc limit 50")
+    curs.execute("select * from history order by date desc limit 50")
     rows = curs.fetchall()
     if(rows):
         admin = admincheck()
@@ -1013,7 +1008,7 @@ def recentchanges():
                         ip = rows[i]['ip'] + ' <a href="/ban/' + parse.quote(rows[i]['ip']).replace('/','%2F') + '">(차단)</a>'
             else:
                 ip = rows[i]['ip']
-            div = div + '<table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;"><a href="/w/' + parse.quote(rows[i]['title']).replace('/','%2F') + '">' + title + '</a> <a href="/history/' + parse.quote(rows[i]['title']).replace('/','%2F') + '/n/1">(역사)</a> (' + leng + ')</td><td style="text-align: center;width:33.33%;">' + ip + '</td><td style="text-align: center;width:33.33%;">' + rows[i]['date'] + '</td></tr><tr><td colspan="3" style="text-align: center;width:100%;">' + send + '</td></tr></tbody></table>'
+            div = div + '<table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;"><a href="/w/' + parse.quote(rows[i]['title']).replace('/','%2F') + '">' + title + '</a> <a href="/history/' + parse.quote(rows[i]['title']).replace('/','%2F') + '/n/1">(역사)</a> <a href="/revert/' + parse.quote(rows[i]['title']).replace('/','%2F') + '/r/' + str(int(rows[i]['id']) - 1) + '">(되돌리기)</a> (' + leng + ')</td><td style="text-align: center;width:33.33%;">' + ip + '</td><td style="text-align: center;width:33.33%;">' + rows[i]['date'] + '</td></tr><tr><td colspan="3" style="text-align: center;width:100%;">' + send + '</td></tr></tbody></table>'
             i = i + 1
         return render_template('index.html', logo = data['name'], rows = div, tn = 3, title = '최근 변경내역')
     else:
@@ -1297,7 +1292,6 @@ def revert(name = None, number = None):
                     leng = '+' + str(len(rows[0]['data']))
                     curs.execute("insert into data (title, data, acl) value ('" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(rows[0]['data']) + "', '')")
                     conn.commit()
-                recent(name, ip, today, '문서를 ' + number + '판으로 되돌렸습니다.', leng)
                 history(name, rows[0]['data'], today, ip, '문서를 ' + number + '판으로 되돌렸습니다.', leng)
                 return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name).replace('/','%2F') + '" />'
         else:
@@ -1328,7 +1322,6 @@ def edit(name = None):
             else:
                 today = getnow()
                 leng = getleng(len(rows[0]['data']), len(request.form["content"]))
-                recent(name, ip, today, request.form["send"], leng)
                 history(name, request.form["content"], today, ip, request.form["send"], leng)
                 curs.execute("update data set data = '" + pymysql.escape_string(request.form["content"]) + "' where title = '" + pymysql.escape_string(name) + "'")
                 conn.commit()
@@ -1340,7 +1333,6 @@ def edit(name = None):
             else:
                 today = getnow()
                 leng = '+' + str(len(request.form["content"]))
-                recent(name, ip, today, request.form["send"], leng)
                 history(name, request.form["content"], today, ip, request.form["send"], leng)
                 curs.execute("insert into data (title, data, acl) value ('" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(request.form["content"]) + "', '')")
                 conn.commit()
@@ -1400,7 +1392,6 @@ def delete(name = None):
             else:
                 today = getnow()
                 leng = '-' + str(len(rows[0]['data']))
-                recent(name, ip, today, '문서를 삭제 했습니다.', leng)
                 history(name, '', today, ip, '문서를 삭제 했습니다.', leng)
                 curs.execute("delete from data where title = '" + pymysql.escape_string(name) + "'")
                 conn.commit()
@@ -1438,7 +1429,6 @@ def move(name = None):
                 if(row):
                     return render_template('index.html', title = '이동 오류', logo = data['name'], data = '이동 하려는 곳에 문서가 이미 있습니다.')
                 else:
-                    recent(name, ip, today, '문서를 <a href="/w/' + pymysql.escape_string(parse.quote(request.form["title"]).replace('/','%2F')) + '">' + pymysql.escape_string(request.form["title"]) + '</a> 문서로 이동 했습니다.', leng)
                     history(name, rows[0]['data'], today, ip, '<a href="/w/' + pymysql.escape_string(parse.quote(name).replace('/','%2F')) + '">' + pymysql.escape_string(name) + '</a> 문서를 <a href="/w/' + pymysql.escape_string(parse.quote(request.form["title"]).replace('/','%2F')) + '">' + pymysql.escape_string(request.form["title"]) + '</a> 문서로 이동 했습니다.', leng)
                     curs.execute("update data set title = '" + pymysql.escape_string(request.form["title"]) + "' where title = '" + pymysql.escape_string(name) + "'")
                     curs.execute("update history set title = '" + pymysql.escape_string(request.form["title"]) + "' where title = '" + pymysql.escape_string(name) + "'")
@@ -1457,7 +1447,6 @@ def move(name = None):
                 if(row):
                      return render_template('index.html', title = '이동 오류', logo = data['name'], data = '이동 하려는 곳에 문서가 이미 있습니다.')
                 else:
-                    recent(name, ip, today, '문서를 <a href="/w/' + pymysql.escape_string(parse.quote(request.form["title"]).replace('/','%2F')) + '">' + pymysql.escape_string(request.form["title"]) + '</a> 문서로 이동 했습니다.', leng)
                     history(name, rows[0]['data'], today, ip, '<a href="/w/' + pymysql.escape_string(parse.quote(name).replace('/','%2F')) + '">' + pymysql.escape_string(name) + '</a> 문서를 <a href="/w/' + pymysql.escape_string(parse.quote(request.form["title"]).replace('/','%2F')) + '">' + pymysql.escape_string(request.form["title"]) + '</a> 문서로 이동 했습니다.', leng)
                     curs.execute("update history set title = '" + pymysql.escape_string(request.form["title"]) + "' where title = '" + pymysql.escape_string(name) + "'")
                     conn.commit()
@@ -1474,7 +1463,6 @@ def move(name = None):
 def setup():
     curs.execute("create table if not exists data(title text not null, data longtext not null, acl text not null)")
     curs.execute("create table if not exists history(id text not null, title text not null, data longtext not null, date text not null, ip text not null, send text not null, leng text not null)")
-    curs.execute("create table if not exists rc(title text not null, date text not null, ip text not null, send text not null, leng text not null, back text not null)")
     curs.execute("create table if not exists rd(title text not null, sub text not null, date text not null)")
     curs.execute("create table if not exists user(id text not null, pw text not null, acl text not null)")
     curs.execute("create table if not exists ban(block text not null, end text not null, why text not null, band text not null)")
