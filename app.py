@@ -999,28 +999,28 @@ def recentchanges():
                 row = curs.fetchall()
                 if(row):
                     if(row[0]['acl'] == 'owner' or row[0]['acl'] == 'admin'):
-                        ip = rows[i]['ip']
+                        ban = ''
                     else:
                         curs.execute("select * from ban where block = '" + pymysql.escape_string(rows[i]['ip']) + "'")
                         row = curs.fetchall()
                         if(row):
-                            ip = rows[i]['ip'] + ' <a href="/ban/' + parse.quote(rows[i]['ip']).replace('/','%2F') + '">(해제)</a>'
+                            ban = ' <a href="/ban/' + parse.quote(rows[i]['ip']).replace('/','%2F') + '">(해제)</a>'
                         else:
-                            ip = rows[i]['ip'] + ' <a href="/ban/' + parse.quote(rows[i]['ip']).replace('/','%2F') + '">(차단)</a>'
+                            ban = ' <a href="/ban/' + parse.quote(rows[i]['ip']).replace('/','%2F') + '">(차단)</a>'
                 else:
                     curs.execute("select * from ban where block = '" + pymysql.escape_string(rows[i]['ip']) + "'")
                     row = curs.fetchall()
                     if(row):
-                        ip = rows[i]['ip'] + ' <a href="/ban/' + parse.quote(rows[i]['ip']).replace('/','%2F') + '">(해제)</a>'
+                        ban = ' <a href="/ban/' + parse.quote(rows[i]['ip']).replace('/','%2F') + '">(해제)</a>'
                     else:
-                        ip = rows[i]['ip'] + ' <a href="/ban/' + parse.quote(rows[i]['ip']).replace('/','%2F') + '">(차단)</a>'
+                        ban = ' <a href="/ban/' + parse.quote(rows[i]['ip']).replace('/','%2F') + '">(차단)</a>'
             else:
-                ip = rows[i]['ip']
+                ban = ''
             if((int(rows[i]['id']) - 1) == 0):
                 revert = ''
             else:
                 revert = '<a href="/revert/' + parse.quote(rows[i]['title']).replace('/','%2F') + '/r/' + str(int(rows[i]['id']) - 1) + '">(되돌리기)</a>'
-            div = div + '<table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;"><a href="/w/' + parse.quote(rows[i]['title']).replace('/','%2F') + '">' + title + '</a> <a href="/history/' + parse.quote(rows[i]['title']).replace('/','%2F') + '/n/1">(역사)</a> ' + revert + ' (' + leng + ')</td><td style="text-align: center;width:33.33%;">' + ip + '</td><td style="text-align: center;width:33.33%;">' + rows[i]['date'] + '</td></tr><tr><td colspan="3" style="text-align: center;width:100%;">' + send + '</td></tr></tbody></table>'
+            div = div + '<table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;"><a href="/w/' + parse.quote(rows[i]['title']).replace('/','%2F') + '">' + title + '</a> <a href="/history/' + parse.quote(rows[i]['title']).replace('/','%2F') + '/n/1">(역사)</a> ' + revert + ' (' + leng + ')</td><td style="text-align: center;width:33.33%;">' + rows[i]['ip'] + ban + '</td><td style="text-align: center;width:33.33%;">' + rows[i]['date'] + '</td></tr><tr><td colspan="3" style="text-align: center;width:100%;">' + send + '</td></tr></tbody></table>'
             i = i + 1
         return render_template('index.html', logo = data['name'], rows = div, tn = 3, title = '최근 변경내역')
     else:
@@ -1949,10 +1949,47 @@ def logout():
 
 @app.route('/ban/<path:name>', methods=['POST', 'GET'])
 def ban(name = None):
+    ip = getip(request)
     curs.execute("select * from user where id = '" + pymysql.escape_string(name) + "'")
     rows = curs.fetchall()
-    if(rows[0]['acl'] == 'owner' or rows[0]['acl'] == 'admin'):
-        return render_template('index.html', title = '차단 오류', logo = data['name'], data = '관리자는 차단 할 수 없습니다.')
+    if(rows):
+        if(rows[0]['acl'] == 'owner' or rows[0]['acl'] == 'admin'):
+            return render_template('index.html', title = '차단 오류', logo = data['name'], data = '관리자는 차단 할 수 없습니다.')
+        else:
+            if(request.method == 'POST'):
+                if(admincheck() == 1):
+                    curs.execute("select * from ban where block = '" + pymysql.escape_string(name) + "'")
+                    row = curs.fetchall()
+                    if(row):
+                        block(name, '해제', getnow(), ip, '')
+                        curs.execute("delete from ban where block = '" + pymysql.escape_string(name) + "'")
+                    else:
+                        b = re.search("^([0-9](?:[0-9][0-9])?\.[0-9](?:[0-9][0-9])?)$", name)
+                        if(b):
+                            block(name, request.form["end"], getnow(), ip, request.form["why"])
+                            curs.execute("insert into ban (block, end, why, band) value ('" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(request.form["end"]) + "', '" + pymysql.escape_string(request.form["why"]) + "', 'O')")
+                        else:
+                            block(name, request.form["end"], getnow(), ip, request.form["why"])
+                            curs.execute("insert into ban (block, end, why, band) value ('" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(request.form["end"]) + "', '" + pymysql.escape_string(request.form["why"]) + "', '')")
+                    conn.commit()
+                    return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(data['frontpage']).replace('/','%2F') + '" />'
+                else:
+                    return render_template('index.html', title = '권한 오류', logo = data['name'], data = '권한이 모자랍니다.')
+            else:
+                if(admincheck() == 1):
+                    curs.execute("select * from ban where block = '" + pymysql.escape_string(name) + "'")
+                    row = curs.fetchall()
+                    if(row):
+                        now = '차단 해제'
+                    else:
+                        b = re.search("^([0-9](?:[0-9][0-9])?\.[0-9](?:[0-9][0-9])?)$", name)
+                        if(b):
+                            now = '대역 차단'
+                        else:
+                            now = '차단'
+                    return render_template('index.html', title = name, page = parse.quote(name).replace('/','%2F'), logo = data['name'], tn = 16, now = now, today = getnow())
+                else:
+                    return render_template('index.html', title = '권한 오류', logo = data['name'], data = '권한이 모자랍니다.')
     else:
         if(request.method == 'POST'):
             if(admincheck() == 1):
