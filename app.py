@@ -447,6 +447,16 @@ def namumark(title, data):
                                 alltable = alltable + 'margin:auto;'
                             else:
                                 alltable = alltable + 'margin-right:auto;'
+                                
+                        ee = re.search("&lt;table\s?textalign=((?:(?!&gt;).)*)&gt;", result[1])
+                        if(ee):
+                            resultss = ee.groups()
+                            if(resultss[0] == 'right'):
+                                alltable = alltable + 'text-align:right;'
+                            elif(resultss[0] == 'center'):
+                                alltable = alltable + 'text-align:center;'
+                            else:
+                                alltable = alltable + 'text-align:left;'
                         
                         r = re.search("&lt;-((?:(?!&gt;).)*)&gt;", result[1])
                         if(r):
@@ -540,7 +550,7 @@ def namumark(title, data):
                             celstyle = celstyle + 'text-align:right;'
                         elif(o):
                             celstyle = celstyle + 'text-align:center;'
-                        else:
+                        elif(p):
                             celstyle = celstyle + 'text-align:left;'
                             
                         alltable = alltable + '"'
@@ -634,7 +644,7 @@ def namumark(title, data):
                             celstyle = celstyle + 'text-align:right;'
                         elif(o):
                             celstyle = celstyle + 'text-align:center;'
-                        else:
+                        elif(p):
                             celstyle = celstyle + 'text-align:left;'
 
                         celstyle = celstyle + '"'
@@ -710,7 +720,7 @@ def namumark(title, data):
                             celstyle = celstyle + 'text-align:right;'
                         elif(o):
                             celstyle = celstyle + 'text-align:center;'
-                        else:
+                        elif(p):
                             celstyle = celstyle + 'text-align:left;'
 
                         celstyle = celstyle + '"'
