@@ -1949,50 +1949,14 @@ def logout():
 
 @app.route('/ban/<path:name>', methods=['POST', 'GET'])
 def ban(name = None):
-    ip = getip(request)
     curs.execute("select * from user where id = '" + pymysql.escape_string(name) + "'")
     rows = curs.fetchall()
-    if(rows):
-        if(rows[0]['acl'] == 'owner' or rows[0]['acl'] == 'admin'):
-            return render_template('index.html', title = '차단 오류', logo = data['name'], data = '관리자는 차단 할 수 없습니다.')
-        else:
-            if(request.method == 'POST'):
-                if(admincheck() == 1):
-                    curs.execute("select * from ban where block = '" + pymysql.escape_string(name) + "'")
-                    row = curs.fetchall()
-                    if(row):
-                        block(name, '해제', getnow(), ip, '')
-                        curs.execute("delete from ban where block = '" + pymysql.escape_string(name) + "'")
-                    else:
-                        b = re.search("^([0-9](?:[0-9][0-9])?\.[0-9](?:[0-9][0-9])?)$", name)
-                        if(b):
-                            block(name, request.form["end"], getnow(), ip, request.form["why"])
-                            curs.execute("insert into ban (block, end, why, band) value ('" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(request.form["end"]) + "', '" + pymysql.escape_string(request.form["why"]) + "', 'O')")
-                        else:
-                            block(name, request.form["end"], getnow(), ip, request.form["why"])
-                            curs.execute("insert into ban (block, end, why, band) value ('" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(request.form["end"]) + "', '" + pymysql.escape_string(request.form["why"]) + "', '')")
-                    conn.commit()
-                    return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(data['frontpage']).replace('/','%2F') + '" />'
-                else:
-                    return render_template('index.html', title = '권한 오류', logo = data['name'], data = '권한이 모자랍니다.')
-            else:
-                if(admincheck() == 1):
-                    curs.execute("select * from ban where block = '" + pymysql.escape_string(name) + "'")
-                    row = curs.fetchall()
-                    if(row):
-                        now = '차단 해제'
-                    else:
-                        b = re.search("^([0-9](?:[0-9][0-9])?\.[0-9](?:[0-9][0-9])?)$", name)
-                        if(b):
-                            now = '대역 차단'
-                        else:
-                            now = '차단'
-                    return render_template('index.html', title = name, page = parse.quote(name).replace('/','%2F'), logo = data['name'], tn = 16, now = now, today = getnow())
-                else:
-                    return render_template('index.html', title = '권한 오류', logo = data['name'], data = '권한이 모자랍니다.')
+    if(rows and rows[0]['acl'] == 'owner' or rows and rows[0]['acl'] == 'admin'):
+        return render_template('index.html', title = '차단 오류', logo = data['name'], data = '관리자는 차단 할 수 없습니다.')
     else:
         if(request.method == 'POST'):
             if(admincheck() == 1):
+                ip = getip(request)
                 curs.execute("select * from ban where block = '" + pymysql.escape_string(name) + "'")
                 row = curs.fetchall()
                 if(row):
