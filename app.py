@@ -1426,12 +1426,16 @@ def edit(name = None):
         if(can == 1):
             return '<meta http-equiv="refresh" content="0;url=/ban" />'
         else:
+            if(re.search('\.', ip)):
+                notice = '비 로그인 상태 입니다. 비 로그인으로 편집시 아이피가 역사에 기록 됩니다. 편집 시 동의 함으로 간주 됩니다.'
+            else:
+                notice = ''
             curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
             rows = curs.fetchall()
             if(rows):
-                return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = rows[0]['data'], tn = 2)
+                return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = rows[0]['data'], tn = 2, notice = notice)
             else:
-                return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = '', tn = 2)
+                return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = '', tn = 2, notice = notice)
                 
 @app.route('/preview/<path:name>', methods=['POST'])
 def preview(name = None):
@@ -1440,6 +1444,10 @@ def preview(name = None):
     if(can == 1):
         return '<meta http-equiv="refresh" content="0;url=/ban" />'
     else:
+        if(re.search('\.', ip)):
+            notice = '비 로그인 상태 입니다. 비 로그인으로 편집시 아이피가 역사에 기록 됩니다. 편집 시 동의 함으로 간주 됩니다.'
+        else:
+            notice = ''
         newdata = request.form["content"]
         newdata = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', ' * \g<in> 문서로 넘겨주기', newdata)
         enddata = namumark(name, newdata)
@@ -1449,18 +1457,7 @@ def preview(name = None):
             left = result[0]
         else:
             left = ''
-        m = re.search("^사용자:(.*)", name)
-        if(m):
-            g = m.groups()
-            if(ip == g[0]):
-                if(re.search("\.", g[0])):
-                    return render_template('index.html', title = '사문 오류', logo = data['name'], data = '사문을 사용하려면 로그인 해야 합니다.')
-                else:
-                    return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = request.form["content"], tn = 2, preview = 1, enddata = enddata, left = left)
-            else:
-                return render_template('index.html', title = '사문 오류', logo = data['name'], data = '본인 사문이 아닙니다.')
-        else:
-            return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = request.form["content"], tn = 2, preview = 1, enddata = enddata, left = left)
+        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = request.form["content"], tn = 2, preview = 1, enddata = enddata, left = left, notice = notice)
 
 @app.route('/delete/<path:name>', methods=['POST', 'GET'])
 def delete(name = None):
