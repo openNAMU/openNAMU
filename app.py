@@ -1245,6 +1245,7 @@ def search():
 
 @app.route('/w/<path:name>')
 def w(name = None):
+    acl = ''
     m = re.search("^(.*)\/(.*)$", name)
     if(m):
         g = m.groups()
@@ -1253,6 +1254,16 @@ def w(name = None):
     else:
         uppage = ""
         style = "display:none;"
+    m = re.search("^사용자:(.*)", name)
+    if(m):
+        g = m.groups()
+        curs.execute("select * from user where id = '" + pymysql.escape_string(g[0]) + "'")
+        rows = curs.fetchall()
+        if(rows):
+            if(rows[0]['acl'] == 'owner'):
+                acl = '(소유자)'
+            elif(rows[0]['acl'] == 'admin'):
+                acl = '(관리자)'
     curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
     rows = curs.fetchall()
     if(rows):
@@ -1261,7 +1272,8 @@ def w(name = None):
         elif(rows[0]['acl'] == 'user'):
             acl = '(유저)'
         else:
-            acl = ''
+            if(not acl):
+                acl = ''
         enddata = namumark(name, rows[0]['data'])
         m = re.search('<div id="toc">((?:(?!\/div>).)*)<\/div>', enddata)
         if(m):
@@ -1271,7 +1283,7 @@ def w(name = None):
             left = ''
         return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = enddata, license = data['license'], tn = 1, acl = acl, left = left, uppage = uppage, style = style)
     else:
-        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = '문서 없음', license = data['license'], tn = 1, uppage = uppage, style = style)
+        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = '문서 없음', license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl)
 
 @app.route('/w/<path:name>/redirect/<redirect>')
 def redirectw(name = None, redirect = None):
