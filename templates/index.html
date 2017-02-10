@@ -90,6 +90,12 @@
             {% else %}
             <h1 class="title">{{title}} <sub>(수정)</sub></h1>
             {% endif %}
+            {% if notice %}
+            <br>
+            <span>{{notice}}</span>
+            <br>
+            <br>
+            {% endif %}
 			<form id="usrform" name="f1" method="POST" action="/edit/{{page}}">
 				<textarea rows="30" cols="100" name="content" form="usrform">{{data}}</textarea>
 				<input name="send" style="margin-top:10px;width:100%" type="text">
