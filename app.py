@@ -1283,14 +1283,14 @@ def w(name = None):
         else:
             if(not acl):
                 acl = ''
-        enddata = namumark(name, rows[0]['data'])
-        m = re.search('<div id="toc">((?:(?!\/div>).)*)<\/div>', enddata)
+        data = namumark(name, rows[0]['data'])
+        m = re.search('<div id="toc">((?:(?!\/div>).)*)<\/div>', data)
         if(m):
             result = m.groups()
             left = result[0]
         else:
             left = ''
-        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = enddata, license = data['license'], tn = 1, acl = acl, left = left, uppage = uppage, style = style)
+        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = data, license = data['license'], tn = 1, acl = acl, left = left, uppage = uppage, style = style)
     else:
         return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = '문서 없음', license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl)
 
