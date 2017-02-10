@@ -15,7 +15,7 @@ set 폴더에 있는 set.json을 폴더 밖으로 꺼내고 json 내용을 수�
  
 ## 의존성
  * pip install [flask](https://pypi.python.org/pypi/Flask/0.12)
- * pip install [bcript](https://pypi.python.org/pypi/bcrypt/3.1.0)
+ * pip install [bcrypt](https://pypi.python.org/pypi/bcrypt/3.1.0)
  * pip install [pymysql](https://pypi.python.org/pypi/PyMySQL)
  * [MariaDB](https://mariadb.org/)나 [MySQL](https://www.mysql.com/)
  
