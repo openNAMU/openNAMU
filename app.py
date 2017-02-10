@@ -2156,7 +2156,10 @@ def user():
     if(getban(ip) == 0):
         if(rows):
             if(rows[0]['acl'] == 'admin' or rows[0]['acl'] == 'owner'):
-                acl = '관리자'
+                if(rows[0]['acl'] == 'admin'):
+                    acl = '관리자'
+                else:
+                    acl = '소유자'
             else:
                 acl = '유저'
         else:
