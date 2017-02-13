@@ -1195,24 +1195,33 @@ def gethistory(name = None, number = None):
                     row = curs.fetchall()
                     if(row):
                         if(row[0]['acl'] == 'owner' or row[0]['acl'] == 'admin'):
-                            ip = rows[i]['ip']
+                            ban = ''
                         else:
                             curs.execute("select * from ban where block = '" + pymysql.escape_string(rows[i]['ip']) + "'")
                             row = curs.fetchall()
                             if(row):
-                                ip = rows[i]['ip'] + ' <a href="/ban/' + parse.quote(rows[i]['ip']).replace('/','%2F') + '">(해제)</a>'
+                                ban = ' <a href="/ban/' + parse.quote(rows[i]['ip']).replace('/','%2F') + '">(해제)</a>'
                             else:
-                                ip = rows[i]['ip'] + ' <a href="/ban/' + parse.quote(rows[i]['ip']).replace('/','%2F') + '">(차단)</a>'
+                                ban = ' <a href="/ban/' + parse.quote(rows[i]['ip']).replace('/','%2F') + '">(차단)</a>'
                     else:
                         curs.execute("select * from ban where block = '" + pymysql.escape_string(rows[i]['ip']) + "'")
                         row = curs.fetchall()
                         if(row):
-                            ip = rows[i]['ip'] + ' <a href="/ban/' + parse.quote(rows[i]['ip']).replace('/','%2F') + '">(해제)</a>'
+                            ban = ' <a href="/ban/' + parse.quote(rows[i]['ip']).replace('/','%2F') + '">(해제)</a>'
                         else:
-                            ip = rows[i]['ip'] + ' <a href="/ban/' + parse.quote(rows[i]['ip']).replace('/','%2F') + '">(차단)</a>'
+                            ban = ' <a href="/ban/' + parse.quote(rows[i]['ip']).replace('/','%2F') + '">(차단)</a>'
                 else:
-                    ip = rows[i]['ip']
-                div = div + '<table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;">r' + rows[i]['id'] + '</a> <a href="/w/' + parse.quote(rows[i]['title']).replace('/','%2F') + '/r/' + rows[i]['id'] + '">(w)</a> <a href="/w/' + parse.quote(rows[i]['title']).replace('/','%2F') + '/raw/' + rows[i]['id'] + '">(Raw)</a> <a href="/revert/' + parse.quote(rows[i]['title']).replace('/','%2F') + '/r/' + rows[i]['id'] + '">(되돌리기)</a> (' + leng + ')</td><td style="text-align: center;width:33.33%;">' + ip + '</td><td style="text-align: center;width:33.33%;">' + rows[i]['date'] + '</td></tr><tr><td colspan="3" style="text-align: center;width:100%;">' + send + '</td></tr></tbody></table>'
+                    ban = ''
+                if(re.search("\.", rows[i]["ip"])):
+                    ip = rows[i]["ip"]
+                else:
+                    curs.execute("select * from data where title = '사용자:" + pymysql.escape_string(rows[i]['ip']) + "'")
+                    row = curs.fetchall()
+                    if(row):
+                        ip = '<a href="/w/' + parse.quote('사용자:' + rows[i]['ip']).replace('/','%2F') + '">' + rows[i]['ip'] + '</a>'
+                    else:
+                        ip = '<a class="not_thing" href="/w/' + parse.quote('사용자:' + rows[i]['ip']).replace('/','%2F') + '">' + rows[i]['ip'] + '</a>'
+                div = div + '<table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;">r' + rows[i]['id'] + '</a> <a href="/w/' + parse.quote(rows[i]['title']).replace('/','%2F') + '/r/' + rows[i]['id'] + '">(w)</a> <a href="/w/' + parse.quote(rows[i]['title']).replace('/','%2F') + '/raw/' + rows[i]['id'] + '">(Raw)</a> <a href="/revert/' + parse.quote(rows[i]['title']).replace('/','%2F') + '/r/' + rows[i]['id'] + '">(되돌리기)</a> (' + leng + ')</td><td style="text-align: center;width:33.33%;">' + ip + ban + '</td><td style="text-align: center;width:33.33%;">' + rows[i]['date'] + '</td></tr><tr><td colspan="3" style="text-align: center;width:100%;">' + send + '</td></tr></tbody></table>'
                 if(i == v):
                     div = div + '</div>'
                     if(number == 1):
@@ -1721,9 +1730,9 @@ def sub(name = None, sub = None):
                 block = 'style="background: gainsboro;"'
             else:
                 block = ''
-            m = re.search("\- (?:Close|Reopen|Stop|Restart)$", rows[i]['ip'])
+            m = re.search("([^-]*)\s\-\s(Close|Reopen|Stop|Restart)$", rows[i]['ip'])
             if(m):
-                ip = rows[i]['ip']
+                ban = ""
             else:
                 if(admin == 1):
                     curs.execute("select * from ban where block = '" + pymysql.escape_string(rows[i]['ip']) + "'")
@@ -1734,20 +1743,38 @@ def sub(name = None, sub = None):
                         isblock = ' <a href="/topic/' + parse.quote(name).replace('/','%2F') + '/sub/' + parse.quote(sub).replace('/','%2F') + '/b/' + str(i + 1) + '">(블라인드)</a>'
                     n = re.search("\- (?:Admin)$", rows[i]['ip'])
                     if(n):
-                        ip = rows[i]['ip'] + isblock
+                        ban = isblock
                     else:
                         if(row):
-                            ip = rows[i]['ip'] + ' <a href="/ban/' + parse.quote(rows[i]['ip']).replace('/','%2F') + '">(해제)</a>' + isblock
+                            ban = ' <a href="/ban/' + parse.quote(rows[i]['ip']).replace('/','%2F') + '">(해제)</a>' + isblock
                         else:
-                            ip = rows[i]['ip'] + ' <a href="/ban/' + parse.quote(rows[i]['ip']).replace('/','%2F') + '">(차단)</a>' + isblock
+                            ban = ' <a href="/ban/' + parse.quote(rows[i]['ip']).replace('/','%2F') + '">(차단)</a>' + isblock
                 else:
-                    ip = rows[i]['ip']
+                    ban = ""
+            m = re.search("([^-]*)\s\-\s(Close|Reopen|Stop|Restart|Admin)$", rows[i]['ip'])
+            if(m):
+                g = m.groups()
+                curs.execute("select * from data where title = '사용자:" + pymysql.escape_string(g[0]) + "'")
+                row = curs.fetchall()
+                if(row):
+                    ip = '<a href="/w/' + parse.quote('사용자:' + g[0]).replace('/','%2F') + '">' + g[0] + '</a> - ' + g[1]
+                else:
+                    ip = '<a class="not_thing" href="/w/' + parse.quote('사용자:' + g[0]).replace('/','%2F') + '">' + g[0] + '</a> - ' + g[1]
+            elif(re.search("\.", rows[i]["ip"])):
+                ip = rows[i]["ip"]
+            else:
+                curs.execute("select * from data where title = '사용자:" + pymysql.escape_string(rows[i]['ip']) + "'")
+                row = curs.fetchall()
+                if(row):
+                    ip = '<a href="/w/' + parse.quote('사용자:' + rows[i]['ip']).replace('/','%2F') + '">' + rows[i]['ip'] + '</a>'
+                else:
+                    ip = '<a class="not_thing" href="/w/' + parse.quote('사용자:' + rows[i]['ip']).replace('/','%2F') + '">' + rows[i]['ip'] + '</a>'
             if(rows[i]['ip'] == start):
                 j = i + 1
-                div = div + '<table id="toron"><tbody><tr><td id="toroncolorgreen"><a href="javascript:void(0);" id="' + str(j) + '">#' + str(j) + '</a> ' + ip + ' <span style="float:right;">' + rows[i]['date'] + '</span></td></tr><tr><td ' + block + '>' + indata + '</td></tr></tbody></table><br>'
+                div = div + '<table id="toron"><tbody><tr><td id="toroncolorgreen"><a href="javascript:void(0);" id="' + str(j) + '">#' + str(j) + '</a> ' + ip + ban + ' <span style="float:right;">' + rows[i]['date'] + '</span></td></tr><tr><td ' + block + '>' + indata + '</td></tr></tbody></table><br>'
             else:
                 j = i + 1
-                div = div + '<table id="toron"><tbody><tr><td id="toroncolor"><a href="javascript:void(0);" id="' + str(j) + '">#' + str(j) + '</a> ' + ip + ' <span style="float:right;">' + rows[i]['date'] + '</span></td></tr><tr><td ' + block + '>' + indata + '</td></tr></tbody></table><br>'
+                div = div + '<table id="toron"><tbody><tr><td id="toroncolor"><a href="javascript:void(0);" id="' + str(j) + '">#' + str(j) + '</a> ' + ip + ban + ' <span style="float:right;">' + rows[i]['date'] + '</span></td></tr><tr><td ' + block + '>' + indata + '</td></tr></tbody></table><br>'
             i = i + 1
         return render_template('index.html', title = name, page = parse.quote(name).replace('/','%2F'), suburl = parse.quote(sub).replace('/','%2F'), sub = sub, logo = data['name'], rows = div, tn = 11, ban = ban)
 
