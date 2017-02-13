@@ -185,6 +185,15 @@ def namumark(title, data):
             t = re.compile("^#(\w+)\s(.*)$", re.DOTALL)
             d = t.search(results[0])
             
+            qqq = re.compile("^@([0-9a-f-A-F]{6})\s(.*)$", re.DOTALL)
+            qqe = qqq.search(results[0])
+            
+            qqw = re.compile("^@([0-9a-f-A-F]{3})\s(.*)$", re.DOTALL)
+            qqa = qqw.search(results[0])
+            
+            qwe = re.compile("^@(\w+)\s(.*)$", re.DOTALL)
+            qsd = qwe.search(results[0])
+            
             y = re.compile("^#!wiki\sstyle=&quot;((?:(?!&quot;|\n).)*)&quot;\n?\s\n(.*)$", re.DOTALL)
             l = y.search(results[0])
             
@@ -203,6 +212,15 @@ def namumark(title, data):
             elif(d):
                 result = d.groups()
                 data = p.sub('<span style="color:' + result[0] + '">' + result[1] + '</span>', data, 1)
+            elif(qqe):
+                result = qqe.groups()
+                data = p.sub('<span style="background:#' + result[0] + '">' + result[1] + '</span>', data, 1)
+            elif(qqa):
+                result = qqa.groups()
+                data = p.sub('<span style="background:#' + result[0] + '">' + result[1] + '</span>', data, 1)
+            elif(qsd):
+                result = qsd.groups()
+                data = p.sub('<span style="background:' + result[0] + '">' + result[1] + '</span>', data, 1)
             elif(l):
                 result = l.groups()
                 data = p.sub('<div style="' + result[0] + '">' + result[1] + '</div>', data, 1)
