@@ -1180,6 +1180,7 @@ def gethistory(name = None, number = None):
     if(request.method == 'POST'):
         return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name).replace('/','%2F') + '/r/' + request.form["a"] + '/diff/' + request.form["b"] + '" />'
     else:
+        select = ''
         v = number * 50
         i = v - 50
         div = '<div>'
@@ -1195,6 +1196,7 @@ def gethistory(name = None, number = None):
                     if(number != 1):
                         div = div + '<br><a href="/history/' + parse.quote(name).replace('/','%2F') + '/n/' + str(number - 1) + '">(이전)'
                     break
+                select = select + '<option value="' + str(i + 1) + '">' + str(i + 1) + '</option>'
                 if(rows[i]['send']):
                     send = rows[i]['send']
                     send = re.sub('<a href="\/w\/(?P<in>[^"]*)">(?P<out>[^&]*)<\/a>', '<a href="/w/\g<in>">\g<out></a>', send)
@@ -1249,9 +1251,9 @@ def gethistory(name = None, number = None):
                     break
                 else:
                     i = i + 1
-            return render_template('index.html', logo = data['name'], rows = div, tn = 5, title = name, page = parse.quote(name).replace('/','%2F'))
+            return render_template('index.html', logo = data['name'], rows = div, tn = 5, title = name, page = parse.quote(name).replace('/','%2F'), select = select)
         else:
-            return render_template('index.html', logo = data['name'], rows = '', tn = 5, title = name, page = parse.quote(name).replace('/','%2F'))
+            return render_template('index.html', logo = data['name'], rows = '', tn = 5, title = name, page = parse.quote(name).replace('/','%2F'), select = select)
 
 @app.route('/search', methods=['POST', 'GET'])
 def search():

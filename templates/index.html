@@ -139,8 +139,16 @@
 			</div>
 			<h1 class="title">{{title}} <sub>(역사)</sub></h1>
             <form class="usrform" method='POST' action='/history/{{page}}/n/1'>
-            <input id="form-control input-sm" type='text' id='history' name='a'>
-            <input id="form-control input-sm" type='text' id='history' name='b'>
+            <select name="a">
+                {% autoescape false %}
+                {{select}}
+                {% endautoescape %}
+            </select>
+            <select name="b">
+                {% autoescape false %}
+                {{select}}
+                {% endautoescape %}
+            </select>
             <button class="btn btn-primary" type='submit'>리비전 비교</button>
             <br>
             <br>
