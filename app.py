@@ -1455,19 +1455,20 @@ def edit(name = None):
         if(m):
             return render_template('index.html', title = '편집 오류', logo = data['name'], data = '편집 내용 기록에는 한글과 영어와 숫자, 공백만 허용 됩니다.')
         else:
+            today = getnow()
+            content = re.sub("\[date\(now\)\]", today, request.form["content"])
             if(rows):
-                if(rows[0]['data'] == request.form["content"]):
+                if(rows[0]['data'] == content):
                     return render_template('index.html', title = '편집 오류', logo = data['name'], data = '내용이 원래 문서와 동일 합니다.')
                 else:
                     ip = getip(request)
                     can = getcan(ip, name)
                     if(can == 1):
                         return '<meta http-equiv="refresh" content="0;url=/ban" />'
-                    else:
-                        today = getnow()
-                        leng = getleng(len(rows[0]['data']), len(request.form["content"]))
-                        history(name, request.form["content"], today, ip, request.form["send"], leng)
-                        curs.execute("update data set data = '" + pymysql.escape_string(request.form["content"]) + "' where title = '" + pymysql.escape_string(name) + "'")
+                    else:                        
+                        leng = getleng(len(rows[0]['data']), len(content))
+                        history(name, content, today, ip, request.form["send"], leng)
+                        curs.execute("update data set data = '" + pymysql.escape_string(content) + "' where title = '" + pymysql.escape_string(name) + "'")
                         conn.commit()
             else:
                 ip = getip(request)
@@ -1475,10 +1476,9 @@ def edit(name = None):
                 if(can == 1):
                     return '<meta http-equiv="refresh" content="0;url=/ban" />'
                 else:
-                    today = getnow()
-                    leng = '+' + str(len(request.form["content"]))
-                    history(name, request.form["content"], today, ip, request.form["send"], leng)
-                    curs.execute("insert into data (title, data, acl) value ('" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(request.form["content"]) + "', '')")
+                    leng = '+' + str(len(content))
+                    history(name, content, today, ip, request.form["send"], leng)
+                    curs.execute("insert into data (title, data, acl) value ('" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(content) + "', '')")
                     conn.commit()
             return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name).replace('/','%2F') + '" />'
     else:
