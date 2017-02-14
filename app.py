@@ -79,11 +79,11 @@ def namumark(title, data):
                     if(results[1]):
                         a = results[1]
                         while True:
-                            g = re.search("([^= ]*)\=([^,]*)", a)
+                            g = re.search("([^= ,]*)\=([^,]*)", a)
                             if(g):
                                 result = g.groups()
                                 enddata = re.sub("@" + result[0] + "@", result[1], enddata)
-                                a = re.sub("([^= ]*)\=([^,]*)", "", a, 1)
+                                a = re.sub("([^= ,]*)\=([^,]*)", "", a, 1)
                             else:
                                 break                        
                     data = re.sub("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]", enddata, data, 1)
