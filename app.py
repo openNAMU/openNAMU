@@ -1196,7 +1196,7 @@ def gethistory(name = None, number = None):
                     if(number != 1):
                         div = div + '<br><a href="/history/' + parse.quote(name).replace('/','%2F') + '/n/' + str(number - 1) + '">(이전)'
                     break
-                select = select + '<option value="' + str(i + 1) + '">' + str(i + 1) + '</option>'
+                select = '<option value="' + str(i + 1) + '">' + str(i + 1) + '</option>' + select
                 if(rows[i]['send']):
                     send = rows[i]['send']
                     send = re.sub('<a href="\/w\/(?P<in>[^"]*)">(?P<out>[^&]*)<\/a>', '<a href="/w/\g<in>">\g<out></a>', send)
