@@ -58,24 +58,37 @@ def namumark(title, data):
     data = re.sub('>', '&gt;', data)
     data = re.sub('"', '&quot;', data)
     
+    data = re.sub("\[anchor\((?P<in>[^\[\]]*)\)\]", '<span id="\g<in>"></span>', data)
+    data = re.sub('\[date\(now\)\]', getnow(), data)
+    
     while True:
-        m = re.search("\[include\((((?!\)\]).)*)\)\]", data)
+        m = re.search("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]", data)
         if(m):
             results = m.groups()
             if(results[0] == title):
-                data = re.sub("\[include\((((?!\)\]).)*)\)\]", "<b>" + results[0] + "</b>", data, 1)
+                data = re.sub("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]", "<b>" + results[0] + "</b>", data, 1)
             else:
                 curs.execute("select * from data where title = '" + pymysql.escape_string(results[0]) + "'")
                 rows = curs.fetchall()
                 if(rows):
                     enddata = rows[0]['data']
-                    enddata = re.sub("\[include\((((?!\)\]).)*)\)\]", "", enddata)
+                    enddata = re.sub("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]", "", enddata)
                     enddata = re.sub('<', '&lt;', enddata)
                     enddata = re.sub('>', '&gt;', enddata)
                     enddata = re.sub('"', '&quot;', enddata)
-                    data = re.sub("\[include\((((?!\)\]).)*)\)\]", enddata, data, 1)
+                    if(results[1]):
+                        a = results[1]
+                        while True:
+                            g = re.search("([^= ]*)\=([^,]*)", a)
+                            if(g):
+                                result = g.groups()
+                                enddata = re.sub("@" + result[0] + "@", result[1], enddata)
+                                a = re.sub("([^= ]*)\=([^,]*)", "", a, 1)
+                            else:
+                                break                        
+                    data = re.sub("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]", enddata, data, 1)
                 else:
-                    data = re.sub("\[include\((((?!\)\]).)*)\)\]", "[[" + results[0] + "]]", data, 1)
+                    data = re.sub("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]", "[[" + results[0] + "]]", data, 1)
         else:
             break
     
@@ -237,8 +250,6 @@ def namumark(title, data):
     data = re.sub('\^\^(?P<in>.+?)\^\^(?!\^)', '<sup>\g<in></sup>', data)
     data = re.sub(',,(?P<in>.+?),,(?!,)', '<sub>\g<in></sub>', data)
     
-    data = re.sub('\[date\(now\)\]', getnow(), data)
-    
     data = re.sub('{{\|(?P<in>(?:(?:(?:(?!\|}}).)*)(?:\n?))+)\|}}', '<table><tbody><tr><td>\g<in></td></tr></tbody></table>', data)
     
     data = re.sub('\[ruby\((?P<in>[^\|]*)\|(?P<out>[^\)]*)\)\]', '<ruby>\g<in><rp>(</rp><rt>\g<out></rt><rp>)</rp></ruby>', data)
@@ -385,7 +396,6 @@ def namumark(title, data):
             break
     
     data = re.sub('\[date\]', getnow(), data)
-    data = re.sub("\[anchor\((?P<in>[^\[\]]*)\)\]", '<span id="\g<in>"></span>', data)
     
     data = re.sub("#(?P<in>jpg|png|gif|jpeg)#", ".\g<in>", data)
     
