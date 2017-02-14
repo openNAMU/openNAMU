@@ -242,7 +242,7 @@ def namumark(title, data):
     data = re.sub("##\s?(?P<in>[^\n]*)\n", "<div style='display:none;'>\g<in></div>", data);
     
     while True:
-        m = re.search("\[\[파일:((?:(?!\]\]|\?).)*)(?:\?((?:(?!\]\]).)*))?\]\]", data)
+        m = re.search("\[\[파일:((?:(?!\]\]|\|).)*)(?:\|((?:(?!\]\]).)*))?\]\]", data)
         if(m):
             c = m.groups()
             if(c[1]):
