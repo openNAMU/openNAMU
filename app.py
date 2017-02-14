@@ -237,6 +237,8 @@ def namumark(title, data):
     data = re.sub('\^\^(?P<in>.+?)\^\^(?!\^)', '<sup>\g<in></sup>', data)
     data = re.sub(',,(?P<in>.+?),,(?!,)', '<sub>\g<in></sub>', data)
     
+    data = re.sub('\[date\(now\)\]', getnow(), data)
+    
     data = re.sub('{{\|(?P<in>(?:(?:(?:(?!\|}}).)*)(?:\n?))+)\|}}', '<table><tbody><tr><td>\g<in></td></tr></tbody></table>', data)
     
     data = re.sub('\[ruby\((?P<in>[^\|]*)\|(?P<out>[^\)]*)\)\]', '<ruby>\g<in><rp>(</rp><rt>\g<out></rt><rp>)</rp></ruby>', data)
