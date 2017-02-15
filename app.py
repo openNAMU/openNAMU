@@ -1630,10 +1630,11 @@ def preview(name = None):
         newdata = request.form["content"]
         newdata = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', ' * \g<in> 문서로 넘겨주기', newdata)
         enddata = namumark(name, newdata)
-        m = re.search('<div id="toc">((?:(?!\/div>).)*)<\/div>', enddata)
-        if(m):
-            result = m.groups()
-            left = result[0]
+        curs.execute("select * from data where title = '" + pymysql.escape_string(data["help"]) + "'")
+        rows = curs.fetchall()
+        if(rows):
+            newdata = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', ' * \g<in> 문서로 넘겨주기', rows[0]["data"])
+            left = namumark(name, newdata)
         else:
             left = ''
         return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = request.form["content"], tn = 2, preview = 1, enddata = enddata, left = left, notice = notice)
