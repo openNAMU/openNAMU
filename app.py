@@ -1598,6 +1598,13 @@ def edit(name = None):
         if(can == 1):
             return '<meta http-equiv="refresh" content="0;url=/ban" />'
         else:
+            curs.execute("select * from data where title = '" + pymysql.escape_string(data["help"]) + "'")
+            rows = curs.fetchall()
+            if(rows):
+                newdata = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', ' * \g<in> 문서로 넘겨주기', rows[0]["data"])
+                left = namumark(name, newdata)
+            else:
+                left = ''
             if(re.search('\.', ip)):
                 notice = '비 로그인 상태 입니다. 비 로그인으로 편집시 아이피가 역사에 기록 됩니다. 편집 시 동의 함으로 간주 됩니다.'
             else:
@@ -1605,9 +1612,9 @@ def edit(name = None):
             curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
             rows = curs.fetchall()
             if(rows):
-                return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = rows[0]['data'], tn = 2, notice = notice)
+                return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = rows[0]['data'], tn = 2, notice = notice, left = left)
             else:
-                return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = '', tn = 2, notice = notice)
+                return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = '', tn = 2, notice = notice, left = left)
                 
 @app.route('/preview/<path:name>', methods=['POST'])
 def preview(name = None):

@@ -9,5 +9,6 @@
 	"license" : "CC 0",
 	"key" : "test",
 	"upload" : "2",
-	"port" : "3000"
+	"port" : "3000",
+	"help" : "위키 도움말"
 }
