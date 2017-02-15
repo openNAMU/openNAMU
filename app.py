@@ -157,6 +157,88 @@ def namumark(title, data):
                     enddata = re.sub('<', '&lt;', enddata)
                     enddata = re.sub('>', '&gt;', enddata)
                     enddata = re.sub('"', '&quot;', enddata)
+                    
+                    while True:
+                        p = re.compile("{{{((?:(?!{)(?!}).)*)}}}", re.DOTALL)
+                        m = p.search(enddata)
+                        if(m):
+                            nnn = m.groups()
+                            q = re.compile("^\+([1-5])\s(.*)$", re.DOTALL)
+                            n = q.search(nnn[0])
+                            
+                            w = re.compile("^\-([1-5])\s(.*)$", re.DOTALL)
+                            a = w.search(nnn[0])
+                            
+                            e = re.compile("^(#[0-9a-f-A-F]{6})\s(.*)$", re.DOTALL)
+                            b = e.search(nnn[0])
+                            
+                            r = re.compile("^(#[0-9a-f-A-F]{3})\s(.*)$", re.DOTALL)
+                            c = r.search(nnn[0])
+                            
+                            t = re.compile("^#(\w+)\s(.*)$", re.DOTALL)
+                            d = t.search(nnn[0])
+                            
+                            qqq = re.compile("^@([0-9a-f-A-F]{6})\s(.*)$", re.DOTALL)
+                            qqe = qqq.search(nnn[0])
+                            
+                            qqw = re.compile("^@([0-9a-f-A-F]{3})\s(.*)$", re.DOTALL)
+                            qqa = qqw.search(nnn[0])
+                            
+                            qwe = re.compile("^@(\w+)\s(.*)$", re.DOTALL)
+                            qsd = qwe.search(nnn[0])
+                            
+                            y = re.compile("^#!wiki\sstyle=&quot;((?:(?!&quot;|\n).)*)&quot;\n?\s\n(.*)$", re.DOTALL)
+                            l = y.search(nnn[0])
+                            
+                            if(n):
+                                result = n.groups()
+                                enddata = p.sub('<span class="font-size-' + result[0] + '">' + result[1] + '</span>', enddata, 1)
+                            elif(a):
+                                result = a.groups()
+                                enddata = p.sub('<span class="font-size-small-' + result[0] + '">' + result[1] + '</span>', enddata, 1)
+                            elif(b):
+                                result = b.groups()
+                                enddata = p.sub('<span style="color:' + result[0] + '">' + result[1] + '</span>', enddata, 1)
+                            elif(c):
+                                result = c.groups()
+                                enddata = p.sub('<span style="color:' + result[0] + '">' + result[1] + '</span>', enddata, 1)
+                            elif(d):
+                                result = d.groups()
+                                enddata = p.sub('<span style="color:' + result[0] + '">' + result[1] + '</span>', enddata, 1)
+                            elif(qqe):
+                                result = qqe.groups()
+                                enddata = p.sub('<span style="background:#' + result[0] + '">' + result[1] + '</span>', enddata, 1)
+                            elif(qqa):
+                                result = qqa.groups()
+                                enddata = p.sub('<span style="background:#' + result[0] + '">' + result[1] + '</span>', enddata, 1)
+                            elif(qsd):
+                                result = qsd.groups()
+                                enddata = p.sub('<span style="background:' + result[0] + '">' + result[1] + '</span>', enddata, 1)
+                            elif(l):
+                                result = l.groups()
+                                enddata = p.sub('<div style="' + result[0] + '">' + result[1] + '</div>', enddata, 1)
+                            else:
+                                enddata = p.sub('<code>' + nnn[0] + '</code>', enddata, 1)
+                        else:
+                            break
+                    
+                    while True:
+                        a = re.compile("<code>(((?!<\/code>).)*)<\/code>", re.DOTALL)
+                        m = a.search(enddata)
+                        if(m):
+                            g = m.groups()
+                            j = re.sub("<\/span>", "}}}", g[0])
+                            j = re.sub("<\/div>", "}}}", j)
+                            j = re.sub('<span class="font\-size\-(?P<in>[1-6])">', "{{{+\g<in> ", j)
+                            j = re.sub('<span class="font\-size\-small\-(?P<in>[1-6])">', "{{{-\g<in> ", j)
+                            j = re.sub('<span style="color:(?:#)?(?P<in>[^"]*)">', "{{{#\g<in> ", j)
+                            j = re.sub('<span style="background:(?:#)?(?P<in>[^"]*)">', "{{{@\g<in> ", j)
+                            j = re.sub('<div style="(?P<in>[^"]*)">', "{{{#!wiki style=&quot;\g<in>&quot;\n", j)
+                            j = re.sub("(?P<in>.)", "<span>\g<in></span>", j)
+                            enddata = a.sub(j, enddata, 1)
+                        else:
+                            break
+                    
                     if(results[1]):
                         a = results[1]
                         while True:
