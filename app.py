@@ -138,6 +138,9 @@ def namumark(title, data):
             data = a.sub(j, data, 1)
         else:
             break
+            
+    data = re.sub("<span>l</span><span>t</span><span>;</span>", "<span>lt;</span>", data)
+    data = re.sub("<span>g</span><span>t</span><span>;</span>", "<span>gt;</span>", data)
     
     data = re.sub("\[anchor\((?P<in>[^\[\]]*)\)\]", '<span id="\g<in>"></span>', data)
     data = re.sub('\[date\(now\)\]', getnow(), data)
