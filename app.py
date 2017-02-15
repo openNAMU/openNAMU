@@ -1174,7 +1174,7 @@ def record(name = None, number = None):
     v = number * 50
     i = v - 50
     div = '<div>'
-    curs.execute("select * from history where ip = '" + name + "' order by date desc")
+    curs.execute("select * from history where ip = '" + pymysql.escape_string(name) + "' order by date desc")
     rows = curs.fetchall()
     if(rows):
         admin = admincheck()
@@ -1183,9 +1183,7 @@ def record(name = None, number = None):
                 a = rows[i]
             except:
                 div = div + '</div>'
-                if(number == 1):
-                    div = div + '<br><a href="/record/' + parse.quote(name).replace('/','%2F') + '/n/' + str(number + 1) + '">(다음)'
-                else:
+                if(number != 1):
                     div = div + '<br><a href="/record/' + parse.quote(name).replace('/','%2F') + '/n/' + str(number - 1) + '">(이전)'
                 break
             if(rows[i]['send']):
@@ -1243,6 +1241,57 @@ def record(name = None, number = None):
         return render_template('index.html', logo = data['name'], rows = div, tn = 3, title = '유저 기록')
     else:
         return render_template('index.html', logo = data['name'], rows = '', tn = 3, title = '유저 기록')
+      
+@app.route('/userlog/n/<int:number>')
+def userlog(number = None):
+    v = number * 50
+    i = v - 50
+    div = ''
+    curs.execute("select * from user")
+    rows = curs.fetchall()
+    if(rows):
+        admin = admincheck()
+        while True:
+            try:
+                a = rows[i]
+            except:
+                if(number != 1):
+                    div = div + '<br><a href="/userlog/n/' + str(number - 1) + '">(이전)'
+                break
+            if(admin == 1):
+                curs.execute("select * from user where id = '" + pymysql.escape_string(rows[i]['id']) + "'")
+                row = curs.fetchall()
+                if(row):
+                    if(row[0]['acl'] == 'owner' or row[0]['acl'] == 'admin'):
+                        ip = rows[i]['id']
+                    else:
+                        curs.execute("select * from ban where block = '" + pymysql.escape_string(rows[i]['id']) + "'")
+                        row = curs.fetchall()
+                        if(row):
+                            ip = rows[i]['id'] + ' <a href="/ban/' + parse.quote(rows[i]['id']).replace('/','%2F') + '">(해제)</a>'
+                        else:
+                            ip = rows[i]['id'] + ' <a href="/ban/' + parse.quote(rows[i]['id']).replace('/','%2F') + '">(차단)</a>'
+                else:
+                    curs.execute("select * from ban where block = '" + pymysql.escape_string(rows[i]['id']) + "'")
+                    row = curs.fetchall()
+                    if(row):
+                        ip = rows[i]['id'] + ' <a href="/ban/' + parse.quote(rows[i]['id']).replace('/','%2F') + '">(해제)</a>'
+                    else:
+                        ip = rows[i]['id'] + ' <a href="/ban/' + parse.quote(rows[i]['id']).replace('/','%2F') + '">(차단)</a>'
+            else:
+                ip = rows[i]['id']
+            div = div + '<li>' + rows[i]['id'] + '</li>'
+            if(i == v):
+                if(number == 1):
+                    div = div + '<br><a href="/userlog/n/' + str(number + 1) + '">(다음)'
+                else:
+                    div = div + '<br><a href="/userlog/n/' + str(number - 1) + '">(이전) <a href="/userlog/n/' + str(number + 1) + '">(다음)'
+                break
+            else:
+                i = i + 1
+        return render_template('index.html', logo = data['name'], data = div, title = '유저 가입 기록')
+    else:
+        return render_template('index.html', logo = data['name'], data = '', title = '유저 가입 기록')
 
 @app.route('/recentdiscuss')
 def recentdiscuss():
@@ -1269,11 +1318,12 @@ def recentdiscuss():
     else:
         return render_template('index.html', logo = data['name'], rows = '', tn = 12, title = '최근 토론내역')
          
-@app.route('/recentblock')
-def recentblock():
-    i = 0
+@app.route('/blocklog/n/<int:number>')
+def blocklog(number = None):
+    v = number * 50
+    i = v - 50
     div = '<div>'
-    curs.execute("select * from rb order by today desc limit 50")
+    curs.execute("select * from rb order by today")
     rows = curs.fetchall()
     if(rows):
         while True:
@@ -1281,15 +1331,25 @@ def recentblock():
                 a = rows[i]
             except:
                 div = div + '</div>'
+                if(number != 1):
+                    div = div + '<br><a href="/blocklog/n/' + str(number - 1) + '">(이전)'
                 break
             why = rows[i]['why']
             why = re.sub('<', '&lt;', why)
             why = re.sub('>', '&gt;', why)
             div = div + '<table style="width: 100%;"><tbody><tr><td style="text-align: center;width:20%;">' + rows[i]['block'] + '</a></td><td style="text-align: center;width:20%;">' + rows[i]['blocker'] + '</td><td style="text-align: center;width:20%;">' + rows[i]['end'] + '</td><td style="text-align: center;width:20%;">' + rows[i]['why'] + '</td><td style="text-align: center;width:20%;">' + rows[i]['today'] + '</td></tr></tbody></table>'
-            i = i + 1
-        return render_template('index.html', logo = data['name'], rows = div, tn = 20, title = '최근 차단내역')
+            if(i == v):
+                div = div + '</div>'
+                if(number == 1):
+                    div = div + '<br><a href="/blocklog/n/' + str(number + 1) + '">(다음)'
+                else:
+                    div = div + '<br><a href="/blocklog/n/' + str(number - 1) + '">(이전) <a href="/blocklog/n/' + str(number + 1) + '">(다음)'
+                break
+            else:
+                i = i + 1
+        return render_template('index.html', logo = data['name'], rows = div, tn = 20, title = '유저 차단 기록')
     else:
-        return render_template('index.html', logo = data['name'], rows = '', tn = 20, title = '최근 차단내역')
+        return render_template('index.html', logo = data['name'], rows = '', tn = 20, title = '유저 차단 기록')
 
 @app.route('/history/<path:name>/n/<int:number>', methods=['POST', 'GET'])
 def gethistory(name = None, number = None):
@@ -1737,7 +1797,7 @@ def setup():
 
 @app.route('/other')
 def other():
-    return render_template('index.html', title = '기타 메뉴', logo = data['name'], data = '<li><a href="/titleindex">모든 문서</a><li><a href="/grammar">문법 설명</a></li><li><a href="/version">버전</a></li><li><a href="/recentblock">최근 차단내역</a></li><li><a href="/upload">업로드</a></li>')
+    return render_template('index.html', title = '기타 메뉴', logo = data['name'], data = '<li><a href="/titleindex">모든 문서</a><li><a href="/grammar">문법 설명</a></li><li><a href="/version">버전</a></li><li><a href="/blocklog/n/1">유저 차단 기록</a></li><li><a href="/userlog/n/1">유저 가입 기록</a></li><li><a href="/upload">업로드</a></li>')
 
 @app.route('/titleindex')
 def titleindex():
