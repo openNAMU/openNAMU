@@ -414,6 +414,92 @@ def namumark(title, data):
             break
             
     while True:
+        m = re.search("\[\[(((?!\]\]).)*)\]\]", data)
+        if(m):
+            result = m.groups()
+            a = re.search("((?:(?!\|).)*)\|(.*)", result[0])
+            if(a):
+                results = a.groups()
+                aa = re.search("^(.*)(#(?:.*))$", results[0])
+                if(aa):
+                    g = results[1]
+                    results = aa.groups()
+                    b = re.search("^http(?:s)?:\/\/", results[0])
+                    if(b):
+                        data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a class="out_link" href="' + results[0] + results[1] + '">' + g + '</a>', data, 1)
+                    else:
+                        if(results[0] == title):
+                            data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<b>' + g + '</b>', data, 1)
+                        else:
+                            curs.execute("select * from data where title = '" + pymysql.escape_string(results[0]) + "'")
+                            rows = curs.fetchall()
+                            if(rows):
+                                data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a title="' + results[0] + results[1] + '" href="/w/' + parse.quote(results[0]).replace('/','%2F') + results[1] + '">' + g + '</a>', data, 1)
+                            else:
+                                data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a title="' + results[0] + results[1] + '" class="not_thing" href="/w/' + parse.quote(results[0]).replace('/','%2F') + results[1] + '">' + g + '</a>', data, 1)
+
+                else:
+                    b = re.search("^http(?:s)?:\/\/", results[0])
+                    if(b):
+                        c = re.search("(?:\.jpg|\.png|\.gif|\.jpeg)", results[0])
+                        if(c):
+                            img = results[0]
+                            img = re.sub("\.(?P<in>jpg|png|gif|jpeg)", "#\g<in>#", img)
+                            data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a class="out_link" href="' + img + '">' + results[1] + '</a>', data, 1)
+                        else:
+                            data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a class="out_link" href="' + results[0] + '">' + results[1] + '</a>', data, 1)
+                    else:
+                        if(results[0] == title):
+                            data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<b>' + results[1] + '</b>', data, 1)
+                        else:
+                            curs.execute("select * from data where title = '" + pymysql.escape_string(results[0]) + "'")
+                            rows = curs.fetchall()
+                            if(rows):
+                                data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a title="' + results[0] + '" href="/w/' + parse.quote(results[0]).replace('/','%2F') + '">' + results[1] + '</a>', data, 1)
+                            else:
+                                data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a title="' + results[0] + '" class="not_thing" href="/w/' + parse.quote(results[0]).replace('/','%2F') + '">' + results[1] + '</a>', data, 1)
+            else:
+                aa = re.search("^(.*)(#(?:.*))$", result[0])
+                if(aa):
+                    result = aa.groups()
+                    b = re.search("^http(?:s)?:\/\/", result[0])
+                    if(b):
+                        data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a class="out_link" href="' + result[0] + result[1] + '">' + result[0] + result[1] + '</a>', data, 1)
+                    else:
+                        if(result[0] == title):
+                            data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<b>' + result[0] + result[1] + '</b>', data, 1)
+                        else:
+                            curs.execute("select * from data where title = '" + pymysql.escape_string(result[0]) + "'")
+                            rows = curs.fetchall()
+                            if(rows):
+                                data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a href="/w/' + parse.quote(result[0]).replace('/','%2F') + result[1] + '">' + result[0] + result[1] + '</a>', data, 1)
+                            else:
+                                data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a class="not_thing" href="/w/' + parse.quote(result[0]).replace('/','%2F') + result[1] + '">' + result[0] + result[1] + '</a>', data, 1)
+
+                else:
+                    b = re.search("^http(?:s)?:\/\/", result[0])
+                    if(b):
+                        c = re.search("(?:\.jpg|\.png|\.gif|\.jpeg)", result[0])
+                        if(c):
+                            img = result[0]
+                            img = re.sub("\.(?P<in>jpg|png|gif|jpeg)", "#\g<in>#", img)
+                            data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a class="out_link" href="' + img + '">' + img + '</a>', data, 1)
+                        else:
+                            data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a class="out_link" href="' + result[0] + '">' + result[0] + '</a>', data, 1)
+                    else:
+                        if(result[0] == title):
+                            data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<b>' + result[0] + '</b>', data, 1)
+                        else:
+                            curs.execute("select * from data where title = '" + pymysql.escape_string(result[0]) + "'")
+                            rows = curs.fetchall()
+                            if(rows):
+                                data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a href="/w/' + parse.quote(result[0]).replace('/','%2F') + '">' + result[0] + '</a>', data, 1)
+                            else:
+                                data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a class="not_thing" href="/w/' + parse.quote(result[0]).replace('/','%2F') + '">' + result[0] + '</a>', data, 1)
+        else:
+            break
+            
+    while True:
         m = re.search("(http(?:s)?:\/\/(?:(?:(?:(?!\.jpg|\.png|\.gif|\.jpeg|#jpg#|#png#|#gif#|#jpeg#).)*)(?:\.jpg|\.png|\.gif|\.jpeg)))(?:(?:(?:\?)width=((?:[0-9]*)(?:px)?))?(?:(?:\?|&)height=((?:[0-9]*)(?:px)?))?(?:(?:&)width=((?:[0-9]*)(?:px)?))?)?", data)
         if(m):
             result = m.groups()
@@ -437,55 +523,6 @@ def namumark(title, data):
             c = result[0]
             c = re.sub("\.(?P<in>jpg|png|gif|jpeg)", "#\g<in>#", c)
             data = re.sub("(http(?:s)?:\/\/(?:(?:(?:(?!\.jpg|\.png|\.gif|\.jpeg|#jpg#|#png#|#gif#|#jpeg#).)*)(?:\.jpg|\.png|\.gif|\.jpeg)))(?:(?:(?:\?)width=((?:[0-9]*)(?:px)?))?(?:(?:\?|&)height=((?:[0-9]*)(?:px)?))?(?:(?:&)width=((?:[0-9]*)(?:px)?))?)?", "<img width='" + width + "' height='" + height + "' src='" + c + "'>", data, 1)
-        else:
-            break
-            
-    while True:
-        m = re.search("\[\[(((?!\]\]).)*)\]\]", data)
-        if(m):
-            result = m.groups()
-            a = re.search("(((?!\|).)*)\|(.*)", result[0])
-            if(a):
-                results = a.groups()
-                b = re.search("^http(?:s)?:\/\/", results[0])
-                if(b):
-                    c = re.search("(?:\.jpg|\.png|\.gif|\.jpeg)", results[0])
-                    if(c):
-                        img = results[0]
-                        img = re.sub("\.(?P<in>jpg|png|gif|jpeg)", "#\g<in>#", img)
-                        data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a class="out_link" href="' + img + '">' + results[2] + '</a>', data, 1)
-                    else:
-                        data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a class="out_link" href="' + results[0] + '">' + results[2] + '</a>', data, 1)
-                else:
-                    if(results[0] == title):
-                        data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<b>' + results[2] + '</b>', data, 1)
-                    else:
-                        curs.execute("select * from data where title = '" + pymysql.escape_string(results[0]) + "'")
-                        rows = curs.fetchall()
-                        if(rows):
-                            data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a title="' + results[0] + '" href="/w/' + parse.quote(results[0]).replace('/','%2F') + '">' + results[2] + '</a>', data, 1)
-                        else:
-                            data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a title="' + results[0] + '" class="not_thing" href="/w/' + parse.quote(results[0]).replace('/','%2F') + '">' + results[2] + '</a>', data, 1)
-            else:
-                b = re.search("^http(?:s)?:\/\/", result[0])
-                if(b):
-                    c = re.search("(?:\.jpg|\.png|\.gif|\.jpeg)", result[0])
-                    if(c):
-                        img = result[0]
-                        img = re.sub("\.(?P<in>jpg|png|gif|jpeg)", "#\g<in>#", img)
-                        data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a class="out_link" href="' + img + '">' + result[0] + '</a>', data, 1)
-                    else:
-                        data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a class="out_link" href="' + result[0] + '">' + result[0] + '</a>', data, 1)
-                else:
-                    if(result[0] == title):
-                        data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<b>' + result[0] + '</b>', data, 1)
-                    else:
-                        curs.execute("select * from data where title = '" + pymysql.escape_string(result[0]) + "'")
-                        rows = curs.fetchall()
-                        if(rows):
-                            data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a href="/w/' + parse.quote(result[0]).replace('/','%2F') + '">' + result[0] + '</a>', data, 1)
-                        else:
-                            data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a class="not_thing" href="/w/' + parse.quote(result[0]).replace('/','%2F') + '">' + result[0] + '</a>', data, 1)
         else:
             break
             
