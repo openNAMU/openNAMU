@@ -34,509 +34,511 @@
 			<a class="scroll-button" href="#top" id="left"><i class="fa fa-arrow-up" aria-hidden="true"></i></a>
 			<a class="scroll-bottom" href="#powered" id="right"><i class="fa fa-arrow-down" aria-hidden="true"></i></a>
 		</div>
-		<div id="left_bar">
-			<a href="#">맨 위로</a>
-			<br>
-			<br>
-			{% autoescape false %}
-			{{left}}
-			{% endautoescape %}
-		</div>
-		<div class="four-fifths column">
-			{% if tn == 1 %}
-			<div id="tool">
-				<nav class="menu">
-					<a class="menu-item selected" href="#" onclick="return false">문서</a>
-					<a class="menu-item" href="/edit/{{page}}">수정</a>
-					<a class="menu-item" href="/topic/{{page}}">토론</a>
-					<a class="menu-item" href="/delete/{{page}}">삭제</a>
-					<a class="menu-item" href="/move/{{page}}">이동</a>
-					<a class="menu-item" href="/raw/{{page}}">Raw</a>
-					<a class="menu-item" href="/history/{{page}}/n/1">역사</a>
-					<!-- <a class="menu-item" href="/xref/{{page}}">역링크</a> -->
-                    <a class="menu-item" style="{{style}}" href="/w/{{uppage}}">상위</a>
-				</nav>
-			</div>
-			<h1 class="title">{{title}} <sub>{{acl}}</sub></h1>
-			{% if redirect %}
-			{% autoescape false %}
-			<li style="margin-top: -20px;">{{redirect}}</li>
-			<br>
-			{% endautoescape %}
-			{% endif %}
-			<div>
-				{% autoescape false %}
-				{{data}}
-				{% endautoescape %}
-			</div>
-			{% elif tn == 2 %}
-            {% if preview == 1 %}
-            <div id="tool">
-				<nav class="menu">
-					<a class="menu-item selected" href="#">미리보기</a>
-					<a class="menu-item" href="/w/{{page}}">문서</a>
-				</nav>
-			</div>
-            {% else %}
-			<div id="tool">
-				<nav class="menu">
-					<a class="menu-item selected" href="#">수정</a>
-					<a class="menu-item" href="/w/{{page}}">문서</a>
-				</nav>
-			</div>
-            {% endif %}
-            {% if preview == 1 %}
-            <h1 class="title">{{title}} <sub>(미리보기)</sub></h1>
-            {% else %}
-            <h1 class="title">{{title}} <sub>(수정)</sub></h1>
-            {% endif %}
-            {% if notice %}
-            <br>
-            <span>{{notice}}</span>
-            <br>
-            <br>
-            {% endif %}
-			<form id="usrform" name="f1" method="POST" action="/edit/{{page}}">
-				<textarea rows="30" cols="100" name="content" form="usrform">{{data}}</textarea>
-				<input name="send" style="margin-top:10px;width:100%" type="text">
-				<br>
-				<br>
-				<div class="form-actions">
-					<button class="btn btn-primary" type="submit" onclick="f1.action='/edit/{{page}}';">저장</button>
-					<button class="btn" type="submit" onclick="f1.action='/preview/{{page}}';">미리보기</button>
-				</div>
-			</form>
-            {% if preview == 1 %}
-            {% autoescape false %}
-            {{enddata}}
-            {% endautoescape %}
-            {% endif %}
-			{% elif tn == 3 %}
-			<h1 class="title">{{title}}</h1>
-			<table style="width: 100%;">
-				<tbody>
-					<tr>
-						<td style="text-align: center;width:33.33%;">문서명</td>
-						<td style="text-align: center;width:33.33%;">기여자</td>
-						<td style="text-align: center;width:33.33%;">시간</td>
-					</tr>
-				</tbody>
-			</table>
-			{% autoescape false %}
-			{{rows}}
-			{% endautoescape %}
-			{% elif tn == 4 %}
-			<h1 class="title">{{title}}</h1>
-			{% autoescape false %}
-			{{rows}}
-			{% endautoescape %}
-			{% elif tn == 5 %}
-			<div id="tool">
-				<nav class="menu">
-					<a class="menu-item selected" href="#">역사</a>
-					<a class="menu-item" href="/w/{{page}}">문서</a>
-				</nav>
-			</div>
-			<h1 class="title">{{title}} <sub>(역사)</sub></h1>
-            <form class="usrform" method='POST' action='/history/{{page}}/n/1'>
-            <select name="a">
-                {% autoescape false %}
-                {{select}}
-                {% endautoescape %}
-            </select>
-            <select name="b">
-                {% autoescape false %}
-                {{select}}
-                {% endautoescape %}
-            </select>
-            <button class="btn btn-primary" type='submit'>리비전 비교</button>
-            <br>
-            <br>
-			<table style="width: 100%;">
-				<tbody>
-					<tr>
-						<td style="text-align: center;width:33.33%;">판</td>
-						<td style="text-align: center;width:33.33%;">기여자</td>
-						<td style="text-align: center;width:33.33%;">시간</td>
-					</tr>
-				</tbody>
-			</table>
-			{% autoescape false %}
-			{{rows}}
-			{% endautoescape %}
-			{% elif tn == 6 %}
-			<div id="tool">
-				<nav class="menu">
-					<a class="menu-item selected" href="#" onclick="return false">옛문서</a>
-					<a class="menu-item" href="javascript:history.back(-1);">뒤로가기</a>
-				</nav>
-			</div>
-			<h1 class="title">{{title}} <sub>(옛문서)</sub></h1>
-			<div>
-				{% autoescape false %}
-				{{data}}
-				{% endautoescape %}
-			</div>
-			{% elif tn == 7 %}
-			<div id="tool">
-				<nav class="menu">
-					<a class="menu-item selected" href="#" onclick="return false">raw</a>
-					<a class="menu-item" href="/w/{{page}}">문서</a>
-				</nav>
-			</div>
-			<h1 class="title">{{title}} <sub>(raw)</sub></h1>
-			<div>
-				{% autoescape false %}
-				{{data}}
-				{% endautoescape %}
-			</div>
-			{% elif tn == 8 %}
-			<h1 class="title">{{title}} <sub>(삭제)</sub></h1>
-			<div id="tool">
-				<nav class="menu">
-					<a class="menu-item selected" href="#" onclick="return false">삭제</a>
-					<a class="menu-item" href="/w/{{page}}">문서</a>
-				</nav>
-			</div>
-			<form id="usrform" method="POST" action="/delete/{{page}}">
-				{{plus}}
-				<br>
-				<br>
-				<button class="btn btn-primary" type="submit">삭제</button>
-			</form>
-			{% elif tn == 9 %}
-			<h1 class="title">{{title}} <sub>(이동)</sub></h1>
-			<div id="tool">
-				<nav class="menu">
-					<a class="menu-item selected" href="#" onclick="return false">이동</a>
-					<a class="menu-item" href="/w/{{page}}">문서</a>
-				</nav>
-			</div>
-			<form id="usrform" method="POST" action="/move/{{page}}">
-				{{plus}}
-				<br>
-				<br>
-				<input class="form-control input-sm" value="{{title}}" name="title" type="text">
-				<br>
-				<br>
-				<button class="btn btn-primary" type="submit">이동</button>
-			</form>
-			{% elif tn == 10 %}
-			<h1 class="title">{{title}} <sub>(토론 목록)</sub></h1>
-            {% if list == 1 %}
-			<div id="tool">
-				<nav class="menu">
-					<a class="menu-item selected" href="#" onclick="return false">토론 목록</a>
-					<a class="menu-item" href="/w/{{page}}">문서</a>
-				</nav>
-			</div>
-            {% else %}
-            <div id="tool">
-				<nav class="menu">
-					<a class="menu-item selected" href="#" onclick="return false">닫힌 토론 목록</a>
-					<a class="menu-item" href="/topic/{{page}}">토론 목록</a>
-				</nav>
-			</div>
-            {% endif %}
-			<form id="usrform" method="POST" action="/topic/{{page}}">
-				{% autoescape false %}
-				{{plus}}
-				{% endautoescape %}
-                {% if list == 1 %}
-				<br>
-                <a href="/topic/{{page}}/close">(닫힌 토론 보기)</a>
+        <div id="all_contect">
+            <div id="left_bar">
+                <a href="#">맨 위로</a>
                 <br>
                 <br>
-				<input class="form-control" name="topic" style="width: 100%">
-				<br>
-				<br>
-				<button class="btn btn-primary" type="submit">새토론</button>
+                {% autoescape false %}
+                {{left}}
+                {% endautoescape %}
+            </div>
+            <div class="four-fifths column">
+                {% if tn == 1 %}
+                <div id="tool">
+                    <nav class="menu">
+                        <a class="menu-item selected" href="#" onclick="return false">문서</a>
+                        <a class="menu-item" href="/edit/{{page}}">수정</a>
+                        <a class="menu-item" href="/topic/{{page}}">토론</a>
+                        <a class="menu-item" href="/delete/{{page}}">삭제</a>
+                        <a class="menu-item" href="/move/{{page}}">이동</a>
+                        <a class="menu-item" href="/raw/{{page}}">Raw</a>
+                        <a class="menu-item" href="/history/{{page}}/n/1">역사</a>
+                        <!-- <a class="menu-item" href="/xref/{{page}}">역링크</a> -->
+                        <a class="menu-item" style="{{style}}" href="/w/{{uppage}}">상위</a>
+                    </nav>
+                </div>
+                <h1 class="title">{{title}} <sub>{{acl}}</sub></h1>
+                {% if redirect %}
+                {% autoescape false %}
+                <li style="margin-top: -20px;">{{redirect}}</li>
+                <br>
+                {% endautoescape %}
                 {% endif %}
-			</form>
-			{% elif tn == 11 %}
-			<h1 class="title">{{title}} <sub>(토론)</sub></h1>
-			<div id="tool">
-				<nav class="menu">
-					<a class="menu-item selected" href="#" onclick="return false">토론</a>
-					<a class="menu-item" href="/topic/{{page}}">토론 목록</a>
-				</nav>
-			</div>
-			<h2>{{sub}}</h2>
-			<br>
-			{% autoescape false %}
-			{{rows}}
-			{% endautoescape %}
-			{% if ban == 1 %}
-			{% else %}
-			<form id="usrform" method="POST" action="/topic/{{page}}/sub/{{suburl}}">
-				<br>
-				<textarea rows="10" cols="100" name="content" form="usrform"></textarea>
-				<br>
-				<br>
-				<button class="btn btn-primary" type="submit">전송</button>
-			</form>
-			{% endif %}
-			{% elif tn == 12 %}
-			<h1 class="title">{{title}}</h1>
-			<table style="width: 100%;">
-				<tbody>
-					<tr>
-						<td style="text-align: center;width:50%;">토론명</td>
-						<td style="text-align: center;width:50%;">시간</td>
-					</tr>
-				</tbody>
-			</table>
-			{% autoescape false %}
-			{{rows}}
-			{% endautoescape %}
-			{% elif tn == 13 %}
-			<h1 class="title">{{title}} <sub>(되돌리기)</sub></h1>
-			<div id="tool">
-				<nav class="menu">
-					<a class="menu-item selected" href="#" onclick="return false">되돌리기</a>
-					<a class="menu-item" href="javascript:history.back(-1);">뒤로가기</a>
-				</nav>
-			</div>
-			<form id="usrform" method="POST" action="/revert/{{page}}/r/{{r}}">
-				{{plus}}
-				<br>
-				<br>
-				<button class="btn btn-primary" type="submit">되돌리기</button>
-			</form>
-			{% elif tn == 14 %}
-			<h1 class="title">{{title}}</h1>
-			<div>
-				<h2 style="margin-top: -5px;">0.1 (알파)</h2>
-				<li>문서 보기와 편집</li>
-				<li>기타 문서</li>
-				<li>랜덤 구현</li>
-				<h2>0.2 ~ 0.9 (베타)</h2>
-				<li>그 외 엄청나게 많은 기능 구현 (기존 <a class="out_link" href="https://github.com/2DU/OWNET">Ownet</a> 기능에서 로그인 필요한 기능 빼고 구현)</li>
-				<h2>1.0</h2>
-				<li>로그인 구현</li>
-				<h2>1.1</h2>
-				<li>차단 구현</li>
-				<li>토론 닫기, 정지</li>
-				<li>블라인드 구현</li>
-				<li>ACL 기능 구현</li>
-				<li>어드민 부여 구현</li>
-				<h2>1.2</h2>
-                <li>미리보기 구현</li>
-				<li>대역 차단 구현</li>
-				<li>diff 구현</li>
-                <li>파일 업로드 개선</li>
-                <li>파일 업로드 구현</li>
-				<li>기본적인 다중 검사 기능</li>
-                <h2>1.3</h2>
-                <li>토론 목록 보강</li>
-                <li>토론에 문법 지원</li>
-                <li>비 효율적으로 돌아가던거 수정</li>
-                <li>하위 문서 지원</li>
-                <li>관리자 기능의 접근성 향상</li>
-                <li>대규모도 편하게 접근되게</li>
-                <h2>1.4</h2>
-                <li>사용자 문서</li>
-                <li>사문 접근성</li>
-                <li>검색 기능 수정</li>
-                <li>상위 문서 바로가기</li>
-                <li>유저 기록 보기</li>
-                <h2>1.5 (진행중)</h2>
-                <li>디자인 변경 (진행중)</li>
-                <li>관리자 기능 접근성</li>
-                <li>파일 문서 생성</li>
-                <li>유저 가입 목록 (완료)</li>
-                <li>최근 차단을 유저 차단 기록으로 (완료)</li>
-				<h2>계속</h2>
-				<li>버그 수정</li>
-				<li>파서 제작 (90%)</li>
-                <h2>보류</h2>
-                <li>설계 약간 변경 (느린 pymysql 대신에 다른 패키지를 쓰려고 했으나 어차피 곧 pypy 신 버전 나올테고 설치도 복잡해지니 보류)</li>
-				<br>
-				<h2>파이나무 라이선스</h2>
-				<li>BSD 3-Clause License</li>
-				<h2>외부 파일 라이선스</h2>
-				<li>인용문 아이콘 <a class="out_link" href="http://www.flaticon.com/free-icon/quote-left_25672">Dave Gandy</a> CC 3.0 BY</li>
-				<li>일부 파일 <a class="out_link" href="https://twitter.com/Basix1120">Basix</a></li>
-				<br>
-				<h2>기타</h2>
-				<li>현재 버전 1.5.6 - Beta <s>정식 버전은 10.0이라더라.</s></li>
+                <div>
+                    {% autoescape false %}
+                    {{data}}
+                    {% endautoescape %}
+                </div>
+                {% elif tn == 2 %}
+                {% if preview == 1 %}
+                <div id="tool">
+                    <nav class="menu">
+                        <a class="menu-item selected" href="#">미리보기</a>
+                        <a class="menu-item" href="/w/{{page}}">문서</a>
+                    </nav>
+                </div>
+                {% else %}
+                <div id="tool">
+                    <nav class="menu">
+                        <a class="menu-item selected" href="#">수정</a>
+                        <a class="menu-item" href="/w/{{page}}">문서</a>
+                    </nav>
+                </div>
+                {% endif %}
+                {% if preview == 1 %}
+                <h1 class="title">{{title}} <sub>(미리보기)</sub></h1>
+                {% else %}
+                <h1 class="title">{{title}} <sub>(수정)</sub></h1>
+                {% endif %}
+                {% if notice %}
                 <br>
-                <h2>개발 이념</h2>
-                <li>나(2DU) 쓰기 편한 엔진을 만들자</li>
-			</div>
-			{% elif tn == 15 %}
-			<h1 class="title">{{title}}</h1>
-			{% if title == '회원가입' %}
-			<form id="usrform" method="POST" action="/register">
-			{% else %}
-			<form id="usrform" method="POST" action="/login">
-			{% endif %}
-				<span>아이디</span>
-				<br>
-				<br>
-				<input name="id" type="text">
-				<br>
-				<br>
-				<span>비밀번호</span>
-				<br>
-				<br>
-				<input name="pw" type="password">
-				<br>
-				<br>
-				<button class="btn btn-primary" type="submit">{{enter}}</button>
-			</form>
-			{% elif tn == 16 %}
-			<h1 class="title">{{title}} <sub>(차단)</sub></h1>
-			<form id="usrform" method="POST" action="/ban/{{page}}">
-				{% if now == '차단' or now == '대역 차단' %}
-				<input class="form-control" name="end" style="width: 100%">
-				<br>
-				<br>
-				<span>아무것도 안 적으면 무기한 차단 입니다.</span>
-				<br>
-				<br>
-				<span>차단 일 지정시 형식은 YYYY-MM-DD로 기록 해야합니다. (예시: 2017-01-20, 2017-10-15)</span>
-				<br>
-				<br>
-                <span>지금 시각은 {{today}} 입니다.</span>
+                <span>{{notice}}</span>
                 <br>
                 <br>
-				<input class="form-control" name="why" style="width: 100%">
-				<br>
-				<br>
-				<span>사유를 쓰는 곳 입니다.</span>
-				{% if allif == 1 %}
-				<br>
-				<br>
-				<input type="checkbox" name="band">
-					<span>대역 차단</span>
-				</input>
-				{% endif %}
-				<br>
-				<br>
-				{% endif %}
-				<button class="btn btn-primary" type="submit">{{now}}</button>
-			</form>
-			{% elif tn == 17 %}
-			<h1 class="title">{{title}}</h1>
-			<div>
-                <a class="out_link" style="margin-top: -5px;" href="https://namu.wiki/w/%EB%82%98%EB%AC%B4%EC%9C%84%ED%82%A4:%ED%8E%B8%EC%A7%91%20%EB%8F%84%EC%9B%80%EB%A7%90">참조</a>
-				<h2>기초 문법</h2>
-				<li>~~취소선~~ --취소선--</li>
-				<li>'''강조'''</li>
-				<li>''기울이기''</li>
-				<li>__언더 바__</li>
-				<li>^^윗 첨자^^</li>
-				<li>,,아랫 첨자,,</li>
-				<h2>문단 문법</h2>
-                <li>[목차]</li>
-				<li>= 1단계 문단 =</li>
-				<li>== 2단계 문단 ==</li>
-				<li>=== 3단계 문단 ===</li>
-				<li>==== 4단계 문단 ====</li>
-				<li>===== 5단계 문단 =====</li>
-				<li>====== 6단계 문단 ======</li>
-                <h2>링크 문법</h2>
-                <li>[[내부 링크]]</li>
-                <li>[[내부 링크|보이는 내용]]</li>
-                <li>[[외부 링크]]</li>
-                <li>[[외부 링크|보이는 내용]]</li>
-                <h2>유튜브 문법</h2>
-                <li>[youtube(코드)]</li>
-                <li>[youtube(코드, width=가로, height=세로)]</li>
-                <li>[youtube(코드, height=세로, width=가로)]</li>
-                <h2>각주 문법</h2>
-                <li>[* 내용]</li>
-                <li>[*이름 내용]</li>
-                <li>[각주]</li>
-                <h2>넘겨주기 문법</h2>
-                <li>#redirect 문서명</li>
-                <li>#넘겨주기 문서명</li>
-			</div>
-			{% elif tn == 18 %}
-			<h1 class="title">{{title}} <sub>(권한 부여)</sub></h1>
-			<form id="usrform" method="POST" action="/admin/{{page}}">
-				{% if now == '권한 부여' %}
-				<select name="select">
-					<option value="admin" selected="selected">관리자</option>
-					<option value="ownet">소유자</option>
-				</select>
-				<br>
-				<br>
-				{% endif %}
-				<button class="btn btn-primary" type="submit">{{now}}</button>
-			</form>
-			{% elif tn == 19 %}
-			<h1 class="title">{{title}} <sub>(ACL)</sub></h1>
-			<p>{{now}}</p>
-			<form id="usrform" method="POST" action="/acl/{{page}}">
-				<select name="select">
-					<option value="admin" selected="selected">관리자만</option>
-					<option value="user">유저 이상</option>
-					<option value="normal">일반</option>
-				</select>
-				<br>
-				<br>
-				<button class="btn btn-primary" type="submit">ACL 변경</button>
-			</form>
-            {% elif tn == 20 %}
-			<h1 class="title">{{title}}</h1>
-			<table style="width: 100%;">
-				<tbody>
-					<tr>
-						<td style="text-align: center;width:20%;">차단자</td>
-						<td style="text-align: center;width:20%;">관리자</td>
-						<td style="text-align: center;width:20%;">언제까지</td>
-                        <td style="text-align: center;width:20%;">왜</td>
-                        <td style="text-align: center;width:20%;">시간</td>
-					</tr>
-				</tbody>
-			</table>
-			{% autoescape false %}
-			{{rows}}
-			{% endautoescape %}
-            {% elif tn == 21 %}
-			<h1 class="title">{{title}}</h1>
-			<div>
-				<form action="" method=post enctype=multipart/form-data>
-                    <input type=file name=file>
-                    <input type=submit value=Upload>
+                {% endif %}
+                <form id="usrform" name="f1" method="POST" action="/edit/{{page}}">
+                    <textarea rows="30" cols="100" name="content" form="usrform">{{data}}</textarea>
+                    <input name="send" style="margin-top:10px;width:100%" type="text">
+                    <br>
+                    <br>
+                    <div class="form-actions">
+                        <button class="btn btn-primary" type="submit" onclick="f1.action='/edit/{{page}}';">저장</button>
+                        <button class="btn" type="submit" onclick="f1.action='/preview/{{page}}';">미리보기</button>
+                    </div>
                 </form>
-			</div>
-            <span>{{number}}MB 이하 파일만 업로드 가능하고 jpg png gif jpeg만 가능 합니다.</span>
-            {% elif tn == 22 %}
-			<h1 class="title">{{title}}</h1>
-			<table style="width: 100%;">
-				<tbody>
-					<tr>
-						<td style="text-align: center;width:33.33%;">유저</td>
-						<td style="text-align: center;width:33.33%;">아이피</td>
-						<td style="text-align: center;width:33.33%;">언제</td>
-					</tr>
-				</tbody>
-			</table>
-			{% autoescape false %}
-			{{rows}}
-			{% endautoescape %}
-            {% else %}
-            <div id="tool">
-				<nav class="menu">
-					<a class="menu-item selected" href="#" onclick="return false">{{title}}</a>
-					<a class="menu-item" href="javascript:history.back(-1);">뒤로가기</a>
-				</nav>
-			</div>
-			<h1 class="title">{{title}}</h1>
-			<div>
-				{% autoescape false %}
-				{{data}}
-				{% endautoescape %}
-			</div>
-			{% endif %}
-			<hr id="last">
-			<p>{% autoescape false %}{{license}}{% endautoescape %}</p>
-			<div id="powered">
-				<a href="https://github.com/2DU/PYnamu"><img src="{{url_for('static', filename='images/on2.png')}}" width="100px"></a>
-			</div>
+                {% if preview == 1 %}
+                {% autoescape false %}
+                {{enddata}}
+                {% endautoescape %}
+                {% endif %}
+                {% elif tn == 3 %}
+                <h1 class="title">{{title}}</h1>
+                <table style="width: 100%;">
+                    <tbody>
+                        <tr>
+                            <td style="text-align: center;width:33.33%;">문서명</td>
+                            <td style="text-align: center;width:33.33%;">기여자</td>
+                            <td style="text-align: center;width:33.33%;">시간</td>
+                        </tr>
+                    </tbody>
+                </table>
+                {% autoescape false %}
+                {{rows}}
+                {% endautoescape %}
+                {% elif tn == 4 %}
+                <h1 class="title">{{title}}</h1>
+                {% autoescape false %}
+                {{rows}}
+                {% endautoescape %}
+                {% elif tn == 5 %}
+                <div id="tool">
+                    <nav class="menu">
+                        <a class="menu-item selected" href="#">역사</a>
+                        <a class="menu-item" href="/w/{{page}}">문서</a>
+                    </nav>
+                </div>
+                <h1 class="title">{{title}} <sub>(역사)</sub></h1>
+                <form class="usrform" method='POST' action='/history/{{page}}/n/1'>
+                <select name="a">
+                    {% autoescape false %}
+                    {{select}}
+                    {% endautoescape %}
+                </select>
+                <select name="b">
+                    {% autoescape false %}
+                    {{select}}
+                    {% endautoescape %}
+                </select>
+                <button class="btn btn-primary" type='submit'>리비전 비교</button>
+                <br>
+                <br>
+                <table style="width: 100%;">
+                    <tbody>
+                        <tr>
+                            <td style="text-align: center;width:33.33%;">판</td>
+                            <td style="text-align: center;width:33.33%;">기여자</td>
+                            <td style="text-align: center;width:33.33%;">시간</td>
+                        </tr>
+                    </tbody>
+                </table>
+                {% autoescape false %}
+                {{rows}}
+                {% endautoescape %}
+                {% elif tn == 6 %}
+                <div id="tool">
+                    <nav class="menu">
+                        <a class="menu-item selected" href="#" onclick="return false">옛문서</a>
+                        <a class="menu-item" href="javascript:history.back(-1);">뒤로가기</a>
+                    </nav>
+                </div>
+                <h1 class="title">{{title}} <sub>(옛문서)</sub></h1>
+                <div>
+                    {% autoescape false %}
+                    {{data}}
+                    {% endautoescape %}
+                </div>
+                {% elif tn == 7 %}
+                <div id="tool">
+                    <nav class="menu">
+                        <a class="menu-item selected" href="#" onclick="return false">raw</a>
+                        <a class="menu-item" href="/w/{{page}}">문서</a>
+                    </nav>
+                </div>
+                <h1 class="title">{{title}} <sub>(raw)</sub></h1>
+                <div>
+                    {% autoescape false %}
+                    {{data}}
+                    {% endautoescape %}
+                </div>
+                {% elif tn == 8 %}
+                <h1 class="title">{{title}} <sub>(삭제)</sub></h1>
+                <div id="tool">
+                    <nav class="menu">
+                        <a class="menu-item selected" href="#" onclick="return false">삭제</a>
+                        <a class="menu-item" href="/w/{{page}}">문서</a>
+                    </nav>
+                </div>
+                <form id="usrform" method="POST" action="/delete/{{page}}">
+                    {{plus}}
+                    <br>
+                    <br>
+                    <button class="btn btn-primary" type="submit">삭제</button>
+                </form>
+                {% elif tn == 9 %}
+                <h1 class="title">{{title}} <sub>(이동)</sub></h1>
+                <div id="tool">
+                    <nav class="menu">
+                        <a class="menu-item selected" href="#" onclick="return false">이동</a>
+                        <a class="menu-item" href="/w/{{page}}">문서</a>
+                    </nav>
+                </div>
+                <form id="usrform" method="POST" action="/move/{{page}}">
+                    {{plus}}
+                    <br>
+                    <br>
+                    <input class="form-control input-sm" value="{{title}}" name="title" type="text">
+                    <br>
+                    <br>
+                    <button class="btn btn-primary" type="submit">이동</button>
+                </form>
+                {% elif tn == 10 %}
+                <h1 class="title">{{title}} <sub>(토론 목록)</sub></h1>
+                {% if list == 1 %}
+                <div id="tool">
+                    <nav class="menu">
+                        <a class="menu-item selected" href="#" onclick="return false">토론 목록</a>
+                        <a class="menu-item" href="/w/{{page}}">문서</a>
+                    </nav>
+                </div>
+                {% else %}
+                <div id="tool">
+                    <nav class="menu">
+                        <a class="menu-item selected" href="#" onclick="return false">닫힌 토론 목록</a>
+                        <a class="menu-item" href="/topic/{{page}}">토론 목록</a>
+                    </nav>
+                </div>
+                {% endif %}
+                <form id="usrform" method="POST" action="/topic/{{page}}">
+                    {% autoescape false %}
+                    {{plus}}
+                    {% endautoescape %}
+                    {% if list == 1 %}
+                    <br>
+                    <a href="/topic/{{page}}/close">(닫힌 토론 보기)</a>
+                    <br>
+                    <br>
+                    <input class="form-control" name="topic" style="width: 100%">
+                    <br>
+                    <br>
+                    <button class="btn btn-primary" type="submit">새토론</button>
+                    {% endif %}
+                </form>
+                {% elif tn == 11 %}
+                <h1 class="title">{{title}} <sub>(토론)</sub></h1>
+                <div id="tool">
+                    <nav class="menu">
+                        <a class="menu-item selected" href="#" onclick="return false">토론</a>
+                        <a class="menu-item" href="/topic/{{page}}">토론 목록</a>
+                    </nav>
+                </div>
+                <h2>{{sub}}</h2>
+                <br>
+                {% autoescape false %}
+                {{rows}}
+                {% endautoescape %}
+                {% if ban == 1 %}
+                {% else %}
+                <form id="usrform" method="POST" action="/topic/{{page}}/sub/{{suburl}}">
+                    <br>
+                    <textarea rows="10" cols="100" name="content" form="usrform"></textarea>
+                    <br>
+                    <br>
+                    <button class="btn btn-primary" type="submit">전송</button>
+                </form>
+                {% endif %}
+                {% elif tn == 12 %}
+                <h1 class="title">{{title}}</h1>
+                <table style="width: 100%;">
+                    <tbody>
+                        <tr>
+                            <td style="text-align: center;width:50%;">토론명</td>
+                            <td style="text-align: center;width:50%;">시간</td>
+                        </tr>
+                    </tbody>
+                </table>
+                {% autoescape false %}
+                {{rows}}
+                {% endautoescape %}
+                {% elif tn == 13 %}
+                <h1 class="title">{{title}} <sub>(되돌리기)</sub></h1>
+                <div id="tool">
+                    <nav class="menu">
+                        <a class="menu-item selected" href="#" onclick="return false">되돌리기</a>
+                        <a class="menu-item" href="javascript:history.back(-1);">뒤로가기</a>
+                    </nav>
+                </div>
+                <form id="usrform" method="POST" action="/revert/{{page}}/r/{{r}}">
+                    {{plus}}
+                    <br>
+                    <br>
+                    <button class="btn btn-primary" type="submit">되돌리기</button>
+                </form>
+                {% elif tn == 14 %}
+                <h1 class="title">{{title}}</h1>
+                <div>
+                    <h2 style="margin-top: -5px;">0.1 (알파)</h2>
+                    <li>문서 보기와 편집</li>
+                    <li>기타 문서</li>
+                    <li>랜덤 구현</li>
+                    <h2>0.2 ~ 0.9 (베타)</h2>
+                    <li>그 외 엄청나게 많은 기능 구현 (기존 <a class="out_link" href="https://github.com/2DU/OWNET">Ownet</a> 기능에서 로그인 필요한 기능 빼고 구현)</li>
+                    <h2>1.0</h2>
+                    <li>로그인 구현</li>
+                    <h2>1.1</h2>
+                    <li>차단 구현</li>
+                    <li>토론 닫기, 정지</li>
+                    <li>블라인드 구현</li>
+                    <li>ACL 기능 구현</li>
+                    <li>어드민 부여 구현</li>
+                    <h2>1.2</h2>
+                    <li>미리보기 구현</li>
+                    <li>대역 차단 구현</li>
+                    <li>diff 구현</li>
+                    <li>파일 업로드 개선</li>
+                    <li>파일 업로드 구현</li>
+                    <li>기본적인 다중 검사 기능</li>
+                    <h2>1.3</h2>
+                    <li>토론 목록 보강</li>
+                    <li>토론에 문법 지원</li>
+                    <li>비 효율적으로 돌아가던거 수정</li>
+                    <li>하위 문서 지원</li>
+                    <li>관리자 기능의 접근성 향상</li>
+                    <li>대규모도 편하게 접근되게</li>
+                    <h2>1.4</h2>
+                    <li>사용자 문서</li>
+                    <li>사문 접근성</li>
+                    <li>검색 기능 수정</li>
+                    <li>상위 문서 바로가기</li>
+                    <li>유저 기록 보기</li>
+                    <h2>1.5 (진행중)</h2>
+                    <li>디자인 변경 (진행중)</li>
+                    <li>관리자 기능 접근성</li>
+                    <li>파일 문서 생성</li>
+                    <li>유저 가입 목록 (완료)</li>
+                    <li>최근 차단을 유저 차단 기록으로 (완료)</li>
+                    <h2>계속</h2>
+                    <li>버그 수정</li>
+                    <li>파서 제작 (90%)</li>
+                    <h2>보류</h2>
+                    <li>설계 약간 변경 (느린 pymysql 대신에 다른 패키지를 쓰려고 했으나 어차피 곧 pypy 신 버전 나올테고 설치도 복잡해지니 보류)</li>
+                    <br>
+                    <h2>파이나무 라이선스</h2>
+                    <li>BSD 3-Clause License</li>
+                    <h2>외부 파일 라이선스</h2>
+                    <li>인용문 아이콘 <a class="out_link" href="http://www.flaticon.com/free-icon/quote-left_25672">Dave Gandy</a> CC 3.0 BY</li>
+                    <li>일부 파일 <a class="out_link" href="https://twitter.com/Basix1120">Basix</a></li>
+                    <br>
+                    <h2>기타</h2>
+                    <li>현재 버전 1.5.6 - Beta <s>정식 버전은 10.0이라더라.</s></li>
+                    <br>
+                    <h2>개발 이념</h2>
+                    <li>나(2DU) 쓰기 편한 엔진을 만들자</li>
+                </div>
+                {% elif tn == 15 %}
+                <h1 class="title">{{title}}</h1>
+                {% if title == '회원가입' %}
+                <form id="usrform" method="POST" action="/register">
+                {% else %}
+                <form id="usrform" method="POST" action="/login">
+                {% endif %}
+                    <span>아이디</span>
+                    <br>
+                    <br>
+                    <input name="id" type="text">
+                    <br>
+                    <br>
+                    <span>비밀번호</span>
+                    <br>
+                    <br>
+                    <input name="pw" type="password">
+                    <br>
+                    <br>
+                    <button class="btn btn-primary" type="submit">{{enter}}</button>
+                </form>
+                {% elif tn == 16 %}
+                <h1 class="title">{{title}} <sub>(차단)</sub></h1>
+                <form id="usrform" method="POST" action="/ban/{{page}}">
+                    {% if now == '차단' or now == '대역 차단' %}
+                    <input class="form-control" name="end" style="width: 100%">
+                    <br>
+                    <br>
+                    <span>아무것도 안 적으면 무기한 차단 입니다.</span>
+                    <br>
+                    <br>
+                    <span>차단 일 지정시 형식은 YYYY-MM-DD로 기록 해야합니다. (예시: 2017-01-20, 2017-10-15)</span>
+                    <br>
+                    <br>
+                    <span>지금 시각은 {{today}} 입니다.</span>
+                    <br>
+                    <br>
+                    <input class="form-control" name="why" style="width: 100%">
+                    <br>
+                    <br>
+                    <span>사유를 쓰는 곳 입니다.</span>
+                    {% if allif == 1 %}
+                    <br>
+                    <br>
+                    <input type="checkbox" name="band">
+                        <span>대역 차단</span>
+                    </input>
+                    {% endif %}
+                    <br>
+                    <br>
+                    {% endif %}
+                    <button class="btn btn-primary" type="submit">{{now}}</button>
+                </form>
+                {% elif tn == 17 %}
+                <h1 class="title">{{title}}</h1>
+                <div>
+                    <a class="out_link" style="margin-top: -5px;" href="https://namu.wiki/w/%EB%82%98%EB%AC%B4%EC%9C%84%ED%82%A4:%ED%8E%B8%EC%A7%91%20%EB%8F%84%EC%9B%80%EB%A7%90">참조</a>
+                    <h2>기초 문법</h2>
+                    <li>~~취소선~~ --취소선--</li>
+                    <li>'''강조'''</li>
+                    <li>''기울이기''</li>
+                    <li>__언더 바__</li>
+                    <li>^^윗 첨자^^</li>
+                    <li>,,아랫 첨자,,</li>
+                    <h2>문단 문법</h2>
+                    <li>[목차]</li>
+                    <li>= 1단계 문단 =</li>
+                    <li>== 2단계 문단 ==</li>
+                    <li>=== 3단계 문단 ===</li>
+                    <li>==== 4단계 문단 ====</li>
+                    <li>===== 5단계 문단 =====</li>
+                    <li>====== 6단계 문단 ======</li>
+                    <h2>링크 문법</h2>
+                    <li>[[내부 링크]]</li>
+                    <li>[[내부 링크|보이는 내용]]</li>
+                    <li>[[외부 링크]]</li>
+                    <li>[[외부 링크|보이는 내용]]</li>
+                    <h2>유튜브 문법</h2>
+                    <li>[youtube(코드)]</li>
+                    <li>[youtube(코드, width=가로, height=세로)]</li>
+                    <li>[youtube(코드, height=세로, width=가로)]</li>
+                    <h2>각주 문법</h2>
+                    <li>[* 내용]</li>
+                    <li>[*이름 내용]</li>
+                    <li>[각주]</li>
+                    <h2>넘겨주기 문법</h2>
+                    <li>#redirect 문서명</li>
+                    <li>#넘겨주기 문서명</li>
+                </div>
+                {% elif tn == 18 %}
+                <h1 class="title">{{title}} <sub>(권한 부여)</sub></h1>
+                <form id="usrform" method="POST" action="/admin/{{page}}">
+                    {% if now == '권한 부여' %}
+                    <select name="select">
+                        <option value="admin" selected="selected">관리자</option>
+                        <option value="ownet">소유자</option>
+                    </select>
+                    <br>
+                    <br>
+                    {% endif %}
+                    <button class="btn btn-primary" type="submit">{{now}}</button>
+                </form>
+                {% elif tn == 19 %}
+                <h1 class="title">{{title}} <sub>(ACL)</sub></h1>
+                <p>{{now}}</p>
+                <form id="usrform" method="POST" action="/acl/{{page}}">
+                    <select name="select">
+                        <option value="admin" selected="selected">관리자만</option>
+                        <option value="user">유저 이상</option>
+                        <option value="normal">일반</option>
+                    </select>
+                    <br>
+                    <br>
+                    <button class="btn btn-primary" type="submit">ACL 변경</button>
+                </form>
+                {% elif tn == 20 %}
+                <h1 class="title">{{title}}</h1>
+                <table style="width: 100%;">
+                    <tbody>
+                        <tr>
+                            <td style="text-align: center;width:20%;">차단자</td>
+                            <td style="text-align: center;width:20%;">관리자</td>
+                            <td style="text-align: center;width:20%;">언제까지</td>
+                            <td style="text-align: center;width:20%;">왜</td>
+                            <td style="text-align: center;width:20%;">시간</td>
+                        </tr>
+                    </tbody>
+                </table>
+                {% autoescape false %}
+                {{rows}}
+                {% endautoescape %}
+                {% elif tn == 21 %}
+                <h1 class="title">{{title}}</h1>
+                <div>
+                    <form action="" method=post enctype=multipart/form-data>
+                        <input type=file name=file>
+                        <input type=submit value=Upload>
+                    </form>
+                </div>
+                <span>{{number}}MB 이하 파일만 업로드 가능하고 jpg png gif jpeg만 가능 합니다.</span>
+                {% elif tn == 22 %}
+                <h1 class="title">{{title}}</h1>
+                <table style="width: 100%;">
+                    <tbody>
+                        <tr>
+                            <td style="text-align: center;width:33.33%;">유저</td>
+                            <td style="text-align: center;width:33.33%;">아이피</td>
+                            <td style="text-align: center;width:33.33%;">언제</td>
+                        </tr>
+                    </tbody>
+                </table>
+                {% autoescape false %}
+                {{rows}}
+                {% endautoescape %}
+                {% else %}
+                <div id="tool">
+                    <nav class="menu">
+                        <a class="menu-item selected" href="#" onclick="return false">{{title}}</a>
+                        <a class="menu-item" href="javascript:history.back(-1);">뒤로가기</a>
+                    </nav>
+                </div>
+                <h1 class="title">{{title}}</h1>
+                <div>
+                    {% autoescape false %}
+                    {{data}}
+                    {% endautoescape %}
+                </div>
+                {% endif %}
+                <hr id="last">
+                <p>{% autoescape false %}{{license}}{% endautoescape %}</p>
+                <div id="powered">
+                    <a href="https://github.com/2DU/PYnamu"><img src="{{url_for('static', filename='images/on2.png')}}" width="100px"></a>
+                </div>
+            </div>
 		</div>
 	</body>
 </html>

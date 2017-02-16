@@ -321,6 +321,7 @@ table {
 		float: right;
 	}
 }
+
 @media (max-width: 459px) {
 	#search {
 		float: left;
@@ -330,6 +331,13 @@ table {
 	.input-group {
 		width: 100%;
 	}
+}
+
+@media (min-width: 1280px) {
+	#all_contect {
+        width: 1280px;
+        margin: auto;
+    }
 }
 
 .four-fifths.column {

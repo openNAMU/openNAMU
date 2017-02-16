@@ -242,6 +242,9 @@ def namumark(title, data):
                         else:
                             break
                     
+                    enddata = re.sub("<span>&</span><span>l</span><span>t</span><span>;</span>", "<span>&lt;</span>", enddata)
+                    enddata = re.sub("<span>&</span><span>g</span><span>t</span><span>;</span>", "<span>&gt;</span>", enddata)
+                    
                     if(results[1]):
                         a = results[1]
                         while True:
