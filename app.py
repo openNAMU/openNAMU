@@ -265,7 +265,12 @@ def namumark(title, data):
         m = re.search('^#(?:redirect|넘겨주기)\s([^\n]*)', data)
         if(m):
             results = m.groups()
-            data = re.sub('^#(?:redirect|넘겨주기)\s([^\n]*)', '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(results[0]).replace('/','%2F') + '/redirect/' + parse.quote(title).replace('/','%2F') + '" />', data, 1)
+            aa = re.search("^(.*)(#(?:.*))$", results[0])
+            if(aa):
+                results = aa.groups()
+                data = re.sub('^#(?:redirect|넘겨주기)\s([^\n]*)', '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(results[0]).replace('/','%2F') + '/redirect/' + parse.quote(title).replace('/','%2F') + results[1] + '" />', data, 1)
+            else:
+                data = re.sub('^#(?:redirect|넘겨주기)\s([^\n]*)', '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(results[0]).replace('/','%2F') + '/redirect/' + parse.quote(title).replace('/','%2F') + '" />', data, 1)
         else:
             break
     
