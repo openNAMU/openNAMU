@@ -588,7 +588,7 @@ def namumark(title, data):
                 tou = ""
             break
     
-    data = re.sub("\[각주\](?:(?:(?:<br>+)*(?:\s+)*(?:\r+)*(?:\n+))+)?$", "", data)
+    data = re.sub("\[각주\](?:(?:<br>| |\r|\n)+)?$", "", data)
     data = re.sub("\[각주\]", "<br>" + tou, data)
     data = data + tou;
     
