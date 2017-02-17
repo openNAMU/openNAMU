@@ -2480,7 +2480,7 @@ def diff(name = None, a = None, b = None):
             enddata = re.sub('\n', '<br>', enddata)
             sm = difflib.SequenceMatcher(None, indata, enddata)
             c = show_diff(sm)
-            return render_template('index.html', title = name + ' <sub>Diff</sub>', logo = data['name'], data = c)
+            return render_template('index.html', title = name, logo = data['name'], data = c, tn = 23)
         else:
             return render_template('index.html', title = 'Diff 오류', logo = data['name'], data = '<a href="/w/' + name + '">이 리비전이나 문서가 없습니다.</a>')
     else:

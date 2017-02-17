@@ -523,6 +523,19 @@
                 {% autoescape false %}
                 {{rows}}
                 {% endautoescape %}
+                {% elif tn == 23 %}
+                <div id="tool">
+                    <nav class="menu">
+                        <a class="menu-item selected" href="#" onclick="return false">{{title}}</a>
+                        <a class="menu-item" href="javascript:history.back(-1);">뒤로가기</a>
+                    </nav>
+                </div>
+                <h1 class="title">{{title}} <sub>(비교)</sub></h1>
+                <div>
+                    {% autoescape false %}
+                    {{data}}
+                    {% endautoescape %}
+                </div>
                 {% else %}
                 <div id="tool">
                     <nav class="menu">
