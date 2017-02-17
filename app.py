@@ -1843,11 +1843,32 @@ def setup():
 
 @app.route('/other')
 def other():
-    return render_template('index.html', title = '기타 메뉴', logo = data['name'], data = '<li><a href="/titleindex">모든 문서</a><li><a href="/grammar">문법 설명</a></li><li><a href="/version">버전</a></li><li><a href="/blocklog/n/1">유저 차단 기록</a></li><li><a href="/userlog/n/1">유저 가입 기록</a></li><li><a href="/upload">업로드</a></li><li><a href="/manager">관리자 메뉴</a></li>')
+    return render_template('index.html', title = '기타 메뉴', logo = data['name'], data = '<li><a href="/titleindex">모든 문서</a></li><li><a href="/grammar">문법 설명</a></li><li><a href="/version">버전</a></li><li><a href="/blocklog/n/1">유저 차단 기록</a></li><li><a href="/userlog/n/1">유저 가입 기록</a></li><li><a href="/upload">업로드</a></li><li><a href="/manager">관리자 메뉴</a></li>')
     
 @app.route('/manager')
 def manager():
-    return render_template('index.html', title = '관리자 메뉴', logo = data['name'], data = 'Dev')
+    return render_template('index.html', title = '관리자 메뉴', logo = data['name'], data = '<li><a href="/acl">문서 ACL</a></li><li><a href="/check">유저 체크</a></li><li><a href="/banget">유저 차단</a></li>')
+
+@app.route('/acl', methods=['POST', 'GET'])
+def aclget():
+    if(request.method == 'POST'):
+        return '<meta http-equiv="refresh" content="0;url=/acl/' + parse.quote(request.form["name"]).replace('/','%2F') + '" />'
+    else:
+        return render_template('index.html', title = 'ACL 이동', logo = data['name'], data = '<form id="usrform" method="POST" action="/acl"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')
+        
+@app.route('/check', methods=['POST', 'GET'])
+def checkget():
+    if(request.method == 'POST'):
+        return '<meta http-equiv="refresh" content="0;url=/check/' + parse.quote(request.form["name"]).replace('/','%2F') + '" />'
+    else:
+        return render_template('index.html', title = '유저 체크 이동', logo = data['name'], data = '<form id="usrform" method="POST" action="/check"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')
+        
+@app.route('/banget', methods=['POST', 'GET'])
+def hebanget():
+    if(request.method == 'POST'):
+        return '<meta http-equiv="refresh" content="0;url=/ban/' + parse.quote(request.form["name"]).replace('/','%2F') + '" />'
+    else:
+        return render_template('index.html', title = '유저 차단 이동', logo = data['name'], data = '<form id="usrform" method="POST" action="/banget"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')
 
 @app.route('/titleindex')
 def titleindex():
