@@ -1400,7 +1400,7 @@ def blocklog(number = None):
 @app.route('/history/<path:name>/n/<int:number>', methods=['POST', 'GET'])
 def gethistory(name = None, number = None):
     if(request.method == 'POST'):
-        return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name).replace('/','%2F') + '/r/' + request.form["a"] + '/diff/' + request.form["b"] + '" />'
+        return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name).replace('/','%2F') + '/r/' + request.form["b"] + '/diff/' + request.form["a"] + '" />'
     else:
         select = ''
         v = number * 50
