@@ -1847,7 +1847,7 @@ def other():
     
 @app.route('/manager')
 def manager():
-    return render_template('index.html', title = '관리자 메뉴', logo = data['name'], data = '<li><a href="/acl">문서 ACL</a></li><li><a href="/check">유저 체크</a></li><li><a href="/banget">유저 차단</a></li>')
+    return render_template('index.html', title = '관리자 메뉴', logo = data['name'], data = '<li><a href="/acl">문서 ACL</a></li><li><a href="/check">유저 체크</a></li><li><a href="/banget">유저 차단</a></li><li><a href="/admin">관리자 권한 주기</a></li>')
 
 @app.route('/acl', methods=['POST', 'GET'])
 def aclget():
@@ -1868,7 +1868,14 @@ def hebanget():
     if(request.method == 'POST'):
         return '<meta http-equiv="refresh" content="0;url=/ban/' + parse.quote(request.form["name"]).replace('/','%2F') + '" />'
     else:
-        return render_template('index.html', title = '유저 차단 이동', logo = data['name'], data = '<form id="usrform" method="POST" action="/banget"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')
+        return render_template('index.html', title = '유저 차단 이동', logo = data['name'], data = '<form id="usrform" method="POST" action="/banget"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button><br><br><span>아이피 앞 두자리 (XXX.XXX) 입력하면 대역 차단</span></form>')
+        
+@app.route('/admin', methods=['POST', 'GET'])
+def adminget():
+    if(request.method == 'POST'):
+        return '<meta http-equiv="refresh" content="0;url=/admin/' + parse.quote(request.form["name"]).replace('/','%2F') + '" />'
+    else:
+        return render_template('index.html', title = '관리자 권한 이동', logo = data['name'], data = '<form id="usrform" method="POST" action="/admin"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')
 
 @app.route('/titleindex')
 def titleindex():
