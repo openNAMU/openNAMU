@@ -1843,7 +1843,7 @@ def setup():
 
 @app.route('/other')
 def other():
-    return render_template('index.html', title = '기타 메뉴', logo = data['name'], data = '<li><a href="/titleindex">모든 문서</a></li><li><a href="/grammar">문법 설명</a></li><li><a href="/version">버전</a></li><li><a href="/blocklog/n/1">유저 차단 기록</a></li><li><a href="/userlog/n/1">유저 가입 기록</a></li><li><a href="/upload">업로드</a></li><li><a href="/manager">관리자 메뉴</a></li>')
+    return render_template('index.html', title = '기타 메뉴', logo = data['name'], data = '<li><a href="/titleindex">모든 문서</a></li><li><a href="/grammar">문법 설명</a></li><li><a href="/version">버전</a></li><li><a href="/blocklog/n/1">유저 차단 기록</a></li><li><a href="/userlog/n/1">유저 가입 기록</a></li><li><a href="/upload">업로드</a></li><li><a href="/manager">관리자 메뉴</a></li><li><a href="/record">유저 기록</a></li>')
     
 @app.route('/manager')
 def manager():
@@ -1876,6 +1876,13 @@ def adminget():
         return '<meta http-equiv="refresh" content="0;url=/admin/' + parse.quote(request.form["name"]).replace('/','%2F') + '" />'
     else:
         return render_template('index.html', title = '관리자 권한 이동', logo = data['name'], data = '<form id="usrform" method="POST" action="/admin"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')
+        
+@app.route('/record', methods=['POST', 'GET'])
+def recordget():
+    if(request.method == 'POST'):
+        return '<meta http-equiv="refresh" content="0;url=/record/' + parse.quote(request.form["name"]).replace('/','%2F') + '/n/1" />'
+    else:
+        return render_template('index.html', title = '유저 기록 이동', logo = data['name'], data = '<form id="usrform" method="POST" action="/record"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')
 
 @app.route('/titleindex')
 def titleindex():
