@@ -1120,7 +1120,6 @@ def upload():
         else:
             file = request.files['file']
             if(file and allowed_file(file.filename)):
-                print(file.filename)
                 if(re.search('^([^./\\*<>|:?"]+)\.(jpg|gif|jpeg|png)$', file.filename)):
                     filename = file.filename
                     if(os.path.exists(os.path.join('image', filename))):
