@@ -1,5 +1,4 @@
 from flask import Flask, request, session, render_template, send_file
-from werkzeug import secure_filename
 app = Flask(__name__)
 
 from urllib import parse
@@ -932,6 +931,7 @@ def getip(request):
 
 def getcan(ip, name):
     m = re.search("^사용자:(.*)", name)
+    n = re.search("^파일:(.*)", name)
     if(m):
         g = m.groups()
         if(ip == g[0]):
@@ -946,6 +946,8 @@ def getcan(ip, name):
                     return 0
         else:
             return 1
+    elif(n):
+        return 1
     else:
         b = re.search("^([0-9](?:[0-9][0-9])?\.[0-9](?:[0-9][0-9])?)", ip)
         if(b):
@@ -1118,14 +1120,20 @@ def upload():
         else:
             file = request.files['file']
             if(file and allowed_file(file.filename)):
-                filename = secure_filename(file.filename)
-                if(os.path.exists(os.path.join('image', filename))):
-                    return render_template('index.html', logo = data['name'], title = '업로드', data = '동일한 이름의 파일이 있습니다.')
+                print(file.filename)
+                if(re.search('^([^./\\*<>|:?"]+)\.(jpg|gif|jpeg|png)$', file.filename)):
+                    filename = file.filename
+                    if(os.path.exists(os.path.join('image', filename))):
+                        return render_template('index.html', logo = data['name'], title = '업로드 오류', data = '동일한 이름의 파일이 있습니다.')
+                    else:
+                        file.save(os.path.join('image', filename))
+                        curs.execute("insert into data (title, data, acl) value ('" + pymysql.escape_string('파일:' + filename) + "', '" + pymysql.escape_string('[[파일:' + filename + ']][br][br]{{{[[파일:' + filename + ']]}}}') + "', '')")
+                        conn.commit()
+                        return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote('파일:' + filename).replace('/','%2F') + '" />'
                 else:
-                    file.save(os.path.join('image', filename))
-                    return render_template('index.html', logo = data['name'], title = '업로드', data = '완료 되었습니다.')
+                    return render_template('index.html', logo = data['name'], title = '업로드 오류', data = '파일 명에 ./\*<>|:? 들은 불가능 합니다.')
             else:
-                return render_template('index.html', logo = data['name'], title = '업로드', data = 'jpg gif jpeg png만 가능 합니다.')
+                return render_template('index.html', logo = data['name'], title = '업로드 오류', data = 'jpg gif jpeg png만 가능 합니다.')
     else:
         ip = getip(request)
         ban = getban(ip)
@@ -1136,8 +1144,10 @@ def upload():
     
 @app.route('/image/<path:name>')
 def image(name = None):
-    filename = secure_filename(name)
-    return send_file(os.path.join('image', filename), mimetype='image')
+    if(os.path.exists(os.path.join('image', name))):
+        return send_file(os.path.join('image', name), mimetype='image')
+    else:
+        return render_template('index.html', logo = data['name'], data = '이미지 없음.', title = '이미지 보기')
     
 @app.route('/')
 @app.route('/w/')
