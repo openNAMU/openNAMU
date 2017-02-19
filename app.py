@@ -1392,7 +1392,12 @@ def blocklog(number = None):
             why = rows[i]['why']
             why = re.sub('<', '&lt;', why)
             why = re.sub('>', '&gt;', why)
-            div = div + '<table style="width: 100%;"><tbody><tr><td style="text-align: center;width:20%;">' + rows[i]['block'] + '</a></td><td style="text-align: center;width:20%;">' + rows[i]['blocker'] + '</td><td style="text-align: center;width:20%;">' + rows[i]['end'] + '</td><td style="text-align: center;width:20%;">' + rows[i]['why'] + '</td><td style="text-align: center;width:20%;">' + rows[i]['today'] + '</td></tr></tbody></table>'
+            b = re.search("^([0-9](?:[0-9]?[0-9]?)\.[0-9](?:[0-9]?[0-9]?))$", rows[i]['block'])
+            if(b):
+                ip = rows[i]['block'] + ' (대역)'
+            else:
+                ip = rows[i]['block']
+            div = div + '<table style="width: 100%;"><tbody><tr><td style="text-align: center;width:20%;">' + ip + '</a></td><td style="text-align: center;width:20%;">' + rows[i]['blocker'] + '</td><td style="text-align: center;width:20%;">' + rows[i]['end'] + '</td><td style="text-align: center;width:20%;">' + rows[i]['why'] + '</td><td style="text-align: center;width:20%;">' + rows[i]['today'] + '</td></tr></tbody></table>'
             if(i == v):
                 div = div + '</div>'
                 if(number == 1):
