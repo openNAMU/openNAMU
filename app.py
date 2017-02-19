@@ -949,7 +949,7 @@ def getcan(ip, name):
     elif(n):
         return 1
     else:
-        b = re.search("^([0-9](?:[0-9][0-9])?\.[0-9](?:[0-9][0-9])?)", ip)
+        b = re.search("^([0-9](?:[0-9]?[0-9]?)\.[0-9](?:[0-9]?[0-9]?))", ip)
         if(b):
             results = b.groups()
             curs.execute("select * from ban where block = '" + pymysql.escape_string(results[0]) + "' and band = 'O'")
@@ -1014,7 +1014,7 @@ def getcan(ip, name):
                     return 0
 
 def getban(ip):
-    b = re.search("^([0-9](?:[0-9][0-9])?\.[0-9](?:[0-9][0-9])?)", ip)
+    b = re.search("^([0-9](?:[0-9]?[0-9]?)\.[0-9](?:[0-9]?[0-9]?))", ip)
     if(b):
         results = b.groups()
         curs.execute("select * from ban where block = '" + pymysql.escape_string(results[0]) + "' and band = 'O'")
@@ -1037,7 +1037,7 @@ def getban(ip):
             return 0
         
 def getdiscuss(ip, name, sub):
-    b = re.search("^([0-9](?:[0-9][0-9])?\.[0-9](?:[0-9][0-9])?)", ip)
+    b = re.search("^([0-9](?:[0-9]?[0-9]?)\.[0-9](?:[0-9]?[0-9]?))", ip)
     if(b):
         results = b.groups()
         curs.execute("select * from ban where block = '" + pymysql.escape_string(results[0]) + "' and band = 'O'")
@@ -2300,7 +2300,7 @@ def ban(name = None):
                     block(name, '해제', getnow(), ip, '')
                     curs.execute("delete from ban where block = '" + pymysql.escape_string(name) + "'")
                 else:
-                    b = re.search("^([0-9](?:[0-9][0-9])?\.[0-9](?:[0-9][0-9])?)$", name)
+                    b = re.search("^([0-9](?:[0-9]?[0-9]?)\.[0-9](?:[0-9]?[0-9]?))$", name)
                     if(b):
                         block(name, request.form["end"], getnow(), ip, request.form["why"])
                         curs.execute("insert into ban (block, end, why, band) value ('" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(request.form["end"]) + "', '" + pymysql.escape_string(request.form["why"]) + "', 'O')")
@@ -2318,7 +2318,7 @@ def ban(name = None):
                 if(row):
                     now = '차단 해제'
                 else:
-                    b = re.search("^([0-9](?:[0-9][0-9])?\.[0-9](?:[0-9][0-9])?)$", name)
+                    b = re.search("^([0-9](?:[0-9]?[0-9]?)\.[0-9](?:[0-9]?[0-9]?))$", name)
                     if(b):
                         now = '대역 차단'
                     else:
@@ -2441,7 +2441,7 @@ def aban():
             else:
                 end = '영구 차단 상태 입니다. / 사유 : ' + rows[0]['why']
         else:
-            b = re.search("^([0-9](?:[0-9][0-9])?\.[0-9](?:[0-9][0-9])?)", ip)
+            b = re.search("^([0-9](?:[0-9]?[0-9]?)\.[0-9](?:[0-9]?[0-9]?))", ip)
             if(b):
                 results = b.groups()
                 curs.execute("select * from ban where block = '" + pymysql.escape_string(results[0]) + "' and band = 'O'")
