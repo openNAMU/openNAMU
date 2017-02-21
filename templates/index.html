@@ -58,7 +58,7 @@
                         <a class="menu-item" href="/move/{{page}}">이동</a>
                         <a class="menu-item" href="/raw/{{page}}">Raw</a>
                         <a class="menu-item" href="/history/{{page}}/n/1">역사</a>
-                        <!-- <a class="menu-item" href="/xref/{{page}}">역링크</a> -->
+                        <a class="menu-item" href="/xref/{{page}}/n/1">역링크</a>
                         <a class="menu-item" style="{{style}}" href="/w/{{uppage}}">상위</a>
                     </nav>
                 </div>
@@ -352,10 +352,10 @@
                     <li>유저 가입 목록 (완료)</li>
                     <li>최근 차단을 유저 차단 기록으로 (완료)</li>
                     <h2>1.6</h2>
-                    <li>토론에 AJAX 적용 (1.6.1)</li>
-                    <li>리캡차 추가 (1.6.2)</li>
-                    <li>섬네일 기능 (1.6.3)</li>
-                    <li>역링크 기능 완성 (미정)</li>
+                    <li>토론에 AJAX 적용 (1.6.2)</li>
+                    <li>리캡차 추가 (1.6.3)</li>
+                    <li>섬네일 기능 (1.6.4)</li>
+                    <li>역링크 기능 완성 (완료?)</li>
                     <li>분류 완성 (미정)</li>
                     <li>팝업 각주 (미정)</li>
                     <li>업로드 보강 (미정)</li>
@@ -370,7 +370,7 @@
                     <li>일부 파일 <a class="out_link" href="https://twitter.com/Basix1120">Basix</a></li>
                     <br>
                     <h2>기타</h2>
-                    <li>버전 1.6.0 - 정식</li>
+                    <li>버전 1.6.1 - 정식</li>
                     <br>
                     <h2>개발 이념</h2>
                     <li>나(<a class="out_link" href="https://github.com/2DU">2DU</a>) 쓰기 편한 엔진을 만들자</li>
@@ -529,19 +529,6 @@
                 {% autoescape false %}
                 {{rows}}
                 {% endautoescape %}
-                {% elif tn == 23 %}
-                <div id="tool">
-                    <nav class="menu">
-                        <a class="menu-item selected" href="#" onclick="return false">{{title}}</a>
-                        <a class="menu-item" href="javascript:history.back(-1);">뒤로가기</a>
-                    </nav>
-                </div>
-                <h1 class="title">{{title}} <sub>(비교)</sub></h1>
-                <div>
-                    {% autoescape false %}
-                    {{data}}
-                    {% endautoescape %}
-                </div>
                 {% else %}
                 <div id="tool">
                     <nav class="menu">
@@ -549,7 +536,7 @@
                         <a class="menu-item" href="javascript:history.back(-1);">뒤로가기</a>
                     </nav>
                 </div>
-                <h1 class="title">{{title}}</h1>
+                <h1 class="title">{{title}} {% if plus %}<sub>{{plus}}</sub>{% endif %}</h1>
                 <div>
                     {% autoescape false %}
                     {{data}}

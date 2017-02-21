@@ -444,7 +444,11 @@ def namumark(title, data):
                                 data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a title="' + results[0] + results[1] + '" href="/w/' + parse.quote(results[0]).replace('/','%2F') + results[1] + '">' + g + '</a>', data, 1)
                             else:
                                 data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a title="' + results[0] + results[1] + '" class="not_thing" href="/w/' + parse.quote(results[0]).replace('/','%2F') + results[1] + '">' + g + '</a>', data, 1)
-
+                            curs.execute("select * from back where title = '" + pymysql.escape_string(results[0]) + "'")
+                            rows = curs.fetchall()
+                            if(not rows):
+                                curs.execute("insert into back (title, link) value ('" + pymysql.escape_string(title) + "', '" + pymysql.escape_string(results[0]) + "')")
+                                conn.commit()
                 else:
                     b = re.search("^http(?:s)?:\/\/", results[0])
                     if(b):
@@ -465,6 +469,11 @@ def namumark(title, data):
                                 data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a title="' + results[0] + '" href="/w/' + parse.quote(results[0]).replace('/','%2F') + '">' + results[1] + '</a>', data, 1)
                             else:
                                 data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a title="' + results[0] + '" class="not_thing" href="/w/' + parse.quote(results[0]).replace('/','%2F') + '">' + results[1] + '</a>', data, 1)
+                            curs.execute("select * from back where title = '" + pymysql.escape_string(results[0]) + "'")
+                            rows = curs.fetchall()
+                            if(not rows):
+                                curs.execute("insert into back (title, link) value ('" + pymysql.escape_string(results[0]) + "', '" + pymysql.escape_string(title) + "')")
+                                conn.commit()
             else:
                 aa = re.search("^(.*)(#(?:.*))$", result[0])
                 if(aa):
@@ -482,7 +491,11 @@ def namumark(title, data):
                                 data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a href="/w/' + parse.quote(result[0]).replace('/','%2F') + result[1] + '">' + result[0] + result[1] + '</a>', data, 1)
                             else:
                                 data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a class="not_thing" href="/w/' + parse.quote(result[0]).replace('/','%2F') + result[1] + '">' + result[0] + result[1] + '</a>', data, 1)
-
+                            curs.execute("select * from back where title = '" + pymysql.escape_string(result[0]) + "'")
+                            rows = curs.fetchall()
+                            if(not rows):
+                                curs.execute("insert into back (title, link) value ('" + pymysql.escape_string(result[0]) + "', '" + pymysql.escape_string(title) + "')")
+                                conn.commit()
                 else:
                     b = re.search("^http(?:s)?:\/\/", result[0])
                     if(b):
@@ -503,6 +516,11 @@ def namumark(title, data):
                                 data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a href="/w/' + parse.quote(result[0]).replace('/','%2F') + '">' + result[0] + '</a>', data, 1)
                             else:
                                 data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a class="not_thing" href="/w/' + parse.quote(result[0]).replace('/','%2F') + '">' + result[0] + '</a>', data, 1)
+                            curs.execute("select * from back where title = '" + pymysql.escape_string(result[0]) + "'")
+                            rows = curs.fetchall()
+                            if(not rows):
+                                curs.execute("insert into back (title, link) value ('" + pymysql.escape_string(result[0]) + "', '" + pymysql.escape_string(title) + "')")
+                                conn.commit()
         else:
             break
             
@@ -1349,6 +1367,48 @@ def userlog(number = None):
         return render_template('index.html', logo = data['name'], data = div, title = '유저 가입 기록')
     else:
         return render_template('index.html', logo = data['name'], data = '', title = '유저 가입 기록')
+        
+@app.route('/xref/<path:name>/n/<int:number>')
+def xref(name = None, number = None):
+    v = number * 50
+    i = v - 50
+    div = ''
+    curs.execute("select * from back where link = '" + pymysql.escape_string(name) + "'")
+    rows = curs.fetchall()
+    if(rows):
+        while True:
+            try:
+                a = rows[i]
+            except:
+                if(number != 1):
+                    div = div + '<br><a href="/xref/n/' + str(number - 1) + '">(이전)'
+                break
+            curs.execute("select * from data where title = '" + pymysql.escape_string(rows[i]['title']) + "'")
+            row = curs.fetchall()
+            if(row):
+                if(re.search("\[\[" + name + "(?:#(?:[^|]*))?(?:\|(?:(?:(?!\]\]).)*))?\]\]", row[0]['data'])):
+                    div = div + '<li><a href="/w/' + parse.quote(rows[i]['title']).replace('/','%2F') + '">' + rows[i]['title'] + '</a></li>'
+                    if(i == v):
+                        if(number == 1):
+                            div = div + '<br><a href="/xref/' + parse.quote(name).replace('/','%2F') + '/n/' + str(number + 1) + '">(다음)'
+                        else:
+                            div = div + '<br><a href="/xref/' + parse.quote(name).replace('/','%2F') + '/n/' + str(number - 1) + '">(이전) <a href="/userlog/n/' + str(number + 1) + '">(다음)'
+                        break
+                    else:
+                        i = i + 1
+                else:
+                    curs.execute("delete from back where link = '" + pymysql.escape_string(name) + "'")
+                    conn.commit()
+                    i = i + 1
+                    v = v + 1
+            else:
+                curs.execute("delete from back where link = '" + pymysql.escape_string(name) + "'")
+                conn.commit()
+                i = i + 1
+                v = v + 1
+        return render_template('index.html', logo = data['name'], data = div, title = name, plus = '(역링크)')
+    else:
+        return render_template('index.html', logo = data['name'], data = '', title = name, plus = '(역링크)')
 
 @app.route('/recentdiscuss')
 def recentdiscuss():
@@ -1855,6 +1915,7 @@ def setup():
     curs.execute("create table if not exists stop(title text not null, sub text not null, close text not null)")
     curs.execute("create table if not exists rb(block text not null, end text not null, today text not null, blocker text not null, why text not null)")
     curs.execute("create table if not exists login(user text not null, ip text not null, today text not null)")
+    curs.execute("create table if not exists back(title text not null, link text not null)")
     return render_template('index.html', title = '설치 완료', logo = data['name'], data = '문제 없었음')
 
 @app.route('/other')
@@ -2496,7 +2557,7 @@ def diff(name = None, a = None, b = None):
             enddata = re.sub('\n', '<br>', enddata)
             sm = difflib.SequenceMatcher(None, indata, enddata)
             c = show_diff(sm)
-            return render_template('index.html', title = name, logo = data['name'], data = c, tn = 23)
+            return render_template('index.html', title = name, logo = data['name'], data = c, plus = '(비교)')
         else:
             return render_template('index.html', title = 'Diff 오류', logo = data['name'], data = '<a href="/w/' + name + '">이 리비전이나 문서가 없습니다.</a>')
     else:
