@@ -444,7 +444,7 @@ def namumark(title, data):
                                 data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a title="' + results[0] + results[1] + '" href="/w/' + parse.quote(results[0]).replace('/','%2F') + results[1] + '">' + g + '</a>', data, 1)
                             else:
                                 data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a title="' + results[0] + results[1] + '" class="not_thing" href="/w/' + parse.quote(results[0]).replace('/','%2F') + results[1] + '">' + g + '</a>', data, 1)
-                            curs.execute("select * from back where title = '" + pymysql.escape_string(results[0]) + "'")
+                            curs.execute("select * from back where title = '" + pymysql.escape_string(results[0]) + "' and link = '" + pymysql.escape_string(title) + "'")
                             rows = curs.fetchall()
                             if(not rows):
                                 curs.execute("insert into back (title, link) value ('" + pymysql.escape_string(results[0]) + "', '" + pymysql.escape_string(title) + "')")
@@ -469,7 +469,7 @@ def namumark(title, data):
                                 data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a title="' + results[0] + '" href="/w/' + parse.quote(results[0]).replace('/','%2F') + '">' + results[1] + '</a>', data, 1)
                             else:
                                 data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a title="' + results[0] + '" class="not_thing" href="/w/' + parse.quote(results[0]).replace('/','%2F') + '">' + results[1] + '</a>', data, 1)
-                            curs.execute("select * from back where title = '" + pymysql.escape_string(results[0]) + "'")
+                            curs.execute("select * from back where title = '" + pymysql.escape_string(results[0]) + "' and link = '" + pymysql.escape_string(title) + "'")
                             rows = curs.fetchall()
                             if(not rows):
                                 curs.execute("insert into back (title, link) value ('" + pymysql.escape_string(results[0]) + "', '" + pymysql.escape_string(title) + "')")
@@ -491,7 +491,7 @@ def namumark(title, data):
                                 data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a href="/w/' + parse.quote(result[0]).replace('/','%2F') + result[1] + '">' + result[0] + result[1] + '</a>', data, 1)
                             else:
                                 data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a class="not_thing" href="/w/' + parse.quote(result[0]).replace('/','%2F') + result[1] + '">' + result[0] + result[1] + '</a>', data, 1)
-                            curs.execute("select * from back where title = '" + pymysql.escape_string(result[0]) + "'")
+                            curs.execute("select * from back where title = '" + pymysql.escape_string(result[0]) + "' and link = '" + pymysql.escape_string(title) + "'")
                             rows = curs.fetchall()
                             if(not rows):
                                 curs.execute("insert into back (title, link) value ('" + pymysql.escape_string(result[0]) + "', '" + pymysql.escape_string(title) + "')")
@@ -516,7 +516,7 @@ def namumark(title, data):
                                 data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a href="/w/' + parse.quote(result[0]).replace('/','%2F') + '">' + result[0] + '</a>', data, 1)
                             else:
                                 data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a class="not_thing" href="/w/' + parse.quote(result[0]).replace('/','%2F') + '">' + result[0] + '</a>', data, 1)
-                            curs.execute("select * from back where title = '" + pymysql.escape_string(result[0]) + "'")
+                            curs.execute("select * from back where title = '" + pymysql.escape_string(result[0]) + "' and link = '" + pymysql.escape_string(title) + "'")
                             rows = curs.fetchall()
                             if(not rows):
                                 curs.execute("insert into back (title, link) value ('" + pymysql.escape_string(result[0]) + "', '" + pymysql.escape_string(title) + "')")
@@ -1386,7 +1386,36 @@ def xref(name = None, number = None):
             curs.execute("select * from data where title = '" + pymysql.escape_string(rows[i]['link']) + "'")
             row = curs.fetchall()
             if(row):
-                if(re.search("\[\[" + name + "(?:#(?:[^|]*))?(?:\|(?:(?:(?!\]\]).)*))?\]\]", row[0]['data'])):
+                aa = row[0]['data']
+                while True:
+                    m = re.search("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]", aa)
+                    if(m):
+                        results = m.groups()
+                        if(results[0] == rows[i]['link']):
+                            aa = re.sub("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]", "", aa, 1)
+                        else:
+                            curs.execute("select * from data where title = '" + pymysql.escape_string(results[0]) + "'")
+                            rowss = curs.fetchall()
+                            if(rowss):
+                                enddata = rowss[0]['data']
+                                enddata = re.sub("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]", "", enddata)
+                                
+                                if(results[1]):
+                                    a = results[1]
+                                    while True:
+                                        g = re.search("([^= ,]*)\=([^,]*)", a)
+                                        if(g):
+                                            result = g.groups()
+                                            enddata = re.sub("@" + result[0] + "@", result[1], enddata)
+                                            a = re.sub("([^= ,]*)\=([^,]*)", "", a, 1)
+                                        else:
+                                            break                        
+                                aa = re.sub("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]", enddata, aa, 1)
+                            else:
+                                aa = re.sub("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]", "", aa, 1)
+                    else:
+                        break
+                if(re.search("\[\[" + name + "(?:#(?:[^|]*))?(?:\|(?:(?:(?!\]\]).)*))?\]\]", aa)):
                     div = div + '<li><a href="/w/' + parse.quote(rows[i]['link']).replace('/','%2F') + '">' + rows[i]['link'] + '</a></li>'
                     if(i == v):
                         if(number == 1):
