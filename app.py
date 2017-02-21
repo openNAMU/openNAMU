@@ -447,7 +447,7 @@ def namumark(title, data):
                             curs.execute("select * from back where title = '" + pymysql.escape_string(results[0]) + "'")
                             rows = curs.fetchall()
                             if(not rows):
-                                curs.execute("insert into back (title, link) value ('" + pymysql.escape_string(title) + "', '" + pymysql.escape_string(results[0]) + "')")
+                                curs.execute("insert into back (title, link) value ('" + pymysql.escape_string(results[0]) + "', '" + pymysql.escape_string(title) + "')")
                                 conn.commit()
                 else:
                     b = re.search("^http(?:s)?:\/\/", results[0])
@@ -1373,7 +1373,7 @@ def xref(name = None, number = None):
     v = number * 50
     i = v - 50
     div = ''
-    curs.execute("select * from back where link = '" + pymysql.escape_string(name) + "'")
+    curs.execute("select * from back where title = '" + pymysql.escape_string(name) + "'")
     rows = curs.fetchall()
     if(rows):
         while True:
@@ -1383,11 +1383,11 @@ def xref(name = None, number = None):
                 if(number != 1):
                     div = div + '<br><a href="/xref/n/' + str(number - 1) + '">(이전)'
                 break
-            curs.execute("select * from data where title = '" + pymysql.escape_string(rows[i]['title']) + "'")
+            curs.execute("select * from data where title = '" + pymysql.escape_string(rows[i]['link']) + "'")
             row = curs.fetchall()
             if(row):
                 if(re.search("\[\[" + name + "(?:#(?:[^|]*))?(?:\|(?:(?:(?!\]\]).)*))?\]\]", row[0]['data'])):
-                    div = div + '<li><a href="/w/' + parse.quote(rows[i]['title']).replace('/','%2F') + '">' + rows[i]['title'] + '</a></li>'
+                    div = div + '<li><a href="/w/' + parse.quote(rows[i]['link']).replace('/','%2F') + '">' + rows[i]['link'] + '</a></li>'
                     if(i == v):
                         if(number == 1):
                             div = div + '<br><a href="/xref/' + parse.quote(name).replace('/','%2F') + '/n/' + str(number + 1) + '">(다음)'
