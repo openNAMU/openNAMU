@@ -154,6 +154,12 @@ def namumark(title, data):
                 curs.execute("select * from data where title = '" + pymysql.escape_string(results[0]) + "'")
                 rows = curs.fetchall()
                 if(rows):
+                    curs.execute("select * from back where title = '" + pymysql.escape_string(results[0]) + "' and link = '" + pymysql.escape_string(title) + "'")
+                    abb = curs.fetchall()
+                    if(not abb):
+                        curs.execute("insert into back (title, link) value ('" + pymysql.escape_string(results[0]) + "', '" + pymysql.escape_string(title) + "')")
+                        conn.commit()
+                        
                     enddata = rows[0]['data']
                     enddata = re.sub("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]", "", enddata)
                     enddata = re.sub('<', '&lt;', enddata)
@@ -1410,7 +1416,7 @@ def xref(name = None, number = None):
                                             a = re.sub("([^= ,]*)\=([^,]*)", "", a, 1)
                                         else:
                                             break                        
-                                aa = re.sub("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]", enddata, aa, 1)
+                                aa = re.sub("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]", enddata + "\n\n [[" + results[0] + "]] \n\n", aa, 1)
                             else:
                                 aa = re.sub("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]", "", aa, 1)
                     else:
