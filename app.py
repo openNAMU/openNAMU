@@ -154,10 +154,10 @@ def namumark(title, data):
                 curs.execute("select * from data where title = '" + pymysql.escape_string(results[0]) + "'")
                 rows = curs.fetchall()
                 if(rows):
-                    curs.execute("select * from back where title = '" + pymysql.escape_string(results[0]) + "' and link = '" + pymysql.escape_string(title) + "'")
+                    curs.execute("select * from back where title = '" + pymysql.escape_string(results[0]) + "' and link = '" + pymysql.escape_string(title) + "' and type = 'include'")
                     abb = curs.fetchall()
                     if(not abb):
-                        curs.execute("insert into back (title, link) value ('" + pymysql.escape_string(results[0]) + "', '" + pymysql.escape_string(title) + "')")
+                        curs.execute("insert into back (title, link, type) value ('" + pymysql.escape_string(results[0]) + "', '" + pymysql.escape_string(title) + "',  'include')")
                         conn.commit()
                         
                     enddata = rows[0]['data']
@@ -453,7 +453,7 @@ def namumark(title, data):
                             curs.execute("select * from back where title = '" + pymysql.escape_string(results[0]) + "' and link = '" + pymysql.escape_string(title) + "'")
                             rows = curs.fetchall()
                             if(not rows):
-                                curs.execute("insert into back (title, link) value ('" + pymysql.escape_string(results[0]) + "', '" + pymysql.escape_string(title) + "')")
+                                curs.execute("insert into back (title, link, type) value ('" + pymysql.escape_string(results[0]) + "', '" + pymysql.escape_string(title) + "', '')")
                                 conn.commit()
                 else:
                     b = re.search("^http(?:s)?:\/\/", results[0])
@@ -478,7 +478,7 @@ def namumark(title, data):
                             curs.execute("select * from back where title = '" + pymysql.escape_string(results[0]) + "' and link = '" + pymysql.escape_string(title) + "'")
                             rows = curs.fetchall()
                             if(not rows):
-                                curs.execute("insert into back (title, link) value ('" + pymysql.escape_string(results[0]) + "', '" + pymysql.escape_string(title) + "')")
+                                curs.execute("insert into back (title, link, type) value ('" + pymysql.escape_string(results[0]) + "', '" + pymysql.escape_string(title) + "', '')")
                                 conn.commit()
             else:
                 aa = re.search("^(.*)(#(?:.*))$", result[0])
@@ -500,7 +500,7 @@ def namumark(title, data):
                             curs.execute("select * from back where title = '" + pymysql.escape_string(result[0]) + "' and link = '" + pymysql.escape_string(title) + "'")
                             rows = curs.fetchall()
                             if(not rows):
-                                curs.execute("insert into back (title, link) value ('" + pymysql.escape_string(result[0]) + "', '" + pymysql.escape_string(title) + "')")
+                                curs.execute("insert into back (title, link, type) value ('" + pymysql.escape_string(result[0]) + "', '" + pymysql.escape_string(title) + "', '')")
                                 conn.commit()
                 else:
                     b = re.search("^http(?:s)?:\/\/", result[0])
@@ -525,7 +525,7 @@ def namumark(title, data):
                             curs.execute("select * from back where title = '" + pymysql.escape_string(result[0]) + "' and link = '" + pymysql.escape_string(title) + "'")
                             rows = curs.fetchall()
                             if(not rows):
-                                curs.execute("insert into back (title, link) value ('" + pymysql.escape_string(result[0]) + "', '" + pymysql.escape_string(title) + "')")
+                                curs.execute("insert into back (title, link, type) value ('" + pymysql.escape_string(result[0]) + "', '" + pymysql.escape_string(title) + "', '')")
                                 conn.commit()
         else:
             break
@@ -1422,7 +1422,11 @@ def xref(name = None, number = None):
                     else:
                         break
                 if(re.search("\[\[" + name + "(?:#(?:[^|]*))?(?:\|(?:(?:(?!\]\]).)*))?\]\]", aa)):
-                    div = div + '<li><a href="/w/' + parse.quote(rows[i]['link']).replace('/','%2F') + '">' + rows[i]['link'] + '</a></li>'
+                    div = div + '<li><a href="/w/' + parse.quote(rows[i]['link']).replace('/','%2F') + '">' + rows[i]['link'] + '</a>'
+                    if(rows[i]['type']):
+                        div = div + ' (' + rows[i]['type'] + ')</li>'
+                    else:
+                        div = div + '</li>'
                     if(i == v):
                         if(number == 1):
                             div = div + '<br><a href="/xref/' + parse.quote(name).replace('/','%2F') + '/n/' + str(number + 1) + '">(다음)'
@@ -1950,7 +1954,7 @@ def setup():
     curs.execute("create table if not exists stop(title text not null, sub text not null, close text not null)")
     curs.execute("create table if not exists rb(block text not null, end text not null, today text not null, blocker text not null, why text not null)")
     curs.execute("create table if not exists login(user text not null, ip text not null, today text not null)")
-    curs.execute("create table if not exists back(title text not null, link text not null)")
+    curs.execute("create table if not exists back(title text not null, link text not null, type text not null)")
     return render_template('index.html', title = '설치 완료', logo = data['name'], data = '문제 없었음')
 
 @app.route('/other')
