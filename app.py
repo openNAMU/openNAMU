@@ -276,6 +276,11 @@ def namumark(title, data):
                 data = re.sub('^#(?:redirect|넘겨주기)\s([^\n]*)', '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(results[0]).replace('/','%2F') + '/redirect/' + parse.quote(title).replace('/','%2F') + results[1] + '" />', data, 1)
             else:
                 data = re.sub('^#(?:redirect|넘겨주기)\s([^\n]*)', '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(results[0]).replace('/','%2F') + '/redirect/' + parse.quote(title).replace('/','%2F') + '" />', data, 1)
+            curs.execute("select * from back where title = '" + pymysql.escape_string(results[0]) + "' and link = '" + pymysql.escape_string(title) + "' and type = 'redirect'")
+            abb = curs.fetchall()
+            if(not abb):
+                curs.execute("insert into back (title, link, type) value ('" + pymysql.escape_string(results[0]) + "', '" + pymysql.escape_string(title) + "',  'redirect')")
+                conn.commit()
         else:
             break
     
@@ -1421,6 +1426,7 @@ def xref(name = None, number = None):
                                 aa = re.sub("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]", "", aa, 1)
                     else:
                         break
+                aa = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', '[[\g<in>]]', aa)
                 if(re.search("\[\[" + name + "(?:#(?:[^|]*))?(?:\|(?:(?:(?!\]\]).)*))?\]\]", aa)):
                     div = div + '<li><a href="/w/' + parse.quote(rows[i]['link']).replace('/','%2F') + '">' + rows[i]['link'] + '</a>'
                     if(rows[i]['type']):
