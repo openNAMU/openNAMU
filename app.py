@@ -397,10 +397,16 @@ def namumark(title, data):
                 else:
                     height = ''
                 img = re.sub("\.(?P<in>jpg|png|gif|jpeg)", "#\g<in>#", c[0])
-                data = re.sub("\[\[파일:((?:(?!\]\]|\?).)*)(?:\?((?:(?!\]\]).)*))?\]\]", '<img src="/image/' + img + '" width="' + width + '" height="' + height + '">', data, 1)
+                data = re.sub("\[\[파일:((?:(?!\]\]|\?).)*)(?:\?((?:(?!\]\]).)*))?\]\]", '<a href="/w/파일:' + img + '"><img src="/image/' + img + '" width="' + width + '" height="' + height + '"></a>', data, 1)
             else:
                 img = re.sub("\.(?P<in>jpg|png|gif|jpeg)", "#\g<in>#", c[0])
-                data = re.sub("\[\[파일:((?:(?!\]\]|\?).)*)(?:\?((?:(?!\]\]).)*))?\]\]", "<img src='/image/" + img + "'>", data, 1)
+                data = re.sub("\[\[파일:((?:(?!\]\]|\?).)*)(?:\?((?:(?!\]\]).)*))?\]\]", "<a href='/w/파일:" + img + "'><img src='/image/" + img + "'></a>", data, 1)
+            if(not re.search("^파일:([^\n]*)", title)):
+                curs.execute("select * from back where title = '" + pymysql.escape_string(c[0]) + "' and link = '" + pymysql.escape_string(title) + "' and type = 'redirect'")
+                abb = curs.fetchall()
+                if(not abb):
+                    curs.execute("insert into back (title, link, type) value ('파일:" + pymysql.escape_string(c[0]) + "', '" + pymysql.escape_string(title) + "',  'file')")
+                    conn.commit()            
         else:
             break
     
