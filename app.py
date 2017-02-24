@@ -1677,7 +1677,36 @@ def w(name = None):
                 curs.execute("select * from data where title = '" + pymysql.escape_string(rows[i]['cat']) + "'")
                 row = curs.fetchall()
                 if(row):
-                    if(re.search("\[\[" + name + "\]\]", row[0]['data'])):
+                    aa = row[0]['data']
+                    while True:
+                        m = re.search("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]", aa)
+                        if(m):
+                            results = m.groups()
+                            if(results[0] == rows[i]['link']):
+                                aa = re.sub("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]", "", aa, 1)
+                            else:
+                                curs.execute("select * from data where title = '" + pymysql.escape_string(results[0]) + "'")
+                                rowss = curs.fetchall()
+                                if(rowss):
+                                    enddata = rowss[0]['data']
+                                    enddata = re.sub("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]", "", enddata)
+                                    
+                                    if(results[1]):
+                                        a = results[1]
+                                        while True:
+                                            g = re.search("([^= ,]*)\=([^,]*)", a)
+                                            if(g):
+                                                result = g.groups()
+                                                enddata = re.sub("@" + result[0] + "@", result[1], enddata)
+                                                a = re.sub("([^= ,]*)\=([^,]*)", "", a, 1)
+                                            else:
+                                                break                        
+                                    aa = re.sub("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]", enddata + "\n\n [[" + results[0] + "]] \n\n", aa, 1)
+                                else:
+                                    aa = re.sub("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]", "", aa, 1)
+                        else:
+                            break
+                    if(re.search("\[\[" + name + "\]\]", aa)):
                         div = div + '<li><a href="/w/' + parse.quote(rows[i]['cat']).replace('/','%2F') + '">' + rows[i]['cat'] + '</a></li>'
                         i = i + 1
                     else:
