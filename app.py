@@ -2223,7 +2223,9 @@ def sub(name = None, sub = None):
                     ip = ip + ' - Admin'
             today = getnow()
             discuss(name, sub, today)
-            curs.execute("insert into topic (id, title, sub, data, date, ip, block) value ('" + str(number) + "', '" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(sub) + "', '" + pymysql.escape_string(request.form["content"]) + "', '" + today + "', '" + ip + "', '')")
+            aa = request.form["content"]
+            aa = re.sub("\[\[(분류:(?:(?:(?!\]\]).)*))\]\]", "[br]", aa)
+            curs.execute("insert into topic (id, title, sub, data, date, ip, block) value ('" + str(number) + "', '" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(sub) + "', '" + pymysql.escape_string(aa) + "', '" + today + "', '" + ip + "', '')")
             conn.commit()
             return '<meta http-equiv="refresh" content="0;url=/topic/' + parse.quote(name).replace('/','%2F') + '/sub/' + parse.quote(sub).replace('/','%2F') + '" />'
     else:
