@@ -1682,7 +1682,7 @@ def w(name = None):
                         m = re.search("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]", aa)
                         if(m):
                             results = m.groups()
-                            if(results[0] == rows[i]['link']):
+                            if(results[0] == rows[i]['cat']):
                                 aa = re.sub("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]", "", aa, 1)
                             else:
                                 curs.execute("select * from data where title = '" + pymysql.escape_string(results[0]) + "'")
