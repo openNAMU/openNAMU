@@ -361,7 +361,26 @@ def namumark(title, data):
     
     data = re.sub("\[목차\]", rtoc, data)
     
-    data = re.sub("\[\[분류:(((?!\]\]).)*)\]\]", '', data)
+    category = ''
+    while True:
+        m = re.search("\[\[(분류:(?:(?:(?!\]\]).)*))\]\]", data)
+        if(m):
+            g = m.groups()
+            if(not title == g[0]):
+                curs.execute("select * from cat where title = '" + pymysql.escape_string(g[0]) + "' and cat = '" + pymysql.escape_string(title) + "'")
+                abb = curs.fetchall()
+                if(not abb):
+                    curs.execute("insert into cat (title, cat) value ('" + pymysql.escape_string(g[0]) + "', '" + pymysql.escape_string(title) + "')")
+                    conn.commit()                
+                    
+                if(category == ''):
+                    category = category + '<a href="/w/' + parse.quote(g[0]).replace('/','%2F') + '">' + re.sub("분류:", "", g[0]) + '</a>'
+                else:
+                    category = category + ' / ' + '<a href="/w/' + parse.quote(g[0]).replace('/','%2F') + '">' + re.sub("분류:", "", g[0]) + '</a>'
+            
+            data = re.sub("\[\[(분류:(?:(?:(?!\]\]).)*))\]\]", '', data, 1)
+        else:
+            break
 
     data = re.sub("'''(?P<in>.+?)'''(?!')", '<b>\g<in></b>', data)
     data = re.sub("''(?P<in>.+?)''(?!')", '<i>\g<in></i>', data)
@@ -626,7 +645,10 @@ def namumark(title, data):
     
     data = re.sub("\[각주\](?:(?:<br>| |\r|\n)+)?$", "", data)
     data = re.sub("\[각주\]", "<br>" + tou, data)
-    data = data + tou;
+    data = data + tou
+    
+    if(category):
+        data = data + '<div style="width:100%;border: 1px solid #777;padding: 5px;margin-top: 1em;">분류: ' + category + '</div>'
     
     while True:
         m = re.search("(\|\|(?:(?:(?:.*)\n?)\|\|)+)", data)
@@ -1448,12 +1470,12 @@ def xref(name = None, number = None):
                     else:
                         i = i + 1
                 else:
-                    curs.execute("delete from back where link = '" + pymysql.escape_string(name) + "'")
+                    curs.execute("delete from back where title = '" + pymysql.escape_string(rows[i]['link']) + "' and link = '" + pymysql.escape_string(name) + "'")
                     conn.commit()
                     i = i + 1
                     v = v + 1
             else:
-                curs.execute("delete from back where link = '" + pymysql.escape_string(name) + "'")
+                curs.execute("delete from back where title = '" + pymysql.escape_string(rows[i]['link']) + "' and link = '" + pymysql.escape_string(name) + "'")
                 conn.commit()
                 i = i + 1
                 v = v + 1
@@ -1641,36 +1663,85 @@ def w(name = None):
     else:
         uppage = ""
         style = "display:none;"
-    m = re.search("^사용자:(.*)", name)
-    if(m):
-        g = m.groups()
-        curs.execute("select * from user where id = '" + pymysql.escape_string(g[0]) + "'")
+    if(re.search("^분류:", name)):
+        curs.execute("select * from cat where title = '" + pymysql.escape_string(name) + "'")
         rows = curs.fetchall()
         if(rows):
-            if(rows[0]['acl'] == 'owner'):
-                acl = '(소유자)'
-            elif(rows[0]['acl'] == 'admin'):
-                acl = '(관리자)'
-    curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
-    rows = curs.fetchall()
-    if(rows):
-        if(rows[0]['acl'] == 'admin'):
-            acl = '(관리자)'
-        elif(rows[0]['acl'] == 'user'):
-            acl = '(유저)'
+            div = ''
+            i = 0
+            while True:
+                try:
+                    a = rows[i]
+                except:
+                    break
+                curs.execute("select * from data where title = '" + pymysql.escape_string(rows[i]['cat']) + "'")
+                row = curs.fetchall()
+                if(row):
+                    if(re.search("\[\[" + name + "\]\]", row[0]['data'])):
+                        div = div + '<li><a href="/w/' + parse.quote(rows[i]['cat']).replace('/','%2F') + '">' + rows[i]['cat'] + '</a></li>'
+                        i = i + 1
+                    else:
+                        curs.execute("delete from cat where title = '" + pymysql.escape_string(rows[i]['cat']) + "' and cat = '" + pymysql.escape_string(name) + "'")
+                        conn.commit()
+                        i = i + 1
+                else:
+                    curs.execute("delete from cat where title = '" + pymysql.escape_string(rows[i]['cat']) + "' and cat = '" + pymysql.escape_string(name) + "'")
+                    conn.commit()
+                    i = i + 1
+            div = '<h2>분류</h2>' + div
+            curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
+            bb = curs.fetchall()
+            if(bb):
+                if(bb[0]['acl'] == 'admin'):
+                    acl = '(관리자)'
+                elif(bb[0]['acl'] == 'user'):
+                    acl = '(유저)'
+                else:
+                    if(not acl):
+                        acl = ''
+                enddata = namumark(name, bb[0]['data'])
+                m = re.search('<div id="toc">((?:(?!\/div>).)*)<\/div>', enddata)
+                if(m):
+                    result = m.groups()
+                    left = result[0]
+                else:
+                    left = ''
+                return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = enddata + '<br>' + div, license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl)
+            else:
+                return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = div, license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl)
         else:
-            if(not acl):
-                acl = ''
-        enddata = namumark(name, rows[0]['data'])
-        m = re.search('<div id="toc">((?:(?!\/div>).)*)<\/div>', enddata)
-        if(m):
-            result = m.groups()
-            left = result[0]
-        else:
-            left = ''
-        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = enddata, license = data['license'], tn = 1, acl = acl, left = left, uppage = uppage, style = style)
+            return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = '분류 문서 없음', license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl)
     else:
-        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = '문서 없음', license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl)
+        m = re.search("^사용자:(.*)", name)
+        if(m):
+            g = m.groups()
+            curs.execute("select * from user where id = '" + pymysql.escape_string(g[0]) + "'")
+            rows = curs.fetchall()
+            if(rows):
+                if(rows[0]['acl'] == 'owner'):
+                    acl = '(소유자)'
+                elif(rows[0]['acl'] == 'admin'):
+                    acl = '(관리자)'
+        curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
+        rows = curs.fetchall()
+        if(rows):
+            if(rows[0]['acl'] == 'admin'):
+                acl = '(관리자)'
+            elif(rows[0]['acl'] == 'user'):
+                acl = '(유저)'
+            else:
+                if(not acl):
+                    acl = ''
+            enddata = namumark(name, rows[0]['data'])
+            m = re.search('<div id="toc">((?:(?!\/div>).)*)<\/div>', enddata)
+            if(m):
+                result = m.groups()
+                left = result[0]
+            else:
+                left = ''
+            return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = enddata, license = data['license'], tn = 1, acl = acl, left = left, uppage = uppage, style = style)
+        else:
+            return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = '문서 없음', license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl)
 
 @app.route('/w/<path:name>/redirect/<redirect>')
 def redirectw(name = None, redirect = None):
@@ -1967,6 +2038,7 @@ def setup():
     curs.execute("create table if not exists rb(block text not null, end text not null, today text not null, blocker text not null, why text not null)")
     curs.execute("create table if not exists login(user text not null, ip text not null, today text not null)")
     curs.execute("create table if not exists back(title text not null, link text not null, type text not null)")
+    curs.execute("create table if not exists cat(title text not null, cat text not null)")
     return render_template('index.html', title = '설치 완료', logo = data['name'], data = '문제 없었음')
 
 @app.route('/other')
