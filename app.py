@@ -2423,6 +2423,39 @@ def login():
             else:
                 return render_template('index.html', title = '로그인', enter = '로그인', logo = data['name'], tn = 15)
                 
+@app.route('/change', methods=['POST', 'GET'])
+def change():
+    if(request.method == 'POST'):
+        ip = getip(request)
+        ban = getban(ip)
+        if(ban == 1):
+            return '<meta http-equiv="refresh" content="0;url=/ban" />'
+        else:
+            curs.execute("select * from user where id = '" + pymysql.escape_string(request.form["id"]) + "'")
+            rows = curs.fetchall()
+            if(rows):
+                if(session.get('Now') == True):
+                    return '<meta http-equiv="refresh" content="0;url=/logout" />'
+                elif(bcrypt.checkpw(bytes(request.form["pw"], 'utf-8'), bytes(rows[0]['pw'], 'utf-8'))):
+                    hashed = bcrypt.hashpw(bytes(request.form["pw2"], 'utf-8'), bcrypt.gensalt())
+                    curs.execute("update user set pw = '" + pymysql.escape_string(hashed.decode()) + "' where id = '" + pymysql.escape_string(request.form["id"]) + "'")
+                    conn.commit()
+                    return '<meta http-equiv="refresh" content="0;url=/login" />'
+                else:
+                    return render_template('index.html', title = '변경 오류', logo = data['name'], data = '비밀번호가 다릅니다.')
+            else:
+                return render_template('index.html', title = '변경 오류', logo = data['name'], data = '없는 계정 입니다.')
+    else:
+        ip = getip(request)
+        ban = getban(ip)
+        if(ban == 1):
+            return '<meta http-equiv="refresh" content="0;url=/ban" />'
+        else:
+            if(session.get('Now') == True):
+                return '<meta http-equiv="refresh" content="0;url=/logout" />'
+            else:
+                return render_template('index.html', title = '비밀번호 변경', enter = '비밀번호 변경', logo = data['name'], tn = 15)
+                
 @app.route('/check/<path:name>')
 def check(name = None, sub = None, number = None):
     curs.execute("select * from user where id = '" + pymysql.escape_string(name) + "'")
@@ -2739,7 +2772,7 @@ def user():
             acl = '일반'
     else:
         acl = '차단'
-    return render_template('index.html', title = '유저 메뉴', logo = data['name'], data = ip + '<br><br><span>권한 상태 : ' + acl + '<br><br><li><a href="/login">로그인</a></li><li><a href="/logout">로그아웃</a></li><li><a href="/register">회원가입</a></li>')
+    return render_template('index.html', title = '유저 메뉴', logo = data['name'], data = ip + '<br><br><span>권한 상태 : ' + acl + '<br><br><li><a href="/login">로그인</a></li><li><a href="/logout">로그아웃</a></li><li><a href="/register">회원가입</a></li><li><a href="/change">비밀번호 변경</a></li>')
 
 @app.route('/random')
 def random():
