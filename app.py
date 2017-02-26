@@ -1156,7 +1156,7 @@ def history(title, data, date, ip, send, leng):
         curs.execute("insert into history (id, title, data, date, ip, send, leng) value ('" + str(number) + "', '" + pymysql.escape_string(title) + "', '" + pymysql.escape_string(data) + "', '" + date + "', '" + pymysql.escape_string(ip) + "', '" + pymysql.escape_string(send) + "', '" + leng + "')")
         conn.commit()
     else:
-        curs.execute("insert into history (id, title, data, date, ip, send, leng) value ('1', '" + pymysql.escape_string(title) + "', '" + pymysql.escape_string(data) + "', '" + date + "', '" + pymysql.escape_string(ip) + "', '" + pymysql.escape_string(send + ' (새 문서)') + "', '" + leng + "')")
+        curs.execute("insert into history (id, title, data, date, ip, send, leng) value ('1', '" + pymysql.escape_string(title) + "', '" + pymysql.escape_string(data) + "', '" + date + "', '" + pymysql.escape_string(ip) + "', '" + pymysql.escape_string(send + ' (' + lang['newdoc']  + ')') + "', '" + leng + "')")
         conn.commit()
 
 def getleng(existing, change):
@@ -1184,30 +1184,30 @@ def upload():
                 if(re.search('^([^./\\*<>|:?"]+)\.(jpg|gif|jpeg|png)$', file.filename)):
                     filename = file.filename
                     if(os.path.exists(os.path.join('image', filename))):
-                        return render_template('index.html', logo = data['name'], title = '업로드 오류', data = '동일한 이름의 파일이 있습니다.')
+                        return render_template('index.html', logo = data['name'], title = lang['uploaderror'], data = lang['equalnameexist'])
                     else:
                         file.save(os.path.join('image', filename))
                         curs.execute("insert into data (title, data, acl) value ('" + pymysql.escape_string('' + lang['file']  + ':' + filename) + "', '" + pymysql.escape_string('[[' + lang['file']  + ':' + filename + ']][br][br]{{{[[' + lang['file']  + ':' + filename + ']]}}}') + "', '')")
                         conn.commit()
-                        return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote('' + lang['file']  + ':' + filename).replace('/','%2F') + '" />'
+                        return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(lang['file']  + ':' + filename).replace('/','%2F') + '" />'
                 else:
-                    return render_template('index.html', logo = data['name'], title = '업로드 오류', data = '' + lang['file']  + ' 명에 ./\*<>|:? 들은 불가능 합니다.')
+                    return render_template('index.html', logo = data['name'], title = lang['uploaderror'], data = lang['filenameerror'])
             else:
-                return render_template('index.html', logo = data['name'], title = '업로드 오류', data = 'jpg gif jpeg png만 가능 합니다.')
+                return render_template('index.html', logo = data['name'], title = lang['uploaderror'], data = lang['fileextensionerror'])
     else:
         ip = getip(request)
         ban = getban(ip)
         if(ban == 1):
             return '<meta http-equiv="refresh" content="0;url=/ban" />'
         else:
-            return render_template('index.html', logo = data['name'], title = '' + lang['upload']  + '', tn = 21, number = data['upload'])
+            return render_template('index.html', logo = data['name'], title = lang['upload'], tn = 21, number = data['upload'])
     
 @app.route('/image/<path:name>')
 def image(name = None):
     if(os.path.exists(os.path.join('image', name))):
         return send_file(os.path.join('image', name), mimetype='image')
     else:
-        return render_template('index.html', logo = data['name'], data = '' + lang['noimage']  + '', title = '' + lang['viewimage']  + '')
+        return render_template('index.html', logo = data['name'], data = lang['noimage'], title = lang['viewimage'])
     
 @app.route('/')
 @app.route('/w/')
@@ -1254,27 +1254,27 @@ def recentchanges():
                         curs.execute("select * from ban where block = '" + pymysql.escape_string(rows[i]['ip']) + "'")
                         row = curs.fetchall()
                         if(row):
-                            ban = ' <a href="/ban/' + parse.quote(rows[i]['ip']).replace('/','%2F') + '">(해제)</a>'
+                            ban = ' <a href="/ban/' + parse.quote(rows[i]['ip']).replace('/','%2F') + '">' + lang['unblock'] +'</a>'
                         else:
-                            ban = ' <a href="/ban/' + parse.quote(rows[i]['ip']).replace('/','%2F') + '">(차단)</a>'
+                            ban = ' <a href="/ban/' + parse.quote(rows[i]['ip']).replace('/','%2F') + '">' + lang['block'] +'</a>'
                 else:
                     curs.execute("select * from ban where block = '" + pymysql.escape_string(rows[i]['ip']) + "'")
                     row = curs.fetchall()
                     if(row):
-                        ban = ' <a href="/ban/' + parse.quote(rows[i]['ip']).replace('/','%2F') + '">(해제)</a>'
+                        ban = ' <a href="/ban/' + parse.quote(rows[i]['ip']).replace('/','%2F') + '">' + lang['unblock'] +'</a>'
                     else:
-                        ban = ' <a href="/ban/' + parse.quote(rows[i]['ip']).replace('/','%2F') + '">(차단)</a>'
+                        ban = ' <a href="/ban/' + parse.quote(rows[i]['ip']).replace('/','%2F') + '">' + lang['block'] +'</a>'
             else:
                 ban = ''
             if(re.search('\.', rows[i]['ip'])):
                 ip = rows[i]['ip']
             else:
-                curs.execute("select * from data where title = '사용자:" + pymysql.escape_string(rows[i]['ip']) + "'")
+                curs.execute("select * from data where title = "+ lang['user'] + ":" + pymysql.escape_string(rows[i]['ip']) + "'")
                 row = curs.fetchall()
                 if(row):
-                    ip = '<a href="/w/' + parse.quote('사용자:' + rows[i]['ip']).replace('/','%2F') + '">' + rows[i]['ip'] + '</a>'
+                    ip = '<a href="/w/' + parse.quote(lang['user'] + rows[i]['ip']).replace('/','%2F') + '">' + rows[i]['ip'] + '</a>'
                 else:
-                    ip = '<a class="not_thing" href="/w/' + parse.quote('사용자:' + rows[i]['ip']).replace('/','%2F') + '">' + rows[i]['ip'] + '</a>'
+                    ip = '<a class="not_thing" href="/w/' + parse.quote(lang['user'] + rows[i]['ip']).replace('/','%2F') + '">' + rows[i]['ip'] + '</a>'
             if((int(rows[i]['id']) - 1) == 0):
                 revert = ''
             else:
