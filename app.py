@@ -12,8 +12,10 @@ import difflib
 
 json_data = open('set.json').read()
 data = json.loads(json_data)
-
-print('오픈나무 시작 포트 : ' + data['port'])
+translate_data = open ('translate/' + data['lang'] + '.json').read()
+lang = json.loads(translate_data)
+print(lang['message'])
+print('openNAMU Running on port : ' + data['port'])
 
 import logging
 log = logging.getLogger('werkzeug')
@@ -267,15 +269,15 @@ def namumark(title, data):
             break
     
     while True:
-        m = re.search('^#(?:redirect|넘겨주기)\s([^\n]*)', data)
+        m = re.search('^#(?:redirect|' + lang['redirect']  + ')\s([^\n]*)', data)
         if(m):
             results = m.groups()
             aa = re.search("^(.*)(#(?:.*))$", results[0])
             if(aa):
                 results = aa.groups()
-                data = re.sub('^#(?:redirect|넘겨주기)\s([^\n]*)', '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(results[0]).replace('/','%2F') + '/redirect/' + parse.quote(title).replace('/','%2F') + results[1] + '" />', data, 1)
+                data = re.sub('^#(?:redirect|' + lang['redirect']  + ')\s([^\n]*)', '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(results[0]).replace('/','%2F') + '/redirect/' + parse.quote(title).replace('/','%2F') + results[1] + '" />', data, 1)
             else:
-                data = re.sub('^#(?:redirect|넘겨주기)\s([^\n]*)', '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(results[0]).replace('/','%2F') + '/redirect/' + parse.quote(title).replace('/','%2F') + '" />', data, 1)
+                data = re.sub('^#(?:redirect|' + lang['redirect']  + ')\s([^\n]*)', '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(results[0]).replace('/','%2F') + '/redirect/' + parse.quote(title).replace('/','%2F') + '" />', data, 1)
             curs.execute("select * from back where title = '" + pymysql.escape_string(results[0]) + "' and link = '" + pymysql.escape_string(title) + "' and type = 'redirect'")
             abb = curs.fetchall()
             if(not abb):
@@ -305,7 +307,7 @@ def namumark(title, data):
     h4c = 0;
     h5c = 0;
     last = 0;
-    rtoc = '<div id="toc"><span id="toc-name">목차</span><br><br>'
+    rtoc = '<div id="toc"><span id="toc-name">' + lang['toc']  + '</span><br><br>'
     while True:
         m = re.search('(={1,6})\s?([^=]*)\s?(?:={1,6})(?:\s+)?\n', data)
         if(m):
@@ -359,11 +361,11 @@ def namumark(title, data):
             rtoc = rtoc + '</div>'
             break
     
-    data = re.sub("\[목차\]", rtoc, data)
+    data = re.sub("\[" + lang['toc']  + "\]", rtoc, data)
     
     category = ''
     while True:
-        m = re.search("\[\[(분류:(?:(?:(?!\]\]).)*))\]\]", data)
+        m = re.search("\[\[(" + lang['classification']  + ":(?:(?:(?!\]\]).)*))\]\]", data)
         if(m):
             g = m.groups()
             if(not title == g[0]):
@@ -374,11 +376,11 @@ def namumark(title, data):
                     conn.commit()                
                     
                 if(category == ''):
-                    category = category + '<a href="/w/' + parse.quote(g[0]).replace('/','%2F') + '">' + re.sub("분류:", "", g[0]) + '</a>'
+                    category = category + '<a href="/w/' + parse.quote(g[0]).replace('/','%2F') + '">' + re.sub("" + lang['classification']  + ":", "", g[0]) + '</a>'
                 else:
-                    category = category + ' / ' + '<a href="/w/' + parse.quote(g[0]).replace('/','%2F') + '">' + re.sub("분류:", "", g[0]) + '</a>'
+                    category = category + ' / ' + '<a href="/w/' + parse.quote(g[0]).replace('/','%2F') + '">' + re.sub("" + lang['classification']  + ":", "", g[0]) + '</a>'
             
-            data = re.sub("\[\[(분류:(?:(?:(?!\]\]).)*))\]\]", '', data, 1)
+            data = re.sub("\[\[(" + lang['classification']  + ":(?:(?:(?!\]\]).)*))\]\]", '', data, 1)
         else:
             break
 
@@ -399,7 +401,7 @@ def namumark(title, data):
     data = re.sub("##\s?(?P<in>[^\n]*)\n", "<div style='display:none;'>\g<in></div>", data);
     
     while True:
-        m = re.search("\[\[파일:((?:(?!\]\]|\|).)*)(?:\|((?:(?!\]\]).)*))?\]\]", data)
+        m = re.search("\[\[" + lang['file']  + ":((?:(?!\]\]|\|).)*)(?:\|((?:(?!\]\]).)*))?\]\]", data)
         if(m):
             c = m.groups()
             if(c[1]):
@@ -416,15 +418,15 @@ def namumark(title, data):
                 else:
                     height = ''
                 img = re.sub("\.(?P<in>jpg|png|gif|jpeg)", "#\g<in>#", c[0])
-                data = re.sub("\[\[파일:((?:(?!\]\]|\?).)*)(?:\?((?:(?!\]\]).)*))?\]\]", '<a href="/w/파일:' + img + '"><img src="/image/' + img + '" width="' + width + '" height="' + height + '"></a>', data, 1)
+                data = re.sub("\[\[" + lang['file']  + ":((?:(?!\]\]|\?).)*)(?:\?((?:(?!\]\]).)*))?\]\]", '<a href="/w/" + lang['file']  + ":' + img + '"><img src="/image/' + img + '" width="' + width + '" height="' + height + '"></a>', data, 1)
             else:
                 img = re.sub("\.(?P<in>jpg|png|gif|jpeg)", "#\g<in>#", c[0])
-                data = re.sub("\[\[파일:((?:(?!\]\]|\?).)*)(?:\?((?:(?!\]\]).)*))?\]\]", "<a href='/w/파일:" + img + "'><img src='/image/" + img + "'></a>", data, 1)
-            if(not re.search("^파일:([^\n]*)", title)):
+                data = re.sub("\[\[" + lang['file']  + ":((?:(?!\]\]|\?).)*)(?:\?((?:(?!\]\]).)*))?\]\]", "<a href='/w/" + lang['file']  + ":" + img + "'><img src='/image/" + img + "'></a>", data, 1)
+            if(not re.search("^" + lang['file']  + ":([^\n]*)", title)):
                 curs.execute("select * from back where title = '" + pymysql.escape_string(c[0]) + "' and link = '" + pymysql.escape_string(title) + "' and type = 'redirect'")
                 abb = curs.fetchall()
                 if(not abb):
-                    curs.execute("insert into back (title, link, type) value ('파일:" + pymysql.escape_string(c[0]) + "', '" + pymysql.escape_string(title) + "',  'file')")
+                    curs.execute("insert into back (title, link, type) value ('" + lang['file']  + ":" + pymysql.escape_string(c[0]) + "', '" + pymysql.escape_string(title) + "',  'file')")
                     conn.commit()            
         else:
             break
@@ -989,8 +991,8 @@ def getip(request):
     return ip
 
 def getcan(ip, name):
-    m = re.search("^사용자:(.*)", name)
-    n = re.search("^파일:(.*)", name)
+    m = re.search("^" + lang['user']  + ":(.*)", name)
+    n = re.search("^" + lang['file']  + ":(.*)", name)
     if(m):
         g = m.groups()
         if(ip == g[0]):
@@ -1154,7 +1156,7 @@ def history(title, data, date, ip, send, leng):
         curs.execute("insert into history (id, title, data, date, ip, send, leng) value ('" + str(number) + "', '" + pymysql.escape_string(title) + "', '" + pymysql.escape_string(data) + "', '" + date + "', '" + pymysql.escape_string(ip) + "', '" + pymysql.escape_string(send) + "', '" + leng + "')")
         conn.commit()
     else:
-        curs.execute("insert into history (id, title, data, date, ip, send, leng) value ('1', '" + pymysql.escape_string(title) + "', '" + pymysql.escape_string(data) + "', '" + date + "', '" + pymysql.escape_string(ip) + "', '" + pymysql.escape_string(send + ' (새 문서)') + "', '" + leng + "')")
+        curs.execute("insert into history (id, title, data, date, ip, send, leng) value ('1', '" + pymysql.escape_string(title) + "', '" + pymysql.escape_string(data) + "', '" + date + "', '" + pymysql.escape_string(ip) + "', '" + pymysql.escape_string(send + ' (' + lang['newdoc']  + ')') + "', '" + leng + "')")
         conn.commit()
 
 def getleng(existing, change):
@@ -1182,30 +1184,30 @@ def upload():
                 if(re.search('^([^./\\*<>|:?"]+)\.(jpg|gif|jpeg|png)$', file.filename)):
                     filename = file.filename
                     if(os.path.exists(os.path.join('image', filename))):
-                        return render_template('index.html', logo = data['name'], title = '업로드 오류', data = '동일한 이름의 파일이 있습니다.')
+                        return render_template('index.html', logo = data['name'], title = lang['uploaderror'], data = lang['equalnameexist'])
                     else:
                         file.save(os.path.join('image', filename))
-                        curs.execute("insert into data (title, data, acl) value ('" + pymysql.escape_string('파일:' + filename) + "', '" + pymysql.escape_string('[[파일:' + filename + ']][br][br]{{{[[파일:' + filename + ']]}}}') + "', '')")
+                        curs.execute("insert into data (title, data, acl) value ('" + pymysql.escape_string('' + lang['file']  + ':' + filename) + "', '" + pymysql.escape_string('[[' + lang['file']  + ':' + filename + ']][br][br]{{{[[' + lang['file']  + ':' + filename + ']]}}}') + "', '')")
                         conn.commit()
-                        return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote('파일:' + filename).replace('/','%2F') + '" />'
+                        return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(lang['file']  + ':' + filename).replace('/','%2F') + '" />'
                 else:
-                    return render_template('index.html', logo = data['name'], title = '업로드 오류', data = '파일 명에 ./\*<>|:? 들은 불가능 합니다.')
+                    return render_template('index.html', logo = data['name'], title = lang['uploaderror'], data = lang['filenameerror'])
             else:
-                return render_template('index.html', logo = data['name'], title = '업로드 오류', data = 'jpg gif jpeg png만 가능 합니다.')
+                return render_template('index.html', logo = data['name'], title = lang['uploaderror'], data = lang['fileextensionerror'])
     else:
         ip = getip(request)
         ban = getban(ip)
         if(ban == 1):
             return '<meta http-equiv="refresh" content="0;url=/ban" />'
         else:
-            return render_template('index.html', logo = data['name'], title = '업로드', tn = 21, number = data['upload'])
+            return render_template('index.html', logo = data['name'], title = lang['upload'], tn = 21, number = data['upload'])
     
 @app.route('/image/<path:name>')
 def image(name = None):
     if(os.path.exists(os.path.join('image', name))):
         return send_file(os.path.join('image', name), mimetype='image')
     else:
-        return render_template('index.html', logo = data['name'], data = '이미지 없음.', title = '이미지 보기')
+        return render_template('index.html', logo = data['name'], data = lang['noimage'], title = lang['viewimage'])
     
 @app.route('/')
 @app.route('/w/')
@@ -1252,31 +1254,31 @@ def recentchanges():
                         curs.execute("select * from ban where block = '" + pymysql.escape_string(rows[i]['ip']) + "'")
                         row = curs.fetchall()
                         if(row):
-                            ban = ' <a href="/ban/' + parse.quote(rows[i]['ip']).replace('/','%2F') + '">(해제)</a>'
+                            ban = ' <a href="/ban/' + parse.quote(rows[i]['ip']).replace('/','%2F') + '">' + lang['unblock'] +'</a>'
                         else:
-                            ban = ' <a href="/ban/' + parse.quote(rows[i]['ip']).replace('/','%2F') + '">(차단)</a>'
+                            ban = ' <a href="/ban/' + parse.quote(rows[i]['ip']).replace('/','%2F') + '">' + lang['block'] +'</a>'
                 else:
                     curs.execute("select * from ban where block = '" + pymysql.escape_string(rows[i]['ip']) + "'")
                     row = curs.fetchall()
                     if(row):
-                        ban = ' <a href="/ban/' + parse.quote(rows[i]['ip']).replace('/','%2F') + '">(해제)</a>'
+                        ban = ' <a href="/ban/' + parse.quote(rows[i]['ip']).replace('/','%2F') + '">' + lang['unblock'] +'</a>'
                     else:
-                        ban = ' <a href="/ban/' + parse.quote(rows[i]['ip']).replace('/','%2F') + '">(차단)</a>'
+                        ban = ' <a href="/ban/' + parse.quote(rows[i]['ip']).replace('/','%2F') + '">' + lang['block'] +'</a>'
             else:
                 ban = ''
             if(re.search('\.', rows[i]['ip'])):
                 ip = rows[i]['ip']
             else:
-                curs.execute("select * from data where title = '사용자:" + pymysql.escape_string(rows[i]['ip']) + "'")
+                curs.execute("select * from data where title = "+ lang['user'] + ":" + pymysql.escape_string(rows[i]['ip']) + "'")
                 row = curs.fetchall()
                 if(row):
-                    ip = '<a href="/w/' + parse.quote('사용자:' + rows[i]['ip']).replace('/','%2F') + '">' + rows[i]['ip'] + '</a>'
+                    ip = '<a href="/w/' + parse.quote(lang['user'] + rows[i]['ip']).replace('/','%2F') + '">' + rows[i]['ip'] + '</a>'
                 else:
-                    ip = '<a class="not_thing" href="/w/' + parse.quote('사용자:' + rows[i]['ip']).replace('/','%2F') + '">' + rows[i]['ip'] + '</a>'
+                    ip = '<a class="not_thing" href="/w/' + parse.quote(lang['user'] + rows[i]['ip']).replace('/','%2F') + '">' + rows[i]['ip'] + '</a>'
             if((int(rows[i]['id']) - 1) == 0):
                 revert = ''
             else:
-                revert = '<a href="/revert/' + parse.quote(rows[i]['title']).replace('/','%2F') + '/r/' + str(int(rows[i]['id']) - 1) + '">(되돌리기)</a>'
+                revert = '<a href="/revert/' + parse.quote(rows[i]['title']).replace('/','%2F') + '/r/' + str(int(rows[i]['id']) - 1) + '">(' + lang['revert'] + ')</a>'
             div = div + '<table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;"><a href="/w/' + parse.quote(rows[i]['title']).replace('/','%2F') + '">' + title + '</a> <a href="/history/' + parse.quote(rows[i]['title']).replace('/','%2F') + '/n/1">(역사)</a> ' + revert + ' (' + leng + ')</td><td style="text-align: center;width:33.33%;">' + ip + ban + '</td><td style="text-align: center;width:33.33%;">' + rows[i]['date'] + '</td></tr><tr><td colspan="3" style="text-align: center;width:100%;">' + send + '</td></tr></tbody></table>'
             i = i + 1
         return render_template('index.html', logo = data['name'], rows = div, tn = 3, title = '최근 변경내역')

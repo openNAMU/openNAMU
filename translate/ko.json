@@ -1,0 +1,18 @@
+{
+	"redirect": "넘겨주기",
+	"toc": "목차",
+	"classification": "분류",
+	"file": "파일",
+	"user": "사용자",
+	"upload": "업로드",
+	"noimage": "이미지 없음",
+	"viewimage": "이미지 보기",
+	"newdoc": "새 문서",
+	"uploaderror": "업로드 오류",
+	"equalnameexist": "동일한 이름의 파일이 있습니다.",
+	"filenameerror": "파일명에 ./\\*<>|:? 들은 불가능 합니다.",
+	"fileextensionerror": "jpg gif jpeg png만 가능 합니다.",
+	"unblock":"차단 해제",
+	"block":"차단",
+	"revert":"되돌리기",
+}
