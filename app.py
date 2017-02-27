@@ -1665,7 +1665,7 @@ def w(name = None):
     else:
         uppage = ""
         style = "display:none;"
-    if(re.search("^분류:", name)):
+    if(re.search("^" + lang['classification'] + ":", name)):
         curs.execute("select * from cat where title = '" + pymysql.escape_string(name) + "'")
         rows = curs.fetchall()
         if(rows):
@@ -1719,14 +1719,14 @@ def w(name = None):
                     curs.execute("delete from cat where title = '" + pymysql.escape_string(rows[i]['cat']) + "' and cat = '" + pymysql.escape_string(name) + "'")
                     conn.commit()
                     i = i + 1
-            div = '<h2>분류</h2>' + div
+            div = '<h2>' + lang['classification'] + '</h2>' + div
             curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
             bb = curs.fetchall()
             if(bb):
                 if(bb[0]['acl'] == 'admin'):
-                    acl = '(관리자)'
+                    acl = '(' + lang['admin'] + ')'
                 elif(bb[0]['acl'] == 'user'):
-                    acl = '(유저)'
+                    acl = '(' + lang['user'] + ')'
                 else:
                     if(not acl):
                         acl = ''
@@ -1741,25 +1741,25 @@ def w(name = None):
             else:
                 return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = div, license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl)
         else:
-            return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = '분류 문서 없음', license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl)
+            return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = lang['noclassificationdocument'], license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl)
     else:
-        m = re.search("^사용자:(.*)", name)
+        m = re.search("^" + lang['user'] + ":(.*)", name)
         if(m):
             g = m.groups()
             curs.execute("select * from user where id = '" + pymysql.escape_string(g[0]) + "'")
             rows = curs.fetchall()
             if(rows):
                 if(rows[0]['acl'] == 'owner'):
-                    acl = '(소유자)'
+                    acl = '(' + lang['owner'] + ')'
                 elif(rows[0]['acl'] == 'admin'):
-                    acl = '(관리자)'
+                    acl = '(' + lang['admin'] + ')'
         curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
         rows = curs.fetchall()
         if(rows):
             if(rows[0]['acl'] == 'admin'):
-                acl = '(관리자)'
+                acl = '(' + lang['admin'] + ')'
             elif(rows[0]['acl'] == 'user'):
-                acl = '(유저)'
+                acl = '(' + lang['user'] + ')'
             else:
                 if(not acl):
                     acl = ''
@@ -1772,7 +1772,7 @@ def w(name = None):
                 left = ''
             return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = enddata, license = data['license'], tn = 1, acl = acl, left = left, uppage = uppage, style = style)
         else:
-            return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = '문서 없음', license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl)
+            return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = lang['nodocument'], license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl)
 
 @app.route('/w/<path:name>/redirect/<redirect>')
 def redirectw(name = None, redirect = None):
@@ -1788,13 +1788,13 @@ def redirectw(name = None, redirect = None):
     rows = curs.fetchall()
     if(rows):
         if(rows[0]['acl'] == 'admin'):
-            acl = '(관리자)'
+            acl = '(' + lang['admin'] + ')'
         elif(rows[0]['acl'] == 'user'):
-            acl = '(유저)'
+            acl = '(' + lang['user'] + ')'
         else:
             acl = ''
         newdata = rows[0]['data']
-        newdata = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', ' * \g<in> 문서로 넘겨주기', newdata)
+        newdata = re.sub('^#(?:redirect|' + lang['redirect'] + ')\s(?P<in>[^\n]*)', ' * \g<in> ' + lang['redirecttodocument'] + '', newdata)
         enddata = namumark(name, newdata)
         m = re.search('<div id="toc">((?:(?!\/div>).)*)<\/div>', enddata)
         if(m):
@@ -1806,13 +1806,13 @@ def redirectw(name = None, redirect = None):
         redirect = re.sub('<', '&lt;', redirect)
         redirect = re.sub('>', '&gt;', redirect)
         redirect = re.sub('"', '&quot;', redirect)
-        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = enddata, license = data['license'], tn = 1, redirect = '<a href="/w/' + parse.quote(test).replace('/','%2F') + '/redirect/' + parse.quote(name).replace('/','%2F') + '">' + redirect + '</a>에서 넘어 왔습니다.', left = left, acl = acl, uppage = uppage, style = style)
+        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = enddata, license = data['license'], tn = 1, redirect = '<a href="/w/' + parse.quote(test).replace('/','%2F') + '/redirect/' + parse.quote(name).replace('/','%2F') + '">' + redirect + '</a>' + lang['redirectfrom'], left = left, acl = acl, uppage = uppage, style = style)
     else:
         test = redirect
         redirect = re.sub('<', '&lt;', redirect)
         redirect = re.sub('>', '&gt;', redirect)
         redirect = re.sub('"', '&quot;', redirect)
-        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = '문서 없음', license = data['license'], tn = 1, redirect = '<a href="/edit/' + parse.quote(test).replace('/','%2F') + '/redirect/' + parse.quote(name).replace('/','%2F') + '">' + redirect + '</a>에서 넘어 왔습니다.', uppage = uppage, style = style)
+        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = lang['nodocument'], license = data['license'], tn = 1, redirect = '<a href="/edit/' + parse.quote(test).replace('/','%2F') + '/redirect/' + parse.quote(name).replace('/','%2F') + '">' + redirect + '</a>' + lang['redirectfrom'], uppage = uppage, style = style)
 
 @app.route('/w/<path:name>/r/<number>')
 def rew(name = None, number = None):
@@ -1828,7 +1828,7 @@ def rew(name = None, number = None):
             left = ''
         return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = enddata, license = data['license'], tn = 6, left = left)
     else:
-        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = '문서 없음', license = data['license'], tn = 6)
+        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = lang['nodocument'], license = data['license'], tn = 6)
 
 @app.route('/w/<path:name>/raw/<number>')
 def reraw(name = None, number = None):
@@ -1841,7 +1841,7 @@ def reraw(name = None, number = None):
         enddata = re.sub("\n", '<br>', enddata)
         return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = enddata, license = data['license'])
     else:
-        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = '문서 없음', license = data['license'])
+        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = lang['nodocument'], license = data['license'])
 
 @app.route('/raw/<path:name>')
 def raw(name = None):
@@ -1854,7 +1854,7 @@ def raw(name = None):
         enddata = re.sub("\n", '<br>', enddata)
         return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = enddata, license = data['license'], tn = 7)
     else:
-        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = '문서 없음', license = data['license'], tn = 7)
+        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = lang['nodocument'], license = data['license'], tn = 7)
 
 @app.route('/revert/<path:name>/r/<number>', methods=['POST', 'GET'])
 def revert(name = None, number = None):
