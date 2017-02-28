@@ -1440,8 +1440,6 @@ def xref(name = None, number = None):
                 aa = re.sub("(?P<in>\[include\((?P<out>(?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\])", "\g<in>\n\n[[\g<out>]]\n\n", aa)
                 aa = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', '[[\g<in>]]', aa)
                 aa = namumark('', aa)
-                print(aa)
-                print(name)
                 if(re.search("<a(?: class=\"not_thing\")? href=\"\/w\/" + parse.quote(name).replace('/','%2F') + "(?:\#[^\"]*)?\">([^<]*)<\/a>", aa)):
                     div = div + '<li><a href="/w/' + parse.quote(rows[i]['link']).replace('/','%2F') + '">' + rows[i]['link'] + '</a>'
                     if(rows[i]['type']):
@@ -2085,7 +2083,7 @@ def topic(name = None):
     else:
         div = '<div>'
         i = 0
-        curs.execute("select * from topic where title = '" + pymysql.escape_string(name) + "' order by sub asc")
+        curs.execute("select * from rd where title = '" + pymysql.escape_string(name) + "' order by sub asc")
         rows = curs.fetchall()
         while True:
             try:
@@ -2094,27 +2092,19 @@ def topic(name = None):
                 div = div + '</div>'
                 break
             j = i + 1
-            indata = namumark(name, rows[i]['data'])
-            if(rows[i]['block'] == 'O'):
+            curs.execute("select * from topic where title = '" + pymysql.escape_string(rows[i]['title']) + "' and sub = '" + pymysql.escape_string(rows[i]['sub']) + "' and id = '1' order by sub asc")
+            aa = curs.fetchall()
+            indata = namumark(name, aa[0]['data'])
+            if(aa[0]['block'] == 'O'):
                 indata = '블라인드 되었습니다.'
                 block = 'style="background: gainsboro;"'
             else:
                 block = ''
-            if(i == 0):
-                sub = rows[i]['sub']
-                curs.execute("select * from stop where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' and close = 'O'")
-                row = curs.fetchall()
-                if(not row):
-                    div = div + '<h2><a href="/topic/' + parse.quote(name).replace('/','%2F') + '/sub/' + parse.quote(rows[i]['sub']).replace('/','%2F') + '">' + str((i + 1)) + '. ' + rows[i]['sub'] + '</a></h2>'
-                    div = div + '<table id="toron"><tbody><tr><td id="toroncolorgreen"><a href="javascript:void(0);" id="' + str(j) + '">#' + str(j) + '</a> ' + rows[i]['ip'] + ' <span style="float:right;">' + rows[i]['date'] + '</span></td></tr><tr><td ' + block + '>' + indata + '</td></tr></tbody></table><br>'
-            else:
-                if(not sub == rows[i]['sub']):
-                    sub = rows[i]['sub']
-                    curs.execute("select * from stop where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' and close = 'O'")
-                    row = curs.fetchall()
-                    if(not row):
-                        div = div + '<h2><a href="/topic/' + parse.quote(name).replace('/','%2F') + '/sub/' + parse.quote(rows[i]['sub']).replace('/','%2F') + '">' + str((i + 1)) + '. ' + rows[i]['sub'] + '</a></h2>'
-                        div = div + '<table id="toron"><tbody><tr><td id="toroncolorgreen"><a href="javascript:void(0);" id="' + str(j) + '">#' + str(j) + '</a> ' + rows[i]['ip'] + ' <span style="float:right;">' + rows[i]['date'] + '</span></td></tr><tr><td ' + block + '>' + indata + '</td></tr></tbody></table><br>'
+            curs.execute("select * from stop where title = '" + pymysql.escape_string(rows[i]['title']) + "' and sub = '" + pymysql.escape_string(rows[i]['sub']) + "' and close = 'O'")
+            row = curs.fetchall()
+            if(not row):
+                div = div + '<h2><a href="/topic/' + parse.quote(rows[i]['title']).replace('/','%2F') + '/sub/' + parse.quote(rows[i]['sub']).replace('/','%2F') + '">' + str((i + 1)) + '. ' + rows[i]['sub'] + '</a></h2>'
+                div = div + '<table id="toron"><tbody><tr><td id="toroncolorgreen"><a href="javascript:void(0);" id="' + str(j) + '">#' + str(j) + '</a> ' + aa[0]['ip'] + ' <span style="float:right;">' + aa[0]['date'] + '</span></td></tr><tr><td ' + block + '>' + indata + '</td></tr></tbody></table><br>'
             i = i + 1
         return render_template('index.html', title = name, page = parse.quote(name).replace('/','%2F'), logo = data['name'], plus = div, tn = 10, list = 1)
         
