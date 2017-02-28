@@ -86,6 +86,9 @@ def namumark(title, data):
             qwe = re.compile("^@(\w+)\s(.*)$", re.DOTALL)
             qsd = qwe.search(results[0])
             
+            qawe = re.compile("^#!noin\s(.*)$", re.DOTALL)
+            qasd = qawe.search(results[0])
+            
             y = re.compile("^#!wiki\sstyle=&quot;((?:(?!&quot;|\n).)*)&quot;\n?\s\n(.*)$", re.DOTALL)
             l = y.search(results[0])
             
@@ -116,6 +119,9 @@ def namumark(title, data):
             elif(l):
                 result = l.groups()
                 data = p.sub('<div style="' + result[0] + '">' + result[1] + '</div>', data, 1)
+            elif(qasd):
+                result = qasd.groups()
+                data = p.sub(result[0], data, 1)
             else:
                 data = p.sub('<code>' + results[0] + '</code>', data, 1)
         else:
@@ -195,6 +201,9 @@ def namumark(title, data):
                             qwe = re.compile("^@(\w+)\s(.*)$", re.DOTALL)
                             qsd = qwe.search(nnn[0])
                             
+                            qawe = re.compile("^#!noin\s(.*)$", re.DOTALL)
+                            qasd = qawe.search(nnn[0])
+                            
                             y = re.compile("^#!wiki\sstyle=&quot;((?:(?!&quot;|\n).)*)&quot;\n?\s\n(.*)$", re.DOTALL)
                             l = y.search(nnn[0])
                             
@@ -225,6 +234,8 @@ def namumark(title, data):
                             elif(l):
                                 result = l.groups()
                                 enddata = p.sub('<div style="' + result[0] + '">' + result[1] + '</div>', enddata, 1)
+                            elif(qasd):
+                                enddata = p.sub("", enddata, 1)
                             else:
                                 enddata = p.sub('<code>' + nnn[0] + '</code>', enddata, 1)
                         else:
@@ -1426,36 +1437,12 @@ def xref(name = None, number = None):
             row = curs.fetchall()
             if(row):
                 aa = row[0]['data']
-                while True:
-                    m = re.search("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]", aa)
-                    if(m):
-                        results = m.groups()
-                        if(results[0] == rows[i]['link']):
-                            aa = re.sub("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]", "", aa, 1)
-                        else:
-                            curs.execute("select * from data where title = '" + pymysql.escape_string(results[0]) + "'")
-                            rowss = curs.fetchall()
-                            if(rowss):
-                                enddata = rowss[0]['data']
-                                enddata = re.sub("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]", "", enddata)
-                                
-                                if(results[1]):
-                                    a = results[1]
-                                    while True:
-                                        g = re.search("([^= ,]*)\=([^,]*)", a)
-                                        if(g):
-                                            result = g.groups()
-                                            enddata = re.sub("@" + result[0] + "@", result[1], enddata)
-                                            a = re.sub("([^= ,]*)\=([^,]*)", "", a, 1)
-                                        else:
-                                            break                        
-                                aa = re.sub("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]", enddata + "\n\n [[" + results[0] + "]] \n\n", aa, 1)
-                            else:
-                                aa = re.sub("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]", "", aa, 1)
-                    else:
-                        break
+                aa = re.sub("(?P<in>\[include\((?P<out>(?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\])", "\g<in>\n\n[[\g<out>]]\n\n", aa)
                 aa = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', '[[\g<in>]]', aa)
-                if(re.search("\[\[" + name + "(?:#(?:[^|]*))?(?:\|(?:(?:(?!\]\]).)*))?\]\]", aa)):
+                aa = namumark('', aa)
+                print(aa)
+                print(name)
+                if(re.search("<a(?: class=\"not_thing\")? href=\"\/w\/" + parse.quote(name).replace('/','%2F') + "(?:\#[^\"]*)?\">([^<]*)<\/a>", aa)):
                     div = div + '<li><a href="/w/' + parse.quote(rows[i]['link']).replace('/','%2F') + '">' + rows[i]['link'] + '</a>'
                     if(rows[i]['type']):
                         div = div + ' (' + rows[i]['type'] + ')</li>'
@@ -1677,38 +1664,25 @@ def w(name = None):
                 curs.execute("select * from data where title = '" + pymysql.escape_string(rows[i]['cat']) + "'")
                 row = curs.fetchall()
                 if(row):
-                    aa = row[0]['data']
-                    while True:
-                        m = re.search("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]", aa)
-                        if(m):
-                            results = m.groups()
-                            if(results[0] == rows[i]['cat']):
-                                aa = re.sub("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]", "", aa, 1)
+                    aa = row[0]['data']                  
+                    aa = namumark('', aa)
+                    bb = re.search('<div style="width:100%;border: 1px solid #777;padding: 5px;margin-top: 1em;">분류:((?:(?!<\/div>).)*)<\/div>', aa)
+                    if(bb):
+                        cc = bb.groups()
+                        mm = re.search("^분류:(.*)", name)
+                        if(mm):
+                            ee = mm.groups()
+                            if(re.search("<a href=\"\/w\/" + parse.quote(name).replace('/','%2F') + "\">" + ee[0] + "<\/a>", cc[0])):
+                                div = div + '<li><a href="/w/' + parse.quote(rows[i]['cat']).replace('/','%2F') + '">' + rows[i]['cat'] + '</a></li>'
+                                i = i + 1
                             else:
-                                curs.execute("select * from data where title = '" + pymysql.escape_string(results[0]) + "'")
-                                rowss = curs.fetchall()
-                                if(rowss):
-                                    enddata = rowss[0]['data']
-                                    enddata = re.sub("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]", "", enddata)
-                                    
-                                    if(results[1]):
-                                        a = results[1]
-                                        while True:
-                                            g = re.search("([^= ,]*)\=([^,]*)", a)
-                                            if(g):
-                                                result = g.groups()
-                                                enddata = re.sub("@" + result[0] + "@", result[1], enddata)
-                                                a = re.sub("([^= ,]*)\=([^,]*)", "", a, 1)
-                                            else:
-                                                break                        
-                                    aa = re.sub("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]", enddata + "\n\n [[" + results[0] + "]] \n\n", aa, 1)
-                                else:
-                                    aa = re.sub("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]", "", aa, 1)
+                                curs.execute("delete from cat where title = '" + pymysql.escape_string(rows[i]['cat']) + "' and cat = '" + pymysql.escape_string(name) + "'")
+                                conn.commit()
+                                i = i + 1
                         else:
-                            break
-                    if(re.search("\[\[" + name + "\]\]", aa)):
-                        div = div + '<li><a href="/w/' + parse.quote(rows[i]['cat']).replace('/','%2F') + '">' + rows[i]['cat'] + '</a></li>'
-                        i = i + 1
+                            curs.execute("delete from cat where title = '" + pymysql.escape_string(rows[i]['cat']) + "' and cat = '" + pymysql.escape_string(name) + "'")
+                            conn.commit()
+                            i = i + 1
                     else:
                         curs.execute("delete from cat where title = '" + pymysql.escape_string(rows[i]['cat']) + "' and cat = '" + pymysql.escape_string(name) + "'")
                         conn.commit()
