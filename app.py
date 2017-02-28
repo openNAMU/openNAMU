@@ -1639,6 +1639,22 @@ def search():
 
 @app.route('/w/<path:name>')
 def w(name = None):
+    i = 0
+    curs.execute("select * from rd where title = '" + pymysql.escape_string(name) + "' order by date asc")
+    rows = curs.fetchall()
+    while True:
+        try:
+            a = rows[i]
+        except:
+            topic = ""
+            break
+        curs.execute("select * from stop where title = '" + pymysql.escape_string(rows[i]['title']) + "' and sub = '" + pymysql.escape_string(rows[i]['sub']) + "' and close = 'O'")
+        row = curs.fetchall()
+        if(not row):
+            topic = "background: #ede1ad;text-shadow: none;"
+            break
+        else:
+            i = i + 1
     acl = ''
     m = re.search("^(.*)\/(.*)$", name)
     if(m):
@@ -1707,11 +1723,11 @@ def w(name = None):
                     left = result[0]
                 else:
                     left = ''
-                return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = enddata + '<br>' + div, license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl)
+                return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = enddata + '<br>' + div, license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic)
             else:
-                return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = div, license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl)
+                return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = div, license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic)
         else:
-            return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = '분류 문서 없음', license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl)
+            return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = '분류 문서 없음', license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic)
     else:
         m = re.search("^사용자:(.*)", name)
         if(m):
@@ -1740,12 +1756,28 @@ def w(name = None):
                 left = result[0]
             else:
                 left = ''
-            return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = enddata, license = data['license'], tn = 1, acl = acl, left = left, uppage = uppage, style = style)
+            return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = enddata, license = data['license'], tn = 1, acl = acl, left = left, uppage = uppage, style = style, topic = topic)
         else:
-            return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = '문서 없음', license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl)
+            return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = '문서 없음', license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic)
 
 @app.route('/w/<path:name>/redirect/<redirect>')
 def redirectw(name = None, redirect = None):
+    i = 0
+    curs.execute("select * from rd where title = '" + pymysql.escape_string(name) + "' order by date asc")
+    rows = curs.fetchall()
+    while True:
+        try:
+            a = rows[i]
+        except:
+            topic = ""
+            break
+        curs.execute("select * from stop where title = '" + pymysql.escape_string(rows[i]['title']) + "' and sub = '" + pymysql.escape_string(rows[i]['sub']) + "' and close = 'O'")
+        row = curs.fetchall()
+        if(not row):
+            topic = "background: #ede1ad;text-shadow: none;"
+            break
+        else:
+            i = i + 1
     m = re.search("^(.*)\/(.*)$", name)
     if(m):
         g = m.groups()
@@ -1754,7 +1786,7 @@ def redirectw(name = None, redirect = None):
     else:
         uppage = ""
         style = "display:none;"
-    return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = '<a href="/w/' + parse.quote(name).replace('/','%2F') + '">문서 보기</a>', license = data['license'], tn = 1, redirect = '<a href="/w/' + parse.quote(redirect).replace('/','%2F') + '/redirect/' + parse.quote(name).replace('/','%2F') + '">' + redirect + '</a>에서 넘어 왔습니다.', uppage = uppage, style = style)
+    return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = '<a href="/w/' + parse.quote(name).replace('/','%2F') + '">문서 보기</a>', license = data['license'], tn = 1, redirect = '<a href="/w/' + parse.quote(redirect).replace('/','%2F') + '/redirect/' + parse.quote(name).replace('/','%2F') + '">' + redirect + '</a>에서 넘어 왔습니다.', uppage = uppage, style = style, topic = topic)
 
 @app.route('/w/<path:name>/r/<number>')
 def rew(name = None, number = None):
@@ -2083,7 +2115,8 @@ def topic(name = None):
     else:
         div = '<div>'
         i = 0
-        curs.execute("select * from rd where title = '" + pymysql.escape_string(name) + "' order by sub asc")
+        j = 1
+        curs.execute("select * from rd where title = '" + pymysql.escape_string(name) + "' order by date asc")
         rows = curs.fetchall()
         while True:
             try:
@@ -2091,7 +2124,6 @@ def topic(name = None):
             except:
                 div = div + '</div>'
                 break
-            j = i + 1
             curs.execute("select * from topic where title = '" + pymysql.escape_string(rows[i]['title']) + "' and sub = '" + pymysql.escape_string(rows[i]['sub']) + "' and id = '1' order by sub asc")
             aa = curs.fetchall()
             indata = namumark(name, aa[0]['data'])
@@ -2103,8 +2135,9 @@ def topic(name = None):
             curs.execute("select * from stop where title = '" + pymysql.escape_string(rows[i]['title']) + "' and sub = '" + pymysql.escape_string(rows[i]['sub']) + "' and close = 'O'")
             row = curs.fetchall()
             if(not row):
-                div = div + '<h2><a href="/topic/' + parse.quote(rows[i]['title']).replace('/','%2F') + '/sub/' + parse.quote(rows[i]['sub']).replace('/','%2F') + '">' + str((i + 1)) + '. ' + rows[i]['sub'] + '</a></h2>'
-                div = div + '<table id="toron"><tbody><tr><td id="toroncolorgreen"><a href="javascript:void(0);" id="' + str(j) + '">#' + str(j) + '</a> ' + aa[0]['ip'] + ' <span style="float:right;">' + aa[0]['date'] + '</span></td></tr><tr><td ' + block + '>' + indata + '</td></tr></tbody></table><br>'
+                div = div + '<h2><a href="/topic/' + parse.quote(rows[i]['title']).replace('/','%2F') + '/sub/' + parse.quote(rows[i]['sub']).replace('/','%2F') + '">' + str(j) + '. ' + rows[i]['sub'] + '</a></h2>'
+                div = div + '<table id="toron"><tbody><tr><td id="toroncolorgreen"><a href="javascript:void(0);" id="1">#1</a> ' + aa[0]['ip'] + ' <span style="float:right;">' + aa[0]['date'] + '</span></td></tr><tr><td ' + block + '>' + indata + '</td></tr></tbody></table><br>'
+                j = j + 1
             i = i + 1
         return render_template('index.html', title = name, page = parse.quote(name).replace('/','%2F'), logo = data['name'], plus = div, tn = 10, list = 1)
         
