@@ -1423,7 +1423,7 @@ def xref(name = None, number = None):
     v = number * 50
     i = v - 50
     div = ''
-    curs.execute("select * from back where title = '" + pymysql.escape_string(name) + "'")
+    curs.execute("select * from back where title = '" + pymysql.escape_string(name) + "' order by link asc")
     rows = curs.fetchall()
     if(rows):
         while True:
@@ -1665,7 +1665,7 @@ def w(name = None):
         uppage = ""
         style = "display:none;"
     if(re.search("^분류:", name)):
-        curs.execute("select * from cat where title = '" + pymysql.escape_string(name) + "'")
+        curs.execute("select * from cat where title = '" + pymysql.escape_string(name) + "' order by cat asc")
         rows = curs.fetchall()
         if(rows):
             div = ''
