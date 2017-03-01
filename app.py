@@ -2095,7 +2095,7 @@ def recordget():
 def titleindex():
     i = 0
     div = '<div>'
-    curs.execute("select * from data")
+    curs.execute("select * from data order by title asc")
     rows = curs.fetchall()
     if(rows):
         while True:
