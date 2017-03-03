@@ -471,3 +471,12 @@ textarea {
 a.not_thing {
     color: #bf4c4c;
 }
+
+#open {
+    background: #ede1ad;
+    text-shadow: none;
+}
+
+.menu-item:hover, #open:hover {
+    background-color: #ddd;
+}

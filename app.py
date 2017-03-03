@@ -1653,7 +1653,7 @@ def w(name = None):
         curs.execute("select * from stop where title = '" + pymysql.escape_string(rows[i]['title']) + "' and sub = '" + pymysql.escape_string(rows[i]['sub']) + "' and close = 'O'")
         row = curs.fetchall()
         if(not row):
-            topic = "background: #ede1ad;text-shadow: none;"
+            topic = "open"
             break
         else:
             i = i + 1
@@ -1776,7 +1776,7 @@ def redirectw(name = None, redirect = None):
         curs.execute("select * from stop where title = '" + pymysql.escape_string(rows[i]['title']) + "' and sub = '" + pymysql.escape_string(rows[i]['sub']) + "' and close = 'O'")
         row = curs.fetchall()
         if(not row):
-            topic = "background: #ede1ad;text-shadow: none;"
+            topic = "open"
             break
         else:
             i = i + 1
