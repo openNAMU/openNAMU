@@ -987,6 +987,7 @@ def namumark(title, data):
         else:
             break
     
+    data = re.sub('<\/blockquote>((\r)?\n){2}<blockquote>', '</blockquote><br><blockquote>', data)
     data = re.sub('\n', '<br>', data)
     data = re.sub('^<br>', '', data)
     return str(data)
