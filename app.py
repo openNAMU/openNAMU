@@ -308,16 +308,22 @@ def namumark(title, data):
             data = re.sub("\n&gt;\s?((?:[^\n]*)(?:(?:(?:(?:\n&gt;\s?)(?:[^\n]*))+)?))", "\n<blockquote>" + blockquote + "</blockquote>", data, 1)
         else:
             break
-
-    h0c = 0;
-    h1c = 0;
-    h2c = 0;
-    h3c = 0;
-    h4c = 0;
-    h5c = 0;
-    last = 0;
+    
+    m = re.search('\[목차\]', data)
+    if(not m):
+        data = re.sub("(?P<in>(={1,6})\s?([^=]*)\s?(?:={1,6})(?:\s+)?\n)", "[목차]\n\g<in>", data, 1)
+    
+    i = 0
+    h0c = 0
+    h1c = 0
+    h2c = 0
+    h3c = 0
+    h4c = 0
+    h5c = 0
+    last = 0
     rtoc = '<div id="toc"><span id="toc-name">목차</span><br><br>'
     while True:
+        i = i + 1
         m = re.search('(={1,6})\s?([^=]*)\s?(?:={1,6})(?:\s+)?\n', data)
         if(m):
             result = m.groups()
@@ -365,7 +371,7 @@ def namumark(title, data):
             toc = re.sub("\.$", '', toc)
             rtoc = rtoc + '<a href="#s-' + toc + '">' + toc + '</a>. ' + result[1] + '<br>'
             c = re.sub(" $", "", result[1])
-            data = re.sub('(={1,6})\s?([^=]*)\s?(?:={1,6})(?:\s+)?\n', '<h' + str(wiki) + ' id="' + c + '"><a href="#toc" id="s-' + toc + '">' + toc + '.</a> ' + c + '</h' + str(wiki) + '>', data, 1);
+            data = re.sub('(={1,6})\s?([^=]*)\s?(?:={1,6})(?:\s+)?\n', '<h' + str(wiki) + ' id="' + c + '"><a href="#toc" id="s-' + toc + '">' + toc + '.</a> ' + c + ' <span style="font-size:11px;">[<a href="/edit/' + parse.quote(title).replace('/','%2F') + '/section/' + str(i) + '">편집</a>]</span></h' + str(wiki) + '>', data, 1);
         else:
             rtoc = rtoc + '</div>'
             break
@@ -1875,14 +1881,14 @@ def revert(name = None, number = None):
 @app.route('/edit/<path:name>', methods=['POST', 'GET'])
 def edit(name = None):
     if(request.method == 'POST'):
-        curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
-        rows = curs.fetchall()
         m = re.search('(?:[^A-Za-zㄱ-힣0-9 ])', request.form["send"])
         if(m):
             return render_template('index.html', title = '편집 오류', logo = data['name'], data = '편집 내용 기록에는 한글과 영어와 숫자, 공백만 허용 됩니다.')
         else:
             today = getnow()
             content = re.sub("\[date\(now\)\]", today, request.form["content"])
+            curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
+            rows = curs.fetchall()
             if(rows):
                 if(rows[0]['data'] == content):
                     return render_template('index.html', title = '편집 오류', logo = data['name'], data = '내용이 원래 문서와 동일 합니다.')
@@ -1931,6 +1937,79 @@ def edit(name = None):
             else:
                 return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = '', tn = 2, notice = notice, left = left)
                 
+@app.route('/edit/<path:name>/section/<int:number>', methods=['POST', 'GET'])
+def secedit(name = None, number = None):
+    if(request.method == 'POST'):
+        m = re.search('(?:[^A-Za-zㄱ-힣0-9 ])', request.form["send"])
+        if(m):
+            return render_template('index.html', title = '편집 오류', logo = data['name'], data = '편집 내용 기록에는 한글과 영어와 숫자, 공백만 허용 됩니다.')
+        else:
+            today = getnow()
+            content = re.sub("\[date\(now\)\]", today, request.form["content"])
+            curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
+            rows = curs.fetchall()
+            if(rows):
+                if(request.form["otent"] == content):
+                    return render_template('index.html', title = '편집 오류', logo = data['name'], data = '내용이 원래 문서와 동일 합니다.')
+                else:
+                    ip = getip(request)
+                    can = getcan(ip, name)
+                    if(can == 1):
+                        return '<meta http-equiv="refresh" content="0;url=/ban" />'
+                    else:                        
+                        leng = getleng(len(request.form['otent']), len(content))
+                        content = rows[0]['data'].replace(request.form['otent'], content)
+                        history(name, content, today, ip, request.form["send"], leng)
+                        curs.execute("update data set data = '" + pymysql.escape_string(content) + "' where title = '" + pymysql.escape_string(name) + "'")
+                        conn.commit()
+            else:
+                return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name).replace('/','%2F') + '" />'
+            return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name).replace('/','%2F') + '" />'
+    else:
+        ip = getip(request)
+        can = getcan(ip, name)
+        if(can == 1):
+            return '<meta http-equiv="refresh" content="0;url=/ban" />'
+        else:
+            curs.execute("select * from data where title = '" + pymysql.escape_string(data["help"]) + "'")
+            rows = curs.fetchall()
+            if(rows):
+                newdata = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', ' * \g<in> 문서로 넘겨주기', rows[0]["data"])
+                left = namumark(name, newdata)
+            else:
+                left = ''
+                
+            if(re.search('\.', ip)):
+                notice = '비 로그인 상태 입니다. 비 로그인으로 편집시 아이피가 역사에 기록 됩니다. 편집 시 동의 함으로 간주 됩니다.'
+            else:
+                notice = ''
+                
+            curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
+            rows = curs.fetchall()
+            if(rows):
+                i = 0
+                j = 0
+                gdata = rows[0]['data']                
+                while True:
+                    m = re.search("((?:={1,6})\s?(?:[^=]*)\s?(?:={1,6})(?:\s+)?\n(?:(?:(?:(?!(?:={1,6})\s?(?:[^=]*)\s?(?:={1,6})(?:\s+)?\n).)*)(?:\n)?)+)", gdata)
+                    if(m):
+                        if(i == number - 1):
+                            g = m.groups()
+                            gdata = g[0]
+                            break
+                        else:
+                            gdata = re.sub("((?:={1,6})\s?(?:[^=]*)\s?(?:={1,6})(?:\s+)?\n(?:(?:(?:(?!(?:={1,6})\s?(?:[^=]*)\s?(?:={1,6})(?:\s+)?\n).)*)(?:\n)?)+)", "", gdata, 1)
+                            i = i + 1
+                    else:
+                        j = 1
+                        break
+                if(j == 0):
+                    return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = gdata, tn = 2, notice = notice, left = left, section = 1, number = number)
+                else:
+                    return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name).replace('/','%2F') + '" />'
+            else:
+                return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name).replace('/','%2F') + '" />'
+                
 @app.route('/preview/<path:name>', methods=['POST'])
 def preview(name = None):
     ip = getip(request)
@@ -1953,6 +2032,29 @@ def preview(name = None):
         else:
             left = ''
         return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = request.form["content"], tn = 2, preview = 1, enddata = enddata, left = left, notice = notice)
+        
+@app.route('/preview/<path:name>/section/<int:number>', methods=['POST'])
+def secpreview(name = None, number = None):
+    ip = getip(request)
+    can = getcan(ip, name)
+    if(can == 1):
+        return '<meta http-equiv="refresh" content="0;url=/ban" />'
+    else:
+        if(re.search('\.', ip)):
+            notice = '비 로그인 상태 입니다. 비 로그인으로 편집시 아이피가 역사에 기록 됩니다. 편집 시 동의 함으로 간주 됩니다.'
+        else:
+            notice = ''
+        newdata = request.form["content"]
+        newdata = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', ' * \g<in> 문서로 넘겨주기', newdata)
+        enddata = namumark(name, newdata)
+        curs.execute("select * from data where title = '" + pymysql.escape_string(data["help"]) + "'")
+        rows = curs.fetchall()
+        if(rows):
+            newdata = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', ' * \g<in> 문서로 넘겨주기', rows[0]["data"])
+            left = namumark(name, newdata)
+        else:
+            left = ''
+        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = request.form["content"], tn = 2, preview = 1, enddata = enddata, left = left, notice = notice, section = 1, number = number)
 
 @app.route('/delete/<path:name>', methods=['POST', 'GET'])
 def delete(name = None):
