@@ -2054,7 +2054,7 @@ def secpreview(name = None, number = None):
             left = namumark(name, newdata)
         else:
             left = ''
-        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = request.form["content"], tn = 2, preview = 1, enddata = enddata, left = left, notice = notice, section = 1, number = number)
+        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = request.form["content"], tn = 2, preview = 1, enddata = enddata, left = left, notice = notice, section = 1, number = number, odata = request.form["otent"])
 
 @app.route('/delete/<path:name>', methods=['POST', 'GET'])
 def delete(name = None):
