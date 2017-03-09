@@ -2153,7 +2153,7 @@ def setup():
 
 @app.route('/other')
 def other():
-    return render_template('index.html', title = '기타 메뉴', logo = data['name'], data = '<li><a href="/titleindex">모든 문서</a></li><li><a href="/grammar">문법 설명</a></li><li><a href="/version">버전</a></li><li><a href="/blocklog/n/1">유저 차단 기록</a></li><li><a href="/userlog/n/1">유저 가입 기록</a></li><li><a href="/upload">업로드</a></li><li><a href="/manager">관리자 메뉴</a></li><li><a href="/record">유저 기록</a></li>')
+    return render_template('index.html', title = '기타 메뉴', logo = data['name'], data = '<li><a href="/titleindex">모든 문서</a></li><li><a href="/version">버전</a></li><li><a href="/blocklog/n/1">유저 차단 기록</a></li><li><a href="/userlog/n/1">유저 가입 기록</a></li><li><a href="/upload">업로드</a></li><li><a href="/manager">관리자 메뉴</a></li><li><a href="/record">유저 기록</a></li>')
     
 @app.route('/manager')
 def manager():
@@ -2739,10 +2739,7 @@ def admin(name = None):
                 return render_template('index.html', title = '권한 오류', logo = data['name'], data = '계정이 없습니다.')
         else:
             return render_template('index.html', title = '권한 오류', logo = data['name'], data = '비 로그인 상태 입니다.')
-
-@app.route('/grammar')
-def grammar():
-    return render_template('index.html', title = '문법 설명', logo = data['name'], tn = 17)
+            return render_template('index.html', title = '권한 오류', logo = data['name'], data = '비 로그인 상태 입니다.')
 
 @app.route('/ban')
 def aban():
@@ -2793,8 +2790,7 @@ def aban():
                             conn.commit()
                             end = '차단이 풀렸습니다. 다시 시도 해 보세요.'
                     else:
-                        end = '영구 차단 상태 입니다. / 사유 : ' + row[0]['why']
-                
+                        end = '영구 차단 상태 입니다. / 사유 : ' + row[0]['why']                
     else:
         end = '권한이 맞지 않는 상태 입니다.'
     

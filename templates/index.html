@@ -461,42 +461,6 @@
                     {% endif %}
                     <button class="btn btn-primary" type="submit">{{now}}</button>
                 </form>
-                {% elif tn == 17 %}
-                <h1 class="title">{{title}}</h1>
-                <div>
-                    <a class="out_link" style="margin-top: -5px;" href="https://namu.wiki/w/%EB%82%98%EB%AC%B4%EC%9C%84%ED%82%A4:%ED%8E%B8%EC%A7%91%20%EB%8F%84%EC%9B%80%EB%A7%90">참조</a>
-                    <h2>기초 문법</h2>
-                    <li>~~취소선~~ --취소선--</li>
-                    <li>'''강조'''</li>
-                    <li>''기울이기''</li>
-                    <li>__언더 바__</li>
-                    <li>^^윗 첨자^^</li>
-                    <li>,,아랫 첨자,,</li>
-                    <h2>문단 문법</h2>
-                    <li>[목차]</li>
-                    <li>= 1단계 문단 =</li>
-                    <li>== 2단계 문단 ==</li>
-                    <li>=== 3단계 문단 ===</li>
-                    <li>==== 4단계 문단 ====</li>
-                    <li>===== 5단계 문단 =====</li>
-                    <li>====== 6단계 문단 ======</li>
-                    <h2>링크 문법</h2>
-                    <li>[[내부 링크]]</li>
-                    <li>[[내부 링크|보이는 내용]]</li>
-                    <li>[[외부 링크]]</li>
-                    <li>[[외부 링크|보이는 내용]]</li>
-                    <h2>유튜브 문법</h2>
-                    <li>[youtube(코드)]</li>
-                    <li>[youtube(코드, width=가로, height=세로)]</li>
-                    <li>[youtube(코드, height=세로, width=가로)]</li>
-                    <h2>각주 문법</h2>
-                    <li>[* 내용]</li>
-                    <li>[*이름 내용]</li>
-                    <li>[각주]</li>
-                    <h2>넘겨주기 문법</h2>
-                    <li>#redirect 문서명</li>
-                    <li>#넘겨주기 문서명</li>
-                </div>
                 {% elif tn == 18 %}
                 <h1 class="title">{{title}} <sub>(권한 부여)</sub></h1>
                 <form id="usrform" method="POST" action="/admin/{{page}}">
