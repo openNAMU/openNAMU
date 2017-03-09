@@ -1427,7 +1427,7 @@ def userlog(number = None):
     else:
         return render_template('index.html', logo = data['name'], data = '', title = '유저 가입 기록')
         
-@app.route('/xref/<path:name>/n/<int:number>')
+@app.route('/backlink/<path:name>/n/<int:number>')
 def xref(name = None, number = None):
     v = number * 50
     i = v - 50
@@ -1440,7 +1440,7 @@ def xref(name = None, number = None):
                 a = rows[i]
             except:
                 if(number != 1):
-                    div = div + '<br><a href="/xref/n/' + str(number - 1) + '">(이전)'
+                    div = div + '<br><a href="/backlink/n/' + str(number - 1) + '">(이전)'
                 break
             curs.execute("select * from data where title = '" + pymysql.escape_string(rows[i]['link']) + "'")
             row = curs.fetchall()
@@ -1457,9 +1457,9 @@ def xref(name = None, number = None):
                         div = div + '</li>'
                     if(i == v):
                         if(number == 1):
-                            div = div + '<br><a href="/xref/' + parse.quote(name).replace('/','%2F') + '/n/' + str(number + 1) + '">(다음)'
+                            div = div + '<br><a href="/backlink/' + parse.quote(name).replace('/','%2F') + '/n/' + str(number + 1) + '">(다음)'
                         else:
-                            div = div + '<br><a href="/xref/' + parse.quote(name).replace('/','%2F') + '/n/' + str(number - 1) + '">(이전) <a href="/userlog/n/' + str(number + 1) + '">(다음)'
+                            div = div + '<br><a href="/backlink/' + parse.quote(name).replace('/','%2F') + '/n/' + str(number - 1) + '">(이전) <a href="/userlog/n/' + str(number + 1) + '">(다음)'
                         break
                     else:
                         i = i + 1
