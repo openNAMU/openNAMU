@@ -284,9 +284,9 @@ def namumark(title, data):
             aa = re.search("^(.*)(#(?:.*))$", results[0])
             if(aa):
                 results = aa.groups()
-                data = re.sub('^#(?:redirect|넘겨주기)\s([^\n]*)', '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(results[0]).replace('/','%2F') + '/redirect/' + parse.quote(title).replace('/','%2F') + results[1] + '" />', data, 1)
+                data = re.sub('^#(?:redirect|넘겨주기)\s([^\n]*)', '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(results[0]).replace('/','%2F') + '/from/' + parse.quote(title).replace('/','%2F') + results[1] + '" />', data, 1)
             else:
-                data = re.sub('^#(?:redirect|넘겨주기)\s([^\n]*)', '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(results[0]).replace('/','%2F') + '/redirect/' + parse.quote(title).replace('/','%2F') + '" />', data, 1)
+                data = re.sub('^#(?:redirect|넘겨주기)\s([^\n]*)', '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(results[0]).replace('/','%2F') + '/from/' + parse.quote(title).replace('/','%2F') + '" />', data, 1)
             curs.execute("select * from back where title = '" + pymysql.escape_string(results[0]) + "' and link = '" + pymysql.escape_string(title) + "' and type = 'redirect'")
             abb = curs.fetchall()
             if(not abb):
@@ -1769,7 +1769,7 @@ def w(name = None):
         else:
             return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = '문서 없음', license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic)
 
-@app.route('/w/<path:name>/redirect/<redirect>')
+@app.route('/w/<path:name>/from/<redirect>')
 def redirectw(name = None, redirect = None):
     i = 0
     curs.execute("select * from rd where title = '" + pymysql.escape_string(name) + "' order by date asc")
@@ -1795,7 +1795,7 @@ def redirectw(name = None, redirect = None):
     else:
         uppage = ""
         style = "display:none;"
-    return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = '<a href="/w/' + parse.quote(name).replace('/','%2F') + '">문서 보기</a>', license = data['license'], tn = 1, redirect = '<a href="/w/' + parse.quote(redirect).replace('/','%2F') + '/redirect/' + parse.quote(name).replace('/','%2F') + '">' + redirect + '</a>에서 넘어 왔습니다.', uppage = uppage, style = style, topic = topic)
+    return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = '<a href="/w/' + parse.quote(name).replace('/','%2F') + '">문서 보기</a>', license = data['license'], tn = 1, redirect = '<a href="/w/' + parse.quote(redirect).replace('/','%2F') + '/from/' + parse.quote(name).replace('/','%2F') + '">' + redirect + '</a>에서 넘어 왔습니다.', uppage = uppage, style = style, topic = topic)
 
 @app.route('/w/<path:name>/r/<number>')
 def rew(name = None, number = None):
