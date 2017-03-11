@@ -2153,7 +2153,7 @@ def setup():
 
 @app.route('/other')
 def other():
-    return render_template('index.html', title = '기타 메뉴', logo = data['name'], data = '<li><a href="/titleindex">모든 문서</a></li><li><a href="/version">버전</a></li><li><a href="/blocklog/n/1">유저 차단 기록</a></li><li><a href="/userlog/n/1">유저 가입 기록</a></li><li><a href="/upload">업로드</a></li><li><a href="/manager">관리자 메뉴</a></li><li><a href="/record">유저 기록</a></li>')
+    return render_template('index.html', title = '기타 메뉴', logo = data['name'], data = '<li><a href="/titleindex">모든 문서</a></li><li><a href="/blocklog/n/1">유저 차단 기록</a></li><li><a href="/userlog/n/1">유저 가입 기록</a></li><li><a href="/upload">업로드</a></li><li><a href="/manager">관리자 메뉴</a></li><li><a href="/record">유저 기록</a></li>')
     
 @app.route('/manager')
 def manager():
@@ -2819,10 +2819,6 @@ def diff(name = None, a = None, b = None):
             return render_template('index.html', title = 'Diff 오류', logo = data['name'], data = '<a href="/w/' + name + '">이 리비전이나 문서가 없습니다.</a>')
     else:
         return render_template('index.html', title = 'Diff 오류', logo = data['name'], data = '<a href="/w/' + name + '">이 리비전이나 문서가 없습니다.</a>')
-
-@app.route('/version')
-def version():
-    return render_template('index.html', title = '버전', logo = data['name'], tn = 14)
 
 @app.route('/user')
 def user():
