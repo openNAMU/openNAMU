@@ -438,22 +438,19 @@ body {
 }
 
 @media (min-width: 768px) {
-
-.four-fifths {
-    width: 85%;
+    .four-fifths {
+        width: 85%;
+    }
 }
 
-}
 @media (max-width: 768px) {
+    .four-fifths {
+        width: 100%;
+    }
 
-.four-fifths {
-    width: 100%;
-}
-
-#left_bar {
-    display: none;
-}
-
+    #left_bar {
+        display: none;
+    }
 }
 
 .out_link::before {
