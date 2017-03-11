@@ -476,3 +476,7 @@ a.not_thing {
 .menu-item:hover, #open:hover {
     background-color: #ddd;
 }
+
+sub, sup {
+    line-height: 1.4em;
+}
