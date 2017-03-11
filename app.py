@@ -21,8 +21,37 @@ log.setLevel(logging.ERROR)
 
 app.config['MAX_CONTENT_LENGTH'] = int(data['upload']) * 1024 * 1024
 
-conn = pymysql.connect(host = data['host'], user = data['user'], password = data['pw'], db = data['db'], charset = 'utf8mb4')
-curs = conn.cursor(pymysql.cursors.DictCursor)
+try:
+    conn = pymysql.connect(host = data['host'], user = data['user'], password = data['pw'], db = data['db'], charset = 'utf8mb4')
+    curs = conn.cursor(pymysql.cursors.DictCursor)
+    curs.execute("create table if not exists data(title text not null, data longtext not null, acl text not null)")
+    curs.execute("create table if not exists history(id text not null, title text not null, data longtext not null, date text not null, ip text not null, send text not null, leng text not null)")
+    curs.execute("create table if not exists rd(title text not null, sub text not null, date text not null)")
+    curs.execute("create table if not exists user(id text not null, pw text not null, acl text not null)")
+    curs.execute("create table if not exists ban(block text not null, end text not null, why text not null, band text not null)")
+    curs.execute("create table if not exists topic(id text not null, title text not null, sub text not null, data longtext not null, date text not null, ip text not null, block text not null)")
+    curs.execute("create table if not exists stop(title text not null, sub text not null, close text not null)")
+    curs.execute("create table if not exists rb(block text not null, end text not null, today text not null, blocker text not null, why text not null)")
+    curs.execute("create table if not exists login(user text not null, ip text not null, today text not null)")
+    curs.execute("create table if not exists back(title text not null, link text not null, type text not null)")
+    curs.execute("create table if not exists cat(title text not null, cat text not null)")
+except:
+    conn = pymysql.connect(host = data['host'], user = data['user'], password = data['pw'], charset = 'utf8mb4')
+    curs = conn.cursor(pymysql.cursors.DictCursor)
+    curs.execute("create database " + data['db'])
+    curs.execute("ALTER DATABASE " + data['db'] + " CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci")
+    curs.execute("use " + data['db'])    
+    curs.execute("create table if not exists data(title text not null, data longtext not null, acl text not null)")
+    curs.execute("create table if not exists history(id text not null, title text not null, data longtext not null, date text not null, ip text not null, send text not null, leng text not null)")
+    curs.execute("create table if not exists rd(title text not null, sub text not null, date text not null)")
+    curs.execute("create table if not exists user(id text not null, pw text not null, acl text not null)")
+    curs.execute("create table if not exists ban(block text not null, end text not null, why text not null, band text not null)")
+    curs.execute("create table if not exists topic(id text not null, title text not null, sub text not null, data longtext not null, date text not null, ip text not null, block text not null)")
+    curs.execute("create table if not exists stop(title text not null, sub text not null, close text not null)")
+    curs.execute("create table if not exists rb(block text not null, end text not null, today text not null, blocker text not null, why text not null)")
+    curs.execute("create table if not exists login(user text not null, ip text not null, today text not null)")
+    curs.execute("create table if not exists back(title text not null, link text not null, type text not null)")
+    curs.execute("create table if not exists cat(title text not null, cat text not null)")
 
 app.secret_key = data['key']
 
@@ -2136,21 +2165,6 @@ def move(name = None):
         else:
             return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), tn = 9, plus = '정말 이동 하시겠습니까?')
 
-@app.route('/setup')
-def setup():
-    curs.execute("create table if not exists data(title text not null, data longtext not null, acl text not null)")
-    curs.execute("create table if not exists history(id text not null, title text not null, data longtext not null, date text not null, ip text not null, send text not null, leng text not null)")
-    curs.execute("create table if not exists rd(title text not null, sub text not null, date text not null)")
-    curs.execute("create table if not exists user(id text not null, pw text not null, acl text not null)")
-    curs.execute("create table if not exists ban(block text not null, end text not null, why text not null, band text not null)")
-    curs.execute("create table if not exists topic(id text not null, title text not null, sub text not null, data longtext not null, date text not null, ip text not null, block text not null)")
-    curs.execute("create table if not exists stop(title text not null, sub text not null, close text not null)")
-    curs.execute("create table if not exists rb(block text not null, end text not null, today text not null, blocker text not null, why text not null)")
-    curs.execute("create table if not exists login(user text not null, ip text not null, today text not null)")
-    curs.execute("create table if not exists back(title text not null, link text not null, type text not null)")
-    curs.execute("create table if not exists cat(title text not null, cat text not null)")
-    return render_template('index.html', title = '설치 완료', logo = data['name'], data = '문제 없었음')
-
 @app.route('/other')
 def other():
     return render_template('index.html', title = '기타 메뉴', logo = data['name'], data = '<li><a href="/titleindex">모든 문서</a></li><li><a href="/blocklog/n/1">유저 차단 기록</a></li><li><a href="/userlog/n/1">유저 가입 기록</a></li><li><a href="/upload">업로드</a></li><li><a href="/manager">관리자 메뉴</a></li><li><a href="/record">유저 기록</a></li>')
@@ -2739,7 +2753,6 @@ def admin(name = None):
                 return render_template('index.html', title = '권한 오류', logo = data['name'], data = '계정이 없습니다.')
         else:
             return render_template('index.html', title = '권한 오류', logo = data['name'], data = '비 로그인 상태 입니다.')
-            return render_template('index.html', title = '권한 오류', logo = data['name'], data = '비 로그인 상태 입니다.')
 
 @app.route('/ban')
 def aban():
@@ -2819,7 +2832,7 @@ def diff(name = None, a = None, b = None):
             return render_template('index.html', title = 'Diff 오류', logo = data['name'], data = '<a href="/w/' + name + '">이 리비전이나 문서가 없습니다.</a>')
     else:
         return render_template('index.html', title = 'Diff 오류', logo = data['name'], data = '<a href="/w/' + name + '">이 리비전이나 문서가 없습니다.</a>')
-
+        
 @app.route('/user')
 def user():
     ip = getip(request)
