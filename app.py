@@ -39,7 +39,7 @@ except:
     conn = pymysql.connect(host = data['host'], user = data['user'], password = data['pw'], charset = 'utf8mb4')
     curs = conn.cursor(pymysql.cursors.DictCursor)
     curs.execute("create database " + data['db'])
-    curs.execute("ALTER DATABASE " + data['db'] + " CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci")
+    curs.execute("alter database " + data['db'] + " character set = utf8mb4 collate = utf8mb4_unicode_ci")
     curs.execute("use " + data['db'])    
     curs.execute("create table if not exists data(title text not null, data longtext not null, acl text not null)")
     curs.execute("create table if not exists history(id text not null, title text not null, data longtext not null, date text not null, ip text not null, send text not null, leng text not null)")
@@ -1536,7 +1536,7 @@ def blocklog(number = None):
     v = number * 50
     i = v - 50
     div = '<div>'
-    curs.execute("select * from rb order by today")
+    curs.execute("select * from rb order by today asc")
     rows = curs.fetchall()
     if(rows):
         while True:
