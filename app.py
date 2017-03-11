@@ -24,34 +24,100 @@ app.config['MAX_CONTENT_LENGTH'] = int(data['upload']) * 1024 * 1024
 try:
     conn = pymysql.connect(host = data['host'], user = data['user'], password = data['pw'], db = data['db'], charset = 'utf8mb4')
     curs = conn.cursor(pymysql.cursors.DictCursor)
-    curs.execute("create table if not exists data(title text not null, data longtext not null, acl text not null)")
-    curs.execute("create table if not exists history(id text not null, title text not null, data longtext not null, date text not null, ip text not null, send text not null, leng text not null)")
-    curs.execute("create table if not exists rd(title text not null, sub text not null, date text not null)")
-    curs.execute("create table if not exists user(id text not null, pw text not null, acl text not null)")
-    curs.execute("create table if not exists ban(block text not null, end text not null, why text not null, band text not null)")
-    curs.execute("create table if not exists topic(id text not null, title text not null, sub text not null, data longtext not null, date text not null, ip text not null, block text not null)")
-    curs.execute("create table if not exists stop(title text not null, sub text not null, close text not null)")
-    curs.execute("create table if not exists rb(block text not null, end text not null, today text not null, blocker text not null, why text not null)")
-    curs.execute("create table if not exists login(user text not null, ip text not null, today text not null)")
-    curs.execute("create table if not exists back(title text not null, link text not null, type text not null)")
-    curs.execute("create table if not exists cat(title text not null, cat text not null)")
+    try:
+        curs.execute("select * from data limit 1")
+    except:
+        curs.execute("create table data(title text not null, data longtext not null, acl text not null)")
+    try:
+        curs.execute("select * from history limit 1")
+    except:
+        curs.execute("create table history(id text not null, title text not null, data longtext not null, date text not null, ip text not null, send text not null, leng text not null)")
+    try:
+        curs.execute("select * from rd limit 1")
+    except:
+        curs.execute("create table rd(title text not null, sub text not null, date text not null)")
+    try:
+        curs.execute("select * from user limit 1")
+    except:
+        curs.execute("create table user(id text not null, pw text not null, acl text not null)")
+    try:
+        curs.execute("select * from ban limit 1")
+    except:
+        curs.execute("create table ban(block text not null, end text not null, why text not null, band text not null)")
+    try:
+        curs.execute("select * from topic limit 1")
+    except:
+        curs.execute("create table topic(id text not null, title text not null, sub text not null, data longtext not null, date text not null, ip text not null, block text not null)")
+    try:
+        curs.execute("select * from stop limit 1")
+    except:
+        curs.execute("create table stop(title text not null, sub text not null, close text not null)")
+    try:
+        curs.execute("select * from rb limit 1")
+    except:
+        curs.execute("create table rb(block text not null, end text not null, today text not null, blocker text not null, why text not null)")
+    try:
+        curs.execute("select * from login limit 1")
+    except:
+        curs.execute("create table login(user text not null, ip text not null, today text not null)")
+    try:
+        curs.execute("select * from back limit 1")
+    except:
+        curs.execute("create table back(title text not null, link text not null, type text not null)")
+    try:
+        curs.execute("select * from cat limit 1")
+    except:
+        curs.execute("create table cat(title text not null, cat text not null)")
 except:
     conn = pymysql.connect(host = data['host'], user = data['user'], password = data['pw'], charset = 'utf8mb4')
     curs = conn.cursor(pymysql.cursors.DictCursor)
     curs.execute("create database " + data['db'])
     curs.execute("alter database " + data['db'] + " character set = utf8mb4 collate = utf8mb4_unicode_ci")
     curs.execute("use " + data['db'])    
-    curs.execute("create table if not exists data(title text not null, data longtext not null, acl text not null)")
-    curs.execute("create table if not exists history(id text not null, title text not null, data longtext not null, date text not null, ip text not null, send text not null, leng text not null)")
-    curs.execute("create table if not exists rd(title text not null, sub text not null, date text not null)")
-    curs.execute("create table if not exists user(id text not null, pw text not null, acl text not null)")
-    curs.execute("create table if not exists ban(block text not null, end text not null, why text not null, band text not null)")
-    curs.execute("create table if not exists topic(id text not null, title text not null, sub text not null, data longtext not null, date text not null, ip text not null, block text not null)")
-    curs.execute("create table if not exists stop(title text not null, sub text not null, close text not null)")
-    curs.execute("create table if not exists rb(block text not null, end text not null, today text not null, blocker text not null, why text not null)")
-    curs.execute("create table if not exists login(user text not null, ip text not null, today text not null)")
-    curs.execute("create table if not exists back(title text not null, link text not null, type text not null)")
-    curs.execute("create table if not exists cat(title text not null, cat text not null)")
+    try:
+        curs.execute("select * from data limit 1")
+    except:
+        curs.execute("create table data(title text not null, data longtext not null, acl text not null)")
+    try:
+        curs.execute("select * from history limit 1")
+    except:
+        curs.execute("create table history(id text not null, title text not null, data longtext not null, date text not null, ip text not null, send text not null, leng text not null)")
+    try:
+        curs.execute("select * from rd limit 1")
+    except:
+        curs.execute("create table rd(title text not null, sub text not null, date text not null)")
+    try:
+        curs.execute("select * from user limit 1")
+    except:
+        curs.execute("create table user(id text not null, pw text not null, acl text not null)")
+    try:
+        curs.execute("select * from ban limit 1")
+    except:
+        curs.execute("create table ban(block text not null, end text not null, why text not null, band text not null)")
+    try:
+        curs.execute("select * from topic limit 1")
+    except:
+        curs.execute("create table topic(id text not null, title text not null, sub text not null, data longtext not null, date text not null, ip text not null, block text not null)")
+    try:
+        curs.execute("select * from stop limit 1")
+    except:
+        curs.execute("create table stop(title text not null, sub text not null, close text not null)")
+    try:
+        curs.execute("select * from rb limit 1")
+    except:
+        curs.execute("create table rb(block text not null, end text not null, today text not null, blocker text not null, why text not null)")
+    try:
+        curs.execute("select * from login limit 1")
+    except:
+        curs.execute("create table login(user text not null, ip text not null, today text not null)")
+    try:
+        curs.execute("select * from back limit 1")
+    except:
+        curs.execute("create table back(title text not null, link text not null, type text not null)")
+    try:
+        curs.execute("select * from cat limit 1")
+    except:
+        curs.execute("create table cat(title text not null, cat text not null)")
 
 app.secret_key = data['key']
 
