@@ -2017,13 +2017,13 @@ def secedit(name = None, number = None):
             if(rows):
                 i = 0
                 j = 0
-                gdata = rows[0]['data'] + '\n'                
+                gdata = rows[0]['data'] + '\r\n'                
                 while True:
                     m = re.search("((?:={1,6})\s?(?:[^=]*)\s?(?:={1,6})(?:\s+)?\n(?:(?:(?:(?!(?:={1,6})\s?(?:[^=]*)\s?(?:={1,6})(?:\s+)?\n).)*)(?:\n)?)+)", gdata)
                     if(m):
                         if(i == number - 1):
                             g = m.groups()
-                            gdata = g[0]
+                            gdata = re.sub("\r\n$", "", g[0])
                             break
                         else:
                             gdata = re.sub("((?:={1,6})\s?(?:[^=]*)\s?(?:={1,6})(?:\s+)?\n(?:(?:(?:(?!(?:={1,6})\s?(?:[^=]*)\s?(?:={1,6})(?:\s+)?\n).)*)(?:\n)?)+)", "", gdata, 1)
