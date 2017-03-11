@@ -1536,7 +1536,7 @@ def blocklog(number = None):
     v = number * 50
     i = v - 50
     div = '<div>'
-    curs.execute("select * from rb order by today asc")
+    curs.execute("select * from rb order by today desc")
     rows = curs.fetchall()
     if(rows):
         while True:
