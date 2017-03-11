@@ -2542,7 +2542,7 @@ def change():
             if(session.get('Now') == True):
                 return '<meta http-equiv="refresh" content="0;url=/logout" />'
             else:
-                return render_template('index.html', title = '비밀번호 변경', enter = '비밀번호 변경', logo = data['name'], tn = 15)
+                return render_template('index.html', title = '비밀번호 변경', enter = '변경', logo = data['name'], tn = 15)
                 
 @app.route('/check/<name>')
 def check(name = None, sub = None, number = None):
