@@ -1991,6 +1991,7 @@ def secedit(name = None, number = None):
                         history(name, content, today, ip, request.form["send"], leng)
                         curs.execute("update data set data = '" + pymysql.escape_string(content) + "' where title = '" + pymysql.escape_string(name) + "'")
                         conn.commit()
+                    return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name).replace('/','%2F') + '" />'
             else:
                 return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name).replace('/','%2F') + '" />'
     else:
@@ -2017,7 +2018,7 @@ def secedit(name = None, number = None):
             if(rows):
                 i = 0
                 j = 0
-                gdata = rows[0]['data'] + '\r\n'                
+                gdata = rows[0]['data'] + '\r\n'
                 while True:
                     m = re.search("((?:={1,6})\s?(?:[^=]*)\s?(?:={1,6})(?:\s+)?\n(?:(?:(?:(?!(?:={1,6})\s?(?:[^=]*)\s?(?:={1,6})(?:\s+)?\n).)*)(?:\n)?)+)", gdata)
                     if(m):
