@@ -1769,7 +1769,7 @@ def w(name = None):
         else:
             return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = '문서 없음', license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic)
 
-@app.route('/w/<path:name>/from/<redirect>')
+@app.route('/w/<path:name>/from/<path:redirect>')
 def redirectw(name = None, redirect = None):
     i = 0
     curs.execute("select * from rd where title = '" + pymysql.escape_string(name) + "' order by date asc")
@@ -1797,9 +1797,9 @@ def redirectw(name = None, redirect = None):
         style = "display:none;"
     return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = '<a href="/w/' + parse.quote(name).replace('/','%2F') + '">문서 보기</a>', license = data['license'], tn = 1, redirect = '<a href="/w/' + parse.quote(redirect).replace('/','%2F') + '/from/' + parse.quote(name).replace('/','%2F') + '">' + redirect + '</a>에서 넘어 왔습니다.', uppage = uppage, style = style, topic = topic)
 
-@app.route('/w/<path:name>/r/<number>')
+@app.route('/w/<path:name>/r/<int:number>')
 def rew(name = None, number = None):
-    curs.execute("select * from history where title = '" + pymysql.escape_string(name) + "' and id = '" + number + "'")
+    curs.execute("select * from history where title = '" + pymysql.escape_string(name) + "' and id = '" + str(number) + "'")
     rows = curs.fetchall()
     if(rows):
         enddata = namumark(name, rows[0]['data'])
@@ -1813,9 +1813,9 @@ def rew(name = None, number = None):
     else:
         return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = '문서 없음', license = data['license'], tn = 6)
 
-@app.route('/w/<path:name>/raw/<number>')
+@app.route('/w/<path:name>/raw/<int:number>')
 def reraw(name = None, number = None):
-    curs.execute("select * from history where title = '" + pymysql.escape_string(name) + "' and id = '" + number + "'")
+    curs.execute("select * from history where title = '" + pymysql.escape_string(name) + "' and id = '" + str(number) + "'")
     rows = curs.fetchall()
     if(rows):
         enddata = re.sub('<', '&lt;', rows[0]['data'])
@@ -1839,10 +1839,10 @@ def raw(name = None):
     else:
         return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = '문서 없음', license = data['license'], tn = 7)
 
-@app.route('/revert/<path:name>/r/<number>', methods=['POST', 'GET'])
+@app.route('/revert/<path:name>/r/<int:number>', methods=['POST', 'GET'])
 def revert(name = None, number = None):
     if(request.method == 'POST'):
-        curs.execute("select * from history where title = '" + pymysql.escape_string(name) + "' and id = '" + number + "'")
+        curs.execute("select * from history where title = '" + pymysql.escape_string(name) + "' and id = '" + str(number) + "'")
         rows = curs.fetchall()
         if(rows):
             ip = getip(request)
@@ -1861,7 +1861,7 @@ def revert(name = None, number = None):
                     leng = '+' + str(len(rows[0]['data']))
                     curs.execute("insert into data (title, data, acl) value ('" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(rows[0]['data']) + "', '')")
                     conn.commit()
-                history(name, rows[0]['data'], today, ip, '문서를 ' + number + '판으로 되돌렸습니다.', leng)
+                history(name, rows[0]['data'], today, ip, '문서를 ' + str(number) + '판으로 되돌렸습니다.', leng)
                 return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name).replace('/','%2F') + '" />'
         else:
             return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name).replace('/','%2F') + '" />'
@@ -1871,10 +1871,10 @@ def revert(name = None, number = None):
         if(can == 1):
             return '<meta http-equiv="refresh" content="0;url=/ban" />'
         else:
-            curs.execute("select * from history where title = '" + pymysql.escape_string(name) + "' and id = '" + number + "'")
+            curs.execute("select * from history where title = '" + pymysql.escape_string(name) + "' and id = '" + str(number) + "'")
             rows = curs.fetchall()
             if(rows):
-                return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), r = parse.quote(number).replace('/','%2F'), tn = 13, plus = '정말 되돌리시겠습니까?')
+                return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), r = parse.quote(str(number)).replace('/','%2F'), tn = 13, plus = '정말 되돌리시겠습니까?')
             else:
                 return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name).replace('/','%2F') + '" />'
 
@@ -2530,7 +2530,7 @@ def change():
             else:
                 return render_template('index.html', title = '비밀번호 변경', enter = '비밀번호 변경', logo = data['name'], tn = 15)
                 
-@app.route('/check/<path:name>')
+@app.route('/check/<name>')
 def check(name = None, sub = None, number = None):
     curs.execute("select * from user where id = '" + pymysql.escape_string(name) + "'")
     rows = curs.fetchall()
@@ -2613,7 +2613,7 @@ def logout():
     session.pop('DREAMER', None)
     return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(data['frontpage']).replace('/','%2F') + '" />'
 
-@app.route('/ban/<path:name>', methods=['POST', 'GET'])
+@app.route('/ban/<name>', methods=['POST', 'GET'])
 def ban(name = None):
     curs.execute("select * from user where id = '" + pymysql.escape_string(name) + "'")
     rows = curs.fetchall()
@@ -2690,7 +2690,7 @@ def acl(name = None):
         else:
             return render_template('index.html', title = '권한 오류', logo = data['name'], data = '권한이 모자랍니다.')
 
-@app.route('/admin/<path:name>', methods=['POST', 'GET'])
+@app.route('/admin/<name>', methods=['POST', 'GET'])
 def admin(name = None):
     if(request.method == 'POST'):
         if(session.get('Now') == True):
