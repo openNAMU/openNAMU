@@ -64,7 +64,7 @@
  * 버그 수정
  * 파서 제작 (Last 1.6.2)
 
-
+----
 ## 파이나무 라이선스
  * BSD 3-Clause License
 
@@ -72,10 +72,10 @@
  * 인용문 아이콘 [Dave Gandy](http://www.flaticon.com/free-icon/quote-left_25672) CC 3.0 BY
  * 일부 파일 [Basix](https://twitter.com/Basix1120)
 
-
+----
 ## 기타
  * 버전 1.6.7 - 정식
 
-
+----
 ## 개발 이념
  * 나([2DU](https://github.com/2DU)) 쓰기 편한 엔진을 만들자
