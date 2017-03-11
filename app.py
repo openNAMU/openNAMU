@@ -1993,7 +1993,6 @@ def secedit(name = None, number = None):
                         conn.commit()
             else:
                 return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name).replace('/','%2F') + '" />'
-            return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name).replace('/','%2F') + '" />'
     else:
         ip = getip(request)
         can = getcan(ip, name)
@@ -2018,7 +2017,7 @@ def secedit(name = None, number = None):
             if(rows):
                 i = 0
                 j = 0
-                gdata = rows[0]['data']                
+                gdata = rows[0]['data'] + '\n'                
                 while True:
                     m = re.search("((?:={1,6})\s?(?:[^=]*)\s?(?:={1,6})(?:\s+)?\n(?:(?:(?:(?!(?:={1,6})\s?(?:[^=]*)\s?(?:={1,6})(?:\s+)?\n).)*)(?:\n)?)+)", gdata)
                     if(m):
@@ -2313,6 +2312,7 @@ def sub(name = None, sub = None):
             discuss(name, sub, today)
             aa = request.form["content"]
             aa = re.sub("\[\[(분류:(?:(?:(?!\]\]).)*))\]\]", "[br]", aa)
+            aa = re.sub("\[date\(now\)\]", today, aa)
             curs.execute("insert into topic (id, title, sub, data, date, ip, block) value ('" + str(number) + "', '" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(sub) + "', '" + pymysql.escape_string(aa) + "', '" + today + "', '" + ip + "', '')")
             conn.commit()
             return '<meta http-equiv="refresh" content="0;url=/topic/' + parse.quote(name).replace('/','%2F') + '/sub/' + parse.quote(sub).replace('/','%2F') + '" />'
