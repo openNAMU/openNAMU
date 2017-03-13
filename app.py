@@ -1897,6 +1897,7 @@ def redirectw(name = None, redirect = None):
             break
         else:
             i = i + 1
+    acl = ''
     m = re.search("^(.*)\/(.*)$", name)
     if(m):
         g = m.groups()
@@ -1905,7 +1906,103 @@ def redirectw(name = None, redirect = None):
     else:
         uppage = ""
         style = "display:none;"
-    return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = '<a href="/w/' + parse.quote(name).replace('/','%2F') + '">문서 보기</a>', license = data['license'], tn = 1, redirect = '<a href="/w/' + parse.quote(redirect).replace('/','%2F') + '/from/' + parse.quote(name).replace('/','%2F') + '">' + redirect + '</a>에서 넘어 왔습니다.', uppage = uppage, style = style, topic = topic)
+    if(re.search("^분류:", name)):
+        curs.execute("select * from cat where title = '" + pymysql.escape_string(name) + "' order by cat asc")
+        rows = curs.fetchall()
+        if(rows):
+            div = ''
+            i = 0
+            while True:
+                try:
+                    a = rows[i]
+                except:
+                    break
+                curs.execute("select * from data where title = '" + pymysql.escape_string(rows[i]['cat']) + "'")
+                row = curs.fetchall()
+                if(row):
+                    aa = row[0]['data']                  
+                    aa = namumark('', aa)
+                    bb = re.search('<div style="width:100%;border: 1px solid #777;padding: 5px;margin-top: 1em;">분류:((?:(?!<\/div>).)*)<\/div>', aa)
+                    if(bb):
+                        cc = bb.groups()
+                        mm = re.search("^분류:(.*)", name)
+                        if(mm):
+                            ee = mm.groups()
+                            if(re.search("<a href=\"\/w\/" + parse.quote(name).replace('/','%2F') + "\">" + ee[0] + "<\/a>", cc[0])):
+                                div = div + '<li><a href="/w/' + parse.quote(rows[i]['cat']).replace('/','%2F') + '">' + rows[i]['cat'] + '</a></li>'
+                                i = i + 1
+                            else:
+                                curs.execute("delete from cat where title = '" + pymysql.escape_string(rows[i]['cat']) + "' and cat = '" + pymysql.escape_string(name) + "'")
+                                conn.commit()
+                                i = i + 1
+                        else:
+                            curs.execute("delete from cat where title = '" + pymysql.escape_string(rows[i]['cat']) + "' and cat = '" + pymysql.escape_string(name) + "'")
+                            conn.commit()
+                            i = i + 1
+                    else:
+                        curs.execute("delete from cat where title = '" + pymysql.escape_string(rows[i]['cat']) + "' and cat = '" + pymysql.escape_string(name) + "'")
+                        conn.commit()
+                        i = i + 1
+                else:
+                    curs.execute("delete from cat where title = '" + pymysql.escape_string(rows[i]['cat']) + "' and cat = '" + pymysql.escape_string(name) + "'")
+                    conn.commit()
+                    i = i + 1
+            div = '<h2>분류</h2>' + div
+            curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
+            bb = curs.fetchall()
+            if(bb):
+                if(bb[0]['acl'] == 'admin'):
+                    acl = '(관리자)'
+                elif(bb[0]['acl'] == 'user'):
+                    acl = '(유저)'
+                else:
+                    if(not acl):
+                        acl = ''
+                newdata = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', ' * \g<in> 문서로 넘겨주기', bb[0]['data'])
+                enddata = namumark(name, newdata)
+                m = re.search('<div id="toc">((?:(?!\/div>).)*)<\/div>', enddata)
+                if(m):
+                    result = m.groups()
+                    left = result[0]
+                else:
+                    left = ''
+                return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = enddata + '<br>' + div, license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, redirect = '<a href="/w/' + parse.quote(redirect).replace('/','%2F') + '/from/' + parse.quote(name).replace('/','%2F') + '">' + redirect + '</a>에서 넘어 왔습니다.')
+            else:
+                return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = div, license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, redirect = '<a href="/w/' + parse.quote(redirect).replace('/','%2F') + '/from/' + parse.quote(name).replace('/','%2F') + '">' + redirect + '</a>에서 넘어 왔습니다.')
+        else:
+            return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = '분류 문서 없음', license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, redirect = '<a href="/w/' + parse.quote(redirect).replace('/','%2F') + '/from/' + parse.quote(name).replace('/','%2F') + '">' + redirect + '</a>에서 넘어 왔습니다.')
+    else:
+        m = re.search("^사용자:(.*)", name)
+        if(m):
+            g = m.groups()
+            curs.execute("select * from user where id = '" + pymysql.escape_string(g[0]) + "'")
+            rows = curs.fetchall()
+            if(rows):
+                if(rows[0]['acl'] == 'owner'):
+                    acl = '(소유자)'
+                elif(rows[0]['acl'] == 'admin'):
+                    acl = '(관리자)'
+        curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
+        rows = curs.fetchall()
+        if(rows):
+            if(rows[0]['acl'] == 'admin'):
+                acl = '(관리자)'
+            elif(rows[0]['acl'] == 'user'):
+                acl = '(유저)'
+            else:
+                if(not acl):
+                    acl = ''
+            newdata = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', ' * \g<in> 문서로 넘겨주기', rows[0]["data"])
+            enddata = namumark(name, newdata)
+            m = re.search('<div id="toc">((?:(?!\/div>).)*)<\/div>', enddata)
+            if(m):
+                result = m.groups()
+                left = result[0]
+            else:
+                left = ''
+            return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = enddata, license = data['license'], tn = 1, acl = acl, left = left, uppage = uppage, style = style, topic = topic, redirect = '<a href="/w/' + parse.quote(redirect).replace('/','%2F') + '/from/' + parse.quote(name).replace('/','%2F') + '">' + redirect + '</a>에서 넘어 왔습니다.')
+        else:
+            return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = '문서 없음', license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, redirect = '<a href="/w/' + parse.quote(redirect).replace('/','%2F') + '/from/' + parse.quote(name).replace('/','%2F') + '">' + redirect + '</a>에서 넘어 왔습니다.')
 
 @app.route('/w/<path:name>/r/<int:number>')
 def rew(name = None, number = None):
