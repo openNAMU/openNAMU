@@ -1312,16 +1312,16 @@ def upload():
                 if(re.search('^([^./\\*<>|:?"]+)\.(jpg|gif|jpeg|png)$', file.filename)):
                     filename = file.filename
                     if(os.path.exists(os.path.join('image', filename))):
-                        return render_template('index.html', logo = data['name'], title = '업로드 오류', data = '동일한 이름의 파일이 있습니다.')
+                        return '<meta http-equiv="refresh" content="0;url=/error/16" />'
                     else:
                         file.save(os.path.join('image', filename))
                         curs.execute("insert into data (title, data, acl) value ('" + pymysql.escape_string('파일:' + filename) + "', '" + pymysql.escape_string('[[파일:' + filename + ']][br][br]{{{[[파일:' + filename + ']]}}}') + "', '')")
                         conn.commit()
                         return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote('파일:' + filename).replace('/','%2F') + '" />'
                 else:
-                    return render_template('index.html', logo = data['name'], title = '업로드 오류', data = '파일 명에 ./\*<>|:? 들은 불가능 합니다.')
+                    return '<meta http-equiv="refresh" content="0;url=/error/15" />'
             else:
-                return render_template('index.html', logo = data['name'], title = '업로드 오류', data = 'jpg gif jpeg png만 가능 합니다.')
+                return '<meta http-equiv="refresh" content="0;url=/error/14" />'
     else:
         ip = getip(request)
         ban = getban(ip)
@@ -1846,7 +1846,7 @@ def w(name = None):
             else:
                 return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = div, license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic)
         else:
-            return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = '분류 문서 없음', license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic)
+            return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = '분류 문서 없음', license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic), 404
     else:
         m = re.search("^사용자:(.*)", name)
         if(m):
@@ -1877,7 +1877,7 @@ def w(name = None):
                 left = ''
             return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = enddata, license = data['license'], tn = 1, acl = acl, left = left, uppage = uppage, style = style, topic = topic)
         else:
-            return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = '문서 없음', license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic)
+            return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = '문서 없음', license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic), 404
 
 @app.route('/w/<path:name>/from/<path:redirect>')
 def redirectw(name = None, redirect = None):
@@ -1970,7 +1970,7 @@ def redirectw(name = None, redirect = None):
             else:
                 return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = div, license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, redirect = '<a href="/w/' + parse.quote(redirect).replace('/','%2F') + '/from/' + parse.quote(name).replace('/','%2F') + '">' + redirect + '</a>에서 넘어 왔습니다.')
         else:
-            return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = '분류 문서 없음', license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, redirect = '<a href="/w/' + parse.quote(redirect).replace('/','%2F') + '/from/' + parse.quote(name).replace('/','%2F') + '">' + redirect + '</a>에서 넘어 왔습니다.')
+            return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = '분류 문서 없음', license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, redirect = '<a href="/w/' + parse.quote(redirect).replace('/','%2F') + '/from/' + parse.quote(name).replace('/','%2F') + '">' + redirect + '</a>에서 넘어 왔습니다.'), 404
     else:
         m = re.search("^사용자:(.*)", name)
         if(m):
@@ -2002,7 +2002,7 @@ def redirectw(name = None, redirect = None):
                 left = ''
             return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = enddata, license = data['license'], tn = 1, acl = acl, left = left, uppage = uppage, style = style, topic = topic, redirect = '<a href="/w/' + parse.quote(redirect).replace('/','%2F') + '/from/' + parse.quote(name).replace('/','%2F') + '">' + redirect + '</a>에서 넘어 왔습니다.')
         else:
-            return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = '문서 없음', license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, redirect = '<a href="/w/' + parse.quote(redirect).replace('/','%2F') + '/from/' + parse.quote(name).replace('/','%2F') + '">' + redirect + '</a>에서 넘어 왔습니다.')
+            return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = '문서 없음', license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, redirect = '<a href="/w/' + parse.quote(redirect).replace('/','%2F') + '/from/' + parse.quote(name).replace('/','%2F') + '">' + redirect + '</a>에서 넘어 왔습니다.'), 404
 
 @app.route('/w/<path:name>/r/<int:number>')
 def rew(name = None, number = None):
@@ -2018,7 +2018,7 @@ def rew(name = None, number = None):
             left = ''
         return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = enddata, license = data['license'], tn = 6, left = left)
     else:
-        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = '문서 없음', license = data['license'], tn = 6)
+        return '<meta http-equiv="refresh" content="0;url=/history/' + parse.quote(name).replace('/','%2F') + '" />'
 
 @app.route('/w/<path:name>/raw/<int:number>')
 def reraw(name = None, number = None):
@@ -2031,7 +2031,7 @@ def reraw(name = None, number = None):
         enddata = re.sub("\n", '<br>', enddata)
         return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = enddata, license = data['license'])
     else:
-        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = '문서 없음', license = data['license'])
+        return '<meta http-equiv="refresh" content="0;url=/history/' + parse.quote(name).replace('/','%2F') + '" />'
 
 @app.route('/raw/<path:name>')
 def raw(name = None):
@@ -2044,7 +2044,7 @@ def raw(name = None):
         enddata = re.sub("\n", '<br>', enddata)
         return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = enddata, license = data['license'], tn = 7)
     else:
-        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = '문서 없음', license = data['license'], tn = 7)
+        return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name).replace('/','%2F') + '" />'
 
 @app.route('/revert/<path:name>/r/<int:number>', methods=['POST', 'GET'])
 def revert(name = None, number = None):
@@ -2090,7 +2090,7 @@ def edit(name = None):
     if(request.method == 'POST'):
         m = re.search('(?:[^A-Za-zㄱ-힣0-9 ])', request.form["send"])
         if(m):
-            return render_template('index.html', title = '편집 오류', logo = data['name'], data = '편집 내용 기록에는 한글과 영어와 숫자, 공백만 허용 됩니다.')
+            return '<meta http-equiv="refresh" content="0;url=/error/17" />'
         else:
             today = getnow()
             content = re.sub("\[date\(now\)\]", today, request.form["content"])
@@ -2098,7 +2098,7 @@ def edit(name = None):
             rows = curs.fetchall()
             if(rows):
                 if(rows[0]['data'] == content):
-                    return render_template('index.html', title = '편집 오류', logo = data['name'], data = '내용이 원래 문서와 동일 합니다.')
+                    return '<meta http-equiv="refresh" content="0;url=/error/18" />'
                 else:
                     ip = getip(request)
                     can = getcan(ip, name)
@@ -2149,7 +2149,7 @@ def secedit(name = None, number = None):
     if(request.method == 'POST'):
         m = re.search('(?:[^A-Za-zㄱ-힣0-9 ])', request.form["send"])
         if(m):
-            return render_template('index.html', title = '편집 오류', logo = data['name'], data = '편집 내용 기록에는 한글과 영어와 숫자, 공백만 허용 됩니다.')
+            return '<meta http-equiv="refresh" content="0;url=/error/17" />'
         else:
             today = getnow()
             content = re.sub("\[date\(now\)\]", today, request.form["content"])
@@ -2157,7 +2157,7 @@ def secedit(name = None, number = None):
             rows = curs.fetchall()
             if(rows):
                 if(request.form["otent"] == content):
-                    return render_template('index.html', title = '편집 오류', logo = data['name'], data = '내용이 원래 문서와 동일 합니다.')
+                    return '<meta http-equiv="refresh" content="0;url=/error/18" />'
                 else:
                     ip = getip(request)
                     can = getcan(ip, name)
@@ -2311,7 +2311,7 @@ def move(name = None):
                 curs.execute("select * from history where title = '" + pymysql.escape_string(request.form["title"]) + "'")
                 row = curs.fetchall()
                 if(row):
-                    return render_template('index.html', title = '이동 오류', logo = data['name'], data = '이동 하려는 곳에 문서가 이미 있습니다.')
+                    return '<meta http-equiv="refresh" content="0;url=/error/19" />'
                 else:
                     history(name, rows[0]['data'], today, ip, '<a href="/w/' + parse.quote(name).replace('/','%2F') + '">' + name + '</a> 문서를 <a href="/w/' + parse.quote(request.form["title"]).replace('/','%2F') + '">' + request.form["title"] + '</a> 문서로 이동 했습니다.', leng)
                     curs.execute("update data set title = '" + pymysql.escape_string(request.form["title"]) + "' where title = '" + pymysql.escape_string(name) + "'")
@@ -2329,7 +2329,7 @@ def move(name = None):
                 curs.execute("select * from history where title = '" + pymysql.escape_string(request.form["title"]) + "'")
                 row = curs.fetchall()
                 if(row):
-                     return render_template('index.html', title = '이동 오류', logo = data['name'], data = '이동 하려는 곳에 문서가 이미 있습니다.')
+                     return '<meta http-equiv="refresh" content="0;url=/error/19" />'
                 else:
                     history(name, '', today, ip, '<a href="/w/' + parse.quote(name).replace('/','%2F') + '">' + name + '</a> 문서를 <a href="/w/' + parse.quote(request.form["title"]).replace('/','%2F') + '">' + request.form["title"] + '</a> 문서로 이동 했습니다.', leng)
                     curs.execute("update history set title = '" + pymysql.escape_string(request.form["title"]) + "' where title = '" + pymysql.escape_string(name) + "'")
@@ -2345,7 +2345,7 @@ def move(name = None):
 
 @app.route('/other')
 def other():
-    return render_template('index.html', title = '기타 메뉴', logo = data['name'], data = '<li><a href="/titleindex">모든 문서</a></li><li><a href="/blocklog/n/1">유저 차단 기록</a></li><li><a href="/userlog/n/1">유저 가입 기록</a></li><li><a href="/upload">업로드</a></li><li><a href="/manager">관리자 메뉴</a></li><li><a href="/record">유저 기록</a></li><br>이 오픈나무의 버전은 <a href="https://github.com/2DU/openNAMU/blob/master/version.md">1.7.1.1</a> 입니다.')
+    return render_template('index.html', title = '기타 메뉴', logo = data['name'], data = '<li><a href="/titleindex">모든 문서</a></li><li><a href="/blocklog/n/1">유저 차단 기록</a></li><li><a href="/userlog/n/1">유저 가입 기록</a></li><li><a href="/upload">업로드</a></li><li><a href="/manager">관리자 메뉴</a></li><li><a href="/record">유저 기록</a></li><br>이 오픈나무의 버전은 <a href="https://github.com/2DU/openNAMU/blob/master/version.md">1.7.2</a> 입니다.')
     
 @app.route('/manager')
 def manager():
@@ -2588,11 +2588,11 @@ def blind(name = None, sub = None, number = None):
                 else:
                     return '<meta http-equiv="refresh" content="0;url=/topic/' + name + '/sub/' + sub + '" />'
             else:
-                return render_template('index.html', title = '권한 오류', logo = data['name'], data = '권한이 모자랍니다.')
+                return '<meta http-equiv="refresh" content="0;url=/error/3" />'
         else:
-            return render_template('index.html', title = '권한 오류', logo = data['name'], data = '계정이 없습니다.')
+            return '<meta http-equiv="refresh" content="0;url=/error/2" />'
     else:
-        return render_template('index.html', title = '권한 오류', logo = data['name'], data = '비 로그인 상태 입니다.')
+        return '<meta http-equiv="refresh" content="0;url=/error/1" />'
         
 @app.route('/topic/<path:name>/sub/<path:sub>/stop')
 def topicstop(name = None, sub = None):
@@ -2619,11 +2619,11 @@ def topicstop(name = None, sub = None):
                 else:
                     return '<meta http-equiv="refresh" content="0;url=/topic/' + name + '/sub/' + sub + '" />'
             else:
-                return render_template('index.html', title = '권한 오류', logo = data['name'], data = '권한이 모자랍니다.')
+                return '<meta http-equiv="refresh" content="0;url=/error/3" />'
         else:
-            return render_template('index.html', title = '권한 오류', logo = data['name'], data = '계정이 없습니다.')
+            return '<meta http-equiv="refresh" content="0;url=/error/2" />'
     else:
-        return render_template('index.html', title = '권한 오류', logo = data['name'], data = '비 로그인 상태 입니다.')
+        return '<meta http-equiv="refresh" content="0;url=/error/1" />'
         
 @app.route('/topic/<path:name>/sub/<path:sub>/close')
 def topicclose(name = None, sub = None):
@@ -2650,11 +2650,11 @@ def topicclose(name = None, sub = None):
                 else:
                     return '<meta http-equiv="refresh" content="0;url=/topic/' + name + '/sub/' + sub + '" />'
             else:
-                return render_template('index.html', title = '권한 오류', logo = data['name'], data = '권한이 모자랍니다.')
+                return '<meta http-equiv="refresh" content="0;url=/error/3" />'
         else:
-            return render_template('index.html', title = '권한 오류', logo = data['name'], data = '계정이 없습니다.')
+            return '<meta http-equiv="refresh" content="0;url=/error/2" />'
     else:
-        return render_template('index.html', title = '권한 오류', logo = data['name'], data = '비 로그인 상태 입니다.')
+        return '<meta http-equiv="refresh" content="0;url=/error/1" />'
 
 @app.route('/login', methods=['POST', 'GET'])
 def login():
@@ -2668,7 +2668,7 @@ def login():
             rows = curs.fetchall()
             if(rows):
                 if(session.get('Now') == True):
-                    return render_template('index.html', title = '로그인 오류', logo = data['name'], data = '이미 로그인 되어 있습니다.')
+                    return '<meta http-equiv="refresh" content="0;url=/error/11" />'
                 elif(bcrypt.checkpw(bytes(request.form["pw"], 'utf-8'), bytes(rows[0]['pw'], 'utf-8'))):
                     session['Now'] = True
                     session['DREAMER'] = request.form["id"]
@@ -2676,9 +2676,9 @@ def login():
                     conn.commit()
                     return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(data['frontpage']).replace('/','%2F') + '" />'
                 else:
-                    return render_template('index.html', title = '로그인 오류', logo = data['name'], data = '비밀번호가 다릅니다.')
+                    return '<meta http-equiv="refresh" content="0;url=/error/13" />'
             else:
-                return render_template('index.html', title = '로그인 오류', logo = data['name'], data = '없는 계정 입니다.')
+                return '<meta http-equiv="refresh" content="0;url=/error/12" />'
     else:
         ip = getip(request)
         ban = getban(ip)
@@ -2686,7 +2686,7 @@ def login():
             return '<meta http-equiv="refresh" content="0;url=/ban" />'
         else:
             if(session.get('Now') == True):
-                return render_template('index.html', title = '로그인 오류', logo = data['name'], data = '이미 로그인 되어 있습니다.')
+                return '<meta http-equiv="refresh" content="0;url=/error/11" />'
             else:
                 return render_template('index.html', title = '로그인', enter = '로그인', logo = data['name'], tn = 15)
                 
@@ -2709,9 +2709,9 @@ def change():
                     conn.commit()
                     return '<meta http-equiv="refresh" content="0;url=/login" />'
                 else:
-                    return render_template('index.html', title = '변경 오류', logo = data['name'], data = '비밀번호가 다릅니다.')
+                    return '<meta http-equiv="refresh" content="0;url=/error/10" />'
             else:
-                return render_template('index.html', title = '변경 오류', logo = data['name'], data = '없는 계정 입니다.')
+                return '<meta http-equiv="refresh" content="0;url=/error/9" />'
     else:
         ip = getip(request)
         ban = getban(ip)
@@ -2728,7 +2728,7 @@ def check(name = None, sub = None, number = None):
     curs.execute("select * from user where id = '" + pymysql.escape_string(name) + "'")
     rows = curs.fetchall()
     if(rows and rows[0]['acl'] == 'owner' or rows and rows[0]['acl'] == 'admin'):
-        return render_template('index.html', title = '차단 오류', logo = data['name'], data = '관리자는 검사 할 수 없습니다.')
+        return '<meta http-equiv="refresh" content="0;url=/error/4" />'
     else:
         if(admincheck() == 1):
             m = re.search('(?:[0-9](?:[0-9][0-9])?\.[0-9](?:[0-9][0-9])?\.[0-9](?:[0-9][0-9])?\.[0-9](?:[0-9][0-9])?)', name)
@@ -2763,7 +2763,7 @@ def check(name = None, sub = None, number = None):
                 else:
                     return render_template('index.html', title = '다중 검사', logo = data['name'], tn = 22, rows = '')
         else:
-            return render_template('index.html', title = '권한 오류', logo = data['name'], data = '권한이 모자랍니다.')
+            return '<meta http-equiv="refresh" content="0;url=/error/3" />'
 
 @app.route('/register', methods=['POST', 'GET'])
 def register():
@@ -2775,15 +2775,15 @@ def register():
         else:
             m = re.search('(?:[^A-Za-zㄱ-힣0-9 ])', request.form["id"])
             if(m):
-                return render_template('index.html', title = '회원가입 오류', logo = data['name'], data = '아이디에는 한글과 알파벳 공백만 허용 됩니다.')
+                return '<meta http-equiv="refresh" content="0;url=/error/8" />'
             else:
                 if(len(request.form["id"]) > 20):
-                    return render_template('index.html', title = '회원가입 오류', logo = data['name'], data = '아이디는 20글자보다 짧아야 합니다.')
+                    return '<meta http-equiv="refresh" content="0;url=/error/7" />'
                 else:
                     curs.execute("select * from user where id = '" + pymysql.escape_string(request.form["id"]) + "'")
                     rows = curs.fetchall()
                     if(rows):
-                        return render_template('index.html', title = '회원가입 오류', logo = data['name'], data = '동일한 아이디의 유저가 있습니다.')
+                        return '<meta http-equiv="refresh" content="0;url=/error/6" />'
                     else:
                         hashed = bcrypt.hashpw(bytes(request.form["pw"], 'utf-8'), bcrypt.gensalt())
                         if(request.form["id"] == data['owner']):
@@ -2811,7 +2811,7 @@ def ban(name = None):
     curs.execute("select * from user where id = '" + pymysql.escape_string(name) + "'")
     rows = curs.fetchall()
     if(rows and rows[0]['acl'] == 'owner' or rows and rows[0]['acl'] == 'admin'):
-        return render_template('index.html', title = '차단 오류', logo = data['name'], data = '관리자는 차단 할 수 없습니다.')
+        return '<meta http-equiv="refresh" content="0;url=/error/4" />'
     else:
         if(request.method == 'POST'):
             if(admincheck() == 1):
@@ -2832,7 +2832,7 @@ def ban(name = None):
                 conn.commit()
                 return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(data['frontpage']).replace('/','%2F') + '" />'
             else:
-                return render_template('index.html', title = '권한 오류', logo = data['name'], data = '권한이 모자랍니다.')
+                return '<meta http-equiv="refresh" content="0;url=/error/3" />'
         else:
             if(admincheck() == 1):
                 curs.execute("select * from ban where block = '" + pymysql.escape_string(name) + "'")
@@ -2847,7 +2847,7 @@ def ban(name = None):
                         now = '차단'
                 return render_template('index.html', title = name, page = parse.quote(name).replace('/','%2F'), logo = data['name'], tn = 16, now = now, today = getnow())
             else:
-                return render_template('index.html', title = '권한 오류', logo = data['name'], data = '권한이 모자랍니다.')
+                return '<meta http-equiv="refresh" content="0;url=/error/3" />'
 
 @app.route('/acl/<path:name>', methods=['POST', 'GET'])
 def acl(name = None):
@@ -2865,7 +2865,7 @@ def acl(name = None):
                 conn.commit()
             return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name).replace('/','%2F') + '" />' 
         else:
-            return render_template('index.html', title = '권한 오류', logo = data['name'], data = '권한이 모자랍니다.')
+            return '<meta http-equiv="refresh" content="0;url=/error/3" />'
     else:
         if(admincheck() == 1):
             curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
@@ -2881,7 +2881,7 @@ def acl(name = None):
             else:
                 return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name).replace('/','%2F') + '" />' 
         else:
-            return render_template('index.html', title = '권한 오류', logo = data['name'], data = '권한이 모자랍니다.')
+            return '<meta http-equiv="refresh" content="0;url=/error/3" />'
 
 @app.route('/admin/<name>', methods=['POST', 'GET'])
 def admin(name = None):
@@ -2902,13 +2902,13 @@ def admin(name = None):
                         conn.commit()
                         return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(data['frontpage']).replace('/','%2F') + '" />'
                     else:
-                        return render_template('index.html', title = '사용자 오류', logo = data['name'], data = '계정이 없습니다.')
+                        return '<meta http-equiv="refresh" content="0;url=/error/5" />'
                 else:
-                    return render_template('index.html', title = '권한 오류', logo = data['name'], data = '권한이 모자랍니다.')
+                    return '<meta http-equiv="refresh" content="0;url=/error/3" />'
             else:
-                return render_template('index.html', title = '권한 오류', logo = data['name'], data = '계정이 없습니다.')
+                return '<meta http-equiv="refresh" content="0;url=/error/2" />'
         else:
-            return render_template('index.html', title = '권한 오류', logo = data['name'], data = '비 로그인 상태 입니다.')
+            return '<meta http-equiv="refresh" content="0;url=/error/1" />'
     else:
         if(session.get('Now') == True):
             ip = getip(request)
@@ -2925,13 +2925,13 @@ def admin(name = None):
                             now = '권한 부여'
                         return render_template('index.html', title = name, page = parse.quote(name).replace('/','%2F'), logo = data['name'], tn = 18, now = now)
                     else:
-                        return render_template('index.html', title = '사용자 오류', logo = data['name'], data = '계정이 없습니다.')
+                        return '<meta http-equiv="refresh" content="0;url=/error/5" />'
                 else:
-                    return render_template('index.html', title = '권한 오류', logo = data['name'], data = '권한이 모자랍니다.')
+                    return '<meta http-equiv="refresh" content="0;url=/error/3" />'
             else:
-                return render_template('index.html', title = '권한 오류', logo = data['name'], data = '계정이 없습니다.')
+                return '<meta http-equiv="refresh" content="0;url=/error/2" />'
         else:
-            return render_template('index.html', title = '권한 오류', logo = data['name'], data = '비 로그인 상태 입니다.')
+            return '<meta http-equiv="refresh" content="0;url=/error/1" />'
 
 @app.route('/ban')
 def aban():
@@ -2941,17 +2941,14 @@ def aban():
         rows = curs.fetchall()
         if(rows):
             if(rows[0]['end']):
-                end = rows[0]['end'] + ' 까지 차단 상태 입니다. / 사유 : ' + rows[0]['why']
-                
+                end = rows[0]['end'] + ' 까지 차단 상태 입니다. / 사유 : ' + rows[0]['why']                
                 now = getnow()
                 now = re.sub(':', '', now)
                 now = re.sub('\-', '', now)
                 now = re.sub(' ', '', now)
                 now = int(now)
-                
                 day = rows[0]['end']
-                day = re.sub('\-', '', day)
-                
+                day = re.sub('\-', '', day)                
                 if(now >= int(day + '000000')):
                     curs.execute("delete from ban where block = '" + pymysql.escape_string(ip) + "'")
                     conn.commit()
@@ -2966,14 +2963,12 @@ def aban():
                 row = curs.fetchall()
                 if(row):
                     if(row[0]['end']):
-                        end = row[0]['end'] + ' 까지 차단 상태 입니다. / 사유 : ' + rows[0]['why']
-                
+                        end = row[0]['end'] + ' 까지 차단 상태 입니다. / 사유 : ' + rows[0]['why']                
                         now = getnow()
                         now = re.sub(':', '', now)
                         now = re.sub('\-', '', now)
                         now = re.sub(' ', '', now)
-                        now = int(now)
-                        
+                        now = int(now)                        
                         day = row[0]['end']
                         day = re.sub('\-', '', day)
                         
@@ -2985,15 +2980,14 @@ def aban():
                         end = '영구 차단 상태 입니다. / 사유 : ' + row[0]['why']                
     else:
         end = '권한이 맞지 않는 상태 입니다.'
-    
-    return render_template('index.html', title = '권한 오류', logo = data['name'], data = end)
+    return render_template('index.html', title = '권한 오류', logo = data['name'], data = end), 401
    
-@app.route('/w/<path:name>/r/<a>/diff/<b>')
+@app.route('/w/<path:name>/r/<int:a>/diff/<int:b>')
 def diff(name = None, a = None, b = None):
-    curs.execute("select * from history where id = '" + pymysql.escape_string(a) + "' and title = '" + pymysql.escape_string(name) + "'")
+    curs.execute("select * from history where id = '" + pymysql.escape_string(str(a)) + "' and title = '" + pymysql.escape_string(name) + "'")
     rows = curs.fetchall()
     if(rows):
-        curs.execute("select * from history where id = '" + pymysql.escape_string(b) + "' and title = '" + pymysql.escape_string(name) + "'")
+        curs.execute("select * from history where id = '" + pymysql.escape_string(str(b)) + "' and title = '" + pymysql.escape_string(name) + "'")
         row = curs.fetchall()
         if(row):
             indata = re.sub('<', '&lt;', rows[0]['data'])
@@ -3008,9 +3002,9 @@ def diff(name = None, a = None, b = None):
             c = show_diff(sm)
             return render_template('index.html', title = name, logo = data['name'], data = c, plus = '(비교)')
         else:
-            return render_template('index.html', title = 'Diff 오류', logo = data['name'], data = '<a href="/w/' + name + '">이 리비전이나 문서가 없습니다.</a>')
+            return '<meta http-equiv="refresh" content="0;url=/history/' + parse.quote(name).replace('/','%2F') + '" />'
     else:
-        return render_template('index.html', title = 'Diff 오류', logo = data['name'], data = '<a href="/w/' + name + '">이 리비전이나 문서가 없습니다.</a>')
+        return '<meta http-equiv="refresh" content="0;url=/history/' + parse.quote(name).replace('/','%2F') + '" />'
         
 @app.route('/user')
 def user():
@@ -3039,7 +3033,50 @@ def random():
     if(rows):
         return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(rows[0]['title']).replace('/','%2F') + '" />'
     else:
-        return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(data['frontpage']).replace('/','%2F') + '" />'
+        return '<meta http-equiv="refresh" content="0;url=/" />'
+        
+@app.route('/error/<int:num>')
+def error(num = None):
+    if(num == 1):
+        return render_template('index.html', title = '권한 오류', logo = data['name'], data = '비 로그인 상태 입니다.'), 401
+    elif(num == 2):
+        return render_template('index.html', title = '권한 오류', logo = data['name'], data = '이 계정이 없습니다.'), 401
+    elif(num == 3):
+        return render_template('index.html', title = '권한 오류', logo = data['name'], data = '권한이 모자랍니다.'), 401
+    elif(num == 4):
+        return render_template('index.html', title = '권한 오류', logo = data['name'], data = '관리자는 차단, 검사 할 수 없습니다.'), 401
+    elif(num == 5):
+        return render_template('index.html', title = '유저 오류', logo = data['name'], data = '그런 계정이 없습니다.'), 401
+    elif(num == 6):
+        return render_template('index.html', title = '가입 오류', logo = data['name'], data = '동일한 아이디의 유저가 있습니다.'), 401
+    elif(num == 7):
+        return render_template('index.html', title = '가입 오류', logo = data['name'], data = '아이디는 20글자보다 짧아야 합니다.'), 401
+    elif(num == 8):
+        return render_template('index.html', title = '가입 오류', logo = data['name'], data = '아이디에는 한글과 알파벳과 공백만 허용 됩니다.'), 401
+    elif(num == 9):
+        return render_template('index.html', title = '변경 오류', logo = data['name'], data = '그런 계정이 없습니다.'), 401
+    elif(num == 10):
+        return render_template('index.html', title = '변경 오류', logo = data['name'], data = '비밀번호가 다릅니다.'), 401
+    elif(num == 11):
+        return render_template('index.html', title = '로그인 오류', logo = data['name'], data = '이미 로그인 되어 있습니다.'), 401
+    elif(num == 12):
+        return render_template('index.html', title = '로그인 오류', logo = data['name'], data = '그런 계정이 없습니다.'), 401
+    elif(num == 13):
+        return render_template('index.html', title = '로그인 오류', logo = data['name'], data = '비밀번호가 다릅니다.'), 401
+    elif(num == 14):
+        return render_template('index.html', title = '업로드 오류', logo = data['name'], data = 'jpg, gif, jpeg, png만 가능 합니다.'), 401
+    elif(num == 15):
+        return render_template('index.html', title = '업로드 오류', logo = data['name'], data = '파일 명에 . / \ * < > | : ? 가 들어 갈 수 없습니다.'), 401
+    elif(num == 16):
+        return render_template('index.html', title = '업로드 오류', logo = data['name'], data = '동일한 이름의 파일이 있습니다.'), 401
+    elif(num == 17):
+        return render_template('index.html', title = '편집 오류', logo = data['name'], data = '편집 내용 기록에는 한글과 영어와 숫자, 공백만 허용 됩니다.'), 401
+    elif(num == 18):
+        return render_template('index.html', title = '편집 오류', logo = data['name'], data = '내용이 원래 문서와 동일 합니다.'), 401
+    elif(num == 19):
+        return render_template('index.html', title = '이동 오류', logo = data['name'], data = '이동 하려는 곳에 문서가 이미 있습니다.'), 401
+    else:
+        return '<meta http-equiv="refresh" content="0;url=/" />'
 
 @app.errorhandler(404)
 def uncaughtError(error):
