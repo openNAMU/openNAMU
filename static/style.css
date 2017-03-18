@@ -102,6 +102,10 @@ h1, h2, h3, h4, h5, h6 {
     font-size: 25%;
 }
 
+td:hover {
+    background: #ddd;
+}
+
 ref {
     background-color: #efefef;
     color: #555555;
