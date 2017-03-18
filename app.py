@@ -1559,37 +1559,43 @@ def backlink(name = None, number = None):
                     div = div + '<br><a href="/backlink/n/' + str(number - 1) + '">(이전)'
                 break
                 
-            curs.execute("select * from data where title = '" + pymysql.escape_string(rows[i]['link']) + "'")
-            row = curs.fetchall()
-            if(row):
-                aa = row[0]['data']
-                aa = re.sub("(?P<in>\[include\((?P<out>(?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\])", "\g<in>\n\n[[\g<out>]]\n\n", aa)
-                aa = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', '[[\g<in>]]', aa)
-                aa = namumark('', aa)
-                
-                if(re.search("<a(?: class=\"not_thing\")? href=\"\/w\/" + parse.quote(name).replace('/','%2F') + "(?:\#[^\"]*)?\">([^<]*)<\/a>", aa)):
-                    div = div + '<li><a href="/w/' + parse.quote(rows[i]['link']).replace('/','%2F') + '">' + rows[i]['link'] + '</a>'
+            if(not re.search('^사용자:', rows[i]['link'])):
+                curs.execute("select * from data where title = '" + pymysql.escape_string(rows[i]['link']) + "'")
+                row = curs.fetchall()
+                if(row):
+                    aa = row[0]['data']
+                    aa = re.sub("(?P<in>\[include\((?P<out>(?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\])", "\g<in>\n\n[[\g<out>]]\n\n", aa)
+                    aa = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', '[[\g<in>]]', aa)
+                    aa = namumark('', aa)
                     
-                    if(rows[i]['type']):
-                        div = div + ' (' + rows[i]['type'] + ')</li>'
-                    else:
-                        div = div + '</li>'
+                    if(re.search("<a(?: class=\"not_thing\")? href=\"\/w\/" + parse.quote(name).replace('/','%2F') + "(?:\#[^\"]*)?\">([^<]*)<\/a>", aa)):
+                        div = div + '<li><a href="/w/' + parse.quote(rows[i]['link']).replace('/','%2F') + '">' + rows[i]['link'] + '</a>'
                         
-                    if(i == v):
-                        if(number == 1):
-                            div = div + '<br><a href="/backlink/' + parse.quote(name).replace('/','%2F') + '/n/' + str(number + 1) + '">(다음)'
+                        if(rows[i]['type']):
+                            div = div + ' (' + rows[i]['type'] + ')</li>'
                         else:
-                            div = div + '<br><a href="/backlink/' + parse.quote(name).replace('/','%2F') + '/n/' + str(number - 1) + '">(이전) <a href="/userlog/n/' + str(number + 1) + '">(다음)'
-                        break
+                            div = div + '</li>'
+                            
+                        if(i == v):
+                            if(number == 1):
+                                div = div + '<br><a href="/backlink/' + parse.quote(name).replace('/','%2F') + '/n/' + str(number + 1) + '">(다음)'
+                            else:
+                                div = div + '<br><a href="/backlink/' + parse.quote(name).replace('/','%2F') + '/n/' + str(number - 1) + '">(이전) <a href="/backlink/' + parse.quote(name).replace('/','%2F') + '/n/' + str(number + 1) + '">(다음)'
+                            break
+                        else:
+                            i = i + 1
                     else:
+                        curs.execute("delete from back where title = '" + pymysql.escape_string(name) + "' and link = '" + pymysql.escape_string(rows[i]['link']) + "'")
+                        conn.commit()
                         i = i + 1
+                        v = v + 1
                 else:
-                    curs.execute("delete from back where title = '" + pymysql.escape_string(rows[i]['link']) + "' and link = '" + pymysql.escape_string(name) + "'")
+                    curs.execute("delete from back where title = '" + pymysql.escape_string(name) + "' and link = '" + pymysql.escape_string(rows[i]['link']) + "'")
                     conn.commit()
                     i = i + 1
                     v = v + 1
             else:
-                curs.execute("delete from back where title = '" + pymysql.escape_string(rows[i]['link']) + "' and link = '" + pymysql.escape_string(name) + "'")
+                curs.execute("delete from back where title = '" + pymysql.escape_string(name) + "' and link = '" + pymysql.escape_string(rows[i]['link']) + "'")
                 conn.commit()
                 i = i + 1
                 v = v + 1
@@ -2431,21 +2437,27 @@ def topic(name = None):
             except:
                 div = div + '</div>'
                 break
+                
             curs.execute("select * from topic where title = '" + pymysql.escape_string(rows[i]['title']) + "' and sub = '" + pymysql.escape_string(rows[i]['sub']) + "' and id = '1' order by sub asc")
             aa = curs.fetchall()
+            
             indata = namumark(name, aa[0]['data'])
+            
             if(aa[0]['block'] == 'O'):
                 indata = '블라인드 되었습니다.'
                 block = 'style="background: gainsboro;"'
             else:
                 block = ''
+                
             curs.execute("select * from stop where title = '" + pymysql.escape_string(rows[i]['title']) + "' and sub = '" + pymysql.escape_string(rows[i]['sub']) + "' and close = 'O'")
             row = curs.fetchall()
             if(not row):
                 div = div + '<h2><a href="/topic/' + parse.quote(rows[i]['title']).replace('/','%2F') + '/sub/' + parse.quote(rows[i]['sub']).replace('/','%2F') + '">' + str(j) + '. ' + rows[i]['sub'] + '</a></h2>'
                 div = div + '<table id="toron"><tbody><tr><td id="toroncolorgreen"><a href="javascript:void(0);" id="1">#1</a> ' + aa[0]['ip'] + ' <span style="float:right;">' + aa[0]['date'] + '</span></td></tr><tr><td ' + block + '>' + indata + '</td></tr></tbody></table><br>'
                 j = j + 1
+                
             i = i + 1
+            
         return render_template('index.html', title = name, page = parse.quote(name).replace('/','%2F'), logo = data['name'], plus = div, tn = 10, list = 1)
         
 @app.route('/topic/<path:name>/close')
@@ -2455,6 +2467,7 @@ def topicstoplist(name = None):
     else:
         div = '<div>'
         i = 0
+        
         curs.execute("select * from stop where title = '" + pymysql.escape_string(name) + "' and close = 'O' order by sub asc")
         rows = curs.fetchall()
         while True:
@@ -2463,19 +2476,24 @@ def topicstoplist(name = None):
             except:
                 div = div + '</div>'
                 break
+                
             curs.execute("select * from topic where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(rows[i]['sub']) + "' and id = '1'")
             row = curs.fetchall()
             if(row):
                 j = i + 1
                 indata = namumark(name, row[0]['data'])
+                
                 if(row[0]['block'] == 'O'):
                     indata = '블라인드 되었습니다.'
                     block = 'style="background: gainsboro;"'
                 else:
                     block = ''
+                    
                 div = div + '<h2><a href="/topic/' + parse.quote(name).replace('/','%2F') + '/sub/' + parse.quote(rows[i]['sub']).replace('/','%2F') + '">' + str((i + 1)) + '. ' + rows[i]['sub'] + '</a></h2>'
                 div = div + '<table id="toron"><tbody><tr><td id="toroncolorgreen"><a href="javascript:void(0);" id="' + str(j) + '">#' + str(j) + '</a> ' + row[0]['ip'] + ' <span style="float:right;">' + row[0]['date'] + '</span></td></tr><tr><td ' + block + '>' + indata + '</td></tr></tbody></table><br>'
+                
             i = i + 1
+            
         return render_template('index.html', title = name, page = parse.quote(name).replace('/','%2F'), logo = data['name'], plus = div, tn = 10)
 
 @app.route('/topic/<path:name>/sub/<path:sub>', methods=['POST', 'GET'])
@@ -2487,8 +2505,10 @@ def sub(name = None, sub = None):
             number = int(rows[0]['id']) + 1
         else:
             number = 1
+            
         ip = getip(request)
         ban = getdiscuss(ip, name, sub)
+        
         if(ban == 1):
             return '<meta http-equiv="refresh" content="0;url=/ban" />'
         else:
@@ -2497,39 +2517,51 @@ def sub(name = None, sub = None):
             if(rows):
                 if(rows[0]['acl'] == 'owner' or rows[0]['acl'] == 'admin'):
                     ip = ip + ' - Admin'
+                    
             today = getnow()
             discuss(name, sub, today)
+            
             aa = request.form["content"]
             aa = re.sub("\[\[(분류:(?:(?:(?!\]\]).)*))\]\]", "[br]", aa)
             aa = re.sub("\[date\(now\)\]", today, aa)
+            
             curs.execute("insert into topic (id, title, sub, data, date, ip, block) value ('" + str(number) + "', '" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(sub) + "', '" + pymysql.escape_string(aa) + "', '" + today + "', '" + ip + "', '')")
             conn.commit()
+            
             return '<meta http-equiv="refresh" content="0;url=/topic/' + parse.quote(name).replace('/','%2F') + '/sub/' + parse.quote(sub).replace('/','%2F') + '" />'
     else:
         ip = getip(request)
         ban = getdiscuss(ip, name, sub)
         admin = admincheck()
+        
         if(admin == 1):
             div = '<div>' + '<a href="/topic/' + parse.quote(name).replace('/','%2F') + '/sub/' + parse.quote(sub).replace('/','%2F') + '/close">(토론 닫기 및 열기)</a>' + ' <a href="/topic/' + parse.quote(name).replace('/','%2F') + '/sub/' + parse.quote(sub).replace('/','%2F') + '/stop">(토론 정지 및 재개)</a><br><br>'
         else:
             div = '<div>'
+            
         i = 0
+        
         curs.execute("select * from topic where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' order by id+0 asc")
         rows = curs.fetchall()
+        
         while True:
             try:
                 a = rows[i]
             except:
                 div = div + '</div>'
                 break
+                
             if(i == 0):
                 start = rows[i]['ip']
+                
             indata = namumark(name, rows[i]['data'])
+            
             if(rows[i]['block'] == 'O'):
                 indata = '블라인드 되었습니다.'
                 block = 'style="background: gainsboro;"'
             else:
                 block = ''
+                
             m = re.search("([^-]*)\s\-\s(Close|Reopen|Stop|Restart)$", rows[i]['ip'])
             if(m):
                 ban = ""
@@ -2541,6 +2573,7 @@ def sub(name = None, sub = None):
                         isblock = ' <a href="/topic/' + parse.quote(name).replace('/','%2F') + '/sub/' + parse.quote(sub).replace('/','%2F') + '/b/' + str(i + 1) + '">(해제)</a>'
                     else:
                         isblock = ' <a href="/topic/' + parse.quote(name).replace('/','%2F') + '/sub/' + parse.quote(sub).replace('/','%2F') + '/b/' + str(i + 1) + '">(블라인드)</a>'
+                        
                     n = re.search("\- (?:Admin)$", rows[i]['ip'])
                     if(n):
                         ban = isblock
@@ -2551,6 +2584,7 @@ def sub(name = None, sub = None):
                             ban = ' <a href="/ban/' + parse.quote(rows[i]['ip']).replace('/','%2F') + '">(차단)</a>' + isblock
                 else:
                     ban = ""
+                    
             m = re.search("([^-]*)\s\-\s(Close|Reopen|Stop|Restart|Admin)$", rows[i]['ip'])
             if(m):
                 g = m.groups()
@@ -2569,19 +2603,23 @@ def sub(name = None, sub = None):
                     ip = '<a href="/w/' + parse.quote('사용자:' + rows[i]['ip']).replace('/','%2F') + '">' + rows[i]['ip'] + '</a>'
                 else:
                     ip = '<a class="not_thing" href="/w/' + parse.quote('사용자:' + rows[i]['ip']).replace('/','%2F') + '">' + rows[i]['ip'] + '</a>'
+                    
             if(rows[i]['ip'] == start):
                 j = i + 1
                 div = div + '<table id="toron"><tbody><tr><td id="toroncolorgreen"><a href="javascript:void(0);" id="' + str(j) + '">#' + str(j) + '</a> ' + ip + ban + ' <span style="float:right;">' + rows[i]['date'] + '</span></td></tr><tr><td ' + block + '>' + indata + '</td></tr></tbody></table><br>'
             else:
                 j = i + 1
                 div = div + '<table id="toron"><tbody><tr><td id="toroncolor"><a href="javascript:void(0);" id="' + str(j) + '">#' + str(j) + '</a> ' + ip + ban + ' <span style="float:right;">' + rows[i]['date'] + '</span></td></tr><tr><td ' + block + '>' + indata + '</td></tr></tbody></table><br>'
+                
             i = i + 1
+            
         return render_template('index.html', title = name, page = parse.quote(name).replace('/','%2F'), suburl = parse.quote(sub).replace('/','%2F'), sub = sub, logo = data['name'], rows = div, tn = 11, ban = ban)
 
 @app.route('/topic/<path:name>/sub/<path:sub>/b/<number>')
 def blind(name = None, sub = None, number = None):
     if(session.get('Now') == True):
         ip = getip(request)
+        
         curs.execute("select * from user where id = '" + pymysql.escape_string(ip) + "'")
         rows = curs.fetchall()
         if(rows):
@@ -2594,6 +2632,7 @@ def blind(name = None, sub = None, number = None):
                     else:
                         curs.execute("update topic set block = 'O' where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' and id = '" + number + "'")
                     conn.commit()
+                    
                     return '<meta http-equiv="refresh" content="0;url=/topic/' + name + '/sub/' + sub + '" />'
                 else:
                     return '<meta http-equiv="refresh" content="0;url=/topic/' + name + '/sub/' + sub + '" />'
@@ -2608,6 +2647,7 @@ def blind(name = None, sub = None, number = None):
 def topicstop(name = None, sub = None):
     if(session.get('Now') == True):
         ip = getip(request)
+        
         curs.execute("select * from user where id = '" + pymysql.escape_string(ip) + "'")
         rows = curs.fetchall()
         if(rows):
@@ -2616,6 +2656,7 @@ def topicstop(name = None, sub = None):
                 row = curs.fetchall()
                 if(row):
                     today = getnow()
+                    
                     curs.execute("select * from stop where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' and close = ''")
                     rows = curs.fetchall()
                     if(rows):
@@ -2625,6 +2666,7 @@ def topicstop(name = None, sub = None):
                         curs.execute("insert into topic (id, title, sub, data, date, ip, block) value ('" + pymysql.escape_string(str(int(row[0]['id']) + 1)) + "', '" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(sub) + "', 'Stop', '" + pymysql.escape_string(today) + "', '" + pymysql.escape_string(ip) + " - Stop', '')")
                         curs.execute("insert into stop (title, sub, close) value ('" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(sub) + "', '')")
                     conn.commit()
+                    
                     return '<meta http-equiv="refresh" content="0;url=/topic/' + name + '/sub/' + sub + '" />'
                 else:
                     return '<meta http-equiv="refresh" content="0;url=/topic/' + name + '/sub/' + sub + '" />'
@@ -2639,6 +2681,7 @@ def topicstop(name = None, sub = None):
 def topicclose(name = None, sub = None):
     if(session.get('Now') == True):
         ip = getip(request)
+        
         curs.execute("select * from user where id = '" + pymysql.escape_string(ip) + "'")
         rows = curs.fetchall()
         if(rows):
@@ -2647,6 +2690,7 @@ def topicclose(name = None, sub = None):
                 row = curs.fetchall()
                 if(row):
                     today = getnow()
+                    
                     curs.execute("select * from stop where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' and close = 'O'")
                     rows = curs.fetchall()
                     if(rows):
@@ -2656,6 +2700,7 @@ def topicclose(name = None, sub = None):
                         curs.execute("insert into topic (id, title, sub, data, date, ip, block) value ('" + pymysql.escape_string(str(int(row[0]['id']) + 1)) + "', '" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(sub) + "', 'Close', '" + pymysql.escape_string(today) + "', '" + pymysql.escape_string(ip) + " - Close', '')")
                         curs.execute("insert into stop (title, sub, close) value ('" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(sub) + "', 'O')")
                     conn.commit()
+                    
                     return '<meta http-equiv="refresh" content="0;url=/topic/' + name + '/sub/' + sub + '" />'
                 else:
                     return '<meta http-equiv="refresh" content="0;url=/topic/' + name + '/sub/' + sub + '" />'
@@ -2671,6 +2716,7 @@ def login():
     if(request.method == 'POST'):
         ip = getip(request)
         ban = getban(ip)
+        
         if(ban == 1):
             return '<meta http-equiv="refresh" content="0;url=/ban" />'
         else:
@@ -2682,8 +2728,10 @@ def login():
                 elif(bcrypt.checkpw(bytes(request.form["pw"], 'utf-8'), bytes(rows[0]['pw'], 'utf-8'))):
                     session['Now'] = True
                     session['DREAMER'] = request.form["id"]
+                    
                     curs.execute("insert into login (user, ip, today) value ('" + pymysql.escape_string(request.form["id"]) + "', '" + pymysql.escape_string(ip) + "', '" + pymysql.escape_string(getnow()) + "')")
                     conn.commit()
+                    
                     return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(data['frontpage']).replace('/','%2F') + '" />'
                 else:
                     return '<meta http-equiv="refresh" content="0;url=/error/13" />'
@@ -2692,6 +2740,7 @@ def login():
     else:
         ip = getip(request)
         ban = getban(ip)
+        
         if(ban == 1):
             return '<meta http-equiv="refresh" content="0;url=/ban" />'
         else:
@@ -2705,6 +2754,7 @@ def change():
     if(request.method == 'POST'):
         ip = getip(request)
         ban = getban(ip)
+        
         if(ban == 1):
             return '<meta http-equiv="refresh" content="0;url=/ban" />'
         else:
@@ -2715,8 +2765,10 @@ def change():
                     return '<meta http-equiv="refresh" content="0;url=/logout" />'
                 elif(bcrypt.checkpw(bytes(request.form["pw"], 'utf-8'), bytes(rows[0]['pw'], 'utf-8'))):
                     hashed = bcrypt.hashpw(bytes(request.form["pw2"], 'utf-8'), bcrypt.gensalt())
+                    
                     curs.execute("update user set pw = '" + pymysql.escape_string(hashed.decode()) + "' where id = '" + pymysql.escape_string(request.form["id"]) + "'")
                     conn.commit()
+                    
                     return '<meta http-equiv="refresh" content="0;url=/login" />'
                 else:
                     return '<meta http-equiv="refresh" content="0;url=/error/10" />'
@@ -2725,6 +2777,7 @@ def change():
     else:
         ip = getip(request)
         ban = getban(ip)
+        
         if(ban == 1):
             return '<meta http-equiv="refresh" content="0;url=/ban" />'
         else:
