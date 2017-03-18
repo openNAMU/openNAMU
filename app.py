@@ -1296,7 +1296,8 @@ def getleng(existing, change):
         leng = '-' + str(leng)
     else:
         leng = '0'
-    return leng;
+        
+    return leng
     
     
 @app.route('/upload', methods=['GET', 'POST'])
@@ -1335,17 +1336,13 @@ def image(name = None):
     if(os.path.exists(os.path.join('image', name))):
         return send_file(os.path.join('image', name), mimetype='image')
     else:
-        return render_template('index.html', logo = data['name'], data = '이미지 없음.', title = '이미지 보기')
-    
-@app.route('/')
-@app.route('/w/')
-def redirect():
-    return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(data['frontpage']).replace('/','%2F') + '" />'
+        return render_template('index.html', logo = data['name'], data = '이미지 없음.', title = '이미지 보기'), 404
 
 @app.route('/recentchanges')
 def recentchanges():
     i = 0
     div = '<div>'
+    
     curs.execute("select * from history order by date desc limit 50")
     rows = curs.fetchall()
     if(rows):
@@ -1356,44 +1353,37 @@ def recentchanges():
             except:
                 div = div + '</div>'
                 break
+                
             if(rows[i]['send']):
                 send = rows[i]['send']
                 send = re.sub('<a href="\/w\/(?P<in>[^"]*)">(?P<out>[^&]*)<\/a>', '<a href="/w/\g<in>">\g<out></a>', send)
             else:
                 send = '<br>'
+                
             title = rows[i]['title']
             title = re.sub('<', '&lt;', title)
             title = re.sub('>', '&gt;', title)
+            
             m = re.search("\+", rows[i]['leng'])
             n = re.search("\-", rows[i]['leng'])
+            
             if(m):
                 leng = '<span style="color:green;">' + rows[i]['leng'] + '</span>'
             elif(n):
                 leng = '<span style="color:red;">' + rows[i]['leng'] + '</span>'
             else:
                 leng = '<span style="color:gray;">' + rows[i]['leng'] + '</span>'
+                
             if(admin == 1):
-                curs.execute("select * from user where id = '" + pymysql.escape_string(rows[i]['ip']) + "'")
+                curs.execute("select * from ban where block = '" + pymysql.escape_string(rows[i]['ip']) + "'")
                 row = curs.fetchall()
                 if(row):
-                    if(row[0]['acl'] == 'owner' or row[0]['acl'] == 'admin'):
-                        ban = ''
-                    else:
-                        curs.execute("select * from ban where block = '" + pymysql.escape_string(rows[i]['ip']) + "'")
-                        row = curs.fetchall()
-                        if(row):
-                            ban = ' <a href="/ban/' + parse.quote(rows[i]['ip']).replace('/','%2F') + '">(해제)</a>'
-                        else:
-                            ban = ' <a href="/ban/' + parse.quote(rows[i]['ip']).replace('/','%2F') + '">(차단)</a>'
+                    ban = ' <a href="/ban/' + parse.quote(rows[i]['ip']).replace('/','%2F') + '">(해제)</a>'
                 else:
-                    curs.execute("select * from ban where block = '" + pymysql.escape_string(rows[i]['ip']) + "'")
-                    row = curs.fetchall()
-                    if(row):
-                        ban = ' <a href="/ban/' + parse.quote(rows[i]['ip']).replace('/','%2F') + '">(해제)</a>'
-                    else:
-                        ban = ' <a href="/ban/' + parse.quote(rows[i]['ip']).replace('/','%2F') + '">(차단)</a>'
+                    ban = ' <a href="/ban/' + parse.quote(rows[i]['ip']).replace('/','%2F') + '">(차단)</a>'
             else:
                 ban = ''
+                
             if(re.search('\.', rows[i]['ip'])):
                 ip = rows[i]['ip']
             else:
@@ -1403,12 +1393,16 @@ def recentchanges():
                     ip = '<a href="/w/' + parse.quote('사용자:' + rows[i]['ip']).replace('/','%2F') + '">' + rows[i]['ip'] + '</a>'
                 else:
                     ip = '<a class="not_thing" href="/w/' + parse.quote('사용자:' + rows[i]['ip']).replace('/','%2F') + '">' + rows[i]['ip'] + '</a>'
+                    
             if((int(rows[i]['id']) - 1) == 0):
                 revert = ''
             else:
                 revert = '<a href="/revert/' + parse.quote(rows[i]['title']).replace('/','%2F') + '/r/' + str(int(rows[i]['id']) - 1) + '">(되돌리기)</a>'
+                
             div = div + '<table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;"><a href="/w/' + parse.quote(rows[i]['title']).replace('/','%2F') + '">' + title + '</a> <a href="/history/' + parse.quote(rows[i]['title']).replace('/','%2F') + '/n/1">(역사)</a> ' + revert + ' (' + leng + ')</td><td style="text-align: center;width:33.33%;">' + ip + ban + '</td><td style="text-align: center;width:33.33%;">' + rows[i]['date'] + '</td></tr><tr><td colspan="3" style="text-align: center;width:100%;">' + send + '</td></tr></tbody></table>'
+            
             i = i + 1
+            
         return render_template('index.html', logo = data['name'], rows = div, tn = 3, title = '최근 변경내역')
     else:
         return render_template('index.html', logo = data['name'], rows = '', tn = 3, title = '최근 변경내역')
@@ -1418,10 +1412,12 @@ def record(name = None, number = None):
     v = number * 50
     i = v - 50
     div = '<div>'
+    
     curs.execute("select * from history where ip = '" + pymysql.escape_string(name) + "' order by date desc")
     rows = curs.fetchall()
     if(rows):
         admin = admincheck()
+        
         while True:
             try:
                 a = rows[i]
@@ -1430,49 +1426,54 @@ def record(name = None, number = None):
                 if(number != 1):
                     div = div + '<br><a href="/record/' + parse.quote(name).replace('/','%2F') + '/n/' + str(number - 1) + '">(이전)'
                 break
+                
             if(rows[i]['send']):
                 send = rows[i]['send']
                 send = re.sub('<a href="\/w\/(?P<in>[^"]*)">(?P<out>[^&]*)<\/a>', '<a href="/w/\g<in>">\g<out></a>', send)
             else:
                 send = '<br>'
+                
             title = rows[i]['title']
             title = re.sub('<', '&lt;', title)
             title = re.sub('>', '&gt;', title)
+            
             m = re.search("\+", rows[i]['leng'])
             n = re.search("\-", rows[i]['leng'])
+            
             if(m):
                 leng = '<span style="color:green;">' + rows[i]['leng'] + '</span>'
             elif(n):
                 leng = '<span style="color:red;">' + rows[i]['leng'] + '</span>'
             else:
                 leng = '<span style="color:gray;">' + rows[i]['leng'] + '</span>'
+                
             if(admin == 1):
-                curs.execute("select * from user where id = '" + pymysql.escape_string(rows[i]['ip']) + "'")
+                curs.execute("select * from ban where block = '" + pymysql.escape_string(rows[i]['ip']) + "'")
                 row = curs.fetchall()
                 if(row):
-                    if(row[0]['acl'] == 'owner' or row[0]['acl'] == 'admin'):
-                        ip = rows[i]['ip']
-                    else:
-                        curs.execute("select * from ban where block = '" + pymysql.escape_string(rows[i]['ip']) + "'")
-                        row = curs.fetchall()
-                        if(row):
-                            ip = rows[i]['ip'] + ' <a href="/ban/' + parse.quote(rows[i]['ip']).replace('/','%2F') + '">(해제)</a>'
-                        else:
-                            ip = rows[i]['ip'] + ' <a href="/ban/' + parse.quote(rows[i]['ip']).replace('/','%2F') + '">(차단)</a>'
+                    ban = ' <a href="/ban/' + parse.quote(rows[i]['ip']).replace('/','%2F') + '">(해제)</a>'
                 else:
-                    curs.execute("select * from ban where block = '" + pymysql.escape_string(rows[i]['ip']) + "'")
-                    row = curs.fetchall()
-                    if(row):
-                        ip = rows[i]['ip'] + ' <a href="/ban/' + parse.quote(rows[i]['ip']).replace('/','%2F') + '">(해제)</a>'
-                    else:
-                        ip = rows[i]['ip'] + ' <a href="/ban/' + parse.quote(rows[i]['ip']).replace('/','%2F') + '">(차단)</a>'
+                    ban = ' <a href="/ban/' + parse.quote(rows[i]['ip']).replace('/','%2F') + '">(차단)</a>'
             else:
+                ban = ''
+                
+            if(re.search('\.', rows[i]['ip'])):
                 ip = rows[i]['ip']
+            else:
+                curs.execute("select * from data where title = '사용자:" + pymysql.escape_string(rows[i]['ip']) + "'")
+                row = curs.fetchall()
+                if(row):
+                    ip = '<a href="/w/' + parse.quote('사용자:' + rows[i]['ip']).replace('/','%2F') + '">' + rows[i]['ip'] + '</a>'
+                else:
+                    ip = '<a class="not_thing" href="/w/' + parse.quote('사용자:' + rows[i]['ip']).replace('/','%2F') + '">' + rows[i]['ip'] + '</a>'
+                    
             if((int(rows[i]['id']) - 1) == 0):
                 revert = ''
             else:
                 revert = '<a href="/revert/' + parse.quote(rows[i]['title']).replace('/','%2F') + '/r/' + str(int(rows[i]['id']) - 1) + '">(되돌리기)</a>'
-            div = div + '<table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;"><a href="/w/' + parse.quote(rows[i]['title']).replace('/','%2F') + '">' + title + '</a> r' + rows[i]['id'] + ' <a href="/history/' + parse.quote(rows[i]['title']).replace('/','%2F') + '/n/1">(역사)</a> ' + revert + ' (' + leng + ')</td><td style="text-align: center;width:33.33%;">' + ip + '</td><td style="text-align: center;width:33.33%;">' + rows[i]['date'] + '</td></tr><tr><td colspan="3" style="text-align: center;width:100%;">' + send + '</td></tr></tbody></table>'
+                
+            div = div + '<table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;"><a href="/w/' + parse.quote(rows[i]['title']).replace('/','%2F') + '">' + title + '</a> r' + rows[i]['id'] + ' <a href="/history/' + parse.quote(rows[i]['title']).replace('/','%2F') + '/n/1">(역사)</a> ' + revert + ' (' + leng + ')</td><td style="text-align: center;width:33.33%;">' + ip + ban +  '</td><td style="text-align: center;width:33.33%;">' + rows[i]['date'] + '</td></tr><tr><td colspan="3" style="text-align: center;width:100%;">' + send + '</td></tr></tbody></table>'
+            
             if(i == v):
                 div = div + '</div>'
                 if(number == 1):
@@ -1482,6 +1483,7 @@ def record(name = None, number = None):
                 break
             else:
                 i = i + 1
+                
         return render_template('index.html', logo = data['name'], rows = div, tn = 3, title = '유저 기록')
     else:
         return render_template('index.html', logo = data['name'], rows = '', tn = 3, title = '유저 기록')
@@ -1491,10 +1493,12 @@ def userlog(number = None):
     v = number * 50
     i = v - 50
     div = ''
+    
     curs.execute("select * from user")
     rows = curs.fetchall()
     if(rows):
         admin = admincheck()
+        
         while True:
             try:
                 a = rows[i]
@@ -1502,29 +1506,29 @@ def userlog(number = None):
                 if(number != 1):
                     div = div + '<br><a href="/userlog/n/' + str(number - 1) + '">(이전)'
                 break
+                
             if(admin == 1):
-                curs.execute("select * from user where id = '" + pymysql.escape_string(rows[i]['id']) + "'")
+                curs.execute("select * from ban where block = '" + pymysql.escape_string(rows[i]['id']) + "'")
                 row = curs.fetchall()
                 if(row):
-                    if(row[0]['acl'] == 'owner' or row[0]['acl'] == 'admin'):
-                        ip = rows[i]['id']
-                    else:
-                        curs.execute("select * from ban where block = '" + pymysql.escape_string(rows[i]['id']) + "'")
-                        row = curs.fetchall()
-                        if(row):
-                            ip = rows[i]['id'] + ' <a href="/ban/' + parse.quote(rows[i]['id']).replace('/','%2F') + '">(해제)</a>'
-                        else:
-                            ip = rows[i]['id'] + ' <a href="/ban/' + parse.quote(rows[i]['id']).replace('/','%2F') + '">(차단)</a>'
+                    ban = ' <a href="/ban/' + parse.quote(rows[i]['id']).replace('/','%2F') + '">(해제)</a>'
                 else:
-                    curs.execute("select * from ban where block = '" + pymysql.escape_string(rows[i]['id']) + "'")
-                    row = curs.fetchall()
-                    if(row):
-                        ip = rows[i]['id'] + ' <a href="/ban/' + parse.quote(rows[i]['id']).replace('/','%2F') + '">(해제)</a>'
-                    else:
-                        ip = rows[i]['id'] + ' <a href="/ban/' + parse.quote(rows[i]['id']).replace('/','%2F') + '">(차단)</a>'
+                    ban = ' <a href="/ban/' + parse.quote(rows[i]['id']).replace('/','%2F') + '">(차단)</a>'
             else:
+                ban = ''
+                
+            if(re.search('\.', rows[i]['id'])):
                 ip = rows[i]['id']
-            div = div + '<li>' + rows[i]['id'] + '</li>'
+            else:
+                curs.execute("select * from data where title = '사용자:" + pymysql.escape_string(rows[i]['id']) + "'")
+                row = curs.fetchall()
+                if(row):
+                    ip = '<a href="/w/' + parse.quote('사용자:' + rows[i]['id']).replace('/','%2F') + '">' + rows[i]['id'] + '</a>'
+                else:
+                    ip = '<a class="not_thing" href="/w/' + parse.quote('사용자:' + rows[i]['id']).replace('/','%2F') + '">' + rows[i]['id'] + '</a>'
+                
+            div = div + '<li>' + ip + ban + '</li>'
+            
             if(i == v):
                 if(number == 1):
                     div = div + '<br><a href="/userlog/n/' + str(number + 1) + '">(다음)'
@@ -1533,15 +1537,17 @@ def userlog(number = None):
                 break
             else:
                 i = i + 1
+                
         return render_template('index.html', logo = data['name'], data = div, title = '유저 가입 기록')
     else:
         return render_template('index.html', logo = data['name'], data = '', title = '유저 가입 기록')
         
 @app.route('/backlink/<path:name>/n/<int:number>')
-def xref(name = None, number = None):
+def backlink(name = None, number = None):
     v = number * 50
     i = v - 50
     div = ''
+    
     curs.execute("select * from back where title = '" + pymysql.escape_string(name) + "' order by link asc")
     rows = curs.fetchall()
     if(rows):
@@ -1552,6 +1558,7 @@ def xref(name = None, number = None):
                 if(number != 1):
                     div = div + '<br><a href="/backlink/n/' + str(number - 1) + '">(이전)'
                 break
+                
             curs.execute("select * from data where title = '" + pymysql.escape_string(rows[i]['link']) + "'")
             row = curs.fetchall()
             if(row):
@@ -1559,12 +1566,15 @@ def xref(name = None, number = None):
                 aa = re.sub("(?P<in>\[include\((?P<out>(?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\])", "\g<in>\n\n[[\g<out>]]\n\n", aa)
                 aa = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', '[[\g<in>]]', aa)
                 aa = namumark('', aa)
+                
                 if(re.search("<a(?: class=\"not_thing\")? href=\"\/w\/" + parse.quote(name).replace('/','%2F') + "(?:\#[^\"]*)?\">([^<]*)<\/a>", aa)):
                     div = div + '<li><a href="/w/' + parse.quote(rows[i]['link']).replace('/','%2F') + '">' + rows[i]['link'] + '</a>'
+                    
                     if(rows[i]['type']):
                         div = div + ' (' + rows[i]['type'] + ')</li>'
                     else:
                         div = div + '</li>'
+                        
                     if(i == v):
                         if(number == 1):
                             div = div + '<br><a href="/backlink/' + parse.quote(name).replace('/','%2F') + '/n/' + str(number + 1) + '">(다음)'
@@ -1583,6 +1593,7 @@ def xref(name = None, number = None):
                 conn.commit()
                 i = i + 1
                 v = v + 1
+                
         return render_template('index.html', logo = data['name'], data = div, title = name, plus = '(역링크)')
     else:
         return render_template('index.html', logo = data['name'], data = '', title = name, plus = '(역링크)')
@@ -1591,6 +1602,7 @@ def xref(name = None, number = None):
 def recentdiscuss():
     i = 0
     div = '<div>'
+    
     curs.execute("select * from rd order by date desc limit 50")
     rows = curs.fetchall()
     if(rows):
@@ -1600,14 +1612,19 @@ def recentdiscuss():
             except:
                 div = div + '</div>'
                 break
+                
             title = rows[i]['title']
             title = re.sub('<', '&lt;', title)
             title = re.sub('>', '&gt;', title)
+            
             sub = rows[i]['sub']
             sub = re.sub('<', '&lt;', sub)
             sub = re.sub('>', '&gt;', sub)
+            
             div = div + '<table style="width: 100%;"><tbody><tr><td style="text-align: center;width:50%;"><a href="/topic/' + parse.quote(rows[i]['title']).replace('/','%2F') + '/sub/' + parse.quote(rows[i]['sub']).replace('/','%2F') + '">' + title + '</a> (' + sub + ')</td><td style="text-align: center;width:50%;">' + rows[i]['date'] + '</td></tr></tbody></table>'
+            
             i = i + 1
+            
         return render_template('index.html', logo = data['name'], rows = div, tn = 12, title = '최근 토론내역')
     else:
         return render_template('index.html', logo = data['name'], rows = '', tn = 12, title = '최근 토론내역')
@@ -2345,7 +2362,7 @@ def move(name = None):
 
 @app.route('/other')
 def other():
-    return render_template('index.html', title = '기타 메뉴', logo = data['name'], data = '<li><a href="/titleindex">모든 문서</a></li><li><a href="/blocklog/n/1">유저 차단 기록</a></li><li><a href="/userlog/n/1">유저 가입 기록</a></li><li><a href="/upload">업로드</a></li><li><a href="/manager/1">관리자 메뉴</a></li><li><a href="/manager/6">유저 기록</a></li><br>이 오픈나무의 버전은 <a href="https://github.com/2DU/openNAMU/blob/master/version.md">1.7.2.1</a> 입니다.')
+    return render_template('index.html', title = '기타 메뉴', logo = data['name'], data = '<li><a href="/titleindex">모든 문서</a></li><li><a href="/blocklog/n/1">유저 차단 기록</a></li><li><a href="/userlog/n/1">유저 가입 기록</a></li><li><a href="/upload">업로드</a></li><li><a href="/manager/1">관리자 메뉴</a></li><li><a href="/manager/6">유저 기록</a></li><br>이 오픈나무의 버전은 <a href="https://github.com/2DU/openNAMU/blob/master/version.md">1.7.3</a> 입니다.')
     
 @app.route('/manager/<int:num>', methods=['POST', 'GET'])
 def manager(num = None):
