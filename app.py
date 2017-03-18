@@ -1305,19 +1305,24 @@ def upload():
     if(request.method == 'POST'):
         ip = getip(request)
         ban = getban(ip)
+        
         if(ban == 1):
             return '<meta http-equiv="refresh" content="0;url=/ban" />'
         else:
             file = request.files['file']
+            
             if(file and allowed_file(file.filename)):
                 if(re.search('^([^./\\*<>|:?"]+)\.(jpg|gif|jpeg|png)$', file.filename)):
                     filename = file.filename
+                    
                     if(os.path.exists(os.path.join('image', filename))):
                         return '<meta http-equiv="refresh" content="0;url=/error/16" />'
                     else:
                         file.save(os.path.join('image', filename))
+                        
                         curs.execute("insert into data (title, data, acl) value ('" + pymysql.escape_string('파일:' + filename) + "', '" + pymysql.escape_string('[[파일:' + filename + ']][br][br]{{{[[파일:' + filename + ']]}}}') + "', '')")
                         conn.commit()
+                        
                         return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote('파일:' + filename).replace('/','%2F') + '" />'
                 else:
                     return '<meta http-equiv="refresh" content="0;url=/error/15" />'
@@ -1326,6 +1331,7 @@ def upload():
     else:
         ip = getip(request)
         ban = getban(ip)
+        
         if(ban == 1):
             return '<meta http-equiv="refresh" content="0;url=/ban" />'
         else:
@@ -2368,7 +2374,7 @@ def move(name = None):
 
 @app.route('/other')
 def other():
-    return render_template('index.html', title = '기타 메뉴', logo = data['name'], data = '<li><a href="/titleindex">모든 문서</a></li><li><a href="/blocklog/n/1">유저 차단 기록</a></li><li><a href="/userlog/n/1">유저 가입 기록</a></li><li><a href="/upload">업로드</a></li><li><a href="/manager/1">관리자 메뉴</a></li><li><a href="/manager/6">유저 기록</a></li><br>이 오픈나무의 버전은 <a href="https://github.com/2DU/openNAMU/blob/master/version.md">1.7.4</a> 입니다.')
+    return render_template('index.html', title = '기타 메뉴', logo = data['name'], data = '<li><a href="/titleindex">모든 문서</a></li><li><a href="/blocklog/n/1">유저 차단 기록</a></li><li><a href="/userlog/n/1">유저 가입 기록</a></li><li><a href="/upload">업로드</a></li><li><a href="/manager/1">관리자 메뉴</a></li><li><a href="/manager/6">유저 기록</a></li><br>이 오픈나무의 버전은 <a href="https://github.com/2DU/openNAMU/blob/master/version.md">1.7.4.1</a> 입니다.')
     
 @app.route('/manager/<int:num>', methods=['POST', 'GET'])
 def manager(num = None):
@@ -3072,6 +3078,7 @@ def diff(name = None, a = None, b = None):
 @app.route('/user')
 def user():
     ip = getip(request)
+    
     curs.execute("select * from user where id = '" + pymysql.escape_string(ip) + "'")
     rows = curs.fetchall()
     if(getban(ip) == 0):
@@ -3087,6 +3094,15 @@ def user():
             acl = '일반'
     else:
         acl = '차단'
+        
+    if(not re.search('\.', ip)):
+        curs.execute("select * from data where title = '사용자:" + pymysql.escape_string(ip) + "'")
+        row = curs.fetchall()
+        if(row):
+            ip = '<a href="/w/' + parse.quote('사용자:' + ip).replace('/','%2F') + '">' + ip + '</a>'
+        else:
+            ip = '<a class="not_thing" href="/w/' + parse.quote('사용자:' + ip).replace('/','%2F') + '">' + ip + '</a>'
+        
     return render_template('index.html', title = '유저 메뉴', logo = data['name'], data = ip + '<br><br><span>권한 상태 : ' + acl + '<br><br><li><a href="/login">로그인</a></li><li><a href="/logout">로그아웃</a></li><li><a href="/register">회원가입</a></li><li><a href="/change">비밀번호 변경</a></li>')
 
 @app.route('/random')
