@@ -2345,47 +2345,40 @@ def move(name = None):
 
 @app.route('/other')
 def other():
-    return render_template('index.html', title = '기타 메뉴', logo = data['name'], data = '<li><a href="/titleindex">모든 문서</a></li><li><a href="/blocklog/n/1">유저 차단 기록</a></li><li><a href="/userlog/n/1">유저 가입 기록</a></li><li><a href="/upload">업로드</a></li><li><a href="/manager">관리자 메뉴</a></li><li><a href="/record">유저 기록</a></li><br>이 오픈나무의 버전은 <a href="https://github.com/2DU/openNAMU/blob/master/version.md">1.7.2</a> 입니다.')
+    return render_template('index.html', title = '기타 메뉴', logo = data['name'], data = '<li><a href="/titleindex">모든 문서</a></li><li><a href="/blocklog/n/1">유저 차단 기록</a></li><li><a href="/userlog/n/1">유저 가입 기록</a></li><li><a href="/upload">업로드</a></li><li><a href="/manager/1">관리자 메뉴</a></li><li><a href="/manager/6">유저 기록</a></li><br>이 오픈나무의 버전은 <a href="https://github.com/2DU/openNAMU/blob/master/version.md">1.7.2.1</a> 입니다.')
     
-@app.route('/manager')
-def manager():
-    return render_template('index.html', title = '관리자 메뉴', logo = data['name'], data = '<li><a href="/acl">문서 ACL</a></li><li><a href="/check">유저 체크</a></li><li><a href="/banget">유저 차단</a></li><li><a href="/admin">관리자 권한 주기</a></li>')
-
-@app.route('/acl', methods=['POST', 'GET'])
-def aclget():
-    if(request.method == 'POST'):
-        return '<meta http-equiv="refresh" content="0;url=/acl/' + parse.quote(request.form["name"]).replace('/','%2F') + '" />'
+@app.route('/manager/<int:num>', methods=['POST', 'GET'])
+def manager(num = None):
+    if(num == 1):
+        return render_template('index.html', title = '관리자 메뉴', logo = data['name'], data = '<li><a href="/manager/2">문서 ACL</a></li><li><a href="/manager/3">유저 체크</a></li><li><a href="/manager/4">유저 차단</a></li><li><a href="/manager/5">관리자 권한 주기</a></li>')
+    elif(num == 2):
+        if(request.method == 'POST'):
+            return '<meta http-equiv="refresh" content="0;url=/acl/' + parse.quote(request.form["name"]).replace('/','%2F') + '" />'
+        else:
+            return render_template('index.html', title = 'ACL 이동', logo = data['name'], data = '<form id="usrform" method="POST" action="/manager/2"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')
+    elif(num == 3):
+        if(request.method == 'POST'):
+            return '<meta http-equiv="refresh" content="0;url=/check/' + parse.quote(request.form["name"]).replace('/','%2F') + '" />'
+        else:
+            return render_template('index.html', title = '유저 체크 이동', logo = data['name'], data = '<form id="usrform" method="POST" action="/manager/3"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')
+    elif(num == 4):
+        if(request.method == 'POST'):
+            return '<meta http-equiv="refresh" content="0;url=/ban/' + parse.quote(request.form["name"]).replace('/','%2F') + '" />'
+        else:
+            return render_template('index.html', title = '유저 차단 이동', logo = data['name'], data = '<form id="usrform" method="POST" action="/manager/4"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button><br><br><span>아이피 앞 두자리 (XXX.XXX) 입력하면 대역 차단</span></form>')
+    elif(num == 5):
+        if(request.method == 'POST'):
+            return '<meta http-equiv="refresh" content="0;url=/admin/' + parse.quote(request.form["name"]).replace('/','%2F') + '" />'
+        else:
+            return render_template('index.html', title = '관리자 권한 이동', logo = data['name'], data = '<form id="usrform" method="POST" action="/manager/5"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')   
+    elif(num == 6):
+        if(request.method == 'POST'):
+            return '<meta http-equiv="refresh" content="0;url=/record/' + parse.quote(request.form["name"]).replace('/','%2F') + '/n/1" />'
+        else:
+            return render_template('index.html', title = '유저 기록 이동', logo = data['name'], data = '<form id="usrform" method="POST" action="/manager/6"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')    
     else:
-        return render_template('index.html', title = 'ACL 이동', logo = data['name'], data = '<form id="usrform" method="POST" action="/acl"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')
+        return '<meta http-equiv="refresh" content="0;url=/" />'
         
-@app.route('/check', methods=['POST', 'GET'])
-def checkget():
-    if(request.method == 'POST'):
-        return '<meta http-equiv="refresh" content="0;url=/check/' + parse.quote(request.form["name"]).replace('/','%2F') + '" />'
-    else:
-        return render_template('index.html', title = '유저 체크 이동', logo = data['name'], data = '<form id="usrform" method="POST" action="/check"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')
-        
-@app.route('/banget', methods=['POST', 'GET'])
-def hebanget():
-    if(request.method == 'POST'):
-        return '<meta http-equiv="refresh" content="0;url=/ban/' + parse.quote(request.form["name"]).replace('/','%2F') + '" />'
-    else:
-        return render_template('index.html', title = '유저 차단 이동', logo = data['name'], data = '<form id="usrform" method="POST" action="/banget"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button><br><br><span>아이피 앞 두자리 (XXX.XXX) 입력하면 대역 차단</span></form>')
-        
-@app.route('/admin', methods=['POST', 'GET'])
-def adminget():
-    if(request.method == 'POST'):
-        return '<meta http-equiv="refresh" content="0;url=/admin/' + parse.quote(request.form["name"]).replace('/','%2F') + '" />'
-    else:
-        return render_template('index.html', title = '관리자 권한 이동', logo = data['name'], data = '<form id="usrform" method="POST" action="/admin"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')
-        
-@app.route('/record', methods=['POST', 'GET'])
-def recordget():
-    if(request.method == 'POST'):
-        return '<meta http-equiv="refresh" content="0;url=/record/' + parse.quote(request.form["name"]).replace('/','%2F') + '/n/1" />'
-    else:
-        return render_template('index.html', title = '유저 기록 이동', logo = data['name'], data = '<form id="usrform" method="POST" action="/record"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')
-
 @app.route('/titleindex')
 def titleindex():
     i = 0
