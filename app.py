@@ -174,10 +174,8 @@ def namumark(title, data):
             if(n):
                 gm = n.groups()
                 if(gm[0] == "www.youtube.com" or gm[0] == "serviceapi.nmv.naver.com" or gm[0] == "tv.kakao.com" or gm[0] == "tvple.com" or gm[0] == "tvpot.daum.net"):
-                    print('1')
                     r = g[0]
                 else:
-                    print('2')
                     r = re.sub('src="([^"]*)"', '', g[0])
             else:
                 r = g[0]
@@ -329,10 +327,8 @@ def namumark(title, data):
                             if(n):
                                 gm = n.groups()
                                 if(gm[0] == "www.youtube.com" or gm[0] == "serviceapi.nmv.naver.com" or gm[0] == "tv.kakao.com" or gm[0] == "tvple.com" or gm[0] == "tvpot.daum.net"):
-                                    print('1')
                                     r = g[0]
                                 else:
-                                    print('2')
                                     r = re.sub('src="([^"]*)"', '', g[0])
                             else:
                                 r = g[0]
