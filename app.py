@@ -165,9 +165,35 @@ def admincheck():
                 return 1
 
 def namumark(title, data):
+    while True:
+        m = re.search("<((?:\/)?(?:div|span|embed|iframe)(?:[^>]*))>", data)
+        if(m):
+            g = m.groups()
+            
+            n = re.search('src="http(?:s)?:\/\/([^\/]*)\/(?:[^"]*)"', g[0])
+            if(n):
+                gm = n.groups()
+                print(gm[0])
+                if(gm[0] == "www.youtube.com" or gm[0] == "serviceapi.nmv.naver.com" or gm[0] == "tv.kakao.com" or gm[0] == "tvple.com" or gm[0] == "tvpot.daum.net"):
+                    print('1')
+                    r = g[0]
+                else:
+                    print('2')
+                    r = re.sub('src="([^"]*)"', '', g[0])
+            else:
+                r = g[0]
+            
+            r = re.sub('"', '#.#', r)
+            data = re.sub("<((?:\/)?(?:div|span|embed|iframe)(?:[^>]*))>", "[" + r + "]", data, 1)
+        else:
+            break
+
     data = re.sub('<', '&lt;', data)
     data = re.sub('>', '&gt;', data)
     data = re.sub('"', '&quot;', data)
+    
+    data = re.sub("\[(?P<in>(?:\/)?(?:div|span|embed|iframe)(?:[^\]]*))\]", "<\g<in>>", data)
+    data = re.sub('#.#', '"', data)
     
     jjjj = 0
     while True:
@@ -2395,7 +2421,7 @@ def move(name = None):
 
 @app.route('/other')
 def other():
-    return render_template('index.html', title = '기타 메뉴', logo = data['name'], data = '<li><a href="/titleindex">모든 문서</a></li><li><a href="/blocklog/n/1">유저 차단 기록</a></li><li><a href="/userlog/n/1">유저 가입 기록</a></li><li><a href="/upload">업로드</a></li><li><a href="/manager/1">관리자 메뉴</a></li><li><a href="/manager/6">유저 기록</a></li><br>이 오픈나무의 버전은 <a href="https://github.com/2DU/openNAMU/blob/master/version.md">1.7.4.2</a> 입니다.')
+    return render_template('index.html', title = '기타 메뉴', logo = data['name'], data = '<li><a href="/titleindex">모든 문서</a></li><li><a href="/blocklog/n/1">유저 차단 기록</a></li><li><a href="/userlog/n/1">유저 가입 기록</a></li><li><a href="/upload">업로드</a></li><li><a href="/manager/1">관리자 메뉴</a></li><li><a href="/manager/6">유저 기록</a></li><br>이 오픈나무의 버전은 <a href="https://github.com/2DU/openNAMU/blob/master/version.md">1.7.5</a> 입니다.')
     
 @app.route('/manager/<int:num>', methods=['POST', 'GET'])
 def manager(num = None):
