@@ -2039,12 +2039,14 @@ def rew(name = None, number = None):
     rows = curs.fetchall()
     if(rows):
         enddata = namumark(name, rows[0]['data'])
+        
         m = re.search('<div id="toc">((?:(?!\/div>).)*)<\/div>', enddata)
         if(m):
             result = m.groups()
             left = result[0]
         else:
             left = ''
+            
         return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = enddata, license = data['license'], tn = 6, left = left)
     else:
         return '<meta http-equiv="refresh" content="0;url=/history/' + parse.quote(name).replace('/','%2F') + '" />'
@@ -2058,6 +2060,7 @@ def reraw(name = None, number = None):
         enddata = re.sub('>', '&gt;', enddata)
         enddata = re.sub('"', '&quot;', enddata)
         enddata = re.sub("\n", '<br>', enddata)
+        
         return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = enddata, license = data['license'])
     else:
         return '<meta http-equiv="refresh" content="0;url=/history/' + parse.quote(name).replace('/','%2F') + '" />'
@@ -2071,6 +2074,7 @@ def raw(name = None):
         enddata = re.sub('>', '&gt;', enddata)
         enddata = re.sub('"', '&quot;', enddata)
         enddata = re.sub("\n", '<br>', enddata)
+        
         return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = enddata, license = data['license'], tn = 7)
     else:
         return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name).replace('/','%2F') + '" />'
@@ -3012,12 +3016,15 @@ def aban():
             if(rows[0]['end']):
                 end = rows[0]['end'] + ' 까지 차단 상태 입니다. / 사유 : ' + rows[0]['why']                
                 now = getnow()
+                
                 now = re.sub(':', '', now)
                 now = re.sub('\-', '', now)
                 now = re.sub(' ', '', now)
                 now = int(now)
+                
                 day = rows[0]['end']
-                day = re.sub('\-', '', day)                
+                day = re.sub('\-', '', day)    
+                
                 if(now >= int(day + '000000')):
                     curs.execute("delete from ban where block = '" + pymysql.escape_string(ip) + "'")
                     conn.commit()
@@ -3028,16 +3035,19 @@ def aban():
             b = re.search("^([0-9](?:[0-9]?[0-9]?)\.[0-9](?:[0-9]?[0-9]?))", ip)
             if(b):
                 results = b.groups()
+                
                 curs.execute("select * from ban where block = '" + pymysql.escape_string(results[0]) + "' and band = 'O'")
                 row = curs.fetchall()
                 if(row):
                     if(row[0]['end']):
-                        end = row[0]['end'] + ' 까지 차단 상태 입니다. / 사유 : ' + rows[0]['why']                
+                        end = row[0]['end'] + ' 까지 차단 상태 입니다. / 사유 : ' + rows[0]['why']             
+                        
                         now = getnow()
                         now = re.sub(':', '', now)
                         now = re.sub('\-', '', now)
                         now = re.sub(' ', '', now)
-                        now = int(now)                        
+                        now = int(now)    
+                        
                         day = row[0]['end']
                         day = re.sub('\-', '', day)
                         
@@ -3063,12 +3073,15 @@ def diff(name = None, a = None, b = None):
             indata = re.sub('>', '&gt;', indata)
             indata = re.sub('"', '&quot;', indata)
             indata = re.sub('\n', '<br>', indata)
+            
             enddata = re.sub('<', '&lt;', row[0]['data'])
             enddata = re.sub('>', '&gt;', enddata)
             enddata = re.sub('"', '&quot;', enddata)
             enddata = re.sub('\n', '<br>', enddata)
+            
             sm = difflib.SequenceMatcher(None, indata, enddata)
             c = show_diff(sm)
+            
             return render_template('index.html', title = name, logo = data['name'], data = c, plus = '(비교)')
         else:
             return '<meta http-equiv="refresh" content="0;url=/history/' + parse.quote(name).replace('/','%2F') + '" />'
