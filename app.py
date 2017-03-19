@@ -144,8 +144,6 @@ except:
 
 app.secret_key = data['key']
 
-ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
-
 def show_diff(seqm):
     output= []
     for opcode, a0, a1, b0, b1 in seqm.get_opcodes():
@@ -156,10 +154,6 @@ def show_diff(seqm):
         elif(opcode == 'delete'):
             output.append("<span style='background:#FDD;'>" + seqm.a[a0:a1] + "</span>")
     return ''.join(output)
-
-def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
            
 def admincheck():
     if(session.get('Now') == True):
@@ -565,10 +559,10 @@ def namumark(title, data):
                     height = b[0]
                 else:
                     height = ''
-                img = re.sub("\.(?P<in>jpg|png|gif|jpeg)", "#\g<in>#", c[0])
+                img = re.sub("\.(?P<in>[Jj][Pp][Gg]|[Pp][Nn][Gg]|[Gg][Ii][Ff]|[Jj][Pp][Ee][Gg])", "#\g<in>#", c[0])
                 data = re.sub("\[\[파일:((?:(?!\]\]|\?).)*)(?:\?((?:(?!\]\]).)*))?\]\]", '<a href="/w/파일:' + img + '"><img src="/image/' + img + '" width="' + width + '" height="' + height + '"></a>', data, 1)
             else:
-                img = re.sub("\.(?P<in>jpg|png|gif|jpeg)", "#\g<in>#", c[0])
+                img = re.sub("\.(?P<in>[Jj][Pp][Gg]|[Pp][Nn][Gg]|[Gg][Ii][Ff]|[Jj][Pp][Ee][Gg])", "#\g<in>#", c[0])
                 data = re.sub("\[\[파일:((?:(?!\]\]|\?).)*)(?:\?((?:(?!\]\]).)*))?\]\]", "<a href='/w/파일:" + img + "'><img src='/image/" + img + "'></a>", data, 1)
             if(not re.search("^파일:([^\n]*)", title)):
                 curs.execute("select * from back where title = '" + pymysql.escape_string(c[0]) + "' and link = '" + pymysql.escape_string(title) + "' and type = 'redirect'")
@@ -640,10 +634,10 @@ def namumark(title, data):
                 else:
                     b = re.search("^http(?:s)?:\/\/", results[0])
                     if(b):
-                        c = re.search("(?:\.jpg|\.png|\.gif|\.jpeg)", results[0])
+                        c = re.search("(?:\.[Jj][Pp][Gg]|\.[Pp][Nn][Gg]|\.[Gg][Ii][Ff]|\.[Jj][Pp][Ee][Gg])", results[0])
                         if(c):
                             img = results[0]
-                            img = re.sub("\.(?P<in>jpg|png|gif|jpeg)", "#\g<in>#", img)
+                            img = re.sub("\.(?P<in>[Jj][Pp][Gg]|[Pp][Nn][Gg]|[Gg][Ii][Ff]|[Jj][Pp][Ee][Gg])", "#\g<in>#", img)
                             data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a class="out_link" href="' + img + '">' + results[1] + '</a>', data, 1)
                         else:
                             data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a class="out_link" href="' + results[0] + '">' + results[1] + '</a>', data, 1)
@@ -687,10 +681,10 @@ def namumark(title, data):
                 else:
                     b = re.search("^http(?:s)?:\/\/", result[0])
                     if(b):
-                        c = re.search("(?:\.jpg|\.png|\.gif|\.jpeg)", result[0])
+                        c = re.search("(?:\.[Jj][Pp][Gg]|\.[Pp][Nn][Gg]|\.[Gg][Ii][Ff]|\.[Jj][Pp][Ee][Gg])", result[0])
                         if(c):
                             img = result[0]
-                            img = re.sub("\.(?P<in>jpg|png|gif|jpeg)", "#\g<in>#", img)
+                            img = re.sub("\.(?P<in>[Jj][Pp][Gg]|[Pp][Nn][Gg]|[Gg][Ii][Ff]|[Jj][Pp][Ee][Gg])", "#\g<in>#", img)
                             data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a class="out_link" href="' + img + '">' + img + '</a>', data, 1)
                         else:
                             data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a class="out_link" href="' + result[0] + '">' + result[0] + '</a>', data, 1)
@@ -713,7 +707,7 @@ def namumark(title, data):
             break
             
     while True:
-        m = re.search("(http(?:s)?:\/\/(?:(?:(?:(?!\.jpg|\.png|\.gif|\.jpeg|#jpg#|#png#|#gif#|#jpeg#).)*)(?:\.jpg|\.png|\.gif|\.jpeg)))(?:(?:(?:\?)width=((?:[0-9]*)(?:px|%)?))?(?:(?:\?|&)height=((?:[0-9]*)(?:px|%)?))?(?:(?:&)width=((?:[0-9]*)(?:px|%)?))?)?", data)
+        m = re.search("(http(?:s)?:\/\/(?:(?:(?:(?!\.[Jj][Pp][Gg]|\.[Pp][Nn][Gg]|\.[Gg][Ii][Ff]|\.[Jj][Pp][Ee][Gg]|#[Jj][Pp][Gg]#|#[Pp][Nn][Gg]#|#[Gg][Ii][Ff]#|#[Jj][Pp][Ee][Gg]#).)*)(?:\.[Jj][Pp][Gg]|\.[Pp][Nn][Gg]|\.[Gg][Ii][Ff]|\.[Jj][Pp][Ee][Gg])))(?:(?:(?:\?)width=((?:[0-9]*)(?:px|%)?))?(?:(?:\?|&)height=((?:[0-9]*)(?:px|%)?))?(?:(?:&)width=((?:[0-9]*)(?:px|%)?))?)?", data)
         if(m):
             result = m.groups()
             if(result[1]):
@@ -734,8 +728,8 @@ def namumark(title, data):
                 width = ''
                 height = ''
             c = result[0]
-            c = re.sub("\.(?P<in>jpg|png|gif|jpeg)", "#\g<in>#", c)
-            data = re.sub("(http(?:s)?:\/\/(?:(?:(?:(?!\.jpg|\.png|\.gif|\.jpeg|#jpg#|#png#|#gif#|#jpeg#).)*)(?:\.jpg|\.png|\.gif|\.jpeg)))(?:(?:(?:\?)width=((?:[0-9]*)(?:px)?))?(?:(?:\?|&)height=((?:[0-9]*)(?:px)?))?(?:(?:&)width=((?:[0-9]*)(?:px)?))?)?", "<img width='" + width + "' height='" + height + "' src='" + c + "'>", data, 1)
+            c = re.sub("\.(?P<in>[Jj][Pp][Gg]|[Pp][Nn][Gg]|[Gg][Ii][Ff]|[Jj][Pp][Ee][Gg])", "#\g<in>#", c)
+            data = re.sub("(http(?:s)?:\/\/(?:(?:(?:(?!\.[Jj][Pp][Gg]|\.[Pp][Nn][Gg]|\.[Gg][Ii][Ff]|\.[Jj][Pp][Ee][Gg]|#[Jj][Pp][Gg]#|#[Pp][Nn][Gg]#|#[Gg][Ii][Ff]#|#[Jj][Pp][Ee][Gg]#).)*)(?:\.[Jj][Pp][Gg]|\.[Pp][Nn][Gg]|\.[Gg][Ii][Ff]|\.[Jj][Pp][Ee][Gg])))(?:(?:(?:\?)width=((?:[0-9]*)(?:px)?))?(?:(?:\?|&)height=((?:[0-9]*)(?:px)?))?(?:(?:&)width=((?:[0-9]*)(?:px)?))?)?", "<img width='" + width + "' height='" + height + "' src='" + c + "'>", data, 1)
         else:
             break
             
@@ -752,7 +746,7 @@ def namumark(title, data):
     
     data = re.sub('\[date\]', getnow(), data)
     
-    data = re.sub("#(?P<in>jpg|png|gif|jpeg)#", ".\g<in>", data)
+    data = re.sub("#(?P<in>[Jj][Pp][Gg]|[Pp][Nn][Gg]|[Gg][Ii][Ff]|[Jj][Pp][Ee][Gg])#", ".\g<in>", data)
     
     data = re.sub("-{4,11}", "<hr>", data)
     
@@ -1334,8 +1328,8 @@ def upload():
         else:
             file = request.files['file']
             
-            if(file and allowed_file(file.filename)):
-                if(re.search('^([^./\\*<>|:?"]+)\.(jpg|gif|jpeg|png)$', file.filename)):
+            if(file):
+                if(re.search('^([^./\\*<>|:?"]+)\.([Jj][Pp][Gg]|[Gg][Ii][Ff]|[Jj][Pp][Ee][Gg]|[Pp][Nn][Gg])$', file.filename)):
                     filename = file.filename
                     
                     if(os.path.exists(os.path.join('image', filename))):
