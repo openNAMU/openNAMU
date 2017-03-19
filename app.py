@@ -2395,7 +2395,7 @@ def move(name = None):
 
 @app.route('/other')
 def other():
-    return render_template('index.html', title = '기타 메뉴', logo = data['name'], data = '<li><a href="/titleindex">모든 문서</a></li><li><a href="/blocklog/n/1">유저 차단 기록</a></li><li><a href="/userlog/n/1">유저 가입 기록</a></li><li><a href="/upload">업로드</a></li><li><a href="/manager/1">관리자 메뉴</a></li><li><a href="/manager/6">유저 기록</a></li><br>이 오픈나무의 버전은 <a href="https://github.com/2DU/openNAMU/blob/master/version.md">1.7.4.1</a> 입니다.')
+    return render_template('index.html', title = '기타 메뉴', logo = data['name'], data = '<li><a href="/titleindex">모든 문서</a></li><li><a href="/blocklog/n/1">유저 차단 기록</a></li><li><a href="/userlog/n/1">유저 가입 기록</a></li><li><a href="/upload">업로드</a></li><li><a href="/manager/1">관리자 메뉴</a></li><li><a href="/manager/6">유저 기록</a></li><br>이 오픈나무의 버전은 <a href="https://github.com/2DU/openNAMU/blob/master/version.md">1.7.4.2</a> 입니다.')
     
 @app.route('/manager/<int:num>', methods=['POST', 'GET'])
 def manager(num = None):
