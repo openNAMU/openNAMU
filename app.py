@@ -320,9 +320,36 @@ def namumark(title, data):
                         
                     enddata = rows[0]['data']
                     enddata = re.sub("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]", "", enddata)
+                    
+                    while True:
+                        m = re.search("<((?:\/)?(?:div|span|embed|iframe)(?:[^>]*))>", enddata)
+                        if(m):
+                            g = m.groups()
+                            
+                            n = re.search('src="http(?:s)?:\/\/([^\/]*)\/(?:[^"]*)"', g[0])
+                            if(n):
+                                gm = n.groups()
+                                print(gm[0])
+                                if(gm[0] == "www.youtube.com" or gm[0] == "serviceapi.nmv.naver.com" or gm[0] == "tv.kakao.com" or gm[0] == "tvple.com" or gm[0] == "tvpot.daum.net"):
+                                    print('1')
+                                    r = g[0]
+                                else:
+                                    print('2')
+                                    r = re.sub('src="([^"]*)"', '', g[0])
+                            else:
+                                r = g[0]
+                            
+                            r = re.sub('"', '#.#', r)
+                            enddata = re.sub("<((?:\/)?(?:div|span|embed|iframe)(?:[^>]*))>", "[" + r + "]", enddata, 1)
+                        else:
+                            break
+
                     enddata = re.sub('<', '&lt;', enddata)
                     enddata = re.sub('>', '&gt;', enddata)
                     enddata = re.sub('"', '&quot;', enddata)
+                    
+                    enddata = re.sub("\[(?P<in>(?:\/)?(?:div|span|embed|iframe)(?:[^\]]*))\]", "<\g<in>>", enddata)
+                    enddata = re.sub('#.#', '"', enddata)
                     
                     while True:
                         p = re.compile("{{{((?:(?!{)(?!}).)*)}}}", re.DOTALL)
