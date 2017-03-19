@@ -173,7 +173,6 @@ def namumark(title, data):
             n = re.search('src="http(?:s)?:\/\/([^\/]*)\/(?:[^"]*)"', g[0])
             if(n):
                 gm = n.groups()
-                print(gm[0])
                 if(gm[0] == "www.youtube.com" or gm[0] == "serviceapi.nmv.naver.com" or gm[0] == "tv.kakao.com" or gm[0] == "tvple.com" or gm[0] == "tvpot.daum.net"):
                     print('1')
                     r = g[0]
@@ -329,7 +328,6 @@ def namumark(title, data):
                             n = re.search('src="http(?:s)?:\/\/([^\/]*)\/(?:[^"]*)"', g[0])
                             if(n):
                                 gm = n.groups()
-                                print(gm[0])
                                 if(gm[0] == "www.youtube.com" or gm[0] == "serviceapi.nmv.naver.com" or gm[0] == "tv.kakao.com" or gm[0] == "tvple.com" or gm[0] == "tvpot.daum.net"):
                                     print('1')
                                     r = g[0]
