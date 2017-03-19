@@ -231,6 +231,9 @@ def namumark(title, data):
             y = re.compile("^#!wiki\sstyle=&quot;((?:(?!&quot;|\n).)*)&quot;\n?\s\n(.*)$", re.DOTALL)
             l = y.search(results[0])
             
+            html = re.compile("^#!html\s(.*)$", re.DOTALL)
+            htmlr = html.search(results[0])
+            
             ppp = re.compile("^#!folding\s((?:(?!\n).)*)\n?\s\n(.*)$", re.DOTALL)
             ooo = ppp.search(results[0])
             
@@ -261,6 +264,9 @@ def namumark(title, data):
             elif(l):
                 result = l.groups()
                 data = p.sub('<div style="' + result[0] + '">' + result[1] + '</div>', data, 1)
+            elif(htmlr):
+                result = htmlr.groups()
+                data = p.sub(result[0], data, 1)
             elif(ooo):
                 result = ooo.groups()
                 data = p.sub("<div>" + result[0] + "<span style='float:right;'><div id='folding_" + str(jjjj + 1) + "' style='display:block;'>[<a href='javascript:void(0);' onclick='var f=document.getElementById(\"folding_" + str(jjjj) + "\");var s=f.style.display==\"block\";f.style.display=s?\"none\":\"block\";this.className=s?\"\":\"opened\";var f=document.getElementById(\"folding_" + str(jjjj + 1) + "\");var s=f.style.display==\"none\";f.style.display=s?\"block\":\"none\";var f=document.getElementById(\"folding_" + str(jjjj + 2) + "\");var s=f.style.display==\"block\";f.style.display=s?\"none\":\"block\";'>펼치기</a>]</div><div id='folding_" + str(jjjj + 2) + "' style='display:none;'>[<a href='javascript:void(0);' onclick='var f=document.getElementById(\"folding_" + str(jjjj) + "\");var s=f.style.display==\"block\";f.style.display=s?\"none\":\"block\";this.className=s?\"\":\"opened\";var f=document.getElementById(\"folding_" + str(jjjj + 1) + "\");var s=f.style.display==\"none\";f.style.display=s?\"block\":\"none\";var f=document.getElementById(\"folding_" + str(jjjj + 2) + "\");var s=f.style.display==\"block\";f.style.display=s?\"none\":\"block\";'>접기</a>]</div></a></span><div id='folding_" + str(jjjj) + "' style='display:none;'><br>" + result[1] + "</div></div>", data, 1)
@@ -353,6 +359,9 @@ def namumark(title, data):
                             y = re.compile("^#!wiki\sstyle=&quot;((?:(?!&quot;|\n).)*)&quot;\n?\s\n(.*)$", re.DOTALL)
                             l = y.search(nnn[0])
                             
+                            html = re.compile("^#!html\s(.*)$", re.DOTALL)
+                            htmlr = html.search(nnn[0])
+                            
                             ppp = re.compile("^#!folding\s((?:(?!\n).)*)\n?\s\n(.*)$", re.DOTALL)
                             ooo = ppp.search(nnn[0])
                             
@@ -383,6 +392,9 @@ def namumark(title, data):
                             elif(l):
                                 result = l.groups()
                                 enddata = p.sub('<div style="' + result[0] + '">' + result[1] + '</div>', enddata, 1)
+                            elif(htmlr):
+                                result = htmlr.groups()
+                                data = p.sub(result[0], enddata, 1)
                             elif(ooo):
                                 result = ooo.groups()
                                 enddata = p.sub("<div>" + result[0] + "<span style='float:right;'><div id='folding_" + str(jjjj + 1) + "' style='display:block;'>[<a href='javascript:void(0);' onclick='var f=document.getElementById(\"folding_" + str(jjjj) + "\");var s=f.style.display==\"block\";f.style.display=s?\"none\":\"block\";this.className=s?\"\":\"opened\";var f=document.getElementById(\"folding_" + str(jjjj + 1) + "\");var s=f.style.display==\"none\";f.style.display=s?\"block\":\"none\";var f=document.getElementById(\"folding_" + str(jjjj + 2) + "\");var s=f.style.display==\"block\";f.style.display=s?\"none\":\"block\";'>펼치기</a>]</div><div id='folding_" + str(jjjj + 2) + "' style='display:none;'>[<a href='javascript:void(0);' onclick='var f=document.getElementById(\"folding_" + str(jjjj) + "\");var s=f.style.display==\"block\";f.style.display=s?\"none\":\"block\";this.className=s?\"\":\"opened\";var f=document.getElementById(\"folding_" + str(jjjj + 1) + "\");var s=f.style.display==\"none\";f.style.display=s?\"block\":\"none\";var f=document.getElementById(\"folding_" + str(jjjj + 2) + "\");var s=f.style.display==\"block\";f.style.display=s?\"none\":\"block\";'>접기</a>]</div></a></span><div id='folding_" + str(jjjj) + "' style='display:none;'><br>" + result[1] + "</div></div>", enddata, 1)
@@ -2421,7 +2433,7 @@ def move(name = None):
 
 @app.route('/other')
 def other():
-    return render_template('index.html', title = '기타 메뉴', logo = data['name'], data = '<li><a href="/titleindex">모든 문서</a></li><li><a href="/blocklog/n/1">유저 차단 기록</a></li><li><a href="/userlog/n/1">유저 가입 기록</a></li><li><a href="/upload">업로드</a></li><li><a href="/manager/1">관리자 메뉴</a></li><li><a href="/manager/6">유저 기록</a></li><br>이 오픈나무의 버전은 <a href="https://github.com/2DU/openNAMU/blob/master/version.md">1.7.5</a> 입니다.')
+    return render_template('index.html', title = '기타 메뉴', logo = data['name'], data = '<li><a href="/titleindex">모든 문서</a></li><li><a href="/blocklog/n/1">유저 차단 기록</a></li><li><a href="/userlog/n/1">유저 가입 기록</a></li><li><a href="/upload">업로드</a></li><li><a href="/manager/1">관리자 메뉴</a></li><li><a href="/manager/6">유저 기록</a></li><br>이 오픈나무의 버전은 <a href="https://github.com/2DU/openNAMU/blob/master/version.md">1.7.5.1</a> 입니다.')
     
 @app.route('/manager/<int:num>', methods=['POST', 'GET'])
 def manager(num = None):
