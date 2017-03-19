@@ -149,11 +149,11 @@ ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 def show_diff(seqm):
     output= []
     for opcode, a0, a1, b0, b1 in seqm.get_opcodes():
-        if opcode == 'equal':
+        if(opcode == 'equal'):
             output.append(seqm.a[a0:a1])
-        elif opcode == 'insert':
+        elif(opcode == 'insert'):
             output.append("<span style='background:#CFC;'>" + seqm.b[b0:b1] + "</span>")
-        elif opcode == 'delete':
+        elif(opcode == 'delete'):
             output.append("<span style='background:#FDD;'>" + seqm.a[a0:a1] + "</span>")
     return ''.join(output)
 
