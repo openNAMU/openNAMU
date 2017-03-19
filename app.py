@@ -2393,22 +2393,22 @@ def manager(num = None):
         if(request.method == 'POST'):
             return '<meta http-equiv="refresh" content="0;url=/check/' + parse.quote(request.form["name"]).replace('/','%2F') + '" />'
         else:
-            return render_template('index.html', title = '유저 체크 이동', logo = data['name'], data = '<form id="usrform" method="POST" action="/manager/3"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')
+            return render_template('index.html', title = '체크 이동', logo = data['name'], data = '<form id="usrform" method="POST" action="/manager/3"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')
     elif(num == 4):
         if(request.method == 'POST'):
             return '<meta http-equiv="refresh" content="0;url=/ban/' + parse.quote(request.form["name"]).replace('/','%2F') + '" />'
         else:
-            return render_template('index.html', title = '유저 차단 이동', logo = data['name'], data = '<form id="usrform" method="POST" action="/manager/4"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button><br><br><span>아이피 앞 두자리 (XXX.XXX) 입력하면 대역 차단</span></form>')
+            return render_template('index.html', title = '차단 이동', logo = data['name'], data = '<form id="usrform" method="POST" action="/manager/4"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button><br><br><span>아이피 앞 두자리 (XXX.XXX) 입력하면 대역 차단</span></form>')
     elif(num == 5):
         if(request.method == 'POST'):
             return '<meta http-equiv="refresh" content="0;url=/admin/' + parse.quote(request.form["name"]).replace('/','%2F') + '" />'
         else:
-            return render_template('index.html', title = '관리자 권한 이동', logo = data['name'], data = '<form id="usrform" method="POST" action="/manager/5"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')   
+            return render_template('index.html', title = '권한 이동', logo = data['name'], data = '<form id="usrform" method="POST" action="/manager/5"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')   
     elif(num == 6):
         if(request.method == 'POST'):
             return '<meta http-equiv="refresh" content="0;url=/record/' + parse.quote(request.form["name"]).replace('/','%2F') + '/n/1" />'
         else:
-            return render_template('index.html', title = '유저 기록 이동', logo = data['name'], data = '<form id="usrform" method="POST" action="/manager/6"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')    
+            return render_template('index.html', title = '기록 이동', logo = data['name'], data = '<form id="usrform" method="POST" action="/manager/6"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')    
     else:
         return '<meta http-equiv="refresh" content="0;url=/" />'
         
