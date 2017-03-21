@@ -80,6 +80,11 @@ try:
         curs.execute("select * from cat limit 1")
     except:
         curs.execute("create table cat(title text, cat text)")
+        
+    try:
+        curs.execute("select * from hidhi limit 1")
+    except:
+        curs.execute("create table hidhi(title text, re text)")
 except:
     conn = pymysql.connect(host = data['host'], user = data['user'], password = data['pw'], charset = 'utf8mb4')
     curs = conn.cursor(pymysql.cursors.DictCursor)
@@ -142,6 +147,11 @@ except:
         curs.execute("select * from cat limit 1")
     except:
         curs.execute("create table cat(title text, cat text)")
+        
+    try:
+        curs.execute("select * from hidhi limit 1")
+    except:
+        curs.execute("create table hidhi(title text, re text)")
 
 app.secret_key = hashlib.sha512(bytes(data['key'], 'ascii')).hexdigest()
 
@@ -1374,8 +1384,7 @@ def getleng(existing, change):
     else:
         leng = '0'
         
-    return leng
-    
+    return leng    
     
 @app.route('/upload', methods=['GET', 'POST'])
 def upload():
