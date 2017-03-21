@@ -2595,8 +2595,9 @@ def sub(name = None, sub = None):
             
         ip = getip(request)
         ban = getdiscuss(ip, name, sub)
+        admin = admincheck()
         
-        if(ban == 1):
+        if(ban == 1 and not admin == 1):
             return '<meta http-equiv="refresh" content="0;url=/ban" />'
         else:
             curs.execute("select * from user where id = '" + pymysql.escape_string(ip) + "'")
@@ -2617,16 +2618,40 @@ def sub(name = None, sub = None):
             
             return '<meta http-equiv="refresh" content="0;url=/topic/' + parse.quote(name).replace('/','%2F') + '/sub/' + parse.quote(sub).replace('/','%2F') + '" />'
     else:
+        style = ''
+        
         ip = getip(request)
         ban = getdiscuss(ip, name, sub)
         admin = admincheck()
         
         if(admin == 1):
-            div = '<div>' + '<a href="/topic/' + parse.quote(name).replace('/','%2F') + '/sub/' + parse.quote(sub).replace('/','%2F') + '/close">(토론 닫기 및 열기)</a>' + ' <a href="/topic/' + parse.quote(name).replace('/','%2F') + '/sub/' + parse.quote(sub).replace('/','%2F') + '/stop">(토론 정지 및 재개)</a><br><br>'
+            div = '<div>'
+            
+            curs.execute("select * from stop where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' and close = 'O'")
+            rows = curs.fetchall()
+            if(rows):
+                div = div + '<a href="/topic/' + parse.quote(name).replace('/','%2F') + '/sub/' + parse.quote(sub).replace('/','%2F') + '/close">(토론 열기)</a> '
+            else:
+                div = div + '<a href="/topic/' + parse.quote(name).replace('/','%2F') + '/sub/' + parse.quote(sub).replace('/','%2F') + '/close">(토론 닫기)</a> '
+            
+            curs.execute("select * from stop where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' and close = ''")
+            rows = curs.fetchall()
+            if(rows):
+                div = div + '<a href="/topic/' + parse.quote(name).replace('/','%2F') + '/sub/' + parse.quote(sub).replace('/','%2F') + '/stop">(토론 재개)</a>'
+            else:
+                div = div + '<a href="/topic/' + parse.quote(name).replace('/','%2F') + '/sub/' + parse.quote(sub).replace('/','%2F') + '/stop">(토론 정지)</a>'
+            
+            div = div + '<br><br>'
         else:
             div = '<div>'
             
         i = 0
+        
+        curs.execute("select * from stop where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "'")
+        rows = curs.fetchall()
+        if(rows):
+            if(not admin == 1):
+                style = 'display:none;'            
         
         curs.execute("select * from topic where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' order by id+0 asc")
         rows = curs.fetchall()
@@ -2649,7 +2674,7 @@ def sub(name = None, sub = None):
             else:
                 block = ''
                 
-            m = re.search("([^-]*)\s\-\s(Close|Reopen|Stop|Restart)$", rows[i]['ip'])
+            m = re.search("^([^-]*)\s\-\s(Close|Reopen|Stop|Restart)$", rows[i]['ip'])
             if(m):
                 ban = ""
             else:
@@ -2675,6 +2700,7 @@ def sub(name = None, sub = None):
             m = re.search("([^-]*)\s\-\s(Close|Reopen|Stop|Restart|Admin)$", rows[i]['ip'])
             if(m):
                 g = m.groups()
+                
                 curs.execute("select * from data where title = '사용자:" + pymysql.escape_string(g[0]) + "'")
                 row = curs.fetchall()
                 if(row):
@@ -2693,14 +2719,16 @@ def sub(name = None, sub = None):
                     
             if(rows[i]['ip'] == start):
                 j = i + 1
+                
                 div = div + '<table id="toron"><tbody><tr><td id="toroncolorgreen"><a href="javascript:void(0);" id="' + str(j) + '">#' + str(j) + '</a> ' + ip + ban + ' <span style="float:right;">' + rows[i]['date'] + '</span></td></tr><tr><td ' + block + '>' + indata + '</td></tr></tbody></table><br>'
             else:
                 j = i + 1
+                
                 div = div + '<table id="toron"><tbody><tr><td id="toroncolor"><a href="javascript:void(0);" id="' + str(j) + '">#' + str(j) + '</a> ' + ip + ban + ' <span style="float:right;">' + rows[i]['date'] + '</span></td></tr><tr><td ' + block + '>' + indata + '</td></tr></tbody></table><br>'
                 
             i = i + 1
             
-        return render_template('index.html', title = name, page = parse.quote(name).replace('/','%2F'), suburl = parse.quote(sub).replace('/','%2F'), sub = sub, logo = data['name'], rows = div, tn = 11, ban = ban)
+        return render_template('index.html', title = name, page = parse.quote(name).replace('/','%2F'), suburl = parse.quote(sub).replace('/','%2F'), sub = sub, logo = data['name'], rows = div, tn = 11, ban = ban, style = style)
 
 @app.route('/topic/<path:name>/sub/<path:sub>/b/<number>')
 def blind(name = None, sub = None, number = None):
