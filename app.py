@@ -2911,7 +2911,7 @@ def change():
 def check(name = None, sub = None, number = None):
     curs.execute("select * from user where id = '" + pymysql.escape_string(name) + "'")
     rows = curs.fetchall()
-    if(rows and rows[0]['acl'] == 'owner' or rows[0]['acl'] == 'admin'):
+    if(rows and rows[0]['acl'] == 'owner' or rows and rows[0]['acl'] == 'admin'):
         return '<meta http-equiv="refresh" content="0;url=/error/4" />'
     else:
         if(admincheck() == 1):
@@ -2994,7 +2994,7 @@ def logout():
 def ban(name = None):
     curs.execute("select * from user where id = '" + pymysql.escape_string(name) + "'")
     rows = curs.fetchall()
-    if(rows and rows[0]['acl'] == 'owner' or rows[0]['acl'] == 'admin'):
+    if(rows and rows[0]['acl'] == 'owner' or rows and rows[0]['acl'] == 'admin'):
         return '<meta http-equiv="refresh" content="0;url=/error/4" />'
     else:
         if(request.method == 'POST'):
