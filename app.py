@@ -9,6 +9,7 @@ import re
 import bcrypt
 import os
 import difflib
+import hashlib
 
 json_data = open('set.json').read()
 data = json.loads(json_data)
@@ -142,7 +143,7 @@ except:
     except:
         curs.execute("create table cat(title text, cat text)")
 
-app.secret_key = data['key']
+app.secret_key = hashlib.sha512(bytes(data['key'])).hexdigest()
 
 def show_diff(seqm):
     output= []
