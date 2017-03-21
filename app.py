@@ -143,7 +143,7 @@ except:
     except:
         curs.execute("create table cat(title text, cat text)")
 
-app.secret_key = hashlib.sha512(bytes(data['key'])).hexdigest()
+app.secret_key = str(hashlib.sha512(bytes(data['key'])).hexdigest())
 
 def show_diff(seqm):
     output= []
