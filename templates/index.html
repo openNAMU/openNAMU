@@ -53,6 +53,13 @@
                 {% endautoescape %}
             </div>
             <div class="four-fifths column">
+                <h1 class="title">{{title}}{% if acl %} <sub>{{acl}}</sub>{% endif %}{% if sub %} <sub>({{sub}})</sub>{% endif %}</h1>
+                {% if redirect %}
+                {% autoescape false %}
+                <li style="margin-top: -20px;">{{redirect}}</li>
+                <br>
+                {% endautoescape %}
+                {% endif %}
                 {% if tn == 1 %}
                 <div id="tool">
                     <nav class="menu">
@@ -67,13 +74,6 @@
                         <a class="menu-item" style="{{style}}" href="/w/{{uppage}}">상위</a>
                     </nav>
                 </div>
-                <h1 class="title">{{title}} <sub>{{acl}}</sub></h1>
-                {% if redirect %}
-                {% autoescape false %}
-                <li style="margin-top: -20px;">{{redirect}}</li>
-                <br>
-                {% endautoescape %}
-                {% endif %}
                 <div>
                     {% autoescape false %}
                     {{data}}
@@ -94,11 +94,6 @@
                         <a class="menu-item" href="/w/{{page}}">문서</a>
                     </nav>
                 </div>
-                {% endif %}
-                {% if preview == 1 %}
-                <h1 class="title">{{title}} <sub>(미리보기)</sub></h1>
-                {% else %}
-                <h1 class="title">{{title}} <sub>(수정)</sub></h1>
                 {% endif %}
                 {% if notice %}
                 <br>
@@ -140,7 +135,6 @@
                 {% endautoescape %}
                 {% endif %}
                 {% elif tn == 3 %}
-                <h1 class="title">{{title}}</h1>
                 <table style="width: 100%;">
                     <tbody>
                         <tr>
@@ -154,7 +148,6 @@
                 {{rows}}
                 {% endautoescape %}
                 {% elif tn == 4 %}
-                <h1 class="title">{{title}}</h1>
                 {% autoescape false %}
                 {{rows}}
                 {% endautoescape %}
@@ -165,7 +158,6 @@
                         <a class="menu-item" href="/w/{{page}}">문서</a>
                     </nav>
                 </div>
-                <h1 class="title">{{title}} <sub>(역사)</sub></h1>
                 <form class="usrform" method='POST' action='/history/{{page}}/n/1'>
                 <select name="a">
                     {% autoescape false %}
@@ -195,11 +187,10 @@
                 {% elif tn == 6 %}
                 <div id="tool">
                     <nav class="menu">
-                        <a class="menu-item selected" href="#" onclick="return false">옛문서</a>
+                        <a class="menu-item selected" href="#" onclick="return false">옛 문서</a>
                         <a class="menu-item" href="javascript:history.back(-1);">뒤로가기</a>
                     </nav>
                 </div>
-                <h1 class="title">{{title}} <sub>(옛문서)</sub></h1>
                 <div>
                     {% autoescape false %}
                     {{data}}
@@ -208,18 +199,16 @@
                 {% elif tn == 7 %}
                 <div id="tool">
                     <nav class="menu">
-                        <a class="menu-item selected" href="#" onclick="return false">raw</a>
+                        <a class="menu-item selected" href="#" onclick="return false">Raw</a>
                         <a class="menu-item" href="/w/{{page}}">문서</a>
                     </nav>
                 </div>
-                <h1 class="title">{{title}} <sub>(raw)</sub></h1>
                 <div>
                     {% autoescape false %}
                     {{data}}
                     {% endautoescape %}
                 </div>
                 {% elif tn == 8 %}
-                <h1 class="title">{{title}} <sub>(삭제)</sub></h1>
                 <div id="tool">
                     <nav class="menu">
                         <a class="menu-item selected" href="#" onclick="return false">삭제</a>
@@ -233,7 +222,6 @@
                     <button class="btn btn-primary" type="submit">삭제</button>
                 </form>
                 {% elif tn == 9 %}
-                <h1 class="title">{{title}} <sub>(이동)</sub></h1>
                 <div id="tool">
                     <nav class="menu">
                         <a class="menu-item selected" href="#" onclick="return false">이동</a>
@@ -250,7 +238,6 @@
                     <button class="btn btn-primary" type="submit">이동</button>
                 </form>
                 {% elif tn == 10 %}
-                <h1 class="title">{{title}} <sub>(토론 목록)</sub></h1>
                 {% if list == 1 %}
                 <div id="tool">
                     <nav class="menu">
@@ -266,7 +253,7 @@
                     </nav>
                 </div>
                 {% endif %}
-                <form id="usrform" method="POST" action="/topic/{{page}}">
+                <form id="usrform" style="margin-top: -30px;" method="POST" action="/topic/{{page}}">
                     {% autoescape false %}
                     {{plus}}
                     {% endautoescape %}
@@ -282,14 +269,13 @@
                     {% endif %}
                 </form>
                 {% elif tn == 11 %}
-                <h1 class="title">{{title}} <sub>(토론)</sub></h1>
                 <div id="tool">
                     <nav class="menu">
                         <a class="menu-item selected" href="#" onclick="return false">토론</a>
                         <a class="menu-item" href="/topic/{{page}}">토론 목록</a>
                     </nav>
                 </div>
-                <h2>{{sub}}</h2>
+                <h2 style="margin-top: -15px;">{{toron}}</h2>
                 <br>
                 {% autoescape false %}
                 {{rows}}
@@ -306,7 +292,6 @@
                 </form>
                 {% endif %}
                 {% elif tn == 12 %}
-                <h1 class="title">{{title}}</h1>
                 <table style="width: 100%;">
                     <tbody>
                         <tr>
@@ -319,7 +304,6 @@
                 {{rows}}
                 {% endautoescape %}
                 {% elif tn == 13 %}
-                <h1 class="title">{{title}} <sub>(되돌리기)</sub></h1>
                 <div id="tool">
                     <nav class="menu">
                         <a class="menu-item selected" href="#" onclick="return false">되돌리기</a>
@@ -333,7 +317,6 @@
                     <button class="btn btn-primary" type="submit">되돌리기</button>
                 </form>
                 {% elif tn == 15 %}
-                <h1 class="title">{{title}}</h1>
                 {% if title == '회원가입' %}
                 <form id="usrform" method="POST" action="/register">
                 {% elif title == '비밀번호 변경' %}
@@ -364,7 +347,6 @@
                     <button class="btn btn-primary" type="submit">{{enter}}</button>
                 </form>
                 {% elif tn == 16 %}
-                <h1 class="title">{{title}} <sub>(차단)</sub></h1>
                 <form id="usrform" method="POST" action="/ban/{{page}}">
                     {% if now == '차단' or now == '대역 차단' %}
                     <input class="form-control" name="end" style="width: 100%">
@@ -396,7 +378,6 @@
                     <button class="btn btn-primary" type="submit">{{now}}</button>
                 </form>
                 {% elif tn == 18 %}
-                <h1 class="title">{{title}} <sub>(권한 부여)</sub></h1>
                 <form id="usrform" method="POST" action="/admin/{{page}}">
                     {% if now == '권한 부여' %}
                     <select name="select">
@@ -409,7 +390,6 @@
                     <button class="btn btn-primary" type="submit">{{now}}</button>
                 </form>
                 {% elif tn == 19 %}
-                <h1 class="title">{{title}} <sub>(ACL)</sub></h1>
                 <p>{{now}}</p>
                 <form id="usrform" method="POST" action="/acl/{{page}}">
                     <select name="select">
@@ -422,7 +402,6 @@
                     <button class="btn btn-primary" type="submit">ACL 변경</button>
                 </form>
                 {% elif tn == 20 %}
-                <h1 class="title">{{title}}</h1>
                 <table style="width: 100%;">
                     <tbody>
                         <tr>
@@ -438,7 +417,6 @@
                 {{rows}}
                 {% endautoescape %}
                 {% elif tn == 21 %}
-                <h1 class="title">{{title}}</h1>
                 <div>
                     <form action="" method=post enctype=multipart/form-data>
                         <input type=file name=file>
@@ -447,7 +425,6 @@
                 </div>
                 <span>{{number}}MB 이하 파일만 업로드 가능하고 파일 명에 ./\*<>|:? 들은 불가능 하며 확장자는 jpg, png, gif, jpeg만 가능 합니다.</span>
                 {% elif tn == 22 %}
-                <h1 class="title">{{title}}</h1>
                 <table style="width: 100%;">
                     <tbody>
                         <tr>
@@ -467,7 +444,6 @@
                         <a class="menu-item" href="javascript:history.back(-1);">뒤로가기</a>
                     </nav>
                 </div>
-                <h1 class="title">{{title}} {% if plus %}<sub>{{plus}}</sub>{% endif %}</h1>
                 <div>
                     {% autoescape false %}
                     {{data}}
