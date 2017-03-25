@@ -54,12 +54,6 @@
             </div>
             <div class="four-fifths column">
                 <h1 class="title">{{title}}{% if acl %} <sub>{{acl}}</sub>{% endif %}{% if sub %} <sub>({{sub}})</sub>{% endif %}</h1>
-                {% if redirect %}
-                {% autoescape false %}
-                <li style="margin-top: -20px;">{{redirect}}</li>
-                <br>
-                {% endautoescape %}
-                {% endif %}
                 {% if tn == 1 %}
                 <div id="tool">
                     <nav class="menu">
@@ -74,6 +68,12 @@
                         <a class="menu-item" style="{{style}}" href="/w/{{uppage}}">상위</a>
                     </nav>
                 </div>
+                {% if redirect %}
+                {% autoescape false %}
+                <li style="margin-top: -20px;">{{redirect}}</li>
+                <br>
+                {% endautoescape %}
+                {% endif %}
                 <div>
                     {% autoescape false %}
                     {{data}}
