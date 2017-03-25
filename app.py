@@ -2534,7 +2534,9 @@ def titleindex():
             except:
                 div = div + '</div>'
                 break
-            div = div + '<li><a href="/w/' + parse.quote(rows[i]['title']).replace('/','%2F') + '">' + rows[i]['title'] + '</a></li>'
+                
+            div = div + '<li>' + str(i + 1) + '. <a href="/w/' + parse.quote(rows[i]['title']).replace('/','%2F') + '">' + rows[i]['title'] + '</a></li>'
+            
             i = i + 1
         return render_template('index.html', logo = data['name'], rows = div + '<br><span>이 위키에는 총 ' + str(i + 1) + '개의 문서가 있습니다.</span>', tn = 4, title = '모든 문서')
     else:
