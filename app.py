@@ -1619,7 +1619,7 @@ def userlog(number = None):
                 else:
                     ip = '<a class="not_thing" href="/w/' + parse.quote('사용자:' + rows[i]['id']).replace('/','%2F') + '">' + rows[i]['id'] + '</a>'
                 
-            div = div + '<li>' + ip + ban + '</li>'
+            div = div + '<li>' + str(i + 1) + '. ' + ip + ban + '</li>'
             
             if(i == v):
                 if(number == 1):
