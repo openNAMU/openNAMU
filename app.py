@@ -2669,7 +2669,7 @@ def other():
 @app.route('/manager/<int:num>', methods=['POST', 'GET'])
 def manager(num = None):
     if(num == 1):
-        return render_template('index.html', title = '관리자 메뉴', logo = data['name'], data = '<li><a href="/manager/2">문서 ACL</a></li><li><a href="/manager/3">유저 체크</a></li><li><a href="/manager/4">유저 차단</a></li><li><a href="/manager/5">관리자 권한 주기</a></li>')
+        return render_template('index.html', title = '관리자 메뉴', logo = data['name'], data = '<h2 style="margin-top: 0px;">관리자 및 소유자</h2><li><a href="/manager/2">문서 ACL</a></li><li><a href="/manager/3">유저 체크</a></li><li><a href="/manager/4">유저 차단</a></li><h2>소유자</h2><li><a href="/manager/5">관리자 권한 주기</a></li>')
     elif(num == 2):
         if(request.method == 'POST'):
             return '<meta http-equiv="refresh" content="0;url=/acl/' + parse.quote(request.form["name"]).replace('/','%2F') + '" />'
