@@ -1698,7 +1698,7 @@ def backlink(name = None, number = None):
                     aa = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', '[[\g<in>]]', aa)
                     aa = namumark('', aa)
                     
-                    if(re.search("<a(?: class=\"not_thing\")? href=\"\/w\/" + parse.quote(name).replace('/','%2F') + "(?:\#[^\"]*)?\">([^<]*)<\/a>", aa)):
+                    if(re.search("<a(?:(?:(?!href=).)*)?href=\"\/w\/" + parse.quote(name).replace('/','%2F') + "(?:\#[^\"]*)?\">([^<]*)<\/a>", aa)):
                         div = div + '<li><a href="/w/' + parse.quote(rows[i]['link']).replace('/','%2F') + '">' + rows[i]['link'] + '</a>'
                         
                         if(rows[i]['type']):
