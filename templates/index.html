@@ -330,19 +330,27 @@
                     <input name="id" type="text">
                     <br>
                     <br>
-                    <span>{% if title == '비밀번호 변경' %}현재{% endif %}비밀번호</span>
+                    <span>{% if title == '비밀번호 변경' %}현재 {% endif %}비밀번호</span>
                     <br>
                     <br>
                     <input name="pw" type="password">
                     <br>
                     <br>
-                    {% if title == '비밀번호 변경' %}
-                    <span>바꿀 비밀번호</span>
+                    {% if not title == '로그인' %}
+                    <span>{% if title == '비밀번호 변경' %}바꿀 비밀번호{% else %}재 확인{% endif %}</span>
                     <br>
                     <br>
                     <input name="pw2" type="password">
                     <br>
                     <br>
+                    {% if title == '비밀번호 변경' %}
+                    <span>재 확인</span>
+                    <br>
+                    <br>
+                    <input name="pw3" type="password">
+                    <br>
+                    <br>
+                    {% endif %}
                     {% endif %}
                     <button class="btn btn-primary" type="submit">{{enter}}</button>
                 </form>

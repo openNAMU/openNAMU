@@ -3102,25 +3102,28 @@ def change():
         ip = getip(request)
         ban = getban(ip)
         
-        if(ban == 1):
-            return '<meta http-equiv="refresh" content="0;url=/ban" />'
-        else:
-            curs.execute("select * from user where id = '" + pymysql.escape_string(request.form["id"]) + "'")
-            rows = curs.fetchall()
-            if(rows):
-                if(session.get('Now') == True):
-                    return '<meta http-equiv="refresh" content="0;url=/logout" />'
-                elif(bcrypt.checkpw(bytes(request.form["pw"], 'utf-8'), bytes(rows[0]['pw'], 'utf-8'))):
-                    hashed = bcrypt.hashpw(bytes(request.form["pw2"], 'utf-8'), bcrypt.gensalt())
-                    
-                    curs.execute("update user set pw = '" + pymysql.escape_string(hashed.decode()) + "' where id = '" + pymysql.escape_string(request.form["id"]) + "'")
-                    conn.commit()
-                    
-                    return '<meta http-equiv="refresh" content="0;url=/login" />'
-                else:
-                    return '<meta http-equiv="refresh" content="0;url=/error/10" />'
+        if(request.form["pw2"] == request.form["pw3"]):
+            if(ban == 1):
+                return '<meta http-equiv="refresh" content="0;url=/ban" />'
             else:
-                return '<meta http-equiv="refresh" content="0;url=/error/9" />'
+                curs.execute("select * from user where id = '" + pymysql.escape_string(request.form["id"]) + "'")
+                rows = curs.fetchall()
+                if(rows):
+                    if(session.get('Now') == True):
+                        return '<meta http-equiv="refresh" content="0;url=/logout" />'
+                    elif(bcrypt.checkpw(bytes(request.form["pw"], 'utf-8'), bytes(rows[0]['pw'], 'utf-8'))):
+                        hashed = bcrypt.hashpw(bytes(request.form["pw2"], 'utf-8'), bcrypt.gensalt())
+                        
+                        curs.execute("update user set pw = '" + pymysql.escape_string(hashed.decode()) + "' where id = '" + pymysql.escape_string(request.form["id"]) + "'")
+                        conn.commit()
+                        
+                        return '<meta http-equiv="refresh" content="0;url=/login" />'
+                    else:
+                        return '<meta http-equiv="refresh" content="0;url=/error/10" />'
+                else:
+                    return '<meta http-equiv="refresh" content="0;url=/error/9" />'
+        else:
+            return '<meta http-equiv="refresh" content="0;url=/error/20" />'
     else:
         ip = getip(request)
         ban = getban(ip)
@@ -3181,28 +3184,31 @@ def register():
         ip = getip(request)
         ban = getban(ip)
         
-        if(ban == 1):
-            return '<meta http-equiv="refresh" content="0;url=/ban" />'
-        else:
-            m = re.search('(?:[^A-Za-zㄱ-힣0-9 ])', request.form["id"])
-            if(m):
-                return '<meta http-equiv="refresh" content="0;url=/error/8" />'
+        if(request.form["pw"] == request.form["pw2"]):
+            if(ban == 1):
+                return '<meta http-equiv="refresh" content="0;url=/ban" />'
             else:
-                if(len(request.form["id"]) > 20):
-                    return '<meta http-equiv="refresh" content="0;url=/error/7" />'
+                m = re.search('(?:[^A-Za-zㄱ-힣0-9 ])', request.form["id"])
+                if(m):
+                    return '<meta http-equiv="refresh" content="0;url=/error/8" />'
                 else:
-                    curs.execute("select * from user where id = '" + pymysql.escape_string(request.form["id"]) + "'")
-                    rows = curs.fetchall()
-                    if(rows):
-                        return '<meta http-equiv="refresh" content="0;url=/error/6" />'
+                    if(len(request.form["id"]) > 20):
+                        return '<meta http-equiv="refresh" content="0;url=/error/7" />'
                     else:
-                        hashed = bcrypt.hashpw(bytes(request.form["pw"], 'utf-8'), bcrypt.gensalt())
-                        if(request.form["id"] == data['owner']):
-                            curs.execute("insert into user (id, pw, acl) value ('" + pymysql.escape_string(request.form["id"]) + "', '" + pymysql.escape_string(hashed.decode()) + "', 'owner')")
+                        curs.execute("select * from user where id = '" + pymysql.escape_string(request.form["id"]) + "'")
+                        rows = curs.fetchall()
+                        if(rows):
+                            return '<meta http-equiv="refresh" content="0;url=/error/6" />'
                         else:
-                            curs.execute("insert into user (id, pw, acl) value ('" + pymysql.escape_string(request.form["id"]) + "', '" + pymysql.escape_string(hashed.decode()) + "', 'user')")
-                        conn.commit()
-                        return '<meta http-equiv="refresh" content="0;url=/login" />'
+                            hashed = bcrypt.hashpw(bytes(request.form["pw"], 'utf-8'), bcrypt.gensalt())
+                            if(request.form["id"] == data['owner']):
+                                curs.execute("insert into user (id, pw, acl) value ('" + pymysql.escape_string(request.form["id"]) + "', '" + pymysql.escape_string(hashed.decode()) + "', 'owner')")
+                            else:
+                                curs.execute("insert into user (id, pw, acl) value ('" + pymysql.escape_string(request.form["id"]) + "', '" + pymysql.escape_string(hashed.decode()) + "', 'user')")
+                            conn.commit()
+                            return '<meta http-equiv="refresh" content="0;url=/login" />'
+        else:
+            return '<meta http-equiv="refresh" content="0;url=/error/20" />'
     else:
         ip = getip(request)
         ban = getban(ip)
@@ -3496,6 +3502,8 @@ def error(num = None):
         return render_template('index.html', title = '편집 오류', logo = data['name'], data = '내용이 원래 문서와 동일 합니다.'), 401
     elif(num == 19):
         return render_template('index.html', title = '이동 오류', logo = data['name'], data = '이동 하려는 곳에 문서가 이미 있습니다.'), 401
+    elif(num == 20):
+        return render_template('index.html', title = '비밀번호 오류', logo = data['name'], data = '재 확인이랑 비밀번호가 다릅니다.'), 401
     else:
         return '<meta http-equiv="refresh" content="0;url=/" />'
 
