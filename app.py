@@ -1681,6 +1681,9 @@ def backlink(name = None, number = None):
     curs.execute("select * from back where title = '" + pymysql.escape_string(name) + "' order by link asc")
     rows = curs.fetchall()
     if(rows):
+        curs.execute("delete from back where title = '" + pymysql.escape_string(name) + "' and link = ''")
+        conn.commit()
+        
         while True:
             try:
                 a = rows[i]
@@ -1711,22 +1714,26 @@ def backlink(name = None, number = None):
                                 div = div + '<br><a href="/backlink/' + parse.quote(name).replace('/','%2F') + '/n/' + str(number + 1) + '">(다음)'
                             else:
                                 div = div + '<br><a href="/backlink/' + parse.quote(name).replace('/','%2F') + '/n/' + str(number - 1) + '">(이전) <a href="/backlink/' + parse.quote(name).replace('/','%2F') + '/n/' + str(number + 1) + '">(다음)'
+                                
                             break
                         else:
                             i = i + 1
                     else:
                         curs.execute("delete from back where title = '" + pymysql.escape_string(name) + "' and link = '" + pymysql.escape_string(rows[i]['link']) + "'")
                         conn.commit()
+                        
                         i = i + 1
                         v = v + 1
                 else:
                     curs.execute("delete from back where title = '" + pymysql.escape_string(name) + "' and link = '" + pymysql.escape_string(rows[i]['link']) + "'")
                     conn.commit()
+                    
                     i = i + 1
                     v = v + 1
             else:
                 curs.execute("delete from back where title = '" + pymysql.escape_string(name) + "' and link = '" + pymysql.escape_string(rows[i]['link']) + "'")
                 conn.commit()
+                
                 i = i + 1
                 v = v + 1
                 
