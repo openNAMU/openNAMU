@@ -475,3 +475,23 @@ a.not_thing {
 sub, sup {
     line-height: 1.4em;
 }
+
+.one-fifth.column {
+    background: #2780E3;
+}
+
+#RecentChanges:hover, #RecentChanges:focus {
+    color: #9DC5F2;
+}
+
+#logo:hover, #logo:focus {
+    color: #9DC5F2;
+}
+
+#log:hover, #log:focus {
+    color: #9DC5F2;
+}
+
+#open {
+    background: #CFE2F8;
+}
