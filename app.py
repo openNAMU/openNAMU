@@ -589,6 +589,7 @@ def namumark(title, data):
         m = re.search("\[\[(분류:(?:(?:(?!\]\]).)*))\]\]", data)
         if(m):
             g = m.groups()
+            
             if(not title == g[0]):
                 curs.execute("select * from cat where title = '" + pymysql.escape_string(g[0]) + "' and cat = '" + pymysql.escape_string(title) + "'")
                 abb = curs.fetchall()
@@ -597,9 +598,23 @@ def namumark(title, data):
                     conn.commit()                
                     
                 if(category == ''):
-                    category = category + '<a href="/w/' + parse.quote(g[0]).replace('/','%2F') + '">' + re.sub("분류:", "", g[0]) + '</a>'
+                    curs.execute("select * from data where title = '" + pymysql.escape_string(g[0]) + "'")
+                    exists = curs.fetchall()
+                    if(exists):
+                        red = ""
+                    else:
+                        red = 'class="not_thing"'
+                        
+                    category = category + '<a ' + red + ' href="/w/' + parse.quote(g[0]).replace('/','%2F') + '">' + re.sub("분류:", "", g[0]) + '</a>'
                 else:
-                    category = category + ' / ' + '<a href="/w/' + parse.quote(g[0]).replace('/','%2F') + '">' + re.sub("분류:", "", g[0]) + '</a>'
+                    curs.execute("select * from data where title = '" + pymysql.escape_string(g[0]) + "'")
+                    exists = curs.fetchall()
+                    if(exists):
+                        red = ""
+                    else:
+                        red = 'class="not_thing"'
+                        
+                    category = category + ' / ' + '<a ' + red + ' href="/w/' + parse.quote(g[0]).replace('/','%2F') + '">' + re.sub("분류:", "", g[0]) + '</a>'
             
             data = re.sub("\[\[(분류:(?:(?:(?!\]\]).)*))\]\]", '', data, 1)
         else:
@@ -1972,17 +1987,20 @@ def w(name = None):
     else:
         uppage = ""
         style = "display:none;"
+        
     if(re.search("^분류:", name)):
         curs.execute("select * from cat where title = '" + pymysql.escape_string(name) + "' order by cat asc")
         rows = curs.fetchall()
         if(rows):
             div = ''
             i = 0
+            
             while True:
                 try:
                     a = rows[i]
                 except:
                     break
+                    
                 curs.execute("select * from data where title = '" + pymysql.escape_string(rows[i]['cat']) + "'")
                 row = curs.fetchall()
                 if(row):
@@ -1991,29 +2009,38 @@ def w(name = None):
                     bb = re.search('<div style="width:100%;border: 1px solid #777;padding: 5px;margin-top: 1em;">분류:((?:(?!<\/div>).)*)<\/div>', aa)
                     if(bb):
                         cc = bb.groups()
+                        
                         mm = re.search("^분류:(.*)", name)
                         if(mm):
                             ee = mm.groups()
-                            if(re.search("<a href=\"\/w\/" + parse.quote(name).replace('/','%2F') + "\">" + ee[0] + "<\/a>", cc[0])):
+                            
+                            if(re.search("<a (class=\"not_thing\")? href=\"\/w\/" + parse.quote(name).replace('/','%2F') + "\">" + ee[0] + "<\/a>", cc[0])):
                                 div = div + '<li><a href="/w/' + parse.quote(rows[i]['cat']).replace('/','%2F') + '">' + rows[i]['cat'] + '</a></li>'
+                                
                                 i = i + 1
                             else:
-                                curs.execute("delete from cat where title = '" + pymysql.escape_string(rows[i]['cat']) + "' and cat = '" + pymysql.escape_string(name) + "'")
+                                curs.execute("delete from cat where title = '" + pymysql.escape_string(name) + "' and cat = '" + pymysql.escape_string(rows[i]['cat']) + "'")
                                 conn.commit()
+                                
                                 i = i + 1
                         else:
-                            curs.execute("delete from cat where title = '" + pymysql.escape_string(rows[i]['cat']) + "' and cat = '" + pymysql.escape_string(name) + "'")
+                            curs.execute("delete from cat where title = '" + pymysql.escape_string(name) + "' and cat = '" + pymysql.escape_string(rows[i]['cat']) + "'")
                             conn.commit()
+                            
                             i = i + 1
                     else:
-                        curs.execute("delete from cat where title = '" + pymysql.escape_string(rows[i]['cat']) + "' and cat = '" + pymysql.escape_string(name) + "'")
+                        curs.execute("delete from cat where title = '" + pymysql.escape_string(name) + "' and cat = '" + pymysql.escape_string(rows[i]['cat']) + "'")
                         conn.commit()
+                        
                         i = i + 1
                 else:
-                    curs.execute("delete from cat where title = '" + pymysql.escape_string(rows[i]['cat']) + "' and cat = '" + pymysql.escape_string(name) + "'")
+                    curs.execute("delete from cat where title = '" + pymysql.escape_string(name) + "' and cat = '" + pymysql.escape_string(rows[i]['cat']) + "'")
                     conn.commit()
+                    
                     i = i + 1
+                    
             div = '<h2>분류</h2>' + div
+            
             curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
             bb = curs.fetchall()
             if(bb):
@@ -2024,13 +2051,16 @@ def w(name = None):
                 else:
                     if(not acl):
                         acl = ''
+                        
                 enddata = namumark(name, bb[0]['data'])
+                
                 m = re.search('<div id="toc">((?:(?!\/div>).)*)<\/div>', enddata)
                 if(m):
                     result = m.groups()
                     left = result[0]
                 else:
                     left = ''
+                    
                 return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = enddata + '<br>' + div, license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic)
             else:
                 return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = div, license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic)
@@ -2101,11 +2131,13 @@ def redirectw(name = None, redirect = None):
         if(rows):
             div = ''
             i = 0
+            
             while True:
                 try:
                     a = rows[i]
                 except:
                     break
+                    
                 curs.execute("select * from data where title = '" + pymysql.escape_string(rows[i]['cat']) + "'")
                 row = curs.fetchall()
                 if(row):
@@ -2114,27 +2146,35 @@ def redirectw(name = None, redirect = None):
                     bb = re.search('<div style="width:100%;border: 1px solid #777;padding: 5px;margin-top: 1em;">분류:((?:(?!<\/div>).)*)<\/div>', aa)
                     if(bb):
                         cc = bb.groups()
+                        
                         mm = re.search("^분류:(.*)", name)
+                        
                         if(mm):
                             ee = mm.groups()
-                            if(re.search("<a href=\"\/w\/" + parse.quote(name).replace('/','%2F') + "\">" + ee[0] + "<\/a>", cc[0])):
+                            
+                            if(re.search("<a (class=\"not_thing\")? href=\"\/w\/" + parse.quote(name).replace('/','%2F') + "\">" + ee[0] + "<\/a>", cc[0])):
                                 div = div + '<li><a href="/w/' + parse.quote(rows[i]['cat']).replace('/','%2F') + '">' + rows[i]['cat'] + '</a></li>'
+                                
                                 i = i + 1
                             else:
-                                curs.execute("delete from cat where title = '" + pymysql.escape_string(rows[i]['cat']) + "' and cat = '" + pymysql.escape_string(name) + "'")
+                                curs.execute("delete from cat where title = '" + pymysql.escape_string(name) + "' and cat = '" + pymysql.escape_string(rows[i]['cat']) + "'")
                                 conn.commit()
+                                
                                 i = i + 1
                         else:
-                            curs.execute("delete from cat where title = '" + pymysql.escape_string(rows[i]['cat']) + "' and cat = '" + pymysql.escape_string(name) + "'")
+                            curs.execute("delete from cat where title = '" + pymysql.escape_string(name) + "' and cat = '" + pymysql.escape_string(rows[i]['cat']) + "'")
                             conn.commit()
+                            
                             i = i + 1
                     else:
-                        curs.execute("delete from cat where title = '" + pymysql.escape_string(rows[i]['cat']) + "' and cat = '" + pymysql.escape_string(name) + "'")
+                        curs.execute("delete from cat where title = '" + pymysql.escape_string(name) + "' and cat = '" + pymysql.escape_string(rows[i]['cat']) + "'")
                         conn.commit()
+                        
                         i = i + 1
                 else:
-                    curs.execute("delete from cat where title = '" + pymysql.escape_string(rows[i]['cat']) + "' and cat = '" + pymysql.escape_string(name) + "'")
+                    curs.execute("delete from cat where title = '" + pymysql.escape_string(name) + "' and cat = '" + pymysql.escape_string(rows[i]['cat']) + "'")
                     conn.commit()
+                    
                     i = i + 1
             div = '<h2>분류</h2>' + div
             curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
