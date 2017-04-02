@@ -3110,7 +3110,9 @@ def change():
                 rows = curs.fetchall()
                 if(rows):
                     if(session.get('Now') == True):
-                        return '<meta http-equiv="refresh" content="0;url=/logout" />'
+                        session['Now'] = False
+                        session.pop('DREAMER', None)
+                        return '<meta http-equiv="refresh" content="0;url=/change" />'
                     elif(bcrypt.checkpw(bytes(request.form["pw"], 'utf-8'), bytes(rows[0]['pw'], 'utf-8'))):
                         hashed = bcrypt.hashpw(bytes(request.form["pw2"], 'utf-8'), bcrypt.gensalt())
                         
@@ -3222,7 +3224,7 @@ def register():
 def logout():
     session['Now'] = False
     session.pop('DREAMER', None)
-    return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(data['frontpage']).replace('/','%2F') + '" />'
+    return '<meta http-equiv="refresh" content="0;url=/user" />'
 
 @app.route('/ban/<name>', methods=['POST', 'GET'])
 def ban(name = None):
