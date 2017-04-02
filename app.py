@@ -3079,7 +3079,7 @@ def login():
                     curs.execute("insert into login (user, ip, today) value ('" + pymysql.escape_string(request.form["id"]) + "', '" + pymysql.escape_string(ip) + "', '" + pymysql.escape_string(getnow()) + "')")
                     conn.commit()
                     
-                    return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(data['frontpage']).replace('/','%2F') + '" />'
+                    return '<meta http-equiv="refresh" content="0;url=/user" />'
                 else:
                     return '<meta http-equiv="refresh" content="0;url=/error/13" />'
             else:
@@ -3134,7 +3134,9 @@ def change():
             return '<meta http-equiv="refresh" content="0;url=/ban" />'
         else:
             if(session.get('Now') == True):
-                return '<meta http-equiv="refresh" content="0;url=/logout" />'
+                session['Now'] = False
+                session.pop('DREAMER', None)
+                return '<meta http-equiv="refresh" content="0;url=/change" />'
             else:
                 return render_template('index.html', title = '비밀번호 변경', enter = '변경', logo = data['name'], tn = 15)
                 
