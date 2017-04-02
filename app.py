@@ -477,7 +477,7 @@ def namumark(title, data):
                                 a = re.sub("([^= ,]*)\=([^,]*)", "", a, 1)
                             else:
                                 break                        
-                    data = re.sub("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]", '\n<div style="margin-top: -20px;margin-bottom: -20px;">' + enddata + '</div>\n', data, 1)
+                    data = re.sub("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]", '\n<div style="margin-bottom: -20px;">' + enddata + '</div>\n', data, 1)
                 else:
                     data = re.sub("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]", "[[" + results[0] + "]]", data, 1)
         else:
