@@ -53,11 +53,10 @@
                 {% endautoescape %}
             </div>
             <div class="four-fifths column">
-                <h1 class="title">{{title}}{% if acl %} <sub>{{acl}}</sub>{% endif %}{% if sub %} <sub>({{sub}})</sub>{% endif %}</h1>
-                {% if tn == 1 %}
                 <div id="tool">
                     <nav class="menu">
-                        <a class="menu-item selected" href="#" onclick="return false">문서</a>
+                        <a class="menu-item selected" href="#" onclick="return false">{% if sub %}{{sub}}{% elif tn == 1 %}문서{% else %}기타{% endif %}</a>
+                        {% if tn == 1 %}
                         <a class="menu-item" href="/edit/{{page}}">수정</a>
                         <a class="menu-item" id="{{topic}}" href="/topic/{{page}}">토론</a>
                         <a class="menu-item" href="/delete/{{page}}">삭제</a>
@@ -65,9 +64,20 @@
                         <a class="menu-item" href="/raw/{{page}}">Raw</a>
                         <a class="menu-item" href="/history/{{page}}/n/1">역사</a>
                         <a class="menu-item" href="/backlink/{{page}}/n/1">역링크</a>
+                        {% if uppage %}
                         <a class="menu-item" style="{{style}}" href="/w/{{uppage}}">상위</a>
+                        {% endif %}
+                        {% elif tn == 6 or tn == 13 or not tn %}
+                        <a class="menu-item" href="javascript:history.back(-1);">뒤로</a>
+                        {% elif tn == 10 and not list or tn == 11 %}
+                        <a class="menu-item" href="/topic/{{page}}">토론 목록</a>
+                        {% else %}
+                        <a class="menu-item" href="/w/{{page}}">문서</a>
+                        {% endif %}
                     </nav>
                 </div>
+                <h1 class="title">{{title}}{% if acl %} <sub>{{acl}}</sub>{% endif %}{% if sub %} <sub>({{sub}})</sub>{% endif %}</h1>
+                {% if tn == 1 %}
                 {% if redirect %}
                 {% autoescape false %}
                 <li style="margin-top: -20px;">{{redirect}}</li>
@@ -80,21 +90,6 @@
                     {% endautoescape %}
                 </div>
                 {% elif tn == 2 %}
-                {% if preview == 1 %}
-                <div id="tool">
-                    <nav class="menu">
-                        <a class="menu-item selected" href="#">미리보기</a>
-                        <a class="menu-item" href="/w/{{page}}">문서</a>
-                    </nav>
-                </div>
-                {% else %}
-                <div id="tool">
-                    <nav class="menu">
-                        <a class="menu-item selected" href="#">수정</a>
-                        <a class="menu-item" href="/w/{{page}}">문서</a>
-                    </nav>
-                </div>
-                {% endif %}
                 {% if notice %}
                 <br>
                 <span>{{notice}}</span>
@@ -152,12 +147,6 @@
                 {{rows}}
                 {% endautoescape %}
                 {% elif tn == 5 %}
-                <div id="tool">
-                    <nav class="menu">
-                        <a class="menu-item selected" href="#">역사</a>
-                        <a class="menu-item" href="/w/{{page}}">문서</a>
-                    </nav>
-                </div>
                 <form class="usrform" method='POST' action='/history/{{page}}/n/1'>
                 <select name="a">
                     {% autoescape false %}
@@ -185,36 +174,18 @@
                 {{rows}}
                 {% endautoescape %}
                 {% elif tn == 6 %}
-                <div id="tool">
-                    <nav class="menu">
-                        <a class="menu-item selected" href="#" onclick="return false">옛 문서</a>
-                        <a class="menu-item" href="javascript:history.back(-1);">뒤로가기</a>
-                    </nav>
-                </div>
                 <div>
                     {% autoescape false %}
                     {{data}}
                     {% endautoescape %}
                 </div>
                 {% elif tn == 7 %}
-                <div id="tool">
-                    <nav class="menu">
-                        <a class="menu-item selected" href="#" onclick="return false">Raw</a>
-                        <a class="menu-item" href="/w/{{page}}">문서</a>
-                    </nav>
-                </div>
                 <div>
                     {% autoescape false %}
                     {{data}}
                     {% endautoescape %}
                 </div>
                 {% elif tn == 8 %}
-                <div id="tool">
-                    <nav class="menu">
-                        <a class="menu-item selected" href="#" onclick="return false">삭제</a>
-                        <a class="menu-item" href="/w/{{page}}">문서</a>
-                    </nav>
-                </div>
                 <form id="usrform" method="POST" action="/delete/{{page}}">
                     {{plus}}
                     <br>
@@ -222,12 +193,6 @@
                     <button class="btn btn-primary" type="submit">삭제</button>
                 </form>
                 {% elif tn == 9 %}
-                <div id="tool">
-                    <nav class="menu">
-                        <a class="menu-item selected" href="#" onclick="return false">이동</a>
-                        <a class="menu-item" href="/w/{{page}}">문서</a>
-                    </nav>
-                </div>
                 <form id="usrform" method="POST" action="/move/{{page}}">
                     {{plus}}
                     <br>
@@ -238,21 +203,6 @@
                     <button class="btn btn-primary" type="submit">이동</button>
                 </form>
                 {% elif tn == 10 %}
-                {% if list == 1 %}
-                <div id="tool">
-                    <nav class="menu">
-                        <a class="menu-item selected" href="#" onclick="return false">토론 목록</a>
-                        <a class="menu-item" href="/w/{{page}}">문서</a>
-                    </nav>
-                </div>
-                {% else %}
-                <div id="tool">
-                    <nav class="menu">
-                        <a class="menu-item selected" href="#" onclick="return false">닫힌 토론 목록</a>
-                        <a class="menu-item" href="/topic/{{page}}">토론 목록</a>
-                    </nav>
-                </div>
-                {% endif %}
                 <form id="usrform" style="margin-top: -30px;" method="POST" action="/topic/{{page}}">
                     {% autoescape false %}
                     {{plus}}
@@ -269,12 +219,6 @@
                     {% endif %}
                 </form>
                 {% elif tn == 11 %}
-                <div id="tool">
-                    <nav class="menu">
-                        <a class="menu-item selected" href="#" onclick="return false">토론</a>
-                        <a class="menu-item" href="/topic/{{page}}">토론 목록</a>
-                    </nav>
-                </div>
                 <h2 style="margin-top: -15px;">{{toron}}</h2>
                 <br>
                 {% autoescape false %}
@@ -304,12 +248,6 @@
                 {{rows}}
                 {% endautoescape %}
                 {% elif tn == 13 %}
-                <div id="tool">
-                    <nav class="menu">
-                        <a class="menu-item selected" href="#" onclick="return false">되돌리기</a>
-                        <a class="menu-item" href="javascript:history.back(-1);">뒤로가기</a>
-                    </nav>
-                </div>
                 <form id="usrform" method="POST" action="/revert/{{page}}/r/{{r}}">
                     {{plus}}
                     <br>
@@ -446,12 +384,6 @@
                 {{rows}}
                 {% endautoescape %}
                 {% else %}
-                <div id="tool">
-                    <nav class="menu">
-                        <a class="menu-item selected" href="#" onclick="return false">{{title}}</a>
-                        <a class="menu-item" href="javascript:history.back(-1);">뒤로가기</a>
-                    </nav>
-                </div>
                 <div>
                     {% autoescape false %}
                     {{data}}
