@@ -185,7 +185,7 @@ def ownercheck():
                 return 1
 
 def namumark(title, data):
-    while True:
+    while(True):
         m = re.search("<((?:\/)?(?:div|span|embed|iframe)(?:[^>]*))>", data)
         if(m):
             g = m.groups()
@@ -213,7 +213,7 @@ def namumark(title, data):
     data = re.sub('#.#', '"', data)
     
     jjjj = 0
-    while True:
+    while(True):
         p = re.compile("{{{((?:(?!{{{)(?!}}}).)*)}}}", re.DOTALL)
         m = p.search(data)
         if(m):
@@ -296,7 +296,7 @@ def namumark(title, data):
         else:
             break
     
-    while True:
+    while(True):
         a = re.compile("<code>(((?!<\/code>).)*)<\/code>", re.DOTALL)
         m = a.search(data)
         if(m):
@@ -319,7 +319,7 @@ def namumark(title, data):
     data = re.sub("\[anchor\((?P<in>[^\[\]]*)\)\]", '<span id="\g<in>"></span>', data)
     data = re.sub('\[date\(now\)\]', getnow(), data)
     
-    while True:
+    while(True):
         m = re.search("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]", data)
         if(m):
             results = m.groups()
@@ -338,7 +338,7 @@ def namumark(title, data):
                     enddata = rows[0]['data']
                     enddata = re.sub("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]", "", enddata)
                     
-                    while True:
+                    while(True):
                         m = re.search("<((?:\/)?(?:div|span|embed|iframe)(?:[^>]*))>", enddata)
                         if(m):
                             g = m.groups()
@@ -365,7 +365,7 @@ def namumark(title, data):
                     enddata = re.sub("\[(?P<in>(?:\/)?(?:div|span|embed|iframe)(?:[^\]]*))\]", "<\g<in>>", enddata)
                     enddata = re.sub('#.#', '"', enddata)
                     
-                    while True:
+                    while(True):
                         p = re.compile("{{{((?:(?!{)(?!}).)*)}}}", re.DOTALL)
                         m = p.search(enddata)
                         if(m):
@@ -447,7 +447,7 @@ def namumark(title, data):
                         else:
                             break
                     
-                    while True:
+                    while(True):
                         a = re.compile("<code>(((?!<\/code>).)*)<\/code>", re.DOTALL)
                         m = a.search(enddata)
                         if(m):
@@ -469,7 +469,7 @@ def namumark(title, data):
                     
                     if(results[1]):
                         a = results[1]
-                        while True:
+                        while(True):
                             g = re.search("([^= ,]*)\=([^,]*)", a)
                             if(g):
                                 result = g.groups()
@@ -483,7 +483,7 @@ def namumark(title, data):
         else:
             break
     
-    while True:
+    while(True):
         m = re.search('^#(?:redirect|넘겨주기)\s([^\n]*)', data)
         if(m):
             results = m.groups()
@@ -505,7 +505,7 @@ def namumark(title, data):
     
     data = '\n' + data + '\n'
     
-    while True:
+    while(True):
         m = re.search("\n&gt;\s?((?:[^\n]*)(?:(?:(?:(?:\n&gt;\s?)(?:[^\n]*))+)?))", data)
         if(m):
             result = m.groups()
@@ -528,7 +528,7 @@ def namumark(title, data):
     h5c = 0
     last = 0
     rtoc = '<div id="toc"><span id="toc-name">목차</span><br><br>'
-    while True:
+    while(True):
         i = i + 1
         m = re.search('(={1,6})\s?([^=]*)\s?(?:={1,6})(?:\s+)?\n', data)
         if(m):
@@ -585,7 +585,7 @@ def namumark(title, data):
     data = re.sub("\[목차\]", rtoc, data)
     
     category = ''
-    while True:
+    while(True):
         m = re.search("\[\[(분류:(?:(?:(?!\]\]).)*))\]\]", data)
         if(m):
             g = m.groups()
@@ -636,7 +636,7 @@ def namumark(title, data):
     
     data = re.sub("##\s?(?P<in>[^\n]*)\n", "<div style='display:none;'>\g<in></div>", data);
     
-    while True:
+    while(True):
         m = re.search("\[\[파일:((?:(?!\]\]|\|).)*)(?:\|((?:(?!\]\]).)*))?\]\]", data)
         if(m):
             c = m.groups()
@@ -669,7 +669,7 @@ def namumark(title, data):
     
     data = re.sub("\[br\]",'<br>', data);
     
-    while True:
+    while(True):
         m = re.search("\[youtube\(((?:(?!,|\)\]).)*)(?:,\s)?(?:width=((?:(?!,|\)\]).)*))?(?:,\s)?(?:height=((?:(?!,|\)\]).)*))?(?:,\s)?(?:width=((?:(?!,|\)\]).)*))?\)\]", data)
         if(m):
             result = m.groups()
@@ -696,7 +696,7 @@ def namumark(title, data):
      
     data = re.sub("\[\[(?::(?P<in>(?:분류|파일):(?:(?:(?!\]\]).)*)))\]\]", "[[\g<in>]]", data)
             
-    while True:
+    while(True):
         m = re.search("\[\[(((?!\]\]).)*)\]\]", data)
         if(m):
             result = m.groups()
@@ -800,7 +800,7 @@ def namumark(title, data):
         else:
             break
             
-    while True:
+    while(True):
         m = re.search("(http(?:s)?:\/\/(?:(?:(?:(?!\.[Jj][Pp][Gg]|\.[Pp][Nn][Gg]|\.[Gg][Ii][Ff]|\.[Jj][Pp][Ee][Gg]|#[Jj][Pp][Gg]#|#[Pp][Nn][Gg]#|#[Gg][Ii][Ff]#|#[Jj][Pp][Ee][Gg]#).)*)(?:\.[Jj][Pp][Gg]|\.[Pp][Nn][Gg]|\.[Gg][Ii][Ff]|\.[Jj][Pp][Ee][Gg])))(?:(?:(?:\?)width=((?:[0-9]*)(?:px|%)?))?(?:(?:\?|&)height=((?:[0-9]*)(?:px|%)?))?(?:(?:&)width=((?:[0-9]*)(?:px|%)?))?)?", data)
         if(m):
             result = m.groups()
@@ -827,7 +827,7 @@ def namumark(title, data):
         else:
             break
             
-    while True:
+    while(True):
         m = re.search("((?:(?:\s\*\s[^\n]*)\n?)+)", data)
         if(m):
             result = m.groups()
@@ -844,14 +844,14 @@ def namumark(title, data):
     
     data = re.sub("-{4,11}", "<hr>", data)
     
-    while True:
+    while(True):
         b = re.search("\r\n( +)", data)
         if(b):
             result = b.groups()
             tp = len(result[0])
             up = ''
             i = 0
-            while True:
+            while(True):
                 up = up + '<span id="in"></span>'
                 i = i + 1
                 if(i == tp):
@@ -862,7 +862,7 @@ def namumark(title, data):
     
     a = 1
     tou = "<hr id='footnote'><div class='wiki-macro-footnote'><br>"
-    while True:
+    while(True):
         b = re.search("\[\*([^\s]*)\s(((?!\]).)*)\]", data)
         if(b):
             results = b.groups()
@@ -890,12 +890,12 @@ def namumark(title, data):
     if(category):
         data = data + '<div style="width:100%;border: 1px solid #777;padding: 5px;margin-top: 1em;">분류: ' + category + '</div>'
     
-    while True:
+    while(True):
         m = re.search("(\|\|(?:(?:(?:.*)\n?)\|\|)+)", data)
         if(m):
             results = m.groups()
             table = results[0]
-            while True:
+            while(True):
                 a = re.search("^(\|\|(?:(?:\|\|)+)?)((?:&lt;(?:(?:(?!&gt;).)*)&gt;)+)?", table)
                 if(a):
                     row = ''
@@ -1044,7 +1044,7 @@ def namumark(title, data):
                     
             table = re.sub("\|\|$", "</td></tr></tbody></table>", table)
             
-            while True:
+            while(True):
                 b = re.search("\|\|\r\n(\|\|(?:(?:\|\|)+)?)((?:&lt;(?:(?:(?!&gt;).)*)&gt;)+)?", table)
                 if(b):
                     row = ''
@@ -1135,7 +1135,7 @@ def namumark(title, data):
                 else:
                     break
 
-            while True:
+            while(True):
                 c = re.search("(\|\|(?:(?:\|\|)+)?)((?:&lt;(?:(?:(?!&gt;).)*)&gt;)+)?", table)
                 if(c):
                     row = ''
@@ -1463,7 +1463,7 @@ def recentchanges():
     rows = curs.fetchall()
     if(rows):
         admin = admincheck()
-        while True:
+        while(True):
             try:
                 a = rows[i]
             except:
@@ -1548,7 +1548,7 @@ def record(name = None, number = None):
     if(rows):
         admin = admincheck()
         
-        while True:
+        while(True):
             try:
                 a = rows[i]
             except:
@@ -1629,7 +1629,7 @@ def userlog(number = None):
     if(rows):
         admin = admincheck()
         
-        while True:
+        while(True):
             try:
                 a = rows[i]
             except:
@@ -1684,7 +1684,7 @@ def backlink(name = None, number = None):
         curs.execute("delete from back where title = '" + pymysql.escape_string(name) + "' and link = ''")
         conn.commit()
         
-        while True:
+        while(True):
             try:
                 a = rows[i]
             except:
@@ -1749,7 +1749,7 @@ def recentdiscuss():
     curs.execute("select * from rd order by date desc limit 50")
     rows = curs.fetchall()
     if(rows):
-        while True:
+        while(True):
             try:
                 a = rows[i]
             except:
@@ -1781,7 +1781,7 @@ def blocklog(number = None):
     curs.execute("select * from rb order by today desc")
     rows = curs.fetchall()
     if(rows):
-        while True:
+        while(True):
             try:
                 a = rows[i]
             except:
@@ -1835,7 +1835,7 @@ def gethistory(name = None, number = None):
         if(rows):
             admin = admincheck()
             
-            while True:
+            while(True):
                 try:
                     a = rows[i]
                 except:
@@ -1955,7 +1955,7 @@ def search():
             
             div = '<li>문서가 없습니다. <a href="/w/' + parse.quote(request.form["search"]).replace('/','%2F') + '">바로가기</a></li><br>'
             
-            while True:
+            while(True):
                 try:
                     div = div + '<li><a href="/w/' + parse.quote(rows[i]['title']).replace('/','%2F') + '">' + rows[i]['title'] + '</a></li>'
                 except:
@@ -1972,7 +1972,7 @@ def w(name = None):
     i = 0
     curs.execute("select * from rd where title = '" + pymysql.escape_string(name) + "' order by date asc")
     rows = curs.fetchall()
-    while True:
+    while(True):
         try:
             a = rows[i]
         except:
@@ -2002,7 +2002,7 @@ def w(name = None):
             div = ''
             i = 0
             
-            while True:
+            while(True):
                 try:
                     a = rows[i]
                 except:
@@ -2110,7 +2110,7 @@ def redirectw(name = None, redirect = None):
     i = 0
     curs.execute("select * from rd where title = '" + pymysql.escape_string(name) + "' order by date asc")
     rows = curs.fetchall()
-    while True:
+    while(True):
         try:
             a = rows[i]
         except:
@@ -2139,7 +2139,7 @@ def redirectw(name = None, redirect = None):
             div = ''
             i = 0
             
-            while True:
+            while(True):
                 try:
                     a = rows[i]
                 except:
@@ -2554,7 +2554,7 @@ def secedit(name = None, number = None):
                 
                 gdata = rows[0]['data'] + '\r\n'
                 
-                while True:
+                while(True):
                     m = re.search("((?:={1,6})\s?(?:[^=]*)\s?(?:={1,6})(?:\s+)?\n(?:(?:(?:(?!(?:={1,6})\s?(?:[^=]*)\s?(?:={1,6})(?:\s+)?\n).)*)(?:\n)?)+)", gdata)
                     if(m):
                         if(i == number - 1):
@@ -2752,7 +2752,7 @@ def titleindex():
     curs.execute("select * from data order by title asc")
     rows = curs.fetchall()
     if(rows):
-        while True:
+        while(True):
             try:
                 a = rows[i]
             except:
@@ -2776,7 +2776,7 @@ def topic(name = None):
         j = 1
         curs.execute("select * from rd where title = '" + pymysql.escape_string(name) + "' order by date asc")
         rows = curs.fetchall()
-        while True:
+        while(True):
             try:
                 a = rows[i]
             except:
@@ -2815,7 +2815,7 @@ def topicstoplist(name = None):
         
         curs.execute("select * from stop where title = '" + pymysql.escape_string(name) + "' and close = 'O' order by sub asc")
         rows = curs.fetchall()
-        while True:
+        while(True):
             try:
                 a = rows[i]
             except:
@@ -2914,7 +2914,7 @@ def sub(name = None, sub = None):
         curs.execute("select * from topic where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' order by id+0 asc")
         rows = curs.fetchall()
         
-        while True:
+        while(True):
             try:
                 a = rows[i]
             except:
@@ -3155,7 +3155,7 @@ def check(name = None, sub = None, number = None):
                 if(row):
                     i = 0
                     c = ''
-                    while True:
+                    while(True):
                         try:
                             c = c + '<table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;">' + row[i]['user'] + '</td><td style="text-align: center;width:33.33%;">' + row[i]['ip'] + '</td><td style="text-align: center;width:33.33%;">' + row[i]['today'] + '</td></tr></tbody></table>'
                         except:
@@ -3170,7 +3170,7 @@ def check(name = None, sub = None, number = None):
                 if(row):
                     i = 0
                     c = ''
-                    while True:
+                    while(True):
                         try:
                             c = c + '<table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;">' + row[i]['user'] + '</td><td style="text-align: center;width:33.33%;">' + row[i]['ip'] + '</td><td style="text-align: center;width:33.33%;">' + row[i]['today'] + '</td></tr></tbody></table>'
                         except:
