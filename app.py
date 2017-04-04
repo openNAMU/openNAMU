@@ -827,13 +827,14 @@ def namumark(title, data):
             if(tou == "<hr id='footnote'><div class='wiki-macro-footnote'><br></div>"):
                 tou = ""
             break
-            
-    if(category):
-        data = data + '<div style="width:100%;border: 1px solid #777;padding: 5px;margin-top: 1em;">분류: ' + category + '</div>'
     
     data = re.sub("\[각주\](?:(?:<br>| |\r|\n)+)?$", "", data)
+    data = re.sub("(?:(?:<br>| |\r|\n)+)$", "", data)
     data = re.sub("\[각주\]", "<br>" + tou, data)
     data = data + tou
+    
+    if(category):
+        data = data + '<div style="width:100%;border: 1px solid #777;padding: 5px;margin-top: 1em;">분류: ' + category + '</div>'
     
     while(True):
         m = re.search("(\|\|(?:(?:(?:.*)\n?)\|\|)+)", data)
