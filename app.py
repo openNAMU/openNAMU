@@ -22,10 +22,7 @@ log.setLevel(logging.ERROR)
 
 app.config['MAX_CONTENT_LENGTH'] = int(data['upload']) * 1024 * 1024
 
-try:
-    conn = pymysql.connect(host = data['host'], user = data['user'], password = data['pw'], db = data['db'], charset = 'utf8mb4')
-    curs = conn.cursor(pymysql.cursors.DictCursor)
-    
+def start():
     try:
         curs.execute("select * from data limit 1")
     except:
@@ -84,7 +81,13 @@ try:
     try:
         curs.execute("select * from hidhi limit 1")
     except:
-        curs.execute("create table hidhi(title text, re text)")
+        curs.execute("create table hidhi(title text, re text)")    
+
+try:
+    conn = pymysql.connect(host = data['host'], user = data['user'], password = data['pw'], db = data['db'], charset = 'utf8mb4')
+    curs = conn.cursor(pymysql.cursors.DictCursor)
+    
+    start()
 except:
     conn = pymysql.connect(host = data['host'], user = data['user'], password = data['pw'], charset = 'utf8mb4')
     curs = conn.cursor(pymysql.cursors.DictCursor)
@@ -93,65 +96,7 @@ except:
     curs.execute("alter database " + data['db'] + " character set = utf8mb4 collate = utf8mb4_unicode_ci")
     curs.execute("use " + data['db'])    
     
-    try:
-        curs.execute("select * from data limit 1")
-    except:
-        curs.execute("create table data(title text, data longtext, acl text)")
-    
-    try:
-        curs.execute("select * from history limit 1")
-    except:
-        curs.execute("create table history(id text, title text, data longtext, date text, ip text, send text, leng text)")
-    
-    try:
-        curs.execute("select * from rd limit 1")
-    except:
-        curs.execute("create table rd(title text, sub text, date text)")
-    
-    try:
-        curs.execute("select * from user limit 1")
-    except:
-        curs.execute("create table user(id text, pw text, acl text)")
-    
-    try:
-        curs.execute("select * from ban limit 1")
-    except:
-        curs.execute("create table ban(block text, end text, why text, band text)")
-    
-    try:
-        curs.execute("select * from topic limit 1")
-    except:
-        curs.execute("create table topic(id text, title text, sub text, data longtext, date text, ip text, block text)")
-    
-    try:
-        curs.execute("select * from stop limit 1")
-    except:
-        curs.execute("create table stop(title text, sub text, close text)")
-    
-    try:
-        curs.execute("select * from rb limit 1")
-    except:
-        curs.execute("create table rb(block text, end text, today text, blocker text, why text)")
-    
-    try:
-        curs.execute("select * from login limit 1")
-    except:
-        curs.execute("create table login(user text, ip text, today text)")
-    
-    try:
-        curs.execute("select * from back limit 1")
-    except:
-        curs.execute("create table back(title text, link text, type text)")
-    
-    try:
-        curs.execute("select * from cat limit 1")
-    except:
-        curs.execute("create table cat(title text, cat text)")
-        
-    try:
-        curs.execute("select * from hidhi limit 1")
-    except:
-        curs.execute("create table hidhi(title text, re text)")
+    start()
 
 app.secret_key = hashlib.sha512(bytes(data['key'], 'ascii')).hexdigest()
 
@@ -882,13 +827,13 @@ def namumark(title, data):
             if(tou == "<hr id='footnote'><div class='wiki-macro-footnote'><br></div>"):
                 tou = ""
             break
+            
+    if(category):
+        data = data + '<div style="width:100%;border: 1px solid #777;padding: 5px;margin-top: 1em;">분류: ' + category + '</div>'
     
     data = re.sub("\[각주\](?:(?:<br>| |\r|\n)+)?$", "", data)
     data = re.sub("\[각주\]", "<br>" + tou, data)
     data = data + tou
-    
-    if(category):
-        data = data + '<div style="width:100%;border: 1px solid #777;padding: 5px;margin-top: 1em;">분류: ' + category + '</div>'
     
     while(True):
         m = re.search("(\|\|(?:(?:(?:.*)\n?)\|\|)+)", data)
