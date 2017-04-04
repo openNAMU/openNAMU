@@ -44,5 +44,5 @@ set 폴더에 있는 set.json을 폴더 밖으로 꺼내고 json 내용을 수�
 
 오픈나무를 키고 회원 가입으로 가서 owner 이름으로 설정 한 이름으로 가입 합니다.
 
-## 주의
-MySQL이나 MariaDB의 wait_timeout 값을 아주 큰 값으로 해주고 skip-name-resolve를 추가 해야 위키가 안 터집니다.
+## 기타
+만약 위키가 자꾸 터질시 MySQL이나 MariaDB의 wait_timeout 값을 아주 큰 값으로 해주고 skip-name-resolve를 추가 하면 위키가 안 터집니다.
