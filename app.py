@@ -1647,6 +1647,7 @@ def backlink(name = None, number = None):
     v = number * 50
     i = v - 50
     div = ''
+    restart = 0
     
     curs.execute("select * from back where title = '" + pymysql.escape_string(name) + "' order by link asc")
     rows = curs.fetchall()
@@ -1658,6 +1659,15 @@ def backlink(name = None, number = None):
                 if(number != 1):
                     div = div + '<br><a href="/backlink/n/' + str(number - 1) + '">(이전)'
                 break
+                
+            if(rows[i]['type'] == 'include'):
+                curs.execute("select * from back where title = '" + pymysql.escape_string(name) + "' and link = '" + pymysql.escape_string(rows[i]['link']) + "' and type = ''")
+                test = curs.fetchall()
+                if(test):
+                    restart = 1
+                    
+                    curs.execute("delete from back where title = '" + pymysql.escape_string(name) + "' and link = '" + pymysql.escape_string(rows[i]['link']) + "' and type = ''")
+                    conn.commit()
                 
             if(not re.search('^사용자:', rows[i]['link'])):
                 curs.execute("select * from data where title = '" + pymysql.escape_string(rows[i]['link']) + "'")
@@ -1704,7 +1714,10 @@ def backlink(name = None, number = None):
                 i = i + 1
                 v = v + 1
                 
-        return render_template('index.html', logo = data['name'], data = div, title = name, sub = '역링크')
+        if(restart == 1):
+            return '<meta http-equiv="refresh" content="0;url=/backlink/' + parse.quote(name).replace('/','%2F') + '/n/' + str(number) + '" />'
+        else:    
+            return render_template('index.html', logo = data['name'], data = div, title = name, sub = '역링크')
     else:
         return render_template('index.html', logo = data['name'], data = '', title = name, sub = '역링크')
 
