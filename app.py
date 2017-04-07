@@ -128,6 +128,24 @@ def ownercheck():
         if(rows):
             if(rows[0]['acl'] == 'owner'):
                 return 1
+                
+def isin(name):
+    if(re.search('^틀:', name)):
+        curs.execute("select * from back where title = '" + pymysql.escape_string(name) + "' and type = 'include'")
+        include = curs.fetchall()
+        if(include):
+            i = 0
+            
+            while(True):
+                try:
+                    curs.execute("select * from data where title = '" + pymysql.escape_string(include[i]['link']) + "'")
+                    file = curs.fetchall()
+                    if(file):
+                        namumark(include[i]['link'], file[0]['data'])
+                except:
+                    break
+                    
+                i = i + 1
 
 def namumark(title, data):
     while(True):
@@ -422,9 +440,15 @@ def namumark(title, data):
                                 a = re.sub("([^= ,]*)\=([^,]*)", "", a, 1)
                             else:
                                 break                        
-                    data = re.sub("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]", '\n<div style="margin-bottom: -20px;">' + enddata + '</div>\n', data, 1)
+                    data = re.sub("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]", '<br><div>' + enddata + '</div><br>', data, 1)
                 else:
-                    data = re.sub("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]", "[[" + results[0] + "]]", data, 1)
+                    curs.execute("select * from back where title = '" + pymysql.escape_string(results[0]) + "' and link = '" + pymysql.escape_string(title) + "' and type = 'include'")
+                    abb = curs.fetchall()
+                    if(not abb):
+                        curs.execute("insert into back (title, link, type) value ('" + pymysql.escape_string(results[0]) + "', '" + pymysql.escape_string(title) + "',  'include')")
+                        conn.commit()
+                
+                    data = re.sub("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]", "<a class=\"not_thing\" href=\"" + parse.quote(results[0]).replace('/','%2F') + "\">" + results[0] + "</a>", data, 1)
         else:
             break
     
@@ -834,7 +858,7 @@ def namumark(title, data):
     data = data + tou
     
     if(category):
-        data = data + '<br><div style="width:100%;border: 1px solid #777;padding: 5px;margin-top: 1em;">분류: ' + category + '</div>'
+        data = data + '<div style="width:100%;border: 1px solid #777;padding: 5px;margin-top: 1em;">분류: ' + category + '</div>'
     
     while(True):
         m = re.search("(\|\|(?:(?:(?:.*)\n?)\|\|)+)", data)
@@ -1626,10 +1650,7 @@ def backlink(name = None, number = None):
     
     curs.execute("select * from back where title = '" + pymysql.escape_string(name) + "' order by link asc")
     rows = curs.fetchall()
-    if(rows):
-        curs.execute("delete from back where title = '" + pymysql.escape_string(name) + "' and link = ''")
-        conn.commit()
-        
+    if(rows):        
         while(True):
             try:
                 a = rows[i]
@@ -1916,6 +1937,7 @@ def search():
 @app.route('/w/<path:name>')
 def w(name = None):
     i = 0
+    
     curs.execute("select * from rd where title = '" + pymysql.escape_string(name) + "' order by date asc")
     rows = curs.fetchall()
     while(True):
@@ -1924,14 +1946,18 @@ def w(name = None):
         except:
             topic = ""
             break
+            
         curs.execute("select * from stop where title = '" + pymysql.escape_string(rows[i]['title']) + "' and sub = '" + pymysql.escape_string(rows[i]['sub']) + "' and close = 'O'")
         row = curs.fetchall()
         if(not row):
             topic = "open"
+            
             break
         else:
             i = i + 1
+            
     acl = ''
+    
     m = re.search("^(.*)\/(.*)$", name)
     if(m):
         g = m.groups()
@@ -2023,6 +2049,7 @@ def w(name = None):
         m = re.search("^사용자:(.*)", name)
         if(m):
             g = m.groups()
+            
             curs.execute("select * from user where id = '" + pymysql.escape_string(g[0]) + "'")
             rows = curs.fetchall()
             if(rows):
@@ -2030,6 +2057,7 @@ def w(name = None):
                     acl = '(소유자)'
                 elif(rows[0]['acl'] == 'admin'):
                     acl = '(관리자)'
+                    
         curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
         rows = curs.fetchall()
         if(rows):
@@ -2040,13 +2068,16 @@ def w(name = None):
             else:
                 if(not acl):
                     acl = ''
+                    
             enddata = namumark(name, rows[0]['data'])
+            
             m = re.search('<div id="toc">((?:(?!\/div>).)*)<\/div>', enddata)
             if(m):
                 result = m.groups()
                 left = result[0]
             else:
                 left = ''
+                
             return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = enddata, license = data['license'], tn = 1, acl = acl, left = left, uppage = uppage, style = style, topic = topic)
         else:
             return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = '문서 없음', license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic), 404
@@ -2054,6 +2085,7 @@ def w(name = None):
 @app.route('/w/<path:name>/from/<path:redirect>')
 def redirectw(name = None, redirect = None):
     i = 0
+    
     curs.execute("select * from rd where title = '" + pymysql.escape_string(name) + "' order by date asc")
     rows = curs.fetchall()
     while(True):
@@ -2061,23 +2093,31 @@ def redirectw(name = None, redirect = None):
             a = rows[i]
         except:
             topic = ""
+            
             break
+            
         curs.execute("select * from stop where title = '" + pymysql.escape_string(rows[i]['title']) + "' and sub = '" + pymysql.escape_string(rows[i]['sub']) + "' and close = 'O'")
         row = curs.fetchall()
         if(not row):
             topic = "open"
+            
             break
         else:
             i = i + 1
+            
     acl = ''
+    
     m = re.search("^(.*)\/(.*)$", name)
     if(m):
         g = m.groups()
         uppage = g[0]
+        
         style = ""
     else:
         uppage = ""
+        
         style = "display:none;"
+        
     if(re.search("^분류:", name)):
         curs.execute("select * from cat where title = '" + pymysql.escape_string(name) + "' order by cat asc")
         rows = curs.fetchall()
@@ -2096,6 +2136,7 @@ def redirectw(name = None, redirect = None):
                 if(row):
                     aa = row[0]['data']                  
                     aa = namumark('', aa)
+                    
                     bb = re.search('<div style="width:100%;border: 1px solid #777;padding: 5px;margin-top: 1em;">분류:((?:(?!<\/div>).)*)<\/div>', aa)
                     if(bb):
                         cc = bb.groups()
@@ -2129,7 +2170,9 @@ def redirectw(name = None, redirect = None):
                     conn.commit()
                     
                     i = i + 1
+                    
             div = '<h2>분류</h2>' + div
+            
             curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
             bb = curs.fetchall()
             if(bb):
@@ -2140,14 +2183,17 @@ def redirectw(name = None, redirect = None):
                 else:
                     if(not acl):
                         acl = ''
+                        
                 newdata = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', ' * \g<in> 문서로 넘겨주기', bb[0]['data'])
                 enddata = namumark(name, newdata)
+                
                 m = re.search('<div id="toc">((?:(?!\/div>).)*)<\/div>', enddata)
                 if(m):
                     result = m.groups()
                     left = result[0]
                 else:
                     left = ''
+                    
                 return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = enddata + '<br>' + div, license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, redirect = '<a href="/w/' + parse.quote(redirect).replace('/','%2F') + '/from/' + parse.quote(name).replace('/','%2F') + '">' + redirect + '</a>에서 넘어 왔습니다.')
             else:
                 return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = div, license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, redirect = '<a href="/w/' + parse.quote(redirect).replace('/','%2F') + '/from/' + parse.quote(name).replace('/','%2F') + '">' + redirect + '</a>에서 넘어 왔습니다.')
@@ -2157,6 +2203,7 @@ def redirectw(name = None, redirect = None):
         m = re.search("^사용자:(.*)", name)
         if(m):
             g = m.groups()
+            
             curs.execute("select * from user where id = '" + pymysql.escape_string(g[0]) + "'")
             rows = curs.fetchall()
             if(rows):
@@ -2164,6 +2211,7 @@ def redirectw(name = None, redirect = None):
                     acl = '(소유자)'
                 elif(rows[0]['acl'] == 'admin'):
                     acl = '(관리자)'
+                    
         curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
         rows = curs.fetchall()
         if(rows):
@@ -2174,14 +2222,17 @@ def redirectw(name = None, redirect = None):
             else:
                 if(not acl):
                     acl = ''
+                    
             newdata = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', ' * \g<in> 문서로 넘겨주기', rows[0]["data"])
             enddata = namumark(name, newdata)
+            
             m = re.search('<div id="toc">((?:(?!\/div>).)*)<\/div>', enddata)
             if(m):
                 result = m.groups()
                 left = result[0]
             else:
                 left = ''
+                
             return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = enddata, license = data['license'], tn = 1, acl = acl, left = left, uppage = uppage, style = style, topic = topic, redirect = '<a href="/w/' + parse.quote(redirect).replace('/','%2F') + '/from/' + parse.quote(name).replace('/','%2F') + '">' + redirect + '</a>에서 넘어 왔습니다.')
         else:
             return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = '문서 없음', license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, redirect = '<a href="/w/' + parse.quote(redirect).replace('/','%2F') + '/from/' + parse.quote(name).replace('/','%2F') + '">' + redirect + '</a>에서 넘어 왔습니다.'), 404
@@ -2410,6 +2461,9 @@ def edit(name = None):
                     
                     curs.execute("insert into data (title, data, acl) value ('" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(content) + "', '')")
                     conn.commit()
+                    
+            isin(name)
+            
             return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name).replace('/','%2F') + '" />'
     else:
         ip = getip(request)
@@ -2468,6 +2522,8 @@ def secedit(name = None, number = None):
                         curs.execute("update data set data = '" + pymysql.escape_string(content) + "' where title = '" + pymysql.escape_string(name) + "'")
                         conn.commit()
                         
+                    isin(name)
+                    
                     return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name).replace('/','%2F') + '" />'
             else:
                 return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name).replace('/','%2F') + '" />'
