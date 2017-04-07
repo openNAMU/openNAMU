@@ -440,7 +440,7 @@ def namumark(title, data):
                                 a = re.sub("([^= ,]*)\=([^,]*)", "", a, 1)
                             else:
                                 break                        
-                    data = re.sub("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]", '<br><div>' + enddata + '</div><br>', data, 1)
+                    data = re.sub("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]", '\n<div>' + enddata + '</div>\n', data, 1)
                 else:
                     curs.execute("select * from back where title = '" + pymysql.escape_string(results[0]) + "' and link = '" + pymysql.escape_string(title) + "' and type = 'include'")
                     abb = curs.fetchall()
