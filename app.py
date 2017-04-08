@@ -109,6 +109,10 @@ def show_diff(seqm):
             output.append("<span style='background:#CFC;'>" + seqm.b[b0:b1] + "</span>")
         elif(opcode == 'delete'):
             output.append("<span style='background:#FDD;'>" + seqm.a[a0:a1] + "</span>")
+        elif(opcode == 'replace'):
+            output.append("<span style='background:#CFC;'>" + seqm.b[b0:b1] + "</span><span style='background:#FDD;'>" + seqm.a[a0:a1] + "</span>")
+        else:
+            output.append(seqm.a[a0:a1])
     return ''.join(output)
            
 def admincheck():
@@ -3429,15 +3433,15 @@ def diff(name = None, a = None, b = None):
             indata = re.sub('<', '&lt;', rows[0]['data'])
             indata = re.sub('>', '&gt;', indata)
             indata = re.sub('"', '&quot;', indata)
-            indata = re.sub('\n', '<br>', indata)
             
             enddata = re.sub('<', '&lt;', row[0]['data'])
             enddata = re.sub('>', '&gt;', enddata)
             enddata = re.sub('"', '&quot;', enddata)
-            enddata = re.sub('\n', '<br>', enddata)
             
             sm = difflib.SequenceMatcher(None, indata, enddata)
             c = show_diff(sm)
+            
+            c = '<pre>' + c + '</pre>'
             
             return render_template('index.html', title = name, logo = data['name'], data = c, sub = '비교')
         else:

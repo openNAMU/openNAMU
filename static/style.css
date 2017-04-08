@@ -475,3 +475,7 @@ a.not_thing {
 sub, sup {
     line-height: 1.4em;
 }
+
+pre span {
+    font-family: '니눔고딕코딩', 'Nanum Gothic Coding', monospace;
+}
