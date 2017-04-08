@@ -2302,7 +2302,8 @@ def reraw(name = None, number = None):
                 enddata = re.sub('<', '&lt;', rows[0]['data'])
                 enddata = re.sub('>', '&gt;', enddata)
                 enddata = re.sub('"', '&quot;', enddata)
-                enddata = re.sub("\n", '<br>', enddata)
+                
+                enddata = '<pre>' + enddata + '</pre>'
                 
                 return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = enddata, license = data['license'])
             else:
@@ -2316,7 +2317,8 @@ def reraw(name = None, number = None):
             enddata = re.sub('<', '&lt;', rows[0]['data'])
             enddata = re.sub('>', '&gt;', enddata)
             enddata = re.sub('"', '&quot;', enddata)
-            enddata = re.sub("\n", '<br>', enddata)
+            
+            enddata = '<pre>' + enddata + '</pre>'
             
             return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = enddata, license = data['license'])
         else:
@@ -2330,7 +2332,8 @@ def raw(name = None):
         enddata = re.sub('<', '&lt;', rows[0]['data'])
         enddata = re.sub('>', '&gt;', enddata)
         enddata = re.sub('"', '&quot;', enddata)
-        enddata = re.sub("\n", '<br>', enddata)
+        
+        enddata = '<pre>' + enddata + '</pre>'
         
         return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name).replace('/','%2F'), data = enddata, license = data['license'], tn = 7, sub = 'Raw')
     else:
