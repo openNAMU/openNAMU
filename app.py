@@ -1222,7 +1222,8 @@ def getcan(ip, name):
         else:
             return 1
     elif(n):
-        return 1
+        if(not ownercheck() == 1):
+            return 1
     else:
         b = re.search("^([0-9](?:[0-9]?[0-9]?)\.[0-9](?:[0-9]?[0-9]?))", ip)
         if(b):
