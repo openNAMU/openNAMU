@@ -153,22 +153,25 @@ def isin(name):
 
 def namumark(title, data):
     while(True):
-        m = re.search("<((?:\/)?(?:div|span|embed|iframe)(?:[^>]*))>", data)
+        m = re.search("<((div|span|embed|iframe)(?:[^>]*))>", data)
         if(m):
             g = m.groups()
-            
-            n = re.search('src="http(?:s)?:\/\/([^\/]*)\/(?:[^"]*)"', g[0])
-            if(n):
-                gm = n.groups()
-                if(gm[0] == "www.youtube.com" or gm[0] == "serviceapi.nmv.naver.com" or gm[0] == "tv.kakao.com" or gm[0] == "tvple.com" or gm[0] == "tvpot.daum.net"):
-                    r = g[0]
+
+            if(re.search("<(\/" + g[1] + ")>", data)):
+                n = re.search('src="http(?:s)?:\/\/([^\/]*)\/(?:[^"]*)"', g[0])
+                if(n):
+                    gm = n.groups()
+                    if(gm[0] == "www.youtube.com" or gm[0] == "serviceapi.nmv.naver.com" or gm[0] == "tv.kakao.com" or gm[0] == "tvple.com" or gm[0] == "tvpot.daum.net"):
+                        r = g[0]
+                    else:
+                        r = re.sub('src="([^"]*)"', '', g[0])
                 else:
-                    r = re.sub('src="([^"]*)"', '', g[0])
+                    r = g[0]
+                
+                r = re.sub('"', '#.#', r)
+                data = re.sub("<((?:\/)?" + g[1] + "(?:[^>]*))>", "[" + r + "]", data, 2)
             else:
-                r = g[0]
-            
-            r = re.sub('"', '#.#', r)
-            data = re.sub("<((?:\/)?(?:div|span|embed|iframe)(?:[^>]*))>", "[" + r + "]", data, 1)
+                break
         else:
             break
 
