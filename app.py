@@ -20,8 +20,6 @@ import logging
 log = logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
 
-app.config['MAX_CONTENT_LENGTH'] = int(data['upload']) * 1024 * 1024
-
 def start():
     try:
         curs.execute("select * from data limit 1")
@@ -1389,6 +1387,7 @@ def getleng(existing, change):
     
 @app.route('/upload', methods=['GET', 'POST'])
 def upload():
+    app.config['MAX_CONTENT_LENGTH'] = int(data['upload']) * 1024 * 1024
     if(request.method == 'POST'):
         ip = getip(request)
         ban = getban(ip)
@@ -3545,6 +3544,11 @@ def error(num = None):
 @app.errorhandler(404)
 def uncaughtError(error):
     return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(data['frontpage']).replace('/','%2F') + '" />'
+
+@app.errorhandler(413)
+def uncaughtError(error):
+    app.config['MAX_CONTENT_LENGTH'] = (1024**3)
+    return error, 401
 
 if __name__ == '__main__':
     app.run(host = '0.0.0.0', port = int(data['port']))
