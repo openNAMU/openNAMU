@@ -149,6 +149,16 @@ def isin(name):
                     
                 i = i + 1
 
+def savemark(data):
+    data = re.sub("\[date\(now\)\]", getnow(), data)
+    if(not re.search("\.", getip(request))):
+        name = '[[사용자:' + getip(request) + '|' + getip(request) + ']]'
+    else:
+        name = getip(request)
+    data = re.sub("\[name\]", name, data)
+
+    return data
+
 def namumark(title, data):
     while(True):
         m = re.search("<((div|span|embed|iframe)(?:[^>]*))>", data)
@@ -286,6 +296,11 @@ def namumark(title, data):
     
     data = re.sub("\[anchor\((?P<in>[^\[\]]*)\)\]", '<span id="\g<in>"></span>', data)
     data = re.sub('\[date\(now\)\]', getnow(), data)
+    if(not re.search("\.", getip(request))):
+        name = '[[사용자:' + getip(request) + '|' + getip(request) + ']]'
+    else:
+        name = getip(request)
+    data = re.sub("\[name\]", name, data)
     
     while(True):
         m = re.search("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]", data)
@@ -2461,7 +2476,7 @@ def edit(name = None):
         else:
             today = getnow()
             
-            content = re.sub("\[date\(now\)\]", today, request.form["content"])
+            content = savemark(request.form["content"])
             
             curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
             rows = curs.fetchall()
@@ -2532,7 +2547,7 @@ def secedit(name = None, number = None):
         else:
             today = getnow()
             
-            content = re.sub("\[date\(now\)\]", today, request.form["content"])
+            content = savemark(request.form["content"])
             
             curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
             rows = curs.fetchall()
@@ -2744,7 +2759,7 @@ def move(name = None):
 
 @app.route('/other')
 def other():
-    return render_template('index.html', title = '기타 메뉴', logo = data['name'], data = '<li><a href="/titleindex">모든 문서</a></li><li><a href="/blocklog/n/1">유저 차단 기록</a></li><li><a href="/userlog/n/1">유저 가입 기록</a></li><li><a href="/upload">업로드</a></li><li><a href="/manager/1">관리자 메뉴</a></li><li><a href="/manager/6">유저 기록</a></li><br>이 오픈나무의 버전은 <a href="https://github.com/2DU/openNAMU/blob/master/version.md">1.8.2</a> 입니다.')
+    return render_template('index.html', title = '기타 메뉴', logo = data['name'], data = '<li><a href="/titleindex">모든 문서</a></li><li><a href="/blocklog/n/1">유저 차단 기록</a></li><li><a href="/userlog/n/1">유저 가입 기록</a></li><li><a href="/upload">업로드</a></li><li><a href="/manager/1">관리자 메뉴</a></li><li><a href="/manager/6">유저 기록</a></li><br>이 오픈나무의 버전은 <a href="https://github.com/2DU/openNAMU/blob/master/version.md">1.8.3</a> 입니다.')
     
 @app.route('/manager/<int:num>', methods=['POST', 'GET'])
 def manager(num = None):
@@ -2902,7 +2917,7 @@ def sub(name = None, sub = None):
             
             aa = request.form["content"]
             aa = re.sub("\[\[(분류:(?:(?:(?!\]\]).)*))\]\]", "[br]", aa)
-            aa = re.sub("\[date\(now\)\]", today, aa)
+            aa = savemark(aa)
             
             curs.execute("insert into topic (id, title, sub, data, date, ip, block) value ('" + str(number) + "', '" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(sub) + "', '" + pymysql.escape_string(aa) + "', '" + today + "', '" + ip + "', '')")
             conn.commit()
