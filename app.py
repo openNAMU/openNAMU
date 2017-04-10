@@ -1448,6 +1448,36 @@ def image(name = None):
     else:
         return render_template('index.html', logo = data['name'], data = '이미지 없음.', title = '이미지 보기'), 404
 
+@app.route('/adminlist')
+def adminlist():
+    i = 0
+    div = '<div>'
+    
+    curs.execute("select * from user where acl = 'admin' or acl = 'owner'")
+    rows = curs.fetchall()
+    if(rows):
+        while(True):
+            try:
+                a = rows[i]
+            except:
+                div = div + '</div>'
+                break
+
+            curs.execute("select * from data where title = '사용자:" + rows[i]['id'] + "'")
+            user = curs.fetchall()
+            if(user):
+                name = '<a href="/w/' + parse.quote('사용자:' + rows[i]['id']).replace('/','%2F') + '">' + rows[i]['id'] + '</a>'
+            else:
+                name = '<a class="not_thing" href="/w/' + parse.quote('사용자:' + rows[i]['id']).replace('/','%2F') + '">' + rows[i]['id'] + '</a>'
+
+            div = div + '<li>' + str(i + 1) + '. ' + name + '</li>'
+            
+            i = i + 1
+            
+        return render_template('index.html', logo = data['name'], data = div, title = '관리자 목록')
+    else:
+        return render_template('index.html', logo = data['name'], title = '관리자 목록')
+
 @app.route('/recentchanges')
 def recentchanges():
     i = 0
@@ -2759,12 +2789,12 @@ def move(name = None):
 
 @app.route('/other')
 def other():
-    return render_template('index.html', title = '기타 메뉴', logo = data['name'], data = '<li><a href="/titleindex">모든 문서</a></li><li><a href="/blocklog/n/1">유저 차단 기록</a></li><li><a href="/userlog/n/1">유저 가입 기록</a></li><li><a href="/upload">업로드</a></li><li><a href="/manager/1">관리자 메뉴</a></li><li><a href="/manager/6">유저 기록</a></li><br>이 오픈나무의 버전은 <a href="https://github.com/2DU/openNAMU/blob/master/version.md">1.8.3</a> 입니다.')
+    return render_template('index.html', title = '기타 메뉴', logo = data['name'], data = '<h2 style="margin-top: 0px;">기록</h2><li><a href="/blocklog/n/1">유저 차단 기록</a></li><li><a href="/userlog/n/1">유저 가입 기록</a></li><li><a href="/manager/6">유저 기록</a></li><h2>기타</h2><li><a href="/titleindex">모든 문서</a></li><li><a href="/upload">업로드</a></li><li><a href="/adminlist">관리자 목록</a></li><li><a href="/manager/1">관리자 메뉴</a></li><br>이 오픈나무의 버전은 <a href="https://github.com/2DU/openNAMU/blob/master/version.md">1.8.4</a> 입니다.')
     
 @app.route('/manager/<int:num>', methods=['POST', 'GET'])
 def manager(num = None):
     if(num == 1):
-        return render_template('index.html', title = '관리자 메뉴', logo = data['name'], data = '<h2 style="margin-top: 0px;">관리자 및 소유자</h2><li><a href="/manager/2">문서 ACL</a></li><li><a href="/manager/3">유저 체크</a></li><li><a href="/manager/4">유저 차단</a></li><h2>소유자</h2><li><a href="/manager/5">관리자 권한 주기</a></li>')
+        return render_template('index.html', title = '관리자 메뉴', logo = data['name'], data = '<h2 style="margin-top: 0px;">관리자 및 소유자</h2><li><a href="/manager/2">문서 ACL</a></li><li><a href="/manager/3">유저 체크</a></li><li><a href="/manager/4">유저 차단</a></li><h2>소유자</h2><li><a href="/manager/5">관리자 권한 주기</a></li><h2>기타</h2><li>이 메뉴에 없는 기능은 해당 문서의 역사나 토론에서 바로 사용 가능함</li>')
     elif(num == 2):
         if(request.method == 'POST'):
             return '<meta http-equiv="refresh" content="0;url=/acl/' + parse.quote(request.form["name"]).replace('/','%2F') + '" />'
