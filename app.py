@@ -1463,12 +1463,17 @@ def adminlist():
                 div = div + '</div>'
                 break
 
+            if(rows[i]['acl'] == 'owner'):
+                acl = '소유자'
+            else:
+                acl = '관리자'
+
             curs.execute("select * from data where title = '사용자:" + rows[i]['id'] + "'")
             user = curs.fetchall()
             if(user):
-                name = '<a href="/w/' + parse.quote('사용자:' + rows[i]['id']).replace('/','%2F') + '">' + rows[i]['id'] + '(' + rows[i]['acl'] + ')</a>'
+                name = '<a href="/w/' + parse.quote('사용자:' + rows[i]['id']).replace('/','%2F') + '">' + rows[i]['id'] + '</a> (' + acl + ')'
             else:
-                name = '<a class="not_thing" href="/w/' + parse.quote('사용자:' + rows[i]['id']).replace('/','%2F') + '">' + rows[i]['id'] + '(' + rows[i]['acl'] + ')</a>'
+                name = '<a class="not_thing" href="/w/' + parse.quote('사용자:' + rows[i]['id']).replace('/','%2F') + '">' + rows[i]['id'] + '</a> (' + acl + ')'
 
             div = div + '<li>' + str(i + 1) + '. ' + name + '</li>'
             
