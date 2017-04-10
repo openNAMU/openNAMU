@@ -1466,9 +1466,9 @@ def adminlist():
             curs.execute("select * from data where title = '사용자:" + rows[i]['id'] + "'")
             user = curs.fetchall()
             if(user):
-                name = '<a href="/w/' + parse.quote('사용자:' + rows[i]['id']).replace('/','%2F') + '">' + rows[i]['id'] + '</a>'
+                name = '<a href="/w/' + parse.quote('사용자:' + rows[i]['id']).replace('/','%2F') + '">' + rows[i]['id'] + '(' + rows[i]['acl'] + ')</a>'
             else:
-                name = '<a class="not_thing" href="/w/' + parse.quote('사용자:' + rows[i]['id']).replace('/','%2F') + '">' + rows[i]['id'] + '</a>'
+                name = '<a class="not_thing" href="/w/' + parse.quote('사용자:' + rows[i]['id']).replace('/','%2F') + '">' + rows[i]['id'] + '(' + rows[i]['acl'] + ')</a>'
 
             div = div + '<li>' + str(i + 1) + '. ' + name + '</li>'
             
