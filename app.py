@@ -817,13 +817,20 @@ def namumark(title, data):
             break
             
     while(True):
-        m = re.search("((?:(?:\s\*\s[^\n]*)\n?)+)", data)
+        m = re.search("((?:(?:( +)\*\s(?:[^\n]*))\n?)+)", data)
         if(m):
             result = m.groups()
             end = str(result[0])
-            end = re.sub("\s\*\s(?P<in>[^\n]*)", "<li>\g<in></li>", end)
+            while(True):
+                isspace = re.search("( +)\*\s([^\n]*)", end)
+                if(isspace):
+                    spacebar = isspace.groups()
+                    up = len(spacebar[0]) * 20
+                    end = re.sub("( +)\*\s([^\n]*)", "<li style='margin-left:" + str(up) + "px'>" + spacebar[1] + "</li>", end, 1)
+                else:
+                    break
             end = re.sub("\n", '', end)
-            data = re.sub("((?:(?:\s\*\s[^\n]*)\n?)+)", '<ul id="list">' + end + '</ul>', data, 1)
+            data = re.sub("(?:(?:(?:( +)\*\s([^\n]*))\n?)+)", '<ul id="list">' + end + '</ul>', data, 1)
         else:
             break
     
@@ -834,18 +841,11 @@ def namumark(title, data):
     data = re.sub("-{4,11}", "<hr>", data)
     
     while(True):
-        b = re.search("\r\n( +)", data)
+        b = re.search("\n( +)", data)
         if(b):
             result = b.groups()
-            tp = len(result[0])
-            up = ''
-            i = 0
-            while(True):
-                up = up + '<span id="in"></span>'
-                i = i + 1
-                if(i == tp):
-                    break
-            data = re.sub("\r\n( +)", '<br>' + up, data, 1)
+            up = re.sub(' ', '<span id="in"></span>', result[0])
+            data = re.sub("\n( +)", '<br>' + up, data, 1)
         else:
             break
     
