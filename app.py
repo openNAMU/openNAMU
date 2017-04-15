@@ -185,8 +185,11 @@ def namumark(title, data):
                     r = g[0]
                 
                 r = re.sub('"', '#.#', r)
-                data = re.sub("<((?:\/)?" + g[1] + "(?:[^>]*))>", "[" + r + "]", data, 2)
+                data = re.sub("<((?:\/)?" + g[1] + "(?:[^>]*))>", "[" + r + "]", data, 1)
+                data = re.sub("<\/" + g[1] + ">", "[/" + g[1] + "]", data, 1)
             else:
+                data = re.sub("<((?:\/)?" + g[1] + "(?:[^>]*))>", '&lt;' + g[0] + '&gt;', data, 1)
+                
                 break
         else:
             break
