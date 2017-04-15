@@ -3090,24 +3090,6 @@ def blind(name = None, sub = None, number = None):
             return '<meta http-equiv="refresh" content="0;url=/topic/' + parse.quote(name) + '/sub/' + parse.quote(sub) + '" />'
     else:
         return '<meta http-equiv="refresh" content="0;url=/error/3" />'
-
-@app.route('/topic/<path:name>/sub/<path:sub>/b/<int:number>')
-def blind(name = None, sub = None, number = None):
-    if(admincheck() == 1):
-        curs.execute("select * from topic where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' and id = '" + str(number) + "'")
-        row = curs.fetchall()
-        if(row):
-            if(row[0]['block'] == 'O'):
-                curs.execute("update topic set block = '' where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' and id = '" + str(number) + "'")
-            else:
-                curs.execute("update topic set block = 'O' where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' and id = '" + str(number) + "'")
-            conn.commit()
-            
-            return '<meta http-equiv="refresh" content="0;url=/topic/' + parse.quote(name) + '/sub/' + parse.quote(sub) + '" />'
-        else:
-            return '<meta http-equiv="refresh" content="0;url=/topic/' + parse.quote(name) + '/sub/' + parse.quote(sub) + '" />'
-    else:
-        return '<meta http-equiv="refresh" content="0;url=/error/3" />'
         
 @app.route('/topic/<path:name>/sub/<path:sub>/stop')
 def topicstop(name = None, sub = None):
