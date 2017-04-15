@@ -81,20 +81,25 @@ def start():
     except:
         curs.execute("create table hidhi(title text, re text)")    
 
+conn = pymysql.connect(host = data['host'], user = data['user'], password = data['pw'], charset = 'utf8mb4')
+curs = conn.cursor(pymysql.cursors.DictCursor)
+
+curs.execute("use mysql")
 try:
-    conn = pymysql.connect(host = data['host'], user = data['user'], password = data['pw'], db = data['db'], charset = 'utf8mb4')
-    curs = conn.cursor(pymysql.cursors.DictCursor)
-    
-    start()
+    curs.execute("set global wait_timeout = 315360000")
 except:
-    conn = pymysql.connect(host = data['host'], user = data['user'], password = data['pw'], charset = 'utf8mb4')
-    curs = conn.cursor(pymysql.cursors.DictCursor)
-    
+    test = 1
+
+try:
+    curs.execute("use " + data['db'])
+except:
     curs.execute("create database " + data['db'])
+    curs.execute("use " + data['db'])
     curs.execute("alter database " + data['db'] + " character set = utf8mb4 collate = utf8mb4_unicode_ci")
-    curs.execute("use " + data['db'])    
-    
-    start()
+
+start()
+
+
 
 app.secret_key = hashlib.sha512(bytes(data['key'], 'ascii')).hexdigest()
 
