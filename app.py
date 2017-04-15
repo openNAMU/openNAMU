@@ -85,10 +85,7 @@ conn = pymysql.connect(host = data['host'], user = data['user'], password = data
 curs = conn.cursor(pymysql.cursors.DictCursor)
 
 curs.execute("use mysql")
-try:
-    curs.execute("set global wait_timeout = 315360000")
-except:
-    test = 1
+curs.execute("set global wait_timeout = 315360000")
 
 try:
     curs.execute("use " + data['db'])
