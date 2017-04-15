@@ -2796,7 +2796,7 @@ def move(name = None):
 
 @app.route('/other')
 def other():
-    return render_template('index.html', title = '기타 메뉴', logo = data['name'], data = '<h2 style="margin-top: 0px;">기록</h2><li><a href="/blocklog/n/1">유저 차단 기록</a></li><li><a href="/userlog/n/1">유저 가입 기록</a></li><li><a href="/manager/6">유저 기록</a></li><h2>기타</h2><li><a href="/titleindex">모든 문서</a></li><li><a href="/upload">업로드</a></li><li><a href="/adminlist">관리자 목록</a></li><li><a href="/manager/1">관리자 메뉴</a></li><br>이 오픈나무의 버전은 <a href="https://github.com/2DU/openNAMU/blob/master/version.md">1.8.4</a> 입니다.')
+    return render_template('index.html', title = '기타 메뉴', logo = data['name'], data = '<h2 style="margin-top: 0px;">기록</h2><li><a href="/blocklog/n/1">유저 차단 기록</a></li><li><a href="/userlog/n/1">유저 가입 기록</a></li><li><a href="/manager/6">유저 기록</a></li><h2>기타</h2><li><a href="/titleindex">모든 문서</a></li><li><a href="/upload">업로드</a></li><li><a href="/adminlist">관리자 목록</a></li><li><a href="/manager/1">관리자 메뉴</a></li><br>이 오픈나무의 버전은 <a href="https://github.com/2DU/openNAMU/blob/master/version.md">1.8.5</a> 입니다.')
     
 @app.route('/manager/<int:num>', methods=['POST', 'GET'])
 def manager(num = None):
@@ -2987,17 +2987,62 @@ def sub(name = None, sub = None):
             div = div + '<br><br>'
         else:
             div = '<div>'
-            
-        i = 0
         
         curs.execute("select * from stop where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "'")
         rows = curs.fetchall()
         if(rows):
             if(not admin == 1):
-                style = 'display:none;'            
+                style = 'display:none;'
         
         curs.execute("select * from topic where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' order by id+0 asc")
         rows = curs.fetchall()
+
+        curs.execute("select * from distop where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' order by id+0 asc")
+        distop = curs.fetchall()
+
+        i = 0
+
+
+        if(distop):
+            while(True):
+                try:
+                    a = distop[i]
+                except:
+                    break
+
+                num = int(distop[i]['id']) - 1
+
+                if(i == 0):
+                    start = rows[num]['ip']
+                    
+                indata = namumark(name, rows[num]['data'])
+                        
+                m = re.search("([^-]*)\s\-\s(Close|Reopen|Stop|Restart|Admin)$", rows[num]['ip'])
+                if(m):
+                    g = m.groups()
+                    
+                    curs.execute("select * from data where title = '사용자:" + pymysql.escape_string(g[0]) + "'")
+                    row = curs.fetchall()
+                    if(row):
+                        ip = '<a href="/w/' + parse.quote('사용자:' + g[0]) + '">' + g[0] + '</a> - ' + g[1]
+                    else:
+                        ip = '<a class="not_thing" href="/w/' + parse.quote('사용자:' + g[0]) + '">' + g[0] + '</a> - ' + g[1]
+
+                elif(re.search("\.", rows[num]["ip"])):
+                    ip = rows[num]["ip"]
+                else:
+                    curs.execute("select * from data where title = '사용자:" + pymysql.escape_string(rows[num]['ip']) + "'")
+                    row = curs.fetchall()
+                    if(row):
+                        ip = '<a href="/w/' + parse.quote('사용자:' + rows[num]['ip']) + '">' + rows[num]['ip'] + '</a>'
+                    else:
+                        ip = '<a class="not_thing" href="/w/' + parse.quote('사용자:' + rows[num]['ip']) + '">' + rows[i]['ip'] + '</a>'
+                                   
+                div = div + '<table id="toron"><tbody><tr><td id="toroncolorred"><a href="#' + distop[i]['id'] + '" id="' + distop[i]['id'] + '-nt">#' + distop[i]['id'] + '</a> ' + ip + ' <span style="float:right;">' + rows[num]['date'] + '</span></td></tr><tr><td>' + indata + '</td></tr></tbody></table><br>'
+                    
+                i = i + 1
+
+        i = 0
         
         while(True):
             try:
@@ -3022,17 +3067,24 @@ def sub(name = None, sub = None):
                 ban = ""
             else:
                 if(admin == 1):
-                    curs.execute("select * from ban where block = '" + pymysql.escape_string(rows[i]['ip']) + "'")
-                    row = curs.fetchall()
                     if(rows[i]['block'] == 'O'):
                         isblock = ' <a href="/topic/' + parse.quote(name) + '/sub/' + parse.quote(sub) + '/b/' + str(i + 1) + '">(해제)</a>'
                     else:
                         isblock = ' <a href="/topic/' + parse.quote(name) + '/sub/' + parse.quote(sub) + '/b/' + str(i + 1) + '">(블라인드)</a>'
+
+                    curs.execute("select * from distop where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' and id = '" + pymysql.escape_string(str(i + 1)) + "'")
+                    row = curs.fetchall()
+                    if(row):
+                        isblock = isblock + ' <a href="/topic/' + parse.quote(name) + '/sub/' + parse.quote(sub) + '/notice/' + str(i + 1) + '">(해제)</a>'
+                    else:
+                        isblock = isblock + ' <a href="/topic/' + parse.quote(name) + '/sub/' + parse.quote(sub) + '/notice/' + str(i + 1) + '">(공지)</a>'
                         
                     n = re.search("\- (?:Admin)$", rows[i]['ip'])
                     if(n):
                         ban = isblock
                     else:
+                        curs.execute("select * from ban where block = '" + pymysql.escape_string(rows[i]['ip']) + "'")
+                        row = curs.fetchall()
                         if(row):
                             ban = ' <a href="/ban/' + parse.quote(rows[i]['ip']) + '">(해제)</a>' + isblock
                         else:
@@ -3085,6 +3137,26 @@ def blind(name = None, sub = None, number = None):
                 curs.execute("update topic set block = 'O' where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' and id = '" + str(number) + "'")
             conn.commit()
             
+            return '<meta http-equiv="refresh" content="0;url=/topic/' + parse.quote(name) + '/sub/' + parse.quote(sub) + '" />'
+        else:
+            return '<meta http-equiv="refresh" content="0;url=/topic/' + parse.quote(name) + '/sub/' + parse.quote(sub) + '" />'
+    else:
+        return '<meta http-equiv="refresh" content="0;url=/error/3" />'
+
+@app.route('/topic/<path:name>/sub/<path:sub>/notice/<int:number>')
+def notice(name = None, sub = None, number = None):
+    if(admincheck() == 1):
+        curs.execute("select * from topic where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' and id = '" + str(number) + "'")
+        data = curs.fetchall()
+        if(data):
+            curs.execute("select * from distop where id = '" + str(number) + "' and title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "'")
+            isthis = curs.fetchall()
+            if(isthis):
+                curs.execute("delete from distop where id = '" + str(number) + "' and title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "'")
+            else:
+                curs.execute("insert into distop (id, title, sub) value ('" + pymysql.escape_string(str(number)) + "', '" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(sub) + "')")
+            conn.commit()
+
             return '<meta http-equiv="refresh" content="0;url=/topic/' + parse.quote(name) + '/sub/' + parse.quote(sub) + '" />'
         else:
             return '<meta http-equiv="refresh" content="0;url=/topic/' + parse.quote(name) + '/sub/' + parse.quote(sub) + '" />'
