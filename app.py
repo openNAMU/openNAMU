@@ -79,13 +79,15 @@ def start():
     try:
         curs.execute("select * from hidhi limit 1")
     except:
-        curs.execute("create table hidhi(title text, re text)")    
+        curs.execute("create table hidhi(title text, re text)")
+
+    try:
+        curs.execute("select * from distop limit 1")
+    except:
+        curs.execute("create table distop(id text, title text, sub text)") 
 
 conn = pymysql.connect(host = data['host'], user = data['user'], password = data['pw'], charset = 'utf8mb4')
 curs = conn.cursor(pymysql.cursors.DictCursor)
-
-curs.execute("use mysql")
-curs.execute("set global wait_timeout = 315360000")
 
 try:
     curs.execute("use " + data['db'])
@@ -95,8 +97,6 @@ except:
     curs.execute("alter database " + data['db'] + " character set = utf8mb4 collate = utf8mb4_unicode_ci")
 
 start()
-
-
 
 app.secret_key = hashlib.sha512(bytes(data['key'], 'ascii')).hexdigest()
 
@@ -3073,16 +3073,16 @@ def sub(name = None, sub = None):
             
         return render_template('index.html', title = name, page = parse.quote(name).replace('/','%2F'), suburl = parse.quote(sub).replace('/','%2F'), toron = sub, logo = data['name'], rows = div, tn = 11, ban = ban, style = style, sub = '토론')
 
-@app.route('/topic/<path:name>/sub/<path:sub>/b/<number>')
+@app.route('/topic/<path:name>/sub/<path:sub>/b/<int:number>')
 def blind(name = None, sub = None, number = None):
     if(admincheck() == 1):
-        curs.execute("select * from topic where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' and id = '" + number + "'")
+        curs.execute("select * from topic where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' and id = '" + str(number) + "'")
         row = curs.fetchall()
         if(row):
             if(row[0]['block'] == 'O'):
-                curs.execute("update topic set block = '' where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' and id = '" + number + "'")
+                curs.execute("update topic set block = '' where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' and id = '" + str(number) + "'")
             else:
-                curs.execute("update topic set block = 'O' where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' and id = '" + number + "'")
+                curs.execute("update topic set block = 'O' where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' and id = '" + str(number) + "'")
             conn.commit()
             
             return '<meta http-equiv="refresh" content="0;url=/topic/' + name + '/sub/' + sub + '" />'
