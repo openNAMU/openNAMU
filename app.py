@@ -2572,17 +2572,12 @@ def edit(name = None):
             else:
                 left = ''
                 
-            if(re.search('\.', ip)):
-                notice = '비 로그인 상태 입니다. 비 로그인으로 편집시 아이피가 역사에 기록 됩니다. 편집 시 동의 함으로 간주 됩니다.'
-            else:
-                notice = ''
-                
             curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
             rows = curs.fetchall()
             if(rows):
-                return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = rows[0]['data'], tn = 2, notice = notice, left = left, sub = '편집', login = nowlogin())
+                return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = rows[0]['data'], tn = 2, left = left, sub = '편집', login = nowlogin())
             else:
-                return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = '', tn = 2, notice = notice, left = left, sub = '편집', login = nowlogin())
+                return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = '', tn = 2, left = left, sub = '편집', login = nowlogin())
                 
 @app.route('/edit/<path:name>/section/<int:number>', methods=['POST', 'GET'])
 def secedit(name = None, number = None):
@@ -3024,7 +3019,8 @@ def sub(name = None, sub = None):
                 if(i == 0):
                     start = rows[num]['ip']
                     
-                indata = namumark(name, rows[num]['data'])
+                indata = namumark('', rows[num]['data'])
+                indata = re.sub("(?P<in>#(?:[0-9]*))", '<a href="\g<in>">\g<in></a>', indata)
                         
                 m = re.search("([^-]*)\s\-\s(Close|Reopen|Stop|Restart|Admin)$", rows[num]['ip'])
                 if(m):
@@ -3063,7 +3059,8 @@ def sub(name = None, sub = None):
             if(i == 0):
                 start = rows[i]['ip']
                 
-            indata = namumark(name, rows[i]['data'])
+            indata = namumark('', rows[i]['data'])
+            indata = re.sub("(?P<in>#(?:[0-9]*))", '<a href="\g<in>">\g<in></a>', indata)
             
             if(rows[i]['block'] == 'O'):
                 indata = '블라인드 되었습니다.'
