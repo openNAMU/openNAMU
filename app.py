@@ -2134,19 +2134,7 @@ def w(name = None):
                 return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = div, license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, login = nowlogin())
         else:
             return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = '분류 문서 없음', license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, login = nowlogin()), 404
-    else:
-        m = re.search("^사용자:(.*)", name)
-        if(m):
-            g = m.groups()
-            
-            curs.execute("select * from user where id = '" + pymysql.escape_string(g[0]) + "'")
-            rows = curs.fetchall()
-            if(rows):
-                if(rows[0]['acl'] == 'owner'):
-                    acl = '(소유자)'
-                elif(rows[0]['acl'] == 'admin'):
-                    acl = '(관리자)'
-                    
+    else:                    
         curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
         rows = curs.fetchall()
         if(rows):
@@ -2157,8 +2145,29 @@ def w(name = None):
             else:
                 if(not acl):
                     acl = ''
+
+            m = re.search("^사용자:(.*)", name)
+            if(m):
+                g = m.groups()
+                
+                curs.execute("select * from user where id = '" + pymysql.escape_string(g[0]) + "'")
+                test = curs.fetchall()
+                if(test):
+                    if(test[0]['acl'] == 'owner'):
+                        acl = '(소유자)'
+                    elif(test[0]['acl'] == 'admin'):
+                        acl = '(관리자)'
+
+                curs.execute("select * from ban where block = '" + pymysql.escape_string(g[0]) + "'")
+                user = curs.fetchall()
+                if(user):
+                    elsedata = '{{{#!wiki style="border:2px solid red;padding:10px;"\r\n{{{+2 {{{#red 이 사용자는 차단 당했습니다.}}}}}}\r\n\r\n차단 해제 일 : ' + user[0]['end'] + '[br]사유 : ' + user[0]['why'] + '}}}[br]' + rows[0]['data']
+                else:
+                    elsedata = rows[0]['data']
+            else:
+                elsedata = rows[0]['data']
                     
-            enddata = namumark(name, rows[0]['data'])
+            enddata = namumark(name, elsedata)
             
             m = re.search('<div id="toc">((?:(?!\/div>).)*)<\/div>', enddata)
             if(m):
@@ -2169,7 +2178,20 @@ def w(name = None):
                 
             return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = enddata, license = data['license'], tn = 1, acl = acl, left = left, uppage = uppage, style = style, topic = topic, login = nowlogin())
         else:
-            return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = '문서 없음', license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, login = nowlogin()), 404
+            m = re.search("^사용자:(.*)", name)
+            if(m):
+                g = m.groups()
+                
+                curs.execute("select * from ban where block = '" + pymysql.escape_string(g[0]) + "'")
+                user = curs.fetchall()
+                if(user):
+                    elsedata = '{{{#!wiki style="border:2px solid red;padding:10px;"\r\n{{{+2 {{{#red 이 사용자는 차단 당했습니다.}}}}}}\r\n\r\n차단 해제 일 : ' + user[0]['end'] + '[br]사유 : ' + user[0]['why'] + '}}}[br]' + '문서 없음'
+                else:
+                    elsedata = '문서 없음'
+            else:
+                elsedata = '문서 없음'
+            
+            return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = namumark(name, elsedata), license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, login = nowlogin()), 404
 
 @app.route('/w/<path:name>/from/<path:redirect>')
 def redirectw(name = None, redirect = None):
@@ -2288,19 +2310,7 @@ def redirectw(name = None, redirect = None):
                 return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = div, license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, redirect = '<a href="/w/' + parse.quote(redirect) + '/from/' + parse.quote(name) + '">' + redirect + '</a>에서 넘어 왔습니다.', login = nowlogin())
         else:
             return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = '분류 문서 없음', license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, redirect = '<a href="/w/' + parse.quote(redirect) + '/from/' + parse.quote(name) + '">' + redirect + '</a>에서 넘어 왔습니다.', login = nowlogin()), 404
-    else:
-        m = re.search("^사용자:(.*)", name)
-        if(m):
-            g = m.groups()
-            
-            curs.execute("select * from user where id = '" + pymysql.escape_string(g[0]) + "'")
-            rows = curs.fetchall()
-            if(rows):
-                if(rows[0]['acl'] == 'owner'):
-                    acl = '(소유자)'
-                elif(rows[0]['acl'] == 'admin'):
-                    acl = '(관리자)'
-                    
+    else:                    
         curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
         rows = curs.fetchall()
         if(rows):
@@ -2311,9 +2321,29 @@ def redirectw(name = None, redirect = None):
             else:
                 if(not acl):
                     acl = ''
+
+            m = re.search("^사용자:(.*)", name)
+            if(m):
+                g = m.groups()
+                
+                curs.execute("select * from user where id = '" + pymysql.escape_string(g[0]) + "'")
+                test = curs.fetchall()
+                if(test):
+                    if(test[0]['acl'] == 'owner'):
+                        acl = '(소유자)'
+                    elif(test[0]['acl'] == 'admin'):
+                        acl = '(관리자)'
+
+                curs.execute("select * from ban where block = '" + pymysql.escape_string(g[0]) + "'")
+                user = curs.fetchall()
+                if(user):
+                    elsedata = '{{{#!wiki style="border:2px solid red;padding:10px;"\r\n{{{+2 {{{#red 이 사용자는 차단 당했습니다.}}}}}}\r\n\r\n차단 해제 일 : ' + user[0]['end'] + '[br]사유 : ' + user[0]['why'] + '}}}[br]' + rows[0]['data']
+                else:
+                    elsedata = rows[0]['data']
+            else:
+                elsedata = rows[0]['data']
                     
-            newdata = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', ' * \g<in> 문서로 넘겨주기', rows[0]["data"])
-            enddata = namumark(name, newdata)
+            enddata = namumark(name, elsedata)
             
             m = re.search('<div id="toc">((?:(?!\/div>).)*)<\/div>', enddata)
             if(m):
@@ -2322,9 +2352,22 @@ def redirectw(name = None, redirect = None):
             else:
                 left = ''
                 
-            return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = enddata, license = data['license'], tn = 1, acl = acl, left = left, uppage = uppage, style = style, topic = topic, redirect = '<a href="/w/' + parse.quote(redirect) + '/from/' + parse.quote(name) + '">' + redirect + '</a>에서 넘어 왔습니다.', login = nowlogin())
+            return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = enddata, license = data['license'], tn = 1, acl = acl, left = left, uppage = uppage, style = style, topic = topic, login = nowlogin(), redirect = '<a href="/w/' + parse.quote(redirect) + '/from/' + parse.quote(name) + '">' + redirect + '</a>에서 넘어 왔습니다.')
         else:
-            return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = '문서 없음', license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, redirect = '<a href="/w/' + parse.quote(redirect) + '/from/' + parse.quote(name) + '">' + redirect + '</a>에서 넘어 왔습니다.', login = nowlogin()), 404
+            m = re.search("^사용자:(.*)", name)
+            if(m):
+                g = m.groups()
+                
+                curs.execute("select * from ban where block = '" + pymysql.escape_string(g[0]) + "'")
+                user = curs.fetchall()
+                if(user):
+                    elsedata = '{{{#!wiki style="border:2px solid red;padding:10px;"\r\n{{{+2 {{{#red 이 사용자는 차단 당했습니다.}}}}}}\r\n\r\n차단 해제 일 : ' + user[0]['end'] + '[br]사유 : ' + user[0]['why'] + '}}}[br]' + '문서 없음'
+                else:
+                    elsedata = '문서 없음'
+            else:
+                elsedata = '문서 없음'
+            
+            return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = namumark(name, elsedata), license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, login = nowlogin(), redirect = '<a href="/w/' + parse.quote(redirect) + '/from/' + parse.quote(name) + '">' + redirect + '</a>에서 넘어 왔습니다.'), 404
 
 @app.route('/w/<path:name>/r/<int:number>')
 def rew(name = None, number = None):
@@ -3402,6 +3445,11 @@ def ban(name = None):
             if(admincheck() == 1):
                 ip = getip(request)
                 
+                if(not re.search("[0-9]{4}-[0-9]{2}-[0-9]{2}", request.form["end"])):
+                    end = ''
+                else:
+                    end = request.form["end"]
+
                 curs.execute("select * from ban where block = '" + pymysql.escape_string(name) + "'")
                 row = curs.fetchall()
                 if(row):
@@ -3411,13 +3459,13 @@ def ban(name = None):
                 else:
                     b = re.search("^([0-9](?:[0-9]?[0-9]?)\.[0-9](?:[0-9]?[0-9]?))$", name)
                     if(b):
-                        block(name, request.form["end"], getnow(), ip, request.form["why"])
+                        block(name, end, getnow(), ip, request.form["why"])
                         
-                        curs.execute("insert into ban (block, end, why, band) value ('" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(request.form["end"]) + "', '" + pymysql.escape_string(request.form["why"]) + "', 'O')")
+                        curs.execute("insert into ban (block, end, why, band) value ('" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(end) + "', '" + pymysql.escape_string(request.form["why"]) + "', 'O')")
                     else:
-                        block(name, request.form["end"], getnow(), ip, request.form["why"])
+                        block(name, end, getnow(), ip, request.form["why"])
                         
-                        curs.execute("insert into ban (block, end, why, band) value ('" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(request.form["end"]) + "', '" + pymysql.escape_string(request.form["why"]) + "', '')")
+                        curs.execute("insert into ban (block, end, why, band) value ('" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(end) + "', '" + pymysql.escape_string(request.form["why"]) + "', '')")
                 conn.commit()
                 
                 return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(data['frontpage']) + '" />'
