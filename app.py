@@ -2361,7 +2361,7 @@ def revert(name = None, number = None):
                     curs.execute("select * from history where title = '" + pymysql.escape_string(name) + "' and id = '" + str(number) + "'")
                     rows = curs.fetchall()
                     if(rows):
-                        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), r = parse.quote(str(number)), tn = 13, plus = '정말 되돌리시겠습니까?', sub = '되돌리기')
+                        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), r = parse.quote(str(number)), tn = 13, plus = '정말 되돌리시겠습니까?', sub = '되돌리기', login = nowlogin())
                     else:
                         return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name) + '" />'
             else:
@@ -2376,7 +2376,7 @@ def revert(name = None, number = None):
                 curs.execute("select * from history where title = '" + pymysql.escape_string(name) + "' and id = '" + str(number) + "'")
                 rows = curs.fetchall()
                 if(rows):
-                    return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), r = parse.quote(str(number)), tn = 13, plus = '정말 되돌리시겠습니까?', sub = '되돌리기')
+                    return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), r = parse.quote(str(number)), tn = 13, plus = '정말 되돌리시겠습니까?', sub = '되돌리기', login = nowlogin())
                 else:
                     return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name) + '" />'
                         
@@ -2604,7 +2604,7 @@ def delete(name = None):
             if(can == 1):
                 return '<meta http-equiv="refresh" content="0;url=/ban" />'
             else:
-                return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), tn = 8, plus = '정말 삭제 하시겠습니까?', sub = '삭제')
+                return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), tn = 8, plus = '정말 삭제 하시겠습니까?', sub = '삭제', login = nowlogin())
         else:
             return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name) + '" />'
 
@@ -2654,7 +2654,7 @@ def move(name = None):
         if(can == 1):
             return '<meta http-equiv="refresh" content="0;url=/ban" />'
         else:
-            return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), tn = 9, plus = '정말 이동 하시겠습니까?', sub = '이동')
+            return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), tn = 9, plus = '정말 이동 하시겠습니까?', sub = '이동', login = nowlogin())
 
 @app.route('/other')
 def other():
