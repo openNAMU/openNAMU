@@ -2443,9 +2443,9 @@ def edit(name = None):
             curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
             rows = curs.fetchall()
             if(rows):
-                return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = rows[0]['data'], tn = 2, left = left, sub = '편집')
+                return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = rows[0]['data'], tn = 2, left = left, sub = '편집', login = nowlogin())
             else:
-                return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = '', tn = 2, left = left, sub = '편집')
+                return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = '', tn = 2, left = left, sub = '편집', login = nowlogin())
                 
 @app.route('/edit/<path:name>/section/<int:number>', methods=['POST', 'GET'])
 def secedit(name = None, number = None):
@@ -2498,11 +2498,6 @@ def secedit(name = None, number = None):
             else:
                 left = ''
                 
-            if(re.search('\.', ip)):
-                notice = '비 로그인 상태 입니다. 비 로그인으로 편집시 아이피가 역사에 기록 됩니다. 편집 시 동의 함으로 간주 됩니다.'
-            else:
-                notice = ''
-                
             curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
             rows = curs.fetchall()
             if(rows):
@@ -2530,7 +2525,7 @@ def secedit(name = None, number = None):
                         break
                         
                 if(j == 0):
-                    return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = gdata, tn = 2, notice = notice, left = left, section = 1, number = number, sub = '편집')
+                    return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = gdata, tn = 2, left = left, section = 1, number = number, sub = '편집', login = nowlogin())
                 else:
                     return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name) + '" />'
             else:
@@ -2542,12 +2537,7 @@ def preview(name = None):
     can = getcan(ip, name)
     if(can == 1):
         return '<meta http-equiv="refresh" content="0;url=/ban" />'
-    else:
-        if(re.search('\.', ip)):
-            notice = '비 로그인 상태 입니다. 비 로그인으로 편집시 아이피가 역사에 기록 됩니다. 편집 시 동의 함으로 간주 됩니다.'
-        else:
-            notice = ''
-            
+    else:            
         newdata = request.form["content"]
         newdata = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', ' * \g<in> 문서로 넘겨주기', newdata)
         enddata = namumark(name, newdata)
@@ -2561,7 +2551,7 @@ def preview(name = None):
         else:
             left = ''
             
-        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = request.form["content"], tn = 2, preview = 1, enddata = enddata, left = left, notice = notice, sub = '미리보기')
+        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = request.form["content"], tn = 2, preview = 1, enddata = enddata, left = left, sub = '미리보기', login = nowlogin())
         
 @app.route('/preview/<path:name>/section/<int:number>', methods=['POST'])
 def secpreview(name = None, number = None):
@@ -2997,7 +2987,7 @@ def sub(name = None, sub = None):
                 
             i = i + 1
             
-        return render_template('index.html', title = name, page = parse.quote(name), suburl = parse.quote(sub), toron = sub, logo = data['name'], rows = div, tn = 11, ban = ban, style = style, sub = '토론')
+        return render_template('index.html', title = name, page = parse.quote(name), suburl = parse.quote(sub), toron = sub, logo = data['name'], rows = div, tn = 11, ban = ban, style = style, sub = '토론', login = nowlogin())
 
 @app.route('/topic/<path:name>/sub/<path:sub>/b/<int:number>')
 def blind(name = None, sub = None, number = None):
