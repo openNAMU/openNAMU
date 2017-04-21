@@ -27,8 +27,7 @@
 					<a href="/recentchanges" id="RecentChanges"><i class="fa fa-refresh" aria-hidden="true"></i><span id="is_mobile">최근 변경</span></a>
 					<a href="/recentdiscuss" id="RecentChanges"><i class="fa fa-comment" aria-hidden="true"></i><span id="is_mobile">최근 토론</span></a>
 					<a href="/random" id="log"><i class="fa fa-random" aria-hidden="true"></i></a>
-					<a href="/user" id="log">{% if login == 1 %}<i class="fa fa-user" aria-hidden="true"></i>{% else %}<i class="fa fa-user-times" aria-hidden="true"></i>
-{% endif %}</a>
+					<a href="/user" id="log">{% if login == 1 %}<i class="fa fa-user" aria-hidden="true"></i>{% elif login == 0 %}<i class="fa fa-user-times" aria-hidden="true"></i>{% else %}<i class="fa fa-user-secret" aria-hidden="true"></i>{% endif %}</a>
 					<a href="/other" id="log"><i class="fa fa-cogs" aria-hidden="true"></i></a>
 				</div>
 				<form method="POST" action="/search" id="search">
@@ -81,7 +80,7 @@
                 {% if tn == 1 %}
                 {% if redirect %}
                 {% autoescape false %}
-                <li style="margin-top: -20px;">{{redirect}}</li>
+                <li style="margin-top: -20px;"><a href="/w/{{redirect}}/from/{{page}}">{{redirect}}</a>에서 넘어 왔습니다.</li>
                 <br>
                 {% endautoescape %}
                 {% endif %}

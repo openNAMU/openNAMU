@@ -1457,7 +1457,7 @@ def image(name = None):
     if(os.path.exists(os.path.join('image', name))):
         return send_file(os.path.join('image', name), mimetype='image')
     else:
-        return render_template('index.html', logo = data['name'], data = '이미지 없음.', title = '이미지 보기', login = nowlogin()), 404
+        return render_template('index.html', logo = data['name'], data = '이미지 없음.', title = '이미지 보기'), 404
 
 @app.route('/adminlist')
 def adminlist():
@@ -1490,9 +1490,9 @@ def adminlist():
             
             i = i + 1
             
-        return render_template('index.html', logo = data['name'], data = div, title = '관리자 목록', login = nowlogin())
+        return render_template('index.html', logo = data['name'], data = div, title = '관리자 목록')
     else:
-        return render_template('index.html', logo = data['name'], title = '관리자 목록', login = nowlogin())
+        return render_template('index.html', logo = data['name'], title = '관리자 목록')
 
 @app.route('/recentchanges')
 def recentchanges():
@@ -1559,9 +1559,9 @@ def recentchanges():
             
             i = i + 1
             
-        return render_template('index.html', logo = data['name'], rows = div, tn = 3, title = '최근 변경내역', login = nowlogin())
+        return render_template('index.html', logo = data['name'], rows = div, tn = 3, title = '최근 변경내역')
     else:
-        return render_template('index.html', logo = data['name'], rows = '', tn = 3, title = '최근 변경내역', login = nowlogin())
+        return render_template('index.html', logo = data['name'], rows = '', tn = 3, title = '최근 변경내역')
         
 @app.route('/history/<path:name>/r/<int:num>/hidden')
 def hidden(name = None, num = None):
@@ -1654,9 +1654,9 @@ def record(name = None, number = None):
             else:
                 i = i + 1
                 
-        return render_template('index.html', logo = data['name'], rows = div, tn = 3, title = '유저 기록', login = nowlogin())
+        return render_template('index.html', logo = data['name'], rows = div, tn = 3, title = '유저 기록')
     else:
-        return render_template('index.html', logo = data['name'], rows = '', tn = 3, title = '유저 기록', login = nowlogin())
+        return render_template('index.html', logo = data['name'], rows = '', tn = 3, title = '유저 기록')
       
 @app.route('/userlog/n/<int:number>')
 def userlog(number = None):
@@ -1708,9 +1708,9 @@ def userlog(number = None):
             else:
                 i = i + 1
                 
-        return render_template('index.html', logo = data['name'], data = div, title = '유저 가입 기록', login = nowlogin())
+        return render_template('index.html', logo = data['name'], data = div, title = '유저 가입 기록')
     else:
-        return render_template('index.html', logo = data['name'], data = '', title = '유저 가입 기록', login = nowlogin())
+        return render_template('index.html', logo = data['name'], data = '', title = '유저 가입 기록')
         
 @app.route('/backlink/<path:name>/n/<int:number>')
 def backlink(name = None, number = None):
@@ -1787,9 +1787,9 @@ def backlink(name = None, number = None):
         if(restart == 1):
             return '<meta http-equiv="refresh" content="0;url=/backlink/' + parse.quote(name) + '/n/' + str(number) + '" />'
         else:    
-            return render_template('index.html', logo = data['name'], data = div, title = name, sub = '역링크', login = nowlogin())
+            return render_template('index.html', logo = data['name'], data = div, title = name, sub = '역링크')
     else:
-        return render_template('index.html', logo = data['name'], data = '', title = name, sub = '역링크', login = nowlogin())
+        return render_template('index.html', logo = data['name'], data = '', title = name, sub = '역링크')
 
 @app.route('/recentdiscuss')
 def recentdiscuss():
@@ -1818,9 +1818,9 @@ def recentdiscuss():
             
             i = i + 1
             
-        return render_template('index.html', logo = data['name'], rows = div, tn = 12, title = '최근 토론내역', login = nowlogin())
+        return render_template('index.html', logo = data['name'], rows = div, tn = 12, title = '최근 토론내역')
     else:
-        return render_template('index.html', logo = data['name'], rows = '', tn = 12, title = '최근 토론내역', login = nowlogin())
+        return render_template('index.html', logo = data['name'], rows = '', tn = 12, title = '최근 토론내역')
          
 @app.route('/blocklog/n/<int:number>')
 def blocklog(number = None):
@@ -1866,9 +1866,9 @@ def blocklog(number = None):
             else:
                 i = i + 1
                 
-        return render_template('index.html', logo = data['name'], rows = div, tn = 20, title = '유저 차단 기록', login = nowlogin())
+        return render_template('index.html', logo = data['name'], rows = div, tn = 20, title = '유저 차단 기록')
     else:
-        return render_template('index.html', logo = data['name'], rows = '', tn = 20, title = '유저 차단 기록', login = nowlogin())
+        return render_template('index.html', logo = data['name'], rows = '', tn = 20, title = '유저 차단 기록')
 
 @app.route('/history/<path:name>/n/<int:number>', methods=['POST', 'GET'])
 def gethistory(name = None, number = None):
@@ -1993,9 +1993,9 @@ def gethistory(name = None, number = None):
                 else:
                     i = i + 1
                     
-            return render_template('index.html', logo = data['name'], rows = div, tn = 5, title = name, page = parse.quote(name), select = select, sub = '역사', login = nowlogin())
+            return render_template('index.html', logo = data['name'], rows = div, tn = 5, title = name, page = parse.quote(name), select = select, sub = '역사')
         else:
-            return render_template('index.html', logo = data['name'], rows = '', tn = 5, title = name, page = parse.quote(name), select = select, sub = '역사', login = nowlogin())
+            return render_template('index.html', logo = data['name'], rows = '', tn = 5, title = name, page = parse.quote(name), select = select, sub = '역사')
 
 @app.route('/search', methods=['POST'])
 def search():
@@ -2021,10 +2021,11 @@ def search():
         else:
             return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(request.form["search"]) + '" />'
             
-        return render_template('index.html', logo = data['name'], data = div, title = '검색', login = nowlogin())
+        return render_template('index.html', logo = data['name'], data = div, title = '검색')
 
 @app.route('/w/<path:name>')
-def w(name = None):
+@app.route('/w/<path:name>/from/<path:redirect>')
+def w(name = None, redirect = None):
     i = 0
     
     curs.execute("select * from rd where title = '" + pymysql.escape_string(name) + "' order by date asc")
@@ -2129,11 +2130,11 @@ def w(name = None):
                 else:
                     left = ''
                     
-                return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = enddata + '<br>' + div, license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, login = nowlogin())
+                return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = enddata + '<br>' + div, license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, redirect = redirect, login = nowlogin())
             else:
-                return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = div, license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, login = nowlogin())
+                return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = div, license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, redirect = redirect, login = nowlogin())
         else:
-            return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = '분류 문서 없음', license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, login = nowlogin()), 404
+            return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = '분류 문서 없음', license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, redirect = redirect, login = nowlogin()), 404
     else:                    
         curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
         rows = curs.fetchall()
@@ -2176,7 +2177,7 @@ def w(name = None):
             else:
                 left = ''
                 
-            return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = enddata, license = data['license'], tn = 1, acl = acl, left = left, uppage = uppage, style = style, topic = topic, login = nowlogin())
+            return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = enddata, license = data['license'], tn = 1, acl = acl, left = left, uppage = uppage, style = style, topic = topic, redirect = redirect, login = nowlogin())
         else:
             m = re.search("^사용자:(.*)", name)
             if(m):
@@ -2191,183 +2192,7 @@ def w(name = None):
             else:
                 elsedata = '문서 없음'
             
-            return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = namumark(name, elsedata), license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, login = nowlogin()), 404
-
-@app.route('/w/<path:name>/from/<path:redirect>')
-def redirectw(name = None, redirect = None):
-    i = 0
-    
-    curs.execute("select * from rd where title = '" + pymysql.escape_string(name) + "' order by date asc")
-    rows = curs.fetchall()
-    while(True):
-        try:
-            a = rows[i]
-        except:
-            topic = ""
-            
-            break
-            
-        curs.execute("select * from stop where title = '" + pymysql.escape_string(rows[i]['title']) + "' and sub = '" + pymysql.escape_string(rows[i]['sub']) + "' and close = 'O'")
-        row = curs.fetchall()
-        if(not row):
-            topic = "open"
-            
-            break
-        else:
-            i = i + 1
-            
-    acl = ''
-    
-    m = re.search("^(.*)\/(.*)$", name)
-    if(m):
-        g = m.groups()
-        uppage = g[0]
-        
-        style = ""
-    else:
-        uppage = ""
-        
-        style = "display:none;"
-        
-    if(re.search("^분류:", name)):
-        curs.execute("select * from cat where title = '" + pymysql.escape_string(name) + "' order by cat asc")
-        rows = curs.fetchall()
-        if(rows):
-            div = ''
-            i = 0
-            
-            while(True):
-                try:
-                    a = rows[i]
-                except:
-                    break
-                    
-                curs.execute("select * from data where title = '" + pymysql.escape_string(rows[i]['cat']) + "'")
-                row = curs.fetchall()
-                if(row):
-                    aa = row[0]['data']                  
-                    aa = namumark('', aa)
-                    
-                    bb = re.search('<div style="width:100%;border: 1px solid #777;padding: 5px;margin-top: 1em;">분류:((?:(?!<\/div>).)*)<\/div>', aa)
-                    if(bb):
-                        cc = bb.groups()
-                        
-                        mm = re.search("^분류:(.*)", name)
-                        
-                        if(mm):
-                            ee = mm.groups()
-                            
-                            if(re.search("<a (class=\"not_thing\")? href=\"\/w\/" + parse.quote(name) + "\">" + ee[0] + "<\/a>", cc[0])):
-                                div = div + '<li><a href="/w/' + parse.quote(rows[i]['cat']) + '">' + rows[i]['cat'] + '</a></li>'
-                                
-                                i = i + 1
-                            else:
-                                curs.execute("delete from cat where title = '" + pymysql.escape_string(name) + "' and cat = '" + pymysql.escape_string(rows[i]['cat']) + "'")
-                                conn.commit()
-                                
-                                i = i + 1
-                        else:
-                            curs.execute("delete from cat where title = '" + pymysql.escape_string(name) + "' and cat = '" + pymysql.escape_string(rows[i]['cat']) + "'")
-                            conn.commit()
-                            
-                            i = i + 1
-                    else:
-                        curs.execute("delete from cat where title = '" + pymysql.escape_string(name) + "' and cat = '" + pymysql.escape_string(rows[i]['cat']) + "'")
-                        conn.commit()
-                        
-                        i = i + 1
-                else:
-                    curs.execute("delete from cat where title = '" + pymysql.escape_string(name) + "' and cat = '" + pymysql.escape_string(rows[i]['cat']) + "'")
-                    conn.commit()
-                    
-                    i = i + 1
-                    
-            div = '<h2>분류</h2>' + div
-            
-            curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
-            bb = curs.fetchall()
-            if(bb):
-                if(bb[0]['acl'] == 'admin'):
-                    acl = '(관리자)'
-                elif(bb[0]['acl'] == 'user'):
-                    acl = '(유저)'
-                else:
-                    if(not acl):
-                        acl = ''
-                        
-                newdata = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', ' * \g<in> 문서로 넘겨주기', bb[0]['data'])
-                enddata = namumark(name, newdata)
-                
-                m = re.search('<div id="toc">((?:(?!\/div>).)*)<\/div>', enddata)
-                if(m):
-                    result = m.groups()
-                    left = result[0]
-                else:
-                    left = ''
-                    
-                return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = enddata + '<br>' + div, license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, redirect = '<a href="/w/' + parse.quote(redirect) + '/from/' + parse.quote(name) + '">' + redirect + '</a>에서 넘어 왔습니다.', login = nowlogin())
-            else:
-                return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = div, license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, redirect = '<a href="/w/' + parse.quote(redirect) + '/from/' + parse.quote(name) + '">' + redirect + '</a>에서 넘어 왔습니다.', login = nowlogin())
-        else:
-            return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = '분류 문서 없음', license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, redirect = '<a href="/w/' + parse.quote(redirect) + '/from/' + parse.quote(name) + '">' + redirect + '</a>에서 넘어 왔습니다.', login = nowlogin()), 404
-    else:                    
-        curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
-        rows = curs.fetchall()
-        if(rows):
-            if(rows[0]['acl'] == 'admin'):
-                acl = '(관리자)'
-            elif(rows[0]['acl'] == 'user'):
-                acl = '(유저)'
-            else:
-                if(not acl):
-                    acl = ''
-
-            m = re.search("^사용자:(.*)", name)
-            if(m):
-                g = m.groups()
-                
-                curs.execute("select * from user where id = '" + pymysql.escape_string(g[0]) + "'")
-                test = curs.fetchall()
-                if(test):
-                    if(test[0]['acl'] == 'owner'):
-                        acl = '(소유자)'
-                    elif(test[0]['acl'] == 'admin'):
-                        acl = '(관리자)'
-
-                curs.execute("select * from ban where block = '" + pymysql.escape_string(g[0]) + "'")
-                user = curs.fetchall()
-                if(user):
-                    elsedata = '{{{#!wiki style="border:2px solid red;padding:10px;"\r\n{{{+2 {{{#red 이 사용자는 차단 당했습니다.}}}}}}\r\n\r\n차단 해제 일 : ' + user[0]['end'] + '[br]사유 : ' + user[0]['why'] + '}}}[br]' + rows[0]['data']
-                else:
-                    elsedata = rows[0]['data']
-            else:
-                elsedata = rows[0]['data']
-                    
-            enddata = namumark(name, elsedata)
-            
-            m = re.search('<div id="toc">((?:(?!\/div>).)*)<\/div>', enddata)
-            if(m):
-                result = m.groups()
-                left = result[0]
-            else:
-                left = ''
-                
-            return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = enddata, license = data['license'], tn = 1, acl = acl, left = left, uppage = uppage, style = style, topic = topic, login = nowlogin(), redirect = '<a href="/w/' + parse.quote(redirect) + '/from/' + parse.quote(name) + '">' + redirect + '</a>에서 넘어 왔습니다.')
-        else:
-            m = re.search("^사용자:(.*)", name)
-            if(m):
-                g = m.groups()
-                
-                curs.execute("select * from ban where block = '" + pymysql.escape_string(g[0]) + "'")
-                user = curs.fetchall()
-                if(user):
-                    elsedata = '{{{#!wiki style="border:2px solid red;padding:10px;"\r\n{{{+2 {{{#red 이 사용자는 차단 당했습니다.}}}}}}\r\n\r\n차단 해제 일 : ' + user[0]['end'] + '[br]사유 : ' + user[0]['why'] + '}}}[br]' + '문서 없음'
-                else:
-                    elsedata = '문서 없음'
-            else:
-                elsedata = '문서 없음'
-            
-            return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = namumark(name, elsedata), license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, login = nowlogin(), redirect = '<a href="/w/' + parse.quote(redirect) + '/from/' + parse.quote(name) + '">' + redirect + '</a>에서 넘어 왔습니다.'), 404
+            return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = namumark(name, elsedata), license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, redirect = redirect, login = nowlogin()), 404
 
 @app.route('/w/<path:name>/r/<int:number>')
 def rew(name = None, number = None):
@@ -2387,7 +2212,7 @@ def rew(name = None, number = None):
                 else:
                     left = ''
                     
-                return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = enddata, license = data['license'], tn = 6, left = left, sub = '옛 문서', login = nowlogin())
+                return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = enddata, license = data['license'], tn = 6, left = left, sub = '옛 문서')
             else:
                 return '<meta http-equiv="refresh" content="0;url=/history/' + parse.quote(name) + '" />'
         else:
@@ -2405,7 +2230,7 @@ def rew(name = None, number = None):
             else:
                 left = ''
                 
-            return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = enddata, license = data['license'], tn = 6, left = left, sub = '옛 문서', login = nowlogin())
+            return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = enddata, license = data['license'], tn = 6, left = left, sub = '옛 문서')
         else:
             return '<meta http-equiv="refresh" content="0;url=/history/' + parse.quote(name) + '" />'
 
@@ -2424,7 +2249,7 @@ def reraw(name = None, number = None):
                 
                 enddata = '<pre>' + enddata + '</pre>'
                 
-                return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = enddata, license = data['license'], login = nowlogin())
+                return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = enddata, license = data['license'])
             else:
                 return '<meta http-equiv="refresh" content="0;url=/history/' + parse.quote(name) + '" />'
         else:
@@ -2439,7 +2264,7 @@ def reraw(name = None, number = None):
             
             enddata = '<pre>' + enddata + '</pre>'
             
-            return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = enddata, license = data['license'], login = nowlogin())
+            return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = enddata, license = data['license'])
         else:
             return '<meta http-equiv="refresh" content="0;url=/history/' + parse.quote(name) + '" />'
 
@@ -2454,7 +2279,7 @@ def raw(name = None):
         
         enddata = '<pre>' + enddata + '</pre>'
         
-        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = enddata, license = data['license'], tn = 7, sub = 'Raw', login = nowlogin())
+        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = enddata, license = data['license'], tn = 7, sub = 'Raw')
     else:
         return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name) + '" />'
 
@@ -2536,7 +2361,7 @@ def revert(name = None, number = None):
                     curs.execute("select * from history where title = '" + pymysql.escape_string(name) + "' and id = '" + str(number) + "'")
                     rows = curs.fetchall()
                     if(rows):
-                        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), r = parse.quote(str(number)), tn = 13, plus = '정말 되돌리시겠습니까?', sub = '되돌리기', login = nowlogin())
+                        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), r = parse.quote(str(number)), tn = 13, plus = '정말 되돌리시겠습니까?', sub = '되돌리기')
                     else:
                         return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name) + '" />'
             else:
@@ -2551,7 +2376,7 @@ def revert(name = None, number = None):
                 curs.execute("select * from history where title = '" + pymysql.escape_string(name) + "' and id = '" + str(number) + "'")
                 rows = curs.fetchall()
                 if(rows):
-                    return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), r = parse.quote(str(number)), tn = 13, plus = '정말 되돌리시겠습니까?', sub = '되돌리기', login = nowlogin())
+                    return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), r = parse.quote(str(number)), tn = 13, plus = '정말 되돌리시겠습니까?', sub = '되돌리기')
                 else:
                     return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name) + '" />'
                         
@@ -2618,9 +2443,9 @@ def edit(name = None):
             curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
             rows = curs.fetchall()
             if(rows):
-                return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = rows[0]['data'], tn = 2, left = left, sub = '편집', login = nowlogin())
+                return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = rows[0]['data'], tn = 2, left = left, sub = '편집')
             else:
-                return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = '', tn = 2, left = left, sub = '편집', login = nowlogin())
+                return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = '', tn = 2, left = left, sub = '편집')
                 
 @app.route('/edit/<path:name>/section/<int:number>', methods=['POST', 'GET'])
 def secedit(name = None, number = None):
@@ -2705,7 +2530,7 @@ def secedit(name = None, number = None):
                         break
                         
                 if(j == 0):
-                    return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = gdata, tn = 2, notice = notice, left = left, section = 1, number = number, sub = '편집', login = nowlogin())
+                    return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = gdata, tn = 2, notice = notice, left = left, section = 1, number = number, sub = '편집')
                 else:
                     return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name) + '" />'
             else:
@@ -2736,7 +2561,7 @@ def preview(name = None):
         else:
             left = ''
             
-        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = request.form["content"], tn = 2, preview = 1, enddata = enddata, left = left, notice = notice, sub = '미리보기', login = nowlogin())
+        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = request.form["content"], tn = 2, preview = 1, enddata = enddata, left = left, notice = notice, sub = '미리보기')
         
 @app.route('/preview/<path:name>/section/<int:number>', methods=['POST'])
 def secpreview(name = None, number = None):
@@ -2759,7 +2584,7 @@ def secpreview(name = None, number = None):
             left = namumark(name, newdata)
         else:
             left = ''
-        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = request.form["content"], tn = 2, preview = 1, enddata = enddata, left = left, notice = notice, section = 1, number = number, odata = request.form["otent"], sub = '미리보기', login = nowlogin())
+        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = request.form["content"], tn = 2, preview = 1, enddata = enddata, left = left, notice = notice, section = 1, number = number, odata = request.form["otent"], sub = '미리보기')
 
 @app.route('/delete/<path:name>', methods=['POST', 'GET'])
 def delete(name = None):
@@ -2789,7 +2614,7 @@ def delete(name = None):
             if(can == 1):
                 return '<meta http-equiv="refresh" content="0;url=/ban" />'
             else:
-                return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), tn = 8, plus = '정말 삭제 하시겠습니까?', sub = '삭제', login = nowlogin())
+                return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), tn = 8, plus = '정말 삭제 하시겠습니까?', sub = '삭제')
         else:
             return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name) + '" />'
 
@@ -2839,41 +2664,41 @@ def move(name = None):
         if(can == 1):
             return '<meta http-equiv="refresh" content="0;url=/ban" />'
         else:
-            return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), tn = 9, plus = '정말 이동 하시겠습니까?', sub = '이동', login = nowlogin())
+            return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), tn = 9, plus = '정말 이동 하시겠습니까?', sub = '이동')
 
 @app.route('/other')
 def other():
-    return render_template('index.html', title = '기타 메뉴', logo = data['name'], data = '<h2 style="margin-top: 0px;">기록</h2><li><a href="/blocklog/n/1">유저 차단 기록</a></li><li><a href="/userlog/n/1">유저 가입 기록</a></li><li><a href="/manager/6">유저 기록</a></li><h2>기타</h2><li><a href="/titleindex">모든 문서</a></li><li><a href="/upload">업로드</a></li><li><a href="/adminlist">관리자 목록</a></li><li><a href="/manager/1">관리자 메뉴</a></li><br>이 오픈나무의 버전은 <a href="https://github.com/2DU/openNAMU/blob/master/version.md">1.8.6</a> 입니다.', login = nowlogin())
+    return render_template('index.html', title = '기타 메뉴', logo = data['name'], data = '<h2 style="margin-top: 0px;">기록</h2><li><a href="/blocklog/n/1">유저 차단 기록</a></li><li><a href="/userlog/n/1">유저 가입 기록</a></li><li><a href="/manager/6">유저 기록</a></li><h2>기타</h2><li><a href="/titleindex">모든 문서</a></li><li><a href="/upload">업로드</a></li><li><a href="/adminlist">관리자 목록</a></li><li><a href="/manager/1">관리자 메뉴</a></li><br>이 오픈나무의 버전은 <a href="https://github.com/2DU/openNAMU/blob/master/version.md">1.8.6</a> 입니다.')
     
 @app.route('/manager/<int:num>', methods=['POST', 'GET'])
 def manager(num = None):
     if(num == 1):
-        return render_template('index.html', title = '관리자 메뉴', logo = data['name'], data = '<h2 style="margin-top: 0px;">관리자 및 소유자</h2><li><a href="/manager/2">문서 ACL</a></li><li><a href="/manager/3">유저 체크</a></li><li><a href="/manager/4">유저 차단</a></li><h2>소유자</h2><li><a href="/manager/5">관리자 권한 주기</a></li><h2>기타</h2><li>이 메뉴에 없는 기능은 해당 문서의 역사나 토론에서 바로 사용 가능함</li>', login = nowlogin())
+        return render_template('index.html', title = '관리자 메뉴', logo = data['name'], data = '<h2 style="margin-top: 0px;">관리자 및 소유자</h2><li><a href="/manager/2">문서 ACL</a></li><li><a href="/manager/3">유저 체크</a></li><li><a href="/manager/4">유저 차단</a></li><h2>소유자</h2><li><a href="/manager/5">관리자 권한 주기</a></li><h2>기타</h2><li>이 메뉴에 없는 기능은 해당 문서의 역사나 토론에서 바로 사용 가능함</li>')
     elif(num == 2):
         if(request.method == 'POST'):
             return '<meta http-equiv="refresh" content="0;url=/acl/' + parse.quote(request.form["name"]) + '" />'
         else:
-            return render_template('index.html', title = 'ACL 이동', logo = data['name'], data = '<form id="usrform" method="POST" action="/manager/2"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>', login = nowlogin())
+            return render_template('index.html', title = 'ACL 이동', logo = data['name'], data = '<form id="usrform" method="POST" action="/manager/2"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')
     elif(num == 3):
         if(request.method == 'POST'):
             return '<meta http-equiv="refresh" content="0;url=/check/' + parse.quote(request.form["name"]) + '" />'
         else:
-            return render_template('index.html', title = '체크 이동', logo = data['name'], data = '<form id="usrform" method="POST" action="/manager/3"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>', login = nowlogin())
+            return render_template('index.html', title = '체크 이동', logo = data['name'], data = '<form id="usrform" method="POST" action="/manager/3"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')
     elif(num == 4):
         if(request.method == 'POST'):
             return '<meta http-equiv="refresh" content="0;url=/ban/' + parse.quote(request.form["name"]) + '" />'
         else:
-            return render_template('index.html', title = '차단 이동', logo = data['name'], data = '<form id="usrform" method="POST" action="/manager/4"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button><br><br><span>아이피 앞 두자리 (XXX.XXX) 입력하면 대역 차단</span></form>', login = nowlogin())
+            return render_template('index.html', title = '차단 이동', logo = data['name'], data = '<form id="usrform" method="POST" action="/manager/4"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button><br><br><span>아이피 앞 두자리 (XXX.XXX) 입력하면 대역 차단</span></form>')
     elif(num == 5):
         if(request.method == 'POST'):
             return '<meta http-equiv="refresh" content="0;url=/admin/' + parse.quote(request.form["name"]) + '" />'
         else:
-            return render_template('index.html', title = '권한 이동', logo = data['name'], data = '<form id="usrform" method="POST" action="/manager/5"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>', login = nowlogin())   
+            return render_template('index.html', title = '권한 이동', logo = data['name'], data = '<form id="usrform" method="POST" action="/manager/5"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')   
     elif(num == 6):
         if(request.method == 'POST'):
             return '<meta http-equiv="refresh" content="0;url=/record/' + parse.quote(request.form["name"]) + '/n/1" />'
         else:
-            return render_template('index.html', title = '기록 이동', logo = data['name'], data = '<form id="usrform" method="POST" action="/manager/6"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>', login = nowlogin())    
+            return render_template('index.html', title = '기록 이동', logo = data['name'], data = '<form id="usrform" method="POST" action="/manager/6"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')    
     else:
         return '<meta http-equiv="refresh" content="0;url=/" />'
         
@@ -2894,9 +2719,9 @@ def titleindex():
             div = div + '<li>' + str(i + 1) + '. <a href="/w/' + parse.quote(rows[i]['title']) + '">' + rows[i]['title'] + '</a></li>'
             
             i = i + 1
-        return render_template('index.html', logo = data['name'], rows = div + '<br><span>이 위키에는 총 ' + str(i) + '개의 문서가 있습니다.</span>', tn = 4, title = '모든 문서', login = nowlogin())
+        return render_template('index.html', logo = data['name'], rows = div + '<br><span>이 위키에는 총 ' + str(i) + '개의 문서가 있습니다.</span>', tn = 4, title = '모든 문서')
     else:
-        return render_template('index.html', logo = data['name'], rows = '', tn = 4, title = '모든 문서', login = nowlogin())
+        return render_template('index.html', logo = data['name'], rows = '', tn = 4, title = '모든 문서')
 
 @app.route('/topic/<path:name>', methods=['POST', 'GET'])
 def topic(name = None):
@@ -2935,7 +2760,7 @@ def topic(name = None):
                 
             i = i + 1
             
-        return render_template('index.html', title = name, page = parse.quote(name), logo = data['name'], plus = div, tn = 10, list = 1, sub = '토론 목록', login = nowlogin())
+        return render_template('index.html', title = name, page = parse.quote(name), logo = data['name'], plus = div, tn = 10, list = 1, sub = '토론 목록')
         
 @app.route('/topic/<path:name>/close')
 def topicstoplist(name = None):
@@ -2971,7 +2796,7 @@ def topicstoplist(name = None):
                 
             i = i + 1
             
-        return render_template('index.html', title = name, page = parse.quote(name), logo = data['name'], plus = div, tn = 10, sub = '토론 목록', login = nowlogin())
+        return render_template('index.html', title = name, page = parse.quote(name), logo = data['name'], plus = div, tn = 10, sub = '토론 목록')
 
 @app.route('/topic/<path:name>/sub/<path:sub>', methods=['POST', 'GET'])
 def sub(name = None, sub = None):
@@ -3172,7 +2997,7 @@ def sub(name = None, sub = None):
                 
             i = i + 1
             
-        return render_template('index.html', title = name, page = parse.quote(name), suburl = parse.quote(sub), toron = sub, logo = data['name'], rows = div, tn = 11, ban = ban, style = style, sub = '토론', login = nowlogin())
+        return render_template('index.html', title = name, page = parse.quote(name), suburl = parse.quote(sub), toron = sub, logo = data['name'], rows = div, tn = 11, ban = ban, style = style, sub = '토론')
 
 @app.route('/topic/<path:name>/sub/<path:sub>/b/<int:number>')
 def blind(name = None, sub = None, number = None):
@@ -3300,7 +3125,7 @@ def login():
             if(session.get('Now') == True):
                 return '<meta http-equiv="refresh" content="0;url=/error/11" />'
             else:
-                return render_template('index.html', title = '로그인', enter = '로그인', logo = data['name'], tn = 15, login = nowlogin())
+                return render_template('index.html', title = '로그인', enter = '로그인', logo = data['name'], tn = 15)
                 
 @app.route('/change', methods=['POST', 'GET'])
 def change():
@@ -3344,7 +3169,7 @@ def change():
                 session.pop('DREAMER', None)
                 return '<meta http-equiv="refresh" content="0;url=/change" />'
             else:
-                return render_template('index.html', title = '비밀번호 변경', enter = '변경', logo = data['name'], tn = 15, login = nowlogin())
+                return render_template('index.html', title = '비밀번호 변경', enter = '변경', logo = data['name'], tn = 15)
                 
 @app.route('/check/<name>')
 def check(name = None, sub = None, number = None):
@@ -3367,9 +3192,9 @@ def check(name = None, sub = None, number = None):
                         except:
                             break
                         i = i + 1
-                    return render_template('index.html', title = '다중 검사', logo = data['name'], tn = 22, rows = c, login = nowlogin())
+                    return render_template('index.html', title = '다중 검사', logo = data['name'], tn = 22, rows = c)
                 else:
-                    return render_template('index.html', title = '다중 검사', logo = data['name'], tn = 22, rows = '', login = nowlogin())
+                    return render_template('index.html', title = '다중 검사', logo = data['name'], tn = 22, rows = '')
             else:
                 curs.execute("select * from login where user = '" + pymysql.escape_string(name) + "' order by today desc")
                 row = curs.fetchall()
@@ -3382,9 +3207,9 @@ def check(name = None, sub = None, number = None):
                         except:
                             break
                         i = i + 1
-                    return render_template('index.html', title = '다중 검사', logo = data['name'], tn = 22, rows = c, login = nowlogin())
+                    return render_template('index.html', title = '다중 검사', logo = data['name'], tn = 22, rows = c)
                 else:
-                    return render_template('index.html', title = '다중 검사', logo = data['name'], tn = 22, rows = '', login = nowlogin())
+                    return render_template('index.html', title = '다중 검사', logo = data['name'], tn = 22, rows = '')
         else:
             return '<meta http-equiv="refresh" content="0;url=/error/3" />'
 
@@ -3426,7 +3251,7 @@ def register():
         if(ban == 1):
             return '<meta http-equiv="refresh" content="0;url=/ban" />'
         else:
-            return render_template('index.html', title = '회원가입', enter = '회원가입', logo = data['name'], tn = 15, login = nowlogin())
+            return render_template('index.html', title = '회원가입', enter = '회원가입', logo = data['name'], tn = 15)
 
 @app.route('/logout')
 def logout():
@@ -3484,7 +3309,7 @@ def ban(name = None):
                     else:
                         now = '차단'
                         
-                return render_template('index.html', title = name, page = parse.quote(name), logo = data['name'], tn = 16, now = now, today = getnow(), sub = '차단', login = nowlogin())
+                return render_template('index.html', title = name, page = parse.quote(name), logo = data['name'], tn = 16, now = now, today = getnow(), sub = '차단')
             else:
                 return '<meta http-equiv="refresh" content="0;url=/error/3" />'
 
@@ -3516,7 +3341,7 @@ def acl(name = None):
                     now = '유저 이상'
                 else:
                     now = '일반'
-                return render_template('index.html', title = name, page = parse.quote(name), logo = data['name'], tn = 19, now = '현재 ACL 상태는 ' + now, sub = 'ACL', login = nowlogin())
+                return render_template('index.html', title = name, page = parse.quote(name), logo = data['name'], tn = 19, now = '현재 ACL 상태는 ' + now, sub = 'ACL')
             else:
                 return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name) + '" />' 
         else:
@@ -3549,7 +3374,7 @@ def admin(name = None):
                     now = '권한 해제'
                 else:
                     now = '권한 부여'
-                return render_template('index.html', title = name, page = parse.quote(name), logo = data['name'], tn = 18, now = now, sub = '권한 부여', login = nowlogin())
+                return render_template('index.html', title = name, page = parse.quote(name), logo = data['name'], tn = 18, now = now, sub = '권한 부여')
             else:
                 return '<meta http-equiv="refresh" content="0;url=/error/5" />'
         else:
@@ -3609,7 +3434,7 @@ def aban():
                         end = '영구 차단 상태 입니다. / 사유 : ' + row[0]['why']                
     else:
         end = '권한이 맞지 않는 상태 입니다.'
-    return render_template('index.html', title = '권한 오류', logo = data['name'], data = end, login = nowlogin()), 401
+    return render_template('index.html', title = '권한 오류', logo = data['name'], data = end), 401
    
 @app.route('/w/<path:name>/r/<int:a>/diff/<int:b>')
 def diff(name = None, a = None, b = None):
@@ -3632,7 +3457,7 @@ def diff(name = None, a = None, b = None):
             
             c = '<pre>' + c + '</pre>'
             
-            return render_template('index.html', title = name, logo = data['name'], data = c, sub = '비교', login = nowlogin())
+            return render_template('index.html', title = name, logo = data['name'], data = c, sub = '비교')
         else:
             return '<meta http-equiv="refresh" content="0;url=/history/' + parse.quote(name) + '" />'
     else:
@@ -3666,7 +3491,7 @@ def user():
         else:
             ip = '<a class="not_thing" href="/w/' + parse.quote('사용자:' + ip) + '">' + ip + '</a>'
         
-    return render_template('index.html', title = '유저 메뉴', logo = data['name'], data = ip + '<br><br><span>권한 상태 : ' + acl + '<br><br><li><a href="/login">로그인</a></li><li><a href="/logout">로그아웃</a></li><li><a href="/register">회원가입</a></li><li><a href="/change">비밀번호 변경</a></li>', login = nowlogin())
+    return render_template('index.html', title = '유저 메뉴', logo = data['name'], data = ip + '<br><br><span>권한 상태 : ' + acl + '<br><br><li><a href="/login">로그인</a></li><li><a href="/logout">로그아웃</a></li><li><a href="/register">회원가입</a></li><li><a href="/change">비밀번호 변경</a></li>')
 
 @app.route('/random')
 def random():
@@ -3680,45 +3505,45 @@ def random():
 @app.route('/error/<int:num>')
 def error(num = None):
     if(num == 1):
-        return render_template('index.html', title = '권한 오류', logo = data['name'], data = '비 로그인 상태 입니다.', login = nowlogin()), 401
+        return render_template('index.html', title = '권한 오류', logo = data['name'], data = '비 로그인 상태 입니다.'), 401
     elif(num == 2):
-        return render_template('index.html', title = '권한 오류', logo = data['name'], data = '이 계정이 없습니다.', login = nowlogin()), 401
+        return render_template('index.html', title = '권한 오류', logo = data['name'], data = '이 계정이 없습니다.'), 401
     elif(num == 3):
-        return render_template('index.html', title = '권한 오류', logo = data['name'], data = '권한이 모자랍니다.', login = nowlogin()), 401
+        return render_template('index.html', title = '권한 오류', logo = data['name'], data = '권한이 모자랍니다.'), 401
     elif(num == 4):
-        return render_template('index.html', title = '권한 오류', logo = data['name'], data = '관리자는 차단, 검사 할 수 없습니다.', login = nowlogin()), 401
+        return render_template('index.html', title = '권한 오류', logo = data['name'], data = '관리자는 차단, 검사 할 수 없습니다.'), 401
     elif(num == 5):
-        return render_template('index.html', title = '유저 오류', logo = data['name'], data = '그런 계정이 없습니다.', login = nowlogin()), 401
+        return render_template('index.html', title = '유저 오류', logo = data['name'], data = '그런 계정이 없습니다.'), 401
     elif(num == 6):
-        return render_template('index.html', title = '가입 오류', logo = data['name'], data = '동일한 아이디의 유저가 있습니다.', login = nowlogin()), 401
+        return render_template('index.html', title = '가입 오류', logo = data['name'], data = '동일한 아이디의 유저가 있습니다.'), 401
     elif(num == 7):
-        return render_template('index.html', title = '가입 오류', logo = data['name'], data = '아이디는 20글자보다 짧아야 합니다.', login = nowlogin()), 401
+        return render_template('index.html', title = '가입 오류', logo = data['name'], data = '아이디는 20글자보다 짧아야 합니다.'), 401
     elif(num == 8):
-        return render_template('index.html', title = '가입 오류', logo = data['name'], data = '아이디에는 한글과 알파벳과 공백만 허용 됩니다.', login = nowlogin()), 401
+        return render_template('index.html', title = '가입 오류', logo = data['name'], data = '아이디에는 한글과 알파벳과 공백만 허용 됩니다.'), 401
     elif(num == 9):
-        return render_template('index.html', title = '변경 오류', logo = data['name'], data = '그런 계정이 없습니다.', login = nowlogin()), 401
+        return render_template('index.html', title = '변경 오류', logo = data['name'], data = '그런 계정이 없습니다.'), 401
     elif(num == 10):
-        return render_template('index.html', title = '변경 오류', logo = data['name'], data = '비밀번호가 다릅니다.', login = nowlogin()), 401
+        return render_template('index.html', title = '변경 오류', logo = data['name'], data = '비밀번호가 다릅니다.'), 401
     elif(num == 11):
-        return render_template('index.html', title = '로그인 오류', logo = data['name'], data = '이미 로그인 되어 있습니다.', login = nowlogin()), 401
+        return render_template('index.html', title = '로그인 오류', logo = data['name'], data = '이미 로그인 되어 있습니다.'), 401
     elif(num == 12):
-        return render_template('index.html', title = '로그인 오류', logo = data['name'], data = '그런 계정이 없습니다.', login = nowlogin()), 401
+        return render_template('index.html', title = '로그인 오류', logo = data['name'], data = '그런 계정이 없습니다.'), 401
     elif(num == 13):
-        return render_template('index.html', title = '로그인 오류', logo = data['name'], data = '비밀번호가 다릅니다.', login = nowlogin()), 401
+        return render_template('index.html', title = '로그인 오류', logo = data['name'], data = '비밀번호가 다릅니다.'), 401
     elif(num == 14):
-        return render_template('index.html', title = '업로드 오류', logo = data['name'], data = 'jpg, gif, jpeg, png만 가능 합니다.', login = nowlogin()), 401
+        return render_template('index.html', title = '업로드 오류', logo = data['name'], data = 'jpg, gif, jpeg, png만 가능 합니다.'), 401
     elif(num == 15):
-        return render_template('index.html', title = '업로드 오류', logo = data['name'], data = '파일 명에 . / \ * < > | : ? 가 들어 갈 수 없습니다.', login = nowlogin()), 401
+        return render_template('index.html', title = '업로드 오류', logo = data['name'], data = '파일 명에 . / \ * < > | : ? 가 들어 갈 수 없습니다.'), 401
     elif(num == 16):
-        return render_template('index.html', title = '업로드 오류', logo = data['name'], data = '동일한 이름의 파일이 있습니다.', login = nowlogin()), 401
+        return render_template('index.html', title = '업로드 오류', logo = data['name'], data = '동일한 이름의 파일이 있습니다.'), 401
     elif(num == 17):
-        return render_template('index.html', title = '편집 오류', logo = data['name'], data = '편집 내용 기록에는 한글과 영어와 숫자, 공백만 허용 됩니다.', login = nowlogin()), 401
+        return render_template('index.html', title = '편집 오류', logo = data['name'], data = '편집 내용 기록에는 한글과 영어와 숫자, 공백만 허용 됩니다.'), 401
     elif(num == 18):
-        return render_template('index.html', title = '편집 오류', logo = data['name'], data = '내용이 원래 문서와 동일 합니다.', login = nowlogin()), 401
+        return render_template('index.html', title = '편집 오류', logo = data['name'], data = '내용이 원래 문서와 동일 합니다.'), 401
     elif(num == 19):
-        return render_template('index.html', title = '이동 오류', logo = data['name'], data = '이동 하려는 곳에 문서가 이미 있습니다.', login = nowlogin()), 401
+        return render_template('index.html', title = '이동 오류', logo = data['name'], data = '이동 하려는 곳에 문서가 이미 있습니다.'), 401
     elif(num == 20):
-        return render_template('index.html', title = '비밀번호 오류', logo = data['name'], data = '재 확인이랑 비밀번호가 다릅니다.', login = nowlogin()), 401
+        return render_template('index.html', title = '비밀번호 오류', logo = data['name'], data = '재 확인이랑 비밀번호가 다릅니다.'), 401
     else:
         return '<meta http-equiv="refresh" content="0;url=/" />'
 
