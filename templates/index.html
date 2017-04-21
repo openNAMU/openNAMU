@@ -278,7 +278,7 @@
                     <br>
                     <br>
                     {% if not title == '로그인' %}
-                    <span>{% if title == '비밀번호 변경' %}바꿀 비밀번호{% else %}재 확인{% endif %}</span>
+                    <span>{% if title == '비밀번호 변경' %}변경할 비밀번호{% else %}재 확인{% endif %}</span>
                     <br>
                     <br>
                     <input name="pw2" type="password">
@@ -301,10 +301,10 @@
                     <input class="form-control" name="end" style="width: 100%">
                     <br>
                     <br>
-                    <span>아무것도 안 적으면 무기한 차단 입니다.</span>
+                    <span>아무것도 안 적으면 무기한 차단입니다.</span>
                     <br>
                     <br>
-                    <span>차단 일 지정시 형식은 YYYY-MM-DD로 기록 해야합니다. (예시: 2017-01-20, 2017-10-15)</span>
+                    <span>차단 일 지정시 형식은 YYYY-MM-DD로 기록해야 합니다. (예시: 2017-01-20, 2017-10-15)</span>
                     <br>
                     <br>
                     <span>지금 시각은 {{today}} 입니다.</span>
@@ -313,7 +313,7 @@
                     <input class="form-control" name="why" style="width: 100%">
                     <br>
                     <br>
-                    <span>사유를 쓰는 곳 입니다.</span>
+                    <span>사유를 쓰는 곳입니다.</span>
                     {% if allif == 1 %}
                     <br>
                     <br>
@@ -372,7 +372,7 @@
                         <input type=submit value=Upload>
                     </form>
                 </div>
-                <span>{{number}}MB 이하 파일만 업로드 가능하고 파일 명에 ./\*<>|:? 들은 불가능 하며 확장자는 jpg, png, gif, jpeg만 가능 합니다.</span>
+                <span>{{number}}MB 이하 파일만 업로드 가능하고 파일 명에 ./\*<>|:? 들은 불가능하며 확장자는 jpg, png, gif, jpeg만 가능합니다.</span>
                 {% elif tn == 22 %}
                 <table style="width: 100%;">
                     <tbody>
