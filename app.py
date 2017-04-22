@@ -2839,7 +2839,7 @@ def 합의된_토론_목록(name = None):
             else:
                 가리기 = ''
 
-            아이디 = 아이디_파싱(내용[숫자]['ip'])
+            아이디 = 아이디_파싱(내용[0]['ip'])
                 
             보여줄_내용 = 보여줄_내용 + '<h2><a href="/topic/' + parse.quote(name) + '/sub/' + parse.quote(내용[숫자]['sub']) + '">' + str((숫자 + 1)) + '. ' + 내용[숫자]['sub'] + '</a></h2><table id="toron"><tbody><tr><td id="toroncolorgreen"><a href="javascript:void(0);" id="' + str(숫자 + 1) + '">#' + str(숫자 + 1) + '</a> ' + 아이디 + ' <span style="float:right;">' + 내용[0]['date'] + '</span></td></tr><tr><td ' + 가리기 + '>' + 내용_파싱 + '</td></tr></tbody></table><br>'
             
