@@ -2690,23 +2690,25 @@ def manager(num = None):
         return '<meta http-equiv="refresh" content="0;url=/" />'
         
 @app.route('/titleindex')
-def titleindex():
-    i = 0
-    div = '<div>'
-    curs.execute("select * from data order by title asc")
-    rows = curs.fetchall()
-    if(rows):
+def 모든_문서():
+    숫자 = 0
+    데이터 = '<div>'
+    curs.execute("select title from data order by title asc")
+    문서명 = curs.fetchall()
+    if(문서명):
         while(True):
             try:
-                a = rows[i]
+                덤 = 문서명[숫자]
             except:
-                div = div + '</div>'
                 break
-                
-            div = div + '<li>' + str(i + 1) + '. <a href="/w/' + parse.quote(rows[i]['title']) + '">' + rows[i]['title'] + '</a></li>'
+
+            데이터 = 데이터 + '<li>' + str(숫자 + 1) + '. <a href="/w/' + parse.quote(문서명[숫자]['title']) + '">' + 문서명[숫자]['title'] + '</a></li>'
             
-            i = i + 1
-        return render_template('index.html', logo = data['name'], rows = div + '<br><span>이 위키에는 총 ' + str(i) + '개의 문서가 있습니다.</span>', tn = 4, title = '모든 문서')
+            숫자 += 1
+
+        데이터 = 데이터 + '</div>'
+
+        return render_template('index.html', logo = data['name'], rows = 데이터 + '<br><span>이 위키에는 총 ' + str(숫자) + '개의 문서가 있습니다.</span>', tn = 4, title = '모든 문서')
     else:
         return render_template('index.html', logo = data['name'], rows = '', tn = 4, title = '모든 문서')
 
