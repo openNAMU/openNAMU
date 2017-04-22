@@ -20,7 +20,7 @@ import logging
 log = logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
 
-def start():
+def 시작():
     try:
         curs.execute("select * from data limit 1")
     except:
@@ -86,6 +86,11 @@ def start():
     except:
         curs.execute("create table distop(id text, title text, sub text)") 
 
+    try:
+        curs.execute("select * from agreedis limit 1")
+    except:
+        curs.execute("create table agreedis(title text, sub text)") 
+
 conn = pymysql.connect(host = data['host'], user = data['user'], password = data['pw'], charset = 'utf8mb4')
 curs = conn.cursor(pymysql.cursors.DictCursor)
 
@@ -96,7 +101,7 @@ except:
     curs.execute("use " + data['db'])
     curs.execute("alter database " + data['db'] + " character set = utf8mb4 collate = utf8mb4_unicode_ci")
 
-start()
+시작()
 
 app.secret_key = hashlib.sha512(bytes(data['key'], 'ascii')).hexdigest()
 
@@ -163,6 +168,29 @@ def nowlogin():
         return 1
     else:
         return 0
+
+def 아이디_파싱(원래_아이디):
+    있나 = re.search("([^-]*)\s\-\s(Close|Reopen|Stop|Restart|Admin|Agreement|Settlement)$", 원래_아이디)
+    if(있나):
+        분리 = 있나.groups()
+        
+        curs.execute("select * from data where title = '사용자:" + pymysql.escape_string(분리[0]) + "'")
+        row = curs.fetchall()
+        if(row):
+            ip = '<a href="/w/' + parse.quote('사용자:' + 분리[0]) + '">' + 분리[0] + '</a> - ' + 분리[1]
+        else:
+            ip = '<a class="not_thing" href="/w/' + parse.quote('사용자:' + 분리[0]) + '">' + 분리[0] + '</a> - ' + 분리[1]
+    elif(re.search("\.", 원래_아이디)):
+        ip = 원래_아이디
+    else:
+        curs.execute("select * from data where title = '사용자:" + pymysql.escape_string(원래_아이디) + "'")
+        row = curs.fetchall()
+        if(row):
+            ip = '<a href="/w/' + parse.quote('사용자:' + 원래_아이디) + '">' + 원래_아이디 + '</a>'
+        else:
+            ip = '<a class="not_thing" href="/w/' + parse.quote('사용자:' + 원래_아이디) + '">' + 원래_아이디 + '</a>'
+
+    return ip
 
 def namumark(title, data):
     while(True):
@@ -2655,7 +2683,7 @@ def move(name = None):
 
 @app.route('/other')
 def other():
-    return render_template('index.html', title = '기타 메뉴', logo = data['name'], data = '<h2 style="margin-top: 0px;">기록</h2><li><a href="/blocklog/n/1">유저 차단 기록</a></li><li><a href="/userlog/n/1">유저 가입 기록</a></li><li><a href="/manager/6">유저 기록</a></li><h2>기타</h2><li><a href="/titleindex">모든 문서</a></li><li><a href="/upload">업로드</a></li><li><a href="/adminlist">관리자 목록</a></li><li><a href="/manager/1">관리자 메뉴</a></li><br>이 오픈나무의 버전은 <a href="https://github.com/2DU/openNAMU/blob/master/version.md">1.8.7</a> 입니다.')
+    return render_template('index.html', title = '기타 메뉴', logo = data['name'], data = '<h2 style="margin-top: 0px;">기록</h2><li><a href="/blocklog/n/1">유저 차단 기록</a></li><li><a href="/userlog/n/1">유저 가입 기록</a></li><li><a href="/manager/6">유저 기록</a></li><h2>기타</h2><li><a href="/titleindex">모든 문서</a></li><li><a href="/upload">업로드</a></li><li><a href="/adminlist">관리자 목록</a></li><li><a href="/manager/1">관리자 메뉴</a></li><br>이 오픈나무의 버전은 <a href="https://github.com/2DU/openNAMU/blob/master/version.md">1.8.8</a> 입니다.')
     
 @app.route('/manager/<int:num>', methods=['POST', 'GET'])
 def manager(num = None):
@@ -2739,12 +2767,13 @@ def topic(name = None):
                 block = 'style="background: gainsboro;"'
             else:
                 block = ''
+
+            ip = 아이디_파싱(aa[0]['ip'])
                 
             curs.execute("select * from stop where title = '" + pymysql.escape_string(rows[i]['title']) + "' and sub = '" + pymysql.escape_string(rows[i]['sub']) + "' and close = 'O'")
             row = curs.fetchall()
             if(not row):
-                div = div + '<h2><a href="/topic/' + parse.quote(rows[i]['title']) + '/sub/' + parse.quote(rows[i]['sub']) + '">' + str(j) + '. ' + rows[i]['sub'] + '</a></h2>'
-                div = div + '<table id="toron"><tbody><tr><td id="toroncolorgreen"><a href="javascript:void(0);" id="1">#1</a> ' + aa[0]['ip'] + ' <span style="float:right;">' + aa[0]['date'] + '</span></td></tr><tr><td ' + block + '>' + indata + '</td></tr></tbody></table><br>'
+                div = div + '<h2><a href="/topic/' + parse.quote(rows[i]['title']) + '/sub/' + parse.quote(rows[i]['sub']) + '">' + str(j) + '. ' + rows[i]['sub'] + '</a></h2><table id="toron"><tbody><tr><td id="toroncolorgreen"><a href="javascript:void(0);" id="1">#1</a> ' + ip + ' <span style="float:right;">' + aa[0]['date'] + '</span></td></tr><tr><td ' + block + '>' + indata + '</td></tr></tbody></table><br>'
                 j = j + 1
                 
             i = i + 1
@@ -2752,40 +2781,71 @@ def topic(name = None):
         return render_template('index.html', title = name, page = parse.quote(name), logo = data['name'], plus = div, tn = 10, list = 1, sub = '토론 목록')
         
 @app.route('/topic/<path:name>/close')
-def topicstoplist(name = None):
-    if(request.method == 'POST'):
-        return '<meta http-equiv="refresh" content="0;url=/topic/' + parse.quote(name) + '/sub/' + parse.quote(request.form["topic"]) + '" />'
-    else:
-        div = '<div>'
-        i = 0
-        
-        curs.execute("select * from stop where title = '" + pymysql.escape_string(name) + "' and close = 'O' order by sub asc")
-        rows = curs.fetchall()
-        while(True):
-            try:
-                a = rows[i]
-            except:
-                div = div + '</div>'
-                break
-                
-            curs.execute("select * from topic where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(rows[i]['sub']) + "' and id = '1'")
-            row = curs.fetchall()
-            if(row):
-                j = i + 1
-                indata = namumark(name, row[0]['data'])
-                
-                if(row[0]['block'] == 'O'):
-                    indata = '블라인드 되었습니다.'
-                    block = 'style="background: gainsboro;"'
-                else:
-                    block = ''
-                    
-                div = div + '<h2><a href="/topic/' + parse.quote(name) + '/sub/' + parse.quote(rows[i]['sub']) + '">' + str((i + 1)) + '. ' + rows[i]['sub'] + '</a></h2>'
-                div = div + '<table id="toron"><tbody><tr><td id="toroncolorgreen"><a href="javascript:void(0);" id="' + str(j) + '">#' + str(j) + '</a> ' + row[0]['ip'] + ' <span style="float:right;">' + row[0]['date'] + '</span></td></tr><tr><td ' + block + '>' + indata + '</td></tr></tbody></table><br>'
-                
-            i = i + 1
+def 닫힌_토론_목록(name = None):
+    div = '<div>'
+    i = 0
+    
+    curs.execute("select * from stop where title = '" + pymysql.escape_string(name) + "' and close = 'O' order by sub asc")
+    rows = curs.fetchall()
+    while(True):
+        try:
+            a = rows[i]
+        except:
+            div = div + '</div>'
+            break
             
-        return render_template('index.html', title = name, page = parse.quote(name), logo = data['name'], plus = div, tn = 10, sub = '토론 목록')
+        curs.execute("select * from topic where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(rows[i]['sub']) + "' and id = '1'")
+        row = curs.fetchall()
+        if(row):
+            j = i + 1
+            indata = namumark(name, row[0]['data'])
+            
+            if(row[0]['block'] == 'O'):
+                indata = '블라인드 되었습니다.'
+                block = 'style="background: gainsboro;"'
+            else:
+                block = ''
+
+            아이디 = 아이디_파싱(row[i]['ip'])
+                
+            div = div + '<h2><a href="/topic/' + parse.quote(name) + '/sub/' + parse.quote(rows[i]['sub']) + '">' + str((i + 1)) + '. ' + rows[i]['sub'] + '</a></h2><table id="toron"><tbody><tr><td id="toroncolorgreen"><a href="javascript:void(0);" id="' + str(j) + '">#' + str(j) + '</a> ' + 아이디 + ' <span style="float:right;">' + row[0]['date'] + '</span></td></tr><tr><td ' + block + '>' + indata + '</td></tr></tbody></table><br>'
+            
+        i = i + 1
+        
+    return render_template('index.html', title = name, page = parse.quote(name), logo = data['name'], plus = div, tn = 10, sub = '닫힌 토론')
+
+@app.route('/topic/<path:name>/agree')
+def 합의된_토론_목록(name = None):
+    보여줄_내용 = '<div>'
+    숫자 = 0
+    
+    curs.execute("select * from agreedis where title = '" + pymysql.escape_string(name) + "' order by sub asc")
+    합의_토론 = curs.fetchall()
+    while(True):
+        try:
+            덤 = 합의_토론[숫자]
+        except:
+            보여줄_내용 = 보여줄_내용 + '</div>'
+            break
+            
+        curs.execute("select * from topic where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(합의_토론[숫자]['sub']) + "' and id = '1'")
+        내용 = curs.fetchall()
+        if(내용):
+            내용_파싱 = namumark(name, 내용[0]['data'])
+            
+            if(내용[0]['block'] == 'O'):
+                내용_파싱 = '블라인드 되었습니다.'
+                가리기 = 'style="background: gainsboro;"'
+            else:
+                가리기 = ''
+
+            아이디 = 아이디_파싱(내용[숫자]['ip'])
+                
+            보여줄_내용 = 보여줄_내용 + '<h2><a href="/topic/' + parse.quote(name) + '/sub/' + parse.quote(내용[숫자]['sub']) + '">' + str((숫자 + 1)) + '. ' + 내용[숫자]['sub'] + '</a></h2><table id="toron"><tbody><tr><td id="toroncolorgreen"><a href="javascript:void(0);" id="' + str(숫자 + 1) + '">#' + str(숫자 + 1) + '</a> ' + 아이디 + ' <span style="float:right;">' + 내용[0]['date'] + '</span></td></tr><tr><td ' + 가리기 + '>' + 내용_파싱 + '</td></tr></tbody></table><br>'
+            
+        숫자 += 1
+        
+    return render_template('index.html', title = name, page = parse.quote(name), logo = data['name'], plus = 보여줄_내용, tn = 10, sub = '합의된 토론')
 
 @app.route('/topic/<path:name>/sub/<path:sub>', methods=['POST', 'GET'])
 def sub(name = None, sub = None):
@@ -2827,31 +2887,38 @@ def sub(name = None, sub = None):
         ip = getip(request)
         ban = getdiscuss(ip, name, sub)
         admin = admincheck()
+
+        curs.execute("select * from stop where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' and close = 'O'")
+        닫음 = curs.fetchall()
+
+        curs.execute("select * from stop where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' and close = ''")
+        정지 = curs.fetchall()
         
         if(admin == 1):
             div = '<div>'
             
-            curs.execute("select * from stop where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' and close = 'O'")
-            rows = curs.fetchall()
-            if(rows):
+            if(닫음):
                 div = div + '<a href="/topic/' + parse.quote(name) + '/sub/' + parse.quote(sub) + '/close">(토론 열기)</a> '
             else:
                 div = div + '<a href="/topic/' + parse.quote(name) + '/sub/' + parse.quote(sub) + '/close">(토론 닫기)</a> '
             
-            curs.execute("select * from stop where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' and close = ''")
-            rows = curs.fetchall()
-            if(rows):
-                div = div + '<a href="/topic/' + parse.quote(name) + '/sub/' + parse.quote(sub) + '/stop">(토론 재개)</a>'
+            if(정지):
+                div = div + '<a href="/topic/' + parse.quote(name) + '/sub/' + parse.quote(sub) + '/stop">(토론 재개)</a> '
             else:
-                div = div + '<a href="/topic/' + parse.quote(name) + '/sub/' + parse.quote(sub) + '/stop">(토론 정지)</a>'
+                div = div + '<a href="/topic/' + parse.quote(name) + '/sub/' + parse.quote(sub) + '/stop">(토론 정지)</a> '
+
+            curs.execute("select * from agreedis where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "'")
+            합의 = curs.fetchall()
+            if(합의):
+                div = div + '<a href="/topic/' + parse.quote(name) + '/sub/' + parse.quote(sub) + '/agree">(합의 취소)</a>'
+            else:
+                div = div + '<a href="/topic/' + parse.quote(name) + '/sub/' + parse.quote(sub) + '/agree">(합의 완료)</a>'
             
             div = div + '<br><br>'
         else:
             div = '<div>'
         
-        curs.execute("select * from stop where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "'")
-        rows = curs.fetchall()
-        if(rows):
+        if(닫음 or 정지):
             if(not admin == 1):
                 style = 'display:none;'
         
@@ -2879,26 +2946,7 @@ def sub(name = None, sub = None):
                 indata = namumark('', rows[num]['data'])
                 indata = re.sub("(?P<in>#(?:[0-9]*))", '<a href="\g<in>">\g<in></a>', indata)
                         
-                m = re.search("([^-]*)\s\-\s(Close|Reopen|Stop|Restart|Admin)$", rows[num]['ip'])
-                if(m):
-                    g = m.groups()
-                    
-                    curs.execute("select * from data where title = '사용자:" + pymysql.escape_string(g[0]) + "'")
-                    row = curs.fetchall()
-                    if(row):
-                        ip = '<a href="/w/' + parse.quote('사용자:' + g[0]) + '">' + g[0] + '</a> - ' + g[1]
-                    else:
-                        ip = '<a class="not_thing" href="/w/' + parse.quote('사용자:' + g[0]) + '">' + g[0] + '</a> - ' + g[1]
-
-                elif(re.search("\.", rows[num]["ip"])):
-                    ip = rows[num]["ip"]
-                else:
-                    curs.execute("select * from data where title = '사용자:" + pymysql.escape_string(rows[num]['ip']) + "'")
-                    row = curs.fetchall()
-                    if(row):
-                        ip = '<a href="/w/' + parse.quote('사용자:' + rows[num]['ip']) + '">' + rows[num]['ip'] + '</a>'
-                    else:
-                        ip = '<a class="not_thing" href="/w/' + parse.quote('사용자:' + rows[num]['ip']) + '">' + rows[i]['ip'] + '</a>'
+                ip = 아이디_파싱(rows[num]['ip'])
                                    
                 div = div + '<table id="toron"><tbody><tr><td id="toroncolorred"><a href="#' + distop[i]['id'] + '" id="' + distop[i]['id'] + '-nt">#' + distop[i]['id'] + '</a> ' + ip + ' <span style="float:right;">' + rows[num]['date'] + '</span></td></tr><tr><td>' + indata + '</td></tr></tbody></table><br>'
                     
@@ -2924,8 +2972,8 @@ def sub(name = None, sub = None):
                 block = 'style="background: gainsboro;"'
             else:
                 block = ''
-                
-            m = re.search("^([^-]*)\s\-\s(Close|Reopen|Stop|Restart)$", rows[i]['ip'])
+
+            m = re.search("^([^-]*)\s\-\s(Close|Reopen|Stop|Restart|Agreement|Settlement)$", rows[i]['ip'])
             if(m):
                 ban = ""
             else:
@@ -2954,26 +3002,8 @@ def sub(name = None, sub = None):
                             ban = ' <a href="/ban/' + parse.quote(rows[i]['ip']) + '">(차단)</a>' + isblock
                 else:
                     ban = ""
-                    
-            m = re.search("([^-]*)\s\-\s(Close|Reopen|Stop|Restart|Admin)$", rows[i]['ip'])
-            if(m):
-                g = m.groups()
-                
-                curs.execute("select * from data where title = '사용자:" + pymysql.escape_string(g[0]) + "'")
-                row = curs.fetchall()
-                if(row):
-                    ip = '<a href="/w/' + parse.quote('사용자:' + g[0]) + '">' + g[0] + '</a> - ' + g[1]
-                else:
-                    ip = '<a class="not_thing" href="/w/' + parse.quote('사용자:' + g[0]) + '">' + g[0] + '</a> - ' + g[1]
-            elif(re.search("\.", rows[i]["ip"])):
-                ip = rows[i]["ip"]
-            else:
-                curs.execute("select * from data where title = '사용자:" + pymysql.escape_string(rows[i]['ip']) + "'")
-                row = curs.fetchall()
-                if(row):
-                    ip = '<a href="/w/' + parse.quote('사용자:' + rows[i]['ip']) + '">' + rows[i]['ip'] + '</a>'
-                else:
-                    ip = '<a class="not_thing" href="/w/' + parse.quote('사용자:' + rows[i]['ip']) + '">' + rows[i]['ip'] + '</a>'
+
+            ip = 아이디_파싱(rows[i]['ip'])
                     
             if(rows[i]['ip'] == start):
                 j = i + 1
@@ -3070,6 +3100,32 @@ def topicclose(name = None, sub = None):
             else:
                 curs.execute("insert into topic (id, title, sub, data, date, ip, block) value ('" + pymysql.escape_string(str(int(row[0]['id']) + 1)) + "', '" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(sub) + "', 'Close', '" + pymysql.escape_string(today) + "', '" + pymysql.escape_string(ip) + " - Close', '')")
                 curs.execute("insert into stop (title, sub, close) value ('" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(sub) + "', 'O')")
+            conn.commit()
+            
+            return '<meta http-equiv="refresh" content="0;url=/topic/' + parse.quote(name) + '/sub/' + parse.quote(sub) + '" />'
+        else:
+            return '<meta http-equiv="refresh" content="0;url=/topic/' + parse.quote(name) + '/sub/' + parse.quote(sub) + '" />'
+    else:
+        return '<meta http-equiv="refresh" content="0;url=/error/3" />'
+
+@app.route('/topic/<path:name>/sub/<path:sub>/agree')
+def 토론_관리자_기능(name = None, sub = None):
+    if(admincheck() == 1):
+        ip = getip(request)
+        
+        curs.execute("select id from topic where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' order by id+0 desc limit 1")
+        토론 = curs.fetchall()
+        if(토론):
+            today = getnow()
+            
+            curs.execute("select * from agreedis where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "'")
+            합의안 = curs.fetchall()
+            if(합의안):
+                curs.execute("insert into topic (id, title, sub, data, date, ip, block) value ('" + pymysql.escape_string(str(int(토론[0]['id']) + 1)) + "', '" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(sub) + "', 'Settlement', '" + pymysql.escape_string(today) + "', '" + pymysql.escape_string(ip) + " - Settlement', '')")
+                curs.execute("delete from agreedis where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "'")
+            else:
+                curs.execute("insert into topic (id, title, sub, data, date, ip, block) value ('" + pymysql.escape_string(str(int(토론[0]['id']) + 1)) + "', '" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(sub) + "', 'Agreement', '" + pymysql.escape_string(today) + "', '" + pymysql.escape_string(ip) + " - Agreement', '')")
+                curs.execute("insert into agreedis (title, sub) value ('" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(sub) + "')")
             conn.commit()
             
             return '<meta http-equiv="refresh" content="0;url=/topic/' + parse.quote(name) + '/sub/' + parse.quote(sub) + '" />'
