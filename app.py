@@ -2797,7 +2797,6 @@ def 닫힌_토론_목록(name = None):
         curs.execute("select * from topic where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(rows[i]['sub']) + "' and id = '1'")
         row = curs.fetchall()
         if(row):
-            j = i + 1
             indata = namumark(name, row[0]['data'])
             
             if(row[0]['block'] == 'O'):
@@ -2808,9 +2807,9 @@ def 닫힌_토론_목록(name = None):
 
             아이디 = 아이디_파싱(row[0]['ip'])
                 
-            div = div + '<h2><a href="/topic/' + parse.quote(name) + '/sub/' + parse.quote(rows[i]['sub']) + '">' + str((i + 1)) + '. ' + rows[i]['sub'] + '</a></h2><table id="toron"><tbody><tr><td id="toroncolorgreen"><a href="javascript:void(0);" id="' + str(j) + '">#' + str(j) + '</a> ' + 아이디 + ' <span style="float:right;">' + row[0]['date'] + '</span></td></tr><tr><td ' + block + '>' + indata + '</td></tr></tbody></table><br>'
+            div = div + '<h2><a href="/topic/' + parse.quote(name) + '/sub/' + parse.quote(rows[i]['sub']) + '">' + str((i + 1)) + '. ' + rows[i]['sub'] + '</a></h2><table id="toron"><tbody><tr><td id="toroncolorgreen"><a href="javascript:void(0);" id="1">#1</a> ' + 아이디 + ' <span style="float:right;">' + row[0]['date'] + '</span></td></tr><tr><td ' + block + '>' + indata + '</td></tr></tbody></table><br>'
             
-        i = i + 1
+        i += 1
         
     return render_template('index.html', title = name, page = parse.quote(name), logo = data['name'], plus = div, tn = 10, sub = '닫힌 토론')
 
@@ -2841,7 +2840,7 @@ def 합의된_토론_목록(name = None):
 
             아이디 = 아이디_파싱(내용[0]['ip'])
                 
-            보여줄_내용 = 보여줄_내용 + '<h2><a href="/topic/' + parse.quote(name) + '/sub/' + parse.quote(내용[숫자]['sub']) + '">' + str((숫자 + 1)) + '. ' + 내용[숫자]['sub'] + '</a></h2><table id="toron"><tbody><tr><td id="toroncolorgreen"><a href="javascript:void(0);" id="' + str(숫자 + 1) + '">#' + str(숫자 + 1) + '</a> ' + 아이디 + ' <span style="float:right;">' + 내용[0]['date'] + '</span></td></tr><tr><td ' + 가리기 + '>' + 내용_파싱 + '</td></tr></tbody></table><br>'
+            보여줄_내용 = 보여줄_내용 + '<h2><a href="/topic/' + parse.quote(name) + '/sub/' + parse.quote(내용[숫자]['sub']) + '">' + str((숫자 + 1)) + '. ' + 내용[숫자]['sub'] + '</a></h2><table id="toron"><tbody><tr><td id="toroncolorgreen"><a href="javascript:void(0);" id="1">#1</a> ' + 아이디 + ' <span style="float:right;">' + 내용[0]['date'] + '</span></td></tr><tr><td ' + 가리기 + '>' + 내용_파싱 + '</td></tr></tbody></table><br>'
             
         숫자 += 1
         
