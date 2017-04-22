@@ -232,7 +232,7 @@
                 {% endautoescape %}
                 {% if ban == 1 %}
                 {% else %}
-                <a href="javascript:window.location.reload(true);">(갱신)</a>
+                <a id="reload" href="javascript:window.location.reload(true);">(갱신)</a> <a href="#reload">(갱신 전에 누르시오)</a>
                 <form id="usrform" style="{{style}}" method="POST" action="/topic/{{page}}/sub/{{suburl}}">
                     <br>
                     <textarea rows="10" cols="100" name="content" form="usrform"></textarea>
