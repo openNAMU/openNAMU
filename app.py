@@ -2806,7 +2806,7 @@ def 닫힌_토론_목록(name = None):
             else:
                 block = ''
 
-            아이디 = 아이디_파싱(row[i]['ip'])
+            아이디 = 아이디_파싱(row[0]['ip'])
                 
             div = div + '<h2><a href="/topic/' + parse.quote(name) + '/sub/' + parse.quote(rows[i]['sub']) + '">' + str((i + 1)) + '. ' + rows[i]['sub'] + '</a></h2><table id="toron"><tbody><tr><td id="toroncolorgreen"><a href="javascript:void(0);" id="' + str(j) + '">#' + str(j) + '</a> ' + 아이디 + ' <span style="float:right;">' + row[0]['date'] + '</span></td></tr><tr><td ' + block + '>' + indata + '</td></tr></tbody></table><br>'
             
