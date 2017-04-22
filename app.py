@@ -133,19 +133,16 @@ def ownercheck():
             if(rows[0]['acl'] == 'owner'):
                 return 1
                 
-def isin(name):
+def isin(name, data):
     if(re.search('^틀:', name)):
         curs.execute("select * from back where title = '" + pymysql.escape_string(name) + "' and type = 'include'")
         include = curs.fetchall()
         if(include):
             i = 0
-            
+
             while(True):
                 try:
-                    curs.execute("select * from data where title = '" + pymysql.escape_string(include[i]['link']) + "'")
-                    file = curs.fetchall()
-                    if(file):
-                        namumark(include[i]['link'], file[0]['data'])
+                    namumark(include[i]['link'], data)
                 except:
                     break
                     
@@ -2422,7 +2419,7 @@ def edit(name = None):
                     curs.execute("insert into data (title, data, acl) value ('" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(content) + "', '')")
                     conn.commit()
                     
-            isin(name)
+            isin(name, content)
             
             return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name) + '" />'
     else:
@@ -2477,7 +2474,7 @@ def secedit(name = None, number = None):
                         curs.execute("update data set data = '" + pymysql.escape_string(content) + "' where title = '" + pymysql.escape_string(name) + "'")
                         conn.commit()
                         
-                    isin(name)
+                    isin(name, content)
                     
                     return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name) + '" />'
             else:
