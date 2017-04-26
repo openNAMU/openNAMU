@@ -100,6 +100,12 @@ def DB_실행(데이터):
 def DB_갱신():
     conn.commit()
 
+def URL_인코딩(데이터):
+    return parse.quote(데이터).replace('/','%2F')
+
+def DB_인코딩(데이터):
+    return pymysql.escape_string(데이터)
+
 try:
     DB_실행("use " + data['db'])
 except:
@@ -129,7 +135,7 @@ def show_diff(seqm):
 def 관리자_확인():
     if(session.get('Now') == True):
         ip = getip(request)
-        DB_실행("select * from user where id = '" + pymysql.escape_string(ip) + "'")
+        DB_실행("select * from user where id = '" + DB_인코딩(ip) + "'")
         rows = curs.fetchall()
         if(rows):
             if(rows[0]['acl'] == 'owner' or rows[0]['acl'] == 'admin'):
@@ -138,7 +144,7 @@ def 관리자_확인():
 def 소유자_확인():
     if(session.get('Now') == True):
         ip = getip(request)
-        DB_실행("select * from user where id = '" + pymysql.escape_string(ip) + "'")
+        DB_실행("select * from user where id = '" + DB_인코딩(ip) + "'")
         rows = curs.fetchall()
         if(rows):
             if(rows[0]['acl'] == 'owner'):
@@ -146,7 +152,7 @@ def 소유자_확인():
                 
 def isin(name, data):
     if(re.search('^틀:', name)):
-        DB_실행("select * from back where title = '" + pymysql.escape_string(name) + "' and type = 'include'")
+        DB_실행("select * from back where title = '" + DB_인코딩(name) + "' and type = 'include'")
         include = curs.fetchall()
         if(include):
             i = 0
@@ -180,21 +186,21 @@ def 아이디_파싱(원래_아이디):
     if(있나):
         분리 = 있나.groups()
         
-        DB_실행("select * from data where title = '사용자:" + pymysql.escape_string(분리[0]) + "'")
+        DB_실행("select * from data where title = '사용자:" + DB_인코딩(분리[0]) + "'")
         row = curs.fetchall()
         if(row):
-            ip = '<a href="/w/' + parse.quote('사용자:' + 분리[0]) + '">' + 분리[0] + '</a> - ' + 분리[1]
+            ip = '<a href="/w/' + URL_인코딩('사용자:' + 분리[0]) + '">' + 분리[0] + '</a> - ' + 분리[1]
         else:
-            ip = '<a class="not_thing" href="/w/' + parse.quote('사용자:' + 분리[0]) + '">' + 분리[0] + '</a> - ' + 분리[1]
+            ip = '<a class="not_thing" href="/w/' + URL_인코딩('사용자:' + 분리[0]) + '">' + 분리[0] + '</a> - ' + 분리[1]
     elif(re.search("\.", 원래_아이디)):
         ip = 원래_아이디
     else:
-        DB_실행("select * from data where title = '사용자:" + pymysql.escape_string(원래_아이디) + "'")
+        DB_실행("select * from data where title = '사용자:" + DB_인코딩(원래_아이디) + "'")
         row = curs.fetchall()
         if(row):
-            ip = '<a href="/w/' + parse.quote('사용자:' + 원래_아이디) + '">' + 원래_아이디 + '</a>'
+            ip = '<a href="/w/' + URL_인코딩('사용자:' + 원래_아이디) + '">' + 원래_아이디 + '</a>'
         else:
-            ip = '<a class="not_thing" href="/w/' + parse.quote('사용자:' + 원래_아이디) + '">' + 원래_아이디 + '</a>'
+            ip = '<a class="not_thing" href="/w/' + URL_인코딩('사용자:' + 원래_아이디) + '">' + 원래_아이디 + '</a>'
 
     return ip
 
@@ -351,13 +357,13 @@ def namumark(title, data):
             if(results[0] == title):
                 data = re.sub("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]", "<b>" + results[0] + "</b>", data, 1)
             else:
-                DB_실행("select * from data where title = '" + pymysql.escape_string(results[0]) + "'")
+                DB_실행("select * from data where title = '" + DB_인코딩(results[0]) + "'")
                 rows = curs.fetchall()
                 if(rows):
-                    DB_실행("select * from back where title = '" + pymysql.escape_string(results[0]) + "' and link = '" + pymysql.escape_string(title) + "' and type = 'include'")
+                    DB_실행("select * from back where title = '" + DB_인코딩(results[0]) + "' and link = '" + DB_인코딩(title) + "' and type = 'include'")
                     abb = curs.fetchall()
                     if(not abb):
-                        DB_실행("insert into back (title, link, type) value ('" + pymysql.escape_string(results[0]) + "', '" + pymysql.escape_string(title) + "',  'include')")
+                        DB_실행("insert into back (title, link, type) value ('" + DB_인코딩(results[0]) + "', '" + DB_인코딩(title) + "',  'include')")
                         DB_갱신()
                         
                     enddata = rows[0]['data']
@@ -504,13 +510,13 @@ def namumark(title, data):
                                 break                        
                     data = re.sub("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]", '\n<div>' + enddata + '</div>\n', data, 1)
                 else:
-                    DB_실행("select * from back where title = '" + pymysql.escape_string(results[0]) + "' and link = '" + pymysql.escape_string(title) + "' and type = 'include'")
+                    DB_실행("select * from back where title = '" + DB_인코딩(results[0]) + "' and link = '" + DB_인코딩(title) + "' and type = 'include'")
                     abb = curs.fetchall()
                     if(not abb):
-                        DB_실행("insert into back (title, link, type) value ('" + pymysql.escape_string(results[0]) + "', '" + pymysql.escape_string(title) + "',  'include')")
+                        DB_실행("insert into back (title, link, type) value ('" + DB_인코딩(results[0]) + "', '" + DB_인코딩(title) + "',  'include')")
                         DB_갱신()
                 
-                    data = re.sub("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]", "<a class=\"not_thing\" href=\"" + parse.quote(results[0]) + "\">" + results[0] + "</a>", data, 1)
+                    data = re.sub("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]", "<a class=\"not_thing\" href=\"" + URL_인코딩(results[0]) + "\">" + results[0] + "</a>", data, 1)
         else:
             break
     
@@ -521,13 +527,13 @@ def namumark(title, data):
             aa = re.search("^(.*)(#(?:.*))$", results[0])
             if(aa):
                 results = aa.groups()
-                data = re.sub('^#(?:redirect|넘겨주기)\s([^\n]*)', '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(results[0]) + '/from/' + parse.quote(title) + results[1] + '" />', data, 1)
+                data = re.sub('^#(?:redirect|넘겨주기)\s([^\n]*)', '<meta http-equiv="refresh" content="0;url=/w/' + URL_인코딩(results[0]) + '/from/' + URL_인코딩(title) + results[1] + '" />', data, 1)
             else:
-                data = re.sub('^#(?:redirect|넘겨주기)\s([^\n]*)', '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(results[0]) + '/from/' + parse.quote(title) + '" />', data, 1)
-            DB_실행("select * from back where title = '" + pymysql.escape_string(results[0]) + "' and link = '" + pymysql.escape_string(title) + "' and type = 'redirect'")
+                data = re.sub('^#(?:redirect|넘겨주기)\s([^\n]*)', '<meta http-equiv="refresh" content="0;url=/w/' + URL_인코딩(results[0]) + '/from/' + URL_인코딩(title) + '" />', data, 1)
+            DB_실행("select * from back where title = '" + DB_인코딩(results[0]) + "' and link = '" + DB_인코딩(title) + "' and type = 'redirect'")
             abb = curs.fetchall()
             if(not abb):
-                DB_실행("insert into back (title, link, type) value ('" + pymysql.escape_string(results[0]) + "', '" + pymysql.escape_string(title) + "',  'redirect')")
+                DB_실행("insert into back (title, link, type) value ('" + DB_인코딩(results[0]) + "', '" + DB_인코딩(title) + "',  'redirect')")
                 DB_갱신()
         else:
             break
@@ -608,7 +614,7 @@ def namumark(title, data):
             toc = re.sub("\.$", '', toc)
             rtoc = rtoc + '<a href="#s-' + toc + '">' + toc + '</a>. ' + result[1] + '<br>'
             c = re.sub(" $", "", result[1])
-            data = re.sub('(={1,6})\s?([^=]*)\s?(?:={1,6})(?:\s+)?\n', '<h' + str(wiki) + ' id="' + c + '"><a href="#toc" id="s-' + toc + '">' + toc + '.</a> ' + c + ' <span style="font-size:11px;">[<a href="/edit/' + parse.quote(title) + '/section/' + str(i) + '">편집</a>]</span></h' + str(wiki) + '>', data, 1);
+            data = re.sub('(={1,6})\s?([^=]*)\s?(?:={1,6})(?:\s+)?\n', '<h' + str(wiki) + ' id="' + c + '"><a href="#toc" id="s-' + toc + '">' + toc + '.</a> ' + c + ' <span style="font-size:11px;">[<a href="/edit/' + URL_인코딩(title) + '/section/' + str(i) + '">편집</a>]</span></h' + str(wiki) + '>', data, 1);
         else:
             rtoc = rtoc + '</div>'
             break
@@ -622,30 +628,30 @@ def namumark(title, data):
             g = m.groups()
             
             if(not title == g[0]):
-                DB_실행("select * from cat where title = '" + pymysql.escape_string(g[0]) + "' and cat = '" + pymysql.escape_string(title) + "'")
+                DB_실행("select * from cat where title = '" + DB_인코딩(g[0]) + "' and cat = '" + DB_인코딩(title) + "'")
                 abb = curs.fetchall()
                 if(not abb):
-                    DB_실행("insert into cat (title, cat) value ('" + pymysql.escape_string(g[0]) + "', '" + pymysql.escape_string(title) + "')")
+                    DB_실행("insert into cat (title, cat) value ('" + DB_인코딩(g[0]) + "', '" + DB_인코딩(title) + "')")
                     DB_갱신()                
                     
                 if(category == ''):
-                    DB_실행("select * from data where title = '" + pymysql.escape_string(g[0]) + "'")
+                    DB_실행("select * from data where title = '" + DB_인코딩(g[0]) + "'")
                     exists = curs.fetchall()
                     if(exists):
                         red = ""
                     else:
                         red = 'class="not_thing"'
                         
-                    category = category + '<a ' + red + ' href="/w/' + parse.quote(g[0]) + '">' + re.sub("분류:", "", g[0]) + '</a>'
+                    category = category + '<a ' + red + ' href="/w/' + URL_인코딩(g[0]) + '">' + re.sub("분류:", "", g[0]) + '</a>'
                 else:
-                    DB_실행("select * from data where title = '" + pymysql.escape_string(g[0]) + "'")
+                    DB_실행("select * from data where title = '" + DB_인코딩(g[0]) + "'")
                     exists = curs.fetchall()
                     if(exists):
                         red = ""
                     else:
                         red = 'class="not_thing"'
                         
-                    category = category + ' / ' + '<a ' + red + ' href="/w/' + parse.quote(g[0]) + '">' + re.sub("분류:", "", g[0]) + '</a>'
+                    category = category + ' / ' + '<a ' + red + ' href="/w/' + URL_인코딩(g[0]) + '">' + re.sub("분류:", "", g[0]) + '</a>'
             
             data = re.sub("\[\[(분류:(?:(?:(?!\]\]).)*))\]\]", '', data, 1)
         else:
@@ -690,10 +696,10 @@ def namumark(title, data):
                 img = re.sub("\.(?P<in>[Jj][Pp][Gg]|[Pp][Nn][Gg]|[Gg][Ii][Ff]|[Jj][Pp][Ee][Gg])", "#\g<in>#", c[0])
                 data = re.sub("\[\[파일:((?:(?!\]\]|\?).)*)(?:\?((?:(?!\]\]).)*))?\]\]", "<a href='/w/파일:" + img + "'><img src='/image/" + img + "'></a>", data, 1)
             if(not re.search("^파일:([^\n]*)", title)):
-                DB_실행("select * from back where title = '" + pymysql.escape_string(c[0]) + "' and link = '" + pymysql.escape_string(title) + "' and type = 'redirect'")
+                DB_실행("select * from back where title = '" + DB_인코딩(c[0]) + "' and link = '" + DB_인코딩(title) + "' and type = 'redirect'")
                 abb = curs.fetchall()
                 if(not abb):
-                    DB_실행("insert into back (title, link, type) value ('파일:" + pymysql.escape_string(c[0]) + "', '" + pymysql.escape_string(title) + "',  'file')")
+                    DB_실행("insert into back (title, link, type) value ('파일:" + DB_인코딩(c[0]) + "', '" + DB_인코딩(title) + "',  'file')")
                     DB_갱신()            
         else:
             break
@@ -745,16 +751,16 @@ def namumark(title, data):
                         if(results[0] == title):
                             data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<b>' + g + '</b>', data, 1)
                         else:
-                            DB_실행("select * from data where title = '" + pymysql.escape_string(results[0]) + "'")
+                            DB_실행("select * from data where title = '" + DB_인코딩(results[0]) + "'")
                             rows = curs.fetchall()
                             if(rows):
-                                data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a title="' + results[0] + results[1] + '" href="/w/' + parse.quote(results[0]) + results[1] + '">' + g + '</a>', data, 1)
+                                data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a title="' + results[0] + results[1] + '" href="/w/' + URL_인코딩(results[0]) + results[1] + '">' + g + '</a>', data, 1)
                             else:
-                                data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a title="' + results[0] + results[1] + '" class="not_thing" href="/w/' + parse.quote(results[0]) + results[1] + '">' + g + '</a>', data, 1)
-                            DB_실행("select * from back where title = '" + pymysql.escape_string(results[0]) + "' and link = '" + pymysql.escape_string(title) + "'")
+                                data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a title="' + results[0] + results[1] + '" class="not_thing" href="/w/' + URL_인코딩(results[0]) + results[1] + '">' + g + '</a>', data, 1)
+                            DB_실행("select * from back where title = '" + DB_인코딩(results[0]) + "' and link = '" + DB_인코딩(title) + "'")
                             rows = curs.fetchall()
                             if(not rows):
-                                DB_실행("insert into back (title, link, type) value ('" + pymysql.escape_string(results[0]) + "', '" + pymysql.escape_string(title) + "', '')")
+                                DB_실행("insert into back (title, link, type) value ('" + DB_인코딩(results[0]) + "', '" + DB_인코딩(title) + "', '')")
                                 DB_갱신()
                 else:
                     b = re.search("^http(?:s)?:\/\/", results[0])
@@ -770,16 +776,16 @@ def namumark(title, data):
                         if(results[0] == title):
                             data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<b>' + results[1] + '</b>', data, 1)
                         else:
-                            DB_실행("select * from data where title = '" + pymysql.escape_string(results[0]) + "'")
+                            DB_실행("select * from data where title = '" + DB_인코딩(results[0]) + "'")
                             rows = curs.fetchall()
                             if(rows):
-                                data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a title="' + results[0] + '" href="/w/' + parse.quote(results[0]) + '">' + results[1] + '</a>', data, 1)
+                                data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a title="' + results[0] + '" href="/w/' + URL_인코딩(results[0]) + '">' + results[1] + '</a>', data, 1)
                             else:
-                                data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a title="' + results[0] + '" class="not_thing" href="/w/' + parse.quote(results[0]) + '">' + results[1] + '</a>', data, 1)
-                            DB_실행("select * from back where title = '" + pymysql.escape_string(results[0]) + "' and link = '" + pymysql.escape_string(title) + "'")
+                                data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a title="' + results[0] + '" class="not_thing" href="/w/' + URL_인코딩(results[0]) + '">' + results[1] + '</a>', data, 1)
+                            DB_실행("select * from back where title = '" + DB_인코딩(results[0]) + "' and link = '" + DB_인코딩(title) + "'")
                             rows = curs.fetchall()
                             if(not rows):
-                                DB_실행("insert into back (title, link, type) value ('" + pymysql.escape_string(results[0]) + "', '" + pymysql.escape_string(title) + "', '')")
+                                DB_실행("insert into back (title, link, type) value ('" + DB_인코딩(results[0]) + "', '" + DB_인코딩(title) + "', '')")
                                 DB_갱신()
             else:
                 aa = re.search("^(.*)(#(?:.*))$", result[0])
@@ -792,16 +798,16 @@ def namumark(title, data):
                         if(result[0] == title):
                             data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<b>' + result[0] + result[1] + '</b>', data, 1)
                         else:
-                            DB_실행("select * from data where title = '" + pymysql.escape_string(result[0]) + "'")
+                            DB_실행("select * from data where title = '" + DB_인코딩(result[0]) + "'")
                             rows = curs.fetchall()
                             if(rows):
-                                data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a href="/w/' + parse.quote(result[0]) + result[1] + '">' + result[0] + result[1] + '</a>', data, 1)
+                                data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a href="/w/' + URL_인코딩(result[0]) + result[1] + '">' + result[0] + result[1] + '</a>', data, 1)
                             else:
-                                data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a class="not_thing" href="/w/' + parse.quote(result[0]) + result[1] + '">' + result[0] + result[1] + '</a>', data, 1)
-                            DB_실행("select * from back where title = '" + pymysql.escape_string(result[0]) + "' and link = '" + pymysql.escape_string(title) + "'")
+                                data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a class="not_thing" href="/w/' + URL_인코딩(result[0]) + result[1] + '">' + result[0] + result[1] + '</a>', data, 1)
+                            DB_실행("select * from back where title = '" + DB_인코딩(result[0]) + "' and link = '" + DB_인코딩(title) + "'")
                             rows = curs.fetchall()
                             if(not rows):
-                                DB_실행("insert into back (title, link, type) value ('" + pymysql.escape_string(result[0]) + "', '" + pymysql.escape_string(title) + "', '')")
+                                DB_실행("insert into back (title, link, type) value ('" + DB_인코딩(result[0]) + "', '" + DB_인코딩(title) + "', '')")
                                 DB_갱신()
                 else:
                     b = re.search("^http(?:s)?:\/\/", result[0])
@@ -817,16 +823,16 @@ def namumark(title, data):
                         if(result[0] == title):
                             data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<b>' + result[0] + '</b>', data, 1)
                         else:
-                            DB_실행("select * from data where title = '" + pymysql.escape_string(result[0]) + "'")
+                            DB_실행("select * from data where title = '" + DB_인코딩(result[0]) + "'")
                             rows = curs.fetchall()
                             if(rows):
-                                data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a href="/w/' + parse.quote(result[0]) + '">' + result[0] + '</a>', data, 1)
+                                data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a href="/w/' + URL_인코딩(result[0]) + '">' + result[0] + '</a>', data, 1)
                             else:
-                                data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a class="not_thing" href="/w/' + parse.quote(result[0]) + '">' + result[0] + '</a>', data, 1)
-                            DB_실행("select * from back where title = '" + pymysql.escape_string(result[0]) + "' and link = '" + pymysql.escape_string(title) + "'")
+                                data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a class="not_thing" href="/w/' + URL_인코딩(result[0]) + '">' + result[0] + '</a>', data, 1)
+                            DB_실행("select * from back where title = '" + DB_인코딩(result[0]) + "' and link = '" + DB_인코딩(title) + "'")
                             rows = curs.fetchall()
                             if(not rows):
-                                DB_실행("insert into back (title, link, type) value ('" + pymysql.escape_string(result[0]) + "', '" + pymysql.escape_string(title) + "', '')")
+                                DB_실행("insert into back (title, link, type) value ('" + DB_인코딩(result[0]) + "', '" + DB_인코딩(title) + "', '')")
                                 DB_갱신()
         else:
             break
@@ -1270,7 +1276,7 @@ def getcan(ip, name):
             if(re.search("\.", g[0])):
                 return 1
             else:
-                DB_실행("select * from ban where block = '" + pymysql.escape_string(ip) + "'")
+                DB_실행("select * from ban where block = '" + DB_인코딩(ip) + "'")
                 rows = curs.fetchall()
                 if(rows):
                     return 1
@@ -1285,20 +1291,20 @@ def getcan(ip, name):
         b = re.search("^([0-9](?:[0-9]?[0-9]?)\.[0-9](?:[0-9]?[0-9]?))", ip)
         if(b):
             results = b.groups()
-            DB_실행("select * from ban where block = '" + pymysql.escape_string(results[0]) + "' and band = 'O'")
+            DB_실행("select * from ban where block = '" + DB_인코딩(results[0]) + "' and band = 'O'")
             rowss = curs.fetchall()
             if(rowss):
                 return 1
             else:
-                DB_실행("select * from ban where block = '" + pymysql.escape_string(ip) + "'")
+                DB_실행("select * from ban where block = '" + DB_인코딩(ip) + "'")
                 rows = curs.fetchall()
                 if(rows):
                     return 1
                 else:
-                    DB_실행("select * from data where title = '" + pymysql.escape_string(name) + "'")
+                    DB_실행("select * from data where title = '" + DB_인코딩(name) + "'")
                     row = curs.fetchall()
                     if(row):
-                        DB_실행("select * from user where id = '" + pymysql.escape_string(ip) + "'")
+                        DB_실행("select * from user where id = '" + DB_인코딩(ip) + "'")
                         rows = curs.fetchall()
                         if(row[0]['acl'] == 'user'):
                             if(rows):
@@ -1318,15 +1324,15 @@ def getcan(ip, name):
                     else:
                         return 0
         else:
-            DB_실행("select * from ban where block = '" + pymysql.escape_string(ip) + "'")
+            DB_실행("select * from ban where block = '" + DB_인코딩(ip) + "'")
             rows = curs.fetchall()
             if(rows):
                 return 1
             else:
-                DB_실행("select * from data where title = '" + pymysql.escape_string(name) + "'")
+                DB_실행("select * from data where title = '" + DB_인코딩(name) + "'")
                 row = curs.fetchall()
                 if(row):
-                    DB_실행("select * from user where id = '" + pymysql.escape_string(ip) + "'")
+                    DB_실행("select * from user where id = '" + DB_인코딩(ip) + "'")
                     rows = curs.fetchall()
                     if(row[0]['acl'] == 'user'):
                         if(rows):
@@ -1350,19 +1356,19 @@ def getban(ip):
     b = re.search("^([0-9](?:[0-9]?[0-9]?)\.[0-9](?:[0-9]?[0-9]?))", ip)
     if(b):
         results = b.groups()
-        DB_실행("select * from ban where block = '" + pymysql.escape_string(results[0]) + "' and band = 'O'")
+        DB_실행("select * from ban where block = '" + DB_인코딩(results[0]) + "' and band = 'O'")
         rowss = curs.fetchall()
         if(rowss):
             return 1
         else:
-            DB_실행("select * from ban where block = '" + pymysql.escape_string(ip) + "'")
+            DB_실행("select * from ban where block = '" + DB_인코딩(ip) + "'")
             rows = curs.fetchall()
             if(rows):
                 return 1
             else:
                 return 0
     else:
-        DB_실행("select * from ban where block = '" + pymysql.escape_string(ip) + "'")
+        DB_실행("select * from ban where block = '" + DB_인코딩(ip) + "'")
         rows = curs.fetchall()
         if(rows):
             return 1
@@ -1373,29 +1379,29 @@ def getdiscuss(ip, name, sub):
     b = re.search("^([0-9](?:[0-9]?[0-9]?)\.[0-9](?:[0-9]?[0-9]?))", ip)
     if(b):
         results = b.groups()
-        DB_실행("select * from ban where block = '" + pymysql.escape_string(results[0]) + "' and band = 'O'")
+        DB_실행("select * from ban where block = '" + DB_인코딩(results[0]) + "' and band = 'O'")
         rowss = curs.fetchall()
         if(rowss):
             return 1
         else:
-            DB_실행("select * from ban where block = '" + pymysql.escape_string(ip) + "'")
+            DB_실행("select * from ban where block = '" + DB_인코딩(ip) + "'")
             rows = curs.fetchall()
             if(rows):
                 return 1
             else:
-                DB_실행("select * from stop where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "'")
+                DB_실행("select * from stop where title = '" + DB_인코딩(name) + "' and sub = '" + DB_인코딩(sub) + "'")
                 rows = curs.fetchall()
                 if(rows):
                     return 1
                 else:
                     return 0
     else:
-        DB_실행("select * from ban where block = '" + pymysql.escape_string(ip) + "'")
+        DB_실행("select * from ban where block = '" + DB_인코딩(ip) + "'")
         rows = curs.fetchall()
         if(rows):
             return 1
         else:
-            DB_실행("select * from stop where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "'")
+            DB_실행("select * from stop where title = '" + DB_인코딩(name) + "' and sub = '" + DB_인코딩(sub) + "'")
             rows = curs.fetchall()
             if(rows):
                 return 1
@@ -1408,27 +1414,27 @@ def 시간():
     return s
 
 def discuss(title, sub, date):
-    DB_실행("select * from rd where title = '" + pymysql.escape_string(title) + "' and sub = '" + pymysql.escape_string(sub) + "'")
+    DB_실행("select * from rd where title = '" + DB_인코딩(title) + "' and sub = '" + DB_인코딩(sub) + "'")
     rows = curs.fetchall()
     if(rows):
-        DB_실행("update rd set date = '" + pymysql.escape_string(date) + "' where title = '" + pymysql.escape_string(title) + "' and sub = '" + pymysql.escape_string(sub) + "'")
+        DB_실행("update rd set date = '" + DB_인코딩(date) + "' where title = '" + DB_인코딩(title) + "' and sub = '" + DB_인코딩(sub) + "'")
     else:
-        DB_실행("insert into rd (title, sub, date) value ('" + pymysql.escape_string(title) + "', '" + pymysql.escape_string(sub) + "', '" + pymysql.escape_string(date) + "')")
+        DB_실행("insert into rd (title, sub, date) value ('" + DB_인코딩(title) + "', '" + DB_인코딩(sub) + "', '" + DB_인코딩(date) + "')")
     DB_갱신()
     
 def block(block, end, today, blocker, why):
-    DB_실행("insert into rb (block, end, today, blocker, why) value ('" + pymysql.escape_string(block) + "', '" + pymysql.escape_string(end) + "', '" + today + "', '" + pymysql.escape_string(blocker) + "', '" + pymysql.escape_string(why) + "')")
+    DB_실행("insert into rb (block, end, today, blocker, why) value ('" + DB_인코딩(block) + "', '" + DB_인코딩(end) + "', '" + today + "', '" + DB_인코딩(blocker) + "', '" + DB_인코딩(why) + "')")
     DB_갱신()
 
 def history(title, data, date, ip, send, leng):
-    DB_실행("select * from history where title = '" + pymysql.escape_string(title) + "' order by id+0 desc limit 1")
+    DB_실행("select * from history where title = '" + DB_인코딩(title) + "' order by id+0 desc limit 1")
     rows = curs.fetchall()
     if(rows):
         number = int(rows[0]['id']) + 1
-        DB_실행("insert into history (id, title, data, date, ip, send, leng) value ('" + str(number) + "', '" + pymysql.escape_string(title) + "', '" + pymysql.escape_string(data) + "', '" + date + "', '" + pymysql.escape_string(ip) + "', '" + pymysql.escape_string(send) + "', '" + leng + "')")
+        DB_실행("insert into history (id, title, data, date, ip, send, leng) value ('" + str(number) + "', '" + DB_인코딩(title) + "', '" + DB_인코딩(data) + "', '" + date + "', '" + DB_인코딩(ip) + "', '" + DB_인코딩(send) + "', '" + leng + "')")
         DB_갱신()
     else:
-        DB_실행("insert into history (id, title, data, date, ip, send, leng) value ('1', '" + pymysql.escape_string(title) + "', '" + pymysql.escape_string(data) + "', '" + date + "', '" + pymysql.escape_string(ip) + "', '" + pymysql.escape_string(send + ' (새 문서)') + "', '" + leng + "')")
+        DB_실행("insert into history (id, title, data, date, ip, send, leng) value ('1', '" + DB_인코딩(title) + "', '" + DB_인코딩(data) + "', '" + date + "', '" + DB_인코딩(ip) + "', '" + DB_인코딩(send + ' (새 문서)') + "', '" + leng + "')")
         DB_갱신()
 
 def getleng(existing, change):
@@ -1464,12 +1470,12 @@ def upload():
                     else:
                         file.save(os.path.join('image', filename))
                         
-                        DB_실행("insert into data (title, data, acl) value ('" + pymysql.escape_string('파일:' + filename) + "', '" + pymysql.escape_string('[[파일:' + filename + ']][br][br]{{{[[파일:' + filename + ']]}}}') + "', '')")
+                        DB_실행("insert into data (title, data, acl) value ('" + DB_인코딩('파일:' + filename) + "', '" + DB_인코딩('[[파일:' + filename + ']][br][br]{{{[[파일:' + filename + ']]}}}') + "', '')")
                         DB_갱신()
                         
                         history('파일:' + filename, '[[파일:' + filename + ']][br][br]{{{[[파일:' + filename + ']]}}}', 시간(), ip, '파일:' + filename + ' 업로드', '0')
                         
-                        return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote('파일:' + filename) + '" />'
+                        return '<meta http-equiv="refresh" content="0;url=/w/' + URL_인코딩('파일:' + filename) + '" />'
                 else:
                     return '<meta http-equiv="refresh" content="0;url=/error/15" />'
             else:
@@ -1513,9 +1519,9 @@ def adminlist():
             DB_실행("select * from data where title = '사용자:" + rows[i]['id'] + "'")
             user = curs.fetchall()
             if(user):
-                name = '<a href="/w/' + parse.quote('사용자:' + rows[i]['id']) + '">' + rows[i]['id'] + '</a> (' + acl + ')'
+                name = '<a href="/w/' + URL_인코딩('사용자:' + rows[i]['id']) + '">' + rows[i]['id'] + '</a> (' + acl + ')'
             else:
-                name = '<a class="not_thing" href="/w/' + parse.quote('사용자:' + rows[i]['id']) + '">' + rows[i]['id'] + '</a> (' + acl + ')'
+                name = '<a class="not_thing" href="/w/' + URL_인코딩('사용자:' + rows[i]['id']) + '">' + rows[i]['id'] + '</a> (' + acl + ')'
 
             div = div + '<li>' + str(i + 1) + '. ' + name + '</li>'
             
@@ -1562,31 +1568,31 @@ def recentchanges():
                 leng = '<span style="color:gray;">' + rows[i]['leng'] + '</span>'
                 
             if(admin == 1):
-                DB_실행("select * from ban where block = '" + pymysql.escape_string(rows[i]['ip']) + "'")
+                DB_실행("select * from ban where block = '" + DB_인코딩(rows[i]['ip']) + "'")
                 row = curs.fetchall()
                 if(row):
-                    ban = ' <a href="/ban/' + parse.quote(rows[i]['ip']) + '">(해제)</a>'
+                    ban = ' <a href="/ban/' + URL_인코딩(rows[i]['ip']) + '">(해제)</a>'
                 else:
-                    ban = ' <a href="/ban/' + parse.quote(rows[i]['ip']) + '">(차단)</a>'
+                    ban = ' <a href="/ban/' + URL_인코딩(rows[i]['ip']) + '">(차단)</a>'
             else:
                 ban = ''
                 
             if(re.search('\.', rows[i]['ip'])):
                 ip = rows[i]['ip']
             else:
-                DB_실행("select * from data where title = '사용자:" + pymysql.escape_string(rows[i]['ip']) + "'")
+                DB_실행("select * from data where title = '사용자:" + DB_인코딩(rows[i]['ip']) + "'")
                 row = curs.fetchall()
                 if(row):
-                    ip = '<a href="/w/' + parse.quote('사용자:' + rows[i]['ip']) + '">' + rows[i]['ip'] + '</a>'
+                    ip = '<a href="/w/' + URL_인코딩('사용자:' + rows[i]['ip']) + '">' + rows[i]['ip'] + '</a>'
                 else:
-                    ip = '<a class="not_thing" href="/w/' + parse.quote('사용자:' + rows[i]['ip']) + '">' + rows[i]['ip'] + '</a>'
+                    ip = '<a class="not_thing" href="/w/' + URL_인코딩('사용자:' + rows[i]['ip']) + '">' + rows[i]['ip'] + '</a>'
                     
             if((int(rows[i]['id']) - 1) == 0):
                 revert = ''
             else:
-                revert = '<a href="/revert/' + parse.quote(rows[i]['title']) + '/r/' + str(int(rows[i]['id']) - 1) + '">(되돌리기)</a>'
+                revert = '<a href="/revert/' + URL_인코딩(rows[i]['title']) + '/r/' + str(int(rows[i]['id']) - 1) + '">(되돌리기)</a>'
                 
-            div = div + '<table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;"><a href="/w/' + parse.quote(rows[i]['title']) + '">' + title + '</a> <a href="/history/' + parse.quote(rows[i]['title']) + '/n/1">(역사)</a> ' + revert + ' (' + leng + ')</td><td style="text-align: center;width:33.33%;">' + ip + ban + '</td><td style="text-align: center;width:33.33%;">' + rows[i]['date'] + '</td></tr><tr><td colspan="3" style="text-align: center;width:100%;">' + send + '</td></tr></tbody></table>'
+            div = div + '<table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;"><a href="/w/' + URL_인코딩(rows[i]['title']) + '">' + title + '</a> <a href="/history/' + URL_인코딩(rows[i]['title']) + '/n/1">(역사)</a> ' + revert + ' (' + leng + ')</td><td style="text-align: center;width:33.33%;">' + ip + ban + '</td><td style="text-align: center;width:33.33%;">' + rows[i]['date'] + '</td></tr><tr><td colspan="3" style="text-align: center;width:100%;">' + send + '</td></tr></tbody></table>'
             
             i = i + 1
             
@@ -1597,16 +1603,16 @@ def recentchanges():
 @app.route('/history/<path:name>/r/<int:num>/hidden')
 def hidden(name = None, num = None):
     if(소유자_확인() == 1):
-        DB_실행("select * from hidhi where title = '" + pymysql.escape_string(name) + "' and re = '" + pymysql.escape_string(str(num)) + "'")
+        DB_실행("select * from hidhi where title = '" + DB_인코딩(name) + "' and re = '" + DB_인코딩(str(num)) + "'")
         rows = curs.fetchall()
         if(rows):
-            DB_실행("delete from hidhi where title = '" + pymysql.escape_string(name) + "' and re = '" + pymysql.escape_string(str(num)) + "'")
+            DB_실행("delete from hidhi where title = '" + DB_인코딩(name) + "' and re = '" + DB_인코딩(str(num)) + "'")
         else:
-            DB_실행("insert into hidhi (title, re) value ('" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(str(num)) + "')")
+            DB_실행("insert into hidhi (title, re) value ('" + DB_인코딩(name) + "', '" + DB_인코딩(str(num)) + "')")
         DB_갱신()
-        return '<meta http-equiv="refresh" content="0;url=/history/' + parse.quote(name) + '/n/1" />'
+        return '<meta http-equiv="refresh" content="0;url=/history/' + URL_인코딩(name) + '/n/1" />'
     else:
-        return '<meta http-equiv="refresh" content="0;url=/history/' + parse.quote(name) + '/n/1" />'
+        return '<meta http-equiv="refresh" content="0;url=/history/' + URL_인코딩(name) + '/n/1" />'
         
 @app.route('/record/<path:name>/n/<int:number>')
 def record(name = None, number = None):
@@ -1614,7 +1620,7 @@ def record(name = None, number = None):
     i = v - 50
     div = '<div>'
     
-    DB_실행("select * from history where ip = '" + pymysql.escape_string(name) + "' order by date desc")
+    DB_실행("select * from history where ip = '" + DB_인코딩(name) + "' order by date desc")
     rows = curs.fetchall()
     if(rows):
         admin = 관리자_확인()
@@ -1625,7 +1631,7 @@ def record(name = None, number = None):
             except:
                 div = div + '</div>'
                 if(number != 1):
-                    div = div + '<br><a href="/record/' + parse.quote(name) + '/n/' + str(number - 1) + '">(이전)'
+                    div = div + '<br><a href="/record/' + URL_인코딩(name) + '/n/' + str(number - 1) + '">(이전)'
                 break
                 
             if(rows[i]['send']):
@@ -1649,38 +1655,38 @@ def record(name = None, number = None):
                 leng = '<span style="color:gray;">' + rows[i]['leng'] + '</span>'
                 
             if(admin == 1):
-                DB_실행("select * from ban where block = '" + pymysql.escape_string(rows[i]['ip']) + "'")
+                DB_실행("select * from ban where block = '" + DB_인코딩(rows[i]['ip']) + "'")
                 row = curs.fetchall()
                 if(row):
-                    ban = ' <a href="/ban/' + parse.quote(rows[i]['ip']) + '">(해제)</a>'
+                    ban = ' <a href="/ban/' + URL_인코딩(rows[i]['ip']) + '">(해제)</a>'
                 else:
-                    ban = ' <a href="/ban/' + parse.quote(rows[i]['ip']) + '">(차단)</a>'
+                    ban = ' <a href="/ban/' + URL_인코딩(rows[i]['ip']) + '">(차단)</a>'
             else:
                 ban = ''
                 
             if(re.search('\.', rows[i]['ip'])):
                 ip = rows[i]['ip']
             else:
-                DB_실행("select * from data where title = '사용자:" + pymysql.escape_string(rows[i]['ip']) + "'")
+                DB_실행("select * from data where title = '사용자:" + DB_인코딩(rows[i]['ip']) + "'")
                 row = curs.fetchall()
                 if(row):
-                    ip = '<a href="/w/' + parse.quote('사용자:' + rows[i]['ip']) + '">' + rows[i]['ip'] + '</a>'
+                    ip = '<a href="/w/' + URL_인코딩('사용자:' + rows[i]['ip']) + '">' + rows[i]['ip'] + '</a>'
                 else:
-                    ip = '<a class="not_thing" href="/w/' + parse.quote('사용자:' + rows[i]['ip']) + '">' + rows[i]['ip'] + '</a>'
+                    ip = '<a class="not_thing" href="/w/' + URL_인코딩('사용자:' + rows[i]['ip']) + '">' + rows[i]['ip'] + '</a>'
                     
             if((int(rows[i]['id']) - 1) == 0):
                 revert = ''
             else:
-                revert = '<a href="/revert/' + parse.quote(rows[i]['title']) + '/r/' + str(int(rows[i]['id']) - 1) + '">(되돌리기)</a>'
+                revert = '<a href="/revert/' + URL_인코딩(rows[i]['title']) + '/r/' + str(int(rows[i]['id']) - 1) + '">(되돌리기)</a>'
                 
-            div = div + '<table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;"><a href="/w/' + parse.quote(rows[i]['title']) + '">' + title + '</a> r' + rows[i]['id'] + ' <a href="/history/' + parse.quote(rows[i]['title']) + '/n/1">(역사)</a> ' + revert + ' (' + leng + ')</td><td style="text-align: center;width:33.33%;">' + ip + ban +  '</td><td style="text-align: center;width:33.33%;">' + rows[i]['date'] + '</td></tr><tr><td colspan="3" style="text-align: center;width:100%;">' + send + '</td></tr></tbody></table>'
+            div = div + '<table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;"><a href="/w/' + URL_인코딩(rows[i]['title']) + '">' + title + '</a> r' + rows[i]['id'] + ' <a href="/history/' + URL_인코딩(rows[i]['title']) + '/n/1">(역사)</a> ' + revert + ' (' + leng + ')</td><td style="text-align: center;width:33.33%;">' + ip + ban +  '</td><td style="text-align: center;width:33.33%;">' + rows[i]['date'] + '</td></tr><tr><td colspan="3" style="text-align: center;width:100%;">' + send + '</td></tr></tbody></table>'
             
             if(i == v):
                 div = div + '</div>'
                 if(number == 1):
-                    div = div + '<br><a href="/record/' + parse.quote(name) + '/n/' + str(number + 1) + '">(다음)'
+                    div = div + '<br><a href="/record/' + URL_인코딩(name) + '/n/' + str(number + 1) + '">(다음)'
                 else:
-                    div = div + '<br><a href="/record/' + parse.quote(name) + '/n/' + str(number - 1) + '">(이전) <a href="/record/' + parse.quote(name) + '/n/' + str(number + 1) + '">(다음)'
+                    div = div + '<br><a href="/record/' + URL_인코딩(name) + '/n/' + str(number - 1) + '">(이전) <a href="/record/' + URL_인코딩(name) + '/n/' + str(number + 1) + '">(다음)'
                 break
             else:
                 i = i + 1
@@ -1709,24 +1715,24 @@ def userlog(number = None):
                 break
                 
             if(admin == 1):
-                DB_실행("select * from ban where block = '" + pymysql.escape_string(rows[i]['id']) + "'")
+                DB_실행("select * from ban where block = '" + DB_인코딩(rows[i]['id']) + "'")
                 row = curs.fetchall()
                 if(row):
-                    ban = ' <a href="/ban/' + parse.quote(rows[i]['id']) + '">(해제)</a>'
+                    ban = ' <a href="/ban/' + URL_인코딩(rows[i]['id']) + '">(해제)</a>'
                 else:
-                    ban = ' <a href="/ban/' + parse.quote(rows[i]['id']) + '">(차단)</a>'
+                    ban = ' <a href="/ban/' + URL_인코딩(rows[i]['id']) + '">(차단)</a>'
             else:
                 ban = ''
                 
             if(re.search('\.', rows[i]['id'])):
                 ip = rows[i]['id']
             else:
-                DB_실행("select * from data where title = '사용자:" + pymysql.escape_string(rows[i]['id']) + "'")
+                DB_실행("select * from data where title = '사용자:" + DB_인코딩(rows[i]['id']) + "'")
                 row = curs.fetchall()
                 if(row):
-                    ip = '<a href="/w/' + parse.quote('사용자:' + rows[i]['id']) + '">' + rows[i]['id'] + '</a>'
+                    ip = '<a href="/w/' + URL_인코딩('사용자:' + rows[i]['id']) + '">' + rows[i]['id'] + '</a>'
                 else:
-                    ip = '<a class="not_thing" href="/w/' + parse.quote('사용자:' + rows[i]['id']) + '">' + rows[i]['id'] + '</a>'
+                    ip = '<a class="not_thing" href="/w/' + URL_인코딩('사용자:' + rows[i]['id']) + '">' + rows[i]['id'] + '</a>'
                 
             div = div + '<li>' + str(i + 1) + '. ' + ip + ban + '</li>'
             
@@ -1750,7 +1756,7 @@ def backlink(name = None, number = None):
     div = ''
     restart = 0
     
-    DB_실행("select * from back where title = '" + pymysql.escape_string(name) + "' order by link asc")
+    DB_실행("select * from back where title = '" + DB_인코딩(name) + "' order by link asc")
     rows = curs.fetchall()
     if(rows):        
         while(True):
@@ -1762,16 +1768,16 @@ def backlink(name = None, number = None):
                 break
                 
             if(rows[i]['type'] == 'include'):
-                DB_실행("select * from back where title = '" + pymysql.escape_string(name) + "' and link = '" + pymysql.escape_string(rows[i]['link']) + "' and type = ''")
+                DB_실행("select * from back where title = '" + DB_인코딩(name) + "' and link = '" + DB_인코딩(rows[i]['link']) + "' and type = ''")
                 test = curs.fetchall()
                 if(test):
                     restart = 1
                     
-                    DB_실행("delete from back where title = '" + pymysql.escape_string(name) + "' and link = '" + pymysql.escape_string(rows[i]['link']) + "' and type = ''")
+                    DB_실행("delete from back where title = '" + DB_인코딩(name) + "' and link = '" + DB_인코딩(rows[i]['link']) + "' and type = ''")
                     DB_갱신()
                 
             if(not re.search('^사용자:', rows[i]['link'])):
-                DB_실행("select * from data where title = '" + pymysql.escape_string(rows[i]['link']) + "'")
+                DB_실행("select * from data where title = '" + DB_인코딩(rows[i]['link']) + "'")
                 row = curs.fetchall()
                 if(row):
                     aa = row[0]['data']
@@ -1779,8 +1785,8 @@ def backlink(name = None, number = None):
                     aa = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', '[[\g<in>]]', aa)
                     aa = namumark('', aa)
                     
-                    if(re.search("<a(?:(?:(?!href=).)*)?href=\"\/w\/" + parse.quote(name) + "(?:\#[^\"]*)?\">([^<]*)<\/a>", aa)):
-                        div = div + '<li><a href="/w/' + parse.quote(rows[i]['link']) + '">' + rows[i]['link'] + '</a>'
+                    if(re.search("<a(?:(?:(?!href=).)*)?href=\"\/w\/" + URL_인코딩(name) + "(?:\#[^\"]*)?\">([^<]*)<\/a>", aa)):
+                        div = div + '<li><a href="/w/' + URL_인코딩(rows[i]['link']) + '">' + rows[i]['link'] + '</a>'
                         
                         if(rows[i]['type']):
                             div = div + ' (' + rows[i]['type'] + ')</li>'
@@ -1789,34 +1795,34 @@ def backlink(name = None, number = None):
                             
                         if(i == v):
                             if(number == 1):
-                                div = div + '<br><a href="/backlink/' + parse.quote(name) + '/n/' + str(number + 1) + '">(다음)'
+                                div = div + '<br><a href="/backlink/' + URL_인코딩(name) + '/n/' + str(number + 1) + '">(다음)'
                             else:
-                                div = div + '<br><a href="/backlink/' + parse.quote(name) + '/n/' + str(number - 1) + '">(이전) <a href="/backlink/' + parse.quote(name) + '/n/' + str(number + 1) + '">(다음)'
+                                div = div + '<br><a href="/backlink/' + URL_인코딩(name) + '/n/' + str(number - 1) + '">(이전) <a href="/backlink/' + URL_인코딩(name) + '/n/' + str(number + 1) + '">(다음)'
                                 
                             break
                         else:
                             i = i + 1
                     else:
-                        DB_실행("delete from back where title = '" + pymysql.escape_string(name) + "' and link = '" + pymysql.escape_string(rows[i]['link']) + "'")
+                        DB_실행("delete from back where title = '" + DB_인코딩(name) + "' and link = '" + DB_인코딩(rows[i]['link']) + "'")
                         DB_갱신()
                         
                         i = i + 1
                         v = v + 1
                 else:
-                    DB_실행("delete from back where title = '" + pymysql.escape_string(name) + "' and link = '" + pymysql.escape_string(rows[i]['link']) + "'")
+                    DB_실행("delete from back where title = '" + DB_인코딩(name) + "' and link = '" + DB_인코딩(rows[i]['link']) + "'")
                     DB_갱신()
                     
                     i = i + 1
                     v = v + 1
             else:
-                DB_실행("delete from back where title = '" + pymysql.escape_string(name) + "' and link = '" + pymysql.escape_string(rows[i]['link']) + "'")
+                DB_실행("delete from back where title = '" + DB_인코딩(name) + "' and link = '" + DB_인코딩(rows[i]['link']) + "'")
                 DB_갱신()
                 
                 i = i + 1
                 v = v + 1
                 
         if(restart == 1):
-            return '<meta http-equiv="refresh" content="0;url=/backlink/' + parse.quote(name) + '/n/' + str(number) + '" />'
+            return '<meta http-equiv="refresh" content="0;url=/backlink/' + URL_인코딩(name) + '/n/' + str(number) + '" />'
         else:    
             return render_template('index.html', logo = data['name'], data = div, title = name, sub = '역링크')
     else:
@@ -1845,7 +1851,7 @@ def recentdiscuss():
             sub = re.sub('<', '&lt;', sub)
             sub = re.sub('>', '&gt;', sub)
             
-            div = div + '<table style="width: 100%;"><tbody><tr><td style="text-align: center;width:50%;"><a href="/topic/' + parse.quote(rows[i]['title']) + '/sub/' + parse.quote(rows[i]['sub']) + '">' + title + '</a> (' + sub + ')</td><td style="text-align: center;width:50%;">' + rows[i]['date'] + '</td></tr></tbody></table>'
+            div = div + '<table style="width: 100%;"><tbody><tr><td style="text-align: center;width:50%;"><a href="/topic/' + URL_인코딩(rows[i]['title']) + '/sub/' + URL_인코딩(rows[i]['sub']) + '">' + title + '</a> (' + sub + ')</td><td style="text-align: center;width:50%;">' + rows[i]['date'] + '</td></tr></tbody></table>'
             
             i = i + 1
             
@@ -1904,14 +1910,14 @@ def blocklog(number = None):
 @app.route('/history/<path:name>/n/<int:number>', methods=['POST', 'GET'])
 def gethistory(name = None, number = None):
     if(request.method == 'POST'):
-        return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name) + '/r/' + request.form["b"] + '/diff/' + request.form["a"] + '" />'
+        return '<meta http-equiv="refresh" content="0;url=/w/' + URL_인코딩(name) + '/r/' + request.form["b"] + '/diff/' + request.form["a"] + '" />'
     else:
         select = ''
         v = number * 50
         i = v - 50
         div = '<div>'
         
-        DB_실행("select * from history where title = '" + pymysql.escape_string(name) + "' order by id+0 desc")
+        DB_실행("select * from history where title = '" + DB_인코딩(name) + "' order by id+0 desc")
         rows = curs.fetchall()
         if(rows):
             admin = 관리자_확인()
@@ -1925,7 +1931,7 @@ def gethistory(name = None, number = None):
                     div = div + '</div>'
                     
                     if(number != 1):
-                        div = div + '<br><a href="/history/' + parse.quote(name) + '/n/' + str(number - 1) + '">(이전)'
+                        div = div + '<br><a href="/history/' + URL_인코딩(name) + '/n/' + str(number - 1) + '">(이전)'
                     break
                     
                 select = '<option value="' + str(i + 1) + '">' + str(i + 1) + '</option>' + select
@@ -1948,43 +1954,43 @@ def gethistory(name = None, number = None):
                 if(re.search("\.", rows[i]["ip"])):
                     ip = rows[i]["ip"]
                 else:
-                    DB_실행("select * from data where title = '사용자:" + pymysql.escape_string(rows[i]['ip']) + "'")
+                    DB_실행("select * from data where title = '사용자:" + DB_인코딩(rows[i]['ip']) + "'")
                     row = curs.fetchall()
                     if(row):
-                        ip = '<a href="/w/' + parse.quote('사용자:' + rows[i]['ip']) + '">' + rows[i]['ip'] + '</a>'
+                        ip = '<a href="/w/' + URL_인코딩('사용자:' + rows[i]['ip']) + '">' + rows[i]['ip'] + '</a>'
                     else:
-                        ip = '<a class="not_thing" href="/w/' + parse.quote('사용자:' + rows[i]['ip']) + '">' + rows[i]['ip'] + '</a>'
+                        ip = '<a class="not_thing" href="/w/' + URL_인코딩('사용자:' + rows[i]['ip']) + '">' + rows[i]['ip'] + '</a>'
                         
                 if(admin == 1):
-                    DB_실행("select * from user where id = '" + pymysql.escape_string(rows[i]['ip']) + "'")
+                    DB_실행("select * from user where id = '" + DB_인코딩(rows[i]['ip']) + "'")
                     row = curs.fetchall()
                     if(row):
                         if(row[0]['acl'] == 'owner' or row[0]['acl'] == 'admin'):
                             ban = ''
                         else:
-                            DB_실행("select * from ban where block = '" + pymysql.escape_string(rows[i]['ip']) + "'")
+                            DB_실행("select * from ban where block = '" + DB_인코딩(rows[i]['ip']) + "'")
                             row = curs.fetchall()
                             if(row):
-                                ban = ' <a href="/ban/' + parse.quote(rows[i]['ip']) + '">(해제)</a>'
+                                ban = ' <a href="/ban/' + URL_인코딩(rows[i]['ip']) + '">(해제)</a>'
                             else:
-                                ban = ' <a href="/ban/' + parse.quote(rows[i]['ip']) + '">(차단)</a>'
+                                ban = ' <a href="/ban/' + URL_인코딩(rows[i]['ip']) + '">(차단)</a>'
                     else:
-                        DB_실행("select * from ban where block = '" + pymysql.escape_string(rows[i]['ip']) + "'")
+                        DB_실행("select * from ban where block = '" + DB_인코딩(rows[i]['ip']) + "'")
                         row = curs.fetchall()
                         if(row):
-                            ban = ' <a href="/ban/' + parse.quote(rows[i]['ip']) + '">(해제)</a>'
+                            ban = ' <a href="/ban/' + URL_인코딩(rows[i]['ip']) + '">(해제)</a>'
                         else:
-                            ban = ' <a href="/ban/' + parse.quote(rows[i]['ip']) + '">(차단)</a>'
+                            ban = ' <a href="/ban/' + URL_인코딩(rows[i]['ip']) + '">(차단)</a>'
                     if(소유자_확인() == 1):
-                        DB_실행("select * from hidhi where title = '" + pymysql.escape_string(name) + "' and re = '" + pymysql.escape_string(rows[i]['id']) + "'")
+                        DB_실행("select * from hidhi where title = '" + DB_인코딩(name) + "' and re = '" + DB_인코딩(rows[i]['id']) + "'")
                         row = curs.fetchall()
                         if(row):                            
                             ip = ip + ' (숨김)'                            
-                            hidden = ' <a href="/history/' + parse.quote(name) + '/r/' + rows[i]['id'] + '/hidden">(공개)'
+                            hidden = ' <a href="/history/' + URL_인코딩(name) + '/r/' + rows[i]['id'] + '/hidden">(공개)'
                         else:
-                            hidden = ' <a href="/history/' + parse.quote(name) + '/r/' + rows[i]['id'] + '/hidden">(숨김)'
+                            hidden = ' <a href="/history/' + URL_인코딩(name) + '/r/' + rows[i]['id'] + '/hidden">(숨김)'
                     else:
-                        DB_실행("select * from hidhi where title = '" + pymysql.escape_string(name) + "' and re = '" + pymysql.escape_string(rows[i]['id']) + "'")
+                        DB_실행("select * from hidhi where title = '" + DB_인코딩(name) + "' and re = '" + DB_인코딩(rows[i]['id']) + "'")
                         row = curs.fetchall()
                         if(row):
                             ip = '숨김'
@@ -1998,7 +2004,7 @@ def gethistory(name = None, number = None):
                 else:
                     ban = ''
                     
-                    DB_실행("select * from hidhi where title = '" + pymysql.escape_string(name) + "' and re = '" + pymysql.escape_string(rows[i]['id']) + "'")
+                    DB_실행("select * from hidhi where title = '" + DB_인코딩(name) + "' and re = '" + DB_인코딩(rows[i]['id']) + "'")
                     row = curs.fetchall()
                     if(row):
                         ip = '숨김'
@@ -2010,47 +2016,47 @@ def gethistory(name = None, number = None):
                     else:
                         hidden = ''                
                         
-                div = div + '<table style="width: 100%;' + style + '"><tbody><tr><td style="text-align: center;width:33.33%;">r' + rows[i]['id'] + '</a> <a href="/w/' + parse.quote(rows[i]['title']) + '/r/' + rows[i]['id'] + '">(w)</a> <a href="/w/' + parse.quote(rows[i]['title']) + '/raw/' + rows[i]['id'] + '">(Raw)</a> <a href="/revert/' + parse.quote(rows[i]['title']) + '/r/' + rows[i]['id'] + '">(되돌리기)</a> (' + leng + ')</td><td style="text-align: center;width:33.33%;">' + ip + ban + hidden + '</td><td style="text-align: center;width:33.33%;">' + rows[i]['date'] + '</td></tr><tr><td colspan="3" style="text-align: center;width:100%;">' + send + '</td></tr></tbody></table>'
+                div = div + '<table style="width: 100%;' + style + '"><tbody><tr><td style="text-align: center;width:33.33%;">r' + rows[i]['id'] + '</a> <a href="/w/' + URL_인코딩(rows[i]['title']) + '/r/' + rows[i]['id'] + '">(w)</a> <a href="/w/' + URL_인코딩(rows[i]['title']) + '/raw/' + rows[i]['id'] + '">(Raw)</a> <a href="/revert/' + URL_인코딩(rows[i]['title']) + '/r/' + rows[i]['id'] + '">(되돌리기)</a> (' + leng + ')</td><td style="text-align: center;width:33.33%;">' + ip + ban + hidden + '</td><td style="text-align: center;width:33.33%;">' + rows[i]['date'] + '</td></tr><tr><td colspan="3" style="text-align: center;width:100%;">' + send + '</td></tr></tbody></table>'
                 
                 if(i == v):
                     div = div + '</div>'
                     
                     if(number == 1):
-                        div = div + '<br><a href="/history/' + parse.quote(name) + '/n/' + str(number + 1) + '">(다음)'
+                        div = div + '<br><a href="/history/' + URL_인코딩(name) + '/n/' + str(number + 1) + '">(다음)'
                     else:
-                        div = div + '<br><a href="/history/' + parse.quote(name) + '/n/' + str(number - 1) + '">(이전) <a href="/history/' + parse.quote(name) + '/n/' + str(number + 1) + '">(다음)'
+                        div = div + '<br><a href="/history/' + URL_인코딩(name) + '/n/' + str(number - 1) + '">(이전) <a href="/history/' + URL_인코딩(name) + '/n/' + str(number + 1) + '">(다음)'
                         
                     break
                 else:
                     i = i + 1
                     
-            return render_template('index.html', logo = data['name'], rows = div, tn = 5, title = name, page = parse.quote(name), select = select, sub = '역사')
+            return render_template('index.html', logo = data['name'], rows = div, tn = 5, title = name, page = URL_인코딩(name), select = select, sub = '역사')
         else:
-            return render_template('index.html', logo = data['name'], rows = '', tn = 5, title = name, page = parse.quote(name), select = select, sub = '역사')
+            return render_template('index.html', logo = data['name'], rows = '', tn = 5, title = name, page = URL_인코딩(name), select = select, sub = '역사')
 
 @app.route('/search', methods=['POST'])
 def search():
-    DB_실행("select * from data where title = '" + pymysql.escape_string(request.form["search"]) + "'")
+    DB_실행("select * from data where title = '" + DB_인코딩(request.form["search"]) + "'")
     rows = curs.fetchall()
     if(rows):
-        return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(request.form["search"]) + '" />'
+        return '<meta http-equiv="refresh" content="0;url=/w/' + URL_인코딩(request.form["search"]) + '" />'
     else:
-        DB_실행("select * from data where title like '%" + pymysql.escape_string(request.form["search"]) + "%'")
+        DB_실행("select * from data where title like '%" + DB_인코딩(request.form["search"]) + "%'")
         rows = curs.fetchall()
         if(rows):
             i = 0
             
-            div = '<li>문서가 없습니다. <a href="/w/' + parse.quote(request.form["search"]) + '">바로가기</a></li><br>'
+            div = '<li>문서가 없습니다. <a href="/w/' + URL_인코딩(request.form["search"]) + '">바로가기</a></li><br>'
             
             while(True):
                 try:
-                    div = div + '<li><a href="/w/' + parse.quote(rows[i]['title']) + '">' + rows[i]['title'] + '</a></li>'
+                    div = div + '<li><a href="/w/' + URL_인코딩(rows[i]['title']) + '">' + rows[i]['title'] + '</a></li>'
                 except:
                     break
                     
                 i = i + 1
         else:
-            return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(request.form["search"]) + '" />'
+            return '<meta http-equiv="refresh" content="0;url=/w/' + URL_인코딩(request.form["search"]) + '" />'
             
         return render_template('index.html', logo = data['name'], data = div, title = '검색')
 
@@ -2059,7 +2065,7 @@ def search():
 def w(name = None, redirect = None):
     i = 0
     
-    DB_실행("select * from rd where title = '" + pymysql.escape_string(name) + "' order by date asc")
+    DB_실행("select * from rd where title = '" + DB_인코딩(name) + "' order by date asc")
     rows = curs.fetchall()
     while(True):
         try:
@@ -2068,7 +2074,7 @@ def w(name = None, redirect = None):
             topic = ""
             break
             
-        DB_실행("select * from stop where title = '" + pymysql.escape_string(rows[i]['title']) + "' and sub = '" + pymysql.escape_string(rows[i]['sub']) + "' and close = 'O'")
+        DB_실행("select * from stop where title = '" + DB_인코딩(rows[i]['title']) + "' and sub = '" + DB_인코딩(rows[i]['sub']) + "' and close = 'O'")
         row = curs.fetchall()
         if(not row):
             topic = "open"
@@ -2089,7 +2095,7 @@ def w(name = None, redirect = None):
         style = "display:none;"
         
     if(re.search("^분류:", name)):
-        DB_실행("select * from cat where title = '" + pymysql.escape_string(name) + "' order by cat asc")
+        DB_실행("select * from cat where title = '" + DB_인코딩(name) + "' order by cat asc")
         rows = curs.fetchall()
         if(rows):
             div = ''
@@ -2101,7 +2107,7 @@ def w(name = None, redirect = None):
                 except:
                     break
                     
-                DB_실행("select * from data where title = '" + pymysql.escape_string(rows[i]['cat']) + "'")
+                DB_실행("select * from data where title = '" + DB_인코딩(rows[i]['cat']) + "'")
                 row = curs.fetchall()
                 if(row):
                     aa = row[0]['data']                  
@@ -2114,34 +2120,34 @@ def w(name = None, redirect = None):
                         if(mm):
                             ee = mm.groups()
                             
-                            if(re.search("<a (class=\"not_thing\")? href=\"\/w\/" + parse.quote(name) + "\">" + ee[0] + "<\/a>", cc[0])):
-                                div = div + '<li><a href="/w/' + parse.quote(rows[i]['cat']) + '">' + rows[i]['cat'] + '</a></li>'
+                            if(re.search("<a (class=\"not_thing\")? href=\"\/w\/" + URL_인코딩(name) + "\">" + ee[0] + "<\/a>", cc[0])):
+                                div = div + '<li><a href="/w/' + URL_인코딩(rows[i]['cat']) + '">' + rows[i]['cat'] + '</a></li>'
                                 
                                 i = i + 1
                             else:
-                                DB_실행("delete from cat where title = '" + pymysql.escape_string(name) + "' and cat = '" + pymysql.escape_string(rows[i]['cat']) + "'")
+                                DB_실행("delete from cat where title = '" + DB_인코딩(name) + "' and cat = '" + DB_인코딩(rows[i]['cat']) + "'")
                                 DB_갱신()
                                 
                                 i = i + 1
                         else:
-                            DB_실행("delete from cat where title = '" + pymysql.escape_string(name) + "' and cat = '" + pymysql.escape_string(rows[i]['cat']) + "'")
+                            DB_실행("delete from cat where title = '" + DB_인코딩(name) + "' and cat = '" + DB_인코딩(rows[i]['cat']) + "'")
                             DB_갱신()
                             
                             i = i + 1
                     else:
-                        DB_실행("delete from cat where title = '" + pymysql.escape_string(name) + "' and cat = '" + pymysql.escape_string(rows[i]['cat']) + "'")
+                        DB_실행("delete from cat where title = '" + DB_인코딩(name) + "' and cat = '" + DB_인코딩(rows[i]['cat']) + "'")
                         DB_갱신()
                         
                         i = i + 1
                 else:
-                    DB_실행("delete from cat where title = '" + pymysql.escape_string(name) + "' and cat = '" + pymysql.escape_string(rows[i]['cat']) + "'")
+                    DB_실행("delete from cat where title = '" + DB_인코딩(name) + "' and cat = '" + DB_인코딩(rows[i]['cat']) + "'")
                     DB_갱신()
                     
                     i = i + 1
                     
             div = '<h2>분류</h2>' + div
             
-            DB_실행("select * from data where title = '" + pymysql.escape_string(name) + "'")
+            DB_실행("select * from data where title = '" + DB_인코딩(name) + "'")
             bb = curs.fetchall()
             if(bb):
                 if(bb[0]['acl'] == 'admin'):
@@ -2161,13 +2167,13 @@ def w(name = None, redirect = None):
                 else:
                     left = ''
                     
-                return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = enddata + '<br>' + div, license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, redirect = redirect, login = nowlogin())
+                return render_template('index.html', title = name, logo = data['name'], page = URL_인코딩(name), data = enddata + '<br>' + div, license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, redirect = redirect, login = nowlogin())
             else:
-                return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = div, license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, redirect = redirect, login = nowlogin())
+                return render_template('index.html', title = name, logo = data['name'], page = URL_인코딩(name), data = div, license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, redirect = redirect, login = nowlogin())
         else:
-            return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = '분류 문서 없음', license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, redirect = redirect, login = nowlogin()), 404
+            return render_template('index.html', title = name, logo = data['name'], page = URL_인코딩(name), data = '분류 문서 없음', license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, redirect = redirect, login = nowlogin()), 404
     else:                    
-        DB_실행("select * from data where title = '" + pymysql.escape_string(name) + "'")
+        DB_실행("select * from data where title = '" + DB_인코딩(name) + "'")
         rows = curs.fetchall()
         if(rows):
             if(rows[0]['acl'] == 'admin'):
@@ -2182,7 +2188,7 @@ def w(name = None, redirect = None):
             if(m):
                 g = m.groups()
                 
-                DB_실행("select * from user where id = '" + pymysql.escape_string(g[0]) + "'")
+                DB_실행("select * from user where id = '" + DB_인코딩(g[0]) + "'")
                 test = curs.fetchall()
                 if(test):
                     if(test[0]['acl'] == 'owner'):
@@ -2190,7 +2196,7 @@ def w(name = None, redirect = None):
                     elif(test[0]['acl'] == 'admin'):
                         acl = '(관리자)'
 
-                DB_실행("select * from ban where block = '" + pymysql.escape_string(g[0]) + "'")
+                DB_실행("select * from ban where block = '" + DB_인코딩(g[0]) + "'")
                 user = curs.fetchall()
                 if(user):
                     elsedata = '{{{#!wiki style="border:2px solid red;padding:10px;"\r\n{{{+2 {{{#red 이 사용자는 차단 당했습니다.}}}}}}\r\n\r\n차단 해제 일 : ' + user[0]['end'] + '[br]사유 : ' + user[0]['why'] + '}}}[br]' + rows[0]['data']
@@ -2208,13 +2214,13 @@ def w(name = None, redirect = None):
             else:
                 left = ''
                 
-            return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = enddata, license = data['license'], tn = 1, acl = acl, left = left, uppage = uppage, style = style, topic = topic, redirect = redirect, login = nowlogin())
+            return render_template('index.html', title = name, logo = data['name'], page = URL_인코딩(name), data = enddata, license = data['license'], tn = 1, acl = acl, left = left, uppage = uppage, style = style, topic = topic, redirect = redirect, login = nowlogin())
         else:
             m = re.search("^사용자:(.*)", name)
             if(m):
                 g = m.groups()
                 
-                DB_실행("select * from ban where block = '" + pymysql.escape_string(g[0]) + "'")
+                DB_실행("select * from ban where block = '" + DB_인코딩(g[0]) + "'")
                 user = curs.fetchall()
                 if(user):
                     elsedata = '{{{#!wiki style="border:2px solid red;padding:10px;"\r\n{{{+2 {{{#red 이 사용자는 차단 당했습니다.}}}}}}\r\n\r\n차단 해제 일 : ' + user[0]['end'] + '[br]사유 : ' + user[0]['why'] + '}}}[br]' + '문서 없음'
@@ -2223,15 +2229,15 @@ def w(name = None, redirect = None):
             else:
                 elsedata = '문서 없음'
             
-            return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = namumark(name, elsedata), license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, redirect = redirect, login = nowlogin()), 404
+            return render_template('index.html', title = name, logo = data['name'], page = URL_인코딩(name), data = namumark(name, elsedata), license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, redirect = redirect, login = nowlogin()), 404
 
 @app.route('/w/<path:name>/r/<int:number>')
 def rew(name = None, number = None):
-    DB_실행("select * from hidhi where title = '" + pymysql.escape_string(name) + "' and re = '" + pymysql.escape_string(str(number)) + "'")
+    DB_실행("select * from hidhi where title = '" + DB_인코딩(name) + "' and re = '" + DB_인코딩(str(number)) + "'")
     row = curs.fetchall()
     if(row):
         if(소유자_확인() == 1):
-            DB_실행("select * from history where title = '" + pymysql.escape_string(name) + "' and id = '" + str(number) + "'")
+            DB_실행("select * from history where title = '" + DB_인코딩(name) + "' and id = '" + str(number) + "'")
             rows = curs.fetchall()
             if(rows):
                 enddata = namumark(name, rows[0]['data'])
@@ -2243,13 +2249,13 @@ def rew(name = None, number = None):
                 else:
                     left = ''
                     
-                return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = enddata, license = data['license'], tn = 6, left = left, sub = '옛 문서')
+                return render_template('index.html', title = name, logo = data['name'], page = URL_인코딩(name), data = enddata, license = data['license'], tn = 6, left = left, sub = '옛 문서')
             else:
-                return '<meta http-equiv="refresh" content="0;url=/history/' + parse.quote(name) + '" />'
+                return '<meta http-equiv="refresh" content="0;url=/history/' + URL_인코딩(name) + '" />'
         else:
             return '<meta http-equiv="refresh" content="0;url=/error/3" />'
     else:
-        DB_실행("select * from history where title = '" + pymysql.escape_string(name) + "' and id = '" + str(number) + "'")
+        DB_실행("select * from history where title = '" + DB_인코딩(name) + "' and id = '" + str(number) + "'")
         rows = curs.fetchall()
         if(rows):
             enddata = namumark(name, rows[0]['data'])
@@ -2261,17 +2267,17 @@ def rew(name = None, number = None):
             else:
                 left = ''
                 
-            return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = enddata, license = data['license'], tn = 6, left = left, sub = '옛 문서')
+            return render_template('index.html', title = name, logo = data['name'], page = URL_인코딩(name), data = enddata, license = data['license'], tn = 6, left = left, sub = '옛 문서')
         else:
-            return '<meta http-equiv="refresh" content="0;url=/history/' + parse.quote(name) + '" />'
+            return '<meta http-equiv="refresh" content="0;url=/history/' + URL_인코딩(name) + '" />'
 
 @app.route('/w/<path:name>/raw/<int:number>')
 def reraw(name = None, number = None):
-    DB_실행("select * from hidhi where title = '" + pymysql.escape_string(name) + "' and re = '" + pymysql.escape_string(str(number)) + "'")
+    DB_실행("select * from hidhi where title = '" + DB_인코딩(name) + "' and re = '" + DB_인코딩(str(number)) + "'")
     row = curs.fetchall()
     if(row):
         if(소유자_확인() == 1):
-            DB_실행("select * from history where title = '" + pymysql.escape_string(name) + "' and id = '" + str(number) + "'")
+            DB_실행("select * from history where title = '" + DB_인코딩(name) + "' and id = '" + str(number) + "'")
             rows = curs.fetchall()
             if(rows):
                 enddata = re.sub('<', '&lt;', rows[0]['data'])
@@ -2280,13 +2286,13 @@ def reraw(name = None, number = None):
                 
                 enddata = '<pre>' + enddata + '</pre>'
                 
-                return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = enddata, license = data['license'])
+                return render_template('index.html', title = name, logo = data['name'], page = URL_인코딩(name), data = enddata, license = data['license'])
             else:
-                return '<meta http-equiv="refresh" content="0;url=/history/' + parse.quote(name) + '" />'
+                return '<meta http-equiv="refresh" content="0;url=/history/' + URL_인코딩(name) + '" />'
         else:
             return '<meta http-equiv="refresh" content="0;url=/error/3" />'
     else:
-        DB_실행("select * from history where title = '" + pymysql.escape_string(name) + "' and id = '" + str(number) + "'")
+        DB_실행("select * from history where title = '" + DB_인코딩(name) + "' and id = '" + str(number) + "'")
         rows = curs.fetchall()
         if(rows):
             enddata = re.sub('<', '&lt;', rows[0]['data'])
@@ -2295,13 +2301,13 @@ def reraw(name = None, number = None):
             
             enddata = '<pre>' + enddata + '</pre>'
             
-            return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = enddata, license = data['license'])
+            return render_template('index.html', title = name, logo = data['name'], page = URL_인코딩(name), data = enddata, license = data['license'])
         else:
-            return '<meta http-equiv="refresh" content="0;url=/history/' + parse.quote(name) + '" />'
+            return '<meta http-equiv="refresh" content="0;url=/history/' + URL_인코딩(name) + '" />'
 
 @app.route('/raw/<path:name>')
 def raw(name = None):
-    DB_실행("select * from data where title = '" + pymysql.escape_string(name) + "'")
+    DB_실행("select * from data where title = '" + DB_인코딩(name) + "'")
     rows = curs.fetchall()
     if(rows):
         enddata = re.sub('<', '&lt;', rows[0]['data'])
@@ -2310,18 +2316,18 @@ def raw(name = None):
         
         enddata = '<pre>' + enddata + '</pre>'
         
-        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = enddata, license = data['license'], tn = 7, sub = 'Raw')
+        return render_template('index.html', title = name, logo = data['name'], page = URL_인코딩(name), data = enddata, license = data['license'], tn = 7, sub = 'Raw')
     else:
-        return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name) + '" />'
+        return '<meta http-equiv="refresh" content="0;url=/w/' + URL_인코딩(name) + '" />'
 
 @app.route('/revert/<path:name>/r/<int:number>', methods=['POST', 'GET'])
 def revert(name = None, number = None):
     if(request.method == 'POST'):
-        DB_실행("select * from hidhi where title = '" + pymysql.escape_string(name) + "' and re = '" + pymysql.escape_string(str(number)) + "'")
+        DB_실행("select * from hidhi where title = '" + DB_인코딩(name) + "' and re = '" + DB_인코딩(str(number)) + "'")
         row = curs.fetchall()
         if(row):
             if(소유자_확인() == 1):        
-                DB_실행("select * from history where title = '" + pymysql.escape_string(name) + "' and id = '" + str(number) + "'")
+                DB_실행("select * from history where title = '" + DB_인코딩(name) + "' and id = '" + str(number) + "'")
                 rows = curs.fetchall()
                 if(rows):
                     ip = getip(request)
@@ -2332,26 +2338,26 @@ def revert(name = None, number = None):
                     else:
                         today = 시간()
                         
-                        DB_실행("select * from data where title = '" + pymysql.escape_string(name) + "'")
+                        DB_실행("select * from data where title = '" + DB_인코딩(name) + "'")
                         row = curs.fetchall()
                         if(row):
                             leng = getleng(len(row[0]['data']), len(rows[0]['data']))
                             
-                            DB_실행("update data set data = '" + pymysql.escape_string(rows[0]['data']) + "' where title = '" + pymysql.escape_string(name) + "'")
+                            DB_실행("update data set data = '" + DB_인코딩(rows[0]['data']) + "' where title = '" + DB_인코딩(name) + "'")
                             DB_갱신()
                         else:
                             leng = '+' + str(len(rows[0]['data']))
                             
-                            DB_실행("insert into data (title, data, acl) value ('" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(rows[0]['data']) + "', '')")
+                            DB_실행("insert into data (title, data, acl) value ('" + DB_인코딩(name) + "', '" + DB_인코딩(rows[0]['data']) + "', '')")
                             DB_갱신()
                         history(name, rows[0]['data'], today, ip, '문서를 ' + str(number) + '판으로 되돌렸습니다.', leng)
-                        return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name) + '" />'
+                        return '<meta http-equiv="refresh" content="0;url=/w/' + URL_인코딩(name) + '" />'
                 else:
-                    return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name) + '" />'
+                    return '<meta http-equiv="refresh" content="0;url=/w/' + URL_인코딩(name) + '" />'
             else:
                 return '<meta http-equiv="refresh" content="0;url=/error/3" />'
         else:
-            DB_실행("select * from history where title = '" + pymysql.escape_string(name) + "' and id = '" + str(number) + "'")
+            DB_실행("select * from history where title = '" + DB_인코딩(name) + "' and id = '" + str(number) + "'")
             rows = curs.fetchall()
             if(rows):
                 ip = getip(request)
@@ -2362,24 +2368,24 @@ def revert(name = None, number = None):
                 else:
                     today = 시간()
                     
-                    DB_실행("select * from data where title = '" + pymysql.escape_string(name) + "'")
+                    DB_실행("select * from data where title = '" + DB_인코딩(name) + "'")
                     row = curs.fetchall()
                     if(row):
                         leng = getleng(len(row[0]['data']), len(rows[0]['data']))
                         
-                        DB_실행("update data set data = '" + pymysql.escape_string(rows[0]['data']) + "' where title = '" + pymysql.escape_string(name) + "'")
+                        DB_실행("update data set data = '" + DB_인코딩(rows[0]['data']) + "' where title = '" + DB_인코딩(name) + "'")
                         DB_갱신()
                     else:
                         leng = '+' + str(len(rows[0]['data']))
                         
-                        DB_실행("insert into data (title, data, acl) value ('" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(rows[0]['data']) + "', '')")
+                        DB_실행("insert into data (title, data, acl) value ('" + DB_인코딩(name) + "', '" + DB_인코딩(rows[0]['data']) + "', '')")
                         DB_갱신()
                     history(name, rows[0]['data'], today, ip, '문서를 ' + str(number) + '판으로 되돌렸습니다.', leng)
-                    return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name) + '" />'
+                    return '<meta http-equiv="refresh" content="0;url=/w/' + URL_인코딩(name) + '" />'
             else:
-                return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name) + '" />'            
+                return '<meta http-equiv="refresh" content="0;url=/w/' + URL_인코딩(name) + '" />'            
     else:
-        DB_실행("select * from hidhi where title = '" + pymysql.escape_string(name) + "' and re = '" + pymysql.escape_string(str(number)) + "'")
+        DB_실행("select * from hidhi where title = '" + DB_인코딩(name) + "' and re = '" + DB_인코딩(str(number)) + "'")
         row = curs.fetchall()
         if(row):
             if(소유자_확인() == 1):
@@ -2389,12 +2395,12 @@ def revert(name = None, number = None):
                 if(can == 1):
                     return '<meta http-equiv="refresh" content="0;url=/ban" />'
                 else:
-                    DB_실행("select * from history where title = '" + pymysql.escape_string(name) + "' and id = '" + str(number) + "'")
+                    DB_실행("select * from history where title = '" + DB_인코딩(name) + "' and id = '" + str(number) + "'")
                     rows = curs.fetchall()
                     if(rows):
-                        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), r = parse.quote(str(number)), tn = 13, plus = '정말 되돌리시겠습니까?', sub = '되돌리기', login = nowlogin())
+                        return render_template('index.html', title = name, logo = data['name'], page = URL_인코딩(name), r = URL_인코딩(str(number)), tn = 13, plus = '정말 되돌리시겠습니까?', sub = '되돌리기', login = nowlogin())
                     else:
-                        return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name) + '" />'
+                        return '<meta http-equiv="refresh" content="0;url=/w/' + URL_인코딩(name) + '" />'
             else:
                 return '<meta http-equiv="refresh" content="0;url=/error/3" />'
         else:            
@@ -2404,12 +2410,12 @@ def revert(name = None, number = None):
             if(can == 1):
                 return '<meta http-equiv="refresh" content="0;url=/ban" />'
             else:
-                DB_실행("select * from history where title = '" + pymysql.escape_string(name) + "' and id = '" + str(number) + "'")
+                DB_실행("select * from history where title = '" + DB_인코딩(name) + "' and id = '" + str(number) + "'")
                 rows = curs.fetchall()
                 if(rows):
-                    return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), r = parse.quote(str(number)), tn = 13, plus = '정말 되돌리시겠습니까?', sub = '되돌리기', login = nowlogin())
+                    return render_template('index.html', title = name, logo = data['name'], page = URL_인코딩(name), r = URL_인코딩(str(number)), tn = 13, plus = '정말 되돌리시겠습니까?', sub = '되돌리기', login = nowlogin())
                 else:
-                    return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name) + '" />'
+                    return '<meta http-equiv="refresh" content="0;url=/w/' + URL_인코딩(name) + '" />'
                         
 @app.route('/edit/<path:name>', methods=['POST', 'GET'])
 def edit(name = None):
@@ -2423,7 +2429,7 @@ def edit(name = None):
             
             content = savemark(request.form["content"])
             
-            DB_실행("select * from data where title = '" + pymysql.escape_string(name) + "'")
+            DB_실행("select * from data where title = '" + DB_인코딩(name) + "'")
             rows = curs.fetchall()
             if(rows):
                 if(rows[0]['data'] == content):
@@ -2438,7 +2444,7 @@ def edit(name = None):
                         leng = getleng(len(rows[0]['data']), len(content))
                         history(name, content, today, ip, request.form["send"], leng)
                         
-                        DB_실행("update data set data = '" + pymysql.escape_string(content) + "' where title = '" + pymysql.escape_string(name) + "'")
+                        DB_실행("update data set data = '" + DB_인코딩(content) + "' where title = '" + DB_인코딩(name) + "'")
                         DB_갱신()
             else:
                 ip = getip(request)
@@ -2450,12 +2456,12 @@ def edit(name = None):
                     leng = '+' + str(len(content))
                     history(name, content, today, ip, request.form["send"], leng)
                     
-                    DB_실행("insert into data (title, data, acl) value ('" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(content) + "', '')")
+                    DB_실행("insert into data (title, data, acl) value ('" + DB_인코딩(name) + "', '" + DB_인코딩(content) + "', '')")
                     DB_갱신()
                     
             isin(name, content)
             
-            return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name) + '" />'
+            return '<meta http-equiv="refresh" content="0;url=/w/' + URL_인코딩(name) + '" />'
     else:
         ip = getip(request)
         can = getcan(ip, name)
@@ -2463,7 +2469,7 @@ def edit(name = None):
         if(can == 1):
             return '<meta http-equiv="refresh" content="0;url=/ban" />'
         else:
-            DB_실행("select * from data where title = '" + pymysql.escape_string(data["help"]) + "'")
+            DB_실행("select * from data where title = '" + DB_인코딩(data["help"]) + "'")
             rows = curs.fetchall()
             if(rows):
                 newdata = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', ' * \g<in> 문서로 넘겨주기', rows[0]["data"])
@@ -2471,12 +2477,12 @@ def edit(name = None):
             else:
                 left = ''
                 
-            DB_실행("select * from data where title = '" + pymysql.escape_string(name) + "'")
+            DB_실행("select * from data where title = '" + DB_인코딩(name) + "'")
             rows = curs.fetchall()
             if(rows):
-                return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = rows[0]['data'], tn = 2, left = left, sub = '편집', login = nowlogin())
+                return render_template('index.html', title = name, logo = data['name'], page = URL_인코딩(name), data = rows[0]['data'], tn = 2, left = left, sub = '편집', login = nowlogin())
             else:
-                return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = '', tn = 2, left = left, sub = '편집', login = nowlogin())
+                return render_template('index.html', title = name, logo = data['name'], page = URL_인코딩(name), data = '', tn = 2, left = left, sub = '편집', login = nowlogin())
                 
 @app.route('/edit/<path:name>/section/<int:number>', methods=['POST', 'GET'])
 def secedit(name = None, number = None):
@@ -2489,7 +2495,7 @@ def secedit(name = None, number = None):
             
             content = savemark(request.form["content"])
             
-            DB_실행("select * from data where title = '" + pymysql.escape_string(name) + "'")
+            DB_실행("select * from data where title = '" + DB_인코딩(name) + "'")
             rows = curs.fetchall()
             if(rows):
                 if(request.form["otent"] == content):
@@ -2505,14 +2511,14 @@ def secedit(name = None, number = None):
                         content = rows[0]['data'].replace(request.form['otent'], content)
                         history(name, content, today, ip, request.form["send"], leng)
                         
-                        DB_실행("update data set data = '" + pymysql.escape_string(content) + "' where title = '" + pymysql.escape_string(name) + "'")
+                        DB_실행("update data set data = '" + DB_인코딩(content) + "' where title = '" + DB_인코딩(name) + "'")
                         DB_갱신()
                         
                     isin(name, content)
                     
-                    return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name) + '" />'
+                    return '<meta http-equiv="refresh" content="0;url=/w/' + URL_인코딩(name) + '" />'
             else:
-                return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name) + '" />'
+                return '<meta http-equiv="refresh" content="0;url=/w/' + URL_인코딩(name) + '" />'
     else:
         ip = getip(request)
         can = getcan(ip, name)
@@ -2520,7 +2526,7 @@ def secedit(name = None, number = None):
         if(can == 1):
             return '<meta http-equiv="refresh" content="0;url=/ban" />'
         else:
-            DB_실행("select * from data where title = '" + pymysql.escape_string(data["help"]) + "'")
+            DB_실행("select * from data where title = '" + DB_인코딩(data["help"]) + "'")
             rows = curs.fetchall()
             if(rows):
                 newdata = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', ' * \g<in> 문서로 넘겨주기', rows[0]["data"])
@@ -2529,7 +2535,7 @@ def secedit(name = None, number = None):
             else:
                 left = ''
                 
-            DB_실행("select * from data where title = '" + pymysql.escape_string(name) + "'")
+            DB_실행("select * from data where title = '" + DB_인코딩(name) + "'")
             rows = curs.fetchall()
             if(rows):
                 i = 0
@@ -2556,11 +2562,11 @@ def secedit(name = None, number = None):
                         break
                         
                 if(j == 0):
-                    return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = gdata, tn = 2, left = left, section = 1, number = number, sub = '편집', login = nowlogin())
+                    return render_template('index.html', title = name, logo = data['name'], page = URL_인코딩(name), data = gdata, tn = 2, left = left, section = 1, number = number, sub = '편집', login = nowlogin())
                 else:
-                    return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name) + '" />'
+                    return '<meta http-equiv="refresh" content="0;url=/w/' + URL_인코딩(name) + '" />'
             else:
-                return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name) + '" />'
+                return '<meta http-equiv="refresh" content="0;url=/w/' + URL_인코딩(name) + '" />'
                 
 @app.route('/preview/<path:name>', methods=['POST'])
 def preview(name = None):
@@ -2573,7 +2579,7 @@ def preview(name = None):
         newdata = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', ' * \g<in> 문서로 넘겨주기', newdata)
         enddata = namumark(name, newdata)
         
-        DB_실행("select * from data where title = '" + pymysql.escape_string(data["help"]) + "'")
+        DB_실행("select * from data where title = '" + DB_인코딩(data["help"]) + "'")
         rows = curs.fetchall()
         if(rows):
             newdata = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', ' * \g<in> 문서로 넘겨주기', rows[0]["data"])
@@ -2582,7 +2588,7 @@ def preview(name = None):
         else:
             left = ''
             
-        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = request.form["content"], tn = 2, preview = 1, enddata = enddata, left = left, sub = '미리보기', login = nowlogin())
+        return render_template('index.html', title = name, logo = data['name'], page = URL_인코딩(name), data = request.form["content"], tn = 2, preview = 1, enddata = enddata, left = left, sub = '미리보기', login = nowlogin())
         
 @app.route('/preview/<path:name>/section/<int:number>', methods=['POST'])
 def secpreview(name = None, number = None):
@@ -2598,19 +2604,19 @@ def secpreview(name = None, number = None):
         newdata = request.form["content"]
         newdata = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', ' * \g<in> 문서로 넘겨주기', newdata)
         enddata = namumark(name, newdata)
-        DB_실행("select * from data where title = '" + pymysql.escape_string(data["help"]) + "'")
+        DB_실행("select * from data where title = '" + DB_인코딩(data["help"]) + "'")
         rows = curs.fetchall()
         if(rows):
             newdata = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', ' * \g<in> 문서로 넘겨주기', rows[0]["data"])
             left = namumark(name, newdata)
         else:
             left = ''
-        return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), data = request.form["content"], tn = 2, preview = 1, enddata = enddata, left = left, notice = notice, section = 1, number = number, odata = request.form["otent"], sub = '미리보기')
+        return render_template('index.html', title = name, logo = data['name'], page = URL_인코딩(name), data = request.form["content"], tn = 2, preview = 1, enddata = enddata, left = left, notice = notice, section = 1, number = number, odata = request.form["otent"], sub = '미리보기')
 
 @app.route('/delete/<path:name>', methods=['POST', 'GET'])
 def delete(name = None):
     if(request.method == 'POST'):
-        DB_실행("select * from data where title = '" + pymysql.escape_string(name) + "'")
+        DB_실행("select * from data where title = '" + DB_인코딩(name) + "'")
         rows = curs.fetchall()
         if(rows):
             ip = getip(request)
@@ -2621,13 +2627,13 @@ def delete(name = None):
                 today = 시간()
                 leng = '-' + str(len(rows[0]['data']))
                 history(name, '', today, ip, '문서를 삭제 했습니다.', leng)
-                DB_실행("delete from data where title = '" + pymysql.escape_string(name) + "'")
+                DB_실행("delete from data where title = '" + DB_인코딩(name) + "'")
                 DB_갱신()
-                return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name) + '" />'
+                return '<meta http-equiv="refresh" content="0;url=/w/' + URL_인코딩(name) + '" />'
         else:
-            return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name) + '" />'
+            return '<meta http-equiv="refresh" content="0;url=/w/' + URL_인코딩(name) + '" />'
     else:
-        DB_실행("select * from data where title = '" + pymysql.escape_string(name) + "'")
+        DB_실행("select * from data where title = '" + DB_인코딩(name) + "'")
         rows = curs.fetchall()
         if(rows):
             ip = getip(request)
@@ -2635,14 +2641,14 @@ def delete(name = None):
             if(can == 1):
                 return '<meta http-equiv="refresh" content="0;url=/ban" />'
             else:
-                return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), tn = 8, plus = '정말 삭제 하시겠습니까?', sub = '삭제', login = nowlogin())
+                return render_template('index.html', title = name, logo = data['name'], page = URL_인코딩(name), tn = 8, plus = '정말 삭제 하시겠습니까?', sub = '삭제', login = nowlogin())
         else:
-            return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name) + '" />'
+            return '<meta http-equiv="refresh" content="0;url=/w/' + URL_인코딩(name) + '" />'
 
 @app.route('/move/<path:name>', methods=['POST', 'GET'])
 def move(name = None):
     if(request.method == 'POST'):
-        DB_실행("select * from data where title = '" + pymysql.escape_string(name) + "'")
+        DB_실행("select * from data where title = '" + DB_인코딩(name) + "'")
         rows = curs.fetchall()
         if(rows):
             ip = getip(request)
@@ -2652,16 +2658,16 @@ def move(name = None):
             else:
                 today = 시간()
                 leng = '0'
-                DB_실행("select * from history where title = '" + pymysql.escape_string(request.form["title"]) + "'")
+                DB_실행("select * from history where title = '" + DB_인코딩(request.form["title"]) + "'")
                 row = curs.fetchall()
                 if(row):
                     return '<meta http-equiv="refresh" content="0;url=/error/19" />'
                 else:
-                    history(name, rows[0]['data'], today, ip, '<a href="/w/' + parse.quote(name) + '">' + name + '</a> 문서를 <a href="/w/' + parse.quote(request.form["title"]) + '">' + request.form["title"] + '</a> 문서로 이동 했습니다.', leng)
-                    DB_실행("update data set title = '" + pymysql.escape_string(request.form["title"]) + "' where title = '" + pymysql.escape_string(name) + "'")
-                    DB_실행("update history set title = '" + pymysql.escape_string(request.form["title"]) + "' where title = '" + pymysql.escape_string(name) + "'")
+                    history(name, rows[0]['data'], today, ip, '<a href="/w/' + URL_인코딩(name) + '">' + name + '</a> 문서를 <a href="/w/' + URL_인코딩(request.form["title"]) + '">' + request.form["title"] + '</a> 문서로 이동 했습니다.', leng)
+                    DB_실행("update data set title = '" + DB_인코딩(request.form["title"]) + "' where title = '" + DB_인코딩(name) + "'")
+                    DB_실행("update history set title = '" + DB_인코딩(request.form["title"]) + "' where title = '" + DB_인코딩(name) + "'")
                     DB_갱신()
-                    return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(request.form["title"]) + '" />'
+                    return '<meta http-equiv="refresh" content="0;url=/w/' + URL_인코딩(request.form["title"]) + '" />'
         else:
             ip = getip(request)
             can = getcan(ip, name)
@@ -2670,22 +2676,22 @@ def move(name = None):
             else:
                 today = 시간()
                 leng = '0'
-                DB_실행("select * from history where title = '" + pymysql.escape_string(request.form["title"]) + "'")
+                DB_실행("select * from history where title = '" + DB_인코딩(request.form["title"]) + "'")
                 row = curs.fetchall()
                 if(row):
                      return '<meta http-equiv="refresh" content="0;url=/error/19" />'
                 else:
-                    history(name, '', today, ip, '<a href="/w/' + parse.quote(name) + '">' + name + '</a> 문서를 <a href="/w/' + parse.quote(request.form["title"]) + '">' + request.form["title"] + '</a> 문서로 이동 했습니다.', leng)
-                    DB_실행("update history set title = '" + pymysql.escape_string(request.form["title"]) + "' where title = '" + pymysql.escape_string(name) + "'")
+                    history(name, '', today, ip, '<a href="/w/' + URL_인코딩(name) + '">' + name + '</a> 문서를 <a href="/w/' + URL_인코딩(request.form["title"]) + '">' + request.form["title"] + '</a> 문서로 이동 했습니다.', leng)
+                    DB_실행("update history set title = '" + DB_인코딩(request.form["title"]) + "' where title = '" + DB_인코딩(name) + "'")
                     DB_갱신()
-                    return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(request.form["title"]) + '" />'
+                    return '<meta http-equiv="refresh" content="0;url=/w/' + URL_인코딩(request.form["title"]) + '" />'
     else:
         ip = getip(request)
         can = getcan(ip, name)
         if(can == 1):
             return '<meta http-equiv="refresh" content="0;url=/ban" />'
         else:
-            return render_template('index.html', title = name, logo = data['name'], page = parse.quote(name), tn = 9, plus = '정말 이동 하시겠습니까?', sub = '이동', login = nowlogin())
+            return render_template('index.html', title = name, logo = data['name'], page = URL_인코딩(name), tn = 9, plus = '정말 이동 하시겠습니까?', sub = '이동', login = nowlogin())
 
 @app.route('/other')
 def other():
@@ -2697,27 +2703,27 @@ def manager(num = None):
         return render_template('index.html', title = '관리자 메뉴', logo = data['name'], data = '<h2 style="margin-top: 0px;">관리자 및 소유자</h2><li><a href="/manager/2">문서 ACL</a></li><li><a href="/manager/3">유저 체크</a></li><li><a href="/manager/4">유저 차단</a></li><h2>소유자</h2><li><a href="/manager/5">관리자 권한 주기</a></li><h2>기타</h2><li>이 메뉴에 없는 기능은 해당 문서의 역사나 토론에서 바로 사용 가능함</li>')
     elif(num == 2):
         if(request.method == 'POST'):
-            return '<meta http-equiv="refresh" content="0;url=/acl/' + parse.quote(request.form["name"]) + '" />'
+            return '<meta http-equiv="refresh" content="0;url=/acl/' + URL_인코딩(request.form["name"]) + '" />'
         else:
             return render_template('index.html', title = 'ACL 이동', logo = data['name'], data = '<form id="usrform" method="POST" action="/manager/2"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')
     elif(num == 3):
         if(request.method == 'POST'):
-            return '<meta http-equiv="refresh" content="0;url=/check/' + parse.quote(request.form["name"]) + '" />'
+            return '<meta http-equiv="refresh" content="0;url=/check/' + URL_인코딩(request.form["name"]) + '" />'
         else:
             return render_template('index.html', title = '체크 이동', logo = data['name'], data = '<form id="usrform" method="POST" action="/manager/3"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')
     elif(num == 4):
         if(request.method == 'POST'):
-            return '<meta http-equiv="refresh" content="0;url=/ban/' + parse.quote(request.form["name"]) + '" />'
+            return '<meta http-equiv="refresh" content="0;url=/ban/' + URL_인코딩(request.form["name"]) + '" />'
         else:
             return render_template('index.html', title = '차단 이동', logo = data['name'], data = '<form id="usrform" method="POST" action="/manager/4"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button><br><br><span>아이피 앞 두자리 (XXX.XXX) 입력하면 대역 차단</span></form>')
     elif(num == 5):
         if(request.method == 'POST'):
-            return '<meta http-equiv="refresh" content="0;url=/admin/' + parse.quote(request.form["name"]) + '" />'
+            return '<meta http-equiv="refresh" content="0;url=/admin/' + URL_인코딩(request.form["name"]) + '" />'
         else:
             return render_template('index.html', title = '권한 이동', logo = data['name'], data = '<form id="usrform" method="POST" action="/manager/5"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')   
     elif(num == 6):
         if(request.method == 'POST'):
-            return '<meta http-equiv="refresh" content="0;url=/record/' + parse.quote(request.form["name"]) + '/n/1" />'
+            return '<meta http-equiv="refresh" content="0;url=/record/' + URL_인코딩(request.form["name"]) + '/n/1" />'
         else:
             return render_template('index.html', title = '기록 이동', logo = data['name'], data = '<form id="usrform" method="POST" action="/manager/6"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')    
     else:
@@ -2736,7 +2742,7 @@ def 모든_문서():
             except:
                 break
 
-            데이터 = 데이터 + '<li>' + str(숫자 + 1) + '. <a href="/w/' + parse.quote(문서명[숫자]['title']) + '">' + 문서명[숫자]['title'] + '</a></li>'
+            데이터 = 데이터 + '<li>' + str(숫자 + 1) + '. <a href="/w/' + URL_인코딩(문서명[숫자]['title']) + '">' + 문서명[숫자]['title'] + '</a></li>'
             
             숫자 += 1
 
@@ -2749,12 +2755,12 @@ def 모든_문서():
 @app.route('/topic/<path:name>', methods=['POST', 'GET'])
 def topic(name = None):
     if(request.method == 'POST'):
-        return '<meta http-equiv="refresh" content="0;url=/topic/' + parse.quote(name) + '/sub/' + parse.quote(request.form["topic"]) + '" />'
+        return '<meta http-equiv="refresh" content="0;url=/topic/' + URL_인코딩(name) + '/sub/' + URL_인코딩(request.form["topic"]) + '" />'
     else:
         div = '<div>'
         i = 0
         j = 1
-        DB_실행("select * from rd where title = '" + pymysql.escape_string(name) + "' order by date asc")
+        DB_실행("select * from rd where title = '" + DB_인코딩(name) + "' order by date asc")
         rows = curs.fetchall()
         while(True):
             try:
@@ -2763,7 +2769,7 @@ def topic(name = None):
                 div = div + '</div>'
                 break
                 
-            DB_실행("select * from topic where title = '" + pymysql.escape_string(rows[i]['title']) + "' and sub = '" + pymysql.escape_string(rows[i]['sub']) + "' and id = '1' order by sub asc")
+            DB_실행("select * from topic where title = '" + DB_인코딩(rows[i]['title']) + "' and sub = '" + DB_인코딩(rows[i]['sub']) + "' and id = '1' order by sub asc")
             aa = curs.fetchall()
             
             indata = namumark(name, aa[0]['data'])
@@ -2776,22 +2782,22 @@ def topic(name = None):
 
             ip = 아이디_파싱(aa[0]['ip'])
                 
-            DB_실행("select * from stop where title = '" + pymysql.escape_string(rows[i]['title']) + "' and sub = '" + pymysql.escape_string(rows[i]['sub']) + "' and close = 'O'")
+            DB_실행("select * from stop where title = '" + DB_인코딩(rows[i]['title']) + "' and sub = '" + DB_인코딩(rows[i]['sub']) + "' and close = 'O'")
             row = curs.fetchall()
             if(not row):
-                div = div + '<h2><a href="/topic/' + parse.quote(rows[i]['title']) + '/sub/' + parse.quote(rows[i]['sub']) + '">' + str(j) + '. ' + rows[i]['sub'] + '</a></h2><table id="toron"><tbody><tr><td id="toroncolorgreen"><a href="javascript:void(0);" id="1">#1</a> ' + ip + ' <span style="float:right;">' + aa[0]['date'] + '</span></td></tr><tr><td ' + block + '>' + indata + '</td></tr></tbody></table><br>'
+                div = div + '<h2><a href="/topic/' + URL_인코딩(rows[i]['title']) + '/sub/' + URL_인코딩(rows[i]['sub']) + '">' + str(j) + '. ' + rows[i]['sub'] + '</a></h2><table id="toron"><tbody><tr><td id="toroncolorgreen"><a href="javascript:void(0);" id="1">#1</a> ' + ip + ' <span style="float:right;">' + aa[0]['date'] + '</span></td></tr><tr><td ' + block + '>' + indata + '</td></tr></tbody></table><br>'
                 j = j + 1
                 
             i = i + 1
             
-        return render_template('index.html', title = name, page = parse.quote(name), logo = data['name'], plus = div, tn = 10, list = 1, sub = '토론 목록')
+        return render_template('index.html', title = name, page = URL_인코딩(name), logo = data['name'], plus = div, tn = 10, list = 1, sub = '토론 목록')
         
 @app.route('/topic/<path:name>/close')
 def 닫힌_토론_목록(name = None):
     div = '<div>'
     i = 0
     
-    DB_실행("select * from stop where title = '" + pymysql.escape_string(name) + "' and close = 'O' order by sub asc")
+    DB_실행("select * from stop where title = '" + DB_인코딩(name) + "' and close = 'O' order by sub asc")
     rows = curs.fetchall()
     while(True):
         try:
@@ -2800,7 +2806,7 @@ def 닫힌_토론_목록(name = None):
             div = div + '</div>'
             break
             
-        DB_실행("select * from topic where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(rows[i]['sub']) + "' and id = '1'")
+        DB_실행("select * from topic where title = '" + DB_인코딩(name) + "' and sub = '" + DB_인코딩(rows[i]['sub']) + "' and id = '1'")
         row = curs.fetchall()
         if(row):
             indata = namumark(name, row[0]['data'])
@@ -2813,18 +2819,18 @@ def 닫힌_토론_목록(name = None):
 
             아이디 = 아이디_파싱(row[0]['ip'])
                 
-            div = div + '<h2><a href="/topic/' + parse.quote(name) + '/sub/' + parse.quote(rows[i]['sub']) + '">' + str((i + 1)) + '. ' + rows[i]['sub'] + '</a></h2><table id="toron"><tbody><tr><td id="toroncolorgreen"><a href="javascript:void(0);" id="1">#1</a> ' + 아이디 + ' <span style="float:right;">' + row[0]['date'] + '</span></td></tr><tr><td ' + block + '>' + indata + '</td></tr></tbody></table><br>'
+            div = div + '<h2><a href="/topic/' + URL_인코딩(name) + '/sub/' + URL_인코딩(rows[i]['sub']) + '">' + str((i + 1)) + '. ' + rows[i]['sub'] + '</a></h2><table id="toron"><tbody><tr><td id="toroncolorgreen"><a href="javascript:void(0);" id="1">#1</a> ' + 아이디 + ' <span style="float:right;">' + row[0]['date'] + '</span></td></tr><tr><td ' + block + '>' + indata + '</td></tr></tbody></table><br>'
             
         i += 1
         
-    return render_template('index.html', title = name, page = parse.quote(name), logo = data['name'], plus = div, tn = 10, sub = '닫힌 토론')
+    return render_template('index.html', title = name, page = URL_인코딩(name), logo = data['name'], plus = div, tn = 10, sub = '닫힌 토론')
 
 @app.route('/topic/<path:name>/agree')
 def 합의된_토론_목록(name = None):
     보여줄_내용 = '<div>'
     숫자 = 0
     
-    DB_실행("select * from agreedis where title = '" + pymysql.escape_string(name) + "' order by sub asc")
+    DB_실행("select * from agreedis where title = '" + DB_인코딩(name) + "' order by sub asc")
     합의_토론 = curs.fetchall()
     while(True):
         try:
@@ -2833,7 +2839,7 @@ def 합의된_토론_목록(name = None):
             보여줄_내용 = 보여줄_내용 + '</div>'
             break
             
-        DB_실행("select * from topic where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(합의_토론[숫자]['sub']) + "' and id = '1'")
+        DB_실행("select * from topic where title = '" + DB_인코딩(name) + "' and sub = '" + DB_인코딩(합의_토론[숫자]['sub']) + "' and id = '1'")
         내용 = curs.fetchall()
         if(내용):
             내용_파싱 = namumark(name, 내용[0]['data'])
@@ -2846,16 +2852,16 @@ def 합의된_토론_목록(name = None):
 
             아이디 = 아이디_파싱(내용[0]['ip'])
                 
-            보여줄_내용 = 보여줄_내용 + '<h2><a href="/topic/' + parse.quote(name) + '/sub/' + parse.quote(내용[숫자]['sub']) + '">' + str((숫자 + 1)) + '. ' + 내용[숫자]['sub'] + '</a></h2><table id="toron"><tbody><tr><td id="toroncolorgreen"><a href="javascript:void(0);" id="1">#1</a> ' + 아이디 + ' <span style="float:right;">' + 내용[0]['date'] + '</span></td></tr><tr><td ' + 가리기 + '>' + 내용_파싱 + '</td></tr></tbody></table><br>'
+            보여줄_내용 = 보여줄_내용 + '<h2><a href="/topic/' + URL_인코딩(name) + '/sub/' + URL_인코딩(내용[숫자]['sub']) + '">' + str((숫자 + 1)) + '. ' + 내용[숫자]['sub'] + '</a></h2><table id="toron"><tbody><tr><td id="toroncolorgreen"><a href="javascript:void(0);" id="1">#1</a> ' + 아이디 + ' <span style="float:right;">' + 내용[0]['date'] + '</span></td></tr><tr><td ' + 가리기 + '>' + 내용_파싱 + '</td></tr></tbody></table><br>'
             
         숫자 += 1
         
-    return render_template('index.html', title = name, page = parse.quote(name), logo = data['name'], plus = 보여줄_내용, tn = 10, sub = '합의된 토론')
+    return render_template('index.html', title = name, page = URL_인코딩(name), logo = data['name'], plus = 보여줄_내용, tn = 10, sub = '합의된 토론')
 
 @app.route('/topic/<path:name>/sub/<path:sub>', methods=['POST', 'GET'])
 def sub(name = None, sub = None):
     if(request.method == 'POST'):
-        DB_실행("select * from topic where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' order by id+0 desc limit 1")
+        DB_실행("select * from topic where title = '" + DB_인코딩(name) + "' and sub = '" + DB_인코딩(sub) + "' order by id+0 desc limit 1")
         rows = curs.fetchall()
         if(rows):
             number = int(rows[0]['id']) + 1
@@ -2869,7 +2875,7 @@ def sub(name = None, sub = None):
         if(ban == 1 and not admin == 1):
             return '<meta http-equiv="refresh" content="0;url=/ban" />'
         else:
-            DB_실행("select * from user where id = '" + pymysql.escape_string(ip) + "'")
+            DB_실행("select * from user where id = '" + DB_인코딩(ip) + "'")
             rows = curs.fetchall()
             if(rows):
                 if(rows[0]['acl'] == 'owner' or rows[0]['acl'] == 'admin'):
@@ -2882,10 +2888,10 @@ def sub(name = None, sub = None):
             aa = re.sub("\[\[(분류:(?:(?:(?!\]\]).)*))\]\]", "[br]", aa)
             aa = savemark(aa)
             
-            DB_실행("insert into topic (id, title, sub, data, date, ip, block) value ('" + str(number) + "', '" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(sub) + "', '" + pymysql.escape_string(aa) + "', '" + today + "', '" + ip + "', '')")
+            DB_실행("insert into topic (id, title, sub, data, date, ip, block) value ('" + str(number) + "', '" + DB_인코딩(name) + "', '" + DB_인코딩(sub) + "', '" + DB_인코딩(aa) + "', '" + today + "', '" + ip + "', '')")
             DB_갱신()
             
-            return '<meta http-equiv="refresh" content="0;url=/topic/' + parse.quote(name) + '/sub/' + parse.quote(sub) + '" />'
+            return '<meta http-equiv="refresh" content="0;url=/topic/' + URL_인코딩(name) + '/sub/' + URL_인코딩(sub) + '" />'
     else:
         style = ''
         
@@ -2893,31 +2899,31 @@ def sub(name = None, sub = None):
         ban = getdiscuss(ip, name, sub)
         admin = 관리자_확인()
 
-        DB_실행("select * from stop where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' and close = 'O'")
+        DB_실행("select * from stop where title = '" + DB_인코딩(name) + "' and sub = '" + DB_인코딩(sub) + "' and close = 'O'")
         닫음 = curs.fetchall()
 
-        DB_실행("select * from stop where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' and close = ''")
+        DB_실행("select * from stop where title = '" + DB_인코딩(name) + "' and sub = '" + DB_인코딩(sub) + "' and close = ''")
         정지 = curs.fetchall()
         
         if(admin == 1):
             div = '<div>'
             
             if(닫음):
-                div = div + '<a href="/topic/' + parse.quote(name) + '/sub/' + parse.quote(sub) + '/close">(토론 열기)</a> '
+                div = div + '<a href="/topic/' + URL_인코딩(name) + '/sub/' + URL_인코딩(sub) + '/close">(토론 열기)</a> '
             else:
-                div = div + '<a href="/topic/' + parse.quote(name) + '/sub/' + parse.quote(sub) + '/close">(토론 닫기)</a> '
+                div = div + '<a href="/topic/' + URL_인코딩(name) + '/sub/' + URL_인코딩(sub) + '/close">(토론 닫기)</a> '
             
             if(정지):
-                div = div + '<a href="/topic/' + parse.quote(name) + '/sub/' + parse.quote(sub) + '/stop">(토론 재개)</a> '
+                div = div + '<a href="/topic/' + URL_인코딩(name) + '/sub/' + URL_인코딩(sub) + '/stop">(토론 재개)</a> '
             else:
-                div = div + '<a href="/topic/' + parse.quote(name) + '/sub/' + parse.quote(sub) + '/stop">(토론 정지)</a> '
+                div = div + '<a href="/topic/' + URL_인코딩(name) + '/sub/' + URL_인코딩(sub) + '/stop">(토론 정지)</a> '
 
-            DB_실행("select * from agreedis where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "'")
+            DB_실행("select * from agreedis where title = '" + DB_인코딩(name) + "' and sub = '" + DB_인코딩(sub) + "'")
             합의 = curs.fetchall()
             if(합의):
-                div = div + '<a href="/topic/' + parse.quote(name) + '/sub/' + parse.quote(sub) + '/agree">(합의 취소)</a>'
+                div = div + '<a href="/topic/' + URL_인코딩(name) + '/sub/' + URL_인코딩(sub) + '/agree">(합의 취소)</a>'
             else:
-                div = div + '<a href="/topic/' + parse.quote(name) + '/sub/' + parse.quote(sub) + '/agree">(합의 완료)</a>'
+                div = div + '<a href="/topic/' + URL_인코딩(name) + '/sub/' + URL_인코딩(sub) + '/agree">(합의 완료)</a>'
             
             div = div + '<br><br>'
         else:
@@ -2927,10 +2933,10 @@ def sub(name = None, sub = None):
             if(not admin == 1):
                 style = 'display:none;'
         
-        DB_실행("select * from topic where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' order by id+0 asc")
+        DB_실행("select * from topic where title = '" + DB_인코딩(name) + "' and sub = '" + DB_인코딩(sub) + "' order by id+0 asc")
         rows = curs.fetchall()
 
-        DB_실행("select * from distop where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' order by id+0 asc")
+        DB_실행("select * from distop where title = '" + DB_인코딩(name) + "' and sub = '" + DB_인코딩(sub) + "' order by id+0 asc")
         distop = curs.fetchall()
 
         i = 0
@@ -2984,27 +2990,27 @@ def sub(name = None, sub = None):
             else:
                 if(admin == 1):
                     if(rows[i]['block'] == 'O'):
-                        isblock = ' <a href="/topic/' + parse.quote(name) + '/sub/' + parse.quote(sub) + '/b/' + str(i + 1) + '">(해제)</a>'
+                        isblock = ' <a href="/topic/' + URL_인코딩(name) + '/sub/' + URL_인코딩(sub) + '/b/' + str(i + 1) + '">(해제)</a>'
                     else:
-                        isblock = ' <a href="/topic/' + parse.quote(name) + '/sub/' + parse.quote(sub) + '/b/' + str(i + 1) + '">(블라인드)</a>'
+                        isblock = ' <a href="/topic/' + URL_인코딩(name) + '/sub/' + URL_인코딩(sub) + '/b/' + str(i + 1) + '">(블라인드)</a>'
 
-                    DB_실행("select * from distop where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' and id = '" + pymysql.escape_string(str(i + 1)) + "'")
+                    DB_실행("select * from distop where title = '" + DB_인코딩(name) + "' and sub = '" + DB_인코딩(sub) + "' and id = '" + DB_인코딩(str(i + 1)) + "'")
                     row = curs.fetchall()
                     if(row):
-                        isblock = isblock + ' <a href="/topic/' + parse.quote(name) + '/sub/' + parse.quote(sub) + '/notice/' + str(i + 1) + '">(해제)</a>'
+                        isblock = isblock + ' <a href="/topic/' + URL_인코딩(name) + '/sub/' + URL_인코딩(sub) + '/notice/' + str(i + 1) + '">(해제)</a>'
                     else:
-                        isblock = isblock + ' <a href="/topic/' + parse.quote(name) + '/sub/' + parse.quote(sub) + '/notice/' + str(i + 1) + '">(공지)</a>'
+                        isblock = isblock + ' <a href="/topic/' + URL_인코딩(name) + '/sub/' + URL_인코딩(sub) + '/notice/' + str(i + 1) + '">(공지)</a>'
                         
                     n = re.search("\- (?:Admin)$", rows[i]['ip'])
                     if(n):
                         ban = isblock
                     else:
-                        DB_실행("select * from ban where block = '" + pymysql.escape_string(rows[i]['ip']) + "'")
+                        DB_실행("select * from ban where block = '" + DB_인코딩(rows[i]['ip']) + "'")
                         row = curs.fetchall()
                         if(row):
-                            ban = ' <a href="/ban/' + parse.quote(rows[i]['ip']) + '">(해제)</a>' + isblock
+                            ban = ' <a href="/ban/' + URL_인코딩(rows[i]['ip']) + '">(해제)</a>' + isblock
                         else:
-                            ban = ' <a href="/ban/' + parse.quote(rows[i]['ip']) + '">(차단)</a>' + isblock
+                            ban = ' <a href="/ban/' + URL_인코딩(rows[i]['ip']) + '">(차단)</a>' + isblock
                 else:
                     ban = ""
 
@@ -3021,43 +3027,43 @@ def sub(name = None, sub = None):
                 
             i = i + 1
             
-        return render_template('index.html', title = name, page = parse.quote(name), suburl = parse.quote(sub), toron = sub, logo = data['name'], rows = div, tn = 11, ban = ban, style = style, sub = '토론', login = nowlogin())
+        return render_template('index.html', title = name, page = URL_인코딩(name), suburl = URL_인코딩(sub), toron = sub, logo = data['name'], rows = div, tn = 11, ban = ban, style = style, sub = '토론', login = nowlogin())
 
 @app.route('/topic/<path:name>/sub/<path:sub>/b/<int:number>')
 def blind(name = None, sub = None, number = None):
     if(관리자_확인() == 1):
-        DB_실행("select * from topic where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' and id = '" + str(number) + "'")
+        DB_실행("select * from topic where title = '" + DB_인코딩(name) + "' and sub = '" + DB_인코딩(sub) + "' and id = '" + str(number) + "'")
         row = curs.fetchall()
         if(row):
             if(row[0]['block'] == 'O'):
-                DB_실행("update topic set block = '' where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' and id = '" + str(number) + "'")
+                DB_실행("update topic set block = '' where title = '" + DB_인코딩(name) + "' and sub = '" + DB_인코딩(sub) + "' and id = '" + str(number) + "'")
             else:
-                DB_실행("update topic set block = 'O' where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' and id = '" + str(number) + "'")
+                DB_실행("update topic set block = 'O' where title = '" + DB_인코딩(name) + "' and sub = '" + DB_인코딩(sub) + "' and id = '" + str(number) + "'")
             DB_갱신()
             
-            return '<meta http-equiv="refresh" content="0;url=/topic/' + parse.quote(name) + '/sub/' + parse.quote(sub) + '" />'
+            return '<meta http-equiv="refresh" content="0;url=/topic/' + URL_인코딩(name) + '/sub/' + URL_인코딩(sub) + '" />'
         else:
-            return '<meta http-equiv="refresh" content="0;url=/topic/' + parse.quote(name) + '/sub/' + parse.quote(sub) + '" />'
+            return '<meta http-equiv="refresh" content="0;url=/topic/' + URL_인코딩(name) + '/sub/' + URL_인코딩(sub) + '" />'
     else:
         return '<meta http-equiv="refresh" content="0;url=/error/3" />'
 
 @app.route('/topic/<path:name>/sub/<path:sub>/notice/<int:number>')
 def notice(name = None, sub = None, number = None):
     if(관리자_확인() == 1):
-        DB_실행("select * from topic where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' and id = '" + str(number) + "'")
+        DB_실행("select * from topic where title = '" + DB_인코딩(name) + "' and sub = '" + DB_인코딩(sub) + "' and id = '" + str(number) + "'")
         data = curs.fetchall()
         if(data):
-            DB_실행("select * from distop where id = '" + str(number) + "' and title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "'")
+            DB_실행("select * from distop where id = '" + str(number) + "' and title = '" + DB_인코딩(name) + "' and sub = '" + DB_인코딩(sub) + "'")
             isthis = curs.fetchall()
             if(isthis):
-                DB_실행("delete from distop where id = '" + str(number) + "' and title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "'")
+                DB_실행("delete from distop where id = '" + str(number) + "' and title = '" + DB_인코딩(name) + "' and sub = '" + DB_인코딩(sub) + "'")
             else:
-                DB_실행("insert into distop (id, title, sub) value ('" + pymysql.escape_string(str(number)) + "', '" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(sub) + "')")
+                DB_실행("insert into distop (id, title, sub) value ('" + DB_인코딩(str(number)) + "', '" + DB_인코딩(name) + "', '" + DB_인코딩(sub) + "')")
             DB_갱신()
 
-            return '<meta http-equiv="refresh" content="0;url=/topic/' + parse.quote(name) + '/sub/' + parse.quote(sub) + '" />'
+            return '<meta http-equiv="refresh" content="0;url=/topic/' + URL_인코딩(name) + '/sub/' + URL_인코딩(sub) + '" />'
         else:
-            return '<meta http-equiv="refresh" content="0;url=/topic/' + parse.quote(name) + '/sub/' + parse.quote(sub) + '" />'
+            return '<meta http-equiv="refresh" content="0;url=/topic/' + URL_인코딩(name) + '/sub/' + URL_인코딩(sub) + '" />'
     else:
         return '<meta http-equiv="refresh" content="0;url=/error/3" />'
         
@@ -3066,24 +3072,24 @@ def topicstop(name = None, sub = None):
     if(관리자_확인() == 1):
         ip = getip(request)
         
-        DB_실행("select * from topic where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' order by id+0 desc limit 1")
+        DB_실행("select * from topic where title = '" + DB_인코딩(name) + "' and sub = '" + DB_인코딩(sub) + "' order by id+0 desc limit 1")
         row = curs.fetchall()
         if(row):
             today = 시간()
             
-            DB_실행("select * from stop where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' and close = ''")
+            DB_실행("select * from stop where title = '" + DB_인코딩(name) + "' and sub = '" + DB_인코딩(sub) + "' and close = ''")
             rows = curs.fetchall()
             if(rows):
-                DB_실행("insert into topic (id, title, sub, data, date, ip, block) value ('" + pymysql.escape_string(str(int(row[0]['id']) + 1)) + "', '" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(sub) + "', 'Restart', '" + pymysql.escape_string(today) + "', '" + pymysql.escape_string(ip) + " - Restart', '')")
-                DB_실행("delete from stop where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' and close = ''")
+                DB_실행("insert into topic (id, title, sub, data, date, ip, block) value ('" + DB_인코딩(str(int(row[0]['id']) + 1)) + "', '" + DB_인코딩(name) + "', '" + DB_인코딩(sub) + "', 'Restart', '" + DB_인코딩(today) + "', '" + DB_인코딩(ip) + " - Restart', '')")
+                DB_실행("delete from stop where title = '" + DB_인코딩(name) + "' and sub = '" + DB_인코딩(sub) + "' and close = ''")
             else:
-                DB_실행("insert into topic (id, title, sub, data, date, ip, block) value ('" + pymysql.escape_string(str(int(row[0]['id']) + 1)) + "', '" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(sub) + "', 'Stop', '" + pymysql.escape_string(today) + "', '" + pymysql.escape_string(ip) + " - Stop', '')")
-                DB_실행("insert into stop (title, sub, close) value ('" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(sub) + "', '')")
+                DB_실행("insert into topic (id, title, sub, data, date, ip, block) value ('" + DB_인코딩(str(int(row[0]['id']) + 1)) + "', '" + DB_인코딩(name) + "', '" + DB_인코딩(sub) + "', 'Stop', '" + DB_인코딩(today) + "', '" + DB_인코딩(ip) + " - Stop', '')")
+                DB_실행("insert into stop (title, sub, close) value ('" + DB_인코딩(name) + "', '" + DB_인코딩(sub) + "', '')")
             DB_갱신()
             
-            return '<meta http-equiv="refresh" content="0;url=/topic/' + parse.quote(name) + '/sub/' + parse.quote(sub) + '" />'
+            return '<meta http-equiv="refresh" content="0;url=/topic/' + URL_인코딩(name) + '/sub/' + URL_인코딩(sub) + '" />'
         else:
-            return '<meta http-equiv="refresh" content="0;url=/topic/' + parse.quote(name) + '/sub/' + parse.quote(sub) + '" />'
+            return '<meta http-equiv="refresh" content="0;url=/topic/' + URL_인코딩(name) + '/sub/' + URL_인코딩(sub) + '" />'
     else:
         return '<meta http-equiv="refresh" content="0;url=/error/3" />'                
         
@@ -3092,24 +3098,24 @@ def topicclose(name = None, sub = None):
     if(관리자_확인() == 1):
         ip = getip(request)
         
-        DB_실행("select * from topic where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' order by id+0 desc limit 1")
+        DB_실행("select * from topic where title = '" + DB_인코딩(name) + "' and sub = '" + DB_인코딩(sub) + "' order by id+0 desc limit 1")
         row = curs.fetchall()
         if(row):
             today = 시간()
             
-            DB_실행("select * from stop where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' and close = 'O'")
+            DB_실행("select * from stop where title = '" + DB_인코딩(name) + "' and sub = '" + DB_인코딩(sub) + "' and close = 'O'")
             rows = curs.fetchall()
             if(rows):
-                DB_실행("insert into topic (id, title, sub, data, date, ip, block) value ('" + pymysql.escape_string(str(int(row[0]['id']) + 1)) + "', '" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(sub) + "', 'Reopen', '" + pymysql.escape_string(today) + "', '" + pymysql.escape_string(ip) + " - Reopen', '')")
-                DB_실행("delete from stop where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' and close = 'O'")
+                DB_실행("insert into topic (id, title, sub, data, date, ip, block) value ('" + DB_인코딩(str(int(row[0]['id']) + 1)) + "', '" + DB_인코딩(name) + "', '" + DB_인코딩(sub) + "', 'Reopen', '" + DB_인코딩(today) + "', '" + DB_인코딩(ip) + " - Reopen', '')")
+                DB_실행("delete from stop where title = '" + DB_인코딩(name) + "' and sub = '" + DB_인코딩(sub) + "' and close = 'O'")
             else:
-                DB_실행("insert into topic (id, title, sub, data, date, ip, block) value ('" + pymysql.escape_string(str(int(row[0]['id']) + 1)) + "', '" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(sub) + "', 'Close', '" + pymysql.escape_string(today) + "', '" + pymysql.escape_string(ip) + " - Close', '')")
-                DB_실행("insert into stop (title, sub, close) value ('" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(sub) + "', 'O')")
+                DB_실행("insert into topic (id, title, sub, data, date, ip, block) value ('" + DB_인코딩(str(int(row[0]['id']) + 1)) + "', '" + DB_인코딩(name) + "', '" + DB_인코딩(sub) + "', 'Close', '" + DB_인코딩(today) + "', '" + DB_인코딩(ip) + " - Close', '')")
+                DB_실행("insert into stop (title, sub, close) value ('" + DB_인코딩(name) + "', '" + DB_인코딩(sub) + "', 'O')")
             DB_갱신()
             
-            return '<meta http-equiv="refresh" content="0;url=/topic/' + parse.quote(name) + '/sub/' + parse.quote(sub) + '" />'
+            return '<meta http-equiv="refresh" content="0;url=/topic/' + URL_인코딩(name) + '/sub/' + URL_인코딩(sub) + '" />'
         else:
-            return '<meta http-equiv="refresh" content="0;url=/topic/' + parse.quote(name) + '/sub/' + parse.quote(sub) + '" />'
+            return '<meta http-equiv="refresh" content="0;url=/topic/' + URL_인코딩(name) + '/sub/' + URL_인코딩(sub) + '" />'
     else:
         return '<meta http-equiv="refresh" content="0;url=/error/3" />'
 
@@ -3118,24 +3124,24 @@ def 토론_관리자_기능(name = None, sub = None):
     if(관리자_확인() == 1):
         ip = getip(request)
         
-        DB_실행("select id from topic where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' order by id+0 desc limit 1")
+        DB_실행("select id from topic where title = '" + DB_인코딩(name) + "' and sub = '" + DB_인코딩(sub) + "' order by id+0 desc limit 1")
         토론 = curs.fetchall()
         if(토론):
             today = 시간()
             
-            DB_실행("select * from agreedis where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "'")
+            DB_실행("select * from agreedis where title = '" + DB_인코딩(name) + "' and sub = '" + DB_인코딩(sub) + "'")
             합의안 = curs.fetchall()
             if(합의안):
-                DB_실행("insert into topic (id, title, sub, data, date, ip, block) value ('" + pymysql.escape_string(str(int(토론[0]['id']) + 1)) + "', '" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(sub) + "', 'Settlement', '" + pymysql.escape_string(today) + "', '" + pymysql.escape_string(ip) + " - Settlement', '')")
-                DB_실행("delete from agreedis where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "'")
+                DB_실행("insert into topic (id, title, sub, data, date, ip, block) value ('" + DB_인코딩(str(int(토론[0]['id']) + 1)) + "', '" + DB_인코딩(name) + "', '" + DB_인코딩(sub) + "', 'Settlement', '" + DB_인코딩(today) + "', '" + DB_인코딩(ip) + " - Settlement', '')")
+                DB_실행("delete from agreedis where title = '" + DB_인코딩(name) + "' and sub = '" + DB_인코딩(sub) + "'")
             else:
-                DB_실행("insert into topic (id, title, sub, data, date, ip, block) value ('" + pymysql.escape_string(str(int(토론[0]['id']) + 1)) + "', '" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(sub) + "', 'Agreement', '" + pymysql.escape_string(today) + "', '" + pymysql.escape_string(ip) + " - Agreement', '')")
-                DB_실행("insert into agreedis (title, sub) value ('" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(sub) + "')")
+                DB_실행("insert into topic (id, title, sub, data, date, ip, block) value ('" + DB_인코딩(str(int(토론[0]['id']) + 1)) + "', '" + DB_인코딩(name) + "', '" + DB_인코딩(sub) + "', 'Agreement', '" + DB_인코딩(today) + "', '" + DB_인코딩(ip) + " - Agreement', '')")
+                DB_실행("insert into agreedis (title, sub) value ('" + DB_인코딩(name) + "', '" + DB_인코딩(sub) + "')")
             DB_갱신()
             
-            return '<meta http-equiv="refresh" content="0;url=/topic/' + parse.quote(name) + '/sub/' + parse.quote(sub) + '" />'
+            return '<meta http-equiv="refresh" content="0;url=/topic/' + URL_인코딩(name) + '/sub/' + URL_인코딩(sub) + '" />'
         else:
-            return '<meta http-equiv="refresh" content="0;url=/topic/' + parse.quote(name) + '/sub/' + parse.quote(sub) + '" />'
+            return '<meta http-equiv="refresh" content="0;url=/topic/' + URL_인코딩(name) + '/sub/' + URL_인코딩(sub) + '" />'
     else:
         return '<meta http-equiv="refresh" content="0;url=/error/3" />'
 
@@ -3148,7 +3154,7 @@ def login():
         if(ban == 1):
             return '<meta http-equiv="refresh" content="0;url=/ban" />'
         else:
-            DB_실행("select * from user where id = '" + pymysql.escape_string(request.form["id"]) + "'")
+            DB_실행("select * from user where id = '" + DB_인코딩(request.form["id"]) + "'")
             rows = curs.fetchall()
             if(rows):
                 if(session.get('Now') == True):
@@ -3157,7 +3163,7 @@ def login():
                     session['Now'] = True
                     session['DREAMER'] = request.form["id"]
                     
-                    DB_실행("insert into login (user, ip, today) value ('" + pymysql.escape_string(request.form["id"]) + "', '" + pymysql.escape_string(ip) + "', '" + pymysql.escape_string(시간()) + "')")
+                    DB_실행("insert into login (user, ip, today) value ('" + DB_인코딩(request.form["id"]) + "', '" + DB_인코딩(ip) + "', '" + DB_인코딩(시간()) + "')")
                     DB_갱신()
                     
                     return '<meta http-equiv="refresh" content="0;url=/user" />'
@@ -3187,7 +3193,7 @@ def change():
             if(ban == 1):
                 return '<meta http-equiv="refresh" content="0;url=/ban" />'
             else:
-                DB_실행("select * from user where id = '" + pymysql.escape_string(request.form["id"]) + "'")
+                DB_실행("select * from user where id = '" + DB_인코딩(request.form["id"]) + "'")
                 rows = curs.fetchall()
                 if(rows):
                     if(session.get('Now') == True):
@@ -3197,7 +3203,7 @@ def change():
                     elif(bcrypt.checkpw(bytes(request.form["pw"], 'utf-8'), bytes(rows[0]['pw'], 'utf-8'))):
                         hashed = bcrypt.hashpw(bytes(request.form["pw2"], 'utf-8'), bcrypt.gensalt())
                         
-                        DB_실행("update user set pw = '" + pymysql.escape_string(hashed.decode()) + "' where id = '" + pymysql.escape_string(request.form["id"]) + "'")
+                        DB_실행("update user set pw = '" + DB_인코딩(hashed.decode()) + "' where id = '" + DB_인코딩(request.form["id"]) + "'")
                         DB_갱신()
                         
                         return '<meta http-equiv="refresh" content="0;url=/login" />'
@@ -3223,7 +3229,7 @@ def change():
                 
 @app.route('/check/<name>')
 def check(name = None, sub = None, number = None):
-    DB_실행("select * from user where id = '" + pymysql.escape_string(name) + "'")
+    DB_실행("select * from user where id = '" + DB_인코딩(name) + "'")
     rows = curs.fetchall()
     if(rows and rows[0]['acl'] == 'owner' or rows and rows[0]['acl'] == 'admin'):
         return '<meta http-equiv="refresh" content="0;url=/error/4" />'
@@ -3231,7 +3237,7 @@ def check(name = None, sub = None, number = None):
         if(관리자_확인() == 1):
             m = re.search('(?:[0-9](?:[0-9][0-9])?\.[0-9](?:[0-9][0-9])?\.[0-9](?:[0-9][0-9])?\.[0-9](?:[0-9][0-9])?)', name)
             if(m):
-                DB_실행("select * from login where ip = '" + pymysql.escape_string(name) + "' order by today desc")
+                DB_실행("select * from login where ip = '" + DB_인코딩(name) + "' order by today desc")
                 row = curs.fetchall()
                 if(row):
                     i = 0
@@ -3246,7 +3252,7 @@ def check(name = None, sub = None, number = None):
                 else:
                     return render_template('index.html', title = '다중 검사', logo = data['name'], tn = 22, rows = '')
             else:
-                DB_실행("select * from login where user = '" + pymysql.escape_string(name) + "' order by today desc")
+                DB_실행("select * from login where user = '" + DB_인코딩(name) + "' order by today desc")
                 row = curs.fetchall()
                 if(row):
                     i = 0
@@ -3280,16 +3286,16 @@ def register():
                     if(len(request.form["id"]) > 20):
                         return '<meta http-equiv="refresh" content="0;url=/error/7" />'
                     else:
-                        DB_실행("select * from user where id = '" + pymysql.escape_string(request.form["id"]) + "'")
+                        DB_실행("select * from user where id = '" + DB_인코딩(request.form["id"]) + "'")
                         rows = curs.fetchall()
                         if(rows):
                             return '<meta http-equiv="refresh" content="0;url=/error/6" />'
                         else:
                             hashed = bcrypt.hashpw(bytes(request.form["pw"], 'utf-8'), bcrypt.gensalt())
                             if(request.form["id"] == data['owner']):
-                                DB_실행("insert into user (id, pw, acl) value ('" + pymysql.escape_string(request.form["id"]) + "', '" + pymysql.escape_string(hashed.decode()) + "', 'owner')")
+                                DB_실행("insert into user (id, pw, acl) value ('" + DB_인코딩(request.form["id"]) + "', '" + DB_인코딩(hashed.decode()) + "', 'owner')")
                             else:
-                                DB_실행("insert into user (id, pw, acl) value ('" + pymysql.escape_string(request.form["id"]) + "', '" + pymysql.escape_string(hashed.decode()) + "', 'user')")
+                                DB_실행("insert into user (id, pw, acl) value ('" + DB_인코딩(request.form["id"]) + "', '" + DB_인코딩(hashed.decode()) + "', 'user')")
                             DB_갱신()
                             return '<meta http-equiv="refresh" content="0;url=/login" />'
         else:
@@ -3311,7 +3317,7 @@ def logout():
 
 @app.route('/ban/<name>', methods=['POST', 'GET'])
 def ban(name = None):
-    DB_실행("select * from user where id = '" + pymysql.escape_string(name) + "'")
+    DB_실행("select * from user where id = '" + DB_인코딩(name) + "'")
     rows = curs.fetchall()
     if(rows and rows[0]['acl'] == 'owner' or rows and rows[0]['acl'] == 'admin'):
         return '<meta http-equiv="refresh" content="0;url=/error/4" />'
@@ -3325,30 +3331,30 @@ def ban(name = None):
                 else:
                     end = request.form["end"]
 
-                DB_실행("select * from ban where block = '" + pymysql.escape_string(name) + "'")
+                DB_실행("select * from ban where block = '" + DB_인코딩(name) + "'")
                 row = curs.fetchall()
                 if(row):
                     block(name, '해제', 시간(), ip, '')
                     
-                    DB_실행("delete from ban where block = '" + pymysql.escape_string(name) + "'")
+                    DB_실행("delete from ban where block = '" + DB_인코딩(name) + "'")
                 else:
                     b = re.search("^([0-9](?:[0-9]?[0-9]?)\.[0-9](?:[0-9]?[0-9]?))$", name)
                     if(b):
                         block(name, end, 시간(), ip, request.form["why"])
                         
-                        DB_실행("insert into ban (block, end, why, band) value ('" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(end) + "', '" + pymysql.escape_string(request.form["why"]) + "', 'O')")
+                        DB_실행("insert into ban (block, end, why, band) value ('" + DB_인코딩(name) + "', '" + DB_인코딩(end) + "', '" + DB_인코딩(request.form["why"]) + "', 'O')")
                     else:
                         block(name, end, 시간(), ip, request.form["why"])
                         
-                        DB_실행("insert into ban (block, end, why, band) value ('" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(end) + "', '" + pymysql.escape_string(request.form["why"]) + "', '')")
+                        DB_실행("insert into ban (block, end, why, band) value ('" + DB_인코딩(name) + "', '" + DB_인코딩(end) + "', '" + DB_인코딩(request.form["why"]) + "', '')")
                 DB_갱신()
                 
-                return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(data['frontpage']) + '" />'
+                return '<meta http-equiv="refresh" content="0;url=/w/' + URL_인코딩(data['frontpage']) + '" />'
             else:
                 return '<meta http-equiv="refresh" content="0;url=/error/3" />'
         else:
             if(관리자_확인() == 1):
-                DB_실행("select * from ban where block = '" + pymysql.escape_string(name) + "'")
+                DB_실행("select * from ban where block = '" + DB_인코딩(name) + "'")
                 row = curs.fetchall()
                 if(row):
                     now = '차단 해제'
@@ -3359,7 +3365,7 @@ def ban(name = None):
                     else:
                         now = '차단'
                         
-                return render_template('index.html', title = name, page = parse.quote(name), logo = data['name'], tn = 16, now = now, today = 시간(), sub = '차단')
+                return render_template('index.html', title = name, page = URL_인코딩(name), logo = data['name'], tn = 16, now = now, today = 시간(), sub = '차단')
             else:
                 return '<meta http-equiv="refresh" content="0;url=/error/3" />'
 
@@ -3367,22 +3373,22 @@ def ban(name = None):
 def acl(name = None):
     if(request.method == 'POST'):
         if(관리자_확인() == 1):
-            DB_실행("select * from data where title = '" + pymysql.escape_string(name) + "'")
+            DB_실행("select * from data where title = '" + DB_인코딩(name) + "'")
             row = curs.fetchall()
             if(row):
                 if(request.form["select"] == 'admin'):
-                   DB_실행("update data set acl = 'admin' where title = '" + pymysql.escape_string(name) + "'")
+                   DB_실행("update data set acl = 'admin' where title = '" + DB_인코딩(name) + "'")
                 elif(request.form["select"] == 'user'):
-                    DB_실행("update data set acl = 'user' where title = '" + pymysql.escape_string(name) + "'")
+                    DB_실행("update data set acl = 'user' where title = '" + DB_인코딩(name) + "'")
                 else:
-                    DB_실행("update data set acl = '' where title = '" + pymysql.escape_string(name) + "'")
+                    DB_실행("update data set acl = '' where title = '" + DB_인코딩(name) + "'")
                 DB_갱신()
-            return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name) + '" />' 
+            return '<meta http-equiv="refresh" content="0;url=/w/' + URL_인코딩(name) + '" />' 
         else:
             return '<meta http-equiv="refresh" content="0;url=/error/3" />'
     else:
         if(관리자_확인() == 1):
-            DB_실행("select * from data where title = '" + pymysql.escape_string(name) + "'")
+            DB_실행("select * from data where title = '" + DB_인코딩(name) + "'")
             row = curs.fetchall()
             if(row):
                 if(row[0]['acl'] == 'admin'):
@@ -3391,9 +3397,9 @@ def acl(name = None):
                     now = '유저 이상'
                 else:
                     now = '일반'
-                return render_template('index.html', title = name, page = parse.quote(name), logo = data['name'], tn = 19, now = '현재 ACL 상태는 ' + now, sub = 'ACL')
+                return render_template('index.html', title = name, page = URL_인코딩(name), logo = data['name'], tn = 19, now = '현재 ACL 상태는 ' + now, sub = 'ACL')
             else:
-                return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(name) + '" />' 
+                return '<meta http-equiv="refresh" content="0;url=/w/' + URL_인코딩(name) + '" />' 
         else:
             return '<meta http-equiv="refresh" content="0;url=/error/3" />'
 
@@ -3401,30 +3407,30 @@ def acl(name = None):
 def admin(name = None):
     if(request.method == 'POST'):
         if(소유자_확인() == 1):
-            DB_실행("select * from user where id = '" + pymysql.escape_string(name) + "'")
+            DB_실행("select * from user where id = '" + DB_인코딩(name) + "'")
             row = curs.fetchall()
             if(row):
                 if(row[0]['acl'] == 'admin' or row[0]['acl'] == 'owner'):
-                    DB_실행("update user set acl = 'user' where id = '" + pymysql.escape_string(name) + "'")
+                    DB_실행("update user set acl = 'user' where id = '" + DB_인코딩(name) + "'")
                 else:
-                    DB_실행("update user set acl = '" + pymysql.escape_string(request.form["select"]) + "' where id = '" + pymysql.escape_string(name) + "'")
+                    DB_실행("update user set acl = '" + DB_인코딩(request.form["select"]) + "' where id = '" + DB_인코딩(name) + "'")
                 DB_갱신()
                 
-                return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(data['frontpage']) + '" />'
+                return '<meta http-equiv="refresh" content="0;url=/w/' + URL_인코딩(data['frontpage']) + '" />'
             else:
                 return '<meta http-equiv="refresh" content="0;url=/error/5" />'
         else:
             return '<meta http-equiv="refresh" content="0;url=/error/3" />'
     else:
         if(소유자_확인() == 1):
-            DB_실행("select * from user where id = '" + pymysql.escape_string(name) + "'")
+            DB_실행("select * from user where id = '" + DB_인코딩(name) + "'")
             row = curs.fetchall()
             if(row):
                 if(row[0]['acl'] == 'admin' or row[0]['acl'] == 'owner'):
                     now = '권한 해제'
                 else:
                     now = '권한 부여'
-                return render_template('index.html', title = name, page = parse.quote(name), logo = data['name'], tn = 18, now = now, sub = '권한 부여')
+                return render_template('index.html', title = name, page = URL_인코딩(name), logo = data['name'], tn = 18, now = now, sub = '권한 부여')
             else:
                 return '<meta http-equiv="refresh" content="0;url=/error/5" />'
         else:
@@ -3435,7 +3441,7 @@ def aban():
     ip = getip(request)
     
     if(getban(ip) == 1):
-        DB_실행("select * from ban where block = '" + pymysql.escape_string(ip) + "'")
+        DB_실행("select * from ban where block = '" + DB_인코딩(ip) + "'")
         rows = curs.fetchall()
         if(rows):
             if(rows[0]['end']):
@@ -3451,7 +3457,7 @@ def aban():
                 day = re.sub('\-', '', day)    
                 
                 if(now >= int(day + '000000')):
-                    DB_실행("delete from ban where block = '" + pymysql.escape_string(ip) + "'")
+                    DB_실행("delete from ban where block = '" + DB_인코딩(ip) + "'")
                     DB_갱신()
                     end = '차단이 풀렸습니다. 다시 시도 해 보세요.'
             else:
@@ -3461,7 +3467,7 @@ def aban():
             if(b):
                 results = b.groups()
                 
-                DB_실행("select * from ban where block = '" + pymysql.escape_string(results[0]) + "' and band = 'O'")
+                DB_실행("select * from ban where block = '" + DB_인코딩(results[0]) + "' and band = 'O'")
                 row = curs.fetchall()
                 if(row):
                     if(row[0]['end']):
@@ -3477,7 +3483,7 @@ def aban():
                         day = re.sub('\-', '', day)
                         
                         if(now >= int(day + '000000')):
-                            DB_실행("delete from ban where block = '" + pymysql.escape_string(results[0]) + "' and band = 'O'")
+                            DB_실행("delete from ban where block = '" + DB_인코딩(results[0]) + "' and band = 'O'")
                             DB_갱신()
                             end = '차단이 풀렸습니다. 다시 시도 해 보세요.'
                     else:
@@ -3488,10 +3494,10 @@ def aban():
    
 @app.route('/w/<path:name>/r/<int:a>/diff/<int:b>')
 def diff(name = None, a = None, b = None):
-    DB_실행("select * from history where id = '" + pymysql.escape_string(str(a)) + "' and title = '" + pymysql.escape_string(name) + "'")
+    DB_실행("select * from history where id = '" + DB_인코딩(str(a)) + "' and title = '" + DB_인코딩(name) + "'")
     rows = curs.fetchall()
     if(rows):
-        DB_실행("select * from history where id = '" + pymysql.escape_string(str(b)) + "' and title = '" + pymysql.escape_string(name) + "'")
+        DB_실행("select * from history where id = '" + DB_인코딩(str(b)) + "' and title = '" + DB_인코딩(name) + "'")
         row = curs.fetchall()
         if(row):
             indata = re.sub('<', '&lt;', rows[0]['data'])
@@ -3509,15 +3515,15 @@ def diff(name = None, a = None, b = None):
             
             return render_template('index.html', title = name, logo = data['name'], data = c, sub = '비교')
         else:
-            return '<meta http-equiv="refresh" content="0;url=/history/' + parse.quote(name) + '" />'
+            return '<meta http-equiv="refresh" content="0;url=/history/' + URL_인코딩(name) + '" />'
     else:
-        return '<meta http-equiv="refresh" content="0;url=/history/' + parse.quote(name) + '" />'
+        return '<meta http-equiv="refresh" content="0;url=/history/' + URL_인코딩(name) + '" />'
         
 @app.route('/user')
 def user():
     ip = getip(request)
     
-    DB_실행("select * from user where id = '" + pymysql.escape_string(ip) + "'")
+    DB_실행("select * from user where id = '" + DB_인코딩(ip) + "'")
     rows = curs.fetchall()
     if(getban(ip) == 0):
         if(rows):
@@ -3534,12 +3540,12 @@ def user():
         acl = '차단'
         
     if(not re.search('\.', ip)):
-        DB_실행("select * from data where title = '사용자:" + pymysql.escape_string(ip) + "'")
+        DB_실행("select * from data where title = '사용자:" + DB_인코딩(ip) + "'")
         row = curs.fetchall()
         if(row):
-            ip = '<a href="/w/' + parse.quote('사용자:' + ip) + '">' + ip + '</a>'
+            ip = '<a href="/w/' + URL_인코딩('사용자:' + ip) + '">' + ip + '</a>'
         else:
-            ip = '<a class="not_thing" href="/w/' + parse.quote('사용자:' + ip) + '">' + ip + '</a>'
+            ip = '<a class="not_thing" href="/w/' + URL_인코딩('사용자:' + ip) + '">' + ip + '</a>'
         
     return render_template('index.html', title = '유저 메뉴', logo = data['name'], data = ip + '<br><br><span>권한 상태 : ' + acl + '<br><br><li><a href="/login">로그인</a></li><li><a href="/logout">로그아웃</a></li><li><a href="/register">회원가입</a></li><li><a href="/change">비밀번호 변경</a></li>')
 
@@ -3548,7 +3554,7 @@ def random():
     DB_실행("select * from data order by rand() limit 1")
     rows = curs.fetchall()
     if(rows):
-        return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(rows[0]['title']) + '" />'
+        return '<meta http-equiv="refresh" content="0;url=/w/' + URL_인코딩(rows[0]['title']) + '" />'
     else:
         return '<meta http-equiv="refresh" content="0;url=/" />'
         
@@ -3599,7 +3605,7 @@ def error(num = None):
 
 @app.errorhandler(404)
 def uncaughtError(error):
-    return '<meta http-equiv="refresh" content="0;url=/w/' + parse.quote(data['frontpage']) + '" />'
+    return '<meta http-equiv="refresh" content="0;url=/w/' + URL_인코딩(data['frontpage']) + '" />'
 
 @app.errorhandler(413)
 def uncaughtError(error):
