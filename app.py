@@ -105,6 +105,9 @@ def URL_인코딩(데이터):
 
 def DB_인코딩(데이터):
     return pymysql.escape_string(데이터)
+    
+def DB_가져오기():
+    return curs.fetchall()
 
 try:
     DB_실행("use " + data['db'])
@@ -134,18 +137,18 @@ def show_diff(seqm):
            
 def 관리자_확인():
     if(session.get('Now') == True):
-        ip = getip(request)
+        ip = 아이피(request)
         DB_실행("select * from user where id = '" + DB_인코딩(ip) + "'")
-        rows = curs.fetchall()
+        rows = DB_가져오기()
         if(rows):
             if(rows[0]['acl'] == 'owner' or rows[0]['acl'] == 'admin'):
                 return 1
                 
 def 소유자_확인():
     if(session.get('Now') == True):
-        ip = getip(request)
+        ip = 아이피(request)
         DB_실행("select * from user where id = '" + DB_인코딩(ip) + "'")
-        rows = curs.fetchall()
+        rows = DB_가져오기()
         if(rows):
             if(rows[0]['acl'] == 'owner'):
                 return 1
@@ -153,27 +156,27 @@ def 소유자_확인():
 def isin(name, data):
     if(re.search('^틀:', name)):
         DB_실행("select * from back where title = '" + DB_인코딩(name) + "' and type = 'include'")
-        include = curs.fetchall()
+        include = DB_가져오기()
         if(include):
             i = 0
 
             while(True):
                 try:
-                    namumark(include[i]['link'], data)
+                    나무마크(include[i]['link'], data)
                 except:
                     break
                     
                 i = i + 1
 
-def savemark(data):
-    data = re.sub("\[date\(now\)\]", 시간(), data)
-    if(not re.search("\.", getip(request))):
-        name = '[[사용자:' + getip(request) + '|' + getip(request) + ']]'
+def 세이브마크(데이터):
+    데이터 = re.sub("\[date\(now\)\]", 시간(), 데이터)
+    if(not re.search("\.", 아이피(request))):
+        이름 = '[[사용자:' + 아이피(request) + '|' + 아이피(request) + ']]'
     else:
-        name = getip(request)
-    data = re.sub("\[name\]", name, data)
+        이름 = 아이피(request)
+    데이터 = re.sub("\[name\]", 이름, 데이터)
 
-    return data
+    return 데이터
     
 def 로그인_확인():
     if(session.get('Now') == True):
@@ -187,7 +190,7 @@ def 아이디_파싱(원래_아이디):
         분리 = 있나.groups()
         
         DB_실행("select * from data where title = '사용자:" + DB_인코딩(분리[0]) + "'")
-        row = curs.fetchall()
+        row = DB_가져오기()
         if(row):
             ip = '<a href="/w/' + URL_인코딩('사용자:' + 분리[0]) + '">' + 분리[0] + '</a> - ' + 분리[1]
         else:
@@ -196,158 +199,179 @@ def 아이디_파싱(원래_아이디):
         ip = 원래_아이디
     else:
         DB_실행("select * from data where title = '사용자:" + DB_인코딩(원래_아이디) + "'")
-        row = curs.fetchall()
+        row = DB_가져오기()
         if(row):
             ip = '<a href="/w/' + URL_인코딩('사용자:' + 원래_아이디) + '">' + 원래_아이디 + '</a>'
         else:
             ip = '<a class="not_thing" href="/w/' + URL_인코딩('사용자:' + 원래_아이디) + '">' + 원래_아이디 + '</a>'
 
     return ip
-
-def namumark(title, data):
+    
+def HTML_파싱(데이터):
     while(True):
-        m = re.search("<((div|span|embed|iframe)(?:[^>]*))>", data)
-        if(m):
-            g = m.groups()
+        있나 = re.search("<((div|span|embed|iframe)(?:[^>]*))>", 데이터)
+        
+        if(있나):
+            분리 = 있나.groups()
 
-            if(re.search("<(\/" + g[1] + ")>", data) and not re.search("'", g[0])):
-                n = re.search('src="http(?:s)?:\/\/([^\/]*)\/(?:[^"]*)"', g[0])
-                if(n):
-                    gm = n.groups()
-                    if(gm[0] == "www.youtube.com" or gm[0] == "serviceapi.nmv.naver.com" or gm[0] == "tv.kakao.com" or gm[0] == "tvple.com" or gm[0] == "tvpot.daum.net"):
-                        r = g[0]
-                    else:
-                        r = re.sub('src="([^"]*)"', '', g[0])
-                else:
-                    r = g[0]
+            if(re.search("<(\/" + 분리[1] + ")>", 데이터) and not re.search("'", 분리[0])):
+                XSS = re.search('src="http(?:s)?:\/\/([^\/]*)\/(?:[^"]*)"', 분리[0])
                 
-                r = re.sub('"', '#.#', r)
-                data = re.sub("<((?:\/)?" + g[1] + "(?:[^>]*))>", "[" + r + "]", data, 1)
-                data = re.sub("<\/" + g[1] + ">", "[/" + g[1] + "]", data, 1)
+                if(XSS):
+                    확인 = XSS.groups()
+                    
+                    if(확인[0] == "www.youtube.com" or 확인[0] == "serviceapi.nmv.naver.com" or 확인[0] == "tv.kakao.com" or 확인[0] == "tvple.com" or 확인[0] == "tvpot.daum.net"):
+                        임시_저장 = 분리[0]
+                    else:
+                        임시_저장 = re.sub('src="([^"]*)"', '', 분리[0])
+                else:
+                    임시_저장 = 분리[0]
+                
+                임시_저장 = re.sub('"', '#.#', 임시_저장)
+                데이터 = re.sub("<((?:\/)?" + 분리[1] + "(?:[^>]*))>", "[" + 임시_저장 + "]", 데이터, 1)
+                데이터 = re.sub("<\/" + 분리[1] + ">", "[/" + 분리[1] + "]", 데이터, 1)
             else:
-                data = re.sub("<((?:\/)?" + g[1] + "(?:[^>]*))>", '&lt;' + g[0] + '&gt;', data, 1)
+                데이터 = re.sub("<((?:\/)?" + 분리[1] + "(?:[^>]*))>", '&lt;' + 분리[0] + '&gt;', 데이터, 1)
                 
                 break
         else:
             break
 
-    data = re.sub('<', '&lt;', data)
-    data = re.sub('>', '&gt;', data)
-    data = re.sub('"', '&quot;', data)
+    데이터 = re.sub('<', '&lt;', 데이터)
+    데이터 = re.sub('>', '&gt;', 데이터)
+    데이터 = re.sub('"', '&quot;', 데이터)
     
-    data = re.sub("\[(?P<in>(?:\/)?(?:div|span|embed|iframe)(?:[^\]]*))\]", "<\g<in>>", data)
-    data = re.sub('#.#', '"', data)
+    데이터 = re.sub("\[(?P<in>(?:\/)?(?:div|span|embed|iframe)(?:[^\]]*))\]", "<\g<in>>", 데이터)
+    데이터 = re.sub('#.#', '"', 데이터)
     
-    jjjj = 0
+    return 데이터
+    
+def 중괄호_문법(데이터, 접기_숫자):
     while(True):
-        p = re.compile("{{{((?:(?!{{{)(?!}}}).)*)}}}", re.DOTALL)
-        m = p.search(data)
-        if(m):
-            results = m.groups()
-            q = re.compile("^\+([1-5])\s(.*)$", re.DOTALL)
-            n = q.search(results[0])
+        문법_컴파일 = re.compile("{{{((?:(?!{{{)(?!}}}).)*)}}}", re.DOTALL)
+        있나 = 문법_컴파일.search(데이터)
+        
+        if(있나):
+            분리 = 있나.groups()
             
-            w = re.compile("^\-([1-5])\s(.*)$", re.DOTALL)
-            a = w.search(results[0])
+            크게_문법 = re.compile("^\+([1-5])\s(.*)$", re.DOTALL)
+            크게 = 크게_문법.search(분리[0])
             
-            e = re.compile("^(#[0-9a-f-A-F]{6})\s(.*)$", re.DOTALL)
-            b = e.search(results[0])
+            작게_문법 = re.compile("^\-([1-5])\s(.*)$", re.DOTALL)
+            작게 = 작게_문법.search(분리[0])
             
-            r = re.compile("^(#[0-9a-f-A-F]{3})\s(.*)$", re.DOTALL)
-            c = r.search(results[0])
+            색깔_문법_1 = re.compile("^(#[0-9a-f-A-F]{6})\s(.*)$", re.DOTALL)
+            색깔_1 = 색깔_문법_1.search(분리[0])
             
-            t = re.compile("^#(\w+)\s(.*)$", re.DOTALL)
-            d = t.search(results[0])
+            색깔_문법_2 = re.compile("^(#[0-9a-f-A-F]{3})\s(.*)$", re.DOTALL)
+            색깔_2 = 색깔_문법_2.search(분리[0])
             
-            qqq = re.compile("^@([0-9a-f-A-F]{6})\s(.*)$", re.DOTALL)
-            qqe = qqq.search(results[0])
+            색깔_문법_3 = re.compile("^#(\w+)\s(.*)$", re.DOTALL)
+            색깔_3 = 색깔_문법_3.search(분리[0])
             
-            qqw = re.compile("^@([0-9a-f-A-F]{3})\s(.*)$", re.DOTALL)
-            qqa = qqw.search(results[0])
+            배경색_문법_1 = re.compile("^@([0-9a-f-A-F]{6})\s(.*)$", re.DOTALL)
+            배경색_1 = 배경색_문법_1.search(분리[0])
             
-            qwe = re.compile("^@(\w+)\s(.*)$", re.DOTALL)
-            qsd = qwe.search(results[0])
+            배경색_문법_2 = re.compile("^@([0-9a-f-A-F]{3})\s(.*)$", re.DOTALL)
+            배경색_2 = 배경색_문법_2.search(분리[0])
             
-            qawe = re.compile("^#!noin\s(.*)$", re.DOTALL)
-            qasd = qawe.search(results[0])
+            배경색_문법_3 = re.compile("^@(\w+)\s(.*)$", re.DOTALL)
+            배경색_3 = 배경색_문법_3.search(분리[0])
             
-            y = re.compile("^#!wiki\sstyle=&quot;((?:(?!&quot;|\n).)*)&quot;\n?\s\n(.*)$", re.DOTALL)
-            l = y.search(results[0])
+            틀_제외_문법 = re.compile("^#!noin\s(.*)$", re.DOTALL)
+            틀_제외 = 틀_제외_문법.search(분리[0])
             
-            html = re.compile("^#!html\s(.*)$", re.DOTALL)
-            htmlr = html.search(results[0])
+            DIV_문법 = re.compile("^#!wiki\sstyle=&quot;((?:(?!&quot;|\n).)*)&quot;\n?\s\n(.*)$", re.DOTALL)
+            DIV = DIV_문법.search(분리[0])
             
-            ppp = re.compile("^#!folding\s((?:(?!\n).)*)\n?\s\n(.*)$", re.DOTALL)
-            ooo = ppp.search(results[0])
+            HTML_문법 = re.compile("^#!html\s(.*)$", re.DOTALL)
+            HTML = HTML_문법.search(분리[0])
             
-            if(n):
-                result = n.groups()
-                data = p.sub('<span class="font-size-' + result[0] + '">' + result[1] + '</span>', data, 1)
-            elif(a):
-                result = a.groups()
-                data = p.sub('<span class="font-size-small-' + result[0] + '">' + result[1] + '</span>', data, 1)
-            elif(b):
-                result = b.groups()
-                data = p.sub('<span style="color:' + result[0] + '">' + result[1] + '</span>', data, 1)
-            elif(c):
-                result = c.groups()
-                data = p.sub('<span style="color:' + result[0] + '">' + result[1] + '</span>', data, 1)
-            elif(d):
-                result = d.groups()
-                data = p.sub('<span style="color:' + result[0] + '">' + result[1] + '</span>', data, 1)
-            elif(qqe):
-                result = qqe.groups()
-                data = p.sub('<span style="background:#' + result[0] + '">' + result[1] + '</span>', data, 1)
-            elif(qqa):
-                result = qqa.groups()
-                data = p.sub('<span style="background:#' + result[0] + '">' + result[1] + '</span>', data, 1)
-            elif(qsd):
-                result = qsd.groups()
-                data = p.sub('<span style="background:' + result[0] + '">' + result[1] + '</span>', data, 1)
-            elif(l):
-                result = l.groups()
-                data = p.sub('<div style="' + result[0] + '">' + result[1] + '</div>', data, 1)
-            elif(htmlr):
-                result = htmlr.groups()
-                data = p.sub(result[0], data, 1)
-            elif(ooo):
-                result = ooo.groups()
-                data = p.sub("<div>" + result[0] + "<span style='float:right;'><div id='folding_" + str(jjjj + 1) + "' style='display:block;'>[<a href='javascript:void(0);' onclick='var f=document.getElementById(\"folding_" + str(jjjj) + "\");var s=f.style.display==\"block\";f.style.display=s?\"none\":\"block\";this.className=s?\"\":\"opened\";var f=document.getElementById(\"folding_" + str(jjjj + 1) + "\");var s=f.style.display==\"none\";f.style.display=s?\"block\":\"none\";var f=document.getElementById(\"folding_" + str(jjjj + 2) + "\");var s=f.style.display==\"block\";f.style.display=s?\"none\":\"block\";'>펼치기</a>]</div><div id='folding_" + str(jjjj + 2) + "' style='display:none;'>[<a href='javascript:void(0);' onclick='var f=document.getElementById(\"folding_" + str(jjjj) + "\");var s=f.style.display==\"block\";f.style.display=s?\"none\":\"block\";this.className=s?\"\":\"opened\";var f=document.getElementById(\"folding_" + str(jjjj + 1) + "\");var s=f.style.display==\"none\";f.style.display=s?\"block\":\"none\";var f=document.getElementById(\"folding_" + str(jjjj + 2) + "\");var s=f.style.display==\"block\";f.style.display=s?\"none\":\"block\";'>접기</a>]</div></a></span><div id='folding_" + str(jjjj) + "' style='display:none;'><br>" + result[1] + "</div></div>", data, 1)
-                jjjj = jjjj + 3
-            elif(qasd):
-                result = qasd.groups()
-                data = p.sub(result[0], data, 1)
+            접기_문법 = re.compile("^#!folding\s((?:(?!\n).)*)\n?\s\n(.*)$", re.DOTALL)
+            접기 = 접기_문법.search(분리[0])
+            
+            if(크게):
+                결과 = 크게.groups()
+                데이터 = 문법_컴파일.sub('<span class="font-size-' + 결과[0] + '">' + 결과[1] + '</span>', 데이터, 1)
+            elif(작게):
+                결과 = 작게.groups()
+                데이터 = 문법_컴파일.sub('<span class="font-size-small-' + 결과[0] + '">' + 결과[1] + '</span>', 데이터, 1)
+            elif(색깔_1):
+                결과 = 색깔_1.groups()
+                data = 문법_컴파일.sub('<span style="color:' + 결과[0] + '">' + 결과[1] + '</span>', 데이터, 1)
+            elif(색깔_2):
+                결과 = 색깔_2.groups()
+                데이터 = 문법_컴파일.sub('<span style="color:' + 결과[0] + '">' + 결과[1] + '</span>', 데이터, 1)
+            elif(색깔_3):
+                결과 = 색깔_3.groups()
+                데이터 = 문법_컴파일.sub('<span style="color:' + 결과[0] + '">' + 결과[1] + '</span>', 데이터, 1)
+            elif(배경색_1):
+                결과 = 배경색_1.groups()
+                데이터 = 문법_컴파일.sub('<span style="background:#' + 결과[0] + '">' + 결과[1] + '</span>', 데이터, 1)
+            elif(배경색_2):
+                결과 = 배경색_2.groups()
+                데이터 = 문법_컴파일.sub('<span style="background:#' + 결과[0] + '">' + 결과[1] + '</span>', 데이터, 1)
+            elif(배경색_3):
+                결과 = 배경색_3.groups()
+                데이터 = 문법_컴파일.sub('<span style="background:' + 결과[0] + '">' + 결과[1] + '</span>', 데이터, 1)
+            elif(DIV):
+                결과 = DIV.groups()
+                데이터 = 문법_컴파일.sub('<div style="' + 결과[0] + '">' + 결과[1] + '</div>', 데이터, 1)
+            elif(HTML):
+                결과 = HTML.groups()
+                데이터 = 문법_컴파일.sub(결과[0], 데이터, 1)
+            elif(접기):
+                결과 = 접기.groups()
+                데이터 = 문법_컴파일.sub("<div>" + 결과[0] + "<span style='float:right;'><div id='folding_" + str(접기_숫자 + 1) + "' style='display:block;'>[<a href='javascript:void(0);' onclick='var f=document.getElementById(\"folding_" + str(접기_숫자) + "\");var s=f.style.display==\"block\";f.style.display=s?\"none\":\"block\";this.className=s?\"\":\"opened\";var f=document.getElementById(\"folding_" + str(접기_숫자 + 1) + "\");var s=f.style.display==\"none\";f.style.display=s?\"block\":\"none\";var f=document.getElementById(\"folding_" + str(접기_숫자 + 2) + "\");var s=f.style.display==\"block\";f.style.display=s?\"none\":\"block\";'>펼치기</a>]</div><div id='folding_" + str(접기_숫자 + 2) + "' style='display:none;'>[<a href='javascript:void(0);' onclick='var f=document.getElementById(\"folding_" + str(접기_숫자) + "\");var s=f.style.display==\"block\";f.style.display=s?\"none\":\"block\";this.className=s?\"\":\"opened\";var f=document.getElementById(\"folding_" + str(접기_숫자 + 1) + "\");var s=f.style.display==\"none\";f.style.display=s?\"block\":\"none\";var f=document.getElementById(\"folding_" + str(접기_숫자 + 2) + "\");var s=f.style.display==\"block\";f.style.display=s?\"none\":\"block\";'>접기</a>]</div></a></span><div id='folding_" + str(접기_숫자) + "' style='display:none;'><br>" + 결과[1] + "</div></div>", 데이터, 1)
+                
+                접기_숫자 += 3
+            elif(HTML):
+                결과 = HTML.groups()
+                데이터 = 문법_컴파일.sub(결과[0], 데이터, 1)
             else:
-                data = p.sub('<code>' + results[0] + '</code>', data, 1)
-        else:
-            break
-    
-    while(True):
-        a = re.compile("<code>(((?!<\/code>).)*)<\/code>", re.DOTALL)
-        m = a.search(data)
-        if(m):
-            g = m.groups()
-            j = re.sub("<\/span>", "}}}", g[0])
-            j = re.sub("<\/div>", "}}}", j)
-            j = re.sub('<span class="font\-size\-(?P<in>[1-6])">', "{{{+\g<in> ", j)
-            j = re.sub('<span class="font\-size\-small\-(?P<in>[1-6])">', "{{{-\g<in> ", j)
-            j = re.sub('<span style="color:(?:#)?(?P<in>[^"]*)">', "{{{#\g<in> ", j)
-            j = re.sub('<span style="background:(?:#)?(?P<in>[^"]*)">', "{{{@\g<in> ", j)
-            j = re.sub('<div style="(?P<in>[^"]*)">', "{{{#!wiki style=&quot;\g<in>&quot;\n", j)
-            j = re.sub("(?P<in>.)", "<span>\g<in></span>", j)
-            data = a.sub(j, data, 1)
+                데이터 = 문법_컴파일.sub('<code>' + 분리[0] + '</code>', 데이터, 1)
         else:
             break
             
-    data = re.sub("<span>&</span><span>l</span><span>t</span><span>;</span>", "<span>&lt;</span>", data)
-    data = re.sub("<span>&</span><span>g</span><span>t</span><span>;</span>", "<span>&gt;</span>", data)
+    while(True):
+        문법_컴파일 = re.compile("<code>(((?!<\/code>).)*)<\/code>", re.DOTALL)
+        있나 = 문법_컴파일.search(데이터)
+        if(있나):
+            결과 = 있나.groups()
+            
+            중간_데이터 = re.sub("<\/span>", "}}}", 결과[0])
+            중간_데이터 = re.sub("<\/div>", "}}}", 중간_데이터)
+            중간_데이터 = re.sub('<span class="font\-size\-(?P<in>[1-6])">', "{{{+\g<in> ", 중간_데이터)
+            중간_데이터 = re.sub('<span class="font\-size\-small\-(?P<in>[1-6])">', "{{{-\g<in> ", 중간_데이터)
+            중간_데이터 = re.sub('<span style="color:(?:#)?(?P<in>[^"]*)">', "{{{#\g<in> ", 중간_데이터)
+            중간_데이터 = re.sub('<span style="background:(?:#)?(?P<in>[^"]*)">', "{{{@\g<in> ", 중간_데이터)
+            중간_데이터 = re.sub('<div style="(?P<in>[^"]*)">', "{{{#!wiki style=&quot;\g<in>&quot;\n", 중간_데이터)
+            중간_데이터 = re.sub("(?P<in>.)", "<span>\g<in></span>", 중간_데이터)
+            
+            데이터 = 문법_컴파일.sub(중간_데이터, 데이터, 1)
+        else:
+            break
+            
+    데이터 = re.sub("<span>&</span><span>l</span><span>t</span><span>;</span>", "<span>&lt;</span>", 데이터)
+    데이터 = re.sub("<span>&</span><span>g</span><span>t</span><span>;</span>", "<span>&gt;</span>", 데이터)
+            
+    return (데이터, 접기_숫자)
+
+def 나무마크(title, data):
+    data = HTML_파싱(data)
+
+    접기_숫자 = 0
+    임시_저장 = 중괄호_문법(data, 접기_숫자)
+    
+    data = 임시_저장[0]
+    접기_숫자 = 임시_저장[1]
     
     data = re.sub("\[anchor\((?P<in>[^\[\]]*)\)\]", '<span id="\g<in>"></span>', data)
     data = re.sub('\[date\(now\)\]', 시간(), data)
-    if(not re.search("\.", getip(request))):
-        name = '[[사용자:' + getip(request) + '|' + getip(request) + ']]'
+    if(not re.search("\.", 아이피(request))):
+        name = '[[사용자:' + 아이피(request) + '|' + 아이피(request) + ']]'
     else:
-        name = getip(request)
+        name = 아이피(request)
     data = re.sub("\[name\]", name, data)
     
     while(True):
@@ -358,145 +382,21 @@ def namumark(title, data):
                 data = re.sub("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]", "<b>" + results[0] + "</b>", data, 1)
             else:
                 DB_실행("select * from data where title = '" + DB_인코딩(results[0]) + "'")
-                rows = curs.fetchall()
-                if(rows):
+                틀_내용 = DB_가져오기()
+                
+                if(틀_내용):
                     DB_실행("select * from back where title = '" + DB_인코딩(results[0]) + "' and link = '" + DB_인코딩(title) + "' and type = 'include'")
-                    abb = curs.fetchall()
-                    if(not abb):
+                    역링크 = DB_가져오기()
+                    
+                    if(not 역링크):
                         DB_실행("insert into back (title, link, type) value ('" + DB_인코딩(results[0]) + "', '" + DB_인코딩(title) + "',  'include')")
                         DB_갱신()
                         
-                    enddata = rows[0]['data']
-                    enddata = re.sub("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]", "", enddata)
+                    틀_데이터 = 틀_내용[0]['data']
+                    틀_데이터 = re.sub("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]", "", 틀_데이터)
                     
-                    while(True):
-                        m = re.search("<((?:\/)?(?:div|span|embed|iframe)(?:[^>]*))>", enddata)
-                        if(m):
-                            g = m.groups()
-                            
-                            n = re.search('src="http(?:s)?:\/\/([^\/]*)\/(?:[^"]*)"', g[0])
-                            if(n):
-                                gm = n.groups()
-                                if(gm[0] == "www.youtube.com" or gm[0] == "serviceapi.nmv.naver.com" or gm[0] == "tv.kakao.com" or gm[0] == "tvple.com" or gm[0] == "tvpot.daum.net"):
-                                    r = g[0]
-                                else:
-                                    r = re.sub('src="([^"]*)"', '', g[0])
-                            else:
-                                r = g[0]
-                            
-                            r = re.sub('"', '#.#', r)
-                            enddata = re.sub("<((?:\/)?(?:div|span|embed|iframe)(?:[^>]*))>", "[" + r + "]", enddata, 1)
-                        else:
-                            break
-
-                    enddata = re.sub('<', '&lt;', enddata)
-                    enddata = re.sub('>', '&gt;', enddata)
-                    enddata = re.sub('"', '&quot;', enddata)
-                    
-                    enddata = re.sub("\[(?P<in>(?:\/)?(?:div|span|embed|iframe)(?:[^\]]*))\]", "<\g<in>>", enddata)
-                    enddata = re.sub('#.#', '"', enddata)
-                    
-                    while(True):
-                        p = re.compile("{{{((?:(?!{)(?!}).)*)}}}", re.DOTALL)
-                        m = p.search(enddata)
-                        if(m):
-                            nnn = m.groups()
-                            q = re.compile("^\+([1-5])\s(.*)$", re.DOTALL)
-                            n = q.search(nnn[0])
-                            
-                            w = re.compile("^\-([1-5])\s(.*)$", re.DOTALL)
-                            a = w.search(nnn[0])
-                            
-                            e = re.compile("^(#[0-9a-f-A-F]{6})\s(.*)$", re.DOTALL)
-                            b = e.search(nnn[0])
-                            
-                            r = re.compile("^(#[0-9a-f-A-F]{3})\s(.*)$", re.DOTALL)
-                            c = r.search(nnn[0])
-                            
-                            t = re.compile("^#(\w+)\s(.*)$", re.DOTALL)
-                            d = t.search(nnn[0])
-                            
-                            qqq = re.compile("^@([0-9a-f-A-F]{6})\s(.*)$", re.DOTALL)
-                            qqe = qqq.search(nnn[0])
-                            
-                            qqw = re.compile("^@([0-9a-f-A-F]{3})\s(.*)$", re.DOTALL)
-                            qqa = qqw.search(nnn[0])
-                            
-                            qwe = re.compile("^@(\w+)\s(.*)$", re.DOTALL)
-                            qsd = qwe.search(nnn[0])
-                            
-                            qawe = re.compile("^#!noin\s(.*)$", re.DOTALL)
-                            qasd = qawe.search(nnn[0])
-                            
-                            y = re.compile("^#!wiki\sstyle=&quot;((?:(?!&quot;|\n).)*)&quot;\n?\s\n(.*)$", re.DOTALL)
-                            l = y.search(nnn[0])
-                            
-                            html = re.compile("^#!html\s(.*)$", re.DOTALL)
-                            htmlr = html.search(nnn[0])
-                            
-                            ppp = re.compile("^#!folding\s((?:(?!\n).)*)\n?\s\n(.*)$", re.DOTALL)
-                            ooo = ppp.search(nnn[0])
-                            
-                            if(n):
-                                result = n.groups()
-                                enddata = p.sub('<span class="font-size-' + result[0] + '">' + result[1] + '</span>', enddata, 1)
-                            elif(a):
-                                result = a.groups()
-                                enddata = p.sub('<span class="font-size-small-' + result[0] + '">' + result[1] + '</span>', enddata, 1)
-                            elif(b):
-                                result = b.groups()
-                                enddata = p.sub('<span style="color:' + result[0] + '">' + result[1] + '</span>', enddata, 1)
-                            elif(c):
-                                result = c.groups()
-                                enddata = p.sub('<span style="color:' + result[0] + '">' + result[1] + '</span>', enddata, 1)
-                            elif(d):
-                                result = d.groups()
-                                enddata = p.sub('<span style="color:' + result[0] + '">' + result[1] + '</span>', enddata, 1)
-                            elif(qqe):
-                                result = qqe.groups()
-                                enddata = p.sub('<span style="background:#' + result[0] + '">' + result[1] + '</span>', enddata, 1)
-                            elif(qqa):
-                                result = qqa.groups()
-                                enddata = p.sub('<span style="background:#' + result[0] + '">' + result[1] + '</span>', enddata, 1)
-                            elif(qsd):
-                                result = qsd.groups()
-                                enddata = p.sub('<span style="background:' + result[0] + '">' + result[1] + '</span>', enddata, 1)
-                            elif(l):
-                                result = l.groups()
-                                enddata = p.sub('<div style="' + result[0] + '">' + result[1] + '</div>', enddata, 1)
-                            elif(htmlr):
-                                result = htmlr.groups()
-                                data = p.sub(result[0], enddata, 1)
-                            elif(ooo):
-                                result = ooo.groups()
-                                enddata = p.sub("<div>" + result[0] + "<span style='float:right;'><div id='folding_" + str(jjjj + 1) + "' style='display:block;'>[<a href='javascript:void(0);' onclick='var f=document.getElementById(\"folding_" + str(jjjj) + "\");var s=f.style.display==\"block\";f.style.display=s?\"none\":\"block\";this.className=s?\"\":\"opened\";var f=document.getElementById(\"folding_" + str(jjjj + 1) + "\");var s=f.style.display==\"none\";f.style.display=s?\"block\":\"none\";var f=document.getElementById(\"folding_" + str(jjjj + 2) + "\");var s=f.style.display==\"block\";f.style.display=s?\"none\":\"block\";'>펼치기</a>]</div><div id='folding_" + str(jjjj + 2) + "' style='display:none;'>[<a href='javascript:void(0);' onclick='var f=document.getElementById(\"folding_" + str(jjjj) + "\");var s=f.style.display==\"block\";f.style.display=s?\"none\":\"block\";this.className=s?\"\":\"opened\";var f=document.getElementById(\"folding_" + str(jjjj + 1) + "\");var s=f.style.display==\"none\";f.style.display=s?\"block\":\"none\";var f=document.getElementById(\"folding_" + str(jjjj + 2) + "\");var s=f.style.display==\"block\";f.style.display=s?\"none\":\"block\";'>접기</a>]</div></a></span><div id='folding_" + str(jjjj) + "' style='display:none;'><br>" + result[1] + "</div></div>", enddata, 1)
-                                jjjj = jjjj + 3
-                            elif(qasd):
-                                enddata = p.sub("", enddata, 1)
-                            else:
-                                enddata = p.sub('<code>' + nnn[0] + '</code>', enddata, 1)
-                        else:
-                            break
-                    
-                    while(True):
-                        a = re.compile("<code>(((?!<\/code>).)*)<\/code>", re.DOTALL)
-                        m = a.search(enddata)
-                        if(m):
-                            g = m.groups()
-                            j = re.sub("<\/span>", "}}}", g[0])
-                            j = re.sub("<\/div>", "}}}", j)
-                            j = re.sub('<span class="font\-size\-(?P<in>[1-6])">', "{{{+\g<in> ", j)
-                            j = re.sub('<span class="font\-size\-small\-(?P<in>[1-6])">', "{{{-\g<in> ", j)
-                            j = re.sub('<span style="color:(?:#)?(?P<in>[^"]*)">', "{{{#\g<in> ", j)
-                            j = re.sub('<span style="background:(?:#)?(?P<in>[^"]*)">', "{{{@\g<in> ", j)
-                            j = re.sub('<div style="(?P<in>[^"]*)">', "{{{#!wiki style=&quot;\g<in>&quot;\n", j)
-                            j = re.sub("(?P<in>.)", "<span>\g<in></span>", j)
-                            enddata = a.sub(j, enddata, 1)
-                        else:
-                            break
-                    
-                    enddata = re.sub("<span>&</span><span>l</span><span>t</span><span>;</span>", "<span>&lt;</span>", enddata)
-                    enddata = re.sub("<span>&</span><span>g</span><span>t</span><span>;</span>", "<span>&gt;</span>", enddata)
+                    틀_데이터 = HTML_파싱(틀_데이터)
+                    틀_데이터 = 중괄호_문법(틀_데이터, 접기_숫자)[0]
                     
                     if(results[1]):
                         a = results[1]
@@ -504,14 +404,14 @@ def namumark(title, data):
                             g = re.search("([^= ,]*)\=([^,]*)", a)
                             if(g):
                                 result = g.groups()
-                                enddata = re.sub("@" + result[0] + "@", result[1], enddata)
+                                틀_데이터 = re.sub("@" + result[0] + "@", result[1], 틀_데이터)
                                 a = re.sub("([^= ,]*)\=([^,]*)", "", a, 1)
                             else:
                                 break                        
-                    data = re.sub("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]", '\n<div>' + enddata + '</div>\n', data, 1)
+                    data = re.sub("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]", '\n<div>' + 틀_데이터 + '</div>\n', data, 1)
                 else:
                     DB_실행("select * from back where title = '" + DB_인코딩(results[0]) + "' and link = '" + DB_인코딩(title) + "' and type = 'include'")
-                    abb = curs.fetchall()
+                    abb = DB_가져오기()
                     if(not abb):
                         DB_실행("insert into back (title, link, type) value ('" + DB_인코딩(results[0]) + "', '" + DB_인코딩(title) + "',  'include')")
                         DB_갱신()
@@ -531,7 +431,7 @@ def namumark(title, data):
             else:
                 data = re.sub('^#(?:redirect|넘겨주기)\s([^\n]*)', '<meta http-equiv="refresh" content="0;url=/w/' + URL_인코딩(results[0]) + '/from/' + URL_인코딩(title) + '" />', data, 1)
             DB_실행("select * from back where title = '" + DB_인코딩(results[0]) + "' and link = '" + DB_인코딩(title) + "' and type = 'redirect'")
-            abb = curs.fetchall()
+            abb = DB_가져오기()
             if(not abb):
                 DB_실행("insert into back (title, link, type) value ('" + DB_인코딩(results[0]) + "', '" + DB_인코딩(title) + "',  'redirect')")
                 DB_갱신()
@@ -629,14 +529,14 @@ def namumark(title, data):
             
             if(not title == g[0]):
                 DB_실행("select * from cat where title = '" + DB_인코딩(g[0]) + "' and cat = '" + DB_인코딩(title) + "'")
-                abb = curs.fetchall()
+                abb = DB_가져오기()
                 if(not abb):
                     DB_실행("insert into cat (title, cat) value ('" + DB_인코딩(g[0]) + "', '" + DB_인코딩(title) + "')")
                     DB_갱신()                
                     
                 if(category == ''):
                     DB_실행("select * from data where title = '" + DB_인코딩(g[0]) + "'")
-                    exists = curs.fetchall()
+                    exists = DB_가져오기()
                     if(exists):
                         red = ""
                     else:
@@ -645,7 +545,7 @@ def namumark(title, data):
                     category = category + '<a ' + red + ' href="/w/' + URL_인코딩(g[0]) + '">' + re.sub("분류:", "", g[0]) + '</a>'
                 else:
                     DB_실행("select * from data where title = '" + DB_인코딩(g[0]) + "'")
-                    exists = curs.fetchall()
+                    exists = DB_가져오기()
                     if(exists):
                         red = ""
                     else:
@@ -697,7 +597,7 @@ def namumark(title, data):
                 data = re.sub("\[\[파일:((?:(?!\]\]|\?).)*)(?:\?((?:(?!\]\]).)*))?\]\]", "<a href='/w/파일:" + img + "'><img src='/image/" + img + "'></a>", data, 1)
             if(not re.search("^파일:([^\n]*)", title)):
                 DB_실행("select * from back where title = '" + DB_인코딩(c[0]) + "' and link = '" + DB_인코딩(title) + "' and type = 'redirect'")
-                abb = curs.fetchall()
+                abb = DB_가져오기()
                 if(not abb):
                     DB_실행("insert into back (title, link, type) value ('파일:" + DB_인코딩(c[0]) + "', '" + DB_인코딩(title) + "',  'file')")
                     DB_갱신()            
@@ -752,13 +652,13 @@ def namumark(title, data):
                             data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<b>' + g + '</b>', data, 1)
                         else:
                             DB_실행("select * from data where title = '" + DB_인코딩(results[0]) + "'")
-                            rows = curs.fetchall()
+                            rows = DB_가져오기()
                             if(rows):
                                 data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a title="' + results[0] + results[1] + '" href="/w/' + URL_인코딩(results[0]) + results[1] + '">' + g + '</a>', data, 1)
                             else:
                                 data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a title="' + results[0] + results[1] + '" class="not_thing" href="/w/' + URL_인코딩(results[0]) + results[1] + '">' + g + '</a>', data, 1)
                             DB_실행("select * from back where title = '" + DB_인코딩(results[0]) + "' and link = '" + DB_인코딩(title) + "'")
-                            rows = curs.fetchall()
+                            rows = DB_가져오기()
                             if(not rows):
                                 DB_실행("insert into back (title, link, type) value ('" + DB_인코딩(results[0]) + "', '" + DB_인코딩(title) + "', '')")
                                 DB_갱신()
@@ -777,13 +677,13 @@ def namumark(title, data):
                             data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<b>' + results[1] + '</b>', data, 1)
                         else:
                             DB_실행("select * from data where title = '" + DB_인코딩(results[0]) + "'")
-                            rows = curs.fetchall()
+                            rows = DB_가져오기()
                             if(rows):
                                 data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a title="' + results[0] + '" href="/w/' + URL_인코딩(results[0]) + '">' + results[1] + '</a>', data, 1)
                             else:
                                 data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a title="' + results[0] + '" class="not_thing" href="/w/' + URL_인코딩(results[0]) + '">' + results[1] + '</a>', data, 1)
                             DB_실행("select * from back where title = '" + DB_인코딩(results[0]) + "' and link = '" + DB_인코딩(title) + "'")
-                            rows = curs.fetchall()
+                            rows = DB_가져오기()
                             if(not rows):
                                 DB_실행("insert into back (title, link, type) value ('" + DB_인코딩(results[0]) + "', '" + DB_인코딩(title) + "', '')")
                                 DB_갱신()
@@ -799,13 +699,13 @@ def namumark(title, data):
                             data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<b>' + result[0] + result[1] + '</b>', data, 1)
                         else:
                             DB_실행("select * from data where title = '" + DB_인코딩(result[0]) + "'")
-                            rows = curs.fetchall()
+                            rows = DB_가져오기()
                             if(rows):
                                 data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a href="/w/' + URL_인코딩(result[0]) + result[1] + '">' + result[0] + result[1] + '</a>', data, 1)
                             else:
                                 data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a class="not_thing" href="/w/' + URL_인코딩(result[0]) + result[1] + '">' + result[0] + result[1] + '</a>', data, 1)
                             DB_실행("select * from back where title = '" + DB_인코딩(result[0]) + "' and link = '" + DB_인코딩(title) + "'")
-                            rows = curs.fetchall()
+                            rows = DB_가져오기()
                             if(not rows):
                                 DB_실행("insert into back (title, link, type) value ('" + DB_인코딩(result[0]) + "', '" + DB_인코딩(title) + "', '')")
                                 DB_갱신()
@@ -824,13 +724,13 @@ def namumark(title, data):
                             data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<b>' + result[0] + '</b>', data, 1)
                         else:
                             DB_실행("select * from data where title = '" + DB_인코딩(result[0]) + "'")
-                            rows = curs.fetchall()
+                            rows = DB_가져오기()
                             if(rows):
                                 data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a href="/w/' + URL_인코딩(result[0]) + '">' + result[0] + '</a>', data, 1)
                             else:
                                 data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a class="not_thing" href="/w/' + URL_인코딩(result[0]) + '">' + result[0] + '</a>', data, 1)
                             DB_실행("select * from back where title = '" + DB_인코딩(result[0]) + "' and link = '" + DB_인코딩(title) + "'")
-                            rows = curs.fetchall()
+                            rows = DB_가져오기()
                             if(not rows):
                                 DB_실행("insert into back (title, link, type) value ('" + DB_인코딩(result[0]) + "', '" + DB_인코딩(title) + "', '')")
                                 DB_갱신()
@@ -1257,7 +1157,7 @@ def namumark(title, data):
     data = re.sub('^<br>', '', data)
     return str(data)
 
-def getip(request):
+def 아이피(request):
     if(session.get('Now') == True):
         ip = format(session['DREAMER'])
     else:
@@ -1277,7 +1177,7 @@ def getcan(ip, name):
                 return 1
             else:
                 DB_실행("select * from ban where block = '" + DB_인코딩(ip) + "'")
-                rows = curs.fetchall()
+                rows = DB_가져오기()
                 if(rows):
                     return 1
                 else:
@@ -1292,20 +1192,20 @@ def getcan(ip, name):
         if(b):
             results = b.groups()
             DB_실행("select * from ban where block = '" + DB_인코딩(results[0]) + "' and band = 'O'")
-            rowss = curs.fetchall()
+            rowss = DB_가져오기()
             if(rowss):
                 return 1
             else:
                 DB_실행("select * from ban where block = '" + DB_인코딩(ip) + "'")
-                rows = curs.fetchall()
+                rows = DB_가져오기()
                 if(rows):
                     return 1
                 else:
                     DB_실행("select * from data where title = '" + DB_인코딩(name) + "'")
-                    row = curs.fetchall()
+                    row = DB_가져오기()
                     if(row):
                         DB_실행("select * from user where id = '" + DB_인코딩(ip) + "'")
-                        rows = curs.fetchall()
+                        rows = DB_가져오기()
                         if(row[0]['acl'] == 'user'):
                             if(rows):
                                 return 0
@@ -1325,15 +1225,15 @@ def getcan(ip, name):
                         return 0
         else:
             DB_실행("select * from ban where block = '" + DB_인코딩(ip) + "'")
-            rows = curs.fetchall()
+            rows = DB_가져오기()
             if(rows):
                 return 1
             else:
                 DB_실행("select * from data where title = '" + DB_인코딩(name) + "'")
-                row = curs.fetchall()
+                row = DB_가져오기()
                 if(row):
                     DB_실행("select * from user where id = '" + DB_인코딩(ip) + "'")
-                    rows = curs.fetchall()
+                    rows = DB_가져오기()
                     if(row[0]['acl'] == 'user'):
                         if(rows):
                             return 0
@@ -1357,19 +1257,19 @@ def getban(ip):
     if(b):
         results = b.groups()
         DB_실행("select * from ban where block = '" + DB_인코딩(results[0]) + "' and band = 'O'")
-        rowss = curs.fetchall()
+        rowss = DB_가져오기()
         if(rowss):
             return 1
         else:
             DB_실행("select * from ban where block = '" + DB_인코딩(ip) + "'")
-            rows = curs.fetchall()
+            rows = DB_가져오기()
             if(rows):
                 return 1
             else:
                 return 0
     else:
         DB_실행("select * from ban where block = '" + DB_인코딩(ip) + "'")
-        rows = curs.fetchall()
+        rows = DB_가져오기()
         if(rows):
             return 1
         else:
@@ -1380,29 +1280,29 @@ def getdiscuss(ip, name, sub):
     if(b):
         results = b.groups()
         DB_실행("select * from ban where block = '" + DB_인코딩(results[0]) + "' and band = 'O'")
-        rowss = curs.fetchall()
+        rowss = DB_가져오기()
         if(rowss):
             return 1
         else:
             DB_실행("select * from ban where block = '" + DB_인코딩(ip) + "'")
-            rows = curs.fetchall()
+            rows = DB_가져오기()
             if(rows):
                 return 1
             else:
                 DB_실행("select * from stop where title = '" + DB_인코딩(name) + "' and sub = '" + DB_인코딩(sub) + "'")
-                rows = curs.fetchall()
+                rows = DB_가져오기()
                 if(rows):
                     return 1
                 else:
                     return 0
     else:
         DB_실행("select * from ban where block = '" + DB_인코딩(ip) + "'")
-        rows = curs.fetchall()
+        rows = DB_가져오기()
         if(rows):
             return 1
         else:
             DB_실행("select * from stop where title = '" + DB_인코딩(name) + "' and sub = '" + DB_인코딩(sub) + "'")
-            rows = curs.fetchall()
+            rows = DB_가져오기()
             if(rows):
                 return 1
             else:
@@ -1415,7 +1315,7 @@ def 시간():
 
 def discuss(title, sub, date):
     DB_실행("select * from rd where title = '" + DB_인코딩(title) + "' and sub = '" + DB_인코딩(sub) + "'")
-    rows = curs.fetchall()
+    rows = DB_가져오기()
     if(rows):
         DB_실행("update rd set date = '" + DB_인코딩(date) + "' where title = '" + DB_인코딩(title) + "' and sub = '" + DB_인코딩(sub) + "'")
     else:
@@ -1428,7 +1328,7 @@ def block(block, end, today, blocker, why):
 
 def history(title, data, date, ip, send, leng):
     DB_실행("select * from history where title = '" + DB_인코딩(title) + "' order by id+0 desc limit 1")
-    rows = curs.fetchall()
+    rows = DB_가져오기()
     if(rows):
         number = int(rows[0]['id']) + 1
         DB_실행("insert into history (id, title, data, date, ip, send, leng) value ('" + str(number) + "', '" + DB_인코딩(title) + "', '" + DB_인코딩(data) + "', '" + date + "', '" + DB_인코딩(ip) + "', '" + DB_인코딩(send) + "', '" + leng + "')")
@@ -1453,7 +1353,7 @@ def getleng(existing, change):
 def upload():
     app.config['MAX_CONTENT_LENGTH'] = int(data['upload']) * 1024 * 1024
     if(request.method == 'POST'):
-        ip = getip(request)
+        ip = 아이피(request)
         ban = getban(ip)
         
         if(ban == 1):
@@ -1481,7 +1381,7 @@ def upload():
             else:
                 return '<meta http-equiv="refresh" content="0;url=/error/14" />'
     else:
-        ip = getip(request)
+        ip = 아이피(request)
         ban = getban(ip)
         
         if(ban == 1):
@@ -1502,7 +1402,7 @@ def adminlist():
     div = '<div>'
     
     DB_실행("select * from user where acl = 'admin' or acl = 'owner'")
-    rows = curs.fetchall()
+    rows = DB_가져오기()
     if(rows):
         while(True):
             try:
@@ -1517,7 +1417,7 @@ def adminlist():
                 acl = '관리자'
 
             DB_실행("select * from data where title = '사용자:" + rows[i]['id'] + "'")
-            user = curs.fetchall()
+            user = DB_가져오기()
             if(user):
                 name = '<a href="/w/' + URL_인코딩('사용자:' + rows[i]['id']) + '">' + rows[i]['id'] + '</a> (' + acl + ')'
             else:
@@ -1537,7 +1437,7 @@ def recentchanges():
     div = '<div>'
     
     DB_실행("select * from history order by date desc limit 50")
-    rows = curs.fetchall()
+    rows = DB_가져오기()
     if(rows):
         admin = 관리자_확인()
         while(True):
@@ -1569,7 +1469,7 @@ def recentchanges():
                 
             if(admin == 1):
                 DB_실행("select * from ban where block = '" + DB_인코딩(rows[i]['ip']) + "'")
-                row = curs.fetchall()
+                row = DB_가져오기()
                 if(row):
                     ban = ' <a href="/ban/' + URL_인코딩(rows[i]['ip']) + '">(해제)</a>'
                 else:
@@ -1581,7 +1481,7 @@ def recentchanges():
                 ip = rows[i]['ip']
             else:
                 DB_실행("select * from data where title = '사용자:" + DB_인코딩(rows[i]['ip']) + "'")
-                row = curs.fetchall()
+                row = DB_가져오기()
                 if(row):
                     ip = '<a href="/w/' + URL_인코딩('사용자:' + rows[i]['ip']) + '">' + rows[i]['ip'] + '</a>'
                 else:
@@ -1604,7 +1504,7 @@ def recentchanges():
 def hidden(name = None, num = None):
     if(소유자_확인() == 1):
         DB_실행("select * from hidhi where title = '" + DB_인코딩(name) + "' and re = '" + DB_인코딩(str(num)) + "'")
-        rows = curs.fetchall()
+        rows = DB_가져오기()
         if(rows):
             DB_실행("delete from hidhi where title = '" + DB_인코딩(name) + "' and re = '" + DB_인코딩(str(num)) + "'")
         else:
@@ -1621,7 +1521,7 @@ def record(name = None, number = None):
     div = '<div>'
     
     DB_실행("select * from history where ip = '" + DB_인코딩(name) + "' order by date desc")
-    rows = curs.fetchall()
+    rows = DB_가져오기()
     if(rows):
         admin = 관리자_확인()
         
@@ -1656,7 +1556,7 @@ def record(name = None, number = None):
                 
             if(admin == 1):
                 DB_실행("select * from ban where block = '" + DB_인코딩(rows[i]['ip']) + "'")
-                row = curs.fetchall()
+                row = DB_가져오기()
                 if(row):
                     ban = ' <a href="/ban/' + URL_인코딩(rows[i]['ip']) + '">(해제)</a>'
                 else:
@@ -1668,7 +1568,7 @@ def record(name = None, number = None):
                 ip = rows[i]['ip']
             else:
                 DB_실행("select * from data where title = '사용자:" + DB_인코딩(rows[i]['ip']) + "'")
-                row = curs.fetchall()
+                row = DB_가져오기()
                 if(row):
                     ip = '<a href="/w/' + URL_인코딩('사용자:' + rows[i]['ip']) + '">' + rows[i]['ip'] + '</a>'
                 else:
@@ -1702,7 +1602,7 @@ def userlog(number = None):
     div = ''
     
     DB_실행("select * from user")
-    rows = curs.fetchall()
+    rows = DB_가져오기()
     if(rows):
         admin = 관리자_확인()
         
@@ -1716,7 +1616,7 @@ def userlog(number = None):
                 
             if(admin == 1):
                 DB_실행("select * from ban where block = '" + DB_인코딩(rows[i]['id']) + "'")
-                row = curs.fetchall()
+                row = DB_가져오기()
                 if(row):
                     ban = ' <a href="/ban/' + URL_인코딩(rows[i]['id']) + '">(해제)</a>'
                 else:
@@ -1728,7 +1628,7 @@ def userlog(number = None):
                 ip = rows[i]['id']
             else:
                 DB_실행("select * from data where title = '사용자:" + DB_인코딩(rows[i]['id']) + "'")
-                row = curs.fetchall()
+                row = DB_가져오기()
                 if(row):
                     ip = '<a href="/w/' + URL_인코딩('사용자:' + rows[i]['id']) + '">' + rows[i]['id'] + '</a>'
                 else:
@@ -1757,7 +1657,7 @@ def backlink(name = None, number = None):
     restart = 0
     
     DB_실행("select * from back where title = '" + DB_인코딩(name) + "' order by link asc")
-    rows = curs.fetchall()
+    rows = DB_가져오기()
     if(rows):        
         while(True):
             try:
@@ -1769,7 +1669,7 @@ def backlink(name = None, number = None):
                 
             if(rows[i]['type'] == 'include'):
                 DB_실행("select * from back where title = '" + DB_인코딩(name) + "' and link = '" + DB_인코딩(rows[i]['link']) + "' and type = ''")
-                test = curs.fetchall()
+                test = DB_가져오기()
                 if(test):
                     restart = 1
                     
@@ -1778,12 +1678,12 @@ def backlink(name = None, number = None):
                 
             if(not re.search('^사용자:', rows[i]['link'])):
                 DB_실행("select * from data where title = '" + DB_인코딩(rows[i]['link']) + "'")
-                row = curs.fetchall()
+                row = DB_가져오기()
                 if(row):
                     aa = row[0]['data']
                     aa = re.sub("(?P<in>\[include\((?P<out>(?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\])", "\g<in>\n\n[[\g<out>]]\n\n", aa)
                     aa = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', '[[\g<in>]]', aa)
-                    aa = namumark('', aa)
+                    aa = 나무마크('', aa)
                     
                     if(re.search("<a(?:(?:(?!href=).)*)?href=\"\/w\/" + URL_인코딩(name) + "(?:\#[^\"]*)?\">([^<]*)<\/a>", aa)):
                         div = div + '<li><a href="/w/' + URL_인코딩(rows[i]['link']) + '">' + rows[i]['link'] + '</a>'
@@ -1834,7 +1734,7 @@ def recentdiscuss():
     div = '<div>'
     
     DB_실행("select * from rd order by date desc limit 50")
-    rows = curs.fetchall()
+    rows = DB_가져오기()
     if(rows):
         while(True):
             try:
@@ -1866,7 +1766,7 @@ def blocklog(number = None):
     div = '<div>'
     
     DB_실행("select * from rb order by today desc")
-    rows = curs.fetchall()
+    rows = DB_가져오기()
     if(rows):
         while(True):
             try:
@@ -1918,7 +1818,7 @@ def gethistory(name = None, number = None):
         div = '<div>'
         
         DB_실행("select * from history where title = '" + DB_인코딩(name) + "' order by id+0 desc")
-        rows = curs.fetchall()
+        rows = DB_가져오기()
         if(rows):
             admin = 관리자_확인()
             
@@ -1955,7 +1855,7 @@ def gethistory(name = None, number = None):
                     ip = rows[i]["ip"]
                 else:
                     DB_실행("select * from data where title = '사용자:" + DB_인코딩(rows[i]['ip']) + "'")
-                    row = curs.fetchall()
+                    row = DB_가져오기()
                     if(row):
                         ip = '<a href="/w/' + URL_인코딩('사용자:' + rows[i]['ip']) + '">' + rows[i]['ip'] + '</a>'
                     else:
@@ -1963,27 +1863,27 @@ def gethistory(name = None, number = None):
                         
                 if(admin == 1):
                     DB_실행("select * from user where id = '" + DB_인코딩(rows[i]['ip']) + "'")
-                    row = curs.fetchall()
+                    row = DB_가져오기()
                     if(row):
                         if(row[0]['acl'] == 'owner' or row[0]['acl'] == 'admin'):
                             ban = ''
                         else:
                             DB_실행("select * from ban where block = '" + DB_인코딩(rows[i]['ip']) + "'")
-                            row = curs.fetchall()
+                            row = DB_가져오기()
                             if(row):
                                 ban = ' <a href="/ban/' + URL_인코딩(rows[i]['ip']) + '">(해제)</a>'
                             else:
                                 ban = ' <a href="/ban/' + URL_인코딩(rows[i]['ip']) + '">(차단)</a>'
                     else:
                         DB_실행("select * from ban where block = '" + DB_인코딩(rows[i]['ip']) + "'")
-                        row = curs.fetchall()
+                        row = DB_가져오기()
                         if(row):
                             ban = ' <a href="/ban/' + URL_인코딩(rows[i]['ip']) + '">(해제)</a>'
                         else:
                             ban = ' <a href="/ban/' + URL_인코딩(rows[i]['ip']) + '">(차단)</a>'
                     if(소유자_확인() == 1):
                         DB_실행("select * from hidhi where title = '" + DB_인코딩(name) + "' and re = '" + DB_인코딩(rows[i]['id']) + "'")
-                        row = curs.fetchall()
+                        row = DB_가져오기()
                         if(row):                            
                             ip = ip + ' (숨김)'                            
                             hidden = ' <a href="/history/' + URL_인코딩(name) + '/r/' + rows[i]['id'] + '/hidden">(공개)'
@@ -1991,7 +1891,7 @@ def gethistory(name = None, number = None):
                             hidden = ' <a href="/history/' + URL_인코딩(name) + '/r/' + rows[i]['id'] + '/hidden">(숨김)'
                     else:
                         DB_실행("select * from hidhi where title = '" + DB_인코딩(name) + "' and re = '" + DB_인코딩(rows[i]['id']) + "'")
-                        row = curs.fetchall()
+                        row = DB_가져오기()
                         if(row):
                             ip = '숨김'
                             hidden = ''
@@ -2005,7 +1905,7 @@ def gethistory(name = None, number = None):
                     ban = ''
                     
                     DB_실행("select * from hidhi where title = '" + DB_인코딩(name) + "' and re = '" + DB_인코딩(rows[i]['id']) + "'")
-                    row = curs.fetchall()
+                    row = DB_가져오기()
                     if(row):
                         ip = '숨김'
                         hidden = ''
@@ -2037,12 +1937,12 @@ def gethistory(name = None, number = None):
 @app.route('/search', methods=['POST'])
 def search():
     DB_실행("select * from data where title = '" + DB_인코딩(request.form["search"]) + "'")
-    rows = curs.fetchall()
+    rows = DB_가져오기()
     if(rows):
         return '<meta http-equiv="refresh" content="0;url=/w/' + URL_인코딩(request.form["search"]) + '" />'
     else:
         DB_실행("select * from data where title like '%" + DB_인코딩(request.form["search"]) + "%'")
-        rows = curs.fetchall()
+        rows = DB_가져오기()
         if(rows):
             i = 0
             
@@ -2066,7 +1966,7 @@ def w(name = None, redirect = None):
     i = 0
     
     DB_실행("select * from rd where title = '" + DB_인코딩(name) + "' order by date asc")
-    rows = curs.fetchall()
+    rows = DB_가져오기()
     while(True):
         try:
             a = rows[i]
@@ -2075,7 +1975,7 @@ def w(name = None, redirect = None):
             break
             
         DB_실행("select * from stop where title = '" + DB_인코딩(rows[i]['title']) + "' and sub = '" + DB_인코딩(rows[i]['sub']) + "' and close = 'O'")
-        row = curs.fetchall()
+        row = DB_가져오기()
         if(not row):
             topic = "open"
             
@@ -2096,7 +1996,7 @@ def w(name = None, redirect = None):
         
     if(re.search("^분류:", name)):
         DB_실행("select * from cat where title = '" + DB_인코딩(name) + "' order by cat asc")
-        rows = curs.fetchall()
+        rows = DB_가져오기()
         if(rows):
             div = ''
             i = 0
@@ -2108,10 +2008,10 @@ def w(name = None, redirect = None):
                     break
                     
                 DB_실행("select * from data where title = '" + DB_인코딩(rows[i]['cat']) + "'")
-                row = curs.fetchall()
+                row = DB_가져오기()
                 if(row):
                     aa = row[0]['data']                  
-                    aa = namumark('', aa)
+                    aa = 나무마크('', aa)
                     bb = re.search('<div style="width:100%;border: 1px solid #777;padding: 5px;margin-top: 1em;">분류:((?:(?!<\/div>).)*)<\/div>', aa)
                     if(bb):
                         cc = bb.groups()
@@ -2148,7 +2048,7 @@ def w(name = None, redirect = None):
             div = '<h2>분류</h2>' + div
             
             DB_실행("select * from data where title = '" + DB_인코딩(name) + "'")
-            bb = curs.fetchall()
+            bb = DB_가져오기()
             if(bb):
                 if(bb[0]['acl'] == 'admin'):
                     acl = '(관리자)'
@@ -2158,7 +2058,7 @@ def w(name = None, redirect = None):
                     if(not acl):
                         acl = ''
                         
-                enddata = namumark(name, bb[0]['data'])
+                enddata = 나무마크(name, bb[0]['data'])
                 
                 m = re.search('<div id="toc">((?:(?!\/div>).)*)<\/div>', enddata)
                 if(m):
@@ -2174,7 +2074,7 @@ def w(name = None, redirect = None):
             return render_template('index.html', title = name, logo = data['name'], page = URL_인코딩(name), data = '분류 문서 없음', license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, redirect = redirect, login = 로그인_확인()), 404
     else:                    
         DB_실행("select * from data where title = '" + DB_인코딩(name) + "'")
-        rows = curs.fetchall()
+        rows = DB_가져오기()
         if(rows):
             if(rows[0]['acl'] == 'admin'):
                 acl = '(관리자)'
@@ -2189,7 +2089,7 @@ def w(name = None, redirect = None):
                 g = m.groups()
                 
                 DB_실행("select * from user where id = '" + DB_인코딩(g[0]) + "'")
-                test = curs.fetchall()
+                test = DB_가져오기()
                 if(test):
                     if(test[0]['acl'] == 'owner'):
                         acl = '(소유자)'
@@ -2197,7 +2097,7 @@ def w(name = None, redirect = None):
                         acl = '(관리자)'
 
                 DB_실행("select * from ban where block = '" + DB_인코딩(g[0]) + "'")
-                user = curs.fetchall()
+                user = DB_가져오기()
                 if(user):
                     elsedata = '{{{#!wiki style="border:2px solid red;padding:10px;"\r\n{{{+2 {{{#red 이 사용자는 차단 당했습니다.}}}}}}\r\n\r\n차단 해제 일 : ' + user[0]['end'] + '[br]사유 : ' + user[0]['why'] + '}}}[br]' + rows[0]['data']
                 else:
@@ -2205,7 +2105,7 @@ def w(name = None, redirect = None):
             else:
                 elsedata = rows[0]['data']
                     
-            enddata = namumark(name, elsedata)
+            enddata = 나무마크(name, elsedata)
             
             m = re.search('<div id="toc">((?:(?!\/div>).)*)<\/div>', enddata)
             if(m):
@@ -2221,7 +2121,7 @@ def w(name = None, redirect = None):
                 g = m.groups()
                 
                 DB_실행("select * from ban where block = '" + DB_인코딩(g[0]) + "'")
-                user = curs.fetchall()
+                user = DB_가져오기()
                 if(user):
                     elsedata = '{{{#!wiki style="border:2px solid red;padding:10px;"\r\n{{{+2 {{{#red 이 사용자는 차단 당했습니다.}}}}}}\r\n\r\n차단 해제 일 : ' + user[0]['end'] + '[br]사유 : ' + user[0]['why'] + '}}}[br]' + '문서 없음'
                 else:
@@ -2229,18 +2129,18 @@ def w(name = None, redirect = None):
             else:
                 elsedata = '문서 없음'
             
-            return render_template('index.html', title = name, logo = data['name'], page = URL_인코딩(name), data = namumark(name, elsedata), license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, redirect = redirect, login = 로그인_확인()), 404
+            return render_template('index.html', title = name, logo = data['name'], page = URL_인코딩(name), data = 나무마크(name, elsedata), license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, redirect = redirect, login = 로그인_확인()), 404
 
 @app.route('/w/<path:name>/r/<int:number>')
 def rew(name = None, number = None):
     DB_실행("select * from hidhi where title = '" + DB_인코딩(name) + "' and re = '" + DB_인코딩(str(number)) + "'")
-    row = curs.fetchall()
+    row = DB_가져오기()
     if(row):
         if(소유자_확인() == 1):
             DB_실행("select * from history where title = '" + DB_인코딩(name) + "' and id = '" + str(number) + "'")
-            rows = curs.fetchall()
+            rows = DB_가져오기()
             if(rows):
-                enddata = namumark(name, rows[0]['data'])
+                enddata = 나무마크(name, rows[0]['data'])
                 
                 m = re.search('<div id="toc">((?:(?!\/div>).)*)<\/div>', enddata)
                 if(m):
@@ -2256,9 +2156,9 @@ def rew(name = None, number = None):
             return '<meta http-equiv="refresh" content="0;url=/error/3" />'
     else:
         DB_실행("select * from history where title = '" + DB_인코딩(name) + "' and id = '" + str(number) + "'")
-        rows = curs.fetchall()
+        rows = DB_가져오기()
         if(rows):
-            enddata = namumark(name, rows[0]['data'])
+            enddata = 나무마크(name, rows[0]['data'])
             
             m = re.search('<div id="toc">((?:(?!\/div>).)*)<\/div>', enddata)
             if(m):
@@ -2274,11 +2174,11 @@ def rew(name = None, number = None):
 @app.route('/w/<path:name>/raw/<int:number>')
 def reraw(name = None, number = None):
     DB_실행("select * from hidhi where title = '" + DB_인코딩(name) + "' and re = '" + DB_인코딩(str(number)) + "'")
-    row = curs.fetchall()
+    row = DB_가져오기()
     if(row):
         if(소유자_확인() == 1):
             DB_실행("select * from history where title = '" + DB_인코딩(name) + "' and id = '" + str(number) + "'")
-            rows = curs.fetchall()
+            rows = DB_가져오기()
             if(rows):
                 enddata = re.sub('<', '&lt;', rows[0]['data'])
                 enddata = re.sub('>', '&gt;', enddata)
@@ -2293,7 +2193,7 @@ def reraw(name = None, number = None):
             return '<meta http-equiv="refresh" content="0;url=/error/3" />'
     else:
         DB_실행("select * from history where title = '" + DB_인코딩(name) + "' and id = '" + str(number) + "'")
-        rows = curs.fetchall()
+        rows = DB_가져오기()
         if(rows):
             enddata = re.sub('<', '&lt;', rows[0]['data'])
             enddata = re.sub('>', '&gt;', enddata)
@@ -2308,7 +2208,7 @@ def reraw(name = None, number = None):
 @app.route('/raw/<path:name>')
 def raw(name = None):
     DB_실행("select * from data where title = '" + DB_인코딩(name) + "'")
-    rows = curs.fetchall()
+    rows = DB_가져오기()
     if(rows):
         enddata = re.sub('<', '&lt;', rows[0]['data'])
         enddata = re.sub('>', '&gt;', enddata)
@@ -2324,13 +2224,13 @@ def raw(name = None):
 def revert(name = None, number = None):
     if(request.method == 'POST'):
         DB_실행("select * from hidhi where title = '" + DB_인코딩(name) + "' and re = '" + DB_인코딩(str(number)) + "'")
-        row = curs.fetchall()
+        row = DB_가져오기()
         if(row):
             if(소유자_확인() == 1):        
                 DB_실행("select * from history where title = '" + DB_인코딩(name) + "' and id = '" + str(number) + "'")
-                rows = curs.fetchall()
+                rows = DB_가져오기()
                 if(rows):
-                    ip = getip(request)
+                    ip = 아이피(request)
                     can = getcan(ip, name)
                     
                     if(can == 1):
@@ -2339,7 +2239,7 @@ def revert(name = None, number = None):
                         today = 시간()
                         
                         DB_실행("select * from data where title = '" + DB_인코딩(name) + "'")
-                        row = curs.fetchall()
+                        row = DB_가져오기()
                         if(row):
                             leng = getleng(len(row[0]['data']), len(rows[0]['data']))
                             
@@ -2358,9 +2258,9 @@ def revert(name = None, number = None):
                 return '<meta http-equiv="refresh" content="0;url=/error/3" />'
         else:
             DB_실행("select * from history where title = '" + DB_인코딩(name) + "' and id = '" + str(number) + "'")
-            rows = curs.fetchall()
+            rows = DB_가져오기()
             if(rows):
-                ip = getip(request)
+                ip = 아이피(request)
                 can = getcan(ip, name)
                 
                 if(can == 1):
@@ -2369,7 +2269,7 @@ def revert(name = None, number = None):
                     today = 시간()
                     
                     DB_실행("select * from data where title = '" + DB_인코딩(name) + "'")
-                    row = curs.fetchall()
+                    row = DB_가져오기()
                     if(row):
                         leng = getleng(len(row[0]['data']), len(rows[0]['data']))
                         
@@ -2386,17 +2286,17 @@ def revert(name = None, number = None):
                 return '<meta http-equiv="refresh" content="0;url=/w/' + URL_인코딩(name) + '" />'            
     else:
         DB_실행("select * from hidhi where title = '" + DB_인코딩(name) + "' and re = '" + DB_인코딩(str(number)) + "'")
-        row = curs.fetchall()
+        row = DB_가져오기()
         if(row):
             if(소유자_확인() == 1):
-                ip = getip(request)
+                ip = 아이피(request)
                 can = getcan(ip, name)
                 
                 if(can == 1):
                     return '<meta http-equiv="refresh" content="0;url=/ban" />'
                 else:
                     DB_실행("select * from history where title = '" + DB_인코딩(name) + "' and id = '" + str(number) + "'")
-                    rows = curs.fetchall()
+                    rows = DB_가져오기()
                     if(rows):
                         return render_template('index.html', title = name, logo = data['name'], page = URL_인코딩(name), r = URL_인코딩(str(number)), tn = 13, plus = '정말 되돌리시겠습니까?', sub = '되돌리기', login = 로그인_확인())
                     else:
@@ -2404,14 +2304,14 @@ def revert(name = None, number = None):
             else:
                 return '<meta http-equiv="refresh" content="0;url=/error/3" />'
         else:            
-            ip = getip(request)
+            ip = 아이피(request)
             can = getcan(ip, name)
             
             if(can == 1):
                 return '<meta http-equiv="refresh" content="0;url=/ban" />'
             else:
                 DB_실행("select * from history where title = '" + DB_인코딩(name) + "' and id = '" + str(number) + "'")
-                rows = curs.fetchall()
+                rows = DB_가져오기()
                 if(rows):
                     return render_template('index.html', title = name, logo = data['name'], page = URL_인코딩(name), r = URL_인코딩(str(number)), tn = 13, plus = '정말 되돌리시겠습니까?', sub = '되돌리기', login = 로그인_확인())
                 else:
@@ -2427,15 +2327,15 @@ def edit(name = None):
         else:
             today = 시간()
             
-            content = savemark(request.form["content"])
+            content = 세이브마크(request.form["content"])
             
             DB_실행("select * from data where title = '" + DB_인코딩(name) + "'")
-            rows = curs.fetchall()
+            rows = DB_가져오기()
             if(rows):
                 if(rows[0]['data'] == content):
                     return '<meta http-equiv="refresh" content="0;url=/error/18" />'
                 else:
-                    ip = getip(request)
+                    ip = 아이피(request)
                     can = getcan(ip, name)
                     
                     if(can == 1):
@@ -2447,7 +2347,7 @@ def edit(name = None):
                         DB_실행("update data set data = '" + DB_인코딩(content) + "' where title = '" + DB_인코딩(name) + "'")
                         DB_갱신()
             else:
-                ip = getip(request)
+                ip = 아이피(request)
                 can = getcan(ip, name)
                 
                 if(can == 1):
@@ -2463,22 +2363,22 @@ def edit(name = None):
             
             return '<meta http-equiv="refresh" content="0;url=/w/' + URL_인코딩(name) + '" />'
     else:
-        ip = getip(request)
+        ip = 아이피(request)
         can = getcan(ip, name)
         
         if(can == 1):
             return '<meta http-equiv="refresh" content="0;url=/ban" />'
         else:
             DB_실행("select * from data where title = '" + DB_인코딩(data["help"]) + "'")
-            rows = curs.fetchall()
+            rows = DB_가져오기()
             if(rows):
                 newdata = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', ' * \g<in> 문서로 넘겨주기', rows[0]["data"])
-                left = namumark(name, newdata)
+                left = 나무마크(name, newdata)
             else:
                 left = ''
                 
             DB_실행("select * from data where title = '" + DB_인코딩(name) + "'")
-            rows = curs.fetchall()
+            rows = DB_가져오기()
             if(rows):
                 return render_template('index.html', title = name, logo = data['name'], page = URL_인코딩(name), data = rows[0]['data'], tn = 2, left = left, sub = '편집', login = 로그인_확인())
             else:
@@ -2493,15 +2393,15 @@ def secedit(name = None, number = None):
         else:
             today = 시간()
             
-            content = savemark(request.form["content"])
+            content = 세이브마크(request.form["content"])
             
             DB_실행("select * from data where title = '" + DB_인코딩(name) + "'")
-            rows = curs.fetchall()
+            rows = DB_가져오기()
             if(rows):
                 if(request.form["otent"] == content):
                     return '<meta http-equiv="refresh" content="0;url=/error/18" />'
                 else:
-                    ip = getip(request)
+                    ip = 아이피(request)
                     can = getcan(ip, name)
                     
                     if(can == 1):
@@ -2520,23 +2420,23 @@ def secedit(name = None, number = None):
             else:
                 return '<meta http-equiv="refresh" content="0;url=/w/' + URL_인코딩(name) + '" />'
     else:
-        ip = getip(request)
+        ip = 아이피(request)
         can = getcan(ip, name)
         
         if(can == 1):
             return '<meta http-equiv="refresh" content="0;url=/ban" />'
         else:
             DB_실행("select * from data where title = '" + DB_인코딩(data["help"]) + "'")
-            rows = curs.fetchall()
+            rows = DB_가져오기()
             if(rows):
                 newdata = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', ' * \g<in> 문서로 넘겨주기', rows[0]["data"])
                 
-                left = namumark(name, newdata)
+                left = 나무마크(name, newdata)
             else:
                 left = ''
                 
             DB_실행("select * from data where title = '" + DB_인코딩(name) + "'")
-            rows = curs.fetchall()
+            rows = DB_가져오기()
             if(rows):
                 i = 0
                 j = 0
@@ -2570,21 +2470,21 @@ def secedit(name = None, number = None):
                 
 @app.route('/preview/<path:name>', methods=['POST'])
 def preview(name = None):
-    ip = getip(request)
+    ip = 아이피(request)
     can = getcan(ip, name)
     if(can == 1):
         return '<meta http-equiv="refresh" content="0;url=/ban" />'
     else:            
         newdata = request.form["content"]
         newdata = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', ' * \g<in> 문서로 넘겨주기', newdata)
-        enddata = namumark(name, newdata)
+        enddata = 나무마크(name, newdata)
         
         DB_실행("select * from data where title = '" + DB_인코딩(data["help"]) + "'")
-        rows = curs.fetchall()
+        rows = DB_가져오기()
         if(rows):
             newdata = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', ' * \g<in> 문서로 넘겨주기', rows[0]["data"])
             
-            left = namumark(name, newdata)
+            left = 나무마크(name, newdata)
         else:
             left = ''
             
@@ -2592,7 +2492,7 @@ def preview(name = None):
         
 @app.route('/preview/<path:name>/section/<int:number>', methods=['POST'])
 def secpreview(name = None, number = None):
-    ip = getip(request)
+    ip = 아이피(request)
     can = getcan(ip, name)
     if(can == 1):
         return '<meta http-equiv="refresh" content="0;url=/ban" />'
@@ -2603,12 +2503,12 @@ def secpreview(name = None, number = None):
             notice = ''
         newdata = request.form["content"]
         newdata = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', ' * \g<in> 문서로 넘겨주기', newdata)
-        enddata = namumark(name, newdata)
+        enddata = 나무마크(name, newdata)
         DB_실행("select * from data where title = '" + DB_인코딩(data["help"]) + "'")
-        rows = curs.fetchall()
+        rows = DB_가져오기()
         if(rows):
             newdata = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', ' * \g<in> 문서로 넘겨주기', rows[0]["data"])
-            left = namumark(name, newdata)
+            left = 나무마크(name, newdata)
         else:
             left = ''
         return render_template('index.html', title = name, logo = data['name'], page = URL_인코딩(name), data = request.form["content"], tn = 2, preview = 1, enddata = enddata, left = left, notice = notice, section = 1, number = number, odata = request.form["otent"], sub = '미리보기')
@@ -2617,9 +2517,9 @@ def secpreview(name = None, number = None):
 def delete(name = None):
     if(request.method == 'POST'):
         DB_실행("select * from data where title = '" + DB_인코딩(name) + "'")
-        rows = curs.fetchall()
+        rows = DB_가져오기()
         if(rows):
-            ip = getip(request)
+            ip = 아이피(request)
             can = getcan(ip, name)
             if(can == 1):
                 return '<meta http-equiv="refresh" content="0;url=/ban" />'
@@ -2634,9 +2534,9 @@ def delete(name = None):
             return '<meta http-equiv="refresh" content="0;url=/w/' + URL_인코딩(name) + '" />'
     else:
         DB_실행("select * from data where title = '" + DB_인코딩(name) + "'")
-        rows = curs.fetchall()
+        rows = DB_가져오기()
         if(rows):
-            ip = getip(request)
+            ip = 아이피(request)
             can = getcan(ip, name)
             if(can == 1):
                 return '<meta http-equiv="refresh" content="0;url=/ban" />'
@@ -2649,9 +2549,9 @@ def delete(name = None):
 def move(name = None):
     if(request.method == 'POST'):
         DB_실행("select * from data where title = '" + DB_인코딩(name) + "'")
-        rows = curs.fetchall()
+        rows = DB_가져오기()
         if(rows):
-            ip = getip(request)
+            ip = 아이피(request)
             can = getcan(ip, name)
             if(can == 1):
                 return '<meta http-equiv="refresh" content="0;url=/ban" />'
@@ -2659,7 +2559,7 @@ def move(name = None):
                 today = 시간()
                 leng = '0'
                 DB_실행("select * from history where title = '" + DB_인코딩(request.form["title"]) + "'")
-                row = curs.fetchall()
+                row = DB_가져오기()
                 if(row):
                     return '<meta http-equiv="refresh" content="0;url=/error/19" />'
                 else:
@@ -2669,7 +2569,7 @@ def move(name = None):
                     DB_갱신()
                     return '<meta http-equiv="refresh" content="0;url=/w/' + URL_인코딩(request.form["title"]) + '" />'
         else:
-            ip = getip(request)
+            ip = 아이피(request)
             can = getcan(ip, name)
             if(can == 1):
                 return '<meta http-equiv="refresh" content="0;url=/ban" />'
@@ -2677,7 +2577,7 @@ def move(name = None):
                 today = 시간()
                 leng = '0'
                 DB_실행("select * from history where title = '" + DB_인코딩(request.form["title"]) + "'")
-                row = curs.fetchall()
+                row = DB_가져오기()
                 if(row):
                      return '<meta http-equiv="refresh" content="0;url=/error/19" />'
                 else:
@@ -2686,7 +2586,7 @@ def move(name = None):
                     DB_갱신()
                     return '<meta http-equiv="refresh" content="0;url=/w/' + URL_인코딩(request.form["title"]) + '" />'
     else:
-        ip = getip(request)
+        ip = 아이피(request)
         can = getcan(ip, name)
         if(can == 1):
             return '<meta http-equiv="refresh" content="0;url=/ban" />'
@@ -2734,7 +2634,7 @@ def 모든_문서():
     숫자 = 0
     데이터 = '<div>'
     DB_실행("select title from data order by title asc")
-    문서명 = curs.fetchall()
+    문서명 = DB_가져오기()
     if(문서명):
         while(True):
             try:
@@ -2761,7 +2661,7 @@ def topic(name = None):
         i = 0
         j = 1
         DB_실행("select * from rd where title = '" + DB_인코딩(name) + "' order by date asc")
-        rows = curs.fetchall()
+        rows = DB_가져오기()
         while(True):
             try:
                 a = rows[i]
@@ -2770,9 +2670,9 @@ def topic(name = None):
                 break
                 
             DB_실행("select * from topic where title = '" + DB_인코딩(rows[i]['title']) + "' and sub = '" + DB_인코딩(rows[i]['sub']) + "' and id = '1' order by sub asc")
-            aa = curs.fetchall()
+            aa = DB_가져오기()
             
-            indata = namumark(name, aa[0]['data'])
+            indata = 나무마크(name, aa[0]['data'])
             
             if(aa[0]['block'] == 'O'):
                 indata = '블라인드 되었습니다.'
@@ -2783,7 +2683,7 @@ def topic(name = None):
             ip = 아이디_파싱(aa[0]['ip'])
                 
             DB_실행("select * from stop where title = '" + DB_인코딩(rows[i]['title']) + "' and sub = '" + DB_인코딩(rows[i]['sub']) + "' and close = 'O'")
-            row = curs.fetchall()
+            row = DB_가져오기()
             if(not row):
                 div = div + '<h2><a href="/topic/' + URL_인코딩(rows[i]['title']) + '/sub/' + URL_인코딩(rows[i]['sub']) + '">' + str(j) + '. ' + rows[i]['sub'] + '</a></h2><table id="toron"><tbody><tr><td id="toroncolorgreen"><a href="javascript:void(0);" id="1">#1</a> ' + ip + ' <span style="float:right;">' + aa[0]['date'] + '</span></td></tr><tr><td ' + block + '>' + indata + '</td></tr></tbody></table><br>'
                 j = j + 1
@@ -2798,7 +2698,7 @@ def 닫힌_토론_목록(name = None):
     i = 0
     
     DB_실행("select * from stop where title = '" + DB_인코딩(name) + "' and close = 'O' order by sub asc")
-    rows = curs.fetchall()
+    rows = DB_가져오기()
     while(True):
         try:
             a = rows[i]
@@ -2807,9 +2707,9 @@ def 닫힌_토론_목록(name = None):
             break
             
         DB_실행("select * from topic where title = '" + DB_인코딩(name) + "' and sub = '" + DB_인코딩(rows[i]['sub']) + "' and id = '1'")
-        row = curs.fetchall()
+        row = DB_가져오기()
         if(row):
-            indata = namumark(name, row[0]['data'])
+            indata = 나무마크(name, row[0]['data'])
             
             if(row[0]['block'] == 'O'):
                 indata = '블라인드 되었습니다.'
@@ -2831,7 +2731,7 @@ def 합의된_토론_목록(name = None):
     숫자 = 0
     
     DB_실행("select * from agreedis where title = '" + DB_인코딩(name) + "' order by sub asc")
-    합의_토론 = curs.fetchall()
+    합의_토론 = DB_가져오기()
     while(True):
         try:
             덤 = 합의_토론[숫자]
@@ -2840,9 +2740,9 @@ def 합의된_토론_목록(name = None):
             break
             
         DB_실행("select * from topic where title = '" + DB_인코딩(name) + "' and sub = '" + DB_인코딩(합의_토론[숫자]['sub']) + "' and id = '1'")
-        내용 = curs.fetchall()
+        내용 = DB_가져오기()
         if(내용):
-            내용_파싱 = namumark(name, 내용[0]['data'])
+            내용_파싱 = 나무마크(name, 내용[0]['data'])
             
             if(내용[0]['block'] == 'O'):
                 내용_파싱 = '블라인드 되었습니다.'
@@ -2862,13 +2762,13 @@ def 합의된_토론_목록(name = None):
 def sub(name = None, sub = None):
     if(request.method == 'POST'):
         DB_실행("select * from topic where title = '" + DB_인코딩(name) + "' and sub = '" + DB_인코딩(sub) + "' order by id+0 desc limit 1")
-        rows = curs.fetchall()
+        rows = DB_가져오기()
         if(rows):
             number = int(rows[0]['id']) + 1
         else:
             number = 1
             
-        ip = getip(request)
+        ip = 아이피(request)
         ban = getdiscuss(ip, name, sub)
         admin = 관리자_확인()
         
@@ -2876,7 +2776,7 @@ def sub(name = None, sub = None):
             return '<meta http-equiv="refresh" content="0;url=/ban" />'
         else:
             DB_실행("select * from user where id = '" + DB_인코딩(ip) + "'")
-            rows = curs.fetchall()
+            rows = DB_가져오기()
             if(rows):
                 if(rows[0]['acl'] == 'owner' or rows[0]['acl'] == 'admin'):
                     ip = ip + ' - Admin'
@@ -2886,7 +2786,7 @@ def sub(name = None, sub = None):
             
             aa = request.form["content"]
             aa = re.sub("\[\[(분류:(?:(?:(?!\]\]).)*))\]\]", "[br]", aa)
-            aa = savemark(aa)
+            aa = 세이브마크(aa)
             
             DB_실행("insert into topic (id, title, sub, data, date, ip, block) value ('" + str(number) + "', '" + DB_인코딩(name) + "', '" + DB_인코딩(sub) + "', '" + DB_인코딩(aa) + "', '" + today + "', '" + ip + "', '')")
             DB_갱신()
@@ -2895,15 +2795,15 @@ def sub(name = None, sub = None):
     else:
         style = ''
         
-        ip = getip(request)
+        ip = 아이피(request)
         ban = getdiscuss(ip, name, sub)
         admin = 관리자_확인()
 
         DB_실행("select * from stop where title = '" + DB_인코딩(name) + "' and sub = '" + DB_인코딩(sub) + "' and close = 'O'")
-        닫음 = curs.fetchall()
+        닫음 = DB_가져오기()
 
         DB_실행("select * from stop where title = '" + DB_인코딩(name) + "' and sub = '" + DB_인코딩(sub) + "' and close = ''")
-        정지 = curs.fetchall()
+        정지 = DB_가져오기()
         
         if(admin == 1):
             div = '<div>'
@@ -2919,7 +2819,7 @@ def sub(name = None, sub = None):
                 div = div + '<a href="/topic/' + URL_인코딩(name) + '/sub/' + URL_인코딩(sub) + '/stop">(토론 정지)</a> '
 
             DB_실행("select * from agreedis where title = '" + DB_인코딩(name) + "' and sub = '" + DB_인코딩(sub) + "'")
-            합의 = curs.fetchall()
+            합의 = DB_가져오기()
             if(합의):
                 div = div + '<a href="/topic/' + URL_인코딩(name) + '/sub/' + URL_인코딩(sub) + '/agree">(합의 취소)</a>'
             else:
@@ -2934,10 +2834,10 @@ def sub(name = None, sub = None):
                 style = 'display:none;'
         
         DB_실행("select * from topic where title = '" + DB_인코딩(name) + "' and sub = '" + DB_인코딩(sub) + "' order by id+0 asc")
-        rows = curs.fetchall()
+        rows = DB_가져오기()
 
         DB_실행("select * from distop where title = '" + DB_인코딩(name) + "' and sub = '" + DB_인코딩(sub) + "' order by id+0 asc")
-        distop = curs.fetchall()
+        distop = DB_가져오기()
 
         i = 0
 
@@ -2954,7 +2854,7 @@ def sub(name = None, sub = None):
                 if(i == 0):
                     start = rows[num]['ip']
                     
-                indata = namumark('', rows[num]['data'])
+                indata = 나무마크('', rows[num]['data'])
                 indata = re.sub("(?P<in>#(?:[0-9]*))", '<a href="\g<in>">\g<in></a>', indata)
                         
                 ip = 아이디_파싱(rows[num]['ip'])
@@ -2975,7 +2875,7 @@ def sub(name = None, sub = None):
             if(i == 0):
                 start = rows[i]['ip']
                 
-            indata = namumark('', rows[i]['data'])
+            indata = 나무마크('', rows[i]['data'])
             indata = re.sub("(?P<in>#(?:[0-9]*))", '<a href="\g<in>">\g<in></a>', indata)
             
             if(rows[i]['block'] == 'O'):
@@ -2995,7 +2895,7 @@ def sub(name = None, sub = None):
                         isblock = ' <a href="/topic/' + URL_인코딩(name) + '/sub/' + URL_인코딩(sub) + '/b/' + str(i + 1) + '">(블라인드)</a>'
 
                     DB_실행("select * from distop where title = '" + DB_인코딩(name) + "' and sub = '" + DB_인코딩(sub) + "' and id = '" + DB_인코딩(str(i + 1)) + "'")
-                    row = curs.fetchall()
+                    row = DB_가져오기()
                     if(row):
                         isblock = isblock + ' <a href="/topic/' + URL_인코딩(name) + '/sub/' + URL_인코딩(sub) + '/notice/' + str(i + 1) + '">(해제)</a>'
                     else:
@@ -3006,7 +2906,7 @@ def sub(name = None, sub = None):
                         ban = isblock
                     else:
                         DB_실행("select * from ban where block = '" + DB_인코딩(rows[i]['ip']) + "'")
-                        row = curs.fetchall()
+                        row = DB_가져오기()
                         if(row):
                             ban = ' <a href="/ban/' + URL_인코딩(rows[i]['ip']) + '">(해제)</a>' + isblock
                         else:
@@ -3033,7 +2933,7 @@ def sub(name = None, sub = None):
 def blind(name = None, sub = None, number = None):
     if(관리자_확인() == 1):
         DB_실행("select * from topic where title = '" + DB_인코딩(name) + "' and sub = '" + DB_인코딩(sub) + "' and id = '" + str(number) + "'")
-        row = curs.fetchall()
+        row = DB_가져오기()
         if(row):
             if(row[0]['block'] == 'O'):
                 DB_실행("update topic set block = '' where title = '" + DB_인코딩(name) + "' and sub = '" + DB_인코딩(sub) + "' and id = '" + str(number) + "'")
@@ -3051,10 +2951,10 @@ def blind(name = None, sub = None, number = None):
 def notice(name = None, sub = None, number = None):
     if(관리자_확인() == 1):
         DB_실행("select * from topic where title = '" + DB_인코딩(name) + "' and sub = '" + DB_인코딩(sub) + "' and id = '" + str(number) + "'")
-        data = curs.fetchall()
+        data = DB_가져오기()
         if(data):
             DB_실행("select * from distop where id = '" + str(number) + "' and title = '" + DB_인코딩(name) + "' and sub = '" + DB_인코딩(sub) + "'")
-            isthis = curs.fetchall()
+            isthis = DB_가져오기()
             if(isthis):
                 DB_실행("delete from distop where id = '" + str(number) + "' and title = '" + DB_인코딩(name) + "' and sub = '" + DB_인코딩(sub) + "'")
             else:
@@ -3070,15 +2970,15 @@ def notice(name = None, sub = None, number = None):
 @app.route('/topic/<path:name>/sub/<path:sub>/stop')
 def topicstop(name = None, sub = None):
     if(관리자_확인() == 1):
-        ip = getip(request)
+        ip = 아이피(request)
         
         DB_실행("select * from topic where title = '" + DB_인코딩(name) + "' and sub = '" + DB_인코딩(sub) + "' order by id+0 desc limit 1")
-        row = curs.fetchall()
+        row = DB_가져오기()
         if(row):
             today = 시간()
             
             DB_실행("select * from stop where title = '" + DB_인코딩(name) + "' and sub = '" + DB_인코딩(sub) + "' and close = ''")
-            rows = curs.fetchall()
+            rows = DB_가져오기()
             if(rows):
                 DB_실행("insert into topic (id, title, sub, data, date, ip, block) value ('" + DB_인코딩(str(int(row[0]['id']) + 1)) + "', '" + DB_인코딩(name) + "', '" + DB_인코딩(sub) + "', 'Restart', '" + DB_인코딩(today) + "', '" + DB_인코딩(ip) + " - Restart', '')")
                 DB_실행("delete from stop where title = '" + DB_인코딩(name) + "' and sub = '" + DB_인코딩(sub) + "' and close = ''")
@@ -3096,15 +2996,15 @@ def topicstop(name = None, sub = None):
 @app.route('/topic/<path:name>/sub/<path:sub>/close')
 def topicclose(name = None, sub = None):
     if(관리자_확인() == 1):
-        ip = getip(request)
+        ip = 아이피(request)
         
         DB_실행("select * from topic where title = '" + DB_인코딩(name) + "' and sub = '" + DB_인코딩(sub) + "' order by id+0 desc limit 1")
-        row = curs.fetchall()
+        row = DB_가져오기()
         if(row):
             today = 시간()
             
             DB_실행("select * from stop where title = '" + DB_인코딩(name) + "' and sub = '" + DB_인코딩(sub) + "' and close = 'O'")
-            rows = curs.fetchall()
+            rows = DB_가져오기()
             if(rows):
                 DB_실행("insert into topic (id, title, sub, data, date, ip, block) value ('" + DB_인코딩(str(int(row[0]['id']) + 1)) + "', '" + DB_인코딩(name) + "', '" + DB_인코딩(sub) + "', 'Reopen', '" + DB_인코딩(today) + "', '" + DB_인코딩(ip) + " - Reopen', '')")
                 DB_실행("delete from stop where title = '" + DB_인코딩(name) + "' and sub = '" + DB_인코딩(sub) + "' and close = 'O'")
@@ -3122,15 +3022,15 @@ def topicclose(name = None, sub = None):
 @app.route('/topic/<path:name>/sub/<path:sub>/agree')
 def 토론_관리자_기능(name = None, sub = None):
     if(관리자_확인() == 1):
-        ip = getip(request)
+        ip = 아이피(request)
         
         DB_실행("select id from topic where title = '" + DB_인코딩(name) + "' and sub = '" + DB_인코딩(sub) + "' order by id+0 desc limit 1")
-        토론 = curs.fetchall()
+        토론 = DB_가져오기()
         if(토론):
             today = 시간()
             
             DB_실행("select * from agreedis where title = '" + DB_인코딩(name) + "' and sub = '" + DB_인코딩(sub) + "'")
-            합의안 = curs.fetchall()
+            합의안 = DB_가져오기()
             if(합의안):
                 DB_실행("insert into topic (id, title, sub, data, date, ip, block) value ('" + DB_인코딩(str(int(토론[0]['id']) + 1)) + "', '" + DB_인코딩(name) + "', '" + DB_인코딩(sub) + "', 'Settlement', '" + DB_인코딩(today) + "', '" + DB_인코딩(ip) + " - Settlement', '')")
                 DB_실행("delete from agreedis where title = '" + DB_인코딩(name) + "' and sub = '" + DB_인코딩(sub) + "'")
@@ -3148,14 +3048,14 @@ def 토론_관리자_기능(name = None, sub = None):
 @app.route('/login', methods=['POST', 'GET'])
 def login():
     if(request.method == 'POST'):
-        ip = getip(request)
+        ip = 아이피(request)
         ban = getban(ip)
         
         if(ban == 1):
             return '<meta http-equiv="refresh" content="0;url=/ban" />'
         else:
             DB_실행("select * from user where id = '" + DB_인코딩(request.form["id"]) + "'")
-            rows = curs.fetchall()
+            rows = DB_가져오기()
             if(rows):
                 if(session.get('Now') == True):
                     return '<meta http-equiv="refresh" content="0;url=/error/11" />'
@@ -3172,7 +3072,7 @@ def login():
             else:
                 return '<meta http-equiv="refresh" content="0;url=/error/12" />'
     else:
-        ip = getip(request)
+        ip = 아이피(request)
         ban = getban(ip)
         
         if(ban == 1):
@@ -3186,7 +3086,7 @@ def login():
 @app.route('/change', methods=['POST', 'GET'])
 def change():
     if(request.method == 'POST'):
-        ip = getip(request)
+        ip = 아이피(request)
         ban = getban(ip)
         
         if(request.form["pw2"] == request.form["pw3"]):
@@ -3194,7 +3094,7 @@ def change():
                 return '<meta http-equiv="refresh" content="0;url=/ban" />'
             else:
                 DB_실행("select * from user where id = '" + DB_인코딩(request.form["id"]) + "'")
-                rows = curs.fetchall()
+                rows = DB_가져오기()
                 if(rows):
                     if(session.get('Now') == True):
                         session['Now'] = False
@@ -3214,7 +3114,7 @@ def change():
         else:
             return '<meta http-equiv="refresh" content="0;url=/error/20" />'
     else:
-        ip = getip(request)
+        ip = 아이피(request)
         ban = getban(ip)
         
         if(ban == 1):
@@ -3230,7 +3130,7 @@ def change():
 @app.route('/check/<name>')
 def check(name = None, sub = None, number = None):
     DB_실행("select * from user where id = '" + DB_인코딩(name) + "'")
-    rows = curs.fetchall()
+    rows = DB_가져오기()
     if(rows and rows[0]['acl'] == 'owner' or rows and rows[0]['acl'] == 'admin'):
         return '<meta http-equiv="refresh" content="0;url=/error/4" />'
     else:
@@ -3238,7 +3138,7 @@ def check(name = None, sub = None, number = None):
             m = re.search('(?:[0-9](?:[0-9][0-9])?\.[0-9](?:[0-9][0-9])?\.[0-9](?:[0-9][0-9])?\.[0-9](?:[0-9][0-9])?)', name)
             if(m):
                 DB_실행("select * from login where ip = '" + DB_인코딩(name) + "' order by today desc")
-                row = curs.fetchall()
+                row = DB_가져오기()
                 if(row):
                     i = 0
                     c = ''
@@ -3253,7 +3153,7 @@ def check(name = None, sub = None, number = None):
                     return render_template('index.html', title = '다중 검사', logo = data['name'], tn = 22, rows = '')
             else:
                 DB_실행("select * from login where user = '" + DB_인코딩(name) + "' order by today desc")
-                row = curs.fetchall()
+                row = DB_가져오기()
                 if(row):
                     i = 0
                     c = ''
@@ -3272,7 +3172,7 @@ def check(name = None, sub = None, number = None):
 @app.route('/register', methods=['POST', 'GET'])
 def register():
     if(request.method == 'POST'):
-        ip = getip(request)
+        ip = 아이피(request)
         ban = getban(ip)
         
         if(request.form["pw"] == request.form["pw2"]):
@@ -3287,7 +3187,7 @@ def register():
                         return '<meta http-equiv="refresh" content="0;url=/error/7" />'
                     else:
                         DB_실행("select * from user where id = '" + DB_인코딩(request.form["id"]) + "'")
-                        rows = curs.fetchall()
+                        rows = DB_가져오기()
                         if(rows):
                             return '<meta http-equiv="refresh" content="0;url=/error/6" />'
                         else:
@@ -3301,7 +3201,7 @@ def register():
         else:
             return '<meta http-equiv="refresh" content="0;url=/error/20" />'
     else:
-        ip = getip(request)
+        ip = 아이피(request)
         ban = getban(ip)
         
         if(ban == 1):
@@ -3318,13 +3218,13 @@ def logout():
 @app.route('/ban/<name>', methods=['POST', 'GET'])
 def ban(name = None):
     DB_실행("select * from user where id = '" + DB_인코딩(name) + "'")
-    rows = curs.fetchall()
+    rows = DB_가져오기()
     if(rows and rows[0]['acl'] == 'owner' or rows and rows[0]['acl'] == 'admin'):
         return '<meta http-equiv="refresh" content="0;url=/error/4" />'
     else:
         if(request.method == 'POST'):
             if(관리자_확인() == 1):
-                ip = getip(request)
+                ip = 아이피(request)
                 
                 if(not re.search("[0-9]{4}-[0-9]{2}-[0-9]{2}", request.form["end"])):
                     end = ''
@@ -3332,7 +3232,7 @@ def ban(name = None):
                     end = request.form["end"]
 
                 DB_실행("select * from ban where block = '" + DB_인코딩(name) + "'")
-                row = curs.fetchall()
+                row = DB_가져오기()
                 if(row):
                     block(name, '해제', 시간(), ip, '')
                     
@@ -3355,7 +3255,7 @@ def ban(name = None):
         else:
             if(관리자_확인() == 1):
                 DB_실행("select * from ban where block = '" + DB_인코딩(name) + "'")
-                row = curs.fetchall()
+                row = DB_가져오기()
                 if(row):
                     now = '차단 해제'
                 else:
@@ -3374,7 +3274,7 @@ def acl(name = None):
     if(request.method == 'POST'):
         if(관리자_확인() == 1):
             DB_실행("select * from data where title = '" + DB_인코딩(name) + "'")
-            row = curs.fetchall()
+            row = DB_가져오기()
             if(row):
                 if(request.form["select"] == 'admin'):
                    DB_실행("update data set acl = 'admin' where title = '" + DB_인코딩(name) + "'")
@@ -3389,7 +3289,7 @@ def acl(name = None):
     else:
         if(관리자_확인() == 1):
             DB_실행("select * from data where title = '" + DB_인코딩(name) + "'")
-            row = curs.fetchall()
+            row = DB_가져오기()
             if(row):
                 if(row[0]['acl'] == 'admin'):
                     now = '관리자만'
@@ -3408,7 +3308,7 @@ def admin(name = None):
     if(request.method == 'POST'):
         if(소유자_확인() == 1):
             DB_실행("select * from user where id = '" + DB_인코딩(name) + "'")
-            row = curs.fetchall()
+            row = DB_가져오기()
             if(row):
                 if(row[0]['acl'] == 'admin' or row[0]['acl'] == 'owner'):
                     DB_실행("update user set acl = 'user' where id = '" + DB_인코딩(name) + "'")
@@ -3424,7 +3324,7 @@ def admin(name = None):
     else:
         if(소유자_확인() == 1):
             DB_실행("select * from user where id = '" + DB_인코딩(name) + "'")
-            row = curs.fetchall()
+            row = DB_가져오기()
             if(row):
                 if(row[0]['acl'] == 'admin' or row[0]['acl'] == 'owner'):
                     now = '권한 해제'
@@ -3438,11 +3338,11 @@ def admin(name = None):
 
 @app.route('/ban')
 def aban():
-    ip = getip(request)
+    ip = 아이피(request)
     
     if(getban(ip) == 1):
         DB_실행("select * from ban where block = '" + DB_인코딩(ip) + "'")
-        rows = curs.fetchall()
+        rows = DB_가져오기()
         if(rows):
             if(rows[0]['end']):
                 end = rows[0]['end'] + ' 까지 차단 상태 입니다. / 사유 : ' + rows[0]['why']                
@@ -3468,7 +3368,7 @@ def aban():
                 results = b.groups()
                 
                 DB_실행("select * from ban where block = '" + DB_인코딩(results[0]) + "' and band = 'O'")
-                row = curs.fetchall()
+                row = DB_가져오기()
                 if(row):
                     if(row[0]['end']):
                         end = row[0]['end'] + ' 까지 차단 상태 입니다. / 사유 : ' + rows[0]['why']             
@@ -3495,10 +3395,10 @@ def aban():
 @app.route('/w/<path:name>/r/<int:a>/diff/<int:b>')
 def diff(name = None, a = None, b = None):
     DB_실행("select * from history where id = '" + DB_인코딩(str(a)) + "' and title = '" + DB_인코딩(name) + "'")
-    rows = curs.fetchall()
+    rows = DB_가져오기()
     if(rows):
         DB_실행("select * from history where id = '" + DB_인코딩(str(b)) + "' and title = '" + DB_인코딩(name) + "'")
-        row = curs.fetchall()
+        row = DB_가져오기()
         if(row):
             indata = re.sub('<', '&lt;', rows[0]['data'])
             indata = re.sub('>', '&gt;', indata)
@@ -3521,10 +3421,10 @@ def diff(name = None, a = None, b = None):
         
 @app.route('/user')
 def user():
-    ip = getip(request)
+    ip = 아이피(request)
     
     DB_실행("select * from user where id = '" + DB_인코딩(ip) + "'")
-    rows = curs.fetchall()
+    rows = DB_가져오기()
     if(getban(ip) == 0):
         if(rows):
             if(rows[0]['acl'] == 'admin' or rows[0]['acl'] == 'owner'):
@@ -3541,7 +3441,7 @@ def user():
         
     if(not re.search('\.', ip)):
         DB_실행("select * from data where title = '사용자:" + DB_인코딩(ip) + "'")
-        row = curs.fetchall()
+        row = DB_가져오기()
         if(row):
             ip = '<a href="/w/' + URL_인코딩('사용자:' + ip) + '">' + ip + '</a>'
         else:
@@ -3552,7 +3452,7 @@ def user():
 @app.route('/random')
 def random():
     DB_실행("select * from data order by rand() limit 1")
-    rows = curs.fetchall()
+    rows = DB_가져오기()
     if(rows):
         return '<meta http-equiv="refresh" content="0;url=/w/' + URL_인코딩(rows[0]['title']) + '" />'
     else:
