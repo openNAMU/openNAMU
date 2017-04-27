@@ -175,7 +175,7 @@ def savemark(data):
 
     return data
     
-def nowlogin():
+def 로그인_확인():
     if(session.get('Now') == True):
         return 1
     else:
@@ -2167,11 +2167,11 @@ def w(name = None, redirect = None):
                 else:
                     left = ''
                     
-                return render_template('index.html', title = name, logo = data['name'], page = URL_인코딩(name), data = enddata + '<br>' + div, license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, redirect = redirect, login = nowlogin())
+                return render_template('index.html', title = name, logo = data['name'], page = URL_인코딩(name), data = enddata + '<br>' + div, license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, redirect = redirect, login = 로그인_확인())
             else:
-                return render_template('index.html', title = name, logo = data['name'], page = URL_인코딩(name), data = div, license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, redirect = redirect, login = nowlogin())
+                return render_template('index.html', title = name, logo = data['name'], page = URL_인코딩(name), data = div, license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, redirect = redirect, login = 로그인_확인())
         else:
-            return render_template('index.html', title = name, logo = data['name'], page = URL_인코딩(name), data = '분류 문서 없음', license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, redirect = redirect, login = nowlogin()), 404
+            return render_template('index.html', title = name, logo = data['name'], page = URL_인코딩(name), data = '분류 문서 없음', license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, redirect = redirect, login = 로그인_확인()), 404
     else:                    
         DB_실행("select * from data where title = '" + DB_인코딩(name) + "'")
         rows = curs.fetchall()
@@ -2214,7 +2214,7 @@ def w(name = None, redirect = None):
             else:
                 left = ''
                 
-            return render_template('index.html', title = name, logo = data['name'], page = URL_인코딩(name), data = enddata, license = data['license'], tn = 1, acl = acl, left = left, uppage = uppage, style = style, topic = topic, redirect = redirect, login = nowlogin())
+            return render_template('index.html', title = name, logo = data['name'], page = URL_인코딩(name), data = enddata, license = data['license'], tn = 1, acl = acl, left = left, uppage = uppage, style = style, topic = topic, redirect = redirect, login = 로그인_확인())
         else:
             m = re.search("^사용자:(.*)", name)
             if(m):
@@ -2229,7 +2229,7 @@ def w(name = None, redirect = None):
             else:
                 elsedata = '문서 없음'
             
-            return render_template('index.html', title = name, logo = data['name'], page = URL_인코딩(name), data = namumark(name, elsedata), license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, redirect = redirect, login = nowlogin()), 404
+            return render_template('index.html', title = name, logo = data['name'], page = URL_인코딩(name), data = namumark(name, elsedata), license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, redirect = redirect, login = 로그인_확인()), 404
 
 @app.route('/w/<path:name>/r/<int:number>')
 def rew(name = None, number = None):
@@ -2398,7 +2398,7 @@ def revert(name = None, number = None):
                     DB_실행("select * from history where title = '" + DB_인코딩(name) + "' and id = '" + str(number) + "'")
                     rows = curs.fetchall()
                     if(rows):
-                        return render_template('index.html', title = name, logo = data['name'], page = URL_인코딩(name), r = URL_인코딩(str(number)), tn = 13, plus = '정말 되돌리시겠습니까?', sub = '되돌리기', login = nowlogin())
+                        return render_template('index.html', title = name, logo = data['name'], page = URL_인코딩(name), r = URL_인코딩(str(number)), tn = 13, plus = '정말 되돌리시겠습니까?', sub = '되돌리기', login = 로그인_확인())
                     else:
                         return '<meta http-equiv="refresh" content="0;url=/w/' + URL_인코딩(name) + '" />'
             else:
@@ -2413,7 +2413,7 @@ def revert(name = None, number = None):
                 DB_실행("select * from history where title = '" + DB_인코딩(name) + "' and id = '" + str(number) + "'")
                 rows = curs.fetchall()
                 if(rows):
-                    return render_template('index.html', title = name, logo = data['name'], page = URL_인코딩(name), r = URL_인코딩(str(number)), tn = 13, plus = '정말 되돌리시겠습니까?', sub = '되돌리기', login = nowlogin())
+                    return render_template('index.html', title = name, logo = data['name'], page = URL_인코딩(name), r = URL_인코딩(str(number)), tn = 13, plus = '정말 되돌리시겠습니까?', sub = '되돌리기', login = 로그인_확인())
                 else:
                     return '<meta http-equiv="refresh" content="0;url=/w/' + URL_인코딩(name) + '" />'
                         
@@ -2480,9 +2480,9 @@ def edit(name = None):
             DB_실행("select * from data where title = '" + DB_인코딩(name) + "'")
             rows = curs.fetchall()
             if(rows):
-                return render_template('index.html', title = name, logo = data['name'], page = URL_인코딩(name), data = rows[0]['data'], tn = 2, left = left, sub = '편집', login = nowlogin())
+                return render_template('index.html', title = name, logo = data['name'], page = URL_인코딩(name), data = rows[0]['data'], tn = 2, left = left, sub = '편집', login = 로그인_확인())
             else:
-                return render_template('index.html', title = name, logo = data['name'], page = URL_인코딩(name), data = '', tn = 2, left = left, sub = '편집', login = nowlogin())
+                return render_template('index.html', title = name, logo = data['name'], page = URL_인코딩(name), data = '', tn = 2, left = left, sub = '편집', login = 로그인_확인())
                 
 @app.route('/edit/<path:name>/section/<int:number>', methods=['POST', 'GET'])
 def secedit(name = None, number = None):
@@ -2562,7 +2562,7 @@ def secedit(name = None, number = None):
                         break
                         
                 if(j == 0):
-                    return render_template('index.html', title = name, logo = data['name'], page = URL_인코딩(name), data = gdata, tn = 2, left = left, section = 1, number = number, sub = '편집', login = nowlogin())
+                    return render_template('index.html', title = name, logo = data['name'], page = URL_인코딩(name), data = gdata, tn = 2, left = left, section = 1, number = number, sub = '편집', login = 로그인_확인())
                 else:
                     return '<meta http-equiv="refresh" content="0;url=/w/' + URL_인코딩(name) + '" />'
             else:
@@ -2588,7 +2588,7 @@ def preview(name = None):
         else:
             left = ''
             
-        return render_template('index.html', title = name, logo = data['name'], page = URL_인코딩(name), data = request.form["content"], tn = 2, preview = 1, enddata = enddata, left = left, sub = '미리보기', login = nowlogin())
+        return render_template('index.html', title = name, logo = data['name'], page = URL_인코딩(name), data = request.form["content"], tn = 2, preview = 1, enddata = enddata, left = left, sub = '미리보기', login = 로그인_확인())
         
 @app.route('/preview/<path:name>/section/<int:number>', methods=['POST'])
 def secpreview(name = None, number = None):
@@ -2641,7 +2641,7 @@ def delete(name = None):
             if(can == 1):
                 return '<meta http-equiv="refresh" content="0;url=/ban" />'
             else:
-                return render_template('index.html', title = name, logo = data['name'], page = URL_인코딩(name), tn = 8, plus = '정말 삭제 하시겠습니까?', sub = '삭제', login = nowlogin())
+                return render_template('index.html', title = name, logo = data['name'], page = URL_인코딩(name), tn = 8, plus = '정말 삭제 하시겠습니까?', sub = '삭제', login = 로그인_확인())
         else:
             return '<meta http-equiv="refresh" content="0;url=/w/' + URL_인코딩(name) + '" />'
 
@@ -2691,7 +2691,7 @@ def move(name = None):
         if(can == 1):
             return '<meta http-equiv="refresh" content="0;url=/ban" />'
         else:
-            return render_template('index.html', title = name, logo = data['name'], page = URL_인코딩(name), tn = 9, plus = '정말 이동 하시겠습니까?', sub = '이동', login = nowlogin())
+            return render_template('index.html', title = name, logo = data['name'], page = URL_인코딩(name), tn = 9, plus = '정말 이동 하시겠습니까?', sub = '이동', login = 로그인_확인())
 
 @app.route('/other')
 def other():
@@ -3027,7 +3027,7 @@ def sub(name = None, sub = None):
                 
             i = i + 1
             
-        return render_template('index.html', title = name, page = URL_인코딩(name), suburl = URL_인코딩(sub), toron = sub, logo = data['name'], rows = div, tn = 11, ban = ban, style = style, sub = '토론', login = nowlogin())
+        return render_template('index.html', title = name, page = URL_인코딩(name), suburl = URL_인코딩(sub), toron = sub, logo = data['name'], rows = div, tn = 11, ban = ban, style = style, sub = '토론', login = 로그인_확인())
 
 @app.route('/topic/<path:name>/sub/<path:sub>/b/<int:number>')
 def blind(name = None, sub = None, number = None):
