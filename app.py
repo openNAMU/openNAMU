@@ -29,7 +29,7 @@ def 시작():
     try:
         DB_실행("select * from history limit 1")
     except:
-        DB_실행("create table history(id text, title text, data longtext, date text, ip text, send text, leng text)")
+        DB_실행("create table 역사_추가(id text, title text, data longtext, date text, ip text, send text, leng text)")
     
     try:
         DB_실행("select * from rd limit 1")
@@ -137,7 +137,7 @@ def show_diff(seqm):
            
 def 관리자_확인():
     if(session.get('Now') == True):
-        ip = 아이피(request)
+        ip = 아이피_확인(request)
         DB_실행("select * from user where id = '" + DB_인코딩(ip) + "'")
         rows = DB_가져오기()
         if(rows):
@@ -146,34 +146,34 @@ def 관리자_확인():
                 
 def 소유자_확인():
     if(session.get('Now') == True):
-        ip = 아이피(request)
+        ip = 아이피_확인(request)
         DB_실행("select * from user where id = '" + DB_인코딩(ip) + "'")
         rows = DB_가져오기()
         if(rows):
             if(rows[0]['acl'] == 'owner'):
                 return 1
                 
-def isin(name, data):
-    if(re.search('^틀:', name)):
-        DB_실행("select * from back where title = '" + DB_인코딩(name) + "' and type = 'include'")
-        include = DB_가져오기()
-        if(include):
-            i = 0
+def 틀_확인(이름, 데이터):
+    if(re.search('^틀:', 이름)):
+        DB_실행("select * from back where title = '" + DB_인코딩(이름) + "' and type = 'include'")
+        틀_역링크 = DB_가져오기()
+        if(틀_역링크):
+            숫자 = 0
 
             while(True):
                 try:
-                    나무마크(include[i]['link'], data)
+                    나무마크(틀_역링크[i]['link'], 데이터)
                 except:
                     break
                     
-                i = i + 1
+                숫자 += 1
 
 def 세이브마크(데이터):
     데이터 = re.sub("\[date\(now\)\]", 시간(), 데이터)
-    if(not re.search("\.", 아이피(request))):
-        이름 = '[[사용자:' + 아이피(request) + '|' + 아이피(request) + ']]'
+    if(not re.search("\.", 아이피_확인(request))):
+        이름 = '[[사용자:' + 아이피_확인(request) + '|' + 아이피_확인(request) + ']]'
     else:
-        이름 = 아이피(request)
+        이름 = 아이피_확인(request)
     데이터 = re.sub("\[name\]", 이름, 데이터)
 
     return 데이터
@@ -368,10 +368,10 @@ def 나무마크(title, data):
     
     data = re.sub("\[anchor\((?P<in>[^\[\]]*)\)\]", '<span id="\g<in>"></span>', data)
     data = re.sub('\[date\(now\)\]', 시간(), data)
-    if(not re.search("\.", 아이피(request))):
-        name = '[[사용자:' + 아이피(request) + '|' + 아이피(request) + ']]'
+    if(not re.search("\.", 아이피_확인(request))):
+        name = '[[사용자:' + 아이피_확인(request) + '|' + 아이피_확인(request) + ']]'
     else:
-        name = 아이피(request)
+        name = 아이피_확인(request)
     data = re.sub("\[name\]", name, data)
     
     while(True):
@@ -1157,7 +1157,7 @@ def 나무마크(title, data):
     data = re.sub('^<br>', '', data)
     return str(data)
 
-def 아이피(request):
+def 아이피_확인(request):
     if(session.get('Now') == True):
         ip = format(session['DREAMER'])
     else:
@@ -1167,7 +1167,7 @@ def 아이피(request):
             ip = request.remote_addr
     return ip
 
-def getcan(ip, name):
+def ACL_체크(ip, name):
     m = re.search("^사용자:(.*)", name)
     n = re.search("^파일:(.*)", name)
     if(m):
@@ -1252,7 +1252,7 @@ def getcan(ip, name):
                 else:
                     return 0
 
-def getban(ip):
+def 차단_체크(ip):
     b = re.search("^([0-9](?:[0-9]?[0-9]?)\.[0-9](?:[0-9]?[0-9]?))", ip)
     if(b):
         results = b.groups()
@@ -1275,7 +1275,7 @@ def getban(ip):
         else:
             return 0
         
-def getdiscuss(ip, name, sub):
+def 토론자_체크(ip, name, sub):
     b = re.search("^([0-9](?:[0-9]?[0-9]?)\.[0-9](?:[0-9]?[0-9]?))", ip)
     if(b):
         results = b.groups()
@@ -1313,20 +1313,20 @@ def 시간():
     s = "%04d-%02d-%02d %02d:%02d:%02d" % (now.tm_year, now.tm_mon, now.tm_mday, now.tm_hour, now.tm_min, now.tm_sec)
     return s
 
-def discuss(title, sub, date):
+def 최근_토론_추가(title, sub, date):
     DB_실행("select * from rd where title = '" + DB_인코딩(title) + "' and sub = '" + DB_인코딩(sub) + "'")
-    rows = DB_가져오기()
-    if(rows):
+    최근_토론 = DB_가져오기()
+    if(최근_토론):
         DB_실행("update rd set date = '" + DB_인코딩(date) + "' where title = '" + DB_인코딩(title) + "' and sub = '" + DB_인코딩(sub) + "'")
     else:
         DB_실행("insert into rd (title, sub, date) value ('" + DB_인코딩(title) + "', '" + DB_인코딩(sub) + "', '" + DB_인코딩(date) + "')")
     DB_갱신()
     
-def block(block, end, today, blocker, why):
+def 최근_차단_추가(block, end, today, blocker, why):
     DB_실행("insert into rb (block, end, today, blocker, why) value ('" + DB_인코딩(block) + "', '" + DB_인코딩(end) + "', '" + today + "', '" + DB_인코딩(blocker) + "', '" + DB_인코딩(why) + "')")
     DB_갱신()
 
-def history(title, data, date, ip, send, leng):
+def 역사_추가(title, data, date, ip, send, leng):
     DB_실행("select * from history where title = '" + DB_인코딩(title) + "' order by id+0 desc limit 1")
     rows = DB_가져오기()
     if(rows):
@@ -1337,24 +1337,24 @@ def history(title, data, date, ip, send, leng):
         DB_실행("insert into history (id, title, data, date, ip, send, leng) value ('1', '" + DB_인코딩(title) + "', '" + DB_인코딩(data) + "', '" + date + "', '" + DB_인코딩(ip) + "', '" + DB_인코딩(send + ' (새 문서)') + "', '" + leng + "')")
         DB_갱신()
 
-def getleng(existing, change):
-    if(existing < change):
-        leng = change - existing
-        leng = '+' + str(leng)
-    elif(change < existing):
-        leng = existing - change
-        leng = '-' + str(leng)
+def 길이_확인(기존, 바뀜):
+    if(기존 < 바뀜):
+        길이 = 바뀜 - 기존
+        길이 = '+' + str(길이)
+    elif(바뀜 < 기존):
+        길이 = 기존 - 바뀜
+        길이 = '-' + str(길이)
     else:
-        leng = '0'
+        길이 = '0'
         
-    return leng    
+    return 길이    
     
 @app.route('/upload', methods=['GET', 'POST'])
 def upload():
     app.config['MAX_CONTENT_LENGTH'] = int(data['upload']) * 1024 * 1024
     if(request.method == 'POST'):
-        ip = 아이피(request)
-        ban = getban(ip)
+        ip = 아이피_확인(request)
+        ban = 차단_체크(ip)
         
         if(ban == 1):
             return '<meta http-equiv="refresh" content="0;url=/ban" />'
@@ -1373,7 +1373,7 @@ def upload():
                         DB_실행("insert into data (title, data, acl) value ('" + DB_인코딩('파일:' + filename) + "', '" + DB_인코딩('[[파일:' + filename + ']][br][br]{{{[[파일:' + filename + ']]}}}') + "', '')")
                         DB_갱신()
                         
-                        history('파일:' + filename, '[[파일:' + filename + ']][br][br]{{{[[파일:' + filename + ']]}}}', 시간(), ip, '파일:' + filename + ' 업로드', '0')
+                        역사_추가('파일:' + filename, '[[파일:' + filename + ']][br][br]{{{[[파일:' + filename + ']]}}}', 시간(), ip, '파일:' + filename + ' 업로드', '0')
                         
                         return '<meta http-equiv="refresh" content="0;url=/w/' + URL_인코딩('파일:' + filename) + '" />'
                 else:
@@ -1381,8 +1381,8 @@ def upload():
             else:
                 return '<meta http-equiv="refresh" content="0;url=/error/14" />'
     else:
-        ip = 아이피(request)
-        ban = getban(ip)
+        ip = 아이피_확인(request)
+        ban = 차단_체크(ip)
         
         if(ban == 1):
             return '<meta http-equiv="refresh" content="0;url=/ban" />'
@@ -1729,7 +1729,7 @@ def backlink(name = None, number = None):
         return render_template('index.html', logo = data['name'], data = '', title = name, sub = '역링크')
 
 @app.route('/recentdiscuss')
-def recentdiscuss():
+def 최근_토론():
     i = 0
     div = '<div>'
     
@@ -1808,7 +1808,7 @@ def blocklog(number = None):
         return render_template('index.html', logo = data['name'], rows = '', tn = 20, title = '유저 차단 기록')
 
 @app.route('/history/<path:name>/n/<int:number>', methods=['POST', 'GET'])
-def gethistory(name = None, number = None):
+def 역사_보기(name = None, number = None):
     if(request.method == 'POST'):
         return '<meta http-equiv="refresh" content="0;url=/w/' + URL_인코딩(name) + '/r/' + request.form["b"] + '/diff/' + request.form["a"] + '" />'
     else:
@@ -2230,8 +2230,8 @@ def revert(name = None, number = None):
                 DB_실행("select * from history where title = '" + DB_인코딩(name) + "' and id = '" + str(number) + "'")
                 rows = DB_가져오기()
                 if(rows):
-                    ip = 아이피(request)
-                    can = getcan(ip, name)
+                    ip = 아이피_확인(request)
+                    can = ACL_체크(ip, name)
                     
                     if(can == 1):
                         return '<meta http-equiv="refresh" content="0;url=/ban" />'
@@ -2241,7 +2241,7 @@ def revert(name = None, number = None):
                         DB_실행("select * from data where title = '" + DB_인코딩(name) + "'")
                         row = DB_가져오기()
                         if(row):
-                            leng = getleng(len(row[0]['data']), len(rows[0]['data']))
+                            leng = 길이_확인(len(row[0]['data']), len(rows[0]['data']))
                             
                             DB_실행("update data set data = '" + DB_인코딩(rows[0]['data']) + "' where title = '" + DB_인코딩(name) + "'")
                             DB_갱신()
@@ -2250,7 +2250,7 @@ def revert(name = None, number = None):
                             
                             DB_실행("insert into data (title, data, acl) value ('" + DB_인코딩(name) + "', '" + DB_인코딩(rows[0]['data']) + "', '')")
                             DB_갱신()
-                        history(name, rows[0]['data'], today, ip, '문서를 ' + str(number) + '판으로 되돌렸습니다.', leng)
+                        역사_추가(name, rows[0]['data'], today, ip, '문서를 ' + str(number) + '판으로 되돌렸습니다.', leng)
                         return '<meta http-equiv="refresh" content="0;url=/w/' + URL_인코딩(name) + '" />'
                 else:
                     return '<meta http-equiv="refresh" content="0;url=/w/' + URL_인코딩(name) + '" />'
@@ -2260,8 +2260,8 @@ def revert(name = None, number = None):
             DB_실행("select * from history where title = '" + DB_인코딩(name) + "' and id = '" + str(number) + "'")
             rows = DB_가져오기()
             if(rows):
-                ip = 아이피(request)
-                can = getcan(ip, name)
+                ip = 아이피_확인(request)
+                can = ACL_체크(ip, name)
                 
                 if(can == 1):
                     return '<meta http-equiv="refresh" content="0;url=/ban" />'
@@ -2271,7 +2271,7 @@ def revert(name = None, number = None):
                     DB_실행("select * from data where title = '" + DB_인코딩(name) + "'")
                     row = DB_가져오기()
                     if(row):
-                        leng = getleng(len(row[0]['data']), len(rows[0]['data']))
+                        leng = 길이_확인(len(row[0]['data']), len(rows[0]['data']))
                         
                         DB_실행("update data set data = '" + DB_인코딩(rows[0]['data']) + "' where title = '" + DB_인코딩(name) + "'")
                         DB_갱신()
@@ -2280,7 +2280,7 @@ def revert(name = None, number = None):
                         
                         DB_실행("insert into data (title, data, acl) value ('" + DB_인코딩(name) + "', '" + DB_인코딩(rows[0]['data']) + "', '')")
                         DB_갱신()
-                    history(name, rows[0]['data'], today, ip, '문서를 ' + str(number) + '판으로 되돌렸습니다.', leng)
+                    역사_추가(name, rows[0]['data'], today, ip, '문서를 ' + str(number) + '판으로 되돌렸습니다.', leng)
                     return '<meta http-equiv="refresh" content="0;url=/w/' + URL_인코딩(name) + '" />'
             else:
                 return '<meta http-equiv="refresh" content="0;url=/w/' + URL_인코딩(name) + '" />'            
@@ -2289,8 +2289,8 @@ def revert(name = None, number = None):
         row = DB_가져오기()
         if(row):
             if(소유자_확인() == 1):
-                ip = 아이피(request)
-                can = getcan(ip, name)
+                ip = 아이피_확인(request)
+                can = ACL_체크(ip, name)
                 
                 if(can == 1):
                     return '<meta http-equiv="refresh" content="0;url=/ban" />'
@@ -2304,8 +2304,8 @@ def revert(name = None, number = None):
             else:
                 return '<meta http-equiv="refresh" content="0;url=/error/3" />'
         else:            
-            ip = 아이피(request)
-            can = getcan(ip, name)
+            ip = 아이피_확인(request)
+            can = ACL_체크(ip, name)
             
             if(can == 1):
                 return '<meta http-equiv="refresh" content="0;url=/ban" />'
@@ -2335,36 +2335,36 @@ def edit(name = None):
                 if(rows[0]['data'] == content):
                     return '<meta http-equiv="refresh" content="0;url=/error/18" />'
                 else:
-                    ip = 아이피(request)
-                    can = getcan(ip, name)
+                    ip = 아이피_확인(request)
+                    can = ACL_체크(ip, name)
                     
                     if(can == 1):
                         return '<meta http-equiv="refresh" content="0;url=/ban" />'
                     else:                        
-                        leng = getleng(len(rows[0]['data']), len(content))
-                        history(name, content, today, ip, request.form["send"], leng)
+                        leng = 길이_확인(len(rows[0]['data']), len(content))
+                        역사_추가(name, content, today, ip, request.form["send"], leng)
                         
                         DB_실행("update data set data = '" + DB_인코딩(content) + "' where title = '" + DB_인코딩(name) + "'")
                         DB_갱신()
             else:
-                ip = 아이피(request)
-                can = getcan(ip, name)
+                ip = 아이피_확인(request)
+                can = ACL_체크(ip, name)
                 
                 if(can == 1):
                     return '<meta http-equiv="refresh" content="0;url=/ban" />'
                 else:
                     leng = '+' + str(len(content))
-                    history(name, content, today, ip, request.form["send"], leng)
+                    역사_추가(name, content, today, ip, request.form["send"], leng)
                     
                     DB_실행("insert into data (title, data, acl) value ('" + DB_인코딩(name) + "', '" + DB_인코딩(content) + "', '')")
                     DB_갱신()
                     
-            isin(name, content)
+            틀_확인(name, content)
             
             return '<meta http-equiv="refresh" content="0;url=/w/' + URL_인코딩(name) + '" />'
     else:
-        ip = 아이피(request)
-        can = getcan(ip, name)
+        ip = 아이피_확인(request)
+        can = ACL_체크(ip, name)
         
         if(can == 1):
             return '<meta http-equiv="refresh" content="0;url=/ban" />'
@@ -2401,27 +2401,27 @@ def secedit(name = None, number = None):
                 if(request.form["otent"] == content):
                     return '<meta http-equiv="refresh" content="0;url=/error/18" />'
                 else:
-                    ip = 아이피(request)
-                    can = getcan(ip, name)
+                    ip = 아이피_확인(request)
+                    can = ACL_체크(ip, name)
                     
                     if(can == 1):
                         return '<meta http-equiv="refresh" content="0;url=/ban" />'
                     else:                        
-                        leng = getleng(len(request.form['otent']), len(content))
+                        leng = 길이_확인(len(request.form['otent']), len(content))
                         content = rows[0]['data'].replace(request.form['otent'], content)
-                        history(name, content, today, ip, request.form["send"], leng)
+                        역사_추가(name, content, today, ip, request.form["send"], leng)
                         
                         DB_실행("update data set data = '" + DB_인코딩(content) + "' where title = '" + DB_인코딩(name) + "'")
                         DB_갱신()
                         
-                    isin(name, content)
+                    틀_확인(name, content)
                     
                     return '<meta http-equiv="refresh" content="0;url=/w/' + URL_인코딩(name) + '" />'
             else:
                 return '<meta http-equiv="refresh" content="0;url=/w/' + URL_인코딩(name) + '" />'
     else:
-        ip = 아이피(request)
-        can = getcan(ip, name)
+        ip = 아이피_확인(request)
+        can = ACL_체크(ip, name)
         
         if(can == 1):
             return '<meta http-equiv="refresh" content="0;url=/ban" />'
@@ -2470,8 +2470,8 @@ def secedit(name = None, number = None):
                 
 @app.route('/preview/<path:name>', methods=['POST'])
 def preview(name = None):
-    ip = 아이피(request)
-    can = getcan(ip, name)
+    ip = 아이피_확인(request)
+    can = ACL_체크(ip, name)
     if(can == 1):
         return '<meta http-equiv="refresh" content="0;url=/ban" />'
     else:            
@@ -2492,8 +2492,8 @@ def preview(name = None):
         
 @app.route('/preview/<path:name>/section/<int:number>', methods=['POST'])
 def secpreview(name = None, number = None):
-    ip = 아이피(request)
-    can = getcan(ip, name)
+    ip = 아이피_확인(request)
+    can = ACL_체크(ip, name)
     if(can == 1):
         return '<meta http-equiv="refresh" content="0;url=/ban" />'
     else:
@@ -2519,14 +2519,14 @@ def delete(name = None):
         DB_실행("select * from data where title = '" + DB_인코딩(name) + "'")
         rows = DB_가져오기()
         if(rows):
-            ip = 아이피(request)
-            can = getcan(ip, name)
+            ip = 아이피_확인(request)
+            can = ACL_체크(ip, name)
             if(can == 1):
                 return '<meta http-equiv="refresh" content="0;url=/ban" />'
             else:
                 today = 시간()
                 leng = '-' + str(len(rows[0]['data']))
-                history(name, '', today, ip, '문서를 삭제 했습니다.', leng)
+                역사_추가(name, '', today, ip, '문서를 삭제 했습니다.', leng)
                 DB_실행("delete from data where title = '" + DB_인코딩(name) + "'")
                 DB_갱신()
                 return '<meta http-equiv="refresh" content="0;url=/w/' + URL_인코딩(name) + '" />'
@@ -2536,8 +2536,8 @@ def delete(name = None):
         DB_실행("select * from data where title = '" + DB_인코딩(name) + "'")
         rows = DB_가져오기()
         if(rows):
-            ip = 아이피(request)
-            can = getcan(ip, name)
+            ip = 아이피_확인(request)
+            can = ACL_체크(ip, name)
             if(can == 1):
                 return '<meta http-equiv="refresh" content="0;url=/ban" />'
             else:
@@ -2551,8 +2551,8 @@ def move(name = None):
         DB_실행("select * from data where title = '" + DB_인코딩(name) + "'")
         rows = DB_가져오기()
         if(rows):
-            ip = 아이피(request)
-            can = getcan(ip, name)
+            ip = 아이피_확인(request)
+            can = ACL_체크(ip, name)
             if(can == 1):
                 return '<meta http-equiv="refresh" content="0;url=/ban" />'
             else:
@@ -2563,14 +2563,14 @@ def move(name = None):
                 if(row):
                     return '<meta http-equiv="refresh" content="0;url=/error/19" />'
                 else:
-                    history(name, rows[0]['data'], today, ip, '<a href="/w/' + URL_인코딩(name) + '">' + name + '</a> 문서를 <a href="/w/' + URL_인코딩(request.form["title"]) + '">' + request.form["title"] + '</a> 문서로 이동 했습니다.', leng)
+                    역사_추가(name, rows[0]['data'], today, ip, '<a href="/w/' + URL_인코딩(name) + '">' + name + '</a> 문서를 <a href="/w/' + URL_인코딩(request.form["title"]) + '">' + request.form["title"] + '</a> 문서로 이동 했습니다.', leng)
                     DB_실행("update data set title = '" + DB_인코딩(request.form["title"]) + "' where title = '" + DB_인코딩(name) + "'")
                     DB_실행("update history set title = '" + DB_인코딩(request.form["title"]) + "' where title = '" + DB_인코딩(name) + "'")
                     DB_갱신()
                     return '<meta http-equiv="refresh" content="0;url=/w/' + URL_인코딩(request.form["title"]) + '" />'
         else:
-            ip = 아이피(request)
-            can = getcan(ip, name)
+            ip = 아이피_확인(request)
+            can = ACL_체크(ip, name)
             if(can == 1):
                 return '<meta http-equiv="refresh" content="0;url=/ban" />'
             else:
@@ -2581,13 +2581,13 @@ def move(name = None):
                 if(row):
                      return '<meta http-equiv="refresh" content="0;url=/error/19" />'
                 else:
-                    history(name, '', today, ip, '<a href="/w/' + URL_인코딩(name) + '">' + name + '</a> 문서를 <a href="/w/' + URL_인코딩(request.form["title"]) + '">' + request.form["title"] + '</a> 문서로 이동 했습니다.', leng)
+                    역사_추가(name, '', today, ip, '<a href="/w/' + URL_인코딩(name) + '">' + name + '</a> 문서를 <a href="/w/' + URL_인코딩(request.form["title"]) + '">' + request.form["title"] + '</a> 문서로 이동 했습니다.', leng)
                     DB_실행("update history set title = '" + DB_인코딩(request.form["title"]) + "' where title = '" + DB_인코딩(name) + "'")
                     DB_갱신()
                     return '<meta http-equiv="refresh" content="0;url=/w/' + URL_인코딩(request.form["title"]) + '" />'
     else:
-        ip = 아이피(request)
-        can = getcan(ip, name)
+        ip = 아이피_확인(request)
+        can = ACL_체크(ip, name)
         if(can == 1):
             return '<meta http-equiv="refresh" content="0;url=/ban" />'
         else:
@@ -2768,8 +2768,8 @@ def sub(name = None, sub = None):
         else:
             number = 1
             
-        ip = 아이피(request)
-        ban = getdiscuss(ip, name, sub)
+        ip = 아이피_확인(request)
+        ban = 토론자_체크(ip, name, sub)
         admin = 관리자_확인()
         
         if(ban == 1 and not admin == 1):
@@ -2782,7 +2782,7 @@ def sub(name = None, sub = None):
                     ip = ip + ' - Admin'
                     
             today = 시간()
-            discuss(name, sub, today)
+            최근_토론_추가(name, sub, today)
             
             aa = request.form["content"]
             aa = re.sub("\[\[(분류:(?:(?:(?!\]\]).)*))\]\]", "[br]", aa)
@@ -2795,8 +2795,8 @@ def sub(name = None, sub = None):
     else:
         style = ''
         
-        ip = 아이피(request)
-        ban = getdiscuss(ip, name, sub)
+        ip = 아이피_확인(request)
+        ban = 토론자_체크(ip, name, sub)
         admin = 관리자_확인()
 
         DB_실행("select * from stop where title = '" + DB_인코딩(name) + "' and sub = '" + DB_인코딩(sub) + "' and close = 'O'")
@@ -2933,13 +2933,15 @@ def sub(name = None, sub = None):
 def blind(name = None, sub = None, number = None):
     if(관리자_확인() == 1):
         DB_실행("select * from topic where title = '" + DB_인코딩(name) + "' and sub = '" + DB_인코딩(sub) + "' and id = '" + str(number) + "'")
-        row = DB_가져오기()
-        if(row):
-            if(row[0]['block'] == 'O'):
+        가리기 = DB_가져오기()
+        if(가리기):
+            if(가리기[0]['block'] == 'O'):
                 DB_실행("update topic set block = '' where title = '" + DB_인코딩(name) + "' and sub = '" + DB_인코딩(sub) + "' and id = '" + str(number) + "'")
             else:
                 DB_실행("update topic set block = 'O' where title = '" + DB_인코딩(name) + "' and sub = '" + DB_인코딩(sub) + "' and id = '" + str(number) + "'")
             DB_갱신()
+            
+            최근_토론_추가(name, sub, 시간())
             
             return '<meta http-equiv="refresh" content="0;url=/topic/' + URL_인코딩(name) + '/sub/' + URL_인코딩(sub) + '" />'
         else:
@@ -2951,15 +2953,17 @@ def blind(name = None, sub = None, number = None):
 def notice(name = None, sub = None, number = None):
     if(관리자_확인() == 1):
         DB_실행("select * from topic where title = '" + DB_인코딩(name) + "' and sub = '" + DB_인코딩(sub) + "' and id = '" + str(number) + "'")
-        data = DB_가져오기()
-        if(data):
+        토론_내용 = DB_가져오기()
+        if(토론_내용):
             DB_실행("select * from distop where id = '" + str(number) + "' and title = '" + DB_인코딩(name) + "' and sub = '" + DB_인코딩(sub) + "'")
-            isthis = DB_가져오기()
-            if(isthis):
+            공지_내용 = DB_가져오기()
+            if(공지_내용):
                 DB_실행("delete from distop where id = '" + str(number) + "' and title = '" + DB_인코딩(name) + "' and sub = '" + DB_인코딩(sub) + "'")
             else:
                 DB_실행("insert into distop (id, title, sub) value ('" + DB_인코딩(str(number)) + "', '" + DB_인코딩(name) + "', '" + DB_인코딩(sub) + "')")
             DB_갱신()
+            
+            최근_토론_추가(name, sub, 시간())
 
             return '<meta http-equiv="refresh" content="0;url=/topic/' + URL_인코딩(name) + '/sub/' + URL_인코딩(sub) + '" />'
         else:
@@ -2970,22 +2974,24 @@ def notice(name = None, sub = None, number = None):
 @app.route('/topic/<path:name>/sub/<path:sub>/stop')
 def topicstop(name = None, sub = None):
     if(관리자_확인() == 1):
-        ip = 아이피(request)
+        아이피 = 아이피_확인(request)
         
-        DB_실행("select * from topic where title = '" + DB_인코딩(name) + "' and sub = '" + DB_인코딩(sub) + "' order by id+0 desc limit 1")
-        row = DB_가져오기()
-        if(row):
-            today = 시간()
+        DB_실행("select * from topic where title = '" + DB_인코딩(name) + "' and sub = '" + DB_인코딩(sub) + "' limit 1")
+        토론_확인 = DB_가져오기()
+        if(토론_확인):
+            현재_시간 = 시간()
             
             DB_실행("select * from stop where title = '" + DB_인코딩(name) + "' and sub = '" + DB_인코딩(sub) + "' and close = ''")
-            rows = DB_가져오기()
-            if(rows):
-                DB_실행("insert into topic (id, title, sub, data, date, ip, block) value ('" + DB_인코딩(str(int(row[0]['id']) + 1)) + "', '" + DB_인코딩(name) + "', '" + DB_인코딩(sub) + "', 'Restart', '" + DB_인코딩(today) + "', '" + DB_인코딩(ip) + " - Restart', '')")
+            정지 = DB_가져오기()
+            if(정지):
+                DB_실행("insert into topic (id, title, sub, data, date, ip, block) value ('" + DB_인코딩(str(int(토론_확인[0]['id']) + 1)) + "', '" + DB_인코딩(name) + "', '" + DB_인코딩(sub) + "', 'Restart', '" + DB_인코딩(현재_시간) + "', '" + DB_인코딩(아이피) + " - Restart', '')")
                 DB_실행("delete from stop where title = '" + DB_인코딩(name) + "' and sub = '" + DB_인코딩(sub) + "' and close = ''")
             else:
-                DB_실행("insert into topic (id, title, sub, data, date, ip, block) value ('" + DB_인코딩(str(int(row[0]['id']) + 1)) + "', '" + DB_인코딩(name) + "', '" + DB_인코딩(sub) + "', 'Stop', '" + DB_인코딩(today) + "', '" + DB_인코딩(ip) + " - Stop', '')")
+                DB_실행("insert into topic (id, title, sub, data, date, ip, block) value ('" + DB_인코딩(str(int(토론_확인[0]['id']) + 1)) + "', '" + DB_인코딩(name) + "', '" + DB_인코딩(sub) + "', 'Stop', '" + DB_인코딩(현재_시간) + "', '" + DB_인코딩(아이피) + " - Stop', '')")
                 DB_실행("insert into stop (title, sub, close) value ('" + DB_인코딩(name) + "', '" + DB_인코딩(sub) + "', '')")
             DB_갱신()
+            
+            최근_토론_추가(name, sub, 현재_시간)
             
             return '<meta http-equiv="refresh" content="0;url=/topic/' + URL_인코딩(name) + '/sub/' + URL_인코딩(sub) + '" />'
         else:
@@ -2996,22 +3002,24 @@ def topicstop(name = None, sub = None):
 @app.route('/topic/<path:name>/sub/<path:sub>/close')
 def topicclose(name = None, sub = None):
     if(관리자_확인() == 1):
-        ip = 아이피(request)
+        아이피 = 아이피_확인(request)
         
         DB_실행("select * from topic where title = '" + DB_인코딩(name) + "' and sub = '" + DB_인코딩(sub) + "' order by id+0 desc limit 1")
-        row = DB_가져오기()
-        if(row):
-            today = 시간()
+        토론_확인 = DB_가져오기()
+        if(토론_확인):
+            현재_시간 = 시간()
             
             DB_실행("select * from stop where title = '" + DB_인코딩(name) + "' and sub = '" + DB_인코딩(sub) + "' and close = 'O'")
-            rows = DB_가져오기()
-            if(rows):
-                DB_실행("insert into topic (id, title, sub, data, date, ip, block) value ('" + DB_인코딩(str(int(row[0]['id']) + 1)) + "', '" + DB_인코딩(name) + "', '" + DB_인코딩(sub) + "', 'Reopen', '" + DB_인코딩(today) + "', '" + DB_인코딩(ip) + " - Reopen', '')")
+            닫기 = DB_가져오기()
+            if(닫기):
+                DB_실행("insert into topic (id, title, sub, data, date, ip, block) value ('" + DB_인코딩(str(int(토론_확인[0]['id']) + 1)) + "', '" + DB_인코딩(name) + "', '" + DB_인코딩(sub) + "', 'Reopen', '" + DB_인코딩(현재_시간) + "', '" + DB_인코딩(아이피) + " - Reopen', '')")
                 DB_실행("delete from stop where title = '" + DB_인코딩(name) + "' and sub = '" + DB_인코딩(sub) + "' and close = 'O'")
             else:
-                DB_실행("insert into topic (id, title, sub, data, date, ip, block) value ('" + DB_인코딩(str(int(row[0]['id']) + 1)) + "', '" + DB_인코딩(name) + "', '" + DB_인코딩(sub) + "', 'Close', '" + DB_인코딩(today) + "', '" + DB_인코딩(ip) + " - Close', '')")
+                DB_실행("insert into topic (id, title, sub, data, date, ip, block) value ('" + DB_인코딩(str(int(토론_확인[0]['id']) + 1)) + "', '" + DB_인코딩(name) + "', '" + DB_인코딩(sub) + "', 'Close', '" + DB_인코딩(현재_시간) + "', '" + DB_인코딩(아이피) + " - Close', '')")
                 DB_실행("insert into stop (title, sub, close) value ('" + DB_인코딩(name) + "', '" + DB_인코딩(sub) + "', 'O')")
             DB_갱신()
+            
+            최근_토론_추가(name, sub, 현재_시간)
             
             return '<meta http-equiv="refresh" content="0;url=/topic/' + URL_인코딩(name) + '/sub/' + URL_인코딩(sub) + '" />'
         else:
@@ -3022,22 +3030,24 @@ def topicclose(name = None, sub = None):
 @app.route('/topic/<path:name>/sub/<path:sub>/agree')
 def 토론_관리자_기능(name = None, sub = None):
     if(관리자_확인() == 1):
-        ip = 아이피(request)
+        아이피 = 아이피_확인(request)
         
         DB_실행("select id from topic where title = '" + DB_인코딩(name) + "' and sub = '" + DB_인코딩(sub) + "' order by id+0 desc limit 1")
         토론 = DB_가져오기()
         if(토론):
-            today = 시간()
+            현재_시간 = 시간()
             
             DB_실행("select * from agreedis where title = '" + DB_인코딩(name) + "' and sub = '" + DB_인코딩(sub) + "'")
             합의안 = DB_가져오기()
             if(합의안):
-                DB_실행("insert into topic (id, title, sub, data, date, ip, block) value ('" + DB_인코딩(str(int(토론[0]['id']) + 1)) + "', '" + DB_인코딩(name) + "', '" + DB_인코딩(sub) + "', 'Settlement', '" + DB_인코딩(today) + "', '" + DB_인코딩(ip) + " - Settlement', '')")
+                DB_실행("insert into topic (id, title, sub, data, date, ip, block) value ('" + DB_인코딩(str(int(토론[0]['id']) + 1)) + "', '" + DB_인코딩(name) + "', '" + DB_인코딩(sub) + "', 'Settlement', '" + DB_인코딩(현재_시간) + "', '" + DB_인코딩(아이피) + " - Settlement', '')")
                 DB_실행("delete from agreedis where title = '" + DB_인코딩(name) + "' and sub = '" + DB_인코딩(sub) + "'")
             else:
-                DB_실행("insert into topic (id, title, sub, data, date, ip, block) value ('" + DB_인코딩(str(int(토론[0]['id']) + 1)) + "', '" + DB_인코딩(name) + "', '" + DB_인코딩(sub) + "', 'Agreement', '" + DB_인코딩(today) + "', '" + DB_인코딩(ip) + " - Agreement', '')")
+                DB_실행("insert into topic (id, title, sub, data, date, ip, block) value ('" + DB_인코딩(str(int(토론[0]['id']) + 1)) + "', '" + DB_인코딩(name) + "', '" + DB_인코딩(sub) + "', 'Agreement', '" + DB_인코딩(현재_시간) + "', '" + DB_인코딩(아이피) + " - Agreement', '')")
                 DB_실행("insert into agreedis (title, sub) value ('" + DB_인코딩(name) + "', '" + DB_인코딩(sub) + "')")
             DB_갱신()
+            
+            최근_토론_추가(name, sub, 시간())
             
             return '<meta http-equiv="refresh" content="0;url=/topic/' + URL_인코딩(name) + '/sub/' + URL_인코딩(sub) + '" />'
         else:
@@ -3047,23 +3057,23 @@ def 토론_관리자_기능(name = None, sub = None):
 
 @app.route('/login', methods=['POST', 'GET'])
 def login():
-    if(request.method == 'POST'):
-        ip = 아이피(request)
-        ban = getban(ip)
+    아이피 = 아이피_확인(request)
+    차단인가 = 차단_체크(아이피)
         
-        if(ban == 1):
+    if(request.method == 'POST'):        
+        if(차단인가 == 1):
             return '<meta http-equiv="refresh" content="0;url=/ban" />'
         else:
             DB_실행("select * from user where id = '" + DB_인코딩(request.form["id"]) + "'")
-            rows = DB_가져오기()
-            if(rows):
+            사용자_정보 = DB_가져오기()
+            if(사용자_정보):
                 if(session.get('Now') == True):
                     return '<meta http-equiv="refresh" content="0;url=/error/11" />'
-                elif(bcrypt.checkpw(bytes(request.form["pw"], 'utf-8'), bytes(rows[0]['pw'], 'utf-8'))):
+                elif(bcrypt.checkpw(bytes(request.form["pw"], 'utf-8'), bytes(사용자_정보[0]['pw'], 'utf-8'))):
                     session['Now'] = True
                     session['DREAMER'] = request.form["id"]
                     
-                    DB_실행("insert into login (user, ip, today) value ('" + DB_인코딩(request.form["id"]) + "', '" + DB_인코딩(ip) + "', '" + DB_인코딩(시간()) + "')")
+                    DB_실행("insert into login (user, ip, today) value ('" + DB_인코딩(request.form["id"]) + "', '" + DB_인코딩(아이피) + "', '" + DB_인코딩(시간()) + "')")
                     DB_갱신()
                     
                     return '<meta http-equiv="refresh" content="0;url=/user" />'
@@ -3071,11 +3081,8 @@ def login():
                     return '<meta http-equiv="refresh" content="0;url=/error/13" />'
             else:
                 return '<meta http-equiv="refresh" content="0;url=/error/12" />'
-    else:
-        ip = 아이피(request)
-        ban = getban(ip)
-        
-        if(ban == 1):
+    else:        
+        if(차단인가 == 1):
             return '<meta http-equiv="refresh" content="0;url=/ban" />'
         else:
             if(session.get('Now') == True):
@@ -3085,22 +3092,22 @@ def login():
                 
 @app.route('/change', methods=['POST', 'GET'])
 def change():
-    if(request.method == 'POST'):
-        ip = 아이피(request)
-        ban = getban(ip)
-        
+    아이피 = 아이피_확인(request)
+    차단인가 = 차단_체크(아이피)
+    
+    if(request.method == 'POST'):      
         if(request.form["pw2"] == request.form["pw3"]):
-            if(ban == 1):
+            if(차단인가 == 1):
                 return '<meta http-equiv="refresh" content="0;url=/ban" />'
             else:
                 DB_실행("select * from user where id = '" + DB_인코딩(request.form["id"]) + "'")
-                rows = DB_가져오기()
-                if(rows):
+                사용자_정보 = DB_가져오기()
+                if(사용자_정보):
                     if(session.get('Now') == True):
                         session['Now'] = False
                         session.pop('DREAMER', None)
                         return '<meta http-equiv="refresh" content="0;url=/change" />'
-                    elif(bcrypt.checkpw(bytes(request.form["pw"], 'utf-8'), bytes(rows[0]['pw'], 'utf-8'))):
+                    elif(bcrypt.checkpw(bytes(request.form["pw"], 'utf-8'), bytes(사용자_정보[0]['pw'], 'utf-8'))):
                         hashed = bcrypt.hashpw(bytes(request.form["pw2"], 'utf-8'), bcrypt.gensalt())
                         
                         DB_실행("update user set pw = '" + DB_인코딩(hashed.decode()) + "' where id = '" + DB_인코딩(request.form["id"]) + "'")
@@ -3113,11 +3120,8 @@ def change():
                     return '<meta http-equiv="refresh" content="0;url=/error/9" />'
         else:
             return '<meta http-equiv="refresh" content="0;url=/error/20" />'
-    else:
-        ip = 아이피(request)
-        ban = getban(ip)
-        
-        if(ban == 1):
+    else:        
+        if(차단인가 == 1):
             return '<meta http-equiv="refresh" content="0;url=/ban" />'
         else:
             if(session.get('Now') == True):
@@ -3130,8 +3134,8 @@ def change():
 @app.route('/check/<name>')
 def check(name = None, sub = None, number = None):
     DB_실행("select * from user where id = '" + DB_인코딩(name) + "'")
-    rows = DB_가져오기()
-    if(rows and rows[0]['acl'] == 'owner' or rows and rows[0]['acl'] == 'admin'):
+    사용자_정보 = DB_가져오기()
+    if(사용자_정보 and 사용자_정보[0]['acl'] == 'owner' or 사용자_정보 and 사용자_정보[0]['acl'] == 'admin'):
         return '<meta http-equiv="refresh" content="0;url=/error/4" />'
     else:
         if(관리자_확인() == 1):
@@ -3171,12 +3175,12 @@ def check(name = None, sub = None, number = None):
 
 @app.route('/register', methods=['POST', 'GET'])
 def register():
-    if(request.method == 'POST'):
-        ip = 아이피(request)
-        ban = getban(ip)
-        
+    아이피 = 아이피_확인(request)
+    차단인가 = 차단_체크(아이피)
+    
+    if(request.method == 'POST'):        
         if(request.form["pw"] == request.form["pw2"]):
-            if(ban == 1):
+            if(차단인가 == 1):
                 return '<meta http-equiv="refresh" content="0;url=/ban" />'
             else:
                 m = re.search('(?:[^A-Za-zㄱ-힣0-9 ])', request.form["id"])
@@ -3200,11 +3204,8 @@ def register():
                             return '<meta http-equiv="refresh" content="0;url=/login" />'
         else:
             return '<meta http-equiv="refresh" content="0;url=/error/20" />'
-    else:
-        ip = 아이피(request)
-        ban = getban(ip)
-        
-        if(ban == 1):
+    else:        
+        if(차단인가 == 1):
             return '<meta http-equiv="refresh" content="0;url=/ban" />'
         else:
             return render_template('index.html', title = '회원가입', enter = '회원가입', logo = data['name'], tn = 15)
@@ -3224,7 +3225,7 @@ def ban(name = None):
     else:
         if(request.method == 'POST'):
             if(관리자_확인() == 1):
-                ip = 아이피(request)
+                ip = 아이피_확인(request)
                 
                 if(not re.search("[0-9]{4}-[0-9]{2}-[0-9]{2}", request.form["end"])):
                     end = ''
@@ -3234,17 +3235,17 @@ def ban(name = None):
                 DB_실행("select * from ban where block = '" + DB_인코딩(name) + "'")
                 row = DB_가져오기()
                 if(row):
-                    block(name, '해제', 시간(), ip, '')
+                    최근_차단_추가(name, '해제', 시간(), ip, '')
                     
                     DB_실행("delete from ban where block = '" + DB_인코딩(name) + "'")
                 else:
                     b = re.search("^([0-9](?:[0-9]?[0-9]?)\.[0-9](?:[0-9]?[0-9]?))$", name)
                     if(b):
-                        block(name, end, 시간(), ip, request.form["why"])
+                        최근_차단_추가(name, end, 시간(), ip, request.form["why"])
                         
                         DB_실행("insert into ban (block, end, why, band) value ('" + DB_인코딩(name) + "', '" + DB_인코딩(end) + "', '" + DB_인코딩(request.form["why"]) + "', 'O')")
                     else:
-                        block(name, end, 시간(), ip, request.form["why"])
+                        최근_차단_추가(name, end, 시간(), ip, request.form["why"])
                         
                         DB_실행("insert into ban (block, end, why, band) value ('" + DB_인코딩(name) + "', '" + DB_인코딩(end) + "', '" + DB_인코딩(request.form["why"]) + "', '')")
                 DB_갱신()
@@ -3338,9 +3339,9 @@ def admin(name = None):
 
 @app.route('/ban')
 def aban():
-    ip = 아이피(request)
+    ip = 아이피_확인(request)
     
-    if(getban(ip) == 1):
+    if(차단_체크(ip) == 1):
         DB_실행("select * from ban where block = '" + DB_인코딩(ip) + "'")
         rows = DB_가져오기()
         if(rows):
@@ -3421,11 +3422,11 @@ def diff(name = None, a = None, b = None):
         
 @app.route('/user')
 def user():
-    ip = 아이피(request)
+    ip = 아이피_확인(request)
     
     DB_실행("select * from user where id = '" + DB_인코딩(ip) + "'")
     rows = DB_가져오기()
-    if(getban(ip) == 0):
+    if(차단_체크(ip) == 0):
         if(rows):
             if(rows[0]['acl'] == 'admin' or rows[0]['acl'] == 'owner'):
                 if(rows[0]['acl'] == 'admin'):
