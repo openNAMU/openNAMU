@@ -3309,9 +3309,9 @@ def admin(name = None):
     if(request.method == 'POST'):
         if(소유자_확인() == 1):
             DB_실행("select * from user where id = '" + DB_인코딩(name) + "'")
-            row = DB_가져오기()
-            if(row):
-                if(row[0]['acl'] == 'admin' or row[0]['acl'] == 'owner'):
+            사용자_정보 = DB_가져오기()
+            if(사용자_정보):
+                if(사용자_정보[0]['acl'] == 'admin' or 사용자_정보[0]['acl'] == 'owner'):
                     DB_실행("update user set acl = 'user' where id = '" + DB_인코딩(name) + "'")
                 else:
                     DB_실행("update user set acl = '" + DB_인코딩(request.form["select"]) + "' where id = '" + DB_인코딩(name) + "'")
@@ -3325,9 +3325,9 @@ def admin(name = None):
     else:
         if(소유자_확인() == 1):
             DB_실행("select * from user where id = '" + DB_인코딩(name) + "'")
-            row = DB_가져오기()
-            if(row):
-                if(row[0]['acl'] == 'admin' or row[0]['acl'] == 'owner'):
+            사용자_정보 = DB_가져오기()
+            if(사용자_정보):
+                if(사용자_정보[0]['acl'] == 'admin' or 사용자_정보[0]['acl'] == 'owner'):
                     now = '권한 해제'
                 else:
                     now = '권한 부여'
