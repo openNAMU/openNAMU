@@ -120,7 +120,7 @@ except:
 
 app.secret_key = hashlib.sha512(bytes(data['key'], 'ascii')).hexdigest()
 
-def show_diff(seqm):
+def 비교(seqm):
     output= []
     for opcode, a0, a1, b0, b1 in seqm.get_opcodes():
         if(opcode == 'equal'):
@@ -192,18 +192,18 @@ def 아이디_파싱(원래_아이디):
         DB_실행("select * from data where title = '사용자:" + DB_인코딩(분리[0]) + "'")
         row = DB_가져오기()
         if(row):
-            ip = '<a href="/w/' + URL_인코딩('사용자:' + 분리[0]) + '">' + 분리[0] + '</a> - ' + 분리[1]
+            ip = '<a href="/w/' + URL_인코딩('사용자:' + 분리[0]) + '">' + 분리[0] + '</a> - ' + 분리[1] + ' <a href="/record/' + URL_인코딩(분리[0]) + '/n/1">(기록)</a>'
         else:
-            ip = '<a class="not_thing" href="/w/' + URL_인코딩('사용자:' + 분리[0]) + '">' + 분리[0] + '</a> - ' + 분리[1]
+            ip = '<a class="not_thing" href="/w/' + URL_인코딩('사용자:' + 분리[0]) + '">' + 분리[0] + '</a> - ' + 분리[1] + ' <a href="/record/' + URL_인코딩(분리[0]) + '/n/1">(기록)</a>'
     elif(re.search("\.", 원래_아이디)):
-        ip = 원래_아이디
+        ip = 원래_아이디 + ' <a href="/record/' + URL_인코딩(원래_아이디) + '/n/1">(기록)</a>'
     else:
         DB_실행("select * from data where title = '사용자:" + DB_인코딩(원래_아이디) + "'")
         row = DB_가져오기()
         if(row):
-            ip = '<a href="/w/' + URL_인코딩('사용자:' + 원래_아이디) + '">' + 원래_아이디 + '</a>'
+            ip = '<a href="/w/' + URL_인코딩('사용자:' + 원래_아이디) + '">' + 원래_아이디 + '</a> <a href="/record/' + URL_인코딩(원래_아이디) + '/n/1">(기록)</a>'
         else:
-            ip = '<a class="not_thing" href="/w/' + URL_인코딩('사용자:' + 원래_아이디) + '">' + 원래_아이디 + '</a>'
+            ip = '<a class="not_thing" href="/w/' + URL_인코딩('사용자:' + 원래_아이디) + '">' + 원래_아이디 + '</a> <a href="/record/' + URL_인코딩(원래_아이디) + '/n/1">(기록)</a>'
 
     return ip
     
@@ -1350,7 +1350,7 @@ def 길이_확인(기존, 바뀜):
     return 길이    
     
 @app.route('/upload', methods=['GET', 'POST'])
-def upload():
+def 업로드():
     app.config['MAX_CONTENT_LENGTH'] = int(data['upload']) * 1024 * 1024
     if(request.method == 'POST'):
         ip = 아이피_확인(request)
@@ -1390,14 +1390,14 @@ def upload():
             return render_template('index.html', logo = data['name'], title = '업로드', tn = 21, number = data['upload'])
     
 @app.route('/image/<path:name>')
-def image(name = None):
+def 이미지(name = None):
     if(os.path.exists(os.path.join('image', name))):
         return send_file(os.path.join('image', name), mimetype='image')
     else:
         return render_template('index.html', logo = data['name'], data = '이미지 없음.', title = '이미지 보기'), 404
 
 @app.route('/adminlist')
-def adminlist():
+def 관리자_목록():
     i = 0
     div = '<div>'
     
@@ -1432,7 +1432,7 @@ def adminlist():
         return render_template('index.html', logo = data['name'], title = '관리자 목록')
 
 @app.route('/recentchanges')
-def recentchanges():
+def 최근바뀜():
     i = 0
     div = '<div>'
     
@@ -1478,14 +1478,14 @@ def recentchanges():
                 ban = ''
                 
             if(re.search('\.', rows[i]['ip'])):
-                ip = rows[i]['ip']
+                ip = rows[i]['ip'] + ' <a href="/record/' + URL_인코딩(rows[i]['ip']) + '/n/1">(기록)</a>'
             else:
                 DB_실행("select * from data where title = '사용자:" + DB_인코딩(rows[i]['ip']) + "'")
                 row = DB_가져오기()
                 if(row):
-                    ip = '<a href="/w/' + URL_인코딩('사용자:' + rows[i]['ip']) + '">' + rows[i]['ip'] + '</a>'
+                    ip = '<a href="/w/' + URL_인코딩('사용자:' + rows[i]['ip']) + '">' + rows[i]['ip'] + '</a> <a href="/record/' + URL_인코딩(rows[i]['ip']) + '/n/1">(기록)</a>'
                 else:
-                    ip = '<a class="not_thing" href="/w/' + URL_인코딩('사용자:' + rows[i]['ip']) + '">' + rows[i]['ip'] + '</a>'
+                    ip = '<a class="not_thing" href="/w/' + URL_인코딩('사용자:' + rows[i]['ip']) + '">' + rows[i]['ip'] + '</a> <a href="/record/' + URL_인코딩(rows[i]['ip']) + '/n/1">(기록)</a>'
                     
             if((int(rows[i]['id']) - 1) == 0):
                 revert = ''
@@ -1501,7 +1501,7 @@ def recentchanges():
         return render_template('index.html', logo = data['name'], rows = '', tn = 3, title = '최근 변경내역')
         
 @app.route('/history/<path:name>/r/<int:num>/hidden')
-def hidden(name = None, num = None):
+def 역사_숨기기(name = None, num = None):
     if(소유자_확인() == 1):
         DB_실행("select * from hidhi where title = '" + DB_인코딩(name) + "' and re = '" + DB_인코딩(str(num)) + "'")
         rows = DB_가져오기()
@@ -1515,7 +1515,7 @@ def hidden(name = None, num = None):
         return '<meta http-equiv="refresh" content="0;url=/history/' + URL_인코딩(name) + '/n/1" />'
         
 @app.route('/record/<path:name>/n/<int:number>')
-def record(name = None, number = None):
+def 사용자_기록(name = None, number = None):
     v = number * 50
     i = v - 50
     div = '<div>'
@@ -1596,61 +1596,58 @@ def record(name = None, number = None):
         return render_template('index.html', logo = data['name'], rows = '', tn = 3, title = '유저 기록')
       
 @app.route('/userlog/n/<int:number>')
-def userlog(number = None):
-    v = number * 50
-    i = v - 50
-    div = ''
+def 모든_사용자(number = None):
+    숫자_1 = number * 50
+    숫자_2 = 숫자_1 - 50
+    목록 = ''
     
     DB_실행("select * from user")
-    rows = DB_가져오기()
-    if(rows):
-        admin = 관리자_확인()
+    사용자_목록 = DB_가져오기()
+    if(사용자_목록):
+        관리자 = 관리자_확인()
         
         while(True):
             try:
-                a = rows[i]
+                임시_변수 = 사용자_목록[숫자_2]
             except:
                 if(number != 1):
-                    div = div + '<br><a href="/userlog/n/' + str(number - 1) + '">(이전)'
+                    목록 = 목록 + '<br><a href="/userlog/n/' + str(number - 1) + '">(이전)'
                 break
                 
-            if(admin == 1):
-                DB_실행("select * from ban where block = '" + DB_인코딩(rows[i]['id']) + "'")
-                row = DB_가져오기()
-                if(row):
-                    ban = ' <a href="/ban/' + URL_인코딩(rows[i]['id']) + '">(해제)</a>'
+            if(관리자 == 1):
+                DB_실행("select * from ban where block = '" + DB_인코딩(사용자_목록[숫자_2]['id']) + "'")
+                차단인가 = DB_가져오기()
+                if(차단인가):
+                    차단_버튼 = ' <a href="/ban/' + URL_인코딩(사용자_목록[숫자_2]['id']) + '">(해제)</a>'
                 else:
-                    ban = ' <a href="/ban/' + URL_인코딩(rows[i]['id']) + '">(차단)</a>'
+                    차단_버튼 = ' <a href="/ban/' + URL_인코딩(사용자_목록[숫자_2]['id']) + '">(차단)</a>'
             else:
-                ban = ''
+                차단_버튼 = ''
                 
-            if(re.search('\.', rows[i]['id'])):
-                ip = rows[i]['id']
+            DB_실행("select * from data where title = '사용자:" + DB_인코딩(사용자_목록[숫자_2]['id']) + "'")
+            자료 = DB_가져오기()
+            if(자료):
+                아이피 = '<a href="/w/' + URL_인코딩('사용자:' + 사용자_목록[숫자_2]['id']) + '">' + 사용자_목록[숫자_2]['id'] + '</a> <a href="/record/' + URL_인코딩(사용자_목록[숫자_2]['id']) + '/n/1">(기록)</a>'
             else:
-                DB_실행("select * from data where title = '사용자:" + DB_인코딩(rows[i]['id']) + "'")
-                row = DB_가져오기()
-                if(row):
-                    ip = '<a href="/w/' + URL_인코딩('사용자:' + rows[i]['id']) + '">' + rows[i]['id'] + '</a>'
-                else:
-                    ip = '<a class="not_thing" href="/w/' + URL_인코딩('사용자:' + rows[i]['id']) + '">' + rows[i]['id'] + '</a>'
+                아이피 = '<a class="not_thing" href="/w/' + URL_인코딩('사용자:' + 사용자_목록[숫자_2]['id']) + '">' + 사용자_목록[숫자_2]['id'] + '</a> <a href="/record/' + URL_인코딩(사용자_목록[숫자_2]['id']) + '/n/1">(기록)</a>'
                 
-            div = div + '<li>' + str(i + 1) + '. ' + ip + ban + '</li>'
+            목록 = 목록 + '<li>' + str(숫자_2 + 1) + '. ' + 아이피 + 차단_버튼 + '</li>'
             
-            if(i == v):
+            if(숫자_2 == 숫자_1):
                 if(number == 1):
-                    div = div + '<br><a href="/userlog/n/' + str(number + 1) + '">(다음)'
+                    목록 = 목록 + '<br><a href="/userlog/n/' + str(number + 1) + '">(다음)'
                 else:
-                    div = div + '<br><a href="/userlog/n/' + str(number - 1) + '">(이전) <a href="/userlog/n/' + str(number + 1) + '">(다음)'
+                    목록 = 목록 + '<br><a href="/userlog/n/' + str(number - 1) + '">(이전) <a href="/userlog/n/' + str(number + 1) + '">(다음)'
                 break
             else:
-                i = i + 1
+                숫자_2 += 1
                 
-        return render_template('index.html', logo = data['name'], data = div, title = '유저 가입 기록')
+        return render_template('index.html', logo = data['name'], data = 목록, title = '유저 가입 기록')
     else:
         return render_template('index.html', logo = data['name'], data = '', title = '유저 가입 기록')
         
 @app.route('/backlink/<path:name>/n/<int:number>')
-def backlink(name = None, number = None):
+def 역링크(name = None, number = None):
     v = number * 50
     i = v - 50
     div = ''
@@ -1852,14 +1849,14 @@ def 역사_보기(name = None, number = None):
                     leng = '<span style="color:gray;">' + rows[i]['leng'] + '</span>'                    
                     
                 if(re.search("\.", rows[i]["ip"])):
-                    ip = rows[i]["ip"]
+                    ip = rows[i]["ip"] + ' <a href="/record/' + URL_인코딩(rows[i]["ip"]) + '/n/1">(기록)</a>'
                 else:
                     DB_실행("select * from data where title = '사용자:" + DB_인코딩(rows[i]['ip']) + "'")
                     row = DB_가져오기()
                     if(row):
-                        ip = '<a href="/w/' + URL_인코딩('사용자:' + rows[i]['ip']) + '">' + rows[i]['ip'] + '</a>'
+                        ip = '<a href="/w/' + URL_인코딩('사용자:' + rows[i]['ip']) + '">' + rows[i]['ip'] + '</a> <a href="/record/' + URL_인코딩(rows[i]["ip"]) + '/n/1">(기록)</a>'
                     else:
-                        ip = '<a class="not_thing" href="/w/' + URL_인코딩('사용자:' + rows[i]['ip']) + '">' + rows[i]['ip'] + '</a>'
+                        ip = '<a class="not_thing" href="/w/' + URL_인코딩('사용자:' + rows[i]['ip']) + '">' + rows[i]['ip'] + '</a> <a href="/record/' + URL_인코딩(rows[i]["ip"]) + '/n/1">(기록)</a>'
                         
                 if(admin == 1):
                     DB_실행("select * from user where id = '" + DB_인코딩(rows[i]['ip']) + "'")
@@ -1881,6 +1878,7 @@ def 역사_보기(name = None, number = None):
                             ban = ' <a href="/ban/' + URL_인코딩(rows[i]['ip']) + '">(해제)</a>'
                         else:
                             ban = ' <a href="/ban/' + URL_인코딩(rows[i]['ip']) + '">(차단)</a>'
+                            
                     if(소유자_확인() == 1):
                         DB_실행("select * from hidhi where title = '" + DB_인코딩(name) + "' and re = '" + DB_인코딩(rows[i]['id']) + "'")
                         row = DB_가져오기()
@@ -2469,7 +2467,7 @@ def secedit(name = None, number = None):
                 return '<meta http-equiv="refresh" content="0;url=/w/' + URL_인코딩(name) + '" />'
                 
 @app.route('/preview/<path:name>', methods=['POST'])
-def preview(name = None):
+def 미리보기(name = None):
     ip = 아이피_확인(request)
     can = ACL_체크(ip, name)
     if(can == 1):
@@ -2491,7 +2489,7 @@ def preview(name = None):
         return render_template('index.html', title = name, logo = data['name'], page = URL_인코딩(name), data = request.form["content"], tn = 2, preview = 1, enddata = enddata, left = left, sub = '미리보기', login = 로그인_확인())
         
 @app.route('/preview/<path:name>/section/<int:number>', methods=['POST'])
-def secpreview(name = None, number = None):
+def 문단_미리보기(name = None, number = None):
     ip = 아이피_확인(request)
     can = ACL_체크(ip, name)
     if(can == 1):
@@ -2514,7 +2512,7 @@ def secpreview(name = None, number = None):
         return render_template('index.html', title = name, logo = data['name'], page = URL_인코딩(name), data = request.form["content"], tn = 2, preview = 1, enddata = enddata, left = left, notice = notice, section = 1, number = number, odata = request.form["otent"], sub = '미리보기')
 
 @app.route('/delete/<path:name>', methods=['POST', 'GET'])
-def delete(name = None):
+def 문서_삭제(name = None):
     if(request.method == 'POST'):
         DB_실행("select * from data where title = '" + DB_인코딩(name) + "'")
         rows = DB_가져오기()
@@ -2546,7 +2544,7 @@ def delete(name = None):
             return '<meta http-equiv="refresh" content="0;url=/w/' + URL_인코딩(name) + '" />'
 
 @app.route('/move/<path:name>', methods=['POST', 'GET'])
-def move(name = None):
+def 문서_이동(name = None):
     if(request.method == 'POST'):
         DB_실행("select * from data where title = '" + DB_인코딩(name) + "'")
         rows = DB_가져오기()
@@ -2594,11 +2592,11 @@ def move(name = None):
             return render_template('index.html', title = name, logo = data['name'], page = URL_인코딩(name), tn = 9, plus = '정말 이동 하시겠습니까?', sub = '이동', login = 로그인_확인())
 
 @app.route('/other')
-def other():
+def 나머지():
     return render_template('index.html', title = '기타 메뉴', logo = data['name'], data = '<h2 style="margin-top: 0px;">기록</h2><li><a href="/blocklog/n/1">유저 차단 기록</a></li><li><a href="/userlog/n/1">유저 가입 기록</a></li><li><a href="/manager/6">유저 기록</a></li><h2>기타</h2><li><a href="/titleindex">모든 문서</a></li><li><a href="/upload">업로드</a></li><li><a href="/adminlist">관리자 목록</a></li><li><a href="/manager/1">관리자 메뉴</a></li><br>이 오픈나무의 버전은 <a href="https://github.com/2DU/openNAMU/blob/master/version.md">1.8.8</a> 입니다.')
     
 @app.route('/manager/<int:num>', methods=['POST', 'GET'])
-def manager(num = None):
+def 관리_기능(num = None):
     if(num == 1):
         return render_template('index.html', title = '관리자 메뉴', logo = data['name'], data = '<h2 style="margin-top: 0px;">관리자 및 소유자</h2><li><a href="/manager/2">문서 ACL</a></li><li><a href="/manager/3">유저 체크</a></li><li><a href="/manager/4">유저 차단</a></li><h2>소유자</h2><li><a href="/manager/5">관리자 권한 주기</a></li><h2>기타</h2><li>이 메뉴에 없는 기능은 해당 문서의 역사나 토론에서 바로 사용 가능함</li>')
     elif(num == 2):
@@ -2653,7 +2651,7 @@ def 모든_문서():
         return render_template('index.html', logo = data['name'], rows = '', tn = 4, title = '모든 문서')
 
 @app.route('/topic/<path:name>', methods=['POST', 'GET'])
-def topic(name = None):
+def 토론_목록(name = None):
     if(request.method == 'POST'):
         return '<meta http-equiv="refresh" content="0;url=/topic/' + URL_인코딩(name) + '/sub/' + URL_인코딩(request.form["topic"]) + '" />'
     else:
@@ -2759,7 +2757,7 @@ def 합의된_토론_목록(name = None):
     return render_template('index.html', title = name, page = URL_인코딩(name), logo = data['name'], plus = 보여줄_내용, tn = 10, sub = '합의된 토론')
 
 @app.route('/topic/<path:name>/sub/<path:sub>', methods=['POST', 'GET'])
-def sub(name = None, sub = None):
+def 토론(name = None, sub = None):
     if(request.method == 'POST'):
         DB_실행("select * from topic where title = '" + DB_인코딩(name) + "' and sub = '" + DB_인코딩(sub) + "' order by id+0 desc limit 1")
         rows = DB_가져오기()
@@ -2837,29 +2835,29 @@ def sub(name = None, sub = None):
         rows = DB_가져오기()
 
         DB_실행("select * from distop where title = '" + DB_인코딩(name) + "' and sub = '" + DB_인코딩(sub) + "' order by id+0 asc")
-        distop = DB_가져오기()
+        공지 = DB_가져오기()
 
         i = 0
 
 
-        if(distop):
+        if(공지):
             while(True):
                 try:
-                    a = distop[i]
+                    a = 공지[i]
                 except:
                     break
 
-                num = int(distop[i]['id']) - 1
+                num = int(공지[i]['id']) - 1
 
                 if(i == 0):
                     start = rows[num]['ip']
                     
-                indata = 나무마크('', rows[num]['data'])
-                indata = re.sub("(?P<in>#(?:[0-9]*))", '<a href="\g<in>">\g<in></a>', indata)
+                공지_데이터 = 나무마크('', rows[num]['data'])
+                공지_데이터 = re.sub("(?P<in>#(?:[0-9]*))", '<a href="\g<in>">\g<in></a>', 공지_데이터)
                         
                 ip = 아이디_파싱(rows[num]['ip'])
                                    
-                div = div + '<table id="toron"><tbody><tr><td id="toroncolorred"><a href="#' + distop[i]['id'] + '" id="' + distop[i]['id'] + '-nt">#' + distop[i]['id'] + '</a> ' + ip + ' <span style="float:right;">' + rows[num]['date'] + '</span></td></tr><tr><td>' + indata + '</td></tr></tbody></table><br>'
+                div = div + '<table id="toron"><tbody><tr><td id="toroncolorred"><a href="#' + 공지[i]['id'] + '" id="' + 공지[i]['id'] + '-nt">#' + 공지[i]['id'] + '</a> ' + ip + ' <span style="float:right;">' + rows[num]['date'] + '</span></td></tr><tr><td>' + 공지_데이터 + '</td></tr></tbody></table><br>'
                     
                 i = i + 1
 
@@ -2930,7 +2928,7 @@ def sub(name = None, sub = None):
         return render_template('index.html', title = name, page = URL_인코딩(name), suburl = URL_인코딩(sub), toron = sub, logo = data['name'], rows = div, tn = 11, ban = ban, style = style, sub = '토론', login = 로그인_확인())
 
 @app.route('/topic/<path:name>/sub/<path:sub>/b/<int:number>')
-def blind(name = None, sub = None, number = None):
+def 토론_블라인드(name = None, sub = None, number = None):
     if(관리자_확인() == 1):
         DB_실행("select * from topic where title = '" + DB_인코딩(name) + "' and sub = '" + DB_인코딩(sub) + "' and id = '" + str(number) + "'")
         가리기 = DB_가져오기()
@@ -2950,7 +2948,7 @@ def blind(name = None, sub = None, number = None):
         return '<meta http-equiv="refresh" content="0;url=/error/3" />'
 
 @app.route('/topic/<path:name>/sub/<path:sub>/notice/<int:number>')
-def notice(name = None, sub = None, number = None):
+def 토론_공지(name = None, sub = None, number = None):
     if(관리자_확인() == 1):
         DB_실행("select * from topic where title = '" + DB_인코딩(name) + "' and sub = '" + DB_인코딩(sub) + "' and id = '" + str(number) + "'")
         토론_내용 = DB_가져오기()
@@ -2972,7 +2970,7 @@ def notice(name = None, sub = None, number = None):
         return '<meta http-equiv="refresh" content="0;url=/error/3" />'
         
 @app.route('/topic/<path:name>/sub/<path:sub>/stop')
-def topicstop(name = None, sub = None):
+def 토론_정지(name = None, sub = None):
     if(관리자_확인() == 1):
         아이피 = 아이피_확인(request)
         
@@ -3000,7 +2998,7 @@ def topicstop(name = None, sub = None):
         return '<meta http-equiv="refresh" content="0;url=/error/3" />'                
         
 @app.route('/topic/<path:name>/sub/<path:sub>/close')
-def topicclose(name = None, sub = None):
+def 토론_닫기(name = None, sub = None):
     if(관리자_확인() == 1):
         아이피 = 아이피_확인(request)
         
@@ -3056,7 +3054,7 @@ def 토론_관리자_기능(name = None, sub = None):
         return '<meta http-equiv="refresh" content="0;url=/error/3" />'
 
 @app.route('/login', methods=['POST', 'GET'])
-def login():
+def 로그인():
     아이피 = 아이피_확인(request)
     차단인가 = 차단_체크(아이피)
         
@@ -3091,7 +3089,7 @@ def login():
                 return render_template('index.html', title = '로그인', enter = '로그인', logo = data['name'], tn = 15)
                 
 @app.route('/change', methods=['POST', 'GET'])
-def change():
+def 비밀번호_변경():
     아이피 = 아이피_확인(request)
     차단인가 = 차단_체크(아이피)
     
@@ -3132,7 +3130,7 @@ def change():
                 return render_template('index.html', title = '비밀번호 변경', enter = '변경', logo = data['name'], tn = 15)
                 
 @app.route('/check/<name>')
-def check(name = None, sub = None, number = None):
+def 사용자_아이피_확인(name = None, sub = None, number = None):
     DB_실행("select * from user where id = '" + DB_인코딩(name) + "'")
     사용자_정보 = DB_가져오기()
     if(사용자_정보 and 사용자_정보[0]['acl'] == 'owner' or 사용자_정보 and 사용자_정보[0]['acl'] == 'admin'):
@@ -3174,7 +3172,7 @@ def check(name = None, sub = None, number = None):
             return '<meta http-equiv="refresh" content="0;url=/error/3" />'
 
 @app.route('/register', methods=['POST', 'GET'])
-def register():
+def 가입():
     아이피 = 아이피_확인(request)
     차단인가 = 차단_체크(아이피)
     
@@ -3211,13 +3209,13 @@ def register():
             return render_template('index.html', title = '회원가입', enter = '회원가입', logo = data['name'], tn = 15)
 
 @app.route('/logout')
-def logout():
+def 로그아웃():
     session['Now'] = False
     session.pop('DREAMER', None)
     return '<meta http-equiv="refresh" content="0;url=/user" />'
 
 @app.route('/ban/<name>', methods=['POST', 'GET'])
-def ban(name = None):
+def 사용자_차단(name = None):
     DB_실행("select * from user where id = '" + DB_인코딩(name) + "'")
     rows = DB_가져오기()
     if(rows and rows[0]['acl'] == 'owner' or rows and rows[0]['acl'] == 'admin'):
@@ -3271,7 +3269,7 @@ def ban(name = None):
                 return '<meta http-equiv="refresh" content="0;url=/error/3" />'
 
 @app.route('/acl/<path:name>', methods=['POST', 'GET'])
-def acl(name = None):
+def ACL(name = None):
     if(request.method == 'POST'):
         if(관리자_확인() == 1):
             DB_실행("select * from data where title = '" + DB_인코딩(name) + "'")
@@ -3305,7 +3303,7 @@ def acl(name = None):
             return '<meta http-equiv="refresh" content="0;url=/error/3" />'
 
 @app.route('/admin/<name>', methods=['POST', 'GET'])
-def admin(name = None):
+def 관리자_부여(name = None):
     if(request.method == 'POST'):
         if(소유자_확인() == 1):
             DB_실행("select * from user where id = '" + DB_인코딩(name) + "'")
@@ -3338,7 +3336,7 @@ def admin(name = None):
             return '<meta http-equiv="refresh" content="0;url=/error/3" />'
 
 @app.route('/ban')
-def aban():
+def 차단_확인_페이지():
     ip = 아이피_확인(request)
     
     if(차단_체크(ip) == 1):
@@ -3394,7 +3392,7 @@ def aban():
     return render_template('index.html', title = '권한 오류', logo = data['name'], data = end), 401
    
 @app.route('/w/<path:name>/r/<int:a>/diff/<int:b>')
-def diff(name = None, a = None, b = None):
+def 문서_비교(name = None, a = None, b = None):
     DB_실행("select * from history where id = '" + DB_인코딩(str(a)) + "' and title = '" + DB_인코딩(name) + "'")
     rows = DB_가져오기()
     if(rows):
@@ -3410,7 +3408,7 @@ def diff(name = None, a = None, b = None):
             enddata = re.sub('"', '&quot;', enddata)
             
             sm = difflib.SequenceMatcher(None, indata, enddata)
-            c = show_diff(sm)
+            c = 비교(sm)
             
             c = '<pre>' + c + '</pre>'
             
@@ -3421,7 +3419,7 @@ def diff(name = None, a = None, b = None):
         return '<meta http-equiv="refresh" content="0;url=/history/' + URL_인코딩(name) + '" />'
         
 @app.route('/user')
-def user():
+def 사용자():
     ip = 아이피_확인(request)
     
     DB_실행("select * from user where id = '" + DB_인코딩(ip) + "'")
@@ -3451,7 +3449,7 @@ def user():
     return render_template('index.html', title = '유저 메뉴', logo = data['name'], data = ip + '<br><br><span>권한 상태 : ' + acl + '<br><br><li><a href="/login">로그인</a></li><li><a href="/logout">로그아웃</a></li><li><a href="/register">회원가입</a></li><li><a href="/change">비밀번호 변경</a></li>')
 
 @app.route('/random')
-def random():
+def 무작위_문서():
     DB_실행("select * from data order by rand() limit 1")
     rows = DB_가져오기()
     if(rows):
@@ -3460,7 +3458,7 @@ def random():
         return '<meta http-equiv="refresh" content="0;url=/" />'
         
 @app.route('/error/<int:num>')
-def error(num = None):
+def 오류(num = None):
     if(num == 1):
         return render_template('index.html', title = '권한 오류', logo = data['name'], data = '비 로그인 상태 입니다.'), 401
     elif(num == 2):
@@ -3513,5 +3511,5 @@ def uncaughtError(error):
     app.config['MAX_CONTENT_LENGTH'] = (1024**3)
     return error, 401
 
-if __name__ == '__main__':
+if(__name__ == '__main__'):
     app.run(host = '0.0.0.0', port = int(data['port']))
