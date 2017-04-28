@@ -5,8 +5,8 @@ python:
   - "3.4"
   - "3.5"
   - "3.6"
-  - "pypy3"
 install:
   - pip install flask
   - pip install bcrypt
   - pip install pymysql
+script: python.app.py
