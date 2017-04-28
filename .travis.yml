@@ -10,4 +10,3 @@ install:
   - pip install flask
   - pip install bcrypt
   - pip install pymysql
-script: python app.py
