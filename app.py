@@ -830,19 +830,22 @@ def 나무마크(title, data):
     if(category):
         data = data + '<div style="width:100%;border: 1px solid #777;padding: 5px;margin-top: 1em;">분류: ' + category + '</div>'
         
+    data = re.sub("(?:\|\|\r\n)", "#table#<nobr>", data)
+        
     while(True):
-        있나 = re.search("\n(\|\|((?:(?:(?:(?!\|\|).)*)(?:\n?))+))", data)
+        있나 = re.search("(\|\|(?:(?:(?:(?:(?!\|\|).)*)(?:\n?))+))", data)
         if(있나):
             분리 = 있나.groups()
             
             중간_내용 = re.sub("\|\|", "#table#", 분리[0])
             중간_내용 = re.sub("\r\n", "<br>", 중간_내용)
             
-            data = re.sub("\n(\|\|((?:(?:(?:(?!\|\|).)*)(?:\n?))+))", '\n' + 중간_내용, data, 1)
+            data = re.sub("(\|\|((?:(?:(?:(?!\|\|).)*)(?:\n?))+))", 중간_내용, data, 1)
         else:
             break
             
     data = re.sub("#table#", "||", data)
+    data = re.sub("<nobr>", "\r\n", data)
     
     while(True):
         m = re.search("(\|\|(?:(?:(?:.*)\n?)\|\|)+)", data)
