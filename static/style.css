@@ -452,11 +452,11 @@ body {
 }
 
 .out_link::before {
-    padding: 0px 0.15em;
-    background: green;
-    color: white;
-    content: "외";
-    font-family: "Ionicons" !important;
+    padding: 0px;
+    background: transparent;
+    color: green;
+    content: "\f14c";
+    font-family: FontAwesome;
 }
 
 textarea {
