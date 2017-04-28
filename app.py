@@ -514,7 +514,9 @@ def 나무마크(title, data):
             toc = re.sub("\.$", '', toc)
             rtoc = rtoc + '<a href="#s-' + toc + '">' + toc + '</a>. ' + result[1] + '<br>'
             c = re.sub(" $", "", result[1])
-            data = re.sub('(={1,6})\s?([^=]*)\s?(?:={1,6})(?:\s+)?\n', '<h' + str(wiki) + ' id="' + c + '"><a href="#toc" id="s-' + toc + '">' + toc + '.</a> ' + c + ' <span style="font-size:11px;">[<a href="/edit/' + URL_인코딩(title) + '/section/' + str(i) + '">편집</a>]</span></h' + str(wiki) + '>', data, 1);
+            d = c
+            c = re.sub("\[\[(([^|]*)\|)?(?P<in>[^\]]*)\]\]", "\g<in>", c)
+            data = re.sub('(={1,6})\s?([^=]*)\s?(?:={1,6})(?:\s+)?\n', '<h' + str(wiki) + ' id="' + c + '"><a href="#toc" id="s-' + toc + '">' + toc + '.</a> ' + d + ' <span style="font-size:11px;">[<a href="/edit/' + URL_인코딩(title) + '/section/' + str(i) + '">편집</a>]</span></h' + str(wiki) + '>', data, 1);
         else:
             rtoc = rtoc + '</div>'
             break
@@ -827,6 +829,20 @@ def 나무마크(title, data):
     
     if(category):
         data = data + '<div style="width:100%;border: 1px solid #777;padding: 5px;margin-top: 1em;">분류: ' + category + '</div>'
+        
+    while(True):
+        있나 = re.search("\n(\|\|((?:(?:(?:(?!\|\|).)*)(?:\n?))+))", data)
+        if(있나):
+            분리 = 있나.groups()
+            
+            중간_내용 = re.sub("\|\|", "#table#", 분리[0])
+            중간_내용 = re.sub("\r\n", "<br>", 중간_내용)
+            
+            data = re.sub("\n(\|\|((?:(?:(?:(?!\|\|).)*)(?:\n?))+))", '\n' + 중간_내용, data, 1)
+        else:
+            break
+            
+    data = re.sub("#table#", "||", data)
     
     while(True):
         m = re.search("(\|\|(?:(?:(?:.*)\n?)\|\|)+)", data)
