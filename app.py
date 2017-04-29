@@ -2074,26 +2074,30 @@ def 문서_보기(name = None, redirect = None):
             div = '<h2>분류</h2>' + div
             
             DB_실행("select * from data where title = '" + DB_인코딩(name) + "'")
-            bb = DB_가져오기()
-            if(bb):
-                if(bb[0]['acl'] == 'admin'):
+            문서_데이터 = DB_가져오기()
+            if(문서_데이터):
+                if(문서_데이터[0]['acl'] == 'admin'):
                     acl = '(관리자)'
-                elif(bb[0]['acl'] == 'user'):
+                elif(문서_데이터[0]['acl'] == 'user'):
                     acl = '(유저)'
                 else:
                     if(not acl):
                         acl = ''
-                        
-                enddata = 나무마크(name, bb[0]['data'])
                 
-                m = re.search('<div id="toc">((?:(?!\/div>).)*)<\/div>', enddata)
+                if(redirect):
+                else:
+                    데이터 = 문서_데이터[0]['data']
+                
+                최종_데이터 = 나무마크(name, 데이터)
+                
+                m = re.search('<div id="toc">((?:(?!\/div>).)*)<\/div>', 최종_데이터)
                 if(m):
                     result = m.groups()
                     left = result[0]
                 else:
                     left = ''
                     
-                return 웹_디자인('index.html', title = name, logo = data['name'], page = URL_인코딩(name), data = enddata + '<br>' + div, license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, redirect = redirect, login = 로그인_확인(), admin = 관리자_메뉴)
+                return 웹_디자인('index.html', title = name, logo = data['name'], page = URL_인코딩(name), data = 최종_데이터 + '<br>' + div, license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, redirect = redirect, login = 로그인_확인(), admin = 관리자_메뉴)
             else:
                 return 웹_디자인('index.html', title = name, logo = data['name'], page = URL_인코딩(name), data = div, license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, redirect = redirect, login = 로그인_확인(), admin = 관리자_메뉴)
         else:
@@ -2131,6 +2135,8 @@ def 문서_보기(name = None, redirect = None):
             else:
                 elsedata = rows[0]['data']
                     
+            if(redirect):
+                    
             enddata = 나무마크(name, elsedata)
             
             m = re.search('<div id="toc">((?:(?!\/div>).)*)<\/div>', enddata)
@@ -2154,6 +2160,8 @@ def 문서_보기(name = None, redirect = None):
                     elsedata = '문서 없음'
             else:
                 elsedata = '문서 없음'
+                
+            if(redirect):
             
             return 웹_디자인('index.html', title = name, logo = data['name'], page = URL_인코딩(name), data = 나무마크(name, elsedata), license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, redirect = redirect, login = 로그인_확인(), admin = 관리자_메뉴), 404
 
