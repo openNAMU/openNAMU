@@ -2017,6 +2017,8 @@ def 문서_보기(name = None, redirect = None):
         
     if(관리자_확인() == 1):
         관리자_메뉴 = 'ACL'
+    else:
+        관리자_메뉴 = ''
         
     if(re.search("^분류:", name)):
         DB_실행("select * from cat where title = '" + DB_인코딩(name) + "' order by cat asc")
