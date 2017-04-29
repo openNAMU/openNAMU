@@ -2085,6 +2085,7 @@ def 문서_보기(name = None, redirect = None):
                         acl = ''
                 
                 if(redirect):
+                    데이터 = re.sub("^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)", " * \g<in> 문서로 넘겨주기", 문서_데이터[0]['data'])
                 else:
                     데이터 = 문서_데이터[0]['data']
                 
@@ -2136,6 +2137,7 @@ def 문서_보기(name = None, redirect = None):
                 elsedata = rows[0]['data']
                     
             if(redirect):
+                elsedata = re.sub("^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)", " * \g<in> 문서로 넘겨주기", elsedata)
                     
             enddata = 나무마크(name, elsedata)
             
@@ -2162,6 +2164,7 @@ def 문서_보기(name = None, redirect = None):
                 elsedata = '문서 없음'
                 
             if(redirect):
+                elsedata = re.sub("^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)", " * \g<in> 문서로 넘겨주기", elsedata)
             
             return 웹_디자인('index.html', title = name, logo = data['name'], page = URL_인코딩(name), data = 나무마크(name, elsedata), license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, redirect = redirect, login = 로그인_확인(), admin = 관리자_메뉴), 404
 
