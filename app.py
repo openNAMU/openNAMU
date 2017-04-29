@@ -160,7 +160,7 @@ def 틀_확인(이름, 데이터):
 
             while(True):
                 try:
-                    나무마크(틀_역링크[i]['link'], 데이터)
+                    나무마크(틀_역링크[숫자]['link'], 데이터)
                 except:
                     break
                     
@@ -1744,9 +1744,9 @@ def 역링크(name = None, number = None):
         if(restart == 1):
             return '<meta http-equiv="refresh" content="0;url=/backlink/' + URL_인코딩(name) + '/n/' + str(number) + '" />'
         else:    
-            return 웹_디자인('index.html', logo = data['name'], data = div, title = name, sub = '역링크')
+            return 웹_디자인('index.html', logo = data['name'], data = div, title = name, page = URL_인코딩(name), sub = '역링크')
     else:
-        return 웹_디자인('index.html', logo = data['name'], data = '', title = name, sub = '역링크')
+        return 웹_디자인('index.html', logo = data['name'], data = '', title = name, page = URL_인코딩(name), sub = '역링크')
 
 @app.route('/recentdiscuss')
 def 최근_토론():
