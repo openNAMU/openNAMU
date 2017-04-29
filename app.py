@@ -1983,7 +1983,7 @@ def search():
 
 @app.route('/w/<path:name>')
 @app.route('/w/<path:name>/from/<path:redirect>')
-def w(name = None, redirect = None):
+def 문서_보기(name = None, redirect = None):
     i = 0
     
     DB_실행("select * from rd where title = '" + DB_인코딩(name) + "' order by date asc")
@@ -2015,6 +2015,9 @@ def w(name = None, redirect = None):
         uppage = ""
         style = "display:none;"
         
+    if(관리자_확인() == 1):
+        관리자_메뉴 = 'ACL'
+        
     if(re.search("^분류:", name)):
         DB_실행("select * from cat where title = '" + DB_인코딩(name) + "' order by cat asc")
         rows = DB_가져오기()
@@ -2024,7 +2027,7 @@ def w(name = None, redirect = None):
             
             while(True):
                 try:
-                    a = rows[i]
+                    임시_변수 = rows[i]
                 except:
                     break
                     
@@ -2088,11 +2091,11 @@ def w(name = None, redirect = None):
                 else:
                     left = ''
                     
-                return 웹_디자인('index.html', title = name, logo = data['name'], page = URL_인코딩(name), data = enddata + '<br>' + div, license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, redirect = redirect, login = 로그인_확인())
+                return 웹_디자인('index.html', title = name, logo = data['name'], page = URL_인코딩(name), data = enddata + '<br>' + div, license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, redirect = redirect, login = 로그인_확인(), admin = 관리자_메뉴)
             else:
-                return 웹_디자인('index.html', title = name, logo = data['name'], page = URL_인코딩(name), data = div, license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, redirect = redirect, login = 로그인_확인())
+                return 웹_디자인('index.html', title = name, logo = data['name'], page = URL_인코딩(name), data = div, license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, redirect = redirect, login = 로그인_확인(), admin = 관리자_메뉴)
         else:
-            return 웹_디자인('index.html', title = name, logo = data['name'], page = URL_인코딩(name), data = '분류 문서 없음', license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, redirect = redirect, login = 로그인_확인()), 404
+            return 웹_디자인('index.html', title = name, logo = data['name'], page = URL_인코딩(name), data = '분류 문서 없음', license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, redirect = redirect, login = 로그인_확인(), admin = 관리자_메뉴), 404
     else:                    
         DB_실행("select * from data where title = '" + DB_인코딩(name) + "'")
         rows = DB_가져오기()
@@ -2135,7 +2138,7 @@ def w(name = None, redirect = None):
             else:
                 left = ''
                 
-            return 웹_디자인('index.html', title = name, logo = data['name'], page = URL_인코딩(name), data = enddata, license = data['license'], tn = 1, acl = acl, left = left, uppage = uppage, style = style, topic = topic, redirect = redirect, login = 로그인_확인())
+            return 웹_디자인('index.html', title = name, logo = data['name'], page = URL_인코딩(name), data = enddata, license = data['license'], tn = 1, acl = acl, left = left, uppage = uppage, style = style, topic = topic, redirect = redirect, login = 로그인_확인(), admin = 관리자_메뉴)
         else:
             m = re.search("^사용자:(.*)", name)
             if(m):
@@ -2150,7 +2153,7 @@ def w(name = None, redirect = None):
             else:
                 elsedata = '문서 없음'
             
-            return 웹_디자인('index.html', title = name, logo = data['name'], page = URL_인코딩(name), data = 나무마크(name, elsedata), license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, redirect = redirect, login = 로그인_확인()), 404
+            return 웹_디자인('index.html', title = name, logo = data['name'], page = URL_인코딩(name), data = 나무마크(name, elsedata), license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, redirect = redirect, login = 로그인_확인(), admin = 관리자_메뉴), 404
 
 @app.route('/w/<path:name>/r/<int:number>')
 def rew(name = None, number = None):
@@ -2193,7 +2196,7 @@ def rew(name = None, number = None):
             return '<meta http-equiv="refresh" content="0;url=/history/' + URL_인코딩(name) + '" />'
 
 @app.route('/w/<path:name>/raw/<int:number>')
-def reraw(name = None, number = None):
+def 역사_RAW(name = None, number = None):
     DB_실행("select * from hidhi where title = '" + DB_인코딩(name) + "' and re = '" + DB_인코딩(str(number)) + "'")
     row = DB_가져오기()
     if(row):
@@ -2227,7 +2230,7 @@ def reraw(name = None, number = None):
             return '<meta http-equiv="refresh" content="0;url=/history/' + URL_인코딩(name) + '" />'
 
 @app.route('/raw/<path:name>')
-def raw(name = None):
+def RAW(name = None):
     DB_실행("select * from data where title = '" + DB_인코딩(name) + "'")
     rows = DB_가져오기()
     if(rows):
@@ -2242,7 +2245,7 @@ def raw(name = None):
         return '<meta http-equiv="refresh" content="0;url=/w/' + URL_인코딩(name) + '" />'
 
 @app.route('/revert/<path:name>/r/<int:number>', methods=['POST', 'GET'])
-def revert(name = None, number = None):
+def 되돌리기(name = None, number = None):
     if(request.method == 'POST'):
         DB_실행("select * from hidhi where title = '" + DB_인코딩(name) + "' and re = '" + DB_인코딩(str(number)) + "'")
         row = DB_가져오기()
@@ -2339,7 +2342,7 @@ def revert(name = None, number = None):
                     return '<meta http-equiv="refresh" content="0;url=/w/' + URL_인코딩(name) + '" />'
                         
 @app.route('/edit/<path:name>', methods=['POST', 'GET'])
-def edit(name = None):
+def 문서_편집(name = None):
     if(request.method == 'POST'):
         m = re.search('(?:[^A-Za-zㄱ-힣0-9 ])', request.form["send"])
         
@@ -2406,7 +2409,7 @@ def edit(name = None):
                 return 웹_디자인('index.html', title = name, logo = data['name'], page = URL_인코딩(name), data = '', tn = 2, left = left, sub = '편집', login = 로그인_확인())
                 
 @app.route('/edit/<path:name>/section/<int:number>', methods=['POST', 'GET'])
-def secedit(name = None, number = None):
+def 문단_편집(name = None, number = None):
     if(request.method == 'POST'):
         m = re.search('(?:[^A-Za-zㄱ-힣0-9 ])', request.form["send"])
         if(m):

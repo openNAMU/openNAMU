@@ -64,6 +64,9 @@
                         <a class="menu-item" href="/raw/{{page}}">Raw</a>
                         <a class="menu-item" href="/history/{{page}}/n/1">역사</a>
                         <a class="menu-item" href="/backlink/{{page}}/n/1">역링크</a>
+                        {% if admin %}
+                        <a class="menu-item" href="/acl/{{page}}">ACL</a>
+                        {% endif %}
                         {% if uppage %}
                         <a class="menu-item" style="{{style}}" href="/w/{{uppage}}">상위</a>
                         {% endif %}
@@ -348,7 +351,10 @@
                     <button class="btn btn-primary" type="submit">{{now}}</button>
                 </form>
                 {% elif tn == 19 %}
-                <p>{{now}}</p>
+                <br>
+                <span>{{now}}</span>
+                <br>
+                <br>
                 <form id="usrform" method="POST" action="/acl/{{page}}">
                     <select name="select">
                         <option value="admin" selected="selected">관리자만</option>
