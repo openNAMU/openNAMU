@@ -2085,7 +2085,7 @@ def 문서_보기(name = None, redirect = None):
                         acl = ''
                 
                 if(redirect):
-                    데이터 = re.sub("^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)", " * \g<in> 문서로 넘겨주기", 문서_데이터[0]['data'])
+                    데이터 = re.sub("^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)", " * [[\g<in>]] 문서로 넘겨주기", 문서_데이터[0]['data'])
                 else:
                     데이터 = 문서_데이터[0]['data']
                 
@@ -2137,7 +2137,7 @@ def 문서_보기(name = None, redirect = None):
                 elsedata = rows[0]['data']
                     
             if(redirect):
-                elsedata = re.sub("^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)", " * \g<in> 문서로 넘겨주기", elsedata)
+                elsedata = re.sub("^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)", " * [[\g<in>]] 문서로 넘겨주기", elsedata)
                     
             enddata = 나무마크(name, elsedata)
             
@@ -2164,7 +2164,7 @@ def 문서_보기(name = None, redirect = None):
                 elsedata = '문서 없음'
                 
             if(redirect):
-                elsedata = re.sub("^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)", " * \g<in> 문서로 넘겨주기", elsedata)
+                elsedata = re.sub("^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)", " * [[\g<in>]] 문서로 넘겨주기", elsedata)
             
             return 웹_디자인('index.html', title = name, logo = data['name'], page = URL_인코딩(name), data = 나무마크(name, elsedata), license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, redirect = redirect, login = 로그인_확인(), admin = 관리자_메뉴), 404
 
@@ -2409,7 +2409,7 @@ def 문서_편집(name = None):
             DB_실행("select * from data where title = '" + DB_인코딩(data["help"]) + "'")
             rows = DB_가져오기()
             if(rows):
-                newdata = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', ' * \g<in> 문서로 넘겨주기', rows[0]["data"])
+                newdata = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', ' * [[\g<in>]] 문서로 넘겨주기', rows[0]["data"])
                 left = 나무마크(name, newdata)
             else:
                 left = ''
@@ -2466,7 +2466,7 @@ def 문단_편집(name = None, number = None):
             DB_실행("select * from data where title = '" + DB_인코딩(data["help"]) + "'")
             rows = DB_가져오기()
             if(rows):
-                newdata = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', ' * \g<in> 문서로 넘겨주기', rows[0]["data"])
+                newdata = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', ' * [[\g<in>]] 문서로 넘겨주기', rows[0]["data"])
                 
                 left = 나무마크(name, newdata)
             else:
@@ -2513,13 +2513,13 @@ def 미리보기(name = None):
         return '<meta http-equiv="refresh" content="0;url=/ban" />'
     else:            
         newdata = request.form["content"]
-        newdata = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', ' * \g<in> 문서로 넘겨주기', newdata)
+        newdata = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', ' * [[\g<in>]] 문서로 넘겨주기', newdata)
         enddata = 나무마크(name, newdata)
         
         DB_실행("select * from data where title = '" + DB_인코딩(data["help"]) + "'")
         rows = DB_가져오기()
         if(rows):
-            newdata = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', ' * \g<in> 문서로 넘겨주기', rows[0]["data"])
+            newdata = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', ' * [[\g<in>]] 문서로 넘겨주기', rows[0]["data"])
             
             left = 나무마크(name, newdata)
         else:
@@ -2539,12 +2539,12 @@ def 문단_미리보기(name = None, number = None):
         else:
             notice = ''
         newdata = request.form["content"]
-        newdata = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', ' * \g<in> 문서로 넘겨주기', newdata)
+        newdata = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', ' * [[\g<in>]] 문서로 넘겨주기', newdata)
         enddata = 나무마크(name, newdata)
         DB_실행("select * from data where title = '" + DB_인코딩(data["help"]) + "'")
         rows = DB_가져오기()
         if(rows):
-            newdata = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', ' * \g<in> 문서로 넘겨주기', rows[0]["data"])
+            newdata = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', ' * [[\g<in>]] 문서로 넘겨주기', rows[0]["data"])
             left = 나무마크(name, newdata)
         else:
             left = ''
