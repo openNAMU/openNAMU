@@ -212,20 +212,20 @@ def HTML_파싱(데이터):
         if(있나):
             분리 = 있나.groups()
 
-            if(re.search("<(\/" + 분리[1] + ")>", 데이터) and not re.search("'", 분리[0])):
-                XSS = re.search('src="http(?:s)?:\/\/([^\/]*)\/(?:[^"]*)"', 분리[0])
+            if(re.search("<(\/" + 분리[1] + ")>", 데이터)):
+                XSS = re.search('src=(?:"|\')http(?:s)?:\/\/([^\/]*)\/(?:[^"\']*)(?:"|\')', 분리[0])
                 
                 if(XSS):
                     확인 = XSS.groups()
                     
-                    if(확인[0] == "www.youtube.com" or 확인[0] == "serviceapi.nmv.naver.com" or 확인[0] == "tv.kakao.com" or 확인[0] == "tvple.com" or 확인[0] == "videofarm.daum.net"):
+                    if(확인[0] == "www.youtube.com" or 확인[0] == "serviceapi.nmv.naver.com" or 확인[0] == "tv.kakao.com" or 확인[0] == "tvple.com"):
                         임시_저장 = 분리[0]
                     else:
-                        임시_저장 = re.sub('src="([^"]*)"', '', 분리[0])
+                        임시_저장 = re.sub('src=(?:"|\')([^"\']*)(?:"|\')', '', 분리[0])
                 else:
                     임시_저장 = 분리[0]
                 
-                임시_저장 = re.sub('"', '#.#', 임시_저장)
+                임시_저장 = re.sub('(?:"|\')', '#.#', 임시_저장)
                 데이터 = re.sub("<((?:\/)?" + 분리[1] + "(?:[^>]*))>", "[" + 임시_저장 + "]", 데이터, 1)
                 데이터 = re.sub("<\/" + 분리[1] + ">", "[/" + 분리[1] + "]", 데이터, 1)
             else:
