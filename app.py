@@ -135,20 +135,20 @@ def 비교(seqm):
            
 def 관리자_확인():
     if(session.get('Now') == True):
-        ip = 아이피_확인(request)
-        DB_실행("select * from user where id = '" + DB_인코딩(ip) + "'")
-        rows = DB_가져오기()
-        if(rows):
-            if(rows[0]['acl'] == 'owner' or rows[0]['acl'] == 'admin'):
+        아이피 = 아이피_확인(request)
+        DB_실행("select * from user where id = '" + DB_인코딩(아이피) + "'")
+        사용자_자료 = DB_가져오기()
+        if(사용자_자료):
+            if(사용자_자료[0]['acl'] == 'owner' or 사용자_자료[0]['acl'] == 'admin'):
                 return 1
                 
 def 소유자_확인():
     if(session.get('Now') == True):
-        ip = 아이피_확인(request)
-        DB_실행("select * from user where id = '" + DB_인코딩(ip) + "'")
-        rows = DB_가져오기()
-        if(rows):
-            if(rows[0]['acl'] == 'owner'):
+        아이피 = 아이피_확인(request)
+        DB_실행("select * from user where id = '" + DB_인코딩(아이피) + "'")
+        사용자_자료 = DB_가져오기()
+        if(사용자_자료):
+            if(사용자_자료[0]['acl'] == 'owner'):
                 return 1
                 
 def 틀_확인(이름, 데이터):
