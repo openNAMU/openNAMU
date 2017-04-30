@@ -1168,7 +1168,7 @@ def 나무마크(title, data):
         else:
             break
     
-    data = re.sub("(\n#nobr#|#nobr#\n)", "", data)
+    data = re.sub("(\n#nobr#|#nobr#\n|#nobr#)", "", data)
     data = re.sub('<\/blockquote>((\r)?\n){2}<blockquote>', '</blockquote><br><blockquote>', data)
     data = re.sub('\n', '<br>', data)
     data = re.sub('^<br>', '', data)
