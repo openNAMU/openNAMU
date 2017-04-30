@@ -371,12 +371,7 @@ def 나무마크(title, data):
     접기_숫자 = 임시_저장[1]
     
     data = re.sub("\[anchor\((?P<in>[^\[\]]*)\)\]", '<span id="\g<in>"></span>', data)
-    data = re.sub('\[date\(now\)\]', 시간(), data)
-    if(not re.search("\.", 아이피_확인(request))):
-        name = '[[사용자:' + 아이피_확인(request) + '|' + 아이피_확인(request) + ']]'
-    else:
-        name = 아이피_확인(request)
-    data = re.sub("\[name\]", name, data)
+    data = 세이브마크(data)
     
     while(True):
         m = re.search("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]", data)
@@ -412,7 +407,7 @@ def 나무마크(title, data):
                                 a = re.sub("([^= ,]*)\=([^,]*)", "", a, 1)
                             else:
                                 break                        
-                    data = re.sub("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]", '\n<div>' + 틀_데이터 + '</div>\n', data, 1)
+                    data = re.sub("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]", '\n#nobr#<div>' + 틀_데이터 + '</div>\n#nobr#', data, 1)
                 else:
                     DB_실행("select * from back where title = '" + DB_인코딩(results[0]) + "' and link = '" + DB_인코딩(title) + "' and type = 'include'")
                     abb = DB_가져오기()
@@ -441,9 +436,7 @@ def 나무마크(title, data):
                 DB_갱신()
         else:
             break
-    
-    
-    
+
     data = '\n' + data + '\n'
     
     while(True):
@@ -1175,6 +1168,7 @@ def 나무마크(title, data):
         else:
             break
     
+    data = re.sub("(\n#nobr#|#nobr#\n)", "", data)
     data = re.sub('<\/blockquote>((\r)?\n){2}<blockquote>', '</blockquote><br><blockquote>', data)
     data = re.sub('\n', '<br>', data)
     data = re.sub('^<br>', '', data)
