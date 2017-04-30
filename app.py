@@ -218,7 +218,7 @@ def HTML_파싱(데이터):
                 if(XSS):
                     확인 = XSS.groups()
                     
-                    if(확인[0] == "www.youtube.com" or 확인[0] == "serviceapi.nmv.naver.com" or 확인[0] == "tv.kakao.com" or 확인[0] == "tvple.com" or 확인[0] == "tvpot.daum.net"):
+                    if(확인[0] == "www.youtube.com" or 확인[0] == "serviceapi.nmv.naver.com" or 확인[0] == "tv.kakao.com" or 확인[0] == "tvple.com" or 확인[0] == "kakaotv.daum.net"):
                         임시_저장 = 분리[0]
                     else:
                         임시_저장 = re.sub('src="([^"]*)"', '', 분리[0])
