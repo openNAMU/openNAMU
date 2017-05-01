@@ -14,7 +14,7 @@ import hashlib
 json_data = open('set.json').read()
 data = json.loads(json_data)
 
-print('오픈나무 시작 포트 : ' + data['port'])
+print('port : ' + data['port'])
 
 import logging
 log = logging.getLogger('werkzeug')
