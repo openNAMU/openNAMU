@@ -29,7 +29,7 @@ def 시작():
     try:
         DB_실행("select * from history limit 1")
     except:
-        DB_실행("create table 역사_추가(id text, title text, data longtext, date text, ip text, send text, leng text)")
+        DB_실행("create table history(id text, title text, data longtext, date text, ip text, send text, leng text)")
     
     try:
         DB_실행("select * from rd limit 1")
@@ -3478,6 +3478,8 @@ def 사용자():
             ip = '<a href="/w/' + URL_인코딩('사용자:' + ip) + '">' + ip + '</a>'
         else:
             ip = '<a class="not_thing" href="/w/' + URL_인코딩('사용자:' + ip) + '">' + ip + '</a>'
+
+    DB_실행("select count(*) from history where id = ''")
         
     return 웹_디자인('index.html', title = '유저 메뉴', logo = data['name'], data = ip + '<br><br><span>권한 상태 : ' + acl + '<br><br><li><a href="/login">로그인</a></li><li><a href="/logout">로그아웃</a></li><li><a href="/register">회원가입</a></li><li><a href="/change">비밀번호 변경</a></li>')
 
