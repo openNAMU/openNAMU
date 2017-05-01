@@ -3454,6 +3454,7 @@ def 문서_비교(name = None, a = None, b = None):
 @app.route('/user')
 def 사용자():
     ip = 아이피_확인(request)
+    원래_아이피 = ip
     
     DB_실행("select * from user where id = '" + DB_인코딩(ip) + "'")
     rows = DB_가져오기()
@@ -3479,7 +3480,7 @@ def 사용자():
         else:
             ip = '<a class="not_thing" href="/w/' + URL_인코딩('사용자:' + ip) + '">' + ip + '</a>'
         
-    return 웹_디자인('index.html', login = 로그인_확인(), title = '유저 메뉴', logo = data['name'], data = ip + '<br><br><span>권한 상태 : ' + acl + '<h2>로그인 관련</h2><li><a href="/login">로그인</a></li><li><a href="/logout">로그아웃</a></li><li><a href="/register">회원가입</a></li><h2>기타</h2><li><a href="/change">비밀번호 변경</a></li><li><a href="/count">기여 횟수</a></li><li><a href="/record/' + ip + '/n/1">기여 목록</a></li>')
+    return 웹_디자인('index.html', login = 로그인_확인(), title = '유저 메뉴', logo = data['name'], data = ip + '<br><br><span>권한 상태 : ' + acl + '<h2>로그인 관련</h2><li><a href="/login">로그인</a></li><li><a href="/logout">로그아웃</a></li><li><a href="/register">회원가입</a></li><h2>기타</h2><li><a href="/change">비밀번호 변경</a></li><li><a href="/count">기여 횟수</a></li><li><a href="/record/' + 원래_아이피 + '/n/1">기여 목록</a></li>')
 
 @app.route('/count')
 def 기여_횟수():
