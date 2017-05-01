@@ -452,6 +452,8 @@ def 나무마크(title, data):
     m = re.search('\[목차\]', data)
     if(not m):
         data = re.sub("(?P<in>(={1,6})\s?([^=]*)\s?(?:={1,6})(?:\s+)?\n)", "[목차]\n\g<in>", data, 1)
+        
+    data = re.sub("(\n+)(?P<in>\r\n(={1,6})\s?([^=]*)\s?(?:={1,6})(?:\s+)?\n)", "\g<in>", data)
     
     i = 0
     h0c = 0
