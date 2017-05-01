@@ -2626,7 +2626,7 @@ def 문서_이동(name = None):
 
 @app.route('/other')
 def 나머지():
-    return 웹_디자인('index.html', login = 로그인_확인(), title = '기타 메뉴', logo = data['name'], data = '<h2 style="margin-top: 0px;">기록</h2><li><a href="/blocklog/n/1">유저 차단 기록</a></li><li><a href="/userlog/n/1">유저 가입 기록</a></li><li><a href="/manager/6">유저 기록</a></li><h2>기타</h2><li><a href="/titleindex">모든 문서</a></li><li><a href="/upload">업로드</a></li><li><a href="/adminlist">관리자 목록</a></li><li><a href="/manager/1">관리자 메뉴</a></li><br>이 오픈나무의 버전은 <a href="https://github.com/2DU/openNAMU/blob/master/version.md">1.8.8c</a> 입니다.')
+    return 웹_디자인('index.html', login = 로그인_확인(), title = '기타 메뉴', logo = data['name'], data = '<h2 style="margin-top: 0px;">기록</h2><li><a href="/blocklog/n/1">유저 차단 기록</a></li><li><a href="/userlog/n/1">유저 가입 기록</a></li><li><a href="/manager/6">유저 기록</a></li><h2>기타</h2><li><a href="/titleindex">모든 문서</a></li><li><a href="/upload">업로드</a></li><li><a href="/adminlist">관리자 목록</a></li><li><a href="/manager/1">관리자 메뉴</a></li><br>이 오픈나무의 버전은 <a href="https://github.com/2DU/openNAMU/blob/master/version.md">1.8.8d</a> 입니다.')
     
 @app.route('/manager/<int:num>', methods=['POST', 'GET'])
 def 관리_기능(num = None):
@@ -3478,10 +3478,15 @@ def 사용자():
             ip = '<a href="/w/' + URL_인코딩('사용자:' + ip) + '">' + ip + '</a>'
         else:
             ip = '<a class="not_thing" href="/w/' + URL_인코딩('사용자:' + ip) + '">' + ip + '</a>'
-
-    DB_실행("select count(*) from history where id = ''")
         
-    return 웹_디자인('index.html', login = 로그인_확인(), title = '유저 메뉴', logo = data['name'], data = ip + '<br><br><span>권한 상태 : ' + acl + '<br><br><li><a href="/login">로그인</a></li><li><a href="/logout">로그아웃</a></li><li><a href="/register">회원가입</a></li><li><a href="/change">비밀번호 변경</a></li>')
+    return 웹_디자인('index.html', login = 로그인_확인(), title = '유저 메뉴', logo = data['name'], data = ip + '<br><br><span>권한 상태 : ' + acl + '<h2>로그인 관련</h2><li><a href="/login">로그인</a></li><li><a href="/logout">로그아웃</a></li><li><a href="/register">회원가입</a></li><h2>기타</h2><li><a href="/change">비밀번호 변경</a></li><li><a href="/count">기여 횟수</a></li><li><a href="/record/' + ip + '/n/1">기여 목록</a></li>')
+
+@app.route('/count')
+def 기여_횟수():
+    DB_실행("select count(title) from history where ip = '" + 아이피_확인(request) + "'")
+    숫자 = DB_가져오기()
+    
+    return 웹_디자인('index.html', login = 로그인_확인(), title = '기여 횟수', logo = data['name'], data = "기여 횟수 : " + str(숫자[0]["count(title)"]))
 
 @app.route('/random')
 def 무작위_문서():
