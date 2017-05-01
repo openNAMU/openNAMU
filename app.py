@@ -1404,14 +1404,14 @@ def 업로드():
         if(ban == 1):
             return '<meta http-equiv="refresh" content="0;url=/ban" />'
         else:
-            return 웹_디자인('index.html', logo = data['name'], title = '업로드', tn = 21, number = data['upload'])
+            return 웹_디자인('index.html', login = 로그인_확인(), logo = data['name'], title = '업로드', tn = 21, number = data['upload'])
     
 @app.route('/image/<path:name>')
 def 이미지(name = None):
     if(os.path.exists(os.path.join('image', name))):
         return send_file(os.path.join('image', name), mimetype='image')
     else:
-        return 웹_디자인('index.html', logo = data['name'], data = '이미지 없음.', title = '이미지 보기'), 404
+        return 웹_디자인('index.html', login = 로그인_확인(), logo = data['name'], data = '이미지 없음.', title = '이미지 보기'), 404
 
 @app.route('/adminlist')
 def 관리자_목록():
@@ -1444,9 +1444,9 @@ def 관리자_목록():
             
             i = i + 1
             
-        return 웹_디자인('index.html', logo = data['name'], data = div, title = '관리자 목록')
+        return 웹_디자인('index.html', login = 로그인_확인(), logo = data['name'], data = div, title = '관리자 목록')
     else:
-        return 웹_디자인('index.html', logo = data['name'], title = '관리자 목록')
+        return 웹_디자인('index.html', login = 로그인_확인(), logo = data['name'], title = '관리자 목록')
 
 @app.route('/recentchanges')
 def 최근바뀜():
@@ -1513,9 +1513,9 @@ def 최근바뀜():
             
             i = i + 1
             
-        return 웹_디자인('index.html', logo = data['name'], rows = div, tn = 3, title = '최근 변경내역')
+        return 웹_디자인('index.html', login = 로그인_확인(), logo = data['name'], rows = div, tn = 3, title = '최근 변경내역')
     else:
-        return 웹_디자인('index.html', logo = data['name'], rows = '', tn = 3, title = '최근 변경내역')
+        return 웹_디자인('index.html', login = 로그인_확인(), logo = data['name'], rows = '', tn = 3, title = '최근 변경내역')
         
 @app.route('/history/<path:name>/r/<int:num>/hidden')
 def 역사_숨기기(name = None, num = None):
@@ -1608,9 +1608,9 @@ def 사용자_기록(name = None, number = None):
             else:
                 i = i + 1
                 
-        return 웹_디자인('index.html', logo = data['name'], rows = div, tn = 3, title = '유저 기록')
+        return 웹_디자인('index.html', login = 로그인_확인(), logo = data['name'], rows = div, tn = 3, title = '유저 기록')
     else:
-        return 웹_디자인('index.html', logo = data['name'], rows = '', tn = 3, title = '유저 기록')
+        return 웹_디자인('index.html', login = 로그인_확인(), logo = data['name'], rows = '', tn = 3, title = '유저 기록')
       
 @app.route('/userlog/n/<int:number>')
 def 모든_사용자(number = None):
@@ -1659,9 +1659,9 @@ def 모든_사용자(number = None):
             else:
                 숫자_2 += 1
                 
-        return 웹_디자인('index.html', logo = data['name'], data = 목록, title = '유저 가입 기록')
+        return 웹_디자인('index.html', login = 로그인_확인(), logo = data['name'], data = 목록, title = '유저 가입 기록')
     else:
-        return 웹_디자인('index.html', logo = data['name'], data = '', title = '유저 가입 기록')
+        return 웹_디자인('index.html', login = 로그인_확인(), logo = data['name'], data = '', title = '유저 가입 기록')
         
 @app.route('/backlink/<path:name>/n/<int:number>')
 def 역링크(name = None, number = None):
@@ -1738,9 +1738,9 @@ def 역링크(name = None, number = None):
         if(restart == 1):
             return '<meta http-equiv="refresh" content="0;url=/backlink/' + URL_인코딩(name) + '/n/' + str(number) + '" />'
         else:    
-            return 웹_디자인('index.html', logo = data['name'], data = div, title = name, page = URL_인코딩(name), sub = '역링크')
+            return 웹_디자인('index.html', login = 로그인_확인(), logo = data['name'], data = div, title = name, page = URL_인코딩(name), sub = '역링크')
     else:
-        return 웹_디자인('index.html', logo = data['name'], data = '', title = name, page = URL_인코딩(name), sub = '역링크')
+        return 웹_디자인('index.html', login = 로그인_확인(), logo = data['name'], data = '', title = name, page = URL_인코딩(name), sub = '역링크')
 
 @app.route('/recentdiscuss')
 def 최근_토론():
@@ -1769,9 +1769,9 @@ def 최근_토론():
             
             i = i + 1
             
-        return 웹_디자인('index.html', logo = data['name'], rows = div, tn = 12, title = '최근 토론내역')
+        return 웹_디자인('index.html', login = 로그인_확인(), logo = data['name'], rows = div, tn = 12, title = '최근 토론내역')
     else:
-        return 웹_디자인('index.html', logo = data['name'], rows = '', tn = 12, title = '최근 토론내역')
+        return 웹_디자인('index.html', login = 로그인_확인(), logo = data['name'], rows = '', tn = 12, title = '최근 토론내역')
          
 @app.route('/blocklog/n/<int:number>')
 def blocklog(number = None):
@@ -1817,9 +1817,9 @@ def blocklog(number = None):
             else:
                 i = i + 1
                 
-        return 웹_디자인('index.html', logo = data['name'], rows = div, tn = 20, title = '유저 차단 기록')
+        return 웹_디자인('index.html', login = 로그인_확인(), logo = data['name'], rows = div, tn = 20, title = '유저 차단 기록')
     else:
-        return 웹_디자인('index.html', logo = data['name'], rows = '', tn = 20, title = '유저 차단 기록')
+        return 웹_디자인('index.html', login = 로그인_확인(), logo = data['name'], rows = '', tn = 20, title = '유저 차단 기록')
 
 @app.route('/history/<path:name>/n/<int:number>', methods=['POST', 'GET'])
 def 역사_보기(name = None, number = None):
@@ -1945,9 +1945,9 @@ def 역사_보기(name = None, number = None):
                 else:
                     i = i + 1
                     
-            return 웹_디자인('index.html', logo = data['name'], rows = div, tn = 5, title = name, page = URL_인코딩(name), select = select, sub = '역사')
+            return 웹_디자인('index.html', login = 로그인_확인(), logo = data['name'], rows = div, tn = 5, title = name, page = URL_인코딩(name), select = select, sub = '역사')
         else:
-            return 웹_디자인('index.html', logo = data['name'], rows = '', tn = 5, title = name, page = URL_인코딩(name), select = select, sub = '역사')
+            return 웹_디자인('index.html', login = 로그인_확인(), logo = data['name'], rows = '', tn = 5, title = name, page = URL_인코딩(name), select = select, sub = '역사')
 
 @app.route('/search', methods=['POST'])
 def search():
@@ -1973,7 +1973,7 @@ def search():
         else:
             return '<meta http-equiv="refresh" content="0;url=/w/' + URL_인코딩(request.form["search"]) + '" />'
             
-        return 웹_디자인('index.html', logo = data['name'], data = div, title = '검색')
+        return 웹_디자인('index.html', login = 로그인_확인(), logo = data['name'], data = div, title = '검색')
 
 @app.route('/w/<path:name>')
 @app.route('/w/<path:name>/from/<path:redirect>')
@@ -2092,11 +2092,11 @@ def 문서_보기(name = None, redirect = None):
                 else:
                     left = ''
                     
-                return 웹_디자인('index.html', title = name, logo = data['name'], page = URL_인코딩(name), data = 최종_데이터 + '<br>' + div, license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, redirect = redirect, login = 로그인_확인(), admin = 관리자_메뉴)
+                return 웹_디자인('index.html', login = 로그인_확인(), title = name, logo = data['name'], page = URL_인코딩(name), data = 최종_데이터 + '<br>' + div, license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, redirect = redirect, admin = 관리자_메뉴)
             else:
-                return 웹_디자인('index.html', title = name, logo = data['name'], page = URL_인코딩(name), data = div, license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, redirect = redirect, login = 로그인_확인(), admin = 관리자_메뉴)
+                return 웹_디자인('index.html', login = 로그인_확인(), title = name, logo = data['name'], page = URL_인코딩(name), data = div, license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, redirect = redirect, admin = 관리자_메뉴)
         else:
-            return 웹_디자인('index.html', title = name, logo = data['name'], page = URL_인코딩(name), data = '분류 문서 없음', license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, redirect = redirect, login = 로그인_확인(), admin = 관리자_메뉴), 404
+            return 웹_디자인('index.html', login = 로그인_확인(), title = name, logo = data['name'], page = URL_인코딩(name), data = '분류 문서 없음', license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, redirect = redirect, admin = 관리자_메뉴), 404
     else:                    
         DB_실행("select * from data where title = '" + DB_인코딩(name) + "'")
         rows = DB_가져오기()
@@ -2142,7 +2142,7 @@ def 문서_보기(name = None, redirect = None):
             else:
                 left = ''
                 
-            return 웹_디자인('index.html', title = name, logo = data['name'], page = URL_인코딩(name), data = enddata, license = data['license'], tn = 1, acl = acl, left = left, uppage = uppage, style = style, topic = topic, redirect = redirect, login = 로그인_확인(), admin = 관리자_메뉴)
+            return 웹_디자인('index.html', login = 로그인_확인(), title = name, logo = data['name'], page = URL_인코딩(name), data = enddata, license = data['license'], tn = 1, acl = acl, left = left, uppage = uppage, style = style, topic = topic, redirect = redirect, admin = 관리자_메뉴)
         else:
             m = re.search("^사용자:(.*)", name)
             if(m):
@@ -2160,7 +2160,7 @@ def 문서_보기(name = None, redirect = None):
             if(redirect):
                 elsedata = re.sub("^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)", " * [[\g<in>]] 문서로 넘겨주기", elsedata)
             
-            return 웹_디자인('index.html', title = name, logo = data['name'], page = URL_인코딩(name), data = 나무마크(name, elsedata), license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, redirect = redirect, login = 로그인_확인(), admin = 관리자_메뉴), 404
+            return 웹_디자인('index.html', login = 로그인_확인(), title = name, logo = data['name'], page = URL_인코딩(name), data = 나무마크(name, elsedata), license = data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, redirect = redirect, admin = 관리자_메뉴), 404
 
 @app.route('/w/<path:name>/r/<int:number>')
 def rew(name = None, number = None):
@@ -2180,7 +2180,7 @@ def rew(name = None, number = None):
                 else:
                     left = ''
                     
-                return 웹_디자인('index.html', title = name, logo = data['name'], page = URL_인코딩(name), data = enddata, license = data['license'], tn = 6, left = left, sub = '옛 문서')
+                return 웹_디자인('index.html', login = 로그인_확인(), title = name, logo = data['name'], page = URL_인코딩(name), data = enddata, license = data['license'], tn = 6, left = left, sub = '옛 문서')
             else:
                 return '<meta http-equiv="refresh" content="0;url=/history/' + URL_인코딩(name) + '" />'
         else:
@@ -2198,7 +2198,7 @@ def rew(name = None, number = None):
             else:
                 left = ''
                 
-            return 웹_디자인('index.html', title = name, logo = data['name'], page = URL_인코딩(name), data = enddata, license = data['license'], tn = 6, left = left, sub = '옛 문서')
+            return 웹_디자인('index.html', login = 로그인_확인(), title = name, logo = data['name'], page = URL_인코딩(name), data = enddata, license = data['license'], tn = 6, left = left, sub = '옛 문서')
         else:
             return '<meta http-equiv="refresh" content="0;url=/history/' + URL_인코딩(name) + '" />'
 
@@ -2217,7 +2217,7 @@ def 역사_RAW(name = None, number = None):
                 
                 enddata = '<pre>' + enddata + '</pre>'
                 
-                return 웹_디자인('index.html', title = name, logo = data['name'], page = URL_인코딩(name), data = enddata, license = data['license'])
+                return 웹_디자인('index.html', login = 로그인_확인(), title = name, logo = data['name'], page = URL_인코딩(name), data = enddata, license = data['license'])
             else:
                 return '<meta http-equiv="refresh" content="0;url=/history/' + URL_인코딩(name) + '" />'
         else:
@@ -2232,7 +2232,7 @@ def 역사_RAW(name = None, number = None):
             
             enddata = '<pre>' + enddata + '</pre>'
             
-            return 웹_디자인('index.html', title = name, logo = data['name'], page = URL_인코딩(name), data = enddata, license = data['license'])
+            return 웹_디자인('index.html', login = 로그인_확인(), title = name, logo = data['name'], page = URL_인코딩(name), data = enddata, license = data['license'])
         else:
             return '<meta http-equiv="refresh" content="0;url=/history/' + URL_인코딩(name) + '" />'
 
@@ -2247,7 +2247,7 @@ def RAW(name = None):
         
         enddata = '<pre>' + enddata + '</pre>'
         
-        return 웹_디자인('index.html', title = name, logo = data['name'], page = URL_인코딩(name), data = enddata, license = data['license'], tn = 7, sub = 'Raw')
+        return 웹_디자인('index.html', login = 로그인_확인(), title = name, logo = data['name'], page = URL_인코딩(name), data = enddata, license = data['license'], tn = 7, sub = 'Raw')
     else:
         return '<meta http-equiv="refresh" content="0;url=/w/' + URL_인코딩(name) + '" />'
 
@@ -2329,7 +2329,7 @@ def 되돌리기(name = None, number = None):
                     DB_실행("select * from history where title = '" + DB_인코딩(name) + "' and id = '" + str(number) + "'")
                     rows = DB_가져오기()
                     if(rows):
-                        return 웹_디자인('index.html', title = name, logo = data['name'], page = URL_인코딩(name), r = URL_인코딩(str(number)), tn = 13, plus = '정말 되돌리시겠습니까?', sub = '되돌리기', login = 로그인_확인())
+                        return 웹_디자인('index.html', login = 로그인_확인(), title = name, logo = data['name'], page = URL_인코딩(name), r = URL_인코딩(str(number)), tn = 13, plus = '정말 되돌리시겠습니까?', sub = '되돌리기')
                     else:
                         return '<meta http-equiv="refresh" content="0;url=/w/' + URL_인코딩(name) + '" />'
             else:
@@ -2344,7 +2344,7 @@ def 되돌리기(name = None, number = None):
                 DB_실행("select * from history where title = '" + DB_인코딩(name) + "' and id = '" + str(number) + "'")
                 rows = DB_가져오기()
                 if(rows):
-                    return 웹_디자인('index.html', title = name, logo = data['name'], page = URL_인코딩(name), r = URL_인코딩(str(number)), tn = 13, plus = '정말 되돌리시겠습니까?', sub = '되돌리기', login = 로그인_확인())
+                    return 웹_디자인('index.html', login = 로그인_확인(), title = name, logo = data['name'], page = URL_인코딩(name), r = URL_인코딩(str(number)), tn = 13, plus = '정말 되돌리시겠습니까?', sub = '되돌리기')
                 else:
                     return '<meta http-equiv="refresh" content="0;url=/w/' + URL_인코딩(name) + '" />'
                         
@@ -2411,9 +2411,9 @@ def 문서_편집(name = None):
             DB_실행("select * from data where title = '" + DB_인코딩(name) + "'")
             rows = DB_가져오기()
             if(rows):
-                return 웹_디자인('index.html', title = name, logo = data['name'], page = URL_인코딩(name), data = rows[0]['data'], tn = 2, left = left, sub = '편집', login = 로그인_확인())
+                return 웹_디자인('index.html', login = 로그인_확인(), title = name, logo = data['name'], page = URL_인코딩(name), data = rows[0]['data'], tn = 2, left = left, sub = '편집')
             else:
-                return 웹_디자인('index.html', title = name, logo = data['name'], page = URL_인코딩(name), data = '', tn = 2, left = left, sub = '편집', login = 로그인_확인())
+                return 웹_디자인('index.html', login = 로그인_확인(), title = name, logo = data['name'], page = URL_인코딩(name), data = '', tn = 2, left = left, sub = '편집')
                 
 @app.route('/edit/<path:name>/section/<int:number>', methods=['POST', 'GET'])
 def 문단_편집(name = None, number = None):
@@ -2493,7 +2493,7 @@ def 문단_편집(name = None, number = None):
                         break
                         
                 if(j == 0):
-                    return 웹_디자인('index.html', title = name, logo = data['name'], page = URL_인코딩(name), data = gdata, tn = 2, left = left, section = 1, number = number, sub = '편집', login = 로그인_확인())
+                    return 웹_디자인('index.html', login = 로그인_확인(), title = name, logo = data['name'], page = URL_인코딩(name), data = gdata, tn = 2, left = left, section = 1, number = number, sub = '편집')
                 else:
                     return '<meta http-equiv="refresh" content="0;url=/w/' + URL_인코딩(name) + '" />'
             else:
@@ -2519,7 +2519,7 @@ def 미리보기(name = None):
         else:
             left = ''
             
-        return 웹_디자인('index.html', title = name, logo = data['name'], page = URL_인코딩(name), data = request.form["content"], tn = 2, preview = 1, enddata = enddata, left = left, sub = '미리보기', login = 로그인_확인())
+        return 웹_디자인('index.html', login = 로그인_확인(), title = name, logo = data['name'], page = URL_인코딩(name), data = request.form["content"], tn = 2, preview = 1, enddata = enddata, left = left, sub = '미리보기')
         
 @app.route('/preview/<path:name>/section/<int:number>', methods=['POST'])
 def 문단_미리보기(name = None, number = None):
@@ -2542,7 +2542,7 @@ def 문단_미리보기(name = None, number = None):
             left = 나무마크(name, newdata)
         else:
             left = ''
-        return 웹_디자인('index.html', title = name, logo = data['name'], page = URL_인코딩(name), data = request.form["content"], tn = 2, preview = 1, enddata = enddata, left = left, notice = notice, section = 1, number = number, odata = request.form["otent"], sub = '미리보기')
+        return 웹_디자인('index.html', login = 로그인_확인(), title = name, logo = data['name'], page = URL_인코딩(name), data = request.form["content"], tn = 2, preview = 1, enddata = enddata, left = left, notice = notice, section = 1, number = number, odata = request.form["otent"], sub = '미리보기')
 
 @app.route('/delete/<path:name>', methods=['POST', 'GET'])
 def 문서_삭제(name = None):
@@ -2572,7 +2572,7 @@ def 문서_삭제(name = None):
             if(can == 1):
                 return '<meta http-equiv="refresh" content="0;url=/ban" />'
             else:
-                return 웹_디자인('index.html', title = name, logo = data['name'], page = URL_인코딩(name), tn = 8, plus = '정말 삭제 하시겠습니까?', sub = '삭제', login = 로그인_확인())
+                return 웹_디자인('index.html', login = 로그인_확인(), title = name, logo = data['name'], page = URL_인코딩(name), tn = 8, plus = '정말 삭제 하시겠습니까?', sub = '삭제')
         else:
             return '<meta http-equiv="refresh" content="0;url=/w/' + URL_인코딩(name) + '" />'
 
@@ -2622,41 +2622,41 @@ def 문서_이동(name = None):
         if(can == 1):
             return '<meta http-equiv="refresh" content="0;url=/ban" />'
         else:
-            return 웹_디자인('index.html', title = name, logo = data['name'], page = URL_인코딩(name), tn = 9, plus = '정말 이동 하시겠습니까?', sub = '이동', login = 로그인_확인())
+            return 웹_디자인('index.html', login = 로그인_확인(), title = name, logo = data['name'], page = URL_인코딩(name), tn = 9, plus = '정말 이동 하시겠습니까?', sub = '이동')
 
 @app.route('/other')
 def 나머지():
-    return 웹_디자인('index.html', title = '기타 메뉴', logo = data['name'], data = '<h2 style="margin-top: 0px;">기록</h2><li><a href="/blocklog/n/1">유저 차단 기록</a></li><li><a href="/userlog/n/1">유저 가입 기록</a></li><li><a href="/manager/6">유저 기록</a></li><h2>기타</h2><li><a href="/titleindex">모든 문서</a></li><li><a href="/upload">업로드</a></li><li><a href="/adminlist">관리자 목록</a></li><li><a href="/manager/1">관리자 메뉴</a></li><br>이 오픈나무의 버전은 <a href="https://github.com/2DU/openNAMU/blob/master/version.md">1.8.8c</a> 입니다.')
+    return 웹_디자인('index.html', login = 로그인_확인(), title = '기타 메뉴', logo = data['name'], data = '<h2 style="margin-top: 0px;">기록</h2><li><a href="/blocklog/n/1">유저 차단 기록</a></li><li><a href="/userlog/n/1">유저 가입 기록</a></li><li><a href="/manager/6">유저 기록</a></li><h2>기타</h2><li><a href="/titleindex">모든 문서</a></li><li><a href="/upload">업로드</a></li><li><a href="/adminlist">관리자 목록</a></li><li><a href="/manager/1">관리자 메뉴</a></li><br>이 오픈나무의 버전은 <a href="https://github.com/2DU/openNAMU/blob/master/version.md">1.8.8c</a> 입니다.')
     
 @app.route('/manager/<int:num>', methods=['POST', 'GET'])
 def 관리_기능(num = None):
     if(num == 1):
-        return 웹_디자인('index.html', title = '관리자 메뉴', logo = data['name'], data = '<h2 style="margin-top: 0px;">관리자 및 소유자</h2><li><a href="/manager/2">문서 ACL</a></li><li><a href="/manager/3">유저 체크</a></li><li><a href="/manager/4">유저 차단</a></li><h2>소유자</h2><li><a href="/manager/5">관리자 권한 주기</a></li><h2>기타</h2><li>이 메뉴에 없는 기능은 해당 문서의 역사나 토론에서 바로 사용 가능함</li>')
+        return 웹_디자인('index.html', login = 로그인_확인(), title = '관리자 메뉴', logo = data['name'], data = '<h2 style="margin-top: 0px;">관리자 및 소유자</h2><li><a href="/manager/2">문서 ACL</a></li><li><a href="/manager/3">유저 체크</a></li><li><a href="/manager/4">유저 차단</a></li><h2>소유자</h2><li><a href="/manager/5">관리자 권한 주기</a></li><h2>기타</h2><li>이 메뉴에 없는 기능은 해당 문서의 역사나 토론에서 바로 사용 가능함</li>')
     elif(num == 2):
         if(request.method == 'POST'):
             return '<meta http-equiv="refresh" content="0;url=/acl/' + URL_인코딩(request.form["name"]) + '" />'
         else:
-            return 웹_디자인('index.html', title = 'ACL 이동', logo = data['name'], data = '<form id="usrform" method="POST" action="/manager/2"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')
+            return 웹_디자인('index.html', login = 로그인_확인(), title = 'ACL 이동', logo = data['name'], data = '<form id="usrform" method="POST" action="/manager/2"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')
     elif(num == 3):
         if(request.method == 'POST'):
             return '<meta http-equiv="refresh" content="0;url=/check/' + URL_인코딩(request.form["name"]) + '" />'
         else:
-            return 웹_디자인('index.html', title = '체크 이동', logo = data['name'], data = '<form id="usrform" method="POST" action="/manager/3"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')
+            return 웹_디자인('index.html', login = 로그인_확인(), title = '체크 이동', logo = data['name'], data = '<form id="usrform" method="POST" action="/manager/3"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')
     elif(num == 4):
         if(request.method == 'POST'):
             return '<meta http-equiv="refresh" content="0;url=/ban/' + URL_인코딩(request.form["name"]) + '" />'
         else:
-            return 웹_디자인('index.html', title = '차단 이동', logo = data['name'], data = '<form id="usrform" method="POST" action="/manager/4"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button><br><br><span>아이피 앞 두자리 (XXX.XXX) 입력하면 대역 차단</span></form>')
+            return 웹_디자인('index.html', login = 로그인_확인(), title = '차단 이동', logo = data['name'], data = '<form id="usrform" method="POST" action="/manager/4"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button><br><br><span>아이피 앞 두자리 (XXX.XXX) 입력하면 대역 차단</span></form>')
     elif(num == 5):
         if(request.method == 'POST'):
             return '<meta http-equiv="refresh" content="0;url=/admin/' + URL_인코딩(request.form["name"]) + '" />'
         else:
-            return 웹_디자인('index.html', title = '권한 이동', logo = data['name'], data = '<form id="usrform" method="POST" action="/manager/5"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')   
+            return 웹_디자인('index.html', login = 로그인_확인(), title = '권한 이동', logo = data['name'], data = '<form id="usrform" method="POST" action="/manager/5"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')   
     elif(num == 6):
         if(request.method == 'POST'):
             return '<meta http-equiv="refresh" content="0;url=/record/' + URL_인코딩(request.form["name"]) + '/n/1" />'
         else:
-            return 웹_디자인('index.html', title = '기록 이동', logo = data['name'], data = '<form id="usrform" method="POST" action="/manager/6"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')    
+            return 웹_디자인('index.html', login = 로그인_확인(), title = '기록 이동', logo = data['name'], data = '<form id="usrform" method="POST" action="/manager/6"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')    
     else:
         return '<meta http-equiv="refresh" content="0;url=/" />'
         
@@ -2679,9 +2679,9 @@ def 모든_문서():
 
         데이터 = 데이터 + '</div>'
 
-        return 웹_디자인('index.html', logo = data['name'], rows = 데이터 + '<br><span>이 위키에는 총 ' + str(숫자) + '개의 문서가 있습니다.</span>', tn = 4, title = '모든 문서')
+        return 웹_디자인('index.html', login = 로그인_확인(), logo = data['name'], rows = 데이터 + '<br><span>이 위키에는 총 ' + str(숫자) + '개의 문서가 있습니다.</span>', tn = 4, title = '모든 문서')
     else:
-        return 웹_디자인('index.html', logo = data['name'], rows = '', tn = 4, title = '모든 문서')
+        return 웹_디자인('index.html', login = 로그인_확인(), logo = data['name'], rows = '', tn = 4, title = '모든 문서')
 
 @app.route('/topic/<path:name>', methods=['POST', 'GET'])
 def 토론_목록(name = None):
@@ -2721,7 +2721,7 @@ def 토론_목록(name = None):
                 
             i = i + 1
             
-        return 웹_디자인('index.html', title = name, page = URL_인코딩(name), logo = data['name'], plus = div, tn = 10, list = 1, sub = '토론 목록')
+        return 웹_디자인('index.html', login = 로그인_확인(), title = name, page = URL_인코딩(name), logo = data['name'], plus = div, tn = 10, list = 1, sub = '토론 목록')
         
 @app.route('/topic/<path:name>/close')
 def 닫힌_토론_목록(name = None):
@@ -2754,7 +2754,7 @@ def 닫힌_토론_목록(name = None):
             
         i += 1
         
-    return 웹_디자인('index.html', title = name, page = URL_인코딩(name), logo = data['name'], plus = div, tn = 10, sub = '닫힌 토론')
+    return 웹_디자인('index.html', login = 로그인_확인(), title = name, page = URL_인코딩(name), logo = data['name'], plus = div, tn = 10, sub = '닫힌 토론')
 
 @app.route('/topic/<path:name>/agree')
 def 합의된_토론_목록(name = None):
@@ -2787,7 +2787,7 @@ def 합의된_토론_목록(name = None):
             
         숫자 += 1
         
-    return 웹_디자인('index.html', title = name, page = URL_인코딩(name), logo = data['name'], plus = 보여줄_내용, tn = 10, sub = '합의된 토론')
+    return 웹_디자인('index.html', login = 로그인_확인(), title = name, page = URL_인코딩(name), logo = data['name'], plus = 보여줄_내용, tn = 10, sub = '합의된 토론')
 
 @app.route('/topic/<path:name>/sub/<path:sub>', methods=['POST', 'GET'])
 def 토론(name = None, sub = None):
@@ -2958,7 +2958,7 @@ def 토론(name = None, sub = None):
                 
             i = i + 1
             
-        return 웹_디자인('index.html', title = name, page = URL_인코딩(name), suburl = URL_인코딩(sub), toron = sub, logo = data['name'], rows = div, tn = 11, ban = ban, style = style, sub = '토론', login = 로그인_확인())
+        return 웹_디자인('index.html', login = 로그인_확인(), title = name, page = URL_인코딩(name), suburl = URL_인코딩(sub), toron = sub, logo = data['name'], rows = div, tn = 11, ban = ban, style = style, sub = '토론')
 
 @app.route('/topic/<path:name>/sub/<path:sub>/b/<int:number>')
 def 토론_블라인드(name = None, sub = None, number = None):
@@ -3119,7 +3119,7 @@ def 로그인():
             if(session.get('Now') == True):
                 return '<meta http-equiv="refresh" content="0;url=/error/11" />'
             else:
-                return 웹_디자인('index.html', title = '로그인', enter = '로그인', logo = data['name'], tn = 15)
+                return 웹_디자인('index.html', login = 로그인_확인(), title = '로그인', enter = '로그인', logo = data['name'], tn = 15)
                 
 @app.route('/change', methods=['POST', 'GET'])
 def 비밀번호_변경():
@@ -3160,7 +3160,7 @@ def 비밀번호_변경():
                 session.pop('DREAMER', None)
                 return '<meta http-equiv="refresh" content="0;url=/change" />'
             else:
-                return 웹_디자인('index.html', title = '비밀번호 변경', enter = '변경', logo = data['name'], tn = 15)
+                return 웹_디자인('index.html', login = 로그인_확인(), title = '비밀번호 변경', enter = '변경', logo = data['name'], tn = 15)
                 
 @app.route('/check/<name>')
 def 사용자_아이피_확인(name = None, sub = None, number = None):
@@ -3183,9 +3183,9 @@ def 사용자_아이피_확인(name = None, sub = None, number = None):
                         except:
                             break
                         i = i + 1
-                    return 웹_디자인('index.html', title = '다중 검사', logo = data['name'], tn = 22, rows = c)
+                    return 웹_디자인('index.html', login = 로그인_확인(), title = '다중 검사', logo = data['name'], tn = 22, rows = c)
                 else:
-                    return 웹_디자인('index.html', title = '다중 검사', logo = data['name'], tn = 22, rows = '')
+                    return 웹_디자인('index.html', login = 로그인_확인(), title = '다중 검사', logo = data['name'], tn = 22, rows = '')
             else:
                 DB_실행("select * from login where user = '" + DB_인코딩(name) + "' order by today desc")
                 row = DB_가져오기()
@@ -3198,9 +3198,9 @@ def 사용자_아이피_확인(name = None, sub = None, number = None):
                         except:
                             break
                         i = i + 1
-                    return 웹_디자인('index.html', title = '다중 검사', logo = data['name'], tn = 22, rows = c)
+                    return 웹_디자인('index.html', login = 로그인_확인(), title = '다중 검사', logo = data['name'], tn = 22, rows = c)
                 else:
-                    return 웹_디자인('index.html', title = '다중 검사', logo = data['name'], tn = 22, rows = '')
+                    return 웹_디자인('index.html', login = 로그인_확인(), title = '다중 검사', logo = data['name'], tn = 22, rows = '')
         else:
             return '<meta http-equiv="refresh" content="0;url=/error/3" />'
 
@@ -3239,7 +3239,7 @@ def 가입():
         if(차단인가 == 1):
             return '<meta http-equiv="refresh" content="0;url=/ban" />'
         else:
-            return 웹_디자인('index.html', title = '회원가입', enter = '회원가입', logo = data['name'], tn = 15)
+            return 웹_디자인('index.html', login = 로그인_확인(), title = '회원가입', enter = '회원가입', logo = data['name'], tn = 15)
 
 @app.route('/logout')
 def 로그아웃():
@@ -3297,7 +3297,7 @@ def 사용자_차단(name = None):
                     else:
                         now = '차단'
                         
-                return 웹_디자인('index.html', title = name, page = URL_인코딩(name), logo = data['name'], tn = 16, now = now, today = 시간(), sub = '차단')
+                return 웹_디자인('index.html', login = 로그인_확인(), title = name, page = URL_인코딩(name), logo = data['name'], tn = 16, now = now, today = 시간(), sub = '차단')
             else:
                 return '<meta http-equiv="refresh" content="0;url=/error/3" />'
 
@@ -3329,7 +3329,7 @@ def ACL(name = None):
                     now = '유저 이상'
                 else:
                     now = '일반'
-                return 웹_디자인('index.html', title = name, page = URL_인코딩(name), logo = data['name'], tn = 19, now = '현재 ACL 상태는 ' + now, sub = 'ACL')
+                return 웹_디자인('index.html', login = 로그인_확인(), title = name, page = URL_인코딩(name), logo = data['name'], tn = 19, now = '현재 ACL 상태는 ' + now, sub = 'ACL')
             else:
                 return '<meta http-equiv="refresh" content="0;url=/w/' + URL_인코딩(name) + '" />' 
         else:
@@ -3362,7 +3362,7 @@ def 관리자_부여(name = None):
                     now = '권한 해제'
                 else:
                     now = '권한 부여'
-                return 웹_디자인('index.html', title = name, page = URL_인코딩(name), logo = data['name'], tn = 18, now = now, sub = '권한 부여')
+                return 웹_디자인('index.html', login = 로그인_확인(), title = name, page = URL_인코딩(name), logo = data['name'], tn = 18, now = now, sub = '권한 부여')
             else:
                 return '<meta http-equiv="refresh" content="0;url=/error/5" />'
         else:
@@ -3422,7 +3422,7 @@ def 차단_확인_페이지():
                         end = '영구 차단 상태 입니다. / 사유 : ' + row[0]['why']                
     else:
         end = '권한이 맞지 않는 상태 입니다.'
-    return 웹_디자인('index.html', title = '권한 오류', logo = data['name'], data = end), 401
+    return 웹_디자인('index.html', login = 로그인_확인(), title = '권한 오류', logo = data['name'], data = end), 401
    
 @app.route('/w/<path:name>/r/<int:a>/diff/<int:b>')
 def 문서_비교(name = None, a = None, b = None):
@@ -3445,7 +3445,7 @@ def 문서_비교(name = None, a = None, b = None):
             
             c = '<pre>' + c + '</pre>'
             
-            return 웹_디자인('index.html', title = name, logo = data['name'], data = c, sub = '비교')
+            return 웹_디자인('index.html', login = 로그인_확인(), title = name, logo = data['name'], data = c, sub = '비교')
         else:
             return '<meta http-equiv="refresh" content="0;url=/history/' + URL_인코딩(name) + '" />'
     else:
@@ -3481,7 +3481,7 @@ def 사용자():
 
     DB_실행("select count(*) from history where id = ''")
         
-    return 웹_디자인('index.html', title = '유저 메뉴', logo = data['name'], data = ip + '<br><br><span>권한 상태 : ' + acl + '<br><br><li><a href="/login">로그인</a></li><li><a href="/logout">로그아웃</a></li><li><a href="/register">회원가입</a></li><li><a href="/change">비밀번호 변경</a></li>')
+    return 웹_디자인('index.html', login = 로그인_확인(), title = '유저 메뉴', logo = data['name'], data = ip + '<br><br><span>권한 상태 : ' + acl + '<br><br><li><a href="/login">로그인</a></li><li><a href="/logout">로그아웃</a></li><li><a href="/register">회원가입</a></li><li><a href="/change">비밀번호 변경</a></li>')
 
 @app.route('/random')
 def 무작위_문서():
@@ -3495,45 +3495,45 @@ def 무작위_문서():
 @app.route('/error/<int:num>')
 def 오류(num = None):
     if(num == 1):
-        return 웹_디자인('index.html', title = '권한 오류', logo = data['name'], data = '비 로그인 상태 입니다.'), 401
+        return 웹_디자인('index.html', login = 로그인_확인(), title = '권한 오류', logo = data['name'], data = '비 로그인 상태 입니다.'), 401
     elif(num == 2):
-        return 웹_디자인('index.html', title = '권한 오류', logo = data['name'], data = '이 계정이 없습니다.'), 401
+        return 웹_디자인('index.html', login = 로그인_확인(), title = '권한 오류', logo = data['name'], data = '이 계정이 없습니다.'), 401
     elif(num == 3):
-        return 웹_디자인('index.html', title = '권한 오류', logo = data['name'], data = '권한이 모자랍니다.'), 401
+        return 웹_디자인('index.html', login = 로그인_확인(), title = '권한 오류', logo = data['name'], data = '권한이 모자랍니다.'), 401
     elif(num == 4):
-        return 웹_디자인('index.html', title = '권한 오류', logo = data['name'], data = '관리자는 차단, 검사 할 수 없습니다.'), 401
+        return 웹_디자인('index.html', login = 로그인_확인(), title = '권한 오류', logo = data['name'], data = '관리자는 차단, 검사 할 수 없습니다.'), 401
     elif(num == 5):
-        return 웹_디자인('index.html', title = '유저 오류', logo = data['name'], data = '그런 계정이 없습니다.'), 401
+        return 웹_디자인('index.html', login = 로그인_확인(), title = '유저 오류', logo = data['name'], data = '그런 계정이 없습니다.'), 401
     elif(num == 6):
-        return 웹_디자인('index.html', title = '가입 오류', logo = data['name'], data = '동일한 아이디의 유저가 있습니다.'), 401
+        return 웹_디자인('index.html', login = 로그인_확인(), title = '가입 오류', logo = data['name'], data = '동일한 아이디의 유저가 있습니다.'), 401
     elif(num == 7):
-        return 웹_디자인('index.html', title = '가입 오류', logo = data['name'], data = '아이디는 20글자보다 짧아야 합니다.'), 401
+        return 웹_디자인('index.html', login = 로그인_확인(), title = '가입 오류', logo = data['name'], data = '아이디는 20글자보다 짧아야 합니다.'), 401
     elif(num == 8):
-        return 웹_디자인('index.html', title = '가입 오류', logo = data['name'], data = '아이디에는 한글과 알파벳과 공백만 허용 됩니다.'), 401
+        return 웹_디자인('index.html', login = 로그인_확인(), title = '가입 오류', logo = data['name'], data = '아이디에는 한글과 알파벳과 공백만 허용 됩니다.'), 401
     elif(num == 9):
-        return 웹_디자인('index.html', title = '변경 오류', logo = data['name'], data = '그런 계정이 없습니다.'), 401
+        return 웹_디자인('index.html', login = 로그인_확인(), title = '변경 오류', logo = data['name'], data = '그런 계정이 없습니다.'), 401
     elif(num == 10):
-        return 웹_디자인('index.html', title = '변경 오류', logo = data['name'], data = '비밀번호가 다릅니다.'), 401
+        return 웹_디자인('index.html', login = 로그인_확인(), title = '변경 오류', logo = data['name'], data = '비밀번호가 다릅니다.'), 401
     elif(num == 11):
-        return 웹_디자인('index.html', title = '로그인 오류', logo = data['name'], data = '이미 로그인 되어 있습니다.'), 401
+        return 웹_디자인('index.html', login = 로그인_확인(), title = '로그인 오류', logo = data['name'], data = '이미 로그인 되어 있습니다.'), 401
     elif(num == 12):
-        return 웹_디자인('index.html', title = '로그인 오류', logo = data['name'], data = '그런 계정이 없습니다.'), 401
+        return 웹_디자인('index.html', login = 로그인_확인(), title = '로그인 오류', logo = data['name'], data = '그런 계정이 없습니다.'), 401
     elif(num == 13):
-        return 웹_디자인('index.html', title = '로그인 오류', logo = data['name'], data = '비밀번호가 다릅니다.'), 401
+        return 웹_디자인('index.html', login = 로그인_확인(), title = '로그인 오류', logo = data['name'], data = '비밀번호가 다릅니다.'), 401
     elif(num == 14):
-        return 웹_디자인('index.html', title = '업로드 오류', logo = data['name'], data = 'jpg, gif, jpeg, png만 가능 합니다.'), 401
+        return 웹_디자인('index.html', login = 로그인_확인(), title = '업로드 오류', logo = data['name'], data = 'jpg, gif, jpeg, png만 가능 합니다.'), 401
     elif(num == 15):
-        return 웹_디자인('index.html', title = '업로드 오류', logo = data['name'], data = '파일 명에 . / \ * < > | : ? 가 들어 갈 수 없습니다.'), 401
+        return 웹_디자인('index.html', login = 로그인_확인(), title = '업로드 오류', logo = data['name'], data = '파일 명에 . / \ * < > | : ? 가 들어 갈 수 없습니다.'), 401
     elif(num == 16):
-        return 웹_디자인('index.html', title = '업로드 오류', logo = data['name'], data = '동일한 이름의 파일이 있습니다.'), 401
+        return 웹_디자인('index.html', login = 로그인_확인(), title = '업로드 오류', logo = data['name'], data = '동일한 이름의 파일이 있습니다.'), 401
     elif(num == 17):
-        return 웹_디자인('index.html', title = '편집 오류', logo = data['name'], data = '편집 내용 기록에는 한글과 영어와 숫자, 공백만 허용 됩니다.'), 401
+        return 웹_디자인('index.html', login = 로그인_확인(), title = '편집 오류', logo = data['name'], data = '편집 내용 기록에는 한글과 영어와 숫자, 공백만 허용 됩니다.'), 401
     elif(num == 18):
-        return 웹_디자인('index.html', title = '편집 오류', logo = data['name'], data = '내용이 원래 문서와 동일 합니다.'), 401
+        return 웹_디자인('index.html', login = 로그인_확인(), title = '편집 오류', logo = data['name'], data = '내용이 원래 문서와 동일 합니다.'), 401
     elif(num == 19):
-        return 웹_디자인('index.html', title = '이동 오류', logo = data['name'], data = '이동 하려는 곳에 문서가 이미 있습니다.'), 401
+        return 웹_디자인('index.html', login = 로그인_확인(), title = '이동 오류', logo = data['name'], data = '이동 하려는 곳에 문서가 이미 있습니다.'), 401
     elif(num == 20):
-        return 웹_디자인('index.html', title = '비밀번호 오류', logo = data['name'], data = '재 확인이랑 비밀번호가 다릅니다.'), 401
+        return 웹_디자인('index.html', login = 로그인_확인(), title = '비밀번호 오류', logo = data['name'], data = '재 확인이랑 비밀번호가 다릅니다.'), 401
     else:
         return '<meta http-equiv="refresh" content="0;url=/" />'
 
