@@ -19,7 +19,7 @@
 ## 1.2
  * 미리보기 구현
  * 대역 차단 구현
- * diff 구현
+ * 문서 비교 구현
  * 파일 업로드 개선
  * 파일 업로드 구현
  * 기본적인 다중 검사 기능
@@ -98,7 +98,7 @@
 
 ## 외부 파일 라이선스
  * 인용문 아이콘 [Dave Gandy](http://www.flaticon.com/free-icon/quote-left_25672) CC 3.0 BY
- * 일부 파일 [Basix](https://twitter.com/Basix1120)
+ * ~~형태도 다른 초기 본~~ 일부 파일 [Basix](https://twitter.com/Basix1120)
 
 ----
 ## 기타
