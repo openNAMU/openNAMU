@@ -135,7 +135,7 @@ def 비교(seqm):
            
 def 관리자_확인():
     if(session.get('Now') == True):
-        아이피 = 아이피_확인(request)
+        아이피 = 아이피_확인()
         DB_실행("select * from user where id = '" + DB_인코딩(아이피) + "'")
         사용자_자료 = DB_가져오기()
         if(사용자_자료):
@@ -144,7 +144,7 @@ def 관리자_확인():
                 
 def 소유자_확인():
     if(session.get('Now') == True):
-        아이피 = 아이피_확인(request)
+        아이피 = 아이피_확인()
         DB_실행("select * from user where id = '" + DB_인코딩(아이피) + "'")
         사용자_자료 = DB_가져오기()
         if(사용자_자료):
@@ -168,10 +168,10 @@ def 틀_확인(이름, 데이터):
 
 def 세이브마크(데이터):
     데이터 = re.sub("\[date\(now\)\]", 시간(), 데이터)
-    if(not re.search("\.", 아이피_확인(request))):
-        이름 = '[[사용자:' + 아이피_확인(request) + '|' + 아이피_확인(request) + ']]'
+    if(not re.search("\.", 아이피_확인())):
+        이름 = '[[사용자:' + 아이피_확인() + '|' + 아이피_확인() + ']]'
     else:
-        이름 = 아이피_확인(request)
+        이름 = 아이피_확인()
     데이터 = re.sub("\[name\]", 이름, 데이터)
 
     return 데이터
@@ -1176,15 +1176,16 @@ def 나무마크(title, data):
     data = re.sub('^<br>', '', data)
     return str(data)
 
-def 아이피_확인(request):
+def 아이피_확인():
     if(session.get('Now') == True):
-        ip = format(session['DREAMER'])
+        아이피 = format(session['DREAMER'])
     else:
         if(request.headers.getlist("X-Forwarded-For")):
-            ip = request.headers.getlist("X-Forwarded-For")[0]
+            아이피 = request.headers.getlist("X-Forwarded-For")[0]
         else:
-            ip = request.remote_addr
-    return ip
+            아이피 = request.remote_addr
+            
+    return 아이피
 
 def ACL_체크(ip, name):
     m = re.search("^사용자:(.*)", name)
@@ -1372,7 +1373,7 @@ def 길이_확인(기존, 바뀜):
 def 업로드():
     app.config['MAX_CONTENT_LENGTH'] = int(data['upload']) * 1024 * 1024
     if(request.method == 'POST'):
-        ip = 아이피_확인(request)
+        ip = 아이피_확인()
         ban = 차단_체크(ip)
         
         if(ban == 1):
@@ -1400,7 +1401,7 @@ def 업로드():
             else:
                 return '<meta http-equiv="refresh" content="0;url=/error/14" />'
     else:
-        ip = 아이피_확인(request)
+        ip = 아이피_확인()
         ban = 차단_체크(ip)
         
         if(ban == 1):
@@ -2263,7 +2264,7 @@ def 되돌리기(name = None, number = None):
                 DB_실행("select * from history where title = '" + DB_인코딩(name) + "' and id = '" + str(number) + "'")
                 rows = DB_가져오기()
                 if(rows):
-                    ip = 아이피_확인(request)
+                    ip = 아이피_확인()
                     can = ACL_체크(ip, name)
                     
                     if(can == 1):
@@ -2293,7 +2294,7 @@ def 되돌리기(name = None, number = None):
             DB_실행("select * from history where title = '" + DB_인코딩(name) + "' and id = '" + str(number) + "'")
             rows = DB_가져오기()
             if(rows):
-                ip = 아이피_확인(request)
+                ip = 아이피_확인()
                 can = ACL_체크(ip, name)
                 
                 if(can == 1):
@@ -2322,7 +2323,7 @@ def 되돌리기(name = None, number = None):
         row = DB_가져오기()
         if(row):
             if(소유자_확인() == 1):
-                ip = 아이피_확인(request)
+                ip = 아이피_확인()
                 can = ACL_체크(ip, name)
                 
                 if(can == 1):
@@ -2337,7 +2338,7 @@ def 되돌리기(name = None, number = None):
             else:
                 return '<meta http-equiv="refresh" content="0;url=/error/3" />'
         else:            
-            ip = 아이피_확인(request)
+            ip = 아이피_확인()
             can = ACL_체크(ip, name)
             
             if(can == 1):
@@ -2368,7 +2369,7 @@ def 문서_편집(name = None):
                 if(rows[0]['data'] == content):
                     return '<meta http-equiv="refresh" content="0;url=/error/18" />'
                 else:
-                    ip = 아이피_확인(request)
+                    ip = 아이피_확인()
                     can = ACL_체크(ip, name)
                     
                     if(can == 1):
@@ -2380,7 +2381,7 @@ def 문서_편집(name = None):
                         DB_실행("update data set data = '" + DB_인코딩(content) + "' where title = '" + DB_인코딩(name) + "'")
                         DB_갱신()
             else:
-                ip = 아이피_확인(request)
+                ip = 아이피_확인()
                 can = ACL_체크(ip, name)
                 
                 if(can == 1):
@@ -2396,7 +2397,7 @@ def 문서_편집(name = None):
             
             return '<meta http-equiv="refresh" content="0;url=/w/' + URL_인코딩(name) + '" />'
     else:
-        ip = 아이피_확인(request)
+        ip = 아이피_확인()
         can = ACL_체크(ip, name)
         
         if(can == 1):
@@ -2434,7 +2435,7 @@ def 문단_편집(name = None, number = None):
                 if(request.form["otent"] == content):
                     return '<meta http-equiv="refresh" content="0;url=/error/18" />'
                 else:
-                    ip = 아이피_확인(request)
+                    ip = 아이피_확인()
                     can = ACL_체크(ip, name)
                     
                     if(can == 1):
@@ -2453,7 +2454,7 @@ def 문단_편집(name = None, number = None):
             else:
                 return '<meta http-equiv="refresh" content="0;url=/w/' + URL_인코딩(name) + '" />'
     else:
-        ip = 아이피_확인(request)
+        ip = 아이피_확인()
         can = ACL_체크(ip, name)
         
         if(can == 1):
@@ -2503,7 +2504,7 @@ def 문단_편집(name = None, number = None):
                 
 @app.route('/preview/<path:name>', methods=['POST'])
 def 미리보기(name = None):
-    ip = 아이피_확인(request)
+    ip = 아이피_확인()
     can = ACL_체크(ip, name)
     if(can == 1):
         return '<meta http-equiv="refresh" content="0;url=/ban" />'
@@ -2525,7 +2526,7 @@ def 미리보기(name = None):
         
 @app.route('/preview/<path:name>/section/<int:number>', methods=['POST'])
 def 문단_미리보기(name = None, number = None):
-    ip = 아이피_확인(request)
+    ip = 아이피_확인()
     can = ACL_체크(ip, name)
     if(can == 1):
         return '<meta http-equiv="refresh" content="0;url=/ban" />'
@@ -2552,7 +2553,7 @@ def 문서_삭제(name = None):
         DB_실행("select * from data where title = '" + DB_인코딩(name) + "'")
         rows = DB_가져오기()
         if(rows):
-            ip = 아이피_확인(request)
+            ip = 아이피_확인()
             can = ACL_체크(ip, name)
             if(can == 1):
                 return '<meta http-equiv="refresh" content="0;url=/ban" />'
@@ -2569,7 +2570,7 @@ def 문서_삭제(name = None):
         DB_실행("select * from data where title = '" + DB_인코딩(name) + "'")
         rows = DB_가져오기()
         if(rows):
-            ip = 아이피_확인(request)
+            ip = 아이피_확인()
             can = ACL_체크(ip, name)
             if(can == 1):
                 return '<meta http-equiv="refresh" content="0;url=/ban" />'
@@ -2584,7 +2585,7 @@ def 문서_이동(name = None):
         DB_실행("select * from data where title = '" + DB_인코딩(name) + "'")
         rows = DB_가져오기()
         if(rows):
-            ip = 아이피_확인(request)
+            ip = 아이피_확인()
             can = ACL_체크(ip, name)
             if(can == 1):
                 return '<meta http-equiv="refresh" content="0;url=/ban" />'
@@ -2602,7 +2603,7 @@ def 문서_이동(name = None):
                     DB_갱신()
                     return '<meta http-equiv="refresh" content="0;url=/w/' + URL_인코딩(request.form["title"]) + '" />'
         else:
-            ip = 아이피_확인(request)
+            ip = 아이피_확인()
             can = ACL_체크(ip, name)
             if(can == 1):
                 return '<meta http-equiv="refresh" content="0;url=/ban" />'
@@ -2619,7 +2620,7 @@ def 문서_이동(name = None):
                     DB_갱신()
                     return '<meta http-equiv="refresh" content="0;url=/w/' + URL_인코딩(request.form["title"]) + '" />'
     else:
-        ip = 아이피_확인(request)
+        ip = 아이피_확인()
         can = ACL_체크(ip, name)
         if(can == 1):
             return '<meta http-equiv="refresh" content="0;url=/ban" />'
@@ -2801,7 +2802,7 @@ def 토론(name = None, sub = None):
         else:
             number = 1
             
-        ip = 아이피_확인(request)
+        ip = 아이피_확인()
         ban = 토론자_체크(ip, name, sub)
         admin = 관리자_확인()
         
@@ -2828,7 +2829,7 @@ def 토론(name = None, sub = None):
     else:
         style = ''
         
-        ip = 아이피_확인(request)
+        ip = 아이피_확인()
         ban = 토론자_체크(ip, name, sub)
         admin = 관리자_확인()
 
@@ -3007,7 +3008,7 @@ def 토론_공지(name = None, sub = None, number = None):
 @app.route('/topic/<path:name>/sub/<path:sub>/stop')
 def 토론_정지(name = None, sub = None):
     if(관리자_확인() == 1):
-        아이피 = 아이피_확인(request)
+        아이피 = 아이피_확인()
         
         DB_실행("select * from topic where title = '" + DB_인코딩(name) + "' and sub = '" + DB_인코딩(sub) + "' limit 1")
         토론_확인 = DB_가져오기()
@@ -3035,7 +3036,7 @@ def 토론_정지(name = None, sub = None):
 @app.route('/topic/<path:name>/sub/<path:sub>/close')
 def 토론_닫기(name = None, sub = None):
     if(관리자_확인() == 1):
-        아이피 = 아이피_확인(request)
+        아이피 = 아이피_확인()
         
         DB_실행("select * from topic where title = '" + DB_인코딩(name) + "' and sub = '" + DB_인코딩(sub) + "' order by id+0 desc limit 1")
         토론_확인 = DB_가져오기()
@@ -3063,7 +3064,7 @@ def 토론_닫기(name = None, sub = None):
 @app.route('/topic/<path:name>/sub/<path:sub>/agree')
 def 토론_관리자_기능(name = None, sub = None):
     if(관리자_확인() == 1):
-        아이피 = 아이피_확인(request)
+        아이피 = 아이피_확인()
         
         DB_실행("select id from topic where title = '" + DB_인코딩(name) + "' and sub = '" + DB_인코딩(sub) + "' order by id+0 desc limit 1")
         토론 = DB_가져오기()
@@ -3090,7 +3091,7 @@ def 토론_관리자_기능(name = None, sub = None):
 
 @app.route('/login', methods=['POST', 'GET'])
 def 로그인():
-    아이피 = 아이피_확인(request)
+    아이피 = 아이피_확인()
     차단인가 = 차단_체크(아이피)
         
     if(request.method == 'POST'):        
@@ -3125,7 +3126,7 @@ def 로그인():
                 
 @app.route('/change', methods=['POST', 'GET'])
 def 비밀번호_변경():
-    아이피 = 아이피_확인(request)
+    아이피 = 아이피_확인()
     차단인가 = 차단_체크(아이피)
     
     if(request.method == 'POST'):      
@@ -3208,7 +3209,7 @@ def 사용자_아이피_확인(name = None, sub = None, number = None):
 
 @app.route('/register', methods=['POST', 'GET'])
 def 가입():
-    아이피 = 아이피_확인(request)
+    아이피 = 아이피_확인()
     차단인가 = 차단_체크(아이피)
     
     if(request.method == 'POST'):        
@@ -3258,7 +3259,7 @@ def 사용자_차단(name = None):
     else:
         if(request.method == 'POST'):
             if(관리자_확인() == 1):
-                ip = 아이피_확인(request)
+                ip = 아이피_확인()
                 
                 if(not re.search("[0-9]{4}-[0-9]{2}-[0-9]{2}", request.form["end"])):
                     end = ''
@@ -3372,7 +3373,7 @@ def 관리자_부여(name = None):
 
 @app.route('/ban')
 def 차단_확인_페이지():
-    ip = 아이피_확인(request)
+    ip = 아이피_확인()
     
     if(차단_체크(ip) == 1):
         DB_실행("select * from ban where block = '" + DB_인코딩(ip) + "'")
@@ -3429,25 +3430,25 @@ def 차단_확인_페이지():
 @app.route('/w/<path:name>/r/<int:a>/diff/<int:b>')
 def 문서_비교(name = None, a = None, b = None):
     DB_실행("select * from history where id = '" + DB_인코딩(str(a)) + "' and title = '" + DB_인코딩(name) + "'")
-    rows = DB_가져오기()
-    if(rows):
+    앞_자료 = DB_가져오기()
+    if(앞_자료):
         DB_실행("select * from history where id = '" + DB_인코딩(str(b)) + "' and title = '" + DB_인코딩(name) + "'")
-        row = DB_가져오기()
-        if(row):
-            indata = re.sub('<', '&lt;', rows[0]['data'])
-            indata = re.sub('>', '&gt;', indata)
-            indata = re.sub('"', '&quot;', indata)
+        뒷_자료 = DB_가져오기()
+        if(뒷_자료):
+            앞_파싱_자료 = re.sub('<', '&lt;', 앞_자료[0]['data'])
+            앞_파싱_자료 = re.sub('>', '&gt;', 앞_파싱_자료)
+            앞_파싱_자료 = re.sub('"', '&quot;', 앞_파싱_자료)
             
-            enddata = re.sub('<', '&lt;', row[0]['data'])
-            enddata = re.sub('>', '&gt;', enddata)
-            enddata = re.sub('"', '&quot;', enddata)
+            뒷_파싱_자료 = re.sub('<', '&lt;', 뒷_자료[0]['data'])
+            뒷_파싱_자료 = re.sub('>', '&gt;', 뒷_파싱_자료)
+            뒷_파싱_자료 = re.sub('"', '&quot;', 뒷_파싱_자료)
             
-            sm = difflib.SequenceMatcher(None, indata, enddata)
-            c = 비교(sm)
+            비교_내용 = difflib.SequenceMatcher(None, 앞_파싱_자료, 뒷_파싱_자료)
+            결과 = 비교(비교_내용)
             
-            c = '<pre>' + c + '</pre>'
+            결과 = '<pre>' + 결과 + '</pre>'
             
-            return 웹_디자인('index.html', login = 로그인_확인(), title = name, logo = data['name'], data = c, sub = '비교')
+            return 웹_디자인('index.html', login = 로그인_확인(), title = name, logo = data['name'], data = 결과, sub = '비교')
         else:
             return '<meta http-equiv="refresh" content="0;url=/history/' + URL_인코딩(name) + '" />'
     else:
@@ -3455,12 +3456,12 @@ def 문서_비교(name = None, a = None, b = None):
         
 @app.route('/user')
 def 사용자():
-    ip = 아이피_확인(request)
-    원래_아이피 = ip
+    아이피 = 아이피_확인()
+    원래_아이피 = 아이피
     
-    DB_실행("select * from user where id = '" + DB_인코딩(ip) + "'")
+    DB_실행("select * from user where id = '" + DB_인코딩(아이피) + "'")
     rows = DB_가져오기()
-    if(차단_체크(ip) == 0):
+    if(차단_체크(아이피) == 0):
         if(rows):
             if(rows[0]['acl'] == 'admin' or rows[0]['acl'] == 'owner'):
                 if(rows[0]['acl'] == 'admin'):
@@ -3474,19 +3475,19 @@ def 사용자():
     else:
         acl = '차단'
         
-    if(not re.search('\.', ip)):
+    if(not re.search('\.', 아이피)):
         DB_실행("select * from data where title = '사용자:" + DB_인코딩(ip) + "'")
         row = DB_가져오기()
         if(row):
-            ip = '<a href="/w/' + URL_인코딩('사용자:' + ip) + '">' + ip + '</a>'
+            아이피 = '<a href="/w/' + URL_인코딩('사용자:' + 아이피) + '">' + 아이피 + '</a>'
         else:
-            ip = '<a class="not_thing" href="/w/' + URL_인코딩('사용자:' + ip) + '">' + ip + '</a>'
+            아이피 = '<a class="not_thing" href="/w/' + URL_인코딩('사용자:' + 아이피) + '">' + 아이피 + '</a>'
         
-    return 웹_디자인('index.html', login = 로그인_확인(), title = '유저 메뉴', logo = data['name'], data = ip + '<br><br><span>권한 상태 : ' + acl + '<h2>로그인 관련</h2><li><a href="/login">로그인</a></li><li><a href="/logout">로그아웃</a></li><li><a href="/register">회원가입</a></li><h2>기타</h2><li><a href="/change">비밀번호 변경</a></li><li><a href="/count">기여 횟수</a></li><li><a href="/record/' + 원래_아이피 + '/n/1">기여 목록</a></li>')
+    return 웹_디자인('index.html', login = 로그인_확인(), title = '유저 메뉴', logo = data['name'], data = 아이피 + '<br><br><span>권한 상태 : ' + acl + '<h2>로그인 관련</h2><li><a href="/login">로그인</a></li><li><a href="/logout">로그아웃</a></li><li><a href="/register">회원가입</a></li><h2>기타</h2><li><a href="/change">비밀번호 변경</a></li><li><a href="/count">기여 횟수</a></li><li><a href="/record/' + 원래_아이피 + '/n/1">기여 목록</a></li>')
 
 @app.route('/count')
 def 기여_횟수():
-    DB_실행("select count(title) from history where ip = '" + 아이피_확인(request) + "'")
+    DB_실행("select count(title) from history where ip = '" + 아이피_확인() + "'")
     숫자 = DB_가져오기()
     
     return 웹_디자인('index.html', login = 로그인_확인(), title = '기여 횟수', logo = data['name'], data = "기여 횟수 : " + str(숫자[0]["count(title)"]))
