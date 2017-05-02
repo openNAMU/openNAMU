@@ -369,7 +369,7 @@ def 역링크_추가(이름, 링크, 값):
         DB_갱신()
 
 def 분류_추가(이름, 링크):
-    DB_실행("select title from cat where title = '" + DB_인코딩(링크) + "' and link = '" + DB_인코딩(이름) + "'")
+    DB_실행("select title from cat where title = '" + DB_인코딩(링크) + "' and cat = '" + DB_인코딩(이름) + "'")
     있나 = DB_가져오기()
     if(not 있나):
         DB_실행("insert into cat (title, link) value ('" + DB_인코딩(링크) + "', '" + DB_인코딩(이름) + "')")
