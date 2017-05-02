@@ -658,9 +658,9 @@ def 나무마크(title, data):
                             DB_실행("select title from data where title = '" + DB_인코딩(results[0]) + "'")
                             있나 = DB_가져오기()
                             if(있나):
-                                클래스 = 'not_thing'
-                            else:
                                 클래스 = ''
+                            else:
+                                클래스 = 'not_thing'
                                 
                             data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a title="' + results[0] + results[1] + '" class="' + 클래스 + '" href="/w/' + URL_인코딩(results[0]) + results[1] + '">' + g + '</a>', data, 1)
                             
@@ -682,9 +682,9 @@ def 나무마크(title, data):
                             DB_실행("select title from data where title = '" + DB_인코딩(results[0]) + "'")
                             있나 = DB_가져오기()
                             if(있나):
-                                클래스 = 'not_thing'
-                            else:
                                 클래스 = ''
+                            else:
+                                클래스 = 'not_thing'
 
                             data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a title="' + results[0] + '" class="' + 클래스 + '" href="/w/' + URL_인코딩(results[0]) + '">' + results[1] + '</a>', data, 1)
 
@@ -703,9 +703,9 @@ def 나무마크(title, data):
                             DB_실행("select title from data where title = '" + DB_인코딩(result[0]) + "'")
                             있나 = DB_가져오기()
                             if(있나):
-                                클래스 = 'not_thing'
-                            else:
                                 클래스 = ''
+                            else:
+                                클래스 = 'not_thing'
 
                             data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a href="/w/' + URL_인코딩(result[0]) + result[1] + '" class="' + 클래스 + '">' + result[0] + result[1] + '</a>', data, 1)
                             
@@ -727,9 +727,9 @@ def 나무마크(title, data):
                             DB_실행("select title from data where title = '" + DB_인코딩(result[0]) + "'")
                             있나 = DB_가져오기()
                             if(있나):
-                                클래스 = 'not_thing'
-                            else:
                                 클래스 = ''
+                            else:
+                                클래스 = 'not_thing'
 
                             data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a href="/w/' + URL_인코딩(result[0]) + '" class="' + 클래스 + '">' + result[0] + '</a>', data, 1)
                             
