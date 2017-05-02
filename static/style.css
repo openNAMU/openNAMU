@@ -27,11 +27,11 @@
 }
 
 textarea, label, span, body, strong, b, div, h1, h2, h3, h4, h5, h6, h7, input {
-	font-family: helvetica, Meiryo, "Noto Sans Japanese", 나눔고딕, "맑은 고딕", "Nanum Gothic", sans-serif;
+	font-family: "나눔바른고딕", "나눔고딕", "맑은 고딕", "NanumBarunGothic", "NanumGothic", "Malgun Gothic", "sans-serif";
 }
 		
 pre {
-    font-family: '니눔고딕코딩', 'Nanum Gothic Coding', monospace;
+    font-family: "d2codingfont", "나눔고딕코딩", "NanumGothicCoding", "monospace";
 }
 
 .four-fifths.column {
