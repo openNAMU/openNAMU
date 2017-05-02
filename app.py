@@ -361,6 +361,20 @@ def 중괄호_문법(데이터, 접기_숫자, 틀):
             
     return (데이터, 접기_숫자)
 
+def 역링크_추가(이름, 링크, 값):
+    DB_실행("select title from back where title = '" + DB_인코딩(링크) + "' and link = '" + DB_인코딩(이름) + "' and type = '" + 값 + "'")
+    있나 = DB_가져오기()
+    if(not 있나):
+        DB_실행("insert into back (title, link, type) value ('" + DB_인코딩(링크) + "', '" + DB_인코딩(이름) + "',  'include')")
+        DB_갱신()
+
+def 분류_추가(이름, 링크):
+    DB_실행("select title from cat where title = '" + DB_인코딩(링크) + "' and link = '" + DB_인코딩(이름) + "'")
+    있나 = DB_가져오기()
+    if(not 있나):
+        DB_실행("insert into cat (title, link) value ('" + DB_인코딩(링크) + "', '" + DB_인코딩(이름) + "')")
+        DB_갱신()
+
 def 나무마크(title, data):
     data = HTML_파싱(data)
 
@@ -383,14 +397,8 @@ def 나무마크(title, data):
                 DB_실행("select * from data where title = '" + DB_인코딩(results[0]) + "'")
                 틀_내용 = DB_가져오기()
                 
-                if(틀_내용):
-                    DB_실행("select * from back where title = '" + DB_인코딩(results[0]) + "' and link = '" + DB_인코딩(title) + "' and type = 'include'")
-                    역링크 = DB_가져오기()
-                    
-                    if(not 역링크):
-                        DB_실행("insert into back (title, link, type) value ('" + DB_인코딩(results[0]) + "', '" + DB_인코딩(title) + "',  'include')")
-                        DB_갱신()
-                        
+                역링크_추가(title, results[0], 'include')
+                if(틀_내용):                        
                     틀_데이터 = 틀_내용[0]['data']
                     틀_데이터 = re.sub("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]", "", 틀_데이터)
                     
@@ -406,15 +414,10 @@ def 나무마크(title, data):
                                 틀_데이터 = re.sub("@" + result[0] + "@", result[1], 틀_데이터)
                                 a = re.sub("([^= ,]*)\=([^,]*)", "", a, 1)
                             else:
-                                break                        
+                                break       
+
                     data = re.sub("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]", '\n#nobr#<div>' + 틀_데이터 + '</div>\n#nobr#', data, 1)
                 else:
-                    DB_실행("select * from back where title = '" + DB_인코딩(results[0]) + "' and link = '" + DB_인코딩(title) + "' and type = 'include'")
-                    abb = DB_가져오기()
-                    if(not abb):
-                        DB_실행("insert into back (title, link, type) value ('" + DB_인코딩(results[0]) + "', '" + DB_인코딩(title) + "',  'include')")
-                        DB_갱신()
-                
                     data = re.sub("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]", "<a class=\"not_thing\" href=\"" + URL_인코딩(results[0]) + "\">" + results[0] + "</a>", data, 1)
         else:
             break
@@ -429,11 +432,8 @@ def 나무마크(title, data):
                 data = re.sub('^#(?:redirect|넘겨주기)\s([^\n]*)', '<meta http-equiv="refresh" content="0;url=/w/' + URL_인코딩(results[0]) + '/from/' + URL_인코딩(title) + results[1] + '" />', data, 1)
             else:
                 data = re.sub('^#(?:redirect|넘겨주기)\s([^\n]*)', '<meta http-equiv="refresh" content="0;url=/w/' + URL_인코딩(results[0]) + '/from/' + URL_인코딩(title) + '" />', data, 1)
-            DB_실행("select * from back where title = '" + DB_인코딩(results[0]) + "' and link = '" + DB_인코딩(title) + "' and type = 'redirect'")
-            abb = DB_가져오기()
-            if(not abb):
-                DB_실행("insert into back (title, link, type) value ('" + DB_인코딩(results[0]) + "', '" + DB_인코딩(title) + "',  'redirect')")
-                DB_갱신()
+            
+            역링크_추가(title, results[0], 'redirect')
         else:
             break
 
@@ -506,15 +506,20 @@ def 나무마크(title, data):
                 h4c = h4c + 1
             else:
                 h5c = h5c + 1
+
             toc = str(h0c) + '.' + str(h1c) + '.' + str(h2c) + '.' + str(h3c) + '.' + str(h4c) + '.' + str(h5c) + '.'
             toc = re.sub("(?P<in>[0-9]0(?:[0]*)?)\.", '\g<in>#.', toc)
+
             toc = re.sub("0\.", '', toc)
             toc = re.sub("#\.", '.', toc)
             toc = re.sub("\.$", '', toc)
+
             rtoc = rtoc + '<a href="#s-' + toc + '">' + toc + '</a>. ' + result[1] + '<br>'
+
             c = re.sub(" $", "", result[1])
             d = c
             c = re.sub("\[\[(([^|]*)\|)?(?P<in>[^\]]*)\]\]", "\g<in>", c)
+
             data = re.sub('(={1,6})\s?([^=]*)\s?(?:={1,6})(?:\s+)?\n', '<h' + str(wiki) + ' id="' + c + '"><a href="#toc" id="s-' + toc + '">' + toc + '.</a> ' + d + ' <span style="font-size:11px;">[<a href="/edit/' + URL_인코딩(title) + '/section/' + str(i) + '">편집</a>]</span></h' + str(wiki) + '>', data, 1);
         else:
             rtoc = rtoc + '</div>'
@@ -529,11 +534,7 @@ def 나무마크(title, data):
             g = m.groups()
             
             if(not title == g[0]):
-                DB_실행("select * from cat where title = '" + DB_인코딩(g[0]) + "' and cat = '" + DB_인코딩(title) + "'")
-                abb = DB_가져오기()
-                if(not abb):
-                    DB_실행("insert into cat (title, cat) value ('" + DB_인코딩(g[0]) + "', '" + DB_인코딩(title) + "')")
-                    DB_갱신()                
+                분류_추가(title, g[0])
                     
                 if(category == ''):
                     DB_실행("select * from data where title = '" + DB_인코딩(g[0]) + "'")
@@ -578,37 +579,42 @@ def 나무마크(title, data):
         m = re.search("\[\[파일:((?:(?!\]\]|\|).)*)(?:\|((?:(?!\]\]).)*))?\]\]", data)
         if(m):
             c = m.groups()
-            if(c[1]):
-                n = re.search("width=([^ \n&]*)", c[1])
-                e = re.search("height=([^ \n&]*)", c[1])
-                if(n):
-                    a = n.groups()
-                    width = a[0]
+
+            if(c):
+                if(c[1]):
+                    n = re.search("width=([^ \n&]*)", c[1])
+                    e = re.search("height=([^ \n&]*)", c[1])
+
+                    if(n):
+                        a = n.groups()
+                        width = a[0]
+                    else:
+                        width = ''
+                    if(e):
+                        b = e.groups()
+                        height = b[0]
+                    else:
+                        height = ''
+
+                    img = re.sub("\.(?P<in>[Jj][Pp][Gg]|[Pp][Nn][Gg]|[Gg][Ii][Ff]|[Jj][Pp][Ee][Gg])", "#\g<in>#", c[0])
+                    data = re.sub("\[\[파일:((?:(?!\]\]|\?).)*)(?:\?((?:(?!\]\]).)*))?\]\]", '<a href="/w/파일:' + img + '"><img src="/image/' + img + '" width="' + width + '" height="' + height + '"></a>', data, 1)
                 else:
-                    width = ''
-                if(e):
-                    b = e.groups()
-                    height = b[0]
-                else:
-                    height = ''
-                img = re.sub("\.(?P<in>[Jj][Pp][Gg]|[Pp][Nn][Gg]|[Gg][Ii][Ff]|[Jj][Pp][Ee][Gg])", "#\g<in>#", c[0])
-                data = re.sub("\[\[파일:((?:(?!\]\]|\?).)*)(?:\?((?:(?!\]\]).)*))?\]\]", '<a href="/w/파일:' + img + '"><img src="/image/' + img + '" width="' + width + '" height="' + height + '"></a>', data, 1)
+                    img = re.sub("\.(?P<in>[Jj][Pp][Gg]|[Pp][Nn][Gg]|[Gg][Ii][Ff]|[Jj][Pp][Ee][Gg])", "#\g<in>#", c[0])
+                    data = re.sub("\[\[파일:((?:(?!\]\]|\?).)*)(?:\?((?:(?!\]\]).)*))?\]\]", "<a href='/w/파일:" + img + "'><img src='/image/" + img + "'></a>", data, 1)
             else:
                 img = re.sub("\.(?P<in>[Jj][Pp][Gg]|[Pp][Nn][Gg]|[Gg][Ii][Ff]|[Jj][Pp][Ee][Gg])", "#\g<in>#", c[0])
                 data = re.sub("\[\[파일:((?:(?!\]\]|\?).)*)(?:\?((?:(?!\]\]).)*))?\]\]", "<a href='/w/파일:" + img + "'><img src='/image/" + img + "'></a>", data, 1)
+
             if(not re.search("^파일:([^\n]*)", title)):
-                DB_실행("select * from back where title = '" + DB_인코딩(c[0]) + "' and link = '" + DB_인코딩(title) + "' and type = 'redirect'")
-                abb = DB_가져오기()
-                if(not abb):
-                    DB_실행("insert into back (title, link, type) value ('파일:" + DB_인코딩(c[0]) + "', '" + DB_인코딩(title) + "',  'file')")
-                    DB_갱신()            
+                역링크_추가(title, '파일' + c[0], 'file')            
         else:
             break
     
-    data = re.sub("\[br\]",'<br>', data);
+    data = re.sub("\[br\]",'<br>', data)
     
     while(True):
-        m = re.search("\[youtube\(((?:(?!,|\)\]).)*)(?:,\s)?(?:width=((?:(?!,|\)\]).)*))?(?:,\s)?(?:height=((?:(?!,|\)\]).)*))?(?:,\s)?(?:width=((?:(?!,|\)\]).)*))?\)\]", data)
+        문법_컴파일 = re.compile("\[youtube\(((?:(?!,|\)\]).)*)(?:,(?:\s)?)?(?:width=((?:(?!,|\)\]).)*))?(?:,(?:\s)?)?(?:height=((?:(?!,|\)\]).)*))?\)\]")
+        m = 문법_컴파일.search(data)
         if(m):
             result = m.groups()
             if(result[1]):
@@ -619,16 +625,13 @@ def 나무마크(title, data):
                     width = result[1]
                     height = '315'
             elif(result[2]):
-                if(result[3]):
-                    height = result[2]
-                    width = result[3]
-                else:
-                    height = result[2]
-                    width = '560'
+                height = result[2]
+                width = '560'
             else:
                 width = '560'
                 height = '315'
-            data = re.sub("\[youtube\(((?:(?!,|\)\]).)*)(?:,\s)?(?:width=((?:(?!,|\)\]).)*))?(?:,\s)?(?:height=((?:(?!,|\)\]).)*))?(?:,\s)?(?:width=((?:(?!,|\)\]).)*))?\)\]", '<iframe width="' + width + '" height="' + height + '" src="https://www.youtube.com/embed/' + result[0] + '" frameborder="0" allowfullscreen></iframe>', data, 1)
+
+            data = 문법_컴파일.sub('<iframe width="' + width + '" height="' + height + '" src="https://www.youtube.com/embed/' + result[0] + '" frameborder="0" allowfullscreen></iframe>', data, 1)
         else:
             break
      
@@ -652,17 +655,16 @@ def 나무마크(title, data):
                         if(results[0] == title):
                             data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<b>' + g + '</b>', data, 1)
                         else:
-                            DB_실행("select * from data where title = '" + DB_인코딩(results[0]) + "'")
-                            rows = DB_가져오기()
-                            if(rows):
-                                data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a title="' + results[0] + results[1] + '" href="/w/' + URL_인코딩(results[0]) + results[1] + '">' + g + '</a>', data, 1)
+                            DB_실행("select title from data where title = '" + DB_인코딩(results[0]) + "'")
+                            있나 = DB_가져오기()
+                            if(있나):
+                                클래스 = 'not_thing'
                             else:
-                                data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a title="' + results[0] + results[1] + '" class="not_thing" href="/w/' + URL_인코딩(results[0]) + results[1] + '">' + g + '</a>', data, 1)
-                            DB_실행("select * from back where title = '" + DB_인코딩(results[0]) + "' and link = '" + DB_인코딩(title) + "'")
-                            rows = DB_가져오기()
-                            if(not rows):
-                                DB_실행("insert into back (title, link, type) value ('" + DB_인코딩(results[0]) + "', '" + DB_인코딩(title) + "', '')")
-                                DB_갱신()
+                                클래스 = ''
+                                
+                            data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a title="' + results[0] + results[1] + '" class="' + 클래스 + '" href="/w/' + URL_인코딩(results[0]) + results[1] + '">' + g + '</a>', data, 1)
+                            
+                            역링크_추가(title, results[0], '')
                 else:
                     b = re.search("^http(?:s)?:\/\/", results[0])
                     if(b):
@@ -677,17 +679,16 @@ def 나무마크(title, data):
                         if(results[0] == title):
                             data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<b>' + results[1] + '</b>', data, 1)
                         else:
-                            DB_실행("select * from data where title = '" + DB_인코딩(results[0]) + "'")
-                            rows = DB_가져오기()
-                            if(rows):
-                                data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a title="' + results[0] + '" href="/w/' + URL_인코딩(results[0]) + '">' + results[1] + '</a>', data, 1)
+                            DB_실행("select title from data where title = '" + DB_인코딩(results[0]) + "'")
+                            있나 = DB_가져오기()
+                            if(있나):
+                                클래스 = 'not_thing'
                             else:
-                                data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a title="' + results[0] + '" class="not_thing" href="/w/' + URL_인코딩(results[0]) + '">' + results[1] + '</a>', data, 1)
-                            DB_실행("select * from back where title = '" + DB_인코딩(results[0]) + "' and link = '" + DB_인코딩(title) + "'")
-                            rows = DB_가져오기()
-                            if(not rows):
-                                DB_실행("insert into back (title, link, type) value ('" + DB_인코딩(results[0]) + "', '" + DB_인코딩(title) + "', '')")
-                                DB_갱신()
+                                클래스 = ''
+
+                            data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a title="' + results[0] + '" class="' + 클래스 + '" href="/w/' + URL_인코딩(results[0]) + '">' + results[1] + '</a>', data, 1)
+
+                            역링크_추가(title, results[0], '')
             else:
                 aa = re.search("^(.*)(#(?:.*))$", result[0])
                 if(aa):
@@ -699,17 +700,16 @@ def 나무마크(title, data):
                         if(result[0] == title):
                             data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<b>' + result[0] + result[1] + '</b>', data, 1)
                         else:
-                            DB_실행("select * from data where title = '" + DB_인코딩(result[0]) + "'")
-                            rows = DB_가져오기()
-                            if(rows):
-                                data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a href="/w/' + URL_인코딩(result[0]) + result[1] + '">' + result[0] + result[1] + '</a>', data, 1)
+                            DB_실행("select title from data where title = '" + DB_인코딩(result[0]) + "'")
+                            있나 = DB_가져오기()
+                            if(있나):
+                                클래스 = 'not_thing'
                             else:
-                                data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a class="not_thing" href="/w/' + URL_인코딩(result[0]) + result[1] + '">' + result[0] + result[1] + '</a>', data, 1)
-                            DB_실행("select * from back where title = '" + DB_인코딩(result[0]) + "' and link = '" + DB_인코딩(title) + "'")
-                            rows = DB_가져오기()
-                            if(not rows):
-                                DB_실행("insert into back (title, link, type) value ('" + DB_인코딩(result[0]) + "', '" + DB_인코딩(title) + "', '')")
-                                DB_갱신()
+                                클래스 = ''
+
+                            data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a href="/w/' + URL_인코딩(result[0]) + result[1] + '" class="' + 클래스 + '">' + result[0] + result[1] + '</a>', data, 1)
+                            
+                            역링크_추가(title, result[0], '')
                 else:
                     b = re.search("^http(?:s)?:\/\/", result[0])
                     if(b):
@@ -724,22 +724,22 @@ def 나무마크(title, data):
                         if(result[0] == title):
                             data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<b>' + result[0] + '</b>', data, 1)
                         else:
-                            DB_실행("select * from data where title = '" + DB_인코딩(result[0]) + "'")
-                            rows = DB_가져오기()
-                            if(rows):
-                                data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a href="/w/' + URL_인코딩(result[0]) + '">' + result[0] + '</a>', data, 1)
+                            DB_실행("select title from data where title = '" + DB_인코딩(result[0]) + "'")
+                            있나 = DB_가져오기()
+                            if(있나):
+                                클래스 = 'not_thing'
                             else:
-                                data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a class="not_thing" href="/w/' + URL_인코딩(result[0]) + '">' + result[0] + '</a>', data, 1)
-                            DB_실행("select * from back where title = '" + DB_인코딩(result[0]) + "' and link = '" + DB_인코딩(title) + "'")
-                            rows = DB_가져오기()
-                            if(not rows):
-                                DB_실행("insert into back (title, link, type) value ('" + DB_인코딩(result[0]) + "', '" + DB_인코딩(title) + "', '')")
-                                DB_갱신()
+                                클래스 = ''
+
+                            data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a href="/w/' + URL_인코딩(result[0]) + '" class="' + 클래스 + '">' + result[0] + '</a>', data, 1)
+                            
+                            역링크_추가(title, result[0], '')
         else:
             break
             
     while(True):
-        m = re.search("(http(?:s)?:\/\/(?:(?:(?:(?!\.[Jj][Pp][Gg]|\.[Pp][Nn][Gg]|\.[Gg][Ii][Ff]|\.[Jj][Pp][Ee][Gg]|#[Jj][Pp][Gg]#|#[Pp][Nn][Gg]#|#[Gg][Ii][Ff]#|#[Jj][Pp][Ee][Gg]#|<\/(?:[^>]*)>).)*)(?:\.[Jj][Pp][Gg]|\.[Pp][Nn][Gg]|\.[Gg][Ii][Ff]|\.[Jj][Pp][Ee][Gg])))(?:(?:(?:\?)width=((?:[0-9]*)(?:px|%)?))?(?:(?:\?|&)height=((?:[0-9]*)(?:px|%)?))?(?:(?:&)width=((?:[0-9]*)(?:px|%)?))?)?", data)
+        문법_컴파일 = re.compile("(http(?:s)?:\/\/(?:(?:(?:(?!\.[Jj][Pp][Gg]|\.[Pp][Nn][Gg]|\.[Gg][Ii][Ff]|\.[Jj][Pp][Ee][Gg]|#[Jj][Pp][Gg]#|#[Pp][Nn][Gg]#|#[Gg][Ii][Ff]#|#[Jj][Pp][Ee][Gg]#|<\/(?:[^>]*)>).)*)(?:\.[Jj][Pp][Gg]|\.[Pp][Nn][Gg]|\.[Gg][Ii][Ff]|\.[Jj][Pp][Ee][Gg])))(?:(?:(?:\?)width=((?:[0-9]*)(?:px|%)?))?(?:(?:\?|&)height=((?:[0-9]*)(?:px|%)?))?")
+        m = 문법_컴파일.search(data)
         if(m):
             result = m.groups()
             if(result[1]):
@@ -750,18 +750,16 @@ def 나무마크(title, data):
                     width = result[1]
                     height = ''
             elif(result[2]):
-                if(result[3]):
-                    height = result[2]
-                    width = result[3]
-                else:
-                    height = result[2]
-                    width = ''
+                height = result[2]
+                width = ''
             else:
                 width = ''
                 height = ''
+
             c = result[0]
             c = re.sub("\.(?P<in>[Jj][Pp][Gg]|[Pp][Nn][Gg]|[Gg][Ii][Ff]|[Jj][Pp][Ee][Gg])", "#\g<in>#", c)
-            data = re.sub("(http(?:s)?:\/\/(?:(?:(?:(?!\.[Jj][Pp][Gg]|\.[Pp][Nn][Gg]|\.[Gg][Ii][Ff]|\.[Jj][Pp][Ee][Gg]|#[Jj][Pp][Gg]#|#[Pp][Nn][Gg]#|#[Gg][Ii][Ff]#|#[Jj][Pp][Ee][Gg]#|<\/(?:[^>]*)>).)*)(?:\.[Jj][Pp][Gg]|\.[Pp][Nn][Gg]|\.[Gg][Ii][Ff]|\.[Jj][Pp][Ee][Gg])))(?:(?:(?:\?)width=((?:[0-9]*)(?:px|%)?))?(?:(?:\?|&)height=((?:[0-9]*)(?:px|%)?))?(?:(?:&)width=((?:[0-9]*)(?:px|%)?))?)?", "<img width='" + width + "' height='" + height + "' src='" + c + "'>", data, 1)
+            
+            data = 문법_컴파일.sub("<img width='" + width + "' height='" + height + "' src='" + c + "'>", data, 1)
         else:
             break
             
@@ -770,6 +768,7 @@ def 나무마크(title, data):
         if(m):
             result = m.groups()
             end = str(result[0])
+
             while(True):
                 isspace = re.search("( +)\*\s([^\n]*)", end)
                 if(isspace):
@@ -778,15 +777,14 @@ def 나무마크(title, data):
                     end = re.sub("( +)\*\s([^\n]*)", "<li style='margin-left:" + str(up) + "px'>" + spacebar[1] + "</li>", end, 1)
                 else:
                     break
+
             end = re.sub("\n", '', end)
             data = re.sub("(?:(?:(?:( +)\*\s([^\n]*))\n?)+)", '<ul id="list">' + end + '</ul>', data, 1)
         else:
             break
     
     data = re.sub('\[date\]', 시간(), data)
-    
     data = re.sub("#(?P<in>[Jj][Pp][Gg]|[Pp][Nn][Gg]|[Gg][Ii][Ff]|[Jj][Pp][Ee][Gg])#", ".\g<in>", data)
-    
     data = re.sub("-{4,11}", "<hr>", data)
     
     while(True):
@@ -807,18 +805,23 @@ def 나무마크(title, data):
             if(results[0]):
                 c = results[1]
                 c = re.sub("<(?:[^>]*)>", '', c)
+
                 tou = tou + "<span class='footnote-list'><a href=\"#rfn-" + str(a) + "\" id=\"fn-" + str(a) + "\">[" + results[0] + "]</a> " + results[1] + "</span><br>"
                 data = re.sub("\[\*([^\s]*)\s(((?!\]).)*)\]", "<sup><a class=\"footnotes\" title=\"" + c + "\" id=\"rfn-" + str(a) + "\" href=\"#fn-" + str(a) + "\">[" + results[0] + "]</a></sup>", data, 1)
             else:
                 c = results[1]
                 c = re.sub("<(?:[^>]*)>", '', c)
+
                 tou = tou + "<span class='footnote-list'><a href=\"#rfn-" + str(a) + "\" id=\"fn-" + str(a) + "\">[" + str(a) + "]</a> " + results[1] + "</span><br>"
                 data = re.sub("\[\*([^\s]*)\s(((?!\]).)*)\]", '<sup><a class="footnotes" title="' + c + '" id="rfn-' + str(a) + '" href="#fn-' + str(a) + '">[' + str(a) + ']</a></sup>', data, 1)
+
             a = a + 1
         else:
             tou = tou + '</div>'
+
             if(tou == "<hr id='footnote'><div class='wiki-macro-footnote'><br></div>"):
                 tou = ""
+
             break
     
     data = re.sub("\[각주\](?:(?:<br>| |\r|\n)+)?$", "", data)
@@ -861,12 +864,13 @@ def 나무마크(title, data):
                     alltable = ''
                     result = a.groups()
                     if(result[1]):
-                        q = re.search("&lt;table\s?width=((?:(?!&gt;).)*)&gt;", result[1])
-                        w = re.search("&lt;table\s?height=((?:(?!&gt;).)*)&gt;", result[1])
-                        e = re.search("&lt;table\s?align=((?:(?!&gt;).)*)&gt;", result[1])
                         alltable = 'style="'
                         celstyle = 'style="'
                         rowstyle = 'style="'
+
+                        q = re.search("&lt;table\s?width=((?:(?!&gt;).)*)&gt;", result[1])
+                        w = re.search("&lt;table\s?height=((?:(?!&gt;).)*)&gt;", result[1])
+                        e = re.search("&lt;table\s?align=((?:(?!&gt;).)*)&gt;", result[1])
                         if(q):
                             resultss = q.groups()
                             alltable = alltable + 'width:' + resultss[0] + ';'
@@ -897,7 +901,8 @@ def 나무마크(title, data):
                             resultss = r.groups()
                             cel = 'colspan="' + resultss[0] + '"'
                         else:
-                            cel = 'colspan="' + str(round(len(result[0]) / 2)) + '"'    
+                            cel = 'colspan="' + str(round(len(result[0]) / 2)) + '"'   
+
                         t = re.search("&lt;\|((?:(?!&gt;).)*)&gt;", result[1])
                         if(t):
                             resultss = t.groups()
@@ -1007,6 +1012,7 @@ def 나무마크(title, data):
                     cel = ''
                     celstyle = ''
                     rowstyle = ''
+
                     result = b.groups()
                     if(result[1]):
                         celstyle = 'style="'
@@ -1018,6 +1024,7 @@ def 나무마크(title, data):
                             cel = 'colspan="' + resultss[0] + '"'
                         else:
                             cel = 'colspan="' + str(round(len(result[0]) / 2)) + '"'
+
                         t = re.search("&lt;\|((?:(?!&gt;).)*)&gt;", result[1])
                         if(t):
                             resultss = t.groups()
@@ -1097,6 +1104,7 @@ def 나무마크(title, data):
                     row = ''
                     cel = ''
                     celstyle = ''
+
                     result = c.groups()
                     if(result[1]):
                         celstyle = 'style="'
@@ -1174,7 +1182,8 @@ def 나무마크(title, data):
     data = re.sub('<\/blockquote>((\r)?\n){2}<blockquote>', '</blockquote><br><blockquote>', data)
     data = re.sub('\n', '<br>', data)
     data = re.sub('^<br>', '', data)
-    return str(data)
+    
+    return data
 
 def 아이피_확인():
     if(session.get('Now') == True):
