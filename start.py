@@ -3485,7 +3485,7 @@ def 사용자():
         acl = '차단'
         
     if(not re.search('\.', 아이피)):
-        DB_실행("select * from data where title = '사용자:" + DB_인코딩(ip) + "'")
+        DB_실행("select * from data where title = '사용자:" + DB_인코딩(아이피) + "'")
         row = DB_가져오기()
         if(row):
             아이피 = '<a href="/w/' + URL_인코딩('사용자:' + 아이피) + '">' + 아이피 + '</a>'
