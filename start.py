@@ -96,6 +96,15 @@ def 시작():
 
 conn = pymysql.connect(host = data['host'], user = data['user'], password = data['pw'], charset = 'utf8mb4')
 curs = conn.cursor(pymysql.cursors.DictCursor)
+
+def DB_갱신():
+    conn.commit()
+
+def URL_인코딩(데이터):
+    return parse.quote(데이터).replace('/','%2F')
+    
+def DB_가져오기():
+    return curs.fetchall()
     
 웹_디자인 = render_template
 DB_실행 = curs.execute
