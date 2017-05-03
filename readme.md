@@ -2,7 +2,7 @@
 오픈나무 정식 버전 입니다. 파이썬 플라스크 기반으로 돌아 갑니다.
 
 ## 설치법
-set 폴더에 있는 set.json을 폴더 밖으로 꺼내고 json 내용을 수정하고 app.py를 파이썬 3.x 버전으로 실행하면 됩니다. (파이썬 3.6을 권장 합니다.)
+set 폴더에 있는 set.json을 폴더 밖으로 꺼내고 json 내용을 수정하고 start.py를 파이썬 3.x 버전으로 실행하면 됩니다. (파이썬 3.6을 권장 합니다.)
 
 등등등등
 
@@ -45,6 +45,6 @@ set 폴더에 있는 set.json을 폴더 밖으로 꺼내고 json 내용을 수�
 오픈나무를 키고 회원 가입으로 가서 owner 이름으로 설정 한 이름으로 가입 합니다.
 
 ## 기타
-만약 위키가 자꾸 터질시 MySQL이나 MariaDB의 my.ini나 my.cnf에 wait_timeout 값을 아주 큰 값으로 해주고 skip-name-resolve를 추가 하면 위키가 안 터집니다.
+만약 위키가 자꾸 터질시 MySQL이나 MariaDB의 my.ini나 my.cnf에 wait_timeout 값을 아주 큰 값으로 해주면 위키가 안 터집니다.
 
-lower_case_table_names 값을 0 으로하면 대소문자 구분하고 1로 하면 대소문자를 구분하지 않습니다.
+lower_case_table_names 값을 0 으로하면 대소문자 구분하고 1로 하면 대소문자를 구분하지 않습니다. (단 버그 존재 가능)
