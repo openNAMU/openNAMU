@@ -1113,7 +1113,7 @@ def section_edit(name = None, num = None):
         if(can == 1):
             return '<meta http-equiv="refresh" content="0;url=/ban" />'
         else:
-            db_ex("select * from data where title = '" + db_pas(data["help"]) + "'")
+            db_ex("select * from data where title = '" + db_pas(set_data["help"]) + "'")
             rows = db_get()
             if(rows):
                 newdata = re.sub('^#(?:[Rr][Ee][Dd][Ii][Rr][Ee][Cc][Tt]|넘겨주기)\s(?P<in>[^\n]*)', ' * [[\g<in>]] 문서로 넘겨주기', rows[0]["data"])
