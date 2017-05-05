@@ -1500,7 +1500,7 @@ def topic(name = None, sub = None):
         else:
             div = '<div>'
         
-        if(닫음 or 정지):
+        if(stop or close):
             if(not admin == 1):
                 style = 'display:none;'
         
