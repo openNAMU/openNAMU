@@ -188,7 +188,7 @@ def mid_pas(data, fol_num, include):
             
     return (data, fol_num)
 
-def backlink_plust(name, link, type):
+def backlink_plus(name, link, type):
     db_ex("select title from back where title = '" + db_pas(link) + "' and link = '" + db_pas(name) + "' and type = '" + type + "'")
     y = db_get()
     if(not y):
