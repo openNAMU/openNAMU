@@ -113,7 +113,7 @@ def mid_pas(data, fol_num, include):
             html = html_a.search(a[0])
             
             fol_a = re.compile("^#!folding\s((?:(?!\n).)*)\n?\s\n(.*)$", re.DOTALL)
-            flo = fol_a.search(a[0])
+            fol = fol_a.search(a[0])
             
             if(big):
                 result = big.groups()
