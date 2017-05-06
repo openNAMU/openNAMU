@@ -192,7 +192,7 @@ def backlink_plus(name, link, type):
     db_ex("select title from back where title = '" + db_pas(link) + "' and link = '" + db_pas(name) + "' and type = '" + type + "'")
     y = db_get()
     if(not y):
-        db_ex("insert into back (title, link, type) value ('" + db_pas(link) + "', '" + db_pas(name) + "',  'include')")
+        db_ex("insert into back (title, link, type) value ('" + db_pas(link) + "', '" + db_pas(name) + "',  '" + type + "')")
         db_com()
 
 def cat_plus(name, link):

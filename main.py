@@ -428,6 +428,7 @@ def backlink(name = None, num = None):
             except:
                 if(num != 1):
                     div = div + '<br><a href="/backlink/n/' + str(num - 1) + '">(이전)'
+                
                 break
                 
             if(rows[i]['type'] == 'include'):
@@ -448,7 +449,7 @@ def backlink(name = None, num = None):
                     data = re.sub('^#(?:[Rr][Ee][Dd][Ii][Rr][Ee][Cc][Tt]|넘겨주기)\s(?P<in>[^\n]*)', '[[\g<in>]]', data)
                     data = namumark('', data)
                     
-                    if(re.search("<a(?:(?:(?!href=).)*)?href=\"\/w\/" + url_pas(name) + "(?:\#[^\"]*)?\">([^<]*)<\/a>", data)):
+                    if(re.search("<a(?:(?:(?!href=).)*)?href=\"\/w\/" + url_pas(name) + "(?:\#[^\"]*)?\"(?:(?:(?!>).)*)?>([^<]*)<\/a>", data)):
                         div = div + '<li><a href="/w/' + url_pas(rows[i]['link']) + '">' + rows[i]['link'] + '</a>'
                         
                         if(rows[i]['type']):
