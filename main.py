@@ -834,7 +834,7 @@ def read_view(name = None, redirect = None):
         
         return web_render('index.html', login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), data = namumark(name, elsedata) + div, license = set_data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, redirect = redirect, admin = admin_memu), 404
         
-@app.route('/w/<path:name>/r/<int:number>')
+@app.route('/w/<path:name>/r/<int:num>')
 def old_view(name = None, num = None):
     db_ex("select * from hidhi where title = '" + db_pas(name) + "' and re = '" + db_pas(str(num)) + "'")
     row = db_get()
