@@ -11,9 +11,6 @@ import os
 import difflib
 import hashlib
 
-from func import *
-from mark import *
-
 json_data = open('set.json').read()
 set_data = json.loads(json_data)
 
@@ -118,6 +115,9 @@ except:
     db_ex("alter database " + set_data['db'] + " character set = utf8mb4 collate = utf8mb4_unicode_ci")
     
 start()
+
+from func import *
+from mark import *
 
 app.secret_key = hashlib.sha512(bytes(set_data['key'], 'ascii')).hexdigest()
 
@@ -495,8 +495,8 @@ def backlink(name = None, num = None):
                         db_ex("delete from back where title = '" + db_pas(name) + "' and link = '" + db_pas(rows[i]['link']) + "'")
                         db_com()
                         
-                    i += 1
-                    v += 1
+                        i += 1
+                        v += 1
                 else:
                     db_ex("delete from back where title = '" + db_pas(name) + "' and link = '" + db_pas(rows[i]['link']) + "'")
                     db_com()
