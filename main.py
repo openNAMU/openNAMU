@@ -444,6 +444,9 @@ def backlink(name = None, num = None):
     div = ''
     restart = 0
     
+    db_ex("delete from back where title = '" + db_pas(name) + "' and link = ''")
+    db_com()
+    
     db_ex("select * from back where title = '" + db_pas(name) + "' order by link asc")
     rows = db_get()
     if(rows):        
