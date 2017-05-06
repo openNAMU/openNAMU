@@ -412,6 +412,31 @@ def user_log(number = None):
     else:
         return web_render('index.html', login = login_check(), logo = set_data['name'], data = '', title = '유저 가입 기록')
         
+@app.route('/backreset')
+def backlink_reset():
+    if(owner_check() == 1):
+        i = 0
+        
+        db_ex("delete from back")
+        db_com()
+        
+        db_ex("select * from data")
+        all = db_get()
+        if(all):
+            while(True):
+                try:
+                    a = all[i]
+                except:
+                    break
+                
+                namumark(all[i]['title'], all[i]['data'])
+                
+                i += 1
+        
+        return web_render('index.html', login = login_check(), logo = set_data['name'], data = '에러 없음', title = '완료')
+    else:
+        return '<meta http-equiv="refresh" content="0;url=/error/3" />'
+        
 @app.route('/backlink/<path:name>/n/<int:num>')
 def backlink(name = None, num = None):
     v = num * 50
@@ -1276,7 +1301,7 @@ def other():
 @app.route('/manager/<int:num>', methods=['POST', 'GET'])
 def manager(num = None):
     if(num == 1):
-        return web_render('index.html', login = login_check(), title = '관리자 메뉴', logo = set_data['name'], data = '<h2 style="margin-top: 0px;">관리자 및 소유자</h2><li><a href="/manager/2">문서 ACL</a></li><li><a href="/manager/3">유저 체크</a></li><li><a href="/manager/4">유저 차단</a></li><h2>소유자</h2><li><a href="/manager/5">관리자 권한 주기</a></li><h2>기타</h2><li>이 메뉴에 없는 기능은 해당 문서의 역사나 토론에서 바로 사용 가능함</li>')
+        return web_render('index.html', login = login_check(), title = '관리자 메뉴', logo = set_data['name'], data = '<h2 style="margin-top: 0px;">관리자 및 소유자</h2><li><a href="/manager/2">문서 ACL</a></li><li><a href="/manager/3">유저 체크</a></li><li><a href="/manager/4">유저 차단</a></li><h2>소유자</h2><li><a href="/backreset">모든 역링크 재 생성</a></li><li><a href="/manager/5">관리자 권한 주기</a></li><h2>기타</h2><li>이 메뉴에 없는 기능은 해당 문서의 역사나 토론에서 바로 사용 가능함</li>')
     elif(num == 2):
         if(request.method == 'POST'):
             return '<meta http-equiv="refresh" content="0;url=/acl/' + url_pas(request.form["name"]) + '" />'
