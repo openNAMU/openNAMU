@@ -889,7 +889,7 @@ def old_raw(name = None, num = None):
                 
                 enddata = '<pre>' + enddata + '</pre>'
                 
-                return web_render('index.html', login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), data = enddata)
+                return web_render('index.html', login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), data = enddata, sub = '옛 Raw')
             else:
                 return '<meta http-equiv="refresh" content="0;url=/history/' + url_pas(name) + '" />'
         else:
@@ -904,7 +904,7 @@ def old_raw(name = None, num = None):
             
             enddata = '<pre>' + enddata + '</pre>'
             
-            return web_render('index.html', login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), data = enddata)
+            return web_render('index.html', login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), data = enddata, sub = '옛 Raw')
         else:
             return '<meta http-equiv="refresh" content="0;url=/history/' + url_pas(name) + '" />'
             
