@@ -388,9 +388,9 @@ def user_record(name = None, num = None):
 
             i += 1
                 
-        return web_render('index.html', login = login_check(), logo = set_data['name'], rows = div, tn = 3, title = '유저 기록')
+        return web_render('index.html', login = login_check(), logo = set_data['name'], rows = div, tn = 3, title = '사용자 기록')
     else:
-        return web_render('index.html', login = login_check(), logo = set_data['name'], rows = '', tn = 3, title = '유저 기록')
+        return web_render('index.html', login = login_check(), logo = set_data['name'], rows = '', tn = 3, title = '사용자 기록')
         
 @app.route('/userlog/n/<int:number>')
 def user_log(number = None):
@@ -437,9 +437,9 @@ def user_log(number = None):
             else:
                 j += 1
                 
-        return web_render('index.html', login = login_check(), logo = set_data['name'], data = list, title = '유저 가입 기록')
+        return web_render('index.html', login = login_check(), logo = set_data['name'], data = list, title = '사용자 가입 기록')
     else:
-        return web_render('index.html', login = login_check(), logo = set_data['name'], data = '', title = '유저 가입 기록')
+        return web_render('index.html', login = login_check(), logo = set_data['name'], data = '', title = '사용자 가입 기록')
         
 @app.route('/backreset')
 def backlink_reset():
@@ -579,6 +579,54 @@ def recent_discuss():
         return web_render('index.html', login = login_check(), logo = set_data['name'], rows = div, tn = 12, title = '최근 토론내역')
     else:
         return web_render('index.html', login = login_check(), logo = set_data['name'], rows = '', tn = 12, title = '최근 토론내역')
+
+@app.route('/blocklog/n/<int:number>')
+def blocklog(number = None):
+    v = number * 50
+    i = v - 50
+    div = '<div>'
+    
+    db_ex("select * from rb order by today desc")
+    rows = db_get()
+    if(rows):
+        while(True):
+            try:
+                a = rows[i]
+            except:
+                div = div + '</div>'
+                
+                if(number != 1):
+                    div = div + '<br><a href="/blocklog/n/' + str(number - 1) + '">(이전)'
+                    
+                break
+                
+            why = rows[i]['why']
+            why = re.sub('<', '&lt;', why)
+            why = re.sub('>', '&gt;', why)
+            
+            b = re.search("^([0-9](?:[0-9]?[0-9]?)\.[0-9](?:[0-9]?[0-9]?))$", rows[i]['block'])
+            if(b):
+                ip = rows[i]['block'] + ' (대역)'
+            else:
+                ip = rows[i]['block']
+                
+            div = div + '<table style="width: 100%;"><tbody><tr><td style="text-align: center;width:20%;">' + ip + '</a></td><td style="text-align: center;width:20%;">' + rows[i]['blocker'] + '</td><td style="text-align: center;width:20%;">' + rows[i]['end'] + '</td><td style="text-align: center;width:20%;">' + rows[i]['why'] + '</td><td style="text-align: center;width:20%;">' + rows[i]['today'] + '</td></tr></tbody></table>'
+            
+            if(i == v):
+                div = div + '</div>'
+                
+                if(number == 1):
+                    div = div + '<br><a href="/blocklog/n/' + str(number + 1) + '">(다음)'
+                else:
+                    div = div + '<br><a href="/blocklog/n/' + str(number - 1) + '">(이전) <a href="/blocklog/n/' + str(number + 1) + '">(다음)'
+                    
+                break
+            else:
+                i += 1
+                
+        return web_render('index.html', login = login_check(), logo = set_data['name'], rows = div, tn = 20, title = '사용자 차단 기록')
+    else:
+        return web_render('index.html', login = login_check(), logo = set_data['name'], rows = '', tn = 20, title = '사용자 차단 기록')
         
 @app.route('/history/<path:name>/n/<int:num>', methods=['POST', 'GET'])
 def history_view(name = None, num = None):
@@ -834,7 +882,7 @@ def read_view(name = None, redirect = None):
         if(rows[0]['acl'] == 'admin'):
             acl = '(관리자)'
         elif(rows[0]['acl'] == 'user'):
-            acl = '(유저)'
+            acl = '(로그인)'
         else:
             if(not acl):
                 acl = ''
@@ -1328,12 +1376,12 @@ def move(name = None):
             
 @app.route('/other')
 def other():
-    return web_render('index.html', login = login_check(), title = '기타 메뉴', logo = set_data['name'], data = '<h2 style="margin-top: 0px;">기록</h2><li><a href="/blocklog/n/1">유저 차단 기록</a></li><li><a href="/userlog/n/1">유저 가입 기록</a></li><li><a href="/manager/6">유저 기록</a></li><h2>기타</h2><li><a href="/titleindex">모든 문서</a></li><li><a href="/acllist">ACL 문서 목록</a></li><li><a href="/upload">업로드</a></li><li><a href="/adminlist">관리자 목록</a></li><li><a href="/manager/1">관리자 메뉴</a></li><br>이 오픈나무의 버전은 <a href="https://github.com/2DU/openNAMU/blob/master/version.md">1.9.1</a> 입니다.')
+    return web_render('index.html', login = login_check(), title = '기타 메뉴', logo = set_data['name'], data = '<h2 style="margin-top: 0px;">기록</h2><li><a href="/blocklog/n/1">사용자 차단 기록</a></li><li><a href="/userlog/n/1">사용자 가입 기록</a></li><li><a href="/manager/6">사용자 기록</a></li><h2>기타</h2><li><a href="/titleindex">모든 문서</a></li><li><a href="/acllist">ACL 문서 목록</a></li><li><a href="/upload">업로드</a></li><li><a href="/adminlist">관리자 목록</a></li><li><a href="/manager/1">관리자 메뉴</a></li><br>이 오픈나무의 버전은 <a href="https://github.com/2DU/openNAMU/blob/master/version.md">1.9.1</a> 입니다.')
     
 @app.route('/manager/<int:num>', methods=['POST', 'GET'])
 def manager(num = None):
     if(num == 1):
-        return web_render('index.html', login = login_check(), title = '관리자 메뉴', logo = set_data['name'], data = '<h2 style="margin-top: 0px;">관리자 및 소유자</h2><li><a href="/manager/2">문서 ACL</a></li><li><a href="/manager/3">유저 체크</a></li><li><a href="/manager/4">유저 차단</a></li><h2>소유자</h2><li><a href="/backreset">모든 역링크 재 생성</a></li><li><a href="/manager/5">관리자 권한 주기</a></li><h2>기타</h2><li>이 메뉴에 없는 기능은 해당 문서의 역사나 토론에서 바로 사용 가능함</li>')
+        return web_render('index.html', login = login_check(), title = '관리자 메뉴', logo = set_data['name'], data = '<h2 style="margin-top: 0px;">관리자 및 소유자</h2><li><a href="/manager/2">문서 ACL</a></li><li><a href="/manager/3">사용자 체크</a></li><li><a href="/manager/4">사용자 차단</a></li><h2>소유자</h2><li><a href="/backreset">모든 역링크 재 생성</a></li><li><a href="/manager/5">관리자 권한 주기</a></li><h2>기타</h2><li>이 메뉴에 없는 기능은 해당 문서의 역사나 토론에서 바로 사용 가능함</li>')
     elif(num == 2):
         if(request.method == 'POST'):
             return '<meta http-equiv="refresh" content="0;url=/acl/' + url_pas(request.form["name"]) + '" />'
@@ -2032,7 +2080,7 @@ def acl(name = None):
                 if(row[0]['acl'] == 'admin'):
                     now = '관리자만'
                 elif(row[0]['acl'] == 'user'):
-                    now = '유저 이상'
+                    now = '로그인 이상'
                 else:
                     now = '일반'
                     
@@ -2177,7 +2225,7 @@ def user_info():
                 else:
                     acl = '소유자'
             else:
-                acl = '유저'
+                acl = '로그인'
         else:
             acl = '일반'
     else:
@@ -2185,7 +2233,7 @@ def user_info():
         
     ip = ip_pas(ip)
         
-    return web_render('index.html', login = login_check(), title = '유저 메뉴', logo = set_data['name'], data = ip + '<br><br><span>권한 상태 : ' + acl + '<h2>로그인 관련</h2><li><a href="/login">로그인</a></li><li><a href="/logout">로그아웃</a></li><li><a href="/register">회원가입</a></li><h2>기타</h2><li><a href="/change">비밀번호 변경</a></li><li><a href="/count">기여 횟수</a></li><li><a href="/record/' + raw_ip + '/n/1">기여 목록</a></li>')
+    return web_render('index.html', login = login_check(), title = '사용자 메뉴', logo = set_data['name'], data = ip + '<br><br><span>권한 상태 : ' + acl + '<h2>로그인 관련</h2><li><a href="/login">로그인</a></li><li><a href="/logout">로그아웃</a></li><li><a href="/register">회원가입</a></li><h2>기타</h2><li><a href="/change">비밀번호 변경</a></li><li><a href="/count">기여 횟수</a></li><li><a href="/record/' + raw_ip + '/n/1">기여 목록</a></li>')
     
 @app.route('/count')
 def count_edit():
@@ -2217,9 +2265,9 @@ def 오류(num = None):
     elif(num == 4):
         return web_render('index.html', login = login_check(), title = '권한 오류', logo = set_data['name'], data = '관리자는 차단, 검사 할 수 없습니다.'), 401
     elif(num == 5):
-        return web_render('index.html', login = login_check(), title = '유저 오류', logo = set_data['name'], data = '그런 계정이 없습니다.'), 401
+        return web_render('index.html', login = login_check(), title = '사용자 오류', logo = set_data['name'], data = '그런 계정이 없습니다.'), 401
     elif(num == 6):
-        return web_render('index.html', login = login_check(), title = '가입 오류', logo = set_data['name'], data = '동일한 아이디의 유저가 있습니다.'), 401
+        return web_render('index.html', login = login_check(), title = '가입 오류', logo = set_data['name'], data = '동일한 아이디의 사용자가 있습니다.'), 401
     elif(num == 7):
         return web_render('index.html', login = login_check(), title = '가입 오류', logo = set_data['name'], data = '아이디는 20글자보다 짧아야 합니다.'), 401
     elif(num == 8):
