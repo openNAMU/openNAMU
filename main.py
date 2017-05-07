@@ -474,7 +474,7 @@ def backlink(name = None, num = None):
                 if(row):
                     data = row[0]['data']
                     data = re.sub("(?P<in>\[include\((?P<out>(?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\])", "\g<in>\n\n[[\g<out>]]\n\n", data)
-                    data = re.sub('^#(?:[Rr][Ee][Dd][Ii][Rr][Ee][Cc][Tt]|넘겨주기)\s(?P<in>[^\n]*)', '[[\g<in>]]', data)
+                    data = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', '[[\g<in>]]', data)
                     data = namumark('', data)
                     
                     if(re.search("<a(?:(?:(?!href=).)*)?href=\"\/w\/" + url_pas(name) + "(?:\#[^\"]*)?\"(?:(?:(?!>).)*)?>([^<]*)<\/a>", data)):
@@ -832,7 +832,7 @@ def read_view(name = None, redirect = None):
             elsedata = rows[0]['data']
                 
         if(redirect):
-            elsedata = re.sub("^#(?:[Rr][Ee][Dd][Ii][Rr][Ee][Cc][Tt]|넘겨주기)\s(?P<in>[^\n]*)", " * [[\g<in>]] 문서로 넘겨주기", elsedata)
+            elsedata = re.sub("^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)", " * [[\g<in>]] 문서로 넘겨주기", elsedata)
                 
         enddata = namumark(name, elsedata)
         
@@ -859,7 +859,7 @@ def read_view(name = None, redirect = None):
             elsedata = '문서 없음'
             
         if(redirect):
-            elsedata = re.sub("^#(?:[Rr][Ee][Dd][Ii][Rr][Ee][Cc][Tt]|넘겨주기)\s(?P<in>[^\n]*)", " * [[\g<in>]] 문서로 넘겨주기", elsedata)
+            elsedata = re.sub("^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)", " * [[\g<in>]] 문서로 넘겨주기", elsedata)
         
         return web_render('index.html', login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), data = namumark(name, elsedata) + div, license = set_data['license'], tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, redirect = redirect, admin = admin_memu), 404
         
@@ -1090,7 +1090,7 @@ def edit(name = None):
             db_ex("select * from data where title = '" + db_pas(set_data["help"]) + "'")
             rows = db_get()
             if(rows):
-                newdata = re.sub('^#(?:[Rr][Ee][Dd][Ii][Rr][Ee][Cc][Tt]|넘겨주기)\s(?P<in>[^\n]*)', ' * [[\g<in>]] 문서로 넘겨주기', rows[0]["data"])
+                newdata = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', ' * [[\g<in>]] 문서로 넘겨주기', rows[0]["data"])
                 left = namumark(name, newdata)
             else:
                 left = ''
@@ -1145,7 +1145,7 @@ def section_edit(name = None, num = None):
             db_ex("select * from data where title = '" + db_pas(set_data["help"]) + "'")
             rows = db_get()
             if(rows):
-                newdata = re.sub('^#(?:[Rr][Ee][Dd][Ii][Rr][Ee][Cc][Tt]|넘겨주기)\s(?P<in>[^\n]*)', ' * [[\g<in>]] 문서로 넘겨주기', rows[0]["data"])
+                newdata = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', ' * [[\g<in>]] 문서로 넘겨주기', rows[0]["data"])
                 
                 left = namumark(name, newdata)
             else:
@@ -1193,13 +1193,13 @@ def preview(name = None):
         return '<meta http-equiv="refresh" content="0;url=/ban" />'
     else:            
         newdata = request.form["content"]
-        newdata = re.sub('^#(?:[Rr][Ee][Dd][Ii][Rr][Ee][Cc][Tt]|넘겨주기)\s(?P<in>[^\n]*)', ' * [[\g<in>]] 문서로 넘겨주기', newdata)
+        newdata = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', ' * [[\g<in>]] 문서로 넘겨주기', newdata)
         enddata = namumark(name, newdata)
         
         db_ex("select * from data where title = '" + db_pas(set_data["help"]) + "'")
         rows = db_get()
         if(rows):
-            newdata = re.sub('^#(?:[Rr][Ee][Dd][Ii][Rr][Ee][Cc][Tt]|넘겨주기)\s(?P<in>[^\n]*)', ' * [[\g<in>]] 문서로 넘겨주기', rows[0]["data"])
+            newdata = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', ' * [[\g<in>]] 문서로 넘겨주기', rows[0]["data"])
             
             left = namumark(name, newdata)
         else:
@@ -1216,13 +1216,13 @@ def section_preview(name = None, num = None):
         return '<meta http-equiv="refresh" content="0;url=/ban" />'
     else:            
         newdata = request.form["content"]
-        newdata = re.sub('^#(?:[Rr][Ee][Dd][Ii][Rr][Ee][Cc][Tt]|넘겨주기)\s(?P<in>[^\n]*)', ' * [[\g<in>]] 문서로 넘겨주기', newdata)
+        newdata = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', ' * [[\g<in>]] 문서로 넘겨주기', newdata)
         enddata = namumark(name, newdata)
         
         db_ex("select * from data where title = '" + db_pas(set_data["help"]) + "'")
         rows = db_get()
         if(rows):
-            newdata = re.sub('^#(?:[Rr][Ee][Dd][Ii][Rr][Ee][Cc][Tt]|넘겨주기)\s(?P<in>[^\n]*)', ' * [[\g<in>]] 문서로 넘겨주기', rows[0]["data"])
+            newdata = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', ' * [[\g<in>]] 문서로 넘겨주기', rows[0]["data"])
             left = namumark(name, newdata)
         else:
             left = ''

@@ -250,7 +250,7 @@ def namumark(title, data):
             break
     
     while(True):
-        m = re.search('^#(?:[Rr][Ee][Dd][Ii][Rr][Ee][Cc][Tt]|넘겨주기)\s([^\n]*)', data)
+        m = re.search('^#(?:redirect|넘겨주기)\s([^\n]*)', data)
         if(m):
             results = m.groups()
             aa = re.search("^(.*)(#(?:.*))$", results[0])
@@ -400,7 +400,7 @@ def namumark(title, data):
     
     data = re.sub('\[ruby\((?P<in>[^\|]*)\|(?P<out>[^\)]*)\)\]', '<ruby>\g<in><rp>(</rp><rt>\g<out></rt><rp>)</rp></ruby>', data)
     
-    data = re.sub("##\s?(?P<in>[^\n]*)\n", "<div style='display:none;'>\g<in></div>", data);
+    data = re.sub("##\s?(?P<in>[^\n]*)\n", "<div style='display:none;'>\g<in></div>", data)
     
     while(True):
         m = re.search("\[\[파일:((?:(?!\]\]|\|).)*)(?:\|((?:(?!\]\]).)*))?\]\]", data)
