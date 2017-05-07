@@ -1196,7 +1196,7 @@ def preview(name = None):
         newdata = re.sub('^#(?:[Rr][Ee][Dd][Ii][Rr][Ee][Cc][Tt]|넘겨주기)\s(?P<in>[^\n]*)', ' * [[\g<in>]] 문서로 넘겨주기', newdata)
         enddata = namumark(name, newdata)
         
-        db_ex("select * from data where title = '" + db_pas(data["help"]) + "'")
+        db_ex("select * from data where title = '" + db_pas(set_data["help"]) + "'")
         rows = db_get()
         if(rows):
             newdata = re.sub('^#(?:[Rr][Ee][Dd][Ii][Rr][Ee][Cc][Tt]|넘겨주기)\s(?P<in>[^\n]*)', ' * [[\g<in>]] 문서로 넘겨주기', rows[0]["data"])
@@ -1219,7 +1219,7 @@ def section_preview(name = None, num = None):
         newdata = re.sub('^#(?:[Rr][Ee][Dd][Ii][Rr][Ee][Cc][Tt]|넘겨주기)\s(?P<in>[^\n]*)', ' * [[\g<in>]] 문서로 넘겨주기', newdata)
         enddata = namumark(name, newdata)
         
-        db_ex("select * from data where title = '" + db_pas(data["help"]) + "'")
+        db_ex("select * from data where title = '" + db_pas(set_data["help"]) + "'")
         rows = db_get()
         if(rows):
             newdata = re.sub('^#(?:[Rr][Ee][Dd][Ii][Rr][Ee][Cc][Tt]|넘겨주기)\s(?P<in>[^\n]*)', ' * [[\g<in>]] 문서로 넘겨주기', rows[0]["data"])
