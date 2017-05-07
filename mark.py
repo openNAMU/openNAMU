@@ -364,7 +364,7 @@ def namumark(title, data):
                 cat_plus(title, g[0])
                     
                 if(category == ''):
-                    db_ex("select * from data where title = '" + db_pas(g[0]) + "'")
+                    db_ex("select title from data where title = '" + db_pas(g[0]) + "'")
                     exists = db_get()
                     if(exists):
                         red = ""
@@ -373,7 +373,7 @@ def namumark(title, data):
                         
                     category = category + '<a ' + red + ' href="/w/' + url_pas(g[0]) + '">' + re.sub("분류:", "", g[0]) + '</a>'
                 else:
-                    db_ex("select * from data where title = '" + db_pas(g[0]) + "'")
+                    db_ex("select title from data where title = '" + db_pas(g[0]) + "'")
                     exists = db_get()
                     if(exists):
                         red = ""

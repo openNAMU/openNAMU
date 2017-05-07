@@ -86,7 +86,7 @@ def ip_pas(raw_ip):
     if(yes):
         results = yes.groups()
         
-        db_ex("select * from data where title = '사용자:" + db_pas(results[0]) + "'")
+        db_ex("select title from data where title = '사용자:" + db_pas(results[0]) + "'")
         row = db_get()
         if(row):
             ip = '<a href="/w/' + url_pas('사용자:' + results[0]) + '">' + results[0] + '</a> - ' + results[1] + ' <a href="/record/' + url_pas(results[0]) + '/n/1">(기록)</a>'
@@ -95,7 +95,7 @@ def ip_pas(raw_ip):
     elif(re.search("\.", raw_ip)):
         ip = raw_ip + ' <a href="/record/' + url_pas(raw_ip) + '/n/1">(기록)</a>'
     else:
-        db_ex("select * from data where title = '사용자:" + db_pas(raw_ip) + "'")
+        db_ex("select title from data where title = '사용자:" + db_pas(raw_ip) + "'")
         row = db_get()
         if(row):
             ip = '<a href="/w/' + url_pas('사용자:' + raw_ip) + '">' + raw_ip + '</a> <a href="/record/' + url_pas(raw_ip) + '/n/1">(기록)</a>'
@@ -149,7 +149,7 @@ def acl_check(ip, name):
                 if(rows):
                     return 1
                 else:
-                    db_ex("select * from data where title = '" + db_pas(name) + "'")
+                    db_ex("select acl from data where title = '" + db_pas(name) + "'")
                     row = db_get()
                     if(row):
                         db_ex("select * from user where id = '" + db_pas(ip) + "'")
@@ -177,7 +177,7 @@ def acl_check(ip, name):
             if(rows):
                 return 1
             else:
-                db_ex("select * from data where title = '" + db_pas(name) + "'")
+                db_ex("select acl from data where title = '" + db_pas(name) + "'")
                 row = db_get()
                 if(row):
                     db_ex("select * from user where id = '" + db_pas(ip) + "'")

@@ -164,6 +164,35 @@ def image_get(name = None):
         return send_file(os.path.join('image', name), mimetype='image')
     else:
         return web_render('index.html', login = login_check(), logo = set_data['name'], data = '이미지 없음.', title = '이미지 보기'), 404
+
+@app.route('/acllist')
+def acl_list():
+    data = ''
+    i = 1
+
+    db_ex("select title, acl from data where acl = 'admin' or acl = 'user' order by acl desc")
+    list_data = db_get()
+    if(list_data):
+        while(True):
+            try:
+                a = list_data[i]
+            except:
+                break
+            
+            if(list_data[i]['acl'] == 'admin'):
+                acl = '관리자'
+            else:
+                acl = '로그인'
+
+            data = data + '<li>' + str(i) + '. <a href="/w/' + url_pas(list_data[i]['title']) + '">' + list_data[i]['title'] + '</a> (' + acl + ')</li>'
+
+            i += 1
+
+        data = data + '</div>'
+    else:
+        data = ''
+
+    return web_render('index.html', login = login_check(), logo = set_data['name'], data = data, title = 'ACL 문서 목록')
         
 @app.route('/adminlist')
 def admin_list():
@@ -185,7 +214,7 @@ def admin_list():
             else:
                 acl = '관리자'
 
-            db_ex("select * from data where title = '사용자:" + user_data[i]['id'] + "'")
+            db_ex("select title from data where title = '사용자:" + user_data[i]['id'] + "'")
             user = db_get()
             if(user):
                 name = '<a href="/w/' + url_pas('사용자:' + user_data[i]['id']) + '">' + user_data[i]['id'] + '</a> (' + acl + ')'
@@ -248,7 +277,7 @@ def recent_changes():
             if(re.search('\.', rows[i]['ip'])):
                 ip = rows[i]['ip'] + ' <a href="/record/' + url_pas(rows[i]['ip']) + '/n/1">(기록)</a>'
             else:
-                db_ex("select * from data where title = '사용자:" + db_pas(rows[i]['ip']) + "'")
+                db_ex("select title from data where title = '사용자:" + db_pas(rows[i]['ip']) + "'")
                 row = db_get()
                 if(row):
                     ip = '<a href="/w/' + url_pas('사용자:' + rows[i]['ip']) + '">' + rows[i]['ip'] + '</a> <a href="/record/' + url_pas(rows[i]['ip']) + '/n/1">(기록)</a>'
@@ -335,7 +364,7 @@ def user_record(name = None, num = None):
             if(re.search('\.', rows[i]['ip'])):
                 ip = rows[i]['ip']
             else:
-                db_ex("select * from data where title = '사용자:" + db_pas(rows[i]['ip']) + "'")
+                db_ex("select title from data where title = '사용자:" + db_pas(rows[i]['ip']) + "'")
                 row = db_get()
                 if(row):
                     ip = '<a href="/w/' + url_pas('사용자:' + rows[i]['ip']) + '">' + rows[i]['ip'] + '</a>'
@@ -390,9 +419,9 @@ def user_log(number = None):
             else:
                 ban_button = ''
                 
-            db_ex("select * from data where title = '사용자:" + db_pas(user_list[j]['id']) + "'")
-            file = db_get()
-            if(file):
+            db_ex("select title from data where title = '사용자:" + db_pas(user_list[j]['id']) + "'")
+            data = db_get()
+            if(data):
                 ip = '<a href="/w/' + url_pas('사용자:' + user_list[j]['id']) + '">' + user_list[j]['id'] + '</a> <a href="/record/' + url_pas(user_list[j]['id']) + '/n/1">(기록)</a>'
             else:
                 ip = '<a class="not_thing" href="/w/' + url_pas('사용자:' + user_list[j]['id']) + '">' + user_list[j]['id'] + '</a> <a href="/record/' + url_pas(user_list[j]['id']) + '/n/1">(기록)</a>'
@@ -596,7 +625,7 @@ def history_view(name = None, num = None):
                 if(re.search("\.", rows[i]["ip"])):
                     ip = rows[i]["ip"] + ' <a href="/record/' + url_pas(rows[i]["ip"]) + '/n/1">(기록)</a>'
                 else:
-                    db_ex("select * from data where title = '사용자:" + db_pas(rows[i]['ip']) + "'")
+                    db_ex("select title from data where title = '사용자:" + db_pas(rows[i]['ip']) + "'")
                     row = db_get()
                     if(row):
                         ip = '<a href="/w/' + url_pas('사용자:' + rows[i]['ip']) + '">' + rows[i]['ip'] + '</a> <a href="/record/' + url_pas(rows[i]["ip"]) + '/n/1">(기록)</a>'
@@ -679,12 +708,12 @@ def history_view(name = None, num = None):
             
 @app.route('/search', methods=['POST'])
 def search():
-    db_ex("select * from data where title = '" + db_pas(request.form["search"]) + "'")
+    db_ex("select title from data where title = '" + db_pas(request.form["search"]) + "'")
     rows = db_get()
     if(rows):
         return '<meta http-equiv="refresh" content="0;url=/w/' + url_pas(request.form["search"]) + '" />'
     else:
-        db_ex("select * from data where title like '%" + db_pas(request.form["search"]) + "%'")
+        db_ex("select title from data where title like '%" + db_pas(request.form["search"]) + "%'")
         rows = db_get()
         if(rows):
             i = 0
@@ -1299,7 +1328,7 @@ def move(name = None):
             
 @app.route('/other')
 def other():
-    return web_render('index.html', login = login_check(), title = '기타 메뉴', logo = set_data['name'], data = '<h2 style="margin-top: 0px;">기록</h2><li><a href="/blocklog/n/1">유저 차단 기록</a></li><li><a href="/userlog/n/1">유저 가입 기록</a></li><li><a href="/manager/6">유저 기록</a></li><h2>기타</h2><li><a href="/titleindex">모든 문서</a></li><li><a href="/upload">업로드</a></li><li><a href="/adminlist">관리자 목록</a></li><li><a href="/manager/1">관리자 메뉴</a></li><br>이 오픈나무의 버전은 <a href="https://github.com/2DU/openNAMU/blob/master/version.md">1.9.1</a> 입니다.')
+    return web_render('index.html', login = login_check(), title = '기타 메뉴', logo = set_data['name'], data = '<h2 style="margin-top: 0px;">기록</h2><li><a href="/blocklog/n/1">유저 차단 기록</a></li><li><a href="/userlog/n/1">유저 가입 기록</a></li><li><a href="/manager/6">유저 기록</a></li><h2>기타</h2><li><a href="/titleindex">모든 문서</a></li><li><a href="/acllist">ACL 문서 목록</a></li><li><a href="/upload">업로드</a></li><li><a href="/adminlist">관리자 목록</a></li><li><a href="/manager/1">관리자 메뉴</a></li><br>이 오픈나무의 버전은 <a href="https://github.com/2DU/openNAMU/blob/master/version.md">1.9.1</a> 입니다.')
     
 @app.route('/manager/<int:num>', methods=['POST', 'GET'])
 def manager(num = None):
@@ -1980,7 +2009,7 @@ def user_ban(name = None):
 def acl(name = None):
     if(request.method == 'POST'):
         if(admin_check() == 1):
-            db_ex("select * from data where title = '" + db_pas(name) + "'")
+            db_ex("select acl from data where title = '" + db_pas(name) + "'")
             row = db_get()
             if(row):
                 if(request.form["select"] == 'admin'):
@@ -1997,7 +2026,7 @@ def acl(name = None):
             return '<meta http-equiv="refresh" content="0;url=/error/3" />'
     else:
         if(admin_check() == 1):
-            db_ex("select * from data where title = '" + db_pas(name) + "'")
+            db_ex("select acl from data where title = '" + db_pas(name) + "'")
             row = db_get()
             if(row):
                 if(row[0]['acl'] == 'admin'):
@@ -2170,7 +2199,7 @@ def count_edit():
         
 @app.route('/random')
 def random():
-    db_ex("select * from data order by rand() limit 1")
+    db_ex("select title from data order by rand() limit 1")
     rows = db_get()
     if(rows):
         return '<meta http-equiv="refresh" content="0;url=/w/' + url_pas(rows[0]['title']) + '" />'
