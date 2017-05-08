@@ -638,7 +638,7 @@ def history_view(name = None, num = None):
         i = v - 50
         div = '<div>'
         
-        db_ex("select * from history where title = '" + db_pas(name) + "' order by id+0 desc")
+        db_ex("select send, leng, ip, date, title, id from history where title = '" + db_pas(name) + "' order by id + 0 desc")
         rows = db_get()
         if(rows):
             while(True):
@@ -1546,7 +1546,7 @@ def topic(name = None, sub = None):
     admin = admin_check()
     
     if(request.method == 'POST'):
-        db_ex("select * from topic where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' order by id+0 desc limit 1")
+        db_ex("select * from topic where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' order by id + 0 desc limit 1")
         rows = db_get()
         if(rows):
             number = int(rows[0]['id']) + 1
@@ -1610,10 +1610,10 @@ def topic(name = None, sub = None):
             if(not admin == 1):
                 style = 'display:none;'
         
-        db_ex("select * from topic where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' order by id+0 asc")
+        db_ex("select * from topic where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' order by id + 0 asc")
         rows = db_get()
 
-        db_ex("select * from distop where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' order by id+0 asc")
+        db_ex("select * from distop where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' order by id + 0 asc")
         top = db_get()
 
         i = 0
@@ -1781,7 +1781,7 @@ def topic_close(name = None, sub = None):
     if(admin_check() == 1):
         ip = ip_check()
         
-        db_ex("select * from topic where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' order by id+0 desc limit 1")
+        db_ex("select * from topic where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' order by id + 0 desc limit 1")
         topic_check = db_get()
         if(topic_check):
             time = get_time()
@@ -1809,7 +1809,7 @@ def topic_agree(name = None, sub = None):
     if(admin_check() == 1):
         ip = ip_check()
         
-        db_ex("select id from topic where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' order by id+0 desc limit 1")
+        db_ex("select id from topic where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' order by id + 0 desc limit 1")
         topic_check = db_get()
         if(topic_check):
             time = get_time()
