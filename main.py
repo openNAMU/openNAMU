@@ -1535,7 +1535,7 @@ def agree_topic_list(name = None):
 
             ip = ip_pas(data[0]['ip'])
                 
-            div = div + '<h2><a href="/topic/' + url_pas(name) + '/sub/' + url_pas(data[i]['sub']) + '">' + str((i + 1)) + '. ' + data[i]['sub'] + '</a></h2><table id="toron"><tbody><tr><td id="toroncolorgreen"><a href="javascript:void(0);" id="1">#1</a> ' + 아이디 + ' <span style="float:right;">' + data[0]['date'] + '</span></td></tr><tr><td ' + block + '>' + indata + '</td></tr></tbody></table><br>'
+            div = div + '<h2><a href="/topic/' + url_pas(name) + '/sub/' + url_pas(data[i]['sub']) + '">' + str(i + 1) + '. ' + data[i]['sub'] + '</a></h2><table id="toron"><tbody><tr><td id="toroncolorgreen"><a href="javascript:void(0);" id="1">#1</a> ' + 아이디 + ' <span style="float:right;">' + data[0]['date'] + '</span></td></tr><tr><td ' + block + '>' + indata + '</td></tr></tbody></table><br>'
             
         i += 1
         
@@ -2257,7 +2257,7 @@ def random():
         return '<meta http-equiv="refresh" content="0;url=/" />'
         
 @app.route('/error/<int:num>')
-def 오류(num = None):
+def error_page(num = None):
     if(num == 1):
         return web_render('index.html', login = login_check(), title = '권한 오류', logo = set_data['name'], data = '비 로그인 상태 입니다.'), 401
     elif(num == 2):
