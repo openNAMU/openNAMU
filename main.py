@@ -16,9 +16,10 @@ set_data = json.loads(json_data)
 
 print('port : ' + set_data['port'])
 
-import logging
-log = logging.getLogger('werkzeug')
-log.setLevel(logging.ERROR)
+if(not set_data['log'] == "O"):
+    import logging
+    log = logging.getLogger('werkzeug')
+    log.setLevel(logging.ERROR)
 
 def start():
     try:
