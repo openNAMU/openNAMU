@@ -433,7 +433,7 @@ def namumark(title, data):
                 data = re.sub("\[\[파일:((?:(?!\]\]|\?).)*)(?:\?((?:(?!\]\]).)*))?\]\]", "<a href='/w/파일:" + img + "'><img src='/image/" + img + "'></a>", data, 1)
 
             if(not re.search("^파일:([^\n]*)", title)):
-                backlink_plus(title, '파일' + c[0], 'file')            
+                backlink_plus(title, '파일:' + c[0], 'file')            
         else:
             break
     
