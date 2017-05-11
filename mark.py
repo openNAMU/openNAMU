@@ -409,7 +409,6 @@ def namumark(title, data):
 
             if(c):
                 if(not re.search("^파일:([^\n]*)", title)):
-                    print(c[0])
                     backlink_plus(title, '파일:' + c[0], 'file')
 
                 if(c[1]):
