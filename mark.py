@@ -188,11 +188,11 @@ def mid_pas(data, fol_num, include):
             
     return (data, fol_num)
 
-def backlink_plus(name, link, type):
-    db_ex("select title from back where title = '" + db_pas(link) + "' and link = '" + db_pas(name) + "' and type = '" + type + "'")
+def backlink_plus(name, link, backtype):
+    db_ex("select title from back where title = '" + db_pas(link) + "' and link = '" + db_pas(name) + "' and type = '" + backtype + "'")
     y = db_get()
     if(not y):
-        db_ex("insert into back (title, link, type) value ('" + db_pas(link) + "', '" + db_pas(name) + "',  '" + type + "')")
+        db_ex("insert into back (title, link, type) value ('" + db_pas(link) + "', '" + db_pas(name) + "',  '" + backtype + "')")
         db_com()
 
 def cat_plus(name, link):
@@ -408,6 +408,10 @@ def namumark(title, data):
             c = m.groups()
 
             if(c):
+                if(not re.search("^파일:([^\n]*)", title)):
+                    print(c[0])
+                    backlink_plus(title, '파일:' + c[0], 'file')
+
                 if(c[1]):
                     n = re.search("width=([^ \n&]*)", c[1])
                     e = re.search("height=([^ \n&]*)", c[1])
@@ -429,11 +433,7 @@ def namumark(title, data):
                     img = re.sub("\.(?P<in>[Jj][Pp][Gg]|[Pp][Nn][Gg]|[Gg][Ii][Ff]|[Jj][Pp][Ee][Gg])", "#\g<in>#", c[0])
                     data = re.sub("\[\[파일:((?:(?!\]\]|\?).)*)(?:\?((?:(?!\]\]).)*))?\]\]", "<a href='/w/파일:" + img + "'><img src='/image/" + img + "'></a>", data, 1)
             else:
-                img = re.sub("\.(?P<in>[Jj][Pp][Gg]|[Pp][Nn][Gg]|[Gg][Ii][Ff]|[Jj][Pp][Ee][Gg])", "#\g<in>#", c[0])
-                data = re.sub("\[\[파일:((?:(?!\]\]|\?).)*)(?:\?((?:(?!\]\]).)*))?\]\]", "<a href='/w/파일:" + img + "'><img src='/image/" + img + "'></a>", data, 1)
-
-            if(not re.search("^파일:([^\n]*)", title)):
-                backlink_plus(title, '파일:' + c[0], 'file')            
+                break            
         else:
             break
     

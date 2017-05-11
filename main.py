@@ -488,7 +488,7 @@ def backlink(name = None, num = None):
                 
                 break
                 
-            if(rows[i]['type'] == 'include'):
+            if(rows[i]['type'] == 'include' or rows[i]['type'] == 'file'):
                 db_ex("select * from back where title = '" + db_pas(name) + "' and link = '" + db_pas(rows[i]['link']) + "' and type = ''")
                 test = db_get()
                 if(test):
@@ -503,8 +503,10 @@ def backlink(name = None, num = None):
                 if(row):
                     data = row[0]['data']
                     data = re.sub("(?P<in>\[include\((?P<out>(?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\])", "\g<in>\n\n[[\g<out>]]\n\n", data)
+                    data = re.sub("\[\[파일:(?P<in>(?:(?!\]\]|\|).)*)(?:\|((?:(?!\]\]).)*))?\]\]", "\n\n[[:파일:\g<in>]]\n\n", data)
                     data = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', '[[\g<in>]]', data)
-                    data = namumark('', data)
+                    print(data)
+                    data = namumark('', data)                    
                     
                     if(re.search("<a(?:(?:(?!href=).)*)?href=\"\/w\/" + url_pas(name) + "(?:\#[^\"]*)?\"(?:(?:(?!>).)*)?>([^<]*)<\/a>", data)):
                         div = div + '<li><a href="/w/' + url_pas(rows[i]['link']) + '">' + rows[i]['link'] + '</a>'
