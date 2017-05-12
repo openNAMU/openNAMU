@@ -758,6 +758,27 @@ def history_view(name = None, num = None):
             
 @app.route('/search', methods=['POST'])
 def search():
+    db_ex("select title from data where title like '%" + db_pas(request.form["search"]) + "%'")
+    rows = db_get()
+    if(rows):
+        i = 0
+        
+        div = '<li>문서가 없습니다. <a href="/w/' + url_pas(request.form["search"]) + '">바로가기</a></li><br>'
+        
+        while(True):
+            try:
+                div = div + '<li><a href="/w/' + url_pas(rows[i]['title']) + '">' + rows[i]['title'] + '</a></li>'
+            except:
+                break
+                
+            i += 1
+    else:
+        return '<meta http-equiv="refresh" content="0;url=/w/' + url_pas(request.form["search"]) + '" />'
+        
+    return web_render('index.html', login = login_check(), logo = set_data['name'], data = div, title = '검색')
+
+@app.route('/goto', methods=['POST'])
+def goto():
     db_ex("select title from data where title = '" + db_pas(request.form["search"]) + "'")
     rows = db_get()
     if(rows):
@@ -780,8 +801,8 @@ def search():
         else:
             return '<meta http-equiv="refresh" content="0;url=/w/' + url_pas(request.form["search"]) + '" />'
             
-        return web_render('index.html', login = login_check(), logo = set_data['name'], data = div, title = '검색')
-        
+        return web_render('index.html', login = login_check(), logo = set_data['name'], data = div, title = '검색')    
+
 @app.route('/w/<path:name>')
 @app.route('/w/<path:name>/from/<path:redirect>')
 def read_view(name = None, redirect = None):

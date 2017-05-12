@@ -1,6 +1,6 @@
 <html>
     <head>
-        <title>{{title}}</title>
+        <title>{{title}} - {{logo}}</title>
         <link rel="stylesheet" href="{{url_for('static', filename='primer.css')}}">
         <link rel="stylesheet" href="{{url_for('static', filename='style.css')}}">
         <link rel="stylesheet" href="{{url_for('static', filename='font-awesome/css/font-awesome.min.css')}}">
@@ -33,7 +33,12 @@
                 <form method="POST" action="/search" id="search">
                     <div class="input-group">
                         <input class="form-control" name="search" type="text">
-                        <span class="input-group-button"><button class="btn"><i class="fa fa-search" aria-hidden="true"></i></button></span>
+                        <span class="input-group-button">
+                            <button id="goto" class="btn" formaction="/goto"><i class="fa fa-share" aria-hidden="true"></i></button>
+                        </span>
+                        <span class="input-group-button">
+                            <button class="btn"><i class="fa fa-search" aria-hidden="true"></i></button>
+                        </span>
                     </div>
                 </form>
             </div>
