@@ -1435,7 +1435,7 @@ def move(name = None):
 
                 db_ex("update history set title = '" + db_pas(request.form["title"]) + "' where title = '" + db_pas(name) + "'")
                 db_com()
-                return '<meta http-equiv="refresh" content="0;url=/w/' + url_pas(request.form["title"]) + '" />'
+                return redirect('/w/' + url_pas(request.form["title"]))
     else:
         if(can == 1):
             return redirect('/ban')
@@ -1452,27 +1452,27 @@ def manager(num = None):
         return web_render('index.html', login = login_check(), title = '관리자 메뉴', logo = set_data['name'], data = '<h2 style="margin-top: 0px;">관리자 및 소유자</h2><li><a href="/manager/2">문서 ACL</a></li><li><a href="/manager/3">사용자 체크</a></li><li><a href="/manager/4">사용자 차단</a></li><h2>소유자</h2><li><a href="/backreset">모든 역링크 재 생성</a></li><li><a href="/manager/5">관리자 권한 주기</a></li><h2>기타</h2><li>이 메뉴에 없는 기능은 해당 문서의 역사나 토론에서 바로 사용 가능함</li>')
     elif(num == 2):
         if(request.method == 'POST'):
-            return '<meta http-equiv="refresh" content="0;url=/acl/' + url_pas(request.form["name"]) + '" />'
+            return redirect('/acl/' + url_pas(request.form["name"]))
         else:
             return web_render('index.html', login = login_check(), title = 'ACL 이동', logo = set_data['name'], data = '<form id="usrform" method="POST" action="/manager/2"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')
     elif(num == 3):
         if(request.method == 'POST'):
-            return '<meta http-equiv="refresh" content="0;url=/check/' + url_pas(request.form["name"]) + '" />'
+            return redirect('/check/' + url_pas(request.form["name"]))
         else:
             return web_render('index.html', login = login_check(), title = '체크 이동', logo = set_data['name'], data = '<form id="usrform" method="POST" action="/manager/3"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')
     elif(num == 4):
         if(request.method == 'POST'):
-            return '<meta http-equiv="refresh" content="0;url=/ban/' + url_pas(request.form["name"]) + '" />'
+            return redirect('/ban/' + url_pas(request.form["name"]))
         else:
             return web_render('index.html', login = login_check(), title = '차단 이동', logo = set_data['name'], data = '<form id="usrform" method="POST" action="/manager/4"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button><br><br><span>아이피 앞 두자리 (XXX.XXX) 입력하면 대역 차단</span></form>')
     elif(num == 5):
         if(request.method == 'POST'):
-            return '<meta http-equiv="refresh" content="0;url=/admin/' + url_pas(request.form["name"]) + '" />'
+            return redirect('/admin/' + url_pas(request.form["name"]))
         else:
             return web_render('index.html', login = login_check(), title = '권한 이동', logo = set_data['name'], data = '<form id="usrform" method="POST" action="/manager/5"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')   
     elif(num == 6):
         if(request.method == 'POST'):
-            return '<meta http-equiv="refresh" content="0;url=/record/' + url_pas(request.form["name"]) + '/n/1" />'
+            return redirect('/record/' + url_pas(request.form["name"]))
         else:
             return web_render('index.html', login = login_check(), title = '기록 이동', logo = set_data['name'], data = '<form id="usrform" method="POST" action="/manager/6"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')    
     else:
@@ -1504,7 +1504,7 @@ def title_index():
 @app.route('/topic/<path:name>', methods=['POST', 'GET'])
 def topic_list(name = None):
     if(request.method == 'POST'):
-        return '<meta http-equiv="refresh" content="0;url=/topic/' + url_pas(name) + '/sub/' + url_pas(request.form["topic"]) + '" />'
+        return redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(request.form["topic"]))
     else:
         div = '<div>'
         i = 0
