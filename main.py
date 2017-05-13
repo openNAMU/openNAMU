@@ -313,9 +313,9 @@ def history_hidden(name = None, num = None):
             
         db_com()
         
-        return redirct('/history/' + url_pas(name) + '/n/1')
+        return redirect('/history/' + url_pas(name) + '/n/1')
     else:
-        return redirct('/history/' + url_pas(name) + '/n/1')
+        return redirect('/history/' + url_pas(name) + '/n/1')
         
 @app.route('/record/<path:name>/n/<int:num>')
 def user_record(name = None, num = None):
@@ -468,7 +468,7 @@ def backlink_reset():
         
         return web_render('index.html', login = login_check(), logo = set_data['name'], data = '에러 없음', title = '완료')
     else:
-        return redirct('/error/3')
+        return redirect('/error/3')
         
 @app.route('/backlink/<path:name>/n/<int:num>')
 def backlink(name = None, num = None):
@@ -548,7 +548,7 @@ def backlink(name = None, num = None):
                 v += 1
                 
         if(restart == 1):
-            return redirct('/backlink/' + url_pas(name) + '/n/' + str(num))
+            return redirect('/backlink/' + url_pas(name) + '/n/' + str(num))
         else:    
             return web_render('index.html', login = login_check(), logo = set_data['name'], data = div, title = name, page = url_pas(name), sub = '역링크')
     else:
@@ -986,9 +986,9 @@ def old_view(name = None, num = None):
                     
                 return web_render('index.html', login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), data = enddata, tn = 6, left = left, sub = '옛 문서')
             else:
-                return redirct('/history/' + url_pas(name))
+                return redirect('/history/' + url_pas(name))
         else:
-            return redirct('/error/3')
+            return redirect('/error/3')
     else:
         db_ex("select * from history where title = '" + db_pas(name) + "' and id = '" + str(num) + "'")
         rows = db_get()
@@ -1004,7 +1004,7 @@ def old_view(name = None, num = None):
                 
             return web_render('index.html', login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), data = enddata, tn = 6, left = left, sub = '옛 문서')
         else:
-            return redirct('/history/' + url_pas(name))
+            return redirect('/history/' + url_pas(name))
             
 @app.route('/w/<path:name>/raw/<int:num>')
 def old_raw(name = None, num = None):
@@ -1023,9 +1023,9 @@ def old_raw(name = None, num = None):
                 
                 return web_render('index.html', login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), data = enddata, sub = '옛 Raw')
             else:
-                return redirct('/history/' + url_pas(name))
+                return redirect('/history/' + url_pas(name))
         else:
-            return redirct('/error/3')
+            return redirect('/error/3')
     else:
         db_ex("select * from history where title = '" + db_pas(name) + "' and id = '" + str(num) + "'")
         rows = db_get()
@@ -1038,7 +1038,7 @@ def old_raw(name = None, num = None):
             
             return web_render('index.html', login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), data = enddata, sub = '옛 Raw')
         else:
-            return redirct('/history/' + url_pas(name))
+            return redirect('/history/' + url_pas(name))
             
 @app.route('/raw/<path:name>')
 def raw_view(name = None):
@@ -1053,7 +1053,7 @@ def raw_view(name = None):
         
         return web_render('index.html', login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), data = enddata, tn = 7, sub = 'Raw')
     else:
-        return redirct('/w/' + url_pas(name))
+        return redirect('/w/' + url_pas(name))
         
 @app.route('/revert/<path:name>/r/<int:num>', methods=['POST', 'GET'])
 def revert(name = None, num = None):
@@ -1070,7 +1070,7 @@ def revert(name = None, num = None):
                 rows = db_get()
                 if(rows):
                     if(can == 1):
-                        return redirct('/ban')
+                        return redirect('/ban')
                     else:
                         db_ex("select * from data where title = '" + db_pas(name) + "'")
                         row = db_get()
@@ -1087,17 +1087,17 @@ def revert(name = None, num = None):
                             
                         history_plus(name, rows[0]['data'], today, ip, '문서를 ' + str(num) + '판으로 되돌렸습니다.', leng)
                         
-                        return redirct('/w/' + url_pas(name))
+                        return redirect('/w/' + url_pas(name))
                 else:
-                    return redirct('/w/' + url_pas(name))
+                    return redirect('/w/' + url_pas(name))
             else:
-                return redirct('/error/3')
+                return redirect('/error/3')
         else:
             db_ex("select * from history where title = '" + db_pas(name) + "' and id = '" + str(num) + "'")
             rows = db_get()
             if(rows):                
                 if(can == 1):
-                    return redirct('/ban')
+                    return redirect('/ban')
                 else:                    
                     db_ex("select * from data where title = '" + db_pas(name) + "'")
                     row = db_get()
@@ -1114,35 +1114,35 @@ def revert(name = None, num = None):
                         
                     history_plus(name, rows[0]['data'], today, ip, '문서를 ' + str(num) + '판으로 되돌렸습니다.', leng)
                     
-                    return redirct('/w/' + url_pas(name))
+                    return redirect('/w/' + url_pas(name))
             else:
-                return redirct('/w/' + url_pas(name))            
+                return redirect('/w/' + url_pas(name))            
     else:
         db_ex("select * from hidhi where title = '" + db_pas(name) + "' and re = '" + db_pas(str(num)) + "'")
         row = db_get()
         if(row):
             if(owner_check() == 1):                
                 if(can == 1):
-                    return redirct('/ban')
+                    return redirect('/ban')
                 else:
                     db_ex("select * from history where title = '" + db_pas(name) + "' and id = '" + str(num) + "'")
                     rows = db_get()
                     if(rows):
                         return web_render('index.html', login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), r = url_pas(str(num)), tn = 13, plus = '정말 되돌리시겠습니까?', sub = '되돌리기')
                     else:
-                        return redirct('/w/' + url_pas(name))
+                        return redirect('/w/' + url_pas(name))
             else:
-                return redirct('/error/3')
+                return redirect('/error/3')
         else:            
             if(can == 1):
-                return redirct('/ban')
+                return redirect('/ban')
             else:
                 db_ex("select * from history where title = '" + db_pas(name) + "' and id = '" + str(num) + "'")
                 rows = db_get()
                 if(rows):
                     return web_render('index.html', login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), r = url_pas(str(num)), tn = 13, plus = '정말 되돌리시겠습니까?', sub = '되돌리기')
                 else:
-                    return redirct('/w/' + url_pas(name))
+                    return redirect('/w/' + url_pas(name))
                     
 @app.route('/edit/<path:name>', methods=['POST', 'GET'])
 def edit(name = None):
@@ -1153,7 +1153,7 @@ def edit(name = None):
         m = re.search('(?:[^A-Za-zㄱ-힣0-9 ])', request.form["send"])
         
         if(m):
-            return redirct('/error/17')
+            return redirect('/error/17')
         else:
             today = get_time()
             
@@ -1163,10 +1163,10 @@ def edit(name = None):
             rows = db_get()
             if(rows):
                 if(rows[0]['data'] == content):
-                    return redirct('/error/18')
+                    return redirect('/error/18')
                 else:                    
                     if(can == 1):
-                        return redirct('/ban')
+                        return redirect('/ban')
                     else:                        
                         leng = leng_check(len(rows[0]['data']), len(content))
                         history_plus(name, content, today, ip, request.form["send"], leng)
@@ -1175,7 +1175,7 @@ def edit(name = None):
                         db_com()
             else:                
                 if(can == 1):
-                    return redirct('/ban')
+                    return redirect('/ban')
                 else:
                     leng = '+' + str(len(content))
                     history_plus(name, content, today, ip, request.form["send"], leng)
@@ -1185,10 +1185,10 @@ def edit(name = None):
                     
             include_check(name, content)
             
-            return redirct('/w/' + url_pas(name))
+            return redirect('/w/' + url_pas(name))
     else:        
         if(can == 1):
-            return redirct('/ban')
+            return redirect('/ban')
         else:
             db_ex("select * from data where title = '" + db_pas(set_data["help"]) + "'")
             rows = db_get()
@@ -1213,7 +1213,7 @@ def section_edit(name = None, num = None):
     if(request.method == 'POST'):
         m = re.search('(?:[^A-Za-zㄱ-힣0-9 ])', request.form["send"])
         if(m):
-            return redirct('/error/17')
+            return redirect('/error/17')
         else:
             today = get_time()
             
@@ -1223,10 +1223,10 @@ def section_edit(name = None, num = None):
             rows = db_get()
             if(rows):
                 if(request.form["otent"] == content):
-                    return redirct('/error/18')
+                    return redirect('/error/18')
                 else:                    
                     if(can == 1):
-                        return redirct('/ban')
+                        return redirect('/ban')
                     else:                        
                         leng = leng_check(len(request.form['otent']), len(content))
                         content = rows[0]['data'].replace(request.form['otent'], content)
@@ -1238,12 +1238,12 @@ def section_edit(name = None, num = None):
                         
                     include_check(name, content)
                     
-                    return redirct('/w/' + url_pas(name))
+                    return redirect('/w/' + url_pas(name))
             else:
-                return redirct('/w/' + url_pas(name))
+                return redirect('/w/' + url_pas(name))
     else:        
         if(can == 1):
-            return redirct('/ban')
+            return redirect('/ban')
         else:
             db_ex("select * from data where title = '" + db_pas(set_data["help"]) + "'")
             rows = db_get()
@@ -1283,9 +1283,9 @@ def section_edit(name = None, num = None):
                 if(j == 0):
                     return web_render('index.html', login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), data = gdata, tn = 2, left = left, section = 1, number = num, sub = '편집')
                 else:
-                    return redirct('/w/' + url_pas(name))
+                    return redirect('/w/' + url_pas(name))
             else:
-                return redirct('/w/' + url_pas(name))
+                return redirect('/w/' + url_pas(name))
                 
 @app.route('/preview/<path:name>', methods=['POST'])
 def preview(name = None):
@@ -1293,7 +1293,7 @@ def preview(name = None):
     can = acl_check(ip, name)
     
     if(can == 1):
-        return redirct('/ban')
+        return redirect('/ban')
     else:            
         newdata = request.form["content"]
         newdata = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', ' * [[\g<in>]] 문서로 넘겨주기', newdata)
@@ -1316,7 +1316,7 @@ def section_preview(name = None, num = None):
     can = acl_check(ip, name)
     
     if(can == 1):
-        return redirct('/ban')
+        return redirect('/ban')
     else:            
         newdata = request.form["content"]
         newdata = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', ' * [[\g<in>]] 문서로 넘겨주기', newdata)
@@ -1342,7 +1342,7 @@ def delete(name = None):
         rows = db_get()
         if(rows):
             if(can == 1):
-                return redirct('/ban')
+                return redirect('/ban')
             else:
                 today = get_time()
                 
@@ -1353,19 +1353,19 @@ def delete(name = None):
                 db_ex("delete from data where title = '" + db_pas(name) + "'")
                 db_com()
                 
-                return redirct('/w/' + url_pas(name))
+                return redirect('/w/' + url_pas(name))
         else:
-            return redirct('/w/' + url_pas(name))
+            return redirect('/w/' + url_pas(name))
     else:
         db_ex("select * from data where title = '" + db_pas(name) + "'")
         rows = db_get()
         if(rows):
             if(can == 1):
-                return redirct('/ban')
+                return redirect('/ban')
             else:
                 return web_render('index.html', login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), tn = 8, plus = '정말 삭제 하시겠습니까?', sub = '삭제')
         else:
-            return redirct('/w/' + url_pas(name))
+            return redirect('/w/' + url_pas(name))
             
 @app.route('/move/<path:name>', methods=['POST', 'GET'])
 def move(name = None):
@@ -1378,13 +1378,13 @@ def move(name = None):
         rows = db_get()
 
         if(can == 1):
-            return redirct('/ban')
+            return redirect('/ban')
         else:
             leng = '0'
             db_ex("select * from history where title = '" + db_pas(request.form["title"]) + "'")
             row = db_get()
             if(row):
-                return redirct('/error/19')
+                return redirect('/error/19')
             else:
                 history_plus(name, rows[0]['data'], today, ip, '<a href="/w/' + url_pas(name) + '">' + name + '</a> 문서를 <a href="/w/' + url_pas(request.form["title"]) + '">' + request.form["title"] + '</a> 문서로 이동 했습니다.', leng)
                 
@@ -1396,7 +1396,7 @@ def move(name = None):
                 return '<meta http-equiv="refresh" content="0;url=/w/' + url_pas(request.form["title"]) + '" />'
     else:
         if(can == 1):
-            return redirct('/ban')
+            return redirect('/ban')
         else:
             return web_render('index.html', login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), tn = 9, plus = '정말 이동 하시겠습니까?', sub = '이동')
             
@@ -1434,7 +1434,7 @@ def manager(num = None):
         else:
             return web_render('index.html', login = login_check(), title = '기록 이동', logo = set_data['name'], data = '<form id="usrform" method="POST" action="/manager/6"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')    
     else:
-        return redirct('/')
+        return redirect('/')
         
 @app.route('/titleindex')
 def title_index():
@@ -1580,7 +1580,7 @@ def topic(name = None, sub = None):
             number = 1
         
         if(ban == 1 and not admin == 1):
-            return redirct('/ban')
+            return redirect('/ban')
         else:
             db_ex("select * from user where id = '" + db_pas(ip) + "'")
             rows = db_get()
@@ -1598,7 +1598,7 @@ def topic(name = None, sub = None):
             db_ex("insert into topic (id, title, sub, data, date, ip, block) value ('" + str(number) + "', '" + db_pas(name) + "', '" + db_pas(sub) + "', '" + db_pas(aa) + "', '" + today + "', '" + ip + "', '')")
             db_com()
             
-            return redirct('/topic/' + url_pas(name) + '/sub/' + url_pas(sub))
+            return redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub))
     else:
         style = ''
 
@@ -1746,11 +1746,11 @@ def topic_block(name = None, sub = None, num = None):
             
             rd_plus(name, sub, get_time())
             
-            return redirct('/topic/' + url_pas(name) + '/sub/' + url_pas(sub))
+            return redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub))
         else:
-            return redirct('/topic/' + url_pas(name) + '/sub/' + url_pas(sub))
+            return redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub))
     else:
-        return redirct('/error/3')
+        return redirect('/error/3')
         
 @app.route('/topic/<path:name>/sub/<path:sub>/notice/<int:num>')
 def topic_top(name = None, sub = None, num = None):
@@ -1768,11 +1768,11 @@ def topic_top(name = None, sub = None, num = None):
             
             rd_plus(name, sub, get_time())
 
-            return redirct('/topic/' + url_pas(name) + '/sub/' + url_pas(sub))
+            return redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub))
         else:
-            return redirct('/topic/' + url_pas(name) + '/sub/' + url_pas(sub))
+            return redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub))
     else:
-        return redirct('/error/3')
+        return redirect('/error/3')
         
 @app.route('/topic/<path:name>/sub/<path:sub>/stop')
 def topic_stop(name = None, sub = None):
@@ -1796,11 +1796,11 @@ def topic_stop(name = None, sub = None):
             
             rd_plus(name, sub, time)
             
-            return redirct('/topic/' + url_pas(name) + '/sub/' + url_pas(sub))
+            return redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub))
         else:
-            return redirct('/topic/' + url_pas(name) + '/sub/' + url_pas(sub))
+            return redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub))
     else:
-        return redirct('/error/3')
+        return redirect('/error/3')
         
 @app.route('/topic/<path:name>/sub/<path:sub>/close')
 def topic_close(name = None, sub = None):
@@ -1824,11 +1824,11 @@ def topic_close(name = None, sub = None):
             
             rd_plus(name, sub, time)
             
-            return redirct('/topic/' + url_pas(name) + '/sub/' + url_pas(sub))
+            return redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub))
         else:
-            return redirct('/topic/' + url_pas(name) + '/sub/' + url_pas(sub))
+            return redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub))
     else:
-        return redirct('/error/3')
+        return redirect('/error/3')
         
 @app.route('/topic/<path:name>/sub/<path:sub>/agree')
 def topic_agree(name = None, sub = None):
@@ -1852,11 +1852,11 @@ def topic_agree(name = None, sub = None):
             
             rd_plus(name, sub, time)
             
-            return redirct('/topic/' + url_pas(name) + '/sub/' + url_pas(sub))
+            return redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub))
         else:
-            return redirct('/topic/' + url_pas(name) + '/sub/' + url_pas(sub))
+            return redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub))
     else:
-        return redirct('/error/3')
+        return redirect('/error/3')
         
 @app.route('/login', methods=['POST', 'GET'])
 def login():
@@ -1865,13 +1865,13 @@ def login():
         
     if(request.method == 'POST'):        
         if(ban == 1):
-            return redirct('/ban')
+            return redirect('/ban')
         else:
             db_ex("select * from user where id = '" + db_pas(request.form["id"]) + "'")
             user = db_get()
             if(user):
                 if(session.get('Now') == True):
-                    return redirct('/error/11')
+                    return redirect('/error/11')
                 elif(bcrypt.checkpw(bytes(request.form["pw"], 'utf-8'), bytes(user[0]['pw'], 'utf-8'))):
                     session['Now'] = True
                     session['DREAMER'] = request.form["id"]
@@ -1879,17 +1879,17 @@ def login():
                     db_ex("insert into login (user, ip, today) value ('" + db_pas(request.form["id"]) + "', '" + db_pas(ip) + "', '" + db_pas(get_time()) + "')")
                     db_com()
                     
-                    return redirct('/user')
+                    return redirect('/user')
                 else:
-                    return redirct('/error/13')
+                    return redirect('/error/13')
             else:
-                return redirct('/error/12')
+                return redirect('/error/12')
     else:        
         if(ban == 1):
-            return redirct('/ban')
+            return redirect('/ban')
         else:
             if(session.get('Now') == True):
-                return redirct('/error/11')
+                return redirect('/error/11')
             else:
                 return web_render('index.html', login = login_check(), title = '로그인', enter = '로그인', logo = set_data['name'], tn = 15)
                 
@@ -1901,7 +1901,7 @@ def change_password():
     if(request.method == 'POST'):      
         if(request.form["pw2"] == request.form["pw3"]):
             if(ban == 1):
-                return redirct('/ban')
+                return redirect('/ban')
             else:
                 db_ex("select * from user where id = '" + db_pas(request.form["id"]) + "'")
                 user = db_get()
@@ -1909,28 +1909,28 @@ def change_password():
                     if(session.get('Now') == True):
                         session['Now'] = False
                         session.pop('DREAMER', None)
-                        return redirct('/change')
+                        return redirect('/change')
                     elif(bcrypt.checkpw(bytes(request.form["pw"], 'utf-8'), bytes(user[0]['pw'], 'utf-8'))):
                         hashed = bcrypt.hashpw(bytes(request.form["pw2"], 'utf-8'), bcrypt.gensalt())
                         
                         db_ex("update user set pw = '" + db_pas(hashed.decode()) + "' where id = '" + db_pas(request.form["id"]) + "'")
                         db_com()
                         
-                        return redirct('/login')
+                        return redirect('/login')
                     else:
-                        return redirct('/error/10')
+                        return redirect('/error/10')
                 else:
-                    return redirct('/error/9')
+                    return redirect('/error/9')
         else:
-            return redirct('/error/20')
+            return redirect('/error/20')
     else:        
         if(ban == 1):
-            return redirct('/ban')
+            return redirect('/ban')
         else:
             if(session.get('Now') == True):
                 session['Now'] = False
                 session.pop('DREAMER', None)
-                return redirct('/change')
+                return redirect('/change')
             else:
                 return web_render('index.html', login = login_check(), title = '비밀번호 변경', enter = '변경', logo = set_data['name'], tn = 15)
                 
@@ -1939,7 +1939,7 @@ def user_check(name = None, sub = None):
     db_ex("select * from user where id = '" + db_pas(name) + "'")
     user = db_get()
     if(user and user[0]['acl'] == 'owner' or user and user[0]['acl'] == 'admin'):
-        return redirct('/error/4')
+        return redirect('/error/4')
     else:
         if(admin_check() == 1):
             m = re.search('(?:[0-9](?:[0-9][0-9])?\.[0-9](?:[0-9][0-9])?\.[0-9](?:[0-9][0-9])?\.[0-9](?:[0-9][0-9])?)', name)
@@ -1978,7 +1978,7 @@ def user_check(name = None, sub = None):
                 else:
                     return web_render('index.html', login = login_check(), title = '다중 검사', logo = set_data['name'], tn = 22, rows = '')
         else:
-            return redirct('/error/3')
+            return redirect('/error/3')
                 
 @app.route('/register', methods=['POST', 'GET'])
 def register():
@@ -1988,19 +1988,19 @@ def register():
     if(request.method == 'POST'):        
         if(request.form["pw"] == request.form["pw2"]):
             if(ban == 1):
-                return redirct('/ban')
+                return redirect('/ban')
             else:
                 m = re.search('(?:[^A-Za-zㄱ-힣0-9 ])', request.form["id"])
                 if(m):
-                    return redirct('/error/8')
+                    return redirect('/error/8')
                 else:
                     if(len(request.form["id"]) > 20):
-                        return redirct('/error/7')
+                        return redirect('/error/7')
                     else:
                         db_ex("select * from user where id = '" + db_pas(request.form["id"]) + "'")
                         rows = db_get()
                         if(rows):
-                            return redirct('/error/6')
+                            return redirect('/error/6')
                         else:
                             hashed = bcrypt.hashpw(bytes(request.form["pw"], 'utf-8'), bcrypt.gensalt())
                             
@@ -2010,12 +2010,12 @@ def register():
                                 db_ex("insert into user (id, pw, acl) value ('" + db_pas(request.form["id"]) + "', '" + db_pas(hashed.decode()) + "', 'user')")
                             db_com()
                             
-                            return redirct('/login')
+                            return redirect('/login')
         else:
-            return redirct('/error/20')
+            return redirect('/error/20')
     else:        
         if(ban == 1):
-            return redirct('/ban')
+            return redirect('/ban')
         else:
             return web_render('index.html', login = login_check(), title = '회원가입', enter = '회원가입', logo = set_data['name'], tn = 15)
             
@@ -2023,14 +2023,14 @@ def register():
 def logout():
     session['Now'] = False
     session.pop('DREAMER', None)
-    return redirct('/user')
+    return redirect('/user')
     
 @app.route('/ban/<name>', methods=['POST', 'GET'])
 def user_ban(name = None):
     db_ex("select * from user where id = '" + db_pas(name) + "'")
     user = db_get()
     if(user and user[0]['acl'] == 'owner' or user and user[0]['acl'] == 'admin'):
-        return redirct('/error/4')
+        return redirect('/error/4')
     else:
         if(request.method == 'POST'):
             if(admin_check() == 1):
@@ -2059,9 +2059,9 @@ def user_ban(name = None):
                         db_ex("insert into ban (block, end, why, band) value ('" + db_pas(name) + "', '" + db_pas(end) + "', '" + db_pas(request.form["why"]) + "', '')")
                 db_com()
                 
-                return redirct('/w/' + url_pas(data['frontpage']))
+                return redirect('/w/' + url_pas(data['frontpage']))
             else:
-                return redirct('/error/3')
+                return redirect('/error/3')
         else:
             if(admin_check() == 1):
                 db_ex("select * from ban where block = '" + db_pas(name) + "'")
@@ -2077,7 +2077,7 @@ def user_ban(name = None):
                         
                 return web_render('index.html', login = login_check(), title = name, page = url_pas(name), logo = set_data['name'], tn = 16, now = now, today = get_time(), sub = '차단')
             else:
-                return redirct('/error/3')
+                return redirect('/error/3')
                 
 @app.route('/acl/<path:name>', methods=['POST', 'GET'])
 def acl(name = None):
@@ -2095,9 +2095,9 @@ def acl(name = None):
                     
                 db_com()
                 
-            return redirct('/w/' + url_pas(name)) 
+            return redirect('/w/' + url_pas(name)) 
         else:
-            return redirct('/error/3')
+            return redirect('/error/3')
     else:
         if(admin_check() == 1):
             db_ex("select acl from data where title = '" + db_pas(name) + "'")
@@ -2112,9 +2112,9 @@ def acl(name = None):
                     
                 return web_render('index.html', login = login_check(), title = name, page = url_pas(name), logo = set_data['name'], tn = 19, now = '현재 ACL 상태는 ' + now, sub = 'ACL')
             else:
-                return redirct('/w/' + url_pas(name)) 
+                return redirect('/w/' + url_pas(name)) 
         else:
-            return redirct('/error/3')
+            return redirect('/error/3')
             
 @app.route('/admin/<name>', methods=['POST', 'GET'])
 def user_admin(name = None):
@@ -2129,11 +2129,11 @@ def user_admin(name = None):
                     db_ex("update user set acl = '" + db_pas(request.form["select"]) + "' where id = '" + db_pas(name) + "'")
                 db_com()
                 
-                return redirct('/w/' + url_pas(data['frontpage']))
+                return redirect('/w/' + url_pas(data['frontpage']))
             else:
-                return redirct('/error/5')
+                return redirect('/error/5')
         else:
-            return redirct('/error/3')
+            return redirect('/error/3')
     else:
         if(owner_check() == 1):
             db_ex("select * from user where id = '" + db_pas(name) + "'")
@@ -2146,9 +2146,9 @@ def user_admin(name = None):
                     
                 return web_render('index.html', login = login_check(), title = name, page = url_pas(name), logo = data['name'], tn = 18, now = now, sub = '권한 부여')
             else:
-                return redirct('/error/5')
+                return redirect('/error/5')
         else:
-            return redirct('/error/3')
+            return redirect('/error/3')
             
 @app.route('/ban')
 def are_you_ban():
@@ -2232,9 +2232,9 @@ def diff_data(name = None, a = None, b = None):
             
             return web_render('index.html', login = login_check(), title = name, logo = set_data['name'], data = result, sub = '비교')
         else:
-            return redirct('/history/' + url_pas(name))
+            return redirect('/history/' + url_pas(name))
     else:
-        return redirct('/history/' + url_pas(name))
+        return redirect('/history/' + url_pas(name))
         
 @app.route('/user')
 def user_info():
@@ -2276,9 +2276,9 @@ def random():
     db_ex("select title from data order by rand() limit 1")
     rows = db_get()
     if(rows):
-        return redirct('/w/' + url_pas(rows[0]['title']))
+        return redirect('/w/' + url_pas(rows[0]['title']))
     else:
-        return redirct('/')
+        return redirect('/')
         
 @app.route('/error/<int:num>')
 def error_page(num = None):
@@ -2323,11 +2323,11 @@ def error_page(num = None):
     elif(num == 20):
         return web_render('index.html', login = login_check(), title = '비밀번호 오류', logo = set_data['name'], data = '재 확인이랑 비밀번호가 다릅니다.'), 401
     else:
-        return redirct('/')
+        return redirect('/')
 
 @app.errorhandler(404)
 def uncaughtError(error):
-    return redirct('/w/' + url_pas(set_data['frontpage']))
+    return redirect('/w/' + url_pas(set_data['frontpage']))
 
 @app.errorhandler(413)
 def uncaughtError(error):
