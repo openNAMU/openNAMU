@@ -636,7 +636,7 @@ def blocklog(number = None):
 @app.route('/history/<path:name>/n/<int:num>', methods=['POST', 'GET'])
 def history_view(name = None, num = None):
     if(request.method == 'POST'):
-        return '<meta http-equiv="refresh" content="0;url=/w/' + url_pas(name) + '/r/' + request.form["b"] + '/diff/' + request.form["a"] + '" />'
+        return redirect('/w/' + url_pas(name) + '/r/' + request.form["b"] + '/diff/' + request.form["a"])
     else:
         select = ''
         v = num * 50
@@ -656,6 +656,7 @@ def history_view(name = None, num = None):
                     
                     if(num != 1):
                         div = div + '<br><a href="/history/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전)'
+
                     break
                     
                 select = '<option value="' + str(i + 1) + '">' + str(i + 1) + '</option>' + select
@@ -761,50 +762,91 @@ def history_view(name = None, num = None):
             
 @app.route('/search', methods=['POST'])
 def search():
-    db_ex("select title from data where title like '%" + db_pas(request.form["search"]) + "%'")
-    rows = db_get()
-    if(rows):
-        i = 0
-        
-        div = '<li>문서가 없습니다. <a href="/w/' + url_pas(request.form["search"]) + '">바로가기</a></li><br>'
-        
-        while(True):
-            try:
-                div = div + '<li><a href="/w/' + url_pas(rows[i]['title']) + '">' + rows[i]['title'] + '</a></li>'
-            except:
-                break
-                
-            i += 1
-    else:
-        return '<meta http-equiv="refresh" content="0;url=/w/' + url_pas(request.form["search"]) + '" />'
-        
-    return web_render('index.html', login = login_check(), logo = set_data['name'], data = div, title = '검색')
+    return redirect('/search/' + url_pas(request.form["search"]) + '/n/1')
 
 @app.route('/goto', methods=['POST'])
 def goto():
     db_ex("select title from data where title = '" + db_pas(request.form["search"]) + "'")
-    rows = db_get()
-    if(rows):
-        return '<meta http-equiv="refresh" content="0;url=/w/' + url_pas(request.form["search"]) + '" />'
+    data = db_get()
+    if(data):
+        return redirect('/w/' + url_pas(request.form["search"]))
     else:
-        db_ex("select title from data where title like '%" + db_pas(request.form["search"]) + "%'")
-        rows = db_get()
-        if(rows):
-            i = 0
-            
-            div = '<li>문서가 없습니다. <a href="/w/' + url_pas(request.form["search"]) + '">바로가기</a></li><br>'
-            
-            while(True):
-                try:
-                    div = div + '<li><a href="/w/' + url_pas(rows[i]['title']) + '">' + rows[i]['title'] + '</a></li>'
-                except:
-                    break
-                    
-                i += 1
+        return redirect('/search/' + url_pas(request.form["search"]) + '/n/1')
+
+@app.route('/search/<path:name>/n/<int:num>')
+def deep_search(name = None, num = None):
+    v = num * 50
+    i = v - 50
+
+    div = ''
+    div_plus = ''
+    end = ''
+
+    db_ex("select title from data where title like '%" + db_pas(name) + "%'")
+    title_list = db_get()
+
+    db_ex("select title from data where data like '%" + db_pas(name) + "%'")
+    data_list = db_get()
+
+    db_ex("select title from data where title = '" + db_pas(name) + "'")
+    exist = db_get()
+    if(exist):
+        div = '<li>문서로 <a href="/w/' + url_pas(name) + '">바로가기</a></li><br>'
+    else:
+        div = '<li>문서가 없습니다. <a class="not_thing" href="/w/' + url_pas(name) + '">바로가기</a></li><br>'
+
+    if(title_list):
+        no = 0
+
+        if(data_list):
+            all_list = title_list + data_list
         else:
-            return '<meta http-equiv="refresh" content="0;url=/w/' + url_pas(request.form["search"]) + '" />'
-            
-        return web_render('index.html', login = login_check(), logo = set_data['name'], data = div, title = '검색')    
+            all_list = title_list
+    else:
+        if(data_list):
+            no = 1
+
+            all_list = data_list
+        else:
+            all_list = ''
+    
+    if(not all_list == ''):
+        while(True):
+            try:
+                re_title = re.compile(name, re.I)
+                if(re.search(re_title, all_list[i]['title'])):
+                    if(no == 0):
+                        div = div + '<li><a href="/w/' + url_pas(all_list[i]['title']) + '">' + all_list[i]['title'] + '</a> (문서명)</li>'
+                    else:
+                        div_plus = div_plus + '<li><a href="/w/' + url_pas(all_list[i]['title']) + '">' + all_list[i]['title'] + '</a> (내용)</li>'
+                else:
+                    no = 1
+
+                    div_plus = div_plus + '<li><a href="/w/' + url_pas(all_list[i]['title']) + '">' + all_list[i]['title'] + '</a> (내용)</li>'
+            except:
+                if(num != 1):
+                    end = '<br><a href="/search/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전)'
+
+                break
+
+            if(i == v):
+                if(num == 1):
+                    end = '<br><a href="/search/' + url_pas(name) + '/n/' + str(num + 1) + '">(다음)'
+                else:
+                    end = '<br><a href="/search/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전) <a href="/search/' + url_pas(name) + '/n/' + str(num + 1) + '">(다음)'
+
+                break
+            else:
+                i += 1
+    else:
+        div = div + '<li>검색 결과 없음</li>'
+
+    div = div + div_plus + end
+
+    return web_render('index.html', login = login_check(), logo = set_data['name'], data = div, title = name, sub = '검색')
+    
+   
+
 
 @app.route('/w/<path:name>')
 @app.route('/w/<path:name>/from/<path:redirect>')
