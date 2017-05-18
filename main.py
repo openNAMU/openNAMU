@@ -91,6 +91,11 @@ def start():
         db_ex("select * from agreedis limit 1")
     except:
         db_ex("create table agreedis(title text, sub text)") 
+
+    try:
+        db_ex("select * from custom limit 1")
+    except:
+        db_ex("create table custom(user text, css longtext)") 
         
 conn = pymysql.connect(host = set_data['host'], user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4')
 curs = conn.cursor(pymysql.cursors.DictCursor)
@@ -160,14 +165,14 @@ def upload():
         if(ban == 1):
             return redirect('/ban')
         else:
-            return web_render('index.html', license = set_data['license'], login = login_check(), logo = set_data['name'], title = '업로드', tn = 21, number = set_data['upload'])
+            return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], title = '업로드', tn = 21, number = set_data['upload'])
             
 @app.route('/image/<path:name>')
 def image_get(name = None):
     if(os.path.exists(os.path.join('image', name))):
         return send_file(os.path.join('image', name), mimetype='image')
     else:
-        return web_render('index.html', license = set_data['license'], login = login_check(), logo = set_data['name'], data = '이미지 없음.', title = '이미지 보기'), 404
+        return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = '이미지 없음.', title = '이미지 보기'), 404
 
 @app.route('/acllist')
 def acl_list():
@@ -196,7 +201,7 @@ def acl_list():
     else:
         data = ''
 
-    return web_render('index.html', license = set_data['license'], login = login_check(), logo = set_data['name'], data = data, title = 'ACL 문서 목록')
+    return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = data, title = 'ACL 문서 목록')
         
 @app.route('/adminlist')
 def admin_list():
@@ -229,9 +234,9 @@ def admin_list():
             
             i += 1
             
-        return web_render('index.html', license = set_data['license'], login = login_check(), logo = set_data['name'], data = div, title = '관리자 목록')
+        return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = div, title = '관리자 목록')
     else:
-        return web_render('index.html', license = set_data['license'], login = login_check(), logo = set_data['name'], title = '관리자 목록')
+        return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], title = '관리자 목록')
         
 @app.route('/recentchanges')
 def recent_changes():
@@ -297,9 +302,9 @@ def recent_changes():
             
             i += 1
             
-        return web_render('index.html', license = set_data['license'], login = login_check(), logo = set_data['name'], rows = div, tn = 3, title = '최근 변경내역')
+        return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], rows = div, tn = 3, title = '최근 변경내역')
     else:
-        return web_render('index.html', license = set_data['license'], login = login_check(), logo = set_data['name'], rows = '', tn = 3, title = '최근 변경내역')
+        return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], rows = '', tn = 3, title = '최근 변경내역')
         
 @app.route('/history/<path:name>/r/<int:num>/hidden')
 def history_hidden(name = None, num = None):
@@ -392,9 +397,9 @@ def user_record(name = None, num = None):
 
             i += 1
                 
-        return web_render('index.html', license = set_data['license'], login = login_check(), logo = set_data['name'], rows = div, tn = 3, title = '사용자 기록')
+        return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], rows = div, tn = 3, title = '사용자 기록')
     else:
-        return web_render('index.html', license = set_data['license'], login = login_check(), logo = set_data['name'], rows = '', tn = 3, title = '사용자 기록')
+        return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], rows = '', tn = 3, title = '사용자 기록')
         
 @app.route('/userlog/n/<int:number>')
 def user_log(number = None):
@@ -441,9 +446,9 @@ def user_log(number = None):
             else:
                 j += 1
                 
-        return web_render('index.html', license = set_data['license'], login = login_check(), logo = set_data['name'], data = list, title = '사용자 가입 기록')
+        return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = list, title = '사용자 가입 기록')
     else:
-        return web_render('index.html', license = set_data['license'], login = login_check(), logo = set_data['name'], data = '', title = '사용자 가입 기록')
+        return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = '', title = '사용자 가입 기록')
         
 @app.route('/backreset')
 def backlink_reset():
@@ -466,7 +471,7 @@ def backlink_reset():
                 
                 i += 1
         
-        return web_render('index.html', license = set_data['license'], login = login_check(), logo = set_data['name'], data = '에러 없음', title = '완료')
+        return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = '에러 없음', title = '완료')
     else:
         return redirect('/error/3')
         
@@ -550,9 +555,9 @@ def backlink(name = None, num = None):
         if(restart == 1):
             return redirect('/backlink/' + url_pas(name) + '/n/' + str(num))
         else:    
-            return web_render('index.html', license = set_data['license'], login = login_check(), logo = set_data['name'], data = div, title = name, page = url_pas(name), sub = '역링크')
+            return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = div, title = name, page = url_pas(name), sub = '역링크')
     else:
-        return web_render('index.html', license = set_data['license'], login = login_check(), logo = set_data['name'], data = '', title = name, page = url_pas(name), sub = '역링크')
+        return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = '', title = name, page = url_pas(name), sub = '역링크')
         
 @app.route('/recentdiscuss')
 def recent_discuss():
@@ -581,9 +586,9 @@ def recent_discuss():
             
             i += 1
             
-        return web_render('index.html', license = set_data['license'], login = login_check(), logo = set_data['name'], rows = div, tn = 12, title = '최근 토론내역')
+        return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], rows = div, tn = 12, title = '최근 토론내역')
     else:
-        return web_render('index.html', license = set_data['license'], login = login_check(), logo = set_data['name'], rows = '', tn = 12, title = '최근 토론내역')
+        return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], rows = '', tn = 12, title = '최근 토론내역')
 
 @app.route('/blocklog/n/<int:number>')
 def blocklog(number = None):
@@ -629,9 +634,9 @@ def blocklog(number = None):
             else:
                 i += 1
                 
-        return web_render('index.html', license = set_data['license'], login = login_check(), logo = set_data['name'], rows = div, tn = 20, title = '사용자 차단 기록')
+        return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], rows = div, tn = 20, title = '사용자 차단 기록')
     else:
-        return web_render('index.html', license = set_data['license'], login = login_check(), logo = set_data['name'], rows = '', tn = 20, title = '사용자 차단 기록')
+        return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], rows = '', tn = 20, title = '사용자 차단 기록')
         
 @app.route('/history/<path:name>/n/<int:num>', methods=['POST', 'GET'])
 def history_view(name = None, num = None):
@@ -756,9 +761,9 @@ def history_view(name = None, num = None):
                 else:
                     i += 1
                     
-            return web_render('index.html', license = set_data['license'], login = login_check(), logo = set_data['name'], rows = div, tn = 5, title = name, page = url_pas(name), select = select, sub = '역사')
+            return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], rows = div, tn = 5, title = name, page = url_pas(name), select = select, sub = '역사')
         else:
-            return web_render('index.html', license = set_data['license'], login = login_check(), logo = set_data['name'], rows = '', tn = 5, title = name, page = url_pas(name), select = select, sub = '역사')
+            return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], rows = '', tn = 5, title = name, page = url_pas(name), select = select, sub = '역사')
             
 @app.route('/search', methods=['POST'])
 def search():
@@ -843,7 +848,7 @@ def deep_search(name = None, num = None):
 
     div = div + div_plus + end
 
-    return web_render('index.html', license = set_data['license'], login = login_check(), logo = set_data['name'], data = div, title = name, sub = '검색')
+    return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = div, title = name, sub = '검색')
     
    
 
@@ -988,7 +993,7 @@ def read_view(name = None, redirect = None):
         else:
             left = ''
             
-        return web_render('index.html', license = set_data['license'], login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), data = enddata + div, tn = 1, acl = acl, left = left, uppage = uppage, style = style, topic = topic, redirect = redirect, admin = admin_memu)
+        return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), data = enddata + div, tn = 1, acl = acl, left = left, uppage = uppage, style = style, topic = topic, redirect = redirect, admin = admin_memu)
     else:
         m = re.search("^사용자:(.*)", name)
         if(m):
@@ -1006,7 +1011,7 @@ def read_view(name = None, redirect = None):
         if(redirect):
             elsedata = re.sub("^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)", " * [[\g<in>]] 문서로 넘겨주기", elsedata)
         
-        return web_render('index.html', license = set_data['license'], login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), data = namumark(name, elsedata) + div, tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, redirect = redirect, admin = admin_memu), 404
+        return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), data = namumark(name, elsedata) + div, tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, redirect = redirect, admin = admin_memu), 404
         
 @app.route('/w/<path:name>/r/<int:num>')
 def old_view(name = None, num = None):
@@ -1026,7 +1031,7 @@ def old_view(name = None, num = None):
                 else:
                     left = ''
                     
-                return web_render('index.html', license = set_data['license'], login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), data = enddata, tn = 6, left = left, sub = '옛 문서')
+                return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), data = enddata, tn = 6, left = left, sub = '옛 문서')
             else:
                 return redirect('/history/' + url_pas(name))
         else:
@@ -1044,7 +1049,7 @@ def old_view(name = None, num = None):
             else:
                 left = ''
                 
-            return web_render('index.html', license = set_data['license'], login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), data = enddata, tn = 6, left = left, sub = '옛 문서')
+            return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), data = enddata, tn = 6, left = left, sub = '옛 문서')
         else:
             return redirect('/history/' + url_pas(name))
             
@@ -1063,7 +1068,7 @@ def old_raw(name = None, num = None):
                 
                 enddata = '<pre>' + enddata + '</pre>'
                 
-                return web_render('index.html', license = set_data['license'], login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), data = enddata, sub = '옛 Raw')
+                return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), data = enddata, sub = '옛 Raw')
             else:
                 return redirect('/history/' + url_pas(name))
         else:
@@ -1078,7 +1083,7 @@ def old_raw(name = None, num = None):
             
             enddata = '<pre>' + enddata + '</pre>'
             
-            return web_render('index.html', license = set_data['license'], login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), data = enddata, sub = '옛 Raw')
+            return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), data = enddata, sub = '옛 Raw')
         else:
             return redirect('/history/' + url_pas(name))
             
@@ -1093,7 +1098,7 @@ def raw_view(name = None):
         
         enddata = '<pre>' + enddata + '</pre>'
         
-        return web_render('index.html', license = set_data['license'], login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), data = enddata, tn = 7, sub = 'Raw')
+        return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), data = enddata, tn = 7, sub = 'Raw')
     else:
         return redirect('/w/' + url_pas(name))
         
@@ -1170,7 +1175,7 @@ def revert(name = None, num = None):
                     db_ex("select * from history where title = '" + db_pas(name) + "' and id = '" + str(num) + "'")
                     rows = db_get()
                     if(rows):
-                        return web_render('index.html', license = set_data['license'], login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), r = url_pas(str(num)), tn = 13, plus = '정말 되돌리시겠습니까?', sub = '되돌리기')
+                        return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), r = url_pas(str(num)), tn = 13, plus = '정말 되돌리시겠습니까?', sub = '되돌리기')
                     else:
                         return redirect('/w/' + url_pas(name))
             else:
@@ -1182,7 +1187,7 @@ def revert(name = None, num = None):
                 db_ex("select * from history where title = '" + db_pas(name) + "' and id = '" + str(num) + "'")
                 rows = db_get()
                 if(rows):
-                    return web_render('index.html', license = set_data['license'], login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), r = url_pas(str(num)), tn = 13, plus = '정말 되돌리시겠습니까?', sub = '되돌리기')
+                    return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), r = url_pas(str(num)), tn = 13, plus = '정말 되돌리시겠습니까?', sub = '되돌리기')
                 else:
                     return redirect('/w/' + url_pas(name))
                     
@@ -1243,9 +1248,9 @@ def edit(name = None):
             db_ex("select * from data where title = '" + db_pas(name) + "'")
             rows = db_get()
             if(rows):
-                return web_render('index.html', license = set_data['license'], login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), data = rows[0]['data'], tn = 2, left = left, sub = '편집')
+                return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), data = rows[0]['data'], tn = 2, left = left, sub = '편집')
             else:
-                return web_render('index.html', license = set_data['license'], login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), data = '', tn = 2, left = left, sub = '편집')
+                return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), data = '', tn = 2, left = left, sub = '편집')
                 
 @app.route('/edit/<path:name>/section/<int:num>', methods=['POST', 'GET'])
 def section_edit(name = None, num = None):
@@ -1323,7 +1328,7 @@ def section_edit(name = None, num = None):
                         break
                         
                 if(j == 0):
-                    return web_render('index.html', license = set_data['license'], login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), data = gdata, tn = 2, left = left, section = 1, number = num, sub = '편집')
+                    return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), data = gdata, tn = 2, left = left, section = 1, number = num, sub = '편집')
                 else:
                     return redirect('/w/' + url_pas(name))
             else:
@@ -1350,7 +1355,7 @@ def preview(name = None):
         else:
             left = ''
             
-        return web_render('index.html', license = set_data['license'], login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), data = request.form["content"], tn = 2, preview = 1, enddata = enddata, left = left, sub = '미리보기')
+        return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), data = request.form["content"], tn = 2, preview = 1, enddata = enddata, left = left, sub = '미리보기')
         
 @app.route('/preview/<path:name>/section/<int:num>', methods=['POST'])
 def section_preview(name = None, num = None):
@@ -1372,7 +1377,7 @@ def section_preview(name = None, num = None):
         else:
             left = ''
             
-        return web_render('index.html', license = set_data['license'], login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), data = request.form["content"], tn = 2, preview = 1, enddata = enddata, left = left, section = 1, number = num, odata = request.form["otent"], sub = '미리보기')
+        return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), data = request.form["content"], tn = 2, preview = 1, enddata = enddata, left = left, section = 1, number = num, odata = request.form["otent"], sub = '미리보기')
         
 @app.route('/delete/<path:name>', methods=['POST', 'GET'])
 def delete(name = None):
@@ -1405,7 +1410,7 @@ def delete(name = None):
             if(can == 1):
                 return redirect('/ban')
             else:
-                return web_render('index.html', license = set_data['license'], login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), tn = 8, plus = '정말 삭제 하시겠습니까?', sub = '삭제')
+                return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), tn = 8, plus = '정말 삭제 하시겠습니까?', sub = '삭제')
         else:
             return redirect('/w/' + url_pas(name))
             
@@ -1440,41 +1445,41 @@ def move(name = None):
         if(can == 1):
             return redirect('/ban')
         else:
-            return web_render('index.html', license = set_data['license'], login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), tn = 9, plus = '정말 이동 하시겠습니까?', sub = '이동')
+            return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), tn = 9, plus = '정말 이동 하시겠습니까?', sub = '이동')
             
 @app.route('/other')
 def other():
-    return web_render('index.html', license = set_data['license'], login = login_check(), title = '기타 메뉴', logo = set_data['name'], data = '<h2 style="margin-top: 0px;">기록</h2><li><a href="/blocklog/n/1">사용자 차단 기록</a></li><li><a href="/userlog/n/1">사용자 가입 기록</a></li><li><a href="/manager/6">사용자 기록</a></li><h2>기타</h2><li><a href="/titleindex">모든 문서</a></li><li><a href="/acllist">ACL 문서 목록</a></li><li><a href="/upload">업로드</a></li><li><a href="/adminlist">관리자 목록</a></li><li><a href="/manager/1">관리자 메뉴</a></li><br>이 오픈나무의 버전은 <a href="https://github.com/2DU/openNAMU/blob/master/version.md">1.9.3</a> 입니다.')
+    return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '기타 메뉴', logo = set_data['name'], data = '<h2 style="margin-top: 0px;">기록</h2><li><a href="/blocklog/n/1">사용자 차단 기록</a></li><li><a href="/userlog/n/1">사용자 가입 기록</a></li><li><a href="/manager/6">사용자 기록</a></li><h2>기타</h2><li><a href="/titleindex">모든 문서</a></li><li><a href="/acllist">ACL 문서 목록</a></li><li><a href="/upload">업로드</a></li><li><a href="/adminlist">관리자 목록</a></li><li><a href="/manager/1">관리자 메뉴</a></li><br>이 오픈나무의 버전은 <a href="https://github.com/2DU/openNAMU/blob/master/version.md">1.9.4</a> 입니다.')
     
 @app.route('/manager/<int:num>', methods=['POST', 'GET'])
 def manager(num = None):
     if(num == 1):
-        return web_render('index.html', license = set_data['license'], login = login_check(), title = '관리자 메뉴', logo = set_data['name'], data = '<h2 style="margin-top: 0px;">관리자 및 소유자</h2><li><a href="/manager/2">문서 ACL</a></li><li><a href="/manager/3">사용자 체크</a></li><li><a href="/manager/4">사용자 차단</a></li><h2>소유자</h2><li><a href="/backreset">모든 역링크 재 생성</a></li><li><a href="/manager/5">관리자 권한 주기</a></li><h2>기타</h2><li>이 메뉴에 없는 기능은 해당 문서의 역사나 토론에서 바로 사용 가능함</li>')
+        return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '관리자 메뉴', logo = set_data['name'], data = '<h2 style="margin-top: 0px;">관리자 및 소유자</h2><li><a href="/manager/2">문서 ACL</a></li><li><a href="/manager/3">사용자 체크</a></li><li><a href="/manager/4">사용자 차단</a></li><h2>소유자</h2><li><a href="/backreset">모든 역링크 재 생성</a></li><li><a href="/manager/5">관리자 권한 주기</a></li><h2>기타</h2><li>이 메뉴에 없는 기능은 해당 문서의 역사나 토론에서 바로 사용 가능함</li>')
     elif(num == 2):
         if(request.method == 'POST'):
             return redirect('/acl/' + url_pas(request.form["name"]))
         else:
-            return web_render('index.html', license = set_data['license'], login = login_check(), title = 'ACL 이동', logo = set_data['name'], data = '<form id="usrform" method="POST" action="/manager/2"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')
+            return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = 'ACL 이동', logo = set_data['name'], data = '<form id="usrform" method="POST" action="/manager/2"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')
     elif(num == 3):
         if(request.method == 'POST'):
             return redirect('/check/' + url_pas(request.form["name"]))
         else:
-            return web_render('index.html', license = set_data['license'], login = login_check(), title = '체크 이동', logo = set_data['name'], data = '<form id="usrform" method="POST" action="/manager/3"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')
+            return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '체크 이동', logo = set_data['name'], data = '<form id="usrform" method="POST" action="/manager/3"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')
     elif(num == 4):
         if(request.method == 'POST'):
             return redirect('/ban/' + url_pas(request.form["name"]))
         else:
-            return web_render('index.html', license = set_data['license'], login = login_check(), title = '차단 이동', logo = set_data['name'], data = '<form id="usrform" method="POST" action="/manager/4"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button><br><br><span>아이피 앞 두자리 (XXX.XXX) 입력하면 대역 차단</span></form>')
+            return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '차단 이동', logo = set_data['name'], data = '<form id="usrform" method="POST" action="/manager/4"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button><br><br><span>아이피 앞 두자리 (XXX.XXX) 입력하면 대역 차단</span></form>')
     elif(num == 5):
         if(request.method == 'POST'):
             return redirect('/admin/' + url_pas(request.form["name"]))
         else:
-            return web_render('index.html', license = set_data['license'], login = login_check(), title = '권한 이동', logo = set_data['name'], data = '<form id="usrform" method="POST" action="/manager/5"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')   
+            return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '권한 이동', logo = set_data['name'], data = '<form id="usrform" method="POST" action="/manager/5"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')   
     elif(num == 6):
         if(request.method == 'POST'):
             return redirect('/record/' + url_pas(request.form["name"]))
         else:
-            return web_render('index.html', license = set_data['license'], login = login_check(), title = '기록 이동', logo = set_data['name'], data = '<form id="usrform" method="POST" action="/manager/6"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')    
+            return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '기록 이동', logo = set_data['name'], data = '<form id="usrform" method="POST" action="/manager/6"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')    
     else:
         return redirect('/')
         
@@ -1497,9 +1502,9 @@ def title_index():
 
         data = data + '</div>'
 
-        return web_render('index.html', license = set_data['license'], login = login_check(), logo = set_data['name'], rows = data + '<br><span>이 위키에는 총 ' + str(i) + '개의 문서가 있습니다.</span>', tn = 4, title = '모든 문서')
+        return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], rows = data + '<br><span>이 위키에는 총 ' + str(i) + '개의 문서가 있습니다.</span>', tn = 4, title = '모든 문서')
     else:
-        return web_render('index.html', license = set_data['license'], login = login_check(), logo = set_data['name'], rows = '', tn = 4, title = '모든 문서')
+        return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], rows = '', tn = 4, title = '모든 문서')
         
 @app.route('/topic/<path:name>', methods=['POST', 'GET'])
 def topic_list(name = None):
@@ -1539,7 +1544,7 @@ def topic_list(name = None):
                 
             i += 1
             
-        return web_render('index.html', license = set_data['license'], login = login_check(), title = name, page = url_pas(name), logo = set_data['name'], plus = div, tn = 10, list = 1, sub = '토론 목록')
+        return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, page = url_pas(name), logo = set_data['name'], plus = div, tn = 10, list = 1, sub = '토론 목록')
         
 @app.route('/topic/<path:name>/close')
 def close_topic_list(name = None):
@@ -1572,7 +1577,7 @@ def close_topic_list(name = None):
             
         i += 1
         
-    return web_render('index.html', license = set_data['license'], login = login_check(), title = name, page = url_pas(name), logo = set_data['name'], plus = div, tn = 10, sub = '닫힌 토론')
+    return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, page = url_pas(name), logo = set_data['name'], plus = div, tn = 10, sub = '닫힌 토론')
     
 @app.route('/topic/<path:name>/agree')
 def agree_topic_list(name = None):
@@ -1605,7 +1610,7 @@ def agree_topic_list(name = None):
             
         i += 1
         
-    return web_render('index.html', license = set_data['license'], login = login_check(), title = name, page = url_pas(name), logo = set_data['name'], plus = div, tn = 10, sub = '합의된 토론')
+    return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, page = url_pas(name), logo = set_data['name'], plus = div, tn = 10, sub = '합의된 토론')
     
 @app.route('/topic/<path:name>/sub/<path:sub>', methods=['POST', 'GET'])
 def topic(name = None, sub = None):
@@ -1772,7 +1777,7 @@ def topic(name = None, sub = None):
                 
             i += 1
             
-        return web_render('index.html', license = set_data['license'], login = login_check(), title = name, page = url_pas(name), suburl = url_pas(sub), toron = sub, logo = set_data['name'], rows = div, tn = 11, ban = ban, style = style, sub = '토론')
+        return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, page = url_pas(name), suburl = url_pas(sub), toron = sub, logo = set_data['name'], rows = div, tn = 11, ban = ban, style = style, sub = '토론')
         
 @app.route('/topic/<path:name>/sub/<path:sub>/b/<int:num>')
 def topic_block(name = None, sub = None, num = None):
@@ -1917,6 +1922,13 @@ def login():
                 elif(bcrypt.checkpw(bytes(request.form["pw"], 'utf-8'), bytes(user[0]['pw'], 'utf-8'))):
                     session['Now'] = True
                     session['DREAMER'] = request.form["id"]
+
+                    db_ex("select * from custom where user = '" + db_pas(request.form["id"]) + "'")
+                    css_data = db_get()
+                    if(css_data):
+                        session['Daydream'] = css_data[0]['css']
+                    else:
+                        session['Daydream'] = ''
                     
                     db_ex("insert into login (user, ip, today) value ('" + db_pas(request.form["id"]) + "', '" + db_pas(ip) + "', '" + db_pas(get_time()) + "')")
                     db_com()
@@ -1933,7 +1945,7 @@ def login():
             if(session.get('Now') == True):
                 return redirect('/error/11')
             else:
-                return web_render('index.html', license = set_data['license'], login = login_check(), title = '로그인', enter = '로그인', logo = set_data['name'], tn = 15)
+                return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '로그인', enter = '로그인', logo = set_data['name'], tn = 15)
                 
 @app.route('/change', methods=['POST', 'GET'])
 def change_password():
@@ -1949,9 +1961,7 @@ def change_password():
                 user = db_get()
                 if(user):
                     if(session.get('Now') == True):
-                        session['Now'] = False
-                        session.pop('DREAMER', None)
-                        return redirect('/change')
+                        return redirect('/logout')
                     elif(bcrypt.checkpw(bytes(request.form["pw"], 'utf-8'), bytes(user[0]['pw'], 'utf-8'))):
                         hashed = bcrypt.hashpw(bytes(request.form["pw2"], 'utf-8'), bcrypt.gensalt())
                         
@@ -1970,11 +1980,9 @@ def change_password():
             return redirect('/ban')
         else:
             if(session.get('Now') == True):
-                session['Now'] = False
-                session.pop('DREAMER', None)
-                return redirect('/change')
+                return redirect('/logout')
             else:
-                return web_render('index.html', license = set_data['license'], login = login_check(), title = '비밀번호 변경', enter = '변경', logo = set_data['name'], tn = 15)
+                return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '비밀번호 변경', enter = '변경', logo = set_data['name'], tn = 15)
                 
 @app.route('/check/<name>')
 def user_check(name = None, sub = None):
@@ -1999,9 +2007,9 @@ def user_check(name = None, sub = None):
                             
                         i += 1
                         
-                    return web_render('index.html', license = set_data['license'], login = login_check(), title = '다중 검사', logo = set_data['name'], tn = 22, rows = c)
+                    return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '다중 검사', logo = set_data['name'], tn = 22, rows = c)
                 else:
-                    return web_render('index.html', license = set_data['license'], login = login_check(), title = '다중 검사', logo = set_data['name'], tn = 22, rows = '')
+                    return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '다중 검사', logo = set_data['name'], tn = 22, rows = '')
             else:
                 db_ex("select * from login where user = '" + db_pas(name) + "' order by today desc")
                 row = db_get()
@@ -2016,9 +2024,9 @@ def user_check(name = None, sub = None):
                             
                         i += 1
                         
-                    return web_render('index.html', license = set_data['license'], login = login_check(), title = '다중 검사', logo = set_data['name'], tn = 22, rows = c)
+                    return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '다중 검사', logo = set_data['name'], tn = 22, rows = c)
                 else:
-                    return web_render('index.html', license = set_data['license'], login = login_check(), title = '다중 검사', logo = set_data['name'], tn = 22, rows = '')
+                    return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '다중 검사', logo = set_data['name'], tn = 22, rows = '')
         else:
             return redirect('/error/3')
                 
@@ -2059,12 +2067,14 @@ def register():
         if(ban == 1):
             return redirect('/ban')
         else:
-            return web_render('index.html', license = set_data['license'], login = login_check(), title = '회원가입', enter = '회원가입', logo = set_data['name'], tn = 15)
+            return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '회원가입', enter = '회원가입', logo = set_data['name'], tn = 15)
             
 @app.route('/logout')
 def logout():
     session['Now'] = False
     session.pop('DREAMER', None)
+    session.pop('Daydream', None)
+
     return redirect('/user')
     
 @app.route('/ban/<name>', methods=['POST', 'GET'])
@@ -2117,7 +2127,7 @@ def user_ban(name = None):
                     else:
                         now = '차단'
                         
-                return web_render('index.html', license = set_data['license'], login = login_check(), title = name, page = url_pas(name), logo = set_data['name'], tn = 16, now = now, today = get_time(), sub = '차단')
+                return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, page = url_pas(name), logo = set_data['name'], tn = 16, now = now, today = get_time(), sub = '차단')
             else:
                 return redirect('/error/3')
                 
@@ -2152,7 +2162,7 @@ def acl(name = None):
                 else:
                     now = '일반'
                     
-                return web_render('index.html', license = set_data['license'], login = login_check(), title = name, page = url_pas(name), logo = set_data['name'], tn = 19, now = '현재 ACL 상태는 ' + now, sub = 'ACL')
+                return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, page = url_pas(name), logo = set_data['name'], tn = 19, now = '현재 ACL 상태는 ' + now, sub = 'ACL')
             else:
                 return redirect('/w/' + url_pas(name)) 
         else:
@@ -2186,7 +2196,7 @@ def user_admin(name = None):
                 else:
                     now = '권한 부여'
                     
-                return web_render('index.html', license = set_data['license'], login = login_check(), title = name, page = url_pas(name), logo = data['name'], tn = 18, now = now, sub = '권한 부여')
+                return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, page = url_pas(name), logo = data['name'], tn = 18, now = now, sub = '권한 부여')
             else:
                 return redirect('/error/5')
         else:
@@ -2249,7 +2259,7 @@ def are_you_ban():
     else:
         end = '권한이 맞지 않는 상태 입니다.'
         
-    return web_render('index.html', license = set_data['license'], login = login_check(), title = '권한 오류', logo = set_data['name'], data = end), 401
+    return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '권한 오류', logo = set_data['name'], data = end), 401
     
 @app.route('/w/<path:name>/r/<int:a>/diff/<int:b>')
 def diff_data(name = None, a = None, b = None):
@@ -2272,7 +2282,7 @@ def diff_data(name = None, a = None, b = None):
             
             result = '<pre>' + result + '</pre>'
             
-            return web_render('index.html', license = set_data['license'], login = login_check(), title = name, logo = set_data['name'], data = result, sub = '비교')
+            return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, logo = set_data['name'], data = result, sub = '비교')
         else:
             return redirect('/history/' + url_pas(name))
     else:
@@ -2301,7 +2311,38 @@ def user_info():
         
     ip = ip_pas(ip)
         
-    return web_render('index.html', license = set_data['license'], login = login_check(), title = '사용자 메뉴', logo = set_data['name'], data = ip + '<br><br><span>권한 상태 : ' + acl + '<h2>로그인 관련</h2><li><a href="/login">로그인</a></li><li><a href="/logout">로그아웃</a></li><li><a href="/register">회원가입</a></li><h2>기타</h2><li><a href="/change">비밀번호 변경</a></li><li><a href="/count">기여 횟수</a></li><li><a href="/record/' + raw_ip + '/n/1">기여 목록</a></li>')
+    return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '사용자 메뉴', logo = set_data['name'], data = ip + '<br><br><span>권한 상태 : ' + acl + '<h2>로그인 관련</h2><li><a href="/login">로그인</a></li><li><a href="/logout">로그아웃</a></li><li><a href="/register">회원가입</a></li><h2>기타</h2><li><a href="/change">비밀번호 변경</a></li><li><a href="/count">기여 횟수</a></li><li><a href="/record/' + raw_ip + '/n/1">기여 목록</a></li><li><a href="/custom">커스텀 CSS</a></li>')
+
+@app.route('/custom', methods=['GET', 'POST'])
+def custom_css():
+    if(not session.get('Now') == True):
+        return redirect('/login')
+    else:
+        ip = ip_check()
+
+        if(request.method == 'POST'):
+            db_ex("select * from custom where user = '" + db_pas(ip) + "'")
+            css_data = db_get()
+            if(css_data):
+                db_ex("update custom set css = '" + db_pas(request.form["content"]) + "' where user = '" + db_pas(ip) + "'")
+            else:
+                db_ex("insert into custom (user, css) value ('" + db_pas(ip) + "', '" + db_pas(request.form["content"]) + "')")
+            db_com()
+
+            session['Daydream'] = request.form["content"]
+
+            return redirect('/user')
+        else:
+            db_ex("select * from custom where user = '" + db_pas(ip) + "'")
+            css_data = db_get()
+            if(css_data):
+                data = css_data[0]['css']
+            else:
+                data = ''
+
+            return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '커스텀 CSS', logo = set_data['name'], data = '<form id="usrform" name="f1" method="POST" action="/custom"><textarea rows="30" cols="100" name="content" form="usrform">' + data + '</textarea><div class="form-actions"><button class="btn btn-primary" type="submit">저장</button></div></form>')
+            
+
     
 @app.route('/count')
 def count_edit():
@@ -2309,9 +2350,9 @@ def count_edit():
     i = db_get()
     
     if(i):
-        return web_render('index.html', license = set_data['license'], login = login_check(), title = '기여 횟수', logo = set_data['name'], data = "기여 횟수 : " + str(i[0]["count(title)"]))
+        return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '기여 횟수', logo = set_data['name'], data = "기여 횟수 : " + str(i[0]["count(title)"]))
     else:
-        return web_render('index.html', license = set_data['license'], login = login_check(), title = '기여 횟수', logo = set_data['name'], data = "기여 횟수 : 0")
+        return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '기여 횟수', logo = set_data['name'], data = "기여 횟수 : 0")
         
 @app.route('/random')
 def random():
@@ -2325,45 +2366,45 @@ def random():
 @app.route('/error/<int:num>')
 def error_page(num = None):
     if(num == 1):
-        return web_render('index.html', license = set_data['license'], login = login_check(), title = '권한 오류', logo = set_data['name'], data = '비 로그인 상태 입니다.'), 401
+        return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '권한 오류', logo = set_data['name'], data = '비 로그인 상태 입니다.'), 401
     elif(num == 2):
-        return web_render('index.html', license = set_data['license'], login = login_check(), title = '권한 오류', logo = set_data['name'], data = '이 계정이 없습니다.'), 401
+        return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '권한 오류', logo = set_data['name'], data = '이 계정이 없습니다.'), 401
     elif(num == 3):
-        return web_render('index.html', license = set_data['license'], login = login_check(), title = '권한 오류', logo = set_data['name'], data = '권한이 모자랍니다.'), 401
+        return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '권한 오류', logo = set_data['name'], data = '권한이 모자랍니다.'), 401
     elif(num == 4):
-        return web_render('index.html', license = set_data['license'], login = login_check(), title = '권한 오류', logo = set_data['name'], data = '관리자는 차단, 검사 할 수 없습니다.'), 401
+        return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '권한 오류', logo = set_data['name'], data = '관리자는 차단, 검사 할 수 없습니다.'), 401
     elif(num == 5):
-        return web_render('index.html', license = set_data['license'], login = login_check(), title = '사용자 오류', logo = set_data['name'], data = '그런 계정이 없습니다.'), 401
+        return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '사용자 오류', logo = set_data['name'], data = '그런 계정이 없습니다.'), 401
     elif(num == 6):
-        return web_render('index.html', license = set_data['license'], login = login_check(), title = '가입 오류', logo = set_data['name'], data = '동일한 아이디의 사용자가 있습니다.'), 401
+        return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '가입 오류', logo = set_data['name'], data = '동일한 아이디의 사용자가 있습니다.'), 401
     elif(num == 7):
-        return web_render('index.html', license = set_data['license'], login = login_check(), title = '가입 오류', logo = set_data['name'], data = '아이디는 20글자보다 짧아야 합니다.'), 401
+        return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '가입 오류', logo = set_data['name'], data = '아이디는 20글자보다 짧아야 합니다.'), 401
     elif(num == 8):
-        return web_render('index.html', license = set_data['license'], login = login_check(), title = '가입 오류', logo = set_data['name'], data = '아이디에는 한글과 알파벳과 공백만 허용 됩니다.'), 401
+        return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '가입 오류', logo = set_data['name'], data = '아이디에는 한글과 알파벳과 공백만 허용 됩니다.'), 401
     elif(num == 9):
-        return web_render('index.html', license = set_data['license'], login = login_check(), title = '변경 오류', logo = set_data['name'], data = '그런 계정이 없습니다.'), 401
+        return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '변경 오류', logo = set_data['name'], data = '그런 계정이 없습니다.'), 401
     elif(num == 10):
-        return web_render('index.html', license = set_data['license'], login = login_check(), title = '변경 오류', logo = set_data['name'], data = '비밀번호가 다릅니다.'), 401
+        return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '변경 오류', logo = set_data['name'], data = '비밀번호가 다릅니다.'), 401
     elif(num == 11):
-        return web_render('index.html', license = set_data['license'], login = login_check(), title = '로그인 오류', logo = set_data['name'], data = '이미 로그인 되어 있습니다.'), 401
+        return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '로그인 오류', logo = set_data['name'], data = '이미 로그인 되어 있습니다.'), 401
     elif(num == 12):
-        return web_render('index.html', license = set_data['license'], login = login_check(), title = '로그인 오류', logo = set_data['name'], data = '그런 계정이 없습니다.'), 401
+        return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '로그인 오류', logo = set_data['name'], data = '그런 계정이 없습니다.'), 401
     elif(num == 13):
-        return web_render('index.html', license = set_data['license'], login = login_check(), title = '로그인 오류', logo = set_data['name'], data = '비밀번호가 다릅니다.'), 401
+        return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '로그인 오류', logo = set_data['name'], data = '비밀번호가 다릅니다.'), 401
     elif(num == 14):
-        return web_render('index.html', license = set_data['license'], login = login_check(), title = '업로드 오류', logo = set_data['name'], data = 'jpg, gif, jpeg, png만 가능 합니다.'), 401
+        return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '업로드 오류', logo = set_data['name'], data = 'jpg, gif, jpeg, png만 가능 합니다.'), 401
     elif(num == 15):
-        return web_render('index.html', license = set_data['license'], login = login_check(), title = '업로드 오류', logo = set_data['name'], data = '파일 명에 . / \ * < > | : ? 가 들어 갈 수 없습니다.'), 401
+        return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '업로드 오류', logo = set_data['name'], data = '파일 명에 . / \ * < > | : ? 가 들어 갈 수 없습니다.'), 401
     elif(num == 16):
-        return web_render('index.html', license = set_data['license'], login = login_check(), title = '업로드 오류', logo = set_data['name'], data = '동일한 이름의 파일이 있습니다.'), 401
+        return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '업로드 오류', logo = set_data['name'], data = '동일한 이름의 파일이 있습니다.'), 401
     elif(num == 17):
-        return web_render('index.html', license = set_data['license'], login = login_check(), title = '편집 오류', logo = set_data['name'], data = '편집 내용 기록에는 한글과 영어와 숫자, 공백만 허용 됩니다.'), 401
+        return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '편집 오류', logo = set_data['name'], data = '편집 내용 기록에는 한글과 영어와 숫자, 공백만 허용 됩니다.'), 401
     elif(num == 18):
-        return web_render('index.html', license = set_data['license'], login = login_check(), title = '편집 오류', logo = set_data['name'], data = '내용이 원래 문서와 동일 합니다.'), 401
+        return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '편집 오류', logo = set_data['name'], data = '내용이 원래 문서와 동일 합니다.'), 401
     elif(num == 19):
-        return web_render('index.html', license = set_data['license'], login = login_check(), title = '이동 오류', logo = set_data['name'], data = '이동 하려는 곳에 문서가 이미 있습니다.'), 401
+        return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '이동 오류', logo = set_data['name'], data = '이동 하려는 곳에 문서가 이미 있습니다.'), 401
     elif(num == 20):
-        return web_render('index.html', license = set_data['license'], login = login_check(), title = '비밀번호 오류', logo = set_data['name'], data = '재 확인이랑 비밀번호가 다릅니다.'), 401
+        return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '비밀번호 오류', logo = set_data['name'], data = '재 확인이랑 비밀번호가 다릅니다.'), 401
     else:
         return redirect('/')
 

@@ -115,6 +115,17 @@ def ip_check():
             
     return ip
 
+def custom_css_user():
+    if(session.get('Now') == True):
+        if(session['Daydream']):
+            data = format(session['Daydream'])
+        else:
+            data = ''
+    else:
+        data = ''
+
+    return data
+
 def acl_check(ip, name):
     m = re.search("^사용자:(.*)", name)
     n = re.search("^파일:(.*)", name)
