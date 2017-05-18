@@ -117,9 +117,9 @@ def ip_check():
 
 def custom_css_user():
     if(session.get('Now') == True):
-        if(session['Daydream']):
+        try:
             data = format(session['Daydream'])
-        else:
+        except:
             data = ''
     else:
         data = ''
