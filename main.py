@@ -97,7 +97,7 @@ def start():
     except:
         db_ex("create table custom(user text, css longtext)") 
         
-conn = pymysql.connect(host = set_data['host'], user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', connect_timeout = None)
+conn = pymysql.connect(host = set_data['host'], user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4')
 curs = conn.cursor(pymysql.cursors.DictCursor)
 
 def redirect(data):
