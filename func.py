@@ -1,11 +1,11 @@
 ﻿from flask import Flask, session, request
 
 from urllib import parse
-import hashlib
+import json
 import pymysql
 import time
 import re
-import json
+import hashlib
 
 json_data = open('set.json').read()
 set_data = json.loads(json_data)
