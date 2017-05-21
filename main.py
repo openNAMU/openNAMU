@@ -146,8 +146,13 @@ def upload():
                     else:
                         file.save(os.path.join('image', file_name))
                         
-                        db_ex("insert into data (title, data, acl) value ('" + db_pas('파일:' + file_data) + "', '" + db_pas('[[파일:' + file_data + ']][br][br]{{{[[파일:' + file_data + ']]}}}') + "', '')")
-                        db_com()
+                        db_ex("select title from data where title = '" + db_pas('파일:' + file_data) + "'")
+                        exist_db = db_get()
+                        if(exist_db):
+                            db_ex("update data set data = '" + db_pas('[[파일:' + file_data + ']][br][br]{{{[[파일:' + file_data + ']]}}}') + "' where title = '" + db_pas('파일:' + file_data) + "'")
+                        else:
+                            db_ex("insert into data (title, data, acl) value ('" + db_pas('파일:' + file_data) + "', '" + db_pas('[[파일:' + file_data + ']][br][br]{{{[[파일:' + file_data + ']]}}}') + "', '')")
+                            db_com()
                         
                         history_plus('파일:' + file_data, '[[파일:' + file_data + ']][br][br]{{{[[파일:' + file_data + ']]}}}', get_time(), ip, '파일:' + file_data + ' 업로드', '0')
                         
