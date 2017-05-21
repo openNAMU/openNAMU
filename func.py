@@ -23,7 +23,7 @@ def db_get():
     return curs.fetchall()
 
 def sha224(data):
-    return hashlib.sha3_224(bytes(data, 'utf-8')).hexdigest()
+    return hashlib.sha224(bytes(data, 'utf-8')).hexdigest()
     
 db_ex = curs.execute
 db_pas = pymysql.escape_string
