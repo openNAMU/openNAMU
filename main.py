@@ -148,9 +148,7 @@ def upload():
                         
                         db_ex("select title from data where title = '" + db_pas('파일:' + file_data) + "'")
                         exist_db = db_get()
-                        if(exist_db):
-                            db_ex("update data set data = '" + db_pas('[[파일:' + file_data + ']][br][br]{{{[[파일:' + file_data + ']]}}}') + "' where title = '" + db_pas('파일:' + file_data) + "'")
-                        else:
+                        if(not exist_db):
                             db_ex("insert into data (title, data, acl) value ('" + db_pas('파일:' + file_data) + "', '" + db_pas('[[파일:' + file_data + ']][br][br]{{{[[파일:' + file_data + ']]}}}') + "', '')")
                             db_com()
                         
