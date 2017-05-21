@@ -46,6 +46,6 @@ set 폴더에 있는 set.json을 폴더 밖으로 꺼내고 json 내용을 수�
 오픈나무를 키고 회원 가입으로 가서 owner 이름으로 설정 한 이름으로 가입 합니다.
 
 ## 기타
-만약 위키가 자꾸 터질시 MySQL이나 MariaDB의 my.ini나 my.cnf에 wait_timeout 값을 아주 큰 값으로 해주면 위키가 안 터집니다.
+만약 위키가 자꾸 터질시 MySQL이나 MariaDB의 my.ini나 my.cnf에 [wait_timeout](http://jjipsycho.tistory.com/71) (윈도우는 `DB_설치_폴더\data\my.ini`를 편집 하면 됨) 값을 아주 큰 값으로 해주면 위키가 안 터집니다.
 
-lower_case_table_names 값을 0 으로하면 대소문자 구분하고 1로 하면 대소문자를 구분하지 않습니다. (단 버그 존재 가능)
+`lower_case_table_names` 값을 0 으로하면 대소문자 구분하고 1로 하면 대소문자를 구분하지 않습니다. (단 버그 존재 가능)
