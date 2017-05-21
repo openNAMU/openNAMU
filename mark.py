@@ -6,11 +6,6 @@ set_data = json.loads(json_data)
 conn = pymysql.connect(host = set_data['host'], user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4')
 curs = conn.cursor(pymysql.cursors.DictCursor)
 
-def db_com():
-    conn.commit()
-
-def url_pas(data):
-    return parse.quote(data).replace('/','%2F')
     
 def db_get():
     return curs.fetchall()
@@ -440,17 +435,22 @@ def namumark(title, data):
                         width = a[0]
                     else:
                         width = ''
+
                     if(e):
                         b = e.groups()
                         height = b[0]
                     else:
                         height = ''
 
-                    img = re.sub("\.(?P<in>[Jj][Pp][Gg]|[Pp][Nn][Gg]|[Gg][Ii][Ff]|[Jj][Pp][Ee][Gg])", "#\g<in>#", c[0])
-                    data = re.sub("\[\[파일:((?:(?!\]\]|\?).)*)(?:\?((?:(?!\]\]).)*))?\]\]", '<a href="/w/파일:' + img + '"><img src="/image/' + img + '" width="' + width + '" height="' + height + '"></a>', data, 1)
+                    extension = re.search("(.+)(\.[Jj][Pp][Gg]|[Pp][Nn][Gg]|[Gg][Ii][Ff]|[Jj][Pp][Ee][Gg])$", c[0]).groups()
+
+                    img = re.sub("\.(?P<in>[Jj][Pp][Gg]|[Pp][Nn][Gg]|[Gg][Ii][Ff]|[Jj][Pp][Ee][Gg])", "#\g<in>#", extension[1])
+                    data = re.sub("\[\[파일:((?:(?!\]\]|\?).)*)(?:\?((?:(?!\]\]).)*))?\]\]", '<a href="/w/파일:' + extension[0] + img + '"><img src="/image/' + sha224(extension[0]) + img + '" width="' + width + '" height="' + height + '"></a>', data, 1)
                 else:
-                    img = re.sub("\.(?P<in>[Jj][Pp][Gg]|[Pp][Nn][Gg]|[Gg][Ii][Ff]|[Jj][Pp][Ee][Gg])", "#\g<in>#", c[0])
-                    data = re.sub("\[\[파일:((?:(?!\]\]|\?).)*)(?:\?((?:(?!\]\]).)*))?\]\]", "<a href='/w/파일:" + img + "'><img src='/image/" + img + "'></a>", data, 1)
+                    extension = re.search("(.+)(\.[Jj][Pp][Gg]|[Pp][Nn][Gg]|[Gg][Ii][Ff]|[Jj][Pp][Ee][Gg])$", c[0]).groups()
+                    
+                    img = re.sub("\.(?P<in>[Jj][Pp][Gg]|[Pp][Nn][Gg]|[Gg][Ii][Ff]|[Jj][Pp][Ee][Gg])", "#\g<in>#", extension[1])
+                    data = re.sub("\[\[파일:((?:(?!\]\]|\?).)*)(?:\?((?:(?!\]\]).)*))?\]\]", "<a href='/w/파일:" + extension[0] + img + "'><img src='/image/" + sha224(extension[0]) + img + "'></a>", data, 1)
             else:
                 break            
         else:

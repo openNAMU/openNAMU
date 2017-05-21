@@ -1,7 +1,7 @@
 ﻿from flask import Flask, session, request
 
 from urllib import parse
-import json
+import hashlib
 import pymysql
 import time
 import re
@@ -21,6 +21,9 @@ def url_pas(data):
     
 def db_get():
     return curs.fetchall()
+
+def sha224(data):
+    return hashlib.sha3_224(bytes(data, 'utf-8')).hexdigest()
     
 db_ex = curs.execute
 db_pas = pymysql.escape_string

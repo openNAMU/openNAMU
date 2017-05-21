@@ -1,15 +1,13 @@
 ﻿from flask import Flask, request, session, render_template, send_file
 app = Flask(__name__)
 
-from urllib import parse
-import json
-import pymysql
-import time
-import re
 import bcrypt
 import os
 import difflib
 import hashlib
+
+from func import *
+from mark import *
 
 json_data = open('set.json').read()
 set_data = json.loads(json_data)
@@ -21,7 +19,6 @@ if(not set_data['log'] == "O"):
 
     print('port : ' + set_data['port'])
     
-
 def start():
     try:
         db_ex("select * from data limit 1")
@@ -103,12 +100,6 @@ curs = conn.cursor(pymysql.cursors.DictCursor)
 
 def redirect(data):
     return '<meta http-equiv="refresh" content="0;url=' + data + '" />'
-
-def db_com():
-    conn.commit()
-
-def url_pas(data):
-    return parse.quote(data).replace('/','%2F')
     
 def db_get():
     return curs.fetchall()
@@ -126,10 +117,7 @@ except:
     
 start()
 
-from func import *
-from mark import *
-
-app.secret_key = hashlib.sha512(bytes(set_data['key'], 'ascii')).hexdigest()
+app.secret_key = sha224(set_data['key'])
 
 @app.route('/upload', methods=['GET', 'POST'])
 def upload():
@@ -144,20 +132,26 @@ def upload():
         else:
             file = request.files['file']
             if(file):
-                if(re.search('^([^./\\*<>|:?"]+)\.([Jj][Pp][Gg]|[Gg][Ii][Ff]|[Jj][Pp][Ee][Gg]|[Pp][Nn][Gg])$', file.filename)):
-                    filename = file.filename
-                    
-                    if(os.path.exists(os.path.join('image', filename))):
+                exist = re.search('^(.+)(\.[Jj][Pp][Gg]|[Gg][Ii][Ff]|[Jj][Pp][Ee][Gg]|[Pp][Nn][Gg])$', file.filename)
+                if(exist):
+                    file_info = exist.groups()
+
+                    file_data = file_info[0] + file_info[1]
+                    file_name = sha224(file_info[0]) + file_info[1]
+                                       
+                    if(os.path.exists(os.path.join('image', file_name))):
                         return redirect('/error/16')
                     else:
-                        file.save(os.path.join('image', filename))
+                        file.save(os.path.join('image', file_name))
+
+                        print(file_data)
                         
-                        db_ex("insert into data (title, data, acl) value ('" + db_pas('파일:' + filename) + "', '" + db_pas('[[파일:' + filename + ']][br][br]{{{[[파일:' + filename + ']]}}}') + "', '')")
+                        db_ex("insert into data (title, data, acl) value ('" + db_pas('파일:' + file_data) + "', '" + db_pas('[[파일:' + file_data + ']][br][br]{{{[[파일:' + file_data + ']]}}}') + "', '')")
                         db_com()
                         
-                        history_plus('파일:' + filename, '[[파일:' + filename + ']][br][br]{{{[[파일:' + filename + ']]}}}', get_time(), ip, '파일:' + filename + ' 업로드', '0')
+                        history_plus('파일:' + file_data, '[[파일:' + file_data + ']][br][br]{{{[[파일:' + file_data + ']]}}}', get_time(), ip, '파일:' + file_data + ' 업로드', '0')
                         
-                        return redirect('/w/' + url_pas('파일:' + filename))
+                        return redirect('/w/' + url_pas('파일:' + file_data))
                 else:
                     return redirect('/error/15')
             else:
