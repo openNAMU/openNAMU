@@ -14,12 +14,13 @@ import hashlib
 json_data = open('set.json').read()
 set_data = json.loads(json_data)
 
-print('port : ' + set_data['port'])
-
 if(not set_data['log'] == "O"):
     import logging
     log = logging.getLogger('werkzeug')
     log.setLevel(logging.ERROR)
+
+    print('port : ' + set_data['port'])
+    
 
 def start():
     try:
