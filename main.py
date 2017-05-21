@@ -248,60 +248,58 @@ def recent_changes():
     rows = db_get()
     if(rows):
         while(True):
-            try:
-                a = rows[i]
+            try:                
+                if(rows[i]['send']):
+                    send = rows[i]['send']
+                    send = re.sub('<a href="\/w\/(?P<in>[^"]*)">(?P<out>[^&]*)<\/a>', '<a href="/w/\g<in>">\g<out></a>', send)
+                else:
+                    send = '<br>'
+                    
+                title = rows[i]['title']
+                title = re.sub('<', '&lt;', title)
+                title = re.sub('>', '&gt;', title)
+                
+                m = re.search("\+", rows[i]['leng'])
+                n = re.search("\-", rows[i]['leng'])
+                
+                if(m):
+                    leng = '<span style="color:green;">' + rows[i]['leng'] + '</span>'
+                elif(n):
+                    leng = '<span style="color:red;">' + rows[i]['leng'] + '</span>'
+                else:
+                    leng = '<span style="color:gray;">' + rows[i]['leng'] + '</span>'
+                    
+                if(admin_check() == 1):
+                    db_ex("select * from ban where block = '" + db_pas(rows[i]['ip']) + "'")
+                    row = db_get()
+                    if(row):
+                        ban = ' <a href="/ban/' + url_pas(rows[i]['ip']) + '">(해제)</a>'
+                    else:
+                        ban = ' <a href="/ban/' + url_pas(rows[i]['ip']) + '">(차단)</a>'
+                else:
+                    ban = ''
+                    
+                if(re.search('\.', rows[i]['ip'])):
+                    ip = rows[i]['ip'] + ' <a href="/record/' + url_pas(rows[i]['ip']) + '/n/1">(기록)</a>'
+                else:
+                    db_ex("select title from data where title = '사용자:" + db_pas(rows[i]['ip']) + "'")
+                    row = db_get()
+                    if(row):
+                        ip = '<a href="/w/' + url_pas('사용자:' + rows[i]['ip']) + '">' + rows[i]['ip'] + '</a> <a href="/record/' + url_pas(rows[i]['ip']) + '/n/1">(기록)</a>'
+                    else:
+                        ip = '<a class="not_thing" href="/w/' + url_pas('사용자:' + rows[i]['ip']) + '">' + rows[i]['ip'] + '</a> <a href="/record/' + url_pas(rows[i]['ip']) + '/n/1">(기록)</a>'
+                        
+                if((int(rows[i]['id']) - 1) == 0):
+                    revert = ''
+                else:
+                    revert = '<a href="/w/' + url_pas(rows[i]['title']) + '/r/' + str(int(rows[i]['id']) - 1) + '/diff/' + rows[i]['id'] + '">(비교)</a> <a href="/revert/' + url_pas(rows[i]['title']) + '/r/' + str(int(rows[i]['id']) - 1) + '">(되돌리기)</a>'
+                    
+                div = div + '<table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;"><a href="/w/' + url_pas(rows[i]['title']) + '">' + title + '</a> <a href="/history/' + url_pas(rows[i]['title']) + '/n/1">(역사)</a> ' + revert + ' (' + leng + ')</td><td style="text-align: center;width:33.33%;">' + ip + ban + '</td><td style="text-align: center;width:33.33%;">' + rows[i]['date'] + '</td></tr><tr><td colspan="3" style="text-align: center;width:100%;">' + send + '</td></tr></tbody></table>'
+                
+                i += 1
             except:
                 div = div + '</div>'
                 break
-                
-            if(rows[i]['send']):
-                send = rows[i]['send']
-                send = re.sub('<a href="\/w\/(?P<in>[^"]*)">(?P<out>[^&]*)<\/a>', '<a href="/w/\g<in>">\g<out></a>', send)
-            else:
-                send = '<br>'
-                
-            title = rows[i]['title']
-            title = re.sub('<', '&lt;', title)
-            title = re.sub('>', '&gt;', title)
-            
-            m = re.search("\+", rows[i]['leng'])
-            n = re.search("\-", rows[i]['leng'])
-            
-            if(m):
-                leng = '<span style="color:green;">' + rows[i]['leng'] + '</span>'
-            elif(n):
-                leng = '<span style="color:red;">' + rows[i]['leng'] + '</span>'
-            else:
-                leng = '<span style="color:gray;">' + rows[i]['leng'] + '</span>'
-                
-            if(admin_check() == 1):
-                db_ex("select * from ban where block = '" + db_pas(rows[i]['ip']) + "'")
-                row = db_get()
-                if(row):
-                    ban = ' <a href="/ban/' + url_pas(rows[i]['ip']) + '">(해제)</a>'
-                else:
-                    ban = ' <a href="/ban/' + url_pas(rows[i]['ip']) + '">(차단)</a>'
-            else:
-                ban = ''
-                
-            if(re.search('\.', rows[i]['ip'])):
-                ip = rows[i]['ip'] + ' <a href="/record/' + url_pas(rows[i]['ip']) + '/n/1">(기록)</a>'
-            else:
-                db_ex("select title from data where title = '사용자:" + db_pas(rows[i]['ip']) + "'")
-                row = db_get()
-                if(row):
-                    ip = '<a href="/w/' + url_pas('사용자:' + rows[i]['ip']) + '">' + rows[i]['ip'] + '</a> <a href="/record/' + url_pas(rows[i]['ip']) + '/n/1">(기록)</a>'
-                else:
-                    ip = '<a class="not_thing" href="/w/' + url_pas('사용자:' + rows[i]['ip']) + '">' + rows[i]['ip'] + '</a> <a href="/record/' + url_pas(rows[i]['ip']) + '/n/1">(기록)</a>'
-                    
-            if((int(rows[i]['id']) - 1) == 0):
-                revert = ''
-            else:
-                revert = '<a href="/w/' + url_pas(rows[i]['title']) + '/r/' + str(int(rows[i]['id']) - 1) + '/diff/' + rows[i]['id'] + '">(비교)</a> <a href="/revert/' + url_pas(rows[i]['title']) + '/r/' + str(int(rows[i]['id']) - 1) + '">(되돌리기)</a>'
-                
-            div = div + '<table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;"><a href="/w/' + url_pas(rows[i]['title']) + '">' + title + '</a> <a href="/history/' + url_pas(rows[i]['title']) + '/n/1">(역사)</a> ' + revert + ' (' + leng + ')</td><td style="text-align: center;width:33.33%;">' + ip + ban + '</td><td style="text-align: center;width:33.33%;">' + rows[i]['date'] + '</td></tr><tr><td colspan="3" style="text-align: center;width:100%;">' + send + '</td></tr></tbody></table>'
-            
-            i += 1
             
         return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], rows = div, tn = 3, title = '최근 변경내역')
     else:
@@ -333,70 +331,70 @@ def user_record(name = None, num = None):
     rows = db_get()
     if(rows):
         while(True):
-            try:
-                a = rows[i]
+            try:       
+                if(rows[i]['send']):
+                    send = rows[i]['send']
+                    send = re.sub('<a href="\/w\/(?P<in>[^"]*)">(?P<out>[^&]*)<\/a>', '<a href="/w/\g<in>">\g<out></a>', send)
+                else:
+                    send = '<br>'
+                    
+                title = rows[i]['title']
+                title = re.sub('<', '&lt;', title)
+                title = re.sub('>', '&gt;', title)
+                
+                m = re.search("\+", rows[i]['leng'])
+                n = re.search("\-", rows[i]['leng'])
+                
+                if(m):
+                    leng = '<span style="color:green;">' + rows[i]['leng'] + '</span>'
+                elif(n):
+                    leng = '<span style="color:red;">' + rows[i]['leng'] + '</span>'
+                else:
+                    leng = '<span style="color:gray;">' + rows[i]['leng'] + '</span>'
+                    
+                if(admin_check() == 1):
+                    db_ex("select * from ban where block = '" + db_pas(rows[i]['ip']) + "'")
+                    row = db_get()
+                    if(row):
+                        ban = ' <a href="/ban/' + url_pas(rows[i]['ip']) + '">(해제)</a>'
+                    else:
+                        ban = ' <a href="/ban/' + url_pas(rows[i]['ip']) + '">(차단)</a>'
+                else:
+                    ban = ''
+                    
+                if(re.search('\.', rows[i]['ip'])):
+                    ip = rows[i]['ip']
+                else:
+                    db_ex("select title from data where title = '사용자:" + db_pas(rows[i]['ip']) + "'")
+                    row = db_get()
+                    if(row):
+                        ip = '<a href="/w/' + url_pas('사용자:' + rows[i]['ip']) + '">' + rows[i]['ip'] + '</a>'
+                    else:
+                        ip = '<a class="not_thing" href="/w/' + url_pas('사용자:' + rows[i]['ip']) + '">' + rows[i]['ip'] + '</a>'
+                        
+                if((int(rows[i]['id']) - 1) == 0):
+                    revert = ''
+                else:
+                    revert = '<a href="/revert/' + url_pas(rows[i]['title']) + '/r/' + str(int(rows[i]['id']) - 1) + '">(되돌리기)</a>'
+                    
+                div = div + '<table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;"><a href="/w/' + url_pas(rows[i]['title']) + '">' + title + '</a> (' + rows[i]['id'] + '판) <a href="/history/' + url_pas(rows[i]['title']) + '/n/1">(역사)</a> ' + revert + ' (' + leng + ')</td><td style="text-align: center;width:33.33%;">' + ip + ban +  '</td><td style="text-align: center;width:33.33%;">' + rows[i]['date'] + '</td></tr><tr><td colspan="3" style="text-align: center;width:100%;">' + send + '</td></tr></tbody></table>'
+                
+                if(i == v):
+                    div = div + '</div>'
+                    if(num == 1):
+                        div = div + '<br><a href="/record/' + url_pas(name) + '/n/' + str(num + 1) + '">(다음)'
+                    else:
+                        div = div + '<br><a href="/record/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전) <a href="/record/' + url_pas(name) + '/n/' + str(num + 1) + '">(다음)'
+                    break
+
+                i += 1
             except:
                 div = div + '</div>'
+
                 if(num != 1):
                     div = div + '<br><a href="/record/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전)'
-                break
-                
-            if(rows[i]['send']):
-                send = rows[i]['send']
-                send = re.sub('<a href="\/w\/(?P<in>[^"]*)">(?P<out>[^&]*)<\/a>', '<a href="/w/\g<in>">\g<out></a>', send)
-            else:
-                send = '<br>'
-                
-            title = rows[i]['title']
-            title = re.sub('<', '&lt;', title)
-            title = re.sub('>', '&gt;', title)
-            
-            m = re.search("\+", rows[i]['leng'])
-            n = re.search("\-", rows[i]['leng'])
-            
-            if(m):
-                leng = '<span style="color:green;">' + rows[i]['leng'] + '</span>'
-            elif(n):
-                leng = '<span style="color:red;">' + rows[i]['leng'] + '</span>'
-            else:
-                leng = '<span style="color:gray;">' + rows[i]['leng'] + '</span>'
-                
-            if(admin_check() == 1):
-                db_ex("select * from ban where block = '" + db_pas(rows[i]['ip']) + "'")
-                row = db_get()
-                if(row):
-                    ban = ' <a href="/ban/' + url_pas(rows[i]['ip']) + '">(해제)</a>'
-                else:
-                    ban = ' <a href="/ban/' + url_pas(rows[i]['ip']) + '">(차단)</a>'
-            else:
-                ban = ''
-                
-            if(re.search('\.', rows[i]['ip'])):
-                ip = rows[i]['ip']
-            else:
-                db_ex("select title from data where title = '사용자:" + db_pas(rows[i]['ip']) + "'")
-                row = db_get()
-                if(row):
-                    ip = '<a href="/w/' + url_pas('사용자:' + rows[i]['ip']) + '">' + rows[i]['ip'] + '</a>'
-                else:
-                    ip = '<a class="not_thing" href="/w/' + url_pas('사용자:' + rows[i]['ip']) + '">' + rows[i]['ip'] + '</a>'
-                    
-            if((int(rows[i]['id']) - 1) == 0):
-                revert = ''
-            else:
-                revert = '<a href="/revert/' + url_pas(rows[i]['title']) + '/r/' + str(int(rows[i]['id']) - 1) + '">(되돌리기)</a>'
-                
-            div = div + '<table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;"><a href="/w/' + url_pas(rows[i]['title']) + '">' + title + '</a> (' + rows[i]['id'] + '판) <a href="/history/' + url_pas(rows[i]['title']) + '/n/1">(역사)</a> ' + revert + ' (' + leng + ')</td><td style="text-align: center;width:33.33%;">' + ip + ban +  '</td><td style="text-align: center;width:33.33%;">' + rows[i]['date'] + '</td></tr><tr><td colspan="3" style="text-align: center;width:100%;">' + send + '</td></tr></tbody></table>'
-            
-            if(i == v):
-                div = div + '</div>'
-                if(num == 1):
-                    div = div + '<br><a href="/record/' + url_pas(name) + '/n/' + str(num + 1) + '">(다음)'
-                else:
-                    div = div + '<br><a href="/record/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전) <a href="/record/' + url_pas(name) + '/n/' + str(num + 1) + '">(다음)'
-                break
 
-            i += 1
+                break
                 
         return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], rows = div, tn = 3, title = '사용자 기록')
     else:
@@ -491,49 +489,48 @@ def backlink(name = None, num = None):
     if(rows):        
         while(True):
             try:
-                a = rows[i]
-            except:
-                if(num != 1):
-                    div = div + '<br><a href="/backlink/n/' + str(num - 1) + '">(이전)'
-                
-                break
-                
-            if(rows[i]['type'] == 'include' or rows[i]['type'] == 'file'):
-                db_ex("select * from back where title = '" + db_pas(name) + "' and link = '" + db_pas(rows[i]['link']) + "' and type = ''")
-                test = db_get()
-                if(test):
-                    restart = 1
-                    
-                    db_ex("delete from back where title = '" + db_pas(name) + "' and link = '" + db_pas(rows[i]['link']) + "' and type = ''")
-                    db_com()
-                
-            if(not re.search('^사용자:', rows[i]['link'])):
-                db_ex("select * from data where title = '" + db_pas(rows[i]['link']) + "'")
-                row = db_get()
-                if(row):
-                    data = row[0]['data']
-                    data = re.sub("(?P<in>\[include\((?P<out>(?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\])", "\g<in>\n\n[[\g<out>]]\n\n", data)
-                    data = re.sub("\[\[파일:(?P<in>(?:(?!\]\]|\|).)*)(?:\|((?:(?!\]\]).)*))?\]\]", "\n\n[[:파일:\g<in>]]\n\n", data)
-                    data = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', '[[\g<in>]]', data)
-                    data = namumark('', data)                    
-                    
-                    if(re.search("<a(?:(?:(?!href=).)*)?href=\"\/w\/" + url_pas(name) + "(?:\#[^\"]*)?\"(?:(?:(?!>).)*)?>([^<]*)<\/a>", data)):
-                        div = div + '<li><a href="/w/' + url_pas(rows[i]['link']) + '">' + rows[i]['link'] + '</a>'
+                if(rows[i]['type'] == 'include' or rows[i]['type'] == 'file'):
+                    db_ex("select * from back where title = '" + db_pas(name) + "' and link = '" + db_pas(rows[i]['link']) + "' and type = ''")
+                    test = db_get()
+                    if(test):
+                        restart = 1
                         
-                        if(rows[i]['type']):
-                            div = div + ' (' + rows[i]['type'] + ')</li>'
-                        else:
-                            div = div + '</li>'
+                        db_ex("delete from back where title = '" + db_pas(name) + "' and link = '" + db_pas(rows[i]['link']) + "' and type = ''")
+                        db_com()
+                    
+                if(not re.search('^사용자:', rows[i]['link'])):
+                    db_ex("select * from data where title = '" + db_pas(rows[i]['link']) + "'")
+                    row = db_get()
+                    if(row):
+                        data = row[0]['data']
+                        data = re.sub("(?P<in>\[include\((?P<out>(?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\])", "\g<in>\n\n[[\g<out>]]\n\n", data)
+                        data = re.sub("\[\[파일:(?P<in>(?:(?!\]\]|\|).)*)(?:\|((?:(?!\]\]).)*))?\]\]", "\n\n[[:파일:\g<in>]]\n\n", data)
+                        data = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', '[[\g<in>]]', data)
+                        data = namumark('', data)                    
+                        
+                        if(re.search("<a(?:(?:(?!href=).)*)?href=\"\/w\/" + url_pas(name) + "(?:\#[^\"]*)?\"(?:(?:(?!>).)*)?>([^<]*)<\/a>", data)):
+                            div = div + '<li><a href="/w/' + url_pas(rows[i]['link']) + '">' + rows[i]['link'] + '</a>'
                             
-                        if(i == v):
-                            if(num == 1):
-                                div = div + '<br><a href="/backlink/' + url_pas(name) + '/n/' + str(num + 1) + '">(다음)'
+                            if(rows[i]['type']):
+                                div = div + ' (' + rows[i]['type'] + ')</li>'
                             else:
-                                div = div + '<br><a href="/backlink/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전) <a href="/backlink/' + url_pas(name) + '/n/' + str(num + 1) + '">(다음)'
+                                div = div + '</li>'
                                 
-                            break
+                            if(i == v):
+                                if(num == 1):
+                                    div = div + '<br><a href="/backlink/' + url_pas(name) + '/n/' + str(num + 1) + '">(다음)'
+                                else:
+                                    div = div + '<br><a href="/backlink/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전) <a href="/backlink/' + url_pas(name) + '/n/' + str(num + 1) + '">(다음)'
+                                    
+                                break
+                            else:
+                                i += 1
                         else:
+                            db_ex("delete from back where title = '" + db_pas(name) + "' and link = '" + db_pas(rows[i]['link']) + "'")
+                            db_com()
+                            
                             i += 1
+                            v += 1
                     else:
                         db_ex("delete from back where title = '" + db_pas(name) + "' and link = '" + db_pas(rows[i]['link']) + "'")
                         db_com()
@@ -546,12 +543,11 @@ def backlink(name = None, num = None):
                     
                     i += 1
                     v += 1
-            else:
-                db_ex("delete from back where title = '" + db_pas(name) + "' and link = '" + db_pas(rows[i]['link']) + "'")
-                db_com()
+            except:
+                if(num != 1):
+                    div = div + '<br><a href="/backlink/n/' + str(num - 1) + '">(이전)'
                 
-                i += 1
-                v += 1
+                break
                 
         if(restart == 1):
             return redirect('/backlink/' + url_pas(name) + '/n/' + str(num))
@@ -570,22 +566,21 @@ def recent_discuss():
     if(rows):
         while(True):
             try:
-                a = rows[i]
+                title = rows[i]['title']
+                title = re.sub('<', '&lt;', title)
+                title = re.sub('>', '&gt;', title)
+                
+                sub = rows[i]['sub']
+                sub = re.sub('<', '&lt;', sub)
+                sub = re.sub('>', '&gt;', sub)
+                
+                div = div + '<table style="width: 100%;"><tbody><tr><td style="text-align: center;width:50%;"><a href="/topic/' + url_pas(rows[i]['title']) + '/sub/' + url_pas(rows[i]['sub']) + '">' + title + '</a> (' + sub + ')</td><td style="text-align: center;width:50%;">' + rows[i]['date'] + '</td></tr></tbody></table>'
+                
+                i += 1
             except:
                 div = div + '</div>'
-                break
                 
-            title = rows[i]['title']
-            title = re.sub('<', '&lt;', title)
-            title = re.sub('>', '&gt;', title)
-            
-            sub = rows[i]['sub']
-            sub = re.sub('<', '&lt;', sub)
-            sub = re.sub('>', '&gt;', sub)
-            
-            div = div + '<table style="width: 100%;"><tbody><tr><td style="text-align: center;width:50%;"><a href="/topic/' + url_pas(rows[i]['title']) + '/sub/' + url_pas(rows[i]['sub']) + '">' + title + '</a> (' + sub + ')</td><td style="text-align: center;width:50%;">' + rows[i]['date'] + '</td></tr></tbody></table>'
-            
-            i += 1
+                break
             
         return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], rows = div, tn = 12, title = '최근 토론내역')
     else:
