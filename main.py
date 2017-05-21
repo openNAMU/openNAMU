@@ -9,6 +9,18 @@ import hashlib
 from func import *
 from mark import *
 
+def db_com():
+    conn.commit()
+
+def url_pas(data):
+    return parse.quote(data).replace('/','%2F')
+    
+def db_get():
+    return curs.fetchall()
+
+def sha224(data):
+    return hashlib.sha224(bytes(data, 'utf-8')).hexdigest()
+
 json_data = open('set.json').read()
 set_data = json.loads(json_data)
 
@@ -2381,8 +2393,6 @@ def error_page(num = None):
         return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '로그인 오류', logo = set_data['name'], data = '비밀번호가 다릅니다.'), 401
     elif(num == 14):
         return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '업로드 오류', logo = set_data['name'], data = 'jpg, gif, jpeg, png만 가능 합니다.'), 401
-    elif(num == 15):
-        return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '업로드 오류', logo = set_data['name'], data = '파일 명에 . / \ * < > | : ? 가 들어 갈 수 없습니다.'), 401
     elif(num == 16):
         return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '업로드 오류', logo = set_data['name'], data = '동일한 이름의 파일이 있습니다.'), 401
     elif(num == 17):
