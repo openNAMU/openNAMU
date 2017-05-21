@@ -5,21 +5,8 @@ import bcrypt
 import os
 import difflib
 import hashlib
-
-from func import *
-from mark import *
-
-def db_com():
-    conn.commit()
-
-def url_pas(data):
-    return parse.quote(data).replace('/','%2F')
-    
-def db_get():
-    return curs.fetchall()
-
-def sha224(data):
-    return hashlib.sha224(bytes(data, 'utf-8')).hexdigest()
+import json
+import pymysql
 
 json_data = open('set.json').read()
 set_data = json.loads(json_data)
@@ -126,7 +113,10 @@ except:
     db_ex("create database " + set_data['db'])
     db_ex("use " + set_data['db'])
     db_ex("alter database " + set_data['db'] + " character set = utf8mb4 collate = utf8mb4_unicode_ci")
-    
+
+from func import *
+from mark import *
+
 start()
 
 app.secret_key = sha224(set_data['key'])

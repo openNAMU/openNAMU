@@ -14,7 +14,7 @@ conn = pymysql.connect(host = set_data['host'], user = set_data['user'], passwor
 curs = conn.cursor(pymysql.cursors.DictCursor)
 
 def db_com():
-    conn.commit()
+    return conn.commit()
 
 def url_pas(data):
     return parse.quote(data).replace('/','%2F')
