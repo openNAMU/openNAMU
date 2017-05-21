@@ -132,7 +132,7 @@ def upload():
         else:
             file = request.files['file']
             if(file):
-                exist = re.search('^(.+)(\.[Jj][Pp][Gg]|[Gg][Ii][Ff]|[Jj][Pp][Ee][Gg]|[Pp][Nn][Gg])$', file.filename)
+                exist = re.search('^(.+)(\.(?:[Jj][Pp][Gg]|[Gg][Ii][Ff]|[Jj][Pp][Ee][Gg]|[Pp][Nn][Gg]))$', file.filename)
                 if(exist):
                     file_info = exist.groups()
 
@@ -143,8 +143,6 @@ def upload():
                         return redirect('/error/16')
                     else:
                         file.save(os.path.join('image', file_name))
-
-                        print(file_data)
                         
                         db_ex("insert into data (title, data, acl) value ('" + db_pas('파일:' + file_data) + "', '" + db_pas('[[파일:' + file_data + ']][br][br]{{{[[파일:' + file_data + ']]}}}') + "', '')")
                         db_com()
