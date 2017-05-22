@@ -288,6 +288,8 @@ def namumark(title, data):
             break
 
     data = '\n' + data + '\n'
+
+    data = re.sub("\[nicovideo\((?P<in>[^,)]*)(?:(?:,(?:[^,)]*))+)?\)\]", "[br][[http://embed.nicovideo.jp/watch/\g<in>]][br]", data)
     
     while(True):
         m = re.search("\n&gt;\s?((?:[^\n]*)(?:(?:(?:(?:\n&gt;\s?)(?:[^\n]*))+)?))", data)
