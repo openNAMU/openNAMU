@@ -53,7 +53,7 @@ def html_pas(data):
                         data = re.sub("<((?:\/)?" + b[1] + "(?:[^>]*))>", "[" + a + "]", data, 1)
                         data = re.sub("<\/" + b[1] + ">", "[/" + b[1] + "]", data, 1)
                     else:
-                        data = re.sub("<((?:\/)?" + b[1] + "(?:[^>]*))>", "[br][[" + check[0] + "]][br]", data, 1)
+                        data = re.sub("<((?:\/)?" + b[1] + "(?:[^>]*))>", "[[" + check[0] + "]]", data, 1)
                         data = re.sub("<\/" + b[1] + ">", "", data, 1)
                 else:
                     data = re.sub("<((?:\/)?" + b[1] + "(?:[^>]*))>", "[" + a + "]", data, 1)
@@ -289,7 +289,7 @@ def namumark(title, data):
 
     data = '\n' + data + '\n'
 
-    data = re.sub("\[nicovideo\((?P<in>[^,)]*)(?:(?:,(?:[^,)]*))+)?\)\]", "[br][[http://embed.nicovideo.jp/watch/\g<in>]][br]", data)
+    data = re.sub("\[nicovideo\((?P<in>[^,)]*)(?:(?:,(?:[^,)]*))+)?\)\]", "[[http://embed.nicovideo.jp/watch/\g<in>]]", data)
     
     while(True):
         m = re.search("\n&gt;\s?((?:[^\n]*)(?:(?:(?:(?:\n&gt;\s?)(?:[^\n]*))+)?))", data)
