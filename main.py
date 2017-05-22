@@ -100,9 +100,12 @@ curs = conn.cursor(pymysql.cursors.DictCursor)
 def redirect(data):
     return '<meta http-equiv="refresh" content="0;url=' + data + '" />'
     
+def db_com():
+    return conn.commit()
+    
 def db_get():
     return curs.fetchall()
-    
+
 web_render = render_template
 db_ex = curs.execute
 db_pas = pymysql.escape_string
