@@ -34,12 +34,12 @@ def html_pas(data):
             b = y.groups()
 
             if(re.search("<(\/" + b[1] + ")>", data)):
-                XSS = re.search('src=(?:"|\')http(?:s)?:\/\/([^\/]*)\/(?:[^"\']*)(?:"|\')', b[0])
+                xss_test = re.search('src=(?:"|\')(http(s)?:\/\/([^\/]*)\/(?:[^"\']*))(?:"|\')', b[0])
                 
-                if(XSS):
-                    check = XSS.groups()
+                if(xss_test):
+                    check = xss_test.groups()
                     
-                    if(check[0] == "www.youtube.com" or check[0] == "serviceapi.nmv.naver.com" or check[0] == "tv.kakao.com" or check[0] == "tvple.com"):
+                    if(check[2] == "www.youtube.com" or check[2] == "serviceapi.nmv.naver.com" or check[2] == "tv.kakao.com" or check[2] == "tvple.com"):
                         a = b[0]
                     else:
                         a = re.sub('src=(?:"|\')([^"\']*)(?:"|\')', '', b[0])
@@ -47,8 +47,17 @@ def html_pas(data):
                     a = b[0]
                 
                 a = re.sub('(?:"|\')', '#.#', a)
-                data = re.sub("<((?:\/)?" + b[1] + "(?:[^>]*))>", "[" + a + "]", data, 1)
-                data = re.sub("<\/" + b[1] + ">", "[/" + b[1] + "]", data, 1)
+
+                if(check):
+                    if(not check[1] == None):
+                        data = re.sub("<((?:\/)?" + b[1] + "(?:[^>]*))>", "[" + a + "]", data, 1)
+                        data = re.sub("<\/" + b[1] + ">", "[/" + b[1] + "]", data, 1)
+                    else:
+                        data = re.sub("<((?:\/)?" + b[1] + "(?:[^>]*))>", "[br][[" + check[0] + "]][br]", data, 1)
+                        data = re.sub("<\/" + b[1] + ">", "", data, 1)
+                else:
+                    data = re.sub("<((?:\/)?" + b[1] + "(?:[^>]*))>", "[" + a + "]", data, 1)
+                    data = re.sub("<\/" + b[1] + ">", "[/" + b[1] + "]", data, 1)
             else:
                 data = re.sub("<((?:\/)?" + b[1] + "(?:[^>]*))>", '&lt;' + b[0] + '&gt;', data, 1)
                 
