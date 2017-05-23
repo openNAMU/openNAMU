@@ -251,7 +251,6 @@ def recent_changes():
             try:                
                 if(rows[i]['send']):
                     send = rows[i]['send']
-                    send = re.sub('<a href="\/w\/(?P<in>[^"]*)">(?P<out>[^&]*)<\/a>', '<a href="/w/\g<in>">\g<out></a>', send)
                 else:
                     send = '<br>'
                     
@@ -664,7 +663,6 @@ def history_view(name = None, num = None):
                 
                 if(rows[i]['send']):
                     send = rows[i]['send']
-                    send = re.sub('<a href="\/w\/(?P<in>[^"]*)">(?P<out>[^&]*)<\/a>', '<a href="/w/\g<in>">\g<out></a>', send)
                 else:
                     send = '<br>'
                     
@@ -1193,42 +1191,37 @@ def edit(name = None):
     can = acl_check(ip, name)
     
     if(request.method == 'POST'):
-        m = re.search('(?:[^A-Za-zㄱ-힣0-9 ])', request.form["send"])
+        today = get_time()
         
-        if(m):
-            return redirect('/error/17')
-        else:
-            today = get_time()
-            
-            content = savemark(request.form["content"])
-            
-            db_ex("select * from data where title = '" + db_pas(name) + "'")
-            rows = db_get()
-            if(rows):
-                if(rows[0]['data'] == content):
-                    return redirect('/error/18')
-                else:                    
-                    if(can == 1):
-                        return redirect('/ban')
-                    else:                        
-                        leng = leng_check(len(rows[0]['data']), len(content))
-                        history_plus(name, content, today, ip, request.form["send"], leng)
-                        
-                        db_ex("update data set data = '" + db_pas(content) + "' where title = '" + db_pas(name) + "'")
-                        db_com()
-            else:                
+        content = savemark(request.form["content"])
+        
+        db_ex("select * from data where title = '" + db_pas(name) + "'")
+        rows = db_get()
+        if(rows):
+            if(rows[0]['data'] == content):
+                return redirect('/error/18')
+            else:                    
                 if(can == 1):
                     return redirect('/ban')
-                else:
-                    leng = '+' + str(len(content))
-                    history_plus(name, content, today, ip, request.form["send"], leng)
+                else:                        
+                    leng = leng_check(len(rows[0]['data']), len(content))
+                    history_plus(name, content, today, ip, html_pas(request.form["send"]), leng)
                     
-                    db_ex("insert into data (title, data, acl) value ('" + db_pas(name) + "', '" + db_pas(content) + "', '')")
+                    db_ex("update data set data = '" + db_pas(content) + "' where title = '" + db_pas(name) + "'")
                     db_com()
-                    
-            include_check(name, content)
-            
-            return redirect('/w/' + url_pas(name))
+        else:                
+            if(can == 1):
+                return redirect('/ban')
+            else:
+                leng = '+' + str(len(content))
+                history_plus(name, content, today, ip, html_pas(request.form["send"]), leng)
+                
+                db_ex("insert into data (title, data, acl) value ('" + db_pas(name) + "', '" + db_pas(content) + "', '')")
+                db_com()
+                
+        include_check(name, content)
+        
+        return redirect('/w/' + url_pas(name))
     else:        
         if(can == 1):
             return redirect('/ban')
@@ -1254,36 +1247,32 @@ def section_edit(name = None, num = None):
     can = acl_check(ip, name)
     
     if(request.method == 'POST'):
-        m = re.search('(?:[^A-Za-zㄱ-힣0-9 ])', request.form["send"])
-        if(m):
-            return redirect('/error/17')
-        else:
-            today = get_time()
-            
-            content = savemark(request.form["content"])
-            
-            db_ex("select * from data where title = '" + db_pas(name) + "'")
-            rows = db_get()
-            if(rows):
-                if(request.form["otent"] == content):
-                    return redirect('/error/18')
-                else:                    
-                    if(can == 1):
-                        return redirect('/ban')
-                    else:                        
-                        leng = leng_check(len(request.form['otent']), len(content))
-                        content = rows[0]['data'].replace(request.form['otent'], content)
-                        
-                        history_plus(name, content, today, ip, request.form["send"], leng)
-                        
-                        db_ex("update data set data = '" + db_pas(content) + "' where title = '" + db_pas(name) + "'")
-                        db_com()
-                        
-                    include_check(name, content)
+        today = get_time()
+        
+        content = savemark(request.form["content"])
+        
+        db_ex("select * from data where title = '" + db_pas(name) + "'")
+        rows = db_get()
+        if(rows):
+            if(request.form["otent"] == content):
+                return redirect('/error/18')
+            else:                    
+                if(can == 1):
+                    return redirect('/ban')
+                else:                        
+                    leng = leng_check(len(request.form['otent']), len(content))
+                    content = rows[0]['data'].replace(request.form['otent'], content)
                     
-                    return redirect('/w/' + url_pas(name))
-            else:
+                    history_plus(name, content, today, ip, html_pas(request.form["send"]), leng)
+                    
+                    db_ex("update data set data = '" + db_pas(content) + "' where title = '" + db_pas(name) + "'")
+                    db_com()
+                    
+                include_check(name, content)
+                
                 return redirect('/w/' + url_pas(name))
+        else:
+            return redirect('/w/' + url_pas(name))
     else:        
         if(can == 1):
             return redirect('/ban')
@@ -2391,8 +2380,6 @@ def error_page(num = None):
         return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '업로드 오류', logo = set_data['name'], data = 'jpg, gif, jpeg, png만 가능 합니다.'), 401
     elif(num == 16):
         return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '업로드 오류', logo = set_data['name'], data = '동일한 이름의 파일이 있습니다.'), 401
-    elif(num == 17):
-        return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '편집 오류', logo = set_data['name'], data = '편집 내용 기록에는 한글과 영어와 숫자, 공백만 허용 됩니다.'), 401
     elif(num == 18):
         return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '편집 오류', logo = set_data['name'], data = '내용이 원래 문서와 동일 합니다.'), 401
     elif(num == 19):

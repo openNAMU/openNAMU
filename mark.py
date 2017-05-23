@@ -28,7 +28,7 @@ def savemark(data):
 
 def html_pas(data):
     while(True):
-        y = re.search("<((div|span|embed|iframe)(?:[^>]*))>", data)
+        y = re.search("<((a|div|span|embed|iframe)(?:[^>]*))>", data)
         
         if(y):
             b = y.groups()
