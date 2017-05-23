@@ -1191,37 +1191,40 @@ def edit(name = None):
     can = acl_check(ip, name)
     
     if(request.method == 'POST'):
-        today = get_time()
-        
-        content = savemark(request.form["content"])
-        
-        db_ex("select * from data where title = '" + db_pas(name) + "'")
-        rows = db_get()
-        if(rows):
-            if(rows[0]['data'] == content):
-                return redirect('/error/18')
-            else:                    
+        if(len(request.form["send"]) > 500):
+            return redirect('/error/15')
+        else:
+            today = get_time()
+            
+            content = savemark(request.form["content"])
+            
+            db_ex("select * from data where title = '" + db_pas(name) + "'")
+            rows = db_get()
+            if(rows):
+                if(rows[0]['data'] == content):
+                    return redirect('/error/18')
+                else:                    
+                    if(can == 1):
+                        return redirect('/ban')
+                    else:                        
+                        leng = leng_check(len(rows[0]['data']), len(content))
+                        history_plus(name, content, today, ip, html_pas(request.form["send"], 2), leng)
+                        
+                        db_ex("update data set data = '" + db_pas(content) + "' where title = '" + db_pas(name) + "'")
+                        db_com()
+            else:                
                 if(can == 1):
                     return redirect('/ban')
-                else:                        
-                    leng = leng_check(len(rows[0]['data']), len(content))
-                    history_plus(name, content, today, ip, html_pas(request.form["send"]), leng)
+                else:
+                    leng = '+' + str(len(content))
+                    history_plus(name, content, today, ip, html_pas(request.form["send"], 2), leng)
                     
-                    db_ex("update data set data = '" + db_pas(content) + "' where title = '" + db_pas(name) + "'")
+                    db_ex("insert into data (title, data, acl) value ('" + db_pas(name) + "', '" + db_pas(content) + "', '')")
                     db_com()
-        else:                
-            if(can == 1):
-                return redirect('/ban')
-            else:
-                leng = '+' + str(len(content))
-                history_plus(name, content, today, ip, html_pas(request.form["send"]), leng)
-                
-                db_ex("insert into data (title, data, acl) value ('" + db_pas(name) + "', '" + db_pas(content) + "', '')")
-                db_com()
-                
-        include_check(name, content)
-        
-        return redirect('/w/' + url_pas(name))
+                    
+            include_check(name, content)
+            
+            return redirect('/w/' + url_pas(name))
     else:        
         if(can == 1):
             return redirect('/ban')
@@ -1247,32 +1250,35 @@ def section_edit(name = None, num = None):
     can = acl_check(ip, name)
     
     if(request.method == 'POST'):
-        today = get_time()
-        
-        content = savemark(request.form["content"])
-        
-        db_ex("select * from data where title = '" + db_pas(name) + "'")
-        rows = db_get()
-        if(rows):
-            if(request.form["otent"] == content):
-                return redirect('/error/18')
-            else:                    
-                if(can == 1):
-                    return redirect('/ban')
-                else:                        
-                    leng = leng_check(len(request.form['otent']), len(content))
-                    content = rows[0]['data'].replace(request.form['otent'], content)
-                    
-                    history_plus(name, content, today, ip, html_pas(request.form["send"]), leng)
-                    
-                    db_ex("update data set data = '" + db_pas(content) + "' where title = '" + db_pas(name) + "'")
-                    db_com()
-                    
-                include_check(name, content)
-                
-                return redirect('/w/' + url_pas(name))
+        if(len(request.form["send"]) > 500):
+            return redirect('/error/15')
         else:
-            return redirect('/w/' + url_pas(name))
+            today = get_time()
+            
+            content = savemark(request.form["content"])
+            
+            db_ex("select * from data where title = '" + db_pas(name) + "'")
+            rows = db_get()
+            if(rows):
+                if(request.form["otent"] == content):
+                    return redirect('/error/18')
+                else:                    
+                    if(can == 1):
+                        return redirect('/ban')
+                    else:                        
+                        leng = leng_check(len(request.form['otent']), len(content))
+                        content = rows[0]['data'].replace(request.form['otent'], content)
+                        
+                        history_plus(name, content, today, ip, html_pas(request.form["send"], 2), leng)
+                        
+                        db_ex("update data set data = '" + db_pas(content) + "' where title = '" + db_pas(name) + "'")
+                        db_com()
+                        
+                    include_check(name, content)
+                    
+                    return redirect('/w/' + url_pas(name))
+            else:
+                return redirect('/w/' + url_pas(name))
     else:        
         if(can == 1):
             return redirect('/ban')
@@ -2378,6 +2384,8 @@ def error_page(num = None):
         return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '로그인 오류', logo = set_data['name'], data = '비밀번호가 다릅니다.'), 401
     elif(num == 14):
         return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '업로드 오류', logo = set_data['name'], data = 'jpg, gif, jpeg, png만 가능 합니다.'), 401
+    elif(num == 15):
+        return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '편집 오류', logo = set_data['name'], data = '편집 기록은 500자를 넘을 수 없습니다.'), 401
     elif(num == 16):
         return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '업로드 오류', logo = set_data['name'], data = '동일한 이름의 파일이 있습니다.'), 401
     elif(num == 18):

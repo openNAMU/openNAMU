@@ -26,9 +26,12 @@ def savemark(data):
 
     return data
 
-def html_pas(data):
+def html_pas(data, how):
     while(True):
-        y = re.search("<((a|div|span|embed|iframe)(?:[^>]*))>", data)
+        if(how == 1):
+            y = re.search("<((a|div|span|embed|iframe)(?:[^>]*))>", data)
+        else:  
+            y = re.search("<((a)(?:[^>]*))>", data)
         
         if(y):
             b = y.groups()
@@ -69,7 +72,7 @@ def html_pas(data):
     data = re.sub('>', '&gt;', data)
     data = re.sub('"', '&quot;', data)
     
-    data = re.sub("\[(?P<in>(?:\/)?(?:div|span|embed|iframe)(?:[^\]]*))\]", "<\g<in>>", data)
+    data = re.sub("\[(?P<in>(?:\/)?(?:a|div|span|embed|iframe)(?:[^\]]*))\]", "<\g<in>>", data)
     data = re.sub('#.#', '"', data)
     
     return data
@@ -206,7 +209,7 @@ def cat_plus(name, link):
         db_com()
 
 def namumark(title, data):
-    data = html_pas(data)
+    data = html_pas(data, 1)
 
     b = 0
     a = mid_pas(data, b, False)
@@ -252,7 +255,7 @@ def namumark(title, data):
                     in_data = in_con[0]['data']
                     in_data = re.sub("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]", "", in_data)
                     
-                    in_data = html_pas(in_data)
+                    in_data = html_pas(in_data, 1)
                     in_data = mid_pas(in_data, b, True)[0]
                     
                     if(results[1]):
