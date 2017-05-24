@@ -6,6 +6,10 @@
     margin-left: 20px;
 }
 
+#out {
+    margin-left: 5px;
+}
+
 #log {
     line-height: 32px;
     width: 20px;

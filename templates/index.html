@@ -81,11 +81,19 @@
                     <nav class="menu">
                         <a class="menu-item selected" href="#" onclick="return false">{% if sub %}{{sub}}{% elif tn == 1 %}문서{% else %}기타{% endif %}</a>
                         {% if tn == 1 %}
+                        {% if data_none == True %}
+                        <a class="menu-item" href="/edit/{{page}}">생성</a>
+                        {% else %}
                         <a class="menu-item" href="/edit/{{page}}">수정</a>
+                        {% endif %}
                         <a class="menu-item" id="{{topic}}" href="/topic/{{page}}">토론</a>
+                        {% if not data_none == True %}
                         <a class="menu-item" href="/delete/{{page}}">삭제</a>
+                        {% endif %}
                         <a class="menu-item" href="/move/{{page}}">이동</a>
+                        {% if not data_none == True %}
                         <a class="menu-item" href="/raw/{{page}}">Raw</a>
+                        {% endif %}
                         <a class="menu-item" href="/history/{{page}}/n/1">역사</a>
                         <a class="menu-item" href="/backlink/{{page}}/n/1">역링크</a>
                         {% if redirect %}

@@ -318,6 +318,7 @@ def namumark(title, data):
     h4c = 0
     h5c = 0
     last = 0
+    span = ''
     rtoc = '<div id="toc"><span id="toc-name">목차</span><br><br>'
     while(True):
         i = i + 1
@@ -350,26 +351,41 @@ def namumark(title, data):
                 elif(wiki == 5):
                     h5c = 0
             if(wiki == 1):
-                h0c = h0c + 1
+                h0c += 1
             elif(wiki == 2):
-                h1c = h1c + 1
+                h1c += 1
             elif(wiki == 3):
-                h2c = h2c + 1
+                h2c += 1
             elif(wiki == 4):
-                h3c = h3c + 1
+                h3c += 1
             elif(wiki == 5):
-                h4c = h4c + 1
+                h4c += 1
             else:
-                h5c = h5c + 1
+                h5c += 1
 
             toc = str(h0c) + '.' + str(h1c) + '.' + str(h2c) + '.' + str(h3c) + '.' + str(h4c) + '.' + str(h5c) + '.'
+
             toc = re.sub("(?P<in>[0-9]0(?:[0]*)?)\.", '\g<in>#.', toc)
 
             toc = re.sub("0\.", '', toc)
             toc = re.sub("#\.", '.', toc)
             toc = re.sub("\.$", '', toc)
 
-            rtoc = rtoc + '<a href="#s-' + toc + '">' + toc + '</a>. ' + result[1] + '<br>'
+            test = re.search('([0-9]*)(\.([0-9]*))?(\.([0-9]*))?(\.([0-9]*))?(\.([0-9]*))?', toc)
+            if(test):
+                g = test.groups()
+                if(g[4]):
+                    span = '<span id="out"></span>' * 4
+                elif(g[3]):
+                    span = '<span id="out"></span>' * 3
+                elif(g[2]):
+                    span = '<span id="out"></span>' * 2
+                elif(g[1]):
+                    span = '<span id="out"></span>'
+                else:
+                    span = ''
+
+            rtoc = rtoc + span + '<a href="#s-' + toc + '">' + toc + '</a>. ' + result[1] + '<br>'
 
             c = re.sub(" $", "", result[1])
             d = c
