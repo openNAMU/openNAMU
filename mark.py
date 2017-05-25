@@ -669,11 +669,15 @@ def namumark(title, data):
     data = re.sub("-{4,11}", "<hr>", data)
     
     while(True):
-        b = re.search("\n( +)", data)
+        b = re.search("(<\/h[0-9]>|\n)( +)", data)
         if(b):
             result = b.groups()
-            up = re.sub(' ', '<span id="in"></span>', result[0])
-            data = re.sub("\n( +)", '<br>' + up, data, 1)
+            up = re.sub(' ', '<span id="in"></span>', result[1])
+
+            if(re.search('<\/h[0-9]>', result[0])):
+                data = re.sub("(?P<in>\/h[0-9]>)( +)", '\g<in>' + up, data, 1)
+            else:
+                data = re.sub("(?:\n)( +)", '<br>' + up, data, 1)
         else:
             break
     
