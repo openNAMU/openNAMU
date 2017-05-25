@@ -472,14 +472,20 @@ def namumark(title, data):
                         height = ''
 
                     extension = re.search("^(.+)(\.(?:[Jj][Pp][Gg]|[Gg][Ii][Ff]|[Jj][Pp][Ee][Gg]|[Pp][Nn][Gg]))$", c[0]).groups()
-
-                    img = re.sub("\.(?P<in>[Jj][Pp][Gg]|[Pp][Nn][Gg]|[Gg][Ii][Ff]|[Jj][Pp][Ee][Gg])", "#\g<in>#", extension[1])
-                    data = re.sub("\[\[파일:((?:(?!\]\]|\?).)*)(?:\?((?:(?!\]\]).)*))?\]\]", '<a href="/w/파일:' + extension[0] + img + '"><img src="/image/' + sha224(extension[0]) + img + '" width="' + width + '" height="' + height + '"></a>', data, 1)
+                    
+                    try:
+                        img = re.sub("\.(?P<in>[Jj][Pp][Gg]|[Pp][Nn][Gg]|[Gg][Ii][Ff]|[Jj][Pp][Ee][Gg])", "#\g<in>#", extension[1])
+                        data = re.sub("\[\[파일:((?:(?!\]\]|\?).)*)(?:\?((?:(?!\]\]).)*))?\]\]", '<a href="/w/파일:' + extension[0] + img + '"><img src="/image/' + sha224(extension[0]) + img + '" width="' + width + '" height="' + height + '"></a>', data, 1)
+                    except:
+                        data = re.sub("\[\[파일:((?:(?!\]\]|\?).)*)(?:\?((?:(?!\]\]).)*))?\]\]", '<a href="/w/파일:' + extension[0] + '"><img src="/image/' + sha224(extension[0]) + '" width="' + width + '" height="' + height + '"></a>', data, 1)
                 else:
                     extension = re.search("^(.+)(\.(?:[Jj][Pp][Gg]|[Gg][Ii][Ff]|[Jj][Pp][Ee][Gg]|[Pp][Nn][Gg]))$", c[0]).groups()
                     
-                    img = re.sub("\.(?P<in>[Jj][Pp][Gg]|[Pp][Nn][Gg]|[Gg][Ii][Ff]|[Jj][Pp][Ee][Gg])", "#\g<in>#", extension[1])
-                    data = re.sub("\[\[파일:((?:(?!\]\]|\?).)*)(?:\?((?:(?!\]\]).)*))?\]\]", "<a href='/w/파일:" + extension[0] + img + "'><img src='/image/" + sha224(extension[0]) + img + "'></a>", data, 1)
+                    try:
+                        img = re.sub("\.(?P<in>[Jj][Pp][Gg]|[Pp][Nn][Gg]|[Gg][Ii][Ff]|[Jj][Pp][Ee][Gg])", "#\g<in>#", extension[1])
+                        data = re.sub("\[\[파일:((?:(?!\]\]|\?).)*)(?:\?((?:(?!\]\]).)*))?\]\]", "<a href='/w/파일:" + extension[0] + img + "'><img src='/image/" + sha224(extension[0]) + img + "'></a>", data, 1)
+                    except:
+                        data = re.sub("\[\[파일:((?:(?!\]\]|\?).)*)(?:\?((?:(?!\]\]).)*))?\]\]", "<a href='/w/파일:" + extension[0] + "'><img src='/image/" + sha224(extension[0]) + "'></a>", data, 1)
             else:
                 break            
         else:
