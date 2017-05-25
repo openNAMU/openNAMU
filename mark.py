@@ -304,9 +304,11 @@ def namumark(title, data):
         else:
             break
     
-    m = re.search('\[목차\]', data)
-    if(not m):
-        data = re.sub("(?P<in>(={1,6})\s?([^=]*)\s?(?:={1,6})(?:\s+)?\n)", "[목차]\n\g<in>", data, 1)
+    if(not re.search('\[목차\]', data)):
+        if(not re.search('\[목차\(없음\)\]', data)):
+            data = re.sub("(?P<in>(={1,6})\s?([^=]*)\s?(?:={1,6})(?:\s+)?\n)", "[목차]\n\g<in>", data, 1)
+        else:
+            data = re.sub("\[목차\(없음\)\]", "", data)
         
     data = re.sub("(\n)(?P<in>\r\n(={1,6})\s?([^=]*)\s?(?:={1,6})(?:\s+)?\n)", "\g<in>", data)
     
