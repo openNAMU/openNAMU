@@ -5,6 +5,9 @@ set_data = json.loads(json_data)
 
 conn = pymysql.connect(host = set_data['host'], user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4')
 curs = conn.cursor(pymysql.cursors.DictCursor)
+
+def db_com():
+    return conn.commit()
     
 def db_get():
     return curs.fetchall()
