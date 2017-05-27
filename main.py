@@ -600,7 +600,7 @@ def blocklog(number = None):
                 why = re.sub('<', '&lt;', why)
                 why = re.sub('>', '&gt;', why)
                 
-                b = re.search("^([0-9](?:[0-9]?[0-9]?)\.[0-9](?:[0-9]?[0-9]?))$", rows[i]['block'])
+                b = re.search("^([0-9]{1,3}\.[0-9]{1,3})$", rows[i]['block'])
                 if(b):
                     ip = rows[i]['block'] + ' (대역)'
                 else:
@@ -2061,7 +2061,7 @@ def logout():
 
     return redirect('/user')
     
-@app.route('/ban/<name>', methods=['POST', 'GET'])
+@app.route('/ban/<path:name>', methods=['POST', 'GET'])
 def user_ban(name = None):
     db_ex("select * from user where id = '" + db_pas(name) + "'")
     user = db_get()
@@ -2084,7 +2084,7 @@ def user_ban(name = None):
                     
                     db_ex("delete from ban where block = '" + db_pas(name) + "'")
                 else:
-                    b = re.search("^([0-9](?:[0-9]?[0-9]?)\.[0-9](?:[0-9]?[0-9]?))$", name)
+                    b = re.search("^([0-9]{1,3}\.[0-9]{1,3})$", name)
                     if(b):
                         rb_plus(name, end, 시간(), ip, request.form["why"])
                         
@@ -2105,7 +2105,7 @@ def user_ban(name = None):
                 if(row):
                     now = '차단 해제'
                 else:
-                    b = re.search("^([0-9](?:[0-9]?[0-9]?)\.[0-9](?:[0-9]?[0-9]?))$", name)
+                    b = re.search("^([0-9]{1,3}\.[0-9]{1,3})$", name)
                     if(b):
                         now = '대역 차단'
                     else:
