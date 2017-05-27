@@ -2372,7 +2372,7 @@ def error_page(num = None):
     elif(num == 13):
         return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '로그인 오류', logo = set_data['name'], data = '비밀번호가 다릅니다.'), 401
     elif(num == 14):
-        return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '업로드 오류', logo = set_data['name'], data = 'jpg, gif, jpeg, png만 가능 합니다.'), 401
+        return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '업로드 오류', logo = set_data['name'], data = 'jpg, gif, jpeg, png(대 소문자 상관 없음)만 가능 합니다.'), 401
     elif(num == 15):
         return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '편집 오류', logo = set_data['name'], data = '편집 기록은 500자를 넘을 수 없습니다.'), 401
     elif(num == 16):
