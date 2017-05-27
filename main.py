@@ -194,11 +194,11 @@ def acl_list():
             else:
                 acl = '로그인'
 
-            data = data + '<li>' + str(i) + '. <a href="/w/' + url_pas(list_data[i]['title']) + '">' + list_data[i]['title'] + '</a> (' + acl + ')</li>'
+            data += '<li>' + str(i) + '. <a href="/w/' + url_pas(list_data[i]['title']) + '">' + list_data[i]['title'] + '</a> (' + acl + ')</li>'
 
             i += 1
 
-        data = data + '</div>'
+        data += '</div>'
     else:
         data = ''
 
@@ -231,7 +231,7 @@ def admin_list():
             else:
                 name = '<a class="not_thing" href="/w/' + url_pas('사용자:' + user_data[i]['id']) + '">' + user_data[i]['id'] + '</a> (' + acl + ')'
 
-            div = div + '<li>' + str(i + 1) + '. ' + name + '</li>'
+            div += '<li>' + str(i + 1) + '. ' + name + '</li>'
             
             i += 1
             
@@ -293,7 +293,7 @@ def recent_changes():
                 else:
                     revert = '<a href="/w/' + url_pas(rows[i]['title']) + '/r/' + str(int(rows[i]['id']) - 1) + '/diff/' + rows[i]['id'] + '">(비교)</a> <a href="/revert/' + url_pas(rows[i]['title']) + '/r/' + str(int(rows[i]['id']) - 1) + '">(되돌리기)</a>'
                     
-                div = div + '<table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;"><a href="/w/' + url_pas(rows[i]['title']) + '">' + title + '</a> <a href="/history/' + url_pas(rows[i]['title']) + '/n/1">(역사)</a> ' + revert + ' (' + leng + ')</td><td style="text-align: center;width:33.33%;">' + ip + ban + '</td><td style="text-align: center;width:33.33%;">' + rows[i]['date'] + '</td></tr><tr><td colspan="3" style="text-align: center;width:100%;">' + send + '</td></tr></tbody></table>'
+                div += '<table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;"><a href="/w/' + url_pas(rows[i]['title']) + '">' + title + '</a> <a href="/history/' + url_pas(rows[i]['title']) + '/n/1">(역사)</a> ' + revert + ' (' + leng + ')</td><td style="text-align: center;width:33.33%;">' + ip + ban + '</td><td style="text-align: center;width:33.33%;">' + rows[i]['date'] + '</td></tr><tr><td colspan="3" style="text-align: center;width:100%;">' + send + '</td></tr></tbody></table>'
                 
                 i += 1
             except:
@@ -376,22 +376,22 @@ def user_record(name = None, num = None):
                 else:
                     revert = '<a href="/revert/' + url_pas(rows[i]['title']) + '/r/' + str(int(rows[i]['id']) - 1) + '">(되돌리기)</a>'
                     
-                div = div + '<table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;"><a href="/w/' + url_pas(rows[i]['title']) + '">' + title + '</a> (' + rows[i]['id'] + '판) <a href="/history/' + url_pas(rows[i]['title']) + '/n/1">(역사)</a> ' + revert + ' (' + leng + ')</td><td style="text-align: center;width:33.33%;">' + ip + ban +  '</td><td style="text-align: center;width:33.33%;">' + rows[i]['date'] + '</td></tr><tr><td colspan="3" style="text-align: center;width:100%;">' + send + '</td></tr></tbody></table>'
+                div += '<table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;"><a href="/w/' + url_pas(rows[i]['title']) + '">' + title + '</a> (' + rows[i]['id'] + '판) <a href="/history/' + url_pas(rows[i]['title']) + '/n/1">(역사)</a> ' + revert + ' (' + leng + ')</td><td style="text-align: center;width:33.33%;">' + ip + ban +  '</td><td style="text-align: center;width:33.33%;">' + rows[i]['date'] + '</td></tr><tr><td colspan="3" style="text-align: center;width:100%;">' + send + '</td></tr></tbody></table>'
                 
                 if(i == v):
                     div = div + '</div>'
                     if(num == 1):
-                        div = div + '<br><a href="/record/' + url_pas(name) + '/n/' + str(num + 1) + '">(다음)'
+                        div += '<br><a href="/record/' + url_pas(name) + '/n/' + str(num + 1) + '">(다음)'
                     else:
-                        div = div + '<br><a href="/record/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전) <a href="/record/' + url_pas(name) + '/n/' + str(num + 1) + '">(다음)'
+                        div += '<br><a href="/record/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전) <a href="/record/' + url_pas(name) + '/n/' + str(num + 1) + '">(다음)'
                     break
 
                 i += 1
             except:
-                div = div + '</div>'
+                div += '</div>'
 
                 if(num != 1):
-                    div = div + '<br><a href="/record/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전)'
+                    div += '<br><a href="/record/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전)'
 
                 break
                 
@@ -508,18 +508,18 @@ def backlink(name = None, num = None):
                         data = namumark('', data)                    
                         
                         if(re.search("<a(?:(?:(?!href=).)*)?href=\"\/w\/" + url_pas(name) + "(?:\#[^\"]*)?\"(?:(?:(?!>).)*)?>([^<]*)<\/a>", data)):
-                            div = div + '<li><a href="/w/' + url_pas(rows[i]['link']) + '">' + rows[i]['link'] + '</a>'
+                            div += '<li><a href="/w/' + url_pas(rows[i]['link']) + '">' + rows[i]['link'] + '</a>'
                             
                             if(rows[i]['type']):
-                                div = div + ' (' + rows[i]['type'] + ')</li>'
+                                div += ' (' + rows[i]['type'] + ')</li>'
                             else:
-                                div = div + '</li>'
+                                div += '</li>'
                                 
                             if(i == v):
                                 if(num == 1):
-                                    div = div + '<br><a href="/backlink/' + url_pas(name) + '/n/' + str(num + 1) + '">(다음)'
+                                    div += '<br><a href="/backlink/' + url_pas(name) + '/n/' + str(num + 1) + '">(다음)'
                                 else:
-                                    div = div + '<br><a href="/backlink/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전) <a href="/backlink/' + url_pas(name) + '/n/' + str(num + 1) + '">(다음)'
+                                    div += '<br><a href="/backlink/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전) <a href="/backlink/' + url_pas(name) + '/n/' + str(num + 1) + '">(다음)'
                                     
                                 break
                             else:
@@ -544,7 +544,7 @@ def backlink(name = None, num = None):
                     v += 1
             except:
                 if(num != 1):
-                    div = div + '<br><a href="/backlink/n/' + str(num - 1) + '">(이전)'
+                    div += '<br><a href="/backlink/n/' + str(num - 1) + '">(이전)'
                 
                 break
                 
@@ -573,11 +573,11 @@ def recent_discuss():
                 sub = re.sub('<', '&lt;', sub)
                 sub = re.sub('>', '&gt;', sub)
                 
-                div = div + '<table style="width: 100%;"><tbody><tr><td style="text-align: center;width:50%;"><a href="/topic/' + url_pas(rows[i]['title']) + '/sub/' + url_pas(rows[i]['sub']) + '">' + title + '</a> (' + sub + ')</td><td style="text-align: center;width:50%;">' + rows[i]['date'] + '</td></tr></tbody></table>'
+                div += '<table style="width: 100%;"><tbody><tr><td style="text-align: center;width:50%;"><a href="/topic/' + url_pas(rows[i]['title']) + '/sub/' + url_pas(rows[i]['sub']) + '">' + title + '</a> (' + sub + ')</td><td style="text-align: center;width:50%;">' + rows[i]['date'] + '</td></tr></tbody></table>'
                 
                 i += 1
             except:
-                div = div + '</div>'
+                div += '</div>'
                 
                 break
             
@@ -618,12 +618,12 @@ def blocklog(number = None):
             div = div + '<table style="width: 100%;"><tbody><tr><td style="text-align: center;width:20%;">' + ip + '</a></td><td style="text-align: center;width:20%;">' + rows[i]['blocker'] + '</td><td style="text-align: center;width:20%;">' + rows[i]['end'] + '</td><td style="text-align: center;width:20%;">' + rows[i]['why'] + '</td><td style="text-align: center;width:20%;">' + rows[i]['today'] + '</td></tr></tbody></table>'
             
             if(i == v):
-                div = div + '</div>'
+                div += '</div>'
                 
                 if(number == 1):
-                    div = div + '<br><a href="/blocklog/n/' + str(number + 1) + '">(다음)'
+                    div += '<br><a href="/blocklog/n/' + str(number + 1) + '">(다음)'
                 else:
-                    div = div + '<br><a href="/blocklog/n/' + str(number - 1) + '">(이전) <a href="/blocklog/n/' + str(number + 1) + '">(다음)'
+                    div += '<br><a href="/blocklog/n/' + str(number - 1) + '">(이전) <a href="/blocklog/n/' + str(number + 1) + '">(다음)'
                     
                 break
             else:
