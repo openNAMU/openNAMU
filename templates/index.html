@@ -168,15 +168,6 @@
                 {% endautoescape %}
                 {% endif %}
                 {% elif tn == 3 %}
-                <table style="width: 100%;">
-                    <tbody>
-                        <tr>
-                            <td style="text-align: center;width:33.33%;">문서명</td>
-                            <td style="text-align: center;width:33.33%;">기여자</td>
-                            <td style="text-align: center;width:33.33%;">시간</td>
-                        </tr>
-                    </tbody>
-                </table>
                 {% autoescape false %}
                 {{rows}}
                 {% endautoescape %}
@@ -199,15 +190,6 @@
                 <button class="btn btn-primary" type='submit'>리비전 비교</button>
                 <br>
                 <br>
-                <table style="width: 100%;">
-                    <tbody>
-                        <tr>
-                            <td style="text-align: center;width:33.33%;">판</td>
-                            <td style="text-align: center;width:33.33%;">기여자</td>
-                            <td style="text-align: center;width:33.33%;">시간</td>
-                        </tr>
-                    </tbody>
-                </table>
                 {% autoescape false %}
                 {{rows}}
                 {% endautoescape %}
@@ -282,18 +264,6 @@
                 <span>비 로그인 상태입니다. 비 로그인으로 작업 시 아이피가 역사에 기록됩니다.</span>
                 {% endif %}
                 {% endif %}
-                {% elif tn == 12 %}
-                <table style="width: 100%;">
-                    <tbody>
-                        <tr>
-                            <td style="text-align: center;width:50%;">토론명</td>
-                            <td style="text-align: center;width:50%;">시간</td>
-                        </tr>
-                    </tbody>
-                </table>
-                {% autoescape false %}
-                {{rows}}
-                {% endautoescape %}
                 {% elif tn == 13 %}
                 <form id="usrform" method="POST" action="/revert/{{page}}/r/{{r}}">
                     {{plus}}
@@ -400,21 +370,6 @@
                     <br>
                     <button class="btn btn-primary" type="submit">ACL 변경</button>
                 </form>
-                {% elif tn == 20 %}
-                <table style="width: 100%;">
-                    <tbody>
-                        <tr>
-                            <td style="text-align: center;width:20%;">차단자</td>
-                            <td style="text-align: center;width:20%;">관리자</td>
-                            <td style="text-align: center;width:20%;">언제까지</td>
-                            <td style="text-align: center;width:20%;">왜</td>
-                            <td style="text-align: center;width:20%;">시간</td>
-                        </tr>
-                    </tbody>
-                </table>
-                {% autoescape false %}
-                {{rows}}
-                {% endautoescape %}
                 {% elif tn == 21 %}
                 <div>
                     <form action="" method=post enctype=multipart/form-data>
@@ -423,19 +378,6 @@
                     </form>
                 </div>
                 <span>{{number}}MB 이하 파일만 업로드 가능하고 확장자는 jpg, png, gif, jpeg만 가능합니다.</span>
-                {% elif tn == 22 %}
-                <table style="width: 100%;">
-                    <tbody>
-                        <tr>
-                            <td style="text-align: center;width:33.33%;">유저</td>
-                            <td style="text-align: center;width:33.33%;">아이피</td>
-                            <td style="text-align: center;width:33.33%;">언제</td>
-                        </tr>
-                    </tbody>
-                </table>
-                {% autoescape false %}
-                {{rows}}
-                {% endautoescape %}
                 {% else %}
                 <div>
                     {% autoescape false %}

@@ -242,7 +242,7 @@ def admin_list():
 @app.route('/recentchanges')
 def recent_changes():
     i = 0
-    div = '<div>'
+    div = '<div><table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;">문서명</td><td style="text-align: center;width:33.33%;">기여자</td><td style="text-align: center;width:33.33%;">시간</td></tr>'
     
     db_ex("select * from history order by date desc limit 50")
     rows = db_get()
@@ -293,11 +293,11 @@ def recent_changes():
                 else:
                     revert = '<a href="/w/' + url_pas(rows[i]['title']) + '/r/' + str(int(rows[i]['id']) - 1) + '/diff/' + rows[i]['id'] + '">(비교)</a> <a href="/revert/' + url_pas(rows[i]['title']) + '/r/' + str(int(rows[i]['id']) - 1) + '">(되돌리기)</a>'
                     
-                div += '<table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;"><a href="/w/' + url_pas(rows[i]['title']) + '">' + title + '</a> <a href="/history/' + url_pas(rows[i]['title']) + '/n/1">(역사)</a> ' + revert + ' (' + leng + ')</td><td style="text-align: center;width:33.33%;">' + ip + ban + '</td><td style="text-align: center;width:33.33%;">' + rows[i]['date'] + '</td></tr><tr><td colspan="3" style="text-align: center;width:100%;">' + send + '</td></tr></tbody></table>'
+                div += '<tr><td style="text-align: center;width:33.33%;"><a href="/w/' + url_pas(rows[i]['title']) + '">' + title + '</a> <a href="/history/' + url_pas(rows[i]['title']) + '/n/1">(역사)</a> ' + revert + ' (' + leng + ')</td><td style="text-align: center;width:33.33%;">' + ip + ban + '</td><td style="text-align: center;width:33.33%;">' + rows[i]['date'] + '</td></tr><tr><td colspan="3" style="text-align: center;width:100%;">' + send + '</td></tr>'
                 
                 i += 1
             except:
-                div = div + '</div>'
+                div = div + '</tbody></table></div>'
                 break
             
         return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], rows = div, tn = 3, title = '최근 변경내역')
@@ -324,7 +324,7 @@ def history_hidden(name = None, num = None):
 def user_record(name = None, num = None):
     v = num * 50
     i = v - 50
-    div = '<div>'
+    div = '<div><table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;">문서명</td><td style="text-align: center;width:33.33%;">기여자</td><td style="text-align: center;width:33.33%;">시간</td></tr>'
     
     db_ex("select * from history where ip = '" + db_pas(name) + "' order by date desc")
     rows = db_get()
@@ -376,22 +376,22 @@ def user_record(name = None, num = None):
                 else:
                     revert = '<a href="/revert/' + url_pas(rows[i]['title']) + '/r/' + str(int(rows[i]['id']) - 1) + '">(되돌리기)</a>'
                     
-                div += '<table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;"><a href="/w/' + url_pas(rows[i]['title']) + '">' + title + '</a> (' + rows[i]['id'] + '판) <a href="/history/' + url_pas(rows[i]['title']) + '/n/1">(역사)</a> ' + revert + ' (' + leng + ')</td><td style="text-align: center;width:33.33%;">' + ip + ban +  '</td><td style="text-align: center;width:33.33%;">' + rows[i]['date'] + '</td></tr><tr><td colspan="3" style="text-align: center;width:100%;">' + send + '</td></tr></tbody></table>'
+                div += '<tr><td style="text-align: center;width:33.33%;"><a href="/w/' + url_pas(rows[i]['title']) + '">' + title + '</a> (' + rows[i]['id'] + '판) <a href="/history/' + url_pas(rows[i]['title']) + '/n/1">(역사)</a> ' + revert + ' (' + leng + ')</td><td style="text-align: center;width:33.33%;">' + ip + ban +  '</td><td style="text-align: center;width:33.33%;">' + rows[i]['date'] + '</td></tr><tr><td colspan="3" style="text-align: center;width:100%;">' + send + '</td></tr>'
                 
                 if(i == v):
-                    div = div + '</div>'
+                    div = div + '</tbody></table></div>'
                     if(num == 1):
-                        div += '<br><a href="/record/' + url_pas(name) + '/n/' + str(num + 1) + '">(다음)'
+                        div += '<br><a href="/record/' + url_pas(name) + '/n/' + str(num + 1) + '">(다음)</a>'
                     else:
-                        div += '<br><a href="/record/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전) <a href="/record/' + url_pas(name) + '/n/' + str(num + 1) + '">(다음)'
+                        div += '<br><a href="/record/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전)</a> <a href="/record/' + url_pas(name) + '/n/' + str(num + 1) + '">(다음)</a>'
                     break
 
                 i += 1
             except:
-                div += '</div>'
+                div += '</tbody></table></div>'
 
                 if(num != 1):
-                    div += '<br><a href="/record/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전)'
+                    div += '<br><a href="/record/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전)</a>'
 
                 break
                 
@@ -558,7 +558,7 @@ def backlink(name = None, num = None):
 @app.route('/recentdiscuss')
 def recent_discuss():
     i = 0
-    div = '<div>'
+    div = '<div><table style="width: 100%;"><tbody><tr><td style="text-align: center;width:50%;">토론명</td><td style="text-align: center;width:50%;">시간</td></tr>'
     
     db_ex("select * from rd order by date desc limit 50")
     rows = db_get()
@@ -573,65 +573,63 @@ def recent_discuss():
                 sub = re.sub('<', '&lt;', sub)
                 sub = re.sub('>', '&gt;', sub)
                 
-                div += '<table style="width: 100%;"><tbody><tr><td style="text-align: center;width:50%;"><a href="/topic/' + url_pas(rows[i]['title']) + '/sub/' + url_pas(rows[i]['sub']) + '">' + title + '</a> (' + sub + ')</td><td style="text-align: center;width:50%;">' + rows[i]['date'] + '</td></tr></tbody></table>'
+                div += '<tr><td style="text-align: center;width:50%;"><a href="/topic/' + url_pas(rows[i]['title']) + '/sub/' + url_pas(rows[i]['sub']) + '">' + title + '</a> (' + sub + ')</td><td style="text-align: center;width:50%;">' + rows[i]['date'] + '</td></tr>'
                 
                 i += 1
             except:
-                div += '</div>'
+                div += '</tbody></table></div>'
                 
                 break
             
-        return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], rows = div, tn = 12, title = '최근 토론내역')
+        return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], rows = div, tn = 3, title = '최근 토론내역')
     else:
-        return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], rows = '', tn = 12, title = '최근 토론내역')
+        return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], rows = '', tn = 3, title = '최근 토론내역')
 
 @app.route('/blocklog/n/<int:number>')
 def blocklog(number = None):
     v = number * 50
     i = v - 50
-    div = '<div>'
+    div = '<div><table style="width: 100%;"><tbody><tr><td style="text-align: center;width:20%;">차단자</td><td style="text-align: center;width:20%;">관리자</td><td style="text-align: center;width:20%;">언제까지</td><td style="text-align: center;width:20%;">왜</td><td style="text-align: center;width:20%;">시간</td></tr>'
     
     db_ex("select * from rb order by today desc")
     rows = db_get()
     if(rows):
         while(True):
-            try:
-                a = rows[i]
+            try: 
+                why = rows[i]['why']
+                why = re.sub('<', '&lt;', why)
+                why = re.sub('>', '&gt;', why)
+                
+                b = re.search("^([0-9](?:[0-9]?[0-9]?)\.[0-9](?:[0-9]?[0-9]?))$", rows[i]['block'])
+                if(b):
+                    ip = rows[i]['block'] + ' (대역)'
+                else:
+                    ip = rows[i]['block']
+                    
+                div += '<tr><td style="text-align: center;width:20%;">' + ip + '</a></td><td style="text-align: center;width:20%;">' + rows[i]['blocker'] + '</td><td style="text-align: center;width:20%;">' + rows[i]['end'] + '</td><td style="text-align: center;width:20%;">' + rows[i]['why'] + '</td><td style="text-align: center;width:20%;">' + rows[i]['today'] + '</td></tr>'
+                
+                if(i == v):
+                    div += '</tbody></table></div>'
+                    
+                    if(number == 1):
+                        div += '<br><a href="/blocklog/n/' + str(number + 1) + '">(다음)</a>'
+                    else:
+                        div += '<br><a href="/blocklog/n/' + str(number - 1) + '">(이전)</a> <a href="/blocklog/n/' + str(number + 1) + '">(다음)</a>'
+                        
+                    break
+                else:
+                    i += 1
             except:
-                div += '</div>'
+                div += '</tbody></table></div>'
                 
                 if(number != 1):
-                    div = div + '<br><a href="/blocklog/n/' + str(number - 1) + '">(이전)'
+                    div = div + '<br><a href="/blocklog/n/' + str(number - 1) + '">(이전)</a>'
                     
                 break
                 
-            why = rows[i]['why']
-            why = re.sub('<', '&lt;', why)
-            why = re.sub('>', '&gt;', why)
-            
-            b = re.search("^([0-9](?:[0-9]?[0-9]?)\.[0-9](?:[0-9]?[0-9]?))$", rows[i]['block'])
-            if(b):
-                ip = rows[i]['block'] + ' (대역)'
-            else:
-                ip = rows[i]['block']
-                
-            div = div + '<table style="width: 100%;"><tbody><tr><td style="text-align: center;width:20%;">' + ip + '</a></td><td style="text-align: center;width:20%;">' + rows[i]['blocker'] + '</td><td style="text-align: center;width:20%;">' + rows[i]['end'] + '</td><td style="text-align: center;width:20%;">' + rows[i]['why'] + '</td><td style="text-align: center;width:20%;">' + rows[i]['today'] + '</td></tr></tbody></table>'
-            
-            if(i == v):
-                div += '</div>'
-                
-                if(number == 1):
-                    div += '<br><a href="/blocklog/n/' + str(number + 1) + '">(다음)'
-                else:
-                    div += '<br><a href="/blocklog/n/' + str(number - 1) + '">(이전) <a href="/blocklog/n/' + str(number + 1) + '">(다음)'
-                    
-                break
-            else:
-                i += 1
-                
-        return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], rows = div, tn = 20, title = '사용자 차단 기록')
+        return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], rows = div, tn = 3, title = '사용자 차단 기록')
     else:
-        return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], rows = '', tn = 20, title = '사용자 차단 기록')
+        return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], rows = '', tn = 3, title = '사용자 차단 기록')
         
 @app.route('/history/<path:name>/n/<int:num>', methods=['POST', 'GET'])
 def history_view(name = None, num = None):
@@ -641,7 +639,7 @@ def history_view(name = None, num = None):
         select = ''
         v = num * 50
         i = v - 50
-        div = '<div>'
+        div = '<div><table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;">판</td><td style="text-align: center;width:33.33%;">기여자</td><td style="text-align: center;width:33.33%;">시간</td></tr>'
         
         db_ex("select send, leng, ip, date, title, id from history where title = '" + db_pas(name) + "' order by id + 0 desc")
         rows = db_get()
@@ -649,48 +647,49 @@ def history_view(name = None, num = None):
             while(True):
                 style = ''
             
-                try:
-                    a = rows[i]
-                except:
-                    div = div + '</div>'
-                    
-                    if(num != 1):
-                        div = div + '<br><a href="/history/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전)'
+                try:                    
+                    print(i)
+                    print(v)
 
-                    break
+                    select += '<option value="' + rows[i]['id'] + '">' + rows[i]['id'] + '</option>'
                     
-                select = '<option value="' + str(i + 1) + '">' + str(i + 1) + '</option>' + select
-                
-                if(rows[i]['send']):
-                    send = rows[i]['send']
-                else:
-                    send = '<br>'
-                    
-                m = re.search("\+", rows[i]['leng'])
-                n = re.search("\-", rows[i]['leng'])
-                if(m):
-                    leng = '<span style="color:green;">' + rows[i]['leng'] + '</span>'
-                elif(n):
-                    leng = '<span style="color:red;">' + rows[i]['leng'] + '</span>'
-                else:
-                    leng = '<span style="color:gray;">' + rows[i]['leng'] + '</span>'                    
-                    
-                if(re.search("\.", rows[i]["ip"])):
-                    ip = rows[i]["ip"] + ' <a href="/record/' + url_pas(rows[i]["ip"]) + '/n/1">(기록)</a>'
-                else:
-                    db_ex("select title from data where title = '사용자:" + db_pas(rows[i]['ip']) + "'")
-                    row = db_get()
-                    if(row):
-                        ip = '<a href="/w/' + url_pas('사용자:' + rows[i]['ip']) + '">' + rows[i]['ip'] + '</a> <a href="/record/' + url_pas(rows[i]["ip"]) + '/n/1">(기록)</a>'
+                    if(rows[i]['send']):
+                        send = rows[i]['send']
                     else:
-                        ip = '<a class="not_thing" href="/w/' + url_pas('사용자:' + rows[i]['ip']) + '">' + rows[i]['ip'] + '</a> <a href="/record/' + url_pas(rows[i]["ip"]) + '/n/1">(기록)</a>'
+                        send = '<br>'
                         
-                if(admin_check() == 1):
-                    db_ex("select * from user where id = '" + db_pas(rows[i]['ip']) + "'")
-                    row = db_get()
-                    if(row):
-                        if(row[0]['acl'] == 'owner' or row[0]['acl'] == 'admin'):
-                            ban = ''
+                    m = re.search("\+", rows[i]['leng'])
+                    n = re.search("\-", rows[i]['leng'])
+                    if(m):
+                        leng = '<span style="color:green;">' + rows[i]['leng'] + '</span>'
+                    elif(n):
+                        leng = '<span style="color:red;">' + rows[i]['leng'] + '</span>'
+                    else:
+                        leng = '<span style="color:gray;">' + rows[i]['leng'] + '</span>'                    
+                        
+                    if(re.search("\.", rows[i]["ip"])):
+                        ip = rows[i]["ip"] + ' <a href="/record/' + url_pas(rows[i]["ip"]) + '/n/1">(기록)</a>'
+                    else:
+                        db_ex("select title from data where title = '사용자:" + db_pas(rows[i]['ip']) + "'")
+                        row = db_get()
+                        if(row):
+                            ip = '<a href="/w/' + url_pas('사용자:' + rows[i]['ip']) + '">' + rows[i]['ip'] + '</a> <a href="/record/' + url_pas(rows[i]["ip"]) + '/n/1">(기록)</a>'
+                        else:
+                            ip = '<a class="not_thing" href="/w/' + url_pas('사용자:' + rows[i]['ip']) + '">' + rows[i]['ip'] + '</a> <a href="/record/' + url_pas(rows[i]["ip"]) + '/n/1">(기록)</a>'
+                            
+                    if(admin_check() == 1):
+                        db_ex("select * from user where id = '" + db_pas(rows[i]['ip']) + "'")
+                        row = db_get()
+                        if(row):
+                            if(row[0]['acl'] == 'owner' or row[0]['acl'] == 'admin'):
+                                ban = ''
+                            else:
+                                db_ex("select * from ban where block = '" + db_pas(rows[i]['ip']) + "'")
+                                row = db_get()
+                                if(row):
+                                    ban = ' <a href="/ban/' + url_pas(rows[i]['ip']) + '">(해제)</a>'
+                                else:
+                                    ban = ' <a href="/ban/' + url_pas(rows[i]['ip']) + '">(차단)</a>'
                         else:
                             db_ex("select * from ban where block = '" + db_pas(rows[i]['ip']) + "'")
                             row = db_get()
@@ -698,23 +697,30 @@ def history_view(name = None, num = None):
                                 ban = ' <a href="/ban/' + url_pas(rows[i]['ip']) + '">(해제)</a>'
                             else:
                                 ban = ' <a href="/ban/' + url_pas(rows[i]['ip']) + '">(차단)</a>'
-                    else:
-                        db_ex("select * from ban where block = '" + db_pas(rows[i]['ip']) + "'")
-                        row = db_get()
-                        if(row):
-                            ban = ' <a href="/ban/' + url_pas(rows[i]['ip']) + '">(해제)</a>'
+                                
+                        if(owner_check() == 1):
+                            db_ex("select * from hidhi where title = '" + db_pas(name) + "' and re = '" + db_pas(rows[i]['id']) + "'")
+                            row = db_get()
+                            if(row):                            
+                                ip = ip + ' (숨김)'                            
+                                hidden = ' <a href="/history/' + url_pas(name) + '/r/' + rows[i]['id'] + '/hidden">(공개)'
+                            else:
+                                hidden = ' <a href="/history/' + url_pas(name) + '/r/' + rows[i]['id'] + '/hidden">(숨김)'
                         else:
-                            ban = ' <a href="/ban/' + url_pas(rows[i]['ip']) + '">(차단)</a>'
-                            
-                    if(owner_check() == 1):
-                        db_ex("select * from hidhi where title = '" + db_pas(name) + "' and re = '" + db_pas(rows[i]['id']) + "'")
-                        row = db_get()
-                        if(row):                            
-                            ip = ip + ' (숨김)'                            
-                            hidden = ' <a href="/history/' + url_pas(name) + '/r/' + rows[i]['id'] + '/hidden">(공개)'
-                        else:
-                            hidden = ' <a href="/history/' + url_pas(name) + '/r/' + rows[i]['id'] + '/hidden">(숨김)'
+                            db_ex("select * from hidhi where title = '" + db_pas(name) + "' and re = '" + db_pas(rows[i]['id']) + "'")
+                            row = db_get()
+                            if(row):
+                                ip = '숨김'
+                                hidden = ''
+                                send = '숨김'
+                                ban = ''
+                                style = 'display:none;'
+                                v += 1
+                            else:
+                                hidden = ''
                     else:
+                        ban = ''
+                        
                         db_ex("select * from hidhi where title = '" + db_pas(name) + "' and re = '" + db_pas(rows[i]['id']) + "'")
                         row = db_get()
                         if(row):
@@ -725,35 +731,29 @@ def history_view(name = None, num = None):
                             style = 'display:none;'
                             v += 1
                         else:
-                            hidden = ''
-                else:
-                    ban = ''
+                            hidden = ''                
+                            
+                    div += '<tr style="' + style + '"><td style="text-align: center;width:33.33%;">' + rows[i]['id'] + '판</a> <a href="/w/' + url_pas(rows[i]['title']) + '/r/' + rows[i]['id'] + '">(w)</a> <a href="/w/' + url_pas(rows[i]['title']) + '/raw/' + rows[i]['id'] + '">(Raw)</a> <a href="/revert/' + url_pas(rows[i]['title']) + '/r/' + rows[i]['id'] + '">(되돌리기)</a> (' + leng + ')</td><td style="text-align: center;width:33.33%;">' + ip + ban + hidden + '</td><td style="text-align: center;width:33.33%;">' + rows[i]['date'] + '</td></tr><tr><td colspan="3" style="text-align: center;width:100%;">' + send + '</td></tr>'
                     
-                    db_ex("select * from hidhi where title = '" + db_pas(name) + "' and re = '" + db_pas(rows[i]['id']) + "'")
-                    row = db_get()
-                    if(row):
-                        ip = '숨김'
-                        hidden = ''
-                        send = '숨김'
-                        ban = ''
-                        style = 'display:none;'
-                        v += 1
-                    else:
-                        hidden = ''                
+                    if(i == v):
+                        div += '</tbody></table></div>'
                         
-                div += '<table style="width: 100%;' + style + '"><tbody><tr><td style="text-align: center;width:33.33%;">' + rows[i]['id'] + '판</a> <a href="/w/' + url_pas(rows[i]['title']) + '/r/' + rows[i]['id'] + '">(w)</a> <a href="/w/' + url_pas(rows[i]['title']) + '/raw/' + rows[i]['id'] + '">(Raw)</a> <a href="/revert/' + url_pas(rows[i]['title']) + '/r/' + rows[i]['id'] + '">(되돌리기)</a> (' + leng + ')</td><td style="text-align: center;width:33.33%;">' + ip + ban + hidden + '</td><td style="text-align: center;width:33.33%;">' + rows[i]['date'] + '</td></tr><tr><td colspan="3" style="text-align: center;width:100%;">' + send + '</td></tr></tbody></table>'
-                
-                if(i == v):
-                    div += '</div>'
+                        if(num == 1):
+                            div += '<br><a href="/history/' + url_pas(name) + '/n/' + str(num + 1) + '">(다음)</a>'
+                        else:
+                            div += '<br><a href="/history/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전)</a> <a href="/history/' + url_pas(name) + '/n/' + str(num + 1) + '">(다음)</a>'
+                            
+                        break
+                    else:
+                        i += 1
+
+                except:
+                    div += '</tbody></table></div>'
                     
-                    if(num == 1):
-                        div += '<br><a href="/history/' + url_pas(name) + '/n/' + str(num + 1) + '">(다음)'
-                    else:
-                        div += '<br><a href="/history/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전) <a href="/history/' + url_pas(name) + '/n/' + str(num + 1) + '">(다음)'
-                        
+                    if(num != 1):
+                        div = div + '<br><a href="/history/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전)</a>'
+
                     break
-                else:
-                    i += 1
                     
             return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], rows = div, tn = 5, title = name, page = url_pas(name), select = select, sub = '역사')
         else:
@@ -1464,7 +1464,7 @@ def manager(num = None):
             return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '권한 이동', logo = set_data['name'], data = '<form id="usrform" method="POST" action="/manager/5"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')   
     elif(num == 6):
         if(request.method == 'POST'):
-            return redirect('/record/' + url_pas(request.form["name"]))
+            return redirect('/record/' + url_pas(request.form["name"]) + '/n/1')
         else:
             return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '기록 이동', logo = set_data['name'], data = '<form id="usrform" method="POST" action="/manager/6"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')    
     else:
@@ -1964,49 +1964,53 @@ def change_password():
             else:
                 return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '비밀번호 변경', enter = '변경', logo = set_data['name'], tn = 15)
                 
-@app.route('/check/<name>')
-def user_check(name = None, sub = None):
+@app.route('/check/<path:name>')
+def user_check(name = None):
     db_ex("select * from user where id = '" + db_pas(name) + "'")
     user = db_get()
     if(user and user[0]['acl'] == 'owner' or user and user[0]['acl'] == 'admin'):
         return redirect('/error/4')
     else:
         if(admin_check() == 1):
-            m = re.search('(?:[0-9](?:[0-9][0-9])?\.[0-9](?:[0-9][0-9])?\.[0-9](?:[0-9][0-9])?\.[0-9](?:[0-9][0-9])?)', name)
+            m = re.search('^(?:[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}?)$', name)
             if(m):
                 db_ex("select * from login where ip = '" + db_pas(name) + "' order by today desc")
                 row = db_get()
                 if(row):
                     i = 0
-                    c = ''
+                    c = '<div><table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;">유저</td><td style="text-align: center;width:33.33%;">아이피</td><td style="text-align: center;width:33.33%;">언제</td></tr>'
                     while(True):
                         try:
-                            c += '<table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;">' + row[i]['user'] + '</td><td style="text-align: center;width:33.33%;">' + row[i]['ip'] + '</td><td style="text-align: center;width:33.33%;">' + row[i]['today'] + '</td></tr></tbody></table>'
+                            c += '<tr><td style="text-align: center;width:33.33%;">' + row[i]['user'] + '</td><td style="text-align: center;width:33.33%;">' + row[i]['ip'] + '</td><td style="text-align: center;width:33.33%;">' + row[i]['today'] + '</td></tr>'
+
+                            i += 1
                         except:
+                            c += '</tbody></table></div>'
+
                             break
-                            
-                        i += 1
                         
-                    return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '다중 검사', logo = set_data['name'], tn = 22, rows = c)
+                    return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '다중 검사', logo = set_data['name'], tn = 3, rows = c)
                 else:
-                    return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '다중 검사', logo = set_data['name'], tn = 22, rows = '')
+                    return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '다중 검사', logo = set_data['name'], tn = 3, rows = '<br>None')
             else:
                 db_ex("select * from login where user = '" + db_pas(name) + "' order by today desc")
                 row = db_get()
                 if(row):
                     i = 0
-                    c = ''
+                    c = '<div><table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;">유저</td><td style="text-align: center;width:33.33%;">아이피</td><td style="text-align: center;width:33.33%;">언제</td></tr>'
                     while(True):
                         try:
-                            c += '<table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;">' + row[i]['user'] + '</td><td style="text-align: center;width:33.33%;">' + row[i]['ip'] + '</td><td style="text-align: center;width:33.33%;">' + row[i]['today'] + '</td></tr></tbody></table>'
+                            c += '<tr><td style="text-align: center;width:33.33%;">' + row[i]['user'] + '</td><td style="text-align: center;width:33.33%;">' + row[i]['ip'] + '</td><td style="text-align: center;width:33.33%;">' + row[i]['today'] + '</td></tr>'
+
+                            i += 1
                         except:
-                            break
+                            c += '</tbody></table></div>'
                             
-                        i += 1
+                            break
                         
-                    return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '다중 검사', logo = set_data['name'], tn = 22, rows = c)
+                    return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '다중 검사', logo = set_data['name'], tn = 3, rows = c)
                 else:
-                    return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '다중 검사', logo = set_data['name'], tn = 22, rows = '')
+                    return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '다중 검사', logo = set_data['name'], tn = 3, rows = '<br>None')
         else:
             return redirect('/error/3')
                 
@@ -2328,7 +2332,6 @@ def custom_css():
 def count_edit():
     db_ex("select count(title) from history where ip = '" + ip_check() + "'")
     i = db_get()
-    
     if(i):
         return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '기여 횟수', logo = set_data['name'], data = "기여 횟수 : " + str(i[0]["count(title)"]))
     else:
