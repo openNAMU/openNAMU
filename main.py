@@ -598,7 +598,7 @@ def blocklog(number = None):
             try:
                 a = rows[i]
             except:
-                div = div + '</div>'
+                div += '</div>'
                 
                 if(number != 1):
                     div = div + '<br><a href="/blocklog/n/' + str(number - 1) + '">(이전)'
@@ -741,15 +741,15 @@ def history_view(name = None, num = None):
                     else:
                         hidden = ''                
                         
-                div = div + '<table style="width: 100%;' + style + '"><tbody><tr><td style="text-align: center;width:33.33%;">' + rows[i]['id'] + '판</a> <a href="/w/' + url_pas(rows[i]['title']) + '/r/' + rows[i]['id'] + '">(w)</a> <a href="/w/' + url_pas(rows[i]['title']) + '/raw/' + rows[i]['id'] + '">(Raw)</a> <a href="/revert/' + url_pas(rows[i]['title']) + '/r/' + rows[i]['id'] + '">(되돌리기)</a> (' + leng + ')</td><td style="text-align: center;width:33.33%;">' + ip + ban + hidden + '</td><td style="text-align: center;width:33.33%;">' + rows[i]['date'] + '</td></tr><tr><td colspan="3" style="text-align: center;width:100%;">' + send + '</td></tr></tbody></table>'
+                div += '<table style="width: 100%;' + style + '"><tbody><tr><td style="text-align: center;width:33.33%;">' + rows[i]['id'] + '판</a> <a href="/w/' + url_pas(rows[i]['title']) + '/r/' + rows[i]['id'] + '">(w)</a> <a href="/w/' + url_pas(rows[i]['title']) + '/raw/' + rows[i]['id'] + '">(Raw)</a> <a href="/revert/' + url_pas(rows[i]['title']) + '/r/' + rows[i]['id'] + '">(되돌리기)</a> (' + leng + ')</td><td style="text-align: center;width:33.33%;">' + ip + ban + hidden + '</td><td style="text-align: center;width:33.33%;">' + rows[i]['date'] + '</td></tr><tr><td colspan="3" style="text-align: center;width:100%;">' + send + '</td></tr></tbody></table>'
                 
                 if(i == v):
-                    div = div + '</div>'
+                    div += '</div>'
                     
                     if(num == 1):
-                        div = div + '<br><a href="/history/' + url_pas(name) + '/n/' + str(num + 1) + '">(다음)'
+                        div += '<br><a href="/history/' + url_pas(name) + '/n/' + str(num + 1) + '">(다음)'
                     else:
-                        div = div + '<br><a href="/history/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전) <a href="/history/' + url_pas(name) + '/n/' + str(num + 1) + '">(다음)'
+                        div += '<br><a href="/history/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전) <a href="/history/' + url_pas(name) + '/n/' + str(num + 1) + '">(다음)'
                         
                     break
                 else:
@@ -815,13 +815,13 @@ def deep_search(name = None, num = None):
                 re_title = re.compile(name, re.I)
                 if(re.search(re_title, all_list[i]['title'])):
                     if(no == 0):
-                        div = div + '<li><a href="/w/' + url_pas(all_list[i]['title']) + '">' + all_list[i]['title'] + '</a> (문서명)</li>'
+                        div += '<li><a href="/w/' + url_pas(all_list[i]['title']) + '">' + all_list[i]['title'] + '</a> (문서명)</li>'
                     else:
-                        div_plus = div_plus + '<li><a href="/w/' + url_pas(all_list[i]['title']) + '">' + all_list[i]['title'] + '</a> (내용)</li>'
+                        div_plus += '<li><a href="/w/' + url_pas(all_list[i]['title']) + '">' + all_list[i]['title'] + '</a> (내용)</li>'
                 else:
                     no = 1
 
-                    div_plus = div_plus + '<li><a href="/w/' + url_pas(all_list[i]['title']) + '">' + all_list[i]['title'] + '</a> (내용)</li>'
+                    div_plus += '<li><a href="/w/' + url_pas(all_list[i]['title']) + '">' + all_list[i]['title'] + '</a> (내용)</li>'
             except:
                 if(num != 1):
                     end = '<br><a href="/search/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전)'
@@ -838,7 +838,7 @@ def deep_search(name = None, num = None):
             else:
                 i += 1
     else:
-        div = div + '<li>검색 결과 없음</li>'
+        div += '<li>검색 결과 없음</li>'
 
     div = div + div_plus + end
 
@@ -865,7 +865,6 @@ def read_view(name = None, redirect = None):
         row = db_get()
         if(not row):
             topic = "open"
-            
             break
         else:
             i += 1
@@ -913,7 +912,7 @@ def read_view(name = None, redirect = None):
                             ee = mm.groups()
                             
                             if(re.search("<a (class=\"not_thing\")? href=\"\/w\/" + url_pas(name) + "\">" + ee[0] + "<\/a>", cc[0])):
-                                div = div + '<li><a href="/w/' + url_pas(rows[i]['cat']) + '">' + rows[i]['cat'] + '</a></li>'
+                                div += '<li><a href="/w/' + url_pas(rows[i]['cat']) + '">' + rows[i]['cat'] + '</a></li>'
                                 
                                 i += 1
                             else:
@@ -1299,15 +1298,12 @@ def section_edit(name = None, num = None):
                 j = 0
                 
                 gdata = rows[0]['data'] + '\r\n'
-                
                 while(True):
                     m = re.search("((?:={1,6})\s?(?:[^=]*)\s?(?:={1,6})(?:\s+)?\n(?:(?:(?:(?!(?:={1,6})\s?(?:[^=]*)\s?(?:={1,6})(?:\s+)?\n).)*)(?:\n)?)+)", gdata)
                     if(m):
                         if(i == num - 1):
                             g = m.groups()
-                            
                             gdata = re.sub("\r\n$", "", g[0])
-                            
                             break
                         else:
                             gdata = re.sub("((?:={1,6})\s?(?:[^=]*)\s?(?:={1,6})(?:\s+)?\n(?:(?:(?:(?!(?:={1,6})\s?(?:[^=]*)\s?(?:={1,6})(?:\s+)?\n).)*)(?:\n)?)+)", "", gdata, 1)
@@ -1487,11 +1483,11 @@ def title_index():
             except:
                 break
 
-            data = data + '<li>' + str(i + 1) + '. <a href="/w/' + url_pas(title_list[i]['title']) + '">' + title_list[i]['title'] + '</a></li>'
+            data += '<li>' + str(i + 1) + '. <a href="/w/' + url_pas(title_list[i]['title']) + '">' + title_list[i]['title'] + '</a></li>'
             
             i += 1
 
-        data = data + '</div>'
+        data += '</div>'
 
         return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], rows = data + '<br><span>이 위키에는 총 ' + str(i) + '개의 문서가 있습니다.</span>', tn = 4, title = '모든 문서')
     else:
@@ -1530,7 +1526,7 @@ def topic_list(name = None):
             db_ex("select * from stop where title = '" + db_pas(rows[i]['title']) + "' and sub = '" + db_pas(rows[i]['sub']) + "' and close = 'O'")
             row = db_get()
             if(not row):
-                div = div + '<h2><a href="/topic/' + url_pas(rows[i]['title']) + '/sub/' + url_pas(rows[i]['sub']) + '">' + str(j) + '. ' + rows[i]['sub'] + '</a></h2><table id="toron"><tbody><tr><td id="toroncolorgreen"><a href="javascript:void(0);" id="1">#1</a> ' + ip + ' <span style="float:right;">' + aa[0]['date'] + '</span></td></tr><tr><td ' + block + '>' + indata + '</td></tr></tbody></table><br>'
+                div += '<h2><a href="/topic/' + url_pas(rows[i]['title']) + '/sub/' + url_pas(rows[i]['sub']) + '">' + str(j) + '. ' + rows[i]['sub'] + '</a></h2><table id="toron"><tbody><tr><td id="toroncolorgreen"><a href="javascript:void(0);" id="1">#1</a> ' + ip + ' <span style="float:right;">' + aa[0]['date'] + '</span></td></tr><tr><td ' + block + '>' + indata + '</td></tr></tbody></table><br>'
                 j += 1
                 
             i += 1
@@ -1548,7 +1544,7 @@ def close_topic_list(name = None):
         try:
             a = rows[i]
         except:
-            div = div + '</div>'
+            div += '</div>'
             break
             
         db_ex("select * from topic where title = '" + db_pas(name) + "' and sub = '" + db_pas(rows[i]['sub']) + "' and id = '1'")
@@ -1564,7 +1560,7 @@ def close_topic_list(name = None):
 
             ip = ip_pas(row[0]['ip'])
                 
-            div = div + '<h2><a href="/topic/' + url_pas(name) + '/sub/' + url_pas(rows[i]['sub']) + '">' + str((i + 1)) + '. ' + rows[i]['sub'] + '</a></h2><table id="toron"><tbody><tr><td id="toroncolorgreen"><a href="javascript:void(0);" id="1">#1</a> ' + ip + ' <span style="float:right;">' + row[0]['date'] + '</span></td></tr><tr><td ' + block + '>' + indata + '</td></tr></tbody></table><br>'
+            div += '<h2><a href="/topic/' + url_pas(name) + '/sub/' + url_pas(rows[i]['sub']) + '">' + str((i + 1)) + '. ' + rows[i]['sub'] + '</a></h2><table id="toron"><tbody><tr><td id="toroncolorgreen"><a href="javascript:void(0);" id="1">#1</a> ' + ip + ' <span style="float:right;">' + row[0]['date'] + '</span></td></tr><tr><td ' + block + '>' + indata + '</td></tr></tbody></table><br>'
             
         i += 1
         
@@ -1581,7 +1577,7 @@ def agree_topic_list(name = None):
         try:
             a = agree_list[i]
         except:
-            div = div + '</div>'
+            div += '</div>'
             break
             
         db_ex("select * from topic where title = '" + db_pas(name) + "' and sub = '" + db_pas(agree_list[i]['sub']) + "' and id = '1'")
@@ -1597,7 +1593,7 @@ def agree_topic_list(name = None):
 
             ip = ip_pas(data[0]['ip'])
                 
-            div = div + '<h2><a href="/topic/' + url_pas(name) + '/sub/' + url_pas(data[i]['sub']) + '">' + str(i + 1) + '. ' + data[i]['sub'] + '</a></h2><table id="toron"><tbody><tr><td id="toroncolorgreen"><a href="javascript:void(0);" id="1">#1</a> ' + 아이디 + ' <span style="float:right;">' + data[0]['date'] + '</span></td></tr><tr><td ' + block + '>' + indata + '</td></tr></tbody></table><br>'
+            div += '<h2><a href="/topic/' + url_pas(name) + '/sub/' + url_pas(data[i]['sub']) + '">' + str(i + 1) + '. ' + data[i]['sub'] + '</a></h2><table id="toron"><tbody><tr><td id="toroncolorgreen"><a href="javascript:void(0);" id="1">#1</a> ' + 아이디 + ' <span style="float:right;">' + data[0]['date'] + '</span></td></tr><tr><td ' + block + '>' + indata + '</td></tr></tbody></table><br>'
             
         i += 1
         
@@ -1650,23 +1646,23 @@ def topic(name = None, sub = None):
             div = '<div>'
             
             if(close):
-                div = div + '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/close">(토론 열기)</a> '
+                div += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/close">(토론 열기)</a> '
             else:
-                div = div + '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/close">(토론 닫기)</a> '
+                div += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/close">(토론 닫기)</a> '
             
             if(stop):
-                div = div + '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/stop">(토론 재개)</a> '
+                div += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/stop">(토론 재개)</a> '
             else:
-                div = div + '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/stop">(토론 정지)</a> '
+                div += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/stop">(토론 정지)</a> '
 
             db_ex("select * from agreedis where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "'")
             agree = db_get()
             if(agree):
-                div = div + '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/agree">(합의 취소)</a>'
+                div += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/agree">(합의 취소)</a>'
             else:
-                div = div + '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/agree">(합의 완료)</a>'
+                div += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/agree">(합의 완료)</a>'
             
-            div = div + '<br><br>'
+            div += '<br><br>'
         else:
             div = '<div>'
         
@@ -1681,92 +1677,85 @@ def topic(name = None, sub = None):
         top = db_get()
 
         i = 0
-
-
         if(top):
             while(True):
                 try:
-                    a = top[i]
+                    num = int(top[i]['id']) - 1
+
+                    if(i == 0):
+                        start = rows[num]['ip']
+                        
+                    top_data = namumark('', rows[num]['data'])
+                    top_data = re.sub("(?P<in>#(?:[0-9]*))", '<a href="\g<in>">\g<in></a>', top_data)
+                            
+                    ip = ip_pas(rows[num]['ip'])
+                                       
+                    div += '<table id="toron"><tbody><tr><td id="toroncolorred"><a href="#' + top[i]['id'] + '" id="' + top[i]['id'] + '-nt">#' + top[i]['id'] + '</a> ' + ip + ' <span style="float:right;">' + rows[num]['date'] + '</span></td></tr><tr><td>' + top_data + '</td></tr></tbody></table><br>'
+                        
+                    i += 1
                 except:
                     break
-
-                num = int(top[i]['id']) - 1
-
-                if(i == 0):
-                    start = rows[num]['ip']
                     
-                top_data = namumark('', rows[num]['data'])
-                top_data = re.sub("(?P<in>#(?:[0-9]*))", '<a href="\g<in>">\g<in></a>', top_data)
-                        
-                ip = ip_pas(rows[num]['ip'])
-                                   
-                div = div + '<table id="toron"><tbody><tr><td id="toroncolorred"><a href="#' + top[i]['id'] + '" id="' + top[i]['id'] + '-nt">#' + top[i]['id'] + '</a> ' + ip + ' <span style="float:right;">' + rows[num]['date'] + '</span></td></tr><tr><td>' + top_data + '</td></tr></tbody></table><br>'
-                    
-                i = i + 1
-
-        i = 0
-        
+        i = 0        
         while(True):
             try:
-                a = rows[i]
-            except:
-                div = div + '</div>'
-                break
+                if(i == 0):
+                    start = rows[i]['ip']
+                    
+                indata = namumark('', rows[i]['data'])
+                indata = re.sub("(?P<in>#(?:[0-9]*))", '<a href="\g<in>">\g<in></a>', indata)
                 
-            if(i == 0):
-                start = rows[i]['ip']
-                
-            indata = namumark('', rows[i]['data'])
-            indata = re.sub("(?P<in>#(?:[0-9]*))", '<a href="\g<in>">\g<in></a>', indata)
-            
-            if(rows[i]['block'] == 'O'):
-                indata = '블라인드 되었습니다.'
-                block = 'style="background: gainsboro;"'
-            else:
-                block = ''
+                if(rows[i]['block'] == 'O'):
+                    indata = '블라인드 되었습니다.'
+                    block = 'style="background: gainsboro;"'
+                else:
+                    block = ''
 
-            m = re.search("^([^-]*)\s\-\s(Close|Reopen|Stop|Restart|Agreement|Settlement)$", rows[i]['ip'])
-            if(m):
-                ban = ""
-            else:
-                if(admin == 1):
-                    if(rows[i]['block'] == 'O'):
-                        isblock = ' <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/b/' + str(i + 1) + '">(해제)</a>'
-                    else:
-                        isblock = ' <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/b/' + str(i + 1) + '">(블라인드)</a>'
+                m = re.search("^([^-]*)\s\-\s(Close|Reopen|Stop|Restart|Agreement|Settlement)$", rows[i]['ip'])
+                if(m):
+                    ban = ""
+                else:
+                    if(admin == 1):
+                        if(rows[i]['block'] == 'O'):
+                            isblock = ' <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/b/' + str(i + 1) + '">(해제)</a>'
+                        else:
+                            isblock = ' <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/b/' + str(i + 1) + '">(블라인드)</a>'
 
-                    db_ex("select * from distop where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' and id = '" + db_pas(str(i + 1)) + "'")
-                    row = db_get()
-                    if(row):
-                        isblock = isblock + ' <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/notice/' + str(i + 1) + '">(해제)</a>'
-                    else:
-                        isblock = isblock + ' <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/notice/' + str(i + 1) + '">(공지)</a>'
-                        
-                    n = re.search("\- (?:Admin)$", rows[i]['ip'])
-                    if(n):
-                        ban = isblock
-                    else:
-                        db_ex("select * from ban where block = '" + db_pas(rows[i]['ip']) + "'")
+                        db_ex("select * from distop where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' and id = '" + db_pas(str(i + 1)) + "'")
                         row = db_get()
                         if(row):
-                            ban = ' <a href="/ban/' + url_pas(rows[i]['ip']) + '">(해제)</a>' + isblock
+                            isblock = isblock + ' <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/notice/' + str(i + 1) + '">(해제)</a>'
                         else:
-                            ban = ' <a href="/ban/' + url_pas(rows[i]['ip']) + '">(차단)</a>' + isblock
-                else:
-                    ban = ""
+                            isblock = isblock + ' <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/notice/' + str(i + 1) + '">(공지)</a>'
+                            
+                        n = re.search("\- (?:Admin)$", rows[i]['ip'])
+                        if(n):
+                            ban = isblock
+                        else:
+                            db_ex("select * from ban where block = '" + db_pas(rows[i]['ip']) + "'")
+                            row = db_get()
+                            if(row):
+                                ban = ' <a href="/ban/' + url_pas(rows[i]['ip']) + '">(해제)</a>' + isblock
+                            else:
+                                ban = ' <a href="/ban/' + url_pas(rows[i]['ip']) + '">(차단)</a>' + isblock
+                    else:
+                        ban = ""
 
-            ip = ip_pas(rows[i]['ip'])
+                ip = ip_pas(rows[i]['ip'])
+                        
+                if(rows[i]['ip'] == start):
+                    j = i + 1
                     
-            if(rows[i]['ip'] == start):
-                j = i + 1
-                
-                div = div + '<table id="toron"><tbody><tr><td id="toroncolorgreen"><a href="javascript:void(0);" id="' + str(j) + '">#' + str(j) + '</a> ' + ip + ban + ' <span style="float:right;">' + rows[i]['date'] + '</span></td></tr><tr><td ' + block + '>' + indata + '</td></tr></tbody></table><br>'
-            else:
-                j = i + 1
-                
-                div = div + '<table id="toron"><tbody><tr><td id="toroncolor"><a href="javascript:void(0);" id="' + str(j) + '">#' + str(j) + '</a> ' + ip + ban + ' <span style="float:right;">' + rows[i]['date'] + '</span></td></tr><tr><td ' + block + '>' + indata + '</td></tr></tbody></table><br>'
-                
-            i += 1
+                    div += '<table id="toron"><tbody><tr><td id="toroncolorgreen"><a href="javascript:void(0);" id="' + str(j) + '">#' + str(j) + '</a> ' + ip + ban + ' <span style="float:right;">' + rows[i]['date'] + '</span></td></tr><tr><td ' + block + '>' + indata + '</td></tr></tbody></table><br>'
+                else:
+                    j = i + 1
+                    
+                    div += '<table id="toron"><tbody><tr><td id="toroncolor"><a href="javascript:void(0);" id="' + str(j) + '">#' + str(j) + '</a> ' + ip + ban + ' <span style="float:right;">' + rows[i]['date'] + '</span></td></tr><tr><td ' + block + '>' + indata + '</td></tr></tbody></table><br>'
+                    
+                i += 1
+            except:
+                div += '</div>'
+                break
             
         return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, page = url_pas(name), suburl = url_pas(sub), toron = sub, logo = set_data['name'], rows = div, tn = 11, ban = ban, style = style, sub = '토론')
         
@@ -1992,7 +1981,7 @@ def user_check(name = None, sub = None):
                     c = ''
                     while(True):
                         try:
-                            c = c + '<table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;">' + row[i]['user'] + '</td><td style="text-align: center;width:33.33%;">' + row[i]['ip'] + '</td><td style="text-align: center;width:33.33%;">' + row[i]['today'] + '</td></tr></tbody></table>'
+                            c += '<table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;">' + row[i]['user'] + '</td><td style="text-align: center;width:33.33%;">' + row[i]['ip'] + '</td><td style="text-align: center;width:33.33%;">' + row[i]['today'] + '</td></tr></tbody></table>'
                         except:
                             break
                             
@@ -2009,7 +1998,7 @@ def user_check(name = None, sub = None):
                     c = ''
                     while(True):
                         try:
-                            c = c + '<table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;">' + row[i]['user'] + '</td><td style="text-align: center;width:33.33%;">' + row[i]['ip'] + '</td><td style="text-align: center;width:33.33%;">' + row[i]['today'] + '</td></tr></tbody></table>'
+                            c += '<table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;">' + row[i]['user'] + '</td><td style="text-align: center;width:33.33%;">' + row[i]['ip'] + '</td><td style="text-align: center;width:33.33%;">' + row[i]['today'] + '</td></tr></tbody></table>'
                         except:
                             break
                             
