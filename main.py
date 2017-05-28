@@ -647,10 +647,7 @@ def history_view(name = None, num = None):
             while(True):
                 style = ''
             
-                try:                    
-                    print(i)
-                    print(v)
-
+                try:
                     select += '<option value="' + rows[i]['id'] + '">' + rows[i]['id'] + '</option>'
                     
                     if(rows[i]['send']):
