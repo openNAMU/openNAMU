@@ -499,7 +499,7 @@ def namumark(title, data):
     data = re.sub("\[br\]",'<br>', data)
     
     while(True):
-        com = re.compile("\[youtube\(((?:(?!,|\)\]).)*)(?:,(?:\s)?)?(?:width=((?:(?!,|\)\]).)*))?(?:,(?:\s)?)?(?:height=((?:(?!,|\)\]).)*))?\)\]")
+        com = re.compile("\[youtube\((?:https:\/\/www\.youtube\.com\/watch\?v=|https:\/\/youtu\.be\/)?((?:(?!,|\)\]).)*)(?:,(?:\s)?)?(?:width=((?:(?!,|\)\]).)*))?(?:,(?:\s)?)?(?:height=((?:(?!,|\)\]).)*))?\)\]")
         m = com.search(data)
         if(m):
             result = m.groups()
