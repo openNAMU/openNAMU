@@ -43,6 +43,7 @@ def diff(seqm):
             output.append("<span style='background:#CFC;'>" + seqm.b[b0:b1] + "</span><span style='background:#FDD;'>" + seqm.a[a0:a1] + "</span>")
         else:
             output.append(seqm.a[a0:a1])
+            
     return ''.join(output)
            
 def admin_check():
