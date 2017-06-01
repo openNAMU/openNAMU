@@ -54,14 +54,14 @@ def html_pas(data, how):
                 
                 a = re.sub('(?:"|\')', '#.#', a)
 
-                if(check):
+                try:
                     if(not check[1] == None):
                         data = re.sub("<((?:\/)?" + b[1] + "(?:[^>]*))>", "[" + a + "]", data, 1)
                         data = re.sub("<\/" + b[1] + ">", "[/" + b[1] + "]", data, 1)
                     else:
                         data = re.sub("<((?:\/)?" + b[1] + "(?:[^>]*))>", "[[" + check[0] + "]]", data, 1)
                         data = re.sub("<\/" + b[1] + ">", "", data, 1)
-                else:
+                except:
                     data = re.sub("<((?:\/)?" + b[1] + "(?:[^>]*))>", "[" + a + "]", data, 1)
                     data = re.sub("<\/" + b[1] + ">", "[/" + b[1] + "]", data, 1)
             else:
