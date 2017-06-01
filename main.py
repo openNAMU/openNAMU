@@ -250,7 +250,10 @@ def recent_changes():
         while(True):
             try:                
                 if(rows[i]['send']):
-                    send = rows[i]['send']
+                    if(re.search("^(?: *)$", rows[i]['send'])):
+                        send = '<br>'
+                    else:
+                        send = rows[i]['send']
                 else:
                     send = '<br>'
                     
