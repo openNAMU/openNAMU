@@ -244,7 +244,7 @@ def recent_changes():
     i = 0
     div = '<div><table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;">문서명</td><td style="text-align: center;width:33.33%;">기여자</td><td style="text-align: center;width:33.33%;">시간</td></tr>'
     
-    db_ex("select * from history order by date desc limit 50")
+    db_ex("select id, title, date, ip, send, leng from history order by date desc limit 50")
     rows = db_get()
     if(rows):
         while(True):
