@@ -19,7 +19,7 @@
     float: left;
     margin-right: 10px;
     padding: 5px;
-	margin-top: 9px;
+    margin-top: 9px;
 }
 
 #log:hover, #log:focus {
@@ -33,9 +33,9 @@ button#goto {
 }
 
 textarea, label, span, body, strong, b, div, h1, h2, h3, h4, h5, h6, h7, input {
-	font-family: "나눔바른고딕", "나눔고딕", "맑은 고딕", "NanumBarunGothic", "NanumGothic", "Malgun Gothic", "sans-serif";
+    font-family: "나눔바른고딕", "나눔고딕", "맑은 고딕", "NanumBarunGothic", "NanumGothic", "Malgun Gothic", "sans-serif";
 }
-		
+        
 pre {
     font-family: "d2codingfont", "나눔고딕코딩", "NanumGothicCoding", "monospace";
 }
@@ -153,8 +153,8 @@ table {
 }
 
 .title {
-	display: inline-block;
-	margin-bottom: 30px;
+    display: inline-block;
+    margin-bottom: 30px;
 }
 
 not_del {
@@ -175,28 +175,28 @@ not_del {
 }
 
 s, strike, del {
-	color:gray;
+    color:gray;
 }
 
 pre {
     padding: 7px;
-	background-color: #eeeeee;
-	border: 1px solid #dddddd;
-	border-radius: 3px;
-	overflow-x: auto;
-	display: block;
-	font-size: 90%;
-	line-height: 1.5;
-	color: #373a3c;
+    background-color: #eeeeee;
+    border: 1px solid #dddddd;
+    border-radius: 3px;
+    overflow-x: auto;
+    display: block;
+    font-size: 90%;
+    line-height: 1.5;
+    color: #373a3c;
 }
 
 s:hover, strike:hover, del:hover {
-	color:#666;background-color:#eee;text-decoration:none;
+    color:#666;background-color:#eee;text-decoration:none;
 }
 
 .menu-item {
     float: left;
-	position: relative;
+    position: relative;
 }
 
 .menu {
@@ -216,22 +216,22 @@ s:hover, strike:hover, del:hover {
 #search {
     width: 250px;
     float: right;
-	padding: 5px;
-	margin-bottom: 0;
+    padding: 5px;
+    margin-bottom: 0;
 }
 
 #logo {
     float: left;
-	margin-right: 10px;
-	padding: 5px;
+    margin-right: 10px;
+    padding: 5px;
 }
 
 .one-fifth.column {
     margin-bottom: 20px;
-	margin-top: -18px;
-	background: #8D7DAD;
-	z-index: 2;
-	position: relative;
+    margin-top: -18px;
+    background: #8D7DAD;
+    z-index: 2;
+    position: relative;
 }
 
 .btn {
@@ -274,7 +274,7 @@ div.scroll-buttons {
     margin-bottom: -10px;
     bottom: 10px;
     right: 0px;
-	opacity: 0.8;
+    opacity: 0.8;
 }
 
 .four-fifths {
@@ -289,8 +289,8 @@ div.scroll-buttons {
 #logo {
     width: auto;
     height: auto;
-	font-size: 25px;
-	color: white;
+    font-size: 25px;
+    color: white;
 }
 
 #logo:hover {
@@ -314,24 +314,24 @@ table {
 }
 
 @media (max-width: 939px) {
-	#search {
-		float: right;
-	}
+    #search {
+        float: right;
+    }
 }
 
 @media (max-width: 459px) {
-	#search {
-		float: left;
-		width: 100%;
-		margin-bottom: 5px;
-	}
-	.input-group {
-		width: 100%;
-	}
+    #search {
+        float: left;
+        width: 100%;
+        margin-bottom: 5px;
+    }
+    .input-group {
+        width: 100%;
+    }
 }
 
 @media (min-width: 1280px) {
-	#all_contect {
+    #all_contect {
         width: 1260px;
         margin: auto;
     }
@@ -340,7 +340,7 @@ table {
 .four-fifths.column {
     border: 1px solid #EFEFEF;
     padding: 30px;
-	background: white;
+    background: white;
 }
 
 body {
@@ -351,7 +351,7 @@ body {
     height: 100%;
     width: 15%;
     position: fixed;
-	overflow: scroll;
+    overflow: scroll;
     left: 0;
     top: 0;
     background: white;
@@ -360,7 +360,7 @@ body {
 
 #yosolo {
     width: 33.33%;
-	text-align: center;
+    text-align: center;
 }
 
 #toron {
@@ -368,15 +368,15 @@ body {
 }
 
 #toroncolorgreen {
-	background-color: #B0D3AD;
+    background-color: #B0D3AD;
 }
 
 #toroncolorred {
-	background-color: #f3c2c2;
+    background-color: #f3c2c2;
 }
 
 #toroncolor {
-	background-color: #d5d5d5;
+    background-color: #d5d5d5;
 }
 
 #bb {
@@ -385,7 +385,7 @@ body {
 }
 
 #history {
-	margin-right: 10px;
+    margin-right: 10px;
 }
 
 #list {
@@ -464,4 +464,36 @@ sub, sup {
 
 pre span {
     font-family: '니눔고딕코딩', 'Nanum Gothic Coding', monospace;
+}
+
+#is_mobile {        
+    margin-left: 5px;        
+}
+
+#RecentChanges:hover, #RecentChanges:focus {        
+    text-decoration: none;        
+    color: #e5dafb;        
+}
+
+#RecentChanges {        
+    line-height: 35px;        
+    width: 105px;        
+    height: 45px;        
+    font-size: 16px;        
+    color: white;        
+    float: left;        
+    padding: 5px;        
+}
+        
+@media (max-width: 710px) {        
+    #is_mobile {        
+        display: none;        
+    }
+    
+    #RecentChanges {
+        width: 20px;        
+        margin-right: 10px;        
+        margin-top: 9px;        
+        height: 36px;        
+    }        
 }
