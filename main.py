@@ -2080,22 +2080,22 @@ def user_ban(name = None):
                 db_ex("select * from ban where block = '" + db_pas(name) + "'")
                 row = db_get()
                 if(row):
-                    rb_plus(name, '해제', 시간(), ip, '')
+                    rb_plus(name, '해제', get_time(), ip, '')
                     
                     db_ex("delete from ban where block = '" + db_pas(name) + "'")
                 else:
                     b = re.search("^([0-9]{1,3}\.[0-9]{1,3})$", name)
                     if(b):
-                        rb_plus(name, end, 시간(), ip, request.form["why"])
+                        rb_plus(name, end, get_time(), ip, request.form["why"])
                         
                         db_ex("insert into ban (block, end, why, band) value ('" + db_pas(name) + "', '" + db_pas(end) + "', '" + db_pas(request.form["why"]) + "', 'O')")
                     else:
-                        rb_plus(name, end, 시간(), ip, request.form["why"])
+                        rb_plus(name, end, get_time(), ip, request.form["why"])
                         
                         db_ex("insert into ban (block, end, why, band) value ('" + db_pas(name) + "', '" + db_pas(end) + "', '" + db_pas(request.form["why"]) + "', '')")
                 db_com()
                 
-                return redirect('/w/' + url_pas(data['frontpage']))
+                return redirect('/')
             else:
                 return redirect('/error/3')
         else:
@@ -2165,7 +2165,7 @@ def user_admin(name = None):
                     db_ex("update user set acl = '" + db_pas(request.form["select"]) + "' where id = '" + db_pas(name) + "'")
                 db_com()
                 
-                return redirect('/w/' + url_pas(data['frontpage']))
+                return redirect('/')
             else:
                 return redirect('/error/5')
         else:
@@ -2180,7 +2180,7 @@ def user_admin(name = None):
                 else:
                     now = '권한 부여'
                     
-                return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, page = url_pas(name), logo = data['name'], tn = 18, now = now, sub = '권한 부여')
+                return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, page = url_pas(name), logo = set_data['name'], tn = 18, now = now, sub = '권한 부여')
             else:
                 return redirect('/error/5')
         else:
