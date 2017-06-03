@@ -556,7 +556,7 @@ def backlink(name = None, num = None):
         else:    
             return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = div, title = name, page = url_pas(name), sub = '역링크')
     else:
-        return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = '', title = name, page = url_pas(name), sub = '역링크')
+        return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = 'None', title = name, page = url_pas(name), sub = '역링크')
         
 @app.route('/recentdiscuss')
 def recent_discuss():
@@ -995,11 +995,11 @@ def read_view(name = None, redirect = None):
             db_ex("select * from ban where block = '" + db_pas(g[0]) + "'")
             user = db_get()
             if(user):
-                elsedata = '{{{#!wiki style="border:2px solid red;padding:10px;"\r\n{{{+2 {{{#red 이 사용자는 차단 당했습니다.}}}}}}\r\n\r\n차단 해제 일 : ' + user[0]['end'] + '[br]사유 : ' + user[0]['why'] + '}}}[br]' + '문서 없음'
+                elsedata = '{{{#!wiki style="border:2px solid red;padding:10px;"\r\n{{{+2 {{{#red 이 사용자는 차단 당했습니다.}}}}}}\r\n\r\n차단 해제 일 : ' + user[0]['end'] + '[br]사유 : ' + user[0]['why'] + '}}}[br]' + 'None'
             else:
-                elsedata = '문서 없음'
+                elsedata = 'None'
         else:
-            elsedata = '문서 없음'
+            elsedata = 'None'
             
         if(redirect):
             elsedata = re.sub("^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)", " * [[\g<in>]] 문서로 넘겨주기", elsedata)
