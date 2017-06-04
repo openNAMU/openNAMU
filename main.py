@@ -406,7 +406,7 @@ def user_record(name = None, num = None):
 def user_log(number = None):
     i = number * 50
     j = i - 50
-    list = ''
+    list_data = ''
     
     db_ex("select * from user")
     user_list = db_get()
@@ -416,7 +416,7 @@ def user_log(number = None):
                 a = user_list[j]
             except:
                 if(number != 1):
-                    list = list + '<br><a href="/userlog/n/' + str(number - 1) + '">(이전)'
+                    list_data += '<br><a href="/userlog/n/' + str(number - 1) + '">(이전)'
                 break
                 
             if(admin_check() == 1):
@@ -436,18 +436,18 @@ def user_log(number = None):
             else:
                 ip = '<a class="not_thing" href="/w/' + url_pas('사용자:' + user_list[j]['id']) + '">' + user_list[j]['id'] + '</a> <a href="/record/' + url_pas(user_list[j]['id']) + '/n/1">(기록)</a>'
                 
-            list = list + '<li>' + str(j + 1) + '. ' + ip + ban_button + '</li>'
+            list_data += '<li>' + str(j + 1) + '. ' + ip + ban_button + '</li>'
             
             if(j == i):
                 if(number == 1):
-                    list = list + '<br><a href="/userlog/n/' + str(number + 1) + '">(다음)'
+                    list_data += '<br><a href="/userlog/n/' + str(number + 1) + '">(다음)'
                 else:
-                    list = list + '<br><a href="/userlog/n/' + str(number - 1) + '">(이전) <a href="/userlog/n/' + str(number + 1) + '">(다음)'
+                    list_data += '<br><a href="/userlog/n/' + str(number - 1) + '">(이전) <a href="/userlog/n/' + str(number + 1) + '">(다음)'
                 break
             else:
                 j += 1
                 
-        return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = list, title = '사용자 가입 기록')
+        return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = list_data, title = '사용자 가입 기록')
     else:
         return web_render('index.html', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = '', title = '사용자 가입 기록')
         
