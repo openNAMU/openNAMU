@@ -12,14 +12,11 @@ set 폴더에 있는 set.json을 폴더 밖으로 꺼내고 json 내용을 수�
 ## 의존성
 ### 기본
  * [MariaDB](https://mariadb.org/)나 [MySQL](https://www.mysql.com/)
-### 윈도우
- * pip install [flask](https://pypi.python.org/pypi/Flask/0.12)
+ * pip install bottle
+ * pip install bottle-session
+ * pip install tornado
  * pip install [bcrypt](https://pypi.python.org/pypi/bcrypt/3.1.0)
  * pip install [pymysql](https://pypi.python.org/pypi/PyMySQL)
-### 우분투
- * pip3 install [flask](https://pypi.python.org/pypi/Flask/0.12)
- * pip3 install [bcrypt](https://pypi.python.org/pypi/bcrypt/3.1.0)
- * pip3 install [pymysql](https://pypi.python.org/pypi/PyMySQL)
 ### 자세한 설명
  * [참조](http://namu.ml/w/오픈나무%2F설치법)
  
