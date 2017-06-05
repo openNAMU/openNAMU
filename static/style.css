@@ -241,6 +241,7 @@ s:hover, strike:hover, del:hover {
 .scroll-buttons a:link, .scroll-buttons a:visited {
     color: white;
 }
+
 div.scroll-buttons a {
     display: inline-block;
     float: left;
