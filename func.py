@@ -1,5 +1,4 @@
-﻿from flask import Flask, session, request
-
+﻿from bottle import request
 from urllib import parse
 import json
 import pymysql
@@ -46,18 +45,18 @@ def diff(seqm):
             
     return ''.join(output)
            
-def admin_check():
+def admin_check(session):
     if(session.get('Now') == True):
-        ip = ip_check()
+        ip = ip_check(session) 
         db_ex("select * from user where id = '" + db_pas(ip) + "'")
         user = db_get()
         if(user):
             if(user[0]['acl'] == 'owner' or user[0]['acl'] == 'admin'):
                 return 1
                 
-def owner_check():
+def owner_check(session):
     if(session.get('Now') == True):
-        ip = ip_check()
+        ip = ip_check(session) 
         db_ex("select * from user where id = '" + db_pas(ip) + "'")
         user = db_get()
         if(user):
@@ -79,7 +78,7 @@ def include_check(name, data):
                     
                 i += 1
     
-def login_check():
+def login_check(session):
     if(session.get('Now') == True):
         return 1
     else:
@@ -108,18 +107,18 @@ def ip_pas(raw_ip):
 
     return ip
 
-def ip_check():
+def ip_check(session):
     if(session.get('Now') == True):
         ip = format(session['DREAMER'])
     else:
-        if(request.headers.getlist("X-Forwarded-For")):
-            ip = request.headers.getlist("X-Forwarded-For")[0]
+        if(request.environ.get('HTTP_X_FORWARDED_FOR')):
+            ip = request.environ.get('HTTP_X_FORWARDED_FOR')
         else:
-            ip = request.remote_addr
-            
+            ip = request.environ.get('REMOTE_ADDR')
+
     return ip
 
-def custom_css_user():
+def custom_css_user(session):
     if(session.get('Now') == True):
         try:
             data = format(session['Daydream'])
