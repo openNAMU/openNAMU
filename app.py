@@ -10,14 +10,6 @@ import pymysql
 json_data = open('set.json').read()
 set_data = json.loads(json_data)
 
-#app_session_options = {
-#    'app_session.type': 'file',
-#    'app_session.data_dir': './app_session/',
-#    'app_session.auto': True,
-#}
-#app_middlware = app_sessionMiddleware(app.app(), app_session_options)
-#app_session = app.request.environ.get('beaker.app_session')
-
 session_opts = {
     'session.type': 'file',
     'session.data_dir': './app_session/',
@@ -1432,7 +1424,7 @@ def move(name = None):
 @route('/other')
 def other():
     app_session = request.environ.get('beaker.session')
-    return web_render('index', custom = custom_css_user(app_session), license = set_data['license'], login = login_check(app_session), title = '기타 메뉴', logo = set_data['name'], data = '<h2 style="margin-top: 0px;">기록</h2><li><a href="/blocklog/n/1">사용자 차단 기록</a></li><li><a href="/userlog/n/1">사용자 가입 기록</a></li><li><a href="/manager/6">사용자 기록</a></li><h2>기타</h2><li><a href="/titleindex">모든 문서</a></li><li><a href="/acllist">ACL 문서 목록</a></li><!--<li><a href="/upload">업로드</a></li>--><li><a href="/adminlist">관리자 목록</a></li><li><a href="/manager/1">관리자 메뉴</a></li><br>이 오픈나무의 버전은 <a href="https://github.com/2DU/openNAMU/blob/master/version.md">2.0 (알파)</a> 입니다.')
+    return web_render('index', custom = custom_css_user(app_session), license = set_data['license'], login = login_check(app_session), title = '기타 메뉴', logo = set_data['name'], data = '<h2 style="margin-top: 0px;">기록</h2><li><a href="/blocklog/n/1">사용자 차단 기록</a></li><li><a href="/userlog/n/1">사용자 가입 기록</a></li><li><a href="/manager/6">사용자 기록</a></li><h2>기타</h2><li><a href="/titleindex">모든 문서</a></li><li><a href="/acllist">ACL 문서 목록</a></li><!--<li><a href="/upload">업로드</a></li>--><li><a href="/adminlist">관리자 목록</a></li><li><a href="/manager/1">관리자 메뉴</a></li><br>이 오픈나무의 버전은 <a href="https://github.com/2DU/openNAMU/blob/normal/version.md">2.0 (알파)</a> 입니다.')
     
 @route('/manager/<num:int>', method=['POST', 'GET'])
 def manager(num = None):
