@@ -17,13 +17,6 @@ session_opts = {
 }
 
 app = beaker.middleware.SessionMiddleware(app(), session_opts)
-
-if(not set_data['log'] == "O"):
-    import logging
-    log = logging.getLogger('werkzeug')
-    log.setLevel(logging.ERROR)
-
-    print('port : ' + set_data['port'])
     
 def start():
     try:
@@ -270,7 +263,7 @@ def recent_changes():
             
         return web_render('index', custom = custom_css_user(app_session), license = set_data['license'], login = login_check(app_session), logo = set_data['name'], rows = div, tn = 3, title = '최근 변경내역')
     else:
-        return web_render('index', custom = custom_css_user(app_session), license = set_data['license'], login = login_check(app_session), logo = set_data['name'], rows = '', tn = 3, title = '최근 변경내역')
+        return web_render('index', custom = custom_css_user(app_session), license = set_data['license'], login = login_check(app_session), logo = set_data['name'], rows = '<br>None', tn = 3, title = '최근 변경내역')
         
 @route('/history/<name:path>/r/<num:int>/hidden')
 def history_hidden(name = None, num = None):
@@ -367,7 +360,7 @@ def user_record(name = None, num = None):
                 
         return web_render('index', custom = custom_css_user(app_session), license = set_data['license'], login = login_check(app_session), logo = set_data['name'], rows = div, tn = 3, title = '사용자 기록')
     else:
-        return web_render('index', custom = custom_css_user(app_session), license = set_data['license'], login = login_check(app_session), logo = set_data['name'], rows = '', tn = 3, title = '사용자 기록')
+        return web_render('index', custom = custom_css_user(app_session), license = set_data['license'], login = login_check(app_session), logo = set_data['name'], rows = '<br>None', tn = 3, title = '사용자 기록')
         
 @route('/userlog/n/<number:int>')
 def user_log(number = None):
@@ -557,7 +550,7 @@ def recent_discuss():
             
         return web_render('index', custom = custom_css_user(app_session), license = set_data['license'], login = login_check(app_session), logo = set_data['name'], rows = div, tn = 3, title = '최근 토론내역')
     else:
-        return web_render('index', custom = custom_css_user(app_session), license = set_data['license'], login = login_check(app_session), logo = set_data['name'], rows = '', tn = 3, title = '최근 토론내역')
+        return web_render('index', custom = custom_css_user(app_session), license = set_data['license'], login = login_check(app_session), logo = set_data['name'], rows = '<br>None', tn = 3, title = '최근 토론내역')
 
 @route('/blocklog/n/<number:int>')
 def blocklog(number = None):
@@ -604,7 +597,7 @@ def blocklog(number = None):
                 
         return web_render('index', custom = custom_css_user(app_session), license = set_data['license'], login = login_check(app_session), logo = set_data['name'], rows = div, tn = 3, title = '사용자 차단 기록')
     else:
-        return web_render('index', custom = custom_css_user(app_session), license = set_data['license'], login = login_check(app_session), logo = set_data['name'], rows = '', tn = 3, title = '사용자 차단 기록')
+        return web_render('index', custom = custom_css_user(app_session), license = set_data['license'], login = login_check(app_session), logo = set_data['name'], rows = '<br>None', tn = 3, title = '사용자 차단 기록')
         
 @route('/history/<name:path>/n/<num:int>', method=['POST', 'GET'])
 def history_view(name = None, num = None):
@@ -730,7 +723,7 @@ def history_view(name = None, num = None):
                     
             return web_render('index', custom = custom_css_user(app_session), license = set_data['license'], login = login_check(app_session), logo = set_data['name'], rows = div, tn = 5, title = name, page = url_pas(name), select = select, sub = '역사')
         else:
-            return web_render('index', custom = custom_css_user(app_session), license = set_data['license'], login = login_check(app_session), logo = set_data['name'], rows = '', tn = 5, title = name, page = url_pas(name), select = select, sub = '역사')
+            return web_render('index', custom = custom_css_user(app_session), license = set_data['license'], login = login_check(app_session), logo = set_data['name'], rows = '<br>None', tn = 5, title = name, page = url_pas(name), select = select, sub = '역사')
             
 @route('/search', method=['POST'])
 def search():
@@ -1261,7 +1254,7 @@ def move(name = None):
 @route('/other')
 def other():
     app_session = request.environ.get('beaker.session')
-    return web_render('index', custom = custom_css_user(app_session), license = set_data['license'], login = login_check(app_session), title = '기타 메뉴', logo = set_data['name'], data = '<h2 style="margin-top: 0px;">기록</h2><li><a href="/blocklog/n/1">사용자 차단 기록</a></li><li><a href="/userlog/n/1">사용자 가입 기록</a></li><li><a href="/manager/6">사용자 기록</a></li><h2>기타</h2><li><a href="/titleindex">모든 문서</a></li><li><a href="/acllist">ACL 문서 목록</a></li><!--<li><a href="/upload">업로드</a></li>--><li><a href="/adminlist">관리자 목록</a></li><li><a href="/manager/1">관리자 메뉴</a></li><br>이 오픈나무의 버전은 <a href="https://github.com/2DU/openNAMU/blob/normal/version.md">2.0 (알파)</a> 입니다.')
+    return web_render('index', custom = custom_css_user(app_session), license = set_data['license'], login = login_check(app_session), title = '기타 메뉴', logo = set_data['name'], data = '<h2 style="margin-top: 0px;">기록</h2><li><a href="/blocklog/n/1">사용자 차단 기록</a></li><li><a href="/userlog/n/1">사용자 가입 기록</a></li><li><a href="/manager/6">사용자 기록</a></li><li><a href="/manager/7">사용자 토론 기록</a></li><h2>기타</h2><li><a href="/titleindex">모든 문서</a></li><li><a href="/acllist">ACL 문서 목록</a></li><!--<li><a href="/upload">업로드</a></li>--><li><a href="/adminlist">관리자 목록</a></li><li><a href="/manager/1">관리자 메뉴</a></li><br>이 오픈나무의 버전은 <a href="https://github.com/2DU/openNAMU/blob/normal/version.md">2.0</a> 입니다.')
     
 @route('/manager/<num:int>', method=['POST', 'GET'])
 def manager(num = None):
@@ -1293,6 +1286,11 @@ def manager(num = None):
             return redirect('/record/' + url_pas(request.forms.name) + '/n/1')
         else:
             return web_render('index', custom = custom_css_user(app_session), license = set_data['license'], login = login_check(app_session), title = '기록 이동', logo = set_data['name'], data = '<form id="usrform" method="POST" action="/manager/6"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')    
+    elif(num == 7):
+        if(request.method == 'POST'):
+            return redirect('/user/' + url_pas(request.forms.name) + '/topic/1')
+        else:
+            return web_render('index', custom = custom_css_user(app_session), license = set_data['license'], login = login_check(app_session), title = '토론 기록 이동', logo = set_data['name'], data = '<form id="usrform" method="POST" action="/manager/7"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')    
     else:
         return redirect('/')
         
@@ -1318,7 +1316,7 @@ def title_index():
 
         return web_render('index', custom = custom_css_user(app_session), license = set_data['license'], login = login_check(app_session), logo = set_data['name'], rows = data + '<br><span>이 위키에는 총 ' + str(i) + '개의 문서가 있습니다.</span>', tn = 3, title = '모든 문서')
     else:
-        return web_render('index', custom = custom_css_user(app_session), license = set_data['license'], login = login_check(app_session), logo = set_data['name'], rows = '', tn = 3, title = '모든 문서')
+        return web_render('index', custom = custom_css_user(app_session), license = set_data['license'], login = login_check(app_session), logo = set_data['name'], rows = '<br>None', tn = 3, title = '모든 문서')
         
 @route('/topic/<name:path>/close')
 def close_topic_list(name = None):
@@ -2277,6 +2275,61 @@ def read_view(name = None, redirect = None):
             elsedata = re.sub("^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)", " * [[\g<in>]] 문서로 넘겨주기", elsedata)
         
         return web_render('index', custom = custom_css_user(app_session), license = set_data['license'], login = login_check(app_session), title = name, logo = set_data['name'], page = url_pas(name), data = namumark(app_session, name, elsedata) + div, tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, redirect = redirect, admin = admin_memu, data_none = True)
+
+@route('/user/<name:path>/topic/<num:int>')
+def close_topic_list(name = None, num = None):
+    app_session = request.environ.get('beaker.session')
+    v = num * 50
+    i = v - 50
+    div = '<div><table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;">토론명</td><td style="text-align: center;width:33.33%;">작성자</td><td style="text-align: center;width:33.33%;">시간</td></tr>'
+    
+    db_ex("select * from topic where ip = '" + db_pas(name) + "' or ip = '" + db_pas(name) + " - Admin' order by date desc")
+    rows = db_get()
+    if(rows):
+        while(True):
+            try:                    
+                title = rows[i]['title']
+                title = re.sub('<', '&lt;', title)
+                title = re.sub('>', '&gt;', title)
+
+                sub = rows[i]['sub']
+                sub = re.sub('<', '&lt;', sub)
+                sub = re.sub('>', '&gt;', sub)
+                    
+                if(admin_check(app_session) == 1):
+                    db_ex("select * from ban where block = '" + db_pas(rows[i]['ip']) + "'")
+                    row = db_get()
+                    if(row):
+                        ban = ' <a href="/ban/' + url_pas(rows[i]['ip']) + '">(해제)</a>'
+                    else:
+                        ban = ' <a href="/ban/' + url_pas(rows[i]['ip']) + '">(차단)</a>'
+                else:
+                    ban = ''
+                    
+                ip = ip_pas(rows[i]['ip'])
+                    
+                div += '<tr><td style="text-align: center;width:33.33%;"><a href="/topic/' + url_pas(rows[i]['title']) + '/sub/' + url_pas(sub) + '#' + rows[i]['id'] + '">' + title + '</a> (' + sub + ') (#' + rows[i]['id'] + ') </td><td style="text-align: center;width:33.33%;">' + ip + ban +  '</td><td style="text-align: center;width:33.33%;">' + rows[i]['date'] + '</td></tr>'
+                
+                if(i == v):
+                    div = div + '</tbody></table></div>'
+                    if(num == 1):
+                        div += '<br><a href="/user/' + url_pas(name) + '/topic/' + str(num + 1) + '">(다음)</a>'
+                    else:
+                        div += '<br><a href="/user/' + url_pas(name) + '/topic/' + str(num - 1) + '">(이전)</a> <a href="/user/' + url_pas(name) + '/topic/' + str(num + 1) + '">(다음)</a>'
+                    break
+
+                i += 1
+            except:
+                div += '</tbody></table></div>'
+
+                if(num != 1):
+                    div += '<br><a href="/user/' + url_pas(name) + '/topic/' + str(num - 1) + '">(이전)</a>'
+
+                break
+                
+        return web_render('index', custom = custom_css_user(app_session), license = set_data['license'], login = login_check(app_session), logo = set_data['name'], rows = div, tn = 3, title = '사용자 토론 기록')
+    else:
+        return web_render('index', custom = custom_css_user(app_session), license = set_data['license'], login = login_check(app_session), logo = set_data['name'], rows = '<br>None', tn = 3, title = '사용자 토론 기록')
         
 @route('/user')
 def user_info():
