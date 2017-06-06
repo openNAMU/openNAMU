@@ -133,7 +133,7 @@ def static(name = None):
 @route('/acllist')
 def acl_list():
     app_session = request.environ.get('beaker.session')
-    data = ''
+    data = '<div>'
     i = 1
 
     db_ex("select title, acl from data where acl = 'admin' or acl = 'user' order by acl desc")
@@ -1298,6 +1298,11 @@ def manager(num = None):
 def title_index():
     app_session = request.environ.get('beaker.session')
     i = 0
+    v = 0
+    z = 0
+    b = 0
+    j = 0
+    e = 0
     data = '<div>'
     db_ex("select title from data order by title asc")
     title_list = db_get()
@@ -1309,12 +1314,23 @@ def title_index():
                 break
 
             data += '<li>' + str(i + 1) + '. <a href="/w/' + url_pas(title_list[i]['title']) + '">' + title_list[i]['title'] + '</a></li>'
+
+            if(re.search('^분류:', title_list[i]['title'])):
+                v += 1
+            elif(re.search('^사용자:', title_list[i]['title'])):
+                z += 1
+            elif(re.search('^틀:', title_list[i]['title'])):
+                b += 1
+            elif(re.search('^파일:', title_list[i]['title'])):
+                j += 1
+            else:
+                e += 1
             
             i += 1
 
         data += '</div>'
 
-        return web_render('index', custom = custom_css_user(app_session), license = set_data['license'], login = login_check(app_session), logo = set_data['name'], rows = data + '<br><span>이 위키에는 총 ' + str(i) + '개의 문서가 있습니다.</span>', tn = 3, title = '모든 문서')
+        return web_render('index', custom = custom_css_user(app_session), license = set_data['license'], login = login_check(app_session), logo = set_data['name'], rows = data + '<br><li>이 위키에는 총 ' + str(i) + '개의 문서가 있습니다.</li><br><li>틀 문서는 총 ' + str(b) + '개의 문서가 있습니다.</li><li>분류 문서는 총 ' + str(v) + '개의 문서가 있습니다.</li><li>사용자 문서는 총 ' + str(z) + '개의 문서가 있습니다.</li><li>파일 문서는 총 ' + str(j) + '개의 문서가 있습니다.</li><li>나머지 문서는 총 ' + str(e) + '개의 문서가 있습니다.</li>', tn = 3, title = '모든 문서')
     else:
         return web_render('index', custom = custom_css_user(app_session), license = set_data['license'], login = login_check(app_session), logo = set_data['name'], rows = '<br>None', tn = 3, title = '모든 문서')
         
