@@ -272,7 +272,7 @@ def recent_changes():
     else:
         return web_render('index', custom = custom_css_user(app_session), license = set_data['license'], login = login_check(app_session), logo = set_data['name'], rows = '', tn = 3, title = '최근 변경내역')
         
-@route('/history/<name>/r/<num:int>/hidden')
+@route('/history/<name:path>/r/<num:int>/hidden')
 def history_hidden(name = None, num = None):
     app_session = request.environ.get('beaker.session')
     if(owner_check(app_session) == 1):
@@ -289,7 +289,7 @@ def history_hidden(name = None, num = None):
     else:
         return redirect('/history/' + url_pas(name) + '/n/1')
         
-@route('/record/<name>/n/<num:int>')
+@route('/record/<name:path>/n/<num:int>')
 def user_record(name = None, num = None):
     app_session = request.environ.get('beaker.session')
     v = num * 50
@@ -445,7 +445,7 @@ def backlink_reset():
     else:
         return redirect('/error/3')
         
-@route('/backlink/<name>/n/<num:int>')
+@route('/backlink/<name:path>/n/<num:int>')
 def backlink(name = None, num = None):
     app_session = request.environ.get('beaker.session')
     v = num * 50
@@ -606,7 +606,7 @@ def blocklog(number = None):
     else:
         return web_render('index', custom = custom_css_user(app_session), license = set_data['license'], login = login_check(app_session), logo = set_data['name'], rows = '', tn = 3, title = '사용자 차단 기록')
         
-@route('/history/<name>/n/<num:int>', method=['POST', 'GET'])
+@route('/history/<name:path>/n/<num:int>', method=['POST', 'GET'])
 def history_view(name = None, num = None):
     app_session = request.environ.get('beaker.session')
     if(request.method == 'POST'):
@@ -747,7 +747,7 @@ def goto():
     else:
         return redirect('/search/' + url_pas(request.forms.search) + '/n/1')
 
-@route('/search/<name>/n/<num:int>')
+@route('/search/<name:path>/n/<num:int>')
 def deep_search(name = None, num = None):
     app_session = request.environ.get('beaker.session')
     v = num * 50
@@ -819,171 +819,8 @@ def deep_search(name = None, num = None):
     div = div + div_plus + end
 
     return web_render('index', custom = custom_css_user(app_session), license = set_data['license'], login = login_check(app_session), logo = set_data['name'], data = div, title = name, sub = '검색')
-    
-   
-
-
-@route('/w/<name>')
-@route('/w/<name>/from/<redirect>')
-def read_view(name = None, redirect = None):
-    app_session = request.environ.get('beaker.session')
-    i = 0
-    
-    db_ex("select * from rd where title = '" + db_pas(name) + "' order by date asc")
-    rows = db_get()
-    while(True):
-        try:
-            a = rows[i]
-        except:
-            topic = ""
-            break
-            
-        db_ex("select * from stop where title = '" + db_pas(rows[i]['title']) + "' and sub = '" + db_pas(rows[i]['sub']) + "' and close = 'O'")
-        row = db_get()
-        if(not row):
-            topic = "open"
-            break
-        else:
-            i += 1
-            
-    acl = ''
-    
-    m = re.search("^(.*)\/(.*)$", name)
-    if(m):
-        g = m.groups()
-        uppage = g[0]
-        style = ""
-    else:
-        uppage = ""
-        style = "display:none;"
         
-    if(admin_check(app_session) == 1):
-        admin_memu = 'ACL'
-    else:
-        admin_memu = ''
-    
-    if(re.search("^분류:", name)):
-        db_ex("select * from cat where title = '" + db_pas(name) + "' order by cat asc")
-        rows = db_get()
-        if(rows):
-            div = ''
-            i = 0
-            
-            while(True):
-                try:
-                    a = rows[i]
-                except:
-                    break
-                    
-                db_ex("select * from data where title = '" + db_pas(rows[i]['cat']) + "'")
-                row = db_get()
-                if(row):
-                    aa = row[0]['data']                  
-                    aa = namumark(app_session, '', aa)
-                    bb = re.search('<div style="width:100%;border: 1px solid #777;padding: 5px;margin-top: 1em;">분류:((?:(?!<\/div>).)*)<\/div>', aa)
-                    if(bb):
-                        cc = bb.groups()
-                        
-                        mm = re.search("^분류:(.*)", name)
-                        if(mm):
-                            ee = mm.groups()
-                            
-                            if(re.search("<a (class=\"not_thing\")? href=\"\/w\/" + url_pas(name) + "\">" + ee[0] + "<\/a>", cc[0])):
-                                div += '<li><a href="/w/' + url_pas(rows[i]['cat']) + '">' + rows[i]['cat'] + '</a></li>'
-                                
-                                i += 1
-                            else:
-                                db_ex("delete from cat where title = '" + db_pas(name) + "' and cat = '" + db_pas(rows[i]['cat']) + "'")
-                                db_com()
-                                
-                                i += 1
-                        else:
-                            db_ex("delete from cat where title = '" + db_pas(name) + "' and cat = '" + db_pas(rows[i]['cat']) + "'")
-                            db_com()
-                            
-                            i += 1
-                    else:
-                        db_ex("delete from cat where title = '" + db_pas(name) + "' and cat = '" + db_pas(rows[i]['cat']) + "'")
-                        db_com()
-                        
-                        i += 1
-                else:
-                    db_ex("delete from cat where title = '" + db_pas(name) + "' and cat = '" + db_pas(rows[i]['cat']) + "'")
-                    db_com()
-                    
-                    i += 1
-                    
-            div = '<h2>분류</h2>' + div
-        else:
-            div = ''
-    else:
-        div = ''
-    
-    db_ex("select * from data where title = '" + db_pas(name) + "'")
-    rows = db_get()
-    if(rows):
-        if(rows[0]['acl'] == 'admin'):
-            acl = '(관리자)'
-        elif(rows[0]['acl'] == 'user'):
-            acl = '(로그인)'
-        else:
-            if(not acl):
-                acl = ''
-
-        m = re.search("^사용자:(.*)", name)
-        if(m):
-            g = m.groups()
-            
-            db_ex("select * from user where id = '" + db_pas(g[0]) + "'")
-            test = db_get()
-            if(test):
-                if(test[0]['acl'] == 'owner'):
-                    acl = '(소유자)'
-                elif(test[0]['acl'] == 'admin'):
-                    acl = '(관리자)'
-
-            db_ex("select * from ban where block = '" + db_pas(g[0]) + "'")
-            user = db_get()
-            if(user):
-                elsedata = '{{{#!wiki style="border:2px solid red;padding:10px;"\r\n{{{+2 {{{#red 이 사용자는 차단 당했습니다.}}}}}}\r\n\r\n차단 해제 일 : ' + user[0]['end'] + '[br]사유 : ' + user[0]['why'] + '}}}[br]' + rows[0]['data']
-            else:
-                elsedata = rows[0]['data']
-        else:
-            elsedata = rows[0]['data']
-                
-        if(redirect):
-            elsedata = re.sub("^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)", " * [[\g<in>]] 문서로 넘겨주기", elsedata)
-                
-        enddata = namumark(app_session, name, elsedata)
-        
-        m = re.search('<div id="toc">((?:(?!\/div>).)*)<\/div>', enddata)
-        if(m):
-            result = m.groups()
-            left = result[0]
-        else:
-            left = ''
-            
-        return web_render('index', custom = custom_css_user(app_session), license = set_data['license'], login = login_check(app_session), title = name, logo = set_data['name'], page = url_pas(name), data = enddata + div, tn = 1, acl = acl, left = left, uppage = uppage, style = style, topic = topic, redirect = redirect, admin = admin_memu)
-    else:
-        m = re.search("^사용자:(.*)", name)
-        if(m):
-            g = m.groups()
-            
-            db_ex("select * from ban where block = '" + db_pas(g[0]) + "'")
-            user = db_get()
-            if(user):
-                elsedata = '{{{#!wiki style="border:2px solid red;padding:10px;"\r\n{{{+2 {{{#red 이 사용자는 차단 당했습니다.}}}}}}\r\n\r\n차단 해제 일 : ' + user[0]['end'] + '[br]사유 : ' + user[0]['why'] + '}}}[br]' + 'None'
-            else:
-                elsedata = 'None'
-        else:
-            elsedata = 'None'
-            
-        if(redirect):
-            elsedata = re.sub("^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)", " * [[\g<in>]] 문서로 넘겨주기", elsedata)
-        
-        return web_render('index', custom = custom_css_user(app_session), license = set_data['license'], login = login_check(app_session), title = name, logo = set_data['name'], page = url_pas(name), data = namumark(app_session, name, elsedata) + div, tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, redirect = redirect, admin = admin_memu, data_none = True)
-        
-@route('/w/<name>/r/<num:int>')
+@route('/w/<name:path>/r/<num:int>')
 def old_view(name = None, num = None):
     app_session = request.environ.get('beaker.session')
     db_ex("select * from hidhi where title = '" + db_pas(name) + "' and re = '" + db_pas(str(num)) + "'")
@@ -1024,7 +861,7 @@ def old_view(name = None, num = None):
         else:
             return redirect('/history/' + url_pas(name))
             
-@route('/w/<name>/raw/<num:int>')
+@route('/w/<name:path>/raw/<num:int>')
 def old_raw(name = None, num = None):
     app_session = request.environ.get('beaker.session')
     db_ex("select * from hidhi where title = '" + db_pas(name) + "' and re = '" + db_pas(str(num)) + "'")
@@ -1059,7 +896,7 @@ def old_raw(name = None, num = None):
         else:
             return redirect('/history/' + url_pas(name))
             
-@route('/raw/<name>')
+@route('/raw/<name:path>')
 def raw_view(name = None):
     app_session = request.environ.get('beaker.session')
     db_ex("select * from data where title = '" + db_pas(name) + "'")
@@ -1075,7 +912,7 @@ def raw_view(name = None):
     else:
         return redirect('/w/' + url_pas(name))
         
-@route('/revert/<name>/r/<num:int>', method=['POST', 'GET'])
+@route('/revert/<name:path>/r/<num:int>', method=['POST', 'GET'])
 def revert(name = None, num = None):
     app_session = request.environ.get('beaker.session')
     ip = ip_check(app_session)
@@ -1165,7 +1002,7 @@ def revert(name = None, num = None):
                 else:
                     return redirect('/w/' + url_pas(name))
                     
-@route('/edit/<name>', method=['POST', 'GET'])
+@route('/edit/<name:path>', method=['POST', 'GET'])
 def edit(name = None):
     app_session = request.environ.get('beaker.session')
     ip = ip_check(app_session)
@@ -1225,7 +1062,7 @@ def edit(name = None):
             else:
                 return web_render('index', custom = custom_css_user(app_session), license = set_data['license'], login = login_check(app_session), title = name, logo = set_data['name'], page = url_pas(name), data = '', tn = 2, left = left, sub = '편집')
                 
-@route('/edit/<name>/section/<num:int>', method=['POST', 'GET'])
+@route('/edit/<name:path>/section/<num:int>', method=['POST', 'GET'])
 def section_edit(name = None, num = None):
     app_session = request.environ.get('beaker.session')
     ip = ip_check(app_session)
@@ -1304,7 +1141,7 @@ def section_edit(name = None, num = None):
             else:
                 return redirect('/w/' + url_pas(name))
                 
-@route('/preview/<name>', method=['POST'])
+@route('/preview/<name:path>', method=['POST'])
 def preview(name = None):
     app_session = request.environ.get('beaker.session')
     ip = ip_check(app_session)
@@ -1328,7 +1165,7 @@ def preview(name = None):
             
         return web_render('index', custom = custom_css_user(app_session), license = set_data['license'], login = login_check(app_session), title = name, logo = set_data['name'], page = url_pas(name), data = request.forms.content, tn = 2, preview = 1, enddata = enddata, left = left, sub = '미리보기')
         
-@route('/preview/<name>/section/<num:int>', method=['POST'])
+@route('/preview/<name:path>/section/<num:int>', method=['POST'])
 def section_preview(name = None, num = None):
     app_session = request.environ.get('beaker.session')
     ip = ip_check(app_session)
@@ -1351,7 +1188,7 @@ def section_preview(name = None, num = None):
             
         return web_render('index', custom = custom_css_user(app_session), license = set_data['license'], login = login_check(app_session), title = name, logo = set_data['name'], page = url_pas(name), data = request.forms.content, tn = 2, preview = 1, enddata = enddata, left = left, section = 1, number = num, odata = request.forms.otent, sub = '미리보기')
         
-@route('/delete/<name>', method=['POST', 'GET'])
+@route('/delete/<name:path>', method=['POST', 'GET'])
 def delete(name = None):
     app_session = request.environ.get('beaker.session')
     ip = ip_check(app_session)
@@ -1387,7 +1224,7 @@ def delete(name = None):
         else:
             return redirect('/w/' + url_pas(name))
             
-@route('/move/<name>', method=['POST', 'GET'])
+@route('/move/<name:path>', method=['POST', 'GET'])
 def move(name = None):
     app_session = request.environ.get('beaker.session')
     ip = ip_check(app_session)
@@ -1483,48 +1320,7 @@ def title_index():
     else:
         return web_render('index', custom = custom_css_user(app_session), license = set_data['license'], login = login_check(app_session), logo = set_data['name'], rows = '', tn = 3, title = '모든 문서')
         
-@route('/topic/<name>', method=['POST', 'GET'])
-def topic_list(name = None):
-    app_session = request.environ.get('beaker.session')
-    if(request.method == 'POST'):
-        return redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(request.forms.topic))
-    else:
-        div = '<div>'
-        i = 0
-        j = 1
-        db_ex("select * from rd where title = '" + db_pas(name) + "' order by date asc")
-        rows = db_get()
-        while(True):
-            try:
-                a = rows[i]
-            except:
-                div = div + '</div>'
-                break
-                
-            db_ex("select * from topic where title = '" + db_pas(rows[i]['title']) + "' and sub = '" + db_pas(rows[i]['sub']) + "' and id = '1' order by sub asc")
-            aa = db_get()
-            
-            indata = namumark(app_session, name, aa[0]['data'])
-            
-            if(aa[0]['block'] == 'O'):
-                indata = '블라인드 되었습니다.'
-                block = 'style="background: gainsboro;"'
-            else:
-                block = ''
-
-            ip = ip_pas(aa[0]['ip'])
-                
-            db_ex("select * from stop where title = '" + db_pas(rows[i]['title']) + "' and sub = '" + db_pas(rows[i]['sub']) + "' and close = 'O'")
-            row = db_get()
-            if(not row):
-                div += '<h2><a href="/topic/' + url_pas(rows[i]['title']) + '/sub/' + url_pas(rows[i]['sub']) + '">' + str(j) + '. ' + rows[i]['sub'] + '</a></h2><table id="toron"><tbody><tr><td id="toroncolorgreen"><a href="javascript:void(0);" id="1">#1</a> ' + ip + ' <span style="float:right;">' + aa[0]['date'] + '</span></td></tr><tr><td ' + block + '>' + indata + '</td></tr></tbody></table><br>'
-                j += 1
-                
-            i += 1
-            
-        return web_render('index', custom = custom_css_user(app_session), license = set_data['license'], login = login_check(app_session), title = name, page = url_pas(name), logo = set_data['name'], plus = div, tn = 10, list = 1, sub = '토론 목록')
-        
-@route('/topic/<name>/close')
+@route('/topic/<name:path>/close')
 def close_topic_list(name = None):
     app_session = request.environ.get('beaker.session')
     div = '<div>'
@@ -1558,7 +1354,7 @@ def close_topic_list(name = None):
         
     return web_render('index', custom = custom_css_user(app_session), license = set_data['license'], login = login_check(app_session), title = name, page = url_pas(name), logo = set_data['name'], plus = div, tn = 10, sub = '닫힌 토론')
     
-@route('/topic/<name>/agree')
+@route('/topic/<name:path>/agree')
 def agree_topic_list(name = None):
     app_session = request.environ.get('beaker.session')
     div = '<div>'
@@ -1591,8 +1387,139 @@ def agree_topic_list(name = None):
         i += 1
         
     return web_render('index', custom = custom_css_user(app_session), license = set_data['license'], login = login_check(app_session), title = name, page = url_pas(name), logo = set_data['name'], plus = div, tn = 10, sub = '합의된 토론')
-    
-@route('/topic/<name>/sub/<sub>', method=['POST', 'GET'])
+        
+@route('/topic/<name:path>/sub/<sub:path>/b/<num:int>')
+def topic_block(name = None, sub = None, num = None):
+    app_session = request.environ.get('beaker.session')
+    if(admin_check(app_session) == 1):
+        db_ex("select * from topic where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' and id = '" + str(num) + "'")
+        block = db_get()
+        if(block):
+            if(block[0]['block'] == 'O'):
+                db_ex("update topic set block = '' where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' and id = '" + str(num) + "'")
+            else:
+                db_ex("update topic set block = 'O' where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' and id = '" + str(num) + "'")
+            db_com()
+            
+            rd_plus(name, sub, get_time())
+            
+            return redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub))
+        else:
+            return redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub))
+    else:
+        return redirect('/error/3')
+        
+@route('/topic/<name:path>/sub/<sub:path>/notice/<num:int>')
+def topic_top(name = None, sub = None, num = None):
+    app_session = request.environ.get('beaker.session')
+    if(admin_check(app_session) == 1):
+        db_ex("select * from topic where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' and id = '" + str(num) + "'")
+        topic_data = db_get()
+        if(topic_data):
+            db_ex("select * from distop where id = '" + str(num) + "' and title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "'")
+            top_data = db_get()
+            if(top_data):
+                db_ex("delete from distop where id = '" + str(num) + "' and title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "'")
+            else:
+                db_ex("insert into distop (id, title, sub) value ('" + db_pas(str(num)) + "', '" + db_pas(name) + "', '" + db_pas(sub) + "')")
+            db_com()
+            
+            rd_plus(name, sub, get_time())
+
+            return redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub))
+        else:
+            return redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub))
+    else:
+        return redirect('/error/3')
+        
+@route('/topic/<name:path>/sub/<sub:path>/stop')
+def topic_stop(name = None, sub = None):
+    app_session = request.environ.get('beaker.session')
+    if(admin_check(app_session) == 1):
+        ip = ip_check(app_session)
+        
+        db_ex("select * from topic where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' limit 1")
+        topic_check = db_get()
+        if(topic_check):
+            time = get_time()
+            
+            db_ex("select * from stop where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' and close = ''")
+            stop = db_get()
+            if(stop):
+                db_ex("insert into topic (id, title, sub, data, date, ip, block) value ('" + db_pas(str(int(topic_check[0]['id']) + 1)) + "', '" + db_pas(name) + "', '" + db_pas(sub) + "', 'Restart', '" + db_pas(time) + "', '" + db_pas(ip) + " - Restart', '')")
+                db_ex("delete from stop where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' and close = ''")
+            else:
+                db_ex("insert into topic (id, title, sub, data, date, ip, block) value ('" + db_pas(str(int(topic_check[0]['id']) + 1)) + "', '" + db_pas(name) + "', '" + db_pas(sub) + "', 'Stop', '" + db_pas(time) + "', '" + db_pas(ip) + " - Stop', '')")
+                db_ex("insert into stop (title, sub, close) value ('" + db_pas(name) + "', '" + db_pas(sub) + "', '')")
+            db_com()
+            
+            rd_plus(name, sub, time)
+            
+            return redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub))
+        else:
+            return redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub))
+    else:
+        return redirect('/error/3')
+        
+@route('/topic/<name:path>/sub/<sub:path>/close')
+def topic_close(name = None, sub = None):
+    app_session = request.environ.get('beaker.session')
+    if(admin_check(app_session) == 1):
+        ip = ip_check(app_session)
+        
+        db_ex("select * from topic where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' order by id + 0 desc limit 1")
+        topic_check = db_get()
+        if(topic_check):
+            time = get_time()
+            
+            db_ex("select * from stop where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' and close = 'O'")
+            close = db_get()
+            if(close):
+                db_ex("insert into topic (id, title, sub, data, date, ip, block) value ('" + db_pas(str(int(topic_check[0]['id']) + 1)) + "', '" + db_pas(name) + "', '" + db_pas(sub) + "', 'Reopen', '" + db_pas(time) + "', '" + db_pas(ip) + " - Reopen', '')")
+                db_ex("delete from stop where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' and close = 'O'")
+            else:
+                db_ex("insert into topic (id, title, sub, data, date, ip, block) value ('" + db_pas(str(int(topic_check[0]['id']) + 1)) + "', '" + db_pas(name) + "', '" + db_pas(sub) + "', 'Close', '" + db_pas(time) + "', '" + db_pas(ip) + " - Close', '')")
+                db_ex("insert into stop (title, sub, close) value ('" + db_pas(name) + "', '" + db_pas(sub) + "', 'O')")
+            db_com()
+            
+            rd_plus(name, sub, time)
+            
+            return redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub))
+        else:
+            return redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub))
+    else:
+        return redirect('/error/3')
+        
+@route('/topic/<name:path>/sub/<sub:path>/agree')
+def topic_agree(name = None, sub = None):
+    app_session = request.environ.get('beaker.session')
+    if(admin_check(app_session) == 1):
+        ip = ip_check(app_session)
+        
+        db_ex("select id from topic where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' order by id + 0 desc limit 1")
+        topic_check = db_get()
+        if(topic_check):
+            time = get_time()
+            
+            db_ex("select * from agreedis where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "'")
+            agree = db_get()
+            if(agree):
+                db_ex("insert into topic (id, title, sub, data, date, ip, block) value ('" + db_pas(str(int(topic_check[0]['id']) + 1)) + "', '" + db_pas(name) + "', '" + db_pas(sub) + "', 'Settlement', '" + db_pas(time) + "', '" + db_pas(ip) + " - Settlement', '')")
+                db_ex("delete from agreedis where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "'")
+            else:
+                db_ex("insert into topic (id, title, sub, data, date, ip, block) value ('" + db_pas(str(int(topic_check[0]['id']) + 1)) + "', '" + db_pas(name) + "', '" + db_pas(sub) + "', 'Agreement', '" + db_pas(time) + "', '" + db_pas(ip) + " - Agreement', '')")
+                db_ex("insert into agreedis (title, sub) value ('" + db_pas(name) + "', '" + db_pas(sub) + "')")
+            db_com()
+            
+            rd_plus(name, sub, time)
+            
+            return redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub))
+        else:
+            return redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub))
+    else:
+        return redirect('/error/3')
+
+@route('/topic/<name:path>/sub/<sub:path>', method=['POST', 'GET'])
 def topic(name = None, sub = None):
     app_session = request.environ.get('beaker.session')
     ip = ip_check(app_session)
@@ -1752,137 +1679,47 @@ def topic(name = None, sub = None):
                 break
             
         return web_render('index', custom = custom_css_user(app_session), license = set_data['license'], login = login_check(app_session), title = name, page = url_pas(name), suburl = url_pas(sub), toron = sub, logo = set_data['name'], rows = div, tn = 11, ban = ban, style = style, sub = '토론')
-        
-@route('/topic/<name>/sub/<sub>/b/<num:int>')
-def topic_block(name = None, sub = None, num = None):
-    app_session = request.environ.get('beaker.session')
-    if(admin_check(app_session) == 1):
-        db_ex("select * from topic where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' and id = '" + str(num) + "'")
-        block = db_get()
-        if(block):
-            if(block[0]['block'] == 'O'):
-                db_ex("update topic set block = '' where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' and id = '" + str(num) + "'")
-            else:
-                db_ex("update topic set block = 'O' where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' and id = '" + str(num) + "'")
-            db_com()
-            
-            rd_plus(name, sub, get_time())
-            
-            return redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub))
-        else:
-            return redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub))
-    else:
-        return redirect('/error/3')
-        
-@route('/topic/<name>/sub/<sub>/notice/<num:int>')
-def topic_top(name = None, sub = None, num = None):
-    app_session = request.environ.get('beaker.session')
-    if(admin_check(app_session) == 1):
-        db_ex("select * from topic where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' and id = '" + str(num) + "'")
-        topic_data = db_get()
-        if(topic_data):
-            db_ex("select * from distop where id = '" + str(num) + "' and title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "'")
-            top_data = db_get()
-            if(top_data):
-                db_ex("delete from distop where id = '" + str(num) + "' and title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "'")
-            else:
-                db_ex("insert into distop (id, title, sub) value ('" + db_pas(str(num)) + "', '" + db_pas(name) + "', '" + db_pas(sub) + "')")
-            db_com()
-            
-            rd_plus(name, sub, get_time())
 
-            return redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub))
-        else:
-            return redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub))
-    else:
-        return redirect('/error/3')
-        
-@route('/topic/<name>/sub/<sub>/stop')
-def topic_stop(name = None, sub = None):
+@route('/topic/<name:path>', method=['POST', 'GET'])
+def topic_list(name = None):
     app_session = request.environ.get('beaker.session')
-    if(admin_check(app_session) == 1):
-        ip = ip_check(app_session)
-        
-        db_ex("select * from topic where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' limit 1")
-        topic_check = db_get()
-        if(topic_check):
-            time = get_time()
-            
-            db_ex("select * from stop where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' and close = ''")
-            stop = db_get()
-            if(stop):
-                db_ex("insert into topic (id, title, sub, data, date, ip, block) value ('" + db_pas(str(int(topic_check[0]['id']) + 1)) + "', '" + db_pas(name) + "', '" + db_pas(sub) + "', 'Restart', '" + db_pas(time) + "', '" + db_pas(ip) + " - Restart', '')")
-                db_ex("delete from stop where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' and close = ''")
-            else:
-                db_ex("insert into topic (id, title, sub, data, date, ip, block) value ('" + db_pas(str(int(topic_check[0]['id']) + 1)) + "', '" + db_pas(name) + "', '" + db_pas(sub) + "', 'Stop', '" + db_pas(time) + "', '" + db_pas(ip) + " - Stop', '')")
-                db_ex("insert into stop (title, sub, close) value ('" + db_pas(name) + "', '" + db_pas(sub) + "', '')")
-            db_com()
-            
-            rd_plus(name, sub, time)
-            
-            return redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub))
-        else:
-            return redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub))
+    if(request.method == 'POST'):
+        return redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(request.forms.topic))
     else:
-        return redirect('/error/3')
-        
-@route('/topic/<name>/sub/<sub>/close')
-def topic_close(name = None, sub = None):
-    app_session = request.environ.get('beaker.session')
-    if(admin_check(app_session) == 1):
-        ip = ip_check(app_session)
-        
-        db_ex("select * from topic where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' order by id + 0 desc limit 1")
-        topic_check = db_get()
-        if(topic_check):
-            time = get_time()
+        div = '<div>'
+        i = 0
+        j = 1
+        db_ex("select * from rd where title = '" + db_pas(name) + "' order by date asc")
+        rows = db_get()
+        while(True):
+            try:
+                a = rows[i]
+            except:
+                div = div + '</div>'
+                break
+                
+            db_ex("select * from topic where title = '" + db_pas(rows[i]['title']) + "' and sub = '" + db_pas(rows[i]['sub']) + "' and id = '1' order by sub asc")
+            aa = db_get()
             
-            db_ex("select * from stop where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' and close = 'O'")
-            close = db_get()
-            if(close):
-                db_ex("insert into topic (id, title, sub, data, date, ip, block) value ('" + db_pas(str(int(topic_check[0]['id']) + 1)) + "', '" + db_pas(name) + "', '" + db_pas(sub) + "', 'Reopen', '" + db_pas(time) + "', '" + db_pas(ip) + " - Reopen', '')")
-                db_ex("delete from stop where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' and close = 'O'")
+            indata = namumark(app_session, name, aa[0]['data'])
+            
+            if(aa[0]['block'] == 'O'):
+                indata = '블라인드 되었습니다.'
+                block = 'style="background: gainsboro;"'
             else:
-                db_ex("insert into topic (id, title, sub, data, date, ip, block) value ('" + db_pas(str(int(topic_check[0]['id']) + 1)) + "', '" + db_pas(name) + "', '" + db_pas(sub) + "', 'Close', '" + db_pas(time) + "', '" + db_pas(ip) + " - Close', '')")
-                db_ex("insert into stop (title, sub, close) value ('" + db_pas(name) + "', '" + db_pas(sub) + "', 'O')")
-            db_com()
+                block = ''
+
+            ip = ip_pas(aa[0]['ip'])
+                
+            db_ex("select * from stop where title = '" + db_pas(rows[i]['title']) + "' and sub = '" + db_pas(rows[i]['sub']) + "' and close = 'O'")
+            row = db_get()
+            if(not row):
+                div += '<h2><a href="/topic/' + url_pas(rows[i]['title']) + '/sub/' + url_pas(rows[i]['sub']) + '">' + str(j) + '. ' + rows[i]['sub'] + '</a></h2><table id="toron"><tbody><tr><td id="toroncolorgreen"><a href="javascript:void(0);" id="1">#1</a> ' + ip + ' <span style="float:right;">' + aa[0]['date'] + '</span></td></tr><tr><td ' + block + '>' + indata + '</td></tr></tbody></table><br>'
+                j += 1
+                
+            i += 1
             
-            rd_plus(name, sub, time)
-            
-            return redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub))
-        else:
-            return redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub))
-    else:
-        return redirect('/error/3')
-        
-@route('/topic/<name>/sub/<sub>/agree')
-def topic_agree(name = None, sub = None):
-    app_session = request.environ.get('beaker.session')
-    if(admin_check(app_session) == 1):
-        ip = ip_check(app_session)
-        
-        db_ex("select id from topic where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' order by id + 0 desc limit 1")
-        topic_check = db_get()
-        if(topic_check):
-            time = get_time()
-            
-            db_ex("select * from agreedis where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "'")
-            agree = db_get()
-            if(agree):
-                db_ex("insert into topic (id, title, sub, data, date, ip, block) value ('" + db_pas(str(int(topic_check[0]['id']) + 1)) + "', '" + db_pas(name) + "', '" + db_pas(sub) + "', 'Settlement', '" + db_pas(time) + "', '" + db_pas(ip) + " - Settlement', '')")
-                db_ex("delete from agreedis where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "'")
-            else:
-                db_ex("insert into topic (id, title, sub, data, date, ip, block) value ('" + db_pas(str(int(topic_check[0]['id']) + 1)) + "', '" + db_pas(name) + "', '" + db_pas(sub) + "', 'Agreement', '" + db_pas(time) + "', '" + db_pas(ip) + " - Agreement', '')")
-                db_ex("insert into agreedis (title, sub) value ('" + db_pas(name) + "', '" + db_pas(sub) + "')")
-            db_com()
-            
-            rd_plus(name, sub, time)
-            
-            return redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub))
-        else:
-            return redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub))
-    else:
-        return redirect('/error/3')
+        return web_render('index', custom = custom_css_user(app_session), license = set_data['license'], login = login_check(app_session), title = name, page = url_pas(name), logo = set_data['name'], plus = div, tn = 10, list = 1, sub = '토론 목록')
         
 @route('/login', method=['POST', 'GET'])
 def login():
@@ -1965,7 +1802,7 @@ def change_password():
             else:
                 return web_render('index', custom = custom_css_user(app_session), license = set_data['license'], login = login_check(app_session), title = '비밀번호 변경', enter = '변경', logo = set_data['name'], tn = 15)
                 
-@route('/check/<name>')
+@route('/check/<name:path>')
 def user_check(name = None):
     app_session = request.environ.get('beaker.session')
     db_ex("select * from user where id = '" + db_pas(name) + "'")
@@ -2065,7 +1902,7 @@ def logout():
 
     return redirect('/user')
     
-@route('/ban/<name>', method=['POST', 'GET'])
+@route('/ban/<name:path>', method=['POST', 'GET'])
 def user_ban(name = None):
     app_session = request.environ.get('beaker.session')
     db_ex("select * from user where id = '" + db_pas(name) + "'")
@@ -2120,7 +1957,7 @@ def user_ban(name = None):
             else:
                 return redirect('/error/3')
                 
-@route('/acl/<name>', method=['POST', 'GET'])
+@route('/acl/<name:path>', method=['POST', 'GET'])
 def acl(name = None):
     app_session = request.environ.get('beaker.session')
     if(request.method == 'POST'):
@@ -2158,7 +1995,7 @@ def acl(name = None):
         else:
             return redirect('/error/3')
             
-@route('/admin/<name>', method=['POST', 'GET'])
+@route('/admin/<name:path>', method=['POST', 'GET'])
 def user_admin(name = None):
     app_session = request.environ.get('beaker.session')
     if(request.method == 'POST'):
@@ -2253,7 +2090,7 @@ def are_you_ban():
         
     return web_render('index', custom = custom_css_user(app_session), license = set_data['license'], login = login_check(app_session), title = '권한 오류', logo = set_data['name'], data = end)
     
-@route('/w/<name>/r/<a:int>/diff/<b:int>')
+@route('/w/<name:path>/r/<a:int>/diff/<b:int>')
 def diff_data(name = None, a = None, b = None):
     app_session = request.environ.get('beaker.session')
     db_ex("select * from history where id = '" + db_pas(str(a)) + "' and title = '" + db_pas(name) + "'")
@@ -2280,6 +2117,166 @@ def diff_data(name = None, a = None, b = None):
             return redirect('/history/' + url_pas(name))
     else:
         return redirect('/history/' + url_pas(name))
+
+@route('/w/<name:path>')
+@route('/w/<name:path>/from/<redirect:path>')
+def read_view(name = None, redirect = None):
+    app_session = request.environ.get('beaker.session')
+    i = 0
+    
+    db_ex("select * from rd where title = '" + db_pas(name) + "' order by date asc")
+    rows = db_get()
+    while(True):
+        try:
+            a = rows[i]
+        except:
+            topic = ""
+            break
+            
+        db_ex("select * from stop where title = '" + db_pas(rows[i]['title']) + "' and sub = '" + db_pas(rows[i]['sub']) + "' and close = 'O'")
+        row = db_get()
+        if(not row):
+            topic = "open"
+            break
+        else:
+            i += 1
+            
+    acl = ''
+    
+    m = re.search("^(.*)\/(.*)$", name)
+    if(m):
+        g = m.groups()
+        uppage = g[0]
+        style = ""
+    else:
+        uppage = ""
+        style = "display:none;"
+        
+    if(admin_check(app_session) == 1):
+        admin_memu = 'ACL'
+    else:
+        admin_memu = ''
+    
+    if(re.search("^분류:", name)):
+        db_ex("select * from cat where title = '" + db_pas(name) + "' order by cat asc")
+        rows = db_get()
+        if(rows):
+            div = ''
+            i = 0
+            
+            while(True):
+                try:
+                    a = rows[i]
+                except:
+                    break
+                    
+                db_ex("select * from data where title = '" + db_pas(rows[i]['cat']) + "'")
+                row = db_get()
+                if(row):
+                    aa = row[0]['data']                  
+                    aa = namumark(app_session, '', aa)
+                    bb = re.search('<div style="width:100%;border: 1px solid #777;padding: 5px;margin-top: 1em;">분류:((?:(?!<\/div>).)*)<\/div>', aa)
+                    if(bb):
+                        cc = bb.groups()
+                        
+                        mm = re.search("^분류:(.*)", name)
+                        if(mm):
+                            ee = mm.groups()
+                            
+                            if(re.search("<a (class=\"not_thing\")? href=\"\/w\/" + url_pas(name) + "\">" + ee[0] + "<\/a>", cc[0])):
+                                div += '<li><a href="/w/' + url_pas(rows[i]['cat']) + '">' + rows[i]['cat'] + '</a></li>'
+                                
+                                i += 1
+                            else:
+                                db_ex("delete from cat where title = '" + db_pas(name) + "' and cat = '" + db_pas(rows[i]['cat']) + "'")
+                                db_com()
+                                
+                                i += 1
+                        else:
+                            db_ex("delete from cat where title = '" + db_pas(name) + "' and cat = '" + db_pas(rows[i]['cat']) + "'")
+                            db_com()
+                            
+                            i += 1
+                    else:
+                        db_ex("delete from cat where title = '" + db_pas(name) + "' and cat = '" + db_pas(rows[i]['cat']) + "'")
+                        db_com()
+                        
+                        i += 1
+                else:
+                    db_ex("delete from cat where title = '" + db_pas(name) + "' and cat = '" + db_pas(rows[i]['cat']) + "'")
+                    db_com()
+                    
+                    i += 1
+                    
+            div = '<h2>분류</h2>' + div
+        else:
+            div = ''
+    else:
+        div = ''
+    
+    db_ex("select * from data where title = '" + db_pas(name) + "'")
+    rows = db_get()
+    if(rows):
+        if(rows[0]['acl'] == 'admin'):
+            acl = '(관리자)'
+        elif(rows[0]['acl'] == 'user'):
+            acl = '(로그인)'
+        else:
+            if(not acl):
+                acl = ''
+
+        m = re.search("^사용자:(.*)", name)
+        if(m):
+            g = m.groups()
+            
+            db_ex("select * from user where id = '" + db_pas(g[0]) + "'")
+            test = db_get()
+            if(test):
+                if(test[0]['acl'] == 'owner'):
+                    acl = '(소유자)'
+                elif(test[0]['acl'] == 'admin'):
+                    acl = '(관리자)'
+
+            db_ex("select * from ban where block = '" + db_pas(g[0]) + "'")
+            user = db_get()
+            if(user):
+                elsedata = '{{{#!wiki style="border:2px solid red;padding:10px;"\r\n{{{+2 {{{#red 이 사용자는 차단 당했습니다.}}}}}}\r\n\r\n차단 해제 일 : ' + user[0]['end'] + '[br]사유 : ' + user[0]['why'] + '}}}[br]' + rows[0]['data']
+            else:
+                elsedata = rows[0]['data']
+        else:
+            elsedata = rows[0]['data']
+                
+        if(redirect):
+            elsedata = re.sub("^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)", " * [[\g<in>]] 문서로 넘겨주기", elsedata)
+                
+        enddata = namumark(app_session, name, elsedata)
+        
+        m = re.search('<div id="toc">((?:(?!\/div>).)*)<\/div>', enddata)
+        if(m):
+            result = m.groups()
+            left = result[0]
+        else:
+            left = ''
+            
+        return web_render('index', custom = custom_css_user(app_session), license = set_data['license'], login = login_check(app_session), title = name, logo = set_data['name'], page = url_pas(name), data = enddata + div, tn = 1, acl = acl, left = left, uppage = uppage, style = style, topic = topic, redirect = redirect, admin = admin_memu)
+    else:
+        m = re.search("^사용자:(.*)", name)
+        if(m):
+            g = m.groups()
+            
+            db_ex("select * from ban where block = '" + db_pas(g[0]) + "'")
+            user = db_get()
+            if(user):
+                elsedata = '{{{#!wiki style="border:2px solid red;padding:10px;"\r\n{{{+2 {{{#red 이 사용자는 차단 당했습니다.}}}}}}\r\n\r\n차단 해제 일 : ' + user[0]['end'] + '[br]사유 : ' + user[0]['why'] + '}}}[br]' + 'None'
+            else:
+                elsedata = 'None'
+        else:
+            elsedata = 'None'
+            
+        if(redirect):
+            elsedata = re.sub("^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)", " * [[\g<in>]] 문서로 넘겨주기", elsedata)
+        
+        return web_render('index', custom = custom_css_user(app_session), license = set_data['license'], login = login_check(app_session), title = name, logo = set_data['name'], page = url_pas(name), data = namumark(app_session, name, elsedata) + div, tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, redirect = redirect, admin = admin_memu, data_none = True)
         
 @route('/user')
 def user_info():
