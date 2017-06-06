@@ -14,7 +14,7 @@
         <meta name="twitter:title" content="{{title}}">
         <meta name="twitter:site" content="@{{logo}}">
         <meta name="twitter:card" content="summary">
-        <meta name="twitter:description" content="{{get('data', 'Nope')}}" />
+        <meta name="twitter:description" content="{{get('data', 'None')}}" />
         <link rel="shortcut icon" href="/static/images/on.ico">
         <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
@@ -142,7 +142,7 @@
                 % if defined('tn'):
                     % if tn == 1:
                         % if redirect:
-                            <li style="margin-top: -20px;"><a href="/w/{{redirect}}/from/{{page}}">{{!redirect or 'Nope'}}</a>에서 넘어 왔습니다.</li>
+                            <li style="margin-top: -20px;"><a href="/w/{{redirect}}/from/{{page}}">{{!redirect or 'None'}}</a>에서 넘어 왔습니다.</li>
                             <br>
                         % end
                         <div>
