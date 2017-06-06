@@ -13,7 +13,7 @@ set 폴더에 있는 set.json을 폴더 밖으로 꺼내고 json 내용을 수�
 ### 기본
  * [MariaDB](https://mariadb.org/)나 [MySQL](https://www.mysql.com/)
  * pip install bottle
- * pip install bottle-session
+ * pip install beaker
  * pip install tornado
  * pip install [bcrypt](https://pypi.python.org/pypi/bcrypt/3.1.0)
  * pip install [pymysql](https://pypi.python.org/pypi/PyMySQL)
