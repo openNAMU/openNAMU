@@ -2126,7 +2126,7 @@ def diff_data(name = None, a = None, b = None):
             
             result = '<pre>' + result + '</pre>'
             
-            return web_render('index', custom = custom_css_user(app_session), license = set_data['license'], login = login_check(app_session), title = name, logo = set_data['name'], data = result, sub = '비교')
+            return web_render('index', custom = custom_css_user(app_session), license = set_data['license'], login = login_check(app_session), title = name, logo = set_data['name'], data = result, sub = '비교', page = url_pas(name))
         else:
             return redirect('/history/' + url_pas(name))
     else:
