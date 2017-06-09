@@ -1017,9 +1017,9 @@ def section_edit(name = None, num = None):
                 else:                    
                     if(can == 1):
                         return redirect('/ban')
-                    else:                        
+                    else:
                         leng = leng_check(len(request.forms.otent), len(content))
-                        content = re.sub(request.forms.otent, content + '\n', rows[0]['data'])
+                        content = rows[0]['data'].replace(request.forms.otent, content)
                         
                         history_plus(name, content, today, ip, html_pas(request.forms.send, 2), leng)
                         
@@ -1133,6 +1133,29 @@ def edit(name = None):
                 return web_render('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = name, logo = set_data['name'], page = url_pas(name), data = rows[0]['data'], tn = 2, left = left, sub = '편집')
             else:
                 return web_render('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = name, logo = set_data['name'], page = url_pas(name), data = '', tn = 2, left = left, sub = '편집')
+
+@route('/preview/<name:path>/section/<num:int>', method=['POST'])
+def section_preview(name = None, num = None):
+    session = request.environ.get('beaker.session')
+    ip = ip_check(session)
+    can = acl_check(session, ip, name)
+    
+    if(can == 1):
+        return redirect('/ban')
+    else:            
+        newdata = request.forms.content
+        newdata = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', ' * [[\g<in>]] 문서로 넘겨주기', newdata)
+        enddata = namumark(session, name, newdata)
+        
+        db_ex("select * from data where title = '" + db_pas(set_data["help"]) + "'")
+        rows = db_get()
+        if(rows):
+            newdata = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', ' * [[\g<in>]] 문서로 넘겨주기', rows[0]["data"])
+            left = namumark(session, name, newdata)
+        else:
+            left = ''
+            
+        return web_render('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = name, logo = set_data['name'], page = url_pas(name), data = request.forms.content, tn = 2, preview = 1, enddata = enddata, left = left, section = 1, number = num, odata = request.forms.otent, sub = '미리보기')
                 
 @route('/preview/<name:path>', method=['POST'])
 def preview(name = None):
@@ -1157,29 +1180,6 @@ def preview(name = None):
             left = ''
             
         return web_render('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = name, logo = set_data['name'], page = url_pas(name), data = request.forms.content, tn = 2, preview = 1, enddata = enddata, left = left, sub = '미리보기')
-        
-@route('/preview/<name:path>/section/<num:int>', method=['POST'])
-def section_preview(name = None, num = None):
-    session = request.environ.get('beaker.session')
-    ip = ip_check(session)
-    can = acl_check(session, ip, name)
-    
-    if(can == 1):
-        return redirect('/ban')
-    else:            
-        newdata = request.forms.content
-        newdata = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', ' * [[\g<in>]] 문서로 넘겨주기', newdata)
-        enddata = namumark(session, name, newdata)
-        
-        db_ex("select * from data where title = '" + db_pas(set_data["help"]) + "'")
-        rows = db_get()
-        if(rows):
-            newdata = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', ' * [[\g<in>]] 문서로 넘겨주기', rows[0]["data"])
-            left = namumark(session, name, newdata)
-        else:
-            left = ''
-            
-        return web_render('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = name, logo = set_data['name'], page = url_pas(name), data = request.forms.content, tn = 2, preview = 1, enddata = enddata, left = left, section = 1, number = num, odata = request.forms.otent, sub = '미리보기')
         
 @route('/delete/<name:path>', method=['POST', 'GET'])
 def delete(name = None):
