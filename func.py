@@ -129,7 +129,7 @@ def custom_css_user(session):
 
     return data
 
-def acl_check(ip, name):
+def acl_check(session, ip, name):
     m = re.search("^사용자:(.*)", name)
     n = re.search("^파일:(.*)", name)
     if(m):
@@ -147,7 +147,7 @@ def acl_check(ip, name):
         else:
             return 1
     elif(n):
-        if(not owner_check() == 1):
+        if(not owner_check(session)  == 1):
             return 1
     else:
         b = re.search("^([0-9](?:[0-9]?[0-9]?)\.[0-9](?:[0-9]?[0-9]?))", ip)
