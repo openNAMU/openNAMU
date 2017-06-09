@@ -994,7 +994,86 @@ def revert(name = None, num = None):
                     return web_render('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = name, logo = set_data['name'], page = url_pas(name), r = url_pas(str(num)), tn = 13, plus = '정말 되돌리시겠습니까?', sub = '되돌리기')
                 else:
                     return redirect('/w/' + url_pas(name))
+                
+@route('/edit/<name:path>/section/<num:int>', method=['POST', 'GET'])
+def section_edit(name = None, num = None):
+    session = request.environ.get('beaker.session')
+    ip = ip_check(session)
+    can = acl_check(session, ip, name)
+    
+    if(request.method == 'POST'):
+        if(len(request.forms.send) > 500):
+            return redirect('/error/15')
+        else:
+            today = get_time()
+            
+            content = savemark(session, request.forms.content)
+            
+            db_ex("select * from data where title = '" + db_pas(name) + "'")
+            rows = db_get()
+            if(rows):
+                if(request.forms.otent == content):
+                    return redirect('/error/18')
+                else:                    
+                    if(can == 1):
+                        return redirect('/ban')
+                    else:                        
+                        leng = leng_check(len(request.forms.otent), len(content))
+                        content = re.sub(request.forms.otent, content + '\n', rows[0]['data'])
+                        
+                        history_plus(name, content, today, ip, html_pas(request.forms.send, 2), leng)
+                        
+                        db_ex("update data set data = '" + db_pas(content) + "' where title = '" + db_pas(name) + "'")
+                        db_com()
+                        
+                    include_check(name, content)
                     
+                    return redirect('/w/' + url_pas(name))
+            else:
+                return redirect('/w/' + url_pas(name))
+    else:        
+        if(can == 1):
+            return redirect('/ban')
+        else:
+            db_ex("select * from data where title = '" + db_pas(set_data["help"]) + "'")
+            rows = db_get()
+            if(rows):
+                newdata = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', ' * [[\g<in>]] 문서로 넘겨주기', rows[0]["data"])
+                
+                left = namumark(session, name, newdata)
+            else:
+                left = ''
+                
+            db_ex("select * from data where title = '" + db_pas(name) + "'")
+            rows = db_get()
+            if(rows):
+                i = 0
+                j = 0
+                
+                gdata = rows[0]['data'] + '\r\n'
+                while(True):
+                    m = re.search("((?:={1,6})\s?(?:[^=]*)\s?(?:={1,6})(?:\s+)?\n(?:(?:(?:(?!(?:={1,6})\s?(?:[^=]*)\s?(?:={1,6})(?:\s+)?\n).)*)(?:\n)?)+)", gdata)
+                    if(m):
+                        if(i == num - 1):
+                            g = m.groups()
+                            gdata = re.sub("\r\n$", "", g[0])
+                            break
+                        else:
+                            gdata = re.sub("((?:={1,6})\s?(?:[^=]*)\s?(?:={1,6})(?:\s+)?\n(?:(?:(?:(?!(?:={1,6})\s?(?:[^=]*)\s?(?:={1,6})(?:\s+)?\n).)*)(?:\n)?)+)", "", gdata, 1)
+                            
+                            i += 1
+                    else:
+                        j = 1
+                        
+                        break
+                        
+                if(j == 0):
+                    return web_render('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = name, logo = set_data['name'], page = url_pas(name), data = gdata, tn = 2, left = left, section = 1, number = num, sub = '편집')
+                else:
+                    return redirect('/w/' + url_pas(name))
+            else:
+                return redirect('/w/' + url_pas(name))
+
 @route('/edit/<name:path>', method=['POST', 'GET'])
 def edit(name = None):
     session = request.environ.get('beaker.session')
@@ -1054,85 +1133,6 @@ def edit(name = None):
                 return web_render('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = name, logo = set_data['name'], page = url_pas(name), data = rows[0]['data'], tn = 2, left = left, sub = '편집')
             else:
                 return web_render('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = name, logo = set_data['name'], page = url_pas(name), data = '', tn = 2, left = left, sub = '편집')
-                
-@route('/edit/<name:path>/section/<num:int>', method=['POST', 'GET'])
-def section_edit(name = None, num = None):
-    session = request.environ.get('beaker.session')
-    ip = ip_check(session)
-    can = acl_check(session, ip, name)
-    
-    if(request.method == 'POST'):
-        if(len(request.forms.send) > 500):
-            return redirect('/error/15')
-        else:
-            today = get_time()
-            
-            content = savemark(session, request.forms.content)
-            
-            db_ex("select * from data where title = '" + db_pas(name) + "'")
-            rows = db_get()
-            if(rows):
-                if(request.forms.otent == content):
-                    return redirect('/error/18')
-                else:                    
-                    if(can == 1):
-                        return redirect('/ban')
-                    else:                        
-                        leng = leng_check(len(request.form['otent']), len(content))
-                        content = rows[0]['data'].replace(request.form['otent'], content)
-                        
-                        history_plus(name, content, today, ip, html_pas(request.forms.send, 2), leng)
-                        
-                        db_ex("update data set data = '" + db_pas(content) + "' where title = '" + db_pas(name) + "'")
-                        db_com()
-                        
-                    include_check(name, content)
-                    
-                    return redirect('/w/' + url_pas(name))
-            else:
-                return redirect('/w/' + url_pas(name))
-    else:        
-        if(can == 1):
-            return redirect('/ban')
-        else:
-            db_ex("select * from data where title = '" + db_pas(set_data["help"]) + "'")
-            rows = db_get()
-            if(rows):
-                newdata = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', ' * [[\g<in>]] 문서로 넘겨주기', rows[0]["data"])
-                
-                left = namumark(session, name, newdata)
-            else:
-                left = ''
-                
-            db_ex("select * from data where title = '" + db_pas(name) + "'")
-            rows = db_get()
-            if(rows):
-                i = 0
-                j = 0
-                
-                gdata = rows[0]['data'] + '\r\n'
-                while(True):
-                    m = re.search("((?:={1,6})\s?(?:[^=]*)\s?(?:={1,6})(?:\s+)?\n(?:(?:(?:(?!(?:={1,6})\s?(?:[^=]*)\s?(?:={1,6})(?:\s+)?\n).)*)(?:\n)?)+)", gdata)
-                    if(m):
-                        if(i == num - 1):
-                            g = m.groups()
-                            gdata = re.sub("\r\n$", "", g[0])
-                            break
-                        else:
-                            gdata = re.sub("((?:={1,6})\s?(?:[^=]*)\s?(?:={1,6})(?:\s+)?\n(?:(?:(?:(?!(?:={1,6})\s?(?:[^=]*)\s?(?:={1,6})(?:\s+)?\n).)*)(?:\n)?)+)", "", gdata, 1)
-                            
-                            i += 1
-                    else:
-                        j = 1
-                        
-                        break
-                        
-                if(j == 0):
-                    return web_render('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = name, logo = set_data['name'], page = url_pas(name), data = gdata, tn = 2, left = left, section = 1, number = num, sub = '편집')
-                else:
-                    return redirect('/w/' + url_pas(name))
-            else:
-                return redirect('/w/' + url_pas(name))
                 
 @route('/preview/<name:path>', method=['POST'])
 def preview(name = None):
