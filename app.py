@@ -1068,6 +1068,8 @@ def section_edit(name = None, num = None):
                         break
                         
                 if(j == 0):
+                    gdata = re.sub("\r\n$", "", gdata)
+
                     return web_render('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = name, logo = set_data['name'], page = url_pas(name), data = gdata, tn = 2, left = left, section = 1, number = num, sub = '편집')
                 else:
                     return redirect('/w/' + url_pas(name))
