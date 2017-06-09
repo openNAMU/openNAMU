@@ -158,7 +158,7 @@
                         % if defined('section'):
                             <form id="usrform" name="f1" method="POST" action="/edit/{{page}}/section/{{number}}">
                                 <textarea rows="30" cols="100" name="content" form="usrform">{{data}}</textarea>
-                                % if preview == 1:
+                                % if defined('preview'):
                                     <textarea style="display:none;" rows="30" cols="100" name="otent" form="usrform">{{odata}}</textarea>
                                 % else:
                                     <textarea style="display:none;" rows="30" cols="100" name="otent" form="usrform">{{data}}</textarea>
