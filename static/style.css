@@ -19,7 +19,7 @@
     float: left;
     margin-right: 10px;
     padding: 5px;
-    margin-top: 9px;
+    margin-top: 10px;
 }
 
 #log:hover, #log:focus {
@@ -483,7 +483,8 @@ pre span {
     font-size: 16px;        
     color: white;        
     float: left;        
-    padding: 5px;        
+    padding: 5px;
+    margin-right: 5px;        
 }
         
 @media (max-width: 710px) {        
