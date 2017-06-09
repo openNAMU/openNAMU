@@ -478,7 +478,7 @@ pre span {
 
 #RecentChanges {        
     line-height: 35px;        
-    width: 110px;        
+    width: auto;
     height: 45px;        
     font-size: 16px;        
     color: white;        
