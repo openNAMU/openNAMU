@@ -464,7 +464,7 @@ sub, sup {
 }
 
 pre span {
-    font-family: '니눔고딕코딩', 'Nanum Gothic Coding', monospace;
+    font-family: "d2codingfont", "나눔고딕코딩", "NanumGothicCoding", "monospace";
 }
 
 #is_mobile {        
