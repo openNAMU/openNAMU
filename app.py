@@ -2373,7 +2373,7 @@ def user_info():
         
     return web_render('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '사용자 메뉴', logo = set_data['name'], data = ip + '<br><br><span>권한 상태 : ' + acl + '<h2>로그인 관련</h2><li><a href="/login">로그인</a></li><li><a href="/logout">로그아웃</a></li><li><a href="/register">회원가입</a></li><h2>기타</h2><li><a href="/change">비밀번호 변경</a></li><li><a href="/count">기여 횟수</a></li><li><a href="/record/' + raw_ip + '/n/1">기여 목록</a></li><li><a href="/custom">커스텀 CSS</a></li>')
 
-@route('/custom', methods=['GET', 'POST'])
+@route('/custom', method=['GET', 'POST'])
 def custom_css():
     session = request.environ.get('beaker.session')
     if(not session.get('Now') == True):
