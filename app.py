@@ -121,6 +121,54 @@ def db_get():
 
 start()
 
+@route('/upload', method=['GET', 'POST'])
+def upload():
+    session = request.environ.get('beaker.session')
+    MEMFILE_MAX = int(set_data['upload']) * 1024 * 1024
+    
+    ip = ip_check(session)
+    ban = ban_check(ip)
+    
+    if(request.method == 'POST'):        
+        if(ban == 1):
+            return redirect('/ban')
+        else:
+            file = request.files.file
+            if(file):
+                exist = re.search('^(.+)(\.(?:[Jj][Pp][Gg]|[Gg][Ii][Ff]|[Jj][Pp][Ee][Gg]|[Pp][Nn][Gg]))$', file.filename)
+                if(exist):
+                    if((int(set_data['upload']) * 1024 * 1024) < request.content_length):
+                        return redirect('/error/17')
+                    else:
+                        file_info = exist.groups()
+
+                        file_data = file_info[0] + file_info[1]
+                        file_name = sha224(file_info[0]) + file_info[1]
+                                           
+                        if(os.path.exists(os.path.join('image', file_name))):
+                            return redirect('/error/16')
+                        else:
+                            file.save(os.path.join('image', file_name))
+                            
+                            db_ex("select title from data where title = '" + db_pas('파일:' + file_data) + "'")
+                            exist_db = db_get()
+                            if(not exist_db):
+                                db_ex("insert into data (title, data, acl) value ('" + db_pas('파일:' + file_data) + "', '" + db_pas('[[파일:' + file_data + ']][br][br]{{{[[파일:' + file_data + ']]}}}') + "', '')")
+                                db_com()
+                            
+                            history_plus('파일:' + file_data, '[[파일:' + file_data + ']][br][br]{{{[[파일:' + file_data + ']]}}}', get_time(), ip, '파일:' + file_data + ' 업로드', '0')
+                            
+                            return redirect('/w/' + url_pas('파일:' + file_data))
+                else:
+                    return redirect('/error/14')
+            else:
+                return redirect('/error/14')
+    else:        
+        if(ban == 1):
+            return redirect('/ban')
+        else:
+            return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), logo = set_data['name'], title = '업로드', tn = 21, number = set_data['upload'])
+
 @route('/image/<name:path>')
 def static(name = None):
     session = request.environ.get('beaker.session')
@@ -2479,6 +2527,8 @@ def error_test(num = None):
         return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '편집 오류', logo = set_data['name'], data = '편집 기록은 500자를 넘을 수 없습니다.')
     elif(num == 16):
         return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '업로드 오류', logo = set_data['name'], data = '동일한 이름의 파일이 있습니다.')
+    elif(num == 17):
+        return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '업로드 오류', logo = set_data['name'], data = '파일 용량은 ' + set_data['upload'] + 'MB를 넘길 수 없습니다.')
     elif(num == 18):
         return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '편집 오류', logo = set_data['name'], data = '내용이 원래 문서와 동일 합니다.')
     elif(num == 19):
