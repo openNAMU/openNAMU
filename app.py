@@ -1303,7 +1303,7 @@ def move(name = None):
 @route('/other')
 def other():
     session = request.environ.get('beaker.session')
-    return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '기타 메뉴', logo = set_data['name'], data = '<h2 style="margin-top: 0px;">기록</h2><li><a href="/blocklog/n/1">사용자 차단 기록</a></li><li><a href="/userlog/n/1">사용자 가입 기록</a></li><li><a href="/manager/6">사용자 기록</a></li><li><a href="/manager/7">사용자 토론 기록</a></li><h2>기타</h2><li><a href="/titleindex">모든 문서</a></li><li><a href="/acllist">ACL 문서 목록</a></li><!--<li><a href="/upload">업로드</a></li>--><li><a href="/adminlist">관리자 목록</a></li><li><a href="/manager/1">관리자 메뉴</a></li><br>이 오픈나무의 버전은 <a href="https://github.com/2DU/openNAMU/blob/normal/version.md">2.0</a> 입니다.')
+    return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '기타 메뉴', logo = set_data['name'], data = '<h2 style="margin-top: 0px;">기록</h2><li><a href="/blocklog/n/1">사용자 차단 기록</a></li><li><a href="/userlog/n/1">사용자 가입 기록</a></li><li><a href="/manager/6">사용자 기록</a></li><li><a href="/manager/7">사용자 토론 기록</a></li><h2>기타</h2><li><a href="/titleindex">모든 문서</a></li><li><a href="/acllist">ACL 문서 목록</a></li><li><a href="/upload">업로드</a></li><li><a href="/adminlist">관리자 목록</a></li><li><a href="/manager/1">관리자 메뉴</a></li><br>이 오픈나무의 버전은 <a href="https://github.com/2DU/openNAMU/blob/normal/version.md">2.0</a> 입니다.')
     
 @route('/manager/<num:int>', method=['POST', 'GET'])
 def manager(num = None):
