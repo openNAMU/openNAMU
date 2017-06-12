@@ -141,7 +141,7 @@
                 </h1>
                 % if(defined('tn')):
                     % if(tn == 1):
-                        % if(defined('redirect')):
+                        % if(redirect):
                             <li style="margin-top: -20px;"><a href="/w/{{redirect}}/from/{{page}}">{{!redirect or 'None'}}</a>에서 넘어 왔습니다.</li>
                             <br>
                         % end
