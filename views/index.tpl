@@ -39,9 +39,9 @@
                         <i class="fa fa-random" aria-hidden="true"></i>
                     </a>
                     <a href="/user" id="log">
-                        % if login == 1:
+                        % if(login == 1):
                             <i class="fa fa-user" aria-hidden="true"></i>
-                        % elif login == 0:
+                        % elif(login == 0):
                             <i class="fa fa-user-times" aria-hidden="true"></i>
                         % else:
                             <i class="fa fa-user-secret" aria-hidden="true"></i>
@@ -80,10 +80,10 @@
                 <div id="tool">
                     <nav class="menu">
                         <a class="menu-item selected" href="#" onclick="return false">
-                            % if defined('sub'):
+                            % if(defined('sub')):
                                 {{sub}}
-                            % elif defined('tn'):
-                                % if tn == 1:
+                            % elif(defined('tn')):
+                                % if(tn == 1):
                                     문서
                                 % else:
                                     기타
@@ -92,35 +92,35 @@
                                 기타
                             % end
                         </a>
-                        % if defined('tn'):
-                            % if tn == 1:
-                                % if defined('data_none'):
+                        % if(defined('tn')):
+                            % if(tn == 1):
+                                % if(defined('data_none')):
                                     <a class="menu-item" href="/edit/{{page}}">생성</a>
                                 % else:
                                     <a class="menu-item" href="/edit/{{page}}">수정</a>
                                 % end
                                 <a class="menu-item" id="{{topic}}" href="/topic/{{page}}">토론</a>
-                                % if not defined('data_none'):
+                                % if(not defined('data_none')):
                                     <a class="menu-item" href="/delete/{{page}}">삭제</a>
                                 % end
                                 <a class="menu-item" href="/move/{{page}}">이동</a>
-                                % if not defined('data_none'):
+                                % if(not defined('data_none')):
                                     <a class="menu-item" href="/raw/{{page}}">Raw</a>
                                 % end
                                 <a class="menu-item" href="/history/{{page}}/n/1">역사</a>
                                 <a class="menu-item" href="/backlink/{{page}}/n/1">역링크</a>
-                                % if redirect:
+                                % if(redirect):
                                     <a class="menu-item" href="/w/{{page}}">넘기기</a>
                                 % end
-                                % if admin == "ACL":
+                                % if(admin == "ACL"):
                                     <a class="menu-item" href="/acl/{{page}}">ACL</a>
                                 % end
-                                % if uppage:
+                                % if(uppage):
                                     <a class="menu-item" style="{{style}}" href="/w/{{uppage}}">상위</a>
                                 % end
-                            % elif tn == 6 or tn == 13 or not tn and not sub == '역링크' or tn == 3:
+                            % elif(tn == 6 or tn == 13 or not tn and not sub == '역링크' or tn == 3):
                                 <a class="menu-item" href="javascript:history.back(-1);">뒤로</a>
-                            % elif tn == 10 and not list or tn == 11:
+                            % elif(tn == 10 and not list or tn == 11):
                                 <a class="menu-item" href="/topic/{{page}}">토론 목록</a>
                             % else:
                                 <a class="menu-item" href="/w/{{get('page', '')}}">문서</a>
@@ -132,33 +132,33 @@
                 </div>
                 <h1 class="title">
                     {{title}}
-                    % if defined('acl'):
+                    % if(defined('acl')):
                         <sub> {{acl}}</sub>
                     % end
-                    % if defined('sub'):
+                    % if(defined('sub')):
                         <sub> ({{sub}})</sub>
                     % end
                 </h1>
-                % if defined('tn'):
-                    % if tn == 1:
-                        % if redirect:
+                % if(defined('tn')):
+                    % if(tn == 1):
+                        % if(defined('redirect')):
                             <li style="margin-top: -20px;"><a href="/w/{{redirect}}/from/{{page}}">{{!redirect or 'None'}}</a>에서 넘어 왔습니다.</li>
                             <br>
                         % end
                         <div>
                             {{!data}}
                         </div>
-                    % elif tn == 2:
-                        % if login == 0:
+                    % elif(tn == 2):
+                        % if(login == 0):
                             <br>
                             <span>비 로그인 상태입니다. 비 로그인으로 작업 시 아이피가 역사에 기록됩니다.</span>
                             <br>
                             <br>
                         % end
-                        % if defined('section'):
+                        % if(defined('section')):
                             <form id="usrform" name="f1" method="POST" action="/edit/{{page}}/section/{{number}}">
                                 <textarea rows="30" cols="100" name="content" form="usrform">{{data}}</textarea>
-                                % if defined('preview'):
+                                % if(defined('preview')):
                                     <textarea style="display:none;" rows="30" cols="100" name="otent" form="usrform">{{odata}}</textarea>
                                 % else:
                                     <textarea style="display:none;" rows="30" cols="100" name="otent" form="usrform">{{data}}</textarea>
@@ -183,12 +183,12 @@
                                 </div>
                             </form>      
                         % end
-                        % if defined('preview'):
+                        % if(defined('preview')):
                             {{!enddata}}
                         % end
-                    % elif tn == 3:
+                    % elif(tn == 3):
                         {{!rows}}
-                    % elif tn == 5:
+                    % elif(tn == 5):
                         <form class="usrform" method='POST' action='/history/{{page}}/n/1'>
                         <select name="a">
                             {{!select}}
@@ -200,21 +200,21 @@
                         <br>
                         <br>
                         {{!rows}}
-                    % elif tn == 6:
+                    % elif(tn == 6):
                         <div>
                             {{!data}}
                         </div>
-                    % elif tn == 8:
+                    % elif(tn == 8):
                         <form id="usrform" method="POST" action="/delete/{{page}}">
                             {{plus}}
                             <br>
                             <br>
                             <button class="btn btn-primary" type="submit">삭제</button>
                         </form>
-                        % if login == 0:
+                        % if(login == 0):
                             <span>비 로그인 상태입니다. 비 로그인으로 작업 시 아이피가 역사에 기록됩니다.</span>
                         % end
-                    % elif tn == 9:
+                    % elif(tn == 9):
                         <form id="usrform" method="POST" action="/move/{{page}}">
                             {{plus}}
                             <br>
@@ -224,13 +224,13 @@
                             <br>
                             <button class="btn btn-primary" type="submit">이동</button>
                         </form>
-                        % if login == 0:
+                        % if(login == 0):
                             <span>비 로그인 상태입니다. 비 로그인으로 작업 시 아이피가 역사에 기록됩니다.</span>
                         % end
-                    % elif tn == 10:
+                    % elif(tn == 10):
                         <form id="usrform" style="margin-top: -30px;" method="POST" action="/topic/{{page}}">
                             {{!plus}}
-                            % if list == 1:
+                            % if(list == 1):
                                 <br>
                                 <a href="/topic/{{page}}/close">(닫힌 토론)</a> <a href="/topic/{{page}}/agree">(합의된 토론)</a>
                                 <br>
@@ -241,11 +241,11 @@
                                 <button class="btn btn-primary" type="submit">새토론</button>
                             % end
                         </form>
-                    % elif tn == 11:
+                    % elif(tn == 11):
                         <h2 style="margin-top: -15px;">{{toron}}</h2>
                         <br>
                         {{!rows}}
-                        % if not ban == 1:
+                        % if(not ban == 1):
                             <a id="reload" href="javascript:window.location.reload(true);">(갱신)</a> <a href="#reload">(갱신 전에 누르시오)</a>
                             <form id="usrform" style="{{style}}" method="POST" action="/topic/{{page}}/sub/{{suburl}}">
                                 <br>
@@ -254,24 +254,24 @@
                                 <br>
                                 <button class="btn btn-primary" type="submit">전송</button>
                             </form>
-                            % if login == 0 and style == '':
+                            % if(login == 0 and style == ''):
                                 <span>비 로그인 상태입니다. 비 로그인으로 작업 시 아이피가 역사에 기록됩니다.</span>
                             % end
                         % end
-                    % elif tn == 13:
+                    % elif(tn == 13):
                         <form id="usrform" method="POST" action="/revert/{{page}}/r/{{r}}">
                             {{plus}}
                             <br>
                             <br>
                             <button class="btn btn-primary" type="submit">되돌리기</button>
                         </form>
-                        % if login == 0:
+                        % if(login == 0):
                             <span>비 로그인 상태입니다. 비 로그인으로 작업 시 아이피가 역사에 기록됩니다.</span>
                         % end
-                    % elif tn == 15:
-                        % if title == '회원가입':
+                    % elif(tn == 15):
+                        % if(title == '회원가입'):
                             <form id="usrform" method="POST" action="/register">
-                        % elif title == '비밀번호 변경':
+                        % elif(title == '비밀번호 변경'):
                             <form id="usrform" method="POST" action="/change">
                         % else:
                             <form id="usrform" method="POST" action="/login">
@@ -283,7 +283,7 @@
                             <br>
                             <br>
                             <span>
-                                % if title == '비밀번호 변경':
+                                % if(title == '비밀번호 변경'):
                                     현재 
                                 % end
                                 비밀번호
@@ -293,9 +293,9 @@
                             <input name="pw" type="password">
                             <br>
                             <br>
-                            % if not title == '로그인':
+                            % if(not title == '로그인'):
                                 <span>
-                                    % if title == '비밀번호 변경':
+                                    % if(title == '비밀번호 변경'):
                                         변경할 비밀번호
                                     % else:
                                         재 확인
@@ -306,7 +306,7 @@
                                 <input name="pw2" type="password">
                                 <br>
                                 <br>
-                                % if title == '비밀번호 변경':
+                                % if(title == '비밀번호 변경'):
                                     <span>재 확인</span>
                                     <br>
                                     <br>
@@ -317,9 +317,9 @@
                             % end
                             <button class="btn btn-primary" type="submit">{{enter}}</button>
                         </form>
-                    % elif tn == 16:
+                    % elif(tn == 16):
                         <form id="usrform" method="POST" action="/ban/{{page}}">
-                            % if now == '차단' or now == '대역 차단':
+                            % if(now == '차단' or now == '대역 차단'):
                                 <input class="form-control" name="end" style="width: 100%">
                                 <br>
                                 <br>
@@ -336,7 +336,7 @@
                                 <br>
                                 <br>
                                 <span>사유를 쓰는 곳입니다.</span>
-                                % if defined('allif'):
+                                % if(defined('allif')):
                                     <br>
                                     <br>
                                     <input type="checkbox" name="band">
@@ -348,9 +348,9 @@
                             % end
                             <button class="btn btn-primary" type="submit">{{now}}</button>
                         </form>
-                    % elif tn == 18:
+                    % elif(tn == 18):
                         <form id="usrform" method="POST" action="/admin/{{page}}">
-                            % if now == '권한 부여':
+                            % if(now == '권한 부여'):
                                 <select name="select">
                                     <option value="admin" selected="selected">관리자</option>
                                     <option value="owner">소유자</option>
@@ -360,7 +360,7 @@
                             % end
                             <button class="btn btn-primary" type="submit">{{now}}</button>
                         </form>
-                    % elif tn == 19:
+                    % elif(tn == 19):
                         <br>
                         <span>{{now}}</span>
                         <br>
@@ -375,7 +375,7 @@
                             <br>
                             <button class="btn btn-primary" type="submit">ACL 변경</button>
                         </form>
-                    % elif tn == 21:
+                    % elif(tn == 21):
                         <div>
                             <form action="" method=post enctype=multipart/form-data>
                                 <input type=file name=file>
