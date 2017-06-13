@@ -1063,7 +1063,7 @@ def revert(name = None, num = None):
                     return redirect('/w/' + url_pas(name))
                     
 @route('/manydel', method=['POST', 'GET'])
-def many_del(name = None, num = None):
+def many_del():
     session = request.environ.get('beaker.session')
     today = get_time()
     ip = ip_check(session)
@@ -1358,7 +1358,7 @@ def other():
 def manager(num = None):
     session = request.environ.get('beaker.session')
     if(num == 1):
-        return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '관리자 메뉴', logo = set_data['name'], data = '<h2 style="margin-top: 0px;">관리자 및 소유자</h2><li><a href="/manager/2">문서 ACL</a></li><li><a href="/manager/3">사용자 체크</a></li><li><a href="/manager/4">사용자 차단</a></li><h2>소유자</h2><li><a href="/backreset">모든 역링크 재 생성</a></li><li><a href="/manager/5">관리자 권한 주기</a></li><li><a href="/backreset">많은 문서 삭제</a></li><h2>기타</h2><li>이 메뉴에 없는 기능은 해당 문서의 역사나 토론에서 바로 사용 가능함</li>')
+        return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '관리자 메뉴', logo = set_data['name'], data = '<h2 style="margin-top: 0px;">관리자 및 소유자</h2><li><a href="/manager/2">문서 ACL</a></li><li><a href="/manager/3">사용자 체크</a></li><li><a href="/manager/4">사용자 차단</a></li><h2>소유자</h2><li><a href="/backreset">모든 역링크 재 생성</a></li><li><a href="/manager/5">관리자 권한 주기</a></li><li><a href="/manydel">많은 문서 삭제</a></li><h2>기타</h2><li>이 메뉴에 없는 기능은 해당 문서의 역사나 토론에서 바로 사용 가능함</li>')
     elif(num == 2):
         if(request.method == 'POST'):
             return redirect('/acl/' + url_pas(request.forms.name))
