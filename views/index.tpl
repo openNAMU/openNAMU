@@ -188,6 +188,26 @@
                         % end
                     % elif(tn == 3):
                         {{!rows}}
+                    % elif(tn == 4):
+                        <br>
+                        <span>문서명 A
+                        <br>
+                        문서명 B
+                        <br>
+                        문서명 C</span>
+                        <br>
+                        <br>
+                        <span>이런 식으로 기제 하시오</span>
+                        <br>
+                        <br>
+                        <form id="usrform" method="POST" action="/manydel">
+                            <textarea rows="30" cols="100" name="content" form="usrform"></textarea>
+                            <br>
+                            <br>
+                            <div class="form-actions">
+                                <button class="btn btn-primary" type="submit">삭제</button>
+                            </div>
+                        </form>
                     % elif(tn == 5):
                         <form class="usrform" method='POST' action='/history/{{page}}/n/1'>
                         <select name="a">

@@ -126,7 +126,7 @@ def db_get():
 
 start()
 
-r_ver = '2.0.0'
+r_ver = '2.0.1'
 
 db_ex('select data from other where name = "version"')
 version = db_get()
@@ -406,7 +406,7 @@ def user_record(name = None, num = None):
                 else:
                     revert = '<a href="/revert/' + url_pas(rows[i]['title']) + '/r/' + str(int(rows[i]['id']) - 1) + '">(되돌리기)</a>'
                     
-                div += '<tr><td style="text-align: center;width:33.33%;"><a href="/w/' + url_pas(rows[i]['title']) + '">' + title + '</a> (' + rows[i]['id'] + '판) <a href="/history/' + url_pas(rows[i]['title']) + '/n/1">(역사)</a> ' + revert + ' (' + leng + ')</td><td style="text-align: center;width:33.33%;">' + ip + ban +  '</td><td style="text-align: center;width:33.33%;">' + rows[i]['date'] + '</td></tr><tr><td colspan="3" style="text-align: center;width:100%;">' + send + '</td></tr>'
+                div += '<tr><td style="text-align: center;width:33.33%;"><a href="/w/' + url_pas(rows[i]['title']) + '">' + title + '</a> (' + rows[i]['id'] + '판) <a href="/history/' + url_pas(rows[i]['title']) + '/n/1">(역사)</a> <a href="/w/' + url_pas(rows[i]['title']) + '/r/' + str(int(rows[i]['id']) - 1) + '/diff/' + rows[i]['id'] + '">(비교)</a> ' + revert + ' (' + leng + ')</td><td style="text-align: center;width:33.33%;">' + ip + ban +  '</td><td style="text-align: center;width:33.33%;">' + rows[i]['date'] + '</td></tr><tr><td colspan="3" style="text-align: center;width:100%;">' + send + '</td></tr>'
                 
                 if(i == v):
                     div = div + '</tbody></table></div>'
@@ -1061,6 +1061,35 @@ def revert(name = None, num = None):
                     return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = name, logo = set_data['name'], page = url_pas(name), r = url_pas(str(num)), tn = 13, plus = '정말 되돌리시겠습니까?', sub = '되돌리기')
                 else:
                     return redirect('/w/' + url_pas(name))
+                    
+@route('/manydel', method=['POST', 'GET'])
+def many_del(name = None, num = None):
+    session = request.environ.get('beaker.session')
+    today = get_time()
+    ip = ip_check(session)
+    if(admin_check(session) == 1):
+        if(request.method == 'POST'):
+            data = request.forms.content + '\r\n'
+            while(True):
+                m = re.search('(.*)\r\n', data)
+                if(m):
+                    g = m.groups()
+                    db_ex("select data from data where title = '" + db_pas(g[0]) + "'")
+                    rows = db_get()
+                    if(rows):
+                        leng = '-' + str(len(rows[0]['data']))
+                        db_ex("delete from data where title = '" + db_pas(g[0]) + "'")
+                        history_plus(g[0], '', today, ip, '문서를 삭제 했습니다.', leng)
+                    data = re.sub('(.*)\r\n', '', data, 1)
+                else:
+                    break
+            db_com()
+            return redirect('/')
+        else:
+            return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '많은 문서 삭제', logo = set_data['name'], tn = 4)
+    else:
+        return redirect('/error/3')
+    
                 
 @route('/edit/<name:path>/section/<num:int>', method=['POST', 'GET'])
 def section_edit(name = None, num = None):
@@ -1267,7 +1296,6 @@ def delete(name = None):
                 today = get_time()
                 
                 leng = '-' + str(len(rows[0]['data']))
-                
                 history_plus(name, '', today, ip, '문서를 삭제 했습니다.', leng)
                 
                 db_ex("delete from data where title = '" + db_pas(name) + "'")
@@ -1330,7 +1358,7 @@ def other():
 def manager(num = None):
     session = request.environ.get('beaker.session')
     if(num == 1):
-        return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '관리자 메뉴', logo = set_data['name'], data = '<h2 style="margin-top: 0px;">관리자 및 소유자</h2><li><a href="/manager/2">문서 ACL</a></li><li><a href="/manager/3">사용자 체크</a></li><li><a href="/manager/4">사용자 차단</a></li><h2>소유자</h2><li><a href="/backreset">모든 역링크 재 생성</a></li><li><a href="/manager/5">관리자 권한 주기</a></li><h2>기타</h2><li>이 메뉴에 없는 기능은 해당 문서의 역사나 토론에서 바로 사용 가능함</li>')
+        return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '관리자 메뉴', logo = set_data['name'], data = '<h2 style="margin-top: 0px;">관리자 및 소유자</h2><li><a href="/manager/2">문서 ACL</a></li><li><a href="/manager/3">사용자 체크</a></li><li><a href="/manager/4">사용자 차단</a></li><h2>소유자</h2><li><a href="/backreset">모든 역링크 재 생성</a></li><li><a href="/manager/5">관리자 권한 주기</a></li><li><a href="/backreset">많은 문서 삭제</a></li><h2>기타</h2><li>이 메뉴에 없는 기능은 해당 문서의 역사나 토론에서 바로 사용 가능함</li>')
     elif(num == 2):
         if(request.method == 'POST'):
             return redirect('/acl/' + url_pas(request.forms.name))
