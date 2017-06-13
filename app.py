@@ -1432,74 +1432,6 @@ def title_index():
     else:
         return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), logo = set_data['name'], rows = '<br>None', tn = 3, title = '모든 문서')
         
-@route('/topic/<name:path>/close')
-def close_topic_list(name = None):
-    session = request.environ.get('beaker.session')
-    div = '<div>'
-    i = 0
-    
-    db_ex("select * from stop where title = '" + db_pas(name) + "' and close = 'O' order by sub asc")
-    rows = db_get()
-    while(True):
-        try:
-            a = rows[i]
-        except:
-            div += '</div>'
-            break
-            
-        db_ex("select * from topic where title = '" + db_pas(name) + "' and sub = '" + db_pas(rows[i]['sub']) + "' and id = '1'")
-        row = db_get()
-        if(row):
-            indata = namumark(session, name, row[0]['data'])
-            
-            if(row[0]['block'] == 'O'):
-                indata = '블라인드 되었습니다.'
-                block = 'style="background: gainsboro;"'
-            else:
-                block = ''
-
-            ip = ip_pas(row[0]['ip'])
-                
-            div += '<h2><a href="/topic/' + url_pas(name) + '/sub/' + url_pas(rows[i]['sub']) + '">' + str((i + 1)) + '. ' + rows[i]['sub'] + '</a></h2><table id="toron"><tbody><tr><td id="toroncolorgreen"><a href="javascript:void(0);" id="1">#1</a> ' + ip + ' <span style="float:right;">' + row[0]['date'] + '</span></td></tr><tr><td ' + block + '>' + indata + '</td></tr></tbody></table><br>'
-            
-        i += 1
-        
-    return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = name, page = url_pas(name), logo = set_data['name'], plus = div, tn = 10, sub = '닫힌 토론')
-    
-@route('/topic/<name:path>/agree')
-def agree_topic_list(name = None):
-    session = request.environ.get('beaker.session')
-    div = '<div>'
-    i = 0
-    
-    db_ex("select * from agreedis where title = '" + db_pas(name) + "' order by sub asc")
-    agree_list = db_get()
-    while(True):
-        try:
-            a = agree_list[i]
-        except:
-            div += '</div>'
-            break
-            
-        db_ex("select * from topic where title = '" + db_pas(name) + "' and sub = '" + db_pas(agree_list[i]['sub']) + "' and id = '1'")
-        data = db_get()
-        if(data):
-            indata = namumark(session, name, data[0]['data'])
-            
-            if(data[0]['block'] == 'O'):
-                indata = '블라인드 되었습니다.'
-                block = 'style="background: gainsboro;"'
-            else:
-                block = ''
-
-            ip = ip_pas(data[0]['ip'])
-                
-            div += '<h2><a href="/topic/' + url_pas(name) + '/sub/' + url_pas(data[i]['sub']) + '">' + str(i + 1) + '. ' + data[i]['sub'] + '</a></h2><table id="toron"><tbody><tr><td id="toroncolorgreen"><a href="javascript:void(0);" id="1">#1</a> ' + 아이디 + ' <span style="float:right;">' + data[0]['date'] + '</span></td></tr><tr><td ' + block + '>' + indata + '</td></tr></tbody></table><br>'
-            
-        i += 1
-        
-    return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = name, page = url_pas(name), logo = set_data['name'], plus = div, tn = 10, sub = '합의된 토론')
-        
 @route('/topic/<name:path>/sub/<sub:path>/b/<num:int>')
 def topic_block(name = None, sub = None, num = None):
     session = request.environ.get('beaker.session')
@@ -1791,6 +1723,74 @@ def topic(name = None, sub = None):
                 break
             
         return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = name, page = url_pas(name), suburl = url_pas(sub), toron = sub, logo = set_data['name'], rows = div, tn = 11, ban = ban, style = style, sub = '토론')
+        
+@route('/topic/<name:path>/close')
+def close_topic_list(name = None):
+    session = request.environ.get('beaker.session')
+    div = '<div>'
+    i = 0
+    
+    db_ex("select * from stop where title = '" + db_pas(name) + "' and close = 'O' order by sub asc")
+    rows = db_get()
+    while(True):
+        try:
+            a = rows[i]
+        except:
+            div += '</div>'
+            break
+            
+        db_ex("select * from topic where title = '" + db_pas(name) + "' and sub = '" + db_pas(rows[i]['sub']) + "' and id = '1'")
+        row = db_get()
+        if(row):
+            indata = namumark(session, name, row[0]['data'])
+            
+            if(row[0]['block'] == 'O'):
+                indata = '블라인드 되었습니다.'
+                block = 'style="background: gainsboro;"'
+            else:
+                block = ''
+
+            ip = ip_pas(row[0]['ip'])
+                
+            div += '<h2><a href="/topic/' + url_pas(name) + '/sub/' + url_pas(rows[i]['sub']) + '">' + str((i + 1)) + '. ' + rows[i]['sub'] + '</a></h2><table id="toron"><tbody><tr><td id="toroncolorgreen"><a href="javascript:void(0);" id="1">#1</a> ' + ip + ' <span style="float:right;">' + row[0]['date'] + '</span></td></tr><tr><td ' + block + '>' + indata + '</td></tr></tbody></table><br>'
+            
+        i += 1
+        
+    return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = name, page = url_pas(name), logo = set_data['name'], plus = div, tn = 10, sub = '닫힌 토론')
+    
+@route('/topic/<name:path>/agree')
+def agree_topic_list(name = None):
+    session = request.environ.get('beaker.session')
+    div = '<div>'
+    i = 0
+    
+    db_ex("select * from agreedis where title = '" + db_pas(name) + "' order by sub asc")
+    agree_list = db_get()
+    while(True):
+        try:
+            a = agree_list[i]
+        except:
+            div += '</div>'
+            break
+            
+        db_ex("select * from topic where title = '" + db_pas(name) + "' and sub = '" + db_pas(agree_list[i]['sub']) + "' and id = '1'")
+        data = db_get()
+        if(data):
+            indata = namumark(session, name, data[0]['data'])
+            
+            if(data[0]['block'] == 'O'):
+                indata = '블라인드 되었습니다.'
+                block = 'style="background: gainsboro;"'
+            else:
+                block = ''
+
+            ip = ip_pas(data[0]['ip'])
+                
+            div += '<h2><a href="/topic/' + url_pas(name) + '/sub/' + url_pas(data[i]['sub']) + '">' + str(i + 1) + '. ' + data[i]['sub'] + '</a></h2><table id="toron"><tbody><tr><td id="toroncolorgreen"><a href="javascript:void(0);" id="1">#1</a> ' + 아이디 + ' <span style="float:right;">' + data[0]['date'] + '</span></td></tr><tr><td ' + block + '>' + indata + '</td></tr></tbody></table><br>'
+            
+        i += 1
+        
+    return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = name, page = url_pas(name), logo = set_data['name'], plus = div, tn = 10, sub = '합의된 토론')
 
 @route('/topic/<name:path>', method=['POST', 'GET'])
 def topic_list(name = None):
