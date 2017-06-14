@@ -137,9 +137,7 @@ if(version):
         db_ex("update other set data = '" + r_ver + "' where name = 'version'")
 else:
     db_ex("insert into other (name, data) value ('version', '" + r_ver + "')")
-    
-db_com()
-    
+db_com()    
 
 @route('/upload', method=['GET', 'POST'])
 def upload():
@@ -1989,7 +1987,6 @@ def register():
                             return redirect('/error/6')
                         else:
                             hashed = bcrypt.hashpw(bytes(request.forms.pw, 'utf-8'), bcrypt.gensalt())
-                            
                             
                             db_ex("select * from user limit 1")
                             user_ex = db_get()

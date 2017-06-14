@@ -688,26 +688,48 @@ def namumark(session, title, data):
     
     a = 1
     tou = "<hr id='footnote'><div class='wiki-macro-footnote'><br>"
+    namu = []
     while(True):
-        b = re.search("\[\*([^\s]*)\s(((?!\]).)*)\]", data)
+        b = re.search("\[\*([^\s]*)(?:\s(((?!\]).)*))?\]", data)
         if(b):
             results = b.groups()
-            if(results[0]):
+            if(not results[1] and results[0]):
+                i = 0
+                
+                while(True):
+                    try:
+                        if(namu[i] == results[0]):
+                            none_this = False
+                            break
+                        else:
+                            i += 1
+                    except:
+                        none_this = True
+                        break
+                        
+                if(none_this == False):
+                    data = re.sub("\[\*([^\s]*)(?:\s(((?!\]).)*))?\]", "<sup><a class=\"footnotes\" title=\"" + namu[i + 1] + "\" id=\"rfn-" + str(a) + "\" href=\"#fn-" + str(a) + "\">[" + results[0] + "]</a></sup>", data, 1)
+                else:
+                    data = re.sub("\[\*([^\s]*)(?:\s(((?!\]).)*))?\]", "<sup><a class=\"footnotes\" id=\"rfn-" + str(a) + "\" href=\"#fn-" + str(a) + "\">[" + results[0] + "]</a></sup>", data, 1)
+            elif(results[0]):
                 c = results[1]
                 c = re.sub("<(?:[^>]*)>", '', c)
+                
+                namu += [results[0]]
+                namu += [c]
 
                 tou = tou + "<span class='footnote-list'><a href=\"#rfn-" + str(a) + "\" id=\"fn-" + str(a) + "\">[" + results[0] + "]</a> " + results[1] + "</span><br>"
-                data = re.sub("\[\*([^\s]*)\s(((?!\]).)*)\]", "<sup><a class=\"footnotes\" title=\"" + c + "\" id=\"rfn-" + str(a) + "\" href=\"#fn-" + str(a) + "\">[" + results[0] + "]</a></sup>", data, 1)
+                data = re.sub("\[\*([^\s]*)(?:\s(((?!\]).)*))?\]", "<sup><a class=\"footnotes\" title=\"" + c + "\" id=\"rfn-" + str(a) + "\" href=\"#fn-" + str(a) + "\">[" + results[0] + "]</a></sup>", data, 1)
             else:
                 c = results[1]
                 c = re.sub("<(?:[^>]*)>", '', c)
 
                 tou = tou + "<span class='footnote-list'><a href=\"#rfn-" + str(a) + "\" id=\"fn-" + str(a) + "\">[" + str(a) + "]</a> " + results[1] + "</span><br>"
-                data = re.sub("\[\*([^\s]*)\s(((?!\]).)*)\]", '<sup><a class="footnotes" title="' + c + '" id="rfn-' + str(a) + '" href="#fn-' + str(a) + '">[' + str(a) + ']</a></sup>', data, 1)
+                data = re.sub("\[\*([^\s]*)(?:\s(((?!\]).)*))?\]", '<sup><a class="footnotes" title="' + c + '" id="rfn-' + str(a) + '" href="#fn-' + str(a) + '">[' + str(a) + ']</a></sup>', data, 1)
 
-            a = a + 1
+            a += 1
         else:
-            tou = tou + '</div>'
+            tou += '</div>'
 
             if(tou == "<hr id='footnote'><div class='wiki-macro-footnote'><br></div>"):
                 tou = ""
