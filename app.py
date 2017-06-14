@@ -1990,7 +1990,10 @@ def register():
                         else:
                             hashed = bcrypt.hashpw(bytes(request.forms.pw, 'utf-8'), bcrypt.gensalt())
                             
-                            if(request.forms.id == set_data['owner']):
+                            
+                            db_ex("select * from user limit 1")
+                            user_ex = db_get()
+                            if(not user_ex):
                                 db_ex("insert into user (id, pw, acl) value ('" + db_pas(request.forms.id) + "', '" + db_pas(hashed.decode()) + "', 'owner')")
                             else:
                                 db_ex("insert into user (id, pw, acl) value ('" + db_pas(request.forms.id) + "', '" + db_pas(hashed.decode()) + "', 'user')")
