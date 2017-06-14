@@ -702,7 +702,7 @@ def namumark(session, title, data):
                             none_this = False
                             break
                         else:
-                            i += 1
+                            i += 2
                     except:
                         none_this = True
                         break
