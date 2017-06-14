@@ -3,7 +3,6 @@
 	"host" : "localhost",
 	"user" : "root",
 	"pw" : "test",
-	"owner" : "Admin",
 	"name" : "name",
 	"frontpage" : "FrontPage",
 	"license" : "CC 0",
