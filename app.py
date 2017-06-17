@@ -2227,16 +2227,12 @@ def user_admin(name = None):
                     name_rem = ''
                     while(True):
                         try:
-                            print(get_alist[i]['name'])
                             if(not name_rem == get_alist[i]['name']):
-                                print(div)
                                 name_rem = get_alist[i]['name']
                                 div += '<option value="' + get_alist[i]['name'] + '" selected="selected">' + get_alist[i]['name'] + '</option>'
                             i += 1
                         except:
-                            break
-                            
-                print(div)
+                            break                            
                     
                 return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = name, page = url_pas(name), datalist = div, logo = set_data['name'], tn = 18, now = now, sub = '권한 부여')
             else:
