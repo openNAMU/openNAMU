@@ -97,7 +97,12 @@ def start():
     try:
         db_ex("select * from other limit 1")
     except:
-        db_ex("create table other(name text, data longtext)") 
+        db_ex("create table other(name text, data text)") 
+        
+    try:
+        db_ex("select * from alist limit 1")
+    except:
+        db_ex("create table alist(name text, acl text)") 
         
 conn = pymysql.connect(host = set_data['host'], user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4')
 curs = conn.cursor(pymysql.cursors.DictCursor)
@@ -126,18 +131,28 @@ def db_get():
 
 start()
 
-r_ver = '2.0.1'
+r_ver = '2.0.2'
 
 db_ex('select data from other where name = "version"')
 version = db_get()
 if(version):
     t_ver = re.sub('\.', '', version[0]['data'])
     r_t_ver = re.sub('\.', '', r_ver)
-    if(t_ver < r_t_ver):
+    if(int(t_ver) < int(r_t_ver)):
         db_ex("update other set data = '" + r_ver + "' where name = 'version'")
 else:
     db_ex("insert into other (name, data) value ('version', '" + r_ver + "')")
-db_com()    
+
+db_ex("select * from user limit 1")
+ust = db_get()
+if(int(t_ver) < 202 or not ust):
+    db_ex("insert into alist (name, acl) value ('owner', 'owner')")
+    db_ex("insert into alist (name, acl) value ('admin', 'ban')")
+    db_ex("insert into alist (name, acl) value ('admin', 'mdel')")
+    db_ex("insert into alist (name, acl) value ('admin', 'toron')")
+    db_ex("insert into alist (name, acl) value ('admin', 'check')")
+    db_ex("insert into alist (name, acl) value ('admin', 'acl')")
+db_com()
 
 @route('/upload', method=['GET', 'POST'])
 def upload():
@@ -199,31 +214,138 @@ def static(name = None):
 def acl_list():
     session = request.environ.get('beaker.session')
     data = '<div>'
-    i = 1
+    i = 0
 
     db_ex("select title, acl from data where acl = 'admin' or acl = 'user' order by acl desc")
     list_data = db_get()
     if(list_data):
         while(True):
-            try:
-                a = list_data[i]
+            try:            
+                if(list_data[i]['acl'] == 'admin'):
+                    acl = '관리자'
+                else:
+                    acl = '로그인'
+
+                data += '<li>' + str(i + 1) + '. <a href="/w/' + url_pas(list_data[i]['title']) + '">' + list_data[i]['title'] + '</a> (' + acl + ')</li>'
+
+                i += 1
             except:
                 break
-            
-            if(list_data[i]['acl'] == 'admin'):
-                acl = '관리자'
-            else:
-                acl = '로그인'
-
-            data += '<li>' + str(i) + '. <a href="/w/' + url_pas(list_data[i]['title']) + '">' + list_data[i]['title'] + '</a> (' + acl + ')</li>'
-
-            i += 1
-
+                
         data += '</div>'
     else:
         data = ''
 
     return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), logo = set_data['name'], data = data, title = 'ACL 문서 목록')
+    
+@route('/listacl')
+def list_acl():
+    session = request.environ.get('beaker.session')
+    data = '<div>'
+    i = 0
+
+    db_ex("select * from alist order by name desc")
+    list_data = db_get()
+    if(list_data):
+        while(True):
+            try:
+                if(list_data[i]['acl'] == 'ban'):
+                    acl = '차단'
+                elif(list_data[i]['acl'] == 'mdel'):
+                    acl = '많은 문서 삭제'
+                elif(list_data[i]['acl'] == 'toron'):
+                    acl = '토론 관리'
+                elif(list_data[i]['acl'] == 'check'):
+                    acl = '사용자 검사'
+                elif(list_data[i]['acl'] == 'acl'):
+                    acl = '문서 ACL'
+                elif(list_data[i]['acl'] == 'hidel'):
+                    acl = '역사 숨김'
+                elif(list_data[i]['acl'] == 'givmin'):
+                    acl = '관리자 권한 부여'
+                elif(list_data[i]['acl'] == 'owner'):
+                    acl = '소유자'
+                    
+                data += '<li>' + str(i + 1) + '. <a href="/adminplus/' + url_pas(list_data[i]['name']) + '">' + list_data[i]['name'] + '</a> (' + acl + ')</li>'
+
+                i += 1
+            except:
+                break
+                
+        data += '<br><a href="/manager/8">(새로 생성)</a></div>'
+    else:
+        data = ''
+
+    return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), logo = set_data['name'], data = data, title = 'ACL 목록')
+
+@route('/adminplus/<name:path>', method=['POST', 'GET'])
+def admin_plus(name = None):
+    session = request.environ.get('beaker.session')
+    if(admin_check(None, session) == 1):
+        if(request.method == 'POST'):
+            db_ex("delete from alist where name = '" + db_pas(name) + "'")
+            
+            if(request.forms.ban):
+                db_ex("insert into alist (name, acl) value ('" + db_pas(name) + "', 'ban')")
+            if(request.forms.mdel):
+                db_ex("insert into alist (name, acl) value ('" + db_pas(name) + "', 'mdel')")    
+            if(request.forms.toron):
+                db_ex("insert into alist (name, acl) value ('" + db_pas(name) + "', 'toron')")
+            if(request.forms.check):
+                db_ex("insert into alist (name, acl) value ('" + db_pas(name) + "', 'check')")
+            if(request.forms.acl):
+                db_ex("insert into alist (name, acl) value ('" + db_pas(name) + "', 'acl')")
+            if(request.forms.hidel):
+                db_ex("insert into alist (name, acl) value ('" + db_pas(name) + "', 'hidel')")
+            if(request.forms.givmin):
+                db_ex("insert into alist (name, acl) value ('" + db_pas(name) + "', 'givmin')")
+            if(request.forms.owner):
+                db_ex("insert into alist (name, acl) value ('" + db_pas(name) + "', 'owner')")
+                
+            db_com()
+            return redirect('/')
+        else:
+            db_ex('select acl from alist where name = "' + db_pas(name) + '"')
+            test = db_get()
+            
+            list = ''
+            exist_list = ['', '', '', '', '', '', '', '', '']
+
+            i = 0
+            while(True):
+                try:
+                    if(test[i]['acl'] == 'ban'):
+                        exist_list[0] = 'checked="checked"'
+                    elif(test[i]['acl'] == 'mdel'):
+                        exist_list[1] = 'checked="checked"'
+                    elif(test[i]['acl'] == 'toron'):
+                        exist_list[2] = 'checked="checked"'
+                    elif(test[i]['acl'] == 'check'):
+                        exist_list[3] = 'checked="checked"'
+                    elif(test[i]['acl'] == 'acl'):
+                        exist_list[4] = 'checked="checked"'
+                    elif(test[i]['acl'] == 'hidel'):
+                        exist_list[5] = 'checked="checked"'
+                    elif(test[i]['acl'] == 'givmin'):
+                        exist_list[6] = 'checked="checked"'
+                    elif(test[i]['acl'] == 'owner'):
+                        exist_list[7] = 'checked="checked"'
+                    i += 1
+                except:
+                    break
+
+            list += '<li><input type="checkbox" name="ban" ' + exist_list[0] + '> 차단</li>'
+            list += '<li><input type="checkbox" name="mdel" ' + exist_list[1] + '> 많은 문서 삭제</li>'
+            list += '<li><input type="checkbox" name="toron" ' + exist_list[2] + '> 토론 관리</li>'
+            list += '<li><input type="checkbox" name="check" ' + exist_list[3] + '> 사용자 검사</li>'
+            list += '<li><input type="checkbox" name="acl" ' + exist_list[4] + '> 문서 ACL</li>'
+            list += '<li><input type="checkbox" name="hidel" ' + exist_list[5] + '> 역사 숨김</li>'
+            list += '<li><input type="checkbox" name="givmin" ' + exist_list[6] + '> 관리자 권한 부여</li>'
+            list += '<li><input type="checkbox" name="owner" ' + exist_list[7] + '> 소유자</li>'
+            
+            return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '관리 그룹 추가', logo = set_data['name'], data = '<form id="usrform" method="POST" action="/adminplus/' + url_pas(name) + '">' + list + '<div class="form-actions"><button class="btn btn-primary" type="submit">저장</button></div></form>')
+    else:
+        return redirect('/error/3')
         
 @route('/adminlist')
 def admin_list():
@@ -265,6 +387,7 @@ def admin_list():
 def recent_changes():
     session = request.environ.get('beaker.session')
     i = 0
+    ydmin = admin_check(1, session)
     div = '<div><table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;">문서명</td><td style="text-align: center;width:33.33%;">기여자</td><td style="text-align: center;width:33.33%;">시간</td></tr>'
     
     db_ex("select id, title, date, ip, send, leng from history order by date desc limit 50")
@@ -294,7 +417,7 @@ def recent_changes():
                 else:
                     leng = '<span style="color:gray;">' + rows[i]['leng'] + '</span>'
                     
-                if(admin_check(session) == 1):
+                if(ydmin == 1):
                     db_ex("select * from ban where block = '" + db_pas(rows[i]['ip']) + "'")
                     row = db_get()
                     if(row):
@@ -304,15 +427,7 @@ def recent_changes():
                 else:
                     ban = ''
                     
-                if(re.search('\.', rows[i]['ip'])):
-                    ip = rows[i]['ip'] + ' <a href="/record/' + url_pas(rows[i]['ip']) + '/n/1">(기록)</a>'
-                else:
-                    db_ex("select title from data where title = '사용자:" + db_pas(rows[i]['ip']) + "'")
-                    row = db_get()
-                    if(row):
-                        ip = '<a href="/w/' + url_pas('사용자:' + rows[i]['ip']) + '">' + rows[i]['ip'] + '</a> <a href="/record/' + url_pas(rows[i]['ip']) + '/n/1">(기록)</a>'
-                    else:
-                        ip = '<a class="not_thing" href="/w/' + url_pas('사용자:' + rows[i]['ip']) + '">' + rows[i]['ip'] + '</a> <a href="/record/' + url_pas(rows[i]['ip']) + '/n/1">(기록)</a>'
+                ip = ip_pas(rows[i]['ip'], None)
                         
                 if((int(rows[i]['id']) - 1) == 0):
                     revert = ''
@@ -333,7 +448,7 @@ def recent_changes():
 @route('/history/<name:path>/r/<num:int>/hidden')
 def history_hidden(name = None, num = None):
     session = request.environ.get('beaker.session')
-    if(owner_check(session) == 1):
+    if(admin_check(6, session) == 1):
         db_ex("select * from hidhi where title = '" + db_pas(name) + "' and re = '" + db_pas(str(num)) + "'")
         exist = db_get()
         if(exist):
@@ -352,6 +467,7 @@ def user_record(name = None, num = None):
     session = request.environ.get('beaker.session')
     v = num * 50
     i = v - 50
+    ydmin = admin_check(1, session)
     div = '<div><table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;">문서명</td><td style="text-align: center;width:33.33%;">기여자</td><td style="text-align: center;width:33.33%;">시간</td></tr>'
     
     db_ex("select * from history where ip = '" + db_pas(name) + "' order by date desc")
@@ -379,7 +495,7 @@ def user_record(name = None, num = None):
                 else:
                     leng = '<span style="color:gray;">' + rows[i]['leng'] + '</span>'
                     
-                if(admin_check(session) == 1):
+                if(ydmin == 1):
                     db_ex("select * from ban where block = '" + db_pas(rows[i]['ip']) + "'")
                     row = db_get()
                     if(row):
@@ -389,15 +505,7 @@ def user_record(name = None, num = None):
                 else:
                     ban = ''
                     
-                if(re.search('\.', rows[i]['ip'])):
-                    ip = rows[i]['ip']
-                else:
-                    db_ex("select title from data where title = '사용자:" + db_pas(rows[i]['ip']) + "'")
-                    row = db_get()
-                    if(row):
-                        ip = '<a href="/w/' + url_pas('사용자:' + rows[i]['ip']) + '">' + rows[i]['ip'] + '</a>'
-                    else:
-                        ip = '<a class="not_thing" href="/w/' + url_pas('사용자:' + rows[i]['ip']) + '">' + rows[i]['ip'] + '</a>'
+                ip = ip_pas(rows[i]['ip'], None)
                         
                 if((int(rows[i]['id']) - 1) == 0):
                     revert = ''
@@ -433,6 +541,7 @@ def user_log(number = None):
     i = number * 50
     j = i - 50
     list_data = ''
+    ydmin = admin_check(1, session)
     
     db_ex("select * from user")
     user_list = db_get()
@@ -445,7 +554,7 @@ def user_log(number = None):
                     list_data = list_data + '<br><a href="/userlog/n/' + str(number - 1) + '">(이전)'
                 break
                 
-            if(admin_check(session) == 1):
+            if(ydmin == 1):
                 db_ex("select * from ban where block = '" + db_pas(user_list[j]['id']) + "'")
                 ban_exist = db_get()
                 if(ban_exist):
@@ -455,12 +564,7 @@ def user_log(number = None):
             else:
                 ban_button = ''
                 
-            db_ex("select title from data where title = '사용자:" + db_pas(user_list[j]['id']) + "'")
-            data = db_get()
-            if(data):
-                ip = '<a href="/w/' + url_pas('사용자:' + user_list[j]['id']) + '">' + user_list[j]['id'] + '</a> <a href="/record/' + url_pas(user_list[j]['id']) + '/n/1">(기록)</a>'
-            else:
-                ip = '<a class="not_thing" href="/w/' + url_pas('사용자:' + user_list[j]['id']) + '">' + user_list[j]['id'] + '</a> <a href="/record/' + url_pas(user_list[j]['id']) + '/n/1">(기록)</a>'
+            ip = ip_pas(user_list[j]['id'], None)
                 
             list_data = list_data + '<li>' + str(j + 1) + '. ' + ip + ban_button + '</li>'
             
@@ -480,7 +584,7 @@ def user_log(number = None):
 @route('/backreset')
 def backlink_reset():
     session = request.environ.get('beaker.session')
-    if(owner_check(session) == 1):
+    if(admin_check(None, session) == 1):
         i = 0
         
         db_ex("delete from back")
@@ -673,6 +777,8 @@ def history_view(name = None, num = None):
         select = ''
         v = num * 50
         i = v - 50
+        ydmin = admin_check(1, session)
+        zdmin = admin_check(6, session)
         div = '<div><table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;">판</td><td style="text-align: center;width:33.33%;">기여자</td><td style="text-align: center;width:33.33%;">시간</td></tr>'
         
         db_ex("select send, leng, ip, date, title, id from history where title = '" + db_pas(name) + "' order by id + 0 desc")
@@ -698,17 +804,9 @@ def history_view(name = None, num = None):
                     else:
                         leng = '<span style="color:gray;">' + rows[i]['leng'] + '</span>'                    
                         
-                    if(re.search("\.", rows[i]["ip"])):
-                        ip = rows[i]["ip"] + ' <a href="/record/' + url_pas(rows[i]["ip"]) + '/n/1">(기록)</a>'
-                    else:
-                        db_ex("select title from data where title = '사용자:" + db_pas(rows[i]['ip']) + "'")
-                        row = db_get()
-                        if(row):
-                            ip = '<a href="/w/' + url_pas('사용자:' + rows[i]['ip']) + '">' + rows[i]['ip'] + '</a> <a href="/record/' + url_pas(rows[i]["ip"]) + '/n/1">(기록)</a>'
-                        else:
-                            ip = '<a class="not_thing" href="/w/' + url_pas('사용자:' + rows[i]['ip']) + '">' + rows[i]['ip'] + '</a> <a href="/record/' + url_pas(rows[i]["ip"]) + '/n/1">(기록)</a>'
+                    ip = ip_pas(rows[i]['ip'], None)
                             
-                    if(admin_check(session) == 1):
+                    if(ydmin == 1):
                         db_ex("select * from user where id = '" + db_pas(rows[i]['ip']) + "'")
                         row = db_get()
                         if(row):
@@ -729,29 +827,15 @@ def history_view(name = None, num = None):
                             else:
                                 ban = ' <a href="/ban/' + url_pas(rows[i]['ip']) + '">(차단)</a>'
                                 
-                        if(owner_check(session) == 1):
-                            db_ex("select * from hidhi where title = '" + db_pas(name) + "' and re = '" + db_pas(rows[i]['id']) + "'")
-                            row = db_get()
-                            if(row):                            
-                                ip = ip + ' (숨김)'                            
-                                hidden = ' <a href="/history/' + url_pas(name) + '/r/' + rows[i]['id'] + '/hidden">(공개)'
-                            else:
-                                hidden = ' <a href="/history/' + url_pas(name) + '/r/' + rows[i]['id'] + '/hidden">(숨김)'
+                    if(zdmin == 1):
+                        db_ex("select * from hidhi where title = '" + db_pas(name) + "' and re = '" + db_pas(rows[i]['id']) + "'")
+                        row = db_get()
+                        if(row):                            
+                            ip += ' (숨김)'                            
+                            hidden = ' <a href="/history/' + url_pas(name) + '/r/' + rows[i]['id'] + '/hidden">(공개)'
                         else:
-                            db_ex("select * from hidhi where title = '" + db_pas(name) + "' and re = '" + db_pas(rows[i]['id']) + "'")
-                            row = db_get()
-                            if(row):
-                                ip = '숨김'
-                                hidden = ''
-                                send = '숨김'
-                                ban = ''
-                                style = 'display:none;'
-                                v += 1
-                            else:
-                                hidden = ''
+                            hidden = ' <a href="/history/' + url_pas(name) + '/r/' + rows[i]['id'] + '/hidden">(숨김)'
                     else:
-                        ban = ''
-                        
                         db_ex("select * from hidhi where title = '" + db_pas(name) + "' and re = '" + db_pas(rows[i]['id']) + "'")
                         row = db_get()
                         if(row):
@@ -762,7 +846,7 @@ def history_view(name = None, num = None):
                             style = 'display:none;'
                             v += 1
                         else:
-                            hidden = ''                
+                            hidden = ''      
                             
                     div += '<tr style="' + style + '"><td style="text-align: center;width:33.33%;">' + rows[i]['id'] + '판</a> <a href="/w/' + url_pas(rows[i]['title']) + '/r/' + rows[i]['id'] + '">(w)</a> <a href="/w/' + url_pas(rows[i]['title']) + '/raw/' + rows[i]['id'] + '">(Raw)</a> <a href="/revert/' + url_pas(rows[i]['title']) + '/r/' + rows[i]['id'] + '">(되돌리기)</a> (' + leng + ')</td><td style="text-align: center;width:33.33%;">' + ip + ban + hidden + '</td><td style="text-align: center;width:33.33%;">' + rows[i]['date'] + '</td></tr><tr><td colspan="3" style="text-align: center;width:100%;">' + send + '</td></tr>'
                     
@@ -884,7 +968,7 @@ def old_view(name = None, num = None):
     db_ex("select * from hidhi where title = '" + db_pas(name) + "' and re = '" + db_pas(str(num)) + "'")
     row = db_get()
     if(row):
-        if(owner_check(session) == 1):
+        if(admin_check(6, session) == 1):
             db_ex("select * from history where title = '" + db_pas(name) + "' and id = '" + str(num) + "'")
             rows = db_get()
             if(rows):
@@ -925,7 +1009,7 @@ def old_raw(name = None, num = None):
     db_ex("select * from hidhi where title = '" + db_pas(name) + "' and re = '" + db_pas(str(num)) + "'")
     row = db_get()
     if(row):
-        if(owner_check(session) == 1):
+        if(admin_check(6, session) == 1):
             db_ex("select * from history where title = '" + db_pas(name) + "' and id = '" + str(num) + "'")
             rows = db_get()
             if(rows):
@@ -981,7 +1065,7 @@ def revert(name = None, num = None):
         db_ex("select * from hidhi where title = '" + db_pas(name) + "' and re = '" + db_pas(str(num)) + "'")
         row = db_get()
         if(row):
-            if(owner_check(session) == 1):        
+            if(admin_check(6, session) == 1):        
                 db_ex("select * from history where title = '" + db_pas(name) + "' and id = '" + str(num) + "'")
                 rows = db_get()
                 if(rows):
@@ -1037,7 +1121,7 @@ def revert(name = None, num = None):
         db_ex("select * from hidhi where title = '" + db_pas(name) + "' and re = '" + db_pas(str(num)) + "'")
         row = db_get()
         if(row):
-            if(owner_check(session) == 1):                
+            if(admin_check(6, session) == 1):                
                 if(can == 1):
                     return redirect('/ban')
                 else:
@@ -1065,7 +1149,7 @@ def many_del():
     session = request.environ.get('beaker.session')
     today = get_time()
     ip = ip_check(session)
-    if(admin_check(session) == 1):
+    if(admin_check(2, session) == 1):
         if(request.method == 'POST'):
             data = request.forms.content + '\r\n'
             while(True):
@@ -1356,7 +1440,7 @@ def other():
 def manager(num = None):
     session = request.environ.get('beaker.session')
     if(num == 1):
-        return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '관리자 메뉴', logo = set_data['name'], data = '<h2 style="margin-top: 0px;">관리자 및 소유자</h2><li><a href="/manager/2">문서 ACL</a></li><li><a href="/manager/3">사용자 체크</a></li><li><a href="/manager/4">사용자 차단</a></li><h2>소유자</h2><li><a href="/backreset">모든 역링크 재 생성</a></li><li><a href="/manager/5">관리자 권한 주기</a></li><li><a href="/manydel">많은 문서 삭제</a></li><h2>기타</h2><li>이 메뉴에 없는 기능은 해당 문서의 역사나 토론에서 바로 사용 가능함</li>')
+        return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '관리자 메뉴', logo = set_data['name'], data = '<h2 style="margin-top: 0px;">목록</h2><li><a href="/manager/2">문서 ACL</a></li><li><a href="/manager/3">사용자 체크</a></li><li><a href="/manager/4">사용자 차단</a></li><li><a href="/manager/5">관리자 권한 주기</a></li><li><a href="/manydel">많은 문서 삭제</a></li><h2>소유자</h2><li><a href="/backreset">모든 역링크 재 생성</a></li><li><a href="/manager/8">새로운 관리 그룹 생성</a></li><h2>기타</h2><li>이 메뉴에 없는 기능은 해당 문서의 역사나 토론에서 바로 사용 가능함</li>')
     elif(num == 2):
         if(request.method == 'POST'):
             return redirect('/acl/' + url_pas(request.forms.name))
@@ -1387,6 +1471,11 @@ def manager(num = None):
             return redirect('/user/' + url_pas(request.forms.name) + '/topic/1')
         else:
             return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '토론 기록 이동', logo = set_data['name'], data = '<form id="usrform" method="POST" action="/manager/7"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')    
+    elif(num == 8):
+        if(request.method == 'POST'):
+            return redirect('/adminplus/' + url_pas(request.forms.name))
+        else:
+            return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '그룹 생성 이동', logo = set_data['name'], data = '<form id="usrform" method="POST" action="/manager/8"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')    
     else:
         return redirect('/')
         
@@ -1433,7 +1522,7 @@ def title_index():
 @route('/topic/<name:path>/sub/<sub:path>/b/<num:int>')
 def topic_block(name = None, sub = None, num = None):
     session = request.environ.get('beaker.session')
-    if(admin_check(session) == 1):
+    if(admin_check(3, session) == 1):
         db_ex("select * from topic where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' and id = '" + str(num) + "'")
         block = db_get()
         if(block):
@@ -1454,7 +1543,7 @@ def topic_block(name = None, sub = None, num = None):
 @route('/topic/<name:path>/sub/<sub:path>/notice/<num:int>')
 def topic_top(name = None, sub = None, num = None):
     session = request.environ.get('beaker.session')
-    if(admin_check(session) == 1):
+    if(admin_check(3, session) == 1):
         db_ex("select * from topic where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' and id = '" + str(num) + "'")
         topic_data = db_get()
         if(topic_data):
@@ -1477,7 +1566,7 @@ def topic_top(name = None, sub = None, num = None):
 @route('/topic/<name:path>/sub/<sub:path>/stop')
 def topic_stop(name = None, sub = None):
     session = request.environ.get('beaker.session')
-    if(admin_check(session) == 1):
+    if(admin_check(3, session) == 1):
         ip = ip_check(session)
         
         db_ex("select * from topic where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' limit 1")
@@ -1506,7 +1595,7 @@ def topic_stop(name = None, sub = None):
 @route('/topic/<name:path>/sub/<sub:path>/close')
 def topic_close(name = None, sub = None):
     session = request.environ.get('beaker.session')
-    if(admin_check(session) == 1):
+    if(admin_check(3, session) == 1):
         ip = ip_check(session)
         
         db_ex("select * from topic where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' order by id + 0 desc limit 1")
@@ -1535,7 +1624,7 @@ def topic_close(name = None, sub = None):
 @route('/topic/<name:path>/sub/<sub:path>/agree')
 def topic_agree(name = None, sub = None):
     session = request.environ.get('beaker.session')
-    if(admin_check(session) == 1):
+    if(admin_check(3, session) == 1):
         ip = ip_check(session)
         
         db_ex("select id from topic where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' order by id + 0 desc limit 1")
@@ -1566,7 +1655,7 @@ def topic(name = None, sub = None):
     session = request.environ.get('beaker.session')
     ip = ip_check(session)
     ban = topic_check(ip, name, sub)
-    admin = admin_check(session)
+    admin = admin_check(3, session)
     
     if(request.method == 'POST'):
         db_ex("select * from topic where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' order by id + 0 desc limit 1")
@@ -1651,7 +1740,7 @@ def topic(name = None, sub = None):
                     top_data = namumark(session, '', rows[num]['data'])
                     top_data = re.sub("(?P<in>#(?:[0-9]*))", '<a href="\g<in>">\g<in></a>', top_data)
                             
-                    ip = ip_pas(rows[num]['ip'])
+                    ip = ip_pas(rows[num]['ip'], 1)
                                        
                     div += '<table id="toron"><tbody><tr><td id="toroncolorred"><a href="#' + top[i]['id'] + '" id="' + top[i]['id'] + '-nt">#' + top[i]['id'] + '</a> ' + ip + ' <span style="float:right;">' + rows[num]['date'] + '</span></td></tr><tr><td>' + top_data + '</td></tr></tbody></table><br>'
                         
@@ -1704,7 +1793,7 @@ def topic(name = None, sub = None):
                     else:
                         ban = ""
 
-                ip = ip_pas(rows[i]['ip'])
+                ip = ip_pas(rows[i]['ip'], 1)
                         
                 if(rows[i]['ip'] == start):
                     j = i + 1
@@ -1748,7 +1837,7 @@ def close_topic_list(name = None):
             else:
                 block = ''
 
-            ip = ip_pas(row[0]['ip'])
+            ip = ip_pas(row[0]['ip'], 1)
                 
             div += '<h2><a href="/topic/' + url_pas(name) + '/sub/' + url_pas(rows[i]['sub']) + '">' + str((i + 1)) + '. ' + rows[i]['sub'] + '</a></h2><table id="toron"><tbody><tr><td id="toroncolorgreen"><a href="javascript:void(0);" id="1">#1</a> ' + ip + ' <span style="float:right;">' + row[0]['date'] + '</span></td></tr><tr><td ' + block + '>' + indata + '</td></tr></tbody></table><br>'
             
@@ -1782,7 +1871,7 @@ def agree_topic_list(name = None):
             else:
                 block = ''
 
-            ip = ip_pas(data[0]['ip'])
+            ip = ip_pas(data[0]['ip'], 1)
                 
             div += '<h2><a href="/topic/' + url_pas(name) + '/sub/' + url_pas(data[i]['sub']) + '">' + str(i + 1) + '. ' + data[i]['sub'] + '</a></h2><table id="toron"><tbody><tr><td id="toroncolorgreen"><a href="javascript:void(0);" id="1">#1</a> ' + 아이디 + ' <span style="float:right;">' + data[0]['date'] + '</span></td></tr><tr><td ' + block + '>' + indata + '</td></tr></tbody></table><br>'
             
@@ -1819,7 +1908,7 @@ def topic_list(name = None):
             else:
                 block = ''
 
-            ip = ip_pas(aa[0]['ip'])
+            ip = ip_pas(aa[0]['ip'], 1)
                 
             db_ex("select * from stop where title = '" + db_pas(rows[i]['title']) + "' and sub = '" + db_pas(rows[i]['sub']) + "' and close = 'O'")
             row = db_get()
@@ -1920,7 +2009,7 @@ def user_check(name = None):
     if(user and user[0]['acl'] == 'owner' or user and user[0]['acl'] == 'admin'):
         return redirect('/error/4')
     else:
-        if(admin_check(session) == 1):
+        if(admin_check(4, session) == 1):
             m = re.search('^(?:[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}?)$', name)
             if(m):
                 db_ex("select * from login where ip = '" + db_pas(name) + "' order by today desc")
@@ -2023,7 +2112,7 @@ def user_ban(name = None):
         return redirect('/error/4')
     else:
         if(request.method == 'POST'):
-            if(admin_check(session) == 1):
+            if(admin_check(1, session) == 1):
                 ip = ip_check(session)
                 
                 if(not re.search("[0-9]{4}-[0-9]{2}-[0-9]{2}", request.forms.end)):
@@ -2053,7 +2142,7 @@ def user_ban(name = None):
             else:
                 return redirect('/error/3')
         else:
-            if(admin_check(session) == 1):
+            if(admin_check(1, session) == 1):
                 db_ex("select * from ban where block = '" + db_pas(name) + "'")
                 row = db_get()
                 if(row):
@@ -2073,7 +2162,7 @@ def user_ban(name = None):
 def acl(name = None):
     session = request.environ.get('beaker.session')
     if(request.method == 'POST'):
-        if(admin_check(session) == 1):
+        if(admin_check(5, session) == 1):
             db_ex("select acl from data where title = '" + db_pas(name) + "'")
             row = db_get()
             if(row):
@@ -2090,7 +2179,7 @@ def acl(name = None):
         else:
             return redirect('/error/3')
     else:
-        if(admin_check(session) == 1):
+        if(admin_check(5, session) == 1):
             db_ex("select acl from data where title = '" + db_pas(name) + "'")
             row = db_get()
             if(row):
@@ -2111,11 +2200,11 @@ def acl(name = None):
 def user_admin(name = None):
     session = request.environ.get('beaker.session')
     if(request.method == 'POST'):
-        if(owner_check(session) == 1):
+        if(admin_check(7, session) == 1):
             db_ex("select * from user where id = '" + db_pas(name) + "'")
             user = db_get()
             if(user):
-                if(user[0]['acl'] == 'admin' or user[0]['acl'] == 'owner'):
+                if(not user[0]['acl'] == 'user'):
                     db_ex("update user set acl = 'user' where id = '" + db_pas(name) + "'")
                 else:
                     db_ex("update user set acl = '" + db_pas(request.forms.select) + "' where id = '" + db_pas(name) + "'")
@@ -2127,16 +2216,36 @@ def user_admin(name = None):
         else:
             return redirect('/error/3')
     else:
-        if(owner_check(session) == 1):
+        if(admin_check(7, session) == 1):
             db_ex("select * from user where id = '" + db_pas(name) + "'")
             user = db_get()
             if(user):
-                if(user[0]['acl'] == 'admin' or user[0]['acl'] == 'owner'):
+                if(not user[0]['acl'] == 'user'):
                     now = '권한 해제'
                 else:
                     now = '권한 부여'
                     
-                return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = name, page = url_pas(name), logo = set_data['name'], tn = 18, now = now, sub = '권한 부여')
+                div = ''
+                    
+                db_ex('select name from alist order by name asc')
+                get_alist = db_get()
+                if(get_alist):
+                    i = 0
+                    name_rem = ''
+                    while(True):
+                        try:
+                            print(get_alist[i]['name'])
+                            if(not name_rem == get_alist[i]['name']):
+                                print(div)
+                                name_rem = get_alist[i]['name']
+                                div += '<option value="' + get_alist[i]['name'] + '" selected="selected">' + get_alist[i]['name'] + '</option>'
+                            i += 1
+                        except:
+                            break
+                            
+                print(div)
+                    
+                return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = name, page = url_pas(name), datalist = div, logo = set_data['name'], tn = 18, now = now, sub = '권한 부여')
             else:
                 return redirect('/error/5')
         else:
@@ -2264,7 +2373,7 @@ def read_view(name = None, redirect = None):
         uppage = ""
         style = "display:none;"
         
-    if(admin_check(session) == 1):
+    if(admin_check(5, session) == 1):
         admin_memu = 'ACL'
     else:
         admin_memu = ''
@@ -2395,6 +2504,7 @@ def close_topic_list(name = None, num = None):
     session = request.environ.get('beaker.session')
     v = num * 50
     i = v - 50
+    ydmin = admin_check(1, session)
     div = '<div><table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;">토론명</td><td style="text-align: center;width:33.33%;">작성자</td><td style="text-align: center;width:33.33%;">시간</td></tr>'
     
     db_ex("select * from topic where ip = '" + db_pas(name) + "' or ip = '" + db_pas(name) + " - Admin' order by date desc")
@@ -2410,7 +2520,7 @@ def close_topic_list(name = None, num = None):
                 sub = re.sub('<', '&lt;', sub)
                 sub = re.sub('>', '&gt;', sub)
                     
-                if(admin_check(session) == 1):
+                if(ydmin == 1):
                     db_ex("select * from ban where block = '" + db_pas(rows[i]['ip']) + "'")
                     row = db_get()
                     if(row):
@@ -2420,7 +2530,7 @@ def close_topic_list(name = None, num = None):
                 else:
                     ban = ''
                     
-                ip = ip_pas(rows[i]['ip'])
+                ip = ip_pas(rows[i]['ip'], 1)
                     
                 div += '<tr><td style="text-align: center;width:33.33%;"><a href="/topic/' + url_pas(rows[i]['title']) + '/sub/' + url_pas(sub) + '#' + rows[i]['id'] + '">' + title + '</a> (' + sub + ') (#' + rows[i]['id'] + ') </td><td style="text-align: center;width:33.33%;">' + ip + ban +  '</td><td style="text-align: center;width:33.33%;">' + rows[i]['date'] + '</td></tr>'
                 
@@ -2455,11 +2565,8 @@ def user_info():
     rows = db_get()
     if(ban_check(ip) == 0):
         if(rows):
-            if(rows[0]['acl'] == 'admin' or rows[0]['acl'] == 'owner'):
-                if(rows[0]['acl'] == 'admin'):
-                    acl = '관리자'
-                else:
-                    acl = '소유자'
+            if(not rows[0]['acl'] == 'user'):
+                acl = rows[0]['acl']
             else:
                 acl = '로그인'
         else:
@@ -2467,7 +2574,7 @@ def user_info():
     else:
         acl = '차단'
         
-    ip = ip_pas(ip)
+    ip = ip_pas(ip, 2)
         
     return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '사용자 메뉴', logo = set_data['name'], data = ip + '<br><br><span>권한 상태 : ' + acl + '<h2>로그인 관련</h2><li><a href="/login">로그인</a></li><li><a href="/logout">로그아웃</a></li><li><a href="/register">회원가입</a></li><h2>기타</h2><li><a href="/change">비밀번호 변경</a></li><li><a href="/count">기여 횟수</a></li><li><a href="/record/' + raw_ip + '/n/1">기여 목록</a></li><li><a href="/custom">커스텀 CSS</a></li>')
 
@@ -2500,8 +2607,6 @@ def custom_css():
                 data = ''
 
             return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '커스텀 CSS', logo = set_data['name'], data = '<form id="usrform" name="f1" method="POST" action="/custom"><textarea rows="30" cols="100" name="content" form="usrform">' + data + '</textarea><div class="form-actions"><button class="btn btn-primary" type="submit">저장</button></div></form>')
-            
-
     
 @route('/count')
 def count_edit():
