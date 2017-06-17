@@ -112,7 +112,7 @@
                                 % if(redirect):
                                     <a class="menu-item" href="/w/{{page}}">넘기기</a>
                                 % end
-                                % if(admin == "ACL"):
+                                % if(not defined('data_none') and admin == "ACL"):
                                     <a class="menu-item" href="/acl/{{page}}">ACL</a>
                                 % end
                                 % if(uppage):
@@ -372,8 +372,7 @@
                         <form id="usrform" method="POST" action="/admin/{{page}}">
                             % if(now == '권한 부여'):
                                 <select name="select">
-                                    <option value="admin" selected="selected">관리자</option>
-                                    <option value="owner">소유자</option>
+                                    {{!datalist}}
                                 </select>
                                 <br>
                                 <br>

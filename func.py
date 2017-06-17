@@ -45,23 +45,54 @@ def diff(seqm):
             
     return ''.join(output)
            
-def admin_check(session):
+def admin_check(num, session):
     if(session.get('Now') == True):
         ip = ip_check(session) 
-        db_ex("select * from user where id = '" + db_pas(ip) + "'")
+        db_ex("select acl from user where id = '" + db_pas(ip) + "'")
         user = db_get()
         if(user):
-            if(user[0]['acl'] == 'owner' or user[0]['acl'] == 'admin'):
-                return 1
-                
-def owner_check(session):
-    if(session.get('Now') == True):
-        ip = ip_check(session) 
-        db_ex("select * from user where id = '" + db_pas(ip) + "'")
-        user = db_get()
-        if(user):
-            if(user[0]['acl'] == 'owner'):
-                return 1
+            db_ex("select acl from alist where name = '" + db_pas(user[0]['acl']) + "'")
+            adata = db_get()
+            if(adata):
+                i = 0
+                while(True):
+                    try:
+                        if(num == 1 and adata[i]['acl'] == 'ban'):
+                            return 1
+                            
+                            break
+                        elif(num == 2 and adata[i]['acl'] == 'mdel'):
+                            return 1
+                            
+                            break
+                        elif(num == 3 and adata[i]['acl'] == 'toron'):
+                            return 1
+                            
+                            break
+                        elif(num == 4 and adata[i]['acl'] == 'check'):
+                            return 1
+                            
+                            break
+                        elif(num == 5 and adata[i]['acl'] == 'acl'):
+                            return 1
+                            
+                            break
+                        elif(num == 6 and adata[i]['acl'] == 'hidel'):
+                            return 1
+                            
+                            break
+                        elif(num == 7 and adata[i]['acl'] == 'givmin'):
+                            return 1
+                            
+                            break
+                        elif(adata[i]['acl'] == 'owner'):
+                            return 1
+                            
+                            break
+                        else:
+                            i += 1
+                    except:
+                        break
                 
 def include_check(name, data):
     if(re.search('^틀:', name)):
@@ -84,7 +115,7 @@ def login_check(session):
     else:
         return 0
 
-def ip_pas(raw_ip):
+def ip_pas(raw_ip, num):
     yes = re.search("([^-]*)\s\-\s(Close|Reopen|Stop|Restart|Admin|Agreement|Settlement)$", raw_ip)
     if(yes):
         results = yes.groups()
@@ -92,18 +123,34 @@ def ip_pas(raw_ip):
         db_ex("select title from data where title = '사용자:" + db_pas(results[0]) + "'")
         row = db_get()
         if(row):
-            ip = '<a href="/w/' + url_pas('사용자:' + results[0]) + '">' + results[0] + '</a> - ' + results[1] + ' <a href="/record/' + url_pas(results[0]) + '/n/1">(기록)</a>'
+            ip = '<a href="/w/' + url_pas('사용자:' + results[0]) + '">' + results[0] + '</a> - ' + results[1]
         else:
-            ip = '<a class="not_thing" href="/w/' + url_pas('사용자:' + results[0]) + '">' + results[0] + '</a> - ' + results[1] + ' <a href="/record/' + url_pas(results[0]) + '/n/1">(기록)</a>'
+            ip = '<a class="not_thing" href="/w/' + url_pas('사용자:' + results[0]) + '">' + results[0] + '</a> - ' + results[1]
     elif(re.search("\.", raw_ip)):
-        ip = raw_ip + ' <a href="/record/' + url_pas(raw_ip) + '/n/1">(기록)</a>'
+        ip = raw_ip
     else:
         db_ex("select title from data where title = '사용자:" + db_pas(raw_ip) + "'")
         row = db_get()
         if(row):
-            ip = '<a href="/w/' + url_pas('사용자:' + raw_ip) + '">' + raw_ip + '</a> <a href="/record/' + url_pas(raw_ip) + '/n/1">(기록)</a>'
+            ip = '<a href="/w/' + url_pas('사용자:' + raw_ip) + '">' + raw_ip + '</a>'
         else:
-            ip = '<a class="not_thing" href="/w/' + url_pas('사용자:' + raw_ip) + '">' + raw_ip + '</a> <a href="/record/' + url_pas(raw_ip) + '/n/1">(기록)</a>'
+            ip = '<a class="not_thing" href="/w/' + url_pas('사용자:' + raw_ip) + '">' + raw_ip + '</a>'
+            
+    if(num == 1):
+        if(yes):
+            ip += ' <a href="/user/' + url_pas(results[0]) + '/topic/1">(기록)</a>'
+        else:
+            ip += ' <a href="/user/' + url_pas(raw_ip) + '/topic/1">(기록)</a>'
+    elif(num == 2):
+        if(yes):
+            ip += ' <a href="/record/' + url_pas(results[0]) + '/n/1">(기록)</a> <a href="/user/' + url_pas(results[0]) + '/topic/1">(토론 기록)</a>'
+        else:
+            ip += ' <a href="/record/' + url_pas(raw_ip) + '/n/1">(기록)</a> <a href="/user/' + url_pas(raw_ip) + '/topic/1">(토론 기록)</a>'        
+    else:
+        if(yes):
+            ip += ' <a href="/record/' + url_pas(results[0]) + '/n/1">(기록)</a>'
+        else:
+            ip += ' <a href="/record/' + url_pas(raw_ip) + '/n/1">(기록)</a>'
 
     return ip
 
