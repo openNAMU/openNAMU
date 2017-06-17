@@ -261,8 +261,6 @@ def list_acl():
                     acl = '문서 ACL'
                 elif(list_data[i]['acl'] == 'hidel'):
                     acl = '역사 숨김'
-                elif(list_data[i]['acl'] == 'givmin'):
-                    acl = '관리자 권한 부여'
                 elif(list_data[i]['acl'] == 'owner'):
                     acl = '소유자'
                     
@@ -297,8 +295,6 @@ def admin_plus(name = None):
                 db_ex("insert into alist (name, acl) value ('" + db_pas(name) + "', 'acl')")
             if(request.forms.hidel):
                 db_ex("insert into alist (name, acl) value ('" + db_pas(name) + "', 'hidel')")
-            if(request.forms.givmin):
-                db_ex("insert into alist (name, acl) value ('" + db_pas(name) + "', 'givmin')")
             if(request.forms.owner):
                 db_ex("insert into alist (name, acl) value ('" + db_pas(name) + "', 'owner')")
                 
@@ -326,8 +322,6 @@ def admin_plus(name = None):
                         exist_list[4] = 'checked="checked"'
                     elif(test[i]['acl'] == 'hidel'):
                         exist_list[5] = 'checked="checked"'
-                    elif(test[i]['acl'] == 'givmin'):
-                        exist_list[6] = 'checked="checked"'
                     elif(test[i]['acl'] == 'owner'):
                         exist_list[7] = 'checked="checked"'
                     i += 1
@@ -340,7 +334,6 @@ def admin_plus(name = None):
             list += '<li><input type="checkbox" name="check" ' + exist_list[3] + '> 사용자 검사</li>'
             list += '<li><input type="checkbox" name="acl" ' + exist_list[4] + '> 문서 ACL</li>'
             list += '<li><input type="checkbox" name="hidel" ' + exist_list[5] + '> 역사 숨김</li>'
-            list += '<li><input type="checkbox" name="givmin" ' + exist_list[6] + '> 관리자 권한 부여</li>'
             list += '<li><input type="checkbox" name="owner" ' + exist_list[7] + '> 소유자</li>'
             
             return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '관리 그룹 추가', logo = set_data['name'], data = '<form id="usrform" method="POST" action="/adminplus/' + url_pas(name) + '">' + list + '<div class="form-actions"><button class="btn btn-primary" type="submit">저장</button></div></form>')
@@ -2200,7 +2193,7 @@ def acl(name = None):
 def user_admin(name = None):
     session = request.environ.get('beaker.session')
     if(request.method == 'POST'):
-        if(admin_check(7, session) == 1):
+        if(admin_check(None, session) == 1):
             db_ex("select * from user where id = '" + db_pas(name) + "'")
             user = db_get()
             if(user):
@@ -2216,7 +2209,7 @@ def user_admin(name = None):
         else:
             return redirect('/error/3')
     else:
-        if(admin_check(7, session) == 1):
+        if(admin_check(None, session) == 1):
             db_ex("select * from user where id = '" + db_pas(name) + "'")
             user = db_get()
             if(user):
