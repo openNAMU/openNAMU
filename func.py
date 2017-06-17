@@ -81,10 +81,6 @@ def admin_check(num, session):
                             return 1
                             
                             break
-                        elif(num == 7 and adata[i]['acl'] == 'givmin'):
-                            return 1
-                            
-                            break
                         elif(adata[i]['acl'] == 'owner'):
                             return 1
                             
