@@ -499,3 +499,7 @@ pre span {
         height: 36px;        
     }        
 }
+
+td#block {
+    background: gainsboro;
+}

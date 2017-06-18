@@ -1752,7 +1752,7 @@ def topic(name = None, sub = None):
                 
                 if(rows[i]['block'] == 'O'):
                     indata = '블라인드 되었습니다.'
-                    block = 'style="background: gainsboro;"'
+                    block = 'id="block"'
                 else:
                     block = ''
 
@@ -1826,7 +1826,7 @@ def close_topic_list(name = None):
             
             if(row[0]['block'] == 'O'):
                 indata = '블라인드 되었습니다.'
-                block = 'style="background: gainsboro;"'
+                block = 'id="block"'
             else:
                 block = ''
 
@@ -1860,7 +1860,7 @@ def agree_topic_list(name = None):
             
             if(data[0]['block'] == 'O'):
                 indata = '블라인드 되었습니다.'
-                block = 'style="background: gainsboro;"'
+                block = 'id="block"'
             else:
                 block = ''
 
@@ -1897,7 +1897,7 @@ def topic_list(name = None):
             
             if(aa[0]['block'] == 'O'):
                 indata = '블라인드 되었습니다.'
-                block = 'style="background: gainsboro;"'
+                block = 'id="block"'
             else:
                 block = ''
 
