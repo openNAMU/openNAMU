@@ -8,6 +8,5 @@
 	"license" : "CC 0",
 	"key" : "test",
 	"upload" : "2",
-	"port" : "3000",
-	"help" : ""
+	"port" : "3000"
 }

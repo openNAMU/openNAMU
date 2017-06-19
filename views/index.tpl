@@ -210,13 +210,14 @@
                         </form>
                     % elif(tn == 5):
                         <form class="usrform" method='POST' action='/history/{{page}}/n/1'>
-                        <select name="a">
-                            {{!select}}
-                        </select>
-                        <select name="b">
-                            {{!select}}
-                        </select>
-                        <button class="btn btn-primary" type='submit'>리비전 비교</button>
+                            <select name="a">
+                                {{!select}}
+                            </select>
+                            <select name="b">
+                                {{!select}}
+                            </select>
+                            <button class="btn btn-primary" type='submit'>리비전 비교</button>
+                        </form>
                         <br>
                         <br>
                         {{!rows}}
