@@ -131,17 +131,19 @@ def db_get():
 
 start()
 
-r_ver = '2.0.2'
+r_ver = '2.0.2a'
 
 db_ex('select data from other where name = "version"')
 version = db_get()
 if(version):
     t_ver = re.sub('\.', '', version[0]['data'])
+    t_ver = re.sub('[a-z]$', '', t_ver)
     r_t_ver = re.sub('\.', '', r_ver)
-    if(int(t_ver) < int(r_t_ver)):
-        db_ex("update other set data = '" + r_ver + "' where name = 'version'")
+    r_t_ver = re.sub('[a-z]$', '', r_t_ver)
+    if(int(t_ver) <= int(r_t_ver)):
+        db_ex("update other set data = '" + db_pas(r_ver) + "' where name = 'version'")
 else:
-    db_ex("insert into other (name, data) value ('version', '" + r_ver + "')")
+    db_ex("insert into other (name, data) value ('version', '" + db_pas(r_ver) + "')")
 
 db_ex("select * from user limit 1")
 ust = db_get()
