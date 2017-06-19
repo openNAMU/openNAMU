@@ -778,9 +778,9 @@ def history_view(name = None, num = None):
         rows = db_get()
         if(rows):
             while(True):
-                style = ''
-            
                 try:
+                    style = ''
+                    
                     select += '<option value="' + rows[i]['id'] + '">' + rows[i]['id'] + '</option>'
                     
                     if(rows[i]['send']):
@@ -799,19 +799,11 @@ def history_view(name = None, num = None):
                         
                     ip = ip_pas(rows[i]['ip'], None)
                             
-                    if(ydmin == 1):
-                        db_ex("select * from user where id = '" + db_pas(rows[i]['ip']) + "'")
-                        row = db_get()
-                        if(row):
-                            if(row[0]['acl'] == 'owner' or row[0]['acl'] == 'admin'):
-                                ban = ''
-                            else:
-                                db_ex("select * from ban where block = '" + db_pas(rows[i]['ip']) + "'")
-                                row = db_get()
-                                if(row):
-                                    ban = ' <a href="/ban/' + url_pas(rows[i]['ip']) + '">(해제)</a>'
-                                else:
-                                    ban = ' <a href="/ban/' + url_pas(rows[i]['ip']) + '">(차단)</a>'
+                    db_ex("select * from user where id = '" + db_pas(rows[i]['ip']) + "'")
+                    row = db_get()
+                    if(row):
+                        if(ydmin == 1):
+                            ban = ''
                         else:
                             db_ex("select * from ban where block = '" + db_pas(rows[i]['ip']) + "'")
                             row = db_get()
@@ -819,6 +811,13 @@ def history_view(name = None, num = None):
                                 ban = ' <a href="/ban/' + url_pas(rows[i]['ip']) + '">(해제)</a>'
                             else:
                                 ban = ' <a href="/ban/' + url_pas(rows[i]['ip']) + '">(차단)</a>'
+                    else:
+                        db_ex("select * from ban where block = '" + db_pas(rows[i]['ip']) + "'")
+                        row = db_get()
+                        if(row):
+                            ban = ' <a href="/ban/' + url_pas(rows[i]['ip']) + '">(해제)</a>'
+                        else:
+                            ban = ' <a href="/ban/' + url_pas(rows[i]['ip']) + '">(차단)</a>'
                                 
                     if(zdmin == 1):
                         db_ex("select * from hidhi where title = '" + db_pas(name) + "' and re = '" + db_pas(rows[i]['id']) + "'")

@@ -218,8 +218,6 @@
                             </select>
                             <button class="btn btn-primary" type='submit'>리비전 비교</button>
                         </form>
-                        <br>
-                        <br>
                         {{!rows}}
                     % elif(tn == 6):
                         <div>
