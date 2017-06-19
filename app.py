@@ -353,26 +353,20 @@ def admin_list():
     if(user_data):
         while(True):
             try:
-                a = user_data[i]
-            except:
-                div = div + '</div>'
-                break
+                db_ex("select title from data where title = '사용자:" + user_data[i]['id'] + "'")
+                user = db_get()
+                if(user):
+                    name = '<a href="/w/' + url_pas('사용자:' + user_data[i]['id']) + '">' + user_data[i]['id'] + '</a> (' + user_data[i]['acl'] + ')'
+                else:
+                    name = '<a class="not_thing" href="/w/' + url_pas('사용자:' + user_data[i]['id']) + '">' + user_data[i]['id'] + '</a> (' + user_data[i]['acl'] + ')'
 
-            if(user_data[i]['acl'] == 'owner'):
-                acl = '소유자'
-            else:
-                acl = '관리자'
-
-            db_ex("select title from data where title = '사용자:" + user_data[i]['id'] + "'")
-            user = db_get()
-            if(user):
-                name = '<a href="/w/' + url_pas('사용자:' + user_data[i]['id']) + '">' + user_data[i]['id'] + '</a> (' + acl + ')'
-            else:
-                name = '<a class="not_thing" href="/w/' + url_pas('사용자:' + user_data[i]['id']) + '">' + user_data[i]['id'] + '</a> (' + acl + ')'
-
-            div += '<li>' + str(i + 1) + '. ' + name + '</li>'
+                div += '<li>' + str(i + 1) + '. ' + name + '</li>'
+                
+                i += 1
             
-            i += 1
+            except:
+                div += '</div>'
+                break
             
         return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), logo = set_data['name'], data = div, title = '관리자 목록')
     else:
