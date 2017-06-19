@@ -590,13 +590,11 @@ def backlink_reset():
         if(all):
             while(True):
                 try:
-                    a = all[i]
+                    namumark(session, all[i]['title'], all[i]['data'])
+                    
+                    i += 1
                 except:
                     break
-                
-                namumark(session, all[i]['title'], all[i]['data'])
-                
-                i += 1
         
         return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), logo = set_data['name'], data = '에러 없음', title = '완료')
     else:
@@ -1442,40 +1440,34 @@ def manager(num = None):
 @route('/titleindex')
 def title_index():
     session = request.environ.get('beaker.session')
-    i = 0
-    v = 0
-    z = 0
-    b = 0
-    j = 0
-    e = 0
+    i = [0, 0, 0, 0, 0, 0]
     data = '<div>'
     db_ex("select title from data order by title asc")
     title_list = db_get()
     if(title_list):
         while(True):
             try:
-                a = title_list[i]
+                print(i[0])
+                data += '<li>' + str(i[0] + 1) + '. <a href="/w/' + url_pas(title_list[i[0]]['title']) + '">' + title_list[i[0]]['title'] + '</a></li>'
+
+                if(re.search('^분류:', title_list[i[0]]['title'])):
+                    i[1] += 1
+                elif(re.search('^사용자:', title_list[i[0]]['title'])):
+                    i[2] += 1
+                elif(re.search('^틀:', title_list[i[0]]['title'])):
+                    i[3] += 1
+                elif(re.search('^파일:', title_list[i[0]]['title'])):
+                    i[4] += 1
+                else:
+                    i[5] += 1
+            
+                i[0] += 1
+                
             except:
+                data += '</div>'
                 break
 
-            data += '<li>' + str(i + 1) + '. <a href="/w/' + url_pas(title_list[i]['title']) + '">' + title_list[i]['title'] + '</a></li>'
-
-            if(re.search('^분류:', title_list[i]['title'])):
-                v += 1
-            elif(re.search('^사용자:', title_list[i]['title'])):
-                z += 1
-            elif(re.search('^틀:', title_list[i]['title'])):
-                b += 1
-            elif(re.search('^파일:', title_list[i]['title'])):
-                j += 1
-            else:
-                e += 1
-            
-            i += 1
-
-        data += '</div>'
-
-        return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), logo = set_data['name'], rows = data + '<br><li>이 위키에는 총 ' + str(i) + '개의 문서가 있습니다.</li><br><li>틀 문서는 총 ' + str(b) + '개의 문서가 있습니다.</li><li>분류 문서는 총 ' + str(v) + '개의 문서가 있습니다.</li><li>사용자 문서는 총 ' + str(z) + '개의 문서가 있습니다.</li><li>파일 문서는 총 ' + str(j) + '개의 문서가 있습니다.</li><li>나머지 문서는 총 ' + str(e) + '개의 문서가 있습니다.</li>', tn = 3, title = '모든 문서')
+        return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), logo = set_data['name'], rows = data + '<br><li>이 위키에는 총 ' + str(i[0]) + '개의 문서가 있습니다.</li><br><li>틀 문서는 총 ' + str(i[3]) + '개의 문서가 있습니다.</li><li>분류 문서는 총 ' + str(i[1]) + '개의 문서가 있습니다.</li><li>사용자 문서는 총 ' + str(i[2]) + '개의 문서가 있습니다.</li><li>파일 문서는 총 ' + str(i[4]) + '개의 문서가 있습니다.</li><li>나머지 문서는 총 ' + str(i[5]) + '개의 문서가 있습니다.</li>', tn = 3, title = '모든 문서')
     else:
         return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), logo = set_data['name'], rows = '<br>None', tn = 3, title = '모든 문서')
         
