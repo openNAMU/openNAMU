@@ -168,8 +168,6 @@ if(int(t_ver) < 203):
                 else:
                     top = ''
                     
-                print(i)
-                    
                 db_ex("insert into topic (id, title, sub, data, date, ip, block, top) value ('" + db_pas(topic_old[i]['id']) + "', '" + db_pas(topic_old[i]['title']) + "', '" + db_pas(topic_old[i]['sub']) + "', '" + db_pas(topic_old[i]['data']) + "', '" + db_pas(topic_old[i]['date']) + "', '" + db_pas(topic_old[i]['ip']) + "', '" + db_pas(topic_old[i]['block']) + "', '" + db_pas(top) + "')")
                 
                 i += 1
