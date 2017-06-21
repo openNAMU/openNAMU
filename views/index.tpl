@@ -105,7 +105,7 @@
                                 % end
                                 <a class="menu-item" href="/move/{{page}}">이동</a>
                                 % if(not defined('data_none')):
-                                    <a class="menu-item" href="/raw/{{page}}">Raw</a>
+                                    <a class="menu-item" href="/raw/{{page}}">원본</a>
                                 % end
                                 <a class="menu-item" href="/history/{{page}}/n/1">역사</a>
                                 <a class="menu-item" href="/backlink/{{page}}/n/1">역링크</a>

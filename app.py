@@ -864,7 +864,7 @@ def history_view(name = None, num = None):
                         else:
                             hidden = ''      
                             
-                    div += '<tr style="' + style + '"><td style="text-align: center;width:33.33%;">' + rows[i]['id'] + '판</a> <a href="/w/' + url_pas(rows[i]['title']) + '/r/' + rows[i]['id'] + '">(w)</a> <a href="/w/' + url_pas(rows[i]['title']) + '/raw/' + rows[i]['id'] + '">(Raw)</a> <a href="/revert/' + url_pas(rows[i]['title']) + '/r/' + rows[i]['id'] + '">(되돌리기)</a> (' + leng + ')</td><td style="text-align: center;width:33.33%;">' + ip + ban + hidden + '</td><td style="text-align: center;width:33.33%;">' + rows[i]['date'] + '</td></tr><tr><td colspan="3" style="text-align: center;width:100%;">' + send + '</td></tr>'
+                    div += '<tr style="' + style + '"><td style="text-align: center;width:33.33%;">' + rows[i]['id'] + '판</a> <a href="/w/' + url_pas(rows[i]['title']) + '/r/' + rows[i]['id'] + '">(보기)</a> <a href="/w/' + url_pas(rows[i]['title']) + '/raw/' + rows[i]['id'] + '">(원본)</a> <a href="/revert/' + url_pas(rows[i]['title']) + '/r/' + rows[i]['id'] + '">(되돌리기)</a> (' + leng + ')</td><td style="text-align: center;width:33.33%;">' + ip + ban + hidden + '</td><td style="text-align: center;width:33.33%;">' + rows[i]['date'] + '</td></tr><tr><td colspan="3" style="text-align: center;width:100%;">' + send + '</td></tr>'
                     
                     if(i == v):
                         div += '</tbody></table></div>'
@@ -1035,7 +1035,7 @@ def old_raw(name = None, num = None):
                 
                 enddata = '<pre>' + enddata + '</pre>'
                 
-                return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = name, logo = set_data['name'], page = url_pas(name), data = enddata, sub = '옛 Raw')
+                return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = name, logo = set_data['name'], page = url_pas(name), data = enddata, sub = '옛 원본')
             else:
                 return redirect('/history/' + url_pas(name))
         else:
@@ -1050,7 +1050,7 @@ def old_raw(name = None, num = None):
             
             enddata = '<pre>' + enddata + '</pre>'
             
-            return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = name, logo = set_data['name'], page = url_pas(name), data = enddata, sub = '옛 Raw')
+            return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = name, logo = set_data['name'], page = url_pas(name), data = enddata, sub = '옛 원본')
         else:
             return redirect('/history/' + url_pas(name))
             
@@ -1066,7 +1066,7 @@ def raw_view(name = None):
         
         enddata = '<pre>' + enddata + '</pre>'
         
-        return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = name, logo = set_data['name'], page = url_pas(name), data = enddata, tn = 6, sub = 'Raw')
+        return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = name, logo = set_data['name'], page = url_pas(name), data = enddata, tn = 6, sub = '원본')
     else:
         return redirect('/w/' + url_pas(name))
         
