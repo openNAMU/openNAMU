@@ -1471,7 +1471,6 @@ def title_index():
     if(title_list):
         while(True):
             try:
-                print(i[0])
                 data += '<li>' + str(i[0] + 1) + '. <a href="/w/' + url_pas(title_list[i[0]]['title']) + '">' + title_list[i[0]]['title'] + '</a></li>'
 
                 if(re.search('^분류:', title_list[i[0]]['title'])):

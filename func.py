@@ -52,7 +52,6 @@ def admin_check(num, session):
     if(user):
         db_ex("select acl from alist where name = '" + db_pas(user[0]['acl']) + "'")
         adata = db_get()
-        print(adata)
         if(adata):
             i = 0
             while(True):
