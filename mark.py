@@ -315,18 +315,12 @@ def namumark(session, title, data):
         
     data = re.sub("(\n)(?P<in>\r\n(={1,6})\s?([^=]*)\s?(?:={1,6})(?:\s+)?\n)", "\g<in>", data)
     
-    i = 0
-    h0c = 0
-    h1c = 0
-    h2c = 0
-    h3c = 0
-    h4c = 0
-    h5c = 0
+    i = [0, 0, 0, 0, 0, 0, 0]
     last = 0
     span = ''
     rtoc = '<div id="toc"><span id="toc-name">목차</span><br><br>'
     while(True):
-        i = i + 1
+        i[0] += 1
         m = re.search('(={1,6})\s?([^=]*)\s?(?:={1,6})(?:\s+)?\n', data)
         if(m):
             result = m.groups()
@@ -336,39 +330,39 @@ def namumark(session, title, data):
             else:
                 last = wiki
                 if(wiki == 1):
-                    h1c = 0
-                    h2c = 0
-                    h3c = 0
-                    h4c = 0
-                    h5c = 0
+                    i[2] = 0
+                    i[3] = 0
+                    i[4] = 0
+                    i[5] = 0
+                    i[6] = 0
                 elif(wiki == 2):
-                    h2c = 0
-                    h3c = 0
-                    h4c = 0
-                    h5c = 0
+                    i[3] = 0
+                    i[4] = 0
+                    i[5] = 0
+                    i[6] = 0
                 elif(wiki == 3):
-                    h3c = 0
-                    h4c = 0
-                    h5c = 0
+                    i[4] = 0
+                    i[5] = 0
+                    i[6] = 0
                 elif(wiki == 4):
-                    h4c = 0
-                    h5c = 0
+                    i[5] = 0
+                    i[6] = 0
                 elif(wiki == 5):
-                    h5c = 0
+                    i[6] = 0
             if(wiki == 1):
-                h0c += 1
+                i[1] += 1
             elif(wiki == 2):
-                h1c += 1
+                i[2] += 1
             elif(wiki == 3):
-                h2c += 1
+                i[3] += 1
             elif(wiki == 4):
-                h3c += 1
+                i[4] += 1
             elif(wiki == 5):
-                h4c += 1
+                i[5] += 1
             else:
-                h5c += 1
+                i[6] += 1
 
-            toc = str(h0c) + '.' + str(h1c) + '.' + str(h2c) + '.' + str(h3c) + '.' + str(h4c) + '.' + str(h5c) + '.'
+            toc = str(i[1]) + '.' + str(i[2]) + '.' + str(i[3]) + '.' + str(i[4]) + '.' + str(i[5]) + '.' + str(i[6]) + '.'
 
             toc = re.sub("(?P<in>[0-9]0(?:[0]*)?)\.", '\g<in>#.', toc)
 
@@ -396,9 +390,10 @@ def namumark(session, title, data):
             d = c
             c = re.sub("\[\[(([^|]*)\|)?(?P<in>[^\]]*)\]\]", "\g<in>", c)
 
-            data = re.sub('(={1,6})\s?([^=]*)\s?(?:={1,6})(?:\s+)?\n', '<h' + str(wiki) + ' id="' + c + '"><a href="#toc" id="s-' + toc + '">' + toc + '.</a> ' + d + ' <span style="font-size:11px;">[<a href="/edit/' + url_pas(title) + '/section/' + str(i) + '">편집</a>]</span></h' + str(wiki) + '>', data, 1);
+            data = re.sub('(={1,6})\s?([^=]*)\s?(?:={1,6})(?:\s+)?\n', '<h' + str(wiki) + ' id="' + c + '"><a href="#toc" id="s-' + toc + '">' + toc + '.</a> ' + d + ' <span style="font-size:11px;">[<a href="/edit/' + url_pas(title) + '/section/' + str(i[0]) + '">편집</a>]</span></h' + str(wiki) + '>', data, 1);
         else:
             rtoc += '</div>'
+            
             break
     
     data = re.sub("\[목차\]", rtoc, data)
