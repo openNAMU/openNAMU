@@ -398,7 +398,7 @@ def namumark(session, title, data):
 
             data = re.sub('(={1,6})\s?([^=]*)\s?(?:={1,6})(?:\s+)?\n', '<h' + str(wiki) + ' id="' + c + '"><a href="#toc" id="s-' + toc + '">' + toc + '.</a> ' + d + ' <span style="font-size:11px;">[<a href="/edit/' + url_pas(title) + '/section/' + str(i) + '">편집</a>]</span></h' + str(wiki) + '>', data, 1);
         else:
-            rtoc = rtoc + '</div>'
+            rtoc += '</div>'
             break
     
     data = re.sub("\[목차\]", rtoc, data)

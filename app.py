@@ -126,7 +126,7 @@ def db_get():
 
 start()
 
-r_ver = '2.0.3'
+r_ver = '2.0.4'
 
 db_ex('select data from other where name = "version"')
 version = db_get()
@@ -140,10 +140,14 @@ if(version):
 else:
     db_ex("insert into other (name, data) value ('version', '" + db_pas(r_ver) + "')")
     t_ver = 0
+    
+db_ex('select name from alist limit 1')
+getalist = db_get()
+if(getalist and int(t_ver) < 204):
+    db_ex("delete from alist where name = 'owner'")
+    db_ex("delete from alist where name = 'admin'")
 
-db_ex("select * from user limit 1")
-ust = db_get()
-if(int(t_ver) < 202 or not ust):
+if(int(t_ver) < 202 or not getalist):
     db_ex("insert into alist (name, acl) value ('owner', 'owner')")
     db_ex("insert into alist (name, acl) value ('admin', 'ban')")
     db_ex("insert into alist (name, acl) value ('admin', 'mdel')")
@@ -152,30 +156,33 @@ if(int(t_ver) < 202 or not ust):
     db_ex("insert into alist (name, acl) value ('admin', 'acl')")
     
 if(int(t_ver) < 203):
-    db_ex('rename table topic to old_topic')
-    db_ex('create table topic(id text, title text, sub text, data longtext, date text, ip text, block text, top text)')
-    
-    db_ex('select * from old_topic')
-    topic_old = db_get()
-    if(topic_old):
-        i = 0
-        while(True):
-            try:
-                db_ex("select id from distop where id = '" + db_pas(topic_old[i]['id']) + "' and title = '" + db_pas(topic_old[i]['title']) + "' and sub = '" + db_pas(topic_old[i]['sub']) + "'")
-                distop = db_get()
-                if(distop):
-                    top = 'O'
-                else:
-                    top = ''
+    db_ex('select title from topic limit 1')
+    gettop = db_get()
+    if(gettop):
+        db_ex('rename table topic to old_topic')
+        db_ex('create table topic(id text, title text, sub text, data longtext, date text, ip text, block text, top text)')
+        
+        db_ex('select * from old_topic')
+        topic_old = db_get()
+        if(topic_old):
+            i = 0
+            while(True):
+                try:
+                    db_ex("select id from distop where id = '" + db_pas(topic_old[i]['id']) + "' and title = '" + db_pas(topic_old[i]['title']) + "' and sub = '" + db_pas(topic_old[i]['sub']) + "'")
+                    distop = db_get()
+                    if(distop):
+                        top = 'O'
+                    else:
+                        top = ''
+                        
+                    db_ex("insert into topic (id, title, sub, data, date, ip, block, top) value ('" + db_pas(topic_old[i]['id']) + "', '" + db_pas(topic_old[i]['title']) + "', '" + db_pas(topic_old[i]['sub']) + "', '" + db_pas(topic_old[i]['data']) + "', '" + db_pas(topic_old[i]['date']) + "', '" + db_pas(topic_old[i]['ip']) + "', '" + db_pas(topic_old[i]['block']) + "', '" + db_pas(top) + "')")
                     
-                db_ex("insert into topic (id, title, sub, data, date, ip, block, top) value ('" + db_pas(topic_old[i]['id']) + "', '" + db_pas(topic_old[i]['title']) + "', '" + db_pas(topic_old[i]['sub']) + "', '" + db_pas(topic_old[i]['data']) + "', '" + db_pas(topic_old[i]['date']) + "', '" + db_pas(topic_old[i]['ip']) + "', '" + db_pas(topic_old[i]['block']) + "', '" + db_pas(top) + "')")
-                
-                i += 1
-            except:
-                break
-    
-    db_ex('drop table old_topic')
-    db_ex('drop table distop')
+                    i += 1
+                except:
+                    break
+        
+        db_ex('drop table old_topic')
+        db_ex('drop table distop')
     
 db_com()
 

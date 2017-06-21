@@ -46,49 +46,49 @@ def diff(seqm):
     return ''.join(output)
            
 def admin_check(num, session):
-    if(session.get('Now') == True):
-        ip = ip_check(session) 
-        db_ex("select acl from user where id = '" + db_pas(ip) + "'")
-        user = db_get()
-        if(user):
-            db_ex("select acl from alist where name = '" + db_pas(user[0]['acl']) + "'")
-            adata = db_get()
-            if(adata):
-                i = 0
-                while(True):
-                    try:
-                        if(num == 1 and adata[i]['acl'] == 'ban'):
-                            return 1
-                            
-                            break
-                        elif(num == 2 and adata[i]['acl'] == 'mdel'):
-                            return 1
-                            
-                            break
-                        elif(num == 3 and adata[i]['acl'] == 'toron'):
-                            return 1
-                            
-                            break
-                        elif(num == 4 and adata[i]['acl'] == 'check'):
-                            return 1
-                            
-                            break
-                        elif(num == 5 and adata[i]['acl'] == 'acl'):
-                            return 1
-                            
-                            break
-                        elif(num == 6 and adata[i]['acl'] == 'hidel'):
-                            return 1
-                            
-                            break
-                        elif(adata[i]['acl'] == 'owner'):
-                            return 1
-                            
-                            break
-                        else:
-                            i += 1
-                    except:
+    ip = ip_check(session) 
+    db_ex("select acl from user where id = '" + db_pas(ip) + "'")
+    user = db_get()
+    if(user):
+        db_ex("select acl from alist where name = '" + db_pas(user[0]['acl']) + "'")
+        adata = db_get()
+        print(adata)
+        if(adata):
+            i = 0
+            while(True):
+                try:
+                    if(num == 1 and adata[i]['acl'] == 'ban'):
+                        return 1
+                        
                         break
+                    elif(num == 2 and adata[i]['acl'] == 'mdel'):
+                        return 1
+                        
+                        break
+                    elif(num == 3 and adata[i]['acl'] == 'toron'):
+                        return 1
+                        
+                        break
+                    elif(num == 4 and adata[i]['acl'] == 'check'):
+                        return 1
+                        
+                        break
+                    elif(num == 5 and adata[i]['acl'] == 'acl'):
+                        return 1
+                        
+                        break
+                    elif(num == 6 and adata[i]['acl'] == 'hidel'):
+                        return 1
+                        
+                        break
+                    elif(adata[i]['acl'] == 'owner'):
+                        return 1
+                        
+                        break
+                    else:
+                        i += 1
+                except:
+                    break
                 
 def include_check(name, data):
     if(re.search('^틀:', name)):
