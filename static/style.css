@@ -503,3 +503,17 @@ pre span {
 td#block {
     background: gainsboro;
 }
+
+.foot {
+    position: fixed;
+    bottom: 0px;
+    padding: 10px;
+    width: 100%;
+    background: white none repeat scroll 0% 0%;
+    left: 0px;
+    border: 1px solid #ccc;
+    text-align: center;
+    z-index: 10000;
+    max-height: 30%;
+    overflow: scroll;
+}

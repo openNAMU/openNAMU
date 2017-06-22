@@ -407,6 +407,7 @@ def recent_changes():
     session = request.environ.get('beaker.session')
     i = 0
     ydmin = admin_check(1, session)
+    zdmin = admin_check(6, session)
     div = '<div><table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;">문서명</td><td style="text-align: center;width:33.33%;">기여자</td><td style="text-align: center;width:33.33%;">시간</td></tr>'
     
     db_ex("select id, title, date, ip, send, leng from history order by date desc limit 50")
@@ -452,8 +453,29 @@ def recent_changes():
                     revert = ''
                 else:
                     revert = '<a href="/w/' + url_pas(rows[i]['title']) + '/r/' + str(int(rows[i]['id']) - 1) + '/diff/' + rows[i]['id'] + '">(비교)</a> <a href="/revert/' + url_pas(rows[i]['title']) + '/r/' + str(int(rows[i]['id']) - 1) + '">(되돌리기)</a>'
+                
+                style = ''
+                if(zdmin == 1):
+                    db_ex("select * from hidhi where title = '" + db_pas(rows[i]['title']) + "' and re = '" + db_pas(rows[i]['id']) + "'")
+                    row = db_get()
+                    if(row):                            
+                        ip += ' (숨김)'                            
+                        hidden = ' <a href="/history/' + url_pas(rows[i]['title']) + '/r/' + rows[i]['id'] + '/hidden">(공개)'
+                    else:
+                        hidden = ' <a href="/history/' + url_pas(rows[i]['title']) + '/r/' + rows[i]['id'] + '/hidden">(숨김)'
+                else:
+                    db_ex("select * from hidhi where title = '" + db_pas(rows[i]['title']) + "' and re = '" + db_pas(rows[i]['id']) + "'")
+                    row = db_get()
+                    if(row):
+                        ip = '숨김'
+                        hidden = ''
+                        send = '숨김'
+                        ban = ''
+                        style = 'display:none;'
+                    else:
+                        hidden = ''      
                     
-                div += '<tr><td style="text-align: center;width:33.33%;"><a href="/w/' + url_pas(rows[i]['title']) + '">' + title + '</a> (' + rows[i]['id'] + '판) ' + revert + ' (' + leng + ')</td><td style="text-align: center;width:33.33%;">' + ip + ban + '</td><td style="text-align: center;width:33.33%;">' + rows[i]['date'] + '</td></tr><tr><td colspan="3" style="text-align: center;width:100%;">' + send + '</td></tr>'
+                div += '<tr style="' + style + '"><td style="text-align: center;width:33.33%;"><a href="/w/' + url_pas(rows[i]['title']) + '">' + title + '</a> (' + rows[i]['id'] + '판) ' + revert + ' (' + leng + ')</td><td style="text-align: center;width:33.33%;">' + ip + ban + hidden + '</td><td style="text-align: center;width:33.33%;">' + rows[i]['date'] + '</td></tr><tr><td colspan="3" style="text-align: center;width:100%;">' + send + '</td></tr>'
                 
                 i += 1
             except:
@@ -487,6 +509,7 @@ def user_record(name = None, num = None):
     v = num * 50
     i = v - 50
     ydmin = admin_check(1, session)
+    zdmin = admin_check(6, session)
     div = '<div><table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;">문서명</td><td style="text-align: center;width:33.33%;">기여자</td><td style="text-align: center;width:33.33%;">시간</td></tr>'
     
     db_ex("select * from history where ip = '" + db_pas(name) + "' order by date desc")
@@ -531,7 +554,28 @@ def user_record(name = None, num = None):
                 else:
                     revert = '<a href="/revert/' + url_pas(rows[i]['title']) + '/r/' + str(int(rows[i]['id']) - 1) + '">(되돌리기)</a>'
                     
-                div += '<tr><td style="text-align: center;width:33.33%;"><a href="/w/' + url_pas(rows[i]['title']) + '">' + title + '</a> (' + rows[i]['id'] + '판) <a href="/w/' + url_pas(rows[i]['title']) + '/r/' + str(int(rows[i]['id']) - 1) + '/diff/' + rows[i]['id'] + '">(비교)</a> ' + revert + ' (' + leng + ')</td><td style="text-align: center;width:33.33%;">' + ip + ban +  '</td><td style="text-align: center;width:33.33%;">' + rows[i]['date'] + '</td></tr><tr><td colspan="3" style="text-align: center;width:100%;">' + send + '</td></tr>'
+                style = ''
+                if(zdmin == 1):
+                    db_ex("select * from hidhi where title = '" + db_pas(rows[i]['title']) + "' and re = '" + db_pas(rows[i]['id']) + "'")
+                    row = db_get()
+                    if(row):                            
+                        ip += ' (숨김)'                            
+                        hidden = ' <a href="/history/' + url_pas(rows[i]['title']) + '/r/' + rows[i]['id'] + '/hidden">(공개)'
+                    else:
+                        hidden = ' <a href="/history/' + url_pas(rows[i]['title']) + '/r/' + rows[i]['id'] + '/hidden">(숨김)'
+                else:
+                    db_ex("select * from hidhi where title = '" + db_pas(rows[i]['title']) + "' and re = '" + db_pas(rows[i]['id']) + "'")
+                    row = db_get()
+                    if(row):
+                        ip = '숨김'
+                        hidden = ''
+                        send = '숨김'
+                        ban = ''
+                        style = 'display:none;'
+                    else:
+                        hidden = ''
+                    
+                div += '<tr style="' + style + '"><td style="text-align: center;width:33.33%;"><a href="/w/' + url_pas(rows[i]['title']) + '">' + title + '</a> (' + rows[i]['id'] + '판) <a href="/w/' + url_pas(rows[i]['title']) + '/r/' + str(int(rows[i]['id']) - 1) + '/diff/' + rows[i]['id'] + '">(비교)</a> ' + revert + ' (' + leng + ')</td><td style="text-align: center;width:33.33%;">' + ip + ban + hidden + '</td><td style="text-align: center;width:33.33%;">' + rows[i]['date'] + '</td></tr><tr><td colspan="3" style="text-align: center;width:100%;">' + send + '</td></tr>'
                 
                 if(i == v):
                     div += '</tbody></table></div>'

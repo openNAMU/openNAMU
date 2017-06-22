@@ -703,24 +703,20 @@ def namumark(session, title, data):
                         break
                         
                 if(none_this == False):
-                    data = re.sub("\[\*([^\s]*)(?:\s(((?!\]).)*))?\]", "<sup><a class=\"footnotes\" title=\"" + namu[i + 1] + "\" id=\"rfn-" + str(a) + "\" href=\"#fn-" + str(a) + "\">[" + results[0] + "]</a></sup>", data, 1)
+                    data = re.sub("\[\*([^\s]*)(?:\s(((?!\]).)*))?\]", "<sup><a href='javascript:void(0);' id=\"rfn-" + str(a) + "\" onclick=\"var f=document.getElementById('footnote_" + str(a) + "');var s=f.style.display=='inline';f.style.display=s?'none':'inline';this.className=s?'':'opened';\">[" + results[0] + "]</a></sup><span class='foot' id='footnote_" + str(a) + "' style='display:none;'><a class=\"footnotes\" href=\"#fn-" + str(a) + "\" onclick=\"var f=document.getElementById('footnote_" + str(a) + "');var s=f.style.display=='inline';f.style.display=s?'none':'inline';this.className=s?'':'opened';\">[" + results[0] + "]</a> <a href='javascript:void(0);' onclick=\"var f=document.getElementById('footnote_" + str(a) + "');var s=f.style.display=='inline';f.style.display=s?'none':'inline';this.className=s?'':'opened';\">[X]</a> " + namu[i + 1] + "</span>", data, 1)
                 else:
                     data = re.sub("\[\*([^\s]*)(?:\s(((?!\]).)*))?\]", "<sup><a class=\"footnotes\" id=\"rfn-" + str(a) + "\" href=\"#fn-" + str(a) + "\">[" + results[0] + "]</a></sup>", data, 1)
-            elif(results[0]):
-                c = results[1]
-                c = re.sub("<(?:[^>]*)>", '', c)
-                
+            elif(results[0]):                
                 namu += [results[0]]
-                namu += [c]
+                namu += [results[1]]
 
                 tou = tou + "<span class='footnote-list'><a href=\"#rfn-" + str(a) + "\" id=\"fn-" + str(a) + "\">[" + results[0] + "]</a> " + results[1] + "</span><br>"
-                data = re.sub("\[\*([^\s]*)(?:\s(((?!\]).)*))?\]", "<sup><a class=\"footnotes\" title=\"" + c + "\" id=\"rfn-" + str(a) + "\" href=\"#fn-" + str(a) + "\">[" + results[0] + "]</a></sup>", data, 1)
+                data = re.sub("\[\*([^\s]*)(?:\s(((?!\]).)*))?\]", "<sup><a href='javascript:void(0);' id=\"rfn-" + str(a) + "\" onclick=\"var f=document.getElementById('footnote_" + str(a) + "');var s=f.style.display=='inline';f.style.display=s?'none':'inline';this.className=s?'':'opened';\">[" + results[0] + "]</a></sup><span class='foot' id='footnote_" + str(a) + "' style='display:none;'><a class=\"footnotes\" href=\"#fn-" + str(a) + "\" onclick=\"var f=document.getElementById('footnote_" + str(a) + "');var s=f.style.display=='inline';f.style.display=s?'none':'inline';this.className=s?'':'opened';\">[" + results[0] + "]</a> <a href='javascript:void(0);' onclick=\"var f=document.getElementById('footnote_" + str(a) + "');var s=f.style.display=='inline';f.style.display=s?'none':'inline';this.className=s?'':'opened';\">[X]</a> " + results[1] + "</span>", data, 1)
+                
+                
             else:
-                c = results[1]
-                c = re.sub("<(?:[^>]*)>", '', c)
-
                 tou = tou + "<span class='footnote-list'><a href=\"#rfn-" + str(a) + "\" id=\"fn-" + str(a) + "\">[" + str(a) + "]</a> " + results[1] + "</span><br>"
-                data = re.sub("\[\*([^\s]*)(?:\s(((?!\]).)*))?\]", '<sup><a class="footnotes" title="' + c + '" id="rfn-' + str(a) + '" href="#fn-' + str(a) + '">[' + str(a) + ']</a></sup>', data, 1)
+                data = re.sub("\[\*([^\s]*)(?:\s(((?!\]).)*))?\]", "<sup><a href='javascript:void(0);' id=\"rfn-" + str(a) + "\" onclick=\"var f=document.getElementById('footnote_" + str(a) + "');var s=f.style.display=='inline';f.style.display=s?'none':'inline';this.className=s?'':'opened';\">[" + str(a) + "]</a></sup><span class='foot' id='footnote_" + str(a) + "' style='display:none;'><a class=\"footnotes\" href=\"#fn-" + str(a) + "\" onclick=\"var f=document.getElementById('footnote_" + str(a) + "');var s=f.style.display=='inline';f.style.display=s?'none':'inline';this.className=s?'':'opened';\">[" + str(a) + "]</a> <a href='javascript:void(0);' onclick=\"var f=document.getElementById('footnote_" + str(a) + "');var s=f.style.display=='inline';f.style.display=s?'none':'inline';this.className=s?'':'opened';\">[X]</a> " + results[1] + "</span>", data, 1)
 
             a += 1
         else:
