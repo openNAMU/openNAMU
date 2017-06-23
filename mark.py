@@ -76,6 +76,8 @@ def html_pas(data, how):
     data = re.sub('"', '&quot;', data)
     
     data = re.sub("\[(?P<in>(?:\/)?(?:a|div|span|embed|iframe)(?:[^\]]*))\]", "<\g<in>>", data)
+    data = re.sub("\[<", "[[", data)
+    data = re.sub(">\]", "]]", data)
     data = re.sub('#.#', '"', data)
     
     return data

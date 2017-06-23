@@ -1,4 +1,4 @@
-﻿from bottle import route, run, template, error, request, static_file, app
+﻿from bottle import route, run, template, error, request, static_file, app, BaseRequest
 from bottle.ext import beaker
 import bcrypt
 import os
@@ -17,6 +17,8 @@ session_opts = {
 }
 
 app = beaker.middleware.SessionMiddleware(app(), session_opts)
+
+BaseRequest.MEMFILE_MAX = 1024 * 1024
     
 def start():
     try:
@@ -2706,4 +2708,4 @@ def error_test(num = None):
 def error_404(error):
     return redirect('/w/' + url_pas(set_data['frontpage']))
     
-run(app = app, server='tornado', host = '0.0.0.0', port = int(set_data['port']), debug = True)
+run(app = app, server='tornado', host = '0.0.0.0', port = int(set_data['port']))
