@@ -128,7 +128,7 @@ def db_get():
 
 start()
 
-r_ver = '2.0.4b'
+r_ver = '2.0.5'
 
 db_ex('select data from other where name = "version"')
 version = db_get()
@@ -234,7 +234,7 @@ def upload():
         if(ban == 1):
             return redirect('/ban')
         else:
-            return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), logo = set_data['name'], title = '업로드', tn = 21, number = set_data['upload'])
+            return template('upload', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), logo = set_data['name'], title = '업로드', number = set_data['upload'])
 
 @route('/image/<name:path>')
 def static(name = None):
@@ -242,7 +242,7 @@ def static(name = None):
     if(os.path.exists(os.path.join('image', name))):
         return static_file(name, root = 'image')
     else:
-        return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), logo = set_data['name'], data = '이미지 없음.', title = '이미지 보기')
+        return template('other', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), logo = set_data['name'], data = '이미지 없음.', title = '이미지 보기')
 
 @route('/acllist')
 def acl_list():
@@ -270,7 +270,7 @@ def acl_list():
     else:
         data = ''
 
-    return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), logo = set_data['name'], data = data, title = 'ACL 문서 목록')
+    return template('other', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), logo = set_data['name'], data = data, title = 'ACL 문서 목록')
     
 @route('/listacl')
 def list_acl():
@@ -308,7 +308,7 @@ def list_acl():
     else:
         data = ''
 
-    return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), logo = set_data['name'], data = data, title = 'ACL 목록')
+    return template('other', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), logo = set_data['name'], data = data, title = 'ACL 목록')
 
 @route('/adminplus/<name:path>', method=['POST', 'GET'])
 def admin_plus(name = None):
@@ -370,7 +370,7 @@ def admin_plus(name = None):
             list += '<li><input type="checkbox" name="hidel" ' + exist_list[5] + '> 역사 숨김</li>'
             list += '<li><input type="checkbox" name="owner" ' + exist_list[7] + '> 소유자</li>'
             
-            return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '관리 그룹 추가', logo = set_data['name'], data = '<form id="usrform" method="POST" action="/adminplus/' + url_pas(name) + '">' + list + '<div class="form-actions"><button class="btn btn-primary" type="submit">저장</button></div></form>')
+            return template('other', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '관리 그룹 추가', logo = set_data['name'], data = '<form id="usrform" method="POST" action="/adminplus/' + url_pas(name) + '">' + list + '<div class="form-actions"><button class="btn btn-primary" type="submit">저장</button></div></form>')
     else:
         return redirect('/error/3')
         
@@ -400,9 +400,9 @@ def admin_list():
                 div += '</div>'
                 break
             
-        return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), logo = set_data['name'], data = div, title = '관리자 목록')
+        return template('other', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), logo = set_data['name'], data = div, title = '관리자 목록')
     else:
-        return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), logo = set_data['name'], title = '관리자 목록')
+        return template('other', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), logo = set_data['name'], title = '관리자 목록')
         
 @route('/recentchanges')
 def recent_changes():
@@ -484,9 +484,9 @@ def recent_changes():
                 div = div + '</tbody></table></div>'
                 break
             
-        return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), logo = set_data['name'], rows = div, tn = 3, title = '최근 변경내역')
+        return template('other', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), logo = set_data['name'], data = div, title = '최근 변경내역')
     else:
-        return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), logo = set_data['name'], rows = '<br>None', tn = 3, title = '최근 변경내역')
+        return template('other', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), logo = set_data['name'], data = '<br>None', title = '최근 변경내역')
         
 @route('/history/<name:path>/r/<num:int>/hidden')
 def history_hidden(name = None, num = None):
@@ -596,9 +596,9 @@ def user_record(name = None, num = None):
 
                 break
                 
-        return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), logo = set_data['name'], rows = div, tn = 3, title = '사용자 기록')
+        return template('other', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), logo = set_data['name'], data = div, title = '사용자 기록')
     else:
-        return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), logo = set_data['name'], rows = '<br>None', tn = 3, title = '사용자 기록')
+        return template('other', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), logo = set_data['name'], data = '<br>None', title = '사용자 기록')
         
 @route('/userlog/n/<number:int>')
 def user_log(number = None):
@@ -642,9 +642,9 @@ def user_log(number = None):
             else:
                 j += 1
                 
-        return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), logo = set_data['name'], data = list_data, title = '사용자 가입 기록')
+        return template('other', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), logo = set_data['name'], data = list_data, title = '사용자 가입 기록')
     else:
-        return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), logo = set_data['name'], data = '', title = '사용자 가입 기록')
+        return template('other', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), logo = set_data['name'], data = '', title = '사용자 가입 기록')
         
 @route('/backreset')
 def backlink_reset():
@@ -666,7 +666,7 @@ def backlink_reset():
                 except:
                     break
         
-        return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), logo = set_data['name'], data = '에러 없음', title = '완료')
+        return template('other', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), logo = set_data['name'], data = '에러 없음', title = '완료')
     else:
         return redirect('/error/3')
         
@@ -749,9 +749,9 @@ def backlink(name = None, num = None):
         if(restart == 1):
             return redirect('/backlink/' + url_pas(name) + '/n/' + str(num))
         else:    
-            return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), logo = set_data['name'], data = div, title = name, page = url_pas(name), sub = '역링크')
+            return template('other', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), logo = set_data['name'], data = div, title = name, page = url_pas(name), sub = '역링크')
     else:
-        return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), logo = set_data['name'], data = 'None', title = name, page = url_pas(name), sub = '역링크')
+        return template('other', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), logo = set_data['name'], data = 'None', title = name, page = url_pas(name), sub = '역링크')
         
 @route('/recentdiscuss')
 def recent_discuss():
@@ -780,9 +780,9 @@ def recent_discuss():
                 
                 break
             
-        return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), logo = set_data['name'], rows = div, tn = 3, title = '최근 토론내역')
+        return template('other', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), logo = set_data['name'], data = div, title = '최근 토론내역')
     else:
-        return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), logo = set_data['name'], rows = '<br>None', tn = 3, title = '최근 토론내역')
+        return template('other', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), logo = set_data['name'], data = '<br>None', title = '최근 토론내역')
 
 @route('/blocklog/n/<number:int>')
 def blocklog(number = None):
@@ -827,9 +827,9 @@ def blocklog(number = None):
                     
                 break
                 
-        return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), logo = set_data['name'], rows = div, tn = 3, title = '사용자 차단 기록')
+        return template('other', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), logo = set_data['name'], data = div, title = '사용자 차단 기록')
     else:
-        return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), logo = set_data['name'], rows = '<br>None', tn = 3, title = '사용자 차단 기록')
+        return template('other', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), logo = set_data['name'], data = '<br>None', title = '사용자 차단 기록')
         
 @route('/history/<name:path>/n/<num:int>', method=['POST', 'GET'])
 def history_view(name = None, num = None):
@@ -932,9 +932,9 @@ def history_view(name = None, num = None):
 
                     break
                     
-            return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), logo = set_data['name'], rows = div, tn = 5, title = name, page = url_pas(name), select = select, sub = '역사')
+            return template('other', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), logo = set_data['name'], data = div, title = name, page = url_pas(name), select = select, sub = '역사')
         else:
-            return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), logo = set_data['name'], rows = '<br>None', tn = 5, title = name, page = url_pas(name), select = select, sub = '역사')
+            return template('other', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), logo = set_data['name'], data = '<br>None', title = name, page = url_pas(name), select = select, sub = '역사')
             
 @route('/search', method=['POST'])
 def search():
@@ -1022,7 +1022,7 @@ def deep_search(name = None, num = None):
 
     div = div + div_plus + end
 
-    return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), logo = set_data['name'], data = div, title = name, sub = '검색')
+    return template('other', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), logo = set_data['name'], data = div, title = name, sub = '검색')
         
 @route('/w/<name:path>/r/<num:int>')
 def old_view(name = None, num = None):
@@ -1043,7 +1043,7 @@ def old_view(name = None, num = None):
                 else:
                     left = ''
                     
-                return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = name, logo = set_data['name'], page = url_pas(name), data = enddata, tn = 6, left = left, sub = '옛 문서')
+                return template('other', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = name, logo = set_data['name'], page = url_pas(name), data = enddata, left = left, sub = '옛 문서')
             else:
                 return redirect('/history/' + url_pas(name))
         else:
@@ -1061,7 +1061,7 @@ def old_view(name = None, num = None):
             else:
                 left = ''
                 
-            return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = name, logo = set_data['name'], page = url_pas(name), data = enddata, tn = 6, left = left, sub = '옛 문서')
+            return template('other', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = name, logo = set_data['name'], page = url_pas(name), data = enddata, left = left, sub = '옛 문서')
         else:
             return redirect('/history/' + url_pas(name))
             
@@ -1081,7 +1081,7 @@ def old_raw(name = None, num = None):
                 
                 enddata = '<pre>' + enddata + '</pre>'
                 
-                return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = name, logo = set_data['name'], page = url_pas(name), data = enddata, sub = '옛 원본')
+                return template('other', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = name, logo = set_data['name'], page = url_pas(name), data = enddata, sub = '옛 원본')
             else:
                 return redirect('/history/' + url_pas(name))
         else:
@@ -1096,7 +1096,7 @@ def old_raw(name = None, num = None):
             
             enddata = '<pre>' + enddata + '</pre>'
             
-            return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = name, logo = set_data['name'], page = url_pas(name), data = enddata, sub = '옛 원본')
+            return template('other', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = name, logo = set_data['name'], page = url_pas(name), data = enddata, sub = '옛 원본')
         else:
             return redirect('/history/' + url_pas(name))
             
@@ -1112,7 +1112,7 @@ def raw_view(name = None):
         
         enddata = '<pre>' + enddata + '</pre>'
         
-        return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = name, logo = set_data['name'], page = url_pas(name), data = enddata, tn = 6, sub = '원본')
+        return template('other', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = name, logo = set_data['name'], page = url_pas(name), data = enddata, sub = '원본')
     else:
         return redirect('/w/' + url_pas(name))
         
@@ -1190,7 +1190,7 @@ def revert(name = None, num = None):
                     db_ex("select * from history where title = '" + db_pas(name) + "' and id = '" + str(num) + "'")
                     rows = db_get()
                     if(rows):
-                        return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = name, logo = set_data['name'], page = url_pas(name), r = url_pas(str(num)), tn = 13, plus = '정말 되돌리시겠습니까?', sub = '되돌리기')
+                        return template('revert', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = name, logo = set_data['name'], page = url_pas(name), r = url_pas(str(num)), plus = '정말 되돌리시겠습니까?', sub = '되돌리기')
                     else:
                         return redirect('/w/' + url_pas(name))
             else:
@@ -1202,7 +1202,7 @@ def revert(name = None, num = None):
                 db_ex("select * from history where title = '" + db_pas(name) + "' and id = '" + str(num) + "'")
                 rows = db_get()
                 if(rows):
-                    return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = name, logo = set_data['name'], page = url_pas(name), r = url_pas(str(num)), tn = 13, plus = '정말 되돌리시겠습니까?', sub = '되돌리기')
+                    return template('revert', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = name, logo = set_data['name'], page = url_pas(name), r = url_pas(str(num)), plus = '정말 되돌리시겠습니까?', sub = '되돌리기')
                 else:
                     return redirect('/w/' + url_pas(name))
                     
@@ -1230,7 +1230,7 @@ def many_del():
             db_com()
             return redirect('/')
         else:
-            return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '많은 문서 삭제', logo = set_data['name'], tn = 4)
+            return template('mdel', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '많은 문서 삭제', logo = set_data['name'])
     else:
         return redirect('/error/3')
     
@@ -1302,7 +1302,7 @@ def section_edit(name = None, num = None):
                 if(j == 0):
                     gdata = re.sub("\r\n$", "", gdata)
 
-                    return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = name, logo = set_data['name'], page = url_pas(name), data = gdata, tn = 2, section = 1, number = num, sub = '편집')
+                    return template('edit', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = name, logo = set_data['name'], page = url_pas(name), data = gdata, section = 1, number = num, sub = '편집')
                 else:
                     return redirect('/w/' + url_pas(name))
             else:
@@ -1356,9 +1356,9 @@ def edit(name = None):
             db_ex("select * from data where title = '" + db_pas(name) + "'")
             rows = db_get()
             if(rows):
-                return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = name, logo = set_data['name'], page = url_pas(name), data = rows[0]['data'], tn = 2, sub = '편집')
+                return template('edit', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = name, logo = set_data['name'], page = url_pas(name), data = rows[0]['data'], sub = '편집')
             else:
-                return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = name, logo = set_data['name'], page = url_pas(name), data = '', tn = 2, sub = '편집')
+                return template('edit', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = name, logo = set_data['name'], page = url_pas(name), data = '', sub = '편집')
 
 @route('/preview/<name:path>/section/<num:int>', method=['POST'])
 def section_preview(name = None, num = None):
@@ -1373,7 +1373,7 @@ def section_preview(name = None, num = None):
         newdata = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', ' * [[\g<in>]] 문서로 넘겨주기', newdata)
         enddata = namumark(session, name, newdata)
             
-        return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = name, logo = set_data['name'], page = url_pas(name), data = request.forms.content, tn = 2, preview = 1, enddata = enddata, section = 1, number = num, odata = request.forms.otent, sub = '미리보기')
+        return template('edit', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = name, logo = set_data['name'], page = url_pas(name), data = request.forms.content, preview = 1, enddata = enddata, section = 1, number = num, odata = request.forms.otent, sub = '미리보기')
                 
 @route('/preview/<name:path>', method=['POST'])
 def preview(name = None):
@@ -1388,7 +1388,7 @@ def preview(name = None):
         newdata = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', ' * [[\g<in>]] 문서로 넘겨주기', newdata)
         enddata = namumark(session, name, newdata)
             
-        return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = name, logo = set_data['name'], page = url_pas(name), data = request.forms.content, tn = 2, preview = 1, enddata = enddata, sub = '미리보기')
+        return template('edit', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = name, logo = set_data['name'], page = url_pas(name), data = request.forms.content, preview = 1, enddata = enddata, sub = '미리보기')
         
 @route('/delete/<name:path>', method=['POST', 'GET'])
 def delete(name = None):
@@ -1421,7 +1421,7 @@ def delete(name = None):
             if(can == 1):
                 return redirect('/ban')
             else:
-                return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = name, logo = set_data['name'], page = url_pas(name), tn = 8, plus = '정말 삭제 하시겠습니까?', sub = '삭제')
+                return template('del', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = name, logo = set_data['name'], page = url_pas(name), plus = '정말 삭제 하시겠습니까?', sub = '삭제')
         else:
             return redirect('/w/' + url_pas(name))
             
@@ -1457,53 +1457,53 @@ def move(name = None):
         if(can == 1):
             return redirect('/ban')
         else:
-            return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = name, logo = set_data['name'], page = url_pas(name), tn = 9, plus = '정말 이동 하시겠습니까?', sub = '이동')
+            return template('move', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = name, logo = set_data['name'], page = url_pas(name), plus = '정말 이동 하시겠습니까?', sub = '이동')
             
 @route('/other')
 def other():
     session = request.environ.get('beaker.session')
-    return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '기타 메뉴', logo = set_data['name'], data = '<h2 style="margin-top: 0px;">기록</h2><li><a href="/blocklog/n/1">사용자 차단 기록</a></li><li><a href="/userlog/n/1">사용자 가입 기록</a></li><li><a href="/manager/6">사용자 기록</a></li><li><a href="/manager/7">사용자 토론 기록</a></li><h2>기타</h2><li><a href="/titleindex">모든 문서</a></li><li><a href="/acllist">ACL 문서 목록</a></li><li><a href="/upload">업로드</a></li><li><a href="/adminlist">관리자 목록</a></li><li><a href="/manager/1">관리자 메뉴</a></li><br>이 오픈나무의 버전은 <a href="https://github.com/2DU/openNAMU/blob/normal/version.md">v' + r_ver + '</a> 입니다.')
+    return template('memu', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '기타 메뉴', logo = set_data['name'], data = '<h2 style="margin-top: 0px;">기록</h2><li><a href="/blocklog/n/1">사용자 차단 기록</a></li><li><a href="/userlog/n/1">사용자 가입 기록</a></li><li><a href="/manager/6">사용자 기록</a></li><li><a href="/manager/7">사용자 토론 기록</a></li><h2>기타</h2><li><a href="/titleindex">모든 문서</a></li><li><a href="/acllist">ACL 문서 목록</a></li><li><a href="/upload">업로드</a></li><li><a href="/adminlist">관리자 목록</a></li><li><a href="/manager/1">관리자 메뉴</a></li><br>이 오픈나무의 버전은 <a href="https://github.com/2DU/openNAMU/blob/normal/version.md">v' + r_ver + '</a> 입니다.')
     
 @route('/manager/<num:int>', method=['POST', 'GET'])
 def manager(num = None):
     session = request.environ.get('beaker.session')
     if(num == 1):
-        return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '관리자 메뉴', logo = set_data['name'], data = '<h2 style="margin-top: 0px;">목록</h2><li><a href="/manager/2">문서 ACL</a></li><li><a href="/manager/3">사용자 체크</a></li><li><a href="/manager/4">사용자 차단</a></li><li><a href="/manager/5">관리자 권한 주기</a></li><li><a href="/manydel">많은 문서 삭제</a></li><h2>소유자</h2><li><a href="/backreset">모든 역링크 재 생성</a></li><li><a href="/manager/8">새로운 관리 그룹 생성</a></li><h2>기타</h2><li>이 메뉴에 없는 기능은 해당 문서의 역사나 토론에서 바로 사용 가능함</li>')
+        return template('other', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '관리자 메뉴', logo = set_data['name'], data = '<h2 style="margin-top: 0px;">목록</h2><li><a href="/manager/2">문서 ACL</a></li><li><a href="/manager/3">사용자 체크</a></li><li><a href="/manager/4">사용자 차단</a></li><li><a href="/manager/5">관리자 권한 주기</a></li><li><a href="/manydel">많은 문서 삭제</a></li><h2>소유자</h2><li><a href="/backreset">모든 역링크 재 생성</a></li><li><a href="/manager/8">새로운 관리 그룹 생성</a></li><h2>기타</h2><li>이 메뉴에 없는 기능은 해당 문서의 역사나 토론에서 바로 사용 가능함</li>')
     elif(num == 2):
         if(request.method == 'POST'):
             return redirect('/acl/' + url_pas(request.forms.name))
         else:
-            return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = 'ACL 이동', logo = set_data['name'], data = '<form id="usrform" method="POST" action="/manager/2"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')
+            return template('other', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = 'ACL 이동', logo = set_data['name'], data = '<form id="usrform" method="POST" action="/manager/2"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')
     elif(num == 3):
         if(request.method == 'POST'):
             return redirect('/check/' + url_pas(request.forms.name))
         else:
-            return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '체크 이동', logo = set_data['name'], data = '<form id="usrform" method="POST" action="/manager/3"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')
+            return template('other', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '체크 이동', logo = set_data['name'], data = '<form id="usrform" method="POST" action="/manager/3"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')
     elif(num == 4):
         if(request.method == 'POST'):
             return redirect('/ban/' + url_pas(request.forms.name))
         else:
-            return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '차단 이동', logo = set_data['name'], data = '<form id="usrform" method="POST" action="/manager/4"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button><br><br><span>아이피 앞 두자리 (XXX.XXX) 입력하면 대역 차단</span></form>')
+            return template('other', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '차단 이동', logo = set_data['name'], data = '<form id="usrform" method="POST" action="/manager/4"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button><br><br><span>아이피 앞 두자리 (XXX.XXX) 입력하면 대역 차단</span></form>')
     elif(num == 5):
         if(request.method == 'POST'):
             return redirect('/admin/' + url_pas(request.forms.name))
         else:
-            return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '권한 이동', logo = set_data['name'], data = '<form id="usrform" method="POST" action="/manager/5"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')   
+            return template('other', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '권한 이동', logo = set_data['name'], data = '<form id="usrform" method="POST" action="/manager/5"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')   
     elif(num == 6):
         if(request.method == 'POST'):
             return redirect('/record/' + url_pas(request.forms.name) + '/n/1')
         else:
-            return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '기록 이동', logo = set_data['name'], data = '<form id="usrform" method="POST" action="/manager/6"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')    
+            return template('other', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '기록 이동', logo = set_data['name'], data = '<form id="usrform" method="POST" action="/manager/6"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')    
     elif(num == 7):
         if(request.method == 'POST'):
             return redirect('/user/' + url_pas(request.forms.name) + '/topic/1')
         else:
-            return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '토론 기록 이동', logo = set_data['name'], data = '<form id="usrform" method="POST" action="/manager/7"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')    
+            return template('other', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '토론 기록 이동', logo = set_data['name'], data = '<form id="usrform" method="POST" action="/manager/7"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')    
     elif(num == 8):
         if(request.method == 'POST'):
             return redirect('/adminplus/' + url_pas(request.forms.name))
         else:
-            return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '그룹 생성 이동', logo = set_data['name'], data = '<form id="usrform" method="POST" action="/manager/8"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')    
+            return template('other', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '그룹 생성 이동', logo = set_data['name'], data = '<form id="usrform" method="POST" action="/manager/8"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')    
     else:
         return redirect('/')
         
@@ -1536,9 +1536,9 @@ def title_index():
                 data += '</div>'
                 break
 
-        return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), logo = set_data['name'], rows = data + '<br><li>이 위키에는 총 ' + str(i[0]) + '개의 문서가 있습니다.</li><br><li>틀 문서는 총 ' + str(i[3]) + '개의 문서가 있습니다.</li><li>분류 문서는 총 ' + str(i[1]) + '개의 문서가 있습니다.</li><li>사용자 문서는 총 ' + str(i[2]) + '개의 문서가 있습니다.</li><li>파일 문서는 총 ' + str(i[4]) + '개의 문서가 있습니다.</li><li>나머지 문서는 총 ' + str(i[5]) + '개의 문서가 있습니다.</li>', tn = 3, title = '모든 문서')
+        return template('other', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), logo = set_data['name'], data = data + '<br><li>이 위키에는 총 ' + str(i[0]) + '개의 문서가 있습니다.</li><br><li>틀 문서는 총 ' + str(i[3]) + '개의 문서가 있습니다.</li><li>분류 문서는 총 ' + str(i[1]) + '개의 문서가 있습니다.</li><li>사용자 문서는 총 ' + str(i[2]) + '개의 문서가 있습니다.</li><li>파일 문서는 총 ' + str(i[4]) + '개의 문서가 있습니다.</li><li>나머지 문서는 총 ' + str(i[5]) + '개의 문서가 있습니다.</li>', title = '모든 문서')
     else:
-        return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), logo = set_data['name'], rows = '<br>None', tn = 3, title = '모든 문서')
+        return template('other', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), logo = set_data['name'], data = '<br>None', title = '모든 문서')
         
 @route('/topic/<name:path>/sub/<sub:path>/b/<num:int>')
 def topic_block(name = None, sub = None, num = None):
@@ -1828,7 +1828,7 @@ def topic(name = None, sub = None):
                 
                 break
             
-        return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = name, page = url_pas(name), suburl = url_pas(sub), toron = sub, logo = set_data['name'], rows = div, tn = 11, ban = ban, style = style, sub = '토론')
+        return template('vstopic', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = name, page = url_pas(name), suburl = url_pas(sub), toron = sub, logo = set_data['name'], rows = div, ban = ban, style = style, sub = '토론')
         
 @route('/topic/<name:path>/close')
 def close_topic_list(name = None):
@@ -1861,7 +1861,7 @@ def close_topic_list(name = None):
             
             break
         
-    return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = name, page = url_pas(name), logo = set_data['name'], plus = div, tn = 10, sub = '닫힌 토론')
+    return template('topic', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = name, page = url_pas(name), logo = set_data['name'], plus = div, sub = '닫힘')
     
 @route('/topic/<name:path>/agree')
 def agree_topic_list(name = None):
@@ -1886,7 +1886,7 @@ def agree_topic_list(name = None):
 
                 ip = ip_pas(data[0]['ip'], 1)
                     
-                div += '<h2><a href="/topic/' + url_pas(name) + '/sub/' + url_pas(data[i]['sub']) + '">' + str(i + 1) + '. ' + data[i]['sub'] + '</a></h2><table id="toron"><tbody><tr><td id="toroncolorgreen"><a href="javascript:void(0);" id="1">#1</a> ' + 아이디 + ' <span style="float:right;">' + data[0]['date'] + '</span></td></tr><tr><td ' + block + '>' + indata + '</td></tr></tbody></table><br>'
+                div += '<h2><a href="/topic/' + url_pas(name) + '/sub/' + url_pas(data[i]['sub']) + '">' + str(i + 1) + '. ' + data[i]['sub'] + '</a></h2><table id="toron"><tbody><tr><td id="toroncolorgreen"><a href="javascript:void(0);" id="1">#1</a> ' + ip + ' <span style="float:right;">' + data[0]['date'] + '</span></td></tr><tr><td ' + block + '>' + indata + '</td></tr></tbody></table><br>'
                 
             i += 1
         except:
@@ -1894,7 +1894,7 @@ def agree_topic_list(name = None):
             
             break
         
-    return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = name, page = url_pas(name), logo = set_data['name'], plus = div, tn = 10, sub = '합의된 토론')
+    return template('topic', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = name, page = url_pas(name), logo = set_data['name'], plus = div, sub = '합의')
 
 @route('/topic/<name:path>', method=['POST', 'GET'])
 def topic_list(name = None):
@@ -1934,7 +1934,7 @@ def topic_list(name = None):
                 div = div + '</div>'
                 break
             
-        return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = name, page = url_pas(name), logo = set_data['name'], plus = div, tn = 10, list = 1, sub = '토론 목록')
+        return template('topic', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = name, page = url_pas(name), logo = set_data['name'], plus = div, list = 1, sub = '토론 목록')
         
 @route('/login', method=['POST', 'GET'])
 def login():
@@ -1977,7 +1977,7 @@ def login():
             if(session.get('Now') == True):
                 return redirect('/error/11')
             else:
-                return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '로그인', enter = '로그인', logo = set_data['name'], tn = 15)
+                return template('login', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '로그인', enter = '로그인', logo = set_data['name'])
                 
 @route('/change', method=['POST', 'GET'])
 def change_password():
@@ -2015,7 +2015,7 @@ def change_password():
             if(session.get('Now') == True):
                 return redirect('/logout')
             else:
-                return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '비밀번호 변경', enter = '변경', logo = set_data['name'], tn = 15)
+                return template('login', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '비밀번호 변경', enter = '변경', logo = set_data['name'])
                 
 @route('/check/<name:path>')
 def user_check(name = None):
@@ -2032,7 +2032,7 @@ def user_check(name = None):
                 row = db_get()
                 if(row):
                     i = 0
-                    c = '<div><table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;">유저</td><td style="text-align: center;width:33.33%;">아이피</td><td style="text-align: center;width:33.33%;">언제</td></tr>'
+                    c = '<div><table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;">이름</td><td style="text-align: center;width:33.33%;">아이피</td><td style="text-align: center;width:33.33%;">언제</td></tr>'
                     while(True):
                         try:
                             c += '<tr><td style="text-align: center;width:33.33%;">' + row[i]['user'] + '</td><td style="text-align: center;width:33.33%;">' + row[i]['ip'] + '</td><td style="text-align: center;width:33.33%;">' + row[i]['today'] + '</td></tr>'
@@ -2043,15 +2043,15 @@ def user_check(name = None):
 
                             break
                         
-                    return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '다중 검사', logo = set_data['name'], tn = 3, rows = c)
+                    return template('other', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '다중 검사', logo = set_data['name'], data = c)
                 else:
-                    return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '다중 검사', logo = set_data['name'], tn = 3, rows = '<br>None')
+                    return template('other', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '다중 검사', logo = set_data['name'], data = '<br>None')
             else:
                 db_ex("select * from login where user = '" + db_pas(name) + "' order by today desc")
                 row = db_get()
                 if(row):
                     i = 0
-                    c = '<div><table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;">유저</td><td style="text-align: center;width:33.33%;">아이피</td><td style="text-align: center;width:33.33%;">언제</td></tr>'
+                    c = '<div><table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;">이름</td><td style="text-align: center;width:33.33%;">아이피</td><td style="text-align: center;width:33.33%;">언제</td></tr>'
                     while(True):
                         try:
                             c += '<tr><td style="text-align: center;width:33.33%;">' + row[i]['user'] + '</td><td style="text-align: center;width:33.33%;">' + row[i]['ip'] + '</td><td style="text-align: center;width:33.33%;">' + row[i]['today'] + '</td></tr>'
@@ -2062,9 +2062,9 @@ def user_check(name = None):
                             
                             break
                         
-                    return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '다중 검사', logo = set_data['name'], tn = 3, rows = c)
+                    return template('other', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '다중 검사', logo = set_data['name'], data = c)
                 else:
-                    return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '다중 검사', logo = set_data['name'], tn = 3, rows = '<br>None')
+                    return template('other', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '다중 검사', logo = set_data['name'], data = '<br>None')
         else:
             return redirect('/error/3')
                 
@@ -2108,7 +2108,7 @@ def register():
         if(ban == 1):
             return redirect('/ban')
         else:
-            return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '회원가입', enter = '회원가입', logo = set_data['name'], tn = 15)
+            return template('login', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '회원가입', enter = '회원가입', logo = set_data['name'])
             
 @route('/logout')
 def logout():
@@ -2170,7 +2170,7 @@ def user_ban(name = None):
                     else:
                         now = '차단'
                         
-                return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = name, page = url_pas(name), logo = set_data['name'], tn = 16, now = now, today = get_time(), sub = '차단')
+                return template('ban', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = name, page = url_pas(name), logo = set_data['name'], now = now, today = get_time(), sub = '차단')
             else:
                 return redirect('/error/3')
                 
@@ -2206,7 +2206,7 @@ def acl(name = None):
                 else:
                     now = '일반'
                     
-                return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = name, page = url_pas(name), logo = set_data['name'], tn = 19, now = '현재 ACL 상태는 ' + now, sub = 'ACL')
+                return template('acl', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = name, page = url_pas(name), logo = set_data['name'], now = '현재 ACL 상태는 ' + now, sub = 'ACL')
             else:
                 return redirect('/w/' + url_pas(name)) 
         else:
@@ -2257,7 +2257,7 @@ def user_admin(name = None):
                         except:
                             break                            
                     
-                return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = name, page = url_pas(name), datalist = div, logo = set_data['name'], tn = 18, now = now, sub = '권한 부여')
+                return template('admin', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = name, page = url_pas(name), datalist = div, logo = set_data['name'], now = now, sub = '권한 부여')
             else:
                 return redirect('/error/5')
         else:
@@ -2321,7 +2321,7 @@ def are_you_ban():
     else:
         end = '권한이 맞지 않는 상태 입니다.'
         
-    return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '권한 오류', logo = set_data['name'], data = end)
+    return template('other', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '권한 오류', logo = set_data['name'], data = end)
     
 @route('/w/<name:path>/r/<a:int>/diff/<b:int>')
 def diff_data(name = None, a = None, b = None):
@@ -2345,7 +2345,7 @@ def diff_data(name = None, a = None, b = None):
             
             result = '<pre>' + result + '</pre>'
             
-            return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = name, logo = set_data['name'], data = result, sub = '비교', page = url_pas(name))
+            return template('other', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = name, logo = set_data['name'], data = result, sub = '비교', page = url_pas(name))
         else:
             return redirect('/history/' + url_pas(name))
     else:
@@ -2491,7 +2491,7 @@ def read_view(name = None, redirect = None):
         else:
             left = ''
             
-        return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = name, logo = set_data['name'], page = url_pas(name), data = enddata + div, tn = 1, acl = acl, left = left, uppage = uppage, style = style, topic = topic, redirect = redirect, admin = admin_memu)
+        return template('read', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = name, logo = set_data['name'], page = url_pas(name), data = enddata + div, acl = acl, left = left, uppage = uppage, style = style, topic = topic, redirect = redirect, admin = admin_memu)
     else:
         m = re.search("^사용자:(.*)", name)
         if(m):
@@ -2509,7 +2509,7 @@ def read_view(name = None, redirect = None):
         if(redirect):
             elsedata = re.sub("^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)", " * [[\g<in>]] 문서로 넘겨주기", elsedata)
         
-        return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = name, logo = set_data['name'], page = url_pas(name), data = namumark(session, name, elsedata) + div, tn = 1, uppage = uppage, style = style, acl = acl, topic = topic, redirect = redirect, admin = admin_memu, data_none = True)
+        return template('read', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = name, logo = set_data['name'], page = url_pas(name), data = namumark(session, name, elsedata) + div, uppage = uppage, style = style, acl = acl, topic = topic, redirect = redirect, admin = admin_memu, data_none = True)
 
 @route('/user/<name:path>/topic/<num:int>')
 def close_topic_list(name = None, num = None):
@@ -2563,9 +2563,9 @@ def close_topic_list(name = None, num = None):
 
                 break
                 
-        return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), logo = set_data['name'], rows = div, tn = 3, title = '사용자 토론 기록')
+        return template('other', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), logo = set_data['name'], data = div, title = '사용자 토론 기록')
     else:
-        return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), logo = set_data['name'], rows = '<br>None', tn = 3, title = '사용자 토론 기록')
+        return template('other', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), logo = set_data['name'], data = '<br>None', title = '사용자 토론 기록')
         
 @route('/user')
 def user_info():
@@ -2588,7 +2588,7 @@ def user_info():
         
     ip = ip_pas(ip, 2)
         
-    return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '사용자 메뉴', logo = set_data['name'], data = ip + '<br><br><span>권한 상태 : ' + acl + '<h2>로그인 관련</h2><li><a href="/login">로그인</a></li><li><a href="/logout">로그아웃</a></li><li><a href="/register">회원가입</a></li><h2>기타</h2><li><a href="/change">비밀번호 변경</a></li><li><a href="/count">기여 횟수</a></li><li><a href="/record/' + raw_ip + '/n/1">기여 목록</a></li><li><a href="/custom">커스텀 CSS</a></li>')
+    return template('other', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '사용자 메뉴', logo = set_data['name'], data = ip + '<br><br><span>권한 상태 : ' + acl + '<h2>로그인 관련</h2><li><a href="/login">로그인</a></li><li><a href="/logout">로그아웃</a></li><li><a href="/register">회원가입</a></li><h2>기타</h2><li><a href="/change">비밀번호 변경</a></li><li><a href="/count">기여 횟수</a></li><li><a href="/record/' + raw_ip + '/n/1">기여 목록</a></li><li><a href="/custom">커스텀 CSS</a></li>')
 
 @route('/custom', method=['GET', 'POST'])
 def custom_css():
@@ -2618,7 +2618,7 @@ def custom_css():
             else:
                 data = ''
 
-            return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '커스텀 CSS', logo = set_data['name'], data = '<form id="usrform" name="f1" method="POST" action="/custom"><textarea rows="30" cols="100" name="content" form="usrform">' + data + '</textarea><div class="form-actions"><button class="btn btn-primary" type="submit">저장</button></div></form>')
+            return template('other', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '커스텀 CSS', logo = set_data['name'], data = '<form id="usrform" name="f1" method="POST" action="/custom"><textarea rows="30" cols="100" name="content" form="usrform">' + data + '</textarea><div class="form-actions"><button class="btn btn-primary" type="submit">저장</button></div></form>')
     
 @route('/count')
 def count_edit():
@@ -2626,9 +2626,9 @@ def count_edit():
     db_ex("select count(title) from history where ip = '" + ip_check(session) + "'")
     i = db_get()
     if(i):
-        return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '기여 횟수', logo = set_data['name'], data = "기여 횟수 : " + str(i[0]["count(title)"]))
+        return template('other', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '기여 횟수', logo = set_data['name'], data = "기여 횟수 : " + str(i[0]["count(title)"]))
     else:
-        return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '기여 횟수', logo = set_data['name'], data = "기여 횟수 : 0")
+        return template('other', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '기여 횟수', logo = set_data['name'], data = "기여 횟수 : 0")
         
 @route('/random')
 def random():
@@ -2662,45 +2662,45 @@ def static(name = None):
 def error_test(num = None):
     session = request.environ.get('beaker.session')
     if(num == 1):
-        return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '권한 오류', logo = set_data['name'], data = '비 로그인 상태 입니다.')
+        return template('other', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '권한 오류', logo = set_data['name'], data = '비 로그인 상태 입니다.')
     elif(num == 2):
-        return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '권한 오류', logo = set_data['name'], data = '이 계정이 없습니다.')
+        return template('other', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '권한 오류', logo = set_data['name'], data = '이 계정이 없습니다.')
     elif(num == 3):
-        return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '권한 오류', logo = set_data['name'], data = '권한이 모자랍니다.')
+        return template('other', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '권한 오류', logo = set_data['name'], data = '권한이 모자랍니다.')
     elif(num == 4):
-        return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '권한 오류', logo = set_data['name'], data = '관리자는 차단, 검사 할 수 없습니다.')
+        return template('other', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '권한 오류', logo = set_data['name'], data = '관리자는 차단, 검사 할 수 없습니다.')
     elif(num == 5):
-        return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '사용자 오류', logo = set_data['name'], data = '그런 계정이 없습니다.')
+        return template('other', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '사용자 오류', logo = set_data['name'], data = '그런 계정이 없습니다.')
     elif(num == 6):
-        return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '가입 오류', logo = set_data['name'], data = '동일한 아이디의 사용자가 있습니다.')
+        return template('other', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '가입 오류', logo = set_data['name'], data = '동일한 아이디의 사용자가 있습니다.')
     elif(num == 7):
-        return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '가입 오류', logo = set_data['name'], data = '아이디는 20글자보다 짧아야 합니다.')
+        return template('other', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '가입 오류', logo = set_data['name'], data = '아이디는 20글자보다 짧아야 합니다.')
     elif(num == 8):
-        return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '가입 오류', logo = set_data['name'], data = '아이디에는 한글과 알파벳과 공백만 허용 됩니다.')
+        return template('other', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '가입 오류', logo = set_data['name'], data = '아이디에는 한글과 알파벳과 공백만 허용 됩니다.')
     elif(num == 9):
-        return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '변경 오류', logo = set_data['name'], data = '그런 계정이 없습니다.')
+        return template('other', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '변경 오류', logo = set_data['name'], data = '그런 계정이 없습니다.')
     elif(num == 10):
-        return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '변경 오류', logo = set_data['name'], data = '비밀번호가 다릅니다.')
+        return template('other', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '변경 오류', logo = set_data['name'], data = '비밀번호가 다릅니다.')
     elif(num == 11):
-        return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '로그인 오류', logo = set_data['name'], data = '이미 로그인 되어 있습니다.')
+        return template('other', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '로그인 오류', logo = set_data['name'], data = '이미 로그인 되어 있습니다.')
     elif(num == 12):
-        return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '로그인 오류', logo = set_data['name'], data = '그런 계정이 없습니다.')
+        return template('other', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '로그인 오류', logo = set_data['name'], data = '그런 계정이 없습니다.')
     elif(num == 13):
-        return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '로그인 오류', logo = set_data['name'], data = '비밀번호가 다릅니다.')
+        return template('other', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '로그인 오류', logo = set_data['name'], data = '비밀번호가 다릅니다.')
     elif(num == 14):
-        return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '업로드 오류', logo = set_data['name'], data = 'jpg, gif, jpeg, png(대 소문자 상관 없음)만 가능 합니다.')
+        return template('other', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '업로드 오류', logo = set_data['name'], data = 'jpg, gif, jpeg, png(대 소문자 상관 없음)만 가능 합니다.')
     elif(num == 15):
-        return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '편집 오류', logo = set_data['name'], data = '편집 기록은 500자를 넘을 수 없습니다.')
+        return template('other', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '편집 오류', logo = set_data['name'], data = '편집 기록은 500자를 넘을 수 없습니다.')
     elif(num == 16):
-        return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '업로드 오류', logo = set_data['name'], data = '동일한 이름의 파일이 있습니다.')
+        return template('other', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '업로드 오류', logo = set_data['name'], data = '동일한 이름의 파일이 있습니다.')
     elif(num == 17):
-        return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '업로드 오류', logo = set_data['name'], data = '파일 용량은 ' + set_data['upload'] + 'MB를 넘길 수 없습니다.')
+        return template('other', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '업로드 오류', logo = set_data['name'], data = '파일 용량은 ' + set_data['upload'] + 'MB를 넘길 수 없습니다.')
     elif(num == 18):
-        return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '편집 오류', logo = set_data['name'], data = '내용이 원래 문서와 동일 합니다.')
+        return template('other', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '편집 오류', logo = set_data['name'], data = '내용이 원래 문서와 동일 합니다.')
     elif(num == 19):
-        return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '이동 오류', logo = set_data['name'], data = '이동 하려는 곳에 문서가 이미 있습니다.')
+        return template('other', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '이동 오류', logo = set_data['name'], data = '이동 하려는 곳에 문서가 이미 있습니다.')
     elif(num == 20):
-        return template('index', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '비밀번호 오류', logo = set_data['name'], data = '재 확인이랑 비밀번호가 다릅니다.')
+        return template('other', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), title = '비밀번호 오류', logo = set_data['name'], data = '재 확인이랑 비밀번호가 다릅니다.')
     else:
         return redirect('/')
 
