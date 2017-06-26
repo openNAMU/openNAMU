@@ -238,11 +238,10 @@ def upload():
 
 @route('/image/<name:path>')
 def static(name = None):
-    session = request.environ.get('beaker.session')
     if(os.path.exists(os.path.join('image', name))):
         return static_file(name, root = 'image')
     else:
-        return template('other', custom = custom_css_user(session), license = set_data['license'], login = login_check(session), logo = set_data['name'], data = '이미지 없음.', title = '이미지 보기')
+        return redirect('/')
 
 @route('/acllist')
 def acl_list():
@@ -938,12 +937,10 @@ def history_view(name = None, num = None):
             
 @route('/search', method=['POST'])
 def search():
-    session = request.environ.get('beaker.session')
     return redirect('/search/' + url_pas(request.forms.search) + '/n/1')
 
 @route('/goto', method=['POST'])
 def goto():
-    session = request.environ.get('beaker.session')
     db_ex("select title from data where title = '" + db_pas(request.forms.search) + "'")
     data = db_get()
     if(data):
@@ -2632,7 +2629,6 @@ def count_edit():
         
 @route('/random')
 def random():
-    session = request.environ.get('beaker.session')
     db_ex("select title from data order by rand() limit 1")
     rows = db_get()
     if(rows):
@@ -2642,7 +2638,6 @@ def random():
 
 @route('/static/<name:path>')
 def static(name = None):
-    session = request.environ.get('beaker.session')
     if(re.search('\/', name)):
         m = re.search('^(.*)\/(.*)$', name)
         if(m):
