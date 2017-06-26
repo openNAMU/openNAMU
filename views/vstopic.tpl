@@ -25,6 +25,6 @@
         <button class="btn btn-primary" type="submit">전송</button>
     </form>
     % if(login == 0 and style == ''):
-        <span>비 로그인 상태입니다. 비 로그인으로 작업 시 아이피가 역사에 기록됩니다.</span>
+        <span>비 로그인 상태입니다. 비 로그인으로 작업 시 아이피가 토론에 기록됩니다.</span>
     % end
 % end
