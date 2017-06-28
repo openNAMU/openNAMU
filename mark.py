@@ -32,9 +32,9 @@ def savemark(session, data):
 def html_pas(data, how):
     while(True):
         if(how == 1):
-            y = re.search("<((a|div|span|embed|iframe)(?:[^>]*))>", data)
+            y = re.search("<((a|div|span|embed|iframe)(?:\s[^>]*))>", data)
         else:  
-            y = re.search("<((a)(?:[^>]*))>", data)
+            y = re.search("<((a)(?:\s[^>]*))>", data)
         
         if(y):
             b = y.groups()
@@ -56,16 +56,16 @@ def html_pas(data, how):
 
                 try:
                     if(not check[1] == None):
-                        data = re.sub("<((?:\/)?" + b[1] + "(?:[^>]*))>", "%shtml%" + a + "%ehtml%", data, 1)
+                        data = re.sub("<((?:\/)?" + b[1] + "(?:\s[^>]*))>", "%shtml%" + a + "%ehtml%", data, 1)
                         data = re.sub("<\/" + b[1] + ">", "%shtml%/" + b[1] + "%ehtml%", data, 1)
                     else:
-                        data = re.sub("<((?:\/)?" + b[1] + "(?:[^>]*))>", "[[" + check[0] + "]]", data, 1)
+                        data = re.sub("<((?:\/)?" + b[1] + "(?:\s[^>]*))>", "[[" + check[0] + "]]", data, 1)
                         data = re.sub("<\/" + b[1] + ">", "", data, 1)
                 except:
-                    data = re.sub("<((?:\/)?" + b[1] + "(?:[^>]*))>", "%shtml%" + a + "%ehtml%", data, 1)
+                    data = re.sub("<((?:\/)?" + b[1] + "(?:\s[^>]*))>", "%shtml%" + a + "%ehtml%", data, 1)
                     data = re.sub("<\/" + b[1] + ">", "%shtml%/" + b[1] + "%ehtml%", data, 1)
             else:
-                data = re.sub("<((?:\/)?" + b[1] + "(?:[^>]*))>", '&lt;' + b[0] + '&gt;', data, 1)
+                data = re.sub("<((?:\/)?" + b[1] + "(?:\s[^>]*))>", '&lt;' + b[0] + '&gt;', data, 1)
                 
                 break
         else:
@@ -75,7 +75,7 @@ def html_pas(data, how):
     data = re.sub('>', '&gt;', data)
     data = re.sub('"', '&quot;', data)
     
-    data = re.sub("%shtml%(?P<in>(?:\/)?(?:a|div|span|embed|iframe)(?:[^%]*))%ehtml%", "<\g<in>>", data)
+    data = re.sub("%shtml%(?P<in>(?:\/)?(?:a|div|span|embed|iframe)(?:\s[^%]*)?)%ehtml%", "<\g<in>>", data)
     data = re.sub('#.#', '"', data)
     
     return data
