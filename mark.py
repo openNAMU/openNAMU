@@ -710,12 +710,12 @@ def namumark(session, title, data):
                 namu += [results[0]]
                 namu += [results[1]]
 
-                tou = tou + "<span class='footnote-list'><a href=\"#rfn-" + str(a) + "\" id=\"fn-" + str(a) + "\">[" + results[0] + "]</a> " + results[1] + "</span><br>"
+                tou += "<span class='footnote-list'><a href=\"#rfn-" + str(a) + "\" id=\"fn-" + str(a) + "\">[" + results[0] + "]</a> " + results[1] + "</span><br>"
                 data = re.sub("\[\*([^\s]*)(?:\s(((?!\]).)*))?\]", "<sup><a href='javascript:void(0);' id=\"rfn-" + str(a) + "\" onclick=\"var f=document.getElementById('footnote_" + str(a) + "');var s=f.style.display=='inline';f.style.display=s?'none':'inline';this.className=s?'':'opened';\">[" + results[0] + "]</a></sup><span class='foot' id='footnote_" + str(a) + "' style='display:none;'><a class=\"footnotes\" href=\"#fn-" + str(a) + "\" onclick=\"var f=document.getElementById('footnote_" + str(a) + "');var s=f.style.display=='inline';f.style.display=s?'none':'inline';this.className=s?'':'opened';\">[" + results[0] + "]</a> <a href='javascript:void(0);' onclick=\"var f=document.getElementById('footnote_" + str(a) + "');var s=f.style.display=='inline';f.style.display=s?'none':'inline';this.className=s?'':'opened';\">[X]</a> " + results[1] + "</span>", data, 1)
                 
                 
             else:
-                tou = tou + "<span class='footnote-list'><a href=\"#rfn-" + str(a) + "\" id=\"fn-" + str(a) + "\">[" + str(a) + "]</a> " + results[1] + "</span><br>"
+                tou += "<span class='footnote-list'><a href=\"#rfn-" + str(a) + "\" id=\"fn-" + str(a) + "\">[" + str(a) + "]</a> " + results[1] + "</span><br>"
                 data = re.sub("\[\*([^\s]*)(?:\s(((?!\]).)*))?\]", "<sup><a href='javascript:void(0);' id=\"rfn-" + str(a) + "\" onclick=\"var f=document.getElementById('footnote_" + str(a) + "');var s=f.style.display=='inline';f.style.display=s?'none':'inline';this.className=s?'':'opened';\">[" + str(a) + "]</a></sup><span class='foot' id='footnote_" + str(a) + "' style='display:none;'><a class=\"footnotes\" href=\"#fn-" + str(a) + "\" onclick=\"var f=document.getElementById('footnote_" + str(a) + "');var s=f.style.display=='inline';f.style.display=s?'none':'inline';this.className=s?'':'opened';\">[" + str(a) + "]</a> <a href='javascript:void(0);' onclick=\"var f=document.getElementById('footnote_" + str(a) + "');var s=f.style.display=='inline';f.style.display=s?'none':'inline';this.className=s?'':'opened';\">[X]</a> " + results[1] + "</span>", data, 1)
 
             a += 1
@@ -730,10 +730,10 @@ def namumark(session, title, data):
     data = re.sub("\[각주\](?:(?:<br>| |\r|\n)+)?$", "", data)
     data = re.sub("(?:(?:<br>| |\r|\n)+)$", "", data)
     data = re.sub("\[각주\]", "<br>" + tou, data)
-    data = data + tou
+    data += tou
     
     if(category):
-        data = data + '<div style="width:100%;border: 1px solid #777;padding: 5px;margin-top: 1em;">분류: ' + category + '</div>'
+        data += '<div style="width:100%;border: 1px solid #777;padding: 5px;margin-top: 1em;">분류: ' + category + '</div>'
         
     data = re.sub("(?:\|\|\r\n)", "#table#<nobr>", data)
         
@@ -776,28 +776,28 @@ def namumark(session, title, data):
                         e = re.search("&lt;table\s?align=((?:(?!&gt;).)*)&gt;", result[1])
                         if(q):
                             resultss = q.groups()
-                            alltable = alltable + 'width:' + resultss[0] + ';'
+                            alltable += 'width:' + resultss[0] + ';'
                         if(w):
                             resultss = w.groups()
-                            alltable = alltable + 'height:' + resultss[0] + ';'
+                            alltable += 'height:' + resultss[0] + ';'
                         if(e):
                             resultss = e.groups()
                             if(resultss[0] == 'right'):
-                                alltable = alltable + 'margin-left:auto;'
+                                alltable += + 'margin-left:auto;'
                             elif(resultss[0] == 'center'):
-                                alltable = alltable + 'margin:auto;'
+                                alltable += 'margin:auto;'
                             else:
-                                alltable = alltable + 'margin-right:auto;'
+                                alltable += 'margin-right:auto;'
                                 
                         ee = re.search("&lt;table\s?textalign=((?:(?!&gt;).)*)&gt;", result[1])
                         if(ee):
                             resultss = ee.groups()
                             if(resultss[0] == 'right'):
-                                alltable = alltable + 'text-align:right;'
+                                alltable += 'text-align:right;'
                             elif(resultss[0] == 'center'):
-                                alltable = alltable + 'text-align:center;'
+                                alltable += 'text-align:center;'
                             else:
-                                alltable = alltable + 'text-align:left;'
+                                alltable += 'text-align:left;'
                         
                         r = re.search("&lt;-((?:(?!&gt;).)*)&gt;", result[1])
                         if(r):
@@ -816,88 +816,88 @@ def namumark(session, title, data):
                         bc = re.search("&lt;rowbgcolor=(\w+)&gt;", result[1])
                         if(ba):
                             resultss = ba.groups()
-                            rowstyle = rowstyle + 'background:' + resultss[0] + ';'
+                            rowstyle += 'background:' + resultss[0] + ';'
                         elif(bb):
                             resultss = bb.groups()
-                            rowstyle = rowstyle + 'background:' + resultss[0] + ';'
+                            rowstyle += 'background:' + resultss[0] + ';'
                         elif(bc):
                             resultss = bc.groups()
-                            rowstyle = rowstyle + 'background:' + resultss[0] + ';'
+                            rowstyle += 'background:' + resultss[0] + ';'
                             
                         z = re.search("&lt;table\s?bordercolor=(#[0-9a-f-A-F]{6})&gt;", result[1])
                         x = re.search("&lt;table\s?bordercolor=(#[0-9a-f-A-F]{3})&gt;", result[1])
                         c = re.search("&lt;table\s?bordercolor=(\w+)&gt;", result[1])
                         if(z):
                             resultss = z.groups()
-                            alltable = alltable + 'border:' + resultss[0] + ' 2px solid;'
+                            alltable += 'border:' + resultss[0] + ' 2px solid;'
                         elif(x):
                             resultss = x.groups()
-                            alltable = alltable + 'border:' + resultss[0] + ' 2px solid;'
+                            alltable += 'border:' + resultss[0] + ' 2px solid;'
                         elif(c):
                             resultss = c.groups()
-                            alltable = alltable + 'border:' + resultss[0] + ' 2px solid;'
+                            alltable += 'border:' + resultss[0] + ' 2px solid;'
                             
                         aq = re.search("&lt;table\s?bgcolor=(#[0-9a-f-A-F]{6})&gt;", result[1])
                         aw = re.search("&lt;table\s?bgcolor=(#[0-9a-f-A-F]{3})&gt;", result[1])
                         ae = re.search("&lt;table\s?bgcolor=(\w+)&gt;", result[1])
                         if(aq):
                             resultss = aq.groups()
-                            alltable = alltable + 'background:' + resultss[0] + ';'
+                            alltable += 'background:' + resultss[0] + ';'
                         elif(aw):
                             resultss = aw.groups()
-                            alltable = alltable + 'background:' + resultss[0] + ';'
+                            alltable += 'background:' + resultss[0] + ';'
                         elif(ae):
                             resultss = ae.groups()
-                            alltable = alltable + 'background:' + resultss[0] + ';'
+                            alltable += 'background:' + resultss[0] + ';'
                             
                         j = re.search("&lt;bgcolor=(#[0-9a-f-A-F]{6})&gt;", result[1])
                         k = re.search("&lt;bgcolor=(#[0-9a-f-A-F]{3})&gt;", result[1])
                         l = re.search("&lt;bgcolor=(\w+)&gt;", result[1])
                         if(j):
                             resultss = j.groups()
-                            celstyle = celstyle + 'background:' + resultss[0] + ';'
+                            celstyle += 'background:' + resultss[0] + ';'
                         elif(k):
                             resultss = k.groups()
-                            celstyle = celstyle + 'background:' + resultss[0] + ';'
+                            celstyle += 'background:' + resultss[0] + ';'
                         elif(l):
                             resultss = l.groups()
-                            celstyle = celstyle + 'background:' + resultss[0] + ';'
+                            celstyle += 'background:' + resultss[0] + ';'
                             
                         aa = re.search("&lt;(#[0-9a-f-A-F]{6})&gt;", result[1])
                         ab = re.search("&lt;(#[0-9a-f-A-F]{3})&gt;", result[1])
                         ac = re.search("&lt;(\w+)&gt;", result[1])
                         if(aa):
                             resultss = aa.groups()
-                            celstyle = celstyle + 'background:' + resultss[0] + ';'
+                            celstyle += 'background:' + resultss[0] + ';'
                         elif(ab):
                             resultss = ab.groups()
-                            celstyle = celstyle + 'background:' + resultss[0] + ';'
+                            celstyle += 'background:' + resultss[0] + ';'
                         elif(ac):
                             resultss = ac.groups()
-                            celstyle = celstyle + 'background:' + resultss[0] + ';'
+                            celstyle += 'background:' + resultss[0] + ';'
                             
                         qa = re.search("&lt;width=((?:(?!&gt;).)*)&gt;", result[1])
                         qb = re.search("&lt;height=((?:(?!&gt;).)*)&gt;", result[1])
                         if(qa):
                             resultss = qa.groups()
-                            celstyle = celstyle + 'width:' + resultss[0] + ';'
+                            celstyle += 'width:' + resultss[0] + ';'
                         if(qb):
                             resultss = qb.groups()
-                            celstyle = celstyle + 'height:' + resultss[0] + ';'
+                            celstyle += 'height:' + resultss[0] + ';'
                             
                         i = re.search("&lt;\)&gt;", result[1])
                         o = re.search("&lt;:&gt;", result[1])
                         p = re.search("&lt;\(&gt;", result[1])
                         if(i):
-                            celstyle = celstyle + 'text-align:right;'
+                            celstyle += 'text-align:right;'
                         elif(o):
-                            celstyle = celstyle + 'text-align:center;'
+                            celstyle += 'text-align:center;'
                         elif(p):
-                            celstyle = celstyle + 'text-align:left;'
+                            celstyle += 'text-align:left;'
                             
-                        alltable = alltable + '"'
-                        celstyle = celstyle + '"'
-                        rowstyle = rowstyle + '"'
+                        alltable += '"'
+                        celstyle += '"'
+                        rowstyle += '"'
                             
                         table = re.sub("^(\|\|(?:(?:\|\|)+)?)((?:&lt;(?:(?:(?!&gt;).)*)&gt;)+)?", "<table " + alltable + "><tbody><tr " + rowstyle + "><td " + cel + " " + row + " " + celstyle + ">", table, 1)
                     else:
