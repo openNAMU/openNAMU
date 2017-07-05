@@ -50,43 +50,57 @@ def admin_check(num, session):
     db_ex("select acl from user where id = '" + db_pas(ip) + "'")
     user = db_get()
     if(user):
-        db_ex("select acl from alist where name = '" + db_pas(user[0]['acl']) + "'")
-        adata = db_get()
-        if(adata):
-            i = 0
-            while(True):
-                try:
-                    if(num == 1 and adata[i]['acl'] == 'ban'):
-                        return 1
-                        
-                        break
-                    elif(num == 2 and adata[i]['acl'] == 'mdel'):
-                        return 1
-                        
-                        break
-                    elif(num == 3 and adata[i]['acl'] == 'toron'):
-                        return 1
-                        
-                        break
-                    elif(num == 4 and adata[i]['acl'] == 'check'):
-                        return 1
-                        
-                        break
-                    elif(num == 5 and adata[i]['acl'] == 'acl'):
-                        return 1
-                        
-                        break
-                    elif(num == 6 and adata[i]['acl'] == 'hidel'):
-                        return 1
-                        
-                        break
-                    elif(adata[i]['acl'] == 'owner'):
-                        return 1
-                        
-                        break
-                    else:
-                        i += 1
-                except:
+        reset = False
+        while(True):
+            print(reset)
+            if(num == 1 and reset == False):
+                db_ex('select name from alist where name = "' + db_pas(user[0]["acl"]) + '" and acl = "ban"')
+                acl_data = db_get()
+                if(acl_data):
+                    return 1
+                else:
+                    reset = True
+            elif(num == 2 and reset == False):
+                db_ex('select name from alist where name = "' + db_pas(user[0]["acl"]) + '" and acl = "mdel"')
+                acl_data = db_get()
+                if(acl_data):
+                    return 1
+                else:
+                    reset = True
+            elif(num == 3 and reset == False):
+                db_ex('select name from alist where name = "' + db_pas(user[0]["acl"]) + '" and acl = "toron"')
+                acl_data = db_get()
+                if(acl_data):
+                    return 1
+                else:
+                    reset = True
+            elif(num == 4 and reset == False):
+                db_ex('select name from alist where name = "' + db_pas(user[0]["acl"]) + '" and acl = "check"')
+                acl_data = db_get()
+                if(acl_data):
+                    return 1
+                else:
+                    reset = True
+            elif(num == 5 and reset == False):
+                db_ex('select name from alist where name = "' + db_pas(user[0]["acl"]) + '" and acl = "acl"')
+                acl_data = db_get()
+                if(acl_data):
+                    return 1
+                else:
+                    reset = True
+            elif(num == 6 and reset == False):
+                db_ex('select name from alist where name = "' + db_pas(user[0]["acl"]) + '" and acl = "hidel"')
+                acl_data = db_get()
+                if(acl_data):
+                    return 1
+                else:
+                    reset = True
+            else:
+                db_ex('select name from alist where name = "' + db_pas(user[0]["acl"]) + '" and acl = "owner"')
+                acl_data = db_get()
+                if(acl_data):
+                    return 1
+                else:
                     break
                 
 def include_check(name, data):
