@@ -350,13 +350,19 @@ body {
 
 #left_bar {
     height: 100%;
-    width: 10%;
+    width: 15%;
     position: fixed;
-    overflow: scroll;
+    overflow-y: scroll;
     left: 0;
     top: 0;
     background: white;
     padding: 20px;
+}
+
+@media (min-width: 1920px) {
+    #left_bar {
+        width: 12%;
+    }
 }
 
 #yosolo {
@@ -515,5 +521,5 @@ td#block {
     text-align: center;
     z-index: 10000;
     max-height: 30%;
-    overflow: scroll;
+    overflow-y: scroll;
 }
