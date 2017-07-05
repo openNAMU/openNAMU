@@ -17,13 +17,13 @@ db_pas = pymysql.escape_string
 
 db_ex("use " + set_data['db'])
 
-def savemark(session, data):
+def savemark(data):
     data = re.sub("\[date\(now\)\]", get_time(), data)
     
-    if(not re.search("\.", ip_check(session))):
-        name = '[[사용자:' + ip_check(session) + '|' + ip_check(session) + ']]'
+    if(not re.search("\.", ip_check())):
+        name = '[[사용자:' + ip_check() + '|' + ip_check() + ']]'
     else:
-        name = ip_check(session)
+        name = ip_check()
         
     data = re.sub("\[name\]", name, data)
 
@@ -211,7 +211,7 @@ def cat_plus(name, link):
         db_ex("insert into cat (title, cat) value ('" + db_pas(link) + "', '" + db_pas(name) + "')")
         db_com()
 
-def namumark(session, title, data):
+def namumark(title, data):
     data = html_pas(data, 1)
 
     b = 0
@@ -221,7 +221,7 @@ def namumark(session, title, data):
     b = a[1]
     
     data = re.sub("\[anchor\((?P<in>[^\[\]]*)\)\]", '<span id="\g<in>"></span>', data)
-    data = savemark(session, data)
+    data = savemark(data)
 
     i = 1
     while(True):

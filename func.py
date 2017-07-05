@@ -1,4 +1,5 @@
-﻿from bottle import request
+﻿from bottle import request, app
+from bottle.ext import beaker
 from urllib import parse
 import json
 import pymysql
@@ -24,6 +25,14 @@ def db_get():
 def sha224(data):
     return hashlib.sha224(bytes(data, 'utf-8')).hexdigest()
     
+session_opts = {
+    'session.type': 'file',
+    'session.data_dir': './app_session/',
+    'session.auto': True
+}
+
+app = beaker.middleware.SessionMiddleware(app(), session_opts)
+    
 db_ex = curs.execute
 db_pas = pymysql.escape_string
 
@@ -45,14 +54,13 @@ def diff(seqm):
             
     return ''.join(output)
            
-def admin_check(num, session):
-    ip = ip_check(session) 
+def admin_check(num):
+    ip = ip_check() 
     db_ex("select acl from user where id = '" + db_pas(ip) + "'")
     user = db_get()
     if(user):
         reset = False
         while(True):
-            print(reset)
             if(num == 1 and reset == False):
                 db_ex('select name from alist where name = "' + db_pas(user[0]["acl"]) + '" and acl = "ban"')
                 acl_data = db_get()
@@ -118,7 +126,8 @@ def include_check(name, data):
                     
                 i += 1
     
-def login_check(session):
+def login_check():
+    session = request.environ.get('beaker.session')
     if(session.get('Now') == True):
         return 1
     else:
@@ -163,7 +172,8 @@ def ip_pas(raw_ip, num):
 
     return ip
 
-def ip_check(session):
+def ip_check():
+    session = request.environ.get('beaker.session')
     if(session.get('Now') == True):
         ip = format(session['DREAMER'])
     else:
@@ -174,7 +184,8 @@ def ip_check(session):
 
     return ip
 
-def custom_css_user(session):
+def custom_css_user():
+    session = request.environ.get('beaker.session')
     if(session.get('Now') == True):
         try:
             data = format(session['Daydream'])
@@ -185,7 +196,7 @@ def custom_css_user(session):
 
     return data
 
-def acl_check(session, ip, name):
+def acl_check(ip, name):
     m = re.search("^사용자:(.*)", name)
     n = re.search("^파일:(.*)", name)
     if(m):
@@ -203,7 +214,7 @@ def acl_check(session, ip, name):
         else:
             return 1
     elif(n):
-        if(not owner_check(session)  == 1):
+        if(not admin_check() == 1):
             return 1
     else:
         b = re.search("^([0-9](?:[0-9]?[0-9]?)\.[0-9](?:[0-9]?[0-9]?))", ip)
