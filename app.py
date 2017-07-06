@@ -2585,23 +2585,6 @@ def random():
         return redirect('/w/' + url_pas(rows[0]['title']))
     else:
         return redirect('/')
-
-@route('/static/<name:path>')
-def static(name = None):
-    if(re.search('\/', name)):
-        m = re.search('^(.*)\/(.*)$', name)
-        if(m):
-            n = m.groups()
-            plus = '/' + n[0]
-            rename = n[1]
-        else:
-            plus = ''
-            rename = name
-    else:
-        plus = ''
-        rename = name
-        
-    return static_file(rename, root = './static' + plus)
     
 @route('/views/<name:path>')
 def views(name = None):
