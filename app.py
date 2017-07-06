@@ -128,7 +128,7 @@ def db_get():
 
 start()
 
-r_ver = '2.0.5b'
+r_ver = '2.0.5c'
 
 db_ex('select data from other where name = "version"')
 version = db_get()
