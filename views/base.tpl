@@ -16,7 +16,7 @@
         <meta name="twitter:site" content="@{{logo}}">
         <meta name="twitter:card" content="summary">
         <meta name="twitter:description" content="{{get('data', 'None')}}" />
-        <link rel="shortcut icon" href="/views/images/on.ico">
+        <link rel="shortcut icon" href="/views/img/on.ico">
         <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
         {{get('custom', '')}}
@@ -84,7 +84,7 @@
                     {{!license}}
                 </p>
                 <div id="powered">
-                    <a href="https://github.com/2DU/openNAMU"><img src="/views/image/on2.png" width="100px"></a>
+                    <a href="https://github.com/2DU/openNAMU"><img src="/views/img/on2.png" width="100px"></a>
                 </div>
             </div>
         </div>
