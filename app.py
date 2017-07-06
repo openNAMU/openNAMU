@@ -308,7 +308,7 @@ def list_acl():
 
 @route('/adminplus/<name:path>', method=['POST', 'GET'])
 def admin_plus(name = None):
-    if(admin_check(None, session) == 1):
+    if(admin_check(None) == 1):
         if(request.method == 'POST'):
             db_ex("delete from alist where name = '" + db_pas(name) + "'")
             
@@ -638,7 +638,7 @@ def user_log(number = None):
         
 @route('/backreset')
 def backlink_reset():
-    if(admin_check(None, session) == 1):
+    if(admin_check(None) == 1):
         i = 0
         
         db_ex("delete from back")
@@ -2169,7 +2169,7 @@ def acl(name = None):
 @route('/admin/<name:path>', method=['POST', 'GET'])
 def user_admin(name = None):
     if(request.method == 'POST'):
-        if(admin_check(None, session) == 1):
+        if(admin_check(None) == 1):
             db_ex("select * from user where id = '" + db_pas(name) + "'")
             user = db_get()
             if(user):
@@ -2185,7 +2185,7 @@ def user_admin(name = None):
         else:
             return redirect('/error/3')
     else:
-        if(admin_check(None, session) == 1):
+        if(admin_check(None) == 1):
             db_ex("select * from user where id = '" + db_pas(name) + "'")
             user = db_get()
             if(user):
@@ -2602,6 +2602,23 @@ def static(name = None):
         rename = name
         
     return static_file(rename, root = './static' + plus)
+    
+@route('/views/<name:path>')
+def views(name = None):
+    if(re.search('\/', name)):
+        m = re.search('^(.*)\/(.*)$', name)
+        if(m):
+            n = m.groups()
+            plus = '/' + n[0]
+            rename = n[1]
+        else:
+            plus = ''
+            rename = name
+    else:
+        plus = ''
+        rename = name
+        
+    return static_file(rename, root = './views' + plus)
         
 @route('/error/<num:int>')
 def error_test(num = None):

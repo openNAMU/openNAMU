@@ -1,9 +1,9 @@
 <html>
     <head>
         <title>{{title}} - {{logo}}</title>
-        <link rel="stylesheet" href="/static/primer.css">
-        <link rel="stylesheet" href="/static/style.css">
-        <link rel="stylesheet" href="/static/font-awesome/css/font-awesome.min.css">
+        <link rel="stylesheet" href="/views/css/primer.css">
+        <link rel="stylesheet" href="/views/css/style.css">
+        <link rel="stylesheet" href="/views/css/awesome/font-awesome.min.css">
         <script type="text/x-mathjax-config">
           MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
         </script>
@@ -15,7 +15,7 @@
         <meta name="twitter:site" content="@{{logo}}">
         <meta name="twitter:card" content="summary">
         <meta name="twitter:description" content="{{get('data', 'None')}}" />
-        <link rel="shortcut icon" href="/static/images/on.ico">
+        <link rel="shortcut icon" href="/views/images/on.ico">
         <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
         {{get('custom', '')}}
@@ -83,7 +83,7 @@
                     {{!license}}
                 </p>
                 <div id="powered">
-                    <a href="https://github.com/2DU/openNAMU"><img src="/static/images/on2.png" width="100px"></a>
+                    <a href="https://github.com/2DU/openNAMU"><img src="/views/image/on2.png" width="100px"></a>
                 </div>
             </div>
         </div>
