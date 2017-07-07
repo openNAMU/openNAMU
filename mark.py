@@ -787,7 +787,7 @@ def namumark(title, data):
                         if(e):
                             resultss = e.groups()
                             if(resultss[0] == 'right'):
-                                alltable += + 'margin-left:auto;'
+                                alltable += 'margin-left:auto;'
                             elif(resultss[0] == 'center'):
                                 alltable += 'margin:auto;'
                             else:
