@@ -2071,7 +2071,6 @@ def logout():
     session = request.environ.get('beaker.session')
     session['Now'] = False
     session.pop('DREAMER', None)
-    session.pop('Daydream', None)
 
     return redirect('/user')
     
@@ -2541,12 +2540,11 @@ def user_info():
 @route('/custom', method=['GET', 'POST'])
 def custom_css():
     session = request.environ.get('beaker.session')
-    if(not session.get('Now') == True):
-        return redirect('/login')
-    else:
-        ip = ip_check()
 
-        if(request.method == 'POST'):
+    ip = ip_check()
+
+    if(request.method == 'POST'):
+        if(not re.search('\.', ip)):
             db_ex("select * from custom where user = '" + db_pas(ip) + "'")
             css_data = db_get()
             if(css_data):
@@ -2555,18 +2553,26 @@ def custom_css():
                 db_ex("insert into custom (user, css) value ('" + db_pas(ip) + "', '" + db_pas(request.forms.content) + "')")
             db_com()
 
-            session['Daydream'] = request.forms.content
+        session['Daydream'] = request.forms.content
 
-            return redirect('/user')
-        else:
+        return redirect('/user')
+    else:
+        if(not re.search('\.', ip)):
+            start = ''
             db_ex("select * from custom where user = '" + db_pas(ip) + "'")
             css_data = db_get()
             if(css_data):
                 data = css_data[0]['css']
             else:
                 data = ''
+        else:
+            start = '<span>비 로그인의 경우에는 로그인하면 날아갑니다.</span><br><br>'
+            try:
+                data = session['Daydream']
+            except:
+                data = ''
 
-            return template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '커스텀 CSS', logo = set_data['name'], data = '<form id="usrform" name="f1" method="POST" action="/custom"><textarea rows="30" cols="100" name="content" form="usrform">' + data + '</textarea><div class="form-actions"><button class="btn btn-primary" type="submit">저장</button></div></form>')
+        return template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '커스텀 CSS', logo = set_data['name'], data = start + '<form id="usrform" name="f1" method="POST" action="/custom"><textarea rows="30" cols="100" name="content" form="usrform">' + data + '</textarea><div class="form-actions"><button class="btn btn-primary" type="submit">저장</button></div></form>')
     
 @route('/count')
 def count_edit():

@@ -186,12 +186,9 @@ def ip_check():
 
 def custom_css_user():
     session = request.environ.get('beaker.session')
-    if(session.get('Now') == True):
-        try:
-            data = format(session['Daydream'])
-        except:
-            data = ''
-    else:
+    try:
+        data = format(session['Daydream'])
+    except:
         data = ''
 
     return data
