@@ -7,10 +7,10 @@ conn = pymysql.connect(host = set_data['host'], user = set_data['user'], passwor
 curs = conn.cursor(pymysql.cursors.DictCursor)
 
 def db_com():
-    return conn.commit()
+    return(conn.commit())
     
 def db_get():
-    return curs.fetchall()
+    return(curs.fetchall())
     
 db_ex = curs.execute
 db_pas = pymysql.escape_string
@@ -27,7 +27,7 @@ def savemark(data):
         
     data = re.sub("\[name\]", name, data)
 
-    return data
+    return(data)
 
 def html_pas(data, how):
     while(True):
@@ -78,7 +78,7 @@ def html_pas(data, how):
     data = re.sub("%shtml%(?P<in>(?:\/)?(?:a|div|span|embed|iframe)(?:\s[^%]*)?)%ehtml%", "<\g<in>>", data)
     data = re.sub('#.#', '"', data)
     
-    return data
+    return(data)
     
 def mid_pas(data, fol_num, include):
     while(True):
@@ -195,7 +195,7 @@ def mid_pas(data, fol_num, include):
     data = re.sub("<span>&</span><span>l</span><span>t</span><span>;</span>", "<span>&lt;</span>", data)
     data = re.sub("<span>&</span><span>g</span><span>t</span><span>;</span>", "<span>&gt;</span>", data)
             
-    return (data, fol_num)
+    return((data, fol_num))
 
 def backlink_plus(name, link, backtype):
     db_ex("select title from back where title = '" + db_pas(link) + "' and link = '" + db_pas(name) + "' and type = '" + backtype + "'")
@@ -1091,4 +1091,4 @@ def namumark(title, data):
     data = re.sub('\n', '<br>', data)
     data = re.sub('^<br>', '', data)
     
-    return data
+    return(data)

@@ -14,16 +14,16 @@ conn = pymysql.connect(host = set_data['host'], user = set_data['user'], passwor
 curs = conn.cursor(pymysql.cursors.DictCursor)
 
 def db_com():
-    return conn.commit()
+    return(conn.commit())
 
 def url_pas(data):
-    return parse.quote(data).replace('/','%2F')
+    return(parse.quote(data).replace('/','%2F'))
     
 def db_get():
-    return curs.fetchall()
+    return(curs.fetchall())
 
 def sha224(data):
-    return hashlib.sha224(bytes(data, 'utf-8')).hexdigest()
+    return(hashlib.sha224(bytes(data, 'utf-8')).hexdigest())
     
 session_opts = {
     'session.type': 'file',
@@ -52,7 +52,7 @@ def diff(seqm):
         else:
             output.append(seqm.a[a0:a1])
             
-    return ''.join(output)
+    return(''.join(output))
            
 def admin_check(num):
     ip = ip_check() 
@@ -65,49 +65,49 @@ def admin_check(num):
                 db_ex('select name from alist where name = "' + db_pas(user[0]["acl"]) + '" and acl = "ban"')
                 acl_data = db_get()
                 if(acl_data):
-                    return 1
+                    return(1)
                 else:
                     reset = True
             elif(num == 2 and reset == False):
                 db_ex('select name from alist where name = "' + db_pas(user[0]["acl"]) + '" and acl = "mdel"')
                 acl_data = db_get()
                 if(acl_data):
-                    return 1
+                    return(1)
                 else:
                     reset = True
             elif(num == 3 and reset == False):
                 db_ex('select name from alist where name = "' + db_pas(user[0]["acl"]) + '" and acl = "toron"')
                 acl_data = db_get()
                 if(acl_data):
-                    return 1
+                    return(1)
                 else:
                     reset = True
             elif(num == 4 and reset == False):
                 db_ex('select name from alist where name = "' + db_pas(user[0]["acl"]) + '" and acl = "check"')
                 acl_data = db_get()
                 if(acl_data):
-                    return 1
+                    return(1)
                 else:
                     reset = True
             elif(num == 5 and reset == False):
                 db_ex('select name from alist where name = "' + db_pas(user[0]["acl"]) + '" and acl = "acl"')
                 acl_data = db_get()
                 if(acl_data):
-                    return 1
+                    return(1)
                 else:
                     reset = True
             elif(num == 6 and reset == False):
                 db_ex('select name from alist where name = "' + db_pas(user[0]["acl"]) + '" and acl = "hidel"')
                 acl_data = db_get()
                 if(acl_data):
-                    return 1
+                    return(1)
                 else:
                     reset = True
             else:
                 db_ex('select name from alist where name = "' + db_pas(user[0]["acl"]) + '" and acl = "owner"')
                 acl_data = db_get()
                 if(acl_data):
-                    return 1
+                    return(1)
                 else:
                     break
                 
@@ -129,9 +129,9 @@ def include_check(name, data):
 def login_check():
     session = request.environ.get('beaker.session')
     if(session.get('Now') == True):
-        return 1
+        return(1)
     else:
-        return 0
+        return(0)
 
 def ip_pas(raw_ip, num):
     yes = re.search("([^-]*)\s\-\s(Close|Reopen|Stop|Restart|Admin|Agreement|Settlement)$", raw_ip)
@@ -170,7 +170,7 @@ def ip_pas(raw_ip, num):
         else:
             ip += ' <a href="/record/' + url_pas(raw_ip) + '/n/1">(기록)</a>'
 
-    return ip
+    return(ip)
 
 def ip_check():
     session = request.environ.get('beaker.session')
@@ -182,7 +182,7 @@ def ip_check():
         else:
             ip = request.environ.get('REMOTE_ADDR')
 
-    return ip
+    return(ip)
 
 def custom_css_user():
     session = request.environ.get('beaker.session')
@@ -191,7 +191,7 @@ def custom_css_user():
     except:
         data = ''
 
-    return data
+    return(data)
 
 def acl_check(ip, name):
     m = re.search("^사용자:(.*)", name)
@@ -200,19 +200,19 @@ def acl_check(ip, name):
         g = m.groups()
         if(ip == g[0]):
             if(re.search("\.", g[0])):
-                return 1
+                return(1)
             else:
                 db_ex("select * from ban where block = '" + db_pas(ip) + "'")
                 rows = db_get()
                 if(rows):
-                    return 1
+                    return(1)
                 else:
-                    return 0
+                    return(0)
         else:
-            return 1
+            return(1)
     elif(n):
         if(not admin_check() == 1):
-            return 1
+            return(1)
     else:
         b = re.search("^([0-9](?:[0-9]?[0-9]?)\.[0-9](?:[0-9]?[0-9]?))", ip)
         if(b):
@@ -220,12 +220,12 @@ def acl_check(ip, name):
             db_ex("select * from ban where block = '" + db_pas(results[0]) + "' and band = 'O'")
             rowss = db_get()
             if(rowss):
-                return 1
+                return(1)
             else:
                 db_ex("select * from ban where block = '" + db_pas(ip) + "'")
                 rows = db_get()
                 if(rows):
-                    return 1
+                    return(1)
                 else:
                     db_ex("select acl from data where title = '" + db_pas(name) + "'")
                     row = db_get()
@@ -234,26 +234,26 @@ def acl_check(ip, name):
                         rows = db_get()
                         if(row[0]['acl'] == 'user'):
                             if(rows):
-                                return 0
+                                return(0)
                             else:
-                                return 1
+                                return(1)
                         elif(row[0]['acl'] == 'admin'):
                             if(rows):
                                 if(rows[0]['acl'] == 'admin' or rows[0]['acl'] == 'owner'):
-                                    return 0
+                                    return(0)
                                 else:
-                                    return 1
+                                    return(1)
                             else:
-                                return 1
+                                return(1)
                         else:
-                            return 0
+                            return(0)
                     else:
-                        return 0
+                        return(0)
         else:
             db_ex("select * from ban where block = '" + db_pas(ip) + "'")
             rows = db_get()
             if(rows):
-                return 1
+                return(1)
             else:
                 db_ex("select acl from data where title = '" + db_pas(name) + "'")
                 row = db_get()
@@ -262,21 +262,21 @@ def acl_check(ip, name):
                     rows = db_get()
                     if(row[0]['acl'] == 'user'):
                         if(rows):
-                            return 0
+                            return(0)
                         else:
-                            return 1
+                            return(1)
                     elif(row[0]['acl'] == 'admin'):
                         if(rows):
                             if(rows[0]['acl'] == 'admin' or rows[0]['acl'] == 'owner'):
-                                return 0
+                                return(0)
                             else:
-                                return 1
+                                return(1)
                         else:
-                            return 1
+                            return(1)
                     else:
-                        return 0
+                        return(0)
                 else:
-                    return 0
+                    return(0)
 
 def ban_check(ip):
     b = re.search("^([0-9](?:[0-9]?[0-9]?)\.[0-9](?:[0-9]?[0-9]?))", ip)
@@ -285,21 +285,21 @@ def ban_check(ip):
         db_ex("select * from ban where block = '" + db_pas(results[0]) + "' and band = 'O'")
         rowss = db_get()
         if(rowss):
-            return 1
+            return(1)
         else:
             db_ex("select * from ban where block = '" + db_pas(ip) + "'")
             rows = db_get()
             if(rows):
-                return 1
+                return(1)
             else:
-                return 0
+                return(0)
     else:
         db_ex("select * from ban where block = '" + db_pas(ip) + "'")
         rows = db_get()
         if(rows):
-            return 1
+            return(1)
         else:
-            return 0
+            return(0)
         
 def topic_check(ip, name, sub):
     b = re.search("^([0-9](?:[0-9]?[0-9]?)\.[0-9](?:[0-9]?[0-9]?))", ip)
@@ -308,37 +308,37 @@ def topic_check(ip, name, sub):
         db_ex("select * from ban where block = '" + db_pas(results[0]) + "' and band = 'O'")
         rowss = db_get()
         if(rowss):
-            return 1
+            return(1)
         else:
             db_ex("select * from ban where block = '" + db_pas(ip) + "'")
             rows = db_get()
             if(rows):
-                return 1
+                return(1)
             else:
                 db_ex("select * from stop where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "'")
                 rows = db_get()
                 if(rows):
-                    return 1
+                    return(1)
                 else:
-                    return 0
+                    return(0)
     else:
         db_ex("select * from ban where block = '" + db_pas(ip) + "'")
         rows = db_get()
         if(rows):
-            return 1
+            return(1)
         else:
             db_ex("select * from stop where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "'")
             rows = db_get()
             if(rows):
-                return 1
+                return(1)
             else:
-                return 0
+                return(0)
 
 def get_time():
     now = time.localtime()
     date = "%04d-%02d-%02d %02d:%02d:%02d" % (now.tm_year, now.tm_mon, now.tm_mday, now.tm_hour, now.tm_min, now.tm_sec)
     
-    return date
+    return(date)
 
 def rd_plus(title, sub, date):
     db_ex("select * from rd where title = '" + db_pas(title) + "' and sub = '" + db_pas(sub) + "'")
@@ -374,4 +374,4 @@ def leng_check(a, b):
     else:
         c = '0'
         
-    return c
+    return(c)
