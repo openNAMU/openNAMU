@@ -1956,7 +1956,7 @@ def change_password():
                 db_ex("select * from user where id = '" + db_pas(request.forms.id) + "'")
                 user = db_get()
                 if(user):
-                    if(session.get('Now') == True):
+                    if(not re.search('\.', ip)):
                         return(redirect('/logout'))
                     elif(bcrypt.checkpw(bytes(request.forms.pw, 'utf-8'), bytes(user[0]['pw'], 'utf-8'))):
                         hashed = bcrypt.hashpw(bytes(request.forms.pw2, 'utf-8'), bcrypt.gensalt())
@@ -1975,7 +1975,7 @@ def change_password():
         if(ban == 1):
             return(redirect('/ban'))
         else:
-            if(session.get('Now') == True):
+            if(not re.search('\.', ip)):
                 return(redirect('/logout'))
             else:
                 return(template('login', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '비밀번호 변경', enter = '변경', logo = set_data['name']))
