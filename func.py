@@ -211,7 +211,7 @@ def acl_check(ip, name):
         else:
             return(1)
     elif(n):
-        if(not admin_check() == 1):
+        if(not admin_check(None) == 1):
             return(1)
     else:
         b = re.search("^([0-9](?:[0-9]?[0-9]?)\.[0-9](?:[0-9]?[0-9]?))", ip)

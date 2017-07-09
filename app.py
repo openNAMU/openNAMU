@@ -421,6 +421,7 @@ def recent_changes():
                 title = rows[i]['title']
                 title = re.sub('<', '&lt;', title)
                 title = re.sub('>', '&gt;', title)
+                title = re.sub('"', '&quot;', title)
                 
                 m = re.search("\+", rows[i]['leng'])
                 n = re.search("\-", rows[i]['leng'])
@@ -519,6 +520,7 @@ def user_record(name = None, num = None):
                 title = rows[i]['title']
                 title = re.sub('<', '&lt;', title)
                 title = re.sub('>', '&gt;', title)
+                title = re.sub('"', '&quot;', title)
                 
                 m = re.search("\+", rows[i]['leng'])
                 n = re.search("\-", rows[i]['leng'])
@@ -754,10 +756,12 @@ def recent_discuss():
                 title = rows[i]['title']
                 title = re.sub('<', '&lt;', title)
                 title = re.sub('>', '&gt;', title)
+                title = re.sub('"', '&quot;', title)
                 
                 sub = rows[i]['sub']
                 sub = re.sub('<', '&lt;', sub)
                 sub = re.sub('>', '&gt;', sub)
+                sub = re.sub('"', '&quot;', sub)
                 
                 div += '<tr><td style="text-align: center;width:50%;"><a href="/topic/' + url_pas(rows[i]['title']) + '/sub/' + url_pas(rows[i]['sub']) + '">' + title + '</a> (' + sub + ')</td><td style="text-align: center;width:50%;">' + rows[i]['date'] + '</td></tr>'
                 
@@ -785,6 +789,7 @@ def blocklog(number = None):
                 why = rows[i]['why']
                 why = re.sub('<', '&lt;', why)
                 why = re.sub('>', '&gt;', why)
+                why = re.sub('"', '&quot;', why)
                 
                 b = re.search("^([0-9]{1,3}\.[0-9]{1,3})$", rows[i]['block'])
                 if(b):
@@ -2475,10 +2480,12 @@ def close_topic_list(name = None, num = None):
                 title = rows[i]['title']
                 title = re.sub('<', '&lt;', title)
                 title = re.sub('>', '&gt;', title)
+                title = re.sub('"', '&quot;', title)
 
                 sub = rows[i]['sub']
                 sub = re.sub('<', '&lt;', sub)
                 sub = re.sub('>', '&gt;', sub)
+                sub = re.sub('"', '&quot;', sub)
                     
                 if(ydmin == 1):
                     db_ex("select * from ban where block = '" + db_pas(rows[i]['ip']) + "'")

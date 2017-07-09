@@ -30,6 +30,7 @@ def savemark(data):
     return(data)
 
 def html_pas(data, how):
+    data = re.sub("%phtml%(?P<in>(?:\/)?(?:a|div|span|embed|iframe)(?:\s[^%]*)?)%phtml%", "<\g<in>>", data)   
     while(True):
         if(how == 1):
             y = re.search("<((a|div|span|embed|iframe)(?:\s[^>]*))>", data)
@@ -40,7 +41,7 @@ def html_pas(data, how):
             b = y.groups()
 
             if(re.search("<(\/" + b[1] + ")>", data)):
-                xss_test = re.search('src=(?:"|\')(http(s)?:\/\/([^\/]*)\/(?:[^"\']*))(?:"|\')', b[0])
+                xss_test = re.search('src=(?:"|\')?(http(s)?:\/\/([^\/]*)\/(?:[^"\' ]*))(?:"|\')?', b[0])
                 
                 if(xss_test):
                     check = xss_test.groups()
@@ -56,14 +57,14 @@ def html_pas(data, how):
 
                 try:
                     if(not check[1] == None):
-                        data = re.sub("<((?:\/)?" + b[1] + "(?:\s[^>]*))>", "%shtml%" + a + "%ehtml%", data, 1)
-                        data = re.sub("<\/" + b[1] + ">", "%shtml%/" + b[1] + "%ehtml%", data, 1)
+                        data = re.sub("<((?:\/)?" + b[1] + "(?:\s[^>]*))>", "%phtml%" + a + "%phtml%", data, 1)
+                        data = re.sub("<\/" + b[1] + ">", "%phtml%/" + b[1] + "%phtml%", data, 1)
                     else:
                         data = re.sub("<((?:\/)?" + b[1] + "(?:\s[^>]*))>", "[[" + check[0] + "]]", data, 1)
                         data = re.sub("<\/" + b[1] + ">", "", data, 1)
                 except:
-                    data = re.sub("<((?:\/)?" + b[1] + "(?:\s[^>]*))>", "%shtml%" + a + "%ehtml%", data, 1)
-                    data = re.sub("<\/" + b[1] + ">", "%shtml%/" + b[1] + "%ehtml%", data, 1)
+                    data = re.sub("<((?:\/)?" + b[1] + "(?:\s[^>]*))>", "%phtml%" + a + "%phtml%", data, 1)
+                    data = re.sub("<\/" + b[1] + ">", "%phtml%/" + b[1] + "%phtml%", data, 1)
             else:
                 data = re.sub("<((?:\/)?" + b[1] + "(?:\s[^>]*))>", '&lt;' + b[0] + '&gt;', data, 1)
                 
@@ -75,9 +76,8 @@ def html_pas(data, how):
     data = re.sub('>', '&gt;', data)
     data = re.sub('"', '&quot;', data)
     
-    data = re.sub("%shtml%(?P<in>(?:\/)?(?:a|div|span|embed|iframe)(?:\s[^%]*)?)%ehtml%", "<\g<in>>", data)
+    data = re.sub("%phtml%(?P<in>(?:\/)?(?:a|div|span|embed|iframe)(?:\s[^%]*)?)%phtml%", "<\g<in>>", data)
     data = re.sub('#.#', '"', data)
-    
     return(data)
     
 def mid_pas(data, fol_num, include):
@@ -186,14 +186,11 @@ def mid_pas(data, fol_num, include):
             mid_data = re.sub('<span style="color:(?:#)?(?P<in>[^"]*)">', "{{{#\g<in> ", mid_data)
             mid_data = re.sub('<span style="background:(?:#)?(?P<in>[^"]*)">', "{{{@\g<in> ", mid_data)
             mid_data = re.sub('<div style="(?P<in>[^"]*)">', "{{{#!wiki style=&quot;\g<in>&quot;\n", mid_data)
-            mid_data = re.sub("(?P<in>.)", "<span>\g<in></span>", mid_data)
+            mid_data = re.sub("(?P<in>.)", "<nowiki>\g<in></nowiki>", mid_data)
             
             data = com.sub(mid_data, data, 1)
         else:
             break
-            
-    data = re.sub("<span>&</span><span>l</span><span>t</span><span>;</span>", "<span>&lt;</span>", data)
-    data = re.sub("<span>&</span><span>g</span><span>t</span><span>;</span>", "<span>&gt;</span>", data)
             
     return((data, fol_num))
 
@@ -272,7 +269,7 @@ def namumark(title, data):
                             else:
                                 break       
 
-                    data = re.sub("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]", '\n#nobr#<div>' + in_data + '</div>\n#nobr#', data, 1)
+                    data = re.sub("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]", '\n<nobr><div>' + in_data + '</div>\n<nobr>', data, 1)
                 else:
                     data = re.sub("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]", "<a class=\"not_thing\" href=\"" + url_pas(results[0]) + "\">" + results[0] + "</a>", data, 1)
         else:
@@ -384,7 +381,7 @@ def namumark(title, data):
                 else:
                     span = ''
 
-            rtoc = rtoc + span + '<a href="#s-' + toc + '">' + toc + '</a>. ' + result[1] + '<br>'
+            rtoc += span + '<a href="#s-' + toc + '">' + toc + '</a>. ' + result[1] + '<br>'
 
             c = re.sub(" $", "", result[1])
             d = c
@@ -415,7 +412,7 @@ def namumark(title, data):
                     else:
                         red = 'class="not_thing"'
                         
-                    category = category + '<a ' + red + ' href="/w/' + url_pas(g[0]) + '">' + re.sub("분류:", "", g[0]) + '</a>'
+                    category += '<a ' + red + ' href="/w/' + url_pas(g[0]) + '">' + re.sub("분류:", "", g[0]) + '</a>'
                 else:
                     db_ex("select title from data where title = '" + db_pas(g[0]) + "'")
                     exists = db_get()
@@ -424,7 +421,7 @@ def namumark(title, data):
                     else:
                         red = 'class="not_thing"'
                         
-                    category = category + ' / ' + '<a ' + red + ' href="/w/' + url_pas(g[0]) + '">' + re.sub("분류:", "", g[0]) + '</a>'
+                    category += ' / ' + '<a ' + red + ' href="/w/' + url_pas(g[0]) + '">' + re.sub("분류:", "", g[0]) + '</a>'
             
             data = re.sub("\[\[(분류:(?:(?:(?!\]\]).)*))\]\]", '', data, 1)
         else:
@@ -517,104 +514,57 @@ def namumark(title, data):
             break
      
     data = re.sub("\[\[(?::(?P<in>(?:분류|파일):(?:(?:(?!\]\]).)*)))\]\]", "[[\g<in>]]", data)
-            
+                
     while(True):
         m = re.search("\[\[(((?!\]\]).)*)\]\]", data)
         if(m):
             result = m.groups()
-            a = re.search("((?:(?!\|).)*)\|(.*)", result[0])
-            if(a):
-                results = a.groups()
-                aa = re.search("^(.*)(#(?:.*))$", results[0])
-                if(aa):
-                    g = results[1]
-                    results = aa.groups()
-                    b = re.search("^http(?:s)?:\/\/", results[0])
-                    if(b):
-                        data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a class="out_link" href="' + results[0] + results[1] + '">' + g + '</a>', data, 1)
-                    else:
-                        if(results[0] == title):
-                            data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<b>' + g + '</b>', data, 1)
-                        else:
-                            db_ex("select title from data where title = '" + db_pas(results[0]) + "'")
-                            y = db_get()
-                            if(y):
-                                clas = ''
-                            else:
-                                clas = 'not_thing'
-                                
-                            data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a title="' + results[0] + results[1] + '" class="' + clas + '" href="/w/' + url_pas(results[0]) + results[1] + '">' + g + '</a>', data, 1)
-                            
-                            backlink_plus(title, results[0], '')
-                else:
-                    b = re.search("^http(?:s)?:\/\/", results[0])
-                    if(b):
-                        c = re.search("(?:\.[Jj][Pp][Gg]|\.[Pp][Nn][Gg]|\.[Gg][Ii][Ff]|\.[Jj][Pp][Ee][Gg])", results[0])
-                        if(c):
-                            img = results[0]
-                            img = re.sub("\.(?P<in>[Jj][Pp][Gg]|[Pp][Nn][Gg]|[Gg][Ii][Ff]|[Jj][Pp][Ee][Gg])", "#\g<in>#", img)
-                            data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a class="out_link" href="' + img + '">' + results[1] + '</a>', data, 1)
-                        else:
-                            data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a class="out_link" href="' + results[0] + '">' + results[1] + '</a>', data, 1)
-                    else:
-                        if(results[0] == title):
-                            data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<b>' + results[1] + '</b>', data, 1)
-                        else:
-                            db_ex("select title from data where title = '" + db_pas(results[0]) + "'")
-                            y = db_get()
-                            if(y):
-                                clas = ''
-                            else:
-                                clas = 'not_thing'
-
-                            data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a title="' + results[0] + '" class="' + clas + '" href="/w/' + url_pas(results[0]) + '">' + results[1] + '</a>', data, 1)
-
-                            backlink_plus(title, results[0], '')
+            rep = result[0]
+            rep = re.sub("\\\#", "<sharp>", rep)
+            a = re.search("^((?:(?!\|).)*)(?:\|(.*))?$", rep)
+            
+            results = a.groups()
+            
+            aa = re.search("^([^#]*)(#(?:.*))?$", results[0])
+            if(results[1]):
+                g = re.sub("<sharp>", "#", results[1])
             else:
-                aa = re.search("^(.*)(#(?:.*))$", result[0])
-                if(aa):
-                    result = aa.groups()
-                    b = re.search("^http(?:s)?:\/\/", result[0])
-                    if(b):
-                        data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a class="out_link" href="' + result[0] + result[1] + '">' + result[0] + result[1] + '</a>', data, 1)
-                    else:
-                        if(result[0] == title):
-                            data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<b>' + result[0] + result[1] + '</b>', data, 1)
-                        else:
-                            db_ex("select title from data where title = '" + db_pas(result[0]) + "'")
-                            y = db_get()
-                            if(y):
-                                clas = ''
-                            else:
-                                clas = 'not_thing'
-
-                            data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a href="/w/' + url_pas(result[0]) + result[1] + '" class="' + clas + '">' + result[0] + result[1] + '</a>', data, 1)
-                            
-                            backlink_plus(title, result[0], '')
+                g = re.sub("<sharp>", "#", results[0])
+            
+            results = aa.groups()
+            
+            if(not results[1]):
+                sharp = ''
+            else:
+                sharp = results[1]
+                
+            b = re.search("^http(?:s)?:\/\/", results[0])
+            if(b):
+                c = re.search("(?:\.[Jj][Pp][Gg]|\.[Pp][Nn][Gg]|\.[Gg][Ii][Ff]|\.[Jj][Pp][Ee][Gg])", results[0])
+                if(c):
+                    img = results[0]
+                    img = re.sub("\.(?P<in>[Jj][Pp][Gg]|[Pp][Nn][Gg]|[Gg][Ii][Ff]|[Jj][Pp][Ee][Gg])", "#\g<in>#", img)
+                    
+                    data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a class="out_link" href="' + img + sharp + '">' + g + '</a>', data, 1)
                 else:
-                    b = re.search("^http(?:s)?:\/\/", result[0])
-                    if(b):
-                        c = re.search("(?:\.[Jj][Pp][Gg]|\.[Pp][Nn][Gg]|\.[Gg][Ii][Ff]|\.[Jj][Pp][Ee][Gg])", result[0])
-                        if(c):
-                            img = result[0]
-                            img = re.sub("\.(?P<in>[Jj][Pp][Gg]|[Pp][Nn][Gg]|[Gg][Ii][Ff]|[Jj][Pp][Ee][Gg])", "#\g<in>#", img)
-                            data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a class="out_link" href="' + img + '">' + img + '</a>', data, 1)
-                        else:
-                            data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a class="out_link" href="' + result[0] + '">' + result[0] + '</a>', data, 1)
+                    data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a class="out_link" href="' + results[0] + sharp + '">' + g + '</a>', data, 1)
+            else:
+                if(results[0] == title):
+                    data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<b>' + g + '</b>', data, 1)
+                else:
+                    db_ex("select title from data where title = '" + db_pas(results[0]) + "'")
+                    y = db_get()
+                    if(y):
+                        clas = ''
                     else:
-                        if(result[0] == title):
-                            data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<b>' + result[0] + '</b>', data, 1)
-                        else:
-                            db_ex("select title from data where title = '" + db_pas(result[0]) + "'")
-                            y = db_get()
-                            if(y):
-                                clas = ''
-                            else:
-                                clas = 'not_thing'
+                        clas = 'not_thing'
+                    
+                    print(results[0])
+                    nosharp = re.sub("<sharp>", "#", results[0])
+                    print(nosharp)
+                    data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a title="' + re.sub('#', '\#', nosharp) + sharp + '" class="' + clas + '" href="/w/' + url_pas(nosharp) + sharp + '">' + g + '</a>', data, 1)
 
-                            data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a href="/w/' + url_pas(result[0]) + '" class="' + clas + '">' + result[0] + '</a>', data, 1)
-                            
-                            backlink_plus(title, result[0], '')
+                    backlink_plus(title, results[0], '')
         else:
             break
             
@@ -1085,7 +1035,8 @@ def namumark(title, data):
         else:
             break
     
-    data = re.sub("(\n#nobr#|#nobr#\n|#nobr#)", "", data)
+    data = re.sub("(\n<nobr>|<nobr>\n|<nobr>)", "", data)
+    data = re.sub("<nowiki>(?P<in>.)<\/nowiki>", "\g<in>", data)
 
     data = re.sub('<\/blockquote>((\r)?\n){2}<blockquote>', '</blockquote><br><blockquote>', data)
     data = re.sub('\n', '<br>', data)
