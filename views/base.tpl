@@ -3,7 +3,7 @@
         <title>{{title}} - {{logo}}</title>
         <link rel="stylesheet" href="/views/css/primer.css">
         <link rel="stylesheet" href="/views/css/style.css">
-        <link rel="javascript" href="/views/js/base.js">
+        <link rel="javascript" href="/views/js/brython.js">
         <link rel="stylesheet" href="/views/css/awesome/font-awesome.min.css">
         <script type="text/x-mathjax-config">
           MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
@@ -22,7 +22,9 @@
         {{get('custom', '')}}
     </style>
     </head>
-    <body>
+    <body onload="brython()">
+        <script type="text/python">
+        </script>
         <br>
         <div class="one-fifth column">
             <div id="top">

@@ -1770,13 +1770,18 @@ def topic(name = None, sub = None):
                             ban = isblock
                         else:
                             db_ex("select end from ban where block = '" + db_pas(rows[i]['ip']) + "'")
-                            row = db_get()
-                            if(row):
+                            ban_it = db_get()
+                            if(ban_it):
                                 ban = ' <a href="/ban/' + url_pas(rows[i]['ip']) + '">(해제)</a>' + isblock
                             else:
                                 ban = ' <a href="/ban/' + url_pas(rows[i]['ip']) + '">(차단)</a>' + isblock
                     else:
-                        ban = ""
+                        db_ex("select end from ban where block = '" + db_pas(rows[i]['ip']) + "'")
+                        ban_it = db_get()
+                        if(ban_it):
+                            ban = ' (X)'
+                        else:
+                            ban = ''
 
                 ip = ip_pas(rows[i]['ip'], 1)
                         
