@@ -32,10 +32,6 @@ button#goto {
     border-right: 0;
 }
 
-#syntax {
-    line-height: 1;
-}
-
 textarea, label, span, body, strong, b, div, h1, h2, h3, h4, h5, h6, h7, input {
     font-family: "나눔바른고딕", "나눔고딕", "맑은 고딕", "NanumBarunGothic", "NanumGothic", "Malgun Gothic", "sans-serif";
 }
