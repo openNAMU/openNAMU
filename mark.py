@@ -225,26 +225,6 @@ def namumark(title, data):
     
     data = re.sub("\[anchor\((?P<in>[^\[\]]*)\)\]", '<span id="\g<in>"></span>', data)
     data = savemark(data)
-
-    i = 1
-    while(True):
-        m = re.search("\n((?:(?:#\s?(?:[^\n]*))\n?)+)", data)
-        if(m):
-            result = m.groups()
-            test = result[0]
-
-            while(True):
-                if(re.search("(?:#\s?(?:[^\n]*))", test)):
-                    test = re.sub("(?:#\s?(?P<in>[^\n]*))", str(i) + ". \g<in>", test, 1)
-                else:
-                    break
-
-                i += 1
-
-            data = re.sub("\n((?:(?:#\s?(?:[^\n]*))\n?)+)", '\n' + test, data, 1)
-            i = 1
-        else:
-            break
     
     while(True):
         m = re.search("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]", data)
