@@ -476,11 +476,12 @@ def recent_changes():
                 i += 1
             except:
                 div = div + '</tbody></table></div>'
+                
                 break
-            
-        return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = div, title = '최근 변경내역'))
     else:
-        return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = '<br>None', title = '최근 변경내역'))
+        div = '<br>None'
+            
+    return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = div, title = '최근 변경내역'))
         
 @route('/history/<name:path>/r/<num:int>/hidden')
 def history_hidden(name = None, num = None):
@@ -588,10 +589,15 @@ def user_record(name = None, num = None):
                     div += '<br><a href="/record/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전)</a>'
 
                 break
-                
-        return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = div, title = '사용자 기록'))
     else:
-        return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = '<br>None', title = '사용자 기록'))
+        div = '<br>None'
+        
+    db_ex("select end, why from ban where block = '" + db_pas(name) + "'")
+    ban_it = db_get()
+    if(ban_it):
+        div = namumark('', '{{{#!wiki style="border:2px solid red;padding:10px;"\r\n{{{+2 {{{#red 이 사용자는 차단 당했습니다.}}}}}}\r\n\r\n차단 해제 일 : ' + ban_it[0]['end'] + '[br]사유 : ' + ban_it[0]['why'] + '}}}') + '<br>' + div
+                
+    return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = div, title = '사용자 기록'))
         
 @route('/userlog/n/<number:int>')
 def user_log(number = None):
@@ -770,10 +776,10 @@ def recent_discuss():
                 div += '</tbody></table></div>'
                 
                 break
-            
-        return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = div, title = '최근 토론내역'))
     else:
-        return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = '<br>None', title = '최근 토론내역'))
+        div = '<br>None'
+            
+    return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = div, title = '최근 토론내역'))
 
 @route('/blocklog/n/<number:int>')
 def blocklog(number = None):
@@ -817,114 +823,98 @@ def blocklog(number = None):
                     div = div + '<br><a href="/blocklog/n/' + str(number - 1) + '">(이전)</a>'
                     
                 break
-                
-        return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = div, title = '사용자 차단 기록'))
     else:
-        return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = '<br>None', title = '사용자 차단 기록'))
-        
+        div = '<br>None'
+                
+    return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = div, title = '사용자 차단 기록'))
+
+@route('/history/<name:path>', method=['POST', 'GET'])    
 @route('/history/<name:path>/n/<num:int>', method=['POST', 'GET'])
-def history_view(name = None, num = None):
+def history_view(name = None, num = 1):
     if(request.method == 'POST'):
         return(redirect('/w/' + url_pas(name) + '/r/' + request.forms.b + '/diff/' + request.forms.a))
     else:
         select = ''
-        v = num * 50
-        i = v - 50
-        ydmin = admin_check(1)
-        zdmin = admin_check(6)
-        div = '<div><table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;">판</td><td style="text-align: center;width:33.33%;">기여자</td><td style="text-align: center;width:33.33%;">시간</td></tr>'
+        db_ex("select id from history where title = '" + db_pas(name) + "' order by id + 0 desc limit 1")
+        end_num = db_get()
+        if(end_num):
+            num1 = int(end_num[0]['id']) - num * 50
+            if(num1 > 0):
+                num2 = num1 + 51
+            else:
+                if(num1 + 51 > 0):
+                    num2 = num1 + 51
+                else:
+                    num2 = 0
+                    
+                num1 = 0
+ 
+        admin1 = admin_check(1)
+        admin2 = admin_check(6)
         
-        db_ex("select send, leng, ip, date, title, id from history where title = '" + db_pas(name) + "' order by id + 0 desc")
-        rows = db_get()
-        if(rows):
-            while(True):
-                try:
-                    style = ''
+        div = '<div><table style="text-align:center; width:100%;"><tbody><tr><td style="width:33.33%;">판</td><td style="width:33.33%;">기여자</td><td style="width:33.33%;">시간</td></tr>'
+        
+        db_ex("select send, leng, ip, date, title, id from history where title = '" + db_pas(name) + "' and id + 0 < '" + str(num2) + "' and id + 0 > '" + str(num1) + "' order by id + 0 desc")
+        all_data = db_get()
+        if(all_data):
+            for data in all_data:
+                select += '<option value="' + data['id'] + '">' + data['id'] + '</option>'
+                
+                if(data['send']):
+                    send = data['send']
+                else:
+                    send = '<br>'
                     
-                    select += '<option value="' + rows[i]['id'] + '">' + rows[i]['id'] + '</option>'
+                if(re.search("^\+", data['leng'])):
+                    leng = '<span style="color:green;">' + data['leng'] + '</span>'
+                elif(re.search("^\+", data['leng'])):
+                    leng = '<span style="color:red;">' + data['leng'] + '</span>'
+                else:
+                    leng = '<span style="color:gray;">' + data['leng'] + '</span>'
                     
-                    if(rows[i]['send']):
-                        send = rows[i]['send']
+                ip = ip_pas(data['ip'], None)
+                
+                db_ex("select block from ban where block = '" + db_pas(data['ip']) + "'")
+                ban_it = db_get()
+                if(ban_it):
+                    if(admin1 == 1):
+                        ban = ' <a href="/ban/' + url_pas(data['ip']) + '">(해제)</a>'
                     else:
-                        send = '<br>'
-                        
-                    m = re.search("\+", rows[i]['leng'])
-                    n = re.search("\-", rows[i]['leng'])
-                    if(m):
-                        leng = '<span style="color:green;">' + rows[i]['leng'] + '</span>'
-                    elif(n):
-                        leng = '<span style="color:red;">' + rows[i]['leng'] + '</span>'
+                        ban = ' (X)'
+                else:
+                    if(admin1 == 1):
+                        ban = ' <a href="/ban/' + url_pas(data['ip']) + '">(차단)</a>'
                     else:
-                        leng = '<span style="color:gray;">' + rows[i]['leng'] + '</span>'                    
-                        
-                    ip = ip_pas(rows[i]['ip'], None)
-                            
-                    db_ex("select * from user where id = '" + db_pas(rows[i]['ip']) + "'")
-                    row = db_get()
-                    if(row):
-                        if(ydmin == 1):
-                            ban = ''
-                        else:
-                            db_ex("select * from ban where block = '" + db_pas(rows[i]['ip']) + "'")
-                            row = db_get()
-                            if(row):
-                                ban = ' <a href="/ban/' + url_pas(rows[i]['ip']) + '">(해제)</a>'
-                            else:
-                                ban = ' <a href="/ban/' + url_pas(rows[i]['ip']) + '">(차단)</a>'
+                        ban = ''
+                
+                db_ex("select * from hidhi where title = '" + db_pas(name) + "' and re = '" + db_pas(data['id']) + "'")
+                hid_it = db_get()
+                if(hid_it):
+                    if(admin2):
+                        hidden = ' <a href="/history/' + url_pas(name) + '/r/' + url_pas(data['id']) + '/hidden">(공개)'
+                        hid = 0
                     else:
-                        db_ex("select * from ban where block = '" + db_pas(rows[i]['ip']) + "'")
-                        row = db_get()
-                        if(row):
-                            ban = ' <a href="/ban/' + url_pas(rows[i]['ip']) + '">(해제)</a>'
-                        else:
-                            ban = ' <a href="/ban/' + url_pas(rows[i]['ip']) + '">(차단)</a>'
-                                
-                    if(zdmin == 1):
-                        db_ex("select * from hidhi where title = '" + db_pas(name) + "' and re = '" + db_pas(rows[i]['id']) + "'")
-                        row = db_get()
-                        if(row):                            
-                            ip += ' (숨김)'                            
-                            hidden = ' <a href="/history/' + url_pas(name) + '/r/' + rows[i]['id'] + '/hidden">(공개)'
-                        else:
-                            hidden = ' <a href="/history/' + url_pas(name) + '/r/' + rows[i]['id'] + '/hidden">(숨김)'
+                        hid = 1
+                else:
+                    if(admin2):
+                        hidden = ' <a href="/history/' + url_pas(name) + '/r/' + url_pas(data['id']) + '/hidden">(숨김)'
+                        hid = 0
                     else:
-                        db_ex("select * from hidhi where title = '" + db_pas(name) + "' and re = '" + db_pas(rows[i]['id']) + "'")
-                        row = db_get()
-                        if(row):
-                            ip = '숨김'
-                            hidden = ''
-                            send = '숨김'
-                            ban = ''
-                            style = 'display:none;'
-                            v += 1
-                        else:
-                            hidden = ''      
-                            
-                    div += '<tr style="' + style + '"><td style="text-align: center;width:33.33%;">' + rows[i]['id'] + '판</a> <a href="/w/' + url_pas(rows[i]['title']) + '/r/' + rows[i]['id'] + '">(보기)</a> <a href="/w/' + url_pas(rows[i]['title']) + '/raw/' + rows[i]['id'] + '">(원본)</a> <a href="/revert/' + url_pas(rows[i]['title']) + '/r/' + rows[i]['id'] + '">(되돌리기)</a> (' + leng + ')</td><td style="text-align: center;width:33.33%;">' + ip + ban + hidden + '</td><td style="text-align: center;width:33.33%;">' + rows[i]['date'] + '</td></tr><tr><td colspan="3" style="text-align: center;width:100%;">' + send + '</td></tr>'
-                    
-                    if(i == v):
-                        div += '</tbody></table></div>'
-                        
-                        if(num == 1):
-                            div += '<br><a href="/history/' + url_pas(name) + '/n/' + str(num + 1) + '">(다음)</a>'
-                        else:
-                            div += '<br><a href="/history/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전)</a> <a href="/history/' + url_pas(name) + '/n/' + str(num + 1) + '">(다음)</a>'
-                            
-                        break
-                    else:
-                        i += 1
-
-                except:
-                    div += '</tbody></table></div>'
-                    
-                    if(num != 1):
-                        div = div + '<br><a href="/history/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전)</a>'
-
-                    break
-                    
-            return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = div, title = name, page = url_pas(name), select = select, sub = '역사'))
+                        hidden = ''
+                        hid = 0
+                
+                if(hid == 1):
+                    div += '<tr><td colspan="3">숨김</td></tr>'
+                else:
+                    div += '<tr><td>' + data['id'] + '판</a> <a href="/w/' + url_pas(data['title']) + '/r/' + url_pas(data['id']) + '">(보기)</a> <a href="/w/' + url_pas(data['title']) + '/raw/' + url_pas(data['id']) + '">(원본)</a> <a href="/revert/' + url_pas(data['title']) + '/r/' + url_pas(data['id']) + '">(되돌리기)</a> (' + leng + ')</td><td>' + ip + ban + hidden + '</td><td>' + data['date'] + '</td></tr><tr><td colspan="3">' + send + '</td></tr>'
+            else:
+                div += '</tbody></table></div>'
         else:
-            return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = '<br>None', title = name, page = url_pas(name), select = select, sub = '역사'))
+            div = '<br>None<br>'
+            
+        div += '<br><a href="/history/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전)</a> <a href="/history/' + url_pas(name) + '/n/' + str(num + 1) + '">(이후)</a>'
+                    
+        return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = div, title = name, page = url_pas(name), select = select, sub = '역사'))
             
 @route('/search', method=['POST'])
 def search():
@@ -1507,11 +1497,14 @@ def title_index():
                 
             except:
                 data += '</div>'
+                
                 break
-
-        return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = data + '<br><li>이 위키에는 총 ' + str(i[0]) + '개의 문서가 있습니다.</li><br><li>틀 문서는 총 ' + str(i[3]) + '개의 문서가 있습니다.</li><li>분류 문서는 총 ' + str(i[1]) + '개의 문서가 있습니다.</li><li>사용자 문서는 총 ' + str(i[2]) + '개의 문서가 있습니다.</li><li>파일 문서는 총 ' + str(i[4]) + '개의 문서가 있습니다.</li><li>나머지 문서는 총 ' + str(i[5]) + '개의 문서가 있습니다.</li>', title = '모든 문서'))
+                
+        data += '<br><li>이 위키에는 총 ' + str(i[0]) + '개의 문서가 있습니다.</li><br><li>틀 문서는 총 ' + str(i[3]) + '개의 문서가 있습니다.</li><li>분류 문서는 총 ' + str(i[1]) + '개의 문서가 있습니다.</li><li>사용자 문서는 총 ' + str(i[2]) + '개의 문서가 있습니다.</li><li>파일 문서는 총 ' + str(i[4]) + '개의 문서가 있습니다.</li><li>나머지 문서는 총 ' + str(i[5]) + '개의 문서가 있습니다.</li>'
     else:
-        return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = '<br>None', title = '모든 문서'))
+        data = '<br>None'
+
+    return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = data, title = '모든 문서'))
         
 @route('/topic/<name:path>/sub/<sub:path>/b/<num:int>')
 def topic_block(name = None, sub = None, num = None):
@@ -2009,10 +2002,10 @@ def user_check(name = None):
                             c += '</tbody></table></div>'
 
                             break
-                        
-                    return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '다중 검사', logo = set_data['name'], data = c))
                 else:
-                    return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '다중 검사', logo = set_data['name'], data = '<br>None'))
+                    c = '<br>None'
+                        
+                return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '다중 검사', logo = set_data['name'], data = c))
             else:
                 db_ex("select * from login where user = '" + db_pas(name) + "' order by today desc")
                 row = db_get()
@@ -2028,10 +2021,10 @@ def user_check(name = None):
                             c += '</tbody></table></div>'
                             
                             break
-                        
-                    return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '다중 검사', logo = set_data['name'], data = c))
                 else:
-                    return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '다중 검사', logo = set_data['name'], data = '<br>None'))
+                    c = '<br>None'
+                        
+                return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '다중 검사', logo = set_data['name'], data = c))
         else:
             return(redirect('/error/3'))
                 
@@ -2522,10 +2515,15 @@ def close_topic_list(name = None, num = None):
                     div += '<br><a href="/user/' + url_pas(name) + '/topic/' + str(num - 1) + '">(이전)</a>'
 
                 break
-                
-        return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = div, title = '사용자 토론 기록'))
     else:
-        return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = '<br>None', title = '사용자 토론 기록'))
+        div = '<br>None'
+                
+    db_ex("select end, why from ban where block = '" + db_pas(name) + "'")
+    ban_it = db_get()
+    if(ban_it):
+        div = namumark('', '{{{#!wiki style="border:2px solid red;padding:10px;"\r\n{{{+2 {{{#red 이 사용자는 차단 당했습니다.}}}}}}\r\n\r\n차단 해제 일 : ' + ban_it[0]['end'] + '[br]사유 : ' + ban_it[0]['why'] + '}}}') + '<br>' + div
+                
+    return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = div, title = '사용자 토론 기록'))
         
 @route('/user')
 def user_info():
