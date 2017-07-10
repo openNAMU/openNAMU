@@ -20,7 +20,7 @@
 </h1>
 <div>
     % if(defined('select')):
-        <form class="usrform" method='POST' action='/history/{{page}}/n/1'>
+        <form class="usrform" method='POST' action='/history/{{page}}'>
             <select name="a">
                 {{!select}}
             </select>

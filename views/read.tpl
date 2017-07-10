@@ -19,7 +19,7 @@
             <a class="menu-item" href="/raw/{{page}}">원본</a>
         % end
         <a class="menu-item" href="/history/{{page}}">역사</a>
-        <a class="menu-item" href="/backlink/{{page}}/n/1">역링크</a>
+        <a class="menu-item" href="/xref/{{page}}">역링크</a>
         % if(redirect):
             <a class="menu-item" href="/w/{{page}}">넘기기</a>
         % end

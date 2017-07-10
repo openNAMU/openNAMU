@@ -495,12 +495,11 @@ def history_hidden(name = None, num = None):
             
         db_com()
         
-        return(redirect('/history/' + url_pas(name) + '/n/1'))
-    else:
-        return(redirect('/history/' + url_pas(name) + '/n/1'))
-        
+    return(redirect('/history/' + url_pas(name)))
+
+@route('/record/<name:path>')
 @route('/record/<name:path>/n/<num:int>')
-def user_record(name = None, num = None):
+def user_record(name = None, num = 1):
     v = num * 50
     i = v - 50
     ydmin = admin_check(1)
@@ -599,9 +598,10 @@ def user_record(name = None, num = None):
                 
     return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = div, title = '사용자 기록'))
         
-@route('/userlog/n/<number:int>')
-def user_log(number = None):
-    i = number * 50
+@route('/userlog')
+@route('/userlog/n/<num:int>')
+def user_log(num = 1):
+    i = num * 50
     j = i - 50
     list_data = ''
     ydmin = admin_check(1)
@@ -613,7 +613,7 @@ def user_log(number = None):
             try:
                 a = user_list[j]
             except:
-                if(number != 1):
+                if(num != 1):
                     list_data = list_data + '<br><a href="/userlog/n/' + str(number - 1) + '">(이전)'
                 break
                 
@@ -632,10 +632,10 @@ def user_log(number = None):
             list_data += '<li>' + str(j + 1) + '. ' + ip + ban_button + '</li>'
             
             if(j == i):
-                if(number == 1):
-                    list_data += '<br><a href="/userlog/n/' + str(number + 1) + '">(다음)'
+                if(num == 1):
+                    list_data += '<br><a href="/userlog/n/' + str(num + 1) + '">(다음)'
                 else:
-                    list_data += '<br><a href="/userlog/n/' + str(number - 1) + '">(이전) <a href="/userlog/n/' + str(number + 1) + '">(다음)'
+                    list_data += '<br><a href="/userlog/n/' + str(num - 1) + '">(이전) <a href="/userlog/n/' + str(num + 1) + '">(다음)'
                 break
             else:
                 j += 1
@@ -667,8 +667,9 @@ def backlink_reset():
     else:
         return(redirect('/error/3'))
         
-@route('/backlink/<name:path>/n/<num:int>')
-def backlink(name = None, num = None):
+@route('/xref/<name:path>')
+@route('/xref/<name:path>/n/<num:int>')
+def backlink(name = None, num = 1):
     v = num * 50
     i = v - 50
     div = ''
@@ -711,9 +712,9 @@ def backlink(name = None, num = None):
                                 
                             if(i == v):
                                 if(num == 1):
-                                    div += '<br><a href="/backlink/' + url_pas(name) + '/n/' + str(num + 1) + '">(다음)'
+                                    div += '<br><a href="/xref/' + url_pas(name) + '/n/' + str(num + 1) + '">(다음)'
                                 else:
-                                    div += '<br><a href="/backlink/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전) <a href="/backlink/' + url_pas(name) + '/n/' + str(num + 1) + '">(다음)'
+                                    div += '<br><a href="/xref/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전) <a href="/xref/' + url_pas(name) + '/n/' + str(num + 1) + '">(다음)'
                                     
                                 break
                             else:
@@ -738,12 +739,12 @@ def backlink(name = None, num = None):
                     v += 1
             except:
                 if(num != 1):
-                    div += '<br><a href="/backlink/n/' + str(num - 1) + '">(이전)'
+                    div += '<br><a href="/xref/n/' + str(num - 1) + '">(이전)'
                 
                 break
                 
         if(restart == 1):
-            return(redirect('/backlink/' + url_pas(name) + '/n/' + str(num)))
+            return(redirect('/xref/' + url_pas(name) + '/n/' + str(num)))
         else:    
             return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = div, title = name, page = url_pas(name), sub = '역링크'))
     else:
@@ -781,8 +782,9 @@ def recent_discuss():
             
     return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = div, title = '최근 토론내역'))
 
+@route('/blocklog')
 @route('/blocklog/n/<number:int>')
-def blocklog(number = None):
+def blocklog(number = 1):
     v = number * 50
     i = v - 50
     div = '<div><table style="width: 100%;"><tbody><tr><td style="text-align: center;width:20%;">차단자</td><td style="text-align: center;width:20%;">관리자</td><td style="text-align: center;width:20%;">언제까지</td><td style="text-align: center;width:20%;">왜</td><td style="text-align: center;width:20%;">시간</td></tr>'
@@ -918,7 +920,7 @@ def history_view(name = None, num = 1):
             
 @route('/search', method=['POST'])
 def search():
-    return(redirect('/search/' + url_pas(request.forms.search) + '/n/1'))
+    return(redirect('/search/' + url_pas(request.forms.search)))
 
 @route('/goto', method=['POST'])
 def goto():
@@ -927,10 +929,11 @@ def goto():
     if(data):
         return(redirect('/w/' + url_pas(request.forms.search)))
     else:
-        return(redirect('/search/' + url_pas(request.forms.search) + '/n/1'))
+        return(redirect('/search/' + url_pas(request.forms.search)))
 
+@route('/search/<name:path>')
 @route('/search/<name:path>/n/<num:int>')
-def deep_search(name = None, num = None):
+def deep_search(name = None, num = 1):
     v = num * 50
     i = v - 50
 
@@ -1427,7 +1430,7 @@ def move(name = None):
             
 @route('/other')
 def other():
-    return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '기타 메뉴', logo = set_data['name'], data = '<h2 style="margin-top: 0px;">기록</h2><li><a href="/blocklog/n/1">사용자 차단 기록</a></li><li><a href="/userlog/n/1">사용자 가입 기록</a></li><li><a href="/manager/6">사용자 기록</a></li><li><a href="/manager/7">사용자 토론 기록</a></li><h2>기타</h2><li><a href="/titleindex">모든 문서</a></li><li><a href="/acllist">ACL 문서 목록</a></li><li><a href="/upload">업로드</a></li><li><a href="/adminlist">관리자 목록</a></li><li><a href="/manager/1">관리자 메뉴</a></li><br>이 오픈나무의 버전은 <a href="https://github.com/2DU/openNAMU/blob/normal/version.md">v' + r_ver + '</a> 입니다.'))
+    return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '기타 메뉴', logo = set_data['name'], data = '<h2 style="margin-top: 0px;">기록</h2><li><a href="/blocklog">사용자 차단 기록</a></li><li><a href="/userlog">사용자 가입 기록</a></li><li><a href="/manager/6">사용자 기록</a></li><li><a href="/manager/7">사용자 토론 기록</a></li><h2>기타</h2><li><a href="/titleindex">모든 문서</a></li><li><a href="/acllist">ACL 문서 목록</a></li><li><a href="/upload">업로드</a></li><li><a href="/adminlist">관리자 목록</a></li><li><a href="/manager/1">관리자 메뉴</a></li><br>이 오픈나무의 버전은 <a href="https://github.com/2DU/openNAMU/blob/normal/version.md">v' + r_ver + '</a> 입니다.'))
     
 @route('/manager/<num:int>', method=['POST', 'GET'])
 def manager(num = None):
@@ -1455,7 +1458,7 @@ def manager(num = None):
             return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '권한 이동', logo = set_data['name'], data = '<form id="usrform" method="POST" action="/manager/5"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')   )
     elif(num == 6):
         if(request.method == 'POST'):
-            return(redirect('/record/' + url_pas(request.forms.name) + '/n/1'))
+            return(redirect('/record/' + url_pas(request.forms.name)))
         else:
             return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '기록 이동', logo = set_data['name'], data = '<form id="usrform" method="POST" action="/manager/6"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')    )
     elif(num == 7):
@@ -2463,8 +2466,9 @@ def read_view(name = None, redirect = None):
         
         return(template('read', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), data = namumark(name, elsedata) + div, uppage = uppage, style = style, acl = acl, topic = topic, redirect = redirect, admin = admin_memu, data_none = True))
 
+@route('/user/<name:path>/topic')
 @route('/user/<name:path>/topic/<num:int>')
-def close_topic_list(name = None, num = None):
+def user_topic_list(name = None, num = 1):
     v = num * 50
     i = v - 50
     ydmin = admin_check(1)
@@ -2545,7 +2549,7 @@ def user_info():
         
     ip = ip_pas(ip, 2)
         
-    return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '사용자 메뉴', logo = set_data['name'], data = ip + '<br><br><span>권한 상태 : ' + acl + '<h2>로그인 관련</h2><li><a href="/login">로그인</a></li><li><a href="/logout">로그아웃</a></li><li><a href="/register">회원가입</a></li><h2>기타</h2><li><a href="/change">비밀번호 변경</a></li><li><a href="/count">기여 횟수</a></li><li><a href="/record/' + raw_ip + '/n/1">기여 목록</a></li><li><a href="/custom">커스텀 CSS</a></li>'))
+    return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '사용자 메뉴', logo = set_data['name'], data = ip + '<br><br><span>권한 상태 : ' + acl + '<h2>로그인 관련</h2><li><a href="/login">로그인</a></li><li><a href="/logout">로그아웃</a></li><li><a href="/register">회원가입</a></li><h2>기타</h2><li><a href="/change">비밀번호 변경</a></li><li><a href="/count">기여 횟수</a></li><li><a href="/record/' + raw_ip + '">기여 목록</a></li><li><a href="/custom">커스텀 CSS</a></li>'))
 
 @route('/custom', method=['GET', 'POST'])
 def custom_css():

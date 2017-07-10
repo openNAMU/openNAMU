@@ -156,19 +156,19 @@ def ip_pas(raw_ip, num):
             
     if(num == 1):
         if(yes):
-            ip += ' <a href="/user/' + url_pas(results[0]) + '/topic/1">(기록)</a>'
+            ip += ' <a href="/user/' + url_pas(results[0]) + '">(기록)</a>'
         else:
-            ip += ' <a href="/user/' + url_pas(raw_ip) + '/topic/1">(기록)</a>'
+            ip += ' <a href="/user/' + url_pas(raw_ip) + '">(기록)</a>'
     elif(num == 2):
         if(yes):
-            ip += ' <a href="/record/' + url_pas(results[0]) + '/n/1">(기록)</a> <a href="/user/' + url_pas(results[0]) + '/topic/1">(토론 기록)</a>'
+            ip += ' <a href="/record/' + url_pas(results[0]) + '">(기록)</a> <a href="/user/' + url_pas(results[0]) + '">(토론 기록)</a>'
         else:
-            ip += ' <a href="/record/' + url_pas(raw_ip) + '/n/1">(기록)</a> <a href="/user/' + url_pas(raw_ip) + '/topic/1">(토론 기록)</a>'        
+            ip += ' <a href="/record/' + url_pas(raw_ip) + '">(기록)</a> <a href="/user/' + url_pas(raw_ip) + '">(토론 기록)</a>'        
     else:
         if(yes):
-            ip += ' <a href="/record/' + url_pas(results[0]) + '/n/1">(기록)</a>'
+            ip += ' <a href="/record/' + url_pas(results[0]) + '">(기록)</a>'
         else:
-            ip += ' <a href="/record/' + url_pas(raw_ip) + '/n/1">(기록)</a>'
+            ip += ' <a href="/record/' + url_pas(raw_ip) + '">(기록)</a>'
 
     return(ip)
 
