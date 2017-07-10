@@ -124,6 +124,9 @@ def mid_pas(data, fol_num, include):
             fol_a = re.compile("^#!folding\s((?:(?!\n).)*)\n?\s\n(.*)$", re.DOTALL)
             fol = fol_a.search(a[0])
             
+            syn_a = re.compile("^#!syntax\s([^\n]*)\r\n(.*)$", re.DOTALL)
+            syn = syn_a.search(a[0])
+            
             if(big):
                 result = big.groups()
                 data = com.sub('<span class="font-size-' + result[0] + '">' + result[1] + '</span>', data, 1)
@@ -159,6 +162,9 @@ def mid_pas(data, fol_num, include):
                 data = com.sub("<div>" + result[0] + "<span style='float:right;'><div id='folding_" + str(fol_num + 1) + "' style='display:block;'>[<a href='javascript:void(0);' onclick='var f=document.getElementById(\"folding_" + str(fol_num) + "\");var s=f.style.display==\"block\";f.style.display=s?\"none\":\"block\";this.className=s?\"\":\"opened\";var f=document.getElementById(\"folding_" + str(fol_num + 1) + "\");var s=f.style.display==\"none\";f.style.display=s?\"block\":\"none\";var f=document.getElementById(\"folding_" + str(fol_num + 2) + "\");var s=f.style.display==\"block\";f.style.display=s?\"none\":\"block\";'>펼치기</a>]</div><div id='folding_" + str(fol_num + 2) + "' style='display:none;'>[<a href='javascript:void(0);' onclick='var f=document.getElementById(\"folding_" + str(fol_num) + "\");var s=f.style.display==\"block\";f.style.display=s?\"none\":\"block\";this.className=s?\"\":\"opened\";var f=document.getElementById(\"folding_" + str(fol_num + 1) + "\");var s=f.style.display==\"none\";f.style.display=s?\"block\":\"none\";var f=document.getElementById(\"folding_" + str(fol_num + 2) + "\");var s=f.style.display==\"block\";f.style.display=s?\"none\":\"block\";'>접기</a>]</div></a></span><div id='folding_" + str(fol_num) + "' style='display:none;'><br>" + result[1] + "</div></div>", data, 1)
                 
                 fol_num += 3
+            elif(syn):
+                result = syn.groups()
+                data = com.sub('<pre id="syntax"><code class="' + result[0] + '">' + re.sub(' ', '<space>', result[1]) + '</code></pre>', data, 1)
             elif(html):
                 result = html.groups()
                 data = com.sub(result[0], data, 1)
@@ -1035,6 +1041,7 @@ def namumark(title, data):
     
     data = re.sub("(\n<nobr>|<nobr>\n|<nobr>)", "", data)
     data = re.sub("<nowiki>(?P<in>.)<\/nowiki>", "\g<in>", data)
+    data = re.sub("<space>", " ", data)
 
     data = re.sub('<\/blockquote>((\r)?\n){2}<blockquote>', '</blockquote><br><blockquote>', data)
     data = re.sub('\n', '<br>', data)
