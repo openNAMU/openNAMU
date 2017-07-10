@@ -159,32 +159,29 @@ if(int(t_ver) < 202 or not getalist):
     
 if(int(t_ver) < 203):
     db_ex('select title from topic limit 1')
-    gettop = db_get()
-    if(gettop):
+    top_yes = db_get()
+    if(top_yes):
         db_ex('rename table topic to old_topic')
+        db_ex('rename table distop to old_distop')
+        
         db_ex('create table topic(id text, title text, sub text, data longtext, date text, ip text, block text, top text)')
         
         db_ex('select * from old_topic')
         topic_old = db_get()
         if(topic_old):
             i = 0
-            while(True):
-                try:
-                    db_ex("select id from distop where id = '" + db_pas(topic_old[i]['id']) + "' and title = '" + db_pas(topic_old[i]['title']) + "' and sub = '" + db_pas(topic_old[i]['sub']) + "'")
-                    distop = db_get()
-                    if(distop):
-                        top = 'O'
-                    else:
-                        top = ''
-                        
-                    db_ex("insert into topic (id, title, sub, data, date, ip, block, top) value ('" + db_pas(topic_old[i]['id']) + "', '" + db_pas(topic_old[i]['title']) + "', '" + db_pas(topic_old[i]['sub']) + "', '" + db_pas(topic_old[i]['data']) + "', '" + db_pas(topic_old[i]['date']) + "', '" + db_pas(topic_old[i]['ip']) + "', '" + db_pas(topic_old[i]['block']) + "', '" + db_pas(top) + "')")
+            for move_topic in topic_old:
+                db_ex("select id from distop where id = '" + db_pas(move_topic['id']) + "' and title = '" + db_pas(move_topic['title']) + "' and sub = '" + db_pas(move_topic['sub']) + "'")
+                distop = db_get()
+                if(distop):
+                    top = 'O'
+                else:
+                    top = ''
                     
-                    i += 1
-                except:
-                    break
+                db_ex("insert into topic (id, title, sub, data, date, ip, block, top) value ('" + db_pas(move_topic['id']) + "', '" + db_pas(move_topic['title']) + "', '" + db_pas(move_topic['sub']) + "', '" + db_pas(move_topic['data']) + "', '" + db_pas(move_topic['date']) + "', '" + db_pas(move_topic['ip']) + "', '" + db_pas(move_topic['block']) + "', '" + db_pas(top) + "')")
         
-        db_ex('drop table old_topic')
-        db_ex('drop table distop')
+#        db_ex('drop table old_topic')
+#        db_ex('drop table distop')
     
 db_com()
 
