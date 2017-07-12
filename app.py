@@ -2228,15 +2228,12 @@ def are_you_ban():
         if(rows):
             if(rows[0]['end']):
                 end = rows[0]['end'] + ' 까지 차단 상태 입니다. / 사유 : ' + rows[0]['why']                
-                now = get_time()
-                
-                now = re.sub(':', '', now)
+
+                now = re.sub(':', '', get_time())
                 now = re.sub('\-', '', now)
-                now = re.sub(' ', '', now)
-                now = int(now)
+                now = int(re.sub(' ', '', now))
                 
-                day = rows[0]['end']
-                day = re.sub('\-', '', day)    
+                day = re.sub('\-', '', rows[0]['end'])    
                 
                 if(now >= int(day + '000000')):
                     db_ex("delete from ban where block = '" + db_pas(ip) + "'")
@@ -2256,14 +2253,11 @@ def are_you_ban():
                     if(row[0]['end']):
                         end = row[0]['end'] + ' 까지 차단 상태 입니다. / 사유 : ' + rows[0]['why']             
                         
-                        now = get_time()
-                        now = re.sub(':', '', now)
+                        now = re.sub(':', '', get_time())
                         now = re.sub('\-', '', now)
-                        now = re.sub(' ', '', now)
-                        now = int(now)    
+                        now = int(re.sub(' ', '', now))
                         
-                        day = row[0]['end']
-                        day = re.sub('\-', '', day)
+                        day = re.sub('\-', '', row[0]['end'])
                         
                         if(now >= int(day + '000000')):
                             db_ex("delete from ban where block = '" + db_pas(results[0]) + "' and band = 'O'")
@@ -2410,7 +2404,7 @@ def read_view(name = None, redirect = None):
             if(not acl):
                 acl = ''
 
-        m = re.search("^사용자:(.*)", name)
+        m = re.search("^사용자:(.*)$", name)
         if(m):
             g = m.groups()
             
@@ -2445,7 +2439,7 @@ def read_view(name = None, redirect = None):
             
         return(template('read', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), data = enddata + div, acl = acl, left = left, uppage = uppage, style = style, topic = topic, redirect = redirect, admin = admin_memu))
     else:
-        m = re.search("^사용자:(.*)", name)
+        m = re.search("^사용자:(.*)$", name)
         if(m):
             g = m.groups()
             
@@ -2476,13 +2470,11 @@ def user_topic_list(name = None, num = 1):
     if(rows):
         while(True):
             try:                    
-                title = rows[i]['title']
-                title = re.sub('<', '&lt;', title)
+                title = re.sub('<', '&lt;', rows[i]['title'])
                 title = re.sub('>', '&gt;', title)
                 title = re.sub('"', '&quot;', title)
 
-                sub = rows[i]['sub']
-                sub = re.sub('<', '&lt;', sub)
+                sub = re.sub('<', '&lt;', rows[i]['sub'])
                 sub = re.sub('>', '&gt;', sub)
                 sub = re.sub('"', '&quot;', sub)
                     
@@ -2551,9 +2543,7 @@ def user_info():
 @route('/custom', method=['GET', 'POST'])
 def custom_css():
     session = request.environ.get('beaker.session')
-
     ip = ip_check()
-
     if(request.method == 'POST'):
         if(not re.search('\.', ip)):
             db_ex("select * from custom where user = '" + db_pas(ip) + "'")
@@ -2588,9 +2578,9 @@ def custom_css():
 @route('/count')
 def count_edit():
     db_ex("select count(title) from history where ip = '" + ip_check() + "'")
-    i = db_get()
-    if(i):
-        return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '기여 횟수', logo = set_data['name'], data = "기여 횟수 : " + str(i[0]["count(title)"])))
+    count = db_get()
+    if(count):
+        return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '기여 횟수', logo = set_data['name'], data = "기여 횟수 : " + str(count[0]["count(title)"])))
     else:
         return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '기여 횟수', logo = set_data['name'], data = "기여 횟수 : 0"))
         
