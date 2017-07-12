@@ -834,6 +834,8 @@ def history_view(name = None, num = 1):
         return(redirect('/w/' + url_pas(name) + '/r/' + request.forms.b + '/diff/' + request.forms.a))
     else:
         select = ''
+        num1 = 0
+        num2 = 0
         db_ex("select id from history where title = '" + db_pas(name) + "' order by id + 0 desc limit 1")
         end_num = db_get()
         if(end_num):
@@ -843,10 +845,6 @@ def history_view(name = None, num = 1):
             else:
                 if(num1 + 51 > 0):
                     num2 = num1 + 51
-                else:
-                    num2 = 0
-                    
-                num1 = 0
  
         admin1 = admin_check(1)
         admin2 = admin_check(6)
