@@ -864,7 +864,7 @@ def history_view(name = None, num = 1):
                     
                 if(re.search("^\+", data['leng'])):
                     leng = '<span style="color:green;">' + data['leng'] + '</span>'
-                elif(re.search("^\+", data['leng'])):
+                elif(re.search("^\-", data['leng'])):
                     leng = '<span style="color:red;">' + data['leng'] + '</span>'
                 else:
                     leng = '<span style="color:gray;">' + data['leng'] + '</span>'
