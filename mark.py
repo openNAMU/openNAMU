@@ -226,12 +226,15 @@ def namumark(title, data):
     data = re.sub("\[anchor\((?P<in>[^\[\]]*)\)\]", '<span id="\g<in>"></span>', data)
     data = savemark(data)
     
+    data = '\n' + data + '\n'
+    
+    include = re.compile("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]")
     while(True):
-        m = re.search("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]", data)
+        m = include.search(data)
         if(m):
             results = m.groups()
             if(results[0] == title):
-                data = re.sub("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]", "<b>" + results[0] + "</b>", data, 1)
+                data = include.sub("<b>" + results[0] + "</b>", data, 1)
             else:
                 db_ex("select * from data where title = '" + db_pas(results[0]) + "'")
                 in_con = db_get()
@@ -239,7 +242,7 @@ def namumark(title, data):
                 backlink_plus(title, results[0], 'include')
                 if(in_con):                        
                     in_data = in_con[0]['data']
-                    in_data = re.sub("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]", "", in_data)
+                    in_data = include.sub("", in_data)
                     
                     in_data = html_pas(in_data, 1)
                     in_data = mid_pas(in_data, b, True)[0]
@@ -254,10 +257,10 @@ def namumark(title, data):
                                 a = re.sub("([^= ,]*)\=([^,]*)", "", a, 1)
                             else:
                                 break       
-
-                    data = re.sub("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]", '\n<nobr><div>' + in_data + '</div>\n<nobr>', data, 1)
+                                
+                    data = include.sub('\n<nobr><div>' + in_data + '</div><nobr>\n', data, 1)
                 else:
-                    data = re.sub("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]", "<a class=\"not_thing\" href=\"" + url_pas(results[0]) + "\">" + results[0] + "</a>", data, 1)
+                    data = include.sub("<a class=\"not_thing\" href=\"" + url_pas(results[0]) + "\">" + results[0] + "</a>", data, 1)
         else:
             break
     
@@ -275,8 +278,6 @@ def namumark(title, data):
             backlink_plus(title, results[0], 'redirect')
         else:
             break
-
-    data = '\n' + data + '\n'
 
     data = re.sub("\[nicovideo\((?P<in>[^,)]*)(?:(?:,(?:[^,)]*))+)?\)\]", "[[http://embed.nicovideo.jp/watch/\g<in>]]", data)
     
@@ -689,7 +690,7 @@ def namumark(title, data):
     if(category):
         data += '<div style="width:100%;border: 1px solid #777;padding: 5px;margin-top: 1em;">분류: ' + category + '</div>'
         
-    data = re.sub("(?:\|\|\r\n)", "#table#<nobr>", data)
+    data = re.sub("(?:\|\|\r\n)", "#table#<tablenobr>", data)
         
     while(True):
         y = re.search("(\|\|(?:(?:(?:(?:(?!\|\|).)*)(?:\n?))+))", data)
@@ -704,7 +705,7 @@ def namumark(title, data):
             break
             
     data = re.sub("#table#", "||", data)
-    data = re.sub("<nobr>", "\r\n", data)
+    data = re.sub("<tablenobr>", "\r\n", data)
     
     while(True):
         m = re.search("(\|\|(?:(?:(?:.*)\n?)\|\|)+)", data)
@@ -1034,7 +1035,7 @@ def namumark(title, data):
             data = re.sub("(\|\|(?:(?:(?:.*)\n?)\|\|)+)", table, data, 1)
         else:
             break
-    
+            
     data = re.sub("(\n<nobr>|<nobr>\n|<nobr>)", "", data)
     data = re.sub("<nowiki>(?P<in>.)<\/nowiki>", "\g<in>", data)
     data = re.sub("<space>", " ", data)
