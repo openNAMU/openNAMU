@@ -819,7 +819,7 @@ def blocklog(number = 1):
                 div += '</tbody></table></div>'
                 
                 if(number != 1):
-                    div = div + '<br><a href="/blocklog/n/' + str(number - 1) + '">(이전)</a>'
+                    div += '<br><a href="/blocklog/n/' + str(number - 1) + '">(이전)</a>'
                     
                 break
     else:
@@ -1008,16 +1008,7 @@ def old_view(name = None, num = None):
             db_ex("select * from history where title = '" + db_pas(name) + "' and id = '" + str(num) + "'")
             rows = db_get()
             if(rows):
-                enddata = namumark(name, rows[0]['data'])
-                
-                m = re.search('<div id="toc">((?:(?!\/div>).)*)<\/div>', enddata)
-                if(m):
-                    result = m.groups()
-                    left = result[0]
-                else:
-                    left = ''
-                    
-                return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), data = enddata, left = left, sub = '옛 문서'))
+                return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), data = namumark(name, rows[0]['data']), sub = '옛 문서'))
             else:
                 return(redirect('/history/' + url_pas(name)))
         else:
@@ -1026,16 +1017,7 @@ def old_view(name = None, num = None):
         db_ex("select * from history where title = '" + db_pas(name) + "' and id = '" + str(num) + "'")
         rows = db_get()
         if(rows):
-            enddata = namumark(name, rows[0]['data'])
-            
-            m = re.search('<div id="toc">((?:(?!\/div>).)*)<\/div>', enddata)
-            if(m):
-                result = m.groups()
-                left = result[0]
-            else:
-                left = ''
-                
-            return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), data = enddata, left = left, sub = '옛 문서'))
+            return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), data = namumark(name, rows[0]['data']), sub = '옛 문서'))
         else:
             return(redirect('/history/' + url_pas(name)))
             
@@ -2427,15 +2409,8 @@ def read_view(name = None, redirect = None):
             elsedata = re.sub("^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)", " * [[\g<in>]] 문서로 넘겨주기", elsedata)
                 
         enddata = namumark(name, elsedata)
-        
-        m = re.search('<div id="toc">((?:(?!\/div>).)*)<\/div>', enddata)
-        if(m):
-            result = m.groups()
-            left = result[0]
-        else:
-            left = ''
             
-        return(template('read', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), data = enddata + div, acl = acl, left = left, uppage = uppage, style = style, topic = topic, redirect = redirect, admin = admin_memu))
+        return(template('read', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), data = enddata + div, acl = acl, uppage = uppage, style = style, topic = topic, redirect = redirect, admin = admin_memu))
     else:
         m = re.search("^사용자:(.*)$", name)
         if(m):

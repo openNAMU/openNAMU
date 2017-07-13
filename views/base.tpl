@@ -74,12 +74,6 @@
             <a class="scroll-bottom" href="#powered" id="right"><i class="fa fa-arrow-down" aria-hidden="true"></i></a>
         </div>
         <div id="all_contect">
-            <div id="left_bar">
-                <a href="#">맨 위로</a>
-                <br>
-                <br>
-                {{!get('left', '')}}
-            </div>
             <div class="four-fifths column">
                 {{!base}}
                 <hr id="last">

@@ -280,7 +280,7 @@ div.scroll-buttons {
 
 .four-fifths {
     float: none;
-    margin-left: auto;
+    margin: auto;
 }
 
 #tool {
