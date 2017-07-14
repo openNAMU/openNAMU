@@ -2264,6 +2264,7 @@ def diff_data(name = None, a = None, b = None):
 @route('/w/<name:path>/from/<redirect:path>')
 def read_view(name = None, redirect = None):
     data_none = False
+    sub = None
     
     i = 0
     db_ex("select * from rd where title = '" + db_pas(name) + "' order by date asc")
@@ -2273,12 +2274,14 @@ def read_view(name = None, redirect = None):
             a = rows[i]
         except:
             topic = ""
+            
             break
             
         db_ex("select * from stop where title = '" + db_pas(rows[i]['title']) + "' and sub = '" + db_pas(rows[i]['sub']) + "' and close = 'O'")
         row = db_get()
         if(not row):
             topic = "open"
+            
             break
         else:
             i += 1
