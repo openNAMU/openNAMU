@@ -198,7 +198,8 @@ def upload():
         else:
             file = request.files.file
             if(file):
-                exist = re.search('^(.+)(\.(?:[Jj][Pp][Gg]|[Gg][Ii][Ff]|[Jj][Pp][Ee][Gg]|[Pp][Nn][Gg]))$', file.filename)
+                comp = re.compile("^(.+)(\.(?:jpg|gif|png|jpeg))$", re.I)
+                exist = comp.search(file.filename)
                 if(exist):
                     if((int(set_data['upload']) * 1024 * 1024) < request.content_length):
                         return(redirect('/error/17'))
