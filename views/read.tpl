@@ -5,7 +5,7 @@
         <a class="menu-item selected" href="#" onclick="return false">
             문서
         </a>
-        % if(defined('data_none')):
+        % if(data_none == True):
             <a class="menu-item" href="/edit/{{page}}">생성</a>
         % else:
             <a class="menu-item" href="/edit/{{page}}">수정</a>
