@@ -1544,10 +1544,10 @@ def topic_stop(name = None, sub = None):
             db_ex("select * from stop where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' and close = ''")
             stop = db_get()
             if(stop):
-                db_ex("insert into topic (id, title, sub, data, date, ip, block, top) value ('" + db_pas(str(int(topic_check[0]['id']) + 1)) + "', '" + db_pas(name) + "', '" + db_pas(sub) + "', 'Restart', '" + db_pas(time) + "', '" + db_pas(ip) + " - Restart', '', '')")
+                db_ex("insert into topic (id, title, sub, data, date, ip, block, top) value ('" + db_pas(str(int(topic_check[0]['id']) + 1)) + "', '" + db_pas(name) + "', '" + db_pas(sub) + "', '토론 재 시작', '" + db_pas(time) + "', '" + db_pas(ip) + "', '', '1')")
                 db_ex("delete from stop where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' and close = ''")
             else:
-                db_ex("insert into topic (id, title, sub, data, date, ip, block, top) value ('" + db_pas(str(int(topic_check[0]['id']) + 1)) + "', '" + db_pas(name) + "', '" + db_pas(sub) + "', 'Stop', '" + db_pas(time) + "', '" + db_pas(ip) + " - Stop', '', '')")
+                db_ex("insert into topic (id, title, sub, data, date, ip, block, top) value ('" + db_pas(str(int(topic_check[0]['id']) + 1)) + "', '" + db_pas(name) + "', '" + db_pas(sub) + "', '토론 정지', '" + db_pas(time) + "', '" + db_pas(ip) + "', '', '1')")
                 db_ex("insert into stop (title, sub, close) value ('" + db_pas(name) + "', '" + db_pas(sub) + "', '')")
             db_com()
             
@@ -1572,10 +1572,10 @@ def topic_close(name = None, sub = None):
             db_ex("select * from stop where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' and close = 'O'")
             close = db_get()
             if(close):
-                db_ex("insert into topic (id, title, sub, data, date, ip, block, top) value ('" + db_pas(str(int(topic_check[0]['id']) + 1)) + "', '" + db_pas(name) + "', '" + db_pas(sub) + "', 'Reopen', '" + db_pas(time) + "', '" + db_pas(ip) + " - Reopen', '', '')")
+                db_ex("insert into topic (id, title, sub, data, date, ip, block, top) value ('" + db_pas(str(int(topic_check[0]['id']) + 1)) + "', '" + db_pas(name) + "', '" + db_pas(sub) + "', '토론 다시 열기', '" + db_pas(time) + "', '" + db_pas(ip) + "', '', '1')")
                 db_ex("delete from stop where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' and close = 'O'")
             else:
-                db_ex("insert into topic (id, title, sub, data, date, ip, block, top) value ('" + db_pas(str(int(topic_check[0]['id']) + 1)) + "', '" + db_pas(name) + "', '" + db_pas(sub) + "', 'Close', '" + db_pas(time) + "', '" + db_pas(ip) + " - Close', '', '')")
+                db_ex("insert into topic (id, title, sub, data, date, ip, block, top) value ('" + db_pas(str(int(topic_check[0]['id']) + 1)) + "', '" + db_pas(name) + "', '" + db_pas(sub) + "', '토론 닫음', '" + db_pas(time) + "', '" + db_pas(ip) + "', '', '1')")
                 db_ex("insert into stop (title, sub, close) value ('" + db_pas(name) + "', '" + db_pas(sub) + "', 'O')")
             db_com()
             
@@ -1600,10 +1600,10 @@ def topic_agree(name = None, sub = None):
             db_ex("select * from agreedis where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "'")
             agree = db_get()
             if(agree):
-                db_ex("insert into topic (id, title, sub, data, date, ip, block, top) value ('" + db_pas(str(int(topic_check[0]['id']) + 1)) + "', '" + db_pas(name) + "', '" + db_pas(sub) + "', 'Settlement', '" + db_pas(time) + "', '" + db_pas(ip) + " - Settlement', '', '')")
+                db_ex("insert into topic (id, title, sub, data, date, ip, block, top) value ('" + db_pas(str(int(topic_check[0]['id']) + 1)) + "', '" + db_pas(name) + "', '" + db_pas(sub) + "', '합의 결렬', '" + db_pas(time) + "', '" + db_pas(ip) + "', '', '1')")
                 db_ex("delete from agreedis where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "'")
             else:
-                db_ex("insert into topic (id, title, sub, data, date, ip, block, top) value ('" + db_pas(str(int(topic_check[0]['id']) + 1)) + "', '" + db_pas(name) + "', '" + db_pas(sub) + "', 'Agreement', '" + db_pas(time) + "', '" + db_pas(ip) + " - Agreement', '', '')")
+                db_ex("insert into topic (id, title, sub, data, date, ip, block, top) value ('" + db_pas(str(int(topic_check[0]['id']) + 1)) + "', '" + db_pas(name) + "', '" + db_pas(sub) + "', '합의 완료', '" + db_pas(time) + "', '" + db_pas(ip) + "', '', '1')")
                 db_ex("insert into agreedis (title, sub) value ('" + db_pas(name) + "', '" + db_pas(sub) + "')")
             db_com()
             
@@ -1625,27 +1625,20 @@ def topic(name = None, sub = None):
         db_ex("select id from topic where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' order by id + 0 desc limit 1")
         rows = db_get()
         if(rows):
-            number = int(rows[0]['id']) + 1
+            num = int(rows[0]['id']) + 1
         else:
-            number = 1
+            num = 1
         
         if(ban == 1 and not admin == 1):
             return(redirect('/ban'))
-        else:
-            db_ex("select * from user where id = '" + db_pas(ip) + "'")
-            rows = db_get()
-            if(rows):
-                if(not rows[0]['acl'] == 'user'):
-                    ip = ip + ' - Admin'
-                    
+        else:                    
             today = get_time()
             rd_plus(name, sub, today)
             
-            aa = request.forms.content
-            aa = re.sub("\[\[(분류:(?:(?:(?!\]\]).)*))\]\]", "[br]", aa)
+            aa = re.sub("\[\[(분류:(?:(?:(?!\]\]).)*))\]\]", "[br]", request.forms.content)
             aa = savemark(aa)
             
-            db_ex("insert into topic (id, title, sub, data, date, ip, block, top) value ('" + str(number) + "', '" + db_pas(name) + "', '" + db_pas(sub) + "', '" + db_pas(aa) + "', '" + today + "', '" + ip + "', '', '')")
+            db_ex("insert into topic (id, title, sub, data, date, ip, block, top) value ('" + str(num) + "', '" + db_pas(name) + "', '" + db_pas(sub) + "', '" + db_pas(aa) + "', '" + today + "', '" + ip + "', '', '')")
             db_com()
             
             return(redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub)))
@@ -1687,92 +1680,80 @@ def topic(name = None, sub = None):
                 style = 'display:none;'
         
         db_ex("select * from topic where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' order by id + 0 asc")
-        rows = db_get()
+        toda = db_get()
 
         db_ex("select * from topic where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' and top = 'O' order by id + 0 asc")
         top = db_get()
 
-        i = 0
         if(top):
-            while(True):
-                try:                        
-                    top_data = namumark('', top[i]['data'])
-                    top_data = re.sub("(?P<in>#(?:[0-9]*))", '<a href="\g<in>">\g<in></a>', top_data)
-                            
-                    ip = ip_pas(top[i]['ip'], 1)
-                                       
-                    div += '<table id="toron"><tbody><tr><td id="toroncolorred"><a href="#' + top[i]['id'] + '" id="' + top[i]['id'] + '-nt">#' + top[i]['id'] + '</a> ' + ip + ' <span style="float:right;">' + top[i]['date'] + '</span></td></tr><tr><td>' + top_data + '</td></tr></tbody></table><br>'
+            for dain in top:                     
+                top_data = namumark('', dain['data'])
+                top_data = re.sub("(?P<in>#(?:[0-9]*))", '<a href="\g<in>">\g<in></a>', top_data)
                         
-                    i += 1
-                except:
-                    break
+                ip = ip_pas(dain['ip'], 1)
+                                   
+                div += '<table id="toron"><tbody><tr><td id="toroncolorred"><a href="#' + dain['id'] + '">#' + dain['id'] + '</a> ' + ip + ' <span style="float:right;">' + dain['date'] + '</span></td></tr><tr><td>' + top_data + '</td></tr></tbody></table><br>'
                     
-        i = 0        
-        while(True):
-            try:
-                if(i == 0):
-                    start = rows[i]['ip']
-                    
-                indata = namumark('', rows[i]['data'])
-                indata = re.sub("(?P<in>#(?:[0-9]*))", '<a href="\g<in>">\g<in></a>', indata)
+        i = 0          
+        for dain in toda:
+            if(i == 0):
+                start = dain['ip']
                 
-                if(rows[i]['block'] == 'O'):
-                    indata = '블라인드 되었습니다.'
-                    block = 'id="block"'
-                else:
-                    block = ''
+            indata = namumark('', dain['data'])
+            indata = re.sub("(?P<in>#(?:[0-9]*))", '<a href="\g<in>">\g<in></a>', indata)
+            
+            if(dain['block'] == 'O'):
+                indata = '블라인드 되었습니다.'
+                block = 'id="block"'
+            else:
+                block = ''
 
-                m = re.search("^([^-]*)\s\-\s(Close|Reopen|Stop|Restart|Agreement|Settlement)$", rows[i]['ip'])
-                if(m):
-                    ban = ""
+            if(admin == 1):
+                if(dain['block'] == 'O'):
+                    isblock = ' <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/b/' + str(i + 1) + '">(해제)</a>'
                 else:
-                    if(admin == 1):
-                        if(rows[i]['block'] == 'O'):
-                            isblock = ' <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/b/' + str(i + 1) + '">(해제)</a>'
-                        else:
-                            isblock = ' <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/b/' + str(i + 1) + '">(블라인드)</a>'
+                    isblock = ' <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/b/' + str(i + 1) + '">(블라인드)</a>'
 
-                        db_ex("select id from topic where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' and id = '" + db_pas(str(i + 1)) + "' and top = 'O'")
-                        row = db_get()
-                        if(row):
-                            isblock = isblock + ' <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/notice/' + str(i + 1) + '">(해제)</a>'
-                        else:
-                            isblock = isblock + ' <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/notice/' + str(i + 1) + '">(공지)</a>'
-                            
-                        n = re.search("\- (?:Admin)$", rows[i]['ip'])
-                        if(n):
-                            ban = isblock
-                        else:
-                            db_ex("select end from ban where block = '" + db_pas(rows[i]['ip']) + "'")
-                            ban_it = db_get()
-                            if(ban_it):
-                                ban = ' <a href="/ban/' + url_pas(rows[i]['ip']) + '">(해제)</a>' + isblock
-                            else:
-                                ban = ' <a href="/ban/' + url_pas(rows[i]['ip']) + '">(차단)</a>' + isblock
-                    else:
-                        db_ex("select end from ban where block = '" + db_pas(rows[i]['ip']) + "'")
-                        ban_it = db_get()
-                        if(ban_it):
-                            ban = ' (X)'
-                        else:
-                            ban = ''
-
-                ip = ip_pas(rows[i]['ip'], 1)
-                        
-                if(rows[i]['ip'] == start):
-                    j = i + 1
-                    
-                    div += '<table id="toron"><tbody><tr><td id="toroncolorgreen"><a href="javascript:void(0);" id="' + str(j) + '">#' + str(j) + '</a> ' + ip + ban + ' <span style="float:right;">' + rows[i]['date'] + '</span></td></tr><tr><td ' + block + '>' + indata + '</td></tr></tbody></table><br>'
+                db_ex("select id from topic where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' and id = '" + db_pas(str(i + 1)) + "' and top = 'O'")
+                row = db_get()
+                if(row):
+                    isblock = isblock + ' <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/notice/' + str(i + 1) + '">(해제)</a>'
                 else:
-                    j = i + 1
+                    isblock = isblock + ' <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/notice/' + str(i + 1) + '">(공지)</a>'
                     
-                    div += '<table id="toron"><tbody><tr><td id="toroncolor"><a href="javascript:void(0);" id="' + str(j) + '">#' + str(j) + '</a> ' + ip + ban + ' <span style="float:right;">' + rows[i]['date'] + '</span></td></tr><tr><td ' + block + '>' + indata + '</td></tr></tbody></table><br>'
+                db_ex("select end from ban where block = '" + db_pas(dain['ip']) + "'")
+                ban_it = db_get()
+                if(ban_it):
+                    ban = ' <a href="/ban/' + url_pas(dain['ip']) + '">(해제)</a>' + isblock
+                else:
+                    ban = ' <a href="/ban/' + url_pas(dain['ip']) + '">(차단)</a>' + isblock
+            else:
+                db_ex("select end from ban where block = '" + db_pas(dain['ip']) + "'")
+                ban_it = db_get()
+                if(ban_it):
+                    ban = ' (X)'
+                else:
+                    ban = ''
+            
+            chad = ''
+            db_ex('select acl from user where id = "' + db_pas(dain['ip']) + '"')
+            adch = db_get()
+            if(adch):
+                if(not adch[0]['acl'] == 'user'):
+                    chad = ' (관리자)'
+
+            ip = ip_pas(dain['ip'], 1)
                     
-                i += 1
-            except:
-                div += '</div>'
+            if(dain['top'] == '1'):
+                color = 'blue'
+            elif(dain['ip'] == start):
+                color = 'green'
+            else:
+                color = ''
+                         
+            div += '<table id="toron"><tbody><tr><td id="toroncolor' + color + '"><a href="javascript:void(0);" id="' + str(i + 1) + '">#' + str(i + 1) + '</a> ' + ip + chad + ban + ' <span style="float:right;">' + dain['date'] + '</span></td></tr><tr><td ' + block + '>' + indata + '</td></tr></tbody></table><br>'
                 
-                break
+            i += 1
             
         return(template('vstopic', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, page = url_pas(name), suburl = url_pas(sub), toron = sub, logo = set_data['name'], rows = div, ban = ban, style = style, sub = '토론'))
         
@@ -2282,8 +2263,9 @@ def diff_data(name = None, a = None, b = None):
 @route('/w/<name:path>')
 @route('/w/<name:path>/from/<redirect:path>')
 def read_view(name = None, redirect = None):
-    i = 0
+    data_none = False
     
+    i = 0
     db_ex("select * from rd where title = '" + db_pas(name) + "' order by date asc")
     rows = db_get()
     while(True):
@@ -2325,28 +2307,29 @@ def read_view(name = None, redirect = None):
             i = 0
             
             while(True):
-                try:
-                    a = rows[i]
-                except:
-                    break
-                    
-                db_ex("select * from data where title = '" + db_pas(rows[i]['cat']) + "'")
-                row = db_get()
-                if(row):
-                    aa = row[0]['data']                  
-                    aa = namumark('', aa)
-                    bb = re.search('<div style="width:100%;border: 1px solid #777;padding: 5px;margin-top: 1em;">분류:((?:(?!<\/div>).)*)<\/div>', aa)
-                    if(bb):
-                        cc = bb.groups()
-                        
-                        mm = re.search("^분류:(.*)", name)
-                        if(mm):
-                            ee = mm.groups()
+                try:                    
+                    db_ex("select * from data where title = '" + db_pas(rows[i]['cat']) + "'")
+                    row = db_get()
+                    if(row):
+                        aa = row[0]['data']                  
+                        aa = namumark('', aa)
+                        bb = re.search('<div style="width:100%;border: 1px solid #777;padding: 5px;margin-top: 1em;">분류:((?:(?!<\/div>).)*)<\/div>', aa)
+                        if(bb):
+                            cc = bb.groups()
                             
-                            if(re.search("<a (class=\"not_thing\")? href=\"\/w\/" + url_pas(name) + "\">" + ee[0] + "<\/a>", cc[0])):
-                                div += '<li><a href="/w/' + url_pas(rows[i]['cat']) + '">' + rows[i]['cat'] + '</a></li>'
+                            mm = re.search("^분류:(.*)", name)
+                            if(mm):
+                                ee = mm.groups()
                                 
-                                i += 1
+                                if(re.search("<a (class=\"not_thing\")? href=\"\/w\/" + url_pas(name) + "\">" + ee[0] + "<\/a>", cc[0])):
+                                    div += '<li><a href="/w/' + url_pas(rows[i]['cat']) + '">' + rows[i]['cat'] + '</a></li>'
+                                    
+                                    i += 1
+                                else:
+                                    db_ex("delete from cat where title = '" + db_pas(name) + "' and cat = '" + db_pas(rows[i]['cat']) + "'")
+                                    db_com()
+                                    
+                                    i += 1
                             else:
                                 db_ex("delete from cat where title = '" + db_pas(name) + "' and cat = '" + db_pas(rows[i]['cat']) + "'")
                                 db_com()
@@ -2362,11 +2345,8 @@ def read_view(name = None, redirect = None):
                         db_com()
                         
                         i += 1
-                else:
-                    db_ex("delete from cat where title = '" + db_pas(name) + "' and cat = '" + db_pas(rows[i]['cat']) + "'")
-                    db_com()
-                    
-                    i += 1
+                except:
+                    break
                     
             div = '<h2>분류</h2>' + div
         else:
@@ -2392,17 +2372,17 @@ def read_view(name = None, redirect = None):
             db_ex("select * from user where id = '" + db_pas(g[0]) + "'")
             test = db_get()
             if(test):
-                if(test[0]['acl'] == 'owner'):
-                    acl = '(소유자)'
-                elif(test[0]['acl'] == 'admin'):
+                if(not test[0]['acl'] == 'user'):
                     acl = '(관리자)'
 
             db_ex("select * from ban where block = '" + db_pas(g[0]) + "'")
             user = db_get()
             if(user):
-                elsedata = '{{{#!wiki style="border:2px solid red;padding:10px;"\r\n{{{+2 {{{#red 이 사용자는 차단 당했습니다.}}}}}}\r\n\r\n차단 해제 일 : ' + user[0]['end'] + '[br]사유 : ' + user[0]['why'] + '}}}[br]' + rows[0]['data']
+                sub = '차단'
             else:
-                elsedata = rows[0]['data']
+                sub = ''
+            
+            elsedata = rows[0]['data']
         else:
             elsedata = rows[0]['data']
                 
@@ -2410,9 +2390,9 @@ def read_view(name = None, redirect = None):
             elsedata = re.sub("^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)", " * [[\g<in>]] 문서로 넘겨주기", elsedata)
                 
         enddata = namumark(name, elsedata)
-            
-        return(template('read', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), data = enddata + div, acl = acl, uppage = uppage, style = style, topic = topic, redirect = redirect, admin = admin_memu))
     else:
+        data_none = True
+        
         m = re.search("^사용자:(.*)$", name)
         if(m):
             g = m.groups()
@@ -2420,16 +2400,20 @@ def read_view(name = None, redirect = None):
             db_ex("select * from ban where block = '" + db_pas(g[0]) + "'")
             user = db_get()
             if(user):
-                elsedata = '{{{#!wiki style="border:2px solid red;padding:10px;"\r\n{{{+2 {{{#red 이 사용자는 차단 당했습니다.}}}}}}\r\n\r\n차단 해제 일 : ' + user[0]['end'] + '[br]사유 : ' + user[0]['why'] + '}}}[br]' + 'None'
+                sub = '차단'
             else:
-                elsedata = 'None'
+                sub = ''
+                
+            elsedata = 'None'
         else:
             elsedata = 'None'
             
         if(redirect):
             elsedata = re.sub("^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)", " * [[\g<in>]] 문서로 넘겨주기", elsedata)
+            
+        enddata = namumark(name, elsedata)
         
-        return(template('read', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), data = namumark(name, elsedata) + div, uppage = uppage, style = style, acl = acl, topic = topic, redirect = redirect, admin = admin_memu, data_none = True))
+    return(template('read', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), data = enddata + div, uppage = uppage, style = style, acl = acl, topic = topic, redirect = redirect, admin = admin_memu, data_none = data_none, sub = sub))
 
 @route('/user/<name:path>/topic')
 @route('/user/<name:path>/topic/<num:int>')

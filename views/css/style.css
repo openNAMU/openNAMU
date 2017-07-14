@@ -510,6 +510,10 @@ td#block {
     background: gainsboro;
 }
 
+td#toroncolorblue {
+    background: #c1ebff;
+}
+
 .foot {
     position: fixed;
     bottom: 0px;

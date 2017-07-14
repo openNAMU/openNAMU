@@ -134,17 +134,7 @@ def login_check():
         return(0)
 
 def ip_pas(raw_ip, num):
-    yes = re.search("([^-]*)\s\-\s(Close|Reopen|Stop|Restart|Admin|Agreement|Settlement)$", raw_ip)
-    if(yes):
-        results = yes.groups()
-        
-        db_ex("select title from data where title = '사용자:" + db_pas(results[0]) + "'")
-        row = db_get()
-        if(row):
-            ip = '<a href="/w/' + url_pas('사용자:' + results[0]) + '">' + results[0] + '</a> - ' + results[1]
-        else:
-            ip = '<a class="not_thing" href="/w/' + url_pas('사용자:' + results[0]) + '">' + results[0] + '</a> - ' + results[1]
-    elif(re.search("\.", raw_ip)):
+    if(re.search("\.", raw_ip)):
         ip = raw_ip
     else:
         db_ex("select title from data where title = '사용자:" + db_pas(raw_ip) + "'")
@@ -155,20 +145,11 @@ def ip_pas(raw_ip, num):
             ip = '<a class="not_thing" href="/w/' + url_pas('사용자:' + raw_ip) + '">' + raw_ip + '</a>'
             
     if(num == 1):
-        if(yes):
-            ip += ' <a href="/user/' + url_pas(results[0]) + '">(기록)</a>'
-        else:
-            ip += ' <a href="/user/' + url_pas(raw_ip) + '">(기록)</a>'
+        ip += ' <a href="/user/' + url_pas(raw_ip) + '">(기록)</a>'
     elif(num == 2):
-        if(yes):
-            ip += ' <a href="/record/' + url_pas(results[0]) + '">(기록)</a> <a href="/user/' + url_pas(results[0]) + '">(토론 기록)</a>'
-        else:
-            ip += ' <a href="/record/' + url_pas(raw_ip) + '">(기록)</a> <a href="/user/' + url_pas(raw_ip) + '">(토론 기록)</a>'        
+        ip += ' <a href="/record/' + url_pas(raw_ip) + '">(기록)</a> <a href="/user/' + url_pas(raw_ip) + '">(토론 기록)</a>'        
     else:
-        if(yes):
-            ip += ' <a href="/record/' + url_pas(results[0]) + '">(기록)</a>'
-        else:
-            ip += ' <a href="/record/' + url_pas(raw_ip) + '">(기록)</a>'
+        ip += ' <a href="/record/' + url_pas(raw_ip) + '">(기록)</a>'
 
     return(ip)
 

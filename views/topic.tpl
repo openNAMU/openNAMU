@@ -26,6 +26,6 @@
         <input class="form-control" name="topic" style="width: 100%">
         <br>
         <br>
-        <button class="btn btn-primary" type="submit">New</button>
+        <button class="btn btn-primary" type="submit">만들기</button>
     % end
 </form>
