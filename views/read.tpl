@@ -36,7 +36,7 @@
     % if(defined('acl')):
         <sub> {{acl}}</sub>
     % end
-    % if(defined('sub')):
+    % if(not sub == None):
         <sub> ({{sub}})</sub>
     % end
 </h1>
