@@ -776,7 +776,7 @@ def recent_discuss():
                 
                 break
     else:
-        div = '<br>None'
+        div = 'None'
             
     return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = div, title = '최근 토론내역'))
 

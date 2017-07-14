@@ -226,8 +226,6 @@ def namumark(title, data):
     data = re.sub("\[anchor\((?P<in>[^\[\]]*)\)\]", '<span id="\g<in>"></span>', data)
     data = savemark(data)
     
-    data = '\n' + data + '\n'
-    
     include = re.compile("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]")
     while(True):
         m = include.search(data)
@@ -265,20 +263,21 @@ def namumark(title, data):
             break
     
     while(True):
-        m = re.search('^#(?:redirect|넘겨주기)\s([^\n]*)', data)
+        m = re.search('^#(?:redirect|넘겨주기) ([^\n]*)$', data)
         if(m):
             results = m.groups()
-            aa = re.search("^(.*)(#(?:.*))$", results[0])
+            aa = re.search("^([^\n]*)(#(?:[^\n]*))$", results[0])
             if(aa):
                 results = aa.groups()
-                data = re.sub('^#(?:redirect|넘겨주기)\s([^\n]*)', '<meta http-equiv="refresh" content="0;url=/w/' + url_pas(results[0]) + '/from/' + url_pas(title) + results[1] + '" />', data, 1)
+                data = re.sub('^#(?:redirect|넘겨주기) ([^\n]*)$', '<meta http-equiv="refresh" content="0;url=/w/' + url_pas(results[0]) + '/from/' + url_pas(title) + results[1] + '" />', data, 1)
             else:
-                data = re.sub('^#(?:redirect|넘겨주기)\s([^\n]*)', '<meta http-equiv="refresh" content="0;url=/w/' + url_pas(results[0]) + '/from/' + url_pas(title) + '" />', data, 1)
+                data = re.sub('^#(?:redirect|넘겨주기) ([^\n]*)$', '<meta http-equiv="refresh" content="0;url=/w/' + url_pas(results[0]) + '/from/' + url_pas(title) + '" />', data, 1)
             
             backlink_plus(title, results[0], 'redirect')
         else:
             break
-
+            
+    data = '\n' + data + '\n'
     data = re.sub("\[nicovideo\((?P<in>[^,)]*)(?:(?:,(?:[^,)]*))+)?\)\]", "[[http://embed.nicovideo.jp/watch/\g<in>]]", data)
     
     while(True):
@@ -374,7 +373,7 @@ def namumark(title, data):
             d = c
             c = re.sub("\[\[(([^|]*)\|)?(?P<in>[^\]]*)\]\]", "\g<in>", c)
 
-            data = re.sub('(={1,6})\s?([^=]*)\s?(?:={1,6})(?:\s+)?\n', '<h' + str(wiki) + ' id="' + c + '"><a href="#toc" id="s-' + toc + '">' + toc + '.</a> ' + d + ' <span style="font-size:11px;">[<a href="/edit/' + url_pas(title) + '/section/' + str(i[0]) + '">편집</a>]</span></h' + str(wiki) + '>', data, 1);
+            data = re.sub('(={1,6})\s?([^=]*)\s?(?:={1,6})(?:\s+)?\n', '<tablenobr><h' + str(wiki) + ' id="' + c + '"><a href="#toc" id="s-' + toc + '">' + toc + '.</a> ' + d + ' <span style="font-size:11px;">[<a href="/edit/' + url_pas(title) + '/section/' + str(i[0]) + '">편집</a>]</span></h' + str(wiki) + '>', data, 1);
         else:
             rtoc += '</div>'
             
@@ -698,7 +697,7 @@ def namumark(title, data):
     
     if(category):
         data += '<div style="width:100%;border: 1px solid #777;padding: 5px;margin-top: 1em;">분류: ' + category + '</div>'
-        
+    
     data = re.sub("(?:\|\|\r\n)", "#table#<tablenobr>", data)
         
     while(True):
@@ -1045,6 +1044,7 @@ def namumark(title, data):
         else:
             break
             
+    data = re.sub("\r\n(?P<in><h[0-6])", "\g<in>", data)
     data = re.sub("(\n<nobr>|<nobr>\n|<nobr>)", "", data)
     data = re.sub("<nowiki>(?P<in>.)<\/nowiki>", "\g<in>", data)
     data = re.sub("<space>", " ", data)
