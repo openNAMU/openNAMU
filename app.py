@@ -2354,50 +2354,31 @@ def read_view(name = None, redirect = None):
         else:
             if(not acl):
                 acl = ''
-
-        m = re.search("^사용자:(.*)$", name)
-        if(m):
-            g = m.groups()
-            
-            db_ex("select * from user where id = '" + db_pas(g[0]) + "'")
-            test = db_get()
-            if(test):
-                if(not test[0]['acl'] == 'user'):
-                    acl = '(관리자)'
-
-            db_ex("select * from ban where block = '" + db_pas(g[0]) + "'")
-            user = db_get()
-            if(user):
-                sub = '차단'
-            
-            elsedata = rows[0]['data']
-        else:
-            elsedata = rows[0]['data']
                 
-        if(redirect):
-            elsedata = re.sub("^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)", " * [[\g<in>]] 문서로 넘겨주기", elsedata)
-                
-        enddata = namumark(name, elsedata)
+        elsedata = rows[0]['data']
     else:
         data_none = True
+        elsedata = 'None'
+
+    m = re.search("^사용자:(.*)$", name)
+    if(m):
+        g = m.groups()
         
-        m = re.search("^사용자:(.*)$", name)
-        if(m):
-            g = m.groups()
+        db_ex("select * from user where id = '" + db_pas(g[0]) + "'")
+        test = db_get()
+        if(test):
+            if(not test[0]['acl'] == 'user'):
+                acl = '(관리자)'
+
+        db_ex("select * from ban where block = '" + db_pas(g[0]) + "'")
+        user = db_get()
+        if(user):
+            sub = '차단'
             
-            db_ex("select * from ban where block = '" + db_pas(g[0]) + "'")
-            user = db_get()
-            if(user):
-                sub = '차단'
-                
-            elsedata = 'None'
-        else:
-            elsedata = 'None'
+    if(redirect):
+        elsedata = re.sub("^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)", " * [[\g<in>]] 문서로 넘겨주기", elsedata)
             
-        if(redirect):
-            elsedata = re.sub("^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)", " * [[\g<in>]] 문서로 넘겨주기", elsedata)
-            
-        enddata = namumark(name, elsedata)
+    enddata = namumark(name, elsedata)
         
     return(template('read', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), data = enddata + div, uppage = uppage, style = style, acl = acl, topic = topic, redirect = redirect, admin = admin_memu, data_none = data_none, sub = sub))
 
