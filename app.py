@@ -2251,7 +2251,6 @@ def diff_data(name = None, a = None, b = None):
 @route('/w/<name:path>/from/<redirect:path>')
 def read_view(name = None, redirect = None):
     data_none = False
-    sub = None
     
     i = 0
     db_ex("select * from rd where title = '" + db_pas(name) + "' order by date asc")
@@ -2464,7 +2463,7 @@ def user_topic_list(name = None, num = 1):
     if(ban_it):
         sub = '차단'
     else:
-        sub = None
+        sub = False
                 
     return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = div, title = '사용자 토론 기록', sub = sub))
         
