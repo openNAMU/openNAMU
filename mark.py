@@ -486,6 +486,7 @@ def namumark(title, data):
             src = ''
             width = '560'
             height = '315'
+            time = '0'
             
             result = m.groups()
             if(result[0]):
@@ -505,8 +506,12 @@ def namumark(title, data):
                 mdata = re.search('height=([0-9]*)', result[1])
                 if(mdata):
                     height = mdata.groups()[0]
+                    
+                mdata = re.search('time=([0-9]*)', result[1])
+                if(mdata):
+                    time = mdata.groups()[0]
 
-            data = com.sub('<iframe width="' + width + '" height="' + height + '" src="https://www.youtube.com/embed/' + src + '" frameborder="0" allowfullscreen></iframe><br>', data, 1)
+            data = com.sub('<iframe width="' + width + '" height="' + height + '" src="https://www.youtube.com/embed/' + src + '?start=' + time + '" frameborder="0" allowfullscreen></iframe><br>', data, 1)
         else:
             break
      
