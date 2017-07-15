@@ -379,9 +379,7 @@ def admin_list():
             i += 1
         else:
             div += '</div>'
-            
-        
-                       
+                
         return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = div, title = '관리자 목록'))
     else:
         return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], title = '관리자 목록'))
@@ -2390,7 +2388,7 @@ def user_topic_list(name = None, num = 1):
     ydmin = admin_check(1)
     div = '<div><table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;">토론명</td><td style="text-align: center;width:33.33%;">작성자</td><td style="text-align: center;width:33.33%;">시간</td></tr>'
     
-    db_ex("select title, id, sub, ip, date from topic where ip = '" + db_pas(name) + "' or ip = '" + db_pas(name) + " - Admin' order by date desc")
+    db_ex("select title, id, sub, ip, date from topic where ip = '" + db_pas(name) + "' order by date desc")
     rows = db_get()
     if(rows):
         while(True):
