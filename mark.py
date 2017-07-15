@@ -559,30 +559,36 @@ def namumark(title, data):
             break
             
     while(True):
-        com = re.compile("(http(?:s)?:\/\/(?:(?:(?:(?!\.(?:jpg|png|gif|jpeg)|#(?:jpg|png|gif|jpeg)#|<\/(?:[^>]*)>).)*)(?:\.(?:jpg|png|gif|jpeg))))(?:(?:(?:\?)width=((?:[0-9]*)(?:px|%)?))?(?:(?:\?|&)height=((?:[0-9]*)(?:px|%)?))?)", re.I)
+        com = re.compile("(http(?:s)?:\/\/(?:(?:(?:(?!\.(?:jpg|png|gif|jpeg)|#(?:jpg|png|gif|jpeg)#|<\/(?:[^>]*)>).)*)(?:\.(?:jpg|png|gif|jpeg))))(\?[^ \r\n]*)?", re.I)
         m = com.search(data)
         if(m):
+            width = ''
+            height = ''
+            align = ''
+            
             result = m.groups()
             if(result[1]):
-                if(result[2]):
-                    width = result[1]
-                    height = result[2]
-                else:
-                    width = result[1]
-                    height = ''
-            elif(result[2]):
-                height = result[2]
-                width = ''
-            else:
-                width = ''
-                height = ''
+                mdata = re.search('width=([0-9]*)', result[1])
+                if(mdata):
+                    width = mdata.groups()[0]
+                
+                mdata = re.search('height=([0-9]*)', result[1])
+                if(mdata):
+                    height = mdata.groups()[0]
+                    
+                mdata = re.search('align=([^&]*)', result[1])
+                if(mdata):
+                    if(mdata.groups()[0] == 'right'):
+                        align = 'right'
+                    elif(mdata.groups()[0] == 'center'):
+                        align = 'center'
 
             c = result[0]
             
             comp = re.compile("\.(?P<in>jpg|gif|png|jpeg)", re.I)
             c = comp.sub("#\g<in>#", c)
 
-            data = com.sub("<img width='" + width + "' height='" + height + "' src='" + c + "'>", data, 1)
+            data = com.sub("<img align='" + align + "' width='" + width + "' height='" + height + "' src='" + c + "'></table>", data, 1)
         else:
             break
             
