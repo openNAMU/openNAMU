@@ -480,25 +480,33 @@ def namumark(title, data):
     data = re.sub("\[br\]",'<br>', data)
     
     while(True):
-        com = re.compile("\[youtube\((?:https:\/\/www\.youtube\.com\/watch\?v=|https:\/\/youtu\.be\/)?((?:(?!,|\)\]).)*)(?:,(?:\s)?)?(?:width=((?:(?!,|\)\]).)*))?(?:,(?:\s)?)?(?:height=((?:(?!,|\)\]).)*))?\)\]")
+        com = re.compile("\[youtube\(([^, )]*)(,[^)]*)?\)\]")
         m = com.search(data)
         if(m):
+            src = ''
+            width = '560'
+            height = '315'
+            
             result = m.groups()
+            if(result[0]):
+                yudt = re.search('(?:\?v=(.*)|\/([^/?]*)|^([a-zA-Z0-9]*))$', result[0])
+                if(yudt.groups()[0]):
+                    src = yudt.groups()[0]
+                elif(yudt.groups()[1]):
+                    src = yudt.groups()[1]
+                elif(yudt.groups()[2]):
+                    src = yudt.groups()[2]
+                    
             if(result[1]):
-                if(result[2]):
-                    width = result[1]
-                    height = result[2]
-                else:
-                    width = result[1]
-                    height = '315'
-            elif(result[2]):
-                height = result[2]
-                width = '560'
-            else:
-                width = '560'
-                height = '315'
+                mdata = re.search('width=([0-9]*)', result[1])
+                if(mdata):
+                    width = mdata.groups()[0]
+                
+                mdata = re.search('height=([0-9]*)', result[1])
+                if(mdata):
+                    height = mdata.groups()[0]
 
-            data = com.sub('<iframe width="' + width + '" height="' + height + '" src="https://www.youtube.com/embed/' + result[0] + '" frameborder="0" allowfullscreen></iframe><br>', data, 1)
+            data = com.sub('<iframe width="' + width + '" height="' + height + '" src="https://www.youtube.com/embed/' + src + '" frameborder="0" allowfullscreen></iframe><br>', data, 1)
         else:
             break
      
