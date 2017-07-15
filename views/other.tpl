@@ -3,7 +3,7 @@
 <div id="tool">
     <nav class="menu">
         <a class="menu-item selected" href="#" onclick="return false">
-            % if defined('sub'):
+            % if(defined('sub') and not sub == None):
                 {{sub}}
             % else:
                 {{title}}
@@ -14,8 +14,8 @@
 </div>
 <h1 class="title">
     {{title}}
-    % if defined('sub'):
-         ({{sub}})
+    % if(defined('sub') and not sub == None):
+         <sub> ({{sub}})</sub>
     % end
 </h1>
 <div>

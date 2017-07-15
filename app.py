@@ -326,7 +326,7 @@ def admin_plus(name = None):
                 db_ex("insert into alist (name, acl) value ('" + db_pas(name) + "', 'owner')")
                 
             db_com()
-            return(redirect('/'))
+            return(redirect('/adminplus/admin'))
         else:
             db_ex('select acl from alist where name = "' + db_pas(name) + '"')
             test = db_get()
@@ -334,26 +334,21 @@ def admin_plus(name = None):
             list = ''
             exist_list = ['', '', '', '', '', '', '', '', '']
 
-            i = 0
-            while(True):
-                try:
-                    if(test[i]['acl'] == 'ban'):
-                        exist_list[0] = 'checked="checked"'
-                    elif(test[i]['acl'] == 'mdel'):
-                        exist_list[1] = 'checked="checked"'
-                    elif(test[i]['acl'] == 'toron'):
-                        exist_list[2] = 'checked="checked"'
-                    elif(test[i]['acl'] == 'check'):
-                        exist_list[3] = 'checked="checked"'
-                    elif(test[i]['acl'] == 'acl'):
-                        exist_list[4] = 'checked="checked"'
-                    elif(test[i]['acl'] == 'hidel'):
-                        exist_list[5] = 'checked="checked"'
-                    elif(test[i]['acl'] == 'owner'):
-                        exist_list[7] = 'checked="checked"'
-                    i += 1
-                except:
-                    break
+            for go in test:
+                if(go['acl'] == 'ban'):
+                    exist_list[0] = 'checked="checked"'
+                elif(go['acl'] == 'mdel'):
+                    exist_list[1] = 'checked="checked"'
+                elif(go['acl'] == 'toron'):
+                    exist_list[2] = 'checked="checked"'
+                elif(go['acl'] == 'check'):
+                    exist_list[3] = 'checked="checked"'
+                elif(go['acl'] == 'acl'):
+                    exist_list[4] = 'checked="checked"'
+                elif(go['acl'] == 'hidel'):
+                    exist_list[5] = 'checked="checked"'
+                elif(go['acl'] == 'owner'):
+                    exist_list[7] = 'checked="checked"'
 
             list += '<li><input type="checkbox" name="ban" ' + exist_list[0] + '> 차단</li>'
             list += '<li><input type="checkbox" name="mdel" ' + exist_list[1] + '> 많은 문서 삭제</li>'
@@ -369,29 +364,24 @@ def admin_plus(name = None):
         
 @route('/adminlist')
 def admin_list():
-    i = 0
+    i = 1
     div = '<div>'
     
     db_ex("select * from user where acl = 'admin' or acl = 'owner'")
     user_data = db_get()
     if(user_data):
-        while(True):
-            try:
-                db_ex("select title from data where title = '사용자:" + user_data[i]['id'] + "'")
-                user = db_get()
-                if(user):
-                    name = '<a href="/w/' + url_pas('사용자:' + user_data[i]['id']) + '">' + user_data[i]['id'] + '</a> (' + user_data[i]['acl'] + ')'
-                else:
-                    name = '<a class="not_thing" href="/w/' + url_pas('사용자:' + user_data[i]['id']) + '">' + user_data[i]['id'] + '</a> (' + user_data[i]['acl'] + ')'
+        for data in user_data:
+            name = ip_pas(data['id'], 2)
+            name += ' (' + data['acl'] + ')'
 
-                div += '<li>' + str(i + 1) + '. ' + name + '</li>'
-                
-                i += 1
+            div += '<li>' + str(i) + '. ' + name + '</li>'
             
-            except:
-                div += '</div>'
-                break
+            i += 1
+        else:
+            div += '</div>'
             
+        
+                       
         return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = div, title = '관리자 목록'))
     else:
         return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], title = '관리자 목록'))
@@ -477,7 +467,7 @@ def recent_changes():
                 
                 break
     else:
-        div = '<br>None'
+        div = 'None'
             
     return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = div, title = '최근 변경내역'))
         
@@ -587,7 +577,7 @@ def user_record(name = None, num = 1):
 
                 break
     else:
-        div = '<br>None'
+        div = 'None'
         
     db_ex("select end, why from ban where block = '" + db_pas(name) + "'")
     ban_it = db_get()
@@ -785,7 +775,7 @@ def recent_discuss():
 def blocklog(number = 1):
     v = number * 50
     i = v - 50
-    div = '<div><table style="width: 100%;"><tbody><tr><td style="text-align: center;width:20%;">차단자</td><td style="text-align: center;width:20%;">관리자</td><td style="text-align: center;width:20%;">언제까지</td><td style="text-align: center;width:20%;">왜</td><td style="text-align: center;width:20%;">시간</td></tr>'
+    div = '<div><table style="width: 100%;"><tbody><tr><td style="text-align: center;width:20%;">차단자</td><td style="text-align: center;width:20%;">관리자</td><td style="text-align: center;width:20%;">기간</td><td style="text-align: center;width:20%;">이유</td><td style="text-align: center;width:20%;">시간</td></tr>'
     
     db_ex("select * from rb order by today desc")
     rows = db_get()
@@ -824,7 +814,7 @@ def blocklog(number = 1):
                     
                 break
     else:
-        div = '<br>None'
+        div = 'None'
                 
     return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = div, title = '사용자 차단 기록'))
 
@@ -908,7 +898,7 @@ def history_view(name = None, num = 1):
             else:
                 div += '</tbody></table></div>'
         else:
-            div = '<br>None<br>'
+            div = 'None<br>'
             
         div += '<br><a href="/history/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전)</a> <a href="/history/' + url_pas(name) + '/n/' + str(num + 1) + '">(이후)</a>'
                     
@@ -1441,7 +1431,7 @@ def manager(num = None):
             return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '기록 이동', logo = set_data['name'], data = '<form id="usrform" method="POST" action="/manager/6"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')    )
     elif(num == 7):
         if(request.method == 'POST'):
-            return(redirect('/user/' + url_pas(request.forms.name) + '/topic/1'))
+            return(redirect('/user/' + url_pas(request.forms.name) + '/topic'))
         else:
             return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '토론 기록 이동', logo = set_data['name'], data = '<form id="usrform" method="POST" action="/manager/7"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')    )
     elif(num == 8):
@@ -1459,31 +1449,28 @@ def title_index():
     db_ex("select title from data order by title asc")
     title_list = db_get()
     if(title_list):
-        while(True):
-            try:
-                data += '<li>' + str(i[0] + 1) + '. <a href="/w/' + url_pas(title_list[i[0]]['title']) + '">' + title_list[i[0]]['title'] + '</a></li>'
+        for list_data in title_list:
+            data += '<li>' + str(i[0] + 1) + '. <a href="/w/' + url_pas(list_data['title']) + '">' + list_data['title'] + '</a></li>'
 
-                if(re.search('^분류:', title_list[i[0]]['title'])):
-                    i[1] += 1
-                elif(re.search('^사용자:', title_list[i[0]]['title'])):
-                    i[2] += 1
-                elif(re.search('^틀:', title_list[i[0]]['title'])):
-                    i[3] += 1
-                elif(re.search('^파일:', title_list[i[0]]['title'])):
-                    i[4] += 1
-                else:
-                    i[5] += 1
-            
-                i[0] += 1
+            if(re.search('^분류:', list_data['title'])):
+                i[1] += 1
+            elif(re.search('^사용자:', list_data['title'])):
+                i[2] += 1
+            elif(re.search('^틀:', list_data['title'])):
+                i[3] += 1
+            elif(re.search('^파일:', list_data['title'])):
+                i[4] += 1
+            else:
+                i[5] += 1
+        
+            i[0] += 1
                 
-            except:
-                data += '</div>'
-                
-                break
+        else:
+            data += '</div>'
                 
         data += '<br><li>이 위키에는 총 ' + str(i[0]) + '개의 문서가 있습니다.</li><br><li>틀 문서는 총 ' + str(i[3]) + '개의 문서가 있습니다.</li><li>분류 문서는 총 ' + str(i[1]) + '개의 문서가 있습니다.</li><li>사용자 문서는 총 ' + str(i[2]) + '개의 문서가 있습니다.</li><li>파일 문서는 총 ' + str(i[4]) + '개의 문서가 있습니다.</li><li>나머지 문서는 총 ' + str(i[5]) + '개의 문서가 있습니다.</li>'
     else:
-        data = '<br>None'
+        data = 'None'
 
     return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = data, title = '모든 문서'))
         
@@ -1965,7 +1952,7 @@ def user_check(name = None):
 
                             break
                 else:
-                    c = '<br>None'
+                    c = 'None'
                         
                 return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '다중 검사', logo = set_data['name'], data = c))
             else:
@@ -1984,7 +1971,7 @@ def user_check(name = None):
                             
                             break
                 else:
-                    c = '<br>None'
+                    c = 'None'
                         
                 return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '다중 검사', logo = set_data['name'], data = c))
         else:
@@ -2073,7 +2060,7 @@ def user_ban(name = None):
                         db_ex("insert into ban (block, end, why, band) value ('" + db_pas(name) + "', '" + db_pas(end) + "', '" + db_pas(request.forms.why) + "', '')")
                 db_com()
                 
-                return(redirect('/'))
+                return(redirect('/ban/' + url_pas(name)))
             else:
                 return(redirect('/error/3'))
         else:
@@ -2426,7 +2413,7 @@ def user_topic_list(name = None, num = 1):
     ydmin = admin_check(1)
     div = '<div><table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;">토론명</td><td style="text-align: center;width:33.33%;">작성자</td><td style="text-align: center;width:33.33%;">시간</td></tr>'
     
-    db_ex("select * from topic where ip = '" + db_pas(name) + "' or ip = '" + db_pas(name) + " - Admin' order by date desc")
+    db_ex("select title, id, sub, ip, date from topic where ip = '" + db_pas(name) + "' or ip = '" + db_pas(name) + " - Admin' order by date desc")
     rows = db_get()
     if(rows):
         while(True):
@@ -2451,7 +2438,7 @@ def user_topic_list(name = None, num = 1):
                     
                 ip = ip_pas(rows[i]['ip'], 1)
                     
-                div += '<tr><td style="text-align: center;width:33.33%;"><a href="/topic/' + url_pas(rows[i]['title']) + '/sub/' + url_pas(sub) + '#' + rows[i]['id'] + '">' + title + '</a> (' + sub + ') (#' + rows[i]['id'] + ') </td><td style="text-align: center;width:33.33%;">' + ip + ban +  '</td><td style="text-align: center;width:33.33%;">' + rows[i]['date'] + '</td></tr>'
+                div += '<tr><td style="text-align: center;width:33.33%;"><a href="/topic/' + url_pas(rows[i]['title']) + '/sub/' + url_pas(rows[i]['sub']) + '#' + rows[i]['id'] + '">' + title + '</a> (' + sub + ') (#' + rows[i]['id'] + ') </td><td style="text-align: center;width:33.33%;">' + ip + ban +  '</td><td style="text-align: center;width:33.33%;">' + rows[i]['date'] + '</td></tr>'
                 
                 if(i == v):
                     div = div + '</tbody></table></div>'
@@ -2470,14 +2457,16 @@ def user_topic_list(name = None, num = 1):
 
                 break
     else:
-        div = '<br>None'
+        div = 'None'
                 
     db_ex("select end, why from ban where block = '" + db_pas(name) + "'")
     ban_it = db_get()
     if(ban_it):
-        div = namumark('', '{{{#!wiki style="border:2px solid red;padding:10px;"\r\n{{{+2 {{{#red 이 사용자는 차단 당했습니다.}}}}}}\r\n\r\n차단 해제 일 : ' + ban_it[0]['end'] + '[br]사유 : ' + ban_it[0]['why'] + '}}}') + '<br>' + div
+        sub = '차단'
+    else:
+        sub = None
                 
-    return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = div, title = '사용자 토론 기록'))
+    return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = div, title = '사용자 토론 기록', sub = sub))
         
 @route('/user')
 def user_info():

@@ -60,5 +60,5 @@
     <button class="btn btn-primary" type="submit">{{enter}}</button>
     <br>
     <br>
-    <span>만약 HTTPS 연결이 아닌 경우 데이터가 유출 될 가능성이 있습니다. 이에 대해 책임 지지 않습니다.</span>
+    <span>주의 : 만약 HTTPS 연결이 아닌 경우 데이터가 유출될 가능성이 있습니다. 이에 대해 책임지지 않습니다.</span>
 </form>

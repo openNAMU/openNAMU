@@ -145,9 +145,9 @@ def ip_pas(raw_ip, num):
             ip = '<a class="not_thing" href="/w/' + url_pas('사용자:' + raw_ip) + '">' + raw_ip + '</a>'
             
     if(num == 1):
-        ip += ' <a href="/user/' + url_pas(raw_ip) + '">(기록)</a>'
+        ip += ' <a href="/user/' + url_pas(raw_ip) + '/topic">(기록)</a>'
     elif(num == 2):
-        ip += ' <a href="/record/' + url_pas(raw_ip) + '">(기록)</a> <a href="/user/' + url_pas(raw_ip) + '">(토론 기록)</a>'        
+        ip += ' <a href="/record/' + url_pas(raw_ip) + '">(기록)</a> <a href="/user/' + url_pas(raw_ip) + '/topic">(토론 기록)</a>'        
     else:
         ip += ' <a href="/record/' + url_pas(raw_ip) + '">(기록)</a>'
 
