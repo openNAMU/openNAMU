@@ -2,20 +2,8 @@
 
 json_data = open('set.json').read()
 set_data = json.loads(json_data)
-
-conn = pymysql.connect(host = set_data['host'], user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4')
-curs = conn.cursor(pymysql.cursors.DictCursor)
-
-def db_com():
-    return(conn.commit())
     
-def db_get():
-    return(curs.fetchall())
-    
-db_ex = curs.execute
 db_pas = pymysql.escape_string
-
-db_ex("use " + set_data['db'])
 
 def savemark(data):
     data = re.sub("\[date\(now\)\]", get_time(), data)
@@ -201,20 +189,33 @@ def mid_pas(data, fol_num, include):
     return((data, fol_num))
 
 def backlink_plus(name, link, backtype):
-    db_ex("select title from back where title = '" + db_pas(link) + "' and link = '" + db_pas(name) + "' and type = '" + backtype + "'")
-    y = db_get()
+    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    curs = conn.cursor(pymysql.cursors.DictCursor)
+    
+    curs.execute("select title from back where title = '" + db_pas(link) + "' and link = '" + db_pas(name) + "' and type = '" + backtype + "'")
+    y = curs.fetchall()
     if(not y):
-        db_ex("insert into back (title, link, type) value ('" + db_pas(link) + "', '" + db_pas(name) + "',  '" + backtype + "')")
-        db_com()
+        curs.execute("insert into back (title, link, type) value ('" + db_pas(link) + "', '" + db_pas(name) + "',  '" + backtype + "')")
+        conn.commit()
+        
+    conn.close()
 
 def cat_plus(name, link):
-    db_ex("select title from cat where title = '" + db_pas(link) + "' and cat = '" + db_pas(name) + "'")
-    y = db_get()
+    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    curs = conn.cursor(pymysql.cursors.DictCursor)
+    
+    curs.execute("select title from cat where title = '" + db_pas(link) + "' and cat = '" + db_pas(name) + "'")
+    y = curs.fetchall()
     if(not y):
-        db_ex("insert into cat (title, cat) value ('" + db_pas(link) + "', '" + db_pas(name) + "')")
-        db_com()
+        curs.execute("insert into cat (title, cat) value ('" + db_pas(link) + "', '" + db_pas(name) + "')")
+        conn.commit()
+        
+    conn.close()
 
 def namumark(title, data):
+    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    curs = conn.cursor(pymysql.cursors.DictCursor)
+    
     data = html_pas(data, 1)
 
     b = 0
@@ -234,8 +235,8 @@ def namumark(title, data):
             if(results[0] == title):
                 data = include.sub("<b>" + results[0] + "</b>", data, 1)
             else:
-                db_ex("select * from data where title = '" + db_pas(results[0]) + "'")
-                in_con = db_get()
+                curs.execute("select * from data where title = '" + db_pas(results[0]) + "'")
+                in_con = curs.fetchall()
                 
                 backlink_plus(title, results[0], 'include')
                 if(in_con):                        
@@ -391,8 +392,8 @@ def namumark(title, data):
                 cat_plus(title, g[0])
                     
                 if(category == ''):
-                    db_ex("select title from data where title = '" + db_pas(g[0]) + "'")
-                    exists = db_get()
+                    curs.execute("select title from data where title = '" + db_pas(g[0]) + "'")
+                    exists = curs.fetchall()
                     if(exists):
                         red = ""
                     else:
@@ -400,8 +401,8 @@ def namumark(title, data):
                         
                     category += '<a ' + red + ' href="/w/' + url_pas(g[0]) + '">' + re.sub("분류:", "", g[0]) + '</a>'
                 else:
-                    db_ex("select title from data where title = '" + db_pas(g[0]) + "'")
-                    exists = db_get()
+                    curs.execute("select title from data where title = '" + db_pas(g[0]) + "'")
+                    exists = curs.fetchall()
                     if(exists):
                         red = ""
                     else:
@@ -557,8 +558,8 @@ def namumark(title, data):
                 if(results[0] == title):
                     data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<b>' + g + '</b>', data, 1)
                 else:
-                    db_ex("select title from data where title = '" + db_pas(results[0]) + "'")
-                    y = db_get()
+                    curs.execute("select title from data where title = '" + db_pas(results[0]) + "'")
+                    y = curs.fetchall()
                     if(y):
                         clas = ''
                     else:
@@ -1072,4 +1073,5 @@ def namumark(title, data):
     data = re.sub('\n', '<br>', data)
     data = re.sub('^<br>', '', data)
     
+    conn.close()
     return(data)

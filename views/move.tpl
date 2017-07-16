@@ -16,10 +16,7 @@
     {{plus}}
     <br>
     <br>
-    <input class="form-control input-sm" value="{{title}}" name="title" type="text">
-    <br>
-    <br>
-    <button class="btn btn-primary" type="submit">이동</button>
+    <input class="form-control input-sm" value="{{title}}" name="title" type="text"> <button class="btn btn-primary" type="submit">이동</button>
 </form>
 % if(login == 0):
     <span>비 로그인 상태입니다. 비 로그인으로 작업 시 아이피가 역사에 기록됩니다.</span>
