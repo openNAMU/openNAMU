@@ -13,14 +13,8 @@ set_data = json.loads(json_data)
 conn = pymysql.connect(host = set_data['host'], user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4')
 curs = conn.cursor(pymysql.cursors.DictCursor)
 
-def db_com():
-    return(conn.commit())
-
 def url_pas(data):
     return(parse.quote(data).replace('/','%2F'))
-    
-def db_get():
-    return(curs.fetchall())
 
 def sha224(data):
     return(hashlib.sha224(bytes(data, 'utf-8')).hexdigest())
@@ -32,13 +26,13 @@ session_opts = {
 }
 
 app = beaker.middleware.SessionMiddleware(app(), session_opts)
-    
-db_ex = curs.execute
+
 db_pas = pymysql.escape_string
 
-db_ex("use " + set_data['db'])
-
 def diff(seqm):
+    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    curs = conn.cursor(pymysql.cursors.DictCursor)
+
     output= []
     for opcode, a0, a1, b0, b1 in seqm.get_opcodes():
         if(opcode == 'equal'):
@@ -52,69 +46,84 @@ def diff(seqm):
         else:
             output.append(seqm.a[a0:a1])
             
+    conn.close()
     return(''.join(output))
            
 def admin_check(num):
+    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    curs = conn.cursor(pymysql.cursors.DictCursor)
+
     ip = ip_check() 
-    db_ex("select acl from user where id = '" + db_pas(ip) + "'")
-    user = db_get()
+    curs.execute("select acl from user where id = '" + db_pas(ip) + "'")
+    user = curs.fetchall()
     if(user):
         reset = False
         while(True):
             if(num == 1 and reset == False):
-                db_ex('select name from alist where name = "' + db_pas(user[0]["acl"]) + '" and acl = "ban"')
-                acl_data = db_get()
+                curs.execute('select name from alist where name = "' + db_pas(user[0]["acl"]) + '" and acl = "ban"')
+                acl_data = curs.fetchall()
                 if(acl_data):
+                    conn.close()
                     return(1)
                 else:
                     reset = True
             elif(num == 2 and reset == False):
-                db_ex('select name from alist where name = "' + db_pas(user[0]["acl"]) + '" and acl = "mdel"')
-                acl_data = db_get()
+                curs.execute('select name from alist where name = "' + db_pas(user[0]["acl"]) + '" and acl = "mdel"')
+                acl_data = curs.fetchall()
                 if(acl_data):
+                    conn.close()
                     return(1)
                 else:
                     reset = True
             elif(num == 3 and reset == False):
-                db_ex('select name from alist where name = "' + db_pas(user[0]["acl"]) + '" and acl = "toron"')
-                acl_data = db_get()
+                curs.execute('select name from alist where name = "' + db_pas(user[0]["acl"]) + '" and acl = "toron"')
+                acl_data = curs.fetchall()
                 if(acl_data):
+                    conn.close()
                     return(1)
                 else:
                     reset = True
             elif(num == 4 and reset == False):
-                db_ex('select name from alist where name = "' + db_pas(user[0]["acl"]) + '" and acl = "check"')
-                acl_data = db_get()
+                curs.execute('select name from alist where name = "' + db_pas(user[0]["acl"]) + '" and acl = "check"')
+                acl_data = curs.fetchall()
                 if(acl_data):
+                    conn.close()
                     return(1)
                 else:
                     reset = True
             elif(num == 5 and reset == False):
-                db_ex('select name from alist where name = "' + db_pas(user[0]["acl"]) + '" and acl = "acl"')
-                acl_data = db_get()
+                curs.execute('select name from alist where name = "' + db_pas(user[0]["acl"]) + '" and acl = "acl"')
+                acl_data = curs.fetchall()
                 if(acl_data):
+                    conn.close()
                     return(1)
                 else:
                     reset = True
             elif(num == 6 and reset == False):
-                db_ex('select name from alist where name = "' + db_pas(user[0]["acl"]) + '" and acl = "hidel"')
-                acl_data = db_get()
+                curs.execute('select name from alist where name = "' + db_pas(user[0]["acl"]) + '" and acl = "hidel"')
+                acl_data = curs.fetchall()
                 if(acl_data):
+                    conn.close()
                     return(1)
                 else:
                     reset = True
             else:
-                db_ex('select name from alist where name = "' + db_pas(user[0]["acl"]) + '" and acl = "owner"')
-                acl_data = db_get()
+                curs.execute('select name from alist where name = "' + db_pas(user[0]["acl"]) + '" and acl = "owner"')
+                acl_data = curs.fetchall()
                 if(acl_data):
+                    conn.close()
                     return(1)
                 else:
                     break
+    conn.close()
                 
 def include_check(name, data):
+    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    curs = conn.cursor(pymysql.cursors.DictCursor)
+
     if(re.search('^틀:', name)):
-        db_ex("select * from back where title = '" + db_pas(name) + "' and type = 'include'")
-        back = db_get()
+        curs.execute("select * from back where title = '" + db_pas(name) + "' and type = 'include'")
+        back = curs.fetchall()
         if(back):
             i = 0
 
@@ -125,20 +134,30 @@ def include_check(name, data):
                     break
                     
                 i += 1
+    conn.close()
     
 def login_check():
+    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    curs = conn.cursor(pymysql.cursors.DictCursor)
+
     session = request.environ.get('beaker.session')
     if(session.get('Now') == True):
+        conn.close()
         return(1)
     else:
+        conn.close()
         return(0)
+    conn.close()
 
 def ip_pas(raw_ip, num):
+    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    curs = conn.cursor(pymysql.cursors.DictCursor)
+
     if(re.search("\.", raw_ip)):
         ip = raw_ip
     else:
-        db_ex("select title from data where title = '사용자:" + db_pas(raw_ip) + "'")
-        row = db_get()
+        curs.execute("select title from data where title = '사용자:" + db_pas(raw_ip) + "'")
+        row = curs.fetchall()
         if(row):
             ip = '<a href="/w/' + url_pas('사용자:' + raw_ip) + '">' + raw_ip + '</a>'
         else:
@@ -151,9 +170,13 @@ def ip_pas(raw_ip, num):
     else:
         ip += ' <a href="/record/' + url_pas(raw_ip) + '">(기록)</a>'
 
+    conn.close()
     return(ip)
 
 def ip_check():
+    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    curs = conn.cursor(pymysql.cursors.DictCursor)
+
     session = request.environ.get('beaker.session')
     if(session.get('Now') == True):
         ip = format(session['DREAMER'])
@@ -163,189 +186,258 @@ def ip_check():
         else:
             ip = request.environ.get('REMOTE_ADDR')
 
+    conn.close()
     return(ip)
 
 def custom_css_user():
+    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    curs = conn.cursor(pymysql.cursors.DictCursor)
+
     session = request.environ.get('beaker.session')
     try:
         data = format(session['Daydream'])
     except:
         data = ''
 
+    conn.close()
     return(data)
 
 def acl_check(ip, name):
+    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    curs = conn.cursor(pymysql.cursors.DictCursor)
+
     m = re.search("^사용자:(.*)", name)
     n = re.search("^파일:(.*)", name)
     if(m):
         g = m.groups()
         if(ip == g[0]):
             if(re.search("\.", g[0])):
+                conn.close()
                 return(1)
             else:
-                db_ex("select * from ban where block = '" + db_pas(ip) + "'")
-                rows = db_get()
+                curs.execute("select * from ban where block = '" + db_pas(ip) + "'")
+                rows = curs.fetchall()
                 if(rows):
+                    conn.close()
                     return(1)
                 else:
+                    conn.close()
                     return(0)
         else:
+            conn.close()
             return(1)
     elif(n):
         if(not admin_check(None) == 1):
+            conn.close()
             return(1)
     else:
         b = re.search("^([0-9](?:[0-9]?[0-9]?)\.[0-9](?:[0-9]?[0-9]?))", ip)
         if(b):
             results = b.groups()
-            db_ex("select * from ban where block = '" + db_pas(results[0]) + "' and band = 'O'")
-            rowss = db_get()
+            curs.execute("select * from ban where block = '" + db_pas(results[0]) + "' and band = 'O'")
+            rowss = curs.fetchall()
             if(rowss):
+                conn.close()
                 return(1)
             else:
-                db_ex("select * from ban where block = '" + db_pas(ip) + "'")
-                rows = db_get()
+                curs.execute("select * from ban where block = '" + db_pas(ip) + "'")
+                rows = curs.fetchall()
                 if(rows):
+                    conn.close()
                     return(1)
                 else:
-                    db_ex("select acl from data where title = '" + db_pas(name) + "'")
-                    row = db_get()
+                    curs.execute("select acl from data where title = '" + db_pas(name) + "'")
+                    row = curs.fetchall()
                     if(row):
-                        db_ex("select * from user where id = '" + db_pas(ip) + "'")
-                        rows = db_get()
+                        curs.execute("select * from user where id = '" + db_pas(ip) + "'")
+                        rows = curs.fetchall()
                         if(row[0]['acl'] == 'user'):
                             if(rows):
+                                conn.close()
                                 return(0)
                             else:
+                                conn.close()
                                 return(1)
                         elif(row[0]['acl'] == 'admin'):
                             if(rows):
                                 if(rows[0]['acl'] == 'admin' or rows[0]['acl'] == 'owner'):
+                                    conn.close()
                                     return(0)
                                 else:
+                                    conn.close()
                                     return(1)
                             else:
+                                conn.close()
                                 return(1)
                         else:
+                            conn.close()
                             return(0)
                     else:
+                        conn.close()
                         return(0)
         else:
-            db_ex("select * from ban where block = '" + db_pas(ip) + "'")
-            rows = db_get()
+            curs.execute("select * from ban where block = '" + db_pas(ip) + "'")
+            rows = curs.fetchall()
             if(rows):
+                conn.close()
                 return(1)
             else:
-                db_ex("select acl from data where title = '" + db_pas(name) + "'")
-                row = db_get()
+                curs.execute("select acl from data where title = '" + db_pas(name) + "'")
+                row = curs.fetchall()
                 if(row):
-                    db_ex("select * from user where id = '" + db_pas(ip) + "'")
-                    rows = db_get()
+                    curs.execute("select * from user where id = '" + db_pas(ip) + "'")
+                    rows = curs.fetchall()
                     if(row[0]['acl'] == 'user'):
                         if(rows):
+                            conn.close()
                             return(0)
                         else:
+                            conn.close()
                             return(1)
                     elif(row[0]['acl'] == 'admin'):
                         if(rows):
                             if(rows[0]['acl'] == 'admin' or rows[0]['acl'] == 'owner'):
+                                conn.close()
                                 return(0)
                             else:
+                                conn.close()
                                 return(1)
                         else:
+                            conn.close()
                             return(1)
                     else:
+                        conn.close()
                         return(0)
                 else:
+                    conn.close()
                     return(0)
+    conn.close()
 
 def ban_check(ip):
+    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    curs = conn.cursor(pymysql.cursors.DictCursor)
+
     b = re.search("^([0-9](?:[0-9]?[0-9]?)\.[0-9](?:[0-9]?[0-9]?))", ip)
     if(b):
         results = b.groups()
-        db_ex("select * from ban where block = '" + db_pas(results[0]) + "' and band = 'O'")
-        rowss = db_get()
+        curs.execute("select * from ban where block = '" + db_pas(results[0]) + "' and band = 'O'")
+        rowss = curs.fetchall()
         if(rowss):
+            conn.close()
             return(1)
         else:
-            db_ex("select * from ban where block = '" + db_pas(ip) + "'")
-            rows = db_get()
+            curs.execute("select * from ban where block = '" + db_pas(ip) + "'")
+            rows = curs.fetchall()
             if(rows):
+                conn.close()
                 return(1)
             else:
+                conn.close()
                 return(0)
     else:
-        db_ex("select * from ban where block = '" + db_pas(ip) + "'")
-        rows = db_get()
+        curs.execute("select * from ban where block = '" + db_pas(ip) + "'")
+        rows = curs.fetchall()
         if(rows):
+            conn.close()
             return(1)
         else:
+            conn.close()
             return(0)
+    conn.close()
         
 def topic_check(ip, name, sub):
+    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    curs = conn.cursor(pymysql.cursors.DictCursor)
+
     b = re.search("^([0-9](?:[0-9]?[0-9]?)\.[0-9](?:[0-9]?[0-9]?))", ip)
     if(b):
         results = b.groups()
-        db_ex("select * from ban where block = '" + db_pas(results[0]) + "' and band = 'O'")
-        rowss = db_get()
+        curs.execute("select * from ban where block = '" + db_pas(results[0]) + "' and band = 'O'")
+        rowss = curs.fetchall()
         if(rowss):
+            conn.close()
             return(1)
         else:
-            db_ex("select * from ban where block = '" + db_pas(ip) + "'")
-            rows = db_get()
+            curs.execute("select * from ban where block = '" + db_pas(ip) + "'")
+            rows = curs.fetchall()
             if(rows):
+                conn.close()
                 return(1)
             else:
-                db_ex("select * from stop where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "'")
-                rows = db_get()
+                curs.execute("select * from stop where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "'")
+                rows = curs.fetchall()
                 if(rows):
+                    conn.close()
                     return(1)
                 else:
+                    conn.close()
                     return(0)
     else:
-        db_ex("select * from ban where block = '" + db_pas(ip) + "'")
-        rows = db_get()
+        curs.execute("select * from ban where block = '" + db_pas(ip) + "'")
+        rows = curs.fetchall()
         if(rows):
+            conn.close()
             return(1)
         else:
-            db_ex("select * from stop where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "'")
-            rows = db_get()
+            curs.execute("select * from stop where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "'")
+            rows = curs.fetchall()
             if(rows):
+                conn.close()
                 return(1)
             else:
+                conn.close()
                 return(0)
+    conn.close()
 
 def get_time():
+    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    curs = conn.cursor(pymysql.cursors.DictCursor)
+
     now = time.localtime()
     date = "%04d-%02d-%02d %02d:%02d:%02d" % (now.tm_year, now.tm_mon, now.tm_mday, now.tm_hour, now.tm_min, now.tm_sec)
     
+    conn.close()
     return(date)
 
 def rd_plus(title, sub, date):
-    db_ex("select * from rd where title = '" + db_pas(title) + "' and sub = '" + db_pas(sub) + "'")
-    rd = db_get()
+    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    curs = conn.cursor(pymysql.cursors.DictCursor)
+
+    curs.execute("select * from rd where title = '" + db_pas(title) + "' and sub = '" + db_pas(sub) + "'")
+    rd = curs.fetchall()
     if(rd):
-        db_ex("update rd set date = '" + db_pas(date) + "' where title = '" + db_pas(title) + "' and sub = '" + db_pas(sub) + "'")
+        curs.execute("update rd set date = '" + db_pas(date) + "' where title = '" + db_pas(title) + "' and sub = '" + db_pas(sub) + "'")
     else:
-        db_ex("insert into rd (title, sub, date) value ('" + db_pas(title) + "', '" + db_pas(sub) + "', '" + db_pas(date) + "')")
-    db_com()
+        curs.execute("insert into rd (title, sub, date) value ('" + db_pas(title) + "', '" + db_pas(sub) + "', '" + db_pas(date) + "')")
+    conn.commit()
+    conn.close()
     
 def rb_plus(block, end, today, blocker, why):
-    db_ex("insert into rb (block, end, today, blocker, why) value ('" + db_pas(block) + "', '" + db_pas(end) + "', '" + today + "', '" + db_pas(blocker) + "', '" + db_pas(why) + "')")
-    db_com()
+    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    curs = conn.cursor(pymysql.cursors.DictCursor)
+
+    curs.execute("insert into rb (block, end, today, blocker, why) value ('" + db_pas(block) + "', '" + db_pas(end) + "', '" + today + "', '" + db_pas(blocker) + "', '" + db_pas(why) + "')")
+    conn.commit()
+    conn.close()
 
 def history_plus(title, data, date, ip, send, leng):
-    db_ex("select * from history where title = '" + db_pas(title) + "' order by id+0 desc limit 1")
-    rows = db_get()
+    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    curs = conn.cursor(pymysql.cursors.DictCursor)
+
+    curs.execute("select * from history where title = '" + db_pas(title) + "' order by id+0 desc limit 1")
+    rows = curs.fetchall()
     if(rows):
         number = int(rows[0]['id']) + 1
-        db_ex("insert into history (id, title, data, date, ip, send, leng) value ('" + str(number) + "', '" + db_pas(title) + "', '" + db_pas(data) + "', '" + date + "', '" + db_pas(ip) + "', '" + db_pas(send) + "', '" + leng + "')")
-        db_com()
+        curs.execute("insert into history (id, title, data, date, ip, send, leng) value ('" + str(number) + "', '" + db_pas(title) + "', '" + db_pas(data) + "', '" + date + "', '" + db_pas(ip) + "', '" + db_pas(send) + "', '" + leng + "')")
     else:
-        db_ex("insert into history (id, title, data, date, ip, send, leng) value ('1', '" + db_pas(title) + "', '" + db_pas(data) + "', '" + date + "', '" + db_pas(ip) + "', '" + db_pas(send + ' (새 문서)') + "', '" + leng + "')")
-        db_com()
+        curs.execute("insert into history (id, title, data, date, ip, send, leng) value ('1', '" + db_pas(title) + "', '" + db_pas(data) + "', '" + date + "', '" + db_pas(ip) + "', '" + db_pas(send + ' (새 문서)') + "', '" + leng + "')")
+    conn.commit()
+    conn.close()
 
 def leng_check(a, b):
+    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    curs = conn.cursor(pymysql.cursors.DictCursor)
+
     if(a < b):
         c = b - a
         c = '+' + str(c)
@@ -355,4 +447,5 @@ def leng_check(a, b):
     else:
         c = '0'
         
+    conn.close()
     return(c)
