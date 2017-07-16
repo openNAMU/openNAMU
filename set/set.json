@@ -1,6 +1,5 @@
 {
 	"db" : "data",
-	"host" : "localhost",
 	"user" : "root",
 	"pw" : "test",
 	"name" : "name",
