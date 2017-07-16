@@ -28,7 +28,7 @@ db_pas = pymysql.escape_string
 from func import *
 from mark import *
 
-r_ver = '2.0.7'
+r_ver = '2.1.0'
 
 @route('/setup', method=['GET', 'POST'])
 def setup():
