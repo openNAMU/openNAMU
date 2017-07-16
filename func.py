@@ -137,17 +137,11 @@ def include_check(name, data):
     conn.close()
     
 def login_check():
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
-    curs = conn.cursor(pymysql.cursors.DictCursor)
-
     session = request.environ.get('beaker.session')
     if(session.get('Now') == True):
-        conn.close()
         return(1)
     else:
-        conn.close()
         return(0)
-    conn.close()
 
 def ip_pas(raw_ip, num):
     conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
@@ -190,16 +184,12 @@ def ip_check():
     return(ip)
 
 def custom_css_user():
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
-    curs = conn.cursor(pymysql.cursors.DictCursor)
-
     session = request.environ.get('beaker.session')
     try:
         data = format(session['Daydream'])
     except:
         data = ''
 
-    conn.close()
     return(data)
 
 def acl_check(ip, name):

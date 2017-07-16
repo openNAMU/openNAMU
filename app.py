@@ -19,164 +19,170 @@ session_opts = {
 app = beaker.middleware.SessionMiddleware(app(), session_opts)
 
 BaseRequest.MEMFILE_MAX = 1024 * 1024
-    
-'''
-def start():
-    try:
-        curs.execute("create table data(title text, data longtext, acl text)")
-    except:
-        pass
-    
-    try:
-        curs.execute("create table history(id text, title text, data longtext, date text, ip text, send text, leng text)")
-    except:
-        pass
-    
-    try:
-        curs.execute("create table rd(title text, sub text, date text)")
-    except:
-        pass
-    
-    try:
-        curs.execute("create table user(id text, pw text, acl text)")
-    except:
-        pass
-    
-    try:
-        curs.execute("create table ban(block text, end text, why text, band text)")
-    except:
-        pass
-    
-    try:
-        curs.execute("create table topic(id text, title text, sub text, data longtext, date text, ip text, block text, top text)")
-    except:
-        pass
-    
-    try:
-        curs.execute("create table stop(title text, sub text, close text)")
-    except:
-        pass
-    
-    try:
-        curs.execute("create table rb(block text, end text, today text, blocker text, why text)")
-    except:
-        pass
-    
-    try:
-        curs.execute("create table login(user text, ip text, today text)")
-    except:
-        pass
-    
-    try:
-        curs.execute("create table back(title text, link text, type text)")
-    except:
-        pass
-    
-    try:
-        curs.execute("create table cat(title text, cat text)")
-    except:
-        pass
-        
-    try:
-        curs.execute("create table hidhi(title text, re text)")
-    except:
-        pass
-
-    try:
-        curs.execute("create table agreedis(title text, sub text)")
-    except:
-        pass
-
-    try:
-        curs.execute("create table custom(user text, css longtext)")
-    except:
-        pass
-        
-    try:
-        curs.execute("create table other(name text, data text)")
-    except:
-        pass
-        
-    try:
-        curs.execute("create table alist(name text, acl text)")
-    except:
-        pass
-'''
 
 def redirect(data):
     return('<meta http-equiv="refresh" content="0;url=' + data + '" />')
     
 db_pas = pymysql.escape_string
 
-'''
-try:
-    curs.execute("use " + set_data['db'])
-except:
-    curs.execute("create database " + set_data['db'])
-    curs.execute("use " + set_data['db'])
-    curs.execute("alter database " + set_data['db'] + " character set = utf8mb4 collate = utf8mb4_unicode_ci")
-'''
-
 from func import *
 from mark import *
-    
-# start()
 
 r_ver = '2.0.7'
 
-'''
-curs.execute('select data from other where name = "version"')
-version = curs.fetchall()
-if(version):
-    t_ver = re.sub('\.', '', version[0]['data'])
-    t_ver = re.sub('[a-z]$', '', t_ver)
-    r_t_ver = re.sub('\.', '', r_ver)
-    r_t_ver = re.sub('[a-z]$', '', r_t_ver)
-    if(int(t_ver) <= int(r_t_ver)):
-        curs.execute("update other set data = '" + db_pas(r_ver) + "' where name = 'version'")
-else:
-    curs.execute("insert into other (name, data) value ('version', '" + db_pas(r_ver) + "')")
-    t_ver = 0
+@route('/setup', method=['GET', 'POST'])
+def setup():
+    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4')
+    curs = conn.cursor(pymysql.cursors.DictCursor)
     
-curs.execute('select name from alist limit 1')
-getalist = curs.fetchall()
-if(getalist and int(t_ver) < 204):
-    curs.execute("delete from alist where name = 'owner'")
-    curs.execute("delete from alist where name = 'admin'")
+    if(request.method == 'POST'):            
+        if(not request.forms.owner == set_data['pw']):            
+            conn.close()
+            return(redirect('/error/3'))
+        else:
+            try:
+                curs.execute("use " + set_data['db'])
+            except:
+                curs.execute("create database " + set_data['db'])
+                curs.execute("use " + set_data['db'])
+                curs.execute("alter database " + set_data['db'] + " character set = utf8mb4 collate = utf8mb4_unicode_ci")    
+        
+            try:
+                curs.execute("create table data(title text, data longtext, acl text)")
+            except:
+                pass
+            
+            try:
+                curs.execute("create table history(id text, title text, data longtext, date text, ip text, send text, leng text)")
+            except:
+                pass
+            
+            try:
+                curs.execute("create table rd(title text, sub text, date text)")
+            except:
+                pass
+            
+            try:
+                curs.execute("create table user(id text, pw text, acl text)")
+            except:
+                pass
+            
+            try:
+                curs.execute("create table ban(block text, end text, why text, band text)")
+            except:
+                pass
+            
+            try:
+                curs.execute("create table topic(id text, title text, sub text, data longtext, date text, ip text, block text, top text)")
+            except:
+                pass
+            
+            try:
+                curs.execute("create table stop(title text, sub text, close text)")
+            except:
+                pass
+            
+            try:
+                curs.execute("create table rb(block text, end text, today text, blocker text, why text)")
+            except:
+                pass
+            
+            try:
+                curs.execute("create table login(user text, ip text, today text)")
+            except:
+                pass
+            
+            try:
+                curs.execute("create table back(title text, link text, type text)")
+            except:
+                pass
+            
+            try:
+                curs.execute("create table cat(title text, cat text)")
+            except:
+                pass
+                
+            try:
+                curs.execute("create table hidhi(title text, re text)")
+            except:
+                pass
 
-if(int(t_ver) < 202 or not getalist):
-    curs.execute("insert into alist (name, acl) value ('owner', 'owner')")
-    curs.execute("insert into alist (name, acl) value ('admin', 'ban')")
-    curs.execute("insert into alist (name, acl) value ('admin', 'mdel')")
-    curs.execute("insert into alist (name, acl) value ('admin', 'toron')")
-    curs.execute("insert into alist (name, acl) value ('admin', 'check')")
-    curs.execute("insert into alist (name, acl) value ('admin', 'acl')")
-    
-if(int(t_ver) < 203):
-    curs.execute('select title from topic limit 1')
-    top_yes = curs.fetchall()
-    if(top_yes):
-        curs.execute('rename table topic to old_topic')
-        curs.execute('rename table distop to old_distop')
+            try:
+                curs.execute("create table agreedis(title text, sub text)")
+            except:
+                pass
+
+            try:
+                curs.execute("create table custom(user text, css longtext)")
+            except:
+                pass
+                
+            try:
+                curs.execute("create table other(name text, data text)")
+            except:
+                pass
+                
+            try:
+                curs.execute("create table alist(name text, acl text)")
+            except:
+                pass
         
-        curs.execute('create table topic(id text, title text, sub text, data longtext, date text, ip text, block text, top text)')
-        
-        curs.execute('select * from old_topic')
-        topic_old = curs.fetchall()
-        if(topic_old):
-            i = 0
-            for move_topic in topic_old:
-                curs.execute("select id from distop where id = '" + db_pas(move_topic['id']) + "' and title = '" + db_pas(move_topic['title']) + "' and sub = '" + db_pas(move_topic['sub']) + "'")
-                distop = curs.fetchall()
-                if(distop):
-                    top = 'O'
-                else:
-                    top = ''
+            curs.execute('select data from other where name = "version"')
+            version = curs.fetchall()
+            if(version):
+                t_ver = re.sub('\.', '', version[0]['data'])
+                t_ver = re.sub('[a-z]$', '', t_ver)
+                r_t_ver = re.sub('\.', '', r_ver)
+                r_t_ver = re.sub('[a-z]$', '', r_t_ver)
+                if(int(t_ver) <= int(r_t_ver)):
+                    curs.execute("update other set data = '" + db_pas(r_ver) + "' where name = 'version'")
+            else:
+                curs.execute("insert into other (name, data) value ('version', '" + db_pas(r_ver) + "')")
+                t_ver = 0
+                
+            curs.execute('select name from alist limit 1')
+            getalist = curs.fetchall()
+            if(getalist and int(t_ver) < 204):
+                curs.execute("delete from alist where name = 'owner'")
+                curs.execute("delete from alist where name = 'admin'")
+
+            if(int(t_ver) < 202 or not getalist):
+                curs.execute("insert into alist (name, acl) value ('owner', 'owner')")
+                curs.execute("insert into alist (name, acl) value ('admin', 'ban')")
+                curs.execute("insert into alist (name, acl) value ('admin', 'mdel')")
+                curs.execute("insert into alist (name, acl) value ('admin', 'toron')")
+                curs.execute("insert into alist (name, acl) value ('admin', 'check')")
+                curs.execute("insert into alist (name, acl) value ('admin', 'acl')")
+                
+            if(int(t_ver) < 203):
+                curs.execute('select title from topic limit 1')
+                top_yes = curs.fetchall()
+                if(top_yes):
+                    curs.execute('rename table topic to old_topic')
+                    curs.execute('rename table distop to old_distop')
                     
-                curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) value ('" + db_pas(move_topic['id']) + "', '" + db_pas(move_topic['title']) + "', '" + db_pas(move_topic['sub']) + "', '" + db_pas(move_topic['data']) + "', '" + db_pas(move_topic['date']) + "', '" + db_pas(move_topic['ip']) + "', '" + db_pas(move_topic['block']) + "', '" + db_pas(top) + "')")
-    
-conn.commit()
-'''
+                    curs.execute('create table topic(id text, title text, sub text, data longtext, date text, ip text, block text, top text)')
+                    
+                    curs.execute('select * from old_topic')
+                    topic_old = curs.fetchall()
+                    if(topic_old):
+                        i = 0
+                        for move_topic in topic_old:
+                            curs.execute("select id from distop where id = '" + db_pas(move_topic['id']) + "' and title = '" + db_pas(move_topic['title']) + "' and sub = '" + db_pas(move_topic['sub']) + "'")
+                            distop = curs.fetchall()
+                            if(distop):
+                                top = 'O'
+                            else:
+                                top = ''
+                                
+                            curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) value ('" + db_pas(move_topic['id']) + "', '" + db_pas(move_topic['title']) + "', '" + db_pas(move_topic['sub']) + "', '" + db_pas(move_topic['data']) + "', '" + db_pas(move_topic['date']) + "', '" + db_pas(move_topic['ip']) + "', '" + db_pas(move_topic['block']) + "', '" + db_pas(top) + "')")
+                
+            conn.commit()
+            conn.close()
+            return(redirect('/'))
+    else:
+        conn.close()
+        return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = '<form method="POST"><input name="owner" type="password"> <button class="btn btn-primary" type="submit">저장</button></form>', title = '오픈나무 설치'))
 
 @route('/upload', method=['GET', 'POST'])
 def upload():
