@@ -125,7 +125,7 @@ def db_com():
     
 def db_get():
     return(curs.fetchall())
-
+    
 start()
 
 r_ver = '2.0.7'
@@ -179,9 +179,6 @@ if(int(t_ver) < 203):
                     top = ''
                     
                 db_ex("insert into topic (id, title, sub, data, date, ip, block, top) value ('" + db_pas(move_topic['id']) + "', '" + db_pas(move_topic['title']) + "', '" + db_pas(move_topic['sub']) + "', '" + db_pas(move_topic['data']) + "', '" + db_pas(move_topic['date']) + "', '" + db_pas(move_topic['ip']) + "', '" + db_pas(move_topic['block']) + "', '" + db_pas(top) + "')")
-        
-#        db_ex('drop table old_topic')
-#        db_ex('drop table distop')
     
 db_com()
 
