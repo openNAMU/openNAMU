@@ -551,9 +551,9 @@ def namumark(title, data):
                     comp = re.compile("\.(?P<in>jpg|gif|png|jpeg)", re.I)
                     img = comp.sub("#\g<in>#", img)
                     
-                    data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a class="out_link" href="' + img + sharp + '">' + g + '</a>', data, 1)
+                    data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a class="out_link" target="_blank" href="' + img + sharp + '">' + g + '</a>', data, 1)
                 else:
-                    data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a class="out_link" href="' + results[0] + sharp + '">' + g + '</a>', data, 1)
+                    data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a class="out_link" target="_blank" href="' + results[0] + sharp + '">' + g + '</a>', data, 1)
             else:
                 if(results[0] == title):
                     data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<b>' + g + '</b>', data, 1)
