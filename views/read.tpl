@@ -29,6 +29,9 @@
         % if(uppage):
             <a class="menu-item" style="{{style}}" href="/w/{{uppage}}">상위</a>
         % end
+        % if(down == True):
+            <a class="menu-item" style="{{down}}" href="/down/{{page}}">하위</a>
+        % end
     </nav>
 </div>
 <h1 class="title">

@@ -28,7 +28,7 @@ db_pas = pymysql.escape_string
 from func import *
 from mark import *
 
-r_ver = '2.1.0'
+r_ver = '2.1.1'
 
 @route('/setup', method=['GET', 'POST'])
 def setup():
@@ -974,10 +974,6 @@ def history_view(name = None, num = 1):
             
 @route('/search', method=['POST'])
 def search():
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
-    curs = conn.cursor(pymysql.cursors.DictCursor)
-
-    conn.close()
     return(redirect('/search/' + url_pas(request.forms.search)))
 
 @route('/goto', method=['POST'])
@@ -987,11 +983,12 @@ def goto():
 
     curs.execute("select title from data where title = '" + db_pas(request.forms.search) + "'")
     data = curs.fetchall()
+    
+    conn.close()
+    
     if(data):
-        conn.close()
         return(redirect('/w/' + url_pas(request.forms.search)))
     else:
-        conn.close()
         return(redirect('/search/' + url_pas(request.forms.search)))
 
 @route('/search/<name:path>')
@@ -2577,6 +2574,25 @@ def diff_data(name = None, a = None, b = None):
     else:
         conn.close()
         return(redirect('/history/' + url_pas(name)))
+        
+@route('/down/<name:path>')
+def down(name = None):
+    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    curs = conn.cursor(pymysql.cursors.DictCursor)
+    
+    curs.execute("select title from data where title like '%" + db_pas(name) + "/%'")
+    under = curs.fetchall()
+    
+    div = ''
+    
+    i = 0
+    for data in under:
+        div += '<li>' + str(i + 1) + '. <a href="/w/' + url_pas(data['title']) + '">' + data['title'] + '</a></li>'
+        i += 1
+        
+    conn.close()
+    
+    return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, logo = set_data['name'], data = div, sub = '하위 문서', page = url_pas(name)))
 
 @route('/w/<name:path>')
 @route('/w/<name:path>/from/<redirect:path>')
@@ -2586,28 +2602,32 @@ def read_view(name = None, redirect = None):
 
     data_none = False
     sub = None
+    acl = ''
     
     i = 0
-    curs.execute("select * from rd where title = '" + db_pas(name) + "' order by date asc")
+    curs.execute("select sub from rd where title = '" + db_pas(name) + "' order by date asc")
     rows = curs.fetchall()
     while(True):
-        try:
-            a = rows[i]
+        try:            
+            curs.execute("select title from stop where title = '" + db_pas(name) + "' and sub = '" + db_pas(rows[i]['sub']) + "' and close = 'O'")
+            row = curs.fetchall()
+            if(not row):
+                topic = "open"
+                
+                break
+
+            i += 1
         except:
             topic = ""
             
             break
             
-        curs.execute("select * from stop where title = '" + db_pas(rows[i]['title']) + "' and sub = '" + db_pas(rows[i]['sub']) + "' and close = 'O'")
-        row = curs.fetchall()
-        if(not row):
-            topic = "open"
-            
-            break
-        else:
-            i += 1
-            
-    acl = ''
+    curs.execute("select title from data where title like '%" + db_pas(name) + "/%'")
+    under = curs.fetchall()
+    if(under):
+        down = True
+    else:
+        down = False
     
     m = re.search("^(.*)\/(.*)$", name)
     if(m):
@@ -2715,7 +2735,8 @@ def read_view(name = None, redirect = None):
     enddata = namumark(name, elsedata)
         
     conn.close()
-    return(template('read', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), data = enddata + div, uppage = uppage, style = style, acl = acl, topic = topic, redirect = redirect, admin = admin_memu, data_none = data_none, sub = sub))
+    
+    return(template('read', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), data = enddata + div, uppage = uppage, style = style, acl = acl, topic = topic, redirect = redirect, admin = admin_memu, data_none = data_none, sub = sub, down = down))
 
 @route('/user/<name:path>/topic')
 @route('/user/<name:path>/topic/<num:int>')
