@@ -132,6 +132,9 @@ def login_check():
         return(0)
 
 def ip_pas(raw_ip, num):
+    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    curs = conn.cursor(pymysql.cursors.DictCursor)
+    
     if(re.search("\.", raw_ip)):
         ip = raw_ip
     else:
@@ -148,7 +151,9 @@ def ip_pas(raw_ip, num):
         ip += ' <a href="/record/' + url_pas(raw_ip) + '">(기록)</a> <a href="/user/' + url_pas(raw_ip) + '/topic">(토론 기록)</a>'        
     else:
         ip += ' <a href="/record/' + url_pas(raw_ip) + '">(기록)</a>'
-        
+    
+    conn.close()
+    
     return(ip)
 
 def ip_check():
