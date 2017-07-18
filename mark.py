@@ -1,9 +1,48 @@
-﻿from func import *
+﻿from bottle import request, app
+from bottle.ext import beaker
+from urllib import parse
+import json
+import pymysql
+import time
+import re
+import hashlib
 
 json_data = open('set.json').read()
 set_data = json.loads(json_data)
+
+session_opts = {
+    'session.type': 'file',
+    'session.data_dir': './app_session/',
+    'session.auto': True
+}
+
+app = beaker.middleware.SessionMiddleware(app(), session_opts)
+
+def get_time():
+    now = time.localtime()
+    date = "%04d-%02d-%02d %02d:%02d:%02d" % (now.tm_year, now.tm_mon, now.tm_mday, now.tm_hour, now.tm_min, now.tm_sec)
+
+    return(date)
+    
+def ip_check():
+    session = request.environ.get('beaker.session')
+    if(session.get('Now') == True):
+        ip = format(session['DREAMER'])
+    else:
+        if(request.environ.get('HTTP_X_FORWARDED_FOR')):
+            ip = request.environ.get('HTTP_X_FORWARDED_FOR')
+        else:
+            ip = request.environ.get('REMOTE_ADDR')
+
+    return(ip)
     
 db_pas = pymysql.escape_string
+
+def url_pas(data):
+    return(parse.quote(data).replace('/','%2F'))
+
+def sha224(data):
+    return(hashlib.sha224(bytes(data, 'utf-8')).hexdigest())
 
 def savemark(data):
     data = re.sub("\[date\(now\)\]", get_time(), data)

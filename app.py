@@ -23,10 +23,10 @@ BaseRequest.MEMFILE_MAX = 1024 * 1024
 def redirect(data):
     return('<meta http-equiv="refresh" content="0;url=' + data + '" />')
     
-db_pas = pymysql.escape_string
-
 from func import *
 from mark import *
+    
+db_pas = pymysql.escape_string
 
 r_ver = '2.1.1'
 

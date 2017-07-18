@@ -10,9 +10,6 @@ import hashlib
 json_data = open('set.json').read()
 set_data = json.loads(json_data)
 
-conn = pymysql.connect(host = set_data['host'], user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4')
-curs = conn.cursor(pymysql.cursors.DictCursor)
-
 def url_pas(data):
     return(parse.quote(data).replace('/','%2F'))
 
@@ -29,10 +26,9 @@ app = beaker.middleware.SessionMiddleware(app(), session_opts)
 
 db_pas = pymysql.escape_string
 
-def diff(seqm):
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
-    curs = conn.cursor(pymysql.cursors.DictCursor)
+from mark import *
 
+def diff(seqm):
     output= []
     for opcode, a0, a1, b0, b1 in seqm.get_opcodes():
         if(opcode == 'equal'):
@@ -46,7 +42,6 @@ def diff(seqm):
         else:
             output.append(seqm.a[a0:a1])
             
-    conn.close()
     return(''.join(output))
            
 def admin_check(num):
@@ -122,18 +117,11 @@ def include_check(name, data):
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
     if(re.search('^틀:', name)):
-        curs.execute("select * from back where title = '" + db_pas(name) + "' and type = 'include'")
+        curs.execute("select link from back where title = '" + db_pas(name) + "' and type = 'include'")
         back = curs.fetchall()
-        if(back):
-            i = 0
-
-            while(True):
-                try:
-                    namumark(back[i]['link'], data)
-                except:
-                    break
-                    
-                i += 1
+        for backp in back:
+            namumark(backp['link'], data)
+    
     conn.close()
     
 def login_check():
@@ -144,9 +132,6 @@ def login_check():
         return(0)
 
 def ip_pas(raw_ip, num):
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
-    curs = conn.cursor(pymysql.cursors.DictCursor)
-
     if(re.search("\.", raw_ip)):
         ip = raw_ip
     else:
@@ -163,14 +148,10 @@ def ip_pas(raw_ip, num):
         ip += ' <a href="/record/' + url_pas(raw_ip) + '">(기록)</a> <a href="/user/' + url_pas(raw_ip) + '/topic">(토론 기록)</a>'        
     else:
         ip += ' <a href="/record/' + url_pas(raw_ip) + '">(기록)</a>'
-
-    conn.close()
+        
     return(ip)
 
 def ip_check():
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
-    curs = conn.cursor(pymysql.cursors.DictCursor)
-
     session = request.environ.get('beaker.session')
     if(session.get('Now') == True):
         ip = format(session['DREAMER'])
@@ -180,7 +161,6 @@ def ip_check():
         else:
             ip = request.environ.get('REMOTE_ADDR')
 
-    conn.close()
     return(ip)
 
 def custom_css_user():
@@ -380,13 +360,9 @@ def topic_check(ip, name, sub):
     conn.close()
 
 def get_time():
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
-    curs = conn.cursor(pymysql.cursors.DictCursor)
-
     now = time.localtime()
     date = "%04d-%02d-%02d %02d:%02d:%02d" % (now.tm_year, now.tm_mon, now.tm_mday, now.tm_hour, now.tm_min, now.tm_sec)
-    
-    conn.close()
+
     return(date)
 
 def rd_plus(title, sub, date):
@@ -400,6 +376,7 @@ def rd_plus(title, sub, date):
     else:
         curs.execute("insert into rd (title, sub, date) value ('" + db_pas(title) + "', '" + db_pas(sub) + "', '" + db_pas(date) + "')")
     conn.commit()
+    
     conn.close()
     
 def rb_plus(block, end, today, blocker, why):
@@ -408,6 +385,7 @@ def rb_plus(block, end, today, blocker, why):
 
     curs.execute("insert into rb (block, end, today, blocker, why) value ('" + db_pas(block) + "', '" + db_pas(end) + "', '" + today + "', '" + db_pas(blocker) + "', '" + db_pas(why) + "')")
     conn.commit()
+    
     conn.close()
 
 def history_plus(title, data, date, ip, send, leng):
@@ -422,12 +400,10 @@ def history_plus(title, data, date, ip, send, leng):
     else:
         curs.execute("insert into history (id, title, data, date, ip, send, leng) value ('1', '" + db_pas(title) + "', '" + db_pas(data) + "', '" + date + "', '" + db_pas(ip) + "', '" + db_pas(send + ' (새 문서)') + "', '" + leng + "')")
     conn.commit()
+    
     conn.close()
 
 def leng_check(a, b):
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
-    curs = conn.cursor(pymysql.cursors.DictCursor)
-
     if(a < b):
         c = b - a
         c = '+' + str(c)
@@ -437,5 +413,4 @@ def leng_check(a, b):
     else:
         c = '0'
         
-    conn.close()
     return(c)
