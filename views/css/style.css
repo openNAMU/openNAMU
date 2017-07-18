@@ -26,6 +26,10 @@
     color: #B2DFEA;
 }
 
+a#inside {
+    color: green;
+}
+
 button#goto {
     border-radius: 0;
     border-left: 0;
@@ -50,10 +54,6 @@ textarea {
 
 li {
     margin-left: 20px;
-}
-
-.form-actions {
-    margin-top: 15px;
 }
 
 .contect {

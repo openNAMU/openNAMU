@@ -430,6 +430,14 @@ def namumark(title, data):
     
     data = re.sub("##\s?(?P<in>[^\n]*)\n", "<div style='display:none;'>\g<in></div>", data)
     
+    test = re.findall('\[\[wiki:([^|\]]+)(?:\|([^\]]+))?\]\]', data)
+    if(test):
+        for wiki in test:
+            if(wiki[1]):
+                data = re.sub('\[\[wiki:([^|\]]+)(?:\|([^\]]+))?\]\]', '<a id="inside" href="/' + wiki[0] + '">' + wiki[1] + '</a>', data, 1)
+            else:
+                data = re.sub('\[\[wiki:([^|\]]+)(?:\|([^\]]+))?\]\]', '<a id="inside" href="/' + wiki[0] + '">' + wiki[0] + '</a>', data, 1)
+    
     while(True):
         m = re.search("\[\[파일:((?:(?!\]\]|\|).)*)(?:\|((?:(?!\]\]).)*))?\]\]", data)
         if(m):
