@@ -709,12 +709,12 @@ def namumark(title, data):
                 data = re.sub("(?:\n)( +)", '<br>' + up, data, 1)
         else:
             break
-
+    
     a = 1
     tou = "<hr id='footnote'><div class='wiki-macro-footnote'><br>"
     namu = []
     while(True):
-        b = re.search("\[\*([^\s]*)(?:\s[^/]*)?\]", data)
+        b = re.search("\[\*([^\s]*)(?:\s(((?!\[|\]).)*))?\]", data)
         if(b):
             results = b.groups()
             if(not results[1] and results[0]):
@@ -732,9 +732,9 @@ def namumark(title, data):
                         break
                         
                 if(none_this == False):
-                    data = re.sub("\[\*([^\s]*)(?:\s[^/]*)?\]", "<sup><a class=\"footnotes\" title=\"" + namu[i + 1] + "\" id=\"rfn-" + str(a) + "\" href=\"#fn-" + str(a) + "\">[" + results[0] + "]</a></sup>", data, 1)
+                    data = re.sub("\[\*([^\s]*)(?:\s(((?!\[|\]).)*))?\]", "<sup><a class=\"footnotes\" title=\"" + namu[i + 1] + "\" id=\"rfn-" + str(a) + "\" href=\"#fn-" + str(a) + "\">[" + results[0] + "]</a></sup>", data, 1)
                 else:
-                    data = re.sub("\[\*([^\s]*)(?:\s[^/]*)?\]", "<sup><a class=\"footnotes\" id=\"rfn-" + str(a) + "\" href=\"#fn-" + str(a) + "\">[" + results[0] + "]</a></sup>", data, 1)
+                    data = re.sub("\[\*([^\s]*)(?:\s(((?!\[|\]).)*))?\]", "<sup><a class=\"footnotes\" id=\"rfn-" + str(a) + "\" href=\"#fn-" + str(a) + "\">[" + results[0] + "]</a></sup>", data, 1)
             elif(results[0]):                
                 namu += [results[0]]
                 namu += [results[1]]
@@ -743,7 +743,7 @@ def namumark(title, data):
                 c = re.sub("<(?:[^>]*)>", '', c)
 
                 tou += "<span class='footnote-list'><a href=\"#rfn-" + str(a) + "\" id=\"fn-" + str(a) + "\">[" + results[0] + "]</a> " + results[1] + "</span><br>"
-                data = re.sub("\[\*([^\s]*)(?:\s[^/]*)?\]", "<sup><a class=\"footnotes\" title=\"" + c + "\" id=\"rfn-" + str(a) + "\" href=\"#fn-" + str(a) + "\">[" + results[0] + "]</a></sup>", data, 1)     
+                data = re.sub("\[\*([^\s]*)(?:\s(((?!\[|\]).)*))?\]", "<sup><a class=\"footnotes\" title=\"" + c + "\" id=\"rfn-" + str(a) + "\" href=\"#fn-" + str(a) + "\">[" + results[0] + "]</a></sup>", data, 1)     
 
                 a += 1
             else:
@@ -751,7 +751,7 @@ def namumark(title, data):
                 c = re.sub("<(?:[^>]*)>", '', c)
                 
                 tou += "<span class='footnote-list'><a href=\"#rfn-" + str(a) + "\" id=\"fn-" + str(a) + "\">[" + str(a) + "]</a> " + results[1] + "</span><br>"
-                data = re.sub("\[\*([^\s]*)(?:\s[^/]*)?\]", '<sup><a class="footnotes" title="' + c + '" id="rfn-' + str(a) + '" href="#fn-' + str(a) + '">[' + str(a) + ']</a></sup>', data, 1)
+                data = re.sub("\[\*([^\s]*)(?:\s(((?!\[|\]).)*))?\]", '<sup><a class="footnotes" title="' + c + '" id="rfn-' + str(a) + '" href="#fn-' + str(a) + '">[' + str(a) + ']</a></sup>', data, 1)
 
                 a += 1
         else:
