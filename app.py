@@ -28,7 +28,7 @@ from mark import *
     
 db_pas = pymysql.escape_string
 
-r_ver = '2.1.1'
+r_ver = '2.1.2'
 
 @route('/setup', method=['GET', 'POST'])
 def setup():
@@ -204,72 +204,66 @@ def acl_list():
     conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
-    data = '<div>'
+    div = '<div>'
     i = 0
 
     curs.execute("select title, acl from data where acl = 'admin' or acl = 'user' order by acl desc")
     list_data = curs.fetchall()
     if(list_data):
-        while(True):
-            try:            
-                if(list_data[i]['acl'] == 'admin'):
-                    acl = '관리자'
-                else:
-                    acl = '로그인'
+        for data in list_data:
+            if(data['acl'] == 'admin'):
+                acl = '관리자'
+            else:
+                acl = '로그인'
 
-                data += '<li>' + str(i + 1) + '. <a href="/w/' + url_pas(list_data[i]['title']) + '">' + list_data[i]['title'] + '</a> (' + acl + ')</li>'
-
-                i += 1
-            except:
-                break
-                
-        data += '</div>'
+            div += '<li>' + str(i + 1) + '. <a href="/w/' + url_pas(data['title']) + '">' + data['title'] + '</a> (' + acl + ')</li>'
+            
+            i += 1
+        else:
+            div += '</div>'
     else:
-        data = ''
+        div = ''
 
     conn.close()
-    return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = data, title = 'ACL 문서 목록'))
+    return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = div, title = 'ACL 문서 목록'))
     
 @route('/listacl')
 def list_acl():
     conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
-    data = '<div>'
+    div = '<div>'
     i = 0
 
     curs.execute("select * from alist order by name desc")
     list_data = curs.fetchall()
     if(list_data):
-        while(True):
-            try:
-                if(list_data[i]['acl'] == 'ban'):
-                    acl = '차단'
-                elif(list_data[i]['acl'] == 'mdel'):
-                    acl = '많은 문서 삭제'
-                elif(list_data[i]['acl'] == 'toron'):
-                    acl = '토론 관리'
-                elif(list_data[i]['acl'] == 'check'):
-                    acl = '사용자 검사'
-                elif(list_data[i]['acl'] == 'acl'):
-                    acl = '문서 ACL'
-                elif(list_data[i]['acl'] == 'hidel'):
-                    acl = '역사 숨김'
-                elif(list_data[i]['acl'] == 'owner'):
-                    acl = '소유자'
-                    
-                data += '<li>' + str(i + 1) + '. <a href="/adminplus/' + url_pas(list_data[i]['name']) + '">' + list_data[i]['name'] + '</a> (' + acl + ')</li>'
-
-                i += 1
-            except:
-                break
+        for data in list_data:
+            if(data['acl'] == 'ban'):
+                acl = '차단'
+            elif(data['acl'] == 'mdel'):
+                acl = '많은 문서 삭제'
+            elif(data['acl'] == 'toron'):
+                acl = '토론 관리'
+            elif(data['acl'] == 'check'):
+                acl = '사용자 검사'
+            elif(data['acl'] == 'acl'):
+                acl = '문서 ACL'
+            elif(data['acl'] == 'hidel'):
+                acl = '역사 숨김'
+            elif(data['acl'] == 'owner'):
+                acl = '소유자'
                 
-        data += '<br><a href="/manager/8">(새로 생성)</a></div>'
+            div += '<li>' + str(i + 1) + '. <a href="/adminplus/' + url_pas(data['name']) + '">' + data['name'] + '</a> (' + acl + ')</li>'
+            
+            i += 1
+        else:        
+            div += '<br><a href="/manager/8">(새로 생성)</a></div>'
     else:
-        data = ''
+        div = '<a href="/manager/8">(새로 생성)</a></div>'
 
     conn.close()
-    return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = data, title = 'ACL 목록'))
+    return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = div, title = 'ACL 목록'))
 
 @route('/adminplus/<name:path>', method=['POST', 'GET'])
 def admin_plus(name = None):
@@ -363,11 +357,10 @@ def admin_list():
         return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], title = '관리자 목록'))
         
 @route('/recentchanges')
-def recent_changes():
+def recentchanges():
     conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
-    i = 0
     ydmin = admin_check(1)
     zdmin = admin_check(6)
     div = '<div><table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;">문서명</td><td style="text-align: center;width:33.33%;">기여자</td><td style="text-align: center;width:33.33%;">시간</td></tr>'
@@ -375,76 +368,71 @@ def recent_changes():
     curs.execute("select id, title, date, ip, send, leng from history order by date desc limit 50")
     rows = curs.fetchall()
     if(rows):
-        while(True):
-            try:                
-                if(rows[i]['send']):
-                    if(re.search("^(?: *)$", rows[i]['send'])):
-                        send = '<br>'
-                    else:
-                        send = rows[i]['send']
-                else:
+        for data in rows:                
+            if(data['send']):
+                if(re.search("^(?: *)$", data['send'])):
                     send = '<br>'
-                    
-                title = rows[i]['title']
-                title = re.sub('<', '&lt;', title)
-                title = re.sub('>', '&gt;', title)
-                title = re.sub('"', '&quot;', title)
-                
-                m = re.search("\+", rows[i]['leng'])
-                n = re.search("\-", rows[i]['leng'])
-                
-                if(m):
-                    leng = '<span style="color:green;">' + rows[i]['leng'] + '</span>'
-                elif(n):
-                    leng = '<span style="color:red;">' + rows[i]['leng'] + '</span>'
                 else:
-                    leng = '<span style="color:gray;">' + rows[i]['leng'] + '</span>'
-                    
-                if(ydmin == 1):
-                    curs.execute("select * from ban where block = '" + db_pas(rows[i]['ip']) + "'")
-                    row = curs.fetchall()
-                    if(row):
-                        ban = ' <a href="/ban/' + url_pas(rows[i]['ip']) + '">(해제)</a>'
-                    else:
-                        ban = ' <a href="/ban/' + url_pas(rows[i]['ip']) + '">(차단)</a>'
+                    send = data['send']
+            else:
+                send = '<br>'
+                
+            title = data['title']
+            title = re.sub('<', '&lt;', title)
+            title = re.sub('>', '&gt;', title)
+            title = re.sub('"', '&quot;', title)
+            
+            m = re.search("\+", data['leng'])
+            n = re.search("\-", data['leng'])
+            
+            if(m):
+                leng = '<span style="color:green;">' + data['leng'] + '</span>'
+            elif(n):
+                leng = '<span style="color:red;">' + data['leng'] + '</span>'
+            else:
+                leng = '<span style="color:gray;">' + data['leng'] + '</span>'
+                
+            if(ydmin == 1):
+                curs.execute("select * from ban where block = '" + db_pas(data['ip']) + "'")
+                row = curs.fetchall()
+                if(row):
+                    ban = ' <a href="/ban/' + url_pas(data['ip']) + '">(해제)</a>'
                 else:
+                    ban = ' <a href="/ban/' + url_pas(data['ip']) + '">(차단)</a>'
+            else:
+                ban = ''
+                
+            ip = ip_pas(data['ip'], None)
+                    
+            if((int(data['id']) - 1) == 0):
+                revert = ''
+            else:
+                revert = '<a href="/w/' + url_pas(data['title']) + '/r/' + str(int(data['id']) - 1) + '/diff/' + data['id'] + '">(비교)</a> <a href="/revert/' + url_pas(data['title']) + '/r/' + str(int(data['id']) - 1) + '">(되돌리기)</a>'
+            
+            style = ''
+            if(zdmin == 1):
+                curs.execute("select * from hidhi where title = '" + db_pas(data['title']) + "' and re = '" + db_pas(data['id']) + "'")
+                row = curs.fetchall()
+                if(row):                            
+                    ip += ' (숨김)'                            
+                    hidden = ' <a href="/history/' + url_pas(data['title']) + '/r/' + data['id'] + '/hidden">(공개)'
+                else:
+                    hidden = ' <a href="/history/' + url_pas(data['title']) + '/r/' + data['id'] + '/hidden">(숨김)'
+            else:
+                curs.execute("select * from hidhi where title = '" + db_pas(data['title']) + "' and re = '" + db_pas(data['id']) + "'")
+                row = curs.fetchall()
+                if(row):
+                    ip = '숨김'
+                    hidden = ''
+                    send = '숨김'
                     ban = ''
-                    
-                ip = ip_pas(rows[i]['ip'], None)
-                        
-                if((int(rows[i]['id']) - 1) == 0):
-                    revert = ''
+                    style = 'display:none;'
                 else:
-                    revert = '<a href="/w/' + url_pas(rows[i]['title']) + '/r/' + str(int(rows[i]['id']) - 1) + '/diff/' + rows[i]['id'] + '">(비교)</a> <a href="/revert/' + url_pas(rows[i]['title']) + '/r/' + str(int(rows[i]['id']) - 1) + '">(되돌리기)</a>'
+                    hidden = ''      
                 
-                style = ''
-                if(zdmin == 1):
-                    curs.execute("select * from hidhi where title = '" + db_pas(rows[i]['title']) + "' and re = '" + db_pas(rows[i]['id']) + "'")
-                    row = curs.fetchall()
-                    if(row):                            
-                        ip += ' (숨김)'                            
-                        hidden = ' <a href="/history/' + url_pas(rows[i]['title']) + '/r/' + rows[i]['id'] + '/hidden">(공개)'
-                    else:
-                        hidden = ' <a href="/history/' + url_pas(rows[i]['title']) + '/r/' + rows[i]['id'] + '/hidden">(숨김)'
-                else:
-                    curs.execute("select * from hidhi where title = '" + db_pas(rows[i]['title']) + "' and re = '" + db_pas(rows[i]['id']) + "'")
-                    row = curs.fetchall()
-                    if(row):
-                        ip = '숨김'
-                        hidden = ''
-                        send = '숨김'
-                        ban = ''
-                        style = 'display:none;'
-                    else:
-                        hidden = ''      
-                    
-                div += '<tr style="' + style + '"><td style="text-align: center;width:33.33%;"><a href="/w/' + url_pas(rows[i]['title']) + '">' + title + '</a> (' + rows[i]['id'] + '판) ' + revert + ' (' + leng + ')</td><td style="text-align: center;width:33.33%;">' + ip + ban + hidden + '</td><td style="text-align: center;width:33.33%;">' + rows[i]['date'] + '</td></tr><tr><td colspan="3" style="text-align: center;width:100%;">' + send + '</td></tr>'
-                
-                i += 1
-            except:
-                div = div + '</tbody></table></div>'
-                
-                break
+            div += '<tr style="' + style + '"><td style="text-align: center;width:33.33%;"><a href="/w/' + url_pas(data['title']) + '">' + title + '</a> (' + data['id'] + '판) ' + revert + ' (' + leng + ')</td><td style="text-align: center;width:33.33%;">' + ip + ban + hidden + '</td><td style="text-align: center;width:33.33%;">' + data['date'] + '</td></tr><tr><td colspan="3" style="text-align: center;width:100%;">' + send + '</td></tr>'
+        else:
+            div += '</tbody></table></div>'
     else:
         div = 'None'
             
@@ -475,96 +463,86 @@ def user_record(name = None, num = 1):
     conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
-    v = num * 50
+    if(num * 50 <= 0):
+        v = 50
+    else:
+        v = num * 50
+        
     i = v - 50
     ydmin = admin_check(1)
     zdmin = admin_check(6)
     div = '<div><table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;">문서명</td><td style="text-align: center;width:33.33%;">기여자</td><td style="text-align: center;width:33.33%;">시간</td></tr>'
     
-    curs.execute("select * from history where ip = '" + db_pas(name) + "' order by date desc")
+    curs.execute("select * from history where ip = '" + db_pas(name) + "' order by date desc limit " + str(i) + ", " + str(v))
     rows = curs.fetchall()
     if(rows):
-        while(True):
-            try:       
-                if(rows[i]['send']):
-                    send = rows[i]['send']
-                    send = re.sub('<a href="\/w\/(?P<in>[^"]*)">(?P<out>[^&]*)<\/a>', '<a href="/w/\g<in>">\g<out></a>', send)
-                else:
-                    send = '<br>'
-                    
-                title = rows[i]['title']
-                title = re.sub('<', '&lt;', title)
-                title = re.sub('>', '&gt;', title)
-                title = re.sub('"', '&quot;', title)
+        for data in rows:  
+            if(data['send']):
+                send = data['send']
+                send = re.sub('<a href="\/w\/(?P<in>[^"]*)">(?P<out>[^&]*)<\/a>', '<a href="/w/\g<in>">\g<out></a>', send)
+            else:
+                send = '<br>'
                 
-                m = re.search("\+", rows[i]['leng'])
-                n = re.search("\-", rows[i]['leng'])
+            title = data['title']
+            title = re.sub('<', '&lt;', title)
+            title = re.sub('>', '&gt;', title)
+            title = re.sub('"', '&quot;', title)
+            
+            m = re.search("\+", data['leng'])
+            n = re.search("\-", data['leng'])
+            
+            if(m):
+                leng = '<span style="color:green;">' + data['leng'] + '</span>'
+            elif(n):
+                leng = '<span style="color:red;">' + data['leng'] + '</span>'
+            else:
+                leng = '<span style="color:gray;">' + data['leng'] + '</span>'
                 
-                if(m):
-                    leng = '<span style="color:green;">' + rows[i]['leng'] + '</span>'
-                elif(n):
-                    leng = '<span style="color:red;">' + rows[i]['leng'] + '</span>'
+            if(ydmin == 1):
+                curs.execute("select * from ban where block = '" + db_pas(data['ip']) + "'")
+                row = curs.fetchall()
+                if(row):
+                    ban = ' <a href="/ban/' + url_pas(data['ip']) + '">(해제)</a>'
                 else:
-                    leng = '<span style="color:gray;">' + rows[i]['leng'] + '</span>'
+                    ban = ' <a href="/ban/' + url_pas(data['ip']) + '">(차단)</a>'
+            else:
+                ban = ''
+                
+            ip = ip_pas(data['ip'], None)
                     
-                if(ydmin == 1):
-                    curs.execute("select * from ban where block = '" + db_pas(rows[i]['ip']) + "'")
-                    row = curs.fetchall()
-                    if(row):
-                        ban = ' <a href="/ban/' + url_pas(rows[i]['ip']) + '">(해제)</a>'
-                    else:
-                        ban = ' <a href="/ban/' + url_pas(rows[i]['ip']) + '">(차단)</a>'
+            if((int(data['id']) - 1) == 0):
+                revert = ''
+            else:
+                revert = '<a href="/revert/' + url_pas(data['title']) + '/r/' + str(int(data['id']) - 1) + '">(되돌리기)</a>'
+                
+            style = ''
+            if(zdmin == 1):
+                curs.execute("select * from hidhi where title = '" + db_pas(data['title']) + "' and re = '" + db_pas(data['id']) + "'")
+                row = curs.fetchall()
+                if(row):                            
+                    ip += ' (숨김)'                            
+                    hidden = ' <a href="/history/' + url_pas(data['title']) + '/r/' + data['id'] + '/hidden">(공개)'
                 else:
+                    hidden = ' <a href="/history/' + url_pas(data['title']) + '/r/' + data['id'] + '/hidden">(숨김)'
+            else:
+                curs.execute("select * from hidhi where title = '" + db_pas(data['title']) + "' and re = '" + db_pas(data['id']) + "'")
+                row = curs.fetchall()
+                if(row):
+                    ip = '숨김'
+                    hidden = ''
+                    send = '숨김'
                     ban = ''
-                    
-                ip = ip_pas(rows[i]['ip'], None)
-                        
-                if((int(rows[i]['id']) - 1) == 0):
-                    revert = ''
+                    style = 'display:none;'
                 else:
-                    revert = '<a href="/revert/' + url_pas(rows[i]['title']) + '/r/' + str(int(rows[i]['id']) - 1) + '">(되돌리기)</a>'
-                    
-                style = ''
-                if(zdmin == 1):
-                    curs.execute("select * from hidhi where title = '" + db_pas(rows[i]['title']) + "' and re = '" + db_pas(rows[i]['id']) + "'")
-                    row = curs.fetchall()
-                    if(row):                            
-                        ip += ' (숨김)'                            
-                        hidden = ' <a href="/history/' + url_pas(rows[i]['title']) + '/r/' + rows[i]['id'] + '/hidden">(공개)'
-                    else:
-                        hidden = ' <a href="/history/' + url_pas(rows[i]['title']) + '/r/' + rows[i]['id'] + '/hidden">(숨김)'
-                else:
-                    curs.execute("select * from hidhi where title = '" + db_pas(rows[i]['title']) + "' and re = '" + db_pas(rows[i]['id']) + "'")
-                    row = curs.fetchall()
-                    if(row):
-                        ip = '숨김'
-                        hidden = ''
-                        send = '숨김'
-                        ban = ''
-                        style = 'display:none;'
-                    else:
-                        hidden = ''
-                    
-                div += '<tr style="' + style + '"><td style="text-align: center;width:33.33%;"><a href="/w/' + url_pas(rows[i]['title']) + '">' + title + '</a> (' + rows[i]['id'] + '판) <a href="/w/' + url_pas(rows[i]['title']) + '/r/' + str(int(rows[i]['id']) - 1) + '/diff/' + rows[i]['id'] + '">(비교)</a> ' + revert + ' (' + leng + ')</td><td style="text-align: center;width:33.33%;">' + ip + ban + hidden + '</td><td style="text-align: center;width:33.33%;">' + rows[i]['date'] + '</td></tr><tr><td colspan="3" style="text-align: center;width:100%;">' + send + '</td></tr>'
+                    hidden = ''
                 
-                if(i == v):
-                    div += '</tbody></table></div>'
-                    if(num == 1):
-                        div += '<br><a href="/record/' + url_pas(name) + '/n/' + str(num + 1) + '">(다음)</a>'
-                    else:
-                        div += '<br><a href="/record/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전)</a> <a href="/record/' + url_pas(name) + '/n/' + str(num + 1) + '">(다음)</a>'
-                    break
-
-                i += 1
-            except:
-                div += '</tbody></table></div>'
-
-                if(num != 1):
-                    div += '<br><a href="/record/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전)</a>'
-
-                break
+            div += '<tr style="' + style + '"><td style="text-align: center;width:33.33%;"><a href="/w/' + url_pas(data['title']) + '">' + title + '</a> (' + data['id'] + '판) <a href="/w/' + url_pas(data['title']) + '/r/' + str(int(data['id']) - 1) + '/diff/' + data['id'] + '">(비교)</a> ' + revert + ' (' + leng + ')</td><td style="text-align: center;width:33.33%;">' + ip + ban + hidden + '</td><td style="text-align: center;width:33.33%;">' + data['date'] + '</td></tr><tr><td colspan="3" style="text-align: center;width:100%;">' + send + '</td></tr>'
+        else:
+            div += '</tbody></table></div>'
     else:
-        div = 'None'
+        div = 'None<br>'
+        
+    div += '<br><a href="/record/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전)</a> <a href="/record/' + url_pas(name) + '/n/' + str(num + 1) + '">(이후)</a>'
         
     curs.execute("select end, why from ban where block = '" + db_pas(name) + "'")
     ban_it = curs.fetchall()
@@ -580,44 +558,36 @@ def user_log(num = 1):
     conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
-    i = num * 50
+    if(num * 50 <= 0):
+         i = 50
+    else:
+        i = num * 50
+        
     j = i - 50
     list_data = ''
     ydmin = admin_check(1)
     
-    curs.execute("select * from user")
+    curs.execute("select * from user limit " + str(j) + ", " + str(i))
     user_list = curs.fetchall()
     if(user_list):        
-        while(True):
-            try:
-                a = user_list[j]
-            except:
-                if(num != 1):
-                    list_data = list_data + '<br><a href="/userlog/n/' + str(number - 1) + '">(이전)'
-                break
-                
+        for data in user_list:
             if(ydmin == 1):
-                curs.execute("select * from ban where block = '" + db_pas(user_list[j]['id']) + "'")
+                curs.execute("select * from ban where block = '" + db_pas(data['id']) + "'")
                 ban_exist = curs.fetchall()
                 if(ban_exist):
-                    ban_button = ' <a href="/ban/' + url_pas(user_list[j]['id']) + '">(해제)</a>'
+                    ban_button = ' <a href="/ban/' + url_pas(data['id']) + '">(해제)</a>'
                 else:
-                    ban_button = ' <a href="/ban/' + url_pas(user_list[j]['id']) + '">(차단)</a>'
+                    ban_button = ' <a href="/ban/' + url_pas(data['id']) + '">(차단)</a>'
             else:
                 ban_button = ''
                 
-            ip = ip_pas(user_list[j]['id'], None)
+            ip = ip_pas(data['id'], None)
                 
             list_data += '<li>' + str(j + 1) + '. ' + ip + ban_button + '</li>'
             
-            if(j == i):
-                if(num == 1):
-                    list_data += '<br><a href="/userlog/n/' + str(num + 1) + '">(다음)'
-                else:
-                    list_data += '<br><a href="/userlog/n/' + str(num - 1) + '">(이전) <a href="/userlog/n/' + str(num + 1) + '">(다음)'
-                break
-            else:
-                j += 1
+            j += 1
+
+        list_data += '<br><a href="/userlog/n/' + str(num - 1) + '">(이전)</a> <a href="/userlog/n/' + str(num + 1) + '">(이후)</a>'
                 
         conn.close()
         return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = list_data, title = '사용자 가입 기록'))
@@ -626,7 +596,7 @@ def user_log(num = 1):
         return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = '', title = '사용자 가입 기록'))
         
 @route('/backreset')
-def backlink_reset():
+def xref_reset():
     conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
@@ -636,16 +606,11 @@ def backlink_reset():
         curs.execute("delete from back")
         conn.commit()
         
-        curs.execute("select * from data")
+        curs.execute("select title, data from data")
         all = curs.fetchall()
         if(all):
-            while(True):
-                try:
-                    namumark(all[i]['title'], all[i]['data'])
-                    
-                    i += 1
-                except:
-                    break
+            for data in all:
+                namumark(data['title'], data['data'])
         
         conn.close()
         return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = '에러 없음', title = '완료'))
@@ -655,11 +620,15 @@ def backlink_reset():
         
 @route('/xref/<name:path>')
 @route('/xref/<name:path>/n/<num:int>')
-def backlink(name = None, num = 1):
+def xref(name = None, num = 1):
     conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
-    v = num * 50
+    if(num * 50 <= 0):
+        v = 50
+    else:
+        v = num * 50
+        
     i = v - 50
     div = ''
     restart = 0
@@ -670,72 +639,59 @@ def backlink(name = None, num = 1):
     curs.execute("select * from back where title = '" + db_pas(name) + "' order by link asc")
     rows = curs.fetchall()
     if(rows):        
-        while(True):
-            try:
-                if(rows[i]['type'] == 'include' or rows[i]['type'] == 'file'):
-                    curs.execute("select * from back where title = '" + db_pas(name) + "' and link = '" + db_pas(rows[i]['link']) + "' and type = ''")
-                    test = curs.fetchall()
-                    if(test):
-                        restart = 1
-                        
-                        curs.execute("delete from back where title = '" + db_pas(name) + "' and link = '" + db_pas(rows[i]['link']) + "' and type = ''")
-                        conn.commit()
+        for data in rows:
+            if(data['type'] == 'include' or data['type'] == 'file'):
+                curs.execute("select * from back where title = '" + db_pas(name) + "' and link = '" + db_pas(data['link']) + "' and type = ''")
+                test = curs.fetchall()
+                if(test):
+                    restart = 1
                     
-                if(not re.search('^사용자:', rows[i]['link'])):
-                    curs.execute("select * from data where title = '" + db_pas(rows[i]['link']) + "'")
-                    row = curs.fetchall()
-                    if(row):
-                        data = row[0]['data']
-                        data = re.sub("(?P<in>\[include\((?P<out>(?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\])", "\g<in>\n\n[[\g<out>]]\n\n", data)
-                        data = re.sub("\[\[파일:(?P<in>(?:(?!\]\]|\|).)*)(?:\|((?:(?!\]\]).)*))?\]\]", "\n\n[[:파일:\g<in>]]\n\n", data)
-                        data = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', '[[\g<in>]]', data)
-                        data = namumark('', data)                    
+                    curs.execute("delete from back where title = '" + db_pas(name) + "' and link = '" + db_pas(data['link']) + "' and type = ''")
+                    conn.commit()
+                
+            if(not re.search('^사용자:', data['link'])):
+                curs.execute("select * from data where title = '" + db_pas(data['link']) + "'")
+                row = curs.fetchall()
+                if(row):
+                    test = row[0]['data']
+                    test = re.sub("(?P<in>\[include\((?P<out>(?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\])", "\g<in>\n\n[[\g<out>]]\n\n", test)
+                    test = re.sub("\[\[파일:(?P<in>(?:(?!\]\]|\|).)*)(?:\|((?:(?!\]\]).)*))?\]\]", "\n\n[[:파일:\g<in>]]\n\n", test)
+                    test = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', '[[\g<in>]]', test)
+                    test = namumark('', test)                    
+                    
+                    if(re.search("<a(?:(?:(?!href=).)*)?href=\"\/w\/" + url_pas(name) + "(?:\#[^\"]*)?\"(?:(?:(?!>).)*)?>([^<]*)<\/a>", test)):
+                        div += '<li><a href="/w/' + url_pas(data['link']) + '">' + data['link'] + '</a>'
                         
-                        if(re.search("<a(?:(?:(?!href=).)*)?href=\"\/w\/" + url_pas(name) + "(?:\#[^\"]*)?\"(?:(?:(?!>).)*)?>([^<]*)<\/a>", data)):
-                            div += '<li><a href="/w/' + url_pas(rows[i]['link']) + '">' + rows[i]['link'] + '</a>'
-                            
-                            if(rows[i]['type']):
-                                div += ' (' + rows[i]['type'] + ')</li>'
-                            else:
-                                div += '</li>'
-                                
-                            if(i == v):
-                                if(num == 1):
-                                    div += '<br><a href="/xref/' + url_pas(name) + '/n/' + str(num + 1) + '">(다음)'
-                                else:
-                                    div += '<br><a href="/xref/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전) <a href="/xref/' + url_pas(name) + '/n/' + str(num + 1) + '">(다음)'
-                                    
-                                break
-                            else:
-                                i += 1
+                        if(data['type']):
+                            div += ' (' + data['type'] + ')</li>'
                         else:
-                            curs.execute("delete from back where title = '" + db_pas(name) + "' and link = '" + db_pas(rows[i]['link']) + "'")
-                            conn.commit()
+                            div += '</li>'
                             
-                            i += 1
-                            v += 1
                     else:
-                        curs.execute("delete from back where title = '" + db_pas(name) + "' and link = '" + db_pas(rows[i]['link']) + "'")
+                        curs.execute("delete from back where title = '" + db_pas(name) + "' and link = '" + db_pas(data['link']) + "'")
                         conn.commit()
                         
                         i += 1
                         v += 1
                 else:
-                    curs.execute("delete from back where title = '" + db_pas(name) + "' and link = '" + db_pas(rows[i]['link']) + "'")
+                    curs.execute("delete from back where title = '" + db_pas(name) + "' and link = '" + db_pas(data['link']) + "'")
                     conn.commit()
                     
                     i += 1
                     v += 1
-            except:
-                if(num != 1):
-                    div += '<br><a href="/xref/n/' + str(num - 1) + '">(이전)'
+            else:
+                curs.execute("delete from back where title = '" + db_pas(name) + "' and link = '" + db_pas(data['link']) + "'")
+                conn.commit()
                 
-                break
+                i += 1
+                v += 1
                 
         if(restart == 1):
             conn.close()
             return(redirect('/xref/' + url_pas(name) + '/n/' + str(num)))
-        else:    
+        else:
+            div += '<br><a href="/xref/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전)</a> <a href="/xref/' + url_pas(name) + '/n/' + str(num + 1) + '">(이후)</a>'
+
             conn.close()
             return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = div, title = name, page = url_pas(name), sub = '역링크'))
     else:
@@ -743,35 +699,29 @@ def backlink(name = None, num = 1):
         return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = 'None', title = name, page = url_pas(name), sub = '역링크'))
         
 @route('/recentdiscuss')
-def recent_discuss():
+def recentdiscuss():
     conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
-    i = 0
     div = '<div><table style="width: 100%;"><tbody><tr><td style="text-align: center;width:50%;">토론명</td><td style="text-align: center;width:50%;">시간</td></tr>'
     
     curs.execute("select * from rd order by date desc limit 50")
     rows = curs.fetchall()
     if(rows):
-        while(True):
-            try:
-                title = rows[i]['title']
-                title = re.sub('<', '&lt;', title)
-                title = re.sub('>', '&gt;', title)
-                title = re.sub('"', '&quot;', title)
-                
-                sub = rows[i]['sub']
-                sub = re.sub('<', '&lt;', sub)
-                sub = re.sub('>', '&gt;', sub)
-                sub = re.sub('"', '&quot;', sub)
-                
-                div += '<tr><td style="text-align: center;width:50%;"><a href="/topic/' + url_pas(rows[i]['title']) + '/sub/' + url_pas(rows[i]['sub']) + '">' + title + '</a> (' + sub + ')</td><td style="text-align: center;width:50%;">' + rows[i]['date'] + '</td></tr>'
-                
-                i += 1
-            except:
-                div += '</tbody></table></div>'
-                
-                break
+        for data in rows:
+            title = data['title']
+            title = re.sub('<', '&lt;', title)
+            title = re.sub('>', '&gt;', title)
+            title = re.sub('"', '&quot;', title)
+            
+            sub = data['sub']
+            sub = re.sub('<', '&lt;', sub)
+            sub = re.sub('>', '&gt;', sub)
+            sub = re.sub('"', '&quot;', sub)
+            
+            div += '<tr><td style="text-align: center;width:50%;"><a href="/topic/' + url_pas(data['title']) + '/sub/' + url_pas(data['sub']) + '">' + title + '</a> (' + sub + ')</td><td style="text-align: center;width:50%;">' + data['date'] + '</td></tr>'
+        else:
+            div += '</tbody></table></div>'
     else:
         div = 'None'
             
@@ -780,50 +730,36 @@ def recent_discuss():
 
 @route('/blocklog')
 @route('/blocklog/n/<number:int>')
-def blocklog(number = 1):
+def blocklog(num = 1):
     conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
-    v = number * 50
+    if(num * 50 <= 0):
+        v = 50
+    else:
+        v = num * 50
+    
     i = v - 50
     div = '<div><table style="width: 100%;"><tbody><tr><td style="text-align: center;width:20%;">차단자</td><td style="text-align: center;width:20%;">관리자</td><td style="text-align: center;width:20%;">기간</td><td style="text-align: center;width:20%;">이유</td><td style="text-align: center;width:20%;">시간</td></tr>'
     
     curs.execute("select * from rb order by today desc")
     rows = curs.fetchall()
     if(rows):
-        while(True):
-            try: 
-                why = rows[i]['why']
-                why = re.sub('<', '&lt;', why)
-                why = re.sub('>', '&gt;', why)
-                why = re.sub('"', '&quot;', why)
+        for data in rows:
+            why = data['why']
+            why = re.sub('<', '&lt;', why)
+            why = re.sub('>', '&gt;', why)
+            why = re.sub('"', '&quot;', why)
+            
+            b = re.search("^([0-9]{1,3}\.[0-9]{1,3})$", data['block'])
+            if(b):
+                ip = data['block'] + ' (대역)'
+            else:
+                ip = data['block']
                 
-                b = re.search("^([0-9]{1,3}\.[0-9]{1,3})$", rows[i]['block'])
-                if(b):
-                    ip = rows[i]['block'] + ' (대역)'
-                else:
-                    ip = rows[i]['block']
-                    
-                div += '<tr><td style="text-align: center;width:20%;">' + ip + '</a></td><td style="text-align: center;width:20%;">' + rows[i]['blocker'] + '</td><td style="text-align: center;width:20%;">' + rows[i]['end'] + '</td><td style="text-align: center;width:20%;">' + rows[i]['why'] + '</td><td style="text-align: center;width:20%;">' + rows[i]['today'] + '</td></tr>'
-                
-                if(i == v):
-                    div += '</tbody></table></div>'
-                    
-                    if(number == 1):
-                        div += '<br><a href="/blocklog/n/' + str(number + 1) + '">(다음)</a>'
-                    else:
-                        div += '<br><a href="/blocklog/n/' + str(number - 1) + '">(이전)</a> <a href="/blocklog/n/' + str(number + 1) + '">(다음)</a>'
-                        
-                    break
-                else:
-                    i += 1
-            except:
-                div += '</tbody></table></div>'
-                
-                if(number != 1):
-                    div += '<br><a href="/blocklog/n/' + str(number - 1) + '">(이전)</a>'
-                    
-                break
+            div += '<tr><td style="text-align: center;width:20%;">' + ip + '</a></td><td style="text-align: center;width:20%;">' + data['blocker'] + '</td><td style="text-align: center;width:20%;">' + data['end'] + '</td><td style="text-align: center;width:20%;">' + data['why'] + '</td><td style="text-align: center;width:20%;">' + data['today'] + '</td></tr>'
+        else:
+            div += '</tbody></table></div>'
     else:
         div = 'None'
                 
@@ -946,7 +882,11 @@ def deep_search(name = None, num = 1):
     conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
-    v = num * 50
+    if(num * 50 <= 0):
+        v = num * 50
+    else:
+        v = 50
+
     i = v - 50
 
     div = ''
@@ -982,37 +922,23 @@ def deep_search(name = None, num = 1):
             all_list = ''
     
     if(not all_list == ''):
-        while(True):
-            try:
-                re_title = re.compile(name, re.I)
-                if(re.search(re_title, all_list[i]['title'])):
-                    if(no == 0):
-                        div += '<li><a href="/w/' + url_pas(all_list[i]['title']) + '">' + all_list[i]['title'] + '</a> (문서명)</li>'
-                    else:
-                        div_plus += '<li><a href="/w/' + url_pas(all_list[i]['title']) + '">' + all_list[i]['title'] + '</a> (내용)</li>'
+        for data in all_list:
+            re_title = re.compile(name, re.I)
+            if(re.search(re_title, data['title'])):
+                if(no == 0):
+                    div += '<li><a href="/w/' + url_pas(data['title']) + '">' + data['title'] + '</a> (문서명)</li>'
                 else:
-                    no = 1
-
-                    div_plus += '<li><a href="/w/' + url_pas(all_list[i]['title']) + '">' + all_list[i]['title'] + '</a> (내용)</li>'
-            except:
-                if(num != 1):
-                    end = '<br><a href="/search/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전)'
-
-                break
-
-            if(i == v):
-                if(num == 1):
-                    end = '<br><a href="/search/' + url_pas(name) + '/n/' + str(num + 1) + '">(다음)'
-                else:
-                    end = '<br><a href="/search/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전) <a href="/search/' + url_pas(name) + '/n/' + str(num + 1) + '">(다음)'
-
-                break
+                    div_plus += '<li><a href="/w/' + url_pas(data['title']) + '">' + data['title'] + '</a> (내용)</li>'
             else:
-                i += 1
+                no = 1
+
+                div_plus += '<li><a href="/w/' + url_pas(data['title']) + '">' + data['title'] + '</a> (내용)</li>'
     else:
         div += '<li>검색 결과 없음</li>'
 
-    div = div + div_plus + end
+    div += div_plus + end
+
+    div += '<br><a href="/search/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전)</a> <a href="/search/' + url_pas(name) + '/n/' + str(num + 1) + '">(이후)</a>'
 
     conn.close()
     return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = div, title = name, sub = '검색'))
@@ -1938,28 +1864,23 @@ def close_topic_list(name = None):
     
     curs.execute("select * from stop where title = '" + db_pas(name) + "' and close = 'O' order by sub asc")
     rows = curs.fetchall()
-    while(True):
-        try:
-            curs.execute("select * from topic where title = '" + db_pas(name) + "' and sub = '" + db_pas(rows[i]['sub']) + "' and id = '1'")
-            row = curs.fetchall()
-            if(row):
-                indata = namumark(name, row[0]['data'])
-                
-                if(row[0]['block'] == 'O'):
-                    indata = '블라인드 되었습니다.'
-                    block = 'id="block"'
-                else:
-                    block = ''
-
-                ip = ip_pas(row[0]['ip'], 1)
-                    
-                div += '<h2><a href="/topic/' + url_pas(name) + '/sub/' + url_pas(rows[i]['sub']) + '">' + str((i + 1)) + '. ' + rows[i]['sub'] + '</a></h2><table id="toron"><tbody><tr><td id="toroncolorgreen"><a href="javascript:void(0);" id="1">#1</a> ' + ip + ' <span style="float:right;">' + row[0]['date'] + '</span></td></tr><tr><td ' + block + '>' + indata + '</td></tr></tbody></table><br>'
-                
-            i += 1
-        except:
-            div += '</div>'
+    for data in rows:
+        curs.execute("select * from topic where title = '" + db_pas(name) + "' and sub = '" + db_pas(data['sub']) + "' and id = '1'")
+        row = curs.fetchall()
+        if(row):
+            indata = namumark(name, row[0]['data'])
             
-            break
+            if(row[0]['block'] == 'O'):
+                indata = '블라인드 되었습니다.'
+                block = 'id="block"'
+            else:
+                block = ''
+
+            ip = ip_pas(row[0]['ip'], 1)
+                
+            div += '<h2><a href="/topic/' + url_pas(name) + '/sub/' + url_pas(data['sub']) + '">' + str((i + 1)) + '. ' + data['sub'] + '</a></h2><table id="toron"><tbody><tr><td id="toroncolorgreen"><a href="javascript:void(0);" id="1">#1</a> ' + ip + ' <span style="float:right;">' + row[0]['date'] + '</span></td></tr><tr><td ' + block + '>' + indata + '</td></tr></tbody></table><br>'
+    else:
+        div += '</div>'
         
     conn.close()
     return(template('topic', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, page = url_pas(name), logo = set_data['name'], plus = div, sub = '닫힘'))
@@ -1974,28 +1895,24 @@ def agree_topic_list(name = None):
     
     curs.execute("select * from agreedis where title = '" + db_pas(name) + "' order by sub asc")
     agree_list = curs.fetchall()
-    while(True):
-        try:            
-            curs.execute("select * from topic where title = '" + db_pas(name) + "' and sub = '" + db_pas(agree_list[i]['sub']) + "' and id = '1'")
-            data = curs.fetchall()
-            if(data):
-                indata = namumark(name, data[0]['data'])
-                
-                if(data[0]['block'] == 'O'):
-                    indata = '블라인드 되었습니다.'
-                    block = 'id="block"'
-                else:
-                    block = ''
-
-                ip = ip_pas(data[0]['ip'], 1)
-                    
-                div += '<h2><a href="/topic/' + url_pas(name) + '/sub/' + url_pas(data[i]['sub']) + '">' + str(i + 1) + '. ' + data[i]['sub'] + '</a></h2><table id="toron"><tbody><tr><td id="toroncolorgreen"><a href="javascript:void(0);" id="1">#1</a> ' + ip + ' <span style="float:right;">' + data[0]['date'] + '</span></td></tr><tr><td ' + block + '>' + indata + '</td></tr></tbody></table><br>'
-                
-            i += 1
-        except:
-            div += '</div>'
+    for data in agree_list:
+        curs.execute("select * from topic where title = '" + db_pas(name) + "' and sub = '" + db_pas(data['sub']) + "' and id = '1'")
+        topic_data = curs.fetchall()
+        if(topic_data):
+            indata = namumark(name, topic_data[0]['data'])
             
-            break
+            if(topic_data[0]['block'] == 'O'):
+                indata = '블라인드 되었습니다.'
+                block = 'id="block"'
+            else:
+                block = ''
+
+            ip = ip_pas(topic_data[0]['ip'], 1)
+                
+            div += '<h2><a href="/topic/' + url_pas(name) + '/sub/' + url_pas(data['sub']) + '">' + str(i + 1) + '. ' + data['sub'] + '</a></h2><table id="toron"><tbody><tr><td id="toroncolorgreen"><a href="javascript:void(0);" id="1">#1</a> ' + ip + ' <span style="float:right;">' + topic_data[0]['date'] + '</span></td></tr><tr><td ' + block + '>' + indata + '</td></tr></tbody></table><br>'
+                
+    else:
+        div += '</div>'
         
     conn.close()
     return(template('topic', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, page = url_pas(name), logo = set_data['name'], plus = div, sub = '합의'))
@@ -2010,37 +1927,32 @@ def topic_list(name = None):
         return(redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(request.forms.topic)))
     else:
         div = '<div>'
-        i = 0
         j = 1
         curs.execute("select * from rd where title = '" + db_pas(name) + "' order by date asc")
         rows = curs.fetchall()
-        while(True):
-            try:                    
-                curs.execute("select * from topic where title = '" + db_pas(rows[i]['title']) + "' and sub = '" + db_pas(rows[i]['sub']) + "' and id = '1' order by sub asc")
-                aa = curs.fetchall()
-                
-                indata = namumark(name, aa[0]['data'])
-                
-                if(aa[0]['block'] == 'O'):
-                    indata = '블라인드 되었습니다.'
-                    block = 'id="block"'
-                else:
-                    block = ''
+        for data in rows:
+            curs.execute("select * from topic where title = '" + db_pas(data['title']) + "' and sub = '" + db_pas(data['sub']) + "' and id = '1' order by sub asc")
+            aa = curs.fetchall()
+            
+            indata = namumark(name, aa[0]['data'])
+            
+            if(aa[0]['block'] == 'O'):
+                indata = '블라인드 되었습니다.'
+                block = 'id="block"'
+            else:
+                block = ''
 
-                ip = ip_pas(aa[0]['ip'], 1)
-                    
-                curs.execute("select * from stop where title = '" + db_pas(rows[i]['title']) + "' and sub = '" + db_pas(rows[i]['sub']) + "' and close = 'O'")
-                row = curs.fetchall()
-                if(not row):
-                    div += '<h2><a href="/topic/' + url_pas(rows[i]['title']) + '/sub/' + url_pas(rows[i]['sub']) + '">' + str(j) + '. ' + rows[i]['sub'] + '</a></h2><table id="toron"><tbody><tr><td id="toroncolorgreen"><a href="javascript:void(0);" id="1">#1</a> ' + ip + ' <span style="float:right;">' + aa[0]['date'] + '</span></td></tr><tr><td ' + block + '>' + indata + '</td></tr></tbody></table><br>'
-                    j += 1
-                    
-                i += 1
-            
-            except:
-                div = div + '</div>'
-                break
-            
+            ip = ip_pas(aa[0]['ip'], 1)
+                
+            curs.execute("select * from stop where title = '" + db_pas(data['title']) + "' and sub = '" + db_pas(data['sub']) + "' and close = 'O'")
+            row = curs.fetchall()
+            if(not row):
+                div += '<h2><a href="/topic/' + url_pas(data['title']) + '/sub/' + url_pas(data['sub']) + '">' + str(j) + '. ' + data['sub'] + '</a></h2><table id="toron"><tbody><tr><td id="toroncolorgreen"><a href="javascript:void(0);" id="1">#1</a> ' + ip + ' <span style="float:right;">' + aa[0]['date'] + '</span></td></tr><tr><td ' + block + '>' + indata + '</td></tr></tbody></table><br>'
+                
+                j += 1
+        else:
+            div += '</div>'
+                
         conn.close()
         return(template('topic', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, page = url_pas(name), logo = set_data['name'], plus = div, list = 1, sub = '토론 목록'))
         
@@ -2164,17 +2076,11 @@ def user_check(name = None):
                 curs.execute("select * from login where ip = '" + db_pas(name) + "' order by today desc")
                 row = curs.fetchall()
                 if(row):
-                    i = 0
                     c = '<div><table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;">이름</td><td style="text-align: center;width:33.33%;">아이피</td><td style="text-align: center;width:33.33%;">언제</td></tr>'
-                    while(True):
-                        try:
-                            c += '<tr><td style="text-align: center;width:33.33%;">' + row[i]['user'] + '</td><td style="text-align: center;width:33.33%;">' + row[i]['ip'] + '</td><td style="text-align: center;width:33.33%;">' + row[i]['today'] + '</td></tr>'
-
-                            i += 1
-                        except:
-                            c += '</tbody></table></div>'
-
-                            break
+                    for data in row:
+                        c += '<tr><td style="text-align: center;width:33.33%;">' + data['user'] + '</td><td style="text-align: center;width:33.33%;">' + data['ip'] + '</td><td style="text-align: center;width:33.33%;">' + data['today'] + '</td></tr>'
+                    else:
+                        c += '</tbody></table></div>'
                 else:
                     c = 'None'
                         
@@ -2184,17 +2090,11 @@ def user_check(name = None):
                 curs.execute("select * from login where user = '" + db_pas(name) + "' order by today desc")
                 row = curs.fetchall()
                 if(row):
-                    i = 0
                     c = '<div><table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;">이름</td><td style="text-align: center;width:33.33%;">아이피</td><td style="text-align: center;width:33.33%;">언제</td></tr>'
-                    while(True):
-                        try:
-                            c += '<tr><td style="text-align: center;width:33.33%;">' + row[i]['user'] + '</td><td style="text-align: center;width:33.33%;">' + row[i]['ip'] + '</td><td style="text-align: center;width:33.33%;">' + row[i]['today'] + '</td></tr>'
-
-                            i += 1
-                        except:
-                            c += '</tbody></table></div>'
-                            
-                            break
+                    for data in row:
+                        c += '<tr><td style="text-align: center;width:33.33%;">' + data['user'] + '</td><td style="text-align: center;width:33.33%;">' + data['ip'] + '</td><td style="text-align: center;width:33.33%;">' + data['today'] + '</td></tr>'
+                    else:
+                        c += '</tbody></table></div>'
                 else:
                     c = 'None'
                         
@@ -2412,14 +2312,10 @@ def user_admin(name = None):
                 if(get_alist):
                     i = 0
                     name_rem = ''
-                    while(True):
-                        try:
-                            if(not name_rem == get_alist[i]['name']):
-                                name_rem = get_alist[i]['name']
-                                div += '<option value="' + get_alist[i]['name'] + '" selected="selected">' + get_alist[i]['name'] + '</option>'
-                            i += 1
-                        except:
-                            break                            
+                    for data in get_alist:
+                        if(not name_rem == data['name']):
+                            name_rem = data['name']
+                            div += '<option value="' + data['name'] + '" selected="selected">' + data['name'] + '</option>'                       
                     
                 conn.close()
                 return(template('admin', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, page = url_pas(name), datalist = div, logo = set_data['name'], now = now, sub = '권한 부여'))
@@ -2548,6 +2444,7 @@ def read_view(name = None, redirect = None):
     data_none = False
     sub = None
     acl = ''
+    div = ''
     
     i = 0
     curs.execute("select sub from rd where title = '" + db_pas(name) + "' order by date asc")
@@ -2576,12 +2473,9 @@ def read_view(name = None, redirect = None):
     
     m = re.search("^(.*)\/(.*)$", name)
     if(m):
-        g = m.groups()
-        uppage = g[0]
-        style = ""
+        uppage = m.groups()[0]
     else:
-        uppage = ""
-        style = "display:none;"
+        uppage = False
         
     if(admin_check(5) == 1):
         admin_memu = 'ACL'
@@ -2592,56 +2486,47 @@ def read_view(name = None, redirect = None):
         curs.execute("select * from cat where title = '" + db_pas(name) + "' order by cat asc")
         rows = curs.fetchall()
         if(rows):
-            div = ''
+            div = '<h2>분류</h2>'
             i = 0
             
-            while(True):
-                try:                    
-                    curs.execute("select * from data where title = '" + db_pas(rows[i]['cat']) + "'")
-                    row = curs.fetchall()
-                    if(row):
-                        aa = row[0]['data']                  
-                        aa = namumark('', aa)
-                        bb = re.search('<div style="width:100%;border: 1px solid #777;padding: 5px;margin-top: 1em;">분류:((?:(?!<\/div>).)*)<\/div>', aa)
-                        if(bb):
-                            cc = bb.groups()
+            for data in rows:       
+                curs.execute("select * from data where title = '" + db_pas(data['cat']) + "'")
+                row = curs.fetchall()
+                if(row):
+                    aa = row[0]['data']                  
+                    aa = namumark('', aa)
+                    bb = re.search('<div style="width:100%;border: 1px solid #777;padding: 5px;margin-top: 1em;">분류:((?:(?!<\/div>).)*)<\/div>', aa)
+                    if(bb):
+                        cc = bb.groups()
+                        
+                        mm = re.search("^분류:(.*)", name)
+                        if(mm):
+                            ee = mm.groups()
                             
-                            mm = re.search("^분류:(.*)", name)
-                            if(mm):
-                                ee = mm.groups()
+                            if(re.search("<a (class=\"not_thing\")? href=\"\/w\/" + url_pas(name) + "\">" + ee[0] + "<\/a>", cc[0])):
+                                div += '<li><a href="/w/' + url_pas(data['cat']) + '">' + data['cat'] + '</a></li>'
                                 
-                                if(re.search("<a (class=\"not_thing\")? href=\"\/w\/" + url_pas(name) + "\">" + ee[0] + "<\/a>", cc[0])):
-                                    div += '<li><a href="/w/' + url_pas(rows[i]['cat']) + '">' + rows[i]['cat'] + '</a></li>'
-                                    
-                                    i += 1
-                                else:
-                                    curs.execute("delete from cat where title = '" + db_pas(name) + "' and cat = '" + db_pas(rows[i]['cat']) + "'")
-                                    conn.commit()
-                                    
-                                    i += 1
+                                i += 1
                             else:
-                                curs.execute("delete from cat where title = '" + db_pas(name) + "' and cat = '" + db_pas(rows[i]['cat']) + "'")
+                                curs.execute("delete from cat where title = '" + db_pas(name) + "' and cat = '" + db_pas(data['cat']) + "'")
                                 conn.commit()
                                 
                                 i += 1
                         else:
-                            curs.execute("delete from cat where title = '" + db_pas(name) + "' and cat = '" + db_pas(rows[i]['cat']) + "'")
+                            curs.execute("delete from cat where title = '" + db_pas(name) + "' and cat = '" + db_pas(data['cat']) + "'")
                             conn.commit()
                             
                             i += 1
                     else:
-                        curs.execute("delete from cat where title = '" + db_pas(name) + "' and cat = '" + db_pas(rows[i]['cat']) + "'")
+                        curs.execute("delete from cat where title = '" + db_pas(name) + "' and cat = '" + db_pas(data['cat']) + "'")
                         conn.commit()
                         
                         i += 1
-                except:
-                    break
+                else:
+                    curs.execute("delete from cat where title = '" + db_pas(name) + "' and cat = '" + db_pas(data['cat']) + "'")
+                    conn.commit()
                     
-            div = '<h2>분류</h2>' + div
-        else:
-            div = ''
-    else:
-        div = ''
+                    i += 1
     
     curs.execute("select * from data where title = '" + db_pas(name) + "'")
     rows = curs.fetchall()
@@ -2650,26 +2535,23 @@ def read_view(name = None, redirect = None):
             acl = '(관리자)'
         elif(rows[0]['acl'] == 'user'):
             acl = '(로그인)'
-        else:
-            if(not acl):
-                acl = ''
                 
         elsedata = rows[0]['data']
     else:
         data_none = True
         elsedata = 'None'
 
-    m = re.search("^사용자:(.*)$", name)
+    m = re.search("^사용자:([^/]*)", name)
     if(m):
         g = m.groups()
         
-        curs.execute("select * from user where id = '" + db_pas(g[0]) + "'")
+        curs.execute("select acl from user where id = '" + db_pas(g[0]) + "'")
         test = curs.fetchall()
         if(test):
             if(not test[0]['acl'] == 'user'):
                 acl = '(관리자)'
 
-        curs.execute("select * from ban where block = '" + db_pas(g[0]) + "'")
+        curs.execute("select block from ban where block = '" + db_pas(g[0]) + "'")
         user = curs.fetchall()
         if(user):
             sub = '차단'
@@ -2680,8 +2562,7 @@ def read_view(name = None, redirect = None):
     enddata = namumark(name, elsedata)
         
     conn.close()
-    
-    return(template('read', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), data = enddata + div, uppage = uppage, style = style, acl = acl, topic = topic, redirect = redirect, admin = admin_memu, data_none = data_none, sub = sub, down = down))
+    return(template('read', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), data = enddata + div, uppage = uppage, acl = acl, topic = topic, redirect = redirect, admin = admin_memu, data_none = data_none, sub = sub, down = down))
 
 @route('/user/<name:path>/topic')
 @route('/user/<name:path>/topic/<num:int>')
@@ -2689,56 +2570,46 @@ def user_topic_list(name = None, num = 1):
     conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
-    v = num * 50
+    if(num * 50 <= 0):
+        v = 50
+    else:
+        v = num * 50
+    
     i = v - 50
     ydmin = admin_check(1)
     div = '<div><table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;">토론명</td><td style="text-align: center;width:33.33%;">작성자</td><td style="text-align: center;width:33.33%;">시간</td></tr>'
     
-    curs.execute("select title, id, sub, ip, date from topic where ip = '" + db_pas(name) + "' order by date desc")
+    curs.execute("select title, id, sub, ip, date from topic where ip = '" + db_pas(name) + "' order by date desc limit " + str(i) + ", " + str(v))
     rows = curs.fetchall()
     if(rows):
-        while(True):
-            try:                    
-                title = re.sub('<', '&lt;', rows[i]['title'])
-                title = re.sub('>', '&gt;', title)
-                title = re.sub('"', '&quot;', title)
+        for data in rows:
+            title = re.sub('<', '&lt;', data['title'])
+            title = re.sub('>', '&gt;', title)
+            title = re.sub('"', '&quot;', title)
 
-                sub = re.sub('<', '&lt;', rows[i]['sub'])
-                sub = re.sub('>', '&gt;', sub)
-                sub = re.sub('"', '&quot;', sub)
-                    
-                if(ydmin == 1):
-                    curs.execute("select * from ban where block = '" + db_pas(rows[i]['ip']) + "'")
-                    row = curs.fetchall()
-                    if(row):
-                        ban = ' <a href="/ban/' + url_pas(rows[i]['ip']) + '">(해제)</a>'
-                    else:
-                        ban = ' <a href="/ban/' + url_pas(rows[i]['ip']) + '">(차단)</a>'
-                else:
-                    ban = ''
-                    
-                ip = ip_pas(rows[i]['ip'], 1)
-                    
-                div += '<tr><td style="text-align: center;width:33.33%;"><a href="/topic/' + url_pas(rows[i]['title']) + '/sub/' + url_pas(rows[i]['sub']) + '#' + rows[i]['id'] + '">' + title + '</a> (' + sub + ') (#' + rows[i]['id'] + ') </td><td style="text-align: center;width:33.33%;">' + ip + ban +  '</td><td style="text-align: center;width:33.33%;">' + rows[i]['date'] + '</td></tr>'
+            sub = re.sub('<', '&lt;', data['sub'])
+            sub = re.sub('>', '&gt;', sub)
+            sub = re.sub('"', '&quot;', sub)
                 
-                if(i == v):
-                    div = div + '</tbody></table></div>'
-                    if(num == 1):
-                        div += '<br><a href="/user/' + url_pas(name) + '/topic/' + str(num + 1) + '">(다음)</a>'
-                    else:
-                        div += '<br><a href="/user/' + url_pas(name) + '/topic/' + str(num - 1) + '">(이전)</a> <a href="/user/' + url_pas(name) + '/topic/' + str(num + 1) + '">(다음)</a>'
-                    break
-
-                i += 1
-            except:
-                div += '</tbody></table></div>'
-
-                if(num != 1):
-                    div += '<br><a href="/user/' + url_pas(name) + '/topic/' + str(num - 1) + '">(이전)</a>'
-
-                break
+            if(ydmin == 1):
+                curs.execute("select * from ban where block = '" + db_pas(data['ip']) + "'")
+                row = curs.fetchall()
+                if(row):
+                    ban = ' <a href="/ban/' + url_pas(data['ip']) + '">(해제)</a>'
+                else:
+                    ban = ' <a href="/ban/' + url_pas(data['ip']) + '">(차단)</a>'
+            else:
+                ban = ''
+                
+            ip = ip_pas(data['ip'], 1)
+                
+            div += '<tr><td style="text-align: center;width:33.33%;"><a href="/topic/' + url_pas(data['title']) + '/sub/' + url_pas(data['sub']) + '#' + data['id'] + '">' + title + '</a> (' + sub + ') (#' + data['id'] + ') </td><td style="text-align: center;width:33.33%;">' + ip + ban +  '</td><td style="text-align: center;width:33.33%;">' + data['date'] + '</td></tr>'
+        else:
+            div += '</tbody></table></div>'
     else:
-        div = 'None'
+        div = 'None<br>'
+        
+    div += '<br><a href="/user/' + url_pas(name) + '/topic/' + str(num - 1) + '">(이전)</a> <a href="/user/' + url_pas(name) + '/topic/' + str(num + 1) + '">(이후)</a>'
                 
     curs.execute("select end, why from ban where block = '" + db_pas(name) + "'")
     ban_it = curs.fetchall()

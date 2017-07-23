@@ -191,7 +191,7 @@ def mid_pas(data, fol_num, include):
                 fol_num += 3
             elif(syn):
                 result = syn.groups()
-                data = com.sub('<pre id="syntax"><code class="' + result[0] + '">' + re.sub(' ', '<space>', result[1]) + '</code></pre>', data, 1)
+                data = com.sub('<pre id="syntax"><code class="' + result[0] + '">' + re.sub('\r\n', '<isbr>', re.sub(' ', '<space>', result[1])) + '</code></pre>', data, 1)
             elif(html):
                 result = html.groups()
                 data = com.sub(result[0], data, 1)
@@ -538,13 +538,16 @@ def namumark(title, data):
             
             result = m.groups()
             if(result[0]):
-                yudt = re.search('(?:\?v=(.*)|\/([^/?]*)|^([a-zA-Z0-9]*))$', result[0])
-                if(yudt.groups()[0]):
-                    src = yudt.groups()[0]
-                elif(yudt.groups()[1]):
-                    src = yudt.groups()[1]
-                elif(yudt.groups()[2]):
-                    src = yudt.groups()[2]
+                yudt = re.search('(?:\?v=(.*)|\/([^/?]*)|^([a-zA-Z0-9\-]*))$', result[0])
+                if(yudt):
+                    if(yudt.groups()[0]):
+                        src = yudt.groups()[0]
+                    elif(yudt.groups()[1]):
+                        src = yudt.groups()[1]
+                    elif(yudt.groups()[2]):
+                        src = yudt.groups()[2]
+                else:
+                    src = ''
                     
             if(result[1]):
                 mdata = re.search('width=([0-9]*)', result[1])
@@ -1120,6 +1123,7 @@ def namumark(title, data):
 
     data = re.sub('<\/blockquote>((\r)?\n){2}<blockquote>', '</blockquote><br><blockquote>', data)
     data = re.sub('\n', '<br>', data)
+    data = re.sub('<isbr>', '\r\n', data)
     data = re.sub('^<br>', '', data)
     
     conn.close()
