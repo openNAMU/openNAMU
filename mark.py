@@ -749,6 +749,8 @@ def namumark(title, data):
                 
                 tou += "<span class='footnote-list'><a href=\"#rfn-" + str(a) + "\" id=\"fn-" + str(a) + "\">[" + str(a) + "]</a> " + results[1] + "</span><br>"
                 data = re.sub("\[\*([^\s]*)(?:\s(((?!\]).)*))?\]", '<sup><a class="footnotes" title="' + c + '" id="rfn-' + str(a) + '" href="#fn-' + str(a) + '">[' + str(a) + ']</a></sup>', data, 1)
+
+                a += 1
         else:
             tou += '</div>'
 
