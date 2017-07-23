@@ -593,7 +593,7 @@ def user_record(name = None, num = 1):
     else:
         div = 'None<br>'
         
-    div += '<br><a href="/record/' + url_pas(name) + '/n/' + str(int(num) - 1) + '">(이전)</a> <a href="/record/' + url_pas(name) + '/n/' + str(int(num) + 1) + '">(이후)</a>'
+    div += '<br><a href="/record/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전)</a> <a href="/record/' + url_pas(name) + '/n/' + str(num + 1) + '">(이후)</a>'
         
     curs.execute("select end, why from ban where block = '" + db_pas(name) + "'")
     ban_it = curs.fetchall()
@@ -637,6 +637,8 @@ def user_log(num = 1):
             list_data += '<li>' + str(j + 1) + '. ' + ip + ban_button + '</li>'
             
             j += 1
+
+        list_data += '<br><a href="/userlog/n/' + str(num - 1) + '">(이전)</a> <a href="/userlog/n/' + str(num + 1) + '">(이후)</a>'
                 
         conn.close()
         return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = list_data, title = '사용자 가입 기록'))
@@ -645,7 +647,7 @@ def user_log(num = 1):
         return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = '', title = '사용자 가입 기록'))
         
 @route('/backreset')
-def backlink_reset():
+def xref_reset():
     conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
@@ -655,7 +657,7 @@ def backlink_reset():
         curs.execute("delete from back")
         conn.commit()
         
-        curs.execute("select * from data")
+        curs.execute("select title, data from data")
         all = curs.fetchall()
         if(all):
             for data in all:
@@ -669,7 +671,7 @@ def backlink_reset():
         
 @route('/xref/<name:path>')
 @route('/xref/<name:path>/n/<num:int>')
-def backlink(name = None, num = 1):
+def xref(name = None, num = 1):
     conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
@@ -702,13 +704,13 @@ def backlink(name = None, num = 1):
                 curs.execute("select * from data where title = '" + db_pas(data['link']) + "'")
                 row = curs.fetchall()
                 if(row):
-                    data = row[0]['data']
-                    data = re.sub("(?P<in>\[include\((?P<out>(?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\])", "\g<in>\n\n[[\g<out>]]\n\n", data)
-                    data = re.sub("\[\[파일:(?P<in>(?:(?!\]\]|\|).)*)(?:\|((?:(?!\]\]).)*))?\]\]", "\n\n[[:파일:\g<in>]]\n\n", data)
-                    data = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', '[[\g<in>]]', data)
-                    data = namumark('', data)                    
+                    test = row[0]['data']
+                    test = re.sub("(?P<in>\[include\((?P<out>(?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\])", "\g<in>\n\n[[\g<out>]]\n\n", test)
+                    test = re.sub("\[\[파일:(?P<in>(?:(?!\]\]|\|).)*)(?:\|((?:(?!\]\]).)*))?\]\]", "\n\n[[:파일:\g<in>]]\n\n", test)
+                    test = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', '[[\g<in>]]', test)
+                    test = namumark('', test)                    
                     
-                    if(re.search("<a(?:(?:(?!href=).)*)?href=\"\/w\/" + url_pas(name) + "(?:\#[^\"]*)?\"(?:(?:(?!>).)*)?>([^<]*)<\/a>", data)):
+                    if(re.search("<a(?:(?:(?!href=).)*)?href=\"\/w\/" + url_pas(name) + "(?:\#[^\"]*)?\"(?:(?:(?!>).)*)?>([^<]*)<\/a>", test)):
                         div += '<li><a href="/w/' + url_pas(data['link']) + '">' + data['link'] + '</a>'
                         
                         if(data['type']):
@@ -738,7 +740,9 @@ def backlink(name = None, num = 1):
         if(restart == 1):
             conn.close()
             return(redirect('/xref/' + url_pas(name) + '/n/' + str(num)))
-        else:    
+        else:
+            div += '<br><a href="/xref/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전)</a> <a href="/xref/' + url_pas(name) + '/n/' + str(num + 1) + '">(이후)</a>'
+
             conn.close()
             return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = div, title = name, page = url_pas(name), sub = '역링크'))
     else:
@@ -746,7 +750,7 @@ def backlink(name = None, num = 1):
         return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = 'None', title = name, page = url_pas(name), sub = '역링크'))
         
 @route('/recentdiscuss')
-def recent_discuss():
+def recentdiscuss():
     conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
@@ -929,7 +933,11 @@ def deep_search(name = None, num = 1):
     conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
-    v = num * 50
+    if(num * 50 <= 0):
+        v = num * 50
+    else:
+        v = 50
+
     i = v - 50
 
     div = ''
@@ -980,6 +988,8 @@ def deep_search(name = None, num = 1):
         div += '<li>검색 결과 없음</li>'
 
     div += div_plus + end
+
+    div += '<br><a href="/search/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전)</a> <a href="/search/' + url_pas(name) + '/n/' + str(num + 1) + '">(이후)</a>'
 
     conn.close()
     return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = div, title = name, sub = '검색'))
