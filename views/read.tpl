@@ -26,8 +26,8 @@
         % if(data_none == False and admin == "ACL"):
             <a class="menu-item" href="/acl/{{page}}">ACL</a>
         % end
-        % if(uppage):
-            <a class="menu-item" style="{{style}}" href="/w/{{uppage}}">상위</a>
+        % if(not uppage == False):
+            <a class="menu-item" href="/w/{{uppage}}">상위</a>
         % end
         % if(down == True):
             <a class="menu-item" style="{{down}}" href="/down/{{page}}">하위</a>
