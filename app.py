@@ -2286,7 +2286,7 @@ def register():
                         else:
                             hashed = bcrypt.hashpw(bytes(request.forms.pw, 'utf-8'), bcrypt.gensalt())
                             
-                            curs.execute("select * from user limit 1")
+                            curs.execute("select id from user limit 1")
                             user_ex = curs.fetchall()
                             if(not user_ex):
                                 curs.execute("insert into user (id, pw, acl) value ('" + db_pas(request.forms.id) + "', '" + db_pas(hashed.decode()) + "', 'owner')")
@@ -2309,14 +2309,10 @@ def register():
             
 @route('/logout')
 def logout():
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
-    curs = conn.cursor(pymysql.cursors.DictCursor)
-
     session = request.environ.get('beaker.session')
     session['Now'] = False
     session.pop('DREAMER', None)
 
-    conn.close()
     return(redirect('/user'))
     
 @route('/ban/<name:path>', method=['POST', 'GET'])
