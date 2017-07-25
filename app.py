@@ -2027,7 +2027,7 @@ def change_password():
                 curs.execute("select * from user where id = '" + db_pas(request.forms.id) + "'")
                 user = curs.fetchall()
                 if(user):
-                    if(not re.search('\.', ip)):
+                    if(not re.search('(\.|:)', ip)):
                         conn.close()
                         return(redirect('/logout'))
                     elif(bcrypt.checkpw(bytes(request.forms.pw, 'utf-8'), bytes(user[0]['pw'], 'utf-8'))):
@@ -2052,7 +2052,7 @@ def change_password():
             conn.close()
             return(redirect('/ban'))
         else:
-            if(not re.search('\.', ip)):
+            if(not re.search('(\.|:)', ip)):
                 conn.close()
                 return(redirect('/logout'))
             else:
@@ -2655,7 +2655,7 @@ def custom_css():
     session = request.environ.get('beaker.session')
     ip = ip_check()
     if(request.method == 'POST'):
-        if(not re.search('\.', ip)):
+        if(not re.search('(\.|:)', ip)):
             curs.execute("select * from custom where user = '" + db_pas(ip) + "'")
             css_data = curs.fetchall()
             if(css_data):
@@ -2669,7 +2669,7 @@ def custom_css():
         conn.close()
         return(redirect('/user'))
     else:
-        if(not re.search('\.', ip)):
+        if(not re.search('(\.|:)', ip)):
             start = ''
             curs.execute("select * from custom where user = '" + db_pas(ip) + "'")
             css_data = curs.fetchall()

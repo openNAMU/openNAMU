@@ -135,7 +135,7 @@ def ip_pas(raw_ip, num):
     conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
     curs = conn.cursor(pymysql.cursors.DictCursor)
     
-    if(re.search("\.", raw_ip)):
+    if(re.search("(\.|:)", raw_ip)):
         ip = raw_ip
     else:
         curs.execute("select title from data where title = '사용자:" + db_pas(raw_ip) + "'")
@@ -186,7 +186,7 @@ def acl_check(ip, name):
     if(m):
         g = m.groups()
         if(ip == g[0]):
-            if(re.search("\.", g[0])):
+            if(re.search("(\.|:)", g[0])):
                 conn.close()
                 return(1)
             else:
