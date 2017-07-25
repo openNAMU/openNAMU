@@ -227,117 +227,7 @@ def mid_pas(data, fol_num, include):
             
     return((data, fol_num))
 
-def backlink_plus(name, link, backtype):
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
-    curs = conn.cursor(pymysql.cursors.DictCursor)
-    
-    curs.execute("select title from back where title = '" + db_pas(link) + "' and link = '" + db_pas(name) + "' and type = '" + backtype + "'")
-    y = curs.fetchall()
-    if(not y):
-        curs.execute("insert into back (title, link, type) value ('" + db_pas(link) + "', '" + db_pas(name) + "',  '" + backtype + "')")
-        conn.commit()
-        
-    conn.close()
-
-def cat_plus(name, link):
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
-    curs = conn.cursor(pymysql.cursors.DictCursor)
-    
-    curs.execute("select title from cat where title = '" + db_pas(link) + "' and cat = '" + db_pas(name) + "'")
-    y = curs.fetchall()
-    if(not y):
-        curs.execute("insert into cat (title, cat) value ('" + db_pas(link) + "', '" + db_pas(name) + "')")
-        conn.commit()
-        
-    conn.close()
-
-def namumark(title, data):
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
-    curs = conn.cursor(pymysql.cursors.DictCursor)
-    
-    data = html_pas(data, 1)
-
-    b = 0
-    a = mid_pas(data, b, False)
-    
-    data = a[0]
-    b = a[1]
-    
-    data = re.sub("\[anchor\((?P<in>[^\[\]]*)\)\]", '<span id="\g<in>"></span>', data)
-    data = savemark(data)
-    
-    include = re.compile("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]")
-    while(True):
-        m = include.search(data)
-        if(m):
-            results = m.groups()
-            if(results[0] == title):
-                data = include.sub("<b>" + results[0] + "</b>", data, 1)
-            else:
-                curs.execute("select * from data where title = '" + db_pas(results[0]) + "'")
-                in_con = curs.fetchall()
-                
-                backlink_plus(title, results[0], 'include')
-                if(in_con):                        
-                    in_data = in_con[0]['data']
-                    in_data = include.sub("", in_data)
-                    
-                    in_data = html_pas(in_data, 1)
-                    in_data = mid_pas(in_data, b, True)[0]
-                    
-                    if(results[1]):
-                        a = results[1]
-                        while(True):
-                            g = re.search("([^= ,]*)\=([^,]*)", a)
-                            if(g):
-                                result = g.groups()
-                                in_data = re.sub("@" + result[0] + "@", result[1], in_data)
-                                a = re.sub("([^= ,]*)\=([^,]*)", "", a, 1)
-                            else:
-                                break       
-                                
-                    data = include.sub('\n<nobr><div>' + in_data + '</div><nobr>\n', data, 1)
-                else:
-                    data = include.sub("<a class=\"not_thing\" href=\"" + url_pas(results[0]) + "\">" + results[0] + "</a>", data, 1)
-        else:
-            break
-    
-    while(True):
-        m = re.search('^#(?:redirect|넘겨주기) ([^\n]*)$', data)
-        if(m):
-            results = m.groups()
-            aa = re.search("^([^\n]*)(#(?:[^\n]*))$", results[0])
-            if(aa):
-                results = aa.groups()
-                data = re.sub('^#(?:redirect|넘겨주기) ([^\n]*)$', '<meta http-equiv="refresh" content="0;url=/w/' + url_pas(results[0]) + '/from/' + url_pas(title) + results[1] + '" />', data, 1)
-            else:
-                data = re.sub('^#(?:redirect|넘겨주기) ([^\n]*)$', '<meta http-equiv="refresh" content="0;url=/w/' + url_pas(results[0]) + '/from/' + url_pas(title) + '" />', data, 1)
-            
-            backlink_plus(title, results[0], 'redirect')
-        else:
-            break
-            
-    data = '\n' + data + '\n'
-    data = re.sub("\[nicovideo\((?P<in>[^,)]*)(?:(?:,(?:[^,)]*))+)?\)\]", "[[http://embed.nicovideo.jp/watch/\g<in>]]", data)
-    
-    while(True):
-        m = re.search("\n&gt;\s?((?:[^\n]*)(?:(?:(?:(?:\n&gt;\s?)(?:[^\n]*))+)?))", data)
-        if(m):
-            result = m.groups()
-            blockquote = result[0]
-            blockquote = re.sub("\n&gt;\s?", "\n", blockquote)
-            data = re.sub("\n&gt;\s?((?:[^\n]*)(?:(?:(?:(?:\n&gt;\s?)(?:[^\n]*))+)?))", "\n<blockquote>" + blockquote + "</blockquote>", data, 1)
-        else:
-            break
-    
-    if(not re.search('\[목차\]', data)):
-        if(not re.search('\[목차\(없음\)\]', data)):
-            data = re.sub("(?P<in>(={1,6})\s?([^=]*)\s?(?:={1,6})(?:\s+)?\n)", "[목차]\n\g<in>", data, 1)
-        else:
-            data = re.sub("\[목차\(없음\)\]", "", data)
-        
-    data = re.sub("(\n)(?P<in>\r\n(={1,6})\s?([^=]*)\s?(?:={1,6})(?:\s+)?\n)", "\g<in>", data)
-    
+def toc_pas(data, title):
     i = [0, 0, 0, 0, 0, 0, 0]
     last = 0
     span = ''
@@ -413,13 +303,130 @@ def namumark(title, data):
             d = c
             c = re.sub("\[\[(([^|]*)\|)?(?P<in>[^\]]*)\]\]", "\g<in>", c)
 
-            data = re.sub('(={1,6})\s?([^=]*)\s?(?:={1,6})(?:\s+)?\n', '<tablenobr><h' + str(wiki) + ' id="' + c + '"><a href="#toc" id="s-' + toc + '">' + toc + '.</a> ' + d + ' <span style="font-size:11px;">[<a href="/edit/' + url_pas(title) + '/section/' + str(i[0]) + '">편집</a>]</span></h' + str(wiki) + '>', data, 1);
+            data = re.sub('(={1,6})\s?([^=]*)\s?(?:={1,6})(?:\s+)?\n', '<tablenobr><h' + str(wiki) + ' id="' + c + '"><a href="#toc" id="s-' + toc + '">' + toc + '.</a> ' + d + ' <span style="font-size:11px;">[<a href="/edit/' + url_pas(title) + '/section/' + str(i[0]) + '">편집</a>]</span></h' + str(wiki) + '>', data, 1)
         else:
             rtoc += '</div>'
             
             break
     
     data = re.sub("\[목차\]", rtoc, data)
+
+    return(data)
+
+def backlink_plus(name, link, backtype):
+    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    curs = conn.cursor(pymysql.cursors.DictCursor)
+    
+    curs.execute("select title from back where title = '" + db_pas(link) + "' and link = '" + db_pas(name) + "' and type = '" + backtype + "'")
+    y = curs.fetchall()
+    if(not y):
+        curs.execute("insert into back (title, link, type) value ('" + db_pas(link) + "', '" + db_pas(name) + "',  '" + backtype + "')")
+        conn.commit()
+        
+    conn.close()
+
+def cat_plus(name, link):
+    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    curs = conn.cursor(pymysql.cursors.DictCursor)
+    
+    curs.execute("select title from cat where title = '" + db_pas(link) + "' and cat = '" + db_pas(name) + "'")
+    y = curs.fetchall()
+    if(not y):
+        curs.execute("insert into cat (title, cat) value ('" + db_pas(link) + "', '" + db_pas(name) + "')")
+        conn.commit()
+        
+    conn.close()
+
+def namumark(title, data):
+    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    curs = conn.cursor(pymysql.cursors.DictCursor)
+    
+    data = html_pas(data, 1)
+
+    b = 0
+    a = mid_pas(data, b, False)
+    
+    data = a[0]
+    b = a[1]
+    
+    data = re.sub("\[anchor\((?P<in>[^\[\]]*)\)\]", '<span id="\g<in>"></span>', data)
+    data = savemark(data)
+    
+    include = re.compile("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]")
+    while(True):
+        m = include.search(data)
+        if(m):
+            results = m.groups()
+            if(results[0] == title):
+                data = include.sub("<b>" + results[0] + "</b>", data, 1)
+            else:
+                curs.execute("select * from data where title = '" + db_pas(results[0]) + "'")
+                in_con = curs.fetchall()
+                
+                backlink_plus(title, results[0], 'include')
+                if(in_con):                        
+                    in_data = in_con[0]['data']
+                    in_data = include.sub("", in_data)
+                    
+                    in_data = html_pas(in_data, 1)
+                    in_data = mid_pas(in_data, b, True)[0]
+                    
+                    if(results[1]):
+                        a = results[1]
+                        while(True):
+                            g = re.search("([^= ,]*)\=([^,]*)", a)
+                            if(g):
+                                result = g.groups()
+                                in_data = re.sub("@" + result[0] + "@", result[1], in_data)
+                                a = re.sub("([^= ,]*)\=([^,]*)", "", a, 1)
+                            else:
+                                break       
+
+                    in_data = toc_pas(in_data, results[0])
+                                
+                    data = include.sub('\n<nobr><div>' + in_data + '</div><nobr>\n', data, 1)
+                else:
+                    data = include.sub("<a class=\"not_thing\" href=\"" + url_pas(results[0]) + "\">" + results[0] + "</a>", data, 1)
+        else:
+            break
+    
+    while(True):
+        m = re.search('^#(?:redirect|넘겨주기) ([^\n]*)$', data)
+        if(m):
+            results = m.groups()
+            aa = re.search("^([^\n]*)(#(?:[^\n]*))$", results[0])
+            if(aa):
+                results = aa.groups()
+                data = re.sub('^#(?:redirect|넘겨주기) ([^\n]*)$', '<meta http-equiv="refresh" content="0;url=/w/' + url_pas(results[0]) + '/from/' + url_pas(title) + results[1] + '" />', data, 1)
+            else:
+                data = re.sub('^#(?:redirect|넘겨주기) ([^\n]*)$', '<meta http-equiv="refresh" content="0;url=/w/' + url_pas(results[0]) + '/from/' + url_pas(title) + '" />', data, 1)
+            
+            backlink_plus(title, results[0], 'redirect')
+        else:
+            break
+            
+    data = '\n' + data + '\n'
+    data = re.sub("\[nicovideo\((?P<in>[^,)]*)(?:(?:,(?:[^,)]*))+)?\)\]", "[[http://embed.nicovideo.jp/watch/\g<in>]]", data)
+    
+    while(True):
+        m = re.search("\n&gt;\s?((?:[^\n]*)(?:(?:(?:(?:\n&gt;\s?)(?:[^\n]*))+)?))", data)
+        if(m):
+            result = m.groups()
+            blockquote = result[0]
+            blockquote = re.sub("\n&gt;\s?", "\n", blockquote)
+            data = re.sub("\n&gt;\s?((?:[^\n]*)(?:(?:(?:(?:\n&gt;\s?)(?:[^\n]*))+)?))", "\n<blockquote>" + blockquote + "</blockquote>", data, 1)
+        else:
+            break
+    
+    if(not re.search('\[목차\]', data)):
+        if(not re.search('\[목차\(없음\)\]', data)):
+            data = re.sub("(?P<in>(={1,6})\s?([^=]*)\s?(?:={1,6})(?:\s+)?\n)", "[목차]\n\g<in>", data, 1)
+        else:
+            data = re.sub("\[목차\(없음\)\]", "", data)
+        
+    data = re.sub("(\n)(?P<in>\r\n(={1,6})\s?([^=]*)\s?(?:={1,6})(?:\s+)?\n)", "\g<in>", data)
+    
+    data = toc_pas(data, title)
     
     category = ''
     while(True):
