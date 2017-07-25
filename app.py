@@ -430,7 +430,7 @@ def recentchanges():
                 else:
                     hidden = ''      
                 
-            div += '<tr style="' + style + '"><td style="text-align: center;width:33.33%;"><a href="/w/' + url_pas(data['title']) + '">' + title + '</a> (' + data['id'] + '판) ' + revert + ' (' + leng + ')</td><td style="text-align: center;width:33.33%;">' + ip + ban + hidden + '</td><td style="text-align: center;width:33.33%;">' + data['date'] + '</td></tr><tr><td colspan="3" style="text-align: center;width:100%;">' + send + '</td></tr>'
+            div += '<tr style="' + style + '"><td style="text-align: center;width:33.33%;"><a href="/w/' + url_pas(data['title']) + '">' + title + '</a> (<a href="/history/' + url_pas(data['title']) + '">' + data['id'] + '판</a>) ' + revert + ' (' + leng + ')</td><td style="text-align: center;width:33.33%;">' + ip + ban + hidden + '</td><td style="text-align: center;width:33.33%;">' + data['date'] + '</td></tr><tr><td colspan="3" style="text-align: center;width:100%;">' + send + '</td></tr>'
         else:
             div += '</tbody></table></div>'
     else:
@@ -536,7 +536,7 @@ def user_record(name = None, num = 1):
                 else:
                     hidden = ''
                 
-            div += '<tr style="' + style + '"><td style="text-align: center;width:33.33%;"><a href="/w/' + url_pas(data['title']) + '">' + title + '</a> (' + data['id'] + '판) <a href="/w/' + url_pas(data['title']) + '/r/' + str(int(data['id']) - 1) + '/diff/' + data['id'] + '">(비교)</a> ' + revert + ' (' + leng + ')</td><td style="text-align: center;width:33.33%;">' + ip + ban + hidden + '</td><td style="text-align: center;width:33.33%;">' + data['date'] + '</td></tr><tr><td colspan="3" style="text-align: center;width:100%;">' + send + '</td></tr>'
+            div += '<tr style="' + style + '"><td style="text-align: center;width:33.33%;"><a href="/w/' + url_pas(data['title']) + '">' + title + '</a> (<a href="/history/' + url_pas(data['title']) + '">' + data['id'] + '판</a>) <a href="/w/' + url_pas(data['title']) + '/r/' + str(int(data['id']) - 1) + '/diff/' + data['id'] + '">(비교)</a> ' + revert + ' (' + leng + ')</td><td style="text-align: center;width:33.33%;">' + ip + ban + hidden + '</td><td style="text-align: center;width:33.33%;">' + data['date'] + '</td></tr><tr><td colspan="3" style="text-align: center;width:100%;">' + send + '</td></tr>'
         else:
             div += '</tbody></table></div>'
     else:
