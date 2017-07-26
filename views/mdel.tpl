@@ -28,8 +28,9 @@
 <span>이런 식으로 기제 하시오</span>
 <br>
 <br>
-<form id="usrform" method="POST" action="/manydel">
+<form id="usrform" method="POST" action="/mdel">
     <textarea rows="30" cols="100" name="content" form="usrform"></textarea>
+    <input style="margin-top:10px;width:100%;" class="form-control input-sm" name="send" type="text">
     <br>
     <br>
     <div class="form-actions">

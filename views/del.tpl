@@ -16,6 +16,9 @@
     {{plus}}
     <br>
     <br>
+    <input style="width:100%;" class="form-control input-sm" name="send" type="text">
+    <br>
+    <br>
     <button class="btn btn-primary" type="submit">삭제</button>
 </form>
 % if(login == 0):

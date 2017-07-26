@@ -1141,7 +1141,7 @@ def revert(name = None, num = None):
                     conn.close()
                     return(redirect('/w/' + url_pas(name)))
                     
-@route('/manydel', method=['POST', 'GET'])
+@route('/mdel', method=['POST', 'GET'])
 def many_del():
     conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
     curs = conn.cursor(pymysql.cursors.DictCursor)
@@ -1160,7 +1160,7 @@ def many_del():
                     if(rows):
                         leng = '-' + str(len(rows[0]['data']))
                         curs.execute("delete from data where title = '" + db_pas(g[0]) + "'")
-                        history_plus(g[0], '', today, ip, '문서를 삭제 했습니다.', leng)
+                        history_plus(g[0], '', today, ip, request.forms.send + ' (대량 삭제)', leng)
                     data = re.sub('(.*)\r\n', '', data, 1)
                 else:
                     break
@@ -1378,7 +1378,7 @@ def delete(name = None):
                 today = get_time()
                 
                 leng = '-' + str(len(rows[0]['data']))
-                history_plus(name, '', today, ip, '문서를 삭제 했습니다.', leng)
+                history_plus(name, '', today, ip, request.forms.send + ' (삭제)', leng)
                 
                 curs.execute("delete from data where title = '" + db_pas(name) + "'")
                 conn.commit()
@@ -1426,7 +1426,7 @@ def move(name = None):
                 conn.close()
                 return(redirect('/error/19'))
             else:
-                history_plus(name, rows[0]['data'], today, ip, '<a href="/w/' + url_pas(name) + '">' + name + '</a> 문서를 <a href="/w/' + url_pas(request.forms.title) + '">' + request.forms.title + '</a> 문서로 이동 했습니다.', leng)
+                history_plus(name, rows[0]['data'], today, ip, request.forms.send + ' (<a href="/w/' + url_pas(name) + '">' + name + '</a> - <a href="/w/' + url_pas(request.forms.title) + '">' + request.forms.title + '</a> 이동)', leng)
                 
                 if(rows):
                     curs.execute("update data set title = '" + db_pas(request.forms.title) + "' where title = '" + db_pas(name) + "'")
@@ -1458,7 +1458,7 @@ def manager(num = None):
 
     if(num == 1):
         conn.close()
-        return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '관리자 메뉴', logo = set_data['name'], data = '<h2 style="margin-top: 0px;">목록</h2><li><a href="/manager/2">문서 ACL</a></li><li><a href="/manager/3">사용자 체크</a></li><li><a href="/manager/4">사용자 차단</a></li><li><a href="/manager/5">관리자 권한 주기</a></li><li><a href="/manydel">많은 문서 삭제</a></li><h2>소유자</h2><li><a href="/backreset">모든 역링크 재 생성</a></li><li><a href="/manager/8">새로운 관리 그룹 생성</a></li><h2>기타</h2><li>이 메뉴에 없는 기능은 해당 문서의 역사나 토론에서 바로 사용 가능함</li>'))
+        return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '관리자 메뉴', logo = set_data['name'], data = '<h2 style="margin-top: 0px;">목록</h2><li><a href="/manager/2">문서 ACL</a></li><li><a href="/manager/3">사용자 체크</a></li><li><a href="/manager/4">사용자 차단</a></li><li><a href="/manager/5">관리자 권한 주기</a></li><li><a href="/mdel">많은 문서 삭제</a></li><h2>소유자</h2><li><a href="/backreset">모든 역링크 재 생성</a></li><li><a href="/manager/8">새로운 관리 그룹 생성</a></li><h2>기타</h2><li>이 메뉴에 없는 기능은 해당 문서의 역사나 토론에서 바로 사용 가능함</li>'))
     elif(num == 2):
         if(request.method == 'POST'):
             conn.close()
