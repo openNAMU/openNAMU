@@ -1129,7 +1129,9 @@ def namumark(title, data):
     data = re.sub("(\n<nobr>|<nobr>\n|<nobr>)", "", data)
     data = re.sub("<nowiki>(?P<in>.)<\/nowiki>", "\g<in>", data)
     data = re.sub("<space>", " ", data)
+
     data = re.sub('<\/blockquote>(?:(?:\r)?\n){2}<blockquote>', '</blockquote><blockquote>', data)
+    data = re.sub('<\/blockquote>(?:(?:\r)?\n)<br><blockquote>', '</blockquote><blockquote>', data)
     data = re.sub('\n', '<br>', data)
     data = re.sub('<isbr>', '\r\n', data)
     data = re.sub('^<br>', '', data)
