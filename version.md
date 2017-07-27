@@ -114,7 +114,7 @@
 ## 도움 준 사람이나 팀
  * [Basix](https://twitter.com/Basix1120)
  * [Team Croatia](https://github.com/TeamCroatia)
- * 기타 텔레그램 채팅방 사람들
+ * 기타 텔레그램 및 카카오톡 채팅방 사람들
 
 ----
 ## 기타
