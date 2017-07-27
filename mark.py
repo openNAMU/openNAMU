@@ -615,14 +615,16 @@ def namumark(title, data):
                 if(results[0] == title):
                     data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<b>' + g + '</b>', data, 1)
                 else:
-                    curs.execute("select title from data where title = '" + db_pas(results[0]) + "'")
+                    nosharp = re.sub("<sharp>", "#", results[0])
+                    
+                    curs.execute("select title from data where title = '" + db_pas(nosharp) + "'")
                     y = curs.fetchall()
                     if(y):
                         clas = ''
                     else:
                         clas = 'not_thing'
                     
-                    nosharp = re.sub("<sharp>", "#", results[0])
+                    
                     data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a title="' + re.sub('#', '\#', nosharp) + sharp + '" class="' + clas + '" href="/w/' + url_pas(nosharp) + sharp + '">' + g + '</a>', data, 1)
 
                     backlink_plus(title, results[0], '')

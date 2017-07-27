@@ -10,7 +10,7 @@ curs = conn.cursor(pymysql.cursors.DictCursor)
 
 db_pas = pymysql.escape_string
 
-r_ver = '2.1.2'
+r_ver = '2.1.3'
 
 curs.execute('select data from other where name = "version"')
 version = curs.fetchall()
