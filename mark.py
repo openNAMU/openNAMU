@@ -394,12 +394,15 @@ def namumark(title, data):
         m = re.search('^#(?:redirect|넘겨주기) ([^\n]*)$', data)
         if(m):
             results = m.groups()
-            aa = re.search("^([^\n]*)(#(?:[^\n]*))$", results[0])
+            g = re.sub("\\\#", "<sharp>", results[0])
+            aa = re.search("^([^\n]*)(#(?:[^\n]*))$", g)
             if(aa):
                 results = aa.groups()
-                data = re.sub('^#(?:redirect|넘겨주기) ([^\n]*)$', '<meta http-equiv="refresh" content="0;url=/w/' + url_pas(results[0]) + '/from/' + url_pas(title) + results[1] + '" />', data, 1)
+                nosharp = re.sub("<sharp>", "#", results[0])
+                data = re.sub('^#(?:redirect|넘겨주기) ([^\n]*)$', '<meta http-equiv="refresh" content="0;url=/w/' + url_pas(nosharp) + '/from/' + url_pas(title) + results[1] + '" />', data, 1)
             else:
-                data = re.sub('^#(?:redirect|넘겨주기) ([^\n]*)$', '<meta http-equiv="refresh" content="0;url=/w/' + url_pas(results[0]) + '/from/' + url_pas(title) + '" />', data, 1)
+                nosharp = re.sub("<sharp>", "#", g)
+                data = re.sub('^#(?:redirect|넘겨주기) ([^\n]*)$', '<meta http-equiv="refresh" content="0;url=/w/' + url_pas(nosharp) + '/from/' + url_pas(title) + '" />', data, 1)
             
             backlink_plus(title, results[0], 'redirect')
         else:
