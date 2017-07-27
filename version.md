@@ -111,9 +111,10 @@
 ## 외부 파일 라이선스
  * 인용문 아이콘 [Dave Gandy](http://www.flaticon.com/free-icon/quote-left_25672) CC 3.0 BY
 
-## 도움 준 사람
+## 도움 준 사람이나 팀
  * [Basix](https://twitter.com/Basix1120)
  * [Team Croatia](https://github.com/TeamCroatia)
+ * 기타 텔레그램 채팅방 사람들
 
 ----
 ## 기타
