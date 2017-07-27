@@ -104,12 +104,15 @@
  * 파서 제작
 
 ----
-## 파이나무 라이선스
+## 오픈나무 라이선스
  * BSD 3-Clause License
 
 ## 외부 파일 라이선스
  * 인용문 아이콘 [Dave Gandy](http://www.flaticon.com/free-icon/quote-left_25672) CC 3.0 BY
- * ~~형태도 다른 초기 본~~ 일부 파일 [Basix](https://twitter.com/Basix1120)
+
+## 도움 준 사람
+ * [Basix](https://twitter.com/Basix1120)
+ * [Team Croatia](https://github.com/TeamCroatia)
 
 ----
 ## 기타
