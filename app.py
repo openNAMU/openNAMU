@@ -631,7 +631,6 @@ def xref(name = None, num = 1):
         
     i = v - 50
     div = ''
-    restart = 0
     
     curs.execute("delete from back where title = '" + db_pas(name) + "' and link = ''")
     conn.commit()
@@ -640,60 +639,17 @@ def xref(name = None, num = 1):
     rows = curs.fetchall()
     if(rows):        
         for data in rows:
-            if(data['type'] == 'include' or data['type'] == 'file'):
-                curs.execute("select * from back where title = '" + db_pas(name) + "' and link = '" + db_pas(data['link']) + "' and type = ''")
-                test = curs.fetchall()
-                if(test):
-                    restart = 1
-                    
-                    curs.execute("delete from back where title = '" + db_pas(name) + "' and link = '" + db_pas(data['link']) + "' and type = ''")
-                    conn.commit()
-                
-            if(not re.search('^사용자:', data['link'])):
-                curs.execute("select * from data where title = '" + db_pas(data['link']) + "'")
-                row = curs.fetchall()
-                if(row):
-                    test = row[0]['data']
-                    test = re.sub("(?P<in>\[include\((?P<out>(?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\])", "\g<in>\n\n[[\g<out>]]\n\n", test)
-                    test = re.sub("\[\[파일:(?P<in>(?:(?!\]\]|\|).)*)(?:\|((?:(?!\]\]).)*))?\]\]", "\n\n[[:파일:\g<in>]]\n\n", test)
-                    test = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', '[[\g<in>]]', test)
-                    test = namumark('', test)                    
-                    
-                    if(re.search("<a(?:(?:(?!href=).)*)?href=\"\/w\/" + url_pas(name) + "(?:\#[^\"]*)?\"(?:(?:(?!>).)*)?>([^<]*)<\/a>", test)):
-                        div += '<li><a href="/w/' + url_pas(data['link']) + '">' + data['link'] + '</a>'
-                        
-                        if(data['type']):
-                            div += ' (' + data['type'] + ')</li>'
-                        else:
-                            div += '</li>'
-                            
-                    else:
-                        curs.execute("delete from back where title = '" + db_pas(name) + "' and link = '" + db_pas(data['link']) + "'")
-                        conn.commit()
-                        
-                        i += 1
-                        v += 1
-                else:
-                    curs.execute("delete from back where title = '" + db_pas(name) + "' and link = '" + db_pas(data['link']) + "'")
-                    conn.commit()
-                    
-                    i += 1
-                    v += 1
+            div += '<li><a href="/w/' + url_pas(data['link']) + '">' + data['link'] + '</a>'
+            
+            if(data['type']):
+                div += ' (' + data['type'] + ')</li>'
             else:
-                curs.execute("delete from back where title = '" + db_pas(name) + "' and link = '" + db_pas(data['link']) + "'")
-                conn.commit()
+                div += '</li>'
                 
-                i += 1
-                v += 1
-                
-        if(restart == 1):
-            conn.close()
-            return(redirect('/xref/' + url_pas(name) + '/n/' + str(num)))
-        else:
-            div += '<br><a href="/xref/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전)</a> <a href="/xref/' + url_pas(name) + '/n/' + str(num + 1) + '">(이후)</a>'
+        div += '<br><a href="/xref/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전)</a> <a href="/xref/' + url_pas(name) + '/n/' + str(num + 1) + '">(이후)</a>'
 
-            conn.close()
-            return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = div, title = name, page = url_pas(name), sub = '역링크'))
+        conn.close()
+        return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = div, title = name, page = url_pas(name), sub = '역링크'))
     else:
         conn.close()
         return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = 'None', title = name, page = url_pas(name), sub = '역링크'))
@@ -1191,6 +1147,9 @@ def section_edit(name = None, num = None):
             today = get_time()
             
             content = savemark(request.forms.content)
+
+            curs.execute("delete from back where title = '" + db_pas(name) + "'")
+            conn.commit()
             
             curs.execute("select * from data where title = '" + db_pas(name) + "'")
             rows = curs.fetchall()
@@ -1275,6 +1234,9 @@ def edit(name = None):
             today = get_time()
             
             content = savemark(request.forms.content)
+
+            curs.execute("delete from back where title = '" + db_pas(name) + "'")
+            conn.commit()
             
             curs.execute("select * from data where title = '" + db_pas(name) + "'")
             rows = curs.fetchall()
