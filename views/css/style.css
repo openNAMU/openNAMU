@@ -30,6 +30,10 @@ a#inside {
     color: green;
 }
 
+#other_text {
+    height: 80%;
+}
+
 button#goto {
     border-radius: 0;
     border-left: 0;
@@ -46,10 +50,6 @@ pre {
 
 .four-fifths.column {
     word-break: break-all;
-}
-
-textarea {
-    width: 100%;
 }
 
 li {

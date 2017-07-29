@@ -874,39 +874,24 @@ def old_raw(name = None, num = None):
     curs.execute("select * from hidhi where title = '" + db_pas(name) + "' and re = '" + db_pas(str(num)) + "'")
     row = curs.fetchall()
     if(row):
-        if(admin_check(6) == 1):
-            curs.execute("select * from history where title = '" + db_pas(name) + "' and id = '" + str(num) + "'")
-            rows = curs.fetchall()
-            if(rows):
-                enddata = re.sub('<', '&lt;', rows[0]['data'])
-                enddata = re.sub('>', '&gt;', enddata)
-                enddata = re.sub('"', '&quot;', enddata)
-                
-                enddata = '<pre>' + enddata + '</pre>'
-                
-                conn.close()
-                return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), data = enddata, sub = '옛 원본'))
-            else:
-                conn.close()
-                return(redirect('/history/' + url_pas(name)))
-        else:
+        if(not admin_check(6) == 1):
             conn.close()
             return(redirect('/error/3'))
+
+    curs.execute("select * from history where title = '" + db_pas(name) + "' and id = '" + str(num) + "'")
+    rows = curs.fetchall()
+    if(rows):
+        enddata = re.sub('<', '&lt;', rows[0]['data'])
+        enddata = re.sub('>', '&gt;', enddata)
+        enddata = re.sub('"', '&quot;', enddata)
+        
+        enddata = '<textarea id="other_text">' + enddata + '</textarea>'
+        
+        conn.close()
+        return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), data = enddata, sub = '옛 원본'))
     else:
-        curs.execute("select * from history where title = '" + db_pas(name) + "' and id = '" + str(num) + "'")
-        rows = curs.fetchall()
-        if(rows):
-            enddata = re.sub('<', '&lt;', rows[0]['data'])
-            enddata = re.sub('>', '&gt;', enddata)
-            enddata = re.sub('"', '&quot;', enddata)
-            
-            enddata = '<pre>' + enddata + '</pre>'
-            
-            conn.close()
-            return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), data = enddata, sub = '옛 원본'))
-        else:
-            conn.close()
-            return(redirect('/history/' + url_pas(name)))
+        conn.close()
+        return(redirect('/history/' + url_pas(name)))
             
 @route('/raw/<name:path>')
 def raw_view(name = None):
@@ -920,7 +905,7 @@ def raw_view(name = None):
         enddata = re.sub('>', '&gt;', enddata)
         enddata = re.sub('"', '&quot;', enddata)
         
-        enddata = '<pre>' + enddata + '</pre>'
+        enddata = '<textarea id="other_text">' + enddata + '</textarea>'
         
         conn.close()
         return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), data = enddata, sub = '원본'))
