@@ -1698,7 +1698,7 @@ def topic(name = None, sub = None):
             indata = re.sub("(?P<in>#(?:[0-9]*))", '<a href="\g<in>">\g<in></a>', indata)
             
             if(dain['block'] == 'O'):
-                indata = '블라인드 되었습니다.'
+                indata = '<br>'
                 block = 'id="block"'
             else:
                 block = ''
@@ -1707,7 +1707,7 @@ def topic(name = None, sub = None):
                 if(dain['block'] == 'O'):
                     isblock = ' <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/b/' + str(i + 1) + '">(해제)</a>'
                 else:
-                    isblock = ' <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/b/' + str(i + 1) + '">(블라인드)</a>'
+                    isblock = ' <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/b/' + str(i + 1) + '">(가림)</a>'
 
                 curs.execute("select id from topic where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' and id = '" + db_pas(str(i + 1)) + "' and top = 'O'")
                 row = curs.fetchall()
@@ -1735,7 +1735,7 @@ def topic(name = None, sub = None):
             adch = curs.fetchall()
             if(adch):
                 if(not adch[0]['acl'] == 'user'):
-                    chad = ' (관리자)'
+                    chad = ' ★'
 
             ip = ip_pas(dain['ip'], 1)
                     
@@ -1770,7 +1770,7 @@ def close_topic_list(name = None):
             indata = namumark(name, row[0]['data'])
             
             if(row[0]['block'] == 'O'):
-                indata = '블라인드 되었습니다.'
+                indata = '<br>'
                 block = 'id="block"'
             else:
                 block = ''
@@ -1803,7 +1803,7 @@ def agree_topic_list(name = None):
             indata = namumark(name, topic_data[0]['data'])
             
             if(topic_data[0]['block'] == 'O'):
-                indata = '블라인드 되었습니다.'
+                indata = '<br>'
                 block = 'id="block"'
             else:
                 block = ''
@@ -1839,7 +1839,7 @@ def topic_list(name = None):
             indata = namumark(name, aa[0]['data'])
             
             if(aa[0]['block'] == 'O'):
-                indata = '블라인드 되었습니다.'
+                indata = '<br>'
                 block = 'id="block"'
             else:
                 block = ''
