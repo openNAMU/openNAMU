@@ -9,12 +9,6 @@ import hashlib
 
 json_data = open('set.json').read()
 set_data = json.loads(json_data)
-
-def url_pas(data):
-    return(parse.quote(data).replace('/','%2F'))
-
-def sha224(data):
-    return(hashlib.sha224(bytes(data, 'utf-8')).hexdigest())
     
 session_opts = {
     'session.type': 'file',
@@ -154,18 +148,6 @@ def ip_pas(raw_ip, num):
     
     conn.close()
     
-    return(ip)
-
-def ip_check():
-    session = request.environ.get('beaker.session')
-    if(session.get('Now') == True):
-        ip = format(session['DREAMER'])
-    else:
-        if(request.environ.get('HTTP_X_FORWARDED_FOR')):
-            ip = request.environ.get('HTTP_X_FORWARDED_FOR')
-        else:
-            ip = request.environ.get('REMOTE_ADDR')
-
     return(ip)
 
 def custom_css_user():
@@ -363,12 +345,6 @@ def topic_check(ip, name, sub):
                 conn.close()
                 return(0)
     conn.close()
-
-def get_time():
-    now = time.localtime()
-    date = "%04d-%02d-%02d %02d:%02d:%02d" % (now.tm_year, now.tm_mon, now.tm_mday, now.tm_hour, now.tm_min, now.tm_sec)
-
-    return(date)
 
 def rd_plus(title, sub, date):
     conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
