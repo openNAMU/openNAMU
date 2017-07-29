@@ -47,85 +47,22 @@ def setup():
                 curs.execute("use " + set_data['db'])
                 curs.execute("alter database " + set_data['db'] + " character set = utf8mb4 collate = utf8mb4_unicode_ci")    
         
-            try:
-                curs.execute("create table data(title text, data longtext, acl text)")
-            except:
-                pass
-            
-            try:
-                curs.execute("create table history(id text, title text, data longtext, date text, ip text, send text, leng text)")
-            except:
-                pass
-            
-            try:
-                curs.execute("create table rd(title text, sub text, date text)")
-            except:
-                pass
-            
-            try:
-                curs.execute("create table user(id text, pw text, acl text)")
-            except:
-                pass
-            
-            try:
-                curs.execute("create table ban(block text, end text, why text, band text)")
-            except:
-                pass
-            
-            try:
-                curs.execute("create table topic(id text, title text, sub text, data longtext, date text, ip text, block text, top text)")
-            except:
-                pass
-            
-            try:
-                curs.execute("create table stop(title text, sub text, close text)")
-            except:
-                pass
-            
-            try:
-                curs.execute("create table rb(block text, end text, today text, blocker text, why text)")
-            except:
-                pass
-            
-            try:
-                curs.execute("create table login(user text, ip text, today text)")
-            except:
-                pass
-            
-            try:
-                curs.execute("create table back(title text, link text, type text)")
-            except:
-                pass
-            
-            try:
-                curs.execute("create table cat(title text, cat text)")
-            except:
-                pass
-                
-            try:
-                curs.execute("create table hidhi(title text, re text)")
-            except:
-                pass
-
-            try:
-                curs.execute("create table agreedis(title text, sub text)")
-            except:
-                pass
-
-            try:
-                curs.execute("create table custom(user text, css longtext)")
-            except:
-                pass
-                
-            try:
-                curs.execute("create table other(name text, data text)")
-            except:
-                pass
-                
-            try:
-                curs.execute("create table alist(name text, acl text)")
-            except:
-                pass
+            curs.execute("create table data(title text, data longtext, acl text)")
+            curs.execute("create table history(id text, title text, data longtext, date text, ip text, send text, leng text)")
+            curs.execute("create table rd(title text, sub text, date text)")
+            curs.execute("create table user(id text, pw text, acl text)")
+            curs.execute("create table ban(block text, end text, why text, band text)")
+            curs.execute("create table topic(id text, title text, sub text, data longtext, date text, ip text, block text, top text)")
+            curs.execute("create table stop(title text, sub text, close text)")
+            curs.execute("create table rb(block text, end text, today text, blocker text, why text)")
+            curs.execute("create table login(user text, ip text, today text)")
+            curs.execute("create table back(title text, link text, type text)")
+            curs.execute("create table cat(title text, cat text)")
+            curs.execute("create table hidhi(title text, re text)")
+            curs.execute("create table agreedis(title text, sub text)")
+            curs.execute("create table custom(user text, css longtext)")
+            curs.execute("create table other(name text, data text)")
+            curs.execute("create table alist(name text, acl text)")
 
             conn.close()
             return(redirect('/'))
@@ -258,9 +195,9 @@ def list_acl():
             
             i += 1
         else:        
-            div += '<br><a href="/manager/8">(새로 생성)</a></div>'
+            div += '<br><a href="/manager/8">(생성)</a></div>'
     else:
-        div = '<a href="/manager/8">(새로 생성)</a></div>'
+        div = '<a href="/manager/8">(생성)</a></div>'
 
     conn.close()
     return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = div, title = 'ACL 목록'))
@@ -1420,7 +1357,7 @@ def manager(num = None):
 
     if(num == 1):
         conn.close()
-        return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '관리자 메뉴', logo = set_data['name'], data = '<h2 style="margin-top: 0px;">목록</h2><li><a href="/manager/2">문서 ACL</a></li><li><a href="/manager/3">사용자 체크</a></li><li><a href="/manager/4">사용자 차단</a></li><li><a href="/manager/5">관리자 권한 주기</a></li><li><a href="/mdel">많은 문서 삭제</a></li><h2>소유자</h2><li><a href="/backreset">모든 역링크 재 생성</a></li><li><a href="/manager/8">새로운 관리 그룹 생성</a></li><h2>기타</h2><li>이 메뉴에 없는 기능은 해당 문서의 역사나 토론에서 바로 사용 가능함</li>'))
+        return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '관리자 메뉴', logo = set_data['name'], data = '<h2 style="margin-top: 0px;">목록</h2><li><a href="/manager/2">문서 ACL</a></li><li><a href="/manager/3">사용자 체크</a></li><li><a href="/manager/4">사용자 차단</a></li><li><a href="/manager/5">관리자 권한 주기</a></li><li><a href="/mdel">많은 문서 삭제</a></li><h2>소유자</h2><li><a href="/backreset">모든 역링크 재 생성</a></li><li><a href="/manager/8">관리 그룹 생성</a></li><h2>기타</h2><li>이 메뉴에 없는 기능은 해당 문서의 역사나 토론에서 바로 사용 가능함</li>'))
     elif(num == 2):
         if(request.method == 'POST'):
             conn.close()
