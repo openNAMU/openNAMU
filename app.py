@@ -18,8 +18,6 @@ session_opts = {
 
 app = beaker.middleware.SessionMiddleware(app(), session_opts)
 
-BaseRequest.MEMFILE_MAX = 1024 * 1024
-
 def redirect(data):
     return('<meta http-equiv="refresh" content="0;url=' + data + '" />')
     
@@ -36,7 +34,7 @@ def setup():
     curs = conn.cursor(pymysql.cursors.DictCursor)
     
     if(request.method == 'POST'):            
-        if(not request.forms.owner == set_data['pw']):            
+        if(not request.forms.owner == set_data['pw']):         
             conn.close()
             return(redirect('/error/3'))
         else:
@@ -75,8 +73,6 @@ def upload():
     conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
     curs = conn.cursor(pymysql.cursors.DictCursor)
     
-    MEMFILE_MAX = int(set_data['upload']) * 1024 * 1024
-    
     ip = ip_check()
     ban = ban_check(ip)
     
@@ -95,9 +91,13 @@ def upload():
                         return(redirect('/error/17'))
                     else:
                         file_info = exist.groups()
-
-                        file_data = file_info[0] + file_info[1]
-                        file_name = sha224(file_info[0]) + file_info[1]
+                        
+                        if(not request.forms.data):
+                            file_data = file_info[0] + file_info[1]
+                            file_name = sha224(file_info[0]) + file_info[1]
+                        else:
+                            file_data = request.forms.data + file_info[1]
+                            file_name = sha224(request.forms.data) + file_info[1]
                                            
                         if(os.path.exists(os.path.join('image', file_name))):
                             conn.close()
@@ -105,10 +105,15 @@ def upload():
                         else:
                             file.save(os.path.join('image', file_name))
                             
+                            if(not request.forms.lice):
+                                lice = ip + ' 업로드'
+                            else:
+                                lice = '라이선스 : ' + request.forms.lice
+                            
                             curs.execute("select title from data where title = '" + db_pas('파일:' + file_data) + "'")
                             exist_db = curs.fetchall()
                             if(not exist_db):
-                                curs.execute("insert into data (title, data, acl) value ('" + db_pas('파일:' + file_data) + "', '" + db_pas('[[파일:' + file_data + ']][br][br]{{{[[파일:' + file_data + ']]}}}') + "', '')")
+                                curs.execute("insert into data (title, data, acl) value ('" + db_pas('파일:' + file_data) + "', '" + db_pas('[[파일:' + file_data + ']][br][br]{{{[[파일:' + file_data + ']]}}}[br][br]' + lice) + "', '')")
                                 conn.commit()
                             
                             history_plus('파일:' + file_data, '[[파일:' + file_data + ']][br][br]{{{[[파일:' + file_data + ']]}}}', get_time(), ip, '파일:' + file_data + ' 업로드', '0')
