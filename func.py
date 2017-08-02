@@ -163,7 +163,7 @@ def acl_check(ip, name):
     conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
-    m = re.search("^사용자:(.*)", name)
+    m = re.search("^사용자:([^/]*)", name)
     n = re.search("^파일:(.*)", name)
     if(m):
         g = m.groups()
