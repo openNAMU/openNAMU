@@ -68,72 +68,6 @@ def setup():
         conn.close()
         return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = '<form method="POST"><input name="owner" type="password"> <button class="btn btn-primary" type="submit">저장</button></form>', title = '오픈나무 설치'))
 
-@route('/upload', method=['GET', 'POST'])
-def upload():
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
-    curs = conn.cursor(pymysql.cursors.DictCursor)
-    
-    ip = ip_check()
-    ban = ban_check(ip)
-    
-    if(request.method == 'POST'):        
-        if(ban == 1):
-            conn.close()
-            return(redirect('/ban'))
-        else:
-            file = request.files.file
-            if(file):
-                comp = re.compile("^(.+)(\.(?:jpg|gif|png|jpeg))$", re.I)
-                exist = comp.search(file.filename)
-                if(exist):
-                    if((int(set_data['upload']) * 1024 * 1024) < request.content_length):
-                        conn.close()
-                        return(redirect('/error/17'))
-                    else:
-                        file_info = exist.groups()
-                        
-                        if(not request.forms.data):
-                            file_data = file_info[0] + file_info[1]
-                            file_name = sha224(file_info[0]) + file_info[1]
-                        else:
-                            file_data = request.forms.data + file_info[1]
-                            file_name = sha224(request.forms.data) + file_info[1]
-                                           
-                        if(os.path.exists(os.path.join('image', file_name))):
-                            conn.close()
-                            return(redirect('/error/16'))
-                        else:
-                            file.save(os.path.join('image', file_name))
-                            
-                            if(not request.forms.lice):
-                                lice = ip + ' 업로드'
-                            else:
-                                lice = '라이선스 : ' + request.forms.lice
-                            
-                            curs.execute("select title from data where title = '" + db_pas('파일:' + file_data) + "'")
-                            exist_db = curs.fetchall()
-                            if(not exist_db):
-                                curs.execute("insert into data (title, data, acl) value ('" + db_pas('파일:' + file_data) + "', '" + db_pas('[[파일:' + file_data + ']][br][br]{{{[[파일:' + file_data + ']]}}}[br][br]' + lice) + "', '')")
-                                conn.commit()
-                            
-                            history_plus('파일:' + file_data, '[[파일:' + file_data + ']][br][br]{{{[[파일:' + file_data + ']]}}}', get_time(), ip, '파일:' + file_data + ' 업로드', '0')
-                            
-                            conn.close()
-                            return(redirect('/w/' + url_pas('파일:' + file_data)))
-                else:
-                    conn.close()
-                    return(redirect('/error/14'))
-            else:
-                conn.close()
-                return(redirect('/error/14'))
-    else:        
-        if(ban == 1):
-            conn.close()
-            return(redirect('/ban'))
-        else:
-            conn.close()
-            return(template('upload', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], title = '업로드', number = set_data['upload']))
-
 @route('/image/<name:path>')
 def static(name = None):
     if(os.path.exists(os.path.join('image', name))):
@@ -2578,6 +2512,66 @@ def custom_css():
 
         conn.close()
         return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '커스텀 CSS', logo = set_data['name'], data = start + '<form id="usrform" name="f1" method="POST" action="/custom"><textarea rows="30" cols="100" name="content" form="usrform">' + data + '</textarea><br><br><div class="form-actions"><button class="btn btn-primary" type="submit">저장</button></div></form>'))
+
+@route('/upload', method=['GET', 'POST'])
+def upload():
+    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    curs = conn.cursor(pymysql.cursors.DictCursor)
+    
+    ip = ip_check()
+    ban = ban_check(ip)
+    
+    if(ban == 1):
+        conn.close()
+        return(redirect('/ban'))
+    elif(request.method == 'POST'):        
+        if(request.files.file):
+            comp = re.compile("^(.+)(\.(?:jpg|gif|png|jpeg))$", re.I)
+            exist = comp.search(request.files.file.filename)
+            if(exist):
+                if((int(set_data['upload']) * 1024 * 1024) < request.content_length):
+                    conn.close()
+                    return(redirect('/error/17'))
+                else:
+                    file_info = exist.groups()
+                    
+                    if(not request.forms.data):
+                        file_data = file_info[0] + file_info[1]
+                        file_name = sha224(file_info[0]) + file_info[1]
+                    else:
+                        file_data = request.forms.data + file_info[1]
+                        file_name = sha224(request.forms.data) + file_info[1]
+                                        
+                    if(os.path.exists(os.path.join('image', file_name))):
+                        conn.close()
+                        return(redirect('/error/16'))
+                    else:
+                        request.files.file.save(os.path.join('image', file_name))
+                        
+                        if(not request.forms.lice):
+                            lice = ip + ' 업로드'
+                        else:
+                            lice = '라이선스 : ' + request.forms.lice
+                        
+                        curs.execute("select title from data where title = '" + db_pas('파일:' + file_data) + "'")
+                        exist_db = curs.fetchall()
+                        if(not exist_db):
+                            curs.execute("insert into data (title, data, acl) value ('" + db_pas('파일:' + file_data) + "', '" + db_pas('[[파일:' + file_data + ']][br][br]{{{[[파일:' + file_data + ']]}}}[br][br]' + lice) + "', '')")
+                            conn.commit()
+                        
+                        history_plus('파일:' + file_data, '[[파일:' + file_data + ']][br][br]{{{[[파일:' + file_data + ']]}}}', get_time(), ip, '파일:' + file_data + ' 업로드', '0')
+                        
+                        conn.close()
+                        return(redirect('/w/' + url_pas('파일:' + file_data)))
+            else:
+                conn.close()
+                return(redirect('/error/14'))
+        else:
+            conn.close()
+            return(redirect('/error/14'))
+    else:        
+        conn.close()
+        return(template('upload', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], title = '업로드', number = set_data['upload']))
     
 @route('/count')
 def count_edit():

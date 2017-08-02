@@ -20,7 +20,7 @@
         <link rel="shortcut icon" href="/views/img/on.ico">
         <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
-        {{get('custom', '')}}
+        {{!get('custom', '')}}
     </style>
     </head>
     <body onload="brython()">
