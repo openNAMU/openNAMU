@@ -30,7 +30,11 @@ r_ver = '2.1.3'
 
 @route('/setup', method=['GET', 'POST'])
 def setup():
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4')
+    conn = pymysql.connect(
+        user = set_data['user'], 
+        password = set_data['pw'], 
+        charset = 'utf8mb4'
+    )
     curs = conn.cursor(pymysql.cursors.DictCursor)
     
     if(request.method == 'POST'):            
@@ -66,7 +70,18 @@ def setup():
             return(redirect('/'))
     else:
         conn.close()
-        return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = '<form method="POST"><input name="owner" type="password"> <button class="btn btn-primary" type="submit">저장</button></form>', title = '오픈나무 설치'))
+        return(
+            template('other', 
+                custom = custom_css_user(), 
+                license = set_data['license'], 
+                login = login_check(), 
+                logo = set_data['name'], 
+                data = '<form method="POST"> \
+                            <input name="owner" type="password"> <button class="btn btn-primary" type="submit">저장</button> \
+                        </form>', 
+                title = '오픈나무 설치'
+            )
+        )
 
 @route('/image/<name:path>')
 def static(name = None):
@@ -77,7 +92,12 @@ def static(name = None):
 
 @route('/acllist')
 def acl_list():
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    conn = pymysql.connect(
+        user = set_data['user'], 
+        password = set_data['pw'], 
+        charset = 'utf8mb4', 
+        db = set_data['db']
+    )
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
     div = '<div>'
@@ -101,11 +121,25 @@ def acl_list():
         div = ''
 
     conn.close()
-    return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = div, title = 'ACL 문서 목록'))
+    return(
+        template('other', 
+            custom = custom_css_user(), 
+            license = set_data['license'], 
+            login = login_check(), 
+            logo = set_data['name'], 
+            data = div, 
+            title = 'ACL 문서 목록'
+        )
+    )
     
 @route('/listacl')
 def list_acl():
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    conn = pymysql.connect(
+        user = set_data['user'], 
+        password = set_data['pw'], 
+        charset = 'utf8mb4', 
+        db = set_data['db']
+    )
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
     div = '<div>'
@@ -139,11 +173,25 @@ def list_acl():
         div = '<a href="/manager/8">(생성)</a></div>'
 
     conn.close()
-    return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = div, title = 'ACL 목록'))
+    return(
+        template('other', 
+            custom = custom_css_user(), 
+            license = set_data['license'], 
+            login = login_check(), 
+            logo = set_data['name'], 
+            data = div, 
+            title = 'ACL 목록'
+        )
+    )
 
 @route('/adminplus/<name:path>', method=['POST', 'GET'])
 def admin_plus(name = None):
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    conn = pymysql.connect(
+        user = set_data['user'], 
+        password = set_data['pw'], 
+        charset = 'utf8mb4', 
+        db = set_data['db']
+    )
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
     if(admin_check(None) == 1):
@@ -152,16 +200,22 @@ def admin_plus(name = None):
             
             if(request.forms.ban):
                 curs.execute("insert into alist (name, acl) value ('" + db_pas(name) + "', 'ban')")
+
             if(request.forms.mdel):
-                curs.execute("insert into alist (name, acl) value ('" + db_pas(name) + "', 'mdel')")    
+                curs.execute("insert into alist (name, acl) value ('" + db_pas(name) + "', 'mdel')")   
+
             if(request.forms.toron):
                 curs.execute("insert into alist (name, acl) value ('" + db_pas(name) + "', 'toron')")
+                
             if(request.forms.check):
                 curs.execute("insert into alist (name, acl) value ('" + db_pas(name) + "', 'check')")
+
             if(request.forms.acl):
                 curs.execute("insert into alist (name, acl) value ('" + db_pas(name) + "', 'acl')")
+
             if(request.forms.hidel):
                 curs.execute("insert into alist (name, acl) value ('" + db_pas(name) + "', 'hidel')")
+
             if(request.forms.owner):
                 curs.execute("insert into alist (name, acl) value ('" + db_pas(name) + "', 'owner')")
                 
@@ -172,7 +226,7 @@ def admin_plus(name = None):
             curs.execute('select acl from alist where name = "' + db_pas(name) + '"')
             test = curs.fetchall()
             
-            list = ''
+            data = ''
             exist_list = ['', '', '', '', '', '', '', '', '']
 
             for go in test:
@@ -191,23 +245,42 @@ def admin_plus(name = None):
                 elif(go['acl'] == 'owner'):
                     exist_list[7] = 'checked="checked"'
 
-            list += '<li><input type="checkbox" name="ban" ' + exist_list[0] + '> 차단</li>'
-            list += '<li><input type="checkbox" name="mdel" ' + exist_list[1] + '> 많은 문서 삭제</li>'
-            list += '<li><input type="checkbox" name="toron" ' + exist_list[2] + '> 토론 관리</li>'
-            list += '<li><input type="checkbox" name="check" ' + exist_list[3] + '> 사용자 검사</li>'
-            list += '<li><input type="checkbox" name="acl" ' + exist_list[4] + '> 문서 ACL</li>'
-            list += '<li><input type="checkbox" name="hidel" ' + exist_list[5] + '> 역사 숨김</li>'
-            list += '<li><input type="checkbox" name="owner" ' + exist_list[7] + '> 소유자</li>'
+            data += '<li><input type="checkbox" name="ban" ' + exist_list[0] + '> 차단</li>'
+            data += '<li><input type="checkbox" name="mdel" ' + exist_list[1] + '> 많은 문서 삭제</li>'
+            data += '<li><input type="checkbox" name="toron" ' + exist_list[2] + '> 토론 관리</li>'
+            data += '<li><input type="checkbox" name="check" ' + exist_list[3] + '> 사용자 검사</li>'
+            data += '<li><input type="checkbox" name="acl" ' + exist_list[4] + '> 문서 ACL</li>'
+            data += '<li><input type="checkbox" name="hidel" ' + exist_list[5] + '> 역사 숨김</li>'
+            data += '<li><input type="checkbox" name="owner" ' + exist_list[7] + '> 소유자</li>'
             
             conn.close()
-            return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '관리 그룹 추가', logo = set_data['name'], data = '<form id="usrform" method="POST" action="/adminplus/' + url_pas(name) + '">' + list + '<div class="form-actions"><button class="btn btn-primary" type="submit">저장</button></div></form>'))
+            return(
+                template('other', 
+                    custom = custom_css_user(), 
+                    license = set_data['license'], 
+                    login = login_check(), 
+                    title = '관리 그룹 추가', 
+                    logo = set_data['name'], 
+                    data = '<form id="usrform" method="POST" action="/adminplus/' + url_pas(name) + '">' \
+                                + data + \
+                                '<div class="form-actions"> \
+                                    <button class="btn btn-primary" type="submit">저장</button> \
+                                </div> \
+                            </form>'
+                )
+            )
     else:
         conn.close()
         return(redirect('/error/3'))
         
 @route('/adminlist')
 def admin_list():
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    conn = pymysql.connect(
+        user = set_data['user'], 
+        password = set_data['pw'], 
+        charset = 'utf8mb4', 
+        db = set_data['db']
+    )
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
     i = 1
@@ -217,8 +290,7 @@ def admin_list():
     user_data = curs.fetchall()
     if(user_data):
         for data in user_data:
-            name = ip_pas(data['id'], 2)
-            name += ' (' + data['acl'] + ')'
+            name = ip_pas(data['id'], 2) + ' (' + data['acl'] + ')'
 
             div += '<li>' + str(i) + '. ' + name + '</li>'
             
@@ -227,19 +299,48 @@ def admin_list():
             div += '</div>'
                 
         conn.close()
-        return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = div, title = '관리자 목록'))
+        return(
+            template('other', 
+                custom = custom_css_user(), 
+                license = set_data['license'], 
+                login = login_check(), 
+                logo = set_data['name'], 
+                data = div, 
+                title = '관리자 목록'
+            )
+        )
     else:
         conn.close()
-        return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], title = '관리자 목록'))
+        return(
+            template('other', 
+                custom = custom_css_user(), 
+                license = set_data['license'], 
+                login = login_check(), 
+                logo = set_data['name'], 
+                title = '관리자 목록'
+            )
+        )
         
 @route('/recentchanges')
 def recentchanges():
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    conn = pymysql.connect(
+        user = set_data['user'], 
+        password = set_data['pw'], 
+        charset = 'utf8mb4', 
+        db = set_data['db']
+    )
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
     ydmin = admin_check(1)
     zdmin = admin_check(6)
-    div = '<div><table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;">문서명</td><td style="text-align: center;width:33.33%;">기여자</td><td style="text-align: center;width:33.33%;">시간</td></tr>'
+    div =  '<div> \
+            <table style="width: 100%; text-align: center;"> \
+                <tbody> \
+                <tr> \
+                    <td style="width:33.33%;">문서명</td> \
+                    <td style="width:33.33%;">기여자</td> \
+                    <td style="width:33.33%;">시간</td> \
+                </tr>'
     
     curs.execute("select id, title, date, ip, send, leng from history order by date desc limit 50")
     rows = curs.fetchall()
@@ -306,18 +407,43 @@ def recentchanges():
                 else:
                     hidden = ''      
                 
-            div += '<tr style="' + style + '"><td style="text-align: center;width:33.33%;"><a href="/w/' + url_pas(data['title']) + '">' + title + '</a> (<a href="/history/' + url_pas(data['title']) + '">' + data['id'] + '판</a>) ' + revert + ' (' + leng + ')</td><td style="text-align: center;width:33.33%;">' + ip + ban + hidden + '</td><td style="text-align: center;width:33.33%;">' + data['date'] + '</td></tr><tr><td colspan="3" style="text-align: center;width:100%;">' + send + '</td></tr>'
+            div += '<tr style="' + style + '"> \
+                        <td> \
+                            <a href="/w/' + url_pas(data['title']) + '">' + title + '</a> (<a href="/history/' + url_pas(data['title']) + '">' + data['id'] + '판</a>) ' + revert + ' (' + leng + ') \
+                        </td> \
+                        <td>' + ip + ban + hidden + '</td> \
+                        <td>' + data['date'] + '</td> \
+                    </tr> \
+                    <tr> \
+                        <td colspan="3">' + send + '</td> \
+                    </tr>'
         else:
-            div += '</tbody></table></div>'
+            div +=          '</tbody> \
+                        </table> \
+                    </div>'
     else:
         div = 'None'
             
     conn.close()
-    return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = div, title = '최근 변경내역'))
+    return(
+        template('other', 
+            custom = custom_css_user(), 
+            license = set_data['license'], 
+            login = login_check(), 
+            logo = set_data['name'], 
+            data = div, 
+            title = '최근 변경내역'
+        )
+    )
         
 @route('/history/<name:path>/r/<num:int>/hidden')
 def history_hidden(name = None, num = None):
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    conn = pymysql.connect(
+        user = set_data['user'], 
+        password = set_data['pw'], 
+        charset = 'utf8mb4', 
+        db = set_data['db']
+    )
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
     if(admin_check(6) == 1):
@@ -336,7 +462,12 @@ def history_hidden(name = None, num = None):
 @route('/record/<name:path>')
 @route('/record/<name:path>/n/<num:int>')
 def user_record(name = None, num = 1):
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    conn = pymysql.connect(
+        user = set_data['user'], 
+        password = set_data['pw'], 
+        charset = 'utf8mb4', 
+        db = set_data['db']
+    )
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
     if(num * 50 <= 0):
@@ -347,7 +478,14 @@ def user_record(name = None, num = 1):
     i = v - 50
     ydmin = admin_check(1)
     zdmin = admin_check(6)
-    div = '<div><table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;">문서명</td><td style="text-align: center;width:33.33%;">기여자</td><td style="text-align: center;width:33.33%;">시간</td></tr>'
+    div =  '<div> \
+            <table style="width: 100%; text-align: center;"> \
+                <tbody> \
+                <tr> \
+                    <td style="width:33.33%;">문서명</td> \
+                    <td style="width:33.33%;">기여자</td> \
+                    <td style="width:33.33%;">시간</td> \
+                </tr>'
     
     curs.execute("select * from history where ip = '" + db_pas(name) + "' order by date desc limit " + str(i) + ", " + str(v))
     rows = curs.fetchall()
@@ -412,9 +550,21 @@ def user_record(name = None, num = 1):
                 else:
                     hidden = ''
                 
-            div += '<tr style="' + style + '"><td style="text-align: center;width:33.33%;"><a href="/w/' + url_pas(data['title']) + '">' + title + '</a> (<a href="/history/' + url_pas(data['title']) + '">' + data['id'] + '판</a>) <a href="/w/' + url_pas(data['title']) + '/r/' + str(int(data['id']) - 1) + '/diff/' + data['id'] + '">(비교)</a> ' + revert + ' (' + leng + ')</td><td style="text-align: center;width:33.33%;">' + ip + ban + hidden + '</td><td style="text-align: center;width:33.33%;">' + data['date'] + '</td></tr><tr><td colspan="3" style="text-align: center;width:100%;">' + send + '</td></tr>'
+            div += '<tr style="' + style + '"> \
+                        <td> \
+                            <a href="/w/' + url_pas(data['title']) + '">' + title + '</a> (<a href="/history/' + url_pas(data['title']) + '">' + data['id'] + '판</a>) \
+                             <a href="/w/' + url_pas(data['title']) + '/r/' + str(int(data['id']) - 1) + '/diff/' + data['id'] + '">(비교)</a> ' + revert + ' (' + leng + ') \
+                        </td> \
+                        <td>' + ip + ban + hidden + '</td> \
+                        <td>' + data['date'] + '</td> \
+                    </tr> \
+                    <tr> \
+                        <td colspan="3">' + send + '</td> \
+                    </tr>'
         else:
-            div += '</tbody></table></div>'
+            div +=          '</tbody> \
+                        </table> \
+                    </div>'
     else:
         div = 'None<br>'
         
@@ -423,15 +573,32 @@ def user_record(name = None, num = 1):
     curs.execute("select end, why from ban where block = '" + db_pas(name) + "'")
     ban_it = curs.fetchall()
     if(ban_it):
-        div = namumark('', '{{{#!wiki style="border:2px solid red;padding:10px;"\r\n{{{+2 {{{#red 이 사용자는 차단 당했습니다.}}}}}}\r\n\r\n차단 해제 일 : ' + ban_it[0]['end'] + '[br]사유 : ' + ban_it[0]['why'] + '}}}') + '<br>' + div
+        sub = '차단'
+    else:
+        sub = None
                 
     conn.close()
-    return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = div, title = '사용자 기록'))
+    return(
+        template('other', 
+            custom = custom_css_user(), 
+            license = set_data['license'], 
+            login = login_check(), 
+            logo = set_data['name'], 
+            data = div, 
+            title = '사용자 기록', 
+            sub = sub
+        )
+    )
         
 @route('/userlog')
 @route('/userlog/n/<num:int>')
 def user_log(num = 1):
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    conn = pymysql.connect(
+        user = set_data['user'], 
+        password = set_data['pw'], 
+        charset = 'utf8mb4', 
+        db = set_data['db']
+    )
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
     if(num * 50 <= 0):
@@ -463,17 +630,31 @@ def user_log(num = 1):
             
             j += 1
 
-        list_data += '<br><a href="/userlog/n/' + str(num - 1) + '">(이전)</a> <a href="/userlog/n/' + str(num + 1) + '">(이후)</a>'
-                
-        conn.close()
-        return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = list_data, title = '사용자 가입 기록'))
+        list_data +=    '<br> \
+                        <a href="/userlog/n/' + str(num - 1) + '">(이전)</a> <a href="/userlog/n/' + str(num + 1) + '">(이후)</a>'
     else:
-        conn.close()
-        return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = '', title = '사용자 가입 기록'))
+        list_data = 'None'
+        
+    conn.close()
+    return(
+        template('other', 
+            custom = custom_css_user(), 
+            license = set_data['license'], 
+            login = login_check(), 
+            logo = set_data['name'], 
+            data = list_data, 
+            title = '사용자 가입 기록'
+        )
+    )
         
 @route('/backreset')
 def xref_reset():
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    conn = pymysql.connect(
+        user = set_data['user'], 
+        password = set_data['pw'], 
+        charset = 'utf8mb4', 
+        db = set_data['db']
+    )
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
     if(admin_check(None) == 1):
@@ -483,13 +664,13 @@ def xref_reset():
         conn.commit()
         
         curs.execute("select title, data from data")
-        all = curs.fetchall()
-        if(all):
-            for data in all:
-                namumark(data['title'], data['data'])
+        data = curs.fetchall()
+        if(data):
+            for end in data:
+                namumark(end['title'], end['data'])
         
         conn.close()
-        return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = '에러 없음', title = '완료'))
+        return(redirect('/'))
     else:
         conn.close()
         return(redirect('/error/3'))
@@ -497,7 +678,12 @@ def xref_reset():
 @route('/xref/<name:path>')
 @route('/xref/<name:path>/n/<num:int>')
 def xref(name = None, num = 1):
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    conn = pymysql.connect(
+        user = set_data['user'], 
+        password = set_data['pw'], 
+        charset = 'utf8mb4', 
+        db = set_data['db']
+    )
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
     if(num * 50 <= 0):
@@ -522,20 +708,42 @@ def xref(name = None, num = 1):
             else:
                 div += '</li>'
                 
-        div += '<br><a href="/xref/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전)</a> <a href="/xref/' + url_pas(name) + '/n/' + str(num + 1) + '">(이후)</a>'
-
-        conn.close()
-        return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = div, title = name, page = url_pas(name), sub = '역링크'))
+        div += '<br> \
+                <a href="/xref/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전)</a> <a href="/xref/' + url_pas(name) + '/n/' + str(num + 1) + '">(이후)</a>'
     else:
-        conn.close()
-        return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = 'None', title = name, page = url_pas(name), sub = '역링크'))
+        div = 'None'
+
+    conn.close()
+    return(
+        template('other', 
+            custom = custom_css_user(), 
+            license = set_data['license'], 
+            login = login_check(), 
+            logo = set_data['name'], 
+            data = div, 
+            title = name, 
+            page = url_pas(name), 
+            sub = '역링크'
+        )
+    )
         
 @route('/recentdiscuss')
 def recentdiscuss():
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    conn = pymysql.connect(
+        user = set_data['user'], 
+        password = set_data['pw'], 
+        charset = 'utf8mb4', 
+        db = set_data['db']
+    )
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
-    div = '<div><table style="width: 100%;"><tbody><tr><td style="text-align: center;width:50%;">토론명</td><td style="text-align: center;width:50%;">시간</td></tr>'
+    div =   '<div> \
+            <table style="text-align: center; width: 100%;"> \
+                <tbody> \
+                    <tr> \
+                        <td style="width:50%;">토론명</td> \
+                        <td style="width:50%;">시간</td> \
+                    </tr>'
     
     curs.execute("select * from rd order by date desc limit 50")
     rows = curs.fetchall()
@@ -551,19 +759,38 @@ def recentdiscuss():
             sub = re.sub('>', '&gt;', sub)
             sub = re.sub('"', '&quot;', sub)
             
-            div += '<tr><td style="text-align: center;width:50%;"><a href="/topic/' + url_pas(data['title']) + '/sub/' + url_pas(data['sub']) + '">' + title + '</a> (' + sub + ')</td><td style="text-align: center;width:50%;">' + data['date'] + '</td></tr>'
+            div += '<tr> \
+                        <td> \
+                            <a href="/topic/' + url_pas(data['title']) + '/sub/' + url_pas(data['sub']) + '">' + title + '</a> (' + sub + ') \
+                        </td> \
+                        <td>' + data['date'] + '</td> \
+                    </tr>'
         else:
             div += '</tbody></table></div>'
     else:
         div = 'None'
             
     conn.close()
-    return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = div, title = '최근 토론내역'))
+    return(
+        template('other', 
+            custom = custom_css_user(), 
+            license = set_data['license'], 
+            login = login_check(), 
+            logo = set_data['name'], 
+            data = div, 
+            title = '최근 토론내역'
+        )
+    )
 
 @route('/blocklog')
 @route('/blocklog/n/<number:int>')
 def blocklog(num = 1):
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    conn = pymysql.connect(
+        user = set_data['user'], 
+        password = set_data['pw'], 
+        charset = 'utf8mb4', 
+        db = set_data['db']
+    )
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
     if(num * 50 <= 0):
@@ -596,12 +823,26 @@ def blocklog(num = 1):
         div = 'None'
                 
     conn.close()
-    return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = div, title = '사용자 차단 기록'))
+    return(
+        template('other', 
+            custom = custom_css_user(), 
+            license = set_data['license'], 
+            login = login_check(), 
+            logo = set_data['name'], 
+            data = div, 
+            title = '사용자 차단 기록'
+        )
+    )
 
 @route('/history/<name:path>', method=['POST', 'GET'])    
 @route('/history/<name:path>/n/<num:int>', method=['POST', 'GET'])
 def history_view(name = None, num = 1):
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    conn = pymysql.connect(
+        user = set_data['user'], 
+        password = set_data['pw'], 
+        charset = 'utf8mb4', 
+        db = set_data['db']
+    )
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
     if(request.method == 'POST'):
@@ -624,7 +865,14 @@ def history_view(name = None, num = 1):
         admin1 = admin_check(1)
         admin2 = admin_check(6)
         
-        div = '<div><table style="text-align:center; width:100%;"><tbody><tr><td style="width:33.33%;">판</td><td style="width:33.33%;">기여자</td><td style="width:33.33%;">시간</td></tr>'
+        div =   '<div> \
+                    <table style="text-align:center; width:100%;"> \
+                        <tbody> \
+                            <tr> \
+                                <td style="width:33.33%;">판</td> \
+                                <td style="width:33.33%;">기여자</td> \
+                                <td style="width:33.33%;">시간</td> \
+                            </tr>'
         
         curs.execute("select send, leng, ip, date, title, id from history where title = '" + db_pas(name) + "' and id + 0 < '" + str(num2) + "' and id + 0 > '" + str(num1) + "' order by id + 0 desc")
         all_data = curs.fetchall()
@@ -676,18 +924,47 @@ def history_view(name = None, num = 1):
                         hid = 0
                 
                 if(hid == 1):
-                    div += '<tr><td colspan="3">숨김</td></tr>'
+                    div += '<tr> \
+                                <td colspan="3">숨김</td> \
+                            </tr>'
                 else:
-                    div += '<tr><td>' + data['id'] + '판</a> <a href="/w/' + url_pas(data['title']) + '/r/' + url_pas(data['id']) + '">(보기)</a> <a href="/w/' + url_pas(data['title']) + '/raw/' + url_pas(data['id']) + '">(원본)</a> <a href="/revert/' + url_pas(data['title']) + '/r/' + url_pas(data['id']) + '">(되돌리기)</a> (' + leng + ')</td><td>' + ip + ban + hidden + '</td><td>' + data['date'] + '</td></tr><tr><td colspan="3">' + send + '</td></tr>'
+                    div += '<tr> \
+                                <td> \
+                                    ' + data['id'] + '판</a> <a href="/w/' + url_pas(data['title']) + '/r/' + url_pas(data['id']) + '">(보기)</a> \
+                                     <a href="/w/' + url_pas(data['title']) + '/raw/' + url_pas(data['id']) + '">(원본)</a> \
+                                     <a href="/revert/' + url_pas(data['title']) + '/r/' + url_pas(data['id']) + '">(되돌리기)</a> (' + leng + ') \
+                                </td> \
+                                <td>' + ip + ban + hidden + '</td> \
+                                <td>' + data['date'] + '</td> \
+                            </tr> \
+                            <tr> \
+                                <td colspan="3">' + send + '</td> \
+                            </tr>'
             else:
-                div += '</tbody></table></div>'
+                div +=          '</tbody> \
+                            </table> \
+                        </div>'
         else:
-            div = 'None<br>'
+            div =   'None \
+                    <br>'
             
-        div += '<br><a href="/history/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전)</a> <a href="/history/' + url_pas(name) + '/n/' + str(num + 1) + '">(이후)</a>'
+        div += '<br> \
+                <a href="/history/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전)</a> <a href="/history/' + url_pas(name) + '/n/' + str(num + 1) + '">(이후)</a>'
                     
         conn.close()
-        return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = div, title = name, page = url_pas(name), select = select, sub = '역사'))
+        return(
+            template('other', 
+                custom = custom_css_user(), 
+                license = set_data['license'], 
+                login = login_check(), 
+                logo = set_data['name'], 
+                data = div, 
+                title = name, 
+                page = url_pas(name), 
+                select = select, 
+                sub = '역사'
+            )
+        )
             
 @route('/search', method=['POST'])
 def search():
@@ -695,7 +972,12 @@ def search():
 
 @route('/goto', method=['POST'])
 def goto():
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    conn = pymysql.connect(
+        user = set_data['user'], 
+        password = set_data['pw'], 
+        charset = 'utf8mb4', 
+        db = set_data['db']
+    )
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
     curs.execute("select title from data where title = '" + db_pas(request.forms.search) + "'")
@@ -711,7 +993,12 @@ def goto():
 @route('/search/<name:path>')
 @route('/search/<name:path>/n/<num:int>')
 def deep_search(name = None, num = 1):
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    conn = pymysql.connect(
+        user = set_data['user'], 
+        password = set_data['pw'], 
+        charset = 'utf8mb4', 
+        db = set_data['db']
+    )
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
     if(num * 50 <= 0):
@@ -734,7 +1021,8 @@ def deep_search(name = None, num = 1):
     curs.execute("select title from data where title = '" + db_pas(name) + "'")
     exist = curs.fetchall()
     if(exist):
-        div = '<li>문서로 <a href="/w/' + url_pas(name) + '">바로가기</a></li><br>'
+        div =   '<li>문서로 <a href="/w/' + url_pas(name) + '">바로가기</a></li> \
+                <br>'
     else:
         div = '<li>문서가 없습니다. <a class="not_thing" href="/w/' + url_pas(name) + '">바로가기</a></li><br>'
 
@@ -770,44 +1058,67 @@ def deep_search(name = None, num = 1):
 
     div += div_plus + end
 
-    div += '<br><a href="/search/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전)</a> <a href="/search/' + url_pas(name) + '/n/' + str(num + 1) + '">(이후)</a>'
+    div += '<br> \
+            <a href="/search/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전)</a> <a href="/search/' + url_pas(name) + '/n/' + str(num + 1) + '">(이후)</a>'
 
     conn.close()
-    return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = div, title = name, sub = '검색'))
+    return(
+        template('other', 
+            custom = custom_css_user(), 
+            license = set_data['license'], 
+            login = login_check(), 
+            logo = set_data['name'], 
+            data = div, 
+            title = name, 
+            sub = '검색'
+        )
+    )
         
 @route('/w/<name:path>/r/<num:int>')
 def old_view(name = None, num = None):
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    conn = pymysql.connect(
+        user = set_data['user'], 
+        password = set_data['pw'], 
+        charset = 'utf8mb4', 
+        db = set_data['db']
+    )
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
     curs.execute("select * from hidhi where title = '" + db_pas(name) + "' and re = '" + db_pas(str(num)) + "'")
     row = curs.fetchall()
     if(row):
-        if(admin_check(6) == 1):
-            curs.execute("select * from history where title = '" + db_pas(name) + "' and id = '" + str(num) + "'")
-            rows = curs.fetchall()
-            if(rows):
-                conn.close()
-                return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), data = namumark(name, rows[0]['data']), sub = '옛 문서'))
-            else:
-                conn.close()
-                return(redirect('/history/' + url_pas(name)))
-        else:
-            conn.close()
-            return(redirect('/error/3'))
-    else:
-        curs.execute("select * from history where title = '" + db_pas(name) + "' and id = '" + str(num) + "'")
-        rows = curs.fetchall()
-        if(rows):
-            conn.close()
-            return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), data = namumark(name, rows[0]['data']), sub = '옛 문서'))
-        else:
+        if(not admin_check(6) == 1):
             conn.close()
             return(redirect('/history/' + url_pas(name)))
             
+    curs.execute("select * from history where title = '" + db_pas(name) + "' and id = '" + str(num) + "'")
+    rows = curs.fetchall()
+    if(rows):
+        conn.close()
+        return(
+            template('other', 
+                custom = custom_css_user(), 
+                license = set_data['license'], 
+                login = login_check(), 
+                title = name, 
+                logo = set_data['name'], 
+                page = url_pas(name), 
+                data = namumark(name, rows[0]['data']), 
+                sub = '옛 문서'
+            )
+        )
+    else:
+        conn.close()
+        return(redirect('/history/' + url_pas(name)))
+            
 @route('/w/<name:path>/raw/<num:int>')
 def old_raw(name = None, num = None):
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    conn = pymysql.connect(
+        user = set_data['user'], 
+        password = set_data['pw'], 
+        charset = 'utf8mb4', 
+        db = set_data['db']
+    )
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
     curs.execute("select * from hidhi where title = '" + db_pas(name) + "' and re = '" + db_pas(str(num)) + "'")
@@ -827,14 +1138,30 @@ def old_raw(name = None, num = None):
         enddata = '<textarea id="other_text">' + enddata + '</textarea>'
         
         conn.close()
-        return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), data = enddata, sub = '옛 원본'))
+        return(
+            template('other', 
+                custom = custom_css_user(), 
+                license = set_data['license'], 
+                login = login_check(), 
+                title = name, 
+                logo = set_data['name'], 
+                page = url_pas(name), 
+                data = enddata, 
+                sub = '옛 원본'
+            )
+        )
     else:
         conn.close()
         return(redirect('/history/' + url_pas(name)))
             
 @route('/raw/<name:path>')
 def raw_view(name = None):
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    conn = pymysql.connect(
+        user = set_data['user'], 
+        password = set_data['pw'], 
+        charset = 'utf8mb4', 
+        db = set_data['db']
+    )
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
     curs.execute("select * from data where title = '" + db_pas(name) + "'")
@@ -847,14 +1174,30 @@ def raw_view(name = None):
         enddata = '<textarea id="other_text">' + enddata + '</textarea>'
         
         conn.close()
-        return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), data = enddata, sub = '원본'))
+        return(
+            template('other', 
+                custom = custom_css_user(), 
+                license = set_data['license'], 
+                login = login_check(), 
+                title = name, 
+                logo = set_data['name'], 
+                page = url_pas(name), 
+                data = enddata, 
+                sub = '원본'
+            )
+        )
     else:
         conn.close()
         return(redirect('/w/' + url_pas(name)))
         
 @route('/revert/<name:path>/r/<num:int>', method=['POST', 'GET'])
 def revert(name = None, num = None):
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    conn = pymysql.connect(
+        user = set_data['user'], 
+        password = set_data['pw'], 
+        charset = 'utf8mb4', 
+        db = set_data['db']
+    )
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
     ip = ip_check()
@@ -865,102 +1208,82 @@ def revert(name = None, num = None):
         curs.execute("select * from hidhi where title = '" + db_pas(name) + "' and re = '" + db_pas(str(num)) + "'")
         row = curs.fetchall()
         if(row):
-            if(admin_check(6) == 1):        
-                curs.execute("select * from history where title = '" + db_pas(name) + "' and id = '" + str(num) + "'")
-                rows = curs.fetchall()
-                if(rows):
-                    if(can == 1):
-                        conn.close()
-                        return(redirect('/ban'))
-                    else:
-                        curs.execute("select * from data where title = '" + db_pas(name) + "'")
-                        row = curs.fetchall()
-                        if(row):
-                            leng = leng_check(len(row[0]['data']), len(rows[0]['data']))
-                            
-                            curs.execute("update data set data = '" + db_pas(rows[0]['data']) + "' where title = '" + db_pas(name) + "'")
-                            conn.commit()
-                        else:
-                            leng = '+' + str(len(rows[0]['data']))
-                            
-                            curs.execute("insert into data (title, data, acl) value ('" + db_pas(name) + "', '" + db_pas(rows[0]['data']) + "', '')")
-                            conn.commit()
-                            
-                        history_plus(name, rows[0]['data'], today, ip, '문서를 ' + str(num) + '판으로 되돌렸습니다.', leng)
-                        
-                        conn.close()
-                        return(redirect('/w/' + url_pas(name)))
-                else:
-                    conn.close()
-                    return(redirect('/w/' + url_pas(name)))
-            else:
+            if(not admin_check(6) == 1):        
                 conn.close()
                 return(redirect('/error/3'))
+
+        if(can == 1):
+            conn.close()
+            return(redirect('/ban'))
         else:
             curs.execute("select * from history where title = '" + db_pas(name) + "' and id = '" + str(num) + "'")
             rows = curs.fetchall()
-            if(rows):                
-                if(can == 1):
-                    conn.close()
-                    return(redirect('/ban'))
-                else:                    
-                    curs.execute("select * from data where title = '" + db_pas(name) + "'")
-                    row = curs.fetchall()
-                    if(row):
-                        leng = leng_check(len(row[0]['data']), len(rows[0]['data']))
-                        
-                        curs.execute("update data set data = '" + db_pas(rows[0]['data']) + "' where title = '" + db_pas(name) + "'")
-                        conn.commit()
-                    else:
-                        leng = '+' + str(len(rows[0]['data']))
-                        
-                        curs.execute("insert into data (title, data, acl) value ('" + db_pas(name) + "', '" + db_pas(rows[0]['data']) + "', '')")
-                        conn.commit()
-                        
-                    history_plus(name, rows[0]['data'], today, ip, '문서를 ' + str(num) + '판으로 되돌렸습니다.', leng)
+            if(rows):                                
+                curs.execute("select * from data where title = '" + db_pas(name) + "'")
+                row = curs.fetchall()
+                if(row):
+                    leng = leng_check(len(row[0]['data']), len(rows[0]['data']))
                     
-                    conn.close()
-                    return(redirect('/w/' + url_pas(name)))
-            else:
+                    curs.execute("update data set data = '" + db_pas(rows[0]['data']) + "' where title = '" + db_pas(name) + "'")
+                    conn.commit()
+                else:
+                    leng = '+' + str(len(rows[0]['data']))
+                    
+                    curs.execute("insert into data (title, data, acl) value ('" + db_pas(name) + "', '" + db_pas(rows[0]['data']) + "', '')")
+                    conn.commit()
+                    
+                history_plus(
+                    name, 
+                    rows[0]['data'], 
+                    today, 
+                    ip, 
+                    '문서를 ' + str(num) + '판으로 되돌렸습니다.', 
+                    leng
+                )
+                
                 conn.close()
-                return(redirect('/w/' + url_pas(name))            )
+                return(redirect('/w/' + url_pas(name)))
     else:
         curs.execute("select * from hidhi where title = '" + db_pas(name) + "' and re = '" + db_pas(str(num)) + "'")
         row = curs.fetchall()
         if(row):
-            if(admin_check(6) == 1):                
-                if(can == 1):
-                    conn.close()
-                    return(redirect('/ban'))
-                else:
-                    curs.execute("select * from history where title = '" + db_pas(name) + "' and id = '" + str(num) + "'")
-                    rows = curs.fetchall()
-                    if(rows):
-                        conn.close()
-                        return(template('revert', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), r = url_pas(str(num)), plus = '정말 되돌리시겠습니까?', sub = '되돌리기'))
-                    else:
-                        conn.close()
-                        return(redirect('/w/' + url_pas(name)))
+            if(not admin_check(6) == 1):
+                conn.close()
+                return(redirect('/error/3'))         
+                          
+        if(can == 1):
+            conn.close()
+            return(redirect('/ban'))
+        else:
+            curs.execute("select * from history where title = '" + db_pas(name) + "' and id = '" + str(num) + "'")
+            rows = curs.fetchall()
+            if(rows):
+                conn.close()
+                return(
+                    template('revert', 
+                        custom = custom_css_user(), 
+                        license = set_data['license'], 
+                        login = login_check(), 
+                        title = name, 
+                        logo = set_data['name'], 
+                        page = url_pas(name), 
+                        r = url_pas(str(num)), 
+                        plus = '정말 되돌리시겠습니까?', 
+                        sub = '되돌리기'
+                    )
+                )
             else:
                 conn.close()
-                return(redirect('/error/3'))
-        else:            
-            if(can == 1):
-                conn.close()
-                return(redirect('/ban'))
-            else:
-                curs.execute("select * from history where title = '" + db_pas(name) + "' and id = '" + str(num) + "'")
-                rows = curs.fetchall()
-                if(rows):
-                    conn.close()
-                    return(template('revert', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), r = url_pas(str(num)), plus = '정말 되돌리시겠습니까?', sub = '되돌리기'))
-                else:
-                    conn.close()
-                    return(redirect('/w/' + url_pas(name)))
+                return(redirect('/w/' + url_pas(name)))
                     
 @route('/mdel', method=['POST', 'GET'])
 def many_del():
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    conn = pymysql.connect(
+        user = set_data['user'], 
+        password = set_data['pw'], 
+        charset = 'utf8mb4', 
+        db = set_data['db']
+    )
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
     today = get_time()
@@ -977,16 +1300,33 @@ def many_del():
                     if(rows):
                         leng = '-' + str(len(rows[0]['data']))
                         curs.execute("delete from data where title = '" + db_pas(g[0]) + "'")
-                        history_plus(g[0], '', today, ip, request.forms.send + ' (대량 삭제)', leng)
+                        history_plus(
+                            g[0], 
+                            '', 
+                            today, 
+                            ip, 
+                            request.forms.send + ' (대량 삭제)', 
+                            leng
+                        )
                     data = re.sub('(.*)\r\n', '', data, 1)
                 else:
                     break
+            
             conn.commit()
+            
             conn.close()
             return(redirect('/'))
         else:
             conn.close()
-            return(template('mdel', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '많은 문서 삭제', logo = set_data['name']))
+            return(
+                template('mdel', 
+                    custom = custom_css_user(), 
+                    license = set_data['license'], 
+                    login = login_check(), 
+                    title = '많은 문서 삭제', 
+                    logo = set_data['name']
+                )
+            )
     else:
         conn.close()
         return(redirect('/error/3'))
@@ -994,7 +1334,12 @@ def many_del():
                 
 @route('/edit/<name:path>/section/<num:int>', method=['POST', 'GET'])
 def section_edit(name = None, num = None):
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    conn = pymysql.connect(
+        user = set_data['user'], 
+        password = set_data['pw'], 
+        charset = 'utf8mb4', 
+        db = set_data['db']
+    )
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
     ip = ip_check()
@@ -1027,7 +1372,14 @@ def section_edit(name = None, num = None):
                         
                         content = rows[0]['data'].replace(request.forms.otent, content)
                         
-                        history_plus(name, content, today, ip, html_pas(request.forms.send, 2), leng)
+                        history_plus(
+                            name, 
+                            content, 
+                            today, 
+                            ip, 
+                            html_pas(request.forms.send, 2), 
+                            leng
+                        )
                         
                         curs.execute("update data set data = '" + db_pas(content) + "' where title = '" + db_pas(name) + "'")
                         conn.commit()
@@ -1071,7 +1423,20 @@ def section_edit(name = None, num = None):
                     gdata = re.sub("\r\n$", "", gdata)
 
                     conn.close()
-                    return(template('edit', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), data = gdata, section = 1, number = num, sub = '편집'))
+                    return(
+                        template('edit', 
+                            custom = custom_css_user(), 
+                            license = set_data['license'], 
+                            login = login_check(), 
+                            title = name, 
+                            logo = set_data['name'], 
+                            page = url_pas(name), 
+                            data = gdata,
+                            section = 1, 
+                            number = num, 
+                            sub = '편집'
+                        )
+                    )
                 else:
                     conn.close()
                     return(redirect('/w/' + url_pas(name)))
@@ -1081,7 +1446,12 @@ def section_edit(name = None, num = None):
 
 @route('/edit/<name:path>', method=['POST', 'GET'])
 def edit(name = None):
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    conn = pymysql.connect(
+        user = set_data['user'], 
+        password = set_data['pw'], 
+        charset = 'utf8mb4', 
+        db = set_data['db']
+    )
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
     ip = ip_check()
@@ -1111,7 +1481,14 @@ def edit(name = None):
                         return(redirect('/ban'))
                     else:                        
                         leng = leng_check(len(rows[0]['data']), len(content))
-                        history_plus(name, content, today, ip, html_pas(request.forms.send, 2), leng)
+                        history_plus(
+                            name, 
+                            content, 
+                            today, 
+                            ip,
+                            html_pas(request.forms.send, 2), 
+                            leng
+                        )
                         
                         curs.execute("update data set data = '" + db_pas(content) + "' where title = '" + db_pas(name) + "'")
                         conn.commit()
@@ -1121,7 +1498,14 @@ def edit(name = None):
                     return(redirect('/ban'))
                 else:
                     leng = '+' + str(len(content))
-                    history_plus(name, content, today, ip, html_pas(request.forms.send, 2), leng)
+                    history_plus(
+                        name, 
+                        content, 
+                        today, 
+                        ip, 
+                        html_pas(request.forms.send, 2), 
+                        leng
+                    )
                     
                     curs.execute("insert into data (title, data, acl) value ('" + db_pas(name) + "', '" + db_pas(content) + "', '')")
                     conn.commit()
@@ -1138,15 +1522,32 @@ def edit(name = None):
             curs.execute("select * from data where title = '" + db_pas(name) + "'")
             rows = curs.fetchall()
             if(rows):
-                conn.close()
-                return(template('edit', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), data = rows[0]['data'], sub = '편집'))
+                data = rows[0]['data']
             else:
-                conn.close()
-                return(template('edit', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), data = '', sub = '편집'))
+                data = ''
+
+            conn.close()
+            return(
+                template('edit', 
+                    custom = custom_css_user(), 
+                    license = set_data['license'], 
+                    login = login_check(), 
+                    title = name, 
+                    logo = set_data['name'], 
+                    page = url_pas(name), 
+                    data = data,
+                    sub = '편집'
+                )
+            )
 
 @route('/preview/<name:path>/section/<num:int>', method=['POST'])
 def section_preview(name = None, num = None):
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    conn = pymysql.connect(
+        user = set_data['user'], 
+        password = set_data['pw'], 
+        charset = 'utf8mb4', 
+        db = set_data['db']
+    )
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
     ip = ip_check()
@@ -1161,11 +1562,32 @@ def section_preview(name = None, num = None):
         enddata = namumark(name, newdata)
             
         conn.close()
-        return(template('edit', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), data = request.forms.content, preview = 1, enddata = enddata, section = 1, number = num, odata = request.forms.otent, sub = '미리보기'))
+        return(
+            template('edit', 
+                custom = custom_css_user(), 
+                license = set_data['license'], 
+                login = login_check(), 
+                title = name, 
+                logo = set_data['name'], 
+                page = url_pas(name), 
+                data = request.forms.content, 
+                preview = 1, 
+                enddata = enddata, 
+                section = 1, 
+                number = num, 
+                odata = request.forms.otent, 
+                sub = '미리보기'
+            )
+        )
                 
 @route('/preview/<name:path>', method=['POST'])
 def preview(name = None):
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    conn = pymysql.connect(
+        user = set_data['user'], 
+        password = set_data['pw'], 
+        charset = 'utf8mb4', 
+        db = set_data['db']
+    )
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
     ip = ip_check()
@@ -1180,11 +1602,29 @@ def preview(name = None):
         enddata = namumark(name, newdata)
             
         conn.close()
-        return(template('edit', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), data = request.forms.content, preview = 1, enddata = enddata, sub = '미리보기'))
+        return(
+            template('edit', 
+                custom = custom_css_user(), 
+                license = set_data['license'], 
+                login = login_check(), 
+                title = name, 
+                logo = set_data['name'], 
+                page = url_pas(name), 
+                data = request.forms.content, 
+                preview = 1, 
+                enddata = enddata, 
+                sub = '미리보기'
+            )
+        )
         
 @route('/delete/<name:path>', method=['POST', 'GET'])
 def delete(name = None):
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    conn = pymysql.connect(
+        user = set_data['user'], 
+        password = set_data['pw'], 
+        charset = 'utf8mb4', 
+        db = set_data['db']
+    )
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
     ip = ip_check()
@@ -1201,7 +1641,14 @@ def delete(name = None):
                 today = get_time()
                 
                 leng = '-' + str(len(rows[0]['data']))
-                history_plus(name, '', today, ip, request.forms.send + ' (삭제)', leng)
+                history_plus(
+                    name, 
+                    '', 
+                    today, 
+                    ip, 
+                    request.forms.send + ' (삭제)', 
+                    leng
+                )
                 
                 curs.execute("delete from data where title = '" + db_pas(name) + "'")
                 conn.commit()
@@ -1220,14 +1667,30 @@ def delete(name = None):
                 return(redirect('/ban'))
             else:
                 conn.close()
-                return(template('del', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), plus = '정말 삭제 하시겠습니까?', sub = '삭제'))
+                return(
+                    template('del', 
+                        custom = custom_css_user(), 
+                        license = set_data['license'], 
+                        login = login_check(),
+                        title = name, 
+                        logo = set_data['name'], 
+                        page = url_pas(name), 
+                        plus = '정말 삭제 하시겠습니까?', 
+                        sub = '삭제'
+                    )
+                )
         else:
             conn.close()
             return(redirect('/w/' + url_pas(name)))
             
 @route('/move/<name:path>', method=['POST', 'GET'])
 def move(name = None):
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    conn = pymysql.connect(
+        user = set_data['user'], 
+        password = set_data['pw'], 
+        charset = 'utf8mb4', 
+        db = set_data['db']
+    )
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
     ip = ip_check()
@@ -1249,13 +1712,21 @@ def move(name = None):
                 conn.close()
                 return(redirect('/error/19'))
             else:
-                history_plus(name, rows[0]['data'], today, ip, request.forms.send + ' (<a href="/w/' + url_pas(name) + '">' + name + '</a> - <a href="/w/' + url_pas(request.forms.title) + '">' + request.forms.title + '</a> 이동)', leng)
+                history_plus(
+                    name, 
+                    rows[0]['data'], 
+                    today, 
+                    ip, 
+                    request.forms.send + ' (<a href="/w/' + url_pas(name) + '">' + name + '</a> - <a href="/w/' + url_pas(request.forms.title) + '">' + request.forms.title + '</a> 이동)', 
+                    leng
+                )
                 
                 if(rows):
                     curs.execute("update data set title = '" + db_pas(request.forms.title) + "' where title = '" + db_pas(name) + "'")
 
                 curs.execute("update history set title = '" + db_pas(request.forms.title) + "' where title = '" + db_pas(name) + "'")
                 conn.commit()
+                
                 conn.close()
                 return(redirect('/w/' + url_pas(request.forms.title)))
     else:
@@ -1264,80 +1735,215 @@ def move(name = None):
             return(redirect('/ban'))
         else:
             conn.close()
-            return(template('move', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), plus = '정말 이동 하시겠습니까?', sub = '이동'))
+            return(
+                template('move', 
+                    custom = custom_css_user(), 
+                    license = set_data['license'], 
+                    login = login_check(), 
+                    title = name, 
+                    logo = set_data['name'], 
+                    page = url_pas(name), 
+                    plus = '정말 이동 하시겠습니까?', 
+                    sub = '이동'
+                )
+            )
             
 @route('/other')
 def other():
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
-    curs = conn.cursor(pymysql.cursors.DictCursor)
-
-    conn.close()
-    return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '기타 메뉴', logo = set_data['name'], data = '<h2 style="margin-top: 0px;">기록</h2><li><a href="/blocklog">사용자 차단 기록</a></li><li><a href="/userlog">사용자 가입 기록</a></li><li><a href="/manager/6">사용자 기록</a></li><li><a href="/manager/7">사용자 토론 기록</a></li><h2>기타</h2><li><a href="/titleindex">모든 문서</a></li><li><a href="/acllist">ACL 문서 목록</a></li><li><a href="/upload">업로드</a></li><li><a href="/adminlist">관리자 목록</a></li><li><a href="/manager/1">관리자 메뉴</a></li><br>이 오픈나무의 버전은 <a href="https://github.com/2DU/openNAMU/blob/normal/version.md">v' + r_ver + '</a> 입니다.'))
+    return(
+        template(
+            'other', 
+            custom = custom_css_user(), 
+            license = set_data['license'], 
+            login = login_check(), 
+            title = '기타 메뉴', 
+            logo = set_data['name'], 
+            data = '<h2 style="margin-top: 0px;">기록</h2> \
+                    <li><a href="/blocklog">사용자 차단 기록</a></li> \
+                    <li><a href="/userlog">사용자 가입 기록</a></li> \
+                    <li><a href="/manager/6">사용자 기록</a></li> \
+                    <li><a href="/manager/7">사용자 토론 기록</a></li> \
+                    <h2>기타</h2> \
+                    <li><a href="/titleindex">모든 문서</a></li> \
+                    <li><a href="/acllist">ACL 문서 목록</a></li> \
+                    <li><a href="/upload">업로드</a></li> \
+                    <li><a href="/adminlist">관리자 목록</a></li> \
+                    <li><a href="/manager/1">관리자 메뉴</a></li> \
+                    <br> \
+                    이 오픈나무의 버전은 <a href="https://github.com/2DU/openNAMU/blob/normal/version.md">v' + r_ver + '</a> 입니다.'
+        )
+    )
     
 @route('/manager/<num:int>', method=['POST', 'GET'])
 def manager(num = None):
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
-    curs = conn.cursor(pymysql.cursors.DictCursor)
-
     if(num == 1):
-        conn.close()
-        return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '관리자 메뉴', logo = set_data['name'], data = '<h2 style="margin-top: 0px;">목록</h2><li><a href="/manager/2">문서 ACL</a></li><li><a href="/manager/3">사용자 체크</a></li><li><a href="/manager/4">사용자 차단</a></li><li><a href="/manager/5">관리자 권한 주기</a></li><li><a href="/mdel">많은 문서 삭제</a></li><h2>소유자</h2><li><a href="/backreset">모든 역링크 재 생성</a></li><li><a href="/manager/8">관리 그룹 생성</a></li><h2>기타</h2><li>이 메뉴에 없는 기능은 해당 문서의 역사나 토론에서 바로 사용 가능함</li>'))
+        return(
+            template('other', 
+                custom = custom_css_user(), 
+                license = set_data['license'], 
+                login = login_check(), 
+                title = '관리자 메뉴', 
+                logo = set_data['name'], 
+                data = '<h2 style="margin-top: 0px;">목록</h2> \
+                        <li><a href="/manager/2">문서 ACL</a></li> \
+                        <li><a href="/manager/3">사용자 체크</a></li> \
+                        <li><a href="/manager/4">사용자 차단</a></li> \
+                        <li><a href="/manager/5">관리자 권한 주기</a></li> \
+                        <li><a href="/mdel">많은 문서 삭제</a></li> \
+                        <h2>소유자</h2> \
+                        <li><a href="/backreset">모든 역링크 재 생성</a></li> \
+                        <li><a href="/manager/8">관리 그룹 생성</a></li> \
+                        <h2>기타</h2> \
+                        <li>이 메뉴에 없는 기능은 해당 문서의 역사나 토론에서 바로 사용 가능함</li>'
+            )
+        )
     elif(num == 2):
         if(request.method == 'POST'):
-            conn.close()
             return(redirect('/acl/' + url_pas(request.forms.name)))
         else:
-            conn.close()
-            return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = 'ACL 이동', logo = set_data['name'], data = '<form id="usrform" method="POST" action="/manager/2"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>'))
+            return(
+                template('other', 
+                    custom = custom_css_user(), 
+                    license = set_data['license'], 
+                    login = login_check(), 
+                    title = 'ACL 이동', 
+                    logo = set_data['name'], 
+                    data = '<form id="usrform" method="POST" action="/manager/2"> \
+                                <input name="name" type="text"> \
+                                <br> \
+                                <br> \
+                                <button class="btn btn-primary" type="submit">이동</button> \
+                            </form>'
+                )
+            )
     elif(num == 3):
         if(request.method == 'POST'):
-            conn.close()
             return(redirect('/check/' + url_pas(request.forms.name)))
         else:
-            conn.close()
-            return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '체크 이동', logo = set_data['name'], data = '<form id="usrform" method="POST" action="/manager/3"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>'))
+            return(
+                template('other', 
+                    custom = custom_css_user(), 
+                    license = set_data['license'], 
+                    login = login_check(), 
+                    title = '체크 이동', 
+                    logo = set_data['name'], 
+                    data = '<form id="usrform" method="POST" action="/manager/3"> \
+                                <input name="name" type="text"> \
+                                <br> \
+                                <br> \
+                                <button class="btn btn-primary" type="submit">이동</button> \
+                            </form>'
+                )
+            )
     elif(num == 4):
         if(request.method == 'POST'):
-            conn.close()
             return(redirect('/ban/' + url_pas(request.forms.name)))
         else:
-            conn.close()
-            return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '차단 이동', logo = set_data['name'], data = '<form id="usrform" method="POST" action="/manager/4"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button><br><br><span>아이피 앞 두자리 (XXX.XXX) 입력하면 대역 차단</span></form>'))
+            return(
+                template('other', 
+                    custom = custom_css_user(), 
+                    license = set_data['license'], 
+                    login = login_check(), 
+                    title = '차단 이동', 
+                    logo = set_data['name'], 
+                    data = '<form id="usrform" method="POST" action="/manager/4"> \
+                                <input name="name" type="text"> \
+                                <br> \
+                                <br> \
+                                <button class="btn btn-primary" type="submit">이동</button> \
+                                <br> \
+                                <br> \
+                                <span>아이피 앞 두자리 (XXX.XXX) 입력하면 대역 차단</span> \
+                            </form>'
+                )
+            )
     elif(num == 5):
         if(request.method == 'POST'):
-            conn.close()
             return(redirect('/admin/' + url_pas(request.forms.name)))
         else:
-            conn.close()
-            return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '권한 이동', logo = set_data['name'], data = '<form id="usrform" method="POST" action="/manager/5"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')   )
+            return(
+                template('other', 
+                    custom = custom_css_user(), 
+                    license = set_data['license'], 
+                    login = login_check(), 
+                    title = '권한 이동', 
+                    logo = set_data['name'], 
+                    data = '<form id="usrform" method="POST" action="/manager/5"> \
+                                <input name="name" type="text"> \
+                                <br> \
+                                <br> \
+                                <button class="btn btn-primary" type="submit">이동</button> \
+                            </form>'
+                )
+            )
     elif(num == 6):
         if(request.method == 'POST'):
-            conn.close()
             return(redirect('/record/' + url_pas(request.forms.name)))
         else:
-            conn.close()
-            return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '기록 이동', logo = set_data['name'], data = '<form id="usrform" method="POST" action="/manager/6"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')    )
+            return(
+                template('other', 
+                    custom = custom_css_user(), 
+                    license = set_data['license'], 
+                    login = login_check(), 
+                    title = '기록 이동', 
+                    logo = set_data['name'], 
+                    data = '<form id="usrform" method="POST" action="/manager/6"> \
+                                <input name="name" type="text"> \
+                                <br> \
+                                <br> \
+                                <button class="btn btn-primary" type="submit">이동</button> \
+                            </form>'
+                )    
+            )
     elif(num == 7):
         if(request.method == 'POST'):
-            conn.close()
             return(redirect('/user/' + url_pas(request.forms.name) + '/topic'))
         else:
-            conn.close()
-            return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '토론 기록 이동', logo = set_data['name'], data = '<form id="usrform" method="POST" action="/manager/7"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')    )
+            return(
+                template('other', 
+                    custom = custom_css_user(), 
+                    license = set_data['license'], 
+                    login = login_check(), 
+                    title = '토론 기록 이동', 
+                    logo = set_data['name'], 
+                    data = '<form id="usrform" method="POST" action="/manager/7"> \
+                                <input name="name" type="text"> \
+                                <br> \
+                                <br> \
+                                <button class="btn btn-primary" type="submit">이동</button> \
+                            </form>'
+                )    
+            )
     elif(num == 8):
         if(request.method == 'POST'):
-            conn.close()
             return(redirect('/adminplus/' + url_pas(request.forms.name)))
         else:
-            conn.close()
-            return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '그룹 생성 이동', logo = set_data['name'], data = '<form id="usrform" method="POST" action="/manager/8"><input name="name" type="text"><br><br><button class="btn btn-primary" type="submit">이동</button></form>')    )
+            return(
+                template('other', 
+                    custom = custom_css_user(), 
+                    license = set_data['license'], 
+                    login = login_check(), 
+                    title = '그룹 생성 이동', 
+                    logo = set_data['name'], 
+                    data = '<form id="usrform" method="POST" action="/manager/8"> \
+                                <input name="name" type="text"> \
+                                <br> \
+                                <br> \
+                                <button class="btn btn-primary" type="submit">이동</button> \
+                            </form>'
+                )    
+            )
     else:
-        conn.close()
         return(redirect('/'))
         
 @route('/titleindex')
 def title_index():
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    conn = pymysql.connect(
+        user = set_data['user'], 
+        password = set_data['pw'], 
+        charset = 'utf8mb4', 
+        db = set_data['db']
+    )
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
     i = [0, 0, 0, 0, 0, 0]
@@ -1364,7 +1970,14 @@ def title_index():
         else:
             data += '</div>'
                 
-        data += '<br><li>이 위키에는 총 ' + str(i[0]) + '개의 문서가 있습니다.</li><br><li>틀 문서는 총 ' + str(i[3]) + '개의 문서가 있습니다.</li><li>분류 문서는 총 ' + str(i[1]) + '개의 문서가 있습니다.</li><li>사용자 문서는 총 ' + str(i[2]) + '개의 문서가 있습니다.</li><li>파일 문서는 총 ' + str(i[4]) + '개의 문서가 있습니다.</li><li>나머지 문서는 총 ' + str(i[5]) + '개의 문서가 있습니다.</li>'
+        data += '<br> \
+                 <li>이 위키에는 총 ' + str(i[0]) + '개의 문서가 있습니다.</li> \
+                 <br> \
+                 <li>틀 문서는 총 ' + str(i[3]) + '개의 문서가 있습니다.</li> \
+                 <li>분류 문서는 총 ' + str(i[1]) + '개의 문서가 있습니다.</li> \
+                 <li>사용자 문서는 총 ' + str(i[2]) + '개의 문서가 있습니다.</li> \
+                 <li>파일 문서는 총 ' + str(i[4]) + '개의 문서가 있습니다.</li> \
+                 <li>나머지 문서는 총 ' + str(i[5]) + '개의 문서가 있습니다.</li>'
     else:
         data = 'None'
 
@@ -1373,7 +1986,12 @@ def title_index():
         
 @route('/topic/<name:path>/sub/<sub:path>/b/<num:int>')
 def topic_block(name = None, sub = None, num = None):
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    conn = pymysql.connect(
+        user = set_data['user'], 
+        password = set_data['pw'], 
+        charset = 'utf8mb4', 
+        db = set_data['db']
+    )
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
     if(admin_check(3) == 1):
@@ -1399,7 +2017,12 @@ def topic_block(name = None, sub = None, num = None):
         
 @route('/topic/<name:path>/sub/<sub:path>/notice/<num:int>')
 def topic_top(name = None, sub = None, num = None):
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    conn = pymysql.connect(
+        user = set_data['user'], 
+        password = set_data['pw'], 
+        charset = 'utf8mb4', 
+        db = set_data['db']
+    )
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
     if(admin_check(3) == 1):
@@ -1418,18 +2041,20 @@ def topic_top(name = None, sub = None, num = None):
             
             rd_plus(name, sub, get_time())
 
-            conn.close()
-            return(redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub)))
-        else:
-            conn.close()
-            return(redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub)))
+        conn.close()
+        return(redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub)))
     else:
         conn.close()
         return(redirect('/error/3'))
         
 @route('/topic/<name:path>/sub/<sub:path>/stop')
 def topic_stop(name = None, sub = None):
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    conn = pymysql.connect(
+        user = set_data['user'], 
+        password = set_data['pw'], 
+        charset = 'utf8mb4', 
+        db = set_data['db']
+    )
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
     if(admin_check(3) == 1):
@@ -1463,7 +2088,12 @@ def topic_stop(name = None, sub = None):
         
 @route('/topic/<name:path>/sub/<sub:path>/close')
 def topic_close(name = None, sub = None):
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    conn = pymysql.connect(
+        user = set_data['user'], 
+        password = set_data['pw'], 
+        charset = 'utf8mb4', 
+        db = set_data['db']
+    )
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
     if(admin_check(3) == 1):
@@ -1497,7 +2127,12 @@ def topic_close(name = None, sub = None):
         
 @route('/topic/<name:path>/sub/<sub:path>/agree')
 def topic_agree(name = None, sub = None):
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    conn = pymysql.connect(
+        user = set_data['user'], 
+        password = set_data['pw'], 
+        charset = 'utf8mb4', 
+        db = set_data['db']
+    )
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
     if(admin_check(3) == 1):
@@ -1531,7 +2166,12 @@ def topic_agree(name = None, sub = None):
 
 @route('/topic/<name:path>/sub/<sub:path>', method=['POST', 'GET'])
 def topic(name = None, sub = None):
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    conn = pymysql.connect(
+        user = set_data['user'], 
+        password = set_data['pw'], 
+        charset = 'utf8mb4', 
+        db = set_data['db']
+    )
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
     ip = ip_check()
@@ -1611,7 +2251,19 @@ def topic(name = None, sub = None):
                         
                 ip = ip_pas(dain['ip'], 1)
                                    
-                div += '<table id="toron"><tbody><tr><td id="toroncolorred"><a href="#' + dain['id'] + '">#' + dain['id'] + '</a> ' + ip + ' <span style="float:right;">' + dain['date'] + '</span></td></tr><tr><td>' + top_data + '</td></tr></tbody></table><br>'
+                div += '<table id="toron"> \
+                            <tbody> \
+                                <tr> \
+                                    <td id="toroncolorred"> \
+                                        <a href="#' + dain['id'] + '">#' + dain['id'] + '</a> ' + ip + ' <span style="float:right;">' + dain['date'] + '</span> \
+                                    </td> \
+                                </tr> \
+                                <tr> \
+                                    <td>' + top_data + '</td> \
+                                </tr> \
+                            </tbody> \
+                        </table> \
+                        <br>'
                     
         i = 0          
         for dain in toda:
@@ -1670,16 +2322,48 @@ def topic(name = None, sub = None):
             else:
                 color = ''
                          
-            div += '<table id="toron"><tbody><tr><td id="toroncolor' + color + '"><a href="javascript:void(0);" id="' + str(i + 1) + '">#' + str(i + 1) + '</a> ' + ip + chad + ban + ' <span style="float:right;">' + dain['date'] + '</span></td></tr><tr><td ' + block + '>' + indata + '</td></tr></tbody></table><br>'
+            div += '<table id="toron"> \
+                        <tbody> \
+                            <tr> \
+                                <td id="toroncolor' + color + '"> \
+                                    <a href="javascript:void(0);" id="' + str(i + 1) + '">#' + str(i + 1) + '</a> ' + ip + chad + ban + ' <span style="float:right;">' + dain['date'] + '</span> \
+                                </td> \
+                            </tr> \
+                            <tr> \
+                                <td ' + block + '>' + indata + '</td> \
+                            </tr> \
+                        </tbody> \
+                    </table> \
+                    <br>'
                 
             i += 1
             
         conn.close()
-        return(template('vstopic', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, page = url_pas(name), suburl = url_pas(sub), toron = sub, logo = set_data['name'], rows = div, ban = ban, style = style, sub = '토론'))
+        return(
+            template('vstopic', 
+                custom = custom_css_user(), 
+                license = set_data['license'], 
+                login = login_check(), 
+                title = name, 
+                page = url_pas(name), 
+                suburl = url_pas(sub), 
+                toron = sub, 
+                logo = set_data['name'], 
+                rows = div, 
+                ban = ban, 
+                style = style, 
+                sub = '토론'
+            )
+        )
         
 @route('/topic/<name:path>/close')
 def close_topic_list(name = None):
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    conn = pymysql.connect(
+        user = set_data['user'], 
+        password = set_data['pw'], 
+        charset = 'utf8mb4', 
+        db = set_data['db']
+    )
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
     div = '<div>'
@@ -1712,7 +2396,12 @@ def close_topic_list(name = None):
     
 @route('/topic/<name:path>/agree')
 def agree_topic_list(name = None):
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    conn = pymysql.connect(
+        user = set_data['user'], 
+        password = set_data['pw'], 
+        charset = 'utf8mb4', 
+        db = set_data['db']
+    )
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
     div = '<div>'
@@ -1745,7 +2434,12 @@ def agree_topic_list(name = None):
 
 @route('/topic/<name:path>', method=['POST', 'GET'])
 def topic_list(name = None):
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    conn = pymysql.connect(
+        user = set_data['user'], 
+        password = set_data['pw'], 
+        charset = 'utf8mb4', 
+        db = set_data['db']
+    )
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
     if(request.method == 'POST'):
@@ -1784,7 +2478,12 @@ def topic_list(name = None):
         
 @route('/login', method=['POST', 'GET'])
 def login():
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    conn = pymysql.connect(
+        user = set_data['user'], 
+        password = set_data['pw'], 
+        charset = 'utf8mb4', 
+        db = set_data['db']
+    )
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
     session = request.environ.get('beaker.session')
@@ -1838,7 +2537,12 @@ def login():
                 
 @route('/change', method=['POST', 'GET'])
 def change_password():
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    conn = pymysql.connect(
+        user = set_data['user'], 
+        password = set_data['pw'], 
+        charset = 'utf8mb4', 
+        db = set_data['db']
+    )
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
     ip = ip_check()
@@ -1887,7 +2591,12 @@ def change_password():
                 
 @route('/check/<name:path>')
 def user_check(name = None):
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    conn = pymysql.connect(
+        user = set_data['user'], 
+        password = set_data['pw'], 
+        charset = 'utf8mb4', 
+        db = set_data['db']
+    )
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
     curs.execute("select * from user where id = '" + db_pas(name) + "'")
@@ -1932,7 +2641,12 @@ def user_check(name = None):
                 
 @route('/register', method=['POST', 'GET'])
 def register():
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    conn = pymysql.connect(
+        user = set_data['user'], 
+        password = set_data['pw'], 
+        charset = 'utf8mb4', 
+        db = set_data['db']
+    )
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
     ip = ip_check()
@@ -1992,7 +2706,12 @@ def logout():
     
 @route('/ban/<name:path>', method=['POST', 'GET'])
 def user_ban(name = None):
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    conn = pymysql.connect(
+        user = set_data['user'], 
+        password = set_data['pw'], 
+        charset = 'utf8mb4', 
+        db = set_data['db']
+    )
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
     curs.execute("select * from user where id = '" + db_pas(name) + "'")
@@ -2054,7 +2773,12 @@ def user_ban(name = None):
                 
 @route('/acl/<name:path>', method=['POST', 'GET'])
 def acl(name = None):
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    conn = pymysql.connect(
+        user = set_data['user'], 
+        password = set_data['pw'], 
+        charset = 'utf8mb4', 
+        db = set_data['db']
+    )
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
     if(request.method == 'POST'):
@@ -2099,7 +2823,12 @@ def acl(name = None):
             
 @route('/admin/<name:path>', method=['POST', 'GET'])
 def user_admin(name = None):
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    conn = pymysql.connect(
+        user = set_data['user'], 
+        password = set_data['pw'], 
+        charset = 'utf8mb4', 
+        db = set_data['db']
+    )
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
     if(request.method == 'POST'):
@@ -2154,7 +2883,12 @@ def user_admin(name = None):
             
 @route('/ban')
 def are_you_ban():
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    conn = pymysql.connect(
+        user = set_data['user'], 
+        password = set_data['pw'], 
+        charset = 'utf8mb4', 
+        db = set_data['db']
+    )
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
     ip = ip_check()
@@ -2211,7 +2945,12 @@ def are_you_ban():
     
 @route('/w/<name:path>/r/<a:int>/diff/<b:int>')
 def diff_data(name = None, a = None, b = None):
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    conn = pymysql.connect(
+        user = set_data['user'], 
+        password = set_data['pw'], 
+        charset = 'utf8mb4', 
+        db = set_data['db']
+    )
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
     curs.execute("select * from history where id = '" + db_pas(str(a)) + "' and title = '" + db_pas(name) + "'")
@@ -2244,7 +2983,12 @@ def diff_data(name = None, a = None, b = None):
         
 @route('/down/<name:path>')
 def down(name = None):
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    conn = pymysql.connect(
+        user = set_data['user'], 
+        password = set_data['pw'], 
+        charset = 'utf8mb4', 
+        db = set_data['db']
+    )
     curs = conn.cursor(pymysql.cursors.DictCursor)
     
     curs.execute("select title from data where title like '%" + db_pas(name) + "/%'")
@@ -2264,7 +3008,12 @@ def down(name = None):
 @route('/w/<name:path>')
 @route('/w/<name:path>/from/<redirect:path>')
 def read_view(name = None, redirect = None):
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    conn = pymysql.connect(
+        user = set_data['user'], 
+        password = set_data['pw'], 
+        charset = 'utf8mb4', 
+        db = set_data['db']
+    )
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
     data_none = False
@@ -2393,7 +3142,12 @@ def read_view(name = None, redirect = None):
 @route('/user/<name:path>/topic')
 @route('/user/<name:path>/topic/<num:int>')
 def user_topic_list(name = None, num = 1):
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    conn = pymysql.connect(
+        user = set_data['user'], 
+        password = set_data['pw'], 
+        charset = 'utf8mb4', 
+        db = set_data['db']
+    )
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
     if(num * 50 <= 0):
@@ -2449,7 +3203,12 @@ def user_topic_list(name = None, num = 1):
         
 @route('/user')
 def user_info():
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    conn = pymysql.connect(
+        user = set_data['user'], 
+        password = set_data['pw'], 
+        charset = 'utf8mb4', 
+        db = set_data['db']
+    )
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
     ip = ip_check()
@@ -2471,11 +3230,36 @@ def user_info():
     ip = ip_pas(ip, 2)
         
     conn.close()
-    return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '사용자 메뉴', logo = set_data['name'], data = ip + '<br><br><span>권한 상태 : ' + acl + '<h2>로그인 관련</h2><li><a href="/login">로그인</a></li><li><a href="/logout">로그아웃</a></li><li><a href="/register">회원가입</a></li><h2>기타</h2><li><a href="/change">비밀번호 변경</a></li><li><a href="/count">기여 횟수</a></li><li><a href="/record/' + raw_ip + '">기여 목록</a></li><li><a href="/custom">커스텀 CSS</a></li>'))
+    return(
+        template('other', 
+            custom = custom_css_user(), 
+            license = set_data['license'], 
+            login = login_check(), 
+            title = '사용자 메뉴', 
+            logo = set_data['name'], 
+            data =  ip + \
+                    '<br> \
+                    <br> \
+                    <span>권한 상태 : ' + acl + '</span> \
+                    <h2>로그인 관련</h2> \
+                    <li><a href="/login">로그인</a></li> \
+                    <li><a href="/logout">로그아웃</a></li> \
+                    <li><a href="/register">회원가입</a></li> \
+                    <h2>기타</h2> \
+                    <li><a href="/change">비밀번호 변경</a></li> \
+                    <li><a href="/count">기여 횟수</a></li> \
+                    <li><a href="/custom">커스텀 CSS</a></li>'
+        )
+    )
 
 @route('/custom', method=['GET', 'POST'])
 def custom_css():
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    conn = pymysql.connect(
+        user = set_data['user'], 
+        password = set_data['pw'], 
+        charset = 'utf8mb4', 
+        db = set_data['db']
+    )
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
     session = request.environ.get('beaker.session')
@@ -2511,11 +3295,35 @@ def custom_css():
                 data = ''
 
         conn.close()
-        return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '커스텀 CSS', logo = set_data['name'], data = start + '<form id="usrform" name="f1" method="POST" action="/custom"><textarea rows="30" cols="100" name="content" form="usrform">' + data + '</textarea><br><br><div class="form-actions"><button class="btn btn-primary" type="submit">저장</button></div></form>'))
+        return(
+            template('other', 
+                custom = custom_css_user(), 
+                license = set_data['license'], 
+                login = login_check(), 
+                title = '커스텀 CSS', 
+                logo = set_data['name'], 
+                data =  start + \
+                        '<form id="usrform" name="f1" method="POST" action="/custom"> \
+                            <textarea rows="30" cols="100" name="content" form="usrform">'\
+                                 + data + \
+                            '</textarea> \
+                            <br> \
+                            <br> \
+                            <div class="form-actions"> \
+                                <button class="btn btn-primary" type="submit">저장</button> \
+                            </div> \
+                        </form>'
+            )
+        )
 
 @route('/upload', method=['GET', 'POST'])
 def upload():
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    conn = pymysql.connect(
+        user = set_data['user'], 
+        password = set_data['pw'], 
+        charset = 'utf8mb4', 
+        db = set_data['db']
+    )
     curs = conn.cursor(pymysql.cursors.DictCursor)
     
     ip = ip_check()
@@ -2571,25 +3379,54 @@ def upload():
             return(redirect('/error/14'))
     else:        
         conn.close()
-        return(template('upload', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], title = '업로드', number = set_data['upload']))
+        return(
+            template('upload', 
+                custom = custom_css_user(), 
+                license = set_data['license'], 
+                login = login_check(), 
+                logo = set_data['name'], 
+                title = '업로드', 
+                number = set_data['upload']
+            )
+        )
     
 @route('/count')
 def count_edit():
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    conn = pymysql.connect(
+        user = set_data['user'], 
+        password = set_data['pw'], 
+        charset = 'utf8mb4', 
+        db = set_data['db']
+    )
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
     curs.execute("select count(title) from history where ip = '" + ip_check() + "'")
     count = curs.fetchall()
     if(count):
-        conn.close()
-        return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '기여 횟수', logo = set_data['name'], data = "기여 횟수 : " + str(count[0]["count(title)"])))
+        data = count[0]["count(title)"]
     else:
-        conn.close()
-        return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '기여 횟수', logo = set_data['name'], data = "기여 횟수 : 0"))
+        data = 0
+
+    conn.close()
+    return(
+        template('other', 
+            custom = custom_css_user(), 
+            license = set_data['license'], 
+            login = login_check(), 
+            title = '기여 횟수', 
+            logo = set_data['name'], 
+            data = "기여 횟수 : " + str(data)
+        )
+    )
         
 @route('/random')
 def random():
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    conn = pymysql.connect(
+        user = set_data['user'], 
+        password = set_data['pw'], 
+        charset = 'utf8mb4', 
+        db = set_data['db']
+    )
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
     curs.execute("select title from data order by rand() limit 1")
@@ -2616,50 +3453,234 @@ def views(name = None):
         plus = ''
         rename = name
         
-    return(static_file(rename, root = './views' + plus))
+    return(
+        static_file(rename, 
+            root = './views' + plus
+        )
+    )
         
 @route('/error/<num:int>')
 def error_test(num = None):
     if(num == 1):
-        return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '권한 오류', logo = set_data['name'], data = '비 로그인 상태 입니다.'))
+        return(
+            template('other', 
+                custom = custom_css_user(), 
+                license = set_data['license'], 
+                login = login_check(), 
+                title = '권한 오류', 
+                logo = set_data['name'], 
+                data = '비 로그인 상태 입니다.'
+            )
+        )
     elif(num == 2):
-        return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '권한 오류', logo = set_data['name'], data = '이 계정이 없습니다.'))
+        return(
+            template('other', 
+                custom = custom_css_user(), 
+                license = set_data['license'], 
+                login = login_check(), 
+                title = '권한 오류', 
+                logo = set_data['name'], 
+                data = '이 계정이 없습니다.'
+            )
+        )
     elif(num == 3):
-        return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '권한 오류', logo = set_data['name'], data = '권한이 모자랍니다.'))
+        return(
+            template('other', 
+                custom = custom_css_user(), 
+                license = set_data['license'], 
+                login = login_check(), 
+                title = '권한 오류',
+                logo = set_data['name'], 
+                data = '권한이 모자랍니다.'
+            )
+        )
     elif(num == 4):
-        return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '권한 오류', logo = set_data['name'], data = '관리자는 차단, 검사 할 수 없습니다.'))
+        return(
+            template('other', 
+                custom = custom_css_user(), 
+                license = set_data['license'], 
+                login = login_check(), 
+                title = '권한 오류', 
+                logo = set_data['name'], 
+                data = '관리자는 차단, 검사 할 수 없습니다.'
+            )
+        )
     elif(num == 5):
-        return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '사용자 오류', logo = set_data['name'], data = '그런 계정이 없습니다.'))
+        return(
+            template('other', 
+                custom = custom_css_user(), 
+                license = set_data['license'], 
+                login = login_check(), 
+                title = '사용자 오류', 
+                logo = set_data['name'], 
+                data = '그런 계정이 없습니다.'
+            )
+        )
     elif(num == 6):
-        return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '가입 오류', logo = set_data['name'], data = '동일한 아이디의 사용자가 있습니다.'))
+        return(
+            template('other', 
+                custom = custom_css_user(), 
+                license = set_data['license'], 
+                login = login_check(), 
+                title = '가입 오류', 
+                logo = set_data['name'], 
+                data = '동일한 아이디의 사용자가 있습니다.'
+            )
+        )
     elif(num == 7):
-        return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '가입 오류', logo = set_data['name'], data = '아이디는 20글자보다 짧아야 합니다.'))
+        return(
+            template('other', 
+                custom = custom_css_user(), 
+                license = set_data['license'], 
+                login = login_check(), 
+                title = '가입 오류', 
+                logo = set_data['name'], 
+                data = '아이디는 20글자보다 짧아야 합니다.'
+            )
+        )
     elif(num == 8):
-        return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '가입 오류', logo = set_data['name'], data = '아이디에는 한글과 알파벳과 공백만 허용 됩니다.'))
+        return(
+            template('other', 
+                custom = custom_css_user(), 
+                license = set_data['license'], 
+                login = login_check(), 
+                title = '가입 오류', 
+                logo = set_data['name'], 
+                data = '아이디에는 한글과 알파벳과 공백만 허용 됩니다.'
+            )
+        )
     elif(num == 9):
-        return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '변경 오류', logo = set_data['name'], data = '그런 계정이 없습니다.'))
+        return(
+            template('other', 
+                custom = custom_css_user(), 
+                license = set_data['license'], 
+                login = login_check(), 
+                title = '변경 오류', 
+                logo = set_data['name'], 
+                data = '그런 계정이 없습니다.'
+            )
+        )
     elif(num == 10):
-        return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '변경 오류', logo = set_data['name'], data = '비밀번호가 다릅니다.'))
+        return(
+            template('other', 
+                custom = custom_css_user(), 
+                license = set_data['license'], 
+                login = login_check(), 
+                title = '변경 오류', 
+                logo = set_data['name'], 
+                data = '비밀번호가 다릅니다.'
+            )
+        )
     elif(num == 11):
-        return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '로그인 오류', logo = set_data['name'], data = '이미 로그인 되어 있습니다.'))
+        return(
+            template('other',
+                custom = custom_css_user(), 
+                license = set_data['license'], 
+                login = login_check(), 
+                title = '로그인 오류', 
+                logo = set_data['name'], 
+                data = '이미 로그인 되어 있습니다.'
+            )
+        )
     elif(num == 12):
-        return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '로그인 오류', logo = set_data['name'], data = '그런 계정이 없습니다.'))
+        return(
+            template('other', 
+                custom = custom_css_user(), 
+                license = set_data['license'], 
+                login = login_check(), 
+                title = '로그인 오류', 
+                logo = set_data['name'], 
+                data = '그런 계정이 없습니다.'
+            )
+        )
     elif(num == 13):
-        return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '로그인 오류', logo = set_data['name'], data = '비밀번호가 다릅니다.'))
+        return(
+            template('other', 
+                custom = custom_css_user(), 
+                license = set_data['license'], 
+                login = login_check(), 
+                title = '로그인 오류', 
+                logo = set_data['name'], 
+                data = '비밀번호가 다릅니다.'
+            )
+        )
     elif(num == 14):
-        return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '업로드 오류', logo = set_data['name'], data = 'jpg, gif, jpeg, png(대 소문자 상관 없음)만 가능 합니다.'))
+        return(
+            template('other', 
+                custom = custom_css_user(), 
+                license = set_data['license'], 
+                login = login_check(), 
+                title = '업로드 오류', 
+                logo = set_data['name'], 
+                data = 'jpg, gif, jpeg, png만 가능 합니다.'
+            )
+        )
     elif(num == 15):
-        return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '편집 오류', logo = set_data['name'], data = '편집 기록은 500자를 넘을 수 없습니다.'))
+        return(
+            template('other', 
+                custom = custom_css_user(), 
+                license = set_data['license'], 
+                login = login_check(), 
+                title = '편집 오류', 
+                logo = set_data['name'], 
+                data = '편집 기록은 500자를 넘을 수 없습니다.'
+            )
+        )
     elif(num == 16):
-        return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '업로드 오류', logo = set_data['name'], data = '동일한 이름의 파일이 있습니다.'))
+        return(
+            template('other', 
+                custom = custom_css_user(), 
+                license = set_data['license'], 
+                login = login_check(), 
+                title = '업로드 오류', 
+                logo = set_data['name'], 
+                data = '동일한 이름의 파일이 있습니다.'
+            )
+        )
     elif(num == 17):
-        return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '업로드 오류', logo = set_data['name'], data = '파일 용량은 ' + set_data['upload'] + 'MB를 넘길 수 없습니다.'))
+        return(
+            template('other', 
+                custom = custom_css_user(), 
+                license = set_data['license'], 
+                login = login_check(), 
+                title = '업로드 오류', 
+                logo = set_data['name'], 
+                data = '파일 용량은 ' + set_data['upload'] + 'MB를 넘길 수 없습니다.'
+            )
+        )
     elif(num == 18):
-        return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '편집 오류', logo = set_data['name'], data = '내용이 원래 문서와 동일 합니다.'))
+        return(
+            template('other', 
+                custom = custom_css_user(), 
+                license = set_data['license'], 
+                login = login_check(), 
+                title = '편집 오류', 
+                logo = set_data['name'], 
+                data = '내용이 원래 문서와 동일 합니다.'
+            )
+        )
     elif(num == 19):
-        return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '이동 오류', logo = set_data['name'], data = '이동 하려는 곳에 문서가 이미 있습니다.'))
+        return(
+            template('other', 
+                custom = custom_css_user(), 
+                license = set_data['license'], 
+                login = login_check(), 
+                title = '이동 오류', 
+                logo = set_data['name'], 
+                data = '이동 하려는 곳에 문서가 이미 있습니다.'
+            )
+        )
     elif(num == 20):
-        return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '비밀번호 오류', logo = set_data['name'], data = '재 확인이랑 비밀번호가 다릅니다.'))
+        return(
+            template('other', 
+                custom = custom_css_user(), 
+                license = set_data['license'], 
+                login = login_check(), 
+                title = '비밀번호 오류', 
+                logo = set_data['name'],
+                data = '재 확인이랑 비밀번호가 다릅니다.'
+            )
+        )
     else:
         return(redirect('/'))
 
@@ -2667,4 +3688,9 @@ def error_test(num = None):
 def error_404(error):
     return(redirect('/w/' + url_pas(set_data['frontpage'])))
     
-run(app = app, server='tornado', host = '0.0.0.0', port = int(set_data['port']))
+run(
+    app = app, 
+    server='tornado', 
+    host = '0.0.0.0', 
+    port = int(set_data['port'])
+)
