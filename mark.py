@@ -577,6 +577,23 @@ def namumark(title, data):
             break
      
     data = re.sub("\[\[(?::(?P<in>(?:분류|파일):(?:(?:(?!\]\]).)*)))\]\]", "[[\g<in>]]", data)
+
+    a = re.findall('\[\[\.\.\/(\|(?:[^\]]*))?\]\]', data)
+    for i in a:
+        b = re.search('(.*)\/', title)
+        if(b):
+            m = b.groups()
+            if(i):
+                data = re.sub('\[\[\.\.\/(\|(?:[^\]]*))?\]\]', '[[' + m[0] + i + ']]', data, 1)
+            else:
+                data = re.sub('\[\[\.\.\/(\|(?:[^\]]*))?\]\]', '[[' + m[0] + ']]', data, 1)
+        else:
+            if(i):
+                data = re.sub('\[\[\.\.\/(\|(?:[^\]]*))?\]\]', '[[' + title + i + ']]', data, 1)
+            else:
+                data = re.sub('\[\[\.\.\/(\|(?:[^\]]*))?\]\]', '[[' + title + ']]', data, 1)
+
+    data = re.sub('\[\[(?P<in>\/[^\]|]*)(?P<out>\|(?:[^\]]*))?\]\]', '[[' + title + '\g<in>\g<out>]]', data)
                 
     while(True):
         m = re.search("\[\[(((?!\]\]).)*)\]\]", data)
