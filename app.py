@@ -566,9 +566,11 @@ def user_record(name = None, num = 1):
                         </table> \
                     </div>'
     else:
-        div = 'None<br>'
+        div =   'None \
+                <br>'
         
-    div += '<br><a href="/record/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전)</a> <a href="/record/' + url_pas(name) + '/n/' + str(num + 1) + '">(이후)</a>'
+    div += '<br> \
+            <a href="/record/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전)</a> <a href="/record/' + url_pas(name) + '/n/' + str(num + 1) + '">(이후)</a>'
         
     curs.execute("select end, why from ban where block = '" + db_pas(name) + "'")
     ban_it = curs.fetchall()
@@ -1982,7 +1984,16 @@ def title_index():
         data = 'None'
 
     conn.close()
-    return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = data, title = '모든 문서'))
+    return(
+        template('other', 
+            custom = custom_css_user(), 
+            license = set_data['license'], 
+            login = login_check(), 
+            logo = set_data['name'], 
+            data = data, 
+            title = '모든 문서'
+        )
+    )
         
 @route('/topic/<name:path>/sub/<sub:path>/b/<num:int>')
 def topic_block(name = None, sub = None, num = None):
@@ -2004,7 +2015,11 @@ def topic_block(name = None, sub = None, num = None):
                 curs.execute("update topic set block = 'O' where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' and id = '" + str(num) + "'")
             conn.commit()
             
-            rd_plus(name, sub, get_time())
+            rd_plus(
+                name, 
+                sub, 
+                get_time()
+            )
             
             conn.close()
             return(redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub)))
@@ -2039,7 +2054,11 @@ def topic_top(name = None, sub = None, num = None):
 
             conn.commit()
             
-            rd_plus(name, sub, get_time())
+            rd_plus(
+                name, 
+                sub, 
+                get_time()
+            )
 
         conn.close()
         return(redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub)))
@@ -2075,7 +2094,11 @@ def topic_stop(name = None, sub = None):
                 curs.execute("insert into stop (title, sub, close) value ('" + db_pas(name) + "', '" + db_pas(sub) + "', '')")
             conn.commit()
             
-            rd_plus(name, sub, time)
+            rd_plus(
+                name, 
+                sub, 
+                time
+            )
             
             conn.close()
             return(redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub)))
@@ -2114,7 +2137,11 @@ def topic_close(name = None, sub = None):
                 curs.execute("insert into stop (title, sub, close) value ('" + db_pas(name) + "', '" + db_pas(sub) + "', 'O')")
             conn.commit()
             
-            rd_plus(name, sub, time)
+            rd_plus(
+                name, 
+                sub, 
+                time
+            )
             
             conn.close()
             return(redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub)))
@@ -2153,7 +2180,11 @@ def topic_agree(name = None, sub = None):
                 curs.execute("insert into agreedis (title, sub) value ('" + db_pas(name) + "', '" + db_pas(sub) + "')")
             conn.commit()
             
-            rd_plus(name, sub, time)
+            rd_plus(
+                name, 
+                sub, 
+                time
+            )
             
             conn.close()
             return(redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub)))
@@ -2191,7 +2222,11 @@ def topic(name = None, sub = None):
             return(redirect('/ban'))
         else:                    
             today = get_time()
-            rd_plus(name, sub, today)
+            rd_plus(
+                name, 
+                sub, 
+                today
+            )
             
             aa = re.sub("\[\[(분류:(?:(?:(?!\]\]).)*))\]\]", "[br]", request.forms.content)
             aa = savemark(aa)
@@ -2385,14 +2420,40 @@ def close_topic_list(name = None):
 
             ip = ip_pas(row[0]['ip'], 1)
                 
-            div += '<h2><a href="/topic/' + url_pas(name) + '/sub/' + url_pas(data['sub']) + '">' + str((i + 1)) + '. ' + data['sub'] + '</a></h2><table id="toron"><tbody><tr><td id="toroncolorgreen"><a href="javascript:void(0);" id="1">#1</a> ' + ip + ' <span style="float:right;">' + row[0]['date'] + '</span></td></tr><tr><td ' + block + '>' + indata + '</td></tr></tbody></table><br>'
+            div += '<h2> \
+                        <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(data['sub']) + '">' + str((i + 1)) + '. ' + data['sub'] + '</a> \
+                    </h2> \
+                    <table id="toron"> \
+                        <tbody> \
+                            <tr> \
+                                <td id="toroncolorgreen"> \
+                                    <a href="javascript:void(0);" id="1">#1</a> ' + ip + ' <span style="float:right;">' + row[0]['date'] + '</span> \
+                                </td> \
+                            </tr> \
+                            <tr> \
+                                <td ' + block + '>' + indata + '</td> \
+                            </tr> \
+                        </tbody> \
+                    </table> \
+                    <br>'
             
             i += 1
     else:
         div += '</div>'
         
     conn.close()
-    return(template('topic', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, page = url_pas(name), logo = set_data['name'], plus = div, sub = '닫힘'))
+    return(
+        template('topic', 
+            custom = custom_css_user(), 
+            license = set_data['license'], 
+            login = login_check(), 
+            title = name, 
+            page = url_pas(name), 
+            logo = set_data['name'], 
+            plus = div, 
+            sub = '닫힘'
+        )
+    )
     
 @route('/topic/<name:path>/agree')
 def agree_topic_list(name = None):
@@ -2423,14 +2484,40 @@ def agree_topic_list(name = None):
 
             ip = ip_pas(topic_data[0]['ip'], 1)
                 
-            div += '<h2><a href="/topic/' + url_pas(name) + '/sub/' + url_pas(data['sub']) + '">' + str(i + 1) + '. ' + data['sub'] + '</a></h2><table id="toron"><tbody><tr><td id="toroncolorgreen"><a href="javascript:void(0);" id="1">#1</a> ' + ip + ' <span style="float:right;">' + topic_data[0]['date'] + '</span></td></tr><tr><td ' + block + '>' + indata + '</td></tr></tbody></table><br>'
+            div += '<h2> \
+                        <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(data['sub']) + '">' + str(i + 1) + '. ' + data['sub'] + '</a> \
+                    </h2> \
+                    <table id="toron"> \
+                        <tbody> \
+                            <tr> \
+                                <td id="toroncolorgreen"> \
+                                    <a href="javascript:void(0);" id="1">#1</a> ' + ip + ' <span style="float:right;">' + topic_data[0]['date'] + '</span> \
+                                </td> \
+                            </tr> \
+                            <tr> \
+                                <td ' + block + '>' + indata + '</td> \
+                            </tr> \
+                        </tbody> \
+                    </table> \
+                    <br>'
             
             i += 1
     else:
         div += '</div>'
         
     conn.close()
-    return(template('topic', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, page = url_pas(name), logo = set_data['name'], plus = div, sub = '합의'))
+    return(
+        template('topic', 
+            custom = custom_css_user(), 
+            license = set_data['license'], 
+            login = login_check(), 
+            title = name, 
+            page = url_pas(name), 
+            logo = set_data['name'], 
+            plus = div, 
+            sub = '합의'
+        )
+    )
 
 @route('/topic/<name:path>', method=['POST', 'GET'])
 def topic_list(name = None):
@@ -2467,14 +2554,41 @@ def topic_list(name = None):
             curs.execute("select * from stop where title = '" + db_pas(data['title']) + "' and sub = '" + db_pas(data['sub']) + "' and close = 'O'")
             row = curs.fetchall()
             if(not row):
-                div += '<h2><a href="/topic/' + url_pas(data['title']) + '/sub/' + url_pas(data['sub']) + '">' + str(j) + '. ' + data['sub'] + '</a></h2><table id="toron"><tbody><tr><td id="toroncolorgreen"><a href="javascript:void(0);" id="1">#1</a> ' + ip + ' <span style="float:right;">' + aa[0]['date'] + '</span></td></tr><tr><td ' + block + '>' + indata + '</td></tr></tbody></table><br>'
+                div += '<h2> \
+                            <a href="/topic/' + url_pas(data['title']) + '/sub/' + url_pas(data['sub']) + '">' + str(j) + '. ' + data['sub'] + '</a> \
+                        </h2> \
+                        <table id="toron"> \
+                            <tbody> \
+                                <tr> \
+                                    <td id="toroncolorgreen"> \
+                                        <a href="javascript:void(0);" id="1">#1</a> ' + ip + ' <span style="float:right;">' + aa[0]['date'] + '</span> \
+                                    </td> \
+                                </tr> \
+                                <tr> \
+                                    <td ' + block + '>' + indata + '</td> \
+                                </tr> \
+                            </tbody> \
+                        </table> \
+                        <br>'
                 
                 j += 1
         else:
             div += '</div>'
                 
         conn.close()
-        return(template('topic', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, page = url_pas(name), logo = set_data['name'], plus = div, list = 1, sub = '토론 목록'))
+        return(
+            template('topic', 
+                custom = custom_css_user(), 
+                license = set_data['license'], 
+                login = login_check(), 
+                title = name, 
+                page = url_pas(name), 
+                logo = set_data['name'], 
+                plus = div, 
+                list = 1, 
+                sub = '토론 목록'
+            )
+        )
         
 @route('/login', method=['POST', 'GET'])
 def login():
@@ -2533,7 +2647,16 @@ def login():
                 return(redirect('/error/11'))
             else:
                 conn.close()
-                return(template('login', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '로그인', enter = '로그인', logo = set_data['name']))
+                return(
+                    template('login', 
+                        custom = custom_css_user(), 
+                        license = set_data['license'], 
+                        login = login_check(), 
+                        title = '로그인', 
+                        enter = '로그인', 
+                        logo = set_data['name']
+                    )
+                )
                 
 @route('/change', method=['POST', 'GET'])
 def change_password():
@@ -2587,7 +2710,16 @@ def change_password():
                 return(redirect('/logout'))
             else:
                 conn.close()
-                return(template('login', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '비밀번호 변경', enter = '변경', logo = set_data['name']))
+                return(
+                    template('login', 
+                        custom = custom_css_user(), 
+                        license = set_data['license'], 
+                        login = login_check(), 
+                        title = '비밀번호 변경', 
+                        enter = '변경', 
+                        logo = set_data['name']
+                    )
+                )
                 
 @route('/check/<name:path>')
 def user_check(name = None):
@@ -2608,33 +2740,32 @@ def user_check(name = None):
         if(admin_check(4) == 1):
             m = re.search('^(?:[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}?)$', name)
             if(m):
-                curs.execute("select * from login where ip = '" + db_pas(name) + "' order by today desc")
-                row = curs.fetchall()
-                if(row):
-                    c = '<div><table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;">이름</td><td style="text-align: center;width:33.33%;">아이피</td><td style="text-align: center;width:33.33%;">언제</td></tr>'
-                    for data in row:
-                        c += '<tr><td style="text-align: center;width:33.33%;">' + data['user'] + '</td><td style="text-align: center;width:33.33%;">' + data['ip'] + '</td><td style="text-align: center;width:33.33%;">' + data['today'] + '</td></tr>'
-                    else:
-                        c += '</tbody></table></div>'
-                else:
-                    c = 'None'
-                        
-                conn.close()
-                return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '다중 검사', logo = set_data['name'], data = c))
+                sql = 'ip'
             else:
-                curs.execute("select * from login where user = '" + db_pas(name) + "' order by today desc")
-                row = curs.fetchall()
-                if(row):
-                    c = '<div><table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;">이름</td><td style="text-align: center;width:33.33%;">아이피</td><td style="text-align: center;width:33.33%;">언제</td></tr>'
-                    for data in row:
-                        c += '<tr><td style="text-align: center;width:33.33%;">' + data['user'] + '</td><td style="text-align: center;width:33.33%;">' + data['ip'] + '</td><td style="text-align: center;width:33.33%;">' + data['today'] + '</td></tr>'
-                    else:
-                        c += '</tbody></table></div>'
+                sql = 'user'
+
+            curs.execute("select * from login where " + sql + " = '" + db_pas(name) + "' order by today desc")
+            row = curs.fetchall()
+            if(row):
+                c = '<div><table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;">이름</td><td style="text-align: center;width:33.33%;">아이피</td><td style="text-align: center;width:33.33%;">언제</td></tr>'
+                for data in row:
+                    c += '<tr><td style="text-align: center;width:33.33%;">' + data['user'] + '</td><td style="text-align: center;width:33.33%;">' + data['ip'] + '</td><td style="text-align: center;width:33.33%;">' + data['today'] + '</td></tr>'
                 else:
-                    c = 'None'
-                        
-                conn.close()
-                return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '다중 검사', logo = set_data['name'], data = c))
+                    c += '</tbody></table></div>'
+            else:
+                c = 'None'
+                    
+            conn.close()
+            return(
+                template('other', 
+                    custom = custom_css_user(), 
+                    license = set_data['license'], 
+                    login = login_check(), 
+                    title = '다중 검사', 
+                    logo = set_data['name'], 
+                    data = c
+                )
+            )
         else:
             conn.close()
             return(redirect('/error/3'))
@@ -2694,7 +2825,16 @@ def register():
             return(redirect('/ban'))
         else:
             conn.close()
-            return(template('login', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '회원가입', enter = '회원가입', logo = set_data['name']))
+            return(
+                template('login', 
+                    custom = custom_css_user(), 
+                    license = set_data['license'], 
+                    login = login_check(), 
+                    title = '회원가입', 
+                    enter = '회원가입', 
+                    logo = set_data['name']
+                )
+            )
             
 @route('/logout')
 def logout():
@@ -2766,7 +2906,19 @@ def user_ban(name = None):
                         now = '차단'
                         
                 conn.close()
-                return(template('ban', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, page = url_pas(name), logo = set_data['name'], now = now, today = get_time(), sub = '차단'))
+                return(
+                    template('ban', 
+                        custom = custom_css_user(), 
+                        license = set_data['license'], 
+                        login = login_check(), 
+                        title = name, 
+                        page = url_pas(name), 
+                        logo = set_data['name'], 
+                        now = now, 
+                        today = get_time(), 
+                        sub = '차단'
+                    )
+                )
             else:
                 conn.close()
                 return(redirect('/error/3'))
@@ -2813,7 +2965,18 @@ def acl(name = None):
                     now = '일반'
                     
                 conn.close()
-                return(template('acl', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, page = url_pas(name), logo = set_data['name'], now = '현재 ACL 상태는 ' + now, sub = 'ACL'))
+                return(
+                    template('acl', 
+                        custom = custom_css_user(), 
+                        license = set_data['license'], 
+                        login = login_check(), 
+                        title = name, 
+                        page = url_pas(name), 
+                        logo = set_data['name'], 
+                        now = '현재 ACL 상태는 ' + now, 
+                        sub = 'ACL'
+                    )
+                )
             else:
                 conn.close()
                 return(redirect('/w/' + url_pas(name)) )
@@ -2873,7 +3036,19 @@ def user_admin(name = None):
                             div += '<option value="' + data['name'] + '" selected="selected">' + data['name'] + '</option>'                       
                     
                 conn.close()
-                return(template('admin', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, page = url_pas(name), datalist = div, logo = set_data['name'], now = now, sub = '권한 부여'))
+                return(
+                    template('admin', 
+                        custom = custom_css_user(), 
+                        license = set_data['license'], 
+                        login = login_check(), 
+                        title = name, 
+                        page = url_pas(name), 
+                        datalist = div, 
+                        logo = set_data['name'], 
+                        now = now, 
+                        sub = '권한 부여'
+                    )
+                )
             else:
                 conn.close()
                 return(redirect('/error/5'))
@@ -2941,7 +3116,16 @@ def are_you_ban():
         end = '권한이 맞지 않는 상태 입니다.'
         
     conn.close()
-    return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = '권한 오류', logo = set_data['name'], data = end))
+    return(
+        template('other', 
+            custom = custom_css_user(), 
+            license = set_data['license'], 
+            login = login_check(), 
+            title = '권한 오류', 
+            logo = set_data['name'], 
+            data = end
+        )
+    )
     
 @route('/w/<name:path>/r/<a:int>/diff/<b:int>')
 def diff_data(name = None, a = None, b = None):
@@ -2973,7 +3157,18 @@ def diff_data(name = None, a = None, b = None):
             result = '<pre>' + result + '</pre>'
             
             conn.close()
-            return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, logo = set_data['name'], data = result, sub = '비교', page = url_pas(name)))
+            return(
+                template('other', 
+                    custom = custom_css_user(), 
+                    license = set_data['license'], 
+                    login = login_check(), 
+                    title = name, 
+                    logo = set_data['name'], 
+                    data = result, 
+                    sub = '비교', 
+                    page = url_pas(name)
+                )
+            )
         else:
             conn.close()
             return(redirect('/history/' + url_pas(name)))
@@ -3003,7 +3198,18 @@ def down(name = None):
         
     conn.close()
     
-    return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, logo = set_data['name'], data = div, sub = '하위 문서', page = url_pas(name)))
+    return(
+        template('other', 
+            custom = custom_css_user(), 
+            license = set_data['license'], 
+            login = login_check(), 
+            title = name, 
+            logo = set_data['name'], 
+            data = div, 
+            sub = '하위 문서', 
+            page = url_pas(name)
+        )
+    )
 
 @route('/w/<name:path>')
 @route('/w/<name:path>/from/<redirect:path>')
@@ -3137,7 +3343,25 @@ def read_view(name = None, redirect = None):
     enddata = namumark(name, elsedata)
         
     conn.close()
-    return(template('read', custom = custom_css_user(), license = set_data['license'], login = login_check(), title = name, logo = set_data['name'], page = url_pas(name), data = enddata + div, uppage = uppage, acl = acl, topic = topic, redirect = redirect, admin = admin_memu, data_none = data_none, sub = sub, down = down))
+    return(
+        template('read', 
+            custom = custom_css_user(), 
+            license = set_data['license'], 
+            login = login_check(), 
+            title = name, 
+            logo = set_data['name'], 
+            page = url_pas(name), 
+            data = enddata + div, 
+            uppage = uppage, 
+            acl = acl, 
+            topic = topic, 
+            redirect = redirect, 
+            admin = admin_memu, 
+            data_none = data_none, 
+            sub = sub, 
+            down = down
+        )
+    )
 
 @route('/user/<name:path>/topic')
 @route('/user/<name:path>/topic/<num:int>')
@@ -3157,7 +3381,14 @@ def user_topic_list(name = None, num = 1):
     
     i = v - 50
     ydmin = admin_check(1)
-    div = '<div><table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;">토론명</td><td style="text-align: center;width:33.33%;">작성자</td><td style="text-align: center;width:33.33%;">시간</td></tr>'
+    div =   '<div> \
+                <table style="text-align: center; width: 100%;"> \
+                    <tbody> \
+                        <tr> \
+                            <td style="width:33.33%;">토론명</td> \
+                            <td style="width:33.33%;">작성자</td> \
+                            <td style="width:33.33%;">시간</td> \
+                        </tr>'
     
     curs.execute("select title, id, sub, ip, date from topic where ip = '" + db_pas(name) + "' order by date desc limit " + str(i) + ", " + str(v))
     rows = curs.fetchall()
@@ -3183,13 +3414,23 @@ def user_topic_list(name = None, num = 1):
                 
             ip = ip_pas(data['ip'], 1)
                 
-            div += '<tr><td style="text-align: center;width:33.33%;"><a href="/topic/' + url_pas(data['title']) + '/sub/' + url_pas(data['sub']) + '#' + data['id'] + '">' + title + '</a> (' + sub + ') (#' + data['id'] + ') </td><td style="text-align: center;width:33.33%;">' + ip + ban +  '</td><td style="text-align: center;width:33.33%;">' + data['date'] + '</td></tr>'
+            div += '<tr> \
+                        <td> \
+                            <a href="/topic/' + url_pas(data['title']) + '/sub/' + url_pas(data['sub']) + '#' + data['id'] + '">' + title + '</a> (' + sub + ') (#' + data['id'] + ') \
+                        </td> \
+                        <td>' + ip + ban +  '</td> \
+                        <td>' + data['date'] + '</td> \
+                    </tr>'
         else:
-            div += '</tbody></table></div>'
+            div +=          '</tbody> \
+                        </table> \
+                    </div>'
     else:
-        div = 'None<br>'
+        div =   'None \
+                <br>'
         
-    div += '<br><a href="/user/' + url_pas(name) + '/topic/' + str(num - 1) + '">(이전)</a> <a href="/user/' + url_pas(name) + '/topic/' + str(num + 1) + '">(이후)</a>'
+    div += '<br> \
+            <a href="/user/' + url_pas(name) + '/topic/' + str(num - 1) + '">(이전)</a> <a href="/user/' + url_pas(name) + '/topic/' + str(num + 1) + '">(이후)</a>'
                 
     curs.execute("select end, why from ban where block = '" + db_pas(name) + "'")
     ban_it = curs.fetchall()
@@ -3199,7 +3440,17 @@ def user_topic_list(name = None, num = 1):
         sub = None
                 
     conn.close()
-    return(template('other', custom = custom_css_user(), license = set_data['license'], login = login_check(), logo = set_data['name'], data = div, title = '사용자 토론 기록', sub = sub))
+    return(
+        template('other', 
+            custom = custom_css_user(), 
+            license = set_data['license'], 
+            login = login_check(), 
+            logo = set_data['name'], 
+            data = div, 
+            title = '사용자 토론 기록', 
+            sub = sub
+        )
+    )
         
 @route('/user')
 def user_info():
