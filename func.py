@@ -114,7 +114,7 @@ def include_check(name, data):
         curs.execute("select link from back where title = '" + db_pas(name) + "' and type = 'include'")
         back = curs.fetchall()
         for backp in back:
-            namumark(backp['link'], data)
+            namumark(backp['link'], data, 1)
     
     conn.close()
     

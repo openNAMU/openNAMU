@@ -313,31 +313,33 @@ def toc_pas(data, title):
 
     return(data)
 
-def backlink_plus(name, link, backtype):
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
-    curs = conn.cursor(pymysql.cursors.DictCursor)
-    
-    curs.execute("select title from back where title = '" + db_pas(link) + "' and link = '" + db_pas(name) + "' and type = '" + backtype + "'")
-    y = curs.fetchall()
-    if(not y):
-        curs.execute("insert into back (title, link, type) value ('" + db_pas(link) + "', '" + db_pas(name) + "',  '" + backtype + "')")
-        conn.commit()
+def backlink_plus(name, link, backtype, num):
+    if(num == 1):
+        conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+        curs = conn.cursor(pymysql.cursors.DictCursor)
         
-    conn.close()
+        curs.execute("select title from back where title = '" + db_pas(link) + "' and link = '" + db_pas(name) + "' and type = '" + backtype + "'")
+        y = curs.fetchall()
+        if(not y):
+            curs.execute("insert into back (title, link, type) value ('" + db_pas(link) + "', '" + db_pas(name) + "',  '" + backtype + "')")
+            conn.commit()
+            
+        conn.close()
 
-def cat_plus(name, link):
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
-    curs = conn.cursor(pymysql.cursors.DictCursor)
-    
-    curs.execute("select title from cat where title = '" + db_pas(link) + "' and cat = '" + db_pas(name) + "'")
-    y = curs.fetchall()
-    if(not y):
-        curs.execute("insert into cat (title, cat) value ('" + db_pas(link) + "', '" + db_pas(name) + "')")
-        conn.commit()
+def cat_plus(name, link, num):
+    if(num == 1):
+        conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+        curs = conn.cursor(pymysql.cursors.DictCursor)
         
-    conn.close()
+        curs.execute("select title from cat where title = '" + db_pas(link) + "' and cat = '" + db_pas(name) + "'")
+        y = curs.fetchall()
+        if(not y):
+            curs.execute("insert into cat (title, cat) value ('" + db_pas(link) + "', '" + db_pas(name) + "')")
+            conn.commit()
+            
+        conn.close()
 
-def namumark(title, data):
+def namumark(title, data, num):
     conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
     curs = conn.cursor(pymysql.cursors.DictCursor)
     
@@ -363,7 +365,7 @@ def namumark(title, data):
                 curs.execute("select * from data where title = '" + db_pas(results[0]) + "'")
                 in_con = curs.fetchall()
                 
-                backlink_plus(title, results[0], 'include')
+                backlink_plus(title, results[0], 'include', num)
                 if(in_con):                        
                     in_data = in_con[0]['data']
                     in_data = include.sub("", in_data)
@@ -404,7 +406,7 @@ def namumark(title, data):
                 nosharp = re.sub("<sharp>", "#", g)
                 data = re.sub('^#(?:redirect|넘겨주기) ([^\n]*)$', '<meta http-equiv="refresh" content="0;url=/w/' + url_pas(nosharp) + '/from/' + url_pas(title) + '" />', data, 1)
             
-            backlink_plus(title, results[0], 'redirect')
+            backlink_plus(title, results[0], 'redirect', num)
         else:
             break
             
@@ -438,7 +440,7 @@ def namumark(title, data):
             g = m.groups()
             
             if(not title == g[0]):
-                cat_plus(title, g[0])
+                cat_plus(title, g[0], num)
                     
                 if(category == ''):
                     curs.execute("select title from data where title = '" + db_pas(g[0]) + "'")
@@ -494,7 +496,7 @@ def namumark(title, data):
 
             if(c):
                 if(not re.search("^파일:([^\n]*)", title)):
-                    backlink_plus(title, '파일:' + c[0], 'file')
+                    backlink_plus(title, '파일:' + c[0], 'file', num)
                     
                 comp = re.compile("^(.+)(\.(?:jpg|gif|png|jpeg))$", re.I)
                 if(c[1]):
@@ -647,7 +649,7 @@ def namumark(title, data):
                     
                     data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a title="' + re.sub('#', '\#', nosharp) + sharp + '" class="' + clas + '" href="/w/' + url_pas(nosharp) + sharp + '">' + g + '</a>', data, 1)
 
-                    backlink_plus(title, results[0], '')
+                    backlink_plus(title, results[0], '', num)
         else:
             break
             

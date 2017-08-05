@@ -659,17 +659,16 @@ def xref_reset():
     )
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
-    if(admin_check(None) == 1):
-        i = 0
-        
+    if(admin_check(None) == 1):        
         curs.execute("delete from back")
+        curs.execute("delete from cat")
         conn.commit()
         
         curs.execute("select title, data from data")
         data = curs.fetchall()
-        if(data):
-            for end in data:
-                namumark(end['title'], end['data'])
+        for end in data:
+            print(end['title'])
+            namumark(end['title'], end['data'], 1)
         
         conn.close()
         return(redirect('/'))
@@ -1105,7 +1104,7 @@ def old_view(name = None, num = None):
                 title = name, 
                 logo = set_data['name'], 
                 page = url_pas(name), 
-                data = namumark(name, rows[0]['data']), 
+                data = namumark(name, rows[0]['data'], 0), 
                 sub = '옛 문서'
             )
         )
@@ -1218,6 +1217,10 @@ def revert(name = None, num = None):
             conn.close()
             return(redirect('/ban'))
         else:
+            curs.execute("delete from back where link = '" + db_pas(name) + "'")
+            curs.execute("delete from cat where cat = '" + db_pas(name) + "'")
+            conn.commit()
+
             curs.execute("select * from history where title = '" + db_pas(name) + "' and id = '" + str(num) + "'")
             rows = curs.fetchall()
             if(rows):                                
@@ -1300,6 +1303,9 @@ def many_del():
                     curs.execute("select data from data where title = '" + db_pas(g[0]) + "'")
                     rows = curs.fetchall()
                     if(rows):
+                        curs.execute("delete from back where title = '" + db_pas(g[0]) + "'")
+                        curs.execute("delete from cat where title = '" + db_pas(g[0]) + "'")
+
                         leng = '-' + str(len(rows[0]['data']))
                         curs.execute("delete from data where title = '" + db_pas(g[0]) + "'")
                         history_plus(
@@ -1356,9 +1362,10 @@ def section_edit(name = None, num = None):
             
             content = savemark(request.forms.content)
 
-            curs.execute("delete from back where title = '" + db_pas(name) + "'")
+            curs.execute("delete from back where link = '" + db_pas(name) + "'")
+            curs.execute("delete from cat where cat = '" + db_pas(name) + "'")
             conn.commit()
-            
+
             curs.execute("select * from data where title = '" + db_pas(name) + "'")
             rows = curs.fetchall()
             if(rows):
@@ -1468,7 +1475,8 @@ def edit(name = None):
             
             content = savemark(request.forms.content)
 
-            curs.execute("delete from back where title = '" + db_pas(name) + "'")
+            curs.execute("delete from back where link = '" + db_pas(name) + "'")
+            curs.execute("delete from cat where cat = '" + db_pas(name) + "'")
             conn.commit()
             
             curs.execute("select * from data where title = '" + db_pas(name) + "'")
@@ -1561,7 +1569,7 @@ def section_preview(name = None, num = None):
     else:            
         newdata = request.forms.content
         newdata = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', ' * [[\g<in>]] 문서로 넘겨주기', newdata)
-        enddata = namumark(name, newdata)
+        enddata = namumark(name, newdata, 0)
             
         conn.close()
         return(
@@ -1601,7 +1609,7 @@ def preview(name = None):
     else:            
         newdata = request.forms.content
         newdata = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', ' * [[\g<in>]] 문서로 넘겨주기', newdata)
-        enddata = namumark(name, newdata)
+        enddata = namumark(name, newdata, 0)
             
         conn.close()
         return(
@@ -1641,6 +1649,9 @@ def delete(name = None):
                 return(redirect('/ban'))
             else:
                 today = get_time()
+
+                curs.execute("delete from back where link = '" + db_pas(name) + "'")
+                curs.execute("delete from cat where cat = '" + db_pas(name) + "'")
                 
                 leng = '-' + str(len(rows[0]['data']))
                 history_plus(
@@ -1726,6 +1737,9 @@ def move(name = None):
                 if(rows):
                     curs.execute("update data set title = '" + db_pas(request.forms.title) + "' where title = '" + db_pas(name) + "'")
 
+                    curs.execute("delete from back where link = '" + db_pas(name) + "'")
+                    curs.execute("delete from cat where cat = '" + db_pas(name) + "'")
+
                 curs.execute("update history set title = '" + db_pas(request.forms.title) + "' where title = '" + db_pas(name) + "'")
                 conn.commit()
                 
@@ -1793,7 +1807,7 @@ def manager(num = None):
                         <li><a href="/manager/5">관리자 권한 주기</a></li> \
                         <li><a href="/mdel">많은 문서 삭제</a></li> \
                         <h2>소유자</h2> \
-                        <li><a href="/backreset">모든 역링크 재 생성</a></li> \
+                        <li><a href="/backreset">역링크, 분류 다시 생성</a></li> \
                         <li><a href="/manager/8">관리 그룹 생성</a></li> \
                         <h2>기타</h2> \
                         <li>이 메뉴에 없는 기능은 해당 문서의 역사나 토론에서 바로 사용 가능함</li>'
@@ -2281,7 +2295,7 @@ def topic(name = None, sub = None):
 
         if(top):
             for dain in top:                     
-                top_data = namumark('', dain['data'])
+                top_data = namumark('', dain['data'], 0)
                 top_data = re.sub("(?P<in>#(?:[0-9]*))", '<a href="\g<in>">\g<in></a>', top_data)
                         
                 ip = ip_pas(dain['ip'], 1)
@@ -2305,7 +2319,7 @@ def topic(name = None, sub = None):
             if(i == 0):
                 start = dain['ip']
                 
-            indata = namumark('', dain['data'])
+            indata = namumark('', dain['data'], 0)
             indata = re.sub("(?P<in>#(?:[0-9]*))", '<a href="\g<in>">\g<in></a>', indata)
             
             if(dain['block'] == 'O'):
@@ -2410,7 +2424,7 @@ def close_topic_list(name = None):
         curs.execute("select * from topic where title = '" + db_pas(name) + "' and sub = '" + db_pas(data['sub']) + "' and id = '1'")
         row = curs.fetchall()
         if(row):
-            indata = namumark(name, row[0]['data'])
+            indata = namumark(name, row[0]['data'], 0)
             
             if(row[0]['block'] == 'O'):
                 indata = '<br>'
@@ -2474,7 +2488,7 @@ def agree_topic_list(name = None):
         curs.execute("select * from topic where title = '" + db_pas(name) + "' and sub = '" + db_pas(data['sub']) + "' and id = '1'")
         topic_data = curs.fetchall()
         if(topic_data):
-            indata = namumark(name, topic_data[0]['data'])
+            indata = namumark(name, topic_data[0]['data'], 0)
             
             if(topic_data[0]['block'] == 'O'):
                 indata = '<br>'
@@ -2541,7 +2555,7 @@ def topic_list(name = None):
             curs.execute("select * from topic where title = '" + db_pas(data['title']) + "' and sub = '" + db_pas(data['sub']) + "' and id = '1' order by sub asc")
             aa = curs.fetchall()
             
-            indata = namumark(name, aa[0]['data'])
+            indata = namumark(name, aa[0]['data'], 0)
             
             if(aa[0]['block'] == 'O'):
                 indata = '<br>'
@@ -3226,23 +3240,16 @@ def read_view(name = None, redirect = None):
     sub = None
     acl = ''
     div = ''
+    topic = ''
     
     i = 0
     curs.execute("select sub from rd where title = '" + db_pas(name) + "' order by date asc")
     rows = curs.fetchall()
-    while(True):
-        try:            
-            curs.execute("select title from stop where title = '" + db_pas(name) + "' and sub = '" + db_pas(rows[i]['sub']) + "' and close = 'O'")
-            row = curs.fetchall()
-            if(not row):
-                topic = "open"
-                
-                break
-
-            i += 1
-        except:
-            topic = ""
-            
+    for data in rows:
+        curs.execute("select title from stop where title = '" + db_pas(name) + "' and sub = '" + db_pas(data['sub']) + "' and close = 'O'")
+        row = curs.fetchall()
+        if(not row):
+            topic = "open"
             break
             
     curs.execute("select title from data where title like '%" + db_pas(name) + "/%'")
@@ -3264,6 +3271,9 @@ def read_view(name = None, redirect = None):
         admin_memu = ''
     
     if(re.search("^분류:", name)):
+        curs.execute("delete from cat where title = '" + db_pas(name) + "' and cat = ''")
+        conn.commit()
+        
         curs.execute("select * from cat where title = '" + db_pas(name) + "' order by cat asc")
         rows = curs.fetchall()
         if(rows):
@@ -3271,43 +3281,7 @@ def read_view(name = None, redirect = None):
             i = 0
             
             for data in rows:       
-                curs.execute("select * from data where title = '" + db_pas(data['cat']) + "'")
-                row = curs.fetchall()
-                if(row):
-                    aa = row[0]['data']                  
-                    aa = namumark('', aa)
-                    bb = re.search('<div style="width:100%;border: 1px solid #777;padding: 5px;margin-top: 1em;">분류:((?:(?!<\/div>).)*)<\/div>', aa)
-                    if(bb):
-                        cc = bb.groups()
-                        
-                        mm = re.search("^분류:(.*)", name)
-                        if(mm):
-                            ee = mm.groups()
-                            
-                            if(re.search("<a (class=\"not_thing\")? href=\"\/w\/" + url_pas(name) + "\">" + ee[0] + "<\/a>", cc[0])):
-                                div += '<li><a href="/w/' + url_pas(data['cat']) + '">' + data['cat'] + '</a></li>'
-                                
-                                i += 1
-                            else:
-                                curs.execute("delete from cat where title = '" + db_pas(name) + "' and cat = '" + db_pas(data['cat']) + "'")
-                                conn.commit()
-                                
-                                i += 1
-                        else:
-                            curs.execute("delete from cat where title = '" + db_pas(name) + "' and cat = '" + db_pas(data['cat']) + "'")
-                            conn.commit()
-                            
-                            i += 1
-                    else:
-                        curs.execute("delete from cat where title = '" + db_pas(name) + "' and cat = '" + db_pas(data['cat']) + "'")
-                        conn.commit()
-                        
-                        i += 1
-                else:
-                    curs.execute("delete from cat where title = '" + db_pas(name) + "' and cat = '" + db_pas(data['cat']) + "'")
-                    conn.commit()
-                    
-                    i += 1
+                div += '<li><a href="/w/' + url_pas(data['cat']) + '">' + data['cat'] + '</a></li>'
     
     curs.execute("select * from data where title = '" + db_pas(name) + "'")
     rows = curs.fetchall()
@@ -3340,7 +3314,7 @@ def read_view(name = None, redirect = None):
     if(redirect):
         elsedata = re.sub("^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)", " * [[\g<in>]] 문서로 넘겨주기", elsedata)
             
-    enddata = namumark(name, elsedata)
+    enddata = namumark(name, elsedata, 1)
         
     conn.close()
     return(
