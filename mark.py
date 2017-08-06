@@ -1081,13 +1081,13 @@ def namumark(title, data, num):
                         r = re.search("&lt;-((?:(?!&gt;).)*)&gt;", result[1])
                         if(r):
                             resultss = r.groups()
-                            cel = 'colspan="' + resultss[0] + '"';
+                            cel = 'colspan="' + resultss[0] + '"'
                         else:
                             cel = 'colspan="' + str(round(len(result[0]) / 2)) + '"'
                         t = re.search("&lt;\|((?:(?!&gt;).)*)&gt;", result[1])
                         if(t):
                             resultss = t.groups()
-                            row = 'rowspan="' + resultss[0] + '"';
+                            row = 'rowspan="' + resultss[0] + '"'
                             
                         j = re.search("&lt;bgcolor=(#[0-9a-f-A-F]{6})&gt;", result[1])
                         k = re.search("&lt;bgcolor=(#[0-9a-f-A-F]{3})&gt;", result[1])
