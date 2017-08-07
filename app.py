@@ -26,7 +26,33 @@ from mark import *
     
 db_pas = pymysql.escape_string
 
-r_ver = '2.1.5'
+r_ver = '2.1.6'
+
+try:
+    conn = pymysql.connect(
+        user = set_data['user'], 
+        password = set_data['pw'], 
+        charset = 'utf8mb4', 
+        db = set_data['db']
+    )
+    curs = conn.cursor(pymysql.cursors.DictCursor)
+    
+    curs.execute('select data from other where name = "version"')
+    version = curs.fetchall()
+    if(version):
+        t_ver = re.sub('\.', '', version[0]['data'])
+        t_ver = re.sub('[a-z]$', '', t_ver)
+        r_t_ver = re.sub('\.', '', r_ver)
+        r_t_ver = re.sub('[a-z]$', '', r_t_ver)
+        if(int(t_ver) <= int(r_t_ver)):
+            curs.execute("update other set data = '" + db_pas(r_ver) + "' where name = 'version'")
+            
+    conn.commit()
+    
+    conn.commit()
+    conn.close()
+except:
+    pass
 
 @route('/setup', method=['GET', 'POST'])
 def setup():
@@ -65,6 +91,9 @@ def setup():
             curs.execute("create table custom(user text, css longtext)")
             curs.execute("create table other(name text, data text)")
             curs.execute("create table alist(name text, acl text)")
+            
+            db_ex("insert into other (name, data) value ('version', '" + db_pas(r_ver) + "')")
+            conn.commit()
 
             conn.close()
             return(redirect('/'))
