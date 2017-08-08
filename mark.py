@@ -186,7 +186,19 @@ def mid_pas(data, fol_num, include):
                 data = com.sub(result[0], data, 1)
             elif(fol):
                 result = fol.groups()
-                data = com.sub("<div>" + result[0] + "<span style='float:right;'><div id='folding_" + str(fol_num + 1) + "' style='display:block;'>[<a href='javascript:void(0);' onclick='var f=document.getElementById(\"folding_" + str(fol_num) + "\");var s=f.style.display==\"block\";f.style.display=s?\"none\":\"block\";this.className=s?\"\":\"opened\";var f=document.getElementById(\"folding_" + str(fol_num + 1) + "\");var s=f.style.display==\"none\";f.style.display=s?\"block\":\"none\";var f=document.getElementById(\"folding_" + str(fol_num + 2) + "\");var s=f.style.display==\"block\";f.style.display=s?\"none\":\"block\";'>펼치기</a>]</div><div id='folding_" + str(fol_num + 2) + "' style='display:none;'>[<a href='javascript:void(0);' onclick='var f=document.getElementById(\"folding_" + str(fol_num) + "\");var s=f.style.display==\"block\";f.style.display=s?\"none\":\"block\";this.className=s?\"\":\"opened\";var f=document.getElementById(\"folding_" + str(fol_num + 1) + "\");var s=f.style.display==\"none\";f.style.display=s?\"block\":\"none\";var f=document.getElementById(\"folding_" + str(fol_num + 2) + "\");var s=f.style.display==\"block\";f.style.display=s?\"none\":\"block\";'>접기</a>]</div></a></span><div id='folding_" + str(fol_num) + "' style='display:none;'><br>" + result[1] + "</div></div>", data, 1)
+                data = com.sub( "<div> \
+                                    " + result[0] + " \
+                                    <div id='folding_" + str(fol_num + 1) + "' style='display: inline-block;'> \
+                                        [<a href='javascript:void(0);' onclick='folding(" + str(fol_num + 1) + "); folding(" + str(fol_num + 2) + "); folding(" + str(fol_num) + ");'>펼치기</a>] \
+                                    </div> \
+                                    <div id='folding_" + str(fol_num + 2) + "' style='display: none;'> \
+                                        [<a href='javascript:void(0);' onclick='folding(" + str(fol_num + 1) + "); folding(" + str(fol_num + 2) + "); folding(" + str(fol_num) + ");'>접기</a>] \
+                                    </div> \
+                                    <div id='folding_" + str(fol_num) + "' style='display: none;'> \
+                                        <br> \
+                                        " + result[1] + " \
+                                    </div> \
+                                </div>", data, 1)
                 
                 fol_num += 3
             elif(syn):
@@ -386,7 +398,7 @@ def namumark(title, data, num):
 
                     in_data = toc_pas(in_data, results[0])
                                 
-                    data = include.sub('\n<nobr><div>' + in_data + '</div><nobr>\n', data, 1)
+                    data = include.sub('\n<nobr><a href="' + url_pas(results[0]) + '">[' + results[0] + ' 이동]</a><div>' + in_data + '</div><nobr>\n', data, 1)
                 else:
                     data = include.sub("<a class=\"not_thing\" href=\"" + url_pas(results[0]) + "\">" + results[0] + "</a>", data, 1)
         else:
@@ -1157,6 +1169,21 @@ def namumark(title, data, num):
     data = re.sub('\n', '<br>', data)
     data = re.sub('<isbr>', '\r\n', data)
     data = re.sub('^<br>', '', data)
+
+    data = "<script> \
+                function folding(num) { \
+                    var fol = document.getElementById('folding_' + num); \
+                    if(fol.style.display == 'inline-block' || fol.style.display == 'block') { \
+                        fol.style.display = 'none'; \
+                    } else { \
+                        if(num % 3 == 0) { \
+                            fol.style.display = 'block'; \
+                        } else { \
+                            fol.style.display = 'inline-block'; \
+                        } \
+                    } \
+                } \
+            </script>" + data
     
     conn.close()
     return(data)

@@ -1075,7 +1075,8 @@ def deep_search(name = None, num = 1):
         div =   '<li>문서로 <a href="/w/' + url_pas(name) + '">바로가기</a></li> \
                 <br>'
     else:
-        div = '<li>문서가 없습니다. <a class="not_thing" href="/w/' + url_pas(name) + '">바로가기</a></li><br>'
+        div =   '<li>문서가 없습니다. <a class="not_thing" href="/w/' + url_pas(name) + '">바로가기</a></li> \
+                <br>'
 
     if(title_list):
         no = 0

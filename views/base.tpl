@@ -3,7 +3,6 @@
         <title>{{title}} - {{logo}}</title>
         <link rel="stylesheet" href="/views/css/primer.css">
         <link rel="stylesheet" href="/views/css/style.css">
-        <script type="text/javascript" src="https://cdn.rawgit.com/brython-dev/brython/stable/www/src/brython.js"></script>
         <!-- 필수 CSS, JS -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.7/styles/default.min.css">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.7/highlight.min.js"></script>
@@ -23,9 +22,7 @@
         {{!get('custom', '')}}
     </style>
     </head>
-    <body onload="brython()">
-        <script type="text/python">
-        </script>
+    <body>
         <br>
         <div class="one-fifth column">
             <div id="top">
