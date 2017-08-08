@@ -798,7 +798,9 @@ def recentdiscuss():
                         <td>' + data['date'] + '</td> \
                     </tr>'
         else:
-            div += '</tbody></table></div>'
+            div +=          '</tbody> \
+                        </table> \
+                    </div>'
     else:
         div = 'None'
             
@@ -831,7 +833,16 @@ def blocklog(num = 1):
         v = num * 50
     
     i = v - 50
-    div = '<div><table style="width: 100%;"><tbody><tr><td style="text-align: center;width:20%;">차단자</td><td style="text-align: center;width:20%;">관리자</td><td style="text-align: center;width:20%;">기간</td><td style="text-align: center;width:20%;">이유</td><td style="text-align: center;width:20%;">시간</td></tr>'
+    div =   '<div> \
+                <table style="text-align: center; width: 100%;"> \
+                    <tbody> \
+                        <tr> \
+                            <td style="width:20%;">차단자</td> \
+                            <td style="width:20%;">관리자</td> \
+                            <td style="width:20%;">기간</td> \
+                            <td style="width:20%;">이유</td> \
+                            <td style="width:20%;">시간</td> \
+                        </tr>'
     
     curs.execute("select * from rb order by today desc")
     rows = curs.fetchall()
@@ -848,9 +859,17 @@ def blocklog(num = 1):
             else:
                 ip = data['block']
                 
-            div += '<tr><td style="text-align: center;width:20%;">' + ip + '</a></td><td style="text-align: center;width:20%;">' + data['blocker'] + '</td><td style="text-align: center;width:20%;">' + data['end'] + '</td><td style="text-align: center;width:20%;">' + data['why'] + '</td><td style="text-align: center;width:20%;">' + data['today'] + '</td></tr>'
+            div += '<tr> \
+                        <td>' + ip + '</td> \
+                        <td>' + data['blocker'] + '</td> \
+                        <td>' + data['end'] + '</td> \
+                        <td>' + data['why'] + '</td> \
+                        <td>' + data['today'] + '</td> \
+                    </tr>'
         else:
-            div += '</tbody></table></div>'
+            div +=          '</tbody> \
+                        </table> \
+                    </div>'
     else:
         div = 'None'
                 
