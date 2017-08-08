@@ -1170,7 +1170,7 @@ def namumark(title, data, num):
     data = re.sub('<isbr>', '\r\n', data)
     data = re.sub('^<br>', '', data)
 
-    data = "<script> \
+    data += "<script> \
                 function folding(num) { \
                     var fol = document.getElementById('folding_' + num); \
                     if(fol.style.display == 'inline-block' || fol.style.display == 'block') { \
@@ -1183,7 +1183,7 @@ def namumark(title, data, num):
                         } \
                     } \
                 } \
-            </script>" + data
+            </script>"
     
     conn.close()
     return(data)
