@@ -18,6 +18,8 @@ session_opts = {
 
 app = beaker.middleware.SessionMiddleware(app(), session_opts)
 
+BaseRequest.MEMFILE_MAX = 1024 * 1024
+
 def redirect(data):
     return('<meta http-equiv="refresh" content="0;url=' + data + '" />')
     
@@ -3419,7 +3421,7 @@ def user_topic_list(name = None, num = 1):
                 
             div += '<tr> \
                         <td> \
-                            <a href="/topic/' + url_pas(data['title']) + '/sub/' + url_pas(data['sub']) + '#' + data['id'] + '">' + title + '</a> (' + sub + ') (#' + data['id'] + ') \
+                            <a href="/topic/' + url_pas(data['title']) + '/sub/' + url_pas(data['sub']) + '#' + data['id'] + '">' + title + '#' + data['id'] + '</a> (' + sub + ') \
                         </td> \
                         <td>' + ip + ban +  '</td> \
                         <td>' + data['date'] + '</td> \
@@ -3621,7 +3623,13 @@ def upload():
                             curs.execute("insert into data (title, data, acl) value ('" + db_pas('파일:' + file_data) + "', '" + db_pas('[[파일:' + file_data + ']][br][br]{{{[[파일:' + file_data + ']]}}}[br][br]' + lice) + "', '')")
                             conn.commit()
                         
-                        history_plus('파일:' + file_data, '[[파일:' + file_data + ']][br][br]{{{[[파일:' + file_data + ']]}}}', get_time(), ip, '파일:' + file_data + ' 업로드', '0')
+                        history_plus(
+                            '파일:' + file_data, '[[파일:' + file_data + ']][br][br]{{{[[파일:' + file_data + ']]}}}', 
+                            get_time(), 
+                            ip, 
+                            '파일:' + file_data + ' 업로드', 
+                            '0'
+                        )
                         
                         conn.close()
                         return(redirect('/w/' + url_pas('파일:' + file_data)))
