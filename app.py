@@ -982,7 +982,7 @@ def history_view(name = None, num = 1):
                     div += '<tr> \
                                 <td> \
                                     ' + data['id'] + '판</a> <a href="/w/' + url_pas(data['title']) + '/r/' + url_pas(data['id']) + '">(보기)</a> \
-                                     <a href="/w/' + url_pas(data['title']) + '/raw/' + url_pas(data['id']) + '">(원본)</a> \
+                                     <a href="/raw/' + url_pas(data['title']) + '/r/' + url_pas(data['id']) + '">(원본)</a> \
                                      <a href="/revert/' + url_pas(data['title']) + '/r/' + url_pas(data['id']) + '">(되돌리기)</a> (' + leng + ') \
                                 </td> \
                                 <td>' + ip + ban + hidden + '</td> \
@@ -1125,89 +1125,10 @@ def deep_search(name = None, num = 1):
             sub = '검색'
         )
     )
-        
-@route('/w/<name:path>/r/<num:int>')
-def old_view(name = None, num = None):
-    conn = pymysql.connect(
-        user = set_data['user'], 
-        password = set_data['pw'], 
-        charset = 'utf8mb4', 
-        db = set_data['db']
-    )
-    curs = conn.cursor(pymysql.cursors.DictCursor)
-
-    curs.execute("select * from hidhi where title = '" + db_pas(name) + "' and re = '" + db_pas(str(num)) + "'")
-    row = curs.fetchall()
-    if(row):
-        if(not admin_check(6) == 1):
-            conn.close()
-            return(redirect('/history/' + url_pas(name)))
-            
-    curs.execute("select * from history where title = '" + db_pas(name) + "' and id = '" + str(num) + "'")
-    rows = curs.fetchall()
-    if(rows):
-        conn.close()
-        return(
-            template('other', 
-                custom = custom_css_user(), 
-                license = set_data['license'], 
-                login = login_check(), 
-                title = name, 
-                logo = set_data['name'], 
-                page = url_pas(name), 
-                data = namumark(name, rows[0]['data'], 0), 
-                sub = '옛 문서'
-            )
-        )
-    else:
-        conn.close()
-        return(redirect('/history/' + url_pas(name)))
-            
-@route('/w/<name:path>/raw/<num:int>')
-def old_raw(name = None, num = None):
-    conn = pymysql.connect(
-        user = set_data['user'], 
-        password = set_data['pw'], 
-        charset = 'utf8mb4', 
-        db = set_data['db']
-    )
-    curs = conn.cursor(pymysql.cursors.DictCursor)
-
-    curs.execute("select * from hidhi where title = '" + db_pas(name) + "' and re = '" + db_pas(str(num)) + "'")
-    row = curs.fetchall()
-    if(row):
-        if(not admin_check(6) == 1):
-            conn.close()
-            return(redirect('/error/3'))
-
-    curs.execute("select * from history where title = '" + db_pas(name) + "' and id = '" + str(num) + "'")
-    rows = curs.fetchall()
-    if(rows):
-        enddata = re.sub('<', '&lt;', rows[0]['data'])
-        enddata = re.sub('>', '&gt;', enddata)
-        enddata = re.sub('"', '&quot;', enddata)
-        
-        enddata = '<textarea id="other_text">' + enddata + '</textarea>'
-        
-        conn.close()
-        return(
-            template('other', 
-                custom = custom_css_user(), 
-                license = set_data['license'], 
-                login = login_check(), 
-                title = name, 
-                logo = set_data['name'], 
-                page = url_pas(name), 
-                data = enddata, 
-                sub = '옛 원본'
-            )
-        )
-    else:
-        conn.close()
-        return(redirect('/history/' + url_pas(name)))
-            
+         
 @route('/raw/<name:path>')
-def raw_view(name = None):
+@route('/raw/<name:path>/r/<num:int>')
+def raw_view(name = None, num = None):
     conn = pymysql.connect(
         user = set_data['user'], 
         password = set_data['pw'], 
@@ -1216,7 +1137,18 @@ def raw_view(name = None):
     )
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
-    curs.execute("select * from data where title = '" + db_pas(name) + "'")
+    if(num):
+        curs.execute("select * from hidhi where title = '" + db_pas(name) + "' and re = '" + db_pas(str(num)) + "'")
+        hid = curs.fetchall()
+        if(hid):
+            if(not admin_check(6) == 1):
+                conn.close()
+                return(redirect('/error/3'))
+        
+        curs.execute("select * from history where title = '" + db_pas(name) + "' and id = '" + str(num) + "'")
+    else:
+        curs.execute("select * from data where title = '" + db_pas(name) + "'")
+
     rows = curs.fetchall()
     if(rows):
         enddata = re.sub('<', '&lt;', rows[0]['data'])
@@ -3277,8 +3209,9 @@ def down(name = None):
     )
 
 @route('/w/<name:path>')
+@route('/w/<name:path>/r/<num:int>')
 @route('/w/<name:path>/from/<redirect:path>')
-def read_view(name = None, redirect = None):
+def read_view(name = None, num = None, redirect = None):
     conn = pymysql.connect(
         user = set_data['user'], 
         password = set_data['pw'], 
@@ -3293,7 +3226,6 @@ def read_view(name = None, redirect = None):
     div = ''
     topic = ''
     
-    i = 0
     curs.execute("select sub from rd where title = '" + db_pas(name) + "' order by date asc")
     rows = curs.fetchall()
     for data in rows:
@@ -3301,15 +3233,16 @@ def read_view(name = None, redirect = None):
         row = curs.fetchall()
         if(not row):
             topic = "open"
-            break
             
+            break
+                
     curs.execute("select title from data where title like '%" + db_pas(name) + "/%'")
     under = curs.fetchall()
     if(under):
         down = True
     else:
         down = False
-    
+        
     m = re.search("^(.*)\/(.*)$", name)
     if(m):
         uppage = m.groups()[0]
@@ -3320,7 +3253,7 @@ def read_view(name = None, redirect = None):
         admin_memu = 'ACL'
     else:
         admin_memu = ''
-    
+        
     if(re.search("^분류:", name)):
         curs.execute("delete from cat where title = '" + db_pas(name) + "' and cat = ''")
         conn.commit()
@@ -3333,14 +3266,26 @@ def read_view(name = None, redirect = None):
             
             for data in rows:       
                 div += '<li><a href="/w/' + url_pas(data['cat']) + '">' + data['cat'] + '</a></li>'
-    
-    curs.execute("select * from data where title = '" + db_pas(name) + "'")
+
+    if(num):
+        curs.execute("select * from hidhi where title = '" + db_pas(name) + "' and re = '" + db_pas(str(num)) + "'")
+        hid = curs.fetchall()
+        if(hid):
+            if(not admin_check(6) == 1):
+                conn.close()
+                return(redirect('/history/' + url_pas(name)))
+
+        curs.execute("select * from history where title = '" + db_pas(name) + "' and id = '" + str(num) + "'")
+    else:
+        curs.execute("select * from data where title = '" + db_pas(name) + "'")
+
     rows = curs.fetchall()
     if(rows):
-        if(rows[0]['acl'] == 'admin'):
-            acl = '(관리자)'
-        elif(rows[0]['acl'] == 'user'):
-            acl = '(로그인)'
+        if(not num):
+            if(rows[0]['acl'] == 'admin'):
+                acl = '(관리자)'
+            elif(rows[0]['acl'] == 'user'):
+                acl = '(로그인)'
                 
         elsedata = rows[0]['data']
     else:
