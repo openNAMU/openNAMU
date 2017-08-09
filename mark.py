@@ -708,7 +708,7 @@ def namumark(title, data, num):
             comp = re.compile("\.(?P<in>jpg|gif|png|jpeg)", re.I)
             c = comp.sub("#\g<in>#", c)
 
-            data = com.sub("<img align='" + align + "' width='" + width + "' height='" + height + "' src='" + c + "'></table>", data, 1)
+            data = com.sub("<img align='" + align + "' width='" + width + "' height='" + height + "' src='" + c + "'>", data, 1)
         else:
             break
             
