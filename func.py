@@ -39,7 +39,12 @@ def diff(seqm):
     return(''.join(output))
            
 def admin_check(num):
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    conn = pymysql.connect(
+        user = set_data['user'], 
+        password = set_data['pw'], 
+        charset = 'utf8mb4', 
+        db = set_data['db']
+    )
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
     ip = ip_check() 
@@ -107,7 +112,12 @@ def admin_check(num):
     conn.close()
                 
 def include_check(name, data):
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    conn = pymysql.connect(
+        user = set_data['user'], 
+        password = set_data['pw'], 
+        charset = 'utf8mb4', 
+        db = set_data['db']
+    )
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
     if(re.search('^틀:', name)):
@@ -126,7 +136,12 @@ def login_check():
         return(0)
 
 def ip_pas(raw_ip, num):
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    conn = pymysql.connect(
+        user = set_data['user'], 
+        password = set_data['pw'], 
+        charset = 'utf8mb4', 
+        db = set_data['db']
+    )
     curs = conn.cursor(pymysql.cursors.DictCursor)
     
     if(re.search("(\.|:)", raw_ip)):
@@ -160,7 +175,12 @@ def custom_css_user():
     return(data)
 
 def acl_check(ip, name):
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    conn = pymysql.connect(
+        user = set_data['user'], 
+        password = set_data['pw'], 
+        charset = 'utf8mb4', 
+        db = set_data['db']
+    )
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
     m = re.search("^사용자:([^/]*)", name)
@@ -271,7 +291,12 @@ def acl_check(ip, name):
     conn.close()
 
 def ban_check(ip):
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    conn = pymysql.connect(
+        user = set_data['user'], 
+        password = set_data['pw'], 
+        charset = 'utf8mb4', 
+        db = set_data['db']
+    )
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
     b = re.search("^([0-9](?:[0-9]?[0-9]?)\.[0-9](?:[0-9]?[0-9]?))", ip)
@@ -303,7 +328,12 @@ def ban_check(ip):
     conn.close()
         
 def topic_check(ip, name, sub):
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    conn = pymysql.connect(
+        user = set_data['user'], 
+        password = set_data['pw'], 
+        charset = 'utf8mb4', 
+        db = set_data['db']
+    )
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
     b = re.search("^([0-9](?:[0-9]?[0-9]?)\.[0-9](?:[0-9]?[0-9]?))", ip)
@@ -347,7 +377,12 @@ def topic_check(ip, name, sub):
     conn.close()
 
 def rd_plus(title, sub, date):
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    conn = pymysql.connect(
+        user = set_data['user'], 
+        password = set_data['pw'], 
+        charset = 'utf8mb4', 
+        db = set_data['db']
+    )
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
     curs.execute("select * from rd where title = '" + db_pas(title) + "' and sub = '" + db_pas(sub) + "'")
@@ -361,7 +396,12 @@ def rd_plus(title, sub, date):
     conn.close()
     
 def rb_plus(block, end, today, blocker, why):
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    conn = pymysql.connect(
+        user = set_data['user'], 
+        password = set_data['pw'], 
+        charset = 'utf8mb4', 
+        db = set_data['db']
+    )
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
     curs.execute("insert into rb (block, end, today, blocker, why) value ('" + db_pas(block) + "', '" + db_pas(end) + "', '" + today + "', '" + db_pas(blocker) + "', '" + db_pas(why) + "')")
@@ -370,7 +410,12 @@ def rb_plus(block, end, today, blocker, why):
     conn.close()
 
 def history_plus(title, data, date, ip, send, leng):
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
+    conn = pymysql.connect(
+        user = set_data['user'], 
+        password = set_data['pw'], 
+        charset = 'utf8mb4', 
+        db = set_data['db']
+    )
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
     curs.execute("select * from history where title = '" + db_pas(title) + "' order by id+0 desc limit 1")
