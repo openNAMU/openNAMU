@@ -487,9 +487,22 @@ def namumark(title, data, num):
     
     data = re.sub('&lt;math&gt;(?P<in>((?!&lt;math&gt;).)*)&lt;\/math&gt;', '$\g<in>$', data)
     
-    data = re.sub('{{\|(?P<in>(?:(?:(?:(?!\|}}).)*)(?:\n?))+)\|}}', '<table><tbody><tr><td>\g<in></td></tr></tbody></table>', data)
+    data = re.sub('{{\|(?P<in>(?:(?:(?:(?!\|}}).)*)(?:\n?))+)\|}}', '<table> \
+                                                                        <tbody> \
+                                                                            <tr> \
+                                                                                <td> \
+                                                                                    \g<in> \
+                                                                                </td> \
+                                                                            </tr> \
+                                                                        </tbody> \
+                                                                    </table>', data)
     
-    data = re.sub('\[ruby\((?P<in>[^\,]*)\,\s?(?P<out>[^\)]*)\)\]', '<ruby>\g<in><rp>(</rp><rt>\g<out></rt><rp>)</rp></ruby>', data)
+    data = re.sub('\[ruby\((?P<in>[^\,]*)\,\s?(?P<out>[^\)]*)\)\]', '<ruby> \
+                                                                        \g<in> \
+                                                                        <rp>(</rp> \
+                                                                        <rt>\g<out></rt> \
+                                                                        <rp>)</rp> \
+                                                                    </ruby>', data)
     
     data = re.sub("##\s?(?P<in>[^\n]*)\n", "<div style='display:none;'>\g<in></div>", data)
     
@@ -754,7 +767,7 @@ def namumark(title, data, num):
             break
     
     a = 1
-    tou = "<hr id='footnote'><div class='wiki-macro-footnote'><br>"
+    tou = "<hr id='footnote'><div><br>"
     namu = []
     while(True):
         b = re.search("\[\*([^\s]*)(?:\s(((?!\[|\]).)*))?\]", data)
@@ -775,9 +788,9 @@ def namumark(title, data, num):
                         break
                         
                 if(none_this == False):
-                    data = re.sub("\[\*([^\s]*)(?:\s(((?!\[|\]).)*))?\]", "<sup><a class=\"footnotes\" title=\"" + namu[i + 1] + "\" id=\"rfn-" + str(a) + "\" href=\"#fn-" + str(a) + "\">[" + results[0] + "]</a></sup>", data, 1)
+                    data = re.sub("\[\*([^\s]*)(?:\s(((?!\[|\]).)*))?\]", "<sup><a title=\"" + namu[i + 1] + "\" id=\"rfn-" + str(a) + "\" href=\"#fn-" + str(a) + "\">[" + results[0] + "]</a></sup>", data, 1)
                 else:
-                    data = re.sub("\[\*([^\s]*)(?:\s(((?!\[|\]).)*))?\]", "<sup><a class=\"footnotes\" id=\"rfn-" + str(a) + "\" href=\"#fn-" + str(a) + "\">[" + results[0] + "]</a></sup>", data, 1)
+                    data = re.sub("\[\*([^\s]*)(?:\s(((?!\[|\]).)*))?\]", "<sup><a id=\"rfn-" + str(a) + "\" href=\"#fn-" + str(a) + "\">[" + results[0] + "]</a></sup>", data, 1)
             elif(results[0]):                
                 namu += [results[0]]
                 namu += [results[1]]
@@ -785,22 +798,22 @@ def namumark(title, data, num):
                 c = results[1]
                 c = re.sub("<(?:[^>]*)>", '', c)
 
-                tou += "<span class='footnote-list'><a href=\"#rfn-" + str(a) + "\" id=\"fn-" + str(a) + "\">[" + results[0] + "]</a> " + results[1] + "</span><br>"
-                data = re.sub("\[\*([^\s]*)(?:\s(((?!\[|\]).)*))?\]", "<sup><a class=\"footnotes\" title=\"" + c + "\" id=\"rfn-" + str(a) + "\" href=\"#fn-" + str(a) + "\">[" + results[0] + "]</a></sup>", data, 1)     
+                tou += "<span id='footnote-list'><a href=\"#rfn-" + str(a) + "\" id=\"fn-" + str(a) + "\">[" + results[0] + "]</a> " + results[1] + "</span><br>"
+                data = re.sub("\[\*([^\s]*)(?:\s(((?!\[|\]).)*))?\]", "<sup><a title=\"" + c + "\" id=\"rfn-" + str(a) + "\" href=\"#fn-" + str(a) + "\">[" + results[0] + "]</a></sup>", data, 1)     
 
                 a += 1
             else:
                 c = results[1]
                 c = re.sub("<(?:[^>]*)>", '', c)
                 
-                tou += "<span class='footnote-list'><a href=\"#rfn-" + str(a) + "\" id=\"fn-" + str(a) + "\">[" + str(a) + "]</a> " + results[1] + "</span><br>"
-                data = re.sub("\[\*([^\s]*)(?:\s(((?!\[|\]).)*))?\]", '<sup><a class="footnotes" title="' + c + '" id="rfn-' + str(a) + '" href="#fn-' + str(a) + '">[' + str(a) + ']</a></sup>', data, 1)
+                tou += "<span id='footnote-list'><a href=\"#rfn-" + str(a) + "\" id=\"fn-" + str(a) + "\">[" + str(a) + "]</a> " + results[1] + "</span><br>"
+                data = re.sub("\[\*([^\s]*)(?:\s(((?!\[|\]).)*))?\]", '<sup><a title="' + c + '" id="rfn-' + str(a) + '" href="#fn-' + str(a) + '">[' + str(a) + ']</a></sup>', data, 1)
 
                 a += 1
         else:
             tou += '</div>'
 
-            if(tou == "<hr id='footnote'><div class='wiki-macro-footnote'><br></div>"):
+            if(tou == "<hr id='footnote'><div><br></div>"):
                 tou = ""
 
             break
@@ -811,7 +824,7 @@ def namumark(title, data, num):
     data += tou
     
     if(category):
-        data += '<div style="width:100%;border: 1px solid #777;padding: 5px;margin-top: 1em;">분류: ' + category + '</div>'
+        data += '<div id="cate">분류: ' + category + '</div>'
     
     data = re.sub("(?:\|\|\r\n)", "#table#<tablenobr>", data)
         
@@ -977,14 +990,23 @@ def namumark(title, data, num):
                         celstyle += '"'
                         rowstyle += '"'
                             
-                        table = re.sub("^(\|\|(?:(?:\|\|)+)?)((?:&lt;(?:(?:(?!&gt;).)*)&gt;)+)?", "<table " + alltable + "><tbody><tr " + rowstyle + "><td " + cel + " " + row + " " + celstyle + ">", table, 1)
+                        table = re.sub("^(\|\|(?:(?:\|\|)+)?)((?:&lt;(?:(?:(?!&gt;).)*)&gt;)+)?",   "<table " + alltable + "> \
+                                                                                                        <tbody> \
+                                                                                                            <tr " + rowstyle + "> \
+                                                                                                                <td " + cel + " " + row + " " + celstyle + ">", table, 1)
                     else:
                         cel = 'colspan="' + str(round(len(result[0]) / 2)) + '"'
-                        table = re.sub("^(\|\|(?:(?:\|\|)+)?)((?:&lt;(?:(?:(?!&gt;).)*)&gt;)+)?", "<table><tbody><tr><td " + cel + ">", table, 1)
+                        table = re.sub("^(\|\|(?:(?:\|\|)+)?)((?:&lt;(?:(?:(?!&gt;).)*)&gt;)+)?",   "<table> \
+                                                                                                        <tbody> \
+                                                                                                            <tr> \
+                                                                                                                <td " + cel + ">", table, 1)
                 else:
                     break
                     
-            table = re.sub("\|\|$", "</td></tr></tbody></table>", table)
+            table = re.sub("\|\|$",                 "</td> \
+                                                </tr> \
+                                            </tbody> \
+                                        </table>", table)
             
             while(True):
                 b = re.search("\|\|\r\n(\|\|(?:(?:\|\|)+)?)((?:&lt;(?:(?:(?!&gt;).)*)&gt;)+)?", table)
@@ -1072,10 +1094,16 @@ def namumark(title, data, num):
                         celstyle = celstyle + '"'
                         rowstyle = rowstyle + '"'
                         
-                        table = re.sub("\|\|\r\n(\|\|(?:(?:\|\|)+)?)((?:&lt;(?:(?:(?!&gt;).)*)&gt;)+)?", "</td></tr><tr " + rowstyle + "><td " + cel + " " + row + " " + celstyle + ">", table, 1)
+                        table = re.sub("\|\|\r\n(\|\|(?:(?:\|\|)+)?)((?:&lt;(?:(?:(?!&gt;).)*)&gt;)+)?",        "</td> \
+                                                                                                            </tr> \
+                                                                                                            <tr " + rowstyle + "> \
+                                                                                                                <td " + cel + " " + row + " " + celstyle + ">", table, 1)
                     else:
                         cel = 'colspan="' + str(round(len(result[0]) / 2)) + '"'
-                        table = re.sub("\|\|\r\n(\|\|(?:(?:\|\|)+)?)((?:&lt;(?:(?:(?!&gt;).)*)&gt;)+)?", "</td></tr><tr><td " + cel + ">", table, 1)
+                        table = re.sub("\|\|\r\n(\|\|(?:(?:\|\|)+)?)((?:&lt;(?:(?:(?!&gt;).)*)&gt;)+)?",        "</td> \
+                                                                                                            </tr> \
+                                                                                                            <tr> \
+                                                                                                                <td " + cel + ">", table, 1)
                 else:
                     break
 
@@ -1148,10 +1176,12 @@ def namumark(title, data, num):
 
                         celstyle = celstyle + '"'
                             
-                        table = re.sub("(\|\|(?:(?:\|\|)+)?)((?:&lt;(?:(?:(?!&gt;).)*)&gt;)+)?", "</td><td " + cel + " " + row + " " + celstyle + ">", table, 1)
+                        table = re.sub("(\|\|(?:(?:\|\|)+)?)((?:&lt;(?:(?:(?!&gt;).)*)&gt;)+)?",    "</td> \
+                                                                                                    <td " + cel + " " + row + " " + celstyle + ">", table, 1)
                     else:
                         cel = 'colspan="' + str(round(len(result[0]) / 2)) + '"'
-                        table = re.sub("(\|\|(?:(?:\|\|)+)?)((?:&lt;(?:(?:(?!&gt;).)*)&gt;)+)?", "</td><td " + cel + ">", table, 1)
+                        table = re.sub("(\|\|(?:(?:\|\|)+)?)((?:&lt;(?:(?:(?!&gt;).)*)&gt;)+)?",    "</td> \
+                                                                                                    <td " + cel + ">", table, 1)
                 else:
                     break
             
