@@ -11,7 +11,7 @@
 <h1 class="title">
     {{title}}
 </h1>
-<form id="usrform" action="/upload" method="POST">
+<form id="usrform" action="/upload" method="POST" enctype="multipart/form-data">
     <input class="form-control input-sm" type="file" name="file"> <button class="btn btn-primary" type="submit">업로드</button>
     <br>
     <br>

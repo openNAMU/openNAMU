@@ -1742,7 +1742,6 @@ def other():
                     <h2>기타</h2> \
                     <li><a href="/titleindex">모든 문서</a></li> \
                     <li><a href="/acllist">ACL 문서 목록</a></li> \
-                    <li><a href="/upload">업로드</a></li> \
                     <li><a href="/adminlist">관리자 목록</a></li> \
                     <li><a href="/manager/1">관리자 메뉴</a></li> \
                     <br> \
@@ -3514,6 +3513,7 @@ def custom_css():
             )
         )
 
+'''
 @route('/upload', method=['GET', 'POST'])
 def upload():
     conn = pymysql.connect(
@@ -3593,6 +3593,7 @@ def upload():
                 number = set_data['upload']
             )
         )
+'''
     
 @route('/count')
 def count_edit():
