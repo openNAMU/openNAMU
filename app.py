@@ -28,7 +28,7 @@ from mark import *
     
 db_pas = pymysql.escape_string
 
-r_ver = '2.1.6'
+r_ver = '2.1.7'
 
 try:
     conn = pymysql.connect(
