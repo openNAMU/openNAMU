@@ -1281,30 +1281,25 @@ def many_del():
     if(admin_check(2) == 1):
         if(request.method == 'POST'):
             data = request.forms.content + '\r\n'
-            while(True):
-                m = re.search('(.*)\r\n', data)
-                if(m):
-                    g = m.groups()
-                    curs.execute("select data from data where title = '" + db_pas(g[0]) + "'")
-                    rows = curs.fetchall()
-                    if(rows):
-                        curs.execute("delete from back where title = '" + db_pas(g[0]) + "'")
-                        curs.execute("delete from cat where title = '" + db_pas(g[0]) + "'")
+            m = re.findall('(.*)\r\n', data)
+            for g in m:
+                curs.execute("select data from data where title = '" + db_pas(g) + "'")
+                rows = curs.fetchall()
+                if(rows):
+                    curs.execute("delete from back where title = '" + db_pas(g) + "'")
+                    curs.execute("delete from cat where title = '" + db_pas(g) + "'")
 
-                        leng = '-' + str(len(rows[0]['data']))
-                        curs.execute("delete from data where title = '" + db_pas(g[0]) + "'")
-                        history_plus(
-                            g[0], 
-                            '', 
-                            today, 
-                            ip, 
-                            request.forms.send + ' (대량 삭제)', 
-                            leng
-                        )
-                    data = re.sub('(.*)\r\n', '', data, 1)
-                else:
-                    break
-            
+                    leng = '-' + str(len(rows[0]['data']))
+                    curs.execute("delete from data where title = '" + db_pas(g) + "'")
+                    history_plus(
+                        g, 
+                        '', 
+                        today, 
+                        ip, 
+                        request.forms.send + ' (대량 삭제)', 
+                        leng
+                    )
+                data = re.sub('(.*)\r\n', '', data, 1)
             conn.commit()
             
             conn.close()
@@ -1397,7 +1392,7 @@ def section_edit(name = None, num = None):
                 j = 0
                 
                 gdata = rows[0]['data'] + '\r\n'
-                while(True):
+                while(1):
                     m = re.search("((?:={1,6})\s?(?:[^=]*)\s?(?:={1,6})(?:\s+)?\n(?:(?:(?:(?!(?:={1,6})\s?(?:[^=]*)\s?(?:={1,6})(?:\s+)?\n).)*)(?:\n)?)+)", gdata)
                     if(m):
                         if(i == num - 1):
@@ -2611,11 +2606,11 @@ def login():
             curs.execute("select * from user where id = '" + db_pas(request.forms.id) + "'")
             user = curs.fetchall()
             if(user):
-                if(session.get('Now') == True):
+                if(session.get('Now') == 1):
                     conn.close()
                     return(redirect('/error/11'))
                 elif(bcrypt.checkpw(bytes(request.forms.pw, 'utf-8'), bytes(user[0]['pw'], 'utf-8'))):
-                    session['Now'] = True
+                    session['Now'] = 1
                     session['DREAMER'] = request.forms.id
 
                     curs.execute("select * from custom where user = '" + db_pas(request.forms.id) + "'")
@@ -2641,7 +2636,7 @@ def login():
             conn.close()
             return(redirect('/ban'))
         else:
-            if(session.get('Now') == True):
+            if(session.get('Now') == 1):
                 conn.close()
                 return(redirect('/error/11'))
             else:
@@ -2838,7 +2833,7 @@ def register():
 @route('/logout')
 def logout():
     session = request.environ.get('beaker.session')
-    session['Now'] = False
+    session['Now'] = 0
     session.pop('DREAMER', None)
 
     return(redirect('/user'))
@@ -3222,8 +3217,8 @@ def read_view(name = None, num = None, redirect = None):
     )
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
-    data_none = False
-    sub = None
+    data_none = 0
+    sub = 0
     acl = ''
     div = ''
     topic = ''
@@ -3241,15 +3236,15 @@ def read_view(name = None, num = None, redirect = None):
     curs.execute("select title from data where title like '%" + db_pas(name) + "/%'")
     under = curs.fetchall()
     if(under):
-        down = True
+        down = 1
     else:
-        down = False
+        down = 0
         
     m = re.search("^(.*)\/(.*)$", name)
     if(m):
         uppage = m.groups()[0]
     else:
-        uppage = False
+        uppage = 0
         
     if(admin_check(5) == 1):
         admin_memu = 'ACL'
@@ -3291,7 +3286,7 @@ def read_view(name = None, num = None, redirect = None):
                 
         elsedata = rows[0]['data']
     else:
-        data_none = True
+        data_none = 1
         elsedata = 'None'
 
     m = re.search("^사용자:([^/]*)", name)

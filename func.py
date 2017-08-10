@@ -51,56 +51,56 @@ def admin_check(num):
     curs.execute("select acl from user where id = '" + db_pas(ip) + "'")
     user = curs.fetchall()
     if(user):
-        reset = False
-        while(True):
-            if(num == 1 and reset == False):
+        reset = 0
+        while(1):
+            if(num == 1 and reset == 0):
                 curs.execute('select name from alist where name = "' + db_pas(user[0]["acl"]) + '" and acl = "ban"')
                 acl_data = curs.fetchall()
                 if(acl_data):
                     conn.close()
                     return(1)
                 else:
-                    reset = True
-            elif(num == 2 and reset == False):
+                    reset = 1
+            elif(num == 2 and reset == 0):
                 curs.execute('select name from alist where name = "' + db_pas(user[0]["acl"]) + '" and acl = "mdel"')
                 acl_data = curs.fetchall()
                 if(acl_data):
                     conn.close()
                     return(1)
                 else:
-                    reset = True
-            elif(num == 3 and reset == False):
+                    reset = 1
+            elif(num == 3 and reset == 0):
                 curs.execute('select name from alist where name = "' + db_pas(user[0]["acl"]) + '" and acl = "toron"')
                 acl_data = curs.fetchall()
                 if(acl_data):
                     conn.close()
                     return(1)
                 else:
-                    reset = True
-            elif(num == 4 and reset == False):
+                    reset = 1
+            elif(num == 4 and reset == 0):
                 curs.execute('select name from alist where name = "' + db_pas(user[0]["acl"]) + '" and acl = "check"')
                 acl_data = curs.fetchall()
                 if(acl_data):
                     conn.close()
                     return(1)
                 else:
-                    reset = True
-            elif(num == 5 and reset == False):
+                    reset = 1
+            elif(num == 5 and reset == 0):
                 curs.execute('select name from alist where name = "' + db_pas(user[0]["acl"]) + '" and acl = "acl"')
                 acl_data = curs.fetchall()
                 if(acl_data):
                     conn.close()
                     return(1)
                 else:
-                    reset = True
-            elif(num == 6 and reset == False):
+                    reset = 1
+            elif(num == 6 and reset == 0):
                 curs.execute('select name from alist where name = "' + db_pas(user[0]["acl"]) + '" and acl = "hidel"')
                 acl_data = curs.fetchall()
                 if(acl_data):
                     conn.close()
                     return(1)
                 else:
-                    reset = True
+                    reset = 1
             else:
                 curs.execute('select name from alist where name = "' + db_pas(user[0]["acl"]) + '" and acl = "owner"')
                 acl_data = curs.fetchall()
@@ -130,7 +130,7 @@ def include_check(name, data):
     
 def login_check():
     session = request.environ.get('beaker.session')
-    if(session.get('Now') == True):
+    if(session.get('Now') == 1):
         return(1)
     else:
         return(0)
