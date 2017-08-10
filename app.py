@@ -43,9 +43,7 @@ try:
     version = curs.fetchall()
     if(version):
         t_ver = re.sub('\.', '', version[0]['data'])
-        t_ver = re.sub('[a-z]$', '', t_ver)
         r_t_ver = re.sub('\.', '', r_ver)
-        r_t_ver = re.sub('[a-z]$', '', r_t_ver)
         if(int(t_ver) <= int(r_t_ver)):
             curs.execute("update other set data = '" + db_pas(r_ver) + "' where name = 'version'")
             
