@@ -319,7 +319,7 @@ def admin_list():
     i = 1
     div = '<div>'
     
-    curs.execute("select * from user where acl = 'admin' or acl = 'owner'")
+    curs.execute("select * from user where not acl = 'user'")
     user_data = curs.fetchall()
     if(user_data):
         for data in user_data:
