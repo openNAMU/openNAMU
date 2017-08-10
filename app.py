@@ -93,8 +93,12 @@ def setup():
             curs.execute("create table custom(user text, css longtext)")
             curs.execute("create table other(name text, data text)")
             curs.execute("create table alist(name text, acl text)")
+
+            curs.execute("delete from alist where name = 'owner'")
+            curs.execute("insert into alist (name, acl) value ('owner', 'owner')")
             
-            db_ex("insert into other (name, data) value ('version', '" + db_pas(r_ver) + "')")
+            curs.execute("delete from other where name = 'version'")
+            curs.execute("insert into other (name, data) value ('version', '" + db_pas(r_ver) + "')")
             conn.commit()
 
             conn.close()
