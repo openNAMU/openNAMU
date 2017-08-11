@@ -874,11 +874,9 @@ def namumark(title, data, num):
                         if(e):
                             resultss = e.groups()
                             if(resultss[0] == 'right'):
-                                alltable += 'margin-left:auto;'
+                                alltable += 'float:right;'
                             elif(resultss[0] == 'center'):
                                 alltable += 'margin:auto;'
-                            else:
-                                alltable += 'margin-right:auto;'
                                 
                         ee = re.search("&lt;table\s?textalign=((?:(?!&gt;).)*)&gt;", result[1])
                         if(ee):
@@ -887,8 +885,6 @@ def namumark(title, data, num):
                                 alltable += 'text-align:right;'
                             elif(resultss[0] == 'center'):
                                 alltable += 'text-align:center;'
-                            else:
-                                alltable += 'text-align:left;'
                         
                         r = re.search("&lt;-((?:(?!&gt;).)*)&gt;", result[1])
                         if(r):
