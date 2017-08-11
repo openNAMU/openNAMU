@@ -2085,8 +2085,8 @@ def topic_top(name = None, sub = None, num = None):
         conn.close()
         return(redirect('/error/3'))
         
-@route('/topic/<name:path>/sub/<sub:path>/stop')
-def topic_stop(name = None, sub = None):
+@route('/topic/<name:path>/sub/<sub:path>/<tool:path>')
+def topic_stop(name = None, sub = None, tool = None):
     conn = pymysql.connect(
         user = set_data['user'], 
         password = set_data['pw'], 
@@ -2095,48 +2095,19 @@ def topic_stop(name = None, sub = None):
     )
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
-    if(admin_check(3) == 1):
-        ip = ip_check()
-        
-        curs.execute("select * from topic where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' order by id + 0 desc limit 1")
-        topic_check = curs.fetchall()
-        if(topic_check):
-            time = get_time()
-            
-            curs.execute("select * from stop where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' and close = ''")
-            stop = curs.fetchall()
-            if(stop):
-                curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) value ('" + db_pas(str(int(topic_check[0]['id']) + 1)) + "', '" + db_pas(name) + "', '" + db_pas(sub) + "', '토론 재 시작', '" + db_pas(time) + "', '" + db_pas(ip) + "', '', '1')")
-                curs.execute("delete from stop where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' and close = ''")
-            else:
-                curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) value ('" + db_pas(str(int(topic_check[0]['id']) + 1)) + "', '" + db_pas(name) + "', '" + db_pas(sub) + "', '토론 정지', '" + db_pas(time) + "', '" + db_pas(ip) + "', '', '1')")
-                curs.execute("insert into stop (title, sub, close) value ('" + db_pas(name) + "', '" + db_pas(sub) + "', '')")
-            conn.commit()
-            
-            rd_plus(
-                name, 
-                sub, 
-                time
-            )
-            
-            conn.close()
-            return(redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub)))
-        else:
-            conn.close()
-            return(redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub)))
+    if(tool == 'close'):
+        close = 'O'
+        n_close = ''
+        data = '토론 닫음'
+        n_data = '토론 다시 열기'
+    elif(tool == 'stop'):
+        close = ''
+        n_close = 'O'
+        data = '토론 정지'
+        n_data = '토론 재 시작'
     else:
         conn.close()
-        return(redirect('/error/3'))
-        
-@route('/topic/<name:path>/sub/<sub:path>/close')
-def topic_close(name = None, sub = None):
-    conn = pymysql.connect(
-        user = set_data['user'], 
-        password = set_data['pw'], 
-        charset = 'utf8mb4', 
-        db = set_data['db']
-    )
-    curs = conn.cursor(pymysql.cursors.DictCursor)
+        return(redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub)))
 
     if(admin_check(3) == 1):
         ip = ip_check()
@@ -2146,14 +2117,15 @@ def topic_close(name = None, sub = None):
         if(topic_check):
             time = get_time()
             
-            curs.execute("select * from stop where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' and close = 'O'")
-            close = curs.fetchall()
-            if(close):
-                curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) value ('" + db_pas(str(int(topic_check[0]['id']) + 1)) + "', '" + db_pas(name) + "', '" + db_pas(sub) + "', '토론 다시 열기', '" + db_pas(time) + "', '" + db_pas(ip) + "', '', '1')")
-                curs.execute("delete from stop where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' and close = 'O'")
+            curs.execute("select * from stop where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' and close = '" + db_pas(close) + "'")
+            stop = curs.fetchall()
+            if(stop):
+                curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) value ('" + db_pas(str(int(topic_check[0]['id']) + 1)) + "', '" + db_pas(name) + "', '" + db_pas(sub) + "', '" + db_pas(n_data) + "', '" + db_pas(time) + "', '" + db_pas(ip) + "', '', '1')")
+                curs.execute("delete from stop where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' and close = '" + db_pas(close) + "'")
             else:
-                curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) value ('" + db_pas(str(int(topic_check[0]['id']) + 1)) + "', '" + db_pas(name) + "', '" + db_pas(sub) + "', '토론 닫음', '" + db_pas(time) + "', '" + db_pas(ip) + "', '', '1')")
-                curs.execute("insert into stop (title, sub, close) value ('" + db_pas(name) + "', '" + db_pas(sub) + "', 'O')")
+                curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) value ('" + db_pas(str(int(topic_check[0]['id']) + 1)) + "', '" + db_pas(name) + "', '" + db_pas(sub) + "', '" + db_pas(data) + "', '" + db_pas(time) + "', '" + db_pas(ip) + "', '', '1')")
+                curs.execute("insert into stop (title, sub, close) value ('" + db_pas(name) + "', '" + db_pas(sub) + "', '" + close + "')")
+                curs.execute("delete from stop where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' and close = '" + db_pas(n_close) + "'")
             conn.commit()
             
             rd_plus(
@@ -3571,88 +3543,6 @@ def custom_css():
                         </form>'
             )
         )
-
-'''
-@route('/upload', method=['GET', 'POST'])
-def upload():
-    conn = pymysql.connect(
-        user = set_data['user'], 
-        password = set_data['pw'], 
-        charset = 'utf8mb4', 
-        db = set_data['db']
-    )
-    curs = conn.cursor(pymysql.cursors.DictCursor)
-    
-    ip = ip_check()
-    ban = ban_check(ip)
-    
-    if(ban == 1):
-        conn.close()
-        return(redirect('/ban'))
-    elif(request.method == 'POST'):        
-        if(request.files.file):
-            comp = re.compile("^(.+)(\.(?:jpg|gif|png|jpeg))$", re.I)
-            exist = comp.search(request.files.file.filename)
-            if(exist):
-                if((int(set_data['upload']) * 1024 * 1024) < request.content_length):
-                    conn.close()
-                    return(redirect('/error/17'))
-                else:
-                    file_info = exist.groups()
-                    
-                    if(not request.forms.data):
-                        file_data = file_info[0] + file_info[1]
-                        file_name = sha224(file_info[0]) + file_info[1]
-                    else:
-                        file_data = request.forms.data + file_info[1]
-                        file_name = sha224(request.forms.data) + file_info[1]
-                                        
-                    if(os.path.exists(os.path.join('image', file_name))):
-                        conn.close()
-                        return(redirect('/error/16'))
-                    else:
-                        request.files.file.save(os.path.join('image', file_name))
-                        
-                        if(not request.forms.lice):
-                            lice = ip + ' 업로드'
-                        else:
-                            lice = '라이선스 : ' + request.forms.lice
-                        
-                        curs.execute("select title from data where title = '" + db_pas('파일:' + file_data) + "'")
-                        exist_db = curs.fetchall()
-                        if(not exist_db):
-                            curs.execute("insert into data (title, data, acl) value ('" + db_pas('파일:' + file_data) + "', '" + db_pas('[[파일:' + file_data + ']][br][br]{{{[[파일:' + file_data + ']]}}}[br][br]' + lice) + "', '')")
-                            conn.commit()
-                        
-                        history_plus(
-                            '파일:' + file_data, '[[파일:' + file_data + ']][br][br]{{{[[파일:' + file_data + ']]}}}', 
-                            get_time(), 
-                            ip, 
-                            '파일:' + file_data + ' 업로드', 
-                            '0'
-                        )
-                        
-                        conn.close()
-                        return(redirect('/w/' + url_pas('파일:' + file_data)))
-            else:
-                conn.close()
-                return(redirect('/error/14'))
-        else:
-            conn.close()
-            return(redirect('/error/14'))
-    else:        
-        conn.close()
-        return(
-            template('upload', 
-                custom = custom_css_user(), 
-                license = set_data['license'], 
-                login = login_check(), 
-                logo = set_data['name'], 
-                title = '업로드', 
-                number = set_data['upload']
-            )
-        )
-'''
     
 @route('/count')
 def count_edit():
