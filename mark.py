@@ -26,7 +26,7 @@ def get_time():
     
 def ip_check():
     session = request.environ.get('beaker.session')
-    if(session.get('Now') == True):
+    if(session.get('Now') == 1):
         ip = format(session['DREAMER'])
     else:
         if(request.environ.get('HTTP_X_FORWARDED_FOR')):
@@ -58,7 +58,7 @@ def savemark(data):
 
 def html_pas(data, how):
     data = re.sub("%phtml%(?P<in>(?:\/)?(?:a|div|span|embed|iframe)(?:\s[^%]*)?)%phtml%", "<\g<in>>", data)   
-    while(True):
+    while(1):
         if(how == 1):
             y = re.search("<((a|div|span|embed|iframe)(?:\s[^>]*))>", data)
         else:  
@@ -108,7 +108,7 @@ def html_pas(data, how):
     return(data)
     
 def mid_pas(data, fol_num, include):
-    while(True):
+    while(1):
         com = re.compile("{{{((?:(?!{{{)(?!}}}).)*)}}}", re.DOTALL)
         y = com.search(data)
         
@@ -208,7 +208,7 @@ def mid_pas(data, fol_num, include):
                 result = html.groups()
                 data = com.sub(result[0], data, 1)
             elif(include_out):
-                if(include == True):
+                if(include == 1):
                     data = com.sub("", data, 1)
                 else:
                     result = include_out.groups()
@@ -218,7 +218,7 @@ def mid_pas(data, fol_num, include):
         else:
             break
             
-    while(True):
+    while(1):
         com = re.compile("<code>(((?!<\/code>).)*)<\/code>", re.DOTALL)
         y = com.search(data)
         if(y):
@@ -244,7 +244,7 @@ def toc_pas(data, title):
     last = 0
     span = ''
     rtoc = '<div id="toc"><span id="toc-name">목차</span><br><br>'
-    while(True):
+    while(1):
         i[0] += 1
         m = re.search('(={1,6})\s?([^=]*)\s?(?:={1,6})(?:\s+)?\n', data)
         if(m):
@@ -358,7 +358,7 @@ def namumark(title, data, num):
     data = html_pas(data, 1)
 
     b = 0
-    a = mid_pas(data, b, False)
+    a = mid_pas(data, b, 0)
     
     data = a[0]
     b = a[1]
@@ -367,7 +367,7 @@ def namumark(title, data, num):
     data = savemark(data)
     
     include = re.compile("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]")
-    while(True):
+    while(1):
         m = include.search(data)
         if(m):
             results = m.groups()
@@ -383,11 +383,11 @@ def namumark(title, data, num):
                     in_data = include.sub("", in_data)
                     
                     in_data = html_pas(in_data, 1)
-                    in_data = mid_pas(in_data, b, True)[0]
+                    in_data = mid_pas(in_data, b, 1)[0]
                     
                     if(results[1]):
                         a = results[1]
-                        while(True):
+                        while(1):
                             g = re.search("([^= ,]*)\=([^,]*)", a)
                             if(g):
                                 result = g.groups()
@@ -404,7 +404,7 @@ def namumark(title, data, num):
         else:
             break
     
-    while(True):
+    while(1):
         m = re.search('^#(?:redirect|넘겨주기) ([^\n]*)$', data)
         if(m):
             results = m.groups()
@@ -425,7 +425,7 @@ def namumark(title, data, num):
     data = '\n' + data + '\n'
     data = re.sub("\[nicovideo\((?P<in>[^,)]*)(?:(?:,(?:[^,)]*))+)?\)\]", "[[http://embed.nicovideo.jp/watch/\g<in>]]", data)
     
-    while(True):
+    while(1):
         m = re.search("\n&gt;\s?((?:[^\n]*)(?:(?:(?:(?:\n&gt;\s?)(?:[^\n]*))+)?))", data)
         if(m):
             result = m.groups()
@@ -446,7 +446,7 @@ def namumark(title, data, num):
     data = toc_pas(data, title)
     
     category = ''
-    while(True):
+    while(1):
         m = re.search("\[\[(분류:(?:(?:(?!\]\]).)*))\]\]", data)
         if(m):
             g = m.groups()
@@ -514,7 +514,7 @@ def namumark(title, data, num):
             else:
                 data = re.sub('\[\[wiki:([^|\]]+)(?:\|([^\]]+))?\]\]', '<a id="inside" href="/' + wiki[0] + '">' + wiki[0] + '</a>', data, 1)
     
-    while(True):
+    while(1):
         m = re.search("\[\[파일:((?:(?!\]\]|\|).)*)(?:\|((?:(?!\]\]).)*))?\]\]", data)
         if(m):
             c = m.groups()
@@ -564,7 +564,7 @@ def namumark(title, data, num):
     
     data = re.sub("\[br\]",'<br>', data)
     
-    while(True):
+    while(1):
         com = re.compile("\[youtube\(([^, )]*)(,[^)]*)?\)\]")
         m = com.search(data)
         if(m):
@@ -622,7 +622,7 @@ def namumark(title, data, num):
 
     data = re.sub('\[\[(?P<in>\/[^\]|]*)(?P<out>\|(?:[^\]]*))?\]\]', '[[' + title + '\g<in>\g<out>]]', data)
                 
-    while(True):
+    while(1):
         m = re.search("\[\[(((?!\]\]).)*)\]\]", data)
         if(m):
             result = m.groups()
@@ -678,7 +678,7 @@ def namumark(title, data, num):
         else:
             break
             
-    while(True):
+    while(1):
         com = re.compile("(http(?:s)?:\/\/(?:(?:(?:(?!\.(?:jpg|png|gif|jpeg)|#(?:jpg|png|gif|jpeg)#|<\/(?:[^>]*)>).)*)(?:\.(?:jpg|png|gif|jpeg))))(\?[^ \r\n]*)?", re.I)
         m = com.search(data)
         if(m):
@@ -712,13 +712,13 @@ def namumark(title, data, num):
         else:
             break
             
-    while(True):
+    while(1):
         m = re.search("((?:(?:( +)\*\s(?:[^\n]*))\n?)+)", data)
         if(m):
             result = m.groups()
             end = str(result[0])
 
-            while(True):
+            while(1):
                 isspace = re.search("( +)\*\s([^\n]*)", end)
                 if(isspace):
                     spacebar = isspace.groups()
@@ -753,7 +753,7 @@ def namumark(title, data, num):
     data = comp.sub(".\g<in>", data)
     data = re.sub("-{4,11}", "<hr>", data)
     
-    while(True):
+    while(1):
         b = re.search("(<\/h[0-9]>|\n)( +)", data)
         if(b):
             result = b.groups()
@@ -769,25 +769,25 @@ def namumark(title, data, num):
     a = 1
     tou = "<hr id='footnote'><div><br>"
     namu = []
-    while(True):
+    while(1):
         b = re.search("\[\*([^\s]*)(?:\s(((?!\[|\]).)*))?\]", data)
         if(b):
             results = b.groups()
             if(not results[1] and results[0]):
                 i = 0
                 
-                while(True):
+                while(1):
                     try:
                         if(namu[i] == results[0]):
-                            none_this = False
+                            none_this = 0
                             break
                         else:
                             i += 2
                     except:
-                        none_this = True
+                        none_this = 1
                         break
                         
-                if(none_this == False):
+                if(none_this == 0):
                     data = re.sub("\[\*([^\s]*)(?:\s(((?!\[|\]).)*))?\]", "<sup><a title=\"" + namu[i + 1] + "\" id=\"rfn-" + str(a) + "\" href=\"#fn-" + str(a) + "\">[" + results[0] + "]</a></sup>", data, 1)
                 else:
                     data = re.sub("\[\*([^\s]*)(?:\s(((?!\[|\]).)*))?\]", "<sup><a id=\"rfn-" + str(a) + "\" href=\"#fn-" + str(a) + "\">[" + results[0] + "]</a></sup>", data, 1)
@@ -828,7 +828,7 @@ def namumark(title, data, num):
     
     data = re.sub("(?:\|\|\r\n)", "#table#<tablenobr>", data)
         
-    while(True):
+    while(1):
         y = re.search("(\|\|(?:(?:(?:(?:(?!\|\|).)*)(?:\n?))+))", data)
         if(y):
             a = y.groups()
@@ -843,12 +843,12 @@ def namumark(title, data, num):
     data = re.sub("#table#", "||", data)
     data = re.sub("<tablenobr>", "\r\n", data)
     
-    while(True):
+    while(1):
         m = re.search("(\|\|(?:(?:(?:.*)\n?)\|\|)+)", data)
         if(m):
             results = m.groups()
             table = results[0]
-            while(True):
+            while(1):
                 a = re.search("^(\|\|(?:(?:\|\|)+)?)((?:&lt;(?:(?:(?!&gt;).)*)&gt;)+)?", table)
                 if(a):
                     row = ''
@@ -1008,7 +1008,7 @@ def namumark(title, data, num):
                                             </tbody> \
                                         </table>", table)
             
-            while(True):
+            while(1):
                 b = re.search("\|\|\r\n(\|\|(?:(?:\|\|)+)?)((?:&lt;(?:(?:(?!&gt;).)*)&gt;)+)?", table)
                 if(b):
                     row = ''
@@ -1107,7 +1107,7 @@ def namumark(title, data, num):
                 else:
                     break
 
-            while(True):
+            while(1):
                 c = re.search("(\|\|(?:(?:\|\|)+)?)((?:&lt;(?:(?:(?!&gt;).)*)&gt;)+)?", table)
                 if(c):
                     row = ''
