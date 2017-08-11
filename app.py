@@ -7,8 +7,54 @@ import hashlib
 import json
 import pymysql
 
-json_data = open('set.json').read()
-set_data = json.loads(json_data)
+try:
+    json_data = open('set.json').read()
+    set_data = json.loads(json_data)
+except:
+    new_json = []
+
+    print('DB 이름 : ', end = '')
+    new_json += [input()]
+
+    print('DB 사용자 : ', end = '')
+    new_json += [input()]
+
+    print('DB 비밀번호 : ', end = '')
+    new_json += [input()]
+    
+    print('위키 이름 : ', end = '')
+    new_json += [input()]
+
+    print('대문 : ', end = '')
+    new_json += [input()]
+
+    print('라이선스 : ', end = '')
+    new_json += [input()]
+
+    print('비밀 키 : ', end = '')
+    new_json += [input()]
+
+    print('업로드 제한 (MB) : ', end = '')
+    new_json += [input()]
+
+    print('위키 포트 : ', end = '')
+    new_json += [input()]
+
+    with open("set.json", "w") as f:
+        f.write('{ \
+                    "db" : "' + new_json[0] + '", \
+                    "user" : "' + new_json[1] + '", \
+                    "pw" : "' + new_json[2] + '", \
+                    "name" : "' + new_json[3] + '", \
+                    "frontpage" : "' + new_json[4] + '", \
+                    "license" : "' + new_json[5] + '", \
+                    "key" : "' + new_json[6] + '", \
+                    "upload" : "' + new_json[7] + '", \
+                    "port" : "' + new_json[8] + '" \
+                }')
+    
+    json_data = open('set.json').read()
+    set_data = json.loads(json_data)
 
 session_opts = {
     'session.type': 'file',
@@ -64,7 +110,7 @@ def setup():
     curs = conn.cursor(pymysql.cursors.DictCursor)
     
     if(request.method == 'POST'):            
-        if(not request.forms.owner == set_data['pw']):         
+        if(request.forms.owner != set_data['pw']):         
             conn.close()
             return(redirect('/error/3'))
         else:
@@ -1075,7 +1121,7 @@ def deep_search(name = None, num = 1):
         else:
             all_list = ''
     
-    if(not all_list == ''):
+    if(all_list != ''):
         for data in all_list:
             re_title = re.compile(name, re.I)
             if(re.search(re_title, data['title'])):
@@ -1123,7 +1169,7 @@ def raw_view(name = None, num = None):
         curs.execute("select * from hidhi where title = '" + db_pas(name) + "' and re = '" + db_pas(str(num)) + "'")
         hid = curs.fetchall()
         if(hid):
-            if(not admin_check(6) == 1):
+            if(admin_check(6) != 1):
                 conn.close()
                 return(redirect('/error/3'))
         
@@ -1174,7 +1220,7 @@ def revert(name = None, num = None):
         curs.execute("select * from hidhi where title = '" + db_pas(name) + "' and re = '" + db_pas(str(num)) + "'")
         row = curs.fetchall()
         if(row):
-            if(not admin_check(6) == 1):        
+            if(admin_check(6) != 1):        
                 conn.close()
                 return(redirect('/error/3'))
 
@@ -1217,7 +1263,7 @@ def revert(name = None, num = None):
         curs.execute("select * from hidhi where title = '" + db_pas(name) + "' and re = '" + db_pas(str(num)) + "'")
         row = curs.fetchall()
         if(row):
-            if(not admin_check(6) == 1):
+            if(admin_check(6) != 1):
                 conn.close()
                 return(redirect('/error/3'))         
                           
@@ -2190,7 +2236,7 @@ def topic(name = None, sub = None):
         else:
             num = 1
         
-        if(ban == 1 and not admin == 1):
+        if(ban == 1 and admin != 1):
             conn.close()
             return(redirect('/ban'))
         else:                    
@@ -2243,7 +2289,7 @@ def topic(name = None, sub = None):
             div = '<div>'
         
         if(stop or close):
-            if(not admin == 1):
+            if(admin != 1):
                 style = 'display:none;'
         
         curs.execute("select * from topic where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' order by id + 0 asc")
@@ -2318,7 +2364,7 @@ def topic(name = None, sub = None):
             curs.execute('select acl from user where id = "' + db_pas(dain['ip']) + '"')
             adch = curs.fetchall()
             if(adch):
-                if(not adch[0]['acl'] == 'user'):
+                if(adch[0]['acl'] != 'user'):
                     chad = ' ★'
 
             ip = ip_pas(dain['ip'], 1)
@@ -2706,7 +2752,7 @@ def user_check(name = None):
 
     curs.execute("select * from user where id = '" + db_pas(name) + "'")
     user = curs.fetchall()
-    if(user and not user[0]['acl'] == 'user'):
+    if(user and user[0]['acl'] != 'user'):
         conn.close()
         return(redirect('/error/4'))
     else:
@@ -2829,7 +2875,7 @@ def user_ban(name = None):
 
     curs.execute("select * from user where id = '" + db_pas(name) + "'")
     user = curs.fetchall()
-    if(user and not user[0]['acl'] == 'user'):
+    if(user and user[0]['acl'] != 'user'):
         conn.close()
         return(redirect('/error/4'))
     else:
@@ -2972,7 +3018,7 @@ def user_admin(name = None):
             curs.execute("select * from user where id = '" + db_pas(name) + "'")
             user = curs.fetchall()
             if(user):
-                if(not user[0]['acl'] == 'user'):
+                if(user[0]['acl'] != 'user'):
                     curs.execute("update user set acl = 'user' where id = '" + db_pas(name) + "'")
                 else:
                     curs.execute("update user set acl = '" + db_pas(request.forms.select) + "' where id = '" + db_pas(name) + "'")
@@ -2991,7 +3037,7 @@ def user_admin(name = None):
             curs.execute("select * from user where id = '" + db_pas(name) + "'")
             user = curs.fetchall()
             if(user):
-                if(not user[0]['acl'] == 'user'):
+                if(user[0]['acl'] != 'user'):
                     now = '권한 해제'
                 else:
                     now = '권한 부여'
@@ -3004,7 +3050,7 @@ def user_admin(name = None):
                     i = 0
                     name_rem = ''
                     for data in get_alist:
-                        if(not name_rem == data['name']):
+                        if(name_rem != data['name']):
                             name_rem = data['name']
                             div += '<option value="' + data['name'] + '" selected="selected">' + data['name'] + '</option>'                       
                     
@@ -3247,7 +3293,7 @@ def read_view(name = None, num = None, redirect = None):
         curs.execute("select * from hidhi where title = '" + db_pas(name) + "' and re = '" + db_pas(str(num)) + "'")
         hid = curs.fetchall()
         if(hid):
-            if(not admin_check(6) == 1):
+            if(admin_check(6) != 1):
                 conn.close()
                 return(redirect('/history/' + url_pas(name)))
 
@@ -3275,7 +3321,7 @@ def read_view(name = None, num = None, redirect = None):
         curs.execute("select acl from user where id = '" + db_pas(g[0]) + "'")
         test = curs.fetchall()
         if(test):
-            if(not test[0]['acl'] == 'user'):
+            if(test[0]['acl'] != 'user'):
                 acl = '(관리자)'
 
         curs.execute("select block from ban where block = '" + db_pas(g[0]) + "'")
@@ -3415,7 +3461,7 @@ def user_info():
     rows = curs.fetchall()
     if(ban_check(ip) == 0):
         if(rows):
-            if(not rows[0]['acl'] == 'user'):
+            if(rows[0]['acl'] != 'user'):
                 acl = rows[0]['acl']
             else:
                 acl = '로그인'

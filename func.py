@@ -204,7 +204,7 @@ def acl_check(ip, name):
             conn.close()
             return(1)
     elif(n):
-        if(not admin_check(None) == 1):
+        if(admin_check(None) != 1):
             conn.close()
             return(1)
     else:

@@ -83,7 +83,7 @@ def html_pas(data, how):
                 a = re.sub('(?:"|\')', '#.#', a)
 
                 try:
-                    if(not check[1] == None):
+                    if(check[1] != None):
                         data = re.sub("<((?:\/)?" + b[1] + "(?:\s[^>]*))>", "%phtml%" + a + "%phtml%", data, 1)
                         data = re.sub("<\/" + b[1] + ">", "%phtml%/" + b[1] + "%phtml%", data, 1)
                     else:
@@ -451,7 +451,7 @@ def namumark(title, data, num):
         if(m):
             g = m.groups()
             
-            if(not title == g[0]):
+            if(title != g[0]):
                 cat_plus(title, g[0], num)
                     
                 if(category == ''):
