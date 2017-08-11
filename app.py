@@ -501,7 +501,7 @@ def recentchanges():
                         </table> \
                     </div>'
     else:
-        div = 'None'
+        div = ''
             
     conn.close()
     return(
@@ -2000,7 +2000,7 @@ def title_index():
                  <li>파일 문서는 총 ' + str(i[4]) + '개의 문서가 있습니다.</li> \
                  <li>나머지 문서는 총 ' + str(i[5]) + '개의 문서가 있습니다.</li>'
     else:
-        data = 'None'
+        data = ''
 
     conn.close()
     return(
@@ -2766,13 +2766,26 @@ def user_check(name = None):
             curs.execute("select * from login where " + sql + " = '" + db_pas(name) + "' order by today desc")
             row = curs.fetchall()
             if(row):
-                c = '<div><table style="width: 100%;"><tbody><tr><td style="text-align: center;width:33.33%;">이름</td><td style="text-align: center;width:33.33%;">아이피</td><td style="text-align: center;width:33.33%;">언제</td></tr>'
+                c = '<div> \
+                        <table style="text-align: center; width: 100%;"> \
+                            <tbody> \
+                                <tr> \
+                                    <td style="width:33.33%;">이름</td> \
+                                    <td style="width:33.33%;">아이피</td> \
+                                    <td style="width:33.33%;">언제</td> \
+                                </tr>'
                 for data in row:
-                    c += '<tr><td style="text-align: center;width:33.33%;">' + data['user'] + '</td><td style="text-align: center;width:33.33%;">' + data['ip'] + '</td><td style="text-align: center;width:33.33%;">' + data['today'] + '</td></tr>'
+                    c +=    '<tr> \
+                                <td>' + data['user'] + '</td> \
+                                <td>' + data['ip'] + '</td> \
+                                <td>' + data['today'] + '</td> \
+                            </tr>'
                 else:
-                    c += '</tbody></table></div>'
+                    c +=            '</tbody> \
+                                </table> \
+                            </div>'
             else:
-                c = 'None'
+                c = ''
                     
             conn.close()
             return(
@@ -3312,7 +3325,7 @@ def read_view(name = None, num = None, redirect = None):
         elsedata = rows[0]['data']
     else:
         data_none = 1
-        elsedata = 'None'
+        elsedata = ''
 
     m = re.search("^사용자:([^/]*)", name)
     if(m):
