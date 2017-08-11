@@ -13,8 +13,6 @@ conn = pymysql.connect(
 )
 curs = conn.cursor(pymysql.cursors.DictCursor)   
 
-db_pas = pymysql.escape_string
-
 r_ver = '2.1.7'
 
 conn.commit()

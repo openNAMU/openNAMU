@@ -35,8 +35,6 @@ def ip_check():
             ip = request.environ.get('REMOTE_ADDR')
 
     return(ip)
-    
-db_pas = pymysql.escape_string
 
 def url_pas(data):
     return(parse.quote(data).replace('/','%2F'))
@@ -330,10 +328,10 @@ def backlink_plus(name, link, backtype, num):
         conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
         curs = conn.cursor(pymysql.cursors.DictCursor)
         
-        curs.execute("select title from back where title = '" + db_pas(link) + "' and link = '" + db_pas(name) + "' and type = '" + backtype + "'")
+        curs.execute("select title from back where title = '" + pymysql.escape_string(link) + "' and link = '" + pymysql.escape_string(name) + "' and type = '" + backtype + "'")
         y = curs.fetchall()
         if(not y):
-            curs.execute("insert into back (title, link, type) value ('" + db_pas(link) + "', '" + db_pas(name) + "',  '" + backtype + "')")
+            curs.execute("insert into back (title, link, type) value ('" + pymysql.escape_string(link) + "', '" + pymysql.escape_string(name) + "',  '" + backtype + "')")
             conn.commit()
             
         conn.close()
@@ -343,10 +341,10 @@ def cat_plus(name, link, num):
         conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
         curs = conn.cursor(pymysql.cursors.DictCursor)
         
-        curs.execute("select title from cat where title = '" + db_pas(link) + "' and cat = '" + db_pas(name) + "'")
+        curs.execute("select title from cat where title = '" + pymysql.escape_string(link) + "' and cat = '" + pymysql.escape_string(name) + "'")
         y = curs.fetchall()
         if(not y):
-            curs.execute("insert into cat (title, cat) value ('" + db_pas(link) + "', '" + db_pas(name) + "')")
+            curs.execute("insert into cat (title, cat) value ('" + pymysql.escape_string(link) + "', '" + pymysql.escape_string(name) + "')")
             conn.commit()
             
         conn.close()
@@ -374,7 +372,7 @@ def namumark(title, data, num):
             if(results[0] == title):
                 data = include.sub("<b>" + results[0] + "</b>", data, 1)
             else:
-                curs.execute("select * from data where title = '" + db_pas(results[0]) + "'")
+                curs.execute("select * from data where title = '" + pymysql.escape_string(results[0]) + "'")
                 in_con = curs.fetchall()
                 
                 backlink_plus(title, results[0], 'include', num)
@@ -455,7 +453,7 @@ def namumark(title, data, num):
                 cat_plus(title, g[0], num)
                     
                 if(category == ''):
-                    curs.execute("select title from data where title = '" + db_pas(g[0]) + "'")
+                    curs.execute("select title from data where title = '" + pymysql.escape_string(g[0]) + "'")
                     exists = curs.fetchall()
                     if(exists):
                         red = ""
@@ -464,7 +462,7 @@ def namumark(title, data, num):
                         
                     category += '<a ' + red + ' href="/w/' + url_pas(g[0]) + '">' + re.sub("분류:", "", g[0]) + '</a>'
                 else:
-                    curs.execute("select title from data where title = '" + db_pas(g[0]) + "'")
+                    curs.execute("select title from data where title = '" + pymysql.escape_string(g[0]) + "'")
                     exists = curs.fetchall()
                     if(exists):
                         red = ""
@@ -664,7 +662,7 @@ def namumark(title, data, num):
                 else:
                     nosharp = re.sub("<sharp>", "#", results[0])
                     
-                    curs.execute("select title from data where title = '" + db_pas(nosharp) + "'")
+                    curs.execute("select title from data where title = '" + pymysql.escape_string(nosharp) + "'")
                     y = curs.fetchall()
                     if(y):
                         clas = ''

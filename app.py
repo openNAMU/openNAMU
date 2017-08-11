@@ -71,8 +71,6 @@ def redirect(data):
     
 from func import *
 from mark import *
-    
-db_pas = pymysql.escape_string
 
 r_ver = '2.1.7'
 
@@ -91,7 +89,7 @@ try:
         t_ver = re.sub('\.', '', version[0]['data'])
         r_t_ver = re.sub('\.', '', r_ver)
         if(int(t_ver) <= int(r_t_ver)):
-            curs.execute("update other set data = '" + db_pas(r_ver) + "' where name = 'version'")
+            curs.execute("update other set data = '" + pymysql.escape_string(r_ver) + "' where name = 'version'")
             
     conn.commit()
     
@@ -142,7 +140,7 @@ def setup():
             curs.execute("insert into alist (name, acl) value ('owner', 'owner')")
             
             curs.execute("delete from other where name = 'version'")
-            curs.execute("insert into other (name, data) value ('version', '" + db_pas(r_ver) + "')")
+            curs.execute("insert into other (name, data) value ('version', '" + pymysql.escape_string(r_ver) + "')")
             conn.commit()
 
             conn.close()
@@ -275,34 +273,34 @@ def admin_plus(name = None):
 
     if(admin_check(None) == 1):
         if(request.method == 'POST'):
-            curs.execute("delete from alist where name = '" + db_pas(name) + "'")
+            curs.execute("delete from alist where name = '" + pymysql.escape_string(name) + "'")
             
             if(request.forms.ban):
-                curs.execute("insert into alist (name, acl) value ('" + db_pas(name) + "', 'ban')")
+                curs.execute("insert into alist (name, acl) value ('" + pymysql.escape_string(name) + "', 'ban')")
 
             if(request.forms.mdel):
-                curs.execute("insert into alist (name, acl) value ('" + db_pas(name) + "', 'mdel')")   
+                curs.execute("insert into alist (name, acl) value ('" + pymysql.escape_string(name) + "', 'mdel')")   
 
             if(request.forms.toron):
-                curs.execute("insert into alist (name, acl) value ('" + db_pas(name) + "', 'toron')")
+                curs.execute("insert into alist (name, acl) value ('" + pymysql.escape_string(name) + "', 'toron')")
                 
             if(request.forms.check):
-                curs.execute("insert into alist (name, acl) value ('" + db_pas(name) + "', 'check')")
+                curs.execute("insert into alist (name, acl) value ('" + pymysql.escape_string(name) + "', 'check')")
 
             if(request.forms.acl):
-                curs.execute("insert into alist (name, acl) value ('" + db_pas(name) + "', 'acl')")
+                curs.execute("insert into alist (name, acl) value ('" + pymysql.escape_string(name) + "', 'acl')")
 
             if(request.forms.hidel):
-                curs.execute("insert into alist (name, acl) value ('" + db_pas(name) + "', 'hidel')")
+                curs.execute("insert into alist (name, acl) value ('" + pymysql.escape_string(name) + "', 'hidel')")
 
             if(request.forms.owner):
-                curs.execute("insert into alist (name, acl) value ('" + db_pas(name) + "', 'owner')")
+                curs.execute("insert into alist (name, acl) value ('" + pymysql.escape_string(name) + "', 'owner')")
                 
             conn.commit()
             conn.close()
             return(redirect('/adminplus/admin'))
         else:
-            curs.execute('select acl from alist where name = "' + db_pas(name) + '"')
+            curs.execute('select acl from alist where name = "' + pymysql.escape_string(name) + '"')
             test = curs.fetchall()
             
             data = ''
@@ -449,7 +447,7 @@ def recentchanges():
                 leng = '<span style="color:gray;">' + data['leng'] + '</span>'
                 
             if(ydmin == 1):
-                curs.execute("select * from ban where block = '" + db_pas(data['ip']) + "'")
+                curs.execute("select * from ban where block = '" + pymysql.escape_string(data['ip']) + "'")
                 row = curs.fetchall()
                 if(row):
                     ban = ' <a href="/ban/' + url_pas(data['ip']) + '">(해제)</a>'
@@ -467,7 +465,7 @@ def recentchanges():
             
             style = ''
             if(zdmin == 1):
-                curs.execute("select * from hidhi where title = '" + db_pas(data['title']) + "' and re = '" + db_pas(data['id']) + "'")
+                curs.execute("select * from hidhi where title = '" + pymysql.escape_string(data['title']) + "' and re = '" + pymysql.escape_string(data['id']) + "'")
                 row = curs.fetchall()
                 if(row):                            
                     ip += ' (숨김)'                            
@@ -475,7 +473,7 @@ def recentchanges():
                 else:
                     hidden = ' <a href="/history/' + url_pas(data['title']) + '/r/' + data['id'] + '/hidden">(숨김)'
             else:
-                curs.execute("select * from hidhi where title = '" + db_pas(data['title']) + "' and re = '" + db_pas(data['id']) + "'")
+                curs.execute("select * from hidhi where title = '" + pymysql.escape_string(data['title']) + "' and re = '" + pymysql.escape_string(data['id']) + "'")
                 row = curs.fetchall()
                 if(row):
                     ip = '숨김'
@@ -526,12 +524,12 @@ def history_hidden(name = None, num = None):
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
     if(admin_check(6) == 1):
-        curs.execute("select * from hidhi where title = '" + db_pas(name) + "' and re = '" + db_pas(str(num)) + "'")
+        curs.execute("select * from hidhi where title = '" + pymysql.escape_string(name) + "' and re = '" + pymysql.escape_string(str(num)) + "'")
         exist = curs.fetchall()
         if(exist):
-            curs.execute("delete from hidhi where title = '" + db_pas(name) + "' and re = '" + db_pas(str(num)) + "'")
+            curs.execute("delete from hidhi where title = '" + pymysql.escape_string(name) + "' and re = '" + pymysql.escape_string(str(num)) + "'")
         else:
-            curs.execute("insert into hidhi (title, re) value ('" + db_pas(name) + "', '" + db_pas(str(num)) + "')")
+            curs.execute("insert into hidhi (title, re) value ('" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(str(num)) + "')")
             
         conn.commit()
         
@@ -566,7 +564,7 @@ def user_record(name = None, num = 1):
                     <td style="width:33.33%;">시간</td> \
                 </tr>'
     
-    curs.execute("select * from history where ip = '" + db_pas(name) + "' order by date desc limit " + str(i) + ", " + str(v))
+    curs.execute("select * from history where ip = '" + pymysql.escape_string(name) + "' order by date desc limit " + str(i) + ", " + str(v))
     rows = curs.fetchall()
     if(rows):
         for data in rows:  
@@ -592,7 +590,7 @@ def user_record(name = None, num = 1):
                 leng = '<span style="color:gray;">' + data['leng'] + '</span>'
                 
             if(ydmin == 1):
-                curs.execute("select * from ban where block = '" + db_pas(data['ip']) + "'")
+                curs.execute("select * from ban where block = '" + pymysql.escape_string(data['ip']) + "'")
                 row = curs.fetchall()
                 if(row):
                     ban = ' <a href="/ban/' + url_pas(data['ip']) + '">(해제)</a>'
@@ -610,7 +608,7 @@ def user_record(name = None, num = 1):
                 
             style = ''
             if(zdmin == 1):
-                curs.execute("select * from hidhi where title = '" + db_pas(data['title']) + "' and re = '" + db_pas(data['id']) + "'")
+                curs.execute("select * from hidhi where title = '" + pymysql.escape_string(data['title']) + "' and re = '" + pymysql.escape_string(data['id']) + "'")
                 row = curs.fetchall()
                 if(row):                            
                     ip += ' (숨김)'                            
@@ -618,7 +616,7 @@ def user_record(name = None, num = 1):
                 else:
                     hidden = ' <a href="/history/' + url_pas(data['title']) + '/r/' + data['id'] + '/hidden">(숨김)'
             else:
-                curs.execute("select * from hidhi where title = '" + db_pas(data['title']) + "' and re = '" + db_pas(data['id']) + "'")
+                curs.execute("select * from hidhi where title = '" + pymysql.escape_string(data['title']) + "' and re = '" + pymysql.escape_string(data['id']) + "'")
                 row = curs.fetchall()
                 if(row):
                     ip = '숨김'
@@ -651,7 +649,7 @@ def user_record(name = None, num = 1):
     div += '<br> \
             <a href="/record/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전)</a> <a href="/record/' + url_pas(name) + '/n/' + str(num + 1) + '">(이후)</a>'
         
-    curs.execute("select end, why from ban where block = '" + db_pas(name) + "'")
+    curs.execute("select end, why from ban where block = '" + pymysql.escape_string(name) + "'")
     ban_it = curs.fetchall()
     if(ban_it):
         sub = '차단'
@@ -695,7 +693,7 @@ def user_log(num = 1):
     user_list = curs.fetchall()
     for data in user_list:
         if(ydmin == 1):
-            curs.execute("select * from ban where block = '" + db_pas(data['id']) + "'")
+            curs.execute("select * from ban where block = '" + pymysql.escape_string(data['id']) + "'")
             ban_exist = curs.fetchall()
             if(ban_exist):
                 ban_button = ' <a href="/ban/' + url_pas(data['id']) + '">(해제)</a>'
@@ -771,10 +769,10 @@ def xref(name = None, num = 1):
     i = v - 50
     div = ''
     
-    curs.execute("delete from back where title = '" + db_pas(name) + "' and link = ''")
+    curs.execute("delete from back where title = '" + pymysql.escape_string(name) + "' and link = ''")
     conn.commit()
     
-    curs.execute("select * from back where title = '" + db_pas(name) + "' order by link asc limit " + str(i) + ", " + str(v))
+    curs.execute("select * from back where title = '" + pymysql.escape_string(name) + "' order by link asc limit " + str(i) + ", " + str(v))
     rows = curs.fetchall()
     for data in rows:
         div += '<li><a href="/w/' + url_pas(data['link']) + '">' + data['link'] + '</a>'
@@ -958,7 +956,7 @@ def history_view(name = None, num = 1):
                                 <td style="width:33.33%;">시간</td> \
                             </tr>'
         
-        curs.execute("select send, leng, ip, date, title, id from history where title = '" + db_pas(name) + "' order by id + 0 desc limit " + str(j) + ", " + str(i))
+        curs.execute("select send, leng, ip, date, title, id from history where title = '" + pymysql.escape_string(name) + "' order by id + 0 desc limit " + str(j) + ", " + str(i))
         all_data = curs.fetchall()
         for data in all_data:
             select += '<option value="' + data['id'] + '">' + data['id'] + '</option>'
@@ -977,7 +975,7 @@ def history_view(name = None, num = 1):
                 
             ip = ip_pas(data['ip'], None)
             
-            curs.execute("select block from ban where block = '" + db_pas(data['ip']) + "'")
+            curs.execute("select block from ban where block = '" + pymysql.escape_string(data['ip']) + "'")
             ban_it = curs.fetchall()
             if(ban_it):
                 if(admin1 == 1):
@@ -990,7 +988,7 @@ def history_view(name = None, num = 1):
                 else:
                     ban = ''
             
-            curs.execute("select * from hidhi where title = '" + db_pas(name) + "' and re = '" + db_pas(data['id']) + "'")
+            curs.execute("select * from hidhi where title = '" + pymysql.escape_string(name) + "' and re = '" + pymysql.escape_string(data['id']) + "'")
             hid_it = curs.fetchall()
             if(hid_it):
                 if(admin2):
@@ -1059,7 +1057,7 @@ def goto():
     )
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
-    curs.execute("select title from data where title = '" + db_pas(request.forms.search) + "'")
+    curs.execute("select title from data where title = '" + pymysql.escape_string(request.forms.search) + "'")
     data = curs.fetchall()
     
     conn.close()
@@ -1091,13 +1089,13 @@ def deep_search(name = None, num = 1):
     div_plus = ''
     end = ''
 
-    curs.execute("select title from data where title like '%" + db_pas(name) + "%'")
+    curs.execute("select title from data where title like '%" + pymysql.escape_string(name) + "%'")
     title_list = curs.fetchall()
 
-    curs.execute("select title from data where data like '%" + db_pas(name) + "%'")
+    curs.execute("select title from data where data like '%" + pymysql.escape_string(name) + "%'")
     data_list = curs.fetchall()
 
-    curs.execute("select title from data where title = '" + db_pas(name) + "'")
+    curs.execute("select title from data where title = '" + pymysql.escape_string(name) + "'")
     exist = curs.fetchall()
     if(exist):
         div =   '<li>문서로 <a href="/w/' + url_pas(name) + '">바로가기</a></li> \
@@ -1166,16 +1164,16 @@ def raw_view(name = None, num = None):
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
     if(num):
-        curs.execute("select * from hidhi where title = '" + db_pas(name) + "' and re = '" + db_pas(str(num)) + "'")
+        curs.execute("select * from hidhi where title = '" + pymysql.escape_string(name) + "' and re = '" + pymysql.escape_string(str(num)) + "'")
         hid = curs.fetchall()
         if(hid):
             if(admin_check(6) != 1):
                 conn.close()
                 return(redirect('/error/3'))
         
-        curs.execute("select * from history where title = '" + db_pas(name) + "' and id = '" + str(num) + "'")
+        curs.execute("select * from history where title = '" + pymysql.escape_string(name) + "' and id = '" + str(num) + "'")
     else:
-        curs.execute("select * from data where title = '" + db_pas(name) + "'")
+        curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
 
     rows = curs.fetchall()
     if(rows):
@@ -1217,7 +1215,7 @@ def revert(name = None, num = None):
     today = get_time()
     
     if(request.method == 'POST'):
-        curs.execute("select * from hidhi where title = '" + db_pas(name) + "' and re = '" + db_pas(str(num)) + "'")
+        curs.execute("select * from hidhi where title = '" + pymysql.escape_string(name) + "' and re = '" + pymysql.escape_string(str(num)) + "'")
         row = curs.fetchall()
         if(row):
             if(admin_check(6) != 1):        
@@ -1228,24 +1226,24 @@ def revert(name = None, num = None):
             conn.close()
             return(redirect('/ban'))
         else:
-            curs.execute("delete from back where link = '" + db_pas(name) + "'")
-            curs.execute("delete from cat where cat = '" + db_pas(name) + "'")
+            curs.execute("delete from back where link = '" + pymysql.escape_string(name) + "'")
+            curs.execute("delete from cat where cat = '" + pymysql.escape_string(name) + "'")
             conn.commit()
 
-            curs.execute("select * from history where title = '" + db_pas(name) + "' and id = '" + str(num) + "'")
+            curs.execute("select * from history where title = '" + pymysql.escape_string(name) + "' and id = '" + str(num) + "'")
             rows = curs.fetchall()
             if(rows):                                
-                curs.execute("select * from data where title = '" + db_pas(name) + "'")
+                curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
                 row = curs.fetchall()
                 if(row):
                     leng = leng_check(len(row[0]['data']), len(rows[0]['data']))
                     
-                    curs.execute("update data set data = '" + db_pas(rows[0]['data']) + "' where title = '" + db_pas(name) + "'")
+                    curs.execute("update data set data = '" + pymysql.escape_string(rows[0]['data']) + "' where title = '" + pymysql.escape_string(name) + "'")
                     conn.commit()
                 else:
                     leng = '+' + str(len(rows[0]['data']))
                     
-                    curs.execute("insert into data (title, data, acl) value ('" + db_pas(name) + "', '" + db_pas(rows[0]['data']) + "', '')")
+                    curs.execute("insert into data (title, data, acl) value ('" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(rows[0]['data']) + "', '')")
                     conn.commit()
                     
                 history_plus(
@@ -1260,7 +1258,7 @@ def revert(name = None, num = None):
                 conn.close()
                 return(redirect('/w/' + url_pas(name)))
     else:
-        curs.execute("select * from hidhi where title = '" + db_pas(name) + "' and re = '" + db_pas(str(num)) + "'")
+        curs.execute("select * from hidhi where title = '" + pymysql.escape_string(name) + "' and re = '" + pymysql.escape_string(str(num)) + "'")
         row = curs.fetchall()
         if(row):
             if(admin_check(6) != 1):
@@ -1271,7 +1269,7 @@ def revert(name = None, num = None):
             conn.close()
             return(redirect('/ban'))
         else:
-            curs.execute("select * from history where title = '" + db_pas(name) + "' and id = '" + str(num) + "'")
+            curs.execute("select * from history where title = '" + pymysql.escape_string(name) + "' and id = '" + str(num) + "'")
             rows = curs.fetchall()
             if(rows):
                 conn.close()
@@ -1309,14 +1307,14 @@ def many_del():
             data = request.forms.content + '\r\n'
             m = re.findall('(.*)\r\n', data)
             for g in m:
-                curs.execute("select data from data where title = '" + db_pas(g) + "'")
+                curs.execute("select data from data where title = '" + pymysql.escape_string(g) + "'")
                 rows = curs.fetchall()
                 if(rows):
-                    curs.execute("delete from back where title = '" + db_pas(g) + "'")
-                    curs.execute("delete from cat where title = '" + db_pas(g) + "'")
+                    curs.execute("delete from back where title = '" + pymysql.escape_string(g) + "'")
+                    curs.execute("delete from cat where title = '" + pymysql.escape_string(g) + "'")
 
                     leng = '-' + str(len(rows[0]['data']))
-                    curs.execute("delete from data where title = '" + db_pas(g) + "'")
+                    curs.execute("delete from data where title = '" + pymysql.escape_string(g) + "'")
                     history_plus(
                         g, 
                         '', 
@@ -1368,11 +1366,11 @@ def section_edit(name = None, num = None):
             
             content = savemark(request.forms.content)
 
-            curs.execute("delete from back where link = '" + db_pas(name) + "'")
-            curs.execute("delete from cat where cat = '" + db_pas(name) + "'")
+            curs.execute("delete from back where link = '" + pymysql.escape_string(name) + "'")
+            curs.execute("delete from cat where cat = '" + pymysql.escape_string(name) + "'")
             conn.commit()
 
-            curs.execute("select * from data where title = '" + db_pas(name) + "'")
+            curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
             rows = curs.fetchall()
             if(rows):
                 if(request.forms.otent == content):
@@ -1396,7 +1394,7 @@ def section_edit(name = None, num = None):
                             leng
                         )
                         
-                        curs.execute("update data set data = '" + db_pas(content) + "' where title = '" + db_pas(name) + "'")
+                        curs.execute("update data set data = '" + pymysql.escape_string(content) + "' where title = '" + pymysql.escape_string(name) + "'")
                         conn.commit()
                         
                     include_check(name, content)
@@ -1411,7 +1409,7 @@ def section_edit(name = None, num = None):
             conn.close()
             return(redirect('/ban'))
         else:                
-            curs.execute("select * from data where title = '" + db_pas(name) + "'")
+            curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
             rows = curs.fetchall()
             if(rows):
                 i = 0
@@ -1481,11 +1479,11 @@ def edit(name = None):
             
             content = savemark(request.forms.content)
 
-            curs.execute("delete from back where link = '" + db_pas(name) + "'")
-            curs.execute("delete from cat where cat = '" + db_pas(name) + "'")
+            curs.execute("delete from back where link = '" + pymysql.escape_string(name) + "'")
+            curs.execute("delete from cat where cat = '" + pymysql.escape_string(name) + "'")
             conn.commit()
             
-            curs.execute("select * from data where title = '" + db_pas(name) + "'")
+            curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
             rows = curs.fetchall()
             if(rows):
                 if(rows[0]['data'] == content):
@@ -1506,7 +1504,7 @@ def edit(name = None):
                             leng
                         )
                         
-                        curs.execute("update data set data = '" + db_pas(content) + "' where title = '" + db_pas(name) + "'")
+                        curs.execute("update data set data = '" + pymysql.escape_string(content) + "' where title = '" + pymysql.escape_string(name) + "'")
                         conn.commit()
             else:                
                 if(can == 1):
@@ -1523,7 +1521,7 @@ def edit(name = None):
                         leng
                     )
                     
-                    curs.execute("insert into data (title, data, acl) value ('" + db_pas(name) + "', '" + db_pas(content) + "', '')")
+                    curs.execute("insert into data (title, data, acl) value ('" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(content) + "', '')")
                     conn.commit()
                     
             include_check(name, content)
@@ -1535,7 +1533,7 @@ def edit(name = None):
             conn.close()
             return(redirect('/ban'))
         else:                
-            curs.execute("select * from data where title = '" + db_pas(name) + "'")
+            curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
             rows = curs.fetchall()
             if(rows):
                 data = rows[0]['data']
@@ -1647,7 +1645,7 @@ def delete(name = None):
     can = acl_check(ip, name)
     
     if(request.method == 'POST'):
-        curs.execute("select * from data where title = '" + db_pas(name) + "'")
+        curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
         rows = curs.fetchall()
         if(rows):
             if(can == 1):
@@ -1656,8 +1654,8 @@ def delete(name = None):
             else:
                 today = get_time()
 
-                curs.execute("delete from back where link = '" + db_pas(name) + "'")
-                curs.execute("delete from cat where cat = '" + db_pas(name) + "'")
+                curs.execute("delete from back where link = '" + pymysql.escape_string(name) + "'")
+                curs.execute("delete from cat where cat = '" + pymysql.escape_string(name) + "'")
                 
                 leng = '-' + str(len(rows[0]['data']))
                 history_plus(
@@ -1669,7 +1667,7 @@ def delete(name = None):
                     leng
                 )
                 
-                curs.execute("delete from data where title = '" + db_pas(name) + "'")
+                curs.execute("delete from data where title = '" + pymysql.escape_string(name) + "'")
                 conn.commit()
                 
                 conn.close()
@@ -1678,7 +1676,7 @@ def delete(name = None):
             conn.close()
             return(redirect('/w/' + url_pas(name)))
     else:
-        curs.execute("select * from data where title = '" + db_pas(name) + "'")
+        curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
         rows = curs.fetchall()
         if(rows):
             if(can == 1):
@@ -1717,7 +1715,7 @@ def move(name = None):
     today = get_time()
     
     if(request.method == 'POST'):
-        curs.execute("select * from data where title = '" + db_pas(name) + "'")
+        curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
         rows = curs.fetchall()
 
         if(can == 1):
@@ -1725,7 +1723,7 @@ def move(name = None):
             return(redirect('/ban'))
         else:
             leng = '0'
-            curs.execute("select * from history where title = '" + db_pas(request.forms.title) + "'")
+            curs.execute("select * from history where title = '" + pymysql.escape_string(request.forms.title) + "'")
             row = curs.fetchall()
             if(row):
                 conn.close()
@@ -1741,12 +1739,12 @@ def move(name = None):
                 )
                 
                 if(rows):
-                    curs.execute("update data set title = '" + db_pas(request.forms.title) + "' where title = '" + db_pas(name) + "'")
+                    curs.execute("update data set title = '" + pymysql.escape_string(request.forms.title) + "' where title = '" + pymysql.escape_string(name) + "'")
 
-                    curs.execute("delete from back where link = '" + db_pas(name) + "'")
-                    curs.execute("delete from cat where cat = '" + db_pas(name) + "'")
+                    curs.execute("delete from back where link = '" + pymysql.escape_string(name) + "'")
+                    curs.execute("delete from cat where cat = '" + pymysql.escape_string(name) + "'")
 
-                curs.execute("update history set title = '" + db_pas(request.forms.title) + "' where title = '" + db_pas(name) + "'")
+                curs.execute("update history set title = '" + pymysql.escape_string(request.forms.title) + "' where title = '" + pymysql.escape_string(name) + "'")
                 conn.commit()
                 
                 conn.close()
@@ -2025,13 +2023,13 @@ def topic_block(name = None, sub = None, num = None):
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
     if(admin_check(3) == 1):
-        curs.execute("select * from topic where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' and id = '" + str(num) + "'")
+        curs.execute("select * from topic where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' and id = '" + str(num) + "'")
         block = curs.fetchall()
         if(block):
             if(block[0]['block'] == 'O'):
-                curs.execute("update topic set block = '' where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' and id = '" + str(num) + "'")
+                curs.execute("update topic set block = '' where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' and id = '" + str(num) + "'")
             else:
-                curs.execute("update topic set block = 'O' where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' and id = '" + str(num) + "'")
+                curs.execute("update topic set block = 'O' where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' and id = '" + str(num) + "'")
             conn.commit()
             
             rd_plus(
@@ -2060,16 +2058,16 @@ def topic_top(name = None, sub = None, num = None):
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
     if(admin_check(3) == 1):
-        curs.execute("select * from topic where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' and id = '" + str(num) + "'")
+        curs.execute("select * from topic where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' and id = '" + str(num) + "'")
         topic_data = curs.fetchall()
         if(topic_data):
-            curs.execute("select * from topic where id = '" + str(num) + "' and title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "'")
+            curs.execute("select * from topic where id = '" + str(num) + "' and title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "'")
             top_data = curs.fetchall()
             if(top_data):
                 if(top_data[0]['top'] == 'O'):
-                    curs.execute("update topic set top = '' where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' and id = '" + str(num) + "'")
+                    curs.execute("update topic set top = '' where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' and id = '" + str(num) + "'")
                 else:
-                    curs.execute("update topic set top = 'O' where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' and id = '" + str(num) + "'")
+                    curs.execute("update topic set top = 'O' where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' and id = '" + str(num) + "'")
 
             conn.commit()
             
@@ -2112,20 +2110,20 @@ def topic_stop(name = None, sub = None, tool = None):
     if(admin_check(3) == 1):
         ip = ip_check()
         
-        curs.execute("select * from topic where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' order by id + 0 desc limit 1")
+        curs.execute("select * from topic where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' order by id + 0 desc limit 1")
         topic_check = curs.fetchall()
         if(topic_check):
             time = get_time()
             
-            curs.execute("select * from stop where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' and close = '" + db_pas(close) + "'")
+            curs.execute("select * from stop where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' and close = '" + pymysql.escape_string(close) + "'")
             stop = curs.fetchall()
             if(stop):
-                curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) value ('" + db_pas(str(int(topic_check[0]['id']) + 1)) + "', '" + db_pas(name) + "', '" + db_pas(sub) + "', '" + db_pas(n_data) + "', '" + db_pas(time) + "', '" + db_pas(ip) + "', '', '1')")
-                curs.execute("delete from stop where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' and close = '" + db_pas(close) + "'")
+                curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) value ('" + pymysql.escape_string(str(int(topic_check[0]['id']) + 1)) + "', '" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(sub) + "', '" + pymysql.escape_string(n_data) + "', '" + pymysql.escape_string(time) + "', '" + pymysql.escape_string(ip) + "', '', '1')")
+                curs.execute("delete from stop where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' and close = '" + pymysql.escape_string(close) + "'")
             else:
-                curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) value ('" + db_pas(str(int(topic_check[0]['id']) + 1)) + "', '" + db_pas(name) + "', '" + db_pas(sub) + "', '" + db_pas(data) + "', '" + db_pas(time) + "', '" + db_pas(ip) + "', '', '1')")
-                curs.execute("insert into stop (title, sub, close) value ('" + db_pas(name) + "', '" + db_pas(sub) + "', '" + close + "')")
-                curs.execute("delete from stop where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' and close = '" + db_pas(n_close) + "'")
+                curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) value ('" + pymysql.escape_string(str(int(topic_check[0]['id']) + 1)) + "', '" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(sub) + "', '" + pymysql.escape_string(data) + "', '" + pymysql.escape_string(time) + "', '" + pymysql.escape_string(ip) + "', '', '1')")
+                curs.execute("insert into stop (title, sub, close) value ('" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(sub) + "', '" + close + "')")
+                curs.execute("delete from stop where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' and close = '" + pymysql.escape_string(n_close) + "'")
             conn.commit()
             
             rd_plus(
@@ -2156,19 +2154,19 @@ def topic_agree(name = None, sub = None):
     if(admin_check(3) == 1):
         ip = ip_check()
         
-        curs.execute("select id from topic where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' order by id + 0 desc limit 1")
+        curs.execute("select id from topic where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' order by id + 0 desc limit 1")
         topic_check = curs.fetchall()
         if(topic_check):
             time = get_time()
             
-            curs.execute("select * from agreedis where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "'")
+            curs.execute("select * from agreedis where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "'")
             agree = curs.fetchall()
             if(agree):
-                curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) value ('" + db_pas(str(int(topic_check[0]['id']) + 1)) + "', '" + db_pas(name) + "', '" + db_pas(sub) + "', '합의 결렬', '" + db_pas(time) + "', '" + db_pas(ip) + "', '', '1')")
-                curs.execute("delete from agreedis where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "'")
+                curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) value ('" + pymysql.escape_string(str(int(topic_check[0]['id']) + 1)) + "', '" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(sub) + "', '합의 결렬', '" + pymysql.escape_string(time) + "', '" + pymysql.escape_string(ip) + "', '', '1')")
+                curs.execute("delete from agreedis where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "'")
             else:
-                curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) value ('" + db_pas(str(int(topic_check[0]['id']) + 1)) + "', '" + db_pas(name) + "', '" + db_pas(sub) + "', '합의 완료', '" + db_pas(time) + "', '" + db_pas(ip) + "', '', '1')")
-                curs.execute("insert into agreedis (title, sub) value ('" + db_pas(name) + "', '" + db_pas(sub) + "')")
+                curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) value ('" + pymysql.escape_string(str(int(topic_check[0]['id']) + 1)) + "', '" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(sub) + "', '합의 완료', '" + pymysql.escape_string(time) + "', '" + pymysql.escape_string(ip) + "', '', '1')")
+                curs.execute("insert into agreedis (title, sub) value ('" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(sub) + "')")
             conn.commit()
             
             rd_plus(
@@ -2201,7 +2199,7 @@ def topic(name = None, sub = None):
     admin = admin_check(3)
     
     if(request.method == 'POST'):
-        curs.execute("select id from topic where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' order by id + 0 desc limit 1")
+        curs.execute("select id from topic where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' order by id + 0 desc limit 1")
         rows = curs.fetchall()
         if(rows):
             num = int(rows[0]['id']) + 1
@@ -2222,7 +2220,7 @@ def topic(name = None, sub = None):
             aa = re.sub("\[\[(분류:(?:(?:(?!\]\]).)*))\]\]", "[br]", request.forms.content)
             aa = savemark(aa)
             
-            curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) value ('" + str(num) + "', '" + db_pas(name) + "', '" + db_pas(sub) + "', '" + db_pas(aa) + "', '" + today + "', '" + ip + "', '', '')")
+            curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) value ('" + str(num) + "', '" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(sub) + "', '" + pymysql.escape_string(aa) + "', '" + today + "', '" + ip + "', '', '')")
             conn.commit()
             
             conn.close()
@@ -2230,10 +2228,10 @@ def topic(name = None, sub = None):
     else:
         style = ''
 
-        curs.execute("select * from stop where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' and close = 'O'")
+        curs.execute("select * from stop where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' and close = 'O'")
         close = curs.fetchall()
 
-        curs.execute("select * from stop where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' and close = ''")
+        curs.execute("select * from stop where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' and close = ''")
         stop = curs.fetchall()
         
         if(admin == 1):
@@ -2249,7 +2247,7 @@ def topic(name = None, sub = None):
             else:
                 div += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/stop">(토론 정지)</a> '
 
-            curs.execute("select * from agreedis where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "'")
+            curs.execute("select * from agreedis where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "'")
             agree = curs.fetchall()
             if(agree):
                 div += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/agree">(합의 취소)</a>'
@@ -2264,10 +2262,10 @@ def topic(name = None, sub = None):
             if(admin != 1):
                 style = 'display:none;'
         
-        curs.execute("select * from topic where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' order by id + 0 asc")
+        curs.execute("select * from topic where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' order by id + 0 asc")
         toda = curs.fetchall()
 
-        curs.execute("select * from topic where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' and top = 'O' order by id + 0 asc")
+        curs.execute("select * from topic where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' and top = 'O' order by id + 0 asc")
         top = curs.fetchall()
 
         if(top):
@@ -2311,21 +2309,21 @@ def topic(name = None, sub = None):
                 else:
                     isblock = ' <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/b/' + str(i + 1) + '">(가림)</a>'
 
-                curs.execute("select id from topic where title = '" + db_pas(name) + "' and sub = '" + db_pas(sub) + "' and id = '" + db_pas(str(i + 1)) + "' and top = 'O'")
+                curs.execute("select id from topic where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' and id = '" + pymysql.escape_string(str(i + 1)) + "' and top = 'O'")
                 row = curs.fetchall()
                 if(row):
                     isblock = isblock + ' <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/notice/' + str(i + 1) + '">(해제)</a>'
                 else:
                     isblock = isblock + ' <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/notice/' + str(i + 1) + '">(공지)</a>'
                     
-                curs.execute("select end from ban where block = '" + db_pas(dain['ip']) + "'")
+                curs.execute("select end from ban where block = '" + pymysql.escape_string(dain['ip']) + "'")
                 ban_it = curs.fetchall()
                 if(ban_it):
                     ban = ' <a href="/ban/' + url_pas(dain['ip']) + '">(해제)</a>' + isblock
                 else:
                     ban = ' <a href="/ban/' + url_pas(dain['ip']) + '">(차단)</a>' + isblock
             else:
-                curs.execute("select end from ban where block = '" + db_pas(dain['ip']) + "'")
+                curs.execute("select end from ban where block = '" + pymysql.escape_string(dain['ip']) + "'")
                 ban_it = curs.fetchall()
                 if(ban_it):
                     ban = ' (X)'
@@ -2333,7 +2331,7 @@ def topic(name = None, sub = None):
                     ban = ''
             
             chad = ''
-            curs.execute('select acl from user where id = "' + db_pas(dain['ip']) + '"')
+            curs.execute('select acl from user where id = "' + pymysql.escape_string(dain['ip']) + '"')
             adch = curs.fetchall()
             if(adch):
                 if(adch[0]['acl'] != 'user'):
@@ -2395,10 +2393,10 @@ def close_topic_list(name = None):
     div = '<div>'
     i = 0
     
-    curs.execute("select * from stop where title = '" + db_pas(name) + "' and close = 'O' order by sub asc")
+    curs.execute("select * from stop where title = '" + pymysql.escape_string(name) + "' and close = 'O' order by sub asc")
     rows = curs.fetchall()
     for data in rows:
-        curs.execute("select * from topic where title = '" + db_pas(name) + "' and sub = '" + db_pas(data['sub']) + "' and id = '1'")
+        curs.execute("select * from topic where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(data['sub']) + "' and id = '1'")
         row = curs.fetchall()
         if(row):
             indata = namumark(name, row[0]['data'], 0)
@@ -2459,10 +2457,10 @@ def agree_topic_list(name = None):
     div = '<div>'
     i = 0
     
-    curs.execute("select * from agreedis where title = '" + db_pas(name) + "' order by sub asc")
+    curs.execute("select * from agreedis where title = '" + pymysql.escape_string(name) + "' order by sub asc")
     agree_list = curs.fetchall()
     for data in agree_list:
-        curs.execute("select * from topic where title = '" + db_pas(name) + "' and sub = '" + db_pas(data['sub']) + "' and id = '1'")
+        curs.execute("select * from topic where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(data['sub']) + "' and id = '1'")
         topic_data = curs.fetchall()
         if(topic_data):
             indata = namumark(name, topic_data[0]['data'], 0)
@@ -2526,10 +2524,10 @@ def topic_list(name = None):
     else:
         div = '<div>'
         j = 1
-        curs.execute("select * from rd where title = '" + db_pas(name) + "' order by date asc")
+        curs.execute("select * from rd where title = '" + pymysql.escape_string(name) + "' order by date asc")
         rows = curs.fetchall()
         for data in rows:
-            curs.execute("select * from topic where title = '" + db_pas(data['title']) + "' and sub = '" + db_pas(data['sub']) + "' and id = '1' order by sub asc")
+            curs.execute("select * from topic where title = '" + pymysql.escape_string(data['title']) + "' and sub = '" + pymysql.escape_string(data['sub']) + "' and id = '1' order by sub asc")
             aa = curs.fetchall()
             
             indata = namumark(name, aa[0]['data'], 0)
@@ -2542,7 +2540,7 @@ def topic_list(name = None):
 
             ip = ip_pas(aa[0]['ip'], 1)
                 
-            curs.execute("select * from stop where title = '" + db_pas(data['title']) + "' and sub = '" + db_pas(data['sub']) + "' and close = 'O'")
+            curs.execute("select * from stop where title = '" + pymysql.escape_string(data['title']) + "' and sub = '" + pymysql.escape_string(data['sub']) + "' and close = 'O'")
             row = curs.fetchall()
             if(not row):
                 div += '<h2> \
@@ -2600,7 +2598,7 @@ def login():
             conn.close()
             return(redirect('/ban'))
         else:
-            curs.execute("select * from user where id = '" + db_pas(request.forms.id) + "'")
+            curs.execute("select * from user where id = '" + pymysql.escape_string(request.forms.id) + "'")
             user = curs.fetchall()
             if(user):
                 if(session.get('Now') == 1):
@@ -2610,14 +2608,14 @@ def login():
                     session['Now'] = 1
                     session['DREAMER'] = request.forms.id
 
-                    curs.execute("select * from custom where user = '" + db_pas(request.forms.id) + "'")
+                    curs.execute("select * from custom where user = '" + pymysql.escape_string(request.forms.id) + "'")
                     css_data = curs.fetchall()
                     if(css_data):
                         session['Daydream'] = css_data[0]['css']
                     else:
                         session['Daydream'] = ''
                     
-                    curs.execute("insert into login (user, ip, today) value ('" + db_pas(request.forms.id) + "', '" + db_pas(ip) + "', '" + db_pas(get_time()) + "')")
+                    curs.execute("insert into login (user, ip, today) value ('" + pymysql.escape_string(request.forms.id) + "', '" + pymysql.escape_string(ip) + "', '" + pymysql.escape_string(get_time()) + "')")
                     conn.commit()
                     
                     conn.close()
@@ -2668,7 +2666,7 @@ def change_password():
                 conn.close()
                 return(redirect('/ban'))
             else:
-                curs.execute("select * from user where id = '" + db_pas(request.forms.id) + "'")
+                curs.execute("select * from user where id = '" + pymysql.escape_string(request.forms.id) + "'")
                 user = curs.fetchall()
                 if(user):
                     if(not re.search('(\.|:)', ip)):
@@ -2677,7 +2675,7 @@ def change_password():
                     elif(bcrypt.checkpw(bytes(request.forms.pw, 'utf-8'), bytes(user[0]['pw'], 'utf-8'))):
                         hashed = bcrypt.hashpw(bytes(request.forms.pw2, 'utf-8'), bcrypt.gensalt())
                         
-                        curs.execute("update user set pw = '" + db_pas(hashed.decode()) + "' where id = '" + db_pas(request.forms.id) + "'")
+                        curs.execute("update user set pw = '" + pymysql.escape_string(hashed.decode()) + "' where id = '" + pymysql.escape_string(request.forms.id) + "'")
                         conn.commit()
                         
                         conn.close()
@@ -2722,7 +2720,7 @@ def user_check(name = None):
     )
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
-    curs.execute("select * from user where id = '" + db_pas(name) + "'")
+    curs.execute("select * from user where id = '" + pymysql.escape_string(name) + "'")
     user = curs.fetchall()
     if(user and user[0]['acl'] != 'user'):
         conn.close()
@@ -2735,7 +2733,7 @@ def user_check(name = None):
             else:
                 sql = 'user'
 
-            curs.execute("select * from login where " + sql + " = '" + db_pas(name) + "' order by today desc")
+            curs.execute("select * from login where " + sql + " = '" + pymysql.escape_string(name) + "' order by today desc")
             row = curs.fetchall()
             if(row):
                 c = '<div> \
@@ -2802,7 +2800,7 @@ def register():
                         conn.close()
                         return(redirect('/error/7'))
                     else:
-                        curs.execute("select * from user where id = '" + db_pas(request.forms.id) + "'")
+                        curs.execute("select * from user where id = '" + pymysql.escape_string(request.forms.id) + "'")
                         rows = curs.fetchall()
                         if(rows):
                             conn.close()
@@ -2813,9 +2811,9 @@ def register():
                             curs.execute("select id from user limit 1")
                             user_ex = curs.fetchall()
                             if(not user_ex):
-                                curs.execute("insert into user (id, pw, acl) value ('" + db_pas(request.forms.id) + "', '" + db_pas(hashed.decode()) + "', 'owner')")
+                                curs.execute("insert into user (id, pw, acl) value ('" + pymysql.escape_string(request.forms.id) + "', '" + pymysql.escape_string(hashed.decode()) + "', 'owner')")
                             else:
-                                curs.execute("insert into user (id, pw, acl) value ('" + db_pas(request.forms.id) + "', '" + db_pas(hashed.decode()) + "', 'user')")
+                                curs.execute("insert into user (id, pw, acl) value ('" + pymysql.escape_string(request.forms.id) + "', '" + pymysql.escape_string(hashed.decode()) + "', 'user')")
                             conn.commit()
                             
                             conn.close()
@@ -2858,7 +2856,7 @@ def user_ban(name = None):
     )
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
-    curs.execute("select * from user where id = '" + db_pas(name) + "'")
+    curs.execute("select * from user where id = '" + pymysql.escape_string(name) + "'")
     user = curs.fetchall()
     if(user and user[0]['acl'] != 'user'):
         conn.close()
@@ -2873,22 +2871,22 @@ def user_ban(name = None):
                 else:
                     end = request.forms.end
 
-                curs.execute("select * from ban where block = '" + db_pas(name) + "'")
+                curs.execute("select * from ban where block = '" + pymysql.escape_string(name) + "'")
                 row = curs.fetchall()
                 if(row):
                     rb_plus(name, '해제', get_time(), ip, '')
                     
-                    curs.execute("delete from ban where block = '" + db_pas(name) + "'")
+                    curs.execute("delete from ban where block = '" + pymysql.escape_string(name) + "'")
                 else:
                     b = re.search("^([0-9]{1,3}\.[0-9]{1,3})$", name)
                     if(b):
                         rb_plus(name, end, get_time(), ip, request.forms.why)
                         
-                        curs.execute("insert into ban (block, end, why, band) value ('" + db_pas(name) + "', '" + db_pas(end) + "', '" + db_pas(request.forms.why) + "', 'O')")
+                        curs.execute("insert into ban (block, end, why, band) value ('" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(end) + "', '" + pymysql.escape_string(request.forms.why) + "', 'O')")
                     else:
                         rb_plus(name, end, get_time(), ip, request.forms.why)
                         
-                        curs.execute("insert into ban (block, end, why, band) value ('" + db_pas(name) + "', '" + db_pas(end) + "', '" + db_pas(request.forms.why) + "', '')")
+                        curs.execute("insert into ban (block, end, why, band) value ('" + pymysql.escape_string(name) + "', '" + pymysql.escape_string(end) + "', '" + pymysql.escape_string(request.forms.why) + "', '')")
                 conn.commit()
                 
                 conn.close()
@@ -2898,7 +2896,7 @@ def user_ban(name = None):
                 return(redirect('/error/3'))
         else:
             if(admin_check(1) == 1):
-                curs.execute("select * from ban where block = '" + db_pas(name) + "'")
+                curs.execute("select * from ban where block = '" + pymysql.escape_string(name) + "'")
                 row = curs.fetchall()
                 if(row):
                     now = '차단 해제'
@@ -2939,15 +2937,15 @@ def acl(name = None):
 
     if(request.method == 'POST'):
         if(admin_check(5) == 1):
-            curs.execute("select acl from data where title = '" + db_pas(name) + "'")
+            curs.execute("select acl from data where title = '" + pymysql.escape_string(name) + "'")
             row = curs.fetchall()
             if(row):
                 if(request.forms.select == 'admin'):
-                   curs.execute("update data set acl = 'admin' where title = '" + db_pas(name) + "'")
+                   curs.execute("update data set acl = 'admin' where title = '" + pymysql.escape_string(name) + "'")
                 elif(request.forms.select == 'user'):
-                    curs.execute("update data set acl = 'user' where title = '" + db_pas(name) + "'")
+                    curs.execute("update data set acl = 'user' where title = '" + pymysql.escape_string(name) + "'")
                 else:
-                    curs.execute("update data set acl = '' where title = '" + db_pas(name) + "'")
+                    curs.execute("update data set acl = '' where title = '" + pymysql.escape_string(name) + "'")
                     
                 conn.commit()
                 
@@ -2958,7 +2956,7 @@ def acl(name = None):
             return(redirect('/error/3'))
     else:
         if(admin_check(5) == 1):
-            curs.execute("select acl from data where title = '" + db_pas(name) + "'")
+            curs.execute("select acl from data where title = '" + pymysql.escape_string(name) + "'")
             row = curs.fetchall()
             if(row):
                 if(row[0]['acl'] == 'admin'):
@@ -3000,13 +2998,13 @@ def user_admin(name = None):
 
     if(request.method == 'POST'):
         if(admin_check(None) == 1):
-            curs.execute("select * from user where id = '" + db_pas(name) + "'")
+            curs.execute("select * from user where id = '" + pymysql.escape_string(name) + "'")
             user = curs.fetchall()
             if(user):
                 if(user[0]['acl'] != 'user'):
-                    curs.execute("update user set acl = 'user' where id = '" + db_pas(name) + "'")
+                    curs.execute("update user set acl = 'user' where id = '" + pymysql.escape_string(name) + "'")
                 else:
-                    curs.execute("update user set acl = '" + db_pas(request.forms.select) + "' where id = '" + db_pas(name) + "'")
+                    curs.execute("update user set acl = '" + pymysql.escape_string(request.forms.select) + "' where id = '" + pymysql.escape_string(name) + "'")
                 conn.commit()
                 
                 conn.close()
@@ -3019,7 +3017,7 @@ def user_admin(name = None):
             return(redirect('/error/3'))
     else:
         if(admin_check(None) == 1):
-            curs.execute("select * from user where id = '" + db_pas(name) + "'")
+            curs.execute("select * from user where id = '" + pymysql.escape_string(name) + "'")
             user = curs.fetchall()
             if(user):
                 if(user[0]['acl'] != 'user'):
@@ -3073,7 +3071,7 @@ def are_you_ban():
     ip = ip_check()
     
     if(ban_check(ip) == 1):
-        curs.execute("select * from ban where block = '" + db_pas(ip) + "'")
+        curs.execute("select * from ban where block = '" + pymysql.escape_string(ip) + "'")
         rows = curs.fetchall()
         if(rows):
             if(rows[0]['end']):
@@ -3086,7 +3084,7 @@ def are_you_ban():
                 day = re.sub('\-', '', rows[0]['end'])    
                 
                 if(now >= int(day + '000000')):
-                    curs.execute("delete from ban where block = '" + db_pas(ip) + "'")
+                    curs.execute("delete from ban where block = '" + pymysql.escape_string(ip) + "'")
                     conn.commit()
                     
                     end = '차단이 풀렸습니다. 다시 시도 해 보세요.'
@@ -3097,7 +3095,7 @@ def are_you_ban():
             if(b):
                 results = b.groups()
                 
-                curs.execute("select * from ban where block = '" + db_pas(results[0]) + "' and band = 'O'")
+                curs.execute("select * from ban where block = '" + pymysql.escape_string(results[0]) + "' and band = 'O'")
                 row = curs.fetchall()
                 if(row):
                     if(row[0]['end']):
@@ -3110,7 +3108,7 @@ def are_you_ban():
                         day = re.sub('\-', '', row[0]['end'])
                         
                         if(now >= int(day + '000000')):
-                            curs.execute("delete from ban where block = '" + db_pas(results[0]) + "' and band = 'O'")
+                            curs.execute("delete from ban where block = '" + pymysql.escape_string(results[0]) + "' and band = 'O'")
                             conn.commit()
                             
                             end = '차단이 풀렸습니다. 다시 시도 해 보세요.'
@@ -3141,10 +3139,10 @@ def diff_data(name = None, a = None, b = None):
     )
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
-    curs.execute("select * from history where id = '" + db_pas(str(a)) + "' and title = '" + db_pas(name) + "'")
+    curs.execute("select * from history where id = '" + pymysql.escape_string(str(a)) + "' and title = '" + pymysql.escape_string(name) + "'")
     a_raw_data = curs.fetchall()
     if(a_raw_data):
-        curs.execute("select * from history where id = '" + db_pas(str(b)) + "' and title = '" + db_pas(name) + "'")
+        curs.execute("select * from history where id = '" + pymysql.escape_string(str(b)) + "' and title = '" + pymysql.escape_string(name) + "'")
         b_raw_data = curs.fetchall()
         if(b_raw_data):
             a_data = re.sub('<', '&lt;', a_raw_data[0]['data'])
@@ -3190,7 +3188,7 @@ def down(name = None):
     )
     curs = conn.cursor(pymysql.cursors.DictCursor)
     
-    curs.execute("select title from data where title like '%" + db_pas(name) + "/%'")
+    curs.execute("select title from data where title like '%" + pymysql.escape_string(name) + "/%'")
     under = curs.fetchall()
     
     div = ''
@@ -3233,17 +3231,17 @@ def read_view(name = None, num = None, redirect = None):
     div = ''
     topic = ''
     
-    curs.execute("select sub from rd where title = '" + db_pas(name) + "' order by date asc")
+    curs.execute("select sub from rd where title = '" + pymysql.escape_string(name) + "' order by date asc")
     rows = curs.fetchall()
     for data in rows:
-        curs.execute("select title from stop where title = '" + db_pas(name) + "' and sub = '" + db_pas(data['sub']) + "' and close = 'O'")
+        curs.execute("select title from stop where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(data['sub']) + "' and close = 'O'")
         row = curs.fetchall()
         if(not row):
             topic = "open"
             
             break
                 
-    curs.execute("select title from data where title like '%" + db_pas(name) + "/%'")
+    curs.execute("select title from data where title like '%" + pymysql.escape_string(name) + "/%'")
     under = curs.fetchall()
     if(under):
         down = 1
@@ -3262,10 +3260,10 @@ def read_view(name = None, num = None, redirect = None):
         admin_memu = ''
         
     if(re.search("^분류:", name)):
-        curs.execute("delete from cat where title = '" + db_pas(name) + "' and cat = ''")
+        curs.execute("delete from cat where title = '" + pymysql.escape_string(name) + "' and cat = ''")
         conn.commit()
         
-        curs.execute("select * from cat where title = '" + db_pas(name) + "' order by cat asc")
+        curs.execute("select * from cat where title = '" + pymysql.escape_string(name) + "' order by cat asc")
         rows = curs.fetchall()
         if(rows):
             div = '<h2>분류</h2>'
@@ -3275,16 +3273,16 @@ def read_view(name = None, num = None, redirect = None):
                 div += '<li><a href="/w/' + url_pas(data['cat']) + '">' + data['cat'] + '</a></li>'
 
     if(num):
-        curs.execute("select * from hidhi where title = '" + db_pas(name) + "' and re = '" + db_pas(str(num)) + "'")
+        curs.execute("select * from hidhi where title = '" + pymysql.escape_string(name) + "' and re = '" + pymysql.escape_string(str(num)) + "'")
         hid = curs.fetchall()
         if(hid):
             if(admin_check(6) != 1):
                 conn.close()
                 return(redirect('/history/' + url_pas(name)))
 
-        curs.execute("select * from history where title = '" + db_pas(name) + "' and id = '" + str(num) + "'")
+        curs.execute("select * from history where title = '" + pymysql.escape_string(name) + "' and id = '" + str(num) + "'")
     else:
-        curs.execute("select * from data where title = '" + db_pas(name) + "'")
+        curs.execute("select * from data where title = '" + pymysql.escape_string(name) + "'")
 
     rows = curs.fetchall()
     if(rows):
@@ -3303,13 +3301,13 @@ def read_view(name = None, num = None, redirect = None):
     if(m):
         g = m.groups()
         
-        curs.execute("select acl from user where id = '" + db_pas(g[0]) + "'")
+        curs.execute("select acl from user where id = '" + pymysql.escape_string(g[0]) + "'")
         test = curs.fetchall()
         if(test):
             if(test[0]['acl'] != 'user'):
                 acl = '(관리자)'
 
-        curs.execute("select block from ban where block = '" + db_pas(g[0]) + "'")
+        curs.execute("select block from ban where block = '" + pymysql.escape_string(g[0]) + "'")
         user = curs.fetchall()
         if(user):
             sub = '차단'
@@ -3367,7 +3365,7 @@ def user_topic_list(name = None, num = 1):
                             <td style="width:33.33%;">시간</td> \
                         </tr>'
     
-    curs.execute("select title, id, sub, ip, date from topic where ip = '" + db_pas(name) + "' order by date desc limit " + str(i) + ", " + str(v))
+    curs.execute("select title, id, sub, ip, date from topic where ip = '" + pymysql.escape_string(name) + "' order by date desc limit " + str(i) + ", " + str(v))
     rows = curs.fetchall()
     if(rows):
         for data in rows:
@@ -3380,7 +3378,7 @@ def user_topic_list(name = None, num = 1):
             sub = re.sub('"', '&quot;', sub)
                 
             if(ydmin == 1):
-                curs.execute("select * from ban where block = '" + db_pas(data['ip']) + "'")
+                curs.execute("select * from ban where block = '" + pymysql.escape_string(data['ip']) + "'")
                 row = curs.fetchall()
                 if(row):
                     ban = ' <a href="/ban/' + url_pas(data['ip']) + '">(해제)</a>'
@@ -3409,7 +3407,7 @@ def user_topic_list(name = None, num = 1):
     div += '<br> \
             <a href="/user/' + url_pas(name) + '/topic/' + str(num - 1) + '">(이전)</a> <a href="/user/' + url_pas(name) + '/topic/' + str(num + 1) + '">(이후)</a>'
                 
-    curs.execute("select end, why from ban where block = '" + db_pas(name) + "'")
+    curs.execute("select end, why from ban where block = '" + pymysql.escape_string(name) + "'")
     ban_it = curs.fetchall()
     if(ban_it):
         sub = '차단'
@@ -3442,7 +3440,7 @@ def user_info():
     ip = ip_check()
     raw_ip = ip
     
-    curs.execute("select * from user where id = '" + db_pas(ip) + "'")
+    curs.execute("select * from user where id = '" + pymysql.escape_string(ip) + "'")
     rows = curs.fetchall()
     if(ban_check(ip) == 0):
         if(rows):
@@ -3494,12 +3492,12 @@ def custom_css():
     ip = ip_check()
     if(request.method == 'POST'):
         if(not re.search('(\.|:)', ip)):
-            curs.execute("select * from custom where user = '" + db_pas(ip) + "'")
+            curs.execute("select * from custom where user = '" + pymysql.escape_string(ip) + "'")
             css_data = curs.fetchall()
             if(css_data):
-                curs.execute("update custom set css = '" + db_pas(request.forms.content) + "' where user = '" + db_pas(ip) + "'")
+                curs.execute("update custom set css = '" + pymysql.escape_string(request.forms.content) + "' where user = '" + pymysql.escape_string(ip) + "'")
             else:
-                curs.execute("insert into custom (user, css) value ('" + db_pas(ip) + "', '" + db_pas(request.forms.content) + "')")
+                curs.execute("insert into custom (user, css) value ('" + pymysql.escape_string(ip) + "', '" + pymysql.escape_string(request.forms.content) + "')")
             conn.commit()
 
         session['Daydream'] = request.forms.content
@@ -3509,7 +3507,7 @@ def custom_css():
     else:
         if(not re.search('(\.|:)', ip)):
             start = ''
-            curs.execute("select * from custom where user = '" + db_pas(ip) + "'")
+            curs.execute("select * from custom where user = '" + pymysql.escape_string(ip) + "'")
             css_data = curs.fetchall()
             if(css_data):
                 data = css_data[0]['css']
