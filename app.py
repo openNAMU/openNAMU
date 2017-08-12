@@ -70,7 +70,6 @@ def redirect(data):
     return('<meta http-equiv="refresh" content="0;url=' + data + '" />')
     
 from func import *
-from mark import *
 
 r_ver = '2.1.7'
 
@@ -89,11 +88,9 @@ try:
         t_ver = re.sub('\.', '', version[0]['data'])
         r_t_ver = re.sub('\.', '', r_ver)
         if(int(t_ver) <= int(r_t_ver)):
-            curs.execute("update other set data = '" + pymysql.escape_string(r_ver) + "' where name = 'version'")
-            
+            curs.execute("update other set data = '" + pymysql.escape_string(r_ver) + "' where name = 'version'")    
     conn.commit()
     
-    conn.commit()
     conn.close()
 except:
     pass
@@ -219,7 +216,7 @@ def list_acl():
     )
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
-    div = '<div>'
+    div = ''
     i = 0
 
     curs.execute("select * from alist order by name desc")
@@ -245,9 +242,10 @@ def list_acl():
             
             i += 1
         else:        
-            div += '<br><a href="/manager/8">(생성)</a></div>'
+            div +=  '<br> \
+                    <a href="/manager/8">(생성)</a>'
     else:
-        div = '<a href="/manager/8">(생성)</a></div>'
+        div += '<a href="/manager/8">(생성)</a>'
 
     conn.close()
     return(
@@ -410,14 +408,13 @@ def recentchanges():
 
     ydmin = admin_check(1)
     zdmin = admin_check(6)
-    div =  '<div> \
-            <table style="width: 100%; text-align: center;"> \
+    div =  '<table style="width: 100%; text-align: center;"> \
                 <tbody> \
-                <tr> \
-                    <td style="width:33.33%;">문서명</td> \
-                    <td style="width:33.33%;">기여자</td> \
-                    <td style="width:33.33%;">시간</td> \
-                </tr>'
+                    <tr> \
+                        <td style="width:33.33%;">문서명</td> \
+                        <td style="width:33.33%;">기여자</td> \
+                        <td style="width:33.33%;">시간</td> \
+                    </tr>'
     
     curs.execute("select id, title, date, ip, send, leng from history order by date desc limit 50")
     rows = curs.fetchall()
@@ -495,9 +492,8 @@ def recentchanges():
                         <td colspan="3">' + send + '</td> \
                     </tr>'
         else:
-            div +=          '</tbody> \
-                        </table> \
-                    </div>'
+            div +=      '</tbody> \
+                    </table>'
     else:
         div = ''
             
@@ -555,14 +551,13 @@ def user_record(name = None, num = 1):
     i = v - 50
     ydmin = admin_check(1)
     zdmin = admin_check(6)
-    div =  '<div> \
-            <table style="width: 100%; text-align: center;"> \
+    div =  '<table style="width: 100%; text-align: center;"> \
                 <tbody> \
-                <tr> \
-                    <td style="width:33.33%;">문서명</td> \
-                    <td style="width:33.33%;">기여자</td> \
-                    <td style="width:33.33%;">시간</td> \
-                </tr>'
+                    <tr> \
+                        <td style="width:33.33%;">문서명</td> \
+                        <td style="width:33.33%;">기여자</td> \
+                        <td style="width:33.33%;">시간</td> \
+                    </tr>'
     
     curs.execute("select * from history where ip = '" + pymysql.escape_string(name) + "' order by date desc limit " + str(i) + ", " + str(v))
     rows = curs.fetchall()
@@ -639,12 +634,10 @@ def user_record(name = None, num = 1):
                         <td colspan="3">' + send + '</td> \
                     </tr>'
         else:
-            div +=          '</tbody> \
-                        </table> \
-                    </div>'
+            div +=      '</tbody> \
+                    </table>'
     else:
-        div =   'None \
-                <br>'
+        div = ''
         
     div += '<br> \
             <a href="/record/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전)</a> <a href="/record/' + url_pas(name) + '/n/' + str(num + 1) + '">(이후)</a>'
@@ -809,8 +802,7 @@ def recentdiscuss():
     )
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
-    div =   '<div> \
-            <table style="text-align: center; width: 100%;"> \
+    div =   '<table style="text-align: center; width: 100%;"> \
                 <tbody> \
                     <tr> \
                         <td style="width:50%;">토론명</td> \
@@ -837,9 +829,8 @@ def recentdiscuss():
                     <td>' + data['date'] + '</td> \
                 </tr>'
     else:
-        div +=          '</tbody> \
-                    </table> \
-                </div>'
+        div +=      '</tbody> \
+                </table>'
             
     conn.close()
     return(
@@ -870,16 +861,15 @@ def blocklog(num = 1):
         v = num * 50
     
     i = v - 50
-    div =   '<div> \
-                <table style="text-align: center; width: 100%;"> \
-                    <tbody> \
-                        <tr> \
-                            <td style="width:20%;">차단자</td> \
-                            <td style="width:20%;">관리자</td> \
-                            <td style="width:20%;">기간</td> \
-                            <td style="width:20%;">이유</td> \
-                            <td style="width:20%;">시간</td> \
-                        </tr>'
+    div =   '<table style="text-align: center; width: 100%;"> \
+                <tbody> \
+                    <tr> \
+                        <td style="width:20%;">차단자</td> \
+                        <td style="width:20%;">관리자</td> \
+                        <td style="width:20%;">기간</td> \
+                        <td style="width:20%;">이유</td> \
+                        <td style="width:20%;">시간</td> \
+                    </tr>'
     
     curs.execute("select * from rb order by today desc limit " + str(i) + ", " + str(v))
     rows = curs.fetchall()
@@ -903,9 +893,8 @@ def blocklog(num = 1):
                     <td>' + data['today'] + '</td> \
                 </tr>'
     else:
-        div +=          '</tbody> \
-                    </table> \
-                </div> \
+        div +=      '</tbody> \
+                </table> \
                 <br> \
                 <a href="/xref/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전)</a> <a href="/xref/' + url_pas(name) + '/n/' + str(num + 1) + '">(이후)</a>'
                 
@@ -947,14 +936,13 @@ def history_view(name = None, num = 1):
         admin1 = admin_check(1)
         admin2 = admin_check(6)
         
-        div =   '<div> \
-                    <table style="text-align:center; width:100%;"> \
-                        <tbody> \
-                            <tr> \
-                                <td style="width:33.33%;">판</td> \
-                                <td style="width:33.33%;">기여자</td> \
-                                <td style="width:33.33%;">시간</td> \
-                            </tr>'
+        div =   '<table style="text-align:center; width:100%;"> \
+                    <tbody> \
+                        <tr> \
+                            <td style="width:33.33%;">판</td> \
+                            <td style="width:33.33%;">기여자</td> \
+                            <td style="width:33.33%;">시간</td> \
+                        </tr>'
         
         curs.execute("select send, leng, ip, date, title, id from history where title = '" + pymysql.escape_string(name) + "' order by id + 0 desc limit " + str(j) + ", " + str(i))
         all_data = curs.fetchall()
@@ -1022,9 +1010,8 @@ def history_view(name = None, num = 1):
                             <td colspan="3">' + send + '</td> \
                         </tr>'
         else:
-            div +=          '</tbody> \
-                        </table> \
-                    </div> \
+            div +=      '</tbody> \
+                    </table> \
                     <br> \
                     <a href="/history/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전)</a> <a href="/history/' + url_pas(name) + '/n/' + str(num + 1) + '">(이후)</a>'
                     
@@ -3356,14 +3343,13 @@ def user_topic_list(name = None, num = 1):
     
     i = v - 50
     ydmin = admin_check(1)
-    div =   '<div> \
-                <table style="text-align: center; width: 100%;"> \
-                    <tbody> \
-                        <tr> \
-                            <td style="width:33.33%;">토론명</td> \
-                            <td style="width:33.33%;">작성자</td> \
-                            <td style="width:33.33%;">시간</td> \
-                        </tr>'
+    div =   '<table style="text-align: center; width: 100%;"> \
+                <tbody> \
+                    <tr> \
+                        <td style="width:33.33%;">토론명</td> \
+                        <td style="width:33.33%;">작성자</td> \
+                        <td style="width:33.33%;">시간</td> \
+                    </tr>'
     
     curs.execute("select title, id, sub, ip, date from topic where ip = '" + pymysql.escape_string(name) + "' order by date desc limit " + str(i) + ", " + str(v))
     rows = curs.fetchall()
@@ -3397,12 +3383,10 @@ def user_topic_list(name = None, num = 1):
                         <td>' + data['date'] + '</td> \
                     </tr>'
         else:
-            div +=          '</tbody> \
-                        </table> \
-                    </div>'
+            div +=      '</tbody> \
+                    </table>'
     else:
-        div =   'None \
-                <br>'
+        div = ''
         
     div += '<br> \
             <a href="/user/' + url_pas(name) + '/topic/' + str(num - 1) + '">(이전)</a> <a href="/user/' + url_pas(name) + '/topic/' + str(num + 1) + '">(이후)</a>'
