@@ -3838,7 +3838,7 @@ def error_404(error):
     
 run(
     app = app, 
-    server='tornado', 
+    server = 'tornado', 
     host = '0.0.0.0', 
     port = int(set_data['port'])
 )
