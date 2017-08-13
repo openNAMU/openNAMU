@@ -150,7 +150,7 @@ def setup():
                 license = set_data['license'], 
                 login = login_check(), 
                 logo = set_data['name'], 
-                data = '<form method="POST"> \
+                data = '<form method="post"> \
                             <input name="owner" type="password"> <button class="btn btn-primary" type="submit">저장</button> \
                         </form>', 
                 title = '오픈나무 설치'
@@ -164,7 +164,7 @@ def static(name = None):
     else:
         return(redirect('/'))
 
-@route('/acllist')
+@route('/acl_list')
 def acl_list():
     conn = pymysql.connect(
         user = set_data['user'], 
@@ -336,7 +336,7 @@ def admin_plus(name = None):
                     login = login_check(), 
                     title = '관리 그룹 추가', 
                     logo = set_data['name'], 
-                    data = '<form id="usrform" method="POST" action="/adminplus/' + url_pas(name) + '">' \
+                    data = '<form method="post">' \
                                 + data + \
                                 '<div class="form-actions"> \
                                     <button class="btn btn-primary" type="submit">저장</button> \
@@ -348,7 +348,7 @@ def admin_plus(name = None):
         conn.close()
         return(redirect('/error/3'))
         
-@route('/adminlist')
+@route('/admin_list')
 def admin_list():
     conn = pymysql.connect(
         user = set_data['user'], 
@@ -359,7 +359,7 @@ def admin_list():
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
     i = 1
-    div = '<div>'
+    div = ''
     
     curs.execute("select * from user where not acl = 'user'")
     user_data = curs.fetchall()
@@ -370,31 +370,18 @@ def admin_list():
             div += '<li>' + str(i) + '. ' + name + '</li>'
             
             i += 1
-        else:
-            div += '</div>'
                 
-        conn.close()
-        return(
-            template('other', 
-                custom = custom_css_user(), 
-                license = set_data['license'], 
-                login = login_check(), 
-                logo = set_data['name'], 
-                data = div, 
-                title = '관리자 목록'
-            )
+    conn.close()
+    return(
+        template('other', 
+            custom = custom_css_user(), 
+            license = set_data['license'], 
+            login = login_check(), 
+            logo = set_data['name'], 
+            data = div, 
+            title = '관리자 목록'
         )
-    else:
-        conn.close()
-        return(
-            template('other', 
-                custom = custom_css_user(), 
-                license = set_data['license'], 
-                login = login_check(), 
-                logo = set_data['name'], 
-                title = '관리자 목록'
-            )
-        )
+    )
         
 @route('/recentchanges')
 def recentchanges():
@@ -411,9 +398,9 @@ def recentchanges():
     div =  '<table style="width: 100%; text-align: center;"> \
                 <tbody> \
                     <tr> \
-                        <td style="width:33.33%;">문서명</td> \
-                        <td style="width:33.33%;">기여자</td> \
-                        <td style="width:33.33%;">시간</td> \
+                        <td style="width: 33.3%;">문서명</td> \
+                        <td style="width: 33.3%;">기여자</td> \
+                        <td style="width: 33.3%;">시간</td> \
                     </tr>'
     
     curs.execute("select id, title, date, ip, send, leng from history order by date desc limit 50")
@@ -554,9 +541,9 @@ def user_record(name = None, num = 1):
     div =  '<table style="width: 100%; text-align: center;"> \
                 <tbody> \
                     <tr> \
-                        <td style="width:33.33%;">문서명</td> \
-                        <td style="width:33.33%;">기여자</td> \
-                        <td style="width:33.33%;">시간</td> \
+                        <td style="width: 33.3%;">문서명</td> \
+                        <td style="width: 33.3%;">기여자</td> \
+                        <td style="width: 33.3%;">시간</td> \
                     </tr>'
     
     curs.execute("select * from history where ip = '" + pymysql.escape_string(name) + "' order by date desc limit " + str(i) + ", " + str(v))
@@ -802,11 +789,11 @@ def recentdiscuss():
     )
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
-    div =   '<table style="text-align: center; width: 100%;"> \
+    div =   '<table style="width: 100%; text-align: center;"> \
                 <tbody> \
                     <tr> \
-                        <td style="width:50%;">토론명</td> \
-                        <td style="width:50%;">시간</td> \
+                        <td style="width: 50%;">토론명</td> \
+                        <td style="width: 50%;">시간</td> \
                     </tr>'
     
     curs.execute("select * from rd order by date desc limit 50")
@@ -861,14 +848,14 @@ def blocklog(num = 1):
         v = num * 50
     
     i = v - 50
-    div =   '<table style="text-align: center; width: 100%;"> \
+    div =   '<table style="width: 100%; text-align: center;"> \
                 <tbody> \
                     <tr> \
-                        <td style="width:20%;">차단자</td> \
-                        <td style="width:20%;">관리자</td> \
-                        <td style="width:20%;">기간</td> \
-                        <td style="width:20%;">이유</td> \
-                        <td style="width:20%;">시간</td> \
+                        <td style="width: 20%;">차단자</td> \
+                        <td style="width: 20%;">관리자</td> \
+                        <td style="width: 20%;">기간</td> \
+                        <td style="width: 20%;">이유</td> \
+                        <td style="width: 20%;">시간</td> \
                     </tr>'
     
     curs.execute("select * from rb order by today desc limit " + str(i) + ", " + str(v))
@@ -936,12 +923,12 @@ def history_view(name = None, num = 1):
         admin1 = admin_check(1)
         admin2 = admin_check(6)
         
-        div =   '<table style="text-align:center; width:100%;"> \
+        div =   '<table style="width: 100%; text-align: center;"> \
                     <tbody> \
                         <tr> \
-                            <td style="width:33.33%;">판</td> \
-                            <td style="width:33.33%;">기여자</td> \
-                            <td style="width:33.33%;">시간</td> \
+                            <td style="width: 33.3%;">판</td> \
+                            <td style="width: 33.3%;">기여자</td> \
+                            <td style="width: 33.3%;">시간</td> \
                         </tr>'
         
         curs.execute("select send, leng, ip, date, title, id from history where title = '" + pymysql.escape_string(name) + "' order by id + 0 desc limit " + str(j) + ", " + str(i))
@@ -1168,7 +1155,7 @@ def raw_view(name = None, num = None):
         enddata = re.sub('>', '&gt;', enddata)
         enddata = re.sub('"', '&quot;', enddata)
         
-        enddata = '<textarea id="other_text">' + enddata + '</textarea>'
+        enddata = '<textarea style="height: 80%;">' + enddata + '</textarea>'
         
         conn.close()
         return(
@@ -1772,8 +1759,8 @@ def other():
                     <li><a href="/manager/7">사용자 토론 기록</a></li> \
                     <h2>기타</h2> \
                     <li><a href="/titleindex">모든 문서</a></li> \
-                    <li><a href="/acllist">ACL 문서 목록</a></li> \
-                    <li><a href="/adminlist">관리자 목록</a></li> \
+                    <li><a href="/acl_list">ACL 문서 목록</a></li> \
+                    <li><a href="/admin_list">관리자 목록</a></li> \
                     <li><a href="/manager/1">관리자 메뉴</a></li> \
                     <br> \
                     이 오픈나무의 버전은 <a href="https://github.com/2DU/openNAMU/blob/normal/version.md">v' + r_ver + '</a> 입니다.'
@@ -1814,7 +1801,7 @@ def manager(num = None):
                     login = login_check(), 
                     title = 'ACL 이동', 
                     logo = set_data['name'], 
-                    data = '<form id="usrform" method="POST" action="/manager/2"> \
+                    data = '<form method="post"> \
                                 <input name="name" type="text"> \
                                 <br> \
                                 <br> \
@@ -1833,7 +1820,7 @@ def manager(num = None):
                     login = login_check(), 
                     title = '체크 이동', 
                     logo = set_data['name'], 
-                    data = '<form id="usrform" method="POST" action="/manager/3"> \
+                    data = '<form method="post"> \
                                 <input name="name" type="text"> \
                                 <br> \
                                 <br> \
@@ -1852,7 +1839,7 @@ def manager(num = None):
                     login = login_check(), 
                     title = '차단 이동', 
                     logo = set_data['name'], 
-                    data = '<form id="usrform" method="POST" action="/manager/4"> \
+                    data = '<form method="post"> \
                                 <input name="name" type="text"> \
                                 <br> \
                                 <br> \
@@ -1874,7 +1861,7 @@ def manager(num = None):
                     login = login_check(), 
                     title = '권한 이동', 
                     logo = set_data['name'], 
-                    data = '<form id="usrform" method="POST" action="/manager/5"> \
+                    data = '<form method="post"> \
                                 <input name="name" type="text"> \
                                 <br> \
                                 <br> \
@@ -1893,7 +1880,7 @@ def manager(num = None):
                     login = login_check(), 
                     title = '기록 이동', 
                     logo = set_data['name'], 
-                    data = '<form id="usrform" method="POST" action="/manager/6"> \
+                    data = '<form method="post"> \
                                 <input name="name" type="text"> \
                                 <br> \
                                 <br> \
@@ -1912,7 +1899,7 @@ def manager(num = None):
                     login = login_check(), 
                     title = '토론 기록 이동', 
                     logo = set_data['name'], 
-                    data = '<form id="usrform" method="POST" action="/manager/7"> \
+                    data = '<form method="post"> \
                                 <input name="name" type="text"> \
                                 <br> \
                                 <br> \
@@ -1931,7 +1918,7 @@ def manager(num = None):
                     login = login_check(), 
                     title = '그룹 생성 이동', 
                     logo = set_data['name'], 
-                    data = '<form id="usrform" method="POST" action="/manager/8"> \
+                    data = '<form method="post"> \
                                 <input name="name" type="text"> \
                                 <br> \
                                 <br> \
@@ -2724,12 +2711,12 @@ def user_check(name = None):
             row = curs.fetchall()
             if(row):
                 c = '<div> \
-                        <table style="text-align: center; width: 100%;"> \
+                        <table style="width: 100%; text-align: center;"> \
                             <tbody> \
                                 <tr> \
-                                    <td style="width:33.33%;">이름</td> \
-                                    <td style="width:33.33%;">아이피</td> \
-                                    <td style="width:33.33%;">언제</td> \
+                                    <td style="width: 33.3%;">이름</td> \
+                                    <td style="width: 33.3%;">아이피</td> \
+                                    <td style="width: 33.3%;">언제</td> \
                                 </tr>'
                 for data in row:
                     c +=    '<tr> \
@@ -3343,12 +3330,12 @@ def user_topic_list(name = None, num = 1):
     
     i = v - 50
     ydmin = admin_check(1)
-    div =   '<table style="text-align: center; width: 100%;"> \
+    div =   '<table style="width: 100%; text-align: center;"> \
                 <tbody> \
                     <tr> \
-                        <td style="width:33.33%;">토론명</td> \
-                        <td style="width:33.33%;">작성자</td> \
-                        <td style="width:33.33%;">시간</td> \
+                        <td style="width: 33.3%;">토론명</td> \
+                        <td style="width: 33.3%;">작성자</td> \
+                        <td style="width: 33.3%;">시간</td> \
                     </tr>'
     
     curs.execute("select title, id, sub, ip, date from topic where ip = '" + pymysql.escape_string(name) + "' order by date desc limit " + str(i) + ", " + str(v))
@@ -3513,7 +3500,7 @@ def custom_css():
                 title = '커스텀 CSS', 
                 logo = set_data['name'], 
                 data =  start + \
-                        '<form id="usrform" name="f1" method="POST" action="/custom"> \
+                        '<form method="post"> \
                             <textarea rows="30" cols="100" name="content" form="usrform">'\
                                  + data + \
                             '</textarea> \
