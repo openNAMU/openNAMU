@@ -157,6 +157,40 @@ def setup():
             )
         )
 
+@route('/not_close_topic')
+def not_close_topic():
+    conn = pymysql.connect(
+        user = set_data['user'], 
+        password = set_data['pw'], 
+        charset = 'utf8mb4',
+        db = set_data['db']
+    )
+    curs = conn.cursor(pymysql.cursors.DictCursor)
+
+    div = ''
+    i = 1
+
+    curs.execute('select * from rd order by date desc')
+    n_list = curs.fetchall()
+    for data in n_list:
+        curs.execute('select * from stop where title = "' + pymysql.escape_string(data['title']) + '" and sub = "' + pymysql.escape_string(data['sub']) + '" and close = "O"')
+        is_close = curs.fetchall()
+        if(not is_close):
+            div += '<li>' + str(i) + '. <a href="/topic/' + url_pas(data['title']) + '/sub/' + url_pas(data['sub']) + '">' + data['title'] + ' (' + data['sub'] + ')</a></li>'
+            i += 1
+
+    conn.close()
+    return(
+        template('other',
+            custom = custom_css_user(),
+            license = set_data['license'],
+            login = login_check(),
+            logo = set_data['name'],
+            data = div,
+            title = '안 닫힌 토론 목록'
+        )
+    )
+
 @route('/image/<name:path>')
 def static(name = None):
     if(os.path.exists(os.path.join('image', name))):
@@ -1779,6 +1813,7 @@ def manager(num = None):
                         <li><a href="/manager/4">사용자 차단</a></li> \
                         <li><a href="/manager/5">관리자 권한 주기</a></li> \
                         <li><a href="/mdel">많은 문서 삭제</a></li> \
+                        <li><a href="/not_close_topic">안 닫힌 토론 목록</a></li> \
                         <h2>소유자</h2> \
                         <li><a href="/backreset">역링크, 분류 다시 생성</a></li> \
                         <li><a href="/manager/8">관리 그룹 생성</a></li> \
