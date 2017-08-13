@@ -2252,7 +2252,7 @@ def topic(name = None, sub = None):
                 div += '<table id="toron"> \
                             <tbody> \
                                 <tr> \
-                                    <td id="toroncolorred"> \
+                                    <td id="toron_color_red"> \
                                         <a href="#' + dain['id'] + '">#' + dain['id'] + '</a> ' + ip + ' <span style="float:right;">' + dain['date'] + '</span> \
                                     </td> \
                                 </tr> \
@@ -2314,16 +2314,16 @@ def topic(name = None, sub = None):
             ip = ip_pas(dain['ip'], 1)
                     
             if(dain['top'] == '1'):
-                color = 'blue'
+                color = '_blue'
             elif(dain['ip'] == start):
-                color = 'green'
+                color = '_green'
             else:
                 color = ''
                          
             div += '<table id="toron"> \
                         <tbody> \
                             <tr> \
-                                <td id="toroncolor' + color + '"> \
+                                <td id="toron_color' + color + '"> \
                                     <a href="javascript:void(0);" id="' + str(i + 1) + '">#' + str(i + 1) + '</a> ' + ip + chad + ban + ' <span style="float:right;">' + dain['date'] + '</span> \
                                 </td> \
                             </tr> \
@@ -2389,7 +2389,7 @@ def close_topic_list(name = None):
                     <table id="toron"> \
                         <tbody> \
                             <tr> \
-                                <td id="toroncolorgreen"> \
+                                <td id="toron_color_green"> \
                                     <a href="javascript:void(0);" id="1">#1</a> ' + ip + ' <span style="float:right;">' + row[0]['date'] + '</span> \
                                 </td> \
                             </tr> \
@@ -2453,7 +2453,7 @@ def agree_topic_list(name = None):
                     <table id="toron"> \
                         <tbody> \
                             <tr> \
-                                <td id="toroncolorgreen"> \
+                                <td id="toron_color_green"> \
                                     <a href="javascript:void(0);" id="1">#1</a> ' + ip + ' <span style="float:right;">' + topic_data[0]['date'] + '</span> \
                                 </td> \
                             </tr> \
@@ -2523,7 +2523,7 @@ def topic_list(name = None):
                         <table id="toron"> \
                             <tbody> \
                                 <tr> \
-                                    <td id="toroncolorgreen"> \
+                                    <td id="toron_color_green"> \
                                         <a href="javascript:void(0);" id="1">#1</a> ' + ip + ' <span style="float:right;">' + aa[0]['date'] + '</span> \
                                     </td> \
                                 </tr> \

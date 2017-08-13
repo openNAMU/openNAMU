@@ -378,15 +378,15 @@ body {
     width: 100%;
 }
 
-#toroncolorgreen {
+#toron_color_green {
     background-color: #B0D3AD;
 }
 
-#toroncolorred {
+#toron_color_red {
     background-color: #f3c2c2;
 }
 
-#toroncolor {
+#toron_color {
     background-color: #d5d5d5;
 }
 
@@ -416,16 +416,8 @@ body {
     z-index: 10000;
 }
 
-#toroncolorstop {
-    background: #9dd5e1;
-}
-
 #bl {
     background: gainsboro;
-}
-
-#toroncoloradmin {
-    background-color: #F5C1C1;
 }
 
 @media (min-width: 768px) {
@@ -510,11 +502,11 @@ pre span {
     }        
 }
 
-td#block {
+#block {
     background: gainsboro;
 }
 
-td#toroncolorblue {
+#toron_color_blue {
     background: #c1ebff;
 }
 
