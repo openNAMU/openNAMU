@@ -174,7 +174,7 @@ def acl_list():
     )
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
-    div = '<div>'
+    div = ''
     i = 0
 
     curs.execute("select title, acl from data where acl = 'admin' or acl = 'user' order by acl desc")
@@ -189,10 +189,6 @@ def acl_list():
             div += '<li>' + str(i + 1) + '. <a href="/w/' + url_pas(data['title']) + '">' + data['title'] + '</a> (' + acl + ')</li>'
             
             i += 1
-        else:
-            div += '</div>'
-    else:
-        div = ''
 
     conn.close()
     return(
@@ -1940,7 +1936,7 @@ def title_index():
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
     i = [0, 0, 0, 0, 0, 0]
-    data = '<div>'
+    data = ''
     curs.execute("select title from data order by title asc")
     title_list = curs.fetchall()
     if(title_list):
@@ -1960,9 +1956,6 @@ def title_index():
         
             i[0] += 1
                 
-        else:
-            data += '</div>'
-                
         data += '<br> \
                  <li>이 위키에는 총 ' + str(i[0]) + '개의 문서가 있습니다.</li> \
                  <br> \
@@ -1971,8 +1964,6 @@ def title_index():
                  <li>사용자 문서는 총 ' + str(i[2]) + '개의 문서가 있습니다.</li> \
                  <li>파일 문서는 총 ' + str(i[4]) + '개의 문서가 있습니다.</li> \
                  <li>나머지 문서는 총 ' + str(i[5]) + '개의 문서가 있습니다.</li>'
-    else:
-        data = ''
 
     conn.close()
     return(
@@ -2209,7 +2200,7 @@ def topic(name = None, sub = None):
         stop = curs.fetchall()
         
         if(admin == 1):
-            div = '<div>'
+            div = ''
             
             if(close):
                 div += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/close">(토론 열기)</a> '
@@ -2229,8 +2220,6 @@ def topic(name = None, sub = None):
                 div += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/agree">(합의 완료)</a>'
             
             div += '<br><br>'
-        else:
-            div = '<div>'
         
         if(stop or close):
             if(admin != 1):
@@ -2364,7 +2353,7 @@ def close_topic_list(name = None):
     )
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
-    div = '<div>'
+    div = ''
     i = 0
     
     curs.execute("select * from stop where title = '" + pymysql.escape_string(name) + "' and close = 'O' order by sub asc")
@@ -2401,8 +2390,6 @@ def close_topic_list(name = None):
                     <br>'
             
             i += 1
-    else:
-        div += '</div>'
         
     conn.close()
     return(
@@ -2428,7 +2415,7 @@ def agree_topic_list(name = None):
     )
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
-    div = '<div>'
+    div = ''
     i = 0
     
     curs.execute("select * from agreedis where title = '" + pymysql.escape_string(name) + "' order by sub asc")
@@ -2465,8 +2452,6 @@ def agree_topic_list(name = None):
                     <br>'
             
             i += 1
-    else:
-        div += '</div>'
         
     conn.close()
     return(
@@ -2496,7 +2481,7 @@ def topic_list(name = None):
         conn.close()
         return(redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(request.forms.topic)))
     else:
-        div = '<div>'
+        div = ''
         j = 1
         curs.execute("select * from rd where title = '" + pymysql.escape_string(name) + "' order by date asc")
         rows = curs.fetchall()
@@ -2535,8 +2520,6 @@ def topic_list(name = None):
                         <br>'
                 
                 j += 1
-        else:
-            div += '</div>'
                 
         conn.close()
         return(
