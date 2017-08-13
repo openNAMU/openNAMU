@@ -48,7 +48,6 @@ except:
                     "name" : "' + new_json[3] + '", \
                     "frontpage" : "' + new_json[4] + '", \
                     "license" : "' + new_json[5] + '", \
-                    "key" : "' + new_json[6] + '", \
                     "upload" : "' + new_json[7] + '", \
                     "port" : "' + new_json[8] + '" \
                 }')
