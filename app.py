@@ -132,10 +132,7 @@ def setup():
             curs.execute("create table other(name text, data text)")
             curs.execute("create table alist(name text, acl text)")
 
-            curs.execute("delete from alist where name = 'owner'")
             curs.execute("insert into alist (name, acl) value ('owner', 'owner')")
-            
-            curs.execute("delete from other where name = 'version'")
             curs.execute("insert into other (name, data) value ('version', '" + pymysql.escape_string(r_ver) + "')")
             conn.commit()
 
