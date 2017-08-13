@@ -2192,6 +2192,7 @@ def topic(name = None, sub = None):
             return(redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub)))
     else:
         style = ''
+        div = ''
 
         curs.execute("select * from stop where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(sub) + "' and close = 'O'")
         close = curs.fetchall()
@@ -2200,8 +2201,6 @@ def topic(name = None, sub = None):
         stop = curs.fetchall()
         
         if(admin == 1):
-            div = ''
-            
             if(close):
                 div += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/close">(토론 열기)</a> '
             else:
@@ -2478,15 +2477,27 @@ def topic_list(name = None):
     curs = conn.cursor(pymysql.cursors.DictCursor)
 
     if(request.method == 'POST'):
+        t_num = ''
+        while(1):
+            curs.execute("select title from topic where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(request.forms.topic + t_num) + "' limit 1")
+            t_data = curs.fetchall()
+            if(t_data):
+                if(t_num == ''):
+                    t_num = ' 2'
+                else:
+                    t_num = ' ' + str(int(t_num.replace(' ', '')) + 1)
+            else:
+                break
+
         conn.close()
-        return(redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(request.forms.topic)))
+        return(redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(request.forms.topic + t_num)))
     else:
         div = ''
         j = 1
-        curs.execute("select * from rd where title = '" + pymysql.escape_string(name) + "' order by date asc")
+        curs.execute("select * from rd where title = '" + pymysql.escape_string(name) + "' order by date desc")
         rows = curs.fetchall()
         for data in rows:
-            curs.execute("select * from topic where title = '" + pymysql.escape_string(data['title']) + "' and sub = '" + pymysql.escape_string(data['sub']) + "' and id = '1' order by sub asc")
+            curs.execute("select * from topic where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(data['sub']) + "' and id = '1'")
             aa = curs.fetchall()
             
             indata = namumark(name, aa[0]['data'], 0)
@@ -2499,11 +2510,11 @@ def topic_list(name = None):
 
             ip = ip_pas(aa[0]['ip'], 1)
                 
-            curs.execute("select * from stop where title = '" + pymysql.escape_string(data['title']) + "' and sub = '" + pymysql.escape_string(data['sub']) + "' and close = 'O'")
+            curs.execute("select * from stop where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(data['sub']) + "' and close = 'O'")
             row = curs.fetchall()
             if(not row):
                 div += '<h2> \
-                            <a href="/topic/' + url_pas(data['title']) + '/sub/' + url_pas(data['sub']) + '">' + str(j) + '. ' + data['sub'] + '</a> \
+                            <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(data['sub']) + '">' + str(j) + '. ' + data['sub'] + '</a> \
                         </h2> \
                         <table id="toron"> \
                             <tbody> \
@@ -3188,7 +3199,7 @@ def read_view(name = None, num = None, redirect = None):
     div = ''
     topic = ''
     
-    curs.execute("select sub from rd where title = '" + pymysql.escape_string(name) + "' order by date asc")
+    curs.execute("select sub from rd where title = '" + pymysql.escape_string(name) + "' order by date desc")
     rows = curs.fetchall()
     for data in rows:
         curs.execute("select title from stop where title = '" + pymysql.escape_string(name) + "' and sub = '" + pymysql.escape_string(data['sub']) + "' and close = 'O'")
