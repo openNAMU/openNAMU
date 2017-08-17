@@ -28,9 +28,8 @@ def get_time():
     return(date)
 
 def escape(data):
-    data = data.replace('\\', '\\\\')
-    data = data.replace("'", "\'")
-    data = data.replace('"', '\"')
+    data = data.replace("'", "''")
+    data = data.replace('"', '""')
 
     return(data)
     

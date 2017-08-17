@@ -62,7 +62,7 @@ def redirect(data):
     
 from func import *
 
-r_ver = '2.1.7'
+r_ver = '2.2.0'
 
 try:
     curs.execute('select data from other where name = "version"')
@@ -79,12 +79,12 @@ except:
 
 @route('/setup', method=['GET', 'POST'])
 def setup():
-    curs.execute("create table data(title text, data longtext, acl text)")
-    curs.execute("create table history(id text, title text, data longtext, date text, ip text, send text, leng text)")
+    curs.execute("create table data(title text, data text, acl text)")
+    curs.execute("create table history(id text, title text, data text, date text, ip text, send text, leng text)")
     curs.execute("create table rd(title text, sub text, date text)")
     curs.execute("create table user(id text, pw text, acl text)")
     curs.execute("create table ban(block text, end text, why text, band text)")
-    curs.execute("create table topic(id text, title text, sub text, data longtext, date text, ip text, block text, top text)")
+    curs.execute("create table topic(id text, title text, sub text, data text, date text, ip text, block text, top text)")
     curs.execute("create table stop(title text, sub text, close text)")
     curs.execute("create table rb(block text, end text, today text, blocker text, why text)")
     curs.execute("create table login(user text, ip text, today text)")
@@ -92,7 +92,7 @@ def setup():
     curs.execute("create table cat(title text, cat text)")
     curs.execute("create table hidhi(title text, re text)")
     curs.execute("create table agreedis(title text, sub text)")
-    curs.execute("create table custom(user text, css longtext)")
+    curs.execute("create table custom(user text, css text)")
     curs.execute("create table other(name text, data text)")
     curs.execute("create table alist(name text, acl text)")
 
