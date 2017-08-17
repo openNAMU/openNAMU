@@ -2,13 +2,16 @@
 from bottle.ext import beaker
 from urllib import parse
 import json
-import pymysql
+import sqlite3
 import time
 import re
 import hashlib
 
 json_data = open('set.json').read()
 set_data = json.loads(json_data)
+
+conn = sqlite3.connect(set_data['db'] + '.db')
+curs = conn.cursor()
 
 session_opts = {
     'session.type': 'file',
@@ -23,6 +26,13 @@ def get_time():
     date = "%04d-%02d-%02d %02d:%02d:%02d" % (now.tm_year, now.tm_mon, now.tm_mday, now.tm_hour, now.tm_min, now.tm_sec)
 
     return(date)
+
+def escape(data):
+    data = data.replace('\\', '\\\\')
+    data = data.replace("'", "\'")
+    data = data.replace('"', '\"')
+
+    return(data)
     
 def ip_check():
     session = request.environ.get('beaker.session')
@@ -324,35 +334,22 @@ def toc_pas(data, title):
     return(data)
 
 def backlink_plus(name, link, backtype, num):
-    if(num == 1):
-        conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
-        curs = conn.cursor(pymysql.cursors.DictCursor)
-        
-        curs.execute("select title from back where title = '" + pymysql.escape_string(link) + "' and link = '" + pymysql.escape_string(name) + "' and type = '" + backtype + "'")
+    if(num == 1):       
+        curs.execute("select title from back where title = '" + escape(link) + "' and link = '" + escape(name) + "' and type = '" + backtype + "'")
         y = curs.fetchall()
         if(not y):
-            curs.execute("insert into back (title, link, type) value ('" + pymysql.escape_string(link) + "', '" + pymysql.escape_string(name) + "',  '" + backtype + "')")
+            curs.execute("insert into back (title, link, type) values ('" + escape(link) + "', '" + escape(name) + "',  '" + backtype + "')")
             conn.commit()
-            
-        conn.close()
 
 def cat_plus(name, link, num):
-    if(num == 1):
-        conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
-        curs = conn.cursor(pymysql.cursors.DictCursor)
-        
-        curs.execute("select title from cat where title = '" + pymysql.escape_string(link) + "' and cat = '" + pymysql.escape_string(name) + "'")
+    if(num == 1):        
+        curs.execute("select title from cat where title = '" + escape(link) + "' and cat = '" + escape(name) + "'")
         y = curs.fetchall()
         if(not y):
-            curs.execute("insert into cat (title, cat) value ('" + pymysql.escape_string(link) + "', '" + pymysql.escape_string(name) + "')")
+            curs.execute("insert into cat (title, cat) values ('" + escape(link) + "', '" + escape(name) + "')")
             conn.commit()
-            
-        conn.close()
 
-def namumark(title, data, num):
-    conn = pymysql.connect(user = set_data['user'], password = set_data['pw'], charset = 'utf8mb4', db = set_data['db'])
-    curs = conn.cursor(pymysql.cursors.DictCursor)
-    
+def namumark(title, data, num):    
     data = html_pas(data, 1)
 
     b = 0
@@ -372,12 +369,12 @@ def namumark(title, data, num):
             if(results[0] == title):
                 data = include.sub("<b>" + results[0] + "</b>", data, 1)
             else:
-                curs.execute("select * from data where title = '" + pymysql.escape_string(results[0]) + "'")
+                curs.execute("select data from data where title = '" + escape(results[0]) + "'")
                 in_con = curs.fetchall()
                 
                 backlink_plus(title, results[0], 'include', num)
                 if(in_con):                        
-                    in_data = in_con[0]['data']
+                    in_data = in_con[0][0]
                     in_data = include.sub("", in_data)
                     
                     in_data = html_pas(in_data, 1)
@@ -453,7 +450,7 @@ def namumark(title, data, num):
                 cat_plus(title, g[0], num)
                     
                 if(category == ''):
-                    curs.execute("select title from data where title = '" + pymysql.escape_string(g[0]) + "'")
+                    curs.execute("select title from data where title = '" + escape(g[0]) + "'")
                     exists = curs.fetchall()
                     if(exists):
                         red = ""
@@ -462,7 +459,7 @@ def namumark(title, data, num):
                         
                     category += '<a ' + red + ' href="/w/' + url_pas(g[0]) + '">' + re.sub("분류:", "", g[0]) + '</a>'
                 else:
-                    curs.execute("select title from data where title = '" + pymysql.escape_string(g[0]) + "'")
+                    curs.execute("select title from data where title = '" + escape(g[0]) + "'")
                     exists = curs.fetchall()
                     if(exists):
                         red = ""
@@ -662,7 +659,7 @@ def namumark(title, data, num):
                 else:
                     nosharp = re.sub("<sharp>", "#", results[0])
                     
-                    curs.execute("select title from data where title = '" + pymysql.escape_string(nosharp) + "'")
+                    curs.execute("select title from data where title = '" + escape(nosharp) + "'")
                     y = curs.fetchall()
                     if(y):
                         clas = ''
@@ -1209,5 +1206,5 @@ def namumark(title, data, num):
                 } \
             </script>"
     
-    conn.close()
+    
     return(data)
