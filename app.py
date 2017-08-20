@@ -694,7 +694,7 @@ def history_view(name = None, num = 1):
                 else:
                     ban = ''
             
-            curs.execute("select * from hidhi where title = ? and re = ?", [name, data(5)])
+            curs.execute("select * from hidhi where title = ? and re = ?", [name, data[5]])
             hid_it = curs.fetchall()
             if(hid_it):
                 if(admin2):
@@ -2724,7 +2724,7 @@ def count_edit():
         
 @route('/random')
 def random():
-    curs.execute("select title from data order by rand() limit 1")
+    curs.execute("select title from data order by random() limit 1")
     rows = curs.fetchall()
     if(rows):
         return(redirect('/w/' + url_pas(rows[0][0])))
