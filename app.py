@@ -71,7 +71,7 @@ try:
         t_ver = re.sub('\.', '', version[0]['data'])
         r_t_ver = re.sub('\.', '', r_ver)
         if(int(t_ver) <= int(r_t_ver)):
-            curs.execute("update other set data = '" + escape(r_ver) + "' where name = 'version'")    
+            curs.execute("update other set data = ? where name = 'version'", [r_ver])    
     
     conn.commit()
 except:
@@ -97,7 +97,7 @@ def setup():
     curs.execute("create table alist(name text, acl text)")
 
     curs.execute("insert into alist (name, acl) values ('owner', 'owner')")
-    curs.execute("insert into other (name, data) values ('version', '" + escape(r_ver) + "')")
+    curs.execute("insert into other (name, data) values ('version', ?)", [r_ver])
     conn.commit()
 
     return(redirect('/'))
@@ -110,7 +110,7 @@ def not_close_topic():
     curs.execute('select title, sub from rd order by date desc')
     n_list = curs.fetchall()
     for data in n_list:
-        curs.execute('select * from stop where title = "' + escape(data[0]) + '" and sub = "' + escape(data[1]) + '" and close = "O"')
+        curs.execute('select * from stop where title = ? and sub = ? and close = "O"', [data[0], data[1]])
         is_close = curs.fetchall()
         if(not is_close):
             div += '<li>' + str(i) + '. <a href="/topic/' + url_pas(data[0]) + '/sub/' + url_pas(data[1]) + '">' + data[0] + ' (' + data[1] + ')</a></li>'
@@ -207,34 +207,34 @@ def list_acl():
 def admin_plus(name = None):
     if(admin_check(None) == 1):
         if(request.method == 'POST'):
-            curs.execute("delete from alist where name = '" + escape(name) + "'")
+            curs.execute("delete from alist where name = ?", [name])
             
             if(request.forms.ban):
-                curs.execute("insert into alist (name, acl) values ('" + escape(name) + "', 'ban')")
+                curs.execute("insert into alist (name, acl) values (?, 'ban')", [name])
 
             if(request.forms.mdel):
-                curs.execute("insert into alist (name, acl) values ('" + escape(name) + "', 'mdel')")   
+                curs.execute("insert into alist (name, acl) values (?, 'mdel')", [name])   
 
             if(request.forms.toron):
-                curs.execute("insert into alist (name, acl) values ('" + escape(name) + "', 'toron')")
+                curs.execute("insert into alist (name, acl) values (?, 'toron')", [name])
                 
             if(request.forms.check):
-                curs.execute("insert into alist (name, acl) values ('" + escape(name) + "', 'check')")
+                curs.execute("insert into alist (name, acl) values (?, 'check')", [name])
 
             if(request.forms.acl):
-                curs.execute("insert into alist (name, acl) values ('" + escape(name) + "', 'acl')")
+                curs.execute("insert into alist (name, acl) values (?, 'acl')", [name])
 
             if(request.forms.hidel):
-                curs.execute("insert into alist (name, acl) values ('" + escape(name) + "', 'hidel')")
+                curs.execute("insert into alist (name, acl) values (?, 'hidel')", [name])
 
             if(request.forms.owner):
-                curs.execute("insert into alist (name, acl) values ('" + escape(name) + "', 'owner')")
+                curs.execute("insert into alist (name, acl) values (?, 'owner')", [name])
                 
             conn.commit()
             
             return(redirect('/admin_plus/admin'))
         else:
-            curs.execute('select acl from alist where name = "' + escape(name) + '"')
+            curs.execute('select acl from alist where name = ?', [name])
             test = curs.fetchall()
             
             data = ''
@@ -332,7 +332,7 @@ def recentchanges(name = None, num = 1):
             
         i = v - 50
 
-        curs.execute("select id, title, date, ip, send, leng from history where ip = '" + escape(name) + "' order by date desc limit " + str(i) + ", " + str(v))
+        curs.execute("select id, title, date, ip, send, leng from history where ip = ? order by date desc limit ?, ?", [name, str(i), str(v)])
     else:
         curs.execute("select id, title, date, ip, send, leng from history order by date desc limit 50")
 
@@ -355,7 +355,7 @@ def recentchanges(name = None, num = 1):
             leng = '<span style="color:gray;">' + data[5] + '</span>'
             
         if(ydmin == 1):
-            curs.execute("select * from ban where block = '" + escape(data[3]) + "'")
+            curs.execute("select * from ban where block = ?", [data[3]])
             row = curs.fetchall()
             if(row):
                 ban = ' <a href="/ban/' + url_pas(data[3]) + '">(해제)</a>'
@@ -370,17 +370,15 @@ def recentchanges(name = None, num = 1):
             revert = '<a href="/w/' + url_pas(data[1]) + '/r/' + str(int(data[0]) - 1) + '/diff/' + data[0] + '">(비교)</a> <a href="/revert/' + url_pas(data[1]) + '/r/' + str(int(data[0]) - 1) + '">(되돌리기)</a>'
         
         style = ''
-        if(zdmin == 1):
-            curs.execute("select * from hidhi where title = '" + escape(data[1]) + "' and re = '" + escape(data[0]) + "'")
-            row = curs.fetchall()
+        curs.execute("select * from hidhi where title = ? and re = ?", [data[1], data[0]])
+        row = curs.fetchall()
+        if(zdmin == 1):    
             if(row):                            
                 ip += ' (숨김)'                            
                 hidden = ' <a href="/history/' + url_pas(data[1]) + '/r/' + data[0] + '/hidden">(공개)'
             else:
                 hidden = ' <a href="/history/' + url_pas(data[1]) + '/r/' + data[0] + '/hidden">(숨김)'
         else:
-            curs.execute("select * from hidhi where title = '" + escape(data[1]) + "' and re = '" + escape(data[0]) + "'")
-            row = curs.fetchall()
             if(row):
                 ip = '숨김'
                 hidden = ''
@@ -405,7 +403,7 @@ def recentchanges(name = None, num = 1):
                 </table>'
 
     if(name):
-        curs.execute("select end, why from ban where block = '" + escape(name) + "'")
+        curs.execute("select end, why from ban where block = ?", [name])
         ban_it = curs.fetchall()
         if(ban_it):
             sub = '차단'
@@ -429,12 +427,12 @@ def recentchanges(name = None, num = 1):
 @route('/history/<name:path>/r/<num:int>/hidden')
 def history_hidden(name = None, num = None):
     if(admin_check(6) == 1):
-        curs.execute("select * from hidhi where title = '" + escape(name) + "' and re = '" + escape(str(num)) + "'")
+        curs.execute("select * from hidhi where title = ? and re = ?", [name, str(num)])
         exist = curs.fetchall()
         if(exist):
-            curs.execute("delete from hidhi where title = '" + escape(name) + "' and re = '" + escape(str(num)) + "'")
+            curs.execute("delete from hidhi where title = ? and re = ?", [name, str(num)])
         else:
-            curs.execute("insert into hidhi (title, re) values ('" + escape(name) + "', '" + escape(str(num)) + "')")
+            curs.execute("insert into hidhi (title, re) values (?, ?)", [name, str(num)])
             
         conn.commit()
     
@@ -452,11 +450,11 @@ def user_log(num = 1):
     list_data = ''
     ydmin = admin_check(1)
     
-    curs.execute("select id from user limit " + str(j) + ", " + str(i))
+    curs.execute("select id from user limit ?, ?", [str(j), str(i)])
     user_list = curs.fetchall()
     for data in user_list:
         if(ydmin == 1):
-            curs.execute("select block from ban where block = '" + escape(data[0]) + "'")
+            curs.execute("select block from ban where block = ?", [data[0]])
             ban_exist = curs.fetchall()
             if(ban_exist):
                 ban_button = ' <a href="/ban/' + url_pas(data[0]) + '">(해제)</a>'
@@ -513,10 +511,10 @@ def xref(name = None, num = 1):
     i = v - 50
     div = ''
     
-    curs.execute("delete from back where title = '" + escape(name) + "' and link = ''")
+    curs.execute("delete from back where title = ? and link = ''", [name])
     conn.commit()
     
-    curs.execute("select link, type from back where title = '" + escape(name) + "' order by link asc limit " + str(i) + ", " + str(v))
+    curs.execute("select link, type from back where title = ? order by link asc limit ?, ?", [name, str(i), str(v)])
     rows = curs.fetchall()
     for data in rows:
         div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a>'
@@ -602,7 +600,7 @@ def blocklog(num = 1):
                         <td style="width: 20%;">시간</td> \
                     </tr>'
     
-    curs.execute("select why, block, blocker, end, today from rb order by today desc limit " + str(i) + ", " + str(v))
+    curs.execute("select why, block, blocker, end, today from rb order by today desc limit ?, ?", [str(i), str(v)])
     rows = curs.fetchall()
     for data in rows:
         why = re.sub('<', '&lt;', data[0])
@@ -664,7 +662,7 @@ def history_view(name = None, num = 1):
                             <td style="width: 33.3%;">시간</td> \
                         </tr>'
         
-        curs.execute("select send, leng, ip, date, title, id from history where title = '" + escape(name) + "' order by id + 0 desc limit " + str(j) + ", " + str(i))
+        curs.execute("select send, leng, ip, date, title, id from history where title = ? order by id + 0 desc limit ?, ?", [name, str(i), str(v)])
         all_data = curs.fetchall()
         for data in all_data:
             select += '<option value="' + data[5] + '">' + data[5] + '</option>'
@@ -683,7 +681,7 @@ def history_view(name = None, num = 1):
                 
             ip = ip_pas(data[2], None)
             
-            curs.execute("select block from ban where block = '" + escape(data[2]) + "'")
+            curs.execute("select block from ban where block = ?", [data[2]])
             ban_it = curs.fetchall()
             if(ban_it):
                 if(admin1 == 1):
@@ -696,7 +694,7 @@ def history_view(name = None, num = 1):
                 else:
                     ban = ''
             
-            curs.execute("select * from hidhi where title = '" + escape(name) + "' and re = '" + escape(data[5]) + "'")
+            curs.execute("select * from hidhi where title = ? and re = ?", [name, data(5)])
             hid_it = curs.fetchall()
             if(hid_it):
                 if(admin2):
@@ -755,7 +753,7 @@ def search():
 
 @route('/goto', method=['POST'])
 def goto():
-    curs.execute("select title from data where title = '" + escape(request.forms.search) + "'")
+    curs.execute("select title from data where title = ?", [request.forms.search])
     data = curs.fetchall()
     if(data):
         return(redirect('/w/' + url_pas(request.forms.search)))
@@ -776,13 +774,13 @@ def deep_search(name = None, num = 1):
     div_plus = ''
     end = ''
 
-    curs.execute("select title from data where title like '%" + escape(name) + "%'")
+    curs.execute("select title from data where title like ?", ['%' + name + '%'])
     title_list = curs.fetchall()
 
-    curs.execute("select title from data where data like '%" + escape(name) + "%'")
+    curs.execute("select title from data where data like ?", ['%' + name + '%'])
     data_list = curs.fetchall()
 
-    curs.execute("select title from data where title = '" + escape(name) + "'")
+    curs.execute("select title from data where title = ?", [name])
     exist = curs.fetchall()
     if(exist):
         div =   '<li>문서로 <a href="/w/' + url_pas(name) + '">바로가기</a></li> \
@@ -842,14 +840,14 @@ def deep_search(name = None, num = 1):
 @route('/raw/<name:path>/r/<num:int>')
 def raw_view(name = None, num = None):
     if(num):
-        curs.execute("select title from hidhi where title = '" + escape(name) + "' and re = '" + escape(str(num)) + "'")
+        curs.execute("select title from hidhi where title = ? and re = ?", [name, str(num)])
         hid = curs.fetchall()
         if(hid and admin_check(6) != 1):
             return(redirect('/error/3'))
         
-        curs.execute("select data from history where title = '" + escape(name) + "' and id = '" + str(num) + "'")
+        curs.execute("select data from history where title = ? and id = ?", [name, str(num)])
     else:
-        curs.execute("select data from data where title = '" + escape(name) + "'")
+        curs.execute("select data from data where title = ?", [name])
 
     rows = curs.fetchall()
     if(rows):
@@ -881,7 +879,7 @@ def revert(name = None, num = None):
     today = get_time()
     
     if(request.method == 'POST'):
-        curs.execute("select title from hidhi where title = '" + escape(name) + "' and re = '" + escape(str(num)) + "'")
+        curs.execute("select title from hidhi where title = ? and re = ?", [name, str(num)])
         hid = curs.fetchall()
         if(hid and admin_check(6) != 1):
             return(redirect('/error/3'))
@@ -889,24 +887,24 @@ def revert(name = None, num = None):
         if(can == 1):
             return(redirect('/ban'))
         else:
-            curs.execute("delete from back where link = '" + escape(name) + "'")
-            curs.execute("delete from cat where cat = '" + escape(name) + "'")
+            curs.execute("delete from back where link = ?", [name])
+            curs.execute("delete from cat where cat = ?", [name])
             conn.commit()
 
-            curs.execute("select data from history where title = '" + escape(name) + "' and id = '" + str(num) + "'")
+            curs.execute("select data from history where title = ? and id = ?", [name, str(num)])
             rows = curs.fetchall()
             if(rows):                                
-                curs.execute("select data from data where title = '" + escape(name) + "'")
+                curs.execute("select data from data where title = ?", [name])
                 row = curs.fetchall()
                 if(row):
                     leng = leng_check(len(row[0][0]), len(rows[0][0]))
                     
-                    curs.execute("update data set data = '" + escape(rows[0][0]) + "' where title = '" + escape(name) + "'")
+                    curs.execute("update data set data = ? where title = ?", [rows[0][0], name])
                     conn.commit()
                 else:
                     leng = '+' + str(len(rows[0][0]))
                     
-                    curs.execute("insert into data (title, data, acl) values ('" + escape(name) + "', '" + escape(rows[0][0]) + "', '')")
+                    curs.execute("insert into data (title, data, acl) values (?, ?, '')", [name, rows[0][0]])
                     conn.commit()
                     
                 history_plus(
@@ -920,7 +918,7 @@ def revert(name = None, num = None):
                 
                 return(redirect('/w/' + url_pas(name)))
     else:
-        curs.execute("select title from hidhi where title = '" + escape(name) + "' and re = '" + escape(str(num)) + "'")
+        curs.execute("select title from hidhi where title = ? and re = ?", [name, str(num)])
         hid = curs.fetchall()
         if(hid and admin_check(6) != 1):
             return(redirect('/error/3'))    
@@ -928,7 +926,7 @@ def revert(name = None, num = None):
         if(can == 1):
             return(redirect('/ban'))
         else:
-            curs.execute("select title from history where title = '" + escape(name) + "' and id = '" + str(num) + "'")
+            curs.execute("select title from history where title = ? and id = ?", [name, str(num)])
             rows = curs.fetchall()
             if(rows):
                 return(
@@ -956,14 +954,14 @@ def many_del():
             data = request.forms.content + '\r\n'
             m = re.findall('(.*)\r\n', data)
             for g in m:
-                curs.execute("select data from data where title = '" + escape(g) + "'")
+                curs.execute("select data from data where title = ?", [g])
                 rows = curs.fetchall()
                 if(rows):
-                    curs.execute("delete from back where title = '" + escape(g) + "'")
-                    curs.execute("delete from cat where title = '" + escape(g) + "'")
+                    curs.execute("delete from back where title = ?", [g])
+                    curs.execute("delete from cat where title = ?", [g])
 
                     leng = '-' + str(len(rows[0][0]))
-                    curs.execute("delete from data where title = '" + escape(g) + "'")
+                    curs.execute("delete from data where title = ?", [g])
                     history_plus(
                         g, 
                         '', 
@@ -1001,11 +999,11 @@ def section_edit(name = None, num = None):
             today = get_time()
             content = savemark(request.forms.content)
 
-            curs.execute("delete from back where link = '" + escape(name) + "'")
-            curs.execute("delete from cat where cat = '" + escape(name) + "'")
+            curs.execute("delete from back where link = ?", [name])
+            curs.execute("delete from cat where cat = ?", [name])
             conn.commit()
 
-            curs.execute("select data from data where title = '" + escape(name) + "'")
+            curs.execute("select data from data where title = ?", [name])
             rows = curs.fetchall()
             if(rows):
                 if(request.forms.otent == content):
@@ -1026,7 +1024,7 @@ def section_edit(name = None, num = None):
                             leng
                         )
                         
-                        curs.execute("update data set data = '" + escape(content) + "' where title = '" + escape(name) + "'")
+                        curs.execute("update data set data = ? where title = ?", [content, name])
                         conn.commit()
 
                     include_check(name, content)
@@ -1038,7 +1036,7 @@ def section_edit(name = None, num = None):
         if(can == 1):
             return(redirect('/ban'))
         else:                
-            curs.execute("select data from data where title = '" + escape(name) + "'")
+            curs.execute("select data from data where title = ?", [name])
             rows = curs.fetchall()
             if(rows):
                 i = 0
@@ -1099,20 +1097,20 @@ def edit(name = None):
             if(can == 1):
                 return(redirect('/ban'))
 
-            curs.execute("select data from data where title = '" + escape(name) + "'")
+            curs.execute("select data from data where title = ?", [name])
             rows = curs.fetchall()
             if(rows):
                 if(rows[0][0] == content):
                     return(redirect('/error/18'))
 
                 leng = leng_check(len(rows[0][0]), len(content))
-                curs.execute("update data set data = '" + escape(content) + "' where title = '" + escape(name) + "'")
+                curs.execute("update data set data = ? where title = ?", [content, name])
             else:
                 leng = '+' + str(len(content))
-                curs.execute("insert into data (title, data, acl) values ('" + escape(name) + "', '" + escape(content) + "', '')")
+                curs.execute("insert into data (title, data, acl) values (?, ?, '')", [name, content])
 
-            curs.execute("delete from back where link = '" + escape(name) + "'")
-            curs.execute("delete from cat where cat = '" + escape(name) + "'")
+            curs.execute("delete from back where link = ?", [name])
+            curs.execute("delete from cat where cat = ?", [name])
             conn.commit()
             
             history_plus(
@@ -1131,7 +1129,7 @@ def edit(name = None):
         if(can == 1):
             return(redirect('/ban'))
         else:                
-            curs.execute("select data from data where title = '" + escape(name) + "'")
+            curs.execute("select data from data where title = ?", [name])
             rows = curs.fetchall()
             if(rows):
                 data = rows[0][0]
@@ -1214,7 +1212,7 @@ def delete(name = None):
     can = acl_check(ip, name)
     
     if(request.method == 'POST'):
-        curs.execute("select data from data where title = '" + escape(name) + "'")
+        curs.execute("select data from data where title = ?", [name])
         rows = curs.fetchall()
         if(rows):
             if(can == 1):
@@ -1222,8 +1220,8 @@ def delete(name = None):
 
             today = get_time()
 
-            curs.execute("delete from back where link = '" + escape(name) + "'")
-            curs.execute("delete from cat where cat = '" + escape(name) + "'")
+            curs.execute("delete from back where link = ?", [name])
+            curs.execute("delete from cat where cat = ?", [name])
             
             leng = '-' + str(len(rows[0][0]))
             history_plus(
@@ -1235,12 +1233,12 @@ def delete(name = None):
                 leng
             )
             
-            curs.execute("delete from data where title = '" + escape(name) + "'")
+            curs.execute("delete from data where title = ?", [name])
             conn.commit()
             
         return(redirect('/w/' + url_pas(name)))
     else:
-        curs.execute("select title from data where title = '" + escape(name) + "'")
+        curs.execute("select title from data where title = ?", [name])
         rows = curs.fetchall()
         if(rows):
             if(can == 1):
@@ -1271,11 +1269,11 @@ def move(name = None):
         return(redirect('/ban'))
     
     if(request.method == 'POST'):
-        curs.execute("select data from data where title = '" + escape(name) + "'")
+        curs.execute("select data from data where title = ?", [name])
         rows = curs.fetchall()
 
         leng = '0'
-        curs.execute("select title from history where title = '" + escape(request.forms.title) + "'")
+        curs.execute("select title from history where title = ?", [request.forms.title])
         row = curs.fetchall()
         if(row):
             return(redirect('/error/19'))
@@ -1290,12 +1288,12 @@ def move(name = None):
         )
         
         if(rows):
-            curs.execute("update data set title = '" + escape(request.forms.title) + "' where title = '" + escape(name) + "'")
+            curs.execute("update data set title = ? where title = ?", [request.forms.title, name])
 
-            curs.execute("delete from back where link = '" + escape(name) + "'")
-            curs.execute("delete from cat where cat = '" + escape(name) + "'")
+            curs.execute("delete from back where link = ?", [name])
+            curs.execute("delete from cat where cat = ?", [name])
 
-        curs.execute("update history set title = '" + escape(request.forms.title) + "' where title = '" + escape(name) + "'")
+        curs.execute("update history set title = ? where title = ?", [request.forms.title, name])
         conn.commit()
         
         return(redirect('/w/' + url_pas(request.forms.title)))
@@ -1549,13 +1547,13 @@ def title_index():
 @route('/topic/<name:path>/sub/<sub:path>/b/<num:int>')
 def topic_block(name = None, sub = None, num = None):
     if(admin_check(3) == 1):
-        curs.execute("select block from topic where title = '" + escape(name) + "' and sub = '" + escape(sub) + "' and id = '" + str(num) + "'")
+        curs.execute("select block from topic where title = ? and sub = ? and id = ?", [name, sub, str(num)])
         block = curs.fetchall()
         if(block):
             if(block[0][0] == 'O'):
-                curs.execute("update topic set block = '' where title = '" + escape(name) + "' and sub = '" + escape(sub) + "' and id = '" + str(num) + "'")
+                curs.execute("update topic set block = '' where title = ? and sub = ? and id = ?", [name, sub, str(num)])
             else:
-                curs.execute("update topic set block = 'O' where title = '" + escape(name) + "' and sub = '" + escape(sub) + "' and id = '" + str(num) + "'")
+                curs.execute("update topic set block = 'O' where title = ? and sub = ? and id = ?", [name, sub, str(num)])
             conn.commit()
             
             rd_plus(
@@ -1571,16 +1569,16 @@ def topic_block(name = None, sub = None, num = None):
 @route('/topic/<name:path>/sub/<sub:path>/notice/<num:int>')
 def topic_top(name = None, sub = None, num = None):
     if(admin_check(3) == 1):
-        curs.execute("select * from topic where title = '" + escape(name) + "' and sub = '" + escape(sub) + "' and id = '" + str(num) + "'")
+        curs.execute("select * from topic where title = ? and sub = ? and id = ?", [name, sub, str(num)])
         topic_data = curs.fetchall()
         if(topic_data):
-            curs.execute("select top from topic where id = '" + str(num) + "' and title = '" + escape(name) + "' and sub = '" + escape(sub) + "'")
+            curs.execute("select top from topic where id = ? and title = ? and sub = ?", [str(num), name, sub])
             top_data = curs.fetchall()
             if(top_data):
                 if(top_data[0][0] == 'O'):
-                    curs.execute("update topic set top = '' where title = '" + escape(name) + "' and sub = '" + escape(sub) + "' and id = '" + str(num) + "'")
+                    curs.execute("update topic set top = '' where title = ? and sub = ? and id = ?", [name, sub, str(num)])
                 else:
-                    curs.execute("update topic set top = 'O' where title = '" + escape(name) + "' and sub = '" + escape(sub) + "' and id = '" + str(num) + "'")
+                    curs.execute("update topic set top = 'O' where title = ? and sub = ? and id = ?", [name, sub, str(num)])
 
             conn.commit()
             
@@ -1599,19 +1597,19 @@ def topic_agree(name = None, sub = None):
     if(admin_check(3) == 1):
         ip = ip_check()
         
-        curs.execute("select id from topic where title = '" + escape(name) + "' and sub = '" + escape(sub) + "' order by id + 0 desc limit 1")
+        curs.execute("select id from topic where title = ? and sub = ? order by id + 0 desc limit 1", [name, sub])
         topic_check = curs.fetchall()
         if(topic_check):
             time = get_time()
             
-            curs.execute("select title from agreedis where title = '" + escape(name) + "' and sub = '" + escape(sub) + "'")
+            curs.execute("select title from agreedis where title = ? and sub = ?", [name, sub])
             agree = curs.fetchall()
             if(agree):
-                curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values ('" + escape(str(int(topic_check[0][0]) + 1)) + "', '" + escape(name) + "', '" + escape(sub) + "', '합의 결렬', '" + escape(time) + "', '" + escape(ip) + "', '', '1')")
-                curs.execute("delete from agreedis where title = '" + escape(name) + "' and sub = '" + escape(sub) + "'")
+                curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, '합의 결렬', ?, ?, '', '1')", [str(int(topic_check[0][0]) + 1), name, sub, time, ip])
+                curs.execute("delete from agreedis where title = ? and sub = ?", [name, sub])
             else:
-                curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values ('" + escape(str(int(topic_check[0][0]) + 1)) + "', '" + escape(name) + "', '" + escape(sub) + "', '합의 완료', '" + escape(time) + "', '" + escape(ip) + "', '', '1')")
-                curs.execute("insert into agreedis (title, sub) values ('" + escape(name) + "', '" + escape(sub) + "')")
+                curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, '합의 완료', ?, ?, '', '1')", [str(int(topic_check[0][0]) + 1), name, sub, time, ip])
+                curs.execute("insert into agreedis (title, sub) values (?, ?)", [name, sub])
             conn.commit()
             
             rd_plus(
@@ -1643,20 +1641,21 @@ def topic_stop(name = None, sub = None, tool = None):
     if(admin_check(3) == 1):
         ip = ip_check()
         
-        curs.execute("select id from topic where title = '" + escape(name) + "' and sub = '" + escape(sub) + "' order by id + 0 desc limit 1")
+        curs.execute("select id from topic where title = ? and sub = ? order by id + 0 desc limit 1", [name, sub])
         topic_check = curs.fetchall()
         if(topic_check):
             time = get_time()
             
-            curs.execute("select title from stop where title = '" + escape(name) + "' and sub = '" + escape(sub) + "' and close = '" + escape(close) + "'")
+            curs.execute("select title from stop where title = ? and sub = ? and close = ?", [name, sub, close])
             stop = curs.fetchall()
             if(stop):
-                curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values ('" + escape(str(int(topic_check[0][0]) + 1)) + "', '" + escape(name) + "', '" + escape(sub) + "', '" + escape(n_data) + "', '" + escape(time) + "', '" + escape(ip) + "', '', '1')")
-                curs.execute("delete from stop where title = '" + escape(name) + "' and sub = '" + escape(sub) + "' and close = '" + escape(close) + "'")
+                curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, ?, ?, ?, '', '1')", [str(int(topic_check[0][0]) + 1), name, sub, n_data, time, ip])
+                curs.execute("delete from stop where title = ? and sub = ? and close = ?", [name, sub, close])
             else:
-                curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values ('" + escape(str(int(topic_check[0][0]) + 1)) + "', '" + escape(name) + "', '" + escape(sub) + "', '" + escape(data) + "', '" + escape(time) + "', '" + escape(ip) + "', '', '1')")
-                curs.execute("insert into stop (title, sub, close) values ('" + escape(name) + "', '" + escape(sub) + "', '" + close + "')")
-                curs.execute("delete from stop where title = '" + escape(name) + "' and sub = '" + escape(sub) + "' and close = '" + escape(n_close) + "'")
+                curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, ?, ?, ?, '', '1')", [str(int(topic_check[0][0]) + 1), name, sub, data, time, ip])
+                curs.execute("insert into stop (title, sub, close) values (?, ?, ?)", [name, sub, close])
+                curs.execute("delete from stop where title = ? and sub = ? and close = ?", [name, sub, n_close])
+                
             conn.commit()
             
             rd_plus(
@@ -1677,7 +1676,7 @@ def topic(name = None, sub = None):
     admin = admin_check(3)
     
     if(request.method == 'POST'):
-        curs.execute("select id from topic where title = '" + escape(name) + "' and sub = '" + escape(sub) + "' order by id + 0 desc limit 1")
+        curs.execute("select id from topic where title = ? and sub = ? order by id + 0 desc limit 1", [name, sub])
         rows = curs.fetchall()
         if(rows):
             num = int(rows[0][0]) + 1
@@ -1697,7 +1696,7 @@ def topic(name = None, sub = None):
             aa = re.sub("\[\[(분류:(?:(?:(?!\]\]).)*))\]\]", "[br]", request.forms.content)
             aa = savemark(aa)
             
-            curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values ('" + str(num) + "', '" + escape(name) + "', '" + escape(sub) + "', '" + escape(aa) + "', '" + today + "', '" + ip + "', '', '')")
+            curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, ?, ?, ?, '', '')", [str(num), name, sub, aa, today, ip])
             conn.commit()
             
             return(redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub)))
@@ -1705,10 +1704,10 @@ def topic(name = None, sub = None):
         style = ''
         div = ''
 
-        curs.execute("select title from stop where title = '" + escape(name) + "' and sub = '" + escape(sub) + "' and close = 'O'")
+        curs.execute("select title from stop where title = ? and sub = ? and close = 'O'", [name, sub])
         close = curs.fetchall()
 
-        curs.execute("select title from stop where title = '" + escape(name) + "' and sub = '" + escape(sub) + "' and close = ''")
+        curs.execute("select title from stop where title = ? and sub = ? and close = ''", [name, sub])
         stop = curs.fetchall()
         
         if(admin == 1):
@@ -1722,7 +1721,7 @@ def topic(name = None, sub = None):
             else:
                 div += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/stop">(토론 정지)</a> '
 
-            curs.execute("select title from agreedis where title = '" + escape(name) + "' and sub = '" + escape(sub) + "'")
+            curs.execute("select title from agreedis where title = ? and sub = ?", [name, sub])
             agree = curs.fetchall()
             if(agree):
                 div += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/agree">(합의 취소)</a>'
@@ -1734,10 +1733,10 @@ def topic(name = None, sub = None):
         if((stop or close) and admin != 1):
             style = 'display:none;'
         
-        curs.execute("select data, id, date, ip, block, top from topic where title = '" + escape(name) + "' and sub = '" + escape(sub) + "' order by id + 0 asc")
+        curs.execute("select data, id, date, ip, block, top from topic where title = ? and sub = ? order by id + 0 asc", [name, sub])
         toda = curs.fetchall()
 
-        curs.execute("select data, id, date, ip from topic where title = '" + escape(name) + "' and sub = '" + escape(sub) + "' and top = 'O' order by id + 0 asc")
+        curs.execute("select data, id, date, ip from topic where title = ? and sub = ? and top = 'O' order by id + 0 asc", [name, sub])
         top = curs.fetchall()
 
         for dain in top:                     
@@ -1780,21 +1779,21 @@ def topic(name = None, sub = None):
                 else:
                     isblock = ' <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/b/' + str(i + 1) + '">(가림)</a>'
 
-                curs.execute("select id from topic where title = '" + escape(name) + "' and sub = '" + escape(sub) + "' and id = '" + escape(str(i + 1)) + "' and top = 'O'")
+                curs.execute("select id from topic where title = ? and sub = ? and id = ? and top = 'O'", [name, sub, str(i + 1)])
                 row = curs.fetchall()
                 if(row):
                     isblock = isblock + ' <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/notice/' + str(i + 1) + '">(해제)</a>'
                 else:
                     isblock = isblock + ' <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/notice/' + str(i + 1) + '">(공지)</a>'
                     
-                curs.execute("select end from ban where block = '" + escape(dain[3]) + "'")
+                curs.execute("select end from ban where block = ?", [dain[3]])
                 ban_it = curs.fetchall()
                 if(ban_it):
                     ban = ' <a href="/ban/' + url_pas(dain[3]) + '">(해제)</a>' + isblock
                 else:
                     ban = ' <a href="/ban/' + url_pas(dain[3]) + '">(차단)</a>' + isblock
             else:
-                curs.execute("select end from ban where block = '" + escape(dain[3]) + "'")
+                curs.execute("select end from ban where block = ?", [dain[3]])
                 ban_it = curs.fetchall()
                 if(ban_it):
                     ban = ' (X)'
@@ -1802,7 +1801,7 @@ def topic(name = None, sub = None):
                     ban = ''
             
             chad = ''
-            curs.execute('select acl from user where id = "' + escape(dain[3]) + '"')
+            curs.execute('select acl from user where id = ?', [dain[3]])
             adch = curs.fetchall()
             if(adch and adch[0][0] != 'user'):
                 chad = ' ★'
@@ -1858,7 +1857,7 @@ def close_topic_list(name = None, tool = None):
     if(request.method == 'POST'):
         t_num = ''
         while(1):
-            curs.execute("select title from topic where title = '" + escape(name) + "' and sub = '" + escape(request.forms.topic + t_num) + "' limit 1")
+            curs.execute("select title from topic where title = ? and sub = ? limit 1", [name, request.forms.topic + t_num])
             t_data = curs.fetchall()
             if(t_data):
                 if(t_num == ''):
@@ -1871,19 +1870,19 @@ def close_topic_list(name = None, tool = None):
         return(redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(request.forms.topic + t_num)))
     else:
         if(tool == 'close'):
-            curs.execute("select sub from stop where title = '" + escape(name) + "' and close = 'O' order by sub asc")
+            curs.execute("select sub from stop where title = ? and close = 'O' order by sub asc", [name])
             sub = '닫힘'
         elif(tool == 'agree'):
-            curs.execute("select sub from agreedis where title = '" + escape(name) + "' order by sub asc")
+            curs.execute("select sub from agreedis where title = ? order by sub asc", [name])
             sub = '합의'
         else:
             list_d = 1
-            curs.execute("select sub from rd where title = '" + escape(name) + "' order by date desc")
+            curs.execute("select sub from rd where title = ? order by date desc")
             sub = '토론 목록'
 
         rows = curs.fetchall()
         for data in rows:
-            curs.execute("select data, date, ip, block from topic where title = '" + escape(name) + "' and sub = '" + escape(data[0]) + "' and id = '1'")
+            curs.execute("select data, date, ip, block from topic where title = ? and sub = ? and id = '1'", [name, data[0]])
             row = curs.fetchall()
             if(row):
                 indata = namumark(name, row[0][0], 0)
@@ -1939,7 +1938,7 @@ def login():
         if(ban == 1):
             return(redirect('/ban'))
 
-        curs.execute("select pw from user where id = '" + escape(request.forms.id) + "'")
+        curs.execute("select pw from user where id = ?", [request.forms.id])
         user = curs.fetchall()
         if(user):
             if(session.get('Now') == 1):
@@ -1949,14 +1948,14 @@ def login():
                 session['Now'] = 1
                 session['DREAMER'] = request.forms.id
 
-                curs.execute("select css from custom where user = '" + escape(request.forms.id) + "'")
+                curs.execute("select css from custom where user = ?", [request.forms.id])
                 css_data = curs.fetchall()
                 if(css_data):
                     session['Daydream'] = css_data[0][0]
                 else:
                     session['Daydream'] = ''
                 
-                curs.execute("insert into login (user, ip, today) values ('" + escape(request.forms.id) + "', '" + escape(ip) + "', '" + escape(get_time()) + "')")
+                curs.execute("insert into login (user, ip, today) values (?, ?, ?)", [request.forms.id, ip, get_time()])
                 conn.commit()
                 
                 return(redirect('/user'))
@@ -1992,7 +1991,7 @@ def change_password():
             if(ban == 1):
                 return(redirect('/ban'))
 
-            curs.execute("select id from user where id = '" + escape(request.forms.id) + "'")
+            curs.execute("select id from user where id = ?", [request.forms.id])
             user = curs.fetchall()
             if(user):
                 if(not re.search('(\.|:)', ip)):
@@ -2001,7 +2000,7 @@ def change_password():
                 if(bcrypt.checkpw(bytes(request.forms.pw, 'utf-8'), bytes(user[0]['pw'], 'utf-8'))):
                     hashed = bcrypt.hashpw(bytes(request.forms.pw2, 'utf-8'), bcrypt.gensalt())
                     
-                    curs.execute("update user set pw = '" + escape(hashed.decode()) + "' where id = '" + escape(request.forms.id) + "'")
+                    curs.execute("update user set pw = ? where id = ?", [hashed.decode(), request.forms.id])
                     conn.commit()
                     
                     return(redirect('/login'))
@@ -2031,7 +2030,7 @@ def change_password():
                 
 @route('/check/<name:path>')
 def user_check(name = None):
-    curs.execute("select acl from user where id = '" + escape(name) + "'")
+    curs.execute("select acl from user where id = ?", [name])
     user = curs.fetchall()
     if(user and user[0][0] != 'user'):
         return(redirect('/error/4'))
@@ -2043,7 +2042,7 @@ def user_check(name = None):
         else:
             sql = 'user'
 
-        curs.execute("select user, ip, today from login where " + sql + " = '" + escape(name) + "' order by today desc")
+        curs.execute("select user, ip, today from login where ? = ? order by today desc", [sql, name])
         row = curs.fetchall()
         if(row):
             c = '<div> \
@@ -2097,7 +2096,7 @@ def register():
             if(len(request.forms.id) > 20):
                 return(redirect('/error/7'))
 
-            curs.execute("select id from user where id = '" + escape(request.forms.id) + "'")
+            curs.execute("select id from user where id = ?", [request.forms.id])
             rows = curs.fetchall()
             if(rows):
                 return(redirect('/error/6'))
@@ -2107,9 +2106,9 @@ def register():
             curs.execute("select id from user limit 1")
             user_ex = curs.fetchall()
             if(not user_ex):
-                curs.execute("insert into user (id, pw, acl) values ('" + escape(request.forms.id) + "', '" + escape(hashed.decode()) + "', 'owner')")
+                curs.execute("insert into user (id, pw, acl) values (?, ?, 'owner')", [request.forms.id, hashed.decode()])
             else:
-                curs.execute("insert into user (id, pw, acl) values ('" + escape(request.forms.id) + "', '" + escape(hashed.decode()) + "', 'user')")
+                curs.execute("insert into user (id, pw, acl) values (?, ?, 'user')", [request.forms.id, hashed.decode()])
             conn.commit()
             
             return(redirect('/login'))
@@ -2137,7 +2136,7 @@ def logout():
     
 @route('/ban/<name:path>', method=['POST', 'GET'])
 def user_ban(name = None):
-    curs.execute("select acl from user where id = '" + escape(name) + "'")
+    curs.execute("select acl from user where id = ?", [name])
     user = curs.fetchall()
     if(user and user[0][0] != 'user'):
         return(redirect('/error/4'))
@@ -2151,22 +2150,22 @@ def user_ban(name = None):
             else:
                 end = request.forms.end
 
-            curs.execute("select block from ban where block = '" + escape(name) + "'")
+            curs.execute("select block from ban where block = ?", [name])
             row = curs.fetchall()
             if(row):
                 rb_plus(name, '해제', get_time(), ip, '')
                 
-                curs.execute("delete from ban where block = '" + escape(name) + "'")
+                curs.execute("delete from ban where block = ?", [name])
             else:
                 b = re.search("^([0-9]{1,3}\.[0-9]{1,3})$", name)
                 if(b):
-                    rb_plus(name, end, get_time(), ip, request.forms.why)
-                    
-                    curs.execute("insert into ban (block, end, why, band) values ('" + escape(name) + "', '" + escape(end) + "', '" + escape(request.forms.why) + "', 'O')")
+                    band_d = 'O'
                 else:
-                    rb_plus(name, end, get_time(), ip, request.forms.why)
-                    
-                    curs.execute("insert into ban (block, end, why, band) values ('" + escape(name) + "', '" + escape(end) + "', '" + escape(request.forms.why) + "', '')")
+                    band_d = ''
+
+                rb_plus(name, end, get_time(), ip, request.forms.why)
+
+                curs.execute("insert into ban (block, end, why, band) values (?, ?, ?, ?)", [name, end, request.forms.why, band_d])
             conn.commit()
 
             return(redirect('/ban/' + url_pas(name)))
@@ -2174,7 +2173,7 @@ def user_ban(name = None):
             return(redirect('/error/3'))
     else:
         if(admin_check(1) == 1):
-            curs.execute("select * from ban where block = '" + escape(name) + "'")
+            curs.execute("select * from ban where block = ?", [name])
             row = curs.fetchall()
             if(row):
                 now = '차단 해제'
@@ -2205,15 +2204,15 @@ def user_ban(name = None):
 def acl(name = None):
     if(request.method == 'POST'):
         if(admin_check(5) == 1):
-            curs.execute("select acl from data where title = '" + escape(name) + "'")
+            curs.execute("select acl from data where title = ?", [name])
             row = curs.fetchall()
             if(row):
                 if(request.forms.select == 'admin'):
-                   curs.execute("update data set acl = 'admin' where title = '" + escape(name) + "'")
+                   curs.execute("update data set acl = 'admin' where title = ?", [name])
                 elif(request.forms.select == 'user'):
-                    curs.execute("update data set acl = 'user' where title = '" + escape(name) + "'")
+                    curs.execute("update data set acl = 'user' where title = ?", [name])
                 else:
-                    curs.execute("update data set acl = '' where title = '" + escape(name) + "'")
+                    curs.execute("update data set acl = '' where title = ?", [name])
                     
                 conn.commit()
                 
@@ -2222,7 +2221,7 @@ def acl(name = None):
             return(redirect('/error/3'))
     else:
         if(admin_check(5) == 1):
-            curs.execute("select acl from data where title = '" + escape(name) + "'")
+            curs.execute("select acl from data where title = ?", [name])
             row = curs.fetchall()
             if(row):
                 if(row[0][0] == 'admin'):
@@ -2253,13 +2252,13 @@ def acl(name = None):
 def user_admin(name = None):
     if(request.method == 'POST'):
         if(admin_check(None) == 1):
-            curs.execute("select acl from user where id = '" + escape(name) + "'")
+            curs.execute("select acl from user where id = ?", [name])
             user = curs.fetchall()
             if(user):
                 if(user[0][0] != 'user'):
-                    curs.execute("update user set acl = 'user' where id = '" + escape(name) + "'")
+                    curs.execute("update user set acl = 'user' where id = ?", [name])
                 else:
-                    curs.execute("update user set acl = '" + escape(request.forms.select) + "' where id = '" + escape(name) + "'")
+                    curs.execute("update user set acl = ? where id = ?", [request.forms.select, name])
                 conn.commit()
                 
                 return(redirect('/'))
@@ -2269,7 +2268,7 @@ def user_admin(name = None):
             return(redirect('/error/3'))
     else:
         if(admin_check(None) == 1):
-            curs.execute("select acl from user where id = '" + escape(name) + "'")
+            curs.execute("select acl from user where id = ?", [name])
             user = curs.fetchall()
             if(user):
                 if(user[0][0] != 'user'):
@@ -2312,13 +2311,13 @@ def are_you_ban():
     ip = ip_check()
     
     if(ban_check(ip) == 1):
-        curs.execute("select end, why from ban where block = '" + escape(ip) + "'")
+        curs.execute("select end, why from ban where block = ?", [ip])
         rows = curs.fetchall()
         if(not rows):
             data = re.search("^([0-9](?:[0-9]?[0-9]?)\.[0-9](?:[0-9]?[0-9]?))", ip)
             if(data):
                 results = data.groups()
-                curs.execute("select end, why from ban where block = '" + escape(results[0]) + "' and band = 'O'")
+                curs.execute("select end, why from ban where block = ? and band = 'O'", [results[0]])
 
                 rows = curs.fetchall()
 
@@ -2333,7 +2332,7 @@ def are_you_ban():
                 day = re.sub('\-', '', rows[0][0])    
                 
                 if(now >= int(day + '000000')):
-                    curs.execute("delete from ban where block = '" + escape(ip) + "'")
+                    curs.execute("delete from ban where block = ?", [ip])
                     conn.commit()
                     
                     end = '차단이 풀렸습니다. 다시 시도 해 보세요.'
@@ -2357,10 +2356,10 @@ def are_you_ban():
     
 @route('/w/<name:path>/r/<a:int>/diff/<b:int>')
 def diff_data(name = None, a = None, b = None):
-    curs.execute("select data from history where id = '" + escape(str(a)) + "' and title = '" + escape(name) + "'")
+    curs.execute("select data from history where id = ? and title = ?", [str(a), name])
     a_raw_data = curs.fetchall()
     if(a_raw_data):
-        curs.execute("select data from history where id = '" + escape(str(b)) + "' and title = '" + escape(name) + "'")
+        curs.execute("select data from history where id = ? and title = ?", [str(b), name])
         b_raw_data = curs.fetchall()
         if(b_raw_data):
             a_data = re.sub('<', '&lt;', a_raw_data[0][0])
@@ -2393,7 +2392,7 @@ def diff_data(name = None, a = None, b = None):
         
 @route('/down/<name:path>')
 def down(name = None):
-    curs.execute("select title from data where title like '%" + escape(name) + "/%'")
+    curs.execute("select title from data where title like ?", ['%' + name + '/%'])
     under = curs.fetchall()
     
     div = ''
@@ -2426,17 +2425,17 @@ def read_view(name = None, num = None, redirect = None):
     div = ''
     topic = ''
     
-    curs.execute("select sub from rd where title = '" + escape(name) + "' order by date desc")
+    curs.execute("select sub from rd where title = ? order by date desc", [name])
     rows = curs.fetchall()
     for data in rows:
-        curs.execute("select title from stop where title = '" + escape(name) + "' and sub = '" + escape(data['sub']) + "' and close = 'O'")
+        curs.execute("select title from stop where title = ? and sub = ? and close = 'O'", [name, data['sub']])
         row = curs.fetchall()
         if(not row):
             topic = "open"
             
             break
                 
-    curs.execute("select title from data where title like '%" + escape(name) + "/%'")
+    curs.execute("select title from data where title like ?", ['%' + name + '/%'])
     under = curs.fetchall()
     if(under):
         down = 1
@@ -2455,10 +2454,10 @@ def read_view(name = None, num = None, redirect = None):
         admin_memu = ''
         
     if(re.search("^분류:", name)):
-        curs.execute("delete from cat where title = '" + escape(name) + "' and cat = ''")
+        curs.execute("delete from cat where title = ? and cat = ''", [name])
         conn.commit()
         
-        curs.execute("select cat from cat where title = '" + escape(name) + "' order by cat asc")
+        curs.execute("select cat from cat where title = ? order by cat asc", [name])
         rows = curs.fetchall()
         if(rows):
             div = '<h2>분류</h2>'
@@ -2468,14 +2467,14 @@ def read_view(name = None, num = None, redirect = None):
                 div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a></li>'
 
     if(num):
-        curs.execute("select title from hidhi where title = '" + escape(name) + "' and re = '" + escape(str(num)) + "'")
+        curs.execute("select title from hidhi where title = ? and re = ?", [name, str(num)])
         hid = curs.fetchall()
         if(hid and admin_check(6) != 1):
             return(redirect('/history/' + url_pas(name)))
 
-        curs.execute("select title, data from history where title = '" + escape(name) + "' and id = '" + str(num) + "'")
+        curs.execute("select title, data from history where title = ? and id = ?", [name, str(num)])
     else:
-        curs.execute("select acl, data from data where title = '" + escape(name) + "'")
+        curs.execute("select acl, data from data where title = ?", [name])
 
     rows = curs.fetchall()
     if(rows):
@@ -2494,12 +2493,12 @@ def read_view(name = None, num = None, redirect = None):
     if(m):
         g = m.groups()
         
-        curs.execute("select acl from user where id = '" + escape(g[0]) + "'")
+        curs.execute("select acl from user where id = ?", [g[0]])
         test = curs.fetchall()
         if(test and test[0][0] != 'user'):
             acl = '(관리자)'
 
-        curs.execute("select block from ban where block = '" + escape(g[0]) + "'")
+        curs.execute("select block from ban where block = ?", [g[0]])
         user = curs.fetchall()
         if(user):
             sub = '차단'
@@ -2547,7 +2546,7 @@ def user_topic_list(name = None, num = 1):
                         <td style="width: 33.3%;">시간</td> \
                     </tr>'
     
-    curs.execute("select title, id, sub, ip, date from topic where ip = '" + escape(name) + "' order by date desc limit " + str(i) + ", " + str(v))
+    curs.execute("select title, id, sub, ip, date from topic where ip = ? order by date desc limit ?, ?", [name, str(i), str(v)])
     rows = curs.fetchall()
     if(rows):
         for data in rows:
@@ -2560,7 +2559,7 @@ def user_topic_list(name = None, num = 1):
             sub = re.sub('"', '&quot;', sub)
                 
             if(ydmin == 1):
-                curs.execute("select * from ban where block = '" + escape(data[3]) + "'")
+                curs.execute("select * from ban where block = ?", [data[3]])
                 row = curs.fetchall()
                 if(row):
                     ban = ' <a href="/ban/' + url_pas(data[3]) + '">(해제)</a>'
@@ -2587,7 +2586,7 @@ def user_topic_list(name = None, num = 1):
     div += '<br> \
             <a href="/user/' + url_pas(name) + '/topic/' + str(num - 1) + '">(이전)</a> <a href="/user/' + url_pas(name) + '/topic/' + str(num + 1) + '">(이후)</a>'
                 
-    curs.execute("select end, why from ban where block = '" + escape(name) + "'")
+    curs.execute("select end, why from ban where block = ?", [name])
     ban_it = curs.fetchall()
     if(ban_it):
         sub = '차단'
@@ -2611,7 +2610,7 @@ def user_info():
     ip = ip_check()
     raw_ip = ip
     
-    curs.execute("select acl from user where id = '" + escape(ip) + "'")
+    curs.execute("select acl from user where id = ?", [ip])
     rows = curs.fetchall()
     if(ban_check(ip) == 0):
         if(rows):
@@ -2654,12 +2653,12 @@ def custom_css():
     ip = ip_check()
     if(request.method == 'POST'):
         if(not re.search('(\.|:)', ip)):
-            curs.execute("select * from custom where user = '" + escape(ip) + "'")
+            curs.execute("select * from custom where user = ?", [ip])
             css_data = curs.fetchall()
             if(css_data):
-                curs.execute("update custom set css = '" + escape(request.forms.content) + "' where user = '" + escape(ip) + "'")
+                curs.execute("update custom set css = ? where user = ?", [request.forms.content, ip])
             else:
-                curs.execute("insert into custom (user, css) values ('" + escape(ip) + "', '" + escape(request.forms.content) + "')")
+                curs.execute("insert into custom (user, css) values (?, ?)", [ip, request.forms.content])
             conn.commit()
 
         session['Daydream'] = request.forms.content
@@ -2668,7 +2667,7 @@ def custom_css():
     else:
         if(not re.search('(\.|:)', ip)):
             start = ''
-            curs.execute("select css from custom where user = '" + escape(ip) + "'")
+            curs.execute("select css from custom where user = ?", [ip])
             css_data = curs.fetchall()
             if(css_data):
                 data = css_data[0][0]

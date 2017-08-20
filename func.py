@@ -41,55 +41,55 @@ def diff(seqm):
            
 def admin_check(num):
     ip = ip_check() 
-    curs.execute("select acl from user where id = '" + escape(ip) + "'")
+    curs.execute("select acl from user where id = ?", [ip])
     user = curs.fetchall()
     if(user):
         reset = 0
         while(1):
             if(num == 1 and reset == 0):
-                curs.execute('select name from alist where name = "' + escape(user[0][0]) + '" and acl = "ban"')
+                curs.execute('select name from alist where name = ? and acl = "ban"', [user[0][0]])
                 acl_data = curs.fetchall()
                 if(acl_data):
                     return(1)
                 else:
                     reset = 1
             elif(num == 2 and reset == 0):
-                curs.execute('select name from alist where name = "' + escape(user[0][0]) + '" and acl = "mdel"')
+                curs.execute('select name from alist where name = ? and acl = "mdel"', [user[0][0]])
                 acl_data = curs.fetchall()
                 if(acl_data):
                     return(1)
                 else:
                     reset = 1
             elif(num == 3 and reset == 0):
-                curs.execute('select name from alist where name = "' + escape(user[0][0]) + '" and acl = "toron"')
+                curs.execute('select name from alist where name = ? and acl = "toron"', [user[0][0]])
                 acl_data = curs.fetchall()
                 if(acl_data):
                     return(1)
                 else:
                     reset = 1
             elif(num == 4 and reset == 0):
-                curs.execute('select name from alist where name = "' + escape(user[0][0]) + '" and acl = "check"')
+                curs.execute('select name from alist where name = ? and acl = "check"', [user[0][0]])
                 acl_data = curs.fetchall()
                 if(acl_data):
                     return(1)
                 else:
                     reset = 1
             elif(num == 5 and reset == 0):
-                curs.execute('select name from alist where name = "' + escape(user[0][0]) + '" and acl = "acl"')
+                curs.execute('select name from alist where name = ? and acl = "acl"', [user[0][0]])
                 acl_data = curs.fetchall()
                 if(acl_data):
                     return(1)
                 else:
                     reset = 1
             elif(num == 6 and reset == 0):
-                curs.execute('select name from alist where name = "' + escape(user[0][0]) + '" and acl = "hidel"')
+                curs.execute('select name from alist where name = ? and acl = "hidel"', [user[0][0]])
                 acl_data = curs.fetchall()
                 if(acl_data):
                     return(1)
                 else:
                     reset = 1
             else:
-                curs.execute('select name from alist where name = "' + escape(user[0][0]) + '" and acl = "owner"')
+                curs.execute('select name from alist where name = ? and acl = "owner"', [user[0][0]])
                 acl_data = curs.fetchall()
                 if(acl_data):
                     return(1)
@@ -98,7 +98,7 @@ def admin_check(num):
                 
 def include_check(name, data):
     if(re.search('^틀:', name)):
-        curs.execute("select link from back where title = '" + escape(name) + "' and type = 'include'")
+        curs.execute("select link from back where title = ? and type = 'include'", [name])
         back = curs.fetchall()
         for backp in back:
             namumark(backp[0], data, 1)    
@@ -114,7 +114,7 @@ def ip_pas(raw_ip, num):
     if(re.search("(\.|:)", raw_ip)):
         ip = raw_ip
     else:
-        curs.execute("select title from data where title = '사용자:" + escape(raw_ip) + "'")
+        curs.execute("select title from data where title = ?", ['사용자:' + raw_ip])
         row = curs.fetchall()
         if(row):
             ip = '<a href="/w/' + url_pas('사용자:' + raw_ip) + '">' + raw_ip + '</a>'
@@ -148,7 +148,7 @@ def acl_check(ip, name):
             if(re.search("(\.|:)", g[0])):
                 return(1)
             else:
-                curs.execute("select block from ban where block = '" + escape(ip) + "'")
+                curs.execute("select block from ban where block = ?", [ip])
                 rows = curs.fetchall()
                 if(rows):
                     return(1)
@@ -162,20 +162,20 @@ def acl_check(ip, name):
         b = re.search("^([0-9](?:[0-9]?[0-9]?)\.[0-9](?:[0-9]?[0-9]?))", ip)
         if(b):
             results = b.groups()
-            curs.execute("select block from ban where block = '" + escape(results[0]) + "' and band = 'O'")
+            curs.execute("select block from ban where block = ? and band = 'O'", [results[0]])
             rowss = curs.fetchall()
             if(rowss):
                 return(1)
 
-        curs.execute("select block from ban where block = '" + escape(ip) + "'")
+        curs.execute("select block from ban where block = ?", [ip])
         rows = curs.fetchall()
         if(rows):
             return(1)
         else:
-            curs.execute("select acl from data where title = '" + escape(name) + "'")
+            curs.execute("select acl from data where title = ?", [name])
             row = curs.fetchall()
             if(row):
-                curs.execute("select acl from user where id = '" + escape(ip) + "'")
+                curs.execute("select acl from user where id = ?", [ip])
                 rows = curs.fetchall()
                 if(row[0][0] == 'user'):
                     if(rows):
@@ -196,12 +196,12 @@ def ban_check(ip):
     b = re.search("^([0-9](?:[0-9]?[0-9]?)\.[0-9](?:[0-9]?[0-9]?))", ip)
     if(b):
         results = b.groups()
-        curs.execute("select block from ban where block = '" + escape(results[0]) + "' and band = 'O'")
+        curs.execute("select block from ban where block = ? and band = 'O'", [results[0]])
         rowss = curs.fetchall()
         if(rowss):
             return(1)
 
-    curs.execute("select block from ban where block = '" + escape(ip) + "'")
+    curs.execute("select block from ban where block = ?", [ip])
     rows = curs.fetchall()
     if(rows):
         return(1)
@@ -212,17 +212,17 @@ def topic_check(ip, name, sub):
     b = re.search("^([0-9](?:[0-9]?[0-9]?)\.[0-9](?:[0-9]?[0-9]?))", ip)
     if(b):
         results = b.groups()
-        curs.execute("select block from ban where block = '" + escape(results[0]) + "' and band = 'O'")
+        curs.execute("select block from ban where block = ? and band = 'O'", [results[0]])
         rowss = curs.fetchall()
         if(rowss):
             return(1)
 
-    curs.execute("select block from ban where block = '" + escape(ip) + "'")
+    curs.execute("select block from ban where block = ?", [ip])
     rows = curs.fetchall()
     if(rows):
         return(1)
     else:
-        curs.execute("select title from stop where title = '" + escape(name) + "' and sub = '" + escape(sub) + "'")
+        curs.execute("select title from stop where title = ? and sub = ?", [name, sub])
         rows = curs.fetchall()
         if(rows):
             return(1)
@@ -230,26 +230,26 @@ def topic_check(ip, name, sub):
             return(0)
 
 def rd_plus(title, sub, date):
-    curs.execute("select title from rd where title = '" + escape(title) + "' and sub = '" + escape(sub) + "'")
+    curs.execute("select title from rd where title = ? and sub = ?", [title, sub])
     rd = curs.fetchall()
     if(rd):
-        curs.execute("update rd set date = '" + escape(date) + "' where title = '" + escape(title) + "' and sub = '" + escape(sub) + "'")
+        curs.execute("update rd set date = ? where title = ? and sub = ?", [date, title, sub])
     else:
-        curs.execute("insert into rd (title, sub, date) values ('" + escape(title) + "', '" + escape(sub) + "', '" + escape(date) + "')")
+        curs.execute("insert into rd (title, sub, date) values (?, ?, ?)", [title, sub, date])
     conn.commit()
     
 def rb_plus(block, end, today, blocker, why):
-    curs.execute("insert into rb (block, end, today, blocker, why) values ('" + escape(block) + "', '" + escape(end) + "', '" + today + "', '" + escape(blocker) + "', '" + escape(why) + "')")
+    curs.execute("insert into rb (block, end, today, blocker, why) values (?, ?, ?, ?, ?)", [block, end, today, blocker, why])
     conn.commit()
 
 def history_plus(title, data, date, ip, send, leng):
-    curs.execute("select id from history where title = '" + escape(title) + "' order by id+0 desc limit 1")
+    curs.execute("select id from history where title = ? order by id+0 desc limit 1", [title])
     rows = curs.fetchall()
     if(rows):
         number = int(rows[0][0]) + 1
-        curs.execute("insert into history (id, title, data, date, ip, send, leng) values ('" + str(number) + "', '" + escape(title) + "', '" + escape(data) + "', '" + date + "', '" + escape(ip) + "', '" + escape(send) + "', '" + leng + "')")
+        curs.execute("insert into history (id, title, data, date, ip, send, leng) values (?, ?, ?, ?, ?, ?, ?)", [str(number), title, data, date, ip, send, leng])
     else:
-        curs.execute("insert into history (id, title, data, date, ip, send, leng) values ('1', '" + escape(title) + "', '" + escape(data) + "', '" + date + "', '" + escape(ip) + "', '" + escape(send + ' (새 문서)') + "', '" + leng + "')")
+        curs.execute("insert into history (id, title, data, date, ip, send, leng) values ('1', ?, ?, ?, ?, ?, ?)", [title, data, date, ip, send + ' (새 문서)', leng])
     conn.commit()
 
 def leng_check(a, b):

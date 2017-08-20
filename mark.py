@@ -26,12 +26,6 @@ def get_time():
     date = "%04d-%02d-%02d %02d:%02d:%02d" % (now.tm_year, now.tm_mon, now.tm_mday, now.tm_hour, now.tm_min, now.tm_sec)
 
     return(date)
-
-def escape(data):
-    data = data.replace("'", "''")
-    data = data.replace('"', '""')
-
-    return(data)
     
 def ip_check():
     session = request.environ.get('beaker.session')
@@ -334,18 +328,18 @@ def toc_pas(data, title):
 
 def backlink_plus(name, link, backtype, num):
     if(num == 1):       
-        curs.execute("select title from back where title = '" + escape(link) + "' and link = '" + escape(name) + "' and type = '" + backtype + "'")
+        curs.execute("select title from back where title = ? and link = ? and type = ?", [link, name, backtype])
         y = curs.fetchall()
         if(not y):
-            curs.execute("insert into back (title, link, type) values ('" + escape(link) + "', '" + escape(name) + "',  '" + backtype + "')")
+            curs.execute("insert into back (title, link, type) values (?, ?,  ?)", [link, name, backtype])
             conn.commit()
 
 def cat_plus(name, link, num):
     if(num == 1):        
-        curs.execute("select title from cat where title = '" + escape(link) + "' and cat = '" + escape(name) + "'")
+        curs.execute("select title from cat where title = ? and cat = ?", [link, name])
         y = curs.fetchall()
         if(not y):
-            curs.execute("insert into cat (title, cat) values ('" + escape(link) + "', '" + escape(name) + "')")
+            curs.execute("insert into cat (title, cat) values (?, ?)", [link, name])
             conn.commit()
 
 def namumark(title, data, num):    
@@ -368,7 +362,7 @@ def namumark(title, data, num):
             if(results[0] == title):
                 data = include.sub("<b>" + results[0] + "</b>", data, 1)
             else:
-                curs.execute("select data from data where title = '" + escape(results[0]) + "'")
+                curs.execute("select data from data where title = ?", [results[0]])
                 in_con = curs.fetchall()
                 
                 backlink_plus(title, results[0], 'include', num)
@@ -449,7 +443,7 @@ def namumark(title, data, num):
                 cat_plus(title, g[0], num)
                     
                 if(category == ''):
-                    curs.execute("select title from data where title = '" + escape(g[0]) + "'")
+                    curs.execute("select title from data where title = ?", [g[0]])
                     exists = curs.fetchall()
                     if(exists):
                         red = ""
@@ -458,7 +452,7 @@ def namumark(title, data, num):
                         
                     category += '<a ' + red + ' href="/w/' + url_pas(g[0]) + '">' + re.sub("분류:", "", g[0]) + '</a>'
                 else:
-                    curs.execute("select title from data where title = '" + escape(g[0]) + "'")
+                    curs.execute("select title from data where title = ?", [g[0]])
                     exists = curs.fetchall()
                     if(exists):
                         red = ""
@@ -658,7 +652,7 @@ def namumark(title, data, num):
                 else:
                     nosharp = re.sub("<sharp>", "#", results[0])
                     
-                    curs.execute("select title from data where title = '" + escape(nosharp) + "'")
+                    curs.execute("select title from data where title = ?", [nosharp])
                     y = curs.fetchall()
                     if(y):
                         clas = ''
