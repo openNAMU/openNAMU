@@ -62,7 +62,7 @@ def redirect(data):
     
 from func import *
 
-r_ver = '2.2.0'
+r_ver = '2.2.1'
 
 try:
     curs.execute('select data from other where name = "version"')
@@ -662,7 +662,7 @@ def history_view(name = None, num = 1):
                             <td style="width: 33.3%;">시간</td> \
                         </tr>'
         
-        curs.execute("select send, leng, ip, date, title, id from history where title = ? order by id + 0 desc limit ?, ?", [name, str(i), str(v)])
+        curs.execute("select send, leng, ip, date, title, id from history where title = ? order by id + 0 desc limit ?, ?", [name, str(j), str(i)])
         all_data = curs.fetchall()
         for data in all_data:
             select += '<option value="' + data[5] + '">' + data[5] + '</option>'
@@ -1848,11 +1848,12 @@ def topic(name = None, sub = None):
             )
         )
         
-@route('/topic/<name:path>/<tool:path>')
 @route('/topic/<name:path>', method=['POST', 'GET'])
+@route('/topic/<name:path>/<tool:path>', method=['GET'])
 def close_topic_list(name = None, tool = None):
     div = ''
     i = 0
+    list_d = 0
 
     if(request.method == 'POST'):
         t_num = ''
@@ -1877,7 +1878,7 @@ def close_topic_list(name = None, tool = None):
             sub = '합의'
         else:
             list_d = 1
-            curs.execute("select sub from rd where title = ? order by date desc")
+            curs.execute("select sub from rd where title = ? order by date desc", [name])
             sub = '토론 목록'
 
         rows = curs.fetchall()
@@ -2428,7 +2429,7 @@ def read_view(name = None, num = None, redirect = None):
     curs.execute("select sub from rd where title = ? order by date desc", [name])
     rows = curs.fetchall()
     for data in rows:
-        curs.execute("select title from stop where title = ? and sub = ? and close = 'O'", [name, data['sub']])
+        curs.execute("select title from stop where title = ? and sub = ? and close = 'O'", [name, data[0]])
         row = curs.fetchall()
         if(not row):
             topic = "open"

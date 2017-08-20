@@ -352,23 +352,6 @@ body {
     background: #EFEFEF;
 }
 
-#left_bar {
-    height: 100%;
-    width: 15%;
-    position: fixed;
-    overflow-y: scroll;
-    left: 0;
-    top: 0;
-    background: white;
-    padding: 20px;
-}
-
-@media (min-width: 1920px) {
-    #left_bar {
-        width: 12%;
-    }
-}
-
 #yosolo {
     width: 33.33%;
     text-align: center;
@@ -431,8 +414,8 @@ body {
         width: 100%;
     }
 
-    #left_bar {
-        display: none;
+    table {
+        min-width: 100%;
     }
 }
 

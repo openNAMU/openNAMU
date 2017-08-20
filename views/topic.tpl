@@ -5,7 +5,7 @@
         <a class="menu-item selected" href="#" onclick="return false">
             {{sub}}
         </a>
-        % if(defined('list')):
+        % if(list == 1):
             <a class="menu-item" href="/w/{{get('page', '')}}">문서</a>
         % else:
             <a class="menu-item" href="/topic/{{page}}">토론 목록</a>
