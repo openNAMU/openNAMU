@@ -61,7 +61,7 @@ def html_pas(data, how):
     data = re.sub("%phtml%(?P<in>(?:\/)?(?:a|div|span|embed|iframe)(?:\s[^%]*)?)%phtml%", "<\g<in>>", data)   
     while(1):
         if(how == 1):
-            y = re.search("<((a|div|span|embed|iframe)(?:\s[^>]*))>", data)
+            y = re.search("<((div|span|embed|iframe)(?:\s[^>]*))>", data)
         else:  
             y = re.search("<((a)(?:\s[^>]*))>", data)
         
