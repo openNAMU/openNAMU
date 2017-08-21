@@ -1592,7 +1592,7 @@ def topic_top(name = None, sub = None, num = None):
     else:
         return(redirect('/error/3'))
 
-@route('/topic/<name:path>/sub/<sub:path>/agree')
+@route('/topic/<name:path>/sub/<sub:path>/tool/agree')
 def topic_agree(name = None, sub = None):
     if(admin_check(3) == 1):
         ip = ip_check()
@@ -1623,7 +1623,7 @@ def topic_agree(name = None, sub = None):
         
         return(redirect('/error/3'))
         
-@route('/topic/<name:path>/sub/<sub:path>/<tool:path>')
+@route('/topic/<name:path>/sub/<sub:path>/tool/<tool:path>')
 def topic_stop(name = None, sub = None, tool = None):
     if(tool == 'close'):
         close = 'O'
@@ -1712,21 +1712,21 @@ def topic(name = None, sub = None):
         
         if(admin == 1):
             if(close):
-                div += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/close">(토론 열기)</a> '
+                div += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/close">(토론 열기)</a> '
             else:
-                div += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/close">(토론 닫기)</a> '
+                div += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/close">(토론 닫기)</a> '
             
             if(stop):
-                div += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/stop">(토론 재개)</a> '
+                div += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/stop">(토론 재개)</a> '
             else:
-                div += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/stop">(토론 정지)</a> '
+                div += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/stop">(토론 정지)</a> '
 
             curs.execute("select title from agreedis where title = ? and sub = ?", [name, sub])
             agree = curs.fetchall()
             if(agree):
-                div += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/agree">(합의 취소)</a>'
+                div += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/agree">(합의 취소)</a>'
             else:
-                div += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/agree">(합의 완료)</a>'
+                div += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/agree">(합의 완료)</a>'
             
             div += '<br><br>'
         
