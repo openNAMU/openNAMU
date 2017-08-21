@@ -1796,7 +1796,7 @@ def topic(name = None, sub = None):
                 curs.execute("select end from ban where block = ?", [dain[3]])
                 ban_it = curs.fetchall()
                 if(ban_it):
-                    ban = ' (X)'
+                    ban = ' <a href="javascript:void(0);" title="차단자">†</a>'
                 else:
                     ban = ''
             
@@ -1804,7 +1804,7 @@ def topic(name = None, sub = None):
             curs.execute('select acl from user where id = ?', [dain[3]])
             adch = curs.fetchall()
             if(adch and adch[0][0] != 'user'):
-                chad = ' ★'
+                chad = ' <a href="javascript:void(0);" title="관리자">★</a>'
 
             ip = ip_pas(dain[3], 1)
                     
