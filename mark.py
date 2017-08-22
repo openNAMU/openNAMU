@@ -66,14 +66,12 @@ def send_p(d):
 
     d = re.sub('&lt;a href="(?:[^"]*)"&gt;(?P<in>(?:(?!&lt;).)*)&lt;\/a&gt;', '<a href="' + url_pas('\g<in>') + '">\g<in></a>', d)
 
-    print(d)
-
     return(d)
 
 def html_pas(data):
-    data = re.sub("%phtml%(?P<in>(?:\/)?(?:a|div|span|embed|iframe)(?: [^%]*)?)%phtml%", "<\g<in>>", data)   
+    data = re.sub("%phtml%(?P<in>(?:\/)?(?:a|div|span|embed|iframe)(?:\s[^%]*)?)%phtml%", "<\g<in>>", data)   
     while(1):
-        y = re.search("<((div|span|embed|iframe)(?: [^>]*))>", data)
+        y = re.search("<((div|span|embed|iframe)(?:\s[^>]*))>", data)
         if(y):
             b = y.groups()
 
@@ -92,16 +90,16 @@ def html_pas(data):
 
                 try:
                     if(check[1] != None):
-                        data = re.sub("<((?:\/)?" + b[1] + "(?: [^>]*))>", "%phtml%" + a + "%phtml%", data, 1)
+                        data = re.sub("<((?:\/)?" + b[1] + "(?:\s[^>]*))>", "%phtml%" + a + "%phtml%", data, 1)
                         data = re.sub("<\/" + b[1] + ">", "%phtml%/" + b[1] + "%phtml%", data, 1)
                     else:
-                        data = re.sub("<((?:\/)?" + b[1] + "(?: [^>]*))>", "[[" + check[0] + "]]", data, 1)
+                        data = re.sub("<((?:\/)?" + b[1] + "(?:\s[^>]*))>", "[[" + check[0] + "]]", data, 1)
                         data = re.sub("<\/" + b[1] + ">", "", data, 1)
                 except:
-                    data = re.sub("<((?:\/)?" + b[1] + "(?: [^>]*))>", "%phtml%" + a + "%phtml%", data, 1)
+                    data = re.sub("<((?:\/)?" + b[1] + "(?:\s[^>]*))>", "%phtml%" + a + "%phtml%", data, 1)
                     data = re.sub("<\/" + b[1] + ">", "%phtml%/" + b[1] + "%phtml%", data, 1)
             else:
-                data = re.sub("<((?:\/)?" + b[1] + "(?: [^>]*))>", '&lt;' + b[0] + '&gt;', data, 1)
+                data = re.sub("<((?:\/)?" + b[1] + "(?:\s[^>]*))>", '&lt;' + b[0] + '&gt;', data, 1)
                 
                 break
         else:
@@ -113,8 +111,7 @@ def html_pas(data):
     js_p = re.compile('javascript:', re.I)
     data = js_p.sub('', data)
     
-    data = re.sub("%phtml%(?P<in>(?:\/)?(?:a|div|span|embed|iframe)(?: [^%]*)?)%phtml%", "<\g<in>>", data)
-
+    data = re.sub("%phtml%(?P<in>(?:\/)?(?:a|div|span|embed|iframe)(?:\s[^%]*)?)%phtml%", "<\g<in>>", data)
     return(data)
     
 def mid_pas(data, fol_num, include):
@@ -125,43 +122,43 @@ def mid_pas(data, fol_num, include):
         if(y):
             a = y.groups()
             
-            big_a = re.compile("^\+([1-5]) (.*)$", re.DOTALL)
+            big_a = re.compile("^\+([1-5])\s(.*)$", re.DOTALL)
             big = big_a.search(a[0])
             
-            small_a = re.compile("^\-([1-5]) (.*)$", re.DOTALL)
+            small_a = re.compile("^\-([1-5])\s(.*)$", re.DOTALL)
             small = small_a.search(a[0])
             
-            color_a = re.compile("^(#[0-9a-f-A-F]{6}) (.*)$", re.DOTALL)
+            color_a = re.compile("^(#[0-9a-f-A-F]{6})\s(.*)$", re.DOTALL)
             color = color_a.search(a[0])
             
-            color_b = re.compile("^(#[0-9a-f-A-F]{3}) (.*)$", re.DOTALL)
+            color_b = re.compile("^(#[0-9a-f-A-F]{3})\s(.*)$", re.DOTALL)
             color_2 = color_b.search(a[0])
             
-            color_c = re.compile("^#(\w+) (.*)$", re.DOTALL)
+            color_c = re.compile("^#(\w+)\s(.*)$", re.DOTALL)
             color_3 = color_c.search(a[0])
             
-            back_a = re.compile("^@([0-9a-f-A-F]{6}) (.*)$", re.DOTALL)
+            back_a = re.compile("^@([0-9a-f-A-F]{6})\s(.*)$", re.DOTALL)
             back = back_a.search(a[0])
             
-            back_b = re.compile("^@([0-9a-f-A-F]{3}) (.*)$", re.DOTALL)
+            back_b = re.compile("^@([0-9a-f-A-F]{3})\s(.*)$", re.DOTALL)
             back_2 = back_b.search(a[0])
             
-            back_c = re.compile("^@(\w+) (.*)$", re.DOTALL)
+            back_c = re.compile("^@(\w+)\s(.*)$", re.DOTALL)
             back_3 = back_c.search(a[0])
             
-            include_out_a = re.compile("^#!noin (.*)$", re.DOTALL)
+            include_out_a = re.compile("^#!noin\s(.*)$", re.DOTALL)
             include_out = include_out_a.search(a[0])
             
-            div_a = re.compile("#!wiki style=['\"]([^'\"]*)['\"]\r\n(.*)$", re.DOTALL)
+            div_a = re.compile("#!wiki style=['\"]([^'\"]*)['\"]\n(.*)$", re.DOTALL)
             div = div_a.search(a[0])
             
-            html_a = re.compile("^#!html (.*)$", re.DOTALL)
+            html_a = re.compile("^#!html\s(.*)$", re.DOTALL)
             html = html_a.search(a[0])
             
-            fol_a = re.compile("^#!folding ((?:(?!\n).)*)\n? \n(.*)$", re.DOTALL)
+            fol_a = re.compile("^#!folding\s((?:(?!\n).)*)\n?\s\n(.*)$", re.DOTALL)
             fol = fol_a.search(a[0])
             
-            syn_a = re.compile("^#!syntax ([^\n]*)\r\n(.*)$", re.DOTALL)
+            syn_a = re.compile("^#!syntax\s([^\n]*)\r\n(.*)$", re.DOTALL)
             syn = syn_a.search(a[0])
             
             if(big):
@@ -213,7 +210,7 @@ def mid_pas(data, fol_num, include):
                 fol_num += 3
             elif(syn):
                 result = syn.groups()
-                data = com.sub('<pre id="syntax"><code class="' + result[0] + '"><code>' + re.sub('\r\n', '<isbr>', re.sub(' ', '<space>', result[1])) + '</code></code></pre>', data, 1)
+                data = com.sub('<pre id="syntax"><code class="' + result[0] + '">' + re.sub('\r\n', '<isbr>', re.sub(' ', '<space>', result[1])) + '</code></pre>', data, 1)
             elif(html):
                 result = html.groups()
                 data = com.sub(result[0], data, 1)
@@ -256,7 +253,7 @@ def toc_pas(data, title):
     rtoc = '<div id="toc"><span id="toc-name">목차</span><br><br>'
     while(1):
         i[0] += 1
-        m = re.search('(={1,6}) ?([^=]*) ?(?:={1,6})(?: +)?\n', data)
+        m = re.search('(={1,6})\s?([^=]*)\s?(?:={1,6})(?:\s+)?\n', data)
         if(m):
             result = m.groups()
             wiki = len(result[0])
@@ -325,7 +322,7 @@ def toc_pas(data, title):
             d = c
             c = re.sub("\[\[(([^|]*)\|)?(?P<in>[^\]]*)\]\]", "\g<in>", c)
 
-            data = re.sub('(={1,6}) ?([^=]*) ?(?:={1,6})(?: +)?\n', '<tablenobr><h' + str(wiki) + ' id="' + c + '"><a href="#toc" id="s-' + toc + '">' + toc + '.</a> ' + d + ' <span style="font-size:11px;">[<a href="/edit/' + url_pas(title) + '/section/' + str(i[0]) + '">편집</a>]</span></h' + str(wiki) + '>', data, 1)
+            data = re.sub('(={1,6})\s?([^=]*)\s?(?:={1,6})(?:\s+)?\n', '<tablenobr><h' + str(wiki) + ' id="' + c + '"><a href="#toc" id="s-' + toc + '">' + toc + '.</a> ' + d + ' <span style="font-size:11px;">[<a href="/edit/' + url_pas(title) + '/section/' + str(i[0]) + '">편집</a>]</span></h' + str(wiki) + '>', data, 1)
         else:
             rtoc += '</div>'
             
@@ -363,7 +360,7 @@ def namumark(title, data, num):
     data = re.sub("\[anchor\((?P<in>[^\[\]]*)\)\]", '<span id="\g<in>"></span>', data)
     data = savemark(data)
     
-    include = re.compile("\[include\(((?:(?!\)\]|,).)*)((?:, ?(?:[^)]*))+)?\)\]")
+    include = re.compile("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]")
     while(1):
         m = include.search(data)
         if(m):
@@ -423,22 +420,22 @@ def namumark(title, data, num):
     data = re.sub("\[nicovideo\((?P<in>[^,)]*)(?:(?:,(?:[^,)]*))+)?\)\]", "[[http://embed.nicovideo.jp/watch/\g<in>]]", data)
     
     while(1):
-        m = re.search("\n&gt; ?((?:[^\n]*)(?:(?:(?:(?:\n&gt; ?)(?:[^\n]*))+)?))", data)
+        m = re.search("\n&gt;\s?((?:[^\n]*)(?:(?:(?:(?:\n&gt;\s?)(?:[^\n]*))+)?))", data)
         if(m):
             result = m.groups()
             blockquote = result[0]
-            blockquote = re.sub("\n&gt; ?", "\n", blockquote)
-            data = re.sub("\n&gt; ?((?:[^\n]*)(?:(?:(?:(?:\n&gt; ?)(?:[^\n]*))+)?))", "\n<blockquote>" + blockquote + "</blockquote>", data, 1)
+            blockquote = re.sub("\n&gt;\s?", "\n", blockquote)
+            data = re.sub("\n&gt;\s?((?:[^\n]*)(?:(?:(?:(?:\n&gt;\s?)(?:[^\n]*))+)?))", "\n<blockquote>" + blockquote + "</blockquote>", data, 1)
         else:
             break
     
     if(not re.search('\[목차\]', data)):
         if(not re.search('\[목차\(없음\)\]', data)):
-            data = re.sub("(?P<in>(={1,6}) ?([^=]*) ?(?:={1,6})(?: +)?\n)", "[목차]\n\g<in>", data, 1)
+            data = re.sub("(?P<in>(={1,6})\s?([^=]*)\s?(?:={1,6})(?:\s+)?\n)", "[목차]\n\g<in>", data, 1)
         else:
             data = re.sub("\[목차\(없음\)\]", "", data)
         
-    data = re.sub("(\n)(?P<in>\r\n(={1,6}) ?([^=]*) ?(?:={1,6})(?: +)?\n)", "\g<in>", data)
+    data = re.sub("(\n)(?P<in>\r\n(={1,6})\s?([^=]*)\s?(?:={1,6})(?:\s+)?\n)", "\g<in>", data)
     
     data = toc_pas(data, title)
     
@@ -494,14 +491,14 @@ def namumark(title, data, num):
                                                                         </tbody> \
                                                                     </table>', data)
     
-    data = re.sub('\[ruby\((?P<in>[^\,]*)\, ?(?P<out>[^\)]*)\)\]', '<ruby> \
+    data = re.sub('\[ruby\((?P<in>[^\,]*)\,\s?(?P<out>[^\)]*)\)\]', '<ruby> \
                                                                         \g<in> \
                                                                         <rp>(</rp> \
                                                                         <rt>\g<out></rt> \
                                                                         <rp>)</rp> \
                                                                     </ruby>', data)
     
-    data = re.sub("## ?(?P<in>[^\n]*)\n", "<div style='display:none;'>\g<in></div>", data)
+    data = re.sub("##\s?(?P<in>[^\n]*)\n", "<div style='display:none;'>\g<in></div>", data)
     
     test = re.findall('\[\[wiki:([^|\]]+)(?:\|([^\]]+))?\]\]', data)
     if(test):
@@ -710,22 +707,22 @@ def namumark(title, data, num):
             break
             
     while(1):
-        m = re.search("((?:(?:( +)\* (?:[^\n]*))\n?)+)", data)
+        m = re.search("((?:(?:( +)\*\s(?:[^\n]*))\n?)+)", data)
         if(m):
             result = m.groups()
             end = str(result[0])
 
             while(1):
-                isspace = re.search("( +)\* ([^\n]*)", end)
+                isspace = re.search("( +)\*\s([^\n]*)", end)
                 if(isspace):
                     spacebar = isspace.groups()
                     up = len(spacebar[0]) * 20
-                    end = re.sub("( +)\* ([^\n]*)", "<li style='margin-left:" + str(up) + "px'>" + spacebar[1] + "</li>", end, 1)
+                    end = re.sub("( +)\*\s([^\n]*)", "<li style='margin-left:" + str(up) + "px'>" + spacebar[1] + "</li>", end, 1)
                 else:
                     break
 
             end = re.sub("\n", '', end)
-            data = re.sub("(?:(?:(?:( +)\* ([^\n]*))\n?)+)", '<ul id="list">' + end + '</ul>', data, 1)
+            data = re.sub("(?:(?:(?:( +)\*\s([^\n]*))\n?)+)", '<ul id="list">' + end + '</ul>', data, 1)
         else:
             break
     
@@ -767,7 +764,7 @@ def namumark(title, data, num):
     tou = "<hr id='footnote'><div><br>"
     namu = []
     while(1):
-        b = re.search("\[\*([^ ]*)(?: (((?!\[|\]).)*))?\]", data)
+        b = re.search("\[\*([^\s]*)(?:\s(((?!\[|\]).)*))?\]", data)
         if(b):
             results = b.groups()
             if(not results[1] and results[0]):
@@ -785,9 +782,9 @@ def namumark(title, data, num):
                         break
                         
                 if(none_this == 0):
-                    data = re.sub("\[\*([^ ]*)(?: (((?!\[|\]).)*))?\]", "<sup><a title=\"" + namu[i + 1] + "\" id=\"rfn-" + str(a) + "\" href=\"#fn-" + str(a) + "\">[" + results[0] + "]</a></sup>", data, 1)
+                    data = re.sub("\[\*([^\s]*)(?:\s(((?!\[|\]).)*))?\]", "<sup><a title=\"" + namu[i + 1] + "\" id=\"rfn-" + str(a) + "\" href=\"#fn-" + str(a) + "\">[" + results[0] + "]</a></sup>", data, 1)
                 else:
-                    data = re.sub("\[\*([^ ]*)(?: (((?!\[|\]).)*))?\]", "<sup><a id=\"rfn-" + str(a) + "\" href=\"#fn-" + str(a) + "\">[" + results[0] + "]</a></sup>", data, 1)
+                    data = re.sub("\[\*([^\s]*)(?:\s(((?!\[|\]).)*))?\]", "<sup><a id=\"rfn-" + str(a) + "\" href=\"#fn-" + str(a) + "\">[" + results[0] + "]</a></sup>", data, 1)
             elif(results[0]):                
                 namu += [results[0]]
                 namu += [results[1]]
@@ -796,7 +793,7 @@ def namumark(title, data, num):
                 c = re.sub("<(?:[^>]*)>", '', c)
 
                 tou += "<span id='footnote-list'><a href=\"#rfn-" + str(a) + "\" id=\"fn-" + str(a) + "\">[" + results[0] + "]</a> " + results[1] + "</span><br>"
-                data = re.sub("\[\*([^ ]*)(?: (((?!\[|\]).)*))?\]", "<sup><a title=\"" + c + "\" id=\"rfn-" + str(a) + "\" href=\"#fn-" + str(a) + "\">[" + results[0] + "]</a></sup>", data, 1)     
+                data = re.sub("\[\*([^\s]*)(?:\s(((?!\[|\]).)*))?\]", "<sup><a title=\"" + c + "\" id=\"rfn-" + str(a) + "\" href=\"#fn-" + str(a) + "\">[" + results[0] + "]</a></sup>", data, 1)     
 
                 a += 1
             else:
@@ -804,7 +801,7 @@ def namumark(title, data, num):
                 c = re.sub("<(?:[^>]*)>", '', c)
                 
                 tou += "<span id='footnote-list'><a href=\"#rfn-" + str(a) + "\" id=\"fn-" + str(a) + "\">[" + str(a) + "]</a> " + results[1] + "</span><br>"
-                data = re.sub("\[\*([^ ]*)(?: (((?!\[|\]).)*))?\]", '<sup><a title="' + c + '" id="rfn-' + str(a) + '" href="#fn-' + str(a) + '">[' + str(a) + ']</a></sup>', data, 1)
+                data = re.sub("\[\*([^\s]*)(?:\s(((?!\[|\]).)*))?\]", '<sup><a title="' + c + '" id="rfn-' + str(a) + '" href="#fn-' + str(a) + '">[' + str(a) + ']</a></sup>', data, 1)
 
                 a += 1
         else:
@@ -859,9 +856,9 @@ def namumark(title, data, num):
                         celstyle = 'style="'
                         rowstyle = 'style="'
 
-                        q = re.search("&lt;table ?width=((?:(?!&gt;).)*)&gt;", result[1])
-                        w = re.search("&lt;table ?height=((?:(?!&gt;).)*)&gt;", result[1])
-                        e = re.search("&lt;table ?align=((?:(?!&gt;).)*)&gt;", result[1])
+                        q = re.search("&lt;table\s?width=((?:(?!&gt;).)*)&gt;", result[1])
+                        w = re.search("&lt;table\s?height=((?:(?!&gt;).)*)&gt;", result[1])
+                        e = re.search("&lt;table\s?align=((?:(?!&gt;).)*)&gt;", result[1])
                         if(q):
                             resultss = q.groups()
                             alltable += 'width:' + resultss[0] + ';'
@@ -875,7 +872,7 @@ def namumark(title, data, num):
                             elif(resultss[0] == 'center'):
                                 alltable += 'margin:auto;'
                                 
-                        ee = re.search("&lt;table ?textalign=((?:(?!&gt;).)*)&gt;", result[1])
+                        ee = re.search("&lt;table\s?textalign=((?:(?!&gt;).)*)&gt;", result[1])
                         if(ee):
                             resultss = ee.groups()
                             if(resultss[0] == 'right'):
@@ -908,9 +905,9 @@ def namumark(title, data, num):
                             resultss = bc.groups()
                             rowstyle += 'background:' + resultss[0] + ';'
                             
-                        z = re.search("&lt;table ?bordercolor=(#[0-9a-f-A-F]{6})&gt;", result[1])
-                        x = re.search("&lt;table ?bordercolor=(#[0-9a-f-A-F]{3})&gt;", result[1])
-                        c = re.search("&lt;table ?bordercolor=(\w+)&gt;", result[1])
+                        z = re.search("&lt;table\s?bordercolor=(#[0-9a-f-A-F]{6})&gt;", result[1])
+                        x = re.search("&lt;table\s?bordercolor=(#[0-9a-f-A-F]{3})&gt;", result[1])
+                        c = re.search("&lt;table\s?bordercolor=(\w+)&gt;", result[1])
                         if(z):
                             resultss = z.groups()
                             alltable += 'border:' + resultss[0] + ' 2px solid;'
@@ -921,9 +918,9 @@ def namumark(title, data, num):
                             resultss = c.groups()
                             alltable += 'border:' + resultss[0] + ' 2px solid;'
                             
-                        aq = re.search("&lt;table ?bgcolor=(#[0-9a-f-A-F]{6})&gt;", result[1])
-                        aw = re.search("&lt;table ?bgcolor=(#[0-9a-f-A-F]{3})&gt;", result[1])
-                        ae = re.search("&lt;table ?bgcolor=(\w+)&gt;", result[1])
+                        aq = re.search("&lt;table\s?bgcolor=(#[0-9a-f-A-F]{6})&gt;", result[1])
+                        aw = re.search("&lt;table\s?bgcolor=(#[0-9a-f-A-F]{3})&gt;", result[1])
+                        ae = re.search("&lt;table\s?bgcolor=(\w+)&gt;", result[1])
                         if(aq):
                             resultss = aq.groups()
                             alltable += 'background:' + resultss[0] + ';'
