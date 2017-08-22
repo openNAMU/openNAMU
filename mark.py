@@ -68,6 +68,139 @@ def send_p(d):
 
     return(d)
 
+def table_p(d, d2):
+    alltable = 'style="'
+    celstyle = 'style="'
+    rowstyle = 'style="'
+    row = ''
+    cel = ''
+
+    q = re.search("&lt;table\s?width=((?:(?!&gt;).)*)&gt;", d)
+    w = re.search("&lt;table\s?height=((?:(?!&gt;).)*)&gt;", d)
+    e = re.search("&lt;table\s?align=((?:(?!&gt;).)*)&gt;", d)
+    if(q):
+        resultss = q.groups()
+        alltable += 'width:' + resultss[0] + ';'
+    if(w):
+        resultss = w.groups()
+        alltable += 'height:' + resultss[0] + ';'
+    if(e):
+        resultss = e.groups()
+        if(resultss[0] == 'right'):
+            alltable += 'float:right;'
+        elif(resultss[0] == 'center'):
+            alltable += 'margin:auto;'
+            
+    ee = re.search("&lt;table\s?textalign=((?:(?!&gt;).)*)&gt;", d)
+    if(ee):
+        resultss = ee.groups()
+        if(resultss[0] == 'right'):
+            alltable += 'text-align:right;'
+        elif(resultss[0] == 'center'):
+            alltable += 'text-align:center;'
+    
+    r = re.search("&lt;-((?:(?!&gt;).)*)&gt;", d)
+    if(r):
+        resultss = r.groups()
+        cel = 'colspan="' + resultss[0] + '"'
+    else:
+        cel = 'colspan="' + str(round(len(d2) / 2)) + '"'   
+
+    t = re.search("&lt;\|((?:(?!&gt;).)*)&gt;", d)
+    if(t):
+        resultss = t.groups()
+        row = 'rowspan="' + resultss[0] + '"'
+
+    ba = re.search("&lt;rowbgcolor=(#[0-9a-f-A-F]{6})&gt;", d)
+    bb = re.search("&lt;rowbgcolor=(#[0-9a-f-A-F]{3})&gt;", d)
+    bc = re.search("&lt;rowbgcolor=(\w+)&gt;", d)
+    if(ba):
+        resultss = ba.groups()
+        rowstyle += 'background:' + resultss[0] + ';'
+    elif(bb):
+        resultss = bb.groups()
+        rowstyle += 'background:' + resultss[0] + ';'
+    elif(bc):
+        resultss = bc.groups()
+        rowstyle += 'background:' + resultss[0] + ';'
+        
+    z = re.search("&lt;table\s?bordercolor=(#[0-9a-f-A-F]{6})&gt;", d)
+    x = re.search("&lt;table\s?bordercolor=(#[0-9a-f-A-F]{3})&gt;", d)
+    c = re.search("&lt;table\s?bordercolor=(\w+)&gt;", d)
+    if(z):
+        resultss = z.groups()
+        alltable += 'border:' + resultss[0] + ' 2px solid;'
+    elif(x):
+        resultss = x.groups()
+        alltable += 'border:' + resultss[0] + ' 2px solid;'
+    elif(c):
+        resultss = c.groups()
+        alltable += 'border:' + resultss[0] + ' 2px solid;'
+        
+    aq = re.search("&lt;table\s?bgcolor=(#[0-9a-f-A-F]{6})&gt;", d)
+    aw = re.search("&lt;table\s?bgcolor=(#[0-9a-f-A-F]{3})&gt;", d)
+    ae = re.search("&lt;table\s?bgcolor=(\w+)&gt;", d)
+    if(aq):
+        resultss = aq.groups()
+        alltable += 'background:' + resultss[0] + ';'
+    elif(aw):
+        resultss = aw.groups()
+        alltable += 'background:' + resultss[0] + ';'
+    elif(ae):
+        resultss = ae.groups()
+        alltable += 'background:' + resultss[0] + ';'
+        
+    j = re.search("&lt;bgcolor=(#[0-9a-f-A-F]{6})&gt;", d)
+    k = re.search("&lt;bgcolor=(#[0-9a-f-A-F]{3})&gt;", d)
+    l = re.search("&lt;bgcolor=(\w+)&gt;", d)
+    if(j):
+        resultss = j.groups()
+        celstyle += 'background:' + resultss[0] + ';'
+    elif(k):
+        resultss = k.groups()
+        celstyle += 'background:' + resultss[0] + ';'
+    elif(l):
+        resultss = l.groups()
+        celstyle += 'background:' + resultss[0] + ';'
+        
+    aa = re.search("&lt;(#[0-9a-f-A-F]{6})&gt;", d)
+    ab = re.search("&lt;(#[0-9a-f-A-F]{3})&gt;", d)
+    ac = re.search("&lt;(\w+)&gt;", d)
+    if(aa):
+        resultss = aa.groups()
+        celstyle += 'background:' + resultss[0] + ';'
+    elif(ab):
+        resultss = ab.groups()
+        celstyle += 'background:' + resultss[0] + ';'
+    elif(ac):
+        resultss = ac.groups()
+        celstyle += 'background:' + resultss[0] + ';'
+        
+    qa = re.search("&lt;width=((?:(?!&gt;).)*)&gt;", d)
+    qb = re.search("&lt;height=((?:(?!&gt;).)*)&gt;", d)
+    if(qa):
+        resultss = qa.groups()
+        celstyle += 'width:' + resultss[0] + ';'
+    if(qb):
+        resultss = qb.groups()
+        celstyle += 'height:' + resultss[0] + ';'
+        
+    i = re.search("&lt;\)&gt;", d)
+    o = re.search("&lt;:&gt;", d)
+    p = re.search("&lt;\(&gt;",  d)
+    if(i):
+        celstyle += 'text-align:right;'
+    elif(o):
+        celstyle += 'text-align:center;'
+    elif(p):
+        celstyle += 'text-align:left;'
+        
+    alltable += '"'
+    celstyle += '"'
+    rowstyle += '"'
+
+    return([alltable, celstyle, rowstyle, row, cel])
+
 def html_pas(data):
     data = re.sub("%phtml%(?P<in>(?:\/)?(?:a|div|span|embed|iframe)(?:\s[^%]*)?)%phtml%", "<\g<in>>", data)   
     while(1):
@@ -244,7 +377,7 @@ def mid_pas(data, fol_num, include):
         else:
             break
             
-    return((data, fol_num))
+    return([data, fol_num])
 
 def toc_pas(data, title):
     i = [0, 0, 0, 0, 0, 0, 0]
@@ -852,133 +985,12 @@ def namumark(title, data, num):
                     alltable = ''
                     result = a.groups()
                     if(result[1]):
-                        alltable = 'style="'
-                        celstyle = 'style="'
-                        rowstyle = 'style="'
-
-                        q = re.search("&lt;table\s?width=((?:(?!&gt;).)*)&gt;", result[1])
-                        w = re.search("&lt;table\s?height=((?:(?!&gt;).)*)&gt;", result[1])
-                        e = re.search("&lt;table\s?align=((?:(?!&gt;).)*)&gt;", result[1])
-                        if(q):
-                            resultss = q.groups()
-                            alltable += 'width:' + resultss[0] + ';'
-                        if(w):
-                            resultss = w.groups()
-                            alltable += 'height:' + resultss[0] + ';'
-                        if(e):
-                            resultss = e.groups()
-                            if(resultss[0] == 'right'):
-                                alltable += 'float:right;'
-                            elif(resultss[0] == 'center'):
-                                alltable += 'margin:auto;'
-                                
-                        ee = re.search("&lt;table\s?textalign=((?:(?!&gt;).)*)&gt;", result[1])
-                        if(ee):
-                            resultss = ee.groups()
-                            if(resultss[0] == 'right'):
-                                alltable += 'text-align:right;'
-                            elif(resultss[0] == 'center'):
-                                alltable += 'text-align:center;'
-                        
-                        r = re.search("&lt;-((?:(?!&gt;).)*)&gt;", result[1])
-                        if(r):
-                            resultss = r.groups()
-                            cel = 'colspan="' + resultss[0] + '"'
-                        else:
-                            cel = 'colspan="' + str(round(len(result[0]) / 2)) + '"'   
-
-                        t = re.search("&lt;\|((?:(?!&gt;).)*)&gt;", result[1])
-                        if(t):
-                            resultss = t.groups()
-                            row = 'rowspan="' + resultss[0] + '"'
-
-                        ba = re.search("&lt;rowbgcolor=(#[0-9a-f-A-F]{6})&gt;", result[1])
-                        bb = re.search("&lt;rowbgcolor=(#[0-9a-f-A-F]{3})&gt;", result[1])
-                        bc = re.search("&lt;rowbgcolor=(\w+)&gt;", result[1])
-                        if(ba):
-                            resultss = ba.groups()
-                            rowstyle += 'background:' + resultss[0] + ';'
-                        elif(bb):
-                            resultss = bb.groups()
-                            rowstyle += 'background:' + resultss[0] + ';'
-                        elif(bc):
-                            resultss = bc.groups()
-                            rowstyle += 'background:' + resultss[0] + ';'
-                            
-                        z = re.search("&lt;table\s?bordercolor=(#[0-9a-f-A-F]{6})&gt;", result[1])
-                        x = re.search("&lt;table\s?bordercolor=(#[0-9a-f-A-F]{3})&gt;", result[1])
-                        c = re.search("&lt;table\s?bordercolor=(\w+)&gt;", result[1])
-                        if(z):
-                            resultss = z.groups()
-                            alltable += 'border:' + resultss[0] + ' 2px solid;'
-                        elif(x):
-                            resultss = x.groups()
-                            alltable += 'border:' + resultss[0] + ' 2px solid;'
-                        elif(c):
-                            resultss = c.groups()
-                            alltable += 'border:' + resultss[0] + ' 2px solid;'
-                            
-                        aq = re.search("&lt;table\s?bgcolor=(#[0-9a-f-A-F]{6})&gt;", result[1])
-                        aw = re.search("&lt;table\s?bgcolor=(#[0-9a-f-A-F]{3})&gt;", result[1])
-                        ae = re.search("&lt;table\s?bgcolor=(\w+)&gt;", result[1])
-                        if(aq):
-                            resultss = aq.groups()
-                            alltable += 'background:' + resultss[0] + ';'
-                        elif(aw):
-                            resultss = aw.groups()
-                            alltable += 'background:' + resultss[0] + ';'
-                        elif(ae):
-                            resultss = ae.groups()
-                            alltable += 'background:' + resultss[0] + ';'
-                            
-                        j = re.search("&lt;bgcolor=(#[0-9a-f-A-F]{6})&gt;", result[1])
-                        k = re.search("&lt;bgcolor=(#[0-9a-f-A-F]{3})&gt;", result[1])
-                        l = re.search("&lt;bgcolor=(\w+)&gt;", result[1])
-                        if(j):
-                            resultss = j.groups()
-                            celstyle += 'background:' + resultss[0] + ';'
-                        elif(k):
-                            resultss = k.groups()
-                            celstyle += 'background:' + resultss[0] + ';'
-                        elif(l):
-                            resultss = l.groups()
-                            celstyle += 'background:' + resultss[0] + ';'
-                            
-                        aa = re.search("&lt;(#[0-9a-f-A-F]{6})&gt;", result[1])
-                        ab = re.search("&lt;(#[0-9a-f-A-F]{3})&gt;", result[1])
-                        ac = re.search("&lt;(\w+)&gt;", result[1])
-                        if(aa):
-                            resultss = aa.groups()
-                            celstyle += 'background:' + resultss[0] + ';'
-                        elif(ab):
-                            resultss = ab.groups()
-                            celstyle += 'background:' + resultss[0] + ';'
-                        elif(ac):
-                            resultss = ac.groups()
-                            celstyle += 'background:' + resultss[0] + ';'
-                            
-                        qa = re.search("&lt;width=((?:(?!&gt;).)*)&gt;", result[1])
-                        qb = re.search("&lt;height=((?:(?!&gt;).)*)&gt;", result[1])
-                        if(qa):
-                            resultss = qa.groups()
-                            celstyle += 'width:' + resultss[0] + ';'
-                        if(qb):
-                            resultss = qb.groups()
-                            celstyle += 'height:' + resultss[0] + ';'
-                            
-                        i = re.search("&lt;\)&gt;", result[1])
-                        o = re.search("&lt;:&gt;", result[1])
-                        p = re.search("&lt;\(&gt;", result[1])
-                        if(i):
-                            celstyle += 'text-align:right;'
-                        elif(o):
-                            celstyle += 'text-align:center;'
-                        elif(p):
-                            celstyle += 'text-align:left;'
-                            
-                        alltable += '"'
-                        celstyle += '"'
-                        rowstyle += '"'
+                        table_d = table_p(result[1], result[0])
+                        alltable = table_d[0]
+                        rowstyle = table_d[1]
+                        celstyle = table_d[2]
+                        row = table_d[3]
+                        cel = table_d[4]
                             
                         table = re.sub("^(\|\|(?:(?:\|\|)+)?)((?:&lt;(?:(?:(?!&gt;).)*)&gt;)+)?",   "<table " + alltable + "> \
                                                                                                         <tbody> \
@@ -1008,81 +1020,11 @@ def namumark(title, data, num):
 
                     result = b.groups()
                     if(result[1]):
-                        celstyle = 'style="'
-                        rowstyle = 'style="'
-                        
-                        r = re.search("&lt;-((?:(?!&gt;).)*)&gt;", result[1])
-                        if(r):
-                            resultss = r.groups()
-                            cel = 'colspan="' + resultss[0] + '"'
-                        else:
-                            cel = 'colspan="' + str(round(len(result[0]) / 2)) + '"'
-
-                        t = re.search("&lt;\|((?:(?!&gt;).)*)&gt;", result[1])
-                        if(t):
-                            resultss = t.groups()
-                            row = 'rowspan="' + resultss[0] + '"'
-                            
-                        ba = re.search("&lt;rowbgcolor=(#[0-9a-f-A-F]{6})&gt;", result[1])
-                        bb = re.search("&lt;rowbgcolor=(#[0-9a-f-A-F]{3})&gt;", result[1])
-                        bc = re.search("&lt;rowbgcolor=(\w+)&gt;", result[1])
-                        if(ba):
-                            resultss = ba.groups()
-                            rowstyle = rowstyle + 'background:' + resultss[0] + ';'
-                        elif(bb):
-                            resultss = bb.groups()
-                            rowstyle = rowstyle + 'background:' + resultss[0] + ';'
-                        elif(bc):
-                            resultss = bc.groups()
-                            rowstyle = rowstyle + 'background:' + resultss[0] + ';'
-                            
-                        j = re.search("&lt;bgcolor=(#[0-9a-f-A-F]{6})&gt;", result[1])
-                        k = re.search("&lt;bgcolor=(#[0-9a-f-A-F]{3})&gt;", result[1])
-                        l = re.search("&lt;bgcolor=(\w+)&gt;", result[1])
-                        if(j):
-                            resultss = j.groups()
-                            celstyle = celstyle + 'background:' + resultss[0] + ';'
-                        elif(k):
-                            resultss = k.groups()
-                            celstyle = celstyle + 'background:' + resultss[0] + ';'
-                        elif(l):
-                            resultss = l.groups()
-                            celstyle = celstyle + 'background:' + resultss[0] + ';'
-
-                        aa = re.search("&lt;(#[0-9a-f-A-F]{6})&gt;", result[1])
-                        ab = re.search("&lt;(#[0-9a-f-A-F]{3})&gt;", result[1])
-                        ac = re.search("&lt;(\w+)&gt;", result[1])
-                        if(aa):
-                            resultss = aa.groups()
-                            celstyle = celstyle + 'background:' + resultss[0] + ';'
-                        elif(ab):
-                            resultss = ab.groups()
-                            celstyle = celstyle + 'background:' + resultss[0] + ';'
-                        elif(ac):
-                            resultss = ac.groups()
-                            celstyle = celstyle + 'background:' + resultss[0] + ';'    
-
-                        qa = re.search("&lt;width=((?:(?!&gt;).)*)&gt;", result[1])
-                        qb = re.search("&lt;height=((?:(?!&gt;).)*)&gt;", result[1])
-                        if(qa):
-                            resultss = qa.groups()
-                            celstyle = celstyle + 'width:' + resultss[0] + ';'
-                        if(qb):
-                            resultss = qb.groups()
-                            celstyle = celstyle + 'height:' + resultss[0] + ';'
-                            
-                        i = re.search("&lt;\)&gt;", result[1])
-                        o = re.search("&lt;:&gt;", result[1])
-                        p = re.search("&lt;\(&gt;", result[1])
-                        if(i):
-                            celstyle = celstyle + 'text-align:right;'
-                        elif(o):
-                            celstyle = celstyle + 'text-align:center;'
-                        elif(p):
-                            celstyle = celstyle + 'text-align:left;'
-
-                        celstyle = celstyle + '"'
-                        rowstyle = rowstyle + '"'
+                        table_d = table_p(result[1], result[0])
+                        rowstyle = table_d[1]
+                        celstyle = table_d[2]
+                        row = table_d[3]
+                        cel = table_d[4]
                         
                         table = re.sub("\|\|\r\n(\|\|(?:(?:\|\|)+)?)((?:&lt;(?:(?:(?!&gt;).)*)&gt;)+)?",        "</td> \
                                                                                                             </tr> \
@@ -1106,66 +1048,11 @@ def namumark(title, data, num):
 
                     result = c.groups()
                     if(result[1]):
-                        celstyle = 'style="'
-                        
-                        r = re.search("&lt;-((?:(?!&gt;).)*)&gt;", result[1])
-                        if(r):
-                            resultss = r.groups()
-                            cel = 'colspan="' + resultss[0] + '"'
-                        else:
-                            cel = 'colspan="' + str(round(len(result[0]) / 2)) + '"'
-                        t = re.search("&lt;\|((?:(?!&gt;).)*)&gt;", result[1])
-                        if(t):
-                            resultss = t.groups()
-                            row = 'rowspan="' + resultss[0] + '"'
-                            
-                        j = re.search("&lt;bgcolor=(#[0-9a-f-A-F]{6})&gt;", result[1])
-                        k = re.search("&lt;bgcolor=(#[0-9a-f-A-F]{3})&gt;", result[1])
-                        l = re.search("&lt;bgcolor=(\w+)&gt;", result[1])
-                        if(j):
-                            resultss = j.groups()
-                            celstyle = celstyle + 'background:' + resultss[0] + ';'
-                        elif(k):
-                            resultss = k.groups()
-                            celstyle = celstyle + 'background:' + resultss[0] + ';'
-                        elif(l):
-                            resultss = l.groups()
-                            celstyle = celstyle + 'background:' + resultss[0] + ';'
-                            
-                        aa = re.search("&lt;(#[0-9a-f-A-F]{6})&gt;", result[1])
-                        ab = re.search("&lt;(#[0-9a-f-A-F]{3})&gt;", result[1])
-                        ac = re.search("&lt;(\w+)&gt;", result[1])
-                        if(aa):
-                            resultss = aa.groups()
-                            celstyle = celstyle + 'background:' + resultss[0] + ';'
-                        elif(ab):
-                            resultss = ab.groups()
-                            celstyle = celstyle + 'background:' + resultss[0] + ';'
-                        elif(ac):
-                            resultss = ac.groups()
-                            celstyle = celstyle + 'background:' + resultss[0] + ';'
-                            
-                        qa = re.search("&lt;width=((?:(?!&gt;).)*)&gt;", result[1])
-                        qb = re.search("&lt;height=((?:(?!&gt;).)*)&gt;", result[1])
-                        if(qa):
-                            resultss = qa.groups()
-                            celstyle = celstyle + 'width:' + resultss[0] + ';'
-                        if(qb):
-                            resultss = qb.groups()
-                            celstyle = celstyle + 'height:' + resultss[0] + ';'
-                            
-                        i = re.search("&lt;\)&gt;", result[1])
-                        o = re.search("&lt;:&gt;", result[1])
-                        p = re.search("&lt;\(&gt;", result[1])
-                        if(i):
-                            celstyle = celstyle + 'text-align:right;'
-                        elif(o):
-                            celstyle = celstyle + 'text-align:center;'
-                        elif(p):
-                            celstyle = celstyle + 'text-align:left;'
+                        table_d = table_p(result[1], result[0])
+                        celstyle = table_d[2]
+                        row = table_d[3]
+                        cel = table_d[4]
 
-                        celstyle = celstyle + '"'
-                            
                         table = re.sub("(\|\|(?:(?:\|\|)+)?)((?:&lt;(?:(?:(?!&gt;).)*)&gt;)+)?",    "</td> \
                                                                                                     <td " + cel + " " + row + " " + celstyle + ">", table, 1)
                     else:
