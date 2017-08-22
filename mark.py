@@ -199,7 +199,7 @@ def table_p(d, d2):
     celstyle += '"'
     rowstyle += '"'
 
-    return([alltable, celstyle, rowstyle, row, cel])
+    return([alltable, rowstyle, celstyle, row, cel])
 
 def html_pas(data):
     data = re.sub("%phtml%(?P<in>(?:\/)?(?:a|div|span|embed|iframe)(?:\s[^%]*)?)%phtml%", "<\g<in>>", data)   
@@ -983,6 +983,8 @@ def namumark(title, data, num):
                     celstyle = ''
                     rowstyle = ''
                     alltable = ''
+                    table_d = ''
+
                     result = a.groups()
                     if(result[1]):
                         table_d = table_p(result[1], result[0])
@@ -1017,6 +1019,7 @@ def namumark(title, data, num):
                     cel = ''
                     celstyle = ''
                     rowstyle = ''
+                    table_d = ''
 
                     result = b.groups()
                     if(result[1]):
@@ -1045,6 +1048,7 @@ def namumark(title, data, num):
                     row = ''
                     cel = ''
                     celstyle = ''
+                    table_d = ''
 
                     result = c.groups()
                     if(result[1]):
