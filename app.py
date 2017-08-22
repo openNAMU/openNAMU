@@ -345,7 +345,6 @@ def recentchanges(name = None, num = 1):
     
         title = re.sub('<', '&lt;', data[1])
         title = re.sub('>', '&gt;', title)
-        title = re.sub('"', '&quot;', title)
         
         if(re.search("\+", data[5])):
             leng = '<span style="color:green;">' + data[5] + '</span>'
@@ -554,11 +553,9 @@ def recentdiscuss():
     for data in rows:
         title = re.sub('<', '&lt;', data[0])
         title = re.sub('>', '&gt;', title)
-        title = re.sub('"', '&quot;', title)
         
         sub = re.sub('<', '&lt;', data[1])
         sub = re.sub('>', '&gt;', sub)
-        sub = re.sub('"', '&quot;', sub)
         
         div += '<tr> \
                     <td> \
@@ -605,7 +602,6 @@ def blocklog(num = 1):
     for data in rows:
         why = re.sub('<', '&lt;', data[0])
         why = re.sub('>', '&gt;', why)
-        why = re.sub('"', '&quot;', why)
         
         b = re.search("^([0-9]{1,3}\.[0-9]{1,3})$", data[1])
         if(b):
@@ -853,7 +849,6 @@ def raw_view(name = None, num = None):
     if(rows):
         enddata = re.sub('<', '&lt;', rows[0][0])
         enddata = re.sub('>', '&gt;', enddata)
-        enddata = re.sub('"', '&quot;', enddata)
         
         enddata = '<textarea style="height: 80%;">' + enddata + '</textarea>'
         
@@ -1020,7 +1015,7 @@ def section_edit(name = None, num = None):
                             content, 
                             today, 
                             ip, 
-                            html_pas(request.forms.send, 2), 
+                            send_p(request.forms.send), 
                             leng
                         )
                         
@@ -1118,7 +1113,7 @@ def edit(name = None):
                 content, 
                 today, 
                 ip,
-                html_pas(request.forms.send, 2), 
+                send_p(request.forms.send), 
                 leng
             )
                     
@@ -2365,11 +2360,9 @@ def diff_data(name = None, a = None, b = None):
         if(b_raw_data):
             a_data = re.sub('<', '&lt;', a_raw_data[0][0])
             a_data = re.sub('>', '&gt;', a_data)
-            a_data = re.sub('"', '&quot;', a_data)
             
             b_data = re.sub('<', '&lt;', b_raw_data[0][0])
             b_data = re.sub('>', '&gt;', b_data)
-            b_data = re.sub('"', '&quot;', b_data)
             
             diff_data = difflib.SequenceMatcher(None, a_data, b_data)
             result = diff(diff_data)
@@ -2553,11 +2546,9 @@ def user_topic_list(name = None, num = 1):
         for data in rows:
             title = re.sub('<', '&lt;', data[0])
             title = re.sub('>', '&gt;', title)
-            title = re.sub('"', '&quot;', title)
 
             sub = re.sub('<', '&lt;', data[2])
             sub = re.sub('>', '&gt;', sub)
-            sub = re.sub('"', '&quot;', sub)
                 
             if(ydmin == 1):
                 curs.execute("select * from ban where block = ?", [data[3]])
