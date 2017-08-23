@@ -34,11 +34,11 @@ except:
     with open("set.json", "w") as f:
         f.write('{ \
                     "db" : "' + new_json[0] + '", \
-                    "name" : "' + new_json[3] + '", \
-                    "frontpage" : "' + new_json[4] + '", \
-                    "license" : "' + new_json[5] + '", \
-                    "upload" : "' + new_json[7] + '", \
-                    "port" : "' + new_json[8] + '" \
+                    "name" : "' + new_json[1] + '", \
+                    "frontpage" : "' + new_json[2] + '", \
+                    "license" : "' + new_json[3] + '", \
+                    "upload" : "' + new_json[4] + '", \
+                    "port" : "' + new_json[5] + '" \
                 }')
     
     json_data = open('set.json').read()
