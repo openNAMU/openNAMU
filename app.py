@@ -1765,7 +1765,7 @@ def topic(name = None, sub = None):
             
             if(dain[4] == 'O'):
                 indata = '<br>'
-                block = 'id="block"'
+                block = 'style="display: none;"'
             else:
                 block = ''
 
@@ -1818,8 +1818,8 @@ def topic(name = None, sub = None):
                                     <a href="javascript:void(0);" id="' + str(i + 1) + '">#' + str(i + 1) + '</a> ' + ip + chad + ban + ' <span style="float:right;">' + dain[2] + '</span> \
                                 </td> \
                             </tr> \
-                            <tr> \
-                                <td ' + block + '>' + indata + '</td> \
+                            <tr ' + block + '> \
+                                <td>' + indata + '</td> \
                             </tr> \
                         </tbody> \
                     </table> \
