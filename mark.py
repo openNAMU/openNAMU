@@ -282,7 +282,7 @@ def mid_pas(data, fol_num, include):
             include_out_a = re.compile("^#!noin\s(.*)$", re.DOTALL)
             include_out = include_out_a.search(a[0])
             
-            div_a = re.compile("#!wiki style=['\"]([^'\"]*)['\"]\n(.*)$", re.DOTALL)
+            div_a = re.compile("^#!wiki style=['\"]([^'\"]*)['\"]\r\n(.*)$", re.DOTALL)
             div = div_a.search(a[0])
             
             html_a = re.compile("^#!html\s(.*)$", re.DOTALL)
