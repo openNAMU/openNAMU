@@ -339,7 +339,7 @@ def recentchanges(name = None, num = 1):
     rows = curs.fetchall()
 
     for data in rows:         
-        send = ''
+        send = '<br>'
         if(data[4]):
             if(not re.search("^(?: *)$", data[4])):
                 send = data[4]
