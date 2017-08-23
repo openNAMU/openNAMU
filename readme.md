@@ -28,7 +28,6 @@ app.py를 파이썬 3.x 버전으로 실행하고 완료되면 ../setup 에 들�
  * name = 위키 이름
  * frontpage = 위키 대문
  * license = 하단에 표기 될 라이선스
- * key = 세션 키
  * upload = 업로드 제한 (메가 바이트 단위)
  * port = 위키 열 포트 (기본 : 3000)
 
