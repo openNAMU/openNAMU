@@ -6,6 +6,7 @@ import sqlite3
 import time
 import re
 import hashlib
+import html
 
 json_data = open('set.json').read()
 set_data = json.loads(json_data)
@@ -58,8 +59,7 @@ def savemark(data):
     return(data)
 
 def send_p(d):
-    d = re.sub('<', '&lt;', d)
-    d = re.sub('>', '&gt;', d)
+    d = html.escape(d)
 
     js_p = re.compile('javascript:', re.I)
     d = js_p.sub('', d)
@@ -238,8 +238,7 @@ def html_pas(data):
         else:
             break
 
-    data = re.sub('<', '&lt;', data)
-    data = re.sub('>', '&gt;', data)
+    data = html.escape(data)
 
     js_p = re.compile('javascript:', re.I)
     data = js_p.sub('', data)
@@ -282,7 +281,7 @@ def mid_pas(data, fol_num, include):
             include_out_a = re.compile("^#!noin\s(.*)$", re.DOTALL)
             include_out = include_out_a.search(a[0])
             
-            div_a = re.compile("^#!wiki style=['\"]([^'\"]*)['\"]\r\n(.*)$", re.DOTALL)
+            div_a = re.compile("^#!wiki\sstyle=(?:&quot;|&apos;)((?:(?!&quot;|&apos;).)*)(?:&quot;|&apos;)\r\n(.*)$", re.DOTALL)
             div = div_a.search(a[0])
             
             html_a = re.compile("^#!html\s(.*)$", re.DOTALL)
