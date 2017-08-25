@@ -412,7 +412,7 @@ def recentchanges(name = None, num = 1):
 
         title = '사용자 기록'
         div += '<br> \
-                <a href="/record/' + url_pas(name) + '/n/' + str(num + 1) + '">(이전)</a> <a href="/record/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전)</a>
+                <a href="/record/' + url_pas(name) + '/n/' + str(num + 1) + '">(이전)</a> <a href="/record/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전)</a>'
     else:
         sub = None
 
