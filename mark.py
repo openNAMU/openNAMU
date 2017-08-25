@@ -641,48 +641,32 @@ def namumark(title, data, num):
                 data = re.sub('\[\[wiki:([^|\]]+)(?:\|([^\]]+))?\]\]', '<a id="inside" href="/' + wiki[0] + '">' + wiki[0] + '</a>', data, 1)
     
     while(1):
-        m = re.search("\[\[파일:((?:(?!\]\]|\|).)*)(?:\|((?:(?!\]\]).)*))?\]\]", data)
+        m = re.search("\[\[(파일|외부):((?:(?!\]\]|\|).)*)(?:\|((?:(?!\]\]).)*))?\]\]", data)
         if(m):
-            c = m.groups()
+            img_d = m.groups()
 
-            if(c):
-                if(not re.search("^파일:([^\n]*)", title)):
-                    backlink_plus(title, '파일:' + c[0], 'file', num)
-                    
-                comp = re.compile("^(.+)(\.(?:jpg|gif|png|jpeg))$", re.I)
-                if(c[1]):
-                    n = re.search("width=([^ \n&]*)", c[1])
-                    e = re.search("height=([^ \n&]*)", c[1])
+            if(img_d):
+                if(img_d[0] == '파일' and not re.search("^파일:([^\n]*)", title)):
+                    backlink_plus(title, '파일:' + c[1], 'file', num)
 
-                    if(n):
-                        a = n.groups()
-                        width = a[0]
-                    else:
-                        width = ''
+                width = ''
+                height = ''
+                if(img_d[2]):
+                    width_r = re.search("width=([^ \n&]*)", img_d[2])
+                    height_r = re.search("height=([^ \n&]*)", img_d[2])
 
-                    if(e):
-                        b = e.groups()
-                        height = b[0]
-                    else:
-                        height = ''
-                    
-                    try:
-                        extension = comp.search(c[0]).groups()
-                        
-                        comp = re.compile("\.(?P<in>jpg|gif|png|jpeg)", re.I)
-                        img = comp.sub("#\g<in>#", extension[1])
-                        data = re.sub("\[\[파일:((?:(?!\]\]|\?).)*)(?:\?((?:(?!\]\]).)*))?\]\]", '<a href="/w/파일:' + extension[0] + img + '"><img src="/image/' + sha224(extension[0]) + img + '" width="' + width + '" height="' + height + '"></a>', data, 1)
-                    except:
-                        data = re.sub("\[\[파일:((?:(?!\]\]|\?).)*)(?:\?((?:(?!\]\]).)*))?\]\]", 'Error', data, 1)
+                    if(width_r):
+                        width_d = width_r.groups()
+                        width = width_d[0]
+
+                    if(height_r):
+                        height_d = height_r.groups()
+                        height = height_d[0]
+
+                if(img_d[0] == '파일'):
+                    data = re.sub("\[\[(파일|외부):((?:(?!\]\]|\|).)*)(?:\|((?:(?!\]\]).)*))?\]\]", '<a href="/w/파일:' + img_d[1] + '"><img src="/image/' + sha224(img_d[1]) + '" width="' + width + '" height="' + height + '"></a>', data, 1)
                 else:
-                    try:
-                        extension = comp.search(c[0]).groups()
-                        
-                        comp = re.compile("\.(?P<in>jpg|gif|png|jpeg)", re.I)
-                        img = comp.sub("#\g<in>#", extension[1])
-                        data = re.sub("\[\[파일:((?:(?!\]\]|\?).)*)(?:\?((?:(?!\]\]).)*))?\]\]", "<a href='/w/파일:" + extension[0] + img + "'><img src='/image/" + sha224(extension[0]) + img + "'></a>", data, 1)
-                    except:
-                        data = re.sub("\[\[파일:((?:(?!\]\]|\?).)*)(?:\?((?:(?!\]\]).)*))?\]\]", 'Error', data, 1)
+                    data = re.sub("\[\[(파일|외부):((?:(?!\]\]|\|).)*)(?:\|((?:(?!\]\]).)*))?\]\]", '<img src="' + img_d[1] + '" width="' + width + '" height="' + height + '">', data, 1)
             else:
                 break            
         else:
@@ -775,13 +759,8 @@ def namumark(title, data, num):
             if(b):
                 comp = re.compile("(?:\.(?:jpg|png|gif|jpeg))", re.I)
                 c = comp.search(results[0])
-                if(c):
-                    img = results[0]
-                    
-                    comp = re.compile("\.(?P<in>jpg|gif|png|jpeg)", re.I)
-                    img = comp.sub("#\g<in>#", img)
-                    
-                    data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a class="out_link" rel="nofollow" target="_blank" href="' + img + sharp + '">' + g + '</a>', data, 1)
+                if(c):                    
+                    data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a class="out_link" rel="nofollow" target="_blank" href="' + results[0] + sharp + '">' + g + '</a>', data, 1)
                 else:
                     data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a class="out_link" rel="nofollow" target="_blank" href="' + results[0] + sharp + '">' + g + '</a>', data, 1)
             else:
@@ -801,40 +780,6 @@ def namumark(title, data, num):
                     data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a title="' + re.sub('#', '\#', nosharp) + sharp + '" class="' + clas + '" href="/w/' + url_pas(nosharp) + sharp + '">' + g + '</a>', data, 1)
 
                     backlink_plus(title, results[0], '', num)
-        else:
-            break
-            
-    while(1):
-        com = re.compile("(http(?:s)?:\/\/(?:(?:(?:(?!\.(?:jpg|png|gif|jpeg)|#(?:jpg|png|gif|jpeg)#|<\/(?:[^>]*)>).)*)(?:\.(?:jpg|png|gif|jpeg))))(\?[^ \r\n]*)?", re.I)
-        m = com.search(data)
-        if(m):
-            width = ''
-            height = ''
-            align = ''
-            
-            result = m.groups()
-            if(result[1]):
-                mdata = re.search('width=([0-9]*)', result[1])
-                if(mdata):
-                    width = mdata.groups()[0]
-                
-                mdata = re.search('height=([0-9]*)', result[1])
-                if(mdata):
-                    height = mdata.groups()[0]
-                    
-                mdata = re.search('align=([^&]*)', result[1])
-                if(mdata):
-                    if(mdata.groups()[0] == 'right'):
-                        align = 'right'
-                    elif(mdata.groups()[0] == 'center'):
-                        align = 'center'
-
-            c = result[0]
-            
-            comp = re.compile("\.(?P<in>jpg|gif|png|jpeg)", re.I)
-            c = comp.sub("#\g<in>#", c)
-
-            data = com.sub("<img align='" + align + "' width='" + width + "' height='" + height + "' src='" + c + "'>", data, 1)
         else:
             break
             
@@ -875,8 +820,6 @@ def namumark(title, data, num):
                 
         data = re.sub('\[age\(([0-9]{4})-([0-9]{2})-([0-9]{2})\)\]', str(year), data, 1)
     
-    comp = re.compile("#(?P<in>jpg|gif|png|jpeg)#", re.I)
-    data = comp.sub(".\g<in>", data)
     data = re.sub("-{4,11}", "<hr>", data)
     
     while(1):
@@ -906,11 +849,13 @@ def namumark(title, data, num):
                     try:
                         if(namu[i] == results[0]):
                             none_this = 0
+
                             break
                         else:
                             i += 2
                     except:
                         none_this = 1
+
                         break
                         
                 if(none_this == 0):
