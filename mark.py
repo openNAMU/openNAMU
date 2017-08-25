@@ -664,7 +664,9 @@ def namumark(title, data, num):
                         height = height_d[0]
 
                 if(img_d[0] == '파일'):
-                    data = re.sub("\[\[(파일|외부):((?:(?!\]\]|\|).)*)(?:\|((?:(?!\]\]).)*))?\]\]", '<a href="/w/파일:' + img_d[1] + '"><img src="/image/' + sha224(img_d[1]) + '" width="' + width + '" height="' + height + '"></a>', data, 1)
+                    img_e = re.search('^(.+)(\.(?:.+))$', img_d[1]).groups()
+                    
+                    data = re.sub("\[\[(파일|외부):((?:(?!\]\]|\|).)*)(?:\|((?:(?!\]\]).)*))?\]\]", '<a href="/w/파일:' + img_d[1] + '"><img src="/image/' + sha224(img_e[0]) + img_e[1] + '" width="' + width + '" height="' + height + '"></a>', data, 1)
                 else:
                     data = re.sub("\[\[(파일|외부):((?:(?!\]\]|\|).)*)(?:\|((?:(?!\]\]).)*))?\]\]", '<img src="' + img_d[1] + '" width="' + width + '" height="' + height + '">', data, 1)
             else:
