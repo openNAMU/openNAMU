@@ -647,7 +647,7 @@ def namumark(title, data, num):
 
             if(img_d):
                 if(img_d[0] == '파일' and not re.search("^파일:([^\n]*)", title)):
-                    backlink_plus(title, '파일:' + c[1], 'file', num)
+                    backlink_plus(title, '파일:' + img_d[1], 'file', num)
 
                 width = ''
                 height = ''
