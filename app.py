@@ -16,18 +16,6 @@ except:
 
     print('DB 이름 : ', end = '')
     new_json += [input()]
-    
-    print('위키 이름 : ', end = '')
-    new_json += [input()]
-
-    print('대문 : ', end = '')
-    new_json += [input()]
-
-    print('라이선스 : ', end = '')
-    new_json += [input()]
-
-    print('업로드 제한 (MB) : ', end = '')
-    new_json += [input()]
 
     print('위키 포트 : ', end = '')
     new_json += [input()]
@@ -35,11 +23,7 @@ except:
     with open("set.json", "w") as f:
         f.write('{ \
                     "db" : "' + new_json[0] + '", \
-                    "name" : "' + new_json[1] + '", \
-                    "frontpage" : "' + new_json[2] + '", \
-                    "license" : "' + new_json[3] + '", \
-                    "upload" : "' + new_json[4] + '", \
-                    "port" : "' + new_json[5] + '" \
+                    "port" : "' + new_json[1] + '" \
                 }')
     
     json_data = open('set.json').read()
@@ -63,15 +47,15 @@ def redirect(data):
     
 from func import *
 
-r_ver = '2.2.1'
+r_ver = '2.2.2'
 
 try:
     curs.execute('select data from other where name = "version"')
     version = curs.fetchall()
     if(version):
-        t_ver = re.sub('\.', '', version[0]['data'])
+        t_ver = re.sub('\.', '', version[0][0])
         r_t_ver = re.sub('\.', '', r_ver)
-        if(int(t_ver) <= int(r_t_ver)):
+        if(int(t_ver) < int(r_t_ver)):
             curs.execute("update other set data = ? where name = 'version'", [r_ver])    
     
     conn.commit()
@@ -99,9 +83,94 @@ def setup():
 
     curs.execute("insert into alist (name, acl) values ('owner', 'owner')")
     curs.execute("insert into other (name, data) values ('version', ?)", [r_ver])
+
+    curs.execute('insert into other (name, data) values ("name", "wiki")')
+    curs.execute('insert into other (name, data) values ("frontpage", "위키:대문")')
+    curs.execute('insert into other (name, data) values ("license", "CC 0")')
+    curs.execute('insert into other (name, data) values ("upload", "2")')
     conn.commit()
 
     return(redirect('/'))
+
+@route('/edit_set', method=['POST', 'GET'])
+def edit_set():
+    if(admin_check(None) == 1):
+        if(request.method == 'POST'):
+            curs.execute("update other set data = ? where name = ?", [request.forms.name, 'name'])
+            curs.execute("update other set data = ? where name = 'frontpage'", [request.forms.frontpage])
+            curs.execute("update other set data = ? where name = 'license'", [request.forms.license])
+            curs.execute("update other set data = ? where name = 'upload'", [request.forms.upload])
+            conn.commit()
+
+            return(redirect('/'))
+        else:
+            curs.execute('select data from other where name = ?', ['name'])
+            name_d = curs.fetchall()
+
+            curs.execute('select data from other where name = "frontpage"')
+            frontpage_d = curs.fetchall()
+
+            curs.execute('select data from other where name = "license"')
+            license_d = curs.fetchall()
+
+            curs.execute('select data from other where name = "upload"')
+            upload_d = curs.fetchall()
+
+            return(
+                template('other',
+                    custom = custom_css_user(),
+                    license = wiki_set(3),
+                    login = login_check(),
+                    logo = wiki_set(1),
+                    data = '<form method="post"> \
+                                <input type="text" name="name" value="' + name_d[0][0] + '"> \
+                                <br> \
+                                <br> \
+                                <input type="text" name="frontpage" value="' + frontpage_d[0][0] + '"> \
+                                <br> \
+                                <br> \
+                                <input type="text" name="license" value="' + license_d[0][0] + '"> \
+                                <br> \
+                                <br> \
+                                <input type="text" name="upload" value="' + upload_d[0][0] + '"> \
+                                <br> \
+                                <br> \
+                                <span>차례대로 위키 이름, 시작 페이지, 라이선스, 업로드 최대 크기 입니다.</span> \
+                                <br> \
+                                <br> \
+                                <button class="btn btn-primary" type="submit">저장</button> \
+                            </form>',
+                    title = '업데이트 목록'
+                )
+            )
+    else:
+        return(redirect('/ban'))
+
+@route('/update')
+@route('/update/<num:int>')
+def update(num = 1):
+    if(admin_check(None) == 1):
+        if(num == 1):
+            return(
+                template('other',
+                    custom = custom_css_user(),
+                    license = wiki_set(3),
+                    login = login_check(),
+                    logo = wiki_set(1),
+                    data = '<li><a href="/update/2">2.2.2</a></li>',
+                    title = '업데이트 목록'
+                )
+            )
+        elif(num == 2):
+            curs.execute('insert into other (name, data) values ("name", ?)', [set_data['name']])
+            curs.execute('insert into other (name, data) values ("frontpage", ?)', [set_data['frontpage']])
+            curs.execute('insert into other (name, data) values ("license", ?)', [set_data['license']])
+            curs.execute('insert into other (name, data) values ("upload", ?)', [set_data['upload']])
+            conn.commit()
+
+            return(redirect('/'))
+    else:
+        return(redirect('/ban'))
 
 @route('/not_close_topic')
 def not_close_topic():
@@ -120,9 +189,9 @@ def not_close_topic():
     return(
         template('other',
             custom = custom_css_user(),
-            license = set_data['license'],
+            license = wiki_set(3),
             login = login_check(),
-            logo = set_data['name'],
+            logo = wiki_set(1),
             data = div,
             title = '안 닫힌 토론 목록'
         )
@@ -155,9 +224,9 @@ def acl_list():
     return(
         template('other', 
             custom = custom_css_user(), 
-            license = set_data['license'], 
+            license = wiki_set(3), 
             login = login_check(), 
-            logo = set_data['name'], 
+            logo = wiki_set(1), 
             data = div, 
             title = 'ACL 문서 목록'
         )
@@ -196,9 +265,9 @@ def list_acl():
     return(
         template('other', 
             custom = custom_css_user(), 
-            license = set_data['license'], 
+            license = wiki_set(3), 
             login = login_check(), 
-            logo = set_data['name'], 
+            logo = wiki_set(1), 
             data = re.sub('^<br>', '', div), 
             title = 'ACL 목록'
         )
@@ -268,10 +337,10 @@ def admin_plus(name = None):
             return(
                 template('other', 
                     custom = custom_css_user(), 
-                    license = set_data['license'], 
+                    license = wiki_set(3), 
                     login = login_check(), 
                     title = '관리 그룹 추가', 
-                    logo = set_data['name'], 
+                    logo = wiki_set(1), 
                     data = '<form method="post">' \
                                 + data + \
                                 '<div class="form-actions"> \
@@ -301,9 +370,9 @@ def admin_list():
     return(
         template('other', 
             custom = custom_css_user(), 
-            license = set_data['license'], 
+            license = wiki_set(3), 
             login = login_check(), 
-            logo = set_data['name'], 
+            logo = wiki_set(1), 
             data = div, 
             title = '관리자 목록'
         )
@@ -421,9 +490,9 @@ def recentchanges(name = None, num = 1):
     return(
         template('other', 
             custom = custom_css_user(), 
-            license = set_data['license'], 
+            license = wiki_set(3), 
             login = login_check(), 
-            logo = set_data['name'], 
+            logo = wiki_set(1), 
             data = div, 
             sub = sub,
             title = title
@@ -481,9 +550,9 @@ def user_log(num = 1):
     return(
         template('other', 
             custom = custom_css_user(), 
-            license = set_data['license'], 
+            license = wiki_set(3), 
             login = login_check(), 
-            logo = set_data['name'], 
+            logo = wiki_set(1), 
             data = list_data, 
             title = '사용자 가입 기록'
         )
@@ -536,9 +605,9 @@ def xref(name = None, num = 1):
     return(
         template('other', 
             custom = custom_css_user(), 
-            license = set_data['license'], 
+            license = wiki_set(3), 
             login = login_check(), 
-            logo = set_data['name'], 
+            logo = wiki_set(1), 
             data = div, 
             title = name, 
             page = url_pas(name), 
@@ -574,9 +643,9 @@ def recentdiscuss():
     return(
         template('other', 
             custom = custom_css_user(), 
-            license = set_data['license'], 
+            license = wiki_set(3), 
             login = login_check(), 
-            logo = set_data['name'], 
+            logo = wiki_set(1), 
             data = div, 
             title = '최근 토론내역'
         )
@@ -628,9 +697,9 @@ def blocklog(num = 1):
     return(
         template('other', 
             custom = custom_css_user(), 
-            license = set_data['license'], 
+            license = wiki_set(3), 
             login = login_check(), 
-            logo = set_data['name'], 
+            logo = wiki_set(1), 
             data = div, 
             title = '사용자 차단 기록'
         )
@@ -735,9 +804,9 @@ def history_view(name = None, num = 1):
         return(
             template('other', 
                 custom = custom_css_user(), 
-                license = set_data['license'], 
+                license = wiki_set(3), 
                 login = login_check(), 
-                logo = set_data['name'], 
+                logo = wiki_set(1), 
                 data = div, 
                 title = name, 
                 page = url_pas(name), 
@@ -826,9 +895,9 @@ def deep_search(name = None, num = 1):
     return(
         template('other', 
             custom = custom_css_user(), 
-            license = set_data['license'], 
+            license = wiki_set(3), 
             login = login_check(), 
-            logo = set_data['name'], 
+            logo = wiki_set(1), 
             data = div, 
             title = name, 
             sub = '검색'
@@ -857,10 +926,10 @@ def raw_view(name = None, num = None):
         return(
             template('other', 
                 custom = custom_css_user(), 
-                license = set_data['license'], 
+                license = wiki_set(3), 
                 login = login_check(), 
                 title = name, 
-                logo = set_data['name'], 
+                logo = wiki_set(1), 
                 page = url_pas(name), 
                 data = enddata, 
                 sub = '원본'
@@ -929,10 +998,10 @@ def revert(name = None, num = None):
                 return(
                     template('revert', 
                         custom = custom_css_user(), 
-                        license = set_data['license'], 
+                        license = wiki_set(3), 
                         login = login_check(), 
                         title = name, 
-                        logo = set_data['name'], 
+                        logo = wiki_set(1), 
                         page = url_pas(name), 
                         r = url_pas(str(num)), 
                         plus = '정말 되돌리시겠습니까?', 
@@ -975,10 +1044,10 @@ def many_del():
             return(
                 template('mdel', 
                     custom = custom_css_user(), 
-                    license = set_data['license'], 
+                    license = wiki_set(3), 
                     login = login_check(), 
                     title = '많은 문서 삭제', 
-                    logo = set_data['name']
+                    logo = wiki_set(1)
                 )
             )
     else:
@@ -1063,10 +1132,10 @@ def section_edit(name = None, num = None):
                     return(
                         template('edit', 
                             custom = custom_css_user(), 
-                            license = set_data['license'], 
+                            license = wiki_set(3), 
                             login = login_check(), 
                             title = name, 
-                            logo = set_data['name'], 
+                            logo = wiki_set(1), 
                             page = url_pas(name), 
                             data = gdata,
                             section = 1, 
@@ -1136,10 +1205,10 @@ def edit(name = None):
             return(
                 template('edit', 
                     custom = custom_css_user(), 
-                    license = set_data['license'], 
+                    license = wiki_set(3), 
                     login = login_check(), 
                     title = name, 
-                    logo = set_data['name'], 
+                    logo = wiki_set(1), 
                     page = url_pas(name), 
                     data = data,
                     sub = '편집'
@@ -1161,10 +1230,10 @@ def section_preview(name = None, num = None):
         return(
             template('edit', 
                 custom = custom_css_user(), 
-                license = set_data['license'], 
+                license = wiki_set(3), 
                 login = login_check(), 
                 title = name, 
-                logo = set_data['name'], 
+                logo = wiki_set(1), 
                 page = url_pas(name), 
                 data = request.forms.content, 
                 preview = 1, 
@@ -1191,10 +1260,10 @@ def preview(name = None):
         return(
             template('edit', 
                 custom = custom_css_user(), 
-                license = set_data['license'], 
+                license = wiki_set(3), 
                 login = login_check(), 
                 title = name, 
-                logo = set_data['name'], 
+                logo = wiki_set(1), 
                 page = url_pas(name), 
                 data = request.forms.content, 
                 preview = 1, 
@@ -1244,10 +1313,10 @@ def delete(name = None):
             return(
                 template('del', 
                     custom = custom_css_user(), 
-                    license = set_data['license'], 
+                    license = wiki_set(3), 
                     login = login_check(),
                     title = name, 
-                    logo = set_data['name'], 
+                    logo = wiki_set(1), 
                     page = url_pas(name), 
                     plus = '정말 삭제 하시겠습니까?', 
                     sub = '삭제'
@@ -1298,10 +1367,10 @@ def move(name = None):
         return(
             template('move', 
                 custom = custom_css_user(), 
-                license = set_data['license'], 
+                license = wiki_set(3), 
                 login = login_check(), 
                 title = name, 
-                logo = set_data['name'], 
+                logo = wiki_set(1), 
                 page = url_pas(name), 
                 plus = '정말 이동 하시겠습니까?', 
                 sub = '이동'
@@ -1314,10 +1383,10 @@ def other():
         template(
             'other', 
             custom = custom_css_user(), 
-            license = set_data['license'], 
+            license = wiki_set(3), 
             login = login_check(), 
             title = '기타 메뉴', 
-            logo = set_data['name'], 
+            logo = wiki_set(1), 
             data = '<h2 style="margin-top: 0px;">기록</h2> \
                     <li><a href="/blocklog">사용자 차단 기록</a></li> \
                     <li><a href="/userlog">사용자 가입 기록</a></li> \
@@ -1340,10 +1409,10 @@ def manager(num = 1):
         return(
             template('other', 
                 custom = custom_css_user(), 
-                license = set_data['license'], 
+                license = wiki_set(3), 
                 login = login_check(), 
                 title = '관리자 메뉴', 
-                logo = set_data['name'], 
+                logo = wiki_set(1), 
                 data = '<h2 style="margin-top: 0px;">목록</h2> \
                         <li><a href="/manager/2">문서 ACL</a></li> \
                         <li><a href="/manager/3">사용자 체크</a></li> \
@@ -1354,6 +1423,8 @@ def manager(num = 1):
                         <h2>소유자</h2> \
                         <li><a href="/backreset">역링크, 분류 다시 생성</a></li> \
                         <li><a href="/manager/8">관리 그룹 생성</a></li> \
+                        <li><a href="/update">업데이트 메뉴</a></li> \
+                        <li><a href="/edit_set">세팅 수정</a></li> \
                         <h2>기타</h2> \
                         <li>이 메뉴에 없는 기능은 해당 문서의 역사나 토론에서 바로 사용 가능함</li>'
             )
@@ -1365,10 +1436,10 @@ def manager(num = 1):
             return(
                 template('other', 
                     custom = custom_css_user(), 
-                    license = set_data['license'], 
+                    license = wiki_set(3), 
                     login = login_check(), 
                     title = 'ACL 이동', 
-                    logo = set_data['name'], 
+                    logo = wiki_set(1), 
                     data = '<form method="post"> \
                                 <input name="name" type="text"> \
                                 <br> \
@@ -1384,10 +1455,10 @@ def manager(num = 1):
             return(
                 template('other', 
                     custom = custom_css_user(), 
-                    license = set_data['license'], 
+                    license = wiki_set(3), 
                     login = login_check(), 
                     title = '체크 이동', 
-                    logo = set_data['name'], 
+                    logo = wiki_set(1), 
                     data = '<form method="post"> \
                                 <input name="name" type="text"> \
                                 <br> \
@@ -1403,10 +1474,10 @@ def manager(num = 1):
             return(
                 template('other', 
                     custom = custom_css_user(), 
-                    license = set_data['license'], 
+                    license = wiki_set(3), 
                     login = login_check(), 
                     title = '차단 이동', 
-                    logo = set_data['name'], 
+                    logo = wiki_set(1), 
                     data = '<form method="post"> \
                                 <input name="name" type="text"> \
                                 <br> \
@@ -1425,10 +1496,10 @@ def manager(num = 1):
             return(
                 template('other', 
                     custom = custom_css_user(), 
-                    license = set_data['license'], 
+                    license = wiki_set(3), 
                     login = login_check(), 
                     title = '권한 이동', 
-                    logo = set_data['name'], 
+                    logo = wiki_set(1), 
                     data = '<form method="post"> \
                                 <input name="name" type="text"> \
                                 <br> \
@@ -1444,10 +1515,10 @@ def manager(num = 1):
             return(
                 template('other', 
                     custom = custom_css_user(), 
-                    license = set_data['license'], 
+                    license = wiki_set(3), 
                     login = login_check(), 
                     title = '기록 이동', 
-                    logo = set_data['name'], 
+                    logo = wiki_set(1), 
                     data = '<form method="post"> \
                                 <input name="name" type="text"> \
                                 <br> \
@@ -1463,10 +1534,10 @@ def manager(num = 1):
             return(
                 template('other', 
                     custom = custom_css_user(), 
-                    license = set_data['license'], 
+                    license = wiki_set(3), 
                     login = login_check(), 
                     title = '토론 기록 이동', 
-                    logo = set_data['name'], 
+                    logo = wiki_set(1), 
                     data = '<form method="post"> \
                                 <input name="name" type="text"> \
                                 <br> \
@@ -1482,10 +1553,10 @@ def manager(num = 1):
             return(
                 template('other', 
                     custom = custom_css_user(), 
-                    license = set_data['license'], 
+                    license = wiki_set(3), 
                     login = login_check(), 
                     title = '그룹 생성 이동', 
-                    logo = set_data['name'], 
+                    logo = wiki_set(1), 
                     data = '<form method="post"> \
                                 <input name="name" type="text"> \
                                 <br> \
@@ -1533,9 +1604,9 @@ def title_index():
     return(
         template('other', 
             custom = custom_css_user(), 
-            license = set_data['license'], 
+            license = wiki_set(3), 
             login = login_check(), 
-            logo = set_data['name'], 
+            logo = wiki_set(1), 
             data = data, 
             title = '모든 문서'
         )
@@ -1831,13 +1902,13 @@ def topic(name = None, sub = None):
         return(
             template('vstopic', 
                 custom = custom_css_user(), 
-                license = set_data['license'], 
+                license = wiki_set(3), 
                 login = login_check(), 
                 title = name, 
                 page = url_pas(name), 
                 suburl = url_pas(sub), 
                 toron = sub, 
-                logo = set_data['name'], 
+                logo = wiki_set(1), 
                 rows = div, 
                 ban = ban, 
                 style = style, 
@@ -1915,11 +1986,11 @@ def close_topic_list(name = None, tool = None):
         return(
             template('topic', 
                 custom = custom_css_user(), 
-                license = set_data['license'], 
+                license = wiki_set(3), 
                 login = login_check(), 
                 title = name, 
                 page = url_pas(name), 
-                logo = set_data['name'], 
+                logo = wiki_set(1), 
                 plus = div, 
                 sub = sub,
                 list = list_d
@@ -1971,11 +2042,11 @@ def login():
         return(
             template('login', 
                 custom = custom_css_user(), 
-                license = set_data['license'], 
+                license = wiki_set(3), 
                 login = login_check(), 
                 title = '로그인', 
                 enter = '로그인', 
-                logo = set_data['name']
+                logo = wiki_set(1)
             )
         )
                 
@@ -2018,11 +2089,11 @@ def change_password():
         return(
             template('login', 
                 custom = custom_css_user(), 
-                license = set_data['license'], 
+                license = wiki_set(3), 
                 login = login_check(), 
                 title = '비밀번호 변경', 
                 enter = '변경', 
-                logo = set_data['name']
+                logo = wiki_set(1)
             )
         )
                 
@@ -2067,10 +2138,10 @@ def user_check(name = None):
         return(
             template('other', 
                 custom = custom_css_user(), 
-                license = set_data['license'], 
+                license = wiki_set(3), 
                 login = login_check(), 
                 title = '다중 검사', 
-                logo = set_data['name'], 
+                logo = wiki_set(1), 
                 data = c
             )
         )
@@ -2116,11 +2187,11 @@ def register():
         return(
             template('login', 
                 custom = custom_css_user(), 
-                license = set_data['license'], 
+                license = wiki_set(3), 
                 login = login_check(), 
                 title = '회원가입', 
                 enter = '회원가입', 
-                logo = set_data['name']
+                logo = wiki_set(1)
             )
         )
             
@@ -2185,11 +2256,11 @@ def user_ban(name = None):
             return(
                 template('ban', 
                     custom = custom_css_user(), 
-                    license = set_data['license'], 
+                    license = wiki_set(3), 
                     login = login_check(), 
                     title = name, 
                     page = url_pas(name), 
-                    logo = set_data['name'], 
+                    logo = wiki_set(1), 
                     now = now, 
                     today = get_time(), 
                     sub = '차단'
@@ -2232,11 +2303,11 @@ def acl(name = None):
                 return(
                     template('acl', 
                         custom = custom_css_user(), 
-                        license = set_data['license'], 
+                        license = wiki_set(3), 
                         login = login_check(), 
                         title = name, 
                         page = url_pas(name), 
-                        logo = set_data['name'], 
+                        logo = wiki_set(1), 
                         now = '현재 ACL 상태는 ' + now, 
                         sub = 'ACL'
                     )
@@ -2289,12 +2360,12 @@ def user_admin(name = None):
                 return(
                     template('admin', 
                         custom = custom_css_user(), 
-                        license = set_data['license'], 
+                        license = wiki_set(3), 
                         login = login_check(), 
                         title = name, 
                         page = url_pas(name), 
                         datalist = div, 
-                        logo = set_data['name'], 
+                        logo = wiki_set(1), 
                         now = now, 
                         sub = '권한 부여'
                     )
@@ -2344,10 +2415,10 @@ def are_you_ban():
     return(
         template('other', 
             custom = custom_css_user(), 
-            license = set_data['license'], 
+            license = wiki_set(3), 
             login = login_check(), 
             title = '권한 오류', 
-            logo = set_data['name'], 
+            logo = wiki_set(1), 
             data = end
         )
     )
@@ -2371,10 +2442,10 @@ def diff_data(name = None, a = None, b = None):
             return(
                 template('other', 
                     custom = custom_css_user(), 
-                    license = set_data['license'], 
+                    license = wiki_set(3), 
                     login = login_check(), 
                     title = name, 
-                    logo = set_data['name'], 
+                    logo = wiki_set(1), 
                     data = result, 
                     sub = '비교', 
                     page = url_pas(name)
@@ -2398,10 +2469,10 @@ def down(name = None):
     return(
         template('other', 
             custom = custom_css_user(), 
-            license = set_data['license'], 
+            license = wiki_set(3), 
             login = login_check(), 
             title = name, 
-            logo = set_data['name'], 
+            logo = wiki_set(1), 
             data = div, 
             sub = '하위 문서', 
             page = url_pas(name)
@@ -2504,10 +2575,10 @@ def read_view(name = None, num = None, redirect = None):
     return(
         template('read', 
             custom = custom_css_user(), 
-            license = set_data['license'], 
+            license = wiki_set(3), 
             login = login_check(), 
             title = name, 
-            logo = set_data['name'], 
+            logo = wiki_set(1), 
             page = url_pas(name), 
             data = enddata + div, 
             uppage = uppage, 
@@ -2584,9 +2655,9 @@ def user_topic_list(name = None, num = 1):
     return(
         template('other', 
             custom = custom_css_user(), 
-            license = set_data['license'], 
+            license = wiki_set(3), 
             login = login_check(), 
-            logo = set_data['name'], 
+            logo = wiki_set(1), 
             data = div, 
             title = '사용자 토론 기록', 
             sub = sub
@@ -2616,10 +2687,10 @@ def user_info():
     return(
         template('other', 
             custom = custom_css_user(), 
-            license = set_data['license'], 
+            license = wiki_set(3), 
             login = login_check(), 
             title = '사용자 메뉴', 
-            logo = set_data['name'], 
+            logo = wiki_set(1), 
             data =  ip + \
                     '<br> \
                     <br> \
@@ -2671,10 +2742,10 @@ def custom_css():
         return(
             template('other', 
                 custom = custom_css_user(), 
-                license = set_data['license'], 
+                license = wiki_set(3), 
                 login = login_check(), 
                 title = '커스텀 CSS', 
-                logo = set_data['name'], 
+                logo = wiki_set(1), 
                 data =  start + \
                         '<form method="post"> \
                             <textarea rows="30" cols="100" name="content" form="usrform">'\
@@ -2701,10 +2772,10 @@ def count_edit():
     return(
         template('other', 
             custom = custom_css_user(), 
-            license = set_data['license'], 
+            license = wiki_set(3), 
             login = login_check(), 
             title = '기여 횟수', 
-            logo = set_data['name'], 
+            logo = wiki_set(1), 
             data = "기여 횟수 : " + str(data)
         )
     )
@@ -2745,10 +2816,10 @@ def error_test(num = None):
         return(
             template('other', 
                 custom = custom_css_user(), 
-                license = set_data['license'], 
+                license = wiki_set(3), 
                 login = login_check(), 
                 title = '권한 오류', 
-                logo = set_data['name'], 
+                logo = wiki_set(1), 
                 data = '비 로그인 상태 입니다.'
             )
         )
@@ -2756,10 +2827,10 @@ def error_test(num = None):
         return(
             template('other', 
                 custom = custom_css_user(), 
-                license = set_data['license'], 
+                license = wiki_set(3), 
                 login = login_check(), 
                 title = '권한 오류', 
-                logo = set_data['name'], 
+                logo = wiki_set(1), 
                 data = '이 계정이 없습니다.'
             )
         )
@@ -2767,10 +2838,10 @@ def error_test(num = None):
         return(
             template('other', 
                 custom = custom_css_user(), 
-                license = set_data['license'], 
+                license = wiki_set(3), 
                 login = login_check(), 
                 title = '권한 오류',
-                logo = set_data['name'], 
+                logo = wiki_set(1), 
                 data = '권한이 모자랍니다.'
             )
         )
@@ -2778,10 +2849,10 @@ def error_test(num = None):
         return(
             template('other', 
                 custom = custom_css_user(), 
-                license = set_data['license'], 
+                license = wiki_set(3), 
                 login = login_check(), 
                 title = '권한 오류', 
-                logo = set_data['name'], 
+                logo = wiki_set(1), 
                 data = '관리자는 차단, 검사 할 수 없습니다.'
             )
         )
@@ -2789,10 +2860,10 @@ def error_test(num = None):
         return(
             template('other', 
                 custom = custom_css_user(), 
-                license = set_data['license'], 
+                license = wiki_set(3), 
                 login = login_check(), 
                 title = '사용자 오류', 
-                logo = set_data['name'], 
+                logo = wiki_set(1), 
                 data = '그런 계정이 없습니다.'
             )
         )
@@ -2800,10 +2871,10 @@ def error_test(num = None):
         return(
             template('other', 
                 custom = custom_css_user(), 
-                license = set_data['license'], 
+                license = wiki_set(3), 
                 login = login_check(), 
                 title = '가입 오류', 
-                logo = set_data['name'], 
+                logo = wiki_set(1), 
                 data = '동일한 아이디의 사용자가 있습니다.'
             )
         )
@@ -2811,10 +2882,10 @@ def error_test(num = None):
         return(
             template('other', 
                 custom = custom_css_user(), 
-                license = set_data['license'], 
+                license = wiki_set(3), 
                 login = login_check(), 
                 title = '가입 오류', 
-                logo = set_data['name'], 
+                logo = wiki_set(1), 
                 data = '아이디는 20글자보다 짧아야 합니다.'
             )
         )
@@ -2822,10 +2893,10 @@ def error_test(num = None):
         return(
             template('other', 
                 custom = custom_css_user(), 
-                license = set_data['license'], 
+                license = wiki_set(3), 
                 login = login_check(), 
                 title = '가입 오류', 
-                logo = set_data['name'], 
+                logo = wiki_set(1), 
                 data = '아이디에는 한글과 알파벳과 공백만 허용 됩니다.'
             )
         )
@@ -2833,10 +2904,10 @@ def error_test(num = None):
         return(
             template('other', 
                 custom = custom_css_user(), 
-                license = set_data['license'], 
+                license = wiki_set(3), 
                 login = login_check(), 
                 title = '변경 오류', 
-                logo = set_data['name'], 
+                logo = wiki_set(1), 
                 data = '그런 계정이 없습니다.'
             )
         )
@@ -2844,10 +2915,10 @@ def error_test(num = None):
         return(
             template('other', 
                 custom = custom_css_user(), 
-                license = set_data['license'], 
+                license = wiki_set(3), 
                 login = login_check(), 
                 title = '변경 오류', 
-                logo = set_data['name'], 
+                logo = wiki_set(1), 
                 data = '비밀번호가 다릅니다.'
             )
         )
@@ -2855,10 +2926,10 @@ def error_test(num = None):
         return(
             template('other',
                 custom = custom_css_user(), 
-                license = set_data['license'], 
+                license = wiki_set(3), 
                 login = login_check(), 
                 title = '로그인 오류', 
-                logo = set_data['name'], 
+                logo = wiki_set(1), 
                 data = '이미 로그인 되어 있습니다.'
             )
         )
@@ -2866,10 +2937,10 @@ def error_test(num = None):
         return(
             template('other', 
                 custom = custom_css_user(), 
-                license = set_data['license'], 
+                license = wiki_set(3), 
                 login = login_check(), 
                 title = '로그인 오류', 
-                logo = set_data['name'], 
+                logo = wiki_set(1), 
                 data = '그런 계정이 없습니다.'
             )
         )
@@ -2877,10 +2948,10 @@ def error_test(num = None):
         return(
             template('other', 
                 custom = custom_css_user(), 
-                license = set_data['license'], 
+                license = wiki_set(3), 
                 login = login_check(), 
                 title = '로그인 오류', 
-                logo = set_data['name'], 
+                logo = wiki_set(1), 
                 data = '비밀번호가 다릅니다.'
             )
         )
@@ -2888,10 +2959,10 @@ def error_test(num = None):
         return(
             template('other', 
                 custom = custom_css_user(), 
-                license = set_data['license'], 
+                license = wiki_set(3), 
                 login = login_check(), 
                 title = '업로드 오류', 
-                logo = set_data['name'], 
+                logo = wiki_set(1), 
                 data = 'jpg, gif, jpeg, png만 가능 합니다.'
             )
         )
@@ -2899,10 +2970,10 @@ def error_test(num = None):
         return(
             template('other', 
                 custom = custom_css_user(), 
-                license = set_data['license'], 
+                license = wiki_set(3), 
                 login = login_check(), 
                 title = '편집 오류', 
-                logo = set_data['name'], 
+                logo = wiki_set(1), 
                 data = '편집 기록은 500자를 넘을 수 없습니다.'
             )
         )
@@ -2910,10 +2981,10 @@ def error_test(num = None):
         return(
             template('other', 
                 custom = custom_css_user(), 
-                license = set_data['license'], 
+                license = wiki_set(3), 
                 login = login_check(), 
                 title = '업로드 오류', 
-                logo = set_data['name'], 
+                logo = wiki_set(1), 
                 data = '동일한 이름의 파일이 있습니다.'
             )
         )
@@ -2921,21 +2992,21 @@ def error_test(num = None):
         return(
             template('other', 
                 custom = custom_css_user(), 
-                license = set_data['license'], 
+                license = wiki_set(3), 
                 login = login_check(), 
                 title = '업로드 오류', 
-                logo = set_data['name'], 
-                data = '파일 용량은 ' + set_data['upload'] + 'MB를 넘길 수 없습니다.'
+                logo = wiki_set(1), 
+                data = '파일 용량은 ' + wiki_set(4) + 'MB를 넘길 수 없습니다.'
             )
         )
     elif(num == 18):
         return(
             template('other', 
                 custom = custom_css_user(), 
-                license = set_data['license'], 
+                license = wiki_set(3), 
                 login = login_check(), 
                 title = '편집 오류', 
-                logo = set_data['name'], 
+                logo = wiki_set(1), 
                 data = '내용이 원래 문서와 동일 합니다.'
             )
         )
@@ -2943,10 +3014,10 @@ def error_test(num = None):
         return(
             template('other', 
                 custom = custom_css_user(), 
-                license = set_data['license'], 
+                license = wiki_set(3), 
                 login = login_check(), 
                 title = '이동 오류', 
-                logo = set_data['name'], 
+                logo = wiki_set(1), 
                 data = '이동 하려는 곳에 문서가 이미 있습니다.'
             )
         )
@@ -2954,10 +3025,10 @@ def error_test(num = None):
         return(
             template('other', 
                 custom = custom_css_user(), 
-                license = set_data['license'], 
+                license = wiki_set(3), 
                 login = login_check(), 
                 title = '비밀번호 오류', 
-                logo = set_data['name'],
+                logo = wiki_set(1),
                 data = '재 확인이랑 비밀번호가 다릅니다.'
             )
         )
@@ -2966,7 +3037,7 @@ def error_test(num = None):
 
 @error(404)
 def error_404(error):
-    return(redirect('/w/' + url_pas(set_data['frontpage'])))
+    return(redirect('/w/' + url_pas(wiki_set(2))))
     
 run(
     app = app, 

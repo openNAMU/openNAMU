@@ -17,7 +17,7 @@ conn = pymysql.connect(
 )
 curs = conn.cursor(pymysql.cursors.DictCursor)   
 
-r_ver = '2.2.1'
+r_ver = '2.2.2'
 
 curs2.execute("create table data(title text, data text, acl text)")
 curs2.execute("create table history(id text, title text, data text, date text, ip text, send text, leng text)")
@@ -37,6 +37,11 @@ curs2.execute("create table other(name text, data text)")
 curs2.execute("create table alist(name text, acl text)")
 
 curs2.execute("insert into other (name, data) values ('version', ?)", [r_ver])
+
+curs2.execute('insert into other (name, data) values ("name", ?)', [set_data['name']])
+curs2.execute('insert into other (name, data) values ("frontpage", ?)', [set_data['frontpage']])
+curs2.execute('insert into other (name, data) values ("license", ?)', [set_data['license']])
+curs2.execute('insert into other (name, data) values ("upload", ?)', [set_data['upload']])
 
 conn2.commit()
 

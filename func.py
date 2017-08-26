@@ -24,6 +24,36 @@ app = beaker.middleware.SessionMiddleware(app(), session_opts)
 
 from mark import *
 
+def wiki_set(num):
+    if(num == 1):
+        curs.execute('select data from other where name = ?', ['name'])
+        data = curs.fetchall()
+        if(data):
+            return(data[0][0])
+        else:
+            return('wiki')
+    elif(num == 2):
+        curs.execute('select data from other where name = "frontpage"')
+        data = curs.fetchall()
+        if(data):
+            return(data[0][0])
+        else:
+            return('위키:대문')
+    elif(num == 3):
+        curs.execute('select data from other where name = "license"')
+        data = curs.fetchall()
+        if(data):
+            return(data[0][0])
+        else:
+            return('CC 0')
+    elif(num == 4):
+        curs.execute('select data from other where name = "upload"')
+        data = curs.fetchall()
+        if(data):
+            return(data[0][0])
+        else:
+            return('2')
+
 def diff(seqm):
     output= []
     for opcode, a0, a1, b0, b1 in seqm.get_opcodes():
