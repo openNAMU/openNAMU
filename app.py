@@ -140,7 +140,7 @@ def edit_set():
                                 <br> \
                                 <button class="btn btn-primary" type="submit">저장</button> \
                             </form>',
-                    title = '업데이트 목록'
+                    title = '설정 편집'
                 )
             )
     else:
