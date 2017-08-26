@@ -157,7 +157,7 @@ def update(num = 1):
                     license = wiki_set(3),
                     login = login_check(),
                     logo = wiki_set(1),
-                    data = '<li><a href="/update/2">2.2.2</a></li>',
+                    data = '<li><a href="/update/2">2.2.1</a></li>',
                     title = '업데이트 목록'
                 )
             )
