@@ -28,11 +28,11 @@
             <div id="top">
                 <a href="/" id="logo">{{logo}}</a>
                 <div>
-                    <a href="/recentchanges" id="RecentChanges">
+                    <a href="/recent_changes" id="RecentChanges">
                         <i class="fa fa-refresh" aria-hidden="true"></i>
                         <span id="is_mobile">최근 변경</span>
                     </a>
-                    <a href="/recentdiscuss" id="RecentChanges">
+                    <a href="/recent_discuss" id="RecentChanges">
                         <i class="fa fa-comment" aria-hidden="true"></i>
                         <span id="is_mobile">최근 토론</span>
                     </a>

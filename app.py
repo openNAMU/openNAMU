@@ -380,8 +380,8 @@ def admin_list():
         
 @route('/record/<name:path>')
 @route('/record/<name:path>/n/<num:int>')
-@route('/recentchanges')
-def recentchanges(name = None, num = 1):
+@route('/recent_changes')
+def recent_changes(name = None, num = 1):
     ydmin = admin_check(1)
     zdmin = admin_check(6)
     ban = ''
@@ -615,8 +615,8 @@ def xref(name = None, num = 1):
         )
     )
         
-@route('/recentdiscuss')
-def recentdiscuss():
+@route('/recent_discuss')
+def recent_discuss():
     div =   '<table style="width: 100%; text-align: center;"> \
                 <tbody> \
                     <tr> \
@@ -1393,7 +1393,7 @@ def other():
                     <li><a href="/manager/6">사용자 기록</a></li> \
                     <li><a href="/manager/7">사용자 토론 기록</a></li> \
                     <h2>기타</h2> \
-                    <li><a href="/titleindex">모든 문서</a></li> \
+                    <li><a href="/title_index">모든 문서</a></li> \
                     <li><a href="/acl_list">ACL 문서 목록</a></li> \
                     <li><a href="/admin_list">관리자 목록</a></li> \
                     <li><a href="/manager/1">관리자 메뉴</a></li> \
