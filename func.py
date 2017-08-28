@@ -161,10 +161,19 @@ def ip_pas(raw_ip, num):
 
     return(ip)
 
-def custom_css_user():
+def custom_css():
     session = request.environ.get('beaker.session')
     try:
         data = format(session['Daydream'])
+    except:
+        data = ''
+
+    return(data)
+
+def custom_js():
+    session = request.environ.get('beaker.session')
+    try:
+        data = format(session['AQUARIUM'])
     except:
         data = ''
 

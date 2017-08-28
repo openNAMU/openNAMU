@@ -18,9 +18,8 @@
         <meta name="twitter:description" content="{{get('data', 'None')}}" />
         <link rel="shortcut icon" href="/views/img/on.ico">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-    <style>
-        {{!get('custom', '')}}
-    </style>
+        <style>{{!get('custom_css', '')}}</style>
+        <script>{{!get('custom_js', '')}}</script>
     </head>
     <body>
         <br>
