@@ -17,7 +17,7 @@ curs = conn.cursor()
 session_opts = {
     'session.type': 'file',
     'session.data_dir': './app_session/',
-    'session.auto': True
+    'session.auto': 1
 }
 
 app = beaker.middleware.SessionMiddleware(app(), session_opts)
