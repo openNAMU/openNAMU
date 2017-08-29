@@ -1086,7 +1086,6 @@ def section_edit(name = None, num = None):
 
             curs.execute("delete from back where link = ?", [name])
             curs.execute("delete from cat where cat = ?", [name])
-            conn.commit()
 
             curs.execute("select data from data where title = ?", [name])
             rows = curs.fetchall()
@@ -1110,13 +1109,11 @@ def section_edit(name = None, num = None):
                         )
                         
                         curs.execute("update data set data = ? where title = ?", [content, name])
-                        conn.commit()
 
                     include_check(name, content)
-                    
-                    return(redirect('/w/' + url_pas(name)))
-            else:
-                return(redirect('/w/' + url_pas(name)))
+                
+            conn.commit()
+            return(redirect('/w/' + url_pas(name)))
     else:        
         if(can == 1):
             return(redirect('/ban'))
@@ -1197,7 +1194,6 @@ def edit(name = None):
 
             curs.execute("delete from back where link = ?", [name])
             curs.execute("delete from cat where cat = ?", [name])
-            conn.commit()
             
             history_plus(
                 name, 
@@ -1210,6 +1206,7 @@ def edit(name = None):
                     
             include_check(name, content)
             
+            conn.commit()
             return(redirect('/w/' + url_pas(name)))
     else:        
         if(can == 1):
