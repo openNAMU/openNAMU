@@ -567,8 +567,8 @@ def user_log(num = 1):
         )
     )
         
-@route('/backreset')
-def xref_reset():
+@route('/back_reset')
+def back_reset():
     if(admin_check(None) == 1):        
         curs.execute("delete from back")
         curs.execute("delete from cat")
@@ -577,6 +577,8 @@ def xref_reset():
         curs.execute("select title, data from data")
         data = curs.fetchall()
         for end in data:
+            print(end[0])
+            
             namumark(end[0], end[1], 1)
         
         return(redirect('/'))
@@ -1446,7 +1448,7 @@ def manager(num = 1):
                         <li><a href="/mdel">많은 문서 삭제</a></li> \
                         <li><a href="/not_close_topic">안 닫힌 토론 목록</a></li> \
                         <h2>소유자</h2> \
-                        <li><a href="/backreset">역링크, 분류 다시 생성</a></li> \
+                        <li><a href="/back_reset">역링크, 분류 다시 생성</a></li> \
                         <li><a href="/manager/8">관리 그룹 생성</a></li> \
                         <li><a href="/update">업데이트 메뉴</a></li> \
                         <li><a href="/edit_set">세팅 수정</a></li> \

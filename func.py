@@ -132,6 +132,8 @@ def include_check(name, data):
         curs.execute("select link from back where title = ? and type = 'include'", [name])
         back = curs.fetchall()
         for backp in back:
+            print(backp[0])
+            curs.execute("delete from cat where cat = ?", [backp[0]])
             namumark(backp[0], data, 1)    
     
 def login_check():
