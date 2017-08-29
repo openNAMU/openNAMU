@@ -470,7 +470,6 @@ def backlink_plus(name, link, backtype, num):
         y = curs.fetchall()
         if(not y):
             curs.execute("insert into back (title, link, type) values (?, ?,  ?)", [link, name, backtype])
-            conn.commit()
 
 def cat_plus(name, link, num):
     if(num == 1):        
@@ -478,7 +477,6 @@ def cat_plus(name, link, num):
         y = curs.fetchall()
         if(not y):
             curs.execute("insert into cat (title, cat) values (?, ?)", [link, name])
-            conn.commit()
 
 def namumark(title, data, num):    
     data = html_pas(data)
@@ -1041,5 +1039,5 @@ def namumark(title, data, num):
                 } \
             </script>"
     
-    
+    conn.commit()
     return(data)
