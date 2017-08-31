@@ -579,7 +579,7 @@ def back_reset():
         for end in data:
             print(end[0])
             
-            namumark(end[0], end[1], 1)
+            namumark(end[0], end[1], 1, 0)
         
         return(redirect('/'))
     else:
@@ -1243,7 +1243,7 @@ def section_preview(name = None, num = None):
     else:            
         newdata = request.forms.content
         newdata = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', ' * [[\g<in>]] 문서로 넘겨주기', newdata)
-        enddata = namumark(name, newdata, 0)
+        enddata = namumark(name, newdata, 0, 0)
             
         return(
             template('edit', 
@@ -1274,7 +1274,7 @@ def preview(name = None):
     else:            
         newdata = request.forms.content
         newdata = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', ' * [[\g<in>]] 문서로 넘겨주기', newdata)
-        enddata = namumark(name, newdata, 0)
+        enddata = namumark(name, newdata, 0, 0)
             
         return(
             template('edit', 
@@ -1840,7 +1840,7 @@ def topic(name = None, sub = None):
         top = curs.fetchall()
 
         for dain in top:                     
-            top_data = namumark('', dain[0], 0)
+            top_data = namumark('', dain[0], 0, 0)
             top_data = re.sub("(?P<in>#(?:[0-9]*))", '<a href="\g<in>">\g<in></a>', top_data)
                     
             ip = ip_pas(dain[3], 1)
@@ -1864,7 +1864,7 @@ def topic(name = None, sub = None):
             if(i == 0):
                 start = dain[3]
                 
-            indata = namumark('', dain[0], 0)
+            indata = namumark('', dain[0], 0, 0)
             indata = re.sub("(?P<in>#(?:[0-9]*))", '<a href="\g<in>">\g<in></a>', indata)
             
             if(dain[4] == 'O'):
@@ -1987,7 +1987,7 @@ def close_topic_list(name = None, tool = None):
             curs.execute("select data, date, ip, block from topic where title = ? and sub = ? and id = '1'", [name, data[0]])
             row = curs.fetchall()
             if(row):
-                indata = namumark(name, row[0][0], 0)
+                indata = namumark(name, row[0][0], 0, 0)
                 
                 if(row[0][3] == 'O'):
                     indata = '<br>'
@@ -2614,7 +2614,7 @@ def read_view(name = None, num = None, redirect = None):
     if(redirect):
         elsedata = re.sub("^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)", " * [[\g<in>]] 문서로 넘겨주기", elsedata)
             
-    enddata = namumark(name, elsedata, 1)
+    enddata = namumark(name, elsedata, 1, 0)
     
     return(
         template('read', 
