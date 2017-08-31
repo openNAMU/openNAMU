@@ -246,7 +246,7 @@ def html_pas(data):
     data = re.sub("%phtml%(?P<in>(?:\/)?(?:a|div|span|embed|iframe)(?:\s[^%]*)?)%phtml%", "<\g<in>>", data)
     return(data)
     
-def mid_pas(data, fol_num, include):
+def mid_pas(data, fol_num, include, in_c):
     while(1):
         com = re.compile("{{{((?:(?!{{{)(?!}}}).)*)}}}", re.DOTALL)
         y = com.search(data)
@@ -347,7 +347,7 @@ def mid_pas(data, fol_num, include):
                 result = html.groups()
                 data = com.sub(result[0], data, 1)
             elif(include_out):
-                if(include == 1):
+                if((include or in_c) == 1):
                     data = com.sub("", data, 1)
                 else:
                     result = include_out.groups()
@@ -478,11 +478,11 @@ def cat_plus(name, link, num):
         if(not y):
             curs.execute("insert into cat (title, cat) values (?, ?)", [link, name])
 
-def namumark(title, data, num):    
+def namumark(title, data, num, in_c):    
     data = html_pas(data)
 
     b = 0
-    a = mid_pas(data, b, 0)
+    a = mid_pas(data, b, 0, in_c)
     
     data = a[0]
     b = a[1]
@@ -507,7 +507,7 @@ def namumark(title, data, num):
                     in_data = include.sub("", in_data)
                     
                     in_data = html_pas(in_data)
-                    in_data = mid_pas(in_data, b, 1)[0]
+                    in_data = mid_pas(in_data, b, 1, in_c)[0]
                     
                     if(results[1]):
                         a = results[1]
