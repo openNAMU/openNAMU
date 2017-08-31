@@ -131,10 +131,8 @@ def include_check(name, data):
     if(re.search('^틀:', name)):
         curs.execute("select link from back where title = ? and type = 'include'", [name])
         back = curs.fetchall()
-        for backp in back:
-            print(backp[0])
-            curs.execute("delete from cat where cat = ?", [backp[0]])
-            namumark(backp[0], data, 1)    
+        for back_p in back:
+            namumark(back_p[0], data, 1)    
     
 def login_check():
     session = request.environ.get('beaker.session')
