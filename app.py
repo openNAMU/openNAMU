@@ -938,7 +938,7 @@ def raw_view(name = None, num = None):
     if(rows):
         enddata = html.escape(rows[0][0])
         
-        enddata = '<textarea disabled style="height: 80%;">' + enddata + '</textarea>'
+        enddata = '<textarea readonly="" style="height: 80%;">' + enddata + '</textarea>'
         
         return(
             template('other', 
