@@ -2519,7 +2519,7 @@ def down(name = None):
             title = name, 
             logo = wiki_set(1), 
             data = div, 
-            sub = '하위 문서', 
+            sub = '하위', 
             page = url_pas(name)
         )
     )
