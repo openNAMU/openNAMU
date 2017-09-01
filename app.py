@@ -1422,7 +1422,7 @@ def other():
                     <li><a href="/admin_list">관리자 목록</a></li> \
                     <li><a href="/manager/1">관리자 메뉴</a></li> \
                     <br> \
-                    이 오픈나무의 버전은 <a href="https://github.com/2DU/openNAMU/blob/normal/version.md">v' + r_ver + p_ver + '</a> 입니다.'
+                    이 오픈나무의 버전은 <a href="https://github.com/2DU/openNAMU/blob/SQLite/version.md">v' + r_ver + p_ver + '</a> 입니다.'
         )
     )
     
