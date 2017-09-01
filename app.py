@@ -1449,7 +1449,7 @@ def manager(num = 1):
                         <li><a href="/back_reset">역링크, 분류 다시 생성</a></li> \
                         <li><a href="/manager/8">관리 그룹 생성</a></li> \
                         <li><a href="/update">업데이트 메뉴</a></li> \
-                        <li><a href="/edit_set">세팅 수정</a></li> \
+                        <li><a href="/edit_set">설정 편집</a></li> \
                         <h2>기타</h2> \
                         <li>이 메뉴에 없는 기능은 해당 문서의 역사나 토론에서 바로 사용 가능함</li>'
             )
