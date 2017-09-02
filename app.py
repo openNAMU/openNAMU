@@ -1030,8 +1030,8 @@ def revert(name = None, num = None):
             else:
                 return(redirect('/w/' + url_pas(name)))
                     
-@route('/mdel', method=['POST', 'GET'])
-def many_del():
+@route('/m_del', method=['POST', 'GET'])
+def m_del():
     today = get_time()
     ip = ip_check()
     if(admin_check(2) == 1):
@@ -1443,13 +1443,15 @@ def manager(num = 1):
                         <li><a href="/manager/3">사용자 체크</a></li> \
                         <li><a href="/manager/4">사용자 차단</a></li> \
                         <li><a href="/manager/5">관리자 권한 주기</a></li> \
-                        <li><a href="/mdel">많은 문서 삭제</a></li> \
+                        <li><a href="/m_del">많은 문서 삭제</a></li> \
                         <li><a href="/not_close_topic">안 닫힌 토론 목록</a></li> \
                         <h2>소유자</h2> \
                         <li><a href="/back_reset">역링크, 분류 다시 생성</a></li> \
                         <li><a href="/manager/8">관리 그룹 생성</a></li> \
                         <li><a href="/update">업데이트 메뉴</a></li> \
                         <li><a href="/edit_set">설정 편집</a></li> \
+                        <li><a href="/manager/9">문서 JSON 출력</a></li> \
+                        <li><a href="/json_in">문서 JSON 입력</a></li> \
                         <h2>기타</h2> \
                         <li>이 메뉴에 없는 기능은 해당 문서의 역사나 토론에서 바로 사용 가능함</li>'
             )
@@ -1579,7 +1581,7 @@ def manager(num = 1):
             )
     elif(num == 8):
         if(request.method == 'POST'):
-            return(redirect('/adminplus/' + url_pas(request.forms.name)))
+            return(redirect('/admin_plus/' + url_pas(request.forms.name)))
         else:
             return(
                 template('other', 
@@ -1597,8 +1599,101 @@ def manager(num = 1):
                             </form>'
                 )    
             )
+    elif(num == 9):
+        if(request.method == 'POST'):
+            return(redirect('/json_out/' + url_pas(request.forms.name)))
+        else:
+            return(
+                template('other', 
+                    custom_css = custom_css(), 
+                    custom_js = custom_js(),
+                    license = wiki_set(3), 
+                    login = login_check(), 
+                    title = '문서 출력 이동', 
+                    logo = wiki_set(1), 
+                    data = '<form method="post"> \
+                                <input name="name" type="text"> \
+                                <br> \
+                                <br> \
+                                <button class="btn btn-primary" type="submit">이동</button> \
+                            </form>'
+                )    
+            )
     else:
         return(redirect('/'))
+
+@route('/json_out/<name:path>')
+def json_out(name = None):
+    if(admin_check(None) == 1):
+        curs.execute('select data from data where title = ?', [name])
+        get_d = curs.fetchall()
+        if(get_d):
+            da = get_d[0][0]
+        else:
+            da = ''
+
+        curs.execute('select ip from history where title = ? order by ip asc', [name])
+        get_h = curs.fetchall()
+
+        var_n = ''
+        hi_d = ''
+        for hi in get_h:
+            if(hi[0] != var_n):
+                var_n = hi[0]
+                hi_d += json.dumps(hi[0]) + ', '
+        else:
+            hi_d = re.sub(', $', '', hi_d)  
+
+        if(hi_d == ''):
+            return(redirect('/w/' + url_pas(name)))
+        
+        json_f = '{ "title" : ' + json.dumps(name) + ', "data" : ' + json.dumps(da) + ', "history" : [' + hi_d + '] }'
+
+        return(json_f)
+    else:
+        return(redirect('/error/3'))
+
+@route('/json_in', method=['POST', 'GET'])
+def json_in():
+    if(admin_check(None) == 1):
+        if(request.method == 'POST'):
+            data = json.loads(request.forms.data)
+            title = data["title"]
+
+            curs.execute('select title from history where title = ?', [title])
+            get_d = curs.fetchall()
+            if(get_d):
+                return(redirect('/w/' + url_pas(title)))
+
+            curs.execute('insert into data (title, data, acl) values (?, ?, "")', [title, data["data"]])
+
+            i = 0
+            date = get_time()
+            for hi in data["history"]:
+                i += 1
+                curs.execute('insert into history (id, title, data, date, ip, send, leng) values (?, ?, "", ?, ?, "", "0")', [i, title, date, hi])
+
+            conn.commit()
+            return(redirect('/w/' + url_pas(title)))
+        else:
+            return(
+                template('other', 
+                    custom_css = custom_css(), 
+                    custom_js = custom_js(),
+                    license = wiki_set(3), 
+                    login = login_check(), 
+                    title = '문서 JSON 입력', 
+                    logo = wiki_set(1), 
+                    data = '<form method="post"> \
+                                <textarea style="height: 80%;" name="data"></textarea> \
+                                <br> \
+                                <br> \
+                                <button class="btn btn-primary" type="submit">입력</button> \
+                            </form>'
+                )    
+            )
+    else:
+        return(redirect('/error/3'))
         
 @route('/title_index')
 def title_index():
@@ -2064,9 +2159,9 @@ def login():
                 
                 return(redirect('/user'))
             else:
-                return(redirect('/error/13'))
+                return(redirect('/error/10'))
         else:
-            return(redirect('/error/12'))
+            return(redirect('/error/5'))
     else:        
         if(ban == 1):
             return(redirect('/ban'))
@@ -2112,7 +2207,7 @@ def change_password():
                 else:
                     return(redirect('/error/10'))
             else:
-                return(redirect('/error/9'))
+                return(redirect('/error/5'))
         else:
             return(redirect('/error/20'))
     else:        
@@ -3014,18 +3109,6 @@ def error_test(num = None):
                 data = '아이디에는 한글과 알파벳과 공백만 허용 됩니다.'
             )
         )
-    elif(num == 9):
-        return(
-            template('other', 
-                custom_css = custom_css(), 
-                custom_js = custom_js(),
-                license = wiki_set(3), 
-                login = login_check(), 
-                title = '변경 오류', 
-                logo = wiki_set(1), 
-                data = '그런 계정이 없습니다.'
-            )
-        )
     elif(num == 10):
         return(
             template('other', 
@@ -3048,30 +3131,6 @@ def error_test(num = None):
                 title = '로그인 오류', 
                 logo = wiki_set(1), 
                 data = '이미 로그인 되어 있습니다.'
-            )
-        )
-    elif(num == 12):
-        return(
-            template('other', 
-                custom_css = custom_css(), 
-                custom_js = custom_js(),
-                license = wiki_set(3), 
-                login = login_check(), 
-                title = '로그인 오류', 
-                logo = wiki_set(1), 
-                data = '그런 계정이 없습니다.'
-            )
-        )
-    elif(num == 13):
-        return(
-            template('other', 
-                custom_css = custom_css(), 
-                custom_js = custom_js(),
-                license = wiki_set(3), 
-                login = login_check(), 
-                title = '로그인 오류', 
-                logo = wiki_set(1), 
-                data = '비밀번호가 다릅니다.'
             )
         )
     elif(num == 14):

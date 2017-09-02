@@ -19,14 +19,16 @@
     <br>
 % end
 % if(defined('section')):
-    <form id="usrform" name="f1" method="POST" action="/edit/{{page}}/section/{{number}}">
-        <textarea rows="30" cols="100" name="content" form="usrform">{{data}}</textarea>
+    <form name="f1" method="post" action="/edit/{{page}}/section/{{number}}">
+        <textarea style="height: 80%;" name="content">{{data}}</textarea>
         % if(defined('preview')):
-            <textarea style="display:none;" rows="30" cols="100" name="otent" form="usrform">{{odata}}</textarea>
+            <textarea style="display: none;" rows="30" cols="100" name="otent">{{odata}}</textarea>
         % else:
-            <textarea style="display:none;" rows="30" cols="100" name="otent" form="usrform">{{data}}</textarea>
+            <textarea style="display: none;" rows="30" cols="100" name="otent">{{data}}</textarea>
         % end
-        <input name="send" style="margin-top:10px;width:100%" type="text">
+        <br>
+        <br>
+        <input name="send" style="width: 100%" type="text">
         <br>
         <br>
         <div class="form-actions">
@@ -35,9 +37,11 @@
         </div>
     </form>
 % else:
-    <form id="usrform" name="f1" method="POST" action="/edit/{{page}}">
-        <textarea rows="30" cols="100" name="content" form="usrform">{{data}}</textarea>
-        <input name="send" style="margin-top:10px;width:100%" type="text">
+    <form name="f1" method="post" action="/edit/{{page}}">
+        <textarea style="height: 80%;" name="content">{{data}}</textarea>
+        <br>
+        <br>
+        <input name="send" style="width: 100%" type="text">
         <br>
         <br>
         <div class="form-actions">
