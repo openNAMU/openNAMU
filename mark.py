@@ -98,6 +98,16 @@ def table_p(d, d2):
             alltable += 'text-align:right;'
         elif(resultss[0] == 'center'):
             alltable += 'text-align:center;'
+
+    row_text = re.search("&lt;row\s?textalign=((?:(?!&gt;).)*)&gt;", d)
+    if(row_text):
+        row_text_d = row_text.groups()
+        if(row_text_d[0] == 'right'):
+            rowstyle += 'text-align: right;'
+        elif(row_text_d[0] == 'center'):
+            rowstyle += 'text-align: center;'
+        else:
+            rowstyle += 'text-align: left;'
     
     r = re.search("&lt;-((?:(?!&gt;).)*)&gt;", d)
     if(r):
