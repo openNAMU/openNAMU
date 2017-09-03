@@ -2976,13 +2976,20 @@ def count_edit(name = None):
         that = ip_check()
     else:
         that = name
-        
+
     curs.execute("select count(title) from history where ip = ?", [that])
     count = curs.fetchall()
     if(count):
         data = count[0][0]
     else:
         data = 0
+
+    curs.execute("select count(title) from topic where ip = ?", [that])
+    count = curs.fetchall()
+    if(count):
+        t_data = count[0][0]
+    else:
+        t_data = 0
     
     return(
         template('other', 
@@ -2992,7 +2999,7 @@ def count_edit(name = None):
             login = login_check(), 
             title = '기여 횟수', 
             logo = wiki_set(1), 
-            data = that + " 기여 횟수 : " + str(data)
+            data = namumark("", "||<-2><:> " + that + " ||\r\n|| 기여 횟수 ||<:> " + str(data) + "||\r\n|| 토론 횟수 ||<:> " + str(t_data) + "||", 0, 1)
         )
     )
         
