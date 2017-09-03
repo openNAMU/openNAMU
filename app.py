@@ -2973,9 +2973,11 @@ def custom_js_view():
 @route('/count/<name:path>')
 def count_edit(name = None):
     if(name == None):
-        curs.execute("select count(title) from history where ip = ?", [ip_check()])
+        that = ip_check()
     else:
-        curs.execute("select count(title) from history where ip = ?", [name])
+        that = name
+        
+    curs.execute("select count(title) from history where ip = ?", [that])
     count = curs.fetchall()
     if(count):
         data = count[0][0]
@@ -2990,7 +2992,7 @@ def count_edit(name = None):
             login = login_check(), 
             title = '기여 횟수', 
             logo = wiki_set(1), 
-            data = "기여 횟수 : " + str(data)
+            data = that + " 기여 횟수 : " + str(data)
         )
     )
         
