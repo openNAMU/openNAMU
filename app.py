@@ -2999,7 +2999,7 @@ def count_edit(name = None):
             login = login_check(), 
             title = '기여 횟수', 
             logo = wiki_set(1), 
-            data = namumark("", "||<-2><:> " + that + " ||\r\n|| 기여 횟수 ||<:> " + str(data) + "||\r\n|| 토론 횟수 ||<:> " + str(t_data) + "||", 0, 1)
+            data = namumark("", "||<-2><:> " + that + " ||\r\n||<:> 기여 횟수 ||<:> " + str(data) + "||\r\n||<:> 토론 횟수 ||<:> " + str(t_data) + "||", 0, 1)
         )
     )
         
