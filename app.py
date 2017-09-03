@@ -2665,10 +2665,19 @@ def read_view(name = None, num = None, redirect = None):
         rows = curs.fetchall()
         if(rows):
             div = '<h2>분류</h2>'
+            u_div = ''
             i = 0
             
             for data in rows:       
-                div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a></li>'
+                if(re.search('^분류:', data[0])):
+                    if(u_div == ''):
+                        u_div = '<h3>하위 분류</h3>'
+
+                    u_div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a></li>'
+                else:
+                    div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a></li>'
+
+            div += u_div
 
     if(num):
         curs.execute("select title from hidhi where title = ? and re = ?", [name, str(num)])
