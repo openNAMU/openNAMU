@@ -2970,8 +2970,12 @@ def custom_js_view():
         )
 
 @route('/count')
-def count_edit():
-    curs.execute("select count(title) from history where ip = '" + ip_check() + "'")
+@route('/count/<name:path>')
+def count_edit(name = None):
+    if(name == None):
+        curs.execute("select count(title) from history where ip = ?", [ip_check()])
+    else:
+        curs.execute("select count(title) from history where ip = ?", [name])
     count = curs.fetchall()
     if(count):
         data = count[0][0]
