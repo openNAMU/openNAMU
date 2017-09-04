@@ -2700,6 +2700,7 @@ def read_view(name = None, num = None, redirect = None):
         elsedata = rows[0][1]
     else:
         data_none = 1
+        response.status = 404
         elsedata = ''
 
     m = re.search("^사용자:([^/]*)", name)
@@ -3035,6 +3036,7 @@ def views(name = None):
         
 @route('/error/<num:int>')
 def error_test(num = None):
+    response.status = 404
     if(num == 1):
         return(
             template('other', 
