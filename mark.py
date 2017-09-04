@@ -75,135 +75,111 @@ def table_p(d, d2):
     row = ''
     cel = ''
 
-    q = re.search("&lt;table\s?width=((?:(?!&gt;).)*)&gt;", d)
-    w = re.search("&lt;table\s?height=((?:(?!&gt;).)*)&gt;", d)
-    e = re.search("&lt;table\s?align=((?:(?!&gt;).)*)&gt;", d)
-    if(q):
-        resultss = q.groups()
-        alltable += 'width:' + resultss[0] + ';'
-    if(w):
-        resultss = w.groups()
-        alltable += 'height:' + resultss[0] + ';'
-    if(e):
-        resultss = e.groups()
-        if(resultss[0] == 'right'):
-            alltable += 'float:right;'
-        elif(resultss[0] == 'center'):
-            alltable += 'margin:auto;'
+    table_w = re.search("&lt;table\s?width=((?:(?!&gt;).)*)&gt;", d)
+    table_h = re.search("&lt;table\s?height=((?:(?!&gt;).)*)&gt;", d)
+    table_a = re.search("&lt;table\s?align=((?:(?!&gt;).)*)&gt;", d)
+    if(table_w):
+        alltable += 'width: ' + table_w.groups()[0] + ';'
+    if(table_h):
+        alltable += 'height: ' + table_h.groups()[0] + ';'
+    if(table_a):
+        if(table_a.groups()[0] == 'right'):
+            alltable += 'float: right;'
+        elif(table_a.groups()[0] == 'center'):
+            alltable += 'margin: auto;'
             
-    ee = re.search("&lt;table\s?textalign=((?:(?!&gt;).)*)&gt;", d)
-    if(ee):
-        resultss = ee.groups()
-        if(resultss[0] == 'right'):
-            alltable += 'text-align:right;'
-        elif(resultss[0] == 'center'):
-            alltable += 'text-align:center;'
+    table_t_a = re.search("&lt;table\s?textalign=((?:(?!&gt;).)*)&gt;", d)
+    if(table_t_a):
+        if(table_t_a.groups()[0] == 'right'):
+            alltable += 'text-align: right;'
+        elif(table_t_a.groups()[0] == 'center'):
+            alltable += 'text-align: center;'
 
-    row_text = re.search("&lt;row\s?textalign=((?:(?!&gt;).)*)&gt;", d)
-    if(row_text):
-        row_text_d = row_text.groups()
-        if(row_text_d[0] == 'right'):
+    row_t_a = re.search("&lt;row\s?textalign=((?:(?!&gt;).)*)&gt;", d)
+    if(row_t_a):
+        if(row_t_a.groups()[0] == 'right'):
             rowstyle += 'text-align: right;'
-        elif(row_text_d[0] == 'center'):
+        elif(row_t_a.groups()[0] == 'center'):
             rowstyle += 'text-align: center;'
         else:
             rowstyle += 'text-align: left;'
     
-    r = re.search("&lt;-((?:(?!&gt;).)*)&gt;", d)
-    if(r):
-        resultss = r.groups()
-        cel = 'colspan="' + resultss[0] + '"'
+    table_cel = re.search("&lt;-((?:(?!&gt;).)*)&gt;", d)
+    if(table_cel):
+        cel = 'colspan="' + table_cel.groups()[0] + '"'
     else:
         cel = 'colspan="' + str(round(len(d2) / 2)) + '"'   
 
-    t = re.search("&lt;\|((?:(?!&gt;).)*)&gt;", d)
-    if(t):
-        resultss = t.groups()
-        row = 'rowspan="' + resultss[0] + '"'
+    table_row = re.search("&lt;\|((?:(?!&gt;).)*)&gt;", d)
+    if(table_row):
+        row = 'rowspan="' + table_row.groups()[0] + '"'
 
-    ba = re.search("&lt;rowbgcolor=(#[0-9a-f-A-F]{6})&gt;", d)
-    bb = re.search("&lt;rowbgcolor=(#[0-9a-f-A-F]{3})&gt;", d)
-    bc = re.search("&lt;rowbgcolor=(\w+)&gt;", d)
-    if(ba):
-        resultss = ba.groups()
-        rowstyle += 'background:' + resultss[0] + ';'
-    elif(bb):
-        resultss = bb.groups()
-        rowstyle += 'background:' + resultss[0] + ';'
-    elif(bc):
-        resultss = bc.groups()
-        rowstyle += 'background:' + resultss[0] + ';'
+    row_bgcolor_1 = re.search("&lt;rowbgcolor=(#[0-9a-f-A-F]{6})&gt;", d)
+    row_bgcolor_2 = re.search("&lt;rowbgcolor=(#[0-9a-f-A-F]{3})&gt;", d)
+    row_bgcolor_3 = re.search("&lt;rowbgcolor=(\w+)&gt;", d)
+    if(row_bgcolor_1): 
+        rowstyle += 'background: ' + row_bgcolor_1.groups()[0] + ';'
+    elif(row_bgcolor_2):
+        rowstyle += 'background: ' + row_bgcolor_2.groups()[0] + ';'
+    elif(row_bgcolor_3):
+        rowstyle += 'background: ' + row_bgcolor_3.groups()[0] + ';'
         
-    z = re.search("&lt;table\s?bordercolor=(#[0-9a-f-A-F]{6})&gt;", d)
-    x = re.search("&lt;table\s?bordercolor=(#[0-9a-f-A-F]{3})&gt;", d)
-    c = re.search("&lt;table\s?bordercolor=(\w+)&gt;", d)
-    if(z):
-        resultss = z.groups()
-        alltable += 'border:' + resultss[0] + ' 2px solid;'
-    elif(x):
-        resultss = x.groups()
-        alltable += 'border:' + resultss[0] + ' 2px solid;'
-    elif(c):
-        resultss = c.groups()
-        alltable += 'border:' + resultss[0] + ' 2px solid;'
+    table_border_1 = re.search("&lt;table\s?bordercolor=(#[0-9a-f-A-F]{6})&gt;", d)
+    table_border_2 = re.search("&lt;table\s?bordercolor=(#[0-9a-f-A-F]{3})&gt;", d)
+    table_border_3 = re.search("&lt;table\s?bordercolor=(\w+)&gt;", d)
+    if(table_border_1):
+        alltable += 'border: ' + table_border_1.groups()[0] + ' 2px solid;'
+    elif(table_border_2):
+        alltable += 'border: ' + table_border_2.groups()[0] + ' 2px solid;'
+    elif(table_border_3):
+        alltable += 'border: ' + table_border_3.groups()[0] + ' 2px solid;'
         
-    aq = re.search("&lt;table\s?bgcolor=(#[0-9a-f-A-F]{6})&gt;", d)
-    aw = re.search("&lt;table\s?bgcolor=(#[0-9a-f-A-F]{3})&gt;", d)
-    ae = re.search("&lt;table\s?bgcolor=(\w+)&gt;", d)
-    if(aq):
-        resultss = aq.groups()
-        alltable += 'background:' + resultss[0] + ';'
-    elif(aw):
-        resultss = aw.groups()
-        alltable += 'background:' + resultss[0] + ';'
-    elif(ae):
-        resultss = ae.groups()
-        alltable += 'background:' + resultss[0] + ';'
+    table_bgcolor_1 = re.search("&lt;table\s?bgcolor=(#[0-9a-f-A-F]{6})&gt;", d)
+    table_bgcolor_2 = re.search("&lt;table\s?bgcolor=(#[0-9a-f-A-F]{3})&gt;", d)
+    table_bgcolor_3 = re.search("&lt;table\s?bgcolor=(\w+)&gt;", d)
+    if(table_bgcolor_1)
+        alltable += 'background: ' + table_bgcolor_1.groups()[0] + ';'
+    elif(table_bgcolor_2):
+        alltable += 'background: ' + table_bgcolor_2.groups()[0] + ';'
+    elif(table_bgcolor_3):
+        alltable += 'background: ' + table_bgcolor_3.groups()[0] + ';'
         
-    j = re.search("&lt;bgcolor=(#[0-9a-f-A-F]{6})&gt;", d)
-    k = re.search("&lt;bgcolor=(#[0-9a-f-A-F]{3})&gt;", d)
-    l = re.search("&lt;bgcolor=(\w+)&gt;", d)
-    if(j):
-        resultss = j.groups()
-        celstyle += 'background:' + resultss[0] + ';'
-    elif(k):
-        resultss = k.groups()
-        celstyle += 'background:' + resultss[0] + ';'
-    elif(l):
-        resultss = l.groups()
-        celstyle += 'background:' + resultss[0] + ';'
+    bgcolor_1 = re.search("&lt;bgcolor=(#[0-9a-f-A-F]{6})&gt;", d)
+    bgcolor_2 = re.search("&lt;bgcolor=(#[0-9a-f-A-F]{3})&gt;", d)
+    bgcolor_3 = re.search("&lt;bgcolor=(\w+)&gt;", d)
+    if(bgcolor_1):
+        celstyle += 'background: ' + bgcolor_1.groups()[0] + ';'
+    elif(bgcolor_2):
+        celstyle += 'background: ' + bgcolor_2.groups()[0] + ';'
+    elif(bgcolor_3):
+        celstyle += 'background: ' + bgcolor_3.groups()[0] + ';'
         
-    aa = re.search("&lt;(#[0-9a-f-A-F]{6})&gt;", d)
-    ab = re.search("&lt;(#[0-9a-f-A-F]{3})&gt;", d)
-    ac = re.search("&lt;(\w+)&gt;", d)
-    if(aa):
-        resultss = aa.groups()
-        celstyle += 'background:' + resultss[0] + ';'
-    elif(ab):
-        resultss = ab.groups()
-        celstyle += 'background:' + resultss[0] + ';'
-    elif(ac):
-        resultss = ac.groups()
-        celstyle += 'background:' + resultss[0] + ';'
+    st_bgcolor_1 = re.search("&lt;(#[0-9a-f-A-F]{6})&gt;", d)
+    st_bgcolor_2 = re.search("&lt;(#[0-9a-f-A-F]{3})&gt;", d)
+    st_bgcolor_3 = re.search("&lt;(\w+)&gt;", d)
+    if(st_bgcolor_1):
+        celstyle += 'background: ' + st_bgcolor_1.groups()[0] + ';'
+    elif(st_bgcolor_2):
+        celstyle += 'background: ' + st_bgcolor_2.groups()[0] + ';'
+    elif(st_bgcolor_3):
+        celstyle += 'background: ' + st_bgcolor_3.groups()[0] + ';'
         
-    qa = re.search("&lt;width=((?:(?!&gt;).)*)&gt;", d)
-    qb = re.search("&lt;height=((?:(?!&gt;).)*)&gt;", d)
-    if(qa):
-        resultss = qa.groups()
-        celstyle += 'width:' + resultss[0] + ';'
-    if(qb):
-        resultss = qb.groups()
-        celstyle += 'height:' + resultss[0] + ';'
+    n_width = re.search("&lt;width=((?:(?!&gt;).)*)&gt;", d)
+    n_height = re.search("&lt;height=((?:(?!&gt;).)*)&gt;", d)
+    if(n_width):
+        celstyle += 'width: ' + n_width.groups()[0] + ';'
+    if(n_height):
+        celstyle += 'height: ' + n_height.groups()[0] + ';'
         
-    i = re.search("&lt;\)&gt;", d)
-    o = re.search("&lt;:&gt;", d)
-    p = re.search("&lt;\(&gt;",  d)
-    if(i):
-        celstyle += 'text-align:right;'
-    elif(o):
-        celstyle += 'text-align:center;'
-    elif(p):
-        celstyle += 'text-align:left;'
+    text_right = re.search("&lt;\)&gt;", d)
+    text_center = re.search("&lt;:&gt;", d)
+    text_left = re.search("&lt;\(&gt;",  d)
+    if(text_right):
+        celstyle += 'text-align: right;'
+    elif(text_center):
+        celstyle += 'text-align: center;'
+    elif(text_left):
+        celstyle += 'text-align: left;'
         
     alltable += '"'
     celstyle += '"'
