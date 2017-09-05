@@ -188,161 +188,149 @@ def table_p(d, d2):
     return([alltable, rowstyle, celstyle, row, cel])
 
 def html_pas(data):
-    data = re.sub("%phtml%(?P<in>(?:\/)?(?:a|div|span|embed|iframe)(?:\s[^%]*)?)%phtml%", "<\g<in>>", data)   
-    while(1):
-        y = re.search("<((div|span|embed|iframe)(?:\s[^>]*))>", data)
-        if(y):
-            b = y.groups()
+    data = re.sub("%phtml%(?P<in>(?:\/)?(?:a|div|span|embed|iframe)(?:\s[^%]*)?)%phtml%", "<\g<in>>", data) 
+    
+    pas_d = re.findall("<((div|span|embed|iframe)(?:\s[^>]*))>", data)
+    for p_d in pas_d:
+        if(re.search("<(\/" + b[1] + ")>", data)):
+            url_d = re.search('src=(?:"|\')?(http(s)?:\/\/([^\/]*)\/(?:[^"\' ]*))(?:"|\')?', p_d[0])
+            if(url_d):
+                check = url_d.groups()
 
-            if(re.search("<(\/" + b[1] + ")>", data)):
-                xss_test = re.search('src=(?:"|\')?(http(s)?:\/\/([^\/]*)\/(?:[^"\' ]*))(?:"|\')?', b[0])
-                
-                if(xss_test):
-                    check = xss_test.groups()
-                    
-                    if(check[2] == "www.youtube.com" or check[2] == "serviceapi.nmv.naver.com" or check[2] == "tv.kakao.com" or check[2] == "tvple.com"):
-                        a = b[0]
-                    else:
-                        a = re.sub('src=(?:"|\')([^"\']*)(?:"|\')', '', b[0])
+                if(check[2] == ("www.youtube.com" or "serviceapi.nmv.naver.com" or "tv.kakao.com" or "tvple.com")):
+                    pas_end = p_d[0]
                 else:
-                    a = b[0]
-
-                try:
-                    if(check[1] != None):
-                        data = re.sub("<((?:\/)?" + b[1] + "(?:\s[^>]*))>", "%phtml%" + a + "%phtml%", data, 1)
-                        data = re.sub("<\/" + b[1] + ">", "%phtml%/" + b[1] + "%phtml%", data, 1)
-                    else:
-                        data = re.sub("<((?:\/)?" + b[1] + "(?:\s[^>]*))>", "[[" + check[0] + "]]", data, 1)
-                        data = re.sub("<\/" + b[1] + ">", "", data, 1)
-                except:
-                    data = re.sub("<((?:\/)?" + b[1] + "(?:\s[^>]*))>", "%phtml%" + a + "%phtml%", data, 1)
-                    data = re.sub("<\/" + b[1] + ">", "%phtml%/" + b[1] + "%phtml%", data, 1)
+                    pas_end = re.sub('src=(?:"|\')([^"\']*)(?:"|\')', '', p_d[0])
             else:
-                data = re.sub("<((?:\/)?" + b[1] + "(?:\s[^>]*))>", '&lt;' + b[0] + '&gt;', data, 1)
-                
-                break
+                pas_end = p_d[0]
+
+            try:
+                if(check[1] != None):
+                    data = re.sub("<((?:\/)?" + p_d[1] + "(?:\s[^>]*))>", "%phtml%" + pas_end + "%phtml%", data, 1)
+                    data = re.sub("<\/" + p_d[1] + ">", "%phtml%/" + p_d[1] + "%phtml%", data, 1)
+                else:
+                    data = re.sub("<((?:\/)?" + p_d[1] + "(?:\s[^>]*))>", "[[" + check[0] + "]]", data, 1)
+                    data = re.sub("<\/" + p_d[1] + ">", "", data, 1)
+            except:
+                data = re.sub("<((?:\/)?" + p_d[1] + "(?:\s[^>]*))>", "%phtml%" + pas_end + "%phtml%", data, 1)
+                data = re.sub("<\/" + p_d[1] + ">", "%phtml%/" + p_d[1] + "%phtml%", data, 1)
         else:
+            data = re.sub("<((?:\/)?" + p_d[1] + "(?:\s[^>]*))>", '&lt;' + p_d[0] + '&gt;', data, 1)
+            
             break
 
     data = html.escape(data)
-
     js_p = re.compile('javascript:', re.I)
     data = js_p.sub('', data)
-    
     data = re.sub("%phtml%(?P<in>(?:\/)?(?:a|div|span|embed|iframe)(?:\s[^%]*)?)%phtml%", "<\g<in>>", data)
+    
     return(data)
     
 def mid_pas(data, fol_num, include, in_c):
-    while(1):
-        com = re.compile("{{{((?:(?!{{{)(?!}}}).)*)}}}", re.DOTALL)
-        y = com.search(data)
-        
-        if(y):
-            a = y.groups()
-            
-            big_a = re.compile("^\+([1-5])\s(.*)$", re.DOTALL)
-            big = big_a.search(a[0])
-            
-            small_a = re.compile("^\-([1-5])\s(.*)$", re.DOTALL)
-            small = small_a.search(a[0])
-            
-            color_a = re.compile("^(#[0-9a-f-A-F]{6})\s(.*)$", re.DOTALL)
-            color = color_a.search(a[0])
-            
-            color_b = re.compile("^(#[0-9a-f-A-F]{3})\s(.*)$", re.DOTALL)
-            color_2 = color_b.search(a[0])
-            
-            color_c = re.compile("^#(\w+)\s(.*)$", re.DOTALL)
-            color_3 = color_c.search(a[0])
-            
-            back_a = re.compile("^@([0-9a-f-A-F]{6})\s(.*)$", re.DOTALL)
-            back = back_a.search(a[0])
-            
-            back_b = re.compile("^@([0-9a-f-A-F]{3})\s(.*)$", re.DOTALL)
-            back_2 = back_b.search(a[0])
-            
-            back_c = re.compile("^@(\w+)\s(.*)$", re.DOTALL)
-            back_3 = back_c.search(a[0])
-            
-            include_out_a = re.compile("^#!noin\s(.*)$", re.DOTALL)
-            include_out = include_out_a.search(a[0])
-            
-            div_a = re.compile("^#!wiki\sstyle=(?:&quot;|&apos;)((?:(?!&quot;|&apos;).)*)(?:&quot;|&apos;)\r\n(.*)$", re.DOTALL)
-            div = div_a.search(a[0])
-            
-            html_a = re.compile("^#!html\s(.*)$", re.DOTALL)
-            html = html_a.search(a[0])
-            
-            fol_a = re.compile("^#!folding\s((?:(?!\n).)*)\n?\s\n(.*)$", re.DOTALL)
-            fol = fol_a.search(a[0])
-            
-            syn_a = re.compile("^#!syntax\s([^\n]*)\r\n(.*)$", re.DOTALL)
-            syn = syn_a.search(a[0])
-            
-            if(big):
-                result = big.groups()
-                data = com.sub('<span class="font-size-' + result[0] + '">' + result[1] + '</span>', data, 1)
-            elif(small):
-                result = small.groups()
-                data = com.sub('<span class="font-size-small-' + result[0] + '">' + result[1] + '</span>', data, 1)
-            elif(color):
-                result = color.groups()
-                data = com.sub('<span style="color:' + result[0] + '">' + result[1] + '</span>', data, 1)
-            elif(color_2):
-                result = color_2.groups()
-                data = com.sub('<span style="color:' + result[0] + '">' + result[1] + '</span>', data, 1)
-            elif(color_3):
-                result = color_3.groups()
-                data = com.sub('<span style="color:' + result[0] + '">' + result[1] + '</span>', data, 1)
-            elif(back):
-                result = back.groups()
-                data = com.sub('<span style="background:#' + result[0] + '">' + result[1] + '</span>', data, 1)
-            elif(back_2):
-                result = back_2.groups()
-                data = com.sub('<span style="background:#' + result[0] + '">' + result[1] + '</span>', data, 1)
-            elif(back_3):
-                result = back_3.groups()
-                data = com.sub('<span style="background:' + result[0] + '">' + result[1] + '</span>', data, 1)
-            elif(div):
-                result = div.groups()
-                data = com.sub('<div style="' + result[0] + '">' + result[1] + '</div>', data, 1)
-            elif(html):
-                result = html.groups()
-                data = com.sub(result[0], data, 1)
-            elif(fol):
-                result = fol.groups()
-                data = com.sub( "<div> \
-                                    " + result[0] + " \
-                                    <div id='folding_" + str(fol_num + 1) + "' style='display: inline-block;'> \
-                                        [<a href='javascript:void(0);' onclick='folding(" + str(fol_num + 1) + "); folding(" + str(fol_num + 2) + "); folding(" + str(fol_num) + ");'>펼치기</a>] \
-                                    </div> \
-                                    <div id='folding_" + str(fol_num + 2) + "' style='display: none;'> \
-                                        [<a href='javascript:void(0);' onclick='folding(" + str(fol_num + 1) + "); folding(" + str(fol_num + 2) + "); folding(" + str(fol_num) + ");'>접기</a>] \
-                                    </div> \
-                                    <div id='folding_" + str(fol_num) + "' style='display: none;'> \
-                                        <br> \
-                                        " + result[1] + " \
-                                    </div> \
-                                </div>", data, 1)
-                
-                fol_num += 3
-            elif(syn):
-                result = syn.groups()
-                data = com.sub('<pre id="syntax"><code class="' + result[0] + '">' + re.sub('\r\n', '<isbr>', re.sub(' ', '<space>', result[1])) + '</code></pre>', data, 1)
-            elif(html):
-                result = html.groups()
-                data = com.sub(result[0], data, 1)
-            elif(include_out):
-                if((include or in_c) == 1):
-                    data = com.sub("", data, 1)
-                else:
-                    result = include_out.groups()
-                    data = com.sub(result[0], data, 1)
+    com = re.compile("{{{((?:(?!{{{)(?!}}}).)*)}}}", re.DOTALL)
+    is_it = com.findall(data)
+    for it_d in is_it:                
+        big_a = re.compile("^\+([1-5])\s(.*)$", re.DOTALL)
+        big = big_a.search(it_d[0])
+
+        small_a = re.compile("^\-([1-5])\s(.*)$", re.DOTALL)
+        small = small_a.search(it_d[0])
+
+        color_a = re.compile("^(#[0-9a-f-A-F]{6})\s(.*)$", re.DOTALL)
+        color = color_a.search(it_d[0])
+
+        color_b = re.compile("^(#[0-9a-f-A-F]{3})\s(.*)$", re.DOTALL)
+        color_2 = color_b.search(it_d[0])
+
+        color_c = re.compile("^#(\w+)\s(.*)$", re.DOTALL)
+        color_3 = color_c.search(it_d[0])
+
+        back_a = re.compile("^@([0-9a-f-A-F]{6})\s(.*)$", re.DOTALL)
+        back = back_a.search(it_d[0])
+
+        back_b = re.compile("^@([0-9a-f-A-F]{3})\s(.*)$", re.DOTALL)
+        back_2 = back_b.search(it_d[0])
+
+        back_c = re.compile("^@(\w+)\s(.*)$", re.DOTALL)
+        back_3 = back_c.search(it_d[0])
+
+        include_out_a = re.compile("^#!noin\s(.*)$", re.DOTALL)
+        include_out = include_out_a.search(it_d[0])
+
+        div_a = re.compile("^#!wiki\sstyle=(?:&quot;|&apos;)((?:(?!&quot;|&apos;).)*)(?:&quot;|&apos;)\r\n(.*)$", re.DOTALL)
+        div = div_a.search(it_d[0])
+
+        html_a = re.compile("^#!html\s(.*)$", re.DOTALL)
+        html = html_a.search(it_d[0])
+
+        fol_a = re.compile("^#!folding\s((?:(?!\n).)*)\n?\s\n(.*)$", re.DOTALL)
+        fol = fol_a.search(it_d[0])
+
+        syn_a = re.compile("^#!syntax\s([^\n]*)\r\n(.*)$", re.DOTALL)
+        syn = syn_a.search(it_d[0])
+
+        if(big):
+            big_d = big.groups()
+            data = com.sub('<span class="font-size-' + big_d[0] + '">' + big_d[1] + '</span>', data, 1)
+        elif(small):
+            sm_d = small.groups()
+            data = com.sub('<span class="font-size-small-' + sm_d[0] + '">' + sm_d[1] + '</span>', data, 1)
+        elif(color):
+            c_d_1 = color.groups()
+            data = com.sub('<span style="color: ' + c_d_1[0] + '">' + c_d_1[1] + '</span>', data, 1)
+        elif(color_2):
+            c_d_2 = color_2.groups()
+            data = com.sub('<span style="color: ' + c_d_2[0] + '">' + c_d_2[1] + '</span>', data, 1)
+        elif(color_3):
+            c_d_3 = color_3.groups()
+            data = com.sub('<span style="color: ' + c_d_3[0] + '">' + c_d_3[1] + '</span>', data, 1)
+        elif(back):
+            back_d_1 = back.groups()
+            data = com.sub('<span style="background: #' + back_d_1[0] + '">' + back_d_1[1] + '</span>', data, 1)
+        elif(back_2):
+            back_d_2 = back_2.groups()
+            data = com.sub('<span style="background: #' + back_d_2[0] + '">' + back_d_2[1] + '</span>', data, 1)
+        elif(back_3):
+            back_d_3 = back_3.groups()
+            data = com.sub('<span style="background: ' + back_d_3[0] + '">' + back_d_3[1] + '</span>', data, 1)
+        elif(div):
+            div_d = div.groups()
+            data = com.sub('<div style="' + div_d[0] + '">' + div_d[1] + '</div>', data, 1)
+        elif(html):
+            data = com.sub(html.groups()[0], data, 1)
+        elif(fol):
+            fol_d = fol.groups()
+            data = com.sub( "<div> \
+                                " + fol_d[0] + " \
+                                <div id='folding_" + str(fol_num + 1) + "' style='display: inline-block;'> \
+                                    [<a href='javascript:void(0);' onclick='folding(" + str(fol_num + 1) + "); folding(" + str(fol_num + 2) + "); folding(" + str(fol_num) + ");'>펼치기</a>] \
+                                </div> \
+                                <div id='folding_" + str(fol_num + 2) + "' style='display: none;'> \
+                                    [<a href='javascript:void(0);' onclick='folding(" + str(fol_num + 1) + "); folding(" + str(fol_num + 2) + "); folding(" + str(fol_num) + ");'>접기</a>] \
+                                </div> \
+                                <div id='folding_" + str(fol_num) + "' style='display: none;'> \
+                                    <br> \
+                                    " + fol_d[1] + " \
+                                </div> \
+                            </div>", data, 1)
+
+            fol_num += 3
+        elif(syn):
+            syn_d = syn.groups()
+            data = com.sub('<pre id="syntax"> \
+                                <code class="' + syn_d[0] + '"> \
+                                ' + re.sub('\r\n', '<isbr>', re.sub(' ', '<space>', syn_d[1])) + ' \
+                                </code> \
+                            </pre>', data, 1)
+        elif(include_out):
+            if((include or in_c) == 1):
+                data = com.sub("", data, 1)
             else:
-                data = com.sub('<code>' + a[0] + '</code>', data, 1)
+                data = com.sub(include_out.groups()[0], data, 1)
         else:
-            break
+            data = com.sub('<code>' + it_d[0] + '</code>', data, 1)
             
+# 여기까지 처리
     while(1):
         com = re.compile("<code>(((?!<\/code>).)*)<\/code>", re.DOTALL)
         y = com.search(data)
