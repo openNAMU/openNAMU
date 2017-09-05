@@ -137,7 +137,7 @@ def table_p(d, d2):
     table_bgcolor_1 = re.search("&lt;table\s?bgcolor=(#[0-9a-f-A-F]{6})&gt;", d)
     table_bgcolor_2 = re.search("&lt;table\s?bgcolor=(#[0-9a-f-A-F]{3})&gt;", d)
     table_bgcolor_3 = re.search("&lt;table\s?bgcolor=(\w+)&gt;", d)
-    if(table_bgcolor_1)
+    if(table_bgcolor_1):
         alltable += 'background: ' + table_bgcolor_1.groups()[0] + ';'
     elif(table_bgcolor_2):
         alltable += 'background: ' + table_bgcolor_2.groups()[0] + ';'
