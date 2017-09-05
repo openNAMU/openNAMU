@@ -192,7 +192,7 @@ def html_pas(data):
     
     pas_d = re.findall("<((div|span|embed|iframe)(?:\s[^>]*))>", data)
     for p_d in pas_d:
-        if(re.search("<(\/" + b[1] + ")>", data)):
+        if(re.search("<(\/" + p_d[1] + ")>", data)):
             url_d = re.search('src=(?:"|\')?(http(s)?:\/\/([^\/]*)\/(?:[^"\' ]*))(?:"|\')?', p_d[0])
             if(url_d):
                 check = url_d.groups()
@@ -222,7 +222,10 @@ def html_pas(data):
     data = html.escape(data)
     js_p = re.compile('javascript:', re.I)
     data = js_p.sub('', data)
-    data = re.sub("%phtml%(?P<in>(?:\/)?(?:a|div|span|embed|iframe)(?:\s[^%]*)?)%phtml%", "<\g<in>>", data)
+
+    pas_2 = re.findall("%phtml%(?P<in>(?:\/)?(?:div|span|embed|iframe)(?:\s(?:(?!%phtml%).)*)?)%phtml%", data)
+    for p_d_2 in pas_2:
+        data = re.sub("%phtml%(?P<in>(?:\/)?(?:div|span|embed|iframe)(?:\s(?:(?!%phtml%).)*)?)%phtml%", '<' + p_d_2.replace("&#x27;", "'").replace('&quot;', '"') + '>', data, 1)
     
     return(data)
     
@@ -231,43 +234,43 @@ def mid_pas(data, fol_num, include, in_c):
     is_it = com.findall(data)
     for it_d in is_it:                
         big_a = re.compile("^\+([1-5])\s(.*)$", re.DOTALL)
-        big = big_a.search(it_d[0])
+        big = big_a.search(it_d)
 
         small_a = re.compile("^\-([1-5])\s(.*)$", re.DOTALL)
-        small = small_a.search(it_d[0])
+        small = small_a.search(it_d)
 
         color_a = re.compile("^(#[0-9a-f-A-F]{6})\s(.*)$", re.DOTALL)
-        color = color_a.search(it_d[0])
+        color = color_a.search(it_d)
 
         color_b = re.compile("^(#[0-9a-f-A-F]{3})\s(.*)$", re.DOTALL)
-        color_2 = color_b.search(it_d[0])
+        color_2 = color_b.search(it_d)
 
         color_c = re.compile("^#(\w+)\s(.*)$", re.DOTALL)
-        color_3 = color_c.search(it_d[0])
+        color_3 = color_c.search(it_d)
 
         back_a = re.compile("^@([0-9a-f-A-F]{6})\s(.*)$", re.DOTALL)
-        back = back_a.search(it_d[0])
+        back = back_a.search(it_d)
 
         back_b = re.compile("^@([0-9a-f-A-F]{3})\s(.*)$", re.DOTALL)
-        back_2 = back_b.search(it_d[0])
+        back_2 = back_b.search(it_d)
 
         back_c = re.compile("^@(\w+)\s(.*)$", re.DOTALL)
-        back_3 = back_c.search(it_d[0])
+        back_3 = back_c.search(it_d)
 
         include_out_a = re.compile("^#!noin\s(.*)$", re.DOTALL)
-        include_out = include_out_a.search(it_d[0])
+        include_out = include_out_a.search(it_d)
 
         div_a = re.compile("^#!wiki\sstyle=(?:&quot;|&apos;)((?:(?!&quot;|&apos;).)*)(?:&quot;|&apos;)\r\n(.*)$", re.DOTALL)
-        div = div_a.search(it_d[0])
+        div = div_a.search(it_d)
 
         html_a = re.compile("^#!html\s(.*)$", re.DOTALL)
-        html = html_a.search(it_d[0])
+        html = html_a.search(it_d)
 
         fol_a = re.compile("^#!folding\s((?:(?!\n).)*)\n?\s\n(.*)$", re.DOTALL)
-        fol = fol_a.search(it_d[0])
+        fol = fol_a.search(it_d)
 
         syn_a = re.compile("^#!syntax\s([^\n]*)\r\n(.*)$", re.DOTALL)
-        syn = syn_a.search(it_d[0])
+        syn = syn_a.search(it_d)
 
         if(big):
             big_d = big.groups()
@@ -328,7 +331,7 @@ def mid_pas(data, fol_num, include, in_c):
             else:
                 data = com.sub(include_out.groups()[0], data, 1)
         else:
-            data = com.sub('<code>' + it_d[0] + '</code>', data, 1)
+            data = com.sub('<code>' + it_d + '</code>', data, 1)
             
 # 여기까지 처리
     while(1):
