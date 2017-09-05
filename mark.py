@@ -333,25 +333,20 @@ def mid_pas(data, fol_num, include, in_c):
         else:
             data = com.sub('<code>' + it_d + '</code>', data, 1)
             
-# 여기까지 처리
-    while(1):
-        com = re.compile("<code>(((?!<\/code>).)*)<\/code>", re.DOTALL)
-        y = com.search(data)
-        if(y):
-            a = y.groups()
-            
-            mid_data = re.sub("<\/span>", "}}}", a[0])
-            mid_data = re.sub("<\/div>", "}}}", mid_data)
-            mid_data = re.sub('<span class="font\-size\-(?P<in>[1-6])">', "{{{+\g<in> ", mid_data)
-            mid_data = re.sub('<span class="font\-size\-small\-(?P<in>[1-6])">', "{{{-\g<in> ", mid_data)
-            mid_data = re.sub('<span style="color:(?:#)?(?P<in>[^"]*)">', "{{{#\g<in> ", mid_data)
-            mid_data = re.sub('<span style="background:(?:#)?(?P<in>[^"]*)">', "{{{@\g<in> ", mid_data)
-            mid_data = re.sub('<div style="(?P<in>[^"]*)">', "{{{#!wiki style=\"\g<in>\"\n", mid_data)
-            mid_data = re.sub("(?P<in>.)", "<nowiki>\g<in></nowiki>", mid_data)
-            
-            data = com.sub(mid_data, data, 1)
-        else:
-            break
+    com = re.compile("<code>((?:(?!<\/code>).)*)<\/code>", re.DOTALL)
+    da_com = com.findall(data)
+    for com_da in da_com:
+        mid_data = re.sub("<\/span>", "}}}", com_da)
+        mid_data = re.sub("<\/div>", "}}}", mid_data)
+        mid_data = re.sub('<span class="font\-size\-(?P<in>[1-6])">', "{{{+\g<in> ", mid_data)
+        mid_data = re.sub('<span class="font\-size\-small\-(?P<in>[1-6])">', "{{{-\g<in> ", mid_data)
+        mid_data = re.sub('<span style="color:(?:#)?(?P<in>[^"]*)">', "{{{#\g<in> ", mid_data)
+        mid_data = re.sub('<span style="background:(?:#)?(?P<in>[^"]*)">', "{{{@\g<in> ", mid_data)
+        mid_data = re.sub('<div style="(?P<in>[^"]*)">', "{{{#!wiki style=\"\g<in>\"\n", mid_data)
+        mid_data = mid_data.replace('<', '&lt;').replace('>', '&gt;')  
+        mid_data = re.sub("(?P<in>.)", "<nowiki>\g<in></nowiki>", mid_data)
+              
+        data = com.sub(mid_data, data, 1)
             
     return([data, fol_num])
 
