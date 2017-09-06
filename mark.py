@@ -231,107 +231,112 @@ def html_pas(data):
     
 def mid_pas(data, fol_num, include, in_c):
     com = re.compile("{{{((?:(?!{{{)(?!}}}).)*)}}}", re.DOTALL)
-    is_it = com.findall(data)
-    for it_d in is_it:                
-        big_a = re.compile("^\+([1-5])\s(.*)$", re.DOTALL)
-        big = big_a.search(it_d)
+    while(1):
+        is_it = com.search(data)
+        if(is_it):
+            it_d = is_it.groups()[0]
 
-        small_a = re.compile("^\-([1-5])\s(.*)$", re.DOTALL)
-        small = small_a.search(it_d)
+            big_a = re.compile("^\+([1-5])\s(.*)$", re.DOTALL)
+            big = big_a.search(it_d)
 
-        color_a = re.compile("^(#[0-9a-f-A-F]{6})\s(.*)$", re.DOTALL)
-        color = color_a.search(it_d)
+            small_a = re.compile("^\-([1-5])\s(.*)$", re.DOTALL)
+            small = small_a.search(it_d)
 
-        color_b = re.compile("^(#[0-9a-f-A-F]{3})\s(.*)$", re.DOTALL)
-        color_2 = color_b.search(it_d)
+            color_a = re.compile("^(#[0-9a-f-A-F]{6})\s(.*)$", re.DOTALL)
+            color = color_a.search(it_d)
 
-        color_c = re.compile("^#(\w+)\s(.*)$", re.DOTALL)
-        color_3 = color_c.search(it_d)
+            color_b = re.compile("^(#[0-9a-f-A-F]{3})\s(.*)$", re.DOTALL)
+            color_2 = color_b.search(it_d)
 
-        back_a = re.compile("^@([0-9a-f-A-F]{6})\s(.*)$", re.DOTALL)
-        back = back_a.search(it_d)
+            color_c = re.compile("^#(\w+)\s(.*)$", re.DOTALL)
+            color_3 = color_c.search(it_d)
 
-        back_b = re.compile("^@([0-9a-f-A-F]{3})\s(.*)$", re.DOTALL)
-        back_2 = back_b.search(it_d)
+            back_a = re.compile("^@([0-9a-f-A-F]{6})\s(.*)$", re.DOTALL)
+            back = back_a.search(it_d)
 
-        back_c = re.compile("^@(\w+)\s(.*)$", re.DOTALL)
-        back_3 = back_c.search(it_d)
+            back_b = re.compile("^@([0-9a-f-A-F]{3})\s(.*)$", re.DOTALL)
+            back_2 = back_b.search(it_d)
 
-        include_out_a = re.compile("^#!noin\s(.*)$", re.DOTALL)
-        include_out = include_out_a.search(it_d)
+            back_c = re.compile("^@(\w+)\s(.*)$", re.DOTALL)
+            back_3 = back_c.search(it_d)
 
-        div_a = re.compile("^#!wiki\sstyle=(?:&quot;|&apos;)((?:(?!&quot;|&apos;).)*)(?:&quot;|&apos;)\r\n(.*)$", re.DOTALL)
-        div = div_a.search(it_d)
+            include_out_a = re.compile("^#!noin\s(.*)$", re.DOTALL)
+            include_out = include_out_a.search(it_d)
 
-        html_a = re.compile("^#!html\s(.*)$", re.DOTALL)
-        html = html_a.search(it_d)
+            div_a = re.compile("^#!wiki\sstyle=(?:&quot;|&apos;)((?:(?!&quot;|&apos;).)*)(?:&quot;|&apos;)\r\n(.*)$", re.DOTALL)
+            div = div_a.search(it_d)
 
-        fol_a = re.compile("^#!folding\s((?:(?!\n).)*)\n?\s\n(.*)$", re.DOTALL)
-        fol = fol_a.search(it_d)
+            html_a = re.compile("^#!html\s(.*)$", re.DOTALL)
+            html = html_a.search(it_d)
 
-        syn_a = re.compile("^#!syntax\s([^\n]*)\r\n(.*)$", re.DOTALL)
-        syn = syn_a.search(it_d)
+            fol_a = re.compile("^#!folding\s((?:(?!\n).)*)\n?\s\n(.*)$", re.DOTALL)
+            fol = fol_a.search(it_d)
 
-        if(big):
-            big_d = big.groups()
-            data = com.sub('<span class="font-size-' + big_d[0] + '">' + big_d[1] + '</span>', data, 1)
-        elif(small):
-            sm_d = small.groups()
-            data = com.sub('<span class="font-size-small-' + sm_d[0] + '">' + sm_d[1] + '</span>', data, 1)
-        elif(color):
-            c_d_1 = color.groups()
-            data = com.sub('<span style="color: ' + c_d_1[0] + '">' + c_d_1[1] + '</span>', data, 1)
-        elif(color_2):
-            c_d_2 = color_2.groups()
-            data = com.sub('<span style="color: ' + c_d_2[0] + '">' + c_d_2[1] + '</span>', data, 1)
-        elif(color_3):
-            c_d_3 = color_3.groups()
-            data = com.sub('<span style="color: ' + c_d_3[0] + '">' + c_d_3[1] + '</span>', data, 1)
-        elif(back):
-            back_d_1 = back.groups()
-            data = com.sub('<span style="background: #' + back_d_1[0] + '">' + back_d_1[1] + '</span>', data, 1)
-        elif(back_2):
-            back_d_2 = back_2.groups()
-            data = com.sub('<span style="background: #' + back_d_2[0] + '">' + back_d_2[1] + '</span>', data, 1)
-        elif(back_3):
-            back_d_3 = back_3.groups()
-            data = com.sub('<span style="background: ' + back_d_3[0] + '">' + back_d_3[1] + '</span>', data, 1)
-        elif(div):
-            div_d = div.groups()
-            data = com.sub('<div style="' + div_d[0] + '">' + div_d[1] + '</div>', data, 1)
-        elif(html):
-            data = com.sub(html.groups()[0], data, 1)
-        elif(fol):
-            fol_d = fol.groups()
-            data = com.sub( "<div> \
-                                " + fol_d[0] + " \
-                                <div id='folding_" + str(fol_num + 1) + "' style='display: inline-block;'> \
-                                    [<a href='javascript:void(0);' onclick='folding(" + str(fol_num + 1) + "); folding(" + str(fol_num + 2) + "); folding(" + str(fol_num) + ");'>펼치기</a>] \
-                                </div> \
-                                <div id='folding_" + str(fol_num + 2) + "' style='display: none;'> \
-                                    [<a href='javascript:void(0);' onclick='folding(" + str(fol_num + 1) + "); folding(" + str(fol_num + 2) + "); folding(" + str(fol_num) + ");'>접기</a>] \
-                                </div> \
-                                <div id='folding_" + str(fol_num) + "' style='display: none;'> \
-                                    <br> \
-                                    " + fol_d[1] + " \
-                                </div> \
-                            </div>", data, 1)
+            syn_a = re.compile("^#!syntax\s([^\n]*)\r\n(.*)$", re.DOTALL)
+            syn = syn_a.search(it_d)
 
-            fol_num += 3
-        elif(syn):
-            syn_d = syn.groups()
-            data = com.sub('<pre id="syntax"> \
-                                <code class="' + syn_d[0] + '"> \
-                                ' + re.sub('\r\n', '<isbr>', re.sub(' ', '<space>', syn_d[1])) + ' \
-                                </code> \
-                            </pre>', data, 1)
-        elif(include_out):
-            if((include or in_c) == 1):
-                data = com.sub("", data, 1)
+            if(big):
+                big_d = big.groups()
+                data = com.sub('<span class="font-size-' + big_d[0] + '">' + big_d[1] + '</span>', data, 1)
+            elif(small):
+                sm_d = small.groups()
+                data = com.sub('<span class="font-size-small-' + sm_d[0] + '">' + sm_d[1] + '</span>', data, 1)
+            elif(color):
+                c_d_1 = color.groups()
+                data = com.sub('<span style="color: ' + c_d_1[0] + '">' + c_d_1[1] + '</span>', data, 1)
+            elif(color_2):
+                c_d_2 = color_2.groups()
+                data = com.sub('<span style="color: ' + c_d_2[0] + '">' + c_d_2[1] + '</span>', data, 1)
+            elif(color_3):
+                c_d_3 = color_3.groups()
+                data = com.sub('<span style="color: ' + c_d_3[0] + '">' + c_d_3[1] + '</span>', data, 1)
+            elif(back):
+                back_d_1 = back.groups()
+                data = com.sub('<span style="background: #' + back_d_1[0] + '">' + back_d_1[1] + '</span>', data, 1)
+            elif(back_2):
+                back_d_2 = back_2.groups()
+                data = com.sub('<span style="background: #' + back_d_2[0] + '">' + back_d_2[1] + '</span>', data, 1)
+            elif(back_3):
+                back_d_3 = back_3.groups()
+                data = com.sub('<span style="background: ' + back_d_3[0] + '">' + back_d_3[1] + '</span>', data, 1)
+            elif(div):
+                div_d = div.groups()
+                data = com.sub('<div style="' + div_d[0] + '">' + div_d[1] + '</div>', data, 1)
+            elif(html):
+                data = com.sub(html.groups()[0], data, 1)
+            elif(fol):
+                fol_d = fol.groups()
+                data = com.sub( "<div> \
+                                    " + fol_d[0] + " \
+                                    <div id='folding_" + str(fol_num + 1) + "' style='display: inline-block;'> \
+                                        [<a href='javascript:void(0);' onclick='folding(" + str(fol_num + 1) + "); folding(" + str(fol_num + 2) + "); folding(" + str(fol_num) + ");'>펼치기</a>] \
+                                    </div> \
+                                    <div id='folding_" + str(fol_num + 2) + "' style='display: none;'> \
+                                        [<a href='javascript:void(0);' onclick='folding(" + str(fol_num + 1) + "); folding(" + str(fol_num + 2) + "); folding(" + str(fol_num) + ");'>접기</a>] \
+                                    </div> \
+                                    <div id='folding_" + str(fol_num) + "' style='display: none;'> \
+                                        <br> \
+                                        " + fol_d[1] + " \
+                                    </div> \
+                                </div>", data, 1)
+
+                fol_num += 3
+            elif(syn):
+                syn_d = syn.groups()
+                data = com.sub('<pre id="syntax"> \
+                                    <code class="' + syn_d[0] + '"> \
+                                    ' + re.sub('\r\n', '<isbr>', re.sub(' ', '<space>', syn_d[1])) + ' \
+                                    </code> \
+                                </pre>', data, 1)
+            elif(include_out):
+                if((include or in_c) == 1):
+                    data = com.sub("", data, 1)
+                else:
+                    data = com.sub(include_out.groups()[0], data, 1)
             else:
-                data = com.sub(include_out.groups()[0], data, 1)
+                data = com.sub('<code>' + it_d + '</code>', data, 1)
         else:
-            data = com.sub('<code>' + it_d + '</code>', data, 1)
+            break
             
     com = re.compile("<code>((?:(?!<\/code>).)*)<\/code>", re.DOTALL)
     da_com = com.findall(data)
