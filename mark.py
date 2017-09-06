@@ -341,7 +341,6 @@ def mid_pas(data, fol_num, include, in_c):
     com = re.compile("<code>((?:(?!(?:<code>|<\/code>)).)*)<\/code>", re.DOTALL)
     da_com = com.findall(data)
     for com_da in da_com:
-        print(com_da)
         mid_data = re.sub("<\/span>", "}}}", com_da)
         mid_data = re.sub("<\/div>", "}}}", mid_data)
         mid_data = re.sub('<span class="font\-size\-(?P<in>[1-6])">', "{{{+\g<in> ", mid_data)
