@@ -48,7 +48,7 @@ def redirect(data):
 from func import *
 
 r_ver = '2.2.2'
-p_ver = 'b'
+p_ver = 'c'
 
 try:
     curs.execute('select data from other where name = "version"')
