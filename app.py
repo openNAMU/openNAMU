@@ -547,7 +547,7 @@ def user_log(num = 1):
         else:
             ban_button = ''
             
-        ip = ip_pas(data[0], None)
+        ip = ip_pas(data[0], 2)
             
         list_data += '<li>' + str(j + 1) + '. ' + ip + ban_button + '</li>'
         
