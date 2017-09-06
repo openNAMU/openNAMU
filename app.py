@@ -2836,6 +2836,11 @@ def user_info():
         
     ip = ip_pas(ip, 2)
 
+    if(login_check() == 1):
+        plus = '<li><a href="/logout">로그아웃</a></li>'
+    else:
+        plus = '<li><a href="/login">로그인</a></li>'
+
     return(
         template('other', 
             custom_css = custom_css(), 
@@ -2849,8 +2854,7 @@ def user_info():
                     <br> \
                     <span>권한 상태 : ' + acl + '</span> \
                     <h2>로그인 관련</h2> \
-                    <li><a href="/login">로그인</a></li> \
-                    <li><a href="/logout">로그아웃</a></li> \
+                    ' + plus + ' \
                     <li><a href="/register">회원가입</a></li> \
                     <h2>기타</h2> \
                     <li><a href="/change">비밀번호 변경</a></li> \
