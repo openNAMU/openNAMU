@@ -21,10 +21,7 @@ except:
     new_json += [input()]
 
     with open("set.json", "w") as f:
-        f.write('{ \
-                    "db" : "' + new_json[0] + '", \
-                    "port" : "' + new_json[1] + '" \
-                }')
+        f.write('{ "db" : "' + new_json[0] + '", "port" : "' + new_json[1] + '" }')
     
     json_data = open('set.json').read()
     set_data = json.loads(json_data)
