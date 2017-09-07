@@ -382,9 +382,15 @@ body {
     margin-right: 10px;
 }
 
-#list {
-    margin-top: 10px;
-    margin-bottom: 10px;
+.popup {
+    position: fixed;
+    padding: 10px;
+    background: #f5f5f5;
+    width: 100%;
+    bottom: 0px;
+    left: 0px;
+    text-align: center;
+    box-shadow: 0 -1px 8px 0 rgba(0,0,0,0.35);
 }
 
 .foot {

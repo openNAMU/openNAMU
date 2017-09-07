@@ -323,11 +323,7 @@ def mid_pas(data, fol_num, include, in_c):
                 fol_num += 3
             elif(syn):
                 syn_d = syn.groups()
-                data = com.sub('<pre id="syntax"> \
-                                    <code class="' + syn_d[0] + '"> \
-                                    ' + re.sub('\r\n', '<isbr>', re.sub(' ', '<space>', syn_d[1])) + ' \
-                                    </code> \
-                                </pre>', data, 1)
+                data = com.sub('<pre id="syntax"><code class="' + syn_d[0] + '">' + re.sub('\r\n', '<isbr>', re.sub(' ', '<space>', syn_d[1])) + '</code></pre>', data, 1)
             elif(include_out):
                 if((include or in_c) == 1):
                     data = com.sub("", data, 1)
@@ -458,11 +454,11 @@ def cat_plus(name, link, num):
 def namumark(title, data, num, in_c):    
     data = html_pas(data)
 
-    b = 0
-    a = mid_pas(data, b, 0, in_c)
+    fol_num = 0
+    var_d = mid_pas(data, fol_num, 0, in_c)
     
-    data = a[0]
-    b = a[1]
+    data = var_d[0]
+    fol_num = var_d[1]
     
     data = re.sub("\[anchor\((?P<in>[^\[\]]*)\)\]", '<span id="\g<in>"></span>', data)
     data = savemark(data)
@@ -484,7 +480,10 @@ def namumark(title, data, num, in_c):
                     in_data = include.sub("", in_data)
                     
                     in_data = html_pas(in_data)
-                    in_data = mid_pas(in_data, b, 1, in_c)[0]
+                    var_d = mid_pas(in_data, fol_num, 1, in_c)
+                    
+                    in_data = var_d[0]
+                    fol_num = var_d[1]
                     
                     if(results[1]):
                         a = results[1]
@@ -835,28 +834,40 @@ def namumark(title, data, num, in_c):
                         break
                         
                 if(none_this == 0):
-                    data = re.sub("\[\*([^\s]*)(?:\s(((?!\[|\]).)*))?\]", "<sup><a title=\"" + namu[i + 1] + "\" id=\"rfn-" + str(a) + "\" href=\"#fn-" + str(a) + "\">[" + results[0] + "]</a></sup>", data, 1)
+                    data = re.sub("\[\*([^\s]*)(?:\s(((?!\[|\]).)*))?\]",   "<sup> \
+                                                                                <a href='javascript:void(0);' onclick='folding(" + str(fol_num) + ");' id='rfn-" + str(a) + "'>[" + results[0] + "]</a> \
+                                                                            </sup> \
+                                                                            <div class='popup' style='display: none;' id='folding_" + str(fol_num) + "'> \
+                                                                                <a onclick='folding(" + str(fol_num) + ");' href='#fn-" + str(a) + "'>[" + results[0] + "]</a> <a href='javascript:void(0);' onclick='folding(" + str(fol_num) + ");'>[X]</a> " + namu[i + 1] + " \
+                                                                            </div>", data, 1)
                 else:
-                    data = re.sub("\[\*([^\s]*)(?:\s(((?!\[|\]).)*))?\]", "<sup><a id=\"rfn-" + str(a) + "\" href=\"#fn-" + str(a) + "\">[" + results[0] + "]</a></sup>", data, 1)
-            elif(results[0]):                
-                namu += [results[0]]
-                namu += [results[1]]
-                
-                c = results[1]
-                c = re.sub("<(?:[^>]*)>", '', c)
-
-                tou += "<span id='footnote-list'><a href=\"#rfn-" + str(a) + "\" id=\"fn-" + str(a) + "\">[" + results[0] + "]</a> " + results[1] + "</span><br>"
-                data = re.sub("\[\*([^\s]*)(?:\s(((?!\[|\]).)*))?\]", "<sup><a title=\"" + c + "\" id=\"rfn-" + str(a) + "\" href=\"#fn-" + str(a) + "\">[" + results[0] + "]</a></sup>", data, 1)     
-
-                a += 1
+                    data = re.sub("\[\*([^\s]*)(?:\s(((?!\[|\]).)*))?\]",   "<sup> \
+                                                                                <a href='javascript:void(0);' id='rfn-" + str(a) + "'>[" + results[0] + "]</a> \
+                                                                            </sup>", data, 1)
             else:
-                c = results[1]
-                c = re.sub("<(?:[^>]*)>", '', c)
-                
-                tou += "<span id='footnote-list'><a href=\"#rfn-" + str(a) + "\" id=\"fn-" + str(a) + "\">[" + str(a) + "]</a> " + results[1] + "</span><br>"
-                data = re.sub("\[\*([^\s]*)(?:\s(((?!\[|\]).)*))?\]", '<sup><a title="' + c + '" id="rfn-' + str(a) + '" href="#fn-' + str(a) + '">[' + str(a) + ']</a></sup>', data, 1)
+                if(results[0]):                
+                    namu += [results[0]]
+                    namu += [results[1]]
+
+                    tou += "<span id='footnote-list'><a href='#rfn-" + str(a) + "' id='fn-" + str(a) + "'>[" + results[0] + "]</a> " + results[1] + "</span><br>"
+                    data = re.sub("\[\*([^\s]*)(?:\s(((?!\[|\]).)*))?\]",   "<sup> \
+                                                                                <a href='javascript:void(0);' onclick='folding(" + str(fol_num) + ");' id='rfn-" + str(a) + "'>[" + results[0] + "]</a> \
+                                                                            </sup> \
+                                                                            <div class='popup' style='display: none;' id='folding_" + str(fol_num) + "'> \
+                                                                                <a onclick='folding(" + str(fol_num) + ");' href='#fn-" + str(a) + "'>[" + results[0] + "]</a> <a href='javascript:void(0);' onclick='folding(" + str(fol_num) + ");'>[X]</a> " + results[1] + " \
+                                                                            </div>", data, 1)     
+                else:                    
+                    tou += "<span id='footnote-list'><a href='#rfn-" + str(a) + "' id='fn-" + str(a) + "'>[" + str(a) + "]</a> " + results[1] + "</span><br>"
+                    data = re.sub("\[\*([^\s]*)(?:\s(((?!\[|\]).)*))?\]",   '<sup> \
+                                                                                <a href="javascript:void(0);" onclick="folding(' + str(fol_num) + ');" id="rfn-' + str(a) + '">[' + str(a) + ']</a> \
+                                                                            </sup> \
+                                                                            <div class="popup" style="display: none;" id="folding_' + str(fol_num) + '"> \
+                                                                                <a onclick="folding(' + str(fol_num) + ');" href="#fn-' + str(a) + '">[' + str(a) + ']</a> <a href="javascript:void(0);" onclick="folding(' + str(fol_num) + ');">[X]</a> ' + results[1] + ' \
+                                                                            </div>', data, 1)
 
                 a += 1
+
+            fol_num += 2
         else:
             tou += '</div>'
 

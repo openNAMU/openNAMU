@@ -887,8 +887,12 @@ def deep_search(name = None, num = 1):
     
     if(all_list != ''):
         for data in all_list:
-            re_title = re.compile(name, re.I)
-            if(re.search(re_title, data[0])):
+            try:
+                var_re = re.search(name, data[0])
+            except:
+                var_re = re.search('\\' + name, data[0])
+                
+            if(var_re):
                 if(no == 0):
                     div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a> (문서명)</li>'
                 else:
