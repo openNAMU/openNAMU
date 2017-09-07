@@ -44,8 +44,8 @@ def redirect(data):
     
 from func import *
 
-r_ver = '2.2.2'
-p_ver = 'c'
+r_ver = '2.2.3'
+p_ver = ''
 
 try:
     curs.execute('select data from other where name = "version"')
@@ -703,7 +703,7 @@ def blocklog(num = 1):
         div +=      '</tbody> \
                 </table> \
                 <br> \
-                <a href="/xref/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전)</a> <a href="/xref/' + url_pas(name) + '/n/' + str(num + 1) + '">(이후)</a>'
+                <a href="/blocklog/n/' + str(num - 1) + '">(이전)</a> <a href="/blocklog/n/' + str(num + 1) + '">(이후)</a>'
                 
     return(
         template('other', 

@@ -17,7 +17,7 @@ conn = pymysql.connect(
 )
 curs = conn.cursor(pymysql.cursors.DictCursor)   
 
-r_ver = '2.2.2'
+r_ver = '2.2.3'
 
 curs2.execute("create table data(title text, data text, acl text)")
 curs2.execute("create table history(id text, title text, data text, date text, ip text, send text, leng text)")
