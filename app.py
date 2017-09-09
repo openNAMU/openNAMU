@@ -321,21 +321,18 @@ def admin_plus(name = None):
             data += '<li><input type="checkbox" name="acl" ' + exist_list[4] + '> 문서 ACL</li>'
             data += '<li><input type="checkbox" name="hidel" ' + exist_list[5] + '> 역사 숨김</li>'
             data += '<li><input type="checkbox" name="owner" ' + exist_list[7] + '> 소유자</li>'
-                  
+
             return(
-                template('other', 
-                    custom_css = custom_css(), 
-                    custom_js = custom_js(),
-                    license = wiki_set(3), 
-                    login = login_check(), 
-                    title = '관리 그룹 추가', 
-                    logo = wiki_set(1), 
+                template(
+                    'index', 
+                    imp = ['관리 그룹 추가', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
                     data = '<form method="post">' \
                                 + data + \
                                 '<div class="form-actions"> \
                                     <button class="btn btn-primary" type="submit">저장</button> \
                                 </div> \
-                            </form>'
+                            </form>',
+                    menu = [['manager', '관리자']]
                 )
             )
     else:
@@ -641,11 +638,13 @@ def blocklog(num = 1):
     div =   '<table style="width: 100%; text-align: center;"> \
                 <tbody> \
                     <tr> \
-                        <td style="width: 20%;">차단자</td> \
-                        <td style="width: 20%;">관리자</td> \
-                        <td style="width: 20%;">기간</td> \
-                        <td style="width: 20%;">이유</td> \
-                        <td style="width: 20%;">시간</td> \
+                        <td style="width: 33.3%;">차단자</td> \
+                        <td style="width: 33.3%;">관리자</td> \
+                        <td style="width: 33.3%;">기간</td> \
+                    </tr> \
+                    <tr> \
+                        <td colspan="2">이유</td> \
+                        <td>시간</td> \
                     </tr>'
     
     curs.execute("select why, block, blocker, end, today from rb order by today desc limit ?, ?", [str(i), str(v)])
@@ -657,13 +656,20 @@ def blocklog(num = 1):
         if(b):
             ip = data[1] + ' (대역)'
         else:
-            ip = data[1]
+            ip = ip_pas(data[1], 2)
+
+        if(not data[3] == ''):
+            end = data[3]
+        else:
+            end = '무기한'
             
         div += '<tr> \
                     <td>' + ip + '</td> \
-                    <td>' + data[2] + '</td> \
-                    <td>' + data[3] + '</td> \
-                    <td>' + why + '</td> \
+                    <td>' + ip_pas(data[2], 2) + '</td> \
+                    <td>' + end + '</td> \
+                </tr> \
+                <tr> \
+                    <td colspan="2">' + why + '</td> \
                     <td>' + data[4] + '</td> \
                 </tr>'
     else:
@@ -1408,7 +1414,7 @@ def manager(num = 1):
                 imp = ['관리자 메뉴', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
                 data = '<h2 style="margin-top: 0px;">목록</h2> \
                         <li><a href="/manager/2">문서 ACL</a></li> \
-                        <li><a href="/manager/3">사용자 체크</a></li> \
+                        <li><a href="/manager/3">사용자 검사</a></li> \
                         <li><a href="/manager/4">사용자 차단</a></li> \
                         <li><a href="/manager/5">관리자 권한 주기</a></li> \
                         <li><a href="/m_del">많은 문서 삭제</a></li> \
@@ -2164,45 +2170,38 @@ def user_check(name = None):
         return(redirect('/error/4'))
 
     if(admin_check(4) == 1):
-        m = re.search('^(?:[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}?)$', name)
-        if(m):
-            sql = 'ip'
+        if(re.search('^(?:[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}?)$', name)):
+            curs.execute("select user, ip, today from login where ip = ? order by today desc", [name])
         else:
-            sql = 'user'
-
-        curs.execute("select user, ip, today from login where ? = ? order by today desc", [sql, name])
+            curs.execute("select user, ip, today from login where user = ? order by today desc", [name])
         row = curs.fetchall()
         if(row):
-            c = '<div> \
-                    <table style="width: 100%; text-align: center;"> \
-                        <tbody> \
-                            <tr> \
-                                <td style="width: 33.3%;">이름</td> \
-                                <td style="width: 33.3%;">아이피</td> \
-                                <td style="width: 33.3%;">언제</td> \
-                            </tr>'
+            c = '<table style="width: 100%; text-align: center;"> \
+                    <tbody> \
+                        <tr> \
+                            <td style="width: 33.3%;">이름</td> \
+                            <td style="width: 33.3%;">아이피</td> \
+                            <td style="width: 33.3%;">언제</td> \
+                        </tr>'
+
             for data in row:
                 c +=    '<tr> \
-                            <td>' + data[0] + '</td> \
-                            <td>' + data[1] + '</td> \
+                            <td>' + ip_pas(data[0], 2) + '</td> \
+                            <td>' + ip_pas(data[1], 2) + '</td> \
                             <td>' + data[2] + '</td> \
                         </tr>'
             else:
-                c +=            '</tbody> \
-                            </table> \
-                        </div>'
+                c +=        '</tbody> \
+                        </table>'
         else:
             c = ''
                 
         return(
-            template('other', 
-                custom_css = custom_css(), 
-                custom_js = custom_js(),
-                license = wiki_set(3), 
-                login = login_check(), 
-                title = '다중 검사', 
-                logo = wiki_set(1), 
-                data = c
+            template(
+                'index',    
+                imp = ['다중 검사', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
+                data = c,
+                menu = [['manager', '관리자']]
             )
         )
     else:
@@ -2950,46 +2949,46 @@ def error_test(num = None):
         title = '권한 오류'
         data = '권한이 모자랍니다.'
     elif(num == 4):
-        title = '권한 오류', 
+        title = '권한 오류'
         data = '관리자는 차단, 검사 할 수 없습니다.'
     elif(num == 5):
-        title = '사용자 오류', 
+        title = '사용자 오류'
         data = '그런 계정이 없습니다.'
     elif(num == 6):
-        title = '가입 오류', 
+        title = '가입 오류'
         data = '동일한 아이디의 사용자가 있습니다.'
     elif(num == 7):
-        title = '가입 오류', 
+        title = '가입 오류'
         data = '아이디는 20글자보다 짧아야 합니다.'
     elif(num == 8):
-        title = '가입 오류', 
+        title = '가입 오류'
         data = '아이디에는 한글과 알파벳과 공백만 허용 됩니다.'
     elif(num == 10):
-        title = '변경 오류', 
+        title = '변경 오류'
         data = '비밀번호가 다릅니다.'
     elif(num == 11):
-        title = '로그인 오류', 
+        title = '로그인 오류'
         data = '이미 로그인 되어 있습니다.'
     elif(num == 14):
-        title = '업로드 오류', 
+        title = '업로드 오류'
         data = 'jpg, gif, jpeg, png만 가능 합니다.'
     elif(num == 15):
-        title = '편집 오류', 
+        title = '편집 오류'
         data = '편집 기록은 500자를 넘을 수 없습니다.'
     elif(num == 16):
-        title = '업로드 오류', 
+        title = '업로드 오류'
         data = '동일한 이름의 파일이 있습니다.'
     elif(num == 17):
-        title = '업로드 오류', 
+        title = '업로드 오류'
         data = '파일 용량은 ' + wiki_set(4) + 'MB를 넘길 수 없습니다.'
     elif(num == 18):
-        title = '편집 오류', 
+        title = '편집 오류'
         data = '내용이 원래 문서와 동일 합니다.'
     elif(num == 19):
-        title = '이동 오류', 
+        title = '이동 오류'
         data = '이동 하려는 곳에 문서가 이미 있습니다.'
     elif(num == 20):
-        title = '비밀번호 오류', 
+        title = '비밀번호 오류'
         data = '재 확인이랑 비밀번호가 다릅니다.'
 
     if(title):
