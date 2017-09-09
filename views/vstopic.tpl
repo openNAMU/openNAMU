@@ -11,12 +11,13 @@
 <h1 class="title">
     {{title}}
     <sub> ({{sub}})</sub>
+    <a id="reload" href="javascript:location.href.endsWith('#reload') ?  location.reload(true) : location.href = '#reload'"><i aria-hidden="true" class="fa fa-refresh"></i></i>
+</a>
 </h1>
 <h2 style="margin-top: -15px;">{{toron}}</h2>
 <br>
 {{!rows}}
 % if(not ban == 1):
-    <a id="reload" href="javascript:window.location.reload(true);">(갱신)</a> <a href="#reload">(갱신 전에 누르시오)</a>
     <form id="usrform" style="{{style}}" method="POST" action="/topic/{{page}}/sub/{{suburl}}">
         <br>
         <textarea rows="10" cols="100" name="content" form="usrform"></textarea>
