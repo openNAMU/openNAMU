@@ -12,12 +12,25 @@
         <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS_CHTML"></script>
         <style>{{!imp[4]}}</style>
         <script>{{!imp[5]}}</script>
+        <script>
+            function folding(num) {
+                var fol = document.getElementById('folding_' + num);
+                if(fol.style.display == 'inline-block' || fol.style.display == 'block') {
+                    fol.style.display = 'none';
+                } else {
+                    if(num % 3 == 0) {
+                        fol.style.display = 'block';
+                    } else {
+                        fol.style.display = 'inline-block';
+                    }
+                }
+            }
+        </script>
         <!-- 필수 부분 끝 -->
         <meta name="twitter:creator" content="@{{imp[1]}}">
         <meta name="twitter:title" content="{{imp[0]}}">
         <meta name="twitter:site" content="@{{imp[1]}}">
         <meta name="twitter:card" content="summary">
-        <meta name="twitter:description" content="{{get('data', 'None')}}" />
         <link rel="shortcut icon" href="/views/img/on.ico">
         <meta name="viewport" content="width=device-width, initial-scale=1">
     </head>

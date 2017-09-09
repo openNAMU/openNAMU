@@ -10,12 +10,25 @@
         <link rel="stylesheet" href="/views/css/awesome/font-awesome.min.css">
         <script type="text/x-mathjax-config">MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});</script>
         <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS_CHTML"></script>
+        <script>
+            function folding(num) {
+                var fol = document.getElementById('folding_' + num);
+                if(fol.style.display == 'inline-block' || fol.style.display == 'block') {
+                    fol.style.display = 'none';
+                } else {
+                    if(num % 3 == 0) {
+                        fol.style.display = 'block';
+                    } else {
+                        fol.style.display = 'inline-block';
+                    }
+                }
+            }
+        </script>
         <!-- 필수 부분 끝 -->
         <meta name="twitter:creator" content="@{{logo}}">
         <meta name="twitter:title" content="{{title}}">
         <meta name="twitter:site" content="@{{logo}}">
         <meta name="twitter:card" content="summary">
-        <meta name="twitter:description" content="{{get('data', 'None')}}" />
         <link rel="shortcut icon" href="/views/img/on.ico">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <style>{{!get('custom_css', '')}}</style>
