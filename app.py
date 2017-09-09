@@ -464,11 +464,12 @@ def recent_changes(name = None, num = 1):
             sub = 0
 
         title = '사용자 기록'
+        menu = [['other', '기타'], ['user', '사용자']]
         div += '<br> \
                 <a href="/record/' + url_pas(name) + '/n/' + str(num + 1) + '">(이전)</a> <a href="/record/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전)</a>'
     else:
         sub = 0
-
+        menu = 0
         title = '최근 변경내역'
             
     return(
@@ -476,7 +477,7 @@ def recent_changes(name = None, num = 1):
             'index', 
             imp = [title, wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), sub],
             data = div,
-            menu = [['other', '기타']]
+            menu = menu
         )
     )
         
@@ -2720,7 +2721,7 @@ def user_topic_list(name = None, num = 1):
         template('index', 
             imp = ['토론 기록', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), sub],
             data = div,
-            menu = [['other', '기타']]
+            menu = [['other', '기타'], ['user', '사용자']]
         )
     )
         
