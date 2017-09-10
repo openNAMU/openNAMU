@@ -131,7 +131,7 @@ def edit_set():
                                 <input style="width: 100%;" type="text" name="upload" value="' + upload_d[0][0] + '"> \
                                 <br> \
                                 <br> \
-                                <span>차례대로 위키 이름, 시작 페이지, 라이선스, 업로드 최대 크기 입니다.</span> \
+                                <span>차례대로 위키 이름, 시작 페이지, 라이선스, 파일 올리기 최대 크기 입니다.</span> \
                                 <br> \
                                 <br> \
                                 <button class="btn btn-primary" type="submit">저장</button> \
@@ -1028,13 +1028,34 @@ def m_del():
             return(redirect('/'))
         else:
             return(
-                template('mdel', 
-                    custom_css = custom_css(), 
-                    custom_js = custom_js(),
-                    license = wiki_set(3), 
-                    login = login_check(), 
-                    title = '많은 문서 삭제', 
-                    logo = wiki_set(1)
+                template(
+                    'index', 
+                    imp = ['많은 문서 삭제', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
+                    data = '<br> \
+                            <span> \
+                                문서명 A \
+                                <br> \
+                                문서명 B \
+                                <br> \
+                                문서명 C \
+                                <br> \
+                                <br> \
+                                이런 식으로 기제 하시오 \
+                            </span> \
+                            <br> \
+                            <br> \
+                            <form method="post"> \
+                                <textarea style="height: 80%;" name="content"></textarea> \
+                                <br> \
+                                <br> \
+                                <input style="width: 100%;" class="form-control input-sm" name="send" type="text"> \
+                                <br> \
+                                <br> \
+                                <div class="form-actions"> \
+                                    <button class="btn btn-primary" type="submit">삭제</button> \
+                                </div> \
+                            </form>',
+                    menu = [['manager', '관리자']]
                 )
             )
     else:
@@ -1329,7 +1350,7 @@ def other():
                     <li><a href="/admin_list">관리자 목록</a></li> \
                     <li><a href="/manager/1">관리자 메뉴</a></li> \
                     <br> \
-                    이 오픈나무의 버전은 <a href="https://github.com/2DU/openNAMU/blob/SQLite/version.md">v' + r_ver + p_ver + '</a> 입니다.',
+                    이 오픈나무는 <a href="https://github.com/2DU/openNAMU/blob/SQLite/version.md">' + r_ver + p_ver + '</a>판 입니다.',
             menu = 0
         )
     )
@@ -1929,6 +1950,8 @@ def close_topic_list(name = None, tool = None):
 
         return(redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(request.forms.topic + t_num)))
     else:
+        plus = ''
+        menu = [['topic/' + url_pas(name), '목록']]
         if(tool == 'close'):
             curs.execute("select sub from stop where title = ? and close = 'O' order by sub asc", [name])
             sub = '닫힘'
@@ -1936,9 +1959,17 @@ def close_topic_list(name = None, tool = None):
             curs.execute("select sub from agreedis where title = ? order by sub asc", [name])
             sub = '합의'
         else:
-            list_d = 1
             curs.execute("select sub from rd where title = ? order by date desc", [name])
             sub = '토론 목록'
+            menu = [['w/' + url_pas(name), '문서']]
+            plus =  '<br> \
+                    <a href="/topic/' + url_pas(name) + '/close">(닫힘)</a> <a href="/topic/' + url_pas(name) + '/agree">(합의)</a> \
+                    <br> \
+                    <br> \
+                    <input class="form-control" name="topic" style="width: 100%;"> \
+                    <br> \
+                    <br> \
+                    <button class="btn btn-primary" type="submit">만들기</button>'
 
         rows = curs.fetchall()
         for data in rows:
@@ -1954,39 +1985,42 @@ def close_topic_list(name = None, tool = None):
                     block = ''
 
                 ip = ip_pas(row[0][2], 1)
-                    
-                div += '<h2> \
-                            <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(data[0]) + '">' + str((i + 1)) + '. ' + data[0] + '</a> \
-                        </h2> \
-                        <table id="toron"> \
-                            <tbody> \
-                                <tr> \
-                                    <td id="toron_color_green"> \
-                                        <a href="javascript:void(0);" id="1">#1</a> ' + ip + ' <span style="float:right;">' + row[0][1] + '</span> \
-                                    </td> \
-                                </tr> \
-                                <tr> \
-                                    <td ' + block + '>' + indata + '</td> \
-                                </tr> \
-                            </tbody> \
-                        </table> \
-                        <br>'
+                
+                it_p = 0
+                if(sub == '토론 목록'):
+                    curs.execute("select title from stop where title = ? and sub = ? and close = 'O' order by sub asc", [name, data[0]])
+                    close = curs.fetchall()
+                    if(close):
+                        it_p = 1
+                
+                if(not it_p == 1):
+                    div += '<h2> \
+                                <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(data[0]) + '">' + str((i + 1)) + '. ' + data[0] + '</a> \
+                            </h2> \
+                            <table id="toron"> \
+                                <tbody> \
+                                    <tr> \
+                                        <td id="toron_color_green"> \
+                                            <a href="javascript:void(0);" id="1">#1</a> ' + ip + ' <span style="float:right;">' + row[0][1] + '</span> \
+                                        </td> \
+                                    </tr> \
+                                    <tr> \
+                                        <td ' + block + '>' + indata + '</td> \
+                                    </tr> \
+                                </tbody> \
+                            </table> \
+                            <br>'
                 
                 i += 1
         
         return(
-            template('topic', 
-                custom_css = custom_css(), 
-                custom_js = custom_js(),
-                license = wiki_set(3), 
-                login = login_check(), 
-                title = name, 
-                page = url_pas(name), 
-                logo = wiki_set(1), 
-                plus = div, 
-                sub = sub,
-                list = list_d
-            )
+            template('index', 
+                imp = [name, wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), ' (' + sub + ')'],
+                data =  '<form style="margin-top: -30px;" method="post"> \
+                            ' + div + plus + ' \
+                        </form>',
+                menu = menu
+            )    
         )
         
 @route('/login', method=['POST', 'GET'])
@@ -2899,16 +2933,16 @@ def error_test(num = None):
         title = '로그인 오류'
         data = '이미 로그인 되어 있습니다.'
     elif(num == 14):
-        title = '업로드 오류'
+        title = '파일 올리기 오류'
         data = 'jpg, gif, jpeg, png만 가능 합니다.'
     elif(num == 15):
         title = '편집 오류'
         data = '편집 기록은 500자를 넘을 수 없습니다.'
     elif(num == 16):
-        title = '업로드 오류'
+        title = '파일 올리기 오류'
         data = '동일한 이름의 파일이 있습니다.'
     elif(num == 17):
-        title = '업로드 오류'
+        title = '파일 올리기 오류'
         data = '파일 용량은 ' + wiki_set(4) + 'MB를 넘길 수 없습니다.'
     elif(num == 18):
         title = '편집 오류'
