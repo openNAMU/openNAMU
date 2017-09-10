@@ -980,18 +980,24 @@ def revert(name = None, num = None):
             curs.execute("select title from history where title = ? and id = ?", [name, str(num)])
             rows = curs.fetchall()
             if(rows):
+                l_c = login_check()
+                if(l_c == 0):
+                    plus = '<br> \
+                            <span>비 로그인 상태입니다. 비 로그인으로 작업 시 아이피가 역사에 기록됩니다.</span> \
+                            <br> \
+                            <br>'
+                else:
+                    plus = ''
+
                 return(
-                    template('revert', 
-                        custom_css = custom_css(), 
-                        custom_js = custom_js(),
-                        license = wiki_set(3), 
-                        login = login_check(), 
-                        title = name, 
-                        logo = wiki_set(1), 
-                        page = url_pas(name), 
-                        r = url_pas(str(num)), 
-                        plus = '정말 되돌리시겠습니까?', 
-                        sub = '되돌리기'
+                    template(
+                        'index', 
+                        imp = [name, wiki_set(1), wiki_set(3), l_c, custom_css(), custom_js(), ' (되돌리기)'],
+                        data =  plus + ' \
+                                <form method="post"> \
+                                    <button class="btn btn-primary" type="submit">되돌리기</button> \
+                                </form>',
+                        menu = [['history/' + url_pas(name), '역사'], ['recent_changes', '최근 변경']]
                     )
                 )
             else:
@@ -2325,6 +2331,26 @@ def acl(name = None):
                     now = '일반'
                 
                 return(
+                    template('index', 
+                        imp = [name, wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), ' (ACL)'],
+                        data = '<br> \
+                                <span>현재 ACL : ' + now + '</span> \
+                                <br> \
+                                <br> \
+                                <form method="post"> \
+                                    <select name="select"> \
+                                        <option value="admin" selected="selected">관리자만</option> \
+                                        <option value="user">유저 이상</option> \
+                                        <option value="normal">일반</option> \
+                                    </select> \
+                                    <br> \
+                                    <br> \
+                                    <button class="btn btn-primary" type="submit">ACL 변경</button> \
+                                </form>',
+                        menu = [['w/' + url_pas(name), '문서'], ['manager', '관리자']]
+                    )
+                )
+                return(
                     template('acl', 
                         custom_css = custom_css(), 
                         custom_js = custom_js(),
@@ -2355,7 +2381,7 @@ def user_admin(name = None):
                     curs.execute("update user set acl = ? where id = ?", [request.forms.select, name])
                 conn.commit()
                 
-                return(redirect('/'))
+                return(redirect('/admin/' + url_pas(name)))
             else:
                 return(redirect('/error/5'))
         else:
@@ -2381,19 +2407,25 @@ def user_admin(name = None):
                         if(name_rem != data[0]):
                             name_rem = data[0]
                             div += '<option value="' + data[0] + '" selected="selected">' + data[0] + '</option>'
+
+                if(now == '권한 부여'):
+                    plus = '<select name="select"> \
+                                ' + div + ' \
+                            </select> \
+                            <br> \
+                            <br>'
+                else:
+                    plus = ''
                 
                 return(
-                    template('admin', 
-                        custom_css = custom_css(), 
-                        custom_js = custom_js(),
-                        license = wiki_set(3), 
-                        login = login_check(), 
-                        title = name, 
-                        page = url_pas(name), 
-                        datalist = div, 
-                        logo = wiki_set(1), 
-                        now = now, 
-                        sub = '권한 부여'
+                    template(
+                        'index', 
+                        imp = [name, wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), ' (권한 부여)'],
+                        data =  '<form method="post"> \
+                                    ' + plus + ' \
+                                    <button class="btn btn-primary" type="submit">' + now + '</button> \
+                                </form>',
+                        menu = [['manager', '관리자']]
                     )
                 )
             else:
@@ -2500,10 +2532,10 @@ def down(name = None):
 @route('/w/<name:path>/from/<redirect:path>')
 def read_view(name = None, num = None, redirect = None):
     data_none = 0
-    sub = 0
+    sub = ''
     acl = ''
     div = ''
-    topic = ''
+    topic = 0
     
     curs.execute("select sub from rd where title = ? order by date desc", [name])
     rows = curs.fetchall()
@@ -2511,7 +2543,7 @@ def read_view(name = None, num = None, redirect = None):
         curs.execute("select title from stop where title = ? and sub = ? and close = 'O'", [name, data[0]])
         row = curs.fetchall()
         if(not row):
-            topic = "open"
+            topic = 1
             
             break
                 
@@ -2529,9 +2561,9 @@ def read_view(name = None, num = None, redirect = None):
         uppage = 0
         
     if(admin_check(5) == 1):
-        admin_memu = 'ACL'
+        admin_memu = 1
     else:
-        admin_memu = ''
+        admin_memu = 0
         
     if(re.search("^분류:", name)):
         curs.execute("delete from cat where title = ? and cat = ''", [name])
@@ -2569,9 +2601,9 @@ def read_view(name = None, num = None, redirect = None):
     if(rows):
         if(not num):
             if(rows[0][0] == 'admin'):
-                acl = '(관리자)'
+                acl = ' (관리자)'
             elif(rows[0][0] == 'user'):
-                acl = '(로그인)'
+                acl = ' (로그인)'
                 
         elsedata = rows[0][1]
     else:
@@ -2586,36 +2618,42 @@ def read_view(name = None, num = None, redirect = None):
         curs.execute("select acl from user where id = ?", [g[0]])
         test = curs.fetchall()
         if(test and test[0][0] != 'user'):
-            acl = '(관리자)'
+            acl = ' (관리자)'
 
         curs.execute("select block from ban where block = ?", [g[0]])
         user = curs.fetchall()
         if(user):
-            sub = '차단'
+            sub = ' (차단)'
             
     if(redirect):
         elsedata = re.sub("^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)", " * [[\g<in>]] 문서로 넘겨주기", elsedata)
             
     enddata = namumark(name, elsedata, 1, 0)
-    
+
+    if(data_none == 1):
+        menu = [['edit/' + url_pas(name), '생성'], ['topic/' + url_pas(name), topic], ['move/' + url_pas(name), '이동'], ['history/' + url_pas(name), '역사'], ['xref/' + url_pas(name), '역링크']]
+    else:
+        menu = [['edit/' + url_pas(name), '수정'], ['topic/' + url_pas(name), topic], ['delete/' + url_pas(name), '삭제'], ['raw/' + url_pas(name), '원본'], ['move/' + url_pas(name), '이동'], ['history/' + url_pas(name), '역사'], ['xref/' + url_pas(name), '역링크']]
+        if(admin_memu == 1):
+            menu[0] += ['acl/' + url_pas(name), 'ACL']
+
+    if(redirect):
+        enddata =   '<li style="margin-top: -20px;"><a href="/w/' + url_pas(redirect) + '/from/' + url_pas(name) + '">' + redirect + '</a>에서 넘어 왔습니다.</li> \
+                    <br>' + enddata
+        menu[0] += ['w/' + url_pas(name), '넘기기']
+
+    if(not uppage == 0):
+        menu[0] += ['w/' + url_pas(uppage), '상위']
+
+    if(down):
+        menu[0] += ['down/' + url_pas(name), '하위']
+
+
     return(
-        template('read', 
-            custom_css = custom_css(), 
-            custom_js = custom_js(),
-            license = wiki_set(3), 
-            login = login_check(), 
-            title = name, 
-            logo = wiki_set(1), 
-            page = url_pas(name), 
-            data = enddata + div, 
-            uppage = uppage, 
-            acl = acl, 
-            topic = topic, 
-            redirect = redirect, 
-            admin = admin_memu, 
-            data_none = data_none, 
-            sub = sub, 
-            down = down
+        template('index', 
+            imp = [name, wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), sub + acl],
+            data = '<br>' + enddata + div,
+            menu = menu
         )
     )
 

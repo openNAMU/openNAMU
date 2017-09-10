@@ -88,7 +88,13 @@
                     <div id="tool">
                         <nav class="menu">
                             % for sub_d in menu:
-                                <a class="menu-item" href="/{{sub_d[0]}}">{{sub_d[1]}}</a>
+                                % if(sub_d[1] == 1):
+                                    <a class="menu-item" href="/{{sub_d[0]}}" id="open">토론</a>
+                                % elif(sub_d[1] == 0):
+                                    <a class="menu-item" href="/{{sub_d[0]}}">토론</a>
+                                % else:
+                                    <a class="menu-item" href="/{{sub_d[0]}}">{{sub_d[1]}}</a>
+                                % end
                             % end
                         </nav>
                     </div>
