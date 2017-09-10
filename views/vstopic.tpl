@@ -11,12 +11,12 @@
 <h1 class="title">
     {{title}}
     <sub> ({{sub}})</sub>
-    <a id="reload" href="javascript:location.href.endsWith('#reload') ?  location.reload(true) : location.href = '#reload'"><i aria-hidden="true" class="fa fa-refresh"></i></i>
 </a>
 </h1>
 <h2 style="margin-top: -15px;">{{toron}}</h2>
 <br>
 {{!rows}}
+<a id="reload" href="javascript:void(0);" onclick="location.href.endsWith('#reload') ?  location.reload(true) : location.href = '#reload'"><i aria-hidden="true" class="fa fa-refresh"></i></a>
 % if(not ban == 1):
     <form id="usrform" style="{{style}}" method="POST" action="/topic/{{page}}/sub/{{suburl}}">
         <br>
