@@ -2072,14 +2072,28 @@ def login():
             return(redirect('/error/11'))
 
         return(
-            template('login', 
-                custom_css = custom_css(), 
-                custom_js = custom_js(),
-                license = wiki_set(3), 
-                login = login_check(), 
-                title = '로그인', 
-                enter = '로그인', 
-                logo = wiki_set(1)
+            template(
+                'index',    
+                imp = ['로그인', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
+                data = '<form method="post"> \
+                            <span>아이디</span> \
+                            <br> \
+                            <br> \
+                            <input name="id" type="text"> \
+                            <br> \
+                            <br> \
+                            <span>비밀번호</span> \
+                            <br> \
+                            <br> \
+                            <input name="pw" type="password"> \
+                            <br> \
+                            <br> \
+                            <button class="btn btn-primary" type="submit">로그인</button> \
+                            <br> \
+                            <br> \
+                            <span>주의 : 만약 HTTPS 연결이 아닌 경우 데이터가 유출될 가능성이 있습니다. 이에 대해 책임지지 않습니다.</span> \
+                        </form>',
+                menu = [['user', '사용자']]
             )
         )
                 
@@ -2093,21 +2107,21 @@ def change_password():
             if(ban == 1):
                 return(redirect('/ban'))
 
-            curs.execute("select id from user where id = ?", [request.forms.id])
+            curs.execute("select pw from user where id = ?", [request.forms.id])
             user = curs.fetchall()
             if(user):
                 if(not re.search('(\.|:)', ip)):
                     return(redirect('/logout'))
-
-                if(bcrypt.checkpw(bytes(request.forms.pw, 'utf-8'), bytes(user[0]['pw'], 'utf-8'))):
-                    hashed = bcrypt.hashpw(bytes(request.forms.pw2, 'utf-8'), bcrypt.gensalt())
-                    
-                    curs.execute("update user set pw = ? where id = ?", [hashed.decode(), request.forms.id])
-                    conn.commit()
-                    
-                    return(redirect('/login'))
                 else:
-                    return(redirect('/error/10'))
+                    if(bcrypt.checkpw(bytes(request.forms.pw, 'utf-8'), bytes(user[0][0], 'utf-8'))):
+                        hashed = bcrypt.hashpw(bytes(request.forms.pw2, 'utf-8'), bcrypt.gensalt())
+                        
+                        curs.execute("update user set pw = ? where id = ?", [hashed.decode(), request.forms.id])
+                        conn.commit()
+                        
+                        return(redirect('/login'))
+                    else:
+                        return(redirect('/error/10'))
             else:
                 return(redirect('/error/5'))
         else:
@@ -2118,16 +2132,42 @@ def change_password():
 
         if(not re.search('(\.|:)', ip)):
             return(redirect('/logout'))
-                
+
         return(
-            template('login', 
-                custom_css = custom_css(), 
-                custom_js = custom_js(),
-                license = wiki_set(3), 
-                login = login_check(), 
-                title = '비밀번호 변경', 
-                enter = '변경', 
-                logo = wiki_set(1)
+            template(
+                'index',    
+                imp = ['비밀번호 변경', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
+                data = '<form method="post"> \
+                            <span>아이디</span> \
+                            <br> \
+                            <br> \
+                            <input name="id" type="text"> \
+                            <br> \
+                            <br> \
+                            <span>현재 비밀번호</span> \
+                            <br> \
+                            <br> \
+                            <input name="pw" type="password"> \
+                            <br> \
+                            <br> \
+                            <span>변경할 비밀번호</span> \
+                            <br> \
+                            <br> \
+                            <input name="pw2" type="password"> \
+                            <br> \
+                            <br> \
+                            <span>재 확인</span> \
+                            <br> \
+                            <br> \
+                            <input name="pw3" type="password"> \
+                            <br> \
+                            <br> \
+                            <button class="btn btn-primary" type="submit">변경</button> \
+                            <br> \
+                            <br> \
+                            <span>주의 : 만약 HTTPS 연결이 아닌 경우 데이터가 유출될 가능성이 있습니다. 이에 대해 책임지지 않습니다.</span> \
+                        </form>',
+                menu = [['user', '사용자']]
             )
         )
                 
@@ -2213,14 +2253,34 @@ def register():
             return(redirect('/error/20'))
     else:        
         return(
-            template('login', 
-                custom_css = custom_css(), 
-                custom_js = custom_js(),
-                license = wiki_set(3), 
-                login = login_check(), 
-                title = '회원가입', 
-                enter = '회원가입', 
-                logo = wiki_set(1)
+            template(
+                'index',    
+                imp = ['회원가입', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
+                data = '<form method="post"> \
+                            <span>아이디</span> \
+                            <br> \
+                            <br> \
+                            <input name="id" type="text"> \
+                            <br> \
+                            <br> \
+                            <span>비밀번호</span> \
+                            <br> \
+                            <br> \
+                            <input name="pw" type="password"> \
+                            <br> \
+                            <br> \
+                            <span>재 확인</span> \
+                            <br> \
+                            <br> \
+                            <input name="pw2" type="password"> \
+                            <br> \
+                            <br> \
+                            <button class="btn btn-primary" type="submit">가입</button> \
+                            <br> \
+                            <br> \
+                            <span>주의 : 만약 HTTPS 연결이 아닌 경우 데이터가 유출될 가능성이 있습니다. 이에 대해 책임지지 않습니다.</span> \
+                        </form>',
+                menu = [['user', '사용자']]
             )
         )
             
@@ -2348,19 +2408,6 @@ def acl(name = None):
                                     <button class="btn btn-primary" type="submit">ACL 변경</button> \
                                 </form>',
                         menu = [['w/' + url_pas(name), '문서'], ['manager', '관리자']]
-                    )
-                )
-                return(
-                    template('acl', 
-                        custom_css = custom_css(), 
-                        custom_js = custom_js(),
-                        license = wiki_set(3), 
-                        login = login_check(), 
-                        title = name, 
-                        page = url_pas(name), 
-                        logo = wiki_set(1), 
-                        now = '현재 ACL 상태는 ' + now, 
-                        sub = 'ACL'
                     )
                 )
             else:
