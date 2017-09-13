@@ -1915,23 +1915,36 @@ def topic(name = None, sub = None):
                     <br>'
                 
             i += 1
-            
+
+        l_c = login_check()
+
+        if(not ban == 1):
+            data = '<a id="reload" href="javascript:void(0);" onclick="location.href.endsWith(\'#reload\') ?  location.reload(true) : location.href = \'#reload\'"> \
+                        <i aria-hidden="true" class="fa fa-refresh"></i> \
+                    </a> \
+                    <form style="' + style + '" method="post"> \
+                        <br> \
+                        <textarea style="width: 100%; height: 100px;" name="content"></textarea> \
+                        <br> \
+                        <br> \
+                        <button class="btn btn-primary" type="submit">전송</button> \
+                    </form>'
+
+            if(l_c == 0 and style == ''):
+                data += '<span>비 로그인 상태입니다. 비 로그인으로 작업 시 아이피가 토론에 기록됩니다.</span>'
+        else:
+            data = ''
+
+
         return(
-            template('vstopic', 
-                custom_css = custom_css(), 
-                custom_js = custom_js(),
-                license = wiki_set(3), 
-                login = login_check(), 
-                title = name, 
-                page = url_pas(name), 
-                suburl = url_pas(sub), 
-                toron = sub, 
-                logo = wiki_set(1), 
-                rows = div, 
-                ban = ban, 
-                style = style, 
-                sub = '토론'
-            )
+            template('index', 
+                imp = [name, wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), ' (토론)'],
+                data =  '<h2 style="margin-top: -15px;">' + sub + '</h2> \
+                        <br> \
+                        ' + div + ' \
+                        ' + data,
+                menu = [['topic/' + url_pas(name), '목록']]
+            )    
         )
         
 @route('/topic/<name:path>', method=['POST', 'GET'])
@@ -2335,25 +2348,41 @@ def user_ban(name = None):
             row = curs.fetchall()
             if(row):
                 now = '차단 해제'
+                data = ''
             else:
                 b = re.search("^([0-9]{1,3}\.[0-9]{1,3})$", name)
                 if(b):
                     now = '대역 차단'
                 else:
                     now = '차단'
+                
+                data = '<input class="form-control" name="end" style="width: 100%;"> \
+                        <br> \
+                        <br> \
+                        <span>아무것도 안 적으면 무기한 차단입니다.</span> \
+                        <br> \
+                        <br> \
+                        <span>차단 일 지정시 형식은 YYYY-MM-DD로 기록해야 합니다. (예시: 2017-01-20, 2017-10-15)</span> \
+                        <br> \
+                        <br> \
+                        <span>지금 시각은 ' + get_time() + ' 입니다.</span> \
+                        <br> \
+                        <br> \
+                        <input class="form-control" name="why" style="width: 100%;"> \
+                        <br> \
+                        <br> \
+                        <span>사유를 쓰는 곳입니다.</span> \
+                        <br> \
+                        <br>'
 
             return(
-                template('ban', 
-                    custom_css = custom_css(), 
-                    custom_js = custom_js(),
-                    license = wiki_set(3), 
-                    login = login_check(), 
-                    title = name, 
-                    page = url_pas(name), 
-                    logo = wiki_set(1), 
-                    now = now, 
-                    today = get_time(), 
-                    sub = '차단'
+                template('index', 
+                    imp = [name, wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), ' (' + now + ')'],
+                    data = '<form method="post"> \
+                                ' + data + ' \
+                                <button class="btn btn-primary" type="submit">' + now + '</button> \
+                            </form>',
+                    menu = [['manager', '관리자']]
                 )
             )
         else:
