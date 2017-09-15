@@ -1167,8 +1167,8 @@ def edit(name = None, num = None):
                                 <br> \
                                 <br> \
                                 <div class="form-actions"> \
-                                    <button class="btn btn-primary" type="submit">저장</button> \
-                                    <button class="btn" type="submit" formaction="/preview/' + url_pas(name) + action + '">미리보기</button> \
+                                    <button id="save" class="btn btn-primary" type="submit">저장</button> \
+                                    <button id="preview" class="btn" type="submit" formaction="/preview/' + url_pas(name) + action + '">미리보기</button> \
                                 </div> \
                             </form>',
                     menu = [['w/' + url_pas(name), '문서']]
@@ -1206,8 +1206,8 @@ def preview(name = None, num = None):
                             <br> \
                             <br> \
                             <div class="form-actions"> \
-                                <button class="btn btn-primary" type="submit">저장</button> \
-                                <button class="btn" type="submit" formaction="/preview/' + url_pas(name) + action + '">미리보기</button> \
+                                <button id="save" class="btn btn-primary" type="submit">저장</button> \
+                                <button id="preview" class="btn" type="submit" formaction="/preview/' + url_pas(name) + action + '">미리보기</button> \
                             </div> \
                         </form> \
                         <br>' + enddata,
