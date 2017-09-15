@@ -1939,7 +1939,7 @@ def topic(name = None, sub = None):
         return(
             template('index', 
                 imp = [name, wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), ' (토론)'],
-                data =  '<h2 style="margin-top: -15px;">' + sub + '</h2> \
+                data =  '<h2 style="margin-top: 0px;">' + sub + '</h2> \
                         <br> \
                         ' + div + ' \
                         ' + data,
@@ -2035,7 +2035,7 @@ def close_topic_list(name = None, tool = None):
         return(
             template('index', 
                 imp = [name, wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), ' (' + sub + ')'],
-                data =  '<form style="margin-top: -30px;" method="post"> \
+                data =  '<form style="margin-top: 0px;" method="post"> \
                             ' + div + plus + ' \
                         </form>',
                 menu = menu
