@@ -1158,7 +1158,7 @@ def edit(name = None, num = None):
                 template(
                     'index', 
                     imp = [name, wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), ' (수정)'],
-                    data = '<form name="edit_form" method="post" action="/edit/' + name + action + '"> \
+                    data = '<form method="post" action="/edit/' + name + action + '"> \
                                 <textarea style="height: 80%;" name="content">' + data + '</textarea> \
                                 <textarea style="display: none; height: 80%;" name="otent">' + data + '</textarea> \
                                 <br> \
@@ -1167,8 +1167,8 @@ def edit(name = None, num = None):
                                 <br> \
                                 <br> \
                                 <div class="form-actions"> \
-                                    <button class="btn btn-primary" type="submit" onclick="edit_form.action=\'/edit/' + name + action + '\';">저장</button> \
-                                    <button class="btn" type="submit" onclick="edit_form.action=\'/preview/' + name + action + '\';">미리보기</button> \
+                                    <button class="btn btn-primary" type="submit">저장</button> \
+                                    <button class="btn" type="submit" formaction="/preview/' + url_pas(name) + action + '">미리보기</button> \
                                 </div> \
                             </form>',
                     menu = [['w/' + url_pas(name), '문서']]
