@@ -44,7 +44,7 @@ def redirect(data):
     
 from func import *
 
-r_ver = '2.2.3'
+r_ver = '2.3.0'
 p_ver = ''
 
 try:
