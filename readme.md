@@ -2,7 +2,7 @@
 오픈나무 정식 버전 입니다. 파이썬 Bottle 기반으로 돌아 갑니다.
 
 ## 설치법
-app.py를 파이썬 3.x 버전으로 실행하고 완료되면 /setup 에 들어가면 됩니다. (파이썬 3.6을 권장 합니다.)
+밑의 의존성을 설치하고 app.py를 파이썬 3.x 버전으로 실행하세요. (파이썬 3.6을 권장 합니다.)
 
 첫 번째 가입자에게 소유자 권한이 부여됩니다.
 
@@ -15,11 +15,13 @@ app.py를 파이썬 3.x 버전으로 실행하고 완료되면 /setup 에 들어
  * pip install [bottle-beaker](https://pypi.python.org/pypi/bottle-beaker)
  * pip install [tornado](https://pypi.python.org/pypi/tornado)
  * pip install [bcrypt](https://pypi.python.org/pypi/bcrypt)
+cmd에 치면 됩니다.
 ### 우분투
  * pip3 install [bottle](https://pypi.python.org/pypi/bottle)
  * pip3 install [bottle-beaker](https://pypi.python.org/pypi/bottle-beaker)
  * pip3 install [tornado](https://pypi.python.org/pypi/tornado)
- * pip3 install [bcrypt](https://pypi.python.org/pypi/bcrypt)
+ * pip3 install [bcrypt](https://pypi.python.org/pypi/bcrypt)\
+터미널에 치면 됩니다.
 ### 자세한 설명
  * [참조](http://namu.ml/w/오픈나무%2F설치법)
  
