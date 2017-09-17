@@ -2722,7 +2722,6 @@ def read_view(name = None, num = None, redirect = None):
         menu += [['w/' + url_pas(name), '넘기기']]
 
     if(not uppage == 0):
-        print(menu)
         menu += [['w/' + url_pas(uppage), '상위']]
 
     if(down):
