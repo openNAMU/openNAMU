@@ -10,6 +10,8 @@
  * [테스트 서버](http://namu.ml/)
  
 ## 의존성
+ * python 3.5 이상
+ 
 ### 윈도우
  * pip install [bottle](https://pypi.python.org/pypi/bottle)
  * pip install [bottle-beaker](https://pypi.python.org/pypi/bottle-beaker)
@@ -18,6 +20,7 @@
  
 cmd에 치면 됩니다.
 ### 우분투
+ * sudo apt-get install python3-pip
  * pip3 install [bottle](https://pypi.python.org/pypi/bottle)
  * pip3 install [bottle-beaker](https://pypi.python.org/pypi/bottle-beaker)
  * pip3 install [tornado](https://pypi.python.org/pypi/tornado)
