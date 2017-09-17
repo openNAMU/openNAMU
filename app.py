@@ -2714,18 +2714,19 @@ def read_view(name = None, num = None, redirect = None):
     else:
         menu = [['edit/' + url_pas(name), '수정'], ['topic/' + url_pas(name), topic], ['delete/' + url_pas(name), '삭제'], ['raw/' + url_pas(name), '원본'], ['move/' + url_pas(name), '이동'], ['history/' + url_pas(name), '역사'], ['xref/' + url_pas(name), '역링크']]
         if(admin_memu == 1):
-            menu[0] += ['acl/' + url_pas(name), 'ACL']
+            menu += [['acl/' + url_pas(name), 'ACL']]
 
     if(redirect):
         enddata =   '<li style="margin-top: -20px;"><a href="/w/' + url_pas(redirect) + '/from/' + url_pas(name) + '">' + redirect + '</a>에서 넘어 왔습니다.</li> \
                     <br>' + enddata
-        menu[0] += ['w/' + url_pas(name), '넘기기']
+        menu += [['w/' + url_pas(name), '넘기기']]
 
     if(not uppage == 0):
-        menu[0] += ['w/' + url_pas(uppage), '상위']
+        print(menu)
+        menu += [['w/' + url_pas(uppage), '상위']]
 
     if(down):
-        menu[0] += ['down/' + url_pas(name), '하위']
+        menu += [['down/' + url_pas(name), '하위']]
 
 
     return(
