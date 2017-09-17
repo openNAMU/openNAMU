@@ -15,12 +15,14 @@
  * pip install [bottle-beaker](https://pypi.python.org/pypi/bottle-beaker)
  * pip install [tornado](https://pypi.python.org/pypi/tornado)
  * pip install [bcrypt](https://pypi.python.org/pypi/bcrypt)
+ 
 cmd에 치면 됩니다.
 ### 우분투
  * pip3 install [bottle](https://pypi.python.org/pypi/bottle)
  * pip3 install [bottle-beaker](https://pypi.python.org/pypi/bottle-beaker)
  * pip3 install [tornado](https://pypi.python.org/pypi/tornado)
- * pip3 install [bcrypt](https://pypi.python.org/pypi/bcrypt)\
+ * pip3 install [bcrypt](https://pypi.python.org/pypi/bcrypt)
+ 
 터미널에 치면 됩니다.
 ### 자세한 설명
  * [참조](http://namu.ml/w/오픈나무%2F설치법)
