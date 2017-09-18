@@ -54,19 +54,22 @@ def wiki_set(num):
         else:
             return('2')
 
-def diff(seqm):
+def diff(seqm, num):
     output= []
     for opcode, a0, a1, b0, b1 in seqm.get_opcodes():
-        if(opcode == 'equal'):
+        if(opcode == 'equal' and num == 1):
             output.append(seqm.a[a0:a1])
-        elif(opcode == 'insert'):
+        elif(opcode == 'insert' and num == 0):
             output.append("<span style='background:#CFC;'>" + seqm.b[b0:b1] + "</span>")
-        elif(opcode == 'delete'):
+        elif(opcode == 'delete' and num == 1):
             output.append("<span style='background:#FDD;'>" + seqm.a[a0:a1] + "</span>")
         elif(opcode == 'replace'):
-            output.append("<span style='background:#CFC;'>" + seqm.b[b0:b1] + "</span><span style='background:#FDD;'>" + seqm.a[a0:a1] + "</span>")
-        else:
-            output.append(seqm.a[a0:a1])
+            if(num == 1):
+                output.append("<span style='background:#FDD;'>" + seqm.a[a0:a1] + "</span>")
+            else:
+                output.append("<span style='background:#CFC;'>" + seqm.b[b0:b1] + "</span>")
+        elif(num == 0):
+            output.append(seqm.b[b0:b1])
             
     return(''.join(output))
            

@@ -2570,9 +2570,10 @@ def diff_data(name = None, a = None, b = None):
             b_data = html.escape(b_raw_data[0][0])
             
             diff_data = difflib.SequenceMatcher(None, a_data, b_data)
-            result = diff(diff_data)
+            result_1 = diff(diff_data, 1)
+            result_2 = diff(diff_data, 0)
             
-            result = '<pre>' + result + '</pre>'
+            result = '<pre>' + result_1 + '<hr>' + result_2 + '</pre>'
             
             return(
                 template(
