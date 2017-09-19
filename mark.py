@@ -197,7 +197,7 @@ def html_pas(data):
             if(url_d):
                 check = url_d.groups()
 
-                if(check[2] == ("www.youtube.com" or "serviceapi.nmv.naver.com" or "tv.kakao.com" or "tvple.com")):
+                if(check[2] in ["www.youtube.com", "serviceapi.nmv.naver.com", "tv.kakao.com", "tvple.com"]):
                     pas_end = p_d[0]
                 else:
                     pas_end = re.sub('src=(?:"|\')([^"\']*)(?:"|\')', '', p_d[0])
