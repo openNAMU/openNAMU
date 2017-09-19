@@ -2572,8 +2572,13 @@ def diff_data(name = None, a = None, b = None):
             diff_data = difflib.SequenceMatcher(None, a_data, b_data)
             result_1 = diff(diff_data, 1)
             result_2 = diff(diff_data, 0)
-            
-            result = '<pre>' + result_1 + '<hr>' + result_2 + '</pre>'
+
+            if(a_data == result_1):
+                result = '<pre>' + result_2 + '</pre>'
+            elif(b_data == result_2):
+                result = '<pre>' + result_1 + '</pre>'
+            else:
+                result = '<pre>' + result_1 + '<hr>' + result_2 + '</pre>'
             
             return(
                 template(
