@@ -2246,7 +2246,7 @@ def register():
             if(m):
                 return(redirect('/error/8'))
 
-            if(len(request.forms.id) > 20):
+            if(len(request.forms.id) > 32):
                 return(redirect('/error/7'))
 
             curs.execute("select id from user where id = ?", [request.forms.id])
