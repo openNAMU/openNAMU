@@ -2738,7 +2738,7 @@ def read_view(name = None, num = None, redirect = None):
 
     if(num):
         menu = [['history/' + url_pas(name), '역사']]
-        sub = ' (' + num + '판)'
+        sub = ' (' + str(num) + '판)'
         acl = ''
 
     return(
