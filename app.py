@@ -2733,6 +2733,10 @@ def read_view(name = None, num = None, redirect = None):
     if(down):
         menu += [['down/' + url_pas(name), '하위']]
 
+    if(num):
+        menu = [['history/' + url_pas(name), '역사']]
+        sub = ' (' + num + '판)'
+        acl = ''
 
     return(
         template('index', 
