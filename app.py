@@ -562,7 +562,7 @@ def user_log(num = 1):
     list_data = ''
     ydmin = admin_check(1, None)
     
-    curs.execute("select who, what, time from re_admin limit ?, ?", [str(j), str(i)])
+    curs.execute("select who, what, time from re_admin order by time desc limit ?, ?", [str(j), str(i)])
     get_list = curs.fetchall()
     for data in get_list:            
         ip = ip_pas(data[0], 2)
@@ -1878,12 +1878,18 @@ def topic(name = None, sub = None):
             top_data = re.sub("(?P<in>#(?:[0-9]*))", '<a href="\g<in>">\g<in></a>', top_data)
                     
             ip = ip_pas(dain[3], 1)
+
+            chad = ''
+            curs.execute("select who from re_admin where what = ? order by time desc limit 1", ['notice (' + name + ' - ' + sub + '#' + dain[1] + ')'])
+            no_da = curs.fetchall()
+            if(no_da):
+                chad += ' @' + no_da[0][0]
                                 
             div += '<table id="toron"> \
                         <tbody> \
                             <tr> \
                                 <td id="toron_color_red"> \
-                                    <a href="#' + dain[1] + '">#' + dain[1] + '</a> ' + ip + ' <span style="float:right;">' + dain[2] + '</span> \
+                                    <a href="#' + dain[1] + '">#' + dain[1] + '</a> ' + ip + chad + ' <span style="float:right;">' + dain[2] + '</span> \
                                 </td> \
                             </tr> \
                             <tr> \
@@ -1901,9 +1907,15 @@ def topic(name = None, sub = None):
             indata = namumark('', dain[0], 0, 0)
             indata = re.sub("(?P<in>#(?:[0-9]*))", '<a href="\g<in>">\g<in></a>', indata)
             
+            chad = ''
             if(dain[4] == 'O'):
                 indata = '<br>'
                 block = 'style="display: none;"'
+                
+                curs.execute("select who from re_admin where what = ? order by time desc limit 1", ['blind (' + name + ' - ' + sub + '#' + str(i + 1) + ')'])
+                bl_da = curs.fetchall()
+                if(bl_da):
+                    chad += ' @' + bl_da[0][0]
             else:
                 block = ''
 
@@ -1934,11 +1946,10 @@ def topic(name = None, sub = None):
                 else:
                     ban = ''
             
-            chad = ''
             curs.execute('select acl from user where id = ?', [dain[3]])
             adch = curs.fetchall()
             if(adch and adch[0][0] != 'user'):
-                chad = ' <a href="javascript:void(0);" title="관리자">★</a>'
+                chad += ' <a href="javascript:void(0);" title="관리자">★</a>'
 
             ip = ip_pas(dain[3], 1)
                     
