@@ -204,7 +204,7 @@ def html_pas(data):
             else:
                 pas_end = p_d[0]
 
-            pas_end = re.sub('position: ?[^ ;]*;?', '', pas_end)
+            pas_end = re.sub('position:(?: +)?[^ ;]*;?', '', pas_end)
 
             try:
                 if(check[1] != None):
