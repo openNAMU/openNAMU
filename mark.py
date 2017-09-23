@@ -748,8 +748,7 @@ def namumark(title, data, num, in_c):
                     else:
                         clas = 'not_thing'
                     
-                    
-                    data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a title="' + re.sub('#', '\#', nosharp) + sharp + '" class="' + clas + '" href="/w/' + url_pas(nosharp) + sharp + '">' + g + '</a>', data, 1)
+                    data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a title="' + re.sub('#', '\#', nosharp) + sharp + '" class="' + clas + '" href="/w/' + url_pas(nosharp) + sharp + '">' + re.sub('(?:<a ([^>]*)>|<\/a>)', '', g) + '</a>', data, 1)
 
                     backlink_plus(title, results[0], '', num)
         else:
