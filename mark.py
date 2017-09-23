@@ -734,12 +734,7 @@ def namumark(title, data, num, in_c):
                 
             b = re.search("^http(?:s)?:\/\/", results[0])
             if(b):
-                comp = re.compile("(?:\.(?:jpg|png|gif|jpeg))", re.I)
-                c = comp.search(results[0])
-                if(c):                    
-                    data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a class="out_link" rel="nofollow" target="_blank" href="' + results[0] + sharp + '">' + g + '</a>', data, 1)
-                else:
-                    data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a class="out_link" rel="nofollow" target="_blank" href="' + results[0] + sharp + '">' + g + '</a>', data, 1)
+                data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a class="out_link" rel="nofollow" target="_blank" href="' + results[0] + sharp + '">' + g + '</a>', data, 1)
             else:
                 if(results[0] == title):
                     data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<b>' + g + '</b>', data, 1)

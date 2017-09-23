@@ -3064,7 +3064,7 @@ def error_test(num = None):
         data = '이미 로그인 되어 있습니다.'
     elif(num == 14):
         title = '파일 올리기 오류'
-        data = 'jpg, gif, jpeg, png만 가능 합니다.'
+        data = 'jpg, gif, jpeg, png, apng, webp만 가능 합니다.'
     elif(num == 15):
         title = '편집 오류'
         data = '편집 기록은 500자를 넘을 수 없습니다.'
