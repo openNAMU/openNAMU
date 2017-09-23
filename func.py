@@ -26,33 +26,23 @@ from mark import *
 
 def wiki_set(num):
     if(num == 1):
+        d_data = '무명위키'
         curs.execute('select data from other where name = ?', ['name'])
-        data = curs.fetchall()
-        if(data):
-            return(data[0][0])
-        else:
-            return('wiki')
     elif(num == 2):
+        d_data = '위키:대문'
         curs.execute('select data from other where name = "frontpage"')
-        data = curs.fetchall()
-        if(data):
-            return(data[0][0])
-        else:
-            return('위키:대문')
     elif(num == 3):
+        d_data = 'CC 0'
         curs.execute('select data from other where name = "license"')
-        data = curs.fetchall()
-        if(data):
-            return(data[0][0])
-        else:
-            return('CC 0')
     elif(num == 4):
+        d_data = '2'
         curs.execute('select data from other where name = "upload"')
-        data = curs.fetchall()
-        if(data):
-            return(data[0][0])
-        else:
-            return('2')
+    
+    data = curs.fetchall()
+    if(data):
+        return(data[0][0])
+    else:
+        return(d_data)
 
 def diff(seqm, num):
     output= []
@@ -73,7 +63,7 @@ def diff(seqm, num):
             
     return(''.join(output))
            
-def admin_check(num):
+def admin_check(num, what):
     ip = ip_check() 
     curs.execute("select acl from user where id = ?", [ip])
     user = curs.fetchall()
@@ -81,52 +71,31 @@ def admin_check(num):
         reset = 0
         while(1):
             if(num == 1 and reset == 0):
-                curs.execute('select name from alist where name = ? and acl = "ban"', [user[0][0]])
-                acl_data = curs.fetchall()
-                if(acl_data):
-                    return(1)
-                else:
-                    reset = 1
+                check = 'ban'
             elif(num == 2 and reset == 0):
-                curs.execute('select name from alist where name = ? and acl = "mdel"', [user[0][0]])
-                acl_data = curs.fetchall()
-                if(acl_data):
-                    return(1)
-                else:
-                    reset = 1
+                check = 'mdel'
             elif(num == 3 and reset == 0):
-                curs.execute('select name from alist where name = ? and acl = "toron"', [user[0][0]])
-                acl_data = curs.fetchall()
-                if(acl_data):
-                    return(1)
-                else:
-                    reset = 1
+                check = 'toron'
             elif(num == 4 and reset == 0):
-                curs.execute('select name from alist where name = ? and acl = "check"', [user[0][0]])
-                acl_data = curs.fetchall()
-                if(acl_data):
-                    return(1)
-                else:
-                    reset = 1
+                check = 'check'
             elif(num == 5 and reset == 0):
-                curs.execute('select name from alist where name = ? and acl = "acl"', [user[0][0]])
-                acl_data = curs.fetchall()
-                if(acl_data):
-                    return(1)
-                else:
-                    reset = 1
+                check = 'acl'
             elif(num == 6 and reset == 0):
-                curs.execute('select name from alist where name = ? and acl = "hidel"', [user[0][0]])
-                acl_data = curs.fetchall()
-                if(acl_data):
-                    return(1)
-                else:
-                    reset = 1
+                check = 'hidel'
             else:
-                curs.execute('select name from alist where name = ? and acl = "owner"', [user[0][0]])
-                acl_data = curs.fetchall()
-                if(acl_data):
-                    return(1)
+                check = 'owner'
+
+            curs.execute('select name from alist where name = ? and acl = ?', [user[0][0], check])
+            acl_data = curs.fetchall()
+            if(acl_data):
+                if(what):
+                    curs.execute("insert into re_admin (who, what, time) values (?, ?, ?)", [ip, what, get_time()])
+                    conn.commit()
+
+                return(1)
+            else:
+                if(reset == 0):
+                    reset = 1
                 else:
                     break
                 
