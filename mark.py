@@ -204,6 +204,8 @@ def html_pas(data):
             else:
                 pas_end = p_d[0]
 
+            pas_end = re.sub('position: ?[^ ;]*;?', '', pas_end)
+
             try:
                 if(check[1] != None):
                     data = re.sub("<((?:\/)?" + p_d[1] + "(?:\s[^>]*))>", "%phtml%" + pas_end + "%phtml%", data, 1)
