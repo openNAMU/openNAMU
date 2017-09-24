@@ -65,6 +65,36 @@ except:
 
 conn.commit()
 
+'''
+@route('/upload', method=['POST', 'GET'])
+def upload():
+    return(
+        template(
+            'index', 
+            imp = ['파일 올리기', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
+            data = '<form method="post"> \
+                        <input style="width: 100%;" type="text" name="name" value="' + name_d[0][0] + '"> \
+                        <br> \
+                        <br> \
+                        <input style="width: 100%;" type="text" name="frontpage" value="' + frontpage_d[0][0] + '"> \
+                        <br> \
+                        <br> \
+                        <input style="width: 100%;" type="text" name="license" value="' + license_d[0][0] + '"> \
+                        <br> \
+                        <br> \
+                        <input style="width: 100%;" type="text" name="upload" value="' + upload_d[0][0] + '"> \
+                        <br> \
+                        <br> \
+                        <span>차례대로 위키 이름, 시작 페이지, 라이선스, 파일 올리기 최대 크기 입니다.</span> \
+                        <br> \
+                        <br> \
+                        <button class="btn btn-primary" type="submit">저장</button> \
+                    </form>',
+            menu = [['other', '기타']]
+        )
+    )
+'''
+
 @route('/setup', method=['GET', 'POST'])
 def setup():
     try:
@@ -642,26 +672,52 @@ def xref(name = None, num = 1):
     )
         
 @route('/recent_discuss')
-def recent_discuss():
-    div =   '<table style="width: 100%; text-align: center;"> \
+@route('/recent_discuss/<tools:path>')
+def recent_discuss(tools = 'normal'):
+    if(tools == 'normal' or tools == 'close'):
+        div = '<br>'
+        
+        if(tools == 'normal'):
+            div += '<a href="/recent_discuss/close">(닫힌 토론)</a>'
+            m_sub = 0
+        else:
+            div += '<a href="/recent_discuss">(열린 토론)</a>'
+            m_sub = ' (닫힘)'
+
+        div +=  '<br> \
+                <br> \
+                <table style="width: 100%; text-align: center;"> \
                 <tbody> \
                     <tr> \
                         <td style="width: 50%;">토론명</td> \
                         <td style="width: 50%;">시간</td> \
                     </tr>'
+    else:
+        return(redirect('/'))
     
     curs.execute("select title, sub, date from rd order by date desc limit 50")
     rows = curs.fetchall()
     for data in rows:
         title = html.escape(data[0])
         sub = html.escape(data[1])
-        
-        div += '<tr> \
-                    <td> \
-                        <a href="/topic/' + url_pas(data[0]) + '/sub/' + url_pas(data[1]) + '">' + title + '</a> (' + sub + ') \
-                    </td> \
-                    <td>' + data[2] + '</td> \
-                </tr>'
+
+        close = 0
+        if(tools == 'normal'):
+            curs.execute("select title from stop where title = ? and sub = ? and close = 'O'", [data[0], data[1]])
+            if(curs.fetchall()):
+                close = 1
+        else:
+            curs.execute("select title from stop where title = ? and sub = ? and close = 'O'", [data[0], data[1]])
+            if(not curs.fetchall()):
+                close = 1
+
+        if(close == 0):
+            div += '<tr> \
+                        <td> \
+                            <a href="/topic/' + url_pas(data[0]) + '/sub/' + url_pas(data[1]) + '">' + title + '</a> (' + sub + ') \
+                        </td> \
+                        <td>' + data[2] + '</td> \
+                    </tr>'
     else:
         div +=      '</tbody> \
                 </table>'
@@ -669,7 +725,7 @@ def recent_discuss():
     return(
         template(
             'index', 
-            imp = ['최근 토론내역', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
+            imp = ['최근 토론내역', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), m_sub],
             data = div,
             menu = 0
         )
