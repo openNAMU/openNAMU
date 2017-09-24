@@ -887,7 +887,7 @@ def namumark(title, data, num, in_c):
         else:
             tou += '</div>'
 
-            if(tou == "<hr id='footnote'><div><br></div>"):
+            if(tou == "<hr style='margin-top: 30px;' id='footnote'><div><br></div>"):
                 tou = ""
 
             break
