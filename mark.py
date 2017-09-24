@@ -425,9 +425,6 @@ def toc_pas(data, title):
                         margin = ''
                     
                     toc_c = toc_d
-                    
-
-            print('toc_c : ' + str(toc.count('.')))
 
             test = re.search('([0-9]*)(\.([0-9]*))?(\.([0-9]*))?(\.([0-9]*))?(\.([0-9]*))?', toc)
             if(test):
