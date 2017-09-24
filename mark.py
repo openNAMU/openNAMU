@@ -356,6 +356,8 @@ def mid_pas(data, fol_num, include, in_c):
 def toc_pas(data, title):
     i = [0, 0, 0, 0, 0, 0, 0]
     last = 0
+    toc_c = -1
+    toc_d = -1
     span = ''
     rtoc = '<div id="toc"><span id="toc-name">목차</span><br><br>'
     while(1):
@@ -409,17 +411,35 @@ def toc_pas(data, title):
             toc = re.sub("#\.", '.', toc)
             toc = re.sub("\.$", '', toc)
 
+            if(toc_c == -1):
+                margin = 'style="margin-top: 30px;"'
+                toc_c = toc.count('.')
+            else:
+                toc_d = toc.count('.')
+                if(toc_c == toc_d):
+                    margin = 'style="margin-top: 30px;"'
+                else:
+                    if(toc_d < toc_c):
+                        margin = 'style="margin-top: 30px;"'
+                    else:
+                        margin = ''
+                    
+                    toc_c = toc_d
+                    
+
+            print('toc_c : ' + str(toc.count('.')))
+
             test = re.search('([0-9]*)(\.([0-9]*))?(\.([0-9]*))?(\.([0-9]*))?(\.([0-9]*))?', toc)
             if(test):
                 g = test.groups()
                 if(g[4]):
-                    span = '<span id="out"></span>' * 4
+                    span = '<span style="margin-left: 5px;"></span>' * 4
                 elif(g[3]):
-                    span = '<span id="out"></span>' * 3
+                    span = '<span style="margin-left: 5px;"></span>' * 3
                 elif(g[2]):
-                    span = '<span id="out"></span>' * 2
+                    span = '<span style="margin-left: 5px;"></span>' * 2
                 elif(g[1]):
-                    span = '<span id="out"></span>'
+                    span = '<span style="margin-left: 5px;"></span>'
                 else:
                     span = ''
 
@@ -429,7 +449,7 @@ def toc_pas(data, title):
             d = c
             c = re.sub("\[\[(([^|]*)\|)?(?P<in>[^\]]*)\]\]", "\g<in>", c)
 
-            data = re.sub('(={1,6})\s?([^=]*)\s?(?:={1,6})(?:\s+)?\n', '<tablenobr><h' + str(wiki) + ' id="' + c + '" style="margin-top: 30px;"><a href="#toc" id="s-' + toc + '">' + toc + '.</a> ' + d + ' <span style="font-size:11px;">[<a href="/edit/' + url_pas(title) + '/section/' + str(i[0]) + '">편집</a>]</span></h' + str(wiki) + '><hr style="margin-top: -5px;">', data, 1)
+            data = re.sub('(={1,6})\s?([^=]*)\s?(?:={1,6})(?:\s+)?\n', '<tablenobr><h' + str(wiki) + ' id="' + c + '" ' + margin + '><a href="#toc" id="s-' + toc + '">' + toc + '.<span style="margin-left: 5px;"></span></a> ' + d + ' <span style="font-size:11px;">[<a href="/edit/' + url_pas(title) + '/section/' + str(i[0]) + '">편집</a>]</span></h' + str(wiki) + '><hr style="margin-top: -5px;">', data, 1)
         else:
             rtoc += '</div>'
             
@@ -770,7 +790,7 @@ def namumark(title, data, num, in_c):
                     break
 
             end = re.sub("\n", '', end)
-            data = re.sub("(?:(?:(?:( +)\*\s([^\n]*))\n?)+)", '<ul id="list">' + end + '</ul>', data, 1)
+            data = re.sub("(?:(?:(?:( +)\*\s([^\n]*))\n?)+)", '<ul style="margin-top: 10px;" id="list">' + end + '</ul>', data, 1)
         else:
             break
     
@@ -807,7 +827,7 @@ def namumark(title, data, num, in_c):
             break
     
     a = 1
-    tou = "<hr id='footnote'><div><br>"
+    tou = "<hr style='margin-top: 30px;' id='footnote'><div><br>"
     namu = []
     while(1):
         b = re.search("\[\*([^\s]*)(?:\s(((?!\[|\]).)*))?\]", data)
@@ -878,7 +898,7 @@ def namumark(title, data, num, in_c):
     data += tou
     
     if(category):
-        data += '<div id="cate">분류: ' + category + '</div>'
+        data += '<div style="margin-top: 30px;" id="cate">분류: ' + category + '</div>'
     
     data = re.sub("(?:\|\|\r\n)", "#table#<tablenobr>", data)
         
