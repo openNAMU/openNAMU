@@ -22,6 +22,10 @@
     margin-top: 10px;
 }
 
+#last {
+    margin-top: 30px;
+}
+
 #log:hover, #log:focus {
     color: #B2DFEA;
 }

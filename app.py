@@ -65,35 +65,18 @@ except:
 
 conn.commit()
 
-'''
-@route('/upload', method=['POST', 'GET'])
+'''@route('/upload', method=['POST', 'GET'])
 def upload():
     return(
         template(
             'index', 
             imp = ['파일 올리기', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
-            data = '<form method="post"> \
-                        <input style="width: 100%;" type="text" name="name" value="' + name_d[0][0] + '"> \
-                        <br> \
-                        <br> \
-                        <input style="width: 100%;" type="text" name="frontpage" value="' + frontpage_d[0][0] + '"> \
-                        <br> \
-                        <br> \
-                        <input style="width: 100%;" type="text" name="license" value="' + license_d[0][0] + '"> \
-                        <br> \
-                        <br> \
-                        <input style="width: 100%;" type="text" name="upload" value="' + upload_d[0][0] + '"> \
-                        <br> \
-                        <br> \
-                        <span>차례대로 위키 이름, 시작 페이지, 라이선스, 파일 올리기 최대 크기 입니다.</span> \
-                        <br> \
-                        <br> \
-                        <button class="btn btn-primary" type="submit">저장</button> \
+            data = '<form method="post" enctype="multipart/form-data"> \
+                        <input type="file" name="upload" /> <input type="submit" value="올리기" />\
                     </form>',
             menu = [['other', '기타']]
         )
-    )
-'''
+    )'''
 
 @route('/setup', method=['GET', 'POST'])
 def setup():
