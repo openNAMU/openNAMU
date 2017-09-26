@@ -37,7 +37,7 @@ session_opts = {
 
 app = beaker.middleware.SessionMiddleware(app(), session_opts)
 
-BaseRequest.MEMFILE_MAX = 1024 * 1024
+BaseRequest.MEMFILE_MAX = 1000 ** 4
 
 def redirect(data):
     return('<meta http-equiv="refresh" content="0;url=' + data + '" />')
