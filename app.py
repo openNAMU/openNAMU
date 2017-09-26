@@ -2750,18 +2750,18 @@ def read_view(name = None, num = None, redirect = None):
         curs.execute("select cat from cat where title = ? order by cat asc", [name])
         rows = curs.fetchall()
         if(rows):
-            div = '<h2>분류</h2>'
+            div = '[목차(없음)]\r\n== 분류 ==\r\n'
             u_div = ''
             i = 0
             
             for data in rows:       
                 if(re.search('^분류:', data[0])):
                     if(u_div == ''):
-                        u_div = '<h3>하위 분류</h3>'
+                        u_div = '=== 하위 분류 ===\r\n'
 
-                    u_div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a></li>'
+                    u_div += ' * [[:' + data[0] + ']]\r\n'
                 else:
-                    div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a></li>'
+                    div += ' * [[' + data[0] + ']]\r\n'
 
             div += u_div
 
@@ -2834,7 +2834,7 @@ def read_view(name = None, num = None, redirect = None):
     return(
         template('index', 
             imp = [name, wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), sub + acl],
-            data = enddata + div,
+            data = enddata + namumark(name, div, 0, 0),
             menu = menu
         )
     )
