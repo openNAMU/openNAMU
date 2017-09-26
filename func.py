@@ -168,7 +168,7 @@ def acl_check(ip, name):
                     return(0)
         else:
             return(1)
-    elif(n and admin_check(5) != 1):
+    elif(n and admin_check(5, 'edit (' + name + ')') != 1):
         return(1)
     else:
         b = re.search("^([0-9](?:[0-9]?[0-9]?)\.[0-9](?:[0-9]?[0-9]?))", ip)
@@ -195,7 +195,7 @@ def acl_check(ip, name):
                     else:
                         return(1)
                 elif(row[0][0] == 'admin'):
-                    if(rows and admin_check(5) == 1):
+                    if(rows and admin_check(5, 'edit (' + name + ')') == 1):
                         return(0)
                     else:
                         return(1)
