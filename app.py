@@ -658,7 +658,7 @@ def xref(name = None, num = 1):
 @route('/recent_discuss/<tools:path>')
 def recent_discuss(tools = 'normal'):
     if(tools == 'normal' or tools == 'close'):
-        div = '<br>'
+        div = ''
         
         if(tools == 'normal'):
             div += '<a href="/recent_discuss/close">(닫힌 토론)</a>'
@@ -714,9 +714,9 @@ def recent_discuss(tools = 'normal'):
         )
     )
 
-@route('/blocklog')
-@route('/blocklog/n/<number:int>')
-def blocklog(num = 1):
+@route('/block_log')
+@route('/block_log/n/<number:int>')
+def block_log(num = 1):
     if(num * 50 <= 0):
         v = 50
     else:
@@ -764,7 +764,7 @@ def blocklog(num = 1):
         div +=      '</tbody> \
                 </table> \
                 <br> \
-                <a href="/blocklog/n/' + str(num - 1) + '">(이전)</a> <a href="/blocklog/n/' + str(num + 1) + '">(이후)</a>'
+                <a href="/block_log/n/' + str(num - 1) + '">(이전)</a> <a href="/block_log/n/' + str(num + 1) + '">(이후)</a>'
                 
     return(
         template(
@@ -1069,8 +1069,7 @@ def revert(name = None, num = None):
             if(rows):
                 l_c = login_check()
                 if(l_c == 0):
-                    plus = '<br> \
-                            <span>비 로그인 상태입니다. 비 로그인으로 작업 시 아이피가 역사에 기록됩니다.</span> \
+                    plus = '<span>비 로그인 상태입니다. 비 로그인으로 작업 시 아이피가 역사에 기록됩니다.</span> \
                             <br> \
                             <br>'
                 else:
@@ -1124,8 +1123,7 @@ def m_del():
                 template(
                     'index', 
                     imp = ['많은 문서 삭제', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
-                    data = '<br> \
-                            <span> \
+                    data = '<span> \
                                 문서명 A \
                                 <br> \
                                 문서명 B \
@@ -1432,19 +1430,21 @@ def other():
         template(
             'index', 
             imp = ['기타 메뉴', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
-            data = '<h2 style="margin-top: 0px;">기록</h2> \
-                    <li><a href="/blocklog">사용자 차단 기록</a></li> \
-                    <li><a href="/user_log">사용자 가입 기록</a></li> \
-                    <li><a href="/admin_log">관리자 권한 기록</a></li> \
-                    <li><a href="/manager/6">사용자 기록</a></li> \
-                    <li><a href="/manager/7">사용자 토론 기록</a></li> \
-                    <h2>기타</h2> \
-                    <li><a href="/title_index">모든 문서</a></li> \
-                    <li><a href="/acl_list">ACL 문서 목록</a></li> \
-                    <li><a href="/admin_list">관리자 목록</a></li> \
-                    <li><a href="/manager/1">관리자 메뉴</a></li> \
-                    <br> \
-                    이 오픈나무는 <a href="https://github.com/2DU/openNAMU/blob/SQLite/version.md">' + r_ver + p_ver + '</a>판 입니다.',
+            data = namumark('', '[목차(없음)]\r\n' + \
+                                '== 기록 ==\r\n' + \
+                                ' * [[wiki:block_log|차단 기록]]\r\n' + \
+                                ' * [[wiki:user_log|가입 기록]]\r\n' + \
+                                ' * [[wiki:admin_log|권한 기록]]\r\n' + \
+                                ' * [[wiki:manager/6|기여 기록]]\r\n' + \
+                                ' * [[wiki:manager/7|토론 기록]]\r\n' + \
+                                ' * [[wiki:not_close_topic|열린 토론 목록]]\r\n' + \
+                                '== 기타 ==\r\n' + \
+                                ' * [[wiki:title_index|모든 문서]]\r\n' + \
+                                ' * [[wiki:acl_list|ACL 문서]]\r\n' + \
+                                ' * [[wiki:admin_list|관리자 목록]]\r\n' + \
+                                ' * [[wiki:manager/1|관리자 메뉴]]\r\n' + \
+                                '== 버전 ==\r\n' + \
+                                '이 오픈나무는 [[https://github.com/2DU/openNAMU/blob/SQLite/version.md|' + r_ver + p_ver + ']]판 입니다.', 0, 0),
             menu = 0
         )
     )
@@ -1456,23 +1456,22 @@ def manager(num = 1):
         return(
             template('index', 
                 imp = ['관리자 메뉴', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
-                data = '<h2 style="margin-top: 0px;">목록</h2> \
-                        <li><a href="/manager/2">문서 ACL</a></li> \
-                        <li><a href="/manager/3">사용자 검사</a></li> \
-                        <li><a href="/manager/4">사용자 차단</a></li> \
-                        <li><a href="/manager/5">관리자 권한 주기</a></li> \
-                        <li><a href="/m_del">많은 문서 삭제</a></li> \
-                        <li><a href="/list_acl">ACL 목록</a></li> \
-                        <li><a href="/not_close_topic">열린 토론 목록</a></li> \
-                        <h2>소유자</h2> \
-                        <li><a href="/back_reset">역링크, 분류 다시 생성</a></li> \
-                        <li><a href="/manager/8">관리 그룹 생성</a></li> \
-                        <li><a href="/update">업데이트 메뉴</a></li> \
-                        <li><a href="/edit_set">설정 편집</a></li> \
-                        <li><a href="/manager/9">문서 JSON 출력</a></li> \
-                        <li><a href="/json_in">문서 JSON 입력</a></li> \
-                        <h2>기타</h2> \
-                        <li>이 메뉴에 없는 기능은 해당 문서의 역사나 토론에서 바로 사용 가능함</li>',
+                data = namumark('', '[목차(없음)]\r\n' + \
+                                    '== 목록 ==\r\n' + \
+                                    ' * [[wiki:manager/2|문서 ACL]]\r\n' + \
+                                    ' * [[wiki:manager/3|사용자 검사]]\r\n' + \
+                                    ' * [[wiki:manager/4|사용자 차단]]\r\n' + \
+                                    ' * [[wiki:manager/5|권한 주기]]\r\n' + \
+                                    ' * [[wiki:m_del|여러 문서 삭제]]\r\n' + \
+                                    '== 소유자 ==\r\n' + \
+                                    ' * [[wiki:back_reset|역링크, 분류 다시 생성]]\r\n' + \
+                                    ' * [[wiki:manager/8|ACL 문서]]\r\n' + \
+                                    ' * [[wiki:update|관리 그룹 생성]]\r\n' + \
+                                    ' * [[wiki:edit_set|업데이트 메뉴]]\r\n' + \
+                                    ' * [[wiki:manager/9|JSON 출력]]\r\n' + \
+                                    ' * [[wiki:json_in|JSON 입력]]\r\n' + \
+                                    '== 기타 ==\r\n' + \
+                                    ' * 이 메뉴에 없는 기능은 해당 문서의 역사나 토론에서 바로 사용 가능함', 0, 0),
                 menu = [['other', '기타']]
             )
         )
@@ -1700,14 +1699,13 @@ def title_index():
         i[0] += 1
 
     if(title_list):        
-        data += '<br> \
-                    <li>이 위키에는 총 ' + str(i[0]) + '개의 문서가 있습니다.</li> \
-                    <br> \
-                    <li>틀 문서는 총 ' + str(i[3]) + '개의 문서가 있습니다.</li> \
-                    <li>분류 문서는 총 ' + str(i[1]) + '개의 문서가 있습니다.</li> \
-                    <li>사용자 문서는 총 ' + str(i[2]) + '개의 문서가 있습니다.</li> \
-                    <li>파일 문서는 총 ' + str(i[4]) + '개의 문서가 있습니다.</li> \
-                    <li>나머지 문서는 총 ' + str(i[5]) + '개의 문서가 있습니다.</li>'
+        data += '<li>이 위키에는 총 ' + str(i[0]) + '개의 문서가 있습니다.</li> \
+                <br> \
+                <li>틀 문서는 총 ' + str(i[3]) + '개의 문서가 있습니다.</li> \
+                <li>분류 문서는 총 ' + str(i[1]) + '개의 문서가 있습니다.</li> \
+                <li>사용자 문서는 총 ' + str(i[2]) + '개의 문서가 있습니다.</li> \
+                <li>파일 문서는 총 ' + str(i[4]) + '개의 문서가 있습니다.</li> \
+                <li>나머지 문서는 총 ' + str(i[5]) + '개의 문서가 있습니다.</li>'
     
     return(
         template('index', 
@@ -2521,8 +2519,7 @@ def acl(name = None):
                 return(
                     template('index', 
                         imp = [name, wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), ' (ACL)'],
-                        data = '<br> \
-                                <span>현재 ACL : ' + now + '</span> \
+                        data = '<span>현재 ACL : ' + now + '</span> \
                                 <br> \
                                 <br> \
                                 <form method="post"> \
@@ -2649,7 +2646,7 @@ def are_you_ban():
         template(
             'index', 
             imp = ['권한 오류', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
-            data = '<br>' + end,
+            data = end,
             menu = 0
         )
     )
@@ -2837,7 +2834,7 @@ def read_view(name = None, num = None, redirect = None):
     return(
         template('index', 
             imp = [name, wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), sub + acl],
-            data = '<br>' + enddata + div,
+            data = enddata + div,
             menu = menu
         )
     )
@@ -2931,27 +2928,23 @@ def user_info():
     ip = ip_pas(ip, 2)
 
     if(login_check() == 1):
-        plus = '<li><a href="/logout">로그아웃</a></li>'
+        plus = ' * [[wiki:logout|로그아웃]]'
     else:
-        plus = '<li><a href="/login">로그인</a></li>'
+        plus = ' * [[wiki:login|로그인]]'
 
     return(
         template(
             'index', 
             imp = ['사용자 메뉴', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
-            data = '<br> \
-                    ' + ip + ' \
-                    <br> \
-                    <br> \
-                    <span>권한 상태 : ' + acl + '</span> \
-                    <h2>로그인 관련</h2> \
-                    ' + plus + ' \
-                    <li><a href="/register">회원가입</a></li> \
-                    <h2>기타</h2> \
-                    <li><a href="/change">비밀번호 변경</a></li> \
-                    <li><a href="/count">기여 횟수</a></li> \
-                    <li><a href="/custom_css">커스텀 CSS</a></li> \
-                    <li><a href="/custom_js">커스텀 JS</a></li>',
+            data =  ip + '<br><br>' + namumark('',  '권한 상태 : ' + acl + '\r\n' + \
+                                                    '== 로그인 관련 ==\r\n' + \
+                                                    plus + '\r\n' + \
+                                                    ' * [[wiki:register|회원가입]]\r\n' + \
+                                                    '== 기타 ==\r\n' + \
+                                                    ' * [[wiki:change|비밀번호 변경]]\r\n' + \
+                                                    ' * [[wiki:count|기여 횟수]]\r\n' + \
+                                                    ' * [[wiki:custom_css|사용자 CSS]]\r\n' + \
+                                                    ' * [[wiki:custom_js|사용자 JS]]\r\n', 0, 0),
             menu = 0
         )
     )
@@ -2992,7 +2985,7 @@ def custom_css_view():
         return(
             template(
                 'index', 
-                imp = ['커스텀 CSS', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
+                imp = ['사용자 CSS', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
                 data =  '<br> \
                         ' + start + ' \
                         <form method="post"> \
@@ -3044,7 +3037,7 @@ def custom_js_view():
         return(
             template(
                 'index', 
-                imp = ['커스텀 JS', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
+                imp = ['사용자 JS', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
                 data =  '<br> \
                         ' + start + ' \
                         <form method="post"> \
@@ -3182,7 +3175,7 @@ def error_test(num = None):
             template(
                 'index', 
                 imp = [title, wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
-                data = '<br>' + data,
+                data = data,
                 menu = 0
             )
         )

@@ -353,7 +353,7 @@ def mid_pas(data, fol_num, include, in_c):
             
     return([data, fol_num])
 
-def toc_pas(data, title):
+def toc_pas(data, title, num):
     i = [0, 0, 0, 0, 0, 0, 0]
     last = 0
     toc_c = -1
@@ -446,7 +446,11 @@ def toc_pas(data, title):
             d = c
             c = re.sub("\[\[(([^|]*)\|)?(?P<in>[^\]]*)\]\]", "\g<in>", c)
 
-            data = re.sub('(={1,6})\s?([^=]*)\s?(?:={1,6})(?:\s+)?\n', '<tablenobr><h' + str(wiki) + ' id="' + c + '" ' + margin + '><a href="#toc" id="s-' + toc + '">' + toc + '.<span style="margin-left: 5px;"></span></a> ' + d + ' <span style="font-size:11px;">[<a href="/edit/' + url_pas(title) + '/section/' + str(i[0]) + '">편집</a>]</span></h' + str(wiki) + '><hr style="margin-top: -5px;">', data, 1)
+            edit_d = ''
+            if(num != 0):
+                edit_d = ' <span style="font-size:11px;">[<a href="/edit/' + url_pas(title) + '/section/' + str(i[0]) + '">편집</a>]</span>'
+
+            data = re.sub('(={1,6})\s?([^=]*)\s?(?:={1,6})(?:\s+)?\n', '<tablenobr><h' + str(wiki) + ' id="' + c + '" ' + margin + '><a href="#toc" id="s-' + toc + '">' + toc + '.<span style="margin-left: 5px;"></span></a> ' + d + edit_d + '</h' + str(wiki) + '><hr style="margin-top: -5px;">', data, 1)
         else:
             rtoc += '</div>'
             
@@ -515,7 +519,7 @@ def namumark(title, data, num, in_c):
                             else:
                                 break       
 
-                    in_data = toc_pas(in_data, results[0])
+                    in_data = toc_pas(in_data, results[0], num)
                                 
                     data = include.sub('\n<nobr><a href="/w/' + url_pas(results[0]) + '">[' + results[0] + ' 이동]</a><div>' + in_data + '</div><nobr>\n', data, 1)
                 else:
@@ -562,7 +566,7 @@ def namumark(title, data, num, in_c):
         
     data = re.sub("(\n)(?P<in>\r\n(={1,6})\s?([^=]*)\s?(?:={1,6})(?:\s+)?\n)", "\g<in>", data)
     
-    data = toc_pas(data, title)
+    data = toc_pas(data, title, num)
     
     category = ''
     while(1):
@@ -1023,7 +1027,7 @@ def namumark(title, data, num, in_c):
     data = re.sub('<\/blockquote>(?:(?:\r)?\n)<br><blockquote>', '</blockquote><blockquote>', data)
     data = re.sub('\n', '<br>', data)
     data = re.sub('<isbr>', '\r\n', data)
-    data = re.sub('^<br>', '', data)
+    data = re.sub('^(?:<br>|\r|\n| )+', '', data)
     
     conn.commit()
     return(data)
