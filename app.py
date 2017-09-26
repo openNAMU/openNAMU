@@ -2809,9 +2809,9 @@ def read_view(name = None, num = None, redirect = None):
     enddata = namumark(name, elsedata, 1, 0)
 
     if(data_none == 1):
-        menu = [['edit/' + url_pas(name), '생성'], ['topic/' + url_pas(name), topic], ['move/' + url_pas(name), '이동'], ['history/' + url_pas(name), '역사'], ['xref/' + url_pas(name), '역링크']]
+        menu = [['edit/' + url_pas(name), '생성'], ['topic/' + url_pas(name), topic], ['history/' + url_pas(name), '역사'], ['move/' + url_pas(name), '이동'], ['xref/' + url_pas(name), '역링크']]
     else:
-        menu = [['edit/' + url_pas(name), '수정'], ['topic/' + url_pas(name), topic], ['delete/' + url_pas(name), '삭제'], ['raw/' + url_pas(name), '원본'], ['move/' + url_pas(name), '이동'], ['history/' + url_pas(name), '역사'], ['xref/' + url_pas(name), '역링크']]
+        menu = [['edit/' + url_pas(name), '수정'], ['topic/' + url_pas(name), topic], ['history/' + url_pas(name), '역사'], ['delete/' + url_pas(name), '삭제'], ['move/' + url_pas(name), '이동'], ['raw/' + url_pas(name), '원본'], ['xref/' + url_pas(name), '역링크']]
         if(admin_memu == 1):
             menu += [['acl/' + url_pas(name), 'ACL']]
 
