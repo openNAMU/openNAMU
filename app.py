@@ -2816,7 +2816,7 @@ def read_view(name = None, num = None, redirect = None):
             menu += [['acl/' + url_pas(name), 'ACL']]
 
     if(redirect):
-        enddata =   '<li style="margin-top: -20px;"><a href="/w/' + url_pas(redirect) + '/from/' + url_pas(name) + '">' + redirect + '</a>에서 넘어 왔습니다.</li> \
+        enddata =   '<li><a href="/w/' + url_pas(redirect) + '/from/' + url_pas(name) + '">' + redirect + '</a>에서 넘어 왔습니다.</li> \
                     <br>' + enddata
         menu += [['w/' + url_pas(name), '넘기기']]
 
