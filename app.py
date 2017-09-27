@@ -1171,7 +1171,7 @@ def edit(name = None, num = None):
                 curs.execute("delete from back where link = ?", [name])
                 curs.execute("delete from cat where cat = ?", [name])
 
-                curs.execute("select title from data where title = ?", [name])
+                curs.execute("select data from data where title = ?", [name])
                 rows = curs.fetchall()
                 if(rows):
                     if(request.forms.otent == content):
@@ -1180,6 +1180,7 @@ def edit(name = None, num = None):
                     leng = leng_check(len(request.forms.otent), len(content))
                     if(num):
                         content = rows[0][0].replace(request.forms.otent, content)
+                        
                     curs.execute("update data set data = ? where title = ?", [content, name])
                 else:
                     leng = '+' + str(len(content))
