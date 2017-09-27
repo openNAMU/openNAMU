@@ -1696,8 +1696,6 @@ def title_index(num = 1000, page = 1):
     if(num == 0):
         curs.execute("select title from data order by title asc")
     else:
-        print('v : ' + str(v_page - num))
-        print('v_2 : ' + str(v_page))
         curs.execute("select title from data order by title asc limit ?, ?", [str(v_page - num), str(num)])
     title_list = curs.fetchall()
 
