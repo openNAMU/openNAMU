@@ -65,19 +65,6 @@ except:
 
 conn.commit()
 
-'''@route('/upload', method=['POST', 'GET'])
-def upload():
-    return(
-        template(
-            'index', 
-            imp = ['파일 올리기', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
-            data = '<form method="post" enctype="multipart/form-data"> \
-                        <input type="file" name="upload" /> <input type="submit" value="올리기" />\
-                    </form>',
-            menu = [['other', '기타']]
-        )
-    )'''
-
 @route('/setup', method=['GET', 'POST'])
 def setup():
     try:
@@ -411,7 +398,7 @@ def recent_changes(name = None, num = 1):
             
         i = v - 50
 
-        curs.execute("select id, title, date, ip, send, leng from history where ip = ? order by date desc limit ?, ?", [name, str(i), str(v)])
+        curs.execute("select id, title, date, ip, send, leng from history where ip = ? and not send = 'Dump' order by date desc limit ?, ?", [name, str(i), str(v)])
     else:
         curs.execute("select id, title, date, ip, send, leng from history order by date desc limit 50")
 
@@ -615,7 +602,25 @@ def back_reset():
         
         return(redirect('/'))
     else:
-        
+        return(redirect('/error/3'))
+
+@route('/indexing')
+def indexing():
+    if(admin_check(None, 'indexing') == 1):
+        curs.execute("select name from sqlite_master where type in ('table', 'view') and name not like 'sqlite_%' union all select name from sqlite_temp_master where type in ('table', 'view') order by 1;")
+        data = curs.fetchall()
+        for table in data:
+            print('----- ' + table[0] + ' -----')
+            curs.execute('select sql from sqlite_master where name = ?', [table[0]])
+            cul = curs.fetchall()
+            r_cul = re.findall('(?:([^ (]*) text)', str(cul[0]))
+            for n_cul in r_cul:
+                print(n_cul)
+                sql = 'create index index_' + table[0] + '_' + n_cul + ' on ' + table[0] + '(' + n_cul + ')'
+                curs.execute(sql)
+        conn.commit()
+        return(redirect('/'))
+    else:
         return(redirect('/error/3'))
         
 @route('/xref/<name:path>')
