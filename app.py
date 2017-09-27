@@ -144,16 +144,16 @@ def edit_set():
                     'index', 
                     imp = ['설정 편집', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
                     data = '<form method="post"> \
-                                <input style="width: 100%;" type="text" name="name" value="' + name_d[0][0] + '"> \
+                                <input placeholder="위키 이름" style="width: 100%;" type="text" name="name" value="' + name_d[0][0] + '"> \
                                 <br> \
                                 <br> \
-                                <input style="width: 100%;" type="text" name="frontpage" value="' + frontpage_d[0][0] + '"> \
+                                <input placeholder="시작 페이지" style="width: 100%;" type="text" name="frontpage" value="' + frontpage_d[0][0] + '"> \
                                 <br> \
                                 <br> \
-                                <input style="width: 100%;" type="text" name="license" value="' + license_d[0][0] + '"> \
+                                <input placeholder="라이선스" style="width: 100%;" type="text" name="license" value="' + license_d[0][0] + '"> \
                                 <br> \
                                 <br> \
-                                <input style="width: 100%;" type="text" name="upload" value="' + upload_d[0][0] + '"> \
+                                <input placeholder="파일 올리기 최대 크기" style="width: 100%;" type="text" name="upload" value="' + upload_d[0][0] + '"> \
                                 <br> \
                                 <br> \
                                 <span>차례대로 위키 이름, 시작 페이지, 라이선스, 파일 올리기 최대 크기 입니다.</span> \
@@ -1139,7 +1139,7 @@ def m_del():
                                 <textarea style="height: 80%;" name="content"></textarea> \
                                 <br> \
                                 <br> \
-                                <input style="width: 100%;" class="form-control input-sm" name="send" type="text"> \
+                                <input placeholder="사유" style="width: 100%;" class="form-control input-sm" name="send" type="text"> \
                                 <br> \
                                 <br> \
                                 <div class="form-actions"> \
@@ -1249,7 +1249,7 @@ def edit(name = None, num = None):
                                 <textarea style="display: none; height: 80%;" name="otent">' + data + '</textarea> \
                                 <br> \
                                 <br> \
-                                <input name="send" style="width: 100%;" type="text"> \
+                                <input placeholder="사유" name="send" style="width: 100%;" type="text"> \
                                 <br> \
                                 <br> \
                                 <div class="form-actions"> \
@@ -1288,7 +1288,7 @@ def preview(name = None, num = None):
                             <textarea style="display: none; height: 80%;" name="otent">' + request.forms.otent + '</textarea> \
                             <br> \
                             <br> \
-                            <input name="send" style="width: 100%;" type="text"> \
+                            <input placeholder="사유" name="send" style="width: 100%;" type="text"> \
                             <br> \
                             <br> \
                             <div class="form-actions"> \
@@ -1351,7 +1351,7 @@ def delete(name = None):
                         imp = [name, wiki_set(1), wiki_set(3), l_c, custom_css(), custom_js(), ' (삭제)'],
                         data = '<form method="post"> \
                                     ' + plus + ' \
-                                    <input style="width: 100%;" class="form-control input-sm" name="send" type="text"> \
+                                    <input placeholder="사유" style="width: 100%;" class="form-control input-sm" name="send" type="text"> \
                                     <br> \
                                     <br> \
                                     <button class="btn btn-primary" type="submit">삭제</button> \
@@ -1413,10 +1413,10 @@ def move(name = None):
                 imp = [name, wiki_set(1), wiki_set(3), l_c, custom_css(), custom_js(), ' (이동)'],
                 data = '<form method="post"> \
                             ' + plus + ' \
-                            <input class="form-control input-sm" value="' + name + '" name="title" type="text"> \
+                            <input placeholder="문서명" class="form-control input-sm" value="' + name + '" name="title" type="text"> \
                             <br> \
                             <br> \
-                            <input style="width: 100%;" class="form-control input-sm" name="send" type="text"> \
+                            <input placeholder="사유" style="width: 100%;" class="form-control input-sm" name="send" type="text"> \
                             <br> \
                             <br> \
                             <button class="btn btn-primary" type="submit">이동</button> \
@@ -1484,7 +1484,7 @@ def manager(num = 1):
                 template('index', 
                     imp = ['ACL 이동', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
                     data = '<form method="post"> \
-                                <input name="name" type="text"> \
+                                <input placeholder="문서명" name="name" type="text"> \
                                 <br> \
                                 <br> \
                                 <button class="btn btn-primary" type="submit">이동</button> \
@@ -1500,7 +1500,7 @@ def manager(num = 1):
                 template('index', 
                     imp = ['검사 이동', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
                     data = '<form method="post"> \
-                                <input name="name" type="text"> \
+                                <input placeholder="사용자명" name="name" type="text"> \
                                 <br> \
                                 <br> \
                                 <button class="btn btn-primary" type="submit">이동</button> \
@@ -1516,7 +1516,7 @@ def manager(num = 1):
                 template('index', 
                     imp = ['차단 이동', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
                     data = '<form method="post"> \
-                                <input name="name" type="text"> \
+                                <input placeholder="사용자명" name="name" type="text"> \
                                 <br> \
                                 <br> \
                                 <button class="btn btn-primary" type="submit">이동</button> \
@@ -1532,7 +1532,7 @@ def manager(num = 1):
                 template('index', 
                     imp = ['권한 이동', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
                     data = '<form method="post"> \
-                                <input name="name" type="text"> \
+                                <input placeholder="사용자명" name="name" type="text"> \
                                 <br> \
                                 <br> \
                                 <button class="btn btn-primary" type="submit">이동</button> \
@@ -1548,7 +1548,7 @@ def manager(num = 1):
                 template('index', 
                     imp = ['기록 이동', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
                     data = '<form method="post"> \
-                                <input name="name" type="text"> \
+                                <input placeholder="사용자명" name="name" type="text"> \
                                 <br> \
                                 <br> \
                                 <button class="btn btn-primary" type="submit">이동</button> \
@@ -1564,7 +1564,7 @@ def manager(num = 1):
                 template('index', 
                     imp = ['토론 기록 이동', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
                     data = '<form method="post"> \
-                                <input name="name" type="text"> \
+                                <input placeholder="사용자명" name="name" type="text"> \
                                 <br> \
                                 <br> \
                                 <button class="btn btn-primary" type="submit">이동</button> \
@@ -1580,7 +1580,7 @@ def manager(num = 1):
                 template('index', 
                     imp = ['그룹 생성 이동', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
                     data = '<form method="post"> \
-                                <input name="name" type="text"> \
+                                <input placeholder="그룹명" name="name" type="text"> \
                                 <br> \
                                 <br> \
                                 <button class="btn btn-primary" type="submit">이동</button> \
@@ -1596,7 +1596,7 @@ def manager(num = 1):
                 template('index', 
                     imp = ['문서 출력 이동', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
                     data = '<form method="post"> \
-                                <input name="name" type="text"> \
+                                <input placeholder="문서명" name="name" type="text"> \
                                 <br> \
                                 <br> \
                                 <button class="btn btn-primary" type="submit">이동</button> \
@@ -2083,7 +2083,7 @@ def close_topic_list(name = None, tool = None):
                     <a href="/topic/' + url_pas(name) + '/close">(닫힘)</a> <a href="/topic/' + url_pas(name) + '/agree">(합의)</a> \
                     <br> \
                     <br> \
-                    <input class="form-control" name="topic" style="width: 100%;"> \
+                    <input placeholder="토론명" class="form-control" name="topic" style="width: 100%;"> \
                     <br> \
                     <br> \
                     <button class="btn btn-primary" type="submit">만들기</button>'
@@ -2187,16 +2187,10 @@ def login():
                 'index',    
                 imp = ['로그인', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
                 data = '<form method="post"> \
-                            <span>아이디</span> \
+                            <input placeholder="아이디" name="id" type="text"> \
                             <br> \
                             <br> \
-                            <input name="id" type="text"> \
-                            <br> \
-                            <br> \
-                            <span>비밀번호</span> \
-                            <br> \
-                            <br> \
-                            <input name="pw" type="password"> \
+                            <input placeholder="비밀번호" name="pw" type="password"> \
                             <br> \
                             <br> \
                             <button class="btn btn-primary" type="submit">로그인</button> \
@@ -2249,28 +2243,16 @@ def change_password():
                 'index',    
                 imp = ['비밀번호 변경', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
                 data = '<form method="post"> \
-                            <span>아이디</span> \
+                            <input placeholder="아이디" name="id" type="text"> \
                             <br> \
                             <br> \
-                            <input name="id" type="text"> \
+                            <input placeholder="현재 비밀번호" name="pw" type="password"> \
                             <br> \
                             <br> \
-                            <span>현재 비밀번호</span> \
+                            <input placeholder="변경할 비밀번호" name="pw2" type="password"> \
                             <br> \
                             <br> \
-                            <input name="pw" type="password"> \
-                            <br> \
-                            <br> \
-                            <span>변경할 비밀번호</span> \
-                            <br> \
-                            <br> \
-                            <input name="pw2" type="password"> \
-                            <br> \
-                            <br> \
-                            <span>재 확인</span> \
-                            <br> \
-                            <br> \
-                            <input name="pw3" type="password"> \
+                            <input placeholder="재 확인" name="pw3" type="password"> \
                             <br> \
                             <br> \
                             <button class="btn btn-primary" type="submit">변경</button> \
@@ -2368,22 +2350,13 @@ def register():
                 'index',    
                 imp = ['회원가입', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
                 data = '<form method="post"> \
-                            <span>아이디</span> \
+                            <input placeholder="아이디" name="id" type="text"> \
                             <br> \
                             <br> \
-                            <input name="id" type="text"> \
+                            <input placeholder="비밀번호" name="pw" type="password"> \
                             <br> \
                             <br> \
-                            <span>비밀번호</span> \
-                            <br> \
-                            <br> \
-                            <input name="pw" type="password"> \
-                            <br> \
-                            <br> \
-                            <span>재 확인</span> \
-                            <br> \
-                            <br> \
-                            <input name="pw2" type="password"> \
+                            <input placeholder="재 확인" name="pw2" type="password"> \
                             <br> \
                             <br> \
                             <button class="btn btn-primary" type="submit">가입</button> \
@@ -2414,10 +2387,10 @@ def user_ban(name = None):
         if(admin_check(1, 'ban (' + name + ')') == 1):
             ip = ip_check()
             
-            if(not re.search("[0-9]{4}-[0-9]{2}-[0-9]{2}", request.forms.end)):
+            if(request.forms.year == '09'):
                 end = ''
             else:
-                end = request.forms.end
+                end = request.forms.year + '-' + request.forms.month + '-' + request.forms.day
 
             curs.execute("select block from ban where block = ?", [name])
             row = curs.fetchall()
@@ -2453,23 +2426,35 @@ def user_ban(name = None):
                     now = '대역 차단'
                 else:
                     now = '차단'
+
+                year_n = int("%04d" % (time.localtime().tm_year))
+                year = '<option value="09">영구</option>'
+                for i in range(year_n, year_n + 51):
+                    if(i == year_n):
+                        year += '<option value="' + str(i) + '" selected>' + str(i) + '</option>'
+                    else:
+                        year += '<option value="' + str(i) + '">' + str(i) + '</option>'
+
+                month = '<option value="1" selected>1</option>'
+                for i in range(2, 13):
+                    month += '<option value="' + str(i) + '">' + str(i) + '</option>'
+
+                day = '<option value="1" selected>1</option>'
+                for i in range(2, 32):
+                    day += '<option value="' + str(i) + '">' + str(i) + '</option>'
                 
-                data = '<input class="form-control" name="end" style="width: 100%;"> \
+                data = '<select name="year"> \
+                            ' + year + ' \
+                        </select> \
+                        <select name="month"> \
+                            ' + month + ' \
+                        </select> \
+                        <select name="day"> \
+                            ' + day + ' \
+                        </select> \
                         <br> \
                         <br> \
-                        <span>아무것도 안 적으면 무기한 차단입니다.</span> \
-                        <br> \
-                        <br> \
-                        <span>차단 일 지정시 형식은 YYYY-MM-DD로 기록해야 합니다. (예시: 2017-01-20, 2017-10-15)</span> \
-                        <br> \
-                        <br> \
-                        <span>지금 시각은 ' + get_time() + ' 입니다.</span> \
-                        <br> \
-                        <br> \
-                        <input class="form-control" name="why" style="width: 100%;"> \
-                        <br> \
-                        <br> \
-                        <span>사유를 쓰는 곳입니다.</span> \
+                        <input placeholder="사유" class="form-control" name="why" style="width: 100%;"> \
                         <br> \
                         <br>'
 
