@@ -398,9 +398,9 @@ def recent_changes(name = None, num = 1):
             
         i = v - 50
 
-        curs.execute("select id, title, date, ip, send, leng from history where ip = ? and not date = 'Dump' order by date desc limit ?, ?", [name, str(i), str(v)])
+        curs.execute("select id, title, date, ip, send, leng from history where ip = ? order by date desc limit ?, ?", [name, str(i), str(v)])
     else:
-        curs.execute("select id, title, date, ip, send, leng from history order by date desc limit 50")
+        curs.execute("select id, title, date, ip, send, leng from history where not date = 'Dump' order by date desc limit 50")
 
     rows = curs.fetchall()
 
