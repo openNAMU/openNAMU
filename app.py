@@ -746,7 +746,7 @@ def block_log(num = 1):
         else:
             ip = ip_pas(data[1], 2)
 
-        if(not data[3] == ''):
+        if(data[3] != ''):
             end = data[3]
         else:
             end = '무기한'
@@ -2016,7 +2016,7 @@ def topic(name = None, sub = None):
 
         l_c = login_check()
 
-        if(not ban == 1):
+        if(ban != 1):
             data = '<a id="reload" href="javascript:void(0);" onclick="location.href.endsWith(\'#reload\') ?  location.reload(true) : location.href = \'#reload\'"> \
                         <i aria-hidden="true" class="fa fa-refresh"></i> \
                     </a> \
@@ -2110,7 +2110,7 @@ def close_topic_list(name = None, tool = None):
                     if(close):
                         it_p = 1
                 
-                if(not it_p == 1):
+                if(it_p != 1):
                     div += '<h2> \
                                 <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(data[0]) + '">' + str((i + 1)) + '. ' + data[0] + '</a> \
                             </h2> \
@@ -2806,7 +2806,7 @@ def read_view(name = None, num = None, redirect = None):
                     <br>' + enddata
         menu += [['w/' + url_pas(name), '넘기기']]
 
-    if(not uppage == 0):
+    if(uppage != 0):
         menu += [['w/' + url_pas(uppage), '상위']]
 
     if(down):
