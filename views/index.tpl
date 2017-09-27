@@ -66,7 +66,7 @@
                 </div>
                 <form method="POST" action="/search" id="search">
                     <div class="input-group">
-                        <input class="form-control" name="search" type="text">
+                        <input placeholder="검색" class="form-control" name="search" type="text">
                         <span class="input-group-button">
                             <button id="goto" class="btn" formaction="/goto"><i class="fa fa-share" aria-hidden="true"></i></button>
                         </span>
