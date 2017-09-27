@@ -362,7 +362,7 @@ def toc_pas(data, title, num):
     rtoc = '<div id="toc"><span id="toc-name">목차</span><br><br>'
     while(1):
         i[0] += 1
-        m = re.search('(={1,6})\s?([^=]*)\s?(?:={1,6})(?:\s+)?\n', data)
+        m = re.search('(={1,6})\s?([^=]*)\s?(?:={1,6})(?:\s+)?\r\n', data)
         if(m):
             result = m.groups()
             wiki = len(result[0])
