@@ -1677,40 +1677,64 @@ def json_in():
         return(redirect('/error/3'))
         
 @route('/title_index')
-def title_index():
-    i = [0, 0, 0, 0, 0, 0]
-    data = ''
-    curs.execute("select title from data order by title asc")
+@route('/title_index/<num:int>/<page:int>')
+def title_index(num = 1000, page = 1):
+    if(page > 0):
+        v_page = page * num
+    else:
+        v_page = 1 * num
+
+    if(num != 0):
+        i = [v_page - num + 1]
+    else:
+        i = [1, 0, 0, 0, 0, 0]
+
+    data = '<a href="/title_index/0/1">(전체)</a> <a href="/title_index/500/1">(500)</a> <a href="/title_index/5000/1">(5000개)</a> <a href="/title_index/10000/1">(10000개)</a> <a href="/title_index/50000/1">(50000개)</a> \
+            <br> \
+            <br>'
+
+    if(num == 0):
+        curs.execute("select title from data order by title asc")
+    else:
+        print('v : ' + str(v_page - num))
+        print('v_2 : ' + str(v_page))
+        curs.execute("select title from data order by title asc limit ?, ?", [str(v_page - num), str(num)])
     title_list = curs.fetchall()
 
     for list_data in title_list:
-        data += '<li>' + str(i[0] + 1) + '. <a href="/w/' + url_pas(list_data[0]) + '">' + list_data[0] + '</a></li>'
+        data += '<li>' + str(i[0]) + '. <a href="/w/' + url_pas(list_data[0]) + '">' + list_data[0] + '</a></li>'
 
-        if(re.search('^분류:', list_data[0])):
-            i[1] += 1
-        elif(re.search('^사용자:', list_data[0])):
-            i[2] += 1
-        elif(re.search('^틀:', list_data[0])):
-            i[3] += 1
-        elif(re.search('^파일:', list_data[0])):
-            i[4] += 1
-        else:
-            i[5] += 1
-    
+        if(num == 0):
+            if(re.search('^분류:', list_data[0])):
+                i[1] += 1
+            elif(re.search('^사용자:', list_data[0])):
+                i[2] += 1
+            elif(re.search('^틀:', list_data[0])):
+                i[3] += 1
+            elif(re.search('^파일:', list_data[0])):
+                i[4] += 1
+            else:
+                i[5] += 1
+        
         i[0] += 1
 
-    if(title_list):        
-        data += '<li>이 위키에는 총 ' + str(i[0]) + '개의 문서가 있습니다.</li> \
-                <br> \
-                <li>틀 문서는 총 ' + str(i[3]) + '개의 문서가 있습니다.</li> \
-                <li>분류 문서는 총 ' + str(i[1]) + '개의 문서가 있습니다.</li> \
-                <li>사용자 문서는 총 ' + str(i[2]) + '개의 문서가 있습니다.</li> \
-                <li>파일 문서는 총 ' + str(i[4]) + '개의 문서가 있습니다.</li> \
-                <li>나머지 문서는 총 ' + str(i[5]) + '개의 문서가 있습니다.</li>'
+    if(num == 0):
+        if(title_list):        
+            data += '<br> \
+                    <li>이 위키에는 총 ' + str(i[0]) + '개의 문서가 있습니다.</li> \
+                    <br> \
+                    <li>틀 문서는 총 ' + str(i[3]) + '개의 문서가 있습니다.</li> \
+                    <li>분류 문서는 총 ' + str(i[1]) + '개의 문서가 있습니다.</li> \
+                    <li>사용자 문서는 총 ' + str(i[2]) + '개의 문서가 있습니다.</li> \
+                    <li>파일 문서는 총 ' + str(i[4]) + '개의 문서가 있습니다.</li> \
+                    <li>나머지 문서는 총 ' + str(i[5]) + '개의 문서가 있습니다.</li>'
+    else:
+        data += '<br> \
+                <a href="/title_index/' + str(num) + '/' + str(page - 1) + '">(이전)</a> <a href="/title_index/' + str(num) + '/' + str(page + 1) + '">(이후)</a>'
     
     return(
         template('index', 
-            imp = ['모든 문서', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
+            imp = ['모든 문서', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), ' (' + str(num) + ')'],
             data = data,
             menu = [['other', '기타']]
         )    
