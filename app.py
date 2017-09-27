@@ -2972,8 +2972,7 @@ def custom_css_view():
             template(
                 'index', 
                 imp = ['사용자 CSS', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
-                data =  '<br> \
-                        ' + start + ' \
+                data =  start + ' \
                         <form method="post"> \
                             <textarea rows="30" cols="100" name="content">'\
                                  + data + \
@@ -3024,8 +3023,7 @@ def custom_js_view():
             template(
                 'index', 
                 imp = ['사용자 JS', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
-                data =  '<br> \
-                        ' + start + ' \
+                data =  start + ' \
                         <form method="post"> \
                             <textarea rows="30" cols="100" name="content">'\
                                  + data + \
