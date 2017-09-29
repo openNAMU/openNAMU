@@ -543,8 +543,6 @@ def namumark(title, data, num, in_c):
             else:
                 plus = ''
 
-            print(n_sharp)
-
             data = re.sub('^#(?:redirect|넘겨주기) ([^\n]*)$', '<meta http-equiv="refresh" content="0;url=/w/' + url_pas(n_sharp) + '/from/' + url_pas(title) + plus + '" />', data, 1)
             backlink_plus(title, n_data[0], 'redirect', num)
         else:
