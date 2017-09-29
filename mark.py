@@ -477,17 +477,8 @@ def cat_plus(name, link, num):
 def namumark(title, data, num, in_c):    
     data = re.sub("\n", "\r\n", re.sub("\r\n", "\n", data))
     data = html_pas(data)
-
-    fol_num = 0
-    var_d = mid_pas(data, fol_num, 0, in_c)
     
-    data = var_d[0]
-    fol_num = var_d[1]
-    
-    data = re.sub("\[anchor\((?P<in>[^\[\]]*)\)\]", '<span id="\g<in>"></span>', data)
-    data = savemark(data)
-    
-    include = re.compile("\[include\(((?:(?!\)\]|,).)*)((?:,\s?(?:[^)]*))+)?\)\]")
+    include = re.compile("\[include\(((?:(?!\)\]|,).)*)((?:(?:,\s?(?:(?!\)\]).)*))+)?\)\]")
     while(1):
         m = include.search(data)
         if(m):
@@ -505,10 +496,6 @@ def namumark(title, data, num, in_c):
                     in_data = re.sub("\n", "\r\n", re.sub("\r\n", "\n", in_data))
                     
                     in_data = html_pas(in_data)
-                    var_d = mid_pas(in_data, fol_num, 1, in_c)
-                    
-                    in_data = var_d[0]
-                    fol_num = var_d[1]
                     
                     if(results[1]):
                         a = results[1]
@@ -528,22 +515,38 @@ def namumark(title, data, num, in_c):
                     data = include.sub("<a class=\"not_thing\" href=\"" + url_pas(results[0]) + "\">" + results[0] + "</a>", data, 1)
         else:
             break
+
+    data = re.sub("##\s?(?P<in>[^\n]*)\n", "", data)
+
+    fol_num = 0
+    var_d = mid_pas(data, fol_num, 0, in_c)
+    
+    data = var_d[0]
+    fol_num = var_d[1]
+    
+    data = re.sub("\[anchor\((?P<in>[^\[\]]*)\)\]", '<span id="\g<in>"></span>', data)
+    data = savemark(data)
     
     while(1):
-        m = re.search('^#(?:redirect|넘겨주기) ([^\n]*)$', data)
-        if(m):
-            results = m.groups()
-            g = re.sub("\\\#", "<sharp>", results[0])
-            aa = re.search("^([^\n]*)(#(?:[^\n]*))$", g)
-            if(aa):
-                results = aa.groups()
-                nosharp = re.sub("<sharp>", "#", results[0])
-                data = re.sub('^#(?:redirect|넘겨주기) ([^\n]*)$', '<meta http-equiv="refresh" content="0;url=/w/' + url_pas(nosharp) + '/from/' + url_pas(title) + results[1] + '" />', data, 1)
+        r_data = re.search('^#(?:redirect|넘겨주기) ([^\n]*)', data)
+        if(r_data):
+            n_data = r_data.groups()
+            n_s_data = re.sub("\\\#", "<sharp>", n_data[0])
+
+            s_data = re.search("^([^\n#]*)(#(?:[^\n]*))?$", n_s_data)
+            r_s_data = s_data.groups()
+
+            n_sharp = re.sub("<sharp>", "#", r_s_data[0])
+
+            if(r_s_data[1]):
+                plus = r_s_data[1]
             else:
-                nosharp = re.sub("<sharp>", "#", g)
-                data = re.sub('^#(?:redirect|넘겨주기) ([^\n]*)$', '<meta http-equiv="refresh" content="0;url=/w/' + url_pas(nosharp) + '/from/' + url_pas(title) + '" />', data, 1)
-            
-            backlink_plus(title, results[0], 'redirect', num)
+                plus = ''
+
+            print(n_sharp)
+
+            data = re.sub('^#(?:redirect|넘겨주기) ([^\n]*)$', '<meta http-equiv="refresh" content="0;url=/w/' + url_pas(n_sharp) + '/from/' + url_pas(title) + plus + '" />', data, 1)
+            backlink_plus(title, n_data[0], 'redirect', num)
         else:
             break
             
@@ -627,8 +630,6 @@ def namumark(title, data, num, in_c):
                                                                         <rt>\g<out></rt> \
                                                                         <rp>)</rp> \
                                                                     </ruby>', data)
-    
-    data = re.sub("##\s?(?P<in>[^\n]*)\n", "<div style='display:none;'>\g<in></div>", data)
     
     test = re.findall('\[\[wiki:([^|\]]+)(?:\|([^\]]+))?\]\]', data)
     if(test):

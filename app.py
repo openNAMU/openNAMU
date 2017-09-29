@@ -1276,7 +1276,7 @@ def preview(name = None, num = None):
         return(redirect('/ban'))
     else:            
         newdata = request.forms.content
-        newdata = re.sub('^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)', ' * [[\g<in>]] 문서로 넘겨주기', newdata)
+        newdata = re.sub('^#(?:redirect|넘겨주기) (?P<in>[^\n]*)', ' * [[\g<in>]] 문서로 넘겨주기', newdata)
         enddata = namumark(name, newdata, 0, 0)
 
         if(num):
@@ -2817,7 +2817,7 @@ def read_view(name = None, num = None, redirect = None):
             sub = ' (차단)'
             
     if(redirect):
-        elsedata = re.sub("^#(?:redirect|넘겨주기)\s(?P<in>[^\n]*)", " * [[\g<in>]] 문서로 넘겨주기", elsedata)
+        elsedata = re.sub("^#(?:redirect|넘겨주기) (?P<in>[^\n]*)", " * [[\g<in>]] 문서로 넘겨주기", elsedata)
             
     enddata = namumark(name, elsedata, 1, 0)
 
