@@ -684,7 +684,7 @@ def namumark(title, data, num, in_c):
             
             result = m.groups()
             if(result[0]):
-                yudt = re.search('(?:\?v=(.*)|\/([^/?]*)|^([a-zA-Z0-9\-]*))$', result[0])
+                yudt = re.search('(?:\?v=(.*)|\/([^/?]*)|^([a-zA-Z0-9\-_]*))$', result[0])
                 if(yudt):
                     if(yudt.groups()[0]):
                         src = yudt.groups()[0]
