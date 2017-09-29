@@ -475,6 +475,7 @@ def cat_plus(name, link, num):
             curs.execute("insert into cat (title, cat) values (?, ?)", [link, name])
 
 def namumark(title, data, num, in_c):    
+    data = re.sub("\n", "\r\n", re.sub("\r\n", "\n", data))
     data = html_pas(data)
 
     fol_num = 0
