@@ -2950,6 +2950,7 @@ def user_info():
             'index', 
             imp = ['사용자 메뉴', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
             data =  ip + '<br><br>' + namumark('',  '권한 상태 : ' + acl + '\r\n' + \
+                                                    '[목차(없음)]\r\n' + \
                                                     '== 로그인 관련 ==\r\n' + \
                                                     plus + '\r\n' + \
                                                     ' * [[wiki:register|회원가입]]\r\n' + \
