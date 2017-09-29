@@ -1471,9 +1471,9 @@ def manager(num = 1):
                                     ' * [[wiki:m_del|여러 문서 삭제]]\r\n' + \
                                     '== 소유자 ==\r\n' + \
                                     ' * [[wiki:back_reset|역링크, 분류 다시 생성]]\r\n' + \
-                                    ' * [[wiki:manager/8|ACL 문서]]\r\n' + \
-                                    ' * [[wiki:update|관리 그룹 생성]]\r\n' + \
-                                    ' * [[wiki:edit_set|업데이트 메뉴]]\r\n' + \
+                                    ' * [[wiki:manager/8|관리 그룹 생성]]\r\n' + \
+                                    ' * [[wiki:update|업데이트 메뉴]]\r\n' + \
+                                    ' * [[wiki:edit_set|설정 편집]]\r\n' + \
                                     ' * [[wiki:manager/9|JSON 출력]]\r\n' + \
                                     ' * [[wiki:json_in|JSON 입력]]\r\n' + \
                                     '== 기타 ==\r\n' + \
