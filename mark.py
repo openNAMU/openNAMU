@@ -599,7 +599,7 @@ def namumark(title, data, num, in_c):
             data = re.sub("\[\[(분류:(?:(?:(?!\]\]).)*))\]\]", '', data, 1)
         else:
             break
-    print(data)
+
     data = re.sub("&#x27;&#x27;&#x27;(?P<in>(?:(?!&#x27;).)*)&#x27;&#x27;&#x27;", '<b>\g<in></b>', data)
     data = re.sub("&#x27;&#x27;(?P<in>(?:(?!&#x27;).)*)&#x27;&#x27;", '<i>\g<in></i>', data)
     data = re.sub('(?:~~|--)(?P<in>(?:(?!~~|--).)+)(?:~~|--)', '<s>\g<in></s>', data)
