@@ -227,7 +227,7 @@ def html_pas(data):
 
     pas_2 = re.findall("%phtml%(?P<in>(?:\/)?(?:div|span|embed|iframe)(?:\s(?:(?!%phtml%).)*)?)%phtml%", data)
     for p_d_2 in pas_2:
-        data = re.sub("%phtml%(?P<in>(?:\/)?(?:div|span|embed|iframe)(?:\s(?:(?!%phtml%).)*)?)%phtml%", '<' + p_d_2.replace("'", "'").replace('&quot;', '"') + '>', data, 1)
+        data = re.sub("%phtml%(?P<in>(?:\/)?(?:div|span|embed|iframe)(?:\s(?:(?!%phtml%).)*)?)%phtml%", '<' + p_d_2.replace("&#x27;", "'").replace('&quot;', '"') + '>', data, 1)
     
     return(data)
     
@@ -599,9 +599,9 @@ def namumark(title, data, num, in_c):
             data = re.sub("\[\[(분류:(?:(?:(?!\]\]).)*))\]\]", '', data, 1)
         else:
             break
-
-    data = re.sub("'''(?P<in>(?:(?!').)*)'''", '<b>\g<in></b>', data)
-    data = re.sub("''(?P<in>(?:(?!').)*)''", '<i>\g<in></i>', data)
+    print(data)
+    data = re.sub("&#x27;&#x27;&#x27;(?P<in>(?:(?!&#x27;).)*)&#x27;&#x27;&#x27;", '<b>\g<in></b>', data)
+    data = re.sub("&#x27;&#x27;(?P<in>(?:(?!&#x27;).)*)&#x27;&#x27;", '<i>\g<in></i>', data)
     data = re.sub('(?:~~|--)(?P<in>(?:(?!~~|--).)+)(?:~~|--)', '<s>\g<in></s>', data)
     data = re.sub('__(?P<in>.+?)__(?!_)', '<u>\g<in></u>', data)
     data = re.sub('\^\^(?P<in>.+?)\^\^(?!\^)', '<sup>\g<in></sup>', data)
