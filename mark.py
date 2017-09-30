@@ -547,7 +547,7 @@ def namumark(title, data, num, in_c):
             else:
                 plus = ''
 
-            data = re.sub('^#(?:redirect|넘겨주기) ([^\n]*)$', '<meta http-equiv="refresh" content="0;url=/w/' + url_pas(n_sharp) + '/from/' + url_pas(title) + plus + '" />', data, 1)
+            data = re.sub('^#(?:redirect|넘겨주기) ([^\n]*)$', '<meta http-equiv="refresh" content="0;url=/w/' + re.sub('%0D$', '', url_pas(n_sharp)) + '/from/' + url_pas(title) + plus + '" />', data, 1)
             backlink_plus(title, n_data[0], 'redirect', num)
         else:
             break
@@ -607,8 +607,9 @@ def namumark(title, data, num, in_c):
         else:
             break
 
-    data = re.sub("&#x27;&#x27;&#x27;(?P<in>(?:(?!&#x27;).)*)&#x27;&#x27;&#x27;", '<b>\g<in></b>', data)
-    data = re.sub("&#x27;&#x27;(?P<in>(?:(?!&#x27;).)*)&#x27;&#x27;", '<i>\g<in></i>', data)
+    print(data)
+    data = re.sub("&#x27;&#x27;&#x27;(?P<in>(?:(?!&#x27;&#x27;&#x27;).)*)&#x27;&#x27;&#x27;", '<b>\g<in></b>', data)
+    data = re.sub("&#x27;&#x27;(?P<in>(?:(?!&#x27;&#x27;).)*)&#x27;&#x27;", '<i>\g<in></i>', data)
     data = re.sub('(?:~~|--)(?P<in>(?:(?!~~|--).)+)(?:~~|--)', '<s>\g<in></s>', data)
     data = re.sub('__(?P<in>.+?)__(?!_)', '<u>\g<in></u>', data)
     data = re.sub('\^\^(?P<in>.+?)\^\^(?!\^)', '<sup>\g<in></sup>', data)
