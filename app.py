@@ -1056,7 +1056,7 @@ def revert(name = None, num = None):
                     rows[0][0], 
                     today, 
                     ip, 
-                    '문서를 ' + str(num) + '판으로 되돌렸습니다.', 
+                    request.forms.send + ' (' + str(num) + '판)', 
                     leng
                 )
                 
@@ -1087,6 +1087,8 @@ def revert(name = None, num = None):
                         imp = [name, wiki_set(1), wiki_set(3), l_c, custom_css(), custom_js(), ' (되돌리기)'],
                         data =  plus + ' \
                                 <form method="post"> \
+                                    <input placeholder="사유" style="width: 100%;" class="form-control input-sm" name="send" type="text"> \
+                                    <br> \
                                     <button class="btn btn-primary" type="submit">되돌리기</button> \
                                 </form>',
                         menu = [['history/' + url_pas(name), '역사'], ['recent_changes', '최근 변경']]
@@ -2652,17 +2654,20 @@ def diff_data(name = None, a = None, b = None):
         if(b_raw_data):
             a_data = html.escape(a_raw_data[0][0])            
             b_data = html.escape(b_raw_data[0][0])
-            
-            diff_data = difflib.SequenceMatcher(None, a_data, b_data)
-            result_1 = diff(diff_data, 1)
-            result_2 = diff(diff_data, 0)
 
-            if(a_data == result_1):
-                result = '<pre>' + result_2 + '</pre>'
-            elif(b_data == result_2):
-                result = '<pre>' + result_1 + '</pre>'
-            else:
-                result = '<pre>' + result_1 + '<hr>' + result_2 + '</pre>'
+            if(a_data == b_data):
+                result = '내용이 같습니다.'
+            else:            
+                diff_data = difflib.SequenceMatcher(None, a_data, b_data)
+                result_1 = diff(diff_data, 1)
+                result_2 = diff(diff_data, 0)
+
+                if(a_data == result_1):
+                    result = '<pre>' + result_2 + '</pre>'
+                elif(b_data == result_2):
+                    result = '<pre>' + result_1 + '</pre>'
+                else:
+                    result = '<pre>' + result_1 + '<hr>' + result_2 + '</pre>'
             
             return(
                 template(
