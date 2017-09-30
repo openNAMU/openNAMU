@@ -2120,17 +2120,7 @@ def close_topic_list(name = None, tool = None):
         for data in rows:
             curs.execute("select data, date, ip, block from topic where title = ? and sub = ? and id = '1'", [name, data[0]])
             row = curs.fetchall()
-            if(row):
-                indata = namumark(name, row[0][0], 0, 0)
-                
-                if(row[0][3] == 'O'):
-                    indata = '<br>'
-                    block = 'id="block"'
-                else:
-                    block = ''
-
-                ip = ip_pas(row[0][2], 1)
-                
+            if(row):                
                 it_p = 0
                 if(sub == '토론 목록'):
                     curs.execute("select title from stop where title = ? and sub = ? and close = 'O' order by sub asc", [name, data[0]])
@@ -2141,20 +2131,7 @@ def close_topic_list(name = None, tool = None):
                 if(it_p != 1):
                     div += '<h2> \
                                 <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(data[0]) + '">' + str((i + 1)) + '. ' + data[0] + '</a> \
-                            </h2> \
-                            <table id="toron"> \
-                                <tbody> \
-                                    <tr> \
-                                        <td id="toron_color_green"> \
-                                            <a href="javascript:void(0);" id="1">#1</a> ' + ip + ' <span style="float:right;">' + row[0][1] + '</span> \
-                                        </td> \
-                                    </tr> \
-                                    <tr> \
-                                        <td ' + block + '>' + indata + '</td> \
-                                    </tr> \
-                                </tbody> \
-                            </table> \
-                            <br>'
+                            </h2>'
                 
                 i += 1
         
