@@ -232,7 +232,7 @@ def html_pas(data):
     return(data)
     
 def mid_pas(data, fol_num, include, in_c):
-    com = re.compile("{{{((?:(?!{{{)(?!}}}).)*)}}}", re.DOTALL)
+    com = re.compile("{{{((?:(?!{|}).)*)}}}", re.DOTALL)
     while(1):
         is_it = com.search(data)
         if(is_it):
@@ -606,7 +606,6 @@ def namumark(title, data, num, in_c):
         else:
             break
 
-    print(data)
     data = re.sub("&#x27;&#x27;&#x27;(?P<in>(?:(?!&#x27;&#x27;&#x27;).)*)&#x27;&#x27;&#x27;", '<b>\g<in></b>', data)
     data = re.sub("&#x27;&#x27;(?P<in>(?:(?!&#x27;&#x27;).)*)&#x27;&#x27;", '<i>\g<in></i>', data)
     data = re.sub('(?:~~|--)(?P<in>(?:(?!~~|--).)+)(?:~~|--)', '<s>\g<in></s>', data)
