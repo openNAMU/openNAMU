@@ -521,7 +521,7 @@ def namumark(title, data, num, in_c):
                                 
                     data = include.sub('\n<nobr><a href="/w/' + url_pas(results[0]) + '">[' + results[0] + ' 이동]</a><div>' + in_data + '</div><nobr>\n', data, 1)
                 else:
-                    data = include.sub("<a class=\"not_thing\" href=\"" + url_pas(results[0]) + "\">" + results[0] + "</a>", data, 1)
+                    data = include.sub("<a class=\"not_thing\" href=\"/w/" + url_pas(results[0]) + "\">" + results[0] + "</a>", data, 1)
         else:
             break
 
