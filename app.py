@@ -58,17 +58,12 @@ try:
 except:
     pass
 
-try:
-    curs.execute('select who from re_admin limit 1')
-except:
-    curs.execute("create table re_admin(who text, what text, time text)")
-
 conn.commit()
 
 @route('/setup', method=['GET', 'POST'])
 def setup():
     try:
-        curs.execute("select title from data limit 1", [that])
+        curs.execute("select title from data limit 1")
     except:
         try:
             curs.execute("create table data(title text, data text, acl text)")
@@ -92,7 +87,7 @@ def setup():
             curs.execute("insert into alist (name, acl) values ('owner', 'owner')")
             curs.execute("insert into other (name, data) values ('version', ?)", [r_ver])
 
-            curs.execute('insert into other (name, data) values ("name", "wiki")')
+            curs.execute('insert into other (name, data) values ("name", "무명위키")')
             curs.execute('insert into other (name, data) values ("frontpage", "위키:대문")')
             curs.execute('insert into other (name, data) values ("license", "CC 0")')
             curs.execute('insert into other (name, data) values ("upload", "2")')
@@ -157,6 +152,12 @@ def edit_set():
 @route('/update')
 @route('/update/<num:int>')
 def update(num = 1):
+    try:
+        admin_check(None, 'update')
+    except:
+        curs.execute("create table re_admin(who text, what text, time text)")
+        return(redirect('/'))
+
     if(admin_check(None, 'update') == 1):
         if(num == 1):
             return(
