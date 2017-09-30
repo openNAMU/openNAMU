@@ -500,12 +500,11 @@ def namumark(title, data, num, in_c):
                     in_data = in_con[0][0]
                     in_data = include.sub("", in_data)
                     in_data = re.sub("\n", "\r\n", re.sub("\r\n", "\n", in_data))
+                    in_data = html_pas(in_data)
                     var_d = mid_pas(in_data, fol_num, 1, in_c)
                     
                     in_data = var_d[0]
                     fol_num = var_d[1]
-                    
-                    in_data = html_pas(in_data)
                     
                     if(results[1]):
                         a = results[1]
