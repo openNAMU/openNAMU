@@ -699,11 +699,11 @@ def namumark(title, data, num, in_c):
                     src = ''
                     
             if(result[1]):
-                mdata = re.search('width=([0-9]*)', result[1])
+                mdata = re.search('width=([0-9%]*)', result[1])
                 if(mdata):
                     width = mdata.groups()[0]
                 
-                mdata = re.search('height=([0-9]*)', result[1])
+                mdata = re.search('height=([0-9%]*)', result[1])
                 if(mdata):
                     height = mdata.groups()[0]
                     
