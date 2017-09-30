@@ -477,6 +477,12 @@ def cat_plus(name, link, num):
 def namumark(title, data, num, in_c):    
     data = re.sub("\n", "\r\n", re.sub("\r\n", "\n", data))
     data = html_pas(data)
+
+    fol_num = 0
+    var_d = mid_pas(data, fol_num, 0, in_c)
+    
+    data = var_d[0]
+    fol_num = var_d[1]
     
     include = re.compile("\[include\(((?:(?!\)\]|,).)*)((?:(?:,\s?(?:(?!\)\]).)*))+)?\)\]")
     while(1):
@@ -494,6 +500,10 @@ def namumark(title, data, num, in_c):
                     in_data = in_con[0][0]
                     in_data = include.sub("", in_data)
                     in_data = re.sub("\n", "\r\n", re.sub("\r\n", "\n", in_data))
+                    var_d = mid_pas(in_data, fol_num, 1, in_c)
+                    
+                    in_data = var_d[0]
+                    fol_num = var_d[1]
                     
                     in_data = html_pas(in_data)
                     
@@ -517,12 +527,6 @@ def namumark(title, data, num, in_c):
             break
 
     data = re.sub("##\s?(?P<in>[^\n]*)\n", "", data)
-
-    fol_num = 0
-    var_d = mid_pas(data, fol_num, 0, in_c)
-    
-    data = var_d[0]
-    fol_num = var_d[1]
     
     data = re.sub("\[anchor\((?P<in>[^\[\]]*)\)\]", '<span id="\g<in>"></span>', data)
     data = savemark(data)
