@@ -303,13 +303,13 @@ def admin_plus(name = None):
                 
             conn.commit()
             
-            return(redirect('/admin_plus/admin'))
+            return(redirect('/admin_plus/' + url_pas(name)))
         else:
             curs.execute('select acl from alist where name = ?', [name])
             test = curs.fetchall()
             
             data = ''
-            exist_list = ['', '', '', '', '', '', '', '', '']
+            exist_list = ['', '', '', '', '', '', '']
 
             for go in test:
                 if(go[0] == 'ban'):
@@ -325,7 +325,7 @@ def admin_plus(name = None):
                 elif(go[0] == 'hidel'):
                     exist_list[5] = 'checked="checked"'
                 elif(go[0] == 'owner'):
-                    exist_list[7] = 'checked="checked"'
+                    exist_list[6] = 'checked="checked"'
 
             data += '<li><input type="checkbox" name="ban" ' + exist_list[0] + '> 차단</li>'
             data += '<li><input type="checkbox" name="mdel" ' + exist_list[1] + '> 많은 문서 삭제</li>'
@@ -333,7 +333,7 @@ def admin_plus(name = None):
             data += '<li><input type="checkbox" name="check" ' + exist_list[3] + '> 사용자 검사</li>'
             data += '<li><input type="checkbox" name="acl" ' + exist_list[4] + '> 문서 ACL</li>'
             data += '<li><input type="checkbox" name="hidel" ' + exist_list[5] + '> 역사 숨김</li>'
-            data += '<li><input type="checkbox" name="owner" ' + exist_list[7] + '> 소유자</li>'
+            data += '<li><input type="checkbox" name="owner" ' + exist_list[6] + '> 소유자</li>'
 
             return(
                 template(
@@ -561,7 +561,6 @@ def user_log(num = 1):
         
     j = i - 50
     list_data = ''
-    ydmin = admin_check(1, None)
     
     curs.execute("select who, what, time from re_admin order by time desc limit ?, ?", [str(j), str(i)])
     get_list = curs.fetchall()
@@ -582,6 +581,38 @@ def user_log(num = 1):
         template(
             'index', 
             imp = ['관리자 권한 기록', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
+            data = list_data,
+            menu = [['other', '기타']]
+        )
+    )
+
+@route('/give_log')
+@route('/give_log/n/<num:int>')
+def give_log(num = 1):
+    if(num * 50 <= 0):
+         i = 50
+    else:
+        i = num * 50
+        
+    j = i - 50
+    list_data = ''
+    back = ''
+
+    curs.execute("select name, acl from alist order by name asc limit ?, ?", [str(j), str(i)])
+    get_list = curs.fetchall()
+    for data in get_list:                      
+        if(back != data[0]):
+            back = data[0]
+            j += 1
+
+        list_data += '<li>' + str(j) + '. ' + data[0] + ' (' + data[1] + ')</li>'
+    else:
+        list_data += '<br><a href="/give_log/n/' + str(num - 1) + '">(이전)</a> <a href="/give_log/n/' + str(num + 1) + '">(이후)</a>'
+
+    return(
+        template(
+            'index', 
+            imp = ['권한 목록', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
             data = list_data,
             menu = [['other', '기타']]
         )
@@ -1451,6 +1482,7 @@ def other():
                                 ' * [[wiki:title_index|모든 문서]]\r\n' + \
                                 ' * [[wiki:acl_list|ACL 문서]]\r\n' + \
                                 ' * [[wiki:admin_list|관리자 목록]]\r\n' + \
+                                ' * [[wiki:give_log|권한 목록]]\r\n' + \
                                 ' * [[wiki:manager/1|관리자 메뉴]]\r\n' + \
                                 '== 버전 ==\r\n' + \
                                 '이 오픈나무는 [[https://github.com/2DU/openNAMU/blob/SQLite/version.md|' + r_ver + p_ver + ']]판 입니다.', 0, 0),
