@@ -84,7 +84,7 @@ def setup():
             curs.execute("create table alist(name text, acl text)")
             curs.execute("create table re_admin(who text, what text, time text)")
 
-            curs.execute("insert into alist (name, acl) values ('owner', 'owner')")
+            curs.execute("insert into alist (name, acl) values ('소유자', 'owner')")
             curs.execute("insert into other (name, data) values ('version', ?)", [r_ver])
 
             curs.execute('insert into other (name, data) values ("name", "무명위키")')
@@ -2375,7 +2375,7 @@ def register():
             curs.execute("select id from user limit 1")
             user_ex = curs.fetchall()
             if(not user_ex):
-                curs.execute("insert into user (id, pw, acl) values (?, ?, 'owner')", [request.forms.id, hashed.decode()])
+                curs.execute("insert into user (id, pw, acl) values (?, ?, '소유자')", [request.forms.id, hashed.decode()])
             else:
                 curs.execute("insert into user (id, pw, acl) values (?, ?, 'user')", [request.forms.id, hashed.decode()])
             conn.commit()
@@ -2569,31 +2569,21 @@ def acl(name = None):
 def user_admin(name = None):
     if(request.method == 'POST'):
         if(admin_check(None, 'admin (' + name + ')') == 1):
-            curs.execute("select acl from user where id = ?", [name])
-            user = curs.fetchall()
-            if(user):
-                if(user[0][0] != 'user'):
-                    curs.execute("update user set acl = 'user' where id = ?", [name])
-                else:
-                    curs.execute("update user set acl = ? where id = ?", [request.forms.select, name])
-                conn.commit()
-                
-                return(redirect('/admin/' + url_pas(name)))
+            if(request.forms.select == 'X'):
+                curs.execute("update user set acl = 'user' where id = ?", [name])
             else:
-                return(redirect('/error/5'))
+                curs.execute("update user set acl = ? where id = ?", [request.forms.select, name])
+            conn.commit()
+            
+            return(redirect('/admin/' + url_pas(name)))
         else:
             return(redirect('/error/3'))
     else:
         if(admin_check(None, None) == 1):
             curs.execute("select acl from user where id = ?", [name])
             user = curs.fetchall()
-            if(user):
-                if(user[0][0] != 'user'):
-                    now = '권한 해제'
-                else:
-                    now = '권한 부여'
-                    
-                div = ''
+            if(user):                    
+                div = '<option value="X">X</option>'
                     
                 curs.execute('select name from alist order by name asc')
                 get_alist = curs.fetchall()
@@ -2603,24 +2593,22 @@ def user_admin(name = None):
                     for data in get_alist:
                         if(name_rem != data[0]):
                             name_rem = data[0]
-                            div += '<option value="' + data[0] + '" selected="selected">' + data[0] + '</option>'
-
-                if(now == '권한 부여'):
-                    plus = '<select name="select"> \
-                                ' + div + ' \
-                            </select> \
-                            <br> \
-                            <br>'
-                else:
-                    plus = ''
+                            if(user[0][0] == data[0]):
+                                div += '<option value="' + data[0] + '" selected="selected">' + data[0] + '</option>'
+                            else:
+                                div += '<option value="' + data[0] + '">' + data[0] + '</option>'
                 
                 return(
                     template(
                         'index', 
                         imp = [name, wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), ' (권한 부여)'],
                         data =  '<form method="post"> \
-                                    ' + plus + ' \
-                                    <button class="btn btn-primary" type="submit">' + now + '</button> \
+                                    <select name="select"> \
+                                        ' + div + ' \
+                                    </select> \
+                                    <br> \
+                                    <br> \
+                                    <button class="btn btn-primary" type="submit">변경</button> \
                                 </form>',
                         menu = [['manager', '관리자']]
                     )
