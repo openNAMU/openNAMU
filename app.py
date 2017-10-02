@@ -1120,6 +1120,7 @@ def revert(name = None, num = None):
                                 <form method="post"> \
                                     <input placeholder="사유" style="width: 100%;" class="form-control input-sm" name="send" type="text"> \
                                     <br> \
+                                    <br> \
                                     <button class="btn btn-primary" type="submit">되돌리기</button> \
                                 </form>',
                         menu = [['history/' + url_pas(name), '역사'], ['recent_changes', '최근 변경']]
