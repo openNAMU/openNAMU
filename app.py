@@ -993,7 +993,7 @@ def deep_search(name = None, num = 1):
                 
             if(var_re):
                 if(no == 0):
-                    div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a> (문서명)</li>'
+                    div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a> (제목)</li>'
                 else:
                     div_plus += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a> (내용)</li>'
             else:
@@ -1011,7 +1011,7 @@ def deep_search(name = None, num = 1):
     return(
         template(
             'index', 
-            imp = ['검색', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
+            imp = [name, wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), ' (검색)'],
             data = div,
             menu = 0
         )

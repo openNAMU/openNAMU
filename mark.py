@@ -232,7 +232,7 @@ def html_pas(data):
     return(data)
     
 def mid_pas(data, fol_num, include, in_c):
-    com = re.compile("{{{((?:(?!{|}).)*)}}}", re.DOTALL)
+    com = re.compile("{{{((?:(?!{{|}}).)*)}}}", re.DOTALL)
     while(1):
         is_it = com.search(data)
         if(is_it):
