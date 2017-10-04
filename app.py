@@ -1050,7 +1050,7 @@ def raw_view(name = None, num = None):
 @route('/revert/<name:path>/r/<num:int>', method=['POST', 'GET'])
 def revert(name = None, num = None):
     ip = ip_check()
-    can = acl_check(ip, name)
+    can = acl_check(name)
     today = get_time()
     
     if(request.method == 'POST'):
@@ -1196,7 +1196,7 @@ def m_del():
 @route('/edit/<name:path>/section/<num:int>', method=['POST', 'GET'])
 def edit(name = None, num = None):
     ip = ip_check()
-    can = acl_check(ip, name)
+    can = acl_check(name)
     
     if(request.method == 'POST'):
         if(len(request.forms.send) > 500):
@@ -1305,7 +1305,7 @@ def edit(name = None, num = None):
 @route('/preview/<name:path>', method=['POST'])
 def preview(name = None, num = None):
     ip = ip_check()
-    can = acl_check(ip, name)
+    can = acl_check(name)
     
     if(can == 1):
         return(redirect('/ban'))
@@ -1344,7 +1344,7 @@ def preview(name = None, num = None):
 @route('/delete/<name:path>', method=['POST', 'GET'])
 def delete(name = None):
     ip = ip_check()
-    can = acl_check(ip, name)
+    can = acl_check(name)
     
     if(request.method == 'POST'):
         curs.execute("select data from data where title = ?", [name])
@@ -1405,7 +1405,7 @@ def delete(name = None):
 @route('/move/<name:path>', method=['POST', 'GET'])
 def move(name = None):
     ip = ip_check()
-    can = acl_check(ip, name)
+    can = acl_check(name)
     today = get_time()
 
     if(can == 1):
@@ -1907,7 +1907,7 @@ def topic_stop(name = None, sub = None, tool = None):
 @route('/topic/<name:path>/sub/<sub:path>', method=['POST', 'GET'])
 def topic(name = None, sub = None):
     ip = ip_check()
-    ban = topic_check(ip, name, sub)
+    ban = topic_check(name, sub)
     admin = admin_check(3, None)
     
     if(request.method == 'POST'):
@@ -2184,7 +2184,7 @@ def close_topic_list(name = None, tool = None):
 def login():
     session = request.environ.get('beaker.session')
     ip = ip_check()
-    ban = ban_check(ip)
+    ban = ban_check()
         
     if(request.method == 'POST'):        
         if(ban == 1):
@@ -2245,7 +2245,7 @@ def login():
 @route('/change', method=['POST', 'GET'])
 def change_password():
     ip = ip_check()
-    ban = ban_check(ip)
+    ban = ban_check()
     
     if(request.method == 'POST'):      
         if(request.forms.pw2 == request.forms.pw3):
@@ -2352,7 +2352,7 @@ def user_check(name = None):
 @route('/register', method=['POST', 'GET'])
 def register():
     ip = ip_check()
-    ban = ban_check(ip)
+    ban = ban_check()
 
     if(ban == 1):
         return(redirect('/ban'))
@@ -2623,7 +2623,7 @@ def user_admin(name = None):
 def are_you_ban():
     ip = ip_check()
     
-    if(ban_check(ip) == 1):
+    if(ban_check() == 1):
         curs.execute("select end, why from ban where block = ?", [ip])
         rows = curs.fetchall()
         if(not rows):
@@ -2923,6 +2923,29 @@ def user_topic_list(name = None, num = 1):
             menu = [['other', '기타'], ['user', '사용자']]
         )
     )
+    
+@route('/upload')
+def upload():
+    ip = ip_check()
+    if(ban_check() == 0):
+        return(redirect('/ban'))
+    
+    if(request.method == 'POST'):
+        pass
+    else:
+        return(
+            template(
+                'index', 
+                imp = ['파일 올리기', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
+                data =  '<form method="post"> \
+                            <input type="file"> \
+                            <br> \
+                            <br> \
+                            <button class="btn btn-primary" type="submit">저장</button> \
+                        </form>',
+                menu = [['other', '기타']]
+            )
+        )        
         
 @route('/user')
 def user_info():
@@ -2931,7 +2954,7 @@ def user_info():
     
     curs.execute("select acl from user where id = ?", [ip])
     rows = curs.fetchall()
-    if(ban_check(ip) == 0):
+    if(ban_check() == 0):
         if(rows):
             if(rows[0][0] != 'user'):
                 acl = rows[0][0]
@@ -3200,7 +3223,10 @@ def error_test(num = None):
 
 @error(404)
 def error_404(error):
-    return(redirect('/w/' + url_pas(wiki_set(2))))
+    try:
+        return(redirect('/w/' + url_pas(wiki_set(2))))
+    except:
+        return(redirect('/setup'))
 
 @error(500)
 def error_500(error):

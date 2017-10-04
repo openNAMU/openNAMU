@@ -151,7 +151,8 @@ def custom_js():
 
     return(data)
 
-def acl_check(ip, name):
+def acl_check(name):
+    ip = ip_check()
     m = re.search("^사용자:([^/]*)", name)
     n = re.search("^파일:(.*)", name)
     if(m):
@@ -204,7 +205,8 @@ def acl_check(ip, name):
             else:
                 return(0)    
 
-def ban_check(ip):
+def ban_check():
+    ip = ip_check()
     b = re.search("^([0-9](?:[0-9]?[0-9]?)\.[0-9](?:[0-9]?[0-9]?))", ip)
     if(b):
         results = b.groups()
@@ -220,7 +222,8 @@ def ban_check(ip):
     else:
         return(0)
         
-def topic_check(ip, name, sub):
+def topic_check(name, sub):
+    ip = ip_check()
     b = re.search("^([0-9](?:[0-9]?[0-9]?)\.[0-9](?:[0-9]?[0-9]?))", ip)
     if(b):
         results = b.groups()
