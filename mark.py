@@ -308,19 +308,19 @@ def mid_pas(data, fol_num, include, in_c):
                 data = com.sub(html.groups()[0], data, 1)
             elif(fol):
                 fol_d = fol.groups()
-                data = com.sub( "<div>" + \
-                                    fol_d[0] + \
-                                    "<div id='folding_" + str(fol_num + 1) + "' style='display: inline-block;'>" + \
-                                        "[<a href='javascript:void(0);' onclick='folding(" + str(fol_num + 1) + "); folding(" + str(fol_num + 2) + "); folding(" + str(fol_num) + ");'>펼치기</a>]" + \
-                                    "</div>" + \
-                                    "<div id='folding_" + str(fol_num + 2) + "' style='display: none;'>" + \
-                                        "[<a href='javascript:void(0);' onclick='folding(" + str(fol_num + 1) + "); folding(" + str(fol_num + 2) + "); folding(" + str(fol_num) + ");'>접기</a>]" + \
-                                    "</div>" + \
-                                    "<div id='folding_" + str(fol_num) + "' style='display: none;'>" + \
-                                        "<br>" + \
-                                        fol_d[1] + \
-                                    "</div>" + \
-                                "</div>", data, 1)
+                data = com.sub( "<div> \
+                                    " + fol_d[0] + " \
+                                    <div id='folding_" + str(fol_num + 1) + "' style='display: inline-block;'> \
+                                        [<a href='javascript:void(0);' onclick='folding(" + str(fol_num + 1) + "); folding(" + str(fol_num + 2) + "); folding(" + str(fol_num) + ");'>펼치기</a>] \
+                                    </div> \
+                                    <div id='folding_" + str(fol_num + 2) + "' style='display: none;'> \
+                                        [<a href='javascript:void(0);' onclick='folding(" + str(fol_num + 1) + "); folding(" + str(fol_num + 2) + "); folding(" + str(fol_num) + ");'>접기</a>] \
+                                    </div> \
+                                    <div id='folding_" + str(fol_num) + "' style='display: none;'> \
+                                        <br> \
+                                        " + fol_d[1] + " \
+                                    </div> \
+                                </div>", data, 1)
 
                 fol_num += 3
             elif(syn):
@@ -615,22 +615,22 @@ def namumark(title, data, num, in_c):
     
     data = re.sub('&lt;math&gt;(?P<in>((?!&lt;math&gt;).)*)&lt;\/math&gt;', '$\g<in>$', data)
     
-    data = re.sub('{{\|(?P<in>(?:(?:(?:(?!\|}}).)*)(?:\n?))+)\|}}', '<table>' + \
-                                                                        '<tbody>' + \
-                                                                            '<tr>' + \
-                                                                                '<td>' + \
-                                                                                    '\g<in>' + \
-                                                                                '</td>' + \
-                                                                            '</tr>' + \
-                                                                        '</tbody>' + \
-                                                                    '</table>', data)
+    data = re.sub('{{\|(?P<in>(?:(?:(?:(?!\|}}).)*)(?:\n?))+)\|}}', '<table> \
+                                                                        <tbody> \
+                                                                            <tr> \
+                                                                                <td> \
+                                                                                    \g<in> \
+                                                                                </td> \
+                                                                            </tr> \
+                                                                        </tbody> \
+                                                                    </table>', data)
     
-    data = re.sub('\[ruby\((?P<in>[^\,]*)\,\s?(?P<out>[^\)]*)\)\]', '<ruby>' + \
-                                                                        '\g<in>' + \
-                                                                        '<rp>(</rp>' + \
-                                                                        '<rt>\g<out></rt>' + \
-                                                                        '<rp>)</rp>' + \
-                                                                    '</ruby>', data)
+    data = re.sub('\[ruby\((?P<in>[^\,]*)\,\s?(?P<out>[^\)]*)\)\]', '<ruby> \
+                                                                        \g<in> \
+                                                                        <rp>(</rp> \
+                                                                        <rt>\g<out></rt> \
+                                                                        <rp>)</rp> \
+                                                                    </ruby>', data)
     
     test = re.findall('\[\[wiki:([^|\]]+)(?:\|([^\]]+))?\]\]', data)
     if(test):
@@ -855,36 +855,36 @@ def namumark(title, data, num, in_c):
                         break
                         
                 if(none_this == 0):
-                    data = re.sub("\[\*([^\s]*)(?:\s(((?!\[|\]).)*))?\]",   "<sup>" + \
-                                                                                "<a href='javascript:void(0);' onclick='folding(" + str(fol_num) + ");' id='rfn-" + str(a) + "'>[" + results[0] + "]</a>" + \
-                                                                            "</sup>" + \
-                                                                            "<div class='popup' style='display: none;' id='folding_" + str(fol_num) + "'>" + \
-                                                                                "<a onclick='folding(" + str(fol_num) + ");' href='#fn-" + str(a) + "'>[" + results[0] + "]</a> <a href='javascript:void(0);' onclick='folding(" + str(fol_num) + ");'>[X]</a> " + namu[i + 1] + \
-                                                                            "</div>", data, 1)
+                    data = re.sub("\[\*([^\s]*)(?:\s(((?!\[|\]).)*))?\]",   "<sup> \
+                                                                                <a href='javascript:void(0);' onclick='folding(" + str(fol_num) + ");' id='rfn-" + str(a) + "'>[" + results[0] + "]</a> \
+                                                                            </sup> \
+                                                                            <div class='popup' style='display: none;' id='folding_" + str(fol_num) + "'> \
+                                                                                <a onclick='folding(" + str(fol_num) + ");' href='#fn-" + str(a) + "'>[" + results[0] + "]</a> <a href='javascript:void(0);' onclick='folding(" + str(fol_num) + ");'>[X]</a> " + namu[i + 1] + " \
+                                                                            </div>", data, 1)
                 else:
-                    data = re.sub("\[\*([^\s]*)(?:\s(((?!\[|\]).)*))?\]",   "<sup>" + \
-                                                                                "<a href='javascript:void(0);' id='rfn-" + str(a) + "'>[" + results[0] + "]</a>" + \
-                                                                            "</sup>", data, 1)
+                    data = re.sub("\[\*([^\s]*)(?:\s(((?!\[|\]).)*))?\]",   "<sup> \
+                                                                                <a href='javascript:void(0);' id='rfn-" + str(a) + "'>[" + results[0] + "]</a> \
+                                                                            </sup>", data, 1)
             else:
                 if(results[0]):                
                     namu += [results[0]]
                     namu += [results[1]]
 
                     tou += "<span id='footnote-list'><a href='#rfn-" + str(a) + "' id='fn-" + str(a) + "'>[" + results[0] + "]</a> " + results[1] + "</span><br>"
-                    data = re.sub("\[\*([^\s]*)(?:\s(((?!\[|\]).)*))?\]",   "<sup>" + \
-                                                                                "<a href='javascript:void(0);' onclick='folding(" + str(fol_num) + ");' id='rfn-" + str(a) + "'>[" + results[0] + "]</a>" + \
-                                                                            "</sup>" + \
-                                                                            "<div class='popup' style='display: none;' id='folding_" + str(fol_num) + "'>" + \
-                                                                                "<a onclick='folding(" + str(fol_num) + ");' href='#fn-" + str(a) + "'>[" + results[0] + "]</a> <a href='javascript:void(0);' onclick='folding(" + str(fol_num) + ");'>[X]</a> " + results[1] + \
-                                                                            "</div>", data, 1)     
+                    data = re.sub("\[\*([^\s]*)(?:\s(((?!\[|\]).)*))?\]",   "<sup> \
+                                                                                <a href='javascript:void(0);' onclick='folding(" + str(fol_num) + ");' id='rfn-" + str(a) + "'>[" + results[0] + "]</a> \
+                                                                            </sup> \
+                                                                            <div class='popup' style='display: none;' id='folding_" + str(fol_num) + "'> \
+                                                                                <a onclick='folding(" + str(fol_num) + ");' href='#fn-" + str(a) + "'>[" + results[0] + "]</a> <a href='javascript:void(0);' onclick='folding(" + str(fol_num) + ");'>[X]</a> " + results[1] + " \
+                                                                            </div>", data, 1)     
                 else:                    
                     tou += "<span id='footnote-list'><a href='#rfn-" + str(a) + "' id='fn-" + str(a) + "'>[" + str(a) + "]</a> " + results[1] + "</span><br>"
-                    data = re.sub("\[\*([^\s]*)(?:\s(((?!\[|\]).)*))?\]",   '<sup>' + \
-                                                                                '<a href="javascript:void(0);" onclick="folding(' + str(fol_num) + ');" id="rfn-' + str(a) + '">[' + str(a) + ']</a>' + \
-                                                                            '</sup>' + \
-                                                                            '<div class="popup" style="display: none;" id="folding_' + str(fol_num) + '">' + \
-                                                                                '<a onclick="folding(' + str(fol_num) + ');" href="#fn-' + str(a) + '">[' + str(a) + ']</a> <a href="javascript:void(0);" onclick="folding(' + str(fol_num) + ');">[X]</a> ' + results[1] + \
-                                                                            '</div>', data, 1)
+                    data = re.sub("\[\*([^\s]*)(?:\s(((?!\[|\]).)*))?\]",   '<sup> \
+                                                                                <a href="javascript:void(0);" onclick="folding(' + str(fol_num) + ');" id="rfn-' + str(a) + '">[' + str(a) + ']</a> \
+                                                                            </sup> \
+                                                                            <div class="popup" style="display: none;" id="folding_' + str(fol_num) + '"> \
+                                                                                <a onclick="folding(' + str(fol_num) + ');" href="#fn-' + str(a) + '">[' + str(a) + ']</a> <a href="javascript:void(0);" onclick="folding(' + str(fol_num) + ');">[X]</a> ' + results[1] + ' \
+                                                                            </div>', data, 1)
 
                 a += 1
 
@@ -946,23 +946,23 @@ def namumark(title, data, num, in_c):
                         row = table_d[3]
                         cel = table_d[4]
                             
-                        table = re.sub("^(\|\|(?:(?:\|\|)+)?)((?:&lt;(?:(?:(?!&gt;).)*)&gt;)+)?",   "<table " + alltable + ">" + \
-                                                                                                        "<tbody>" + \
-                                                                                                            "<tr " + rowstyle + ">" + \
-                                                                                                                "<td " + cel + " " + row + " " + celstyle + ">", table, 1)
+                        table = re.sub("^(\|\|(?:(?:\|\|)+)?)((?:&lt;(?:(?:(?!&gt;).)*)&gt;)+)?",   "<table " + alltable + "> \
+                                                                                                        <tbody> \
+                                                                                                            <tr " + rowstyle + "> \
+                                                                                                                <td " + cel + " " + row + " " + celstyle + ">", table, 1)
                     else:
                         cel = 'colspan="' + str(round(len(result[0]) / 2)) + '"'
-                        table = re.sub("^(\|\|(?:(?:\|\|)+)?)((?:&lt;(?:(?:(?!&gt;).)*)&gt;)+)?",   "<table>" + \
-                                                                                                        "<tbody>" + \
-                                                                                                            "<tr>" + \
-                                                                                                                "<td " + cel + ">", table, 1)
+                        table = re.sub("^(\|\|(?:(?:\|\|)+)?)((?:&lt;(?:(?:(?!&gt;).)*)&gt;)+)?",   "<table> \
+                                                                                                        <tbody> \
+                                                                                                            <tr> \
+                                                                                                                <td " + cel + ">", table, 1)
                 else:
                     break
                     
-            table = re.sub("\|\|$",                 "</td>" + \
-                                                "</tr>" + \
-                                            "</tbody>" + \
-                                        "</table>", table)
+            table = re.sub("\|\|$",                 "</td> \
+                                                </tr> \
+                                            </tbody> \
+                                        </table>", table)
             
             while(1):
                 b = re.search("\|\|\r\n(\|\|(?:(?:\|\|)+)?)((?:&lt;(?:(?:(?!&gt;).)*)&gt;)+)?", table)
@@ -981,16 +981,16 @@ def namumark(title, data, num, in_c):
                         row = table_d[3]
                         cel = table_d[4]
                         
-                        table = re.sub("\|\|\r\n(\|\|(?:(?:\|\|)+)?)((?:&lt;(?:(?:(?!&gt;).)*)&gt;)+)?",        "</td>" + \
-                                                                                                            "</tr>" + \
-                                                                                                            "<tr " + rowstyle + ">" + \
-                                                                                                                "<td " + cel + " " + row + " " + celstyle + ">", table, 1)
+                        table = re.sub("\|\|\r\n(\|\|(?:(?:\|\|)+)?)((?:&lt;(?:(?:(?!&gt;).)*)&gt;)+)?",        "</td> \
+                                                                                                            </tr> \
+                                                                                                            <tr " + rowstyle + "> \
+                                                                                                                <td " + cel + " " + row + " " + celstyle + ">", table, 1)
                     else:
                         cel = 'colspan="' + str(round(len(result[0]) / 2)) + '"'
-                        table = re.sub("\|\|\r\n(\|\|(?:(?:\|\|)+)?)((?:&lt;(?:(?:(?!&gt;).)*)&gt;)+)?",        "</td>" + \
-                                                                                                            "</tr>" + \
-                                                                                                            "<tr>" + \
-                                                                                                                "<td " + cel + ">", table, 1)
+                        table = re.sub("\|\|\r\n(\|\|(?:(?:\|\|)+)?)((?:&lt;(?:(?:(?!&gt;).)*)&gt;)+)?",        "</td> \
+                                                                                                            </tr> \
+                                                                                                            <tr> \
+                                                                                                                <td " + cel + ">", table, 1)
                 else:
                     break
 
@@ -1009,10 +1009,12 @@ def namumark(title, data, num, in_c):
                         row = table_d[3]
                         cel = table_d[4]
 
-                        table = re.sub("(\|\|(?:(?:\|\|)+)?)((?:&lt;(?:(?:(?!&gt;).)*)&gt;)+)?",    "</td><td " + cel + " " + row + " " + celstyle + ">", table, 1)
+                        table = re.sub("(\|\|(?:(?:\|\|)+)?)((?:&lt;(?:(?:(?!&gt;).)*)&gt;)+)?",    "</td> \
+                                                                                                    <td " + cel + " " + row + " " + celstyle + ">", table, 1)
                     else:
                         cel = 'colspan="' + str(round(len(result[0]) / 2)) + '"'
-                        table = re.sub("(\|\|(?:(?:\|\|)+)?)((?:&lt;(?:(?:(?!&gt;).)*)&gt;)+)?",    "</td><td " + cel + ">", table, 1)
+                        table = re.sub("(\|\|(?:(?:\|\|)+)?)((?:&lt;(?:(?:(?!&gt;).)*)&gt;)+)?",    "</td> \
+                                                                                                    <td " + cel + ">", table, 1)
                 else:
                     break
             
