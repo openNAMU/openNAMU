@@ -2849,7 +2849,7 @@ def read_view(name = None, num = None, redirect = None):
         sub = ' (' + str(num) + '판)'
         acl = ''
     else:
-        curs.execute("select date from history where title = ? limit 1", [name])
+        curs.execute("select date from history where title = ? order by date desc limit 1", [name])
         date = curs.fetchall()
         if(date):
             r_date = date[0][0]
