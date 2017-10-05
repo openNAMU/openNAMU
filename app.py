@@ -86,11 +86,6 @@ def setup():
 
             curs.execute("insert into alist (name, acl) values ('소유자', 'owner')")
             curs.execute("insert into other (name, data) values ('version', ?)", [r_ver])
-
-            curs.execute('insert into other (name, data) values ("name", "무명위키")')
-            curs.execute('insert into other (name, data) values ("frontpage", "위키:대문")')
-            curs.execute('insert into other (name, data) values ("license", "CC 0")')
-            curs.execute('insert into other (name, data) values ("upload", "2")')
             conn.commit()
         except:
             pass
@@ -105,40 +100,102 @@ def edit_set():
             curs.execute("update other set data = ? where name = 'frontpage'", [request.forms.frontpage])
             curs.execute("update other set data = ? where name = 'license'", [request.forms.license])
             curs.execute("update other set data = ? where name = 'upload'", [request.forms.upload])
+            curs.execute("update other set data = ? where name = 'recapt_p'", [request.forms.recapt_p])
+            curs.execute("update other set data = ? where name = 'recapt_s'", [request.forms.recapt_s])
             conn.commit()
 
-            return(redirect('/'))
+            return(redirect('/edit_set'))
         else:
             curs.execute('select data from other where name = ?', ['name'])
             name_d = curs.fetchall()
+            if(name_d):
+                name = name_d[0][0]
+            else:
+                name = ''
+                curs.execute('insert into other (name, data) values (?, "무명위키")', ['name'])
 
             curs.execute('select data from other where name = "frontpage"')
             frontpage_d = curs.fetchall()
+            if(frontpage_d):
+                frontpage = frontpage_d[0][0]
+            else:
+                frontpage = ''
+                curs.execute('insert into other (name, data) values ("frontpage", "위키:대문")')
 
             curs.execute('select data from other where name = "license"')
             license_d = curs.fetchall()
+            if(license_d):
+                license = license_d[0][0]
+            else:
+                license = ''
+                curs.execute('insert into other (name, data) values ("license", "CC 0")')
 
             curs.execute('select data from other where name = "upload"')
             upload_d = curs.fetchall()
+            if(upload_d):
+                upload = upload_d[0][0]
+            else:
+                upload = ''
+                curs.execute('insert into other (name, data) values ("upload", "2")')
+            
+            curs.execute('select data from other where name = "recapt_p"')
+            recapt_p = curs.fetchall()
+            if(recapt_p):
+                recapt_p_d = recapt_p[0][0]
+            else:
+                recapt_p_d = ''
+                curs.execute('insert into other (name, data) values ("recapt_p", "")')
+            
+            curs.execute('select data from other where name = "recapt_s"')
+            recapt_s = curs.fetchall()
+            if(recapt_s):
+                recapt_s_d = recapt_s[0][0]
+            else:
+                recapt_s_d = ''
+                curs.execute('insert into other (name, data) values ("recapt_s", "")')
+            conn.commit()
 
             return(
                 template(
                     'index', 
                     imp = ['설정 편집', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
                     data = '<form method="post"> \
-                                <input placeholder="위키 이름" style="width: 100%;" type="text" name="name" value="' + name_d[0][0] + '"> \
+                                <span>위키 이름</span> \
                                 <br> \
                                 <br> \
-                                <input placeholder="시작 페이지" style="width: 100%;" type="text" name="frontpage" value="' + frontpage_d[0][0] + '"> \
+                                <input placeholder="위키 이름" style="width: 100%;" type="text" name="name" value="' + name + '"> \
                                 <br> \
                                 <br> \
-                                <input placeholder="라이선스" style="width: 100%;" type="text" name="license" value="' + license_d[0][0] + '"> \
+                                <span>시작 페이지</span> \
                                 <br> \
                                 <br> \
-                                <input placeholder="파일 올리기 최대 크기" style="width: 100%;" type="text" name="upload" value="' + upload_d[0][0] + '"> \
+                                <input placeholder="시작 페이지" style="width: 100%;" type="text" name="frontpage" value="' + frontpage + '"> \
                                 <br> \
                                 <br> \
-                                <span>차례대로 위키 이름, 시작 페이지, 라이선스, 파일 올리기 최대 크기 입니다.</span> \
+                                <span>라이선스</span> \
+                                <br> \
+                                <br> \
+                                <input placeholder="라이선스" style="width: 100%;" type="text" name="license" value="' + license + '"> \
+                                <br> \
+                                <br> \
+                                <span>파일 올리기 최대 크기</span> \
+                                <br> \
+                                <br> \
+                                <input placeholder="파일 올리기 최대 크기" style="width: 100%;" type="text" name="upload" value="' + upload + '"> \
+                                <br> \
+                                <br> \
+                                <hr> \
+                                <br> \
+                                <span>구글 리캡차 코드 [공개] (선택)</span> \
+                                <br> \
+                                <br> \
+                                <input placeholder="구글 리캡차 코드 [공개] (선택)" style="width: 100%;" type="text" name="recapt_p" value="' + recapt_p_d + '"> \
+                                <br> \
+                                <br> \
+                                <span>구글 리캡차 코드 [비밀] (선택)</span> \
+                                <br> \
+                                <br> \
+                                <input placeholder="구글 리캡차 코드 [비밀] (선택)" style="width: 100%;" type="text" name="recapt_s" value="' + recapt_s_d + '"> \
                                 <br> \
                                 <br> \
                                 <button class="btn btn-primary" type="submit">저장</button> \

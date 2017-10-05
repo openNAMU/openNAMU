@@ -11,6 +11,7 @@
         <link rel="stylesheet" href="/views/css/awesome/font-awesome.min.css">
         <script type="text/x-mathjax-config">MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});</script>
         <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS_CHTML"></script>
+        <script src='https://www.google.com/recaptcha/api.js'></script>
         <style>{{!imp[4]}}</style>
         <script>{{!imp[5]}}</script>
         <script>
