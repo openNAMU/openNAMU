@@ -98,6 +98,12 @@
                                 % end
                             % end
                         </nav>
+                        <br>
+                        <span id="edit_time">
+                            % if(not imp[7] == 0):
+                                최근 수정 : {{imp[7]}}
+                            % end
+                        </span>
                     </div>
                 % end
                 <h1 class="title">

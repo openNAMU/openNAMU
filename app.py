@@ -124,7 +124,7 @@ def edit_set():
             return(
                 template(
                     'index', 
-                    imp = ['설정 편집', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
+                    imp = ['설정 편집', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
                     data = '<form method="post"> \
                                 <input placeholder="위키 이름" style="width: 100%;" type="text" name="name" value="' + name_d[0][0] + '"> \
                                 <br> \
@@ -163,7 +163,7 @@ def update(num = 1):
             return(
                 template(
                     'index', 
-                    imp = ['업데이트 목록', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
+                    imp = ['업데이트 목록', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
                     data = '<li><a href="/update/2">2.2.1</a></li>',
                     menu = [['manager', '관리자']]
                 )
@@ -196,7 +196,7 @@ def not_close_topic():
     return(
         template(
             'index', 
-            imp = ['열린 토론 목록', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
+            imp = ['열린 토론 목록', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
             data = div,
             menu = [['manager', '관리자']]
         )
@@ -229,7 +229,7 @@ def acl_list():
     return(
         template(
             'index', 
-            imp = ['ACL 문서 목록', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
+            imp = ['ACL 문서 목록', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
             data = div,
             menu = [['other', '기타']]
         )
@@ -268,7 +268,7 @@ def list_acl():
     return(
         template(
             'index',    
-            imp = ['ACL 목록', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
+            imp = ['ACL 목록', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
             data = re.sub('^<br>', '', div),
             menu = [['manager', '관리자']]
         )
@@ -338,7 +338,7 @@ def admin_plus(name = None):
             return(
                 template(
                     'index', 
-                    imp = ['관리 그룹 추가', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
+                    imp = ['관리 그룹 추가', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
                     data = '<form method="post">' \
                                 + data + \
                                 '<div class="form-actions"> \
@@ -369,7 +369,7 @@ def admin_list():
     return(
         template(
             'index', 
-            imp = ['관리자 목록', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
+            imp = ['관리자 목록', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
             data = div,
             menu = [['other', '기타']]
         )
@@ -488,7 +488,7 @@ def recent_changes(name = None, num = 1):
     return(
         template(
             'index', 
-            imp = [title, wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), sub],
+            imp = [title, wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), sub, 0],
             data = div,
             menu = menu
         )
@@ -545,7 +545,7 @@ def user_log(num = 1):
     return(
         template(
             'index', 
-            imp = ['사용자 가입 기록', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
+            imp = ['사용자 가입 기록', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
             data = list_data,
             menu = [['other', '기타']]
         )
@@ -580,7 +580,7 @@ def user_log(num = 1):
     return(
         template(
             'index', 
-            imp = ['관리자 권한 기록', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
+            imp = ['관리자 권한 기록', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
             data = list_data,
             menu = [['other', '기타']]
         )
@@ -612,7 +612,7 @@ def give_log(num = 1):
     return(
         template(
             'index', 
-            imp = ['권한 목록', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
+            imp = ['권한 목록', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
             data = list_data,
             menu = [['other', '기타']]
         )
@@ -685,7 +685,7 @@ def xref(name = None, num = 1):
     return(
         template(
             'index', 
-            imp = [name, wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), ' (역링크)'],
+            imp = [name, wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), ' (역링크)', 0],
             data = div,
             menu = [['w/' + url_pas(name), '문서']]
         )
@@ -745,7 +745,7 @@ def recent_discuss(tools = 'normal'):
     return(
         template(
             'index', 
-            imp = ['최근 토론내역', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), m_sub],
+            imp = ['최근 토론내역', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), m_sub, 0],
             data = div,
             menu = 0
         )
@@ -806,7 +806,7 @@ def block_log(num = 1):
     return(
         template(
             'index', 
-            imp = ['차단 기록', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
+            imp = ['차단 기록', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
             data = div,
             menu = [['other', '기타']]
         )
@@ -921,7 +921,7 @@ def history_view(name = None, num = 1):
         return(
             template(
                 'index', 
-                imp = [name, wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), ' (역사)'],
+                imp = [name, wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), ' (역사)', 0],
                 data = div,
                 menu = [['w/' + url_pas(name), '문서']]
             )
@@ -1011,7 +1011,7 @@ def deep_search(name = None, num = 1):
     return(
         template(
             'index', 
-            imp = [name, wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), ' (검색)'],
+            imp = [name, wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), ' (검색)', 0],
             data = div,
             menu = 0
         )
@@ -1039,7 +1039,7 @@ def raw_view(name = None, num = None):
         return(
             template(
                 'index', 
-                imp = [name, wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), ' (원본)'],
+                imp = [name, wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), ' (원본)', 0],
                 data = enddata,
                 menu = [['w/' + url_pas(name), '문서'], ['history/' + url_pas(name), '역사']]
             )
@@ -1115,7 +1115,7 @@ def revert(name = None, num = None):
                 return(
                     template(
                         'index', 
-                        imp = [name, wiki_set(1), wiki_set(3), l_c, custom_css(), custom_js(), ' (되돌리기)'],
+                        imp = [name, wiki_set(1), wiki_set(3), l_c, custom_css(), custom_js(), ' (되돌리기)', 0],
                         data =  plus + ' \
                                 <form method="post"> \
                                     <input placeholder="사유" style="width: 100%;" class="form-control input-sm" name="send" type="text"> \
@@ -1162,7 +1162,7 @@ def m_del():
             return(
                 template(
                     'index', 
-                    imp = ['많은 문서 삭제', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
+                    imp = ['많은 문서 삭제', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
                     data = '<span> \
                                 문서명 A \
                                 <br> \
@@ -1283,7 +1283,7 @@ def edit(name = None, num = None):
             return(
                 template(
                     'index', 
-                    imp = [name, wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), ' (수정)'],
+                    imp = [name, wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), ' (수정)', 0],
                     data = '<form method="post" action="/edit/' + name + action + '"> \
                                 <textarea style="height: 80%;" name="content">' + data + '</textarea> \
                                 <textarea style="display: none; height: 80%;" name="otent">' + data + '</textarea> \
@@ -1322,7 +1322,7 @@ def preview(name = None, num = None):
         return(
             template(
                 'index', 
-                imp = [name, wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), ' (미리보기)'],
+                imp = [name, wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), ' (미리보기)', 0],
                 data = '<form method="post" action="/edit/' + name + action + '"> \
                             <textarea style="height: 80%;" name="content">' + request.forms.content + '</textarea> \
                             <textarea style="display: none; height: 80%;" name="otent">' + request.forms.otent + '</textarea> \
@@ -1388,7 +1388,7 @@ def delete(name = None):
                 return(
                     template(
                         'index', 
-                        imp = [name, wiki_set(1), wiki_set(3), l_c, custom_css(), custom_js(), ' (삭제)'],
+                        imp = [name, wiki_set(1), wiki_set(3), l_c, custom_css(), custom_js(), ' (삭제)', 0],
                         data = '<form method="post"> \
                                     ' + plus + ' \
                                     <input placeholder="사유" style="width: 100%;" class="form-control input-sm" name="send" type="text"> \
@@ -1450,7 +1450,7 @@ def move(name = None):
         return(
             template(
                 'index', 
-                imp = [name, wiki_set(1), wiki_set(3), l_c, custom_css(), custom_js(), ' (이동)'],
+                imp = [name, wiki_set(1), wiki_set(3), l_c, custom_css(), custom_js(), ' (이동)', 0],
                 data = '<form method="post"> \
                             ' + plus + ' \
                             <input placeholder="문서명" class="form-control input-sm" value="' + name + '" name="title" type="text"> \
@@ -1470,7 +1470,7 @@ def other():
     return(
         template(
             'index', 
-            imp = ['기타 메뉴', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
+            imp = ['기타 메뉴', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
             data = namumark('', '[목차(없음)]\r\n' + \
                                 '== 기록 ==\r\n' + \
                                 ' * [[wiki:block_log|차단 기록]]\r\n' + \
@@ -1498,7 +1498,7 @@ def manager(num = 1):
     if(num == 1):
         return(
             template('index', 
-                imp = ['관리자 메뉴', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
+                imp = ['관리자 메뉴', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
                 data = namumark('', '[목차(없음)]\r\n' + \
                                     '== 목록 ==\r\n' + \
                                     ' * [[wiki:manager/2|문서 ACL]]\r\n' + \
@@ -1524,7 +1524,7 @@ def manager(num = 1):
         else:
             return(
                 template('index', 
-                    imp = ['ACL 이동', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
+                    imp = ['ACL 이동', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
                     data = '<form method="post"> \
                                 <input placeholder="문서명" name="name" type="text"> \
                                 <br> \
@@ -1540,7 +1540,7 @@ def manager(num = 1):
         else:
             return(
                 template('index', 
-                    imp = ['검사 이동', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
+                    imp = ['검사 이동', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
                     data = '<form method="post"> \
                                 <input placeholder="사용자명" name="name" type="text"> \
                                 <br> \
@@ -1556,7 +1556,7 @@ def manager(num = 1):
         else:
             return(
                 template('index', 
-                    imp = ['차단 이동', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
+                    imp = ['차단 이동', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
                     data = '<form method="post"> \
                                 <input placeholder="사용자명" name="name" type="text"> \
                                 <br> \
@@ -1572,7 +1572,7 @@ def manager(num = 1):
         else:
             return(
                 template('index', 
-                    imp = ['권한 이동', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
+                    imp = ['권한 이동', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
                     data = '<form method="post"> \
                                 <input placeholder="사용자명" name="name" type="text"> \
                                 <br> \
@@ -1588,7 +1588,7 @@ def manager(num = 1):
         else:
             return(
                 template('index', 
-                    imp = ['기록 이동', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
+                    imp = ['기록 이동', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
                     data = '<form method="post"> \
                                 <input placeholder="사용자명" name="name" type="text"> \
                                 <br> \
@@ -1604,7 +1604,7 @@ def manager(num = 1):
         else:
             return(
                 template('index', 
-                    imp = ['토론 기록 이동', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
+                    imp = ['토론 기록 이동', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
                     data = '<form method="post"> \
                                 <input placeholder="사용자명" name="name" type="text"> \
                                 <br> \
@@ -1620,7 +1620,7 @@ def manager(num = 1):
         else:
             return(
                 template('index', 
-                    imp = ['그룹 생성 이동', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
+                    imp = ['그룹 생성 이동', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
                     data = '<form method="post"> \
                                 <input placeholder="그룹명" name="name" type="text"> \
                                 <br> \
@@ -1636,7 +1636,7 @@ def manager(num = 1):
         else:
             return(
                 template('index', 
-                    imp = ['문서 출력 이동', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
+                    imp = ['문서 출력 이동', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
                     data = '<form method="post"> \
                                 <input placeholder="문서명" name="name" type="text"> \
                                 <br> \
@@ -1705,7 +1705,7 @@ def json_in():
         else:
             return(
                 template('index', 
-                    imp = ['문서 JSON 입력', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
+                    imp = ['문서 JSON 입력', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
                     data = '<form method="post"> \
                                 <textarea style="height: 80%;" name="data"></textarea> \
                                 <br> \
@@ -1774,7 +1774,7 @@ def title_index(num = 1000, page = 1):
     
     return(
         template('index', 
-            imp = ['모든 문서', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), ' (' + str(num) + ')'],
+            imp = ['모든 문서', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), ' (' + str(num) + ')', 0],
             data = data,
             menu = [['other', '기타']]
         )    
@@ -2100,7 +2100,7 @@ def topic(name = None, sub = None):
 
         return(
             template('index', 
-                imp = [name, wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), ' (토론)'],
+                imp = [name, wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), ' (토론)', 0],
                 data =  '<h2 style="margin-top: 0px;">' + sub + '</h2> \
                         <br> \
                         ' + div + ' \
@@ -2173,7 +2173,7 @@ def close_topic_list(name = None, tool = None):
         
         return(
             template('index', 
-                imp = [name, wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), ' (' + sub + ')'],
+                imp = [name, wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), ' (' + sub + ')', 0],
                 data =  '<form style="margin-top: 0px;" method="post"> \
                             ' + div + plus + ' \
                         </form>',
@@ -2226,7 +2226,7 @@ def login():
         return(
             template(
                 'index',    
-                imp = ['로그인', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
+                imp = ['로그인', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
                 data = '<form method="post"> \
                             <input placeholder="아이디" name="id" type="text"> \
                             <br> \
@@ -2282,7 +2282,7 @@ def change_password():
         return(
             template(
                 'index',    
-                imp = ['비밀번호 변경', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
+                imp = ['비밀번호 변경', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
                 data = '<form method="post"> \
                             <input placeholder="아이디" name="id" type="text"> \
                             <br> \
@@ -2342,7 +2342,7 @@ def user_check(name = None):
         return(
             template(
                 'index',    
-                imp = ['다중 검사', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
+                imp = ['다중 검사', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
                 data = c,
                 menu = [['manager', '관리자']]
             )
@@ -2389,7 +2389,7 @@ def register():
         return(
             template(
                 'index',    
-                imp = ['회원가입', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
+                imp = ['회원가입', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
                 data = '<form method="post"> \
                             <input placeholder="아이디" name="id" type="text"> \
                             <br> \
@@ -2501,7 +2501,7 @@ def user_ban(name = None):
 
             return(
                 template('index', 
-                    imp = [name, wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), ' (' + now + ')'],
+                    imp = [name, wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), ' (' + now + ')', 0],
                     data = '<form method="post"> \
                                 ' + data + ' \
                                 <button class="btn btn-primary" type="submit">' + now + '</button> \
@@ -2545,7 +2545,7 @@ def acl(name = None):
                 
                 return(
                     template('index', 
-                        imp = [name, wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), ' (ACL)'],
+                        imp = [name, wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), ' (ACL)', 0],
                         data = '<span>현재 ACL : ' + now + '</span> \
                                 <br> \
                                 <br> \
@@ -2603,7 +2603,7 @@ def user_admin(name = None):
                 return(
                     template(
                         'index', 
-                        imp = [name, wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), ' (권한 부여)'],
+                        imp = [name, wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), ' (권한 부여)', 0],
                         data =  '<form method="post"> \
                                     <select name="select"> \
                                         ' + div + ' \
@@ -2660,7 +2660,7 @@ def are_you_ban():
     return(
         template(
             'index', 
-            imp = ['권한 오류', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
+            imp = ['권한 오류', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
             data = end,
             menu = 0
         )
@@ -2694,7 +2694,7 @@ def diff_data(name = None, a = None, b = None):
             return(
                 template(
                     'index', 
-                    imp = [name, wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), ' (비교)'],
+                    imp = [name, wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), ' (비교)', 0],
                     data = result,
                     menu = [['history/' + url_pas(name), '역사']]
                 )
@@ -2717,7 +2717,7 @@ def down(name = None):
     return(
         template(
             'index', 
-            imp = [name, wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), ' (하위)'],
+            imp = [name, wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), ' (하위)', 0],
             data = div,
             menu = [['w/' + url_pas(name), '문서']]
         )
@@ -2848,10 +2848,17 @@ def read_view(name = None, num = None, redirect = None):
         menu = [['history/' + url_pas(name), '역사']]
         sub = ' (' + str(num) + '판)'
         acl = ''
+    else:
+        curs.execute("select date from history where title = ? limit 1", [name])
+        date = curs.fetchall()
+        if(date):
+            r_date = date[0][0]
+        else:
+            r_date = 0
 
     return(
         template('index', 
-            imp = [name, wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), sub + acl],
+            imp = [name, wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), sub + acl, r_date],
             data = enddata + namumark(name, div, 0, 0),
             menu = menu
         )
@@ -2919,7 +2926,7 @@ def user_topic_list(name = None, num = 1):
     
     return(
         template('index', 
-            imp = ['토론 기록', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), sub],
+            imp = ['토론 기록', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), sub, 0],
             data = div,
             menu = [['other', '기타'], ['user', '사용자']]
         )
@@ -2986,7 +2993,7 @@ def upload():
         return(
             template(
                 'index', 
-                imp = ['파일 올리기', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
+                imp = ['파일 올리기', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
                 data =  '<form method="post" enctype="multipart/form-data" accept-charset="utf8"> \
                             <input type="file" name="f_data"> \
                             <br> \
@@ -3031,7 +3038,7 @@ def user_info():
     return(
         template(
             'index', 
-            imp = ['사용자 메뉴', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
+            imp = ['사용자 메뉴', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
             data =  ip + '<br><br>' + namumark('',  '권한 상태 : ' + acl + '\r\n' + \
                                                     '[목차(없음)]\r\n' + \
                                                     '== 로그인 관련 ==\r\n' + \
@@ -3082,7 +3089,7 @@ def custom_css_view():
         return(
             template(
                 'index', 
-                imp = ['사용자 CSS', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
+                imp = ['사용자 CSS', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
                 data =  start + ' \
                         <form method="post"> \
                             <textarea rows="30" cols="100" name="content">'\
@@ -3133,7 +3140,7 @@ def custom_js_view():
         return(
             template(
                 'index', 
-                imp = ['사용자 JS', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
+                imp = ['사용자 JS', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
                 data =  start + ' \
                         <form method="post"> \
                             <textarea rows="30" cols="100" name="content">'\
@@ -3174,7 +3181,7 @@ def count_edit(name = None):
     return(
         template(
             'index', 
-            imp = ['기여 횟수', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
+            imp = ['기여 횟수', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
             data = namumark("", "||<-2><:> " + that + " ||\r\n||<:> 기여 횟수 ||<:> " + str(data) + "||\r\n||<:> 토론 횟수 ||<:> " + str(t_data) + "||", 0, 1),
             menu = [['user', '사용자']]
         )
@@ -3272,7 +3279,7 @@ def error_test(num = None):
         return(
             template(
                 'index', 
-                imp = [title, wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
+                imp = [title, wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
                 data = data,
                 menu = 0
             )

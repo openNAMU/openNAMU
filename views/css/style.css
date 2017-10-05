@@ -519,3 +519,8 @@ pre span {
     max-height: 30%;
     overflow-y: scroll;
 }
+
+#edit_time {
+    float: right;
+    margin-top: -5px;
+}
