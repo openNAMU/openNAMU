@@ -17,6 +17,7 @@
  * pip install [bottle-beaker](https://pypi.python.org/pypi/bottle-beaker)
  * pip install [tornado](https://pypi.python.org/pypi/tornado)
  * pip install [bcrypt](https://pypi.python.org/pypi/bcrypt)
+ * pip install [css-html-js-minify](https://pypi.python.org/pypi/css-html-js-minify)
  
 cmd에 치면 됩니다.
 ### 우분투
@@ -25,6 +26,7 @@ cmd에 치면 됩니다.
  * pip3 install [bottle-beaker](https://pypi.python.org/pypi/bottle-beaker)
  * pip3 install [tornado](https://pypi.python.org/pypi/tornado)
  * pip3 install [bcrypt](https://pypi.python.org/pypi/bcrypt)
+ * pip3 install [css-html-js-minify](https://pypi.python.org/pypi/css-html-js-minify)
  
 터미널에 치면 됩니다.
 ### 자세한 설명
