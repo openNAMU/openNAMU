@@ -1037,9 +1037,11 @@ def deep_search(name = None, num = 1):
     exist = curs.fetchall()
     if(exist):
         div =   '<li>문서로 <a href="/w/' + url_pas(name) + '">바로가기</a></li> \
+                <br> \
                 <br>'
     else:
         div =   '<li>문서가 없습니다. <a class="not_thing" href="/w/' + url_pas(name) + '">바로가기</a></li> \
+                <br> \
                 <br>'
 
     if(title_list):
@@ -1079,6 +1081,7 @@ def deep_search(name = None, num = 1):
     div += div_plus + end
 
     div += '<br> \
+            <br> \
             <a href="/search/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전)</a> <a href="/search/' + url_pas(name) + '/n/' + str(num + 1) + '">(이후)</a>'
     
     return(
@@ -1591,6 +1594,7 @@ def manager(num = 1):
                                         ' * [[wiki:m_del|여러 문서 삭제]]\r\n' + \
                                         '== 소유자 ==\r\n' + \
                                         ' * [[wiki:back_reset|역링크, 분류 다시 생성]]\r\n' + \
+                                        ' * [[wiki:indexing|인덱싱]]\r\n' + \
                                         ' * [[wiki:manager/8|관리 그룹 생성]]\r\n' + \
                                         ' * [[wiki:update|업데이트 메뉴]]\r\n' + \
                                         ' * [[wiki:edit_set|설정 편집]]\r\n' + \
