@@ -44,7 +44,7 @@ def redirect(data):
     
 from func import *
 
-r_ver = '2.3.1'
+r_ver = '2.3.2'
 p_ver = ''
 
 try:
@@ -1485,6 +1485,7 @@ def other():
                                 ' * [[wiki:admin_list|관리자 목록]]\r\n' + \
                                 ' * [[wiki:give_log|권한 목록]]\r\n' + \
                                 ' * [[wiki:manager/1|관리자 메뉴]]\r\n' + \
+                                ' * [[wiki:upload|파일 올리기]]\r\n' + \
                                 '== 버전 ==\r\n' + \
                                 '이 오픈나무는 [[https://github.com/2DU/openNAMU/blob/SQLite/version.md|' + r_ver + p_ver + ']]판 입니다.', 0, 0),
             menu = 0
@@ -2924,21 +2925,76 @@ def user_topic_list(name = None, num = 1):
         )
     )
     
-@route('/upload')
+@route('/upload', method=['GET', 'POST'])
 def upload():
-    ip = ip_check()
-    if(ban_check() == 0):
+    if(ban_check() == 1):
         return(redirect('/ban'))
     
     if(request.method == 'POST'):
-        pass
+        data = request.files.f_data
+        if(data):
+            if(int(wiki_set(4)) * 1024 * 1024 < request.content_length):
+                return redirect('/error/17')
+            
+            value = os.path.splitext(data.filename)[1]
+            if(not value in ['.jpeg', '.jpg', '.gif', '.png', '.webp', '.JPEG', '.JPG', '.GIF', '.PNG', '.WEBP']):
+                return redirect('/error/14')
+        
+            if(request.forms.get('f_name')):
+                name = request.forms.get('f_name') + value
+            else:
+                name = data.filename
+            
+            piece = os.path.splitext(name)
+            e_data = sha224(piece[0]) + piece[1]
+                
+            ip = ip_check()
+            if(request.forms.get('f_lice')):
+                lice = request.forms.get('f_lice')
+            else:
+                if(re.search('(?:\.|:)', ip)):
+                    lice = ip + ' 올림'
+                else:
+                    lice = '[[사용자:' + ip + ']] 올림'
+                    
+            if(os.path.exists(os.path.join('image', e_data))):
+                return(redirect('/error/16'))
+                
+            data.save(os.path.join('image', e_data))
+                
+            curs.execute("select title from data where title = ?", ['파일:' + name])
+            exist = curs.fetchall()
+            if(exist): 
+                curs.execute("delete from data where title = ?", ['파일:' + name])
+            
+            curs.execute("insert into data (title, data, acl) values (?, ?, 'admin')", ['파일:' + name, '[[파일:' + name + ']][br][br]{{{[[파일:' + name + ']]}}}[br][br]' + lice])
+            conn.commit()
+            
+            history_plus(
+                '파일:' + name, 
+                '[[파일:' + name + ']][br][br]{{{[[파일:' + name + ']]}}}[br][br]' + lice, 
+                get_time(), 
+                ip, 
+                '(파일 올림)', 
+                '0'
+            )
+            
+            return(redirect('/w/파일:' + name))
+        else:
+            return(redirect('/error/9'))
     else:
         return(
             template(
                 'index', 
                 imp = ['파일 올리기', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0],
-                data =  '<form method="post"> \
-                            <input type="file"> \
+                data =  '<form method="post" enctype="multipart/form-data" accept-charset="utf8"> \
+                            <input type="file" name="f_data"> \
+                            <br> \
+                            <br> \
+                            <input placeholder="파일 이름" name="f_name"> \
+                            <br> \
+                            <br> \
+                            <input placeholder="라이선스" name="f_lice"> \
                             <br> \
                             <br> \
                             <button class="btn btn-primary" type="submit">저장</button> \
@@ -3181,6 +3237,9 @@ def error_test(num = None):
     elif(num == 8):
         title = '가입 오류'
         data = '아이디에는 한글과 알파벳과 공백만 허용 됩니다.'
+    elif(num == 9):
+        title = '파일 올리기 오류'
+        data = '파일이 없습니다.'
     elif(num == 10):
         title = '변경 오류'
         data = '비밀번호가 다릅니다.'
@@ -3189,7 +3248,7 @@ def error_test(num = None):
         data = '이미 로그인 되어 있습니다.'
     elif(num == 14):
         title = '파일 올리기 오류'
-        data = 'jpg, gif, jpeg, png, apng, webp만 가능 합니다.'
+        data = 'jpg, gif, jpeg, png, webp만 가능 합니다.'
     elif(num == 15):
         title = '편집 오류'
         data = '편집 기록은 500자를 넘을 수 없습니다.'

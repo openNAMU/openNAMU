@@ -1,5 +1,6 @@
 <html>
     <head>
+        <meta charset="utf-8">
         <title>{{imp[0]}} - {{imp[1]}}</title>
         <link rel="stylesheet" href="/views/css/primer.css">
         <link rel="stylesheet" href="/views/css/style.css">
