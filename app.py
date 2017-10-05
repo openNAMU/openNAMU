@@ -159,47 +159,47 @@ def edit_set():
                 template(
                     'index', 
                     imp = ['설정 편집', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
-                    data = '<form method="post"> \
-                                <span>위키 이름</span> \
-                                <br> \
-                                <br> \
-                                <input placeholder="위키 이름" style="width: 100%;" type="text" name="name" value="' + name + '"> \
-                                <br> \
-                                <br> \
-                                <span>시작 페이지</span> \
-                                <br> \
-                                <br> \
-                                <input placeholder="시작 페이지" style="width: 100%;" type="text" name="frontpage" value="' + frontpage + '"> \
-                                <br> \
-                                <br> \
-                                <span>라이선스</span> \
-                                <br> \
-                                <br> \
-                                <input placeholder="라이선스" style="width: 100%;" type="text" name="license" value="' + license + '"> \
-                                <br> \
-                                <br> \
-                                <span>파일 올리기 최대 크기</span> \
-                                <br> \
-                                <br> \
-                                <input placeholder="파일 올리기 최대 크기" style="width: 100%;" type="text" name="upload" value="' + upload + '"> \
-                                <br> \
-                                <br> \
-                                <hr> \
-                                <br> \
-                                <span>구글 리캡차 코드 [공개] (선택)</span> \
-                                <br> \
-                                <br> \
-                                <input placeholder="구글 리캡차 코드 [공개] (선택)" style="width: 100%;" type="text" name="recapt_p" value="' + recapt_p_d + '"> \
-                                <br> \
-                                <br> \
-                                <span>구글 리캡차 코드 [비밀] (선택)</span> \
-                                <br> \
-                                <br> \
-                                <input placeholder="구글 리캡차 코드 [비밀] (선택)" style="width: 100%;" type="text" name="recapt_s" value="' + recapt_s_d + '"> \
-                                <br> \
-                                <br> \
-                                <button class="btn btn-primary" type="submit">저장</button> \
-                            </form>',
+                    data = '<form method="post">' + \
+                                '<span>위키 이름</span>' + \
+                                '<br>' + \
+                                '<br>' + \
+                                '<input placeholder="위키 이름" style="width: 100%;" type="text" name="name" value="' + name + '">' + \
+                                '<br>' + \
+                                '<br>' + \
+                                '<span>시작 페이지</span>' + \
+                                '<br>' + \
+                                '<br>' + \
+                                '<input placeholder="시작 페이지" style="width: 100%;" type="text" name="frontpage" value="' + frontpage + '">' + \
+                                '<br>' + \
+                                '<br>' + \
+                                '<span>라이선스</span>' + \
+                                '<br>' + \
+                                '<br>' + \
+                                '<input placeholder="라이선스" style="width: 100%;" type="text" name="license" value="' + license + '">' + \
+                                '<br>' + \
+                                '<br>' + \
+                                '<span>파일 올리기 최대 크기</span>' + \
+                                '<br>' + \
+                                '<br>' + \
+                                '<input placeholder="파일 올리기 최대 크기" style="width: 100%;" type="text" name="upload" value="' + upload + '">' + \
+                                '<br>' + \
+                                '<br>' + \
+                                '<hr>' + \
+                                '<br>' + \
+                                '<span>구글 리캡차 코드 [공개] (선택)</span>' + \
+                                '<br>' + \
+                                '<br>' + \
+                                '<input placeholder="구글 리캡차 코드 [공개] (선택)" style="width: 100%;" type="text" name="recapt_p" value="' + recapt_p_d + '">' + \
+                                '<br>' + \
+                                '<br>' + \
+                                '<span>구글 리캡차 코드 [비밀] (선택)</span>' + \
+                                '<br>' + \
+                                '<br>' + \
+                                '<input placeholder="구글 리캡차 코드 [비밀] (선택)" style="width: 100%;" type="text" name="recapt_s" value="' + recapt_s_d + '">' + \
+                                '<br>' + \
+                                '<br>' + \
+                                '<button class="btn btn-primary" type="submit">저장</button>' + \
+                            '</form>',
                     menu = [['manager', '관리자']]
                 )
             )
@@ -319,8 +319,7 @@ def list_acl():
         
         i += 1
     else:        
-        div +=  '<br> \
-                <a href="/manager/8">(생성)</a>'
+        div +=  '<br><a href="/manager/8">(생성)</a>'
 
     return(
         template(
@@ -396,12 +395,12 @@ def admin_plus(name = None):
                 template(
                     'index', 
                     imp = ['관리 그룹 추가', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
-                    data = '<form method="post">' \
-                                + data + \
-                                '<div class="form-actions"> \
-                                    <button class="btn btn-primary" type="submit">저장</button> \
-                                </div> \
-                            </form>',
+                    data = '<form method="post">' + \
+                                data + \
+                                '<div class="form-actions">' + \
+                                    '<button class="btn btn-primary" type="submit">저장</button>' + \
+                                '</div>' + \
+                            '</form>',
                     menu = [['manager', '관리자']]
                 )
             )
@@ -440,13 +439,13 @@ def recent_changes(name = None, num = 1):
     zdmin = admin_check(6, None)
     ban = ''
     send = '<br>'
-    div =  '<table style="width: 100%; text-align: center;"> \
-                <tbody> \
-                    <tr> \
-                        <td style="width: 33.3%;">문서명</td> \
-                        <td style="width: 33.3%;">기여자</td> \
-                        <td style="width: 33.3%;">시간</td> \
-                    </tr>'
+    div =  '<table style="width: 100%; text-align: center;">' + \
+                '<tbody>' + \
+                    '<tr>' + \
+                        '<td style="width: 33.3%;">문서명</td>' + \
+                        '<td style="width: 33.3%;">기여자</td>' + \
+                        '<td style="width: 33.3%;">시간</td>' + \
+                    '</tr>'
     
     if(name):
         if(num * 50 <= 0):
@@ -511,19 +510,18 @@ def recent_changes(name = None, num = 1):
             else:
                 hidden = ''      
             
-        div += '<tr style="' + style + '"> \
-                    <td> \
-                        <a href="/w/' + url_pas(data[1]) + '">' + title + '</a> (<a href="/history/' + url_pas(data[1]) + '">' + data[0] + '판</a>) ' + revert + ' (' + leng + ') \
-                    </td> \
-                    <td>' + ip + ban + hidden + '</td> \
-                    <td>' + data[2] + '</td> \
-                </tr> \
-                <tr> \
-                    <td colspan="3">' + send + '</td> \
-                </tr>'
+        div += '<tr style="' + style + '">' + \
+                    '<td>' + \
+                        '<a href="/w/' + url_pas(data[1]) + '">' + title + '</a> (<a href="/history/' + url_pas(data[1]) + '">' + data[0] + '판</a>) ' + revert + ' (' + leng + ')' + \
+                    '</td>' + \
+                    '<td>' + ip + ban + hidden + '</td>' + \
+                    '<td>' + data[2] + '</td>' + \
+                '</tr>' + \
+                '<tr>' + \
+                    '<td colspan="3">' + send + '</td>' + \
+                '</tr>'
     else:
-        div +=      '</tbody> \
-                </table>'
+        div += '</tbody></table>'
 
     if(name):
         curs.execute("select end, why from ban where block = ?", [name])
@@ -535,8 +533,7 @@ def recent_changes(name = None, num = 1):
 
         title = '사용자 기록'
         menu = [['other', '기타'], ['user', '사용자']]
-        div += '<br> \
-                <a href="/record/' + url_pas(name) + '/n/' + str(num + 1) + '">(이전)</a> <a href="/record/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전)</a>'
+        div += '<br><a href="/record/' + url_pas(name) + '/n/' + str(num + 1) + '">(이전)</a> <a href="/record/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전)</a>'
     else:
         sub = 0
         menu = 0
@@ -596,8 +593,7 @@ def user_log(num = 1):
         
         j += 1
     else:
-        list_data +=    '<br> \
-                        <a href="/user_log/n/' + str(num - 1) + '">(이전)</a> <a href="/user_log/n/' + str(num + 1) + '">(이후)</a>'
+        list_data += '<br><a href="/user_log/n/' + str(num - 1) + '">(이전)</a> <a href="/user_log/n/' + str(num + 1) + '">(이후)</a>'
 
     return(
         template(
@@ -628,11 +624,11 @@ def user_log(num = 1):
         
         j += 1
     else:
-        list_data +=    '<br> \
-                        <span>주의 : 권한 사용 안하고 열람만 해도 기록되는 경우도 있습니다.</span> \
-                        <br> \
-                        <br> \
-                        <a href="/admin_log/n/' + str(num - 1) + '">(이전)</a> <a href="/admin_log/n/' + str(num + 1) + '">(이후)</a>'
+        list_data +=    '<br>' + \
+                        '<span>주의 : 권한 사용 안하고 열람만 해도 기록되는 경우도 있습니다.</span>' + \
+                        '<br>' + \
+                        '<br>' + \
+                        '<a href="/admin_log/n/' + str(num - 1) + '">(이전)</a> <a href="/admin_log/n/' + str(num + 1) + '">(이후)</a>'
 
     return(
         template(
@@ -736,8 +732,7 @@ def xref(name = None, num = 1):
         
         div += '</li>'
     else:        
-        div += '<br> \
-                <a href="/xref/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전)</a> <a href="/xref/' + url_pas(name) + '/n/' + str(num + 1) + '">(이후)</a>'
+        div += '<br><a href="/xref/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전)</a> <a href="/xref/' + url_pas(name) + '/n/' + str(num + 1) + '">(이후)</a>'
     
     return(
         template(
@@ -761,14 +756,14 @@ def recent_discuss(tools = 'normal'):
             div += '<a href="/recent_discuss">(열린 토론)</a>'
             m_sub = ' (닫힘)'
 
-        div +=  '<br> \
-                <br> \
-                <table style="width: 100%; text-align: center;"> \
-                <tbody> \
-                    <tr> \
-                        <td style="width: 50%;">토론명</td> \
-                        <td style="width: 50%;">시간</td> \
-                    </tr>'
+        div +=  '<br>' + \
+                '<br>' + \
+                '<table style="width: 100%; text-align: center;">' + \
+                '<tbody>' + \
+                    '<tr>' + \
+                        '<td style="width: 50%;">토론명</td>' + \
+                        '<td style="width: 50%;">시간</td>' + \
+                    '</tr>'
     else:
         return(redirect('/'))
     
@@ -789,15 +784,14 @@ def recent_discuss(tools = 'normal'):
                 close = 1
 
         if(close == 0):
-            div += '<tr> \
-                        <td> \
-                            <a href="/topic/' + url_pas(data[0]) + '/sub/' + url_pas(data[1]) + '">' + title + '</a> (' + sub + ') \
-                        </td> \
-                        <td>' + data[2] + '</td> \
-                    </tr>'
+            div += '<tr>' + \
+                        '<td>' + \
+                            '<a href="/topic/' + url_pas(data[0]) + '/sub/' + url_pas(data[1]) + '">' + title + '</a> (' + sub + ')' + \
+                        '</td>' + \
+                        '<td>' + data[2] + '</td>' + \
+                    '</tr>'
     else:
-        div +=      '</tbody> \
-                </table>'
+        div += '</tbody></table>'
             
     return(
         template(
@@ -817,17 +811,17 @@ def block_log(num = 1):
         v = num * 50
     
     i = v - 50
-    div =   '<table style="width: 100%; text-align: center;"> \
-                <tbody> \
-                    <tr> \
-                        <td style="width: 33.3%;">차단자</td> \
-                        <td style="width: 33.3%;">관리자</td> \
-                        <td style="width: 33.3%;">기간</td> \
-                    </tr> \
-                    <tr> \
-                        <td colspan="2">이유</td> \
-                        <td>시간</td> \
-                    </tr>'
+    div =   '<table style="width: 100%; text-align: center;">' + \
+                '<tbody>' + \
+                    '<tr>' + \
+                        '<td style="width: 33.3%;">차단자</td>' + \
+                        '<td style="width: 33.3%;">관리자</td>' + \
+                        '<td style="width: 33.3%;">기간</td>' + \
+                    '</tr>' + \
+                    '<tr>' + \
+                        '<td colspan="2">이유</td>' + \
+                        '<td>시간</td>' + \
+                    '</tr>'
     
     curs.execute("select why, block, blocker, end, today from rb order by today desc limit ?, ?", [str(i), str(v)])
     rows = curs.fetchall()
@@ -845,20 +839,20 @@ def block_log(num = 1):
         else:
             end = '무기한'
             
-        div += '<tr> \
-                    <td>' + ip + '</td> \
-                    <td>' + ip_pas(data[2], 2) + '</td> \
-                    <td>' + end + '</td> \
-                </tr> \
-                <tr> \
-                    <td colspan="2">' + why + '</td> \
-                    <td>' + data[4] + '</td> \
-                </tr>'
+        div += '<tr>' + \
+                    '<td>' + ip + '</td>' + \
+                    '<td>' + ip_pas(data[2], 2) + '</td>' + \
+                    '<td>' + end + '</td>' + \
+                '</tr>' + \
+                '<tr>' + \
+                    '<td colspan="2">' + why + '</td>' + \
+                    '<td>' + data[4] + '</td>' + \
+                '</tr>'
     else:
-        div +=      '</tbody> \
-                </table> \
-                <br> \
-                <a href="/block_log/n/' + str(num - 1) + '">(이전)</a> <a href="/block_log/n/' + str(num + 1) + '">(이후)</a>'
+        div +=      '</tbody>' + \
+                '</table>' + \
+                '<br>' + \
+                '<a href="/block_log/n/' + str(num - 1) + '">(이전)</a> <a href="/block_log/n/' + str(num + 1) + '">(이후)</a>'
                 
     return(
         template(
@@ -886,13 +880,13 @@ def history_view(name = None, num = 1):
         admin1 = admin_check(1, None)
         admin2 = admin_check(6, None)
         
-        div =   '<table style="width: 100%; text-align: center;"> \
-                    <tbody> \
-                        <tr> \
-                            <td style="width: 33.3%;">판</td> \
-                            <td style="width: 33.3%;">기여자</td> \
-                            <td style="width: 33.3%;">시간</td> \
-                        </tr>'
+        div =   '<table style="width: 100%; text-align: center;">' + \
+                    '<tbody>' + \
+                        '<tr>' + \
+                            '<td style="width: 33.3%;">판</td>' + \
+                            '<td style="width: 33.3%;">기여자</td>' + \
+                            '<td style="width: 33.3%;">시간</td>' + \
+                        '</tr>'
         
         curs.execute("select send, leng, ip, date, title, id from history where title = ? order by id + 0 desc limit ?, ?", [name, str(j), str(i)])
         all_data = curs.fetchall()
@@ -943,37 +937,35 @@ def history_view(name = None, num = 1):
                     hid = 0
             
             if(hid == 1):
-                div += '<tr> \
-                            <td colspan="3">숨김</td> \
-                        </tr>'
+                div += '<tr><td colspan="3">숨김</td></tr>'
             else:
-                div += '<tr> \
-                            <td> \
-                                ' + data[5] + '판</a> <a href="/w/' + url_pas(name) + '/r/' + url_pas(data[5]) + '">(보기)</a> \
-                                    <a href="/raw/' + url_pas(name) + '/r/' + url_pas(data[5]) + '">(원본)</a> \
-                                    <a href="/revert/' + url_pas(name) + '/r/' + url_pas(data[5]) + '">(되돌리기)</a> (' + leng + ') \
-                            </td> \
-                            <td>' + ip + ban + hidden + '</td> \
-                            <td>' + data[3] + '</td> \
-                        </tr> \
-                        <tr> \
-                            <td colspan="3">' + send + '</td> \
-                        </tr>'
+                div += '<tr>' + \
+                            '<td>' + \
+                                data[5] + '판</a> <a href="/w/' + url_pas(name) + '/r/' + url_pas(data[5]) + '">(보기)</a>' + \
+                                    '<a href="/raw/' + url_pas(name) + '/r/' + url_pas(data[5]) + '">(원본)</a>' + \
+                                    '<a href="/revert/' + url_pas(name) + '/r/' + url_pas(data[5]) + '">(되돌리기)</a> (' + leng + ')' + \
+                            '</td>' + \
+                            '<td>' + ip + ban + hidden + '</td>' + \
+                            '<td>' + data[3] + '</td>' + \
+                        '</tr>' + \
+                        '<tr>' + \
+                            '<td colspan="3">' + send + '</td>' + \
+                        '</tr>'
         else:
-            div +=      '</tbody> \
-                    </table> \
-                    <br> \
-                    <a href="/history/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전)</a> <a href="/history/' + url_pas(name) + '/n/' + str(num + 1) + '">(이후)</a>'
+            div +=      '</tbody>' + \
+                    '</table>' + \
+                    '<br>' + \
+                    '<a href="/history/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전)</a> <a href="/history/' + url_pas(name) + '/n/' + str(num + 1) + '">(이후)</a>'
 
-        div =   '<form method="post"> \
-                    <select name="a"> \
-                        ' + select + ' \
-                    </select> \
-                    <select name="b"> \
-                        ' + select + ' \
-                    </select> \
-                    <button class="btn btn-primary" type="submit">비교</button> \
-                </form>' + div
+        div =   '<form method="post">' + \
+                    '<select name="a">' + \
+                        select + \
+                    '</select>' + \
+                    '<select name="b">' + \
+                        select + \
+                    '</select>' + \
+                    '<button class="btn btn-primary" type="submit">비교</button>' + \
+                '</form>' + div
 
         return(
             template(
@@ -1020,11 +1012,9 @@ def deep_search(name = None, num = 1):
     curs.execute("select title from data where title = ?", [name])
     exist = curs.fetchall()
     if(exist):
-        div =   '<li>문서로 <a href="/w/' + url_pas(name) + '">바로가기</a></li> \
-                <br>'
+        div =   '<li>문서로 <a href="/w/' + url_pas(name) + '">바로가기</a></li><br>'
     else:
-        div =   '<li>문서가 없습니다. <a class="not_thing" href="/w/' + url_pas(name) + '">바로가기</a></li> \
-                <br>'
+        div =   '<li>문서가 없습니다. <a class="not_thing" href="/w/' + url_pas(name) + '">바로가기</a></li><br>'
 
     if(title_list):
         no = 0
@@ -1062,8 +1052,7 @@ def deep_search(name = None, num = 1):
 
     div += div_plus + end
 
-    div += '<br> \
-            <a href="/search/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전)</a> <a href="/search/' + url_pas(name) + '/n/' + str(num + 1) + '">(이후)</a>'
+    div += '<br><a href="/search/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전)</a> <a href="/search/' + url_pas(name) + '/n/' + str(num + 1) + '">(이후)</a>'
     
     return(
         template(
@@ -1163,9 +1152,7 @@ def revert(name = None, num = None):
             if(rows):
                 l_c = login_check()
                 if(l_c == 0):
-                    plus = '<span>비 로그인 상태입니다. 비 로그인으로 작업 시 아이피가 역사에 기록됩니다.</span> \
-                            <br> \
-                            <br>'
+                    plus = '<span>비 로그인 상태입니다. 비 로그인으로 작업 시 아이피가 역사에 기록됩니다.</span><br><br>'
                 else:
                     plus = ''
 
@@ -1173,13 +1160,13 @@ def revert(name = None, num = None):
                     template(
                         'index', 
                         imp = [name, wiki_set(1), wiki_set(3), l_c, custom_css(), custom_js(), ' (되돌리기)', 0],
-                        data =  plus + ' \
-                                <form method="post"> \
-                                    <input placeholder="사유" style="width: 100%;" class="form-control input-sm" name="send" type="text"> \
-                                    <br> \
-                                    <br> \
-                                    <button class="btn btn-primary" type="submit">되돌리기</button> \
-                                </form>',
+                        data =  plus + '' + \
+                                '<form method="post">' + \
+                                    '<input placeholder="사유" style="width: 100%;" class="form-control input-sm" name="send" type="text">' + \
+                                    '<br>' + \
+                                    '<br>' + \
+                                    '<button class="btn btn-primary" type="submit">되돌리기</button>' + \
+                                '</form>',
                         menu = [['history/' + url_pas(name), '역사'], ['recent_changes', '최근 변경']]
                     )
                 )
@@ -1220,29 +1207,29 @@ def m_del():
                 template(
                     'index', 
                     imp = ['많은 문서 삭제', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
-                    data = '<span> \
-                                문서명 A \
-                                <br> \
-                                문서명 B \
-                                <br> \
-                                문서명 C \
-                                <br> \
-                                <br> \
-                                이런 식으로 적으세요. \
-                            </span> \
-                            <br> \
-                            <br> \
-                            <form method="post"> \
-                                <textarea style="height: 80%;" name="content"></textarea> \
-                                <br> \
-                                <br> \
-                                <input placeholder="사유" style="width: 100%;" class="form-control input-sm" name="send" type="text"> \
-                                <br> \
-                                <br> \
-                                <div class="form-actions"> \
-                                    <button class="btn btn-primary" type="submit">삭제</button> \
-                                </div> \
-                            </form>',
+                    data = '<span>' + \
+                                '문서명 A' + \
+                                '<br>' + \
+                                '문서명 B' + \
+                                '<br>' + \
+                                '문서명 C' + \
+                                '<br>' + \
+                                '<br>' + \
+                                '이런 식으로 적으세요.' + \
+                            '</span>' + \
+                            '<br>' + \
+                            '<br>' + \
+                            '<form method="post">' + \
+                                '<textarea style="height: 80%;" name="content"></textarea>' + \
+                                '<br>' + \
+                                '<br>' + \
+                                '<input placeholder="사유" style="width: 100%;" class="form-control input-sm" name="send" type="text">' + \
+                                '<br>' + \
+                                '<br>' + \
+                                '<div class="form-actions">' + \
+                                    '<button class="btn btn-primary" type="submit">삭제</button>' + \
+                                '</div>' + \
+                            '</form>',
                     menu = [['manager', '관리자']]
                 )
             )
@@ -1341,19 +1328,19 @@ def edit(name = None, num = None):
                 template(
                     'index', 
                     imp = [name, wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), ' (수정)', 0],
-                    data = '<form method="post" action="/edit/' + name + action + '"> \
-                                <textarea style="height: 80%;" name="content">' + data + '</textarea> \
-                                <textarea style="display: none; height: 80%;" name="otent">' + data + '</textarea> \
-                                <br> \
-                                <br> \
-                                <input placeholder="사유" name="send" style="width: 100%;" type="text"> \
-                                <br> \
-                                <br> \
-                                <div class="form-actions"> \
-                                    <button id="save" class="btn btn-primary" type="submit">저장</button> \
-                                    <button id="preview" class="btn" type="submit" formaction="/preview/' + url_pas(name) + action + '">미리보기</button> \
-                                </div> \
-                            </form>',
+                    data = '<form method="post" action="/edit/' + name + action + '">' + \
+                                '<textarea style="height: 80%;" name="content">' + data + '</textarea>' + \
+                                '<textarea style="display: none; height: 80%;" name="otent">' + data + '</textarea>' + \
+                                '<br>' + \
+                                '<br>' + \
+                                '<input placeholder="사유" name="send" style="width: 100%;" type="text">' + \
+                                '<br>' + \
+                                '<br>' + \
+                                '<div class="form-actions">' + \
+                                    '<button id="save" class="btn btn-primary" type="submit">저장</button>' + \
+                                    '<button id="preview" class="btn" type="submit" formaction="/preview/' + url_pas(name) + action + '">미리보기</button>' + \
+                                '</div>' + \
+                            '</form>',
                     menu = [['w/' + url_pas(name), '문서']]
                 )
             )
@@ -1380,20 +1367,20 @@ def preview(name = None, num = None):
             template(
                 'index', 
                 imp = [name, wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), ' (미리보기)', 0],
-                data = '<form method="post" action="/edit/' + name + action + '"> \
-                            <textarea style="height: 80%;" name="content">' + request.forms.content + '</textarea> \
-                            <textarea style="display: none; height: 80%;" name="otent">' + request.forms.otent + '</textarea> \
-                            <br> \
-                            <br> \
-                            <input placeholder="사유" name="send" style="width: 100%;" type="text"> \
-                            <br> \
-                            <br> \
-                            <div class="form-actions"> \
-                                <button id="save" class="btn btn-primary" type="submit">저장</button> \
-                                <button id="preview" class="btn" type="submit" formaction="/preview/' + url_pas(name) + action + '">미리보기</button> \
-                            </div> \
-                        </form> \
-                        <br>' + enddata,
+                data = '<form method="post" action="/edit/' + name + action + '">' + \
+                            '<textarea style="height: 80%;" name="content">' + request.forms.content + '</textarea>' + \
+                            '<textarea style="display: none; height: 80%;" name="otent">' + request.forms.otent + '</textarea>' + \
+                            '<br>' + \
+                            '<br>' + \
+                            '<input placeholder="사유" name="send" style="width: 100%;" type="text">' + \
+                            '<br>' + \
+                            '<br>' + \
+                            '<div class="form-actions">' + \
+                                '<button id="save" class="btn btn-primary" type="submit">저장</button>' + \
+                                '<button id="preview" class="btn" type="submit" formaction="/preview/' + url_pas(name) + action + '">미리보기</button>' + \
+                            '</div>' + \
+                        '</form>' + \
+                        '<br>' + enddata,
                 menu = [['w/' + url_pas(name), '문서']]
             )
         )
@@ -1446,13 +1433,13 @@ def delete(name = None):
                     template(
                         'index', 
                         imp = [name, wiki_set(1), wiki_set(3), l_c, custom_css(), custom_js(), ' (삭제)', 0],
-                        data = '<form method="post"> \
-                                    ' + plus + ' \
-                                    <input placeholder="사유" style="width: 100%;" class="form-control input-sm" name="send" type="text"> \
-                                    <br> \
-                                    <br> \
-                                    <button class="btn btn-primary" type="submit">삭제</button> \
-                                </form>',
+                        data = '<form method="post">' + \
+                                    plus + \
+                                    '<input placeholder="사유" style="width: 100%;" class="form-control input-sm" name="send" type="text">' + \
+                                    '<br>' + \
+                                    '<br>' + \
+                                    '<button class="btn btn-primary" type="submit">삭제</button>' + \
+                                '</form>',
                         menu = [['w/' + url_pas(name), '문서']]
                     )
                 )
@@ -1508,16 +1495,16 @@ def move(name = None):
             template(
                 'index', 
                 imp = [name, wiki_set(1), wiki_set(3), l_c, custom_css(), custom_js(), ' (이동)', 0],
-                data = '<form method="post"> \
-                            ' + plus + ' \
-                            <input placeholder="문서명" class="form-control input-sm" value="' + name + '" name="title" type="text"> \
-                            <br> \
-                            <br> \
-                            <input placeholder="사유" style="width: 100%;" class="form-control input-sm" name="send" type="text"> \
-                            <br> \
-                            <br> \
-                            <button class="btn btn-primary" type="submit">이동</button> \
-                        </form>',
+                data = '<form method="post">' + \
+                            plus + \
+                            '<input placeholder="문서명" class="form-control input-sm" value="' + name + '" name="title" type="text">' + \
+                            '<br>' + \
+                            '<br>' + \
+                            '<input placeholder="사유" style="width: 100%;" class="form-control input-sm" name="send" type="text">' + \
+                            '<br>' + \
+                            '<br>' + \
+                            '<button class="btn btn-primary" type="submit">이동</button>' + \
+                        '</form>',
                 menu = [['w/' + url_pas(name), '문서']]
             )
         )
@@ -1582,12 +1569,12 @@ def manager(num = 1):
             return(
                 template('index', 
                     imp = ['ACL 이동', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
-                    data = '<form method="post"> \
-                                <input placeholder="문서명" name="name" type="text"> \
-                                <br> \
-                                <br> \
-                                <button class="btn btn-primary" type="submit">이동</button> \
-                            </form>',
+                    data = '<form method="post">' + \
+                                '<input placeholder="문서명" name="name" type="text">' + \
+                                '<br>' + \
+                                '<br>' + \
+                                '<button class="btn btn-primary" type="submit">이동</button>' + \
+                            '</form>',
                     menu = [['manager', '관리자']]
                 )
             )
@@ -1598,12 +1585,12 @@ def manager(num = 1):
             return(
                 template('index', 
                     imp = ['검사 이동', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
-                    data = '<form method="post"> \
-                                <input placeholder="사용자명" name="name" type="text"> \
-                                <br> \
-                                <br> \
-                                <button class="btn btn-primary" type="submit">이동</button> \
-                            </form>',
+                    data = '<form method="post">' + \
+                                '<input placeholder="사용자명" name="name" type="text">' + \
+                                '<br>' + \
+                                '<br>' + \
+                                '<button class="btn btn-primary" type="submit">이동</button>' + \
+                            '</form>',
                     menu = [['manager', '관리자']]
                 )
             )
@@ -1614,12 +1601,12 @@ def manager(num = 1):
             return(
                 template('index', 
                     imp = ['차단 이동', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
-                    data = '<form method="post"> \
-                                <input placeholder="사용자명" name="name" type="text"> \
-                                <br> \
-                                <br> \
-                                <button class="btn btn-primary" type="submit">이동</button> \
-                            </form>',
+                    data = '<form method="post">' + \
+                                '<input placeholder="사용자명" name="name" type="text">' + \
+                                '<br>' + \
+                                '<br>' + \
+                                '<button class="btn btn-primary" type="submit">이동</button>' + \
+                            '</form>',
                     menu = [['manager', '관리자']]
                 )
             )
@@ -1630,12 +1617,12 @@ def manager(num = 1):
             return(
                 template('index', 
                     imp = ['권한 이동', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
-                    data = '<form method="post"> \
-                                <input placeholder="사용자명" name="name" type="text"> \
-                                <br> \
-                                <br> \
-                                <button class="btn btn-primary" type="submit">이동</button> \
-                            </form>',
+                    data = '<form method="post">' + \
+                                '<input placeholder="사용자명" name="name" type="text">' + \
+                                '<br>' + \
+                                '<br>' + \
+                                '<button class="btn btn-primary" type="submit">이동</button>' + \
+                            '</form>',
                     menu = [['manager', '관리자']]
                 )
             )
@@ -1646,12 +1633,12 @@ def manager(num = 1):
             return(
                 template('index', 
                     imp = ['기록 이동', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
-                    data = '<form method="post"> \
-                                <input placeholder="사용자명" name="name" type="text"> \
-                                <br> \
-                                <br> \
-                                <button class="btn btn-primary" type="submit">이동</button> \
-                            </form>',
+                    data = '<form method="post">' + \
+                                '<input placeholder="사용자명" name="name" type="text">' + \
+                                '<br>' + \
+                                '<br>' + \
+                                '<button class="btn btn-primary" type="submit">이동</button>' + \
+                            '</form>',
                     menu = [['other', '기타']]
                 )
             )
@@ -1662,12 +1649,12 @@ def manager(num = 1):
             return(
                 template('index', 
                     imp = ['토론 기록 이동', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
-                    data = '<form method="post"> \
-                                <input placeholder="사용자명" name="name" type="text"> \
-                                <br> \
-                                <br> \
-                                <button class="btn btn-primary" type="submit">이동</button> \
-                            </form>',
+                    data = '<form method="post">' + \
+                                '<input placeholder="사용자명" name="name" type="text">' + \
+                                '<br>' + \
+                                '<br>' + \
+                                '<button class="btn btn-primary" type="submit">이동</button>' + \
+                            '</form>',
                     menu = [['other', '기타']]
                 )
             )
@@ -1678,12 +1665,12 @@ def manager(num = 1):
             return(
                 template('index', 
                     imp = ['그룹 생성 이동', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
-                    data = '<form method="post"> \
-                                <input placeholder="그룹명" name="name" type="text"> \
-                                <br> \
-                                <br> \
-                                <button class="btn btn-primary" type="submit">이동</button> \
-                            </form>',
+                    data = '<form method="post">' + \
+                                '<input placeholder="그룹명" name="name" type="text">' + \
+                                '<br>' + \
+                                '<br>' + \
+                                '<button class="btn btn-primary" type="submit">이동</button>' + \
+                            '</form>',
                     menu = [['manager', '관리자']]
                 )
             )
@@ -1694,12 +1681,12 @@ def manager(num = 1):
             return(
                 template('index', 
                     imp = ['문서 출력 이동', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
-                    data = '<form method="post"> \
-                                <input placeholder="문서명" name="name" type="text"> \
-                                <br> \
-                                <br> \
-                                <button class="btn btn-primary" type="submit">이동</button> \
-                            </form>',
+                    data = '<form method="post">' + \
+                                '<input placeholder="문서명" name="name" type="text">' + \
+                                '<br>' + \
+                                '<br>' + \
+                                '<button class="btn btn-primary" type="submit">이동</button>' + \
+                            '</form>',
                     menu = [['manager', '관리자']]
                 )
             )
@@ -1763,12 +1750,12 @@ def json_in():
             return(
                 template('index', 
                     imp = ['문서 JSON 입력', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
-                    data = '<form method="post"> \
-                                <textarea style="height: 80%;" name="data"></textarea> \
-                                <br> \
-                                <br> \
-                                <button class="btn btn-primary" type="submit">입력</button> \
-                            </form>',
+                    data = '<form method="post">' + \
+                                '<textarea style="height: 80%;" name="data"></textarea>' + \
+                                '<br>' + \
+                                '<br>' + \
+                                '<button class="btn btn-primary" type="submit">입력</button>' + \
+                            '</form>',
                     menu = [['manager', '관리자']]
                 )    
             )
@@ -1788,9 +1775,7 @@ def title_index(num = 1000, page = 1):
     else:
         i = [1, 0, 0, 0, 0, 0]
 
-    data = '<a href="/title_index/0/1">(전체)</a> <a href="/title_index/500/1">(500)</a> <a href="/title_index/5000/1">(5000개)</a> <a href="/title_index/10000/1">(10000개)</a> <a href="/title_index/50000/1">(50000개)</a> \
-            <br> \
-            <br>'
+    data = '<a href="/title_index/0/1">(전체)</a> <a href="/title_index/500/1">(500)</a> <a href="/title_index/5000/1">(5000개)</a> <a href="/title_index/10000/1">(10000개)</a> <a href="/title_index/50000/1">(50000개)</a><br><br>'
 
     if(num == 0):
         curs.execute("select title from data order by title asc")
@@ -1817,17 +1802,16 @@ def title_index(num = 1000, page = 1):
 
     if(num == 0):
         if(title_list):        
-            data += '<br> \
-                    <li>이 위키에는 총 ' + str(i[0]) + '개의 문서가 있습니다.</li> \
-                    <br> \
-                    <li>틀 문서는 총 ' + str(i[3]) + '개의 문서가 있습니다.</li> \
-                    <li>분류 문서는 총 ' + str(i[1]) + '개의 문서가 있습니다.</li> \
-                    <li>사용자 문서는 총 ' + str(i[2]) + '개의 문서가 있습니다.</li> \
-                    <li>파일 문서는 총 ' + str(i[4]) + '개의 문서가 있습니다.</li> \
-                    <li>나머지 문서는 총 ' + str(i[5]) + '개의 문서가 있습니다.</li>'
+            data += '<br>' + \
+                    '<li>이 위키에는 총 ' + str(i[0]) + '개의 문서가 있습니다.</li>' + \
+                    '<br>' + \
+                    '<li>틀 문서는 총 ' + str(i[3]) + '개의 문서가 있습니다.</li>' + \
+                    '<li>분류 문서는 총 ' + str(i[1]) + '개의 문서가 있습니다.</li>' + \
+                    '<li>사용자 문서는 총 ' + str(i[2]) + '개의 문서가 있습니다.</li>' + \
+                    '<li>파일 문서는 총 ' + str(i[4]) + '개의 문서가 있습니다.</li>' + \
+                    '<li>나머지 문서는 총 ' + str(i[5]) + '개의 문서가 있습니다.</li>'
     else:
-        data += '<br> \
-                <a href="/title_index/' + str(num) + '/' + str(page - 1) + '">(이전)</a> <a href="/title_index/' + str(num) + '/' + str(page + 1) + '">(이후)</a>'
+        data += '<br><a href="/title_index/' + str(num) + '/' + str(page - 1) + '">(이전)</a> <a href="/title_index/' + str(num) + '/' + str(page + 1) + '">(이후)</a>'
     
     return(
         template('index', 
@@ -2044,19 +2028,19 @@ def topic(name = None, sub = None):
             if(no_da):
                 chad += ' @' + no_da[0][0]
                                 
-            div += '<table id="toron"> \
-                        <tbody> \
-                            <tr> \
-                                <td id="toron_color_red"> \
-                                    <a href="#' + dain[1] + '">#' + dain[1] + '</a> ' + ip + chad + ' <span style="float:right;">' + dain[2] + '</span> \
-                                </td> \
-                            </tr> \
-                            <tr> \
-                                <td>' + top_data + '</td> \
-                            </tr> \
-                        </tbody> \
-                    </table> \
-                    <br>'
+            div += '<table id="toron">' + \
+                        '<tbody>' + \
+                            '<tr>' + \
+                                '<td id="toron_color_red">' + \
+                                    '<a href="#' + dain[1] + '">#' + dain[1] + '</a> ' + ip + chad + ' <span style="float:right;">' + dain[2] + '</span>' + \
+                                '</td>' + \
+                            '</tr>' + \
+                            '<tr>' + \
+                                '<td>' + top_data + '</td>' + \
+                            '</tr>' + \
+                        '</tbody>' + \
+                    '</table>' + \
+                    '<br>'
                     
         i = 0          
         for dain in toda:
@@ -2119,35 +2103,35 @@ def topic(name = None, sub = None):
             else:
                 color = ''
                          
-            div += '<table id="toron"> \
-                        <tbody> \
-                            <tr> \
-                                <td id="toron_color' + color + '"> \
-                                    <a href="javascript:void(0);" id="' + str(i + 1) + '">#' + str(i + 1) + '</a> ' + ip + chad + ban + ' <span style="float:right;">' + dain[2] + '</span> \
-                                </td> \
-                            </tr> \
-                            <tr ' + block + '> \
-                                <td>' + indata + '</td> \
-                            </tr> \
-                        </tbody> \
-                    </table> \
-                    <br>'
+            div += '<table id="toron">' + \
+                        '<tbody>' + \
+                            '<tr>' + \
+                                '<td id="toron_color' + color + '">' + \
+                                    '<a href="javascript:void(0);" id="' + str(i + 1) + '">#' + str(i + 1) + '</a> ' + ip + chad + ban + ' <span style="float:right;">' + dain[2] + '</span>' + \
+                                '</td>' + \
+                            '</tr>' + \
+                            '<tr ' + block + '>' + \
+                                '<td>' + indata + '</td>' + \
+                            '</tr>' + \
+                        '</tbody>' + \
+                    '</table>' + \
+                    '<br>'
                 
             i += 1
 
         l_c = login_check()
 
         if(ban != 1):
-            data = '<a id="reload" href="javascript:void(0);" onclick="location.href.endsWith(\'#reload\') ?  location.reload(true) : location.href = \'#reload\'"> \
-                        <i aria-hidden="true" class="fa fa-refresh"></i> \
-                    </a> \
-                    <form style="' + style + '" method="post"> \
-                        <br> \
-                        <textarea style="width: 100%; height: 100px;" name="content"></textarea> \
-                        <br> \
-                        <br> \
-                        <button class="btn btn-primary" type="submit">전송</button> \
-                    </form>'
+            data = '<a id="reload" href="javascript:void(0);" onclick="location.href.endsWith(\'#reload\') ?  location.reload(true) : location.href = \'#reload\'">' + \
+                        '<i aria-hidden="true" class="fa fa-refresh"></i>' + \
+                    '</a>' + \
+                    '<form style="' + style + '" method="post">' + \
+                        '<br>' + \
+                        '<textarea style="width: 100%; height: 100px;" name="content"></textarea>' + \
+                        '<br>' + \
+                        '<br>' + \
+                        '<button class="btn btn-primary" type="submit">전송</button>' + \
+                    '</form>'
 
             if(l_c == 0 and style == ''):
                 data += '<span>비 로그인 상태입니다. 비 로그인으로 작업 시 아이피가 토론에 기록됩니다.</span>'
@@ -2158,10 +2142,7 @@ def topic(name = None, sub = None):
         return(
             template('index', 
                 imp = [name, wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), ' (토론)', 0],
-                data =  '<h2 style="margin-top: 0px;">' + sub + '</h2> \
-                        <br> \
-                        ' + div + ' \
-                        ' + data,
+                data =  '<h2 style="margin-top: 0px;">' + sub + '</h2><br>' + div + data,
                 menu = [['topic/' + url_pas(name), '목록']]
             )    
         )
@@ -2200,14 +2181,14 @@ def close_topic_list(name = None, tool = None):
             curs.execute("select sub from rd where title = ? order by date desc", [name])
             sub = '토론 목록'
             menu = [['w/' + url_pas(name), '문서']]
-            plus =  '<br> \
-                    <a href="/topic/' + url_pas(name) + '/close">(닫힘)</a> <a href="/topic/' + url_pas(name) + '/agree">(합의)</a> \
-                    <br> \
-                    <br> \
-                    <input placeholder="토론명" class="form-control" name="topic" style="width: 100%;"> \
-                    <br> \
-                    <br> \
-                    <button class="btn btn-primary" type="submit">만들기</button>'
+            plus =  '<br>' + \
+                    '<a href="/topic/' + url_pas(name) + '/close">(닫힘)</a> <a href="/topic/' + url_pas(name) + '/agree">(합의)</a>' + \
+                    '<br>' + \
+                    '<br>' + \
+                    '<input placeholder="토론명" class="form-control" name="topic" style="width: 100%;">' + \
+                    '<br>' + \
+                    '<br>' + \
+                    '<button class="btn btn-primary" type="submit">만들기</button>'
 
         rows = curs.fetchall()
         for data in rows:
@@ -2222,18 +2203,14 @@ def close_topic_list(name = None, tool = None):
                         it_p = 1
                 
                 if(it_p != 1):
-                    div += '<h2> \
-                                <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(data[0]) + '">' + str((i + 1)) + '. ' + data[0] + '</a> \
-                            </h2>'
+                    div += '<h2><a href="/topic/' + url_pas(name) + '/sub/' + url_pas(data[0]) + '">' + str((i + 1)) + '. ' + data[0] + '</a></h2>'
                 
                 i += 1
         
         return(
             template('index', 
                 imp = [name, wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), ' (' + sub + ')', 0],
-                data =  '<form style="margin-top: 0px;" method="post"> \
-                            ' + div + plus + ' \
-                        </form>',
+                data =  '<form style="margin-top: 0px;" method="post">' + div + plus + '</form>',
                 menu = menu
             )    
         )
@@ -2284,18 +2261,18 @@ def login():
             template(
                 'index',    
                 imp = ['로그인', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
-                data = '<form method="post"> \
-                            <input placeholder="아이디" name="id" type="text"> \
-                            <br> \
-                            <br> \
-                            <input placeholder="비밀번호" name="pw" type="password"> \
-                            <br> \
-                            <br> \
-                            <button class="btn btn-primary" type="submit">로그인</button> \
-                            <br> \
-                            <br> \
-                            <span>주의 : 만약 HTTPS 연결이 아닌 경우 데이터가 유출될 가능성이 있습니다. 이에 대해 책임지지 않습니다.</span> \
-                        </form>',
+                data = '<form method="post">' + \
+                            '<input placeholder="아이디" name="id" type="text">' + \
+                            '<br>' + \
+                            '<br>' + \
+                            '<input placeholder="비밀번호" name="pw" type="password">' + \
+                            '<br>' + \
+                            '<br>' + \
+                            '<button class="btn btn-primary" type="submit">로그인</button>' + \
+                            '<br>' + \
+                            '<br>' + \
+                            '<span>주의 : 만약 HTTPS 연결이 아닌 경우 데이터가 유출될 가능성이 있습니다. 이에 대해 책임지지 않습니다.</span>' + \
+                        '</form>',
                 menu = [['user', '사용자']]
             )
         )
@@ -2340,24 +2317,24 @@ def change_password():
             template(
                 'index',    
                 imp = ['비밀번호 변경', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
-                data = '<form method="post"> \
-                            <input placeholder="아이디" name="id" type="text"> \
-                            <br> \
-                            <br> \
-                            <input placeholder="현재 비밀번호" name="pw" type="password"> \
-                            <br> \
-                            <br> \
-                            <input placeholder="변경할 비밀번호" name="pw2" type="password"> \
-                            <br> \
-                            <br> \
-                            <input placeholder="재 확인" name="pw3" type="password"> \
-                            <br> \
-                            <br> \
-                            <button class="btn btn-primary" type="submit">변경</button> \
-                            <br> \
-                            <br> \
-                            <span>주의 : 만약 HTTPS 연결이 아닌 경우 데이터가 유출될 가능성이 있습니다. 이에 대해 책임지지 않습니다.</span> \
-                        </form>',
+                data = '<form method="post">' + \
+                            '<input placeholder="아이디" name="id" type="text">' + \
+                            '<br>' + \
+                            '<br>' + \
+                            '<input placeholder="현재 비밀번호" name="pw" type="password">' + \
+                            '<br>' + \
+                            '<br>' + \
+                            '<input placeholder="변경할 비밀번호" name="pw2" type="password">' + \
+                            '<br>' + \
+                            '<br>' + \
+                            '<input placeholder="재 확인" name="pw3" type="password">' + \
+                            '<br>' + \
+                            '<br>' + \
+                            '<button class="btn btn-primary" type="submit">변경</button>' + \
+                            '<br>' + \
+                            '<br>' + \
+                            '<span>주의 : 만약 HTTPS 연결이 아닌 경우 데이터가 유출될 가능성이 있습니다. 이에 대해 책임지지 않습니다.</span>' + \
+                        '</form>',
                 menu = [['user', '사용자']]
             )
         )
@@ -2376,23 +2353,22 @@ def user_check(name = None):
             curs.execute("select user, ip, today from login where user = ? order by today desc", [name])
         row = curs.fetchall()
         if(row):
-            c = '<table style="width: 100%; text-align: center;"> \
-                    <tbody> \
-                        <tr> \
-                            <td style="width: 33.3%;">이름</td> \
-                            <td style="width: 33.3%;">아이피</td> \
-                            <td style="width: 33.3%;">언제</td> \
-                        </tr>'
+            c = '<table style="width: 100%; text-align: center;">' + \
+                    '<tbody>' + \
+                        '<tr>' + \
+                            '<td style="width: 33.3%;">이름</td>' + \
+                            '<td style="width: 33.3%;">아이피</td>' + \
+                            '<td style="width: 33.3%;">언제</td>' + \
+                        '</tr>'
 
             for data in row:
-                c +=    '<tr> \
-                            <td>' + ip_pas(data[0], 2) + '</td> \
-                            <td>' + ip_pas(data[1], 2) + '</td> \
-                            <td>' + data[2] + '</td> \
-                        </tr>'
+                c +=    '<tr>' + \
+                            '<td>' + ip_pas(data[0], 2) + '</td>' + \
+                            '<td>' + ip_pas(data[1], 2) + '</td>' + \
+                            '<td>' + data[2] + '</td>' + \
+                        '</tr>'
             else:
-                c +=        '</tbody> \
-                        </table>'
+                c += '</tbody></table>'
         else:
             c = ''
                 
@@ -2447,21 +2423,21 @@ def register():
             template(
                 'index',    
                 imp = ['회원가입', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
-                data = '<form method="post"> \
-                            <input placeholder="아이디" name="id" type="text"> \
-                            <br> \
-                            <br> \
-                            <input placeholder="비밀번호" name="pw" type="password"> \
-                            <br> \
-                            <br> \
-                            <input placeholder="재 확인" name="pw2" type="password"> \
-                            <br> \
-                            <br> \
-                            <button class="btn btn-primary" type="submit">가입</button> \
-                            <br> \
-                            <br> \
-                            <span>주의 : 만약 HTTPS 연결이 아닌 경우 데이터가 유출될 가능성이 있습니다. 이에 대해 책임지지 않습니다.</span> \
-                        </form>',
+                data = '<form method="post">' + \
+                            '<input placeholder="아이디" name="id" type="text">' + \
+                            '<br>' + \
+                            '<br>' + \
+                            '<input placeholder="비밀번호" name="pw" type="password">' + \
+                            '<br>' + \
+                            '<br>' + \
+                            '<input placeholder="재 확인" name="pw2" type="password">' + \
+                            '<br>' + \
+                            '<br>' + \
+                            '<button class="btn btn-primary" type="submit">가입</button>' + \
+                            '<br>' + \
+                            '<br>' + \
+                            '<span>주의 : 만약 HTTPS 연결이 아닌 경우 데이터가 유출될 가능성이 있습니다. 이에 대해 책임지지 않습니다.</span>' + \
+                        '</form>',
                 menu = [['user', '사용자']]
             )
         )
@@ -2541,28 +2517,28 @@ def user_ban(name = None):
                 for i in range(2, 32):
                     day += '<option value="' + str(i) + '">' + str(i) + '</option>'
                 
-                data = '<select name="year"> \
-                            ' + year + ' \
-                        </select> \
-                        <select name="month"> \
-                            ' + month + ' \
-                        </select> \
-                        <select name="day"> \
-                            ' + day + ' \
-                        </select> \
-                        <br> \
-                        <br> \
-                        <input placeholder="사유" class="form-control" name="why" style="width: 100%;"> \
-                        <br> \
-                        <br>'
+                data = '<select name="year">' + \
+                            year + \
+                        '</select>' + \
+                        '<select name="month">' + \
+                            month + \
+                        '</select>' + \
+                        '<select name="day">' + \
+                            day + \
+                        '</select>' + \
+                        '<br>' + \
+                        '<br>' + \
+                        '<input placeholder="사유" class="form-control" name="why" style="width: 100%;">' + \
+                        '<br>' + \
+                        '<br>'
 
             return(
                 template('index', 
                     imp = [name, wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), ' (' + now + ')', 0],
-                    data = '<form method="post"> \
-                                ' + data + ' \
-                                <button class="btn btn-primary" type="submit">' + now + '</button> \
-                            </form>',
+                    data = '<form method="post">' + \
+                                data + \
+                                '<button class="btn btn-primary" type="submit">' + now + '</button>' + \
+                            '</form>',
                     menu = [['manager', '관리자']]
                 )
             )
@@ -2603,19 +2579,19 @@ def acl(name = None):
                 return(
                     template('index', 
                         imp = [name, wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), ' (ACL)', 0],
-                        data = '<span>현재 ACL : ' + now + '</span> \
-                                <br> \
-                                <br> \
-                                <form method="post"> \
-                                    <select name="select"> \
-                                        <option value="admin" selected="selected">관리자만</option> \
-                                        <option value="user">유저 이상</option> \
-                                        <option value="normal">일반</option> \
-                                    </select> \
-                                    <br> \
-                                    <br> \
-                                    <button class="btn btn-primary" type="submit">ACL 변경</button> \
-                                </form>',
+                        data = '<span>현재 ACL : ' + now + '</span>' + \
+                                '<br>' + \
+                                '<br>' + \
+                                '<form method="post">' + \
+                                    '<select name="select">' + \
+                                        '<option value="admin" selected="selected">관리자만</option>' + \
+                                        '<option value="user">유저 이상</option>' + \
+                                        '<option value="normal">일반</option>' + \
+                                    '</select>' + \
+                                    '<br>' + \
+                                    '<br>' + \
+                                    '<button class="btn btn-primary" type="submit">ACL 변경</button>' + \
+                                '</form>',
                         menu = [['w/' + url_pas(name), '문서'], ['manager', '관리자']]
                     )
                 )
@@ -2661,14 +2637,14 @@ def user_admin(name = None):
                     template(
                         'index', 
                         imp = [name, wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), ' (권한 부여)', 0],
-                        data =  '<form method="post"> \
-                                    <select name="select"> \
-                                        ' + div + ' \
-                                    </select> \
-                                    <br> \
-                                    <br> \
-                                    <button class="btn btn-primary" type="submit">변경</button> \
-                                </form>',
+                        data =  '<form method="post">' + \
+                                    '<select name="select">' + \
+                                        div + \
+                                    '</select>' + \
+                                    '<br>' + \
+                                    '<br>' + \
+                                    '<button class="btn btn-primary" type="submit">변경</button>' + \
+                                '</form>',
                         menu = [['manager', '관리자']]
                     )
                 )
@@ -2891,8 +2867,7 @@ def read_view(name = None, num = None, redirect = None):
             menu += [['acl/' + url_pas(name), 'ACL']]
 
     if(redirect):
-        enddata =   '<li><a href="/w/' + url_pas(redirect) + '/from/' + url_pas(name) + '">' + redirect + '</a>에서 넘어 왔습니다.</li> \
-                    <br>' + enddata
+        enddata =   '<li><a href="/w/' + url_pas(redirect) + '/from/' + url_pas(name) + '">' + redirect + '</a>에서 넘어 왔습니다.</li><br>' + enddata
         menu += [['w/' + url_pas(name), '넘기기']]
 
     if(uppage != 0):
@@ -2931,13 +2906,13 @@ def user_topic_list(name = None, num = 1):
     
     i = v - 50
     ydmin = admin_check(1, None)
-    div =   '<table style="width: 100%; text-align: center;"> \
-                <tbody> \
-                    <tr> \
-                        <td style="width: 33.3%;">토론명</td> \
-                        <td style="width: 33.3%;">작성자</td> \
-                        <td style="width: 33.3%;">시간</td> \
-                    </tr>'
+    div =   '<table style="width: 100%; text-align: center;">' + \
+                '<tbody>' + \
+                    '<tr>' + \
+                        '<td style="width: 33.3%;">토론명</td>' + \
+                        '<td style="width: 33.3%;">작성자</td>' + \
+                        '<td style="width: 33.3%;">시간</td>' + \
+                    '</tr>'
     
     curs.execute("select title, id, sub, ip, date from topic where ip = ? order by date desc limit ?, ?", [name, str(i), str(v)])
     rows = curs.fetchall()
@@ -2958,21 +2933,19 @@ def user_topic_list(name = None, num = 1):
                 
             ip = ip_pas(data[3], 1)
                 
-            div += '<tr> \
-                        <td> \
-                            <a href="/topic/' + url_pas(data[0]) + '/sub/' + url_pas(data[2]) + '#' + data[1] + '">' + title + '#' + data[1] + '</a> (' + sub + ') \
-                        </td> \
-                        <td>' + ip + ban +  '</td> \
-                        <td>' + data[4] + '</td> \
-                    </tr>'
+            div += '<tr>' + \
+                        '<td>' + \
+                            '<a href="/topic/' + url_pas(data[0]) + '/sub/' + url_pas(data[2]) + '#' + data[1] + '">' + title + '#' + data[1] + '</a> (' + sub + ')' + \
+                        '</td>' + \
+                        '<td>' + ip + ban +  '</td>' + \
+                        '<td>' + data[4] + '</td>' + \
+                    '</tr>'
         else:
-            div +=      '</tbody> \
-                    </table>'
+            div += '</tbody></table>'
     else:
         div = ''
         
-    div += '<br> \
-            <a href="/user/' + url_pas(name) + '/topic/' + str(num - 1) + '">(이전)</a> <a href="/user/' + url_pas(name) + '/topic/' + str(num + 1) + '">(이후)</a>'
+    div += '<br><a href="/user/' + url_pas(name) + '/topic/' + str(num - 1) + '">(이전)</a> <a href="/user/' + url_pas(name) + '/topic/' + str(num + 1) + '">(이후)</a>'
                 
     curs.execute("select end, why from ban where block = ?", [name])
     ban_it = curs.fetchall()
@@ -3051,18 +3024,18 @@ def upload():
             template(
                 'index', 
                 imp = ['파일 올리기', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
-                data =  '<form method="post" enctype="multipart/form-data" accept-charset="utf8"> \
-                            <input type="file" name="f_data"> \
-                            <br> \
-                            <br> \
-                            <input placeholder="파일 이름" name="f_name"> \
-                            <br> \
-                            <br> \
-                            <input placeholder="라이선스" name="f_lice"> \
-                            <br> \
-                            <br> \
-                            <button class="btn btn-primary" type="submit">저장</button> \
-                        </form>',
+                data =  '<form method="post" enctype="multipart/form-data" accept-charset="utf8">' + \
+                            '<input type="file" name="f_data">' + \
+                            '<br>' + \
+                            '<br>' + \
+                            '<input placeholder="파일 이름" name="f_name">' + \
+                            '<br>' + \
+                            '<br>' + \
+                            '<input placeholder="라이선스" name="f_lice">' + \
+                            '<br>' + \
+                            '<br>' + \
+                            '<button class="btn btn-primary" type="submit">저장</button>' + \
+                        '</form>',
                 menu = [['other', '기타']]
             )
         )        
@@ -3147,17 +3120,17 @@ def custom_css_view():
             template(
                 'index', 
                 imp = ['사용자 CSS', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
-                data =  start + ' \
-                        <form method="post"> \
-                            <textarea rows="30" cols="100" name="content">'\
-                                 + data + \
-                            '</textarea> \
-                            <br> \
-                            <br> \
-                            <div class="form-actions"> \
-                                <button class="btn btn-primary" type="submit">저장</button> \
-                            </div> \
-                        </form>',
+                data =  start + \
+                        '<form method="post">' + \
+                            '<textarea rows="30" cols="100" name="content">' + \
+                                data + \
+                            '</textarea>' + \
+                            '<br>' + \
+                            '<br>' + \
+                            '<div class="form-actions">' + \
+                                '<button class="btn btn-primary" type="submit">저장</button>' + \
+                            '</div>' + \
+                        '</form>',
                 menu = [['user', '사용자']]
             )
         )
@@ -3198,17 +3171,17 @@ def custom_js_view():
             template(
                 'index', 
                 imp = ['사용자 JS', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
-                data =  start + ' \
-                        <form method="post"> \
-                            <textarea rows="30" cols="100" name="content">'\
-                                 + data + \
-                            '</textarea> \
-                            <br> \
-                            <br> \
-                            <div class="form-actions"> \
-                                <button class="btn btn-primary" type="submit">저장</button> \
-                            </div> \
-                        </form>',
+                data =  start +
+                        '<form method="post">' + \
+                            '<textarea rows="30" cols="100" name="content">' + \
+                                data + \
+                            '</textarea>' + \
+                            '<br>' + \
+                            '<br>' + \
+                            '<div class="form-actions">' + \
+                                '<button class="btn btn-primary" type="submit">저장</button>' + \
+                            '</div>' + \
+                        '</form>',
                 menu = [['user', '사용자']]
             )
         )
