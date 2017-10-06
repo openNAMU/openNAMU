@@ -477,6 +477,7 @@ def cat_plus(name, link, num):
 def namumark(title, data, num, in_c):    
     data = re.sub("\n", "\r\n", re.sub("\r\n", "\n", data))
     data = html_pas(data)
+    data = '\r\n' + data + '\r\n'
 
     fol_num = 0
     var_d = mid_pas(data, fol_num, 0, in_c)
@@ -525,7 +526,7 @@ def namumark(title, data, num, in_c):
         else:
             break
 
-    data = re.sub("##\s?(?P<in>[^\n]*)\n", "", data)
+    data = re.sub("##\s?([^\n]*)\r\n", "", data)
     
     data = re.sub("\[anchor\((?P<in>[^\[\]]*)\)\]", '<span id="\g<in>"></span>', data)
     data = savemark(data)
@@ -551,7 +552,6 @@ def namumark(title, data, num, in_c):
         else:
             break
             
-    data = '\r\n' + data + '\r\n'
     data = re.sub("\[nicovideo\((?P<in>[^,)]*)(?:(?:,(?:[^,)]*))+)?\)\]", "[[http://embed.nicovideo.jp/watch/\g<in>]]", data)
     
     while(1):
