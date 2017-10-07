@@ -1297,8 +1297,6 @@ def edit(name = None, num = None):
         curs.execute("select data from data where title = ?", [name])
         rows = curs.fetchall()
         if(rows):
-            
-
             leng = leng_check(len(request.forms.otent), len(content))
             if(num):
                 content = rows[0][0].replace(request.forms.otent, content)
@@ -1401,7 +1399,6 @@ def preview(name = None, num = None):
         action = '/section/' + str(num)
     else:
         action = ''
-
 
     return(
         html_minify(

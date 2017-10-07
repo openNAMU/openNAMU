@@ -222,7 +222,7 @@ def html_pas(data):
     return(data)
     
 def mid_pas(data, fol_num, include, in_c):
-    com = re.compile("{{{((?:(?!{{|}}).)*)}}}", re.DOTALL)
+    com = re.compile("{{{((?:(?!{{{|}}}).)*)}}}", re.DOTALL)
     while(1):
         is_it = com.search(data)
         if(is_it):
@@ -255,7 +255,7 @@ def mid_pas(data, fol_num, include, in_c):
             include_out_a = re.compile("^#!noin\s(.*)$", re.DOTALL)
             include_out = include_out_a.search(it_d)
 
-            div_a = re.compile("^#!wiki\sstyle=(?:&quot;|&apos;)((?:(?!&quot;|&apos;).)*)(?:&quot;|&apos;)\r\n(.*)$", re.DOTALL)
+            div_a = re.compile("^#!wiki\sstyle=(?:&quot;|&#x27;)((?:(?!&quot;|&#x27;).)*)(?:&quot;|&#x27;)\r\n(.*)$", re.DOTALL)
             div = div_a.search(it_d)
 
             html_a = re.compile("^#!html\s(.*)$", re.DOTALL)
