@@ -452,17 +452,13 @@ def toc_pas(data, title, num):
 
 def backlink_plus(name, link, backtype, num):
     if(num == 1):       
-        curs.execute("select title from back where title = ? and link = ? and type = ?", [link, name, backtype])
-        y = curs.fetchall()
-        if(not y):
-            curs.execute("insert into back (title, link, type) values (?, ?,  ?)", [link, name, backtype])
+        curs.execute("delete from back where title = ? and link = ? and type = ?", [link, name, backtype])
+        curs.execute("insert into back (title, link, type) values (?, ?,  ?)", [link, name, backtype])
 
 def cat_plus(name, link, num):
     if(num == 1):        
-        curs.execute("select title from cat where title = ? and cat = ?", [link, name])
-        y = curs.fetchall()
-        if(not y):
-            curs.execute("insert into cat (title, cat) values (?, ?)", [link, name])
+        curs.execute("delete from cat where title = ? and cat = ?", [link, name])
+        curs.execute("insert into cat (title, cat) values (?, ?)", [link, name])
 
 def namumark(title, data, num, in_c):    
     data = re.sub("\n", "\r\n", re.sub("\r\n", "\n", data))
