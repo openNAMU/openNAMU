@@ -269,10 +269,10 @@ def mid_pas(data, fol_num, include, in_c):
 
             if(big):
                 big_d = big.groups()
-                data = com.sub('<span class="font-size-' + big_d[0] + '">' + big_d[1] + '</span>', data, 1)
+                data = com.sub('<span style="font-size: ' + str(int(big_d[0]) * 20 + 100) + '%;">' + big_d[1] + '</span>', data, 1)
             elif(small):
                 sm_d = small.groups()
-                data = com.sub('<span class="font-size-small-' + sm_d[0] + '">' + sm_d[1] + '</span>', data, 1)
+                data = com.sub('<span style="font-size: ' + str(100 - int(sm_d[0]) * 10) + '%;">' + sm_d[1] + '</span>', data, 1)
             elif(color):
                 c_d_1 = color.groups()
                 data = com.sub('<span style="color: ' + c_d_1[0] + '">' + c_d_1[1] + '</span>', data, 1)
