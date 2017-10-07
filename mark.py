@@ -532,7 +532,7 @@ def namumark(title, data, num, in_c):
     data = savemark(data)
     
     while(1):
-        r_data = re.search('^#(?:redirect|넘겨주기) ([^\n]*)', data)
+        r_data = re.search('\n#(?:redirect|넘겨주기) ([^\n]*)', data)
         if(r_data):
             n_data = r_data.groups()
             n_s_data = re.sub("\\\#", "<sharp>", n_data[0])
@@ -547,7 +547,7 @@ def namumark(title, data, num, in_c):
             else:
                 plus = ''
 
-            data = re.sub('^#(?:redirect|넘겨주기) ([^\n]*)$', '<meta http-equiv="refresh" content="0;url=/w/' + re.sub('%0D$', '', url_pas(n_sharp)) + '/from/' + url_pas(title) + plus + '" />', data, 1)
+            data = re.sub('\n#(?:redirect|넘겨주기) ([^\n]*)', '<meta http-equiv="refresh" content="0;url=/w/' + re.sub('%0D$', '', url_pas(n_sharp)) + '/from/' + url_pas(title) + plus + '" />', data, 1)
             backlink_plus(title, n_data[0], 'redirect', num)
         else:
             break
