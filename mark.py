@@ -1,4 +1,4 @@
-﻿from bottle import request, app
+from bottle import request, app
 from bottle.ext import beaker
 from urllib import parse
 import json
@@ -188,47 +188,34 @@ def table_p(d, d2):
     return([alltable, rowstyle, celstyle, row, cel])
 
 def html_pas(data):
-    data = re.sub("%phtml%(?P<in>(?:\/)?(?:a|div|span|embed|iframe)(?:\s[^%]*)?)%phtml%", "<\g<in>>", data) 
-    
-    pas_d = re.findall("<((div|span|embed|iframe)(?:\s[^>]*))>", data)
-    for p_d in pas_d:
-        if(re.search("<(\/" + p_d[1] + ")>", data)):
-            url_d = re.search('src=(?:"|\')?(http(s)?:\/\/([^\/]*)\/(?:[^"\' ]*))(?:"|\')?', p_d[0])
-            if(url_d):
-                check = url_d.groups()
+    data = re.sub('%H%', '<', data)
+    data = re.sub('%\/H%', '>', data)
 
-                if(check[2] in ["www.youtube.com", "serviceapi.nmv.naver.com", "tv.kakao.com", "tvple.com", "www.google.com"]):
-                    pas_end = p_d[0].replace('®', '&reg')
-                else:
-                    pas_end = re.sub('src=(?:"|\')([^"\']*)(?:"|\')', '', p_d[0])
-            else:
-                pas_end = p_d[0]
+    d_list = re.findall('<(\/)?([^> ]+)( (?:[^>]+)?)?>', data)
+    for i_list in d_list:
+        if(i_list[0] == ''):
+            if(i_list[1] in ['div', 'span', 'embed', 'iframe']):
+                if(re.search('<\/' + i_list[1] + '>', data)):
+                    src = re.search('src=([^ ]*)', i_list[2])
+                    if(src):
+                        v_src = re.search('https:\/\/([^/\'" ]*)', src[1])
+                        if(not v_src[1] in ["www.youtube.com", "serviceapi.nmv.naver.com", "tv.kakao.com", "www.google.com"]):
+                            ot = re.sub('src=([^ ]*)', '', i_list[2])
+                        else:
+                            ot = i_list[2]
+                    else:
+                        ot = i_list[2]
 
-            pas_end = re.sub('position:(?: +)?[^ ;]*;?', '', pas_end)
-
-            try:
-                if(check[1] != None):
-                    data = re.sub("<((?:\/)?" + p_d[1] + "(?:\s[^>]*))>", "%phtml%" + pas_end + "%phtml%", data, 1)
-                    data = re.sub("<\/" + p_d[1] + ">", "%phtml%/" + p_d[1] + "%phtml%", data, 1)
-                else:
-                    data = re.sub("<((?:\/)?" + p_d[1] + "(?:\s[^>]*))>", "[[" + check[0] + "]]", data, 1)
-                    data = re.sub("<\/" + p_d[1] + ">", "", data, 1)
-            except:
-                data = re.sub("<((?:\/)?" + p_d[1] + "(?:\s[^>]*))>", "%phtml%" + pas_end + "%phtml%", data, 1)
-                data = re.sub("<\/" + p_d[1] + ">", "%phtml%/" + p_d[1] + "%phtml%", data, 1)
-        else:
-            data = re.sub("<((?:\/)?" + p_d[1] + "(?:\s[^>]*))>", '&lt;' + p_d[0] + '&gt;', data, 1)
-            
-            break
+                    po = re.compile('position', re.I)
+                    data = re.sub('<(\/)?([^> ]+)( (?:[^>]+)?)?>', '%H%' + i_list[1] + po.sub('', ot) + '%/H%', data, 1)
+                    data = re.sub('<\/' + i_list[1] + '>', '%H%/' + i_list[1] + '%/H%', data, 1)
 
     data = html.escape(data)
-    js_p = re.compile('javascript:', re.I)
-    data = js_p.sub('', data)
-
-    pas_2 = re.findall("%phtml%(?P<in>(?:\/)?(?:div|span|embed|iframe)(?:\s(?:(?!%phtml%).)*)?)%phtml%", data)
-    for p_d_2 in pas_2:
-        data = re.sub("%phtml%(?P<in>(?:\/)?(?:div|span|embed|iframe)(?:\s(?:(?!%phtml%).)*)?)%phtml%", '<' + p_d_2.replace("&#x27;", "'").replace('&quot;', '"') + '>', data, 1)
     
+    end = re.findall('%H%((?:(?!%/H%).)*)%/H%', data)
+    for d_end in end:
+        data = re.sub('%H%((?:(?!%/H%).)*)%/H%', '<' + re.sub('&quot;', '"', re.sub('&#x27;', "'", d_end)) + '>', data, 1)
+
     return(data)
     
 def mid_pas(data, fol_num, include, in_c):
