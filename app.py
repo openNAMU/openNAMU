@@ -2972,6 +2972,7 @@ def read_view(name = None, num = None, redirect = None):
         menu = [['history/' + url_pas(name), '역사']]
         sub = ' (' + str(num) + '판)'
         acl = ''
+        r_date = 0
     else:
         curs.execute("select date from history where title = ? order by date desc limit 1", [name])
         date = curs.fetchall()
