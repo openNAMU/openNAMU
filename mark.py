@@ -198,11 +198,14 @@ def html_pas(data):
                 if(re.search('<\/' + i_list[1] + '>', data)):
                     src = re.search('src=([^ ]*)', i_list[2])
                     if(src):
-                        v_src = re.search('https:\/\/([^/\'" ]*)', src[1])
-                        if(not v_src[1] in ["www.youtube.com", "serviceapi.nmv.naver.com", "tv.kakao.com", "www.google.com"]):
-                            ot = re.sub('src=([^ ]*)', '', i_list[2])
+                        v_src = re.search('https:\/\/([^/\'" ]*)', src.groups()[0])
+                        if(v_src):
+                            if(not v_src.groups()[0] in ["www.youtube.com", "serviceapi.nmv.naver.com", "tv.kakao.com", "www.google.com"]):
+                                ot = re.sub('src=([^ ]*)', '', i_list[2])
+                            else:
+                                ot = i_list[2]
                         else:
-                            ot = i_list[2]
+                            ot = re.sub('src=([^ ]*)', '', i_list[2])
                     else:
                         ot = i_list[2]
 
