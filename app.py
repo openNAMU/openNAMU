@@ -1279,121 +1279,83 @@ def edit(name = None, num = None):
     can = acl_check(name)
     
     if(request.method == 'POST'):
+        if(can == 1):
+            return(redirect('/ban'))
+
         if(len(request.forms.send) > 500):
             return(redirect('/error/15'))
+
+        if(request.forms.otent == request.forms.content):
+            return(redirect('/error/18'))
+
+        today = get_time()
+        content = savemark(request.forms.content)
+
+        curs.execute("delete from back where link = ?", [name])
+        curs.execute("delete from cat where cat = ?", [name])
+
+        curs.execute("select data from data where title = ?", [name])
+        rows = curs.fetchall()
+        if(rows):
+            
+
+            leng = leng_check(len(request.forms.otent), len(content))
+            if(num):
+                content = rows[0][0].replace(request.forms.otent, content)
+                
+            curs.execute("update data set data = ? where title = ?", [content, name])
         else:
-            today = get_time()
-            content = savemark(request.forms.content)
-
-            if(can == 1):
-                return(redirect('/ban'))
-            else:
-                curs.execute("delete from back where link = ?", [name])
-                curs.execute("delete from cat where cat = ?", [name])
-
-                curs.execute("select data from data where title = ?", [name])
-                rows = curs.fetchall()
-                if(rows):
-                    if(request.forms.otent == content):
-                        return(redirect('/error/18'))
-
-                    leng = leng_check(len(request.forms.otent), len(content))
-                    if(num):
-                        content = rows[0][0].replace(request.forms.otent, content)
-                        
-                    curs.execute("update data set data = ? where title = ?", [content, name])
-                else:
-                    leng = '+' + str(len(content))
-                    curs.execute("insert into data (title, data, acl) values (?, ?, '')", [name, content])
+            leng = '+' + str(len(content))
+            curs.execute("insert into data (title, data, acl) values (?, ?, '')", [name, content])
+        
+        history_plus(
+            name, 
+            content, 
+            today, 
+            ip,
+            send_p(request.forms.send), 
+            leng
+        )
                 
-                history_plus(
-                    name, 
-                    content, 
-                    today, 
-                    ip,
-                    send_p(request.forms.send), 
-                    leng
-                )
-                        
-                include_check(name, content)
-                
-                conn.commit()
-                return(redirect('/w/' + url_pas(name)))
+        include_check(name, content)
+        
+        conn.commit()
+        return(redirect('/w/' + url_pas(name)))
     else:        
         if(can == 1):
             return(redirect('/ban'))
-        else:                
-            curs.execute("select data from data where title = ?", [name])
-            rows = curs.fetchall()
-            if(rows):
-                if(num):
-                    i = 0
-                    j = 0
-                    
-                    data = rows[0][0] + '\r\n'
-                    while(1):
-                        m = re.search("((?:={1,6})\s?(?:[^=]*)\s?(?:={1,6})(?:\s+)?\n(?:(?:(?:(?!(?:={1,6})\s?(?:[^=]*)\s?(?:={1,6})(?:\s+)?\n).)*)(?:\n)?)+)", data)
-                        if(m):
-                            if(i == num - 1):
-                                g = m.groups()
-                                data = re.sub("\r\n$", "", g[0])
-                                
-                                break
-                            else:
-                                data = re.sub("((?:={1,6})\s?(?:[^=]*)\s?(?:={1,6})(?:\s+)?\n(?:(?:(?:(?!(?:={1,6})\s?(?:[^=]*)\s?(?:={1,6})(?:\s+)?\n).)*)(?:\n)?)+)", "", data, 1)
-                                
-                                i += 1
-                        else:
-                            j = 1
+            
+        curs.execute("select data from data where title = ?", [name])
+        rows = curs.fetchall()
+        if(rows):
+            if(num):
+                i = 0
+                j = 0
+                
+                data = rows[0][0] + '\r\n'
+                while(1):
+                    m = re.search("((?:={1,6})\s?(?:[^=]*)\s?(?:={1,6})(?:\s+)?\n(?:(?:(?:(?!(?:={1,6})\s?(?:[^=]*)\s?(?:={1,6})(?:\s+)?\n).)*)(?:\n)?)+)", data)
+                    if(m):
+                        if(i == num - 1):
+                            g = m.groups()
+                            data = re.sub("\r\n$", "", g[0])
                             
                             break
+                        else:
+                            data = re.sub("((?:={1,6})\s?(?:[^=]*)\s?(?:={1,6})(?:\s+)?\n(?:(?:(?:(?!(?:={1,6})\s?(?:[^=]*)\s?(?:={1,6})(?:\s+)?\n).)*)(?:\n)?)+)", "", data, 1)
                             
-                    if(j == 0):
-                        data = re.sub("\r\n$", "", data)
-                else:
-                    data = rows[0][0]
+                            i += 1
+                    else:
+                        j = 1
+                        
+                        break
+                        
+                if(j == 0):
+                    data = re.sub("\r\n$", "", data)
             else:
-                data = ''
-
-            if(num):
-                action = '/section/' + str(num)
-            else:
-                action = ''
-            
-            return(
-                html_minify(
-                    template('index', 
-                        imp = [name, wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), ' (수정)', 0],
-                        data = '<form method="post" action="/edit/' + name + action + '"> \
-                                    <textarea style="height: 80%;" name="content">' + data + '</textarea> \
-                                    <textarea style="display: none; height: 80%;" name="otent">' + data + '</textarea> \
-                                    <br> \
-                                    <br> \
-                                    <input placeholder="사유" name="send" style="width: 100%;" type="text"> \
-                                    <br> \
-                                    <br> \
-                                    <div class="form-actions"> \
-                                        <button id="save" class="btn btn-primary" type="submit">저장</button> \
-                                        <button id="preview" class="btn" type="submit" formaction="/preview/' + url_pas(name) + action + '">미리보기</button> \
-                                    </div> \
-                                </form>',
-                        menu = [['w/' + url_pas(name), '문서']]
-                    )
-                )
-            )
-
-@route('/preview/<name:path>/section/<num:int>', method=['POST'])
-@route('/preview/<name:path>', method=['POST'])
-def preview(name = None, num = None):
-    ip = ip_check()
-    can = acl_check(name)
-    
-    if(can == 1):
-        return(redirect('/ban'))
-    else:            
-        newdata = request.forms.content
-        newdata = re.sub('^#(?:redirect|넘겨주기) (?P<in>[^\n]*)', ' * [[\g<in>]] 문서로 넘겨주기', newdata)
-        enddata = namumark(name, newdata, 0, 0)
+                data = rows[0][0]
+        else:
+            data = ''
 
         if(num):
             action = '/section/' + str(num)
@@ -1403,10 +1365,10 @@ def preview(name = None, num = None):
         return(
             html_minify(
                 template('index', 
-                    imp = [name, wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), ' (미리보기)', 0],
-                    data = '<form method="post" action="/edit/' + name + action + '"> \
-                                <textarea style="height: 80%;" name="content">' + request.forms.content + '</textarea> \
-                                <textarea style="display: none; height: 80%;" name="otent">' + request.forms.otent + '</textarea> \
+                    imp = [name, wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), ' (수정)', 0],
+                    data = '<form method="post" action="/edit/' + url_pas(name) + action + '"> \
+                                <textarea style="height: 80%;" name="content">' + data + '</textarea> \
+                                <textarea style="display: none; height: 80%;" name="otent">' + data + '</textarea> \
                                 <br> \
                                 <br> \
                                 <input placeholder="사유" name="send" style="width: 100%;" type="text"> \
@@ -1416,12 +1378,53 @@ def preview(name = None, num = None):
                                     <button id="save" class="btn btn-primary" type="submit">저장</button> \
                                     <button id="preview" class="btn" type="submit" formaction="/preview/' + url_pas(name) + action + '">미리보기</button> \
                                 </div> \
-                            </form> \
-                            <br>' + enddata,
+                            </form>',
                     menu = [['w/' + url_pas(name), '문서']]
                 )
             )
         )
+
+@route('/preview/<name:path>', method=['POST'])
+@route('/preview/<name:path>/section/<num:int>', method=['POST'])
+def preview(name = None, num = None):
+    ip = ip_check()
+    can = acl_check(name)
+    
+    if(can == 1):
+        return(redirect('/ban'))
+         
+    newdata = request.forms.content
+    newdata = re.sub('^#(?:redirect|넘겨주기) (?P<in>[^\n]*)', ' * [[\g<in>]] 문서로 넘겨주기', newdata)
+    enddata = namumark(name, newdata, 0, 0)
+
+    if(num):
+        action = '/section/' + str(num)
+    else:
+        action = ''
+
+
+    return(
+        html_minify(
+            template('index', 
+                imp = [name, wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), ' (미리보기)', 0],
+                data = '<form method="post" action="/edit/' + url_pas(name) + action + '"> \
+                            <textarea style="height: 80%;" name="content">' + request.forms.content + '</textarea> \
+                            <textarea style="display: none; height: 80%;" name="otent">' + request.forms.content + '</textarea> \
+                            <br> \
+                            <br> \
+                            <input placeholder="사유" name="send" style="width: 100%;" type="text"> \
+                            <br> \
+                            <br> \
+                            <div class="form-actions"> \
+                                <button id="save" class="btn btn-primary" type="submit">저장</button> \
+                                <button id="preview" class="btn" type="submit" formaction="/preview/' + url_pas(name) + action + '">미리보기</button> \
+                            </div> \
+                        </form> \
+                        <br>' + enddata,
+                menu = [['w/' + url_pas(name), '문서']]
+            )
+        )
+    )
         
 @route('/delete/<name:path>', method=['POST', 'GET'])
 def delete(name = None):
