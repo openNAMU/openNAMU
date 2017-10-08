@@ -1,12 +1,10 @@
 ﻿from bottle import *
 from bottle.ext import beaker
+import json
+import sqlite3
 import bcrypt
 import os
 import difflib
-import hashlib
-import json
-import sqlite3
-import html
 from css_html_js_minify import html_minify
 
 try:
@@ -38,12 +36,12 @@ session_opts = {
 
 app = beaker.middleware.SessionMiddleware(app(), session_opts)
 
+from func import *
+
 BaseRequest.MEMFILE_MAX = 1000 ** 4
 
 def redirect(data):
     return('<meta http-equiv="refresh" content="0;url=' + data + '" />')
-    
-from func import *
 
 r_ver = '2.3.2'
 p_ver = ''

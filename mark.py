@@ -7,6 +7,7 @@ import time
 import re
 import hashlib
 import html
+import datetime
 
 json_data = open('set.json').read()
 set_data = json.loads(json_data)
@@ -801,6 +802,19 @@ def namumark(title, data, num, in_c):
                 year -= 1
                 
         data = re.sub('\[age\(([0-9]{4})-([0-9]{2})-([0-9]{2})\)\]', str(year), data, 1)
+
+    dday_data = re.findall('\[dday\(([0-9]{4}-[0-9]{2}-[0-9]{2})\)\]', data)
+    for dday in dday_data:
+        old = datetime.datetime.strptime(time[0] + '-' + time[1] + '-' + time[2], '%Y-%m-%d')
+        will = datetime.datetime.strptime(dday, '%Y-%m-%d')
+        e_data = old - will
+
+        if(re.search('^-', str(e_data.days))):
+            e_day = str(e_data.days)
+        else:
+            e_day = '+' + str(e_data.days)
+
+        data = re.sub('\[dday\(([0-9]{4}-[0-9]{2}-[0-9]{2})\)\]', e_day, data, 1)
     
     data = re.sub("-{4,11}", "<hr>", data)
     

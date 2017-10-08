@@ -1,12 +1,7 @@
 ﻿from bottle import request, app
 from bottle.ext import beaker
-from urllib import parse
 import json
 import sqlite3
-import time
-import re
-import hashlib
-import html
 
 json_data = open('set.json').read()
 set_data = json.loads(json_data)
