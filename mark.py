@@ -738,6 +738,10 @@ def namumark(title, data, num, in_c):
                         clas = ''
                     else:
                         clas = 'not_thing'
+
+                    if(re.search('<', nosharp)):
+                        nosharp = ''
+                        sharp = ''
                     
                     data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a title="' + re.sub('#', '\#', nosharp) + sharp + '" class="' + clas + '" href="/w/' + url_pas(nosharp) + sharp + '">' + re.sub('(?:<a ([^>]*)>|<\/a>)', '', g) + '</a>', data, 1)
 
