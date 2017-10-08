@@ -789,23 +789,20 @@ def namumark(title, data, num, in_c):
     now_time = get_time()
     data = re.sub('\[date\]', now_time, data)
     
-    time_data = re.search('^([0-9]{4})-([0-9]{2})-([0-9]{2})', now_time)
+    time_data = re.search('^([0-9]{4}-[0-9]{2}-[0-9]{2})', now_time)
     time = time_data.groups()
     
-    age_data = re.findall('\[age\(([0-9]{4})-([0-9]{2})-([0-9]{2})\)\]', data)
+    age_data = re.findall('\[age\(([0-9]{4}-[0-9]{2}-[0-9]{2})\)\]', data)
     for age in age_data:
-        year = int(time[0]) - int(age[0])
-        if(age[1] > time[1]):
-            year -= 1
-        elif(age[1] == time[1]):
-            if(age[2] > time[2]):
-                year -= 1
-                
-        data = re.sub('\[age\(([0-9]{4})-([0-9]{2})-([0-9]{2})\)\]', str(year), data, 1)
+        old = datetime.datetime.strptime(time[0], '%Y-%m-%d')
+        will = datetime.datetime.strptime(age, '%Y-%m-%d')
+        e_data = old - will
+
+        data = re.sub('\[age\(([0-9]{4})-([0-9]{2})-([0-9]{2})\)\]', str(int(int(e_data.days) / 365)), data, 1)
 
     dday_data = re.findall('\[dday\(([0-9]{4}-[0-9]{2}-[0-9]{2})\)\]', data)
     for dday in dday_data:
-        old = datetime.datetime.strptime(time[0] + '-' + time[1] + '-' + time[2], '%Y-%m-%d')
+        old = datetime.datetime.strptime(time[0], '%Y-%m-%d')
         will = datetime.datetime.strptime(dday, '%Y-%m-%d')
         e_data = old - will
 
