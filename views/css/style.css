@@ -10,6 +10,10 @@
     margin-left: 5px;
 }
 
+#redirect {
+    margin-top: -25px;
+}
+
 #log {
     line-height: 32px;
     width: 20px;
@@ -74,46 +78,6 @@ li {
 
 h1, h2, h3, h4, h5, h6 {
     margin-bottom: 10px;
-}
-
-.font-size-1 {
-    font-size: 120%;
-}
-
-.font-size-2 {
-    font-size: 140%;
-}
-
-.font-size-3 {
-    font-size: 160%;
-}
-
-.font-size-4 {
-    font-size: 180%;
-}
-
-.font-size-5 {
-    font-size: 200%;
-}
-
-.font-size-small-1 {
-    font-size: 85%;
-}
-
-.font-size-small-2 {
-    font-size: 70%;
-}
-
-.font-size-small-3 {
-    font-size: 55%;
-}
-
-.font-size-small-4 {
-    font-size: 40%;
-}
-
-.font-size-small-5 {
-    font-size: 25%;
 }
 
 td:hover {
