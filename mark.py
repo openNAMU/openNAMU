@@ -115,52 +115,37 @@ def table_p(d, d2):
     if(table_row):
         row = 'rowspan="' + table_row.groups()[0] + '"'
 
-    row_bgcolor_1 = re.search("&lt;rowbgcolor=(#[0-9a-f-A-F]{6})&gt;", d)
-    row_bgcolor_2 = re.search("&lt;rowbgcolor=(#[0-9a-f-A-F]{3})&gt;", d)
+    row_bgcolor_2 = re.search("&lt;rowbgcolor=(#(?:[0-9a-f-A-F]{6}|[0-9a-f-A-F]{3}))&gt;", d)
     row_bgcolor_3 = re.search("&lt;rowbgcolor=(\w+)&gt;", d)
-    if(row_bgcolor_1): 
-        rowstyle += 'background: ' + row_bgcolor_1.groups()[0] + ';'
-    elif(row_bgcolor_2):
+    if(row_bgcolor_2):
         rowstyle += 'background: ' + row_bgcolor_2.groups()[0] + ';'
     elif(row_bgcolor_3):
         rowstyle += 'background: ' + row_bgcolor_3.groups()[0] + ';'
         
-    table_border_1 = re.search("&lt;table\s?bordercolor=(#[0-9a-f-A-F]{6})&gt;", d)
-    table_border_2 = re.search("&lt;table\s?bordercolor=(#[0-9a-f-A-F]{3})&gt;", d)
+    table_border_2 = re.search("&lt;table\s?bordercolor=(#(?:[0-9a-f-A-F]{6}|[0-9a-f-A-F]{3}))&gt;", d)
     table_border_3 = re.search("&lt;table\s?bordercolor=(\w+)&gt;", d)
-    if(table_border_1):
-        alltable += 'border: ' + table_border_1.groups()[0] + ' 2px solid;'
-    elif(table_border_2):
+    if(table_border_2):
         alltable += 'border: ' + table_border_2.groups()[0] + ' 2px solid;'
     elif(table_border_3):
         alltable += 'border: ' + table_border_3.groups()[0] + ' 2px solid;'
         
-    table_bgcolor_1 = re.search("&lt;table\s?bgcolor=(#[0-9a-f-A-F]{6})&gt;", d)
-    table_bgcolor_2 = re.search("&lt;table\s?bgcolor=(#[0-9a-f-A-F]{3})&gt;", d)
+    table_bgcolor_2 = re.search("&lt;table\s?bgcolor=(#(?:[0-9a-f-A-F]{6}|[0-9a-f-A-F]{3}))&gt;", d)
     table_bgcolor_3 = re.search("&lt;table\s?bgcolor=(\w+)&gt;", d)
-    if(table_bgcolor_1):
-        alltable += 'background: ' + table_bgcolor_1.groups()[0] + ';'
-    elif(table_bgcolor_2):
+    if(table_bgcolor_2):
         alltable += 'background: ' + table_bgcolor_2.groups()[0] + ';'
     elif(table_bgcolor_3):
         alltable += 'background: ' + table_bgcolor_3.groups()[0] + ';'
         
-    bgcolor_1 = re.search("&lt;bgcolor=(#[0-9a-f-A-F]{6})&gt;", d)
-    bgcolor_2 = re.search("&lt;bgcolor=(#[0-9a-f-A-F]{3})&gt;", d)
+    bgcolor_2 = re.search("&lt;bgcolor=(#(?:[0-9a-f-A-F]{6}|[0-9a-f-A-F]{3}))&gt;", d)
     bgcolor_3 = re.search("&lt;bgcolor=(\w+)&gt;", d)
-    if(bgcolor_1):
-        celstyle += 'background: ' + bgcolor_1.groups()[0] + ';'
-    elif(bgcolor_2):
+    if(bgcolor_2):
         celstyle += 'background: ' + bgcolor_2.groups()[0] + ';'
     elif(bgcolor_3):
         celstyle += 'background: ' + bgcolor_3.groups()[0] + ';'
         
-    st_bgcolor_1 = re.search("&lt;(#[0-9a-f-A-F]{6})&gt;", d)
-    st_bgcolor_2 = re.search("&lt;(#[0-9a-f-A-F]{3})&gt;", d)
+    st_bgcolor_2 = re.search("&lt;(#(?:[0-9a-f-A-F]{6}|[0-9a-f-A-F]{3}))&gt;", d)
     st_bgcolor_3 = re.search("&lt;(\w+)&gt;", d)
-    if(st_bgcolor_1):
-        celstyle += 'background: ' + st_bgcolor_1.groups()[0] + ';'
-    elif(st_bgcolor_2):
+    if(st_bgcolor_2):
         celstyle += 'background: ' + st_bgcolor_2.groups()[0] + ';'
     elif(st_bgcolor_3):
         celstyle += 'background: ' + st_bgcolor_3.groups()[0] + ';'
@@ -235,10 +220,7 @@ def mid_pas(data, fol_num, include, in_c):
             small_a = re.compile("^\-([1-5])\s(.*)$", re.DOTALL)
             small = small_a.search(it_d)
 
-            color_a = re.compile("^(#[0-9a-f-A-F]{6})\s(.*)$", re.DOTALL)
-            color = color_a.search(it_d)
-
-            color_b = re.compile("^(#[0-9a-f-A-F]{3})\s(.*)$", re.DOTALL)
+            color_b = re.compile("^(#(?:[0-9a-f-A-F]{6}|[0-9a-f-A-F]{3}))\s(.*)$", re.DOTALL)
             color_2 = color_b.search(it_d)
 
             color_c = re.compile("^#(\w+)\s(.*)$", re.DOTALL)
@@ -274,9 +256,6 @@ def mid_pas(data, fol_num, include, in_c):
             elif(small):
                 sm_d = small.groups()
                 data = com.sub('<span style="font-size: ' + str(100 - int(sm_d[0]) * 10) + '%;">' + sm_d[1] + '</span>', data, 1)
-            elif(color):
-                c_d_1 = color.groups()
-                data = com.sub('<span style="color: ' + c_d_1[0] + '">' + c_d_1[1] + '</span>', data, 1)
             elif(color_2):
                 c_d_2 = color_2.groups()
                 data = com.sub('<span style="color: ' + c_d_2[0] + '">' + c_d_2[1] + '</span>', data, 1)
