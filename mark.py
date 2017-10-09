@@ -677,15 +677,15 @@ def namumark(title, data, num, in_c):
             try:        
                 w_d = re.search('width=([0-9]+(?:[a-z%]+)?)', d[1])
                 if(w_d):
-                    width = 'width: ' + w_d.groups()[0] + ';'
+                    width = 'width="' + w_d.groups()[0] + '" '
                 
                 h_d = re.search('height=([0-9]+(?:[a-z%]+)?)', d[1])
                 if(h_d):
-                    height = 'height: ' + h_d.groups()[0] + ';'
+                    height = 'height="' + h_d.groups()[0] + '" '
                     
                 a_d = re.search('align=(left|center|right)', d[1])
                 if(a_d):
-                    align = 'float: ' + a_d.groups()[0] + ';'
+                    align = 'text-align: ' + a_d.groups()[0] + ';'
             except:
                 pass
                 
@@ -694,10 +694,10 @@ def namumark(title, data, num, in_c):
                 if(not re.search("^파일:([^\n]*)", title)):
                     backlink_plus(title, d[0], 'file', num)
                     
-                img = '<img src="/image/' + sha224(f_d.groups()[0]) + '.' + f_d.groups()[1] + '" style="' + width + height + align + '">'
+                img = '<span style="display: block; ' + align + '"><img src="/image/' + sha224(f_d.groups()[0]) + '.' + f_d.groups()[1] + '" ' + width + height + '></span>'
                 data = link.sub(img, data, 1)
             else:
-                img = '<img src="' + re.sub('^외부:', '', d[0]) + '" style="' + width + height + align + '">'
+                img = '<span style="display: block; ' + align + '"><img src="' + re.sub('^외부:', '', d[0]) + '" ' + width + height + '></span>'
                 data = link.sub(img, data, 1)
                                 
         elif(re.search('^https?:\/\/', d[0])):
