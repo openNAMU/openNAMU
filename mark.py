@@ -685,7 +685,7 @@ def namumark(title, data, num, in_c):
                     
                 a_d = re.search('align=(left|center|right)', d[1])
                 if(a_d):
-                    align = 'align: ' + a_d.groups()[0] + ';'
+                    align = 'float: ' + a_d.groups()[0] + ';'
             except:
                 pass
                 
@@ -697,7 +697,7 @@ def namumark(title, data, num, in_c):
                 img = '<img src="/image/' + sha224(f_d.groups()[0]) + '.' + f_d.groups()[1] + '" style="' + width + height + align + '">'
                 data = link.sub(img, data, 1)
             else:
-                img = '<img src="' + d[0] + '" style="' + width + height + align + '">'
+                img = '<img src="' + re.sub('^외부:', '', d[0]) + '" style="' + width + height + align + '">'
                 data = link.sub(img, data, 1)
                                 
         elif(re.search('^https?:\/\/', d[0])):
