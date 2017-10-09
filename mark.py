@@ -492,7 +492,7 @@ def namumark(title, data, num, in_c):
         else:
             break
 
-    data = re.sub("##\s?([^\n]*)\r\n", "", data)
+    data = re.sub("\r\n##\s?([^\n]*)\r\n", "\r\n", data)
     
     data = re.sub("\[anchor\((?P<in>[^\[\]]*)\)\]", '<span id="\g<in>"></span>', data)
     data = savemark(data)
@@ -606,40 +606,6 @@ def namumark(title, data, num, in_c):
             else:
                 data = re.sub('\[\[wiki:([^|\]]+)(?:\|([^\]]+))?\]\]', '<a id="inside" href="/' + wiki[0] + '">' + wiki[0] + '</a>', data, 1)
     
-    while(1):
-        m = re.search("\[\[(파일|외부):((?:(?!\]\]|\|).)*)(?:\|((?:(?!\]\]).)*))?\]\]", data)
-        if(m):
-            img_d = m.groups()
-
-            if(img_d):
-                if(img_d[0] == '파일' and not re.search("^파일:([^\n]*)", title)):
-                    backlink_plus(title, '파일:' + img_d[1], 'file', num)
-
-                width = ''
-                height = ''
-                if(img_d[2]):
-                    width_r = re.search("width=([^ \n&]*)", img_d[2])
-                    height_r = re.search("height=([^ \n&]*)", img_d[2])
-
-                    if(width_r):
-                        width_d = width_r.groups()
-                        width = width_d[0]
-
-                    if(height_r):
-                        height_d = height_r.groups()
-                        height = height_d[0]
-
-                if(img_d[0] == '파일'):
-                    img_e = re.search('^(.+)(\.(?:.+))$', img_d[1]).groups()
-                    
-                    data = re.sub("\[\[(파일|외부):((?:(?!\]\]|\|).)*)(?:\|((?:(?!\]\]).)*))?\]\]", '<a href="/w/파일:' + img_d[1] + '"><img src="/image/' + sha224(img_e[0]) + img_e[1] + '" width="' + width + '" height="' + height + '"></a>', data, 1)
-                else:
-                    data = re.sub("\[\[(파일|외부):((?:(?!\]\]|\|).)*)(?:\|((?:(?!\]\]).)*))?\]\]", '<img src="' + img_d[1] + '" width="' + width + '" height="' + height + '">', data, 1)
-            else:
-                break            
-        else:
-            break
-    
     data = re.sub("\[br\]",'<br>', data)
     
     while(1):
@@ -700,54 +666,79 @@ def namumark(title, data, num, in_c):
 
     data = re.sub('\[\[(?P<in>\/[^\]|]*)(?P<out>\|(?:[^\]]*))?\]\]', '[[' + title + '\g<in>\g<out>]]', data)
                 
-    while(1):
-        m = re.search("\[\[(((?!\]\]).)*)\]\]", data)
-        if(m):
-            result = m.groups()
-            rep = result[0]
-            rep = re.sub("\\\#", "<sharp>", rep)
-            a = re.search("^((?:(?!\|).)*)(?:\|(.*))?$", rep)
+    link = re.compile('\[\[((?:(?!\]\]|\|).)*)(?:\|((?:(?!\]\]).)*))?\]\]')
+    d_da = link.findall(data)
+    for d in d_da:
+        if(re.search('^(?:파일|외부):', d[0])):
+            width = ''
+            height = ''
+            align = ''
             
-            results = a.groups()
-            
-            aa = re.search("^([^#]*)(#(?:.*))?$", results[0])
-            if(results[1]):
-                g = re.sub("<sharp>", "#", results[1])
-            else:
-                g = re.sub("<sharp>", "#", results[0])
-            
-            results = aa.groups()
-            
-            if(not results[1]):
-                sharp = ''
-            else:
-                sharp = results[1]
+            try:        
+                w_d = re.search('width=([0-9]+(?:[a-z%]+)?)', d[1])
+                if(w_d):
+                    width = 'width: ' + w_d.groups()[0] + ';'
                 
-            b = re.search("^http(?:s)?:\/\/", results[0])
-            if(b):
-                data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a class="out_link" rel="nofollow" target="_blank" href="' + results[0] + sharp + '">' + g + '</a>', data, 1)
+                h_d = re.search('height=([0-9]+(?:[a-z%]+)?)', d[1])
+                if(h_d):
+                    height = 'height: ' + h_d.groups()[0] + ';'
+                    
+                a_d = re.search('align=(left|center|right)', d[1])
+                if(a_d):
+                    align = 'align: ' + a_d.groups()[0] + ';'
+            except:
+                pass
+                
+            f_d = re.search('^파일:([^.]+)\.(.+)$', d[0])
+            if(f_d):
+                if(not re.search("^파일:([^\n]*)", title)):
+                    backlink_plus(title, d[0], 'file', num)
+                    
+                img = '<img src="/image/' + sha224(f_d.groups()[0]) + '.' + f_d.groups()[1] + '" style="' + width + height + align + '">'
+                data = link.sub(img, data, 1)
             else:
-                if(results[0] == title):
-                    data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<b>' + g + '</b>', data, 1)
-                else:
-                    nosharp = re.sub("<sharp>", "#", results[0])
-                    
-                    curs.execute("select title from data where title = ?", [nosharp])
-                    y = curs.fetchall()
-                    if(y):
-                        clas = ''
-                    else:
-                        clas = 'not_thing'
-
-                    if(re.search('<', nosharp)):
-                        nosharp = ''
-                        sharp = ''
-                    
-                    data = re.sub('\[\[(((?!\]\]).)*)\]\]', '<a title="' + re.sub('#', '\#', nosharp) + sharp + '" class="' + clas + '" href="/w/' + url_pas(nosharp) + sharp + '">' + re.sub('(?:<a ([^>]*)>|<\/a>)', '', g) + '</a>', data, 1)
-
-                    backlink_plus(title, results[0], '', num)
+                img = '<img src="' + d[0] + '" style="' + width + height + align + '">'
+                data = link.sub(img, data, 1)
+                                
+        elif(re.search('^https?:\/\/', d[0])):
+            view = d[0]
+            try:
+                if(re.search('(.+)', d[1])):
+                    view = d[1]
+            except:
+                pass
+            
+            data = link.sub('<a class="out_link" rel="nofollow" href="' + d[0] + '">' + view + '</a>', data, 1)
         else:
-            break
+            view = d[0].replace('\\', '')
+            try:
+                if(re.search('(.+)', d[1])):
+                    view = d[1]
+            except:
+                pass        
+                
+            sh = ''
+            s_d = re.search('#([^#]+)$', d[0])
+            if(s_d):
+                href = re.sub('#([^#]+)$', '', d[0])
+                sh = '#' + s_d.groups()[0]
+            else:
+                href = d[0]
+                
+            if(d[0] == title):
+                data = link.sub('<b>' + view + '</b>', data, 1)
+            elif(re.search('^#', d[0])):
+                data = link.sub('<a href="' + url_pas(href.replace('\\', '')) + sh + '">' + view + '</a>', data, 1)
+            else:
+                backlink_plus(title, href.replace('\\', ''), '', num)
+                
+                curs.execute("select title from data where title = ?", [href.replace('\\', '')])
+                if(not curs.fetchall()):
+                    no = 'class="not_thing"'
+                else:
+                    no = ''
+                
+                data = link.sub('<a ' + no + ' href="/w/' + url_pas(href.replace('\\', '')) + sh + '">' + view + '</a>', data, 1)
             
     while(1):
         m = re.search("((?:(?:( +)\*\s(?:[^\n]*))\n?)+)", data)

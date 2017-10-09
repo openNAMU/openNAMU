@@ -221,7 +221,7 @@ def update(num = 1):
                 html_minify(
                     template('index', 
                         imp = ['업데이트 목록', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
-                        data = '<li><a href="/update/2">2.2.1</a></li>',
+                        data = '<ul><li><a href="/update/2">2.2.1</a></li></ul>',
                         menu = [['manager', '관리자']]
                     )
                 )
@@ -239,7 +239,7 @@ def update(num = 1):
 
 @route('/not_close_topic')
 def not_close_topic():
-    div = ''
+    div = '<ul>'
     i = 1
 
     curs.execute('select title, sub from rd order by date desc')
@@ -250,6 +250,8 @@ def not_close_topic():
         if(not is_close):
             div += '<li>' + str(i) + '. <a href="/topic/' + url_pas(data[0]) + '/sub/' + url_pas(data[1]) + '">' + data[0] + ' (' + data[1] + ')</a></li>'
             i += 1
+            
+    div += '</ul>'
 
     return(
         html_minify(
@@ -270,7 +272,7 @@ def static(name = None):
 
 @route('/acl_list')
 def acl_list():
-    div = ''
+    div = '<ul>'
     i = 0
 
     curs.execute("select title, acl from data where acl = 'admin' or acl = 'user' order by acl desc")
@@ -284,6 +286,8 @@ def acl_list():
         div += '<li>' + str(i + 1) + '. <a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a> (' + acl + ')</li>'
         
         i += 1
+        
+    div += '</ul>'
     
     return(
         html_minify(
@@ -297,7 +301,7 @@ def acl_list():
     
 @route('/list_acl')
 def list_acl():
-    div = ''
+    div = '<ul>'
     i = 0
 
     curs.execute("select name, acl from alist order by name desc")
@@ -322,8 +326,7 @@ def list_acl():
         
         i += 1
     else:        
-        div +=  '<br> \
-                <a href="/manager/8">(생성)</a>'
+        div += '</ul><br><a href="/manager/8">(생성)</a>'
 
     return(
         html_minify(
@@ -369,7 +372,7 @@ def admin_plus(name = None):
             curs.execute('select acl from alist where name = ?', [name])
             test = curs.fetchall()
             
-            data = ''
+            data = '<ul>'
             exist_list = ['', '', '', '', '', '', '']
 
             for go in test:
@@ -394,7 +397,7 @@ def admin_plus(name = None):
             data += '<li><input type="checkbox" name="check" ' + exist_list[3] + '> 사용자 검사</li>'
             data += '<li><input type="checkbox" name="acl" ' + exist_list[4] + '> 문서 ACL</li>'
             data += '<li><input type="checkbox" name="hidel" ' + exist_list[5] + '> 역사 숨김</li>'
-            data += '<li><input type="checkbox" name="owner" ' + exist_list[6] + '> 소유자</li>'
+            data += '<li><input type="checkbox" name="owner" ' + exist_list[6] + '> 소유자</li></ul>'
 
             return(
                 html_minify(
@@ -416,7 +419,7 @@ def admin_plus(name = None):
 @route('/admin_list')
 def admin_list():
     i = 1
-    div = ''
+    div = '<ul>'
     
     curs.execute("select id, acl from user where not acl = 'user'")
     user_data = curs.fetchall()
@@ -427,6 +430,8 @@ def admin_list():
         div += '<li>' + str(i) + '. ' + name + '</li>'
         
         i += 1
+        
+    div += '</ul>'
                 
     return(
         html_minify(
@@ -581,7 +586,7 @@ def user_log(num = 1):
         i = num * 50
         
     j = i - 50
-    list_data = ''
+    list_data = '<ul>'
     ydmin = admin_check(1, None)
     
     curs.execute("select id from user limit ?, ?", [str(j), str(i)])
@@ -603,8 +608,7 @@ def user_log(num = 1):
         
         j += 1
     else:
-        list_data +=    '<br> \
-                        <a href="/user_log/n/' + str(num - 1) + '">(이전)</a> <a href="/user_log/n/' + str(num + 1) + '">(이후)</a>'
+        list_data += '</ul><br><a href="/user_log/n/' + str(num - 1) + '">(이전)</a> <a href="/user_log/n/' + str(num + 1) + '">(이후)</a>'
 
     return(
         html_minify(
@@ -625,7 +629,7 @@ def user_log(num = 1):
         i = num * 50
         
     j = i - 50
-    list_data = ''
+    list_data = '<ul>'
     
     curs.execute("select who, what, time from re_admin order by time desc limit ?, ?", [str(j), str(i)])
     get_list = curs.fetchall()
@@ -636,7 +640,7 @@ def user_log(num = 1):
         
         j += 1
     else:
-        list_data +=    '<br> \
+        list_data +=    '</ul><br> \
                         <span>주의 : 권한 사용 안하고 열람만 해도 기록되는 경우도 있습니다.</span> \
                         <br> \
                         <br> \
@@ -661,7 +665,7 @@ def give_log(num = 1):
         i = num * 50
         
     j = i - 50
-    list_data = ''
+    list_data = '<ul>'
     back = ''
 
     curs.execute("select name, acl from alist order by name asc limit ?, ?", [str(j), str(i)])
@@ -673,7 +677,7 @@ def give_log(num = 1):
 
         list_data += '<li>' + str(j) + '. ' + data[0] + ' (' + data[1] + ')</li>'
     else:
-        list_data += '<br><a href="/give_log/n/' + str(num - 1) + '">(이전)</a> <a href="/give_log/n/' + str(num + 1) + '">(이후)</a>'
+        list_data += '</ul><br><a href="/give_log/n/' + str(num - 1) + '">(이전)</a> <a href="/give_log/n/' + str(num + 1) + '">(이후)</a>'
 
     return(
         html_minify(
@@ -731,7 +735,7 @@ def xref(name = None, num = 1):
         v = num * 50
         
     i = v - 50
-    div = ''
+    div = '<ul>'
     
     curs.execute("delete from back where title = ? and link = ''", [name])
     conn.commit()
@@ -744,10 +748,9 @@ def xref(name = None, num = 1):
         if(data[1]):
             div += ' (' + data[1] + ')'
         
-        div += '</li>'
+        div += '</li></ul>'
     else:        
-        div += '<br> \
-                <a href="/xref/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전)</a> <a href="/xref/' + url_pas(name) + '/n/' + str(num + 1) + '">(이후)</a>'
+        div += '<br><a href="/xref/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전)</a> <a href="/xref/' + url_pas(name) + '/n/' + str(num + 1) + '">(이후)</a>'
     
     return(
         html_minify(
@@ -1021,7 +1024,7 @@ def deep_search(name = None, num = 1):
 
     i = v - 50
 
-    div = ''
+    div = '<ul>'
     div_plus = ''
     end = ''
 
@@ -1034,13 +1037,9 @@ def deep_search(name = None, num = 1):
     curs.execute("select title from data where title = ?", [name])
     exist = curs.fetchall()
     if(exist):
-        div =   '<li>문서로 <a href="/w/' + url_pas(name) + '">바로가기</a></li> \
-                <br> \
-                <br>'
+        div = '<ul><li>문서로 <a href="/w/' + url_pas(name) + '">바로가기</a></li><br><br>'
     else:
-        div =   '<li>문서가 없습니다. <a class="not_thing" href="/w/' + url_pas(name) + '">바로가기</a></li> \
-                <br> \
-                <br>'
+        div = '<ul><li>문서가 없습니다. <a class="not_thing" href="/w/' + url_pas(name) + '">바로가기</a></li><br><br>'
 
     if(title_list):
         no = 0
@@ -1078,9 +1077,7 @@ def deep_search(name = None, num = 1):
 
     div += div_plus + end
 
-    div += '<br> \
-            <br> \
-            <a href="/search/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전)</a> <a href="/search/' + url_pas(name) + '/n/' + str(num + 1) + '">(이후)</a>'
+    div += '</ul><br><a href="/search/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전)</a> <a href="/search/' + url_pas(name) + '/n/' + str(num + 1) + '">(이후)</a>'
     
     return(
         html_minify(
@@ -1835,9 +1832,7 @@ def title_index(num = 1000, page = 1):
     else:
         i = [1, 0, 0, 0, 0, 0]
 
-    data = '<a href="/title_index/0/1">(전체)</a> <a href="/title_index/500/1">(500)</a> <a href="/title_index/5000/1">(5000개)</a> <a href="/title_index/10000/1">(10000개)</a> <a href="/title_index/50000/1">(50000개)</a> \
-            <br> \
-            <br>'
+    data = '<ul><a href="/title_index/0/1">(전체)</a> <a href="/title_index/500/1">(500)</a> <a href="/title_index/5000/1">(5000개)</a> <a href="/title_index/10000/1">(10000개)</a> <a href="/title_index/50000/1">(50000개)</a><br><br>'
 
     if(num == 0):
         curs.execute("select title from data order by title asc")
@@ -1873,8 +1868,7 @@ def title_index(num = 1000, page = 1):
                     <li>파일 문서는 총 ' + str(i[4]) + '개의 문서가 있습니다.</li> \
                     <li>나머지 문서는 총 ' + str(i[5]) + '개의 문서가 있습니다.</li>'
     else:
-        data += '<br> \
-                <a href="/title_index/' + str(num) + '/' + str(page - 1) + '">(이전)</a> <a href="/title_index/' + str(num) + '/' + str(page + 1) + '">(이후)</a>'
+        data += '</ul><br><a href="/title_index/' + str(num) + '/' + str(page - 1) + '">(이전)</a> <a href="/title_index/' + str(num) + '/' + str(page + 1) + '">(이후)</a>'
     
     return(
         html_minify(
@@ -2828,12 +2822,14 @@ def down(name = None):
     curs.execute("select title from data where title like ?", ['%' + name + '/%'])
     under = curs.fetchall()
     
-    div = ''
+    div = '<ul>'
     i = 0
 
     for data in under:
         div += '<li>' + str(i + 1) + '. <a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a></li>'
         i += 1
+        
+    div += '</ul>'
     
     return(
         html_minify(
