@@ -2029,10 +2029,10 @@ def topic(name = None, sub = None):
                 today
             )
             
-            aa = re.sub("\[\[(분류:(?:(?:(?!\]\]).)*))\]\]", "[br]", request.forms.content)
-            aa = savemark(aa)
+            data = re.sub("\[\[(분류:(?:(?:(?!\]\]).)*))\]\]", "[br]", request.forms.content)
+            data = savemark(data)
             
-            curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, ?, ?, ?, '', '')", [str(num), name, sub, aa, today, ip])
+            curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, ?, ?, ?, '', '')", [str(num), name, sub, data, today, ip])
             conn.commit()
             
             return(redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub)))
@@ -2161,6 +2161,9 @@ def topic(name = None, sub = None):
                 color = '_green'
             else:
                 color = ''
+                
+            if(indata == ''):
+                indata = '<br>'
                          
             div += '<table id="toron"> \
                         <tbody> \
