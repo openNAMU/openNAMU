@@ -824,7 +824,7 @@ def recent_discuss(tools = 'normal'):
     )
 
 @route('/block_log')
-@route('/block_log/n/<number:int>')
+@route('/block_log/n/<num:int>')
 def block_log(num = 1):
     if(num * 50 <= 0):
         v = 50
