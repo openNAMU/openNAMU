@@ -497,27 +497,20 @@ def namumark(title, data, num, in_c):
     data = re.sub("\[anchor\((?P<in>[^\[\]]*)\)\]", '<span id="\g<in>"></span>', data)
     data = savemark(data)
     
-    while(1):
-        r_data = re.search('\n#(?:redirect|넘겨주기) ([^\n]*)', data)
-        if(r_data):
-            n_data = r_data.groups()
-            n_s_data = re.sub("\\\#", "<sharp>", n_data[0])
-
-            s_data = re.search("^([^\n#]*)(#(?:[^\n]*))?$", n_s_data)
-            r_s_data = s_data.groups()
-
-            n_sharp = re.sub("<sharp>", "#", r_s_data[0])
-
-            if(r_s_data[1]):
-                plus = r_s_data[1]
-            else:
-                plus = ''
-
-            data = re.sub('\n#(?:redirect|넘겨주기) ([^\n]*)', '<meta http-equiv="refresh" content="0;url=/w/' + re.sub('%0D$', '', url_pas(n_sharp)) + '/from/' + url_pas(title) + plus + '" />', data, 1)
-            backlink_plus(title, n_data[0], 'redirect', num)
-        else:
-            break
+    d_re = re.findall('\r\n#(?:redirect|넘겨주기) ([^\n]+)', data)
+    for d in d_re:
+        view = d.replace('\\', '')    
             
+        sh = ''
+        s_d = re.search('#((?:(?!x27;|#).)+)$', d)
+        if(s_d):
+            href = re.sub('#((?:(?!x27;|#).)+)$', '', d)
+            sh = '#' + s_d.groups()[0]
+        else:
+            href = d
+            
+        data = re.sub('\r\n#(?:redirect|넘겨주기) ([^\n]+)', '<meta http-equiv="refresh" content="0;url=/w/' + url_pas(href.replace('\\', '').replace('&#x27;', "'")) + '/from/' + url_pas(title) + sh + '" />', data, 1)
+          
     data = re.sub("\[nicovideo\((?P<in>[^,)]*)(?:(?:,(?:[^,)]*))+)?\)\]", "[[http://embed.nicovideo.jp/watch/\g<in>]]", data)
     
     while(1):
@@ -718,9 +711,9 @@ def namumark(title, data, num, in_c):
                 pass        
                 
             sh = ''
-            s_d = re.search('#([^#]+)$', d[0])
+            s_d = re.search('#((?:(?!x27;|#).)+)$', d[0])
             if(s_d):
-                href = re.sub('#([^#]+)$', '', d[0])
+                href = re.sub('#((?:(?!x27;|#).)+)$', '', d[0])
                 sh = '#' + s_d.groups()[0]
             else:
                 href = d[0]
@@ -738,7 +731,7 @@ def namumark(title, data, num, in_c):
                 else:
                     no = ''
                 
-                data = link.sub('<a ' + no + ' href="/w/' + url_pas(href.replace('\\', '')) + sh + '">' + view + '</a>', data, 1)
+                data = link.sub('<a ' + no + ' href="/w/' + url_pas(href.replace('\\', '').replace('&#x27;', "'")) + sh + '">' + view + '</a>', data, 1)
             
     while(1):
         m = re.search("((?:(?:( +)\*\s(?:[^\n]*))\n?)+)", data)
