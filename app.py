@@ -1164,6 +1164,7 @@ def revert(name = None, num = None):
                     leng
                 )
                 
+                namumark(name, rows[0][0], 1, 0)
                 return(redirect('/w/' + url_pas(name)))
     else:
         curs.execute("select title from hidhi where title = ? and re = ?", [name, str(num)])
@@ -1310,6 +1311,7 @@ def edit(name = None, num = None):
             leng
         )
                 
+        namumark(name, content, 1, 0)
         include_check(name, content)
         
         conn.commit()
@@ -1431,9 +1433,6 @@ def delete(name = None):
                 return(redirect('/ban'))
 
             today = get_time()
-
-            curs.execute("delete from back where link = ?", [name])
-            curs.execute("delete from cat where cat = ?", [name])
             
             leng = '-' + str(len(rows[0][0]))
             history_plus(
@@ -1445,6 +1444,8 @@ def delete(name = None):
                 leng
             )
             
+            curs.execute("delete from back where link = ?", [name])
+            curs.execute("delete from cat where cat = ?", [name])
             curs.execute("delete from data where title = ?", [name])
             conn.commit()
             
@@ -1510,9 +1511,8 @@ def move(name = None):
         
         if(rows):
             curs.execute("update data set title = ? where title = ?", [request.forms.title, name])
-
-            curs.execute("delete from back where link = ?", [name])
-            curs.execute("delete from cat where cat = ?", [name])
+            curs.execute("update back set link = ? where link = ?", [request.forms.title, name])
+            curs.execute("update cat set cat = ? where cat = ?", [request.forms.title, name])
 
         curs.execute("update history set title = ? where title = ?", [request.forms.title, name])
         conn.commit()
@@ -2945,7 +2945,7 @@ def read_view(name = None, num = None, redirect = None):
     if(redirect):
         elsedata = re.sub("^#(?:redirect|넘겨주기) (?P<in>[^\n]*)", " * [[\g<in>]] 문서로 넘겨주기", elsedata)
             
-    enddata = namumark(name, elsedata, 1, 0)
+    enddata = namumark(name, elsedata, 0, 0)
 
     if(data_none == 1):
         menu = [['edit/' + url_pas(name), '생성'], ['topic/' + url_pas(name), topic], ['history/' + url_pas(name), '역사'], ['move/' + url_pas(name), '이동'], ['xref/' + url_pas(name), '역링크']]
