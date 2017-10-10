@@ -659,7 +659,7 @@ def namumark(title, data, num, in_c):
 
     data = re.sub('\[\[(?P<in>\/[^\]|]*)(?P<out>\|(?:[^\]]*))?\]\]', '[[' + title + '\g<in>\g<out>]]', data)
                 
-    link = re.compile('\[\[((?:(?!\]\]|\|).)*)(?:\|((?:(?!\]\]).)*))?\]\]')
+    link = re.compile('\[\[((?:(?!\[\[|\]\]|\|).)*)(?:\|((?:(?!\[\[|\]\]).)*))?\]\]')
     d_da = link.findall(data)
     for d in d_da:
         if(re.search('^(?:파일|외부):', d[0])):
