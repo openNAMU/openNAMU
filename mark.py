@@ -962,6 +962,5 @@ def namumark(title, data, num, in_c, toc_y):
     data = re.sub('<isbr>', '\r\n', data)
     data = re.sub('^(?:<br>|\r|\n| )+', '', data)
     data = re.sub('^<div style="margin-top: 30px;" id="cate">', '<div id="cate">', data)
-    
-    conn.commit()
+
     return(data)

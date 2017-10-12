@@ -1129,14 +1129,10 @@ def revert(name = None, num = None):
                 row = curs.fetchall()
                 if(row):
                     leng = leng_check(len(row[0][0]), len(rows[0][0]))
-                    
                     curs.execute("update data set data = ? where title = ?", [rows[0][0], name])
-                    conn.commit()
                 else:
                     leng = '+' + str(len(rows[0][0]))
-                    
                     curs.execute("insert into data (title, data, acl) values (?, ?, '')", [name, rows[0][0]])
-                    conn.commit()
                     
                 history_plus(
                     name, 
@@ -1148,6 +1144,8 @@ def revert(name = None, num = None):
                 )
                 
                 namumark(name, rows[0][0], 1, 0, 0)
+                conn.commit()
+                
                 return(redirect('/w/' + url_pas(name)))
     else:
         curs.execute("select title from hidhi where title = ? and re = ?", [name, str(num)])
@@ -1296,8 +1294,8 @@ def edit(name = None, num = None):
                 
         namumark(name, content, 1, 0, 0)
         include_check(name, content)
-        
         conn.commit()
+        
         return(redirect('/w/' + url_pas(name)))
     else:        
         if(can == 1):
