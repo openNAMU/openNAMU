@@ -309,8 +309,8 @@ def mid_pas(data, fol_num, include, in_c):
     com = re.compile("<code>((?:(?!(?:<code>|<\/code>)).)*)<\/code>", re.DOTALL)
     da_com = com.findall(data)
     for com_da in da_com:
-        mid_data = mid_data.replace('<', '&lt;').replace('>', '&gt;')
-        mid_data = re.sub("(?P<in>.)", "<nowiki>\g<in></nowiki>", mid_data)
+        mid_data = com_da.replace('<', '&lt;').replace('>', '&gt;')
+        mid_data = re.sub("(?P<in>.)", "#no#\g<in>#/no#", mid_data)
               
         data = com.sub(mid_data, data, 1)
             
@@ -989,7 +989,7 @@ def namumark(title, data, num, in_c):
             
     data = re.sub("\r\n(?P<in><h[0-6])", "\g<in>", data)
     data = re.sub("(\n<nobr>|<nobr>\n|<nobr>)", "", data)
-    data = re.sub("<nowiki>(?P<in>.)<\/nowiki>", "\g<in>", data)
+    data = re.sub("#no#(?P<in>.)#\/no#", "\g<in>", data)
     data = re.sub("<space>", " ", data)
 
     data = re.sub('<\/blockquote>(?:(?:\r)?\n){2}<blockquote>', '</blockquote><blockquote>', data)
