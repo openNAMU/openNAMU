@@ -8,6 +8,7 @@ import re
 import hashlib
 import html
 import datetime
+import time
 
 json_data = open('set.json').read()
 set_data = json.loads(json_data)
@@ -388,16 +389,32 @@ def toc_pas(data, title, num, toc_y):
     return(data)
 
 def backlink_plus(name, link, backtype, num):
-    if(num == 1):       
+    if(num == 1):
         curs.execute("select title from back where title = ? and link = ? and type = ?", [link, name, backtype])
         if(not curs.fetchall()):
-            curs.execute("insert into back (title, link, type) values (?, ?,  ?)", [link, name, backtype])
+            try:
+                curs.execute("insert into back (title, link, type) values (?, ?,  ?)", [link, name, backtype])
+            except:
+                while(1):
+                    try:
+                        curs.execute("insert into back (title, link, type) values (?, ?,  ?)", [link, name, backtype])
+                        break
+                    except:
+                        time.sleep(1)
 
 def cat_plus(name, link, num):
     if(num == 1):
         curs.execute("select title from cat where title = ? and cat = ?", [link, name])
         if(not curs.fetchall()):
-            curs.execute("insert into cat (title, cat) values (?, ?)", [link, name])
+            try:
+                curs.execute("insert into cat (title, cat) values (?, ?)", [link, name])
+            except:
+                while(1):
+                    try:
+                        curs.execute("insert into cat (title, cat) values (?, ?)", [link, name])
+                        break
+                    except:
+                        time.sleep(1)
 
 def namumark(title, data, num, in_c, toc_y):    
     data = re.sub("\n", "\r\n", re.sub("\r\n", "\n", data))
