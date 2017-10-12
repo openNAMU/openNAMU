@@ -1403,7 +1403,7 @@ def preview(name = None, num = None):
                 imp = [name, wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), ' (미리보기)', 0],
                 data = '<form method="post" action="/edit/' + url_pas(name) + action + '"> \
                             <textarea style="height: 80%;" name="content">' + request.forms.content + '</textarea> \
-                            <textarea style="display: none; height: 80%;" name="otent">' + request.forms.content + '</textarea> \
+                            <textarea style="display: none; height: 80%;" name="otent">' + request.forms.otent + '</textarea> \
                             <br> \
                             <br> \
                             <input placeholder="사유" name="send" style="width: 100%;" type="text"> \
