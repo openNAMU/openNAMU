@@ -333,38 +333,10 @@ def toc_pas(data, title, num):
                 last = wiki
             else:
                 last = wiki
-                if(wiki == 1):
-                    i[2] = 0
-                    i[3] = 0
-                    i[4] = 0
-                    i[5] = 0
-                    i[6] = 0
-                elif(wiki == 2):
-                    i[3] = 0
-                    i[4] = 0
-                    i[5] = 0
-                    i[6] = 0
-                elif(wiki == 3):
-                    i[4] = 0
-                    i[5] = 0
-                    i[6] = 0
-                elif(wiki == 4):
-                    i[5] = 0
-                    i[6] = 0
-                elif(wiki == 5):
-                    i[6] = 0
-            if(wiki == 1):
-                i[1] += 1
-            elif(wiki == 2):
-                i[2] += 1
-            elif(wiki == 3):
-                i[3] += 1
-            elif(wiki == 4):
-                i[4] += 1
-            elif(wiki == 5):
-                i[5] += 1
-            else:
-                i[6] += 1
+                for a in range(wiki + 1, 7):
+                    i[a] = 0
+            
+            i[wiki] += 1
 
             toc = str(i[1]) + '.' + str(i[2]) + '.' + str(i[3]) + '.' + str(i[4]) + '.' + str(i[5]) + '.' + str(i[6]) + '.'
 
@@ -389,19 +361,8 @@ def toc_pas(data, title, num):
                     
                     toc_c = toc_d
 
-            test = re.search('([0-9]*)(\.([0-9]*))?(\.([0-9]*))?(\.([0-9]*))?(\.([0-9]*))?', toc)
-            if(test):
-                g = test.groups()
-                if(g[4]):
-                    span = '<span style="margin-left: 5px;"></span>' * 4
-                elif(g[3]):
-                    span = '<span style="margin-left: 5px;"></span>' * 3
-                elif(g[2]):
-                    span = '<span style="margin-left: 5px;"></span>' * 2
-                elif(g[1]):
-                    span = '<span style="margin-left: 5px;"></span>'
-                else:
-                    span = ''
+            t = toc.count('.')
+            span = '<span style="margin-left: 5px;"></span>' * t
 
             rtoc += span + '<a href="#s-' + toc + '">' + toc + '</a>. ' + result[1] + '<br>'
 
