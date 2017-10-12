@@ -701,7 +701,7 @@ def back_reset():
         for end in data:
             print(end[0])
             
-            namumark(end[0], end[1], 1, 0)
+            namumark(end[0], end[1], 1, 0, 0)
         
         return(redirect('/'))
     else:
@@ -1164,7 +1164,7 @@ def revert(name = None, num = None):
                     leng
                 )
                 
-                namumark(name, rows[0][0], 1, 0)
+                namumark(name, rows[0][0], 1, 0, 0)
                 return(redirect('/w/' + url_pas(name)))
     else:
         curs.execute("select title from hidhi where title = ? and re = ?", [name, str(num)])
@@ -1311,7 +1311,7 @@ def edit(name = None, num = None):
             leng
         )
                 
-        namumark(name, content, 1, 0)
+        namumark(name, content, 1, 0, 0)
         include_check(name, content)
         
         conn.commit()
@@ -1390,7 +1390,7 @@ def preview(name = None, num = None):
          
     newdata = request.forms.content
     newdata = re.sub('^#(?:redirect|넘겨주기) (?P<in>[^\n]*)', ' * [[\g<in>]] 문서로 넘겨주기', newdata)
-    enddata = namumark(name, newdata, 0, 0)
+    enddata = namumark(name, newdata, 0, 0, 0)
 
     if(num):
         action = '/section/' + str(num)
@@ -1566,7 +1566,7 @@ def other():
                                     ' * [[wiki:manager/1|관리자 메뉴]]\r\n' + \
                                     ' * [[wiki:upload|파일 올리기]]\r\n' + \
                                     '== 버전 ==\r\n' + \
-                                    '이 오픈나무는 [[https://github.com/2DU/openNAMU/blob/SQLite/version.md|' + r_ver + p_ver + ']]판 입니다.', 0, 0),
+                                    '이 오픈나무는 [[https://github.com/2DU/openNAMU/blob/SQLite/version.md|' + r_ver + p_ver + ']]판 입니다.', 0, 0, 0),
                 menu = 0
             )
         )
@@ -1596,7 +1596,7 @@ def manager(num = 1):
                                         ' * [[wiki:manager/9|JSON 출력]]\r\n' + \
                                         ' * [[wiki:json_in|JSON 입력]]\r\n' + \
                                         '== 기타 ==\r\n' + \
-                                        ' * 이 메뉴에 없는 기능은 해당 문서의 역사나 토론에서 바로 사용 가능함', 0, 0),
+                                        ' * 이 메뉴에 없는 기능은 해당 문서의 역사나 토론에서 바로 사용 가능함', 0, 0, 0),
                     menu = [['other', '기타']]
                 )
             )
@@ -2076,7 +2076,7 @@ def topic(name = None, sub = None):
         top = curs.fetchall()
 
         for dain in top:                     
-            top_data = namumark('', dain[0], 0, 0)
+            top_data = namumark('', dain[0], 0, 0, 0)
             top_data = re.sub("(?P<in>#(?:[0-9]*))", '<a href="\g<in>">\g<in></a>', top_data)
                     
             ip = ip_pas(dain[3], 1)
@@ -2106,7 +2106,7 @@ def topic(name = None, sub = None):
             if(i == 0):
                 start = dain[3]
                 
-            indata = namumark('', dain[0], 0, 0)
+            indata = namumark('', dain[0], 0, 0, 0)
             indata = re.sub("(?P<in>#(?:[0-9]*))", '<a href="\g<in>">\g<in></a>', indata)
             
             chad = ''
@@ -2945,7 +2945,7 @@ def read_view(name = None, num = None, redirect = None):
     if(redirect):
         elsedata = re.sub("^#(?:redirect|넘겨주기) (?P<in>[^\n]*)", " * [[\g<in>]] 문서로 넘겨주기", elsedata)
             
-    enddata = namumark(name, elsedata, 0, 0)
+    enddata = namumark(name, elsedata, 0, 0, 1)
 
     if(data_none == 1):
         menu = [['edit/' + url_pas(name), '생성'], ['topic/' + url_pas(name), topic], ['history/' + url_pas(name), '역사'], ['move/' + url_pas(name), '이동'], ['xref/' + url_pas(name), '역링크']]
@@ -2981,7 +2981,7 @@ def read_view(name = None, num = None, redirect = None):
         html_minify(
             template('index', 
                 imp = [name, wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), sub + acl, r_date],
-                data = enddata + namumark(name, div, 0, 0),
+                data = enddata + namumark(name, div, 0, 0, 0),
                 menu = menu
             )
         )
@@ -3174,7 +3174,7 @@ def user_info():
                                                         ' * [[wiki:change|비밀번호 변경]]\r\n' + \
                                                         ' * [[wiki:count|기여 횟수]]\r\n' + \
                                                         ' * [[wiki:custom_css|사용자 CSS]]\r\n' + \
-                                                        ' * [[wiki:custom_js|사용자 JS]]\r\n', 0, 0),
+                                                        ' * [[wiki:custom_js|사용자 JS]]\r\n', 0, 0, 0),
                 menu = 0
             )
         )
@@ -3311,7 +3311,7 @@ def count_edit(name = None):
         html_minify(
             template('index', 
                 imp = ['기여 횟수', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
-                data = namumark("", "||<-2><:> " + that + " ||\r\n||<:> 기여 횟수 ||<:> " + str(data) + "||\r\n||<:> 토론 횟수 ||<:> " + str(t_data) + "||", 0, 1),
+                data = namumark("", "||<-2><:> " + that + " ||\r\n||<:> 기여 횟수 ||<:> " + str(data) + "||\r\n||<:> 토론 횟수 ||<:> " + str(t_data) + "||", 0, 0, 0),
                 menu = [['user', '사용자']]
             )
         )
