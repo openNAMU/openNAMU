@@ -6,6 +6,7 @@ import bcrypt
 import os
 import difflib
 from css_html_js_minify import html_minify
+from multiprocessing import Process
 
 try:
     json_data = open('set.json').read()
@@ -688,24 +689,6 @@ def give_log(num = 1):
             )
         )
     )
-        
-@route('/back_reset')
-def back_reset():
-    if(admin_check(None, 'back_reset') == 1):        
-        curs.execute("delete from back")
-        curs.execute("delete from cat")
-        conn.commit()
-        
-        curs.execute("select title, data from data")
-        data = curs.fetchall()
-        for end in data:
-            print(end[0])
-            
-            namumark(end[0], end[1], 1, 0, 0)
-        
-        return(redirect('/'))
-    else:
-        return(redirect('/error/3'))
 
 @route('/indexing')
 def indexing():
@@ -748,9 +731,9 @@ def xref(name = None, num = 1):
         if(data[1]):
             div += ' (' + data[1] + ')'
         
-        div += '</li></ul>'
+        div += '</li>'
     else:        
-        div += '<br><a href="/xref/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전)</a> <a href="/xref/' + url_pas(name) + '/n/' + str(num + 1) + '">(이후)</a>'
+        div += '</ul><br><a href="/xref/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전)</a> <a href="/xref/' + url_pas(name) + '/n/' + str(num + 1) + '">(이후)</a>'
     
     return(
         html_minify(

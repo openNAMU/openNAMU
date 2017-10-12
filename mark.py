@@ -31,13 +31,16 @@ def get_time():
     
 def ip_check():
     session = request.environ.get('beaker.session')
-    if(session.get('Now') == 1):
-        ip = format(session['DREAMER'])
-    else:
-        if(request.environ.get('HTTP_X_FORWARDED_FOR')):
-            ip = request.environ.get('HTTP_X_FORWARDED_FOR')
+    try:
+        if(session.get('Now') == 1):
+            ip = format(session['DREAMER'])
         else:
-            ip = request.environ.get('REMOTE_ADDR')
+            if(request.environ.get('HTTP_X_FORWARDED_FOR')):
+                ip = request.environ.get('HTTP_X_FORWARDED_FOR')
+            else:
+                ip = request.environ.get('REMOTE_ADDR')
+    except:
+        ip = 'None'
 
     return(ip)
 
