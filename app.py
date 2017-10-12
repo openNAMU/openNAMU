@@ -1571,7 +1571,6 @@ def manager(num = 1):
                                         ' * [[wiki:manager/5|권한 주기]]\r\n' + \
                                         ' * [[wiki:m_del|여러 문서 삭제]]\r\n' + \
                                         '== 소유자 ==\r\n' + \
-                                        ' * [[wiki:back_reset|역링크, 분류 다시 생성]]\r\n' + \
                                         ' * [[wiki:indexing|인덱싱]]\r\n' + \
                                         ' * [[wiki:manager/8|관리 그룹 생성]]\r\n' + \
                                         ' * [[wiki:update|업데이트 메뉴]]\r\n' + \
