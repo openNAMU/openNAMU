@@ -44,7 +44,7 @@ BaseRequest.MEMFILE_MAX = 1000 ** 4
 def redirect(data):
     return('<meta http-equiv="refresh" content="0;url=' + data + '" />')
 
-r_ver = '2.3.2'
+r_ver = '2.3.3'
 p_ver = ''
 
 conn.commit()
