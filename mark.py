@@ -473,7 +473,7 @@ def namumark(title, data, num, in_c, toc_y):
     data = re.sub("\[anchor\((?P<in>[^\[\]]*)\)\]", '<span id="\g<in>"></span>', data)
     data = savemark(data)
     
-    d_re = re.findall('\r\n#(?:redirect|넘겨주기) ([^\n]+)', data)
+    d_re = re.findall('\r\n#(?:redirect|넘겨주기) ((?:(?!\r|\n|%0D).)+)', data)
     for d in d_re:
         view = d.replace('\\', '')    
             
@@ -485,7 +485,7 @@ def namumark(title, data, num, in_c, toc_y):
         else:
             href = d
             
-        data = re.sub('\r\n#(?:redirect|넘겨주기) ([^\n]+)', '<meta http-equiv="refresh" content="0;url=/w/' + url_pas(href.replace('\\', '').replace('&#x27;', "'")) + '/from/' + url_pas(title) + sh + '" />', data, 1)
+        data = re.sub('\r\n#(?:redirect|넘겨주기) ((?:(?!\r|\n|%0D).)+)', '<meta http-equiv="refresh" content="0;url=/w/' + url_pas(href.replace('\\', '').replace('&#x27;', "'")) + '/from/' + url_pas(title) + sh + '" />', data, 1)
           
     data = re.sub("\[nicovideo\((?P<in>[^,)]*)(?:(?:,(?:[^,)]*))+)?\)\]", "[[http://embed.nicovideo.jp/watch/\g<in>]]", data)
     
