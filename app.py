@@ -47,18 +47,14 @@ def redirect(data):
 r_ver = '2.3.2'
 p_ver = ''
 
-try:
-    curs.execute('select data from other where name = "version"')
-    version = curs.fetchall()
-    if(version):
-        t_ver = re.sub('\.', '', version[0][0])
-        r_t_ver = re.sub('\.', '', r_ver)
-        if(int(t_ver) < int(r_t_ver)):
-            curs.execute("update other set data = ? where name = 'version'", [r_ver])    
-except:
-    pass
-
 conn.commit()
+
+curs.execute('select data from other where name = "skin"')
+s_d = curs.fetchall()
+if(s_d):
+    TEMPLATE_PATH.insert(0, './views/' + s_d[0][0] + '/')
+else:
+    TEMPLATE_PATH.insert(0, './views/yousoro/')
 
 @route('/setup', method=['GET', 'POST'])
 def setup():
@@ -85,7 +81,6 @@ def setup():
             curs.execute("create table re_admin(who text, what text, time text)")
 
             curs.execute("insert into alist (name, acl) values ('소유자', 'owner')")
-            curs.execute("insert into other (name, data) values ('version', ?)", [r_ver])
             conn.commit()
         except:
             pass

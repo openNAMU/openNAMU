@@ -2,13 +2,13 @@
     <head>
         <meta charset="utf-8">
         <title>{{imp[0]}} - {{imp[1]}}</title>
-        <link rel="stylesheet" href="/views/css/primer.css">
-        <link rel="stylesheet" href="/views/css/style.css">
+        <link rel="stylesheet" href="/views/yousoro/css/primer.css">
+        <link rel="stylesheet" href="/views/yousoro/css/style.css">
         <!-- 필수 CSS, JS -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.7/styles/default.min.css">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.7/highlight.min.js"></script>
         <script>hljs.initHighlightingOnLoad();</script>
-        <link rel="stylesheet" href="/views/css/awesome/font-awesome.min.css">
+        <link rel="stylesheet" href="/views/yousoro/css/awesome/font-awesome.min.css">
         <script type="text/x-mathjax-config">MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});</script>
         <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS_CHTML"></script>
         <script src='https://www.google.com/recaptcha/api.js'></script>
@@ -33,7 +33,7 @@
         <meta name="twitter:title" content="{{imp[0]}}">
         <meta name="twitter:site" content="@{{imp[1]}}">
         <meta name="twitter:card" content="summary">
-        <link rel="shortcut icon" href="/views/img/on.ico">
+        <link rel="shortcut icon" href="/views/yousoro/img/on.ico">
         <meta name="viewport" content="width=device-width, initial-scale=1">
     </head>
     <body>
@@ -120,7 +120,7 @@
                     {{!imp[2]}}
                 </p>
                 <div id="powered">
-                    <a href="https://github.com/2DU/openNAMU"><img src="/views/img/on2.png" width="100px"></a>
+                    <a href="https://github.com/2DU/openNAMU"><img src="/views/yousoro/img/on2.png" width="100px"></a>
                 </div>
             </div>
         </div>
