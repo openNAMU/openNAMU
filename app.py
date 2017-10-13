@@ -45,20 +45,25 @@ def redirect(data):
     return('<meta http-equiv="refresh" content="0;url=' + data + '" />')
 
 r_ver = '2.3.3'
-p_ver = ''
+p_ver = 'a'
 
 conn.commit()
 
 curs.execute('select data from other where name = "skin"')
 s_d = curs.fetchall()
 if(s_d):
-    print(os.path.exists(os.path.abspath('./views/yousoro/index.tpl')))
     if(os.path.exists(os.path.abspath('./views/' + s_d[0][0] + '/index.tpl')) == 1):
         TEMPLATE_PATH.insert(0, './views/' + s_d[0][0] + '/')
     else:
         TEMPLATE_PATH.insert(0, './views/yousoro/')
 else:
     TEMPLATE_PATH.insert(0, './views/yousoro/')
+    
+try:
+    curs.execute('select new from move limit 1')
+except:
+    curs.execute("create table move(origin text, new text, date text, who text, send text)")
+    print('move 테이블 생성')
 
 @route('/setup', method=['GET', 'POST'])
 def setup():
@@ -83,6 +88,7 @@ def setup():
             curs.execute("create table other(name text, data text)")
             curs.execute("create table alist(name text, acl text)")
             curs.execute("create table re_admin(who text, what text, time text)")
+            curs.execute("create table move(origin text, new text, date text, who text, send text)")
 
             curs.execute("insert into alist (name, acl) values ('소유자', 'owner')")
             conn.commit()
@@ -1459,6 +1465,36 @@ def delete(name = None):
         else:
             return(redirect('/w/' + url_pas(name)))
             
+@route('/move_data/<name:path>')
+@route('/move_data/<name:path>/<n:int>')
+def move_data(name = None, n = 1):
+    if(n > 0):
+        i = n
+    else:
+        i = 1
+       
+    j = i * 50
+    da = '<ul>'
+    
+    curs.execute("select origin, new, date, who, send from move where origin = ? or new = ? limit ?, ?", [name, name, j - 50, j])
+    for d in curs.fetchall():
+        if(d[4] == ''):
+            sn = '(없음)'
+        else:
+            sn = d[4]
+        da += '<li><a href="/move_data/' + url_pas(d[0]) + '">' + d[0] + '</a> >> <a href="/move_data/' + url_pas(d[1]) + '">' + d[1] + '</a> / ' + d[2] + ' / ' + d[3] + ' / ' + sn + '</li>'
+    da += '</ul><br><a href="/move_data/' + name + '/' + str(n - 1) + '">(이전)</a> <a href="/move_data/' + name + '/' + str(n + 1) + '">(이후)</a>'
+    
+    return(
+        html_minify(
+            template('index', 
+                imp = [name, wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), ' (이동)', 0],
+                data = da,
+                menu = [['w/' + url_pas(name), '문서']]
+            )
+        )
+    )        
+            
 @route('/move/<name:path>', method=['POST', 'GET'])
 def move(name = None):
     ip = ip_check()
@@ -1478,19 +1514,27 @@ def move(name = None):
         if(row):
             return(redirect('/error/19'))
 
+
+        
+        if(rows):            
+            curs.execute("update data set title = ? where title = ?", [request.forms.title, name])
+            curs.execute("update back set link = ? where link = ?", [request.forms.title, name])
+            curs.execute("update cat set cat = ? where cat = ?", [request.forms.title, name])
+            
+            d = rows[0][0]
+        else:
+            d = ''
+            
         history_plus(
             name, 
-            rows[0][0], 
+            d,
             today, 
             ip, 
             request.forms.send + ' (<a href="/w/' + url_pas(name) + '">' + name + '</a> - <a href="/w/' + url_pas(request.forms.title) + '">' + request.forms.title + '</a> 이동)', 
             leng
         )
-        
-        if(rows):
-            curs.execute("update data set title = ? where title = ?", [request.forms.title, name])
-            curs.execute("update back set link = ? where link = ?", [request.forms.title, name])
-            curs.execute("update cat set cat = ? where cat = ?", [request.forms.title, name])
+            
+        curs.execute('insert into move (origin, new, date, who, send) values (?, ?, ?, ?, ?)', [name, request.forms.title, today, ip, request.forms.send])
 
         curs.execute("update history set title = ? where title = ?", [request.forms.title, name])
         conn.commit()
@@ -1517,7 +1561,7 @@ def move(name = None):
                                 <br> \
                                 <button class="btn btn-primary" type="submit">이동</button> \
                             </form>',
-                    menu = [['w/' + url_pas(name), '문서']]
+                    menu = [['w/' + url_pas(name), '문서'], ['move_data/' + url_pas(name), '기록']]
                 )
             )
         )
