@@ -3103,10 +3103,13 @@ def upload():
                                 <input type="file" name="f_data"> \
                                 <br> \
                                 <br> \
-                                <input placeholder="파일 이름" name="f_name"> \
+                                <input placeholder="파일 이름" name="f_name" type="text"> \
                                 <br> \
                                 <br> \
-                                <input placeholder="라이선스" name="f_lice"> \
+                                <input placeholder="라이선스" name="f_lice" type="text"> \
+                                <br> \
+                                <br> \
+                                <span>원인 모를 버그로 한글이 되지 않습니다.</span> \
                                 <br> \
                                 <br> \
                                 <button class="btn btn-primary" type="submit">저장</button> \

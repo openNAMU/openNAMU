@@ -547,25 +547,9 @@ def namumark(title, data, num, in_c, toc_y):
     data = re.sub('__(?P<in>.+?)__(?!_)', '<u>\g<in></u>', data)
     data = re.sub('\^\^(?P<in>.+?)\^\^(?!\^)', '<sup>\g<in></sup>', data)
     data = re.sub(',,(?P<in>.+?),,(?!,)', '<sub>\g<in></sub>', data)
-    
     data = re.sub('&lt;math&gt;(?P<in>((?!&lt;math&gt;).)*)&lt;\/math&gt;', '$\g<in>$', data)
-    
-    data = re.sub('{{\|(?P<in>(?:(?:(?:(?!\|}}).)*)(?:\n?))+)\|}}', '<table> \
-                                                                        <tbody> \
-                                                                            <tr> \
-                                                                                <td> \
-                                                                                    \g<in> \
-                                                                                </td> \
-                                                                            </tr> \
-                                                                        </tbody> \
-                                                                    </table>', data)
-    
-    data = re.sub('\[ruby\((?P<in>[^\,]*)\,\s?(?P<out>[^\)]*)\)\]', '<ruby> \
-                                                                        \g<in> \
-                                                                        <rp>(</rp> \
-                                                                        <rt>\g<out></rt> \
-                                                                        <rp>)</rp> \
-                                                                    </ruby>', data)
+    data = re.sub('{{\|(?P<in>(?:(?:(?:(?!\|}}).)*)(?:\n?))+)\|}}', '<table><tbody><tr><td>\g<in></td></tr></tbody></table>', data)
+    data = re.sub('\[ruby\((?P<in>[^\,]*)\,\s?(?P<out>[^\)]*)\)\]', '<ruby>\g<in><rp>(</rp><rt>\g<out></rt><rp>)</rp></ruby>', data)
     
     test = re.findall('\[\[wiki:([^|\]]+)(?:\|([^\]]+))?\]\]', data)
     if(test):
@@ -731,7 +715,7 @@ def namumark(title, data, num, in_c, toc_y):
                     break
 
             end = re.sub("\n", '', end)
-            data = re.sub("(?:(?:(?:( +)\*\s([^\n]*))\n?)+)", '<ul style="margin-top: 10px;" id="list">' + end + '</ul>', data, 1)
+            data = re.sub("(?:(?:(?:( +)\*\s([^\n]*))\n?)+)", '<ul style="margin-top: 10px; margin-bottom: 10px;" id="list">' + end + '</ul>', data, 1)
         else:
             break
     
