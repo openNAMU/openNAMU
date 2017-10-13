@@ -52,7 +52,11 @@ conn.commit()
 curs.execute('select data from other where name = "skin"')
 s_d = curs.fetchall()
 if(s_d):
-    TEMPLATE_PATH.insert(0, './views/' + s_d[0][0] + '/')
+    print(os.path.exists(os.path.abspath('./views/yousoro/index.tpl')))
+    if(os.path.exists(os.path.abspath('./views/' + s_d[0][0] + '/index.tpl')) == 1):
+        TEMPLATE_PATH.insert(0, './views/' + s_d[0][0] + '/')
+    else:
+        TEMPLATE_PATH.insert(0, './views/yousoro/')
 else:
     TEMPLATE_PATH.insert(0, './views/yousoro/')
 
@@ -95,18 +99,22 @@ def edit_set():
             curs.execute("update other set data = ? where name = 'frontpage'", [request.forms.frontpage])
             curs.execute("update other set data = ? where name = 'license'", [request.forms.license])
             curs.execute("update other set data = ? where name = 'upload'", [request.forms.upload])
-            curs.execute("update other set data = ? where name = 'recapt_p'", [request.forms.recapt_p])
-            curs.execute("update other set data = ? where name = 'recapt_s'", [request.forms.recapt_s])
+            curs.execute("update other set data = ? where name = 'skin'", [request.forms.skin])
             conn.commit()
 
             return(redirect('/edit_set'))
         else:
+            name = ''
+            frontpage = ''
+            license = ''
+            upload = ''
+            skin = ''
+            
             curs.execute('select data from other where name = ?', ['name'])
             name_d = curs.fetchall()
             if(name_d):
                 name = name_d[0][0]
             else:
-                name = ''
                 curs.execute('insert into other (name, data) values (?, "무명위키")', ['name'])
 
             curs.execute('select data from other where name = "frontpage"')
@@ -114,7 +122,6 @@ def edit_set():
             if(frontpage_d):
                 frontpage = frontpage_d[0][0]
             else:
-                frontpage = ''
                 curs.execute('insert into other (name, data) values ("frontpage", "위키:대문")')
 
             curs.execute('select data from other where name = "license"')
@@ -122,7 +129,6 @@ def edit_set():
             if(license_d):
                 license = license_d[0][0]
             else:
-                license = ''
                 curs.execute('insert into other (name, data) values ("license", "CC 0")')
 
             curs.execute('select data from other where name = "upload"')
@@ -130,7 +136,6 @@ def edit_set():
             if(upload_d):
                 upload = upload_d[0][0]
             else:
-                upload = ''
                 curs.execute('insert into other (name, data) values ("upload", "2")')
             
             curs.execute('select data from other where name = "recapt_p"')
@@ -138,7 +143,6 @@ def edit_set():
             if(recapt_p):
                 recapt_p_d = recapt_p[0][0]
             else:
-                recapt_p_d = ''
                 curs.execute('insert into other (name, data) values ("recapt_p", "")')
             
             curs.execute('select data from other where name = "recapt_s"')
@@ -146,51 +150,49 @@ def edit_set():
             if(recapt_s):
                 recapt_s_d = recapt_s[0][0]
             else:
-                recapt_s_d = ''
                 curs.execute('insert into other (name, data) values ("recapt_s", "")')
+                
+            curs.execute('select data from other where name = "skin"')
+            s_d = curs.fetchall()
+            if(s_d):
+                skin = s_d[0][0]
+            else:
+                curs.execute('insert into other (name, data) values ("skin", "")')
+            
             conn.commit()
-
             return(
                 html_minify(
                     template('index', 
                         imp = ['설정 편집', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
                         data = '<form method="post"> \
-                                    <span>위키 이름</span> \
+                                    <span>위키 이름 (기본 : 무명위키)</span> \
                                     <br> \
                                     <br> \
                                     <input placeholder="위키 이름" style="width: 100%;" type="text" name="name" value="' + name + '"> \
                                     <br> \
                                     <br> \
-                                    <span>시작 페이지</span> \
+                                    <span>시작 페이지 (기본 : 위키:대문)</span> \
                                     <br> \
                                     <br> \
                                     <input placeholder="시작 페이지" style="width: 100%;" type="text" name="frontpage" value="' + frontpage + '"> \
                                     <br> \
                                     <br> \
-                                    <span>라이선스</span> \
+                                    <span>라이선스 (기본 : CC 0)</span> \
                                     <br> \
                                     <br> \
                                     <input placeholder="라이선스" style="width: 100%;" type="text" name="license" value="' + license + '"> \
                                     <br> \
                                     <br> \
-                                    <span>파일 올리기 최대 크기</span> \
+                                    <span>파일 올리기 최대 크기 (기본 : 2)</span> \
                                     <br> \
                                     <br> \
                                     <input placeholder="파일 올리기 최대 크기" style="width: 100%;" type="text" name="upload" value="' + upload + '"> \
                                     <br> \
                                     <br> \
-                                    <hr> \
-                                    <br> \
-                                    <span>구글 리캡차 코드 [공개] (선택)</span> \
+                                    <span>스킨 (기본 : yousoro)</span> \
                                     <br> \
                                     <br> \
-                                    <input placeholder="구글 리캡차 코드 [공개] (선택)" style="width: 100%;" type="text" name="recapt_p" value="' + recapt_p_d + '"> \
-                                    <br> \
-                                    <br> \
-                                    <span>구글 리캡차 코드 [비밀] (선택)</span> \
-                                    <br> \
-                                    <br> \
-                                    <input placeholder="구글 리캡차 코드 [비밀] (선택)" style="width: 100%;" type="text" name="recapt_s" value="' + recapt_s_d + '"> \
+                                    <input placeholder="스킨" style="width: 100%;" type="text" name="skin" value="' + skin + '"> \
                                     <br> \
                                     <br> \
                                     <button class="btn btn-primary" type="submit">저장</button> \
@@ -1539,8 +1541,9 @@ def other():
                                     ' * [[wiki:acl_list|ACL 문서]]\r\n' + \
                                     ' * [[wiki:admin_list|관리자 목록]]\r\n' + \
                                     ' * [[wiki:give_log|권한 목록]]\r\n' + \
-                                    ' * [[wiki:manager/1|관리자 메뉴]]\r\n' + \
                                     ' * [[wiki:upload|파일 올리기]]\r\n' + \
+                                    '== 관리자 ==\r\n' + \
+                                    ' * [[wiki:manager/1|관리자 메뉴]]\r\n' + \
                                     '== 버전 ==\r\n' + \
                                     '이 오픈나무는 [[https://github.com/2DU/openNAMU/blob/SQLite/version.md|' + r_ver + p_ver + ']]판 입니다.', 0, 0, 0),
                 menu = 0
