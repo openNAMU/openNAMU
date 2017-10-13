@@ -45,7 +45,7 @@ def redirect(data):
     return('<meta http-equiv="refresh" content="0;url=' + data + '" />')
 
 r_ver = '2.3.3'
-p_ver = 'a'
+p_ver = 'b'
 
 conn.commit()
 

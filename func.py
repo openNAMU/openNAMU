@@ -104,7 +104,7 @@ def include_check(name, data):
             if(data):
                 curs.execute("delete from back where link = ?", [back_p[0]])
                 curs.execute("delete from cat where cat = ?", [back_p[0]])
-                namumark(back_p[0], data[0][0], 1, 0)
+                namumark(back_p[0], data[0][0], 1, 0, 0)
     
 def login_check():
     session = request.environ.get('beaker.session')
