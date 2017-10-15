@@ -104,6 +104,10 @@ def setup():
 
     return(redirect('/'))
 
+@route('/del_alarm')
+def del_alarm():
+    curs.execute("delete from alarm where name = ?", [ip_check()])
+
 @route('/alarm')
 def alarm():
     ip = ip_check()
@@ -113,9 +117,14 @@ def alarm():
     da = '<ul>'    
     curs.execute("select data, date from alarm where name = ? order by date", [ip])
     dt = curs.fetchall()
-    for do in dt:
-        da += '<li>' + do + '</li>'
-    da = '</ul>'
+    if(dt):
+        da = '<a href="/del_alarm">(알람 삭제)</a><br><br>' + da
+
+        for do in dt:
+            da += '<li>' + do[0] + ' / ' + do[1] + '</li>'
+    else:
+        da += '<li>알림이 없습니다.</li>'
+    da += '</ul>'
 
     return(
             html_minify(
@@ -2018,30 +2027,36 @@ def topic(name = None, sub = None):
     admin = admin_check(3, None)
     
     if(request.method == 'POST'):
+        today = get_time()
+
         curs.execute("select id from topic where title = ? and sub = ? order by id + 0 desc limit 1", [name, sub])
         rows = curs.fetchall()
         if(rows):
             num = int(rows[0][0]) + 1
         else:
             num = 1
+
+            m = re.search('^사용자:(.+)', name)
+            if(m):
+                d = m.groups()
+                curs.execute('insert into alarm (name, data, date) values (?, ?, ?)', [d[0], ip + '님이 <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '">사용자 토론</a>을 시작했습니다.', today])
         
         if(ban == 1 and admin != 1):
             return(redirect('/ban'))
-        else:                    
-            today = get_time()
-            rd_plus(
-                name, 
-                sub, 
-                today
-            )
-            
-            data = re.sub("\[\[(분류:(?:(?:(?!\]\]).)*))\]\]", "[br]", request.forms.content)
-            data = savemark(data)
-            
-            curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, ?, ?, ?, '', '')", [str(num), name, sub, data, today, ip])
-            conn.commit()
-            
-            return(redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub)))
+
+        rd_plus(
+            name, 
+            sub, 
+            today
+        )
+        
+        data = re.sub("\[\[(분류:(?:(?:(?!\]\]).)*))\]\]", "[br]", request.forms.content)
+        data = savemark(data)
+        
+        curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, ?, ?, ?, '', '')", [str(num), name, sub, data, today, ip])
+        conn.commit()
+        
+        return(redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub)))
     else:
         style = ''
         div = ''
