@@ -63,6 +63,12 @@ if(s_d):
 else:
     TEMPLATE_PATH.insert(0, './views/yousoro/')
 
+try:
+    curs.execute('select name from alarm limit 1')
+except:
+    curs.execute("create table alarm(name text, data text, date text)")
+    print('alarm 테이블 생성')
+
 conn.commit()
     
 @route('/setup', method=['GET', 'POST'])
