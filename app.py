@@ -65,6 +65,12 @@ except:
     curs.execute("create table move(origin text, new text, date text, who text, send text)")
     print('move 테이블 생성')
 
+try:
+    curs.execute('select name from alarm limit 1')
+except:
+    curs.execute("create table alarm(name text, data text, date text)")
+    print('alarm 테이블 생성')
+
 @route('/setup', method=['GET', 'POST'])
 def setup():
     try:
@@ -89,6 +95,7 @@ def setup():
             curs.execute("create table alist(name text, acl text)")
             curs.execute("create table re_admin(who text, what text, time text)")
             curs.execute("create table move(origin text, new text, date text, who text, send text)")
+            curs.execute("create table alarm(name text, data text, date text)")
 
             curs.execute("insert into alist (name, acl) values ('소유자', 'owner')")
             conn.commit()
@@ -207,37 +214,6 @@ def edit_set():
                     )
                 )
             )
-    else:
-        return(redirect('/ban'))
-
-@route('/update')
-@route('/update/<num:int>')
-def update(num = 1):
-    try:
-        admin_check(None, 'update')
-    except:
-        curs.execute("create table re_admin(who text, what text, time text)")
-        return(redirect('/'))
-
-    if(admin_check(None, 'update') == 1):
-        if(num == 1):
-            return(
-                html_minify(
-                    template('index', 
-                        imp = ['업데이트 목록', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
-                        data = '<ul><li><a href="/update/2">2.2.1</a></li></ul>',
-                        menu = [['manager', '관리자']]
-                    )
-                )
-            )
-        elif(num == 2):
-            curs.execute('insert into other (name, data) values ("name", ?)', [set_data['name']])
-            curs.execute('insert into other (name, data) values ("frontpage", ?)', [set_data['frontpage']])
-            curs.execute('insert into other (name, data) values ("license", ?)', [set_data['license']])
-            curs.execute('insert into other (name, data) values ("upload", ?)', [set_data['upload']])
-        
-        conn.commit()
-        return(redirect('/'))
     else:
         return(redirect('/ban'))
 
@@ -1613,7 +1589,6 @@ def manager(num = 1):
                                         '== 소유자 ==\r\n' + \
                                         ' * [[wiki:indexing|인덱싱]]\r\n' + \
                                         ' * [[wiki:manager/8|관리 그룹 생성]]\r\n' + \
-                                        ' * [[wiki:update|업데이트 메뉴]]\r\n' + \
                                         ' * [[wiki:edit_set|설정 편집]]\r\n' + \
                                         ' * [[wiki:manager/9|JSON 출력]]\r\n' + \
                                         ' * [[wiki:json_in|JSON 입력]]\r\n' + \
