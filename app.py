@@ -104,6 +104,29 @@ def setup():
 
     return(redirect('/'))
 
+@route('/alarm')
+def alarm():
+    ip = ip_check()
+    if(re.search('(?:\.|:)', ip)):
+        return(redirect('/login'))    
+
+    da = '<ul>'    
+    curs.execute("select data, date from alarm where name = ? order by date", [ip])
+    dt = curs.fetchall()
+    for do in dt:
+        da += '<li>' + do + '</li>'
+    da = '</ul>'
+
+    return(
+            html_minify(
+                template('index', 
+                    imp = ['알림', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
+                    data = da,
+                    menu = [['user', '사용자']]
+                )
+            )
+        )
+
 @route('/edit_set', method=['POST', 'GET'])
 def edit_set():
     if(admin_check(None, 'edit_set') == 1):
@@ -117,58 +140,44 @@ def edit_set():
 
             return(redirect('/edit_set'))
         else:
-            name = ''
-            frontpage = ''
-            license = ''
-            upload = ''
-            skin = ''
+            nm = ''
+            fp = ''
+            lc = ''
+            ul = ''
+            si = ''
             
             curs.execute('select data from other where name = ?', ['name'])
-            name_d = curs.fetchall()
-            if(name_d):
-                name = name_d[0][0]
+            nm_d = curs.fetchall()
+            if(nm_d):
+                nm = nm_d[0][0]
             else:
                 curs.execute('insert into other (name, data) values (?, "무명위키")', ['name'])
 
             curs.execute('select data from other where name = "frontpage"')
-            frontpage_d = curs.fetchall()
-            if(frontpage_d):
-                frontpage = frontpage_d[0][0]
+            fp_d = curs.fetchall()
+            if(fp_d):
+                fp = fp_d[0][0]
             else:
                 curs.execute('insert into other (name, data) values ("frontpage", "위키:대문")')
 
             curs.execute('select data from other where name = "license"')
-            license_d = curs.fetchall()
-            if(license_d):
-                license = license_d[0][0]
+            lc_d = curs.fetchall()
+            if(lc_d):
+                lc = lc_d[0][0]
             else:
                 curs.execute('insert into other (name, data) values ("license", "CC 0")')
 
             curs.execute('select data from other where name = "upload"')
-            upload_d = curs.fetchall()
-            if(upload_d):
-                upload = upload_d[0][0]
+            ul_d = curs.fetchall()
+            if(ul_d):
+                ul = ul_d[0][0]
             else:
                 curs.execute('insert into other (name, data) values ("upload", "2")')
-            
-            curs.execute('select data from other where name = "recapt_p"')
-            recapt_p = curs.fetchall()
-            if(recapt_p):
-                recapt_p_d = recapt_p[0][0]
-            else:
-                curs.execute('insert into other (name, data) values ("recapt_p", "")')
-            
-            curs.execute('select data from other where name = "recapt_s"')
-            recapt_s = curs.fetchall()
-            if(recapt_s):
-                recapt_s_d = recapt_s[0][0]
-            else:
-                curs.execute('insert into other (name, data) values ("recapt_s", "")')
                 
             curs.execute('select data from other where name = "skin"')
-            s_d = curs.fetchall()
-            if(s_d):
-                skin = s_d[0][0]
+            si_d = curs.fetchall()
+            if(si_d):
+                si = si_d[0][0]
             else:
                 curs.execute('insert into other (name, data) values ("skin", "")')
             
@@ -181,31 +190,31 @@ def edit_set():
                                     <span>위키 이름 (기본 : 무명위키)</span> \
                                     <br> \
                                     <br> \
-                                    <input placeholder="위키 이름" style="width: 100%;" type="text" name="name" value="' + name + '"> \
+                                    <input placeholder="위키 이름" style="width: 100%;" type="text" name="name" value="' + nm + '"> \
                                     <br> \
                                     <br> \
                                     <span>시작 페이지 (기본 : 위키:대문)</span> \
                                     <br> \
                                     <br> \
-                                    <input placeholder="시작 페이지" style="width: 100%;" type="text" name="frontpage" value="' + frontpage + '"> \
+                                    <input placeholder="시작 페이지" style="width: 100%;" type="text" name="frontpage" value="' + fp + '"> \
                                     <br> \
                                     <br> \
                                     <span>라이선스 (기본 : CC 0)</span> \
                                     <br> \
                                     <br> \
-                                    <input placeholder="라이선스" style="width: 100%;" type="text" name="license" value="' + license + '"> \
+                                    <input placeholder="라이선스" style="width: 100%;" type="text" name="license" value="' + lc + '"> \
                                     <br> \
                                     <br> \
                                     <span>파일 올리기 최대 크기 (기본 : 2)</span> \
                                     <br> \
                                     <br> \
-                                    <input placeholder="파일 올리기 최대 크기" style="width: 100%;" type="text" name="upload" value="' + upload + '"> \
+                                    <input placeholder="파일 올리기 최대 크기" style="width: 100%;" type="text" name="upload" value="' + ul + '"> \
                                     <br> \
                                     <br> \
                                     <span>스킨 (기본 : yousoro)</span> \
                                     <br> \
                                     <br> \
-                                    <input placeholder="스킨" style="width: 100%;" type="text" name="skin" value="' + skin + '"> \
+                                    <input placeholder="스킨" style="width: 100%;" type="text" name="skin" value="' + si + '"> \
                                     <br> \
                                     <br> \
                                     <button class="btn btn-primary" type="submit">저장</button> \
@@ -3171,6 +3180,7 @@ def user_info():
                                                         plus + '\r\n' + \
                                                         ' * [[wiki:register|회원가입]]\r\n' + \
                                                         '== 기타 ==\r\n' + \
+                                                        ' * [[wiki:alarm|알림]]\r\n' + \
                                                         ' * [[wiki:change|비밀번호 변경]]\r\n' + \
                                                         ' * [[wiki:count|기여 횟수]]\r\n' + \
                                                         ' * [[wiki:custom_css|사용자 CSS]]\r\n' + \
