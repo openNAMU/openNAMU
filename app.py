@@ -44,8 +44,8 @@ BaseRequest.MEMFILE_MAX = 1000 ** 4
 def redirect(data):
     return('<meta http-equiv="refresh" content="0;url=' + data + '" />')
 
-r_ver = '2.3.3'
-p_ver = 'b'
+r_ver = '2.3.4'
+p_ver = ''
 
 try:
     curs.execute('select new from move limit 1')
