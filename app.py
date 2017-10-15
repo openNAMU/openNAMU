@@ -47,7 +47,11 @@ def redirect(data):
 r_ver = '2.3.3'
 p_ver = 'b'
 
-conn.commit()
+try:
+    curs.execute('select new from move limit 1')
+except:
+    curs.execute("create table move(origin text, new text, date text, who text, send text)")
+    print('move 테이블 생성')
 
 curs.execute('select data from other where name = "skin"')
 s_d = curs.fetchall()
@@ -58,19 +62,9 @@ if(s_d):
         TEMPLATE_PATH.insert(0, './views/yousoro/')
 else:
     TEMPLATE_PATH.insert(0, './views/yousoro/')
+
+conn.commit()
     
-try:
-    curs.execute('select new from move limit 1')
-except:
-    curs.execute("create table move(origin text, new text, date text, who text, send text)")
-    print('move 테이블 생성')
-
-try:
-    curs.execute('select name from alarm limit 1')
-except:
-    curs.execute("create table alarm(name text, data text, date text)")
-    print('alarm 테이블 생성')
-
 @route('/setup', method=['GET', 'POST'])
 def setup():
     try:
