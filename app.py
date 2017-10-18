@@ -2056,7 +2056,8 @@ def topic(name = None, sub = None):
             curs.execute("select ip from topic where title = ? and sub = ? and id = ?", [name, sub, da])
             row = curs.fetchall()
             if(row):
-                curs.execute('insert into alarm (name, data, date) values (?, ?, ?)', [row[0][0], ip + '님이 <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '#' + str(num) + '">토론</a>에서 언급 했습니다.', today])
+                if(not re.search('(\.|:)', row[0][0])):
+                    curs.execute('insert into alarm (name, data, date) values (?, ?, ?)', [row[0][0], ip + '님이 <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '#' + str(num) + '">토론</a>에서 언급 했습니다.', today])
             data = re.sub("(?P<in>#(?:[0-9]+))", '[[\g<in>]]', data)
 
         data = savemark(data)
