@@ -2369,18 +2369,18 @@ def change_password():
             curs.execute("select pw from user where id = ?", [request.forms.id])
             user = curs.fetchall()
             if(user):
-                if(not re.search('(\.|:)', ip)):
-                    return(redirect('/logout'))
+                if(re.search('(\.|:)', ip)):
+                    return(redirect('/login'))
+
+                if(bcrypt.checkpw(bytes(request.forms.pw, 'utf-8'), bytes(user[0][0], 'utf-8'))):
+                    hashed = bcrypt.hashpw(bytes(request.forms.pw2, 'utf-8'), bcrypt.gensalt())
+                    
+                    curs.execute("update user set pw = ? where id = ?", [hashed.decode(), request.forms.id])
+                    conn.commit()
+                    
+                    return(redirect('/user'))
                 else:
-                    if(bcrypt.checkpw(bytes(request.forms.pw, 'utf-8'), bytes(user[0][0], 'utf-8'))):
-                        hashed = bcrypt.hashpw(bytes(request.forms.pw2, 'utf-8'), bcrypt.gensalt())
-                        
-                        curs.execute("update user set pw = ? where id = ?", [hashed.decode(), request.forms.id])
-                        conn.commit()
-                        
-                        return(redirect('/login'))
-                    else:
-                        return(redirect('/error/10'))
+                    return(redirect('/error/10'))
             else:
                 return(redirect('/error/5'))
         else:
@@ -2389,8 +2389,8 @@ def change_password():
         if(ban == 1):
             return(redirect('/ban'))
 
-        if(not re.search('(\.|:)', ip)):
-            return(redirect('/logout'))
+        if(re.search('(\.|:)', ip)):
+            return(redirect('/login'))
 
         return(
             html_minify(
