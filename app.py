@@ -152,48 +152,23 @@ def edit_set():
 
             return(redirect('/edit_set'))
         else:
-            nm = ''
-            fp = ''
-            lc = ''
-            ul = ''
-            si = ''
+            i_list = ['name', 'frontpage', 'license', 'upload', 'skin']
+            n_list = ['무명위키', '위키:대문', 'CC 0', '2', '']
+            d_list = []
             
-            curs.execute('select data from other where name = ?', ['name'])
-            nm_d = curs.fetchall()
-            if(nm_d):
-                nm = nm_d[0][0]
-            else:
-                curs.execute('insert into other (name, data) values (?, "무명위키")', ['name'])
+            x = 0
+            for i in i_list:
+                curs.execute('select data from other where name = ?', [i])
+                sql_d = curs.fetchall()
+                if(sql_d):
+                    d_list += [sql_d[0][0]]
+                else:
+                    curs.execute('insert into other (name, data) values (?, ?)', [i, n_list[x]])
+                    d_list += [n_list[x]]
 
-            curs.execute('select data from other where name = "frontpage"')
-            fp_d = curs.fetchall()
-            if(fp_d):
-                fp = fp_d[0][0]
-            else:
-                curs.execute('insert into other (name, data) values ("frontpage", "위키:대문")')
-
-            curs.execute('select data from other where name = "license"')
-            lc_d = curs.fetchall()
-            if(lc_d):
-                lc = lc_d[0][0]
-            else:
-                curs.execute('insert into other (name, data) values ("license", "CC 0")')
-
-            curs.execute('select data from other where name = "upload"')
-            ul_d = curs.fetchall()
-            if(ul_d):
-                ul = ul_d[0][0]
-            else:
-                curs.execute('insert into other (name, data) values ("upload", "2")')
-                
-            curs.execute('select data from other where name = "skin"')
-            si_d = curs.fetchall()
-            if(si_d):
-                si = si_d[0][0]
-            else:
-                curs.execute('insert into other (name, data) values ("skin", "")')
-            
+                x += 1
             conn.commit()
+
             return(
                 html_minify(
                     template('index', 
@@ -202,31 +177,31 @@ def edit_set():
                                     <span>위키 이름 (기본 : 무명위키)</span> \
                                     <br> \
                                     <br> \
-                                    <input placeholder="위키 이름" style="width: 100%;" type="text" name="name" value="' + nm + '"> \
+                                    <input placeholder="위키 이름" style="width: 100%;" type="text" name="name" value="' + d_list[0] + '"> \
                                     <br> \
                                     <br> \
                                     <span>시작 페이지 (기본 : 위키:대문)</span> \
                                     <br> \
                                     <br> \
-                                    <input placeholder="시작 페이지" style="width: 100%;" type="text" name="frontpage" value="' + fp + '"> \
+                                    <input placeholder="시작 페이지" style="width: 100%;" type="text" name="frontpage" value="' + d_list[1] + '"> \
                                     <br> \
                                     <br> \
                                     <span>라이선스 (기본 : CC 0)</span> \
                                     <br> \
                                     <br> \
-                                    <input placeholder="라이선스" style="width: 100%;" type="text" name="license" value="' + lc + '"> \
+                                    <input placeholder="라이선스" style="width: 100%;" type="text" name="license" value="' + d_list[2] + '"> \
                                     <br> \
                                     <br> \
                                     <span>파일 올리기 최대 크기 (기본 : 2)</span> \
                                     <br> \
                                     <br> \
-                                    <input placeholder="파일 올리기 최대 크기" style="width: 100%;" type="text" name="upload" value="' + ul + '"> \
+                                    <input placeholder="파일 올리기 최대 크기" style="width: 100%;" type="text" name="upload" value="' + d_list[3] + '"> \
                                     <br> \
                                     <br> \
                                     <span>스킨 (기본 : yousoro)</span> \
                                     <br> \
                                     <br> \
-                                    <input placeholder="스킨" style="width: 100%;" type="text" name="skin" value="' + si + '"> \
+                                    <input placeholder="스킨" style="width: 100%;" type="text" name="skin" value="' + d_list[4] + '"> \
                                     <br> \
                                     <br> \
                                     <button class="btn btn-primary" type="submit">저장</button> \
