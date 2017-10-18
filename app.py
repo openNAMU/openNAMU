@@ -115,7 +115,7 @@ def alarm():
         return(redirect('/login'))    
 
     da = '<ul>'    
-    curs.execute("select data, date from alarm where name = ? order by date", [ip])
+    curs.execute("select data, date from alarm where name = ? order by date desc", [ip])
     dt = curs.fetchall()
     if(dt):
         da = '<a href="/del_alarm">(알람 삭제)</a><br><br>' + da
@@ -2051,6 +2051,14 @@ def topic(name = None, sub = None):
         )
         
         data = re.sub("\[\[(분류:(?:(?:(?!\]\]).)*))\]\]", "[br]", request.forms.content)
+        m = re.findall("(?:#([0-9]+))", data)
+        for da in m:
+            curs.execute("select ip from topic where title = ? and sub = ? and id = ?", [name, sub, da])
+            row = curs.fetchall()
+            if(row):
+                curs.execute('insert into alarm (name, data, date) values (?, ?, ?)', [row[0][0], ip + '님이 <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '#' + str(num) + '">토론</a>에서 언급 했습니다.', today])
+            data = re.sub("(?P<in>#(?:[0-9]+))", '[[\g<in>]]', data)
+
         data = savemark(data)
         
         curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, ?, ?, ?, '', '')", [str(num), name, sub, data, today, ip])
@@ -2098,7 +2106,6 @@ def topic(name = None, sub = None):
 
         for dain in top:                     
             top_data = namumark('', dain[0], 0, 0, 0)
-            top_data = re.sub("(?P<in>#(?:[0-9]*))", '<a href="\g<in>">\g<in></a>', top_data)
                     
             ip = ip_pas(dain[3], 1)
 
@@ -2126,21 +2133,19 @@ def topic(name = None, sub = None):
         for dain in toda:
             if(i == 0):
                 start = dain[3]
-                
-            indata = namumark('', dain[0], 0, 0, 0)
-            indata = re.sub("(?P<in>#(?:[0-9]*))", '<a href="\g<in>">\g<in></a>', indata)
             
             chad = ''
+            indata = dain[0]
             if(dain[4] == 'O'):
-                indata = '<br>'
-                block = 'style="display: none;"'
-                
+                block = 'style="background: gainsboro;"'
                 curs.execute("select who from re_admin where what = ? order by time desc limit 1", ['blind (' + name + ' - ' + sub + '#' + str(i + 1) + ')'])
                 bl_da = curs.fetchall()
                 if(bl_da):
-                    chad += ' @' + bl_da[0][0]
+                    indata = '[[사용자:' + bl_da[0][0] + ']]님이 가림'
             else:
                 block = ''
+
+            indata = namumark('', indata, 0, 0, 0)
 
             if(admin == 1):
                 if(dain[4] == 'O'):
