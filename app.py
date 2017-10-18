@@ -107,6 +107,9 @@ def setup():
 @route('/del_alarm')
 def del_alarm():
     curs.execute("delete from alarm where name = ?", [ip_check()])
+    conn.commit()
+
+    return(redirect('/alarm'))
 
 @route('/alarm')
 def alarm():

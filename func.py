@@ -109,7 +109,11 @@ def include_check(name, data):
 def login_check():
     session = request.environ.get('beaker.session')
     if(session.get('Now') == 1):
-        return(1)
+        curs.execute('select name from alarm limit 1')
+        if(curs.fetchall()):
+            return(2)
+        else:
+            return(1)
     else:
         return(0)
 
