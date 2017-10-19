@@ -217,7 +217,7 @@ def mid_pas(data, fol_num, include, in_c):
         m = p.search(data)
         if(m):
             d = m.groups()
-            data = p.sub('###' + d[0] + '###', data, 1)
+            data = p.sub('###' + d[0] + '/###', data, 1)
         else:
             break
 
@@ -230,7 +230,7 @@ def mid_pas(data, fol_num, include, in_c):
         else:
             break
 
-    com3 = re.compile('###((?:(?!###).)+)###', re.DOTALL)
+    com3 = re.compile('###((?:(?!\/###).)+)\/###', re.DOTALL)
     m = com3.search(data)
     while(1):
         m = com3.search(data)
