@@ -48,28 +48,33 @@ r_ver = '2.3.4'
 p_ver = ''
 
 try:
-    curs.execute('select new from move limit 1')
-except:
-    curs.execute("create table move(origin text, new text, date text, who text, send text)")
-    print('move 테이블 생성')
+    curs.execute("select title from data limit 1")
 
-curs.execute('select data from other where name = "skin"')
-s_d = curs.fetchall()
-if(s_d):
-    if(os.path.exists(os.path.abspath('./views/' + s_d[0][0] + '/index.tpl')) == 1):
-        TEMPLATE_PATH.insert(0, './views/' + s_d[0][0] + '/')
+    try:
+        curs.execute('select new from move limit 1')
+    except:
+        curs.execute("create table move(origin text, new text, date text, who text, send text)")
+        print('move 테이블 생성')
+
+    curs.execute('select data from other where name = "skin"')
+    s_d = curs.fetchall()
+    if(s_d):
+        if(os.path.exists(os.path.abspath('./views/' + s_d[0][0] + '/index.tpl')) == 1):
+            TEMPLATE_PATH.insert(0, './views/' + s_d[0][0] + '/')
+        else:
+            TEMPLATE_PATH.insert(0, './views/yousoro/')
     else:
         TEMPLATE_PATH.insert(0, './views/yousoro/')
-else:
-    TEMPLATE_PATH.insert(0, './views/yousoro/')
 
-try:
-    curs.execute('select name from alarm limit 1')
+    try:
+        curs.execute('select name from alarm limit 1')
+    except:
+        curs.execute("create table alarm(name text, data text, date text)")
+        print('alarm 테이블 생성')
+
+    conn.commit()
 except:
-    curs.execute("create table alarm(name text, data text, date text)")
-    print('alarm 테이블 생성')
-
-conn.commit()
+    pass
     
 @route('/setup', method=['GET', 'POST'])
 def setup():
