@@ -789,7 +789,6 @@ def namumark(title, data, num, in_c, toc_y):
         b = pop_re.search(data)
         if(b):
             results = b.groups()
-            print(results)
             try:
                 if(not results[1] and results[0]):
                     i = 0
@@ -848,7 +847,6 @@ def namumark(title, data, num, in_c, toc_y):
                     tou = re.sub('#d#(?P<in>(?:(?!#\/d#).)*)#\/d#', '[\g<in>]', tou)
 
                 data = pop_re.sub("<br>" + tou, data, 1)
-                print(data)
                 tou = "<hr style='margin-top: 30px;' id='footnote'><div><br>"
         else:
             tou += '</div>'
