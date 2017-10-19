@@ -212,7 +212,41 @@ def html_pas(data):
     return(data)
     
 def mid_pas(data, fol_num, include, in_c):
+    p = re.compile('{{{((?:(?:(?:\+|-)[0-5])|(?:#|@)(?:(?:[0-9a-f-A-F]{3}){1,2}|(?:\w+))|(?:#!(?:html|wiki|noin|folding|syntax)))(?:(?!{{{|}}}).)+)}}}', re.DOTALL)
+    while(1):
+        m = p.search(data)
+        if(m):
+            d = m.groups()
+            data = p.sub('###' + d[0] + '###', data, 1)
+        else:
+            break
+
     com = re.compile("{{{((?:(?!{{{|}}}).)*)}}}", re.DOTALL)
+    while(1):
+        m = com.search(data)
+        if(m):
+            d = m.groups()
+            data = com.sub('<code>' + d[0] + '</code>', data, 1)
+        else:
+            break
+
+    com3 = re.compile('###((?:(?!###).)+)###', re.DOTALL)
+    m = com3.search(data)
+    while(1):
+        m = com3.search(data)
+        if(m):
+            d = m.groups()
+            data = com3.sub('{{{' + d[0] + '}}}', data, 1)
+        else:
+            break
+
+    com2 = re.compile("<code>((?:(?!(?:<code>|<\/code>)).)*)<\/code>", re.DOTALL)
+    da_com = com2.findall(data)
+    for com_da in da_com:
+        mid_data = com_da.replace('<', '&lt;').replace('>', '&gt;')
+        mid_data = re.sub("(?P<in>.)", "#no#\g<in>#/no#", mid_data)
+        data = com2.sub(mid_data, data, 1)
+
     while(1):
         is_it = com.search(data)
         if(is_it):
@@ -224,17 +258,14 @@ def mid_pas(data, fol_num, include, in_c):
             small_a = re.compile("^\-([1-5])\s(.*)$", re.DOTALL)
             small = small_a.search(it_d)
 
-            color_b = re.compile("^(#(?:[0-9a-f-A-F]{6}|[0-9a-f-A-F]{3}))\s(.*)$", re.DOTALL)
+            color_b = re.compile("^(#(?:[0-9a-f-A-F]{3}){1,2})\s(.*)$", re.DOTALL)
             color_2 = color_b.search(it_d)
 
             color_c = re.compile("^#(\w+)\s(.*)$", re.DOTALL)
             color_3 = color_c.search(it_d)
 
-            back_a = re.compile("^@([0-9a-f-A-F]{6})\s(.*)$", re.DOTALL)
+            back_a = re.compile("^@((?:[0-9a-f-A-F]{3}){1,2})\s(.*)$", re.DOTALL)
             back = back_a.search(it_d)
-
-            back_b = re.compile("^@([0-9a-f-A-F]{3})\s(.*)$", re.DOTALL)
-            back_2 = back_b.search(it_d)
 
             back_c = re.compile("^@(\w+)\s(.*)$", re.DOTALL)
             back_3 = back_c.search(it_d)
@@ -269,9 +300,6 @@ def mid_pas(data, fol_num, include, in_c):
             elif(back):
                 back_d_1 = back.groups()
                 data = com.sub('<span style="background: #' + back_d_1[0] + '">' + back_d_1[1] + '</span>', data, 1)
-            elif(back_2):
-                back_d_2 = back_2.groups()
-                data = com.sub('<span style="background: #' + back_d_2[0] + '">' + back_d_2[1] + '</span>', data, 1)
             elif(back_3):
                 back_d_3 = back_3.groups()
                 data = com.sub('<span style="background: ' + back_d_3[0] + '">' + back_d_3[1] + '</span>', data, 1)
@@ -306,17 +334,9 @@ def mid_pas(data, fol_num, include, in_c):
                 else:
                     data = com.sub(include_out.groups()[0], data, 1)
             else:
-                data = com.sub('<code>' + it_d + '</code>', data, 1)
+                data = com.sub(it_d, data, 1)
         else:
             break
-            
-    com = re.compile("<code>((?:(?!(?:<code>|<\/code>)).)*)<\/code>", re.DOTALL)
-    da_com = com.findall(data)
-    for com_da in da_com:
-        mid_data = com_da.replace('<', '&lt;').replace('>', '&gt;')
-        mid_data = re.sub("(?P<in>.)", "#no#\g<in>#/no#", mid_data)
-              
-        data = com.sub(mid_data, data, 1)
             
     return([data, fol_num])
 

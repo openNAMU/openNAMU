@@ -145,76 +145,88 @@ def alarm():
         )
 
 @route('/edit_set', method=['POST', 'GET'])
-def edit_set():
-    if(admin_check(None, 'edit_set') == 1):
-        if(request.method == 'POST'):
-            curs.execute("update other set data = ? where name = ?", [request.forms.name, 'name'])
-            curs.execute("update other set data = ? where name = 'frontpage'", [request.forms.frontpage])
-            curs.execute("update other set data = ? where name = 'license'", [request.forms.license])
-            curs.execute("update other set data = ? where name = 'upload'", [request.forms.upload])
-            curs.execute("update other set data = ? where name = 'skin'", [request.forms.skin])
-            conn.commit()
-
-            return(redirect('/edit_set'))
-        else:
-            i_list = ['name', 'frontpage', 'license', 'upload', 'skin']
-            n_list = ['무명위키', '위키:대문', 'CC 0', '2', '']
-            d_list = []
-            
-            x = 0
-            for i in i_list:
-                curs.execute('select data from other where name = ?', [i])
-                sql_d = curs.fetchall()
-                if(sql_d):
-                    d_list += [sql_d[0][0]]
-                else:
-                    curs.execute('insert into other (name, data) values (?, ?)', [i, n_list[x]])
-                    d_list += [n_list[x]]
-
-                x += 1
-            conn.commit()
-
-            return(
-                html_minify(
-                    template('index', 
-                        imp = ['설정 편집', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
-                        data = '<form method="post"> \
-                                    <span>위키 이름 (기본 : 무명위키)</span> \
-                                    <br> \
-                                    <br> \
-                                    <input placeholder="위키 이름" style="width: 100%;" type="text" name="name" value="' + d_list[0] + '"> \
-                                    <br> \
-                                    <br> \
-                                    <span>시작 페이지 (기본 : 위키:대문)</span> \
-                                    <br> \
-                                    <br> \
-                                    <input placeholder="시작 페이지" style="width: 100%;" type="text" name="frontpage" value="' + d_list[1] + '"> \
-                                    <br> \
-                                    <br> \
-                                    <span>라이선스 (기본 : CC 0)</span> \
-                                    <br> \
-                                    <br> \
-                                    <input placeholder="라이선스" style="width: 100%;" type="text" name="license" value="' + d_list[2] + '"> \
-                                    <br> \
-                                    <br> \
-                                    <span>파일 올리기 최대 크기 (기본 : 2)</span> \
-                                    <br> \
-                                    <br> \
-                                    <input placeholder="파일 올리기 최대 크기" style="width: 100%;" type="text" name="upload" value="' + d_list[3] + '"> \
-                                    <br> \
-                                    <br> \
-                                    <span>스킨 (기본 : yousoro)</span> \
-                                    <br> \
-                                    <br> \
-                                    <input placeholder="스킨" style="width: 100%;" type="text" name="skin" value="' + d_list[4] + '"> \
-                                    <br> \
-                                    <br> \
-                                    <button class="btn btn-primary" type="submit">저장</button> \
-                                </form>',
-                        menu = [['manager', '관리자']]
-                    )
+@route('/edit_set/<num:int>', method=['POST', 'GET'])
+def edit_set(num = 0):
+    if(num == 0):
+        return(
+            html_minify(
+                template('index', 
+                    imp = ['설정 편집', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
+                    data = '<ul><li><a href="/edit_set/1">기본 설정</a></li></ul>',
+                    menu = [['manager', '관리자']]
                 )
             )
+        )
+    elif(num == 1):
+        if(admin_check(None, 'edit_set') == 1):
+            if(request.method == 'POST'):
+                curs.execute("update other set data = ? where name = ?", [request.forms.name, 'name'])
+                curs.execute("update other set data = ? where name = 'frontpage'", [request.forms.frontpage])
+                curs.execute("update other set data = ? where name = 'license'", [request.forms.license])
+                curs.execute("update other set data = ? where name = 'upload'", [request.forms.upload])
+                curs.execute("update other set data = ? where name = 'skin'", [request.forms.skin])
+                conn.commit()
+
+                return(redirect('/edit_set'))
+            else:
+                i_list = ['name', 'frontpage', 'license', 'upload', 'skin']
+                n_list = ['무명위키', '위키:대문', 'CC 0', '2', '']
+                d_list = []
+                
+                x = 0
+                for i in i_list:
+                    curs.execute('select data from other where name = ?', [i])
+                    sql_d = curs.fetchall()
+                    if(sql_d):
+                        d_list += [sql_d[0][0]]
+                    else:
+                        curs.execute('insert into other (name, data) values (?, ?)', [i, n_list[x]])
+                        d_list += [n_list[x]]
+
+                    x += 1
+                conn.commit()
+
+                return(
+                    html_minify(
+                        template('index', 
+                            imp = ['설정 편집', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
+                            data = '<form method="post"> \
+                                        <span>위키 이름 (기본 : 무명위키)</span> \
+                                        <br> \
+                                        <br> \
+                                        <input placeholder="위키 이름" style="width: 100%;" type="text" name="name" value="' + d_list[0] + '"> \
+                                        <br> \
+                                        <br> \
+                                        <span>시작 페이지 (기본 : 위키:대문)</span> \
+                                        <br> \
+                                        <br> \
+                                        <input placeholder="시작 페이지" style="width: 100%;" type="text" name="frontpage" value="' + d_list[1] + '"> \
+                                        <br> \
+                                        <br> \
+                                        <span>라이선스 (기본 : CC 0)</span> \
+                                        <br> \
+                                        <br> \
+                                        <input placeholder="라이선스" style="width: 100%;" type="text" name="license" value="' + d_list[2] + '"> \
+                                        <br> \
+                                        <br> \
+                                        <span>파일 올리기 최대 크기 (기본 : 2)</span> \
+                                        <br> \
+                                        <br> \
+                                        <input placeholder="파일 올리기 최대 크기" style="width: 100%;" type="text" name="upload" value="' + d_list[3] + '"> \
+                                        <br> \
+                                        <br> \
+                                        <span>스킨 (기본 : yousoro)</span> \
+                                        <br> \
+                                        <br> \
+                                        <input placeholder="스킨" style="width: 100%;" type="text" name="skin" value="' + d_list[4] + '"> \
+                                        <br> \
+                                        <br> \
+                                        <button class="btn btn-primary" type="submit">저장</button> \
+                                    </form>',
+                            menu = [['manager', '관리자']]
+                        )
+                    )
+                )
     else:
         return(redirect('/ban'))
 
@@ -306,14 +318,14 @@ def list_acl():
         div += '<li>' + str(i + 1) + '. <a href="/admin_plus/' + url_pas(data[0]) + '">' + data[0] + '</a> (' + acl + ')</li>'
         
         i += 1
-    else:        
-        div += '</ul><br><a href="/manager/8">(생성)</a>'
+    
+    div += '</ul><br><a href="/manager/8">(생성)</a>'
 
     return(
         html_minify(
             template('index',    
                 imp = ['ACL 목록', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
-                data = re.sub('^<br>', '', div),
+                data = re.sub('^<ul></ul><br>', '', div),
                 menu = [['manager', '관리자']]
             )
         )
