@@ -188,9 +188,9 @@ def html_pas(data):
                 if(re.search('<\/' + i_list[1] + '>', data)):
                     src = re.search('src=([^ ]*)', i_list[2])
                     if(src):
-                        v_src = re.search('https:\/\/([^/\'" ]*)', src.groups()[0])
+                        v_src = re.search('http(?:s)?:\/\/([^/\'" ]*)', src.groups()[0])
                         if(v_src):
-                            if(not v_src.groups()[0] in ["www.youtube.com", "serviceapi.nmv.naver.com", "tv.kakao.com", "www.google.com"]):
+                            if(not v_src.groups()[0] in ["www.youtube.com", "serviceapi.nmv.naver.com", "tv.kakao.com", "www.google.com", "serviceapi.rmcnmv.naver.com"]):
                                 ot = re.sub('src=([^ ]*)', '', i_list[2])
                             else:
                                 ot = i_list[2]
@@ -200,7 +200,7 @@ def html_pas(data):
                         ot = i_list[2]
 
                     po = re.compile('position', re.I)
-                    data = re.sub('<(\/)?([^> ]+)( (?:[^>]+)?)?>', '%H%' + i_list[1] + po.sub('', ot) + '%/H%', data, 1)
+                    data = data.replace('<' + i_list[1] + i_list[2] + '>', '%H%' + i_list[1] + po.sub('', ot) + '%/H%', 1)
                     data = re.sub('<\/' + i_list[1] + '>', '%H%/' + i_list[1] + '%/H%', data, 1)
 
     data = html.escape(data)
