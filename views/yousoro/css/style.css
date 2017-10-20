@@ -104,7 +104,7 @@ blockquote {
     display:table;
     border:2px dashed #ccc;
     border-left:5px solid #52A9BD;
-    background-image: url('/views/img/quote.png');
+    background-image: url('/views/img/yousoro/quote.png');
     background-position:calc(100% - 10px) 10px;
     background-repeat:no-repeat;
     background-size:25px;
