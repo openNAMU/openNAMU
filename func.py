@@ -157,96 +157,101 @@ def custom_js():
 
 def acl_check(name):
     ip = ip_check()
-    m = re.search("^사용자:([^/]*)", name)
-    n = re.search("^파일:(.*)", name)
-    if(m):
-        g = m.groups()
-        if(ip == g[0]):
-            if(re.search("(\.|:)", g[0])):
-                return(1)
-            else:
-                curs.execute("select block from ban where block = ?", [ip])
-                rows = curs.fetchall()
-                if(rows):
-                    return(1)
-                else:
-                    return(0)
-        else:
-            return(1)
-    elif(n and admin_check(5, 'edit (' + name + ')') != 1):
-        return(1)
+    band = re.search("^([0-9]{1,3}\.[0-9]{1,3})", ip)
+    if(band):
+        band_it = band.groups()
     else:
-        b = re.search("^([0-9](?:[0-9]?[0-9]?)\.[0-9](?:[0-9]?[0-9]?))", ip)
-        if(b):
-            results = b.groups()
-            curs.execute("select block from ban where block = ? and band = 'O'", [results[0]])
-            rowss = curs.fetchall()
-            if(rowss):
-                return(1)
+        band_it = ['Not']
 
-        curs.execute("select block from ban where block = ?", [ip])
-        rows = curs.fetchall()
-        if(rows):
-            return(1)
-        else:
-            curs.execute("select acl from data where title = ?", [name])
-            row = curs.fetchall()
-            if(row):
-                curs.execute("select acl from user where id = ?", [ip])
-                rows = curs.fetchall()
-                if(row[0][0] == 'user'):
-                    if(rows):
-                        return(0)
-                    else:
-                        return(1)
-                elif(row[0][0] == 'admin'):
-                    if(rows and admin_check(5, 'edit (' + name + ')') == 1):
-                        return(0)
-                    else:
-                        return(1)
-                else:
-                    return(0)
-            else:
-                return(0)    
+    curs.execute("select block from ban where block = ? and band = 'O'", [band_it[0]])
+    band_d = curs.fetchall()
+
+    curs.execute("select block from ban where block = ?", [ip])
+    ban_d = curs.fetchall()
+    if(band_d or ban_d):
+        return(1)
+
+    acl_c = re.search("^사용자:([^/]*)", name)
+    if(acl_c):
+        acl_n = acl_c.groups()
+        
+        curs.execute("select acl from data where title = ?", [acl_n[0]])
+        acl_d = curs.fetchall()
+        if(acl_d):
+            if(acl_d[0][0] == 'all'):
+                return(0)
+
+            if(acl_d[0][0] == 'user' and not re.search("(\.|:)", acl_n[0])):
+                return(0)
+
+            if(not ip == g[0] or re.search("(\.|:)", acl_n[0])):
+                return(1)
+        
+        return(0)
+
+    file_c = re.search("^파일:(.*)", name)
+    if(file_c and admin_check(5, 'edit (' + name + ')') != 1):
+        return(1)
+
+    curs.execute("select acl from data where title = ?", [name])
+    acl_d = curs.fetchall()
+    if(not acl_d):
+        return(0)
+
+    curs.execute("select acl from user where id = ?", [ip])
+    user_d = curs.fetchall()
+    if(acl_d[0][0] == 'user' and user_d):
+        return(0)
+    else:
+        return(1)
+
+    if(acl_d[0][0] == 'admin' and user_d and admin_check(5, 'edit (' + name + ')') == 1):
+        return(0)
+    else:
+        return(1)
+
+    return(0)
 
 def ban_check():
     ip = ip_check()
-    b = re.search("^([0-9](?:[0-9]?[0-9]?)\.[0-9](?:[0-9]?[0-9]?))", ip)
-    if(b):
-        results = b.groups()
-        curs.execute("select block from ban where block = ? and band = 'O'", [results[0]])
-        rowss = curs.fetchall()
-        if(rowss):
-            return(1)
+    band = re.search("^([0-9]{1,3}\.[0-9]{1,3})", ip)
+    if(band):
+        band_it = band.groups()
+    else:
+        band_it = ['Not']
+        
+    curs.execute("select block from ban where block = ? and band = 'O'", [band_it[0]])
+    band_d = curs.fetchall()
 
     curs.execute("select block from ban where block = ?", [ip])
-    rows = curs.fetchall()
-    if(rows):
+    ban_d = curs.fetchall()
+    if(band_d or ban_d):
         return(1)
-    else:
-        return(0)
+    
+    return(0)
         
 def topic_check(name, sub):
     ip = ip_check()
-    b = re.search("^([0-9](?:[0-9]?[0-9]?)\.[0-9](?:[0-9]?[0-9]?))", ip)
-    if(b):
-        results = b.groups()
-        curs.execute("select block from ban where block = ? and band = 'O'", [results[0]])
-        rowss = curs.fetchall()
-        if(rowss):
-            return(1)
+    band = re.search("^([0-9]{1,3}\.[0-9]{1,3})", ip)
+    if(band):
+        band_it = band.groups()
+    else:
+        band_it = ['Not']
+        
+    curs.execute("select block from ban where block = ? and band = 'O'", [band_it[0]])
+    band_d = curs.fetchall()
 
     curs.execute("select block from ban where block = ?", [ip])
-    rows = curs.fetchall()
-    if(rows):
+    ban_d = curs.fetchall()
+    if(band_d or ban_d):
         return(1)
-    else:
-        curs.execute("select title from stop where title = ? and sub = ?", [name, sub])
-        rows = curs.fetchall()
-        if(rows):
-            return(1)
-        else:
-            return(0)
+
+    curs.execute("select title from stop where title = ? and sub = ?", [name, sub])
+    topic_s = curs.fetchall()
+    if(topic_s):
+        return(1)
+
+    return(0)
 
 def rd_plus(title, sub, date):
     curs.execute("select title from rd where title = ? and sub = ?", [title, sub])

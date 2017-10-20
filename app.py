@@ -2032,7 +2032,7 @@ def topic(name = None, sub = None):
         else:
             num = 1
 
-            m = re.search('^사용자:(.+)', name)
+            m = re.search('^사용자:([^/]+)', name)
             if(m):
                 d = m.groups()
                 curs.execute('insert into alarm (name, data, date) values (?, ?, ?)', [d[0], ip + '님이 <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '">사용자 토론</a>을 시작했습니다.', today])
@@ -2647,6 +2647,61 @@ def user_ban(name = None):
             )
         else:
             return(redirect('/error/3'))
+
+@route('/user_acl/<name:path>', method=['POST', 'GET'])
+def acl(name = None):
+    ip = ip_check()
+    if(not ip == name or re.search("(\.|:)", name)):
+        return(redirect('/error/3'))
+    
+    if(request.method == 'POST'):
+        curs.execute("select acl from data where title = ?", ['사용자:' + name])
+        acl_d = curs.fetchall()
+        if(acl_d):
+            if(request.forms.select == 'all'):
+                curs.execute("update data set acl = 'all' where title = ?", ['사용자:' + name])
+            elif(request.forms.select == 'user'):
+                curs.execute("update data set acl = 'user' where title = ?", ['사용자:' + name])
+            else:
+                curs.execute("update data set acl = '' where title = ?", ['사용자:' + name])
+                
+            conn.commit()
+            
+        return(redirect('/w/' + url_pas('사용자:' + name)))
+
+    curs.execute("select acl from data where title = ?", ['사용자:' + name])
+    acl_d = curs.fetchall()
+    if(acl_d):
+        if(acl_d[0][0] == 'all'):
+            now = '모두'
+        elif(acl_d[0][0] == 'user'):
+            now = '로그인'
+        else:
+            now = '일반'
+        
+        return(
+            html_minify(
+                template('index', 
+                    imp = [name, wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), ' (SET)', 0],
+                    data = '<span>현재 ACL : ' + now + '</span> \
+                            <br> \
+                            <br> \
+                            <form method="post"> \
+                                <select name="select"> \
+                                    <option value="all">모두</option> \
+                                    <option value="user">로그인</option> \
+                                    <option value="normal" selected="selected">일반</option> \
+                                </select> \
+                                <br> \
+                                <br> \
+                                <button class="btn btn-primary" type="submit">ACL 변경</button> \
+                            </form>',
+                    menu = [['user', '사용자']]
+                )
+            )
+        )
+    else:
+        return(redirect('/w/' + url_pas(name)))
                 
 @route('/acl/<name:path>', method=['POST', 'GET'])
 def acl(name = None):
@@ -2673,9 +2728,9 @@ def acl(name = None):
             row = curs.fetchall()
             if(row):
                 if(row[0][0] == 'admin'):
-                    now = '관리자만'
+                    now = '관리자'
                 elif(row[0][0] == 'user'):
-                    now = '로그인 이상'
+                    now = '로그인'
                 else:
                     now = '일반'
                 
@@ -2688,8 +2743,8 @@ def acl(name = None):
                                     <br> \
                                     <form method="post"> \
                                         <select name="select"> \
-                                            <option value="admin" selected="selected">관리자만</option> \
-                                            <option value="user">유저 이상</option> \
+                                            <option value="admin" selected="selected">관리자</option> \
+                                            <option value="user">로그인</option> \
                                             <option value="normal">일반</option> \
                                         </select> \
                                         <br> \
@@ -2960,6 +3015,11 @@ def read_view(name = None, num = None, redirect = None):
         if(test and test[0][0] != 'user'):
             acl = ' (관리자)'
 
+        if(rows[0][0] == 'all'):
+            acl += ' (모두)'
+        elif(rows[0][0] == 'user'):
+            acl += ' (로그인)'
+
         curs.execute("select block from ban where block = ?", [g[0]])
         user = curs.fetchall()
         if(user):
@@ -3200,6 +3260,7 @@ def user_info():
                                                         ' * [[wiki:alarm|알림]]\r\n' + \
                                                         ' * [[wiki:change|비밀번호 변경]]\r\n' + \
                                                         ' * [[wiki:count|기여 횟수]]\r\n' + \
+                                                        ' * [[wiki:user_acl/' + url_pas(raw_ip) + '|사용자 문서 ACL]]\r\n' + \
                                                         ' * [[wiki:custom_css|사용자 CSS]]\r\n' + \
                                                         ' * [[wiki:custom_js|사용자 JS]]\r\n', 0, 0, 0),
                 menu = 0
