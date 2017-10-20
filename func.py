@@ -184,7 +184,7 @@ def acl_check(name):
             if(acl_d[0][0] == 'user' and not re.search("(\.|:)", acl_n[0])):
                 return(0)
 
-            if(not ip == g[0] or re.search("(\.|:)", acl_n[0])):
+            if(not ip == acl_n[0] or re.search("(\.|:)", acl_n[0])):
                 return(1)
         
         return(0)
@@ -200,14 +200,10 @@ def acl_check(name):
 
     curs.execute("select acl from user where id = ?", [ip])
     user_d = curs.fetchall()
-    if(acl_d[0][0] == 'user' and user_d):
-        return(0)
-    else:
+    if(acl_d[0][0] == 'user' and not user_d):
         return(1)
 
-    if(acl_d[0][0] == 'admin' and user_d and admin_check(5, 'edit (' + name + ')') == 1):
-        return(0)
-    else:
+    if(acl_d[0][0] == 'admin' and (not user_d or not admin_check(5, 'edit (' + name + ')') == 1)):
         return(1)
 
     return(0)

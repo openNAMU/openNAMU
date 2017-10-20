@@ -3071,11 +3071,14 @@ def read_view(name = None, num = None, redirect = None):
         test = curs.fetchall()
         if(test and test[0][0] != 'user'):
             acl = ' (관리자)'
+        else:
+            acl = ''
 
-        if(rows[0][0] == 'all'):
-            acl += ' (모두)'
-        elif(rows[0][0] == 'user'):
-            acl += ' (로그인)'
+        if(rows):
+            if(rows[0][0] == 'all'):
+                acl += ' (모두)'
+            elif(rows[0][0] == 'user'):
+                acl += ' (로그인)'
 
         curs.execute("select block from ban where block = ?", [g[0]])
         user = curs.fetchall()
