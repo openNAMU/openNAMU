@@ -44,7 +44,7 @@ BaseRequest.MEMFILE_MAX = 1000 ** 4
 def redirect(data):
     return('<meta http-equiv="refresh" content="0;url=' + data + '" />')
 
-r_ver = '2.3.4'
+r_ver = '2.3.5'
 p_ver = ''
 
 try:
@@ -72,6 +72,23 @@ try:
         curs.execute("create table alarm(name text, data text, date text)")
         print('alarm 테이블 생성')
 
+    try:
+        curs.execute('select name from ua_d limit 1')
+    except:
+        curs.execute("create table ua_d(name text, ip text, ua text, today text, sub text)")
+        print('ua_d 테이블 생성')
+
+    try:
+        curs.execute('select user, ip, today from login')
+        lo_d = curs.fetchall()
+        for m_lo in lo_d:
+            curs.execute("insert into ua_d (name, ip, ua, today, sub) values (?, ?, '', ?, '')", [m_lo[0], m_lo[1], m_lo[2]])
+
+        curs.execute("drop table login")
+        print('login 테이블 삭제')
+    except:
+        pass
+
     conn.commit()
 except:
     pass
@@ -90,7 +107,6 @@ def setup():
             curs.execute("create table topic(id text, title text, sub text, data text, date text, ip text, block text, top text)")
             curs.execute("create table stop(title text, sub text, close text)")
             curs.execute("create table rb(block text, end text, today text, blocker text, why text)")
-            curs.execute("create table login(user text, ip text, today text)")
             curs.execute("create table back(title text, link text, type text)")
             curs.execute("create table cat(title text, cat text)")
             curs.execute("create table hidhi(title text, re text)")
@@ -101,6 +117,7 @@ def setup():
             curs.execute("create table re_admin(who text, what text, time text)")
             curs.execute("create table move(origin text, new text, date text, who text, send text)")
             curs.execute("create table alarm(name text, data text, date text)")
+            curs.execute("create table ua_d(name text, ip text, ua text, today text, sub text)")
 
             curs.execute("insert into alist (name, acl) values ('소유자', 'owner')")
             conn.commit()
@@ -2314,6 +2331,7 @@ def close_topic_list(name = None, tool = None):
 @route('/login', method=['POST', 'GET'])
 def login():
     session = request.environ.get('beaker.session')
+    agent = request.environ.get('HTTP_USER_AGENT')
     ip = ip_check()
     ban = ban_check()
         
@@ -2338,7 +2356,7 @@ def login():
                 else:
                     session['Daydream'] = ''
                 
-                curs.execute("insert into login (user, ip, today) values (?, ?, ?)", [request.forms.id, ip, get_time()])
+                curs.execute("insert into ua_d (name, ip, ua, today, sub) values (?, ?, ?, ?, '')", [request.forms.id, ip, agent, get_time()])
                 conn.commit()
                 
                 return(redirect('/user'))
@@ -2446,9 +2464,9 @@ def user_check(name = None):
 
     if(admin_check(4, 'check (' + name + ')') == 1):
         if(re.search('^(?:[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}?)$', name)):
-            curs.execute("select user, ip, today from login where ip = ? order by today desc", [name])
+            curs.execute("select name, ip, ua, today from ua_d where ip = ? order by today desc", [name])
         else:
-            curs.execute("select user, ip, today from login where user = ? order by today desc", [name])
+            curs.execute("select name, ip, ua, today from ua_d where name = ? order by today desc", [name])
         row = curs.fetchall()
         if(row):
             c = '<table style="width: 100%; text-align: center;"> \
@@ -2463,8 +2481,9 @@ def user_check(name = None):
                 c +=    '<tr> \
                             <td>' + ip_pas(data[0], 2) + '</td> \
                             <td>' + ip_pas(data[1], 2) + '</td> \
-                            <td>' + data[2] + '</td> \
-                        </tr>'
+                            <td>' + data[3] + '</td> \
+                        </tr> \
+                        <tr><td colspan="3">' + data[2] + '</td></tr>'
             else:
                 c +=        '</tbody> \
                         </table>'
