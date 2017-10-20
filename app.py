@@ -1869,9 +1869,7 @@ def title_index(num = 1000, page = 1):
 
     if(num == 0):
         if(title_list):        
-            data += '<br> \
-                    <li>이 위키에는 총 ' + str(i[0]) + '개의 문서가 있습니다.</li> \
-                    <br> \
+            data += '<br><br><li>이 위키에는 총 ' + str(i[0]) + '개의 문서가 있습니다.</li><br><br> \
                     <li>틀 문서는 총 ' + str(i[3]) + '개의 문서가 있습니다.</li> \
                     <li>분류 문서는 총 ' + str(i[1]) + '개의 문서가 있습니다.</li> \
                     <li>사용자 문서는 총 ' + str(i[2]) + '개의 문서가 있습니다.</li> \
