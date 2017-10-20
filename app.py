@@ -1613,6 +1613,7 @@ def manager(num = 1):
                                         '== 목록 ==\r\n' + \
                                         ' * [[wiki:manager/2|문서 ACL]]\r\n' + \
                                         ' * [[wiki:manager/3|사용자 검사]]\r\n' + \
+                                        ' * [[wiki:manager/10|사용자 비교]]\r\n' + \
                                         ' * [[wiki:manager/4|사용자 차단]]\r\n' + \
                                         ' * [[wiki:manager/5|권한 주기]]\r\n' + \
                                         ' * [[wiki:m_del|여러 문서 삭제]]\r\n' + \
@@ -1764,6 +1765,27 @@ def manager(num = 1):
                         imp = ['문서 출력 이동', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
                         data = '<form method="post"> \
                                     <input placeholder="문서명" name="name" type="text"> \
+                                    <br> \
+                                    <br> \
+                                    <button class="btn btn-primary" type="submit">이동</button> \
+                                </form>',
+                        menu = [['manager', '관리자']]
+                    )
+                )
+            )
+    elif(num == 10):
+        if(request.method == 'POST'):
+            return(redirect('/check/' + url_pas(request.forms.name) + '/' + url_pas(request.forms.name2)))
+        else:
+            return(
+                html_minify(
+                    template('index', 
+                        imp = ['검사 이동', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
+                        data = '<form method="post"> \
+                                    <input placeholder="사용자명" name="name" type="text"> \
+                                    <br> \
+                                    <br> \
+                                    <input placeholder="비교 대상" name="name2" type="text"> \
                                     <br> \
                                     <br> \
                                     <button class="btn btn-primary" type="submit">이동</button> \
@@ -2456,14 +2478,26 @@ def change_password():
         )
                 
 @route('/check/<name:path>')
-def user_check(name = None):
-    curs.execute("select acl from user where id = ?", [name])
+@route('/check/<name:path>/<name2:path>')
+def user_check(name = None, name2 = None):
+    curs.execute("select acl from user where id = ? or id = ?", [name, name2])
     user = curs.fetchall()
     if(user and user[0][0] != 'user'):
         return(redirect('/error/4'))
 
     if(admin_check(4, 'check (' + name + ')') == 1):
-        if(re.search('^(?:[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}?)$', name)):
+        if(name2):
+            if(re.search('(?:\.|:)', name)):
+                if(re.search('(?:\.|:)', name2)):
+                    curs.execute("select name, ip, ua, today from ua_d where ip = ? or ip = ? order by today desc", [name, name2])
+                else:
+                    curs.execute("select name, ip, ua, today from ua_d where ip = ? or name = ? order by today desc", [name, name2])
+            else:
+                if(re.search('(?:\.|:)', name2)):
+                    curs.execute("select name, ip, ua, today from ua_d where name = ? or ip = ? order by today desc", [name, name2])
+                else:
+                    curs.execute("select name, ip, ua, today from ua_d where name = ? or name = ? order by today desc", [name, name2])
+        elif(re.search('(?:\.|:)', name)):
             curs.execute("select name, ip, ua, today from ua_d where ip = ? order by today desc", [name])
         else:
             curs.execute("select name, ip, ua, today from ua_d where name = ? order by today desc", [name])
@@ -2478,12 +2512,16 @@ def user_check(name = None):
                         </tr>'
 
             for data in row:
+                if(data[2]):
+                    ua = data[2]
+                else:
+                    ua = '<br>'
                 c +=    '<tr> \
                             <td>' + ip_pas(data[0], 2) + '</td> \
                             <td>' + ip_pas(data[1], 2) + '</td> \
                             <td>' + data[3] + '</td> \
                         </tr> \
-                        <tr><td colspan="3">' + data[2] + '</td></tr>'
+                        <tr><td colspan="3">' + ua + '</td></tr>'
             else:
                 c +=        '</tbody> \
                         </table>'
