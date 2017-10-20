@@ -1807,7 +1807,10 @@ def json_in():
             date = get_time()
             for hi in data["history"]:
                 i += 1
-                curs.execute('insert into history (id, title, data, date, ip, send, leng) values (?, ?, "", ?, ?, "", "0")', [i, title, date, hi])
+                if(i == 0):
+                    curs.execute('insert into history (id, title, data, date, ip, send, leng) values (?, ?, ?, ?, ?, "", ?)', [i, title, data["data"], date, hi, '+' + len(data["data"])])
+                else:
+                    curs.execute('insert into history (id, title, data, date, ip, send, leng) values (?, ?, "", ?, ?, "", "0")', [i, title, date, hi])
 
             conn.commit()
             return(redirect('/w/' + url_pas(title)))
