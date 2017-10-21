@@ -291,14 +291,15 @@ def acl_list():
     curs.execute("select title, acl from data where acl = 'admin' or acl = 'user' order by acl desc")
     list_data = curs.fetchall()
     for data in list_data:
-        if(data[1] == 'admin'):
-            acl = '관리자'
-        else:
-            acl = '로그인'
+        if(not re.search('^사용자:', data[0])):
+            if(data[1] == 'admin'):
+                acl = '관리자'
+            else:
+                acl = '로그인'
 
-        div += '<li>' + str(i + 1) + '. <a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a> (' + acl + ')</li>'
-        
-        i += 1
+            div += '<li>' + str(i + 1) + '. <a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a> (' + acl + ')</li>'
+            
+            i += 1
         
     div += '</ul>'
     
