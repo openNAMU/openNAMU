@@ -226,10 +226,10 @@ def edit_set(num = 0):
                                         <input placeholder="라이선스" style="width: 100%;" type="text" name="license" value="' + d_list[2] + '"> \
                                         <br> \
                                         <br> \
-                                        <span>파일 올리기 최대 크기 (기본 : 2)</span> \
+                                        <span>파일 용량 한도 (기본 : 2)</span> \
                                         <br> \
                                         <br> \
-                                        <input placeholder="파일 올리기 최대 크기" style="width: 100%;" type="text" name="upload" value="' + d_list[3] + '"> \
+                                        <input placeholder="파일 용량 한도" style="width: 100%;" type="text" name="upload" value="' + d_list[3] + '"> \
                                         <br> \
                                         <br> \
                                         <span>스킨 (기본 : yousoro)</span> \
@@ -556,8 +556,7 @@ def recent_changes(name = None, num = 1):
 
         title = '사용자 기록'
         menu = [['other', '기타'], ['user', '사용자']]
-        div += '<br> \
-                <a href="/record/' + url_pas(name) + '/n/' + str(num + 1) + '">(이전)</a> <a href="/record/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전)</a>'
+        div += '<br><a href="/record/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전)</a> <a href="/record/' + url_pas(name) + '/n/' + str(num + 1) + '">(이후)</a>'
     else:
         sub = 0
         menu = 0
@@ -2483,7 +2482,8 @@ def user_check(name = None, name2 = None):
     curs.execute("select acl from user where id = ? or id = ?", [name, name2])
     user = curs.fetchall()
     if(user and user[0][0] != 'user'):
-        return(redirect('/error/4'))
+        if(admin_check(None, None) != 1):
+            return(redirect('/error/4'))
 
     if(admin_check(4, 'check (' + name + ')') == 1):
         if(name2):
@@ -3180,8 +3180,7 @@ def user_topic_list(name = None, num = 1):
     else:
         div = ''
         
-    div += '<br> \
-            <a href="/user/' + url_pas(name) + '/topic/' + str(num - 1) + '">(이전)</a> <a href="/user/' + url_pas(name) + '/topic/' + str(num + 1) + '">(이후)</a>'
+    div += '<br><a href="/user/' + url_pas(name) + '/topic/' + str(num - 1) + '">(이전)</a> <a href="/user/' + url_pas(name) + '/topic/' + str(num + 1) + '">(이후)</a>'
                 
     curs.execute("select end, why from ban where block = ?", [name])
     ban_it = curs.fetchall()
@@ -3313,16 +3312,17 @@ def user_info():
                 imp = ['사용자 메뉴', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
                 data =  ip + '<br><br>' + namumark('',  '권한 상태 : ' + acl + '\r\n' + \
                                                         '[목차(없음)]\r\n' + \
-                                                        '== 로그인 관련 ==\r\n' + \
+                                                        '== 로그인 ==\r\n' + \
                                                         plus + '\r\n' + \
                                                         ' * [[wiki:register|회원가입]]\r\n' + \
+                                                        '== 사용자 ==\r\n' + \
+                                                        ' * [[wiki:user_acl/' + url_pas(raw_ip) + '|사용자 문서 ACL]]\r\n' + \
+                                                        ' * [[wiki:custom_css|사용자 CSS]]\r\n' + \
+                                                        ' * [[wiki:custom_js|사용자 JS]]\r\n' + \
                                                         '== 기타 ==\r\n' + \
                                                         ' * [[wiki:alarm|알림]]\r\n' + \
                                                         ' * [[wiki:change|비밀번호 변경]]\r\n' + \
-                                                        ' * [[wiki:count|기여 횟수]]\r\n' + \
-                                                        ' * [[wiki:user_acl/' + url_pas(raw_ip) + '|사용자 문서 ACL]]\r\n' + \
-                                                        ' * [[wiki:custom_css|사용자 CSS]]\r\n' + \
-                                                        ' * [[wiki:custom_js|사용자 JS]]\r\n', 0, 0, 0),
+                                                        ' * [[wiki:count|기여 횟수]]\r\n', 0, 0, 0),
                 menu = 0
             )
         )
