@@ -169,7 +169,10 @@ def edit_set(num = 0):
             html_minify(
                 template('index', 
                     imp = ['설정 편집', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
-                    data = '<ul><li><a href="/edit_set/1">기본 설정</a></li></ul>',
+                    data = '<ul> \
+                                <li><a href="/edit_set/1">기본 설정</a></li> \
+                                <li><a href="/edit_set/2">로그인 관련</a></li> \
+                            </ul>',
                     menu = [['manager', '관리자']]
                 )
             )
@@ -206,7 +209,7 @@ def edit_set(num = 0):
                 return(
                     html_minify(
                         template('index', 
-                            imp = ['설정 편집', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
+                            imp = ['기본 설정', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
                             data = '<form method="post"> \
                                         <span>위키 이름 (기본 : 무명위키)</span> \
                                         <br> \
@@ -1082,29 +1085,44 @@ def deep_search(name = None, num = 1):
          
 @route('/raw/<name:path>')
 @route('/raw/<name:path>/r/<num:int>')
-def raw_view(name = None, num = None):
-    if(num):
+@route('/topic/<name:path>/sub/<sub_t:path>/raw/<num:int>')
+def raw_view(name = None, sub_t = None, num = None):
+    v_name = name
+    sub = ' (원본)'
+    
+    if(not sub_t and num):
         curs.execute("select title from hidhi where title = ? and re = ?", [name, str(num)])
         hid = curs.fetchall()
         if(hid and admin_check(6, None) != 1):
             return(redirect('/error/3'))
         
         curs.execute("select data from history where title = ? and id = ?", [name, str(num)])
+
+        sub += ' (' + str(num) + '판)'
+        menu = [['history/' + url_pas(name), '역사']]
+    elif(sub_t):
+        curs.execute("select data from topic where id = ? and title = ? and sub = ? and block = ''", [str(num), name, sub_t])
+
+        v_name = '토론 원본'
+        sub = ' (' + str(num) + '번)'
+        menu = [['topic/' + url_pas(name) + '/sub/' + url_pas(sub_t) + '#' + str(num), '토론']]
     else:
         curs.execute("select data from data where title = ?", [name])
-
-    rows = curs.fetchall()
-    if(rows):
-        enddata = html.escape(rows[0][0])
         
-        enddata = '<textarea readonly="" style="height: 80%;">' + enddata + '</textarea>'
+        menu = [['w/' + url_pas(name), '문서']]
+
+    data = curs.fetchall()
+    if(data):
+        p_data = html.escape(data[0][0])
+        
+        p_data = '<textarea readonly style="height: 80%;">' + p_data + '</textarea>'
         
         return(
             html_minify(
                 template('index', 
-                    imp = [name, wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), ' (원본)', 0],
-                    data = enddata,
-                    menu = [['w/' + url_pas(name), '문서'], ['history/' + url_pas(name), '역사']]
+                    imp = [v_name, wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), sub, 0],
+                    data = p_data,
+                    menu = menu
                 )
             )
         )
@@ -2169,14 +2187,16 @@ def topic(name = None, sub = None):
             if(i == 0):
                 start = dain[3]
             
-            chad = ''
             indata = dain[0]
             if(dain[4] == 'O'):
                 block = 'style="background: gainsboro;"'
-                curs.execute("select who from re_admin where what = ? order by time desc limit 1", ['blind (' + name + ' - ' + sub + '#' + str(i + 1) + ')'])
-                bl_da = curs.fetchall()
-                if(bl_da):
-                    indata = '[[사용자:' + bl_da[0][0] + ']]님이 가림'
+                if(not admin == 1):
+                    curs.execute("select who from re_admin where what = ? order by time desc limit 1", ['blind (' + name + ' - ' + sub + '#' + str(i + 1) + ')'])
+                    bl_da = curs.fetchall()
+                    if(bl_da):
+                        indata = '[[사용자:' + bl_da[0][0] + ']]님이 가림'
+                    else:
+                        indata = '관리자가 가림'
             else:
                 block = ''
 
@@ -2184,23 +2204,23 @@ def topic(name = None, sub = None):
 
             if(admin == 1):
                 if(dain[4] == 'O'):
-                    isblock = ' <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/b/' + str(i + 1) + '">(해제)</a>'
+                    is_ban = ' <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/b/' + str(i + 1) + '">(해제)</a>'
                 else:
-                    isblock = ' <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/b/' + str(i + 1) + '">(가림)</a>'
+                    is_ban = ' <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/b/' + str(i + 1) + '">(가림)</a>'
 
                 curs.execute("select id from topic where title = ? and sub = ? and id = ? and top = 'O'", [name, sub, str(i + 1)])
                 row = curs.fetchall()
                 if(row):
-                    isblock = isblock + ' <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/notice/' + str(i + 1) + '">(해제)</a>'
+                    is_ban = is_ban + ' <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/notice/' + str(i + 1) + '">(해제)</a>'
                 else:
-                    isblock = isblock + ' <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/notice/' + str(i + 1) + '">(공지)</a>'
+                    is_ban = is_ban + ' <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/notice/' + str(i + 1) + '">(공지)</a>'
                     
                 curs.execute("select end from ban where block = ?", [dain[3]])
                 ban_it = curs.fetchall()
                 if(ban_it):
-                    ban = ' <a href="/ban/' + url_pas(dain[3]) + '">(해제)</a>' + isblock
+                    ban = ' <a href="/ban/' + url_pas(dain[3]) + '">(해제)</a>' + is_ban
                 else:
-                    ban = ' <a href="/ban/' + url_pas(dain[3]) + '">(차단)</a>' + isblock
+                    ban = ' <a href="/ban/' + url_pas(dain[3]) + '">(차단)</a>' + is_ban
             else:
                 curs.execute("select end from ban where block = ?", [dain[3]])
                 ban_it = curs.fetchall()
@@ -2208,13 +2228,16 @@ def topic(name = None, sub = None):
                     ban = ' <a href="javascript:void(0);" title="차단자">†</a>'
                 else:
                     ban = ''
-            
-            curs.execute('select acl from user where id = ?', [dain[3]])
-            adch = curs.fetchall()
-            if(adch and adch[0][0] != 'user'):
-                chad += ' <a href="javascript:void(0);" title="관리자">★</a>'
 
             ip = ip_pas(dain[3], 1)
+
+            curs.execute('select acl from user where id = ?', [dain[3]])
+            user_acl = curs.fetchall()
+            if(user_acl and user_acl[0][0] != 'user'):
+                ip += ' <a href="javascript:void(0);" title="관리자">★</a>'
+
+            if(admin == 1 or block == ''):
+                ip += ' <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/raw/' + str(i + 1) + '">(원본)</a>'
                     
             if(dain[5] == '1'):
                 color = '_blue'
@@ -2230,7 +2253,7 @@ def topic(name = None, sub = None):
                         <tbody> \
                             <tr> \
                                 <td id="toron_color' + color + '"> \
-                                    <a href="javascript:void(0);" id="' + str(i + 1) + '">#' + str(i + 1) + '</a> ' + ip + chad + ban + ' <span style="float:right;">' + dain[2] + '</span> \
+                                    <a href="javascript:void(0);" id="' + str(i + 1) + '">#' + str(i + 1) + '</a> ' + ip + ban + ' <span style="float:right;">' + dain[2] + '</span> \
                                 </td> \
                             </tr> \
                             <tr ' + block + '> \
