@@ -2190,7 +2190,7 @@ def topic(name = None, sub = None):
             indata = dain[0]
             if(dain[4] == 'O'):
                 block = 'style="background: gainsboro;"'
-                if(not admin == 1):
+                if(admin != 1):
                     curs.execute("select who from re_admin where what = ? order by time desc limit 1", ['blind (' + name + ' - ' + sub + '#' + str(i + 1) + ')'])
                     bl_da = curs.fetchall()
                     if(bl_da):
@@ -2731,7 +2731,7 @@ def user_ban(name = None):
 @route('/user_acl/<name:path>', method=['POST', 'GET'])
 def acl(name = None):
     ip = ip_check()
-    if(not ip == name or re.search("(\.|:)", name)):
+    if(ip != name or re.search("(\.|:)", name)):
         return(redirect('/error/3'))
     
     if(request.method == 'POST'):
