@@ -44,6 +44,81 @@ BaseRequest.MEMFILE_MAX = 1000 ** 4
 def redirect(data):
     return('<meta http-equiv="refresh" content="0;url=' + data + '" />')
 
+def re_error(data):
+    d = re.search('\/error\/([0-9]+)', data)
+    if(d):
+        num = int(d.groups()[0])
+        if(num == 1):
+            title = '권한 오류'
+            data = '비 로그인 상태 입니다.'
+        elif(num == 2):
+            title = '권한 오류'
+            data = '이 계정이 없습니다.'
+        elif(num == 3):
+            title = '권한 오류'
+            data = '권한이 모자랍니다.'
+        elif(num == 4):
+            title = '권한 오류'
+            data = '관리자는 차단, 검사 할 수 없습니다.'
+        elif(num == 5):
+            title = '사용자 오류'
+            data = '그런 계정이 없습니다.'
+        elif(num == 6):
+            title = '가입 오류'
+            data = '동일한 아이디의 사용자가 있습니다.'
+        elif(num == 7):
+            title = '가입 오류'
+            data = '아이디는 20글자보다 짧아야 합니다.'
+        elif(num == 8):
+            title = '가입 오류'
+            data = '아이디에는 한글과 알파벳과 공백만 허용 됩니다.'
+        elif(num == 9):
+            title = '파일 올리기 오류'
+            data = '파일이 없습니다.'
+        elif(num == 10):
+            title = '변경 오류'
+            data = '비밀번호가 다릅니다.'
+        elif(num == 11):
+            title = '로그인 오류'
+            data = '이미 로그인 되어 있습니다.'
+        elif(num == 14):
+            title = '파일 올리기 오류'
+            data = 'jpg, gif, jpeg, png, webp만 가능 합니다.'
+        elif(num == 15):
+            title = '편집 오류'
+            data = '편집 기록은 500자를 넘을 수 없습니다.'
+        elif(num == 16):
+            title = '파일 올리기 오류'
+            data = '동일한 이름의 파일이 있습니다.'
+        elif(num == 17):
+            title = '파일 올리기 오류'
+            data = '파일 용량은 ' + wiki_set(4) + 'MB를 넘길 수 없습니다.'
+        elif(num == 18):
+            title = '편집 오류'
+            data = '내용이 원래 문서와 동일 합니다.'
+        elif(num == 19):
+            title = '이동 오류'
+            data = '이동 하려는 곳에 문서가 이미 있습니다.'
+        elif(num == 20):
+            title = '비밀번호 오류'
+            data = '재 확인이랑 비밀번호가 다릅니다.'
+
+        if(title):
+            return(
+                html_minify(
+                    template(
+                        'index', 
+                        imp = [title, wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
+                        data = data,
+                        menu = 0
+                    )
+                )
+            )
+        else:
+            return(redirect('/'))
+    else:
+        return(redirect('/'))
+
 r_ver = '2.3.5'
 p_ver = ''
 
@@ -470,7 +545,7 @@ def admin_plus(name = None):
                 )
             )
     else:
-        return(redirect('/error/3'))
+        return(re_error('/error/3'))
         
 @route('/admin_list')
 def admin_list():
@@ -763,7 +838,7 @@ def indexing():
         conn.commit()
         return(redirect('/'))
     else:
-        return(redirect('/error/3'))
+        return(re_error('/error/3'))
         
 @route('/xref/<name:path>')
 @route('/xref/<name:path>/n/<num:int>')
@@ -1139,7 +1214,7 @@ def raw_view(name = None, sub_t = None, num = None):
         curs.execute("select title from hidhi where title = ? and re = ?", [name, str(num)])
         hid = curs.fetchall()
         if(hid and admin_check(6, None) != 1):
-            return(redirect('/error/3'))
+            return(re_error('/error/3'))
         
         curs.execute("select data from history where title = ? and id = ?", [name, str(num)])
 
@@ -1184,7 +1259,7 @@ def revert(name = None, num = None):
         curs.execute("select title from hidhi where title = ? and re = ?", [name, str(num)])
         hid = curs.fetchall()
         if(hid and admin_check(6, None) != 1):
-            return(redirect('/error/3'))
+            return(re_error('/error/3'))
 
         if(can == 1):
             return(redirect('/ban'))
@@ -1222,7 +1297,7 @@ def revert(name = None, num = None):
         curs.execute("select title from hidhi where title = ? and re = ?", [name, str(num)])
         hid = curs.fetchall()
         if(hid and admin_check(6, None) != 1):
-            return(redirect('/error/3'))    
+            return(re_error('/error/3'))    
                           
         if(can == 1):
             return(redirect('/ban'))
@@ -1318,7 +1393,7 @@ def m_del():
                 )
             )
     else:
-        return(redirect('/error/3'))
+        return(re_error('/error/3'))
                 
 @route('/edit/<name:path>', method=['POST', 'GET'])
 @route('/edit/<name:path>/section/<num:int>', method=['POST', 'GET'])
@@ -1331,10 +1406,10 @@ def edit(name = None, num = None):
             return(redirect('/ban'))
 
         if(len(request.forms.send) > 500):
-            return(redirect('/error/15'))
+            return(re_error('/error/15'))
 
         if(request.forms.otent == request.forms.content):
-            return(redirect('/error/18'))
+            return(re_error('/error/18'))
 
         today = get_time()
         content = savemark(request.forms.content)
@@ -1580,7 +1655,7 @@ def move(name = None):
         curs.execute("select title from history where title = ?", [request.forms.title])
         row = curs.fetchall()
         if(row):
-            return(redirect('/error/19'))
+            return(re_error('/error/19'))
 
 
         
@@ -1869,7 +1944,7 @@ def json_out(name = None):
 
         return(json_f)
     else:
-        return(redirect('/error/3'))
+        return(re_error('/error/3'))
 
 @route('/json_in', method=['POST', 'GET'])
 def json_in():
@@ -1912,7 +1987,7 @@ def json_in():
                 )
             )
     else:
-        return(redirect('/error/3'))
+        return(re_error('/error/3'))
         
 @route('/title_index')
 @route('/title_index/<num:int>/<page:int>')
@@ -1993,7 +2068,7 @@ def topic_block(name = None, sub = None, num = None):
             
         return(redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '#' + str(num)))
     else:
-        return(redirect('/error/3'))
+        return(re_error('/error/3'))
         
 @route('/topic/<name:path>/sub/<sub:path>/notice/<num:int>')
 def topic_top(name = None, sub = None, num = None):
@@ -2019,7 +2094,7 @@ def topic_top(name = None, sub = None, num = None):
 
         return(redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '#' + str(num)))
     else:
-        return(redirect('/error/3'))
+        return(re_error('/error/3'))
 
 @route('/topic/<name:path>/sub/<sub:path>/tool/agree')
 def topic_agree(name = None, sub = None):
@@ -2050,7 +2125,7 @@ def topic_agree(name = None, sub = None):
         return(redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub)))
     else:
         
-        return(redirect('/error/3'))
+        return(re_error('/error/3'))
         
 @route('/topic/<name:path>/sub/<sub:path>/tool/<tool:path>')
 def topic_stop(name = None, sub = None, tool = None):
@@ -2096,7 +2171,7 @@ def topic_stop(name = None, sub = None, tool = None):
         return(redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub)))
     else:
         
-        return(redirect('/error/3'))
+        return(re_error('/error/3'))
 
 @route('/topic/<name:path>/sub/<sub:path>/admin/<num:int>')
 def topic_admin(name = None, sub = None, num = None):
@@ -2440,7 +2515,7 @@ def login():
         user = curs.fetchall()
         if(user):
             if(session.get('Now') == 1):
-                return(redirect('/error/11'))
+                return(re_error('/error/11'))
 
             if(bcrypt.checkpw(bytes(request.forms.pw, 'utf-8'), bytes(user[0][0], 'utf-8'))):
                 session['Now'] = 1
@@ -2458,15 +2533,15 @@ def login():
                 
                 return(redirect('/user'))
             else:
-                return(redirect('/error/10'))
+                return(re_error('/error/10'))
         else:
-            return(redirect('/error/5'))
+            return(re_error('/error/5'))
     else:        
         if(ban == 1):
             return(redirect('/ban'))
 
         if(session.get('Now') == 1):
-            return(redirect('/error/11'))
+            return(re_error('/error/11'))
 
         return(
             html_minify(
@@ -2513,11 +2588,11 @@ def change_password():
                     
                     return(redirect('/user'))
                 else:
-                    return(redirect('/error/10'))
+                    return(re_error('/error/10'))
             else:
-                return(redirect('/error/5'))
+                return(re_error('/error/5'))
         else:
-            return(redirect('/error/20'))
+            return(re_error('/error/20'))
     else:        
         if(ban == 1):
             return(redirect('/ban'))
@@ -2559,7 +2634,7 @@ def user_check(name = None, name2 = None):
     user = curs.fetchall()
     if(user and user[0][0] != 'user'):
         if(admin_check(None, None) != 1):
-            return(redirect('/error/4'))
+            return(re_error('/error/4'))
 
     if(admin_check(4, 'check (' + name + ')') == 1):
         if(name2):
@@ -2614,7 +2689,7 @@ def user_check(name = None, name2 = None):
             )
         )
     else:
-        return(redirect('/error/3'))
+        return(re_error('/error/3'))
                 
 @route('/register', method=['POST', 'GET'])
 def register():
@@ -2628,15 +2703,15 @@ def register():
         if(request.forms.pw == request.forms.pw2):
             m = re.search('(?:[^A-Za-zㄱ-힣0-9 ])', request.forms.id)
             if(m):
-                return(redirect('/error/8'))
+                return(re_error('/error/8'))
 
             if(len(request.forms.id) > 32):
-                return(redirect('/error/7'))
+                return(re_error('/error/7'))
 
             curs.execute("select id from user where id = ?", [request.forms.id])
             rows = curs.fetchall()
             if(rows):
-                return(redirect('/error/6'))
+                return(re_error('/error/6'))
 
             hashed = bcrypt.hashpw(bytes(request.forms.pw, 'utf-8'), bcrypt.gensalt())
             
@@ -2650,7 +2725,7 @@ def register():
             
             return(redirect('/login'))
         else:
-            return(redirect('/error/20'))
+            return(re_error('/error/20'))
     else:        
         p = ''
         curs.execute('select data from other where name = "contract"')
@@ -2698,7 +2773,7 @@ def user_ban(name = None):
     user = curs.fetchall()
     if(user and user[0][0] != 'user'):
         if(admin_check(None, None) != 1):
-            return(redirect('/error/4'))
+            return(re_error('/error/4'))
 
     if(request.method == 'POST'):
         if(admin_check(1, 'ban (' + name + ')') == 1):
@@ -2729,7 +2804,7 @@ def user_ban(name = None):
 
             return(redirect('/ban/' + url_pas(name)))
         else:
-            return(redirect('/error/3'))
+            return(re_error('/error/3'))
     else:
         if(admin_check(1, None) == 1):
             curs.execute("select * from ban where block = ?", [name])
@@ -2788,13 +2863,13 @@ def user_ban(name = None):
                 )
             )
         else:
-            return(redirect('/error/3'))
+            return(re_error('/error/3'))
 
 @route('/user_acl/<name:path>', method=['POST', 'GET'])
 def acl(name = None):
     ip = ip_check()
     if(ip != name or re.search("(\.|:)", name)):
-        return(redirect('/error/3'))
+        return(re_error('/error/3'))
     
     if(request.method == 'POST'):
         curs.execute("select acl from data where title = ?", ['사용자:' + name])
@@ -2863,7 +2938,7 @@ def acl(name = None):
                 
             return(redirect('/w/' + url_pas(name)))
         else:
-            return(redirect('/error/3'))
+            return(re_error('/error/3'))
     else:
         if(admin_check(5, None) == 1):
             curs.execute("select acl from data where title = ?", [name])
@@ -2900,7 +2975,7 @@ def acl(name = None):
             else:
                 return(redirect('/w/' + url_pas(name)) )
         else:
-            return(redirect('/error/3'))
+            return(re_error('/error/3'))
             
 @route('/admin/<name:path>', method=['POST', 'GET'])
 def user_admin(name = None):
@@ -2914,7 +2989,7 @@ def user_admin(name = None):
             
             return(redirect('/admin/' + url_pas(name)))
         else:
-            return(redirect('/error/3'))
+            return(re_error('/error/3'))
     else:
         if(admin_check(None, None) == 1):
             curs.execute("select acl from user where id = ?", [name])
@@ -2952,9 +3027,9 @@ def user_admin(name = None):
                     )
                 )
             else:
-                return(redirect('/error/5'))
+                return(re_error('/error/5'))
         else:
-            return(redirect('/error/3'))
+            return(re_error('/error/3'))
             
 @route('/ban')
 def are_you_ban():
@@ -3295,11 +3370,11 @@ def upload():
         data = request.files.f_data
         if(data):
             if(int(wiki_set(4)) * 1024 * 1024 < request.content_length):
-                return redirect('/error/17')
+                return re_error('/error/17')
             
             value = os.path.splitext(data.filename)[1]
             if(not value in ['.jpeg', '.jpg', '.gif', '.png', '.webp', '.JPEG', '.JPG', '.GIF', '.PNG', '.WEBP']):
-                return redirect('/error/14')
+                return re_error('/error/14')
         
             if(request.forms.get('f_name')):
                 name = request.forms.get('f_name') + value
@@ -3319,7 +3394,7 @@ def upload():
                     lice = '[[사용자:' + ip + ']] 올림'
                     
             if(os.path.exists(os.path.join('image', e_data))):
-                return(redirect('/error/16'))
+                return(re_error('/error/16'))
                 
             data.save(os.path.join('image', e_data))
                 
@@ -3342,7 +3417,7 @@ def upload():
             
             return(redirect('/w/파일:' + name))
         else:
-            return(redirect('/error/9'))
+            return(re_error('/error/9'))
     else:
         return(
             html_minify(
@@ -3581,78 +3656,6 @@ def views(name = None):
             root = './views' + plus
         )
     )
-        
-@route('/error/<num:int>')
-def error_test(num = None):
-    response.status = 404
-    if(num == 1):
-        title = '권한 오류'
-        data = '비 로그인 상태 입니다.'
-    elif(num == 2):
-        title = '권한 오류'
-        data = '이 계정이 없습니다.'
-    elif(num == 3):
-        title = '권한 오류'
-        data = '권한이 모자랍니다.'
-    elif(num == 4):
-        title = '권한 오류'
-        data = '관리자는 차단, 검사 할 수 없습니다.'
-    elif(num == 5):
-        title = '사용자 오류'
-        data = '그런 계정이 없습니다.'
-    elif(num == 6):
-        title = '가입 오류'
-        data = '동일한 아이디의 사용자가 있습니다.'
-    elif(num == 7):
-        title = '가입 오류'
-        data = '아이디는 20글자보다 짧아야 합니다.'
-    elif(num == 8):
-        title = '가입 오류'
-        data = '아이디에는 한글과 알파벳과 공백만 허용 됩니다.'
-    elif(num == 9):
-        title = '파일 올리기 오류'
-        data = '파일이 없습니다.'
-    elif(num == 10):
-        title = '변경 오류'
-        data = '비밀번호가 다릅니다.'
-    elif(num == 11):
-        title = '로그인 오류'
-        data = '이미 로그인 되어 있습니다.'
-    elif(num == 14):
-        title = '파일 올리기 오류'
-        data = 'jpg, gif, jpeg, png, webp만 가능 합니다.'
-    elif(num == 15):
-        title = '편집 오류'
-        data = '편집 기록은 500자를 넘을 수 없습니다.'
-    elif(num == 16):
-        title = '파일 올리기 오류'
-        data = '동일한 이름의 파일이 있습니다.'
-    elif(num == 17):
-        title = '파일 올리기 오류'
-        data = '파일 용량은 ' + wiki_set(4) + 'MB를 넘길 수 없습니다.'
-    elif(num == 18):
-        title = '편집 오류'
-        data = '내용이 원래 문서와 동일 합니다.'
-    elif(num == 19):
-        title = '이동 오류'
-        data = '이동 하려는 곳에 문서가 이미 있습니다.'
-    elif(num == 20):
-        title = '비밀번호 오류'
-        data = '재 확인이랑 비밀번호가 다릅니다.'
-
-    if(title):
-        return(
-            html_minify(
-                template(
-                    'index', 
-                    imp = [title, wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
-                    data = data,
-                    menu = 0
-                )
-            )
-        )
-    else:
-        return(redirect('/'))
 
 @error(404)
 def error_404(error):
