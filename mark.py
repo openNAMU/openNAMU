@@ -398,7 +398,7 @@ def toc_pas(data, title, num, toc_y):
             if(toc_y == 1):
                 edit_d = ' <span style="font-size:11px;">[<a href="/edit/' + url_pas(title) + '/section/' + str(i[0]) + '">편집</a>]</span>'
 
-            data = re.sub('(={1,6})\s?([^=]*)\s?(?:={1,6})(?:\s+)?\n', '<tablenobr><h' + str(wiki) + ' id="' + c + '" ' + margin + '><a href="#toc" id="s-' + toc + '">' + toc + '.<span style="margin-left: 5px;"></span></a> ' + d + edit_d + '</h' + str(wiki) + '><hr style="margin-top: -5px;">', data, 1)
+            data = re.sub('(={1,6})\s?([^=]*)\s?(?:={1,6})(?:\s+)?\n', '<tablenobr><h' + str(wiki) + ' id="' + c + '" ' + margin + '><a href="#toc" id="s-' + toc + '">' + toc + '.<span style="margin-left: 5px;"></span></a> ' + d + edit_d + '</h' + str(wiki) + '><hr style="margin-top: -5px;">\n', data, 1)
         else:
             rtoc += '</div>'
             
@@ -992,6 +992,7 @@ def namumark(title, data, num, in_c, toc_y):
     data = re.sub('<\/blockquote>(?:(?:\r)?\n){2}<blockquote>', '</blockquote><blockquote>', data)
     data = re.sub('<\/blockquote>(?:(?:\r)?\n)<br><blockquote>', '</blockquote><blockquote>', data)
     data = re.sub('\n', '<br>', data)
+    data = re.sub('<hr style="margin-top: -5px;"><br>', '<hr style="margin-top: -5px;">', data)
     data = re.sub('<isbr>', '\r\n', data)
     data = re.sub('^(?:<br>|\r|\n| )+', '', data)
     data = re.sub('^<div style="margin-top: 30px;" id="cate">', '<div id="cate">', data)
