@@ -45,6 +45,51 @@ def redirect(data):
     return('<meta http-equiv="refresh" content="0;url=' + data + '" />')
 
 def re_error(data):
+    if(data == '/ban'):
+        ip = ip_check()
+        if(ban_check() == 1):
+            curs.execute("select end, why from ban where block = ?", [ip])
+            rows = curs.fetchall()
+            if(not rows):
+                data = re.search("^([0-9](?:[0-9]?[0-9]?)\.[0-9](?:[0-9]?[0-9]?))", ip)
+                if(data):
+                    results = data.groups()
+                    curs.execute("select end, why from ban where block = ? and band = 'O'", [results[0]])
+
+                    rows = curs.fetchall()
+
+            if(rows):
+                if(rows[0][0]):
+                    end = rows[0][0] + ' 까지 차단 상태 입니다. / 사유 : ' + rows[0][1]                
+
+                    now = re.sub(':', '', get_time())
+                    now = re.sub('\-', '', now)
+                    now = int(re.sub(' ', '', now))
+                    
+                    day = re.sub('\-', '', rows[0][0])    
+                    
+                    if(now >= int(day + '000000')):
+                        curs.execute("delete from ban where block = ?", [ip])
+                        conn.commit()
+                        
+                        end = '차단이 풀렸습니다. 다시 시도 해 보세요.'
+                else:
+                    end = '영구 차단 상태 입니다. / 사유 : ' + rows[0][1]
+            else:
+                end = '권한이 맞지 않는 상태 입니다.'
+        else:
+            end = '권한이 맞지 않는 상태 입니다.'
+
+        return(
+            html_minify(
+                template('index', 
+                    imp = ['권한 오류', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
+                    data = end,
+                    menu = 0
+                )
+            )
+        )
+
     d = re.search('\/error\/([0-9]+)', data)
     if(d):
         num = int(d.groups()[0])
@@ -365,7 +410,7 @@ def edit_set(num = 0):
                     )
                 )
     else:
-        return(redirect('/ban'))
+        return(re_error('/ban'))
 
 @route('/not_close_topic')
 def not_close_topic():
@@ -1262,7 +1307,7 @@ def revert(name = None, num = None):
             return(re_error('/error/3'))
 
         if(can == 1):
-            return(redirect('/ban'))
+            return(re_error('/ban'))
         else:
             curs.execute("delete from back where link = ?", [name])
             curs.execute("delete from cat where cat = ?", [name])
@@ -1300,7 +1345,7 @@ def revert(name = None, num = None):
             return(re_error('/error/3'))    
                           
         if(can == 1):
-            return(redirect('/ban'))
+            return(re_error('/ban'))
         else:
             curs.execute("select title from history where title = ? and id = ?", [name, str(num)])
             rows = curs.fetchall()
@@ -1403,7 +1448,7 @@ def edit(name = None, num = None):
     
     if(request.method == 'POST'):
         if(can == 1):
-            return(redirect('/ban'))
+            return(re_error('/ban'))
 
         if(len(request.forms.send) > 500):
             return(re_error('/error/15'))
@@ -1445,7 +1490,7 @@ def edit(name = None, num = None):
         return(redirect('/w/' + url_pas(name)))
     else:        
         if(can == 1):
-            return(redirect('/ban'))
+            return(re_error('/ban'))
             
         curs.execute("select data from data where title = ?", [name])
         rows = curs.fetchall()
@@ -1513,7 +1558,7 @@ def preview(name = None, num = None):
     can = acl_check(name)
     
     if(can == 1):
-        return(redirect('/ban'))
+        return(re_error('/ban'))
          
     newdata = request.forms.content
     newdata = re.sub('^#(?:redirect|넘겨주기) (?P<in>[^\n]*)', ' * [[\g<in>]] 문서로 넘겨주기', newdata)
@@ -1557,7 +1602,7 @@ def delete(name = None):
         rows = curs.fetchall()
         if(rows):
             if(can == 1):
-                return(redirect('/ban'))
+                return(re_error('/ban'))
 
             today = get_time()
             
@@ -1582,7 +1627,7 @@ def delete(name = None):
         rows = curs.fetchall()
         if(rows):
             if(can == 1):
-                return(redirect('/ban'))
+                return(re_error('/ban'))
             else:
                 l_c = login_check()
                 if(l_c == 0):
@@ -1645,7 +1690,7 @@ def move(name = None):
     today = get_time()
 
     if(can == 1):
-        return(redirect('/ban'))
+        return(re_error('/ban'))
     
     if(request.method == 'POST'):
         curs.execute("select data from data where title = ?", [name])
@@ -2239,7 +2284,7 @@ def topic(name = None, sub = None):
                 curs.execute('insert into alarm (name, data, date) values (?, ?, ?)', [d[0], ip + '님이 <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '">사용자 토론</a>을 시작했습니다.', today])
         
         if(ban == 1 and admin != 1):
-            return(redirect('/ban'))
+            return(re_error('/ban'))
 
         rd_plus(
             name, 
@@ -2509,7 +2554,7 @@ def login():
         
     if(request.method == 'POST'):        
         if(ban == 1):
-            return(redirect('/ban'))
+            return(re_error('/ban'))
 
         curs.execute("select pw from user where id = ?", [request.forms.id])
         user = curs.fetchall()
@@ -2538,7 +2583,7 @@ def login():
             return(re_error('/error/5'))
     else:        
         if(ban == 1):
-            return(redirect('/ban'))
+            return(re_error('/ban'))
 
         if(session.get('Now') == 1):
             return(re_error('/error/11'))
@@ -2572,7 +2617,7 @@ def change_password():
     if(request.method == 'POST'):      
         if(request.forms.pw2 == request.forms.pw3):
             if(ban == 1):
-                return(redirect('/ban'))
+                return(re_error('/ban'))
 
             curs.execute("select pw from user where id = ?", [request.forms.id])
             user = curs.fetchall()
@@ -2595,7 +2640,7 @@ def change_password():
             return(re_error('/error/20'))
     else:        
         if(ban == 1):
-            return(redirect('/ban'))
+            return(re_error('/ban'))
 
         if(re.search('(\.|:)', ip)):
             return(redirect('/login'))
@@ -2697,7 +2742,7 @@ def register():
     ban = ban_check()
 
     if(ban == 1):
-        return(redirect('/ban'))
+        return(re_error('/ban'))
     
     if(request.method == 'POST'):        
         if(request.forms.pw == request.forms.pw2):
@@ -3030,53 +3075,6 @@ def user_admin(name = None):
                 return(re_error('/error/5'))
         else:
             return(re_error('/error/3'))
-            
-@route('/ban')
-def are_you_ban():
-    ip = ip_check()
-    
-    if(ban_check() == 1):
-        curs.execute("select end, why from ban where block = ?", [ip])
-        rows = curs.fetchall()
-        if(not rows):
-            data = re.search("^([0-9](?:[0-9]?[0-9]?)\.[0-9](?:[0-9]?[0-9]?))", ip)
-            if(data):
-                results = data.groups()
-                curs.execute("select end, why from ban where block = ? and band = 'O'", [results[0]])
-
-                rows = curs.fetchall()
-
-        if(rows):
-            if(rows[0][0]):
-                end = rows[0][0] + ' 까지 차단 상태 입니다. / 사유 : ' + rows[0][1]                
-
-                now = re.sub(':', '', get_time())
-                now = re.sub('\-', '', now)
-                now = int(re.sub(' ', '', now))
-                
-                day = re.sub('\-', '', rows[0][0])    
-                
-                if(now >= int(day + '000000')):
-                    curs.execute("delete from ban where block = ?", [ip])
-                    conn.commit()
-                    
-                    end = '차단이 풀렸습니다. 다시 시도 해 보세요.'
-            else:
-                end = '영구 차단 상태 입니다. / 사유 : ' + rows[0][1]
-        else:
-            end = '권한이 맞지 않는 상태 입니다.'
-    else:
-        end = '권한이 맞지 않는 상태 입니다.'
-
-    return(
-        html_minify(
-            template('index', 
-                imp = ['권한 오류', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
-                data = end,
-                menu = 0
-            )
-        )
-    )
     
 @route('/w/<name:path>/r/<a:int>/diff/<b:int>')
 def diff_data(name = None, a = None, b = None):
@@ -3364,7 +3362,7 @@ def user_topic_list(name = None, num = 1):
 @route('/upload', method=['GET', 'POST'])
 def upload():
     if(ban_check() == 1):
-        return(redirect('/ban'))
+        return(re_error('/ban'))
     
     if(request.method == 'POST'):
         data = request.files.f_data
