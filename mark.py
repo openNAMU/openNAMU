@@ -507,7 +507,7 @@ def namumark(title, data, num, in_c, toc_y):
         else:
             href = d
             
-        data = re.sub('\r\n#(?:redirect|넘겨주기) ((?:(?!\r|\n|%0D).)+)', '<meta http-equiv="refresh" content="0;url=/w/' + url_pas(href.replace('\\', '').replace('&#x27;', "'")) + '/from/' + url_pas(title) + sh + '" />', data, 1)
+        data = re.sub('\r\n#(?:redirect|넘겨주기) ((?:(?!\r|\n|%0D).)+)', '<meta http-equiv="refresh" content="0;url=/w/' + url_pas(href.replace('\\', '').replace('&#x27;', "'").replace('&quot;', '"')) + '/from/' + url_pas(title) + sh + '" />', data, 1)
           
     data = re.sub("\[nicovideo\((?P<in>[^,)]*)(?:(?:,(?:[^,)]*))+)?\)\]", "[[http://embed.nicovideo.jp/watch/\g<in>]]", data)
     
@@ -717,7 +717,7 @@ def namumark(title, data, num, in_c, toc_y):
                     else:
                         no = ''
                     
-                    data = link.sub('<a ' + no + ' href="/w/' + url_pas(href.replace('\\', '').replace('&#x27;', "'")) + sh + '">' + view + '</a>', data, 1)
+                    data = link.sub('<a ' + no + ' href="/w/' + url_pas(href.replace('\\', '').replace('&#x27;', "'").replace('&quot;', '"')) + sh + '">' + view + '</a>', data, 1)
         else:
             break
             
