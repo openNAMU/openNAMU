@@ -411,7 +411,8 @@ def toc_pas(data, title, num, toc_y):
 def backlink_plus(name, link, backtype, num):
     if(num == 1):
         curs.execute("select title from back where title = ? and link = ? and type = ?", [link, name, backtype])
-        if(not curs.fetchall()):
+        d = curs.fetchall()
+        if(not d):
             try:
                 curs.execute("insert into back (title, link, type) values (?, ?,  ?)", [link, name, backtype])
             except:
@@ -425,7 +426,8 @@ def backlink_plus(name, link, backtype, num):
 def cat_plus(name, link, num):
     if(num == 1):
         curs.execute("select title from cat where title = ? and cat = ?", [link, name])
-        if(not curs.fetchall()):
+        d = curs.fetchall()
+        if(not d):
             try:
                 curs.execute("insert into cat (title, cat) values (?, ?)", [link, name])
             except:
@@ -995,6 +997,9 @@ def namumark(title, data, num, in_c, toc_y):
     data = re.sub('<hr style="margin-top: -5px;"><br>', '<hr style="margin-top: -5px;">', data)
     data = re.sub('<isbr>', '\r\n', data)
     data = re.sub('^(?:<br>|\r|\n| )+', '', data)
-    data = re.sub('^<div style="margin-top: 30px;" id="cate">', '<div id="cate">', data)
+    data = re.sub('^<div style="margin-top: 30px;" id="cate">', '<div id="cate">', data)        
+
+    if(num == 1):
+        conn.commit()
 
     return(data)
