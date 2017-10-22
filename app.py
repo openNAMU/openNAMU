@@ -2687,7 +2687,8 @@ def user_ban(name = None):
     curs.execute("select acl from user where id = ?", [name])
     user = curs.fetchall()
     if(user and user[0][0] != 'user'):
-        return(redirect('/error/4'))
+        if(admin_check(None, None) != 1):
+            return(redirect('/error/4'))
 
     if(request.method == 'POST'):
         if(admin_check(1, 'ban (' + name + ')') == 1):
