@@ -174,20 +174,23 @@ def acl_check(name):
     acl_c = re.search("^사용자:([^/]*)", name)
     if(acl_c):
         acl_n = acl_c.groups()
-        
-        curs.execute("select acl from data where title = ?", [acl_n[0]])
+
+        curs.execute("select acl from data where title = ?", ['사용자:' + acl_n[0]])
         acl_d = curs.fetchall()
         if(acl_d):
             if(acl_d[0][0] == 'all'):
                 return(0)
 
-            if(acl_d[0][0] == 'user' and not re.search("(\.|:)", acl_n[0])):
+            if(acl_d[0][0] == 'user' and not re.search("(\.|:)", ip)):
                 return(0)
 
-            if(not ip == acl_n[0] or re.search("(\.|:)", acl_n[0])):
+            if(not ip == acl_n[0] or re.search("(\.|:)", ip)):
                 return(1)
         
-        return(0)
+        if(ip == acl_n[0] and not re.search("(\.|:)", ip) and not re.search("(\.|:)", acl_n[0])):
+            return(0)
+        else:
+            return(1)
 
     file_c = re.search("^파일:(.*)", name)
     if(file_c and admin_check(5, 'edit (' + name + ')') != 1):
