@@ -117,23 +117,18 @@ def login_check():
     else:
         return(0)
 
-def ip_pas(raw_ip, num):
+def ip_pas(raw_ip):
     if(re.search("(\.|:)", raw_ip)):
         ip = raw_ip
     else:
         curs.execute("select title from data where title = ?", ['사용자:' + raw_ip])
-        row = curs.fetchall()
-        if(row):
+        data = curs.fetchall()
+        if(data):
             ip = '<a href="/w/' + url_pas('사용자:' + raw_ip) + '">' + raw_ip + '</a>'
         else:
             ip = '<a class="not_thing" href="/w/' + url_pas('사용자:' + raw_ip) + '">' + raw_ip + '</a>'
             
-    if(num == 1):
-        ip += ' <a href="/user/' + url_pas(raw_ip) + '/topic">(기록)</a>'
-    elif(num == 2):
-        ip += ' <a href="/record/' + url_pas(raw_ip) + '">(기록)</a> <a href="/user/' + url_pas(raw_ip) + '/topic">(토론 기록)</a>'        
-    else:
-        ip += ' <a href="/record/' + url_pas(raw_ip) + '">(기록)</a>'
+    ip += ' <a href="/record/' + url_pas(raw_ip) + '">(기록)</a>'
 
     return(ip)
 

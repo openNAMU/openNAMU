@@ -481,7 +481,7 @@ def admin_list():
     user_data = curs.fetchall()
 
     for data in user_data:
-        name = ip_pas(data[0], 2) + ' (' + data[1] + ')'
+        name = ip_pas(data[0]) + ' (' + data[1] + ')'
 
         div += '<li>' + str(i) + '. ' + name + '</li>'
         
@@ -523,6 +523,8 @@ def recent_changes(name = None, num = 1):
             
         i = v - 50
 
+        div = '<a href="/user/' + url_pas(name) + '/topic">(토론 기록)</a><br><br>' + div
+
         curs.execute("select id, title, date, ip, send, leng from history where ip = ? order by date desc limit ?, ?", [name, str(i), str(v)])
     else:
         curs.execute("select id, title, date, ip, send, leng from history where not date = 'Dump' order by date desc limit 50")
@@ -552,7 +554,7 @@ def recent_changes(name = None, num = 1):
             else:
                 ban = ' <a href="/ban/' + url_pas(data[3]) + '">(차단)</a>'            
             
-        ip = ip_pas(data[3], None)
+        ip = ip_pas(data[3])
                 
         if((int(data[0]) - 1) == 0):
             revert = ''
@@ -600,7 +602,7 @@ def recent_changes(name = None, num = 1):
         else:
             sub = 0
 
-        title = '사용자 기록'
+        title = '기여 기록'
         menu = [['other', '기타'], ['user', '사용자']]
         div += '<br><a href="/record/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전)</a> <a href="/record/' + url_pas(name) + '/n/' + str(num + 1) + '">(이후)</a>'
     else:
@@ -657,7 +659,7 @@ def user_log(num = 1):
         else:
             ban_button = ''
             
-        ip = ip_pas(data[0], 2)
+        ip = ip_pas(data[0])
             
         list_data += '<li>' + str(j + 1) + '. ' + ip + ban_button + '</li>'
         
@@ -689,7 +691,7 @@ def user_log(num = 1):
     curs.execute("select who, what, time from re_admin order by time desc limit ?, ?", [str(j), str(i)])
     get_list = curs.fetchall()
     for data in get_list:            
-        ip = ip_pas(data[0], 2)
+        ip = ip_pas(data[0])
             
         list_data += '<li>' + str(j + 1) + '. ' + ip + ' / ' + data[1] + ' / ' + data[2] + '</li>'
         
@@ -890,7 +892,7 @@ def block_log(num = 1):
         if(b):
             ip = data[1] + ' (대역)'
         else:
-            ip = ip_pas(data[1], 2)
+            ip = ip_pas(data[1])
 
         if(data[3] != ''):
             end = data[3]
@@ -899,7 +901,7 @@ def block_log(num = 1):
             
         div += '<tr> \
                     <td>' + ip + '</td> \
-                    <td>' + ip_pas(data[2], 2) + '</td> \
+                    <td>' + ip_pas(data[2]) + '</td> \
                     <td>' + end + '</td> \
                 </tr> \
                 <tr> \
@@ -964,7 +966,7 @@ def history_view(name = None, num = 1):
             else:
                 leng = '<span style="color:gray;">' + data[1] + '</span>'
                 
-            ip = ip_pas(data[2], None)
+            ip = ip_pas(data[2])
             
             curs.execute("select block from ban where block = ?", [data[2]])
             ban_it = curs.fetchall()
@@ -2247,7 +2249,7 @@ def topic(name = None, sub = None):
         for dain in top:                     
             top_data = namumark('', dain[0], 0, 0, 0)
                     
-            ip = ip_pas(dain[3], 1)
+            ip = ip_pas(dain[3])
 
             chad = ''
             curs.execute("select who from re_admin where what = ? order by time desc limit 1", ['notice (' + name + ' - ' + sub + '#' + dain[1] + ')'])
@@ -2296,7 +2298,7 @@ def topic(name = None, sub = None):
             else:
                 ban = ''
 
-            ip = ip_pas(dain[3], 1)
+            ip = ip_pas(dain[3])
 
             curs.execute('select acl from user where id = ?', [dain[3]])
             user_acl = curs.fetchall()
@@ -2610,8 +2612,8 @@ def user_check(name = None, name2 = None):
                 else:
                     ua = '<br>'
                 c +=    '<tr> \
-                            <td>' + ip_pas(data[0], 2) + '</td> \
-                            <td>' + ip_pas(data[1], 2) + '</td> \
+                            <td>' + ip_pas(data[0]) + '</td> \
+                            <td>' + ip_pas(data[1]) + '</td> \
                             <td>' + data[3] + '</td> \
                         </tr> \
                         <tr><td colspan="3">' + ua + '</td></tr>'
@@ -3249,6 +3251,8 @@ def user_topic_list(name = None, num = 1):
                         <td style="width: 33.3%;">작성자</td> \
                         <td style="width: 33.3%;">시간</td> \
                     </tr>'
+
+    div = '<a href="/record/' + url_pas(name) + '">(기여 기록)</a><br><br>' + div
     
     curs.execute("select title, id, sub, ip, date from topic where ip = ? order by date desc limit ?, ?", [name, str(i), str(v)])
     rows = curs.fetchall()
@@ -3267,7 +3271,7 @@ def user_topic_list(name = None, num = 1):
             else:
                 ban = ''
                 
-            ip = ip_pas(data[3], 1)
+            ip = ip_pas(data[3])
                 
             div += '<tr> \
                         <td> \
@@ -3401,7 +3405,7 @@ def user_info():
     else:
         acl = '차단'
         
-    ip = ip_pas(ip, 2)
+    ip = ip_pas(ip)
 
     if(login_check() == 1):
         plus = ' * [[wiki:logout|로그아웃]]'
