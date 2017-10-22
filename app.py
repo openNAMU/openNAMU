@@ -1155,7 +1155,7 @@ def history_view(name = None, num = 1):
                 template('index', 
                     imp = [name, wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), ' (역사)', 0],
                     data = div,
-                    menu = [['w/' + url_pas(name), '문서']]
+                    menu = [['w/' + url_pas(name), '문서'], ['move_data/' + url_pas(name), '이동 기록']]
                 )
             )
         )
@@ -1702,8 +1702,6 @@ def move(name = None):
         if(row):
             return(re_error('/error/19'))
 
-
-        
         if(rows):            
             curs.execute("update data set title = ? where title = ?", [request.forms.title, name])
             curs.execute("update back set link = ? where link = ?", [request.forms.title, name])
@@ -1749,7 +1747,7 @@ def move(name = None):
                                 <br> \
                                 <button class="btn btn-primary" type="submit">이동</button> \
                             </form>',
-                    menu = [['w/' + url_pas(name), '문서'], ['move_data/' + url_pas(name), '기록']]
+                    menu = [['w/' + url_pas(name), '문서']]
                 )
             )
         )
