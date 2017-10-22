@@ -1645,8 +1645,7 @@ def other():
                                     ' * [[wiki:block_log|차단 기록]]\r\n' + \
                                     ' * [[wiki:user_log|가입 기록]]\r\n' + \
                                     ' * [[wiki:admin_log|권한 기록]]\r\n' + \
-                                    ' * [[wiki:manager/6|기여 기록]]\r\n' + \
-                                    ' * [[wiki:manager/7|토론 기록]]\r\n' + \
+                                    ' * [[wiki:manager/6|사용자 기록]]\r\n' + \
                                     ' * [[wiki:not_close_topic|열린 토론 목록]]\r\n' + \
                                     '== 기타 ==\r\n' + \
                                     ' * [[wiki:title_index|모든 문서]]\r\n' + \
@@ -1771,24 +1770,6 @@ def manager(num = 1):
                 html_minify(
                     template('index', 
                         imp = ['기록 이동', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
-                        data = '<form method="post"> \
-                                    <input placeholder="사용자명" name="name" type="text"> \
-                                    <br> \
-                                    <br> \
-                                    <button class="btn btn-primary" type="submit">이동</button> \
-                                </form>',
-                        menu = [['other', '기타']]
-                    )
-                )
-            )
-    elif(num == 7):
-        if(request.method == 'POST'):
-            return(redirect('/user/' + url_pas(request.forms.name) + '/topic'))
-        else:
-            return(
-                html_minify(
-                    template('index', 
-                        imp = ['토론 기록 이동', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
                         data = '<form method="post"> \
                                     <input placeholder="사용자명" name="name" type="text"> \
                                     <br> \
