@@ -720,7 +720,7 @@ def namumark(title, data, num, in_c, toc_y):
             break
             
     while(1):
-        m = re.search("((?:(?:( +)\*\s(?:[^\n]*))\n?)+)", data)
+        m = re.search("(\n(?:(?:( +)\*\s(?:[^\n]*))\n?)+)", data)
         if(m):
             result = m.groups()
             end = str(result[0])
@@ -735,7 +735,7 @@ def namumark(title, data, num, in_c, toc_y):
                     break
 
             end = re.sub("\n", '', end)
-            data = re.sub("(?:(?:(?:( +)\*\s([^\n]*))\n?)+)", '<ul style="margin-top: 10px; margin-bottom: 10px;" id="list">' + end + '</ul>', data, 1)
+            data = re.sub("(\n(?:(?:( +)\*\s(?:[^\n]*))\n?)+)", '<ul style="margin-top: 10px; margin-bottom: 10px;" id="list">' + end + '</ul>', data, 1)
         else:
             break
     
