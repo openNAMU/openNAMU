@@ -171,7 +171,7 @@ def edit_set(num = 0):
                     imp = ['설정 편집', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
                     data = '<ul> \
                                 <li><a href="/edit_set/1">기본 설정</a></li> \
-                                <li><a href="/edit_set/2">로그인 관련</a></li> \
+                                <li><a href="/edit_set/2">문구 관련</a></li> \
                             </ul>',
                     menu = [['manager', '관리자']]
                 )
@@ -187,7 +187,7 @@ def edit_set(num = 0):
                 curs.execute("update other set data = ? where name = 'skin'", [request.forms.skin])
                 conn.commit()
 
-                return(redirect('/edit_set'))
+                return(redirect('/edit_set/1'))
             else:
                 i_list = ['name', 'frontpage', 'license', 'upload', 'skin']
                 n_list = ['무명위키', '위키:대문', 'CC 0', '2', '']
@@ -243,7 +243,49 @@ def edit_set(num = 0):
                                         <br> \
                                         <button class="btn btn-primary" type="submit">저장</button> \
                                     </form>',
-                            menu = [['manager', '관리자']]
+                            menu = [['edit_set', '설정 편집']]
+                        )
+                    )
+                )
+    elif(num == 2):
+        if(admin_check(None, 'edit_set') == 1):
+            if(request.method == 'POST'):
+                curs.execute("update other set data = ? where name = ?", [request.forms.contract, 'contract'])
+                conn.commit()
+
+                return(redirect('/edit_set/2'))
+            else:
+                i_list = ['contract']
+                n_list = ['']
+                d_list = []
+                
+                x = 0
+                for i in i_list:
+                    curs.execute('select data from other where name = ?', [i])
+                    sql_d = curs.fetchall()
+                    if(sql_d):
+                        d_list += [sql_d[0][0]]
+                    else:
+                        curs.execute('insert into other (name, data) values (?, ?)', [i, n_list[x]])
+                        d_list += [n_list[x]]
+
+                    x += 1
+                conn.commit()
+
+                return(
+                    html_minify(
+                        template('index', 
+                            imp = ['문구 관련', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
+                            data = '<form method="post"> \
+                                        <span>가입 약관</span> \
+                                        <br> \
+                                        <br> \
+                                        <input placeholder="가입 약관" style="width: 100%;" type="text" name="contract" value="' + d_list[0] + '"> \
+                                        <br> \
+                                        <br> \
+                                        <button class="btn btn-primary" type="submit">저장</button> \
+                                    </form>',
+                            menu = [['edit_set', '설정 편집']]
                         )
                     )
                 )
@@ -2600,11 +2642,19 @@ def register():
         else:
             return(redirect('/error/20'))
     else:        
+        p = ''
+        curs.execute('select data from other where name = "contract"')
+        d = curs.fetchall()
+        if(d):
+            if(d[0][0] != ''):
+                p = d[0][0] + '<br><br>'
+
         return(
             html_minify(
                 template('index',    
                     imp = ['회원가입', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
                     data = '<form method="post"> \
+                                ' + p + ' \
                                 <input placeholder="아이디" name="id" type="text"> \
                                 <br> \
                                 <br> \
