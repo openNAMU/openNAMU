@@ -2008,7 +2008,7 @@ def topic_block(name = None, sub = None, num = None):
                 get_time()
             )
             
-        return(redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub)))
+        return(redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '#' + str(num)))
     else:
         return(redirect('/error/3'))
         
@@ -2034,7 +2034,7 @@ def topic_top(name = None, sub = None, num = None):
                 get_time()
             )
 
-        return(redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub)))
+        return(redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '#' + str(num)))
     else:
         return(redirect('/error/3'))
 
@@ -2115,6 +2115,50 @@ def topic_stop(name = None, sub = None, tool = None):
         
         return(redirect('/error/3'))
 
+@route('/topic/<name:path>/sub/<sub:path>/admin/<num:int>')
+def topic_admin(name = None, sub = None, num = None):
+    curs.execute("select block, ip from topic where title = ? and sub = ? and id = ?", [name, sub, str(num)])
+    data = curs.fetchall()
+    if(not data):
+        return(redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub)))
+
+    is_ban = '<li><a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/b/' + str(num) + '">'
+    if(data[0][0] == 'O'):
+        is_ban += '가림 해제'
+    else:
+        is_ban += '가림'
+    is_ban += '</a></li>'
+
+    curs.execute("select id from topic where title = ? and sub = ? and id = ? and top = 'O'", [name, sub, str(num)])
+    row = curs.fetchall()
+    
+    is_ban += '<li><a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/notice/' + str(num) + '">'
+    if(row):
+        is_ban += '공지 해제'
+    else:
+        is_ban += '공지'
+    is_ban += '</a></li>'
+
+    curs.execute("select end from ban where block = ?", [data[0][1]])
+    ban_it = curs.fetchall()
+
+    ban = '<li><a href="/ban/' + url_pas(data[0][1]) + '">'
+    if(ban_it):
+        ban += '차단 해제'
+    else:
+        ban += '차단'
+    ban += '</a></li>' + is_ban
+
+    return(
+        html_minify(
+            template('index', 
+                imp = ['토론 관리', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), ' (' + str(num) + '번)', 0],
+                data = '<ul>' + ban + '</ul>',
+                menu = [['topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '#' + str(num), '토론']]
+            )  
+        )
+    )
+
 @route('/topic/<name:path>/sub/<sub:path>', method=['POST', 'GET'])
 def topic(name = None, sub = None):
     ip = ip_check()
@@ -2173,21 +2217,21 @@ def topic(name = None, sub = None):
         
         if(admin == 1):
             if(close):
-                div += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/close">(토론 열기)</a> '
+                div += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/close">(열기)</a> '
             else:
-                div += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/close">(토론 닫기)</a> '
+                div += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/close">(닫기)</a> '
             
             if(stop):
-                div += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/stop">(토론 재개)</a> '
+                div += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/stop">(재개)</a> '
             else:
-                div += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/stop">(토론 정지)</a> '
+                div += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/stop">(정지)</a> '
 
             curs.execute("select title from agreedis where title = ? and sub = ?", [name, sub])
             agree = curs.fetchall()
             if(agree):
-                div += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/agree">(합의 취소)</a>'
+                div += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/agree">(합의)</a>'
             else:
-                div += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/agree">(합의 완료)</a>'
+                div += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/agree">(취소)</a>'
             
             div += '<br><br>'
         
@@ -2244,33 +2288,13 @@ def topic(name = None, sub = None):
                 block = ''
 
             indata = namumark('', indata, 0, 0, 0)
-
-            if(admin == 1):
-                if(dain[4] == 'O'):
-                    is_ban = ' <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/b/' + str(i + 1) + '">(해제)</a>'
-                else:
-                    is_ban = ' <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/b/' + str(i + 1) + '">(가림)</a>'
-
-                curs.execute("select id from topic where title = ? and sub = ? and id = ? and top = 'O'", [name, sub, str(i + 1)])
-                row = curs.fetchall()
-                if(row):
-                    is_ban = is_ban + ' <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/notice/' + str(i + 1) + '">(해제)</a>'
-                else:
-                    is_ban = is_ban + ' <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/notice/' + str(i + 1) + '">(공지)</a>'
-                    
-                curs.execute("select end from ban where block = ?", [dain[3]])
-                ban_it = curs.fetchall()
-                if(ban_it):
-                    ban = ' <a href="/ban/' + url_pas(dain[3]) + '">(해제)</a>' + is_ban
-                else:
-                    ban = ' <a href="/ban/' + url_pas(dain[3]) + '">(차단)</a>' + is_ban
+            
+            curs.execute("select end from ban where block = ?", [dain[3]])
+            ban_it = curs.fetchall()
+            if(ban_it):
+                ban = ' <a href="javascript:void(0);" title="차단자">†</a>'
             else:
-                curs.execute("select end from ban where block = ?", [dain[3]])
-                ban_it = curs.fetchall()
-                if(ban_it):
-                    ban = ' <a href="javascript:void(0);" title="차단자">†</a>'
-                else:
-                    ban = ''
+                ban = ''
 
             ip = ip_pas(dain[3], 1)
 
@@ -2281,6 +2305,9 @@ def topic(name = None, sub = None):
 
             if(admin == 1 or block == ''):
                 ip += ' <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/raw/' + str(i + 1) + '">(원본)</a>'
+
+                if(admin == 1):
+                    ip += ' <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/admin/' + str(i + 1) + '">(관리)</a>'
                     
             if(dain[5] == '1'):
                 color = '_blue'
