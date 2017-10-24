@@ -717,7 +717,8 @@ def namumark(title, data, num, in_c, toc_y):
                     else:
                         no = ''
                     
-                    data = link.sub('<a ' + no + ' href="/w/' + url_pas(href.replace('\\', '').replace('&#x27;', "'").replace('&quot;', '"')) + sh + '">' + view + '</a>', data, 1)
+                    a = href.replace('\\', '').replace('&#x27;', "'").replace('&quot;', '"')
+                    data = link.sub('<a ' + no + ' title="' + a + sh + '" href="/w/' + url_pas(a) + sh + '">' + view + '</a>', data, 1)
         else:
             break
             
