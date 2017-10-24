@@ -74,6 +74,7 @@ def send_p(d):
     return(d)
 
 def table_p(d, d2):
+    table_class = 'class="'
     alltable = 'style="'
     celstyle = 'style="'
     rowstyle = 'style="'
@@ -119,40 +120,33 @@ def table_p(d, d2):
     if(table_row):
         row = 'rowspan="' + table_row.groups()[0] + '"'
 
-    row_bgcolor_2 = re.search("&lt;rowbgcolor=(#(?:[0-9a-f-A-F]{6}|[0-9a-f-A-F]{3}))&gt;", d)
+    row_bgcolor_2 = re.search("&lt;rowbgcolor=(#(?:[0-9a-f-A-F]{3}){1,2})&gt;", d)
     row_bgcolor_3 = re.search("&lt;rowbgcolor=(\w+)&gt;", d)
     if(row_bgcolor_2):
         rowstyle += 'background: ' + row_bgcolor_2.groups()[0] + ';'
     elif(row_bgcolor_3):
         rowstyle += 'background: ' + row_bgcolor_3.groups()[0] + ';'
         
-    table_border_2 = re.search("&lt;table\s?bordercolor=(#(?:[0-9a-f-A-F]{6}|[0-9a-f-A-F]{3}))&gt;", d)
+    table_border_2 = re.search("&lt;table\s?bordercolor=(#(?:[0-9a-f-A-F]{3}){1,2})&gt;", d)
     table_border_3 = re.search("&lt;table\s?bordercolor=(\w+)&gt;", d)
     if(table_border_2):
         alltable += 'border: ' + table_border_2.groups()[0] + ' 2px solid;'
     elif(table_border_3):
         alltable += 'border: ' + table_border_3.groups()[0] + ' 2px solid;'
         
-    table_bgcolor_2 = re.search("&lt;table\s?bgcolor=(#(?:[0-9a-f-A-F]{6}|[0-9a-f-A-F]{3}))&gt;", d)
+    table_bgcolor_2 = re.search("&lt;table\s?bgcolor=(#(?:[0-9a-f-A-F]{3}){1,2})&gt;", d)
     table_bgcolor_3 = re.search("&lt;table\s?bgcolor=(\w+)&gt;", d)
     if(table_bgcolor_2):
         alltable += 'background: ' + table_bgcolor_2.groups()[0] + ';'
     elif(table_bgcolor_3):
         alltable += 'background: ' + table_bgcolor_3.groups()[0] + ';'
         
-    bgcolor_2 = re.search("&lt;bgcolor=(#(?:[0-9a-f-A-F]{6}|[0-9a-f-A-F]{3}))&gt;", d)
-    bgcolor_3 = re.search("&lt;bgcolor=(\w+)&gt;", d)
+    bgcolor_2 = re.search("&lt;(?:bgcolor=)?(#(?:[0-9a-f-A-F]{3}){1,2})&gt;", d)
+    bgcolor_3 = re.search("&lt;(?:bgcolor=)?(\w+)&gt;", d)
     if(bgcolor_2):
         celstyle += 'background: ' + bgcolor_2.groups()[0] + ';'
     elif(bgcolor_3):
         celstyle += 'background: ' + bgcolor_3.groups()[0] + ';'
-        
-    st_bgcolor_2 = re.search("&lt;(#(?:[0-9a-f-A-F]{6}|[0-9a-f-A-F]{3}))&gt;", d)
-    st_bgcolor_3 = re.search("&lt;(\w+)&gt;", d)
-    if(st_bgcolor_2):
-        celstyle += 'background: ' + st_bgcolor_2.groups()[0] + ';'
-    elif(st_bgcolor_3):
-        celstyle += 'background: ' + st_bgcolor_3.groups()[0] + ';'
         
     n_width = re.search("&lt;width=((?:(?!&gt;).)*)&gt;", d)
     n_height = re.search("&lt;height=((?:(?!&gt;).)*)&gt;", d)
@@ -170,12 +164,18 @@ def table_p(d, d2):
         celstyle += 'text-align: center;'
     elif(text_left):
         celstyle += 'text-align: left;'
+
+    text_class = re.search("&lt;table\s?class=((?:(?!&gt;).)+)&gt;", d)
+    if(text_class):
+        d = text_class.groups()
+        table_class += d[0]
         
     alltable += '"'
     celstyle += '"'
     rowstyle += '"'
+    table_class += '"'
 
-    return([alltable, rowstyle, celstyle, row, cel])
+    return([alltable, rowstyle, celstyle, row, cel, table_class])
 
 def html_pas(data):
     data = re.sub('%H%', '<', data)
@@ -910,8 +910,9 @@ def namumark(title, data, num, in_c, toc_y):
                         celstyle = table_d[2]
                         row = table_d[3]
                         cel = table_d[4]
+                        table_class = table_d[5]
                             
-                        table = re.sub("^(\|\|(?:(?:\|\|)+)?)((?:&lt;(?:(?:(?!&gt;).)*)&gt;)+)?",   "<table " + alltable + "> \
+                        table = re.sub("^(\|\|(?:(?:\|\|)+)?)((?:&lt;(?:(?:(?!&gt;).)*)&gt;)+)?",   "<table " + table_class + " " + alltable + "> \
                                                                                                         <tbody> \
                                                                                                             <tr " + rowstyle + "> \
                                                                                                                 <td " + cel + " " + row + " " + celstyle + ">", table, 1)
