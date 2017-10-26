@@ -3145,6 +3145,17 @@ def read_view(name = None, num = None, redirect = None):
     div = ''
     topic = 0
     
+    if(not num):
+        session = request.environ.get('beaker.session')
+        if(session.get('View_List')):
+            session['View_List'] += name + '\n'
+            m = re.findall('([^\n]+)\n', session.get('View_List'))
+            if(len(m) > 50):
+                session['View_List'] = re.sub('([^\n]+)\n', '', session.get('View_List'), 1)
+        else:
+            session['View_List'] = name + '\n'
+
+
     curs.execute("select sub from rd where title = ? order by date desc", [name])
     rows = curs.fetchall()
     for data in rows:
@@ -3460,7 +3471,7 @@ def user_info():
     ip = ip_pas(ip)
 
     if(login_check() == 1):
-        plus = ' * [[wiki:logout|로그아웃]]'
+        plus = ' * [[wiki:logout|로그아웃]]\r\n * [[wiki:change|비밀번호 변경]]'
     else:
         plus = ' * [[wiki:login|로그인]]'
 
@@ -3479,9 +3490,32 @@ def user_info():
                                                         ' * [[wiki:custom_js|사용자 JS]]\r\n' + \
                                                         '== 기타 ==\r\n' + \
                                                         ' * [[wiki:alarm|알림]]\r\n' + \
-                                                        ' * [[wiki:change|비밀번호 변경]]\r\n' + \
+                                                        ' * [[wiki:view_log|지나온 문서]]\r\n' + \
                                                         ' * [[wiki:count|기여 횟수]]\r\n', 0, 0, 0),
                 menu = 0
+            )
+        )
+    )
+
+@route('/view_log')
+def view_log():
+    session = request.environ.get('beaker.session')
+    data = '<ul>'
+    if(session.get('View_List')):
+        data += '<li>최근 50개</li><br><br>'
+        m = re.findall('([^\n]+)\n', session.get('View_List'))
+        for d in m:
+            data += '<li><a href="/w/' + url_pas(d) + '">' + d + '</a></li>'
+    else:
+        data += '<li>기록 없음</li>'
+    data += '</ul>'
+
+    return(
+        html_minify(
+            template('index', 
+                imp = ['지나온 문서', wiki_set(1), wiki_set(3), login_check(), custom_css(), custom_js(), 0, 0],
+                data = data,
+                menu = [['user', '사용자']]
             )
         )
     )
