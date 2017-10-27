@@ -105,17 +105,6 @@ def include_check(name, data):
                 curs.execute("delete from back where link = ?", [back_p[0]])
                 curs.execute("delete from cat where cat = ?", [back_p[0]])
                 namumark(back_p[0], data[0][0], 1, 0, 0)
-    
-def login_check():
-    session = request.environ.get('beaker.session')
-    if(session.get('Now') == 1):
-        curs.execute('select name from alarm limit 1')
-        if(curs.fetchall()):
-            return(2)
-        else:
-            return(1)
-    else:
-        return(0)
 
 def ip_pas(raw_ip):
     if(re.search("(\.|:)", raw_ip)):
@@ -132,23 +121,29 @@ def ip_pas(raw_ip):
 
     return(ip)
 
-def custom_css():
+def custom(num):
     session = request.environ.get('beaker.session')
-    try:
-        data = format(session['Daydream'])
-    except:
-        data = ''
+    if(num == 1):
+        try:
+            d = format(session['Daydream'])
+        except:
+            d = ''
+    elif(num == 2):
+        try:
+            d = format(session['AQUARIUM'])
+        except:
+            d = ''
+    else:
+        if(session.get('Now') == 1):
+            curs.execute('select name from alarm limit 1')
+            if(curs.fetchall()):
+                return(2)
+            else:
+                return(1)
+        else:
+            return(0)
 
-    return(data)
-
-def custom_js():
-    session = request.environ.get('beaker.session')
-    try:
-        data = format(session['AQUARIUM'])
-    except:
-        data = ''
-
-    return(data)
+    return(d)
 
 def acl_check(name):
     ip = ip_check()
