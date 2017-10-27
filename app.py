@@ -488,7 +488,7 @@ def acl_list():
             if(data[1] == 'admin'):
                 acl = '관리자'
             else:
-                acl = '로그인'
+                acl = '사용자'
 
             div += '<li>' + str(i + 1) + '. <a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a> (' + acl + ')</li>'
             
@@ -2781,8 +2781,7 @@ def register():
     
     if(request.method == 'POST'):        
         if(request.forms.pw == request.forms.pw2):
-            m = re.search('(?:[^A-Za-zㄱ-힣0-9 ])', request.forms.id)
-            if(m):
+            if(re.search('(?:[^A-Za-zㄱ-힣0-9 ])', request.forms.id)):
                 return(re_error('/error/8'))
 
             if(len(request.forms.id) > 32):
@@ -2972,7 +2971,7 @@ def acl(name = None):
         if(acl_d[0][0] == 'all'):
             now = '모두'
         elif(acl_d[0][0] == 'user'):
-            now = '로그인'
+            now = '사용자'
         else:
             now = '일반'
         
@@ -2986,7 +2985,7 @@ def acl(name = None):
                             <form method="post"> \
                                 <select name="select"> \
                                     <option value="all">모두</option> \
-                                    <option value="user">로그인</option> \
+                                    <option value="user">사용자</option> \
                                     <option value="normal" selected="selected">일반</option> \
                                 </select> \
                                 <br> \
@@ -3027,7 +3026,7 @@ def acl(name = None):
                 if(row[0][0] == 'admin'):
                     now = '관리자'
                 elif(row[0][0] == 'user'):
-                    now = '로그인'
+                    now = '사용자'
                 else:
                     now = '일반'
                 
@@ -3041,7 +3040,7 @@ def acl(name = None):
                                     <form method="post"> \
                                         <select name="select"> \
                                             <option value="admin" selected="selected">관리자</option> \
-                                            <option value="user">로그인</option> \
+                                            <option value="user">사용자</option> \
                                             <option value="normal">일반</option> \
                                         </select> \
                                         <br> \
@@ -3259,7 +3258,7 @@ def read_view(name = None, num = None, redirect = None):
             if(rows[0][0] == 'admin'):
                 acl = ' (관리자)'
             elif(rows[0][0] == 'user'):
-                acl = ' (로그인)'
+                acl = ' (사용자)'
                 
         elsedata = rows[0][1]
     else:
@@ -3282,7 +3281,7 @@ def read_view(name = None, num = None, redirect = None):
             if(rows[0][0] == 'all'):
                 acl += ' (모두)'
             elif(rows[0][0] == 'user'):
-                acl += ' (로그인)'
+                acl += ' (사용자)'
 
         curs.execute("select block from ban where block = ?", [g[0]])
         user = curs.fetchall()
@@ -3499,7 +3498,7 @@ def user_info():
             if(rows[0][0] != 'user'):
                 acl = rows[0][0]
             else:
-                acl = '로그인'
+                acl = '사용자'
         else:
             acl = '일반'
     else:
