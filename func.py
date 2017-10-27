@@ -208,7 +208,6 @@ def acl_check(name):
             return(1)
 
     if(set_d):
-        print(set_d[0][0])
         if(set_d[0][0] == 'user'):
             if(not user_d):
                 return(1)
