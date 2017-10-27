@@ -306,12 +306,13 @@ def edit_set(num = 0):
                 curs.execute("update other set data = ? where name = 'upload'", [request.forms.upload])
                 curs.execute("update other set data = ? where name = 'skin'", [request.forms.skin])
                 curs.execute("update other set data = ? where name = 'edit'", [request.forms.edit])
+                curs.execute("update other set data = ? where name = 'reg'", [request.forms.reg])
                 conn.commit()
 
                 return(redirect('/edit_set/1'))
             else:
-                i_list = ['name', 'frontpage', 'license', 'upload', 'skin', 'edit']
-                n_list = ['무명위키', '위키:대문', 'CC 0', '2', '', 'normal']
+                i_list = ['name', 'frontpage', 'license', 'upload', 'skin', 'edit', 'reg']
+                n_list = ['무명위키', '위키:대문', 'CC 0', '2', '', 'normal', '']
                 d_list = []
                 
                 x = 0
@@ -328,26 +329,23 @@ def edit_set(num = 0):
                 conn.commit()
 
                 div = ''
-                if(d_list[5] == 'ip'):
-                    div += '<option value="ip">가입불가</option>'
-                    div += '<option value="normal">일반</option>'
-                    div += '<option value="admin">관리자</option>'
-                    div += '<option value="login">사용자</option>'
-                elif(d_list[5] == 'login'):
+                if(d_list[5] == 'login'):
                     div += '<option value="login">사용자</option>'
                     div += '<option value="normal">일반</option>'
-                    div += '<option value="ip">가입불가</option>'
                     div += '<option value="admin">관리자</option>'
                 elif(d_list[5] == 'admin'):
                     div += '<option value="admin">관리자</option>'
                     div += '<option value="login">사용자</option>'
                     div += '<option value="normal">일반</option>'
-                    div += '<option value="ip">가입불가</option>'
                 else:
                     div += '<option value="normal">일반</option>'
                     div += '<option value="admin">관리자</option>'
                     div += '<option value="login">사용자</option>'
-                    div += '<option value="ip">가입불가</option>'
+
+                if(d_list[6]):
+                    ch_1 = 'checked="checked"'
+                else:
+                    ch_1 = ''
 
                 return(
                     html_minify(
@@ -390,6 +388,9 @@ def edit_set(num = 0):
                                         <select name="edit"> \
                                             ' + div + ' \
                                         </select> \
+                                        <br> \
+                                        <br> \
+                                        <input type="checkbox" name="reg" ' + ch_1 + '> 가입불가 \
                                         <br> \
                                         <br> \
                                         <button class="btn btn-primary" type="submit">저장</button> \
@@ -2774,9 +2775,9 @@ def register():
         return(re_error('/ban'))
 
     if(not admin_check(None, None) == 1):
-        curs.execute('select data from other where name = "edit"')
+        curs.execute('select data from other where name = "reg"')
         set_d = curs.fetchall()
-        if(set_d and set_d[0][0] == 'ip'):
+        if(set_d and set_d[0][0] == 'on'):
             return(re_error('/ban'))
     
     if(request.method == 'POST'):        
