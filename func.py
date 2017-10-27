@@ -193,10 +193,16 @@ def acl_check(name):
 
     curs.execute("select acl from user where id = ?", [ip])
     user_d = curs.fetchall()
-    if(acl_d[0][0] == 'user' and not user_d):
+
+    curs.execute('select data from other where name = "edit"')
+    set_d = curs.fetchall()
+    if(acl_d[0][0] == 'user' or set_d[0][0] == 'login' and not user_d):
         return(1)
 
-    if(acl_d[0][0] == 'admin' and (not user_d or not admin_check(5, 'edit (' + name + ')') == 1)):
+    if(acl_d[0][0] == 'admin' and not user_d or not admin_check(5, 'edit (' + name + ')') == 1):
+        return(1)
+
+    if(set_d[0][0] == 'admin' and not user_d or not admin_check(5, None) == 1):
         return(1)
 
     return(0)
