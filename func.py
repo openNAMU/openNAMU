@@ -279,8 +279,7 @@ def history_plus(title, data, date, ip, send, leng):
     curs.execute("select id from history where title = ? order by id+0 desc limit 1", [title])
     rows = curs.fetchall()
     if(rows):
-        number = int(rows[0][0]) + 1
-        curs.execute("insert into history (id, title, data, date, ip, send, leng) values (?, ?, ?, ?, ?, ?, ?)", [str(number), title, data, date, ip, send, leng])
+        curs.execute("insert into history (id, title, data, date, ip, send, leng) values (?, ?, ?, ?, ?, ?, ?)", [str(int(rows[0][0]) + 1), title, data, date, ip, send, leng])
     else:
         curs.execute("insert into history (id, title, data, date, ip, send, leng) values ('1', ?, ?, ?, ?, ?, ?)", [title, data, date, ip, send + ' (새 문서)', leng])
     conn.commit()

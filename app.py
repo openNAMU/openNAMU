@@ -17,7 +17,7 @@ except:
     print('DB 이름 : ', end = '')
     new_json += [input()]
 
-    print('위키 포트 : ', end = '')
+    print('포트 : ', end = '')
     new_json += [input()]
 
     with open("set.json", "w") as f:
@@ -2294,11 +2294,11 @@ def topic_admin(name = None, sub = None, num = None):
 
 @route('/topic/<name:path>/sub/<sub:path>', method=['POST', 'GET'])
 def topic(name = None, sub = None):
-    ip = ip_check()
     ban = topic_check(name, sub)
     admin = admin_check(3, None)
     
     if(request.method == 'POST'):
+        ip = ip_check()
         today = get_time()
 
         curs.execute("select id from topic where title = ? and sub = ? order by id + 0 desc limit 1", [name, sub])
@@ -2316,11 +2316,7 @@ def topic(name = None, sub = None):
         if(ban == 1 and admin != 1):
             return(re_error('/ban'))
 
-        rd_plus(
-            name, 
-            sub, 
-            today
-        )
+        rd_plus(name, sub, today)
         
         data = re.sub("\[\[(분류:(?:(?:(?!\]\]).)*))\]\]", "[br]", request.forms.content)
         m = re.findall("(?:#([0-9]+))", data)
@@ -2339,128 +2335,120 @@ def topic(name = None, sub = None):
         
         return(redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub)))
     else:
-        style = ''
+        s = ''
         div = ''
 
         curs.execute("select title from stop where title = ? and sub = ? and close = 'O'", [name, sub])
-        close = curs.fetchall()
+        cd = curs.fetchall()
 
         curs.execute("select title from stop where title = ? and sub = ? and close = ''", [name, sub])
-        stop = curs.fetchall()
+        sd = curs.fetchall()
         
         if(admin == 1):
-            if(close):
+            if(cd):
                 div += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/close">(열기)</a> '
             else:
                 div += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/close">(닫기)</a> '
             
-            if(stop):
+            if(sd):
                 div += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/stop">(재개)</a> '
             else:
                 div += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/stop">(정지)</a> '
 
             curs.execute("select title from agreedis where title = ? and sub = ?", [name, sub])
-            agree = curs.fetchall()
-            if(agree):
+            if(curs.fetchall()):
                 div += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/agree">(합의)</a>'
             else:
                 div += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/agree">(취소)</a>'
             
             div += '<br><br>'
         
-        if((stop or close) and admin != 1):
-            style = 'display:none;'
+        if((sd or cd) and admin != 1):
+            s = 'display: none;'
         
         curs.execute("select data, id, date, ip, block, top from topic where title = ? and sub = ? order by id + 0 asc", [name, sub])
-        toda = curs.fetchall()
+        t1 = curs.fetchall()
 
         curs.execute("select data, id, date, ip from topic where title = ? and sub = ? and top = 'O' order by id + 0 asc", [name, sub])
-        top = curs.fetchall()
+        t2 = curs.fetchall()
 
-        for dain in top:                     
-            top_data = namumark('', dain[0], 0, 0, 0)
-                    
-            ip = ip_pas(dain[3])
-
-            chad = ''
-            curs.execute("select who from re_admin where what = ? order by time desc limit 1", ['notice (' + name + ' - ' + sub + '#' + dain[1] + ')'])
-            no_da = curs.fetchall()
-            if(no_da):
-                chad += ' @' + no_da[0][0]
+        for d in t2:                   
+            a = ''
+            curs.execute("select who from re_admin where what = ? order by time desc limit 1", ['notice (' + name + ' - ' + sub + '#' + d[1] + ')'])
+            m = curs.fetchall()
+            if(m):
+                a += ' @' + m[0][0]
                                 
             div += '<table id="toron"> \
                         <tbody> \
                             <tr> \
                                 <td id="toron_color_red"> \
-                                    <a href="#' + dain[1] + '">#' + dain[1] + '</a> ' + ip + chad + ' <span style="float:right;">' + dain[2] + '</span> \
+                                    <a href="#' + d[1] + '">#' + d[1] + '</a> ' + ip_pas(d[3]) + a + ' <span style="float:right;">' + d[2] + '</span> \
                                 </td> \
                             </tr> \
                             <tr> \
-                                <td>' + top_data + '</td> \
+                                <td>' + namumark('', d[0], 0, 0, 0) + '</td> \
                             </tr> \
                         </tbody> \
                     </table> \
                     <br>'
                     
-        i = 0          
-        for dain in toda:
-            if(i == 0):
-                start = dain[3]
+        i = 1          
+        for d in t1:
+            if(i == 1):
+                start = d[3]
             
-            indata = dain[0]
-            if(dain[4] == 'O'):
-                block = 'style="background: gainsboro;"'
+            p = d[0]
+            if(d[4] == 'O'):
+                bd = 'style="background: gainsboro;"'
                 if(admin != 1):
-                    curs.execute("select who from re_admin where what = ? order by time desc limit 1", ['blind (' + name + ' - ' + sub + '#' + str(i + 1) + ')'])
-                    bl_da = curs.fetchall()
-                    if(bl_da):
-                        indata = '[[사용자:' + bl_da[0][0] + ']]님이 가림'
+                    curs.execute("select who from re_admin where what = ? order by time desc limit 1", ['blind (' + name + ' - ' + sub + '#' + str(i) + ')'])
+                    b = curs.fetchall()
+                    if(b):
+                        p = '[[사용자:' + b[0][0] + ']]님이 가림'
                     else:
-                        indata = '관리자가 가림'
+                        p = '관리자가 가림'
             else:
-                block = ''
+                bd = ''
 
-            indata = namumark('', indata, 0, 0, 0)
-            
-            curs.execute("select end from ban where block = ?", [dain[3]])
-            ban_it = curs.fetchall()
-            if(ban_it):
-                ban = ' <a href="javascript:void(0);" title="차단자">†</a>'
-            else:
-                ban = ''
+            p = namumark('', p, 0, 0, 0)
 
-            ip = ip_pas(dain[3])
+            ip = ip_pas(d[3])
 
-            curs.execute('select acl from user where id = ?', [dain[3]])
+            curs.execute('select acl from user where id = ?', [d[3]])
             user_acl = curs.fetchall()
             if(user_acl and user_acl[0][0] != 'user'):
                 ip += ' <a href="javascript:void(0);" title="관리자">★</a>'
 
-            if(admin == 1 or block == ''):
+            if(admin == 1 or bd == ''):
                 ip += ' <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/raw/' + str(i + 1) + '">(원본)</a>'
 
                 if(admin == 1):
                     ip += ' <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/admin/' + str(i + 1) + '">(관리)</a>'
+
+            curs.execute("select end from ban where block = ?", [d[3]])
+            if(curs.fetchall()):
+                ip += ' <a href="javascript:void(0);" title="차단자">†</a>'
                     
-            if(dain[5] == '1'):
-                color = '_blue'
-            elif(dain[3] == start):
-                color = '_green'
+            if(d[5] == '1'):
+                c = '_blue'
+            elif(d[3] == start):
+                c = '_green'
             else:
-                color = ''
+                c = ''
                 
             if(indata == ''):
-                indata = '<br>'
+                p = '<br>'
                          
             div += '<table id="toron"> \
                         <tbody> \
                             <tr> \
-                                <td id="toron_color' + color + '"> \
-                                    <a href="javascript:void(0);" id="' + str(i + 1) + '">#' + str(i + 1) + '</a> ' + ip + ban + ' <span style="float:right;">' + dain[2] + '</span> \
+                                <td id="toron_color' + c + '"> \
+                                    <a href="javascript:void(0);" id="' + str(i) + '">#' + str(i) + '</a> ' + ip + ' <span style="float:right;">' + d[2] + '</span> \
                                 </td> \
                             </tr> \
-                            <tr ' + block + '> \
-                                <td>' + indata + '</td> \
+                            <tr ' + bd + '> \
+                                <td>' + p + '</td> \
                             </tr> \
                         </tbody> \
                     </table> \
@@ -2468,13 +2456,12 @@ def topic(name = None, sub = None):
                 
             i += 1
 
-        l_c = custom(0)
-
+        l = custom(0)
         if(ban != 1):
             data = '<a id="reload" href="javascript:void(0);" onclick="location.href.endsWith(\'#reload\') ?  location.reload(true) : location.href = \'#reload\'"> \
                         <i aria-hidden="true" class="fa fa-refresh"></i> \
                     </a> \
-                    <form style="' + style + '" method="post"> \
+                    <form style="' + s + '" method="post"> \
                         <br> \
                         <textarea style="width: 100%; height: 100px;" name="content"></textarea> \
                         <br> \
@@ -2482,16 +2469,15 @@ def topic(name = None, sub = None):
                         <button class="btn btn-primary" type="submit">전송</button> \
                     </form>'
 
-            if(l_c == 0 and style == ''):
+            if(l == 0 and s == ''):
                 data += '<span>비 로그인 상태입니다. 비 로그인으로 작업 시 아이피가 토론에 기록됩니다.</span>'
         else:
             data = ''
 
-
         return(
             html_minify(
                 template('index', 
-                    imp = [name, wiki_set(1), wiki_set(3), custom(0), custom(1), custom(2), ' (토론)', 0],
+                    imp = [name, wiki_set(1), wiki_set(3), l, custom(1), custom(2), ' (토론)', 0],
                     data =  '<h2 style="margin-top: 0px;">' + sub + '</h2> \
                             <br> \
                             ' + div + ' \
