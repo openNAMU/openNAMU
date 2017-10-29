@@ -2426,7 +2426,7 @@ def topic(name = None, sub = None):
             else:
                 c = ''
                 
-            if(indata == ''):
+            if(p == ''):
                 p = '<br>'
                          
             div += '<table id="toron"> \
