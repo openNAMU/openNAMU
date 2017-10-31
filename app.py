@@ -2410,10 +2410,10 @@ def topic(name = None, sub = None):
                 ip += ' <a href="javascript:void(0);" title="관리자">★</a>'
 
             if(admin == 1 or bd == ''):
-                ip += ' <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/raw/' + str(i + 1) + '">(원본)</a>'
+                ip += ' <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/raw/' + str(i) + '">(원본)</a>'
 
                 if(admin == 1):
-                    ip += ' <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/admin/' + str(i + 1) + '">(관리)</a>'
+                    ip += ' <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/admin/' + str(i) + '">(관리)</a>'
 
             curs.execute("select end from ban where block = ?", [d[3]])
             if(curs.fetchall()):
