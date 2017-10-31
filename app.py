@@ -372,7 +372,7 @@ def edit_set(num = 0):
                                         <input placeholder="파일 용량 한도" style="width: 100%;" type="text" name="upload" value="' + d_list[3] + '"> \
                                         <br> \
                                         <br> \
-                                        <span>스킨 (기본 : yousoro)</span> \
+                                        <span>스킨 (기본 : yousoro) (위키 끄고 켜야 적용 됨)</span> \
                                         <br> \
                                         <br> \
                                         <input placeholder="스킨" style="width: 100%;" type="text" name="skin" value="' + d_list[4] + '"> \
@@ -2923,7 +2923,7 @@ def user_ban(name = None):
 def acl(name = None):
     ip = ip_check()
     if(ip != name or re.search("(\.|:)", name)):
-        return(re_error('/error/3'))
+        return(redirect('/login'))
     
     if(request.method == 'POST'):
         curs.execute("select acl from data where title = ?", ['사용자:' + name])
@@ -3159,10 +3159,11 @@ def read_view(name = None, num = None, redirect = None):
     if(not num):
         session = request.environ.get('beaker.session')
         if(session.get('View_List')):
-            session['View_List'] += name + '\n'
             m = re.findall('([^\n]+)\n', session.get('View_List'))
-            if(len(m) > 50):
-                session['View_List'] = re.sub('([^\n]+)\n', '', session.get('View_List'), 1)
+            if(m[-1] != name):
+                session['View_List'] += name + '\n'
+                if(len(m) > 50):
+                    session['View_List'] = re.sub('([^\n]+)\n', '', session.get('View_List'), 1)
         else:
             session['View_List'] = name + '\n'
 
