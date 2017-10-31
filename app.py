@@ -1496,8 +1496,6 @@ def edit(name = None, num = None):
             leng = leng_check(len(request.forms.otent), len(content))
             if(num):
                 content = rows[0][0].replace(request.forms.otent, content)
-
-            print(request.forms.otent)
                 
             curs.execute("update data set data = ? where title = ?", [content, name])
         else:
