@@ -216,29 +216,101 @@ def setup():
     except:
         try:
             curs.execute("create table data(title text, data text, acl text)")
-            curs.execute("create table history(id text, title text, data text, date text, ip text, send text, leng text)")
-            curs.execute("create table rd(title text, sub text, date text)")
-            curs.execute("create table user(id text, pw text, acl text)")
-            curs.execute("create table ban(block text, end text, why text, band text)")
-            curs.execute("create table topic(id text, title text, sub text, data text, date text, ip text, block text, top text)")
-            curs.execute("create table stop(title text, sub text, close text)")
-            curs.execute("create table rb(block text, end text, today text, blocker text, why text)")
-            curs.execute("create table back(title text, link text, type text)")
-            curs.execute("create table cat(title text, cat text)")
-            curs.execute("create table hidhi(title text, re text)")
-            curs.execute("create table agreedis(title text, sub text)")
-            curs.execute("create table custom(user text, css text)")
-            curs.execute("create table other(name text, data text)")
-            curs.execute("create table alist(name text, acl text)")
-            curs.execute("create table re_admin(who text, what text, time text)")
-            curs.execute("create table move(origin text, new text, date text, who text, send text)")
-            curs.execute("create table alarm(name text, data text, date text)")
-            curs.execute("create table ua_d(name text, ip text, ua text, today text, sub text)")
-
-            curs.execute("insert into alist (name, acl) values ('소유자', 'owner')")
-            conn.commit()
         except:
             pass
+
+        try:
+            curs.execute("create table history(id text, title text, data text, date text, ip text, send text, leng text)")
+        except:
+            pass
+
+        try:
+            curs.execute("create table rd(title text, sub text, date text)")
+        except:
+            pass
+
+        try:
+            curs.execute("create table user(id text, pw text, acl text)")
+        except:
+            pass
+
+        try:
+            curs.execute("create table ban(block text, end text, why text, band text)")
+        except:
+            pass
+
+        try:
+            curs.execute("create table topic(id text, title text, sub text, data text, date text, ip text, block text, top text)")
+        except:
+            pass
+
+        try:
+            curs.execute("create table stop(title text, sub text, close text)")
+        except:
+            pass
+
+        try:
+            curs.execute("create table rb(block text, end text, today text, blocker text, why text)")
+        except:
+            pass
+
+        try:
+            curs.execute("create table back(title text, link text, type text)")
+        except:
+            pass
+
+        try:
+            curs.execute("create table cat(title text, cat text)")
+        except:
+            pass
+
+        try:
+            curs.execute("create table hidhi(title text, re text)")
+        except:
+            pass
+
+        try:
+            curs.execute("create table agreedis(title text, sub text)")
+        except:
+            pass
+
+        try:
+            curs.execute("create table custom(user text, css text)")
+        except:
+            pass
+
+        try:
+            curs.execute("create table other(name text, data text)")
+        except:
+            pass
+
+        try:
+            curs.execute("create table alist(name text, acl text)")
+            curs.execute("insert into alist (name, acl) values ('소유자', 'owner')")
+        except:
+            pass
+
+        try:
+            curs.execute("create table re_admin(who text, what text, time text)")
+        except:
+            pass
+
+        try:
+            curs.execute("create table move(origin text, new text, date text, who text, send text)")
+        except:
+            pass
+
+        try:
+            curs.execute("create table alarm(name text, data text, date text)")
+        except:
+            pass
+
+        try:
+            curs.execute("create table ua_d(name text, ip text, ua text, today text, sub text)")
+        except:
+            pass
+
+        conn.commit()
 
     return(redirect('/'))
 
@@ -3700,6 +3772,7 @@ def views(name = None):
 @error(404)
 def error_404(error):
     try:
+        curs.execute("select title from data limit 1")
         return(redirect('/w/' + url_pas(wiki_set(2))))
     except:
         return(redirect('/setup'))
@@ -3707,7 +3780,7 @@ def error_404(error):
 @error(500)
 def error_500(error):
     try:
-        curs.execute("select title from data limit 1", [that])
+        curs.execute("select title from data limit 1")
         return(error)
     except:
         return(redirect('/setup'))
