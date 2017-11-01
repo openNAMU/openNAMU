@@ -178,9 +178,9 @@ try:
         if(os.path.exists(os.path.abspath('./views/' + skin_exist[0][0] + '/index.tpl')) == 1):
             TEMPLATE_PATH.insert(0, './views/' + skin_exist[0][0] + '/')
         else:
-            TEMPLATE_PATH.insert(0, './views/yousoro/')
+            TEMPLATE_PATH.insert(0, './views/acme/')
     else:
-        TEMPLATE_PATH.insert(0, './views/yousoro/')
+        TEMPLATE_PATH.insert(0, './views/acme/')
 
     try:
         curs.execute('select name from alarm limit 1')
@@ -372,7 +372,7 @@ def edit_set(num = 0):
                                         <input placeholder="파일 용량 한도" style="width: 100%;" type="text" name="upload" value="' + d_list[3] + '"> \
                                         <br> \
                                         <br> \
-                                        <span>스킨 (기본 : yousoro) (재시작 필요)</span> \
+                                        <span>스킨 (기본 : acme) (재시작 필요)</span> \
                                         <br> \
                                         <br> \
                                         <input placeholder="스킨" style="width: 100%;" type="text" name="skin" value="' + d_list[4] + '"> \
