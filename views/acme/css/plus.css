@@ -30,10 +30,6 @@ textarea {
     box-shadow: 0 2px 5px rgba(50,50,50,0.1);
 }
 
-select {
-    font-size: 16px;
-}
-
 .btn.btn-primary {
     margin: 0;
 }
@@ -64,7 +60,7 @@ select {
 select {
     display: inline-block;
     padding: 0.2rem 0.4rem;
-    font-size: 1rem;
+    font-size: 16px;
     line-height: 1.5;
     color: #55595c;
     background-color: #fff;
