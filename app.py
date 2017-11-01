@@ -205,6 +205,17 @@ try:
     except:
         pass
 
+    try:
+        curs.execute('select title, cat from cat')
+        lo_d = curs.fetchall()
+        for m_lo in lo_d:
+            curs.execute("insert into back (title, link, type) values (?, ?, 'cat')", [m_lo[0], m_lo[1]])
+
+        curs.execute("drop table cat")
+        print('cat 테이블 삭제')
+    except:
+        pass
+
     conn.commit()
 except:
     pass
@@ -256,11 +267,6 @@ def setup():
 
         try:
             curs.execute("create table back(title text, link text, type text)")
-        except:
-            pass
-
-        try:
-            curs.execute("create table cat(title text, cat text)")
         except:
             pass
 
@@ -1410,7 +1416,6 @@ def revert(name = None, num = None):
             return(re_error('/ban'))
         else:
             curs.execute("delete from back where link = ?", [name])
-            curs.execute("delete from cat where cat = ?", [name])
             conn.commit()
 
             curs.execute("select data from history where title = ? and id = ?", [name, str(num)])
@@ -1489,7 +1494,6 @@ def m_del():
                 rows = curs.fetchall()
                 if(rows):
                     curs.execute("delete from back where title = ?", [g])
-                    curs.execute("delete from cat where title = ?", [g])
 
                     leng = '-' + str(len(rows[0][0]))
                     curs.execute("delete from data where title = ?", [g])
@@ -1560,7 +1564,6 @@ def edit(name = None, num = None):
         content = savemark(request.forms.content)
 
         curs.execute("delete from back where link = ?", [name])
-        curs.execute("delete from cat where cat = ?", [name])
 
         curs.execute("select data from data where title = ?", [name])
         rows = curs.fetchall()
@@ -1710,7 +1713,6 @@ def delete(name = None):
             history_plus(name, '', today, ip, request.forms.send + ' (삭제)', leng)
             
             curs.execute("delete from back where link = ?", [name])
-            curs.execute("delete from cat where cat = ?", [name])
             curs.execute("delete from data where title = ?", [name])
             conn.commit()
             
@@ -1798,7 +1800,6 @@ def move(name = None):
         if(rows):            
             curs.execute("update data set title = ? where title = ?", [request.forms.title, name])
             curs.execute("update back set link = ? where link = ?", [request.forms.title, name])
-            curs.execute("update cat set cat = ? where cat = ?", [request.forms.title, name])
             
             d = rows[0][0]
         else:
@@ -3267,10 +3268,10 @@ def read_view(name = None, num = None, redirect = None):
         admin_memu = 0
         
     if(re.search("^분류:", name)):
-        curs.execute("delete from cat where title = ? and cat = ''", [name])
+        curs.execute("delete from back where title = ? and type='cat' and link = ''", [name])
         conn.commit()
         
-        curs.execute("select cat from cat where title = ? order by cat asc", [name])
+        curs.execute("select link from back where title = ? and type='cat' order by link asc", [name])
         rows = curs.fetchall()
         if(rows):
             div = '[목차(없음)]\r\n== 분류 ==\r\n'
