@@ -3480,7 +3480,7 @@ def user_info():
         
     ip = ip_pas(ip)
 
-    if(custom(0) == 1):
+    if(custom(0) != 0):
         plus = ' * [[wiki:logout|로그아웃]]\r\n * [[wiki:change|비밀번호 변경]]'
     else:
         plus = ' * [[wiki:login|로그인]]'
