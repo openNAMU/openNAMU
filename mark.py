@@ -423,21 +423,6 @@ def backlink_plus(name, link, backtype, num):
                     except:
                         time.sleep(1)
 
-def cat_plus(name, link, num):
-    if(num == 1):
-        curs.execute("select title from cat where title = ? and cat = ?", [link, name])
-        d = curs.fetchall()
-        if(not d):
-            try:
-                curs.execute("insert into cat (title, cat) values (?, ?)", [link, name])
-            except:
-                while(1):
-                    try:
-                        curs.execute("insert into cat (title, cat) values (?, ?)", [link, name])
-                        break
-                    except:
-                        time.sleep(1)
-
 def namumark(title, data, num, in_c, toc_y):    
     data = re.sub("\n", "\r\n", re.sub("\r\n", "\n", data))
     data = html_pas(data)
@@ -538,7 +523,7 @@ def namumark(title, data, num, in_c, toc_y):
             g = m.groups()
             
             if(title != g[0]):
-                cat_plus(title, g[0], num)
+                backlink_plus(title, g[0], num, 'cat')
                     
                 if(category == ''):
                     curs.execute("select title from data where title = ?", [g[0]])
