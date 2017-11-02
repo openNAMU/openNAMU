@@ -166,8 +166,8 @@
                 <div class="row">
                     <div class="copyright">
                         {{!imp[2]}}
-                        <span class="pull-right" style="margin-right: 10px; margin-top:5px; padding-bottom: 20px;">
-                            <a href="https://github.com/2DU/openNAMU"><img style="background: white;" src="/views/acme/img/on2.png" width="100px"></a> <a href="/views/acme/list.html">기여자</a>
+                        <span class="pull-right" style="margin-right: 10px; margin-top:5px; padding-bottom: 40px;">
+                            <a href="https://github.com/2DU/openNAMU"><img src="/views/acme/img/on2.png" width="100px"></a> <a href="/views/acme/list.html">기여자</a>
                         </span>    
                     </div>
                 </div>
