@@ -3466,8 +3466,8 @@ def upload():
             if(not value in ['.jpeg', '.jpg', '.gif', '.png', '.webp', '.JPEG', '.JPG', '.GIF', '.PNG', '.WEBP']):
                 return re_error('/error/14')
         
-            if(request.forms.f_name):
-                name = request.forms.f_name + value
+            if(request.forms.get('f_name')):
+                name = request.forms.get('f_name') + value
             else:
                 name = data.filename
             
@@ -3475,8 +3475,8 @@ def upload():
             e_data = sha224(piece[0]) + piece[1]
                 
             ip = ip_check()
-            if(request.forms.f_lice):
-                lice = request.forms.f_lice
+            if(request.forms.get('f_lice')):
+                lice = request.forms.get('f_lice')
             else:
                 if(re.search('(?:\.|:)', ip)):
                     lice = ip + ' 올림'
@@ -3523,7 +3523,7 @@ def upload():
                                 <input placeholder="라이선스" name="f_lice" type="text"> \
                                 <br> \
                                 <br> \
-                                <span>원인 모를 버그로 한글이 되지 않습니다.</span> \
+                                <span>한글이 되지 않을 때도 있습니다.</span> \
                                 <br> \
                                 <br> \
                                 <button class="btn btn-primary" type="submit">저장</button> \
@@ -3531,7 +3531,7 @@ def upload():
                     menu = [['other', '기타']]
                 )
             )
-        )        
+        )  
         
 @route('/user')
 def user_info():
