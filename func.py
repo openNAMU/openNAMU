@@ -165,6 +165,9 @@ def acl_check(name):
     if(acl_c):
         acl_n = acl_c.groups()
 
+        if(admin_check(5, None) == 1):
+            return(0)
+
         curs.execute("select acl from data where title = ?", ['사용자:' + acl_n[0]])
         acl_d = curs.fetchall()
         if(acl_d):
