@@ -26,8 +26,6 @@ if(__name__=='__main__'):
     d4 = data[l * 3:]
 
     curs.execute("delete from back")
-    curs.execute("delete from cat")
-
     conn.commit()
 
     p1 = Process(target = go_namu, args = [d1])
