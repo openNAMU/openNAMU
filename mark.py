@@ -523,7 +523,7 @@ def namumark(title, data, num, in_c, toc_y):
             g = m.groups()
             
             if(title != g[0]):
-                backlink_plus(title, g[0], num, 'cat')
+                backlink_plus(title, g[0], 'cat', num)
                     
                 if(category == ''):
                     curs.execute("select title from data where title = ?", [g[0]])
