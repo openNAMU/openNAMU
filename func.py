@@ -20,7 +20,18 @@ app = beaker.middleware.SessionMiddleware(app(), session_opts)
 from mark import *
 
 def other2(d):
-    return(d)
+    g = 0
+    session = request.environ.get('beaker.session')
+    if(session.get('View_List')):
+        m = re.findall('(?:(?:([^\n]+)\n))', session.get('View_List'))
+        if(m):
+            g = ''
+            for z in m[-6:-1]:
+                g += '<a href="/w/' + url_pas(z) + '">' + z + '</a> / '
+            g = re.sub(' / $', '', g)
+            
+    r = d + [g]
+    return(r)
 
 def wiki_set(num):
     if(num == 1):

@@ -6,6 +6,17 @@
     margin-left: 5px;
 }
 
+.breadcrumbs h1 {
+    word-break: break-all;
+}
+
+#back_title {
+    border: 1px solid #eee;
+    padding: 10px;
+    margin-top: -30px;
+    margin-bottom: 10px;
+}
+
 li {
     margin-left: 20px;
 }
