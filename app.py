@@ -1456,10 +1456,8 @@ def revert(name = None, num = None):
             rows = curs.fetchall()
             if(rows):
                 l = custom()
-                if(l[0] == 0):
-                    plus = '<span>비 로그인 상태입니다. 비 로그인으로 작업 시 아이피가 역사에 기록됩니다.</span> \
-                            <br> \
-                            <br>'
+                if(l[2] == 0):
+                    plus = '<span>비 로그인 상태입니다. 비 로그인으로 작업 시 아이피가 역사에 기록됩니다.</span><br><br>'
                 else:
                     plus = ''
 
@@ -1725,7 +1723,7 @@ def delete(name = None):
                 return(re_error('/ban'))
             else:
                 l = custom()
-                if(l[0] == 0):
+                if(l[2] == 0):
                     plus = '<span>비 로그인 상태입니다. 비 로그인으로 작업 시 아이피가 역사에 기록됩니다.</span><br><br>'
                 else:
                     plus = ''
@@ -1822,7 +1820,7 @@ def move(name = None):
         return(redirect('/w/' + url_pas(request.forms.title)))
     else:
         l = custom()
-        if(l[0] == 0):
+        if(l[2] == 0):
             plus = '<span>비 로그인 상태입니다. 비 로그인으로 작업 시 아이피가 역사에 기록됩니다.</span><br><br>'
         else:
             plus = ''
@@ -2531,7 +2529,7 @@ def topic(name = None, sub = None):
                         <button class="btn btn-primary" type="submit">전송</button> \
                     </form>'
 
-            if(l[0] == 0 and s == ''):
+            if(l[2] == 0 and s == ''):
                 data += '<span>비 로그인 상태입니다. 비 로그인으로 작업 시 아이피가 토론에 기록됩니다.</span>'
         else:
             data = ''
@@ -3554,7 +3552,7 @@ def user_info():
     ip = ip_pas(ip)
 
     l = custom()
-    if(l[0] != 0):
+    if(l[2] != 0):
         plus = ' * [[wiki:logout|로그아웃]]\r\n * [[wiki:change|비밀번호 변경]]'
     else:
         plus = ' * [[wiki:login|로그인]]'
