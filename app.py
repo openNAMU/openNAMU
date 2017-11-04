@@ -473,6 +473,8 @@ def edit_set(num = 0):
                         )
                     )
                 )
+        else:
+            return(re_error('/ban'))
     elif(num == 2):
         if(admin_check(None, 'edit_set') == 1):
             if(request.method == 'POST'):
@@ -515,8 +517,10 @@ def edit_set(num = 0):
                         )
                     )
                 )
+        else:
+            return(re_error('/ban'))
     else:
-        return(re_error('/ban'))
+        return(redirect('/'))
 
 @route('/not_close_topic')
 def not_close_topic():
