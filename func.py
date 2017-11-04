@@ -19,25 +19,41 @@ app = beaker.middleware.SessionMiddleware(app(), session_opts)
 
 from mark import *
 
+def other2(d):
+    return(d)
+
 def wiki_set(num):
     if(num == 1):
-        d_data = '무명위키'
+        r = []
+
         curs.execute('select data from other where name = ?', ['name'])
-    elif(num == 2):
-        d_data = '위키:대문'
+        d = curs.fetchall()
+        if(d):
+            r += [d[0][0]]
+        else:
+            r += ['무명위키']
+
+        curs.execute('select data from other where name = "license"')
+        d = curs.fetchall()
+        if(d):
+            r += [d[0][0]]
+        else:
+            r += ['CC 0']
+
+        return(r)
+
+    if(num == 2):
+        d = '위키:대문'
         curs.execute('select data from other where name = "frontpage"')
     elif(num == 3):
-        d_data = 'CC 0'
-        curs.execute('select data from other where name = "license"')
-    elif(num == 4):
-        d_data = '2'
+        d = '2'
         curs.execute('select data from other where name = "upload"')
     
-    data = curs.fetchall()
-    if(data):
-        return(data[0][0])
+    r = curs.fetchall()
+    if(r):
+        return(r[0][0])
     else:
-        return(d_data)
+        return(d)
 
 def diff(seqm, num):
     output= []
@@ -121,29 +137,28 @@ def ip_pas(raw_ip):
 
     return(ip)
 
-def custom(num):
+def custom():
     session = request.environ.get('beaker.session')
-    if(num == 1):
-        try:
-            d = format(session['Daydream'])
-        except:
-            d = ''
-    elif(num == 2):
-        try:
-            d = format(session['AQUARIUM'])
-        except:
-            d = ''
-    else:
-        if(session.get('Now') == 1):
-            curs.execute('select name from alarm limit 1')
-            if(curs.fetchall()):
-                return(2)
-            else:
-                return(1)
-        else:
-            return(0)
+    try:
+        d1 = format(session['Daydream'])
+    except:
+        d1 = ''
 
-    return(d)
+    try:
+        d2 = format(session['AQUARIUM'])
+    except:
+        d2 = ''
+
+    if(session.get('Now') == 1):
+        curs.execute('select name from alarm limit 1')
+        if(curs.fetchall()):
+            d3 = 2
+        else:
+            d3 = 1
+    else:
+        d3 = 0
+
+    return([d1, d2, d3])
 
 def acl_check(name):
     ip = ip_check()
