@@ -161,7 +161,7 @@ def re_error(data):
         return(redirect('/'))
 
 r_ver = '2.3.5'
-p_ver = ''
+p_ver = 's'
 
 try:
     curs.execute("select title from data limit 1")
