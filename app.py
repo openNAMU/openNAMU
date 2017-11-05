@@ -1018,8 +1018,8 @@ def xref(name = None, num = 1):
             div += ' (' + data[1] + ')'
         
         div += '</li>'
-    else:        
-        div += '</ul><br><a href="/xref/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전)</a> <a href="/xref/' + url_pas(name) + '/n/' + str(num + 1) + '">(이후)</a>'
+      
+    div += '</ul><br><a href="/xref/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전)</a> <a href="/xref/' + url_pas(name) + '/n/' + str(num + 1) + '">(이후)</a>'
     
     return(
         html_minify(
@@ -1027,6 +1027,34 @@ def xref(name = None, num = 1):
                 imp = [name, wiki_set(1), custom(), other2([' (역링크)', 0])],
                 data = div,
                 menu = [['w/' + url_pas(name), '문서']]
+            )
+        )
+    )
+
+@route('/please')
+@route('/please/<num:int>')
+def please(num = 1):
+    if(num * 50 <= 0):
+        v = 50
+    else:
+        v = num * 50
+        
+    i = v - 50
+    div = '<ul>'
+    
+    curs.execute("select title from back where type = 'no' order by link asc limit ?, ?", [str(i), str(v)])
+    rows = curs.fetchall()
+    for data in rows:
+        div += '<li><a class="not_thing" href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a></li>'        
+        
+    div += '</ul><br><a href="/please/' + str(num - 1) + '">(이전)</a> <a href="/please/' + str(num + 1) + '">(이후)</a>'
+    
+    return(
+        html_minify(
+            template('index', 
+                imp = ['필요한 문서', wiki_set(1), custom(), other2([0, 0])],
+                data = div,
+                menu = [['other', '기타']]
             )
         )
     )
@@ -1865,7 +1893,8 @@ def other():
                                     ' * [[wiki:title_index|모든 문서]]\r\n' + \
                                     ' * [[wiki:acl_list|ACL 문서]]\r\n' + \
                                     ' * [[wiki:admin_list|관리자 목록]]\r\n' + \
-                                    ' * [[wiki:give_log|권한 목록]]\r\n' + \
+                                    ' * [[wiki:give_log|권한 목록]]\r\n' + 
+                                    ' * [[wiki:please|필요한 문서]]\r\n' + \
                                     ' * [[wiki:upload|파일 올리기]]\r\n' + \
                                     '== 관리자 ==\r\n' + \
                                     ' * [[wiki:manager/1|관리자 메뉴]]\r\n' + \

@@ -699,6 +699,8 @@ def namumark(title, data, num, in_c, toc_y):
                     curs.execute("select title from data where title = ?", [href.replace('\\', '')])
                     if(not curs.fetchall()):
                         no = 'class="not_thing"'
+
+                        backlink_plus(title, href.replace('\\', ''), 'no', num)
                     else:
                         no = ''
                     
