@@ -10,9 +10,9 @@
         <link rel="stylesheet" href="/views/acme/css/plus.css">
         <script src="/views/acme/js/jquery.min.js"></script>
         <script src="/views/acme/js/bootstrap.min.js"></script>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.7/styles/default.min.css">
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.7/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
         <script>hljs.initHighlightingOnLoad();</script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css">
         <link rel="stylesheet" href="/views/acme/css/font-awesome/css/font-awesome.min.css">
         <script type="text/x-mathjax-config">MathJax.Hub.Config({tex2jax: {inlineMath: [['[math]', '[/math]']]}});</script>
         <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS_CHTML"></script>
@@ -144,12 +144,10 @@
             <div class="container">
                     <div class="row">
                         <div class="col-md-10 col-md-offset-1 mar-b-30">
-                            % if(imp[3][2] != 0):
-                                <div id="back_title">
-                                    추적 : 
-                                    {{!imp[3][2]}}
-                                </div>
-                            % end
+                            <div id="back_title">
+                                추적 : 
+                                {{!imp[3][2]}}
+                            </div>
                             {{!data}}
                         </div>
                     </div>
