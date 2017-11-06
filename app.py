@@ -1671,8 +1671,8 @@ def edit(name = None, num = None):
                 template('index', 
                     imp = [name, wiki_set(1), custom(), other2([' (수정)', 0])],
                     data = '<form method="post" action="/edit/' + url_pas(name) + action + '"> \
-                                <textarea style="height: 80%;" name="content">' + data + '</textarea> \
-                                <textarea style="display: none; height: 80%;" name="otent">' + data + '</textarea> \
+                                <textarea style="height: 80%;" name="content">' + re.sub('>', '&gt;', re.sub('<', '&lt;', data)) + '</textarea> \
+                                <textarea style="display: none; height: 80%;" name="otent">' + re.sub('>', '&gt;', re.sub('<', '&lt;', data)) + '</textarea> \
                                 <br> \
                                 <br> \
                                 <input placeholder="사유" name="send" style="width: 100%;" type="text"> \
@@ -1711,8 +1711,8 @@ def preview(name = None, num = None):
             template('index', 
                 imp = [name, wiki_set(1), custom(), other2([' (미리보기)', 0])],
                 data = '<form method="post" action="/edit/' + url_pas(name) + action + '"> \
-                            <textarea style="height: 80%;" name="content">' + request.forms.content + '</textarea> \
-                            <textarea style="display: none; height: 80%;" name="otent">' + request.forms.otent + '</textarea> \
+                            <textarea style="height: 80%;" name="content">' + re.sub('>', '&gt;', re.sub('<', '&lt;', request.forms.content)) + '</textarea> \
+                            <textarea style="display: none; height: 80%;" name="otent">' + re.sub('>', '&gt;', re.sub('<', '&lt;', request.forms.otent)) + '</textarea> \
                             <br> \
                             <br> \
                             <input placeholder="사유" name="send" style="width: 100%;" type="text"> \

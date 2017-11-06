@@ -327,7 +327,7 @@ def mid_pas(data, fol_num, include, in_c):
                 fol_num += 3
             elif(syn):
                 syn_d = syn.groups()
-                data = com.sub('<pre id="syntax"><code class="' + syn_d[0] + '">' + re.sub('\r\n', '<isbr>', re.sub(' ', '<space>', syn_d[1])) + '</code></pre>', data, 1)
+                data = com.sub('<pre id="syntax"><code class="' + syn_d[0] + '"><code>' + re.sub('\r\n', '<isbr>', re.sub(' ', '<space>', syn_d[1])) + '</code></code></pre>', data, 1)
             elif(include_out):
                 if((include or in_c) == 1):
                     data = com.sub("", data, 1)
@@ -337,6 +337,13 @@ def mid_pas(data, fol_num, include, in_c):
                 data = com.sub(it_d, data, 1)
         else:
             break
+
+    com2 = re.compile("<code>((?:(?!(?:<code>|<\/code>)).)*)<\/code>", re.DOTALL)
+    da_com = com2.findall(data)
+    for com_da in da_com:
+        mid_data = com_da.replace('<', '&lt;').replace('>', '&gt;')
+        mid_data = re.sub("(?P<in>.)", "#no#\g<in>#/no#", mid_data)
+        data = com2.sub(mid_data, data, 1)
             
     return([data, fol_num])
 
@@ -984,13 +991,14 @@ def namumark(title, data, num, in_c, toc_y):
     data = re.sub("\r\n(?P<in><h[0-6])", "\g<in>", data)
     data = re.sub("(\n<nobr>|<nobr>\n|<nobr>)", "", data)
     data = re.sub("#no#(?P<in>.)#\/no#", "\g<in>", data)
-    data = re.sub("<space>", " ", data)
+    data = re.sub("&lt;space&gt;", " ", data)
 
     data = re.sub('<\/blockquote>(?:(?:\r)?\n){2}<blockquote>', '</blockquote><blockquote>', data)
     data = re.sub('<\/blockquote>(?:(?:\r)?\n)<br><blockquote>', '</blockquote><blockquote>', data)
+    
     data = re.sub('\n', '<br>', data)
     data = re.sub('<hr style="margin-top: -5px;"><br>', '<hr style="margin-top: -5px;">', data)
-    data = re.sub('<isbr>', '\r\n', data)
+    data = re.sub('&lt;isbr&gt;', '\r\n', data)
     data = re.sub('^(?:<br>|\r|\n| )+', '', data)
     data = re.sub('^<div style="margin-top: 30px;" id="cate">', '<div id="cate">', data)        
 
