@@ -1723,7 +1723,7 @@ def preview(name = None, num = None):
                                 <button id="preview" class="btn" type="submit" formaction="/preview/' + url_pas(name) + action + '">미리보기</button> \
                             </div> \
                         </form> \
-                        <br>' + enddata,
+                        <br><br>' + enddata,
                 menu = [['w/' + url_pas(name), '문서']]
             )
         )
