@@ -422,8 +422,7 @@ def link(title, data, num, num2, category):
             g = m.groups()
             
             if(title != g[0]):
-                if(num == 1):
-                    backlink_plus(title, g[0], 'cat', num2)
+                backlink_plus(title, g[0], 'cat', num)
                     
                 if(category == ''):
                     curs.execute("select title from data where title = ?", [g[0]])
@@ -505,7 +504,8 @@ def link(title, data, num, num2, category):
                 f_d = re.search('^파일:([^.]+)\.(.+)$', d[0])
                 if(f_d):
                     if(not re.search("^파일:([^\n]*)", title)):
-                        backlink_plus(title, d[0], 'file', num)
+                        if(num == 1):
+                            backlink_plus(title, d[0], 'file', num2)
                         
                     img = span[0] + '<img src="/image/' + sha224(f_d.groups()[0]) + '.' + f_d.groups()[1] + '" ' + width + height + '>' + span[1]
                     data = link.sub(img, data, 1)
@@ -543,13 +543,15 @@ def link(title, data, num, num2, category):
                 elif(re.search('^#', d[0])):
                     data = link.sub('<a href="' + url_pas(href.replace('\\', '')) + sh + '">' + view + '</a>', data, 1)
                 else:
-                    backlink_plus(title, href.replace('\\', ''), '', num)
+                    if(num == 1):
+                        backlink_plus(title, href.replace('\\', ''), '', num2)
                     
                     curs.execute("select title from data where title = ?", [href.replace('\\', '')])
                     if(not curs.fetchall()):
                         no = 'class="not_thing"'
 
-                        backlink_plus(title, href.replace('\\', ''), 'no', num)
+                        if(num == 1):
+                            backlink_plus(title, href.replace('\\', ''), 'no', num2)
                     else:
                         no = ''
                     
