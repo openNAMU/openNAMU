@@ -120,17 +120,6 @@ def admin_check(num, what):
                     reset = 1
                 else:
                     break
-                
-def include_check(name, data):
-    if(re.search('^틀:', name)):
-        curs.execute("select link from back where title = ? and type = 'include'", [name])
-        back = curs.fetchall()
-        for back_p in back:
-            curs.execute("select data from data where title = ?", [back_p[0]])
-            data = curs.fetchall()
-            if(data):
-                curs.execute("delete from back where link = ?", [back_p[0]])
-                namumark(back_p[0], data[0][0], 1, 0, 0)
 
 def ip_pas(raw_ip):
     if(re.search("(\.|:)", raw_ip)):
