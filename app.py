@@ -1009,9 +1009,6 @@ def xref(name = None, num = 1):
     i = v - 50
     div = '<ul>'
     
-    curs.execute("delete from back where title = ? and link = ''", [name])
-    conn.commit()
-    
     curs.execute("select link, type from back where title = ? order by link asc limit ?, ?", [name, str(i), str(v)])
     rows = curs.fetchall()
     for data in rows:
@@ -1044,11 +1041,16 @@ def please(num = 1):
         
     i = v - 50
     div = '<ul>'
+    var = ''
     
-    curs.execute("select title from back where type = 'no' order by link asc limit ?, ?", [str(i), str(v)])
+    curs.execute("select distinct title from back where type = 'no' order by title asc limit ?, ?", [str(i), str(v)])
     rows = curs.fetchall()
+    i += 1
     for data in rows:
-        div += '<li><a class="not_thing" href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a></li>'        
+        if(var != data[0]):
+            div += '<li>' + str(i) + '. <a class="not_thing" href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a></li>'        
+            i += 1
+            var = data[0]
         
     div += '</ul><br><a href="/please/' + str(num - 1) + '">(이전)</a> <a href="/please/' + str(num + 1) + '">(이후)</a>'
     
@@ -3300,10 +3302,7 @@ def read_view(name = None, num = None, redirect = None):
     else:
         admin_memu = 0
         
-    if(re.search("^분류:", name)):
-        curs.execute("delete from back where title = ? and type='cat' and link = ''", [name])
-        conn.commit()
-        
+    if(re.search("^분류:", name)):        
         curs.execute("select link from back where title = ? and type='cat' order by link asc", [name])
         rows = curs.fetchall()
         if(rows):
