@@ -1617,7 +1617,6 @@ def edit(name = None, num = None):
         )
                 
         namumark(name, content, 1, 0, 0)
-        include_check(name, content)
         conn.commit()
         
         return(redirect('/w/' + url_pas(name)))

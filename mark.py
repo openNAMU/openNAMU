@@ -408,115 +408,7 @@ def toc_pas(data, title, num, toc_y):
 
     return(data)
 
-def backlink_plus(name, link, backtype, num):
-    if(num == 1):
-        curs.execute("select title from back where title = ? and link = ? and type = ?", [link, name, backtype])
-        d = curs.fetchall()
-        if(not d):
-            try:
-                curs.execute("insert into back (title, link, type) values (?, ?,  ?)", [link, name, backtype])
-            except:
-                while(1):
-                    try:
-                        curs.execute("insert into back (title, link, type) values (?, ?,  ?)", [link, name, backtype])
-                        break
-                    except:
-                        time.sleep(1)
-
-def namumark(title, data, num, in_c, toc_y):    
-    data = re.sub("\n", "\r\n", re.sub("\r\n", "\n", data))
-    data = html_pas(data)
-    data = '\r\n' + data + '\r\n'
-
-    fol_num = 0
-    var_d = mid_pas(data, fol_num, 0, in_c)
-    
-    data = var_d[0]
-    fol_num = var_d[1]
-    
-    include = re.compile("\[include\(((?:(?!\)\]|,).)*)((?:(?:,\s?(?:(?!\)\]).)*))+)?\)\]")
-    while(1):
-        m = include.search(data)
-        if(m):
-            results = m.groups()
-            if(results[0] == title):
-                data = include.sub("<b>" + results[0] + "</b>", data, 1)
-            else:
-                curs.execute("select data from data where title = ?", [results[0]])
-                in_con = curs.fetchall()
-                
-                backlink_plus(title, results[0], 'include', num)
-                if(in_con):                        
-                    in_data = in_con[0][0]
-                    in_data = include.sub("", in_data)
-                    in_data = re.sub("\n", "\r\n", re.sub("\r\n", "\n", in_data))
-                    in_data = html_pas(in_data)
-                    var_d = mid_pas(in_data, fol_num, 1, in_c)
-                    
-                    in_data = var_d[0]
-                    fol_num = var_d[1]
-                    
-                    if(results[1]):
-                        a = results[1]
-                        while(1):
-                            g = re.search("([^= ,]*)\=([^,]*)", a)
-                            if(g):
-                                result = g.groups()
-                                in_data = re.sub("@" + result[0] + "@", result[1], in_data)
-                                a = re.sub("([^= ,]*)\=([^,]*)", "", a, 1)
-                            else:
-                                break       
-
-                    in_data = toc_pas(in_data, results[0], num, toc_y)
-                                
-                    data = include.sub('\n<nobr><a href="/w/' + url_pas(results[0]) + '">[' + results[0] + ' 이동]</a><div>' + in_data + '</div><nobr>\n', data, 1)
-                else:
-                    data = include.sub("<a class=\"not_thing\" href=\"/w/" + url_pas(results[0]) + "\">" + results[0] + "</a>", data, 1)
-        else:
-            break
-
-    data = re.sub("\r\n##\s?([^\n]*)\r\n", "\r\n", data)
-    
-    data = re.sub("\[anchor\((?P<in>[^\[\]]*)\)\]", '<span id="\g<in>"></span>', data)
-    data = savemark(data)
-    
-    d_re = re.findall('\r\n#(?:redirect|넘겨주기) ((?:(?!\r|\n|%0D).)+)', data)
-    for d in d_re:
-        view = d.replace('\\', '')    
-            
-        sh = ''
-        s_d = re.search('#((?:(?!x27;|#).)+)$', d)
-        if(s_d):
-            href = re.sub('#((?:(?!x27;|#).)+)$', '', d)
-            sh = '#' + s_d.groups()[0]
-        else:
-            href = d
-            
-        data = re.sub('\r\n#(?:redirect|넘겨주기) ((?:(?!\r|\n|%0D).)+)', '<meta http-equiv="refresh" content="0;url=/w/' + url_pas(href.replace('\\', '').replace('&#x27;', "'").replace('&quot;', '"')) + '/from/' + url_pas(title) + sh + '" />', data, 1)
-          
-    data = re.sub("\[nicovideo\((?P<in>[^,)]*)(?:(?:,(?:[^,)]*))+)?\)\]", "[[http://embed.nicovideo.jp/watch/\g<in>]]", data)
-    
-    while(1):
-        m = re.search("\n&gt;\s?((?:[^\n]*)(?:(?:(?:(?:\n&gt;\s?)(?:[^\n]*))+)?))", data)
-        if(m):
-            result = m.groups()
-            blockquote = result[0]
-            blockquote = re.sub("\n&gt;\s?", "\n", blockquote)
-            data = re.sub("\n&gt;\s?((?:[^\n]*)(?:(?:(?:(?:\n&gt;\s?)(?:[^\n]*))+)?))", "\n<blockquote>" + blockquote + "</blockquote>", data, 1)
-        else:
-            break
-    
-    if(not re.search('\[목차\]', data)):
-        if(not re.search('\[목차\(없음\)\]', data)):
-            data = re.sub("(?P<in>(={1,6})\s?([^=]*)\s?(?:={1,6})(?:\s+)?\n)", "[목차]\n\g<in>", data, 1)
-        else:
-            data = re.sub("\[목차\(없음\)\]", "", data)
-        
-    data = re.sub("(\n)(?P<in>\r\n(={1,6})\s?([^=]*)\s?(?:={1,6})(?:\s+)?\n)", "\g<in>", data)
-    
-    data = toc_pas(data, title, num, toc_y)
-    
-    category = ''
+def link(title, data, num, category):
     while(1):
         m = re.search("\[\[(분류:(?:(?:(?!\]\]).)*))\]\]", data)
         if(m):
@@ -547,16 +439,6 @@ def namumark(title, data, num, in_c, toc_y):
             data = re.sub("\[\[(분류:(?:(?:(?!\]\]).)*))\]\]", '', data, 1)
         else:
             break
-
-    data = re.sub("&#x27;&#x27;&#x27;(?P<in>(?:(?!&#x27;&#x27;&#x27;).)*)&#x27;&#x27;&#x27;", '<b>\g<in></b>', data)
-    data = re.sub("&#x27;&#x27;(?P<in>(?:(?!&#x27;&#x27;).)*)&#x27;&#x27;", '<i>\g<in></i>', data)
-    data = re.sub('(?:~~|--)(?P<in>(?:(?!~~|--).)+)(?:~~|--)', '<s>\g<in></s>', data)
-    data = re.sub('__(?P<in>.+?)__(?!_)', '<u>\g<in></u>', data)
-    data = re.sub('\^\^(?P<in>.+?)\^\^(?!\^)', '<sup>\g<in></sup>', data)
-    data = re.sub(',,(?P<in>.+?),,(?!,)', '<sub>\g<in></sub>', data)
-    data = re.sub('&lt;math&gt;(?P<in>((?!&lt;math&gt;).)*)&lt;\/math&gt;', '[math]\g<in>[/math]', data)
-    data = re.sub('{{\|(?P<in>(?:(?:(?:(?!\|}}).)*)(?:\n?))+)\|}}', '<table><tbody><tr><td>\g<in></td></tr></tbody></table>', data)
-    data = re.sub('\[ruby\((?P<in>[^\,]*)\,\s?(?P<out>[^\)]*)\)\]', '<ruby>\g<in><rp>(</rp><rt>\g<out></rt><rp>)</rp></ruby>', data)
     
     test = re.findall('\[\[wiki:([^|\]]+)(?:\|([^\]]+))?\]\]', data)
     if(test):
@@ -565,47 +447,6 @@ def namumark(title, data, num, in_c, toc_y):
                 data = re.sub('\[\[wiki:([^|\]]+)(?:\|([^\]]+))?\]\]', '<a id="inside" href="/' + wiki[0] + '">' + wiki[1] + '</a>', data, 1)
             else:
                 data = re.sub('\[\[wiki:([^|\]]+)(?:\|([^\]]+))?\]\]', '<a id="inside" href="/' + wiki[0] + '">' + wiki[0] + '</a>', data, 1)
-    
-    data = re.sub("\[br\]",'<br>', data)
-    
-    while(1):
-        com = re.compile("\[youtube\(([^, )]*)(,[^)]*)?\)\]")
-        m = com.search(data)
-        if(m):
-            src = ''
-            width = '560'
-            height = '315'
-            time = '0'
-            
-            result = m.groups()
-            if(result[0]):
-                yudt = re.search('(?:\?v=(.*)|\/([^/?]*)|^([a-zA-Z0-9\-_]*))$', result[0])
-                if(yudt):
-                    if(yudt.groups()[0]):
-                        src = yudt.groups()[0]
-                    elif(yudt.groups()[1]):
-                        src = yudt.groups()[1]
-                    elif(yudt.groups()[2]):
-                        src = yudt.groups()[2]
-                else:
-                    src = ''
-                    
-            if(result[1]):
-                mdata = re.search('width=([0-9%]*)', result[1])
-                if(mdata):
-                    width = mdata.groups()[0]
-                
-                mdata = re.search('height=([0-9%]*)', result[1])
-                if(mdata):
-                    height = mdata.groups()[0]
-                    
-                mdata = re.search('time=([0-9]*)', result[1])
-                if(mdata):
-                    time = mdata.groups()[0]
-
-            data = com.sub('<iframe width="' + width + '" height="' + height + '" src="https://www.youtube.com/embed/' + src + '?start=' + time + '" frameborder="0" allowfullscreen></iframe><br>', data, 1)
-        else:
-            break
      
     data = re.sub("\[\[(?::(?P<in>(?:분류|파일):(?:(?:(?!\]\]).)*)))\]\]", "[[\g<in>]]", data)
 
@@ -708,6 +549,171 @@ def namumark(title, data, num, in_c, toc_y):
                     data = link.sub('<a ' + no + ' title="' + a + sh + '" href="/w/' + url_pas(a) + sh + '">' + view + '</a>', data, 1)
         else:
             break
+
+    return([data, category])
+
+
+def backlink_plus(name, link, backtype, num):
+    if(num == 1):
+        curs.execute("select title from back where title = ? and link = ? and type = ?", [link, name, backtype])
+        d = curs.fetchall()
+        if(not d):
+            try:
+                curs.execute("insert into back (title, link, type) values (?, ?,  ?)", [link, name, backtype])
+            except:
+                while(1):
+                    try:
+                        curs.execute("insert into back (title, link, type) values (?, ?,  ?)", [link, name, backtype])
+                        break
+                    except:
+                        time.sleep(1)
+
+def namumark(title, data, num, in_c, toc_y):    
+    data = re.sub("\n", "\r\n", re.sub("\r\n", "\n", data))
+    data = html_pas(data)
+    data = '\r\n' + data + '\r\n'
+
+    fol_num = 0
+    var_d = mid_pas(data, fol_num, 0, in_c)
+    
+    data = var_d[0]
+    fol_num = var_d[1]
+
+    category = ''
+    
+    include = re.compile("\[include\(((?:(?!\)\]|,).)*)((?:(?:,\s?(?:(?!\)\]).)*))+)?\)\]")
+    m = include.findall(data)
+    for results in m:
+        if(results[0] == title):
+            data = include.sub("<b>" + results[0] + "</b>", data, 1)
+        else:
+            curs.execute("select data from data where title = ?", [results[0]])
+            in_con = curs.fetchall()
+            
+            backlink_plus(title, results[0], 'include', num)
+            if(in_con):                        
+                in_data = in_con[0][0]
+                in_data = include.sub("", in_data)
+                in_data = re.sub("\n", "\r\n", re.sub("\r\n", "\n", in_data))
+                in_data = html_pas(in_data)
+                
+                var_d = mid_pas(in_data, fol_num, 1, in_c)
+                var_d2 = link(title, var_d[0], 0, category)
+
+                in_data = var_d2[0]
+                category = var_d2[1]
+                fol_num = var_d[1]
+                
+                if(results[1]):
+                    a = results[1]
+                    while(1):
+                        g = re.search("([^= ,]*)\=([^,]*)", a)
+                        if(g):
+                            result = g.groups()
+                            in_data = re.sub("@" + result[0] + "@", result[1], in_data)
+                            a = re.sub("([^= ,]*)\=([^,]*)", "", a, 1)
+                        else:
+                            break       
+
+                in_data = toc_pas(in_data, results[0], num, toc_y)
+                            
+                data = include.sub('\n<nobr><a href="/w/' + url_pas(results[0]) + '">[' + results[0] + ' 이동]</a><div>' + in_data + '</div><nobr>\n', data, 1)
+            else:
+                data = include.sub("<a class=\"not_thing\" href=\"/w/" + url_pas(results[0]) + "\">" + results[0] + "</a>", data, 1)
+
+    data = re.sub("\r\n##\s?([^\n]*)\r\n", "\r\n", data)
+    
+    data = re.sub("\[anchor\((?P<in>[^\[\]]*)\)\]", '<span id="\g<in>"></span>', data)
+    data = savemark(data)
+    
+    d_re = re.findall('\r\n#(?:redirect|넘겨주기) ((?:(?!\r|\n|%0D).)+)', data)
+    for d in d_re:
+        view = d.replace('\\', '')    
+            
+        sh = ''
+        s_d = re.search('#((?:(?!x27;|#).)+)$', d)
+        if(s_d):
+            href = re.sub('#((?:(?!x27;|#).)+)$', '', d)
+            sh = '#' + s_d.groups()[0]
+        else:
+            href = d
+            
+        data = re.sub('\r\n#(?:redirect|넘겨주기) ((?:(?!\r|\n|%0D).)+)', '<meta http-equiv="refresh" content="0;url=/w/' + url_pas(href.replace('\\', '').replace('&#x27;', "'").replace('&quot;', '"')) + '/from/' + url_pas(title) + sh + '" />', data, 1)
+          
+    data = re.sub("\[nicovideo\((?P<in>[^,)]*)(?:(?:,(?:[^,)]*))+)?\)\]", "[[http://embed.nicovideo.jp/watch/\g<in>]]", data)
+    
+    while(1):
+        m = re.search("\n&gt;\s?((?:[^\n]*)(?:(?:(?:(?:\n&gt;\s?)(?:[^\n]*))+)?))", data)
+        if(m):
+            result = m.groups()
+            blockquote = result[0]
+            blockquote = re.sub("\n&gt;\s?", "\n", blockquote)
+            data = re.sub("\n&gt;\s?((?:[^\n]*)(?:(?:(?:(?:\n&gt;\s?)(?:[^\n]*))+)?))", "\n<blockquote>" + blockquote + "</blockquote>", data, 1)
+        else:
+            break
+    
+    if(not re.search('\[목차\]', data)):
+        if(not re.search('\[목차\(없음\)\]', data)):
+            data = re.sub("(?P<in>(={1,6})\s?([^=]*)\s?(?:={1,6})(?:\s+)?\n)", "[목차]\n\g<in>", data, 1)
+        else:
+            data = re.sub("\[목차\(없음\)\]", "", data)
+        
+    data = re.sub("(\n)(?P<in>\r\n(={1,6})\s?([^=]*)\s?(?:={1,6})(?:\s+)?\n)", "\g<in>", data)
+    data = toc_pas(data, title, num, toc_y)
+
+    data = re.sub("&#x27;&#x27;&#x27;(?P<in>(?:(?!&#x27;&#x27;&#x27;).)*)&#x27;&#x27;&#x27;", '<b>\g<in></b>', data)
+    data = re.sub("&#x27;&#x27;(?P<in>(?:(?!&#x27;&#x27;).)*)&#x27;&#x27;", '<i>\g<in></i>', data)
+    data = re.sub('(?:~~|--)(?P<in>(?:(?!~~|--).)+)(?:~~|--)', '<s>\g<in></s>', data)
+    data = re.sub('__(?P<in>.+?)__(?!_)', '<u>\g<in></u>', data)
+    data = re.sub('\^\^(?P<in>.+?)\^\^(?!\^)', '<sup>\g<in></sup>', data)
+    data = re.sub(',,(?P<in>.+?),,(?!,)', '<sub>\g<in></sub>', data)
+    data = re.sub('&lt;math&gt;(?P<in>((?!&lt;math&gt;).)*)&lt;\/math&gt;', '[math]\g<in>[/math]', data)
+    data = re.sub('{{\|(?P<in>(?:(?:(?:(?!\|}}).)*)(?:\n?))+)\|}}', '<table><tbody><tr><td>\g<in></td></tr></tbody></table>', data)
+    data = re.sub('\[ruby\((?P<in>[^\,]*)\,\s?(?P<out>[^\)]*)\)\]', '<ruby>\g<in><rp>(</rp><rt>\g<out></rt><rp>)</rp></ruby>', data)
+    data = re.sub("\[br\]", '<br>', data)
+    
+    while(1):
+        com = re.compile("\[youtube\(([^, )]*)(,[^)]*)?\)\]")
+        m = com.search(data)
+        if(m):
+            src = ''
+            width = '560'
+            height = '315'
+            time = '0'
+            
+            result = m.groups()
+            if(result[0]):
+                yudt = re.search('(?:\?v=(.*)|\/([^/?]*)|^([a-zA-Z0-9\-_]*))$', result[0])
+                if(yudt):
+                    if(yudt.groups()[0]):
+                        src = yudt.groups()[0]
+                    elif(yudt.groups()[1]):
+                        src = yudt.groups()[1]
+                    elif(yudt.groups()[2]):
+                        src = yudt.groups()[2]
+                else:
+                    src = ''
+                    
+            if(result[1]):
+                mdata = re.search('width=([0-9%]*)', result[1])
+                if(mdata):
+                    width = mdata.groups()[0]
+                
+                mdata = re.search('height=([0-9%]*)', result[1])
+                if(mdata):
+                    height = mdata.groups()[0]
+                    
+                mdata = re.search('time=([0-9]*)', result[1])
+                if(mdata):
+                    time = mdata.groups()[0]
+
+            data = com.sub('<iframe width="' + width + '" height="' + height + '" src="https://www.youtube.com/embed/' + src + '?start=' + time + '" frameborder="0" allowfullscreen></iframe><br>', data, 1)
+        else:
+            break
+
+    var_d2 = link(title, data, 1, category)
+    data = var_d2[0]
+    category = var_d2[1]
             
     while(1):
         m = re.search("(\n(?:(?:( +)\*\s(?:[^\n]*))\n?)+)", data)
