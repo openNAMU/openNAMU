@@ -17,6 +17,11 @@
     margin-bottom: 10px;
 }
 
+.form-control.input-sm {
+    font-size: 14px;
+    color: black;
+}
+
 li {
     margin-left: 20px;
 }

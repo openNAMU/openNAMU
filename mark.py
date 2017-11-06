@@ -415,14 +415,15 @@ def toc_pas(data, title, num, toc_y):
 
     return(data)
 
-def link(title, data, num, category):
+def link(title, data, num, num2, category):
     while(1):
         m = re.search("\[\[(분류:(?:(?:(?!\]\]).)*))\]\]", data)
         if(m):
             g = m.groups()
             
             if(title != g[0]):
-                backlink_plus(title, g[0], 'cat', num)
+                if(num == 1):
+                    backlink_plus(title, g[0], 'cat', num2)
                     
                 if(category == ''):
                     curs.execute("select title from data where title = ?", [g[0]])
@@ -605,7 +606,7 @@ def namumark(title, data, num, in_c, toc_y):
                 in_data = html_pas(in_data)
                 
                 var_d = mid_pas(in_data, fol_num, 1, in_c)
-                var_d2 = link(title, var_d[0], 0, category)
+                var_d2 = link(title, var_d[0], num, 0, category)
 
                 in_data = var_d2[0]
                 category = var_d2[1]
@@ -718,7 +719,7 @@ def namumark(title, data, num, in_c, toc_y):
         else:
             break
 
-    var_d2 = link(title, data, 1, category)
+    var_d2 = link(title, data, num, 1, category)
     data = var_d2[0]
     category = var_d2[1]
             
@@ -995,7 +996,7 @@ def namumark(title, data, num, in_c, toc_y):
 
     data = re.sub('<\/blockquote>(?:(?:\r)?\n){2}<blockquote>', '</blockquote><blockquote>', data)
     data = re.sub('<\/blockquote>(?:(?:\r)?\n)<br><blockquote>', '</blockquote><blockquote>', data)
-    
+
     data = re.sub('\n', '<br>', data)
     data = re.sub('<hr style="margin-top: -5px;"><br>', '<hr style="margin-top: -5px;">', data)
     data = re.sub('&lt;isbr&gt;', '\r\n', data)
