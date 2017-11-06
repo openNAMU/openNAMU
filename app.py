@@ -989,7 +989,10 @@ def indexing():
             for n_cul in r_cul:
                 print(n_cul)
                 sql = 'create index index_' + table[0] + '_' + n_cul + ' on ' + table[0] + '(' + n_cul + ')'
-                curs.execute(sql)
+                try:
+                    curs.execute(sql)
+                except:
+                    pass
         conn.commit()
         return(redirect('/'))
     else:
