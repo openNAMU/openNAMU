@@ -27,7 +27,7 @@ def other2(d):
         if(m):
             g = ''
             for z in m[-6:-1]:
-                g += '<a href="/w/' + url_pas(z) + '">' + z + '</a> / '
+                g += '<a href="/w/' + url_pas(z) + '">' +  html.escape(z) + '</a> / '
             g = re.sub(' / $', '', g)
             
     r = d + [g]
