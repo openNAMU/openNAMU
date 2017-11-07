@@ -21,6 +21,7 @@ app = beaker.middleware.SessionMiddleware(app(), session_opts)
 from mark import *
 
 def other2(d):
+    g = ''
     session = request.environ.get('beaker.session')
     if(session.get('View_List')):
         m = re.findall('(?:(?:([^\n]+)\n))', session.get('View_List'))
