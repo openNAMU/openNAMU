@@ -43,15 +43,11 @@ def include(title, old, new):
 
         curs.execute("select link from back where title = ? and type = 'include'", [title])
         d1 = curs.fetchall()
-        print(d1)
         for x in d1:
-            print('x : ' + str(x[0]))
             for y in m1:
-                print('y : ' + str(y))
                 curs.execute("delete from back where link = ? and type = 'cat'", [y])
 
             for z in m2:
-                print('z : ' + str(z))
                 backlink_plus(x[0], z, 'cat', 1)
 
         conn.commit()
