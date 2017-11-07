@@ -41,7 +41,7 @@ from func import *
 BaseRequest.MEMFILE_MAX = 1000 ** 4
 
 r_ver = '2.3.5'
-p_ver = 's'
+p_ver = 'd'
 
 try:
     curs.execute("select title from data limit 1")
