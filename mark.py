@@ -17,7 +17,7 @@ conn = sqlite3.connect(set_data['db'] + '.db')
 curs = conn.cursor()
 
 session_opts = {
-    'session.type': 'file',
+    'session.type': 'dbm',
     'session.data_dir': './app_session/',
     'session.auto': 1
 }
@@ -416,36 +416,31 @@ def toc_pas(data, title, num, toc_y):
     return(data)
 
 def link(title, data, num, num2, category):
-    while(1):
-        m = re.search("\[\[(분류:(?:(?:(?!\]\]).)*))\]\]", data)
-        if(m):
-            g = m.groups()
-            
-            if(title != g[0]):
-                backlink_plus(title, g[0], 'cat', num)
-                    
-                if(category == ''):
-                    curs.execute("select title from data where title = ?", [g[0]])
-                    exists = curs.fetchall()
-                    if(exists):
-                        red = ""
-                    else:
-                        red = 'class="not_thing"'
-                        
-                    category += '<a ' + red + ' href="/w/' + url_pas(g[0]) + '">' + re.sub("분류:", "", g[0]) + '</a>'
+    m = re.findall("\[\[(분류:(?:(?:(?!\]\]).)*))\]\]", data)
+    for g in m:
+        if(title != g):
+            backlink_plus(title, g, 'cat', num)
+                
+            if(category == ''):
+                curs.execute("select title from data where title = ?", [g])
+                exists = curs.fetchall()
+                if(exists):
+                    red = ""
                 else:
-                    curs.execute("select title from data where title = ?", [g[0]])
-                    exists = curs.fetchall()
-                    if(exists):
-                        red = ""
-                    else:
-                        red = 'class="not_thing"'
-                        
-                    category += ' / ' + '<a ' + red + ' href="/w/' + url_pas(g[0]) + '">' + re.sub("분류:", "", g[0]) + '</a>'
-            
-            data = re.sub("\[\[(분류:(?:(?:(?!\]\]).)*))\]\]", '', data, 1)
-        else:
-            break
+                    red = 'class="not_thing"'
+                    
+                category += '<a ' + red + ' href="/w/' + url_pas(g) + '">' + re.sub("분류:", "", g) + '</a>'
+            else:
+                curs.execute("select title from data where title = ?", [g])
+                exists = curs.fetchall()
+                if(exists):
+                    red = ""
+                else:
+                    red = 'class="not_thing"'
+                    
+                category += ' / ' + '<a ' + red + ' href="/w/' + url_pas(g) + '">' + re.sub("분류:", "", g) + '</a>'
+        
+        data = re.sub("\[\[(분류:(?:(?:(?!\]\]).)*))\]\]", '', data, 1)
     
     test = re.findall('\[\[wiki:([^|\]]+)(?:\|([^\]]+))?\]\]', data)
     if(test):

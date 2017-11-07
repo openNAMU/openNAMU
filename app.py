@@ -5,7 +5,6 @@ import sqlite3
 import bcrypt
 import os
 import difflib
-from css_html_js_minify import html_minify
 from multiprocessing import Process
 
 try:
@@ -30,7 +29,7 @@ conn = sqlite3.connect(set_data['db'] + '.db')
 curs = conn.cursor()
 
 session_opts = {
-    'session.type': 'file',
+    'session.type': 'dbm',
     'session.data_dir': './app_session/',
     'session.auto': 1
 }
@@ -40,125 +39,6 @@ app = beaker.middleware.SessionMiddleware(app(), session_opts)
 from func import *
 
 BaseRequest.MEMFILE_MAX = 1000 ** 4
-
-def redirect(data):
-    return('<meta http-equiv="refresh" content="0;url=' + data + '" />')
-
-def re_error(data):
-    if(data == '/ban'):
-        ip = ip_check()
-        end = '권한이 맞지 않는 상태 입니다.'
-        if(ban_check() == 1):
-            curs.execute("select end, why from ban where block = ?", [ip])
-            d = curs.fetchall()
-            if(not d):
-                m = re.search("^([0-9]{1,3}\.[0-9]{1,3})", ip)
-                if(m):
-                    curs.execute("select end, why from ban where block = ? and band = 'O'", [m.groups()[0]])
-                    d = curs.fetchall()
-
-            if(d):
-                if(d[0][0]):
-                    end = d[0][0] + ' 까지 차단 상태 입니다. / 사유 : ' + d[0][1]                
-
-                    now = re.sub(':', '', get_time())
-                    now = re.sub('\-', '', now)
-                    now = int(re.sub(' ', '', now))
-                    
-                    day = re.sub('\-', '', d[0][0])    
-                    
-                    if(now >= int(day + '000000')):
-                        curs.execute("delete from ban where block = ?", [ip])
-                        conn.commit()
-                        
-                        end = '차단이 풀렸습니다. 다시 시도 해 보세요.'
-                else:
-                    end = '영구 차단 상태 입니다. / 사유 : ' + d[0][1]
-            
-
-        return(
-            html_minify(
-                template('index', 
-                    imp = ['권한 오류', wiki_set(1), custom(), other2([0, 0])],
-                    data = end,
-                    menu = 0
-                )
-            )
-        )
-
-    d = re.search('\/error\/([0-9]+)', data)
-    if(d):
-        num = int(d.groups()[0])
-        if(num == 1):
-            title = '권한 오류'
-            data = '비 로그인 상태 입니다.'
-        elif(num == 2):
-            title = '권한 오류'
-            data = '이 계정이 없습니다.'
-        elif(num == 3):
-            title = '권한 오류'
-            data = '권한이 모자랍니다.'
-        elif(num == 4):
-            title = '권한 오류'
-            data = '관리자는 차단, 검사 할 수 없습니다.'
-        elif(num == 5):
-            title = '사용자 오류'
-            data = '그런 계정이 없습니다.'
-        elif(num == 6):
-            title = '가입 오류'
-            data = '동일한 아이디의 사용자가 있습니다.'
-        elif(num == 7):
-            title = '가입 오류'
-            data = '아이디는 20글자보다 짧아야 합니다.'
-        elif(num == 8):
-            title = '가입 오류'
-            data = '아이디에는 한글과 알파벳과 공백만 허용 됩니다.'
-        elif(num == 9):
-            title = '파일 올리기 오류'
-            data = '파일이 없습니다.'
-        elif(num == 10):
-            title = '변경 오류'
-            data = '비밀번호가 다릅니다.'
-        elif(num == 11):
-            title = '로그인 오류'
-            data = '이미 로그인 되어 있습니다.'
-        elif(num == 14):
-            title = '파일 올리기 오류'
-            data = 'jpg, gif, jpeg, png, webp만 가능 합니다.'
-        elif(num == 15):
-            title = '편집 오류'
-            data = '편집 기록은 500자를 넘을 수 없습니다.'
-        elif(num == 16):
-            title = '파일 올리기 오류'
-            data = '동일한 이름의 파일이 있습니다.'
-        elif(num == 17):
-            title = '파일 올리기 오류'
-            data = '파일 용량은 ' + wiki_set(3) + 'MB를 넘길 수 없습니다.'
-        elif(num == 18):
-            title = '편집 오류'
-            data = '내용이 원래 문서와 동일 합니다.'
-        elif(num == 19):
-            title = '이동 오류'
-            data = '이동 하려는 곳에 문서가 이미 있습니다.'
-        elif(num == 20):
-            title = '비밀번호 오류'
-            data = '재 확인이랑 비밀번호가 다릅니다.'
-
-        if(title):
-            return(
-                html_minify(
-                    template(
-                        'index', 
-                        imp = [title, wiki_set(1), custom(), other2([0, 0])],
-                        data = data,
-                        menu = 0
-                    )
-                )
-            )
-        else:
-            return(redirect('/'))
-    else:
-        return(redirect('/'))
 
 r_ver = '2.3.5'
 p_ver = 's'
@@ -1622,6 +1502,7 @@ def edit(name = None, num = None):
         )
                 
         namumark(name, content, 1, 0, 0)
+        include(name, request.forms.otent, content)
         conn.commit()
         
         return(redirect('/w/' + url_pas(name)))
