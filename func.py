@@ -86,6 +86,13 @@ def wiki_set(num):
         else:
             r += ['']
 
+        curs.execute('select data from other where name = "logo"')
+        d = curs.fetchall()
+        if(d):
+            r += [d[0][0]]
+        else:
+            r += r[0]
+
         return(r)
 
     if(num == 2):
