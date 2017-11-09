@@ -72,6 +72,20 @@ def wiki_set(num):
         else:
             r += ['CC 0']
 
+        curs.execute("select data from other where name = 'css'")
+        d = curs.fetchall()
+        if(d):
+            r += [d[0][0]]
+        else:
+            r += ['']
+
+        curs.execute("select data from other where name = 'js'")
+        d = curs.fetchall()
+        if(d):
+            r += [d[0][0]]
+        else:
+            r += ['']
+
         return(r)
 
     if(num == 2):

@@ -238,167 +238,242 @@ def alarm():
 @route('/edit_set', method=['POST', 'GET'])
 @route('/edit_set/<num:int>', method=['POST', 'GET'])
 def edit_set(num = 0):
+    if(num != 0 and admin_check(None, 'edit_set') != 1):
+        return(redirect('/ban'))
+
     if(num == 0):
+        li_list = ['기본 설정', '문구 관련', '전역 CSS', '전역 JS']
+        x = 0
+        li_data = ''
+        for li in li_list:
+            x += 1
+            li_data += '<li>' + str(x) + '. <a href="/edit_set/' + str(x) + '">' + li + '</a></li>'
+
         return(
             html_minify(
                 template('index', 
                     imp = ['설정 편집', wiki_set(1), custom(), other2([0, 0])],
-                    data = '<ul> \
-                                <li><a href="/edit_set/1">기본 설정</a></li> \
-                                <li><a href="/edit_set/2">문구 관련</a></li> \
-                            </ul>',
+                    data = '<ul>' + li_data + '</ul>',
                     menu = [['manager', '관리자']]
                 )
             )
         )
     elif(num == 1):
-        if(admin_check(None, 'edit_set') == 1):
-            if(request.method == 'POST'):
-                curs.execute("update other set data = ? where name = ?", [request.forms.name, 'name'])
-                curs.execute("update other set data = ? where name = 'frontpage'", [request.forms.frontpage])
-                curs.execute("update other set data = ? where name = 'license'", [request.forms.license])
-                curs.execute("update other set data = ? where name = 'upload'", [request.forms.upload])
-                curs.execute("update other set data = ? where name = 'skin'", [request.forms.skin])
-                curs.execute("update other set data = ? where name = 'edit'", [request.forms.edit])
-                curs.execute("update other set data = ? where name = 'reg'", [request.forms.reg])
-                conn.commit()
+        if(request.method == 'POST'):
+            curs.execute("update other set data = ? where name = ?", [request.forms.name, 'name'])
+            curs.execute("update other set data = ? where name = 'frontpage'", [request.forms.frontpage])
+            curs.execute("update other set data = ? where name = 'license'", [request.forms.license])
+            curs.execute("update other set data = ? where name = 'upload'", [request.forms.upload])
+            curs.execute("update other set data = ? where name = 'skin'", [request.forms.skin])
+            curs.execute("update other set data = ? where name = 'edit'", [request.forms.edit])
+            curs.execute("update other set data = ? where name = 'reg'", [request.forms.reg])
+            conn.commit()
 
-                return(redirect('/edit_set/1'))
+            return(redirect('/edit_set/1'))
+        else:
+            i_list = ['name', 'frontpage', 'license', 'upload', 'skin', 'edit', 'reg']
+            n_list = ['무명위키', '위키:대문', 'CC 0', '2', '', 'normal', '']
+            d_list = []
+            
+            x = 0
+            for i in i_list:
+                curs.execute('select data from other where name = ?', [i])
+                sql_d = curs.fetchall()
+                if(sql_d):
+                    d_list += [sql_d[0][0]]
+                else:
+                    curs.execute('insert into other (name, data) values (?, ?)', [i, n_list[x]])
+                    d_list += [n_list[x]]
+
+                x += 1
+            conn.commit()
+
+            div = ''
+            if(d_list[5] == 'login'):
+                div += '<option value="login">사용자</option>'
+                div += '<option value="normal">일반</option>'
+                div += '<option value="admin">관리자</option>'
+            elif(d_list[5] == 'admin'):
+                div += '<option value="admin">관리자</option>'
+                div += '<option value="login">사용자</option>'
+                div += '<option value="normal">일반</option>'
             else:
-                i_list = ['name', 'frontpage', 'license', 'upload', 'skin', 'edit', 'reg']
-                n_list = ['무명위키', '위키:대문', 'CC 0', '2', '', 'normal', '']
-                d_list = []
-                
-                x = 0
-                for i in i_list:
-                    curs.execute('select data from other where name = ?', [i])
-                    sql_d = curs.fetchall()
-                    if(sql_d):
-                        d_list += [sql_d[0][0]]
-                    else:
-                        curs.execute('insert into other (name, data) values (?, ?)', [i, n_list[x]])
-                        d_list += [n_list[x]]
+                div += '<option value="normal">일반</option>'
+                div += '<option value="admin">관리자</option>'
+                div += '<option value="login">사용자</option>'
 
-                    x += 1
-                conn.commit()
+            if(d_list[6]):
+                ch_1 = 'checked="checked"'
+            else:
+                ch_1 = ''
 
-                div = ''
-                if(d_list[5] == 'login'):
-                    div += '<option value="login">사용자</option>'
-                    div += '<option value="normal">일반</option>'
-                    div += '<option value="admin">관리자</option>'
-                elif(d_list[5] == 'admin'):
-                    div += '<option value="admin">관리자</option>'
-                    div += '<option value="login">사용자</option>'
-                    div += '<option value="normal">일반</option>'
-                else:
-                    div += '<option value="normal">일반</option>'
-                    div += '<option value="admin">관리자</option>'
-                    div += '<option value="login">사용자</option>'
-
-                if(d_list[6]):
-                    ch_1 = 'checked="checked"'
-                else:
-                    ch_1 = ''
-
-                return(
-                    html_minify(
-                        template('index', 
-                            imp = ['기본 설정', wiki_set(1), custom(), other2([0, 0])],
-                            data = '<form method="post"> \
-                                        <span>위키 이름 (기본 : 무명위키)</span> \
-                                        <br> \
-                                        <br> \
-                                        <input placeholder="위키 이름" style="width: 100%;" type="text" name="name" value="' + d_list[0] + '"> \
-                                        <br> \
-                                        <br> \
-                                        <span>시작 페이지 (기본 : 위키:대문)</span> \
-                                        <br> \
-                                        <br> \
-                                        <input placeholder="시작 페이지" style="width: 100%;" type="text" name="frontpage" value="' + d_list[1] + '"> \
-                                        <br> \
-                                        <br> \
-                                        <span>라이선스 (기본 : CC 0)</span> \
-                                        <br> \
-                                        <br> \
-                                        <input placeholder="라이선스" style="width: 100%;" type="text" name="license" value="' + d_list[2] + '"> \
-                                        <br> \
-                                        <br> \
-                                        <span>파일 용량 한도 (기본 : 2)</span> \
-                                        <br> \
-                                        <br> \
-                                        <input placeholder="파일 용량 한도" style="width: 100%;" type="text" name="upload" value="' + d_list[3] + '"> \
-                                        <br> \
-                                        <br> \
-                                        <span>스킨 (기본 : acme) (재시작 필요)</span> \
-                                        <br> \
-                                        <br> \
-                                        <input placeholder="스킨" style="width: 100%;" type="text" name="skin" value="' + d_list[4] + '"> \
-                                        <br> \
-                                        <br> \
-                                        <span>기본 ACL 설정 (기본 : 일반)</span> \
-                                        <br> \
-                                        <br> \
-                                        <select name="edit"> \
-                                            ' + div + ' \
-                                        </select> \
-                                        <br> \
-                                        <br> \
-                                        <input type="checkbox" name="reg" ' + ch_1 + '> 가입불가 \
-                                        <br> \
-                                        <br> \
-                                        <button class="btn btn-primary" type="submit">저장</button> \
-                                    </form>',
-                            menu = [['edit_set', '설정 편집']]
-                        )
+            return(
+                html_minify(
+                    template('index', 
+                        imp = ['기본 설정', wiki_set(1), custom(), other2([0, 0])],
+                        data = '<form method="post"> \
+                                    <span>위키 이름 (기본 : 무명위키)</span> \
+                                    <br> \
+                                    <br> \
+                                    <input placeholder="위키 이름" style="width: 100%;" type="text" name="name" value="' + d_list[0] + '"> \
+                                    <br> \
+                                    <br> \
+                                    <span>시작 페이지 (기본 : 위키:대문)</span> \
+                                    <br> \
+                                    <br> \
+                                    <input placeholder="시작 페이지" style="width: 100%;" type="text" name="frontpage" value="' + d_list[1] + '"> \
+                                    <br> \
+                                    <br> \
+                                    <span>라이선스 (기본 : CC 0)</span> \
+                                    <br> \
+                                    <br> \
+                                    <input placeholder="라이선스" style="width: 100%;" type="text" name="license" value="' + d_list[2] + '"> \
+                                    <br> \
+                                    <br> \
+                                    <span>파일 용량 한도 (기본 : 2)</span> \
+                                    <br> \
+                                    <br> \
+                                    <input placeholder="파일 용량 한도" style="width: 100%;" type="text" name="upload" value="' + d_list[3] + '"> \
+                                    <br> \
+                                    <br> \
+                                    <span>스킨 (기본 : acme) (재시작 필요)</span> \
+                                    <br> \
+                                    <br> \
+                                    <input placeholder="스킨" style="width: 100%;" type="text" name="skin" value="' + d_list[4] + '"> \
+                                    <br> \
+                                    <br> \
+                                    <span>기본 ACL 설정 (기본 : 일반)</span> \
+                                    <br> \
+                                    <br> \
+                                    <select name="edit"> \
+                                        ' + div + ' \
+                                    </select> \
+                                    <br> \
+                                    <br> \
+                                    <input type="checkbox" name="reg" ' + ch_1 + '> 가입불가 \
+                                    <br> \
+                                    <br> \
+                                    <button class="btn btn-primary" type="submit">저장</button> \
+                                </form>',
+                        menu = [['edit_set', '설정 편집']]
                     )
                 )
-        else:
-            return(re_error('/ban'))
+            )
     elif(num == 2):
-        if(admin_check(None, 'edit_set') == 1):
-            if(request.method == 'POST'):
-                curs.execute("update other set data = ? where name = ?", [request.forms.contract, 'contract'])
-                conn.commit()
+        if(request.method == 'POST'):
+            curs.execute("update other set data = ? where name = ?", [request.forms.contract, 'contract'])
+            conn.commit()
 
-                return(redirect('/edit_set/2'))
-            else:
-                i_list = ['contract']
-                n_list = ['']
-                d_list = []
-                
-                x = 0
-                for i in i_list:
-                    curs.execute('select data from other where name = ?', [i])
-                    sql_d = curs.fetchall()
-                    if(sql_d):
-                        d_list += [sql_d[0][0]]
-                    else:
-                        curs.execute('insert into other (name, data) values (?, ?)', [i, n_list[x]])
-                        d_list += [n_list[x]]
+            return(redirect('/edit_set/2'))
+        else:
+            i_list = ['contract']
+            n_list = ['']
+            d_list = []
+            
+            x = 0
+            for i in i_list:
+                curs.execute('select data from other where name = ?', [i])
+                sql_d = curs.fetchall()
+                if(sql_d):
+                    d_list += [sql_d[0][0]]
+                else:
+                    curs.execute('insert into other (name, data) values (?, ?)', [i, n_list[x]])
+                    d_list += [n_list[x]]
 
-                    x += 1
-                conn.commit()
+                x += 1
+            conn.commit()
 
-                return(
-                    html_minify(
-                        template('index', 
-                            imp = ['문구 관련', wiki_set(1), custom(), other2([0, 0])],
-                            data = '<form method="post"> \
-                                        <span>가입 약관</span> \
-                                        <br> \
-                                        <br> \
-                                        <input placeholder="가입 약관" style="width: 100%;" type="text" name="contract" value="' + d_list[0] + '"> \
-                                        <br> \
-                                        <br> \
-                                        <button class="btn btn-primary" type="submit">저장</button> \
-                                    </form>',
-                            menu = [['edit_set', '설정 편집']]
-                        )
+            return(
+                html_minify(
+                    template('index', 
+                        imp = ['문구 관련', wiki_set(1), custom(), other2([0, 0])],
+                        data = '<form method="post"> \
+                                    <span>가입 약관</span> \
+                                    <br> \
+                                    <br> \
+                                    <input placeholder="가입 약관" style="width: 100%;" type="text" name="contract" value="' + d_list[0] + '"> \
+                                    <br> \
+                                    <br> \
+                                    <button class="btn btn-primary" type="submit">저장</button> \
+                                </form>',
+                        menu = [['edit_set', '설정 편집']]
                     )
                 )
+            )
+    elif(num == 3):
+        session = request.environ.get('beaker.session')
+        if(request.method == 'POST'):
+            curs.execute("select name from other where name = 'css'")
+            if(curs.fetchall()):
+                curs.execute("update other set data = ? where name = 'css'", [request.forms.content])
+            else:
+                curs.execute("insert into other (name, data) values ('css', ?)", [request.forms.content])
+            conn.commit()
+
+            return(redirect('/edit_set/3'))
         else:
-            return(re_error('/ban'))
+            curs.execute("select data from other where name = 'css'")
+            css = curs.fetchall()
+            if(css):
+                data = css[0][0]
+            else:
+                data = ''
+
+            return(
+                html_minify(
+                    template('index', 
+                        imp = ['전역 CSS', wiki_set(1), custom(), other2([0, 0])],
+                        data =  '<form method="post"> \
+                                    <textarea rows="30" cols="100" name="content">'\
+                                        + data + \
+                                    '</textarea> \
+                                    <br> \
+                                    <br> \
+                                    <div class="form-actions"> \
+                                        <button class="btn btn-primary" type="submit">저장</button> \
+                                    </div> \
+                                </form>',
+                        menu = [['edit_set', '설정 편집']]
+                    )
+                )
+            )
+    elif(num == 4):
+        session = request.environ.get('beaker.session')
+        if(request.method == 'POST'):
+            curs.execute("select name from other where name = 'js'")
+            if(curs.fetchall()):
+                curs.execute("update other set data = ? where name = 'js'", [request.forms.content])
+            else:
+                curs.execute("insert into other (name, data) values ('js', ?)", [request.forms.content])
+            conn.commit()
+
+            return(redirect('/edit_set/4'))
+        else:
+            curs.execute("select data from other where name = 'js'")
+            js = curs.fetchall()
+            if(js):
+                data = js[0][0]
+            else:
+                data = ''
+
+            return(
+                html_minify(
+                    template('index', 
+                        imp = ['전역 JS', wiki_set(1), custom(), other2([0, 0])],
+                        data =  '<form method="post"> \
+                                    <textarea rows="30" cols="100" name="content">'\
+                                        + data + \
+                                    '</textarea> \
+                                    <br> \
+                                    <br> \
+                                    <div class="form-actions"> \
+                                        <button class="btn btn-primary" type="submit">저장</button> \
+                                    </div> \
+                                </form>',
+                        menu = [['edit_set', '설정 편집']]
+                    )
+                )
+            )
     else:
         return(redirect('/'))
 
@@ -3156,18 +3231,15 @@ def read_view(name = None, num = None, redirect = None):
 
 
     curs.execute("select sub from rd where title = ? order by date desc", [name])
-    rows = curs.fetchall()
-    for data in rows:
+    rd = curs.fetchall()
+    for data in rd:
         curs.execute("select title from stop where title = ? and sub = ? and close = 'O'", [name, data[0]])
-        row = curs.fetchall()
-        if(not row):
+        if(not curs.fetchall()):
             topic = 1
-            
             break
                 
     curs.execute("select title from data where title like ?", ['%' + name + '/%'])
-    under = curs.fetchall()
-    if(under):
+    if(curs.fetchall()):
         down = 1
     else:
         down = 0
@@ -3185,13 +3257,13 @@ def read_view(name = None, num = None, redirect = None):
         
     if(re.search("^분류:", name)):        
         curs.execute("select link from back where title = ? and type='cat' order by link asc", [name])
-        rows = curs.fetchall()
-        if(rows):
+        back = curs.fetchall()
+        if(back):
             div = '[목차(없음)]\r\n== 분류 ==\r\n'
             u_div = ''
             i = 0
             
-            for data in rows:       
+            for data in back:       
                 if(re.search('^분류:', data[0])):
                     if(u_div == ''):
                         u_div = '=== 하위 분류 ===\r\n'
