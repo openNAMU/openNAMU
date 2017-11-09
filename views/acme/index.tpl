@@ -17,6 +17,8 @@
         <script type="text/x-mathjax-config">MathJax.Hub.Config({tex2jax: {inlineMath: [['[math]', '[/math]']]}});</script>
         <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS_CHTML"></script>
         <script src='https://www.google.com/recaptcha/api.js'></script>
+        <style>{{!imp[1][2]}}</style>
+        <script>{{!imp[1][3]}}</script>
         <style>{{!imp[2][0]}}</style>
         <script>{{!imp[2][1]}}</script>
         <meta name="twitter:creator" content="@{{imp[1][0]}}">
