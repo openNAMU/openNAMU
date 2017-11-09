@@ -91,7 +91,7 @@ def wiki_set(num):
         if(d):
             r += [d[0][0]]
         else:
-            r += r[0]
+            r += [r[0]]
 
         return(r)
 
