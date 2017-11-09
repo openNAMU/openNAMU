@@ -315,31 +315,31 @@ def edit_set(num = 0):
                                     <span>위키 이름 (기본 : 무명위키)</span> \
                                     <br> \
                                     <br> \
-                                    <input placeholder="위키 이름" style="width: 100%;" type="text" name="name" value="' + d_list[0] + '"> \
+                                    <input placeholder="위키 이름" style="width: 100%;" type="text" name="name" value="' + html.escape(d_list[0]) + '"> \
                                     <br> \
                                     <br> \
                                     <span>시작 페이지 (기본 : 위키:대문)</span> \
                                     <br> \
                                     <br> \
-                                    <input placeholder="시작 페이지" style="width: 100%;" type="text" name="frontpage" value="' + d_list[1] + '"> \
+                                    <input placeholder="시작 페이지" style="width: 100%;" type="text" name="frontpage" value="' + html.escape(d_list[1]) + '"> \
                                     <br> \
                                     <br> \
                                     <span>라이선스 (기본 : CC 0)</span> \
                                     <br> \
                                     <br> \
-                                    <input placeholder="라이선스" style="width: 100%;" type="text" name="license" value="' + d_list[2] + '"> \
+                                    <input placeholder="라이선스" style="width: 100%;" type="text" name="license" value="' + html.escape(d_list[2]) + '"> \
                                     <br> \
                                     <br> \
                                     <span>파일 용량 한도 (기본 : 2)</span> \
                                     <br> \
                                     <br> \
-                                    <input placeholder="파일 용량 한도" style="width: 100%;" type="text" name="upload" value="' + d_list[3] + '"> \
+                                    <input placeholder="파일 용량 한도" style="width: 100%;" type="text" name="upload" value="' + html.escape(d_list[3]) + '"> \
                                     <br> \
                                     <br> \
                                     <span>스킨 (기본 : acme) (재시작 필요)</span> \
                                     <br> \
                                     <br> \
-                                    <input placeholder="스킨" style="width: 100%;" type="text" name="skin" value="' + d_list[4] + '"> \
+                                    <input placeholder="스킨" style="width: 100%;" type="text" name="skin" value="' + html.escape(d_list[4]) + '"> \
                                     <br> \
                                     <br> \
                                     <span>기본 ACL 설정 (기본 : 일반)</span> \
@@ -391,7 +391,7 @@ def edit_set(num = 0):
                                     <span>가입 약관</span> \
                                     <br> \
                                     <br> \
-                                    <input placeholder="가입 약관" style="width: 100%;" type="text" name="contract" value="' + d_list[0] + '"> \
+                                    <input placeholder="가입 약관" style="width: 100%;" type="text" name="contract" value="' + html.escape(d_list[0]) + '"> \
                                     <br> \
                                     <br> \
                                     <button class="btn btn-primary" type="submit">저장</button> \
@@ -425,7 +425,7 @@ def edit_set(num = 0):
                         imp = ['전역 CSS', wiki_set(1), custom(), other2([0, 0])],
                         data =  '<form method="post"> \
                                     <textarea rows="30" cols="100" name="content">'\
-                                        + data + \
+                                        + html.escape(data) + \
                                     '</textarea> \
                                     <br> \
                                     <br> \
@@ -462,7 +462,7 @@ def edit_set(num = 0):
                         imp = ['전역 JS', wiki_set(1), custom(), other2([0, 0])],
                         data =  '<form method="post"> \
                                     <textarea rows="30" cols="100" name="content">'\
-                                        + data + \
+                                        + html.escape(data) + \
                                     '</textarea> \
                                     <br> \
                                     <br> \
@@ -1627,8 +1627,8 @@ def edit(name = None, num = None):
                 template('index', 
                     imp = [name, wiki_set(1), custom(), other2([' (수정)', 0])],
                     data = '<form method="post" action="/edit/' + url_pas(name) + action + '"> \
-                                <textarea style="height: 80%;" name="content">' + re.sub('>', '&gt;', re.sub('<', '&lt;', data)) + '</textarea> \
-                                <textarea style="display: none; height: 80%;" name="otent">' + re.sub('>', '&gt;', re.sub('<', '&lt;', data)) + '</textarea> \
+                                <textarea style="height: 80%;" name="content">' + html.escape(data) + '</textarea> \
+                                <textarea style="display: none; height: 80%;" name="otent">' + html.escape(data) + '</textarea> \
                                 <br> \
                                 <br> \
                                 <input placeholder="사유" name="send" style="width: 100%;" type="text"> \
@@ -1667,8 +1667,8 @@ def preview(name = None, num = None):
             template('index', 
                 imp = [name, wiki_set(1), custom(), other2([' (미리보기)', 0])],
                 data = '<form method="post" action="/edit/' + url_pas(name) + action + '"> \
-                            <textarea style="height: 80%;" name="content">' + re.sub('>', '&gt;', re.sub('<', '&lt;', request.forms.content)) + '</textarea> \
-                            <textarea style="display: none; height: 80%;" name="otent">' + re.sub('>', '&gt;', re.sub('<', '&lt;', request.forms.otent)) + '</textarea> \
+                            <textarea style="height: 80%;" name="content">' + html.escape(request.forms.content) + '</textarea> \
+                            <textarea style="display: none; height: 80%;" name="otent">' + html.escape(request.forms.otent) + '</textarea> \
                             <br> \
                             <br> \
                             <input placeholder="사유" name="send" style="width: 100%;" type="text"> \
