@@ -2181,13 +2181,13 @@ def topic_block(name = None, sub = None, num = None):
             curs.execute("update topic set block = '' where title = ? and sub = ? and id = ?", [name, sub, str(num)])
         else:
             curs.execute("update topic set block = 'O' where title = ? and sub = ? and id = ?", [name, sub, str(num)])
-        conn.commit()
         
         rd_plus(
             name, 
             sub, 
             get_time()
         )
+        conn.commit()
         
     return(redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '#' + str(num)))
         
@@ -2206,14 +2206,13 @@ def topic_top(name = None, sub = None, num = None):
                 curs.execute("update topic set top = '' where title = ? and sub = ? and id = ?", [name, sub, str(num)])
             else:
                 curs.execute("update topic set top = 'O' where title = ? and sub = ? and id = ?", [name, sub, str(num)])
-
-        conn.commit()
         
         rd_plus(
             name, 
             sub, 
             get_time()
         )
+        conn.commit()
 
     return(redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '#' + str(num)))        
 
@@ -2237,13 +2236,13 @@ def topic_agree(name = None, sub = None):
         else:
             curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, '합의 완료', ?, ?, '', '1')", [str(int(topic_check[0][0]) + 1), name, sub, time, ip])
             curs.execute("insert into agreedis (title, sub) values (?, ?)", [name, sub])
-        conn.commit()
-        
+
         rd_plus(
             name, 
             sub, 
             time
         )
+        conn.commit()
             
     return(redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub)))
         
@@ -2281,14 +2280,13 @@ def topic_stop(name = None, sub = None, tool = None):
             curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, ?, ?, ?, '', '1')", [str(int(topic_check[0][0]) + 1), name, sub, data, time, ip])
             curs.execute("insert into stop (title, sub, close) values (?, ?, ?)", [name, sub, close])
             curs.execute("delete from stop where title = ? and sub = ? and close = ?", [name, sub, n_close])
-            
-        conn.commit()
         
         rd_plus(
             name, 
             sub, 
             time
         )
+        conn.commit()
         
     return(redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub)))    
 
@@ -3454,8 +3452,6 @@ def upload():
             curs.execute("delete from data where title = ?", ['파일:' + name])
         
         curs.execute("insert into data (title, data, acl) values (?, ?, 'admin')", ['파일:' + name, '[[파일:' + name + ']][br][br]{{{[[파일:' + name + ']]}}}[br][br]' + lice])
-        conn.commit()
-        
         history_plus(
             '파일:' + name, 
             '[[파일:' + name + ']][br][br]{{{[[파일:' + name + ']]}}}[br][br]' + lice, 
@@ -3464,6 +3460,7 @@ def upload():
             '(파일 올림)', 
             '0'
         )
+        conn.commit()
         
         return(redirect('/w/파일:' + name))            
     else:
