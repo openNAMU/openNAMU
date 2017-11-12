@@ -436,6 +436,9 @@ def re_error(data):
         elif(num == 11):
             title = '로그인 오류'
             data = '이미 로그인 되어 있습니다.'
+        elif(num == 12):
+            title = '편집 오류'
+            data = '누군가 먼저 편집 했습니다.'
         elif(num == 14):
             title = '파일 올리기 오류'
             data = 'jpg, gif, jpeg, png, webp만 가능 합니다.'
