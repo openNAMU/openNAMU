@@ -43,8 +43,7 @@ def include(title, old, new):
         m2 = re.findall("\[\[(분류:(?:(?:(?!\]\]).)*))\]\]", new_d)
 
         curs.execute("select link from back where title = ? and type = 'include'", [title])
-        d1 = curs.fetchall()
-        for x in d1:
+        for x in curs.fetchall():
             for y in m1:
                 curs.execute("delete from back where link = ? and type = 'cat'", [y])
 
@@ -168,8 +167,7 @@ def ip_pas(raw_ip):
         ip = raw_ip
     else:
         curs.execute("select title from data where title = ?", ['사용자:' + raw_ip])
-        data = curs.fetchall()
-        if(data):
+        if(curs.fetchall()):
             ip = '<a href="/w/' + url_pas('사용자:' + raw_ip) + '">' + raw_ip + '</a>'
         else:
             ip = '<a class="not_thing" href="/w/' + url_pas('사용자:' + raw_ip) + '">' + raw_ip + '</a>'
@@ -323,25 +321,21 @@ def topic_check(name, sub):
 
 def rd_plus(title, sub, date):
     curs.execute("select title from rd where title = ? and sub = ?", [title, sub])
-    rd = curs.fetchall()
-    if(rd):
+    if(curs.fetchall()):
         curs.execute("update rd set date = ? where title = ? and sub = ?", [date, title, sub])
     else:
         curs.execute("insert into rd (title, sub, date) values (?, ?, ?)", [title, sub, date])
-    conn.commit()
     
 def rb_plus(block, end, today, blocker, why):
     curs.execute("insert into rb (block, end, today, blocker, why) values (?, ?, ?, ?, ?)", [block, end, today, blocker, why])
-    conn.commit()
 
 def history_plus(title, data, date, ip, send, leng):
     curs.execute("select id from history where title = ? order by id+0 desc limit 1", [title])
-    rows = curs.fetchall()
-    if(rows):
-        curs.execute("insert into history (id, title, data, date, ip, send, leng) values (?, ?, ?, ?, ?, ?, ?)", [str(int(rows[0][0]) + 1), title, data, date, ip, send, leng])
+    d = curs.fetchall()
+    if(d):
+        curs.execute("insert into history (id, title, data, date, ip, send, leng) values (?, ?, ?, ?, ?, ?, ?)", [str(int(d[0][0]) + 1), title, data, date, ip, send, leng])
     else:
         curs.execute("insert into history (id, title, data, date, ip, send, leng) values ('1', ?, ?, ?, ?, ?, ?)", [title, data, date, ip, send + ' (새 문서)', leng])
-    conn.commit()
 
 def leng_check(a, b):
     if(a < b):
