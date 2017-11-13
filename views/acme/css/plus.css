@@ -6,6 +6,10 @@
     margin-left: 5px;
 }
 
+input {
+    max-width: 100%;
+}
+
 .breadcrumbs h1 {
     word-break: break-all;
 }
