@@ -345,6 +345,7 @@ table {
 @media (max-width: 768px) {
     table {
         min-width: 100%;
+        max-width: 100;
     }
 }
 
