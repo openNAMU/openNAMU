@@ -3246,6 +3246,8 @@ def read_view(name = None, num = None, redirect = None):
                         u_div = '=== 하위 분류 ===\r\n'
 
                     u_div += ' * [[:' + data[0] + ']]\r\n'
+                elif(re.search('^틀:', data[0])):
+                    div += ' * [[' + data[0] + ']]\r\n * [[wiki:xref/' + url_pas(data[0]) + '|' + data[0] + ' (역링크)]]\r\n'
                 else:
                     div += ' * [[' + data[0] + ']]\r\n'
 
