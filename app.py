@@ -1579,7 +1579,6 @@ def edit(name = None, num = None):
 
         curs.execute("delete from back where link = ?", [name])
         namumark(name, content, 1, 0, 0)
-        include(name, request.forms.otent, content)
         conn.commit()
         
         return(redirect('/w/' + url_pas(name)))
