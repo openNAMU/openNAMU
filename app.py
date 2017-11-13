@@ -226,14 +226,14 @@ def alarm():
     da += '</ul>'
 
     return(
-            html_minify(
-                template('index', 
-                    imp = ['알림', wiki_set(1), custom(), other2([0, 0])],
-                    data = da,
-                    menu = [['user', '사용자']]
-                )
+        html_minify(
+            template('index', 
+                imp = ['알림', wiki_set(1), custom(), other2([0, 0])],
+                data = da,
+                menu = [['user', '사용자']]
             )
         )
+    )
 
 @route('/edit_set', method=['POST', 'GET'])
 @route('/edit_set/<num:int>', method=['POST', 'GET'])
