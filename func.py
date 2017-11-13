@@ -32,26 +32,7 @@ def other2(d):
             g = re.sub(' / $', '', g)
             
     r = d + [g]
-    return(r)
-
-def include(title, old, new):
-    if(re.search('^틀:', title)):
-        old_d = mid_pas(old, 0, 1, 1)[0]
-        new_d = mid_pas(new, 0, 1, 1)[0]
-
-        m1 = re.findall("\[\[(분류:(?:(?:(?!\]\]).)*))\]\]", old_d)
-        m2 = re.findall("\[\[(분류:(?:(?:(?!\]\]).)*))\]\]", new_d)
-
-        curs.execute("select link from back where title = ? and type = 'include'", [title])
-        for x in curs.fetchall():
-            for y in m1:
-                curs.execute("delete from back where link = ? and type = 'cat'", [y])
-
-            for z in m2:
-                backlink_plus(x[0], z, 'cat', 1)
-
-        conn.commit()
-    
+    return(r)    
 
 def wiki_set(num):
     if(num == 1):
