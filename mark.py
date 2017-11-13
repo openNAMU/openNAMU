@@ -415,7 +415,7 @@ def toc_pas(data, title, num, toc_y):
 
     return(data)
 
-def link(title, data, num, num2, category):
+def link(title, data, num, category):
     m = re.findall("\[\[(분류:(?:(?:(?!\]\]).)*))\]\]", data)
     for g in m:
         if(title != g):
@@ -499,8 +499,7 @@ def link(title, data, num, num2, category):
                 f_d = re.search('^파일:([^.]+)\.(.+)$', d[0])
                 if(f_d):
                     if(not re.search("^파일:([^\n]*)", title)):
-                        if(num == 1):
-                            backlink_plus(title, d[0], 'file', num2)
+                        backlink_plus(title, d[0], 'file', num)
                         
                     img = span[0] + '<img src="/image/' + sha224(f_d.groups()[0]) + '.' + f_d.groups()[1] + '" ' + width + height + '>' + span[1]
                     data = link.sub(img, data, 1)
@@ -538,15 +537,12 @@ def link(title, data, num, num2, category):
                 elif(re.search('^#', d[0])):
                     data = link.sub('<a href="' + url_pas(href.replace('\\', '')) + sh + '">' + view + '</a>', data, 1)
                 else:
-                    if(num == 1):
-                        backlink_plus(title, href.replace('\\', ''), '', num2)
+                    backlink_plus(title, href.replace('\\', ''), '', num)
                     
                     curs.execute("select title from data where title = ?", [href.replace('\\', '')])
                     if(not curs.fetchall()):
                         no = 'class="not_thing"'
-
-                        if(num == 1):
-                            backlink_plus(title, href.replace('\\', ''), 'no', num2)
+                        backlink_plus(title, href.replace('\\', ''), 'no', num)
                     else:
                         no = ''
                     
@@ -603,7 +599,7 @@ def namumark(title, data, num, in_c, toc_y):
                 in_data = html_pas(in_data)
                 
                 var_d = mid_pas(in_data, fol_num, 1, in_c)
-                var_d2 = link(title, var_d[0], num, 0, category)
+                var_d2 = link(title, var_d[0], 0, category)
 
                 in_data = var_d2[0]
                 category = var_d2[1]
@@ -716,7 +712,7 @@ def namumark(title, data, num, in_c, toc_y):
         else:
             break
 
-    var_d2 = link(title, data, num, 1, category)
+    var_d2 = link(title, data, num, category)
     data = var_d2[0]
     category = var_d2[1]
             
