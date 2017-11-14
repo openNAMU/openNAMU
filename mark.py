@@ -539,6 +539,7 @@ def link(title, data, num, category):
                 else:                    
                     a = href.replace('&#x27;', "'").replace('&quot;', '"').replace('\\\\', '<slash>').replace('\\', '').replace('<slash>', '\\')
                     
+                    backlink_plus(title, a, '', num)
                     curs.execute("select title from data where title = ?", [a])
                     if(not curs.fetchall()):
                         no = 'class="not_thing"'
@@ -640,7 +641,9 @@ def namumark(title, data, num, in_c, toc_y):
         else:
             href = d
             
-        data = re.sub('\r\n#(?:redirect|넘겨주기) ((?:(?!\r|\n|%0D).)+)', '<meta http-equiv="refresh" content="0;url=/w/' + url_pas(href.replace('&#x27;', "'").replace('&quot;', '"').replace('\\\\', '<slash>').replace('\\', '').replace('<slash>', '\\')) + '/from/' + url_pas(title) + sh + '" />', data, 1)
+        a = href.replace('&#x27;', "'").replace('&quot;', '"').replace('\\\\', '<slash>').replace('\\', '').replace('<slash>', '\\')
+        backlink_plus(title, a, 'redirect', num)
+        data = re.sub('\r\n#(?:redirect|넘겨주기) ((?:(?!\r|\n|%0D).)+)', '<meta http-equiv="refresh" content="0;url=/w/' + url_pas(a) + '/from/' + url_pas(title) + sh + '" />', data, 1)
           
     data = re.sub("\[nicovideo\((?P<in>[^,)]*)(?:(?:,(?:[^,)]*))+)?\)\]", "[[http://embed.nicovideo.jp/watch/\g<in>]]", data)
     

@@ -966,7 +966,7 @@ def xref(name = None, num = 1):
     i = v - 50
     div = '<ul>'
     
-    curs.execute("select link, type from back where title = ? order by link asc limit ?, ?", [name, str(i), str(v)])
+    curs.execute("select link, type from back where title = ? and not type = 'no' order by link asc limit ?, ?", [name, str(i), str(v)])
     for data in curs.fetchall():
         div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a>'
         
