@@ -517,10 +517,10 @@ def link(title, data, num, category):
                 
                 data = link.sub('<a class="out_link" rel="nofollow" href="' + d[0] + '">' + view + '</a>', data, 1)
             else:
-                view = d[0].replace('\\', '')
+                view = d[0].replace('\\\\', '<slash>').replace('\\', '').replace('<slash>', '\\')
                 try:
                     if(re.search('(.+)', d[1])):
-                        view = d[1]
+                        view = d[1].replace('\\\\', '<slash>').replace('\\', '').replace('<slash>', '\\')
                 except:
                     pass        
                     
@@ -535,19 +535,20 @@ def link(title, data, num, category):
                 if(d[0] == title):
                     data = link.sub('<b>' + view + '</b>', data, 1)
                 elif(re.search('^#', d[0])):
-                    data = link.sub('<a href="' + url_pas(href.replace('\\', '')) + sh + '">' + view + '</a>', data, 1)
-                else:
-                    backlink_plus(title, href.replace('\\', ''), '', num)
+                    data = link.sub('<a title="' + sh + '" href="' + sh + '">' + view + '</a>', data, 1)
+                else:                    
+                    a = href.replace('&#x27;', "'").replace('&quot;', '"').replace('\\\\', '<slash>').replace('\\', '').replace('<slash>', '\\')
                     
-                    curs.execute("select title from data where title = ?", [href.replace('&#x27;', "'").replace('&quot;', '"')])
+                    curs.execute("select title from data where title = ?", [a])
                     if(not curs.fetchall()):
                         no = 'class="not_thing"'
-                        backlink_plus(title, href.replace('\\', ''), 'no', num)
+                        backlink_plus(title, a, 'no', num)
                     else:
                         no = ''
+                        
+                    print(d[0].replace('\\\\', '<slash>').replace('\\', '').replace('<slash>', '\\'))
                     
-                    a = href.replace('\\', '').replace('&#x27;', "'").replace('&quot;', '"')
-                    data = link.sub('<a ' + no + ' title="' + href + sh + '" href="/w/' + url_pas(a) + sh + '">' + view + '</a>', data, 1)
+                    data = link.sub('<a ' + no + ' title="' + href + sh + '" href="/w/' + url_pas(a) + sh + '">' + view.replace('\\', '\\\\') + '</a>', data, 1)
         else:
             break
 
@@ -639,7 +640,7 @@ def namumark(title, data, num, in_c, toc_y):
         else:
             href = d
             
-        data = re.sub('\r\n#(?:redirect|넘겨주기) ((?:(?!\r|\n|%0D).)+)', '<meta http-equiv="refresh" content="0;url=/w/' + url_pas(href.replace('\\', '').replace('&#x27;', "'").replace('&quot;', '"')) + '/from/' + url_pas(title) + sh + '" />', data, 1)
+        data = re.sub('\r\n#(?:redirect|넘겨주기) ((?:(?!\r|\n|%0D).)+)', '<meta http-equiv="refresh" content="0;url=/w/' + url_pas(href.replace('&#x27;', "'").replace('&quot;', '"').replace('\\\\', '<slash>').replace('\\', '').replace('<slash>', '\\')) + '/from/' + url_pas(title) + sh + '" />', data, 1)
           
     data = re.sub("\[nicovideo\((?P<in>[^,)]*)(?:(?:,(?:[^,)]*))+)?\)\]", "[[http://embed.nicovideo.jp/watch/\g<in>]]", data)
     
