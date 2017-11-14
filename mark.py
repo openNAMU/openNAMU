@@ -539,7 +539,7 @@ def link(title, data, num, category):
                 else:
                     backlink_plus(title, href.replace('\\', ''), '', num)
                     
-                    curs.execute("select title from data where title = ?", [href.replace('\\', '')])
+                    curs.execute("select title from data where title = ?", [href.replace('&#x27;', "'").replace('&quot;', '"')])
                     if(not curs.fetchall()):
                         no = 'class="not_thing"'
                         backlink_plus(title, href.replace('\\', ''), 'no', num)
@@ -547,7 +547,7 @@ def link(title, data, num, category):
                         no = ''
                     
                     a = href.replace('\\', '').replace('&#x27;', "'").replace('&quot;', '"')
-                    data = link.sub('<a ' + no + ' title="' + a + sh + '" href="/w/' + url_pas(a) + sh + '">' + view + '</a>', data, 1)
+                    data = link.sub('<a ' + no + ' title="' + href + sh + '" href="/w/' + url_pas(a) + sh + '">' + view + '</a>', data, 1)
         else:
             break
 
