@@ -452,22 +452,22 @@ def link(title, data, num, category):
      
     data = re.sub("\[\[(?::(?P<in>(?:분류|파일):(?:(?:(?!\]\]).)*)))\]\]", "[[\g<in>]]", data)
 
-    a = re.findall('\[\[\.\.\/(\|(?:[^\]]*))?\]\]', data)
+    a = re.findall('\[\[\.\.\/(\|(?:(?!]]).)+)?]]', data)
     for i in a:
         b = re.search('(.*)\/', title)
         if(b):
             m = b.groups()
             if(i):
-                data = re.sub('\[\[\.\.\/(\|(?:[^\]]*))?\]\]', '[[' + m[0] + i + ']]', data, 1)
+                data = re.sub('\[\[\.\.\/(\|((?!]]).)+)?]]', '[[' + m[0] + i + ']]', data, 1)
             else:
-                data = re.sub('\[\[\.\.\/(\|(?:[^\]]*))?\]\]', '[[' + m[0] + ']]', data, 1)
+                data = re.sub('\[\[\.\.\/(\|((?!]]).)+)?]]', '[[' + m[0] + ']]', data, 1)
         else:
             if(i):
-                data = re.sub('\[\[\.\.\/(\|(?:[^\]]*))?\]\]', '[[' + title + i + ']]', data, 1)
+                data = re.sub('\[\[\.\.\/(\|((?!]]).)+)?]]', '[[' + title + i + ']]', data, 1)
             else:
-                data = re.sub('\[\[\.\.\/(\|(?:[^\]]*))?\]\]', '[[' + title + ']]', data, 1)
+                data = re.sub('\[\[\.\.\/(\|((?!]]).)+)?]]', '[[' + title + ']]', data, 1)
 
-    data = re.sub('\[\[(?P<in>\/[^\]|]*)(?P<out>\|(?:[^\]]*))?\]\]', '[[' + title + '\g<in>\g<out>]]', data)
+    data = re.sub('\[\[(?P<in>\/(?:(?!]]|\|).)+)(?P<out>\|(?:(?:(?!]]).)+))?]]', '[[' + title + '\g<in>\g<out>]]', data)
                 
     link = re.compile('\[\[((?:(?!\[\[|\]\]|\|).)*)(?:\|((?:(?!\[\[|\]\]).)*))?\]\]')
     while(1):
@@ -546,8 +546,6 @@ def link(title, data, num, category):
                         backlink_plus(title, a, 'no', num)
                     else:
                         no = ''
-                        
-                    print(d[0].replace('\\\\', '<slash>').replace('\\', '').replace('<slash>', '\\'))
                     
                     data = link.sub('<a ' + no + ' title="' + href + sh + '" href="/w/' + url_pas(a) + sh + '">' + view.replace('\\', '\\\\') + '</a>', data, 1)
         else:

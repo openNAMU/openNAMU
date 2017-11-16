@@ -971,9 +971,19 @@ def xref(name = None, num = 1):
         div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a>'
         
         if(data[1]):
-            div += ' (' + data[1] + ')'
+            if(data[1] == 'include'):
+                d = '포함'
+            elif(data[1] == 'file'):
+                d = '파일'
+            else:
+                d = '넘겨주기'
+                
+            div += ' (' + d + ')'
         
         div += '</li>'
+        
+        if(re.search('^틀:', data[0])):
+            div += '<li><a id="inside" href="/xref/' + url_pas(data[0]) + '">' + data[0] + ' [역링크]</a></li>'
       
     div += '</ul><br><a href="/xref/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전)</a> <a href="/xref/' + url_pas(name) + '/n/' + str(num + 1) + '">(이후)</a>'
     
