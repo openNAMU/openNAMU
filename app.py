@@ -1429,14 +1429,7 @@ def revert(name = None, num = None):
                 leng = '+' + str(len(data[0][0]))
                 curs.execute("insert into data (title, data, acl) values (?, ?, '')", [name, data[0][0]])
                 
-            history_plus(
-                name, 
-                data[0][0], 
-                today, 
-                ip, 
-                request.forms.send + ' (' + str(num) + '판)', 
-                leng
-            )
+            history_plus(name, data[0][0], today, ip, request.forms.send + ' (' + str(num) + '판)', leng)
             
             namumark(name, data[0][0], 1, 0, 0)
             conn.commit()
@@ -1496,14 +1489,7 @@ def m_del():
 
                 leng = '-' + str(len(d[0][0]))
                 curs.execute("delete from data where title = ?", [g])
-                history_plus(
-                    g, 
-                    '', 
-                    today, 
-                    ip, 
-                    request.forms.send + ' (대량 삭제)', 
-                    leng
-                )
+                history_plus(g, '', today, ip, request.forms.send + ' (대량 삭제)', leng)
             data = re.sub('(.*)\r\n', '', data, 1)
         conn.commit()
 
@@ -1577,14 +1563,7 @@ def edit(name = None, num = None):
 
             curs.execute("insert into data (title, data, acl) values (?, ?, '')", [name, content])
         
-        history_plus(
-            name, 
-            content, 
-            today, 
-            ip,
-            send_p(request.forms.send), 
-            leng
-        )
+        history_plus(name, content, today, ip, send_p(request.forms.send), leng)
 
         curs.execute("delete from back where link = ?", [name])
         namumark(name, content, 1, 0, 0)
@@ -1797,14 +1776,7 @@ def move(name = None):
         else:
             d = ''
             
-        history_plus(
-            name, 
-            d,
-            today, 
-            ip, 
-            request.forms.send + ' (<a href="/w/' + url_pas(name) + '">' + name + '</a> - <a href="/w/' + url_pas(request.forms.title) + '">' + request.forms.title + '</a> 이동)', 
-            leng
-        )
+        history_plus(name, d, today, ip, request.forms.send + ' (<a href="/w/' + url_pas(name) + '">' + name + '</a> - <a href="/w/' + url_pas(request.forms.title) + '">' + request.forms.title + '</a> 이동)', leng)
             
         curs.execute('insert into move (origin, new, date, who, send) values (?, ?, ?, ?, ?)', [name, request.forms.title, today, ip, request.forms.send])
         curs.execute("update history set title = ? where title = ?", [request.forms.title, name])
@@ -3462,14 +3434,7 @@ def upload():
             curs.execute("delete from data where title = ?", ['파일:' + name])
         
         curs.execute("insert into data (title, data, acl) values (?, ?, 'admin')", ['파일:' + name, '[[파일:' + name + ']][br][br]{{{[[파일:' + name + ']]}}}[br][br]' + lice])
-        history_plus(
-            '파일:' + name, 
-            '[[파일:' + name + ']][br][br]{{{[[파일:' + name + ']]}}}[br][br]' + lice, 
-            get_time(), 
-            ip, 
-            '(파일 올림)', 
-            '0'
-        )
+        history_plus('파일:' + name, '[[파일:' + name + ']][br][br]{{{[[파일:' + name + ']]}}}[br][br]' + lice, get_time(), ip, '(파일 올림)', '0')
         conn.commit()
         
         return(redirect('/w/파일:' + name))            
@@ -3752,9 +3717,4 @@ def error_500(error):
     except:
         return('<!-- 아카이 타이요노 도레스데 오도루 와타시노 코토 미츠메테이루노 메오 소라시타이 데모 소라세나이 아아 죠네츠데 야카레타이 도키메키 이죠노 리즈무 코요이 시리타쿠테 이츠모요리 타이탄나 코토바오 츠부야이타 지분노 키모치나노니 젠젠 와카라나쿠 (낫챠이타이나) 리세이카라 시레이가 (토도카나이) 콘토로-루 후카노 손나 코이오 시타놋테 코에가 토도이테시맛타 하즈카시잇테 오모우케도 못토 시리타이노 못토 시리타이노 이케나이 유메다토 키즈키나가라 아카이 타이요노 도레스데 오도루 와타시노 코토 미츠메루 히토미 메오 소라시타이 데모 소라세나이 마나츠와 다레노 모노 아나타토 와타시노 모노니시타이 (닷테네) 코코로가 토마레나이 키세츠니 하지메테 무네노 토비라가 아이테 시마이소오요 You knock knock my heart!! -->' + redirect('/setup'))
     
-run(
-    app = app, 
-    server = 'tornado', 
-    host = '0.0.0.0', 
-    port = int(set_data['port'])
-)
+run(app = app, server = 'tornado', host = '0.0.0.0', port = int(set_data['port']))
