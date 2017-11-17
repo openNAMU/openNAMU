@@ -966,7 +966,7 @@ def xref(name = None, num = 1):
     i = v - 50
     div = '<ul>'
     
-    curs.execute("select link, type from back where title = ? and not type = 'no' order by link asc limit ?, ?", [name, str(i), str(v)])
+    curs.execute("select link, type from back where title = ? and not type = 'cat' and not type = 'no' order by link asc limit ?, ?", [name, str(i), str(v)])
     for data in curs.fetchall():
         div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a>'
         
@@ -3228,7 +3228,12 @@ def read_view(name = None, num = None, redirect = None):
 
                     u_div += ' * [[:' + data[0] + ']]\r\n'
                 elif(re.search('^틀:', data[0])):
-                    div += ' * [[' + data[0] + ']]\r\n * [[wiki:xref/' + url_pas(data[0]) + '|' + data[0] + ' (역링크)]]\r\n'
+                    curs.execute("select data from data where title = ?", [data[0]])
+                    d = mid_pas(curs.fetchall()[0][0], 0, 1, 0)[0]
+                    if(re.search('\[\[' + name + ']]', d)):
+                        div += ' * [[' + data[0] + ']]\r\n * [[wiki:xref/' + url_pas(data[0]) + '|' + data[0] + ' (역링크)]]\r\n'
+                    else:
+                        div += ' * [[' + data[0] + ']]\r\n'
                 else:
                     div += ' * [[' + data[0] + ']]\r\n'
 
