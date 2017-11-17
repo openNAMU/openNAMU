@@ -10,7 +10,7 @@
  * [테스트 서버](http://namu.ml/)
  
 ## 의존성
- * [python 3.5 이상](https://www.python.org/)
+ * [파이썬](https://www.python.org/downloads/) 3.5 이상
  
 ### 윈도우
  * pip install [bottle](https://pypi.python.org/pypi/bottle)
