@@ -919,7 +919,24 @@ def give_log(num = 1):
             back = data[0]
             j += 1
 
-        list_data += '<li>' + str(j) + '. ' + data[0] + ' (' + data[1] + ')</li>'
+        list_data += '<li>' + str(j) + '. ' + data[0] + ' ('
+        
+        if(data[1] == 'ban'):
+            d = '차단'
+        elif(data[1] == 'mdel'):
+            d = '많은 문서 삭제'
+        elif(data[1] == 'toron'):
+            d = '토론'
+        elif(data[1] == 'check'):
+            d = '사용자 검사'
+        elif(data[1] == 'acl'):
+            d = 'ACL'
+        elif(data[1] == 'hidel'):
+            d = '역사 가리기'
+        else:
+            d = '소유자'
+            
+        list_data += d + ')</li>'
     else:
         list_data += '</ul><br><a href="/give_log/n/' + str(num - 1) + '">(이전)</a> <a href="/give_log/n/' + str(num + 1) + '">(이후)</a>'
 
