@@ -3181,9 +3181,11 @@ def read_view(name = None, num = None, redirect = None):
         if(session.get('View_List')):
             m = re.findall('([^\n]+)\n', session.get('View_List'))
             if(m[-1] != name):
-                session['View_List'] += name + '\n'
+                d = re.sub(name + '\n', '', session.get('View_List'))
+                d += name + '\n'
                 if(len(m) > 50):
-                    session['View_List'] = re.sub('([^\n]+)\n', '', session.get('View_List'), 1)
+                    d = re.sub('([^\n]+)\n', '', d, 1)
+                session['View_List'] = d
         else:
             session['View_List'] = name + '\n'
 
