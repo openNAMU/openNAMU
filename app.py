@@ -1549,8 +1549,9 @@ def m_del():
         )
                 
 @route('/edit/<name:path>', method=['POST', 'GET'])
+@route('/edit/<name:path>/from/<name2:path>', method=['POST', 'GET'])
 @route('/edit/<name:path>/section/<num:int>', method=['POST', 'GET'])
-def edit(name = None, num = None):
+def edit(name = None, name2 = None, num = None):
     ip = ip_check()
     can = acl_check(name)
 
@@ -1628,28 +1629,44 @@ def edit(name = None, num = None):
             action = '/section/' + str(num)
         else:
             action = ''
+            
+        data2 = data
+        p = '<form method="post" id="get_edit" action="/edit_get/' + url_pas(name) + '"> \
+            <input placeholder="불러 올 문서" name="name" style="width: 50%;" type="text"> \
+            <button id="preview" class="btn" type="submit">불러오기</button> \
+        </form>'
+        if(name2):
+            curs.execute("select data from data where title = ?", [name2])
+            d1 = curs.fetchall()
+            if(d1):
+                data = d1[0][0]
+                p = ''
 
         return(
             html_minify(
                 template('index', 
                     imp = [name, wiki_set(1), custom(), other2([' (수정)', 0])],
-                    data = '<form method="post" action="/edit/' + url_pas(name) + action + '"> \
-                                <textarea style="height: 80%;" name="content">' + html.escape(data) + '</textarea> \
-                                <textarea style="display: none; height: 80%;" name="otent">' + html.escape(data) + '</textarea> \
-                                <br> \
-                                <br> \
-                                <input placeholder="사유" name="send" style="width: 100%;" type="text"> \
-                                <br> \
-                                <br> \
-                                <div class="form-actions"> \
-                                    <button id="save" class="btn btn-primary" type="submit">저장</button> \
-                                    <button id="preview" class="btn" type="submit" formaction="/preview/' + url_pas(name) + action + '">미리보기</button> \
-                                </div> \
-                            </form>',
+                    data = p + '<form method="post" action="/edit/' + url_pas(name) + action + '"> \
+                                    <textarea style="height: 80%;" name="content">' + html.escape(data) + '</textarea> \
+                                    <textarea style="display: none; height: 80%;" name="otent">' + html.escape(data2) + '</textarea> \
+                                    <br> \
+                                    <br> \
+                                    <input placeholder="사유" name="send" style="width: 100%;" type="text"> \
+                                    <br> \
+                                    <br> \
+                                    <div class="form-actions"> \
+                                        <button id="preview" class="btn btn-primary" type="submit">저장</button> \
+                                        <button id="preview" class="btn" type="submit" formaction="/preview/' + url_pas(name) + action + '">미리보기</button> \
+                                    </div> \
+                                </form>',
                     menu = [['w/' + url_pas(name), '문서']]
                 )
             )
         )
+        
+@route('/edit_get/<name:path>', method=['POST'])
+def edit_get(name = None):
+    return(redirect('/edit/' + url_pas(name) + '/from/' + url_pas(request.forms.name)))
 
 @route('/preview/<name:path>', method=['POST'])
 @route('/preview/<name:path>/section/<num:int>', method=['POST'])
