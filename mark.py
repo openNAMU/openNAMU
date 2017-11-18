@@ -389,7 +389,7 @@ def toc_pas(data, title, num, toc_y):
                     if(toc_d < toc_c):
                         margin = 'style="margin-top: 30px;"'
                     else:
-                        margin = ''
+                        margin = 'style="margin-top: 15px;"'
                     
                     toc_c = toc_d
 
