@@ -2507,7 +2507,6 @@ span.filter {
 }
 .btn.btn-primary {
     background-color: #3bafda;
-    border: none;
     -webkit-transition: all .3s ease;
     -moz-transition: all .3s ease;
     -ms-transition: all .3s ease;
@@ -2518,7 +2517,6 @@ span.filter {
 .btn.btn-primary:active,
 .btn.btn-primary.hover {
     background-color: #4fc1e9;
-    border: none;
     -webkit-transition: all .3s ease;
     -moz-transition: all .3s ease;
     -ms-transition: all .3s ease;

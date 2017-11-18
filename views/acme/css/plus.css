@@ -54,6 +54,10 @@ textarea {
     margin: 0;
 }
 
+.btn {
+    transition: all .3s ease;
+}
+
 #inside {
     color: green;
 }
