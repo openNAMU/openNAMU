@@ -93,6 +93,7 @@ select {
 #preview {
     background: #37b1e3;
     color: white;
+    margin-bottom: 0;
 }
 
 #preview:hover {
