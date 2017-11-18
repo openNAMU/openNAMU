@@ -124,9 +124,10 @@
                     </div>
                     % if(menu != 0):
                         <div class="col-lg-8 col-sm-8">
-                            <ol class="breadcrumb pull-right">             
-                                % for sub_d in menu:
-                                    <li style="margin: 0;">
+                            <ol class="breadcrumb pull-right">   
+                                <li style="margin: 0;">
+                                    % i = 1
+                                    % for sub_d in menu:
                                         % if(sub_d[1] == 1):
                                             <a class="menu-item" href="/{{sub_d[0]}}" id="open">토론</a>
                                         % elif(sub_d[1] == 0):
@@ -134,8 +135,15 @@
                                         % else:
                                             <a class="menu-item" href="/{{sub_d[0]}}">{{sub_d[1]}}</a>
                                         % end
-                                    </li>
-                                % end
+                                        % try:
+                                            % d = menu[i]
+                                            ㆍ
+                                        % except:
+                                            % break
+                                        % end
+                                        % i += 1
+                                    % end
+                                </li>
                             </ol>
                         </div>
                     % end
