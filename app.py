@@ -1631,10 +1631,14 @@ def edit(name = None, name2 = None, num = None):
             action = ''
             
         data2 = data
-        p = '<form method="post" id="get_edit" action="/edit_get/' + url_pas(name) + '"> \
-            <input placeholder="불러 올 문서" name="name" style="width: 50%;" type="text"> \
-            <button id="preview" class="btn" type="submit">불러오기</button> \
-        </form>'
+        if(not num):
+            p = '<form method="post" id="get_edit" action="/edit_get/' + url_pas(name) + '"> \
+                    <input placeholder="불러 올 문서" name="name" style="width: 50%;" type="text"> \
+                    <button id="preview" class="btn" type="submit">불러오기</button> \
+                </form>'
+        else:
+            p = ''
+            
         if(name2):
             curs.execute("select data from data where title = ?", [name2])
             d1 = curs.fetchall()
