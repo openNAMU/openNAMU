@@ -5,7 +5,6 @@ import sqlite3
 import bcrypt
 import os
 import difflib
-from multiprocessing import Process
 
 try:
     json_data = open('set.json').read()
