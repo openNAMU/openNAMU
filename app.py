@@ -41,15 +41,8 @@ BaseRequest.MEMFILE_MAX = 1000 ** 4
 
 r_ver = '2.3.6'
 
+# 스킨 불러오기 부분
 try:
-    curs.execute("select title from data limit 1")
-
-    try:
-        curs.execute('select new from move limit 1')
-    except:
-        curs.execute("create table move(origin text, new text, date text, who text, send text)")
-        print('move 테이블 생성')
-
     curs.execute('select data from other where name = "skin"')
     skin_exist = curs.fetchall()
     if(skin_exist):
@@ -59,6 +52,18 @@ try:
             TEMPLATE_PATH.insert(0, './views/acme/')
     else:
         TEMPLATE_PATH.insert(0, './views/acme/')
+except:
+    TEMPLATE_PATH.insert(0, './views/acme/')
+
+# 테이블 생성 부분
+try:
+    curs.execute("select title from data limit 1")
+
+    try:
+        curs.execute('select new from move limit 1')
+    except:
+        curs.execute("create table move(origin text, new text, date text, who text, send text)")
+        print('move 테이블 생성')
 
     try:
         curs.execute('select name from alarm limit 1')
