@@ -707,7 +707,7 @@ def namumark(title, data, num, in_c, toc_y):
                 if(mdata):
                     height = mdata.groups()[0]
                     
-                mdata = re.search('time=([0-9]*)', result[1])
+                mdata = re.search('start=([0-9]*)', result[1])
                 if(mdata):
                     time = mdata.groups()[0]
 
