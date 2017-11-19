@@ -294,17 +294,17 @@ def edit_set(num = 0):
 
             div = ''
             if(d_list[5] == 'login'):
-                div += '<option value="login">사용자</option>'
+                div += '<option value="login">가입자</option>'
                 div += '<option value="normal">일반</option>'
                 div += '<option value="admin">관리자</option>'
             elif(d_list[5] == 'admin'):
                 div += '<option value="admin">관리자</option>'
-                div += '<option value="login">사용자</option>'
+                div += '<option value="login">가입자</option>'
                 div += '<option value="normal">일반</option>'
             else:
                 div += '<option value="normal">일반</option>'
                 div += '<option value="admin">관리자</option>'
-                div += '<option value="login">사용자</option>'
+                div += '<option value="login">가입자</option>'
 
             if(d_list[6]):
                 ch_1 = 'checked="checked"'
@@ -532,7 +532,7 @@ def acl_list():
             if(data[1] == 'admin'):
                 acl = '관리자'
             else:
-                acl = '사용자'
+                acl = '가입자'
 
             div += '<li>' + str(i + 1) + '. <a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a> (' + acl + ')</li>'
             
@@ -1862,7 +1862,7 @@ def other():
                                     ' * [[wiki:block_log|차단 기록]]\r\n' + \
                                     ' * [[wiki:user_log|가입 기록]]\r\n' + \
                                     ' * [[wiki:admin_log|권한 기록]]\r\n' + \
-                                    ' * [[wiki:manager/6|사용자 기록]]\r\n' + \
+                                    ' * [[wiki:manager/6|기여 기록]]\r\n' + \
                                     ' * [[wiki:not_close_topic|열린 토론 목록]]\r\n' + \
                                     '== 기타 ==\r\n' + \
                                     ' * [[wiki:title_index|모든 문서]]\r\n' + \
@@ -3009,7 +3009,7 @@ def acl(name = None):
         if(acl_d[0][0] == 'all'):
             now = '모두'
         elif(acl_d[0][0] == 'user'):
-            now = '사용자'
+            now = '가입자'
         else:
             now = '일반'
         
@@ -3023,7 +3023,7 @@ def acl(name = None):
                             <form method="post"> \
                                 <select name="select"> \
                                     <option value="all">모두</option> \
-                                    <option value="user">사용자</option> \
+                                    <option value="user">가입자</option> \
                                     <option value="normal" selected="selected">일반</option> \
                                 </select> \
                                 <br> \
@@ -3065,7 +3065,7 @@ def acl(name = None):
             if(acl[0][0] == 'admin'):
                 now = '관리자'
             elif(acl[0][0] == 'user'):
-                now = '사용자'
+                now = '가입자'
             else:
                 now = '일반'
             
@@ -3079,7 +3079,7 @@ def acl(name = None):
                                 <form method="post"> \
                                     <select name="select"> \
                                         <option value="admin" selected="selected">관리자</option> \
-                                        <option value="user">사용자</option> \
+                                        <option value="user">가입자</option> \
                                         <option value="normal">일반</option> \
                                     </select> \
                                     <br> \
@@ -3299,7 +3299,7 @@ def read_view(name = None, num = None, redirect = None):
             if(data[0][0] == 'admin'):
                 acl = ' (관리자)'
             elif(data[0][0] == 'user'):
-                acl = ' (사용자)'
+                acl = ' (가입자)'
                 
         elsedata = data[0][1]
     else:
@@ -3322,7 +3322,7 @@ def read_view(name = None, num = None, redirect = None):
             if(data[0][0] == 'all'):
                 acl += ' (모두)'
             elif(data[0][0] == 'user'):
-                acl += ' (사용자)'
+                acl += ' (가입자)'
 
         curs.execute("select block from ban where block = ?", [g[0]])
         user = curs.fetchall()
@@ -3524,7 +3524,7 @@ def user_info():
             if(data[0][0] != 'user'):
                 acl = data[0][0]
             else:
-                acl = '사용자'
+                acl = '가입자'
         else:
             acl = '일반'
     else:
@@ -3547,7 +3547,7 @@ def user_info():
                                                         '== 로그인 ==\r\n' + \
                                                         plus + '\r\n' + \
                                                         ' * [[wiki:register|회원가입]]\r\n' + \
-                                                        '== 사용자 ==\r\n' + \
+                                                        '== 사용자 기능 ==\r\n' + \
                                                         ' * [[wiki:user_acl/' + url_pas(raw_ip) + '|사용자 문서 ACL]]\r\n' + \
                                                         ' * [[wiki:custom_css|사용자 CSS]]\r\n' + \
                                                         ' * [[wiki:custom_js|사용자 JS]]\r\n' + \
