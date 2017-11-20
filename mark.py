@@ -205,6 +205,7 @@ def html_pas(data):
                     data = re.sub('<\/' + i_list[1] + '>', '%H%/' + i_list[1] + '%/H%', data, 1)
 
     data = html.escape(data)
+    data = data.replace('\\', '&#92;')
     
     end = re.findall('%H%((?:(?!%/H%).)*)%/H%', data)
     for d_end in end:
@@ -217,8 +218,7 @@ def mid_pas(data, fol_num, include, in_c):
     while(1):
         m = p.search(data)
         if(m):
-            d = m.groups()
-            data = p.sub('###' + d[0] + '/###', data, 1)
+            data = p.sub('###' + m.groups()[0] + '/###', data, 1)
         else:
             break
 
@@ -226,8 +226,7 @@ def mid_pas(data, fol_num, include, in_c):
     while(1):
         m = com.search(data)
         if(m):
-            d = m.groups()
-            data = com.sub('<code>' + d[0] + '</code>', data, 1)
+            data = com.sub('<code>' + m.groups()[0] + '</code>', data, 1)
         else:
             break
 
@@ -236,8 +235,7 @@ def mid_pas(data, fol_num, include, in_c):
     while(1):
         m = com3.search(data)
         if(m):
-            d = m.groups()
-            data = com3.sub('{{{' + d[0] + '}}}', data, 1)
+            data = com3.sub('{{{' + m.groups()[0] + '}}}', data, 1)
         else:
             break
 
@@ -278,7 +276,7 @@ def mid_pas(data, fol_num, include, in_c):
             div = div_a.search(it_d)
 
             html_a = re.compile("^#!html\s(.*)$", re.DOTALL)
-            html = html_a.search(it_d)
+            html_d = html_a.search(it_d)
 
             fol_a = re.compile("^#!folding\s((?:(?!\n).)*)\n?\s\n(.*)$", re.DOTALL)
             fol = fol_a.search(it_d)
@@ -307,8 +305,8 @@ def mid_pas(data, fol_num, include, in_c):
             elif(div):
                 div_d = div.groups()
                 data = com.sub('<div style="' + div_d[0] + '">' + div_d[1] + '</div>', data, 1)
-            elif(html):
-                data = com.sub(html.groups()[0], data, 1)
+            elif(html_d):
+                data = com.sub(html_d.groups()[0], data, 1)
             elif(fol):
                 fol_d = fol.groups()
                 data = com.sub( "<div> \
@@ -328,7 +326,9 @@ def mid_pas(data, fol_num, include, in_c):
                 fol_num += 3
             elif(syn):
                 syn_d = syn.groups()
-                data = com.sub('<pre id="syntax"><code class="' + syn_d[0] + '"><code>' + re.sub('\r\n', '<isbr>', re.sub(' ', '<space>', syn_d[1])) + '</code></code></pre>', data, 1)
+                tax_d = syn_d[1].replace(' ', '<space>')
+                tax_d = tax_d.replace('\r\n', '<isbr>')
+                data = com.sub('<pre id="syntax"><code class="' + syn_d[0] + '"><code>' + tax_d + '</code></code></pre>', data, 1)
             elif(include_out):
                 if((include or in_c) == 1):
                     data = com.sub("", data, 1)
@@ -571,6 +571,8 @@ def backlink_plus(name, link, backtype, num):
                         time.sleep(1)
 
 def namumark(title, data, num, in_c, toc_y):    
+    data = data.replace('\\r', '&#92;r')
+    data = data.replace('\\n', '&#92;n')
     data = re.sub("\n", "\r\n", re.sub("\r\n", "\n", data))
     data = html_pas(data)
     data = '\r\n' + data + '\r\n'
@@ -998,7 +1000,8 @@ def namumark(title, data, num, in_c, toc_y):
     data = re.sub('&lt;isbr&gt;', '\r\n', data)
     data = re.sub('^(?:<br>|\r|\n| )+', '', data)
     data = re.sub('^<div style="margin-top: 30px;" id="cate">', '<div id="cate">', data)        
-
+    data = re.sub('&amp;#92;', '&#92;', data)
+    
     if(num == 1):
         conn.commit()
 
