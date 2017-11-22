@@ -39,7 +39,7 @@ from func import *
 
 BaseRequest.MEMFILE_MAX = 1000 ** 4
 
-r_ver = '2.3.6'
+r_ver = '2.3.7'
 
 # 스킨 불러오기 부분
 try:
@@ -283,8 +283,8 @@ def edit_set(num = 0):
 
             return(redirect('/edit_set/1'))
         else:
-            i_list = ['name', 'logo', 'frontpage', 'license', 'upload', 'skin', 'edit', 'reg']
-            n_list = ['무명위키', '', '위키:대문', 'CC 0', '2', '', 'normal', '']
+            i_list = ['name', 'logo', 'frontpage', 'license', 'upload', 'skin', 'edit', 'reg', 'ip_view']
+            n_list = ['무명위키', '', '위키:대문', 'CC 0', '2', '', 'normal', '', '']
             d_list = []
             
             x = 0
@@ -318,6 +318,11 @@ def edit_set(num = 0):
                 ch_1 = 'checked="checked"'
             else:
                 ch_1 = ''
+            
+            if(d_list[8]):
+                ch_2 = 'checked="checked"'
+            else:
+                ch_2 = ''
 
             return(
                 html_minify(
@@ -369,6 +374,9 @@ def edit_set(num = 0):
                                     <br> \
                                     <br> \
                                     <input type="checkbox" name="reg" ' + ch_1 + '> 가입불가 \
+                                    <br> \
+                                    <br> \
+                                    <input type="checkbox" name="ip_view" ' + ch_2 + '> 아이피 비공개 \
                                     <br> \
                                     <br> \
                                     <button class="btn btn-primary" type="submit">저장</button> \

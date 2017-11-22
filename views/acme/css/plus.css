@@ -14,7 +14,7 @@ input {
     word-break: break-all;
 }
 
-footer#footer {
+footer {
     height: -webkit-fill-available;
 }
 

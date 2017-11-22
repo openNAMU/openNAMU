@@ -2,6 +2,7 @@
 from bottle.ext import beaker
 import json
 import sqlite3
+from hashlib import md5
 from css_html_js_minify import html_minify
 
 json_data = open('set.json').read()
@@ -144,16 +145,24 @@ def admin_check(num, what):
                     break
 
 def ip_pas(raw_ip):
+    hide = 0
     if(re.search("(\.|:)", raw_ip)):
-        ip = raw_ip
+        curs.execute("select name from other where name = 'ip_view'")
+        if(curs.fetchall()):
+            ip = '<span style="font-size: 75%;">' + md5(bytes(raw_ip, 'utf-8')).hexdigest() + '</span>'
+            if(not admin_check('ban', None)):
+                hide = 1
+        else:
+            ip = raw_ip
     else:
         curs.execute("select title from data where title = ?", ['사용자:' + raw_ip])
         if(curs.fetchall()):
             ip = '<a href="/w/' + url_pas('사용자:' + raw_ip) + '">' + raw_ip + '</a>'
         else:
             ip = '<a class="not_thing" href="/w/' + url_pas('사용자:' + raw_ip) + '">' + raw_ip + '</a>'
-            
-    ip += ' <a href="/record/' + url_pas(raw_ip) + '">(기록)</a>'
+         
+    if(hide == 0):
+        ip += ' <a href="/record/' + url_pas(raw_ip) + '">(기록)</a>'
 
     return(ip)
 
