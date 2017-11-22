@@ -52,7 +52,7 @@
                         <span class="icon-bar"></span>
                     </button>
                     <a class="navbar-brand" href="/" style="margin-top: 30px;">
-                        {{!imp[1][4]}}
+                        {{!imp[1][0]}}
                     </a>
                 </div>
                 <div class="navbar-collapse collapse">
