@@ -102,6 +102,10 @@ try:
     conn.commit()
 except:
     pass
+
+# Image directory create
+if not os.path.exists('image'):
+    os.makedirs('image')
     
 @route('/setup', method=['GET', 'POST'])
 def setup():
