@@ -9,7 +9,7 @@ import hashlib
 import html
 import datetime
 import time
-from multiprocessing import Process
+import asyncio
 
 json_data = open('set.json').read()
 set_data = json.loads(json_data)
@@ -25,6 +25,7 @@ session_opts = {
 
 app = beaker.middleware.SessionMiddleware(app(), session_opts)
 
+back_list = []
 def get_time():
     now = time.localtime()
     date = "%04d-%02d-%02d %02d:%02d:%02d" % (now.tm_year, now.tm_mon, now.tm_mday, now.tm_hour, now.tm_min, now.tm_sec)
@@ -417,10 +418,13 @@ def toc_pas(data, title, num, toc_y):
     return(data)
 
 def link(title, data, num, category):
+    data = data.replace('&#92;', '\\')
+    
     m = re.findall("\[\[(분류:(?:(?:(?!\]\]).)*))\]\]", data)
     for g in m:
         if(title != g):
-            backlink_plus(title, g, 'cat', num)
+            if(num == 1):
+                backlink_plus(title, g, 'cat')
                 
             if(category == ''):
                 curs.execute("select title from data where title = ?", [g])
@@ -500,7 +504,8 @@ def link(title, data, num, category):
                 f_d = re.search('^파일:([^.]+)\.(.+)$', d[0])
                 if(f_d):
                     if(not re.search("^파일:([^\n]*)", title)):
-                        backlink_plus(title, d[0], 'file', num)
+                        if(num == 1):
+                            backlink_plus(title, d[0], 'file')
                         
                     img = span[0] + '<img src="/image/' + sha224(f_d.groups()[0]) + '.' + f_d.groups()[1] + '" ' + width + height + '>' + span[1]
                     data = link.sub(img, data, 1)
@@ -540,37 +545,40 @@ def link(title, data, num, category):
                 else:                    
                     a = href.replace('&#x27;', "'").replace('&quot;', '"').replace('\\\\', '<slash>').replace('\\', '').replace('<slash>', '\\')
                     
-                    backlink_plus(title, a, '', num)
+                    if(num == 1):
+                        backlink_plus(title, a, '')
+                    
                     curs.execute("select title from data where title = ?", [a])
                     if(not curs.fetchall()):
                         no = 'class="not_thing"'
-                        backlink_plus(title, a, 'no', num)
+                        
+                        if(num == 1):
+                            backlink_plus(title, a, 'no')
                     else:
                         no = ''
                     
                     data = link.sub('<a ' + no + ' title="' + href + sh + '" href="/w/' + url_pas(a) + sh + '">' + view.replace('\\', '\\\\') + '</a>', data, 1)
         else:
             break
+            
+    data = data.replace('\\', '&#92;')
 
     return([data, category])
 
-
-def backlink_plus(name, link, backtype, num):
-    if(num == 1):
-        curs.execute("select title from back where title = ? and link = ? and type = ?", [link, name, backtype])
-        d = curs.fetchall()
-        if(not d):
-            try:
-                curs.execute("insert into back (title, link, type) values (?, ?,  ?)", [link, name, backtype])
-            except:
-                while(1):
-                    try:
-                        curs.execute("insert into back (title, link, type) values (?, ?,  ?)", [link, name, backtype])
-                        break
-                    except:
-                        time.sleep(1)
+def backlink_plus(name, link, backtype):
+    global back_list
+    back_list += [[name, link, backtype]]
+    
+async def plusing(name, link, backtype):
+    curs.execute("select title from back where title = ? and link = ? and type = ?", [link, name, backtype])
+    if(not curs.fetchall()):
+        curs.execute("insert into back (title, link, type) values (?, ?,  ?)", [link, name, backtype])
+                        
+    return('')
 
 def namumark(title, data, num, in_c, toc_y):    
+    global back_list
+    back_list = []
     data = data.replace('\\r', '&#92;r')
     data = data.replace('\\n', '&#92;n')
     data = re.sub("\n", "\r\n", re.sub("\r\n", "\n", data))
@@ -594,7 +602,7 @@ def namumark(title, data, num, in_c, toc_y):
             curs.execute("select data from data where title = ?", [results[0]])
             in_con = curs.fetchall()
             
-            backlink_plus(title, results[0], 'include', num)
+            backlink_plus(title, results[0], 'include')
             if(in_con):                        
                 in_data = in_con[0][0]
                 in_data = include.sub("", in_data)
@@ -643,7 +651,7 @@ def namumark(title, data, num, in_c, toc_y):
             href = d
             
         a = href.replace('&#x27;', "'").replace('&quot;', '"').replace('\\\\', '<slash>').replace('\\', '').replace('<slash>', '\\')
-        backlink_plus(title, a, 'redirect', num)
+        backlink_plus(title, a, 'redirect')
         data = re.sub('\r\n#(?:redirect|넘겨주기) ((?:(?!\r|\n|%0D).)+)', '<meta http-equiv="refresh" content="0;url=/w/' + url_pas(a) + '/from/' + url_pas(title) + sh + '" />', data, 1)
           
     data = re.sub("\[nicovideo\((?P<in>[^,)]*)(?:(?:,(?:[^,)]*))+)?\)\]", "[[http://embed.nicovideo.jp/watch/\g<in>]]", data)
@@ -1002,7 +1010,12 @@ def namumark(title, data, num, in_c, toc_y):
     data = re.sub('^<div style="margin-top: 30px;" id="cate">', '<div id="cate">', data)        
     data = re.sub('&amp;#92;', '&#92;', data)
     
-    if(num == 1):
+    if(num == 1):        
+        asyncio.set_event_loop(asyncio.new_event_loop())
+        loop = asyncio.get_event_loop()
+        for d4 in back_list:
+            loop.run_until_complete(plusing(d4[0], d4[1], d4[2]))
+        loop.close()
         conn.commit()
-
+        
     return(data)
