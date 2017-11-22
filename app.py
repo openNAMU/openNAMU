@@ -301,11 +301,11 @@ def edit_set(num = 0):
             conn.commit()
 
             div = ''
-            if(d_list[5] == 'login'):
+            if(d_list[6] == 'login'):
                 div += '<option value="login">가입자</option>'
                 div += '<option value="normal">일반</option>'
                 div += '<option value="admin">관리자</option>'
-            elif(d_list[5] == 'admin'):
+            elif(d_list[6] == 'admin'):
                 div += '<option value="admin">관리자</option>'
                 div += '<option value="login">가입자</option>'
                 div += '<option value="normal">일반</option>'
@@ -314,7 +314,7 @@ def edit_set(num = 0):
                 div += '<option value="admin">관리자</option>'
                 div += '<option value="login">가입자</option>'
 
-            if(d_list[6]):
+            if(d_list[7]):
                 ch_1 = 'checked="checked"'
             else:
                 ch_1 = ''
