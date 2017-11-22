@@ -14,6 +14,10 @@ input {
     word-break: break-all;
 }
 
+footer#footer {
+    height: -webkit-fill-available;
+}
+
 #back_title {
     border: 1px solid black;
     padding: 5px;
