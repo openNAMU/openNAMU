@@ -103,9 +103,13 @@ try:
 except:
     pass
 
-# Image directory create
-if not os.path.exists('image'):
+# 이미지 폴더 생성
+if(not os.path.exists('image')):
     os.makedirs('image')
+    
+# 스킨 폴더 생성
+if(not os.path.exists('views')):
+    os.makedirs('views')
     
 @route('/setup', method=['GET', 'POST'])
 def setup():
