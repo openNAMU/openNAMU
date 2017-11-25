@@ -3,6 +3,9 @@ from bottle.ext import beaker
 import json
 import sqlite3
 from hashlib import md5
+from urllib import parse
+import re
+import html
 from css_html_js_minify import html_minify
 
 json_data = open('set.json').read()
@@ -19,7 +22,29 @@ session_opts = {
 
 app = beaker.middleware.SessionMiddleware(app(), session_opts)
 
-from mark import *
+def get_time():
+    now = time.localtime()
+    date = "%04d-%02d-%02d %02d:%02d:%02d" % (now.tm_year, now.tm_mon, now.tm_mday, now.tm_hour, now.tm_min, now.tm_sec)
+
+    return(date)
+    
+def ip_check():
+    session = request.environ.get('beaker.session')
+    try:
+        if(session.get('Now') == 1):
+            ip = format(session['DREAMER'])
+        else:
+            if(request.environ.get('HTTP_X_FORWARDED_FOR')):
+                ip = request.environ.get('HTTP_X_FORWARDED_FOR')
+            else:
+                ip = request.environ.get('REMOTE_ADDR')
+    except:
+        ip = 'None'
+
+    return(ip)
+    
+def url_pas(data):
+    return(parse.quote(data).replace('/','%2F'))
 
 def other2(d):
     g = ''
