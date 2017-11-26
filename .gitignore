@@ -3,3 +3,5 @@ set.json
 /app_session
 opennamu.db
 image
+.vscode
+set_mark/__pycache__
