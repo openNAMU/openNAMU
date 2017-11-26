@@ -3,7 +3,11 @@ from bottle.ext import beaker
 import json
 import sqlite3
 from hashlib import md5
+from urllib import parse
+import re
+import html
 from css_html_js_minify import html_minify
+import time
 
 json_data = open('set.json').read()
 set_data = json.loads(json_data)
@@ -19,7 +23,29 @@ session_opts = {
 
 app = beaker.middleware.SessionMiddleware(app(), session_opts)
 
-from mark import *
+def get_time():
+    now = time.localtime()
+    date = "%04d-%02d-%02d %02d:%02d:%02d" % (now.tm_year, now.tm_mon, now.tm_mday, now.tm_hour, now.tm_min, now.tm_sec)
+
+    return(date)
+    
+def ip_check():
+    session = request.environ.get('beaker.session')
+    try:
+        if(session.get('Now') == 1):
+            ip = format(session['DREAMER'])
+        else:
+            if(request.environ.get('HTTP_X_FORWARDED_FOR')):
+                ip = request.environ.get('HTTP_X_FORWARDED_FOR')
+            else:
+                ip = request.environ.get('REMOTE_ADDR')
+    except:
+        ip = 'None'
+
+    return(ip)
+    
+def url_pas(data):
+    return(parse.quote(data).replace('/','%2F'))
 
 def other2(d):
     g = ''
@@ -320,7 +346,7 @@ def rb_plus(block, end, today, blocker, why):
     curs.execute("insert into rb (block, end, today, blocker, why) values (?, ?, ?, ?, ?)", [block, end, today, blocker, why])
 
 def history_plus(title, data, date, ip, send, leng):
-    curs.execute("select id from history where title = ? order by id+0 desc limit 1", [title])
+    curs.execute("select id from history where title = ? order by id + 0 desc limit 1", [title])
     d = curs.fetchall()
     if(d):
         curs.execute("insert into history (id, title, data, date, ip, send, leng) values (?, ?, ?, ?, ?, ?, ?)", [str(int(d[0][0]) + 1), title, data, date, ip, send, leng])
@@ -340,7 +366,7 @@ def leng_check(a, b):
     return(c)
 
 def redirect(data):
-    return('<meta http-equiv="refresh" content="0;url=' + data + '" />')
+    return('<meta http-equiv="refresh" content="0; url=' + data + '">')
 
 def re_error(data):
     if(data == '/ban'):
