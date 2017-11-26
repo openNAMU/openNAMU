@@ -7,6 +7,7 @@ from urllib import parse
 import re
 import html
 from css_html_js_minify import html_minify
+import time
 
 json_data = open('set.json').read()
 set_data = json.loads(json_data)
@@ -345,7 +346,7 @@ def rb_plus(block, end, today, blocker, why):
     curs.execute("insert into rb (block, end, today, blocker, why) values (?, ?, ?, ?, ?)", [block, end, today, blocker, why])
 
 def history_plus(title, data, date, ip, send, leng):
-    curs.execute("select id from history where title = ? order by id+0 desc limit 1", [title])
+    curs.execute("select id from history where title = ? order by id + 0 desc limit 1", [title])
     d = curs.fetchall()
     if(d):
         curs.execute("insert into history (id, title, data, date, ip, send, leng) values (?, ?, ?, ?, ?, ?, ?)", [str(int(d[0][0]) + 1), title, data, date, ip, send, leng])
@@ -365,7 +366,7 @@ def leng_check(a, b):
     return(c)
 
 def redirect(data):
-    return('<meta http-equiv="refresh" content="0;url=' + data + '" />')
+    return('<meta http-equiv="refresh" content="0; url=' + data + '">')
 
 def re_error(data):
     if(data == '/ban'):

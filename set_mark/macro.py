@@ -5,7 +5,6 @@ import time
 import datetime
 import re
 import json
-import sqlite3
 
 session_opts = {
     'session.type': 'dbm',

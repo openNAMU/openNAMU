@@ -1,6 +1,10 @@
 import re
+from urllib import parse
 
-def redirect_pas(data, backlink):    
+def url_pas(data):
+    return(parse.quote(data).replace('/','%2F'))
+
+def redirect_pas(data, title, backlink):    
     d_re = re.findall('\r\n#(?:redirect|넘겨주기) ((?:(?!\r|\n|%0D).)+)', data)
     for d in d_re:
         view = d.replace('\\', '')    
