@@ -1,14 +1,7 @@
-import json
 import sqlite3
 import re
 from urllib import parse
 import hashlib
-
-json_data = open('set.json').read()
-set_data = json.loads(json_data)
-
-conn = sqlite3.connect(set_data['db'] + '.db')
-curs = conn.cursor()
 
 def url_pas(data):
     return(parse.quote(data).replace('/','%2F'))
@@ -16,7 +9,9 @@ def url_pas(data):
 def sha224(data):
     return(hashlib.sha224(bytes(data, 'utf-8')).hexdigest())
 
-def link(title, data, num, category, backlink):
+def link(conn, title, data, num, category, backlink):
+    curs = conn.cursor()
+
     data = data.replace('&#92;', '\\')
     
     m = re.findall("\[\[(분류:(?:(?:(?!\]\]).)*))\]\]", data)

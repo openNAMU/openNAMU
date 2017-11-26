@@ -5,6 +5,7 @@ import sqlite3
 import bcrypt
 import os
 import difflib
+from set_mark.macro import savemark
 
 try:
     json_data = open('set.json').read()
@@ -35,8 +36,9 @@ session_opts = {
 
 app = beaker.middleware.SessionMiddleware(app(), session_opts)
 
+from set_mark.mark import *
+from set_mark.mid_pas import *
 from func import *
-from mark import *
 
 BaseRequest.MEMFILE_MAX = 1000 ** 4
 
@@ -1469,7 +1471,7 @@ def revert(name = None, num = None):
                 
             history_plus(name, data[0][0], today, ip, request.forms.send + ' (' + str(num) + '판)', leng)
             
-            namumark(name, data[0][0], 1, 0, 0)
+            namumark(conn, name, data[0][0], 1, 0, 0)
             conn.commit()
             
             return(redirect('/w/' + url_pas(name)))
@@ -1591,21 +1593,18 @@ def edit(name = None, name2 = None, num = None):
             if(not num and request.forms.otent != old[0][0]):
                 return(re_error('/error/12'))
 
-            leng = leng_check(len(request.forms.otent), len(content))
-            
             if(num):
                 content = old[0][0].replace(request.forms.otent, content)
-                
+
+            leng = leng_check(len(request.forms.otent), len(content))
             curs.execute("update data set data = ? where title = ?", [content, name])
         else:
             leng = '+' + str(len(content))
-
             curs.execute("insert into data (title, data, acl) values (?, ?, '')", [name, content])
-        
-        history_plus(name, content, today, ip, send_p(request.forms.send), leng)
 
+        history_plus(name, content, today, ip, send_p(request.forms.send), leng)
         curs.execute("delete from back where link = ?", [name])
-        namumark(name, content, 1, 0, 0)
+        namumark(conn, name, content, 1, 0, 0)
         conn.commit()
         
         return(redirect('/w/' + url_pas(name)))
@@ -1700,7 +1699,7 @@ def preview(name = None, num = None):
          
     newdata = request.forms.content
     newdata = re.sub('^#(?:redirect|넘겨주기) (?P<in>[^\n]*)', ' * [[\g<in>]] 문서로 넘겨주기', newdata)
-    enddata = namumark(name, newdata, 0, 0, 0)
+    enddata = namumark(conn, name, newdata, 0, 0, 0)
 
     if(num):
         action = '/section/' + str(num)
@@ -1874,7 +1873,7 @@ def other():
         html_minify(
             template('index', 
                 imp = ['기타 메뉴', wiki_set(1), custom(), other2([0, 0])],
-                data = namumark('', '[목차(없음)]\r\n' + \
+                data = namumark(conn, '', '[목차(없음)]\r\n' + \
                                     '== 기록 ==\r\n' + \
                                     ' * [[wiki:block_log|차단 기록]]\r\n' + \
                                     ' * [[wiki:user_log|가입 기록]]\r\n' + \
@@ -1905,7 +1904,7 @@ def manager(num = 1):
             html_minify(
                 template('index', 
                     imp = ['관리자 메뉴', wiki_set(1), custom(), other2([0, 0])],
-                    data = namumark('', '[목차(없음)]\r\n' + \
+                    data = namumark(conn, '', '[목차(없음)]\r\n' + \
                                         '== 목록 ==\r\n' + \
                                         ' * [[wiki:manager/2|문서 ACL]]\r\n' + \
                                         ' * [[wiki:manager/3|사용자 검사]]\r\n' + \
@@ -2464,7 +2463,7 @@ def topic(name = None, sub = None):
                                 </td> \
                             </tr> \
                             <tr> \
-                                <td>' + namumark('', d[0], 0, 0, 0) + '</td> \
+                                <td>' + namumark(conn, '', d[0], 0, 0, 0) + '</td> \
                             </tr> \
                         </tbody> \
                     </table> \
@@ -2488,7 +2487,7 @@ def topic(name = None, sub = None):
             else:
                 bd = ''
 
-            p = namumark('', p, 0, 0, 0)
+            p = namumark(conn, '', p, 0, 0, 0)
 
             ip = ip_pas(d[3])
 
@@ -3349,7 +3348,7 @@ def read_view(name = None, num = None, redirect = None):
     if(redirect):
         elsedata = re.sub("^#(?:redirect|넘겨주기) (?P<in>[^\n]*)", " * [[\g<in>]] 문서로 넘겨주기", elsedata)
             
-    enddata = namumark(name, elsedata, 0, 0, 1)
+    enddata = namumark(conn, name, elsedata, 0, 0, 1)
 
     if(data_none == 1):
         menu = [['edit/' + url_pas(name), '생성'], ['topic/' + url_pas(name), topic], ['history/' + url_pas(name), '역사'], ['move/' + url_pas(name), '이동'], ['xref/' + url_pas(name), '역링크']]
@@ -3385,7 +3384,7 @@ def read_view(name = None, num = None, redirect = None):
         html_minify(
             template('index', 
                 imp = [name, wiki_set(1), custom(), other2([sub + acl, r_date])],
-                data = enddata + namumark(name, div, 0, 0, 0),
+                data = enddata + namumark(conn, name, div, 0, 0, 0),
                 menu = menu
             )
         )
@@ -3559,7 +3558,7 @@ def user_info():
         html_minify(
             template('index', 
                 imp = ['사용자 메뉴', wiki_set(1), l, other2([0, 0])],
-                data =  ip + '<br><br>' + namumark('',  '권한 상태 : ' + acl + '\r\n' + \
+                data =  ip + '<br><br>' + namumark(conn, '',  '권한 상태 : ' + acl + '\r\n' + \
                                                         '[목차(없음)]\r\n' + \
                                                         '== 로그인 ==\r\n' + \
                                                         plus + '\r\n' + \
@@ -3731,7 +3730,7 @@ def count_edit(name = None):
         html_minify(
             template('index', 
                 imp = ['기여 횟수', wiki_set(1), custom(), other2([0, 0])],
-                data = namumark("", "||<-2><:> " + that + " ||\r\n||<:> 기여 횟수 ||<:> " + str(data) + "||\r\n||<:> 토론 횟수 ||<:> " + str(t_data) + "||", 0, 0, 0),
+                data = namumark(conn, "", "||<-2><:> " + that + " ||\r\n||<:> 기여 횟수 ||<:> " + str(data) + "||\r\n||<:> 토론 횟수 ||<:> " + str(t_data) + "||", 0, 0, 0),
                 menu = [['user', '사용자']]
             )
         )
@@ -3779,8 +3778,8 @@ def error_404(error):
 def error_500(error):
     try:
         curs.execute("select title from data limit 1")
-        return(error)
+        return('<!-- Splash, Spark, and Shining the Summer! 코코데맛떼나이데 잇쇼니코나캬, 다! Summer time (Oh ya! Summer time!!) 톤데모나이 나츠니나리소오 키미모카쿠고와 데키타카나? 히토리맛떼타라 앗토이우마니 바이바이 Summer time (Oh ya! Summer time!!) 오이데카레루노가 키라이나라 스구니오이데요 코코로우키우키 우키요노도리-무 비-치 세카이데 보우켄시요오 "보-옷"토 스키챠못타이나이 "규-웃"토 코이지칸가호시이? 닷타라(Let\'s go!) 닷타라(Let\'s go!) 코토시와 이치도키리사 아소보오 Splash! (Splash!!) 토비콘다 우미노아오사가(Good feeling) 오와라나이 나츠에노 토비라오 유메밋테루토 싯테루카이? 아소보오 Splash! (Splash!!) 토비콘데 미세타아토 키미가 타메랏테루(나라바) 요우샤나쿠 Summer Summer Summer에 츠레텟챠우카라! -->' + error)
     except:
         return('<!-- 아카이 타이요노 도레스데 오도루 와타시노 코토 미츠메테이루노 메오 소라시타이 데모 소라세나이 아아 죠네츠데 야카레타이 도키메키 이죠노 리즈무 코요이 시리타쿠테 이츠모요리 타이탄나 코토바오 츠부야이타 지분노 키모치나노니 젠젠 와카라나쿠 (낫챠이타이나) 리세이카라 시레이가 (토도카나이) 콘토로-루 후카노 손나 코이오 시타놋테 코에가 토도이테시맛타 하즈카시잇테 오모우케도 못토 시리타이노 못토 시리타이노 이케나이 유메다토 키즈키나가라 아카이 타이요노 도레스데 오도루 와타시노 코토 미츠메루 히토미 메오 소라시타이 데모 소라세나이 마나츠와 다레노 모노 아나타토 와타시노 모노니시타이 (닷테네) 코코로가 토마레나이 키세츠니 하지메테 무네노 토비라가 아이테 시마이소오요 You knock knock my heart!! -->' + redirect('/setup'))
     
-run(app = app, server = 'tornado', host = '0.0.0.0', port = int(set_data['port']))
+run(app = app, server = 'tornado', host = '0.0.0.0', port = int(set_data['port']), debug = True)

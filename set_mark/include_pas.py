@@ -1,22 +1,17 @@
+from . import html_pas
+from . import link
+from . import mid_pas
+from . import toc_pas
 import sqlite3
 from urllib import parse
-import json
 import re
-from html_pas import *
-from link import *
-from mid_pas import *
-from toc import *
-
-json_data = open('set.json').read()
-set_data = json.loads(json_data)
-
-conn = sqlite3.connect(set_data['db'] + '.db')
-curs = conn.cursor()
 
 def url_pas(data):
     return(parse.quote(data).replace('/','%2F'))
     
-def include(data, title, in_c, num, toc_y, fol_num):
+def include_pas(conn, data, title, in_c, num, toc_y, fol_num):
+    curs = conn.cursor()
+
     category = ''
     backlink = []
     
@@ -37,7 +32,7 @@ def include(data, title, in_c, num, toc_y, fol_num):
                 in_data = html_pas.html_pas(in_data)
                 
                 var_d = mid_pas.mid_pas(in_data, fol_num, 1, in_c)
-                var_d2 = link.link(title, var_d[0], 0, category, backlink)
+                var_d2 = link.link(conn, title, var_d[0], 0, category, backlink)
 
                 in_data = var_d2[0]
                 category = var_d2[1]
@@ -54,7 +49,7 @@ def include(data, title, in_c, num, toc_y, fol_num):
                         else:
                             break       
 
-                in_data = toc.toc_pas(in_data, results[0], num, toc_y)
+                in_data = toc_pas.toc_pas(in_data, results[0], num, toc_y)
                             
                 data = include.sub('\n<nobr><a id="include_link" href="/w/' + url_pas(results[0]) + '">[' + results[0] + ' 이동]</a><div>' + in_data + '</div><nobr>\n', data, 1)
             else:
