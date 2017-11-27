@@ -279,7 +279,7 @@ def alarm():
 @route('/edit_set/<num:int>', method=['POST', 'GET'])
 def edit_set(num = 0):
     if(num != 0 and admin_check(None, 'edit_set') != 1):
-        return(redirect('/ban'))
+        return(re_error('/ban'))
 
     if(num == 0):
         li_list = ['기본 설정', '문구 관련', '전역 CSS', '전역 JS']
