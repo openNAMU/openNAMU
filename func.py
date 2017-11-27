@@ -173,8 +173,9 @@ def admin_check(num, what):
 def ip_pas(raw_ip):
     hide = 0
     if(re.search("(\.|:)", raw_ip)):
-        curs.execute("select name from other where name = 'ip_view'")
-        if(curs.fetchall()):
+        curs.execute("select data from other where name = 'ip_view'")
+        d = curs.fetchall()
+        if(d and d[0][0] != ''):
             ip = '<span style="font-size: 75%;">' + md5(bytes(raw_ip, 'utf-8')).hexdigest() + '</span>'
             if(not admin_check('ban', None)):
                 hide = 1
