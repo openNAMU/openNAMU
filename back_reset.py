@@ -2,6 +2,7 @@ import json
 import sqlite3
 from multiprocessing import Process
 from func import *
+from set_mark.mark import *
 
 json_data = open('set.json').read()
 set_data = json.loads(json_data)
@@ -12,7 +13,7 @@ curs = conn.cursor()
 def go_namu(data):
     for end in data:
         print(end[0])
-        namumark(end[0], end[1], 1, 0, 0)
+        namumark(conn, end[0], end[1], 1, 0, 0)
 
 if(__name__=='__main__'):
     curs.execute("select title, data from data")
