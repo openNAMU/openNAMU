@@ -123,7 +123,7 @@ def back_up():
     except:
         print('백업 오류')
 
-    threading.Timer(60 * 60 * 3, back_up).start()
+    threading.Timer(60 * 60 * 24, back_up).start()
     
 @route('/setup', method=['GET', 'POST'])
 def setup():
