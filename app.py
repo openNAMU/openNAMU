@@ -315,7 +315,7 @@ def edit_set(num = 0):
             return(redirect('/edit_set/1'))
         else:
             i_list = ['name', 'logo', 'frontpage', 'license', 'upload', 'skin', 'edit', 'reg', 'ip_view', 'back_up']
-            n_list = ['무명위키', '', '위키:대문', 'CC 0', '2', '', 'normal', '', '', '24']
+            n_list = ['무명위키', '', '위키:대문', 'CC 0', '2', '', 'normal', '', '', '0']
             d_list = []
             
             x = 0
@@ -360,7 +360,7 @@ def edit_set(num = 0):
                     template('index', 
                         imp = ['기본 설정', wiki_set(1), custom(), other2([0, 0])],
                         data = '<form method="post"> \
-                                    <span>위키 이름 (기본 : 무명위키)</span> \
+                                    <span>위키 이름</span> \
                                     <br> \
                                     <br> \
                                     <input placeholder="위키 이름" style="width: 100%;" type="text" name="name" value="' + html.escape(d_list[0]) + '"> \
@@ -372,31 +372,31 @@ def edit_set(num = 0):
                                     <input placeholder="로고" style="width: 100%;" type="text" name="logo" value="' + html.escape(d_list[1]) + '"> \
                                     <br> \
                                     <br> \
-                                    <span>시작 페이지 (기본 : 위키:대문)</span> \
+                                    <span>시작 페이지</span> \
                                     <br> \
                                     <br> \
                                     <input placeholder="시작 페이지" style="width: 100%;" type="text" name="frontpage" value="' + html.escape(d_list[2]) + '"> \
                                     <br> \
                                     <br> \
-                                    <span>라이선스 (기본 : CC 0)</span> \
+                                    <span>라이선스</span> \
                                     <br> \
                                     <br> \
                                     <input placeholder="라이선스" style="width: 100%;" type="text" name="license" value="' + html.escape(d_list[3]) + '"> \
                                     <br> \
                                     <br> \
-                                    <span>파일 용량 한도 [메가] (기본 : 2)</span> \
+                                    <span>파일 용량 한도 [메가]</span> \
                                     <br> \
                                     <br> \
                                     <input placeholder="파일 용량 한도" style="width: 100%;" type="text" name="upload" value="' + html.escape(d_list[4]) + '"> \
                                     <br> \
                                     <br> \
-                                    <span>스킨 (기본 : acme) (재시작 필요)</span> \
+                                    <span>스킨 (재시작 필요)</span> \
                                     <br> \
                                     <br> \
                                     <input placeholder="스킨" style="width: 100%;" type="text" name="skin" value="' + html.escape(d_list[5]) + '"> \
                                     <br> \
                                     <br> \
-                                    <span>기본 ACL 설정 (기본 : 일반)</span> \
+                                    <span>기본 ACL 설정</span> \
                                     <br> \
                                     <br> \
                                     <select name="edit"> \
@@ -410,7 +410,7 @@ def edit_set(num = 0):
                                     <input type="checkbox" name="ip_view" ' + ch_2 + '> 아이피 비공개 \
                                     <br> \
                                     <br> \
-                                    <span>백업 간격 [시간] (기본 : 24) (끄기 : 0) (재시작 필요)</span> \
+                                    <span>백업 간격 [시간] (끄기 : 0) (재시작 필요)</span> \
                                     <br> \
                                     <br> \
                                     <input placeholder="백업 간격" style="width: 100%;" type="text" name="back_up" value="' + html.escape(d_list[9]) + '"> \
