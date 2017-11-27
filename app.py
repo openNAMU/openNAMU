@@ -5,7 +5,8 @@ import sqlite3
 import bcrypt
 import os
 import difflib
-from set_mark.macro import savemark
+import shutil
+import threading
 
 try:
     json_data = open('set.json').read()
@@ -38,6 +39,7 @@ app = beaker.middleware.SessionMiddleware(app(), session_opts)
 
 from set_mark.mark import *
 from set_mark.mid_pas import *
+from set_mark.macro import savemark
 from func import *
 
 BaseRequest.MEMFILE_MAX = 1000 ** 4
@@ -113,6 +115,15 @@ if(not os.path.exists('image')):
 # 스킨 폴더 생성
 if(not os.path.exists('views')):
     os.makedirs('views')
+
+def back_up():
+    try:
+        shutil.copyfile(set_data['db'] + '.db', 'back_' + set_data['db'] + '.db')
+        print('디비 백업')
+    except:
+        print('백업 오류')
+
+    threading.Timer(60 * 60 * 3, back_up).start()
     
 @route('/setup', method=['GET', 'POST'])
 def setup():
@@ -3782,4 +3793,7 @@ def error_500(error):
     except:
         return('<!-- 아카이 타이요노 도레스데 오도루 와타시노 코토 미츠메테이루노 메오 소라시타이 데모 소라세나이 아아 죠네츠데 야카레타이 도키메키 이죠노 리즈무 코요이 시리타쿠테 이츠모요리 타이탄나 코토바오 츠부야이타 지분노 키모치나노니 젠젠 와카라나쿠 (낫챠이타이나) 리세이카라 시레이가 (토도카나이) 콘토로-루 후카노 손나 코이오 시타놋테 코에가 토도이테시맛타 하즈카시잇테 오모우케도 못토 시리타이노 못토 시리타이노 이케나이 유메다토 키즈키나가라 아카이 타이요노 도레스데 오도루 와타시노 코토 미츠메루 히토미 메오 소라시타이 데모 소라세나이 마나츠와 다레노 모노 아나타토 와타시노 모노니시타이 (닷테네) 코코로가 토마레나이 키세츠니 하지메테 무네노 토비라가 아이테 시마이소오요 You knock knock my heart!! -->' + redirect('/setup'))
     
+if(__name__ == '__main__'):
+    back_up()
+
 run(app = app, server = 'tornado', host = '0.0.0.0', port = int(set_data['port']), debug = True)
