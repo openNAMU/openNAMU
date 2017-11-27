@@ -119,11 +119,26 @@ if(not os.path.exists('views')):
 def back_up():
     try:
         shutil.copyfile(set_data['db'] + '.db', 'back_' + set_data['db'] + '.db')
-        print('디비 백업')
+        print('백업 성공')
     except:
         print('백업 오류')
 
-    threading.Timer(60 * 60 * 24, back_up).start()
+    threading.Timer(60 * 60 * back_time, back_up).start()
+
+try:
+    curs.execute('select data from other where name = "back_up"')
+    back_up_time = curs.fetchall()
+    back_time = int(back_up_time[0][0])
+except:
+    back_time = 24
+    
+if(back_time != 0):
+    print(str(back_time) + '시간 간격으로 백업')
+
+    if(__name__ == '__main__'):
+        back_up()
+else:
+    print('백업하지 않음')
     
 @route('/setup', method=['GET', 'POST'])
 def setup():
@@ -293,12 +308,14 @@ def edit_set(num = 0):
             curs.execute("update other set data = ? where name = 'skin'", [request.forms.skin])
             curs.execute("update other set data = ? where name = 'edit'", [request.forms.edit])
             curs.execute("update other set data = ? where name = 'reg'", [request.forms.reg])
+            curs.execute("update other set data = ? where name = 'ip_view'", [request.forms.ip_view])
+            curs.execute("update other set data = ? where name = 'back_up'", [request.forms.back_up])
             conn.commit()
 
             return(redirect('/edit_set/1'))
         else:
-            i_list = ['name', 'logo', 'frontpage', 'license', 'upload', 'skin', 'edit', 'reg', 'ip_view']
-            n_list = ['무명위키', '', '위키:대문', 'CC 0', '2', '', 'normal', '', '']
+            i_list = ['name', 'logo', 'frontpage', 'license', 'upload', 'skin', 'edit', 'reg', 'ip_view', 'back_up']
+            n_list = ['무명위키', '', '위키:대문', 'CC 0', '2', '', 'normal', '', '', '24']
             d_list = []
             
             x = 0
@@ -367,7 +384,7 @@ def edit_set(num = 0):
                                     <input placeholder="라이선스" style="width: 100%;" type="text" name="license" value="' + html.escape(d_list[3]) + '"> \
                                     <br> \
                                     <br> \
-                                    <span>파일 용량 한도 (기본 : 2)</span> \
+                                    <span>파일 용량 한도 [메가] (기본 : 2)</span> \
                                     <br> \
                                     <br> \
                                     <input placeholder="파일 용량 한도" style="width: 100%;" type="text" name="upload" value="' + html.escape(d_list[4]) + '"> \
@@ -391,6 +408,12 @@ def edit_set(num = 0):
                                     <br> \
                                     <br> \
                                     <input type="checkbox" name="ip_view" ' + ch_2 + '> 아이피 비공개 \
+                                    <br> \
+                                    <br> \
+                                    <span>백업 간격 [시간] (기본 : 24) (끄기 : 0) (재시작 필요)</span> \
+                                    <br> \
+                                    <br> \
+                                    <input placeholder="백업 간격" style="width: 100%;" type="text" name="back_up" value="' + html.escape(d_list[9]) + '"> \
                                     <br> \
                                     <br> \
                                     <button class="btn btn-primary" type="submit">저장</button> \
@@ -3792,8 +3815,5 @@ def error_500(error):
         return('<!-- Splash, Spark, and Shining the Summer! 코코데맛떼나이데 잇쇼니코나캬, 다! Summer time (Oh ya! Summer time!!) 톤데모나이 나츠니나리소오 키미모카쿠고와 데키타카나? 히토리맛떼타라 앗토이우마니 바이바이 Summer time (Oh ya! Summer time!!) 오이데카레루노가 키라이나라 스구니오이데요 코코로우키우키 우키요노도리-무 비-치 세카이데 보우켄시요오 "보-옷"토 스키챠못타이나이 "규-웃"토 코이지칸가호시이? 닷타라(Let\'s go!) 닷타라(Let\'s go!) 코토시와 이치도키리사 아소보오 Splash! (Splash!!) 토비콘다 우미노아오사가(Good feeling) 오와라나이 나츠에노 토비라오 유메밋테루토 싯테루카이? 아소보오 Splash! (Splash!!) 토비콘데 미세타아토 키미가 타메랏테루(나라바) 요우샤나쿠 Summer Summer Summer에 츠레텟챠우카라! -->' + error)
     except:
         return('<!-- 아카이 타이요노 도레스데 오도루 와타시노 코토 미츠메테이루노 메오 소라시타이 데모 소라세나이 아아 죠네츠데 야카레타이 도키메키 이죠노 리즈무 코요이 시리타쿠테 이츠모요리 타이탄나 코토바오 츠부야이타 지분노 키모치나노니 젠젠 와카라나쿠 (낫챠이타이나) 리세이카라 시레이가 (토도카나이) 콘토로-루 후카노 손나 코이오 시타놋테 코에가 토도이테시맛타 하즈카시잇테 오모우케도 못토 시리타이노 못토 시리타이노 이케나이 유메다토 키즈키나가라 아카이 타이요노 도레스데 오도루 와타시노 코토 미츠메루 히토미 메오 소라시타이 데모 소라세나이 마나츠와 다레노 모노 아나타토 와타시노 모노니시타이 (닷테네) 코코로가 토마레나이 키세츠니 하지메테 무네노 토비라가 아이테 시마이소오요 You knock knock my heart!! -->' + redirect('/setup'))
-    
-if(__name__ == '__main__'):
-    back_up()
 
 run(app = app, server = 'tornado', host = '0.0.0.0', port = int(set_data['port']), debug = True)
