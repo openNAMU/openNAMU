@@ -130,7 +130,7 @@ try:
     back_up_time = curs.fetchall()
     back_time = int(back_up_time[0][0])
 except:
-    back_time = 24
+    back_time = 0
     
 if(back_time != 0):
     print(str(back_time) + '시간 간격으로 백업')
