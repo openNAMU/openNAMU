@@ -55,7 +55,7 @@ def macro(data):
     data = re.sub("\[br\]", '<br>', data)
     
     while(1):
-        com = re.compile("\[(youtube|kakao)\(([^, )]*)(,[^)]*)?\)\]")
+        com = re.compile("\[(youtube|kakaotv)\(([^, )]*)(,[^)]*)?\)\]")
         m = com.search(data)
         if(m):
             src = ''
