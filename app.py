@@ -44,7 +44,7 @@ from func import *
 
 BaseRequest.MEMFILE_MAX = 1000 ** 4
 
-r_ver = '2.3.9a'
+r_ver = '2.3.9b'
 
 # 스킨 불러오기 부분
 try:
@@ -1780,6 +1780,10 @@ def delete(name = None):
             
             leng = '-' + str(len(data[0][0]))
             history_plus(name, '', today, ip, request.forms.send + ' (삭제)', leng)
+
+            curs.execute("select title, link from back where title = ? and not type = 'cat' and not type = 'no'", [name])
+            for data in curs.fetchall():
+                curs.execute("insert into back (title, link, type) values (?, ?, 'no')", [data[0], data[1]])
             
             curs.execute("delete from back where link = ?", [name])
             curs.execute("delete from data where title = ?", [name])
@@ -1870,6 +1874,10 @@ def move(name = None):
             d = ''
             
         history_plus(name, d, today, ip, request.forms.send + ' (<a href="/w/' + url_pas(name) + '">' + name + '</a> - <a href="/w/' + url_pas(request.forms.title) + '">' + request.forms.title + '</a> 이동)', leng)
+
+        curs.execute("select title, link from back where title = ? and not type = 'cat' and not type = 'no'", [name])
+        for data in curs.fetchall():
+            curs.execute("insert into back (title, link, type) values (?, ?, 'no')", [data[0], data[1]])
             
         curs.execute('insert into move (origin, new, date, who, send) values (?, ?, ?, ?, ?)', [name, request.forms.title, today, ip, request.forms.send])
         curs.execute("update history set title = ? where title = ?", [request.forms.title, name])
