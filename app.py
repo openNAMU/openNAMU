@@ -44,7 +44,7 @@ from func import *
 
 BaseRequest.MEMFILE_MAX = 1000 ** 4
 
-r_ver = '2.3.9'
+r_ver = '2.3.9a'
 
 # 스킨 불러오기 부분
 try:
@@ -1634,11 +1634,11 @@ def edit(name = None, name2 = None, num = None):
             curs.execute("update data set data = ? where title = ?", [content, name])
         else:
             leng = '+' + str(len(content))
-            curs.execute("delete from back where title = ? and type = 'no'", [name])
             curs.execute("insert into data (title, data, acl) values (?, ?, '')", [name, content])
 
         history_plus(name, content, today, ip, send_p(request.forms.send), leng)
         curs.execute("delete from back where link = ?", [name])
+        curs.execute("delete from back where title = ? and type = 'no'", [name])
         namumark(conn, name, content, 1, 0, 0)
         conn.commit()
         
