@@ -34,9 +34,9 @@ def url_pas(data):
     
 async def plusing(conn, name, link, backtype):
     curs = conn.cursor()
-    curs.execute("select title from back where title = ? and link = ? and type = ?", [name, link, backtype])
+    curs.execute("select title from back where title = ? and link = ? and type = ?", [link, name, backtype])
     if(not curs.fetchall()):
-        curs.execute("insert into back (title, link, type) values (?, ?,  ?)", [name, link, backtype])
+        curs.execute("insert into back (title, link, type) values (?, ?,  ?)", [link, name, backtype])
 
 def namumark(conn, title, data, num, in_c, toc_y):  
     data = start.start(data)
