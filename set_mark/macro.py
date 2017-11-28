@@ -55,7 +55,7 @@ def macro(data):
     data = re.sub("\[br\]", '<br>', data)
     
     while(1):
-        com = re.compile("\[youtube\(([^, )]*)(,[^)]*)?\)\]")
+        com = re.compile("\[(youtube|kakao)\(([^, )]*)(,[^)]*)?\)\]")
         m = com.search(data)
         if(m):
             src = ''
@@ -64,8 +64,8 @@ def macro(data):
             time = '0'
             
             result = m.groups()
-            if(result[0]):
-                yudt = re.search('(?:\?v=(.*)|\/([^/?]*)|^([a-zA-Z0-9\-_]*))$', result[0])
+            if(result[1]):
+                yudt = re.search('(?:\?v=(.*)|\/([^/?]*)|^([a-zA-Z0-9\-_]*))$', result[1])
                 if(yudt):
                     if(yudt.groups()[0]):
                         src = yudt.groups()[0]
@@ -76,20 +76,23 @@ def macro(data):
                 else:
                     src = ''
                     
-            if(result[1]):
-                mdata = re.search('width=([0-9%]*)', result[1])
+            if(result[2]):
+                mdata = re.search('width=([0-9%]*)', result[2])
                 if(mdata):
                     width = mdata.groups()[0]
                 
-                mdata = re.search('height=([0-9%]*)', result[1])
+                mdata = re.search('height=([0-9%]*)', result[2])
                 if(mdata):
                     height = mdata.groups()[0]
                     
-                mdata = re.search('start=([0-9]*)', result[1])
+                mdata = re.search('start=([0-9]*)', result[2])
                 if(mdata):
                     time = mdata.groups()[0]
 
-            data = com.sub('<iframe width="' + width + '" height="' + height + '" src="https://www.youtube.com/embed/' + src + '?start=' + time + '" frameborder="0" allowfullscreen></iframe><br>', data, 1)
+            if(result[0] == 'youtube'):
+                data = com.sub('<iframe width="' + width + '" height="' + height + '" src="https://www.youtube.com/embed/' + src + '?start=' + time + '" frameborder="0" allowfullscreen></iframe><br>', data, 1)
+            else:
+                data = com.sub('<iframe width="' + width + '" height="' + height + '" src="https://tv.kakao.com/embed/player/cliplink/' + src + '?service=kakao_tv&start=' + time + '" allowfullscreen frameborder="0" scrolling="no"></iframe><br>', data, 1)
         else:
             break
     
