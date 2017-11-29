@@ -3802,12 +3802,21 @@ def views(name = None):
     else:
         plus = ''
         rename = name
-        
-    return(
-        static_file(rename, 
-            root = './views' + plus
-        )
-    )
+
+    m = re.search('\.(.+)$', name)
+    if(m):
+        g = m.groups()
+    else:
+        g = ['']
+
+    if(g == 'css'):
+        return(css_minify(static_file(rename, root = './views' + plus)))   
+    elif(g == 'js'):
+        return(js_minify(static_file(rename, root = './views' + plus)))   
+    elif(g == 'html'):
+        return(html_minify(static_file(rename, root = './views' + plus)))   
+    else:
+        return(static_file(rename, root = './views' + plus))
 
 @error(404)
 def error_404(error):

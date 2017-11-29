@@ -6,7 +6,7 @@ from hashlib import md5
 from urllib import parse
 import re
 import html
-from css_html_js_minify import html_minify
+from css_html_js_minify import html_minify, js_minify, css_minify
 import time
 
 json_data = open('set.json').read()
