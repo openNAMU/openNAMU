@@ -1057,7 +1057,7 @@ def xref(name = None, num = 1):
         div += '</li>'
         
         if(re.search('^틀:', data[0])):
-            div += '<li><a id="inside" href="/xref/' + url_pas(data[0]) + '">' + data[0] + ' [역링크]</a></li>'
+            div += '<li><a id="inside" href="/xref/' + url_pas(data[0]) + '">' + data[0] + '</a> (역링크)</li>'
       
     div += '</ul><br><a href="/xref/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전)</a> <a href="/xref/' + url_pas(name) + '/n/' + str(num + 1) + '">(이후)</a>'
     
@@ -1395,6 +1395,7 @@ def deep_search(name = None, num = 1):
         else:
             all_list = ''
     
+    start = 0
     if(all_list != ''):
         for data in all_list:
             try:
@@ -1406,11 +1407,18 @@ def deep_search(name = None, num = 1):
                 if(no == 0):
                     div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a> (제목)</li>'
                 else:
+                    if(start == 0):
+                        start = 1
+                        div_plus += '<hr>'
                     div_plus += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a> (내용)</li>'
             else:
                 no = 1
-
+                if(start == 0):
+                    start = 1
+                    div_plus += '<hr>'
                 div_plus += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a> (내용)</li>'
+
+            
     else:
         div += '<li>검색 결과 없음</li>'
 
@@ -3334,7 +3342,7 @@ def read_view(name = None, num = None, redirect = None):
                     curs.execute("select data from data where title = ?", [data[0]])
                     d = mid_pas(curs.fetchall()[0][0], 0, 1, 0)[0]
                     if(re.search('\[\[' + name + ']]', d)):
-                        div += ' * [[' + data[0] + ']]\r\n * [[wiki:xref/' + url_pas(data[0]) + '|' + data[0] + ' (역링크)]]\r\n'
+                        div += ' * [[' + data[0] + ']]\r\n * [[wiki:xref/' + url_pas(data[0]) + '|' + data[0] + ']] (역링크)\r\n'
                     else:
                         div += ' * [[' + data[0] + ']]\r\n'
                 else:
