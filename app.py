@@ -44,7 +44,7 @@ from func import *
 
 BaseRequest.MEMFILE_MAX = 1000 ** 4
 
-r_ver = '2.3.9b'
+r_ver = '2.4.0'
 
 # 스킨 불러오기 부분
 try:
