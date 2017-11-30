@@ -84,8 +84,7 @@ try:
 
     try:
         curs.execute('select user, ip, today from login')
-        lo_d = curs.fetchall()
-        for m_lo in lo_d:
+        for m_lo in curs.fetchall():
             curs.execute("insert into ua_d (name, ip, ua, today, sub) values (?, ?, '', ?, '')", [m_lo[0], m_lo[1], m_lo[2]])
 
         curs.execute("drop table login")
@@ -95,12 +94,61 @@ try:
 
     try:
         curs.execute('select title, cat from cat')
-        lo_d = curs.fetchall()
-        for m_lo in lo_d:
+        for m_lo in curs.fetchall():
             curs.execute("insert into back (title, link, type) values (?, ?, 'cat')", [m_lo[0], m_lo[1]])
 
         curs.execute("drop table cat")
         print('cat 테이블 삭제')
+    except:
+        pass
+
+    try:
+        plus_all_data = ''
+        start_replace = 0
+
+        curs.execute('select data from other where name = "css"')
+        for m_lo in curs.fetchall():
+            plus_all_data += '\r\n<style>' + m_lo[0] + '</style>'
+
+        curs.execute('select data from other where name = "js"')
+        for m_lo in curs.fetchall():
+            plus_all_data += '\r\n<script>' + m_lo[0] + '</script>'
+
+        if(plus_all_data != ''):
+            curs.execute("insert into other (name, data) values ('head', ?)", [plus_all_data])
+            curs.execute("delete from other where name = 'css'")
+            curs.execute("delete from other where name = 'js'")
+            start_replace = 1
+
+        curs.execute('select user from custom')
+        if(curs.fetchall()):
+            curs.execute("select user from custom where user like ?", ['% (head)%'])
+            if(not curs.fetchall()):
+                curs.execute("select user, css from custom")
+                for data_lo in curs.fetchall():
+                    plus_all_data = ''
+                    if(re.search(' \(js\)$', data_lo[0])):
+                        name_data_is = data_lo[0].replace(' (js)', '')
+                        plus_all_data = '\r\n<script>' + data_lo[1] + '</script>'
+                    else:
+                        name_data_is = data_lo[0]
+                        plus_all_data = '\r\n<style>' + data_lo[1] + '</style>'
+
+                    print('plus : ' + plus_all_data)
+                    print('name : ' + data_lo[0])
+
+                    curs.execute("select css from custom where user = ?", [name_data_is + ' (head)'])
+                    data_is_it = curs.fetchall()
+                    if(data_is_it):
+                        curs.execute("update custom set css = ? where user = ?", [data_is_it[0][0] + plus_all_data, name_data_is + ' (head)'])
+                    else:
+                        curs.execute("insert into custom (user, css) values (?, ?)", [name_data_is + ' (head)', plus_all_data])
+                    
+                    curs.execute("delete from custom where user = ?", [data_lo[0]])
+                start_replace = 1
+
+        if(start_replace == 1):
+            print('CSS, JS 데이터 변환')
     except:
         pass
 
@@ -282,7 +330,7 @@ def edit_set(num = 0):
         return(re_error('/ban'))
 
     if(num == 0):
-        li_list = ['기본 설정', '문구 관련', '전역 CSS', '전역 JS']
+        li_list = ['기본 설정', '문구 관련', '전역 HEAD']
         x = 0
         li_data = ''
         for li in li_list:
@@ -464,75 +512,39 @@ def edit_set(num = 0):
                 )
             )
     elif(num == 3):
-        session = request.environ.get('beaker.session')
         if(request.method == 'POST'):
-            curs.execute("select name from other where name = 'css'")
+            curs.execute("select name from other where name = 'head'")
             if(curs.fetchall()):
-                curs.execute("update other set data = ? where name = 'css'", [request.forms.content])
+                curs.execute("update other set data = ? where name = 'head'", [request.forms.content])
             else:
-                curs.execute("insert into other (name, data) values ('css', ?)", [request.forms.content])
+                curs.execute("insert into other (name, data) values ('head', ?)", [request.forms.content])
             conn.commit()
 
             return(redirect('/edit_set/3'))
         else:
-            curs.execute("select data from other where name = 'css'")
-            css = curs.fetchall()
-            if(css):
-                data = css[0][0]
+            curs.execute("select data from other where name = 'head'")
+            head = curs.fetchall()
+            if(head):
+                data = head[0][0]
             else:
                 data = ''
+
+            start = '<span>&lt;style&gt;CSS 코드&lt;/style&gt;<br>&lt;script&gt;JS 코드&lt;/script&gt;</span><br><br>'
 
             return(
                 html_minify(
                     template('index', 
-                        imp = ['전역 CSS', wiki_set(1), custom(), other2([0, 0])],
-                        data =  '<form method="post"> \
-                                    <textarea rows="30" cols="100" name="content">'\
-                                        + html.escape(data) + \
-                                    '</textarea> \
-                                    <br> \
-                                    <br> \
-                                    <div class="form-actions"> \
-                                        <button class="btn btn-primary" type="submit">저장</button> \
-                                    </div> \
-                                </form>',
-                        menu = [['edit_set', '설정 편집']]
-                    )
-                )
-            )
-    elif(num == 4):
-        session = request.environ.get('beaker.session')
-        if(request.method == 'POST'):
-            curs.execute("select name from other where name = 'js'")
-            if(curs.fetchall()):
-                curs.execute("update other set data = ? where name = 'js'", [request.forms.content])
-            else:
-                curs.execute("insert into other (name, data) values ('js', ?)", [request.forms.content])
-            conn.commit()
-
-            return(redirect('/edit_set/4'))
-        else:
-            curs.execute("select data from other where name = 'js'")
-            js = curs.fetchall()
-            if(js):
-                data = js[0][0]
-            else:
-                data = ''
-
-            return(
-                html_minify(
-                    template('index', 
-                        imp = ['전역 JS', wiki_set(1), custom(), other2([0, 0])],
-                        data =  '<form method="post"> \
-                                    <textarea rows="30" cols="100" name="content">'\
-                                        + html.escape(data) + \
-                                    '</textarea> \
-                                    <br> \
-                                    <br> \
-                                    <div class="form-actions"> \
-                                        <button class="btn btn-primary" type="submit">저장</button> \
-                                    </div> \
-                                </form>',
+                        imp = ['전역 HEAD', wiki_set(1), custom(), other2([0, 0])],
+                        data =  start + '<form method="post"> \
+                                            <textarea rows="30" cols="100" name="content">'\
+                                                + html.escape(data) + \
+                                            '</textarea> \
+                                            <br> \
+                                            <br> \
+                                            <div class="form-actions"> \
+                                                <button class="btn btn-primary" type="submit">저장</button> \
+                                            </div> \
+                                        </form>',
                         menu = [['edit_set', '설정 편집']]
                     )
                 )
@@ -3616,8 +3628,7 @@ def user_info():
                                                         ' * [[wiki:register|회원가입]]\r\n' + \
                                                         '== 사용자 기능 ==\r\n' + \
                                                         ' * [[wiki:user_acl/' + url_pas(raw_ip) + '|사용자 문서 ACL]]\r\n' + \
-                                                        ' * [[wiki:custom_css|사용자 CSS]]\r\n' + \
-                                                        ' * [[wiki:custom_js|사용자 JS]]\r\n' + \
+                                                        ' * [[wiki:custom_head|사용자 HEAD]]\r\n' + \
                                                         '== 기타 ==\r\n' + \
                                                         ' * [[wiki:alarm|알림]]\r\n' + \
                                                         ' * [[wiki:view_log|지나온 문서]]\r\n' + \
@@ -3650,95 +3661,44 @@ def view_log():
         )
     )
 
-@route('/custom_css', method=['GET', 'POST'])
-def custom_css_view():
+@route('/custom_head', method=['GET', 'POST'])
+def custom_head_view():
     session = request.environ.get('beaker.session')
     ip = ip_check()
     if(request.method == 'POST'):
         if(not re.search('(\.|:)', ip)):
-            curs.execute("select * from custom where user = ?", [ip])
-            css_data = curs.fetchall()
-            if(css_data):
-                curs.execute("update custom set css = ? where user = ?", [request.forms.content, ip])
+            curs.execute("select user from custom where user = ?", [ip + ' (head)'])
+            if(curs.fetchall()):
+                curs.execute("update custom set css = ? where user = ?", [request.forms.content, ip + ' (head)'])
             else:
-                curs.execute("insert into custom (user, css) values (?, ?)", [ip, request.forms.content])
+                curs.execute("insert into custom (user, css) values (?, ?)", [ip + ' (head)', request.forms.content])
             conn.commit()
 
-        session['Daydream'] = request.forms.content
+        session['MyMaiToNight'] = request.forms.content
 
         return(redirect('/user'))
     else:
         if(not re.search('(\.|:)', ip)):
             start = ''
-            curs.execute("select css from custom where user = ?", [ip])
-            css_data = curs.fetchall()
-            if(css_data):
-                data = css_data[0][0]
+            curs.execute("select css from custom where user = ?", [ip + ' (head)'])
+            head_data = curs.fetchall()
+            if(head_data):
+                data = head_data[0][0]
             else:
                 data = ''
         else:
             start = '<span>비 로그인의 경우에는 로그인하면 날아갑니다.</span><br><br>'
             try:
-                data = session['Daydream']
+                data = session['MyMaiToNight']
             except:
                 data = ''
+
+        start += '<span>&lt;style&gt;CSS 코드&lt;/style&gt;<br>&lt;script&gt;JS 코드&lt;/script&gt;</span><br><br>'
 
         return(
             html_minify(
                 template('index', 
-                    imp = ['사용자 CSS', wiki_set(1), custom(), other2([0, 0])],
-                    data =  start + ' \
-                            <form method="post"> \
-                                <textarea rows="30" cols="100" name="content">'\
-                                     + data + \
-                                '</textarea> \
-                                <br> \
-                                <br> \
-                                <div class="form-actions"> \
-                                    <button class="btn btn-primary" type="submit">저장</button> \
-                                </div> \
-                            </form>',
-                    menu = [['user', '사용자']]
-                )
-            )
-        )
-
-@route('/custom_js', method=['GET', 'POST'])
-def custom_js_view():
-    session = request.environ.get('beaker.session')
-    ip = ip_check()
-    if(request.method == 'POST'):
-        if(not re.search('(\.|:)', ip)):
-            curs.execute("select * from custom where user = ?", [ip + ' (js)'])
-            js_data = curs.fetchall()
-            if(js_data):
-                curs.execute("update custom set css = ? where user = ?", [request.forms.content, ip + ' (js)'])
-            else:
-                curs.execute("insert into custom (user, css) values (?, ?)", [ip + ' (js)', request.forms.content])
-            conn.commit()
-        session['AQUARIUM'] = request.forms.content
-
-        return(redirect('/user'))
-    else:
-        if(not re.search('(\.|:)', ip)):
-            start = ''
-            curs.execute("select css from custom where user = ?", [ip + ' (js)'])
-            js_data = curs.fetchall()
-            if(js_data):
-                data = js_data[0][0]
-            else:
-                data = ''
-        else:
-            start = '<span>비 로그인의 경우에는 로그인하면 날아갑니다.</span><br><br>'
-            try:
-                data = session['AQUARIUM']
-            except:
-                data = ''
-
-        return(
-            html_minify(
-                template('index', 
-                    imp = ['사용자 JS', wiki_set(1), custom(), other2([0, 0])],
+                    imp = ['사용자 HEAD', wiki_set(1), custom(), other2([0, 0])],
                     data =  start + ' \
                             <form method="post"> \
                                 <textarea rows="30" cols="100" name="content">'\

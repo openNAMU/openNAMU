@@ -79,19 +79,7 @@ def wiki_set(num):
         else:
             r += ['CC 0']
 
-        curs.execute("select data from other where name = 'css'")
-        d = curs.fetchall()
-        if(d):
-            r += [d[0][0]]
-        else:
-            r += ['']
-
-        curs.execute("select data from other where name = 'js'")
-        d = curs.fetchall()
-        if(d):
-            r += [d[0][0]]
-        else:
-            r += ['']
+        r += ['', '']
 
         curs.execute('select data from other where name = "logo"')
         d = curs.fetchall()
@@ -99,6 +87,13 @@ def wiki_set(num):
             r += [d[0][0]]
         else:
             r += [r[0]]
+            
+        curs.execute("select data from other where name = 'head'")
+        d = curs.fetchall()
+        if(d):
+            r += [d[0][0]]
+        else:
+            r += ['']
 
         return(r)
 
@@ -196,14 +191,9 @@ def ip_pas(raw_ip):
 def custom():
     session = request.environ.get('beaker.session')
     try:
-        d1 = format(session['Daydream'])
+        d4 = format(session['MyMaiToNight'])
     except:
-        d1 = ''
-
-    try:
-        d2 = format(session['AQUARIUM'])
-    except:
-        d2 = ''
+        d4 = ''
 
     if(session.get('Now') == 1):
         curs.execute('select name from alarm limit 1')
@@ -214,7 +204,7 @@ def custom():
     else:
         d3 = 0
 
-    return([d1, d2, d3])
+    return(['', '', d3, d4])
 
 def acl_check(name):
     ip = ip_check()
