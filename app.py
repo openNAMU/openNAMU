@@ -134,9 +134,6 @@ try:
                         name_data_is = data_lo[0]
                         plus_all_data = '\r\n<style>' + data_lo[1] + '</style>'
 
-                    print('plus : ' + plus_all_data)
-                    print('name : ' + data_lo[0])
-
                     curs.execute("select css from custom where user = ?", [name_data_is + ' (head)'])
                     data_is_it = curs.fetchall()
                     if(data_is_it):
