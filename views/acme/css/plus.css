@@ -283,6 +283,25 @@ div.scroll-buttons {
     opacity: 0.8;
 }
 
+div.scroll-buttons a.random-link {
+    border-left: 1px solid #545454;
+}
+
+div.scroll-buttons a {
+    display: inline-block;
+    float: left;
+    width: 42px;
+    height: 42px;
+    padding: 5px 8px 9px 8px;
+    border: 1px solid #545454;
+    border-left: 0;
+    background: #dedede;
+    text-decoration: none;
+    text-align: center;
+    background: rgba(26,26,26,0.9);
+    border-bottom: 0;
+}
+
 table {
     font-size: 13px;
 }
