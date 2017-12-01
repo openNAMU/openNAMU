@@ -14,15 +14,12 @@ input {
     word-break: break-all;
 }
 
-footer {
-    height: -webkit-fill-available;
-}
-
 #back_title {
     border: 1px solid black;
     padding: 5px;
     margin-top: -30px;
     margin-bottom: 10px;
+    word-break: break-all;
 }
 
 .form-control.input-sm {
@@ -253,7 +250,6 @@ s:hover, strike:hover, del:hover {
 
 div.scroll-buttons a {
     display: inline-block;
-    float: left;
     width: 42px;
     height: 42px;
     padding: 5px 8px 9px 8px;
@@ -417,4 +413,25 @@ h1, h2, h3, h4, h5, h6 {
     z-index: 10000;
     max-height: 30%;
     overflow-y: scroll;
+}
+
+footer#footer {
+    bottom: 0;
+    position: relative;
+    width: 100%;
+}
+
+body {
+    padding-top: 70px;
+    padding-bottom: 30px;
+}
+  
+.theme-dropdown .dropdown-menu {
+    display: block;
+    position: static;
+    margin-bottom: 20px;
+}
+  
+.theme-showcase > p > .btn {
+    margin: 5px 0;
 }

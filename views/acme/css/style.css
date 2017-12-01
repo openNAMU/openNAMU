@@ -313,8 +313,6 @@ ul.dropdown-menu { border: none }
     color: #6f6f6f;
     background: #f4f4f4;
 }
-.panel-heading .nav > li:first-child.active > a,
-.panel-heading .nav > li:first-child > a:hover { }
 .tab .nav-tabs.nav-justified > li { border-right: 1px solid #f4f4f4 }
 .tab .nav-tabs.nav-justified > li:last-child { border-right: none }
 .p-head {
@@ -415,8 +413,7 @@ ul.about-flex-slides { margin-left: 0 }
     -moz-transform: rotate(45deg);
     -webkit-transform: rotate(45deg);
     width: 15px;
-    display: none\0/;
-    _display: none;
+    display: none;
 }
 /*----image hove----*/
 .view {
@@ -647,7 +644,6 @@ ul.about-flex-slides { margin-left: 0 }
 }
 [data-zlname = reverse-effect] [data-zl-popup = link]:hover,
 [data-zlname = reverse-effect] [data-zl-popup = link2]:hover { opacity: .5 }
-.bx-wrapper { }
 /*pricing table*/
 .price-two-container {
     margin-bottom: 50px;
@@ -1173,7 +1169,6 @@ ul.tag li {
     float: left;
     margin: 0px 5px 0 0;
     border-bottom: none;
-    padding-top: ;
     list-style: none;
 }
 ul.tag li a {
@@ -1451,7 +1446,7 @@ a.btn-purchase {
     text-transform: uppercase;
     border-radius: 4px;
     -webkit-border-radius: 4px;
-    -moz-border-radius: 4px padding: 20px 40px;
+    -moz-border-radius: 4px padding 20px 40px;
     margin-top: 30px;
     -webkit-transition: all .3s ease;
     -moz-transition: all .3s ease;
@@ -1775,7 +1770,7 @@ ul#filters > .active > span {
     border: 1px solid #d9d9d9;
 }
 .input-group-addon {
-    border: border: 1px solid #d9d9d9;
+    border: border 1px solid #d9d9d9;
     border-radius: 1px;
     -moz-border-radius: 1px;
     -webkit-border-radius: 1px;
@@ -1812,7 +1807,7 @@ ul#filters > .active > span {
     padding-top: 10px;
     padding-bottom: 10px;
 }
-#searchÂ id="search" { background-color: #fff }
+#search { background-color: #fff }
 .btn-lg {
     border-radius: 1px;
     -webkit-border-radius: 1px;
@@ -1993,7 +1988,6 @@ ul#filters > .active > span {
 }
 .modal-input { border: 1px solid #eee }
 .modal-input:focus { border: 1px solid #eee }
-.panel-faq { }
 #accordion .panel-heading-faq { border: 1px solid #c7c7c7 }
 #accordion .panel-body {
     border-width: 0px 1px 1px 1px;
@@ -2185,9 +2179,6 @@ ol.unstyled {
     color: #fff;
 }
 #portfoliolist-three .portfolio {
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    -o-box-sizing: border-box;
     width: 32%;
     margin-right: 1%;
     margin-bottom: 1%;
@@ -2196,9 +2187,6 @@ ol.unstyled {
     overflow: hidden;
 }
 #portfoliolist .portfolio {
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    -o-box-sizing: border-box;
     width: 24%;
     margin-right: 1%;
     margin-bottom: 1%;
@@ -2279,7 +2267,6 @@ span.filter {
     text-align: center;
     padding-bottom: 40px;
 }
-.taglist { }
 /*pricing table*/
 .pricing-table-two {
     background-color: #fff;
@@ -2370,7 +2357,6 @@ span.filter {
 .muted { color: #b6bfc5 }
 .text-error { color: #e74c3c }
 .f-w-n { font-weight: normal }
-.hlight { }
 .pr-10 { padding-right: 10px }
 .pr-5 { padding-right: 5px }
 .error-inner {
@@ -2725,7 +2711,7 @@ span.filter {
 .bg-teal,
 .bg-olive,
 .bg-lime,
-.bg-rgb(44, 62, 80),
+.bg-rgb,
 .bg-fuchsia,
 .bg-purple,
 .bg-maroon,
@@ -2742,7 +2728,7 @@ span.filter {
 .bg-teal { background-color: #39cccc !important }
 .bg-olive { background-color: #3d9970 !important }
 .bg-lime { background-color: #01ff70 !important }
-.bg-rgb(44, 62, 80) { background-color: #ff851b !important }
+.bg-rgb { background-color: #ff851b !important }
 .bg-fuchsia { background-color: #f012be !important }
 .bg-purple { background-color: #932ab6 !important }
 .bg-maroon { background-color: #85144b !important }
