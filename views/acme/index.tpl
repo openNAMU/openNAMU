@@ -63,18 +63,21 @@
                             <a href="/recent_changes">
                                 <i class="fa fa-refresh" aria-hidden="true"></i>
                                 <span id="mobile">최근 변경</span>
+                                <i class="fa fa-angle-left"></i>
                             </a>
                         </li>
                         <li>
                             <a href="/recent_discuss">
                                 <i class="fa fa-comment" aria-hidden="true"></i>
                                 <span id="mobile">최근 토론</span>
+                                <i class="fa fa-angle-left"></i>
                             </a>
                         </li>
                         <li>
                             <a href="/random">
                                 <i class="fa fa-random" aria-hidden="true"></i>
                                 <span id="mobile">무작위</span>
+                                <i class="fa fa-angle-left"></i>
                             </a>
                         </li>
                         <li class="dropdown">
