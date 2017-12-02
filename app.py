@@ -15,16 +15,23 @@ except:
     new_json = []
 
     print('DB 이름 : ', end = '')
-    new_json += [input()]
+    new_json.append(input())
 
-    print('포트 : ', end = '')
-    new_json += [input()]
+    print('포트(공백으로 넘기면 기본값 80으로 설정됩니다.) : ', end = '')
+    port = input()
+    if port:
+        pass
+    else:
+        port = str(80)
+
+    new_json.append(port)
 
     with open("set.json", "w") as f:
         f.write('{ "db" : "' + new_json[0] + '", "port" : "' + new_json[1] + '" }')
     
     json_data = open('set.json').read()
     set_data = json.loads(json_data)
+
 
 conn = sqlite3.connect(set_data['db'] + '.db')
 curs = conn.cursor()
