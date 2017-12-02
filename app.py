@@ -14,10 +14,16 @@ try:
 except:
     new_json = []
 
-    print('DB 이름 : ', end = '')
-    new_json.append(input())
+    print('DB 이름(입력하지 않고 Enter키를 누르면 openNamu.db로 설정됩니다.) : ', end = '')
+    db_name = input()
+    if db_name:
+        pass
+    else:
+        db_name = "openNamu.db"
 
-    print('포트(공백으로 넘기면 기본값 80으로 설정됩니다.) : ', end = '')
+    new_json.append(db_name)
+
+    print('포트(입력하지 않고 Enter키를 누르면 80으로 설정됩니다.) : ', end = '')
     port = input()
     if port:
         pass
