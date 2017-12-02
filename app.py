@@ -12,6 +12,7 @@ try:
     json_data = open('set.json').read()
     set_data = json.loads(json_data)
 except:
+    print('오픈나무의 서버 설정 정보를 찾을수 없습니다. 오픈나무를 설정합니다.')
     new_json = []
 
     print('DB 이름(입력하지 않고 Enter키를 누르면 openNamu.db로 설정됩니다.) : ', end = '')
