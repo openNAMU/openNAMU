@@ -43,30 +43,6 @@
     background-color: #344860;
 }
 
-.text-danger {
-    color: #FF6C60;
-}
-
-.text-muted {
-    color: #a1a1a1;
-}
-
-.text-primary {
-    color: #59ace2;
-}
-
-.text-warning {
-    color: #FCB322;
-}
-
-.text-success {
-    color: #A9D86E;
-}
-
-.text-info {
-    color: #8175c7;
-}
-
 .modal-content {
     box-shadow: none;
     border: none;
@@ -87,7 +63,6 @@
 .form-control {
     border: 1px solid #e2e2e4;
     box-shadow: none;
-    color: #c2c2c2;
 }
 
 

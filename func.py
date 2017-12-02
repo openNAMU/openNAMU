@@ -382,7 +382,12 @@ def re_error(data):
                     
                     day = re.sub('\-', '', d[0][0])    
                     
-                    if(now >= int(day + '000000')):
+                    if(re.search(':', day)):
+                        day = re.sub('( |:)', '', day)
+                    else:
+                        day += '000000'
+                    
+                    if(now >= int(day)):
                         curs.execute("delete from ban where block = ?", [ip])
                         conn.commit()
                         
