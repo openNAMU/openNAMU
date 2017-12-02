@@ -12,33 +12,19 @@ try:
     json_data = open('set.json').read()
     set_data = json.loads(json_data)
 except:
-    print('오픈나무의 서버 설정 정보를 찾을수 없습니다. 오픈나무를 설정합니다.')
     new_json = []
 
-    print('DB 이름(입력하지 않고 Enter키를 누르면 openNamu.db로 설정됩니다.) : ', end = '')
-    db_name = input()
-    if db_name:
-        pass
-    else:
-        db_name = "openNamu.db"
+    print('DB 이름 : ', end = '')
+    new_json += [input()]
 
-    new_json.append(db_name)
-
-    print('포트(입력하지 않고 Enter키를 누르면 80으로 설정됩니다.) : ', end = '')
-    port = input()
-    if port:
-        pass
-    else:
-        port = str(80)
-
-    new_json.append(port)
+    print('포트 : ', end = '')
+    new_json += [input()]
 
     with open("set.json", "w") as f:
         f.write('{ "db" : "' + new_json[0] + '", "port" : "' + new_json[1] + '" }')
     
     json_data = open('set.json').read()
     set_data = json.loads(json_data)
-
 
 conn = sqlite3.connect(set_data['db'] + '.db')
 curs = conn.cursor()
