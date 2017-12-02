@@ -533,7 +533,7 @@ def edit_set(num = 0):
             else:
                 data = ''
 
-            start = '<span>&lt;style&gt;CSS 코드&lt;/style&gt;<br>&lt;script&gt;JS 코드&lt;/script&gt;</span><br><br>'
+            start = '<span>&lt;style&gt;CSS&lt;/style&gt;<br>&lt;script&gt;JS&lt;/script&gt;</span><br><br>'
 
             return(
                 html_minify(
@@ -1548,7 +1548,7 @@ def revert(name = None, num = None):
 
         l = custom()
         if(l[2] == 0):
-            plus = '<span>비 로그인 상태입니다. 비 로그인으로 작업 시 아이피가 역사에 기록됩니다.</span><br><br>'
+            plus = '<span>비 로그인 상태입니다. 비 로그인으로 진행 시 아이피가 역사에 기록됩니다.</span><br><br>'
         else:
             plus = ''
 
@@ -1821,7 +1821,7 @@ def delete(name = None):
 
         l = custom()
         if(l[2] == 0):
-            plus = '<span>비 로그인 상태입니다. 비 로그인으로 작업 시 아이피가 역사에 기록됩니다.</span><br><br>'
+            plus = '<span>비 로그인 상태입니다. 비 로그인으로 진행 시 아이피가 역사에 기록됩니다.</span><br><br>'
         else:
             plus = ''
 
@@ -1911,7 +1911,7 @@ def move(name = None):
     else:
         c = custom()
         if(c[2] == 0):
-            plus = '<span>비 로그인 상태입니다. 비 로그인으로 작업 시 아이피가 역사에 기록됩니다.</span><br><br>'
+            plus = '<span>비 로그인 상태입니다. 비 로그인으로 진행 시 아이피가 역사에 기록됩니다.</span><br><br>'
         else:
             plus = ''
             
@@ -2613,7 +2613,7 @@ def topic(name = None, sub = None):
                     </form>'
 
             if(l[2] == 0 and s == ''):
-                data += '<span>비 로그인 상태입니다. 비 로그인으로 작업 시 아이피가 토론에 기록됩니다.</span>'
+                data += '<span>비 로그인 상태입니다. 비 로그인으로 진행 시 아이피가 토론에 기록됩니다.</span>'
         else:
             data = ''
 
@@ -3691,13 +3691,13 @@ def custom_head_view():
             else:
                 data = ''
         else:
-            start = '<span>비 로그인의 경우에는 로그인하면 날아갑니다.</span><br><br>'
+            start = '<span>비 로그인의 경우에는 로그인하거나 브라우저 닫으면 날아갑니다.</span><br><br>'
             try:
                 data = session['MyMaiToNight']
             except:
                 data = ''
 
-        start += '<span>&lt;style&gt;CSS 코드&lt;/style&gt;<br>&lt;script&gt;JS 코드&lt;/script&gt;</span><br><br>'
+        start += '<span>&lt;style&gt;CSS&lt;/style&gt;<br>&lt;script&gt;JS&lt;/script&gt;</span><br><br>'
 
         return(
             html_minify(
