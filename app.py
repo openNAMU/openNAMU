@@ -12,19 +12,26 @@ try:
     json_data = open('set.json').read()
     set_data = json.loads(json_data)
 except:
-    new_json = []
+    while(1):
+        new_json = []
 
-    print('DB 이름 : ', end = '')
-    new_json += [input()]
+        print('DB 이름 : ', end = '')
+        new_json += [input()]
 
-    print('포트 : ', end = '')
-    new_json += [input()]
+        print('포트 : ', end = '')
+        new_json += [input()]
 
-    with open("set.json", "w") as f:
-        f.write('{ "db" : "' + new_json[0] + '", "port" : "' + new_json[1] + '" }')
-    
-    json_data = open('set.json').read()
-    set_data = json.loads(json_data)
+        if(new_json[0] != '' and new_json[1] != ''):
+            with open("set.json", "w") as f:
+                f.write('{ "db" : "' + new_json[0] + '", "port" : "' + new_json[1] + '" }')
+            
+            json_data = open('set.json').read()
+            set_data = json.loads(json_data)
+
+            break
+        else:
+            print('모든 값을 입력하세요.')
+            pass
 
 conn = sqlite3.connect(set_data['db'] + '.db')
 curs = conn.cursor()
