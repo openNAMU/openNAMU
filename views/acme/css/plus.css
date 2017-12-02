@@ -454,3 +454,7 @@ body {
 .theme-showcase > p > .btn {
     margin: 5px 0;
 }
+
+body {
+    word-break: break-all;
+}
