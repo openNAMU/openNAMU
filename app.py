@@ -51,7 +51,7 @@ from func import *
 
 BaseRequest.MEMFILE_MAX = 1000 ** 4
 
-r_ver = '2.4.0'
+r_ver = '2.4.1'
 
 # 스킨 불러오기 부분
 try:
@@ -155,6 +155,12 @@ try:
             print('CSS, JS 데이터 변환')
     except:
         pass
+
+    try:
+        curs.execute('select name from ua_d limit 1')
+    except:
+        curs.execute("create table ok_login(ip text, sub text)")
+        print('ok_login 테이블 생성')
 
     conn.commit()
 except:
@@ -285,6 +291,11 @@ def setup():
 
         try:
             curs.execute("create table ua_d(name text, ip text, ua text, today text, sub text)")
+        except:
+            pass
+
+        try:
+            curs.execute("create table ok_login(ip text, sub text)")
         except:
             pass
 
@@ -2703,20 +2714,29 @@ def close_topic_list(name = None, tool = None):
 def login():
     session = request.environ.get('beaker.session')
     agent = request.environ.get('HTTP_USER_AGENT')
+
+    if(session.get('Now') == 1):
+        return(re_error('/error/11'))
+
     ip = ip_check()
-    ban = ban_check()
+    
+    curs.execute("select ip from ok_login where ip = ?", [ip])
+    if(not curs.fetchall()):
+        ban = ban_check()
+    else:
+        ban = 0
+
+    if(ban == 1):
+        return(re_error('/ban'))
+
+    if(session.get('Now') == 1):
+        return(re_error('/error/11'))
         
     if(request.method == 'POST'):        
-        if(ban == 1):
-            return(re_error('/ban'))
-
         curs.execute("select pw from user where id = ?", [request.forms.id])
         user = curs.fetchall()
         if(not user):
             return(re_error('/error/5'))
-
-        if(session.get('Now') == 1):
-            return(re_error('/error/11'))
 
         if(not bcrypt.checkpw(bytes(request.forms.pw, 'utf-8'), bytes(user[0][0], 'utf-8'))):
             return(re_error('/error/10'))
@@ -2736,12 +2756,6 @@ def login():
         
         return(redirect('/user'))                            
     else:        
-        if(ban == 1):
-            return(re_error('/ban'))
-
-        if(session.get('Now') == 1):
-            return(re_error('/error/11'))
-
         return(
             html_minify(
                 template('index',    
@@ -2986,7 +3000,7 @@ def user_ban(name = None):
         if(request.forms.year == '09'):
             end = ''
         else:
-            end = request.forms.year + '-' + request.forms.month + '-' + request.forms.day
+            end = request.forms.year + '-' + request.forms.month + '-' + request.forms.day + ' ' + request.forms.hour + ':' + request.forms.minu + ':00'
 
         curs.execute("select block from ban where block = ?", [name])
         if(curs.fetchall()):
@@ -3003,6 +3017,11 @@ def user_ban(name = None):
             rb_plus(name, end, get_time(), ip, request.forms.why)
 
             curs.execute("insert into ban (block, end, why, band) values (?, ?, ?, ?)", [name, end, request.forms.why, band_d])
+
+        print(request.forms.login_ok)
+        if(request.forms.login_ok != ''):
+            curs.execute("insert into ok_login (ip, sub) values (?, '')", [name])
+
         conn.commit()
 
         return(redirect('/ban/' + url_pas(name)))            
@@ -3010,10 +3029,14 @@ def user_ban(name = None):
         if(admin_check(1, None) != 1):
             return(re_error('/error/3'))
 
-        curs.execute("select block from ban where block = ?", [name])
-        if(curs.fetchall()):
+        curs.execute("select end from ban where block = ?", [name])
+        end = curs.fetchall()
+        if(end):
             now = '차단 해제'
-            data = ''
+            if(end[0][0] == ''):
+                data = '영구 차단<br><br>'
+            else:
+                data = end[0][0] + ' 까지 차단<br><br>'
         else:
             b = re.search("^([0-9]{1,3}\.[0-9]{1,3})$", name)
             if(b):
@@ -3021,36 +3044,74 @@ def user_ban(name = None):
             else:
                 now = '차단'
 
-            year_n = int("%04d" % (time.localtime().tm_year))
+            now_time = get_time()
+            m = re.search('^([0-9]{4})-([0-9]{2})-([0-9]{2}) ([0-9]{2}):([0-9]{2}):[0-9]{2}', now_time)
+            g = m.groups()
+
             year = '<option value="09">영구</option>'
-            for i in range(year_n, year_n + 51):
-                if(i == year_n):
+            for i in range(int(g[0]), int(g[0]) + 11):
+                if(i == int(g[0])):
                     year += '<option value="' + str(i) + '" selected>' + str(i) + '</option>'
                 else:
                     year += '<option value="' + str(i) + '">' + str(i) + '</option>'
 
-            month = '<option value="1" selected>1</option>'
-            for i in range(2, 13):
-                month += '<option value="' + str(i) + '">' + str(i) + '</option>'
+            month = ''
+            for i in range(1, 13):
+                if(i == int(g[1])):
+                    month += '<option value="' + str(i) + '" selected>' + str(i) + '</option>'
+                else:
+                    month += '<option value="' + str(i) + '">' + str(i) + '</option>'
+                
+            day = ''
+            for i in range(1, 32):
+                if(i == int(g[2])):
+                    day += '<option value="' + str(i) + '" selected>' + str(i) + '</option>'
+                else:
+                    day += '<option value="' + str(i) + '">' + str(i) + '</option>'
 
-            day = '<option value="1" selected>1</option>'
-            for i in range(2, 32):
-                day += '<option value="' + str(i) + '">' + str(i) + '</option>'
+            hour = ''
+            for i in range(0, 24):
+                if(i == int(g[3])):
+                    hour += '<option value="' + str(i) + '" selected>' + str(i) + '</option>'
+                else:
+                    hour += '<option value="' + str(i) + '">' + str(i) + '</option>'
+
+            minu = ''
+            for i in range(0, 61):
+                if(i == int(g[4])):
+                    minu += '<option value="' + str(i) + '" selected>' + str(i) + '</option>'
+                else:
+                    minu += '<option value="' + str(i) + '">' + str(i) + '</option>'
+
+            is_it = ''
+            if(re.search('(\.|:)', name)):
+                plus = '<input type="checkbox" name="login_ok"> 로그인 가능 \
+                        <br> \
+                        <br>'
+            else:
+                plus = ''
             
             data = '<select name="year"> \
                         ' + year + ' \
-                    </select> \
+                    </select> 년 \
                     <select name="month"> \
                         ' + month + ' \
-                    </select> \
+                    </select> 월 \
                     <select name="day"> \
                         ' + day + ' \
-                    </select> \
+                    </select> 일 \
+                    <br> \
+                    <br> \
+                    <select name="hour"> \
+                        ' + hour + ' \
+                    </select> 시 \
+                    <select name="minu"> \
+                        ' + minu + ' \
+                    </select> 분 까지 \
                     <br> \
                     <br> \
                     <input placeholder="사유" class="form-control" name="why" style="width: 100%;"> \
-                    <br> \
-                    <br>'
+                    <br>' + plus
 
         return(
             html_minify(
@@ -3612,6 +3673,10 @@ def user_info():
             acl = '일반'
     else:
         acl = '차단'
+        
+        curs.execute("select ip from ok_login where ip = ?", [ip])
+        if(curs.fetchall()):
+            acl += ' (로그인 가능)'
         
     ip = ip_pas(ip)
 

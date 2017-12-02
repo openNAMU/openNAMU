@@ -288,7 +288,7 @@ div.scroll-buttons a.random-link {
 }
 
 div.scroll-buttons a {
-    display: inline-block;
+    display: block;
     float: left;
     width: 42px;
     height: 42px;
