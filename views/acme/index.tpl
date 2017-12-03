@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
     <head>
         <meta charset="utf-8">
@@ -14,7 +15,7 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css">
         <link rel="stylesheet" href="/views/acme/css/font-awesome/css/font-awesome.min.css">
         <script type="text/x-mathjax-config">MathJax.Hub.Config({tex2jax: {inlineMath: [['[math]', '[/math]']]}});</script>
-        <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS_CHTML"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS_CHTML"></script>
         <script>
             function folding(num) {
                 var fol = document.getElementById('folding_' + num);
@@ -151,14 +152,13 @@
         </div>
         <section id="body">
             <div class="container">
-                    <div class="row">
-                        <div class="col-md-10 col-md-offset-1 mar-b-30">
-                            <div id="back_title">
-                                추적 : 
-                                {{!imp[3][2]}}
-                            </div>
-                            {{!data}}
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 mar-b-30">
+                        <div id="back_title">
+                            추적 : 
+                            {{!imp[3][2]}}
                         </div>
+                        {{!data}}
                     </div>
                 </div>
             </div>
