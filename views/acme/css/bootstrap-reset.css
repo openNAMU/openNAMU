@@ -830,3 +830,7 @@ body {
 body {
     word-break: break-all;
 }
+
+input[type="checkbox"] {
+    width: auto;
+}
