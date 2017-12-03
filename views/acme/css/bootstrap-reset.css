@@ -509,12 +509,6 @@ a.navbar-brand {
     margin-right: 20px;
 }
 
-#open:hover {
-    color: black;
-    background: white;
-    border: 1px solid #ccc;
-}
-
 .font-size-2 {
     font-size: 140%;
 }
@@ -770,8 +764,7 @@ a.out_link::before {
 }
 
 #open {
-    background: #4188F1;
-    color: white;
+    color: yellow;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -839,4 +832,8 @@ input[type="checkbox"] {
     margin-right: 10px;
     margin-top: 5px;
     padding-bottom: 40px;
+}
+
+a.not_thing:hover {
+    color: #903535;
 }
