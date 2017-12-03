@@ -3593,11 +3593,14 @@ def upload():
             return(re_error('/error/9'))
 
         if(int(wiki_set(3)) * 1024 * 1024 < request.content_length):
-            return re_error('/error/17')
+            return(re_error('/error/17'))
         
         value = os.path.splitext(data.filename)[1]
+        if(not value):
+            return(re_error('/error/16'))
+
         if(not value in ['.jpeg', '.jpg', '.gif', '.png', '.webp', '.JPEG', '.JPG', '.GIF', '.PNG', '.WEBP']):
-            return re_error('/error/14')
+            return(re_error('/error/14'))
     
         if(request.forms.get('f_name')):
             name = request.forms.get('f_name') + value
