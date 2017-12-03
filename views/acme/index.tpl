@@ -7,7 +7,6 @@
         <link rel="stylesheet" href="/views/acme/css/bootstrap-reset.css">
         <link rel="stylesheet" href="/views/acme/css/style.css">
         <link rel="stylesheet" href="/views/acme/css/style-responsive.css">
-        <link rel="stylesheet" href="/views/acme/css/plus.css">
         <script src="/views/acme/js/jquery.min.js"></script>
         <script src="/views/acme/js/bootstrap.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
