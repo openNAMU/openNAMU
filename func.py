@@ -70,14 +70,14 @@ def wiki_set(num):
 
         curs.execute('select data from other where name = ?', ['name'])
         d = curs.fetchall()
-        if(d):
+        if(d and d[0][0] != ''):
             r += [d[0][0]]
         else:
             r += ['무명위키']
 
         curs.execute('select data from other where name = "license"')
         d = curs.fetchall()
-        if(d):
+        if(d and d[0][0] != ''):
             r += [d[0][0]]
         else:
             r += ['CC 0']
@@ -86,14 +86,14 @@ def wiki_set(num):
 
         curs.execute('select data from other where name = "logo"')
         d = curs.fetchall()
-        if(d):
+        if(d and d[0][0] != ''):
             r += [d[0][0]]
         else:
             r += [r[0]]
             
         curs.execute("select data from other where name = 'head'")
         d = curs.fetchall()
-        if(d):
+        if(d and d[0][0] != ''):
             r += [d[0][0]]
         else:
             r += ['']
@@ -108,7 +108,7 @@ def wiki_set(num):
         curs.execute('select data from other where name = "upload"')
     
     r = curs.fetchall()
-    if(r):
+    if(r and r[0][0] != ''):
         return(r[0][0])
     else:
         return(d)
