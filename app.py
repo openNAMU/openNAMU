@@ -426,37 +426,37 @@ def edit_set(num = 0):
                                     <span>위키 이름</span> \
                                     <br> \
                                     <br> \
-                                    <input placeholder="위키 이름" style="width: 100%;" type="text" name="name" value="' + html.escape(d_list[0]) + '"> \
+                                    <input placeholder="위키 이름" type="text" name="name" value="' + html.escape(d_list[0]) + '"> \
                                     <br> \
                                     <br> \
                                     <span>로고 HTML (있으면 이름 대신 로고 사용)</span> \
                                     <br> \
                                     <br> \
-                                    <input placeholder="로고" style="width: 100%;" type="text" name="logo" value="' + html.escape(d_list[1]) + '"> \
+                                    <input placeholder="로고" type="text" name="logo" value="' + html.escape(d_list[1]) + '"> \
                                     <br> \
                                     <br> \
                                     <span>시작 페이지</span> \
                                     <br> \
                                     <br> \
-                                    <input placeholder="시작 페이지" style="width: 100%;" type="text" name="frontpage" value="' + html.escape(d_list[2]) + '"> \
+                                    <input placeholder="시작 페이지" type="text" name="frontpage" value="' + html.escape(d_list[2]) + '"> \
                                     <br> \
                                     <br> \
                                     <span>라이선스</span> \
                                     <br> \
                                     <br> \
-                                    <input placeholder="라이선스" style="width: 100%;" type="text" name="license" value="' + html.escape(d_list[3]) + '"> \
+                                    <input placeholder="라이선스" type="text" name="license" value="' + html.escape(d_list[3]) + '"> \
                                     <br> \
                                     <br> \
                                     <span>파일 용량 한도 [메가]</span> \
                                     <br> \
                                     <br> \
-                                    <input placeholder="파일 용량 한도" style="width: 100%;" type="text" name="upload" value="' + html.escape(d_list[4]) + '"> \
+                                    <input placeholder="파일 용량 한도" type="text" name="upload" value="' + html.escape(d_list[4]) + '"> \
                                     <br> \
                                     <br> \
                                     <span>스킨 (재시작 필요)</span> \
                                     <br> \
                                     <br> \
-                                    <input placeholder="스킨" style="width: 100%;" type="text" name="skin" value="' + html.escape(d_list[5]) + '"> \
+                                    <input placeholder="스킨" type="text" name="skin" value="' + html.escape(d_list[5]) + '"> \
                                     <br> \
                                     <br> \
                                     <span>기본 ACL 설정</span> \
@@ -476,7 +476,7 @@ def edit_set(num = 0):
                                     <span>백업 간격 [시간] (끄기 : 0) (재시작 필요)</span> \
                                     <br> \
                                     <br> \
-                                    <input placeholder="백업 간격" style="width: 100%;" type="text" name="back_up" value="' + html.escape(d_list[9]) + '"> \
+                                    <input placeholder="백업 간격" type="text" name="back_up" value="' + html.escape(d_list[9]) + '"> \
                                     <br> \
                                     <br> \
                                     <button class="btn btn-primary" type="submit">저장</button> \
@@ -517,7 +517,7 @@ def edit_set(num = 0):
                                     <span>가입 약관</span> \
                                     <br> \
                                     <br> \
-                                    <input placeholder="가입 약관" style="width: 100%;" type="text" name="contract" value="' + html.escape(d_list[0]) + '"> \
+                                    <input placeholder="가입 약관" type="text" name="contract" value="' + html.escape(d_list[0]) + '"> \
                                     <br> \
                                     <br> \
                                     <button class="btn btn-primary" type="submit">저장</button> \
@@ -551,7 +551,7 @@ def edit_set(num = 0):
                     template('index', 
                         imp = ['전역 HEAD', wiki_set(1), custom(), other2([0, 0])],
                         data =  start + '<form method="post"> \
-                                            <textarea rows="30" cols="100" name="content">'\
+                                            <textarea rows="25" name="content">'\
                                                 + html.escape(data) + \
                                             '</textarea> \
                                             <br> \
@@ -1495,7 +1495,7 @@ def raw_view(name = None, sub_t = None, num = None):
     if(data):
         p_data = html.escape(data[0][0])
         
-        p_data = '<textarea readonly style="height: 80%;">' + p_data + '</textarea>'
+        p_data = '<textarea readonly rows="25">' + p_data + '</textarea>'
         
         return(
             html_minify(
@@ -1569,7 +1569,7 @@ def revert(name = None, num = None):
                     imp = [name, wiki_set(1), l, other2([' (되돌리기)', 0])],
                     data =  plus + ' \
                             <form method="post"> \
-                                <input placeholder="사유" style="width: 100%;" class="form-control input-sm" name="send" type="text"> \
+                                <input placeholder="사유" class="form-control input-sm" name="send" type="text"> \
                                 <br> \
                                 <br> \
                                 <button class="btn btn-primary" type="submit">되돌리기</button> \
@@ -1621,10 +1621,10 @@ def m_del():
                             <br> \
                             <br> \
                             <form method="post"> \
-                                <textarea style="height: 80%;" name="content"></textarea> \
+                                <textarea rows="25" name="content"></textarea> \
                                 <br> \
                                 <br> \
-                                <input placeholder="사유" style="width: 100%;" class="form-control input-sm" name="send" type="text"> \
+                                <input placeholder="사유" class="form-control input-sm" name="send" type="text"> \
                                 <br> \
                                 <br> \
                                 <div class="form-actions"> \
@@ -1721,7 +1721,8 @@ def edit(name = None, name2 = None, num = None):
             p = '<form method="post" id="get_edit" action="/edit_get/' + url_pas(name) + '"> \
                     <input placeholder="불러 올 문서" name="name" style="width: 50%;" type="text"> \
                     <button id="preview" class="btn" type="submit">불러오기</button> \
-                </form>'
+                </form> \
+                <br>'
         else:
             p = ''
             
@@ -1737,11 +1738,11 @@ def edit(name = None, name2 = None, num = None):
                 template('index', 
                     imp = [name, wiki_set(1), custom(), other2([' (수정)', 0])],
                     data = p + '<form method="post" action="/edit/' + url_pas(name) + action + '"> \
-                                    <textarea style="height: 80%;" name="content">' + html.escape(data) + '</textarea> \
-                                    <textarea style="display: none; height: 80%;" name="otent">' + html.escape(data2) + '</textarea> \
+                                    <textarea rows="25" name="content">' + html.escape(data) + '</textarea> \
+                                    <textarea style="display: none;" name="otent">' + html.escape(data2) + '</textarea> \
                                     <br> \
                                     <br> \
-                                    <input placeholder="사유" name="send" style="width: 100%;" type="text"> \
+                                    <input placeholder="사유" name="send" type="text"> \
                                     <br> \
                                     <br> \
                                     <div class="form-actions"> \
@@ -1781,11 +1782,11 @@ def preview(name = None, num = None):
             template('index', 
                 imp = [name, wiki_set(1), custom(), other2([' (미리보기)', 0])],
                 data = '<form method="post" action="/edit/' + url_pas(name) + action + '"> \
-                            <textarea style="height: 80%;" name="content">' + html.escape(request.forms.content) + '</textarea> \
-                            <textarea style="display: none; height: 80%;" name="otent">' + html.escape(request.forms.otent) + '</textarea> \
+                            <textarea rows="25" name="content">' + html.escape(request.forms.content) + '</textarea> \
+                            <textarea style="display: none;" name="otent">' + html.escape(request.forms.otent) + '</textarea> \
                             <br> \
                             <br> \
-                            <input placeholder="사유" name="send" style="width: 100%;" type="text"> \
+                            <input placeholder="사유" name="send" type="text"> \
                             <br> \
                             <br> \
                             <div class="form-actions"> \
@@ -1842,7 +1843,7 @@ def delete(name = None):
                     imp = [name, wiki_set(1), l, other2([' (삭제)', 0])],
                     data = '<form method="post"> \
                                 ' + plus + ' \
-                                <input placeholder="사유" style="width: 100%;" class="form-control input-sm" name="send" type="text"> \
+                                <input placeholder="사유" class="form-control input-sm" name="send" type="text"> \
                                 <br> \
                                 <br> \
                                 <button class="btn btn-primary" type="submit">삭제</button> \
@@ -1935,7 +1936,7 @@ def move(name = None):
                                 <input placeholder="문서명" class="form-control input-sm" value="' + name + '" name="title" type="text"> \
                                 <br> \
                                 <br> \
-                                <input placeholder="사유" style="width: 100%;" class="form-control input-sm" name="send" type="text"> \
+                                <input placeholder="사유" class="form-control input-sm" name="send" type="text"> \
                                 <br> \
                                 <br> \
                                 <button class="btn btn-primary" type="submit">이동</button> \
@@ -2216,7 +2217,7 @@ def json_in():
                 template('index', 
                     imp = ['문서 JSON 입력', wiki_set(1), custom(), other2([0, 0])],
                     data = '<form method="post"> \
-                                <textarea style="height: 80%;" name="data"></textarea> \
+                                <textarea rows="25" name="data"></textarea> \
                                 <br> \
                                 <br> \
                                 <button class="btn btn-primary" type="submit">입력</button> \
@@ -2537,7 +2538,7 @@ def topic(name = None, sub = None):
                         <tbody> \
                             <tr> \
                                 <td id="toron_color_red"> \
-                                    <a href="#' + d[1] + '">#' + d[1] + '</a> ' + ip_pas(d[3]) + a + ' <span style="float:right;">' + d[2] + '</span> \
+                                    <a href="#' + d[1] + '">#' + d[1] + '</a> ' + ip_pas(d[3]) + a + ' <span style="float: right;">' + d[2] + '</span> \
                                 </td> \
                             </tr> \
                             <tr> \
@@ -2598,7 +2599,7 @@ def topic(name = None, sub = None):
                         <tbody> \
                             <tr> \
                                 <td id="toron_color' + c + '"> \
-                                    <a href="javascript:void(0);" id="' + str(i) + '">#' + str(i) + '</a> ' + ip + ' <span style="float:right;">' + d[2] + '</span> \
+                                    <a href="javascript:void(0);" id="' + str(i) + '">#' + str(i) + '</a> ' + ip + ' <span style="float: right;">' + d[2] + '</span> \
                                 </td> \
                             </tr> \
                             <tr ' + bd + '> \
@@ -2617,7 +2618,7 @@ def topic(name = None, sub = None):
                     </a> \
                     <form style="' + s + '" method="post"> \
                         <br> \
-                        <textarea style="width: 100%; height: 100px;" name="content"></textarea> \
+                        <textarea style="height: 100px;" name="content"></textarea> \
                         <br> \
                         <br> \
                         <button class="btn btn-primary" type="submit">전송</button> \
@@ -2678,7 +2679,7 @@ def close_topic_list(name = None, tool = None):
                     <a href="/topic/' + url_pas(name) + '/close">(닫힘)</a> <a href="/topic/' + url_pas(name) + '/agree">(합의)</a> \
                     <br> \
                     <br> \
-                    <input placeholder="토론명" class="form-control" name="topic" style="width: 100%;"> \
+                    <input placeholder="토론명" class="form-control" name="topic"> \
                     <br> \
                     <br> \
                     <button class="btn btn-primary" type="submit">만들기</button>'
@@ -3110,7 +3111,7 @@ def user_ban(name = None):
                     </select> 분 까지 \
                     <br> \
                     <br> \
-                    <input placeholder="사유" class="form-control" name="why" style="width: 100%;"> \
+                    <input placeholder="사유" class="form-control" name="why"> \
                     <br>' + plus
 
         return(
@@ -3773,7 +3774,7 @@ def custom_head_view():
                     imp = ['사용자 HEAD', wiki_set(1), custom(), other2([0, 0])],
                     data =  start + ' \
                             <form method="post"> \
-                                <textarea rows="30" cols="100" name="content">'\
+                                <textarea rows="25" cols="100" name="content">'\
                                      + data + \
                                 '</textarea> \
                                 <br> \
