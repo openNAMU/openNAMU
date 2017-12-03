@@ -2,7 +2,7 @@
 from bottle.ext import beaker
 import json
 import sqlite3
-from hashlib import md5
+import hashlib
 from urllib import parse
 import re
 import html
@@ -28,6 +28,9 @@ def get_time():
     date = "%04d-%02d-%02d %02d:%02d:%02d" % (now.tm_year, now.tm_mon, now.tm_mday, now.tm_hour, now.tm_min, now.tm_sec)
 
     return(date)
+
+def sha224(data):
+    return(hashlib.sha224(bytes(data, 'utf-8')).hexdigest())
     
 def ip_check():
     session = request.environ.get('beaker.session')
@@ -171,7 +174,7 @@ def ip_pas(raw_ip):
         curs.execute("select data from other where name = 'ip_view'")
         d = curs.fetchall()
         if(d and d[0][0] != ''):
-            ip = '<span style="font-size: 75%;">' + md5(bytes(raw_ip, 'utf-8')).hexdigest() + '</span>'
+            ip = '<span style="font-size: 75%;">' + hashlib.md5(bytes(raw_ip, 'utf-8')).hexdigest() + '</span>'
             if(not admin_check('ban', None)):
                 hide = 1
         else:
@@ -445,6 +448,9 @@ def re_error(data):
         elif(num == 12):
             title = '편집 오류'
             data = '누군가 먼저 편집 했습니다.'
+        elif(num == 16):
+            title = '파일 올리기 오류'
+            data = '파일 이름을 다른 걸로 설정 해주세요.'
         elif(num == 14):
             title = '파일 올리기 오류'
             data = 'jpg, gif, jpeg, png, webp만 가능 합니다.'
