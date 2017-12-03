@@ -157,7 +157,7 @@ try:
         pass
 
     try:
-        curs.execute('select name from ua_d limit 1')
+        curs.execute('select name from ok_login limit 1')
     except:
         curs.execute("create table ok_login(ip text, sub text)")
         print('ok_login 테이블 생성')
