@@ -14,7 +14,7 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css">
         <link rel="stylesheet" href="/views/acme/css/font-awesome/css/font-awesome.min.css">
         <script type="text/x-mathjax-config">MathJax.Hub.Config({tex2jax: {inlineMath: [['[math]', '[/math]']]}});</script>
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS_CHTML"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS_CHTML"></script>
         <script>
             function folding(num) {
                 var fol = document.getElementById('folding_' + num);
@@ -61,31 +61,31 @@
                         <li>
                             <a href="/recent_changes">
                                 <i class="fa fa-refresh" aria-hidden="true"></i>
-                                <span id="mobile">최근 변경</span>
+                                최근 변경
                                 <i class="fa fa-angle-left"></i>
                             </a>
                         </li>
                         <li>
                             <a href="/recent_discuss">
                                 <i class="fa fa-comment" aria-hidden="true"></i>
-                                <span id="mobile">최근 토론</span>
+                                최근 토론
                                 <i class="fa fa-angle-left"></i>
                             </a>
                         </li>
                         <li>
                             <a href="/random">
                                 <i class="fa fa-random" aria-hidden="true"></i>
-                                <span id="mobile">무작위</span>
+                                무작위
                                 <i class="fa fa-angle-left"></i>
                             </a>
                         </li>
                         <li class="dropdown">
                             <a class="dropdown-toggle" data-close-others="false" data-delay="0" data-hover="dropdown" data-toggle="dropdown" href="javascript:void(0);">
                                 <i class="fa fa-plus-circle" aria-hidden="true"></i>
-                                <span id="mobile">나머지</span>
+                                나머지
                                 <i class="fa fa-angle-down"></i>
                             </a>
-                            <ul aria-labelledby="" role="menu" class="dropdown-menu">
+                            <ul role="menu" class="dropdown-menu">
                                 <li>
                                     <a href="/user">
                                         % if(imp[2][2] == 1):
@@ -110,46 +110,46 @@
                 </div>
             </div>
         </header>
-        <div class="breadcrumbs">
-            <div class="container">
-                <div class="row">
-                    <div class="col-lg-4 col-sm-4">
-                        <h1>
-                            {{imp[0]}}
-                            % if(imp[3][0] != 0):
-                                <sub>{{imp[3][0]}}</sub>
-                            % end
-                        </h1>
-                    </div>
-                    % if(menu != 0):
-                        <div class="col-lg-8 col-sm-8">
-                            <ol class="breadcrumb pull-right">   
-                                <li style="margin: 0;">
-                                    % i = 1
-                                    % for sub_d in menu:
-                                        % if(sub_d[1] == 1):
-                                            <a class="menu-item" href="/{{sub_d[0]}}" id="open">토론</a>
-                                        % elif(sub_d[1] == 0):
-                                            <a class="menu-item" href="/{{sub_d[0]}}">토론</a>
-                                        % else:
-                                            <a class="menu-item" href="/{{sub_d[0]}}">{{sub_d[1]}}</a>
-                                        % end
-                                        % try:
-                                            % d = menu[i]
-                                            ㆍ
-                                        % except:
-                                            % break
-                                        % end
-                                        % i += 1
-                                    % end
-                                </li>
-                            </ol>
+        <section id="body">
+            <div class="breadcrumbs">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-4 col-sm-4">
+                            <h1>
+                                {{imp[0]}}
+                                % if(imp[3][0] != 0):
+                                    <sub>{{imp[3][0]}}</sub>
+                                % end
+                            </h1>
                         </div>
-                    % end
+                        % if(menu != 0):
+                            <div class="col-lg-8 col-sm-8">
+                                <ol class="breadcrumb pull-right">   
+                                    <li style="margin: 0;">
+                                        % i = 1
+                                        % for sub_d in menu:
+                                            % if(sub_d[1] == 1):
+                                                <a class="menu-item" href="/{{sub_d[0]}}" id="open">토론</a>
+                                            % elif(sub_d[1] == 0):
+                                                <a class="menu-item" href="/{{sub_d[0]}}">토론</a>
+                                            % else:
+                                                <a class="menu-item" href="/{{sub_d[0]}}">{{sub_d[1]}}</a>
+                                            % end
+                                            % try:
+                                                % d = menu[i]
+                                                ㆍ
+                                            % except:
+                                                % break
+                                            % end
+                                            % i += 1
+                                        % end
+                                    </li>
+                                </ol>
+                            </div>
+                        % end
+                    </div>
                 </div>
             </div>
-        </div>
-        <section id="body">
             <div class="container">
                 <div class="row">
                     <div class="col-md-10 col-md-offset-1 mar-b-30">
@@ -178,8 +178,11 @@
                 <div class="row">
                     <div class="copyright">
                         {{!imp[1][1]}}
-                        <span class="pull-right" style="margin-right: 10px; margin-top:5px; padding-bottom: 40px;">
-                            <a href="https://github.com/2DU/openNAMU"><img src="/views/acme/img/on2.png" width="100px"></a> <a href="/views/acme/list.html">기여자</a>
+                        <span id="left_end" class="pull-right">
+                            <a href="https://github.com/2DU/openNAMU">
+                                <img src="/views/acme/img/on2.png" alt="opennamu" style="width: 100px;">
+                            </a>
+                            <a href="/views/acme/list.html">기여자</a>
                         </span>    
                     </div>
                 </div>

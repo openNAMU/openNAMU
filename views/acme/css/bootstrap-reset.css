@@ -834,3 +834,9 @@ body {
 input[type="checkbox"] {
     width: auto;
 }
+
+#left_end {
+    margin-right: 10px;
+    margin-top: 5px;
+    padding-bottom: 40px;
+}
