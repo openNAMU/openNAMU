@@ -51,7 +51,7 @@ from func import *
 
 BaseRequest.MEMFILE_MAX = 1000 ** 4
 
-r_ver = '2.4.1b'
+r_ver = '2.4.1c'
 
 # 스킨 불러오기 부분
 try:
@@ -345,7 +345,7 @@ def edit_set(num = 0):
         return(re_error('/ban'))
 
     if(num == 0):
-        li_list = ['기본 설정', '문구 관련', '전역 HEAD']
+        li_list = ['기본 설정', '문구 관련', '전역 HEAD', 'robots.txt']
         x = 0
         li_data = ''
         for li in li_list:
@@ -551,6 +551,45 @@ def edit_set(num = 0):
                     template('index', 
                         imp = ['전역 HEAD', wiki_set(1), custom(), other2([0, 0])],
                         data =  start + '<form method="post"> \
+                                            <textarea rows="25" name="content">'\
+                                                + html.escape(data) + \
+                                            '</textarea> \
+                                            <br> \
+                                            <br> \
+                                            <div class="form-actions"> \
+                                                <button class="btn btn-primary" type="submit">저장</button> \
+                                            </div> \
+                                        </form>',
+                        menu = [['edit_set', '설정 편집']]
+                    )
+                )
+            )
+    elif(num == 4):
+        if(request.method == 'POST'):
+            curs.execute("select name from other where name = 'robot'")
+            if(curs.fetchall()):
+                curs.execute("update other set data = ? where name = 'robot'", [request.forms.content])
+            else:
+                curs.execute("insert into other (name, data) values ('robot', ?)", [request.forms.content])
+            conn.commit()
+
+            return(redirect('/edit_set/4'))
+        else:
+            curs.execute("select data from other where name = 'robot'")
+            robot = curs.fetchall()
+            if(robot):
+                data = robot[0][0]
+            else:
+                data = ''
+
+            return(
+                html_minify(
+                    template('index', 
+                        imp = ['robots.txt', wiki_set(1), custom(), other2([0, 0])],
+                        data =  '<a href="/robots.txt">상태 보기</a> \
+                                <br> \
+                                <br> \
+                                <form method="post"> \
                                             <textarea rows="25" name="content">'\
                                                 + html.escape(data) + \
                                             '</textarea> \
@@ -3858,6 +3897,15 @@ def views(name = None):
         return(html_minify(static_file(rename, root = './views' + plus)))   
     else:
         return(static_file(rename, root = './views' + plus))
+
+@route('/robots.txt')
+def random():
+    curs.execute("select data from other where name = 'robot'")
+    d = curs.fetchall()
+    if(d):
+        return('<pre>' + d[0][0] + '</pre>')
+    else:
+        return('')
 
 @error(404)
 def error_404(error):
