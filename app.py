@@ -1701,10 +1701,10 @@ def edit(name = None, name2 = None, num = None):
             if(not num and request.forms.otent != old[0][0]):
                 return(re_error('/error/12'))
 
-            if(num):
-                content = old[0][0].replace(request.forms.otent, content)
-
             leng = leng_check(len(request.forms.otent), len(content))
+            if(num):
+                content = old[0][0].replace(request.forms.otent, content)      
+                
             curs.execute("update data set data = ? where title = ?", [content, name])
         else:
             leng = '+' + str(len(content))
