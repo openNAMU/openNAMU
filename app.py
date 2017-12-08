@@ -7,6 +7,8 @@ import os
 import difflib
 import shutil
 import threading
+import logging
+logging.basicConfig(level = logging.ERROR)
 
 try:
     json_data = open('set.json').read()
@@ -1903,13 +1905,13 @@ def move_data(name = None, n = 1):
     j = i * 50
     da = '<ul>'
     
-    curs.execute("select origin, new, date, who, send from move where origin = ? or new = ? limit ?, ?", [name, name, j - 50, j])
+    curs.execute("select origin, new, date, who, send from move where origin = ? or new = ? order by date desc limit ?, ?", [name, name, j - 50, j])
     for d in curs.fetchall():
         if(d[4] == ''):
             sn = '(없음)'
         else:
             sn = d[4]
-        da += '<li><a href="/move_data/' + url_pas(d[0]) + '">' + d[0] + '</a> >> <a href="/move_data/' + url_pas(d[1]) + '">' + d[1] + '</a> / ' + d[2] + ' / ' + d[3] + ' / ' + sn + '</li>'
+        da += '<li><a href="/move_data/' + url_pas(d[0]) + '">' + d[0] + '</a> - <a href="/move_data/' + url_pas(d[1]) + '">' + d[1] + '</a> / ' + d[2] + ' / ' + d[3] + ' / ' + sn + '</li>'
     da += '</ul><br><a href="/move_data/' + name + '/' + str(n - 1) + '">(이전)</a> <a href="/move_data/' + name + '/' + str(n + 1) + '">(이후)</a>'
     
     return(
