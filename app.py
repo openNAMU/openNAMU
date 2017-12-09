@@ -53,7 +53,7 @@ from func import *
 
 BaseRequest.MEMFILE_MAX = 1000 ** 4
 
-r_ver = '2.4.1c'
+r_ver = '2.4.2'
 
 # 스킨 불러오기 부분
 try:
@@ -1424,7 +1424,7 @@ def goto():
 @route('/search/<name:path>')
 @route('/search/<name:path>/n/<num:int>')
 def deep_search(name = None, num = 1):
-    if(num * 50 <= 0):
+    if(num * 50 > 0):
         v = num * 50
     else:
         v = 50
@@ -1433,13 +1433,10 @@ def deep_search(name = None, num = 1):
 
     div = '<ul>'
     div_plus = ''
-    end = ''
+    no = 0
 
-    curs.execute("select title from data where title like ?", ['%' + name + '%'])
-    title_list = curs.fetchall()
-
-    curs.execute("select title from data where data like ?", ['%' + name + '%'])
-    data_list = curs.fetchall()
+    curs.execute("select title from data where title like ? or data like ? order by case when title like ? then 1 else 2 end limit ?, ?", ['%' + name + '%', '%' + name + '%', '%' + name + '%', i, v])
+    all_list = curs.fetchall()
 
     curs.execute("select title from data where title = ?", [name])
     exist = curs.fetchall()
@@ -1447,24 +1444,9 @@ def deep_search(name = None, num = 1):
         div = '<ul><li>문서로 <a href="/w/' + url_pas(name) + '">바로가기</a></li><br><br>'
     else:
         div = '<ul><li>문서가 없습니다. <a class="not_thing" href="/w/' + url_pas(name) + '">바로가기</a></li><br><br>'
-
-    if(title_list):
-        no = 0
-
-        if(data_list):
-            all_list = title_list + data_list
-        else:
-            all_list = title_list
-    else:
-        if(data_list):
-            no = 1
-
-            all_list = data_list
-        else:
-            all_list = ''
     
-    start = 0
-    if(all_list != ''):
+    start = 2
+    if(all_list):
         for data in all_list:
             try:
                 var_re = re.search(name, data[0])
@@ -1473,25 +1455,23 @@ def deep_search(name = None, num = 1):
                 
             if(var_re):
                 if(no == 0):
-                    div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a> (제목)</li>'
+                    div_plus += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a> (제목)</li>'
+                    start = 0
                 else:
-                    if(start == 0):
+                    if(start == 0 and div_plus != ''):
                         start = 1
                         div_plus += '<hr>'
                     div_plus += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a> (내용)</li>'
             else:
                 no = 1
-                if(start == 0):
+                if(start == 0 and div_plus != ''):
                     start = 1
                     div_plus += '<hr>'
                 div_plus += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a> (내용)</li>'
-
-            
     else:
         div += '<li>검색 결과 없음</li>'
 
-    div += div_plus + end
-
+    div += div_plus
     div += '</ul><br><a href="/search/' + url_pas(name) + '/n/' + str(num - 1) + '">(이전)</a> <a href="/search/' + url_pas(name) + '/n/' + str(num + 1) + '">(이후)</a>'
     
     return(
