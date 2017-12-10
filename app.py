@@ -56,18 +56,7 @@ BaseRequest.MEMFILE_MAX = 1000 ** 4
 r_ver = '2.4.2'
 
 # 스킨 불러오기 부분
-try:
-    curs.execute('select data from other where name = "skin"')
-    skin_exist = curs.fetchall()
-    if(skin_exist):
-        if(os.path.exists(os.path.abspath('./views/' + skin_exist[0][0] + '/index.tpl')) == 1):
-            TEMPLATE_PATH.insert(0, './views/' + skin_exist[0][0] + '/')
-        else:
-            TEMPLATE_PATH.insert(0, './views/acme/')
-    else:
-        TEMPLATE_PATH.insert(0, './views/acme/')
-except:
-    TEMPLATE_PATH.insert(0, './views/acme/')
+TEMPLATE_PATH.insert(0, skin_check())
 
 # 테이블 생성 부분
 try:
@@ -377,6 +366,7 @@ def edit_set(num = 0):
             curs.execute("update other set data = ? where name = 'back_up'", [request.forms.back_up])
             conn.commit()
 
+            TEMPLATE_PATH.insert(0, skin_check())
             return(redirect('/edit_set/1'))
         else:
             i_list = ['name', 'logo', 'frontpage', 'license', 'upload', 'skin', 'edit', 'reg', 'ip_view', 'back_up']
@@ -455,7 +445,7 @@ def edit_set(num = 0):
                                     <input placeholder="파일 용량 한도" type="text" name="upload" value="' + html.escape(d_list[4]) + '"> \
                                     <br> \
                                     <br> \
-                                    <span>스킨 (재시작 필요)</span> \
+                                    <span>스킨</span> \
                                     <br> \
                                     <br> \
                                     <input placeholder="스킨" type="text" name="skin" value="' + html.escape(d_list[5]) + '"> \
