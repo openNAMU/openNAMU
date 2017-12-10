@@ -660,52 +660,13 @@ def acl_list():
             )
         )
     )
-    
-@route('/list_acl')
-def list_acl():
-    div = '<ul>'
-    i = 0
-
-    curs.execute("select name, acl from alist order by name desc")
-    list_data = curs.fetchall()
-    for data in list_data:
-        if(data[1] == 'ban'):
-            acl = '차단'
-        elif(data[1] == 'mdel'):
-            acl = '많은 문서 삭제'
-        elif(data[1] == 'toron'):
-            acl = '토론 관리'
-        elif(data[1] == 'check'):
-            acl = '사용자 검사'
-        elif(data[1] == 'acl'):
-            acl = '문서 ACL'
-        elif(data[1] == 'hidel'):
-            acl = '역사 숨김'
-        elif(data[1] == 'owner'):
-            acl = '소유자'
-            
-        div += '<li>' + str(i + 1) + '. <a href="/admin_plus/' + url_pas(data[0]) + '">' + data[0] + '</a> (' + acl + ')</li>'
-        
-        i += 1
-    
-    div += '</ul><br><a href="/manager/8">(생성)</a>'
-
-    return(
-        html_minify(
-            template('index',    
-                imp = ['ACL 목록', wiki_set(1), custom(), other2([0, 0])],
-                data = re.sub('^<ul></ul><br>', '', div),
-                menu = [['manager', '관리자']]
-            )
-        )
-    )
 
 @route('/admin_plus/<name:path>', method=['POST', 'GET'])
 def admin_plus(name = None):
-    if(admin_check(None, 'admin_plus (' + name + ')') != 1):
-        return(re_error('/error/3'))
-
     if(request.method == 'POST'):
+        if(admin_check(None, 'admin_plus (' + name + ')') != 1):
+            return(re_error('/error/3'))
+
         curs.execute("delete from alist where name = ?", [name])
         
         if(request.forms.ban):
@@ -755,13 +716,18 @@ def admin_plus(name = None):
             elif(go[0] == 'owner'):
                 exist_list[6] = 'checked="checked"'
 
-        data += '<li><input type="checkbox" name="ban" ' + exist_list[0] + '> 차단</li>'
-        data += '<li><input type="checkbox" name="mdel" ' + exist_list[1] + '> 많은 문서 삭제</li>'
-        data += '<li><input type="checkbox" name="toron" ' + exist_list[2] + '> 토론 관리</li>'
-        data += '<li><input type="checkbox" name="check" ' + exist_list[3] + '> 사용자 검사</li>'
-        data += '<li><input type="checkbox" name="acl" ' + exist_list[4] + '> 문서 ACL</li>'
-        data += '<li><input type="checkbox" name="hidel" ' + exist_list[5] + '> 역사 숨김</li>'
-        data += '<li><input type="checkbox" name="owner" ' + exist_list[6] + '> 소유자</li></ul>'
+        if(admin_check(None, None) != 1):
+            state = 'disabled'
+        else:
+            state = ''
+
+        data += '<li><input type="checkbox" ' + state +  ' name="ban" ' + exist_list[0] + '> 차단</li>'
+        data += '<li><input type="checkbox" ' + state +  ' name="mdel" ' + exist_list[1] + '> 많은 문서 삭제</li>'
+        data += '<li><input type="checkbox" ' + state +  ' name="toron" ' + exist_list[2] + '> 토론 관리</li>'
+        data += '<li><input type="checkbox" ' + state +  ' name="check" ' + exist_list[3] + '> 사용자 검사</li>'
+        data += '<li><input type="checkbox" ' + state +  ' name="acl" ' + exist_list[4] + '> 문서 ACL</li>'
+        data += '<li><input type="checkbox" ' + state +  ' name="hidel" ' + exist_list[5] + '> 역사 숨김</li>'
+        data += '<li><input type="checkbox" ' + state +  ' name="owner" ' + exist_list[6] + '> 소유자</li></ul>'
 
         return(
             html_minify(
@@ -770,7 +736,7 @@ def admin_plus(name = None):
                     data = '<form method="post">' \
                                 + data + \
                                 '<div class="form-actions"> \
-                                    <button class="btn btn-primary" type="submit">저장</button> \
+                                    <button ' + state +  ' class="btn btn-primary" type="submit">저장</button> \
                                 </div> \
                             </form>',
                     menu = [['manager', '관리자']]
@@ -787,9 +753,8 @@ def admin_list():
     user_data = curs.fetchall()
 
     for data in user_data:
-        name = ip_pas(data[0]) + ' (' + data[1] + ')'
-
-        div += '<li>' + str(i) + '. ' + name + '</li>'
+        name = ip_pas(data[0]) + ' (<a href="/admin_plus/' + url_pas(data[1]) + '">' + data[1] + '</a>)'
+        div += '<li>' + name + '</li>'
         
         i += 1
         
@@ -1027,33 +992,17 @@ def give_log(num = 1):
     list_data = '<ul>'
     back = ''
 
-    curs.execute("select name, acl from alist order by name asc limit ?, ?", [str(j), str(i)])
+    curs.execute("select distinct name from alist order by name asc limit ?, ?", [str(j), str(i)])
     get_list = curs.fetchall()
     for data in get_list:                      
         if(back != data[0]):
             back = data[0]
             j += 1
 
-        list_data += '<li>' + str(j) + '. ' + data[0] + ' ('
-        
-        if(data[1] == 'ban'):
-            d = '차단'
-        elif(data[1] == 'mdel'):
-            d = '많은 문서 삭제'
-        elif(data[1] == 'toron'):
-            d = '토론'
-        elif(data[1] == 'check'):
-            d = '사용자 검사'
-        elif(data[1] == 'acl'):
-            d = 'ACL'
-        elif(data[1] == 'hidel'):
-            d = '역사 가리기'
-        else:
-            d = '소유자'
-            
-        list_data += d + ')</li>'
-    else:
-        list_data += '</ul><br><a href="/give_log/n/' + str(num - 1) + '">(이전)</a> <a href="/give_log/n/' + str(num + 1) + '">(이후)</a>'
+        list_data += '<li>' + str(j) + '. <a href="/admin_plus/' + url_pas(data[0]) + '">' + data[0] + '</a></li>'
+    
+    list_data += '</ul><a href="/manager/8">(생성)</a>'
+    list_data += '<br><br><a href="/give_log/n/' + str(num - 1) + '">(이전)</a> <a href="/give_log/n/' + str(num + 1) + '">(이후)</a>'
 
     return(
         html_minify(
