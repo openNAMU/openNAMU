@@ -165,6 +165,8 @@ def admin_check(num, what):
                 check = 'acl'
             elif(num == 6 and reset == 0):
                 check = 'hidel'
+            elif(num == 7 and reset == 0):
+                check = 'give'
             else:
                 check = 'owner'
 

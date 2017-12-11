@@ -53,7 +53,7 @@ from func import *
 
 BaseRequest.MEMFILE_MAX = 1000 ** 4
 
-r_ver = '2.4.2'
+r_ver = '2.4.3'
 
 # 스킨 불러오기 부분
 TEMPLATE_PATH.insert(0, skin_check())
@@ -682,6 +682,9 @@ def admin_plus(name = None):
         if(request.forms.hidel):
             curs.execute("insert into alist (name, acl) values (?, 'hidel')", [name])
 
+        if(request.forms.give):
+            curs.execute("insert into alist (name, acl) values (?, 'give')", [name])
+
         if(request.forms.owner):
             curs.execute("insert into alist (name, acl) values (?, 'owner')", [name])
             
@@ -690,12 +693,12 @@ def admin_plus(name = None):
         return(redirect('/admin_plus/' + url_pas(name)))
     else:
         curs.execute('select acl from alist where name = ?', [name])
-        test = curs.fetchall()
+        acl_list = curs.fetchall()
         
         data = '<ul>'
-        exist_list = ['', '', '', '', '', '', '']
+        exist_list = ['', '', '', '', '', '', '', '']
 
-        for go in test:
+        for go in acl_list:
             if(go[0] == 'ban'):
                 exist_list[0] = 'checked="checked"'
             elif(go[0] == 'mdel'):
@@ -708,8 +711,10 @@ def admin_plus(name = None):
                 exist_list[4] = 'checked="checked"'
             elif(go[0] == 'hidel'):
                 exist_list[5] = 'checked="checked"'
-            elif(go[0] == 'owner'):
+            elif(go[0] == 'give'):
                 exist_list[6] = 'checked="checked"'
+            elif(go[0] == 'owner'):
+                exist_list[7] = 'checked="checked"'
 
         if(admin_check(None, None) != 1):
             state = 'disabled'
@@ -722,7 +727,8 @@ def admin_plus(name = None):
         data += '<li><input type="checkbox" ' + state +  ' name="check" ' + exist_list[3] + '> 사용자 검사</li>'
         data += '<li><input type="checkbox" ' + state +  ' name="acl" ' + exist_list[4] + '> 문서 ACL</li>'
         data += '<li><input type="checkbox" ' + state +  ' name="hidel" ' + exist_list[5] + '> 역사 숨김</li>'
-        data += '<li><input type="checkbox" ' + state +  ' name="owner" ' + exist_list[6] + '> 소유자</li></ul>'
+        data += '<li><input type="checkbox" ' + state +  ' name="give" ' + exist_list[6] + '> 권한 부여</li>'
+        data += '<li><input type="checkbox" ' + state +  ' name="owner" ' + exist_list[7] + '> 소유자</li></ul>'
 
         return(
             html_minify(
@@ -3170,9 +3176,28 @@ def acl(name = None):
             
 @route('/admin/<name:path>', method=['POST', 'GET'])
 def user_admin(name = None):
+    owner = admin_check(None, None)
+
+    curs.execute("select acl from user where id = ?", [name])
+    user = curs.fetchall()
+    if(not user):
+        return(re_error('/error/5'))
+    else:
+        if(owner != 1):
+            curs.execute('select name from alist where name = ? and acl = "owner"', [user[0][0]])
+            if(curs.fetchall()):
+                return(re_error('/error/3'))
+
+            if(ip_check() == name):
+                return(re_error('/error/3'))
+
     if(request.method == 'POST'):
-        if(admin_check(None, 'admin (' + name + ')') != 1):
+        if(admin_check(7, 'admin (' + name + ')') != 1):
             return(re_error('/error/3'))
+
+            curs.execute('select name from alist where name = ? and acl = "owner"', [request.forms.select])
+            if(curs.fetchall()):
+                return(re_error('/error/3'))
 
         if(request.forms.select == 'X'):
             curs.execute("update user set acl = 'user' where id = ?", [name])
@@ -3182,26 +3207,24 @@ def user_admin(name = None):
         
         return(redirect('/admin/' + url_pas(name)))            
     else:
-        if(admin_check(None, None) != 1):
-            return(re_error('/error/3'))
-
-        curs.execute("select acl from user where id = ?", [name])
-        user = curs.fetchall()
-        if(not user):
-            return(re_error('/error/5'))
+        if(admin_check(7, None) != 1):
+            return(re_error('/error/3'))            
 
         div = '<option value="X">X</option>'
             
-        curs.execute('select name from alist order by name asc')
+        curs.execute('select distinct name from alist order by name asc')
         get_alist = curs.fetchall()
         if(get_alist):
             i = 0
             name_rem = ''
             for data in get_alist:
-                if(name_rem != data[0]):
-                    name_rem = data[0]
-                    if(user[0][0] == data[0]):
-                        div += '<option value="' + data[0] + '" selected="selected">' + data[0] + '</option>'
+                if(user[0][0] == data[0]):
+                    div += '<option value="' + data[0] + '" selected="selected">' + data[0] + '</option>'
+                else:
+                    if(owner != 1):
+                        curs.execute('select name from alist where name = ? and acl = "owner"', [data[0]])
+                        if(not curs.fetchall()):
+                            div += '<option value="' + data[0] + '">' + data[0] + '</option>'
                     else:
                         div += '<option value="' + data[0] + '">' + data[0] + '</option>'
         
