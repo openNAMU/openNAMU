@@ -601,7 +601,6 @@ def edit_set(num = 0):
 @route('/not_close_topic')
 def not_close_topic():
     div = '<ul>'
-    i = 1
 
     curs.execute('select title, sub from rd order by date desc')
     n_list = curs.fetchall()
@@ -609,8 +608,7 @@ def not_close_topic():
         curs.execute('select * from stop where title = ? and sub = ? and close = "O"', [data[0], data[1]])
         is_close = curs.fetchall()
         if(not is_close):
-            div += '<li>' + str(i) + '. <a href="/topic/' + url_pas(data[0]) + '/sub/' + url_pas(data[1]) + '">' + data[0] + ' (' + data[1] + ')</a></li>'
-            i += 1
+            div += '<li><a href="/topic/' + url_pas(data[0]) + '/sub/' + url_pas(data[1]) + '">' + data[0] + ' (' + data[1] + ')</a></li>'
             
     div += '</ul>'
 
@@ -634,20 +632,17 @@ def static(name = None):
 @route('/acl_list')
 def acl_list():
     div = '<ul>'
-    i = 0
 
     curs.execute("select title, acl from data where acl = 'admin' or acl = 'user' order by acl desc")
     list_data = curs.fetchall()
     for data in list_data:
-        if(not re.search('^사용자:', data[0])):
+        if(not re.search('^사용자:', data[0]) and not re.search('^파일:', data[0])):
             if(data[1] == 'admin'):
                 acl = '관리자'
             else:
                 acl = '가입자'
 
-            div += '<li>' + str(i + 1) + '. <a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a> (' + acl + ')</li>'
-            
-            i += 1
+            div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a> (' + acl + ')</li>'
         
     div += '</ul>'
     
@@ -746,7 +741,6 @@ def admin_plus(name = None):
         
 @route('/admin_list')
 def admin_list():
-    i = 1
     div = '<ul>'
     
     curs.execute("select id, acl from user where not acl = 'user'")
@@ -755,8 +749,6 @@ def admin_list():
     for data in user_data:
         name = ip_pas(data[0]) + ' (<a href="/admin_plus/' + url_pas(data[1]) + '">' + data[1] + '</a>)'
         div += '<li>' + name + '</li>'
-        
-        i += 1
         
     div += '</ul>'
                 
@@ -787,16 +779,14 @@ def recent_changes(name = None, num = 1):
                     </tr>'
     
     if(name):
-        if(num * 50 <= 0):
-            v = 50
+        if(num * 50 > 0):
+            sql_num = num * 50 - 50
         else:
-            v = num * 50
-            
-        i = v - 50
+            sql_num = 0            
 
         div = '<a href="/user/' + url_pas(name) + '/topic">(토론 기록)</a><br><br>' + div
 
-        curs.execute("select id, title, date, ip, send, leng from history where ip = ? order by date desc limit ?, ?", [name, str(i), str(v)])
+        curs.execute("select id, title, date, ip, send, leng from history where ip = ? order by date desc limit ?, '50'", [name, str(sql_num)])
     else:
         curs.execute("select id, title, date, ip, send, leng from history where not date = 'Dump' order by date desc limit 50")
 
@@ -904,19 +894,18 @@ def history_hidden(name = None, num = None):
 @route('/user_log')
 @route('/user_log/n/<num:int>')
 def user_log(num = 1):
-    if(num * 50 <= 0):
-         i = 50
+    if(num * 50 > 0):
+        sql_num = num * 50 - 50
     else:
-        i = num * 50
+        sql_num = 0
         
-    j = i - 50
     list_data = '<ul>'
-    ydmin = admin_check(1, None)
+    admin_one = admin_check(1, None)
     
-    curs.execute("select id from user limit ?, ?", [str(j), str(i)])
+    curs.execute("select id from user limit ?, '50'", [str(sql_num)])
     user_list = curs.fetchall()
     for data in user_list:
-        if(ydmin == 1):
+        if(admin_one == 1):
             curs.execute("select block from ban where block = ?", [data[0]])
             ban_exist = curs.fetchall()
             if(ban_exist):
@@ -927,10 +916,7 @@ def user_log(num = 1):
             ban_button = ''
             
         ip = ip_pas(data[0])
-            
-        list_data += '<li>' + str(j + 1) + '. ' + ip + ban_button + '</li>'
-        
-        j += 1
+        list_data += '<li>' + ip + ban_button + '</li>'
     else:
         list_data += '</ul><br><a href="/user_log/n/' + str(num - 1) + '">(이전)</a> <a href="/user_log/n/' + str(num + 1) + '">(이후)</a>'
 
@@ -947,28 +933,21 @@ def user_log(num = 1):
 @route('/admin_log')
 @route('/admin_log/n/<num:int>')
 def user_log(num = 1):
-    if(num * 50 <= 0):
-         i = 50
+    if(num * 50 > 0):
+        sql_num = num * 50 - 50
     else:
-        i = num * 50
-        
-    j = i - 50
+        sql_num = 0
+
     list_data = '<ul>'
     
-    curs.execute("select who, what, time from re_admin order by time desc limit ?, ?", [str(j), str(i)])
+    curs.execute("select who, what, time from re_admin order by time desc limit ?, '50'", [str(sql_num)])
     get_list = curs.fetchall()
     for data in get_list:            
         ip = ip_pas(data[0])
-            
-        list_data += '<li>' + str(j + 1) + '. ' + ip + ' / ' + data[1] + ' / ' + data[2] + '</li>'
-        
-        j += 1
-    else:
-        list_data +=    '</ul><br> \
-                        <span>주의 : 권한 사용 안하고 열람만 해도 기록되는 경우도 있습니다.</span> \
-                        <br> \
-                        <br> \
-                        <a href="/admin_log/n/' + str(num - 1) + '">(이전)</a> <a href="/admin_log/n/' + str(num + 1) + '">(이후)</a>'
+        list_data += '<li>' + ip + ' / ' + data[1] + ' / ' + data[2] + '</li>'
+
+    list_data += '</ul><br><span>주의 : 권한 사용 안하고 열람만 해도 기록되는 경우도 있습니다.</span><br><br>'
+    list_data += '<a href="/admin_log/n/' + str(num - 1) + '">(이전)</a> <a href="/admin_log/n/' + str(num + 1) + '">(이후)</a>'
 
     return(
         html_minify(
@@ -983,23 +962,21 @@ def user_log(num = 1):
 @route('/give_log')
 @route('/give_log/n/<num:int>')
 def give_log(num = 1):
-    if(num * 50 <= 0):
-         i = 50
+    if(num * 50 > 0):
+        sql_num = num * 50 - 50
     else:
-        i = num * 50
+        sql_num = 0
         
-    j = i - 50
     list_data = '<ul>'
     back = ''
 
-    curs.execute("select distinct name from alist order by name asc limit ?, ?", [str(j), str(i)])
+    curs.execute("select distinct name from alist order by name asc limit ?, '50'", [str(sql_num)])
     get_list = curs.fetchall()
     for data in get_list:                      
         if(back != data[0]):
             back = data[0]
-            j += 1
 
-        list_data += '<li>' + str(j) + '. <a href="/admin_plus/' + url_pas(data[0]) + '">' + data[0] + '</a></li>'
+        list_data += '<li><a href="/admin_plus/' + url_pas(data[0]) + '">' + data[0] + '</a></li>'
     
     list_data += '</ul><a href="/manager/8">(생성)</a>'
     list_data += '<br><br><a href="/give_log/n/' + str(num - 1) + '">(이전)</a> <a href="/give_log/n/' + str(num + 1) + '">(이후)</a>'
@@ -1039,27 +1016,26 @@ def indexing():
 @route('/xref/<name:path>')
 @route('/xref/<name:path>/n/<num:int>')
 def xref(name = None, num = 1):
-    if(num * 50 <= 0):
-        v = 50
+    if(num * 50 > 0):
+        sql_num = num * 50 - 50
     else:
-        v = num * 50
+        sql_num = 0
         
-    i = v - 50
     div = '<ul>'
     
-    curs.execute("select link, type from back where title = ? and not type = 'cat' and not type = 'no' order by link asc limit ?, ?", [name, str(i), str(v)])
+    curs.execute("select link, type from back where title = ? and not type = 'cat' and not type = 'no' order by link asc limit ?, '50'", [name, str(sql_num)])
     for data in curs.fetchall():
         div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a>'
         
         if(data[1]):
             if(data[1] == 'include'):
-                d = '포함'
+                side = '포함'
             elif(data[1] == 'file'):
-                d = '파일'
+                side = '파일'
             else:
-                d = '넘겨주기'
+                side = '넘겨주기'
                 
-            div += ' (' + d + ')'
+            div += ' (' + side + ')'
         
         div += '</li>'
         
@@ -1081,21 +1057,18 @@ def xref(name = None, num = 1):
 @route('/please')
 @route('/please/<num:int>')
 def please(num = 1):
-    if(num * 50 <= 0):
-        v = 50
+    if(num * 50 > 0):
+        sql_num = num * 50 - 50
     else:
-        v = num * 50
+        sql_num = 0
         
-    i = v - 50
     div = '<ul>'
     var = ''
     
-    i += 1
-    curs.execute("select distinct title from back where type = 'no' order by title asc limit ?, ?", [str(i), str(v)])
+    curs.execute("select distinct title from back where type = 'no' order by title asc limit ?, '50'", [str(sql_num)])
     for data in curs.fetchall():
         if(var != data[0]):
-            div += '<li>' + str(i) + '. <a class="not_thing" href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a></li>'        
-            i += 1
+            div += '<li><a class="not_thing" href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a></li>'        
             var = data[0]
         
     div += '</ul><br><a href="/please/' + str(num - 1) + '">(이전)</a> <a href="/please/' + str(num + 1) + '">(이후)</a>'
@@ -1173,12 +1146,11 @@ def recent_discuss(tools = 'normal'):
 @route('/block_log')
 @route('/block_log/n/<num:int>')
 def block_log(num = 1):
-    if(num * 50 <= 0):
-        v = 50
+    if(num * 50 > 0):
+        sql_num = num * 50 - 50
     else:
-        v = num * 50
+        sql_num = 0
     
-    i = v - 50
     div =   '<table style="width: 100%; text-align: center;"> \
                 <tbody> \
                     <tr> \
@@ -1191,7 +1163,7 @@ def block_log(num = 1):
                         <td>시간</td> \
                     </tr>'
     
-    curs.execute("select why, block, blocker, end, today from rb order by today desc limit ?, ?", [str(i), str(v)])
+    curs.execute("select why, block, blocker, end, today from rb order by today desc limit ?, '50'", [str(sql_num)])
     for data in curs.fetchall():
         why = html.escape(data[0])
         
@@ -1238,12 +1210,10 @@ def history_view(name = None, num = 1):
         return(redirect('/w/' + url_pas(name) + '/r/' + request.forms.b + '/diff/' + request.forms.a))
     else:
         select = ''
-        if(num * 50 <= 0):
-            i = 50
+        if(num * 50 > 0):
+            sql_num = num * 50 - 50
         else:
-            i = num * 50
-            
-        j = i - 50
+            sql_num = 0
  
         admin1 = admin_check(1, None)
         admin2 = admin_check(6, None)
@@ -1256,7 +1226,7 @@ def history_view(name = None, num = 1):
                             <td style="width: 33.3%;">시간</td> \
                         </tr>'
         
-        curs.execute("select send, leng, ip, date, title, id from history where title = ? order by id + 0 desc limit ?, ?", [name, str(j), str(i)])
+        curs.execute("select send, leng, ip, date, title, id from history where title = ? order by id + 0 desc limit ?, '50'", [name, str(sql_num)])
         all_data = curs.fetchall()
         for data in all_data:
             select += '<option value="' + data[5] + '">' + data[5] + '</option>'
@@ -1335,7 +1305,7 @@ def history_view(name = None, num = 1):
                         ' + select + ' \
                     </select> \
                     <button class="btn btn-primary" type="submit">비교</button> \
-                </form>' + div
+                </form><br>' + div
 
         return(
             html_minify(
@@ -1364,17 +1334,15 @@ def goto():
 @route('/search/<name:path>/n/<num:int>')
 def deep_search(name = None, num = 1):
     if(num * 50 > 0):
-        v = num * 50
+        sql_num = num * 50 - 50
     else:
-        v = 50
-
-    i = v - 50
+        sql_num = 0
 
     div = '<ul>'
     div_plus = ''
     no = 0
 
-    curs.execute("select title from data where title like ? or data like ? order by case when title like ? then 1 else 2 end limit ?, ?", ['%' + name + '%', '%' + name + '%', '%' + name + '%', i, v])
+    curs.execute("select distinct title from data where title like ? or data like ? order by case when title like ? then 1 else 2 end limit ?, '50'", ['%' + name + '%', '%' + name + '%', '%' + name + '%', str(sql_num)])
     all_list = curs.fetchall()
 
     curs.execute("select title from data where title = ?", [name])
@@ -1814,30 +1782,32 @@ def delete(name = None):
         )            
             
 @route('/move_data/<name:path>')
-@route('/move_data/<name:path>/<n:int>')
-def move_data(name = None, n = 1):
-    if(n > 0):
-        i = n
+@route('/move_data/<name:path>/<num:int>')
+def move_data(name = None, num = 1):
+    if(num * 50 > 0):
+        sql_num = num * 50 - 50
     else:
-        i = 1
-       
-    j = i * 50
-    da = '<ul>'
+        sql_num = 0
+
+    data = '<ul>'
     
-    curs.execute("select origin, new, date, who, send from move where origin = ? or new = ? order by date desc limit ?, ?", [name, name, j - 50, j])
-    for d in curs.fetchall():
-        if(d[4] == ''):
-            sn = '(없음)'
+    curs.execute("select origin, new, date, who, send from move where origin = ? or new = ? order by date desc limit ?, '50'", [name, name, str(sql_num)])
+    for for_data in curs.fetchall():
+        if(for_data[4] == ''):
+            side = '(없음)'
         else:
-            sn = d[4]
-        da += '<li><a href="/move_data/' + url_pas(d[0]) + '">' + d[0] + '</a> - <a href="/move_data/' + url_pas(d[1]) + '">' + d[1] + '</a> / ' + d[2] + ' / ' + d[3] + ' / ' + sn + '</li>'
-    da += '</ul><br><a href="/move_data/' + name + '/' + str(n - 1) + '">(이전)</a> <a href="/move_data/' + name + '/' + str(n + 1) + '">(이후)</a>'
+            side = for_data[4]
+
+        data += '<li><a href="/move_data/' + url_pas(for_data[0]) + '">' + for_data[0] + '</a> - <a href="/move_data/' + url_pas(for_data[1]) + '">' + for_data[1] + '</a>'
+        data += '/ ' + for_data[2] + ' / ' + for_data[3] + ' / ' + side + '</li>'
+    
+    data += '</ul><br><a href="/move_data/' + url_pas(name) + '/' + str(num - 1) + '">(이전)</a> <a href="/move_data/' + url_pas(name) + '/' + str(num + 1) + '">(이후)</a>'
     
     return(
         html_minify(
             template('index', 
                 imp = [name, wiki_set(1), custom(), other2([' (이동)', 0])],
-                data = da,
+                data = data,
                 menu = [['w/' + url_pas(name), '문서']]
             )
         )
@@ -2190,22 +2160,22 @@ def json_in():
 @route('/title_index')
 @route('/title_index/<num:int>/<page:int>')
 def title_index(num = 1000, page = 1):
-    if(page > 0):
-        v_page = page * num
+    if(page * num > 0):
+        sql_num = page * num - page
     else:
-        v_page = 1 * num
+        sql_num = 1 * num - page
 
     if(num != 0):
-        i = [v_page - num + 1]
+        all_list = [sql_num + 1, 0, 0, 0, 0, 0]
     else:
-        i = [1, 0, 0, 0, 0, 0]
+        all_list = [1, 0, 0, 0, 0, 0]
 
     data = '<ul><a href="/title_index/0/1">(전체)</a> <a href="/title_index/500/1">(500)</a> <a href="/title_index/5000/1">(5000개)</a> <a href="/title_index/10000/1">(10000개)</a> <a href="/title_index/50000/1">(50000개)</a><br><br>'
 
     if(num == 0):
         curs.execute("select title from data order by title asc")
     else:
-        curs.execute("select title from data order by title asc limit ?, ?", [str(v_page - num), str(num)])
+        curs.execute("select title from data order by title asc limit ?, '50'", [str(sql_num)])
     title_list = curs.fetchall()
 
     for list_data in title_list:
@@ -2213,26 +2183,26 @@ def title_index(num = 1000, page = 1):
 
         if(num == 0):
             if(re.search('^분류:', list_data[0])):
-                i[1] += 1
+                all_list[1] += 1
             elif(re.search('^사용자:', list_data[0])):
-                i[2] += 1
+                all_list[2] += 1
             elif(re.search('^틀:', list_data[0])):
-                i[3] += 1
+                all_list[3] += 1
             elif(re.search('^파일:', list_data[0])):
-                i[4] += 1
+                all_list[4] += 1
             else:
-                i[5] += 1
+                all_list[5] += 1
         
-        i[0] += 1
+        all_list[0] += 1
 
     if(num == 0):
         if(title_list):        
-            data += '<br><br><li>이 위키에는 총 ' + str(i[0]) + '개의 문서가 있습니다.</li><br><br> \
-                    <li>틀 문서는 총 ' + str(i[3]) + '개의 문서가 있습니다.</li> \
-                    <li>분류 문서는 총 ' + str(i[1]) + '개의 문서가 있습니다.</li> \
-                    <li>사용자 문서는 총 ' + str(i[2]) + '개의 문서가 있습니다.</li> \
-                    <li>파일 문서는 총 ' + str(i[4]) + '개의 문서가 있습니다.</li> \
-                    <li>나머지 문서는 총 ' + str(i[5]) + '개의 문서가 있습니다.</li>'
+            data += '<br><br><li>이 위키에는 총 ' + str(all_list[0]) + '개의 문서가 있습니다.</li><br><br> \
+                    <li>틀 문서는 총 ' + str(all_list[3]) + '개의 문서가 있습니다.</li> \
+                    <li>분류 문서는 총 ' + str(all_list[1]) + '개의 문서가 있습니다.</li> \
+                    <li>사용자 문서는 총 ' + str(all_list[2]) + '개의 문서가 있습니다.</li> \
+                    <li>파일 문서는 총 ' + str(all_list[4]) + '개의 문서가 있습니다.</li> \
+                    <li>나머지 문서는 총 ' + str(all_list[5]) + '개의 문서가 있습니다.</li>'
     else:
         data += '</ul><br><a href="/title_index/' + str(num) + '/' + str(page - 1) + '">(이전)</a> <a href="/title_index/' + str(num) + '/' + str(page + 1) + '">(이후)</a>'
     
@@ -3295,11 +3265,9 @@ def down(name = None):
     under = curs.fetchall()
     
     div = '<ul>'
-    i = 0
 
     for data in under:
-        div += '<li>' + str(i + 1) + '. <a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a></li>'
-        i += 1
+        div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a></li>'
         
     div += '</ul>'
     
@@ -3482,12 +3450,11 @@ def read_view(name = None, num = None, redirect = None):
 @route('/user/<name:path>/topic')
 @route('/user/<name:path>/topic/<num:int>')
 def user_topic_list(name = None, num = 1):
-    if(num * 50 <= 0):
-        v = 50
+    if(num * 50 > 0):
+        sql_num = num * 50 - 50
     else:
-        v = num * 50
+        sql_num = 0
     
-    i = v - 50
     ydmin = admin_check(1, None)
     div =   '<table style="width: 100%; text-align: center;"> \
                 <tbody> \
@@ -3499,7 +3466,7 @@ def user_topic_list(name = None, num = 1):
 
     div = '<a href="/record/' + url_pas(name) + '">(기여 기록)</a><br><br>' + div
     
-    curs.execute("select title, id, sub, ip, date from topic where ip = ? order by date desc limit ?, ?", [name, str(i), str(v)])
+    curs.execute("select title, id, sub, ip, date from topic where ip = ? order by date desc limit ?, '50'", [name, str(sql_num)])
     for data in curs.fetchall():
         title = html.escape(data[0])
         sub = html.escape(data[2])
