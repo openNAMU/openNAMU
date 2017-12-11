@@ -8,6 +8,7 @@ import re
 import html
 from css_html_js_minify import html_minify, js_minify, css_minify
 import time
+import os
 
 json_data = open('set.json').read()
 set_data = json.loads(json_data)
@@ -28,6 +29,19 @@ def get_time():
     date = "%04d-%02d-%02d %02d:%02d:%02d" % (now.tm_year, now.tm_mon, now.tm_mday, now.tm_hour, now.tm_min, now.tm_sec)
 
     return(date)
+
+def skin_check():
+    skin = './views/acme/'
+    try:
+        curs.execute('select data from other where name = "skin"')
+        skin_exist = curs.fetchall()
+        if(skin_exist):
+            if(os.path.exists(os.path.abspath('./views/' + skin_exist[0][0] + '/index.tpl')) == 1):
+                skin = './views/' + skin_exist[0][0] + '/'
+    except:
+        pass
+
+    return(skin)
 
 def sha224(data):
     return(hashlib.sha224(bytes(data, 'utf-8')).hexdigest())
@@ -151,6 +165,8 @@ def admin_check(num, what):
                 check = 'acl'
             elif(num == 6 and reset == 0):
                 check = 'hidel'
+            elif(num == 7 and reset == 0):
+                check = 'give'
             else:
                 check = 'owner'
 
