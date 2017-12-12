@@ -364,13 +364,14 @@ def edit_set(num = 0):
             curs.execute("update other set data = ? where name = 'reg'", [request.forms.reg])
             curs.execute("update other set data = ? where name = 'ip_view'", [request.forms.ip_view])
             curs.execute("update other set data = ? where name = 'back_up'", [request.forms.back_up])
+            curs.execute("update other set data = ? where name = 'all_title'", [request.forms.all_title])
             conn.commit()
 
             TEMPLATE_PATH.insert(0, skin_check())
             return(redirect('/edit_set/1'))
         else:
-            i_list = ['name', 'logo', 'frontpage', 'license', 'upload', 'skin', 'edit', 'reg', 'ip_view', 'back_up']
-            n_list = ['무명위키', '', '위키:대문', 'CC 0', '2', '', 'normal', '', '', '0']
+            i_list = ['name', 'logo', 'frontpage', 'license', 'upload', 'skin', 'edit', 'reg', 'ip_view', 'back_up', 'all_title']
+            n_list = ['무명위키', '', '위키:대문', 'CC 0', '2', '', 'normal', '', '', '0', '']
             d_list = []
             
             x = 0
@@ -400,15 +401,17 @@ def edit_set(num = 0):
                 div += '<option value="admin">관리자</option>'
                 div += '<option value="login">가입자</option>'
 
+            ch_1 = ''
+            ch_2 = ''
+            ch_3 = ''
             if(d_list[7]):
                 ch_1 = 'checked="checked"'
-            else:
-                ch_1 = ''
             
             if(d_list[8]):
                 ch_2 = 'checked="checked"'
-            else:
-                ch_2 = ''
+
+            if(d_list[10]):
+                ch_3 = 'checked="checked"'                
 
             return(
                 html_minify(
@@ -463,6 +466,9 @@ def edit_set(num = 0):
                                     <br> \
                                     <br> \
                                     <input type="checkbox" name="ip_view" ' + ch_2 + '> 아이피 비공개 \
+                                    <br> \
+                                    <br> \
+                                    <input type="checkbox" name="all_title" ' + ch_3 + '> 모든 문서 보기 비활성화 \
                                     <br> \
                                     <br> \
                                     <span>백업 간격 [시간] (끄기 : 0) (재시작 필요)</span> \
@@ -2165,27 +2171,36 @@ def json_in():
         
 @route('/title_index')
 @route('/title_index/<num:int>/<page:int>')
-def title_index(num = 1000, page = 1):
+def title_index(num = 100, page = 1):
     if(page * num > 0):
-        sql_num = page * num - page
+        sql_num = page * num - num
     else:
-        sql_num = 1 * num - page
+        sql_num = 0
 
     if(num != 0):
         all_list = [sql_num + 1, 0, 0, 0, 0, 0]
     else:
         all_list = [1, 0, 0, 0, 0, 0]
 
-    data = '<ul><a href="/title_index/0/1">(전체)</a> <a href="/title_index/500/1">(500)</a> <a href="/title_index/5000/1">(5000개)</a> <a href="/title_index/10000/1">(10000개)</a> <a href="/title_index/50000/1">(50000개)</a><br><br>'
+    if(num > 1000):
+        return(re_error('/error/3'))
+
+    data = '<ul><a href="/title_index/0/1">(전체)</a> <a href="/title_index/250/1">(250)</a> <a href="/title_index/500/1">(500)</a> <a href="/title_index/1000/1">(1000)</a><br><br>'
 
     if(num == 0):
+        curs.execute("select data from other where name = 'all_title'")
+        all_title_can = curs.fetchall()
+        if(all_title_can and all_title_can[0][0] != ''):
+            return(re_error('/error/3'))
+
         curs.execute("select title from data order by title asc")
     else:
-        curs.execute("select title from data order by title asc limit ?, '50'", [str(sql_num)])
+        curs.execute("select title from data order by title asc limit ?, ?", [str(sql_num), str(num)])
     title_list = curs.fetchall()
+    print(sql_num)
 
     for list_data in title_list:
-        data += '<li>' + str(i[0]) + '. <a href="/w/' + url_pas(list_data[0]) + '">' + list_data[0] + '</a></li>'
+        data += '<li>' + str(all_list[0]) + '. <a href="/w/' + url_pas(list_data[0]) + '">' + list_data[0] + '</a></li>'
 
         if(num == 0):
             if(re.search('^분류:', list_data[0])):
