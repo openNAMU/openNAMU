@@ -53,7 +53,7 @@ from func import *
 
 BaseRequest.MEMFILE_MAX = 1000 ** 4
 
-r_ver = '2.4.3'
+r_ver = '2.4.4'
 
 # 스킨 불러오기 부분
 TEMPLATE_PATH.insert(0, skin_check())
@@ -2197,7 +2197,6 @@ def title_index(num = 100, page = 1):
     else:
         curs.execute("select title from data order by title asc limit ?, ?", [str(sql_num), str(num)])
     title_list = curs.fetchall()
-    print(sql_num)
 
     for list_data in title_list:
         data += '<li>' + str(all_list[0]) + '. <a href="/w/' + url_pas(list_data[0]) + '">' + list_data[0] + '</a></li>'
