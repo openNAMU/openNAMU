@@ -839,3 +839,8 @@ input[type="checkbox"] {
 a.not_thing:hover {
     color: #903535;
 }
+
+table#toron tbody tr td {
+    padding-top: 6px;
+    padding-bottom: 6px;
+}
