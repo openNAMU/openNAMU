@@ -336,7 +336,7 @@ def edit_set(num = 0):
         return(re_error('/ban'))
 
     if(num == 0):
-        li_list = ['기본 설정', '문구 관련', '전역 HEAD', 'robots.txt']
+        li_list = ['기본 설정', '문구 관련', '전역 HEAD', 'robots.txt', '구글 관련']
         x = 0
         li_data = ''
         for li in li_list:
@@ -597,6 +597,47 @@ def edit_set(num = 0):
                                                 <button class="btn btn-primary" type="submit">저장</button> \
                                             </div> \
                                         </form>',
+                        menu = [['edit_set', '설정 편집']]
+                    )
+                )
+            )
+    elif(num == 5):
+        if(request.method == 'POST'):
+            curs.execute("update other set data = ? where name = 'recaptcha'", [request.forms.recaptcha])
+            conn.commit()
+
+            return(redirect('/edit_set/5'))
+        else:
+            i_list = ['recaptcha']
+            n_list = ['']
+            d_list = []
+            
+            x = 0
+            for i in i_list:
+                curs.execute('select data from other where name = ?', [i])
+                sql_d = curs.fetchall()
+                if(sql_d):
+                    d_list += [sql_d[0][0]]
+                else:
+                    curs.execute('insert into other (name, data) values (?, ?)', [i, n_list[x]])
+                    d_list += [n_list[x]]
+
+                x += 1
+            conn.commit()         
+
+            return(
+                html_minify(
+                    template('index', 
+                        imp = ['구글 관련', wiki_set(1), custom(), other2([0, 0])],
+                        data = '<form method="post"> \
+                                    <span>리캡차 (HTML)</span> \
+                                    <br> \
+                                    <br> \
+                                    <input placeholder="리캡차" type="text" name="recaptcha" value="' + html.escape(d_list[0]) + '"> \
+                                    <br> \
+                                    <br> \
+                                    <button class="btn btn-primary" type="submit">저장</button> \
+                                </form>',
                         menu = [['edit_set', '설정 편집']]
                     )
                 )
@@ -2690,6 +2731,9 @@ def login():
         return(re_error('/error/11'))
         
     if(request.method == 'POST'):        
+        if(not request.forms.get('g-recaptcha-response')):
+            return(re_error('/error/13'))
+
         curs.execute("select pw from user where id = ?", [request.forms.id])
         user = curs.fetchall()
         if(not user):
@@ -2713,6 +2757,13 @@ def login():
         
         return(redirect('/user'))                            
     else:        
+        curs.execute('select data from other where name = "recaptcha"')
+        recaptcha = curs.fetchall()
+        if(recaptcha and recaptcha[0][0] != ''):
+            plus = recaptcha[0][0] + '<br>'
+        else:
+            plus = ''
+
         return(
             html_minify(
                 template('index',    
@@ -2724,6 +2775,7 @@ def login():
                                 <input placeholder="비밀번호" name="pw" type="password"> \
                                 <br> \
                                 <br> \
+                                ' + plus + ' \
                                 <button class="btn btn-primary" type="submit">로그인</button> \
                                 <br> \
                                 <br> \
@@ -2736,17 +2788,18 @@ def login():
                 
 @route('/change', method=['POST', 'GET'])
 def change_password():
+    session = request.environ.get('beaker.session')
     ip = ip_check()
     ban = ban_check()
     
-    if(request.method == 'POST'):      
+    if(request.method == 'POST'):    
         if(request.forms.pw2 != request.forms.pw3):
             return(re_error('/error/20'))
 
         if(ban == 1):
             return(re_error('/ban'))
 
-        curs.execute("select pw from user where id = ?", [request.forms.id])
+        curs.execute("select pw from user where id = ?", [session['DREAMER']])
         user = curs.fetchall()
         if(not user):
             return(re_error('/error/10'))
@@ -2759,7 +2812,7 @@ def change_password():
 
         hashed = bcrypt.hashpw(bytes(request.forms.pw2, 'utf-8'), bcrypt.gensalt())
         
-        curs.execute("update user set pw = ? where id = ?", [hashed.decode(), request.forms.id])
+        curs.execute("update user set pw = ? where id = ?", [hashed.decode(), session['DREAMER']])
         conn.commit()
         
         return(redirect('/user'))
@@ -2775,9 +2828,6 @@ def change_password():
                 template('index',    
                     imp = ['비밀번호 변경', wiki_set(1), custom(), other2([0, 0])],
                     data = '<form method="post"> \
-                                <input placeholder="아이디" name="id" type="text"> \
-                                <br> \
-                                <br> \
                                 <input placeholder="현재 비밀번호" name="pw" type="password"> \
                                 <br> \
                                 <br> \
@@ -2875,7 +2925,10 @@ def register():
         if(set_d and set_d[0][0] == 'on'):
             return(re_error('/ban'))
     
-    if(request.method == 'POST'):        
+    if(request.method == 'POST'): 
+        if(not request.forms.get('g-recaptcha-response')):
+            return(re_error('/error/13'))
+
         if(request.forms.pw != request.forms.pw2):
             return(re_error('/error/20'))
 
@@ -2907,6 +2960,13 @@ def register():
         if(d and d[0][0] != ''):
             p = d[0][0] + '<br><br>'
 
+        curs.execute('select data from other where name = "recaptcha"')
+        recaptcha = curs.fetchall()
+        if(recaptcha and recaptcha[0][0] != ''):
+            plus = recaptcha[0][0] + '<br>'
+        else:
+            plus = ''
+
         return(
             html_minify(
                 template('index',    
@@ -2922,6 +2982,7 @@ def register():
                                 <input placeholder="재 확인" name="pw2" type="password"> \
                                 <br> \
                                 <br> \
+                                ' + plus + ' \
                                 <button class="btn btn-primary" type="submit">가입</button> \
                                 <br> \
                                 <br> \

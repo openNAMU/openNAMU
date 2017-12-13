@@ -464,9 +464,9 @@ def re_error(data):
         elif(num == 12):
             title = '편집 오류'
             data = '누군가 먼저 편집 했습니다.'
-        elif(num == 16):
-            title = '파일 올리기 오류'
-            data = '파일 이름을 다른 걸로 설정 해주세요.'
+        elif(num == 13):
+            title = '리캡차 오류'
+            data = '리캡차를 통과하세요.'
         elif(num == 14):
             title = '파일 올리기 오류'
             data = 'jpg, gif, jpeg, png, webp만 가능 합니다.'
