@@ -418,34 +418,34 @@ def edit_set(num = 0):
                     template('index', 
                         imp = ['기본 설정', wiki_set(1), custom(), other2([0, 0])],
                         data = '<form method="post"> \
-                                    <span>위키 이름</span> \
+                                    <span>이름</span> \
                                     <br> \
                                     <br> \
-                                    <input placeholder="위키 이름" type="text" name="name" value="' + html.escape(d_list[0]) + '"> \
+                                    <input placeholder="이름" type="text" name="name" value="' + html.escape(d_list[0]) + '"> \
                                     <br> \
                                     <br> \
-                                    <span>로고 HTML (있으면 이름 대신 로고 사용)</span> \
+                                    <span>로고 (HTML) {이름 대체}</span> \
                                     <br> \
                                     <br> \
                                     <input placeholder="로고" type="text" name="logo" value="' + html.escape(d_list[1]) + '"> \
                                     <br> \
                                     <br> \
-                                    <span>시작 페이지</span> \
+                                    <span>대문</span> \
                                     <br> \
                                     <br> \
-                                    <input placeholder="시작 페이지" type="text" name="frontpage" value="' + html.escape(d_list[2]) + '"> \
+                                    <input placeholder="대문" type="text" name="frontpage" value="' + html.escape(d_list[2]) + '"> \
                                     <br> \
                                     <br> \
-                                    <span>라이선스</span> \
+                                    <span>라이선스 (HTML)</span> \
                                     <br> \
                                     <br> \
                                     <input placeholder="라이선스" type="text" name="license" value="' + html.escape(d_list[3]) + '"> \
                                     <br> \
                                     <br> \
-                                    <span>파일 용량 한도 [메가]</span> \
+                                    <span>파일 크기 [메가]</span> \
                                     <br> \
                                     <br> \
-                                    <input placeholder="파일 용량 한도" type="text" name="upload" value="' + html.escape(d_list[4]) + '"> \
+                                    <input placeholder="파일 크기" type="text" name="upload" value="' + html.escape(d_list[4]) + '"> \
                                     <br> \
                                     <br> \
                                     <span>스킨</span> \
@@ -454,7 +454,7 @@ def edit_set(num = 0):
                                     <input placeholder="스킨" type="text" name="skin" value="' + html.escape(d_list[5]) + '"> \
                                     <br> \
                                     <br> \
-                                    <span>기본 ACL 설정</span> \
+                                    <span>전역 ACL</span> \
                                     <br> \
                                     <br> \
                                     <select name="edit"> \
@@ -471,7 +471,7 @@ def edit_set(num = 0):
                                     <input type="checkbox" name="all_title" ' + ch_3 + '> 모든 문서 보기 비활성화 \
                                     <br> \
                                     <br> \
-                                    <span>백업 간격 [시간] (끄기 : 0) (재시작 필요)</span> \
+                                    <span>백업 간격 [시간] (끄기 : 0) {재시작 필요}</span> \
                                     <br> \
                                     <br> \
                                     <input placeholder="백업 간격" type="text" name="back_up" value="' + html.escape(d_list[9]) + '"> \
@@ -2178,9 +2178,9 @@ def title_index(num = 100, page = 1):
         sql_num = 0
 
     if(num != 0):
-        all_list = [sql_num + 1, 0, 0, 0, 0, 0]
+        all_list = sql_num + 1
     else:
-        all_list = [1, 0, 0, 0, 0, 0]
+        all_list = 0
 
     if(num > 1000):
         return(re_error('/error/3'))
@@ -2199,31 +2199,37 @@ def title_index(num = 100, page = 1):
     title_list = curs.fetchall()
 
     for list_data in title_list:
-        data += '<li>' + str(all_list[0]) + '. <a href="/w/' + url_pas(list_data[0]) + '">' + list_data[0] + '</a></li>'
+        data += '<li>' + str(all_list) + '. <a href="/w/' + url_pas(list_data[0]) + '">' + list_data[0] + '</a></li>'        
+        all_list += 1
 
-        if(num == 0):
-            if(re.search('^분류:', list_data[0])):
-                all_list[1] += 1
-            elif(re.search('^사용자:', list_data[0])):
-                all_list[2] += 1
-            elif(re.search('^틀:', list_data[0])):
-                all_list[3] += 1
-            elif(re.search('^파일:', list_data[0])):
-                all_list[4] += 1
-            else:
-                all_list[5] += 1
-        
-        all_list[0] += 1
-
-    if(num == 0):
-        if(title_list):        
-            data += '<br><br><li>이 위키에는 총 ' + str(all_list[0]) + '개의 문서가 있습니다.</li><br><br> \
-                    <li>틀 문서는 총 ' + str(all_list[3]) + '개의 문서가 있습니다.</li> \
-                    <li>분류 문서는 총 ' + str(all_list[1]) + '개의 문서가 있습니다.</li> \
-                    <li>사용자 문서는 총 ' + str(all_list[2]) + '개의 문서가 있습니다.</li> \
-                    <li>파일 문서는 총 ' + str(all_list[4]) + '개의 문서가 있습니다.</li> \
-                    <li>나머지 문서는 총 ' + str(all_list[5]) + '개의 문서가 있습니다.</li>'
+    count_end = []
+    curs.execute("select count(title) from data")
+    count = curs.fetchall()
+    if(count):
+        count_end += [count[0][0]]
     else:
+        count_end += [0]
+
+    sql_list = ['틀:', '분류:', '사용자:', '파일:']
+
+    for sql in sql_list:
+        curs.execute("select count(title) from data where title like ?", [sql + '%'])
+        count = curs.fetchall()
+        if(count):
+            count_end += [count[0][0]]
+        else:
+            count_end += [0]
+
+    count_end += [count_end[0] - count_end[1]  - count_end[2]  - count_end[3]  - count_end[4]]
+
+    data += '<br><br><li>이 위키에는 총 ' + str(count_end[0]) + '개의 문서가 있습니다.</li><br><br>'
+    data += '<li>틀 문서는 총 ' + str(count_end[1]) + '개의 문서가 있습니다.</li>'
+    data += '<li>분류 문서는 총 ' + str(count_end[2]) + '개의 문서가 있습니다.</li>'
+    data += '<li>사용자 문서는 총 ' + str(count_end[3]) + '개의 문서가 있습니다.</li>'
+    data += '<li>파일 문서는 총 ' + str(count_end[4]) + '개의 문서가 있습니다.</li>'
+    data += '<li>나머지 문서는 총 ' + str(count_end[5]) + '개의 문서가 있습니다.</li>'
+
+    if(num != 0):
         data += '</ul><br><a href="/title_index/' + str(num) + '/' + str(page - 1) + '">(이전)</a> <a href="/title_index/' + str(num) + '/' + str(page + 1) + '">(이후)</a>'
     
     return(
