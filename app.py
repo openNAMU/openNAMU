@@ -53,7 +53,7 @@ from func import *
 
 BaseRequest.MEMFILE_MAX = 1000 ** 4
 
-r_ver = '2.4.4'
+r_ver = '2.4.5'
 
 # 스킨 불러오기 부분
 TEMPLATE_PATH.insert(0, skin_check())
