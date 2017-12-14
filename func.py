@@ -64,68 +64,68 @@ def ip_check():
 def url_pas(data):
     return(parse.quote(data).replace('/','%2F'))
 
-def other2(d):
-    g = ''
+def other2(origin):
+    div = ''
     session = request.environ.get('beaker.session')
     if(session.get('View_List')):
-        m = re.findall('(?:(?:([^\n]+)\n))', session.get('View_List'))
-        if(m):
-            g = ''
-            for z in m[-6:-1]:
-                g += '<a href="/w/' + url_pas(z) + '">' +  html.escape(z) + '</a> / '
-            g = re.sub(' / $', '', g)
+        match = re.findall('(?:(?:([^\n]+)\n))', session.get('View_List'))
+        if(match):
+            div = ''
+            for data in match[-6:-1]:
+                div += '<a href="/w/' + url_pas(data) + '">' +  html.escape(data) + '</a> / '
+            div = re.sub(' / $', '', div)
             
-    r = d + [g]
-    return(r)    
+    re_data = origin + [div]
+    return(re_data)    
 
 def wiki_set(num):
     if(num == 1):
-        r = []
+        data_list = []
 
         curs.execute('select data from other where name = ?', ['name'])
-        d = curs.fetchall()
-        if(d and d[0][0] != ''):
-            r += [d[0][0]]
+        db_data = curs.fetchall()
+        if(db_data and db_data[0][0] != ''):
+            data_list += [db_data[0][0]]
         else:
-            r += ['무명위키']
+            data_list += ['무명위키']
 
         curs.execute('select data from other where name = "license"')
-        d = curs.fetchall()
-        if(d and d[0][0] != ''):
-            r += [d[0][0]]
+        db_data = curs.fetchall()
+        if(db_data and db_data[0][0] != ''):
+            data_list += [db_data[0][0]]
         else:
-            r += ['CC 0']
+            data_list += ['CC 0']
 
-        r += ['', '']
+        data_list += ['', '']
 
         curs.execute('select data from other where name = "logo"')
-        d = curs.fetchall()
-        if(d and d[0][0] != ''):
-            r += [d[0][0]]
+        db_data = curs.fetchall()
+        if(db_data and db_data[0][0] != ''):
+            data_list += [db_data[0][0]]
         else:
-            r += [r[0]]
+            data_list += [data_list[0]]
             
         curs.execute("select data from other where name = 'head'")
-        d = curs.fetchall()
-        if(d and d[0][0] != ''):
-            r += [d[0][0]]
+        db_data = curs.fetchall()
+        if(db_data and db_data[0][0] != ''):
+            data_list += [db_data[0][0]]
         else:
-            r += ['']
+            data_list += ['']
 
-        return(r)
+        return(data_list)
 
     if(num == 2):
-        d = '위키:대문'
+        var_data = '위키:대문'
         curs.execute('select data from other where name = "frontpage"')
     elif(num == 3):
-        d = '2'
+        var_data = '2'
         curs.execute('select data from other where name = "upload"')
     
-    r = curs.fetchall()
-    if(r and r[0][0] != ''):
-        return(r[0][0])
+    db_data = curs.fetchall()
+    if(db_data and db_data[0][0] != ''):
+        return(db_data[0][0])
     else:
-        return(d)
+        return(var_data)
 
 def diff(seqm, num):
     output= []
@@ -210,20 +210,20 @@ def ip_pas(raw_ip):
 def custom():
     session = request.environ.get('beaker.session')
     try:
-        d4 = format(session['MyMaiToNight'])
+        user_head = format(session['MyMaiToNight'])
     except:
-        d4 = ''
+        user_head = ''
 
     if(session.get('Now') == 1):
         curs.execute('select name from alarm limit 1')
         if(curs.fetchall()):
-            d3 = 2
+            user_icon = 2
         else:
-            d3 = 1
+            user_icon = 1
     else:
-        d3 = 0
+        user_icon = 0
 
-    return(['', '', d3, d4])
+    return(['', '', user_head, user_icon])
 
 def acl_check(name):
     ip = ip_check()
