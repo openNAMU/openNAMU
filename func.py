@@ -36,9 +36,14 @@ def captcha_get():
 
     return(data)
 
-def captcha_post():
+def captcha_post(num = 1):
     session = request.environ.get('beaker.session')
-    if(re.search('\.|:', ip_check()) and session.get('Awaken') != 1):
+    if(num == 1):
+        if(re.search('\.|:', ip_check()) and session.get('Awaken') != 1):
+            return(1)
+        else:
+            return(0)
+    else:
         session['Awaken'] = 1
 
 def get_time():
