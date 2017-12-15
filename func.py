@@ -223,7 +223,7 @@ def custom():
     else:
         user_icon = 0
 
-    return(['', '', user_head, user_icon])
+    return(['', '', user_icon, user_head])
 
 def acl_check(name):
     ip = ip_check()
