@@ -2765,12 +2765,7 @@ def login():
         
         return(redirect('/user'))                            
     else:        
-        curs.execute('select data from other where name = "recaptcha"')
-        recaptcha = curs.fetchall()
-        if(recaptcha and recaptcha[0][0] != ''):
-            plus = recaptcha[0][0] + '<br>'
-        else:
-            plus = ''
+        captcha = captcha_get()
 
         return(
             html_minify(
@@ -2783,7 +2778,7 @@ def login():
                                 <input placeholder="비밀번호" name="pw" type="password"> \
                                 <br> \
                                 <br> \
-                                ' + plus + ' \
+                                ' + captcha + ' \
                                 <button class="btn btn-primary" type="submit">로그인</button> \
                                 <br> \
                                 <br> \
@@ -2962,25 +2957,20 @@ def register():
         
         return(redirect('/login'))
     else:        
-        p = ''
+        contract = ''
         curs.execute('select data from other where name = "contract"')
-        d = curs.fetchall()
-        if(d and d[0][0] != ''):
-            p = d[0][0] + '<br><br>'
+        data = curs.fetchall()
+        if(data and data[0][0] != ''):
+            contract = data[0][0] + '<br><br>'
 
-        curs.execute('select data from other where name = "recaptcha"')
-        recaptcha = curs.fetchall()
-        if(recaptcha and recaptcha[0][0] != ''):
-            plus = recaptcha[0][0] + '<br>'
-        else:
-            plus = ''
+        captcha = captcha_get()
 
         return(
             html_minify(
                 template('index',    
                     imp = ['회원가입', wiki_set(1), custom(), other2([0, 0])],
                     data = '<form method="post"> \
-                                ' + p + ' \
+                                ' + contract + ' \
                                 <input placeholder="아이디" name="id" type="text"> \
                                 <br> \
                                 <br> \
@@ -2990,7 +2980,7 @@ def register():
                                 <input placeholder="재 확인" name="pw2" type="password"> \
                                 <br> \
                                 <br> \
-                                ' + plus + ' \
+                                ' + captcha + ' \
                                 <button class="btn btn-primary" type="submit">가입</button> \
                                 <br> \
                                 <br> \
@@ -3044,7 +3034,6 @@ def user_ban(name = None):
 
             curs.execute("insert into ban (block, end, why, band) values (?, ?, ?, ?)", [name, end, request.forms.why, band_d])
 
-        print(request.forms.login_ok)
         if(request.forms.login_ok != ''):
             curs.execute("insert into ok_login (ip, sub) values (?, '')", [name])
 
