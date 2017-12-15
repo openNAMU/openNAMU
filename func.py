@@ -24,6 +24,18 @@ session_opts = {
 
 app = beaker.middleware.SessionMiddleware(app(), session_opts)
 
+def captcha_get():
+    session = request.environ.get('beaker.session')
+
+    plus = ''
+    if(re.search('\.|:', ip_check() and session.get('DREAMER') != 1):
+        curs.execute('select data from other where name = "recaptcha"')
+        recaptcha = curs.fetchall()
+        if(recaptcha and recaptcha[0][0] != ''):
+            plus += recaptcha[0][0] + '<br>'
+
+    return(plus)
+
 def get_time():
     now = time.localtime()
     date = "%04d-%02d-%02d %02d:%02d:%02d" % (now.tm_year, now.tm_mon, now.tm_mday, now.tm_hour, now.tm_min, now.tm_sec)
@@ -50,7 +62,7 @@ def ip_check():
     session = request.environ.get('beaker.session')
     try:
         if(session.get('Now') == 1):
-            ip = format(session['DREAMER'])
+            ip = session['DREAMER']
         else:
             if(request.environ.get('HTTP_X_FORWARDED_FOR')):
                 ip = request.environ.get('HTTP_X_FORWARDED_FOR')
@@ -210,7 +222,7 @@ def ip_pas(raw_ip):
 def custom():
     session = request.environ.get('beaker.session')
     try:
-        user_head = format(session['MyMaiToNight'])
+        user_head = session['MyMaiToNight']
     except:
         user_head = ''
 
