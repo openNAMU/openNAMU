@@ -27,14 +27,19 @@ app = beaker.middleware.SessionMiddleware(app(), session_opts)
 def captcha_get():
     session = request.environ.get('beaker.session')
 
-    plus = ''
-    if(re.search('\.|:', ip_check() and session.get('DREAMER') != 1):
+    data = ''
+    if(re.search('\.|:', ip_check()) and session.get('Awaken') != 1):
         curs.execute('select data from other where name = "recaptcha"')
         recaptcha = curs.fetchall()
         if(recaptcha and recaptcha[0][0] != ''):
-            plus += recaptcha[0][0] + '<br>'
+            data += recaptcha[0][0] + '<br>'
 
-    return(plus)
+    return(data)
+
+def captcha_post():
+    session = request.environ.get('beaker.session')
+    if(re.search('\.|:', ip_check()) and session.get('Awaken') != 1):
+        session['Awaken'] = 1
 
 def get_time():
     now = time.localtime()
