@@ -53,7 +53,7 @@ from func import *
 
 BaseRequest.MEMFILE_MAX = 1000 ** 4
 
-r_ver = '2.4.5'
+r_ver = '2.4.6'
 
 # 스킨 불러오기 부분
 TEMPLATE_PATH.insert(0, skin_check())
@@ -3024,7 +3024,7 @@ def register():
                                 <input placeholder="비밀번호" name="pw" type="password"> \
                                 <br> \
                                 <br> \
-                                <input placeholder="재 확인" name="pw2" type="password"> \
+                                <input placeholder="다시" name="pw2" type="password"> \
                                 <br> \
                                 <br> \
                                 ' + captcha + ' \
@@ -3252,12 +3252,13 @@ def acl(name = None):
         curs.execute("select acl from data where title = ?", [name])
         if(curs.fetchall()):
             if(request.forms.select == 'admin'):
-                curs.execute("update data set acl = 'admin' where title = ?", [name])
+                acl = 'admin'
             elif(request.forms.select == 'user'):
-                curs.execute("update data set acl = 'user' where title = ?", [name])
+                acl = 'user'
             else:
-                curs.execute("update data set acl = '' where title = ?", [name])
+                acl = ''
                 
+            curs.execute("update data set acl = ? where title = ?", [acl, name])    
             conn.commit()
             
         return(redirect('/w/' + url_pas(name)))            
@@ -3279,17 +3280,16 @@ def acl(name = None):
                 html_minify(
                     template('index', 
                         imp = [name, wiki_set(1), custom(), other2([' (ACL)', 0])],
-                        data = '<span>현재 ACL : ' + now + '</span> \
-                                <br> \
-                                <br> \
+                        data = '<span>현재 ACL : ' + now + '</span><br><br> \
                                 <form method="post"> \
                                     <select name="select"> \
                                         <option value="admin" selected="selected">관리자</option> \
                                         <option value="user">가입자</option> \
                                         <option value="normal">일반</option> \
                                     </select> \
-                                    <br> \
-                                    <br> \
+                                    <br><br> \
+                                    <input placeholder="사유" name="why"> \
+                                    <br><br> \
                                     <button class="btn btn-primary" type="submit">ACL 변경</button> \
                                 </form>',
                         menu = [['w/' + url_pas(name), '문서'], ['manager', '관리자']]
