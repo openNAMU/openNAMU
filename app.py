@@ -1505,6 +1505,10 @@ def revert(name = None, num = None):
     today = get_time()
     
     if(request.method == 'POST'):
+        if(not request.forms.get('g-recaptcha-response')):
+            captcha_post()
+            return(re_error('/error/13'))
+
         curs.execute("select title from hidhi where title = ? and re = ?", [name, str(num)])
         if(curs.fetchall() and admin_check(6, None) != 1):
             return(re_error('/error/3'))
@@ -1546,21 +1550,23 @@ def revert(name = None, num = None):
         if(not curs.fetchall()):
             return(redirect('/w/' + url_pas(name)))
 
-        l = custom()
-        if(l[2] == 0):
-            plus = '<span>비 로그인 상태입니다. 비 로그인으로 진행 시 아이피가 역사에 기록됩니다.</span><br><br>'
+        custom_data = custom()
+        captcha = captcha_get()
+        if(custom_data[2] == 0):
+            ip_warring = '<span>비 로그인 상태입니다. 비 로그인으로 진행 시 아이피가 역사에 기록됩니다.</span><br><br>'
         else:
-            plus = ''
+            ip_warring = ''
 
         return(
             html_minify(
                 template('index', 
-                    imp = [name, wiki_set(1), l, other2([' (되돌리기)', 0])],
-                    data =  plus + ' \
+                    imp = [name, wiki_set(1), custom_data, other2([' (되돌리기)', 0])],
+                    data =  ip_warring + ' \
                             <form method="post"> \
                                 <input placeholder="사유" class="form-control input-sm" name="send" type="text"> \
                                 <br> \
                                 <br> \
+                                ' + captcha + ' \
                                 <button class="btn btn-primary" type="submit">되돌리기</button> \
                             </form>',
                     menu = [['history/' + url_pas(name), '역사'], ['recent_changes', '최근 변경']]
@@ -1636,6 +1642,10 @@ def edit(name = None, name2 = None, num = None):
         return(re_error('/ban'))
     
     if(request.method == 'POST'):
+        if(not request.forms.get('g-recaptcha-response')):
+            captcha_post()
+            return(re_error('/error/13'))
+
         if(len(request.forms.send) > 500):
             return(re_error('/error/15'))
 
@@ -1707,38 +1717,41 @@ def edit(name = None, name2 = None, num = None):
             
         data2 = data
         if(not num):
-            p = '<form method="post" id="get_edit" action="/edit_get/' + url_pas(name) + '"> \
+            get_name = '<form method="post" id="get_edit" action="/edit_get/' + url_pas(name) + '"> \
                     <input placeholder="불러 올 문서" name="name" style="width: 50%;" type="text"> \
                     <button id="preview" class="btn" type="submit">불러오기</button> \
                 </form> \
                 <br>'
         else:
-            p = ''
+            get_name = ''
             
+        captcha = captcha_get()
         if(name2):
             curs.execute("select data from data where title = ?", [name2])
-            d1 = curs.fetchall()
-            if(d1):
-                data = d1[0][0]
-                p = ''
+            get_data = curs.fetchall()
+            if(get_data):
+                data = get_data[0][0]
+                get_name = ''
 
         return(
             html_minify(
                 template('index', 
                     imp = [name, wiki_set(1), custom(), other2([' (수정)', 0])],
-                    data = p + '<form method="post" action="/edit/' + url_pas(name) + action + '"> \
-                                    <textarea rows="25" name="content">' + html.escape(data) + '</textarea> \
-                                    <textarea style="display: none;" name="otent">' + html.escape(data2) + '</textarea> \
-                                    <br> \
-                                    <br> \
-                                    <input placeholder="사유" name="send" type="text"> \
-                                    <br> \
-                                    <br> \
-                                    <div class="form-actions"> \
-                                        <button id="preview" class="btn btn-primary" type="submit">저장</button> \
-                                        <button id="preview" class="btn" type="submit" formaction="/preview/' + url_pas(name) + action + '">미리보기</button> \
-                                    </div> \
-                                </form>',
+                    data = get_name + ' \
+                            <form method="post" action="/edit/' + url_pas(name) + action + '"> \
+                                <textarea rows="25" name="content">' + html.escape(data) + '</textarea> \
+                                <textarea style="display: none;" name="otent">' + html.escape(data2) + '</textarea> \
+                                <br> \
+                                <br> \
+                                <input placeholder="사유" name="send" type="text"> \
+                                <br> \
+                                <br> \
+                                <div class="form-actions"> \
+                                    ' + captcha + ' \
+                                    <button id="preview" class="btn btn-primary" type="submit">저장</button> \
+                                    <button id="preview" class="btn" type="submit" formaction="/preview/' + url_pas(name) + action + '">미리보기</button> \
+                                </div> \
+                            </form>',
                     menu = [['w/' + url_pas(name), '문서']]
                 )
             )
@@ -1798,6 +1811,10 @@ def delete(name = None):
         return(re_error('/ban'))
     
     if(request.method == 'POST'):
+        if(not request.forms.get('g-recaptcha-response')):
+            captcha_post()
+            return(re_error('/error/13'))
+
         curs.execute("select data from data where title = ?", [name])
         data = curs.fetchall()
         if(data):
@@ -1820,21 +1837,23 @@ def delete(name = None):
         if(not curs.fetchall()):
             return(redirect('/w/' + url_pas(name)))
 
-        l = custom()
-        if(l[2] == 0):
-            plus = '<span>비 로그인 상태입니다. 비 로그인으로 진행 시 아이피가 역사에 기록됩니다.</span><br><br>'
+        custom_data = custom()
+        captcha = captcha_get()
+        if(custom_data[2] == 0):
+            ip_warring = '<span>비 로그인 상태입니다. 비 로그인으로 진행 시 아이피가 역사에 기록됩니다.</span><br><br>'
         else:
-            plus = ''
+            ip_warring = ''
 
         return(
             html_minify(
                 template('index', 
-                    imp = [name, wiki_set(1), l, other2([' (삭제)', 0])],
+                    imp = [name, wiki_set(1), custom_data, other2([' (삭제)', 0])],
                     data = '<form method="post"> \
-                                ' + plus + ' \
+                                ' + ip_warring + ' \
                                 <input placeholder="사유" class="form-control input-sm" name="send" type="text"> \
                                 <br> \
                                 <br> \
+                                ' + captcha + ' \
                                 <button class="btn btn-primary" type="submit">삭제</button> \
                             </form>',
                     menu = [['w/' + url_pas(name), '문서']]
@@ -1884,6 +1903,10 @@ def move(name = None):
         return(re_error('/ban'))
     
     if(request.method == 'POST'):
+        if(not request.forms.get('g-recaptcha-response')):
+            captcha_post()
+            return(re_error('/error/13'))
+
         curs.execute("select title from history where title = ?", [request.forms.title])
         if(curs.fetchall()):
             return(re_error('/error/19'))
@@ -1912,24 +1935,26 @@ def move(name = None):
         
         return(redirect('/w/' + url_pas(request.forms.title)))
     else:
-        c = custom()
-        if(c[2] == 0):
-            plus = '<span>비 로그인 상태입니다. 비 로그인으로 진행 시 아이피가 역사에 기록됩니다.</span><br><br>'
+        custom_data = custom()
+        captcha = captcha_get()
+        if(custom_data[2] == 0):
+            ip_warring = '<span>비 로그인 상태입니다. 비 로그인으로 진행 시 아이피가 역사에 기록됩니다.</span><br><br>'
         else:
-            plus = ''
+            ip_warring = ''
             
         return(
             html_minify(
                 template('index', 
-                    imp = [name, wiki_set(1), c, other2([' (이동)', 0])],
+                    imp = [name, wiki_set(1), custom_data, other2([' (이동)', 0])],
                     data = '<form method="post"> \
-                                ' + plus + ' \
+                                ' + ip_warring + ' \
                                 <input placeholder="문서명" class="form-control input-sm" value="' + name + '" name="title" type="text"> \
                                 <br> \
                                 <br> \
                                 <input placeholder="사유" class="form-control input-sm" name="send" type="text"> \
                                 <br> \
                                 <br> \
+                                ' + captcha + ' \
                                 <button class="btn btn-primary" type="submit">이동</button> \
                             </form>',
                     menu = [['w/' + url_pas(name), '문서']]
@@ -2458,6 +2483,10 @@ def topic(name = None, sub = None):
     admin = admin_check(3, None)
     
     if(request.method == 'POST'):
+        if(not request.forms.get('g-recaptcha-response')):
+            captcha_post()
+            return(re_error('/error/13'))
+
         ip = ip_check()
         today = get_time()
 
@@ -2616,28 +2645,24 @@ def topic(name = None, sub = None):
                 
             i += 1
 
-        l = custom()
+        custom_data = custom()
+        captcha = captcha_get()
         if(ban != 1):
-            data = '<a id="reload" href="javascript:void(0);" onclick="location.href.endsWith(\'#reload\') ?  location.reload(true) : location.href = \'#reload\'"> \
-                        <i aria-hidden="true" class="fa fa-refresh"></i> \
-                    </a> \
-                    <form style="' + s + '" method="post"> \
-                        <br> \
-                        <textarea style="height: 100px;" name="content"></textarea> \
-                        <br> \
-                        <br> \
-                        <button class="btn btn-primary" type="submit">전송</button> \
-                    </form>'
+            data = '<a id="reload" href="javascript:void(0);" onclick="location.href.endsWith(\'#reload\') ?  location.reload(true) : location.href = \'#reload\'"><i aria-hidden="true" class="fa fa-refresh"></i></a>'
+            data += '<form style="' + s + '" method="post"><br><textarea style="height: 100px;" name="content"></textarea><br><br>' + captcha
 
-            if(l[2] == 0 and s == ''):
-                data += '<span>비 로그인 상태입니다. 비 로그인으로 진행 시 아이피가 토론에 기록됩니다.</span>'
+            if(custom_data[2] == 0 and s == ''):
+                data += '<span>비 로그인 상태입니다. 비 로그인으로 진행 시 아이피가 토론에 기록됩니다.</span><br><br>'
+
+            data += '<button class="btn btn-primary" type="submit">전송</button></form>'
+
         else:
             data = ''
 
         return(
             html_minify(
                 template('index', 
-                    imp = [name, wiki_set(1), l, other2([' (토론)', 0])],
+                    imp = [name, wiki_set(1), custom_data, other2([' (토론)', 0])],
                     data =  '<h2 style="margin-top: 0px;">' + sub + '</h2> \
                             <br> \
                             ' + div + ' \
@@ -2651,7 +2676,6 @@ def topic(name = None, sub = None):
 @route('/topic/<name:path>/<tool:path>', method=['GET'])
 def close_topic_list(name = None, tool = None):
     div = ''
-    i = 0
     list_d = 0
 
     if(request.method == 'POST'):
@@ -2700,9 +2724,10 @@ def close_topic_list(name = None, tool = None):
                         it_p = 1
                 
                 if(it_p != 1):
-                    div += '<h2><a href="/topic/' + url_pas(name) + '/sub/' + url_pas(data[0]) + '">' + str((i + 1)) + '. ' + data[0] + '</a></h2>'
-                
-                i += 1
+                    div += '<h2><a href="/topic/' + url_pas(name) + '/sub/' + url_pas(data[0]) + '">' + data[0] + '</a></h2>'
+
+        if(div == ''):
+            plus = re.sub('^<br>', '', plus)
         
         return(
             html_minify(
@@ -2740,6 +2765,7 @@ def login():
         
     if(request.method == 'POST'):        
         if(not request.forms.get('g-recaptcha-response')):
+            captcha_post()
             return(re_error('/error/13'))
 
         curs.execute("select pw from user where id = ?", [request.forms.id])
@@ -2930,6 +2956,7 @@ def register():
     
     if(request.method == 'POST'): 
         if(not request.forms.get('g-recaptcha-response')):
+            captcha_post()
             return(re_error('/error/13'))
 
         if(request.forms.pw != request.forms.pw2):
@@ -3712,8 +3739,8 @@ def user_info():
         
     ip = ip_pas(ip)
 
-    l = custom()
-    if(l[2] != 0):
+    custom_data = custom()
+    if(custom_data[2] != 0):
         plus = ' * [[wiki:logout|로그아웃]]\r\n * [[wiki:change|비밀번호 변경]]'
     else:
         plus = ' * [[wiki:login|로그인]]'
@@ -3721,7 +3748,7 @@ def user_info():
     return(
         html_minify(
             template('index', 
-                imp = ['사용자 메뉴', wiki_set(1), l, other2([0, 0])],
+                imp = ['사용자 메뉴', wiki_set(1), custom_data, other2([0, 0])],
                 data =  ip + '<br><br>' + namumark(conn, '',  '권한 상태 : ' + acl + '\r\n' + \
                                                         '[목차(없음)]\r\n' + \
                                                         '== 로그인 ==\r\n' + \
