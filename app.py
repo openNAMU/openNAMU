@@ -1506,8 +1506,10 @@ def revert(name = None, num = None):
     
     if(request.method == 'POST'):
         if(not request.forms.get('g-recaptcha-response')):
-            captcha_post()
-            return(re_error('/error/13'))
+            if(captcha_post() == 1):
+                return(re_error('/error/13'))
+            else:
+                captcha_post(0)
 
         curs.execute("select title from hidhi where title = ? and re = ?", [name, str(num)])
         if(curs.fetchall() and admin_check(6, None) != 1):
@@ -1643,8 +1645,10 @@ def edit(name = None, name2 = None, num = None):
     
     if(request.method == 'POST'):
         if(not request.forms.get('g-recaptcha-response')):
-            captcha_post()
-            return(re_error('/error/13'))
+            if(captcha_post() == 1):
+                return(re_error('/error/13'))
+            else:
+                captcha_post(0)
 
         if(len(request.forms.send) > 500):
             return(re_error('/error/15'))
@@ -1764,6 +1768,12 @@ def edit_get(name = None):
 @route('/preview/<name:path>', method=['POST'])
 @route('/preview/<name:path>/section/<num:int>', method=['POST'])
 def preview(name = None, num = None):
+    if(not request.forms.get('g-recaptcha-response')):
+        if(captcha_post() == 1):
+            return(re_error('/error/13'))
+        else:
+            captcha_post(0)
+
     ip = ip_check()
     can = acl_check(name)
     
@@ -1792,7 +1802,7 @@ def preview(name = None, num = None):
                             <br> \
                             <br> \
                             <div class="form-actions"> \
-                                <button id="save" class="btn btn-primary" type="submit">저장</button> \
+                                <button id="preview" class="btn btn-primary" type="submit">저장</button> \
                                 <button id="preview" class="btn" type="submit" formaction="/preview/' + url_pas(name) + action + '">미리보기</button> \
                             </div> \
                         </form> \
@@ -1812,8 +1822,10 @@ def delete(name = None):
     
     if(request.method == 'POST'):
         if(not request.forms.get('g-recaptcha-response')):
-            captcha_post()
-            return(re_error('/error/13'))
+            if(captcha_post() == 1):
+                return(re_error('/error/13'))
+            else:
+                captcha_post(0)
 
         curs.execute("select data from data where title = ?", [name])
         data = curs.fetchall()
@@ -1904,8 +1916,10 @@ def move(name = None):
     
     if(request.method == 'POST'):
         if(not request.forms.get('g-recaptcha-response')):
-            captcha_post()
-            return(re_error('/error/13'))
+            if(captcha_post() == 1):
+                return(re_error('/error/13'))
+            else:
+                captcha_post(0)
 
         curs.execute("select title from history where title = ?", [request.forms.title])
         if(curs.fetchall()):
@@ -2484,8 +2498,10 @@ def topic(name = None, sub = None):
     
     if(request.method == 'POST'):
         if(not request.forms.get('g-recaptcha-response')):
-            captcha_post()
-            return(re_error('/error/13'))
+            if(captcha_post() == 1):
+                return(re_error('/error/13'))
+            else:
+                captcha_post(0)
 
         ip = ip_check()
         today = get_time()
@@ -2765,8 +2781,10 @@ def login():
         
     if(request.method == 'POST'):        
         if(not request.forms.get('g-recaptcha-response')):
-            captcha_post()
-            return(re_error('/error/13'))
+            if(captcha_post() == 1):
+                return(re_error('/error/13'))
+            else:
+                captcha_post(0)
 
         curs.execute("select pw from user where id = ?", [request.forms.id])
         user = curs.fetchall()
@@ -2956,8 +2974,10 @@ def register():
     
     if(request.method == 'POST'): 
         if(not request.forms.get('g-recaptcha-response')):
-            captcha_post()
-            return(re_error('/error/13'))
+            if(captcha_post() == 1):
+                return(re_error('/error/13'))
+            else:
+                captcha_post(0)
 
         if(request.forms.pw != request.forms.pw2):
             return(re_error('/error/20'))
