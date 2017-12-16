@@ -39,7 +39,7 @@ def captcha_get():
 def captcha_post(num = 1):
     session = request.environ.get('beaker.session')
     if(num == 1):
-        if(re.search('\.|:', ip_check()) and session.get('Awaken') != 1):
+        if(re.search('\.|:', ip_check()) and session.get('Awaken') != 1 and captcha_get() != ''):
             return(1)
         else:
             return(0)
