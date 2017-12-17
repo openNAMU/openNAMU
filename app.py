@@ -503,7 +503,7 @@ def edit_set(num = 0):
                         data =  '<span>&lt;style&gt;CSS&lt;/style&gt;<br>&lt;script&gt;JS&lt;/script&gt;</span><br><br> \
                                 <form method="post"> \
                                     <textarea rows="25" name="content">' + html.escape(data) + '</textarea><br><br> \
-                                    <div class="form-actions"><button class="btn btn-primary" type="submit">저장</button></div> \
+                                    <button class="btn btn-primary" type="submit">저장</button> \
                                 </form>',
                         menu = [['edit_set', '설정 편집']]
                     )
@@ -535,7 +535,7 @@ def edit_set(num = 0):
                         data =  '<a href="/robots.txt">상태 보기</a><br><br> \
                                 <form method="post"> \
                                     <textarea rows="25" name="content">' + html.escape(data) + '</textarea><br><br> \
-                                    <div class="form-actions"><button class="btn btn-primary" type="submit">저장</button></div> \
+                                    <button class="btn btn-primary" type="submit">저장</button> \
                                 </form>',
                         menu = [['edit_set', '설정 편집']]
                     )
@@ -718,12 +718,7 @@ def admin_plus(name = None):
             html_minify(
                 template('index', 
                     imp = ['관리 그룹 추가', wiki_set(conn, 1), custom(conn), other2([0, 0])],
-                    data = '<form method="post">' \
-                                + data + \
-                                '<div class="form-actions"> \
-                                    <button ' + state +  ' class="btn btn-primary" type="submit">저장</button> \
-                                </div> \
-                            </form>',
+                    data = '<form method="post">' + data + '<button ' + state +  ' class="btn btn-primary" type="submit">저장</button></form>',
                     menu = [['manager', '관리자']]
                 )
             )
@@ -1542,28 +1537,11 @@ def m_del():
             html_minify(
                 template('index', 
                     imp = ['많은 문서 삭제', wiki_set(conn, 1), custom(conn), other2([0, 0])],
-                    data = '<span> \
-                                문서명 A \
-                                <br> \
-                                문서명 B \
-                                <br> \
-                                문서명 C \
-                                <br> \
-                                <br> \
-                                이런 식으로 적으세요. \
-                            </span> \
-                            <br> \
-                            <br> \
+                    data = '<span>문서명 A<br>문서명 B<br>문서명 C<br><br>이런 식으로 적으세요.</span><br><br> \
                             <form method="post"> \
-                                <textarea rows="25" name="content"></textarea> \
-                                <br> \
-                                <br> \
-                                <input placeholder="사유" class="form-control input-sm" name="send" type="text"> \
-                                <br> \
-                                <br> \
-                                <div class="form-actions"> \
-                                    <button class="btn btn-primary" type="submit">삭제</button> \
-                                </div> \
+                                <textarea rows="25" name="content"></textarea><br><br> \
+                                <input placeholder="사유" class="form-control input-sm" name="send" type="text"><br><br> \
+                                <button class="btn btn-primary" type="submit">삭제</button> \
                             </form>',
                     menu = [['manager', '관리자']]
                 )
@@ -1659,10 +1637,9 @@ def edit(name = None, name2 = None, num = None):
         data2 = data
         if(not num):
             get_name = '<form method="post" id="get_edit" action="/edit_get/' + url_pas(name) + '"> \
-                    <input placeholder="불러 올 문서" name="name" style="width: 50%;" type="text"> \
-                    <button id="preview" class="btn" type="submit">불러오기</button> \
-                </form> \
-                <br>'
+                            <input placeholder="불러 올 문서" name="name" style="width: 50%;" type="text"> \
+                            <button id="preview" class="btn" type="submit">불러오기</button> \
+                        </form><br>'
         else:
             get_name = ''
             
@@ -1681,17 +1658,11 @@ def edit(name = None, name2 = None, num = None):
                     data = get_name + ' \
                             <form method="post" action="/edit/' + url_pas(name) + action + '"> \
                                 <textarea rows="25" name="content">' + html.escape(data) + '</textarea> \
-                                <textarea style="display: none;" name="otent">' + html.escape(data2) + '</textarea> \
-                                <br> \
-                                <br> \
-                                <input placeholder="사유" name="send" type="text"> \
-                                <br> \
-                                <br> \
-                                <div class="form-actions"> \
-                                    ' + captcha + ' \
-                                    <button id="preview" class="btn btn-primary" type="submit">저장</button> \
-                                    <button id="preview" class="btn" type="submit" formaction="/preview/' + url_pas(name) + action + '">미리보기</button> \
-                                </div> \
+                                <textarea style="display: none;" name="otent">' + html.escape(data2) + '</textarea><br><br> \
+                                <input placeholder="사유" name="send" type="text"><br><br> \
+                                ' + captcha + ' \
+                                <button id="preview" class="btn btn-primary" type="submit">저장</button> \
+                                <button id="preview" class="btn" type="submit" formaction="/preview/' + url_pas(name) + action + '">미리보기</button> \
                             </form>',
                     menu = [['w/' + url_pas(name), '문서']]
                 )
@@ -1732,18 +1703,11 @@ def preview(name = None, num = None):
                 imp = [name, wiki_set(conn, 1), custom(conn), other2([' (미리보기)', 0])],
                 data = '<form method="post" action="/edit/' + url_pas(name) + action + '"> \
                             <textarea rows="25" name="content">' + html.escape(request.forms.content) + '</textarea> \
-                            <textarea style="display: none;" name="otent">' + html.escape(request.forms.otent) + '</textarea> \
-                            <br> \
-                            <br> \
-                            <input placeholder="사유" name="send" type="text"> \
-                            <br> \
-                            <br> \
-                            <div class="form-actions"> \
-                                <button id="preview" class="btn btn-primary" type="submit">저장</button> \
-                                <button id="preview" class="btn" type="submit" formaction="/preview/' + url_pas(name) + action + '">미리보기</button> \
-                            </div> \
-                        </form> \
-                        <br><br>' + enddata,
+                            <textarea style="display: none;" name="otent">' + html.escape(request.forms.otent) + '</textarea><br><br> \
+                            <input placeholder="사유" name="send" type="text"><br><br> \
+                            <button id="preview" class="btn btn-primary" type="submit">저장</button> \
+                            <button id="preview" class="btn" type="submit" formaction="/preview/' + url_pas(name) + action + '">미리보기</button> \
+                        </form><br><br>' + enddata,
                 menu = [['w/' + url_pas(name), '문서']]
             )
         )
@@ -3787,14 +3751,8 @@ def custom_head_view():
                     imp = ['사용자 HEAD', wiki_set(conn, 1), custom(conn), other2([0, 0])],
                     data =  start + ' \
                             <form method="post"> \
-                                <textarea rows="25" cols="100" name="content">'\
-                                     + data + \
-                                '</textarea> \
-                                <br> \
-                                <br> \
-                                <div class="form-actions"> \
-                                    <button class="btn btn-primary" type="submit">저장</button> \
-                                </div> \
+                                <textarea rows="25" cols="100" name="content">' + data + '</textarea><br><br> \
+                                <button class="btn btn-primary" type="submit">저장</button> \
                             </form>',
                     menu = [['user', '사용자']]
                 )
