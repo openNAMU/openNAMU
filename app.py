@@ -2042,178 +2042,147 @@ def topic(name = None, sub = None):
 
         ip = ip_check()
         today = get_time()
-
         if(ban == 1 and admin != 1):
             return(re_error(conn, '/ban'))
         
         curs.execute("select id from topic where title = ? and sub = ? order by id + 0 desc limit 1", [name, sub])
-        old_n = curs.fetchall()
-        if(old_n):
-            num = int(old_n[0][0]) + 1
+        old_num = curs.fetchall()
+        if(old_num):
+            num = int(old_num[0][0]) + 1
         else:
             num = 1
 
-            m = re.search('^사용자:([^/]+)', name)
-            if(m):
-                d = m.groups()
-                curs.execute('insert into alarm (name, data, date) values (?, ?, ?)', [d[0], ip + '님이 <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '">사용자 토론</a>을 시작했습니다.', today])
+        match = re.search('^사용자:([^/]+)', name)
+        if(match):
+            curs.execute('insert into alarm (name, data, date) values (?, ?, ?)', [match.groups()[0], ip + '님이 <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '">사용자 토론</a>을 시작했습니다.', today])
         
         rd_plus(conn, name, sub, today)
         data = re.sub("\[\[(분류:(?:(?:(?!\]\]).)*))\]\]", "[br]", request.forms.content)
-        m = re.findall("(?:#([0-9]+))", data)
-        for da in m:
-            curs.execute("select ip from topic where title = ? and sub = ? and id = ?", [name, sub, da])
-            ip_d = curs.fetchall()
-            if(ip_d):
-                if(not re.search('(\.|:)', ip_d[0][0])):
-                    curs.execute('insert into alarm (name, data, date) values (?, ?, ?)', [ip_d[0][0], ip + '님이 <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '#' + str(num) + '">토론</a>에서 언급 했습니다.', today])
+        match = re.findall("(?:#([0-9]+))", data)
+        for rd_data in match:
+            curs.execute("select ip from topic where title = ? and sub = ? and id = ?", [name, sub, rd_data])
+            ip_data = curs.fetchall()
+            if(ip_data and not re.search('(\.|:)', ip_data[0][0])):
+                curs.execute('insert into alarm (name, data, date) values (?, ?, ?)', [ip_data[0][0], ip + '님이 <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '#' + str(num) + '">토론</a>에서 언급 했습니다.', today])
             data = re.sub("(?P<in>#(?:[0-9]+))", '[[\g<in>]]', data)
 
         data = savemark(data)
-        
         curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, ?, ?, ?, '', '')", [str(num), name, sub, data, today, ip])
         conn.commit()
         
         return(redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub)))
     else:
-        s = ''
-        div = ''
-
         curs.execute("select title from stop where title = ? and sub = ? and close = 'O'", [name, sub])
-        cd = curs.fetchall()
+        close_data = curs.fetchall()
 
         curs.execute("select title from stop where title = ? and sub = ? and close = ''", [name, sub])
-        sd = curs.fetchall()
+        stop_data = curs.fetchall()
         
+        display = ''
+        all_data = ''
         if(admin == 1):
-            if(cd):
-                div += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/close">(열기)</a> '
+            if(close_data):
+                all_data += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/close">(열기)</a> '
             else:
-                div += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/close">(닫기)</a> '
+                all_data += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/close">(닫기)</a> '
             
-            if(sd):
-                div += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/stop">(재개)</a> '
+            if(stop_data):
+                all_data += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/stop">(재개)</a> '
             else:
-                div += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/stop">(정지)</a> '
+                all_data += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/stop">(정지)</a> '
 
             curs.execute("select title from agreedis where title = ? and sub = ?", [name, sub])
             if(curs.fetchall()):
-                div += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/agree">(합의)</a>'
+                all_data += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/agree">(합의)</a>'
             else:
-                div += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/agree">(취소)</a>'
+                all_data += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/agree">(취소)</a>'
             
-            div += '<br><br>'
+            all_data += '<br><br>'
         
-        if((sd or cd) and admin != 1):
-            s = 'display: none;'
+        if(close_data or stop_data and admin != 1):
+            display = 'display: none;'
         
         curs.execute("select data, id, date, ip, block, top from topic where title = ? and sub = ? order by id + 0 asc", [name, sub])
-        t1 = curs.fetchall()
+        topic_1 = curs.fetchall()
 
         curs.execute("select data, id, date, ip from topic where title = ? and sub = ? and top = 'O' order by id + 0 asc", [name, sub])
-        t2 = curs.fetchall()
+        topic_2 = curs.fetchall()
 
-        for d in t2:                   
-            a = ''
-            curs.execute("select who from re_admin where what = ? order by time desc limit 1", ['notice (' + name + ' - ' + sub + '#' + d[1] + ')'])
-            m = curs.fetchall()
-            if(m):
-                a += ' @' + m[0][0]
+        for topic_data in topic_2:                   
+            who_plus = ''
+            curs.execute("select who from re_admin where what = ? order by time desc limit 1", ['notice (' + name + ' - ' + sub + '#' + topic_data[1] + ')'])
+            topic_data_top = curs.fetchall()
+            if(topic_data_top):
+                who_plus += ' @' + topic_data_top[0][0]
                                 
-            div += '<table id="toron"> \
-                        <tbody> \
-                            <tr> \
-                                <td id="toron_color_red"> \
-                                    <a href="#' + d[1] + '">#' + d[1] + '</a> ' + ip_pas(conn, d[3]) + a + ' <span style="float: right;">' + d[2] + '</span> \
-                                </td> \
-                            </tr> \
-                            <tr> \
-                                <td>' + namumark(conn, '', d[0], 0, 0, 0) + '</td> \
-                            </tr> \
-                        </tbody> \
-                    </table> \
-                    <br>'
+            all_data += '<table id="toron"><tbody><tr><td id="toron_color_red">'
+            all_data += '<a href="#' + topic_data[1] + '">#' + topic_data[1] + '</a> ' + ip_pas(conn, topic_data[3]) + who_plus + ' <span style="float: right;">' + topic_data[2] + '</span>'
+            all_data += '</td></tr><tr><td>' + namumark(conn, '', topic_data[0], 0, 0, 0) + '</td></tr></tbody></table><br>'
                     
-        i = 1          
-        for d in t1:
-            if(i == 1):
-                start = d[3]
+        number = 1          
+        for topic_data in topic_1:
+            if(number == 1):
+                start = topic_data[3]
             
-            p = d[0]
-            if(d[4] == 'O'):
-                bd = 'style="background: gainsboro;"'
+            user_write = topic_data[0]
+            if(topic_data[4] == 'O'):
+                blind_data = 'style="background: gainsboro;"'
                 if(admin != 1):
-                    curs.execute("select who from re_admin where what = ? order by time desc limit 1", ['blind (' + name + ' - ' + sub + '#' + str(i) + ')'])
-                    b = curs.fetchall()
-                    if(b):
-                        p = '[[사용자:' + b[0][0] + ']]님이 가림'
+                    curs.execute("select who from re_admin where what = ? order by time desc limit 1", ['blind (' + name + ' - ' + sub + '#' + str(number) + ')'])
+                    who_blind = curs.fetchall()
+                    if(who_blind):
+                        user_write = '[[사용자:' + who_blind[0][0] + ']]님이 가림'
                     else:
-                        p = '관리자가 가림'
+                        user_write = '관리자가 가림'
             else:
-                bd = ''
+                blind_data = ''
 
-            p = namumark(conn, '', p, 0, 0, 0)
-
-            ip = ip_pas(conn, d[3])
-
-            curs.execute('select acl from user where id = ?', [d[3]])
+            user_write = namumark(conn, '', user_write, 0, 0, 0)
+            ip = ip_pas(conn, topic_data[3])
+            curs.execute('select acl from user where id = ?', [topic_data[3]])
             user_acl = curs.fetchall()
             if(user_acl and user_acl[0][0] != 'user'):
                 ip += ' <a href="javascript:void(0);" title="관리자">★</a>'
 
-            if(admin == 1 or bd == ''):
-                ip += ' <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/raw/' + str(i) + '">(원본)</a>'
-
+            if(admin == 1 or blind_data == ''):
+                ip += ' <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/raw/' + str(number) + '">(원본)</a>'
                 if(admin == 1):
-                    ip += ' <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/admin/' + str(i) + '">(관리)</a>'
+                    ip += ' <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/admin/' + str(number) + '">(관리)</a>'
 
-            curs.execute("select end from ban where block = ?", [d[3]])
+            curs.execute("select end from ban where block = ?", [topic_data[3]])
             if(curs.fetchall()):
                 ip += ' <a href="javascript:void(0);" title="차단자">†</a>'
                     
-            if(d[5] == '1'):
-                c = '_blue'
-            elif(d[3] == start):
-                c = '_green'
+            if(topic_data[5] == '1'):
+                color = '_blue'
+            elif(topic_data[3] == start):
+                color = '_green'
             else:
-                c = ''
+                color = ''
                 
-            if(p == ''):
-                p = '<br>'
+            if(user_write == ''):
+                user_write = '<br>'
                          
-            div += '<table id="toron"> \
-                        <tbody> \
-                            <tr> \
-                                <td id="toron_color' + c + '"> \
-                                    <a href="javascript:void(0);" id="' + str(i) + '">#' + str(i) + '</a> ' + ip + ' <span style="float: right;">' + d[2] + '</span> \
-                                </td> \
-                            </tr> \
-                            <tr ' + bd + '> \
-                                <td>' + p + '</td> \
-                            </tr> \
-                        </tbody> \
-                    </table> \
-                    <br>'
-                
-            i += 1
+            all_data += '<table id="toron"><tbody><tr><td id="toron_color' + color + '">'
+            all_data += '<a href="javascript:void(0);" id="' + str(number) + '">#' + str(number) + '</a> ' + ip + ' <span style="float: right;">' + topic_data[2] + '</span>'
+            all_data += '</td></tr><tr ' + blind_data + '><td>' + user_write + '</td></tr></tbody></table><br>'
+            number += 1
 
         custom_data = custom(conn)
         captcha = captcha_get(conn)
         if(ban != 1):
             data = '<a id="reload" href="javascript:void(0);" onclick="location.href.endsWith(\'#reload\') ?  location.reload(true) : location.href = \'#reload\'"><i aria-hidden="true" class="fa fa-refresh"></i></a>'
-            data += '<form style="' + s + '" method="post"><br><textarea style="height: 100px;" name="content"></textarea><br><br>' + captcha
-
-            if(custom_data[2] == 0 and s == ''):
+            data += '<form style="' + display + '" method="post"><br><textarea style="height: 100px;" name="content"></textarea><br><br>' + captcha
+            if(custom_data[2] == 0 and display == ''):
                 data += '<span>비 로그인 상태입니다. 비 로그인으로 진행 시 아이피가 토론에 기록됩니다.</span><br><br>'
 
             data += '<button class="btn btn-primary" type="submit">전송</button></form>'
-
         else:
             data = ''
 
         return(html_minify(template('index', 
             imp = [name, wiki_set(conn, 1), custom_data, other2([' (토론)', 0])],
-            data =  '<h2 style="margin-top: 0px;">' + sub + '</h2><br>' + div + data,
+            data =  '<h2 style="margin-top: 0px;">' + sub + '</h2><br>' + all_data + data,
             menu = [['topic/' + url_pas(name), '목록']]
         )))
         
@@ -2249,13 +2218,8 @@ def close_topic_list(name = None, tool = None):
             curs.execute("select sub from rd where title = ? order by date desc", [name])
             sub = '토론 목록'
             menu = [['w/' + url_pas(name), '문서']]
-            plus =  '<br> \
-                    <a href="/topic/' + url_pas(name) + '/close">(닫힘)</a> <a href="/topic/' + url_pas(name) + '/agree">(합의)</a> \
-                    <br> \
-                    <br> \
-                    <input placeholder="토론명" class="form-control" name="topic"> \
-                    <br> \
-                    <br> \
+            plus =  '<br><a href="/topic/' + url_pas(name) + '/close">(닫힘)</a> <a href="/topic/' + url_pas(name) + '/agree">(합의)</a><br><br> \
+                    <input placeholder="토론명" class="form-control" name="topic"><br> \
                     <button class="btn btn-primary" type="submit">만들기</button>'
 
         for data in curs.fetchall():
@@ -2449,7 +2413,7 @@ def user_check(name = None, name2 = None):
     else:
         c = ''
             
-    return(html_minifytemplate('index',    
+    return(html_minify(template('index',    
         imp = ['다중 검사', wiki_set(conn, 1), custom(conn), other2([0, 0])],
         data = c,
         menu = [['manager', '관리자']]
