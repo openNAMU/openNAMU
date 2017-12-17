@@ -10,11 +10,10 @@ from css_html_js_minify import html_minify, js_minify, css_minify
 import time
 import os
 
-json_data = open('set.json').read()
-set_data = json.loads(json_data)
-
-conn = sqlite3.connect(set_data['db'] + '.db')
-curs = conn.cursor()
+from set_mark.macro import get_time
+from set_mark.macro import ip_check
+from set_mark.link import url_pas
+from set_mark.link import sha224
     
 session_opts = {
     'session.type': 'dbm',
@@ -24,8 +23,9 @@ session_opts = {
 
 app = beaker.middleware.SessionMiddleware(app(), session_opts)
 
-def captcha_get():
+def captcha_get(conn):
     session = request.environ.get('beaker.session')
+    curs = conn.cursor()
 
     data = ''
     if(re.search('\.|:', ip_check()) and session.get('Awaken') != 1):
@@ -36,23 +36,18 @@ def captcha_get():
 
     return(data)
 
-def captcha_post(num = 1):
+def captcha_post(conn, num = 1):
     session = request.environ.get('beaker.session')
     if(num == 1):
-        if(re.search('\.|:', ip_check()) and session.get('Awaken') != 1 and captcha_get() != ''):
+        if(re.search('\.|:', ip_check()) and session.get('Awaken') != 1 and captcha_get(conn) != ''):
             return(1)
         else:
             return(0)
     else:
         session['Awaken'] = 1
 
-def get_time():
-    now = time.localtime()
-    date = "%04d-%02d-%02d %02d:%02d:%02d" % (now.tm_year, now.tm_mon, now.tm_mday, now.tm_hour, now.tm_min, now.tm_sec)
-
-    return(date)
-
-def skin_check():
+def skin_check(conn):
+    curs = conn.cursor()
     skin = './views/acme/'
     try:
         curs.execute('select data from other where name = "skin"')
@@ -64,27 +59,6 @@ def skin_check():
         pass
 
     return(skin)
-
-def sha224(data):
-    return(hashlib.sha224(bytes(data, 'utf-8')).hexdigest())
-    
-def ip_check():
-    session = request.environ.get('beaker.session')
-    try:
-        if(session.get('Now') == 1):
-            ip = session['DREAMER']
-        else:
-            if(request.environ.get('HTTP_X_FORWARDED_FOR')):
-                ip = request.environ.get('HTTP_X_FORWARDED_FOR')
-            else:
-                ip = request.environ.get('REMOTE_ADDR')
-    except:
-        ip = 'None'
-
-    return(ip)
-    
-def url_pas(data):
-    return(parse.quote(data).replace('/','%2F'))
 
 def other2(origin):
     div = ''
@@ -100,7 +74,8 @@ def other2(origin):
     re_data = origin + [div]
     return(re_data)    
 
-def wiki_set(num):
+def wiki_set(conn, num):
+    curs = conn.cursor()
     if(num == 1):
         data_list = []
 
@@ -149,27 +124,24 @@ def wiki_set(num):
     else:
         return(var_data)
 
-def diff(seqm, num):
-    output= []
+def diff(seqm):
+    output = []
     for opcode, a0, a1, b0, b1 in seqm.get_opcodes():
-        if(opcode == 'equal' and num == 1):
-            output.append(seqm.a[a0:a1])
-        elif(opcode == 'insert' and num == 0):
-            output.append("<span style='background:#CFC;'>" + seqm.b[b0:b1] + "</span>")
-        elif(opcode == 'delete' and num == 1):
-            output.append("<span style='background:#FDD;'>" + seqm.a[a0:a1] + "</span>")
+        if(opcode == 'equal'):
+            output += [seqm.a[a0:a1]]
+        elif(opcode == 'insert'):
+            output += ["<span style='background:#CFC;'>" + seqm.b[b0:b1] + "</span>"]
+        elif(opcode == 'delete'):
+            output += ["<span style='background:#FDD;'>" + seqm.a[a0:a1] + "</span>"]
         elif(opcode == 'replace'):
-            if(num == 1):
-                output.append("<span style='background:#FDD;'>" + seqm.a[a0:a1] + "</span>")
-            else:
-                output.append("<span style='background:#CFC;'>" + seqm.b[b0:b1] + "</span>")
-        elif(num == 0):
-            output.append(seqm.b[b0:b1])
+            output += ["<span style='background:#FDD;'>" + seqm.a[a0:a1] + "</span>"]
+            output += ["<span style='background:#CFC;'>" + seqm.b[b0:b1] + "</span>"]
             
     return(''.join(output))
            
-def admin_check(num, what):
+def admin_check(conn, num, what):
     ip = ip_check() 
+    curs = conn.cursor()
     curs.execute("select acl from user where id = ?", [ip])
     user = curs.fetchall()
     if(user):
@@ -206,14 +178,15 @@ def admin_check(num, what):
                 else:
                     break
 
-def ip_pas(raw_ip):
+def ip_pas(conn, raw_ip):
     hide = 0
+    curs = conn.cursor()
     if(re.search("(\.|:)", raw_ip)):
         curs.execute("select data from other where name = 'ip_view'")
         d = curs.fetchall()
         if(d and d[0][0] != ''):
             ip = '<span style="font-size: 75%;">' + hashlib.md5(bytes(raw_ip, 'utf-8')).hexdigest() + '</span>'
-            if(not admin_check('ban', None)):
+            if(not admin_check(conn, 'ban', None)):
                 hide = 1
         else:
             ip = raw_ip
@@ -229,7 +202,8 @@ def ip_pas(raw_ip):
 
     return(ip)
 
-def custom():
+def custom(conn):
+    curs = conn.cursor()
     session = request.environ.get('beaker.session')
     try:
         user_head = session['MyMaiToNight']
@@ -247,27 +221,17 @@ def custom():
 
     return(['', '', user_icon, user_head])
 
-def acl_check(name):
+def acl_check(conn, name):
     ip = ip_check()
-    band = re.search("^([0-9]{1,3}\.[0-9]{1,3})", ip)
-    if(band):
-        band_it = band.groups()
-    else:
-        band_it = ['Not']
-
-    curs.execute("select block from ban where block = ? and band = 'O'", [band_it[0]])
-    band_d = curs.fetchall()
-
-    curs.execute("select block from ban where block = ?", [ip])
-    ban_d = curs.fetchall()
-    if(band_d or ban_d):
+    curs = conn.cursor()
+    if(ban_check(conn) == 1):
         return(1)
 
     acl_c = re.search("^사용자:([^/]*)", name)
     if(acl_c):
         acl_n = acl_c.groups()
 
-        if(admin_check(5, None) == 1):
+        if(admin_check(conn, 5, None) == 1):
             return(0)
 
         curs.execute("select acl from data where title = ?", ['사용자:' + acl_n[0]])
@@ -288,30 +252,28 @@ def acl_check(name):
             return(1)
 
     file_c = re.search("^파일:(.*)", name)
-    if(file_c and admin_check(5, 'edit (' + name + ')') != 1):
+    if(file_c and admin_check(conn, 5, 'edit (' + name + ')') != 1):
         return(1)
-
-    curs.execute("select acl from data where title = ?", [name])
-    acl_d = curs.fetchall()
-    if(not acl_d):
-        return(0)
 
     curs.execute("select acl from user where id = ?", [ip])
     user_d = curs.fetchall()
 
+    curs.execute("select acl from data where title = ?", [name])
+    acl_d = curs.fetchall()
+    if(acl_d):
+        if(acl_d[0][0] == 'user'):
+            if(not user_d):
+                return(1)
+
+        if(acl_d[0][0] == 'admin'):
+            if(not user_d):
+                return(1)
+
+            if(not admin_check(conn, 5, 'edit (' + name + ')') == 1):
+                return(1)
+
     curs.execute('select data from other where name = "edit"')
     set_d = curs.fetchall()
-    if(acl_d[0][0] == 'user'):
-        if(not user_d):
-            return(1)
-
-    if(acl_d[0][0] == 'admin'):
-        if(not user_d):
-            return(1)
-
-        if(not admin_check(5, 'edit (' + name + ')') == 1):
-            return(1)
-
     if(set_d):
         if(set_d[0][0] == 'user'):
             if(not user_d):
@@ -321,13 +283,14 @@ def acl_check(name):
             if(not user_d):
                 return(1)
 
-            if(not admin_check(5, None) == 1):
+            if(not admin_check(conn, 5, None) == 1):
                 return(1)
 
     return(0)
 
-def ban_check():
+def ban_check(conn):
     ip = ip_check()
+    curs = conn.cursor()
     band = re.search("^([0-9]{1,3}\.[0-9]{1,3})", ip)
     if(band):
         band_it = band.groups()
@@ -344,20 +307,10 @@ def ban_check():
     
     return(0)
         
-def topic_check(name, sub):
+def topic_check(conn, name, sub):
     ip = ip_check()
-    band = re.search("^([0-9]{1,3}\.[0-9]{1,3})", ip)
-    if(band):
-        band_it = band.groups()
-    else:
-        band_it = ['Not']
-        
-    curs.execute("select block from ban where block = ? and band = 'O'", [band_it[0]])
-    band_d = curs.fetchall()
-
-    curs.execute("select block from ban where block = ?", [ip])
-    ban_d = curs.fetchall()
-    if(band_d or ban_d):
+    curs = conn.cursor()
+    if(ban_check(conn) == 1):
         return(1)
 
     curs.execute("select title from stop where title = ? and sub = ?", [name, sub])
@@ -367,17 +320,20 @@ def topic_check(name, sub):
 
     return(0)
 
-def rd_plus(title, sub, date):
+def rd_plus(conn, title, sub, date):
+    curs = conn.cursor()
     curs.execute("select title from rd where title = ? and sub = ?", [title, sub])
     if(curs.fetchall()):
         curs.execute("update rd set date = ? where title = ? and sub = ?", [date, title, sub])
     else:
         curs.execute("insert into rd (title, sub, date) values (?, ?, ?)", [title, sub, date])
     
-def rb_plus(block, end, today, blocker, why):
+def rb_plus(conn, block, end, today, blocker, why):
+    curs = conn.cursor()
     curs.execute("insert into rb (block, end, today, blocker, why) values (?, ?, ?, ?, ?)", [block, end, today, blocker, why])
 
-def history_plus(title, data, date, ip, send, leng):
+def history_plus(conn, title, data, date, ip, send, leng):
+    curs = conn.cursor()
     curs.execute("select id from history where title = ? order by id + 0 desc limit 1", [title])
     d = curs.fetchall()
     if(d):
@@ -400,11 +356,12 @@ def leng_check(a, b):
 def redirect(data):
     return('<meta http-equiv="refresh" content="0; url=' + data + '">')
 
-def re_error(data):
+def re_error(conn, data):
+    curs = conn.cursor()
     if(data == '/ban'):
         ip = ip_check()
         end = '권한이 맞지 않는 상태 입니다.'
-        if(ban_check() == 1):
+        if(ban_check(conn) == 1):
             curs.execute("select end, why from ban where block = ?", [ip])
             d = curs.fetchall()
             if(not d):
@@ -440,7 +397,7 @@ def re_error(data):
         return(
             html_minify(
                 template('index', 
-                    imp = ['권한 오류', wiki_set(1), custom(), other2([0, 0])],
+                    imp = ['권한 오류', wiki_set(conn, 1), custom(conn), other2([0, 0])],
                     data = end,
                     menu = 0
                 )
@@ -500,7 +457,7 @@ def re_error(data):
             data = '동일한 이름의 파일이 있습니다.'
         elif(num == 17):
             title = '파일 올리기 오류'
-            data = '파일 용량은 ' + wiki_set(3) + 'MB를 넘길 수 없습니다.'
+            data = '파일 용량은 ' + wiki_set(conn, 3) + 'MB를 넘길 수 없습니다.'
         elif(num == 18):
             title = '편집 오류'
             data = '내용이 원래 문서와 동일 합니다.'
@@ -516,7 +473,7 @@ def re_error(data):
                 html_minify(
                     template(
                         'index', 
-                        imp = [title, wiki_set(1), custom(), other2([0, 0])],
+                        imp = [title, wiki_set(conn, 1), custom(conn), other2([0, 0])],
                         data = data,
                         menu = 0
                     )
