@@ -124,22 +124,18 @@ def wiki_set(conn, num):
     else:
         return(var_data)
 
-def diff(seqm, num):
-    output= []
+def diff(seqm):
+    output = []
     for opcode, a0, a1, b0, b1 in seqm.get_opcodes():
-        if(opcode == 'equal' and num == 1):
-            output.append(seqm.a[a0:a1])
-        elif(opcode == 'insert' and num == 0):
-            output.append("<span style='background:#CFC;'>" + seqm.b[b0:b1] + "</span>")
-        elif(opcode == 'delete' and num == 1):
-            output.append("<span style='background:#FDD;'>" + seqm.a[a0:a1] + "</span>")
+        if(opcode == 'equal'):
+            output += [seqm.a[a0:a1]]
+        elif(opcode == 'insert'):
+            output += ["<span style='background:#CFC;'>" + seqm.b[b0:b1] + "</span>"]
+        elif(opcode == 'delete'):
+            output += ["<span style='background:#FDD;'>" + seqm.a[a0:a1] + "</span>"]
         elif(opcode == 'replace'):
-            if(num == 1):
-                output.append("<span style='background:#FDD;'>" + seqm.a[a0:a1] + "</span>")
-            else:
-                output.append("<span style='background:#CFC;'>" + seqm.b[b0:b1] + "</span>")
-        elif(num == 0):
-            output.append(seqm.b[b0:b1])
+            output += ["<span style='background:#FDD;'>" + seqm.a[a0:a1] + "</span>"]
+            output += ["<span style='background:#CFC;'>" + seqm.b[b0:b1] + "</span>"]
             
     return(''.join(output))
            

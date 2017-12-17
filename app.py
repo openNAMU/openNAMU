@@ -2602,27 +2602,12 @@ def user_ban(name = None):
             else:
                 plus = ''
             
-            data = '<select name="year"> \
-                        ' + year + ' \
-                    </select> 년 \
-                    <select name="month"> \
-                        ' + month + ' \
-                    </select> 월 \
-                    <select name="day"> \
-                        ' + day + ' \
-                    </select> 일 \
-                    <br> \
-                    <br> \
-                    <select name="hour"> \
-                        ' + hour + ' \
-                    </select> 시 \
-                    <select name="minu"> \
-                        ' + minu + ' \
-                    </select> 분 까지 \
-                    <br> \
-                    <br> \
-                    <input placeholder="사유" class="form-control" name="why"> \
-                    <br>' + plus
+            data = '<select name="year">' + year + '</select> 년'
+            data += '<select name="month">' + month + '</select> 월'
+            data += '<select name="day">' + day + '</select> 일 <br><br>'
+            data += '<select name="hour">' + hour + '</select> 시'
+            data += '<select name="minu">' + minu + '</select> 분 까지<br><br>'
+            data += '<input placeholder="사유" class="form-control" name="why"><br>' + plus
 
         return(html_minify(template('index', 
             imp = [name, wiki_set(conn, 1), custom(conn), other2([' (' + now + ')', 0])],
@@ -2790,34 +2775,25 @@ def user_admin(name = None):
             menu = [['manager', '관리자']]
         )))
     
-@route('/w/<name:path>/r/<a:int>/diff/<b:int>')
-def diff_data(name = None, a = None, b = None):
-    curs.execute("select data from history where id = ? and title = ?", [str(a), name])
-    a_raw_data = curs.fetchall()
-    if(a_raw_data):
-        curs.execute("select data from history where id = ? and title = ?", [str(b), name])
-        b_raw_data = curs.fetchall()
-        if(b_raw_data):
-            a_data = html.escape(a_raw_data[0][0])            
-            b_data = html.escape(b_raw_data[0][0])
-
-            if(a_data == b_data):
+@route('/w/<name:path>/r/<first:int>/diff/<second:int>')
+def diff_data(name = None, first = None, second = None):
+    curs.execute("select data from history where id = ? and title = ?", [str(first), name])
+    first_raw_data = curs.fetchall()
+    if(first_raw_data):
+        curs.execute("select data from history where id = ? and title = ?", [str(second), name])
+        second_raw_data = curs.fetchall()
+        if(second_raw_data):
+            first_data = html.escape(first_raw_data[0][0])            
+            second_data = html.escape(second_raw_data[0][0])
+            if(first == second):
                 result = '내용이 같습니다.'
             else:            
-                diff_data = difflib.SequenceMatcher(None, a_data, b_data)
-                result_1 = diff(diff_data, 1)
-                result_2 = diff(diff_data, 0)
-
-                if(a_data == result_1):
-                    result = '<pre>' + result_2 + '</pre>'
-                elif(b_data == result_2):
-                    result = '<pre>' + result_1 + '</pre>'
-                else:
-                    result = '<pre>' + result_1 + '<hr>' + result_2 + '</pre>'
+                diff_data = difflib.SequenceMatcher(None, first_data, second_data)
+                result = diff(diff_data)
             
             return(html_minify(template('index', 
                 imp = [name, wiki_set(conn, 1), custom(conn), other2([' (비교)', 0])],
-                data = result,
+                data = '<pre>' + result + '</pre>',
                 menu = [['history/' + url_pas(name), '역사']]
             )))
 
