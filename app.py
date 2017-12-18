@@ -1929,9 +1929,9 @@ def topic_top(name = None, sub = None, num = None):
 @route('/topic/<name:path>/sub/<sub:path>/tool/<tool:path>')
 def topic_stop(name = None, sub = None, tool = None):
     if(tool == 'close'):
-        set_list = ['O', '', '토론 정지', '토론 열림']
+        set_list = ['O', '', '토론 닫기', '토론 열림']
     elif(tool == 'stop'):
-        set_list = ['', 'O', '토론 닫기', '토론 시작']
+        set_list = ['', 'O', '토론 정지', '토론 재개']
     elif(tool == 'agree'):
         pass
     else:
@@ -1958,7 +1958,7 @@ def topic_stop(name = None, sub = None, tool = None):
             curs.execute("select title from stop where title = ? and sub = ? and close = ?", [name, sub, set_list[0]])
             if(curs.fetchall()):
                 curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, ?, ?, ?, '', '1')", [str(int(topic_check[0][0]) + 1), name, sub, set_list[3], time, ip])
-                curs.execute("delete from stop where title = ? and sub = ? and close = ?", [name, sub, set_list[1]])
+                curs.execute("delete from stop where title = ? and sub = ? and close = ?", [name, sub, set_list[0]])
             else:
                 curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, ?, ?, ?, '', '1')", [str(int(topic_check[0][0]) + 1), name, sub, set_list[2], time, ip])
                 curs.execute("insert into stop (title, sub, close) values (?, ?, ?)", [name, sub, set_list[0]])
@@ -2055,13 +2055,16 @@ def topic(name = None, sub = None):
 
         curs.execute("select title from stop where title = ? and sub = ? and close = ''", [name, sub])
         stop_data = curs.fetchall()
+
+        curs.execute("select id from topic where title = ? and sub = ? limit 1", [name, sub])
+        topic_exist = curs.fetchall()
         
         display = ''
         all_data = ''
         data = ''
         number = 1
 
-        if(admin == 1):
+        if(admin == 1 and topic_exist):
             if(close_data):
                 all_data += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/close">(열기)</a> '
             else:
@@ -2080,7 +2083,7 @@ def topic(name = None, sub = None):
             
             all_data += '<br><br>'
         
-        if(close_data or stop_data and admin != 1):
+        if((close_data or stop_data) and admin != 1):
             display = 'display: none;'
         
         curs.execute("select data, id, date, ip, block, top from topic where title = ? and sub = ? order by id + 0 asc", [name, sub])
@@ -2150,7 +2153,7 @@ def topic(name = None, sub = None):
 
         custom_data = custom(conn)
         captcha = captcha_get(conn)
-        if(ban != 1):
+        if(ban != 1 or admin == 1):
             data += '<a id="reload" href="javascript:void(0);" onclick="location.href.endsWith(\'#reload\') ?  location.reload(true) : location.href = \'#reload\'"><i aria-hidden="true" class="fa fa-refresh"></i></a>'
             data += '<form style="' + display + '" method="post"><br><textarea style="height: 100px;" name="content"></textarea><br><br>' + captcha
             
