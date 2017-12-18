@@ -2478,6 +2478,7 @@ def user_ban(name = None):
             return(re_error(conn, '/error/3'))
 
         ip = ip_check()
+        time = get_time()
         
         if(request.forms.year == '09'):
             end = ''
@@ -2486,25 +2487,21 @@ def user_ban(name = None):
 
         curs.execute("select block from ban where block = ?", [name])
         if(curs.fetchall()):
-            rb_plus(conn, name, '해제', get_time(), ip, '')
-            
+            rb_plus(conn, name, '해제', time, ip, '')  
             curs.execute("delete from ban where block = ?", [name])
         else:
-            b = re.search("^([0-9]{1,3}\.[0-9]{1,3})$", name)
-            if(b):
+            if(re.search("^([0-9]{1,3}\.[0-9]{1,3})$", name)):
                 band_d = 'O'
             else:
                 band_d = ''
 
-            rb_plus(conn, name, end, get_time(), ip, request.forms.why)
-
+            rb_plus(conn, name, end, time, ip, request.forms.why)
             curs.execute("insert into ban (block, end, why, band) values (?, ?, ?, ?)", [name, end, request.forms.why, band_d])
 
         if(request.forms.login_ok != ''):
             curs.execute("insert into ok_login (ip, sub) values (?, '')", [name])
 
         conn.commit()
-
         return(redirect('/ban/' + url_pas(name)))            
     else:
         if(admin_check(conn, 1, None) != 1):
@@ -2519,8 +2516,7 @@ def user_ban(name = None):
             else:
                 data = end[0][0] + ' 까지 차단<br><br>'
         else:
-            b = re.search("^([0-9]{1,3}\.[0-9]{1,3})$", name)
-            if(b):
+            if(re.search("^([0-9]{1,3}\.[0-9]{1,3})$", name)):
                 now = '대역 차단'
             else:
                 now = '차단'
