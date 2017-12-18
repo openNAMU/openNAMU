@@ -1925,67 +1925,44 @@ def topic_top(name = None, sub = None, num = None):
         conn.commit()
 
     return(redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '#' + str(num)))        
-
-@route('/topic/<name:path>/sub/<sub:path>/tool/agree')
-def topic_agree(name = None, sub = None):
-    if(admin_check(conn, 3, 'agree (' + name + ' - ' + sub + ')') != 1):
-        return(re_error(conn, '/error/3'))
-
-    ip = ip_check()
-    
-    curs.execute("select id from topic where title = ? and sub = ? order by id + 0 desc limit 1", [name, sub])
-    topic_check = curs.fetchall()
-    if(topic_check):
-        time = get_time()
-        
-        curs.execute("select title from agreedis where title = ? and sub = ?", [name, sub])
-        agree = curs.fetchall()
-        if(agree):
-            curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, '합의 결렬', ?, ?, '', '1')", [str(int(topic_check[0][0]) + 1), name, sub, time, ip])
-            curs.execute("delete from agreedis where title = ? and sub = ?", [name, sub])
-        else:
-            curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, '합의 완료', ?, ?, '', '1')", [str(int(topic_check[0][0]) + 1), name, sub, time, ip])
-            curs.execute("insert into agreedis (title, sub) values (?, ?)", [name, sub])
-
-        rd_plus(conn, name, sub, time)
-        conn.commit()
-            
-    return(redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub)))
         
 @route('/topic/<name:path>/sub/<sub:path>/tool/<tool:path>')
 def topic_stop(name = None, sub = None, tool = None):
     if(tool == 'close'):
-        close = 'O'
-        n_close = ''
-        data = '토론 닫음'
-        n_data = '토론 다시 열기'
+        set_list = ['O', '', '토론 정지', '토론 열림']
     elif(tool == 'stop'):
-        close = ''
-        n_close = 'O'
-        data = '토론 정지'
-        n_data = '토론 재 시작'
+        set_list = ['', 'O', '토론 닫기', '토론 시작']
+    elif(tool == 'agree'):
+        pass
     else:
         return(redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub)))
 
-    if(admin_check(conn, 3, 'topic stop and end (' + name + ' - ' + sub + ')') != 1):
+    if(admin_check(conn, 3, 'topic ' + tool + ' (' + name + ' - ' + sub + ')') != 1):
         return(re_error(conn, '/error/3'))
 
     ip = ip_check()
+    time = get_time()
     
     curs.execute("select id from topic where title = ? and sub = ? order by id + 0 desc limit 1", [name, sub])
     topic_check = curs.fetchall()
     if(topic_check):
-        time = get_time()
-        
-        curs.execute("select title from stop where title = ? and sub = ? and close = ?", [name, sub, close])
-        stop = curs.fetchall()
-        if(stop):
-            curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, ?, ?, ?, '', '1')", [str(int(topic_check[0][0]) + 1), name, sub, n_data, time, ip])
-            curs.execute("delete from stop where title = ? and sub = ? and close = ?", [name, sub, close])
+        if(tool == 'agree'):
+            curs.execute("select title from agreedis where title = ? and sub = ?", [name, sub])
+            if(curs.fetchall()):
+                curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, '합의 결렬', ?, ?, '', '1')", [str(int(topic_check[0][0]) + 1), name, sub, time, ip])
+                curs.execute("delete from agreedis where title = ? and sub = ?", [name, sub])
+            else:
+                curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, '합의 완료', ?, ?, '', '1')", [str(int(topic_check[0][0]) + 1), name, sub, time, ip])
+                curs.execute("insert into agreedis (title, sub) values (?, ?)", [name, sub])
         else:
-            curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, ?, ?, ?, '', '1')", [str(int(topic_check[0][0]) + 1), name, sub, data, time, ip])
-            curs.execute("insert into stop (title, sub, close) values (?, ?, ?)", [name, sub, close])
-            curs.execute("delete from stop where title = ? and sub = ? and close = ?", [name, sub, n_close])
+            curs.execute("select title from stop where title = ? and sub = ? and close = ?", [name, sub, set_list[0]])
+            if(curs.fetchall()):
+                curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, ?, ?, ?, '', '1')", [str(int(topic_check[0][0]) + 1), name, sub, set_list[3], time, ip])
+                curs.execute("delete from stop where title = ? and sub = ? and close = ?", [name, sub, set_list[1]])
+            else:
+                curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, ?, ?, ?, '', '1')", [str(int(topic_check[0][0]) + 1), name, sub, set_list[2], time, ip])
+                curs.execute("insert into stop (title, sub, close) values (?, ?, ?)", [name, sub, set_list[0]])
+                curs.execute("delete from stop where title = ? and sub = ? and close = ?", [name, sub, set_list[1]])
         
         rd_plus(conn, name, sub, time)
         conn.commit()
@@ -2093,9 +2070,9 @@ def topic(name = None, sub = None):
 
             curs.execute("select title from agreedis where title = ? and sub = ?", [name, sub])
             if(curs.fetchall()):
-                all_data += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/agree">(합의)</a>'
-            else:
                 all_data += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/agree">(취소)</a>'
+            else:
+                all_data += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/agree">(합의)</a>'
             
             all_data += '<br><br>'
         
