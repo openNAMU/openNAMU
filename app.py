@@ -53,48 +53,7 @@ curs = conn.cursor()
 # 스킨 불러오기 부분
 TEMPLATE_PATH.insert(0, skin_check(conn))
 
-# 테이블 생성 부분
 try:
-    curs.execute("select title from data limit 1")
-
-    try:
-        curs.execute('select new from move limit 1')
-    except:
-        curs.execute("create table move(origin text, new text, date text, who text, send text)")
-        print('move 테이블 생성')
-
-    try:
-        curs.execute('select name from alarm limit 1')
-    except:
-        curs.execute("create table alarm(name text, data text, date text)")
-        print('alarm 테이블 생성')
-
-    try:
-        curs.execute('select name from ua_d limit 1')
-    except:
-        curs.execute("create table ua_d(name text, ip text, ua text, today text, sub text)")
-        print('ua_d 테이블 생성')
-
-    try:
-        curs.execute('select user, ip, today from login')
-        for m_lo in curs.fetchall():
-            curs.execute("insert into ua_d (name, ip, ua, today, sub) values (?, ?, '', ?, '')", [m_lo[0], m_lo[1], m_lo[2]])
-
-        curs.execute("drop table login")
-        print('login 테이블 삭제')
-    except:
-        pass
-
-    try:
-        curs.execute('select title, cat from cat')
-        for m_lo in curs.fetchall():
-            curs.execute("insert into back (title, link, type) values (?, ?, 'cat')", [m_lo[0], m_lo[1]])
-
-        curs.execute("drop table cat")
-        print('cat 테이블 삭제')
-    except:
-        pass
-
     try:
         plus_all_data = ''
         start_replace = 0
@@ -147,6 +106,12 @@ try:
     except:
         curs.execute("create table ok_login(ip text, sub text)")
         print('ok_login 테이블 생성')
+    
+    try:
+        curs.execute("drop table move")
+        print("move 테이블 삭제")
+    except:
+        pass
 
     conn.commit()
 except:
@@ -262,11 +227,6 @@ def setup():
 
         try:
             curs.execute("create table re_admin(who text, what text, time text)")
-        except:
-            pass
-
-        try:
-            curs.execute("create table move(origin text, new text, date text, who text, send text)")
         except:
             pass
 
@@ -1656,22 +1616,22 @@ def move_data(name = None, num = 1):
 
     data = '<ul>'
     
-    curs.execute("select origin, new, date, who, send from move where origin = ? or new = ? order by date desc limit ?, '50'", [name, name, str(sql_num)])
+    curs.execute("select send, date, ip from history where send like ? or send like ? order by date desc limit ?, '50'", ['%<a href="/w/' + url_pas(name) + '">' + name + '</a> 이동)%', '%(<a href="/w/' + url_pas(name) + '">' + name + '</a>%', str(sql_num)])
     for for_data in curs.fetchall():
-        if(for_data[4] == ''):
-            side = '(없음)'
-        else:
-            side = for_data[4]
+        match = re.findall('<a href="\/w\/(?:(?:(?!">).)+)">((?:(?!<\/a>).)+)<\/a>', for_data[0])
+        send = re.sub('\([^\)]+\)$', '', for_data[0])
+        if(re.search('^( *)+$', send)):
+            send = '(없음)'
 
-        data += '<li><a href="/move_data/' + url_pas(for_data[0]) + '">' + for_data[0] + '</a> - <a href="/move_data/' + url_pas(for_data[1]) + '">' + for_data[1] + '</a>'
-        data += '/ ' + for_data[2] + ' / ' + for_data[3] + ' / ' + side + '</li>'
+        data += '<li><a href="/move_data/' + url_pas(match[0]) + '">' + match[0] + '</a> - <a href="/move_data/' + url_pas(match[1]) + '">' + match[1] + '</a>'
+        data += ' / ' + for_data[2] + ' / ' + for_data[1] + ' / ' + send + '</li>'
     
-    data += '</ul><br><a href="/move_data/' + url_pas(name) + '/' + str(num - 1) + '">(이전)</a> <a href="/move_data/' + url_pas(name) + '/' + str(num + 1) + '">(이후)</a>'
+    data += '</ul><a href="/move_data/' + url_pas(name) + '/' + str(num - 1) + '">(이전)</a> <a href="/move_data/' + url_pas(name) + '/' + str(num + 1) + '">(이후)</a>'
     
     return(html_minify(template('index', 
-        imp = [name, wiki_set(conn, 1), custom(conn), other2([' (이동)', 0])],
+        imp = [name, wiki_set(conn, 1), custom(conn), other2([' (이동 기록)', 0])],
         data = data,
-        menu = [['w/' + url_pas(name), '문서']]
+        menu = [['history/' + url_pas(name), '역사']]
     )))        
             
 @route('/move/<name:path>', method=['POST', 'GET'])
@@ -1712,7 +1672,6 @@ def move(name = None):
         for data in curs.fetchall():
             curs.execute("insert into back (title, link, type) values (?, ?, 'no')", [data[0], data[1]])
             
-        curs.execute('insert into move (origin, new, date, who, send) values (?, ?, ?, ?, ?)', [name, request.forms.title, today, ip, request.forms.send])
         curs.execute("update history set title = ? where title = ?", [request.forms.title, name])
         conn.commit()
         
