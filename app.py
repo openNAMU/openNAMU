@@ -1925,67 +1925,44 @@ def topic_top(name = None, sub = None, num = None):
         conn.commit()
 
     return(redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '#' + str(num)))        
-
-@route('/topic/<name:path>/sub/<sub:path>/tool/agree')
-def topic_agree(name = None, sub = None):
-    if(admin_check(conn, 3, 'agree (' + name + ' - ' + sub + ')') != 1):
-        return(re_error(conn, '/error/3'))
-
-    ip = ip_check()
-    
-    curs.execute("select id from topic where title = ? and sub = ? order by id + 0 desc limit 1", [name, sub])
-    topic_check = curs.fetchall()
-    if(topic_check):
-        time = get_time()
-        
-        curs.execute("select title from agreedis where title = ? and sub = ?", [name, sub])
-        agree = curs.fetchall()
-        if(agree):
-            curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, '합의 결렬', ?, ?, '', '1')", [str(int(topic_check[0][0]) + 1), name, sub, time, ip])
-            curs.execute("delete from agreedis where title = ? and sub = ?", [name, sub])
-        else:
-            curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, '합의 완료', ?, ?, '', '1')", [str(int(topic_check[0][0]) + 1), name, sub, time, ip])
-            curs.execute("insert into agreedis (title, sub) values (?, ?)", [name, sub])
-
-        rd_plus(conn, name, sub, time)
-        conn.commit()
-            
-    return(redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub)))
         
 @route('/topic/<name:path>/sub/<sub:path>/tool/<tool:path>')
 def topic_stop(name = None, sub = None, tool = None):
     if(tool == 'close'):
-        close = 'O'
-        n_close = ''
-        data = '토론 닫음'
-        n_data = '토론 다시 열기'
+        set_list = ['O', '', '토론 닫기', '토론 열림']
     elif(tool == 'stop'):
-        close = ''
-        n_close = 'O'
-        data = '토론 정지'
-        n_data = '토론 재 시작'
+        set_list = ['', 'O', '토론 정지', '토론 재개']
+    elif(tool == 'agree'):
+        pass
     else:
         return(redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub)))
 
-    if(admin_check(conn, 3, 'topic stop and end (' + name + ' - ' + sub + ')') != 1):
+    if(admin_check(conn, 3, 'topic ' + tool + ' (' + name + ' - ' + sub + ')') != 1):
         return(re_error(conn, '/error/3'))
 
     ip = ip_check()
+    time = get_time()
     
     curs.execute("select id from topic where title = ? and sub = ? order by id + 0 desc limit 1", [name, sub])
     topic_check = curs.fetchall()
     if(topic_check):
-        time = get_time()
-        
-        curs.execute("select title from stop where title = ? and sub = ? and close = ?", [name, sub, close])
-        stop = curs.fetchall()
-        if(stop):
-            curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, ?, ?, ?, '', '1')", [str(int(topic_check[0][0]) + 1), name, sub, n_data, time, ip])
-            curs.execute("delete from stop where title = ? and sub = ? and close = ?", [name, sub, close])
+        if(tool == 'agree'):
+            curs.execute("select title from agreedis where title = ? and sub = ?", [name, sub])
+            if(curs.fetchall()):
+                curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, '합의 결렬', ?, ?, '', '1')", [str(int(topic_check[0][0]) + 1), name, sub, time, ip])
+                curs.execute("delete from agreedis where title = ? and sub = ?", [name, sub])
+            else:
+                curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, '합의 완료', ?, ?, '', '1')", [str(int(topic_check[0][0]) + 1), name, sub, time, ip])
+                curs.execute("insert into agreedis (title, sub) values (?, ?)", [name, sub])
         else:
-            curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, ?, ?, ?, '', '1')", [str(int(topic_check[0][0]) + 1), name, sub, data, time, ip])
-            curs.execute("insert into stop (title, sub, close) values (?, ?, ?)", [name, sub, close])
-            curs.execute("delete from stop where title = ? and sub = ? and close = ?", [name, sub, n_close])
+            curs.execute("select title from stop where title = ? and sub = ? and close = ?", [name, sub, set_list[0]])
+            if(curs.fetchall()):
+                curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, ?, ?, ?, '', '1')", [str(int(topic_check[0][0]) + 1), name, sub, set_list[3], time, ip])
+                curs.execute("delete from stop where title = ? and sub = ? and close = ?", [name, sub, set_list[0]])
+            else:
+                curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, ?, ?, ?, '', '1')", [str(int(topic_check[0][0]) + 1), name, sub, set_list[2], time, ip])
+                curs.execute("insert into stop (title, sub, close) values (?, ?, ?)", [name, sub, set_list[0]])
+                curs.execute("delete from stop where title = ? and sub = ? and close = ?", [name, sub, set_list[1]])
         
         rd_plus(conn, name, sub, time)
         conn.commit()
@@ -2042,6 +2019,7 @@ def topic(name = None, sub = None):
 
         ip = ip_check()
         today = get_time()
+
         if(ban == 1 and admin != 1):
             return(re_error(conn, '/ban'))
         
@@ -2056,7 +2034,6 @@ def topic(name = None, sub = None):
         if(match):
             curs.execute('insert into alarm (name, data, date) values (?, ?, ?)', [match.groups()[0], ip + '님이 <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '">사용자 토론</a>을 시작했습니다.', today])
         
-        rd_plus(conn, name, sub, today)
         data = re.sub("\[\[(분류:(?:(?:(?!\]\]).)*))\]\]", "[br]", request.forms.content)
         match = re.findall("(?:#([0-9]+))", data)
         for rd_data in match:
@@ -2067,6 +2044,7 @@ def topic(name = None, sub = None):
             data = re.sub("(?P<in>#(?:[0-9]+))", '[[\g<in>]]', data)
 
         data = savemark(data)
+        rd_plus(conn, name, sub, today)
         curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, ?, ?, ?, '', '')", [str(num), name, sub, data, today, ip])
         conn.commit()
         
@@ -2077,10 +2055,16 @@ def topic(name = None, sub = None):
 
         curs.execute("select title from stop where title = ? and sub = ? and close = ''", [name, sub])
         stop_data = curs.fetchall()
+
+        curs.execute("select id from topic where title = ? and sub = ? limit 1", [name, sub])
+        topic_exist = curs.fetchall()
         
         display = ''
         all_data = ''
-        if(admin == 1):
+        data = ''
+        number = 1
+
+        if(admin == 1 and topic_exist):
             if(close_data):
                 all_data += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/close">(열기)</a> '
             else:
@@ -2093,13 +2077,13 @@ def topic(name = None, sub = None):
 
             curs.execute("select title from agreedis where title = ? and sub = ?", [name, sub])
             if(curs.fetchall()):
-                all_data += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/agree">(합의)</a>'
-            else:
                 all_data += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/agree">(취소)</a>'
+            else:
+                all_data += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/agree">(합의)</a>'
             
             all_data += '<br><br>'
         
-        if(close_data or stop_data and admin != 1):
+        if((close_data or stop_data) and admin != 1):
             display = 'display: none;'
         
         curs.execute("select data, id, date, ip, block, top from topic where title = ? and sub = ? order by id + 0 asc", [name, sub])
@@ -2117,14 +2101,12 @@ def topic(name = None, sub = None):
                                 
             all_data += '<table id="toron"><tbody><tr><td id="toron_color_red">'
             all_data += '<a href="#' + topic_data[1] + '">#' + topic_data[1] + '</a> ' + ip_pas(conn, topic_data[3]) + who_plus + ' <span style="float: right;">' + topic_data[2] + '</span>'
-            all_data += '</td></tr><tr><td>' + namumark(conn, '', topic_data[0], 0, 0, 0) + '</td></tr></tbody></table><br>'
-                    
-        number = 1          
+            all_data += '</td></tr><tr><td>' + namumark(conn, '', topic_data[0], 0, 0, 0) + '</td></tr></tbody></table><br>'    
+
         for topic_data in topic_1:
             if(number == 1):
                 start = topic_data[3]
-            
-            user_write = topic_data[0]
+
             if(topic_data[4] == 'O'):
                 blind_data = 'style="background: gainsboro;"'
                 if(admin != 1):
@@ -2137,8 +2119,9 @@ def topic(name = None, sub = None):
             else:
                 blind_data = ''
 
-            user_write = namumark(conn, '', user_write, 0, 0, 0)
+            user_write = namumark(conn, '', topic_data[0], 0, 0, 0)
             ip = ip_pas(conn, topic_data[3])
+
             curs.execute('select acl from user where id = ?', [topic_data[3]])
             user_acl = curs.fetchall()
             if(user_acl and user_acl[0][0] != 'user'):
@@ -2170,19 +2153,18 @@ def topic(name = None, sub = None):
 
         custom_data = custom(conn)
         captcha = captcha_get(conn)
-        if(ban != 1):
-            data = '<a id="reload" href="javascript:void(0);" onclick="location.href.endsWith(\'#reload\') ?  location.reload(true) : location.href = \'#reload\'"><i aria-hidden="true" class="fa fa-refresh"></i></a>'
+        if(ban != 1 or admin == 1):
+            data += '<a id="reload" href="javascript:void(0);" onclick="location.href.endsWith(\'#reload\') ?  location.reload(true) : location.href = \'#reload\'"><i aria-hidden="true" class="fa fa-refresh"></i></a>'
             data += '<form style="' + display + '" method="post"><br><textarea style="height: 100px;" name="content"></textarea><br><br>' + captcha
+            
             if(custom_data[2] == 0 and display == ''):
                 data += '<span>비 로그인 상태입니다. 비 로그인으로 진행 시 아이피가 토론에 기록됩니다.</span><br><br>'
 
             data += '<button class="btn btn-primary" type="submit">전송</button></form>'
-        else:
-            data = ''
 
         return(html_minify(template('index', 
             imp = [name, wiki_set(conn, 1), custom_data, other2([' (토론)', 0])],
-            data =  '<h2 style="margin-top: 0px;">' + sub + '</h2><br>' + all_data + data,
+            data =  '<h2 id="topic_top_title">' + sub + '</h2>' + all_data + data,
             menu = [['topic/' + url_pas(name), '목록']]
         )))
         
@@ -2218,7 +2200,7 @@ def close_topic_list(name = None, tool = None):
             curs.execute("select sub from rd where title = ? order by date desc", [name])
             sub = '토론 목록'
             menu = [['w/' + url_pas(name), '문서']]
-            plus =  '<br><a href="/topic/' + url_pas(name) + '/close">(닫힘)</a> <a href="/topic/' + url_pas(name) + '/agree">(합의)</a><br><br> \
+            plus =  '<a href="/topic/' + url_pas(name) + '/close">(닫힘)</a> <a href="/topic/' + url_pas(name) + '/agree">(합의)</a><br><br> \
                     <input placeholder="토론명" class="form-control" name="topic"><br> \
                     <button class="btn btn-primary" type="submit">만들기</button>'
 
@@ -2240,7 +2222,7 @@ def close_topic_list(name = None, tool = None):
         
         return(html_minify(template('index', 
             imp = [name, wiki_set(conn, 1), custom(conn), other2([' (' + sub + ')', 0])],
-            data =  '<form style="margin-top: 0px;" method="post">' + div + plus + '</form>',
+            data =  '<form method="post">' + div + plus + '</form>',
             menu = menu
         )))
         
@@ -2388,13 +2370,8 @@ def user_check(name = None, name2 = None):
         curs.execute("select name, ip, ua, today from ua_d where name = ? order by today desc", [name])
     record = curs.fetchall()
     if(record):
-        c = '<table style="width: 100%; text-align: center;"> \
-                <tbody> \
-                    <tr> \
-                        <td style="width: 33.3%;">이름</td> \
-                        <td style="width: 33.3%;">아이피</td> \
-                        <td style="width: 33.3%;">언제</td> \
-                    </tr>'
+        div = '<table style="width: 100%; text-align: center;"><tbody><tr>'
+        div = '<td style="width: 33.3%;">이름</td><td style="width: 33.3%;">아이피</td><td style="width: 33.3%;">언제</td></tr>'
 
         for data in record:
             if(data[2]):
@@ -2402,20 +2379,16 @@ def user_check(name = None, name2 = None):
             else:
                 ua = '<br>'
 
-            c +=    '<tr> \
-                        <td>' + ip_pas(conn, data[0]) + '</td> \
-                        <td>' + ip_pas(conn, data[1]) + '</td> \
-                        <td>' + data[3] + '</td> \
-                    </tr> \
-                    <tr><td colspan="3">' + ua + '</td></tr>'
-        else:
-            c += '</tbody></table>'
+            div += '<tr><td>' + ip_pas(conn, data[0]) + '</td><td>' + ip_pas(conn, data[1]) + '</td><td>' + data[3] + '</td></tr>'
+            div += '<tr><td colspan="3">' + ua + '</td></tr>'
+        
+        div += '</tbody></table>'
     else:
-        c = ''
+        div = ''
             
     return(html_minify(template('index',    
         imp = ['다중 검사', wiki_set(conn, 1), custom(conn), other2([0, 0])],
-        data = c,
+        data = div,
         menu = [['manager', '관리자']]
     )))
                 
@@ -2508,6 +2481,7 @@ def user_ban(name = None):
             return(re_error(conn, '/error/3'))
 
         ip = ip_check()
+        time = get_time()
         
         if(request.forms.year == '09'):
             end = ''
@@ -2516,25 +2490,21 @@ def user_ban(name = None):
 
         curs.execute("select block from ban where block = ?", [name])
         if(curs.fetchall()):
-            rb_plus(conn, name, '해제', get_time(), ip, '')
-            
+            rb_plus(conn, name, '해제', time, ip, '')  
             curs.execute("delete from ban where block = ?", [name])
         else:
-            b = re.search("^([0-9]{1,3}\.[0-9]{1,3})$", name)
-            if(b):
+            if(re.search("^([0-9]{1,3}\.[0-9]{1,3})$", name)):
                 band_d = 'O'
             else:
                 band_d = ''
 
-            rb_plus(conn, name, end, get_time(), ip, request.forms.why)
-
+            rb_plus(conn, name, end, time, ip, request.forms.why)
             curs.execute("insert into ban (block, end, why, band) values (?, ?, ?, ?)", [name, end, request.forms.why, band_d])
 
         if(request.forms.login_ok != ''):
             curs.execute("insert into ok_login (ip, sub) values (?, '')", [name])
 
         conn.commit()
-
         return(redirect('/ban/' + url_pas(name)))            
     else:
         if(admin_check(conn, 1, None) != 1):
@@ -2549,8 +2519,7 @@ def user_ban(name = None):
             else:
                 data = end[0][0] + ' 까지 차단<br><br>'
         else:
-            b = re.search("^([0-9]{1,3}\.[0-9]{1,3})$", name)
-            if(b):
+            if(re.search("^([0-9]{1,3}\.[0-9]{1,3})$", name)):
                 now = '대역 차단'
             else:
                 now = '차단'
