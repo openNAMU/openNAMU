@@ -2161,7 +2161,7 @@ def topic(name = None, sub = None):
 
         return(html_minify(template('index', 
             imp = [name, wiki_set(conn, 1), custom_data, other2([' (토론)', 0])],
-            data =  '<h2 style="margin-top: 0px;">' + sub + '</h2><br>' + all_data + data,
+            data =  '<h2>' + sub + '</h2>' + all_data + data,
             menu = [['topic/' + url_pas(name), '목록']]
         )))
         
@@ -2197,7 +2197,7 @@ def close_topic_list(name = None, tool = None):
             curs.execute("select sub from rd where title = ? order by date desc", [name])
             sub = '토론 목록'
             menu = [['w/' + url_pas(name), '문서']]
-            plus =  '<br><a href="/topic/' + url_pas(name) + '/close">(닫힘)</a> <a href="/topic/' + url_pas(name) + '/agree">(합의)</a><br><br> \
+            plus =  '<a href="/topic/' + url_pas(name) + '/close">(닫힘)</a> <a href="/topic/' + url_pas(name) + '/agree">(합의)</a><br><br> \
                     <input placeholder="토론명" class="form-control" name="topic"><br> \
                     <button class="btn btn-primary" type="submit">만들기</button>'
 
@@ -2219,7 +2219,7 @@ def close_topic_list(name = None, tool = None):
         
         return(html_minify(template('index', 
             imp = [name, wiki_set(conn, 1), custom(conn), other2([' (' + sub + ')', 0])],
-            data =  '<form style="margin-top: 0px;" method="post">' + div + plus + '</form>',
+            data =  '<form method="post">' + div + plus + '</form>',
             menu = menu
         )))
         
