@@ -2161,7 +2161,7 @@ def topic(name = None, sub = None):
 
         return(html_minify(template('index', 
             imp = [name, wiki_set(conn, 1), custom_data, other2([' (토론)', 0])],
-            data =  '<h2>' + sub + '</h2>' + all_data + data,
+            data =  '<h2 id="topic_top_title">' + sub + '</h2>' + all_data + data,
             menu = [['topic/' + url_pas(name), '목록']]
         )))
         
