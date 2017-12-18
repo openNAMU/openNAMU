@@ -2019,6 +2019,7 @@ def topic(name = None, sub = None):
 
         ip = ip_check()
         today = get_time()
+
         if(ban == 1 and admin != 1):
             return(re_error(conn, '/ban'))
         
@@ -2033,7 +2034,6 @@ def topic(name = None, sub = None):
         if(match):
             curs.execute('insert into alarm (name, data, date) values (?, ?, ?)', [match.groups()[0], ip + '님이 <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '">사용자 토론</a>을 시작했습니다.', today])
         
-        rd_plus(conn, name, sub, today)
         data = re.sub("\[\[(분류:(?:(?:(?!\]\]).)*))\]\]", "[br]", request.forms.content)
         match = re.findall("(?:#([0-9]+))", data)
         for rd_data in match:
@@ -2044,6 +2044,7 @@ def topic(name = None, sub = None):
             data = re.sub("(?P<in>#(?:[0-9]+))", '[[\g<in>]]', data)
 
         data = savemark(data)
+        rd_plus(conn, name, sub, today)
         curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, ?, ?, ?, '', '')", [str(num), name, sub, data, today, ip])
         conn.commit()
         
@@ -2057,6 +2058,9 @@ def topic(name = None, sub = None):
         
         display = ''
         all_data = ''
+        data = ''
+        number = 1
+
         if(admin == 1):
             if(close_data):
                 all_data += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/close">(열기)</a> '
@@ -2094,14 +2098,12 @@ def topic(name = None, sub = None):
                                 
             all_data += '<table id="toron"><tbody><tr><td id="toron_color_red">'
             all_data += '<a href="#' + topic_data[1] + '">#' + topic_data[1] + '</a> ' + ip_pas(conn, topic_data[3]) + who_plus + ' <span style="float: right;">' + topic_data[2] + '</span>'
-            all_data += '</td></tr><tr><td>' + namumark(conn, '', topic_data[0], 0, 0, 0) + '</td></tr></tbody></table><br>'
-                    
-        number = 1          
+            all_data += '</td></tr><tr><td>' + namumark(conn, '', topic_data[0], 0, 0, 0) + '</td></tr></tbody></table><br>'    
+
         for topic_data in topic_1:
             if(number == 1):
                 start = topic_data[3]
-            
-            user_write = topic_data[0]
+
             if(topic_data[4] == 'O'):
                 blind_data = 'style="background: gainsboro;"'
                 if(admin != 1):
@@ -2114,8 +2116,9 @@ def topic(name = None, sub = None):
             else:
                 blind_data = ''
 
-            user_write = namumark(conn, '', user_write, 0, 0, 0)
+            user_write = namumark(conn, '', topic_data[0], 0, 0, 0)
             ip = ip_pas(conn, topic_data[3])
+
             curs.execute('select acl from user where id = ?', [topic_data[3]])
             user_acl = curs.fetchall()
             if(user_acl and user_acl[0][0] != 'user'):
@@ -2148,14 +2151,13 @@ def topic(name = None, sub = None):
         custom_data = custom(conn)
         captcha = captcha_get(conn)
         if(ban != 1):
-            data = '<a id="reload" href="javascript:void(0);" onclick="location.href.endsWith(\'#reload\') ?  location.reload(true) : location.href = \'#reload\'"><i aria-hidden="true" class="fa fa-refresh"></i></a>'
+            data += '<a id="reload" href="javascript:void(0);" onclick="location.href.endsWith(\'#reload\') ?  location.reload(true) : location.href = \'#reload\'"><i aria-hidden="true" class="fa fa-refresh"></i></a>'
             data += '<form style="' + display + '" method="post"><br><textarea style="height: 100px;" name="content"></textarea><br><br>' + captcha
+            
             if(custom_data[2] == 0 and display == ''):
                 data += '<span>비 로그인 상태입니다. 비 로그인으로 진행 시 아이피가 토론에 기록됩니다.</span><br><br>'
 
             data += '<button class="btn btn-primary" type="submit">전송</button></form>'
-        else:
-            data = ''
 
         return(html_minify(template('index', 
             imp = [name, wiki_set(conn, 1), custom_data, other2([' (토론)', 0])],
@@ -2365,13 +2367,8 @@ def user_check(name = None, name2 = None):
         curs.execute("select name, ip, ua, today from ua_d where name = ? order by today desc", [name])
     record = curs.fetchall()
     if(record):
-        c = '<table style="width: 100%; text-align: center;"> \
-                <tbody> \
-                    <tr> \
-                        <td style="width: 33.3%;">이름</td> \
-                        <td style="width: 33.3%;">아이피</td> \
-                        <td style="width: 33.3%;">언제</td> \
-                    </tr>'
+        div = '<table style="width: 100%; text-align: center;"><tbody><tr>'
+        div = '<td style="width: 33.3%;">이름</td><td style="width: 33.3%;">아이피</td><td style="width: 33.3%;">언제</td></tr>'
 
         for data in record:
             if(data[2]):
@@ -2379,20 +2376,16 @@ def user_check(name = None, name2 = None):
             else:
                 ua = '<br>'
 
-            c +=    '<tr> \
-                        <td>' + ip_pas(conn, data[0]) + '</td> \
-                        <td>' + ip_pas(conn, data[1]) + '</td> \
-                        <td>' + data[3] + '</td> \
-                    </tr> \
-                    <tr><td colspan="3">' + ua + '</td></tr>'
-        else:
-            c += '</tbody></table>'
+            div += '<tr><td>' + ip_pas(conn, data[0]) + '</td><td>' + ip_pas(conn, data[1]) + '</td><td>' + data[3] + '</td></tr>'
+            div += '<tr><td colspan="3">' + ua + '</td></tr>'
+        
+        div += '</tbody></table>'
     else:
-        c = ''
+        div = ''
             
     return(html_minify(template('index',    
         imp = ['다중 검사', wiki_set(conn, 1), custom(conn), other2([0, 0])],
-        data = c,
+        data = div,
         menu = [['manager', '관리자']]
     )))
                 
