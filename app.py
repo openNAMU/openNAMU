@@ -15,9 +15,8 @@ session_opts = {
 
 app = beaker.middleware.SessionMiddleware(app(), session_opts)
 BaseRequest.MEMFILE_MAX = 1000 ** 4
-r_ver = '2.4.6'
+r_ver = '2.4.7'
 
-from set_mark.mark import *
 from set_mark.mid_pas import *
 from set_mark.macro import savemark
 from func import *
@@ -53,48 +52,7 @@ curs = conn.cursor()
 # 스킨 불러오기 부분
 TEMPLATE_PATH.insert(0, skin_check(conn))
 
-# 테이블 생성 부분
 try:
-    curs.execute("select title from data limit 1")
-
-    try:
-        curs.execute('select new from move limit 1')
-    except:
-        curs.execute("create table move(origin text, new text, date text, who text, send text)")
-        print('move 테이블 생성')
-
-    try:
-        curs.execute('select name from alarm limit 1')
-    except:
-        curs.execute("create table alarm(name text, data text, date text)")
-        print('alarm 테이블 생성')
-
-    try:
-        curs.execute('select name from ua_d limit 1')
-    except:
-        curs.execute("create table ua_d(name text, ip text, ua text, today text, sub text)")
-        print('ua_d 테이블 생성')
-
-    try:
-        curs.execute('select user, ip, today from login')
-        for m_lo in curs.fetchall():
-            curs.execute("insert into ua_d (name, ip, ua, today, sub) values (?, ?, '', ?, '')", [m_lo[0], m_lo[1], m_lo[2]])
-
-        curs.execute("drop table login")
-        print('login 테이블 삭제')
-    except:
-        pass
-
-    try:
-        curs.execute('select title, cat from cat')
-        for m_lo in curs.fetchall():
-            curs.execute("insert into back (title, link, type) values (?, ?, 'cat')", [m_lo[0], m_lo[1]])
-
-        curs.execute("drop table cat")
-        print('cat 테이블 삭제')
-    except:
-        pass
-
     try:
         plus_all_data = ''
         start_replace = 0
@@ -147,6 +105,12 @@ try:
     except:
         curs.execute("create table ok_login(ip text, sub text)")
         print('ok_login 테이블 생성')
+    
+    try:
+        curs.execute("drop table move")
+        print("move 테이블 삭제")
+    except:
+        pass
 
     conn.commit()
 except:
@@ -262,11 +226,6 @@ def setup():
 
         try:
             curs.execute("create table re_admin(who text, what text, time text)")
-        except:
-            pass
-
-        try:
-            curs.execute("create table move(origin text, new text, date text, who text, send text)")
         except:
             pass
 
@@ -704,20 +663,16 @@ def admin_list():
     )))
         
 @route('/record/<name:path>')
-@route('/record/<name:path>/<num:int>')
+@route('/record/<name:path>/<num:int>/<what:path>')
 @route('/recent_changes')
-def recent_changes(name = None, num = 1):
+@route('/recent_changes/<what:path>')
+def recent_changes(name = None, num = 1, what = 'all'):
     ydmin = admin_check(conn, 1, None)
     zdmin = admin_check(conn, 6, None)
     ban = ''
     send = '<br>'
-    div =  '<table style="width: 100%; text-align: center;"> \
-                <tbody> \
-                    <tr> \
-                        <td style="width: 33.3%;">문서명</td> \
-                        <td style="width: 33.3%;">편집자</td> \
-                        <td style="width: 33.3%;">시간</td> \
-                    </tr>'
+    div = '<table style="width: 100%; text-align: center;"><tbody><tr>'
+    div += '<td style="width: 33.3%;">문서명</td><td style="width: 33.3%;">편집자</td><td style="width: 33.3%;">시간</td></tr>'
     
     if(name):
         if(num * 50 > 0):
@@ -725,11 +680,42 @@ def recent_changes(name = None, num = 1):
         else:
             sql_num = 0            
 
-        div = '<a href="/topic_record/' + url_pas(name) + '">(토론 기록)</a><br><br>' + div
+        if(what == 'all'):
+            div = '<a href="/topic_record/' + url_pas(name) + '">(토론 기록)</a><br><br>' + div
+            div = '<a href="/record/' + url_pas(name) + '/' + str(num) + '/revert">(되돌리기)</a> ' + div
+            div = '<a href="/record/' + url_pas(name) + '/' + str(num) + '/move">(이동)</a> ' + div
+            div = '<a href="/record/' + url_pas(name) + '/' + str(num) + '/delete">(삭제)</a> ' + div
+        
+            curs.execute("select id, title, date, ip, send, leng from history where ip = ? order by date desc limit ?, '50'", [name, str(sql_num)])
+        else:
+            if(what == 'delete'):
+                sql = '%(삭제)'
+            elif(what == 'move'):
+                sql = '%이동)'
+            elif(what == 'revert'):
+                sql = '%판)'
+            else:
+                return(redirect('/'))
 
-        curs.execute("select id, title, date, ip, send, leng from history where ip = ? order by date desc limit ?, '50'", [name, str(sql_num)])
+            curs.execute("select id, title, date, ip, send, leng from history where ip = ? and send like ? order by date desc limit ?, '50'", [name, sql, str(sql_num)])
     else:
-        curs.execute("select id, title, date, ip, send, leng from history where not date = 'Dump' order by date desc limit 50")
+        if(what == 'all'):
+            div = '<a href="/recent_changes/revert">(되돌리기)</a><br><br>' + div
+            div = '<a href="/recent_changes/move">(이동)</a> ' + div
+            div = '<a href="/recent_changes/delete">(삭제)</a> ' + div
+
+            curs.execute("select id, title, date, ip, send, leng from history order by date desc limit 50")
+        else:
+            if(what == 'delete'):
+                sql = '%(삭제)'
+            elif(what == 'move'):
+                sql = '%이동)'
+            elif(what == 'revert'):
+                sql = '%판)'
+            else:
+                return(redirect('/'))
+
+            curs.execute("select id, title, date, ip, send, leng from history where send like ? order by date desc limit 50", [sql])
 
     for data in curs.fetchall():         
         send = '<br>'
@@ -779,18 +765,10 @@ def recent_changes(name = None, num = 1):
             else:
                 hidden = ''      
             
-        div += '<tr style="' + style + '"> \
-                    <td> \
-                        <a href="/w/' + url_pas(data[1]) + '">' + title + '</a> (<a href="/history/' + url_pas(data[1]) + '">' + data[0] + '판</a>) ' + revert + ' (' + leng + ') \
-                    </td> \
-                    <td>' + ip + ban + hidden + '</td> \
-                    <td>' + data[2] + '</td> \
-                </tr> \
-                <tr> \
-                    <td colspan="3">' + send + '</td> \
-                </tr>'
-    else:
-        div += '</tbody></table>'
+        div += '<tr style="' + style + '"><td><a href="/w/' + url_pas(data[1]) + '">' + title + '</a> (<a href="/history/' + url_pas(data[1]) + '">' + data[0] + '판</a>) ' + revert + ' (' + leng + ')</td>'
+        div += '<td>' + ip + ban + hidden + '</td><td>' + data[2] + '</td></tr><tr><td colspan="3">' + send + '</td></tr>'
+
+    div += '</tbody></table>'
 
     if(name):
         curs.execute("select end, why from ban where block = ?", [name])
@@ -803,10 +781,16 @@ def recent_changes(name = None, num = 1):
         title = '편집 기록'
         menu = [['other', '기타'], ['user', '사용자'], ['count/' + url_pas(name), '횟수']]
         div += '<br><a href="/record/' + url_pas(name) + '/' + str(num - 1) + '">(이전)</a> <a href="/record/' + url_pas(name) + '/' + str(num + 1) + '">(이후)</a>'
+
+        if(what != 'all'):
+            menu += [['record/' + url_pas(name), '일반']]
     else:
         sub = 0
         menu = 0
         title = '최근 변경내역'
+
+        if(what != 'all'):
+            menu = [['recent_changes', '일반']]
             
     return(html_minify(template('index', 
         imp = [title, wiki_set(conn, 1), custom(conn), other2([sub, 0])],
@@ -1566,6 +1550,7 @@ def preview(name = None, num = None):
 
     ip = ip_check()
     can = acl_check(conn, name)
+    captcha = captcha_get(conn)
     
     if(can == 1):
         return(re_error(conn, '/ban'))
@@ -1585,6 +1570,7 @@ def preview(name = None, num = None):
                     <textarea rows="25" name="content">' + html.escape(request.forms.content) + '</textarea> \
                     <textarea style="display: none;" name="otent">' + html.escape(request.forms.otent) + '</textarea><br><br> \
                     <input placeholder="사유" name="send" type="text"><br><br> \
+                    ' + captcha + ' \
                     <button id="preview" class="btn btn-primary" type="submit">저장</button> \
                     <button id="preview" class="btn" type="submit" formaction="/preview/' + url_pas(name) + action + '">미리보기</button> \
                 </form><br><br>' + enddata,
@@ -1656,22 +1642,22 @@ def move_data(name = None, num = 1):
 
     data = '<ul>'
     
-    curs.execute("select origin, new, date, who, send from move where origin = ? or new = ? order by date desc limit ?, '50'", [name, name, str(sql_num)])
+    curs.execute("select send, date, ip from history where send like ? or send like ? order by date desc limit ?, '50'", ['%<a href="/w/' + url_pas(name) + '">' + name + '</a> 이동)%', '%(<a href="/w/' + url_pas(name) + '">' + name + '</a>%', str(sql_num)])
     for for_data in curs.fetchall():
-        if(for_data[4] == ''):
-            side = '(없음)'
-        else:
-            side = for_data[4]
+        match = re.findall('<a href="\/w\/(?:(?:(?!">).)+)">((?:(?!<\/a>).)+)<\/a>', for_data[0])
+        send = re.sub('\([^\)]+\)$', '', for_data[0])
+        if(re.search('^( *)+$', send)):
+            send = '(없음)'
 
-        data += '<li><a href="/move_data/' + url_pas(for_data[0]) + '">' + for_data[0] + '</a> - <a href="/move_data/' + url_pas(for_data[1]) + '">' + for_data[1] + '</a>'
-        data += '/ ' + for_data[2] + ' / ' + for_data[3] + ' / ' + side + '</li>'
+        data += '<li><a href="/move_data/' + url_pas(match[0]) + '">' + match[0] + '</a> - <a href="/move_data/' + url_pas(match[1]) + '">' + match[1] + '</a>'
+        data += ' / ' + for_data[2] + ' / ' + for_data[1] + ' / ' + send + '</li>'
     
-    data += '</ul><br><a href="/move_data/' + url_pas(name) + '/' + str(num - 1) + '">(이전)</a> <a href="/move_data/' + url_pas(name) + '/' + str(num + 1) + '">(이후)</a>'
+    data += '</ul><a href="/move_data/' + url_pas(name) + '/' + str(num - 1) + '">(이전)</a> <a href="/move_data/' + url_pas(name) + '/' + str(num + 1) + '">(이후)</a>'
     
     return(html_minify(template('index', 
-        imp = [name, wiki_set(conn, 1), custom(conn), other2([' (이동)', 0])],
+        imp = [name, wiki_set(conn, 1), custom(conn), other2([' (이동 기록)', 0])],
         data = data,
-        menu = [['w/' + url_pas(name), '문서']]
+        menu = [['history/' + url_pas(name), '역사']]
     )))        
             
 @route('/move/<name:path>', method=['POST', 'GET'])
@@ -1712,7 +1698,6 @@ def move(name = None):
         for data in curs.fetchall():
             curs.execute("insert into back (title, link, type) values (?, ?, 'no')", [data[0], data[1]])
             
-        curs.execute('insert into move (origin, new, date, who, send) values (?, ?, ?, ?, ?)', [name, request.forms.title, today, ip, request.forms.send])
         curs.execute("update history set title = ? where title = ?", [request.forms.title, name])
         conn.commit()
         
@@ -1747,6 +1732,7 @@ def other():
                             ' * [[wiki:user_log|가입 기록]]\r\n' + \
                             ' * [[wiki:admin_log|권한 기록]]\r\n' + \
                             ' * [[wiki:manager/6|편집 기록]]\r\n' + \
+                            ' * [[wiki:manager/7|토론 기록]]\r\n' + \
                             ' * [[wiki:not_close_topic|열린 토론 목록]]\r\n' + \
                             '== 기타 ==\r\n' + \
                             ' * [[wiki:title_index|모든 문서]]\r\n' + \
@@ -1765,7 +1751,7 @@ def other():
 @route('/manager', method=['POST', 'GET'])
 @route('/manager/<num:int>', method=['POST', 'GET'])
 def manager(num = 1):
-    title_list = [['ACL 이동', '문서명', 'acl'], ['검사 이동', 0, 'check'], ['차단 이동', 0, 'ban'], ['권한 이동', 0, 'admin'], ['기록 이동', 0, 'record'], [], ['그룹 생성 이동', '그룹명', 'admin_plus']]
+    title_list = [['ACL', '문서명', 'acl'], ['검사', 0, 'check'], ['차단', 0, 'ban'], ['권한', 0, 'admin'], ['편집 기록', 0, 'record'], ['토론 기록', 0, 'topic_record'], ['그룹 생성', '그룹명', 'admin_plus']]
     if(num == 1):
         return(html_minify(template('index', 
             imp = ['관리자 메뉴', wiki_set(conn, 1), custom(conn), other2([0, 0])],
@@ -1785,12 +1771,12 @@ def manager(num = 1):
                                         ' * 이 메뉴에 없는 기능은 해당 문서의 역사나 토론에서 바로 사용 가능함', 0, 0, 0),
             menu = [['other', '기타']]
         )))
-    elif(num in range(2, 6) or num == 8):
+    elif(num in range(2, 8)):
         if(request.method == 'POST'):
             return(redirect('/' + title_list[(num - 2)][2] + '/' + url_pas(request.forms.name)))
         else:
             if(title_list[(num - 2)][1] == 0):
-                placeholder = '문서명'
+                placeholder = '사용자명'
             else:
                 placeholder = title_list[(num - 2)][1]
 
@@ -1807,7 +1793,7 @@ def manager(num = 1):
             return(redirect('/check/' + url_pas(request.forms.name) + '/' + url_pas(request.forms.name2)))
         else:
             return(html_minify(template('index', 
-                imp = ['검사 이동', wiki_set(conn, 1), custom(conn), other2([0, 0])],
+                imp = ['검사', wiki_set(conn, 1), custom(conn), other2([0, 0])],
                 data = '<form method="post"> \
                             <input placeholder="사용자명" name="name" type="text"><br><br> \
                             <input placeholder="비교 대상" name="name2" type="text"><br><br> \
@@ -2571,10 +2557,10 @@ def user_ban(name = None):
             else:
                 plus = ''
             
-            data = '<select name="year">' + year + '</select> 년'
-            data += '<select name="month">' + month + '</select> 월'
+            data = '<select name="year">' + year + '</select> 년 '
+            data += '<select name="month">' + month + '</select> 월 '
             data += '<select name="day">' + day + '</select> 일 <br><br>'
-            data += '<select name="hour">' + hour + '</select> 시'
+            data += '<select name="hour">' + hour + '</select> 시 '
             data += '<select name="minu">' + minu + '</select> 분 까지<br><br>'
             data += '<input placeholder="사유" class="form-control" name="why"><br>' + plus
 
@@ -3132,7 +3118,7 @@ def user_info():
                                                         ' * [[wiki:view_log|지나온 문서]]\r\n' + \
                                                         ' * [[wiki:record/' + raw_ip + '|편집 기록]]\r\n' + \
                                                         ' * [[wiki:topic_record/' + raw_ip + '|토론 기록]]\r\n' + \
-                                                        ' * [[wiki:count|편집 횟수]]\r\n', 0, 0, 0),
+                                                        ' * [[wiki:count|활동 횟수]]\r\n', 0, 0, 0),
         menu = 0
     )))
 
@@ -3223,7 +3209,7 @@ def count_edit(name = None):
 
     return(html_minify(template('index', 
         imp = ['활동 횟수', wiki_set(conn, 1), custom(conn), other2([0, 0])],
-        data = namumark(conn, "", "||<-2><:> " + that + " ||\r\n||<:> 편집 횟수 ||<:> " + str(data) + "||\r\n||<:> 토론 횟수 ||<:> " + str(t_data) + "||", 0, 0, 0),
+        data = namumark(conn, "", "[목차(없음)]\r\n== " + that + " ==\r\n||<:> 편집 횟수 ||<:> " + str(data) + "||\r\n||<:> 토론 횟수 ||<:> " + str(t_data) + "||", 0, 0, 0),
         menu = [['user', '사용자'], ['record/' + url_pas(that), '편집 기록'], ['topic_record/' + url_pas(that), '토론 기록']]
     )))
         

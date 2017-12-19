@@ -122,10 +122,10 @@
                                 % end
                             </h1>
                         </div>
-                        % if(menu != 0):
-                            <div class="col-lg-8 col-sm-8">
-                                <ol class="breadcrumb pull-right">   
-                                    <li style="margin: 0;">
+                        <div class="col-lg-8 col-sm-8">
+                            <ol class="breadcrumb pull-right">   
+                                <li style="margin: 0;">
+                                    % if(menu != 0):
                                         % i = 1
                                         % for sub_d in menu:
                                             % if(sub_d[1] == 1):
@@ -143,10 +143,10 @@
                                             % end
                                             % i += 1
                                         % end
-                                    </li>
-                                </ol>
-                            </div>
-                        % end
+                                        % end
+                                </li>
+                            </ol>
+                        </div>
                     </div>
                 </div>
             </div>
