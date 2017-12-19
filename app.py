@@ -17,7 +17,6 @@ app = beaker.middleware.SessionMiddleware(app(), session_opts)
 BaseRequest.MEMFILE_MAX = 1000 ** 4
 r_ver = '2.4.7'
 
-from set_mark.mark import *
 from set_mark.mid_pas import *
 from set_mark.macro import savemark
 from func import *
@@ -2532,10 +2531,10 @@ def user_ban(name = None):
             else:
                 plus = ''
             
-            data = '<select name="year">' + year + '</select> 년'
-            data += '<select name="month">' + month + '</select> 월'
+            data = '<select name="year">' + year + '</select> 년 '
+            data += '<select name="month">' + month + '</select> 월 '
             data += '<select name="day">' + day + '</select> 일 <br><br>'
-            data += '<select name="hour">' + hour + '</select> 시'
+            data += '<select name="hour">' + hour + '</select> 시 '
             data += '<select name="minu">' + minu + '</select> 분 까지<br><br>'
             data += '<input placeholder="사유" class="form-control" name="why"><br>' + plus
 
@@ -3093,7 +3092,7 @@ def user_info():
                                                         ' * [[wiki:view_log|지나온 문서]]\r\n' + \
                                                         ' * [[wiki:record/' + raw_ip + '|편집 기록]]\r\n' + \
                                                         ' * [[wiki:topic_record/' + raw_ip + '|토론 기록]]\r\n' + \
-                                                        ' * [[wiki:count|편집 횟수]]\r\n', 0, 0, 0),
+                                                        ' * [[wiki:count|활동 횟수]]\r\n', 0, 0, 0),
         menu = 0
     )))
 
@@ -3184,7 +3183,7 @@ def count_edit(name = None):
 
     return(html_minify(template('index', 
         imp = ['활동 횟수', wiki_set(conn, 1), custom(conn), other2([0, 0])],
-        data = namumark(conn, "", "||<-2><:> " + that + " ||\r\n||<:> 편집 횟수 ||<:> " + str(data) + "||\r\n||<:> 토론 횟수 ||<:> " + str(t_data) + "||", 0, 0, 0),
+        data = namumark(conn, "", "[목차(없음)]\r\n== " + that + " ==\r\n||<:> 편집 횟수 ||<:> " + str(data) + "||\r\n||<:> 토론 횟수 ||<:> " + str(t_data) + "||", 0, 0, 0),
         menu = [['user', '사용자'], ['record/' + url_pas(that), '편집 기록'], ['topic_record/' + url_pas(that), '토론 기록']]
     )))
         
