@@ -336,10 +336,6 @@ div.scroll-buttons a.scroll-button {
     box-sizing: border-box;
 }
 
-blockquote {
-    margin: 10px 0 10px;
-}
-
 img {
     max-width: 100%;
     height: auto;
@@ -557,16 +553,17 @@ iframe {
 }
 
 blockquote {
-    padding:1em calc(2em + 25px) 1em 1em;
-    margin:1em 0em 0em;
-    background:#eeeeee;
-    display:table;
-    border:2px dashed #ccc;
-    border-left:5px solid #2C3E50;
+    padding: 1em calc(2em + 25px) 1em 1em;
+    margin: 1em 0em 0em;
+    background: #eeeeee;
+    display: block;
+    border: 2px dashed #ccc;
+    border-left: 5px solid #2C3E50;
     background-image: url('/views/acme/img/quote.png');
-    background-position:calc(100% - 10px) 10px;
-    background-repeat:no-repeat;
-    background-size:25px;
+    background-position: calc(100% - 10px) 10px;
+    background-repeat: no-repeat;
+    background-size: 25px;
+    font-size: 14px;
 }
 
 img {
