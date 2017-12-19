@@ -665,18 +665,14 @@ def admin_list():
 @route('/record/<name:path>')
 @route('/record/<name:path>/<num:int>')
 @route('/recent_changes')
-def recent_changes(name = None, num = 1):
+@route('/recent_changes/<what:path>')
+def recent_changes(name = None, num = 1, what = 'all'):
     ydmin = admin_check(conn, 1, None)
     zdmin = admin_check(conn, 6, None)
     ban = ''
     send = '<br>'
-    div =  '<table style="width: 100%; text-align: center;"> \
-                <tbody> \
-                    <tr> \
-                        <td style="width: 33.3%;">문서명</td> \
-                        <td style="width: 33.3%;">편집자</td> \
-                        <td style="width: 33.3%;">시간</td> \
-                    </tr>'
+    div = '<table style="width: 100%; text-align: center;"><tbody><tr>'
+    div += '<td style="width: 33.3%;">문서명</td><td style="width: 33.3%;">편집자</td><td style="width: 33.3%;">시간</td></tr>'
     
     if(name):
         if(num * 50 > 0):
@@ -688,7 +684,23 @@ def recent_changes(name = None, num = 1):
 
         curs.execute("select id, title, date, ip, send, leng from history where ip = ? order by date desc limit ?, '50'", [name, str(sql_num)])
     else:
-        curs.execute("select id, title, date, ip, send, leng from history where not date = 'Dump' order by date desc limit 50")
+        if(what == 'all'):
+            div = '<a href="/recent_changes/revert">(되돌리기)</a><br><br>' + div
+            div = '<a href="/recent_changes/move">(이동)</a> ' + div
+            div = '<a href="/recent_changes/delete">(삭제)</a> ' + div
+
+            curs.execute("select id, title, date, ip, send, leng from history order by date desc limit 50")
+        else:
+            if(what == 'delete'):
+                sql = '%(삭제)'
+            elif(what == 'move'):
+                sql = '%이동)'
+            elif(what == 'revert'):
+                sql = '%판)'
+            else:
+                return(redirect('/'))
+
+            curs.execute("select id, title, date, ip, send, leng from history where send like ? order by date desc limit 50", [sql])
 
     for data in curs.fetchall():         
         send = '<br>'
@@ -738,18 +750,10 @@ def recent_changes(name = None, num = 1):
             else:
                 hidden = ''      
             
-        div += '<tr style="' + style + '"> \
-                    <td> \
-                        <a href="/w/' + url_pas(data[1]) + '">' + title + '</a> (<a href="/history/' + url_pas(data[1]) + '">' + data[0] + '판</a>) ' + revert + ' (' + leng + ') \
-                    </td> \
-                    <td>' + ip + ban + hidden + '</td> \
-                    <td>' + data[2] + '</td> \
-                </tr> \
-                <tr> \
-                    <td colspan="3">' + send + '</td> \
-                </tr>'
-    else:
-        div += '</tbody></table>'
+        div += '<tr style="' + style + '"><td><a href="/w/' + url_pas(data[1]) + '">' + title + '</a> (<a href="/history/' + url_pas(data[1]) + '">' + data[0] + '판</a>) ' + revert + ' (' + leng + ')</td>'
+        div += '<td>' + ip + ban + hidden + '</td><td>' + data[2] + '</td></tr><tr><td colspan="3">' + send + '</td></tr>'
+
+    div += '</tbody></table>'
 
     if(name):
         curs.execute("select end, why from ban where block = ?", [name])
@@ -766,6 +770,9 @@ def recent_changes(name = None, num = 1):
         sub = 0
         menu = 0
         title = '최근 변경내역'
+
+        if(what != 'all'):
+            menu = [['recent_changes', '일반']]
             
     return(html_minify(template('index', 
         imp = [title, wiki_set(conn, 1), custom(conn), other2([sub, 0])],
