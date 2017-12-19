@@ -1526,6 +1526,7 @@ def preview(name = None, num = None):
 
     ip = ip_check()
     can = acl_check(conn, name)
+    captcha = captcha_get(conn)
     
     if(can == 1):
         return(re_error(conn, '/ban'))
@@ -1545,6 +1546,7 @@ def preview(name = None, num = None):
                     <textarea rows="25" name="content">' + html.escape(request.forms.content) + '</textarea> \
                     <textarea style="display: none;" name="otent">' + html.escape(request.forms.otent) + '</textarea><br><br> \
                     <input placeholder="사유" name="send" type="text"><br><br> \
+                    ' + captcha + ' \
                     <button id="preview" class="btn btn-primary" type="submit">저장</button> \
                     <button id="preview" class="btn" type="submit" formaction="/preview/' + url_pas(name) + action + '">미리보기</button> \
                 </form><br><br>' + enddata,

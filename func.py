@@ -28,7 +28,7 @@ def captcha_get(conn):
     curs = conn.cursor()
 
     data = ''
-    if(re.search('\.|:', ip_check()) and session.get('Awaken') != 1):
+    if(re.search('\.|:', ip_check()) and session.get('Awaken') and session.get('Awaken') != 1):
         curs.execute('select data from other where name = "recaptcha"')
         recaptcha = curs.fetchall()
         if(recaptcha and recaptcha[0][0] != ''):
@@ -39,7 +39,7 @@ def captcha_get(conn):
 def captcha_post(conn, num = 1):
     session = request.environ.get('beaker.session')
     if(num == 1):
-        if(re.search('\.|:', ip_check()) and session.get('Awaken') != 1 and captcha_get(conn) != ''):
+        if(re.search('\.|:', ip_check()) and session.get('Awaken') and session.get('Awaken') != 1 and captcha_get(conn) != ''):
             return(1)
         else:
             return(0)
@@ -369,7 +369,6 @@ def re_error(conn, data):
                 if(m):
                     curs.execute("select end, why from ban where block = ? and band = 'O'", [m.groups()[0]])
                     d = curs.fetchall()
-
             if(d):
                 if(d[0][0]):
                     end = d[0][0] + ' 까지 차단 상태 입니다. / 사유 : ' + d[0][1]                
@@ -392,17 +391,12 @@ def re_error(conn, data):
                         end = '차단이 풀렸습니다. 다시 시도 해 보세요.'
                 else:
                     end = '영구 차단 상태 입니다. / 사유 : ' + d[0][1]
-            
 
-        return(
-            html_minify(
-                template('index', 
-                    imp = ['권한 오류', wiki_set(conn, 1), custom(conn), other2([0, 0])],
-                    data = end,
-                    menu = 0
-                )
-            )
-        )
+        return(html_minify(template('index', 
+            imp = ['권한 오류', wiki_set(conn, 1), custom(conn), other2([0, 0])],
+            data = end,
+            menu = 0
+        )))
 
     d = re.search('\/error\/([0-9]+)', data)
     if(d):
@@ -469,16 +463,11 @@ def re_error(conn, data):
             data = '재 확인이랑 비밀번호가 다릅니다.'
 
         if(title):
-            return(
-                html_minify(
-                    template(
-                        'index', 
-                        imp = [title, wiki_set(conn, 1), custom(conn), other2([0, 0])],
-                        data = data,
-                        menu = 0
-                    )
-                )
-            )
+            return(html_minify(template('index', 
+                imp = [title, wiki_set(conn, 1), custom(conn), other2([0, 0])],
+                data = data,
+                menu = 0
+            )))
         else:
             return(redirect('/'))
     else:
