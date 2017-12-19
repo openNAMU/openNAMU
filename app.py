@@ -663,7 +663,7 @@ def admin_list():
     )))
         
 @route('/record/<name:path>')
-@route('/record/<name:path>/<num:int>')
+@route('/record/<name:path>/<num:int>/<what:path>')
 @route('/recent_changes')
 @route('/recent_changes/<what:path>')
 def recent_changes(name = None, num = 1, what = 'all'):
@@ -680,9 +680,24 @@ def recent_changes(name = None, num = 1, what = 'all'):
         else:
             sql_num = 0            
 
-        div = '<a href="/topic_record/' + url_pas(name) + '">(토론 기록)</a><br><br>' + div
+        if(what == 'all'):
+            div = '<a href="/topic_record/' + url_pas(name) + '">(토론 기록)</a><br><br>' + div
+            div = '<a href="/record/' + url_pas(name) + '/' + str(num) + '/revert">(되돌리기)</a> ' + div
+            div = '<a href="/record/' + url_pas(name) + '/' + str(num) + '/move">(이동)</a> ' + div
+            div = '<a href="/record/' + url_pas(name) + '/' + str(num) + '/delete">(삭제)</a> ' + div
+        
+            curs.execute("select id, title, date, ip, send, leng from history where ip = ? order by date desc limit ?, '50'", [name, str(sql_num)])
+        else:
+            if(what == 'delete'):
+                sql = '%(삭제)'
+            elif(what == 'move'):
+                sql = '%이동)'
+            elif(what == 'revert'):
+                sql = '%판)'
+            else:
+                return(redirect('/'))
 
-        curs.execute("select id, title, date, ip, send, leng from history where ip = ? order by date desc limit ?, '50'", [name, str(sql_num)])
+            curs.execute("select id, title, date, ip, send, leng from history where ip = ? and send like ? order by date desc limit ?, '50'", [name, sql, str(sql_num)])
     else:
         if(what == 'all'):
             div = '<a href="/recent_changes/revert">(되돌리기)</a><br><br>' + div
@@ -766,6 +781,9 @@ def recent_changes(name = None, num = 1, what = 'all'):
         title = '편집 기록'
         menu = [['other', '기타'], ['user', '사용자'], ['count/' + url_pas(name), '횟수']]
         div += '<br><a href="/record/' + url_pas(name) + '/' + str(num - 1) + '">(이전)</a> <a href="/record/' + url_pas(name) + '/' + str(num + 1) + '">(이후)</a>'
+
+        if(what != 'all'):
+            menu += [['record/' + url_pas(name), '일반']]
     else:
         sub = 0
         menu = 0
@@ -1714,6 +1732,7 @@ def other():
                             ' * [[wiki:user_log|가입 기록]]\r\n' + \
                             ' * [[wiki:admin_log|권한 기록]]\r\n' + \
                             ' * [[wiki:manager/6|편집 기록]]\r\n' + \
+                            ' * [[wiki:manager/7|토론 기록]]\r\n' + \
                             ' * [[wiki:not_close_topic|열린 토론 목록]]\r\n' + \
                             '== 기타 ==\r\n' + \
                             ' * [[wiki:title_index|모든 문서]]\r\n' + \
@@ -1732,7 +1751,7 @@ def other():
 @route('/manager', method=['POST', 'GET'])
 @route('/manager/<num:int>', method=['POST', 'GET'])
 def manager(num = 1):
-    title_list = [['ACL 이동', '문서명', 'acl'], ['검사 이동', 0, 'check'], ['차단 이동', 0, 'ban'], ['권한 이동', 0, 'admin'], ['기록 이동', 0, 'record'], [], ['그룹 생성 이동', '그룹명', 'admin_plus']]
+    title_list = [['ACL', '문서명', 'acl'], ['검사', 0, 'check'], ['차단', 0, 'ban'], ['권한', 0, 'admin'], ['편집 기록', 0, 'record'], ['토론 기록', 0, 'topic_record'], ['그룹 생성', '그룹명', 'admin_plus']]
     if(num == 1):
         return(html_minify(template('index', 
             imp = ['관리자 메뉴', wiki_set(conn, 1), custom(conn), other2([0, 0])],
@@ -1752,12 +1771,12 @@ def manager(num = 1):
                                         ' * 이 메뉴에 없는 기능은 해당 문서의 역사나 토론에서 바로 사용 가능함', 0, 0, 0),
             menu = [['other', '기타']]
         )))
-    elif(num in range(2, 6) or num == 8):
+    elif(num in range(2, 8)):
         if(request.method == 'POST'):
             return(redirect('/' + title_list[(num - 2)][2] + '/' + url_pas(request.forms.name)))
         else:
             if(title_list[(num - 2)][1] == 0):
-                placeholder = '문서명'
+                placeholder = '사용자명'
             else:
                 placeholder = title_list[(num - 2)][1]
 
@@ -1774,7 +1793,7 @@ def manager(num = 1):
             return(redirect('/check/' + url_pas(request.forms.name) + '/' + url_pas(request.forms.name2)))
         else:
             return(html_minify(template('index', 
-                imp = ['검사 이동', wiki_set(conn, 1), custom(conn), other2([0, 0])],
+                imp = ['검사', wiki_set(conn, 1), custom(conn), other2([0, 0])],
                 data = '<form method="post"> \
                             <input placeholder="사용자명" name="name" type="text"><br><br> \
                             <input placeholder="비교 대상" name="name2" type="text"><br><br> \
