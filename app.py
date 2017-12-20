@@ -17,9 +17,9 @@ app = beaker.middleware.SessionMiddleware(app(), session_opts)
 BaseRequest.MEMFILE_MAX = 1000 ** 4
 r_ver = '2.4.7'
 
-from set_mark.mid_pas import *
-from set_mark.macro import savemark
 from func import *
+from set_mark.mid_pas import mid_pas
+from set_mark.macro import savemark
 
 try:
     json_data = open('set.json').read()
@@ -2837,11 +2837,12 @@ def read_view(name = None, num = None, redirect = None):
                     u_div += ' * [[:' + data[0] + ']]\r\n'
                 elif(re.search('^틀:', data[0])):
                     curs.execute("select data from data where title = ?", [data[0]])
-                    d = mid_pas(curs.fetchall()[0][0], 0, 1, 0)[0]
-                    if(re.search('\[\[' + name + ']]', d)):
-                        div += ' * [[' + data[0] + ']]\r\n * [[wiki:xref/' + url_pas(data[0]) + '|' + data[0] + ']] (역링크)\r\n'
-                    else:
-                        div += ' * [[' + data[0] + ']]\r\n'
+                    db_data = curs.fetchall()
+                    if(db_data):
+                        if(re.search('\[\[' + name + ']]', mid_pas(db_data[0][0], 0, 1, 0)[0])):
+                            div += ' * [[' + data[0] + ']]\r\n * [[wiki:xref/' + url_pas(data[0]) + '|' + data[0] + ']] (역링크)\r\n'
+                        else:
+                            div += ' * [[' + data[0] + ']]\r\n'
                 else:
                     div += ' * [[' + data[0] + ']]\r\n'
 
