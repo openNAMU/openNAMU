@@ -17,9 +17,9 @@ app = beaker.middleware.SessionMiddleware(app(), session_opts)
 BaseRequest.MEMFILE_MAX = 1000 ** 4
 r_ver = '2.4.7'
 
-from set_mark.mid_pas import *
-from set_mark.macro import savemark
 from func import *
+from set_mark.mid_pas import mid_pas
+from set_mark.macro import savemark
 
 try:
     json_data = open('set.json').read()
@@ -1957,37 +1957,46 @@ def topic_stop(name = None, sub = None, tool = None):
 
 @route('/topic/<name:path>/sub/<sub:path>/admin/<num:int>')
 def topic_admin(name = None, sub = None, num = None):
-    curs.execute("select block, ip from topic where title = ? and sub = ? and id = ?", [name, sub, str(num)])
+    curs.execute("select block, ip, date from topic where title = ? and sub = ? and id = ?", [name, sub, str(num)])
     data = curs.fetchall()
     if(not data):
         return(redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub)))
 
-    is_ban = '<li><a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/b/' + str(num) + '">'
-    if(data[0][0] == 'O'):
-        is_ban += '가림 해제'
-    else:
-        is_ban += '가림'
-    is_ban += '</a></li>'
+    ban = '[목차(없음)]\r\n'
+    if(admin_check(conn, 3, None) == 1):
+        ban += '== 관리 도구 ==\r\n'
 
-    curs.execute("select id from topic where title = ? and sub = ? and id = ? and top = 'O'", [name, sub, str(num)])
-    is_ban += '<li><a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/notice/' + str(num) + '">'
-    if(curs.fetchall()):
-        is_ban += '공지 해제'
-    else:
-        is_ban += '공지'
-    is_ban += '</a></li>'
+        is_ban = ' * [[wiki:topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/b/' + str(num) + '|'
+        if(data[0][0] == 'O'):
+            is_ban += '가림 해제'
+        else:
+            is_ban += '가림'
+        is_ban += ']]\r\n'
 
-    curs.execute("select end from ban where block = ?", [data[0][1]])
-    ban = '<li><a href="/ban/' + url_pas(data[0][1]) + '">'
-    if(curs.fetchall()):
-        ban += '차단 해제'
-    else:
-        ban += '차단'
-    ban += '</a></li>' + is_ban
+        curs.execute("select id from topic where title = ? and sub = ? and id = ? and top = 'O'", [name, sub, str(num)])
+        is_ban += ' * [[wiki:topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/notice/' + str(num) + '|'
+        if(curs.fetchall()):
+            is_ban += '공지 해제'
+        else:
+            is_ban += '공지'
+        is_ban += ']]\r\n'
+
+        curs.execute("select end from ban where block = ?", [data[0][1]])
+        ban += ' * [[wiki:/ban/' + url_pas(data[0][1]) + '|'
+        if(curs.fetchall()):
+            ban += '차단 해제'
+        else:
+            ban += '차단'
+        ban += ']]\r\n' + is_ban
+
+    ban += '== 기타 도구 ==\r\n'
+    ban += ' * [[wiki:/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/raw/' + str(num) + '|원본]]'
+    ban = ' * 작성 시간 : ' + data[0][2] + ban
+    ban = ' * 작성인 : ' + data[0][1] + ban
 
     return(html_minify(template('index', 
-        imp = ['토론 관리', wiki_set(conn, 1), custom(conn), other2([' (' + str(num) + '번)', 0])],
-        data = '<ul>' + ban + '</ul>',
+        imp = ['토론 도구', wiki_set(conn, 1), custom(conn), other2([' (' + str(num) + '번)', 0])],
+        data = namumark(conn, '', ban, 0, 0, 0),
         menu = [['topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '#' + str(num), '토론']]
     )))
 
@@ -2114,9 +2123,7 @@ def topic(name = None, sub = None):
                 ip += ' <a href="javascript:void(0);" title="관리자">★</a>'
 
             if(admin == 1 or blind_data == ''):
-                ip += ' <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/raw/' + str(number) + '">(원본)</a>'
-                if(admin == 1):
-                    ip += ' <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/admin/' + str(number) + '">(관리)</a>'
+                ip += ' <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/admin/' + str(number) + '">(도구)</a>'
 
             curs.execute("select end from ban where block = ?", [topic_data[3]])
             if(curs.fetchall()):
@@ -2133,7 +2140,7 @@ def topic(name = None, sub = None):
                 user_write = '<br>'
                          
             all_data += '<table id="toron"><tbody><tr><td id="toron_color' + color + '">'
-            all_data += '<a href="javascript:void(0);" id="' + str(number) + '">#' + str(number) + '</a> ' + ip + ' <span style="float: right;">' + topic_data[2] + '</span>'
+            all_data += '<a href="javascript:void(0);" id="' + str(number) + '">#' + str(number) + '</a> ' + ip + '</span>'
             all_data += '</td></tr><tr ' + blind_data + '><td>' + user_write + '</td></tr></tbody></table><br>'
             number += 1
 
@@ -2837,11 +2844,12 @@ def read_view(name = None, num = None, redirect = None):
                     u_div += ' * [[:' + data[0] + ']]\r\n'
                 elif(re.search('^틀:', data[0])):
                     curs.execute("select data from data where title = ?", [data[0]])
-                    d = mid_pas(curs.fetchall()[0][0], 0, 1, 0)[0]
-                    if(re.search('\[\[' + name + ']]', d)):
-                        div += ' * [[' + data[0] + ']]\r\n * [[wiki:xref/' + url_pas(data[0]) + '|' + data[0] + ']] (역링크)\r\n'
-                    else:
-                        div += ' * [[' + data[0] + ']]\r\n'
+                    db_data = curs.fetchall()
+                    if(db_data):
+                        if(re.search('\[\[' + name + ']]', mid_pas(db_data[0][0], 0, 1, 0)[0])):
+                            div += ' * [[' + data[0] + ']]\r\n * [[wiki:xref/' + url_pas(data[0]) + '|' + data[0] + ']] (역링크)\r\n'
+                        else:
+                            div += ' * [[' + data[0] + ']]\r\n'
                 else:
                     div += ' * [[' + data[0] + ']]\r\n'
 
