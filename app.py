@@ -889,15 +889,9 @@ def recent_discuss(tools = 'normal'):
                 close = 1
 
         if(close == 0):
-            div += '<tr> \
-                        <td> \
-                            <a href="/topic/' + url_pas(data[0]) + '/sub/' + url_pas(data[1]) + '">' + title + '</a> (' + sub + ') \
-                        </td> \
-                        <td>' + data[2] + '</td> \
-                    </tr>'
+            div += '<tr><td><a href="/topic/' + url_pas(data[0]) + '/sub/' + url_pas(data[1]) + '">' + title + '</a> (' + sub + ')</td><td>' + data[2] + '</td></tr>'
     else:
-        div +=      '</tbody> \
-                </table>'
+        div += '</tbody></table>'
             
     return(html_minify(template('index', 
         imp = ['최근 토론내역', wiki_set(conn, 1), custom(conn), other2([m_sub, 0])],
@@ -1621,8 +1615,13 @@ def title_index(num = 100, page = 1):
     if(num != 0):
         data += '</ul><br><a href="/title_index/' + str(num) + '/' + str(page - 1) + '">(이전)</a> <a href="/title_index/' + str(num) + '/' + str(page + 1) + '">(이후)</a>'
     
+    if(' (' + str(num) + '개)' == ' (0개)'):
+        sub = 0
+    else:
+        sub = ' (' + str(num) + '개)'
+    
     return(html_minify(template('index', 
-        imp = ['모든 문서', wiki_set(conn, 1), custom(conn), other2([' (' + str(num) + ')', 0])],
+        imp = ['모든 문서', wiki_set(conn, 1), custom(conn), other2([sub, 0])],
         data = data,
         menu = [['other', '기타']]
     )))
@@ -2363,7 +2362,7 @@ def acl(name = None):
             now = '일반'
         
         return(html_minify(template('index', 
-            imp = [name, wiki_set(conn, 1), custom(conn), other2([' (SET)', 0])],
+            imp = [name, wiki_set(conn, 1), custom(conn), other2([' (사문 ACL)', 0])],
             data = '<span>현재 ACL : ' + now + '</span><br><br> \
                     <form method="post"> \
                         <select name="select"> \
@@ -3174,21 +3173,20 @@ def recent_changes(name = None, num = 1, what = 'all', tool = 'record'):
             div += '<td>' + ip + ban + hidden + '</td><td>' + date + '</td></tr><tr style="' + style[1] + '"><td colspan="3">' + send + '</td></tr>'
 
         div += '</tbody></table>'
+        sub = ''
 
         if(name):
             if(tool == 'history'):
                 div = '<form method="post"><select name="a">' + select + '</select> <select name="b">' + select + '</select> <button class="btn btn-primary" type="submit">비교</button></form><br>' + div
                 title = name
-                sub = '역사'
+                sub += ' (역사)'
                 menu = [['w/' + url_pas(name), '문서']]
                 div += '<br><a href="/history/' + url_pas(name) + '/' + str(num - 1) + '">(이전)</a> <a href="/history/' + url_pas(name) + '/' + str(num + 1) + '">(이후)</a>'
             else:
                 curs.execute("select end, why from ban where block = ?", [name])
                 ban_it = curs.fetchall()
                 if(ban_it):
-                    sub = '(차단)'
-                else:
-                    sub = 0
+                    sub += ' (차단)'
 
                 title = '편집 기록'
                 menu = [['other', '기타'], ['user', '사용자'], ['count/' + url_pas(name), '횟수']]
@@ -3200,12 +3198,21 @@ def recent_changes(name = None, num = 1, what = 'all', tool = 'record'):
                 if(what != 'all'):
                     menu += [['record/' + url_pas(name), '일반']]
         else:
-            sub = 0
             menu = 0
             title = '최근 변경내역'
 
             if(what != 'all'):
                 menu = [['recent_changes', '일반']]
+                
+        if(what == 'delete'):
+            sub += ' (삭제)'
+        elif(what == 'move'):
+            sub += ' (이동)'
+        elif(what == 'revert'):
+            sub += ' (되돌리기)'
+        
+        if(sub == ''):
+            sub = 0
                 
         return(html_minify(template('index', 
             imp = [title, wiki_set(conn, 1), custom(conn), other2([sub, 0])],
