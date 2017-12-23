@@ -465,6 +465,12 @@ def re_error(conn, data):
         elif(num == 20):
             title = '비밀번호 오류'
             data = '재 확인이랑 비밀번호가 다릅니다.'
+        elif(num == 21):
+            title = '편집 오류'
+            data = '편집 필터에 의해 검열 되었습니다.'
+        else:
+            title = '정체 불명의 오류'
+            data = '???'
 
         if(title):
             return(html_minify(template('index', 
