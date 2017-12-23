@@ -101,16 +101,22 @@ try:
         pass
 
     try:
-        curs.execute('select name from ok_login limit 1')
+        curs.execute('select ip from ok_login limit 1')
     except:
         curs.execute("create table ok_login(ip text, sub text)")
         print('ok_login 테이블 생성')
-    
+
     try:
         curs.execute("drop table move")
         print("move 테이블 삭제")
     except:
         pass
+
+    try:
+        curs.execute('select name from filter limit 1')
+    except:
+        curs.execute("create table filter(name text, regex text, sub text)")
+        print("filter 테이블 생성")
 
     conn.commit()
 except:
@@ -241,6 +247,11 @@ def setup():
 
         try:
             curs.execute("create table ok_login(ip text, sub text)")
+        except:
+            pass
+
+        try:
+            curs.execute("create table filter(name text, regex text, sub text)")
         except:
             pass
 
@@ -1165,7 +1176,61 @@ def big_delete():
                     </form>',
             menu = [['manager', '관리자']]
         )))
-                
+
+@route('/edit_filter')
+def edit_filter():
+    div = '<ul>'
+    
+    curs.execute("select name from filter")
+    data = curs.fetchall()
+    for data_list in data:
+        div += '<li><a href="/edit_filter/' + url_pas(data_list[0]) + '">' + data_list[0] + '</a></li>'
+
+    div += '</ul>'
+    div += '<a href="/manager/9">(편집 필터 추가)</a>'
+
+    return(html_minify(template('index', 
+        imp = ['편집 필터 목록', wiki_set(conn, 1), custom(conn), other2([0, 0])],
+        data = div,
+        menu = [['manager', '관리자']]
+    )))
+
+@route('/edit_filter/<name:path>', method=['POST', 'GET'])
+def set_edit_filter(name = None):
+    if(request.method == 'POST'):
+        if(admin_check(conn, 1, 'edit_filter edit') != 1):
+            return(re_error('/error/3'))
+
+        curs.execute("select name from filter where name = ?", [name])
+        if(curs.fetchall()):
+            curs.execute("update filter set regex = ? where name = ?", [request.forms.content, name])
+        else:
+            curs.execute("insert into filter (name, regex, sub) values (?, ?, '')", [name, request.forms.content])
+        conn.commit()
+    
+        return(redirect('/edit_filter/' + url_pas(name)))
+    else:
+        curs.execute("select regex from filter where name = ?", [name])
+        exist = curs.fetchall()
+        if(exist):
+            textarea = exist[0][0]
+        else:
+            textarea = ''
+
+        if(admin_check(conn, 1, None) != 1):
+            stat = 'disabled'
+        else:
+            stat = ''
+
+        return(html_minify(template('index', 
+            imp = [name, wiki_set(conn, 1), custom(conn), other2([' (편집 필터)', 0])],
+            data = '<form method="post"> \
+                        <input ' + stat + ' placeholder="정규식" name="content" value="' + html.escape(textarea) + '" type="text"><br><br> \
+                        <button ' + stat + ' id="preview" class="btn btn-primary" type="submit">저장</button> \
+                    </form>',
+            menu = [['edit_filter', '목록']]
+        )))
+
 @route('/edit/<name:path>', method=['POST', 'GET'])
 @route('/edit/<name:path>/from/<name2:path>', method=['POST', 'GET'])
 @route('/edit/<name:path>/section/<num:int>', method=['POST', 'GET'])
@@ -1177,6 +1242,17 @@ def edit(name = None, name2 = None, num = None):
         return(re_error(conn, '/ban'))
     
     if(request.method == 'POST'):
+        curs.execute("select regex from filter")
+        data = curs.fetchall()
+        for data_list in data:
+            try:
+                match = re.compile(data_list[0])
+                exist = match.search(request.forms.content)
+                if(exist):
+                    return(re_error(conn, '/error/21'))
+            except:
+                pass
+
         if(not request.forms.get('g-recaptcha-response')):
             if(captcha_post(conn) == 1):
                 return(re_error(conn, '/error/13'))
@@ -1499,7 +1575,7 @@ def other():
 @route('/manager', method=['POST', 'GET'])
 @route('/manager/<num:int>', method=['POST', 'GET'])
 def manager(num = 1):
-    title_list = [['ACL', '문서명', 'acl'], ['검사', 0, 'check'], ['차단', 0, 'ban'], ['권한', 0, 'admin'], ['편집 기록', 0, 'record'], ['토론 기록', 0, 'topic_record'], ['그룹 생성', '그룹명', 'admin_plus']]
+    title_list = [['ACL', '문서명', 'acl'], ['검사', 0, 'check'], ['차단', 0, 'ban'], ['권한', 0, 'admin'], ['편집 기록', 0, 'record'], ['토론 기록', 0, 'topic_record'], ['그룹 생성', '그룹명', 'admin_plus'], ['편집 필터 생성', '필터명', 'edit_filter']]
     if(num == 1):
         return(html_minify(template('index', 
             imp = ['관리자 메뉴', wiki_set(conn, 1), custom(conn), other2([0, 0])],
@@ -1511,6 +1587,7 @@ def manager(num = 1):
                                         ' * [[wiki:manager/4|사용자 차단]]\r\n' + \
                                         ' * [[wiki:manager/5|권한 주기]]\r\n' + \
                                         ' * [[wiki:big_delete|여러 문서 삭제]]\r\n' + \
+                                        ' * [[wiki:edit_filter|편집 필터]]\r\n' + \
                                         '== 소유자 ==\r\n' + \
                                         ' * [[wiki:indexing|인덱싱]]\r\n' + \
                                         ' * [[wiki:manager/8|관리 그룹 생성]]\r\n' + \
@@ -1519,7 +1596,7 @@ def manager(num = 1):
                                         ' * 이 메뉴에 없는 기능은 해당 문서의 역사나 토론에서 바로 사용 가능함', 0, 0, 0),
             menu = [['other', '기타']]
         )))
-    elif(num in range(2, 8)):
+    elif(num in range(2, 10)):
         if(request.method == 'POST'):
             return(redirect('/' + title_list[(num - 2)][2] + '/' + url_pas(request.forms.name)))
         else:
@@ -2769,6 +2846,188 @@ def user_topic_list(name = None, num = 1):
         data = div,
         menu = [['other', '기타'], ['user', '사용자'], ['count/' + url_pas(name), '횟수']]
     )))
+
+@route('/<tool:re:history|record>/<name:path>', method=['POST', 'GET'])
+@route('/<tool:re:history|record>/<name:path>/<num:int>', method=['POST', 'GET'])
+@route('/record/<name:path>/<num:int>/<what:path>')
+@route('/recent_changes')
+@route('/recent_changes/<what:path>')
+def recent_changes(name = None, num = 1, what = 'all', tool = 'record'):
+    if(request.method == 'POST'):
+        return(redirect('/w/' + url_pas(name) + '/r/' + request.forms.b + '/diff/' + request.forms.a))
+    else:
+        one_admin = admin_check(conn, 1, None)
+        six_admin = admin_check(conn, 6, None)
+        ban = ''
+        select = ''
+        div = '<table style="width: 100%; text-align: center;"><tbody><tr>'
+        
+        if(name):
+            if(num * 50 > 0):
+                sql_num = num * 50 - 50
+            else:
+                sql_num = 0      
+
+            if(tool == 'history'):
+                div += '<td style="width: 33.3%;">판</td><td style="width: 33.3%;">편집자</td><td style="width: 33.3%;">시간</td></tr>'
+
+                curs.execute("select id, title, date, ip, send, leng from history where title = ? order by id + 0 desc limit ?, '50'", [name, str(sql_num)])
+            elif(tool == 'record'):
+                div += '<td style="width: 33.3%;">문서명</td><td style="width: 33.3%;">편집자</td><td style="width: 33.3%;">시간</td></tr>'
+
+                if(what == 'all'):
+                    div = '<a href="/topic_record/' + url_pas(name) + '">(토론 기록)</a><br><br>' + div
+                    div = '<a href="/record/' + url_pas(name) + '/' + str(num) + '/revert">(되돌리기)</a> ' + div
+                    div = '<a href="/record/' + url_pas(name) + '/' + str(num) + '/move">(이동)</a> ' + div
+                    div = '<a href="/record/' + url_pas(name) + '/' + str(num) + '/delete">(삭제)</a> ' + div
+                
+                    curs.execute("select id, title, date, ip, send, leng from history where ip = ? order by date desc limit ?, '50'", [name, str(sql_num)])
+                else:
+                    if(what == 'delete'):
+                        sql = '%(삭제)'
+                    elif(what == 'move'):
+                        sql = '%이동)'
+                    elif(what == 'revert'):
+                        sql = '%판)'
+                    else:
+                        return(redirect('/'))
+
+                    curs.execute("select id, title, date, ip, send, leng from history where ip = ? and send like ? order by date desc limit ?, '50'", [name, sql, str(sql_num)])
+            else:
+                return(redirect('/'))
+        else:
+            div += '<td style="width: 33.3%;">문서명</td><td style="width: 33.3%;">편집자</td><td style="width: 33.3%;">시간</td></tr>'
+
+            if(what == 'all'):
+                div = '<a href="/recent_changes/revert">(되돌리기)</a><br><br>' + div
+                div = '<a href="/recent_changes/move">(이동)</a> ' + div
+                div = '<a href="/recent_changes/delete">(삭제)</a> ' + div
+
+                curs.execute("select id, title, date, ip, send, leng from history order by date desc limit 50")
+            else:
+                if(what == 'delete'):
+                    sql = '%(삭제)'
+                elif(what == 'move'):
+                    sql = '%이동)'
+                elif(what == 'revert'):
+                    sql = '%판)'
+                else:
+                    return(redirect('/'))
+
+                curs.execute("select id, title, date, ip, send, leng from history where send like ? order by date desc limit 50", [sql])
+
+        for data in curs.fetchall():    
+            select += '<option value="' + data[0] + '">' + data[0] + '</option>'     
+            send = '<br>'
+            if(data[4]):
+                if(not re.search("^(?: *)$", data[4])):
+                    send = data[4]
+            
+            if(re.search("\+", data[5])):
+                leng = '<span style="color:green;">' + data[5] + '</span>'
+            elif(re.search("\-", data[5])):
+                leng = '<span style="color:red;">' + data[5] + '</span>'
+            else:
+                leng = '<span style="color:gray;">' + data[5] + '</span>'
+                
+            if(one_admin == 1):
+                curs.execute("select * from ban where block = ?", [data[3]])
+                if(curs.fetchall()):
+                    ban = ' <a href="/ban/' + url_pas(data[3]) + '">(해제)</a>'
+                else:
+                    ban = ' <a href="/ban/' + url_pas(data[3]) + '">(차단)</a>'            
+                
+            ip = ip_pas(conn, data[3])
+                    
+            if((int(data[0]) - 1) == 0):
+                revert = ''
+            else:
+                revert = '<a href="/w/' + url_pas(data[1]) + '/r/' + str(int(data[0]) - 1) + '/diff/' + data[0] + '">(비교)</a> <a href="/revert/' + url_pas(data[1]) + '/r/' + str(int(data[0]) - 1) + '">(되돌리기)</a>'
+            
+            style = ['', '']
+            date = data[2]
+            curs.execute("select title from hidhi where title = ? and re = ?", [data[1], data[0]])
+            hide = curs.fetchall()
+            if(six_admin == 1):
+                if(hide):                            
+                    hidden = ' <a href="/history/' + url_pas(data[1]) + '/r/' + data[0] + '/hidden">(공개)'
+                    
+                    style[0] = 'background: gainsboro;'
+                    style[1] = 'background: gainsboro;'
+
+                    if(send == '<br>'):
+                        send = '(숨김)'
+                    else:
+                        send += ' (숨김)'
+                else:
+                    hidden = ' <a href="/history/' + url_pas(data[1]) + '/r/' + data[0] + '/hidden">(숨김)'
+            elif(not hide):
+                hidden = ''
+            else:
+                ip = ''
+                hidden = ''
+                ban = ''
+                date = ''
+                send = '(숨김)'
+
+                style[0] = 'display: none;'
+                style[1] = 'background: gainsboro;'
+
+            if(tool == 'history'):
+                title = data[0] + '판 '
+            else:
+                title = '<a href="/w/' + url_pas(data[1]) + '">' + html.escape(data[1]) + '</a> (<a href="/history/' + url_pas(data[1]) + '">' + data[0] + '판</a>) '
+                    
+            div += '<tr style="' + style[0] + '"><td>' + title + revert + ' (' + leng + ')</td>'
+            div += '<td>' + ip + ban + hidden + '</td><td>' + date + '</td></tr><tr style="' + style[1] + '"><td colspan="3">' + send + '</td></tr>'
+
+        div += '</tbody></table>'
+        sub = ''
+
+        if(name):
+            if(tool == 'history'):
+                div = '<form method="post"><select name="a">' + select + '</select> <select name="b">' + select + '</select> <button class="btn btn-primary" type="submit">비교</button></form><br>' + div
+                title = name
+                sub += ' (역사)'
+                menu = [['w/' + url_pas(name), '문서']]
+                div += '<br><a href="/history/' + url_pas(name) + '/' + str(num - 1) + '">(이전)</a> <a href="/history/' + url_pas(name) + '/' + str(num + 1) + '">(이후)</a>'
+            else:
+                curs.execute("select end, why from ban where block = ?", [name])
+                ban_it = curs.fetchall()
+                if(ban_it):
+                    sub += ' (차단)'
+
+                title = '편집 기록'
+                menu = [['other', '기타'], ['user', '사용자'], ['count/' + url_pas(name), '횟수']]
+                if(what):
+                    div += '<br><a href="/record/' + url_pas(name) + '/' + str(num - 1) + '/' + url_pas(what) + '">(이전)</a> <a href="/record/' + url_pas(name) + '/' + str(num + 1) + '/' + url_pas(what) + '">(이후)</a>'
+                else:
+                    div += '<br><a href="/record/' + url_pas(name) + '/' + str(num - 1) + '">(이전)</a> <a href="/record/' + url_pas(name) + '/' + str(num + 1) + '">(이후)</a>'
+
+                if(what != 'all'):
+                    menu += [['record/' + url_pas(name), '일반']]
+        else:
+            menu = 0
+            title = '최근 변경내역'
+
+            if(what != 'all'):
+                menu = [['recent_changes', '일반']]
+                
+        if(what == 'delete'):
+            sub += ' (삭제)'
+        elif(what == 'move'):
+            sub += ' (이동)'
+        elif(what == 'revert'):
+            sub += ' (되돌리기)'
+        
+        if(sub == ''):
+            sub = 0
+                
+        return(html_minify(template('index', 
+            imp = [title, wiki_set(conn, 1), custom(conn), other2([sub, 0])],
+            data = div,
+            menu = menu
+        )))
     
 @route('/upload', method=['GET', 'POST'])
 def upload():
@@ -3037,187 +3296,5 @@ def error_500(error):
         return('<!-- Splash, Spark, and Shining the Summer! 코코데맛떼나이데 잇쇼니코나캬, 다! Summer time (Oh ya! Summer time!!) 톤데모나이 나츠니나리소오 키미모카쿠고와 데키타카나? 히토리맛떼타라 앗토이우마니 바이바이 Summer time (Oh ya! Summer time!!) 오이데카레루노가 키라이나라 스구니오이데요 코코로우키우키 우키요노도리-무 비-치 세카이데 보우켄시요오 "보-옷"토 스키챠못타이나이 "규-웃"토 코이지칸가호시이? 닷타라(Let\'s go!) 닷타라(Let\'s go!) 코토시와 이치도키리사 아소보오 Splash! (Splash!!) 토비콘다 우미노아오사가(Good feeling) 오와라나이 나츠에노 토비라오 유메밋테루토 싯테루카이? 아소보오 Splash! (Splash!!) 토비콘데 미세타아토 키미가 타메랏테루(나라바) 요우샤나쿠 Summer Summer Summer에 츠레텟챠우카라! -->' + error)
     except:
         return('<!-- 아카이 타이요노 도레스데 오도루 와타시노 코토 미츠메테이루노 메오 소라시타이 데모 소라세나이 아아 죠네츠데 야카레타이 도키메키 이죠노 리즈무 코요이 시리타쿠테 이츠모요리 타이탄나 코토바오 츠부야이타 지분노 키모치나노니 젠젠 와카라나쿠 (낫챠이타이나) 리세이카라 시레이가 (토도카나이) 콘토로-루 후카노 손나 코이오 시타놋테 코에가 토도이테시맛타 하즈카시잇테 오모우케도 못토 시리타이노 못토 시리타이노 이케나이 유메다토 키즈키나가라 아카이 타이요노 도레스데 오도루 와타시노 코토 미츠메루 히토미 메오 소라시타이 데모 소라세나이 마나츠와 다레노 모노 아나타토 와타시노 모노니시타이 (닷테네) 코코로가 토마레나이 키세츠니 하지메테 무네노 토비라가 아이테 시마이소오요 You knock knock my heart!! -->' + redirect('/setup'))
-
-@route('/<tool:re:history|record>/<name:path>', method=['POST', 'GET'])
-@route('/<tool:re:history|record>/<name:path>/<num:int>', method=['POST', 'GET'])
-@route('/record/<name:path>/<num:int>/<what:path>')
-@route('/recent_changes')
-@route('/recent_changes/<what:path>')
-def recent_changes(name = None, num = 1, what = 'all', tool = 'record'):
-    if(request.method == 'POST'):
-        return(redirect('/w/' + url_pas(name) + '/r/' + request.forms.b + '/diff/' + request.forms.a))
-    else:
-        one_admin = admin_check(conn, 1, None)
-        six_admin = admin_check(conn, 6, None)
-        ban = ''
-        select = ''
-        div = '<table style="width: 100%; text-align: center;"><tbody><tr>'
-        
-        if(name):
-            if(num * 50 > 0):
-                sql_num = num * 50 - 50
-            else:
-                sql_num = 0      
-
-            if(tool == 'history'):
-                div += '<td style="width: 33.3%;">판</td><td style="width: 33.3%;">편집자</td><td style="width: 33.3%;">시간</td></tr>'
-
-                curs.execute("select id, title, date, ip, send, leng from history where title = ? order by id + 0 desc limit ?, '50'", [name, str(sql_num)])
-            elif(tool == 'record'):
-                div += '<td style="width: 33.3%;">문서명</td><td style="width: 33.3%;">편집자</td><td style="width: 33.3%;">시간</td></tr>'
-
-                if(what == 'all'):
-                    div = '<a href="/topic_record/' + url_pas(name) + '">(토론 기록)</a><br><br>' + div
-                    div = '<a href="/record/' + url_pas(name) + '/' + str(num) + '/revert">(되돌리기)</a> ' + div
-                    div = '<a href="/record/' + url_pas(name) + '/' + str(num) + '/move">(이동)</a> ' + div
-                    div = '<a href="/record/' + url_pas(name) + '/' + str(num) + '/delete">(삭제)</a> ' + div
-                
-                    curs.execute("select id, title, date, ip, send, leng from history where ip = ? order by date desc limit ?, '50'", [name, str(sql_num)])
-                else:
-                    if(what == 'delete'):
-                        sql = '%(삭제)'
-                    elif(what == 'move'):
-                        sql = '%이동)'
-                    elif(what == 'revert'):
-                        sql = '%판)'
-                    else:
-                        return(redirect('/'))
-
-                    curs.execute("select id, title, date, ip, send, leng from history where ip = ? and send like ? order by date desc limit ?, '50'", [name, sql, str(sql_num)])
-            else:
-                return(redirect('/'))
-        else:
-            div += '<td style="width: 33.3%;">문서명</td><td style="width: 33.3%;">편집자</td><td style="width: 33.3%;">시간</td></tr>'
-
-            if(what == 'all'):
-                div = '<a href="/recent_changes/revert">(되돌리기)</a><br><br>' + div
-                div = '<a href="/recent_changes/move">(이동)</a> ' + div
-                div = '<a href="/recent_changes/delete">(삭제)</a> ' + div
-
-                curs.execute("select id, title, date, ip, send, leng from history order by date desc limit 50")
-            else:
-                if(what == 'delete'):
-                    sql = '%(삭제)'
-                elif(what == 'move'):
-                    sql = '%이동)'
-                elif(what == 'revert'):
-                    sql = '%판)'
-                else:
-                    return(redirect('/'))
-
-                curs.execute("select id, title, date, ip, send, leng from history where send like ? order by date desc limit 50", [sql])
-
-        for data in curs.fetchall():    
-            select += '<option value="' + data[0] + '">' + data[0] + '</option>'     
-            send = '<br>'
-            if(data[4]):
-                if(not re.search("^(?: *)$", data[4])):
-                    send = data[4]
-            
-            if(re.search("\+", data[5])):
-                leng = '<span style="color:green;">' + data[5] + '</span>'
-            elif(re.search("\-", data[5])):
-                leng = '<span style="color:red;">' + data[5] + '</span>'
-            else:
-                leng = '<span style="color:gray;">' + data[5] + '</span>'
-                
-            if(one_admin == 1):
-                curs.execute("select * from ban where block = ?", [data[3]])
-                if(curs.fetchall()):
-                    ban = ' <a href="/ban/' + url_pas(data[3]) + '">(해제)</a>'
-                else:
-                    ban = ' <a href="/ban/' + url_pas(data[3]) + '">(차단)</a>'            
-                
-            ip = ip_pas(conn, data[3])
-                    
-            if((int(data[0]) - 1) == 0):
-                revert = ''
-            else:
-                revert = '<a href="/w/' + url_pas(data[1]) + '/r/' + str(int(data[0]) - 1) + '/diff/' + data[0] + '">(비교)</a> <a href="/revert/' + url_pas(data[1]) + '/r/' + str(int(data[0]) - 1) + '">(되돌리기)</a>'
-            
-            style = ['', '']
-            date = data[2]
-            curs.execute("select title from hidhi where title = ? and re = ?", [data[1], data[0]])
-            hide = curs.fetchall()
-            if(six_admin == 1):
-                if(hide):                            
-                    hidden = ' <a href="/history/' + url_pas(data[1]) + '/r/' + data[0] + '/hidden">(공개)'
-                    
-                    style[0] = 'background: gainsboro;'
-                    style[1] = 'background: gainsboro;'
-
-                    if(send == '<br>'):
-                        send = '(숨김)'
-                    else:
-                        send += ' (숨김)'
-                else:
-                    hidden = ' <a href="/history/' + url_pas(data[1]) + '/r/' + data[0] + '/hidden">(숨김)'
-            elif(not hide):
-                hidden = ''
-            else:
-                ip = ''
-                hidden = ''
-                ban = ''
-                date = ''
-                send = '(숨김)'
-
-                style[0] = 'display: none;'
-                style[1] = 'background: gainsboro;'
-
-            if(tool == 'history'):
-                title = data[0] + '판 '
-            else:
-                title = '<a href="/w/' + url_pas(data[1]) + '">' + html.escape(data[1]) + '</a> (<a href="/history/' + url_pas(data[1]) + '">' + data[0] + '판</a>) '
-                    
-            div += '<tr style="' + style[0] + '"><td>' + title + revert + ' (' + leng + ')</td>'
-            div += '<td>' + ip + ban + hidden + '</td><td>' + date + '</td></tr><tr style="' + style[1] + '"><td colspan="3">' + send + '</td></tr>'
-
-        div += '</tbody></table>'
-        sub = ''
-
-        if(name):
-            if(tool == 'history'):
-                div = '<form method="post"><select name="a">' + select + '</select> <select name="b">' + select + '</select> <button class="btn btn-primary" type="submit">비교</button></form><br>' + div
-                title = name
-                sub += ' (역사)'
-                menu = [['w/' + url_pas(name), '문서']]
-                div += '<br><a href="/history/' + url_pas(name) + '/' + str(num - 1) + '">(이전)</a> <a href="/history/' + url_pas(name) + '/' + str(num + 1) + '">(이후)</a>'
-            else:
-                curs.execute("select end, why from ban where block = ?", [name])
-                ban_it = curs.fetchall()
-                if(ban_it):
-                    sub += ' (차단)'
-
-                title = '편집 기록'
-                menu = [['other', '기타'], ['user', '사용자'], ['count/' + url_pas(name), '횟수']]
-                if(what):
-                    div += '<br><a href="/record/' + url_pas(name) + '/' + str(num - 1) + '/' + url_pas(what) + '">(이전)</a> <a href="/record/' + url_pas(name) + '/' + str(num + 1) + '/' + url_pas(what) + '">(이후)</a>'
-                else:
-                    div += '<br><a href="/record/' + url_pas(name) + '/' + str(num - 1) + '">(이전)</a> <a href="/record/' + url_pas(name) + '/' + str(num + 1) + '">(이후)</a>'
-
-                if(what != 'all'):
-                    menu += [['record/' + url_pas(name), '일반']]
-        else:
-            menu = 0
-            title = '최근 변경내역'
-
-            if(what != 'all'):
-                menu = [['recent_changes', '일반']]
-                
-        if(what == 'delete'):
-            sub += ' (삭제)'
-        elif(what == 'move'):
-            sub += ' (이동)'
-        elif(what == 'revert'):
-            sub += ' (되돌리기)'
-        
-        if(sub == ''):
-            sub = 0
-                
-        return(html_minify(template('index', 
-            imp = [title, wiki_set(conn, 1), custom(conn), other2([sub, 0])],
-            data = div,
-            menu = menu
-        )))
 
 run(app = app, server = 'tornado', host = '0.0.0.0', port = int(set_data['port']), debug = True)
