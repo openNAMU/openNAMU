@@ -183,14 +183,18 @@ def ip_pas(conn, raw_ip):
     hide = 0
     curs = conn.cursor()
     if(re.search("(\.|:)", raw_ip)):
-        curs.execute("select data from other where name = 'ip_view'")
-        d = curs.fetchall()
-        if(d and d[0][0] != ''):
-            ip = '<span style="font-size: 75%;">' + hashlib.md5(bytes(raw_ip, 'utf-8')).hexdigest() + '</span>'
-            if(not admin_check(conn, 'ban', None)):
-                hide = 1
+        if(not re.search("^도구:", raw_ip)):    
+            curs.execute("select data from other where name = 'ip_view'")
+            d = curs.fetchall()
+            if(d and d[0][0] != ''):
+                ip = '<span style="font-size: 75%;">' + hashlib.md5(bytes(raw_ip, 'utf-8')).hexdigest() + '</span>'
+                if(not admin_check(conn, 'ban', None)):
+                    hide = 1
+            else:
+                ip = raw_ip
         else:
             ip = raw_ip
+            hide = 1
     else:
         curs.execute("select title from data where title = ?", ['사용자:' + raw_ip])
         if(curs.fetchall()):
