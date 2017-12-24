@@ -918,21 +918,14 @@ def block_log(num = 1):
     else:
         sql_num = 0
     
-    div =   '<table style="width: 100%; text-align: center;"> \
-                <tbody> \
-                    <tr> \
-                        <td style="width: 33.3%;">차단자</td> \
-                        <td style="width: 33.3%;">관리자</td> \
-                        <td style="width: 33.3%;">기간</td> \
-                    </tr> \
-                    <tr> \
-                        <td colspan="2">이유</td> \
-                        <td>시간</td> \
-                    </tr>'
+    div = '<table style="width: 100%; text-align: center;"><tbody><tr><td style="width: 33.3%;">차단자</td><td style="width: 33.3%;">관리자</td><td style="width: 33.3%;">기간</td></tr>'
     
     curs.execute("select why, block, blocker, end, today from rb order by today desc limit ?, '50'", [str(sql_num)])
     for data in curs.fetchall():
         why = html.escape(data[0])
+
+        if(why == ''):
+            why = '<br>'
         
         b = re.search("^([0-9]{1,3}\.[0-9]{1,3})$", data[1])
         if(b):
@@ -945,8 +938,8 @@ def block_log(num = 1):
         else:
             end = '무기한'
             
-        div += '<tr><td>' + ip + '</td><td>' + ip_pas(conn, data[2]) + '</td><td>' + end + '</td></tr>'
-        div += '<tr><td colspan="2">' + why + '</td><td>' + data[4] + '</td></tr>'
+        div += '<tr><td>' + ip + '</td><td>' + ip_pas(conn, data[2]) + '</td><td>시작 : ' + data[4] + '<br>끝 : ' + end + '</td></tr>'
+        div += '<tr><td colspan="3">' + why + '</td></tr>'
     else:
         div += '</tbody></table><br>'
         div += '<a href="/block_log/' + str(num - 1) + '">(이전)</a> <a href="/block_log/' + str(num + 1) + '">(이후)</a>'
@@ -1201,34 +1194,74 @@ def set_edit_filter(name = None):
         if(admin_check(conn, 1, 'edit_filter edit') != 1):
             return(re_error('/error/3'))
 
+        if(request.forms.day == '00'):
+            end = ''
+        elif(request.forms.day == '09'):
+            end = 'X'
+        else:
+            end = request.forms.day + ' ' + request.forms.hour + ':' + request.forms.minu 
+
         curs.execute("select name from filter where name = ?", [name])
         if(curs.fetchall()):
-            curs.execute("update filter set regex = ? where name = ?", [request.forms.content, name])
+            curs.execute("update filter set regex = ?, sub = ? where name = ?", [request.forms.content, end, name])
         else:
-            curs.execute("insert into filter (name, regex, sub) values (?, ?, '')", [name, request.forms.content])
+            curs.execute("insert into filter (name, regex, sub) values (?, ?, ?)", [name, request.forms.content, end])
         conn.commit()
     
         return(redirect('/edit_filter/' + url_pas(name)))
     else:
-        curs.execute("select regex from filter where name = ?", [name])
+        curs.execute("select regex, sub from filter where name = ?", [name])
         exist = curs.fetchall()
         if(exist):
             textarea = exist[0][0]
+
+            match = re.search("^([^ ]+) ([^:]+):([^:]+)$", exist[0][1])
+            if(match):
+                end_data = match.groups()
+            else:
+                end_data = ['', '', '']
         else:
             textarea = ''
+            end_data = ['', '', '']
 
         if(admin_check(conn, 1, None) != 1):
             stat = 'disabled'
         else:
             stat = ''
 
+        day = '<option value="00">차단 X</option><option value="09">영구</option>'
+        for i in range(1, 32):
+            if(str(i) == end_data[0]):
+                day += '<option value="' + str(i) + '" selected>' + str(i) + '</option>'
+            else:
+                day += '<option value="' + str(i) + '">' + str(i) + '</option>'
+
+        hour = ''
+        for i in range(0, 24):
+            if(str(i) == end_data[1]):
+                hour += '<option value="' + str(i) + '" selected>' + str(i) + '</option>'
+            else:
+                hour += '<option value="' + str(i) + '">' + str(i) + '</option>'
+
+        minu = ''
+        for i in range(0, 61):
+            if(str(i) == end_data[2]):
+                minu += '<option value="' + str(i) + '" selected>' + str(i) + '</option>'
+            else:
+                minu += '<option value="' + str(i) + '">' + str(i) + '</option>'
+
+        data = '<select ' + stat + ' name="day">' + day + '</select> 일 '
+        data += '<select ' + stat + ' name="hour">' + hour + '</select> 시 '
+        data += '<select ' + stat + ' name="minu">' + minu + '</select> 분 동안<br><br>'
+
         return(html_minify(template('index', 
             imp = [name, wiki_set(conn, 1), custom(conn), other2([' (편집 필터)', 0])],
             data = '<form method="post"> \
+                        ' + data + ' \
                         <input ' + stat + ' placeholder="정규식" name="content" value="' + html.escape(textarea) + '" type="text"><br><br> \
                         <button ' + stat + ' id="preview" class="btn btn-primary" type="submit">저장</button> \
                     </form>',
-            menu = [['edit_filter', '목록']]
+            menu = [['edit_filter', '목록'], ['edit_filter/' + url_pas(name) + '/delete', '삭제']]
         )))
 
 @route('/edit/<name:path>', method=['POST', 'GET'])
@@ -1242,16 +1275,48 @@ def edit(name = None, name2 = None, num = None):
         return(re_error(conn, '/ban'))
     
     if(request.method == 'POST'):
-        curs.execute("select regex from filter")
-        data = curs.fetchall()
-        for data_list in data:
-            try:
+        if(admin_check(conn, 1, 'edit_filter pass') != 1):
+            curs.execute("select regex, sub from filter")
+            data = curs.fetchall()
+            for data_list in data:
                 match = re.compile(data_list[0])
-                exist = match.search(request.forms.content)
-                if(exist):
+                if(match.search(request.forms.content)):
+                    if(data_list[1] == 'X'):
+                        rb_plus(conn, ip, '', get_time(), '도구:편집 필터', '편집 필터에 의한 차단')
+                        curs.execute("insert into ban (block, end, why, band) values (?, '', ?, '')", [name, '편집 필터에 의한 차단'])
+                    elif(not data_list[1] == ''):
+                        match = re.search("^([^ ]+) ([^:]+):([^:]+)$", data_list[1])
+                        end_data = match.groups()
+
+                        match = re.search("^([^-]+)-([^-]+)-([^ ]+) ([^:]+):([^:]+):(.+)$", get_time())
+                        time_data = match.groups()
+
+                        if(int(time_data[2]) + int(end_data[0]) > 29):
+                            month = int(time_data[1]) + 1
+                            day = int(time_data[2]) + int(end_data[0]) - 30
+                        else:
+                            month = int(time_data[1])
+                            day = int(time_data[2]) + int(end_data[0])
+
+                        if(int(time_data[3]) + int(end_data[1]) > 23):
+                            day += 1
+                            hour = int(time_data[3]) + int(end_data[1]) - 24
+                        else:
+                            hour = int(time_data[3]) + int(end_data[1])
+
+                        if(int(time_data[4]) + int(end_data[2]) > 59):
+                            hour += 1
+                            minu = int(time_data[4]) + int(end_data[2]) - 60
+                        else:
+                            minu = int(time_data[4]) + int(end_data[2])
+
+                        end = time_data[0] + '-' + str(month) + '-' + str(day) + ' ' + str(hour) + ':' + str(minu) + ':' + time_data[5]
+
+                        rb_plus(conn, ip, end, get_time(), '도구:편집 필터', '편집 필터에 의한 차단')
+                        curs.execute("insert into ban (block, end, why, band) values (?, ?, ?, '')", [ip, end, '편집 필터에 의한 차단'])
+                    
+                    conn.commit()
                     return(re_error(conn, '/error/21'))
-            except:
-                pass
 
         if(not request.forms.get('g-recaptcha-response')):
             if(captcha_post(conn) == 1):
