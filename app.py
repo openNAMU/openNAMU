@@ -1188,6 +1188,16 @@ def edit_filter():
         menu = [['manager', '관리자']]
     )))
 
+@route('/edit_filter/<name:path>/delete', method=['POST', 'GET'])
+def delete_edit_filter(name = None):
+    if(admin_check(conn, 1, 'edit_filter delete') != 1):
+        return(re_error('/error/3'))
+
+    curs.execute("delete from filter where name = ?", [name])
+    conn.commit()
+
+    return(redirect('/edit_filter'))
+
 @route('/edit_filter/<name:path>', method=['POST', 'GET'])
 def set_edit_filter(name = None):
     if(request.method == 'POST'):
@@ -1229,8 +1239,11 @@ def set_edit_filter(name = None):
         else:
             stat = ''
 
-        day = '<option value="00">차단 X</option><option value="09">영구</option>'
-        for i in range(1, 32):
+        day = '<option value="00">차단 X</option>'
+        if(exist[0][1] == 'X'):
+            day += '<option value="09" selected>영구</option>'
+
+        for i in range(0, 32):
             if(str(i) == end_data[0]):
                 day += '<option value="' + str(i) + '" selected>' + str(i) + '</option>'
             else:
@@ -1281,9 +1294,10 @@ def edit(name = None, name2 = None, num = None):
             for data_list in data:
                 match = re.compile(data_list[0])
                 if(match.search(request.forms.content)):
+                    print(data_list[1])
                     if(data_list[1] == 'X'):
                         rb_plus(conn, ip, '', get_time(), '도구:편집 필터', '편집 필터에 의한 차단')
-                        curs.execute("insert into ban (block, end, why, band) values (?, '', ?, '')", [name, '편집 필터에 의한 차단'])
+                        curs.execute("insert into ban (block, end, why, band) values (?, '', ?, '')", [ip, '편집 필터에 의한 차단'])
                     elif(not data_list[1] == ''):
                         match = re.search("^([^ ]+) ([^:]+):([^:]+)$", data_list[1])
                         end_data = match.groups()
@@ -1294,9 +1308,16 @@ def edit(name = None, name2 = None, num = None):
                         if(int(time_data[2]) + int(end_data[0]) > 29):
                             month = int(time_data[1]) + 1
                             day = int(time_data[2]) + int(end_data[0]) - 30
+
+                            if(month > 12):
+                                year = int(time_data[0]) + 1
+                                month -= 12
+                            else:
+                                year = int(time_data[0])
                         else:
                             month = int(time_data[1])
                             day = int(time_data[2]) + int(end_data[0])
+                            year = int(time_data[0])
 
                         if(int(time_data[3]) + int(end_data[1]) > 23):
                             day += 1
@@ -1310,7 +1331,17 @@ def edit(name = None, name2 = None, num = None):
                         else:
                             minu = int(time_data[4]) + int(end_data[2])
 
-                        end = time_data[0] + '-' + str(month) + '-' + str(day) + ' ' + str(hour) + ':' + str(minu) + ':' + time_data[5]
+                        time_list = [month, day, hour, minu]
+                        num = 0
+                        for time_fix in time_list:
+                            if(not re.search("[0-9]{2}", str(time_fix))):
+                                time_list[num] = '0' + str(time_fix)   
+                            else:
+                                time_list[num] = str(time_fix)
+                            
+                            num += 1
+
+                        end = str(year) + '-' + time_list[0] + '-' + time_list[1] + ' ' + time_list[2] + ':' + time_list[3] + ':' + time_data[5]
 
                         rb_plus(conn, ip, end, get_time(), '도구:편집 필터', '편집 필터에 의한 차단')
                         curs.execute("insert into ban (block, end, why, band) values (?, ?, ?, '')", [ip, end, '편집 필터에 의한 차단'])
@@ -2370,11 +2401,19 @@ def user_ban(name = None):
 
         ip = ip_check()
         time = get_time()
+
+        time_list = [request.forms.month, request.forms.day, request.forms.hour, request.forms.minu]
+        num = 0
+        for time_fix in time_list:
+            if(not re.search("[0-9]{2}", time_fix)):
+                time_list[num] = '0' + time_fix
+                
+            num += 1
         
         if(request.forms.year == '09'):
             end = ''
         else:
-            end = request.forms.year + '-' + request.forms.month + '-' + request.forms.day + ' ' + request.forms.hour + ':' + request.forms.minu + ':00'
+            end = request.forms.year + '-' + time_list[0] + '-' + time_list[1] + ' ' + time_list[2] + ':' + time_list[3] + ':00'
 
         curs.execute("select block from ban where block = ?", [name])
         if(curs.fetchall()):
@@ -2453,9 +2492,7 @@ def user_ban(name = None):
 
             is_it = ''
             if(re.search('(\.|:)', name)):
-                plus = '<input type="checkbox" name="login_ok"> 로그인 가능 \
-                        <br> \
-                        <br>'
+                plus = '<input type="checkbox" name="login_ok"> 로그인 가능<br><br>'
             else:
                 plus = ''
             
