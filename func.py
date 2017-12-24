@@ -374,6 +374,7 @@ def re_error(conn, data):
                 if(m):
                     curs.execute("select end, why from ban where block = ? and band = 'O'", [m.groups()[0]])
                     d = curs.fetchall()
+            
             if(d):
                 end = '|| 상태 ||'
                 if(d[0][0]):
