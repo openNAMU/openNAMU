@@ -2885,9 +2885,14 @@ def read_view(name = None, num = None, redirect = None):
         else:
             r_date = 0
 
+    if(div != '' and enddata != ''):
+        div = enddata + '<br>' + namumark(conn, name, div, 0, 0, 0)
+    else:
+        div = enddata + namumark(conn, name, div, 0, 0, 0)
+
     return(html_minify(template('index', 
         imp = [name, wiki_set(conn, 1), custom(conn), other2([sub + acl, r_date])],
-        data = enddata + namumark(conn, name, div, 0, 0, 0),
+        data = div,
         menu = menu
     )))
 
