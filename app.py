@@ -3093,7 +3093,7 @@ def recent_changes(name = None, num = 1, what = 'all', tool = 'record'):
                 div = '<form method="post"><select name="a">' + select + '</select> <select name="b">' + select + '</select> <button class="btn btn-primary" type="submit">비교</button></form><br>' + div
                 title = name
                 sub += ' (역사)'
-                menu = [['w/' + url_pas(name), '문서']]
+                menu = [['w/' + url_pas(name), '문서'], ['move_data/' + url_pas(name), '이동 기록']]
                 div += '<br><a href="/history/' + url_pas(name) + '/' + str(num - 1) + '">(이전)</a> <a href="/history/' + url_pas(name) + '/' + str(num + 1) + '">(이후)</a>'
             else:
                 curs.execute("select end, why from ban where block = ?", [name])
