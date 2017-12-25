@@ -18,5 +18,5 @@ def end(data, category):
     data = re.sub('^(?:<br>|\r|\n| )+', '', data)
     data = re.sub('^<div style="margin-top: 30px;" id="cate">', '<div id="cate">', data)        
     data = re.sub('&amp;#92;', '&#92;', data)
-        
+
     return(data)
