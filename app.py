@@ -100,23 +100,9 @@ try:
     except:
         pass
 
-    try:
-        curs.execute('select ip from ok_login limit 1')
-    except:
-        curs.execute("create table ok_login(ip text, sub text)")
-        print('ok_login 테이블 생성')
-
-    try:
-        curs.execute("drop table move")
-        print("move 테이블 삭제")
-    except:
-        pass
-
-    try:
-        curs.execute('select name from filter limit 1')
-    except:
-        curs.execute("create table filter(name text, regex text, sub text)")
-        print("filter 테이블 생성")
+    curs.execute("create table if not exists ok_login(ip text, sub text)")
+    curs.execute("drop table if exists move")
+    curs.execute("create table if not exists filter(name text, regex text, sub text)")
 
     conn.commit()
 except:
@@ -159,101 +145,29 @@ def setup():
     try:
         curs.execute("select title from data limit 1")
     except:
-        try:
-            curs.execute("create table data(title text, data text, acl text)")
-        except:
-            pass
+        curs.execute("create table if not exists data(title text, data text, acl text)")
+        curs.execute("create table if not exists history(id text, title text, data text, date text, ip text, send text, leng text)")
+        curs.execute("create table if not exists rd(title text, sub text, date text)")
+        curs.execute("create table if not exists user(id text, pw text, acl text)")
+        curs.execute("create table if not exists ban(block text, end text, why text, band text)")
+        curs.execute("create table if not exists topic(id text, title text, sub text, data text, date text, ip text, block text, top text)")
+        curs.execute("create table if not exists stop(title text, sub text, close text)")
+        curs.execute("create table if not exists rb(block text, end text, today text, blocker text, why text)")
+        curs.execute("create table if not exists back(title text, link text, type text)")
+        curs.execute("create table if not exists hidhi(title text, re text)")
+        curs.execute("create table if not exists agreedis(title text, sub text)")
+        curs.execute("create table if not exists custom(user text, css text)")
+        curs.execute("create table if not exists other(name text, data text)")
+        curs.execute("create table if not exists alist(name text, acl text)")
+        curs.execute("create table if not exists re_admin(who text, what text, time text)")
+        curs.execute("create table if not exists alarm(name text, data text, date text)")
+        curs.execute("create table if not exists ua_d(name text, ip text, ua text, today text, sub text)")
+        curs.execute("create table if not exists ok_login(ip text, sub text)")
+        curs.execute("create table if not exists filter(name text, regex text, sub text)")
 
-        try:
-            curs.execute("create table history(id text, title text, data text, date text, ip text, send text, leng text)")
-        except:
-            pass
-
-        try:
-            curs.execute("create table rd(title text, sub text, date text)")
-        except:
-            pass
-
-        try:
-            curs.execute("create table user(id text, pw text, acl text)")
-        except:
-            pass
-
-        try:
-            curs.execute("create table ban(block text, end text, why text, band text)")
-        except:
-            pass
-
-        try:
-            curs.execute("create table topic(id text, title text, sub text, data text, date text, ip text, block text, top text)")
-        except:
-            pass
-
-        try:
-            curs.execute("create table stop(title text, sub text, close text)")
-        except:
-            pass
-
-        try:
-            curs.execute("create table rb(block text, end text, today text, blocker text, why text)")
-        except:
-            pass
-
-        try:
-            curs.execute("create table back(title text, link text, type text)")
-        except:
-            pass
-
-        try:
-            curs.execute("create table hidhi(title text, re text)")
-        except:
-            pass
-
-        try:
-            curs.execute("create table agreedis(title text, sub text)")
-        except:
-            pass
-
-        try:
-            curs.execute("create table custom(user text, css text)")
-        except:
-            pass
-
-        try:
-            curs.execute("create table other(name text, data text)")
-        except:
-            pass
-
-        try:
-            curs.execute("create table alist(name text, acl text)")
+        curs.execute("select name from alist where = '소유자'")
+        if(not curs.fetchall()):
             curs.execute("insert into alist (name, acl) values ('소유자', 'owner')")
-        except:
-            pass
-
-        try:
-            curs.execute("create table re_admin(who text, what text, time text)")
-        except:
-            pass
-
-        try:
-            curs.execute("create table alarm(name text, data text, date text)")
-        except:
-            pass
-
-        try:
-            curs.execute("create table ua_d(name text, ip text, ua text, today text, sub text)")
-        except:
-            pass
-
-        try:
-            curs.execute("create table ok_login(ip text, sub text)")
-        except:
-            pass
-
-        try:
-            curs.execute("create table filter(name text, regex text, sub text)")
-        except:
-            pass
 
         conn.commit()
 
