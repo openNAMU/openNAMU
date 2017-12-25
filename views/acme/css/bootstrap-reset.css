@@ -837,3 +837,7 @@ table#toron tbody tr td {
     padding-top: 6px;
     padding-bottom: 6px;
 }
+
+ul#redirect {
+    margin-bottom: 0;
+}

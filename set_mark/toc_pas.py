@@ -43,7 +43,7 @@ def toc_pas(data, title, num, toc_y):
             toc = re.sub("\.$", '', toc)
 
             if(toc_c == -1):
-                margin = 'style="margin-top: 30px;"'
+                margin = ''
                 toc_c = toc.count('.')
             else:
                 toc_d = toc.count('.')
