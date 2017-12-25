@@ -1127,7 +1127,7 @@ def revert(name = None, num = None):
             imp = [name, wiki_set(conn, 1), custom_data, other2([' (되돌리기)', 0])],
             data =  ip_warring + ' \
                     <form method="post"> \
-                        <input placeholder="사유" class="form-control input-sm" name="send" type="text"><br> \
+                        <input placeholder="사유" name="send" type="text"><br> \
                         ' + captcha + ' \
                         <button class="btn btn-primary" type="submit">되돌리기</button> \
                     </form>',
@@ -1164,7 +1164,7 @@ def big_delete():
             data = '<span>문서명 A<br>문서명 B<br>문서명 C<br><br>이런 식으로 적으세요.</span><br><br> \
                     <form method="post"> \
                         <textarea rows="25" name="content"></textarea><br><br> \
-                        <input placeholder="사유" class="form-control input-sm" name="send" type="text"><br><br> \
+                        <input placeholder="사유" name="send" type="text"><br><br> \
                         <button class="btn btn-primary" type="submit">삭제</button> \
                     </form>',
             menu = [['manager', '관리자']]
@@ -1547,7 +1547,7 @@ def delete(name = None):
             imp = [name, wiki_set(conn, 1), custom_data, other2([' (삭제)', 0])],
             data = '<form method="post"> \
                         ' + ip_warring + ' \
-                        <input placeholder="사유" class="form-control input-sm" name="send" type="text"><br> \
+                        <input placeholder="사유" name="send" type="text"><br> \
                         ' + captcha + ' \
                         <button class="btn btn-primary" type="submit">삭제</button> \
                     </form>',
@@ -1636,8 +1636,8 @@ def move(name = None):
             imp = [name, wiki_set(conn, 1), custom_data, other2([' (이동)', 0])],
             data = '<form method="post"> \
                         ' + ip_warring + ' \
-                        <input placeholder="문서명" class="form-control input-sm" value="' + name + '" name="title" type="text"><br> \
-                        <input placeholder="사유" class="form-control input-sm" name="send" type="text"><br> \
+                        <input placeholder="문서명" value="' + name + '" name="title" type="text"><br> \
+                        <input placeholder="사유" name="send" type="text"><br> \
                         ' + captcha + ' \
                         <button class="btn btn-primary" type="submit">이동</button> \
                     </form>',
@@ -2122,7 +2122,7 @@ def close_topic_list(name = None, tool = None):
             sub = '토론 목록'
             menu = [['w/' + url_pas(name), '문서']]
             plus =  '<a href="/topic/' + url_pas(name) + '/close">(닫힘)</a> <a href="/topic/' + url_pas(name) + '/agree">(합의)</a><br><br> \
-                    <input placeholder="토론명" class="form-control" name="topic"><br> \
+                    <input placeholder="토론명" class="form-control" name="topic" type="text"><br> \
                     <button class="btn btn-primary" type="submit">만들기</button>'
 
         for data in curs.fetchall():
@@ -2503,7 +2503,7 @@ def user_ban(name = None):
             data += '<select name="day">' + day + '</select> 일 <br><br>'
             data += '<select name="hour">' + hour + '</select> 시 '
             data += '<select name="minu">' + minu + '</select> 분 까지<br><br>'
-            data += '<input placeholder="사유" class="form-control" name="why"><br>' + plus
+            data += '<input placeholder="사유" class="form-control" name="why" type="text"><br>' + plus
 
         return(html_minify(template('index', 
             imp = [name, wiki_set(conn, 1), custom(conn), other2([' (' + now + ')', 0])],
@@ -2600,7 +2600,6 @@ def acl(name = None):
                                 <option value="user">가입자</option> \
                                 <option value="normal">일반</option> \
                             </select><br><br> \
-                            <input placeholder="사유" name="why"><br><br> \
                             <button class="btn btn-primary" type="submit">ACL 변경</button> \
                         </form>',
                 menu = [['w/' + url_pas(name), '문서'], ['manager', '관리자']]
