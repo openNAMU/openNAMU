@@ -1242,6 +1242,8 @@ def set_edit_filter(name = None):
         day = '<option value="00">차단 X</option>'
         if(exist[0][1] == 'X'):
             day += '<option value="09" selected>영구</option>'
+        else:
+            day += '<option value="09">영구</option>'
 
         for i in range(0, 32):
             if(str(i) == end_data[0]):
