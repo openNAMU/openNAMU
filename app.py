@@ -289,22 +289,22 @@ def edit_set(num = 0):
                 imp = ['기본 설정', wiki_set(conn, 1), custom(conn), other2([0, 0])],
                 data = '<form method="post"> \
                             <span>이름</span><br><br> \
-                            <input placeholder="이름" type="text" name="name" value="' + html.escape(d_list[0]) + '"><br><br> \
+                            <input placeholder="이름" type="text" name="name" value="' + html.escape(d_list[0]) + '"><hr> \
                             <span>로고 (HTML)</span><br><br> \
-                            <input placeholder="로고" type="text" name="logo" value="' + html.escape(d_list[1]) + '"><br><br> \
+                            <input placeholder="로고" type="text" name="logo" value="' + html.escape(d_list[1]) + '"><hr> \
                             <span>대문</span><br><br> \
-                            <input placeholder="대문" type="text" name="frontpage" value="' + html.escape(d_list[2]) + '"><br><br> \
+                            <input placeholder="대문" type="text" name="frontpage" value="' + html.escape(d_list[2]) + '"><hr> \
                             <span>라이선스 (HTML)</span><br><br> \
-                            <input placeholder="라이선스" type="text" name="license" value="' + html.escape(d_list[3]) + '"><br><br> \
+                            <input placeholder="라이선스" type="text" name="license" value="' + html.escape(d_list[3]) + '"><hr> \
                             <span>파일 크기 [메가]</span><br><br> \
-                            <input placeholder="파일 크기" type="text" name="upload" value="' + html.escape(d_list[4]) + '"><br><br> \
+                            <input placeholder="파일 크기" type="text" name="upload" value="' + html.escape(d_list[4]) + '"><hr> \
                             <span>스킨</span><br><br> \
-                            <input placeholder="스킨" type="text" name="skin" value="' + html.escape(d_list[5]) + '"><br><br> \
+                            <input placeholder="스킨" type="text" name="skin" value="' + html.escape(d_list[5]) + '"><hr> \
                             <span>전역 ACL</span><br><br> \
-                            <select name="edit">' + div + '</select><br><br> \
+                            <select name="edit">' + div + '</select><hr> \
                             <input type="checkbox" name="reg" ' + ch_1 + '> 가입불가<br><br> \
                             <input type="checkbox" name="ip_view" ' + ch_2 + '> 아이피 비공개<br><br> \
-                            <input type="checkbox" name="all_title" ' + ch_3 + '> 모든 문서 보기 비활성화<br><br> \
+                            <input type="checkbox" name="all_title" ' + ch_3 + '> 모든 문서 보기 비활성화<hr> \
                             <span>백업 간격 [시간] (끄기 : 0) {재시작 필요}</span><br><br> \
                             <input placeholder="백업 간격" type="text" name="back_up" value="' + html.escape(d_list[9]) + '"><br><br> \
                             <button class="btn btn-primary" type="submit">저장</button> \
@@ -1041,7 +1041,7 @@ def revert(name = None, num = None):
             imp = [name, wiki_set(conn, 1), custom_data, other2([' (되돌리기)', 0])],
             data =  ip_warring + ' \
                     <form method="post"> \
-                        <input placeholder="사유" name="send" type="text"><br> \
+                        <input placeholder="사유" name="send" type="text"><hr> \
                         ' + captcha + ' \
                         <button class="btn btn-primary" type="submit">되돌리기</button> \
                     </form>',
@@ -1461,7 +1461,7 @@ def delete(name = None):
             imp = [name, wiki_set(conn, 1), custom_data, other2([' (삭제)', 0])],
             data = '<form method="post"> \
                         ' + ip_warring + ' \
-                        <input placeholder="사유" name="send" type="text"><br> \
+                        <input placeholder="사유" name="send" type="text"><hr> \
                         ' + captcha + ' \
                         <button class="btn btn-primary" type="submit">삭제</button> \
                     </form>',
@@ -1550,8 +1550,8 @@ def move(name = None):
             imp = [name, wiki_set(conn, 1), custom_data, other2([' (이동)', 0])],
             data = '<form method="post"> \
                         ' + ip_warring + ' \
-                        <input placeholder="문서명" value="' + name + '" name="title" type="text"><br> \
-                        <input placeholder="사유" name="send" type="text"><br> \
+                        <input placeholder="문서명" value="' + name + '" name="title" type="text"><hr> \
+                        <input placeholder="사유" name="send" type="text"><hr> \
                         ' + captcha + ' \
                         <button class="btn btn-primary" type="submit">이동</button> \
                     </form>',
