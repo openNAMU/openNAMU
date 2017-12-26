@@ -3150,13 +3150,13 @@ def user_info():
                                     plus + '\r\n' + \
                                     ' * [[wiki:register|회원가입]]\r\n' + \
                                     '== 사용자 기능 ==\r\n' + \
-                                    ' * [[wiki:user_acl/' + url_pas(raw_ip) + '|사용자 문서 ACL]]\r\n' + \
+                                    ' * [[wiki:user_acl/' + url_pas(ip) + '|사용자 문서 ACL]]\r\n' + \
                                     ' * [[wiki:custom_head|사용자 HEAD]]\r\n' + \
                                     '== 기타 ==\r\n' + \
                                     ' * [[wiki:alarm|알림]]\r\n' + \
                                     ' * [[wiki:view_log|지나온 문서]]\r\n' + \
-                                    ' * [[wiki:record/' + raw_ip + '|편집 기록]]\r\n' + \
-                                    ' * [[wiki:topic_record/' + raw_ip + '|토론 기록]]\r\n' + \
+                                    ' * [[wiki:record/' + url_pas(ip) + '|편집 기록]]\r\n' + \
+                                    ' * [[wiki:topic_record/' + url_pas(ip) + '|토론 기록]]\r\n' + \
                                     ' * [[wiki:count|활동 횟수]]\r\n', 0, 0, 0),
         menu = 0
     )))
