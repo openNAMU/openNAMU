@@ -96,7 +96,7 @@ def mid_pas(data, fol_num, include, in_c):
                 data = com.sub(html_d.groups()[0], data, 1)
             elif(fol):
                 fol_d = fol.groups()
-                data = com.sub( "<div>" + fol_d[0] + "<div id='folding_" + str(fol_num + 1) + "' style='display: inline-block;'>[<a href='javascript:void(0);' onclick='folding(" + str(fol_num + 1) + "); folding(" + str(fol_num + 2) + "); folding(" + str(fol_num) + ");'>펼치기</a>]</div><div id='folding_" + str(fol_num + 2) + "' style='display: none;'>[<a href='javascript:void(0);' onclick='folding(" + str(fol_num + 1) + "); folding(" + str(fol_num + 2) + "); folding(" + str(fol_num) + ");'>접기</a>]</div><div id='folding_" + str(fol_num) + "' style='display: none;'><br>" + fol_d[1] + "</div></div>", data, 1)
+                data = com.sub( "<div>" + fol_d[0] + " <div id='folding_" + str(fol_num + 1) + "' style='display: inline-block;'>[<a href='javascript:void(0);' onclick='folding(" + str(fol_num + 1) + "); folding(" + str(fol_num + 2) + "); folding(" + str(fol_num) + ");'>펼치기</a>]</div><div id='folding_" + str(fol_num + 2) + "' style='display: none;'>[<a href='javascript:void(0);' onclick='folding(" + str(fol_num + 1) + "); folding(" + str(fol_num + 2) + "); folding(" + str(fol_num) + ");'>접기</a>]</div><div id='folding_" + str(fol_num) + "' style='display: none;'><br>" + fol_d[1] + "</div></div>", data, 1)
 
                 fol_num += 3
             elif(syn):
