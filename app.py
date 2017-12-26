@@ -628,15 +628,17 @@ def user_log(num = 1):
         ip = ip_pas(conn, data[0])
         list_data += '<li>' + ip + ban_button + '</li>'
     
-    curs.execute("select count(id) from user")
-    user_count = curs.fetchall()
-    if(user_count):
-        count = user_count[0][0]
-    else:
-        count = 0
+    if(num == 1):
+        curs.execute("select count(id) from user")
+        user_count = curs.fetchall()
+        if(user_count):
+            count = user_count[0][0]
+        else:
+            count = 0
 
-    list_data += '<br><br><li>이 위키에는 ' + str(count) + '명의 사람이 있습니다.</li>'
-    list_data += '</ul><br><a href="/user_log/' + str(num - 1) + '">(이전)</a> <a href="/user_log/' + str(num + 1) + '">(이후)</a>'
+        list_data += '<hr><li>이 위키에는 ' + str(count) + '명의 사람이 있습니다.</li>'
+        
+    list_data += '</ul><hr><a href="/user_log/' + str(num - 1) + '">(이전)</a> <a href="/user_log/' + str(num + 1) + '">(이후)</a>'
 
     return(html_minify(template('index', 
         imp = ['사용자 가입 기록', wiki_set(conn, 1), custom(conn), other2([0, 0])],
@@ -660,7 +662,7 @@ def user_log(num = 1):
         ip = ip_pas(conn, data[0])
         list_data += '<li>' + ip + ' / ' + data[1] + ' / ' + data[2] + '</li>'
 
-    list_data += '</ul><br><span>주의 : 권한 사용 안하고 열람만 해도 기록되는 경우도 있습니다.</span><br><br>'
+    list_data += '</ul><hr><span>주의 : 권한 사용 안하고 열람만 해도 기록되는 경우도 있습니다.</span><hr>'
     list_data += '<a href="/admin_log/' + str(num - 1) + '">(이전)</a> <a href="/admin_log/' + str(num + 1) + '">(이후)</a>'
 
     return(html_minify(template('index', 
@@ -688,8 +690,8 @@ def give_log(num = 1):
 
         list_data += '<li><a href="/admin_plus/' + url_pas(data[0]) + '">' + data[0] + '</a></li>'
     
-    list_data += '</ul><a href="/manager/8">(생성)</a>'
-    list_data += '<br><br><a href="/give_log/' + str(num - 1) + '">(이전)</a> <a href="/give_log/' + str(num + 1) + '">(이후)</a>'
+    list_data += '</ul><hr><a href="/manager/8">(생성)</a>'
+    list_data += '<hr><a href="/give_log/' + str(num - 1) + '">(이전)</a> <a href="/give_log/' + str(num + 1) + '">(이후)</a>'
 
     return(html_minify(template('index', 
         imp = ['권한 목록', wiki_set(conn, 1), custom(conn), other2([0, 0])],
@@ -748,7 +750,7 @@ def xref(name = None, num = 1):
         if(re.search('^틀:', data[0])):
             div += '<li><a id="inside" href="/xref/' + url_pas(data[0]) + '">' + data[0] + '</a> (역링크)</li>'
       
-    div += '</ul><br><a href="/xref/' + url_pas(name) + '/' + str(num - 1) + '">(이전)</a> <a href="/xref/' + url_pas(name) + '/' + str(num + 1) + '">(이후)</a>'
+    div += '</ul><hr><a href="/xref/' + url_pas(name) + '/' + str(num - 1) + '">(이전)</a> <a href="/xref/' + url_pas(name) + '/' + str(num + 1) + '">(이후)</a>'
     
     return(html_minify(template('index', 
         imp = [name, wiki_set(conn, 1), custom(conn), other2([' (역링크)', 0])],
@@ -773,7 +775,7 @@ def please(num = 1):
             div += '<li><a class="not_thing" href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a></li>'        
             var = data[0]
         
-    div += '</ul><br><a href="/please/' + str(num - 1) + '">(이전)</a> <a href="/please/' + str(num + 1) + '">(이후)</a>'
+    div += '</ul><hr><a href="/please/' + str(num - 1) + '">(이전)</a> <a href="/please/' + str(num + 1) + '">(이후)</a>'
     
     return(html_minify(template('index', 
         imp = ['필요한 문서', wiki_set(conn, 1), custom(conn), other2([0, 0])],
@@ -854,9 +856,9 @@ def block_log(num = 1):
             
         div += '<tr><td>' + ip + '</td><td>' + ip_pas(conn, data[2]) + '</td><td>시작 : ' + data[4] + '<br>끝 : ' + end + '</td></tr>'
         div += '<tr><td colspan="3">' + why + '</td></tr>'
-    else:
-        div += '</tbody></table><br>'
-        div += '<a href="/block_log/' + str(num - 1) + '">(이전)</a> <a href="/block_log/' + str(num + 1) + '">(이후)</a>'
+
+    div += '</tbody></table><hr>'
+    div += '<a href="/block_log/' + str(num - 1) + '">(이전)</a> <a href="/block_log/' + str(num + 1) + '">(이후)</a>'
                 
     return(html_minify(template('index', 
         imp = ['차단 기록', wiki_set(conn, 1), custom(conn), other2([0, 0])],
@@ -895,9 +897,9 @@ def deep_search(name = None, num = 1):
     curs.execute("select title from data where title = ?", [name])
     exist = curs.fetchall()
     if(exist):
-        div = '<ul><li>문서로 <a href="/w/' + url_pas(name) + '">바로가기</a></li><br><br>'
+        div = '<ul><li>문서로 <a href="/w/' + url_pas(name) + '">바로가기</a></li><hr>'
     else:
-        div = '<ul><li>문서가 없습니다. <a class="not_thing" href="/w/' + url_pas(name) + '">바로가기</a></li><br><br>'
+        div = '<ul><li>문서가 없습니다. <a class="not_thing" href="/w/' + url_pas(name) + '">바로가기</a></li><hr>'
     
     start = 2
     if(all_list):
@@ -926,7 +928,7 @@ def deep_search(name = None, num = 1):
         div += '<li>검색 결과 없음</li>'
 
     div += div_plus
-    div += '</ul><br><a href="/search/' + url_pas(name) + '/' + str(num - 1) + '">(이전)</a> <a href="/search/' + url_pas(name) + '/' + str(num + 1) + '">(이후)</a>'
+    div += '</ul><hr><a href="/search/' + url_pas(name) + '/' + str(num - 1) + '">(이전)</a> <a href="/search/' + url_pas(name) + '/' + str(num + 1) + '">(이후)</a>'
     
     return(html_minify(template('index', 
         imp = [name, wiki_set(conn, 1), custom(conn), other2([' (검색)', 0])],
@@ -1488,7 +1490,7 @@ def move_data(name = None, num = 1):
         data += '<li><a href="/move_data/' + url_pas(match[0]) + '">' + match[0] + '</a> - <a href="/move_data/' + url_pas(match[1]) + '">' + match[1] + '</a>'
         data += ' / ' + for_data[2] + ' / ' + for_data[1] + ' / ' + send + '</li>'
     
-    data += '</ul><a href="/move_data/' + url_pas(name) + '/' + str(num - 1) + '">(이전)</a> <a href="/move_data/' + url_pas(name) + '/' + str(num + 1) + '">(이후)</a>'
+    data += '</ul><hr><a href="/move_data/' + url_pas(name) + '/' + str(num - 1) + '">(이전)</a> <a href="/move_data/' + url_pas(name) + '/' + str(num + 1) + '">(이후)</a>'
     
     return(html_minify(template('index', 
         imp = [name, wiki_set(conn, 1), custom(conn), other2([' (이동 기록)', 0])],
@@ -1657,7 +1659,7 @@ def title_index(num = 100, page = 1):
     if(num > 1000):
         return(re_error(conn, '/error/3'))
 
-    data = '<ul><a href="/title_index/0/1">(전체)</a> <a href="/title_index/250/1">(250)</a> <a href="/title_index/500/1">(500)</a> <a href="/title_index/1000/1">(1000)</a><br><br>'
+    data = '<ul><a href="/title_index/0/1">(전체)</a> <a href="/title_index/250/1">(250)</a> <a href="/title_index/500/1">(500)</a> <a href="/title_index/1000/1">(1000)</a><hr>'
 
     if(num == 0):
         curs.execute("select data from other where name = 'all_title'")
@@ -1674,35 +1676,36 @@ def title_index(num = 100, page = 1):
         data += '<li>' + str(all_list) + '. <a href="/w/' + url_pas(list_data[0]) + '">' + list_data[0] + '</a></li>'        
         all_list += 1
 
-    count_end = []
-    curs.execute("select count(title) from data")
-    count = curs.fetchall()
-    if(count):
-        count_end += [count[0][0]]
-    else:
-        count_end += [0]
-
-    sql_list = ['틀:', '분류:', '사용자:', '파일:']
-
-    for sql in sql_list:
-        curs.execute("select count(title) from data where title like ?", [sql + '%'])
+    if(page == 1):
+        count_end = []
+        curs.execute("select count(title) from data")
         count = curs.fetchall()
         if(count):
             count_end += [count[0][0]]
         else:
             count_end += [0]
 
-    count_end += [count_end[0] - count_end[1]  - count_end[2]  - count_end[3]  - count_end[4]]
+        sql_list = ['틀:', '분류:', '사용자:', '파일:']
 
-    data += '<br><br><li>이 위키에는 총 ' + str(count_end[0]) + '개의 문서가 있습니다.</li><br><br>'
-    data += '<li>틀 문서는 총 ' + str(count_end[1]) + '개의 문서가 있습니다.</li>'
-    data += '<li>분류 문서는 총 ' + str(count_end[2]) + '개의 문서가 있습니다.</li>'
-    data += '<li>사용자 문서는 총 ' + str(count_end[3]) + '개의 문서가 있습니다.</li>'
-    data += '<li>파일 문서는 총 ' + str(count_end[4]) + '개의 문서가 있습니다.</li>'
-    data += '<li>나머지 문서는 총 ' + str(count_end[5]) + '개의 문서가 있습니다.</li>'
+        for sql in sql_list:
+            curs.execute("select count(title) from data where title like ?", [sql + '%'])
+            count = curs.fetchall()
+            if(count):
+                count_end += [count[0][0]]
+            else:
+                count_end += [0]
+
+        count_end += [count_end[0] - count_end[1]  - count_end[2]  - count_end[3]  - count_end[4]]
+
+        data += '<hr><li>이 위키에는 총 ' + str(count_end[0]) + '개의 문서가 있습니다.</li><hr>'
+        data += '<li>틀 문서는 총 ' + str(count_end[1]) + '개의 문서가 있습니다.</li>'
+        data += '<li>분류 문서는 총 ' + str(count_end[2]) + '개의 문서가 있습니다.</li>'
+        data += '<li>사용자 문서는 총 ' + str(count_end[3]) + '개의 문서가 있습니다.</li>'
+        data += '<li>파일 문서는 총 ' + str(count_end[4]) + '개의 문서가 있습니다.</li>'
+        data += '<li>나머지 문서는 총 ' + str(count_end[5]) + '개의 문서가 있습니다.</li>'
 
     if(num != 0):
-        data += '</ul><br><a href="/title_index/' + str(num) + '/' + str(page - 1) + '">(이전)</a> <a href="/title_index/' + str(num) + '/' + str(page + 1) + '">(이후)</a>'
+        data += '</ul><hr><a href="/title_index/' + str(num) + '/' + str(page - 1) + '">(이전)</a> <a href="/title_index/' + str(num) + '/' + str(page + 1) + '">(이후)</a>'
     
     if(' (' + str(num) + '개)' == ' (0개)'):
         sub = 0
@@ -2819,15 +2822,10 @@ def user_topic_list(name = None, num = 1):
         sql_num = 0
     
     one_admin = admin_check(conn, 1, None)
-    div =   '<table style="width: 100%; text-align: center;"> \
-                <tbody> \
-                    <tr> \
-                        <td style="width: 33.3%;">토론명</td> \
-                        <td style="width: 33.3%;">작성자</td> \
-                        <td style="width: 33.3%;">시간</td> \
-                    </tr>'
+    div = '<table style="width: 100%; text-align: center;"><tbody><tr>'
+    div += '<td style="width: 33.3%;">토론명</td><td style="width: 33.3%;">작성자</td><td style="width: 33.3%;">시간</td></tr>'
 
-    div = '<a href="/record/' + url_pas(name) + '">(편집 기록)</a><br><br>' + div
+    div = '<a href="/record/' + url_pas(name) + '">(편집 기록)</a><hr>' + div
     
     curs.execute("select title, id, sub, ip, date from topic where ip = ? order by date desc limit ?, '50'", [name, str(sql_num)])
     for data in curs.fetchall():
@@ -2845,16 +2843,11 @@ def user_topic_list(name = None, num = 1):
             
         ip = ip_pas(conn, data[3])
             
-        div += '<tr> \
-                    <td> \
-                        <a href="/topic/' + url_pas(data[0]) + '/sub/' + url_pas(data[2]) + '#' + data[1] + '">' + title + '#' + data[1] + '</a> (' + sub + ') \
-                    </td> \
-                    <td>' + ip + ban +  '</td> \
-                    <td>' + data[4] + '</td> \
-                </tr>'
+        div += '<tr><td><a href="/topic/' + url_pas(data[0]) + '/sub/' + url_pas(data[2]) + '#' + data[1] + '">' + title + '#' + data[1] + '</a> (' + sub + ')</td>'
+        div += '<td>' + ip + ban +  '</td><td>' + data[4] + '</td></tr>'
 
     div += '</tbody></table>'
-    div += '<br><a href="/topic_record/' + url_pas(name) + '/' + str(num - 1) + '">(이전)</a> <a href="/topic_record/' + url_pas(name) + '/' + str(num + 1) + '">(이후)</a>'
+    div += '<hr><a href="/topic_record/' + url_pas(name) + '/' + str(num - 1) + '">(이전)</a> <a href="/topic_record/' + url_pas(name) + '/' + str(num + 1) + '">(이후)</a>'
                 
     curs.execute("select end, why from ban where block = ?", [name])
     ban_it = curs.fetchall()
@@ -2898,7 +2891,7 @@ def recent_changes(name = None, num = 1, what = 'all', tool = 'record'):
                 div += '<td style="width: 33.3%;">문서명</td><td style="width: 33.3%;">편집자</td><td style="width: 33.3%;">시간</td></tr>'
 
                 if(what == 'all'):
-                    div = '<a href="/topic_record/' + url_pas(name) + '">(토론 기록)</a><br><br>' + div
+                    div = '<a href="/topic_record/' + url_pas(name) + '">(토론 기록)</a><hr>' + div
                     div = '<a href="/record/' + url_pas(name) + '/' + str(num) + '/revert">(되돌리기)</a> ' + div
                     div = '<a href="/record/' + url_pas(name) + '/' + str(num) + '/move">(이동)</a> ' + div
                     div = '<a href="/record/' + url_pas(name) + '/' + str(num) + '/delete">(삭제)</a> ' + div
@@ -2921,7 +2914,7 @@ def recent_changes(name = None, num = 1, what = 'all', tool = 'record'):
             div += '<td style="width: 33.3%;">문서명</td><td style="width: 33.3%;">편집자</td><td style="width: 33.3%;">시간</td></tr>'
 
             if(what == 'all'):
-                div = '<a href="/recent_changes/revert">(되돌리기)</a><br><br>' + div
+                div = '<a href="/recent_changes/revert">(되돌리기)</a><hr>' + div
                 div = '<a href="/recent_changes/move">(이동)</a> ' + div
                 div = '<a href="/recent_changes/delete">(삭제)</a> ' + div
 
@@ -3008,11 +3001,11 @@ def recent_changes(name = None, num = 1, what = 'all', tool = 'record'):
 
         if(name):
             if(tool == 'history'):
-                div = '<form method="post"><select name="a">' + select + '</select> <select name="b">' + select + '</select> <button class="btn btn-primary" type="submit">비교</button></form><br>' + div
+                div = '<form method="post"><select name="a">' + select + '</select> <select name="b">' + select + '</select> <button class="btn btn-primary" type="submit">비교</button></form><hr>' + div
                 title = name
                 sub += ' (역사)'
                 menu = [['w/' + url_pas(name), '문서'], ['move_data/' + url_pas(name), '이동 기록']]
-                div += '<br><a href="/history/' + url_pas(name) + '/' + str(num - 1) + '">(이전)</a> <a href="/history/' + url_pas(name) + '/' + str(num + 1) + '">(이후)</a>'
+                div += '<hr><a href="/history/' + url_pas(name) + '/' + str(num - 1) + '">(이전)</a> <a href="/history/' + url_pas(name) + '/' + str(num + 1) + '">(이후)</a>'
             else:
                 curs.execute("select end, why from ban where block = ?", [name])
                 ban_it = curs.fetchall()
@@ -3022,9 +3015,9 @@ def recent_changes(name = None, num = 1, what = 'all', tool = 'record'):
                 title = '편집 기록'
                 menu = [['other', '기타'], ['user', '사용자'], ['count/' + url_pas(name), '횟수']]
                 if(what):
-                    div += '<br><a href="/record/' + url_pas(name) + '/' + str(num - 1) + '/' + url_pas(what) + '">(이전)</a> <a href="/record/' + url_pas(name) + '/' + str(num + 1) + '/' + url_pas(what) + '">(이후)</a>'
+                    div += '<hr><a href="/record/' + url_pas(name) + '/' + str(num - 1) + '/' + url_pas(what) + '">(이전)</a> <a href="/record/' + url_pas(name) + '/' + str(num + 1) + '/' + url_pas(what) + '">(이후)</a>'
                 else:
-                    div += '<br><a href="/record/' + url_pas(name) + '/' + str(num - 1) + '">(이전)</a> <a href="/record/' + url_pas(name) + '/' + str(num + 1) + '">(이후)</a>'
+                    div += '<hr><a href="/record/' + url_pas(name) + '/' + str(num - 1) + '">(이전)</a> <a href="/record/' + url_pas(name) + '/' + str(num + 1) + '">(이후)</a>'
 
                 if(what != 'all'):
                     menu += [['record/' + url_pas(name), '일반']]
