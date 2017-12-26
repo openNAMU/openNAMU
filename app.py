@@ -216,7 +216,7 @@ def edit_set(num = 0):
         li_data = ''
         for li in li_list:
             x += 1
-            li_data += '<li>' + str(x) + '. <a href="/edit_set/' + str(x) + '">' + li + '</a></li>'
+            li_data += '<li><a href="/edit_set/' + str(x) + '">' + li + '</a></li>'
 
         return(html_minify(template('index', 
             imp = ['설정 편집', wiki_set(conn, 1), custom(conn), other2([0, 0])],
@@ -576,7 +576,7 @@ def admin_list():
     user_data = curs.fetchall()
 
     for data in user_data:
-        name = ip_pas(conn, data[0]) + ' (<a href="/admin_plus/' + url_pas(data[1]) + '">' + data[1] + '</a>)'
+        name = ip_pas(conn, data[0]) + ' <a href="/admin_plus/' + url_pas(data[1]) + '">(' + data[1] + ')</a>'
         div += '<li>' + name + '</li>'
         
     div += '</ul>'
@@ -1096,7 +1096,7 @@ def edit_filter():
         div += '<li><a href="/edit_filter/' + url_pas(data_list[0]) + '">' + data_list[0] + '</a></li>'
 
     div += '</ul>'
-    div += '<a href="/manager/9">(편집 필터 추가)</a>'
+    div += '<hr><a href="/manager/9">(추가)</a>'
 
     return(html_minify(template('index', 
         imp = ['편집 필터 목록', wiki_set(conn, 1), custom(conn), other2([0, 0])],
