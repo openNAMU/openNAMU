@@ -3111,7 +3111,6 @@ def upload():
 @route('/user')
 def user_info():
     ip = ip_check()
-    raw_ip = ip
     
     curs.execute("select acl from user where id = ?", [ip])
     data = curs.fetchall()
@@ -3129,6 +3128,11 @@ def user_info():
         curs.execute("select ip from ok_login where ip = ?", [ip])
         if(curs.fetchall()):
             acl += ' (로그인 가능)'
+            
+    if(not re.search('(\.|:)', ip)):
+        ip_user = '[[사용자:' + ip + '|' + ip + ']]'
+    else:
+        ip_user = ip
 
     custom_data = custom(conn)
     if(custom_data[2] != 0):
@@ -3140,19 +3144,19 @@ def user_info():
         imp = ['사용자 메뉴', wiki_set(conn, 1), custom_data, other2([0, 0])],
         data =  namumark(conn, '',  '[목차(없음)]\r\n' + \
                                     '== 상태 ==\r\n' + \
-                                    '[[사용자:' + ip + '|' + ip + ']] [[wiki:record/' + url_pas(ip) + '|(기록)]]\r\n\r\n'
+                                    ip_user + ' [[wiki:record/' + url_pas(ip) + '|(기록)]]\r\n\r\n'
                                     '권한 상태 : ' + acl + '\r\n' + \
                                     '== 로그인 ==\r\n' + \
                                     plus + '\r\n' + \
                                     ' * [[wiki:register|회원가입]]\r\n' + \
                                     '== 사용자 기능 ==\r\n' + \
-                                    ' * [[wiki:user_acl/' + url_pas(raw_ip) + '|사용자 문서 ACL]]\r\n' + \
+                                    ' * [[wiki:user_acl/' + url_pas(ip) + '|사용자 문서 ACL]]\r\n' + \
                                     ' * [[wiki:custom_head|사용자 HEAD]]\r\n' + \
                                     '== 기타 ==\r\n' + \
                                     ' * [[wiki:alarm|알림]]\r\n' + \
                                     ' * [[wiki:view_log|지나온 문서]]\r\n' + \
-                                    ' * [[wiki:record/' + raw_ip + '|편집 기록]]\r\n' + \
-                                    ' * [[wiki:topic_record/' + raw_ip + '|토론 기록]]\r\n' + \
+                                    ' * [[wiki:record/' + url_pas(ip) + '|편집 기록]]\r\n' + \
+                                    ' * [[wiki:topic_record/' + url_pas(ip) + '|토론 기록]]\r\n' + \
                                     ' * [[wiki:count|활동 횟수]]\r\n', 0, 0, 0),
         menu = 0
     )))
