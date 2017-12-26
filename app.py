@@ -796,7 +796,7 @@ def recent_discuss(tools = 'normal'):
             div += '<a href="/recent_discuss">(열린 토론)</a>'
             m_sub = ' (닫힘)'
 
-        div +=  '<br><br><table style="width: 100%; text-align: center;"><tbody><tr><td style="width: 50%;">토론명</td><td style="width: 50%;">시간</td></tr>'
+        div +=  '<hr><table style="width: 100%; text-align: center;"><tbody><tr><td style="width: 50%;">토론명</td><td style="width: 50%;">시간</td></tr>'
     else:
         return(redirect('/'))
     
@@ -3140,7 +3140,8 @@ def user_info():
 
     return(html_minify(template('index', 
         imp = ['사용자 메뉴', wiki_set(conn, 1), custom_data, other2([0, 0])],
-        data =  ip + '<br><br>' + namumark(conn, '',    '권한 상태 : ' + acl + '\r\n' + \
+        data =  ip + '<br><br>' + namumark(conn, '',    '== 상태 ==\r\n' + \
+                                                        '권한 상태 : ' + acl + '\r\n' + \
                                                         '[목차(없음)]\r\n' + \
                                                         '== 로그인 ==\r\n' + \
                                                         plus + '\r\n' + \
