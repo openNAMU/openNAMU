@@ -1652,7 +1652,7 @@ def title_index(num = 100, page = 1):
     if(num != 0):
         all_list = sql_num + 1
     else:
-        all_list = 0
+        all_list = 1
 
     if(num > 1000):
         return(re_error(conn, '/error/3'))
