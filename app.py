@@ -3111,7 +3111,6 @@ def upload():
 @route('/user')
 def user_info():
     ip = ip_check()
-    raw_ip = ip
     
     curs.execute("select acl from user where id = ?", [ip])
     data = curs.fetchall()
@@ -3129,6 +3128,11 @@ def user_info():
         curs.execute("select ip from ok_login where ip = ?", [ip])
         if(curs.fetchall()):
             acl += ' (로그인 가능)'
+            
+    if(not re.search('(\.|:)', ip)):
+        ip_user = '[[사용자:' + ip + '|' + ip + ']]'
+    else:
+        ip_user = ip
 
     custom_data = custom(conn)
     if(custom_data[2] != 0):
@@ -3140,7 +3144,7 @@ def user_info():
         imp = ['사용자 메뉴', wiki_set(conn, 1), custom_data, other2([0, 0])],
         data =  namumark(conn, '',  '[목차(없음)]\r\n' + \
                                     '== 상태 ==\r\n' + \
-                                    '[[사용자:' + ip + '|' + ip + ']] [[wiki:record/' + url_pas(ip) + '|(기록)]]\r\n\r\n'
+                                    ip_user + ' [[wiki:record/' + url_pas(ip) + '|(기록)]]\r\n\r\n'
                                     '권한 상태 : ' + acl + '\r\n' + \
                                     '== 로그인 ==\r\n' + \
                                     plus + '\r\n' + \
