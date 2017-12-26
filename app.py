@@ -2996,7 +2996,7 @@ def recent_changes(name = None, num = 1, what = 'all', tool = 'record'):
                 style[1] = 'background: gainsboro;'
 
             if(tool == 'history'):
-                title = data[0] + '판 '
+                title = '<a href="/w/' + url_pas(name) + '/r/' + data[0] + '">' + data[0] + '판</a> <a href="/raw/' + url_pas(name) + '/r/' + data[0] + '">(원본)</a> '
             else:
                 title = '<a href="/w/' + url_pas(data[1]) + '">' + html.escape(data[1]) + '</a> (<a href="/history/' + url_pas(data[1]) + '">' + data[0] + '판</a>) '
                     
