@@ -15,7 +15,7 @@ session_opts = {
 
 app = beaker.middleware.SessionMiddleware(app(), session_opts)
 BaseRequest.MEMFILE_MAX = 1000 ** 4
-r_ver = '2.4.8'
+r_ver = '2.4.9'
 
 from func import *
 from set_mark.mid_pas import mid_pas
@@ -165,7 +165,7 @@ def setup():
         curs.execute("create table if not exists ok_login(ip text, sub text)")
         curs.execute("create table if not exists filter(name text, regex text, sub text)")
 
-        curs.execute("select name from alist where = '소유자'")
+        curs.execute("select name from alist where name = '소유자'")
         if(not curs.fetchall()):
             curs.execute("insert into alist (name, acl) values ('소유자', 'owner')")
 
