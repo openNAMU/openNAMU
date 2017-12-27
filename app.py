@@ -1285,7 +1285,7 @@ def edit(name = None, name2 = None, num = None):
         curs.execute("select data from data where title = ?", [name])
         old = curs.fetchall()
         if(old):
-            if(not num and request.forms.otent != old[0][0]):
+            if(not num and request.forms.cotent != old[0][0]):
                 return(re_error(conn, '/error/12'))
 
             leng = leng_check(len(request.forms.otent), len(content))
