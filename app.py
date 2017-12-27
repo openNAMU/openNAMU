@@ -1347,7 +1347,7 @@ def edit(name = None, name2 = None, num = None):
             get_name = '<form method="post" id="get_edit" action="/edit_get/' + url_pas(name) + '"> \
                             <input placeholder="불러 올 문서" name="name" style="width: 50%;" type="text"> \
                             <button id="preview" class="btn" type="submit">불러오기</button> \
-                        </form><br>'
+                        </form><hr>'
         else:
             get_name = ''
             
@@ -1364,8 +1364,8 @@ def edit(name = None, name2 = None, num = None):
             data = get_name + ' \
                     <form method="post" action="/edit/' + url_pas(name) + action + '"> \
                         <textarea rows="25" name="content">' + html.escape(data) + '</textarea> \
-                        <textarea style="display: none;" name="otent">' + html.escape(data2) + '</textarea><br><br> \
-                        <input placeholder="사유" name="send" type="text"><br><br> \
+                        <textarea style="display: none;" name="otent">' + html.escape(data2) + '</textarea><hr> \
+                        <input placeholder="사유" name="send" type="text"><hr> \
                         ' + captcha + ' \
                         <button id="preview" class="btn btn-primary" type="submit">저장</button> \
                         <button id="preview" class="btn" type="submit" formaction="/preview/' + url_pas(name) + action + '">미리보기</button> \
@@ -1406,12 +1406,12 @@ def preview(name = None, num = None):
         imp = [name, wiki_set(conn, 1), custom(conn), other2([' (미리보기)', 0])],
         data = '<form method="post" action="/edit/' + url_pas(name) + action + '"> \
                     <textarea rows="25" name="content">' + html.escape(request.forms.content) + '</textarea> \
-                    <textarea style="display: none;" name="otent">' + html.escape(request.forms.otent) + '</textarea><br><br> \
-                    <input placeholder="사유" name="send" type="text"><br><br> \
+                    <textarea style="display: none;" name="otent">' + html.escape(request.forms.otent) + '</textarea><hr> \
+                    <input placeholder="사유" name="send" type="text"><hr> \
                     ' + captcha + ' \
                     <button id="preview" class="btn btn-primary" type="submit">저장</button> \
                     <button id="preview" class="btn" type="submit" formaction="/preview/' + url_pas(name) + action + '">미리보기</button> \
-                </form><br><br>' + enddata,
+                </form><hr>' + enddata,
         menu = [['w/' + url_pas(name), '문서']]
     )))
         
@@ -3100,9 +3100,9 @@ def upload():
         return(html_minify(template('index', 
             imp = ['파일 올리기', wiki_set(conn, 1), custom(conn), other2([0, 0])],
             data =  '<form method="post" enctype="multipart/form-data" accept-charset="utf8"> \
-                        <input type="file" name="f_data"><br><br> \
-                        <input placeholder="파일 이름" name="f_name" type="text"><br><br> \
-                        <input placeholder="라이선스" name="f_lice" type="text"><br><br> \
+                        <input type="file" name="f_data"><hr> \
+                        <input placeholder="파일 이름" name="f_name" type="text"><hr> \
+                        <input placeholder="라이선스" name="f_lice" type="text"><hr> \
                         <button class="btn btn-primary" type="submit">저장</button> \
                     </form>',
             menu = [['other', '기타']]
