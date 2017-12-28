@@ -828,7 +828,9 @@ def recent_discuss(tools = 'normal'):
 
 @route('/block_log')
 @route('/block_log/<num:int>')
-def block_log(num = 1):
+@route('/<tool:re:block_user|block_admin>/<name:path>')
+@route('/<tool:re:block_user|block_admin>/<name:path>/<num:int>')
+def block_log(num = 1, name = None, tool = None):
     if(num * 50 > 0):
         sql_num = num * 50 - 50
     else:
@@ -836,7 +838,24 @@ def block_log(num = 1):
     
     div = '<table style="width: 100%; text-align: center;"><tbody><tr><td style="width: 33.3%;">차단자</td><td style="width: 33.3%;">관리자</td><td style="width: 33.3%;">기간</td></tr>'
     
-    curs.execute("select why, block, blocker, end, today from rb order by today desc limit ?, '50'", [str(sql_num)])
+    if(not name):
+        div = '<a href="/manager/11">(차단자 검색)</a> <a href="/manager/12">(관리자 검색)</a><hr>' + div
+        sub = 0
+        menu = [['other', '기타']]
+
+        curs.execute("select why, block, blocker, end, today from rb order by today desc limit ?, '50'", [str(sql_num)])
+    else:
+        menu = [['block_log', '일반']]
+
+        if(tool == 'block_user'):
+            sub = ' (차단자)'
+
+            curs.execute("select why, block, blocker, end, today from rb where block = ? order by today desc limit ?, '50'", [name, str(sql_num)])
+        else:
+            sub = ' (관리자)'
+
+            curs.execute("select why, block, blocker, end, today from rb where blocker = ? order by today desc limit ?, '50'", [name, str(sql_num)])
+
     for data in curs.fetchall():
         why = html.escape(data[0])
 
@@ -861,9 +880,9 @@ def block_log(num = 1):
     div += '<a href="/block_log/' + str(num - 1) + '">(이전)</a> <a href="/block_log/' + str(num + 1) + '">(이후)</a>'
                 
     return(html_minify(template('index', 
-        imp = ['차단 기록', wiki_set(conn, 1), custom(conn), other2([0, 0])],
+        imp = ['차단 기록', wiki_set(conn, 1), custom(conn), other2([sub, 0])],
         data = div,
-        menu = [['other', '기타']]
+        menu = menu
     )))
             
 @route('/search', method=['POST'])
@@ -1571,14 +1590,16 @@ def other():
                             ' * [[wiki:admin_log|권한 기록]]\r\n' + \
                             ' * [[wiki:manager/6|편집 기록]]\r\n' + \
                             ' * [[wiki:manager/7|토론 기록]]\r\n' + \
+                            '== 목록 ==\r\n' + \
+                            ' * [[wiki:admin_list|관리자 목록]]\r\n' + \
+                            ' * [[wiki:give_log|권한 목록]]\r\n' + 
                             ' * [[wiki:not_close_topic|열린 토론 목록]]\r\n' + \
                             '== 기타 ==\r\n' + \
                             ' * [[wiki:title_index|모든 문서]]\r\n' + \
                             ' * [[wiki:acl_list|ACL 문서]]\r\n' + \
-                            ' * [[wiki:admin_list|관리자 목록]]\r\n' + \
-                            ' * [[wiki:give_log|권한 목록]]\r\n' + 
                             ' * [[wiki:please|필요한 문서]]\r\n' + \
                             ' * [[wiki:upload|파일 올리기]]\r\n' + \
+                            ' * [[wiki:manager/10|문서 검색]]\r\n' + \
                             '== 관리자 ==\r\n' + \
                             ' * [[wiki:manager/1|관리자 메뉴]]\r\n' + \
                             '== 버전 ==\r\n' + \
@@ -1589,7 +1610,7 @@ def other():
 @route('/manager', method=['POST', 'GET'])
 @route('/manager/<num:int>', method=['POST', 'GET'])
 def manager(num = 1):
-    title_list = [['ACL', '문서명', 'acl'], ['검사', 0, 'check'], ['차단', 0, 'ban'], ['권한', 0, 'admin'], ['편집 기록', 0, 'record'], ['토론 기록', 0, 'topic_record'], ['그룹 생성', '그룹명', 'admin_plus'], ['편집 필터 생성', '필터명', 'edit_filter']]
+    title_list = [['문서 ACL', '문서명', 'acl'], ['사용자 검사', 0, 'check'], ['사용자 차단', 0, 'ban'], ['권한 주기', 0, 'admin'], ['편집 기록', 0, 'record'], ['토론 기록', 0, 'topic_record'], ['그룹 생성', '그룹명', 'admin_plus'], ['편집 필터 생성', '필터명', 'edit_filter'], ['문서 검색', '문서명', 'search'], ['차단자 검색', 0, 'block_user'], ['관리자 검색', 0, 'block_admin']]
     if(num == 1):
         return(html_minify(template('index', 
             imp = ['관리자 메뉴', wiki_set(conn, 1), custom(conn), other2([0, 0])],
@@ -1597,7 +1618,7 @@ def manager(num = 1):
                                         '== 목록 ==\r\n' + \
                                         ' * [[wiki:manager/2|문서 ACL]]\r\n' + \
                                         ' * [[wiki:manager/3|사용자 검사]]\r\n' + \
-                                        ' * [[wiki:manager/10|사용자 비교]]\r\n' + \
+                                        ' * [[wiki:manager/100|사용자 비교]]\r\n' + \
                                         ' * [[wiki:manager/4|사용자 차단]]\r\n' + \
                                         ' * [[wiki:manager/5|권한 주기]]\r\n' + \
                                         ' * [[wiki:big_delete|여러 문서 삭제]]\r\n' + \
@@ -1610,7 +1631,7 @@ def manager(num = 1):
                                         ' * 이 메뉴에 없는 기능은 해당 문서의 역사나 토론에서 바로 사용 가능함', 0, 0, 0),
             menu = [['other', '기타']]
         )))
-    elif(num in range(2, 10)):
+    elif(num in range(2, 13)):
         if(request.method == 'POST'):
             return(redirect('/' + title_list[(num - 2)][2] + '/' + url_pas(request.forms.name)))
         else:
@@ -1627,7 +1648,7 @@ def manager(num = 1):
                         </form>',
                 menu = [['manager', '관리자']]
             )))
-    elif(num == 10):
+    elif(num == 100):
         if(request.method == 'POST'):
             return(redirect('/check/' + url_pas(request.forms.name) + '/' + url_pas(request.forms.name2)))
         else:
