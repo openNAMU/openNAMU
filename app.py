@@ -828,9 +828,10 @@ def recent_discuss(tools = 'normal'):
 
 @route('/block_log')
 @route('/block_log/<num:int>')
+@route('/block_log/<num:int>/<tool2:re:ip|user|never_end|can_end|end>')
 @route('/<tool:re:block_user|block_admin>/<name:path>')
 @route('/<tool:re:block_user|block_admin>/<name:path>/<num:int>')
-def block_log(num = 1, name = None, tool = None):
+def block_log(num = 1, name = None, tool = None, tool2 = None):
     if(num * 50 > 0):
         sql_num = num * 50 - 50
     else:
@@ -839,11 +840,35 @@ def block_log(num = 1, name = None, tool = None):
     div = '<table style="width: 100%; text-align: center;"><tbody><tr><td style="width: 33.3%;">차단자</td><td style="width: 33.3%;">관리자</td><td style="width: 33.3%;">기간</td></tr>'
     
     if(not name):
-        div = '<a href="/manager/11">(차단자 검색)</a> <a href="/manager/12">(관리자 검색)</a><hr>' + div
-        sub = 0
-        menu = [['other', '기타']]
+        if(not tool2):
+            div = '<a href="/manager/11">(차단자 검색)</a> <a href="/manager/12">(관리자 검색)</a><hr><a href="/block_log/1/ip">(아이피)</a> <a href="/block_log/1/user">(가입자)</a> <a href="/block_log/1/never_end">(영구)</a> <a href="/block_log/1/can_end">(기간)</a> <a href="/block_log/1/end">(해제)</a><hr>' + div
+            sub = 0
+            menu = [['other', '기타']]
 
-        curs.execute("select why, block, blocker, end, today from rb order by today desc limit ?, '50'", [str(sql_num)])
+            curs.execute("select why, block, blocker, end, today from rb order by today desc limit ?, '50'", [str(sql_num)])
+        else:
+            menu = [['block_log', '일반']]
+
+            if(tool2 == 'ip'):
+                sub = ' (아이피)'
+
+                curs.execute("select why, block, blocker, end, today from rb where (block like ? or block like ?) order by today desc limit ?, '50'", ['%.%', '%:%', str(sql_num)])
+            elif(tool2 == 'user'):
+                sub = ' (가입자)'
+
+                curs.execute("select why, block, blocker, end, today from rb where not (block like ? or block like ?) order by today desc limit ?, '50'", ['%.%', '%:%', str(sql_num)])
+            elif(tool2 == 'never_end'):
+                sub = '(영구)'
+
+                curs.execute("select why, block, blocker, end, today from rb where not end like ? and not end like ? order by today desc limit ?, '50'", ['%:%', '%해제%', str(sql_num)])
+            elif(tool2 == 'end'):
+                sub = '(해제)'
+
+                curs.execute("select why, block, blocker, end, today from rb where end = ? order by today desc limit ?, '50'", ['해제', str(sql_num)])
+            else:
+                sub = '(기간)'
+
+                curs.execute("select why, block, blocker, end, today from rb where end like ? order by today desc limit ?, '50'", ['%:%', str(sql_num)])
     else:
         menu = [['block_log', '일반']]
 
