@@ -15,7 +15,7 @@ session_opts = {
 
 app = beaker.middleware.SessionMiddleware(app(), session_opts)
 BaseRequest.MEMFILE_MAX = 1000 ** 4
-r_ver = '2.4.9'
+r_ver = '2.5.0'
 
 from func import *
 from set_mark.mid_pas import mid_pas
