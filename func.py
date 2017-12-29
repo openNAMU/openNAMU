@@ -4,6 +4,7 @@ import json
 import sqlite3
 import hashlib
 from urllib import parse
+import requests
 import re
 import html
 from css_html_js_minify import html_minify, js_minify, css_minify
@@ -29,19 +30,36 @@ def captcha_get(conn):
     curs = conn.cursor()
 
     data = ''
-    if(re.search('\.|:', ip_check()) and session.get('Awaken') and session.get('Awaken') != 1):
+    print(session.get('Awaken'))
+    if(re.search('\.|:', ip_check()) and (not session.get('Awaken') or session.get('Awaken') != 1)):
         curs.execute('select data from other where name = "recaptcha"')
         recaptcha = curs.fetchall()
         if(recaptcha and recaptcha[0][0] != ''):
-            data += recaptcha[0][0] + '<br>'
+            curs.execute('select data from other where name = "sec_re"')
+            sec_re = curs.fetchall()
+            if(sec_re and sec_re[0][0] != ''):
+                data += recaptcha[0][0] + '<br>'
 
     return(data)
 
-def captcha_post(conn, num = 1):
+def captcha_post(response, conn, num = 1):
     session = request.environ.get('beaker.session')
+    curs = conn.cursor()
+
     if(num == 1):
-        if(re.search('\.|:', ip_check()) and session.get('Awaken') and session.get('Awaken') != 1 and captcha_get(conn) != ''):
-            return(1)
+        if(re.search('\.|:', ip_check()) and (not session.get('Awaken') or session.get('Awaken') != 1) and captcha_get(conn) != ''):
+            curs.execute('select data from other where name = "sec_re"')
+            sec_re = curs.fetchall()
+            if(sec_re and sec_re[0][0] != ''):
+                data = requests.get('https://www.google.com/recaptcha/api/siteverify', params = { 'secret' : sec_re, 'response' : response })
+
+                print(data.json())
+                if(data and data.status_code == 200 and data.json()['success'] == True):
+                    return(0)
+                else:
+                    return(1)
+            else:
+                return(0)
         else:
             return(0)
     else:
