@@ -30,7 +30,6 @@ def captcha_get(conn):
     curs = conn.cursor()
 
     data = ''
-    print(session.get('Awaken'))
     if(re.search('\.|:', ip_check()) and (not session.get('Awaken') or session.get('Awaken') != 1)):
         curs.execute('select data from other where name = "recaptcha"')
         recaptcha = curs.fetchall()
@@ -53,11 +52,21 @@ def captcha_post(response, conn, num = 1):
             if(sec_re and sec_re[0][0] != ''):
                 data = requests.get('https://www.google.com/recaptcha/api/siteverify', params = { 'secret' : sec_re, 'response' : response })
 
-                print(data.json())
-                if(data and data.status_code == 200 and data.json()['success'] == True):
+                if(not data):
                     return(0)
                 else:
-                    return(1)
+                    json_data = data.json()
+
+                    try:
+                        json_data['error-codes']
+                        return(0)
+                    except:
+                        pass
+
+                    if(data.status_code == 200 and json_data['success'] == True):
+                        return(0)
+                    else:
+                        return(1)
             else:
                 return(0)
         else:

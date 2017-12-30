@@ -1851,7 +1851,7 @@ def topic_admin(name = None, sub = None, num = None):
     if(not data):
         return(redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub)))
 
-    ban = '[목차(없음)]\r\n'
+    ban = ''
     if(admin_check(conn, 3, None) == 1):
         ban += '== 관리 도구 ==\r\n'
 
@@ -1879,9 +1879,11 @@ def topic_admin(name = None, sub = None, num = None):
         ban += ']]\r\n' + is_ban
 
     ban += '== 기타 도구 ==\r\n'
-    ban += ' * [[wiki:/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/raw/' + str(num) + '|원본]]'
-    ban = ' * 작성 시간 : ' + data[0][2] + ban
-    ban = ' * 작성인 : ' + data[0][1] + ban
+    ban += ' * [[wiki:/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/raw/' + str(num) + '|원본]]\r\n'
+    ban = ' * 작성 시간 : ' + data[0][2] + '\r\n' + ban
+    ban = ' * 작성인 : ' + data[0][1] + ' [[wiki:record/' + url_pas(data[0][1]) + '|(기록)]]\r\n' + ban
+    ban = '== 정보 ==\r\n' + ban
+    ban = '[목차(없음)]\r\n' + ban
 
     return(html_minify(template('index', 
         imp = ['토론 도구', wiki_set(conn, 1), custom(conn), other2([' (' + str(num) + '번)', 0])],
@@ -3185,7 +3187,7 @@ def user_info():
         imp = ['사용자 메뉴', wiki_set(conn, 1), custom_data, other2([0, 0])],
         data =  namumark(conn, '',  '[목차(없음)]\r\n' + \
                                     '== 상태 ==\r\n' + \
-                                    ip_user + ' [[wiki:record/' + url_pas(ip) + '|(기록)]]\r\n\r\n'
+                                    ip_user + '\r\n\r\n'
                                     '권한 상태 : ' + acl + '\r\n' + \
                                     '== 로그인 ==\r\n' + \
                                     plus + '\r\n' + \
