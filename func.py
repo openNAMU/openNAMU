@@ -500,6 +500,9 @@ def re_error(conn, data):
         elif(num == 21):
             title = '편집 오류'
             data = '편집 필터에 의해 검열 되었습니다.'
+        elif(num == 22):
+            title = '파일 올리기 오류'
+            data = '파일을 읽을 수 없습니다. 파일명이 한글이면 영문으로 바꿔서 올려주세요.'
         else:
             title = '정체 불명의 오류'
             data = '???'
