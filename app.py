@@ -57,6 +57,16 @@ try:
     curs.execute("drop table if exists move")
     curs.execute("create table if not exists filter(name text, regex text, sub text)")
 
+    try:
+        curs.execute("alter table history add hide text default ''")
+        
+        curs.execute('select title, re from hidhi')
+        for rep in curs.fetchall():
+            curs.execute("update history set hide = 'O' where title = ? and id = ?", [rep[0], rep[1]])
+        curs.execute("drop table if exists hidhi")
+    except:
+        pass
+
     conn.commit()
 except:
     pass
@@ -99,7 +109,7 @@ def setup():
         curs.execute("select title from data limit 1")
     except:
         curs.execute("create table if not exists data(title text, data text, acl text)")
-        curs.execute("create table if not exists history(id text, title text, data text, date text, ip text, send text, leng text)")
+        curs.execute("create table if not exists history(id text, title text, data text, date text, ip text, send text, leng text, hide text)")
         curs.execute("create table if not exists rd(title text, sub text, date text)")
         curs.execute("create table if not exists user(id text, pw text, acl text)")
         curs.execute("create table if not exists ban(block text, end text, why text, band text)")
@@ -107,7 +117,6 @@ def setup():
         curs.execute("create table if not exists stop(title text, sub text, close text)")
         curs.execute("create table if not exists rb(block text, end text, today text, blocker text, why text)")
         curs.execute("create table if not exists back(title text, link text, type text)")
-        curs.execute("create table if not exists hidhi(title text, re text)")
         curs.execute("create table if not exists agreedis(title text, sub text)")
         curs.execute("create table if not exists custom(user text, css text)")
         curs.execute("create table if not exists other(name text, data text)")
@@ -548,12 +557,11 @@ def admin_list():
 @route('/history/<name:path>/r/<num:int>/hidden')
 def history_hidden(name = None, num = None):
     if(admin_check(conn, 6, 'history_hidden (' + name + '#' + str(num) + ')') == 1):
-        curs.execute("select * from hidhi where title = ? and re = ?", [name, str(num)])
-        exist = curs.fetchall()
-        if(exist):
-            curs.execute("delete from hidhi where title = ? and re = ?", [name, str(num)])
+        curs.execute("select title from history where title = ? and id = ? and hide = 'O'", [name, str(num)])
+        if(curs.fetchall()):
+            curs.execute("update history set hide = '' where title = ? and id = ?", [name, str(num)])
         else:
-            curs.execute("insert into hidhi (title, re) values (?, ?)", [name, str(num)])
+            curs.execute("update history set hide = 'O' where title = ? and id = ?", [name, str(num)])
             
         conn.commit()
     
@@ -946,7 +954,7 @@ def raw_view(name = None, sub_t = None, num = None):
     sub = ' (원본)'
     
     if(not sub_t and num):
-        curs.execute("select title from hidhi where title = ? and re = ?", [name, str(num)])
+        curs.execute("select title from history where title = ? and id = ? and hide = 'O'", [name, str(num)])
         hid = curs.fetchall()
         if(hid and admin_check(conn, 6, None) != 1):
             return(re_error(conn, '/error/3'))
@@ -992,7 +1000,7 @@ def revert(name = None, num = None):
         else:
             captcha_post('', conn, 0)
 
-        curs.execute("select title from hidhi where title = ? and re = ?", [name, str(num)])
+        curs.execute("select title from history where title = ? and id = ? and hide = 'O'", [name, str(num)])
         if(curs.fetchall() and admin_check(conn, 6, None) != 1):
             return(re_error(conn, '/error/3'))
 
@@ -1021,7 +1029,7 @@ def revert(name = None, num = None):
             
             return(redirect('/w/' + url_pas(name)))
     else:
-        curs.execute("select title from hidhi where title = ? and re = ?", [name, str(num)])
+        curs.execute("select title from history where title = ? and id = ? and hide = 'O'", [name, str(num)])
         hid = curs.fetchall()
         if(hid and admin_check(conn, 6, None) != 1):
             return(re_error(conn, '/error/3'))    
@@ -2704,7 +2712,7 @@ def read_view(name = None, num = None, redirect = None):
             div += u_div
 
     if(num):
-        curs.execute("select title from hidhi where title = ? and re = ?", [name, str(num)])
+        curs.execute("select title from history where title = ? and id = ? and hide = 'O'", [name, str(num)])
         hid = curs.fetchall()
         if(hid and admin_check(conn, 6, None) != 1):
             return(redirect('/history/' + url_pas(name)))
@@ -2959,7 +2967,8 @@ def recent_changes(name = None, num = 1, what = 'all', tool = 'record'):
             
             style = ['', '']
             date = data[2]
-            curs.execute("select title from hidhi where title = ? and re = ?", [data[1], data[0]])
+
+            curs.execute("select title from history where title = ? and id = ? and hide = 'O'", [data[1], data[0]])
             hide = curs.fetchall()
             if(six_admin == 1):
                 if(hide):                            
