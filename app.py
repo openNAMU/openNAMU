@@ -216,11 +216,13 @@ def edit_set(num = 0):
         li_data = ''
         for li in li_list:
             x += 1
-            li_data += '<li><a href="/edit_set/' + str(x) + '">' + li + '</a></li>'
+            li_data += ' * [[wiki:edit_set/' + str(x) + '|' + li + ']]\r\n'
 
         return(html_minify(template('index', 
             imp = ['설정 편집', wiki_set(conn, 1), custom(conn), other2([0, 0])],
-            data = '<ul>' + li_data + '</ul>',
+            data = namumark(conn, '',   '[목차(없음)]\r\n' + \
+                                        '== 메뉴 ==\r\n' + \
+                                        li_data, 0, 0, 0),
             menu = [['manager', '관리자']]
         )))
     elif(num == 1):
