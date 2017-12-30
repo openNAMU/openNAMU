@@ -216,11 +216,13 @@ def edit_set(num = 0):
         li_data = ''
         for li in li_list:
             x += 1
-            li_data += '<li><a href="/edit_set/' + str(x) + '">' + li + '</a></li>'
+            li_data += ' * [[wiki:edit_set/' + str(x) + '|' + li + ']]\r\n'
 
         return(html_minify(template('index', 
             imp = ['설정 편집', wiki_set(conn, 1), custom(conn), other2([0, 0])],
-            data = '<ul>' + li_data + '</ul>',
+            data = namumark(conn, '',   '[목차(없음)]\r\n' + \
+                                        '== 메뉴 ==\r\n' + \
+                                        li_data, 0, 0, 0),
             menu = [['manager', '관리자']]
         )))
     elif(num == 1):
@@ -394,7 +396,7 @@ def edit_set(num = 0):
 
             return(html_minify(template('index', 
                 imp = ['robots.txt', wiki_set(conn, 1), custom(conn), other2([0, 0])],
-                data =  '<a href="/robots.txt">상태 보기</a><hr> \
+                data =  '<a href="/robots.txt">(보기)</a><hr> \
                         <form method="post"> \
                             <textarea rows="25" name="content">' + html.escape(data) + '</textarea><hr> \
                             <button class="btn btn-primary" type="submit">저장</button> \
@@ -3093,7 +3095,12 @@ def upload():
         return(re_error(conn, '/ban'))
     
     if(request.method == 'POST'):
-        data = request.files.f_data
+        if(captcha_post(request.forms.get('g-recaptcha-response'), conn) == 1):
+            return(re_error(conn, '/error/13'))
+        else:
+            captcha_post('', conn, 0)
+
+        data = request.files.get('f_data')
         if(not data):
             return(re_error(conn, '/error/9'))
 
@@ -3102,7 +3109,7 @@ def upload():
         
         value = os.path.splitext(data.filename)[1]
         if(not value):
-            return(re_error(conn, '/error/16'))
+            return(re_error(conn, '/error/22'))
 
         if(not value in ['.jpeg', '.jpg', '.gif', '.png', '.webp', '.JPEG', '.JPG', '.GIF', '.PNG', '.WEBP']):
             return(re_error(conn, '/error/14'))
@@ -3140,12 +3147,14 @@ def upload():
         
         return(redirect('/w/파일:' + name))            
     else:
+        captcha = captcha_get(conn)
         return(html_minify(template('index', 
             imp = ['파일 올리기', wiki_set(conn, 1), custom(conn), other2([0, 0])],
             data =  '<form method="post" enctype="multipart/form-data" accept-charset="utf8"> \
                         <input type="file" name="f_data"><hr> \
                         <input placeholder="파일 이름" name="f_name" type="text"><hr> \
                         <input placeholder="라이선스" name="f_lice" type="text"><hr> \
+                        ' + captcha + ' \
                         <button class="btn btn-primary" type="submit">저장</button> \
                     </form>',
             menu = [['other', '기타']]
