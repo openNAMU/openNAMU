@@ -53,6 +53,53 @@ curs = conn.cursor()
 TEMPLATE_PATH.insert(0, skin_check(conn))
 
 try:
+    try:
+        plus_all_data = ''
+        start_replace = 0
+
+        curs.execute('select data from other where name = "css"')
+        for m_lo in curs.fetchall():
+            plus_all_data += '\r\n<style>' + m_lo[0] + '</style>'
+
+        curs.execute('select data from other where name = "js"')
+        for m_lo in curs.fetchall():
+            plus_all_data += '\r\n<script>' + m_lo[0] + '</script>'
+
+        if(plus_all_data != ''):
+            curs.execute("insert into other (name, data) values ('head', ?)", [plus_all_data])
+            curs.execute("delete from other where name = 'css'")
+            curs.execute("delete from other where name = 'js'")
+            start_replace = 1
+
+        curs.execute('select user from custom')
+        if(curs.fetchall()):
+            curs.execute("select user from custom where user like ?", ['% (head)%'])
+            if(not curs.fetchall()):
+                curs.execute("select user, css from custom")
+                for data_lo in curs.fetchall():
+                    plus_all_data = ''
+                    if(re.search(' \(js\)$', data_lo[0])):
+                        name_data_is = data_lo[0].replace(' (js)', '')
+                        plus_all_data = '\r\n<script>' + data_lo[1] + '</script>'
+                    else:
+                        name_data_is = data_lo[0]
+                        plus_all_data = '\r\n<style>' + data_lo[1] + '</style>'
+
+                    curs.execute("select css from custom where user = ?", [name_data_is + ' (head)'])
+                    data_is_it = curs.fetchall()
+                    if(data_is_it):
+                        curs.execute("update custom set css = ? where user = ?", [data_is_it[0][0] + plus_all_data, name_data_is + ' (head)'])
+                    else:
+                        curs.execute("insert into custom (user, css) values (?, ?)", [name_data_is + ' (head)', plus_all_data])
+                    
+                    curs.execute("delete from custom where user = ?", [data_lo[0]])
+                start_replace = 1
+
+        if(start_replace == 1):
+            print('CSS, JS 데이터 변환')
+    except:
+        pass
+
     curs.execute("create table if not exists ok_login(ip text, sub text)")
     curs.execute("drop table if exists move")
     curs.execute("create table if not exists filter(name text, regex text, sub text)")
