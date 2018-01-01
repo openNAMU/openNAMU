@@ -1636,7 +1636,7 @@ def other():
                             '== 관리자 ==\r\n' + \
                             ' * [[wiki:manager/1|관리자 메뉴]]\r\n' + \
                             '== 버전 ==\r\n' + \
-                            '이 오픈나무는 [[https://github.com/2DU/openNAMU/blob/SQLite/version.md|' + r_ver + ']]판 입니다.', 0, 0, 0),
+                            ' * 이 오픈나무는 [[https://github.com/2DU/openNAMU/blob/SQLite/version.md|' + r_ver + ']]판 입니다.', 0, 0, 0),
         menu = 0
     )))
     
@@ -1891,7 +1891,12 @@ def topic_admin(name = None, sub = None, num = None):
     ban += '== 기타 도구 ==\r\n'
     ban += ' * [[wiki:/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/raw/' + str(num) + '|원본]]\r\n'
     ban = ' * 작성 시간 : ' + data[0][2] + '\r\n' + ban
-    ban = ' * 작성인 : ' + data[0][1] + ' [[wiki:record/' + url_pas(data[0][1]) + '|(기록)]]\r\n' + ban
+
+    if(re.search('(\.|:)', data[0][1])):
+        ban = ' * 작성인 : ' + data[0][1] + ' [[wiki:record/' + url_pas(data[0][1]) + '|(기록)]]\r\n' + ban
+    else:
+        ban = ' * 작성인 : [[사용자:' + data[0][1] + '|' + data[0][1] + ']] [[wiki:record/' + url_pas(data[0][1]) + '|(기록)]]\r\n' + ban
+
     ban = '== 정보 ==\r\n' + ban
     ban = '[목차(없음)]\r\n' + ban
 
@@ -3205,8 +3210,8 @@ def user_info():
         imp = ['사용자 메뉴', wiki_set(conn, 1), custom_data, other2([0, 0])],
         data =  namumark(conn, '',  '[목차(없음)]\r\n' + \
                                     '== 상태 ==\r\n' + \
-                                    ip_user + '\r\n\r\n'
-                                    '권한 상태 : ' + acl + '\r\n' + \
+                                    ' * ' + ip_user + '\r\n'
+                                    ' * 권한 상태 : ' + acl + '\r\n' + \
                                     '== 로그인 ==\r\n' + \
                                     plus + '\r\n' + \
                                     ' * [[wiki:register|회원가입]]\r\n' + \

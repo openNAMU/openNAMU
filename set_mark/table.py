@@ -1,6 +1,6 @@
 import re
 
-def table_p(d, d2):
+def table_p(d, d2, d3, num = 0):
     table_class = 'class="'
     alltable = 'style="'
     celstyle = 'style="'
@@ -23,6 +23,7 @@ def table_p(d, d2):
             
     table_t_a = re.search("&lt;table\s?textalign=((?:(?!&gt;).)*)&gt;", d)
     if(table_t_a):
+        num = 1
         if(table_t_a.groups()[0] == 'right'):
             alltable += 'text-align: right;'
         elif(table_t_a.groups()[0] == 'center'):
@@ -91,6 +92,13 @@ def table_p(d, d2):
         celstyle += 'text-align: center;'
     elif(text_left):
         celstyle += 'text-align: left;'
+    elif(num == 0):
+        if(re.search('^ (.*) $', d3)):
+            celstyle += 'text-align: center;'
+        elif(re.search('^ (.*)$', d3)):
+            celstyle += 'text-align: right;'
+        elif(re.search('^(.*) $', d3)):
+            celstyle += 'text-align: left;'
 
     text_class = re.search("&lt;table\s?class=((?:(?!&gt;).)+)&gt;", d)
     if(text_class):
@@ -102,7 +110,7 @@ def table_p(d, d2):
     rowstyle += '"'
     table_class += '"'
 
-    return([alltable, rowstyle, celstyle, row, cel, table_class])
+    return([alltable, rowstyle, celstyle, row, cel, table_class, num])
 
 def table(data):
     data = re.sub("(?:\|\|\r\n)", "#table#<tablenobr>", data)
@@ -128,7 +136,7 @@ def table(data):
             results = m.groups()
             table = results[0]
             while(1):
-                a = re.search("^(\|\|(?:(?:\|\|)+)?)((?:&lt;(?:(?:(?!&gt;).)*)&gt;)+)?", table)
+                a = re.search("^(\|\|(?:(?:\|\|)*))((?:&lt;(?:(?:(?!&gt;).)*)&gt;)*)((?:(?!\|\|).)*)", table)
                 if(a):
                     row = ''
                     cel = ''
@@ -136,28 +144,30 @@ def table(data):
                     rowstyle = ''
                     alltable = ''
                     table_d = ''
+                    num = 0
 
                     result = a.groups()
                     if(result[1]):
-                        table_d = table_p(result[1], result[0])
+                        table_d = table_p(result[1], result[0], result[2])
                         alltable = table_d[0]
                         rowstyle = table_d[1]
                         celstyle = table_d[2]
                         row = table_d[3]
                         cel = table_d[4]
                         table_class = table_d[5]
+                        num = table_d[6]
                             
-                        table = re.sub("^(\|\|(?:(?:\|\|)+)?)((?:&lt;(?:(?:(?!&gt;).)*)&gt;)+)?",   "<table " + table_class + " " + alltable + "><tbody><tr " + rowstyle + "><td " + cel + " " + row + " " + celstyle + ">", table, 1)
+                        table = re.sub("^(\|\|(?:(?:\|\|)*))((?:&lt;(?:(?:(?!&gt;).)*)&gt;)*)", "<table " + table_class + " " + alltable + "><tbody><tr " + rowstyle + "><td " + cel + " " + row + " " + celstyle + ">", table, 1)
                     else:
                         cel = 'colspan="' + str(round(len(result[0]) / 2)) + '"'
-                        table = re.sub("^(\|\|(?:(?:\|\|)+)?)((?:&lt;(?:(?:(?!&gt;).)*)&gt;)+)?",   "<table><tbody><tr><td " + cel + ">", table, 1)
+                        table = re.sub("^(\|\|(?:(?:\|\|)*))((?:&lt;(?:(?:(?!&gt;).)*)&gt;)*)", "<table><tbody><tr><td " + cel + ">", table, 1)
                 else:
                     break
                     
             table = re.sub("\|\|$", "</td></tr></tbody></table>", table)
             
             while(1):
-                b = re.search("\|\|\r\n(\|\|(?:(?:\|\|)+)?)((?:&lt;(?:(?:(?!&gt;).)*)&gt;)+)?", table)
+                b = re.search("\|\|\r\n(\|\|(?:(?:\|\|)*))((?:&lt;(?:(?:(?!&gt;).)*)&gt;)*)((?:(?!\|\|).)*)", table)
                 if(b):
                     row = ''
                     cel = ''
@@ -167,21 +177,21 @@ def table(data):
 
                     result = b.groups()
                     if(result[1]):
-                        table_d = table_p(result[1], result[0])
+                        table_d = table_p(result[1], result[0], result[2], num)
                         rowstyle = table_d[1]
                         celstyle = table_d[2]
                         row = table_d[3]
                         cel = table_d[4]
                         
-                        table = re.sub("\|\|\r\n(\|\|(?:(?:\|\|)+)?)((?:&lt;(?:(?:(?!&gt;).)*)&gt;)+)?", "</td></tr><tr " + rowstyle + "><td " + cel + " " + row + " " + celstyle + ">", table, 1)
+                        table = re.sub("\|\|\r\n(\|\|(?:(?:\|\|)*))((?:&lt;(?:(?:(?!&gt;).)*)&gt;)*)", "</td></tr><tr " + rowstyle + "><td " + cel + " " + row + " " + celstyle + ">", table, 1)
                     else:
                         cel = 'colspan="' + str(round(len(result[0]) / 2)) + '"'
-                        table = re.sub("\|\|\r\n(\|\|(?:(?:\|\|)+)?)((?:&lt;(?:(?:(?!&gt;).)*)&gt;)+)?", "</td></tr><tr><td " + cel + ">", table, 1)
+                        table = re.sub("\|\|\r\n(\|\|(?:(?:\|\|)*))((?:&lt;(?:(?:(?!&gt;).)*)&gt;)*)", "</td></tr><tr><td " + cel + ">", table, 1)
                 else:
                     break
 
             while(1):
-                c = re.search("(\|\|(?:(?:\|\|)+)?)((?:&lt;(?:(?:(?!&gt;).)*)&gt;)+)?", table)
+                c = re.search("(\|\|(?:(?:\|\|)*))((?:&lt;(?:(?:(?!&gt;).)*)&gt;)*)((?:(?!\|\|).)*)", table)
                 if(c):
                     row = ''
                     cel = ''
@@ -190,15 +200,15 @@ def table(data):
 
                     result = c.groups()
                     if(result[1]):
-                        table_d = table_p(result[1], result[0])
+                        table_d = table_p(result[1], result[0], result[2], num)
                         celstyle = table_d[2]
                         row = table_d[3]
                         cel = table_d[4]
 
-                        table = re.sub("(\|\|(?:(?:\|\|)+)?)((?:&lt;(?:(?:(?!&gt;).)*)&gt;)+)?", "</td><td " + cel + " " + row + " " + celstyle + ">", table, 1)
+                        table = re.sub("(\|\|(?:(?:\|\|)*))((?:&lt;(?:(?:(?!&gt;).)*)&gt;)*)", "</td><td " + cel + " " + row + " " + celstyle + ">", table, 1)
                     else:
                         cel = 'colspan="' + str(round(len(result[0]) / 2)) + '"'
-                        table = re.sub("(\|\|(?:(?:\|\|)+)?)((?:&lt;(?:(?:(?!&gt;).)*)&gt;)+)?", "</td><td " + cel + ">", table, 1)
+                        table = re.sub("(\|\|(?:(?:\|\|)*))((?:&lt;(?:(?:(?!&gt;).)*)&gt;)*)", "</td><td " + cel + ">", table, 1)
                 else:
                     break
             
