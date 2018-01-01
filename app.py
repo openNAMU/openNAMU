@@ -735,7 +735,7 @@ def indexing():
     return(redirect('/'))        
         
 @route('/xref/<name:path>')
-@route('/xref/<name:path>/<num:int>')
+@route('/xref/<name:path>/num/<num:int>')
 def xref(name = None, num = 1):
     if(num * 50 > 0):
         sql_num = num * 50 - 50
@@ -763,7 +763,7 @@ def xref(name = None, num = 1):
         if(re.search('^틀:', data[0])):
             div += '<li><a id="inside" href="/xref/' + url_pas(data[0]) + '">' + data[0] + '</a> (역링크)</li>'
       
-    div += '</ul><hr><a href="/xref/' + url_pas(name) + '/' + str(num - 1) + '">(이전)</a> <a href="/xref/' + url_pas(name) + '/' + str(num + 1) + '">(이후)</a>'
+    div += '</ul><hr><a href="/xref/' + url_pas(name) + '/num/' + str(num - 1) + '">(이전)</a> <a href="/xref/' + url_pas(name) + '/num/' + str(num + 1) + '">(이후)</a>'
     
     return(html_minify(template('index', 
         imp = [name, wiki_set(conn, 1), custom(conn), other2([' (역링크)', 0])],
@@ -1524,7 +1524,7 @@ def delete(name = None):
         )))            
             
 @route('/move_data/<name:path>')
-@route('/move_data/<name:path>/<num:int>')
+@route('/move_data/<name:path>/num/<num:int>')
 def move_data(name = None, num = 1):
     if(num * 50 > 0):
         sql_num = num * 50 - 50
@@ -1543,7 +1543,7 @@ def move_data(name = None, num = 1):
         data += '<li><a href="/move_data/' + url_pas(match[0]) + '">' + match[0] + '</a> - <a href="/move_data/' + url_pas(match[1]) + '">' + match[1] + '</a>'
         data += ' / ' + for_data[2] + ' / ' + for_data[1] + ' / ' + send + '</li>'
     
-    data += '</ul><hr><a href="/move_data/' + url_pas(name) + '/' + str(num - 1) + '">(이전)</a> <a href="/move_data/' + url_pas(name) + '/' + str(num + 1) + '">(이후)</a>'
+    data += '</ul><hr><a href="/move_data/' + url_pas(name) + '/num/' + str(num - 1) + '">(이전)</a> <a href="/move_data/' + url_pas(name) + '/num/' + str(num + 1) + '">(이후)</a>'
     
     return(html_minify(template('index', 
         imp = [name, wiki_set(conn, 1), custom(conn), other2([' (이동 기록)', 0])],
@@ -2921,7 +2921,7 @@ def user_topic_list(name = None, num = 1):
     )))
 
 @route('/<tool:re:history|record>/<name:path>', method=['POST', 'GET'])
-@route('/<tool:re:history|record>/<name:path>/<num:int>', method=['POST', 'GET'])
+@route('/<tool:re:history|record>/<name:path>/num/<num:int>', method=['POST', 'GET'])
 @route('/record/<name:path>/<num:int>/<what:path>')
 @route('/recent_changes')
 @route('/recent_changes/<what:path>')
@@ -3064,7 +3064,7 @@ def recent_changes(name = None, num = 1, what = 'all', tool = 'record'):
                 title = name
                 sub += ' (역사)'
                 menu = [['w/' + url_pas(name), '문서'], ['move_data/' + url_pas(name), '이동 기록']]
-                div += '<hr><a href="/history/' + url_pas(name) + '/' + str(num - 1) + '">(이전)</a> <a href="/history/' + url_pas(name) + '/' + str(num + 1) + '">(이후)</a>'
+                div += '<hr><a href="/history/' + url_pas(name) + '/num/' + str(num - 1) + '">(이전)</a> <a href="/history/' + url_pas(name) + '/num/' + str(num + 1) + '">(이후)</a>'
             else:
                 curs.execute("select end, why from ban where block = ?", [name])
                 ban_it = curs.fetchall()
