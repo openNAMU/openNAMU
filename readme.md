@@ -9,6 +9,13 @@
 ## 기타
  * [테스트 서버](http://namu.ml/)
  
+## 클론하는 방법
+### 일반
+ * git clone https://github.com/2DU/openNAMU.git
+
+### 베타
+ * git clone -b beta https://github.com/2DU/openNAMU.git 
+ 
 ## 의존성
  * [파이썬](https://www.python.org/downloads/) 3.5 이상
  
