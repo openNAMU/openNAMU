@@ -104,6 +104,16 @@ try:
     curs.execute("drop table if exists move")
     curs.execute("create table if not exists filter(name text, regex text, sub text)")
 
+    try:
+        curs.execute("alter table history add hide text default ''")
+        
+        curs.execute('select title, re from hidhi')
+        for rep in curs.fetchall():
+            curs.execute("update history set hide = 'O' where title = ? and id = ?", [rep[0], rep[1]])
+        curs.execute("drop table if exists hidhi")
+    except:
+        pass
+
     conn.commit()
 except:
     pass
@@ -146,7 +156,7 @@ def setup():
         curs.execute("select title from data limit 1")
     except:
         curs.execute("create table if not exists data(title text, data text, acl text)")
-        curs.execute("create table if not exists history(id text, title text, data text, date text, ip text, send text, leng text)")
+        curs.execute("create table if not exists history(id text, title text, data text, date text, ip text, send text, leng text, hide text)")
         curs.execute("create table if not exists rd(title text, sub text, date text)")
         curs.execute("create table if not exists user(id text, pw text, acl text)")
         curs.execute("create table if not exists ban(block text, end text, why text, band text)")
@@ -154,7 +164,6 @@ def setup():
         curs.execute("create table if not exists stop(title text, sub text, close text)")
         curs.execute("create table if not exists rb(block text, end text, today text, blocker text, why text)")
         curs.execute("create table if not exists back(title text, link text, type text)")
-        curs.execute("create table if not exists hidhi(title text, re text)")
         curs.execute("create table if not exists agreedis(title text, sub text)")
         curs.execute("create table if not exists custom(user text, css text)")
         curs.execute("create table if not exists other(name text, data text)")
@@ -595,12 +604,11 @@ def admin_list():
 @route('/history/<name:path>/r/<num:int>/hidden')
 def history_hidden(name = None, num = None):
     if(admin_check(conn, 6, 'history_hidden (' + name + '#' + str(num) + ')') == 1):
-        curs.execute("select * from hidhi where title = ? and re = ?", [name, str(num)])
-        exist = curs.fetchall()
-        if(exist):
-            curs.execute("delete from hidhi where title = ? and re = ?", [name, str(num)])
+        curs.execute("select title from history where title = ? and id = ? and hide = 'O'", [name, str(num)])
+        if(curs.fetchall()):
+            curs.execute("update history set hide = '' where title = ? and id = ?", [name, str(num)])
         else:
-            curs.execute("insert into hidhi (title, re) values (?, ?)", [name, str(num)])
+            curs.execute("update history set hide = 'O' where title = ? and id = ?", [name, str(num)])
             
         conn.commit()
     
@@ -727,7 +735,7 @@ def indexing():
     return(redirect('/'))        
         
 @route('/xref/<name:path>')
-@route('/xref/<name:path>/<num:int>')
+@route('/xref/<name:path>/num/<num:int>')
 def xref(name = None, num = 1):
     if(num * 50 > 0):
         sql_num = num * 50 - 50
@@ -755,7 +763,7 @@ def xref(name = None, num = 1):
         if(re.search('^틀:', data[0])):
             div += '<li><a id="inside" href="/xref/' + url_pas(data[0]) + '">' + data[0] + '</a> (역링크)</li>'
       
-    div += '</ul><hr><a href="/xref/' + url_pas(name) + '/' + str(num - 1) + '">(이전)</a> <a href="/xref/' + url_pas(name) + '/' + str(num + 1) + '">(이후)</a>'
+    div += '</ul><hr><a href="/xref/' + url_pas(name) + '/num/' + str(num - 1) + '">(이전)</a> <a href="/xref/' + url_pas(name) + '/num/' + str(num + 1) + '">(이후)</a>'
     
     return(html_minify(template('index', 
         imp = [name, wiki_set(conn, 1), custom(conn), other2([' (역링크)', 0])],
@@ -993,7 +1001,7 @@ def raw_view(name = None, sub_t = None, num = None):
     sub = ' (원본)'
     
     if(not sub_t and num):
-        curs.execute("select title from hidhi where title = ? and re = ?", [name, str(num)])
+        curs.execute("select title from history where title = ? and id = ? and hide = 'O'", [name, str(num)])
         hid = curs.fetchall()
         if(hid and admin_check(conn, 6, None) != 1):
             return(re_error(conn, '/error/3'))
@@ -1039,7 +1047,7 @@ def revert(name = None, num = None):
         else:
             captcha_post('', conn, 0)
 
-        curs.execute("select title from hidhi where title = ? and re = ?", [name, str(num)])
+        curs.execute("select title from history where title = ? and id = ? and hide = 'O'", [name, str(num)])
         if(curs.fetchall() and admin_check(conn, 6, None) != 1):
             return(re_error(conn, '/error/3'))
 
@@ -1068,7 +1076,7 @@ def revert(name = None, num = None):
             
             return(redirect('/w/' + url_pas(name)))
     else:
-        curs.execute("select title from hidhi where title = ? and re = ?", [name, str(num)])
+        curs.execute("select title from history where title = ? and id = ? and hide = 'O'", [name, str(num)])
         hid = curs.fetchall()
         if(hid and admin_check(conn, 6, None) != 1):
             return(re_error(conn, '/error/3'))    
@@ -1516,7 +1524,7 @@ def delete(name = None):
         )))            
             
 @route('/move_data/<name:path>')
-@route('/move_data/<name:path>/<num:int>')
+@route('/move_data/<name:path>/num/<num:int>')
 def move_data(name = None, num = 1):
     if(num * 50 > 0):
         sql_num = num * 50 - 50
@@ -1535,7 +1543,7 @@ def move_data(name = None, num = 1):
         data += '<li><a href="/move_data/' + url_pas(match[0]) + '">' + match[0] + '</a> - <a href="/move_data/' + url_pas(match[1]) + '">' + match[1] + '</a>'
         data += ' / ' + for_data[2] + ' / ' + for_data[1] + ' / ' + send + '</li>'
     
-    data += '</ul><hr><a href="/move_data/' + url_pas(name) + '/' + str(num - 1) + '">(이전)</a> <a href="/move_data/' + url_pas(name) + '/' + str(num + 1) + '">(이후)</a>'
+    data += '</ul><hr><a href="/move_data/' + url_pas(name) + '/num/' + str(num - 1) + '">(이전)</a> <a href="/move_data/' + url_pas(name) + '/num/' + str(num + 1) + '">(이후)</a>'
     
     return(html_minify(template('index', 
         imp = [name, wiki_set(conn, 1), custom(conn), other2([' (이동 기록)', 0])],
@@ -1628,7 +1636,7 @@ def other():
                             '== 관리자 ==\r\n' + \
                             ' * [[wiki:manager/1|관리자 메뉴]]\r\n' + \
                             '== 버전 ==\r\n' + \
-                            '이 오픈나무는 [[https://github.com/2DU/openNAMU/blob/SQLite/version.md|' + r_ver + ']]판 입니다.', 0, 0, 0),
+                            ' * 이 오픈나무는 [[https://github.com/2DU/openNAMU/blob/SQLite/version.md|' + r_ver + ']]판 입니다.', 0, 0, 0),
         menu = 0
     )))
     
@@ -1883,7 +1891,12 @@ def topic_admin(name = None, sub = None, num = None):
     ban += '== 기타 도구 ==\r\n'
     ban += ' * [[wiki:/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/raw/' + str(num) + '|원본]]\r\n'
     ban = ' * 작성 시간 : ' + data[0][2] + '\r\n' + ban
-    ban = ' * 작성인 : ' + data[0][1] + ' [[wiki:record/' + url_pas(data[0][1]) + '|(기록)]]\r\n' + ban
+
+    if(re.search('(\.|:)', data[0][1])):
+        ban = ' * 작성인 : ' + data[0][1] + ' [[wiki:record/' + url_pas(data[0][1]) + '|(기록)]]\r\n' + ban
+    else:
+        ban = ' * 작성인 : [[사용자:' + data[0][1] + '|' + data[0][1] + ']] [[wiki:record/' + url_pas(data[0][1]) + '|(기록)]]\r\n' + ban
+
     ban = '== 정보 ==\r\n' + ban
     ban = '[목차(없음)]\r\n' + ban
 
@@ -2751,7 +2764,7 @@ def read_view(name = None, num = None, redirect = None):
             div += u_div
 
     if(num):
-        curs.execute("select title from hidhi where title = ? and re = ?", [name, str(num)])
+        curs.execute("select title from history where title = ? and id = ? and hide = 'O'", [name, str(num)])
         hid = curs.fetchall()
         if(hid and admin_check(conn, 6, None) != 1):
             return(redirect('/history/' + url_pas(name)))
@@ -2908,7 +2921,7 @@ def user_topic_list(name = None, num = 1):
     )))
 
 @route('/<tool:re:history|record>/<name:path>', method=['POST', 'GET'])
-@route('/<tool:re:history|record>/<name:path>/<num:int>', method=['POST', 'GET'])
+@route('/<tool:re:history|record>/<name:path>/num/<num:int>', method=['POST', 'GET'])
 @route('/record/<name:path>/<num:int>/<what:path>')
 @route('/recent_changes')
 @route('/recent_changes/<what:path>')
@@ -3006,7 +3019,8 @@ def recent_changes(name = None, num = 1, what = 'all', tool = 'record'):
             
             style = ['', '']
             date = data[2]
-            curs.execute("select title from hidhi where title = ? and re = ?", [data[1], data[0]])
+
+            curs.execute("select title from history where title = ? and id = ? and hide = 'O'", [data[1], data[0]])
             hide = curs.fetchall()
             if(six_admin == 1):
                 if(hide):                            
@@ -3050,7 +3064,7 @@ def recent_changes(name = None, num = 1, what = 'all', tool = 'record'):
                 title = name
                 sub += ' (역사)'
                 menu = [['w/' + url_pas(name), '문서'], ['move_data/' + url_pas(name), '이동 기록']]
-                div += '<hr><a href="/history/' + url_pas(name) + '/' + str(num - 1) + '">(이전)</a> <a href="/history/' + url_pas(name) + '/' + str(num + 1) + '">(이후)</a>'
+                div += '<hr><a href="/history/' + url_pas(name) + '/num/' + str(num - 1) + '">(이전)</a> <a href="/history/' + url_pas(name) + '/num/' + str(num + 1) + '">(이후)</a>'
             else:
                 curs.execute("select end, why from ban where block = ?", [name])
                 ban_it = curs.fetchall()
@@ -3196,8 +3210,8 @@ def user_info():
         imp = ['사용자 메뉴', wiki_set(conn, 1), custom_data, other2([0, 0])],
         data =  namumark(conn, '',  '[목차(없음)]\r\n' + \
                                     '== 상태 ==\r\n' + \
-                                    ip_user + '\r\n\r\n'
-                                    '권한 상태 : ' + acl + '\r\n' + \
+                                    ' * ' + ip_user + '\r\n'
+                                    ' * 권한 상태 : ' + acl + '\r\n' + \
                                     '== 로그인 ==\r\n' + \
                                     plus + '\r\n' + \
                                     ' * [[wiki:register|회원가입]]\r\n' + \
