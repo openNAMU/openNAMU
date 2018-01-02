@@ -17,12 +17,7 @@ from set_mark.mark import *
 from set_mark.link import url_pas
 from set_mark.link import sha224
     
-session_opts = {
-    'session.type': 'dbm',
-    'session.data_dir': './app_session/',
-    'session.auto': 1
-}
-
+session_opts = { 'session.type' : 'dbm', 'session.data_dir' : './app_session/', 'session.auto' : 1 }
 app = beaker.middleware.SessionMiddleware(app(), session_opts)
 
 def captcha_get(conn):
