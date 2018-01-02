@@ -1779,13 +1779,14 @@ def title_index(num = 100, page = 1):
         data += '<li>파일 문서는 총 ' + str(count_end[4]) + '개의 문서가 있습니다.</li>'
         data += '<li>나머지 문서는 총 ' + str(count_end[5]) + '개의 문서가 있습니다.</li>'
 
-    if(page != 1):
-        if(len(title_list) == num):
-            data += '</ul><hr><a href="/title_index/' + str(num) + '/' + str(page + 1) + '">(이후)</a>'
-    elif(len(title_list) != num):
-        data += '</ul><hr><a href="/title_index/' + str(num) + '/' + str(page - 1) + '">(이전)</a>'
-    else:
-        data += '</ul><hr><a href="/title_index/' + str(num) + '/' + str(page - 1) + '">(이전)</a> <a href="/title_index/' + str(num) + '/' + str(page + 1) + '">(이후)</a>'
+    if(num != 0):
+        if(page == 1):
+            if(len(title_list) == num):
+                data += '</ul><hr><a href="/title_index/' + str(num) + '/' + str(page + 1) + '">(이후)</a>'
+        elif(len(title_list) != num):
+            data += '</ul><hr><a href="/title_index/' + str(num) + '/' + str(page - 1) + '">(이전)</a>'
+        else:
+            data += '</ul><hr><a href="/title_index/' + str(num) + '/' + str(page - 1) + '">(이전)</a> <a href="/title_index/' + str(num) + '/' + str(page + 1) + '">(이후)</a>'
     
     if(' (' + str(num) + '개)' == ' (0개)'):
         sub = 0
