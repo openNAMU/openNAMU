@@ -25,7 +25,7 @@ def captcha_get(conn):
     curs = conn.cursor()
 
     data = ''
-    if(re.search('\.|:', ip_check()) and (not session.get('Awaken') or session.get('Awaken') != 1)):
+    if(re.search('\.|:', ip_check())):
         curs.execute('select data from other where name = "recaptcha"')
         recaptcha = curs.fetchall()
         if(recaptcha and recaptcha[0][0] != ''):
@@ -41,7 +41,7 @@ def captcha_post(response, conn, num = 1):
     curs = conn.cursor()
 
     if(num == 1):
-        if(re.search('\.|:', ip_check()) and (not session.get('Awaken') or session.get('Awaken') != 1) and captcha_get(conn) != ''):
+        if(re.search('\.|:', ip_check()) and captcha_get(conn) != ''):
             curs.execute('select data from other where name = "sec_re"')
             sec_re = curs.fetchall()
             if(sec_re and sec_re[0][0] != ''):
@@ -52,12 +52,6 @@ def captcha_post(response, conn, num = 1):
                 else:
                     json_data = data.json()
 
-                    try:
-                        json_data['error-codes']
-                        return(0)
-                    except:
-                        pass
-
                     if(data.status_code == 200 and json_data['success'] == True):
                         return(0)
                     else:
@@ -67,7 +61,7 @@ def captcha_post(response, conn, num = 1):
         else:
             return(0)
     else:
-        session['Awaken'] = 1
+        pass
 
 def skin_check(conn):
     curs = conn.cursor()
