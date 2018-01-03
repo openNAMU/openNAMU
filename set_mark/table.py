@@ -136,7 +136,7 @@ def table(data):
             results = m.groups()
             table = results[0]
             while(1):
-                a = re.search("^(\|\|(?:(?:\|\|)*))((?:&lt;(?:(?:(?!&gt;).)*)&gt;)*)((?:(?!\|\|).)*)", table)
+                a = re.search("^(\|\|(?:(?:\|\|)*))((?:&lt;(?:(?:(?!&gt;).)*)&gt;)*)((?:(?!\|\||<\/td>).)*)", table)
                 if(a):
                     row = ''
                     cel = ''
@@ -160,14 +160,22 @@ def table(data):
                         table = re.sub("^(\|\|(?:(?:\|\|)*))((?:&lt;(?:(?:(?!&gt;).)*)&gt;)*)", "<table " + table_class + " " + alltable + "><tbody><tr " + rowstyle + "><td " + cel + " " + row + " " + celstyle + ">", table, 1)
                     else:
                         cel = 'colspan="' + str(round(len(result[0]) / 2)) + '"'
-                        table = re.sub("^(\|\|(?:(?:\|\|)*))((?:&lt;(?:(?:(?!&gt;).)*)&gt;)*)", "<table><tbody><tr><td " + cel + ">", table, 1)
+
+                        if(re.search('^ (.*) $', result[2])):
+                            celstyle += 'text-align: center;'
+                        elif(re.search('^ (.*)$', result[2])):
+                            celstyle += 'text-align: right;'
+                        elif(re.search('^(.*) $', result[2])):
+                            celstyle += 'text-align: left;'
+
+                        table = re.sub("^(\|\|(?:(?:\|\|)*))((?:&lt;(?:(?:(?!&gt;).)*)&gt;)*)", "<table><tbody><tr><td " + cel + " style='" + celstyle + "'>", table, 1)
                 else:
                     break
                     
             table = re.sub("\|\|$", "</td></tr></tbody></table>", table)
             
             while(1):
-                b = re.search("\|\|\r\n(\|\|(?:(?:\|\|)*))((?:&lt;(?:(?:(?!&gt;).)*)&gt;)*)((?:(?!\|\|).)*)", table)
+                b = re.search("\|\|\r\n(\|\|(?:(?:\|\|)*))((?:&lt;(?:(?:(?!&gt;).)*)&gt;)*)((?:(?!\|\||<\/td>).)*)", table)
                 if(b):
                     row = ''
                     cel = ''
@@ -186,12 +194,20 @@ def table(data):
                         table = re.sub("\|\|\r\n(\|\|(?:(?:\|\|)*))((?:&lt;(?:(?:(?!&gt;).)*)&gt;)*)", "</td></tr><tr " + rowstyle + "><td " + cel + " " + row + " " + celstyle + ">", table, 1)
                     else:
                         cel = 'colspan="' + str(round(len(result[0]) / 2)) + '"'
-                        table = re.sub("\|\|\r\n(\|\|(?:(?:\|\|)*))((?:&lt;(?:(?:(?!&gt;).)*)&gt;)*)", "</td></tr><tr><td " + cel + ">", table, 1)
+
+                        if(re.search('^ (.*) $', result[2])):
+                            celstyle += 'text-align: center;'
+                        elif(re.search('^ (.*)$', result[2])):
+                            celstyle += 'text-align: right;'
+                        elif(re.search('^(.*) $', result[2])):
+                            celstyle += 'text-align: left;'
+
+                        table = re.sub("\|\|\r\n(\|\|(?:(?:\|\|)*))((?:&lt;(?:(?:(?!&gt;).)*)&gt;)*)", "</td></tr><tr><td " + cel + " style='" + celstyle + "'>", table, 1)
                 else:
                     break
 
             while(1):
-                c = re.search("(\|\|(?:(?:\|\|)*))((?:&lt;(?:(?:(?!&gt;).)*)&gt;)*)((?:(?!\|\|).)*)", table)
+                c = re.search("(\|\|(?:(?:\|\|)*))((?:&lt;(?:(?:(?!&gt;).)*)&gt;)*)((?:(?!\|\||<\/td>).)*)", table)
                 if(c):
                     row = ''
                     cel = ''
@@ -208,7 +224,15 @@ def table(data):
                         table = re.sub("(\|\|(?:(?:\|\|)*))((?:&lt;(?:(?:(?!&gt;).)*)&gt;)*)", "</td><td " + cel + " " + row + " " + celstyle + ">", table, 1)
                     else:
                         cel = 'colspan="' + str(round(len(result[0]) / 2)) + '"'
-                        table = re.sub("(\|\|(?:(?:\|\|)*))((?:&lt;(?:(?:(?!&gt;).)*)&gt;)*)", "</td><td " + cel + ">", table, 1)
+
+                        if(re.search('^ (.*) $', result[2])):
+                            celstyle += 'text-align: center;'
+                        elif(re.search('^ (.*)$', result[2])):
+                            celstyle += 'text-align: right;'
+                        elif(re.search('^(.*) $', result[2])):
+                            celstyle += 'text-align: left;'
+
+                        table = re.sub("(\|\|(?:(?:\|\|)*))((?:&lt;(?:(?:(?!&gt;).)*)&gt;)*)", "</td><td " + cel + " style='" + celstyle + "'>", table, 1)
                 else:
                     break
             
