@@ -1297,7 +1297,6 @@ def edit(name = None, name2 = None, num = None):
             for data_list in data:
                 match = re.compile(data_list[0])
                 if(match.search(request.forms.content)):
-                    print(data_list[1])
                     if(data_list[1] == 'X'):
                         rb_plus(conn, ip, '', get_time(), '도구:편집 필터', '편집 필터에 의한 차단')
                         curs.execute("insert into ban (block, end, why, band) values (?, '', ?, '')", [ip, '편집 필터에 의한 차단'])
@@ -1471,7 +1470,6 @@ def preview(name = None, num = None):
 
     ip = ip_check()
     can = acl_check(conn, name)
-    captcha = captcha_get(conn)
     
     if(can == 1):
         return(re_error(conn, '/ban'))
@@ -1491,7 +1489,6 @@ def preview(name = None, num = None):
                     <textarea rows="25" name="content">' + html.escape(request.forms.content) + '</textarea> \
                     <textarea style="display: none;" name="otent">' + html.escape(request.forms.otent) + '</textarea><hr> \
                     <input placeholder="사유" name="send" type="text"><hr> \
-                    ' + captcha + ' \
                     <button id="preview" class="btn btn-primary" type="submit">저장</button> \
                     <button id="preview" class="btn" type="submit" formaction="/preview/' + url_pas(name) + action + '">미리보기</button> \
                 </form><hr>' + enddata,
