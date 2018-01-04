@@ -107,7 +107,7 @@ def link(conn, title, data, num, category, backlink):
                     img = span[0] + '<img src="' + re.sub('^외부:', '', d[0]) + '" ' + width + height + '>' + span[1]
                     data = link.sub(img, data, 1)
                                     
-            elif(re.search('^https?:\/\/', d[0])):
+            elif(re.search('^https?:\/\/', re.sub('<([^>]*)>', '', d[0]))):
                 view = d[0]
                 try:
                     if(re.search('(.+)', d[1])):
@@ -115,7 +115,7 @@ def link(conn, title, data, num, category, backlink):
                 except:
                     pass
                 
-                data = link.sub('<a class="out_link" rel="nofollow" href="' + d[0] + '">' + view + '</a>', data, 1)
+                data = link.sub('<a class="out_link" rel="nofollow" href="' + re.sub('<([^>]*)>', '', d[0]) + '">' + view + '</a>', data, 1)
             else:
                 view = d[0].replace('\\\\', '<slash>').replace('\\', '').replace('<slash>', '\\')
                 try:
