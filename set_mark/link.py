@@ -151,7 +151,7 @@ def link(conn, title, data, num, category, backlink):
                     else:
                         no = ''
                     
-                    data = link.sub('<a ' + no + ' title="' + href + sh + '" href="/w/' + url_pas(a) + sh + '">' + view.replace('\\', '\\\\') + '</a>', data, 1)
+                    data = link.sub('<a ' + no + ' title="' + re.sub('<([^>]*)>', '', href) + sh + '" href="/w/' + url_pas(re.sub('<([^>]*)>', '', a)) + sh + '">' + view.replace('\\', '\\\\') + '</a>', data, 1)
         else:
             break
             
