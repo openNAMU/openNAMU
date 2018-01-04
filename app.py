@@ -1654,7 +1654,7 @@ def other():
                             '== 관리자 ==\r\n' + \
                             ' * [[wiki:manager/1|관리자 메뉴]]\r\n' + \
                             '== 버전 ==\r\n' + \
-                            ' * 이 오픈나무는 [[https://github.com/2DU/openNAMU/blob/SQLite/version.md|' + r_ver + ']]판 입니다.', 0, 0, 0),
+                            ' * 이 오픈나무는 [[https://github.com/2DU/openNAMU/blob/master/version.md|' + r_ver + ']]판 입니다.', 0, 0, 0),
         menu = 0
     )))
     
