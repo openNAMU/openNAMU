@@ -77,6 +77,18 @@ def skin_check(conn):
 
     return(skin)
 
+def next_fix(link, num, page, end = 50):
+    list_data = ''
+    if(num == 1):
+        if(len(page) == end):
+            list_data += '<hr><a href="' + link + str(num + 1) + '">(이후)</a>'
+    elif(len(page) != end):
+        list_data += '<hr><a href="' + link + str(num - 1) + '">(이전)</a>'
+    else:
+        list_data += '<hr><a href="' + link + str(num - 1) + '">(이전)</a> <a href="' + link + str(num + 1) + '">(이후)</a>'
+
+    return(list_data)
+
 def other2(origin):
     div = ''
     session = request.environ.get('beaker.session')
