@@ -38,37 +38,37 @@ def mid_pas(data, fol_num, include, in_c):
         if(is_it):
             it_d = is_it.groups()[0]
 
-            big_a = re.compile("^\+([1-5])\s(.*)$", re.DOTALL)
+            big_a = re.compile("^\+([1-5]) (.*)$", re.DOTALL)
             big = big_a.search(it_d)
 
-            small_a = re.compile("^\-([1-5])\s(.*)$", re.DOTALL)
+            small_a = re.compile("^\-([1-5]) (.*)$", re.DOTALL)
             small = small_a.search(it_d)
 
-            color_b = re.compile("^(#(?:[0-9a-f-A-F]{3}){1,2})\s(.*)$", re.DOTALL)
+            color_b = re.compile("^(#(?:[0-9a-f-A-F]{3}){1,2}) (.*)$", re.DOTALL)
             color_2 = color_b.search(it_d)
 
-            color_c = re.compile("^#(\w+)\s(.*)$", re.DOTALL)
+            color_c = re.compile("^#(\w+) (.*)$", re.DOTALL)
             color_3 = color_c.search(it_d)
 
-            back_a = re.compile("^@((?:[0-9a-f-A-F]{3}){1,2})\s(.*)$", re.DOTALL)
+            back_a = re.compile("^@((?:[0-9a-f-A-F]{3}){1,2}) (.*)$", re.DOTALL)
             back = back_a.search(it_d)
 
-            back_c = re.compile("^@(\w+)\s(.*)$", re.DOTALL)
+            back_c = re.compile("^@(\w+) (.*)$", re.DOTALL)
             back_3 = back_c.search(it_d)
 
-            include_out_a = re.compile("^#!noin\s(.*)$", re.DOTALL)
+            include_out_a = re.compile("^#!noin (.*)$", re.DOTALL)
             include_out = include_out_a.search(it_d)
 
-            div_a = re.compile("^#!wiki\sstyle=(?:&quot;|&#x27;)((?:(?!&quot;|&#x27;).)*)(?:&quot;|&#x27;)\r\n(.*)$", re.DOTALL)
+            div_a = re.compile("^#!wiki style=(?:&quot;|&#x27;)((?:(?!&quot;|&#x27;).)*)(?:&quot;|&#x27;)\r\n(.*)$", re.DOTALL)
             div = div_a.search(it_d)
 
-            html_a = re.compile("^#!html\s(.*)$", re.DOTALL)
+            html_a = re.compile("^#!html (.*)$", re.DOTALL)
             html_d = html_a.search(it_d)
 
-            fol_a = re.compile("^#!folding\s((?:(?!\n).)*)\n?\s\n(.*)$", re.DOTALL)
+            fol_a = re.compile("^#!folding ((?:(?!\n).)*)\n(.*)$", re.DOTALL)
             fol = fol_a.search(it_d)
 
-            syn_a = re.compile("^#!syntax\s([^\n]*)\r\n(.*)$", re.DOTALL)
+            syn_a = re.compile("^#!syntax ((?:(?!\n).)*)\n(.*)$", re.DOTALL)
             syn = syn_a.search(it_d)
 
             if(big):
