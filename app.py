@@ -1525,17 +1525,22 @@ def delete(name = None):
             
 @route('/move_data/<name:path>')
 def move_data(name = None):    
+    data = '<ul>'
+
     curs.execute("select send, date, ip from history where send like ? or send like ? order by date desc", ['%<a href="/w/' + url_pas(name) + '">' + name + '</a> 이동)%', '%(<a href="/w/' + url_pas(name) + '">' + name + '</a>%'])
     for for_data in curs.fetchall():
         match = re.findall('<a href="\/w\/(?:(?:(?!">).)+)">((?:(?!<\/a>).)+)<\/a>', for_data[0])
         send = re.sub('\([^\)]+\)$', '', for_data[0])
-        if(re.search('^( *)+$', send)):
-            send = '(없음)'
+        
+            
 
         data += '<li><a href="/move_data/' + url_pas(match[0]) + '">' + match[0] + '</a> - <a href="/move_data/' + url_pas(match[1]) + '">' + match[1] + '</a>'
-        data += ' / ' + for_data[2] + ' / ' + for_data[1] + ' / ' + send + '</li>'
+        if(re.search('^( *)+$', send)):
+            data += ' / ' + for_data[2] + ' / ' + for_data[1] + '</li>'
+        else:
+            data += ' / ' + for_data[2] + ' / ' + for_data[1] + ' / ' + send + '</li>'
     
-    data = '<ul>' + data + '</ul>'
+    data += '</ul>'
     
     return(html_minify(template('index', 
         imp = [name, wiki_set(conn, 1), custom(conn), other2([' (이동 기록)', 0])],
