@@ -2,22 +2,26 @@ import re
 
 def indent(data):
     while(1):
-        m = re.search("(\n(?:(?:( +)\*\s(?:[^\n]*))\n?)+)", data)
+        m = re.search("(\n(?:(?:( *)\* (?:[^\n]*))\n?)+)", data)
         if(m):
             result = m.groups()
             end = str(result[0])
 
             while(1):
-                isspace = re.search("( +)\*\s([^\n]*)", end)
+                isspace = re.search("( *)\*\s([^\n]*)", end)
                 if(isspace):
                     spacebar = isspace.groups()
-                    up = len(spacebar[0]) * 20
-                    end = re.sub("( +)\*\s([^\n]*)", "<li style='margin-left:" + str(up) + "px'>" + spacebar[1] + "</li>", end, 1)
+                    if(len(spacebar[0]) == 0):
+                        up = 20
+                    else:
+                        up = len(spacebar[0]) * 20
+
+                    end = re.sub("( *)\*\s([^\n]*)", "<li style='margin-left:" + str(up) + "px'>" + spacebar[1] + "</li>", end, 1)
                 else:
                     break
 
             end = re.sub("\n", '', end)
-            data = re.sub("(\n(?:(?:( +)\*\s(?:[^\n]*))\n?)+)", '<ul style="margin-top: 10px; margin-bottom: 10px;" id="list">' + end + '</ul>', data, 1)
+            data = re.sub("(\n(?:(?:( *)\* (?:[^\n]*))\n?)+)", '<ul style="margin-top: 10px; margin-bottom: 10px;" id="list">' + end + '</ul>', data, 1)
         else:
             break
 
