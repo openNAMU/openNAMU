@@ -10,7 +10,7 @@ logging.basicConfig(level = logging.ERROR)
 session_opts = { 'session.type' : 'dbm', 'session.data_dir' : './app_session/', 'session.auto' : 1 }
 app = beaker.middleware.SessionMiddleware(app(), session_opts)
 BaseRequest.MEMFILE_MAX = 1000 ** 4
-r_ver = '2.5.2'
+r_ver = '2.5.3'
 
 from func import *
 from set_mark.mid_pas import mid_pas
