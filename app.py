@@ -789,8 +789,8 @@ def recent_discuss(tools = 'normal'):
 
 @route('/block_log')
 @route('/block_log/<num:int>')
-@route('/block_log/<tool2:re:ip|user|never_end|can_end|end>')
-@route('/block_log/<tool2:re:ip|user|never_end|can_end|end>/<num:int>')
+@route('/block_log/<tool2:re:ip|user|never_end|can_end|end|now>')
+@route('/block_log/<tool2:re:ip|user|never_end|can_end|end|now>/<num:int>')
 @route('/<tool:re:block_user|block_admin>/<name:path>')
 @route('/<tool:re:block_user|block_admin>/<name:path>/<num:int>')
 def block_log(num = 1, name = None, tool = None, tool2 = None):
@@ -800,10 +800,11 @@ def block_log(num = 1, name = None, tool = None, tool2 = None):
         sql_num = 0
     
     div = '<table style="width: 100%; text-align: center;"><tbody><tr><td style="width: 33.3%;">차단자</td><td style="width: 33.3%;">관리자</td><td style="width: 33.3%;">기간</td></tr>'
+    data_list = ''
     
     if(not name):
         if(not tool2):
-            div = '<a href="/manager/11">(차단자)</a> <a href="/manager/12">(관리자)</a><hr><a href="/block_log/ip">(아이피)</a> <a href="/block_log/user">(가입자)</a> <a href="/block_log/never_end">(영구)</a> <a href="/block_log/can_end">(기간)</a> <a href="/block_log/end">(해제)</a><hr>' + div
+            div = '<a href="/manager/11">(차단자)</a> <a href="/manager/12">(관리자)</a><hr><a href="/block_log/ip">(아이피)</a> <a href="/block_log/user">(가입자)</a> <a href="/block_log/never_end">(영구)</a> <a href="/block_log/can_end">(기간)</a> <a href="/block_log/end">(해제)</a> <a href="/block_log/now">(현재)</a><hr>' + div
             sub = 0
             menu = [['other', '기타']]
 
@@ -827,6 +828,14 @@ def block_log(num = 1, name = None, tool = None, tool2 = None):
                 sub = '(해제)'
 
                 curs.execute("select why, block, blocker, end, today from rb where end = ? order by today desc limit ?, '50'", ['해제', str(sql_num)])
+            elif(tool2 == 'now'):
+                sub = '(현재)'
+                data_list = []
+
+                curs.execute("select block from ban limit ?, '50'", [str(sql_num)])
+                for in_data in curs.fetchall():
+                    curs.execute("select why, block, blocker, end, today from rb where block = ? order by today desc limit 1", [in_data[0]])
+                    data_list = [curs.fetchall()[0]] + data_list
             else:
                 sub = '(기간)'
 
@@ -843,7 +852,8 @@ def block_log(num = 1, name = None, tool = None, tool2 = None):
 
             curs.execute("select why, block, blocker, end, today from rb where blocker = ? order by today desc limit ?, '50'", [name, str(sql_num)])
 
-    data_list = curs.fetchall()
+    if(data_list == ''):
+        data_list = curs.fetchall()
 
     for data in data_list:
         why = html.escape(data[0])
