@@ -10,7 +10,7 @@ logging.basicConfig(level = logging.ERROR)
 session_opts = { 'session.type' : 'dbm', 'session.data_dir' : './app_session/', 'session.auto' : 1 }
 app = beaker.middleware.SessionMiddleware(app(), session_opts)
 BaseRequest.MEMFILE_MAX = 1000 ** 4
-r_ver = '2.5.2'
+r_ver = '2.5.3'
 
 from func import *
 from set_mark.mid_pas import mid_pas
@@ -51,53 +51,6 @@ TEMPLATE_PATH.insert(0, skin_check(conn))
 
 # 호환성 설정
 try:
-    try:
-        plus_all_data = ''
-        start_replace = 0
-
-        curs.execute('select data from other where name = "css"')
-        for m_lo in curs.fetchall():
-            plus_all_data += '\r\n<style>' + m_lo[0] + '</style>'
-
-        curs.execute('select data from other where name = "js"')
-        for m_lo in curs.fetchall():
-            plus_all_data += '\r\n<script>' + m_lo[0] + '</script>'
-
-        if(plus_all_data != ''):
-            curs.execute("insert into other (name, data) values ('head', ?)", [plus_all_data])
-            curs.execute("delete from other where name = 'css'")
-            curs.execute("delete from other where name = 'js'")
-            start_replace = 1
-
-        curs.execute('select user from custom')
-        if(curs.fetchall()):
-            curs.execute("select user from custom where user like ?", ['% (head)%'])
-            if(not curs.fetchall()):
-                curs.execute("select user, css from custom")
-                for data_lo in curs.fetchall():
-                    plus_all_data = ''
-                    if(re.search(' \(js\)$', data_lo[0])):
-                        name_data_is = data_lo[0].replace(' (js)', '')
-                        plus_all_data = '\r\n<script>' + data_lo[1] + '</script>'
-                    else:
-                        name_data_is = data_lo[0]
-                        plus_all_data = '\r\n<style>' + data_lo[1] + '</style>'
-
-                    curs.execute("select css from custom where user = ?", [name_data_is + ' (head)'])
-                    data_is_it = curs.fetchall()
-                    if(data_is_it):
-                        curs.execute("update custom set css = ? where user = ?", [data_is_it[0][0] + plus_all_data, name_data_is + ' (head)'])
-                    else:
-                        curs.execute("insert into custom (user, css) values (?, ?)", [name_data_is + ' (head)', plus_all_data])
-                    
-                    curs.execute("delete from custom where user = ?", [data_lo[0]])
-                start_replace = 1
-
-        if(start_replace == 1):
-            print('CSS, JS 데이터 변환')
-    except:
-        pass
-
     curs.execute("create table if not exists ok_login(ip text, sub text)")
     curs.execute("drop table if exists move")
     curs.execute("create table if not exists filter(name text, regex text, sub text)")
@@ -112,6 +65,7 @@ try:
     except:
         pass
 
+    curs.execute("create table if not exists scan(user text, title text)")
     conn.commit()
 except:
     pass
@@ -173,6 +127,7 @@ def setup():
         curs.execute("create table if not exists ua_d(name text, ip text, ua text, today text, sub text)")
         curs.execute("create table if not exists ok_login(ip text, sub text)")
         curs.execute("create table if not exists filter(name text, regex text, sub text)")
+        curs.execute("create table if not exists scan(user text, title text)")
 
         curs.execute("select name from alist where name = '소유자'")
         if(not curs.fetchall()):
@@ -836,8 +791,8 @@ def recent_discuss(tools = 'normal'):
 
 @route('/block_log')
 @route('/block_log/<num:int>')
-@route('/block_log/<tool2:re:ip|user|never_end|can_end|end>')
-@route('/block_log/<tool2:re:ip|user|never_end|can_end|end>/<num:int>')
+@route('/block_log/<tool2:re:ip|user|never_end|can_end|end|now>')
+@route('/block_log/<tool2:re:ip|user|never_end|can_end|end|now>/<num:int>')
 @route('/<tool:re:block_user|block_admin>/<name:path>')
 @route('/<tool:re:block_user|block_admin>/<name:path>/<num:int>')
 def block_log(num = 1, name = None, tool = None, tool2 = None):
@@ -847,10 +802,11 @@ def block_log(num = 1, name = None, tool = None, tool2 = None):
         sql_num = 0
     
     div = '<table style="width: 100%; text-align: center;"><tbody><tr><td style="width: 33.3%;">차단자</td><td style="width: 33.3%;">관리자</td><td style="width: 33.3%;">기간</td></tr>'
+    data_list = ''
     
     if(not name):
         if(not tool2):
-            div = '<a href="/manager/11">(차단자)</a> <a href="/manager/12">(관리자)</a><hr><a href="/block_log/ip">(아이피)</a> <a href="/block_log/user">(가입자)</a> <a href="/block_log/never_end">(영구)</a> <a href="/block_log/can_end">(기간)</a> <a href="/block_log/end">(해제)</a><hr>' + div
+            div = '<a href="/manager/11">(차단자)</a> <a href="/manager/12">(관리자)</a><hr><a href="/block_log/ip">(아이피)</a> <a href="/block_log/user">(가입자)</a> <a href="/block_log/never_end">(영구)</a> <a href="/block_log/can_end">(기간)</a> <a href="/block_log/end">(해제)</a> <a href="/block_log/now">(현재)</a><hr>' + div
             sub = 0
             menu = [['other', '기타']]
 
@@ -874,6 +830,14 @@ def block_log(num = 1, name = None, tool = None, tool2 = None):
                 sub = '(해제)'
 
                 curs.execute("select why, block, blocker, end, today from rb where end = ? order by today desc limit ?, '50'", ['해제', str(sql_num)])
+            elif(tool2 == 'now'):
+                sub = '(현재)'
+                data_list = []
+
+                curs.execute("select block from ban limit ?, '50'", [str(sql_num)])
+                for in_data in curs.fetchall():
+                    curs.execute("select why, block, blocker, end, today from rb where block = ? order by today desc limit 1", [in_data[0]])
+                    data_list = [curs.fetchall()[0]] + data_list
             else:
                 sub = '(기간)'
 
@@ -890,7 +854,8 @@ def block_log(num = 1, name = None, tool = None, tool2 = None):
 
             curs.execute("select why, block, blocker, end, today from rb where blocker = ? order by today desc limit ?, '50'", [name, str(sql_num)])
 
-    data_list = curs.fetchall()
+    if(data_list == ''):
+        data_list = curs.fetchall()
 
     for data in data_list:
         why = html.escape(data[0])
