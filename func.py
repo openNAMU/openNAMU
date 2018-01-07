@@ -32,7 +32,7 @@ def captcha_get(conn):
             curs.execute('select data from other where name = "sec_re"')
             sec_re = curs.fetchall()
             if(sec_re and sec_re[0][0] != ''):
-                data += recaptcha[0][0] + '<br>'
+                data += recaptcha[0][0] + '<hr>'
 
     return(data)
 
