@@ -65,6 +65,7 @@ try:
     except:
         pass
 
+    curs.execute("create table if not exists scan(user text, title text)")
     conn.commit()
 except:
     pass
@@ -126,6 +127,7 @@ def setup():
         curs.execute("create table if not exists ua_d(name text, ip text, ua text, today text, sub text)")
         curs.execute("create table if not exists ok_login(ip text, sub text)")
         curs.execute("create table if not exists filter(name text, regex text, sub text)")
+        curs.execute("create table if not exists scan(user text, title text)")
 
         curs.execute("select name from alist where name = '소유자'")
         if(not curs.fetchall()):
