@@ -244,7 +244,7 @@ def custom(conn):
         user_head = ''
 
     if(session.get('Now') == 1):
-        curs.execute('select name from alarm limit 1')
+        curs.execute('select name from alarm where name = ? limit 1', [ip_check()])
         if(curs.fetchall()):
             user_icon = 2
         else:

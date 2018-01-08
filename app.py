@@ -154,7 +154,7 @@ def alarm():
     curs.execute("select data, date from alarm where name = ? order by date desc", [ip])
     dt = curs.fetchall()
     if(dt):
-        da = '<a href="/del_alarm">(알람 삭제)</a><hr>' + da
+        da = '<a href="/del_alarm">(모두 삭제)</a><hr>' + da
 
         for do in dt:
             da += '<li>' + do[0] + ' / ' + do[1] + '</li>'
@@ -1319,6 +1319,10 @@ def edit(name = None, name2 = None, num = None):
             leng = '+' + str(len(content))
             curs.execute("insert into data (title, data, acl) values (?, ?, '')", [name, content])
 
+        curs.execute("select user from scan where title = ?", [name])
+        for user_data in curs.fetchall():
+            curs.execute("insert into alarm (name, data, date) values (?, ?, ?)", [ip, ip + '님이 <a href="/w/' + url_pas(name) + '">' + name + '</a> 문서를 편집 했습니다.', today])
+
         history_plus(conn, name, content, today, ip, send_p(request.forms.send), leng)
         curs.execute("delete from back where link = ?", [name])
         curs.execute("delete from back where title = ? and type = 'no'", [name])
@@ -1605,7 +1609,7 @@ def other():
 @route('/manager', method=['POST', 'GET'])
 @route('/manager/<num:int>', method=['POST', 'GET'])
 def manager(num = 1):
-    title_list = [['문서 ACL', '문서명', 'acl'], ['사용자 검사', 0, 'check'], ['사용자 차단', 0, 'ban'], ['권한 주기', 0, 'admin'], ['편집 기록', 0, 'record'], ['토론 기록', 0, 'topic_record'], ['그룹 생성', '그룹명', 'admin_plus'], ['편집 필터 생성', '필터명', 'edit_filter'], ['문서 검색', '문서명', 'search'], ['차단자 검색', 0, 'block_user'], ['관리자 검색', 0, 'block_admin']]
+    title_list = [['문서 ACL', '문서명', 'acl'], ['사용자 검사', 0, 'check'], ['사용자 차단', 0, 'ban'], ['권한 주기', 0, 'admin'], ['편집 기록', 0, 'record'], ['토론 기록', 0, 'topic_record'], ['그룹 생성', '그룹명', 'admin_plus'], ['편집 필터 생성', '필터명', 'edit_filter'], ['문서 검색', '문서명', 'search'], ['차단자 검색', 0, 'block_user'], ['관리자 검색', 0, 'block_admin'], ['주시 문서 추가', '문서명', 'watch_list']]
     if(num == 1):
         return(html_minify(template('index', 
             imp = ['관리자 메뉴', wiki_set(conn, 1), custom(conn), other2([0, 0])],
@@ -1626,7 +1630,7 @@ def manager(num = 1):
                                         ' * 이 메뉴에 없는 기능은 해당 문서의 역사나 토론에서 바로 사용 가능함', 0, 0, 0),
             menu = [['other', '기타']]
         )))
-    elif(num in range(2, 13)):
+    elif(num in range(2, 14)):
         if(request.method == 'POST'):
             return(redirect('/' + title_list[(num - 2)][2] + '/' + url_pas(request.forms.name)))
         else:
@@ -3184,9 +3188,55 @@ def user_info():
                                     ' * [[wiki:view_log|지나온 문서]]\r\n' + \
                                     ' * [[wiki:record/' + url_pas(ip) + '|편집 기록]]\r\n' + \
                                     ' * [[wiki:topic_record/' + url_pas(ip) + '|토론 기록]]\r\n' + \
+                                    ' * [[wiki:watch_list|주시 문서]]\r\n' + \
                                     ' * [[wiki:count|활동 횟수]]\r\n', 0, 0, 0),
         menu = 0
     )))
+
+@route('/watch_list')
+def watch_list():
+    div = '한도 : 10개<hr>'
+    ip = ip_check()
+    
+    if(re.search('\.|:', ip)):
+        return(redirect('/login'))
+
+    curs.execute("select title from scan where user = ?", [ip])
+    data = curs.fetchall()
+    for data_list in data:
+        div += '<li><a href="/w/' + url_pas(data_list[0]) + '">' + data_list[0] + '</a> <a href="/watch_list/' + url_pas(data_list[0]) + '">(삭제)</a></li>'
+
+    if(data):
+        div = '<ul>' + div + '</ul><hr>'
+
+    div += '<a href="/manager/13">(추가)</a>'
+
+    return(html_minify(template('index', 
+        imp = ['편집 필터 목록', wiki_set(conn, 1), custom(conn), other2([0, 0])],
+        data = div,
+        menu = [['manager', '관리자']]
+    )))
+
+@route('/watch_list/<name:path>')
+def watch_list(name = None):
+    ip = ip_check()
+    if(re.search('\.|:', ip)):
+        return(redirect('/login'))
+
+    curs.execute("select count(title) from scan where user = ?", [ip])
+    count = curs.fetchall()
+    if(count):
+        if(count[0][0] > 9):
+            return(redirect('/watch_list'))
+
+    curs.execute("select title from scan where user = ? and title = ?", [ip, name])
+    if(curs.fetchall()):
+        curs.execute("delete from scan where user = ? and title = ?", [ip, name])
+    else:
+        curs.execute("insert into scan (user, title) values (?, ?)", [ip, name])
+    conn.commit()
+
+    return(redirect('/watch_list'))
 
 @route('/view_log')
 def view_log():
