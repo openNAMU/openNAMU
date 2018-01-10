@@ -66,6 +66,12 @@ try:
         pass
 
     curs.execute("create table if not exists scan(user text, title text)")
+
+    try:
+        curs.execute("alter table user add date text default ''")
+    except:
+        pass
+
     conn.commit()
 except:
     pass
@@ -112,7 +118,7 @@ def setup():
         curs.execute("create table if not exists data(title text, data text, acl text)")
         curs.execute("create table if not exists history(id text, title text, data text, date text, ip text, send text, leng text, hide text)")
         curs.execute("create table if not exists rd(title text, sub text, date text)")
-        curs.execute("create table if not exists user(id text, pw text, acl text)")
+        curs.execute("create table if not exists user(id text, pw text, acl text, date text)")
         curs.execute("create table if not exists ban(block text, end text, why text, band text)")
         curs.execute("create table if not exists topic(id text, title text, sub text, data text, date text, ip text, block text, top text)")
         curs.execute("create table if not exists stop(title text, sub text, close text)")
@@ -541,11 +547,15 @@ def admin_plus(name = None):
 def admin_list():
     div = '<ul>'
     
-    curs.execute("select id, acl from user where not acl = 'user'")
+    curs.execute("select id, acl, date from user where not acl = 'user' order by date desc")
     user_data = curs.fetchall()
 
     for data in user_data:
         name = ip_pas(conn, data[0]) + ' <a href="/admin_plus/' + url_pas(data[1]) + '">(' + data[1] + ')</a>'
+
+        if(data[2] != ''):
+            name += '(가입 : ' + data[2] + ')'
+
         div += '<li>' + name + '</li>'
         
     div += '</ul>'
@@ -580,7 +590,7 @@ def user_log(num = 1):
     list_data = '<ul>'
     admin_one = admin_check(conn, 1, None)
     
-    curs.execute("select id from user limit ?, '50'", [str(sql_num)])
+    curs.execute("select id, date from user order by date desc limit ?, '50'", [str(sql_num)])
     user_list = curs.fetchall()
     for data in user_list:
         if(admin_one == 1):
@@ -594,8 +604,13 @@ def user_log(num = 1):
             ban_button = ''
             
         ip = ip_pas(conn, data[0])
-        list_data += '<li>' + ip + ban_button + '</li>'
-    
+        list_data += '<li>' + ip + ban_button
+
+        if(data[1] != ''):
+            list_data += ' (가입 : ' + data[1] + ')'
+
+        list_data += '</li>'
+
     if(num == 1):
         curs.execute("select count(id) from user")
         user_count = curs.fetchall()
@@ -2293,9 +2308,9 @@ def register():
         curs.execute("select id from user limit 1")
         user_ex = curs.fetchall()
         if(not user_ex):
-            curs.execute("insert into user (id, pw, acl) values (?, ?, '소유자')", [request.forms.id, hashed.decode()])
+            curs.execute("insert into user (id, pw, acl, date) values (?, ?, '소유자', ?)", [request.forms.id, hashed.decode(), get_time()])
         else:
-            curs.execute("insert into user (id, pw, acl) values (?, ?, 'user')", [request.forms.id, hashed.decode()])
+            curs.execute("insert into user (id, pw, acl, date) values (?, ?, 'user', ?)", [request.forms.id, hashed.decode(), get_time()])
         conn.commit()
         
         return(redirect('/login'))
