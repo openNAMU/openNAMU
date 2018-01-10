@@ -1237,7 +1237,7 @@ def edit(name = None, name2 = None, num = None):
                 match = re.compile(data_list[0])
                 if(match.search(request.forms.content)):
                     if(data_list[1] == 'X'):
-                        rb_plus(conn, ip, '', get_time(), '도구:편집 필터', '편집 필터에 의한 차단')
+                        curs.execute("insert into rb (block, end, today, blocker, why) values (?, ?, ?, ?, ?)", [ip, '', get_time(), '도구:편집 필터', '편집 필터에 의한 차단'])
                         curs.execute("insert into ban (block, end, why, band) values (?, '', ?, '')", [ip, '편집 필터에 의한 차단'])
                     elif(not data_list[1] == ''):
                         match = re.search("^([^ ]+) ([^:]+):([^:]+)$", data_list[1])
@@ -1284,7 +1284,7 @@ def edit(name = None, name2 = None, num = None):
 
                         end = str(year) + '-' + time_list[0] + '-' + time_list[1] + ' ' + time_list[2] + ':' + time_list[3] + ':' + time_data[5]
 
-                        rb_plus(conn, ip, end, get_time(), '도구:편집 필터', '편집 필터에 의한 차단')
+                        curs.execute("insert into rb (block, end, today, blocker, why) values (?, ?, ?, ?, ?)", [ip, end, get_time(), '도구:편집 필터', '편집 필터에 의한 차단'])
                         curs.execute("insert into ban (block, end, why, band) values (?, ?, ?, '')", [ip, end, '편집 필터에 의한 차단'])
                     
                     conn.commit()
@@ -2360,7 +2360,7 @@ def user_ban(name = None):
 
         curs.execute("select block from ban where block = ?", [name])
         if(curs.fetchall()):
-            rb_plus(conn, name, '해제', time, ip, '')  
+            curs.execute("insert into rb (block, end, today, blocker, why) values (?, ?, ?, ?, ?)", [name, '해제', time, ip, ''])
             curs.execute("delete from ban where block = ?", [name])
         else:
             if(re.search("^([0-9]{1,3}\.[0-9]{1,3})$", name)):
@@ -2368,7 +2368,7 @@ def user_ban(name = None):
             else:
                 band_d = ''
 
-            rb_plus(conn, name, end, time, ip, request.forms.why)
+            curs.execute("insert into rb (block, end, today, blocker, why) values (?, ?, ?, ?, ?)", [name, end, time, ip, request.forms.why])
             curs.execute("insert into ban (block, end, why, band) values (?, ?, ?, ?)", [name, end, request.forms.why, band_d])
 
         if(request.forms.login_ok != ''):
