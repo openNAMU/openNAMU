@@ -66,6 +66,13 @@ try:
         pass
 
     curs.execute("create table if not exists scan(user text, title text)")
+
+    try:
+        curs.execute("alter table user add date text default ''")
+        curs.execute("alter table rb add band text default ''")
+    except:
+        pass
+
     conn.commit()
 except:
     pass
@@ -112,7 +119,7 @@ def setup():
         curs.execute("create table if not exists data(title text, data text, acl text)")
         curs.execute("create table if not exists history(id text, title text, data text, date text, ip text, send text, leng text, hide text)")
         curs.execute("create table if not exists rd(title text, sub text, date text)")
-        curs.execute("create table if not exists user(id text, pw text, acl text)")
+        curs.execute("create table if not exists user(id text, pw text, acl text, date text)")
         curs.execute("create table if not exists ban(block text, end text, why text, band text)")
         curs.execute("create table if not exists topic(id text, title text, sub text, data text, date text, ip text, block text, top text)")
         curs.execute("create table if not exists stop(title text, sub text, close text)")
@@ -541,11 +548,15 @@ def admin_plus(name = None):
 def admin_list():
     div = '<ul>'
     
-    curs.execute("select id, acl from user where not acl = 'user'")
+    curs.execute("select id, acl, date from user where not acl = 'user' order by date desc")
     user_data = curs.fetchall()
 
     for data in user_data:
         name = ip_pas(conn, data[0]) + ' <a href="/admin_plus/' + url_pas(data[1]) + '">(' + data[1] + ')</a>'
+
+        if(data[2] != ''):
+            name += '(가입 : ' + data[2] + ')'
+
         div += '<li>' + name + '</li>'
         
     div += '</ul>'
@@ -580,7 +591,7 @@ def user_log(num = 1):
     list_data = '<ul>'
     admin_one = admin_check(conn, 1, None)
     
-    curs.execute("select id from user limit ?, '50'", [str(sql_num)])
+    curs.execute("select id, date from user order by date desc limit ?, '50'", [str(sql_num)])
     user_list = curs.fetchall()
     for data in user_list:
         if(admin_one == 1):
@@ -594,8 +605,13 @@ def user_log(num = 1):
             ban_button = ''
             
         ip = ip_pas(conn, data[0])
-        list_data += '<li>' + ip + ban_button + '</li>'
-    
+        list_data += '<li>' + ip + ban_button
+
+        if(data[1] != ''):
+            list_data += ' (가입 : ' + data[1] + ')'
+
+        list_data += '</li>'
+
     if(num == 1):
         curs.execute("select count(id) from user")
         user_count = curs.fetchall()
@@ -1237,7 +1253,7 @@ def edit(name = None, name2 = None, num = None):
                 match = re.compile(data_list[0])
                 if(match.search(request.forms.content)):
                     if(data_list[1] == 'X'):
-                        rb_plus(conn, ip, '', get_time(), '도구:편집 필터', '편집 필터에 의한 차단')
+                        curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, '')", [ip, '', get_time(), '도구:편집 필터', '편집 필터에 의한 차단'])
                         curs.execute("insert into ban (block, end, why, band) values (?, '', ?, '')", [ip, '편집 필터에 의한 차단'])
                     elif(not data_list[1] == ''):
                         match = re.search("^([^ ]+) ([^:]+):([^:]+)$", data_list[1])
@@ -1284,7 +1300,7 @@ def edit(name = None, name2 = None, num = None):
 
                         end = str(year) + '-' + time_list[0] + '-' + time_list[1] + ' ' + time_list[2] + ':' + time_list[3] + ':' + time_data[5]
 
-                        rb_plus(conn, ip, end, get_time(), '도구:편집 필터', '편집 필터에 의한 차단')
+                        curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, '')", [ip, end, get_time(), '도구:편집 필터', '편집 필터에 의한 차단'])
                         curs.execute("insert into ban (block, end, why, band) values (?, ?, ?, '')", [ip, end, '편집 필터에 의한 차단'])
                     
                     conn.commit()
@@ -2293,9 +2309,9 @@ def register():
         curs.execute("select id from user limit 1")
         user_ex = curs.fetchall()
         if(not user_ex):
-            curs.execute("insert into user (id, pw, acl) values (?, ?, '소유자')", [request.forms.id, hashed.decode()])
+            curs.execute("insert into user (id, pw, acl, date) values (?, ?, '소유자', ?)", [request.forms.id, hashed.decode(), get_time()])
         else:
-            curs.execute("insert into user (id, pw, acl) values (?, ?, 'user')", [request.forms.id, hashed.decode()])
+            curs.execute("insert into user (id, pw, acl, date) values (?, ?, 'user', ?)", [request.forms.id, hashed.decode(), get_time()])
         conn.commit()
         
         return(redirect('/login'))
@@ -2360,7 +2376,7 @@ def user_ban(name = None):
 
         curs.execute("select block from ban where block = ?", [name])
         if(curs.fetchall()):
-            rb_plus(conn, name, '해제', time, ip, '')  
+            curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, '')", [name, '해제', time, ip, ''])
             curs.execute("delete from ban where block = ?", [name])
         else:
             if(re.search("^([0-9]{1,3}\.[0-9]{1,3})$", name)):
@@ -2368,7 +2384,7 @@ def user_ban(name = None):
             else:
                 band_d = ''
 
-            rb_plus(conn, name, end, time, ip, request.forms.why)
+            curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, ?)", [name, end, time, ip, request.forms.why, band_d])
             curs.execute("insert into ban (block, end, why, band) values (?, ?, ?, ?)", [name, end, request.forms.why, band_d])
 
         if(request.forms.login_ok != ''):
