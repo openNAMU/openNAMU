@@ -360,10 +360,6 @@ def rd_plus(conn, title, sub, date):
         curs.execute("update rd set date = ? where title = ? and sub = ?", [date, title, sub])
     else:
         curs.execute("insert into rd (title, sub, date) values (?, ?, ?)", [title, sub, date])
-    
-def rb_plus(conn, block, end, today, blocker, why):
-    curs = conn.cursor()
-    curs.execute("insert into rb (block, end, today, blocker, why) values (?, ?, ?, ?, ?)", [block, end, today, blocker, why])
 
 def history_plus(conn, title, data, date, ip, send, leng):
     curs = conn.cursor()
