@@ -69,6 +69,10 @@ try:
 
     try:
         curs.execute("alter table user add date text default ''")
+    except:
+        pass
+
+    try:
         curs.execute("alter table rb add band text default ''")
     except:
         pass
