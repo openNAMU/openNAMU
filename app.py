@@ -10,7 +10,7 @@ logging.basicConfig(level = logging.ERROR)
 session_opts = { 'session.type' : 'dbm', 'session.data_dir' : './app_session/', 'session.auto' : 1 }
 app = beaker.middleware.SessionMiddleware(app(), session_opts)
 BaseRequest.MEMFILE_MAX = 1000 ** 4
-r_ver = '2.5.3'
+r_ver = 'v2.5.4'
 
 from func import *
 from set_mark.mid_pas import mid_pas
@@ -51,7 +51,6 @@ TEMPLATE_PATH.insert(0, skin_check(conn))
 
 # 호환성 설정
 try:
-    curs.execute("create table if not exists ok_login(ip text, sub text)")
     curs.execute("drop table if exists move")
     curs.execute("create table if not exists filter(name text, regex text, sub text)")
 
@@ -74,6 +73,11 @@ try:
 
     try:
         curs.execute("alter table rb add band text default ''")
+    except:
+        pass
+
+    try:
+        curs.execute("alter table ban add login text default ''")
     except:
         pass
 
@@ -136,7 +140,6 @@ def setup():
         curs.execute("create table if not exists re_admin(who text, what text, time text)")
         curs.execute("create table if not exists alarm(name text, data text, date text)")
         curs.execute("create table if not exists ua_d(name text, ip text, ua text, today text, sub text)")
-        curs.execute("create table if not exists ok_login(ip text, sub text)")
         curs.execute("create table if not exists filter(name text, regex text, sub text)")
         curs.execute("create table if not exists scan(user text, title text)")
 
@@ -1258,7 +1261,7 @@ def edit(name = None, name2 = None, num = None):
                 if(match.search(request.forms.content)):
                     if(data_list[1] == 'X'):
                         curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, '')", [ip, '', get_time(), '도구:편집 필터', '편집 필터에 의한 차단'])
-                        curs.execute("insert into ban (block, end, why, band) values (?, '', ?, '')", [ip, '편집 필터에 의한 차단'])
+                        curs.execute("insert into ban (block, end, why, band, login) values (?, '', ?, '', '')", [ip, '편집 필터에 의한 차단'])
                     elif(not data_list[1] == ''):
                         match = re.search("^([^ ]+) ([^:]+):([^:]+)$", data_list[1])
                         end_data = match.groups()
@@ -1305,7 +1308,7 @@ def edit(name = None, name2 = None, num = None):
                         end = str(year) + '-' + time_list[0] + '-' + time_list[1] + ' ' + time_list[2] + ':' + time_list[3] + ':' + time_data[5]
 
                         curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, '')", [ip, end, get_time(), '도구:편집 필터', '편집 필터에 의한 차단'])
-                        curs.execute("insert into ban (block, end, why, band) values (?, ?, ?, '')", [ip, end, '편집 필터에 의한 차단'])
+                        curs.execute("insert into ban (block, end, why, band, login) values (?, ?, ?, '', '')", [ip, end, '편집 필터에 의한 차단'])
                     
                     conn.commit()
                     return(re_error(conn, '/error/21'))
@@ -1426,11 +1429,6 @@ def edit_get(name = None):
 @route('/preview/<name:path>', method=['POST'])
 @route('/preview/<name:path>/section/<num:int>', method=['POST'])
 def preview(name = None, num = None):
-    if(captcha_post(request.forms.get('g-recaptcha-response'), conn) == 1):
-        return(re_error(conn, '/error/13'))
-    else:
-        captcha_post('', conn, 0)
-
     ip = ip_check()
     can = acl_check(conn, name)
     
@@ -1440,6 +1438,7 @@ def preview(name = None, num = None):
     newdata = request.forms.content
     newdata = re.sub('^#(?:redirect|넘겨주기) (?P<in>[^\n]*)', ' * [[\g<in>]] 문서로 넘겨주기', newdata)
     enddata = namumark(conn, name, newdata, 0, 0, 0)
+    captcha = captcha_get(conn)
 
     if(num):
         action = '/section/' + str(num)
@@ -1452,6 +1451,7 @@ def preview(name = None, num = None):
                     <textarea rows="25" name="content">' + html.escape(request.forms.content) + '</textarea> \
                     <textarea style="display: none;" name="otent">' + html.escape(request.forms.otent) + '</textarea><hr> \
                     <input placeholder="사유" name="send" type="text"><hr> \
+                    ' + captcha + ' \
                     <button id="preview" class="btn btn-primary" type="submit">저장</button> \
                     <button id="preview" class="btn" type="submit" formaction="/preview/' + url_pas(name) + action + '">미리보기</button> \
                 </form><hr>' + enddata,
@@ -1622,7 +1622,7 @@ def other():
                             '== 관리자 ==\r\n' + \
                             ' * [[wiki:manager/1|관리자 메뉴]]\r\n' + \
                             '== 버전 ==\r\n' + \
-                            ' * 이 오픈나무는 [[https://github.com/2DU/openNAMU/blob/master/version.md|' + r_ver + ']]판 입니다.', 0, 0, 0),
+                            ' * 이 오픈나무는 [[https://github.com/2DU/openNAMU/blob/master/version.md|' + r_ver + ']] 입니다.', 0, 0, 0),
         menu = 0
     )))
     
@@ -2120,7 +2120,7 @@ def login():
 
     ip = ip_check()
     
-    curs.execute("select ip from ok_login where ip = ?", [ip])
+    curs.execute("select block from ban where block = ? and login = 'O'", [ip])
     if(not curs.fetchall()):
         ban = ban_check(conn)
     else:
@@ -2388,11 +2388,13 @@ def user_ban(name = None):
             else:
                 band_d = ''
 
-            curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, ?)", [name, end, time, ip, request.forms.why, band_d])
-            curs.execute("insert into ban (block, end, why, band) values (?, ?, ?, ?)", [name, end, request.forms.why, band_d])
+            if(request.forms.login_ok != ''):
+                login = 'O'
+            else:
+                login = ''
 
-        if(request.forms.login_ok != ''):
-            curs.execute("insert into ok_login (ip, sub) values (?, '')", [name])
+            curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, ?)", [name, end, time, ip, request.forms.why, band_d])
+            curs.execute("insert into ban (block, end, why, band, login) values (?, ?, ?, ?, ?)", [name, end, request.forms.why, band_d, login])
 
         conn.commit()
         return(redirect('/ban/' + url_pas(name)))            
@@ -3176,7 +3178,7 @@ def user_info():
     else:
         acl = '차단'
         
-        curs.execute("select ip from ok_login where ip = ?", [ip])
+        curs.execute("select block from ban where block = ? and login = 'O'", [ip])
         if(curs.fetchall()):
             acl += ' (로그인 가능)'
             
