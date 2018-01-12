@@ -32,7 +32,7 @@ def captcha_get(conn):
             curs.execute('select data from other where name = "sec_re"')
             sec_re = curs.fetchall()
             if(sec_re and sec_re[0][0] != ''):
-                data += recaptcha[0][0] + '<br>'
+                data += recaptcha[0][0] + '<hr>'
 
     return(data)
 
@@ -244,7 +244,7 @@ def custom(conn):
         user_head = ''
 
     if(session.get('Now') == 1):
-        curs.execute('select name from alarm limit 1')
+        curs.execute('select name from alarm where name = ? limit 1', [ip_check()])
         if(curs.fetchall()):
             user_icon = 2
         else:
@@ -360,10 +360,6 @@ def rd_plus(conn, title, sub, date):
         curs.execute("update rd set date = ? where title = ? and sub = ?", [date, title, sub])
     else:
         curs.execute("insert into rd (title, sub, date) values (?, ?, ?)", [title, sub, date])
-    
-def rb_plus(conn, block, end, today, blocker, why):
-    curs = conn.cursor()
-    curs.execute("insert into rb (block, end, today, blocker, why) values (?, ?, ?, ?, ?)", [block, end, today, blocker, why])
 
 def history_plus(conn, title, data, date, ip, send, leng):
     curs = conn.cursor()

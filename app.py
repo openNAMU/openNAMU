@@ -10,7 +10,7 @@ logging.basicConfig(level = logging.ERROR)
 session_opts = { 'session.type' : 'dbm', 'session.data_dir' : './app_session/', 'session.auto' : 1 }
 app = beaker.middleware.SessionMiddleware(app(), session_opts)
 BaseRequest.MEMFILE_MAX = 1000 ** 4
-r_ver = '2.5.2'
+r_ver = 'v2.5.4'
 
 from func import *
 from set_mark.mid_pas import mid_pas
@@ -51,54 +51,6 @@ TEMPLATE_PATH.insert(0, skin_check(conn))
 
 # 호환성 설정
 try:
-    try:
-        plus_all_data = ''
-        start_replace = 0
-
-        curs.execute('select data from other where name = "css"')
-        for m_lo in curs.fetchall():
-            plus_all_data += '\r\n<style>' + m_lo[0] + '</style>'
-
-        curs.execute('select data from other where name = "js"')
-        for m_lo in curs.fetchall():
-            plus_all_data += '\r\n<script>' + m_lo[0] + '</script>'
-
-        if(plus_all_data != ''):
-            curs.execute("insert into other (name, data) values ('head', ?)", [plus_all_data])
-            curs.execute("delete from other where name = 'css'")
-            curs.execute("delete from other where name = 'js'")
-            start_replace = 1
-
-        curs.execute('select user from custom')
-        if(curs.fetchall()):
-            curs.execute("select user from custom where user like ?", ['% (head)%'])
-            if(not curs.fetchall()):
-                curs.execute("select user, css from custom")
-                for data_lo in curs.fetchall():
-                    plus_all_data = ''
-                    if(re.search(' \(js\)$', data_lo[0])):
-                        name_data_is = data_lo[0].replace(' (js)', '')
-                        plus_all_data = '\r\n<script>' + data_lo[1] + '</script>'
-                    else:
-                        name_data_is = data_lo[0]
-                        plus_all_data = '\r\n<style>' + data_lo[1] + '</style>'
-
-                    curs.execute("select css from custom where user = ?", [name_data_is + ' (head)'])
-                    data_is_it = curs.fetchall()
-                    if(data_is_it):
-                        curs.execute("update custom set css = ? where user = ?", [data_is_it[0][0] + plus_all_data, name_data_is + ' (head)'])
-                    else:
-                        curs.execute("insert into custom (user, css) values (?, ?)", [name_data_is + ' (head)', plus_all_data])
-                    
-                    curs.execute("delete from custom where user = ?", [data_lo[0]])
-                start_replace = 1
-
-        if(start_replace == 1):
-            print('CSS, JS 데이터 변환')
-    except:
-        pass
-
-    curs.execute("create table if not exists ok_login(ip text, sub text)")
     curs.execute("drop table if exists move")
     curs.execute("create table if not exists filter(name text, regex text, sub text)")
 
@@ -109,6 +61,23 @@ try:
         for rep in curs.fetchall():
             curs.execute("update history set hide = 'O' where title = ? and id = ?", [rep[0], rep[1]])
         curs.execute("drop table if exists hidhi")
+    except:
+        pass
+
+    curs.execute("create table if not exists scan(user text, title text)")
+
+    try:
+        curs.execute("alter table user add date text default ''")
+    except:
+        pass
+
+    try:
+        curs.execute("alter table rb add band text default ''")
+    except:
+        pass
+
+    try:
+        curs.execute("alter table ban add login text default ''")
     except:
         pass
 
@@ -158,7 +127,7 @@ def setup():
         curs.execute("create table if not exists data(title text, data text, acl text)")
         curs.execute("create table if not exists history(id text, title text, data text, date text, ip text, send text, leng text, hide text)")
         curs.execute("create table if not exists rd(title text, sub text, date text)")
-        curs.execute("create table if not exists user(id text, pw text, acl text)")
+        curs.execute("create table if not exists user(id text, pw text, acl text, date text)")
         curs.execute("create table if not exists ban(block text, end text, why text, band text)")
         curs.execute("create table if not exists topic(id text, title text, sub text, data text, date text, ip text, block text, top text)")
         curs.execute("create table if not exists stop(title text, sub text, close text)")
@@ -171,8 +140,8 @@ def setup():
         curs.execute("create table if not exists re_admin(who text, what text, time text)")
         curs.execute("create table if not exists alarm(name text, data text, date text)")
         curs.execute("create table if not exists ua_d(name text, ip text, ua text, today text, sub text)")
-        curs.execute("create table if not exists ok_login(ip text, sub text)")
         curs.execute("create table if not exists filter(name text, regex text, sub text)")
+        curs.execute("create table if not exists scan(user text, title text)")
 
         curs.execute("select name from alist where name = '소유자'")
         if(not curs.fetchall()):
@@ -199,7 +168,7 @@ def alarm():
     curs.execute("select data, date from alarm where name = ? order by date desc", [ip])
     dt = curs.fetchall()
     if(dt):
-        da = '<a href="/del_alarm">(알람 삭제)</a><hr>' + da
+        da = '<a href="/del_alarm">(모두 삭제)</a><hr>' + da
 
         for do in dt:
             da += '<li>' + do[0] + ' / ' + do[1] + '</li>'
@@ -586,11 +555,15 @@ def admin_plus(name = None):
 def admin_list():
     div = '<ul>'
     
-    curs.execute("select id, acl from user where not acl = 'user'")
+    curs.execute("select id, acl, date from user where not acl = 'user' order by date desc")
     user_data = curs.fetchall()
 
     for data in user_data:
         name = ip_pas(conn, data[0]) + ' <a href="/admin_plus/' + url_pas(data[1]) + '">(' + data[1] + ')</a>'
+
+        if(data[2] != ''):
+            name += '(가입 : ' + data[2] + ')'
+
         div += '<li>' + name + '</li>'
         
     div += '</ul>'
@@ -625,7 +598,7 @@ def user_log(num = 1):
     list_data = '<ul>'
     admin_one = admin_check(conn, 1, None)
     
-    curs.execute("select id from user limit ?, '50'", [str(sql_num)])
+    curs.execute("select id, date from user order by date desc limit ?, '50'", [str(sql_num)])
     user_list = curs.fetchall()
     for data in user_list:
         if(admin_one == 1):
@@ -639,8 +612,13 @@ def user_log(num = 1):
             ban_button = ''
             
         ip = ip_pas(conn, data[0])
-        list_data += '<li>' + ip + ban_button + '</li>'
-    
+        list_data += '<li>' + ip + ban_button
+
+        if(data[1] != ''):
+            list_data += ' (가입 : ' + data[1] + ')'
+
+        list_data += '</li>'
+
     if(num == 1):
         curs.execute("select count(id) from user")
         user_count = curs.fetchall()
@@ -836,8 +814,8 @@ def recent_discuss(tools = 'normal'):
 
 @route('/block_log')
 @route('/block_log/<num:int>')
-@route('/block_log/<tool2:re:ip|user|never_end|can_end|end>')
-@route('/block_log/<tool2:re:ip|user|never_end|can_end|end>/<num:int>')
+@route('/block_log/<tool2:re:ip|user|never_end|can_end|end|now>')
+@route('/block_log/<tool2:re:ip|user|never_end|can_end|end|now>/<num:int>')
 @route('/<tool:re:block_user|block_admin>/<name:path>')
 @route('/<tool:re:block_user|block_admin>/<name:path>/<num:int>')
 def block_log(num = 1, name = None, tool = None, tool2 = None):
@@ -847,10 +825,11 @@ def block_log(num = 1, name = None, tool = None, tool2 = None):
         sql_num = 0
     
     div = '<table style="width: 100%; text-align: center;"><tbody><tr><td style="width: 33.3%;">차단자</td><td style="width: 33.3%;">관리자</td><td style="width: 33.3%;">기간</td></tr>'
+    data_list = ''
     
     if(not name):
         if(not tool2):
-            div = '<a href="/manager/11">(차단자)</a> <a href="/manager/12">(관리자)</a><hr><a href="/block_log/ip">(아이피)</a> <a href="/block_log/user">(가입자)</a> <a href="/block_log/never_end">(영구)</a> <a href="/block_log/can_end">(기간)</a> <a href="/block_log/end">(해제)</a><hr>' + div
+            div = '<a href="/manager/11">(차단자)</a> <a href="/manager/12">(관리자)</a><hr><a href="/block_log/ip">(아이피)</a> <a href="/block_log/user">(가입자)</a> <a href="/block_log/never_end">(영구)</a> <a href="/block_log/can_end">(기간)</a> <a href="/block_log/end">(해제)</a> <a href="/block_log/now">(현재)</a><hr>' + div
             sub = 0
             menu = [['other', '기타']]
 
@@ -874,6 +853,14 @@ def block_log(num = 1, name = None, tool = None, tool2 = None):
                 sub = '(해제)'
 
                 curs.execute("select why, block, blocker, end, today from rb where end = ? order by today desc limit ?, '50'", ['해제', str(sql_num)])
+            elif(tool2 == 'now'):
+                sub = '(현재)'
+                data_list = []
+
+                curs.execute("select block from ban limit ?, '50'", [str(sql_num)])
+                for in_data in curs.fetchall():
+                    curs.execute("select why, block, blocker, end, today from rb where block = ? order by today desc limit 1", [in_data[0]])
+                    data_list = [curs.fetchall()[0]] + data_list
             else:
                 sub = '(기간)'
 
@@ -890,7 +877,8 @@ def block_log(num = 1, name = None, tool = None, tool2 = None):
 
             curs.execute("select why, block, blocker, end, today from rb where blocker = ? order by today desc limit ?, '50'", [name, str(sql_num)])
 
-    data_list = curs.fetchall()
+    if(data_list == ''):
+        data_list = curs.fetchall()
 
     for data in data_list:
         why = html.escape(data[0])
@@ -1272,8 +1260,8 @@ def edit(name = None, name2 = None, num = None):
                 match = re.compile(data_list[0])
                 if(match.search(request.forms.content)):
                     if(data_list[1] == 'X'):
-                        rb_plus(conn, ip, '', get_time(), '도구:편집 필터', '편집 필터에 의한 차단')
-                        curs.execute("insert into ban (block, end, why, band) values (?, '', ?, '')", [ip, '편집 필터에 의한 차단'])
+                        curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, '')", [ip, '', get_time(), '도구:편집 필터', '편집 필터에 의한 차단'])
+                        curs.execute("insert into ban (block, end, why, band, login) values (?, '', ?, '', '')", [ip, '편집 필터에 의한 차단'])
                     elif(not data_list[1] == ''):
                         match = re.search("^([^ ]+) ([^:]+):([^:]+)$", data_list[1])
                         end_data = match.groups()
@@ -1319,8 +1307,8 @@ def edit(name = None, name2 = None, num = None):
 
                         end = str(year) + '-' + time_list[0] + '-' + time_list[1] + ' ' + time_list[2] + ':' + time_list[3] + ':' + time_data[5]
 
-                        rb_plus(conn, ip, end, get_time(), '도구:편집 필터', '편집 필터에 의한 차단')
-                        curs.execute("insert into ban (block, end, why, band) values (?, ?, ?, '')", [ip, end, '편집 필터에 의한 차단'])
+                        curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, '')", [ip, end, get_time(), '도구:편집 필터', '편집 필터에 의한 차단'])
+                        curs.execute("insert into ban (block, end, why, band, login) values (?, ?, ?, '', '')", [ip, end, '편집 필터에 의한 차단'])
                     
                     conn.commit()
                     return(re_error(conn, '/error/21'))
@@ -1353,6 +1341,10 @@ def edit(name = None, name2 = None, num = None):
         else:
             leng = '+' + str(len(content))
             curs.execute("insert into data (title, data, acl) values (?, ?, '')", [name, content])
+
+        curs.execute("select user from scan where title = ?", [name])
+        for user_data in curs.fetchall():
+            curs.execute("insert into alarm (name, data, date) values (?, ?, ?)", [ip, ip + '님이 <a href="/w/' + url_pas(name) + '">' + name + '</a> 문서를 편집 했습니다.', today])
 
         history_plus(conn, name, content, today, ip, send_p(request.forms.send), leng)
         curs.execute("delete from back where link = ?", [name])
@@ -1437,11 +1429,6 @@ def edit_get(name = None):
 @route('/preview/<name:path>', method=['POST'])
 @route('/preview/<name:path>/section/<num:int>', method=['POST'])
 def preview(name = None, num = None):
-    if(captcha_post(request.forms.get('g-recaptcha-response'), conn) == 1):
-        return(re_error(conn, '/error/13'))
-    else:
-        captcha_post('', conn, 0)
-
     ip = ip_check()
     can = acl_check(conn, name)
     
@@ -1451,6 +1438,7 @@ def preview(name = None, num = None):
     newdata = request.forms.content
     newdata = re.sub('^#(?:redirect|넘겨주기) (?P<in>[^\n]*)', ' * [[\g<in>]] 문서로 넘겨주기', newdata)
     enddata = namumark(conn, name, newdata, 0, 0, 0)
+    captcha = captcha_get(conn)
 
     if(num):
         action = '/section/' + str(num)
@@ -1463,6 +1451,7 @@ def preview(name = None, num = None):
                     <textarea rows="25" name="content">' + html.escape(request.forms.content) + '</textarea> \
                     <textarea style="display: none;" name="otent">' + html.escape(request.forms.otent) + '</textarea><hr> \
                     <input placeholder="사유" name="send" type="text"><hr> \
+                    ' + captcha + ' \
                     <button id="preview" class="btn btn-primary" type="submit">저장</button> \
                     <button id="preview" class="btn" type="submit" formaction="/preview/' + url_pas(name) + action + '">미리보기</button> \
                 </form><hr>' + enddata,
@@ -1633,14 +1622,14 @@ def other():
                             '== 관리자 ==\r\n' + \
                             ' * [[wiki:manager/1|관리자 메뉴]]\r\n' + \
                             '== 버전 ==\r\n' + \
-                            ' * 이 오픈나무는 [[https://github.com/2DU/openNAMU/blob/master/version.md|' + r_ver + ']]판 입니다.', 0, 0, 0),
+                            ' * 이 오픈나무는 [[https://github.com/2DU/openNAMU/blob/master/version.md|' + r_ver + ']] 입니다.', 0, 0, 0),
         menu = 0
     )))
     
 @route('/manager', method=['POST', 'GET'])
 @route('/manager/<num:int>', method=['POST', 'GET'])
 def manager(num = 1):
-    title_list = [['문서 ACL', '문서명', 'acl'], ['사용자 검사', 0, 'check'], ['사용자 차단', 0, 'ban'], ['권한 주기', 0, 'admin'], ['편집 기록', 0, 'record'], ['토론 기록', 0, 'topic_record'], ['그룹 생성', '그룹명', 'admin_plus'], ['편집 필터 생성', '필터명', 'edit_filter'], ['문서 검색', '문서명', 'search'], ['차단자 검색', 0, 'block_user'], ['관리자 검색', 0, 'block_admin']]
+    title_list = [['문서 ACL', '문서명', 'acl'], ['사용자 검사', 0, 'check'], ['사용자 차단', 0, 'ban'], ['권한 주기', 0, 'admin'], ['편집 기록', 0, 'record'], ['토론 기록', 0, 'topic_record'], ['그룹 생성', '그룹명', 'admin_plus'], ['편집 필터 생성', '필터명', 'edit_filter'], ['문서 검색', '문서명', 'search'], ['차단자 검색', 0, 'block_user'], ['관리자 검색', 0, 'block_admin'], ['주시 문서 추가', '문서명', 'watch_list']]
     if(num == 1):
         return(html_minify(template('index', 
             imp = ['관리자 메뉴', wiki_set(conn, 1), custom(conn), other2([0, 0])],
@@ -1661,7 +1650,7 @@ def manager(num = 1):
                                         ' * 이 메뉴에 없는 기능은 해당 문서의 역사나 토론에서 바로 사용 가능함', 0, 0, 0),
             menu = [['other', '기타']]
         )))
-    elif(num in range(2, 13)):
+    elif(num in range(2, 14)):
         if(request.method == 'POST'):
             return(redirect('/' + title_list[(num - 2)][2] + '/' + url_pas(request.forms.name)))
         else:
@@ -2131,7 +2120,7 @@ def login():
 
     ip = ip_check()
     
-    curs.execute("select ip from ok_login where ip = ?", [ip])
+    curs.execute("select block from ban where block = ? and login = 'O'", [ip])
     if(not curs.fetchall()):
         ban = ban_check(conn)
     else:
@@ -2324,9 +2313,9 @@ def register():
         curs.execute("select id from user limit 1")
         user_ex = curs.fetchall()
         if(not user_ex):
-            curs.execute("insert into user (id, pw, acl) values (?, ?, '소유자')", [request.forms.id, hashed.decode()])
+            curs.execute("insert into user (id, pw, acl, date) values (?, ?, '소유자', ?)", [request.forms.id, hashed.decode(), get_time()])
         else:
-            curs.execute("insert into user (id, pw, acl) values (?, ?, 'user')", [request.forms.id, hashed.decode()])
+            curs.execute("insert into user (id, pw, acl, date) values (?, ?, 'user', ?)", [request.forms.id, hashed.decode(), get_time()])
         conn.commit()
         
         return(redirect('/login'))
@@ -2391,7 +2380,7 @@ def user_ban(name = None):
 
         curs.execute("select block from ban where block = ?", [name])
         if(curs.fetchall()):
-            rb_plus(conn, name, '해제', time, ip, '')  
+            curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, '')", [name, '해제', time, ip, ''])
             curs.execute("delete from ban where block = ?", [name])
         else:
             if(re.search("^([0-9]{1,3}\.[0-9]{1,3})$", name)):
@@ -2399,11 +2388,13 @@ def user_ban(name = None):
             else:
                 band_d = ''
 
-            rb_plus(conn, name, end, time, ip, request.forms.why)
-            curs.execute("insert into ban (block, end, why, band) values (?, ?, ?, ?)", [name, end, request.forms.why, band_d])
+            if(request.forms.login_ok != ''):
+                login = 'O'
+            else:
+                login = ''
 
-        if(request.forms.login_ok != ''):
-            curs.execute("insert into ok_login (ip, sub) values (?, '')", [name])
+            curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, ?)", [name, end, time, ip, request.forms.why, band_d])
+            curs.execute("insert into ban (block, end, why, band, login) values (?, ?, ?, ?, ?)", [name, end, request.forms.why, band_d, login])
 
         conn.commit()
         return(redirect('/ban/' + url_pas(name)))            
@@ -3187,7 +3178,7 @@ def user_info():
     else:
         acl = '차단'
         
-        curs.execute("select ip from ok_login where ip = ?", [ip])
+        curs.execute("select block from ban where block = ? and login = 'O'", [ip])
         if(curs.fetchall()):
             acl += ' (로그인 가능)'
             
@@ -3219,9 +3210,55 @@ def user_info():
                                     ' * [[wiki:view_log|지나온 문서]]\r\n' + \
                                     ' * [[wiki:record/' + url_pas(ip) + '|편집 기록]]\r\n' + \
                                     ' * [[wiki:topic_record/' + url_pas(ip) + '|토론 기록]]\r\n' + \
+                                    ' * [[wiki:watch_list|주시 문서]]\r\n' + \
                                     ' * [[wiki:count|활동 횟수]]\r\n', 0, 0, 0),
         menu = 0
     )))
+
+@route('/watch_list')
+def watch_list():
+    div = '한도 : 10개<hr>'
+    ip = ip_check()
+    
+    if(re.search('\.|:', ip)):
+        return(redirect('/login'))
+
+    curs.execute("select title from scan where user = ?", [ip])
+    data = curs.fetchall()
+    for data_list in data:
+        div += '<li><a href="/w/' + url_pas(data_list[0]) + '">' + data_list[0] + '</a> <a href="/watch_list/' + url_pas(data_list[0]) + '">(삭제)</a></li>'
+
+    if(data):
+        div = '<ul>' + div + '</ul><hr>'
+
+    div += '<a href="/manager/13">(추가)</a>'
+
+    return(html_minify(template('index', 
+        imp = ['편집 필터 목록', wiki_set(conn, 1), custom(conn), other2([0, 0])],
+        data = div,
+        menu = [['manager', '관리자']]
+    )))
+
+@route('/watch_list/<name:path>')
+def watch_list(name = None):
+    ip = ip_check()
+    if(re.search('\.|:', ip)):
+        return(redirect('/login'))
+
+    curs.execute("select count(title) from scan where user = ?", [ip])
+    count = curs.fetchall()
+    if(count):
+        if(count[0][0] > 9):
+            return(redirect('/watch_list'))
+
+    curs.execute("select title from scan where user = ? and title = ?", [ip, name])
+    if(curs.fetchall()):
+        curs.execute("delete from scan where user = ? and title = ?", [ip, name])
+    else:
+        curs.execute("insert into scan (user, title) values (?, ?)", [ip, name])
+    conn.commit()
+
+    return(redirect('/watch_list'))
 
 @route('/view_log')
 def view_log():
