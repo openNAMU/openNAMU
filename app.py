@@ -2468,68 +2468,29 @@ def user_ban(name = None):
             data = '<form method="post">' + data + '<button class="btn btn-primary" type="submit">' + now + '</button></form>',
             menu = [['manager', '관리자']]
         )))            
-
-@route('/user_acl/<name:path>', method=['POST', 'GET'])
-def acl(name = None):
-    ip = ip_check()
-    if(ip != name or re.search("(\.|:)", name)):
-        return(redirect('/login'))
-    
-    if(request.method == 'POST'):
-        if(request.forms.select == 'all'):
-            sql = 'all'
-        elif(request.forms.select == 'user'):
-            sql = 'user'
-        else:
-            sql = ''
-
-        if(sql == ''):
-            curs.execute("delete from acl where title = ?", ['사용자:' + name])
-        else:
-            curs.execute("select title from acl where title = ?", ['사용자:' + name])
-            if(curs.fetchall()):
-                curs.execute("update acl set dec = ? where title = ?", [sql, '사용자:' + name])
-            else:
-                curs.execute("insert into acl (title, dec, dis, why) values (?, ?, '', '')", ['사용자:' + name, sql])
-                
-        conn.commit()
-            
-        return(redirect('/w/' + url_pas('사용자:' + name)))
-    else:
-        curs.execute("select dec from acl where title = ?", [name])
-        acl_d = curs.fetchall()
-        if(acl_d):
-            if(acl_d[0][0] == 'all'):
-                now = '모두'
-            elif(acl_d[0][0] == 'user'):
-                now = '가입자'
-            else:
-                now = '일반'
-        else:
-            now = '일반'
-            
-        return(html_minify(template('index', 
-            imp = [name, wiki_set(conn, 1), custom(conn), other2([' (사문 ACL)', 0])],
-            data = '<span>현재 ACL : ' + now + '</span><hr> \
-                    <form method="post"> \
-                        <select name="select"> \
-                            <option value="all">모두</option> \
-                            <option value="user">가입자</option> \
-                            <option value="normal" selected="selected">일반</option> \
-                        </select><hr> \
-                        <button class="btn btn-primary" type="submit">ACL 변경</button> \
-                    </form>',
-            menu = [['user', '사용자']]
-        )))
                 
 @route('/acl/<name:path>', method=['POST', 'GET'])
 def acl(name = None):
+    test = re.search('^사용자:(.+)$', name)
+
     if(request.method == 'POST'):
-        if(admin_check(conn, 5, 'acl (' + name + ')') != 1):
-            return(re_error(conn, '/error/3'))
+        if(test):
+            test = test.groups()
+            ip = ip_check()
+
+            if(re.search("(\.|:)", ip)):
+                return(redirect('/login'))
+            elif(test[0] != ip):
+                if(admin_check(conn, 5, 'acl (' + name + ')') != 1):
+                    return(re_error(conn, '/error/3'))
+        else:
+            if(admin_check(conn, 5, 'acl (' + name + ')') != 1):
+                return(re_error(conn, '/error/3'))
 
         if(request.forms.select == 'admin'):
             sql = 'admin'
+        if(request.forms.select == 'all'):
+            sql = 'all'
         elif(request.forms.select == 'user'):
             sql = 'user'
         else:
@@ -2548,29 +2509,65 @@ def acl(name = None):
             
         return(redirect('/w/' + url_pas(name)))            
     else:
-        if(admin_check(conn, 5, None) != 1):
-            return(re_error(conn, '/error/3'))
+        if(test):
+            test = test.groups()
+            ip = ip_check()
 
-        curs.execute("select dec from acl where title = ?", [name])
-        acl_d = curs.fetchall()
-        if(acl_d):
-            if(acl_d[0][0] == 'admin'):
-                now = '관리자'
-            elif(acl_d[0][0] == 'user'):
-                now = '가입자'
+            if(re.search("(\.|:)", ip)):
+                return(redirect('/login'))
+            elif(test[0] != ip):
+                if(admin_check(conn, 5, 'acl (' + name + ')') != 1):
+                    return(re_error(conn, '/error/3'))
+        else:
+            if(admin_check(conn, 5, 'acl (' + name + ')') != 1):
+                return(re_error(conn, '/error/3'))
+
+        acl_list = ['', '', '']
+        if(test):
+            curs.execute("select dec from acl where title = ?", [name])
+            acl_d = curs.fetchall()
+            if(acl_d):
+                if(acl_d[0][0] == 'all'):
+                    now = '모두'
+                    acl_list[0] = 'selected="selected"'
+                elif(acl_d[0][0] == 'user'):
+                    now = '가입자'
+                    acl_list[1] = 'selected="selected"'
+                else:
+                    now = '일반'
+                    acl_list[2] = 'selected="selected"'
             else:
                 now = '일반'
+                acl_list[2] = 'selected="selected"'
+
+            plus = '<option value="all" ' + acl_list[0] + '>모두</option>'
         else:
-            now = '일반'
+            curs.execute("select dec from acl where title = ?", [name])
+            acl_d = curs.fetchall()
+            if(acl_d):
+                if(acl_d[0][0] == 'admin'):
+                    now = '관리자'
+                    acl_list[0] = 'selected="selected"'
+                elif(acl_d[0][0] == 'user'):
+                    now = '가입자'
+                    acl_list[1] = 'selected="selected"'
+                else:
+                    now = '일반'
+                    acl_list[2] = 'selected="selected"'
+            else:
+                now = '일반'
+                acl_list[2] = 'selected="selected"'
+
+            plus = '<option value="admin" ' + acl_list[0] + '>관리자</option>'
             
         return(html_minify(template('index', 
             imp = [name, wiki_set(conn, 1), custom(conn), other2([' (ACL)', 0])],
             data = '<span>현재 ACL : ' + now + '</span><hr> \
                     <form method="post"> \
                         <select name="select"> \
-                            <option value="admin" selected="selected">관리자</option> \
-                            <option value="user">가입자</option> \
-                            <option value="normal">일반</option> \
+                            ' + plus + ' \
+                            <option value="user" ' + acl_list[1] + '>가입자</option> \
+                            <option value="normal" ' + acl_list[2] + '>일반</option> \
                         </select><hr> \
                         <button class="btn btn-primary" type="submit">ACL 변경</button> \
                     </form>',
@@ -3211,7 +3208,7 @@ def user_info():
                                     plus + '\r\n' + \
                                     ' * [[wiki:register|회원가입]]\r\n' + \
                                     '== 사용자 기능 ==\r\n' + \
-                                    ' * [[wiki:user_acl/' + url_pas(ip) + '|사용자 문서 ACL]]\r\n' + \
+                                    ' * [[wiki:acl/사용자:' + url_pas(ip) + '|사용자 문서 ACL]]\r\n' + \
                                     ' * [[wiki:custom_head|사용자 HEAD]]\r\n' + \
                                     '== 기타 ==\r\n' + \
                                     ' * [[wiki:alarm|알림]]\r\n' + \
