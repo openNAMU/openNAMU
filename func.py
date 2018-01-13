@@ -267,7 +267,7 @@ def acl_check(conn, name):
         if(admin_check(conn, 5, None) == 1):
             return(0)
 
-        curs.execute("select acl from data where title = ?", ['사용자:' + acl_n[0]])
+        curs.execute("select dec from acl where title = ?", ['사용자:' + acl_n[0]])
         acl_d = curs.fetchall()
         if(acl_d):
             if(acl_d[0][0] == 'all'):
@@ -291,7 +291,7 @@ def acl_check(conn, name):
     curs.execute("select acl from user where id = ?", [ip])
     user_d = curs.fetchall()
 
-    curs.execute("select acl from data where title = ?", [name])
+    curs.execute("select dec from acl where title = ?", [name])
     acl_d = curs.fetchall()
     if(acl_d):
         if(acl_d[0][0] == 'user'):

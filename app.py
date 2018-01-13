@@ -10,7 +10,7 @@ logging.basicConfig(level = logging.ERROR)
 session_opts = { 'session.type' : 'dbm', 'session.data_dir' : './app_session/', 'session.auto' : 1 }
 app = beaker.middleware.SessionMiddleware(app(), session_opts)
 BaseRequest.MEMFILE_MAX = 1000 ** 4
-r_ver = 'v2.5.4'
+r_ver = 'v2.5.5 Beta'
 
 from func import *
 from set_mark.mid_pas import mid_pas
@@ -49,41 +49,68 @@ curs = conn.cursor()
 # 스킨 불러오기 부분
 TEMPLATE_PATH.insert(0, skin_check(conn))
 
+# 셋업 부분
+curs.execute("create table if not exists data(title text, data text)")
+curs.execute("create table if not exists history(id text, title text, data text, date text, ip text, send text, leng text, hide text)")
+curs.execute("create table if not exists rd(title text, sub text, date text)")
+curs.execute("create table if not exists user(id text, pw text, acl text, date text)")
+curs.execute("create table if not exists ban(block text, end text, why text, band text)")
+curs.execute("create table if not exists topic(id text, title text, sub text, data text, date text, ip text, block text, top text)")
+curs.execute("create table if not exists stop(title text, sub text, close text)")
+curs.execute("create table if not exists rb(block text, end text, today text, blocker text, why text)")
+curs.execute("create table if not exists back(title text, link text, type text)")
+curs.execute("create table if not exists agreedis(title text, sub text)")
+curs.execute("create table if not exists custom(user text, css text)")
+curs.execute("create table if not exists other(name text, data text)")
+curs.execute("create table if not exists alist(name text, acl text)")
+curs.execute("create table if not exists re_admin(who text, what text, time text)")
+curs.execute("create table if not exists alarm(name text, data text, date text)")
+curs.execute("create table if not exists ua_d(name text, ip text, ua text, today text, sub text)")
+curs.execute("create table if not exists filter(name text, regex text, sub text)")
+curs.execute("create table if not exists scan(user text, title text)")
+curs.execute("create table if not exists acl(title text, dec text, dis text, why text)")
+
+curs.execute("select name from alist where name = '소유자'")
+if(not curs.fetchall()):
+    curs.execute("insert into alist (name, acl) values ('소유자', 'owner')")
+
 # 호환성 설정
+curs.execute("drop table if exists move")
+
 try:
-    curs.execute("drop table if exists move")
-    curs.execute("create table if not exists filter(name text, regex text, sub text)")
-
-    try:
-        curs.execute("alter table history add hide text default ''")
-        
-        curs.execute('select title, re from hidhi')
-        for rep in curs.fetchall():
-            curs.execute("update history set hide = 'O' where title = ? and id = ?", [rep[0], rep[1]])
-        curs.execute("drop table if exists hidhi")
-    except:
-        pass
-
-    curs.execute("create table if not exists scan(user text, title text)")
-
-    try:
-        curs.execute("alter table user add date text default ''")
-    except:
-        pass
-
-    try:
-        curs.execute("alter table rb add band text default ''")
-    except:
-        pass
-
-    try:
-        curs.execute("alter table ban add login text default ''")
-    except:
-        pass
-
-    conn.commit()
+    curs.execute("alter table history add hide text default ''")
+    
+    curs.execute('select title, re from hidhi')
+    for rep in curs.fetchall():
+        curs.execute("update history set hide = 'O' where title = ? and id = ?", [rep[0], rep[1]])
+    curs.execute("drop table if exists hidhi")
 except:
     pass
+
+try:
+    curs.execute("alter table user add date text default ''")
+except:
+    pass
+
+try:
+    curs.execute("alter table rb add band text default ''")
+except:
+    pass
+
+try:
+    curs.execute("alter table ban add login text default ''")
+except:
+    pass
+
+try:
+    curs.execute("select title, acl from data where acl != ''")
+    for rep in curs.fetchall():
+        curs.execute("insert into acl (title, dec, dis, why) values (?, ?, '', '')", [rep[0], rep[1]])
+    curs.execute("alter table data drop acl")
+except:
+    pass
+
+conn.commit()
 
 # 이미지 폴더 생성
 if(not os.path.exists('image')):
@@ -118,38 +145,6 @@ if(back_time != 0):
         back_up()
 else:
     print('백업하지 않음')
-    
-@route('/setup', method=['GET', 'POST'])
-def setup():
-    try:
-        curs.execute("select title from data limit 1")
-    except:
-        curs.execute("create table if not exists data(title text, data text, acl text)")
-        curs.execute("create table if not exists history(id text, title text, data text, date text, ip text, send text, leng text, hide text)")
-        curs.execute("create table if not exists rd(title text, sub text, date text)")
-        curs.execute("create table if not exists user(id text, pw text, acl text, date text)")
-        curs.execute("create table if not exists ban(block text, end text, why text, band text)")
-        curs.execute("create table if not exists topic(id text, title text, sub text, data text, date text, ip text, block text, top text)")
-        curs.execute("create table if not exists stop(title text, sub text, close text)")
-        curs.execute("create table if not exists rb(block text, end text, today text, blocker text, why text)")
-        curs.execute("create table if not exists back(title text, link text, type text)")
-        curs.execute("create table if not exists agreedis(title text, sub text)")
-        curs.execute("create table if not exists custom(user text, css text)")
-        curs.execute("create table if not exists other(name text, data text)")
-        curs.execute("create table if not exists alist(name text, acl text)")
-        curs.execute("create table if not exists re_admin(who text, what text, time text)")
-        curs.execute("create table if not exists alarm(name text, data text, date text)")
-        curs.execute("create table if not exists ua_d(name text, ip text, ua text, today text, sub text)")
-        curs.execute("create table if not exists filter(name text, regex text, sub text)")
-        curs.execute("create table if not exists scan(user text, title text)")
-
-        curs.execute("select name from alist where name = '소유자'")
-        if(not curs.fetchall()):
-            curs.execute("insert into alist (name, acl) values ('소유자', 'owner')")
-
-        conn.commit()
-
-    return(redirect('/'))
 
 @route('/del_alarm')
 def del_alarm():
@@ -1058,7 +1053,7 @@ def revert(name = None, num = None):
                 curs.execute("update data set data = ? where title = ?", [data[0][0], name])
             else:
                 leng = '+' + str(len(data[0][0]))
-                curs.execute("insert into data (title, data, acl) values (?, ?, '')", [name, data[0][0]])
+                curs.execute("insert into data (title, data) values (?, ?)", [name, data[0][0]])
                 
             history_plus(conn, name, data[0][0], today, ip, request.forms.send + ' (' + str(num) + '판)', leng)
             
@@ -1340,7 +1335,7 @@ def edit(name = None, name2 = None, num = None):
             curs.execute("update data set data = ? where title = ?", [content, name])
         else:
             leng = '+' + str(len(content))
-            curs.execute("insert into data (title, data, acl) values (?, ?, '')", [name, content])
+            curs.execute("insert into data (title, data) values (?, ?)", [name, content])
 
         curs.execute("select user from scan where title = ?", [name])
         for user_data in curs.fetchall():
@@ -2473,102 +2468,111 @@ def user_ban(name = None):
             data = '<form method="post">' + data + '<button class="btn btn-primary" type="submit">' + now + '</button></form>',
             menu = [['manager', '관리자']]
         )))            
-
-@route('/user_acl/<name:path>', method=['POST', 'GET'])
-def acl(name = None):
-    ip = ip_check()
-    if(ip != name or re.search("(\.|:)", name)):
-        return(redirect('/login'))
-    
-    if(request.method == 'POST'):
-        curs.execute("select acl from data where title = ?", ['사용자:' + name])
-        acl_d = curs.fetchall()
-        if(acl_d):
-            if(request.forms.select == 'all'):
-                curs.execute("update data set acl = 'all' where title = ?", ['사용자:' + name])
-            elif(request.forms.select == 'user'):
-                curs.execute("update data set acl = 'user' where title = ?", ['사용자:' + name])
-            else:
-                curs.execute("update data set acl = '' where title = ?", ['사용자:' + name])
-                
-            conn.commit()
-            
-        return(redirect('/w/' + url_pas('사용자:' + name)))
-
-    curs.execute("select acl from data where title = ?", ['사용자:' + name])
-    acl_d = curs.fetchall()
-    if(acl_d):
-        if(acl_d[0][0] == 'all'):
-            now = '모두'
-        elif(acl_d[0][0] == 'user'):
-            now = '가입자'
-        else:
-            now = '일반'
-        
-        return(html_minify(template('index', 
-            imp = [name, wiki_set(conn, 1), custom(conn), other2([' (사문 ACL)', 0])],
-            data = '<span>현재 ACL : ' + now + '</span><hr> \
-                    <form method="post"> \
-                        <select name="select"> \
-                            <option value="all">모두</option> \
-                            <option value="user">가입자</option> \
-                            <option value="normal" selected="selected">일반</option> \
-                        </select><hr> \
-                        <button class="btn btn-primary" type="submit">ACL 변경</button> \
-                    </form>',
-            menu = [['user', '사용자']]
-        )))
-    else:
-        return(redirect('/w/' + url_pas(name)))
                 
 @route('/acl/<name:path>', method=['POST', 'GET'])
 def acl(name = None):
-    if(request.method == 'POST'):
-        if(admin_check(conn, 5, 'acl (' + name + ')') != 1):
-            return(re_error(conn, '/error/3'))
+    test = re.search('^사용자:(.+)$', name)
 
-        curs.execute("select acl from data where title = ?", [name])
-        if(curs.fetchall()):
-            if(request.forms.select == 'admin'):
-                acl = 'admin'
-            elif(request.forms.select == 'user'):
-                acl = 'user'
+    if(request.method == 'POST'):
+        if(test):
+            test = test.groups()
+            ip = ip_check()
+
+            if(re.search("(\.|:)", ip)):
+                return(redirect('/login'))
+            elif(test[0] != ip):
+                if(admin_check(conn, 5, 'acl (' + name + ')') != 1):
+                    return(re_error(conn, '/error/3'))
+        else:
+            if(admin_check(conn, 5, 'acl (' + name + ')') != 1):
+                return(re_error(conn, '/error/3'))
+
+        if(request.forms.select == 'admin'):
+            sql = 'admin'
+        if(request.forms.select == 'all'):
+            sql = 'all'
+        elif(request.forms.select == 'user'):
+            sql = 'user'
+        else:
+            sql = ''
+            
+        if(sql == ''):
+            curs.execute("delete from acl where title = ?", [name])
+        else:
+            curs.execute("select title from acl where title = ?", [name])
+            if(curs.fetchall()):
+                curs.execute("update acl set dec = ? where title = ?", [sql, name])
             else:
-                acl = ''
-                
-            curs.execute("update data set acl = ? where title = ?", [acl, name])    
-            conn.commit()
+                curs.execute("insert into acl (title, dec, dis, why) values (?, ?, '', '')", [name, sql])
+
+        conn.commit()
             
         return(redirect('/w/' + url_pas(name)))            
     else:
-        if(admin_check(conn, 5, None) != 1):
-            return(re_error(conn, '/error/3'))
+        if(test):
+            test = test.groups()
+            ip = ip_check()
 
-        curs.execute("select acl from data where title = ?", [name])
-        acl = curs.fetchall()
-        if(acl):
-            if(acl[0][0] == 'admin'):
-                now = '관리자'
-            elif(acl[0][0] == 'user'):
-                now = '가입자'
+            if(re.search("(\.|:)", ip)):
+                return(redirect('/login'))
+            elif(test[0] != ip):
+                if(admin_check(conn, 5, 'acl (' + name + ')') != 1):
+                    return(re_error(conn, '/error/3'))
+        else:
+            if(admin_check(conn, 5, 'acl (' + name + ')') != 1):
+                return(re_error(conn, '/error/3'))
+
+        acl_list = ['', '', '']
+        if(test):
+            curs.execute("select dec from acl where title = ?", [name])
+            acl_d = curs.fetchall()
+            if(acl_d):
+                if(acl_d[0][0] == 'all'):
+                    now = '모두'
+                    acl_list[0] = 'selected="selected"'
+                elif(acl_d[0][0] == 'user'):
+                    now = '가입자'
+                    acl_list[1] = 'selected="selected"'
+                else:
+                    now = '일반'
+                    acl_list[2] = 'selected="selected"'
             else:
                 now = '일반'
-            
-            return(html_minify(template('index', 
-                imp = [name, wiki_set(conn, 1), custom(conn), other2([' (ACL)', 0])],
-                data = '<span>현재 ACL : ' + now + '</span><hr> \
-                        <form method="post"> \
-                            <select name="select"> \
-                                <option value="admin" selected="selected">관리자</option> \
-                                <option value="user">가입자</option> \
-                                <option value="normal">일반</option> \
-                            </select><hr> \
-                            <button class="btn btn-primary" type="submit">ACL 변경</button> \
-                        </form>',
-                menu = [['w/' + url_pas(name), '문서'], ['manager', '관리자']]
-            )))
+                acl_list[2] = 'selected="selected"'
+
+            plus = '<option value="all" ' + acl_list[0] + '>모두</option>'
         else:
-            return(redirect('/w/' + url_pas(name)))
+            curs.execute("select dec from acl where title = ?", [name])
+            acl_d = curs.fetchall()
+            if(acl_d):
+                if(acl_d[0][0] == 'admin'):
+                    now = '관리자'
+                    acl_list[0] = 'selected="selected"'
+                elif(acl_d[0][0] == 'user'):
+                    now = '가입자'
+                    acl_list[1] = 'selected="selected"'
+                else:
+                    now = '일반'
+                    acl_list[2] = 'selected="selected"'
+            else:
+                now = '일반'
+                acl_list[2] = 'selected="selected"'
+
+            plus = '<option value="admin" ' + acl_list[0] + '>관리자</option>'
+            
+        return(html_minify(template('index', 
+            imp = [name, wiki_set(conn, 1), custom(conn), other2([' (ACL)', 0])],
+            data = '<span>현재 ACL : ' + now + '</span><hr> \
+                    <form method="post"> \
+                        <select name="select"> \
+                            ' + plus + ' \
+                            <option value="user" ' + acl_list[1] + '>가입자</option> \
+                            <option value="normal" ' + acl_list[2] + '>일반</option> \
+                        </select><hr> \
+                        <button class="btn btn-primary" type="submit">ACL 변경</button> \
+                    </form>',
+            menu = [['w/' + url_pas(name), '문서'], ['manager', '관리자']]
+        )))
             
 @route('/admin/<name:path>', method=['POST', 'GET'])
 def user_admin(name = None):
@@ -2759,37 +2763,31 @@ def read_view(name = None, num = None, redirect = None):
 
         curs.execute("select title, data from history where title = ? and id = ?", [name, str(num)])
     else:
-        curs.execute("select acl, data from data where title = ?", [name])
-
+        curs.execute("select title, data from data where title = ?", [name])
     data = curs.fetchall()
     if(data):
-        if(not num):
-            if(data[0][0] == 'admin'):
-                acl = ' (관리자)'
-            elif(data[0][0] == 'user'):
-                acl = ' (가입자)'
-            else:
-                curs.execute('select data from other where name = "edit"')
-                set_data = curs.fetchall()
-                if(set_data):
-                    if(set_data[0][0] == 'admin'):
-                        acl = ' (관리자)'
-                    elif(set_data[0][0] == 'user'):
-                        acl = ' (가입자)'
-                
         elsedata = data[0][1]
     else:
-        curs.execute('select data from other where name = "edit"')
-        set_data = curs.fetchall()
-        if(set_data):
-            if(set_data[0][0] == 'admin'):
-                acl = ' (관리자)'
-            elif(set_data[0][0] == 'user'):
-                acl = ' (가입자)'
-
         data_none = 1
         response.status = 404
         elsedata = ''
+
+    if(not num):
+        curs.execute("select dec from acl where title = ?", [name])
+        acl_d = curs.fetchall()
+        if(acl_d):
+            if(acl_d[0][0] == 'admin'):
+                acl = ' (관리자)'
+            elif(acl_d[0][0] == 'user'):
+                acl = ' (가입자)'
+        else:
+            curs.execute('select data from other where name = "edit"')
+            set_data = curs.fetchall()
+            if(set_data):
+                if(set_data[0][0] == 'admin'):
+                    acl = ' (관리자)'
+                elif(set_data[0][0] == 'user'):
+                    acl = ' (가입자)'
 
     m = re.search("^사용자:([^/]*)", name)
     if(m):
@@ -2800,18 +2798,19 @@ def read_view(name = None, num = None, redirect = None):
         if(test and test[0][0] != 'user'):
             acl = ' (관리자)'
         else:
-            acl = ''
+            curs.execute("select block from ban where block = ?", [g[0]])
+            if(curs.fetchall()):
+                sub = ' (차단)'
+            else:
+                acl = ''
 
+        curs.execute("select dec from acl where title = ?", [name])
+        data = curs.fetchall()
         if(data):
             if(data[0][0] == 'all'):
                 acl += ' (모두)'
             elif(data[0][0] == 'user'):
                 acl += ' (가입자)'
-
-        curs.execute("select block from ban where block = ?", [g[0]])
-        user = curs.fetchall()
-        if(user):
-            sub = ' (차단)'
             
     if(redirect):
         elsedata = re.sub("^#(?:redirect|넘겨주기) (?P<in>[^\n]*)", " * [[\g<in>]] 문서로 넘겨주기", elsedata)
@@ -3122,6 +3121,10 @@ def upload():
         
         piece = os.path.splitext(name)
         e_data = sha224(piece[0]) + piece[1]
+
+        curs.execute("select title from data where title = ?", ['파일:' + name])
+        if(curs.fetchall()):
+            return(re_error(conn, '/error/16'))
             
         ip = ip_check()
         if(request.forms.get('f_lice')):
@@ -3131,18 +3134,20 @@ def upload():
                 lice = ip + ' 올림'
             else:
                 lice = '[[사용자:' + ip + ']] 올림'
-                
-        if(os.path.exists(os.path.join('image', e_data))):
-            return(re_error(conn, '/error/16'))
             
-        data.save(os.path.join('image', e_data))
+        if(os.path.exists(os.path.join('image', e_data))):
+            os.remove(os.path.join('image', e_data))
+            data.save(os.path.join('image', e_data))
+        else:
+            data.save(os.path.join('image', e_data))
             
         curs.execute("select title from data where title = ?", ['파일:' + name])
         exist = curs.fetchall()
         if(exist): 
             curs.execute("delete from data where title = ?", ['파일:' + name])
         
-        curs.execute("insert into data (title, data, acl) values (?, ?, 'admin')", ['파일:' + name, '[[파일:' + name + ']][br][br]{{{[[파일:' + name + ']]}}}[br][br]' + lice])
+        curs.execute("insert into data (title, data) values (?, ?)", ['파일:' + name, '[[파일:' + name + ']][br][br]{{{[[파일:' + name + ']]}}}[br][br]' + lice])
+        curs.execute("insert into acl (title, dec, dis, why) values (?, 'admin', '', '')", ['파일:' + name])
         history_plus(conn, '파일:' + name, '[[파일:' + name + ']][br][br]{{{[[파일:' + name + ']]}}}[br][br]' + lice, get_time(), ip, '(파일 올림)', '0')
         conn.commit()
         
@@ -3203,7 +3208,7 @@ def user_info():
                                     plus + '\r\n' + \
                                     ' * [[wiki:register|회원가입]]\r\n' + \
                                     '== 사용자 기능 ==\r\n' + \
-                                    ' * [[wiki:user_acl/' + url_pas(ip) + '|사용자 문서 ACL]]\r\n' + \
+                                    ' * [[wiki:acl/사용자:' + url_pas(ip) + '|사용자 문서 ACL]]\r\n' + \
                                     ' * [[wiki:custom_head|사용자 HEAD]]\r\n' + \
                                     '== 기타 ==\r\n' + \
                                     ' * [[wiki:alarm|알림]]\r\n' + \
@@ -3401,18 +3406,6 @@ def random():
 
 @error(404)
 def error_404(error):
-    try:
-        curs.execute("select title from data limit 1")
-        return('<!-- 나니카가 하지마룻테 코토와 오와리니 츠나가루다난테 캉가에테모 미나캇타. 이야, 캉카에타쿠나캇탄다... 아마오토 마도오 타타쿠 소라카라 와타시노 요-나 카나시미 훗테루 토메도나쿠 이마오 누라시테 오모이데 난테 이라나이노 코코로가 쿠루시쿠나루 다케다토 No more! September Rain No more! September Rain 이츠닷테 아나타와 미짓카닷타 와자와자 키모치오 타시카메룻테 코토모 히츠요-쟈나쿠테 시젠니 나카라요쿠 나레타카라 안신시테타노 카모시레나이네 도-시테? 나미니 토이카케루케도 나츠노 하지마리가 츠레테키타 오모이 나츠가 오와루토키 키에챠우모노닷타 난테 시라나쿠테 토키메이테타 아츠이 키세츠 우미베노 소라가 히캇테 토츠젠 쿠모가 나가레 오츠부노 아메 와타시노 나카노 나미다미타이 콘나니 타노시이 나츠가 즛토 츠즈이테쿳테 신지테타요 But now... September Rain But now... September Rain -->' + redirect('/w/' + url_pas(wiki_set(conn, 2))))
-    except:
-        return('<!-- 토오쿠 츠즈이테루 우미노사키니와 돈나 나츠가 아루노다로? 이츠카 타시카메타이 키모치모 아루케레도 팟토하데쟈나이 데모 코노우미와 즛또 와타시타치노코토오 이츠모 미테테쿠레따 요로코비모 나미다모 싯떼루노 무카시카라노 하마베 아사와 마다 츠메타쿠떼 아시가 빗쿠리시떼루요 미즈노나카 오사카나니 츠츠카레챳따? 난다카 타노시이네 잇쇼노 나츠와 코코데 스고소우요 오야스미 키분데 요세떼 카에스 나미노 코에 잇쇼니 키키타이나 농비리스루노모 이이데쇼? 타마니와 이키누키시나쿠챠 스나오 사쿠사쿠 후미나가라 오샤베리시요우요 호랏 지모토지만노 사마 라이후 -->' + redirect('/setup'))
+    return('<!-- 나니카가 하지마룻테 코토와 오와리니 츠나가루다난테 캉가에테모 미나캇타. 이야, 캉카에타쿠나캇탄다... 아마오토 마도오 타타쿠 소라카라 와타시노 요-나 카나시미 훗테루 토메도나쿠 이마오 누라시테 오모이데 난테 이라나이노 코코로가 쿠루시쿠나루 다케다토 No more! September Rain No more! September Rain 이츠닷테 아나타와 미짓카닷타 와자와자 키모치오 타시카메룻테 코토모 히츠요-쟈나쿠테 시젠니 나카라요쿠 나레타카라 안신시테타노 카모시레나이네 도-시테? 나미니 토이카케루케도 나츠노 하지마리가 츠레테키타 오모이 나츠가 오와루토키 키에챠우모노닷타 난테 시라나쿠테 토키메이테타 아츠이 키세츠 우미베노 소라가 히캇테 토츠젠 쿠모가 나가레 오츠부노 아메 와타시노 나카노 나미다미타이 콘나니 타노시이 나츠가 즛토 츠즈이테쿳테 신지테타요 But now... September Rain But now... September Rain -->' + redirect('/w/' + url_pas(wiki_set(conn, 2))))
 
-@error(500)
-def error_500(error):
-    try:
-        curs.execute("select title from data limit 1")
-        return('<!-- Splash, Spark, and Shining the Summer! 코코데맛떼나이데 잇쇼니코나캬, 다! Summer time (Oh ya! Summer time!!) 톤데모나이 나츠니나리소오 키미모카쿠고와 데키타카나? 히토리맛떼타라 앗토이우마니 바이바이 Summer time (Oh ya! Summer time!!) 오이데카레루노가 키라이나라 스구니오이데요 코코로우키우키 우키요노도리-무 비-치 세카이데 보우켄시요오 "보-옷"토 스키챠못타이나이 "규-웃"토 코이지칸가호시이? 닷타라(Let\'s go!) 닷타라(Let\'s go!) 코토시와 이치도키리사 아소보오 Splash! (Splash!!) 토비콘다 우미노아오사가(Good feeling) 오와라나이 나츠에노 토비라오 유메밋테루토 싯테루카이? 아소보오 Splash! (Splash!!) 토비콘데 미세타아토 키미가 타메랏테루(나라바) 요우샤나쿠 Summer Summer Summer에 츠레텟챠우카라! -->' + error)
-    except:
-        return('<!-- 아카이 타이요노 도레스데 오도루 와타시노 코토 미츠메테이루노 메오 소라시타이 데모 소라세나이 아아 죠네츠데 야카레타이 도키메키 이죠노 리즈무 코요이 시리타쿠테 이츠모요리 타이탄나 코토바오 츠부야이타 지분노 키모치나노니 젠젠 와카라나쿠 (낫챠이타이나) 리세이카라 시레이가 (토도카나이) 콘토로-루 후카노 손나 코이오 시타놋테 코에가 토도이테시맛타 하즈카시잇테 오모우케도 못토 시리타이노 못토 시리타이노 이케나이 유메다토 키즈키나가라 아카이 타이요노 도레스데 오도루 와타시노 코토 미츠메루 히토미 메오 소라시타이 데모 소라세나이 마나츠와 다레노 모노 아나타토 와타시노 모노니시타이 (닷테네) 코코로가 토마레나이 키세츠니 하지메테 무네노 토비라가 아이테 시마이소오요 You knock knock my heart!! -->' + redirect('/setup'))
-
-run(app = app, server = 'tornado', host = '0.0.0.0', port = int(set_data['port']), debug = True)
+run(app = app, server = 'tornado', host = '0.0.0.0', port = int(set_data['port']))
