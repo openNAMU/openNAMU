@@ -54,7 +54,10 @@ def include_pas(conn, data, title, in_c, num, toc_y, fol_num):
                 if(results[2]):
                     test = '<br>'
                 else:
-                    test = ''
+                    if(re.search('\|\|', in_data)):
+                        test = '\n'
+                    else:
+                        test = ''
 
                 data = include.sub('<nobr><a id="include_link" href="/w/' + url_pas(results[0]) + '">[' + results[0] + ' 이동]</a><br><span>' + in_data + '</span>' + test, data, 1)
             else:
