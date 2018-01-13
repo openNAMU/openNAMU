@@ -3124,6 +3124,10 @@ def upload():
         
         piece = os.path.splitext(name)
         e_data = sha224(piece[0]) + piece[1]
+
+        curs.execute("select title from data where title = ?", ['파일:' + name])
+        if(curs.fetchall()):
+            return(re_error(conn, '/error/16'))
             
         ip = ip_check()
         if(request.forms.get('f_lice')):
@@ -3133,11 +3137,12 @@ def upload():
                 lice = ip + ' 올림'
             else:
                 lice = '[[사용자:' + ip + ']] 올림'
-                
-        if(os.path.exists(os.path.join('image', e_data))):
-            return(re_error(conn, '/error/16'))
             
-        data.save(os.path.join('image', e_data))
+        if(os.path.exists(os.path.join('image', e_data))):
+            os.remove(os.path.join('image', e_data))
+            data.save(os.path.join('image', e_data))
+        else:
+            data.save(os.path.join('image', e_data))
             
         curs.execute("select title from data where title = ?", ['파일:' + name])
         exist = curs.fetchall()
@@ -3406,8 +3411,4 @@ def random():
 def error_404(error):
     return('<!-- 나니카가 하지마룻테 코토와 오와리니 츠나가루다난테 캉가에테모 미나캇타. 이야, 캉카에타쿠나캇탄다... 아마오토 마도오 타타쿠 소라카라 와타시노 요-나 카나시미 훗테루 토메도나쿠 이마오 누라시테 오모이데 난테 이라나이노 코코로가 쿠루시쿠나루 다케다토 No more! September Rain No more! September Rain 이츠닷테 아나타와 미짓카닷타 와자와자 키모치오 타시카메룻테 코토모 히츠요-쟈나쿠테 시젠니 나카라요쿠 나레타카라 안신시테타노 카모시레나이네 도-시테? 나미니 토이카케루케도 나츠노 하지마리가 츠레테키타 오모이 나츠가 오와루토키 키에챠우모노닷타 난테 시라나쿠테 토키메이테타 아츠이 키세츠 우미베노 소라가 히캇테 토츠젠 쿠모가 나가레 오츠부노 아메 와타시노 나카노 나미다미타이 콘나니 타노시이 나츠가 즛토 츠즈이테쿳테 신지테타요 But now... September Rain But now... September Rain -->' + redirect('/w/' + url_pas(wiki_set(conn, 2))))
 
-@error(500)
-def error_500(error):
-    return('<!-- Splash, Spark, and Shining the Summer! 코코데맛떼나이데 잇쇼니코나캬, 다! Summer time (Oh ya! Summer time!!) 톤데모나이 나츠니나리소오 키미모카쿠고와 데키타카나? 히토리맛떼타라 앗토이우마니 바이바이 Summer time (Oh ya! Summer time!!) 오이데카레루노가 키라이나라 스구니오이데요 코코로우키우키 우키요노도리-무 비-치 세카이데 보우켄시요오 "보-옷"토 스키챠못타이나이 "규-웃"토 코이지칸가호시이? 닷타라(Let\'s go!) 닷타라(Let\'s go!) 코토시와 이치도키리사 아소보오 Splash! (Splash!!) 토비콘다 우미노아오사가(Good feeling) 오와라나이 나츠에노 토비라오 유메밋테루토 싯테루카이? 아소보오 Splash! (Splash!!) 토비콘데 미세타아토 키미가 타메랏테루(나라바) 요우샤나쿠 Summer Summer Summer에 츠레텟챠우카라! -->' + error)
-
-run(app = app, server = 'tornado', host = '0.0.0.0', port = int(set_data['port']), debug = True)
+run(app = app, server = 'tornado', host = '0.0.0.0', port = int(set_data['port']))
