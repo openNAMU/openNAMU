@@ -143,7 +143,7 @@
                                             % end
                                             % i += 1
                                         % end
-                                        % end
+                                    % end
                                 </li>
                             </ol>
                         </div>
