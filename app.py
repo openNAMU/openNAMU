@@ -1432,7 +1432,7 @@ def preview(name = None, num = None):
          
     newdata = request.forms.content
     newdata = re.sub('^#(?:redirect|넘겨주기) (?P<in>[^\n]*)', ' * [[\g<in>]] 문서로 넘겨주기', newdata)
-    enddata = namumark(conn, name, newdata, 0, 0, 0)
+    enddata = namumark(conn, name, newdata, 0, 0, 1)
     captcha = captcha_get(conn)
 
     if(num):
