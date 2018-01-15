@@ -31,7 +31,7 @@ def include_pas(conn, data, title, in_c, num, toc_y, fol_num):
                 in_data = re.sub("\n", "\r\n", re.sub("\r\n", "\n", in_data))
                 in_data = html_pas.html_pas(in_data)
                 
-                var_d = mid_pas.mid_pas(in_data, fol_num, 1, in_c)
+                var_d = mid_pas.mid_pas(in_data, fol_num, 1, in_c, toc_y)
                 var_d2 = link.link(conn, title, var_d[0], 0, category, backlink)
 
                 in_data = var_d2[0]
@@ -54,7 +54,10 @@ def include_pas(conn, data, title, in_c, num, toc_y, fol_num):
                 if(results[2]):
                     test = '<br>'
                 else:
-                    test = ''
+                    if(re.search('\|\|', in_data)):
+                        test = '\n'
+                    else:
+                        test = ''
 
                 data = include.sub('<nobr><a id="include_link" href="/w/' + url_pas(results[0]) + '">[' + results[0] + ' 이동]</a><br><span>' + in_data + '</span>' + test, data, 1)
             else:
