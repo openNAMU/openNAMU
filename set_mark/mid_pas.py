@@ -1,6 +1,6 @@
 import re
 
-def mid_pas(data, fol_num, include, in_c):
+def mid_pas(data, fol_num, include, in_c, toc_y):
     p = re.compile('{{{((?:(?:(?:\+|-)[0-5])|(?:#|@)(?:(?:[0-9a-f-A-F]{3}){1,2}|(?:\w+))|(?:#!(?:html|wiki|noin|folding|syntax)))(?:(?!{{{|}}}).)+)}}}', re.DOTALL)
     while(1):
         m = p.search(data)
@@ -96,13 +96,16 @@ def mid_pas(data, fol_num, include, in_c):
                 data = com.sub(html_d.groups()[0], data, 1)
             elif(fol):
                 fol_d = fol.groups()
-                data = com.sub("<div>" + fol_d[0] + " <div id='folding_" + str(fol_num + 1) + "' style='display: inline-block;'>[<a href='javascript:void(0);' onclick='folding(" + str(fol_num + 1) + \
-                                "); folding(" + str(fol_num + 2) + "); folding(" + str(fol_num) + ");'>펼치기</a>]</div><div id='folding_" + str(fol_num + 2) + \
-                                "' style='display: none;'>[<a href='javascript:void(0);' onclick='folding(" + str(fol_num + 1) + "); folding(" + str(fol_num + 2) + \
-                                "); folding(" + str(fol_num) + ");'>접기</a>]</div><div id='folding_" + str(fol_num) + "' style='display: none;'><br>" + fol_d[1] + \
-                                "</div></div>", data, 1)
-
-                fol_num += 3
+                if(toc_y != 0):
+                    data = com.sub("<div>" + fol_d[0] + " <div id='folding_" + str(fol_num + 1) + "' style='display: inline-block;'>[<a href='javascript:void(0);' onclick='folding(" + str(fol_num + 1) + \
+                                    "); folding(" + str(fol_num + 2) + "); folding(" + str(fol_num) + ");'>펼치기</a>]</div><div id='folding_" + str(fol_num + 2) + \
+                                    "' style='display: none;'>[<a href='javascript:void(0);' onclick='folding(" + str(fol_num + 1) + "); folding(" + str(fol_num + 2) + \
+                                    "); folding(" + str(fol_num) + ");'>접기</a>]</div><div id='folding_" + str(fol_num) + "' style='display: none;'><br>" + fol_d[1] + \
+                                    "</div></div>", data, 1)
+                    fol_num += 3
+                else:
+                    data = com.sub("<div>" + fol_d[0] + "<br><br>" + fol_d[1] + "</div>", data, 1)
+                
             elif(syn):
                 syn_d = syn.groups()
                 tax_d = syn_d[1].replace(' ', '<space>')
