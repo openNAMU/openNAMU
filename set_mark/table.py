@@ -157,7 +157,8 @@ def table(data):
                         table_class = table_d[5]
                         num = table_d[6]
                             
-                        table = re.sub("^(\|\|(?:(?:\|\|)*))((?:&lt;(?:(?:(?!&gt;).)*)&gt;)*)", "<table " + table_class + " " + alltable + "><tbody><tr " + rowstyle + "><td " + cel + " " + row + " " + celstyle + ">", table, 1)
+                        table = re.sub("^(\|\|(?:(?:\|\|)*))((?:&lt;(?:(?:(?!&gt;).)*)&gt;)*)", \
+                                        "<table " + table_class + " " + alltable + "><tbody><tr " + rowstyle + "><td " + cel + " " + row + " " + celstyle + ">", table, 1)
                     else:
                         cel = 'colspan="' + str(round(len(result[0]) / 2)) + '"'
 

@@ -43,7 +43,7 @@ def namumark(conn, title, data, num, in_c, toc_y):
     data = html_pas.html_pas(data)
     
     fol_num = 0
-    a = mid_pas.mid_pas(data, fol_num, 0, in_c)
+    a = mid_pas.mid_pas(data, fol_num, 0, in_c, toc_y)
     data = a[0]
     fol_num = a[1]
 
