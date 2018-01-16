@@ -144,7 +144,7 @@ def link(conn, title, data, num, category, backlink):
                 elif(re.search('^#', d[0])):
                     data = link.sub('<a title="' + sh + '" href="' + sh + '">' + view + '</a>', data, 1)
                 else:                    
-                    a = href.replace('&#x27;', "'").replace('&quot;', '"').replace('\\\\', '<slash>').replace('\\', '').replace('<slash>', '\\')
+                    a = re.sub('<([^>]*)>', '', href.replace('&#x27;', "'").replace('&quot;', '"').replace('\\\\', '<slash>').replace('\\', '').replace('<slash>', '\\'))
                     
                     if(num == 1):
                         backlink += [[title, a, '']]
@@ -158,7 +158,7 @@ def link(conn, title, data, num, category, backlink):
                     else:
                         no = ''
                     
-                    data = link.sub('<a ' + no + ' title="' + re.sub('<([^>]*)>', '', href) + sh + '" href="/w/' + url_pas(re.sub('<([^>]*)>', '', a)) + sh + '">' + view.replace('\\', '\\\\') + '</a>', data, 1)
+                    data = link.sub('<a ' + no + ' title="' + re.sub('<([^>]*)>', '', href) + sh + '" href="/w/' + url_pas(a) + sh + '">' + view.replace('\\', '\\\\') + '</a>', data, 1)
         else:
             break
             
