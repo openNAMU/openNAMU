@@ -947,24 +947,7 @@ def deep_search(name = None, num = 1):
     all_list = curs.fetchall()
     if(all_list):
         for data in all_list:
-            test = re.compile(name)
-            var_re = test.search(data[0])
-                
-            if(var_re):
-                if(no == 0):
-                    div_plus += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a> (제목)</li>'
-                    start = 0
-                else:
-                    if(start == 0 and div_plus != ''):
-                        start = 1
-                        div_plus += '<hr>'
-                    div_plus += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a> (내용)</li>'
-            else:
-                no = 1
-                if(start == 0 and div_plus != ''):
-                    start = 1
-                    div_plus += '<hr>'
-                div_plus += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a> (내용)</li>'
+            div_plus += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a></li>'
     else:
         div += '<li>검색 결과 없음</li>'
 
