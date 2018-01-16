@@ -947,10 +947,8 @@ def deep_search(name = None, num = 1):
     all_list = curs.fetchall()
     if(all_list):
         for data in all_list:
-            try:
-                var_re = re.search(name, data[0])
-            except:
-                var_re = re.search('\\' + name, data[0])
+            test = re.compile(name)
+            var_re = test.search(data[0])
                 
             if(var_re):
                 if(no == 0):
