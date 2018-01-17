@@ -100,8 +100,15 @@ def link(conn, title, data, num, category, backlink):
                     if(not re.search("^파일:([^\n]*)", title)):
                         if(num == 1):
                             backlink += [[title, d[0], 'file']]
-                        
-                    img = span[0] + '<img src="/image/' + sha224(f_d.groups()[0]) + '.' + f_d.groups()[1] + '" ' + width + height + '>' + span[1]
+
+                    file_name = f_d.groups()
+
+                    curs.execute("select title from data where title = ?", ['파일:' + file_name[0] + '.' + file_name[1]])
+                    if(not curs.fetchall()):
+                        img = '<a class="not_thing" href="/w/' + url_pas('파일:' + file_name[0] + '.' + file_name[1]) + '">파일:' + file_name[0] + '.' + file_name[1] + '</a>'
+                    else:
+                        img = span[0] + '<img src="/image/' + sha224(file_name[0]) + '.' + file_name[1] + '" ' + width + height + '>' + span[1]
+                    
                     data = link.sub(img, data, 1)
                 else:
                     img = span[0] + '<img src="' + re.sub('^외부:', '', d[0]) + '" ' + width + height + '>' + span[1]
@@ -137,7 +144,7 @@ def link(conn, title, data, num, category, backlink):
                 elif(re.search('^#', d[0])):
                     data = link.sub('<a title="' + sh + '" href="' + sh + '">' + view + '</a>', data, 1)
                 else:                    
-                    a = href.replace('&#x27;', "'").replace('&quot;', '"').replace('\\\\', '<slash>').replace('\\', '').replace('<slash>', '\\')
+                    a = re.sub('<([^>]*)>', '', href.replace('&#x27;', "'").replace('&quot;', '"').replace('\\\\', '<slash>').replace('\\', '').replace('<slash>', '\\'))
                     
                     if(num == 1):
                         backlink += [[title, a, '']]
@@ -151,7 +158,7 @@ def link(conn, title, data, num, category, backlink):
                     else:
                         no = ''
                     
-                    data = link.sub('<a ' + no + ' title="' + re.sub('<([^>]*)>', '', href) + sh + '" href="/w/' + url_pas(re.sub('<([^>]*)>', '', a)) + sh + '">' + view.replace('\\', '\\\\') + '</a>', data, 1)
+                    data = link.sub('<a ' + no + ' title="' + re.sub('<([^>]*)>', '', href) + sh + '" href="/w/' + url_pas(a) + sh + '">' + view.replace('\\', '\\\\') + '</a>', data, 1)
         else:
             break
             

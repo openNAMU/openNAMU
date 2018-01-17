@@ -13,7 +13,7 @@ def end(data, category):
     data = re.sub('<\/blockquote>(?:(?:\r)?\n)<br><blockquote>', '</blockquote><blockquote>', data)
 
     data = re.sub('\n', '<br>', data)
-    data = re.sub('<hr style="margin-top: -5px;"><br>', '<hr style="margin-top: -5px;">', data)
+    data = re.sub('<hr id="under_bar"([^>]*)><br>', '<hr style="margin-top: -5px;">', data)
     data = re.sub('&lt;isbr&gt;', '\r\n', data)
     data = re.sub('^(?:<br>|\r|\n| )+', '', data)
     data = re.sub('^<div style="margin-top: 30px;" id="cate">', '<div id="cate">', data)        
