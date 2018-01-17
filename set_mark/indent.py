@@ -8,7 +8,7 @@ def indent(data):
             end = str(result[0])
 
             while(1):
-                isspace = re.search("( *)\*\s([^\n]*)", end)
+                isspace = re.search("\n( *)\* ([^\n]*)", end)
                 if(isspace):
                     spacebar = isspace.groups()
                     if(len(spacebar[0]) == 0):
@@ -16,7 +16,7 @@ def indent(data):
                     else:
                         up = len(spacebar[0]) * 20
 
-                    end = re.sub("( *)\*\s([^\n]*)", "<li style='margin-left:" + str(up) + "px'>" + spacebar[1] + "</li>", end, 1)
+                    end = re.sub("\n( *)\* ([^\n]*)", "<li style='margin-left:" + str(up) + "px'>" + spacebar[1] + "</li>", end, 1)
                 else:
                     break
 

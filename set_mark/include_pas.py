@@ -15,7 +15,7 @@ def include_pas(conn, data, title, in_c, num, toc_y, fol_num):
     category = ''
     backlink = []
     
-    include = re.compile("\[include\(((?:(?!\)\]|,).)*)((?:(?:,\s?(?:(?!\)\]).)*))+)?\)\]")
+    include = re.compile("\[include\(((?:(?!\)\]|,).)*)((?:(?:,\s?(?:(?!\)\]).)*))+)?\)\]((?:(?!\n))*)")
     m = include.findall(data)
     for results in m:
         if(results[0] == title):
@@ -31,7 +31,7 @@ def include_pas(conn, data, title, in_c, num, toc_y, fol_num):
                 in_data = re.sub("\n", "\r\n", re.sub("\r\n", "\n", in_data))
                 in_data = html_pas.html_pas(in_data)
                 
-                var_d = mid_pas.mid_pas(in_data, fol_num, 1, in_c)
+                var_d = mid_pas.mid_pas(in_data, fol_num, 1, in_c, toc_y)
                 var_d2 = link.link(conn, title, var_d[0], 0, category, backlink)
 
                 in_data = var_d2[0]
@@ -51,7 +51,15 @@ def include_pas(conn, data, title, in_c, num, toc_y, fol_num):
 
                 in_data = toc_pas.toc_pas(in_data, results[0], num, toc_y)
                             
-                data = include.sub('\n<nobr><a id="include_link" href="/w/' + url_pas(results[0]) + '">[' + results[0] + ' 이동]</a><div>' + in_data + '</div><nobr>\n', data, 1)
+                if(results[2]):
+                    test = '<br>'
+                else:
+                    if(re.search('\|\|', in_data)):
+                        test = '\n'
+                    else:
+                        test = ''
+
+                data = include.sub('<nobr><a id="include_link" href="/w/' + url_pas(results[0]) + '">[' + results[0] + ' 이동]</a><br><span>' + in_data + '</span>' + test, data, 1)
             else:
                 data = include.sub("<a class=\"not_thing\" href=\"/w/" + url_pas(results[0]) + "\">" + results[0] + "</a>", data, 1)
 
