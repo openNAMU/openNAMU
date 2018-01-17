@@ -2919,7 +2919,7 @@ def recent_changes(name = None, num = 1, what = 'all', tool = 'record'):
                 div += '<td style="width: 33.3%;">문서명</td><td style="width: 33.3%;">편집자</td><td style="width: 33.3%;">시간</td></tr>'
 
                 if(what == 'all'):
-                    div = '<a href="/topic_record/' + url_pas(name) + '">(토론 기록)</a><hr>' + div
+                    div = '<a href="/topic_record/' + url_pas(name) + '">(토론)</a><hr>' + div
                     div = '<a href="/record/' + url_pas(name) + '/revert">(되돌리기)</a> ' + div
                     div = '<a href="/record/' + url_pas(name) + '/move">(이동)</a> ' + div
                     div = '<a href="/record/' + url_pas(name) + '/delete">(삭제)</a> ' + div
@@ -2966,11 +2966,11 @@ def recent_changes(name = None, num = 1, what = 'all', tool = 'record'):
                     send = data[4]
             
             if(re.search("\+", data[5])):
-                leng = '<span style="color:green;">' + data[5] + '</span>'
+                leng = '<span style="color:green;">(' + data[5] + ')</span>'
             elif(re.search("\-", data[5])):
-                leng = '<span style="color:red;">' + data[5] + '</span>'
+                leng = '<span style="color:red;">(' + data[5] + ')</span>'
             else:
-                leng = '<span style="color:gray;">' + data[5] + '</span>'
+                leng = '<span style="color:gray;">(' + data[5] + ')</span>'
                 
             if(one_admin == 1):
                 curs.execute("select * from ban where block = ?", [data[3]])
@@ -3019,9 +3019,9 @@ def recent_changes(name = None, num = 1, what = 'all', tool = 'record'):
             if(tool == 'history'):
                 title = '<a href="/w/' + url_pas(name) + '/r/' + data[0] + '">' + data[0] + '판</a> <a href="/raw/' + url_pas(name) + '/r/' + data[0] + '">(원본)</a> '
             else:
-                title = '<a href="/w/' + url_pas(data[1]) + '">' + html.escape(data[1]) + '</a> (<a href="/history/' + url_pas(data[1]) + '">' + data[0] + '판</a>) '
+                title = '<a href="/w/' + url_pas(data[1]) + '">' + html.escape(data[1]) + '</a> <a href="/history/' + url_pas(data[1]) + '">(' + data[0] + '판)</a> '
                     
-            div += '<tr style="' + style[0] + '"><td>' + title + revert + ' (' + leng + ')</td>'
+            div += '<tr style="' + style[0] + '"><td>' + title + revert + ' ' + leng + '</td>'
             div += '<td>' + ip + ban + hidden + '</td><td>' + date + '</td></tr><tr style="' + style[1] + '"><td colspan="3">' + send + '</td></tr>'
 
         div += '</tbody></table>'
