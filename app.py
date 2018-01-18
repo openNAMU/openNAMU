@@ -2850,8 +2850,6 @@ def user_topic_list(name = None, num = 1):
     one_admin = admin_check(conn, 1, None)
     div = '<table style="width: 100%; text-align: center;"><tbody><tr>'
     div += '<td style="width: 33.3%;">토론명</td><td style="width: 33.3%;">작성자</td><td style="width: 33.3%;">시간</td></tr>'
-
-    div = '<a href="/record/' + url_pas(name) + '">(편집 기록)</a><hr>' + div
     
     curs.execute("select title, id, sub, ip, date from topic where ip = ? order by date desc limit ?, '50'", [name, str(sql_num)])
     data_list = curs.fetchall()
@@ -2886,7 +2884,7 @@ def user_topic_list(name = None, num = 1):
     return(html_minify(template('index', 
         imp = ['토론 기록', wiki_set(conn, 1), custom(conn), other2([sub, 0])],
         data = div,
-        menu = [['other', '기타'], ['user', '사용자'], ['count/' + url_pas(name), '횟수']]
+        menu = [['other', '기타'], ['user', '사용자'], ['count/' + url_pas(name), '횟수'], ['record/' + url_pas(name), '편집 기록']]
     )))
 
 @route('/<tool:re:history|record>/<name:path>', method=['POST', 'GET'])
@@ -2919,8 +2917,7 @@ def recent_changes(name = None, num = 1, what = 'all', tool = 'record'):
                 div += '<td style="width: 33.3%;">문서명</td><td style="width: 33.3%;">편집자</td><td style="width: 33.3%;">시간</td></tr>'
 
                 if(what == 'all'):
-                    div = '<a href="/topic_record/' + url_pas(name) + '">(토론)</a><hr>' + div
-                    div = '<a href="/record/' + url_pas(name) + '/revert">(되돌리기)</a> ' + div
+                    div = '<a href="/record/' + url_pas(name) + '/revert">(되돌리기)</a><hr>' + div
                     div = '<a href="/record/' + url_pas(name) + '/move">(이동)</a> ' + div
                     div = '<a href="/record/' + url_pas(name) + '/delete">(삭제)</a> ' + div
                 
@@ -3042,7 +3039,7 @@ def recent_changes(name = None, num = 1, what = 'all', tool = 'record'):
                     sub += ' (차단)'
 
                 title = '편집 기록'
-                menu = [['other', '기타'], ['user', '사용자'], ['count/' + url_pas(name), '횟수']]
+                menu = [['other', '기타'], ['user', '사용자'], ['count/' + url_pas(name), '횟수'], ['topic_record/' + url_pas(name), '토론 기록']]
                 div += next_fix('/record/' + url_pas(name) + '/' + url_pas(what) + '/', num, data_list)
 
                 if(what != 'all'):
