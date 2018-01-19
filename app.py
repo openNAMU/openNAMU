@@ -436,7 +436,7 @@ def not_close_topic():
         menu = [['manager', '관리자']]
     )))
 
-@route('/image/<name:path>')
+@route('/image/<name>')
 def static(name = None):
     if(os.path.exists(os.path.join('image', name))):
         return(static_file(name, root = 'image'))
@@ -466,7 +466,7 @@ def acl_list():
         menu = [['other', '기타']]
     )))
 
-@route('/admin_plus/<name:path>', method=['POST', 'GET'])
+@route('/admin_plus/<name>', method=['POST', 'GET'])
 def admin_plus(name = None):
     if(request.method == 'POST'):
         if(admin_check(conn, None, 'admin_plus (' + name + ')') != 1):
@@ -569,22 +569,26 @@ def admin_list():
         menu = [['other', '기타']]
     )))
         
-@route('/history/<name:path>/r/<num:int>/hidden')
-def history_hidden(name = None, num = None):
-    if(admin_check(conn, 6, 'history_hidden (' + name + '#' + str(num) + ')') == 1):
-        curs.execute("select title from history where title = ? and id = ? and hide = 'O'", [name, str(num)])
-        if(curs.fetchall()):
-            curs.execute("update history set hide = '' where title = ? and id = ?", [name, str(num)])
-        else:
-            curs.execute("update history set hide = 'O' where title = ? and id = ?", [name, str(num)])
-            
-        conn.commit()
+@route('/hidden/<name:path>')
+def history_hidden(name = None):
+    num = request.query.num or None
+    if(int(num)):
+        num = int(num)
+
+        if(admin_check(conn, 6, 'history_hidden (' + name + '#' + str(num) + ')') == 1):
+            curs.execute("select title from history where title = ? and id = ? and hide = 'O'", [name, str(num)])
+            if(curs.fetchall()):
+                curs.execute("update history set hide = '' where title = ? and id = ?", [name, str(num)])
+            else:
+                curs.execute("update history set hide = 'O' where title = ? and id = ?", [name, str(num)])
+                
+            conn.commit()
     
     return(redirect('/history/' + url_pas(name)))
         
 @route('/user_log')
-@route('/user_log/<num:int>')
-def user_log(num = 1):
+def user_log():
+    num = int(request.query.num or 1)
     if(num * 50 > 0):
         sql_num = num * 50 - 50
     else:
@@ -624,7 +628,7 @@ def user_log(num = 1):
 
         list_data += '</ul><hr><ul><li>이 위키에는 ' + str(count) + '명의 사람이 있습니다.</li></ul>'
 
-    list_data += next_fix('/user_log/', num, user_list)
+    list_data += next_fix('/user_log?num=', num, user_list)
 
     return(html_minify(template('index', 
         imp = ['사용자 가입 기록', wiki_set(conn, 1), custom(conn), other2([0, 0])],
@@ -633,8 +637,8 @@ def user_log(num = 1):
     )))
 
 @route('/admin_log')
-@route('/admin_log/<num:int>')
-def user_log(num = 1):
+def user_log():
+    num = int(request.query.num or 1)
     if(num * 50 > 0):
         sql_num = num * 50 - 50
     else:
@@ -649,7 +653,7 @@ def user_log(num = 1):
         list_data += '<li>' + ip + ' / ' + data[1] + ' / ' + data[2] + '</li>'
 
     list_data += '</ul><hr><ul><li>주의 : 권한 사용 안하고 열람만 해도 기록되는 경우도 있습니다.</li></ul>'
-    list_data += next_fix('/admin_log/', num, get_list)
+    list_data += next_fix('/admin_log?num=', num, get_list)
 
     return(html_minify(template('index', 
         imp = ['권한 사용 기록', wiki_set(conn, 1), custom(conn), other2([0, 0])],
@@ -701,8 +705,8 @@ def indexing():
     return(redirect('/'))        
         
 @route('/xref/<name:path>')
-@route('/xref/<name:path>/num/<num:int>')
-def xref(name = None, num = 1):
+def xref(name = None):
+    num = int(request.query.num or 1)
     if(num * 50 > 0):
         sql_num = num * 50 - 50
     else:
@@ -730,7 +734,7 @@ def xref(name = None, num = 1):
         if(re.search('^틀:', data[0])):
             div += '<li><a id="inside" href="/xref/' + url_pas(data[0]) + '">' + data[0] + '</a> (역링크)</li>'
       
-    div += '</ul>' + next_fix('/xref/' + url_pas(name) + '/num/', num, data_list)
+    div += '</ul>' + next_fix('/xref/' + url_pas(name) + '?num=', num, data_list)
     
     return(html_minify(template('index', 
         imp = [name, wiki_set(conn, 1), custom(conn), other2([' (역링크)', 0])],
@@ -739,8 +743,8 @@ def xref(name = None, num = 1):
     )))
 
 @route('/please')
-@route('/please/<num:int>')
-def please(num = 1):
+def please():
+    num = int(request.query.num or 1)
     if(num * 50 > 0):
         sql_num = num * 50 - 50
     else:
@@ -756,7 +760,7 @@ def please(num = 1):
             div += '<li><a class="not_thing" href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a></li>'        
             var = data[0]
         
-    div += '</ul>' + next_fix('/please/', num, data_list)
+    div += '</ul>' + next_fix('/please?num=', num, data_list)
     
     return(html_minify(template('index', 
         imp = ['필요한 문서', wiki_set(conn, 1), custom(conn), other2([0, 0])],
@@ -808,12 +812,10 @@ def recent_discuss(tools = 'normal'):
     )))
 
 @route('/block_log')
-@route('/block_log/<num:int>')
 @route('/block_log/<tool2:re:ip|user|never_end|can_end|end|now>')
-@route('/block_log/<tool2:re:ip|user|never_end|can_end|end|now>/<num:int>')
-@route('/<tool:re:block_user|block_admin>/<name:path>')
-@route('/<tool:re:block_user|block_admin>/<name:path>/<num:int>')
-def block_log(num = 1, name = None, tool = None, tool2 = None):
+@route('/<tool:re:block_user|block_admin>/<name>')
+def block_log(name = None, tool = None, tool2 = None):
+    num = int(request.query.num or 1)
     if(num * 50 > 0):
         sql_num = num * 50 - 50
     else:
@@ -899,11 +901,11 @@ def block_log(num = 1, name = None, tool = None, tool2 = None):
 
     if(not name):
         if(not tool2):
-            div += next_fix('/block_log/', num, data_list)
+            div += next_fix('/block_log?num=', num, data_list)
         else:
-            div += next_fix('/block_log/' + url_pas(tool2) + '/', num, data_list)
+            div += next_fix('/block_log/' + url_pas(tool2) + '?num=', num, data_list)
     else:
-        div += next_fix('/' + url_pas(tool) + '/' + url_pas(name) + '/', num, data_list)
+        div += next_fix('/' + url_pas(tool) + '/' + url_pas(name) + '?num=', num, data_list)
                 
     return(html_minify(template('index', 
         imp = ['차단 기록', wiki_set(conn, 1), custom(conn), other2([sub, 0])],
@@ -925,8 +927,8 @@ def goto():
         return(redirect('/search/' + url_pas(request.forms.search)))
 
 @route('/search/<name:path>')
-@route('/search/<name:path>/<num:int>')
-def deep_search(name = None, num = 1):
+def deep_search(name = None):
+    num = int(request.query.num or 1)
     if(num * 50 > 0):
         sql_num = num * 50 - 50
     else:
@@ -936,6 +938,7 @@ def deep_search(name = None, num = 1):
     div_plus = ''
     no = 0
     start = 2
+    test = ''
 
     curs.execute("select title from data where title = ?", [name])
     if(curs.fetchall()):
@@ -943,16 +946,21 @@ def deep_search(name = None, num = 1):
     else:
         div = '<ul><li>문서가 없습니다. <a class="not_thing" href="/w/' + url_pas(name) + '">바로가기</a></li><hr>'
 
-    curs.execute("select distinct title from data where title like ? or data like ? order by case when title like ? then 1 else 2 end limit ?, '50'", ['%' + name + '%', '%' + name + '%', '%' + name + '%', str(sql_num)])
+    curs.execute("select distinct title, case when title like ? then '제목' else '내용' end from data where title like ? or data like ? order by case when title like ? then 1 else 2 end limit ?, '50'", ['%' + name + '%', '%' + name + '%', '%' + name + '%', '%' + name + '%', str(sql_num)])
     all_list = curs.fetchall()
     if(all_list):
+        test = all_list[0][1]
         for data in all_list:
-            div_plus += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a></li>'
+            if(data[1] != test):
+                div_plus += '<hr>'
+                test = data[1]
+
+            div_plus += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a> (' + data[1] + ')</li>'
     else:
         div += '<li>검색 결과 없음</li>'
 
     div += div_plus + '</ul>'
-    div += next_fix('/search/' + url_pas(name) + '/', num, all_list)
+    div += next_fix('/search/' + url_pas(name) + '?num=', num, all_list)
     
     return(html_minify(template('index', 
         imp = [name, wiki_set(conn, 1), custom(conn), other2([' (검색)', 0])],
@@ -961,11 +969,12 @@ def deep_search(name = None, num = 1):
     )))
          
 @route('/raw/<name:path>')
-@route('/raw/<name:path>/r/<num:int>')
-@route('/topic/<name:path>/sub/<sub_t:path>/raw/<num:int>')
+@route('/topic/<name:path>/sub/<sub_t>/raw/<num:int>')
 def raw_view(name = None, sub_t = None, num = None):
     v_name = name
     sub = ' (원본)'
+    if(not num):
+        num = int(request.query.num or None)
     
     if(not sub_t and num):
         curs.execute("select title from history where title = ? and id = ? and hide = 'O'", [name, str(num)])
@@ -1002,11 +1011,12 @@ def raw_view(name = None, sub_t = None, num = None):
     else:
         return(redirect('/w/' + url_pas(name)))
         
-@route('/revert/<name:path>/r/<num:int>', method=['POST', 'GET'])
-def revert(name = None, num = None):
+@route('/revert/<name:path>', method=['POST', 'GET'])
+def revert(name = None):
     ip = ip_check()
     can = acl_check(conn, name)
     today = get_time()
+    num = int(request.query.num or None)
     
     if(request.method == 'POST'):
         if(captcha_post(request.forms.get('g-recaptcha-response'), conn) == 1):
@@ -1063,7 +1073,7 @@ def revert(name = None, num = None):
             ip_warring = ''
 
         return(html_minify(template('index', 
-            imp = [name, wiki_set(conn, 1), custom_data, other2([' (되돌리기)', 0])],
+            imp = [name, wiki_set(conn, 1), custom_data, other2([' (되돌리기) (' + request.query.num + '판)', 0])],
             data =  ip_warring + ' \
                     <form method="post"> \
                         <input placeholder="사유" name="send" type="text"><hr> \
@@ -1127,7 +1137,7 @@ def edit_filter():
         menu = [['manager', '관리자']]
     )))
 
-@route('/edit_filter/<name:path>/delete', method=['POST', 'GET'])
+@route('/edit_filter/<name>/delete', method=['POST', 'GET'])
 def delete_edit_filter(name = None):
     if(admin_check(conn, 1, 'edit_filter delete') != 1):
         return(re_error('/error/3'))
@@ -1137,7 +1147,7 @@ def delete_edit_filter(name = None):
 
     return(redirect('/edit_filter'))
 
-@route('/edit_filter/<name:path>', method=['POST', 'GET'])
+@route('/edit_filter/<name>', method=['POST', 'GET'])
 def set_edit_filter(name = None):
     if(request.method == 'POST'):
         if(admin_check(conn, 1, 'edit_filter edit') != 1):
@@ -1219,9 +1229,7 @@ def set_edit_filter(name = None):
         )))
 
 @route('/edit/<name:path>', method=['POST', 'GET'])
-@route('/edit/<name:path>/from/<name2:path>', method=['POST', 'GET'])
-@route('/edit/<name:path>/section/<num:int>', method=['POST', 'GET'])
-def edit(name = None, name2 = None, num = None):
+def edit(name = None):
     ip = ip_check()
     can = acl_check(conn, name)
 
@@ -1306,11 +1314,11 @@ def edit(name = None, name2 = None, num = None):
         curs.execute("select data from data where title = ?", [name])
         old = curs.fetchall()
         if(old):
-            if(not num and request.forms.otent != old[0][0]):
+            if(not request.query.section and request.forms.otent != old[0][0]):
                 return(re_error(conn, '/error/12'))
 
             leng = leng_check(len(request.forms.otent), len(content))
-            if(num):
+            if(request.query.section):
                 content = old[0][0].replace(request.forms.otent, content)      
                 
             curs.execute("update data set data = ? where title = ?", [content, name])
@@ -1333,7 +1341,7 @@ def edit(name = None, name2 = None, num = None):
         curs.execute("select data from data where title = ?", [name])
         new = curs.fetchall()
         if(new):
-            if(num):
+            if(request.query.section):
                 i = 0
                 j = 0
                 
@@ -1341,7 +1349,7 @@ def edit(name = None, name2 = None, num = None):
                 while(1):
                     m = re.search("((?:={1,6})\s?(?:[^=]*)\s?(?:={1,6})(?:\s+)?\n(?:(?:(?:(?!(?:={1,6})\s?(?:[^=]*)\s?(?:={1,6})(?:\s+)?\n).)*)(?:\n)?)+)", data)
                     if(m):
-                        if(i == num - 1):
+                        if(i == int(request.query.section) - 1):
                             g = m.groups()
                             data = re.sub("\r\n$", "", g[0])
                             
@@ -1361,24 +1369,21 @@ def edit(name = None, name2 = None, num = None):
                 data = new[0][0]
         else:
             data = ''
-
-        if(num):
-            action = '/section/' + str(num)
-        else:
-            action = ''
             
         data2 = data
-        if(not num):
+        if(not request.query.section):
             get_name = '<form method="post" id="get_edit" action="/edit_get/' + url_pas(name) + '"> \
                             <input placeholder="불러 올 문서" name="name" style="width: 50%;" type="text"> \
                             <button id="preview" class="btn" type="submit">불러오기</button> \
                         </form><hr>'
+            action = ''
         else:
             get_name = ''
+            action = '?section=' + request.query.section
             
         captcha = captcha_get(conn)
-        if(name2):
-            curs.execute("select data from data where title = ?", [name2])
+        if(request.query.froms):
+            curs.execute("select data from data where title = ?", [request.query.froms])
             get_data = curs.fetchall()
             if(get_data):
                 data = get_data[0][0]
@@ -1400,11 +1405,10 @@ def edit(name = None, name2 = None, num = None):
         
 @route('/edit_get/<name:path>', method=['POST'])
 def edit_get(name = None):
-    return(redirect('/edit/' + url_pas(name) + '/from/' + url_pas(request.forms.name)))
+    return(redirect('/edit/' + url_pas(name) + '?froms=' + url_pas(request.forms.name)))
 
 @route('/preview/<name:path>', method=['POST'])
-@route('/preview/<name:path>/section/<num:int>', method=['POST'])
-def preview(name = None, num = None):
+def preview(name = None):
     ip = ip_check()
     can = acl_check(conn, name)
     
@@ -1416,8 +1420,8 @@ def preview(name = None, num = None):
     enddata = namumark(conn, name, newdata, 0, 0, 1)
     captcha = captcha_get(conn)
 
-    if(num):
-        action = '/section/' + str(num)
+    if(request.query.section):
+        action = '?section=' + request.query.section
     else:
         action = ''
 
@@ -1645,7 +1649,7 @@ def manager(num = 1):
             )))
     elif(num == 100):
         if(request.method == 'POST'):
-            return(redirect('/check/' + url_pas(request.forms.name) + '/' + url_pas(request.forms.name2)))
+            return(redirect('/check/' + url_pas(request.forms.name) + '?plus=' + url_pas(request.forms.name2)))
         else:
             return(html_minify(template('index', 
                 imp = ['검사', wiki_set(conn, 1), custom(conn), other2([0, 0])],
@@ -1660,8 +1664,9 @@ def manager(num = 1):
         return(redirect('/'))
         
 @route('/title_index')
-@route('/title_index/<num:int>/<page:int>')
-def title_index(num = 100, page = 1):
+def title_index():
+    page = int(request.query.page or 1)
+    num = int(request.query.num or 100)
     if(page * num > 0):
         sql_num = page * num - num
     else:
@@ -1675,7 +1680,7 @@ def title_index(num = 100, page = 1):
     if(num > 1000):
         return(re_error(conn, '/error/3'))
 
-    data = '<ul><a href="/title_index/0/1">(전체)</a> <a href="/title_index/250/1">(250)</a> <a href="/title_index/500/1">(500)</a> <a href="/title_index/1000/1">(1000)</a><hr>'
+    data = '<ul><a href="/title_index?num=0">(전체)</a> <a href="/title_index?num=250">(250)</a> <a href="/title_index?num=500">(500)</a> <a href="/title_index?num=1000">(1000)</a><hr>'
 
     if(num == 0):
         curs.execute("select data from other where name = 'all_title'")
@@ -1721,7 +1726,7 @@ def title_index(num = 100, page = 1):
         data += '<li>나머지 문서는 총 ' + str(count_end[5]) + '개의 문서가 있습니다.</li>'
 
     if(num != 0):
-        data += '</ul>' + next_fix('/title_index/' + str(num) + '/', page, title_list, num)
+        data += '</ul>' + next_fix('/title_index?num=' + str(num) + '&page=', page, title_list, num)
     
     if(' (' + str(num) + '개)' == ' (0개)'):
         sub = 0
@@ -1734,7 +1739,7 @@ def title_index(num = 100, page = 1):
         menu = [['other', '기타']]
     )))
         
-@route('/topic/<name:path>/sub/<sub:path>/b/<num:int>')
+@route('/topic/<name:path>/sub/<sub>/b/<num:int>')
 def topic_block(name = None, sub = None, num = None):
     if(admin_check(conn, 3, 'blind (' + name + ' - ' + sub + '#' + str(num) + ')') != 1):
         return(re_error(conn, '/error/3'))
@@ -1752,7 +1757,7 @@ def topic_block(name = None, sub = None, num = None):
         
     return(redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '#' + str(num)))
         
-@route('/topic/<name:path>/sub/<sub:path>/notice/<num:int>')
+@route('/topic/<name:path>/sub/<sub>/notice/<num:int>')
 def topic_top(name = None, sub = None, num = None):
     if(admin_check(conn, 3, 'notice (' + name + ' - ' + sub + '#' + str(num) + ')') != 1):
         return(re_error(conn, '/error/3'))
@@ -1773,7 +1778,7 @@ def topic_top(name = None, sub = None, num = None):
 
     return(redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '#' + str(num)))        
         
-@route('/topic/<name:path>/sub/<sub:path>/tool/<tool:re:close|stop|agree>')
+@route('/topic/<name:path>/sub/<sub>/tool/<tool:re:close|stop|agree>')
 def topic_stop(name = None, sub = None, tool = None):
     if(tool == 'close'):
         set_list = ['O', '', '토론 닫기', '토론 열림']
@@ -1816,7 +1821,7 @@ def topic_stop(name = None, sub = None, tool = None):
         
     return(redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub)))    
 
-@route('/topic/<name:path>/sub/<sub:path>/admin/<num:int>')
+@route('/topic/<name:path>/sub/<sub>/admin/<num:int>')
 def topic_admin(name = None, sub = None, num = None):
     curs.execute("select block, ip, date from topic where title = ? and sub = ? and id = ?", [name, sub, str(num)])
     data = curs.fetchall()
@@ -1868,7 +1873,7 @@ def topic_admin(name = None, sub = None, num = None):
         menu = [['topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '#' + str(num), '토론']]
     )))
 
-@route('/topic/<name:path>/sub/<sub:path>', method=['POST', 'GET'])
+@route('/topic/<name:path>/sub/<sub>', method=['POST', 'GET'])
 def topic(name = None, sub = None):
     ban = topic_check(conn, name, sub)
     admin = admin_check(conn, 3, None)
@@ -2200,37 +2205,37 @@ def change_password():
             menu = [['user', '사용자']]
         )))
                 
-@route('/check/<name:path>')
-@route('/check/<name:path>/<name2:path>')
-def user_check(name = None, name2 = None):
-    curs.execute("select acl from user where id = ? or id = ?", [name, name2])
+@route('/check/<name>')
+def user_check(name = None):
+    if(admin_check(conn, 4, 'check (' + name + ')') != 1):
+        return(re_error(conn, '/error/3'))
+
+    curs.execute("select acl from user where id = ? or id = ?", [name, request.query.plus])
     user = curs.fetchall()
     if(user and user[0][0] != 'user'):
         if(admin_check(conn, None, None) != 1):
             return(re_error(conn, '/error/4'))
-
-    if(admin_check(conn, 4, 'check (' + name + ')') != 1):
-        return(re_error(conn, '/error/3'))
     
-    if(name2):
+    if(request.query.plus):
         if(re.search('(?:\.|:)', name)):
-            if(re.search('(?:\.|:)', name2)):
-                curs.execute("select name, ip, ua, today from ua_d where ip = ? or ip = ? order by today desc", [name, name2])
+            if(re.search('(?:\.|:)', request.query.plus)):
+                curs.execute("select name, ip, ua, today from ua_d where ip = ? or ip = ? order by today desc", [name, request.query.plus])
             else:
-                curs.execute("select name, ip, ua, today from ua_d where ip = ? or name = ? order by today desc", [name, name2])
+                curs.execute("select name, ip, ua, today from ua_d where ip = ? or name = ? order by today desc", [name, request.query.plus])
         else:
-            if(re.search('(?:\.|:)', name2)):
-                curs.execute("select name, ip, ua, today from ua_d where name = ? or ip = ? order by today desc", [name, name2])
+            if(re.search('(?:\.|:)', request.query.plus)):
+                curs.execute("select name, ip, ua, today from ua_d where name = ? or ip = ? order by today desc", [name, request.query.plus])
             else:
-                curs.execute("select name, ip, ua, today from ua_d where name = ? or name = ? order by today desc", [name, name2])
+                curs.execute("select name, ip, ua, today from ua_d where name = ? or name = ? order by today desc", [name, request.query.plus])
     elif(re.search('(?:\.|:)', name)):
         curs.execute("select name, ip, ua, today from ua_d where ip = ? order by today desc", [name])
     else:
         curs.execute("select name, ip, ua, today from ua_d where name = ? order by today desc", [name])
+    
     record = curs.fetchall()
     if(record):
         div = '<table style="width: 100%; text-align: center;"><tbody><tr>'
-        div = '<td style="width: 33.3%;">이름</td><td style="width: 33.3%;">아이피</td><td style="width: 33.3%;">언제</td></tr>'
+        div += '<td style="width: 33.3%;">이름</td><td style="width: 33.3%;">아이피</td><td style="width: 33.3%;">언제</td></tr>'
 
         for data in record:
             if(data[2]):
@@ -2243,7 +2248,7 @@ def user_check(name = None, name2 = None):
         
         div += '</tbody></table>'
     else:
-        div = ''
+        return(re_error(conn, '/error/5'))
             
     return(html_minify(template('index',    
         imp = ['다중 검사', wiki_set(conn, 1), custom(conn), other2([0, 0])],
@@ -2326,7 +2331,7 @@ def logout():
 
     return(redirect('/user'))
     
-@route('/ban/<name:path>', method=['POST', 'GET'])
+@route('/ban/<name>', method=['POST', 'GET'])
 def user_ban(name = None):
     curs.execute("select acl from user where id = ?", [name])
     user = curs.fetchall()
@@ -2555,7 +2560,7 @@ def acl(name = None):
             menu = [['w/' + url_pas(name), '문서'], ['manager', '관리자']]
         )))
             
-@route('/admin/<name:path>', method=['POST', 'GET'])
+@route('/admin/<name>', method=['POST', 'GET'])
 def user_admin(name = None):
     owner = admin_check(conn, None, None)
 
@@ -2618,12 +2623,15 @@ def user_admin(name = None):
             menu = [['manager', '관리자']]
         )))
     
-@route('/w/<name:path>/r/<first:int>/diff/<second:int>')
-def diff_data(name = None, first = None, second = None):
-    curs.execute("select data from history where id = ? and title = ?", [str(first), name])
+@route('/diff/<name:path>')
+def diff_data(name = None):
+    first = request.query.first or '1'
+    second = request.query.second or '1'
+
+    curs.execute("select data from history where id = ? and title = ?", [first, name])
     first_raw_data = curs.fetchall()
     if(first_raw_data):
-        curs.execute("select data from history where id = ? and title = ?", [str(second), name])
+        curs.execute("select data from history where id = ? and title = ?", [second, name])
         second_raw_data = curs.fetchall()
         if(second_raw_data):
             first_data = html.escape(first_raw_data[0][0])            
@@ -2661,14 +2669,13 @@ def down(name = None):
     )))
 
 @route('/w/<name:path>')
-@route('/w/<name:path>/r/<num:int>')
-@route('/w/<name:path>/from/<redirect:path>')
-def read_view(name = None, num = None, redirect = None):
+def read_view(name = None):
     data_none = 0
     sub = ''
     acl = ''
     div = ''
     topic = 0
+    num = request.query.num or None
     
     if(not num):
         session = request.environ.get('beaker.session')
@@ -2681,6 +2688,9 @@ def read_view(name = None, num = None, redirect = None):
                     d = re.sub('([^\n]+)\n', '', d, 1)
                 session['View_List'] = d
         else:
+            if(int(num)):
+                num = int(num)
+
             session['View_List'] = name + '\n'
 
 
@@ -2793,7 +2803,7 @@ def read_view(name = None, num = None, redirect = None):
             elif(data[0][0] == 'user'):
                 acl += ' (가입자)'
             
-    if(redirect):
+    if(request.query.froms):
         elsedata = re.sub("^#(?:redirect|넘겨주기) (?P<in>[^\n]*)", " * [[\g<in>]] 문서로 넘겨주기", elsedata)
             
     enddata = namumark(conn, name, elsedata, 0, 0, 1)
@@ -2805,9 +2815,9 @@ def read_view(name = None, num = None, redirect = None):
         if(admin_memu == 1):
             menu += [['acl/' + url_pas(name), 'ACL']]
 
-    if(redirect):
+    if(request.query.froms):
         menu += [['w/' + url_pas(name), '넘기기']]
-        enddata = '<ul id="redirect"><li><a href="/w/' + url_pas(redirect) + '/from/' + url_pas(name) + '">' + redirect + '</a>에서 넘어 왔습니다.</li></ul><br>' + enddata
+        enddata = '<ul id="redirect"><li><a href="/w/' + url_pas(request.query.froms) + '?froms=' + url_pas(name) + '">' + request.query.froms + '</a>에서 넘어 왔습니다.</li></ul><br>' + enddata
 
     if(uppage != 0):
         menu += [['w/' + url_pas(uppage), '상위']]
@@ -2839,9 +2849,9 @@ def read_view(name = None, num = None, redirect = None):
         menu = menu
     )))
 
-@route('/topic_record/<name:path>')
-@route('/topic_record/<name:path>/<num:int>')
-def user_topic_list(name = None, num = 1):
+@route('/topic_record/<name>')
+def user_topic_list(name = None):
+    num = int(request.query.num or 1)
     if(num * 50 > 0):
         sql_num = num * 50 - 50
     else:
@@ -2872,7 +2882,7 @@ def user_topic_list(name = None, num = 1):
         div += '<td>' + ip + ban +  '</td><td>' + data[4] + '</td></tr>'
 
     div += '</tbody></table>'
-    div += next_fix('/topic_record/' + url_pas(name) + '/', num, data_list)
+    div += next_fix('/topic_record/' + url_pas(name) + '?num=', num, data_list)
                 
     curs.execute("select end, why from ban where block = ?", [name])
     ban_it = curs.fetchall()
@@ -2887,23 +2897,22 @@ def user_topic_list(name = None, num = 1):
         menu = [['other', '기타'], ['user', '사용자'], ['count/' + url_pas(name), '횟수'], ['record/' + url_pas(name), '편집 기록']]
     )))
 
-@route('/<tool:re:history|record>/<name:path>', method=['POST', 'GET'])
-@route('/<tool:re:history>/<name:path>/num/<num:int>', method=['POST', 'GET'])
-@route('/<tool:re:record>/<name:path>/<what:path>')
-@route('/<tool:re:record>/<name:path>/<what:path>/<num:int>')
 @route('/recent_changes')
-@route('/recent_changes/<what:path>')
-def recent_changes(name = None, num = 1, what = 'all', tool = 'record'):
+@route('/<tool:re:record>/<name>')
+@route('/<tool:re:history>/<name:path>', method=['POST', 'GET'])
+def recent_changes(name = None, tool = 'record'):
     if(request.method == 'POST'):
-        return(redirect('/w/' + url_pas(name) + '/r/' + request.forms.b + '/diff/' + request.forms.a))
+        return(redirect('/diff/' + url_pas(name) + '?first=' + request.forms.b + '&second=' + request.forms.a))
     else:
         one_admin = admin_check(conn, 1, None)
         six_admin = admin_check(conn, 6, None)
         ban = ''
         select = ''
+        what = request.query.what or 'all'
         div = '<table style="width: 100%; text-align: center;"><tbody><tr>'
         
         if(name):
+            num = int(request.query.num or 1)
             if(num * 50 > 0):
                 sql_num = num * 50 - 50
             else:
@@ -2917,9 +2926,9 @@ def recent_changes(name = None, num = 1, what = 'all', tool = 'record'):
                 div += '<td style="width: 33.3%;">문서명</td><td style="width: 33.3%;">편집자</td><td style="width: 33.3%;">시간</td></tr>'
 
                 if(what == 'all'):
-                    div = '<a href="/record/' + url_pas(name) + '/revert">(되돌리기)</a><hr>' + div
-                    div = '<a href="/record/' + url_pas(name) + '/move">(이동)</a> ' + div
-                    div = '<a href="/record/' + url_pas(name) + '/delete">(삭제)</a> ' + div
+                    div = '<a href="/record/' + url_pas(name) + '?what=revert">(되돌리기)</a><hr>' + div
+                    div = '<a href="/record/' + url_pas(name) + '?what=move">(이동)</a> ' + div
+                    div = '<a href="/record/' + url_pas(name) + '?what=delete">(삭제)</a> ' + div
                 
                     curs.execute("select id, title, date, ip, send, leng from history where ip = ? order by date desc limit ?, '50'", [name, str(sql_num)])
                 else:
@@ -2937,9 +2946,9 @@ def recent_changes(name = None, num = 1, what = 'all', tool = 'record'):
             div += '<td style="width: 33.3%;">문서명</td><td style="width: 33.3%;">편집자</td><td style="width: 33.3%;">시간</td></tr>'
 
             if(what == 'all'):
-                div = '<a href="/recent_changes/revert">(되돌리기)</a><hr>' + div
-                div = '<a href="/recent_changes/move">(이동)</a> ' + div
-                div = '<a href="/recent_changes/delete">(삭제)</a> ' + div
+                div = '<a href="/recent_changes?what=revert">(되돌리기)</a><hr>' + div
+                div = '<a href="/recent_changes?what=move">(이동)</a> ' + div
+                div = '<a href="/recent_changes?what=delete">(삭제)</a> ' + div
 
                 curs.execute("select id, title, date, ip, send, leng from history order by date desc limit 50")
             else:
@@ -2981,7 +2990,7 @@ def recent_changes(name = None, num = 1, what = 'all', tool = 'record'):
             if((int(data[0]) - 1) == 0):
                 revert = ''
             else:
-                revert = '<a href="/w/' + url_pas(data[1]) + '/r/' + str(int(data[0]) - 1) + '/diff/' + data[0] + '">(비교)</a> <a href="/revert/' + url_pas(data[1]) + '/r/' + str(int(data[0]) - 1) + '">(되돌리기)</a>'
+                revert = '<a href="/diff/' + url_pas(data[1]) + '?first=' + str(int(data[0]) - 1) + '&second=' + data[0] + '">(비교)</a> <a href="/revert/' + url_pas(data[1]) + '?num=' + str(int(data[0]) - 1) + '">(되돌리기)</a>'
             
             style = ['', '']
             date = data[2]
@@ -2990,7 +2999,7 @@ def recent_changes(name = None, num = 1, what = 'all', tool = 'record'):
             hide = curs.fetchall()
             if(six_admin == 1):
                 if(hide):                            
-                    hidden = ' <a href="/history/' + url_pas(data[1]) + '/r/' + data[0] + '/hidden">(공개)'
+                    hidden = ' <a href="/hidden/' + url_pas(data[1]) + '?num=' + data[0] + '">(공개)'
                     
                     style[0] = 'background: gainsboro;'
                     style[1] = 'background: gainsboro;'
@@ -3000,7 +3009,7 @@ def recent_changes(name = None, num = 1, what = 'all', tool = 'record'):
                     else:
                         send += ' (숨김)'
                 else:
-                    hidden = ' <a href="/history/' + url_pas(data[1]) + '/r/' + data[0] + '/hidden">(숨김)'
+                    hidden = ' <a href="/hidden/' + url_pas(data[1]) + '?num=' + data[0] + '">(숨김)'
             elif(not hide):
                 hidden = ''
             else:
@@ -3014,7 +3023,7 @@ def recent_changes(name = None, num = 1, what = 'all', tool = 'record'):
                 style[1] = 'background: gainsboro;'
 
             if(tool == 'history'):
-                title = '<a href="/w/' + url_pas(name) + '/r/' + data[0] + '">' + data[0] + '판</a> <a href="/raw/' + url_pas(name) + '/r/' + data[0] + '">(원본)</a> '
+                title = '<a href="/w/' + url_pas(name) + '?num=' + data[0] + '">' + data[0] + '판</a> <a href="/raw/' + url_pas(name) + '?num=' + data[0] + '">(원본)</a> '
             else:
                 title = '<a href="/w/' + url_pas(data[1]) + '">' + html.escape(data[1]) + '</a> <a href="/history/' + url_pas(data[1]) + '">(' + data[0] + '판)</a> '
                     
@@ -3031,7 +3040,7 @@ def recent_changes(name = None, num = 1, what = 'all', tool = 'record'):
                 sub += ' (역사)'
                 menu = [['w/' + url_pas(name), '문서'], ['move_data/' + url_pas(name), '이동 기록']]
                 
-                div += next_fix('/history/' + url_pas(name) + '/num/', num, data_list)
+                div += next_fix('/history/' + url_pas(name) + '?num=', num, data_list)
             else:
                 curs.execute("select end, why from ban where block = ?", [name])
                 ban_it = curs.fetchall()
@@ -3040,7 +3049,7 @@ def recent_changes(name = None, num = 1, what = 'all', tool = 'record'):
 
                 title = '편집 기록'
                 menu = [['other', '기타'], ['user', '사용자'], ['count/' + url_pas(name), '횟수'], ['topic_record/' + url_pas(name), '토론 기록']]
-                div += next_fix('/record/' + url_pas(name) + '/' + url_pas(what) + '/', num, data_list)
+                div += next_fix('/record/' + url_pas(name) + '/' + url_pas(what) + '?num=', num, data_list)
 
                 if(what != 'all'):
                     menu += [['record/' + url_pas(name), '일반']]
@@ -3222,7 +3231,7 @@ def watch_list():
         menu = [['manager', '관리자']]
     )))
 
-@route('/watch_list/<name:path>')
+@route('/watch_list/<name>')
 def watch_list(name = None):
     ip = ip_check()
     if(re.search('\.|:', ip)):
@@ -3307,7 +3316,7 @@ def custom_head_view():
         )))
 
 @route('/count')
-@route('/count/<name:path>')
+@route('/count/<name>')
 def count_edit(name = None):
     if(name == None):
         that = ip_check()
