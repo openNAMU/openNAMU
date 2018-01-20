@@ -2029,7 +2029,7 @@ def topic(name = None, sub = None):
 
         return(html_minify(template('index', 
             imp = [name, wiki_set(conn, 1), custom_data, other2([' (토론)', 0])],
-            data =  '<h2 id="topic_top_title">' + sub + '</h2>' + all_data + data,
+            data = '<h2 id="topic_top_title"><a href="#toc" id="s-1">1.<span style="margin-left: 5px;"></span></a>' + sub + '</h2><hr id="under_bar" style="margin-top: -5px;">' + all_data + data,
             menu = [['topic/' + url_pas(name), '목록']]
         )))
         
