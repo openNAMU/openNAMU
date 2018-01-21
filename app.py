@@ -2202,8 +2202,6 @@ def user_check(name = None):
     if(admin_check(conn, 4, 'check (' + name + ')') != 1):
         return(re_error(conn, '/error/3'))
 
-    
-
     curs.execute("select acl from user where id = ? or id = ?", [name, request.query.plus or 'None-Data'])
     user = curs.fetchall()
     if(user and user[0][0] != 'user'):
