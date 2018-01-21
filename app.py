@@ -110,6 +110,16 @@ try:
 except:
     pass
 
+try:
+    curs.execute("select data from other where name = 'robot'")
+    robot_test = curs.fetchall()
+    if(robot_test):
+        fw_test = open('./robots.txt', 'w')
+        fw_test.write(robot_test[0][0])
+        fw_test.close()
+except:
+    pass
+
 conn.commit()
 
 # 이미지 폴더 생성
@@ -360,6 +370,10 @@ def edit_set(num = 0):
                 curs.execute("insert into other (name, data) values ('robot', ?)", [request.forms.content])
             conn.commit()
 
+            fw = open('./robots.txt', 'w')
+            fw.write(request.forms.content)
+            fw.close()
+            
             admin_check(conn, None, 'edit_set')
             return(redirect('/edit_set/4'))
         else:
@@ -3349,12 +3363,7 @@ def views(name = None):
 
 @route('/robots.txt')
 def random():
-    curs.execute("select data from other where name = 'robot'")
-    data = curs.fetchall()
-    if(data):
-        return(data[0][0])
-    else:
-        return('')
+    return(static_file('robots.txt', root = './'))
 
 @error(404)
 def error_404(error):
