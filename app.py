@@ -263,25 +263,25 @@ def edit_set(num = 0):
             return(html_minify(template('index', 
                 imp = ['기본 설정', wiki_set(conn, 1), custom(conn), other2([0, 0])],
                 data = '<form method="post"> \
-                            <span>이름</span><hr> \
+                            <span>이름</span><br><br> \
                             <input placeholder="이름" type="text" name="name" value="' + html.escape(d_list[0]) + '"><hr> \
-                            <span>로고 (HTML)</span><hr> \
+                            <span>로고 (HTML)</span><br><br> \
                             <input placeholder="로고" type="text" name="logo" value="' + html.escape(d_list[1]) + '"><hr> \
-                            <span>대문</span><hr> \
+                            <span>대문</span><br><br> \
                             <input placeholder="대문" type="text" name="frontpage" value="' + html.escape(d_list[2]) + '"><hr> \
-                            <span>라이선스 (HTML)</span><hr> \
+                            <span>라이선스 (HTML)</span><br><br> \
                             <input placeholder="라이선스" type="text" name="license" value="' + html.escape(d_list[3]) + '"><hr> \
-                            <span>파일 크기 [메가]</span><hr> \
+                            <span>파일 크기 [메가]</span><br><br> \
                             <input placeholder="파일 크기" type="text" name="upload" value="' + html.escape(d_list[4]) + '"><hr> \
-                            <span>스킨</span><hr> \
+                            <span>스킨</span><br><br> \
                             <input placeholder="스킨" type="text" name="skin" value="' + html.escape(d_list[5]) + '"><hr> \
-                            <span>전역 ACL</span><hr> \
+                            <span>전역 ACL</span><br><br> \
                             <select name="edit">' + div + '</select><hr> \
                             <input type="checkbox" name="reg" ' + ch_1 + '> 가입불가<hr> \
                             <input type="checkbox" name="ip_view" ' + ch_2 + '> 아이피 비공개<hr> \
                             <input type="checkbox" name="all_title" ' + ch_3 + '> 모든 문서 보기 비활성화<hr> \
                             <span>백업 간격 [시간] (끄기 : 0) {재시작 필요}</span><hr> \
-                            <input placeholder="백업 간격" type="text" name="back_up" value="' + html.escape(d_list[9]) + '"><hr> \
+                            <input placeholder="백업 간격" type="text" name="back_up" value="' + html.escape(d_list[9]) + '"><br> \
                             <button class="btn btn-primary" type="submit">저장</button> \
                         </form>',
                 menu = [['edit_set', '설정 편집']]
@@ -289,13 +289,14 @@ def edit_set(num = 0):
     elif(num == 2):
         if(request.method == 'POST'):
             curs.execute("update other set data = ? where name = ?", [request.forms.contract, 'contract'])
+            curs.execute("update other set data = ? where name = ?", [request.forms.no_login_warring, 'no_login_warring'])
             conn.commit()
 
             admin_check(conn, None, 'edit_set')
             return(redirect('/edit_set/2'))
         else:
-            i_list = ['contract']
-            n_list = ['']
+            i_list = ['contract', 'no_login_warring']
+            n_list = ['', '']
             d_list = []
             
             x = 0
@@ -314,8 +315,10 @@ def edit_set(num = 0):
             return(html_minify(template('index', 
                 imp = ['문구 관련', wiki_set(conn, 1), custom(conn), other2([0, 0])],
                 data = '<form method="post"> \
-                            <span>가입 약관</span><hr> \
+                            <span>가입 약관</span><br><br> \
                             <input placeholder="가입 약관" type="text" name="contract" value="' + html.escape(d_list[0]) + '"><hr> \
+                            <span>비 로그인 경고</span><br><br> \
+                            <input placeholder="비 로그인 경고" type="text" name="no_login_warring" value="' + html.escape(d_list[1]) + '"><hr> \
                             <button class="btn btn-primary" type="submit">저장</button> \
                         </form>',
                 menu = [['edit_set', '설정 편집']]
@@ -405,9 +408,9 @@ def edit_set(num = 0):
             return(html_minify(template('index', 
                 imp = ['구글 관련', wiki_set(conn, 1), custom(conn), other2([0, 0])],
                 data = '<form method="post"> \
-                            <span>리캡차 (HTML)</span><hr> \
+                            <span>리캡차 (HTML)</span><br><br> \
                             <input placeholder="리캡차 (HTML)" type="text" name="recaptcha" value="' + html.escape(d_list[0]) + '"><hr> \
-                            <span>리캡차 (비밀키)</span><hr> \
+                            <span>리캡차 (비밀키)</span><br><br> \
                             <input placeholder="리캡차 (비밀키)" type="text" name="sec_re" value="' + html.escape(d_list[1]) + '"><hr> \
                             <button class="btn btn-primary" type="submit">저장</button> \
                         </form>',
@@ -1065,20 +1068,13 @@ def revert(name = None):
         if(not curs.fetchall()):
             return(redirect('/w/' + url_pas(name)))
 
-        custom_data = custom(conn)
-        captcha = captcha_get(conn)
-        if(custom_data[2] == 0):
-            ip_warring = '<span>비 로그인 상태입니다. 비 로그인으로 진행 시 아이피가 역사에 기록됩니다.</span><hr>'
-        else:
-            ip_warring = ''
-
         return(html_minify(template('index', 
-            imp = [name, wiki_set(conn, 1), custom_data, other2([' (되돌리기)', 0])],
+            imp = [name, wiki_set(conn, 1), custom(conn), other2([' (되돌리기)', 0])],
             data =  '<form method="post"> \
                         <span>' + request.query.num + '판으로 되돌리겠습니까?</span><hr> \
-                        ' + ip_warring + ' \
+                        ' + ip_warring(conn) + ' \
                         <input placeholder="사유" name="send" type="text"><hr> \
-                        ' + captcha + ' \
+                        ' + captcha_get(conn) + ' \
                         <button class="btn btn-primary" type="submit">되돌리기</button> \
                     </form>',
             menu = [['history/' + url_pas(name), '역사'], ['recent_changes', '최근 변경']]
@@ -1382,7 +1378,6 @@ def edit(name = None):
             get_name = ''
             action = '?section=' + request.query.section
             
-        captcha = captcha_get(conn)
         if(request.query.froms):
             curs.execute("select data from data where title = ?", [request.query.froms])
             get_data = curs.fetchall()
@@ -1397,7 +1392,8 @@ def edit(name = None):
                         <textarea rows="25" name="content">' + html.escape(data) + '</textarea> \
                         <textarea style="display: none;" name="otent">' + html.escape(data2) + '</textarea><hr> \
                         <input placeholder="사유" name="send" type="text"><hr> \
-                        ' + captcha + ' \
+                        ' + captcha_get(conn) + ' \
+                        ' + ip_warring(conn) + ' \
                         <button id="preview" class="btn btn-primary" type="submit">저장</button> \
                         <button id="preview" class="btn" type="submit" formaction="/preview/' + url_pas(name) + action + '">미리보기</button> \
                     </form>',
@@ -1419,7 +1415,6 @@ def preview(name = None):
     newdata = request.forms.content
     newdata = re.sub('^#(?:redirect|넘겨주기) (?P<in>[^\n]*)', ' * [[\g<in>]] 문서로 넘겨주기', newdata)
     enddata = namumark(conn, name, newdata, 0, 0, 1)
-    captcha = captcha_get(conn)
 
     if(request.query.section):
         action = '?section=' + request.query.section
@@ -1432,7 +1427,7 @@ def preview(name = None):
                     <textarea rows="25" name="content">' + html.escape(request.forms.content) + '</textarea> \
                     <textarea style="display: none;" name="otent">' + html.escape(request.forms.otent) + '</textarea><hr> \
                     <input placeholder="사유" name="send" type="text"><hr> \
-                    ' + captcha + ' \
+                    ' + captcha_get(conn) + ' \
                     <button id="preview" class="btn btn-primary" type="submit">저장</button> \
                     <button id="preview" class="btn" type="submit" formaction="/preview/' + url_pas(name) + action + '">미리보기</button> \
                 </form><hr>' + enddata,
@@ -1475,19 +1470,12 @@ def delete(name = None):
         if(not curs.fetchall()):
             return(redirect('/w/' + url_pas(name)))
 
-        custom_data = custom(conn)
-        captcha = captcha_get(conn)
-        if(custom_data[2] == 0):
-            ip_warring = '<span>비 로그인 상태입니다. 비 로그인으로 진행 시 아이피가 역사에 기록됩니다.</span><hr>'
-        else:
-            ip_warring = ''
-
         return(html_minify(template('index', 
-            imp = [name, wiki_set(conn, 1), custom_data, other2([' (삭제)', 0])],
+            imp = [name, wiki_set(conn, 1), custom(conn), other2([' (삭제)', 0])],
             data = '<form method="post"> \
-                        ' + ip_warring + ' \
+                        ' + ip_warring(conn) + ' \
                         <input placeholder="사유" name="send" type="text"><hr> \
-                        ' + captcha + ' \
+                        ' + captcha_get(conn) + ' \
                         <button class="btn btn-primary" type="submit">삭제</button> \
                     </form>',
             menu = [['w/' + url_pas(name), '문서']]
@@ -1559,21 +1547,14 @@ def move(name = None):
         conn.commit()
         
         return(redirect('/w/' + url_pas(request.forms.title)))
-    else:
-        custom_data = custom(conn)
-        captcha = captcha_get(conn)
-        if(custom_data[2] == 0):
-            ip_warring = '<span>비 로그인 상태입니다. 비 로그인으로 진행 시 아이피가 역사에 기록됩니다.</span><hr>'
-        else:
-            ip_warring = ''
-            
+    else:            
         return(html_minify(template('index', 
             imp = [name, wiki_set(conn, 1), custom_data, other2([' (이동)', 0])],
             data = '<form method="post"> \
-                        ' + ip_warring + ' \
+                        ' + ip_warring(conn) + ' \
                         <input placeholder="문서명" value="' + name + '" name="title" type="text"><hr> \
                         <input placeholder="사유" name="send" type="text"><hr> \
-                        ' + captcha + ' \
+                        ' + captcha_get(conn) + ' \
                         <button class="btn btn-primary" type="submit">이동</button> \
                     </form>',
             menu = [['w/' + url_pas(name), '문서']]
@@ -2017,19 +1998,17 @@ def topic(name = None, sub = None):
             all_data += '</td></tr><tr ' + blind_data + '><td>' + user_write + '</td></tr></tbody></table><br>'
             number += 1
 
-        custom_data = custom(conn)
-        captcha = captcha_get(conn)
         if(ban != 1 or admin == 1):
             data += '<a id="reload" href="javascript:void(0);" onclick="location.href.endsWith(\'#reload\') ?  location.reload(true) : location.href = \'#reload\'"><i aria-hidden="true" class="fa fa-refresh"></i></a>'
-            data += '<form style="' + display + '" method="post"><br><textarea style="height: 100px;" name="content"></textarea><hr>' + captcha
+            data += '<form style="' + display + '" method="post"><br><textarea style="height: 100px;" name="content"></textarea><hr>' + captcha_get(conn)
             
-            if(custom_data[2] == 0 and display == ''):
-                data += '<span>비 로그인 상태입니다. 비 로그인으로 진행 시 아이피가 토론에 기록됩니다.</span><hr>'
+            if(display == ''):
+                data += ip_warring(conn)
 
             data += '<button class="btn btn-primary" type="submit">전송</button></form>'
 
         return(html_minify(template('index', 
-            imp = [name, wiki_set(conn, 1), custom_data, other2([' (토론)', 0])],
+            imp = [name, wiki_set(conn, 1), custom(conn), other2([' (토론)', 0])],
             data = '<h2 id="topic_top_title"><a href="#toc" id="s-1">1.<span style="margin-left: 5px;"></span></a>' + sub + '</h2><hr id="under_bar" style="margin-top: -5px;">' + all_data + data,
             menu = [['topic/' + url_pas(name), '목록']]
         )))
@@ -2143,14 +2122,12 @@ def login():
         
         return(redirect('/user'))                            
     else:        
-        captcha = captcha_get(conn)
-
         return(html_minify(template('index',    
             imp = ['로그인', wiki_set(conn, 1), custom(conn), other2([0, 0])],
             data = '<form method="post"> \
                         <input placeholder="아이디" name="id" type="text"><hr> \
                         <input placeholder="비밀번호" name="pw" type="password"><hr> \
-                        ' + captcha + ' \
+                        ' + captcha_get(conn) + ' \
                         <button class="btn btn-primary" type="submit">로그인</button><hr> \
                         <span>주의 : 만약 HTTPS 연결이 아닌 경우 데이터가 유출될 가능성이 있습니다. 이에 대해 책임지지 않습니다.</span> \
                     </form>',
@@ -2308,8 +2285,6 @@ def register():
         if(data and data[0][0] != ''):
             contract = data[0][0] + '<hr>'
 
-        captcha = captcha_get(conn)
-
         return(html_minify(template('index',    
             imp = ['회원가입', wiki_set(conn, 1), custom(conn), other2([0, 0])],
             data = '<form method="post"> \
@@ -2317,7 +2292,7 @@ def register():
                         <input placeholder="아이디" name="id" type="text"><hr> \
                         <input placeholder="비밀번호" name="pw" type="password"><hr> \
                         <input placeholder="다시" name="pw2" type="password"><hr> \
-                        ' + captcha + ' \
+                        ' + captcha_get(conn) + ' \
                         <button class="btn btn-primary" type="submit">가입</button><hr> \
                         <span>주의 : 만약 HTTPS 연결이 아닌 경우 데이터가 유출될 가능성이 있습니다. 이에 대해 책임지지 않습니다.</span> \
                     </form>',
@@ -3129,14 +3104,13 @@ def upload():
         
         return(redirect('/w/파일:' + name))            
     else:
-        captcha = captcha_get(conn)
         return(html_minify(template('index', 
             imp = ['파일 올리기', wiki_set(conn, 1), custom(conn), other2([0, 0])],
             data =  '<form method="post" enctype="multipart/form-data" accept-charset="utf8"> \
                         <input type="file" name="f_data"><hr> \
                         <input placeholder="파일 이름" name="f_name" type="text"><hr> \
                         <input placeholder="라이선스" name="f_lice" type="text"><hr> \
-                        ' + captcha + ' \
+                        ' + captcha_get(conn) + ' \
                         <button class="btn btn-primary" type="submit">저장</button> \
                     </form>',
             menu = [['other', '기타']]
