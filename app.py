@@ -572,7 +572,7 @@ def admin_list():
 @route('/hidden/<name:path>')
 def history_hidden(name = None):
     num = request.query.num or None
-    if(int(num)):
+    if(num):
         num = int(num)
 
         if(admin_check(conn, 6, 'history_hidden (' + name + '#' + str(num) + ')') == 1):
@@ -2688,7 +2688,7 @@ def read_view(name = None):
                     d = re.sub('([^\n]+)\n', '', d, 1)
                 session['View_List'] = d
         else:
-            if(int(num)):
+            if(num):
                 num = int(num)
 
             session['View_List'] = name + '\n'
