@@ -2800,8 +2800,9 @@ def read_view(name = None):
         menu = [['edit/' + url_pas(name), '생성'], ['topic/' + url_pas(name), topic], ['history/' + url_pas(name), '역사'], ['move/' + url_pas(name), '이동'], ['xref/' + url_pas(name), '역링크']]
     else:
         menu = [['edit/' + url_pas(name), '수정'], ['topic/' + url_pas(name), topic], ['history/' + url_pas(name), '역사'], ['delete/' + url_pas(name), '삭제'], ['move/' + url_pas(name), '이동'], ['raw/' + url_pas(name), '원본'], ['xref/' + url_pas(name), '역링크']]
-        if(admin_memu == 1):
-            menu += [['acl/' + url_pas(name), 'ACL']]
+        
+    if(admin_memu == 1):
+        menu += [['acl/' + url_pas(name), 'ACL']]
 
     if(request.query.froms):
         menu += [['w/' + url_pas(name), '넘기기']]
