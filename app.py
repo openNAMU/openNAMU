@@ -3350,9 +3350,9 @@ def views(name = None):
 @route('/robots.txt')
 def random():
     curs.execute("select data from other where name = 'robot'")
-    d = curs.fetchall()
-    if(d):
-        return('<pre>' + d[0][0] + '</pre>')
+    data = curs.fetchall()
+    if(data):
+        return(data[0][0])
     else:
         return('')
 
