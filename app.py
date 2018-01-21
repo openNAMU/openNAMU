@@ -1073,9 +1073,10 @@ def revert(name = None):
             ip_warring = ''
 
         return(html_minify(template('index', 
-            imp = [name, wiki_set(conn, 1), custom_data, other2([' (되돌리기) (' + request.query.num + '판)', 0])],
-            data =  ip_warring + ' \
-                    <form method="post"> \
+            imp = [name, wiki_set(conn, 1), custom_data, other2([' (되돌리기)', 0])],
+            data =  '<form method="post"> \
+                        <span>' + request.query.num + '판으로 되돌리겠습니까?</span><hr> \
+                        ' + ip_warring + ' \
                         <input placeholder="사유" name="send" type="text"><hr> \
                         ' + captcha + ' \
                         <button class="btn btn-primary" type="submit">되돌리기</button> \
@@ -2475,7 +2476,7 @@ def acl(name = None):
 
         if(request.forms.select == 'admin'):
             sql = 'admin'
-        if(request.forms.select == 'all'):
+        elif(request.forms.select == 'all'):
             sql = 'all'
         elif(request.forms.select == 'user'):
             sql = 'user'
@@ -2509,47 +2510,34 @@ def acl(name = None):
                 return(re_error(conn, '/error/3'))
 
         acl_list = ['', '', '']
-        if(test):
-            curs.execute("select dec from acl where title = ?", [name])
-            acl_d = curs.fetchall()
-            if(acl_d):
-                if(acl_d[0][0] == 'all'):
-                    now = '모두'
-                    acl_list[0] = 'selected="selected"'
-                elif(acl_d[0][0] == 'user'):
-                    now = '가입자'
-                    acl_list[1] = 'selected="selected"'
-                else:
-                    now = '일반'
-                    acl_list[2] = 'selected="selected"'
+        curs.execute("select dec from acl where title = ?", [name])
+        acl_d = curs.fetchall()
+        if(acl_d):
+            if(test and acl_d[0][0] == 'all'):
+                now = '모두'
+                acl_list[0] = 'selected="selected"'
+            elif(not test and acl_d[0][0] == 'admin'):
+                now = '관리자'
+                acl_list[0] = 'selected="selected"'
+            elif(acl_d[0][0] == 'user'):
+                now = '가입자'
+                acl_list[1] = 'selected="selected"'
             else:
                 now = '일반'
                 acl_list[2] = 'selected="selected"'
+        else:
+            now = '일반'
+            acl_list[2] = 'selected="selected"'
 
+        if(test):
             plus = '<option value="all" ' + acl_list[0] + '>모두</option>'
         else:
-            curs.execute("select dec from acl where title = ?", [name])
-            acl_d = curs.fetchall()
-            if(acl_d):
-                if(acl_d[0][0] == 'admin'):
-                    now = '관리자'
-                    acl_list[0] = 'selected="selected"'
-                elif(acl_d[0][0] == 'user'):
-                    now = '가입자'
-                    acl_list[1] = 'selected="selected"'
-                else:
-                    now = '일반'
-                    acl_list[2] = 'selected="selected"'
-            else:
-                now = '일반'
-                acl_list[2] = 'selected="selected"'
-
             plus = '<option value="admin" ' + acl_list[0] + '>관리자</option>'
             
         return(html_minify(template('index', 
             imp = [name, wiki_set(conn, 1), custom(conn), other2([' (ACL)', 0])],
-            data = '<span>현재 ACL : ' + now + '</span><hr> \
-                    <form method="post"> \
+            data = '<form method="post"> \
+                        <span>현재 ACL : ' + now + '</span><hr> \
                         <select name="select"> \
                             ' + plus + ' \
                             <option value="user" ' + acl_list[1] + '>가입자</option> \
