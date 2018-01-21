@@ -574,18 +574,16 @@ def admin_list():
         
 @route('/hidden/<name:path>')
 def history_hidden(name = None):
-    num = request.query.num or None
-    if(num):
-        num = int(num)
+    num = int(request.query.num or 0)
 
-        if(admin_check(conn, 6, 'history_hidden (' + name + '#' + str(num) + ')') == 1):
-            curs.execute("select title from history where title = ? and id = ? and hide = 'O'", [name, str(num)])
-            if(curs.fetchall()):
-                curs.execute("update history set hide = '' where title = ? and id = ?", [name, str(num)])
-            else:
-                curs.execute("update history set hide = 'O' where title = ? and id = ?", [name, str(num)])
-                
-            conn.commit()
+    if(admin_check(conn, 6, 'history_hidden (' + name + '#' + str(num) + ')') == 1):
+        curs.execute("select title from history where title = ? and id = ? and hide = 'O'", [name, str(num)])
+        if(curs.fetchall()):
+            curs.execute("update history set hide = '' where title = ? and id = ?", [name, str(num)])
+        else:
+            curs.execute("update history set hide = 'O' where title = ? and id = ?", [name, str(num)])
+            
+        conn.commit()
     
     return(redirect('/history/' + url_pas(name)))
         
@@ -977,7 +975,9 @@ def raw_view(name = None, sub_t = None, num = None):
     v_name = name
     sub = ' (원본)'
     if(not num):
-        num = int(request.query.num or None)
+        num = request.query.num or None
+        if(num):
+            num = int(num)
     
     if(not sub_t and num):
         curs.execute("select title from history where title = ? and id = ? and hide = 'O'", [name, str(num)])
@@ -1019,7 +1019,7 @@ def revert(name = None):
     ip = ip_check()
     can = acl_check(conn, name)
     today = get_time()
-    num = int(request.query.num or None)
+    num = int(request.query.num or 0)
     
     if(request.method == 'POST'):
         if(captcha_post(request.forms.get('g-recaptcha-response'), conn) == 1):
@@ -2188,7 +2188,9 @@ def user_check(name = None):
     if(admin_check(conn, 4, 'check (' + name + ')') != 1):
         return(re_error(conn, '/error/3'))
 
-    curs.execute("select acl from user where id = ? or id = ?", [name, request.query.plus])
+    
+
+    curs.execute("select acl from user where id = ? or id = ?", [name, request.query.plus or 'None-Data'])
     user = curs.fetchall()
     if(user and user[0][0] != 'user'):
         if(admin_check(conn, None, None) != 1):
@@ -2639,6 +2641,9 @@ def read_view(name = None):
     div = ''
     topic = 0
     num = request.query.num or None
+
+    if(num):
+        num = int(num)
     
     if(not num):
         session = request.environ.get('beaker.session')
@@ -2651,9 +2656,6 @@ def read_view(name = None):
                     d = re.sub('([^\n]+)\n', '', d, 1)
                 session['View_List'] = d
         else:
-            if(num):
-                num = int(num)
-
             session['View_List'] = name + '\n'
 
 
