@@ -25,7 +25,7 @@ def captcha_get(conn):
     curs = conn.cursor()
 
     data = ''
-    if(re.search('\.|:', ip_check())):
+    if(custom(conn)[2] == 0):
         curs.execute('select data from other where name = "recaptcha"')
         recaptcha = curs.fetchall()
         if(recaptcha and recaptcha[0][0] != ''):
@@ -41,7 +41,7 @@ def captcha_post(response, conn, num = 1):
     curs = conn.cursor()
 
     if(num == 1):
-        if(re.search('\.|:', ip_check()) and captcha_get(conn) != ''):
+        if(custom(conn)[2] == 0 and captcha_get(conn) != ''):
             curs.execute('select data from other where name = "sec_re"')
             sec_re = curs.fetchall()
             if(sec_re and sec_re[0][0] != ''):
@@ -62,6 +62,21 @@ def captcha_post(response, conn, num = 1):
             return(0)
     else:
         pass
+
+def ip_warring(conn):
+    curs = conn.cursor()
+
+    if(custom(conn)[2] == 0):    
+        curs.execute('select data from other where name = "no_login_warring"')
+        data = curs.fetchall()
+        if(data and data[0][0] != ''):
+            text_data = '<span>' + data[0][0] + '</span><hr>'
+        else:
+            text_data = '<span>비 로그인 상태입니다. 비 로그인으로 진행 시 아이피가 기록됩니다.</span><hr>'
+    else:
+        text_data = ''
+
+    return(text_data)
 
 def skin_check(conn):
     curs = conn.cursor()
