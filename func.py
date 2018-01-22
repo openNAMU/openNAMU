@@ -37,8 +37,6 @@ def captcha_get(conn):
 def captcha_post(test, conn, num = 1):
     curs = conn.cursor()
 
-    print('TEST')
-
     if(num == 1):
         if(custom(conn)[2] == 0 and captcha_get(conn) != ''):
             curs.execute('select data from other where name = "sec_re"')
