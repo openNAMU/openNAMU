@@ -1574,7 +1574,7 @@ def move(name = None):
         return(redirect('/w/' + url_pas(request.form['title'])))
     else:            
         return(html_minify(template('index', 
-            imp = [name, wiki_set(conn, 1), custom_data, other2([' (이동)', 0])],
+            imp = [name, wiki_set(conn, 1), custom(conn), other2([' (이동)', 0])],
             data = '<form method="post"> \
                         ' + ip_warring(conn) + ' \
                         <input placeholder="문서명" value="' + name + '" name="title" type="text"><hr> \
@@ -3161,14 +3161,13 @@ def user_info():
     else:
         ip_user = ip
 
-    custom_data = custom(conn)
-    if(custom_data[2] != 0):
+    if(custom(conn)[2] != 0):
         plus = ' * [[wiki:logout|로그아웃]]\r\n * [[wiki:change|비밀번호 변경]]'
     else:
         plus = ' * [[wiki:login|로그인]]'
 
     return(html_minify(template('index', 
-        imp = ['사용자 메뉴', wiki_set(conn, 1), custom_data, other2([0, 0])],
+        imp = ['사용자 메뉴', wiki_set(conn, 1), custom(conn), other2([0, 0])],
         data =  namumark(conn, '',  '[목차(없음)]\r\n' + \
                                     '== 상태 ==\r\n' + \
                                     ' * ' + ip_user + '\r\n'
