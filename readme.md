@@ -14,7 +14,7 @@
  * git clone https://github.com/2DU/openNAMU.git
 
 ### 베타
- * git clone -b beta https://github.com/2DU/openNAMU.git 
+ * git clone -b master https://github.com/2DU/openNAMU.git 
  
 ## 의존성
  * [파이썬](https://www.python.org/downloads/) 3.5 이상
