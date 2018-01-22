@@ -1,5 +1,7 @@
-﻿from bottle import request, app, template
-from bottle.ext import beaker
+﻿from bottle import template
+
+from flask import session
+
 import json
 import sqlite3
 import hashlib
@@ -16,12 +18,8 @@ from set_mark.macro import ip_check
 from set_mark.mark import *
 from set_mark.link import url_pas
 from set_mark.link import sha224
-    
-session_opts = { 'session.type' : 'dbm', 'session.data_dir' : './app_session/', 'session.auto' : 1 }
-app = beaker.middleware.SessionMiddleware(app(), session_opts)
 
 def captcha_get(conn):
-    session = request.environ.get('beaker.session')
     curs = conn.cursor()
 
     data = ''
@@ -36,16 +34,17 @@ def captcha_get(conn):
 
     return(data)
 
-def captcha_post(response, conn, num = 1):
-    session = request.environ.get('beaker.session')
+def captcha_post(test, conn, num = 1):
     curs = conn.cursor()
+
+    print('TEST')
 
     if(num == 1):
         if(custom(conn)[2] == 0 and captcha_get(conn) != ''):
             curs.execute('select data from other where name = "sec_re"')
             sec_re = curs.fetchall()
             if(sec_re and sec_re[0][0] != ''):
-                data = requests.get('https://www.google.com/recaptcha/api/siteverify', params = { 'secret' : sec_re, 'response' : response })
+                data = requests.get('https://www.google.com/recaptcha/api/siteverify', params = { 'secret' : sec_re, 'response' : test })
 
                 if(not data):
                     return(0)
@@ -106,9 +105,8 @@ def next_fix(link, num, page, end = 50):
 
 def other2(origin):
     div = ''
-    session = request.environ.get('beaker.session')
-    if(session.get('View_List')):
-        match = re.findall('(?:(?:([^\n]+)\n))', session.get('View_List'))
+    if('View_List' in session):
+        match = re.findall('(?:(?:([^\n]+)\n))', session['View_List'])
         if(match):
             div = ''
             for data in match[-6:-1]:
@@ -252,13 +250,12 @@ def ip_pas(conn, raw_ip):
 
 def custom(conn):
     curs = conn.cursor()
-    session = request.environ.get('beaker.session')
-    try:
+    if('MyMaiToNight' in session):
         user_head = session['MyMaiToNight']
-    except:
+    else:
         user_head = ''
 
-    if(session.get('Now') == 1):
+    if('Now' in session and session['Now'] == 1):
         curs.execute('select name from alarm where name = ? limit 1', [ip_check()])
         if(curs.fetchall()):
             user_icon = 2
