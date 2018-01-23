@@ -21,7 +21,7 @@ Reggie(app)
 random_key = str(random.randint(1, 10000000))
 print('비밀키 : ' + random_key)
 
-r_ver = 'v2.6.0 alpha'
+r_ver = 'v2.6.0 beta'
 
 from func import *
 from set_mark.mid_pas import mid_pas
@@ -467,7 +467,7 @@ def not_close_topic():
 @app.route('/image/<name>')
 def image_view(name = None):
     if(os.path.exists(os.path.join('image', name))):
-        return(send_from_directory(name, 'image'))
+        return(send_from_directory('./image', name))
     else:
         return(redirect('/'))
 
@@ -1604,7 +1604,7 @@ def other():
                             ' * [[wiki:title_index|모든 문서]]\r\n' + \
                             ' * [[wiki:acl_list|ACL 문서]]\r\n' + \
                             ' * [[wiki:please|필요한 문서]]\r\n' + \
-#                            ' * [[wiki:upload|파일 올리기]]\r\n' + \
+                            ' * [[wiki:upload|파일 올리기]]\r\n' + \
                             ' * [[wiki:manager/10|문서 검색]]\r\n' + \
                             '== 관리자 ==\r\n' + \
                             ' * [[wiki:manager/1|관리자 메뉴]]\r\n' + \
@@ -3057,7 +3057,6 @@ def recent_changes(name = None, tool = 'record'):
             menu = menu
         )))
     
-'''
 @app.route('/upload', methods=['GET', 'POST'])
 def upload():
     if(ban_check(conn) == 1):
@@ -3069,7 +3068,7 @@ def upload():
         else:
             captcha_post('', conn, 0)
 
-        data = request.files['get']('f_data')
+        data = request.files['f_data']
         if(not data):
             return(re_error(conn, '/error/9'))
 
@@ -3077,8 +3076,6 @@ def upload():
             return(re_error(conn, '/error/17'))
         
         value = os.path.splitext(data.filename)[1]
-        if(not value):
-            return(re_error(conn, '/error/22'))
 
         if(not value in ['.jpeg', '.jpg', '.gif', '.png', '.webp', '.JPEG', '.JPG', '.GIF', '.PNG', '.WEBP']):
             return(re_error(conn, '/error/14'))
@@ -3089,6 +3086,10 @@ def upload():
             name = data.filename
         
         piece = os.path.splitext(name)
+
+        if(re.search('[^ㄱ-힣0-9a-zA-Z_\- ]', piece[0])):
+            return(re_error(conn, '/error/22'))
+
         e_data = sha224(piece[0]) + piece[1]
 
         curs.execute("select title from data where title = ?", ['파일:' + name])
@@ -3133,7 +3134,6 @@ def upload():
                     </form>',
             menu = [['other', '기타']]
         )))  
-'''
         
 @app.route('/user')
 def user_info():
