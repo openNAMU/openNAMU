@@ -213,32 +213,23 @@ def edit_set(num = 0):
             li_data += ' * [[wiki:edit_set/' + str(x) + '|' + li + ']]\r\n'
 
         return(html_minify(template('index', 
-            imp = ['설정 편집', wiki_set(conn, 1), custom(conn), other2([0, 0])],
+            imp = ['설정', wiki_set(conn, 1), custom(conn), other2([0, 0])],
             data = namumark(conn, '',   '[목차(없음)]\r\n' + \
                                         '== 메뉴 ==\r\n' + \
                                         li_data, 0, 0, 0),
             menu = [['manager', '관리자']]
         )))
     elif(num == 1):
+        i_list = ['name', 'logo', 'frontpage', 'license', 'upload', 'skin', 'edit', 'reg', 'ip_view', 'back_up', 'all_title']
         if(request.method == 'POST'):
-            curs.execute("update other set data = ? where name = ?", [request.form['name'], 'name'])
-            curs.execute("update other set data = ? where name = ?", [request.form['logo'], 'logo'])
-            curs.execute("update other set data = ? where name = 'frontpage'", [request.form['frontpage']])
-            curs.execute("update other set data = ? where name = 'license'", [request.form['license']])
-            curs.execute("update other set data = ? where name = 'upload'", [request.form['upload']])
-            curs.execute("update other set data = ? where name = 'skin'", [request.form['skin']])
-            curs.execute("update other set data = ? where name = 'edit'", [request.form['edit']])
-            curs.execute("update other set data = ? where name = 'reg'", [request.form['reg']])
-            curs.execute("update other set data = ? where name = 'ip_view'", [request.form['ip_view']])
-            curs.execute("update other set data = ? where name = 'back_up'", [request.form['back_up']])
-            curs.execute("update other set data = ? where name = 'all_title'", [request.form['all_title']])
+            for data in i_list:
+                curs.execute("update other set data = ? where name = ?", [request.form[data], data])
             conn.commit()
 
             TEMPLATE_PATH.insert(0, skin_check(conn))
             admin_check(conn, None, 'edit_set')
             return(redirect('/edit_set/1'))
         else:
-            i_list = ['name', 'logo', 'frontpage', 'license', 'upload', 'skin', 'edit', 'reg', 'ip_view', 'back_up', 'all_title']
             n_list = ['무명위키', '', '위키:대문', 'CC 0', '2', '', 'normal', '', '', '0', '']
             d_list = []
             
@@ -302,10 +293,10 @@ def edit_set(num = 0):
                             <input type="checkbox" name="ip_view" ' + ch_2 + '> 아이피 비공개<hr> \
                             <input type="checkbox" name="all_title" ' + ch_3 + '> 모든 문서 보기 비활성화<hr> \
                             <span>백업 간격 [시간] (끄기 : 0) {재시작 필요}</span><hr> \
-                            <input placeholder="백업 간격" type="text" name="back_up" value="' + html.escape(d_list[9]) + '"><br> \
+                            <input placeholder="백업 간격" type="text" name="back_up" value="' + html.escape(d_list[9]) + '"><hr> \
                             <button class="btn btn-primary" type="submit">저장</button> \
                         </form>',
-                menu = [['edit_set', '설정 편집']]
+                menu = [['edit_set', '설정']]
             )))
     elif(num == 2):
         if(request.method == 'POST'):
@@ -342,7 +333,7 @@ def edit_set(num = 0):
                             <input placeholder="비 로그인 경고" type="text" name="no_login_warring" value="' + html.escape(d_list[1]) + '"><hr> \
                             <button class="btn btn-primary" type="submit">저장</button> \
                         </form>',
-                menu = [['edit_set', '설정 편집']]
+                menu = [['edit_set', '설정']]
             )))
     elif(num == 3):
         if(request.method == 'POST'):
@@ -370,7 +361,7 @@ def edit_set(num = 0):
                             <textarea rows="25" name="content">' + html.escape(data) + '</textarea><hr> \
                             <button class="btn btn-primary" type="submit">저장</button> \
                         </form>',
-                menu = [['edit_set', '설정 편집']]
+                menu = [['edit_set', '설정']]
             )))
     elif(num == 4):
         if(request.method == 'POST'):
@@ -402,7 +393,7 @@ def edit_set(num = 0):
                             <textarea rows="25" name="content">' + html.escape(data) + '</textarea><hr> \
                             <button class="btn btn-primary" type="submit">저장</button> \
                         </form>',
-                menu = [['edit_set', '설정 편집']]
+                menu = [['edit_set', '설정']]
             )))
     elif(num == 5):
         if(request.method == 'POST'):
@@ -439,7 +430,7 @@ def edit_set(num = 0):
                             <input placeholder="리캡차 (비밀키)" type="text" name="sec_re" value="' + html.escape(d_list[1]) + '"><hr> \
                             <button class="btn btn-primary" type="submit">저장</button> \
                         </form>',
-                menu = [['edit_set', '설정 편집']]
+                menu = [['edit_set', '설정']]
             )))
     else:
         return(redirect('/'))
