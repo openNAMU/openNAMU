@@ -1,5 +1,7 @@
-﻿from bottle import request, app, template
-from bottle.ext import beaker
+﻿from bottle import template
+
+from flask import session
+
 import json
 import sqlite3
 import hashlib
@@ -16,16 +18,12 @@ from set_mark.macro import ip_check
 from set_mark.mark import *
 from set_mark.link import url_pas
 from set_mark.link import sha224
-    
-session_opts = { 'session.type' : 'dbm', 'session.data_dir' : './app_session/', 'session.auto' : 1 }
-app = beaker.middleware.SessionMiddleware(app(), session_opts)
 
 def captcha_get(conn):
-    session = request.environ.get('beaker.session')
     curs = conn.cursor()
 
     data = ''
-    if(re.search('\.|:', ip_check())):
+    if(custom(conn)[2] == 0):
         curs.execute('select data from other where name = "recaptcha"')
         recaptcha = curs.fetchall()
         if(recaptcha and recaptcha[0][0] != ''):
@@ -36,16 +34,15 @@ def captcha_get(conn):
 
     return(data)
 
-def captcha_post(response, conn, num = 1):
-    session = request.environ.get('beaker.session')
+def captcha_post(test, conn, num = 1):
     curs = conn.cursor()
 
     if(num == 1):
-        if(re.search('\.|:', ip_check()) and captcha_get(conn) != ''):
+        if(custom(conn)[2] == 0 and captcha_get(conn) != ''):
             curs.execute('select data from other where name = "sec_re"')
             sec_re = curs.fetchall()
             if(sec_re and sec_re[0][0] != ''):
-                data = requests.get('https://www.google.com/recaptcha/api/siteverify', params = { 'secret' : sec_re, 'response' : response })
+                data = requests.get('https://www.google.com/recaptcha/api/siteverify', params = { 'secret' : sec_re, 'response' : test })
 
                 if(not data):
                     return(0)
@@ -62,6 +59,21 @@ def captcha_post(response, conn, num = 1):
             return(0)
     else:
         pass
+
+def ip_warring(conn):
+    curs = conn.cursor()
+
+    if(custom(conn)[2] == 0):    
+        curs.execute('select data from other where name = "no_login_warring"')
+        data = curs.fetchall()
+        if(data and data[0][0] != ''):
+            text_data = '<span>' + data[0][0] + '</span><hr>'
+        else:
+            text_data = '<span>비 로그인 상태입니다. 비 로그인으로 진행 시 아이피가 기록됩니다.</span><hr>'
+    else:
+        text_data = ''
+
+    return(text_data)
 
 def skin_check(conn):
     curs = conn.cursor()
@@ -91,9 +103,8 @@ def next_fix(link, num, page, end = 50):
 
 def other2(origin):
     div = ''
-    session = request.environ.get('beaker.session')
-    if(session.get('View_List')):
-        match = re.findall('(?:(?:([^\n]+)\n))', session.get('View_List'))
+    if('View_List' in session):
+        match = re.findall('(?:(?:([^\n]+)\n))', session['View_List'])
         if(match):
             div = ''
             for data in match[-6:-1]:
@@ -237,13 +248,12 @@ def ip_pas(conn, raw_ip):
 
 def custom(conn):
     curs = conn.cursor()
-    session = request.environ.get('beaker.session')
-    try:
+    if('MyMaiToNight' in session):
         user_head = session['MyMaiToNight']
-    except:
+    else:
         user_head = ''
 
-    if(session.get('Now') == 1):
+    if('Now' in session and session['Now'] == 1):
         curs.execute('select name from alarm where name = ? limit 1', [ip_check()])
         if(curs.fetchall()):
             user_icon = 2
@@ -499,7 +509,7 @@ def re_error(conn, data):
             data = '편집 필터에 의해 검열 되었습니다.'
         elif(num == 22):
             title = '파일 올리기 오류'
-            data = '파일을 읽을 수 없습니다. 파일명이 한글이면 영문으로 바꿔서 올려주세요.'
+            data = '파일 이름은 알파벳, 한글, 띄어쓰기, 언더바, 빼기표만 허용 됩니다.'
         else:
             title = '정체 불명의 오류'
             data = '???'
