@@ -19,6 +19,6 @@ def redirect_pas(data, title, backlink):
             
         a = href.replace('&#x27;', "'").replace('&quot;', '"').replace('\\\\', '<slash>').replace('\\', '').replace('<slash>', '\\')
         backlink += [[title, a, 'redirect']]
-        data = re.sub('\r\n#(?:redirect|넘겨주기) ((?:(?!\r|\n|%0D).)+)', '<meta http-equiv="refresh" content="0;url=/w/' + url_pas(a) + '/from/' + url_pas(title) + sh + '" />', data, 1)
+        data = re.sub('\r\n#(?:redirect|넘겨주기) ((?:(?!\r|\n|%0D).)+)', '<meta http-equiv="refresh" content="0;url=/w/' + url_pas(a) + '?froms=' + url_pas(title) + sh + '" />', data, 1)
         
     return([data, backlink])

@@ -1,18 +1,10 @@
-from bottle import request, app
-from bottle.ext import beaker
+from flask import session, request
+
 from urllib import parse
 import time
 import datetime
 import re
 import json
-
-session_opts = {
-    'session.type': 'dbm',
-    'session.data_dir': './app_session/',
-    'session.auto': 1
-}
-
-app = beaker.middleware.SessionMiddleware(app(), session_opts)
 
 def get_time():
     now = time.localtime()
@@ -21,19 +13,12 @@ def get_time():
     return(date)
     
 def ip_check():
-    session = request.environ.get('beaker.session')
-    try:
-        if(session.get('Now') == 1):
-            ip = format(session['DREAMER'])
-        else:
-            if(request.environ.get('HTTP_X_FORWARDED_FOR')):
-                ip = request.environ.get('HTTP_X_FORWARDED_FOR')
-            else:
-                ip = request.environ.get('REMOTE_ADDR')
-    except:
-        ip = 'None'
+    if(('Now' and 'DREAMER') in session and session['Now'] == 1):
+        ip = session['DREAMER']
+    else:
+        ip = request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
 
-    return(ip)
+    return(str(ip))
 
 def savemark(data):
     data = re.sub("\[date\(now\)\]", get_time(), data)
