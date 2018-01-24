@@ -21,7 +21,7 @@ Reggie(app)
 random_key = str(random.randint(1, 10000000))
 print('비밀키 : ' + random_key)
 
-r_ver = 'v2.6.0 beta'
+r_ver = 'v2.6.0'
 
 from func import *
 from set_mark.mid_pas import mid_pas
