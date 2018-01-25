@@ -1,4 +1,4 @@
-﻿from bottle import template
+﻿from bottle import template, TEMPLATE_PATH, response
 
 from flask import session
 
@@ -87,7 +87,7 @@ def skin_check(conn):
     except:
         pass
 
-    return(skin)
+    TEMPLATE_PATH.insert(0, skin)
 
 def next_fix(link, num, page, end = 50):
     list_data = ''
