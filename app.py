@@ -986,9 +986,9 @@ def deep_search(name = None):
 
     curs.execute("select title from data where title = ?", [name])
     if(curs.fetchall()):
-        div = '<ul><li>문서로 <a href="/w/' + url_pas(name) + '">바로가기</a></li><hr>'
+        div = '<ul><li>문서로 <a href="/w/' + url_pas(name) + '">바로가기</a></li></ul><hr><ul>'
     else:
-        div = '<ul><li>문서가 없습니다. <a class="not_thing" href="/w/' + url_pas(name) + '">바로가기</a></li><hr>'
+        div = '<ul><li>문서가 없습니다. <a class="not_thing" href="/w/' + url_pas(name) + '">바로가기</a></li></ul><hr><ul>'
 
     curs.execute("select distinct title, case when title like ? then '제목' else '내용' end from data where title like ? or data like ? order by case when title like ? then 1 else 2 end limit ?, '50'", ['%' + name + '%', '%' + name + '%', '%' + name + '%', '%' + name + '%', str(sql_num)])
     all_list = curs.fetchall()
