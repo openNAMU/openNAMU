@@ -1,8 +1,6 @@
 ﻿from flask import Flask, request, send_from_directory
 from flask_reggie import Reggie
 
-from bottle import TEMPLATE_PATH, response
-
 from tornado.wsgi import WSGIContainer
 from tornado.httpserver import HTTPServer
 from tornado.ioloop import IOLoop
@@ -51,7 +49,7 @@ conn = sqlite3.connect(set_data['db'] + '.db')
 curs = conn.cursor()
 
 # 스킨 불러오기 부분
-TEMPLATE_PATH.insert(0, skin_check(conn))
+skin_check(conn)
 
 # 셋업 부분
 curs.execute("create table if not exists data(title text, data text)")
@@ -255,9 +253,9 @@ def edit_set(num = 0):
                 i += 1
 
             conn.commit()
-
-            TEMPLATE_PATH.insert(0, skin_check(conn))
+            skin_check(conn)
             admin_check(conn, None, 'edit_set')
+
             return(redirect('/edit_set/1'))
         else:
             d_list = []
@@ -314,7 +312,7 @@ def edit_set(num = 0):
                             <input placeholder="라이선스" type="text" name="license" value="' + html.escape(d_list[3]) + '"><hr> \
                             <span>파일 크기 [메가]</span><br><br> \
                             <input placeholder="파일 크기" type="text" name="upload" value="' + html.escape(d_list[4]) + '"><hr> \
-                            <span>스킨</span><br><br> \
+                            <span>스킨 {재시작 필요}</span><br><br> \
                             <input placeholder="스킨" type="text" name="skin" value="' + html.escape(d_list[5]) + '"><hr> \
                             <span>전역 ACL</span><br><br> \
                             <select name="edit">' + div + '</select><hr> \
