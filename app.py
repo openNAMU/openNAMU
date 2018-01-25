@@ -18,9 +18,6 @@ logging.basicConfig(level = logging.ERROR)
 app = Flask(__name__)
 Reggie(app)
 
-random_key = str(random.randint(1, 10000000))
-print('비밀키 : ' + random_key)
-
 r_ver = 'v2.6.0'
 
 from func import *
@@ -33,24 +30,20 @@ try:
     set_data = json.loads(json_data)
 except:
     while(1):
-        new_json = []
-
         print('DB 이름 : ', end = '')
-        new_json += [input()]
+        new_json = str(input())
 
-        print('포트 : ', end = '')
-        new_json += [input()]
-
-        if(new_json[0] != '' and new_json[1] != ''):
+        if(new_json != ''):
             with open("set.json", "w") as f:
-                f.write('{ "db" : "' + new_json[0] + '", "port" : "' + new_json[1] + '" }')
+                f.write('{ "db" : "' + new_json + '" }')
             
             json_data = open('set.json').read()
             set_data = json.loads(json_data)
 
             break
         else:
-            print('모든 값을 입력하세요.')
+            print('값을 입력하세요.')
+            
             pass
 
 # 디비 연결
@@ -84,6 +77,38 @@ curs.execute("create table if not exists acl(title text, dec text, dis text, why
 curs.execute("select name from alist where name = '소유자'")
 if(not curs.fetchall()):
     curs.execute("insert into alist (name, acl) values ('소유자', 'owner')")
+
+curs.execute("select data from other where name = 'port'")
+rep_data = curs.fetchall()
+if(not rep_data):
+    while(1):
+        print('포트 : ', end = '')
+        rep_port = int(input())
+
+        if(rep_port):
+            curs.execute("insert into other (name, data) values ('port', ?)", [rep_port])
+            
+            break
+        else:
+            pass
+else:
+    rep_port = rep_data[0][0]
+
+curs.execute("select data from other where name = 'key'")
+rep_data = curs.fetchall()
+if(not rep_data):
+    while(1):
+        print('비밀 키 : ', end = '')
+        rep_key = str(input())
+
+        if(rep_key):
+            curs.execute("insert into other (name, data) values ('key', ?)", [rep_key])
+            
+            break
+        else:
+            pass
+else:
+    rep_key = rep_data[0][0]
 
 # 호환성 설정
 curs.execute("drop table if exists move")
@@ -198,7 +223,7 @@ def alarm():
         menu = [['user', '사용자']]
     )))
 
-@app.route('/edit_set', methods=['POST', 'GET'])
+@app.route('/edit_set')
 @app.route('/edit_set/<int:num>', methods=['POST', 'GET'])
 def edit_set(num = 0):
     if(num != 0 and admin_check(conn, None, None) != 1):
@@ -213,33 +238,28 @@ def edit_set(num = 0):
             li_data += ' * [[wiki:edit_set/' + str(x) + '|' + li + ']]\r\n'
 
         return(html_minify(template('index', 
-            imp = ['설정 편집', wiki_set(conn, 1), custom(conn), other2([0, 0])],
+            imp = ['설정', wiki_set(conn, 1), custom(conn), other2([0, 0])],
             data = namumark(conn, '',   '[목차(없음)]\r\n' + \
                                         '== 메뉴 ==\r\n' + \
                                         li_data, 0, 0, 0),
             menu = [['manager', '관리자']]
         )))
     elif(num == 1):
+        i_list = ['name', 'logo', 'frontpage', 'license', 'upload', 'skin', 'edit', 'reg', 'ip_view', 'back_up', 'all_title']
+        n_list = ['무명위키', '', '위키:대문', 'CC 0', '2', '', 'normal', '', '', '0', '']
         if(request.method == 'POST'):
-            curs.execute("update other set data = ? where name = ?", [request.form['name'], 'name'])
-            curs.execute("update other set data = ? where name = ?", [request.form['logo'], 'logo'])
-            curs.execute("update other set data = ? where name = 'frontpage'", [request.form['frontpage']])
-            curs.execute("update other set data = ? where name = 'license'", [request.form['license']])
-            curs.execute("update other set data = ? where name = 'upload'", [request.form['upload']])
-            curs.execute("update other set data = ? where name = 'skin'", [request.form['skin']])
-            curs.execute("update other set data = ? where name = 'edit'", [request.form['edit']])
-            curs.execute("update other set data = ? where name = 'reg'", [request.form['reg']])
-            curs.execute("update other set data = ? where name = 'ip_view'", [request.form['ip_view']])
-            curs.execute("update other set data = ? where name = 'back_up'", [request.form['back_up']])
-            curs.execute("update other set data = ? where name = 'all_title'", [request.form['all_title']])
+            i = 0
+
+            for data in i_list:
+                curs.execute("update other set data = ? where name = ?", [request.form.get(data, n_list[i]), data])
+                i += 1
+
             conn.commit()
 
             TEMPLATE_PATH.insert(0, skin_check(conn))
             admin_check(conn, None, 'edit_set')
             return(redirect('/edit_set/1'))
         else:
-            i_list = ['name', 'logo', 'frontpage', 'license', 'upload', 'skin', 'edit', 'reg', 'ip_view', 'back_up', 'all_title']
-            n_list = ['무명위키', '', '위키:대문', 'CC 0', '2', '', 'normal', '', '', '0', '']
             d_list = []
             
             x = 0
@@ -302,10 +322,10 @@ def edit_set(num = 0):
                             <input type="checkbox" name="ip_view" ' + ch_2 + '> 아이피 비공개<hr> \
                             <input type="checkbox" name="all_title" ' + ch_3 + '> 모든 문서 보기 비활성화<hr> \
                             <span>백업 간격 [시간] (끄기 : 0) {재시작 필요}</span><hr> \
-                            <input placeholder="백업 간격" type="text" name="back_up" value="' + html.escape(d_list[9]) + '"><br> \
+                            <input placeholder="백업 간격" type="text" name="back_up" value="' + html.escape(d_list[9]) + '"><hr> \
                             <button class="btn btn-primary" type="submit">저장</button> \
                         </form>',
-                menu = [['edit_set', '설정 편집']]
+                menu = [['edit_set', '설정']]
             )))
     elif(num == 2):
         if(request.method == 'POST'):
@@ -342,7 +362,7 @@ def edit_set(num = 0):
                             <input placeholder="비 로그인 경고" type="text" name="no_login_warring" value="' + html.escape(d_list[1]) + '"><hr> \
                             <button class="btn btn-primary" type="submit">저장</button> \
                         </form>',
-                menu = [['edit_set', '설정 편집']]
+                menu = [['edit_set', '설정']]
             )))
     elif(num == 3):
         if(request.method == 'POST'):
@@ -370,7 +390,7 @@ def edit_set(num = 0):
                             <textarea rows="25" name="content">' + html.escape(data) + '</textarea><hr> \
                             <button class="btn btn-primary" type="submit">저장</button> \
                         </form>',
-                menu = [['edit_set', '설정 편집']]
+                menu = [['edit_set', '설정']]
             )))
     elif(num == 4):
         if(request.method == 'POST'):
@@ -402,7 +422,7 @@ def edit_set(num = 0):
                             <textarea rows="25" name="content">' + html.escape(data) + '</textarea><hr> \
                             <button class="btn btn-primary" type="submit">저장</button> \
                         </form>',
-                menu = [['edit_set', '설정 편집']]
+                menu = [['edit_set', '설정']]
             )))
     elif(num == 5):
         if(request.method == 'POST'):
@@ -439,7 +459,7 @@ def edit_set(num = 0):
                             <input placeholder="리캡차 (비밀키)" type="text" name="sec_re" value="' + html.escape(d_list[1]) + '"><hr> \
                             <button class="btn btn-primary" type="submit">저장</button> \
                         </form>',
-                menu = [['edit_set', '설정 편집']]
+                menu = [['edit_set', '설정']]
             )))
     else:
         return(redirect('/'))
@@ -3370,7 +3390,7 @@ def error_404(e):
     return('<!-- 나니카가 하지마룻테 코토와 오와리니 츠나가루다난테 캉가에테모 미나캇타. 이야, 캉카에타쿠나캇탄다... 아마오토 마도오 타타쿠 소라카라 와타시노 요-나 카나시미 훗테루 토메도나쿠 이마오 누라시테 오모이데 난테 이라나이노 코코로가 쿠루시쿠나루 다케다토 No more! September Rain No more! September Rain 이츠닷테 아나타와 미짓카닷타 와자와자 키모치오 타시카메룻테 코토모 히츠요-쟈나쿠테 시젠니 나카라요쿠 나레타카라 안신시테타노 카모시레나이네 도-시테? 나미니 토이카케루케도 나츠노 하지마리가 츠레테키타 오모이 나츠가 오와루토키 키에챠우모노닷타 난테 시라나쿠테 토키메이테타 아츠이 키세츠 우미베노 소라가 히캇테 토츠젠 쿠모가 나가레 오츠부노 아메 와타시노 나카노 나미다미타이 콘나니 타노시이 나츠가 즛토 츠즈이테쿳테 신지테타요 But now... September Rain But now... September Rain -->' + redirect('/w/' + url_pas(wiki_set(conn, 2))))
 
 if(__name__=="__main__"):
-    app.secret_key = random_key
+    app.secret_key = rep_key
     http_server = HTTPServer(WSGIContainer(app))
-    http_server.listen(int(set_data['port']))
+    http_server.listen(rep_port)
     IOLoop.instance().start()
