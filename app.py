@@ -1,8 +1,6 @@
 ﻿from flask import Flask, request, send_from_directory
 from flask_reggie import Reggie
 
-from bottle import TEMPLATE_PATH, response
-
 from tornado.wsgi import WSGIContainer
 from tornado.httpserver import HTTPServer
 from tornado.ioloop import IOLoop
@@ -51,7 +49,7 @@ conn = sqlite3.connect(set_data['db'] + '.db')
 curs = conn.cursor()
 
 # 스킨 불러오기 부분
-TEMPLATE_PATH.insert(0, skin_check(conn))
+skin_check(conn)
 
 # 셋업 부분
 curs.execute("create table if not exists data(title text, data text)")
@@ -255,9 +253,8 @@ def edit_set(num = 0):
                 i += 1
 
             conn.commit()
-
-            TEMPLATE_PATH.insert(0, skin_check(conn))
             admin_check(conn, None, 'edit_set')
+
             return(redirect('/edit_set/1'))
         else:
             d_list = []
@@ -314,7 +311,7 @@ def edit_set(num = 0):
                             <input placeholder="라이선스" type="text" name="license" value="' + html.escape(d_list[3]) + '"><hr> \
                             <span>파일 크기 [메가]</span><br><br> \
                             <input placeholder="파일 크기" type="text" name="upload" value="' + html.escape(d_list[4]) + '"><hr> \
-                            <span>스킨</span><br><br> \
+                            <span>스킨 {재시작 필요}</span><br><br> \
                             <input placeholder="스킨" type="text" name="skin" value="' + html.escape(d_list[5]) + '"><hr> \
                             <span>전역 ACL</span><br><br> \
                             <select name="edit">' + div + '</select><hr> \
@@ -747,6 +744,7 @@ def indexing():
                 curs.execute(sql)
             except:
                 pass
+
     conn.commit()
     return(redirect('/'))        
         
@@ -1015,7 +1013,7 @@ def deep_search(name = None):
     )))
          
 @app.route('/raw/<path:name>')
-@app.route('/topic/<path:name>/sub/<int:sub_t>/raw/<num>')
+@app.route('/topic/<path:name>/sub/<sub_t>/raw/<int:num>')
 def raw_view(name = None, sub_t = None, num = None):
     v_name = name
     sub = ' (원본)'
@@ -1766,7 +1764,7 @@ def title_index():
         menu = [['other', '기타']]
     )))
         
-@app.route('/topic/<path:name>/sub/<int:sub>/b/<num>')
+@app.route('/topic/<path:name>/sub/<sub>/b/<int:num>')
 def topic_block(name = None, sub = None, num = None):
     if(admin_check(conn, 3, 'blind (' + name + ' - ' + sub + '#' + str(num) + ')') != 1):
         return(re_error(conn, '/error/3'))
@@ -1784,7 +1782,7 @@ def topic_block(name = None, sub = None, num = None):
         
     return(redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '#' + str(num)))
         
-@app.route('/topic/<path:name>/sub/<int:sub>/notice/<num>')
+@app.route('/topic/<path:name>/sub/<sub>/notice/<int:num>')
 def topic_top(name = None, sub = None, num = None):
     if(admin_check(conn, 3, 'notice (' + name + ' - ' + sub + '#' + str(num) + ')') != 1):
         return(re_error(conn, '/error/3'))
@@ -1848,7 +1846,7 @@ def topic_stop(name = None, sub = None, tool = None):
         
     return(redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub)))    
 
-@app.route('/topic/<path:name>/sub/<int:sub>/admin/<num>')
+@app.route('/topic/<path:name>/sub/<sub>/admin/<int:num>')
 def topic_admin(name = None, sub = None, num = None):
     curs.execute("select block, ip, date from topic where title = ? and sub = ? and id = ?", [name, sub, str(num)])
     data = curs.fetchall()
@@ -1991,7 +1989,7 @@ def topic(name = None, sub = None):
             curs.execute("select who from re_admin where what = ? order by time desc limit 1", ['notice (' + name + ' - ' + sub + '#' + topic_data[1] + ')'])
             topic_data_top = curs.fetchall()
             if(topic_data_top):
-                who_plus += ' @' + topic_data_top[0][0]
+                who_plus += ' <span style="margin-right: 5px;">@' + topic_data_top[0][0] + ' </span>'
                                 
             all_data += '<table id="toron"><tbody><tr><td id="toron_color_red">'
             all_data += '<a href="#' + topic_data[1] + '">#' + topic_data[1] + '</a> ' + ip_pas(conn, topic_data[3]) + who_plus + ' <span style="float: right;">' + topic_data[2] + '</span>'
@@ -2091,7 +2089,7 @@ def close_topic_list(name = None, tool = None):
             sub = '토론 목록'
             menu = [['w/' + url_pas(name), '문서']]
             plus =  '<a href="/topic/' + url_pas(name) + '/close">(닫힘)</a> <a href="/topic/' + url_pas(name) + '/agree">(합의)</a><hr> \
-                    <input placeholder="토론명" class="form-control" name="topic" type="text"><br> \
+                    <input placeholder="토론명" class="form-control" name="topic" type="text"><hr> \
                     <button class="btn btn-primary" type="submit">만들기</button>'
 
         for data in curs.fetchall():
