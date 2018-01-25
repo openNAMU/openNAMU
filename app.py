@@ -996,7 +996,7 @@ def deep_search(name = None):
         test = all_list[0][1]
         for data in all_list:
             if(data[1] != test):
-                div_plus += '<hr>'
+                div_plus += '</ul><hr><ul>'
                 test = data[1]
 
             div_plus += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a> (' + data[1] + ')</li>'
