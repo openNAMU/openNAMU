@@ -2054,7 +2054,7 @@ def topic(name = None, sub = None):
 
         return(html_minify(template('index', 
             imp = [name, wiki_set(conn, 1), custom(conn), other2([' (토론)', 0])],
-            data = '<h2 id="topic_top_title"><a href="#toc" id="s-1">1.<span style="margin-left: 5px;"></span></a>' + sub + '</h2><hr id="under_bar" style="margin-top: -5px;">' + all_data + data,
+            data = '<h2 id="topic_top_title">' + sub + '</h2><hr id="under_bar" style="margin-top: -5px;">' + all_data + data,
             menu = [['topic/' + url_pas(name), '목록']]
         )))
         
@@ -2105,7 +2105,7 @@ def close_topic_list(name = None, tool = None):
                         it_p = 1
                 
                 if(it_p != 1):
-                    div += '<h2><a href="/topic/' + url_pas(name) + '/sub/' + url_pas(data[0]) + '">' + data[0] + '</a></h2>'
+                    div += '<h2><a href="/topic/' + url_pas(name) + '/sub/' + url_pas(data[0]) + '">' + data[0] + '</a></h2><hr id="under_bar" style="margin-top: -5px;">'
 
         if(div == ''):
             plus = re.sub('^<br>', '', plus)
