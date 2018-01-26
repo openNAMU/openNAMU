@@ -2737,7 +2737,8 @@ def read_view(name = None):
                     curs.execute("select data from data where title = ?", [data[0]])
                     db_data = curs.fetchall()
                     if(db_data):
-                        if(re.search('\[\[' + name + ']]', mid_pas(db_data[0][0], 0, 1, 0, 0)[0])):
+                        cat_data = re.sub("\[\[(분류:(?:(?:(?!\]\]|\|).)+))(?!\|include)\]\]", "", mid_pas(db_data[0][0], 0, 1, 0, 0)[0])
+                        if(re.search('\[\[' + name + '|include]]', cat_data)):
                             div += ' * [[' + data[0] + ']]\r\n * [[wiki:xref/' + url_pas(data[0]) + '|' + data[0] + ']] (역링크)\r\n'
                         else:
                             div += ' * [[' + data[0] + ']]\r\n'
