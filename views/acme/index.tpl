@@ -4,7 +4,6 @@
         <meta charset="utf-8">
         <title>{{imp[0]}} - {{imp[1][0]}}</title>
         <link rel="stylesheet" href="/views/acme/css/bootstrap.min.css">
-        <link rel="stylesheet" href="/views/acme/css/bootstrap-reset.css">
         <link rel="stylesheet" href="/views/acme/css/style.css">
         <link rel="stylesheet" href="/views/acme/css/style-responsive.css">
         <script src="/views/acme/js/jquery.min.js"></script>
