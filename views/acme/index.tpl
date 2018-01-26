@@ -153,10 +153,6 @@
             <div class="container">
                 <div class="row">
                     <div class="col-md-10 col-md-offset-1 mar-b-30">
-                        <div id="back_title">
-                            추적 : 
-                            {{!imp[3][2]}}
-                        </div>
                         {{!data}}
                     </div>
                 </div>

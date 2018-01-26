@@ -102,17 +102,7 @@ def next_fix(link, num, page, end = 50):
     return(list_data)
 
 def other2(origin):
-    div = ''
-    if('View_List' in session):
-        match = re.findall('(?:(?:([^\n]+)\n))', session['View_List'])
-        if(match):
-            div = ''
-            for data in match[-6:-1]:
-                div += '<a href="/w/' + url_pas(data) + '">' +  html.escape(data) + '</a> / '
-            div = re.sub(' / $', '', div)
-            
-    re_data = origin + [div]
-    return(re_data)    
+    return(origin + ['제거 되었음. 스킨 업데이트 필요함.'])    
 
 def wiki_set(conn, num):
     curs = conn.cursor()
