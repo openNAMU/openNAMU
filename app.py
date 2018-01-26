@@ -16,7 +16,7 @@ logging.basicConfig(level = logging.ERROR)
 app = Flask(__name__)
 Reggie(app)
 
-r_ver = 'v2.6.0'
+r_ver = 'v2.6.1 beta'
 
 from func import *
 from set_mark.mid_pas import mid_pas
