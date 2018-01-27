@@ -16,7 +16,7 @@ logging.basicConfig(level = logging.ERROR)
 app = Flask(__name__)
 Reggie(app)
 
-r_ver = 'v2.6.0'
+r_ver = 'v2.6.1'
 
 from func import *
 from set_mark.mid_pas import mid_pas
@@ -492,7 +492,7 @@ def image_view(name = None):
 def acl_list():
     div = '<ul>'
 
-    curs.execute("select title, acl from data where acl = 'admin' or acl = 'user' order by acl desc")
+    curs.execute("select title, dec from acl where dec = 'admin' or dec = 'user' order by title desc")
     list_data = curs.fetchall()
     for data in list_data:
         if(not re.search('^사용자:', data[0]) and not re.search('^파일:', data[0])):
@@ -986,11 +986,13 @@ def deep_search(name = None):
 
     curs.execute("select title from data where title = ?", [name])
     if(curs.fetchall()):
-        div = '<ul><li>문서로 <a href="/w/' + url_pas(name) + '">바로가기</a></li><hr>'
+        div = '<ul><li>문서로 <a href="/w/' + url_pas(name) + '">바로가기</a></li></ul><hr><ul>'
     else:
-        div = '<ul><li>문서가 없습니다. <a class="not_thing" href="/w/' + url_pas(name) + '">바로가기</a></li><hr>'
+        div = '<ul><li>문서가 없습니다. <a class="not_thing" href="/w/' + url_pas(name) + '">바로가기</a></li></ul><hr><ul>'
 
-    curs.execute("select distinct title, case when title like ? then '제목' else '내용' end from data where title like ? or data like ? order by case when title like ? then 1 else 2 end limit ?, '50'", ['%' + name + '%', '%' + name + '%', '%' + name + '%', '%' + name + '%', str(sql_num)])
+    curs.execute("select distinct title, case when title like ? then '제목' else '내용' " + \
+                "end from data where title like ? or data like ? order by case when title like ? " + \
+                "then 1 else 2 end limit ?, '50'", ['%' + name + '%', '%' + name + '%', '%' + name + '%', '%' + name + '%', str(sql_num)])
     all_list = curs.fetchall()
     if(all_list):
         test = all_list[0][1]
@@ -2052,7 +2054,7 @@ def topic(name = None, sub = None):
 
         return(html_minify(template('index', 
             imp = [name, wiki_set(conn, 1), custom(conn), other2([' (토론)', 0])],
-            data = '<h2 id="topic_top_title"><a href="#toc" id="s-1">1.<span style="margin-left: 5px;"></span></a>' + sub + '</h2><hr id="under_bar" style="margin-top: -5px;">' + all_data + data,
+            data = '<h2 id="topic_top_title">' + sub + '</h2><hr id="under_bar" style="margin-top: -5px;">' + all_data + data,
             menu = [['topic/' + url_pas(name), '목록']]
         )))
         
@@ -2103,7 +2105,7 @@ def close_topic_list(name = None, tool = None):
                         it_p = 1
                 
                 if(it_p != 1):
-                    div += '<h2><a href="/topic/' + url_pas(name) + '/sub/' + url_pas(data[0]) + '">' + data[0] + '</a></h2>'
+                    div += '<h2><a href="/topic/' + url_pas(name) + '/sub/' + url_pas(data[0]) + '">' + data[0] + '</a></h2><hr id="under_bar" style="margin-top: -5px;">'
 
         if(div == ''):
             plus = re.sub('^<br>', '', plus)
@@ -2735,7 +2737,8 @@ def read_view(name = None):
                     curs.execute("select data from data where title = ?", [data[0]])
                     db_data = curs.fetchall()
                     if(db_data):
-                        if(re.search('\[\[' + name + ']]', mid_pas(db_data[0][0], 0, 1, 0, 0)[0])):
+                        cat_data = re.sub("\[\[(분류:(?:(?:(?!\]\]|\|).)+))(?!\|include)\]\]", "", mid_pas(db_data[0][0], 0, 1, 0, 0)[0])
+                        if(re.search('\[\[' + name + '|include]]', cat_data)):
                             div += ' * [[' + data[0] + ']]\r\n * [[wiki:xref/' + url_pas(data[0]) + '|' + data[0] + ']] (역링크)\r\n'
                         else:
                             div += ' * [[' + data[0] + ']]\r\n'

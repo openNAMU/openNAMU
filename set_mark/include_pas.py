@@ -21,13 +21,14 @@ def include_pas(conn, data, title, in_c, num, toc_y, fol_num):
         if(results[0] == title):
             data = include.sub("<b>" + results[0] + "</b>", data, 1)
         else:
+            backlink += [[title, results[0], 'include']]
+
             curs.execute("select data from data where title = ?", [results[0]])
             in_con = curs.fetchall()
-            
-            backlink += [[title, results[0], 'include']]
             if(in_con):                        
                 in_data = in_con[0][0]
                 in_data = include.sub("", in_data)
+                in_data = re.sub("\[\[(분류:(?:(?:(?!\]\]|\|).)+))(?!\|include)\]\]", "", in_data)
                 in_data = re.sub("\n", "\r\n", re.sub("\r\n", "\n", in_data))
                 in_data = html_pas.html_pas(in_data)
                 
