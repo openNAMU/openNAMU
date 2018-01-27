@@ -492,7 +492,7 @@ def image_view(name = None):
 def acl_list():
     div = '<ul>'
 
-    curs.execute("select title, acl from data where acl = 'admin' or acl = 'user' order by acl desc")
+    curs.execute("select title, dec from acl where dec = 'admin' or dec = 'user' order by title desc")
     list_data = curs.fetchall()
     for data in list_data:
         if(not re.search('^사용자:', data[0]) and not re.search('^파일:', data[0])):
