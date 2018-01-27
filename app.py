@@ -17,6 +17,7 @@ app = Flask(__name__)
 Reggie(app)
 
 r_ver = 'v2.6.1'
+print('버전 : ' + r_ver)
 
 from func import *
 from set_mark.mid_pas import mid_pas
@@ -91,6 +92,7 @@ if(not rep_data):
             pass
 else:
     rep_port = rep_data[0][0]
+    print('포트 : ' + str(rep_port))
 
 curs.execute("select data from other where name = 'key'")
 rep_data = curs.fetchall()
@@ -107,6 +109,9 @@ if(not rep_data):
             pass
 else:
     rep_key = rep_data[0][0]
+    print('비밀 키 : ' + rep_key)
+
+print('')
 
 # 호환성 설정
 curs.execute("drop table if exists move")
@@ -1694,6 +1699,7 @@ def manager(num = 1):
 def title_index():
     page = int(request.args.get('page', 1))
     num = int(request.args.get('num', 100))
+
     if(page * num > 0):
         sql_num = page * num - num
     else:
