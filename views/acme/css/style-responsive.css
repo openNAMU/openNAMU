@@ -82,7 +82,7 @@ label, span, body, strong, b, div, h1, h2, h3, h4, h5, h6, h7, input {
 
 pre { 
     font-family: "monospace"; 
-    white-space: pre-line;
+    white-space: pre-wrap;
     overflow: hidden;
 }
 
