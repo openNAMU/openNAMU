@@ -11,43 +11,35 @@ def sha224(data):
 
 def link(conn, title, data, num, category, backlink):
     curs = conn.cursor()
-
     data = data.replace('&#92;', '\\')
     
-    m = re.findall("\[\[(분류:(?:(?:(?!\]\]).)*))\]\]", data)
+    m = re.findall("\[\[(분류:(?:(?:(?!\]\]|\|).)+))(?:\|((?:(?!\]\]).)+))?\]\]", data)
     for g in m:
-        if(title != g):
+        if(title != g[0]):
             if(num == 1):
-                backlink += [[title, g, 'cat']]
+                backlink += [[title, g[0], 'cat']]
                 
-            if(category == ''):
-                curs.execute("select title from data where title = ?", [g])
-                exists = curs.fetchall()
-                if(exists):
-                    red = ""
-                else:
-                    red = 'class="not_thing"'
-                    
-                category += '<a ' + red + ' href="/w/' + url_pas(g) + '">' + re.sub("분류:", "", g) + '</a>'
+            curs.execute("select title from data where title = ?", [g[0]])
+            if(curs.fetchall()):
+                red = ""
             else:
-                curs.execute("select title from data where title = ?", [g])
-                exists = curs.fetchall()
-                if(exists):
-                    red = ""
-                else:
-                    red = 'class="not_thing"'
-                    
-                category += ' / ' + '<a ' + red + ' href="/w/' + url_pas(g) + '">' + re.sub("분류:", "", g) + '</a>'
+                red = 'class="not_thing"'
+
+            if(category != ''):    
+                category += ' / '                
+                
+            category += '<a ' + red + ' href="/w/' + url_pas(g[0]) + '">' + re.sub("분류:", "", g[0]) + '</a>'
         
-        data = re.sub("\[\[(분류:(?:(?:(?!\]\]).)*))\]\]", '', data, 1)
+        data = re.sub("\[\[(분류:(?:(?:(?!\]\]|\|).)+))(?:\|((?:(?!\]\]).)+))?\]\]", '', data, 1)
     
     test = re.findall('\[\[wiki:([^|\]]+)(?:\|([^\]]+))?\]\]', data)
-    if(test):
-        for wiki in test:
-            if(wiki[1]):
-                data = re.sub('\[\[wiki:([^|\]]+)(?:\|([^\]]+))?\]\]', '<a id="inside" href="/' + wiki[0] + '">' + wiki[1] + '</a>', data, 1)
-            else:
-                data = re.sub('\[\[wiki:([^|\]]+)(?:\|([^\]]+))?\]\]', '<a id="inside" href="/' + wiki[0] + '">' + wiki[0] + '</a>', data, 1)
+    for wiki in test:
+        if(wiki[1]):
+            out = wiki[1]
+        else:
+            out = wiki[0]
+
+        data = re.sub('\[\[wiki:([^|\]]+)(?:\|([^\]]+))?\]\]', '<a id="inside" href="/' + wiki[0] + '">' + out + '</a>', data, 1)
      
     data = re.sub("\[\[(?::(?P<in>(?:분류|파일):(?:(?:(?!\]\]).)*)))\]\]", "[[\g<in>]]", data)
 
