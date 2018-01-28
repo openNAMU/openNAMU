@@ -13,7 +13,7 @@ def link(conn, title, data, num, category, backlink):
     curs = conn.cursor()
     data = data.replace('&#92;', '\\')
     
-    m = re.findall("\[\[(분류:(?:(?:(?!\]\]|\|).)+))(?:\|((?:(?!\]\]).)+))?\]\]", data)
+    m = re.findall("\[\[(분류:(?:(?:(?!\]\]|#).)+))((?:#(?:(?:(?!#|\]\]).)+))+)?\]\]", data)
     for g in m:
         if(title != g[0]):
             if(num == 1):
@@ -27,10 +27,16 @@ def link(conn, title, data, num, category, backlink):
 
             if(category != ''):    
                 category += ' / '                
+
+            style = ''
+            if(g[1]):
+                print(g[1])
+                if(re.search('#blur', g[1])):
+                    style = ' style="filter: blur(3px);" onmouseover="this.style.filter=\'none\';" onmouseout="this.style.filter=\'blur(3px)\';"'
                 
-            category += '<a ' + red + ' href="/w/' + url_pas(g[0]) + '">' + re.sub("분류:", "", g[0]) + '</a>'
+            category += '<a ' + red + ' ' + style + '" href="/w/' + url_pas(g[0]) + '">' + re.sub("분류:", "", g[0]) + '</a>'
         
-        data = re.sub("\[\[(분류:(?:(?:(?!\]\]|\|).)+))(?:\|((?:(?!\]\]).)+))?\]\]", '', data, 1)
+        data = re.sub("\[\[(분류:(?:(?:(?!\]\]|#).)+))((?:#(?:(?:(?!#|\]\]).)+))+)?\]\]", '', data, 1)
     
     test = re.findall('\[\[wiki:([^|\]]+)(?:\|([^\]]+))?\]\]', data)
     for wiki in test:

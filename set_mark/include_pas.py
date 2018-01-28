@@ -28,7 +28,7 @@ def include_pas(conn, data, title, in_c, num, toc_y, fol_num):
             if(in_con):                        
                 in_data = in_con[0][0]
                 in_data = include.sub("", in_data)
-                in_data = re.sub("\[\[(분류:(?:(?:(?!\]\]|\|).)+))(?!\|include)\]\]", "", in_data)
+                in_data = re.sub("\[\[(분류:(?:(?:(?!\]\]|#include).)+))\]\]", "", in_data)
                 in_data = re.sub("\n", "\r\n", re.sub("\r\n", "\n", in_data))
                 in_data = html_pas.html_pas(in_data)
                 
