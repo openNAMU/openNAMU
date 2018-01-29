@@ -735,7 +735,8 @@ def indexing():
     if(admin_check(conn, None, 'indexing') != 1):
         return(re_error(conn, '/error/3'))
 
-    curs.execute("select name from sqlite_master where type in ('table', 'view') and name not like 'sqlite_%' union all select name from sqlite_temp_master where type in ('table', 'view') order by 1;")
+    curs.execute("select name from sqlite_master where type in ('table', 'view') and name not like " + \
+                "sqlite_%' union all select name from sqlite_temp_master where type in ('table', 'view') order by 1;")
     data = curs.fetchall()
     for table in data:
         print('----- ' + table[0] + ' -----')
@@ -886,15 +887,18 @@ def block_log(name = None, tool = None, tool2 = None):
             if(tool2 == 'ip'):
                 sub = ' (아이피)'
 
-                curs.execute("select why, block, blocker, end, today from rb where (block like ? or block like ?) order by today desc limit ?, '50'", ['%.%', '%:%', str(sql_num)])
+                curs.execute("select why, block, blocker, end, today from rb where (block like ? or block like ?) order by today desc limit ?, '50'", \
+                            ['%.%', '%:%', str(sql_num)])
             elif(tool2 == 'user'):
                 sub = ' (가입자)'
 
-                curs.execute("select why, block, blocker, end, today from rb where not (block like ? or block like ?) order by today desc limit ?, '50'", ['%.%', '%:%', str(sql_num)])
+                curs.execute("select why, block, blocker, end, today from rb where not (block like ? or block like ?) order by today desc limit ?, '50'", \
+                            ['%.%', '%:%', str(sql_num)])
             elif(tool2 == 'never_end'):
                 sub = '(영구)'
 
-                curs.execute("select why, block, blocker, end, today from rb where not end like ? and not end like ? order by today desc limit ?, '50'", ['%:%', '%해제%', str(sql_num)])
+                curs.execute("select why, block, blocker, end, today from rb where not end like ? and not end like ? order by today desc limit ?, '50'", \
+                            ['%:%', '%해제%', str(sql_num)])
             elif(tool2 == 'end'):
                 sub = '(해제)'
 
@@ -910,7 +914,7 @@ def block_log(name = None, tool = None, tool2 = None):
             else:
                 sub = '(기간)'
 
-                curs.execute("select why, block, blocker, end, today from rb where end like ? order by today desc limit ?, '50'", ['%-%', str(sql_num)])
+                curs.execute("select why, block, blocker, end, today from rb where end like ? order by today desc limit ?, '50'", ['%\-%', str(sql_num)])
     else:
         menu = [['block_log', '일반']]
 
@@ -1535,7 +1539,8 @@ def delete(name = None):
 def move_data(name = None):    
     data = '<ul>'
 
-    curs.execute("select send, date, ip from history where send like ? or send like ? order by date desc", ['%<a href="/w/' + url_pas(name) + '">' + name + '</a> 이동)%', '%(<a href="/w/' + url_pas(name) + '">' + name + '</a>%'])
+    curs.execute("select send, date, ip from history where send like ? or send like ? order by date desc", \
+                ['%<a href="/w/' + url_pas(name) + '">' + name + '</a> 이동)%', '%(<a href="/w/' + url_pas(name) + '">' + name + '</a>%'])
     for for_data in curs.fetchall():
         match = re.findall('<a href="\/w\/(?:(?:(?!">).)+)">((?:(?!<\/a>).)+)<\/a>', for_data[0])
         send = re.sub('\([^\)]+\)$', '', for_data[0])
@@ -2949,7 +2954,8 @@ def recent_changes(name = None, tool = 'record'):
                     else:
                         return(redirect('/'))
 
-                    curs.execute("select id, title, date, ip, send, leng from history where ip = ? and send like ? order by date desc limit ?, '50'", [name, sql, str(sql_num)])
+                    curs.execute("select id, title, date, ip, send, leng from history where ip = ? and send like ? order by date desc limit ?, '50'", \
+                                [name, sql, str(sql_num)])
         else:
             div += '<td style="width: 33.3%;">문서명</td><td style="width: 33.3%;">편집자</td><td style="width: 33.3%;">시간</td></tr>'
 
