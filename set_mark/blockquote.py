@@ -1,9 +1,9 @@
 import re
 
 def blockquote(data):
-    while(1):
+    while 1:
         m = re.search("\n&gt;\s?((?:[^\n]*)(?:(?:(?:(?:\n&gt;\s?)(?:[^\n]*))+)?))", data)
-        if(m):
+        if m:
             result = m.groups()
             blockquote = result[0]
             blockquote = re.sub("\n&gt;\s?", "\n", blockquote)
@@ -11,4 +11,4 @@ def blockquote(data):
         else:
             break
 
-    return(data)
+    return data

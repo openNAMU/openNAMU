@@ -1,7 +1,7 @@
 import re
 
 def end(data, category):    
-    if(category):
+    if category:
         data += '<div style="margin-top: 30px;" id="cate">분류: ' + category + '</div>'
             
     data = re.sub("\r\n(?P<in><h[0-6])", "\g<in>", data)
@@ -19,4 +19,4 @@ def end(data, category):
     data = re.sub('^<div style="margin-top: 30px;" id="cate">', '<div id="cate">', data)        
     data = re.sub('&amp;#92;', '&#92;', data)
 
-    return(data)
+    return data

@@ -7,7 +7,7 @@ from urllib import parse
 import re
 
 def url_pas(data):
-    return(parse.quote(data).replace('/','%2F'))
+    return parse.quote(data).replace('/','%2F')
     
 def include_pas(conn, data, title, in_c, num, toc_y, fol_num):
     curs = conn.cursor()
@@ -18,7 +18,7 @@ def include_pas(conn, data, title, in_c, num, toc_y, fol_num):
     include = re.compile("\[include\(((?:(?!\)\]|,).)*)((?:(?:,\s?(?:(?!\)\]).)*))+)?\)\]((?:(?!\n))*)")
     m = include.findall(data)
     for results in m:
-        if(results[0] == title):
+        if results[0] == title:
             data = include.sub("<b>" + results[0] + "</b>", data, 1)
         else:
             backlink += [[title, results[0], 'include']]
@@ -39,11 +39,11 @@ def include_pas(conn, data, title, in_c, num, toc_y, fol_num):
                 category = var_d2[1]
                 fol_num = var_d[1]
                 
-                if(results[1]):
+                if results[1]:
                     a = results[1]
-                    while(1):
+                    while 1:
                         g = re.search("([^= ,]*)\=([^,]*)", a)
-                        if(g):
+                        if g:
                             result = g.groups()
                             in_data = re.sub("@" + result[0] + "@", result[1], in_data)
                             a = re.sub("([^= ,]*)\=([^,]*)", "", a, 1)
@@ -52,10 +52,10 @@ def include_pas(conn, data, title, in_c, num, toc_y, fol_num):
 
                 in_data = toc_pas.toc_pas(in_data, results[0], num, toc_y)
                             
-                if(results[2]):
+                if results[2]:
                     test = '<br>'
                 else:
-                    if(re.search('\|\|', in_data)):
+                    if re.search('\|\|', in_data):
                         test = '\n'
                     else:
                         test = ''
@@ -64,4 +64,4 @@ def include_pas(conn, data, title, in_c, num, toc_y, fol_num):
             else:
                 data = include.sub("<a class=\"not_thing\" href=\"/w/" + url_pas(results[0]) + "\">" + results[0] + "</a>", data, 1)
 
-    return([data, category, fol_num, backlink])
+    return [data, category, fol_num, backlink]

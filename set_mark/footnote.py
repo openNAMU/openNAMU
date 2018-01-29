@@ -5,17 +5,17 @@ def footnote(data, fol_num):
     tou = "<hr style='margin-top: 30px;' id='footnote'><div><br>"
     namu = []
     pop_re = re.compile('(?:\[\*([^\s]*)(?:\s((?:(?!\[|\]).)*))?\]|(\[각주\]))')
-    while(1):
+    while 1:
         b = pop_re.search(data)
-        if(b):
+        if b:
             results = b.groups()
             try:
-                if(not results[1] and results[0]):
+                if not results[1] and results[0]:
                     i = 0
                     
-                    while(1):
+                    while 1:
                         try:
-                            if(namu[i] == results[0]):
+                            if namu[i] == results[0]:
                                 none_this = 0
                                 break
                             else:
@@ -24,7 +24,7 @@ def footnote(data, fol_num):
                             none_this = 1
                             break
                             
-                    if(none_this == 0):
+                    if none_this == 0:
                         data = pop_re.sub("<sup><a href='javascript:void(0);' onclick='folding(" + str(fol_num) + ");' id='rfn-" + str(a) + "'>[" + results[0] + "]</a></sup>" + \
                                         "<div class='popup' style='display: none;' id='folding_" + str(fol_num) + "'><a onclick='folding(" + str(fol_num) + ");'" + \
                                         " href='#fn-" + str(a) + "'>#d#" + results[0] + "#/d#</a> <a href='javascript:void(0);' onclick='folding(" + str(fol_num) + ");'>[X]</a> " + \
@@ -53,7 +53,7 @@ def footnote(data, fol_num):
             except:
                 tou += '</div>'
 
-                if(tou == "<hr style='margin-top: 30px;' id='footnote'><div><br></div>"):
+                if tou == "<hr style='margin-top: 30px;' id='footnote'><div><br></div>":
                     tou = ""
                 else:
                     tou = re.sub('#d#(?P<in>(?:(?!#\/d#).)*)#\/d#', '[\g<in>]', tou)
@@ -63,7 +63,7 @@ def footnote(data, fol_num):
         else:
             tou += '</div>'
 
-            if(tou == "<hr style='margin-top: 30px;' id='footnote'><div><br></div>"):
+            if tou == "<hr style='margin-top: 30px;' id='footnote'><div><br></div>":
                 tou = ""
             else:
                 tou = re.sub('#d#(?P<in>(?:(?!#\/d#).)*)#\/d#', '[\g<in>]', tou)
@@ -76,4 +76,4 @@ def footnote(data, fol_num):
     data = re.sub("(?:(?:<br>| |\r|\n)+)$", "", data)
     data += tou
     
-    return(data)
+    return data
