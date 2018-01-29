@@ -15,7 +15,7 @@ def go_namu(data):
         print(end[0])
         namumark(conn, end[0], end[1], 1, 0, 0)
 
-if(__name__=='__main__'):
+if __name__=='__main__':
     curs.execute("select title, data from data")
     data = curs.fetchall()
     print(int(len(data) / 4))
