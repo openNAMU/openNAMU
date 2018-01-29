@@ -425,11 +425,11 @@ def re_error(conn, data):
                 if d[0][1] != '':
                     end += '\r\n|| 사유 || ' + d[0][1] + ' ||'
 
-        return(html_minify(template('index', 
+        return html_minify(template('index', 
             imp = ['권한 오류', wiki_set(conn, 1), custom(conn), other2([0, 0])],
             data = namumark(conn, "", "[목차(없음)]\r\n== 권한 상태 ==\r\n" + end, 0, 0, 0),
             menu = 0
-        )))
+        ))
 
     d = re.search('\/error\/([0-9]+)', data)
     if d:
@@ -505,11 +505,11 @@ def re_error(conn, data):
             data = '???'
 
         if title:
-            return(html_minify(template('index', 
+            return html_minify(template('index', 
                 imp = [title, wiki_set(conn, 1), custom(conn), other2([0, 0])],
                 data = namumark(conn, "", "[목차(없음)]\r\n== 오류 발생 ==\r\n" + data, 0, 0, 0),
                 menu = 0
-            )))
+            ))
         else:
             return redirect('/')
     else:
