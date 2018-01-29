@@ -30,7 +30,6 @@ def link(conn, title, data, num, category, backlink):
 
             style = ''
             if(g[1]):
-                print(g[1])
                 if(re.search('#blur', g[1])):
                     style = ' style="filter: blur(3px);" onmouseover="this.style.filter=\'none\';" onmouseout="this.style.filter=\'blur(3px)\';"'
                 
