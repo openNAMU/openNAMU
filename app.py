@@ -220,11 +220,11 @@ def alarm():
         da += '<li>알림이 없습니다.</li>'
     da += '</ul>'
 
-    return(html_minify(template('index', 
+    return html_minify(template('index', 
         imp = ['알림', wiki_set(conn, 1), custom(conn), other2([0, 0])],
         data = da,
         menu = [['user', '사용자']]
-    )))
+    ))
 
 @app.route('/edit_set')
 @app.route('/edit_set/<int:num>', methods=['POST', 'GET'])
@@ -240,13 +240,13 @@ def edit_set(num = 0):
             x += 1
             li_data += ' * [[wiki:edit_set/' + str(x) + '|' + li + ']]\r\n'
 
-        return(html_minify(template('index', 
+        return html_minify(template('index', 
             imp = ['설정 편집', wiki_set(conn, 1), custom(conn), other2([0, 0])],
             data = namumark(conn, '',   '[목차(없음)]\r\n' + \
                                         '== 메뉴 ==\r\n' + \
                                         li_data, 0, 0, 0),
             menu = [['manager', '관리자']]
-        )))
+        ))
     elif num == 1:
         i_list = ['name', 'logo', 'frontpage', 'license', 'upload', 'skin', 'edit', 'reg', 'ip_view', 'back_up', 'all_title']
         n_list = ['무명위키', '', '위키:대문', 'CC 0', '2', '', 'normal', '', '', '0', '']
@@ -303,7 +303,7 @@ def edit_set(num = 0):
             if d_list[10]:
                 ch_3 = 'checked="checked"'                
 
-            return(html_minify(template('index', 
+            return html_minify(template('index', 
                 imp = ['기본 설정', wiki_set(conn, 1), custom(conn), other2([0, 0])],
                 data = '<form method="post"> \
                             <span>이름</span><br><br> \
@@ -328,7 +328,7 @@ def edit_set(num = 0):
                             <button class="btn btn-primary" type="submit">저장</button> \
                         </form>',
                 menu = [['edit_set', '설정']]
-            )))
+            ))
     elif num == 2:
         if request.method == 'POST':
             curs.execute("update other set data = ? where name = ?", [request.form['contract'], 'contract'])
@@ -355,7 +355,7 @@ def edit_set(num = 0):
                 x += 1
             conn.commit()
 
-            return(html_minify(template('index', 
+            return html_minify(template('index', 
                 imp = ['문구 관련', wiki_set(conn, 1), custom(conn), other2([0, 0])],
                 data = '<form method="post"> \
                             <span>가입 약관</span><br><br> \
@@ -365,7 +365,7 @@ def edit_set(num = 0):
                             <button class="btn btn-primary" type="submit">저장</button> \
                         </form>',
                 menu = [['edit_set', '설정']]
-            )))
+            ))
     elif num == 3:
         if request.method == 'POST':
             curs.execute("select name from other where name = 'head'")
@@ -385,7 +385,7 @@ def edit_set(num = 0):
             else:
                 data = ''
 
-            return(html_minify(template('index', 
+            return html_minify(template('index', 
                 imp = ['전역 HEAD', wiki_set(conn, 1), custom(conn), other2([0, 0])],
                 data =  '<span>&lt;style&gt;CSS&lt;/style&gt;<br>&lt;script&gt;JS&lt;/script&gt;</span><hr> \
                         <form method="post"> \
@@ -393,7 +393,7 @@ def edit_set(num = 0):
                             <button class="btn btn-primary" type="submit">저장</button> \
                         </form>',
                 menu = [['edit_set', '설정']]
-            )))
+            ))
     elif num == 4:
         if request.method == 'POST':
             curs.execute("select name from other where name = 'robot'")
@@ -417,7 +417,7 @@ def edit_set(num = 0):
             else:
                 data = ''
 
-            return(html_minify(template('index', 
+            return html_minify(template('index', 
                 imp = ['robots.txt', wiki_set(conn, 1), custom(conn), other2([0, 0])],
                 data =  '<a href="/robots.txt">(보기)</a><hr> \
                         <form method="post"> \
@@ -425,7 +425,7 @@ def edit_set(num = 0):
                             <button class="btn btn-primary" type="submit">저장</button> \
                         </form>',
                 menu = [['edit_set', '설정']]
-            )))
+            ))
     elif num == 5:
         if request.method == 'POST':
             curs.execute("update other set data = ? where name = 'recaptcha'", [request.form['recaptcha']])
@@ -452,7 +452,7 @@ def edit_set(num = 0):
                 x += 1
             conn.commit()
 
-            return(html_minify(template('index', 
+            return html_minify(template('index', 
                 imp = ['구글 관련', wiki_set(conn, 1), custom(conn), other2([0, 0])],
                 data = '<form method="post"> \
                             <span>리캡차 (HTML)</span><br><br> \
@@ -462,7 +462,7 @@ def edit_set(num = 0):
                             <button class="btn btn-primary" type="submit">저장</button> \
                         </form>',
                 menu = [['edit_set', '설정']]
-            )))
+            ))
     else:
         return redirect('/')
 
@@ -480,11 +480,11 @@ def not_close_topic():
             
     div += '</ul>'
 
-    return(html_minify(template('index', 
+    return html_minify(template('index', 
         imp = ['열린 토론 목록', wiki_set(conn, 1), custom(conn), other2([0, 0])],
         data = div,
         menu = [['manager', '관리자']]
-    )))
+    ))
 
 @app.route('/image/<name>')
 def image_view(name = None):
@@ -510,11 +510,11 @@ def acl_list():
         
     div += '</ul>'
     
-    return(html_minify(template('index', 
+    return html_minify(template('index', 
         imp = ['ACL 문서 목록', wiki_set(conn, 1), custom(conn), other2([0, 0])],
         data = div,
         menu = [['other', '기타']]
-    )))
+    ))
 
 @app.route('/admin_plus/<name>', methods=['POST', 'GET'])
 def admin_plus(name = None):
@@ -590,11 +590,11 @@ def admin_plus(name = None):
         data += '<li><input type="checkbox" ' + state +  ' name="give" ' + exist_list[6] + '> 권한 부여</li>'
         data += '<li><input type="checkbox" ' + state +  ' name="owner" ' + exist_list[7] + '> 소유자</li></ul>'
 
-        return(html_minify(template('index', 
+        return html_minify(template('index', 
             imp = ['관리 그룹 추가', wiki_set(conn, 1), custom(conn), other2([0, 0])],
             data = '<form method="post">' + data + '<button ' + state +  ' class="btn btn-primary" type="submit">저장</button></form>',
             menu = [['manager', '관리자']]
-        )))        
+        ))        
         
 @app.route('/admin_list')
 def admin_list():
@@ -613,11 +613,11 @@ def admin_list():
         
     div += '</ul>'
                 
-    return(html_minify(template('index', 
+    return html_minify(template('index', 
         imp = ['관리자 목록', wiki_set(conn, 1), custom(conn), other2([0, 0])],
         data = div,
         menu = [['other', '기타']]
-    )))
+    ))
         
 @app.route('/hidden/<path:name>')
 def history_hidden(name = None):
@@ -678,11 +678,11 @@ def user_log():
 
     list_data += next_fix('/user_log?num=', num, user_list)
 
-    return(html_minify(template('index', 
+    return html_minify(template('index', 
         imp = ['사용자 가입 기록', wiki_set(conn, 1), custom(conn), other2([0, 0])],
         data = list_data,
         menu = [['other', '기타']]
-    )))
+    ))
 
 @app.route('/admin_log')
 def admin_log():
@@ -703,11 +703,11 @@ def admin_log():
     list_data += '</ul><hr><ul><li>주의 : 권한 사용 안하고 열람만 해도 기록되는 경우도 있습니다.</li></ul>'
     list_data += next_fix('/admin_log?num=', num, get_list)
 
-    return(html_minify(template('index', 
+    return html_minify(template('index', 
         imp = ['권한 사용 기록', wiki_set(conn, 1), custom(conn), other2([0, 0])],
         data = list_data,
         menu = [['other', '기타']]
-    )))
+    ))
 
 @app.route('/give_log')
 def give_log():        
@@ -724,11 +724,11 @@ def give_log():
     
     list_data += '</ul><hr><a href="/manager/8">(생성)</a>'
 
-    return(html_minify(template('index', 
+    return html_minify(template('index', 
         imp = ['권한 목록', wiki_set(conn, 1), custom(conn), other2([0, 0])],
         data = list_data,
         menu = [['other', '기타']]
-    )))
+    ))
 
 @app.route('/indexing')
 def indexing():
@@ -786,11 +786,11 @@ def xref(name = None):
       
     div += '</ul>' + next_fix('/xref/' + url_pas(name) + '?num=', num, data_list)
     
-    return(html_minify(template('index', 
+    return html_minify(template('index', 
         imp = [name, wiki_set(conn, 1), custom(conn), other2([' (역링크)', 0])],
         data = div,
         menu = [['w/' + url_pas(name), '문서']]
-    )))
+    ))
 
 @app.route('/please')
 def please():
@@ -812,11 +812,11 @@ def please():
         
     div += '</ul>' + next_fix('/please?num=', num, data_list)
     
-    return(html_minify(template('index', 
+    return html_minify(template('index', 
         imp = ['필요한 문서', wiki_set(conn, 1), custom(conn), other2([0, 0])],
         data = div,
         menu = [['other', '기타']]
-    )))
+    ))
         
 @app.route('/recent_discuss')
 @app.route('/recent_discuss/<regex("close"):tools>')
@@ -855,11 +855,11 @@ def recent_discuss(tools = 'normal'):
     else:
         div += '</tbody></table>'
             
-    return(html_minify(template('index', 
+    return html_minify(template('index', 
         imp = ['최근 토론내역', wiki_set(conn, 1), custom(conn), other2([m_sub, 0])],
         data = div,
         menu = 0
-    )))
+    ))
 
 @app.route('/block_log')
 @app.route('/block_log/<regex("ip|user|never_end|can_end|end|now"):tool2>')
@@ -960,11 +960,11 @@ def block_log(name = None, tool = None, tool2 = None):
     else:
         div += next_fix('/' + url_pas(tool) + '/' + url_pas(name) + '?num=', num, data_list)
                 
-    return(html_minify(template('index', 
+    return html_minify(template('index', 
         imp = ['차단 기록', wiki_set(conn, 1), custom(conn), other2([sub, 0])],
         data = div,
         menu = menu
-    )))
+    ))
             
 @app.route('/search', methods=['POST'])
 def search():
@@ -1017,11 +1017,11 @@ def deep_search(name = None):
     div += div_plus + '</ul>'
     div += next_fix('/search/' + url_pas(name) + '?num=', num, all_list)
     
-    return(html_minify(template('index', 
+    return html_minify(template('index', 
         imp = [name, wiki_set(conn, 1), custom(conn), other2([' (검색)', 0])],
         data = div,
         menu = 0
-    )))
+    ))
          
 @app.route('/raw/<path:name>')
 @app.route('/topic/<path:name>/sub/<sub_t>/raw/<int:num>')
@@ -1060,11 +1060,11 @@ def raw_view(name = None, sub_t = None, num = None):
         
         p_data = '<textarea readonly rows="25">' + p_data + '</textarea>'
         
-        return(html_minify(template('index', 
+        return html_minify(template('index', 
             imp = [v_name, wiki_set(conn, 1), custom(conn), other2([sub, 0])],
             data = p_data,
             menu = menu
-        )))
+        ))
     else:
         return redirect('/w/' + url_pas(name))
         
@@ -1122,7 +1122,7 @@ def revert(name = None):
         if not curs.fetchall():
             return redirect('/w/' + url_pas(name))
 
-        return(html_minify(template('index', 
+        return html_minify(template('index', 
             imp = [name, wiki_set(conn, 1), custom(conn), other2([' (되돌리기)', 0])],
             data =  '<form method="post"> \
                         <span>' + request.args.get('num', '0') + '판으로 되돌리겠습니까?</span><hr> \
@@ -1132,7 +1132,7 @@ def revert(name = None):
                         <button class="btn btn-primary" type="submit">되돌리기</button> \
                     </form>',
             menu = [['history/' + url_pas(name), '역사'], ['recent_changes', '최근 변경']]
-        )))            
+        ))            
                     
 @app.route('/big_delete', methods=['POST', 'GET'])
 def big_delete():
@@ -1159,7 +1159,7 @@ def big_delete():
 
         return redirect('/')
     else:
-        return(html_minify(template('index', 
+        return html_minify(template('index', 
             imp = ['많은 문서 삭제', wiki_set(conn, 1), custom(conn), other2([0, 0])],
             data = '<span>문서명 A<br>문서명 B<br>문서명 C<hr>이런 식으로 적으세요.</span><hr> \
                     <form method="post"> \
@@ -1168,7 +1168,7 @@ def big_delete():
                         <button class="btn btn-primary" type="submit">삭제</button> \
                     </form>',
             menu = [['manager', '관리자']]
-        )))
+        ))
 
 @app.route('/edit_filter')
 def edit_filter():
@@ -1182,11 +1182,11 @@ def edit_filter():
     div += '</ul>'
     div += '<hr><a href="/manager/9">(추가)</a>'
 
-    return(html_minify(template('index', 
+    return html_minify(template('index', 
         imp = ['편집 필터 목록', wiki_set(conn, 1), custom(conn), other2([0, 0])],
         data = div,
         menu = [['manager', '관리자']]
-    )))
+    ))
 
 @app.route('/edit_filter/<name>/delete', methods=['POST', 'GET'])
 def delete_edit_filter(name = None):
@@ -1269,7 +1269,7 @@ def set_edit_filter(name = None):
         data += '<select ' + stat + ' name="hour">' + hour + '</select> 시 '
         data += '<select ' + stat + ' name="minu">' + minu + '</select> 분 동안<hr>'
 
-        return(html_minify(template('index', 
+        return html_minify(template('index', 
             imp = [name, wiki_set(conn, 1), custom(conn), other2([' (편집 필터)', 0])],
             data = '<form method="post"> \
                         ' + data + ' \
@@ -1277,7 +1277,7 @@ def set_edit_filter(name = None):
                         <button ' + stat + ' id="preview" class="btn btn-primary" type="submit">저장</button> \
                     </form>',
             menu = [['edit_filter', '목록'], ['edit_filter/' + url_pas(name) + '/delete', '삭제']]
-        )))
+        ))
 
 @app.route('/edit/<path:name>', methods=['POST', 'GET'])
 def edit(name = None):
@@ -1439,7 +1439,7 @@ def edit(name = None):
                 data = get_data[0][0]
                 get_name = ''
 
-        return(html_minify(template('index', 
+        return html_minify(template('index', 
             imp = [name, wiki_set(conn, 1), custom(conn), other2([' (수정)', 0])],
             data = get_name + ' \
                     <form method="post" action="/edit/' + url_pas(name) + action + '"> \
@@ -1452,7 +1452,7 @@ def edit(name = None):
                         <button id="preview" class="btn" type="submit" formaction="/preview/' + url_pas(name) + action + '">미리보기</button> \
                     </form>',
             menu = [['w/' + url_pas(name), '문서']]
-        )))
+        ))
         
 @app.route('/edit_get/<path:name>', methods=['POST'])
 def edit_get(name = None):
@@ -1475,7 +1475,7 @@ def preview(name = None):
     else:
         action = ''
 
-    return(html_minify(template('index', 
+    return html_minify(template('index', 
         imp = [name, wiki_set(conn, 1), custom(conn), other2([' (미리보기)', 0])],
         data = '<form method="post" action="/edit/' + url_pas(name) + action + '"> \
                     <textarea rows="25" name="content">' + html.escape(request.form['content']) + '</textarea> \
@@ -1486,7 +1486,7 @@ def preview(name = None):
                     <button id="preview" class="btn" type="submit" formaction="/preview/' + url_pas(name) + action + '">미리보기</button> \
                 </form><hr>' + enddata,
         menu = [['w/' + url_pas(name), '문서']]
-    )))
+    ))
         
 @app.route('/delete/<path:name>', methods=['POST', 'GET'])
 def delete(name = None):
@@ -1524,7 +1524,7 @@ def delete(name = None):
         if not curs.fetchall():
             return redirect('/w/' + url_pas(name))
 
-        return(html_minify(template('index', 
+        return html_minify(template('index', 
             imp = [name, wiki_set(conn, 1), custom(conn), other2([' (삭제)', 0])],
             data = '<form method="post"> \
                         ' + ip_warring(conn) + ' \
@@ -1533,7 +1533,7 @@ def delete(name = None):
                         <button class="btn btn-primary" type="submit">삭제</button> \
                     </form>',
             menu = [['w/' + url_pas(name), '문서']]
-        )))            
+        ))            
             
 @app.route('/move_data/<path:name>')
 def move_data(name = None):    
@@ -1555,11 +1555,11 @@ def move_data(name = None):
     
     data += '</ul>'
     
-    return(html_minify(template('index', 
+    return html_minify(template('index', 
         imp = [name, wiki_set(conn, 1), custom(conn), other2([' (이동 기록)', 0])],
         data = data,
         menu = [['history/' + url_pas(name), '역사']]
-    )))        
+    ))        
             
 @app.route('/move/<path:name>', methods=['POST', 'GET'])
 def move(name = None):
@@ -1603,7 +1603,7 @@ def move(name = None):
         
         return redirect('/w/' + url_pas(request.form['title']))
     else:            
-        return(html_minify(template('index', 
+        return html_minify(template('index', 
             imp = [name, wiki_set(conn, 1), custom(conn), other2([' (이동)', 0])],
             data = '<form method="post"> \
                         ' + ip_warring(conn) + ' \
@@ -1613,11 +1613,11 @@ def move(name = None):
                         <button class="btn btn-primary" type="submit">이동</button> \
                     </form>',
             menu = [['w/' + url_pas(name), '문서']]
-        )))
+        ))
             
 @app.route('/other')
 def other():
-    return(html_minify(template('index', 
+    return html_minify(template('index', 
         imp = ['기타 메뉴', wiki_set(conn, 1), custom(conn), other2([0, 0])],
         data = namumark(conn, '', '[목차(없음)]\r\n' + \
                             '== 기록 ==\r\n' + \
@@ -1641,14 +1641,14 @@ def other():
                             '== 버전 ==\r\n' + \
                             ' * 이 오픈나무는 [[https://github.com/2DU/openNAMU/blob/master/version.md|' + r_ver + ']] 입니다.', 0, 0, 0),
         menu = 0
-    )))
+    ))
     
 @app.route('/manager', methods=['POST', 'GET'])
 @app.route('/manager/<int:num>', methods=['POST', 'GET'])
 def manager(num = 1):
     title_list = [['문서 ACL', '문서명', 'acl'], ['사용자 검사', 0, 'check'], ['사용자 차단', 0, 'ban'], ['권한 주기', 0, 'admin'], ['편집 기록', 0, 'record'], ['토론 기록', 0, 'topic_record'], ['그룹 생성', '그룹명', 'admin_plus'], ['편집 필터 생성', '필터명', 'edit_filter'], ['문서 검색', '문서명', 'search'], ['차단자 검색', 0, 'block_user'], ['관리자 검색', 0, 'block_admin'], ['주시 문서 추가', '문서명', 'watch_list']]
     if num == 1:
-        return(html_minify(template('index', 
+        return html_minify(template('index', 
             imp = ['관리자 메뉴', wiki_set(conn, 1), custom(conn), other2([0, 0])],
             data = namumark(conn, '',   '[목차(없음)]\r\n' + \
                                         '== 목록 ==\r\n' + \
@@ -1666,7 +1666,7 @@ def manager(num = 1):
                                         '== 기타 ==\r\n' + \
                                         ' * 이 메뉴에 없는 기능은 해당 문서의 역사나 토론에서 바로 사용 가능함', 0, 0, 0),
             menu = [['other', '기타']]
-        )))
+        ))
     elif num in range(2, 14):
         if request.method == 'POST':
             return redirect('/' + title_list[(num - 2)][2] + '/' + url_pas(request.form['name']))
@@ -1676,19 +1676,19 @@ def manager(num = 1):
             else:
                 placeholder = title_list[(num - 2)][1]
 
-            return(html_minify(template('index', 
+            return html_minify(template('index', 
                 imp = [title_list[(num - 2)][0], wiki_set(conn, 1), custom(conn), other2([0, 0])],
                 data = '<form method="post"> \
                             <input placeholder="' + placeholder + '" name="name" type="text"><hr> \
                             <button class="btn btn-primary" type="submit">이동</button> \
                         </form>',
                 menu = [['manager', '관리자']]
-            )))
+            ))
     elif num == 100:
         if request.method == 'POST':
             return redirect('/check/' + url_pas(request.form['name']) + '?plus=' + url_pas(request.form['name2']))
         else:
-            return(html_minify(template('index', 
+            return html_minify(template('index', 
                 imp = ['검사', wiki_set(conn, 1), custom(conn), other2([0, 0])],
                 data = '<form method="post"> \
                             <input placeholder="사용자명" name="name" type="text"><hr> \
@@ -1696,7 +1696,7 @@ def manager(num = 1):
                             <button class="btn btn-primary" type="submit">이동</button> \
                         </form>',
                 menu = [['manager', '관리자']]
-            )))
+            ))
     else:
         return redirect('/')
         
@@ -1771,11 +1771,11 @@ def title_index():
     else:
         sub = ' (' + str(num) + '개)'
     
-    return(html_minify(template('index', 
+    return html_minify(template('index', 
         imp = ['모든 문서', wiki_set(conn, 1), custom(conn), other2([sub, 0])],
         data = data,
         menu = [['other', '기타']]
-    )))
+    ))
         
 @app.route('/topic/<path:name>/sub/<sub>/b/<int:num>')
 def topic_block(name = None, sub = None, num = None):
@@ -1905,11 +1905,11 @@ def topic_admin(name = None, sub = None, num = None):
     ban = '== 정보 ==\r\n' + ban
     ban = '[목차(없음)]\r\n' + ban
 
-    return(html_minify(template('index', 
+    return html_minify(template('index', 
         imp = ['토론 도구', wiki_set(conn, 1), custom(conn), other2([' (' + str(num) + '번)', 0])],
         data = namumark(conn, '', ban, 0, 0, 0),
         menu = [['topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '#' + str(num), '토론']]
-    )))
+    ))
 
 @app.route('/topic/<path:name>/sub/<sub>', methods=['POST', 'GET'])
 def topic(name = None, sub = None):
@@ -2063,11 +2063,11 @@ def topic(name = None, sub = None):
 
             data += '<button class="btn btn-primary" type="submit">전송</button></form>'
 
-        return(html_minify(template('index', 
+        return html_minify(template('index', 
             imp = [name, wiki_set(conn, 1), custom(conn), other2([' (토론)', 0])],
             data = '<h2 id="topic_top_title">' + sub + '</h2><hr id="under_bar" style="margin-top: -5px;">' + all_data + data,
             menu = [['topic/' + url_pas(name), '목록']]
-        )))
+        ))
         
 @app.route('/topic/<path:name>', methods=['POST', 'GET'])
 @app.route('/topic/<path:name>/<regex("close|agree"):tool>', methods=['GET'])
@@ -2121,11 +2121,11 @@ def close_topic_list(name = None, tool = None):
         if div == '':
             plus = re.sub('^<br>', '', plus)
         
-        return(html_minify(template('index', 
+        return html_minify(template('index', 
             imp = [name, wiki_set(conn, 1), custom(conn), other2([' (' + sub + ')', 0])],
             data =  '<form method="post">' + div + plus + '</form>',
             menu = menu
-        )))
+        ))
         
 @app.route('/login', methods=['POST', 'GET'])
 def login():
@@ -2173,7 +2173,7 @@ def login():
         
         return redirect('/user')                            
     else:        
-        return(html_minify(template('index',    
+        return html_minify(template('index',    
             imp = ['로그인', wiki_set(conn, 1), custom(conn), other2([0, 0])],
             data = '<form method="post"> \
                         <input placeholder="아이디" name="id" type="text"><hr> \
@@ -2183,7 +2183,7 @@ def login():
                         <span>주의 : 만약 HTTPS 연결이 아닌 경우 데이터가 유출될 가능성이 있습니다. 이에 대해 책임지지 않습니다.</span> \
                     </form>',
             menu = [['user', '사용자']]
-        )))
+        ))
                 
 @app.route('/change', methods=['POST', 'GET'])
 def change_password():
@@ -2221,7 +2221,7 @@ def change_password():
         if re.search('(\.|:)', ip):
             return redirect('/login')
 
-        return(html_minify(template('index',    
+        return html_minify(template('index',    
             imp = ['비밀번호 변경', wiki_set(conn, 1), custom(conn), other2([0, 0])],
             data = '<form method="post"> \
                         <input placeholder="현재 비밀번호" name="pw" type="password"><hr> \
@@ -2231,7 +2231,7 @@ def change_password():
                         <span>주의 : 만약 HTTPS 연결이 아닌 경우 데이터가 유출될 가능성이 있습니다. 이에 대해 책임지지 않습니다.</span> \
                     </form>',
             menu = [['user', '사용자']]
-        )))
+        ))
                 
 @app.route('/check/<name>')
 def user_check(name = None):
@@ -2278,11 +2278,11 @@ def user_check(name = None):
     else:
         return re_error(conn, '/error/5')
             
-    return(html_minify(template('index',    
+    return html_minify(template('index',    
         imp = ['다중 검사', wiki_set(conn, 1), custom(conn), other2([0, 0])],
         data = div,
         menu = [['manager', '관리자']]
-    )))
+    ))
                 
 @app.route('/register', methods=['POST', 'GET'])
 def register():
@@ -2335,7 +2335,7 @@ def register():
         if data and data[0][0] != '':
             contract = data[0][0] + '<hr>'
 
-        return(html_minify(template('index',    
+        return html_minify(template('index',    
             imp = ['회원가입', wiki_set(conn, 1), custom(conn), other2([0, 0])],
             data = '<form method="post"> \
                         ' + contract + ' \
@@ -2347,7 +2347,7 @@ def register():
                         <span>주의 : 만약 HTTPS 연결이 아닌 경우 데이터가 유출될 가능성이 있습니다. 이에 대해 책임지지 않습니다.</span> \
                     </form>',
             menu = [['user', '사용자']]
-        )))
+        ))
             
 @app.route('/logout')
 def logout():
@@ -2474,11 +2474,11 @@ def user_ban(name = None):
             data += '<select name="minu">' + minu + '</select> 분 까지<hr>'
             data += '<input placeholder="사유" class="form-control" name="why" type="text"><br>' + plus
 
-        return(html_minify(template('index', 
+        return html_minify(template('index', 
             imp = [name, wiki_set(conn, 1), custom(conn), other2([' (' + now + ')', 0])],
             data = '<form method="post">' + data + '<button class="btn btn-primary" type="submit">' + now + '</button></form>',
             menu = [['manager', '관리자']]
-        )))            
+        ))            
                 
 @app.route('/acl/<path:name>', methods=['POST', 'GET'])
 def acl(name = None):
@@ -2558,7 +2558,7 @@ def acl(name = None):
         else:
             plus = '<option value="admin" ' + acl_list[0] + '>관리자</option>'
             
-        return(html_minify(template('index', 
+        return html_minify(template('index', 
             imp = [name, wiki_set(conn, 1), custom(conn), other2([' (ACL)', 0])],
             data = '<form method="post"> \
                         <span>현재 ACL : ' + now + '</span><hr> \
@@ -2570,7 +2570,7 @@ def acl(name = None):
                         <button class="btn btn-primary" type="submit">ACL 변경</button> \
                     </form>',
             menu = [['w/' + url_pas(name), '문서'], ['manager', '관리자']]
-        )))
+        ))
             
 @app.route('/admin/<name>', methods=['POST', 'GET'])
 def user_admin(name = None):
@@ -2626,14 +2626,14 @@ def user_admin(name = None):
                     else:
                         div += '<option value="' + data[0] + '">' + data[0] + '</option>'
         
-        return(html_minify(template('index', 
+        return html_minify(template('index', 
             imp = [name, wiki_set(conn, 1), custom(conn), other2([' (권한 부여)', 0])],
             data =  '<form method="post"> \
                         <select name="select">' + div + '</select><hr> \
                         <button class="btn btn-primary" type="submit">변경</button> \
                     </form>',
             menu = [['manager', '관리자']]
-        )))
+        ))
     
 @app.route('/diff/<path:name>')
 def diff_data(name = None):
@@ -2654,11 +2654,11 @@ def diff_data(name = None):
                 diff_data = difflib.SequenceMatcher(None, first_data, second_data)
                 result = diff(diff_data)
             
-            return(html_minify(template('index', 
+            return html_minify(template('index', 
                 imp = [name, wiki_set(conn, 1), custom(conn), other2([' (비교)', 0])],
                 data = '<pre>' + result + '</pre>',
                 menu = [['history/' + url_pas(name), '역사']]
-            )))
+            ))
 
     return redirect('/history/' + url_pas(name))
         
@@ -2674,11 +2674,11 @@ def down(name = None):
         
     div += '</ul>'
     
-    return(html_minify(template('index', 
+    return html_minify(template('index', 
         imp = [name, wiki_set(conn, 1), custom(conn), other2([' (하위)', 0])],
         data = div,
         menu = [['w/' + url_pas(name), '문서']]
-    )))
+    ))
 
 @app.route('/w/<path:name>')
 def read_view(name = None):
@@ -2856,11 +2856,11 @@ def read_view(name = None):
     else:
         div = enddata + namumark(conn, name, div, 0, 0, 0)
 
-    return(html_minify(template('index', 
+    return html_minify(template('index', 
         imp = [name, wiki_set(conn, 1), custom(conn), other2([sub + acl, r_date])],
         data = div,
         menu = menu
-    )))
+    ))
 
 @app.route('/topic_record/<name>')
 def user_topic_list(name = None):
@@ -2904,11 +2904,11 @@ def user_topic_list(name = None):
     else:
         sub = 0 
     
-    return(html_minify(template('index', 
+    return html_minify(template('index', 
         imp = ['토론 기록', wiki_set(conn, 1), custom(conn), other2([sub, 0])],
         data = div,
         menu = [['other', '기타'], ['user', '사용자'], ['count/' + url_pas(name), '횟수'], ['record/' + url_pas(name), '편집 기록']]
-    )))
+    ))
 
 @app.route('/recent_changes')
 @app.route('/<regex("record"):tool>/<name>')
@@ -3084,11 +3084,11 @@ def recent_changes(name = None, tool = 'record'):
         if sub == '':
             sub = 0
                 
-        return(html_minify(template('index', 
+        return html_minify(template('index', 
             imp = [title, wiki_set(conn, 1), custom(conn), other2([sub, 0])],
             data = div,
             menu = menu
-        )))
+        ))
     
 @app.route('/upload', methods=['GET', 'POST'])
 def upload():
@@ -3156,7 +3156,7 @@ def upload():
         
         return redirect('/w/파일:' + name)            
     else:
-        return(html_minify(template('index', 
+        return html_minify(template('index', 
             imp = ['파일 올리기', wiki_set(conn, 1), custom(conn), other2([0, 0])],
             data =  '<form method="post" enctype="multipart/form-data" accept-charset="utf8"> \
                         <input type="file" name="f_data"><hr> \
@@ -3166,7 +3166,7 @@ def upload():
                         <button class="btn btn-primary" type="submit">저장</button> \
                     </form>',
             menu = [['other', '기타']]
-        )))  
+        ))  
         
 @app.route('/user')
 def user_info():
@@ -3199,7 +3199,7 @@ def user_info():
     else:
         plus = ' * [[wiki:login|로그인]]'
 
-    return(html_minify(template('index', 
+    return html_minify(template('index', 
         imp = ['사용자 메뉴', wiki_set(conn, 1), custom(conn), other2([0, 0])],
         data =  namumark(conn, '',  '[목차(없음)]\r\n' + \
                                     '== 상태 ==\r\n' + \
@@ -3219,7 +3219,7 @@ def user_info():
                                     ' * [[wiki:watch_list|주시 문서]]\r\n' + \
                                     ' * [[wiki:count|활동 횟수]]\r\n', 0, 0, 0),
         menu = 0
-    )))
+    ))
 
 @app.route('/watch_list')
 def watch_list():
@@ -3239,11 +3239,11 @@ def watch_list():
 
     div += '<a href="/manager/13">(추가)</a>'
 
-    return(html_minify(template('index', 
+    return html_minify(template('index', 
         imp = ['편집 필터 목록', wiki_set(conn, 1), custom(conn), other2([0, 0])],
         data = div,
         menu = [['manager', '관리자']]
-    )))
+    ))
 
 @app.route('/watch_list/<name>')
 def watch_list_name(name = None):
@@ -3278,11 +3278,11 @@ def view_log():
         data += '<li>기록 없음</li>'
     data += '</ul>'
 
-    return(html_minify(template('index', 
+    return html_minify(template('index', 
         imp = ['지나온 문서', wiki_set(conn, 1), custom(conn), other2([0, 0])],
         data = data,
         menu = [['user', '사용자']]
-    )))
+    ))
 
 @app.route('/custom_head', methods=['GET', 'POST'])
 def custom_head_view():
@@ -3317,7 +3317,7 @@ def custom_head_view():
 
         start += '<span>&lt;style&gt;CSS&lt;/style&gt;<br>&lt;script&gt;JS&lt;/script&gt;</span><hr>'
 
-        return(html_minify(template('index', 
+        return html_minify(template('index', 
             imp = ['사용자 HEAD', wiki_set(conn, 1), custom(conn), other2([0, 0])],
             data =  start + ' \
                     <form method="post"> \
@@ -3325,7 +3325,7 @@ def custom_head_view():
                         <button class="btn btn-primary" type="submit">저장</button> \
                     </form>',
             menu = [['user', '사용자']]
-        )))
+        ))
 
 @app.route('/count')
 @app.route('/count/<name>')
@@ -3349,11 +3349,11 @@ def count_edit(name = None):
     else:
         t_data = 0
 
-    return(html_minify(template('index', 
+    return html_minify(template('index', 
         imp = ['활동 횟수', wiki_set(conn, 1), custom(conn), other2([0, 0])],
         data = namumark(conn, "", "[목차(없음)]\r\n== " + that + " ==\r\n||<:> 편집 횟수 ||<:> " + str(data) + "||\r\n||<:> 토론 횟수 ||<:> " + str(t_data) + "||", 0, 0, 0),
         menu = [['user', '사용자'], ['record/' + url_pas(that), '편집 기록'], ['topic_record/' + url_pas(that), '토론 기록']]
-    )))
+    ))
         
 @app.route('/random')
 def random():
