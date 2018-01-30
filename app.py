@@ -16,7 +16,7 @@ logging.basicConfig(level = logging.ERROR)
 app = Flask(__name__)
 Reggie(app)
 
-r_ver = 'v2.6.1'
+r_ver = 'v2.6.2 beta'
 print('버전 : ' + r_ver)
 
 from func import *
@@ -737,7 +737,7 @@ def indexing():
 
     curs.execute("select name from sqlite_master where type = 'index'")
     index_data = curs.fetchall()
-    if(index_data):
+    if index_data:
         for delete_index in index_data:
             print('----- delete : ' + delete_index[0] + ' -----')
             
@@ -783,7 +783,8 @@ def xref(name = None):
         
     div = '<ul>'
     
-    curs.execute("select link, type from back where title = ? and not type = 'cat' and not type = 'no' order by link asc limit ?, '50'", [name, str(sql_num)])
+    curs.execute("select link, type from back where title = ? and not type = 'cat' and not type = 'no' order by link asc limit ?, '50'", \
+                [name, str(sql_num)])
     data_list = curs.fetchall()
     for data in data_list:
         div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a>'
@@ -890,12 +891,15 @@ def block_log(name = None, tool = None, tool2 = None):
     else:
         sql_num = 0
     
-    div = '<table style="width: 100%; text-align: center;"><tbody><tr><td style="width: 33.3%;">차단자</td><td style="width: 33.3%;">관리자</td><td style="width: 33.3%;">기간</td></tr>'
+    div = '<table style="width: 100%; text-align: center;"><tbody><tr><td style="width: 33.3%;">차단자</td>' + \
+        '<td style="width: 33.3%;">관리자</td><td style="width: 33.3%;">기간</td></tr>'
     data_list = ''
     
     if not name:
         if not tool2:
-            div = '<a href="/manager/11">(차단자)</a> <a href="/manager/12">(관리자)</a><hr><a href="/block_log/ip">(아이피)</a> <a href="/block_log/user">(가입자)</a> <a href="/block_log/never_end">(영구)</a> <a href="/block_log/can_end">(기간)</a> <a href="/block_log/end">(해제)</a> <a href="/block_log/now">(현재)</a><hr>' + div
+            div = '<a href="/manager/11">(차단자)</a> <a href="/manager/12">(관리자)</a><hr><a href="/block_log/ip">(아이피)</a>' + \
+                ' <a href="/block_log/user">(가입자)</a> <a href="/block_log/never_end">(영구)</a> <a href="/block_log/can_end">(기간)</a>' + \
+                ' <a href="/block_log/end">(해제)</a> <a href="/block_log/now">(현재)</a><hr>' + div
             sub = 0
             menu = [['other', '기타']]
 
@@ -1314,7 +1318,8 @@ def edit(name = None):
                 match = re.compile(data_list[0])
                 if match.search(request.form['content']):
                     if data_list[1] == 'X':
-                        curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, '')", [ip, '', get_time(), '도구:편집 필터', '편집 필터에 의한 차단'])
+                        curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, '')", \
+                                    [ip, '', get_time(), '도구:편집 필터', '편집 필터에 의한 차단'])
                         curs.execute("insert into ban (block, end, why, band, login) values (?, '', ?, '', '')", [ip, '편집 필터에 의한 차단'])
                     elif not data_list[1] == '':
                         match = re.search("^([^ ]+) ([^:]+):([^:]+)$", data_list[1])
@@ -1361,7 +1366,8 @@ def edit(name = None):
 
                         end = str(year) + '-' + time_list[0] + '-' + time_list[1] + ' ' + time_list[2] + ':' + time_list[3] + ':' + time_data[5]
 
-                        curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, '')", [ip, end, get_time(), '도구:편집 필터', '편집 필터에 의한 차단'])
+                        curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, '')", \
+                                    [ip, end, get_time(), '도구:편집 필터', '편집 필터에 의한 차단'])
                         curs.execute("insert into ban (block, end, why, band, login) values (?, ?, ?, '', '')", [ip, end, '편집 필터에 의한 차단'])
                     
                     conn.commit()
@@ -1398,7 +1404,8 @@ def edit(name = None):
 
         curs.execute("select user from scan where title = ?", [name])
         for user_data in curs.fetchall():
-            curs.execute("insert into alarm (name, data, date) values (?, ?, ?)", [ip, ip + '님이 <a href="/w/' + url_pas(name) + '">' + name + '</a> 문서를 편집 했습니다.', today])
+            curs.execute("insert into alarm (name, data, date) values (?, ?, ?)", \
+                        [ip, ip + '님이 <a href="/w/' + url_pas(name) + '">' + name + '</a> 문서를 편집 했습니다.', today])
 
         history_plus(conn, name, content, today, ip, send_p(request.form['send']), leng)
         curs.execute("delete from back where link = ?", [name])
@@ -1417,7 +1424,8 @@ def edit(name = None):
                 
                 data = new[0][0] + '\r\n'
                 while 1:
-                    m = re.search("((?:={1,6})\s?(?:[^=]*)\s?(?:={1,6})(?:\s+)?\n(?:(?:(?:(?!(?:={1,6})\s?(?:[^=]*)\s?(?:={1,6})(?:\s+)?\n).)*)(?:\n)?)+)", data)
+                    m = re.search("((?:={1,6})\s?(?:[^=]*)\s?(?:={1,6})(?:\s+)?\n(?:(?:(?:(?!(?:={1,6})" + \
+                                "\s?(?:[^=]*)\s?(?:={1,6})(?:\s+)?\n).)*)(?:\n)?)+)", data)
                     if m:
                         if i == int(request.args.get('section', 0)) - 1:
                             g = m.groups()
@@ -1425,7 +1433,8 @@ def edit(name = None):
                             
                             break
                         else:
-                            data = re.sub("((?:={1,6})\s?(?:[^=]*)\s?(?:={1,6})(?:\s+)?\n(?:(?:(?:(?!(?:={1,6})\s?(?:[^=]*)\s?(?:={1,6})(?:\s+)?\n).)*)(?:\n)?)+)", "", data, 1)
+                            data = re.sub("((?:={1,6})\s?(?:[^=]*)\s?(?:={1,6})(?:\s+)?\n(?:(?:(?:(?!(?:={1,6})" + \
+                                        "\s?(?:[^=]*)\s?(?:={1,6})(?:\s+)?\n).)*)(?:\n)?)+)", "", data, 1)
                             
                             i += 1
                     else:
@@ -1563,9 +1572,7 @@ def move_data(name = None):
     for for_data in curs.fetchall():
         match = re.findall('<a href="\/w\/(?:(?:(?!">).)+)">((?:(?!<\/a>).)+)<\/a>', for_data[0])
         send = re.sub('\([^\)]+\)$', '', for_data[0])
-        
-            
-
+    
         data += '<li><a href="/move_data/' + url_pas(match[0]) + '">' + match[0] + '</a> - <a href="/move_data/' + url_pas(match[1]) + '">' + match[1] + '</a>'
         if re.search('^( *)+$', send):
             data += ' / ' + for_data[2] + ' / ' + for_data[1] + '</li>'
@@ -1611,7 +1618,8 @@ def move(name = None):
         else:
             d = ''
             
-        history_plus(conn, name, d, today, ip, request.form['send'] + ' (<a href="/w/' + url_pas(name) + '">' + name + '</a> - <a href="/w/' + url_pas(request.form['title']) + '">' + request.form['title'] + '</a> 이동)', leng)
+        history_plus(conn, name, d, today, ip, request.form['send'] + ' (<a href="/w/' + url_pas(name) + '">' + name + \
+                    '</a> - <a href="/w/' + url_pas(request.form['title']) + '">' + request.form['title'] + '</a> 이동)', leng)
 
         curs.execute("select title, link from back where title = ? and not type = 'cat' and not type = 'no'", [name])
         for data in curs.fetchall():
