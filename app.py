@@ -735,21 +735,40 @@ def indexing():
     if admin_check(conn, None, 'indexing') != 1:
         return re_error(conn, '/error/3')
 
-    curs.execute("select name from sqlite_master where type in ('table', 'view') and name not like " + \
-                "sqlite_%' union all select name from sqlite_temp_master where type in ('table', 'view') order by 1;")
-    data = curs.fetchall()
-    for table in data:
-        print('----- ' + table[0] + ' -----')
-        curs.execute('select sql from sqlite_master where name = ?', [table[0]])
-        cul = curs.fetchall()
-        r_cul = re.findall('(?:([^ (]*) text)', str(cul[0]))
-        for n_cul in r_cul:
-            print(n_cul)
-            sql = 'create index index_' + table[0] + '_' + n_cul + ' on ' + table[0] + '(' + n_cul + ')'
+    curs.execute("select name from sqlite_master where type = 'index'")
+    index_data = curs.fetchall()
+    if(index_data):
+        for delete_index in index_data:
+            print('----- delete : ' + delete_index[0] + ' -----')
+            
+            sql = 'drop index if exists ' + delete_index[0]
+
             try:
                 curs.execute(sql)
             except:
                 pass
+    else:
+        curs.execute("select name from sqlite_master where type in ('table', 'view') and name not like " + \
+                    "'sqlite_%' union all select name from sqlite_temp_master where type in ('table', 'view') order by 1;")
+        data = curs.fetchall()
+        
+        for table in data:
+            print('----- create : ' + table[0] + ' -----')
+            
+            curs.execute('select sql from sqlite_master where name = ?', [table[0]])
+            cul = curs.fetchall()
+            
+            r_cul = re.findall('(?:([^ (]*) text)', str(cul[0]))
+            
+            for n_cul in r_cul:
+                print(n_cul)
+                
+                sql = 'create index index_' + table[0] + '_' + n_cul + ' on ' + table[0] + '(' + n_cul + ')'
+                
+                try:
+                    curs.execute(sql)
+                except:
+                    pass
 
     conn.commit()
     return redirect('/')        
@@ -1660,7 +1679,7 @@ def manager(num = 1):
                                         ' * [[wiki:big_delete|여러 문서 삭제]]\r\n' + \
                                         ' * [[wiki:edit_filter|편집 필터]]\r\n' + \
                                         '== 소유자 ==\r\n' + \
-                                        ' * [[wiki:indexing|인덱싱]]\r\n' + \
+                                        ' * [[wiki:indexing|인덱싱 (생성 or 삭제)]]\r\n' + \
                                         ' * [[wiki:manager/8|관리 그룹 생성]]\r\n' + \
                                         ' * [[wiki:edit_set|설정 편집]]\r\n' + \
                                         '== 기타 ==\r\n' + \
