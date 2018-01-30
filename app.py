@@ -1913,7 +1913,7 @@ def topic_admin(name = None, sub = None, num = None):
         is_ban += ']]\r\n'
 
         curs.execute("select end from ban where block = ?", [data[0][1]])
-        ban += ' * [[wiki:/ban/' + url_pas(data[0][1]) + '|'
+        ban += ' * [[wiki:ban/' + url_pas(data[0][1]) + '|'
         if curs.fetchall():
             ban += '차단 해제'
         else:
@@ -1921,7 +1921,7 @@ def topic_admin(name = None, sub = None, num = None):
         ban += ']]\r\n' + is_ban
 
     ban += '== 기타 도구 ==\r\n'
-    ban += ' * [[wiki:/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/raw/' + str(num) + '|원본]]\r\n'
+    ban += ' * [[wiki:topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/raw/' + str(num) + '|원본]]\r\n'
     ban = ' * 작성 시간 : ' + data[0][2] + '\r\n' + ban
 
     if re.search('(\.|:)', data[0][1]):
