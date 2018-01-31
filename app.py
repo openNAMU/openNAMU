@@ -11,8 +11,9 @@ import shutil
 import threading
 import logging
 import random
-logging.basicConfig(level = logging.ERROR)
+import sys
 
+logging.basicConfig(level = logging.ERROR)
 app = Flask(__name__)
 Reggie(app)
 
@@ -772,6 +773,17 @@ def indexing():
 
     conn.commit()
     return redirect('/')        
+
+@app.route('/re_start')
+def re_start():
+    if admin_check(conn, None, 're_start') != 1:
+        return re_error(conn, '/error/3')
+
+    print('')
+    print('서버 재 시작')
+    print('')
+
+    os.execl(sys.executable, sys.executable, *sys.argv)
         
 @app.route('/xref/<path:name>')
 def xref(name = None):
@@ -1690,6 +1702,7 @@ def manager(num = 1):
                                         ' * [[wiki:indexing|인덱싱 (생성 or 삭제)]]\r\n' + \
                                         ' * [[wiki:manager/8|관리 그룹 생성]]\r\n' + \
                                         ' * [[wiki:edit_set|설정 편집]]\r\n' + \
+                                        ' * [[wiki:re_start|서버 재 시작]]\r\n' + \
                                         '== 기타 ==\r\n' + \
                                         ' * 이 메뉴에 없는 기능은 해당 문서의 역사나 토론에서 바로 사용 가능함', 0, 0, 0),
             menu = [['other', '기타']]
