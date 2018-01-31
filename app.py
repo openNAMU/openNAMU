@@ -46,7 +46,7 @@ except:
             pass
 
 # 디비 연결
-conn = sqlite3.connect(set_data['db'] + '.db')
+conn = sqlite3.connect(set_data['db'] + '.db', check_same_thread = False)
 curs = conn.cursor()
 
 # 스킨 불러오기 부분

@@ -13,10 +13,13 @@ def get_time():
     return date
     
 def ip_check():
-    if ('Now' and 'DREAMER') in session and session['Now'] == 1:
+    if session and ('Now' and 'DREAMER') in session and session['Now'] == 1:
         ip = session['DREAMER']
     else:
-        ip = request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
+        try:
+            ip = request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
+        except:
+            ip = 'None'
 
     return str(ip)
 
