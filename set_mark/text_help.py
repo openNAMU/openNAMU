@@ -11,4 +11,4 @@ def text_help(data):
     data = re.sub('{{\|(?P<in>(?:(?:(?:(?!\|}}).)*)(?:\n?))+)\|}}', '<table><tbody><tr><td>\g<in></td></tr></tbody></table>', data)
     data = re.sub("-{4,11}", "<hr>", data)
         
-    return(data)
+    return data

@@ -6,4 +6,4 @@ def start(data):
     data = re.sub("\n", "\r\n", re.sub("\r\n", "\n", data))
     data = '\r\n' + data + '\r\n'
         
-    return(data)
+    return data
