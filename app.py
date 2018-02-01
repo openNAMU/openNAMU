@@ -740,10 +740,10 @@ def indexing():
 
     curs.execute("select name from sqlite_master where type = 'index'")
     index_data = curs.fetchall()
-    
+
     if index_data:
         for delete_index in index_data:
-            print('----- delete : ' + delete_index[0] + ' -----')
+            print('delete : ' + delete_index[0])
             
             sql = 'drop index if exists ' + delete_index[0]
 
@@ -756,16 +756,14 @@ def indexing():
                     "'sqlite_%' union all select name from sqlite_temp_master where type in ('table', 'view') order by 1;")
         data = curs.fetchall()
         
-        for table in data:
-            print('----- create : ' + table[0] + ' -----')
-            
+        for table in data:            
             curs.execute('select sql from sqlite_master where name = ?', [table[0]])
             cul = curs.fetchall()
             
             r_cul = re.findall('(?:([^ (]*) text)', str(cul[0]))
             
             for n_cul in r_cul:
-                print(n_cul)
+                print('create : index_' + table[0] + '_' + n_cul)
                 
                 sql = 'create index index_' + table[0] + '_' + n_cul + ' on ' + table[0] + '(' + n_cul + ')'
                 
