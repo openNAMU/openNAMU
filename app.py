@@ -736,8 +736,11 @@ def indexing():
     if admin_check(conn, None, 'indexing') != 1:
         return re_error(conn, '/error/3')
 
+    print('')
+
     curs.execute("select name from sqlite_master where type = 'index'")
     index_data = curs.fetchall()
+    
     if index_data:
         for delete_index in index_data:
             print('----- delete : ' + delete_index[0] + ' -----')
@@ -772,6 +775,9 @@ def indexing():
                     pass
 
     conn.commit()
+
+    print('')
+
     return redirect('/')        
 
 @app.route('/re_start')
