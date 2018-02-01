@@ -2,11 +2,11 @@ import re
 from urllib import parse
 
 def url_pas(data):
-    return(parse.quote(data).replace('/','%2F'))
+    return parse.quote(data).replace('/','%2F')
 
 def toc_pas(data, title, num, toc_y):
-    if(not re.search('\[목차\]', data)):
-        if(not re.search('\[목차\(없음\)\]', data)):
+    if not re.search('\[목차\]', data):
+        if not re.search('\[목차\(없음\)\]', data):
             data = re.sub("(?P<in>(={1,6})\s?([^=]*)\s?(?:={1,6})(?:\s+)?\n)", "[목차]\n\g<in>", data, 1)
         else:
             data = re.sub("\[목차\(없음\)\]", "", data)
@@ -19,13 +19,13 @@ def toc_pas(data, title, num, toc_y):
     toc_d = -1
     span = ''
     rtoc = '<div id="toc"><span id="toc-name">목차</span><br><br>'
-    while(1):
+    while 1:
         i[0] += 1
         m = re.search('(={1,6})\s?([^=]*)\s?(?:={1,6})(?:\s+)?\r\n', data)
-        if(m):
+        if m:
             result = m.groups()
             wiki = len(result[0])
-            if(last < wiki):
+            if last < wiki:
                 last = wiki
             else:
                 last = wiki
@@ -42,15 +42,15 @@ def toc_pas(data, title, num, toc_y):
             toc = re.sub("#\.", '.', toc)
             toc = re.sub("\.$", '', toc)
 
-            if(toc_c == -1):
+            if toc_c == -1:
                 margin = ''
                 toc_c = toc.count('.')
             else:
                 toc_d = toc.count('.')
-                if(toc_c == toc_d):
+                if toc_c == toc_d:
                     margin = 'style="margin-top: 30px;"'
                 else:
-                    if(toc_d < toc_c):
+                    if toc_d < toc_c:
                         margin = 'style="margin-top: 30px;"'
                     else:
                         margin = 'style="margin-top: 15px;"'
@@ -67,7 +67,7 @@ def toc_pas(data, title, num, toc_y):
             c = re.sub("\[\[(([^|]*)\|)?(?P<in>[^\]]*)\]\]", "\g<in>", c)
 
             edit_d = ''
-            if(toc_y == 1):
+            if toc_y == 1:
                 edit_d = ' <span style="font-size: 12px;"><a href="/edit/' + url_pas(title) + '?section=' + str(i[0]) + '">(편집)</a></span>'
 
             data = re.sub('(={1,6})\s?([^=]*)\s?(?:={1,6})(?:\s+)?\n', '<tablenobr><h' + str(wiki) + ' id="' + c + '" ' + margin + '><a href="#toc" id="s-' + toc + '">' \
@@ -80,4 +80,4 @@ def toc_pas(data, title, num, toc_y):
     
     data = re.sub("\[목차\]", rtoc, data)
 
-    return(data)
+    return data

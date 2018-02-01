@@ -7,15 +7,15 @@ def html_pas(data):
 
     d_list = re.findall('<(\/)?([^> ]+)( (?:[^>]+)?)?>', data)
     for i_list in d_list:
-        if(i_list[0] == ''):
-            if(i_list[1] in ['div', 'span', 'embed', 'iframe']):
-                if(re.search('<\/' + i_list[1] + '>', data)):
+        if i_list[0] == '':
+            if i_list[1] in ['div', 'span', 'embed', 'iframe']:
+                if re.search('<\/' + i_list[1] + '>', data):
                     src = re.search('src=([^ ]*)', i_list[2])
-                    if(src):
+                    if src:
                         v_src = re.search('http(?:s)?:\/\/([^/\'" ]*)', src.groups()[0])
                         data_list = ["www.youtube.com", "serviceapi.nmv.naver.com", "tv.kakao.com", "www.google.com", "serviceapi.rmcnmv.naver.com"]
-                        if(v_src):
-                            if(not v_src.groups()[0] in data_list):
+                        if v_src:
+                            if not v_src.groups()[0] in data_list:
                                 ot = re.sub('src=([^ ]*)', '', i_list[2])
                             else:
                                 ot = i_list[2]
@@ -35,4 +35,4 @@ def html_pas(data):
     for d_end in end:
         data = re.sub('%H%((?:(?!%/H%).)*)%/H%', '<' + re.sub('&quot;', '"', re.sub('&#x27;', "'", d_end)) + '>', data, 1)
 
-    return(data)
+    return data
