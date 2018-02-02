@@ -77,6 +77,7 @@ curs.execute("create table if not exists inter(title text, link text)")
 
 curs.execute("select name from alist where acl = 'owner'")
 if not curs.fetchall():
+    curs.execute("delete from alist where name = 'owner'")
     curs.execute("insert into alist (name, acl) values ('owner', 'owner')")
 
 curs.execute("select data from other where name = 'port'")
@@ -599,28 +600,28 @@ def admin_plus(name = None):
 
         curs.execute("delete from alist where name = ?", [name])
         
-        if request.form['ban']:
+        if request.form.get('ban', 0) != 0:
             curs.execute("insert into alist (name, acl) values (?, 'ban')", [name])
 
-        if request.form['mdel']:
+        if request.form.get('mdel', 0) != 0:
             curs.execute("insert into alist (name, acl) values (?, 'mdel')", [name])   
 
-        if request.form['toron']:
+        if request.form.get('toron', 0) != 0:
             curs.execute("insert into alist (name, acl) values (?, 'toron')", [name])
             
-        if request.form['check']:
+        if request.form.get('check', 0) != 0:
             curs.execute("insert into alist (name, acl) values (?, 'check')", [name])
 
-        if request.form['acl']:
+        if request.form.get('acl', 0) != 0:
             curs.execute("insert into alist (name, acl) values (?, 'acl')", [name])
 
-        if request.form['hidel']:
+        if request.form.get('hidel', 0) != 0:
             curs.execute("insert into alist (name, acl) values (?, 'hidel')", [name])
 
-        if request.form['give']:
+        if request.form.get('give', 0) != 0:
             curs.execute("insert into alist (name, acl) values (?, 'give')", [name])
 
-        if request.form['owner']:
+        if request.form.get('owner', 0) != 0:
             curs.execute("insert into alist (name, acl) values (?, 'owner')", [name])
             
         conn.commit()
@@ -667,7 +668,7 @@ def admin_plus(name = None):
 
         return html_minify(template('index', 
             imp = ['관리 그룹 추가', wiki_set(conn, 1), custom(conn), other2([0, 0])],
-            data = '<form method="post">' + data + '<button id="save" ' + state +  ' type="submit">저장</button></form>',
+            data = '<form method="post">' + data + '<hr><button id="save" ' + state +  ' type="submit">저장</button></form>',
             menu = [['manager', '관리자']]
         ))        
         
@@ -800,7 +801,7 @@ def give_log():
     list_data += '</ul><hr><a href="/manager/8">(생성)</a>'
 
     return html_minify(template('index', 
-        imp = ['권한 목록', wiki_set(conn, 1), custom(conn), other2([0, 0])],
+        imp = ['관리 그룹 목록', wiki_set(conn, 1), custom(conn), other2([0, 0])],
         data = list_data,
         menu = [['other', '기타']]
     ))
@@ -1745,7 +1746,7 @@ def other():
                             ' * [[wiki:manager/7|토론 기록]]\r\n' + \
                             '== 목록 ==\r\n' + \
                             ' * [[wiki:admin_list|관리자 목록]]\r\n' + \
-                            ' * [[wiki:give_log|권한 목록]]\r\n' + 
+                            ' * [[wiki:give_log|관리 그룹 목록]]\r\n' + 
                             ' * [[wiki:not_close_topic|열린 토론 목록]]\r\n' + \
                             '== 기타 ==\r\n' + \
                             ' * [[wiki:title_index|모든 문서]]\r\n' + \
