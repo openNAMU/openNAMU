@@ -75,9 +75,9 @@ curs.execute("create table if not exists scan(user text, title text)")
 curs.execute("create table if not exists acl(title text, dec text, dis text, why text)")
 curs.execute("create table if not exists inter(title text, link text)")
 
-curs.execute("select name from alist where name = '소유자'")
+curs.execute("select name from alist where acl = 'owner'")
 if not curs.fetchall():
-    curs.execute("insert into alist (name, acl) values ('소유자', 'owner')")
+    curs.execute("insert into alist (name, acl) values ('owner', 'owner')")
 
 curs.execute("select data from other where name = 'port'")
 rep_data = curs.fetchall()
@@ -2444,7 +2444,7 @@ def register():
         curs.execute("select id from user limit 1")
         user_ex = curs.fetchall()
         if not user_ex:
-            curs.execute("insert into user (id, pw, acl, date) values (?, ?, '소유자', ?)", [request.form['id'], hashed.decode(), get_time()])
+            curs.execute("insert into user (id, pw, acl, date) values (?, ?, 'owner', ?)", [request.form['id'], hashed.decode(), get_time()])
         else:
             curs.execute("insert into user (id, pw, acl, date) values (?, ?, 'user', ?)", [request.form['id'], hashed.decode(), get_time()])
         conn.commit()
