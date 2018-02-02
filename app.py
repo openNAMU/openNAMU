@@ -231,6 +231,7 @@ def alarm():
 @app.route('/inter_wiki')
 def inter_wiki():
     div = ''
+    admin = admin_check(conn, None, None)
 
     curs.execute('select title, link from inter')
     db_data = curs.fetchall()
@@ -239,14 +240,19 @@ def inter_wiki():
         div = '<ul>'
 
         for data in db_data:
-            div += '<li>' + data[0] + ' : ' + data[1] + '</li>'
+            div += '<li>' + data[0] + ' : ' + data[1]
+
+            if admin == 1:
+                div += ' <a href="/del_inter/' + url_pas(data[0]) + '">(삭제)</a>'
+
+            div += '</li>'
 
         div += '</ul>'
 
-        if admin_check(conn, None, None):
+        if admin == 1:
             div += '<hr><a href="/plus_inter">(추가)</a>'
     else:
-        if admin_check(conn, None, None):
+        if admin == 1:
             div += '<a href="/plus_inter">(추가)</a>'
 
     return html_minify(template('index', 
@@ -255,6 +261,15 @@ def inter_wiki():
         menu = [['other', '기타']]
     ))
 
+@app.route('/del_inter/<name>')
+def del_inter(name = None):
+    if admin_check(conn, None, None) == 1:
+        curs.execute("delete from inter where title = ?", [name])
+        conn.commit()
+
+        return redirect('/inter_wiki')
+    else:
+        return re_error(conn, '/error/3')
 
 @app.route('/plus_inter', methods=['POST', 'GET'])
 def plus_inter():
@@ -447,17 +462,20 @@ def edit_set(num = 0):
     elif num == 4:
         if request.method == 'POST':
             curs.execute("select name from other where name = 'robot'")
+            
             if curs.fetchall():
                 curs.execute("update other set data = ? where name = 'robot'", [request.form['content']])
             else:
                 curs.execute("insert into other (name, data) values ('robot', ?)", [request.form['content']])
+            
             conn.commit()
 
             fw = open('./robots.txt', 'w')
-            fw.write(request.form['content'])
+            fw.write(re.sub('\r\n', '\n', request.form['content']))
             fw.close()
             
             admin_check(conn, None, 'edit_set')
+
             return redirect('/edit_set/4')
         else:
             curs.execute("select data from other where name = 'robot'")
@@ -466,6 +484,13 @@ def edit_set(num = 0):
                 data = robot[0][0]
             else:
                 data = ''
+
+            f = open('./robots.txt', 'r')
+            lines = f.readlines()
+            f.close()
+
+            if not data or data == '':
+                data = ''.join(lines)
 
             return html_minify(template('index', 
                 imp = ['robots.txt', wiki_set(conn, 1), custom(conn), other2([0, 0])],
@@ -3491,9 +3516,12 @@ def views(name = None):
     else:
         return send_from_directory('./views' + plus, rename)
 
-@app.route('/robots.txt')
-def robots():
-    return send_from_directory('./', request.path[1:])
+@app.route('/<test>')
+def main_file(test = None):
+    if re.search('\.(txt|html)$', test):
+        return send_from_directory('./', test)
+    else:
+        return ''
 
 @app.errorhandler(404)
 def error_404(e):
