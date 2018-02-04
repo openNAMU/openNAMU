@@ -2954,7 +2954,8 @@ def read_view(name = None):
     enddata = namumark(conn, name, elsedata, 0, 0, 1)
 
     if data_none == 1:
-        menu = [['edit/' + url_pas(name), '생성'], ['topic/' + url_pas(name), topic], ['history/' + url_pas(name), '역사'], ['move/' + url_pas(name), '이동'], ['xref/' + url_pas(name), '역링크']]
+        menu = [['edit/' + url_pas(name), '생성'], ['topic/' + url_pas(name), topic], \
+                ['history/' + url_pas(name), '역사'], ['move/' + url_pas(name), '이동'], ['xref/' + url_pas(name), '역링크']]
     else:
         menu = [['edit/' + url_pas(name), '수정'], ['topic/' + url_pas(name), topic], \
                 ['history/' + url_pas(name), '역사'], ['delete/' + url_pas(name), '삭제'], \
