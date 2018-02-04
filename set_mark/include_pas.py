@@ -6,10 +6,10 @@ import sqlite3
 from urllib import parse
 import re
 
-def url_fix(data):
+def url_pas(data):
     return parse.quote(data).replace('/','%2F')
     
-def include(conn, data, title, in_c, num, toc_y, fol_num):
+def include_pas(conn, data, title, in_c, num, toc_y, fol_num):
     curs = conn.cursor()
 
     category = ''
