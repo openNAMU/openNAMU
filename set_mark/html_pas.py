@@ -8,7 +8,7 @@ def html_pas(data):
     d_list = re.findall('<(\/)?([^> ]+)( (?:[^>]+)?)?>', data)
     for i_list in d_list:
         if i_list[0] == '':
-            if i_list[1] in ['div', 'span', 'embed', 'iframe']:
+            if i_list[1] in ['div', 'span', 'embed', 'iframe', 'ruby', 'rp', 'rt']:
                 if re.search('<\/' + i_list[1] + '>', data):
                     src = re.search('src=([^ ]*)', i_list[2])
                     if src:
