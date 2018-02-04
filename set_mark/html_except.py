@@ -1,7 +1,7 @@
 import re
 import html
 
-def html_pas(data):
+def html_except(data):
     data = re.sub('%H%', '<', data)
     data = re.sub('%\/H%', '>', data)
 

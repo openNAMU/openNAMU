@@ -1,6 +1,6 @@
 import re
 
-def table_p(d, d2, d3, num = 0):
+def table_return(d, d2, d3, num = 0):
     table_class = 'class="'
     alltable = 'style="'
     celstyle = 'style="'
@@ -148,7 +148,7 @@ def table(data):
 
                     result = a.groups()
                     if result[1]:
-                        table_d = table_p(result[1], result[0], result[2])
+                        table_d = table_return(result[1], result[0], result[2])
                         alltable = table_d[0]
                         rowstyle = table_d[1]
                         celstyle = table_d[2]
@@ -188,7 +188,7 @@ def table(data):
 
                     result = b.groups()
                     if result[1]:
-                        table_d = table_p(result[1], result[0], result[2], num)
+                        table_d = table_return(result[1], result[0], result[2], num)
                         rowstyle = table_d[1]
                         celstyle = table_d[2]
                         row = table_d[3]
@@ -221,7 +221,7 @@ def table(data):
 
                     result = c.groups()
                     if result[1]:
-                        table_d = table_p(result[1], result[0], result[2], num)
+                        table_d = table_return(result[1], result[0], result[2], num)
                         celstyle = table_d[2]
                         row = table_d[3]
                         cel = table_d[4]
