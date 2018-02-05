@@ -226,7 +226,8 @@ def table(data):
                         row = table_d[3]
                         cel = table_d[4]
 
-                        table = re.sub("(\|\|(?:(?:\|\|)*))((?:&lt;(?:(?:(?!&gt;).)*)&gt;)*)", "</td><td " + cel + " " + row + " " + celstyle + ">", table, 1)
+                        table = re.sub("(\|\|(?:(?:\|\|)*))((?:&lt;(?:(?:(?!&gt;).)*)&gt;)*)", \
+                                        "</td><td " + cel + " " + row + " " + celstyle + ">", table, 1)
                     else:
                         cel = 'colspan="' + str(round(len(result[0]) / 2)) + '"'
 
@@ -237,7 +238,8 @@ def table(data):
                         elif re.search('^(.*) $', result[2]):
                             celstyle += 'text-align: left;'
 
-                        table = re.sub("(\|\|(?:(?:\|\|)*))((?:&lt;(?:(?:(?!&gt;).)*)&gt;)*)", "</td><td " + cel + " style='" + celstyle + "'>", table, 1)
+                        table = re.sub("(\|\|(?:(?:\|\|)*))((?:&lt;(?:(?:(?!&gt;).)*)&gt;)*)", \
+                                        "</td><td " + cel + " style='" + celstyle + "'>", table, 1)
                 else:
                     break
             
