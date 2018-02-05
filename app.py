@@ -157,8 +157,13 @@ try:
     robot_test = curs.fetchall()
     if robot_test:
         fw_test = open('./robots.txt', 'w')
-        fw_test.write(robot_test[0][0])
+        fw_test.write(re.sub('\r\n', '\n', robot_test[0][0]))
         fw_test.close()
+except:
+    pass
+
+try:
+    curs.execute("alter table user add email text default ''")
 except:
     pass
 
@@ -208,7 +213,7 @@ def del_alarm():
 @app.route('/alarm')
 def alarm():
     ip = ip_check()
-    if re.search('(?:\.|:)', ip):
+    if custom(conn)[2] == 0:
         return redirect('/login')    
 
     da = '<ul>'    
@@ -1414,7 +1419,7 @@ def edit(name = None):
                         curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, '')", \
                                     [ip, '', get_time(), '도구:편집 필터', '편집 필터에 의한 차단'])
                         curs.execute("insert into ban (block, end, why, band, login) values (?, '', ?, '', '')", [ip, '편집 필터에 의한 차단'])
-                    elif not data_list[1] == '':
+                    elif data_list[1] != '':
                         match = re.search("^([^ ]+) ([^:]+):([^:]+)$", data_list[1])
                         end_data = match.groups()
 
@@ -2275,7 +2280,7 @@ def login():
     if ban == 1:
         return re_error(conn, '/ban')
         
-    if(request.method == 'POST'):        
+    if request.method == 'POST':        
         if captcha_post(request.form.get('g-recaptcha-response', None), conn) == 1:
             return re_error(conn, '/error/13')
         else:
@@ -2318,10 +2323,9 @@ def login():
                 
 @app.route('/change', methods=['POST', 'GET'])
 def change_password():
-    ip = ip_check()
     ban = ban_check(conn)
     
-    if(request.method == 'POST'):    
+    if request.method == 'POST':    
         if request.form['pw2'] != request.form['pw3']:
             return re_error(conn, '/error/20')
 
@@ -2333,7 +2337,7 @@ def change_password():
         if not user:
             return re_error(conn, '/error/10')
 
-        if re.search('(\.|:)', ip):
+        if custom(conn)[2] == 0:
             return redirect('/login')
 
         if not bcrypt.checkpw(bytes(request.form['pw'], 'utf-8'), bytes(user[0][0], 'utf-8')):
@@ -2349,7 +2353,7 @@ def change_password():
         if ban == 1:
             return re_error(conn, '/ban')
 
-        if re.search('(\.|:)', ip):
+        if custom(conn)[2] == 0:
             return redirect('/login')
 
         return html_minify(template('index',    
@@ -2429,7 +2433,7 @@ def register():
         if set_d and set_d[0][0] == 'on':
             return re_error(conn, '/ban')
     
-    if(request.method == 'POST'): 
+    if request.method == 'POST': 
         if captcha_post(request.form.get('g-recaptcha-response', None), conn) == 1:
             return re_error(conn, '/error/13')
         else:
@@ -2453,9 +2457,11 @@ def register():
         curs.execute("select id from user limit 1")
         user_ex = curs.fetchall()
         if not user_ex:
-            curs.execute("insert into user (id, pw, acl, date) values (?, ?, 'owner', ?)", [request.form['id'], hashed.decode(), get_time()])
+            curs.execute("insert into user (id, pw, acl, date, email) values (?, ?, 'owner', ?, ?)", \
+                        [request.form['id'], hashed.decode(), get_time(), request.form.get('email', '')])
         else:
-            curs.execute("insert into user (id, pw, acl, date) values (?, ?, 'user', ?)", [request.form['id'], hashed.decode(), get_time()])
+            curs.execute("insert into user (id, pw, acl, date, email) values (?, ?, 'user', ?, ?)", \
+                        [request.form['id'], hashed.decode(), get_time(), request.form.get('email', '')])
         conn.commit()
         
         return redirect('/login')
@@ -2473,6 +2479,7 @@ def register():
                         <input placeholder="아이디" name="id" type="text"><hr> \
                         <input placeholder="비밀번호" name="pw" type="password"><hr> \
                         <input placeholder="다시" name="pw2" type="password"><hr> \
+                        <input placeholder="이메일 (선택)" name="email" type="text"><hr> \
                         ' + captcha_get(conn) + ' \
                         <button type="submit">가입</button><hr> \
                         <span>주의 : 만약 HTTPS 연결이 아닌 경우 데이터가 유출될 가능성이 있습니다. 이에 대해 책임지지 않습니다.</span> \
@@ -2622,7 +2629,7 @@ def acl(name = None):
             test = test.groups()
             ip = ip_check()
 
-            if re.search("(\.|:)", ip):
+            if custom(conn)[2] == 0:
                 return redirect('/login')
             elif test[0] != ip:
                 if admin_check(conn, 5, 'acl (' + name + ')') != 1:
@@ -2657,7 +2664,7 @@ def acl(name = None):
             test = test.groups()
             ip = ip_check()
 
-            if re.search("(\.|:)", ip):
+            if custom(conn)[2] == 0:
                 return redirect('/login')
             elif test[0] != ip:
                 if admin_check(conn, 5, 'acl (' + name + ')') != 1:
@@ -3277,7 +3284,7 @@ def upload():
         if request.form['f_lice']:
             lice = request.form['f_lice']
         else:
-            if re.search('(?:\.|:)', ip):
+            if custom(conn)[2] == 0:
                 lice = ip + ' 올림'
             else:
                 lice = '[[사용자:' + ip + ']] 올림'
@@ -3293,10 +3300,11 @@ def upload():
         if(exist): 
             curs.execute("delete from data where title = ?", ['파일:' + name])
         
-        curs.execute("insert into data (title, data) values (?, ?)", ['파일:' + name, '[[파일:' + name + \
-                    ']][br][br]{{{[[파일:' + name + ']]}}}[br][br]' + lice])
+        curs.execute("insert into data (title, data) values (?, ?)", \
+                    ['파일:' + name, '[[파일:' + name + ']][br][br]{{{[[파일:' + name + ']]}}}[br][br]' + lice])
         curs.execute("insert into acl (title, dec, dis, why) values (?, 'admin', '', '')", ['파일:' + name])
-        history_plus(conn, '파일:' + name, '[[파일:' + name + ']][br][br]{{{[[파일:' + name + ']]}}}[br][br]' + lice, get_time(), ip, '(파일 올림)', '0')
+        history_plus(conn, '파일:' + name, '[[파일:' + name + ']][br][br]{{{[[파일:' + name + ']]}}}[br][br]' + lice, \
+                    get_time(), ip, '(파일 올림)', '0')
         conn.commit()
         
         return redirect('/w/파일:' + name)            
@@ -3334,14 +3342,11 @@ def user_info():
         if curs.fetchall():
             acl += ' (로그인 가능)'
             
-    if not re.search('(\.|:)', ip):
+    if custom(conn)[2] != 0:
         ip_user = '[[사용자:' + ip + '|' + ip + ']]'
+        plus = ' * [[wiki:logout|로그아웃]]\r\n * [[wiki:change|비밀번호 변경]]\r\n * [[wiki:email|이메일 수정]]'
     else:
         ip_user = ip
-
-    if custom(conn)[2] != 0:
-        plus = ' * [[wiki:logout|로그아웃]]\r\n * [[wiki:change|비밀번호 변경]]'
-    else:
         plus = ' * [[wiki:login|로그인]]'
 
     return html_minify(template('index', 
@@ -3366,12 +3371,39 @@ def user_info():
         menu = 0
     ))
 
+@app.route('/email', methods=['GET', 'POST'])
+def email():
+    if custom(conn)[2] == 0:
+        return re_error(conn, '/error/1')
+
+    if request.method == 'POST':
+        curs.execute("update user set email = ? where id = ?", [request.form.get('email', ''), ip_check()])
+        conn.commit()
+
+        return redirect('/user')
+    else:
+        curs.execute('select email from user where id = ?', [ip_check()])
+        data = curs.fetchall()
+        if data:
+            email = data[0][0]
+        else:
+            email = ''
+
+        return html_minify(template('index',    
+            imp = ['이메일 수정', wiki_set(conn, 1), custom(conn), other2([0, 0])],
+            data = '<form method="post"> \
+                        <input placeholder="이메일" name="email" type="text" value="' + email + '"><hr> \
+                        <button type="submit">변경</button><hr> \
+                    </form>',
+            menu = [['user', '사용자']]
+        ))
+
 @app.route('/watch_list')
 def watch_list():
     div = '한도 : 10개<hr>'
     ip = ip_check()
     
-    if re.search('\.|:', ip):
+    if custom(conn)[2] == 0:
         return redirect('/login')
 
     curs.execute("select title from scan where user = ?", [ip])
@@ -3394,7 +3426,7 @@ def watch_list():
 @app.route('/watch_list/<name>')
 def watch_list_name(name = None):
     ip = ip_check()
-    if re.search('\.|:', ip):
+    if custom(conn)[2] == 0:
         return redirect('/login')
 
     curs.execute("select count(title) from scan where user = ?", [ip])
@@ -3434,7 +3466,7 @@ def view_log():
 def custom_head_view():
     ip = ip_check()
     if request.method == 'POST':
-        if not re.search('(\.|:)', ip):
+        if custom(conn)[2] != 0:
             curs.execute("select user from custom where user = ?", [ip + ' (head)'])
             if curs.fetchall():
                 curs.execute("update custom set css = ? where user = ?", [request.form['content'], ip + ' (head)'])
@@ -3446,7 +3478,7 @@ def custom_head_view():
 
         return redirect('/user')
     else:
-        if not re.search('(\.|:)', ip):
+        if custom(conn)[2] != 0:
             start = ''
             curs.execute("select css from custom where user = ?", [ip + ' (head)'])
             head_data = curs.fetchall()

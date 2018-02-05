@@ -276,7 +276,7 @@ def acl_check(conn, name):
             if acl_d[0][0] == 'user' and not re.search("(\.|:)", ip):
                 return 0
 
-            if not ip == acl_n[0] or re.search("(\.|:)", ip):
+            if ip != acl_n[0] or re.search("(\.|:)", ip):
                 return 1
         
         if ip == acl_n[0] and not re.search("(\.|:)", ip) and not re.search("(\.|:)", acl_n[0]):
