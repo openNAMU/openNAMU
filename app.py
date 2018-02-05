@@ -3052,7 +3052,7 @@ def user_topic_list(name = None):
     return html_minify(template('index', 
         imp = ['토론 기록', wiki_set(conn, 1), custom(conn), other2([sub, 0])],
         data = div,
-        menu = [['other', '기타'], ['user', '사용자'], ['count/' + url_pas(name), '횟수'], ['record/' + url_pas(name), '편집 기록']]
+        menu = [['other', '기타'], ['user', '사용자'], ['count/' + url_pas(name), '횟수'], ['record/' + url_pas(name), '편집']]
     ))
 
 @app.route('/recent_changes')
@@ -3213,7 +3213,7 @@ def recent_changes(name = None, tool = 'record'):
                     sub += ' (차단)'
 
                 title = '편집 기록'
-                menu = [['other', '기타'], ['user', '사용자'], ['count/' + url_pas(name), '횟수'], ['topic_record/' + url_pas(name), '토론 기록']]
+                menu = [['other', '기타'], ['user', '사용자'], ['count/' + url_pas(name), '횟수'], ['topic_record/' + url_pas(name), '토론']]
                 div += next_fix('/record/' + url_pas(name) + '/' + url_pas(what) + '?num=', num, data_list)
 
                 if what != 'all':
@@ -3353,7 +3353,7 @@ def user_info():
         imp = ['사용자 메뉴', wiki_set(conn, 1), custom(conn), other2([0, 0])],
         data =  namumark(conn, '',  '[목차(없음)]\r\n' + \
                                     '== 상태 ==\r\n' + \
-                                    ' * ' + ip_user + '\r\n'
+                                    ' * ' + ip_user + ' [[wiki:record/' + url_pas(ip) + '|(기록)]]\r\n' + \
                                     ' * 권한 상태 : ' + acl + '\r\n' + \
                                     '== 로그인 ==\r\n' + \
                                     plus + '\r\n' + \
@@ -3364,8 +3364,6 @@ def user_info():
                                     '== 기타 ==\r\n' + \
                                     ' * [[wiki:alarm|알림]]\r\n' + \
                                     ' * [[wiki:view_log|지나온 문서]]\r\n' + \
-                                    ' * [[wiki:record/' + url_pas(ip) + '|편집 기록]]\r\n' + \
-                                    ' * [[wiki:topic_record/' + url_pas(ip) + '|토론 기록]]\r\n' + \
                                     ' * [[wiki:watch_list|주시 문서]]\r\n' + \
                                     ' * [[wiki:count|활동 횟수]]\r\n', 0, 0, 0),
         menu = 0
