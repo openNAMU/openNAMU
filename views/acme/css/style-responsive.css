@@ -155,12 +155,11 @@ a:link {
 }
 
 button {
-    border: 1px solid #aaaaaa;
-    margin-left: 0.5em;
+    border: 1px solid deepskyblue;
     border-radius: 0.25rem;
-    padding: 5px 20px 5px 20px;
-    background: white;
-    box-shadow: 0 2px 5px rgba(50,50,50,0.1);
+    padding: 5px 10px 5px 10px;
+    background: deepskyblue;
+    color: white;
 }
 
 input {
@@ -291,14 +290,14 @@ select {
     border-radius: .25rem;
 }
 
-#preview {
-    background: #37b1e3;
-    color: white;
-    margin-bottom: 0;
+button#save {
+    background: lightseagreen;
+    border-color: lightseagreen;
 }
 
-#preview:hover {
-    background: #2b90ba;
+button#come {
+    background: palevioletred;
+    border-color: palevioletred;
 }
 
 input {

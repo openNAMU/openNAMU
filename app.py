@@ -17,7 +17,7 @@ logging.basicConfig(level = logging.ERROR)
 app = Flask(__name__)
 Reggie(app)
 
-r_ver = 'v2.6.2'
+r_ver = 'v2.6.3'
 print('버전 : ' + r_ver)
 
 from func import *
@@ -73,10 +73,12 @@ curs.execute("create table if not exists ua_d(name text, ip text, ua text, today
 curs.execute("create table if not exists filter(name text, regex text, sub text)")
 curs.execute("create table if not exists scan(user text, title text)")
 curs.execute("create table if not exists acl(title text, dec text, dis text, why text)")
+curs.execute("create table if not exists inter(title text, link text)")
 
-curs.execute("select name from alist where name = '소유자'")
+curs.execute("select name from alist where acl = 'owner'")
 if not curs.fetchall():
-    curs.execute("insert into alist (name, acl) values ('소유자', 'owner')")
+    curs.execute("delete from alist where name = 'owner'")
+    curs.execute("insert into alist (name, acl) values ('owner', 'owner')")
 
 curs.execute("select data from other where name = 'port'")
 rep_data = curs.fetchall()
@@ -155,8 +157,13 @@ try:
     robot_test = curs.fetchall()
     if robot_test:
         fw_test = open('./robots.txt', 'w')
-        fw_test.write(robot_test[0][0])
+        fw_test.write(re.sub('\r\n', '\n', robot_test[0][0]))
         fw_test.close()
+except:
+    pass
+
+try:
+    curs.execute("alter table user add email text default ''")
 except:
     pass
 
@@ -206,7 +213,7 @@ def del_alarm():
 @app.route('/alarm')
 def alarm():
     ip = ip_check()
-    if re.search('(?:\.|:)', ip):
+    if custom(conn)[2] == 0:
         return redirect('/login')    
 
     da = '<ul>'    
@@ -226,6 +233,69 @@ def alarm():
         data = da,
         menu = [['user', '사용자']]
     ))
+
+@app.route('/inter_wiki')
+def inter_wiki():
+    div = ''
+    admin = admin_check(conn, None, None)
+
+    curs.execute('select title, link from inter')
+    db_data = curs.fetchall()
+
+    if db_data:
+        div = '<ul>'
+
+        for data in db_data:
+            div += '<li>' + data[0] + ' : ' + data[1]
+
+            if admin == 1:
+                div += ' <a href="/del_inter/' + url_pas(data[0]) + '">(삭제)</a>'
+
+            div += '</li>'
+
+        div += '</ul>'
+
+        if admin == 1:
+            div += '<hr><a href="/plus_inter">(추가)</a>'
+    else:
+        if admin == 1:
+            div += '<a href="/plus_inter">(추가)</a>'
+
+    return html_minify(template('index', 
+        imp = ['인터위키 목록', wiki_set(conn, 1), custom(conn), other2([0, 0])],
+        data = div,
+        menu = [['other', '기타']]
+    ))
+
+@app.route('/del_inter/<name>')
+def del_inter(name = None):
+    if admin_check(conn, None, None) == 1:
+        curs.execute("delete from inter where title = ?", [name])
+        conn.commit()
+
+        return redirect('/inter_wiki')
+    else:
+        return re_error(conn, '/error/3')
+
+@app.route('/plus_inter', methods=['POST', 'GET'])
+def plus_inter():
+    if request.method == 'POST':
+        curs.execute('insert into inter (title, link) values (?, ?)', [request.form['title'], request.form['link']])
+        conn.commit()
+
+        admin_check(conn, None, 'inter_wiki_plus')
+    
+        return redirect('/inter_wiki')
+    else:
+        return html_minify(template('index', 
+            imp = ['인터위키 목록', wiki_set(conn, 1), custom(conn), other2([0, 0])],
+            data = '<form method="post"> \
+                        <input placeholder="이름" type="text" name="title"><hr> \
+                        <input placeholder="링크" type="text" name="link"><hr> \
+                        <button type="submit">추가</button> \
+                    </form>',
+            menu = [['other', '기타']]
+        ))
 
 @app.route('/edit_set')
 @app.route('/edit_set/<int:num>', methods=['POST', 'GET'])
@@ -326,7 +396,7 @@ def edit_set(num = 0):
                             <input type="checkbox" name="all_title" ' + ch_3 + '> 모든 문서 보기 비활성화<hr> \
                             <span>백업 간격 [시간] (끄기 : 0) {재시작 필요}</span><hr> \
                             <input placeholder="백업 간격" type="text" name="back_up" value="' + html.escape(d_list[9]) + '"><hr> \
-                            <button class="btn btn-primary" type="submit">저장</button> \
+                            <button id="save" type="submit">저장</button> \
                         </form>',
                 menu = [['edit_set', '설정']]
             ))
@@ -363,7 +433,7 @@ def edit_set(num = 0):
                             <input placeholder="가입 약관" type="text" name="contract" value="' + html.escape(d_list[0]) + '"><hr> \
                             <span>비 로그인 경고</span><br><br> \
                             <input placeholder="비 로그인 경고" type="text" name="no_login_warring" value="' + html.escape(d_list[1]) + '"><hr> \
-                            <button class="btn btn-primary" type="submit">저장</button> \
+                            <button id="save" type="submit">저장</button> \
                         </form>',
                 menu = [['edit_set', '설정']]
             ))
@@ -391,24 +461,27 @@ def edit_set(num = 0):
                 data =  '<span>&lt;style&gt;CSS&lt;/style&gt;<br>&lt;script&gt;JS&lt;/script&gt;</span><hr> \
                         <form method="post"> \
                             <textarea rows="25" name="content">' + html.escape(data) + '</textarea><hr> \
-                            <button class="btn btn-primary" type="submit">저장</button> \
+                            <button id="save" type="submit">저장</button> \
                         </form>',
                 menu = [['edit_set', '설정']]
             ))
     elif num == 4:
         if request.method == 'POST':
             curs.execute("select name from other where name = 'robot'")
+            
             if curs.fetchall():
                 curs.execute("update other set data = ? where name = 'robot'", [request.form['content']])
             else:
                 curs.execute("insert into other (name, data) values ('robot', ?)", [request.form['content']])
+            
             conn.commit()
 
             fw = open('./robots.txt', 'w')
-            fw.write(request.form['content'])
+            fw.write(re.sub('\r\n', '\n', request.form['content']))
             fw.close()
             
             admin_check(conn, None, 'edit_set')
+
             return redirect('/edit_set/4')
         else:
             curs.execute("select data from other where name = 'robot'")
@@ -418,12 +491,19 @@ def edit_set(num = 0):
             else:
                 data = ''
 
+            f = open('./robots.txt', 'r')
+            lines = f.readlines()
+            f.close()
+
+            if not data or data == '':
+                data = ''.join(lines)
+
             return html_minify(template('index', 
                 imp = ['robots.txt', wiki_set(conn, 1), custom(conn), other2([0, 0])],
                 data =  '<a href="/robots.txt">(보기)</a><hr> \
                         <form method="post"> \
                             <textarea rows="25" name="content">' + html.escape(data) + '</textarea><hr> \
-                            <button class="btn btn-primary" type="submit">저장</button> \
+                            <button id="save" type="submit">저장</button> \
                         </form>',
                 menu = [['edit_set', '설정']]
             ))
@@ -460,7 +540,7 @@ def edit_set(num = 0):
                             <input placeholder="리캡차 (HTML)" type="text" name="recaptcha" value="' + html.escape(d_list[0]) + '"><hr> \
                             <span>리캡차 (비밀키)</span><br><br> \
                             <input placeholder="리캡차 (비밀키)" type="text" name="sec_re" value="' + html.escape(d_list[1]) + '"><hr> \
-                            <button class="btn btn-primary" type="submit">저장</button> \
+                            <button id="save" type="submit">저장</button> \
                         </form>',
                 menu = [['edit_set', '설정']]
             ))
@@ -525,28 +605,28 @@ def admin_plus(name = None):
 
         curs.execute("delete from alist where name = ?", [name])
         
-        if request.form['ban']:
+        if request.form.get('ban', 0) != 0:
             curs.execute("insert into alist (name, acl) values (?, 'ban')", [name])
 
-        if request.form['mdel']:
+        if request.form.get('mdel', 0) != 0:
             curs.execute("insert into alist (name, acl) values (?, 'mdel')", [name])   
 
-        if request.form['toron']:
+        if request.form.get('toron', 0) != 0:
             curs.execute("insert into alist (name, acl) values (?, 'toron')", [name])
             
-        if request.form['check']:
+        if request.form.get('check', 0) != 0:
             curs.execute("insert into alist (name, acl) values (?, 'check')", [name])
 
-        if request.form['acl']:
+        if request.form.get('acl', 0) != 0:
             curs.execute("insert into alist (name, acl) values (?, 'acl')", [name])
 
-        if request.form['hidel']:
+        if request.form.get('hidel', 0) != 0:
             curs.execute("insert into alist (name, acl) values (?, 'hidel')", [name])
 
-        if request.form['give']:
+        if request.form.get('give', 0) != 0:
             curs.execute("insert into alist (name, acl) values (?, 'give')", [name])
 
-        if request.form['owner']:
+        if request.form.get('owner', 0) != 0:
             curs.execute("insert into alist (name, acl) values (?, 'owner')", [name])
             
         conn.commit()
@@ -593,7 +673,7 @@ def admin_plus(name = None):
 
         return html_minify(template('index', 
             imp = ['관리 그룹 추가', wiki_set(conn, 1), custom(conn), other2([0, 0])],
-            data = '<form method="post">' + data + '<button ' + state +  ' class="btn btn-primary" type="submit">저장</button></form>',
+            data = '<form method="post">' + data + '<hr><button id="save" ' + state +  ' type="submit">저장</button></form>',
             menu = [['manager', '관리자']]
         ))        
         
@@ -726,7 +806,7 @@ def give_log():
     list_data += '</ul><hr><a href="/manager/8">(생성)</a>'
 
     return html_minify(template('index', 
-        imp = ['권한 목록', wiki_set(conn, 1), custom(conn), other2([0, 0])],
+        imp = ['관리 그룹 목록', wiki_set(conn, 1), custom(conn), other2([0, 0])],
         data = list_data,
         menu = [['other', '기타']]
     ))
@@ -736,11 +816,14 @@ def indexing():
     if admin_check(conn, None, 'indexing') != 1:
         return re_error(conn, '/error/3')
 
+    print('')
+
     curs.execute("select name from sqlite_master where type = 'index'")
     index_data = curs.fetchall()
+
     if index_data:
         for delete_index in index_data:
-            print('----- delete : ' + delete_index[0] + ' -----')
+            print('delete : ' + delete_index[0])
             
             sql = 'drop index if exists ' + delete_index[0]
 
@@ -753,16 +836,14 @@ def indexing():
                     "'sqlite_%' union all select name from sqlite_temp_master where type in ('table', 'view') order by 1;")
         data = curs.fetchall()
         
-        for table in data:
-            print('----- create : ' + table[0] + ' -----')
-            
+        for table in data:            
             curs.execute('select sql from sqlite_master where name = ?', [table[0]])
             cul = curs.fetchall()
             
             r_cul = re.findall('(?:([^ (]*) text)', str(cul[0]))
             
             for n_cul in r_cul:
-                print(n_cul)
+                print('create : index_' + table[0] + '_' + n_cul)
                 
                 sql = 'create index index_' + table[0] + '_' + n_cul + ' on ' + table[0] + '(' + n_cul + ')'
                 
@@ -772,6 +853,9 @@ def indexing():
                     pass
 
     conn.commit()
+
+    print('')
+
     return redirect('/')        
 
 @app.route('/re_start')
@@ -857,13 +941,14 @@ def recent_discuss(tools = 'normal'):
         div = ''
         
         if tools == 'normal':
-            div += '<a href="/recent_discuss/close">(닫힌 토론)</a>'
+            div += '<a href="/recent_discuss/close">(닫힘)</a>'
             m_sub = 0
         else:
-            div += '<a href="/recent_discuss">(열린 토론)</a>'
+            div += '<a href="/recent_discuss">(열림)</a>'
             m_sub = ' (닫힘)'
 
-        div +=  '<hr><table style="width: 100%; text-align: center;"><tbody><tr><td style="width: 50%;">토론명</td><td style="width: 50%;">시간</td></tr>'
+        div +=  '<hr><table style="width: 100%; text-align: center;"><tbody><tr> \
+                <td style="width: 50%;">토론명</td><td style="width: 50%;">시간</td></tr>'
     else:
         return redirect('/')
     
@@ -883,7 +968,8 @@ def recent_discuss(tools = 'normal'):
                 close = 1
 
         if close == 0:
-            div += '<tr><td><a href="/topic/' + url_pas(data[0]) + '/sub/' + url_pas(data[1]) + '">' + title + '</a> (' + sub + ')</td><td>' + data[2] + '</td></tr>'
+            div += '<tr><td><a href="/topic/' + url_pas(data[0]) + '/sub/' + url_pas(data[1]) + '">' + \
+                    title + '</a> (' + sub + ')</td><td>' + data[2] + '</td></tr>'
     else:
         div += '</tbody></table>'
             
@@ -1164,7 +1250,7 @@ def revert(name = None):
                         ' + ip_warring(conn) + ' \
                         <input placeholder="사유" name="send" type="text"><hr> \
                         ' + captcha_get(conn) + ' \
-                        <button class="btn btn-primary" type="submit">되돌리기</button> \
+                        <button type="submit">되돌리기</button> \
                     </form>',
             menu = [['history/' + url_pas(name), '역사'], ['recent_changes', '최근 변경']]
         ))            
@@ -1200,7 +1286,7 @@ def big_delete():
                     <form method="post"> \
                         <textarea rows="25" name="content"></textarea><hr> \
                         <input placeholder="사유" name="send" type="text"><hr> \
-                        <button class="btn btn-primary" type="submit">삭제</button> \
+                        <button type="submit">삭제</button> \
                     </form>',
             menu = [['manager', '관리자']]
         ))
@@ -1309,7 +1395,7 @@ def set_edit_filter(name = None):
             data = '<form method="post"> \
                         ' + data + ' \
                         <input ' + stat + ' placeholder="정규식" name="content" value="' + html.escape(textarea) + '" type="text"><hr> \
-                        <button ' + stat + ' id="preview" class="btn btn-primary" type="submit">저장</button> \
+                        <button ' + stat + ' id="save" type="submit">저장</button> \
                     </form>',
             menu = [['edit_filter', '목록'], ['edit_filter/' + url_pas(name) + '/delete', '삭제']]
         ))
@@ -1333,7 +1419,7 @@ def edit(name = None):
                         curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, '')", \
                                     [ip, '', get_time(), '도구:편집 필터', '편집 필터에 의한 차단'])
                         curs.execute("insert into ban (block, end, why, band, login) values (?, '', ?, '', '')", [ip, '편집 필터에 의한 차단'])
-                    elif not data_list[1] == '':
+                    elif data_list[1] != '':
                         match = re.search("^([^ ]+) ([^:]+):([^:]+)$", data_list[1])
                         end_data = match.groups()
 
@@ -1465,7 +1551,7 @@ def edit(name = None):
         if not request.args.get('section', None):
             get_name = '<form method="post" id="get_edit" action="/edit_get/' + url_pas(name) + '"> \
                             <input placeholder="불러 올 문서" name="name" style="width: 50%;" type="text"> \
-                            <button id="preview" class="btn" type="submit">불러오기</button> \
+                            <button id="come" type="submit">불러오기</button> \
                         </form><hr>'
             action = ''
         else:
@@ -1488,8 +1574,8 @@ def edit(name = None):
                         <input placeholder="사유" name="send" type="text"><hr> \
                         ' + captcha_get(conn) + ' \
                         ' + ip_warring(conn) + ' \
-                        <button id="preview" class="btn btn-primary" type="submit">저장</button> \
-                        <button id="preview" class="btn" type="submit" formaction="/preview/' + url_pas(name) + action + '">미리보기</button> \
+                        <button id="save" type="submit">저장</button> \
+                        <button id="preview" type="submit" formaction="/preview/' + url_pas(name) + action + '">미리보기</button> \
                     </form>',
             menu = [['w/' + url_pas(name), '문서']]
         ))
@@ -1522,8 +1608,8 @@ def preview(name = None):
                     <textarea style="display: none;" name="otent">' + html.escape(request.form['otent']) + '</textarea><hr> \
                     <input placeholder="사유" name="send" type="text"><hr> \
                     ' + captcha_get(conn) + ' \
-                    <button id="preview" class="btn btn-primary" type="submit">저장</button> \
-                    <button id="preview" class="btn" type="submit" formaction="/preview/' + url_pas(name) + action + '">미리보기</button> \
+                    <button id="save" type="submit">저장</button> \
+                    <button id="preview" type="submit" formaction="/preview/' + url_pas(name) + action + '">미리보기</button> \
                 </form><hr>' + enddata,
         menu = [['w/' + url_pas(name), '문서']]
     ))
@@ -1570,7 +1656,7 @@ def delete(name = None):
                         ' + ip_warring(conn) + ' \
                         <input placeholder="사유" name="send" type="text"><hr> \
                         ' + captcha_get(conn) + ' \
-                        <button class="btn btn-primary" type="submit">삭제</button> \
+                        <button type="submit">삭제</button> \
                     </form>',
             menu = [['w/' + url_pas(name), '문서']]
         ))            
@@ -1649,7 +1735,7 @@ def move(name = None):
                         <input placeholder="문서명" value="' + name + '" name="title" type="text"><hr> \
                         <input placeholder="사유" name="send" type="text"><hr> \
                         ' + captcha_get(conn) + ' \
-                        <button class="btn btn-primary" type="submit">이동</button> \
+                        <button type="submit">이동</button> \
                     </form>',
             menu = [['w/' + url_pas(name), '문서']]
         ))
@@ -1667,7 +1753,7 @@ def other():
                             ' * [[wiki:manager/7|토론 기록]]\r\n' + \
                             '== 목록 ==\r\n' + \
                             ' * [[wiki:admin_list|관리자 목록]]\r\n' + \
-                            ' * [[wiki:give_log|권한 목록]]\r\n' + 
+                            ' * [[wiki:give_log|관리 그룹 목록]]\r\n' + 
                             ' * [[wiki:not_close_topic|열린 토론 목록]]\r\n' + \
                             '== 기타 ==\r\n' + \
                             ' * [[wiki:title_index|모든 문서]]\r\n' + \
@@ -1703,6 +1789,7 @@ def manager(num = 1):
                                         ' * [[wiki:manager/8|관리 그룹 생성]]\r\n' + \
                                         ' * [[wiki:edit_set|설정 편집]]\r\n' + \
                                         ' * [[wiki:re_start|서버 재 시작]]\r\n' + \
+                                        ' * [[wiki:inter_wiki|인터위키]]\r\n' + \
                                         '== 기타 ==\r\n' + \
                                         ' * 이 메뉴에 없는 기능은 해당 문서의 역사나 토론에서 바로 사용 가능함', 0, 0, 0),
             menu = [['other', '기타']]
@@ -1720,7 +1807,7 @@ def manager(num = 1):
                 imp = [title_list[(num - 2)][0], wiki_set(conn, 1), custom(conn), other2([0, 0])],
                 data = '<form method="post"> \
                             <input placeholder="' + placeholder + '" name="name" type="text"><hr> \
-                            <button class="btn btn-primary" type="submit">이동</button> \
+                            <button type="submit">이동</button> \
                         </form>',
                 menu = [['manager', '관리자']]
             ))
@@ -1733,7 +1820,7 @@ def manager(num = 1):
                 data = '<form method="post"> \
                             <input placeholder="사용자명" name="name" type="text"><hr> \
                             <input placeholder="비교 대상" name="name2" type="text"><hr> \
-                            <button class="btn btn-primary" type="submit">이동</button> \
+                            <button type="submit">이동</button> \
                         </form>',
                 menu = [['manager', '관리자']]
             ))
@@ -1758,7 +1845,7 @@ def title_index():
     if num > 1000:
         return re_error(conn, '/error/3')
 
-    data = '<ul><a href="/title_index?num=0">(전체)</a> <a href="/title_index?num=250">(250)</a> <a href="/title_index?num=500">(500)</a> <a href="/title_index?num=1000">(1000)</a><hr>'
+    data = '<ul><a href="/title_index?num=0">(전체)</a> <a href="/title_index?num=250">(250)</a> <a href="/title_index?num=500">(500)</a> <a href="/title_index?num=1000">(1000)</a>'
 
     if num == 0:
         curs.execute("select data from other where name = 'all_title'")
@@ -1770,6 +1857,9 @@ def title_index():
     else:
         curs.execute("select title from data order by title asc limit ?, ?", [str(sql_num), str(num)])
     title_list = curs.fetchall()
+
+    if title_list:
+        data += '<hr>'
 
     for list_data in title_list:
         data += '<li>' + str(all_list) + '. <a href="/w/' + url_pas(list_data[0]) + '">' + list_data[0] + '</a></li>'        
@@ -1879,18 +1969,22 @@ def topic_stop(name = None, sub = None, tool = None):
         if tool == 'agree':
             curs.execute("select title from agreedis where title = ? and sub = ?", [name, sub])
             if curs.fetchall():
-                curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, '합의 결렬', ?, ?, '', '1')", [str(int(topic_check[0][0]) + 1), name, sub, time, ip])
+                curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, '합의 결렬', ?, ?, '', '1')", \
+                            [str(int(topic_check[0][0]) + 1), name, sub, time, ip])
                 curs.execute("delete from agreedis where title = ? and sub = ?", [name, sub])
             else:
-                curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, '합의 완료', ?, ?, '', '1')", [str(int(topic_check[0][0]) + 1), name, sub, time, ip])
+                curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, '합의 완료', ?, ?, '', '1')", \
+                            [str(int(topic_check[0][0]) + 1), name, sub, time, ip])
                 curs.execute("insert into agreedis (title, sub) values (?, ?)", [name, sub])
         else:
             curs.execute("select title from stop where title = ? and sub = ? and close = ?", [name, sub, set_list[0]])
             if curs.fetchall():
-                curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, ?, ?, ?, '', '1')", [str(int(topic_check[0][0]) + 1), name, sub, set_list[3], time, ip])
+                curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, ?, ?, ?, '', '1')", \
+                            [str(int(topic_check[0][0]) + 1), name, sub, set_list[3], time, ip])
                 curs.execute("delete from stop where title = ? and sub = ? and close = ?", [name, sub, set_list[0]])
             else:
-                curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, ?, ?, ?, '', '1')", [str(int(topic_check[0][0]) + 1), name, sub, set_list[2], time, ip])
+                curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, ?, ?, ?, '', '1')", \
+                            [str(int(topic_check[0][0]) + 1), name, sub, set_list[2], time, ip])
                 curs.execute("insert into stop (title, sub, close) values (?, ?, ?)", [name, sub, set_list[0]])
                 curs.execute("delete from stop where title = ? and sub = ? and close = ?", [name, sub, set_list[1]])
         
@@ -2095,13 +2189,14 @@ def topic(name = None, sub = None):
             number += 1
 
         if ban != 1 or admin == 1:
-            data += '<a id="reload" href="javascript:void(0);" onclick="location.href.endsWith(\'#reload\') ?  location.reload(true) : location.href = \'#reload\'"><i aria-hidden="true" class="fa fa-refresh"></i></a>'
-            data += '<form style="' + display + '" method="post"><br><textarea style="height: 100px;" name="content"></textarea><hr>' + captcha_get(conn)
+            data += '<a id="reload" href="javascript:void(0);" onclick="location.href.endsWith(\'#reload\') ?  ' + \
+                    'location.reload(true) : location.href = \'#reload\'"><i aria-hidden="true" class="fa fa-refresh"></i></a>' + \
+                    '<form style="' + display + '" method="post"><br><textarea style="height: 100px;" name="content"></textarea><hr>' + captcha_get(conn)
             
             if display == '':
                 data += ip_warring(conn)
 
-            data += '<button class="btn btn-primary" type="submit">전송</button></form>'
+            data += '<button type="submit">전송</button></form>'
 
         return html_minify(template('index', 
             imp = [name, wiki_set(conn, 1), custom(conn), other2([' (토론)', 0])],
@@ -2143,7 +2238,7 @@ def close_topic_list(name = None, tool = None):
             menu = [['w/' + url_pas(name), '문서']]
             plus =  '<a href="/topic/' + url_pas(name) + '/close">(닫힘)</a> <a href="/topic/' + url_pas(name) + '/agree">(합의)</a><hr> \
                     <input placeholder="토론명" class="form-control" name="topic" type="text"><hr> \
-                    <button class="btn btn-primary" type="submit">만들기</button>'
+                    <button type="submit">만들기</button>'
 
         for data in curs.fetchall():
             curs.execute("select data, date, ip, block from topic where title = ? and sub = ? and id = '1'", [name, data[0]])
@@ -2156,7 +2251,8 @@ def close_topic_list(name = None, tool = None):
                         it_p = 1
                 
                 if it_p != 1:
-                    div += '<h2><a href="/topic/' + url_pas(name) + '/sub/' + url_pas(data[0]) + '">' + data[0] + '</a></h2><hr id="under_bar" style="margin-top: -5px;">'
+                    div += '<h2><a href="/topic/' + url_pas(name) + '/sub/' + url_pas(data[0]) + '">' + data[0] + \
+                            '</a></h2><hr id="under_bar" style="margin-top: -5px;">'
 
         if div == '':
             plus = re.sub('^<br>', '', plus)
@@ -2184,7 +2280,7 @@ def login():
     if ban == 1:
         return re_error(conn, '/ban')
         
-    if(request.method == 'POST'):        
+    if request.method == 'POST':        
         if captcha_post(request.form.get('g-recaptcha-response', None), conn) == 1:
             return re_error(conn, '/error/13')
         else:
@@ -2219,7 +2315,7 @@ def login():
                         <input placeholder="아이디" name="id" type="text"><hr> \
                         <input placeholder="비밀번호" name="pw" type="password"><hr> \
                         ' + captcha_get(conn) + ' \
-                        <button class="btn btn-primary" type="submit">로그인</button><hr> \
+                        <button type="submit">로그인</button><hr> \
                         <span>주의 : 만약 HTTPS 연결이 아닌 경우 데이터가 유출될 가능성이 있습니다. 이에 대해 책임지지 않습니다.</span> \
                     </form>',
             menu = [['user', '사용자']]
@@ -2227,10 +2323,9 @@ def login():
                 
 @app.route('/change', methods=['POST', 'GET'])
 def change_password():
-    ip = ip_check()
     ban = ban_check(conn)
     
-    if(request.method == 'POST'):    
+    if request.method == 'POST':    
         if request.form['pw2'] != request.form['pw3']:
             return re_error(conn, '/error/20')
 
@@ -2242,7 +2337,7 @@ def change_password():
         if not user:
             return re_error(conn, '/error/10')
 
-        if re.search('(\.|:)', ip):
+        if custom(conn)[2] == 0:
             return redirect('/login')
 
         if not bcrypt.checkpw(bytes(request.form['pw'], 'utf-8'), bytes(user[0][0], 'utf-8')):
@@ -2258,7 +2353,7 @@ def change_password():
         if ban == 1:
             return re_error(conn, '/ban')
 
-        if re.search('(\.|:)', ip):
+        if custom(conn)[2] == 0:
             return redirect('/login')
 
         return html_minify(template('index',    
@@ -2267,7 +2362,7 @@ def change_password():
                         <input placeholder="현재 비밀번호" name="pw" type="password"><hr> \
                         <input placeholder="변경할 비밀번호" name="pw2" type="password"><hr> \
                         <input placeholder="재 확인" name="pw3" type="password"><hr> \
-                        <button class="btn btn-primary" type="submit">변경</button><hr> \
+                        <button type="submit">변경</button><hr> \
                         <span>주의 : 만약 HTTPS 연결이 아닌 경우 데이터가 유출될 가능성이 있습니다. 이에 대해 책임지지 않습니다.</span> \
                     </form>',
             menu = [['user', '사용자']]
@@ -2338,7 +2433,7 @@ def register():
         if set_d and set_d[0][0] == 'on':
             return re_error(conn, '/ban')
     
-    if(request.method == 'POST'): 
+    if request.method == 'POST': 
         if captcha_post(request.form.get('g-recaptcha-response', None), conn) == 1:
             return re_error(conn, '/error/13')
         else:
@@ -2362,9 +2457,11 @@ def register():
         curs.execute("select id from user limit 1")
         user_ex = curs.fetchall()
         if not user_ex:
-            curs.execute("insert into user (id, pw, acl, date) values (?, ?, '소유자', ?)", [request.form['id'], hashed.decode(), get_time()])
+            curs.execute("insert into user (id, pw, acl, date, email) values (?, ?, 'owner', ?, ?)", \
+                        [request.form['id'], hashed.decode(), get_time(), request.form.get('email', '')])
         else:
-            curs.execute("insert into user (id, pw, acl, date) values (?, ?, 'user', ?)", [request.form['id'], hashed.decode(), get_time()])
+            curs.execute("insert into user (id, pw, acl, date, email) values (?, ?, 'user', ?, ?)", \
+                        [request.form['id'], hashed.decode(), get_time(), request.form.get('email', '')])
         conn.commit()
         
         return redirect('/login')
@@ -2382,8 +2479,9 @@ def register():
                         <input placeholder="아이디" name="id" type="text"><hr> \
                         <input placeholder="비밀번호" name="pw" type="password"><hr> \
                         <input placeholder="다시" name="pw2" type="password"><hr> \
+                        <input placeholder="이메일 (선택)" name="email" type="text"><hr> \
                         ' + captcha_get(conn) + ' \
-                        <button class="btn btn-primary" type="submit">가입</button><hr> \
+                        <button type="submit">가입</button><hr> \
                         <span>주의 : 만약 HTTPS 연결이 아닌 경우 데이터가 유출될 가능성이 있습니다. 이에 대해 책임지지 않습니다.</span> \
                     </form>',
             menu = [['user', '사용자']]
@@ -2439,8 +2537,10 @@ def user_ban(name = None):
             else:
                 login = ''
 
-            curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, ?)", [name, end, time, ip, request.form['why'], band_d])
-            curs.execute("insert into ban (block, end, why, band, login) values (?, ?, ?, ?, ?)", [name, end, request.form['why'], band_d, login])
+            curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, ?)", \
+                        [name, end, time, ip, request.form['why'], band_d])
+            curs.execute("insert into ban (block, end, why, band, login) values (?, ?, ?, ?, ?)", \
+                        [name, end, request.form['why'], band_d, login])
 
         conn.commit()
         return redirect('/ban/' + url_pas(name))            
@@ -2516,7 +2616,7 @@ def user_ban(name = None):
 
         return html_minify(template('index', 
             imp = [name, wiki_set(conn, 1), custom(conn), other2([' (' + now + ')', 0])],
-            data = '<form method="post">' + data + '<button class="btn btn-primary" type="submit">' + now + '</button></form>',
+            data = '<form method="post">' + data + '<button type="submit">' + now + '</button></form>',
             menu = [['manager', '관리자']]
         ))            
                 
@@ -2529,7 +2629,7 @@ def acl(name = None):
             test = test.groups()
             ip = ip_check()
 
-            if re.search("(\.|:)", ip):
+            if custom(conn)[2] == 0:
                 return redirect('/login')
             elif test[0] != ip:
                 if admin_check(conn, 5, 'acl (' + name + ')') != 1:
@@ -2564,7 +2664,7 @@ def acl(name = None):
             test = test.groups()
             ip = ip_check()
 
-            if re.search("(\.|:)", ip):
+            if custom(conn)[2] == 0:
                 return redirect('/login')
             elif test[0] != ip:
                 if admin_check(conn, 5, 'acl (' + name + ')') != 1:
@@ -2607,7 +2707,7 @@ def acl(name = None):
                             <option value="user" ' + acl_list[1] + '>가입자</option> \
                             <option value="normal" ' + acl_list[2] + '>일반</option> \
                         </select><hr> \
-                        <button class="btn btn-primary" type="submit">ACL 변경</button> \
+                        <button type="submit">ACL 변경</button> \
                     </form>',
             menu = [['w/' + url_pas(name), '문서'], ['manager', '관리자']]
         ))
@@ -2670,7 +2770,7 @@ def user_admin(name = None):
             imp = [name, wiki_set(conn, 1), custom(conn), other2([' (권한 부여)', 0])],
             data =  '<form method="post"> \
                         <select name="select">' + div + '</select><hr> \
-                        <button class="btn btn-primary" type="submit">변경</button> \
+                        <button type="submit">변경</button> \
                     </form>',
             menu = [['manager', '관리자']]
         ))
@@ -2861,16 +2961,20 @@ def read_view(name = None):
     enddata = namumark(conn, name, elsedata, 0, 0, 1)
 
     if data_none == 1:
-        menu = [['edit/' + url_pas(name), '생성'], ['topic/' + url_pas(name), topic], ['history/' + url_pas(name), '역사'], ['move/' + url_pas(name), '이동'], ['xref/' + url_pas(name), '역링크']]
+        menu = [['edit/' + url_pas(name), '생성'], ['topic/' + url_pas(name), topic], \
+                ['history/' + url_pas(name), '역사'], ['move/' + url_pas(name), '이동'], ['xref/' + url_pas(name), '역링크']]
     else:
-        menu = [['edit/' + url_pas(name), '수정'], ['topic/' + url_pas(name), topic], ['history/' + url_pas(name), '역사'], ['delete/' + url_pas(name), '삭제'], ['move/' + url_pas(name), '이동'], ['raw/' + url_pas(name), '원본'], ['xref/' + url_pas(name), '역링크']]
+        menu = [['edit/' + url_pas(name), '수정'], ['topic/' + url_pas(name), topic], \
+                ['history/' + url_pas(name), '역사'], ['delete/' + url_pas(name), '삭제'], \
+                ['move/' + url_pas(name), '이동'], ['raw/' + url_pas(name), '원본'], ['xref/' + url_pas(name), '역링크']]
         
     if admin_memu == 1:
         menu += [['acl/' + url_pas(name), 'ACL']]
 
     if request.args.get('froms', None):
         menu += [['w/' + url_pas(name), '넘기기']]
-        enddata = '<ul id="redirect"><li><a href="/w/' + url_pas(request.args.get('froms', None)) + '?froms=' + url_pas(name) + '">' + request.args.get('froms', None) + '</a>에서 넘어 왔습니다.</li></ul><br>' + enddata
+        enddata = '<ul id="redirect"><li><a href="/w/' + url_pas(request.args.get('froms', None)) + \
+                    '?froms=' + url_pas(name) + '">' + request.args.get('froms', None) + '</a>에서 넘어 왔습니다.</li></ul><br>' + enddata
 
     if uppage != 0:
         menu += [['w/' + url_pas(uppage), '상위']]
@@ -2931,7 +3035,8 @@ def user_topic_list(name = None):
             
         ip = ip_pas(conn, data[3])
             
-        div += '<tr><td><a href="/topic/' + url_pas(data[0]) + '/sub/' + url_pas(data[2]) + '#' + data[1] + '">' + title + '#' + data[1] + '</a> (' + sub + ')</td>'
+        div += '<tr><td><a href="/topic/' + url_pas(data[0]) + '/sub/' + url_pas(data[2]) + '#' + data[1] + '">' + \
+                title + '#' + data[1] + '</a> (' + sub + ')</td>'
         div += '<td>' + ip + ban +  '</td><td>' + data[4] + '</td></tr>'
 
     div += '</tbody></table>'
@@ -2947,7 +3052,7 @@ def user_topic_list(name = None):
     return html_minify(template('index', 
         imp = ['토론 기록', wiki_set(conn, 1), custom(conn), other2([sub, 0])],
         data = div,
-        menu = [['other', '기타'], ['user', '사용자'], ['count/' + url_pas(name), '횟수'], ['record/' + url_pas(name), '편집 기록']]
+        menu = [['other', '기타'], ['user', '사용자'], ['count/' + url_pas(name), '횟수'], ['record/' + url_pas(name), '편집']]
     ))
 
 @app.route('/recent_changes')
@@ -2974,7 +3079,8 @@ def recent_changes(name = None, tool = 'record'):
             if tool == 'history':
                 div += '<td style="width: 33.3%;">판</td><td style="width: 33.3%;">편집자</td><td style="width: 33.3%;">시간</td></tr>'
 
-                curs.execute("select id, title, date, ip, send, leng from history where title = ? order by id + 0 desc limit ?, '50'", [name, str(sql_num)])
+                curs.execute("select id, title, date, ip, send, leng from history where title = ? order by id + 0 desc limit ?, '50'", \
+                            [name, str(sql_num)])
             else:
                 div += '<td style="width: 33.3%;">문서명</td><td style="width: 33.3%;">편집자</td><td style="width: 33.3%;">시간</td></tr>'
 
@@ -2983,7 +3089,8 @@ def recent_changes(name = None, tool = 'record'):
                     div = '<a href="/record/' + url_pas(name) + '?what=move">(이동)</a> ' + div
                     div = '<a href="/record/' + url_pas(name) + '?what=delete">(삭제)</a> ' + div
                 
-                    curs.execute("select id, title, date, ip, send, leng from history where ip = ? order by date desc limit ?, '50'", [name, str(sql_num)])
+                    curs.execute("select id, title, date, ip, send, leng from history where ip = ? order by date desc limit ?, '50'", \
+                                [name, str(sql_num)])
                 else:
                     if what == 'delete':
                         sql = '%(삭제)'
@@ -3044,7 +3151,8 @@ def recent_changes(name = None, tool = 'record'):
             if (int(data[0]) - 1) == 0:
                 revert = ''
             else:
-                revert = '<a href="/diff/' + url_pas(data[1]) + '?first=' + str(int(data[0]) - 1) + '&second=' + data[0] + '">(비교)</a> <a href="/revert/' + url_pas(data[1]) + '?num=' + str(int(data[0]) - 1) + '">(되돌리기)</a>'
+                revert = '<a href="/diff/' + url_pas(data[1]) + '?first=' + str(int(data[0]) - 1) + '&second=' + data[0] + \
+                        '">(비교)</a> <a href="/revert/' + url_pas(data[1]) + '?num=' + str(int(data[0]) - 1) + '">(되돌리기)</a>'
             
             style = ['', '']
             date = data[2]
@@ -3077,9 +3185,11 @@ def recent_changes(name = None, tool = 'record'):
                 style[1] = 'background: gainsboro;'
 
             if tool == 'history':
-                title = '<a href="/w/' + url_pas(name) + '?num=' + data[0] + '">' + data[0] + '판</a> <a href="/raw/' + url_pas(name) + '?num=' + data[0] + '">(원본)</a> '
+                title = '<a href="/w/' + url_pas(name) + '?num=' + data[0] + '">' + data[0] + '판</a> <a href="/raw/' + \
+                        url_pas(name) + '?num=' + data[0] + '">(원본)</a> '
             else:
-                title = '<a href="/w/' + url_pas(data[1]) + '">' + html.escape(data[1]) + '</a> <a href="/history/' + url_pas(data[1]) + '">(' + data[0] + '판)</a> '
+                title = '<a href="/w/' + url_pas(data[1]) + '">' + html.escape(data[1]) + '</a> <a href="/history/' + \
+                        url_pas(data[1]) + '">(' + data[0] + '판)</a> '
                     
             div += '<tr style="' + style[0] + '"><td>' + title + revert + ' ' + leng + '</td>'
             div += '<td>' + ip + ban + hidden + '</td><td>' + date + '</td></tr><tr style="' + style[1] + '"><td colspan="3">' + send + '</td></tr>'
@@ -3089,7 +3199,8 @@ def recent_changes(name = None, tool = 'record'):
 
         if name:
             if tool == 'history':
-                div = '<form method="post"><select name="a">' + select + '</select> <select name="b">' + select + '</select> <button class="btn btn-primary" type="submit">비교</button></form><hr>' + div
+                div = '<form method="post"><select name="a">' + select + '</select> <select name="b">' + select + \
+                        '</select> <button type="submit">비교</button></form><hr>' + div
                 title = name
                 sub += ' (역사)'
                 menu = [['w/' + url_pas(name), '문서'], ['move_data/' + url_pas(name), '이동 기록']]
@@ -3102,7 +3213,7 @@ def recent_changes(name = None, tool = 'record'):
                     sub += ' (차단)'
 
                 title = '편집 기록'
-                menu = [['other', '기타'], ['user', '사용자'], ['count/' + url_pas(name), '횟수'], ['topic_record/' + url_pas(name), '토론 기록']]
+                menu = [['other', '기타'], ['user', '사용자'], ['count/' + url_pas(name), '횟수'], ['topic_record/' + url_pas(name), '토론']]
                 div += next_fix('/record/' + url_pas(name) + '/' + url_pas(what) + '?num=', num, data_list)
 
                 if what != 'all':
@@ -3173,7 +3284,7 @@ def upload():
         if request.form['f_lice']:
             lice = request.form['f_lice']
         else:
-            if re.search('(?:\.|:)', ip):
+            if custom(conn)[2] == 0:
                 lice = ip + ' 올림'
             else:
                 lice = '[[사용자:' + ip + ']] 올림'
@@ -3189,9 +3300,11 @@ def upload():
         if(exist): 
             curs.execute("delete from data where title = ?", ['파일:' + name])
         
-        curs.execute("insert into data (title, data) values (?, ?)", ['파일:' + name, '[[파일:' + name + ']][br][br]{{{[[파일:' + name + ']]}}}[br][br]' + lice])
+        curs.execute("insert into data (title, data) values (?, ?)", \
+                    ['파일:' + name, '[[파일:' + name + ']][br][br]{{{[[파일:' + name + ']]}}}[br][br]' + lice])
         curs.execute("insert into acl (title, dec, dis, why) values (?, 'admin', '', '')", ['파일:' + name])
-        history_plus(conn, '파일:' + name, '[[파일:' + name + ']][br][br]{{{[[파일:' + name + ']]}}}[br][br]' + lice, get_time(), ip, '(파일 올림)', '0')
+        history_plus(conn, '파일:' + name, '[[파일:' + name + ']][br][br]{{{[[파일:' + name + ']]}}}[br][br]' + lice, \
+                    get_time(), ip, '(파일 올림)', '0')
         conn.commit()
         
         return redirect('/w/파일:' + name)            
@@ -3203,7 +3316,7 @@ def upload():
                         <input placeholder="파일 이름" name="f_name" type="text"><hr> \
                         <input placeholder="라이선스" name="f_lice" type="text"><hr> \
                         ' + captcha_get(conn) + ' \
-                        <button class="btn btn-primary" type="submit">저장</button> \
+                        <button id="save" type="submit">저장</button> \
                     </form>',
             menu = [['other', '기타']]
         ))  
@@ -3229,21 +3342,18 @@ def user_info():
         if curs.fetchall():
             acl += ' (로그인 가능)'
             
-    if not re.search('(\.|:)', ip):
+    if custom(conn)[2] != 0:
         ip_user = '[[사용자:' + ip + '|' + ip + ']]'
+        plus = ' * [[wiki:logout|로그아웃]]\r\n * [[wiki:change|비밀번호 변경]]\r\n * [[wiki:email|이메일 수정]]'
     else:
         ip_user = ip
-
-    if custom(conn)[2] != 0:
-        plus = ' * [[wiki:logout|로그아웃]]\r\n * [[wiki:change|비밀번호 변경]]'
-    else:
         plus = ' * [[wiki:login|로그인]]'
 
     return html_minify(template('index', 
         imp = ['사용자 메뉴', wiki_set(conn, 1), custom(conn), other2([0, 0])],
         data =  namumark(conn, '',  '[목차(없음)]\r\n' + \
                                     '== 상태 ==\r\n' + \
-                                    ' * ' + ip_user + '\r\n'
+                                    ' * ' + ip_user + ' [[wiki:record/' + url_pas(ip) + '|(기록)]]\r\n' + \
                                     ' * 권한 상태 : ' + acl + '\r\n' + \
                                     '== 로그인 ==\r\n' + \
                                     plus + '\r\n' + \
@@ -3254,25 +3364,51 @@ def user_info():
                                     '== 기타 ==\r\n' + \
                                     ' * [[wiki:alarm|알림]]\r\n' + \
                                     ' * [[wiki:view_log|지나온 문서]]\r\n' + \
-                                    ' * [[wiki:record/' + url_pas(ip) + '|편집 기록]]\r\n' + \
-                                    ' * [[wiki:topic_record/' + url_pas(ip) + '|토론 기록]]\r\n' + \
                                     ' * [[wiki:watch_list|주시 문서]]\r\n' + \
                                     ' * [[wiki:count|활동 횟수]]\r\n', 0, 0, 0),
         menu = 0
     ))
+
+@app.route('/email', methods=['GET', 'POST'])
+def email():
+    if custom(conn)[2] == 0:
+        return re_error(conn, '/error/1')
+
+    if request.method == 'POST':
+        curs.execute("update user set email = ? where id = ?", [request.form.get('email', ''), ip_check()])
+        conn.commit()
+
+        return redirect('/user')
+    else:
+        curs.execute('select email from user where id = ?', [ip_check()])
+        data = curs.fetchall()
+        if data:
+            email = data[0][0]
+        else:
+            email = ''
+
+        return html_minify(template('index',    
+            imp = ['이메일 수정', wiki_set(conn, 1), custom(conn), other2([0, 0])],
+            data = '<form method="post"> \
+                        <input placeholder="이메일" name="email" type="text" value="' + email + '"><hr> \
+                        <button type="submit">변경</button><hr> \
+                    </form>',
+            menu = [['user', '사용자']]
+        ))
 
 @app.route('/watch_list')
 def watch_list():
     div = '한도 : 10개<hr>'
     ip = ip_check()
     
-    if re.search('\.|:', ip):
+    if custom(conn)[2] == 0:
         return redirect('/login')
 
     curs.execute("select title from scan where user = ?", [ip])
     data = curs.fetchall()
     for data_list in data:
-        div += '<li><a href="/w/' + url_pas(data_list[0]) + '">' + data_list[0] + '</a> <a href="/watch_list/' + url_pas(data_list[0]) + '">(삭제)</a></li>'
+        div += '<li><a href="/w/' + url_pas(data_list[0]) + '">' + data_list[0] + '</a> <a href="/watch_list/' + \
+                url_pas(data_list[0]) + '">(삭제)</a></li>'
 
     if data:
         div = '<ul>' + div + '</ul><hr>'
@@ -3288,7 +3424,7 @@ def watch_list():
 @app.route('/watch_list/<name>')
 def watch_list_name(name = None):
     ip = ip_check()
-    if re.search('\.|:', ip):
+    if custom(conn)[2] == 0:
         return redirect('/login')
 
     curs.execute("select count(title) from scan where user = ?", [ip])
@@ -3328,7 +3464,7 @@ def view_log():
 def custom_head_view():
     ip = ip_check()
     if request.method == 'POST':
-        if not re.search('(\.|:)', ip):
+        if custom(conn)[2] != 0:
             curs.execute("select user from custom where user = ?", [ip + ' (head)'])
             if curs.fetchall():
                 curs.execute("update custom set css = ? where user = ?", [request.form['content'], ip + ' (head)'])
@@ -3340,7 +3476,7 @@ def custom_head_view():
 
         return redirect('/user')
     else:
-        if not re.search('(\.|:)', ip):
+        if custom(conn)[2] != 0:
             start = ''
             curs.execute("select css from custom where user = ?", [ip + ' (head)'])
             head_data = curs.fetchall()
@@ -3362,7 +3498,7 @@ def custom_head_view():
             data =  start + ' \
                     <form method="post"> \
                         <textarea rows="25" cols="100" name="content">' + data + '</textarea><hr> \
-                        <button class="btn btn-primary" type="submit">저장</button> \
+                        <button id="save" type="submit">저장</button> \
                     </form>',
             menu = [['user', '사용자']]
         ))
@@ -3391,7 +3527,8 @@ def count_edit(name = None):
 
     return html_minify(template('index', 
         imp = ['활동 횟수', wiki_set(conn, 1), custom(conn), other2([0, 0])],
-        data = namumark(conn, "", "[목차(없음)]\r\n== " + that + " ==\r\n||<:> 편집 횟수 ||<:> " + str(data) + "||\r\n||<:> 토론 횟수 ||<:> " + str(t_data) + "||", 0, 0, 0),
+        data = namumark(conn, "", "[목차(없음)]\r\n== " + that + " ==\r\n||<:> 편집 횟수 ||<:> " + str(data) + \
+                        "||\r\n||<:> 토론 횟수 ||<:> " + str(t_data) + "||", 0, 0, 0),
         menu = [['user', '사용자'], ['record/' + url_pas(that), '편집 기록'], ['topic_record/' + url_pas(that), '토론 기록']]
     ))
         
@@ -3434,9 +3571,12 @@ def views(name = None):
     else:
         return send_from_directory('./views' + plus, rename)
 
-@app.route('/robots.txt')
-def robots():
-    return send_from_directory('./', request.path[1:])
+@app.route('/<test>')
+def main_file(test = None):
+    if re.search('\.(txt|html)$', test):
+        return send_from_directory('./', test)
+    else:
+        return ''
 
 @app.errorhandler(404)
 def error_404(e):
@@ -3448,7 +3588,8 @@ def error_404(e):
             나츠노 하지마리가 츠레테키타 오모이 나츠가 오와루토키 키에챠우모노닷타 난테 시라나쿠테 \
             토키메이테타 아츠이 키세츠 \
             우미베노 소라가 히캇테 토츠젠 쿠모가 나가레 오츠부노 아메 와타시노 나카노 나미다미타이 \
-            콘나니 타노시이 나츠가 즛토 츠즈이테쿳테 신지테타요 But now... September Rain But now... September Rain -->' + redirect('/w/' + url_pas(wiki_set(conn, 2)))
+            콘나니 타노시이 나츠가 즛토 츠즈이테쿳테 신지테타요 But now... September Rain But now... September Rain -->' + \
+            redirect('/w/' + url_pas(wiki_set(conn, 2)))
 
 if __name__=="__main__":
     app.secret_key = rep_key

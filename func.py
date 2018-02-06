@@ -252,7 +252,17 @@ def custom(conn):
     else:
         user_icon = 0
 
-    return ['', '', user_icon, user_head]
+    if user_icon == 1:
+        curs.execute('select email from user where id = ?', [ip_check()])
+        data = curs.fetchall()
+        if data:
+            email = data[0][0]
+        else:
+            email = ''
+    else:
+        email = ''
+
+    return ['', '', user_icon, user_head, email]
 
 def acl_check(conn, name):
     ip = ip_check()
@@ -276,7 +286,7 @@ def acl_check(conn, name):
             if acl_d[0][0] == 'user' and not re.search("(\.|:)", ip):
                 return 0
 
-            if not ip == acl_n[0] or re.search("(\.|:)", ip):
+            if ip != acl_n[0] or re.search("(\.|:)", ip):
                 return 1
         
         if ip == acl_n[0] and not re.search("(\.|:)", ip) and not re.search("(\.|:)", acl_n[0]):

@@ -149,6 +149,8 @@
 
 ## 외부 파일 라이선스
  * 인용문 아이콘 [Dave Gandy](http://www.flaticon.com/free-icon/quote-left_25672) CC 3.0 BY
+ * 구문 강조 [highlightjs](https://highlightjs.org/)
+ * 수식 [MathJax](https://www.mathjax.org/)
 
 ## 도움 준 사람이나 팀
  * [Basix](https://twitter.com/Basix1120)
@@ -158,7 +160,7 @@
 
 ----
 ## 기타
- * 현재 버전 : v2.6.2
+ * 현재 버전 : v2.6.3
 
 ----
 ## 개발 이념
