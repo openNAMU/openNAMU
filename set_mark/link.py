@@ -45,6 +45,20 @@ def link(conn, title, data, num, category, backlink):
             out = wiki[0]
 
         data = re.sub('\[\[wiki:([^|\]]+)(?:\|([^\]]+))?\]\]', '<a id="inside" href="/' + wiki[0] + '">' + out + '</a>', data, 1)
+
+    test = re.findall('\[\[inter:([^:]+):((?:(?!\||]]).)+)(?:\|([^\]]+))?]]', data)
+    for wiki in test:
+        curs.execute('select link from inter where title = ?', [wiki[0]])
+        inter = curs.fetchall()
+        if not inter:
+            data = re.sub('\[\[inter:([^:]+):((?:(?!\||]]).)+)(?:\|([^\]]+))?]]', '인터위키 정보 없음', data, 1)
+        else:
+            if wiki[2]:
+                out = wiki[0] + ':' +  wiki[2]
+            else:
+                out = wiki[0] + ':' + wiki[1]
+
+            data = re.sub('\[\[inter:([^:]+):((?:(?!\||]]).)+)(?:\|([^\]]+))?]]', '<a id="inside" href="' + inter[0][0] + wiki[1] + '">' + out + '</a>', data, 1)
      
     data = re.sub("\[\[(?::(?P<in>(?:분류|파일):(?:(?:(?!\]\]).)*)))\]\]", "[[\g<in>]]", data)
 
@@ -110,7 +124,6 @@ def link(conn, title, data, num, category, backlink):
                 else:
                     img = span[0] + '<img src="' + re.sub('^외부:', '', d[0]) + '" ' + width + height + '>' + span[1]
                     data = link.sub(img, data, 1)
-                                    
             elif re.search('^https?:\/\/', re.sub('<([^>]*)>', '', d[0])):
                 view = d[0]
                 try:

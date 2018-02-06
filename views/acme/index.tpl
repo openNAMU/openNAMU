@@ -8,26 +8,7 @@
         <link rel="stylesheet" href="/views/acme/css/style-responsive.css">
         <script src="/views/acme/js/jquery.min.js"></script>
         <script src="/views/acme/js/bootstrap.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
-        <script>hljs.initHighlightingOnLoad();</script>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css">
         <link rel="stylesheet" href="/views/acme/css/font-awesome/css/font-awesome.min.css">
-        <script type="text/x-mathjax-config">MathJax.Hub.Config({tex2jax: {inlineMath: [['[math]', '[/math]']]}});</script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS_CHTML"></script>
-        <script>
-            function folding(num) {
-                var fol = document.getElementById('folding_' + num);
-                if(fol.style.display == 'inline-block' || fol.style.display == 'block') {
-                    fol.style.display = 'none';
-                } else {
-                    if(num % 3 == 0) {
-                        fol.style.display = 'block';
-                    } else {
-                        fol.style.display = 'inline-block';
-                    }
-                }
-            }
-        </script>
         {{!imp[1][5]}}
         {{!imp[2][3]}}
         <meta name="twitter:creator" content="@{{imp[1][0]}}">
@@ -71,13 +52,6 @@
                                 <i class="fa fa-angle-left"></i>
                             </a>
                         </li>
-                        <li>
-                            <a href="/random">
-                                <i class="fa fa-random" aria-hidden="true"></i>
-                                무작위
-                                <i class="fa fa-angle-left"></i>
-                            </a>
-                        </li>
                         <li class="dropdown">
                             <a class="dropdown-toggle" data-close-others="false" data-delay="0" data-hover="dropdown" data-toggle="dropdown" href="javascript:void(0);">
                                 <i class="fa fa-plus-circle" aria-hidden="true"></i>
@@ -86,15 +60,9 @@
                             </a>
                             <ul role="menu" class="dropdown-menu">
                                 <li>
-                                    <a href="/user">
-                                        % if(imp[2][2] == 1):
-                                            <i class="fa fa-user" aria-hidden="true"></i>
-                                        % elif(imp[2][2] == 0):
-                                            <i class="fa fa-user-times" aria-hidden="true"></i>
-                                        % else:
-                                            <i class="fa fa-user-secret" aria-hidden="true"></i>
-                                        % end
-                                        사용자
+                                    <a href="/random">
+                                        <i class="fa fa-random" aria-hidden="true"></i>
+                                        무작위
                                     </a>
                                 </li>
                                 <li>
@@ -104,7 +72,27 @@
                                     </a>
                                 </li>
                             </ul>
-                        </li>         
+                        </li>       
+                        <li>
+                            <a href="/user">
+                                % if(imp[2][2] == 1):
+                                    <i class="fa fa-user" aria-hidden="true"></i>
+                                % elif(imp[2][2] == 0):
+                                    <i class="fa fa-user-times" aria-hidden="true"></i>
+                                % else:
+                                    <i class="fa fa-user-secret" aria-hidden="true"></i>
+                                % end
+
+                                % if(imp[2][4] != ''):
+                                    % import hashlib
+                                    % md5_email = hashlib.md5(imp[2][4].encode()).hexdigest()
+                                    
+                                    <img src="http://www.gravatar.com/avatar/{{md5_email}}?s=30">
+                                % else:
+                                    사용자
+                                % end
+                            </a>
+                        </li>  
                     </ul>
                 </div>
             </div>

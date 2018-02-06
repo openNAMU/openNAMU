@@ -1,6 +1,9 @@
 import re
 
 def mid_pas(data, fol_num, include, in_c, toc_y):
+    syntax = 0
+    folding_test = 0
+
     p = re.compile('{{{((?:(?:(?:\+|-)[0-5])|(?:#|@)(?:(?:[0-9a-f-A-F]{3}){1,2}|(?:\w+))|(?:#!(?:html|wiki|noin|folding|syntax)))(?:(?!{{{|}}}).)+)}}}', re.DOTALL)
     while 1:
         m = p.search(data)
@@ -56,13 +59,13 @@ def mid_pas(data, fol_num, include, in_c, toc_y):
             back_c = re.compile("^@(\w+) (.*)$", re.DOTALL)
             back_3 = back_c.search(it_d)
 
-            include_out_a = re.compile("^#!noin (.*)$", re.DOTALL)
+            include_out_a = re.compile("^#!noin ?(.*)$", re.DOTALL)
             include_out = include_out_a.search(it_d)
 
             div_a = re.compile("^#!wiki style=(?:&quot;|&#x27;)((?:(?!&quot;|&#x27;).)*)(?:&quot;|&#x27;)\r\n(.*)$", re.DOTALL)
             div = div_a.search(it_d)
 
-            html_a = re.compile("^#!html (.*)$", re.DOTALL)
+            html_a = re.compile("^#!html ?(.*)$", re.DOTALL)
             html_d = html_a.search(it_d)
 
             fol_a = re.compile("^#!folding ((?:(?!\n).)*)\n(.*)$", re.DOTALL)
@@ -97,16 +100,30 @@ def mid_pas(data, fol_num, include, in_c, toc_y):
             elif fol:
                 fol_d = fol.groups()
                 if toc_y != 0:
-                    data = com.sub("<div>" + fol_d[0] + " <div id='folding_" + str(fol_num + 1) + "' style='display: inline-block;'>[<a href='javascript:void(0);' onclick='folding(" + str(fol_num + 1) + \
-                                    "); folding(" + str(fol_num + 2) + "); folding(" + str(fol_num) + ");'>펼치기</a>]</div><div id='folding_" + str(fol_num + 2) + \
-                                    "' style='display: none;'>[<a href='javascript:void(0);' onclick='folding(" + str(fol_num + 1) + "); folding(" + str(fol_num + 2) + \
-                                    "); folding(" + str(fol_num) + ");'>접기</a>]</div><div id='folding_" + str(fol_num) + "' style='display: none;'><br>" + fol_d[1] + \
-                                    "</div></div>", data, 1)
+                    if folding_test == 0:
+                        data += '<script>function folding(num) { var fol = document.getElementById(\'folding_\' + num); \
+                                if(fol.style.display == \'inline-block\' || fol.style.display == \'block\') { fol.style.display = \'none\'; } \
+                                else { if(num % 3 == 0) { fol.style.display = \'block\'; } else { fol.style.display = \'inline-block\'; } } } \
+                                </script>'
+
+                    data = com.sub("<div>" + fol_d[0] + " <div id='folding_" + str(fol_num + 1) + "' style='display: inline-block;'>" + \
+                                    "[<a href='javascript:void(0);' onclick='folding(" + str(fol_num + 1) + \
+                                    "); folding(" + str(fol_num + 2) + "); folding(" + str(fol_num) + ");'>펼치기</a>]</div>" + \
+                                    "<div id='folding_" + str(fol_num + 2) + "' style='display: none;'>[" + \
+                                    "<a href='javascript:void(0);' onclick='folding(" + str(fol_num + 1) + "); folding(" + str(fol_num + 2) + ");" + \
+                                    " folding(" + str(fol_num) + ");'>접기</a>]</div><div id='folding_" + str(fol_num) + "' style='display: none;'>" + \
+                                    "<br>" + fol_d[1] + "</div></div>", data, 1)
                     fol_num += 3
                 else:
                     data = com.sub("<div>" + fol_d[0] + "<br><br>" + fol_d[1] + "</div>", data, 1)
                 
             elif syn:
+                if syntax == 0:
+                    data += '<script src="/views/file/highlight.min.js"></script> \
+                            <link rel="stylesheet" href="/views/file/default.min.css"> \
+                            <script>hljs.initHighlightingOnLoad();</script>'
+                    syntax = 1
+
                 syn_d = syn.groups()
                 tax_d = syn_d[1].replace(' ', '<space>')
                 tax_d = tax_d.replace('\r\n', '<isbr>')
