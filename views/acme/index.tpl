@@ -42,14 +42,12 @@
                             <a href="/recent_changes">
                                 <i class="fa fa-refresh" aria-hidden="true"></i>
                                 최근 변경
-                                <i class="fa fa-angle-left"></i>
                             </a>
                         </li>
                         <li>
                             <a href="/recent_discuss">
                                 <i class="fa fa-comment" aria-hidden="true"></i>
                                 최근 토론
-                                <i class="fa fa-angle-left"></i>
                             </a>
                         </li>
                         <li class="dropdown">
