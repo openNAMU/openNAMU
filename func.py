@@ -63,7 +63,7 @@ def captcha_post(test, conn, num = 1):
 def ip_warring(conn):
     curs = conn.cursor()
 
-    if(custom(conn)[2] == 0):    
+    if custom(conn)[2] == 0:    
         curs.execute('select data from other where name = "no_login_warring"')
         data = curs.fetchall()
         if data and data[0][0] != '':
@@ -212,7 +212,7 @@ def ip_pas(conn, raw_ip):
     hide = 0
     curs = conn.cursor()
     if re.search("(\.|:)", raw_ip):
-        if(not re.search("^도구:", raw_ip)):    
+        if not re.search("^도구:", raw_ip):    
             curs.execute("select data from other where name = 'ip_view'")
             d = curs.fetchall()
             if d and d[0][0] != '':
