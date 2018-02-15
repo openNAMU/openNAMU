@@ -25,7 +25,7 @@ def footnote(data, fol_num):
                             break
                             
                     if none_this == 0:
-                        data = pop_re.sub("<sup><a href='javascript:void(0);' onclick='folding(" + str(fol_num) + ");' id='rfn-" + str(a) + "'>[" + results[0] + "]</a></sup>" + \
+                        data = pop_re.sub("<sup><a href='javascript:void(0);' onclick='folding(" + str(fol_num) + ", 1);' id='rfn-" + str(a) + "'>[" + results[0] + "]</a></sup>" + \
                                         "<div class='popup' style='display: none;' id='folding_" + str(fol_num) + "'><a onclick='folding(" + str(fol_num) + ");'" + \
                                         " href='#fn-" + str(a) + "'>#d#" + results[0] + "#/d#</a> <a href='javascript:void(0);' onclick='folding(" + str(fol_num) + ");'>[X]</a> " + \
                                          namu[i + 1] + "</div>", data, 1)
@@ -37,13 +37,13 @@ def footnote(data, fol_num):
                         namu += [results[1]]
 
                         tou += "<span id='footnote-list'><a href='#rfn-" + str(a) + "' id='fn-" + str(a) + "'>[" + results[0] + "]</a> " + results[1] + "</span><br>"
-                        data = pop_re.sub("<sup><a href='javascript:void(0);' onclick='folding(" + str(fol_num) + ");' id='rfn-" + str(a) + "'>#d#" + results[0] + "#/d#</a>" + \
+                        data = pop_re.sub("<sup><a href='javascript:void(0);' onclick='folding(" + str(fol_num) + ", 1);' id='rfn-" + str(a) + "'>#d#" + results[0] + "#/d#</a>" + \
                                         "</sup><div class='popup' style='display: none;' id='folding_" + str(fol_num) + "'><a onclick='folding(" + str(fol_num) + ");'" + \
                                         " href='#fn-" + str(a) + "'>#d#" + results[0] + "#/d#</a> <a href='javascript:void(0);' onclick='folding(" + str(fol_num) + ");'>" + \
                                         "#d#X#/d#</a> " + results[1] + "</div>", data, 1)     
                     else:                    
                         tou += "<span id='footnote-list'><a href='#rfn-" + str(a) + "' id='fn-" + str(a) + "'>[" + str(a) + "]</a> " + results[1] + "</span><br>"
-                        data = pop_re.sub('<sup><a href="javascript:void(0);" onclick="folding(' + str(fol_num) + ');" id="rfn-' + str(a) + '">#d#' + str(a) + '#/d#</a></sup>' + \
+                        data = pop_re.sub('<sup><a href="javascript:void(0);" onclick="folding(' + str(fol_num) + ', 1);" id="rfn-' + str(a) + '">#d#' + str(a) + '#/d#</a></sup>' + \
                                         '<div class="popup" style="display: none;" id="folding_' + str(fol_num) + '"><a onclick="folding(' + str(fol_num) + ');"' + \
                                         ' href="#fn-' + str(a) + '">#d#' + str(a) + '#/d#</a> <a href="javascript:void(0);" onclick="folding(' + str(fol_num) + ');">#d#X#/d#</a> ' + \
                                         results[1] + '</div>', data, 1)

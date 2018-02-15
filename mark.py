@@ -75,9 +75,9 @@ def namumark(conn, title, data, num, in_c, toc_y):
     data = table(data)
     data = end(data, category)
 
-    data += '<script>function folding(num) { var fol = document.getElementById(\'folding_\' + num); \
+    data += '<script>function folding(num, test = 0) { var fol = document.getElementById(\'folding_\' + num); \
             if(fol.style.display == \'inline-block\' || fol.style.display == \'block\') { fol.style.display = \'none\'; } \
-            else { if(num % 3 == 0) { fol.style.display = \'block\'; } else { fol.style.display = \'inline-block\'; } } } \
+            else { if(num % 3 == 0 && test != 1) { fol.style.display = \'block\'; } else { fol.style.display = \'inline-block\'; } } } \
             </script>'
     
     if num == 1:        
