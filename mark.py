@@ -80,7 +80,7 @@ def namumark(conn, title, data, num, in_c, toc_y):
             else { if(num % 3 == 0) { fol.style.display = \'block\'; } else { fol.style.display = \'inline-block\'; } } } \
             </script>'
     
-    if(num == 1):        
+    if num == 1:        
         for d4 in backlink:
             t = threading.Thread(target = plusing, args = [conn, d4[0], d4[1], d4[2]])
             t.start()
