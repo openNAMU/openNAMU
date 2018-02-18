@@ -17,8 +17,8 @@ logging.basicConfig(level = logging.ERROR)
 app = Flask(__name__)
 Reggie(app)
 
-r_ver = 'v2.6.3'
-print('버전 : ' + r_ver)
+r_ver = 'v2.6.4'
+print('Version : ' + r_ver)
 
 from func import *
 from set_mark.mid_pas import mid_pas
@@ -30,7 +30,7 @@ try:
     set_data = json.loads(json_data)
 except:
     while 1:
-        print('DB 이름 : ', end = '')
+        print('DB Name : ', end = '')
         new_json = str(input())
 
         if new_json != '':
@@ -42,7 +42,7 @@ except:
 
             break
         else:
-            print('값을 입력하세요.')
+            print('Insert Values')
             
             pass
 
@@ -84,7 +84,7 @@ curs.execute("select data from other where name = 'port'")
 rep_data = curs.fetchall()
 if not rep_data:
     while 1:
-        print('포트 : ', end = '')
+        print('Port : ', end = '')
         rep_port = int(input())
 
         if rep_port:
@@ -95,13 +95,13 @@ if not rep_data:
             pass
 else:
     rep_port = rep_data[0][0]
-    print('포트 : ' + str(rep_port))
+    print('Port : ' + str(rep_port))
 
 curs.execute("select data from other where name = 'key'")
 rep_data = curs.fetchall()
 if not rep_data:
     while 1:
-        print('비밀 키 : ', end = '')
+        print('Secret Key : ', end = '')
         rep_key = str(input())
 
         if rep_key:
@@ -112,7 +112,7 @@ if not rep_data:
             pass
 else:
     rep_key = rep_data[0][0]
-    print('비밀 키 : ' + rep_key)
+    print('Secret Key : ' + rep_key)
 
 print('')
 
@@ -181,9 +181,9 @@ if not os.path.exists('views'):
 def back_up():
     try:
         shutil.copyfile(set_data['db'] + '.db', 'back_' + set_data['db'] + '.db')
-        print('백업 성공')
+        print('Back Up Ok')
     except:
-        print('백업 오류')
+        print('Back Up Error')
 
     threading.Timer(60 * 60 * back_time, back_up).start()
 
@@ -196,12 +196,12 @@ except:
     
 # 백업 여부 확인
 if back_time != 0:
-    print(str(back_time) + '시간 간격으로 백업')
+    print(str(back_time) + ' Hours Back Up')
 
     if __name__ == '__main__':
         back_up()
 else:
-    print('백업하지 않음')
+    print('No Back Up')
 
 @app.route('/del_alarm')
 def del_alarm():
@@ -823,7 +823,7 @@ def indexing():
 
     if index_data:
         for delete_index in index_data:
-            print('delete : ' + delete_index[0])
+            print('Delete : ' + delete_index[0])
             
             sql = 'drop index if exists ' + delete_index[0]
 
@@ -843,7 +843,7 @@ def indexing():
             r_cul = re.findall('(?:([^ (]*) text)', str(cul[0]))
             
             for n_cul in r_cul:
-                print('create : index_' + table[0] + '_' + n_cul)
+                print('Create : index_' + table[0] + '_' + n_cul)
                 
                 sql = 'create index index_' + table[0] + '_' + n_cul + ' on ' + table[0] + '(' + n_cul + ')'
                 
@@ -864,7 +864,7 @@ def re_start():
         return re_error(conn, '/error/3')
 
     print('')
-    print('서버 재 시작')
+    print('Re Start')
     print('')
 
     os.execl(sys.executable, sys.executable, *sys.argv)

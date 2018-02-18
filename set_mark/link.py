@@ -29,11 +29,13 @@ def link(conn, title, data, num, category, backlink):
                 category += ' / '                
 
             style = ''
+            title_name = re.sub("분류:", "", g[0])
             if g[1]:
                 if re.search('#blur', g[1]):
-                    style = ' style="filter: blur(3px);" onmouseover="this.style.filter=\'none\';" onmouseout="this.style.filter=\'blur(3px)\';"'
+                    style = ' onmouseover="this.innerHTML=\'' + title_name + '\';"'
+                    title_name = '<span id="inside">스포일러</span>'
                 
-            category += '<a ' + red + ' ' + style + ' href="/w/' + url_pas(g[0]) + '">' + re.sub("분류:", "", g[0]) + '</a>'
+            category += '<a ' + red + ' ' + style + ' href="/w/' + url_pas(g[0]) + '">' + title_name + '</a>'
         
         data = re.sub("\[\[(분류:(?:(?:(?!\]\]|#).)+))((?:#(?:(?:(?!#|\]\]).)+))+)?\]\]", '', data, 1)
     
