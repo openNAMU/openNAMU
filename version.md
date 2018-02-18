@@ -152,21 +152,17 @@
  * 구문 강조 [highlightjs](https://highlightjs.org/)
  * 수식 [MathJax](https://www.mathjax.org/)
 
-## 도움 준 사람이나 팀
- * [Basix](https://twitter.com/Basix1120)
- * Efrit
+## 도움 준 사람들
  * [Team Croatia](https://github.com/TeamCroatia)
- * 기타 텔레그램 및 카카오톡 채팅방 사람들
+ * Basix
+ * Efrit
+ * 기타 채팅방 사람들
 
 ----
 ## 기타
- * 현재 버전 : v2.6.4 베타
+ * 현재 버전 : v2.6.4
 
 ----
 ## 개발 이념
- * 타 위키 엔진과 같지는 않게
  * 최대한 간단하게
- * 설치하고 바로 쓸 수 있게
  * 개발하기 편하게
- * 가볍게
- * **나한테 맞는 위키 엔진을 만들자**
