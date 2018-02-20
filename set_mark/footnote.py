@@ -4,6 +4,8 @@ def footnote(data, fol_num):
     a = 1
     tou = "<hr style='margin-top: 30px;' id='footnote'><div><br>"
     namu = []
+    div = ''
+    print(data)
     pop_re = re.compile('(?:\[\*([^\s]*)(?:\s((?:(?!\[|\]).)*))?\]|(\[각주\]))')
     while 1:
         b = pop_re.search(data)
@@ -25,10 +27,10 @@ def footnote(data, fol_num):
                             break
                             
                     if none_this == 0:
-                        data = pop_re.sub("<sup><a href='javascript:void(0);' onclick='folding(" + str(fol_num) + ", 1);' id='rfn-" + str(a) + "'>(" + results[0] + ")</a></sup>" + \
-                                        "<div class='popup' style='display: none;' id='folding_" + str(fol_num) + "'><a onclick='folding(" + str(fol_num) + ");'" + \
-                                        " href='#fn-" + str(a) + "'>(" + results[0] + ")</a> <a href='javascript:void(0);' onclick='folding(" + str(fol_num) + ");'>(X)</a> " + \
-                                         namu[i + 1] + "</div>", data, 1)
+                        data = pop_re.sub("<sup><a href='javascript:void(0);' onclick='folding(" + str(fol_num) + ", 1);' id='rfn-" + str(a) + "'>(" + results[0] + ")</a></sup>", data, 1)
+                        div += "<div class='popup' style='display: none;' id='folding_" + str(fol_num) + "'><a onclick='folding(" + str(fol_num) + ");'" + \
+                                " href='#fn-" + str(a) + "'>(" + results[0] + ")</a> <a href='javascript:void(0);' onclick='folding(" + str(fol_num) + ");'>(X)</a> " + \
+                                namu[i + 1] + "</div>"
                     else:
                         data = pop_re.sub("<sup><a href='javascript:void(0);' id='rfn-" + str(a) + "'>(" + results[0] + ")</a></sup>", data, 1)
                 else:
@@ -36,17 +38,20 @@ def footnote(data, fol_num):
                         namu += [results[0]]
                         namu += [results[1]]
 
-                        tou += "<span id='footnote-list'><a href='#rfn-" + str(a) + "' id='fn-" + str(a) + "'>(" + results[0] + ")</a> " + results[1] + "</span><br>"
-                        data = pop_re.sub("<sup><a href='javascript:void(0);' onclick='folding(" + str(fol_num) + ", 1);' id='rfn-" + str(a) + "'>(" + results[0] + ")</a>" + \
-                                        "</sup><div class='popup' style='display: none;' id='folding_" + str(fol_num) + "'><a onclick='folding(" + str(fol_num) + ");'" + \
-                                        " href='#fn-" + str(a) + "'>(" + results[0] + ")</a> <a href='javascript:void(0);' onclick='folding(" + str(fol_num) + ");'>" + \
-                                        "(X)</a> " + results[1] + "</div>", data, 1)     
+                        data = pop_re.sub("<sup><a href='javascript:void(0);' onclick='folding(" + str(fol_num) + ", 1);' id='rfn-" + str(a) + "'>(" + results[0] + ")</a></sup>", data, 1)
+
+                        tou += "<span id='footnote-list'><a href='#rfn-" + str(a) + "' id='fn-" + str(a) + "'>(" + results[0] + ")</a> " + results[1] + "</span><br>"                        
+                        div += "<div class='popup' style='display: none;' id='folding_" + str(fol_num) + "'><a onclick='folding(" + str(fol_num) + ");'" + \
+                                " href='#fn-" + str(a) + "'>(" + results[0] + ")</a> <a href='javascript:void(0);' onclick='folding(" + str(fol_num) + ");'>" + \
+                                "(X)</a> " + results[1] + "</div>"
+
                     else:                    
+                        data = pop_re.sub('<sup><a href="javascript:void(0);" onclick="folding(' + str(fol_num) + ', 1);" id="rfn-' + str(a) + '">(' + str(a) + ')</a></sup>', data, 1)
+
                         tou += "<span id='footnote-list'><a href='#rfn-" + str(a) + "' id='fn-" + str(a) + "'>(" + str(a) + ")</a> " + results[1] + "</span><br>"
-                        data = pop_re.sub('<sup><a href="javascript:void(0);" onclick="folding(' + str(fol_num) + ', 1);" id="rfn-' + str(a) + '">(' + str(a) + ')</a></sup>' + \
-                                        '<div class="popup" style="display: none;" id="folding_' + str(fol_num) + '"><a onclick="folding(' + str(fol_num) + ');"' + \
-                                        ' href="#fn-' + str(a) + '">(' + str(a) + ')</a> <a href="javascript:void(0);" onclick="folding(' + str(fol_num) + ');">(X)</a> ' + \
-                                        results[1] + '</div>', data, 1)
+                        div += '<div class="popup" style="display: none;" id="folding_' + str(fol_num) + '"><a onclick="folding(' + str(fol_num) + ');"' + \
+                                ' href="#fn-' + str(a) + '">(' + str(a) + ')</a> <a href="javascript:void(0);" onclick="folding(' + str(fol_num) + ');">(X)</a> ' + \
+                                results[1] + '</div>'
                     a += 1
 
                 fol_num += 2
@@ -68,6 +73,6 @@ def footnote(data, fol_num):
     
     data = re.sub("\[각주\](?:(?:<br>| |\r|\n)+)?$", "", data)
     data = re.sub("(?:(?:<br>| |\r|\n)+)$", "", data)
-    data += tou
+    data += tou + div
     
     return data
