@@ -17,7 +17,7 @@ logging.basicConfig(level = logging.ERROR)
 app = Flask(__name__)
 Reggie(app)
 
-r_ver = 'v2.6.4'
+r_ver = 'v2.6.5 Beta'
 print('Version : ' + r_ver)
 
 from func import *
@@ -1779,7 +1779,6 @@ def manager(num = 1):
                                         '== 목록 ==\r\n' + \
                                         ' * [[wiki:manager/2|문서 ACL]]\r\n' + \
                                         ' * [[wiki:manager/3|사용자 검사]]\r\n' + \
-                                        ' * [[wiki:manager/100|사용자 비교]]\r\n' + \
                                         ' * [[wiki:manager/4|사용자 차단]]\r\n' + \
                                         ' * [[wiki:manager/5|권한 주기]]\r\n' + \
                                         ' * [[wiki:big_delete|여러 문서 삭제]]\r\n' + \
@@ -1807,19 +1806,6 @@ def manager(num = 1):
                 imp = [title_list[(num - 2)][0], wiki_set(conn, 1), custom(conn), other2([0, 0])],
                 data = '<form method="post"> \
                             <input placeholder="' + placeholder + '" name="name" type="text"><hr> \
-                            <button type="submit">이동</button> \
-                        </form>',
-                menu = [['manager', '관리자']]
-            ))
-    elif num == 100:
-        if request.method == 'POST':
-            return redirect('/check/' + url_pas(request.form['name']) + '?plus=' + url_pas(request.form['name2']))
-        else:
-            return html_minify(template('index', 
-                imp = ['검사', wiki_set(conn, 1), custom(conn), other2([0, 0])],
-                data = '<form method="post"> \
-                            <input placeholder="사용자명" name="name" type="text"><hr> \
-                            <input placeholder="비교 대상" name="name2" type="text"><hr> \
                             <button type="submit">이동</button> \
                         </form>',
                 menu = [['manager', '관리자']]
@@ -2397,7 +2383,12 @@ def user_check(name = None):
     
     record = curs.fetchall()
     if record:
-        div = '<table style="width: 100%; text-align: center;"><tbody><tr>'
+        if not request.args.get('plus', None):
+            div = '<a href="/plus_check/' + url_pas(name) + '">(비교)</a><hr>'
+        else:
+            div = '<a href="/check/' + url_pas(name) + '">(주요 대상)</a> <a href="/check/' + url_pas(request.args.get('plus', None)) + '">(비교 대상)</a><hr>'
+
+        div += '<table style="width: 100%; text-align: center;"><tbody><tr>'
         div += '<td style="width: 33.3%;">이름</td><td style="width: 33.3%;">아이피</td><td style="width: 33.3%;">언제</td></tr>'
 
         for data in record:
@@ -2418,10 +2409,23 @@ def user_check(name = None):
         data = div,
         menu = [['manager', '관리자']]
     ))
+
+@app.route('/plus_check/<name>', methods=['POST', 'GET'])
+def plus_check(name):
+    if request.method == 'POST':
+        return redirect('/check/' + url_pas(name) + '?plus=' + url_pas(request.form['name2']))
+    else:
+        return html_minify(template('index',
+            imp = ['대상 추가', wiki_set(conn, 1), custom(conn), other2([0, 0])],
+            data = '<form method="post"> \
+                        <input placeholder="비교 대상" name="name2" type="text"><hr> \
+                        <button type="submit">이동</button> \
+                    </form>',
+            menu = [['manager', '관리자']]
+        ))
                 
 @app.route('/register', methods=['POST', 'GET'])
 def register():
-    ip = ip_check()
     ban = ban_check(conn)
 
     if ban == 1:
