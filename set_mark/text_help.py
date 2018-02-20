@@ -11,7 +11,7 @@ def text_help(data):
     if re.search('&lt;math&gt;((?:(?!&lt;\/math&gt;).)*)&lt;\/math&gt;', data):
         data = re.sub('&lt;math&gt;(?P<in>(?:(?!&lt;\/math&gt;).)*)&lt;\/math&gt;', '[math]\g<in>[/math]', data)
         data += '<script type="text/x-mathjax-config">MathJax.Hub.Config({tex2jax: { inlineMath: [ [\'[math]\', \'[/math]\'] ] } });</script> \
-                <script src="/views/file/MathJax.js?config=TeX-AMS_CHTML"></script>'
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/MathJax.js?config=TeX-AMS_CHTML"></script>'
  
     data = re.sub('{{\|(?P<in>(?:(?:(?:(?!\|}}).)*)(?:\n?))+)\|}}', '<table><tbody><tr><td>\g<in></td></tr></tbody></table>', data)
     data = re.sub("-{4,11}", "<hr>", data)
