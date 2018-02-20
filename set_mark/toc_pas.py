@@ -60,11 +60,12 @@ def toc_pas(data, title, num, toc_y):
             t = toc.count('.')
             span = '<span style="margin-left: 5px;"></span>' * t
 
-            rtoc += span + '<a href="#s-' + toc + '">' + toc + '</a>. ' + result[1] + '<br>'
+            rtoc += span + '<a href="#s-' + toc + '">' + toc + '</a>. ' + re.sub('(?:\[\*([^\s]*)(?:\s((?:(?!\[|\]).)*))?\])', '', result[1]) + '<br>'
 
             c = re.sub(" $", "", result[1])
             d = c
             c = re.sub("\[\[(([^|]*)\|)?(?P<in>[^\]]*)\]\]", "\g<in>", c)
+            c = re.sub('(?:\[\*([^\s]*)(?:\s((?:(?!\[|\]).)*))?\])', '', c)
 
             edit_d = ''
             if toc_y == 1:
