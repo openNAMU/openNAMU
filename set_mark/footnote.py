@@ -5,7 +5,6 @@ def footnote(data, fol_num):
     tou = "<hr style='margin-top: 30px;' id='footnote'><div><br>"
     namu = []
     div = ''
-    print(data)
     pop_re = re.compile('(?:\[\*([^\s]*)(?:\s((?:(?!\[|\]).)*))?\]|(\[각주\]))')
     while 1:
         b = pop_re.search(data)
