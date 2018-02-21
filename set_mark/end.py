@@ -25,24 +25,7 @@ def end(data, category):
         else:
             break
 
-    com = re.compile('#mini#((?:(?!#\/mini#).)+)#\/mini#', re.DOTALL)
-    while 1:
-        m = com.search(data)
-        if m:
-            data = com.sub(parse.unquote(m.groups()[0]).replace('&#95;', '_'), data, 1)
-        else:
-            break
-
-    com3 = re.compile('#mid2#((?:(?!#\/mid2#).)+)#\/mid2#', re.DOTALL)
-    m = com3.search(data)
-    while 1:
-        m = com3.search(data)
-        if m:
-            data = com3.sub('{{{' + m.groups()[0] + '}}}', data, 1)
-        else:
-            break
-
-    com3 = re.compile('#mid#((?:(?!#\/mid#).)+)#\/mid#', re.DOTALL)
+    com3 = re.compile('(?:#mid#|#\/mid2#)((?:(?!#\/mid#|#\/mid2#).)+)(?:#\/mid#|#\/mid2#)', re.DOTALL)
     m = com3.search(data)
     while 1:
         m = com3.search(data)
