@@ -14,6 +14,7 @@ def include_pas(conn, data, title, in_c, num, toc_y, fol_num):
 
     category = ''
     backlink = []
+    data = data.replace('&#92;&#92;,', '#comma#')
     
     include = re.compile("\[include\(((?:(?!\)\]|,).)*)((?:(?:,\s?(?:(?!\)\]).)*))+)?\)\]((?:(?!\n))*)")
     m = include.findall(data)
@@ -45,7 +46,7 @@ def include_pas(conn, data, title, in_c, num, toc_y, fol_num):
                         g = re.search("([^= ,]*)\=([^,]*)", a)
                         if g:
                             result = g.groups()
-                            in_data = re.sub("@" + result[0] + "@", result[1], in_data)
+                            in_data = re.sub("@" + result[0] + "@", result[1].replace('#comma#', ','), in_data)
                             a = re.sub("([^= ,]*)\=([^,]*)", "", a, 1)
                         else:
                             break       
@@ -63,5 +64,7 @@ def include_pas(conn, data, title, in_c, num, toc_y, fol_num):
                 data = include.sub('<nobr><a id="include_link" href="/w/' + url_pas(results[0]) + '">[' + results[0] + ' 이동]</a><br><span>' + in_data + '</span>' + test, data, 1)
             else:
                 data = include.sub("<a class=\"not_thing\" href=\"/w/" + url_pas(results[0]) + "\">" + results[0] + "</a>", data, 1)
+
+    data = data.replace('#comma#', '&#92;&#92;,')
 
     return [data, category, fol_num, backlink]
