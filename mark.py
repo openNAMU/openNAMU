@@ -55,7 +55,7 @@ def namumark(conn, title, data, num, in_c, toc_y):
     fol_num = a[2]
     backlink = a[3]
     
-    data = re.sub("\r\n##\s?([^\n]*)\r\n", "\r\n", data)    
+    data = re.sub("\n##\s?([^\n]*)", "", data)    
     a = redirect_pas(data, title, backlink)
     data = a[0]
     backlink = a[1]
