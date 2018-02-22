@@ -5,6 +5,23 @@ def mid_pas(data, fol_num, include, in_c, toc_y):
     syntax = 0
     folding_test = 0
 
+    com = re.compile("{{{((?!(?:(?:\+|-)(?:[^ ]+))|(?:#|@)(?:(?:[0-9a-f-A-F]{3}){1,2}|(?:\w+))|(?:#!(?:html|wiki|noin|folding|syntax)))(?:(?!{|}).)+)}}}", re.DOTALL)
+    while 1:
+        m = com.search(data)
+        if m:
+            com4 = re.compile('#base64#((?:(?!#\/base64#).)+)#\/base64#', re.DOTALL)
+            test = com4.search(m.groups()[0])
+            if test:
+                test2 = com4.sub('#mid2#' + parse.unquote(test.groups()[0]).replace('&#95;', '_').replace('&#8208;', '-') + '#/mid2#', m.groups()[0])
+            else:
+                test2 = m.groups()[0]
+                
+            data = com.sub('#base64#' + parse.quote(test2).replace('_', '&#95;').replace('-', '&#8208;').replace('%3C', '&lt;').replace('%3E', '&gt;') + '#/base64#', data, 1)
+        else:
+            break
+
+        data = re.sub("{#base64#%7B%7B", "{{{#base64#", data)
+
     p = re.compile('{{{((?!#mid#)(?:(?:(?:\+|-)(?:[^ ]+))|(?:#|@)(?:(?:[0-9a-f-A-F]{3}){1,2}|(?:\w+))|(?:#!(?:html|wiki|noin|folding|syntax)))(?:(?!{{{|}}}).)+)}}}', re.DOTALL)
     while 1:
         m = p.search(data)
@@ -20,13 +37,11 @@ def mid_pas(data, fol_num, include, in_c, toc_y):
             com4 = re.compile('#base64#((?:(?!#\/base64#).)+)#\/base64#', re.DOTALL)
             test = com4.search(m.groups()[0])
             if test:
-                test2 = com4.sub('#mid2#' + parse.unquote(test.groups()[0]).replace('&#95;', '_').replace('&#8208;', '-') + \
-                                '#/mid2#', m.groups()[0])
+                test2 = com4.sub('#mid2#' + parse.unquote(test.groups()[0]).replace('&#95;', '_').replace('&#8208;', '-') + '#/mid2#', m.groups()[0])
             else:
                 test2 = m.groups()[0]
                 
-            data = com.sub('#base64#' + parse.quote(test2).replace('_', '&#95;').replace('-', '&#8208;').replace('%3C', '&lt;').replace('%3E', '&gt;') + \
-                            '#/base64#', data, 1)
+            data = com.sub('#base64#' + parse.quote(test2).replace('_', '&#95;').replace('-', '&#8208;').replace('%3C', '&lt;').replace('%3E', '&gt;') + '#/base64#', data, 1)
         else:
             break
 
@@ -105,22 +120,14 @@ def mid_pas(data, fol_num, include, in_c, toc_y):
             elif fol:
                 fol_d = fol.groups()
                 if toc_y != 0:
-                    data = com.sub("<div>" + fol_d[0] + " <div id='folding_" + str(fol_num + 1) + "' style='display: inline-block;'>" + \
-                                    "[<a href='javascript:void(0);' onclick='folding(" + str(fol_num + 1) + \
-                                    "); folding(" + str(fol_num + 2) + "); folding(" + str(fol_num) + ");'>펼치기</a>]</div>" + \
-                                    "<div id='folding_" + str(fol_num + 2) + "' style='display: none;'>[" + \
-                                    "<a href='javascript:void(0);' onclick='folding(" + str(fol_num + 1) + "); folding(" + str(fol_num + 2) + ");" + \
-                                    " folding(" + str(fol_num) + ");'>접기</a>]</div><div id='folding_" + str(fol_num) + "' style='display: none;'>" + \
-                                    "<br>" + fol_d[1] + "</div></div>", data, 1)
+                    data = com.sub("<div>" + fol_d[0] + " <div id='folding_" + str(fol_num + 1) + "' style='display: inline-block;'>" + "[<a href='javascript:void(0);' onclick='folding(" + str(fol_num + 1) + "); folding(" + str(fol_num + 2) + "); folding(" + str(fol_num) + ");'>펼치기</a>]</div>" + "<div id='folding_" + str(fol_num + 2) + "' style='display: none;'>[" + "<a href='javascript:void(0);' onclick='folding(" + str(fol_num + 1) + "); folding(" + str(fol_num + 2) + ");" + " folding(" + str(fol_num) + ");'>접기</a>]</div><div id='folding_" + str(fol_num) + "' style='display: none;'>" + "<br>" + fol_d[1] + "</div></div>", data, 1)
                     fol_num += 3
                 else:
                     data = com.sub("<div>" + fol_d[0] + "<br><br>" + fol_d[1] + "</div>", data, 1)
                 
             elif syn:
                 if syntax == 0:
-                    data += '<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"> \
-                            <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script> \
-                            <script>hljs.initHighlightingOnLoad();</script>'
+                    data += '<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"><script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script><script>hljs.initHighlightingOnLoad();</script>'
                     syntax = 1
 
                 syn_d = syn.groups()
