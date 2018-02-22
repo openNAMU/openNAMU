@@ -30,8 +30,6 @@ def html_pas(data):
 
     data = html.escape(data)
     data = data.replace('\\', '&#92;')
-
-    print([data])
     
     end = re.findall('%H%((?:(?!%/H%).)*)%/H%', data)
     for d_end in end:
