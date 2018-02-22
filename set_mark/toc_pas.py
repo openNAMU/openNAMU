@@ -71,9 +71,7 @@ def toc_pas(data, title, num, toc_y):
             if toc_y == 1:
                 edit_d = ' <span style="font-size: 12px;"><a href="/edit/' + url_pas(title) + '?section=' + str(i[0]) + '">(편집)</a></span>'
 
-            data = re.sub('(={1,6})\s?([^=]*)\s?(?:={1,6})(?:\s+)?\n', '<tablenobr><h' + str(wiki) + ' id="' + c + '" ' + margin + '><a href="#toc" id="s-' + toc + '">' \
-                                                                         + toc + '.<span style="margin-left: 5px;"></span></a> ' \
-                                                                         + d + edit_d + '</h' + str(wiki) + '><hr id="under_bar" style="margin-top: -5px;">\n', data, 1)
+            data = re.sub('(={1,6})\s?([^=]*)\s?(?:={1,6})(?:\s+)?\n', '#table-no-br#<h' + str(wiki) + ' id="' + c + '" ' + margin + '><a href="#toc" id="s-' + toc + '">' + toc + '.<span style="margin-left: 5px;"></span></a> ' + d + edit_d + '</h' + str(wiki) + '><hr id="under_bar" style="margin-top: -5px;">\n', data, 1)
         else:
             rtoc += '</div>'
             
