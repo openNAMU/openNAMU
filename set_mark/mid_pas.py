@@ -5,57 +5,6 @@ def mid_pas(data, fol_num, include, in_c, toc_y):
     syntax = 0
     folding_test = 0
 
-    com = re.compile("{{{((?!(?:(?:\+|-)(?:[^ ]+))|(?:#|@)(?:(?:[0-9a-f-A-F]{3}){1,2}|(?:\w+))|(?:#!(?:html|wiki|noin|folding|syntax)))(?:(?!{|}).)+)}}}", re.DOTALL)
-    while 1:
-        m = com.search(data)
-        if m:
-            com4 = re.compile('#base64#((?:(?!#\/base64#).)+)#\/base64#', re.DOTALL)
-            test = com4.search(m.groups()[0])
-            if test:
-                test2 = com4.sub('#mid2#' + parse.unquote(test.groups()[0]).replace('&#95;', '_').replace('&#8208;', '-') + '#/mid2#', m.groups()[0])
-            else:
-                test2 = m.groups()[0]
-                
-            data = com.sub('#base64#' + parse.quote(test2).replace('_', '&#95;').replace('-', '&#8208;').replace('%3C', '&lt;').replace('%3E', '&gt;') + '#/base64#', data, 1)
-        else:
-            break
-
-        data = re.sub("{#base64#%7B%7B", "{{{#base64#", data)
-
-    p = re.compile('{{{((?!#mid#)(?:(?:(?:\+|-)(?:[^ ]+))|(?:#|@)(?:(?:[0-9a-f-A-F]{3}){1,2}|(?:\w+))|(?:#!(?:html|wiki|noin|folding|syntax)))(?:(?!{{{|}}}).)+)}}}', re.DOTALL)
-    while 1:
-        m = p.search(data)
-        if m:
-            data = p.sub('#mid#' + m.groups()[0] + '#/mid#', data, 1)
-        else:
-            break
-
-    com = re.compile("{{{((?:(?!{{{|}}}).)*)}}}", re.DOTALL)
-    while 1:
-        m = com.search(data)
-        if m:
-            com4 = re.compile('#base64#((?:(?!#\/base64#).)+)#\/base64#', re.DOTALL)
-            test = com4.search(m.groups()[0])
-            if test:
-                test2 = com4.sub('#mid2#' + parse.unquote(test.groups()[0]).replace('&#95;', '_').replace('&#8208;', '-') + '#/mid2#', m.groups()[0])
-            else:
-                test2 = m.groups()[0]
-                
-            data = com.sub('#base64#' + parse.quote(test2).replace('_', '&#95;').replace('-', '&#8208;').replace('%3C', '&lt;').replace('%3E', '&gt;') + '#/base64#', data, 1)
-        else:
-            break
-
-        data = re.sub("{#base64#%7B%7B", "{{{#base64#", data)
-
-    com3 = re.compile('#mid#((?:(?!#\/mid#).)+)#\/mid#', re.DOTALL)
-    m = com3.search(data)
-    while 1:
-        m = com3.search(data)
-        if m:
-            data = com3.sub('{{{' + m.groups()[0] + '}}}', data, 1)
-        else:
-            break
-
     while 1:
         is_it = com.search(data)
         if is_it:
