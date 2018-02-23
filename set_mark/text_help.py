@@ -8,6 +8,7 @@ def text_help(data):
     data = re.sub('\^\^(?P<in>.+?)\^\^(?!\^)', '<sup>\g<in></sup>', data)
     data = re.sub(',,(?P<in>.+?),,(?!,)', '<sub>\g<in></sub>', data) 
     data = re.sub('{{\|(?P<in>(?:(?:(?:(?!\|}}).)*)(?:\n?))+)\|}}', '<table><tbody><tr><td>\g<in></td></tr></tbody></table>', data)
+    data = re.sub('&lt;math&gt;(?P<in>(?:(?!&lt;\/math&gt;).)*)&lt;\/math&gt;', '[math]\g<in>[/math]', data)
 
     while 1:
         if re.search("\n-{4,9}( *)\r\n", data):
