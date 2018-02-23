@@ -2,7 +2,7 @@ import re
 
 def indent(data):
     while 1:
-        m = re.search("(\n(?:(?:( *)\* ?(?:[^\n]*))\n?)+)", data)
+        m = re.search("(\n(?:(?:( *)\* ?(?:((?!\n|\|\|).)*))\n?)+)", data)
         if m:
             end = m.groups()[0]
 
@@ -20,7 +20,13 @@ def indent(data):
                     break
 
             end = re.sub("\n", '', end)
-            data = re.sub("(\n(?:(?:( *)\* ?(?:[^\n]*))\n?)+)", '\r\n<ul style="margin-top: 10px; margin-bottom: 10px;" id="list">' + end + '</ul>\r\n', data, 1)
+
+            if re.search(' <\/li>$', end):
+                test = ' '
+            else:
+                test = ''
+
+            data = re.sub("(\n(?:(?:( *)\* ?(?:((?!\n|\|\|).)*))\n?)+)", '<ul style="margin-top: 10px; margin-bottom: 10px;" id="list">' + end + '</ul>' + test, data, 1)
         else:
             break
 
