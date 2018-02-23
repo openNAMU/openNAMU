@@ -133,7 +133,7 @@ def table(data):
     data = re.sub("#table-no-br#", "\r\n", data)
     
     while 1:
-        m = re.search("(?:\n|<br>)(\|\|(?:(?:(?:.*)\n?)\|\|)+)", data)
+        m = re.search("(?:\n|<br>|<span>)(\|\|(?:(?:(?:.*)\n?)\|\|)+)", data)
         if m:
             results = m.groups()
             table = results[0]
@@ -239,7 +239,7 @@ def table(data):
                 else:
                     break
             
-            data = re.sub("(?:\n|<br>)(\|\|(?:(?:(?:.*)\n?)\|\|)+)", table, data, 1)
+            data = re.sub("(?:\n|<br>|<span>)(\|\|(?:(?:(?:.*)\n?)\|\|)+)", table, data, 1)
         else:
             break
         
