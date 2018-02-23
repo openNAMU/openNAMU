@@ -9,23 +9,6 @@ def end(data, category):
     data = re.sub("(\n#no-br#|#no-br#\n|#no-br#)", "", data)
     data = re.sub("&lt;space&gt;", " ", data)
 
-    com = re.compile('#base64#((?:(?!#\/base64#).)+)#\/base64#', re.DOTALL)
-    while 1:
-        m = com.search(data)
-        if m:
-            data = com.sub(parse.unquote(m.groups()[0]).replace('&#95;', '_').replace('\r\n', '<br>'), data, 1)
-        else:
-            break
-
-    com3 = re.compile('(?:#mid#|#\/mid2#)((?:(?!#\/mid#|#\/mid2#).)+)(?:#\/mid#|#\/mid2#)', re.DOTALL)
-    m = com3.search(data)
-    while 1:
-        m = com3.search(data)
-        if m:
-            data = com3.sub('{{{' + m.groups()[0] + '}}}', data, 1)
-        else:
-            break
-
     data = re.sub('<\/blockquote>(?:(?:\r)?\n){2}<blockquote>', '</blockquote><blockquote>', data)
     data = re.sub('<\/blockquote>(?:(?:\r)?\n)<br><blockquote>', '</blockquote><blockquote>', data)
 
