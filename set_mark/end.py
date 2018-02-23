@@ -13,6 +13,8 @@ def end(data, category):
     data = re.sub('<\/blockquote>(?:(?:\r)?\n)<br><blockquote>', '</blockquote><blockquote>', data)
 
     data = re.sub('\n', '<br>', data)
+    data = re.sub("\[br\]", '<br>', data)
+
     data = re.sub('<br><ul id="list">', '<ul id="list">', data)
     data = re.sub('<\/ul>\r<br>', '</ul>', data)
     data = re.sub('<\/table>\r<br><ul ', '</table><ul ', data)
