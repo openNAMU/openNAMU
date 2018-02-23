@@ -5,6 +5,7 @@ def mid_pas(data, fol_num, include, in_c, toc_y):
     syntax = 0
     folding_test = 0
 
+    com = re.compile("{{{((?:(?!{{{|}}}).)*)}}}", re.DOTALL)
     while 1:
         is_it = com.search(data)
         if is_it:
