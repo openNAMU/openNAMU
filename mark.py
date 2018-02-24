@@ -41,51 +41,14 @@ def plusing(conn, name, link, backtype):
         curs.execute("insert into back (title, link, type) values (?, ?, ?)", [link, name, backtype])
 
 def namumark(conn, title, data, num, in_c, toc_y):  
-    data = start(data)
-    data = html_pas(data)
-    
-    fol_num = 0
-    a = mid_pas(data, fol_num, 0, in_c, toc_y)
-    data = a[0]
-    fol_num = a[1]
-
-    a = include_pas(conn, data, title, in_c, num, toc_y, fol_num)
-    data = a[0]
-    category = a[1]
-    fol_num = a[2]
-    backlink = a[3]
-    
-    data = re.sub("\n##\s?([^\n]*)", "", data)    
-    a = redirect_pas(data, title, backlink)
-    data = a[0]
-    backlink = a[1]
-    
-    data = blockquote(data)
-    data = toc_pas(data, title, num, toc_y)
-    data = text_help(data)
-    data = macro(data)
-    
-    a = link(conn, title, data, num, category, backlink)
-    data = a[0]
-    category = a[1]
-    backlink = a[2]
-    
-    data = indent(data)
-    data = footnote(data, fol_num)
-    data = table(data)
-    data = end(data, category)
-
-    data += '<script>function folding(num, test = 0) { var fol = document.getElementById(\'folding_\' + num); \
-            if(fol.style.display == \'inline-block\' || fol.style.display == \'block\') { fol.style.display = \'none\'; } \
-            else { if(num % 3 == 0 && test != 1) { fol.style.display = \'block\'; } else { fol.style.display = \'inline-block\'; } } } \
-            </script>'
-    
-    if num == 1:        
-        for d4 in backlink:
-            t = threading.Thread(target = plusing, args = [conn, d4[0], d4[1], d4[2]])
-            t.start()
-            t.join()
-
-        conn.commit()
+#    data += '<script>function folding(num, test = 0) { var fol = document.getElementById(\'folding_\' + num); if(fol.style.display == \'inline-block\' || fol.style.display == \'block\') { fol.style.display = \'none\'; } else { if(num % 3 == 0 && test != 1) { fol.style.display = \'block\'; } else { fol.style.display = \'inline-block\'; } } } </script>'
+#    
+#    if num == 1:        
+#        for d4 in backlink:
+#            t = threading.Thread(target = plusing, args = [conn, d4[0], d4[1], d4[2]])
+#            t.start()
+#            t.join()
+#
+#        conn.commit()
         
     return data
