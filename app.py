@@ -17,7 +17,7 @@ logging.basicConfig(level = logging.ERROR)
 app = Flask(__name__)
 Reggie(app)
 
-r_ver = 'v2.6.5 Beta'
+r_ver = 'v3.0.0 Beta'
 print('Version : ' + r_ver)
 
 from func import *
