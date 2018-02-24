@@ -21,8 +21,7 @@ r_ver = 'v3.0.0 Beta'
 print('Version : ' + r_ver)
 
 from func import *
-from set_mark.mid_pas import mid_pas
-from set_mark.macro import savemark
+from set_mark.tool import savemark
 
 # set.json 설정 확인
 try:
@@ -1592,9 +1591,12 @@ def preview(name = None):
     if can == 1:
         return re_error(conn, '/ban')
          
-    newdata = request.form['content']
-    newdata = re.sub('^#(?:redirect|넘겨주기) (?P<in>[^\n]*)', ' * [[\g<in>]] 문서로 넘겨주기', newdata)
-    enddata = namumark(conn, name, newdata, 0, 0, 1)
+    new_data = request.form['content']
+    new_data = re.sub('\r\n#(?:redirect|넘겨주기) (?P<in>(?:(?!\r\n).)+)\r\n', ' * [[\g<in>]] 문서로 넘겨주기', '\r\n' + new_data + '\r\n')
+    new_data = re.sub('^\r\n', '', new_data)
+    new_data = re.sub('\r\n$', '', new_data)
+    
+    end_data = namumark(conn, name, new_data, 0, 0, 1)
 
     if request.args.get('section', None):
         action = '?section=' + request.args.get('section', None)
@@ -1610,7 +1612,7 @@ def preview(name = None):
                     ' + captcha_get(conn) + ' \
                     <button id="save" type="submit">저장</button> \
                     <button id="preview" type="submit" formaction="/preview/' + url_pas(name) + action + '">미리보기</button> \
-                </form><hr>' + enddata,
+                </form><hr>' + end_data,
         menu = [['w/' + url_pas(name), '문서']]
     ))
         
@@ -2892,7 +2894,7 @@ def read_view(name = None):
                     curs.execute("select data from data where title = ?", [data[0]])
                     db_data = curs.fetchall()
                     if db_data:
-                        cat_data = re.sub("\[\[(분류:(?:(?:(?!\]\]|#include).)+))\]\]", "", mid_pas(db_data[0][0], 0, 1, 0, 0)[0])
+#                        cat_data = re.sub("\[\[(분류:(?:(?:(?!\]\]|#include).)+))\]\]", "", mid_pas(db_data[0][0], 0, 1, 0, 0)[0])
                         if re.search('\[\[' + name + '|include]]', cat_data):
                             div += ' * [[' + data[0] + ']]\r\n * [[wiki:xref/' + url_pas(data[0]) + '|' + data[0] + ']] (역링크)\r\n'
                         else:
@@ -2913,11 +2915,11 @@ def read_view(name = None):
         curs.execute("select title, data from data where title = ?", [name])
     data = curs.fetchall()
     if data:
-        elsedata = data[0][1]
+        else_data = data[0][1]
     else:
         data_none = 1
         response.status = 404
-        elsedata = ''
+        else_data = ''
 
     if not num:
         curs.execute("select dec from acl where title = ?", [name])
@@ -2960,9 +2962,11 @@ def read_view(name = None):
                 acl += ' (가입자)'
             
     if request.args.get('froms', None):
-        elsedata = re.sub("^#(?:redirect|넘겨주기) (?P<in>[^\n]*)", " * [[\g<in>]] 문서로 넘겨주기", elsedata)
+        else_data = re.sub('\r\n#(?:redirect|넘겨주기) (?P<in>(?:(?!\r\n).)+)\r\n', ' * [[\g<in>]] 문서로 넘겨주기', '\r\n' + else_data + '\r\n')
+        else_data = re.sub('^\r\n', '', else_data)
+        else_data = re.sub('\r\n$', '', else_data)
             
-    enddata = namumark(conn, name, elsedata, 0, 0, 1)
+    end_data = namumark(conn, name, else_data, 0, 0, 1)
 
     if data_none == 1:
         menu = [['edit/' + url_pas(name), '생성'], ['topic/' + url_pas(name), topic], \
@@ -2977,8 +2981,8 @@ def read_view(name = None):
 
     if request.args.get('froms', None):
         menu += [['w/' + url_pas(name), '넘기기']]
-        enddata = '<ul id="redirect"><li><a href="/w/' + url_pas(request.args.get('froms', None)) + \
-                    '?froms=' + url_pas(name) + '">' + request.args.get('froms', None) + '</a>에서 넘어 왔습니다.</li></ul><br>' + enddata
+        end_data = '<ul id="redirect"><li><a href="/w/' + url_pas(request.args.get('froms', None)) + \
+                    '?froms=' + url_pas(name) + '">' + request.args.get('froms', None) + '</a>에서 넘어 왔습니다.</li></ul><br>' + end_data
 
     if uppage != 0:
         menu += [['w/' + url_pas(uppage), '상위']]
@@ -2999,10 +3003,10 @@ def read_view(name = None):
         else:
             r_date = 0
 
-    if div != '' and enddata != '':
-        div = enddata + '<br>' + namumark(conn, name, div, 0, 0, 0)
+    if div != '' and end_data != '':
+        div = end_data + '<br>' + namumark(conn, name, div, 0, 0, 0)
     else:
-        div = enddata + namumark(conn, name, div, 0, 0, 0)
+        div = end_data + namumark(conn, name, div, 0, 0, 0)
 
     return html_minify(template('index', 
         imp = [name, wiki_set(conn, 1), custom(conn), other2([sub + acl, r_date])],
