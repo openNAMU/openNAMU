@@ -1507,7 +1507,7 @@ def edit(name = None):
             curs.execute("insert into alarm (name, data, date) values (?, ?, ?)", \
                         [ip, ip + '님이 <a href="/w/' + url_pas(name) + '">' + name + '</a> 문서를 편집 했습니다.', today])
 
-        history_plus(conn, name, content, today, ip, send_p(request.form['send']), leng)
+        history_plus(conn, name, content, today, ip, send_parser(request.form['send']), leng)
         curs.execute("delete from back where link = ?", [name])
         curs.execute("delete from back where title = ? and type = 'no'", [name])
         namumark(conn, name, content, 1, 0, 0)
