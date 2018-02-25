@@ -23,7 +23,9 @@ def start(data, title):
 
     # 문단 문법
     toc_full = 0
+    toc_top_stack = 6
     toc_stack = [0, 0, 0, 0, 0, 0]
+    toc_data = '<div id="toc"><span style="font-size: 18px;">목차</span>\r\n\r\n'
     while 1:
         toc = re.search('\r\n(={1,6}) ?((?:(?!=).)+) ?={1,6}\r\n', data)
         if toc:
@@ -34,6 +36,9 @@ def start(data, title):
             if toc_full > toc_number:
                 for i in range(toc_number, 6):
                     toc_stack[i] = 0
+
+            if toc_top_stack > toc_number:
+                toc_top_stack = toc_number
                     
             toc_full = toc_number        
             toc_stack[toc_number - 1] += 1
@@ -46,9 +51,14 @@ def start(data, title):
 
             all_stack = re.sub('0.', '', all_stack)
             
-            data = re.sub('\r\n(={1,6}) ?((?:(?!=).)+) ?={1,6}\r\n', '<h' + toc_number + '><a href="">' + all_stack + '</a> ' + toc[1] + '</h' + toc_number + '>\r\n', data, 1)
+            data = re.sub('\r\n(={1,6}) ?((?:(?!=).)+) ?={1,6}\r\n', '\r\n<h' + toc_number + '><a href="">' + all_stack + '</a> ' + toc[1] + '</h' + toc_number + '><hr id="under_bar" style="margin-top: -5px; margin-bottom: 10px;">\r\n', data, 1)
+            toc_data += '<span style="margin-left: ' + str((toc_full - toc_top_stack) * 10) + 'px"><a href="">' + all_stack + '</a> ' + toc[1] + '</span>\r\n'
         else:
             break
+
+    toc_data += '</div>'
+    
+    data = re.sub('\[목차\]', toc_data, data)
 
     while 1:
         hr = re.search('\r\n-{4,9}\r\n', data)
@@ -96,7 +106,7 @@ def start(data, title):
             break
     
     # 마지막 처리
-    data = re.sub('(?P<in><\/h[1-6]>)\r\n', '\g<in>', data)
+    data = re.sub('(?P<in><hr id="under_bar" style="margin-top: -5px; margin-bottom: 10px;">)\r\n', '\g<in>', data)
     data = re.sub('\r\n', '<br>', data)
 
     return data
