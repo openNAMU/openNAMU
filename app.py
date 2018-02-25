@@ -1,4 +1,5 @@
 ﻿from flask import Flask, request, send_from_directory
+from flask_compress import Compress
 from flask_reggie import Reggie
 
 from tornado.wsgi import WSGIContainer
@@ -16,6 +17,8 @@ import sys
 logging.basicConfig(level = logging.ERROR)
 app = Flask(__name__)
 Reggie(app)
+compress = Compress()
+compress.init_app(app)
 
 r_ver = 'v3.0.0 Beta'
 print('Version : ' + r_ver)
