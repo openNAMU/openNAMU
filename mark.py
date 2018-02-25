@@ -28,7 +28,7 @@ def plusing(conn, name, link, backtype):
         curs.execute("insert into back (title, link, type) values (?, ?, ?)", [link, name, backtype])
 
 def namumark(conn, title, data, num, in_c, toc_y):
-    data = start(data, title)
+    data = start(conn, data, title)
 
     data += '<script>function folding(num, test = 0) { var fol = document.getElementById(\'folding_\' + num); if(fol.style.display == \'inline-block\' || fol.style.display == \'block\') { fol.style.display = \'none\'; } else { if(num % 3 == 0 && test != 1) { fol.style.display = \'block\'; } else { fol.style.display = \'inline-block\'; } } } </script>'
     
