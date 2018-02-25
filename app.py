@@ -834,8 +834,7 @@ def indexing():
             except:
                 pass
     else:
-        curs.execute("select name from sqlite_master where type in ('table', 'view') and name not like " + \
-                    "'sqlite_%' union all select name from sqlite_temp_master where type in ('table', 'view') order by 1;")
+        curs.execute("select name from sqlite_master where type in ('table', 'view') and name not like 'sqlite_%' union all select name from sqlite_temp_master where type in ('table', 'view') order by 1;")
         data = curs.fetchall()
         
         for table in data:            
@@ -881,8 +880,7 @@ def xref(name = None):
         
     div = '<ul>'
     
-    curs.execute("select link, type from back where title = ? and not type = 'cat' and not type = 'no' order by link asc limit ?, '50'", \
-                [name, str(sql_num)])
+    curs.execute("select link, type from back where title = ? and not type = 'cat' and not type = 'no' order by link asc limit ?, '50'", [name, str(sql_num)])
     data_list = curs.fetchall()
     for data in data_list:
         div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a>'
@@ -949,8 +947,7 @@ def recent_discuss(tools = 'normal'):
             div += '<a href="/recent_discuss">(열림)</a>'
             m_sub = ' (닫힘)'
 
-        div +=  '<hr><table style="width: 100%; text-align: center;"><tbody><tr> \
-                <td style="width: 50%;">토론명</td><td style="width: 50%;">시간</td></tr>'
+        div +=  '<hr><table style="width: 100%; text-align: center;"><tbody><tr><td style="width: 50%;">토론명</td><td style="width: 50%;">시간</td></tr>'
     else:
         return redirect('/')
     
@@ -970,8 +967,7 @@ def recent_discuss(tools = 'normal'):
                 close = 1
 
         if close == 0:
-            div += '<tr><td><a href="/topic/' + url_pas(data[0]) + '/sub/' + url_pas(data[1]) + '">' + \
-                    title + '</a> (' + sub + ')</td><td>' + data[2] + '</td></tr>'
+            div += '<tr><td><a href="/topic/' + url_pas(data[0]) + '/sub/' + url_pas(data[1]) + '">' + title + '</a> (' + sub + ')</td><td>' + data[2] + '</td></tr>'
     else:
         div += '</tbody></table>'
             
@@ -991,15 +987,12 @@ def block_log(name = None, tool = None, tool2 = None):
     else:
         sql_num = 0
     
-    div = '<table style="width: 100%; text-align: center;"><tbody><tr><td style="width: 33.3%;">차단자</td>' + \
-        '<td style="width: 33.3%;">관리자</td><td style="width: 33.3%;">기간</td></tr>'
+    div = '<table style="width: 100%; text-align: center;"><tbody><tr><td style="width: 33.3%;">차단자</td><td style="width: 33.3%;">관리자</td><td style="width: 33.3%;">기간</td></tr>'
     data_list = ''
     
     if not name:
         if not tool2:
-            div = '<a href="/manager/11">(차단자)</a> <a href="/manager/12">(관리자)</a><hr><a href="/block_log/ip">(아이피)</a>' + \
-                ' <a href="/block_log/user">(가입자)</a> <a href="/block_log/never_end">(영구)</a> <a href="/block_log/can_end">(기간)</a>' + \
-                ' <a href="/block_log/end">(해제)</a> <a href="/block_log/now">(현재)</a><hr>' + div
+            div = '<a href="/manager/11">(차단자)</a> <a href="/manager/12">(관리자)</a><hr><a href="/block_log/ip">(아이피)</a> <a href="/block_log/user">(가입자)</a> <a href="/block_log/never_end">(영구)</a> <a href="/block_log/can_end">(기간)</a> <a href="/block_log/end">(해제)</a> <a href="/block_log/now">(현재)</a><hr>' + div
             sub = 0
             menu = [['other', '기타']]
 
@@ -1010,18 +1003,15 @@ def block_log(name = None, tool = None, tool2 = None):
             if tool2 == 'ip':
                 sub = ' (아이피)'
 
-                curs.execute("select why, block, blocker, end, today from rb where (block like ? or block like ?) order by today desc limit ?, '50'", \
-                            ['%.%', '%:%', str(sql_num)])
+                curs.execute("select why, block, blocker, end, today from rb where (block like ? or block like ?) order by today desc limit ?, '50'", ['%.%', '%:%', str(sql_num)])
             elif tool2 == 'user':
                 sub = ' (가입자)'
 
-                curs.execute("select why, block, blocker, end, today from rb where not (block like ? or block like ?) order by today desc limit ?, '50'", \
-                            ['%.%', '%:%', str(sql_num)])
+                curs.execute("select why, block, blocker, end, today from rb where not (block like ? or block like ?) order by today desc limit ?, '50'", ['%.%', '%:%', str(sql_num)])
             elif tool2 == 'never_end':
                 sub = '(영구)'
 
-                curs.execute("select why, block, blocker, end, today from rb where not end like ? and not end like ? order by today desc limit ?, '50'", \
-                            ['%:%', '%해제%', str(sql_num)])
+                curs.execute("select why, block, blocker, end, today from rb where not end like ? and not end like ? order by today desc limit ?, '50'", ['%:%', '%해제%', str(sql_num)])
             elif tool2 == 'end':
                 sub = '(해제)'
 
@@ -1122,9 +1112,7 @@ def deep_search(name = None):
     else:
         div = '<ul><li>문서가 없습니다. <a class="not_thing" href="/w/' + url_pas(name) + '">바로가기</a></li></ul><hr><ul>'
 
-    curs.execute("select distinct title, case when title like ? then '제목' else '내용' " + \
-                "end from data where title like ? or data like ? order by case when title like ? " + \
-                "then 1 else 2 end limit ?, '50'", ['%' + name + '%', '%' + name + '%', '%' + name + '%', '%' + name + '%', str(sql_num)])
+    curs.execute("select distinct title, case when title like ? then '제목' else '내용' end from data where title like ? or data like ? order by case when title like ? then 1 else 2 end limit ?, '50'", ['%' + name + '%', '%' + name + '%', '%' + name + '%', '%' + name + '%', str(sql_num)])
     all_list = curs.fetchall()
     if all_list:
         test = all_list[0][1]
@@ -1418,8 +1406,7 @@ def edit(name = None):
                 match = re.compile(data_list[0])
                 if match.search(request.form['content']):
                     if data_list[1] == 'X':
-                        curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, '')", \
-                                    [ip, '', get_time(), '도구:편집 필터', '편집 필터에 의한 차단'])
+                        curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, '')", [ip, '', get_time(), '도구:편집 필터', '편집 필터에 의한 차단'])
                         curs.execute("insert into ban (block, end, why, band, login) values (?, '', ?, '', '')", [ip, '편집 필터에 의한 차단'])
                     elif data_list[1] != '':
                         match = re.search("^([^ ]+) ([^:]+):([^:]+)$", data_list[1])
@@ -1466,8 +1453,7 @@ def edit(name = None):
 
                         end = str(year) + '-' + time_list[0] + '-' + time_list[1] + ' ' + time_list[2] + ':' + time_list[3] + ':' + time_data[5]
 
-                        curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, '')", \
-                                    [ip, end, get_time(), '도구:편집 필터', '편집 필터에 의한 차단'])
+                        curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, '')", [ip, end, get_time(), '도구:편집 필터', '편집 필터에 의한 차단'])
                         curs.execute("insert into ban (block, end, why, band, login) values (?, ?, ?, '', '')", [ip, end, '편집 필터에 의한 차단'])
                     
                     conn.commit()
@@ -1504,8 +1490,7 @@ def edit(name = None):
 
         curs.execute("select user from scan where title = ?", [name])
         for user_data in curs.fetchall():
-            curs.execute("insert into alarm (name, data, date) values (?, ?, ?)", \
-                        [ip, ip + '님이 <a href="/w/' + url_pas(name) + '">' + name + '</a> 문서를 편집 했습니다.', today])
+            curs.execute("insert into alarm (name, data, date) values (?, ?, ?)", [ip, ip + '님이 <a href="/w/' + url_pas(name) + '">' + name + '</a> 문서를 편집 했습니다.', today])
 
         history_plus(conn, name, content, today, ip, send_parser(request.form['send']), leng)
         curs.execute("delete from back where link = ?", [name])
@@ -1524,8 +1509,7 @@ def edit(name = None):
                 
                 data = new[0][0] + '\r\n'
                 while 1:
-                    m = re.search("((?:={1,6})\s?(?:[^=]*)\s?(?:={1,6})(?:\s+)?\n(?:(?:(?:(?!(?:={1,6})" + \
-                                "\s?(?:[^=]*)\s?(?:={1,6})(?:\s+)?\n).)*)(?:\n)?)+)", data)
+                    m = re.search("((?:={1,6})\s?(?:[^=]*)\s?(?:={1,6})(?:\s+)?\n(?:(?:(?:(?!(?:={1,6})\s?(?:[^=]*)\s?(?:={1,6})(?:\s+)?\n).)*)(?:\n)?)+)", data)
                     if m:
                         if i == int(request.args.get('section', 0)) - 1:
                             g = m.groups()
@@ -1533,8 +1517,7 @@ def edit(name = None):
                             
                             break
                         else:
-                            data = re.sub("((?:={1,6})\s?(?:[^=]*)\s?(?:={1,6})(?:\s+)?\n(?:(?:(?:(?!(?:={1,6})" + \
-                                        "\s?(?:[^=]*)\s?(?:={1,6})(?:\s+)?\n).)*)(?:\n)?)+)", "", data, 1)
+                            data = re.sub("((?:={1,6})\s?(?:[^=]*)\s?(?:={1,6})(?:\s+)?\n(?:(?:(?:(?!(?:={1,6})\s?(?:[^=]*)\s?(?:={1,6})(?:\s+)?\n).)*)(?:\n)?)+)", "", data, 1)
                             
                             i += 1
                     else:
@@ -1670,8 +1653,7 @@ def delete(name = None):
 def move_data(name = None):    
     data = '<ul>'
 
-    curs.execute("select send, date, ip from history where send like ? or send like ? order by date desc", \
-                ['%<a href="/w/' + url_pas(name) + '">' + name + '</a> 이동)%', '%(<a href="/w/' + url_pas(name) + '">' + name + '</a>%'])
+    curs.execute("select send, date, ip from history where send like ? or send like ? order by date desc", ['%<a href="/w/' + url_pas(name) + '">' + name + '</a> 이동)%', '%(<a href="/w/' + url_pas(name) + '">' + name + '</a>%'])
     for for_data in curs.fetchall():
         match = re.findall('<a href="\/w\/(?:(?:(?!">).)+)">((?:(?!<\/a>).)+)<\/a>', for_data[0])
         send = re.sub('\([^\)]+\)$', '', for_data[0])
@@ -1721,8 +1703,7 @@ def move(name = None):
         else:
             d = ''
             
-        history_plus(conn, name, d, today, ip, request.form['send'] + ' (<a href="/w/' + url_pas(name) + '">' + name + \
-                    '</a> - <a href="/w/' + url_pas(request.form['title']) + '">' + request.form['title'] + '</a> 이동)', leng)
+        history_plus(conn, name, d, today, ip, request.form['send'] + ' (<a href="/w/' + url_pas(name) + '">' + name + '</a> - <a href="/w/' + url_pas(request.form['title']) + '">' + request.form['title'] + '</a> 이동)', leng)
 
         curs.execute("select title, link from back where title = ? and not type = 'cat' and not type = 'no'", [name])
         for data in curs.fetchall():
@@ -1960,22 +1941,18 @@ def topic_stop(name = None, sub = None, tool = None):
         if tool == 'agree':
             curs.execute("select title from agreedis where title = ? and sub = ?", [name, sub])
             if curs.fetchall():
-                curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, '합의 결렬', ?, ?, '', '1')", \
-                            [str(int(topic_check[0][0]) + 1), name, sub, time, ip])
+                curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, '합의 결렬', ?, ?, '', '1')", [str(int(topic_check[0][0]) + 1), name, sub, time, ip])
                 curs.execute("delete from agreedis where title = ? and sub = ?", [name, sub])
             else:
-                curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, '합의 완료', ?, ?, '', '1')", \
-                            [str(int(topic_check[0][0]) + 1), name, sub, time, ip])
+                curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, '합의 완료', ?, ?, '', '1')", [str(int(topic_check[0][0]) + 1), name, sub, time, ip])
                 curs.execute("insert into agreedis (title, sub) values (?, ?)", [name, sub])
         else:
             curs.execute("select title from stop where title = ? and sub = ? and close = ?", [name, sub, set_list[0]])
             if curs.fetchall():
-                curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, ?, ?, ?, '', '1')", \
-                            [str(int(topic_check[0][0]) + 1), name, sub, set_list[3], time, ip])
+                curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, ?, ?, ?, '', '1')", [str(int(topic_check[0][0]) + 1), name, sub, set_list[3], time, ip])
                 curs.execute("delete from stop where title = ? and sub = ? and close = ?", [name, sub, set_list[0]])
             else:
-                curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, ?, ?, ?, '', '1')", \
-                            [str(int(topic_check[0][0]) + 1), name, sub, set_list[2], time, ip])
+                curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, ?, ?, ?, '', '1')", [str(int(topic_check[0][0]) + 1), name, sub, set_list[2], time, ip])
                 curs.execute("insert into stop (title, sub, close) values (?, ?, ?)", [name, sub, set_list[0]])
                 curs.execute("delete from stop where title = ? and sub = ? and close = ?", [name, sub, set_list[1]])
         
@@ -2180,9 +2157,7 @@ def topic(name = None, sub = None):
             number += 1
 
         if ban != 1 or admin == 1:
-            data += '<a id="reload" href="javascript:void(0);" onclick="location.href.endsWith(\'#reload\') ?  ' + \
-                    'location.reload(true) : location.href = \'#reload\'"><i aria-hidden="true" class="fa fa-refresh"></i></a>' + \
-                    '<form style="' + display + '" method="post"><br><textarea style="height: 100px;" name="content"></textarea><hr>' + captcha_get(conn)
+            data += '<a id="reload" href="javascript:void(0);" onclick="location.href.endsWith(\'#reload\')? location.reload(true):location.href=\'#reload\'"><i aria-hidden="true" class="fa fa-refresh"></i></a><form style="' + display + '" method="post"><br><textarea style="height: 100px;" name="content"></textarea><hr>' + captcha_get(conn)
             
             if display == '':
                 data += ip_warring(conn)
@@ -2227,9 +2202,7 @@ def close_topic_list(name = None, tool = None):
             curs.execute("select sub from rd where title = ? order by date desc", [name])
             sub = '토론 목록'
             menu = [['w/' + url_pas(name), '문서']]
-            plus =  '<a href="/topic/' + url_pas(name) + '/close">(닫힘)</a> <a href="/topic/' + url_pas(name) + '/agree">(합의)</a><hr> \
-                    <input placeholder="토론명" class="form-control" name="topic" type="text"><hr> \
-                    <button type="submit">만들기</button>'
+            plus =  '<a href="/topic/' + url_pas(name) + '/close">(닫힘)</a> <a href="/topic/' + url_pas(name) + '/agree">(합의)</a><hr><input placeholder="토론명" class="form-control" name="topic" type="text"><hr><button type="submit">만들기</button>'
 
         for data in curs.fetchall():
             curs.execute("select data, date, ip, block from topic where title = ? and sub = ? and id = '1'", [name, data[0]])
@@ -2242,8 +2215,7 @@ def close_topic_list(name = None, tool = None):
                         it_p = 1
                 
                 if it_p != 1:
-                    div += '<h2><a href="/topic/' + url_pas(name) + '/sub/' + url_pas(data[0]) + '">' + data[0] + \
-                            '</a></h2><hr id="under_bar" style="margin-top: -5px;">'
+                    div += '<h2><a href="/topic/' + url_pas(name) + '/sub/' + url_pas(data[0]) + '">' + data[0] + '</a></h2><hr id="under_bar" style="margin-top: -5px; margin-bottom: 10px;">'
 
         if div == '':
             plus = re.sub('^<br>', '', plus)
@@ -2466,11 +2438,9 @@ def register():
         curs.execute("select id from user limit 1")
         user_ex = curs.fetchall()
         if not user_ex:
-            curs.execute("insert into user (id, pw, acl, date, email) values (?, ?, 'owner', ?, ?)", \
-                        [request.form['id'], hashed.decode(), get_time(), request.form.get('email', '')])
+            curs.execute("insert into user (id, pw, acl, date, email) values (?, ?, 'owner', ?, ?)", [request.form['id'], hashed.decode(), get_time(), request.form.get('email', '')])
         else:
-            curs.execute("insert into user (id, pw, acl, date, email) values (?, ?, 'user', ?, ?)", \
-                        [request.form['id'], hashed.decode(), get_time(), request.form.get('email', '')])
+            curs.execute("insert into user (id, pw, acl, date, email) values (?, ?, 'user', ?, ?)", [request.form['id'], hashed.decode(), get_time(), request.form.get('email', '')])
         conn.commit()
         
         return redirect('/login')
@@ -2546,10 +2516,8 @@ def user_ban(name = None):
             else:
                 login = ''
 
-            curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, ?)", \
-                        [name, end, time, ip, request.form['why'], band_d])
-            curs.execute("insert into ban (block, end, why, band, login) values (?, ?, ?, ?, ?)", \
-                        [name, end, request.form['why'], band_d, login])
+            curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, ?)", [name, end, time, ip, request.form['why'], band_d])
+            curs.execute("insert into ban (block, end, why, band, login) values (?, ?, ?, ?, ?)", [name, end, request.form['why'], band_d, login])
 
         conn.commit()
         return redirect('/ban/' + url_pas(name))            
@@ -2972,20 +2940,16 @@ def read_view(name = None):
     end_data = namumark(conn, name, else_data, 0, 0, 1)
 
     if data_none == 1:
-        menu = [['edit/' + url_pas(name), '생성'], ['topic/' + url_pas(name), topic], \
-                ['history/' + url_pas(name), '역사'], ['move/' + url_pas(name), '이동'], ['xref/' + url_pas(name), '역링크']]
+        menu = [['edit/' + url_pas(name), '생성'], ['topic/' + url_pas(name), topic], ['history/' + url_pas(name), '역사'], ['move/' + url_pas(name), '이동'], ['xref/' + url_pas(name), '역링크']]
     else:
-        menu = [['edit/' + url_pas(name), '수정'], ['topic/' + url_pas(name), topic], \
-                ['history/' + url_pas(name), '역사'], ['delete/' + url_pas(name), '삭제'], \
-                ['move/' + url_pas(name), '이동'], ['raw/' + url_pas(name), '원본'], ['xref/' + url_pas(name), '역링크']]
+        menu = [['edit/' + url_pas(name), '수정'], ['topic/' + url_pas(name), topic], ['history/' + url_pas(name), '역사'], ['delete/' + url_pas(name), '삭제'], ['move/' + url_pas(name), '이동'], ['raw/' + url_pas(name), '원본'], ['xref/' + url_pas(name), '역링크']]
         
     if admin_memu == 1:
         menu += [['acl/' + url_pas(name), 'ACL']]
 
     if request.args.get('froms', None):
         menu += [['w/' + url_pas(name), '넘기기']]
-        end_data = '<ul id="redirect"><li><a href="/w/' + url_pas(request.args.get('froms', None)) + \
-                    '?froms=' + url_pas(name) + '">' + request.args.get('froms', None) + '</a>에서 넘어 왔습니다.</li></ul><br>' + end_data
+        end_data = '<ul id="redirect"><li><a href="/w/' + url_pas(request.args.get('froms', None)) + '?froms=' + url_pas(name) + '">' + request.args.get('froms', None) + '</a>에서 넘어 왔습니다.</li></ul><br>' + end_data
 
     if uppage != 0:
         menu += [['w/' + url_pas(uppage), '상위']]
@@ -3046,8 +3010,7 @@ def user_topic_list(name = None):
             
         ip = ip_pas(conn, data[3])
             
-        div += '<tr><td><a href="/topic/' + url_pas(data[0]) + '/sub/' + url_pas(data[2]) + '#' + data[1] + '">' + \
-                title + '#' + data[1] + '</a> (' + sub + ')</td>'
+        div += '<tr><td><a href="/topic/' + url_pas(data[0]) + '/sub/' + url_pas(data[2]) + '#' + data[1] + '">' + title + '#' + data[1] + '</a> (' + sub + ')</td>'
         div += '<td>' + ip + ban +  '</td><td>' + data[4] + '</td></tr>'
 
     div += '</tbody></table>'
@@ -3090,8 +3053,7 @@ def recent_changes(name = None, tool = 'record'):
             if tool == 'history':
                 div += '<td style="width: 33.3%;">판</td><td style="width: 33.3%;">편집자</td><td style="width: 33.3%;">시간</td></tr>'
 
-                curs.execute("select id, title, date, ip, send, leng from history where title = ? order by id + 0 desc limit ?, '50'", \
-                            [name, str(sql_num)])
+                curs.execute("select id, title, date, ip, send, leng from history where title = ? order by id + 0 desc limit ?, '50'", [name, str(sql_num)])
             else:
                 div += '<td style="width: 33.3%;">문서명</td><td style="width: 33.3%;">편집자</td><td style="width: 33.3%;">시간</td></tr>'
 
@@ -3100,8 +3062,7 @@ def recent_changes(name = None, tool = 'record'):
                     div = '<a href="/record/' + url_pas(name) + '?what=move">(이동)</a> ' + div
                     div = '<a href="/record/' + url_pas(name) + '?what=delete">(삭제)</a> ' + div
                 
-                    curs.execute("select id, title, date, ip, send, leng from history where ip = ? order by date desc limit ?, '50'", \
-                                [name, str(sql_num)])
+                    curs.execute("select id, title, date, ip, send, leng from history where ip = ? order by date desc limit ?, '50'", [name, str(sql_num)])
                 else:
                     if what == 'delete':
                         sql = '%(삭제)'
@@ -3112,8 +3073,7 @@ def recent_changes(name = None, tool = 'record'):
                     else:
                         return redirect('/')
 
-                    curs.execute("select id, title, date, ip, send, leng from history where ip = ? and send like ? order by date desc limit ?, '50'", \
-                                [name, sql, str(sql_num)])
+                    curs.execute("select id, title, date, ip, send, leng from history where ip = ? and send like ? order by date desc limit ?, '50'", [name, sql, str(sql_num)])
         else:
             div += '<td style="width: 33.3%;">문서명</td><td style="width: 33.3%;">편집자</td><td style="width: 33.3%;">시간</td></tr>'
 
@@ -3162,8 +3122,7 @@ def recent_changes(name = None, tool = 'record'):
             if (int(data[0]) - 1) == 0:
                 revert = ''
             else:
-                revert = '<a href="/diff/' + url_pas(data[1]) + '?first=' + str(int(data[0]) - 1) + '&second=' + data[0] + \
-                        '">(비교)</a> <a href="/revert/' + url_pas(data[1]) + '?num=' + str(int(data[0]) - 1) + '">(되돌리기)</a>'
+                revert = '<a href="/diff/' + url_pas(data[1]) + '?first=' + str(int(data[0]) - 1) + '&second=' + data[0] + '">(비교)</a> <a href="/revert/' + url_pas(data[1]) + '?num=' + str(int(data[0]) - 1) + '">(되돌리기)</a>'
             
             style = ['', '']
             date = data[2]
@@ -3196,11 +3155,9 @@ def recent_changes(name = None, tool = 'record'):
                 style[1] = 'background: gainsboro;'
 
             if tool == 'history':
-                title = '<a href="/w/' + url_pas(name) + '?num=' + data[0] + '">' + data[0] + '판</a> <a href="/raw/' + \
-                        url_pas(name) + '?num=' + data[0] + '">(원본)</a> '
+                title = '<a href="/w/' + url_pas(name) + '?num=' + data[0] + '">' + data[0] + '판</a> <a href="/raw/' + url_pas(name) + '?num=' + data[0] + '">(원본)</a> '
             else:
-                title = '<a href="/w/' + url_pas(data[1]) + '">' + html.escape(data[1]) + '</a> <a href="/history/' + \
-                        url_pas(data[1]) + '">(' + data[0] + '판)</a> '
+                title = '<a href="/w/' + url_pas(data[1]) + '">' + html.escape(data[1]) + '</a> <a href="/history/' + url_pas(data[1]) + '">(' + data[0] + '판)</a> '
                     
             div += '<tr style="' + style[0] + '"><td>' + title + revert + ' ' + leng + '</td>'
             div += '<td>' + ip + ban + hidden + '</td><td>' + date + '</td></tr><tr style="' + style[1] + '"><td colspan="3">' + send + '</td></tr>'
@@ -3210,8 +3167,7 @@ def recent_changes(name = None, tool = 'record'):
 
         if name:
             if tool == 'history':
-                div = '<form method="post"><select name="a">' + select + '</select> <select name="b">' + select + \
-                        '</select> <button type="submit">비교</button></form><hr>' + div
+                div = '<form method="post"><select name="a">' + select + '</select> <select name="b">' + select + '</select> <button type="submit">비교</button></form><hr>' + div
                 title = name
                 sub += ' (역사)'
                 menu = [['w/' + url_pas(name), '문서'], ['move_data/' + url_pas(name), '이동 기록']]
@@ -3311,11 +3267,9 @@ def upload():
         if(exist): 
             curs.execute("delete from data where title = ?", ['파일:' + name])
         
-        curs.execute("insert into data (title, data) values (?, ?)", \
-                    ['파일:' + name, '[[파일:' + name + ']][br][br]{{{[[파일:' + name + ']]}}}[br][br]' + lice])
+        curs.execute("insert into data (title, data) values (?, ?)", ['파일:' + name, '[[파일:' + name + ']][br][br]{{{[[파일:' + name + ']]}}}[br][br]' + lice])
         curs.execute("insert into acl (title, dec, dis, why) values (?, 'admin', '', '')", ['파일:' + name])
-        history_plus(conn, '파일:' + name, '[[파일:' + name + ']][br][br]{{{[[파일:' + name + ']]}}}[br][br]' + lice, \
-                    get_time(), ip, '(파일 올림)', '0')
+        history_plus(conn, '파일:' + name, '[[파일:' + name + ']][br][br]{{{[[파일:' + name + ']]}}}[br][br]' + lice, get_time(), ip, '(파일 올림)', '0')
         conn.commit()
         
         return redirect('/w/파일:' + name)            
@@ -3418,8 +3372,7 @@ def watch_list():
     curs.execute("select title from scan where user = ?", [ip])
     data = curs.fetchall()
     for data_list in data:
-        div += '<li><a href="/w/' + url_pas(data_list[0]) + '">' + data_list[0] + '</a> <a href="/watch_list/' + \
-                url_pas(data_list[0]) + '">(삭제)</a></li>'
+        div += '<li><a href="/w/' + url_pas(data_list[0]) + '">' + data_list[0] + '</a> <a href="/watch_list/' + url_pas(data_list[0]) + '">(삭제)</a></li>'
 
     if data:
         div = '<ul>' + div + '</ul><hr>'
@@ -3538,8 +3491,7 @@ def count_edit(name = None):
 
     return html_minify(template('index', 
         imp = ['활동 횟수', wiki_set(conn, 1), custom(conn), other2([0, 0])],
-        data = namumark(conn, "", "[목차(없음)]\r\n== " + that + " ==\r\n||<:> 편집 횟수 ||<:> " + str(data) + \
-                        "||\r\n||<:> 토론 횟수 ||<:> " + str(t_data) + "||", 0, 0, 0),
+        data = namumark(conn, "", "[목차(없음)]\r\n== " + that + " ==\r\n||<:> 편집 횟수 ||<:> " + str(data) + "||\r\n||<:> 토론 횟수 ||<:> " + str(t_data) + "||", 0, 0, 0),
         menu = [['user', '사용자'], ['record/' + url_pas(that), '편집 기록'], ['topic_record/' + url_pas(that), '토론 기록']]
     ))
         
