@@ -119,7 +119,11 @@ def start(conn, data, title):
             curs.execute("select data from data where title = ?", [include])
             include_data = curs.fetchall()
             if include_data:
-                data = re.sub('\[include\(((?:(?!\)\]).)+)\)\]', '\r\n' + include_data[0][0] + '\r\n', data, 1)
+                include_parser = include_data[0][0]
+
+                include_parser = re.sub('\[\[분류:(((?!\]\]|#include).)+)\]\]', '', include_parser)
+
+                data = re.sub('\[include\(((?:(?!\)\]).)+)\)\]', '\r\n' + include_parser + '\r\n', data, 1)
             else:
                 data = re.sub('\[include\(((?:(?!\)\]).)+)\)\]', '[[' + include + ']]', data, 1)
         else:
@@ -140,6 +144,42 @@ def start(conn, data, title):
     # 넘겨주기 변환
     data = re.sub('\r\n#(?:redirect|넘겨주기) (?P<in>(?:(?!\r\n).)+)\r\n', '<meta http-equiv="refresh" content="0; url=/w/\g<in>?froms=' + tool.url_pas(title) + '">', data)
 
+    # 각주 처리
+    footnote_number = 0
+    footnote_all = '\r\n<hr><ul id="footnote_data">'
+    while 1:
+        footnote = re.search('(?:\[\*((?:(?! ).)*) ((?:(?!\]).)+)\]|(\[각주\]))', data)
+        if footnote:
+            footnote_data = footnote.groups()
+
+            if footnote_data[2]:
+                footnote_all += '</ul>'
+
+                data = re.sub('(?:\[\*((?:(?! ).)*) ((?:(?!\]).)+)\]|(\[각주\]))', footnote_all, data, 1)
+
+                footnote_all = '\r\n<hr><ul id="footnote_data">'
+            else:
+                footnote = footnote_data[1]
+                footnote_name = footnote_data[0]
+
+                footnote_number += 1
+
+                if not footnote_name:
+                    footnote_name = str(footnote_number)
+
+                footnote_all += '<li><a href="#rfn-' + str(footnote_number) + '" id="fn-' + str(footnote_number) + '">(' + footnote_name + ')</a> ' + footnote + '</li>'
+
+                data = re.sub('(?:\[\*((?:(?! ).)*) ((?:(?!\]).)+)\]|(\[각주\]))', '<sup><a href="#fn-' + str(footnote_number) + '" id="rfn-' + str(footnote_number) + '">(' + footnote_name + ')</a></sup>', data, 1)
+        else:
+            break
+
+    footnote_all += '</ul>'
+
+    if footnote_all == '\r\n<hr><ul id="footnote_data"></ul>':
+        footnote_all = ''
+
+    data = re.sub('\r\n$', footnote_all, data)
+
     # [목차(없음)] 처리
     if not re.search('\[목차\(없음\)\]\r\n', data):
         if not re.search('\[목차\]', data):
@@ -151,12 +191,14 @@ def start(conn, data, title):
     toc_full = 0
     toc_top_stack = 6
     toc_stack = [0, 0, 0, 0, 0, 0]
+    edit_number = 0
     toc_data = '<div id="toc"><span style="font-size: 18px;">목차</span>\r\n\r\n'
     while 1:
         toc = re.search('\r\n(={1,6}) ?((?:(?!=).)+) ?={1,6}\r\n', data)
         if toc:
             toc = toc.groups()
             toc_number = len(toc[0])
+            edit_number += 1
 
             # 더 크면 그 전 스택은 초기화
             if toc_full > toc_number:
@@ -177,7 +219,7 @@ def start(conn, data, title):
 
             all_stack = re.sub('0.', '', all_stack)
             
-            data = re.sub('\r\n(={1,6}) ?((?:(?!=).)+) ?={1,6}\r\n', '\r\n<h' + toc_number + '><a href="">' + all_stack + '</a> ' + toc[1] + '</h' + toc_number + '><hr id="under_bar" style="margin-top: -5px; margin-bottom: 10px;">\r\n', data, 1)
+            data = re.sub('\r\n(={1,6}) ?((?:(?!=).)+) ?={1,6}\r\n', '\r\n<h' + toc_number + '><a href="">' + all_stack + '</a> ' + toc[1] + ' <span style="font-size: 12px"><a href="/edit/' + tool.url_pas(title) + '?section=' + str(edit_number) + '">(편집)</a></span></h' + toc_number + '><hr id="under_bar" style="margin-top: -5px; margin-bottom: 10px;">\r\n', data, 1)
             toc_data += '<span style="margin-left: ' + str((toc_full - toc_top_stack) * 10) + 'px"><a href="">' + all_stack + '</a> ' + toc[1] + '</span>\r\n'
         else:
             break
@@ -190,6 +232,98 @@ def start(conn, data, title):
         hr = re.search('\r\n-{4,9}\r\n', data)
         if hr:
             data = re.sub('\r\n-{4,9}\r\n', '<hr>', data, 1)
+        else:
+            break
+
+    data += '\r\n'
+
+    # 일부 매크로 처리
+    data = tool.savemark(data)
+
+    data = re.sub("\[anchor\((?P<in>(?:(?!\)\]).)+)\)\]", '<span id="\g<in>"></span>', data)          
+    data = re.sub("\[nicovideo\((?P<in>(?:(?!,|\)\]).)+)(?:(?:(?!\)\]).)*)\)\]", "[[http://embed.nicovideo.jp/watch/\g<in>|\g<in>]]", data)
+    data = re.sub('\[ruby\((?P<in>(?:(?!,).)+)\, ?(?P<out>(?:(?!\)\]).)+)\)\]', '<ruby>\g<in><rp>(</rp><rt>\g<out></rt><rp>)</rp></ruby>', data)
+
+    now_time = tool.get_time()
+    data = re.sub('\[date\]', now_time, data)
+    
+    time_data = re.search('^([0-9]{4}-[0-9]{2}-[0-9]{2})', now_time)
+    time = time_data.groups()
+    
+    age_data = re.findall('\[age\(([0-9]{4}-[0-9]{2}-[0-9]{2})\)\]', data)
+    for age in age_data:
+        old = datetime.datetime.strptime(time[0], '%Y-%m-%d')
+        will = datetime.datetime.strptime(age, '%Y-%m-%d')
+        e_data = old - will
+
+        data = re.sub('\[age\(([0-9]{4})-([0-9]{2})-([0-9]{2})\)\]', str(int(int(e_data.days) / 365)), data, 1)
+
+    dday_data = re.findall('\[dday\(([0-9]{4}-[0-9]{2}-[0-9]{2})\)\]', data)
+    for dday in dday_data:
+        old = datetime.datetime.strptime(time[0], '%Y-%m-%d')
+        will = datetime.datetime.strptime(dday, '%Y-%m-%d')
+        e_data = old - will
+
+        if re.search('^-', str(e_data.days)):
+            e_day = str(e_data.days)
+        else:
+            e_day = '+' + str(e_data.days)
+
+        data = re.sub('\[dday\(([0-9]{4}-[0-9]{2}-[0-9]{2})\)\]', e_day, data, 1)
+
+    # 유튜브, 카카오 티비 처리
+    while 1:
+        video = re.search('\[(youtube|kakaotv)\(((?:(?!\)\]).)+)\)\]', data)
+        if video:
+            video = video.groups()
+
+            width = re.search(', ?width=((?:(?!,|\)\]).)+)', video[1])
+            if width:
+                video_width = width.groups()[0]
+            else:
+                video_width = '560'
+            
+            height = re.search(', ?height=((?:(?!,|\)\]).)+)', video[1])
+            if height:
+                video_height = height.groups()[0]
+            else:
+                video_height = '315'
+
+            code = re.search('^(((?!,|\)\]).)+)', video[1])
+            if code:
+                video_code = code.groups()[0]
+            else:
+                if video[0] == 'youtube':
+                    video_code = 'BQ5PcIUcdUE'
+                else:
+                    video_code = '66861302'
+
+            if video[0] == 'youtube':
+                video_code = re.sub('^https:\/\/www\.youtube\.com\/watch\?v=', '', video_code)
+                video_code = re.sub('^https:\/\/youtu\.be\/', '', video_code)
+
+                video_src = 'https://www.youtube.com/embed/' + video_code
+            else:
+                video_code = re.sub('^https:\/\/tv\.kakao\.com\/channel\/9262\/cliplink\/', '', video_code)
+                video_code = re.sub('^http:\/\/tv\.kakao\.com\/v\/', '', video_code)
+
+                video_src = 'https://tv.kakao.com/embed/player/cliplink/' + video_code +'?service=kakao_tv'
+                
+            data = re.sub('\[(youtube|kakaotv)\(((?:(?!\)\]).)+)\)\]', '<iframe width="' + video_width + '" height="' + video_height + '" src="' + video_src + '" allowfullscreen></iframe>', data, 1)
+        else:
+            break
+
+    # 인용문 구현
+    while 1:
+        block = re.search('(\r\n(?:> ?(?:(?:(?!\r\n).)+)\r\n)+)', data)
+        if block:
+            block = block.groups()[0]
+
+            block = re.sub('^\r\n> ?', '', block)
+            block = re.sub('\r\n> ?', '\r\n', block)
+            block = re.sub('\r\n$', '', block)
+
+            data = re.sub('(\r\n(?:> ?(?:(?:(?!\r\n).)+)\r\n)+)', '<blockquote>' + block + '</blockquote>\r\n', data, 1)
         else:
             break
 
@@ -278,6 +412,8 @@ def start(conn, data, title):
         else:
             break
 
+    # 링크 관련 문법 구현
+    category = '\r\n<div id="cate">분류: '
     while 1:
         link = re.search('\[\[((?:(?!\]\]).)+)\]\]', data)
         if link:
@@ -293,10 +429,25 @@ def start(conn, data, title):
                 main_link = link
                 see_link = link
 
-            if re.search('^wiki:', main_link):
+            if re.search('^분류:', main_link):
+                see_link = re.sub('#include', '', see_link)
+                main_link = re.sub('#include', '', main_link)
+                
+                if re.search('#blur', main_link):
+                    see_link = '스포일러'
+                    link_id = 'id="inside"'
+
+                    main_link = re.sub('#blur', '', main_link)
+                else:
+                    link_id = ''
+
+                category += '<a ' + link_id + ' href="' + tool.url_pas(main_link) + '">' + re.sub('^분류:', '', see_link) + '</a> / '
+
+                data = re.sub('\[\[((?:(?!\]\]).)+)\]\]', '', data, 1)
+            elif re.search('^wiki:', main_link):
                 data = re.sub('\[\[((?:(?!\]\]).)+)\]\]', '<a id="inside" href="/' + tool.url_pas(main_link) + '">' + see_link + '</a>', data, 1)
-            if re.search('^http(s)?:\/\/', main_link):
-                data = re.sub('\[\[((?:(?!\]\]).)+)\]\]', '<a class="out_link" rel="nofollow" href="' + tool.url_pas(main_link) + '">' + see_link + '</a>', data, 1)
+            elif re.search('^http(s)?:\/\/', main_link):
+                data = re.sub('\[\[((?:(?!\]\]).)+)\]\]', '<a class="out_link" rel="nofollow" href="' + main_link + '">' + see_link + '</a>', data, 1)
             else:
                 if re.search('^:', main_link):
                     main_link = re.sub('^:', '', main_link)
@@ -310,10 +461,20 @@ def start(conn, data, title):
                 data = re.sub('\[\[((?:(?!\]\]).)+)\]\]', '<a ' + link_class + ' href="/w/' + tool.url_pas(main_link) + '">' + see_link + '</a>', data, 1)
         else:
             break
+
+    category += '</div>'
+    category = re.sub(' / <\/div>$', '</div>', category)
+
+    if category == '\r\n<div id="cate">분류: </div>':
+        category = ''
+
+    data += category
     
     # 마지막 처리
-    data = re.sub('(?P<in><hr id="under_bar" style="margin-top: -5px; margin-bottom: 10px;">)\r\n', '\g<in>', data)
+    data = re.sub('(?P<in><hr id="under_bar" style="margin-top: -5px; margin-bottom: 10px;">)(\r\n)+', '\g<in>', data)
     data = re.sub('<\/ul>\r\n\r\n', '</ul>\r\n', data)
+    data = re.sub('^(\r\n)+', '', data)
+    data = re.sub('(\r\n)+$', '', data)
     data = re.sub('\r\n', '<br>', data)
 
     return data
