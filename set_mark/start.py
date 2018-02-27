@@ -116,16 +116,35 @@ def start(conn, data, title):
         if include:
             include = include.groups()[0]
 
-            curs.execute("select data from data where title = ?", [include])
+            include_data = re.search('^((?:(?!,).)+)', include)
+            if include_data:
+                include_data = include_data.groups()[0]
+            else:
+                include_data = 'Test'
+
+            include = re.sub('^((?:(?!,).)+)', '', include)
+
+            curs.execute("select data from data where title = ?", [include_data])
             include_data = curs.fetchall()
             if include_data:
                 include_parser = include_data[0][0]
 
+                while 1:
+                    include_plus = re.search(', ?((?:(?!=).)+)=((?:(?!,).)+)', include)
+                    if include_plus:
+                        include_plus = include_plus.groups()
+
+                        include_parser = re.sub('@' + include_plus[0] + '@', include_plus[1], include_parser)
+                        include = re.sub(', ?((?:(?!=).)+)=((?:(?!,).)+)', '', include, 1)
+                    else:
+                        break
+
                 include_parser = re.sub('\[\[분류:(((?!\]\]|#include).)+)\]\]', '', include_parser)
 
-                data = re.sub('\[include\(((?:(?!\)\]).)+)\)\]', '\r\n' + include_parser + '\r\n', data, 1)
+                data = re.sub('\[include\(((?:(?!\)\]).)+)\)\]', '\r\n<span id="include"></span>' + include_parser + '<span id="include"></span>\r\n', data, 1)
             else:
                 data = re.sub('\[include\(((?:(?!\)\]).)+)\)\]', '[[' + include + ']]', data, 1)
+
         else:
             break
 
@@ -518,6 +537,7 @@ def start(conn, data, title):
     data = re.sub('<\/ul>\r\n\r\n', '</ul>\r\n', data)
     data = re.sub('^(\r\n)+', '', data)
     data = re.sub('(\r\n)+$', '', data)
+    data = re.sub('(\r\n)?<span id="include"><\/span>(\r\n)?(<span style="margin-left: 20px;"><\/span>)?', '', data)
     data = re.sub('\r\n', '<br>', data)
 
     return data
