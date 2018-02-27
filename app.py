@@ -1481,7 +1481,10 @@ def edit(name = None):
 
             leng = leng_check(len(request.form['otent']), len(content))
             if request.args.get('section', None):
-                content = old[0][0].replace(request.form['otent'], content)      
+                if not re.search('\r\n$', content):
+                    content = old[0][0].replace(request.form['otent'], content + '\r\n')
+                else:
+                    content = old[0][0].replace(request.form['otent'], content)
                 
             curs.execute("update data set data = ? where title = ?", [content, name])
         else:
@@ -1504,29 +1507,10 @@ def edit(name = None):
         new = curs.fetchall()
         if new:
             if request.args.get('section', None):
-                i = 0
-                j = 0
-                
-                data = new[0][0] + '\r\n'
-                while 1:
-                    m = re.search("((?:={1,6})\s?(?:[^=]*)\s?(?:={1,6})(?:\s+)?\n(?:(?:(?:(?!(?:={1,6})\s?(?:[^=]*)\s?(?:={1,6})(?:\s+)?\n).)*)(?:\n)?)+)", data)
-                    if m:
-                        if i == int(request.args.get('section', 0)) - 1:
-                            g = m.groups()
-                            data = re.sub("\r\n$", "", g[0])
-                            
-                            break
-                        else:
-                            data = re.sub("((?:={1,6})\s?(?:[^=]*)\s?(?:={1,6})(?:\s+)?\n(?:(?:(?:(?!(?:={1,6})\s?(?:[^=]*)\s?(?:={1,6})(?:\s+)?\n).)*)(?:\n)?)+)", "", data, 1)
-                            
-                            i += 1
-                    else:
-                        j = 1
-                        
-                        break
-                        
-                if j == 0:
-                    data = re.sub("\r\n$", "", data)
+                test_data = '\r\n' + new[0][0] + '\r\n'   
+
+                section_data = re.findall('(\r\n(={1,6}) ?((?:(?!=).)+) ?={1,6}\r\n(?:(?:(?:(?!\r\n(={1,6}) ?((?:(?!=).)+) ?={1,6}\r\n).)|\n)*))', test_data)
+                data = section_data[int(request.args.get('section', None)) - 1][0]
             else:
                 data = new[0][0]
         else:
