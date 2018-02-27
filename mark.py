@@ -13,7 +13,8 @@ def send_parser(data):
     javascript = re.compile('javascript:', re.I)
     data = javascript.sub('', data)
 
-    data = re.sub('&lt;a href="(?:[^"]*)"&gt;(?P<in>(?:(?!&lt;).)*)&lt;\/a&gt;', '<a href="' + parse.quote('\g<in>').replace('/','%2F') + '">\g<in></a>', d)  
+    data = re.sub('&lt;a href="(?:[^"]*)"&gt;(?P<in>(?:(?!&lt;).)*)&lt;\/a&gt;', '<a href="' + parse.quote('\g<in>').replace('/','%2F') + '">\g<in></a>', data)  
+    
     return data
     
 def plusing(conn, name, link, backtype):
@@ -25,8 +26,6 @@ def plusing(conn, name, link, backtype):
 
 def namumark(conn, title, data, num, in_c, toc_y):
     data = start(conn, data, title)
-
-    data += '<script>function folding(num, test = 0) { var fol = document.getElementById(\'folding_\' + num); if(fol.style.display == \'inline-block\' || fol.style.display == \'block\') { fol.style.display = \'none\'; } else { if(num % 3 == 0 && test != 1) { fol.style.display = \'block\'; } else { fol.style.display = \'inline-block\'; } } } </script>'
     
     # if num == 1:        
     #     for d4 in backlink:
