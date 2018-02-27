@@ -240,6 +240,7 @@ def start(conn, data, title):
     # 일부 매크로 처리
     data = tool.savemark(data)
 
+    data = re.sub("\[br\]", '\r\n', data)
     data = re.sub("\[anchor\((?P<in>(?:(?!\)\]).)+)\)\]", '<span id="\g<in>"></span>', data)          
     data = re.sub("\[nicovideo\((?P<in>(?:(?!,|\)\]).)+)(?:(?:(?!\)\]).)*)\)\]", "[[http://embed.nicovideo.jp/watch/\g<in>|\g<in>]]", data)
     data = re.sub('\[ruby\((?P<in>(?:(?!,).)+)\, ?(?P<out>(?:(?!\)\]).)+)\)\]', '<ruby>\g<in><rp>(</rp><rt>\g<out></rt><rp>)</rp></ruby>', data)
@@ -277,19 +278,19 @@ def start(conn, data, title):
         if video:
             video = video.groups()
 
-            width = re.search(', ?width=((?:(?!,|\)\]).)+)', video[1])
+            width = re.search(', ?width=((?:(?!,).)+)', video[1])
             if width:
                 video_width = width.groups()[0]
             else:
                 video_width = '560'
             
-            height = re.search(', ?height=((?:(?!,|\)\]).)+)', video[1])
+            height = re.search(', ?height=((?:(?!,).)+)', video[1])
             if height:
                 video_height = height.groups()[0]
             else:
                 video_height = '315'
 
-            code = re.search('^(((?!,|\)\]).)+)', video[1])
+            code = re.search('^(((?!,).)+)', video[1])
             if code:
                 video_code = code.groups()[0]
             else:
@@ -348,7 +349,7 @@ def start(conn, data, title):
                 else:
                     break
 
-            data = re.sub('(\r\n(?:(?: *)\* ?(?:(?:(?!\r\n).)+)\r\n)+)', '<ul>' + li + '</ul>\r\n', data, 1)
+            data = re.sub('(\r\n(?:(?: *)\* ?(?:(?:(?!\r\n).)+)\r\n)+)', '\r\n\r\n<ul>' + li + '</ul>\r\n', data, 1)
         else:
             break
 
@@ -415,7 +416,7 @@ def start(conn, data, title):
     # 링크 관련 문법 구현
     category = '\r\n<div id="cate">분류: '
     while 1:
-        link = re.search('\[\[((?:(?!\]\]).)+)\]\]', data)
+        link = re.search('\[\[((?:(?!\[\[|\]\]).)+)\]\]', data)
         if link:
             link = link.groups()[0]
 
@@ -429,7 +430,49 @@ def start(conn, data, title):
                 main_link = link
                 see_link = link
 
-            if re.search('^분류:', main_link):
+            if re.search('^(파일|외부):', main_link):
+                width = re.search('width=((?:(?!,).)+)', see_link)
+                if width:
+                    file_width = width.groups()[0]
+                else:
+                    file_width = 'auto'
+                
+                height = re.search('height=((?:(?!,).)+)', see_link)
+                if height:
+                    file_height = height.groups()[0]
+                else:
+                    file_height = 'auto'
+
+                align = re.search('align=((?:(?!,).)+)', see_link)
+                if align:
+                    file_align = align.groups()[0]
+
+                    if file_align == 'center':
+                        file_align = 'display: block; text-align: center;'
+                    else:
+                        file_align = 'float: ' + file_align + ';'
+                else:
+                    file_align = ''
+
+                if re.search('^외부:', main_link):
+                    file_src = re.sub('^외부:', '', main_link)
+                    file_alt = main_link
+                else:
+                    file_data = re.search('^파일:((?:(?!\.).)+)\.(.+)$', main_link)
+                    if file_data:
+                        file_data = file_data.groups()
+
+                        file_name = file_data[0]
+                        file_end = file_data[1]
+                    else:
+                        file_name = 'TEST'
+                        file_end = 'jpg'
+
+                    file_src = '/image/' + tool.sha224(file_name) + '.' + file_end
+                    file_alt = '파일:' + file_name + '.' + file_end
+                
+                data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<span style="' + file_align + '"><img width="' + file_width + '" height="' + file_height + '" alt="' + file_alt + '" src="' + file_src + '"></span>', data, 1)
+            elif re.search('^분류:', main_link):
                 see_link = re.sub('#include', '', see_link)
                 main_link = re.sub('#include', '', main_link)
                 
@@ -443,11 +486,11 @@ def start(conn, data, title):
 
                 category += '<a ' + link_id + ' href="' + tool.url_pas(main_link) + '">' + re.sub('^분류:', '', see_link) + '</a> / '
 
-                data = re.sub('\[\[((?:(?!\]\]).)+)\]\]', '', data, 1)
+                data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '', data, 1)
             elif re.search('^wiki:', main_link):
-                data = re.sub('\[\[((?:(?!\]\]).)+)\]\]', '<a id="inside" href="/' + tool.url_pas(main_link) + '">' + see_link + '</a>', data, 1)
+                data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<a id="inside" href="/' + tool.url_pas(re.sub('^wiki:', '', main_link)) + '">' + see_link + '</a>', data, 1)
             elif re.search('^http(s)?:\/\/', main_link):
-                data = re.sub('\[\[((?:(?!\]\]).)+)\]\]', '<a class="out_link" rel="nofollow" href="' + main_link + '">' + see_link + '</a>', data, 1)
+                data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<a class="out_link" rel="nofollow" href="' + main_link + '">' + see_link + '</a>', data, 1)
             else:
                 if re.search('^:', main_link):
                     main_link = re.sub('^:', '', main_link)
@@ -458,7 +501,7 @@ def start(conn, data, title):
                 else:
                     link_class = ''
 
-                data = re.sub('\[\[((?:(?!\]\]).)+)\]\]', '<a ' + link_class + ' href="/w/' + tool.url_pas(main_link) + '">' + see_link + '</a>', data, 1)
+                data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<a ' + link_class + ' href="/w/' + tool.url_pas(main_link) + '">' + see_link + '</a>', data, 1)
         else:
             break
 
