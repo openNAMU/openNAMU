@@ -13,11 +13,11 @@ from css_html_js_minify import html_minify, js_minify, css_minify
 import time
 import os
 
-from set_mark.macro import get_time
-from set_mark.macro import ip_check
+from set_mark.tool import get_time
+from set_mark.tool import ip_check
+from set_mark.tool import url_pas
+from set_mark.tool import sha224
 from mark import *
-from set_mark.link import url_pas
-from set_mark.link import sha224
 
 def captcha_get(conn):
     curs = conn.cursor()
