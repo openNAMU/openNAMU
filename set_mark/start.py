@@ -1,6 +1,7 @@
 from . import tool
 
 import datetime
+import html
 import re
 
 def table_parser(data, cel_data, start_data, num = 0):
@@ -13,11 +14,11 @@ def table_parser(data, cel_data, start_data, num = 0):
 
     table_width = re.search("<table ?width=((?:(?!>).)*)>", data)
     if table_width:
-        all_table += 'width: ' + table_width.groups()[0] + ';'
+        all_table += 'width: ' + table_width.groups()[0] + 'px;'
     
     table_height = re.search("<table ?height=((?:(?!>).)*)>", data)
     if table_height:
-        all_table += 'height: ' + table_height.groups()[0] + ';'
+        all_table += 'height: ' + table_height.groups()[0] + 'px;'
     
     table_align = re.search("<table ?align=((?:(?!>).)*)>", data)
     if table_align:
@@ -71,11 +72,11 @@ def table_parser(data, cel_data, start_data, num = 0):
         
     cel_width = re.search("<width=((?:(?!>).)*)>", data)
     if cel_width:
-        cel_style += 'width: ' + cel_width.groups()[0] + ';'
+        cel_style += 'width: ' + cel_width.groups()[0] + 'px;'
 
     cel_height = re.search("<height=((?:(?!>).)*)>", data)
     if cel_height:
-        cel_style += 'height: ' + cel_height.groups()[0] + ';'
+        cel_style += 'height: ' + cel_height.groups()[0] + 'px;'
         
     text_right = re.search("<\)>", data)
     text_center = re.search("<:>", data)
@@ -111,6 +112,10 @@ def start(conn, data, title):
 
     # 맨 앞과 끝에 개행 문자 추가
     data = '\r\n' + data + '\r\n'
+
+    # XSS 이스케이프
+    data = html.escape(data)
+    data = re.sub('&lt;(?P<in>(table|row)? ?(text|bg|border|width|height|class)?(color|align)?(=(((?!&gt;).)+))|\(|:|\)|(-|\|)[0-9]+|(#(?:[0-9a-f-A-F]{3}){1,2})|(\w+))&gt;', '<\g<in>>', data)
 
     # 추가 데이터 지정
     plus_data = ''
@@ -259,7 +264,7 @@ def start(conn, data, title):
             all_stack = re.sub('0.', '', all_stack)
             
             data = re.sub('\r\n(={1,6}) ?((?:(?!=).)+) ?={1,6}\r\n', '\r\n<h' + toc_number + '><a href="">' + all_stack + '</a> ' + toc[1] + ' <span style="font-size: 12px"><a href="/edit/' + tool.url_pas(title) + '?section=' + str(edit_number) + '">(편집)</a></span></h' + toc_number + '><hr id="under_bar" style="margin-top: -5px; margin-bottom: 10px;">\r\n', data, 1)
-            toc_data += '<span style="margin-left: ' + str((toc_full - toc_top_stack) * 10) + 'px"><a href="">' + all_stack + '</a> ' + toc[1] + '</span>\r\n'
+            toc_data += '<span style="margin-left: ' + str((toc_full - toc_top_stack) * 10) + 'px;"><a href="">' + all_stack + '</a> ' + toc[1] + '</span>\r\n'
         else:
             break
 
@@ -384,7 +389,7 @@ def start(conn, data, title):
                     else:
                         margin = len(sub_li[0]) * 20
 
-                    li = re.sub('\r\n(?:( *)\* ?((?:(?!\r\n).)+))', '<li style="margin-left: ' + str(margin) + 'px">' + sub_li[1] + '</li>', li, 1)
+                    li = re.sub('\r\n(?:( *)\* ?((?:(?!\r\n).)+))', '<li style="margin-left: ' + str(margin) + 'px;">' + sub_li[1] + '</li>', li, 1)
                 else:
                     break
 
