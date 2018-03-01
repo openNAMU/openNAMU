@@ -1,5 +1,6 @@
 from . import tool
 
+import datetime
 import re
 
 def table_parser(data, cel_data, start_data, num = 0):
@@ -111,6 +112,9 @@ def start(conn, data, title):
     # 맨 앞과 끝에 개행 문자 추가
     data = '\r\n' + data + '\r\n'
 
+    # 추가 데이터 지정
+    plus_data = ''
+
     while 1:
         include = re.search('\[include\(((?:(?!\)\]).)+)\)\]', data)
         if include:
@@ -145,6 +149,22 @@ def start(conn, data, title):
             else:
                 data = re.sub('\[include\(((?:(?!\)\]).)+)\)\]', '[[' + include + ']]', data, 1)
 
+        else:
+            break
+
+    # 수식 처리
+    first = 0
+    while 1:
+        math = re.search('<math>((?:(?!<\/math>).)+)<\/math>', data)
+        if math:
+            if first == 0:
+                plus_data += '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.css" integrity="sha384-TEMocfGvRuD1rIAacqrknm5BQZ7W7uWitoih+jMNFXQIbNl16bO8OZmylH/Vi/Ei" crossorigin="anonymous"><script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.js" integrity="sha384-jmxIlussZWB7qCuB+PgKG1uLjjxbVVIayPJwi6cG6Zb4YKq0JIw+OMnkkEC7kYCq" crossorigin="anonymous"></script>'
+
+            math = math.groups()[0]
+            first += 1
+
+            data = re.sub('<math>((?:(?!<\/math>).)+)<\/math>', '<span id="math_' + str(first) + '"></span>', data, 1)
+            plus_data += '<script>katex.render("' + math.replace('\\', '\\\\') +'", document.getElementById("math_' + str(first) + '"));</script>'
         else:
             break
 
@@ -540,4 +560,4 @@ def start(conn, data, title):
     data = re.sub('(\r\n)?<span id="include"><\/span>(\r\n)?(<span style="margin-left: 20px;"><\/span>)?', '', data)
     data = re.sub('\r\n', '<br>', data)
 
-    return data
+    return [data, plus_data]
