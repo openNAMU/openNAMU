@@ -110,12 +110,16 @@ def start(conn, data, title):
     # DB 지정
     curs = conn.cursor()
 
-    # 맨 앞과 끝에 개행 문자 추가
+    # 초기 설정
     data = '\r\n' + data + '\r\n'
+    data = re.sub('\r\n( +)\|\|', '\r\n||', data)
 
     # XSS 이스케이프
     data = html.escape(data)
+
     data = re.sub('&lt;(?P<in>(table|row)? ?(text|bg|border|width|height|class)?(color|align)?(=(((?!&gt;).)+))|\(|:|\)|(-|\|)[0-9]+|(#(?:[0-9a-f-A-F]{3}){1,2})|(\w+))&gt;', '<\g<in>>', data)
+    data = re.sub('&lt;(?P<in>\/?math)&gt;', '<\g<in>>', data)
+
     data = re.sub('&#x27;&#x27;&#x27;(?P<in>((?!&#x27;&#x27;&#x27;).)+)&#x27;&#x27;&#x27;', '\'\'\'\g<in>\'\'\'', data)
     data = re.sub('&#x27;&#x27;(?P<in>((?!&#x27;&#x27;).)+)&#x27;&#x27;', '\'\'\g<in>\'\'', data)
 
@@ -174,6 +178,8 @@ def start(conn, data, title):
             plus_data += '<script>katex.render("' + math.replace('\\', '\\\\') +'", document.getElementById("math_' + str(first) + '"));</script>'
         else:
             break
+
+    data = data.replace('\\', '&#92;')
 
     # 텍스트 꾸미기 문법
     data = re.sub('\'\'\'(?P<in>(?:(?!\'\'\').)+)\'\'\'', '<b>\g<in></b>', data)
