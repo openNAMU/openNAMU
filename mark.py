@@ -35,4 +35,4 @@ def namumark(conn, title, data, num, in_c, toc_y):
     #
     #     conn.commit()
         
-    return data
+    return data[0] + data[1]
