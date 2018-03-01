@@ -116,6 +116,8 @@ def start(conn, data, title):
     # XSS 이스케이프
     data = html.escape(data)
     data = re.sub('&lt;(?P<in>(table|row)? ?(text|bg|border|width|height|class)?(color|align)?(=(((?!&gt;).)+))|\(|:|\)|(-|\|)[0-9]+|(#(?:[0-9a-f-A-F]{3}){1,2})|(\w+))&gt;', '<\g<in>>', data)
+    data = re.sub('&#x27;&#x27;&#x27;(?P<in>((?!&#x27;&#x27;&#x27;).)+)&#x27;&#x27;&#x27;', '\'\'\'\g<in>\'\'\'', data)
+    data = re.sub('&#x27;&#x27;(?P<in>((?!&#x27;&#x27;).)+)&#x27;&#x27;', '\'\'\g<in>\'\'', data)
 
     # 추가 데이터 지정
     plus_data = ''
