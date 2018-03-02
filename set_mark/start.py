@@ -112,7 +112,9 @@ def start(conn, data, title):
 
     # 초기 설정
     data = '\r\n' + data + '\r\n'
+
     data = re.sub('\r\n( +)\|\|', '\r\n||', data)
+    data = re.sub('\|\|( +)\r\n', '||\r\n', data)
 
     # XSS 이스케이프
     data = html.escape(data)
@@ -156,7 +158,7 @@ def start(conn, data, title):
 
                 include_parser = re.sub('\[\[분류:(((?!\]\]|#include).)+)\]\]', '', include_parser)
 
-                data = re.sub('\[include\(((?:(?!\)\]).)+)\)\]', '\r\n<span id="include"></span>' + include_parser + '<span id="include"></span>\r\n', data, 1)
+                data = re.sub('\[include\(((?:(?!\)\]).)+)\)\]', '\r\n' + include_parser + '\r\n', data, 1)
             else:
                 data = re.sub('\[include\(((?:(?!\)\]).)+)\)\]', '[[' + include + ']]', data, 1)
 
@@ -179,6 +181,7 @@ def start(conn, data, title):
         else:
             break
 
+    # 추가 이스케이프
     data = data.replace('\\', '&#92;')
 
     # 텍스트 꾸미기 문법
@@ -283,7 +286,7 @@ def start(conn, data, title):
     while 1:
         hr = re.search('\r\n-{4,9}\r\n', data)
         if hr:
-            data = re.sub('\r\n-{4,9}\r\n', '<hr>', data, 1)
+            data = re.sub('\r\n-{4,9}\r\n', '\r\n<hr>\r\n', data, 1)
         else:
             break
 
@@ -368,15 +371,15 @@ def start(conn, data, title):
 
     # 인용문 구현
     while 1:
-        block = re.search('(\r\n(?:> ?(?:(?:(?!\r\n).)+)\r\n)+)', data)
+        block = re.search('(\r\n(?:&gt; ?(?:(?:(?!\r\n).)+)\r\n)+)', data)
         if block:
             block = block.groups()[0]
 
-            block = re.sub('^\r\n> ?', '', block)
-            block = re.sub('\r\n> ?', '\r\n', block)
+            block = re.sub('^\r\n&gt; ?', '', block)
+            block = re.sub('\r\n&gt; ?', '\r\n', block)
             block = re.sub('\r\n$', '', block)
 
-            data = re.sub('(\r\n(?:> ?(?:(?:(?!\r\n).)+)\r\n)+)', '<blockquote>' + block + '</blockquote>\r\n', data, 1)
+            data = re.sub('(\r\n(?:&gt; ?(?:(?:(?!\r\n).)+)\r\n)+)', '<blockquote>' + block + '</blockquote>\r\n', data, 1)
         else:
             break
 
@@ -420,7 +423,7 @@ def start(conn, data, title):
 
     # 표 처리
     while 1:
-        table = re.search('((?:(?:(?:(?:\|\|)+(?:(?:(?!\|\|).(?:\r\n)*)+))+)\|\|(?:\r\n)?)+)', data)
+        table = re.search('\r\n((?:(?:(?:(?:\|\|)+(?:(?:(?!\|\|).(?:\r\n)*)+))+)\|\|(?:\r\n)?)+)', data)
         if table:
             table = table.groups()[0]
             
@@ -433,7 +436,7 @@ def start(conn, data, title):
                     return_table = table_parser(all_table[1], all_table[2], all_table[0])
                     number = return_table[6]
 
-                    table = re.sub('^\|\|((?:<(?:(?:(?!>).)+)>)*)', '<table ' + return_table[5] + ' ' + return_table[0] + '><tbody><tr ' + return_table[1] + '><td ' + return_table[2] + ' ' + return_table[3] + ' ' + return_table[4] + '>', table, 1)
+                    table = re.sub('^\|\|((?:<(?:(?:(?!>).)+)>)*)', '\r\n<table ' + return_table[5] + ' ' + return_table[0] + '><tbody><tr ' + return_table[1] + '><td ' + return_table[2] + ' ' + return_table[3] + ' ' + return_table[4] + '>\r\n', table, 1)
                 else:
                     break
 
@@ -450,18 +453,20 @@ def start(conn, data, title):
                 else:
                     break
 
+            print(table)
+
             while 1:
-                cel_table = re.search('((?:\|\|)+)((?:<(?:(?:(?!>).)+)>)*)((?:(?!\|\||<\/td>).)+)', table)
+                cel_table = re.search('((?:\|\|)+)((?:<(?:(?:(?!>).)+)>)*)((?:(?:(?!\|\||<\/td>).)|\n)+)', table)
                 if cel_table:
                     cel_table = cel_table.groups()
 
-                    return_table = table_parser(cel_table[1], cel_table[2], cel_table[0], number)
+                    return_table = table_parser(cel_table[1], re.sub('\r\n', ' ', cel_table[2]), cel_table[0], number)
 
                     table = re.sub('((?:\|\|)+)((?:<(?:(?:(?!>).)+)>)*)', '</td><td ' + return_table[2] + ' ' + return_table[3] + ' ' + return_table[4] + '>', table, 1)
                 else:
                     break
 
-            data = re.sub('((?:(?:(?:(?:\|\|)+(?:(?:(?!\|\|).(?:\r\n)*)+))+)\|\|(?:\r\n)?)+)', table, data, 1)
+            data = re.sub('\r\n((?:(?:(?:(?:\|\|)+(?:(?:(?!\|\|).(?:\r\n)*)+))+)\|\|(?:\r\n)?)+)', table, data, 1)
         else:
             break
 
@@ -570,7 +575,8 @@ def start(conn, data, title):
     data = re.sub('<\/ul>\r\n\r\n', '</ul>\r\n', data)
     data = re.sub('^(\r\n)+', '', data)
     data = re.sub('(\r\n)+$', '', data)
-    data = re.sub('(\r\n)?<span id="include"><\/span>(\r\n)?(<span style="margin-left: 20px;"><\/span>)?', '', data)
+    data = re.sub('(?P<in><td(((?!>).)*)>)\r\n', '\g<in>', data)
+    data = re.sub('(\r\n)?<hr>(\r\n)?', '<hr>', data)
     data = re.sub('\r\n', '<br>', data)
 
     return [data, plus_data]
