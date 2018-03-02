@@ -121,6 +121,16 @@ def start(conn, data, title):
 
     data = re.sub('&lt;(?P<in>(table|row)? ?(text|bg|border|width|height|class)?(color|align)?(=(((?!&gt;).)+))|\(|:|\)|(-|\|)[0-9]+|(#(?:[0-9a-f-A-F]{3}){1,2})|(\w+))&gt;', '<\g<in>>', data)
     data = re.sub('&lt;(?P<in>\/?math)&gt;', '<\g<in>>', data)
+    
+
+    while 1:
+        block_back = re.search('\r\n((?:&gt;)+)', data)
+        if block_back:
+            block_back = block_back.groups()[0]
+            
+            data = re.sub('\r\n((?:&gt;)+)', '\r\n' + ('>' * int(len(block_back) / 4)), data, 1)
+        else:
+            break
 
     data = re.sub('&#x27;&#x27;&#x27;(?P<in>((?!&#x27;&#x27;&#x27;).)+)&#x27;&#x27;&#x27;', '\'\'\'\g<in>\'\'\'', data)
     data = re.sub('&#x27;&#x27;(?P<in>((?!&#x27;&#x27;).)+)&#x27;&#x27;', '\'\'\g<in>\'\'', data)
@@ -371,15 +381,15 @@ def start(conn, data, title):
 
     # 인용문 구현
     while 1:
-        block = re.search('(\r\n(?:&gt; ?(?:(?:(?!\r\n).)+)\r\n)+)', data)
+        block = re.search('(\r\n(?:> ?(?:(?:(?!\r\n).)+)\r\n)+)', data)
         if block:
             block = block.groups()[0]
 
-            block = re.sub('^\r\n&gt; ?', '', block)
-            block = re.sub('\r\n&gt; ?', '\r\n', block)
+            block = re.sub('^\r\n> ?', '', block)
+            block = re.sub('\r\n> ?', '\r\n', block)
             block = re.sub('\r\n$', '', block)
 
-            data = re.sub('(\r\n(?:&gt; ?(?:(?:(?!\r\n).)+)\r\n)+)', '<blockquote>' + block + '</blockquote>\r\n', data, 1)
+            data = re.sub('(\r\n(?:> ?(?:(?:(?!\r\n).)+)\r\n)+)', '<blockquote>' + block + '</blockquote>\r\n', data, 1)
         else:
             break
 
