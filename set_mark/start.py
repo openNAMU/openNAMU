@@ -284,8 +284,8 @@ def start(conn, data, title):
 
             all_stack = re.sub('0.', '', all_stack)
             
-            data = re.sub('\r\n(={1,6}) ?((?:(?!=).)+) ?={1,6}\r\n', '\r\n<h' + toc_number + '><a href="">' + all_stack + '</a> ' + toc[1] + ' <span style="font-size: 12px"><a href="/edit/' + tool.url_pas(title) + '?section=' + str(edit_number) + '">(편집)</a></span></h' + toc_number + '><hr id="under_bar" style="margin-top: -5px; margin-bottom: 10px;">\r\n', data, 1)
-            toc_data += '<span style="margin-left: ' + str((toc_full - toc_top_stack) * 10) + 'px;"><a href="">' + all_stack + '</a> ' + toc[1] + '</span>\r\n'
+            data = re.sub('\r\n(={1,6}) ?((?:(?!=).)+) ?={1,6}\r\n', '\r\n<h' + toc_number + ' id="s-' + re.sub('\.$', '', all_stack) + '"><a href="#toc">' + all_stack + '</a> ' + toc[1] + ' <span style="font-size: 12px"><a href="/edit/' + tool.url_pas(title) + '?section=' + str(edit_number) + '">(편집)</a></span></h' + toc_number + '>\r\n', data, 1)
+            toc_data += '<span style="margin-left: ' + str((toc_full - toc_top_stack) * 10) + 'px;"><a href="#s-' + re.sub('\.$', '', all_stack) + '">' + all_stack + '</a> ' + toc[1] + '</span>\r\n'
         else:
             break
 
@@ -463,8 +463,6 @@ def start(conn, data, title):
                 else:
                     break
 
-            print(table)
-
             while 1:
                 cel_table = re.search('((?:\|\|)+)((?:<(?:(?:(?!>).)+)>)*)((?:(?:(?!\|\||<\/td>).)|\n)+)', table)
                 if cel_table:
@@ -557,18 +555,18 @@ def start(conn, data, title):
             elif re.search('^wiki:', main_link):
                 data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<a id="inside" href="/' + tool.url_pas(re.sub('^wiki:', '', main_link)) + '">' + see_link + '</a>', data, 1)
             elif re.search('^http(s)?:\/\/', main_link):
-                data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<a class="out_link" rel="nofollow" href="' + main_link + '">' + see_link + '</a>', data, 1)
+                data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<a id="out_link" rel="nofollow" href="' + main_link + '">' + see_link + '</a>', data, 1)
             else:
                 if re.search('^:', main_link):
                     main_link = re.sub('^:', '', main_link)
 
                 curs.execute("select title from data where title = ?", [main_link])
                 if not curs.fetchall():
-                    link_class = 'class="not_thing"'
+                    link_id = 'id="not_thing"'
                 else:
-                    link_class = ''
+                    link_id = ''
 
-                data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<a ' + link_class + ' href="/w/' + tool.url_pas(main_link) + '">' + see_link + '</a>', data, 1)
+                data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<a ' + link_id + ' href="/w/' + tool.url_pas(main_link) + '">' + see_link + '</a>', data, 1)
         else:
             break
 
@@ -581,7 +579,7 @@ def start(conn, data, title):
     data += category
     
     # 마지막 처리
-    data = re.sub('(?P<in><hr id="under_bar" style="margin-top: -5px; margin-bottom: 10px;">)(\r\n)+', '\g<in>', data)
+    data = re.sub('(?P<in><\/h[0-9]>)(\r\n)+', '\g<in>', data)
     data = re.sub('<\/ul>\r\n\r\n', '</ul>\r\n', data)
     data = re.sub('^(\r\n)+', '', data)
     data = re.sub('(\r\n)+$', '', data)
