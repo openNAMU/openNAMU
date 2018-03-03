@@ -399,7 +399,7 @@ def re_error(conn, data):
     curs = conn.cursor()
     if data == '/ban':
         ip = ip_check()
-        end = '|| 사유 || 권한이 맞지 않는 상태 입니다. ||'
+        end = '<li>사유 : 권한이 맞지 않는 상태 입니다.</li>'
         if ban_check(conn) == 1:
             curs.execute("select end, why from ban where block = ?", [ip])
             d = curs.fetchall()
@@ -410,7 +410,7 @@ def re_error(conn, data):
                     d = curs.fetchall()
             
             if d:
-                end = '|| 상태 ||'
+                end = '<li>상태 : '
                 if d[0][0]:
                     now = int(re.sub('(:|-| )', '', get_time()))
                     day = re.sub('\-', '', d[0][0])              
@@ -430,14 +430,14 @@ def re_error(conn, data):
                 else:
                     end += '영구 차단 상태 입니다.'
                 
-                end += '||'
+                end += '</li>'
 
                 if d[0][1] != '':
-                    end += '\r\n|| 사유 || ' + d[0][1] + ' ||'
+                    end += '<li>사유 : ' + d[0][1] + '</li>'
 
         return html_minify(template('index', 
             imp = ['권한 오류', wiki_set(conn, 1), custom(conn), other2([0, 0])],
-            data = namumark(conn, "", "[목차(없음)]\r\n== 권한 상태 ==\r\n" + end, 0, 0, 0),
+            data = '<h2>권한 상태</h2><ul>' + end + '</ul>',
             menu = 0
         ))
 
@@ -517,7 +517,7 @@ def re_error(conn, data):
         if title:
             return html_minify(template('index', 
                 imp = [title, wiki_set(conn, 1), custom(conn), other2([0, 0])],
-                data = namumark(conn, "", "[목차(없음)]\r\n== 오류 발생 ==\r\n" + data, 0, 0, 0),
+                data = '<h2>오류 발생</h2><ul><li>' + data + '</li></ul>',
                 menu = 0
             ))
         else:

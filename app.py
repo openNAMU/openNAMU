@@ -311,13 +311,11 @@ def edit_set(num = 0):
         li_data = ''
         for li in li_list:
             x += 1
-            li_data += ' * [[wiki:edit_set/' + str(x) + '|' + li + ']]\r\n'
+            li_data += '<li><a href="/edit_set/' + str(x) + '">' + li + '</a></li>'
 
         return html_minify(template('index', 
             imp = ['설정 편집', wiki_set(conn, 1), custom(conn), other2([0, 0])],
-            data = namumark(conn, '',   '[목차(없음)]\r\n' + \
-                                        '== 메뉴 ==\r\n' + \
-                                        li_data, 0, 0, 0),
+            data = '<h2>메뉴</h2><ul>' + li_data + '</ul>',
             menu = [['manager', '관리자']]
         ))
     elif num == 1:
@@ -1216,7 +1214,7 @@ def revert(name = None):
                 
             history_plus(conn, name, data[0][0], today, ip, request.form['send'] + ' (' + str(num) + '판)', leng)
             
-            namumark(conn, name, data[0][0], 1, 0, 0)
+            namumark(conn, name, data[0][0], 1)
             conn.commit()
             
             return redirect('/w/' + url_pas(name))
@@ -1496,9 +1494,12 @@ def edit(name = None):
             curs.execute("insert into alarm (name, data, date) values (?, ?, ?)", [ip, ip + '님이 <a href="/w/' + url_pas(name) + '">' + name + '</a> 문서를 편집 했습니다.', today])
 
         history_plus(conn, name, content, today, ip, send_parser(request.form['send']), leng)
+        
         curs.execute("delete from back where link = ?", [name])
         curs.execute("delete from back where title = ? and type = 'no'", [name])
-        namumark(conn, name, content, 1, 0, 0)
+        
+        namumark(conn, name, content, 1)
+        
         conn.commit()
         
         return redirect('/w/' + url_pas(name))
@@ -1561,12 +1562,11 @@ def preview(name = None):
     if can == 1:
         return re_error(conn, '/ban')
          
-    new_data = request.form['content']
-    new_data = re.sub('\r\n#(?:redirect|넘겨주기) (?P<in>(?:(?!\r\n).)+)\r\n', ' * [[\g<in>]] 문서로 넘겨주기', '\r\n' + new_data + '\r\n')
+    new_data = re.sub('\r\n#(?:redirect|넘겨주기) (?P<in>(?:(?!\r\n).)+)\r\n', ' * [[\g<in>]] 문서로 넘겨주기', '\r\n' + request.form['content'] + '\r\n')
     new_data = re.sub('^\r\n', '', new_data)
     new_data = re.sub('\r\n$', '', new_data)
     
-    end_data = namumark(conn, name, new_data, 0, 0, 1)
+    end_data = namumark(conn, name, new_data, 0)
 
     if request.args.get('section', None):
         action = '?section=' + request.args.get('section', None)
@@ -1714,27 +1714,7 @@ def move(name = None):
 def other():
     return html_minify(template('index', 
         imp = ['기타 메뉴', wiki_set(conn, 1), custom(conn), other2([0, 0])],
-        data = namumark(conn, '', '[목차(없음)]\r\n' + \
-                            '== 기록 ==\r\n' + \
-                            ' * [[wiki:block_log|차단 기록]]\r\n' + \
-                            ' * [[wiki:user_log|가입 기록]]\r\n' + \
-                            ' * [[wiki:admin_log|권한 사용 기록]]\r\n' + \
-                            ' * [[wiki:manager/6|편집 기록]]\r\n' + \
-                            ' * [[wiki:manager/7|토론 기록]]\r\n' + \
-                            '== 목록 ==\r\n' + \
-                            ' * [[wiki:admin_list|관리자 목록]]\r\n' + \
-                            ' * [[wiki:give_log|관리 그룹 목록]]\r\n' + 
-                            ' * [[wiki:not_close_topic|열린 토론 목록]]\r\n' + \
-                            '== 기타 ==\r\n' + \
-                            ' * [[wiki:title_index|모든 문서]]\r\n' + \
-                            ' * [[wiki:acl_list|ACL 문서]]\r\n' + \
-                            ' * [[wiki:please|필요한 문서]]\r\n' + \
-                            ' * [[wiki:upload|파일 올리기]]\r\n' + \
-                            ' * [[wiki:manager/10|문서 검색]]\r\n' + \
-                            '== 관리자 ==\r\n' + \
-                            ' * [[wiki:manager/1|관리자 메뉴]]\r\n' + \
-                            '== 버전 ==\r\n' + \
-                            ' * 이 오픈나무는 [[https://github.com/2DU/openNAMU/blob/master/version.md|' + r_ver + ']] 입니다.', 0, 0, 0),
+        data = '<h2>기록</h2><ul><li><a href="/block_log">차단 기록</a></li><li><a href="/user_log">가입 기록</a></li><li><a href="/admin_log">권한 사용 기록</a></li><li><a href="/manager/6">편집 기록</a></li><li><a href="/manager/7">토론 기록</a></li></ul><br><h2>목록</h2><ul><li><a href="/admin_list">관리자 목록</a></li><li><a href="/give_log">관리 그룹 목록</a></li><li><a href="/not_close_topic">열린 토론 목록</a></li></ul><br><h2>기타</h2><ul><li><a href="/title_index">모든 문서</a></li><li><a href="/acl_list">ACL 문서</a></li><li><a href="/please">필요한 문서</a></li><li><a href="/upload">파일 올리기</a></li><li><a href="/manager/10">문서 검색</a></li></ul><br><h2>관리자</h2><ul><li><a href="/manager/1">관리자 메뉴</a></li></ul><br><h2>버전</h2><ul><li>이 오픈나무는 <a href="https://github.com/2DU/openNAMU/blob/master/version.md">' + r_ver + '</a> 입니다.</li></ul>',
         menu = 0
     ))
     
@@ -1745,22 +1725,7 @@ def manager(num = 1):
     if num == 1:
         return html_minify(template('index', 
             imp = ['관리자 메뉴', wiki_set(conn, 1), custom(conn), other2([0, 0])],
-            data = namumark(conn, '',   '[목차(없음)]\r\n' + \
-                                        '== 목록 ==\r\n' + \
-                                        ' * [[wiki:manager/2|문서 ACL]]\r\n' + \
-                                        ' * [[wiki:manager/3|사용자 검사]]\r\n' + \
-                                        ' * [[wiki:manager/4|사용자 차단]]\r\n' + \
-                                        ' * [[wiki:manager/5|권한 주기]]\r\n' + \
-                                        ' * [[wiki:big_delete|여러 문서 삭제]]\r\n' + \
-                                        ' * [[wiki:edit_filter|편집 필터]]\r\n' + \
-                                        '== 소유자 ==\r\n' + \
-                                        ' * [[wiki:indexing|인덱싱 (생성 or 삭제)]]\r\n' + \
-                                        ' * [[wiki:manager/8|관리 그룹 생성]]\r\n' + \
-                                        ' * [[wiki:edit_set|설정 편집]]\r\n' + \
-                                        ' * [[wiki:re_start|서버 재 시작]]\r\n' + \
-                                        ' * [[wiki:inter_wiki|인터위키]]\r\n' + \
-                                        '== 기타 ==\r\n' + \
-                                        ' * 이 메뉴에 없는 기능은 해당 문서의 역사나 토론에서 바로 사용 가능함', 0, 0, 0),
+            data = '<h2>목록</h2><ul><li><a href="/manager/2">문서 ACL</a></li><li><a href="/manager/3">사용자 검사</a></li><li><a href="/manager/4">사용자 차단</a></li><li><a href="/manager/5">권한 주기</a></li><li><a href="/big_delete">여러 문서 삭제</a></li><li><a href="edit_filter">편집 필터</a></li></ul><br><h2>소유자</h2><ul><li><a href="/indexing">인덱싱 (생성 or 삭제)</a></li><li><a href="/manager/8">관리 그룹 생성</a></li><li><a href="/edit_set">설정 편집</a></li><li><a href="/re_start">서버 재 시작</a></li><li><a href="/inter_wiki">인터위키</a></li></ul>',
             menu = [['other', '기타']]
         ))
     elif num in range(2, 14):
@@ -1993,7 +1958,7 @@ def topic_admin(name = None, sub = None, num = None):
 
     return html_minify(template('index', 
         imp = ['토론 도구', wiki_set(conn, 1), custom(conn), other2([' (' + str(num) + '번)', 0])],
-        data = namumark(conn, '', ban, 0, 0, 0),
+        data = ban,
         menu = [['topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '#' + str(num), '토론']]
     ))
 
@@ -2092,7 +2057,7 @@ def topic(name = None, sub = None):
                                 
             all_data += '<table id="toron"><tbody><tr><td id="toron_color_red">'
             all_data += '<a href="#' + topic_data[1] + '">#' + topic_data[1] + '</a> ' + ip_pas(conn, topic_data[3]) + who_plus + ' <span style="float: right;">' + topic_data[2] + '</span>'
-            all_data += '</td></tr><tr><td>' + namumark(conn, '', topic_data[0], 0, 0, 0) + '</td></tr></tbody></table><br>'    
+            all_data += '</td></tr><tr><td>' + namumark(conn, '', topic_data[0], 0) + '</td></tr></tbody></table><br>'    
 
         for topic_data in topic_1:
             if number == 1:
@@ -2110,7 +2075,7 @@ def topic(name = None, sub = None):
             else:
                 blind_data = ''
 
-            user_write = namumark(conn, '', topic_data[0], 0, 0, 0)
+            user_write = namumark(conn, '', topic_data[0], 0)
             ip = ip_pas(conn, topic_data[3])
 
             curs.execute('select acl from user where id = ?', [topic_data[3]])
@@ -2908,7 +2873,7 @@ def read_view(name = None):
         else_data = re.sub('^\r\n', '', else_data)
         else_data = re.sub('\r\n$', '', else_data)
             
-    end_data = namumark(conn, name, else_data, 0, 0, 1)
+    end_data = namumark(conn, name, else_data, 0)
 
     if data_none == 1:
         menu = [['edit/' + url_pas(name), '생성'], ['topic/' + url_pas(name), topic], ['history/' + url_pas(name), '역사'], ['move/' + url_pas(name), '이동'], ['xref/' + url_pas(name), '역링크']]
@@ -3276,28 +3241,15 @@ def user_info():
             acl += ' (로그인 가능)'
             
     if custom(conn)[2] != 0:
-        ip_user = '[[사용자:' + ip + '|' + ip + ']]'
-        plus = ' * [[wiki:logout|로그아웃]]\r\n * [[wiki:change|비밀번호 변경]]\r\n * [[wiki:email|이메일 수정]]'
+        ip_user = '<a href="/w/사용자:' + ip + '">' + ip + '</a>'
+        plus = '<li><a href="/logout">로그아웃</a></li><li><a href="/change">비밀번호 변경</a></li><li><a href="/email">이메일 수정</a></li>'
     else:
         ip_user = ip
-        plus = ' * [[wiki:login|로그인]]'
+        plus = '<li><a href="/login">로그인</a></li>'
 
     return html_minify(template('index', 
         imp = ['사용자 메뉴', wiki_set(conn, 1), custom(conn), other2([0, 0])],
-        data =  namumark(conn, '',  '[목차(없음)]\r\n' + \
-                                    '== 상태 ==\r\n' + \
-                                    ' * ' + ip_user + ' [[wiki:record/' + url_pas(ip) + '|(기록)]]\r\n' + \
-                                    ' * 권한 상태 : ' + acl + '\r\n' + \
-                                    '== 로그인 ==\r\n' + \
-                                    plus + '\r\n' + \
-                                    ' * [[wiki:register|회원가입]]\r\n' + \
-                                    '== 사용자 기능 ==\r\n' + \
-                                    ' * [[wiki:acl/사용자:' + url_pas(ip) + '|사용자 문서 ACL]]\r\n' + \
-                                    ' * [[wiki:custom_head|사용자 HEAD]]\r\n' + \
-                                    '== 기타 ==\r\n' + \
-                                    ' * [[wiki:alarm|알림]]\r\n' + \
-                                    ' * [[wiki:watch_list|주시 문서]]\r\n' + \
-                                    ' * [[wiki:count|활동 횟수]]\r\n', 0, 0, 0),
+        data =  '<h2>상태</h2><ul><li>' + ip_user + ' <a href="/record/' + url_pas(ip) + '">(기록)</a></li><li>권한 상태 : ' + acl + '</li></ul><br><h2>로그인</h2><ul>' + plus + '<li><a href="/register">회원가입</a></li></ul><br><h2>사용자 기능</h2><ul><li><a href="/acl/사용자:' + url_pas(ip) + '">사용자 문서 ACL</a></li><li><a href="/custom_head">사용자 HEAD</a></li></ul><br><h2>기타</h2><ul><li><a href="/alarm">알림</a></li><li><a href="/watch_list">주시 문서</a></li><li><a href="/count">활동 횟수</a></li></ul>',
         menu = 0
     ))
 
@@ -3440,8 +3392,8 @@ def count_edit(name = None):
 
     return html_minify(template('index', 
         imp = ['활동 횟수', wiki_set(conn, 1), custom(conn), other2([0, 0])],
-        data = namumark(conn, "", "[목차(없음)]\r\n== " + that + " ==\r\n||<:> 편집 횟수 ||<:> " + str(data) + "||\r\n||<:> 토론 횟수 ||<:> " + str(t_data) + "||", 0, 0, 0),
-        menu = [['user', '사용자'], ['record/' + url_pas(that), '편집 기록'], ['topic_record/' + url_pas(that), '토론 기록']]
+        data = '<ul><li><a href="/record/' + url_pas(that) + '">편집 횟수</a> : ' + str(data) + '</li><li><a href="/topic_record/' + url_pas(that) + '">토론 횟수</a> : ' + str(t_data) + '</a></li></ul>',
+        menu = [['user', '사용자']]
     ))
         
 @app.route('/random')
