@@ -1508,10 +1508,10 @@ def edit(name = None):
         new = curs.fetchall()
         if new:
             if request.args.get('section', None):
-                test_data = '\r\n' + new[0][0] + '\r\n'   
+                test_data = '\n' + re.sub('\r\n', '\n', new[0][0]) + '\n'   
 
-                section_data = re.findall('(\r\n(={1,6}) ?((?:(?!=).)+) ?={1,6}\r\n(?:(?:(?:(?!\r\n(={1,6}) ?((?:(?!=).)+) ?={1,6}\r\n).)|\n)*))', test_data)
-                data = section_data[int(request.args.get('section', None)) - 1][0]
+                section_data = re.findall('((?:={1,6}) ?(?:(?:(?!=).)+) ?={1,6}\\n(?:(?:(?!(?:={1,6}) ?(?:(?:(?!=).)+) ?={1,6}\\n).)*))', test_data)
+                data = section_data[int(request.args.get('section', None)) - 1]
             else:
                 data = new[0][0]
         else:
