@@ -2150,7 +2150,7 @@ def topic(name = None, sub = None):
 
         return html_minify(template('index', 
             imp = [name, wiki_set(conn, 1), custom(conn), other2([' (토론)', 0])],
-            data = '<h2 id="topic_top_title">' + sub + '</h2><hr id="under_bar" style="margin-top: -5px;">' + all_data + data,
+            data = '<h2 id="topic_top_title">' + sub + '</h2>' + all_data + data,
             menu = [['topic/' + url_pas(name), '목록']]
         ))
         
@@ -2792,19 +2792,6 @@ def read_view(name = None):
 
     if num:
         num = int(num)
-    
-    if not num:
-        if 'View_list' in session:
-            m = re.findall('([^\n]+)\n', session['View_List'])
-            if m[-1] != name:
-                d = re.sub(name + '\n', '', session['View_List'])
-                d += name + '\n'
-                if len(m) > 50:
-                    d = re.sub('([^\n]+)\n', '', d, 1)
-                session['View_List'] = d
-        else:
-            session['View_List'] = name + '\n'
-
 
     curs.execute("select sub from rd where title = ? order by date desc", [name])
     rd = curs.fetchall()
@@ -3312,7 +3299,6 @@ def user_info():
                                     ' * [[wiki:custom_head|사용자 HEAD]]\r\n' + \
                                     '== 기타 ==\r\n' + \
                                     ' * [[wiki:alarm|알림]]\r\n' + \
-                                    ' * [[wiki:view_log|지나온 문서]]\r\n' + \
                                     ' * [[wiki:watch_list|주시 문서]]\r\n' + \
                                     ' * [[wiki:count|활동 횟수]]\r\n', 0, 0, 0),
         menu = 0
@@ -3389,24 +3375,6 @@ def watch_list_name(name = None):
     conn.commit()
 
     return redirect('/watch_list')
-
-@app.route('/view_log')
-def view_log():
-    data = '<ul>'
-    if session['View_List']:
-        data += '<li>최근 50개</li><hr>'
-        m = re.findall('([^\n]+)\n', session['View_List'])
-        for d in m:
-            data += '<li><a href="/w/' + url_pas(d) + '">' + d + '</a></li>'
-    else:
-        data += '<li>기록 없음</li>'
-    data += '</ul>'
-
-    return html_minify(template('index', 
-        imp = ['지나온 문서', wiki_set(conn, 1), custom(conn), other2([0, 0])],
-        data = data,
-        menu = [['user', '사용자']]
-    ))
 
 @app.route('/custom_head', methods=['GET', 'POST'])
 def custom_head_view():
@@ -3527,16 +3495,7 @@ def main_file(test = None):
 
 @app.errorhandler(404)
 def error_404(e):
-    return '<!-- 나니카가 하지마룻테 코토와 오와리니 츠나가루다난테 캉가에테모 미나캇타. 이야, 캉카에타쿠나캇탄다... \
-            아마오토 마도오 타타쿠 소라카라 와타시노 요-나 카나시미 훗테루 토메도나쿠 이마오 누라시테 \
-            오모이데 난테 이라나이노 코코로가 쿠루시쿠나루 다케다토 No more! September Rain No more! September Rain \
-            이츠닷테 아나타와 미짓카닷타 와자와자 키모치오 타시카메룻테 코토모 히츠요-쟈나쿠테 \
-            시젠니 나카라요쿠 나레타카라 안신시테타노 카모시레나이네 도-시테? 나미니 토이카케루케도 \
-            나츠노 하지마리가 츠레테키타 오모이 나츠가 오와루토키 키에챠우모노닷타 난테 시라나쿠테 \
-            토키메이테타 아츠이 키세츠 \
-            우미베노 소라가 히캇테 토츠젠 쿠모가 나가레 오츠부노 아메 와타시노 나카노 나미다미타이 \
-            콘나니 타노시이 나츠가 즛토 츠즈이테쿳테 신지테타요 But now... September Rain But now... September Rain -->' + \
-            redirect('/w/' + url_pas(wiki_set(conn, 2)))
+    return '<!-- 나니카가 하지마룻테 코토와 오와리니 츠나가루다난테 캉가에테모 미나캇타. 이야, 캉카에타쿠나캇탄다... 아마오토 마도오 타타쿠 소라카라 와타시노 요-나 카나시미 훗테루 토메도나쿠 이마오 누라시테 오모이데 난테 이라나이노 코코로가 쿠루시쿠나루 다케다토 No more! September Rain No more! September Rain 이츠닷테 아나타와 미짓카닷타 와자와자 키모치오 타시카메룻테 코토모 히츠요-쟈나쿠테 시젠니 나카라요쿠 나레타카라 안신시테타노 카모시레나이네 도-시테? 나미니 토이카케루케도 나츠노 하지마리가 츠레테키타 오모이 나츠가 오와루토키 키에챠우모노닷타 난테 시라나쿠테 토키메이테타 아츠이 키세츠 우미베노 소라가 히캇테 토츠젠 쿠모가 나가레 오츠부노 아메 와타시노 나카노 나미다미타이 콘나니 타노시이 나츠가 즛토 츠즈이테쿳테 신지테타요 But now... September Rain But now... September Rain -->' + redirect('/w/' + url_pas(wiki_set(conn, 2)))
 
 if __name__=="__main__":
     app.secret_key = rep_key

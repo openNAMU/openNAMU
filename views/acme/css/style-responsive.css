@@ -484,15 +484,15 @@ textarea {
     width: 100%;
 }
 
-a.not_thing {
+#not_thing {
     color: #bf4c4c;
 }
 
-a.out_link {
+#out_link {
     color: #008000;
 }
 
-a.out_link::before {
+#out_link::before {
     padding: 0px;
     background: transparent;
     color: green;
