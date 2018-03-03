@@ -365,7 +365,7 @@ def start(conn, data, title):
 
     # 인용문 구현
     while 1:
-        block = re.search('(\n(?:> ?(?:(?:(?!\n).)+)\n)+)', data)
+        block = re.search('(\n(?:> ?(?:(?:(?!\n).)+)?\n)+)', data)
         if block:
             block = block.groups()[0]
 
@@ -373,7 +373,7 @@ def start(conn, data, title):
             block = re.sub('\n> ?', '\n', block)
             block = re.sub('\n$', '', block)
 
-            data = re.sub('(\n(?:> ?(?:(?:(?!\n).)+)\n)+)', '<blockquote>' + block + '</blockquote>\n', data, 1)
+            data = re.sub('(\n(?:> ?(?:(?:(?!\n).)+)?\n)+)', '<blockquote>' + block + '</blockquote>\n', data, 1)
         else:
             break
 
@@ -398,7 +398,7 @@ def start(conn, data, title):
                 else:
                     break
 
-            data = re.sub('(\n(?:(?: *)\* ?(?:(?:(?!\n).)+)\n)+)', '\n\n<ul>' + li + '</ul>', data, 1)
+            data = re.sub('(\n(?:(?: *)\* ?(?:(?:(?!\n).)+)\n)+)', '\n\n<ul>' + li + '</ul>\n', data, 1)
         else:
             break
 
@@ -430,7 +430,7 @@ def start(conn, data, title):
                     return_table = table_parser(all_table[1], all_table[2], all_table[0])
                     number = return_table[6]
 
-                    table = re.sub('^\|\|((?:<(?:(?:(?!>).)+)>)*)', '\n<table ' + return_table[5] + ' ' + return_table[0] + '><tbody><tr ' + return_table[1] + '><td ' + return_table[2] + ' ' + return_table[3] + ' ' + return_table[4] + '>\n', table, 1)
+                    table = re.sub('^((?:\|\|)+)((?:<(?:(?:(?!>).)+)>)*)', '\n<table ' + return_table[5] + ' ' + return_table[0] + '><tbody><tr ' + return_table[1] + '><td ' + return_table[2] + ' ' + return_table[3] + ' ' + return_table[4] + '>\n', table, 1)
                 else:
                     break
 
@@ -604,6 +604,8 @@ def start(conn, data, title):
         category = ''
 
     data += category
+
+    print([data])
     
     # 마지막 처리
     data = re.sub('(?P<in><\/h[0-9]>)(\n)+', '\g<in>', data)
