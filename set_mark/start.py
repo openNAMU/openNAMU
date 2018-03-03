@@ -604,8 +604,6 @@ def start(conn, data, title):
         category = ''
 
     data += category
-
-    print([data])
     
     # 마지막 처리
     data = re.sub('(?P<in><\/h[0-9]>)(\n)+', '\g<in>', data)
