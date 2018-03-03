@@ -119,9 +119,19 @@ def start(conn, data, title):
     # XSS 이스케이프
     data = html.escape(data)
 
-    data = re.sub('&lt;(?P<in>(table|row)? ?(text|bg|border|width|height|class)?(color|align)?(=(((?!&gt;).)+))|\(|:|\)|(-|\|)[0-9]+|(#(?:[0-9a-f-A-F]{3}){1,2})|(\w+))&gt;', '<\g<in>>', data)
     data = re.sub('&lt;(?P<in>\/?math)&gt;', '<\g<in>>', data)
-    
+
+    while 1:
+        table_back = re.search('\|\|((?:&lt;(?:(?:(?!&gt;)))&gt;)+)', data)
+        if table_back:
+            table_back = table_back.groups()[0]
+
+            table_back = re.sub('&lt;', '<', table_back)
+            table_back = re.sub('&gt;', '>', table_back)
+
+            data = re.sub('\|\|((?:&lt;(?:(?:(?!&gt;)))&gt;)+)', '\|\|' + table_back, data, 1)
+        else:
+            break
 
     while 1:
         block_back = re.search('\r\n((?:&gt;)+)', data)
@@ -149,6 +159,7 @@ def start(conn, data, title):
             else:
                 include_data = 'Test'
 
+            include_link = include
             include = re.sub('^((?:(?!,).)+)', '', include)
 
             curs.execute("select data from data where title = ?", [include_data])
@@ -170,8 +181,9 @@ def start(conn, data, title):
 
                 data = re.sub('\[include\(((?:(?!\)\]).)+)\)\]', '\r\n' + include_parser + '\r\n', data, 1)
             else:
-                data = re.sub('\[include\(((?:(?!\)\]).)+)\)\]', '[[' + include + ']]', data, 1)
+                include_link = re.sub('(, ?(?:(?:(?!,).)+))+$', '', include_link)
 
+                data = re.sub('\[include\(((?:(?!\)\]).)+)\)\]', '[[' + include_link + ']]', data, 1)
         else:
             break
 
@@ -208,42 +220,6 @@ def start(conn, data, title):
 
     # 넘겨주기 변환
     data = re.sub('\r\n#(?:redirect|넘겨주기) (?P<in>(?:(?!\r\n).)+)\r\n', '<meta http-equiv="refresh" content="0; url=/w/\g<in>?froms=' + tool.url_pas(title) + '">', data)
-
-    # 각주 처리
-    footnote_number = 0
-    footnote_all = '\r\n<hr><ul id="footnote_data">'
-    while 1:
-        footnote = re.search('(?:\[\*((?:(?! ).)*) ((?:(?!\]).)+)\]|(\[각주\]))', data)
-        if footnote:
-            footnote_data = footnote.groups()
-
-            if footnote_data[2]:
-                footnote_all += '</ul>'
-
-                data = re.sub('(?:\[\*((?:(?! ).)*) ((?:(?!\]).)+)\]|(\[각주\]))', footnote_all, data, 1)
-
-                footnote_all = '\r\n<hr><ul id="footnote_data">'
-            else:
-                footnote = footnote_data[1]
-                footnote_name = footnote_data[0]
-
-                footnote_number += 1
-
-                if not footnote_name:
-                    footnote_name = str(footnote_number)
-
-                footnote_all += '<li><a href="#rfn-' + str(footnote_number) + '" id="fn-' + str(footnote_number) + '">(' + footnote_name + ')</a> ' + footnote + '</li>'
-
-                data = re.sub('(?:\[\*((?:(?! ).)*) ((?:(?!\]).)+)\]|(\[각주\]))', '<sup><a href="#fn-' + str(footnote_number) + '" id="rfn-' + str(footnote_number) + '">(' + footnote_name + ')</a></sup>', data, 1)
-        else:
-            break
-
-    footnote_all += '</ul>'
-
-    if footnote_all == '\r\n<hr><ul id="footnote_data"></ul>':
-        footnote_all = ''
-
-    data = re.sub('\r\n$', footnote_all, data)
 
     # [목차(없음)] 처리
     if not re.search('\[목차\(없음\)\]\r\n', data):
@@ -285,6 +261,7 @@ def start(conn, data, title):
             all_stack = re.sub('0.', '', all_stack)
             
             data = re.sub('\r\n(={1,6}) ?((?:(?!=).)+) ?={1,6}\r\n', '\r\n<h' + toc_number + ' id="s-' + re.sub('\.$', '', all_stack) + '"><a href="#toc">' + all_stack + '</a> ' + toc[1] + ' <span style="font-size: 12px"><a href="/edit/' + tool.url_pas(title) + '?section=' + str(edit_number) + '">(편집)</a></span></h' + toc_number + '>\r\n', data, 1)
+
             toc_data += '<span style="margin-left: ' + str((toc_full - toc_top_stack) * 10) + 'px;"><a href="#s-' + re.sub('\.$', '', all_stack) + '">' + all_stack + '</a> ' + toc[1] + '</span>\r\n'
         else:
             break
@@ -310,6 +287,7 @@ def start(conn, data, title):
     data = re.sub("\[nicovideo\((?P<in>(?:(?!,|\)\]).)+)(?:(?:(?!\)\]).)*)\)\]", "[[http://embed.nicovideo.jp/watch/\g<in>|\g<in>]]", data)
     data = re.sub('\[ruby\((?P<in>(?:(?!,).)+)\, ?(?P<out>(?:(?!\)\]).)+)\)\]', '<ruby>\g<in><rp>(</rp><rt>\g<out></rt><rp>)</rp></ruby>', data)
 
+    # 원래 코드 재탕
     now_time = tool.get_time()
     data = re.sub('\[date\]', now_time, data)
     
@@ -570,6 +548,43 @@ def start(conn, data, title):
         else:
             break
 
+    # 각주 처리
+    footnote_number = 0
+    footnote_all = '\r\n<hr><ul id="footnote_data">'
+    while 1:
+        footnote = re.search('(?:\[\*((?:(?! ).)*) ((?:(?!\]).)+)\]|(\[각주\]))', data)
+        if footnote:
+            footnote_data = footnote.groups()
+
+            if footnote_data[2]:
+                footnote_all += '</ul>'
+
+                data = re.sub('(?:\[\*((?:(?! ).)*) ((?:(?!\]).)+)\]|(\[각주\]))', footnote_all, data, 1)
+
+                footnote_all = '\r\n<hr><ul id="footnote_data">'
+            else:
+                footnote = footnote_data[1]
+                footnote_name = footnote_data[0]
+
+                footnote_number += 1
+
+                if not footnote_name:
+                    footnote_name = str(footnote_number)
+
+                footnote_all += '<li><a href="#rfn-' + str(footnote_number) + '" id="fn-' + str(footnote_number) + '">(' + footnote_name + ')</a> ' + footnote + '</li>'
+
+                data = re.sub('(?:\[\*((?:(?! ).)*) ((?:(?!\]).)+)\]|(\[각주\]))', '<sup><a href="#fn-' + str(footnote_number) + '" id="rfn-' + str(footnote_number) + '">(' + footnote_name + ')</a></sup>', data, 1)
+        else:
+            break
+
+    footnote_all += '</ul>'
+
+    if footnote_all == '\r\n<hr><ul id="footnote_data"></ul>':
+        footnote_all = ''
+
+    data = re.sub('\r\n$', footnote_all, data)
+
+    # 분류 마지막 처리
     category += '</div>'
     category = re.sub(' / <\/div>$', '</div>', category)
 
@@ -582,9 +597,12 @@ def start(conn, data, title):
     data = re.sub('(?P<in><\/h[0-9]>)(\r\n)+', '\g<in>', data)
     data = re.sub('<\/ul>\r\n\r\n', '</ul>\r\n', data)
     data = re.sub('^(\r\n)+', '', data)
-    data = re.sub('(\r\n)+$', '', data)
+    data = re.sub('(\r\n)+<hr><ul id="footnote_data">', '<hr><ul id="footnote_data">', data)
     data = re.sub('(?P<in><td(((?!>).)*)>)\r\n', '\g<in>', data)
     data = re.sub('(\r\n)?<hr>(\r\n)?', '<hr>', data)
     data = re.sub('\r\n', '<br>', data)
+
+    if data == '':
+        data = '문서가 없습니다.'
 
     return [data, plus_data]

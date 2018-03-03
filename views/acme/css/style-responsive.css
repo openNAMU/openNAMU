@@ -76,7 +76,7 @@ ul {
     text-decoration: none;
 }
 
-label, span, body, strong, b, div, h1, h2, h3, h4, h5, h6, h7, input { 
+label, span, body, strong, b, div, h1, h2, h3, h4, h5, h6, input { 
     font-family: "helvetica", "Noto Sans Japanese", "나눔고딕", "맑은 고딕", "Nanum Gothic", "sans-serif"; 
 }
 
@@ -210,6 +210,7 @@ input {
 
 .breadcrumbs h1 {
     word-break: break-all;
+    border: none;
 }
 
 #back_title {
@@ -507,6 +508,8 @@ textarea {
 h1, h2, h3, h4, h5, h6 {
     margin-bottom: 10px;
     margin-top: 10px;
+    border-bottom: 1px solid #CCC;
+    padding-bottom: 5px;
 }
 
 .navbar-brand {

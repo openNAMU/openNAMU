@@ -923,7 +923,7 @@ def please():
     data_list = curs.fetchall()
     for data in data_list:
         if var != data[0]:
-            div += '<li><a class="not_thing" href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a></li>'        
+            div += '<li><a id="not_thing" href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a></li>'        
             var = data[0]
         
     div += '</ul>' + next_fix('/please?num=', num, data_list)
@@ -1110,7 +1110,7 @@ def deep_search(name = None):
     if curs.fetchall():
         div = '<ul><li>문서로 <a href="/w/' + url_pas(name) + '">바로가기</a></li></ul><hr><ul>'
     else:
-        div = '<ul><li>문서가 없습니다. <a class="not_thing" href="/w/' + url_pas(name) + '">바로가기</a></li></ul><hr><ul>'
+        div = '<ul><li>문서가 없습니다. <a id="not_thing" href="/w/' + url_pas(name) + '">바로가기</a></li></ul><hr><ul>'
 
     curs.execute("select distinct title, case when title like ? then '제목' else '내용' end from data where title like ? or data like ? order by case when title like ? then 1 else 2 end limit ?, '50'", ['%' + name + '%', '%' + name + '%', '%' + name + '%', '%' + name + '%', str(sql_num)])
     all_list = curs.fetchall()
@@ -2186,7 +2186,7 @@ def close_topic_list(name = None, tool = None):
             curs.execute("select sub from rd where title = ? order by date desc", [name])
             sub = '토론 목록'
             menu = [['w/' + url_pas(name), '문서']]
-            plus =  '<a href="/topic/' + url_pas(name) + '/close">(닫힘)</a> <a href="/topic/' + url_pas(name) + '/agree">(합의)</a><hr><input placeholder="토론명" class="form-control" name="topic" type="text"><hr><button type="submit">만들기</button>'
+            plus =  '<a href="/topic/' + url_pas(name) + '/close">(닫힘)</a> <a href="/topic/' + url_pas(name) + '/agree">(합의)</a><hr><input placeholder="토론명" name="topic" type="text"><hr><button type="submit">만들기</button>'
 
         for data in curs.fetchall():
             curs.execute("select data, date, ip, block from topic where title = ? and sub = ? and id = '1'", [name, data[0]])
@@ -2573,7 +2573,7 @@ def user_ban(name = None):
             data += '<select name="day">' + day + '</select> 일 <hr>'
             data += '<select name="hour">' + hour + '</select> 시 '
             data += '<select name="minu">' + minu + '</select> 분 까지<hr>'
-            data += '<input placeholder="사유" class="form-control" name="why" type="text"><br>' + plus
+            data += '<input placeholder="사유" name="why" type="text"><br>' + plus
 
         return html_minify(template('index', 
             imp = [name, wiki_set(conn, 1), custom(conn), other2([' (' + now + ')', 0])],
@@ -2822,29 +2822,29 @@ def read_view(name = None):
         curs.execute("select link from back where title = ? and type='cat' order by link asc", [name])
         back = curs.fetchall()
         if back:
-            div = '[목차(없음)]\r\n== 분류 ==\r\n'
+            div = '<br><h2 id="cate_normal">분류</h2><ul>'
             u_div = ''
             i = 0
             
             for data in back:       
                 if re.search('^분류:', data[0]):
                     if u_div == '':
-                        u_div = '=== 하위 분류 ===\r\n'
+                        u_div = '</ul><br><h3 id="cate_under">하위 분류</h3><ul>'
 
-                    u_div += ' * [[:' + data[0] + ']]\r\n'
+                    u_div += '<li><a href="' + url_pas(data[0]) + '">' + data[0] + '</a></li>'
                 elif re.search('^틀:', data[0]):
                     curs.execute("select data from data where title = ?", [data[0]])
                     db_data = curs.fetchall()
                     if db_data:
                         # cat_data = re.sub("\[\[(분류:(?:(?:(?!\]\]|#include).)+))\]\]", "", mid_pas(db_data[0][0], 0, 1, 0, 0)[0])
-                        if re.search('\[\[' + name + '|include]]', cat_data):
-                            div += ' * [[' + data[0] + ']]\r\n * [[wiki:xref/' + url_pas(data[0]) + '|' + data[0] + ']] (역링크)\r\n'
-                        else:
-                            div += ' * [[' + data[0] + ']]\r\n'
+                        # if re.search('\[\[' + name + '|include]]', cat_data):
+                            # div += '<li><a href="' + url_pas(data[0]) + '">' + data[0] + '</a></li><li><a href="/xref/' + url_pas(data[0]) + '>' + data[0] + '</a> (역링크)</li>'
+                        # else:
+                        div += '<li><a href="' + url_pas(data[0]) + '">' + data[0] + '</a></li>'
                 else:
-                    div += ' * [[' + data[0] + ']]\r\n'
+                    div += '<li><a href="' + url_pas(data[0]) + '">' + data[0] + '</a></li>'
 
-            div += u_div
+            div += '</ul>' + u_div
 
     if num:
         curs.execute("select title from history where title = ? and id = ? and hide = 'O'", [name, str(num)])
@@ -2941,10 +2941,7 @@ def read_view(name = None):
         else:
             r_date = 0
 
-    if div != '' and end_data != '':
-        div = end_data + '<br>' + namumark(conn, name, div, 0, 0, 0)
-    else:
-        div = end_data + namumark(conn, name, div, 0, 0, 0)
+    div = end_data + div
 
     return html_minify(template('index', 
         imp = [name, wiki_set(conn, 1), custom(conn), other2([sub + acl, r_date])],
