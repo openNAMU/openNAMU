@@ -363,6 +363,63 @@ def topic_check(conn, name, sub):
 
     return 0
 
+def ban_insert(conn, name, end, why, login, blocker = ip_check()):
+    curs = conn.cursor()
+    time = get_time()
+    if re.search("^([0-9]{1,3}\.[0-9]{1,3})$", name):
+        band = 'O'
+    else:
+        band = ''
+
+    if end != '':
+        year = int(int(end) / 525600)
+        month = int(int(end) % 525600 / 40320)
+        day = int(int(end) % 525600 % 40320 / 1440)
+        hour = int(int(end) % 525600 % 40320 % 1440 / 60)
+        minute = int(int(end) % 525600 % 40320 % 1440 % 60)
+
+        end_data = [month, day, hour, minute]
+
+        match = re.search("^([^-]+)-([^-]+)-([^ ]+) ([^:]+):([^:]+):(.+)$", time)
+        time_data = match.groups()
+
+        time_cut = [11, 27, 23, 59]
+        test_list = [int(time_data[0]) + year, 0, 0, 0, 0]
+        for number in range(0, 4):
+            if month + int(time_data[number + 1]) > time_cut[number]:
+                test_list[number] += 1
+                test_list[number + 1] = end_data[number] + int(time_data[number + 1]) - (time_cut[number] + 1)
+            else:
+                test_list[number + 1] = end_data[number] + int(time_data[number + 1])
+
+        time_list = [test_list[1], test_list[2], test_list[3], test_list[4]]
+        number = 0
+        for time_fix in time_list:
+            if not re.search("[0-9]{2}", str(time_fix)):
+                time_list[number] = '0' + str(time_fix)   
+            else:
+                time_list[number] = str(time_fix)
+
+            number += 1
+
+        end = str(test_list[0]) + '-' + time_list[0] + '-' + time_list[1] + ' ' + time_list[2] + ':' + time_list[3] + ':' + time_data[5]
+    else:
+        end = ''
+
+    curs.execute("select block from ban where block = ?", [name])
+    if curs.fetchall():
+        curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, ?)", [name, '해제', time, blocker, '', band])
+        curs.execute("delete from ban where block = ?", [name])
+    else:
+        if login:
+            login = 'O'
+        else:
+            login = ''
+
+        curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, ?)", [name, end, time, blocker, why, band])
+        curs.execute("insert into ban (block, end, why, band, login) values (?, ?, ?, ?, ?)", [name, end, why, band, login])
+    conn.commit()
+
 def rd_plus(conn, title, sub, date):
     curs = conn.cursor()
     curs.execute("select title from rd where title = ? and sub = ?", [title, sub])

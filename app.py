@@ -108,7 +108,6 @@ if not rep_data:
 
         if rep_key:
             curs.execute("insert into other (name, data) values ('key', ?)", [rep_key])
-            
             break
         else:
             pass
@@ -168,6 +167,21 @@ try:
     curs.execute("alter table user add email text default ''")
 except:
     pass
+
+try:
+    curs.execute('select name, sub from filter')
+    filter_name = curs.fetchall()
+    for filter_delete in filter_name:
+        filter_change = re.search('^((?:(?! ).)+) ((?:(?!:).)+):(.+)$', filter_delete[1])
+        if filter_change:
+            filter_change = filter_change.groups()
+            filter_change = filter_change[0] * 44640 + filter_change[1] * 1440 + filter_change[2]
+            curs.execute("update filter set sub = ? where name = ?", [filter_change, filter_delete[0]])
+        else:
+            curs.execute("update filter set sub = '1' where name = ?", [filter_delete[0]])
+except:
+    pass
+        
 
 conn.commit()
 
@@ -1313,18 +1327,11 @@ def set_edit_filter(name = None):
         if admin_check(conn, 1, 'edit_filter edit') != 1:
             return re_error('/error/3')
 
-        if request.form['day'] == '00':
-            end = ''
-        elif request.form['day'] == '09':
-            end = 'X'
-        else:
-            end = request.form['day'] + ' ' + request.form['hour'] + ':' + request.form['minu'] 
-
         curs.execute("select name from filter where name = ?", [name])
         if curs.fetchall():
-            curs.execute("update filter set regex = ?, sub = ? where name = ?", [request.form['content'], end, name])
+            curs.execute("update filter set regex = ?, sub = ? where name = ?", [request.form.get('content', '테스트'), request.form.get('end', ''), name])
         else:
-            curs.execute("insert into filter (name, regex, sub) values (?, ?, ?)", [name, request.form['content'], end])
+            curs.execute("insert into filter (name, regex, sub) values (?, ?, ?)", [name, request.form.get('content', '테스트'), request.form.get('end', '')])
         conn.commit()
     
         return redirect('/edit_filter/' + url_pas(name))
@@ -1333,55 +1340,20 @@ def set_edit_filter(name = None):
         exist = curs.fetchall()
         if exist:
             textarea = exist[0][0]
-
-            match = re.search("^([^ ]+) ([^:]+):([^:]+)$", exist[0][1])
-            if match:
-                end_data = match.groups()
-            else:
-                end_data = ['', '', '']
+            time_data = exist[0][1]
         else:
             textarea = ''
-            end_data = ['', '', '']
+            time_data = ''
 
         if admin_check(conn, 1, None) != 1:
             stat = 'disabled'
         else:
             stat = ''
 
-        day = '<option value="00">차단 X</option>'
-        if exist[0][1] == 'X':
-            day += '<option value="09" selected>영구</option>'
-        else:
-            day += '<option value="09">영구</option>'
-
-        for i in range(0, 32):
-            if str(i) == end_data[0]:
-                day += '<option value="' + str(i) + '" selected>' + str(i) + '</option>'
-            else:
-                day += '<option value="' + str(i) + '">' + str(i) + '</option>'
-
-        hour = ''
-        for i in range(0, 24):
-            if str(i) == end_data[1]:
-                hour += '<option value="' + str(i) + '" selected>' + str(i) + '</option>'
-            else:
-                hour += '<option value="' + str(i) + '">' + str(i) + '</option>'
-
-        minu = ''
-        for i in range(0, 61):
-            if str(i) == end_data[2]:
-                minu += '<option value="' + str(i) + '" selected>' + str(i) + '</option>'
-            else:
-                minu += '<option value="' + str(i) + '">' + str(i) + '</option>'
-
-        data = '<select ' + stat + ' name="day">' + day + '</select> 일 '
-        data += '<select ' + stat + ' name="hour">' + hour + '</select> 시 '
-        data += '<select ' + stat + ' name="minu">' + minu + '</select> 분 동안<hr>'
-
         return html_minify(template('index', 
             imp = [name, wiki_set(conn, 1), custom(conn), other2([' (편집 필터)', 0])],
             data = '<form method="post"> \
-                        ' + data + ' \
+                        <input ' + stat + ' placeholder="분 차단" name="end" value="' + html.escape(time_data) + '" type="text"><br><br><ul><li>비우면 영구 차단</li><li>1달은 28일로 취급</li></ul><hr> \
                         <input ' + stat + ' placeholder="정규식" name="content" value="' + html.escape(textarea) + '" type="text"><hr> \
                         <button ' + stat + ' id="save" type="submit">저장</button> \
                     </form>',
@@ -1403,58 +1375,8 @@ def edit(name = None):
             for data_list in data:
                 match = re.compile(data_list[0])
                 if match.search(request.form['content']):
-                    if data_list[1] == 'X':
-                        curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, '')", [ip, '', get_time(), '도구:편집 필터', '편집 필터에 의한 차단'])
-                        curs.execute("insert into ban (block, end, why, band, login) values (?, '', ?, '', '')", [ip, '편집 필터에 의한 차단'])
-                    elif data_list[1] != '':
-                        match = re.search("^([^ ]+) ([^:]+):([^:]+)$", data_list[1])
-                        end_data = match.groups()
+                    ban_insert(conn, ip, data_list[1], '편집 필터에 의한 차단', None, '도구:편집 필터')
 
-                        match = re.search("^([^-]+)-([^-]+)-([^ ]+) ([^:]+):([^:]+):(.+)$", get_time())
-                        time_data = match.groups()
-
-                        if int(time_data[2]) + int(end_data[0]) > 29:
-                            month = int(time_data[1]) + 1
-                            day = int(time_data[2]) + int(end_data[0]) - 30
-
-                            if month > 12:
-                                year = int(time_data[0]) + 1
-                                month -= 12
-                            else:
-                                year = int(time_data[0])
-                        else:
-                            month = int(time_data[1])
-                            day = int(time_data[2]) + int(end_data[0])
-                            year = int(time_data[0])
-
-                        if int(time_data[3]) + int(end_data[1]) > 23:
-                            day += 1
-                            hour = int(time_data[3]) + int(end_data[1]) - 24
-                        else:
-                            hour = int(time_data[3]) + int(end_data[1])
-
-                        if int(time_data[4]) + int(end_data[2]) > 59:
-                            hour += 1
-                            minu = int(time_data[4]) + int(end_data[2]) - 60
-                        else:
-                            minu = int(time_data[4]) + int(end_data[2])
-
-                        time_list = [month, day, hour, minu]
-                        num = 0
-                        for time_fix in time_list:
-                            if not re.search("[0-9]{2}", str(time_fix)):
-                                time_list[num] = '0' + str(time_fix)   
-                            else:
-                                time_list[num] = str(time_fix)
-                            
-                            num += 1
-
-                        end = str(year) + '-' + time_list[0] + '-' + time_list[1] + ' ' + time_list[2] + ':' + time_list[3] + ':' + time_data[5]
-
-                        curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, '')", [ip, end, get_time(), '도구:편집 필터', '편집 필터에 의한 차단'])
-                        curs.execute("insert into ban (block, end, why, band, login) values (?, ?, ?, '', '')", [ip, end, '편집 필터에 의한 차단'])
-                    
-                    conn.commit()
                     return re_error(conn, '/error/21')
 
         if captcha_post(request.form.get('g-recaptcha-response', None), conn) == 1:
@@ -2434,41 +2356,8 @@ def user_ban(name = None):
         if admin_check(conn, 1, 'ban (' + name + ')') != 1:
             return re_error(conn, '/error/3')
 
-        ip = ip_check()
-        time = get_time()
+        ban_insert(conn, name, request.form.get('end', ''), request.form.get('why', None), request.form.get('login', None))
 
-        time_list = [request.form['month'], request.form['day'], request.form['hour'], request.form['minu']]
-        num = 0
-        for time_fix in time_list:
-            if not re.search("[0-9]{2}", time_fix):
-                time_list[num] = '0' + time_fix
-                
-            num += 1
-        
-        if request.form['year'] == '09':
-            end = ''
-        else:
-            end = request.form['year'] + '-' + time_list[0] + '-' + time_list[1] + ' ' + time_list[2] + ':' + time_list[3] + ':00'
-
-        curs.execute("select block from ban where block = ?", [name])
-        if curs.fetchall():
-            curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, '')", [name, '해제', time, ip, ''])
-            curs.execute("delete from ban where block = ?", [name])
-        else:
-            if re.search("^([0-9]{1,3}\.[0-9]{1,3})$", name):
-                band_d = 'O'
-            else:
-                band_d = ''
-
-            if request.form['login_ok'] != '':
-                login = 'O'
-            else:
-                login = ''
-
-            curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, ?)", [name, end, time, ip, request.form['why'], band_d])
-            curs.execute("insert into ban (block, end, why, band, login) values (?, ?, ?, ?, ?)", [name, end, request.form['why'], band_d, login])
-
-        conn.commit()
         return redirect('/ban/' + url_pas(name))            
     else:
         if admin_check(conn, 1, None) != 1:
@@ -2481,64 +2370,19 @@ def user_ban(name = None):
             if end[0][0] == '':
                 data = '영구 차단<hr>'
             else:
-                data = end[0][0] + ' 까지 차단<hr>'
+                data = end[0][0] + '까지 차단<hr>'
         else:
             if re.search("^([0-9]{1,3}\.[0-9]{1,3})$", name):
                 now = '대역 차단'
             else:
                 now = '차단'
-
-            now_time = get_time()
-            m = re.search('^([0-9]{4})-([0-9]{2})-([0-9]{2}) ([0-9]{2}):([0-9]{2}):[0-9]{2}', now_time)
-            g = m.groups()
-
-            year = '<option value="09">영구</option>'
-            for i in range(int(g[0]), int(g[0]) + 11):
-                if i == int(g[0]):
-                    year += '<option value="' + str(i) + '" selected>' + str(i) + '</option>'
-                else:
-                    year += '<option value="' + str(i) + '">' + str(i) + '</option>'
-
-            month = ''
-            for i in range(1, 13):
-                if i == int(g[1]):
-                    month += '<option value="' + str(i) + '" selected>' + str(i) + '</option>'
-                else:
-                    month += '<option value="' + str(i) + '">' + str(i) + '</option>'
-                
-            day = ''
-            for i in range(1, 32):
-                if i == int(g[2]):
-                    day += '<option value="' + str(i) + '" selected>' + str(i) + '</option>'
-                else:
-                    day += '<option value="' + str(i) + '">' + str(i) + '</option>'
-
-            hour = ''
-            for i in range(0, 24):
-                if i == int(g[3]):
-                    hour += '<option value="' + str(i) + '" selected>' + str(i) + '</option>'
-                else:
-                    hour += '<option value="' + str(i) + '">' + str(i) + '</option>'
-
-            minu = ''
-            for i in range(0, 61):
-                if i == int(g[4]):
-                    minu += '<option value="' + str(i) + '" selected>' + str(i) + '</option>'
-                else:
-                    minu += '<option value="' + str(i) + '">' + str(i) + '</option>'
-
-            is_it = ''
+            
             if re.search('(\.|:)', name):
-                plus = '<input type="checkbox" name="login_ok"> 로그인 가능<hr>'
+                plus = '<input type="checkbox" name="login"> 로그인 가능<hr>'
             else:
                 plus = ''
-            
-            data = '<select name="year">' + year + '</select> 년 '
-            data += '<select name="month">' + month + '</select> 월 '
-            data += '<select name="day">' + day + '</select> 일 <hr>'
-            data += '<select name="hour">' + hour + '</select> 시 '
-            data += '<select name="minu">' + minu + '</select> 분 까지<hr>'
-            data += '<input placeholder="사유" name="why" type="text"><br>' + plus
+
+            data = '<input placeholder="사유" name="why" type="text"><hr><input placeholder="분 차단" name="end" type="text"><br><br><ul><li>비우면 영구 차단</li><li>1달은 28일로 취급</li></ul><hr>' + plus
 
         return html_minify(template('index', 
             imp = [name, wiki_set(conn, 1), custom(conn), other2([' (' + now + ')', 0])],
@@ -3235,10 +3079,17 @@ def user_info():
             acl = '일반'
     else:
         acl = '차단'
+
+        curs.execute("select end, login from ban where block = ?", [ip])
+        block_data = curs.fetchall()
+        if block_data:
+            if block_data[0][0] != '':
+                acl += ' (' + block_data[0][0] + '까지)'
+            else:
+                acl += ' (영구)'
         
-        curs.execute("select block from ban where block = ? and login = 'O'", [ip])
-        if curs.fetchall():
-            acl += ' (로그인 가능)'
+            if block_data[0][1] != '':
+                acl += ' (로그인 가능)'
             
     if custom(conn)[2] != 0:
         ip_user = '<a href="/w/사용자:' + ip + '">' + ip + '</a>'
