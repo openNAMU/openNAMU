@@ -12,22 +12,22 @@ def table_parser(data, cel_data, start_data, num = 0):
     row = ''
     cel = ''
 
-    table_width = re.search("<table ?width=((?:(?!>).)*)>", data)
+    table_width = re.search("&lt;table ?width=((?:(?!&gt;).)*)&gt;", data)
     if table_width:
         all_table += 'width: ' + table_width.groups()[0] + 'px;'
     
-    table_height = re.search("<table ?height=((?:(?!>).)*)>", data)
+    table_height = re.search("&lt;table ?height=((?:(?!&gt;).)*)&gt;", data)
     if table_height:
         all_table += 'height: ' + table_height.groups()[0] + 'px;'
     
-    table_align = re.search("<table ?align=((?:(?!>).)*)>", data)
+    table_align = re.search("&lt;table ?align=((?:(?!&gt;).)*)&gt;", data)
     if table_align:
         if table_align.groups()[0] == 'right':
             all_table += 'float: right;'
         elif table_align.groups()[0] == 'center':
             all_table += 'margin: auto;'
             
-    table_text_align = re.search("<table ?textalign=((?:(?!>).)*)>", data)
+    table_text_align = re.search("&lt;table ?textalign=((?:(?!&gt;).)*)&gt;", data)
     if table_text_align:
         num = 1
         if table_text_align.groups()[0] == 'right':
@@ -35,7 +35,7 @@ def table_parser(data, cel_data, start_data, num = 0):
         elif table_text_align.groups()[0] == 'center':
             all_table += 'text-align: center;'
 
-    row_t_a = re.search("<row ?textalign=((?:(?!>).)*)>", data)
+    row_t_a = re.search("&lt;row ?textalign=((?:(?!&gt;).)*)&gt;", data)
     if row_t_a:
         if row_t_a.groups()[0] == 'right':
             row_style += 'text-align: right;'
@@ -44,43 +44,43 @@ def table_parser(data, cel_data, start_data, num = 0):
         else:
             row_style += 'text-align: left;'
     
-    table_cel = re.search("<-((?:(?!>).)*)>", data)
+    table_cel = re.search("&lt;-((?:(?!&gt;).)*)&gt;", data)
     if table_cel:
         cel = 'colspan="' + table_cel.groups()[0] + '"'
     else:
         cel = 'colspan="' + str(round(len(start_data) / 2)) + '"'   
 
-    table_row = re.search("<\|((?:(?!>).)*)>", data)
+    table_row = re.search("&lt;\|((?:(?!&gt;).)*)&gt;", data)
     if table_row:
         row = 'rowspan="' + table_row.groups()[0] + '"'
 
-    row_bgcolor = re.search("<rowbgcolor=(#(?:[0-9a-f-A-F]{3}){1,2}|\w+)>", data)
+    row_bgcolor = re.search("&lt;rowbgcolor=(#(?:[0-9a-f-A-F]{3}){1,2}|\w+)&gt;", data)
     if row_bgcolor:
         row_style += 'background: ' + row_bgcolor.groups()[0] + ';'
         
-    table_border = re.search("<table ?bordercolor=(#(?:[0-9a-f-A-F]{3}){1,2}|\w+)>", data)
+    table_border = re.search("&lt;table ?bordercolor=(#(?:[0-9a-f-A-F]{3}){1,2}|\w+)&gt;", data)
     if table_border:
         all_table += 'border: ' + table_border.groups()[0] + ' 2px solid;'
         
-    table_bgcolor = re.search("<table ?bgcolor=(#(?:[0-9a-f-A-F]{3}){1,2}|\w+)>", data)
+    table_bgcolor = re.search("&lt;table ?bgcolor=(#(?:[0-9a-f-A-F]{3}){1,2}|\w+)&gt;", data)
     if table_bgcolor:
         all_table += 'background: ' + table_bgcolor.groups()[0] + ';'
         
-    bgcolor = re.search("<(?:bgcolor=)?(#(?:[0-9a-f-A-F]{3}){1,2}|\w+)>", data)
+    bgcolor = re.search("&lt;(?:bgcolor=)?(#(?:[0-9a-f-A-F]{3}){1,2}|\w+)&gt;", data)
     if bgcolor:
         cel_style += 'background: ' + bgcolor.groups()[0] + ';'
         
-    cel_width = re.search("<width=((?:(?!>).)*)>", data)
+    cel_width = re.search("&lt;width=((?:(?!&gt;).)*)&gt;", data)
     if cel_width:
         cel_style += 'width: ' + cel_width.groups()[0] + 'px;'
 
-    cel_height = re.search("<height=((?:(?!>).)*)>", data)
+    cel_height = re.search("&lt;height=((?:(?!&gt;).)*)&gt;", data)
     if cel_height:
         cel_style += 'height: ' + cel_height.groups()[0] + 'px;'
         
-    text_right = re.search("<\)>", data)
-    text_center = re.search("<:>", data)
-    text_left = re.search("<\(>",  data)
+    text_right = re.search("&lt;\)&gt;", data)
+    text_center = re.search("&lt;:&gt;", data)
+    text_left = re.search("&lt;\(&gt;",  data)
     if text_right:
         cel_style += 'text-align: right;'
     elif text_center:
@@ -95,7 +95,7 @@ def table_parser(data, cel_data, start_data, num = 0):
         elif re.search('^(.*) $', cel_data):
             cel_style += 'text-align: left;'
 
-    text_class = re.search("<table ?class=((?:(?!>).)+)>", data)
+    text_class = re.search("&lt;table ?class=((?:(?!&gt;).)+)&gt;", data)
     if text_class:
         table_class += text_class.groups()[0]
         
@@ -164,39 +164,13 @@ def start(conn, data, title):
     # XSS 이스케이프
     data = html.escape(data)
 
-    data = re.sub('&lt;(?P<in>\/?math)&gt;', '<\g<in>>', data)
-
-    while 1:
-        table_back = re.search('\|\|((?:&lt;(?:(?:(?!&gt;).)+)&gt;)+)', data)
-        if table_back:
-            table_back = table_back.groups()[0]
-
-            table_back = re.sub('&lt;', '<', table_back)
-            table_back = re.sub('&gt;', '>', table_back)
-
-            data = re.sub('\|\|((?:&lt;(?:(?:(?!&gt;).)+)&gt;)+)', '||' + table_back, data, 1)
-        else:
-            break
-
-    while 1:
-        block_back = re.search('\n((?:&gt;)+)', data)
-        if block_back:
-            block_back = block_back.groups()[0]
-            
-            data = re.sub('\n((?:&gt;)+)', '\n' + ('>' * int(len(block_back) / 4)), data, 1)
-        else:
-            break
-
-    data = re.sub('&#x27;&#x27;&#x27;(?P<in>((?!&#x27;&#x27;&#x27;).)+)&#x27;&#x27;&#x27;', '\'\'\'\g<in>\'\'\'', data)
-    data = re.sub('&#x27;&#x27;(?P<in>((?!&#x27;&#x27;).)+)&#x27;&#x27;', '\'\'\g<in>\'\'', data)
-
     # 추가 데이터 지정
     plus_data = ''
 
     # 수식 처리
     first = 0
     while 1:
-        math = re.search('<math>((?:(?!<\/math>).)+)<\/math>', data)
+        math = re.search('&lt;math&gt;((?:(?!&lt;\/math&gt;).)+)&lt;\/math&gt;', data)
         if math:
             if first == 0:
                 plus_data += '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.css" integrity="sha384-TEMocfGvRuD1rIAacqrknm5BQZ7W7uWitoih+jMNFXQIbNl16bO8OZmylH/Vi/Ei" crossorigin="anonymous"><script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.js" integrity="sha384-jmxIlussZWB7qCuB+PgKG1uLjjxbVVIayPJwi6cG6Zb4YKq0JIw+OMnkkEC7kYCq" crossorigin="anonymous"></script>'
@@ -204,7 +178,7 @@ def start(conn, data, title):
             math = math.groups()[0]
             first += 1
 
-            data = re.sub('<math>((?:(?!<\/math>).)+)<\/math>', '<span id="math_' + str(first) + '"></span>', data, 1)
+            data = re.sub('&lt;math&gt;((?:(?!&lt;\/math&gt;).)+)&lt;\/math&gt;', '<span id="math_' + str(first) + '"></span>', data, 1)
             plus_data += '<script>katex.render("' + math.replace('\\', '\\\\') +'", document.getElementById("math_' + str(first) + '"));</script>'
         else:
             break
@@ -213,8 +187,8 @@ def start(conn, data, title):
     data = data.replace('\\', '&#92;')
 
     # 텍스트 꾸미기 문법
-    data = re.sub('\'\'\'(?P<in>(?:(?!\'\'\').)+)\'\'\'', '<b>\g<in></b>', data)
-    data = re.sub('\'\'(?P<in>(?:(?!\'\').)+)\'\'', '<i>\g<in></i>', data)
+    data = re.sub('&#x27;&#x27;&#x27;(?P<in>((?!&#x27;&#x27;&#x27;).)+)&#x27;&#x27;&#x27;', '<b>\g<in></b>', data)
+    data = re.sub('&#x27;&#x27;(?P<in>((?!&#x27;&#x27;).)+)&#x27;&#x27;', '<i>\g<in></i>', data)
 
     data = re.sub('~~(?P<in>(?:(?!~~).)+)~~', '<s>\g<in></s>', data)
     data = re.sub('--(?P<in>(?:(?!~~).)+)--', '<s>\g<in></s>', data)
@@ -284,6 +258,81 @@ def start(conn, data, title):
             break
 
     data += '\n'
+
+    # 중괄호 문법 처리
+    middle_stack = 0
+    middle_list = []
+    middle_number = 0
+    while 1:
+        middle_data = re.search('(?:{{{((?:(?! |{{{).)*)|(}}}))', data)
+        if middle_data:
+            middle_data = middle_data.groups()
+            if not middle_data[1]:
+                if middle_stack > 0:
+                    middle_stack += 1
+                    data = re.sub('(?:{{{((?:(?! |{{{).)*)|(}}}))', '&#123;&#123;&#123;' + middle_data[0], data, 1)
+                else:
+                    check = 0
+                    middle_search = re.search('^(#(?:[0-9a-f-A-F]{3}){1,2})', middle_data[0])
+                    if middle_search and check == 0:
+                        check = 1
+                        middle_search = middle_search.groups()[0]
+                        middle_list += ['span']
+                        data = re.sub('(?:{{{((?:(?! |{{{).)*)|(}}}))', '<span style="color: ' + middle_search + ';">', data, 1)
+                    
+                    middle_search = re.search('^(?:#(\w+))', middle_data[0])
+                    if middle_search and check == 0:
+                        check = 1
+                        middle_search = middle_search.groups()[0]
+                        middle_list += ['span']
+                        data = re.sub('(?:{{{((?:(?! |{{{).)*)|(}}}))', '<span style="color: ' + middle_search + ';">', data, 1)
+
+                    middle_search = re.search('^(?:@((?:[0-9a-f-A-F]{3}){1,2}))', middle_data[0])
+                    if middle_search and check == 0:
+                        check = 1
+                        middle_search = middle_search.groups()[0]
+                        middle_list += ['span']
+                        data = re.sub('(?:{{{((?:(?! |{{{).)*)|(}}}))', '<span style="background: #' + middle_search + ';">', data, 1)
+                    
+                    middle_search = re.search('^(?:@(\w+))', middle_data[0])
+                    if middle_search and check == 0:
+                        check = 1
+                        middle_search = middle_search.groups()[0]
+                        middle_list += ['span']
+                        data = re.sub('(?:{{{((?:(?! |{{{).)*)|(}}}))', '<span style="background: ' + middle_search + ';">', data, 1)
+
+                    middle_search = re.search('^(\+|-)([1-5])', middle_data[0])
+                    if middle_search and check == 0:
+                        check = 1
+                        middle_search = middle_search.groups()
+                        if middle_search[0] == '+':
+                            font_size = str(int(middle_search[1]) * 20 + 100)
+                        else:
+                            font_size = str(100 - int(middle_search[1]) * 10)
+
+                        middle_list += ['span']
+                        data = re.sub('(?:{{{((?:(?! |{{{).)*)|(}}}))', '<span style="font-size: ' + font_size + '%;">', data, 1)
+
+                    if not check == 1:
+                        middle_list += ['code']
+                        middle_stack += 1
+                        data = re.sub('(?:{{{((?:(?! |{{{).)*)|(}}}))', '<code>' + middle_data[0], data, 1)
+                
+                    middle_number += 1
+            else:
+                if middle_stack > 0:
+                    middle_stack -= 1
+
+                if middle_stack > 0:
+                    data = re.sub('(?:{{{((?:(?! |{{{).)*)|(}}}))', '&#125;&#125;&#125;', data, 1)
+                else:
+                    if middle_number > 0:
+                        middle_number -= 1
+
+                    data = re.sub('(?:{{{((?:(?! |{{{).)*)|(}}}))', '</' + middle_list[middle_number] + '>', data, 1)
+                    del(middle_list[middle_number])
+        else:
+            break
 
     # 일부 매크로 처리
     data = tool.savemark(data)
@@ -365,15 +414,15 @@ def start(conn, data, title):
 
     # 인용문 구현
     while 1:
-        block = re.search('(\n(?:> ?(?:(?:(?!\n).)+)?\n)+)', data)
+        block = re.search('(\n(?:&gt; ?(?:(?:(?!\n).)+)?\n)+)', data)
         if block:
             block = block.groups()[0]
 
-            block = re.sub('^\n> ?', '', block)
-            block = re.sub('\n> ?', '\n', block)
+            block = re.sub('^\n&gt; ?', '', block)
+            block = re.sub('\n&gt; ?', '\n', block)
             block = re.sub('\n$', '', block)
 
-            data = re.sub('(\n(?:> ?(?:(?:(?!\n).)+)?\n)+)', '<blockquote>' + block + '</blockquote>\n', data, 1)
+            data = re.sub('(\n(?:&gt; ?(?:(?:(?!\n).)+)?\n)+)', '\n<blockquote>' + block + '</blockquote>\n', data, 1)
         else:
             break
 
@@ -423,38 +472,38 @@ def start(conn, data, title):
             
             # return [all_table, row_style, cel_style, row, cel, table_class, num]
             while 1:
-                all_table = re.search('^((?:\|\|)+)((?:<(?:(?:(?!>).)+)>)*)((?:(?!\|\||<\/td>).)+)', table)
+                all_table = re.search('^((?:\|\|)+)((?:&lt;(?:(?:(?!&gt;).)+)&gt;)*)((?:(?!\|\||<\/td>).)+)', table)
                 if all_table:
                     all_table = all_table.groups()
 
                     return_table = table_parser(all_table[1], all_table[2], all_table[0])
                     number = return_table[6]
 
-                    table = re.sub('^((?:\|\|)+)((?:<(?:(?:(?!>).)+)>)*)', '\n<table ' + return_table[5] + ' ' + return_table[0] + '><tbody><tr ' + return_table[1] + '><td ' + return_table[2] + ' ' + return_table[3] + ' ' + return_table[4] + '>\n', table, 1)
+                    table = re.sub('^((?:\|\|)+)((?:&lt;(?:(?:(?!&gt;).)+)&gt;)*)', '\n<table ' + return_table[5] + ' ' + return_table[0] + '><tbody><tr ' + return_table[1] + '><td ' + return_table[2] + ' ' + return_table[3] + ' ' + return_table[4] + '>\n', table, 1)
                 else:
                     break
 
             table = re.sub('\|\|\n$', '</td></tr></tbody></table>', table)
 
             while 1:
-                row_table = re.search('\|\|\n((?:\|\|)+)((?:<(?:(?:(?!>).)+)>)*)((?:(?!\|\||<\/td>).)+)', table)
+                row_table = re.search('\|\|\n((?:\|\|)+)((?:&lt;(?:(?:(?!&gt;).)+)&gt;)*)((?:(?!\|\||<\/td>).)+)', table)
                 if row_table:
                     row_table = row_table.groups()
 
                     return_table = table_parser(row_table[1], row_table[2], row_table[0], number)
 
-                    table = re.sub('\|\|\n((?:\|\|)+)((?:<(?:(?:(?!>).)+)>)*)', '</td></tr><tr ' + return_table[1] + '><td ' + return_table[2] + ' ' + return_table[3] + ' ' + return_table[4] + '>', table, 1)
+                    table = re.sub('\|\|\n((?:\|\|)+)((?:&lt;(?:(?:(?!&gt;).)+)&gt;)*)', '</td></tr><tr ' + return_table[1] + '><td ' + return_table[2] + ' ' + return_table[3] + ' ' + return_table[4] + '>', table, 1)
                 else:
                     break
 
             while 1:
-                cel_table = re.search('((?:\|\|)+)((?:<(?:(?:(?!>).)+)>)*)((?:(?:(?!\|\||<\/td>).)|\n)+)', table)
+                cel_table = re.search('((?:\|\|)+)((?:&lt;(?:(?:(?!&gt;).)+)&gt;)*)((?:(?:(?!\|\||<\/td>).)|\n)+)', table)
                 if cel_table:
                     cel_table = cel_table.groups()
 
                     return_table = table_parser(cel_table[1], re.sub('\n', ' ', cel_table[2]), cel_table[0], number)
 
-                    table = re.sub('((?:\|\|)+)((?:<(?:(?:(?!>).)+)>)*)', '</td><td ' + return_table[2] + ' ' + return_table[3] + ' ' + return_table[4] + '>', table, 1)
+                    table = re.sub('((?:\|\|)+)((?:&lt;(?:(?:(?!&gt;).)+)&gt;)*)', '</td><td ' + return_table[2] + ' ' + return_table[3] + ' ' + return_table[4] + '>', table, 1)
                 else:
                     break
 
