@@ -896,7 +896,6 @@ def xref(name = None):
     data_list = curs.fetchall()
     for data in data_list:
         div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a>'
-        
         if data[1]:
             if data[1] == 'include':
                 side = '포함'
@@ -908,7 +907,6 @@ def xref(name = None):
             div += ' (' + side + ')'
         
         div += '</li>'
-        
         if re.search('^틀:', data[0]):
             div += '<li><a id="inside" href="/xref/' + url_pas(data[0]) + '">' + data[0] + '</a> (역링크)</li>'
       
@@ -2628,7 +2626,7 @@ def read_view(name = None):
         admin_memu = 0
         
     if(re.search("^분류:", name)):        
-        curs.execute("select link from back where title = ? and type='cat' order by link asc", [name])
+        curs.execute("select link from back where title = ? and type = 'cat' order by link asc", [name])
         back = curs.fetchall()
         if back:
             div = '<br><h2 id="cate_normal">분류</h2><ul>'
@@ -2641,15 +2639,15 @@ def read_view(name = None):
                         u_div = '</ul><br><h3 id="cate_under">하위 분류</h3><ul>'
 
                     u_div += '<li><a href="' + url_pas(data[0]) + '">' + data[0] + '</a></li>'
-                elif re.search('^틀:', data[0]):
-                    curs.execute("select data from data where title = ?", [data[0]])
-                    db_data = curs.fetchall()
-                    if db_data:
+                # elif re.search('^틀:', data[0]):
+                    # curs.execute("select data from data where title = ?", [data[0]])
+                    # db_data = curs.fetchall()
+                    # if db_data:
                         # cat_data = re.sub("\[\[(분류:(?:(?:(?!\]\]|#include).)+))\]\]", "", mid_pas(db_data[0][0], 0, 1, 0, 0)[0])
                         # if re.search('\[\[' + name + '|include]]', cat_data):
                             # div += '<li><a href="' + url_pas(data[0]) + '">' + data[0] + '</a></li><li><a href="/xref/' + url_pas(data[0]) + '>' + data[0] + '</a> (역링크)</li>'
                         # else:
-                        div += '<li><a href="' + url_pas(data[0]) + '">' + data[0] + '</a></li>'
+                            # div += '<li><a href="' + url_pas(data[0]) + '">' + data[0] + '</a></li>'
                 else:
                     div += '<li><a href="' + url_pas(data[0]) + '">' + data[0] + '</a></li>'
 
