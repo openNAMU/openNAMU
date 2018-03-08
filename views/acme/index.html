@@ -80,7 +80,11 @@
                                 {% else %}
                                     <i class="fa fa-user-secret" aria-hidden="true"></i>
                                 {% endif %}
-                                사용자
+                                {% if imp[2][4] != '' %}
+                                    <img src="http://www.gravatar.com/avatar/{{imp[2][4]|md5_replace}}?s=30">
+                                {% else %}
+                                    사용자
+                                {% endif %}
                             </a>
                         </li>  
                     </ul>

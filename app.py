@@ -57,10 +57,10 @@ compress = Compress()
 compress.init_app(app)
 
 # 템플릿 설정
-def regex(find, replace, data):
-    return re.sub(find, replace, data)
+def md5_replace(data):
+    return hashlib.md5(data.encode()).hexdigest()           
 
-app.jinja_env.filters['regex'] = regex
+app.jinja_env.filters['md5_replace'] = md5_replace
 
 # 셋업 부분
 curs.execute("create table if not exists data(title text, data text)")
