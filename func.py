@@ -1,6 +1,4 @@
-﻿from bottle import template, TEMPLATE_PATH, response
-
-from flask import session
+﻿from flask import session, render_template
 
 import json
 import sqlite3
@@ -87,7 +85,7 @@ def skin_check(conn):
     except:
         pass
 
-    TEMPLATE_PATH.insert(0, skin)
+    return skin
 
 def next_fix(link, num, page, end = 50):
     list_data = ''
@@ -492,7 +490,7 @@ def re_error(conn, data):
                 if d[0][1] != '':
                     end += '<li>사유 : ' + d[0][1] + '</li>'
 
-        return html_minify(template('index', 
+        return html_minify(render_template('index.html', 
             imp = ['권한 오류', wiki_set(conn, 1), custom(conn), other2([0, 0])],
             data = '<h2>권한 상태</h2><ul>' + end + '</ul>',
             menu = 0
@@ -572,7 +570,7 @@ def re_error(conn, data):
             data = '???'
 
         if title:
-            return html_minify(template('index', 
+            return html_minify(render_template('index.html', 
                 imp = [title, wiki_set(conn, 1), custom(conn), other2([0, 0])],
                 data = '<h2>오류 발생</h2><ul><li>' + data + '</li></ul>',
                 menu = 0
