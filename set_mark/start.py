@@ -626,7 +626,5 @@ def start(conn, data, title):
     data = re.sub('(?P<in><td(((?!>).)*)>)\n', '\g<in>', data)
     data = re.sub('(\n)?<hr>(\n)?', '<hr>', data)
     data = re.sub('\n', '<br>', data)
-    if data == '':
-        data = '문서가 없습니다.'
 
     return [data, plus_data, backlink]

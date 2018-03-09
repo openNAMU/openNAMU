@@ -2635,33 +2635,27 @@ def read_view(name = None):
     else:
         admin_memu = 0
         
-    if(re.search("^분류:", name)):        
+    if re.search("^분류:", name):        
         curs.execute("select link from back where title = ? and type = 'cat' order by link asc", [name])
         back = curs.fetchall()
         if back:
             div = '<br><h2 id="cate_normal">분류</h2><ul>'
             u_div = ''
             i = 0
-            
-            for data in back:       
-                if re.search('^분류:', data[0]):
-                    if u_div == '':
-                        u_div = '</ul><br><h3 id="cate_under">하위 분류</h3><ul>'
-
-                    u_div += '<li><a href="' + url_pas(data[0]) + '">' + data[0] + '</a></li>'
-                # elif re.search('^틀:', data[0]):
+            for data in back:    
+                print(data)   
+                if re.search('^틀:', data[0]):
                     # curs.execute("select data from data where title = ?", [data[0]])
                     # db_data = curs.fetchall()
                     # if db_data:
-                        # cat_data = re.sub("\[\[(분류:(?:(?:(?!\]\]|#include).)+))\]\]", "", mid_pas(db_data[0][0], 0, 1, 0, 0)[0])
-                        # if re.search('\[\[' + name + '|include]]', cat_data):
-                            # div += '<li><a href="' + url_pas(data[0]) + '">' + data[0] + '</a></li><li><a href="/xref/' + url_pas(data[0]) + '>' + data[0] + '</a> (역링크)</li>'
+                        # if re.search('\[\[' + name + '#include]]', db_data[0][0]):
+                            # div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a></li><li><a href="/xref/' + url_pas(data[0]) + '>' + data[0] + '</a> (역링크)</li>'
                         # else:
-                            # div += '<li><a href="' + url_pas(data[0]) + '">' + data[0] + '</a></li>'
+                    div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a></li>'
                 else:
-                    div += '<li><a href="' + url_pas(data[0]) + '">' + data[0] + '</a></li>'
+                    div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a></li>'
 
-            div += '</ul>' + u_div
+            div += '</ul>'
 
     if num:
         curs.execute("select title from history where title = ? and id = ? and hide = 'O'", [name, str(num)])
