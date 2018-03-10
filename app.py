@@ -1437,7 +1437,7 @@ def edit(name = None):
             if request.args.get('section', None):
                 test_data = '\n' + re.sub('\r\n', '\n', new[0][0]) + '\n'   
 
-                section_data = re.findall('((?:={1,6}) ?(?:(?:(?!=).)+) ?={1,6}\\n(?:(?:(?!(?:={1,6}) ?(?:(?:(?!=).)+) ?={1,6}\\n).)*))', test_data)
+                section_data = re.findall('((?:={1,6}) ?(?:(?:(?!=).)+) ?={1,6}\n(?:(?:(?!(?:={1,6}) ?(?:(?:(?!=).)+) ?={1,6}\n).)*\n*)*)', test_data)
                 data = section_data[int(request.args.get('section', None)) - 1]
             else:
                 data = new[0][0]
