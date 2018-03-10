@@ -1224,7 +1224,7 @@ def revert(name = None):
 
         curs.execute("select data from history where title = ? and id = ?", [name, str(num)])
         data = curs.fetchall()
-        if(data):                                
+        if data:                                
             curs.execute("select data from data where title = ?", [name])
             d = curs.fetchall()
             if d:
@@ -1606,7 +1606,7 @@ def move(name = None):
         data = curs.fetchall()
 
         leng = '0'
-        if(data):            
+        if data:            
             curs.execute("update data set title = ? where title = ?", [request.form['title'], name])
             curs.execute("update back set link = ? where link = ?", [request.form['title'], name])
             
@@ -2082,7 +2082,7 @@ def close_topic_list(name = None, tool = None):
 
         for data in curs.fetchall():
             curs.execute("select data, date, ip, block from topic where title = ? and sub = ? and id = '1'", [name, data[0]])
-            if(curs.fetchall()):                
+            if curs.fetchall():                
                 it_p = 0
                 if sub == '토론 목록':
                     curs.execute("select title from stop where title = ? and sub = ? and close = 'O' order by sub asc", [name, data[0]])
@@ -2912,7 +2912,7 @@ def recent_changes(name = None, tool = 'record'):
             curs.execute("select title from history where title = ? and id = ? and hide = 'O'", [data[1], data[0]])
             hide = curs.fetchall()
             if six_admin == 1:
-                if(hide):                            
+                if hide:                            
                     hidden = ' <a href="/hidden/' + url_pas(data[1]) + '?num=' + data[0] + '">(공개)'
                     
                     style[0] = 'background: gainsboro;'
@@ -3046,7 +3046,7 @@ def upload():
             
         curs.execute("select title from data where title = ?", ['파일:' + name])
         exist = curs.fetchall()
-        if(exist): 
+        if exist: 
             curs.execute("delete from data where title = ?", ['파일:' + name])
         
         curs.execute("insert into data (title, data) values (?, ?)", ['파일:' + name, '[[파일:' + name + ']][br][br]{{{[[파일:' + name + ']]}}}[br][br]' + lice])
