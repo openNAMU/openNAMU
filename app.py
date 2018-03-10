@@ -2761,7 +2761,7 @@ def read_view(name = None):
         imp = [name, wiki_set(conn, 1), custom(conn), other2([sub + acl, r_date])],
         data = div,
         menu = menu
-    ), response_data)
+    )), response_data
 
 @app.route('/topic_record/<name>')
 def user_topic_list(name = None):
