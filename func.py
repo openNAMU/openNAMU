@@ -1,25 +1,28 @@
-﻿from flask import session, render_template
+﻿# 모듈들 불러옴
+from css_html_js_minify import html_minify, js_minify, css_minify
+from flask import session, render_template
+from urllib import parse
 
 import json
 import sqlite3
 import hashlib
-from urllib import parse
 import requests
 import re
 import html
-from css_html_js_minify import html_minify, js_minify, css_minify
 import time
 import os
 
+# 일부 툴 불러옴
 from set_mark.tool import get_time
 from set_mark.tool import ip_check
 from set_mark.tool import url_pas
 from set_mark.tool import sha224
+
+# 나무마크 불러옴
 from mark import *
 
 def captcha_get(conn):
     curs = conn.cursor()
-
     data = ''
     if custom(conn)[2] == 0:
         curs.execute('select data from other where name = "recaptcha"')
@@ -34,19 +37,16 @@ def captcha_get(conn):
 
 def captcha_post(test, conn, num = 1):
     curs = conn.cursor()
-
     if num == 1:
         if custom(conn)[2] == 0 and captcha_get(conn) != '':
             curs.execute('select data from other where name = "sec_re"')
             sec_re = curs.fetchall()
             if sec_re and sec_re[0][0] != '':
                 data = requests.get('https://www.google.com/recaptcha/api/siteverify', params = { 'secret' : sec_re, 'response' : test })
-
                 if not data:
                     return 0
                 else:
                     json_data = data.json()
-
                     if data.status_code == 200 and json_data['success'] == True:
                         return 0
                     else:
@@ -60,7 +60,6 @@ def captcha_post(test, conn, num = 1):
 
 def ip_warring(conn):
     curs = conn.cursor()
-
     if custom(conn)[2] == 0:    
         curs.execute('select data from other where name = "no_login_warring"')
         data = curs.fetchall()
@@ -106,7 +105,6 @@ def wiki_set(conn, num):
     curs = conn.cursor()
     if num == 1:
         data_list = []
-
         curs.execute('select data from other where name = ?', ['name'])
         db_data = curs.fetchall()
         if db_data and db_data[0][0] != '':
@@ -122,7 +120,6 @@ def wiki_set(conn, num):
             data_list += ['CC 0']
 
         data_list += ['', '']
-
         curs.execute('select data from other where name = "logo"')
         db_data = curs.fetchall()
         if db_data and db_data[0][0] != '':
@@ -193,8 +190,8 @@ def admin_check(conn, num, what):
                 check = 'owner'
 
             curs.execute('select name from alist where name = ? and acl = ?', [user[0][0], check])
-            acl_data = curs.fetchall()
-            if acl_data:
+            acl_dataata = curs.fetchall()
+            if acl_dataata:
                 if what:
                     curs.execute("insert into re_admin (who, what, time) values (?, ?, ?)", [ip, what, get_time()])
                     conn.commit()
@@ -212,8 +209,8 @@ def ip_pas(conn, raw_ip):
     if re.search("(\.|:)", raw_ip):
         if not re.search("^도구:", raw_ip):    
             curs.execute("select data from other where name = 'ip_view'")
-            d = curs.fetchall()
-            if d and d[0][0] != '':
+            data = curs.fetchall()
+            if data and data[0][0] != '':
                 ip = '<span style="font-size: 75%;">' + hashlib.md5(bytes(raw_ip, 'utf-8')).hexdigest() + '</span>'
                 if not admin_check(conn, 'ban', None):
                     hide = 1
@@ -263,25 +260,24 @@ def custom(conn):
     return ['', '', user_icon, user_head, email]
 
 def acl_check(conn, name):
-    ip = ip_check()
     curs = conn.cursor()
+    ip = ip_check()
     if ban_check(conn) == 1:
         return 1
 
     acl_c = re.search("^사용자:([^/]*)", name)
     if acl_c:
         acl_n = acl_c.groups()
-
         if admin_check(conn, 5, None) == 1:
             return 0
 
         curs.execute("select dec from acl where title = ?", ['사용자:' + acl_n[0]])
-        acl_d = curs.fetchall()
-        if acl_d:
-            if acl_d[0][0] == 'all':
+        acl_data = curs.fetchall()
+        if acl_data:
+            if acl_data[0][0] == 'all':
                 return 0
 
-            if acl_d[0][0] == 'user' and not re.search("(\.|:)", ip):
+            if acl_data[0][0] == 'user' and not re.search("(\.|:)", ip):
                 return 0
 
             if ip != acl_n[0] or re.search("(\.|:)", ip):
@@ -298,15 +294,14 @@ def acl_check(conn, name):
 
     curs.execute("select acl from user where id = ?", [ip])
     user_d = curs.fetchall()
-
     curs.execute("select dec from acl where title = ?", [name])
-    acl_d = curs.fetchall()
-    if acl_d:
-        if acl_d[0][0] == 'user':
+    acl_data = curs.fetchall()
+    if acl_data:
+        if acl_data[0][0] == 'user':
             if not user_d:
                 return 1
 
-        if acl_d[0][0] == 'admin':
+        if acl_data[0][0] == 'admin':
             if not user_d:
                 return 1
 
@@ -314,13 +309,13 @@ def acl_check(conn, name):
                 return 1
 
     curs.execute('select data from other where name = "edit"')
-    set_d = curs.fetchall()
-    if set_d:
-        if set_d[0][0] == 'user':
+    set_data = curs.fetchall()
+    if set_data:
+        if set_data[0][0] == 'user':
             if not user_d:
                 return 1
 
-        if set_d[0][0] == 'admin':
+        if set_data[0][0] == 'admin':
             if not user_d:
                 return 1
 
@@ -340,7 +335,6 @@ def ban_check(conn):
         
     curs.execute("select block from ban where block = ? and band = 'O'", [band_it[0]])
     band_d = curs.fetchall()
-
     curs.execute("select block from ban where block = ?", [ip])
     ban_d = curs.fetchall()
     if band_d or ban_d:
@@ -355,8 +349,8 @@ def topic_check(conn, name, sub):
         return 1
 
     curs.execute("select title from stop where title = ? and sub = ?", [name, sub])
-    topic_s = curs.fetchall()
-    if topic_s:
+    topic_stop = curs.fetchall()
+    if topic_stop:
         return 1
 
     return 0
@@ -375,12 +369,9 @@ def ban_insert(conn, name, end, why, login, blocker = ip_check()):
         day = int(int(end) % 525600 % 40320 / 1440)
         hour = int(int(end) % 525600 % 40320 % 1440 / 60)
         minute = int(int(end) % 525600 % 40320 % 1440 % 60)
-
         end_data = [month, day, hour, minute]
-
         match = re.search("^([^-]+)-([^-]+)-([^ ]+) ([^:]+):([^:]+):(.+)$", time)
         time_data = match.groups()
-
         time_cut = [11, 27, 23, 59]
         test_list = [int(time_data[0]) + year, 0, 0, 0, 0]
         for number in range(0, 4):
@@ -416,6 +407,7 @@ def ban_insert(conn, name, end, why, login, blocker = ip_check()):
 
         curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, ?)", [name, end, time, blocker, why, band])
         curs.execute("insert into ban (block, end, why, band, login) values (?, ?, ?, ?, ?)", [name, end, why, band, login])
+    
     conn.commit()
 
 def rd_plus(conn, title, sub, date):
@@ -429,23 +421,21 @@ def rd_plus(conn, title, sub, date):
 def history_plus(conn, title, data, date, ip, send, leng):
     curs = conn.cursor()
     curs.execute("select id from history where title = ? order by id + 0 desc limit 1", [title])
-    d = curs.fetchall()
-    if d:
-        curs.execute("insert into history (id, title, data, date, ip, send, leng) values (?, ?, ?, ?, ?, ?, ?)", [str(int(d[0][0]) + 1), title, data, date, ip, send, leng])
+    id_data = curs.fetchall()
+    if id_data:
+        curs.execute("insert into history (id, title, data, date, ip, send, leng) values (?, ?, ?, ?, ?, ?, ?)", [str(int(id_data[0][0]) + 1), title, data, date, ip, send, leng])
     else:
         curs.execute("insert into history (id, title, data, date, ip, send, leng) values ('1', ?, ?, ?, ?, ?, ?)", [title, data, date, ip, send + ' (새 문서)', leng])
 
-def leng_check(a, b):
-    if a < b:
-        c = b - a
-        c = '+' + str(c)
-    elif b < a:
-        c = a - b
-        c = '-' + str(c)
+def leng_check(first, second):
+    if first < second:
+        all_plus = '+' + str(second - first)
+    elif second < first:
+        all_plus = '-' + str(first - second)
     else:
-        c = '0'
+        all_plus = '0'
         
-    return c
+    return all_plus
 
 def redirect(data):
     return '<meta http-equiv="refresh" content="0; url=' + data + '">'
@@ -457,19 +447,18 @@ def re_error(conn, data):
         end = '<li>사유 : 권한이 맞지 않는 상태 입니다.</li>'
         if ban_check(conn) == 1:
             curs.execute("select end, why from ban where block = ?", [ip])
-            d = curs.fetchall()
-            if not d:
-                m = re.search("^([0-9]{1,3}\.[0-9]{1,3})", ip)
-                if m:
+            end_data = curs.fetchall()
+            if not end_data:
+                match = re.search("^([0-9]{1,3}\.[0-9]{1,3})", ip)
+                if match:
                     curs.execute("select end, why from ban where block = ? and band = 'O'", [m.groups()[0]])
-                    d = curs.fetchall()
+                    end_data = curs.fetchall()
             
-            if d:
+            if end_data:
                 end = '<li>상태 : '
-                if d[0][0]:
+                if end_data[0][0]:
                     now = int(re.sub('(:|-| )', '', get_time()))
-                    day = re.sub('\-', '', d[0][0])              
-                              
+                    day = re.sub('\-', '', end_data[0][0])              
                     if re.search(':', day):
                         day = re.sub('( |:)', '', day)
                     else:
@@ -478,17 +467,15 @@ def re_error(conn, data):
                     if now >= int(day):
                         curs.execute("delete from ban where block = ?", [ip])
                         conn.commit()
-                        
                         end += '차단이 풀렸습니다. 다시 시도 해 보세요.'
                     else:
-                        end += d[0][0] + ' 까지 차단 상태 입니다.'
+                        end += end_data[0][0] + ' 까지 차단 상태 입니다.'
                 else:
                     end += '영구 차단 상태 입니다.'
                 
                 end += '</li>'
-
-                if d[0][1] != '':
-                    end += '<li>사유 : ' + d[0][1] + '</li>'
+                if end_data[0][1] != '':
+                    end += '<li>사유 : ' + end_data[0][1] + '</li>'
 
         return html_minify(render_template('index.html', 
             imp = ['권한 오류', wiki_set(conn, 1), custom(conn), other2([0, 0])],
@@ -496,9 +483,9 @@ def re_error(conn, data):
             menu = 0
         ))
 
-    d = re.search('\/error\/([0-9]+)', data)
-    if d:
-        num = int(d.groups()[0])
+    error_data = re.search('\/error\/([0-9]+)', data)
+    if error_data:
+        num = int(error_data.groups()[0])
         if num == 1:
             title = '권한 오류'
             data = '비 로그인 상태 입니다.'
