@@ -851,6 +851,21 @@ def re_start():
     print('')
 
     os.execl(sys.executable, sys.executable, *sys.argv)
+
+@app.route('/update')
+def update():
+    if admin_check(conn, None, 'update') != 1:
+        return re_error(conn, '/error/3')
+
+    print('')
+    print('Update')
+
+    os.system('git pull')
+
+    print('Re Start')
+    print('')
+
+    os.execl(sys.executable, sys.executable, *sys.argv)
         
 @app.route('/xref/<path:name>')
 def xref(name = None):
