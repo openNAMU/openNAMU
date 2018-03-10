@@ -1409,10 +1409,7 @@ def edit(name = None):
 
             leng = leng_check(len(request.form['otent']), len(content))
             if request.args.get('section', None):
-                if not re.search('\r\n$', content):
-                    content = old[0][0].replace(request.form['otent'], content + '\r\n')
-                else:
-                    content = old[0][0].replace(request.form['otent'], content)
+                content = old[0][0].replace(request.form['otent'], content)
                 
             curs.execute("update data set data = ? where title = ?", [content, name])
         else:
@@ -1470,7 +1467,7 @@ def edit(name = None):
             data = get_name + ' \
                     <form method="post" action="/edit/' + url_pas(name) + action + '"> \
                         <textarea rows="25" name="content">' + html.escape(data) + '</textarea> \
-                        <textarea style="display: none;" name="otent">' + html.escape(data2) + '</textarea><hr> \
+                        <textarea style="display: none;" name="otent">' + html.escape(re.sub('\n$', '', data2)) + '</textarea><hr> \
                         <input placeholder="사유" name="send" type="text"><hr> \
                         ' + captcha_get(conn) + ' \
                         ' + ip_warring(conn) + ' \
