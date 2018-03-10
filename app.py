@@ -2643,19 +2643,24 @@ def read_view(name = None):
             u_div = ''
             i = 0
             for data in back:    
-                print(data)   
-                if re.search('^틀:', data[0]):
-                    # curs.execute("select data from data where title = ?", [data[0]])
-                    # db_data = curs.fetchall()
-                    # if db_data:
-                        # if re.search('\[\[' + name + '#include]]', db_data[0][0]):
-                            # div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a></li><li><a href="/xref/' + url_pas(data[0]) + '>' + data[0] + '</a> (역링크)</li>'
-                        # else:
-                    div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a></li>'
+                if re.search('^분류:', data[0]):
+                    u_div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a></li>'
+                elif re.search('^틀:', data[0]):
+                    curs.execute("select data from data where title = ?", [data[0]])
+                    db_data = curs.fetchall()
+                    if db_data:
+                        if re.search('\[\[' + name + '#include]]', db_data[0][0]):
+                            div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a> <a href="/xref/' + url_pas(data[0]) + '">(역링크)</a></li>'
+                        else:
+                            div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a></li>'
+                    else:
+                        div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a></li>'
                 else:
                     div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a></li>'
 
             div += '</ul>'
+            if u_div != '':
+                div = '<br><h2 id="cate_under">하위 분류</h2><ul>' + u_div + '</ul>' + div
 
     if num:
         curs.execute("select title from history where title = ? and id = ? and hide = 'O'", [name, str(num)])
