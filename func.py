@@ -293,16 +293,16 @@ def acl_check(conn, name):
         return 1
 
     curs.execute("select acl from user where id = ?", [ip])
-    user_d = curs.fetchall()
+    user_data = curs.fetchall()
     curs.execute("select dec from acl where title = ?", [name])
     acl_data = curs.fetchall()
     if acl_data:
         if acl_data[0][0] == 'user':
-            if not user_d:
+            if not user_data:
                 return 1
 
         if acl_data[0][0] == 'admin':
-            if not user_d:
+            if not user_data:
                 return 1
 
             if not admin_check(conn, 5, 'edit (' + name + ')') == 1:
@@ -312,11 +312,11 @@ def acl_check(conn, name):
     set_data = curs.fetchall()
     if set_data:
         if set_data[0][0] == 'user':
-            if not user_d:
+            if not user_data:
                 return 1
 
         if set_data[0][0] == 'admin':
-            if not user_d:
+            if not user_data:
                 return 1
 
             if not admin_check(conn, 5, None) == 1:
