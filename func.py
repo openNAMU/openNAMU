@@ -224,7 +224,7 @@ def ip_pas(conn, raw_ip):
         if curs.fetchall():
             ip = '<a href="/w/' + url_pas('사용자:' + raw_ip) + '">' + raw_ip + '</a>'
         else:
-            ip = '<a class="not_thing" href="/w/' + url_pas('사용자:' + raw_ip) + '">' + raw_ip + '</a>'
+            ip = '<a id="not_thing" href="/w/' + url_pas('사용자:' + raw_ip) + '">' + raw_ip + '</a>'
          
     if hide == 0:
         ip += ' <a href="/record/' + url_pas(raw_ip) + '">(기록)</a>'
