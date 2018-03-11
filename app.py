@@ -16,7 +16,7 @@ import random
 import sys
 
 # 버전 표기
-r_ver = 'v3.0.0-Beta-180310-01'
+r_ver = 'v3.0.0-Beta-180311-01'
 print('Version : ' + r_ver)
 
 # 나머지 불러오기
@@ -1999,7 +1999,7 @@ def close_topic_list(name = None, tool = None):
                         it_p = 1
                 
                 if it_p != 1:
-                    div += '<h2><a href="/topic/' + url_pas(name) + '/sub/' + url_pas(data[0]) + '">' + data[0] + '</a></h2><hr id="under_bar" style="margin-top: -5px; margin-bottom: 10px;">'
+                    div += '<h2><a href="/topic/' + url_pas(name) + '/sub/' + url_pas(data[0]) + '">' + data[0] + '</a></h2>'
 
         if div == '':
             plus = re.sub('^<br>', '', plus)
