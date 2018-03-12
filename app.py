@@ -16,7 +16,7 @@ import random
 import sys
 
 # 버전 표기
-r_ver = 'v3.0.0-Beta-180311-01'
+r_ver = 'v3.0.0-Beta-180313-01'
 print('Version : ' + r_ver)
 
 # 나머지 불러오기
@@ -3279,7 +3279,7 @@ def upload():
         conn.commit()
         
         return redirect('/w/파일:' + name)      
-          
+
     else:
         return html_minify(render_template('index.html', 
             imp = ['파일 올리기', wiki_set(conn, 1), custom(conn), other2([0, 0])],
