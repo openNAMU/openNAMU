@@ -16,7 +16,7 @@ import random
 import sys
 
 # 버전 표기
-r_ver = 'v3.0.0-Beta-180313-01'
+r_ver = 'v3.0.0-Beta-180313-02'
 print('Version : ' + r_ver)
 
 # 나머지 불러오기
@@ -2014,7 +2014,7 @@ def topic_admin(name = None, sub = None, num = None):
         ban = '<li>작성인 : ' + data[0][1] + ' <li><a href="/record/' + url_pas(data[0][1]) + '">(기록)</a></li>' + ban
         
     else:
-        ban = '<li>작성인 : <li><a href="/w/사용자:' + data[0][1] + '">' + data[0][1] + '</a> <a href="/record/' + url_pas(data[0][1]) + '">(기록)</a></li>' + ban
+        ban = '<li>작성인 : <a href="/w/사용자:' + data[0][1] + '">' + data[0][1] + '</a> <a href="/record/' + url_pas(data[0][1]) + '">(기록)</a></li>' + ban
 
     ban = '<h2>정보</h2><ul>' + ban
 
