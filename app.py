@@ -364,8 +364,8 @@ def edit_set(num = 0):
         ))
 
     elif num == 1:
-        i_list = ['name', 'logo', 'frontpage', 'license', 'upload', 'skin', 'edit', 'reg', 'ip_view', 'back_up', 'all_title']
-        n_list = ['무명위키', '', '위키:대문', 'CC 0', '2', '', 'normal', '', '', '0', '']
+        i_list = ['name', 'logo', 'frontpage', 'license', 'upload', 'skin', 'edit', 'reg', 'ip_view', 'back_up']
+        n_list = ['무명위키', '', '위키:대문', 'CC 0', '2', '', 'normal', '', '', '0']
         
         if request.method == 'POST':
             i = 0
@@ -424,10 +424,7 @@ def edit_set(num = 0):
                 ch_1 = 'checked="checked"'
             
             if d_list[8]:
-                ch_2 = 'checked="checked"'
-
-            if d_list[10]:
-                ch_3 = 'checked="checked"'                
+                ch_2 = 'checked="checked"'            
 
             return html_minify(render_template('index.html', 
                 imp = ['기본 설정', wiki_set(conn, 1), custom(conn), other2([0, 0])],
@@ -448,7 +445,6 @@ def edit_set(num = 0):
                             <select name="edit">' + div + '</select><hr> \
                             <input type="checkbox" name="reg" ' + ch_1 + '> 가입불가<hr> \
                             <input type="checkbox" name="ip_view" ' + ch_2 + '> 아이피 비공개<hr> \
-                            <input type="checkbox" name="all_title" ' + ch_3 + '> 모든 문서 보기 비활성화<hr> \
                             <span>백업 간격 [시간] (끄기 : 0) {재시작 필요}</span><hr> \
                             <input placeholder="백업 간격" type="text" name="back_up" value="' + html.escape(d_list[9]) + '"><hr> \
                             <button id="save" type="submit">저장</button> \
@@ -1764,7 +1760,7 @@ def manager(num = 1):
     if num == 1:
         return html_minify(render_template('index.html', 
             imp = ['관리자 메뉴', wiki_set(conn, 1), custom(conn), other2([0, 0])],
-            data = '<h2>목록</h2><ul><li><a href="/manager/2">문서 ACL</a></li><li><a href="/manager/3">사용자 검사</a></li><li><a href="/manager/4">사용자 차단</a></li><li><a href="/manager/5">권한 주기</a></li><li><a href="/big_delete">여러 문서 삭제</a></li><li><a href="edit_filter">편집 필터</a></li></ul><br><h2>소유자</h2><ul><li><a href="/indexing">인덱싱 (생성 or 삭제)</a></li><li><a href="/manager/8">관리 그룹 생성</a></li><li><a href="/edit_set">설정 편집</a></li><li><a href="/re_start">서버 재 시작</a></li><li><a href="/update">업데이트 (Git 사용)</a></li><li><a href="/inter_wiki">인터위키</a></li></ul>',
+            data = '<h2>목록</h2><ul><li><a href="/manager/2">문서 ACL</a></li><li><a href="/manager/3">사용자 검사</a></li><li><a href="/manager/4">사용자 차단</a></li><li><a href="/manager/5">권한 주기</a></li><li><a href="/big_delete">여러 문서 삭제</a></li><li><a href="edit_filter">편집 필터</a></li></ul><br><h2>소유자</h2><ul><li><a href="/indexing">인덱싱 (생성 or 삭제)</a></li><li><a href="/manager/8">관리 그룹 생성</a></li><li><a href="/edit_set">설정 편집</a></li><li><a href="/re_start">서버 재 시작</a></li><li><a href="/update">업데이트 (Git 사용)</a></li><!-- <li><a href="/inter_wiki">인터위키</a></li> --></ul>',
             menu = [['other', '기타']]
         ))
     elif num in range(2, 14):
@@ -1800,30 +1796,17 @@ def title_index():
     else:
         sql_num = 0
 
-    if num != 0:
-        all_list = sql_num + 1
-        
-    else:
-        all_list = 1
+    all_list = sql_num + 1
 
     if num > 1000:
         return re_error(conn, '/error/3')
 
-    data = '<ul><a href="/title_index?num=0">(전체)</a> <a href="/title_index?num=250">(250)</a> <a href="/title_index?num=500">(500)</a> <a href="/title_index?num=1000">(1000)</a>'
+    data = '<a href="/title_index?num=250">(250)</a> <a href="/title_index?num=500">(500)</a> <a href="/title_index?num=1000">(1000)</a>'
 
-    if num == 0:
-        curs.execute("select data from other where name = 'all_title'")
-        all_title_can = curs.fetchall()
-        if all_title_can and all_title_can[0][0] != '':
-            return re_error(conn, '/error/3')
-
-        curs.execute("select title from data order by title asc")
-    else:
-        curs.execute("select title from data order by title asc limit ?, ?", [str(sql_num), str(num)])
-    
+    curs.execute("select title from data order by title asc limit ?, ?", [str(sql_num), str(num)])
     title_list = curs.fetchall()
     if title_list:
-        data += '<hr>'
+        data += '<hr><ul>'
 
     for list_data in title_list:
         data += '<li>' + str(all_list) + '. <a href="/w/' + url_pas(list_data[0]) + '">' + list_data[0] + '</a></li>'        
@@ -1857,14 +1840,8 @@ def title_index():
         data += '<li>파일 문서는 총 ' + str(count_end[4]) + '개의 문서가 있습니다.</li>'
         data += '<li>나머지 문서는 총 ' + str(count_end[5]) + '개의 문서가 있습니다.</li>'
 
-    if num != 0:
-        data += '</ul>' + next_fix('/title_index?num=' + str(num) + '&page=', page, title_list, num)
-    
-    if ' (' + str(num) + '개)' == ' (0개)':
-        sub = 0
-
-    else:
-        sub = ' (' + str(num) + '개)'
+    data += '</ul>' + next_fix('/title_index?num=' + str(num) + '&page=', page, title_list, num)
+    sub = ' (' + str(num) + '개)'
     
     return html_minify(render_template('index.html', 
         imp = ['모든 문서', wiki_set(conn, 1), custom(conn), other2([sub, 0])],
