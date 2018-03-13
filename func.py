@@ -23,7 +23,9 @@ from mark import *
 
 def captcha_get(conn):
     curs = conn.cursor()
+
     data = ''
+
     if custom(conn)[2] == 0:
         curs.execute('select data from other where name = "recaptcha"')
         recaptcha = curs.fetchall()
@@ -37,6 +39,7 @@ def captcha_get(conn):
 
 def captcha_post(test, conn, num = 1):
     curs = conn.cursor()
+
     if num == 1:
         if custom(conn)[2] == 0 and captcha_get(conn) != '':
             curs.execute('select data from other where name = "sec_re"')
@@ -45,28 +48,36 @@ def captcha_post(test, conn, num = 1):
                 data = requests.get('https://www.google.com/recaptcha/api/siteverify', params = { 'secret' : sec_re, 'response' : test })
                 if not data:
                     return 0
+
                 else:
                     json_data = data.json()
                     if data.status_code == 200 and json_data['success'] == True:
                         return 0
+
                     else:
                         return 1
+
             else:
                 return 0
+
         else:
             return 0
+
     else:
         pass
 
 def ip_warring(conn):
     curs = conn.cursor()
+
     if custom(conn)[2] == 0:    
         curs.execute('select data from other where name = "no_login_warring"')
         data = curs.fetchall()
         if data and data[0][0] != '':
             text_data = '<span>' + data[0][0] + '</span><hr>'
+
         else:
             text_data = '<span>비 로그인 상태입니다. 비 로그인으로 진행 시 아이피가 기록됩니다.</span><hr>'
+
     else:
         text_data = ''
 
@@ -74,13 +85,16 @@ def ip_warring(conn):
 
 def skin_check(conn):
     curs = conn.cursor()
+
     skin = './views/acme/'
+    
     try:
         curs.execute('select data from other where name = "skin"')
         skin_exist = curs.fetchall()
         if skin_exist:
             if os.path.exists(os.path.abspath('./views/' + skin_exist[0][0] + '/index.tpl')) == 1:
                 skin = './views/' + skin_exist[0][0] + '/'
+
     except:
         pass
 
@@ -88,11 +102,14 @@ def skin_check(conn):
 
 def next_fix(link, num, page, end = 50):
     list_data = ''
+
     if num == 1:
         if len(page) == end:
             list_data += '<hr><a href="' + link + str(num + 1) + '">(이후)</a>'
+
     elif len(page) != end:
         list_data += '<hr><a href="' + link + str(num - 1) + '">(이전)</a>'
+
     else:
         list_data += '<hr><a href="' + link + str(num - 1) + '">(이전)</a> <a href="' + link + str(num + 1) + '">(이후)</a>'
 
@@ -103,12 +120,15 @@ def other2(origin):
 
 def wiki_set(conn, num):
     curs = conn.cursor()
+
     if num == 1:
         data_list = []
+
         curs.execute('select data from other where name = ?', ['name'])
         db_data = curs.fetchall()
         if db_data and db_data[0][0] != '':
             data_list += [db_data[0][0]]
+
         else:
             data_list += ['무명위키']
 
@@ -116,14 +136,17 @@ def wiki_set(conn, num):
         db_data = curs.fetchall()
         if db_data and db_data[0][0] != '':
             data_list += [db_data[0][0]]
+
         else:
             data_list += ['CC 0']
 
         data_list += ['', '']
+
         curs.execute('select data from other where name = "logo"')
         db_data = curs.fetchall()
         if db_data and db_data[0][0] != '':
             data_list += [db_data[0][0]]
+
         else:
             data_list += [data_list[0]]
             
@@ -131,6 +154,7 @@ def wiki_set(conn, num):
         db_data = curs.fetchall()
         if db_data and db_data[0][0] != '':
             data_list += [db_data[0][0]]
+
         else:
             data_list += ['']
 
@@ -138,26 +162,34 @@ def wiki_set(conn, num):
 
     if num == 2:
         var_data = '위키:대문'
+
         curs.execute('select data from other where name = "frontpage"')
+
     elif num == 3:
         var_data = '2'
+
         curs.execute('select data from other where name = "upload"')
     
     db_data = curs.fetchall()
     if db_data and db_data[0][0] != '':
         return db_data[0][0]
+
     else:
         return var_data
 
 def diff(seqm):
     output = []
+
     for opcode, a0, a1, b0, b1 in seqm.get_opcodes():
         if opcode == 'equal':
             output += [seqm.a[a0:a1]]
+
         elif opcode == 'insert':
             output += ["<span style='background:#CFC;'>" + seqm.b[b0:b1] + "</span>"]
+
         elif opcode == 'delete':
             output += ["<span style='background:#FDD;'>" + seqm.a[a0:a1] + "</span>"]
+
         elif opcode == 'replace':
             output += ["<span style='background:#FDD;'>" + seqm.a[a0:a1] + "</span>"]
             output += ["<span style='background:#CFC;'>" + seqm.b[b0:b1] + "</span>"]
@@ -166,32 +198,41 @@ def diff(seqm):
            
 def admin_check(conn, num, what):
     ip = ip_check() 
+
     curs = conn.cursor()
+
     curs.execute("select acl from user where id = ?", [ip])
     user = curs.fetchall()
     if user:
         reset = 0
+
         while 1:
             if num == 1 and reset == 0:
                 check = 'ban'
+
             elif num == 2 and reset == 0:
                 check = 'mdel'
+
             elif num == 3 and reset == 0:
                 check = 'toron'
+
             elif num == 4 and reset == 0:
                 check = 'check'
+
             elif num == 5 and reset == 0:
                 check = 'acl'
+
             elif num == 6 and reset == 0:
                 check = 'hidel'
+
             elif num == 7 and reset == 0:
                 check = 'give'
+
             else:
                 check = 'owner'
 
             curs.execute('select name from alist where name = ? and acl = ?', [user[0][0], check])
-            acl_dataata = curs.fetchall()
-            if acl_dataata:
+            if curs.fetchall():
                 if what:
                     curs.execute("insert into re_admin (who, what, time) values (?, ?, ?)", [ip, what, get_time()])
                     conn.commit()
@@ -200,22 +241,28 @@ def admin_check(conn, num, what):
             else:
                 if reset == 0:
                     reset = 1
+
                 else:
                     break
 
 def ip_pas(conn, raw_ip):
     hide = 0
+
     curs = conn.cursor()
+
     if re.search("(\.|:)", raw_ip):
         if not re.search("^도구:", raw_ip):    
             curs.execute("select data from other where name = 'ip_view'")
             data = curs.fetchall()
             if data and data[0][0] != '':
                 ip = '<span style="font-size: 75%;">' + hashlib.md5(bytes(raw_ip, 'utf-8')).hexdigest() + '</span>'
+
                 if not admin_check(conn, 'ban', None):
                     hide = 1
+
             else:
                 ip = raw_ip
+
         else:
             ip = raw_ip
             hide = 1
@@ -223,6 +270,7 @@ def ip_pas(conn, raw_ip):
         curs.execute("select title from data where title = ?", ['사용자:' + raw_ip])
         if curs.fetchall():
             ip = '<a href="/w/' + url_pas('사용자:' + raw_ip) + '">' + raw_ip + '</a>'
+
         else:
             ip = '<a id="not_thing" href="/w/' + url_pas('사용자:' + raw_ip) + '">' + raw_ip + '</a>'
          
@@ -233,8 +281,10 @@ def ip_pas(conn, raw_ip):
 
 def custom(conn):
     curs = conn.cursor()
+
     if 'MyMaiToNight' in session:
         user_head = session['MyMaiToNight']
+
     else:
         user_head = ''
 
@@ -242,8 +292,10 @@ def custom(conn):
         curs.execute('select name from alarm where name = ? limit 1', [ip_check()])
         if curs.fetchall():
             user_icon = 2
+
         else:
             user_icon = 1
+
     else:
         user_icon = 0
 
@@ -252,8 +304,10 @@ def custom(conn):
         data = curs.fetchall()
         if data:
             email = data[0][0]
+
         else:
             email = ''
+
     else:
         email = ''
 
@@ -261,13 +315,16 @@ def custom(conn):
 
 def acl_check(conn, name):
     curs = conn.cursor()
+
     ip = ip_check()
+
     if ban_check(conn) == 1:
         return 1
 
     acl_c = re.search("^사용자:([^/]*)", name)
     if acl_c:
         acl_n = acl_c.groups()
+
         if admin_check(conn, 5, None) == 1:
             return 0
 
@@ -285,6 +342,7 @@ def acl_check(conn, name):
         
         if ip == acl_n[0] and not re.search("(\.|:)", ip) and not re.search("(\.|:)", acl_n[0]):
             return 0
+
         else:
             return 1
 
@@ -294,6 +352,7 @@ def acl_check(conn, name):
 
     curs.execute("select acl from user where id = ?", [ip])
     user_data = curs.fetchall()
+
     curs.execute("select dec from acl where title = ?", [name])
     acl_data = curs.fetchall()
     if acl_data:
@@ -326,7 +385,9 @@ def acl_check(conn, name):
 
 def ban_check(conn):
     ip = ip_check()
+
     curs = conn.cursor()
+
     band = re.search("^([0-9]{1,3}\.[0-9]{1,3})", ip)
     if band:
         band_it = band.groups()
@@ -335,6 +396,7 @@ def ban_check(conn):
         
     curs.execute("select block from ban where block = ? and band = 'O'", [band_it[0]])
     band_d = curs.fetchall()
+    
     curs.execute("select block from ban where block = ?", [ip])
     ban_d = curs.fetchall()
     if band_d or ban_d:
@@ -344,20 +406,23 @@ def ban_check(conn):
         
 def topic_check(conn, name, sub):
     ip = ip_check()
+
     curs = conn.cursor()
+
     if ban_check(conn) == 1:
         return 1
 
     curs.execute("select title from stop where title = ? and sub = ?", [name, sub])
-    topic_stop = curs.fetchall()
-    if topic_stop:
+    if curs.fetchall():
         return 1
 
     return 0
 
 def ban_insert(conn, name, end, why, login, blocker = ip_check()):
     curs = conn.cursor()
+
     time = get_time()
+
     if re.search("^([0-9]{1,3}\.[0-9]{1,3})$", name):
         band = 'O'
     else:
@@ -369,15 +434,21 @@ def ban_insert(conn, name, end, why, login, blocker = ip_check()):
         day = int(int(end) % 525600 % 40320 / 1440)
         hour = int(int(end) % 525600 % 40320 % 1440 / 60)
         minute = int(int(end) % 525600 % 40320 % 1440 % 60)
+
         end_data = [month, day, hour, minute]
+
         match = re.search("^([^-]+)-([^-]+)-([^ ]+) ([^:]+):([^:]+):(.+)$", time)
         time_data = match.groups()
+
         time_cut = [11, 27, 23, 59]
         test_list = [int(time_data[0]) + year, 0, 0, 0, 0]
+
         for number in range(0, 4):
             if month + int(time_data[number + 1]) > time_cut[number]:
                 test_list[number] += 1
+
                 test_list[number + 1] = end_data[number] + int(time_data[number + 1]) - (time_cut[number] + 1)
+
             else:
                 test_list[number + 1] = end_data[number] + int(time_data[number + 1])
 
@@ -385,13 +456,15 @@ def ban_insert(conn, name, end, why, login, blocker = ip_check()):
         number = 0
         for time_fix in time_list:
             if not re.search("[0-9]{2}", str(time_fix)):
-                time_list[number] = '0' + str(time_fix)   
+                time_list[number] = '0' + str(time_fix) 
+
             else:
                 time_list[number] = str(time_fix)
 
             number += 1
 
         end = str(test_list[0]) + '-' + time_list[0] + '-' + time_list[1] + ' ' + time_list[2] + ':' + time_list[3] + ':' + time_data[5]
+
     else:
         end = ''
 
@@ -399,9 +472,11 @@ def ban_insert(conn, name, end, why, login, blocker = ip_check()):
     if curs.fetchall():
         curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, ?)", [name, '해제', time, blocker, '', band])
         curs.execute("delete from ban where block = ?", [name])
+
     else:
         if login:
             login = 'O'
+            
         else:
             login = ''
 
@@ -412,26 +487,32 @@ def ban_insert(conn, name, end, why, login, blocker = ip_check()):
 
 def rd_plus(conn, title, sub, date):
     curs = conn.cursor()
+
     curs.execute("select title from rd where title = ? and sub = ?", [title, sub])
     if curs.fetchall():
         curs.execute("update rd set date = ? where title = ? and sub = ?", [date, title, sub])
+
     else:
         curs.execute("insert into rd (title, sub, date) values (?, ?, ?)", [title, sub, date])
 
 def history_plus(conn, title, data, date, ip, send, leng):
     curs = conn.cursor()
+
     curs.execute("select id from history where title = ? order by id + 0 desc limit 1", [title])
     id_data = curs.fetchall()
     if id_data:
         curs.execute("insert into history (id, title, data, date, ip, send, leng) values (?, ?, ?, ?, ?, ?, ?)", [str(int(id_data[0][0]) + 1), title, data, date, ip, send, leng])
+        
     else:
         curs.execute("insert into history (id, title, data, date, ip, send, leng) values ('1', ?, ?, ?, ?, ?, ?)", [title, data, date, ip, send + ' (새 문서)', leng])
 
 def leng_check(first, second):
     if first < second:
         all_plus = '+' + str(second - first)
+
     elif second < first:
         all_plus = '-' + str(first - second)
+
     else:
         all_plus = '0'
         
@@ -442,9 +523,12 @@ def redirect(data):
 
 def re_error(conn, data):
     curs = conn.cursor()
+
     if data == '/ban':
         ip = ip_check()
+
         end = '<li>사유 : 권한이 맞지 않는 상태 입니다.</li>'
+
         if ban_check(conn) == 1:
             curs.execute("select end, why from ban where block = ?", [ip])
             end_data = curs.fetchall()
@@ -456,24 +540,29 @@ def re_error(conn, data):
             
             if end_data:
                 end = '<li>상태 : '
+
                 if end_data[0][0]:
                     now = int(re.sub('(:|-| )', '', get_time()))
-                    day = re.sub('\-', '', end_data[0][0])              
+                    day = re.sub('\-', '', end_data[0][0])      
                     if re.search(':', day):
                         day = re.sub('( |:)', '', day)
+
                     else:
                         day += '000000'
                     
                     if now >= int(day):
                         curs.execute("delete from ban where block = ?", [ip])
                         conn.commit()
+
                         end += '차단이 풀렸습니다. 다시 시도 해 보세요.'
                     else:
                         end += end_data[0][0] + ' 까지 차단 상태 입니다.'
+
                 else:
                     end += '영구 차단 상태 입니다.'
                 
                 end += '</li>'
+
                 if end_data[0][1] != '':
                     end += '<li>사유 : ' + end_data[0][1] + '</li>'
 
@@ -489,69 +578,91 @@ def re_error(conn, data):
         if num == 1:
             title = '권한 오류'
             data = '비 로그인 상태 입니다.'
+
         elif num == 2:
             title = '권한 오류'
             data = '이 계정이 없습니다.'
+
         elif num == 3:
             title = '권한 오류'
             data = '권한이 모자랍니다.'
+
         elif num == 4:
             title = '권한 오류'
             data = '관리자는 차단, 검사 할 수 없습니다.'
+
         elif num == 5:
             title = '사용자 오류'
             data = '그런 계정이 없습니다.'
+
         elif num == 6:
             title = '가입 오류'
             data = '동일한 아이디의 사용자가 있습니다.'
+
         elif num == 7:
             title = '가입 오류'
             data = '아이디는 20글자보다 짧아야 합니다.'
+
         elif num == 8:
             title = '가입 오류'
             data = '아이디에는 한글과 알파벳과 공백만 허용 됩니다.'
+
         elif num == 9:
             title = '파일 올리기 오류'
             data = '파일이 없습니다.'
+
         elif num == 10:
             title = '변경 오류'
             data = '비밀번호가 다릅니다.'
+
         elif num == 11:
             title = '로그인 오류'
             data = '이미 로그인 되어 있습니다.'
+
         elif num == 12:
             title = '편집 오류'
             data = '누군가 먼저 편집 했습니다.'
+
         elif num == 13:
             title = '리캡차 오류'
             data = '리캡차를 통과하세요.'
+
         elif num == 14:
             title = '파일 올리기 오류'
             data = 'jpg, gif, jpeg, png, webp만 가능 합니다.'
+
         elif num == 15:
             title = '편집 오류'
             data = '편집 기록은 500자를 넘을 수 없습니다.'
+
         elif num == 16:
             title = '파일 올리기 오류'
             data = '동일한 이름의 파일이 있습니다.'
+
         elif num == 17:
             title = '파일 올리기 오류'
             data = '파일 용량은 ' + wiki_set(conn, 3) + 'MB를 넘길 수 없습니다.'
+
         elif num == 18:
             title = '편집 오류'
             data = '내용이 원래 문서와 동일 합니다.'
+
         elif num == 19:
             title = '이동 오류'
             data = '이동 하려는 곳에 문서가 이미 있습니다.'
+
         elif num == 20:
             title = '비밀번호 오류'
             data = '재 확인이랑 비밀번호가 다릅니다.'
+
         elif num == 21:
             title = '편집 오류'
             data = '편집 필터에 의해 검열 되었습니다.'
+
         elif num == 22:
             title = '파일 올리기 오류'
             data = '파일 이름은 알파벳, 한글, 띄어쓰기, 언더바, 빼기표만 허용 됩니다.'
+
         else:
             title = '정체 불명의 오류'
             data = '???'
@@ -562,7 +673,9 @@ def re_error(conn, data):
                 data = '<h2>오류 발생</h2><ul><li>' + data + '</li></ul>',
                 menu = 0
             ))
+
         else:
             return redirect('/')
+            
     else:
         return redirect('/')

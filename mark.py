@@ -9,7 +9,9 @@ import threading
 
 def send_parser(data):
     data = html.escape(data)
+    
     javascript = re.compile('javascript:', re.I)
+    
     data = javascript.sub('', data)
     data = re.sub('&lt;a href="(?:[^"]*)"&gt;(?P<in>(?:(?!&lt;).)*)&lt;\/a&gt;', '<a href="' + parse.quote('\g<in>').replace('/','%2F') + '">\g<in></a>', data)  
     

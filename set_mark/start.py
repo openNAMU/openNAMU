@@ -24,29 +24,35 @@ def table_parser(data, cel_data, start_data, num = 0):
     if table_align:
         if table_align.groups()[0] == 'right':
             all_table += 'float: right;'
+
         elif table_align.groups()[0] == 'center':
             all_table += 'margin: auto;'
             
     table_text_align = re.search("&lt;table ?textalign=((?:(?!&gt;).)*)&gt;", data)
     if table_text_align:
         num = 1
+
         if table_text_align.groups()[0] == 'right':
             all_table += 'text-align: right;'
+
         elif table_text_align.groups()[0] == 'center':
             all_table += 'text-align: center;'
 
-    row_t_a = re.search("&lt;row ?textalign=((?:(?!&gt;).)*)&gt;", data)
-    if row_t_a:
-        if row_t_a.groups()[0] == 'right':
+    row_table_align = re.search("&lt;row ?textalign=((?:(?!&gt;).)*)&gt;", data)
+    if row_table_align:
+        if row_table_align.groups()[0] == 'right':
             row_style += 'text-align: right;'
-        elif row_t_a.groups()[0] == 'center':
+
+        elif row_table_align.groups()[0] == 'center':
             row_style += 'text-align: center;'
+
         else:
             row_style += 'text-align: left;'
     
     table_cel = re.search("&lt;-((?:(?!&gt;).)*)&gt;", data)
     if table_cel:
         cel = 'colspan="' + table_cel.groups()[0] + '"'
+
     else:
         cel = 'colspan="' + str(round(len(start_data) / 2)) + '"'   
 
@@ -83,15 +89,20 @@ def table_parser(data, cel_data, start_data, num = 0):
     text_left = re.search("&lt;\(&gt;",  data)
     if text_right:
         cel_style += 'text-align: right;'
+
     elif text_center:
         cel_style += 'text-align: center;'
+
     elif text_left:
         cel_style += 'text-align: left;'
+
     elif num == 0:
         if re.search('^ (.*) $', cel_data):
             cel_style += 'text-align: center;'
+
         elif re.search('^ (.*)$', cel_data):
             cel_style += 'text-align: right;'
+
         elif re.search('^(.*) $', cel_data):
             cel_style += 'text-align: left;'
 
@@ -122,30 +133,38 @@ def start(conn, data, title):
         include = re.search('\[include\(((?:(?!\)\]).)+)\)\]', data)
         if include:
             include = include.groups()[0]
+    
             include_data = re.search('^((?:(?!,).)+)', include)
             if include_data:
                 include_data = include_data.groups()[0]
+
             else:
                 include_data = 'Test'
 
             include_link = include_data
+
             backlink += [[title, include_link, 'include']]
+
             include = re.sub('^((?:(?!,).)+)', '', include)
+
             curs.execute("select data from data where title = ?", [include_data])
             include_data = curs.fetchall()
             if include_data:
                 include_parser = include_data[0][0]
+
                 while 1:
                     include_plus = re.search(', ?((?:(?!=).)+)=((?:(?!,).)+)', include)
                     if include_plus:
                         include_plus = include_plus.groups()
                         include_parser = re.sub('@' + include_plus[0] + '@', include_plus[1], include_parser)
+
                         include = re.sub(', ?((?:(?!=).)+)=((?:(?!,).)+)', '', include, 1)
                     else:
                         break
 
                 include_parser = re.sub('\[\[분류:(((?!\]\]|#include).)+)\]\]', '', include_parser)
                 include_parser = html.escape(include_parser)
+
                 data = re.sub('\[include\(((?:(?!\)\]).)+)\)\]', '\n' + include_parser + '\n', data, 1)
             else:
                 data = re.sub('\[include\(((?:(?!\)\]).)+)\)\]', '<a id="not_thing" href="/w/' + tool.url_pas(include_link) + '">' + include_link + '</a>', data, 1)
@@ -171,7 +190,9 @@ def start(conn, data, title):
                 plus_data += '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.css" integrity="sha384-TEMocfGvRuD1rIAacqrknm5BQZ7W7uWitoih+jMNFXQIbNl16bO8OZmylH/Vi/Ei" crossorigin="anonymous"><script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.js" integrity="sha384-jmxIlussZWB7qCuB+PgKG1uLjjxbVVIayPJwi6cG6Zb4YKq0JIw+OMnkkEC7kYCq" crossorigin="anonymous"></script>'
 
             math = math.groups()[0]
+            
             first += 1
+            
             data = re.sub('&lt;math&gt;((?:(?!&lt;\/math&gt;).)+)&lt;\/math&gt;', '<span id="math_' + str(first) + '"></span>', data, 1)
             plus_data += '<script>katex.render("' + math.replace('\\', '\\\\') +'", document.getElementById("math_' + str(first) + '"));</script>'
         else:
@@ -194,7 +215,9 @@ def start(conn, data, title):
         redirect = re.search('\n#(?:redirect|넘겨주기) ((?:(?!\n).)+)\n', data)
         if redirect:
             redirect = redirect.groups()[0]
+            
             backlink += [[title, redirect, 'redirect']]
+            
             data = re.sub('\n#(?:redirect|넘겨주기) (?P<in>(?:(?!\n).)+)\n', '<meta http-equiv="refresh" content="0; url=/w/\g<in>?froms=' + tool.url_pas(title) + '">', data, 1)
         else:
             break
@@ -216,6 +239,7 @@ def start(conn, data, title):
         toc = re.search('\n(={1,6}) ?((?:(?!=).)+) ?={1,6}\n', data)
         if toc:
             toc = toc.groups()
+            
             toc_number = len(toc[0])
             edit_number += 1
 
@@ -237,13 +261,17 @@ def start(conn, data, title):
                 all_stack += str(toc_stack[i]) + '.'
 
             all_stack = re.sub('0.', '', all_stack)
+            
             data = re.sub('\n(={1,6}) ?((?:(?!=).)+) ?={1,6}\n', '\n<h' + toc_number + ' id="s-' + re.sub('\.$', '', all_stack) + '"><a href="#toc">' + all_stack + '</a> ' + toc[1] + ' <span style="font-size: 12px"><a href="/edit/' + tool.url_pas(title) + '?section=' + str(edit_number) + '">(편집)</a></span></h' + toc_number + '>\n', data, 1)
+            
             toc_data += '<span style="margin-left: ' + str((toc_full - toc_top_stack) * 10) + 'px;"><a href="#s-' + re.sub('\.$', '', all_stack) + '">' + all_stack + '</a> ' + toc[1] + '</span>\n'
         else:
             break
 
     toc_data += '</div>'
+    
     data = re.sub('\[목차\]', toc_data, data)
+    
     while 1:
         hr = re.search('\n-{4,9}\n', data)
         if hr:
