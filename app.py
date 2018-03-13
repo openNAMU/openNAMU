@@ -848,9 +848,9 @@ def user_log():
     list_data += next_fix('/user_log?num=', num, user_list)
 
     return html_minify(render_template('index.html', 
-        imp = ['사용자 가입 기록', wiki_set(conn, 1), custom(conn), other2([0, 0])],
+        imp = ['최근 가입', wiki_set(conn, 1), custom(conn), other2([0, 0])],
         data = list_data,
-        menu = [['other', '기타']]
+        menu = 0
     ))
 
 @app.route('/admin_log')
@@ -873,9 +873,9 @@ def admin_log():
     list_data += next_fix('/admin_log?num=', num, get_list)
 
     return html_minify(render_template('index.html', 
-        imp = ['권한 사용 기록', wiki_set(conn, 1), custom(conn), other2([0, 0])],
+        imp = ['최근 권한', wiki_set(conn, 1), custom(conn), other2([0, 0])],
         data = list_data,
-        menu = [['other', '기타']]
+        menu = 0
     ))
 
 @app.route('/give_log')
@@ -1079,7 +1079,7 @@ def recent_discuss(tools = 'normal'):
         div += '</tbody></table>'
             
     return html_minify(render_template('index.html', 
-        imp = ['최근 토론내역', wiki_set(conn, 1), custom(conn), other2([m_sub, 0])],
+        imp = ['최근 토론', wiki_set(conn, 1), custom(conn), other2([m_sub, 0])],
         data = div,
         menu = 0
     ))
@@ -1104,8 +1104,7 @@ def block_log(name = None, tool = None, tool2 = None):
             div = '<a href="/manager/11">(차단자)</a> <a href="/manager/12">(관리자)</a><hr><a href="/block_log/ip">(아이피)</a> <a href="/block_log/user">(가입자)</a> <a href="/block_log/never_end">(영구)</a> <a href="/block_log/can_end">(기간)</a> <a href="/block_log/end">(해제)</a> <a href="/block_log/now">(현재)</a><hr>' + div
             
             sub = 0
-            
-            menu = [['other', '기타']]
+            menu = 0
             
             curs.execute("select why, block, blocker, end, today from rb order by today desc limit ?, '50'", [str(sql_num)])
 
@@ -1198,7 +1197,7 @@ def block_log(name = None, tool = None, tool2 = None):
         div += next_fix('/' + url_pas(tool) + '/' + url_pas(name) + '?num=', num, data_list)
                 
     return html_minify(render_template('index.html', 
-        imp = ['차단 기록', wiki_set(conn, 1), custom(conn), other2([sub, 0])],
+        imp = ['최근 차단', wiki_set(conn, 1), custom(conn), other2([sub, 0])],
         data = div,
         menu = menu
     ))
@@ -1753,7 +1752,7 @@ def move(name = None):
 def other():
     return html_minify(render_template('index.html', 
         imp = ['기타 메뉴', wiki_set(conn, 1), custom(conn), other2([0, 0])],
-        data = '<h2>기록</h2><ul><li><a href="/block_log">차단 기록</a></li><li><a href="/user_log">가입 기록</a></li><li><a href="/admin_log">권한 사용 기록</a></li><li><a href="/manager/6">편집 기록</a></li><li><a href="/manager/7">토론 기록</a></li></ul><br><h2>목록</h2><ul><li><a href="/admin_list">관리자 목록</a></li><li><a href="/give_log">관리 그룹 목록</a></li><li><a href="/not_close_topic">열린 토론 목록</a></li></ul><br><h2>기타</h2><ul><li><a href="/title_index">모든 문서</a></li><li><a href="/acl_list">ACL 문서</a></li><li><a href="/please">필요한 문서</a></li><li><a href="/upload">파일 올리기</a></li><li><a href="/manager/10">문서 검색</a></li></ul><br><h2>관리자</h2><ul><li><a href="/manager/1">관리자 메뉴</a></li></ul><br><h2>버전</h2><ul><li>이 오픈나무는 <a href="https://github.com/2DU/openNAMU/blob/master/version.md">' + r_ver + '</a> 입니다.</li></ul>',
+        data = '<h2>기록</h2><ul><li><a href="/manager/6">편집 기록</a></li><li><a href="/manager/7">토론 기록</a></li></ul><br><h2>목록</h2><ul><li><a href="/admin_list">관리자 목록</a></li><li><a href="/give_log">관리 그룹 목록</a></li><li><a href="/not_close_topic">열린 토론 목록</a></li></ul><br><h2>기타</h2><ul><li><a href="/title_index">모든 문서</a></li><li><a href="/acl_list">ACL 문서</a></li><li><a href="/please">필요한 문서</a></li><li><a href="/upload">파일 올리기</a></li><li><a href="/manager/10">문서 검색</a></li></ul><br><h2>관리자</h2><ul><li><a href="/manager/1">관리자 메뉴</a></li></ul><br><h2>버전</h2><ul><li>이 오픈나무는 <a href="https://github.com/2DU/openNAMU/blob/master/version.md">' + r_ver + '</a> 입니다.</li></ul>',
         menu = 0
     ))
     
@@ -3034,7 +3033,7 @@ def recent_changes(name = None, tool = 'record'):
 
             else:
                 div += '<td style="width: 33.3%;">문서명</td><td style="width: 33.3%;">편집자</td><td style="width: 33.3%;">시간</td></tr>'
-                
+
                 if what == 'all':
                     div = '<a href="/record/' + url_pas(name) + '?what=revert">(되돌리기)</a><hr>' + div
                     div = '<a href="/record/' + url_pas(name) + '?what=move">(이동)</a> ' + div
@@ -3063,6 +3062,8 @@ def recent_changes(name = None, tool = 'record'):
                 div = '<a href="/recent_changes?what=revert">(되돌리기)</a><hr>' + div
                 div = '<a href="/recent_changes?what=move">(이동)</a> ' + div
                 div = '<a href="/recent_changes?what=delete">(삭제)</a> ' + div
+
+                div = '<a href="/recent_discuss">(토론)</a> <a href="/block_log">(차단)</a> <a href="/user_log">(가입)</a> <a href="/admin_log">(권한)</a><hr>' + div
                 
                 curs.execute("select id, title, date, ip, send, leng from history order by date desc limit 50")
 
@@ -3081,7 +3082,8 @@ def recent_changes(name = None, tool = 'record'):
 
                 curs.execute("select id, title, date, ip, send, leng from history where send like ? order by date desc limit 50", [sql])
 
-        for data in curs.fetchall():    
+        data_list = curs.fetchall()
+        for data in data_list:    
             select += '<option value="' + data[0] + '">' + data[0] + '</option>'     
             send = '<br>'
             
@@ -3187,7 +3189,7 @@ def recent_changes(name = None, tool = 'record'):
 
         else:
             menu = 0
-            title = '최근 변경내역'
+            title = '최근 변경'
             
             if what != 'all':
                 menu = [['recent_changes', '일반']]
