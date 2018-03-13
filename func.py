@@ -92,7 +92,7 @@ def skin_check(conn):
         curs.execute('select data from other where name = "skin"')
         skin_exist = curs.fetchall()
         if skin_exist:
-            if os.path.exists(os.path.abspath('./views/' + skin_exist[0][0] + '/index.tpl')) == 1:
+            if os.path.exists(os.path.abspath('./views/' + skin_exist[0][0] + '/index.html')) == 1:
                 skin = './views/' + skin_exist[0][0] + '/'
 
     except:
@@ -676,6 +676,6 @@ def re_error(conn, data):
 
         else:
             return redirect('/')
-            
+
     else:
         return redirect('/')
