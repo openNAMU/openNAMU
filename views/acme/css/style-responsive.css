@@ -47,7 +47,7 @@
     }
 
     .navbar-toggle {
-        margin-right: -10px;
+        margin-right: 0px;
     }
 
     .head-section .nav li .dropdown-menu li a:hover {
@@ -57,6 +57,7 @@
     .navbar-brand {
         margin-top: 10px !important;
         float: left !important;
+        line-height: 40px;
     }
 }
 
