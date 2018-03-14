@@ -52,16 +52,20 @@ curs = conn.cursor()
 
 # 기타 설정 변경
 logging.basicConfig(level = logging.ERROR)
-app = Flask(__name__, template_folder = skin_check(conn))
+app = Flask(__name__, template_folder = './')
 Reggie(app)
 compress = Compress()
 compress.init_app(app)
 
 # 템플릿 설정
 def md5_replace(data):
-    return hashlib.md5(data.encode()).hexdigest()           
+    return hashlib.md5(data.encode()).hexdigest()       
+
+def plus_data(first, second):
+    return first + second             
 
 app.jinja_env.filters['md5_replace'] = md5_replace
+app.jinja_env.filters['plus_data'] = plus_data
 
 # 셋업 부분
 curs.execute("create table if not exists data(title text, data text)")
@@ -271,7 +275,7 @@ def alarm():
     
     data += '</ul>'
 
-    return html_minify(render_template('index.html', 
+    return html_minify(render_template(skin_check(conn), 
         imp = ['알림', wiki_set(conn, 1), custom(conn), other2([0, 0])],
         data = data,
         menu = [['user', '사용자']]
@@ -304,7 +308,7 @@ def inter_wiki():
         if admin == 1:
             div += '<a href="/plus_inter">(추가)</a>'
 
-    return html_minify(render_template('index.html', 
+    return html_minify(render_template(skin_check(conn), 
         imp = ['인터위키 목록', wiki_set(conn, 1), custom(conn), other2([0, 0])],
         data = div,
         menu = [['other', '기타']]
@@ -330,7 +334,7 @@ def plus_inter():
     
         return redirect('/inter_wiki')
     else:
-        return html_minify(render_template('index.html', 
+        return html_minify(render_template(skin_check(conn), 
             imp = ['인터위키 목록', wiki_set(conn, 1), custom(conn), other2([0, 0])],
             data = '<form method="post"> \
                         <input placeholder="이름" type="text" name="title"><hr> \
@@ -357,7 +361,7 @@ def edit_set(num = 0):
             x += 1
             li_data += '<li><a href="/edit_set/' + str(x) + '">' + li + '</a></li>'
 
-        return html_minify(render_template('index.html', 
+        return html_minify(render_template(skin_check(conn), 
             imp = ['설정 편집', wiki_set(conn, 1), custom(conn), other2([0, 0])],
             data = '<h2>메뉴</h2><ul>' + li_data + '</ul>',
             menu = [['manager', '관리자']]
@@ -426,7 +430,7 @@ def edit_set(num = 0):
             if d_list[8]:
                 ch_2 = 'checked="checked"'            
 
-            return html_minify(render_template('index.html', 
+            return html_minify(render_template(skin_check(conn), 
                 imp = ['기본 설정', wiki_set(conn, 1), custom(conn), other2([0, 0])],
                 data = '<form method="post"> \
                             <span>이름</span><br><br> \
@@ -439,7 +443,7 @@ def edit_set(num = 0):
                             <input placeholder="라이선스" type="text" name="license" value="' + html.escape(d_list[3]) + '"><hr> \
                             <span>파일 크기 [메가]</span><br><br> \
                             <input placeholder="파일 크기" type="text" name="upload" value="' + html.escape(d_list[4]) + '"><hr> \
-                            <span>스킨 {재시작 필요}</span><br><br> \
+                            <span>스킨</span><br><br> \
                             <input placeholder="스킨" type="text" name="skin" value="' + html.escape(d_list[5]) + '"><hr> \
                             <span>전역 ACL</span><br><br> \
                             <select name="edit">' + div + '</select><hr> \
@@ -484,7 +488,7 @@ def edit_set(num = 0):
 
             conn.commit()
 
-            return html_minify(render_template('index.html', 
+            return html_minify(render_template(skin_check(conn), 
                 imp = ['문구 관련', wiki_set(conn, 1), custom(conn), other2([0, 0])],
                 data = '<form method="post"> \
                             <span>가입 약관</span><br><br> \
@@ -520,7 +524,7 @@ def edit_set(num = 0):
             else:
                 data = ''
 
-            return html_minify(render_template('index.html', 
+            return html_minify(render_template(skin_check(conn), 
                 imp = ['전역 HEAD', wiki_set(conn, 1), custom(conn), other2([0, 0])],
                 data =  '<span>&lt;style&gt;CSS&lt;/style&gt;<br>&lt;script&gt;JS&lt;/script&gt;</span><hr> \
                         <form method="post"> \
@@ -565,7 +569,7 @@ def edit_set(num = 0):
             if not data or data == '':
                 data = ''.join(lines)
 
-            return html_minify(render_template('index.html', 
+            return html_minify(render_template(skin_check(conn), 
                 imp = ['robots.txt', wiki_set(conn, 1), custom(conn), other2([0, 0])],
                 data =  '<a href="/robots.txt">(보기)</a><hr> \
                         <form method="post"> \
@@ -606,7 +610,7 @@ def edit_set(num = 0):
 
             conn.commit()
 
-            return html_minify(render_template('index.html', 
+            return html_minify(render_template(skin_check(conn), 
                 imp = ['구글 관련', wiki_set(conn, 1), custom(conn), other2([0, 0])],
                 data = '<form method="post"> \
                             <span>리캡차 (HTML)</span><br><br> \
@@ -635,7 +639,7 @@ def not_close_topic():
             
     div += '</ul>'
 
-    return html_minify(render_template('index.html', 
+    return html_minify(render_template(skin_check(conn), 
         imp = ['열린 토론 목록', wiki_set(conn, 1), custom(conn), other2([0, 0])],
         data = div,
         menu = [['manager', '관리자']]
@@ -667,7 +671,7 @@ def acl_list():
         
     div += '</ul>'
     
-    return html_minify(render_template('index.html', 
+    return html_minify(render_template(skin_check(conn), 
         imp = ['ACL 문서 목록', wiki_set(conn, 1), custom(conn), other2([0, 0])],
         data = div,
         menu = [['other', '기타']]
@@ -754,7 +758,7 @@ def admin_plus(name = None):
         data += '<li><input type="checkbox" ' + state +  ' name="give" ' + exist_list[6] + '> 권한 부여</li>'
         data += '<li><input type="checkbox" ' + state +  ' name="owner" ' + exist_list[7] + '> 소유자</li></ul>'
 
-        return html_minify(render_template('index.html', 
+        return html_minify(render_template(skin_check(conn), 
             imp = ['관리 그룹 추가', wiki_set(conn, 1), custom(conn), other2([0, 0])],
             data = '<form method="post">' + data + '<hr><button id="save" ' + state +  ' type="submit">저장</button></form>',
             menu = [['manager', '관리자']]
@@ -775,7 +779,7 @@ def admin_list():
         
     div += '</ul>'
                 
-    return html_minify(render_template('index.html', 
+    return html_minify(render_template(skin_check(conn), 
         imp = ['관리자 목록', wiki_set(conn, 1), custom(conn), other2([0, 0])],
         data = div,
         menu = [['other', '기타']]
@@ -843,7 +847,7 @@ def user_log():
 
     list_data += next_fix('/user_log?num=', num, user_list)
 
-    return html_minify(render_template('index.html', 
+    return html_minify(render_template(skin_check(conn), 
         imp = ['최근 가입', wiki_set(conn, 1), custom(conn), other2([0, 0])],
         data = list_data,
         menu = 0
@@ -868,7 +872,7 @@ def admin_log():
     list_data += '</ul><hr><ul><li>주의 : 권한 사용 안하고 열람만 해도 기록되는 경우도 있습니다.</li></ul>'
     list_data += next_fix('/admin_log?num=', num, get_list)
 
-    return html_minify(render_template('index.html', 
+    return html_minify(render_template(skin_check(conn), 
         imp = ['최근 권한', wiki_set(conn, 1), custom(conn), other2([0, 0])],
         data = list_data,
         menu = 0
@@ -888,7 +892,7 @@ def give_log():
     
     list_data += '</ul><hr><a href="/manager/8">(생성)</a>'
 
-    return html_minify(render_template('index.html', 
+    return html_minify(render_template(skin_check(conn), 
         imp = ['관리 그룹 목록', wiki_set(conn, 1), custom(conn), other2([0, 0])],
         data = list_data,
         menu = [['other', '기타']]
@@ -997,7 +1001,7 @@ def xref(name = None):
       
     div += '</ul>' + next_fix('/xref/' + url_pas(name) + '?num=', num, data_list)
     
-    return html_minify(render_template('index.html', 
+    return html_minify(render_template(skin_check(conn), 
         imp = [name, wiki_set(conn, 1), custom(conn), other2([' (역링크)', 0])],
         data = div,
         menu = [['w/' + url_pas(name), '문서']]
@@ -1025,7 +1029,7 @@ def please():
         
     div += '</ul>' + next_fix('/please?num=', num, data_list)
     
-    return html_minify(render_template('index.html', 
+    return html_minify(render_template(skin_check(conn), 
         imp = ['필요한 문서', wiki_set(conn, 1), custom(conn), other2([0, 0])],
         data = div,
         menu = [['other', '기타']]
@@ -1074,7 +1078,7 @@ def recent_discuss(tools = 'normal'):
     else:
         div += '</tbody></table>'
             
-    return html_minify(render_template('index.html', 
+    return html_minify(render_template(skin_check(conn), 
         imp = ['최근 토론', wiki_set(conn, 1), custom(conn), other2([m_sub, 0])],
         data = div,
         menu = 0
@@ -1192,7 +1196,7 @@ def block_log(name = None, tool = None, tool2 = None):
     else:
         div += next_fix('/' + url_pas(tool) + '/' + url_pas(name) + '?num=', num, data_list)
                 
-    return html_minify(render_template('index.html', 
+    return html_minify(render_template(skin_check(conn), 
         imp = ['최근 차단', wiki_set(conn, 1), custom(conn), other2([sub, 0])],
         data = div,
         menu = menu
@@ -1254,7 +1258,7 @@ def deep_search(name = None):
     div += div_plus + '</ul>'
     div += next_fix('/search/' + url_pas(name) + '?num=', num, all_list)
 
-    return html_minify(render_template('index.html', 
+    return html_minify(render_template(skin_check(conn), 
         imp = [name, wiki_set(conn, 1), custom(conn), other2([' (검색)', 0])],
         data = div,
         menu = 0
@@ -1300,7 +1304,7 @@ def raw_view(name = None, sub_title = None, num = None):
         p_data = html.escape(data[0][0])
         p_data = '<textarea readonly rows="25">' + p_data + '</textarea>'
         
-        return html_minify(render_template('index.html', 
+        return html_minify(render_template(skin_check(conn), 
             imp = [v_name, wiki_set(conn, 1), custom(conn), other2([sub, 0])],
             data = p_data,
             menu = menu
@@ -1365,7 +1369,7 @@ def revert(name = None):
         if not curs.fetchall():
             return redirect('/w/' + url_pas(name))
 
-        return html_minify(render_template('index.html', 
+        return html_minify(render_template(skin_check(conn), 
             imp = [name, wiki_set(conn, 1), custom(conn), other2([' (되돌리기)', 0])],
             data =  '<form method="post"> \
                         <span>' + request.args.get('num', '0') + '판으로 되돌리겠습니까?</span><hr> \
@@ -1405,7 +1409,7 @@ def big_delete():
 
         return redirect('/')
     else:
-        return html_minify(render_template('index.html', 
+        return html_minify(render_template(skin_check(conn), 
             imp = ['많은 문서 삭제', wiki_set(conn, 1), custom(conn), other2([0, 0])],
             data = '<span>문서명 A<br>문서명 B<br>문서명 C<hr>이런 식으로 적으세요.</span><hr> \
                     <form method="post"> \
@@ -1427,7 +1431,7 @@ def edit_filter():
     div += '</ul>'
     div += '<hr><a href="/manager/9">(추가)</a>'
 
-    return html_minify(render_template('index.html', 
+    return html_minify(render_template(skin_check(conn), 
         imp = ['편집 필터 목록', wiki_set(conn, 1), custom(conn), other2([0, 0])],
         data = div,
         menu = [['manager', '관리자']]
@@ -1475,7 +1479,7 @@ def set_edit_filter(name = None):
         else:
             stat = ''
 
-        return html_minify(render_template('index.html', 
+        return html_minify(render_template(skin_check(conn), 
             imp = [name, wiki_set(conn, 1), custom(conn), other2([' (편집 필터)', 0])],
             data = '<form method="post"> \
                         <input ' + stat + ' placeholder="분 차단" name="end" value="' + html.escape(time_data) + '" type="text"><br><br><ul><li>비우면 영구 차단</li><li>1달은 28일로 취급</li></ul><hr> \
@@ -1575,7 +1579,7 @@ def edit(name = None):
                 data = get_data[0][0]
                 get_name = ''
 
-        return html_minify(render_template('index.html', 
+        return html_minify(render_template(skin_check(conn), 
             imp = [name, wiki_set(conn, 1), custom(conn), other2([' (수정)', 0])],
             data = get_name + ' \
                     <form method="post" action="/edit/' + url_pas(name) + action + '"> \
@@ -1611,7 +1615,7 @@ def preview(name = None):
     else:
         action = ''
 
-    return html_minify(render_template('index.html', 
+    return html_minify(render_template(skin_check(conn), 
         imp = [name, wiki_set(conn, 1), custom(conn), other2([' (미리보기)', 0])],
         data = '<form method="post" action="/edit/' + url_pas(name) + action + '"> \
                     <textarea rows="25" name="content">' + html.escape(request.form['content']) + '</textarea> \
@@ -1660,7 +1664,7 @@ def delete(name = None):
         if not curs.fetchall():
             return redirect('/w/' + url_pas(name))
 
-        return html_minify(render_template('index.html', 
+        return html_minify(render_template(skin_check(conn), 
             imp = [name, wiki_set(conn, 1), custom(conn), other2([' (삭제)', 0])],
             data = '<form method="post"> \
                         ' + ip_warring(conn) + ' \
@@ -1688,7 +1692,7 @@ def move_data(name = None):
     
     data += '</ul>'
     
-    return html_minify(render_template('index.html', 
+    return html_minify(render_template(skin_check(conn), 
         imp = [name, wiki_set(conn, 1), custom(conn), other2([' (이동 기록)', 0])],
         data = data,
         menu = [['history/' + url_pas(name), '역사']]
@@ -1732,7 +1736,7 @@ def move(name = None):
         return redirect('/w/' + url_pas(request.form['title']))
 
     else:            
-        return html_minify(render_template('index.html', 
+        return html_minify(render_template(skin_check(conn), 
             imp = [name, wiki_set(conn, 1), custom(conn), other2([' (이동)', 0])],
             data = '<form method="post"> \
                         ' + ip_warring(conn) + ' \
@@ -1746,7 +1750,7 @@ def move(name = None):
             
 @app.route('/other')
 def other():
-    return html_minify(render_template('index.html', 
+    return html_minify(render_template(skin_check(conn), 
         imp = ['기타 메뉴', wiki_set(conn, 1), custom(conn), other2([0, 0])],
         data = '<h2>기록</h2><ul><li><a href="/manager/6">편집 기록</a></li><li><a href="/manager/7">토론 기록</a></li></ul><br><h2>목록</h2><ul><li><a href="/admin_list">관리자 목록</a></li><li><a href="/give_log">관리 그룹 목록</a></li><li><a href="/not_close_topic">열린 토론 목록</a></li></ul><br><h2>기타</h2><ul><li><a href="/title_index">모든 문서</a></li><li><a href="/acl_list">ACL 문서</a></li><li><a href="/please">필요한 문서</a></li><li><a href="/upload">파일 올리기</a></li><li><a href="/manager/10">문서 검색</a></li></ul><br><h2>관리자</h2><ul><li><a href="/manager/1">관리자 메뉴</a></li></ul><br><h2>버전</h2><ul><li>이 오픈나무는 <a href="https://github.com/2DU/openNAMU/blob/master/version.md">' + r_ver + '</a> 입니다.</li></ul>',
         menu = 0
@@ -1758,7 +1762,7 @@ def manager(num = 1):
     title_list = [['문서 ACL', '문서명', 'acl'], ['사용자 검사', 0, 'check'], ['사용자 차단', 0, 'ban'], ['권한 주기', 0, 'admin'], ['편집 기록', 0, 'record'], ['토론 기록', 0, 'topic_record'], ['그룹 생성', '그룹명', 'admin_plus'], ['편집 필터 생성', '필터명', 'edit_filter'], ['문서 검색', '문서명', 'search'], ['차단자 검색', 0, 'block_user'], ['관리자 검색', 0, 'block_admin'], ['주시 문서 추가', '문서명', 'watch_list']]
     
     if num == 1:
-        return html_minify(render_template('index.html', 
+        return html_minify(render_template(skin_check(conn), 
             imp = ['관리자 메뉴', wiki_set(conn, 1), custom(conn), other2([0, 0])],
             data = '<h2>목록</h2><ul><li><a href="/manager/2">문서 ACL</a></li><li><a href="/manager/3">사용자 검사</a></li><li><a href="/manager/4">사용자 차단</a></li><li><a href="/manager/5">권한 주기</a></li><li><a href="/big_delete">여러 문서 삭제</a></li><li><a href="edit_filter">편집 필터</a></li></ul><br><h2>소유자</h2><ul><li><a href="/indexing">인덱싱 (생성 or 삭제)</a></li><li><a href="/manager/8">관리 그룹 생성</a></li><li><a href="/edit_set">설정 편집</a></li><li><a href="/re_start">서버 재 시작</a></li><li><a href="/update">업데이트 (Git 사용)</a></li><!-- <li><a href="/inter_wiki">인터위키</a></li> --></ul>',
             menu = [['other', '기타']]
@@ -1774,7 +1778,7 @@ def manager(num = 1):
             else:
                 placeholder = title_list[(num - 2)][1]
 
-            return html_minify(render_template('index.html', 
+            return html_minify(render_template(skin_check(conn), 
                 imp = [title_list[(num - 2)][0], wiki_set(conn, 1), custom(conn), other2([0, 0])],
                 data = '<form method="post"> \
                             <input placeholder="' + placeholder + '" name="name" type="text"><hr> \
@@ -1843,7 +1847,7 @@ def title_index():
     data += '</ul>' + next_fix('/title_index?num=' + str(num) + '&page=', page, title_list, num)
     sub = ' (' + str(num) + '개)'
     
-    return html_minify(render_template('index.html', 
+    return html_minify(render_template(skin_check(conn), 
         imp = ['모든 문서', wiki_set(conn, 1), custom(conn), other2([sub, 0])],
         data = data,
         menu = [['other', '기타']]
@@ -1994,7 +1998,7 @@ def topic_admin(name = None, sub = None, num = None):
 
     ban = '<h2>정보</h2><ul>' + ban
 
-    return html_minify(render_template('index.html', 
+    return html_minify(render_template(skin_check(conn), 
         imp = ['토론 도구', wiki_set(conn, 1), custom(conn), other2([' (' + str(num) + '번)', 0])],
         data = ban,
         menu = [['topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '#' + str(num), '토론']]
@@ -2162,7 +2166,7 @@ def topic(name = None, sub = None):
 
             data += '<button type="submit">전송</button></form>'
 
-        return html_minify(render_template('index.html', 
+        return html_minify(render_template(skin_check(conn), 
             imp = [name, wiki_set(conn, 1), custom(conn), other2([' (토론)', 0])],
             data = '<h2 id="topic_top_title">' + sub + '</h2>' + all_data + data,
             menu = [['topic/' + url_pas(name), '목록']]
@@ -2228,7 +2232,7 @@ def close_topic_list(name = None, tool = None):
         if div == '':
             plus = re.sub('^<br>', '', plus)
         
-        return html_minify(render_template('index.html', 
+        return html_minify(render_template(skin_check(conn), 
             imp = [name, wiki_set(conn, 1), custom(conn), other2([' (' + sub + ')', 0])],
             data =  '<form method="post">' + div + plus + '</form>',
             menu = menu
@@ -2284,7 +2288,7 @@ def login():
         return redirect('/user')  
 
     else:        
-        return html_minify(render_template('index.html',    
+        return html_minify(render_template(skin_check(conn),    
             imp = ['로그인', wiki_set(conn, 1), custom(conn), other2([0, 0])],
             data = '<form method="post"> \
                         <input placeholder="아이디" name="id" type="text"><hr> \
@@ -2324,7 +2328,7 @@ def change_password():
         return redirect('/user')
 
     else:        
-        return html_minify(render_template('index.html',    
+        return html_minify(render_template(skin_check(conn),    
             imp = ['비밀번호 변경', wiki_set(conn, 1), custom(conn), other2([0, 0])],
             data = '<form method="post"> \
                         <input placeholder="현재 비밀번호" name="pw" type="password"><hr> \
@@ -2394,7 +2398,7 @@ def user_check(name = None):
     else:
         return re_error(conn, '/error/5')
             
-    return html_minify(render_template('index.html',    
+    return html_minify(render_template(skin_check(conn),    
         imp = ['다중 검사', wiki_set(conn, 1), custom(conn), other2([0, 0])],
         data = div,
         menu = [['manager', '관리자']]
@@ -2405,7 +2409,7 @@ def plus_check(name):
     if request.method == 'POST':
         return redirect('/check/' + url_pas(name) + '?plus=' + url_pas(request.form['name2']))
     else:
-        return html_minify(render_template('index.html',
+        return html_minify(render_template(skin_check(conn),
             imp = ['대상 추가', wiki_set(conn, 1), custom(conn), other2([0, 0])],
             data = '<form method="post"> \
                         <input placeholder="비교 대상" name="name2" type="text"><hr> \
@@ -2465,7 +2469,7 @@ def register():
         if data and data[0][0] != '':
             contract = data[0][0] + '<hr>'
 
-        return html_minify(render_template('index.html',    
+        return html_minify(render_template(skin_check(conn),    
             imp = ['회원가입', wiki_set(conn, 1), custom(conn), other2([0, 0])],
             data = '<form method="post"> \
                         ' + contract + ' \
@@ -2532,7 +2536,7 @@ def user_ban(name = None):
 
             data = '<input placeholder="사유" name="why" type="text"><hr><input placeholder="분 차단" name="end" type="text"><br><br><ul><li>비우면 영구 차단</li><li>1달은 28일로 취급</li></ul><hr>' + plus
 
-        return html_minify(render_template('index.html', 
+        return html_minify(render_template(skin_check(conn), 
             imp = [name, wiki_set(conn, 1), custom(conn), other2([' (' + now + ')', 0])],
             data = '<form method="post">' + data + '<button type="submit">' + now + '</button></form>',
             menu = [['manager', '관리자']]
@@ -2619,7 +2623,7 @@ def acl(name = None):
         else:
             plus = '<option value="admin" ' + acl_list[0] + '>관리자</option>'
             
-        return html_minify(render_template('index.html', 
+        return html_minify(render_template(skin_check(conn), 
             imp = [name, wiki_set(conn, 1), custom(conn), other2([' (ACL)', 0])],
             data = '<form method="post"> \
                         <span>현재 ACL : ' + now + '</span><hr> \
@@ -2690,7 +2694,7 @@ def user_admin(name = None):
                 else:
                     div += '<option value="' + data[0] + '">' + data[0] + '</option>'
         
-        return html_minify(render_template('index.html', 
+        return html_minify(render_template(skin_check(conn), 
             imp = [name, wiki_set(conn, 1), custom(conn), other2([' (권한 부여)', 0])],
             data =  '<form method="post"> \
                         <select name="select">' + div + '</select><hr> \
@@ -2719,7 +2723,7 @@ def diff_data(name = None):
                 diff_data = difflib.SequenceMatcher(None, first_data, second_data)
                 result = diff(diff_data)
             
-            return html_minify(render_template('index.html', 
+            return html_minify(render_template(skin_check(conn), 
                 imp = [name, wiki_set(conn, 1), custom(conn), other2([' (비교)', 0])],
                 data = '<pre>' + result + '</pre>',
                 menu = [['history/' + url_pas(name), '역사']]
@@ -2737,7 +2741,7 @@ def down(name = None):
         
     div += '</ul>'
     
-    return html_minify(render_template('index.html', 
+    return html_minify(render_template(skin_check(conn), 
         imp = [name, wiki_set(conn, 1), custom(conn), other2([' (하위)', 0])],
         data = div,
         menu = [['w/' + url_pas(name), '문서']]
@@ -2923,7 +2927,7 @@ def read_view(name = None):
 
     div = end_data + div
 
-    return html_minify(render_template('index.html', 
+    return html_minify(render_template(skin_check(conn), 
         imp = [name, wiki_set(conn, 1), custom(conn), other2([sub + acl, r_date])],
         data = div,
         menu = menu
@@ -2971,7 +2975,7 @@ def user_topic_list(name = None):
     else:
         sub = 0 
     
-    return html_minify(render_template('index.html', 
+    return html_minify(render_template(skin_check(conn), 
         imp = ['토론 기록', wiki_set(conn, 1), custom(conn), other2([sub, 0])],
         data = div,
         menu = [['other', '기타'], ['user', '사용자'], ['count/' + url_pas(name), '횟수'], ['record/' + url_pas(name), '편집']]
@@ -3183,7 +3187,7 @@ def recent_changes(name = None, tool = 'record'):
         if sub == '':
             sub = 0
                 
-        return html_minify(render_template('index.html', 
+        return html_minify(render_template(skin_check(conn), 
             imp = [title, wiki_set(conn, 1), custom(conn), other2([sub, 0])],
             data = div,
             menu = menu
@@ -3260,7 +3264,7 @@ def upload():
         return redirect('/w/파일:' + name)      
 
     else:
-        return html_minify(render_template('index.html', 
+        return html_minify(render_template(skin_check(conn), 
             imp = ['파일 올리기', wiki_set(conn, 1), custom(conn), other2([0, 0])],
             data =  '<form method="post" enctype="multipart/form-data" accept-charset="utf8"> \
                         <input type="file" name="f_data"><hr> \
@@ -3314,7 +3318,7 @@ def user_info():
         
         plus = '<li><a href="/login">로그인</a></li>'
 
-    return html_minify(render_template('index.html', 
+    return html_minify(render_template(skin_check(conn), 
         imp = ['사용자 메뉴', wiki_set(conn, 1), custom(conn), other2([0, 0])],
         data =  '<h2>상태</h2><ul><li>' + ip_user + ' <a href="/record/' + url_pas(ip) + '">(기록)</a></li><li>권한 상태 : ' + acl + '</li></ul><br><h2>로그인</h2><ul>' + plus + '<li><a href="/register">회원가입</a></li></ul><br><h2>사용자 기능</h2><ul><li><a href="/acl/사용자:' + url_pas(ip) + '">사용자 문서 ACL</a></li><li><a href="/custom_head">사용자 HEAD</a></li></ul><br><h2>기타</h2><ul><li><a href="/alarm">알림</a></li><li><a href="/watch_list">주시 문서</a></li><li><a href="/count">활동 횟수</a></li></ul>',
         menu = 0
@@ -3340,7 +3344,7 @@ def email():
         else:
             email = ''
 
-        return html_minify(render_template('index.html',    
+        return html_minify(render_template(skin_check(conn),    
             imp = ['이메일 수정', wiki_set(conn, 1), custom(conn), other2([0, 0])],
             data = '<form method="post"> \
                         <input placeholder="이메일" name="email" type="text" value="' + email + '"><hr> \
@@ -3366,7 +3370,7 @@ def watch_list():
 
     div += '<a href="/manager/13">(추가)</a>'
 
-    return html_minify(render_template('index.html', 
+    return html_minify(render_template(skin_check(conn), 
         imp = ['편집 필터 목록', wiki_set(conn, 1), custom(conn), other2([0, 0])],
         data = div,
         menu = [['manager', '관리자']]
@@ -3436,7 +3440,7 @@ def custom_head_view():
 
         start += '<span>&lt;style&gt;CSS&lt;/style&gt;<br>&lt;script&gt;JS&lt;/script&gt;</span><hr>'
 
-        return html_minify(render_template('index.html', 
+        return html_minify(render_template(skin_check(conn), 
             imp = ['사용자 HEAD', wiki_set(conn, 1), custom(conn), other2([0, 0])],
             data =  start + ' \
                     <form method="post"> \
@@ -3471,7 +3475,7 @@ def count_edit(name = None):
     else:
         t_data = 0
 
-    return html_minify(render_template('index.html', 
+    return html_minify(render_template(skin_check(conn), 
         imp = ['활동 횟수', wiki_set(conn, 1), custom(conn), other2([0, 0])],
         data = '<ul><li><a href="/record/' + url_pas(that) + '">편집 횟수</a> : ' + str(data) + '</li><li><a href="/topic_record/' + url_pas(that) + '">토론 횟수</a> : ' + str(t_data) + '</a></li></ul>',
         menu = [['user', '사용자']]

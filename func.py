@@ -98,7 +98,7 @@ def skin_check(conn):
     except:
         pass
 
-    return skin
+    return skin + 'index.html'
 
 def next_fix(link, num, page, end = 50):
     list_data = ''
@@ -566,7 +566,7 @@ def re_error(conn, data):
                 if end_data[0][1] != '':
                     end += '<li>사유 : ' + end_data[0][1] + '</li>'
 
-        return html_minify(render_template('index.html', 
+        return html_minify(render_template(skin_check(conn), 
             imp = ['권한 오류', wiki_set(conn, 1), custom(conn), other2([0, 0])],
             data = '<h2>권한 상태</h2><ul>' + end + '</ul>',
             menu = 0
@@ -668,7 +668,7 @@ def re_error(conn, data):
             data = '???'
 
         if title:
-            return html_minify(render_template('index.html', 
+            return html_minify(render_template(skin_check(conn), 
                 imp = [title, wiki_set(conn, 1), custom(conn), other2([0, 0])],
                 data = '<h2>오류 발생</h2><ul><li>' + data + '</li></ul>',
                 menu = 0
