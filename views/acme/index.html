@@ -115,7 +115,9 @@
                                             {% else %}
                                                 <a class="menu-item" href="/{{sub_d[0]}}">{{sub_d[1]}}</a>
                                             {% endif %}
-                                            <span style="margin-left: 10px"></span>
+                                            {% if menu[loop.index] %}
+                                                ㆍ
+                                            {% endif %}
                                         {% endfor %}
                                     {% endif %}
                                 </li>
