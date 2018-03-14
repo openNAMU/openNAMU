@@ -7,6 +7,7 @@ from tornado.wsgi import WSGIContainer
 from tornado.httpserver import HTTPServer
 from tornado.ioloop import IOLoop
 
+import platform
 import bcrypt
 import difflib
 import shutil
@@ -433,6 +434,7 @@ def edit_set(num = 0):
             for skin_data in os.listdir(os.path.abspath('views')):
                 if d_list[5] == skin_data:
                     div2 = '<option value="' + skin_data + '">' + skin_data + '</option>' + div2
+                    
                 else:
                     div2 += '<option value="' + skin_data + '">' + skin_data + '</option>'
 
@@ -962,15 +964,22 @@ def update():
     if admin_check(conn, None, 'update') != 1:
         return re_error(conn, '/error/3')
 
-    print('')
-    print('Update')
+    if platform.system() == 'Linux':
+        print('')
+        print('Update')
 
-    os.system('git pull')
+        ok = os.system('git pull')
+        if ok == 0:
+            print('Re Start')
+            print('')
 
-    print('Re Start')
-    print('')
+            os.execl(sys.executable, sys.executable, *sys.argv)
 
-    os.execl(sys.executable, sys.executable, *sys.argv)
+    return html_minify(render_template(skin_check(conn), 
+        imp = ['업데이트', wiki_set(conn, 1), custom(conn), other2([0, 0])],
+        data = '수동 업데이트를 권장 합니다. <a href="https://github.com/2DU/openNAMU">(깃허브)</a>',
+        menu = [['manager/1', '관리자']]
+    ))
         
 @app.route('/xref/<path:name>')
 def xref(name = None):
