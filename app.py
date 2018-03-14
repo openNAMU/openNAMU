@@ -422,13 +422,19 @@ def edit_set(num = 0):
                 div += '<option value="login">가입자</option>'
 
             ch_1 = ''
-            ch_2 = ''
-            ch_3 = ''
             if d_list[7]:
                 ch_1 = 'checked="checked"'
-            
+
+            ch_2 = ''
             if d_list[8]:
-                ch_2 = 'checked="checked"'            
+                ch_2 = 'checked="checked"'
+            
+            div2 = ''
+            for skin_data in os.listdir(os.path.abspath('views')):
+                if d_list[5] == skin_data:
+                    div2 = '<option value="' + skin_data + '">' + skin_data + '</option>' + div2
+                else:
+                    div2 += '<option value="' + skin_data + '">' + skin_data + '</option>'
 
             return html_minify(render_template(skin_check(conn), 
                 imp = ['기본 설정', wiki_set(conn, 1), custom(conn), other2([0, 0])],
@@ -444,7 +450,7 @@ def edit_set(num = 0):
                             <span>파일 크기 [메가]</span><br><br> \
                             <input placeholder="파일 크기" type="text" name="upload" value="' + html.escape(d_list[4]) + '"><hr> \
                             <span>스킨</span><br><br> \
-                            <input placeholder="스킨" type="text" name="skin" value="' + html.escape(d_list[5]) + '"><hr> \
+                            <select name="skin">' + div2 + '</select><hr> \
                             <span>전역 ACL</span><br><br> \
                             <select name="edit">' + div + '</select><hr> \
                             <input type="checkbox" name="reg" ' + ch_1 + '> 가입불가<hr> \
