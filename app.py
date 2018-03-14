@@ -451,14 +451,14 @@ def edit_set(num = 0):
                             <input placeholder="라이선스" type="text" name="license" value="' + html.escape(d_list[3]) + '"><hr> \
                             <span>파일 크기 [메가]</span><br><br> \
                             <input placeholder="파일 크기" type="text" name="upload" value="' + html.escape(d_list[4]) + '"><hr> \
+                            <span>백업 간격 [시간] (끄기 : 0) {재시작 필요}</span><br><br> \
+                            <input placeholder="백업 간격" type="text" name="back_up" value="' + html.escape(d_list[9]) + '"><hr> \
                             <span>스킨</span><br><br> \
                             <select name="skin">' + div2 + '</select><hr> \
                             <span>전역 ACL</span><br><br> \
                             <select name="edit">' + div + '</select><hr> \
                             <input type="checkbox" name="reg" ' + ch_1 + '> 가입불가<hr> \
                             <input type="checkbox" name="ip_view" ' + ch_2 + '> 아이피 비공개<hr> \
-                            <span>백업 간격 [시간] (끄기 : 0) {재시작 필요}</span><hr> \
-                            <input placeholder="백업 간격" type="text" name="back_up" value="' + html.escape(d_list[9]) + '"><hr> \
                             <button id="save" type="submit">저장</button> \
                         </form>',
                 menu = [['edit_set', '설정']]
