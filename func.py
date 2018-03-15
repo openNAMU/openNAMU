@@ -418,7 +418,7 @@ def topic_check(conn, name, sub):
 
     return 0
 
-def ban_insert(conn, name, end, why, login, blocker = ip_check()):
+def ban_insert(conn, name, end, why, login, blocker):
     curs = conn.cursor()
 
     time = get_time()
@@ -427,46 +427,6 @@ def ban_insert(conn, name, end, why, login, blocker = ip_check()):
         band = 'O'
     else:
         band = ''
-
-    if end != '':
-        year = int(int(end) / 525600)
-        month = int(int(end) % 525600 / 40320)
-        day = int(int(end) % 525600 % 40320 / 1440)
-        hour = int(int(end) % 525600 % 40320 % 1440 / 60)
-        minute = int(int(end) % 525600 % 40320 % 1440 % 60)
-
-        end_data = [month, day, hour, minute]
-
-        match = re.search("^([^-]+)-([^-]+)-([^ ]+) ([^:]+):([^:]+):(.+)$", time)
-        time_data = match.groups()
-
-        time_cut = [11, 27, 23, 59]
-        test_list = [int(time_data[0]) + year, 0, 0, 0, 0]
-
-        for number in range(0, 4):
-            if month + int(time_data[number + 1]) > time_cut[number]:
-                test_list[number] += 1
-
-                test_list[number + 1] = end_data[number] + int(time_data[number + 1]) - (time_cut[number] + 1)
-
-            else:
-                test_list[number + 1] = end_data[number] + int(time_data[number + 1])
-
-        time_list = [test_list[1], test_list[2], test_list[3], test_list[4]]
-        number = 0
-        for time_fix in time_list:
-            if not re.search("[0-9]{2}", str(time_fix)):
-                time_list[number] = '0' + str(time_fix) 
-
-            else:
-                time_list[number] = str(time_fix)
-
-            number += 1
-
-        end = str(test_list[0]) + '-' + time_list[0] + '-' + time_list[1] + ' ' + time_list[2] + ':' + time_list[3] + ':' + time_data[5]
-
-    else:
-        end = ''
 
     curs.execute("select block from ban where block = ?", [name])
     if curs.fetchall():
@@ -479,6 +439,11 @@ def ban_insert(conn, name, end, why, login, blocker = ip_check()):
             
         else:
             login = ''
+
+        if end != '':
+            end += ' 00:00:00'
+
+        print(end)
 
         curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, ?)", [name, end, time, blocker, why, band])
         curs.execute("insert into ban (block, end, why, band, login) values (?, ?, ?, ?, ?)", [name, end, why, band, login])
@@ -542,24 +507,19 @@ def re_error(conn, data):
                 end = '<li>상태 : '
 
                 if end_data[0][0]:
-                    now = int(re.sub('(:|-| )', '', get_time()))
-                    day = re.sub('\-', '', end_data[0][0])      
-                    if re.search(':', day):
-                        day = re.sub('( |:)', '', day)
-
-                    else:
-                        day += '000000'
+                    now = int(re.sub('(\-| |:)', '', get_time()))
+                    day = int(re.sub('(\-| |:)', '', end_data[0][0]))
                     
-                    if now >= int(day):
+                    if now >= day:
                         curs.execute("delete from ban where block = ?", [ip])
                         conn.commit()
 
-                        end += '차단이 풀렸습니다. 다시 시도 해 보세요.'
+                        end += '차단이 풀렸습니다. 다시 해보세요.'
                     else:
-                        end += end_data[0][0] + ' 까지 차단 상태 입니다.'
+                        end += '차단 중 : ' + end_data[0][0]
 
                 else:
-                    end += '영구 차단 상태 입니다.'
+                    end += '무기한 차단 상태 입니다.'
                 
                 end += '</li>'
 
