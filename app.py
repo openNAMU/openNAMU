@@ -140,7 +140,14 @@ else:
 print('')
 
 # 호환성 설정
-curs.execute("drop table if exists move")
+try:
+    curs.execute("drop table move")
+
+    print('move table delete')
+
+except:
+    pass
+
 try:
     curs.execute("alter table history add hide text default ''")
     
@@ -149,21 +156,33 @@ try:
         curs.execute("update history set hide = 'O' where title = ? and id = ?", [rep[0], rep[1]])
 
     curs.execute("drop table if exists hidhi")
+
+    print('move table hidhi')
+
 except:
     pass
 
 try:
     curs.execute("alter table user add date text default ''")
+
+    print('user table add column date')
+
 except:
     pass
 
 try:
     curs.execute("alter table rb add band text default ''")
+
+    print('rb table add column band')
+
 except:
     pass
 
 try:
     curs.execute("alter table ban add login text default ''")
+
+    print('ban table add column login')
+
 except:
     pass
 
@@ -173,38 +192,44 @@ try:
         curs.execute("insert into acl (title, dec, dis, why) values (?, ?, '', '')", [rep[0], rep[1]])
 
     curs.execute("alter table data drop acl")
+
+    print('data table delete column acl')
+
 except:
     pass
 
 try:
-    curs.execute("select data from other where name = 'robot'")
-    robot_test = curs.fetchall()
-    if robot_test:
-        fw_test = open('./robots.txt', 'w')
-        fw_test.write(re.sub('\r\n', '\n', robot_test[0][0]))
-        fw_test.close()
+    if not os.path.exists('robot.txt'):
+        curs.execute("select data from other where name = 'robot'")
+        robot_test = curs.fetchall()
+        if robot_test:
+            fw_test = open('./robots.txt', 'w')
+            fw_test.write(re.sub('\r\n', '\n', robot_test[0][0]))
+            fw_test.close()
+
+            print('robot.txt create')
 
 except:
     pass
 
 try:
     curs.execute("alter table user add email text default ''")
+
+    print('user table add email acl')
+
 except:
     pass
 
 try:
-    curs.execute('select name, sub from filter')
+    curs.execute('select name, sub from filter where sub != "X" and sub != ""')
     filter_name = curs.fetchall()
-    for filter_delete in filter_name:
-        filter_change = re.search('^((?:(?! ).)+) ((?:(?!:).)+):(.+)$', filter_delete[1])
-        if filter_change:
-            filter_change = filter_change.groups()
-            filter_change = filter_change[0] * 44640 + filter_change[1] * 1440 + filter_change[2]
-            
-            curs.execute("update filter set sub = ? where name = ?", [filter_change, filter_delete[0]])
+    if filter_name:
+        for filter_delete in filter_name:
+            if filter_delete[1] != '' or filter_delete[1] != 'X':
+                curs.execute("update filter set sub = '' where name = ?", [filter_delete[0]])
 
-        else:
-            curs.execute("update filter set sub = '1' where name = ?", [filter_delete[0]])
+        print('filter data fix')
+
 except:
     pass
         
@@ -1100,7 +1125,7 @@ def recent_discuss(tools = 'normal'):
     ))
 
 @app.route('/block_log')
-@app.route('/block_log/<regex("ip|user|never_end|can_end|end|now"):tool2>')
+@app.route('/block_log/<regex("ip|user|never_end|can_end|end|now|edit_filter"):tool2>')
 @app.route('/<regex("block_user|block_admin"):tool>/<name>')
 def block_log(name = None, tool = None, tool2 = None):
     num = int(request.args.get('num', 1))
@@ -1116,7 +1141,7 @@ def block_log(name = None, tool = None, tool2 = None):
     
     if not name:
         if not tool2:
-            div = '<a href="/manager/11">(차단자)</a> <a href="/manager/12">(관리자)</a><hr><a href="/block_log/ip">(아이피)</a> <a href="/block_log/user">(가입자)</a> <a href="/block_log/never_end">(영구)</a> <a href="/block_log/can_end">(기간)</a> <a href="/block_log/end">(해제)</a> <a href="/block_log/now">(현재)</a><hr>' + div
+            div = '<a href="/manager/11">(차단자)</a> <a href="/manager/12">(관리자)</a><hr><a href="/block_log/ip">(아이피)</a> <a href="/block_log/user">(가입자)</a> <a href="/block_log/never_end">(무기한)</a> <a href="/block_log/can_end">(기간)</a> <a href="/block_log/end">(해제)</a> <a href="/block_log/now">(현재)</a> <a href="/block_log/edit_filter">(편집 필터)</a><hr>' + div
             
             sub = 0
             menu = 0
@@ -1137,7 +1162,7 @@ def block_log(name = None, tool = None, tool2 = None):
                 curs.execute("select why, block, blocker, end, today from rb where not (block like ? or block like ?) order by today desc limit ?, '50'", ['%.%', '%:%', str(sql_num)])
 
             elif tool2 == 'never_end':
-                sub = '(영구)'
+                sub = '(무기한)'
                 
                 curs.execute("select why, block, blocker, end, today from rb where not end like ? and not end like ? order by today desc limit ?, '50'", ['%:%', '%해제%', str(sql_num)])
 
@@ -1156,6 +1181,11 @@ def block_log(name = None, tool = None, tool2 = None):
                     curs.execute("select why, block, blocker, end, today from rb where block = ? order by today desc limit 1", [in_data[0]])
                     
                     data_list = [curs.fetchall()[0]] + data_list
+
+            elif tool2 == 'edit_filter':
+                sub = '(편집 필터)'
+
+                curs.execute("select why, block, blocker, end, today from rb where blocker = ? order by today desc limit ?, '50'", ['도구:편집 필터', str(sql_num)])
 
             else:
                 sub = '(기간)'
@@ -1440,11 +1470,17 @@ def edit_filter():
     div = '<ul>'
     
     curs.execute("select name from filter")
-    for data_list in curs.fetchall():
+    data = curs.fetchall()
+    for data_list in data:
         div += '<li><a href="/edit_filter/' + url_pas(data_list[0]) + '">' + data_list[0] + '</a></li>'
 
     div += '</ul>'
-    div += '<hr><a href="/manager/9">(추가)</a>'
+
+    if data:
+        div += '<hr><a href="/manager/9">(추가)</a>'
+    
+    else:
+        div = '<a href="/manager/9">(추가)</a>'
 
     return html_minify(render_template(skin_check(conn), 
         imp = ['편집 필터 목록', wiki_set(conn, 1), custom(conn), other2([0, 0])],
@@ -1455,7 +1491,7 @@ def edit_filter():
 @app.route('/edit_filter/<name>/delete', methods=['POST', 'GET'])
 def delete_edit_filter(name = None):
     if admin_check(conn, 1, 'edit_filter delete') != 1:
-        return re_error('/error/3')
+        return re_error(conn, '/error/3')
 
     curs.execute("delete from filter where name = ?", [name])
     conn.commit()
@@ -1466,14 +1502,20 @@ def delete_edit_filter(name = None):
 def set_edit_filter(name = None):
     if request.method == 'POST':
         if admin_check(conn, 1, 'edit_filter edit') != 1:
-            return re_error('/error/3')
+            return re_error(conn, '/error/3')
+
+        if request.form.get('ban', None):
+            end = 'X'
+
+        else:
+            end = ''
 
         curs.execute("select name from filter where name = ?", [name])
         if curs.fetchall():
-            curs.execute("update filter set regex = ?, sub = ? where name = ?", [request.form.get('content', '테스트'), request.form.get('end', ''), name])
+            curs.execute("update filter set regex = ?, sub = ? where name = ?", [request.form.get('content', '테스트'), end, name])
 
         else:
-            curs.execute("insert into filter (name, regex, sub) values (?, ?, ?)", [name, request.form.get('content', '테스트'), request.form.get('end', '')])
+            curs.execute("insert into filter (name, regex, sub) values (?, ?, ?)", [name, request.form.get('content', '테스트'), end])
 
         conn.commit()
     
@@ -1483,7 +1525,12 @@ def set_edit_filter(name = None):
         exist = curs.fetchall()
         if exist:
             textarea = exist[0][0]
-            time_data = exist[0][1]
+            
+            if exist[0][1] == 'X':
+                time_data = 'checked="checked"'
+            
+            else:
+                time_data = ''
 
         else:
             textarea = ''
@@ -1497,7 +1544,7 @@ def set_edit_filter(name = None):
         return html_minify(render_template(skin_check(conn), 
             imp = [name, wiki_set(conn, 1), custom(conn), other2([' (편집 필터)', 0])],
             data = '<form method="post"> \
-                        <input ' + stat + ' placeholder="분 차단" name="end" value="' + html.escape(time_data) + '" type="text"><br><br><ul><li>비우면 영구 차단</li><li>1달은 28일로 취급</li></ul><hr> \
+                        <input ' + stat + ' type="checkbox" ' + time_data + ' name="ban"> 차단<hr> \
                         <input ' + stat + ' placeholder="정규식" name="content" value="' + html.escape(textarea) + '" type="text"><hr> \
                         <button ' + stat + ' id="save" type="submit">저장</button> \
                     </form>',
@@ -1514,10 +1561,12 @@ def edit(name = None):
         if admin_check(conn, 1, 'edit_filter pass') != 1:
             curs.execute("select regex, sub from filter")
             for data_list in curs.fetchall():
+                print(data_list)
                 match = re.compile(data_list[0])
                 if match.search(request.form['content']):
-                    ban_insert(conn, ip, data_list[1], '편집 필터에 의한 차단', None, '도구:편집 필터')
-
+                    if data_list[1] == 'X':
+                        ban_insert(conn, ip, '', '편집 필터에 의한 차단', None, '도구:편집 필터')
+                    
                     return re_error(conn, '/error/21')
 
         if captcha_post(request.form.get('g-recaptcha-response', None), conn) == 1:
@@ -1779,7 +1828,7 @@ def manager(num = 1):
     if num == 1:
         return html_minify(render_template(skin_check(conn), 
             imp = ['관리자 메뉴', wiki_set(conn, 1), custom(conn), other2([0, 0])],
-            data = '<h2>목록</h2><ul><li><a href="/manager/2">문서 ACL</a></li><li><a href="/manager/3">사용자 검사</a></li><li><a href="/manager/4">사용자 차단</a></li><li><a href="/manager/5">권한 주기</a></li><li><a href="/big_delete">여러 문서 삭제</a></li><li><a href="edit_filter">편집 필터</a></li></ul><br><h2>소유자</h2><ul><li><a href="/indexing">인덱싱 (생성 or 삭제)</a></li><li><a href="/manager/8">관리 그룹 생성</a></li><li><a href="/edit_set">설정 편집</a></li><li><a href="/re_start">서버 재 시작</a></li><li><a href="/update">업데이트 (Git 사용)</a></li><!-- <li><a href="/inter_wiki">인터위키</a></li> --></ul>',
+            data = '<h2>목록</h2><ul><li><a href="/manager/2">문서 ACL</a></li><li><a href="/manager/3">사용자 검사</a></li><li><a href="/manager/4">사용자 차단</a></li><li><a href="/manager/5">권한 주기</a></li><li><a href="/big_delete">여러 문서 삭제</a></li><li><a href="/edit_filter">편집 필터</a></li></ul><br><h2>소유자</h2><ul><li><a href="/indexing">인덱싱 (생성 or 삭제)</a></li><li><a href="/manager/8">관리 그룹 생성</a></li><li><a href="/edit_set">설정 편집</a></li><li><a href="/re_start">서버 재 시작</a></li><li><a href="/update">업데이트 (Git 사용)</a></li><!-- <li><a href="/inter_wiki">인터위키</a></li> --></ul>',
             menu = [['other', '기타']]
         ))
     elif num in range(2, 14):
@@ -2518,7 +2567,7 @@ def user_ban(name = None):
         if admin_check(conn, 1, 'ban (' + name + ')') != 1:
             return re_error(conn, '/error/3')
 
-        ban_insert(conn, name, request.form.get('end', ''), request.form.get('why', None), request.form.get('login', None))
+        ban_insert(conn, name, request.form.get('end', ''), request.form.get('why', None), request.form.get('login', None), ip_check())
 
         return redirect('/ban/' + url_pas(name))     
 
@@ -2526,15 +2575,22 @@ def user_ban(name = None):
         if admin_check(conn, 1, None) != 1:
             return re_error(conn, '/error/3')
 
-        curs.execute("select end from ban where block = ?", [name])
+        curs.execute("select end, why from ban where block = ?", [name])
         end = curs.fetchall()
         if end:
             now = '차단 해제'
+
             if end[0][0] == '':
-                data = '영구 차단<hr>'
+                data = '<ul><li>무기한 차단</li>'
 
             else:
-                data = end[0][0] + '까지 차단<hr>'
+                data = '<ul><li>차단 중 : ' + end[0][0] + '</li>'
+
+            if end[0][1] != '':
+                data += '<li>사유 : ' + end[0][1] + '</li></ul><hr>'
+
+            else:
+                data += '</ul><hr>'
 
         else:
             if re.search("^([0-9]{1,3}\.[0-9]{1,3})$", name):
@@ -2549,7 +2605,7 @@ def user_ban(name = None):
             else:
                 plus = ''
 
-            data = '<input placeholder="사유" name="why" type="text"><hr><input placeholder="분 차단" name="end" type="text"><br><br><ul><li>비우면 영구 차단</li><li>1달은 28일로 취급</li></ul><hr>' + plus
+            data = '<input placeholder="YYYY-MM-DD" name="end" type="text"><br><br>지금 날짜 : ' + re.sub(' .+$', '', get_time()) + '<hr><input placeholder="사유" name="why" type="text"><hr>' + plus
 
         return html_minify(render_template(skin_check(conn), 
             imp = [name, wiki_set(conn, 1), custom(conn), other2([' (' + now + ')', 0])],
@@ -3318,7 +3374,7 @@ def user_info():
                 acl += ' (' + block_data[0][0] + '까지)'
 
             else:
-                acl += ' (영구)'
+                acl += ' (무기한)'
         
             if block_data[0][1] != '':
                 acl += ' (로그인 가능)'
