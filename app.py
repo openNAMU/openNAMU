@@ -2222,7 +2222,7 @@ def topic(name = None, sub = None):
             number += 1
 
         if ban != 1 or admin == 1:
-            data += '<a id="reload" href="javascript:void(0);" onclick="location.href.endsWith(\'#reload\')? location.reload(true):location.href=\'#reload\'"><i aria-hidden="true" class="fa fa-refresh"></i></a><form style="' + display + '" method="post"><br><textarea style="height: 100px;" name="content"></textarea><hr>' + captcha_get(conn)
+            data += '<a id="reload" href="javascript:void(0);" onclick="location.href.endsWith(\'#reload\')? location.reload(true):location.href=\'#reload\'">(새로고침)</a><form style="' + display + '" method="post"><br><textarea style="height: 100px;" name="content"></textarea><hr>' + captcha_get(conn)
             
             if display == '':
                 data += ip_warring(conn)
