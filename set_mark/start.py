@@ -180,8 +180,194 @@ def start(conn, data, title):
     data = re.sub('\n( +)\|\|', '\n||', data)
     data = re.sub('\|\|( +)\n', '||\n', data)
 
+    # 중괄호 문법 처리
+    middle_stack = 0
+    middle_list = []
+    middle_number = 0
+    while 1:
+        middle_data = re.search('(?:{{{((?:(?! |{{{).)*)|(}}}))', data)
+        if middle_data:
+            middle_data = middle_data.groups()
+            if not middle_data[1]:
+                if middle_stack > 0:
+                    middle_stack += 1
+                    
+                    data = re.sub('(?:{{{((?:(?! |{{{).)*)|(}}}))', '&#123;&#123;&#123;' + middle_data[0], data, 1)
+
+                else:
+                    check = 0
+                    if check == 0:
+                        middle_search = re.search('^(#(?:[0-9a-f-A-F]{3}){1,2})', middle_data[0])
+                        if middle_search:
+                            check = 1
+                            
+                            middle_search = middle_search.groups()[0]
+                            
+                            middle_list += ['span']
+                            
+                            data = re.sub('(?:{{{((?:(?! |{{{).)*)|(}}}))', '<span style="color: ' + middle_search + ';">', data, 1)
+                        
+                        middle_search = re.search('^(?:#(\w+))', middle_data[0])
+                        if middle_search:
+                            check = 1
+                            
+                            middle_search = middle_search.groups()[0]
+                            
+                            middle_list += ['span']
+                            
+                            data = re.sub('(?:{{{((?:(?! |{{{).)*)|(}}}))', '<span style="color: ' + middle_search + ';">', data, 1)
+
+                        middle_search = re.search('^(?:@((?:[0-9a-f-A-F]{3}){1,2}))', middle_data[0])
+                        if middle_search:
+                            check = 1
+                            
+                            middle_search = middle_search.groups()[0]
+                            
+                            middle_list += ['span']
+                            
+                            data = re.sub('(?:{{{((?:(?! |{{{).)*)|(}}}))', '<span style="background: #' + middle_search + ';">', data, 1)
+                        
+                        middle_search = re.search('^(?:@(\w+))', middle_data[0])
+                        if middle_search:
+                            check = 1
+                            
+                            middle_search = middle_search.groups()[0]
+                            
+                            middle_list += ['span']
+                            
+                            data = re.sub('(?:{{{((?:(?! |{{{).)*)|(}}}))', '<span style="background: ' + middle_search + ';">', data, 1)
+
+                        middle_search = re.search('^(\+|-)([1-5])', middle_data[0])
+                        if middle_search:
+                            check = 1
+                            
+                            middle_search = middle_search.groups()
+                            if middle_search[0] == '+':
+                                font_size = str(int(middle_search[1]) * 20 + 100)
+                            else:
+                                font_size = str(100 - int(middle_search[1]) * 10)
+
+                            middle_list += ['span']
+                            
+                            data = re.sub('(?:{{{((?:(?! |{{{).)*)|(}}}))', '<span style="font-size: ' + font_size + '%;">', data, 1)
+
+                        middle_search = re.search('^#!wiki', middle_data[0])
+                        if middle_search:
+                            check = 1
+        
+                            middle_data_2 = re.search('{{{#!wiki style=(?:&quot;|&#x27;)((?:(?!&quot;|&#x27;).)*)(?:&quot;|&#x27;)\n', data)
+                            middle_data_2 = middle_data_2.groups()
+
+                            middle_list += ['div']
+                            
+                            data = re.sub('{{{#!wiki style=(?:&quot;|&#x27;)((?:(?!&quot;|&#x27;).)*)(?:&quot;|&#x27;)\n', '<div style="' + middle_data_2[0] + '">', data, 1)
+
+                        middle_search = re.search('^#!syntax', middle_data[0])
+                        if middle_search:
+                            check = 1
+        
+                            middle_data_2 = re.search('{{{#!syntax ((?:(?!\n).)+)\n', data)
+                            middle_data_2 = middle_data_2.groups()
+
+                            middle_list += ['code', 'pre']
+                            middle_number += 1
+                            
+                            data = re.sub('{{{#!syntax ((?:(?!\n).)+)\n', '<pre id="syntax"><code class="' + middle_data_2[0] + '">', data, 1)
+
+                        middle_search = re.search('^#!html', middle_data[0])
+                        if middle_search:
+                            check = 1
+
+                            middle_list += ['span']
+                            
+                            data = re.sub('(?:{{{((?:(?! |{{{).)*)|(}}}))', '<span>', data, 1)
+
+                        middle_search = re.search('^#!folding', middle_data[0])
+                        if middle_search:
+                            check = 1
+
+                            middle_list += ['span']
+                            
+                            data = re.sub('(?:{{{((?:(?! |{{{).)*)|(}}}))', '<span>', data, 1)
+
+                    if not check == 1:
+                        middle_list += ['code']
+                        
+                        middle_stack += 1
+                        
+                        data = re.sub('(?:{{{((?:(?! |{{{).)*)|(}}}))', '<code>' + middle_data[0], data, 1)
+                
+                    middle_number += 1
+
+            else:
+                if middle_stack > 0:
+                    middle_stack -= 1
+
+                if middle_stack > 0:
+                    data = re.sub('(?:{{{((?:(?! |{{{).)*)|(}}}))', '&#125;&#125;&#125;', data, 1)
+
+                else:
+                    if middle_number > 0:
+                        middle_number -= 1
+
+                    if middle_list[middle_number] == 'pre':
+                        data = re.sub('(?:{{{((?:(?! |{{{).)*)|(}}}))', '</code></pre>', data, 1)
+
+                        del(middle_list[middle_number])
+                        middle_number -= 1
+                    else:
+                        data = re.sub('(?:{{{((?:(?! |{{{).)*)|(}}}))', '</' + middle_list[middle_number] + '>', data, 1)
+                    
+                    del(middle_list[middle_number])
+
+        else:
+            break
+
     # 추가 데이터 지정
-    plus_data = ''
+    plus_data = '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"><script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script><script>hljs.initHighlightingOnLoad();</script>'
+
+    # NoWiki 처리
+    num = 0
+    while 1:
+        nowiki_data = re.search('<code>((?:(?:(?!<\/code>).)+\n*)+)<\/code>', data)
+        if nowiki_data:
+            nowiki_data = nowiki_data.groups()
+
+            num += 1
+
+            plus_data += '<script>function func_nowiki_' + str(num) + '() { document.all("nowiki_' + str(num) + '").innerHTML = "' + nowiki_data[0] + '"; }</script>'
+
+            data = re.sub('<code>((?:(?:(?!<\/code>).)+\n*)+)<\/code>', '<a href="javascript:void(0);" onclick="func_nowiki_' + str(num) + '();" id="nowiki_' + str(num) + '">(NoWiki 보기)</a>', data, 1)
+
+        else:
+            break
+
+    # Syntax 처리
+    while 1:
+        syntax_data = re.search('<code class="((?:(?!").)+)">((?:(?:(?!<\/code>|<span id="space">).)+\n*)+)<\/code>', data)
+        if syntax_data:
+            syntax_data = syntax_data.groups()
+
+            syntax_data_replace = syntax_data[1]
+
+            while 1:
+                syntax_space = re.search('\n( +)', syntax_data_replace)
+                if syntax_space:
+                    syntax_space = syntax_space.groups()
+
+                    space_len = '\n<span id="space">' + syntax_space[0] + '</span>'
+
+                    syntax_data_replace = re.sub('\n( +)', space_len, syntax_data_replace, 1)
+
+                else:
+                    break             
+
+            data = re.sub('<code class="((?:(?!").)+)">((?:(?:(?!<\/code>).)+\n*)+)<\/code>', '<code class="' + syntax_data[0] + '">' + syntax_data_replace + '</code>', data, 1)
+        
+        else:
+            break
+
+    print(data)
 
     # 수식 처리
     first = 0
@@ -288,103 +474,6 @@ def start(conn, data, title):
             break
 
     data += '\n'
-
-    # 중괄호 문법 처리
-    middle_stack = 0
-    middle_list = []
-    middle_number = 0
-    while 1:
-        middle_data = re.search('(?:{{{((?:(?! |{{{).)*)|(}}}))', data)
-        if middle_data:
-            middle_data = middle_data.groups()
-            if not middle_data[1]:
-                if middle_stack > 0:
-                    middle_stack += 1
-                    
-                    data = re.sub('(?:{{{((?:(?! |{{{).)*)|(}}}))', '&#123;&#123;&#123;' + middle_data[0], data, 1)
-
-                else:
-                    check = 0
-                    if check == 0:
-                        middle_search = re.search('^(#(?:[0-9a-f-A-F]{3}){1,2})', middle_data[0])
-                        if middle_search:
-                            check = 1
-                            
-                            middle_search = middle_search.groups()[0]
-                            
-                            middle_list += ['span']
-                            
-                            data = re.sub('(?:{{{((?:(?! |{{{).)*)|(}}}))', '<span style="color: ' + middle_search + ';">', data, 1)
-                        
-                        middle_search = re.search('^(?:#(\w+))', middle_data[0])
-                        if middle_search:
-                            check = 1
-                            
-                            middle_search = middle_search.groups()[0]
-                            
-                            middle_list += ['span']
-                            
-                            data = re.sub('(?:{{{((?:(?! |{{{).)*)|(}}}))', '<span style="color: ' + middle_search + ';">', data, 1)
-
-                        middle_search = re.search('^(?:@((?:[0-9a-f-A-F]{3}){1,2}))', middle_data[0])
-                        if middle_search:
-                            check = 1
-                            
-                            middle_search = middle_search.groups()[0]
-                            
-                            middle_list += ['span']
-                            
-                            data = re.sub('(?:{{{((?:(?! |{{{).)*)|(}}}))', '<span style="background: #' + middle_search + ';">', data, 1)
-                        
-                        middle_search = re.search('^(?:@(\w+))', middle_data[0])
-                        if middle_search:
-                            check = 1
-                            
-                            middle_search = middle_search.groups()[0]
-                            
-                            middle_list += ['span']
-                            
-                            data = re.sub('(?:{{{((?:(?! |{{{).)*)|(}}}))', '<span style="background: ' + middle_search + ';">', data, 1)
-
-                        middle_search = re.search('^(\+|-)([1-5])', middle_data[0])
-                        if middle_search:
-                            check = 1
-                            
-                            middle_search = middle_search.groups()
-                            if middle_search[0] == '+':
-                                font_size = str(int(middle_search[1]) * 20 + 100)
-                            else:
-                                font_size = str(100 - int(middle_search[1]) * 10)
-
-                            middle_list += ['span']
-                            
-                            data = re.sub('(?:{{{((?:(?! |{{{).)*)|(}}}))', '<span style="font-size: ' + font_size + '%;">', data, 1)
-
-                    if not check == 1:
-                        middle_list += ['code']
-                        
-                        middle_stack += 1
-                        
-                        data = re.sub('(?:{{{((?:(?! |{{{).)*)|(}}}))', '<code>' + middle_data[0], data, 1)
-                
-                    middle_number += 1
-
-            else:
-                if middle_stack > 0:
-                    middle_stack -= 1
-
-                if middle_stack > 0:
-                    data = re.sub('(?:{{{((?:(?! |{{{).)*)|(}}}))', '&#125;&#125;&#125;', data, 1)
-
-                else:
-                    if middle_number > 0:
-                        middle_number -= 1
-
-                    data = re.sub('(?:{{{((?:(?! |{{{).)*)|(}}}))', '</' + middle_list[middle_number] + '>', data, 1)
-                    
-                    del(middle_list[middle_number])
-        else:
-            break
 
     # 일부 매크로 처리
     data = tool.savemark(data)
