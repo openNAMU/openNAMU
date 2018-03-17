@@ -619,7 +619,7 @@ def start(conn, data, title):
                     link_id = ''
 
                 backlink += [[title, main_link, '']]
-                
+
                 data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<a ' + link_id + ' href="/w/' + tool.url_pas(main_link) + '">' + see_link + '</a>', data, 1)
         else:
             break
@@ -634,22 +634,29 @@ def start(conn, data, title):
             footnote_data = footnote.groups()
             if footnote_data[2]:
                 footnote_all += '</ul>'
+                
                 data = re.sub('(?:\[\*((?:(?! ).)*) ((?:(?!\]).)+)\]|(\[각주\]))', footnote_all, data, 1)
+                
                 footnote_all = '\n<hr><ul id="footnote_data">'
+
             else:
                 footnote = footnote_data[1]
                 footnote_name = footnote_data[0]
                 if footnote_name and not footnote:
                     data = re.sub('(?:\[\*((?:(?! |\]).)*)(?: ((?:(?!\]).)+))?\]|(\[각주\]))', '<sup><a href="#fn-' + footnote_dict[footnote_name] + '" id="rfn-' + footnote_dict[footnote_name] + '">(' + footnote_name + ')</a></sup>', data, 1)
+
                 else:
                     footnote_number += 1
+
                     if not footnote_name:
                         footnote_name = str(footnote_number)
                     else:
                         footnote_dict.update({ footnote_name : str(footnote_number) })
 
                     footnote_all += '<li><a href="#rfn-' + str(footnote_number) + '" id="fn-' + str(footnote_number) + '">(' + footnote_name + ')</a> ' + footnote + '</li>'
+                    
                     data = re.sub('(?:\[\*((?:(?! |\]).)*)(?: ((?:(?!\]).)+))?\]|(\[각주\]))', '<sup><a href="#fn-' + str(footnote_number) + '" id="rfn-' + str(footnote_number) + '">(' + footnote_name + ')</a></sup>', data, 1)
+                    
         else:
             break
 
