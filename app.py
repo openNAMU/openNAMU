@@ -525,9 +525,9 @@ def edit_set(num = 0):
                 imp = ['문구 관련', wiki_set(conn, 1), custom(conn), other2([0, 0])],
                 data = '<form method="post"> \
                             <span>가입 약관</span><br><br> \
-                            <input placeholder="가입 약관" type="text" name="contract" value="' + html.escape(d_list[0]) + '"><hr> \
+                            <textarea placeholder="가입 약관" name="contract">' + html.escape(d_list[0]) + '</textarea><hr> \
                             <span>비 로그인 경고</span><br><br> \
-                            <input placeholder="비 로그인 경고" type="text" name="no_login_warring" value="' + html.escape(d_list[1]) + '"><hr> \
+                            <textarea placeholder="비 로그인 경고" name="no_login_warring">' + html.escape(d_list[1]) + '</textarea><hr> \
                             <button id="save" type="submit">저장</button> \
                         </form>',
                 menu = [['edit_set', '설정']]
@@ -647,9 +647,9 @@ def edit_set(num = 0):
                 imp = ['구글 관련', wiki_set(conn, 1), custom(conn), other2([0, 0])],
                 data = '<form method="post"> \
                             <span>리캡차 (HTML)</span><br><br> \
-                            <input placeholder="리캡차 (HTML)" type="text" name="recaptcha" value="' + html.escape(d_list[0]) + '"><hr> \
+                            <textarea placeholder="리캡차 (HTML)" name="recaptcha">' + html.escape(d_list[0]) + '</textarea><hr> \
                             <span>리캡차 (비밀키)</span><br><br> \
-                            <input placeholder="리캡차 (비밀키)" type="text" name="sec_re" value="' + html.escape(d_list[1]) + '"><hr> \
+                            <textarea placeholder="리캡차 (비밀키)" name="sec_re">' + html.escape(d_list[1]) + '</textarea><hr> \
                             <button id="save" type="submit">저장</button> \
                         </form>',
                 menu = [['edit_set', '설정']]
