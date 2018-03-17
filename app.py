@@ -1561,7 +1561,6 @@ def edit(name = None):
         if admin_check(conn, 1, 'edit_filter pass') != 1:
             curs.execute("select regex, sub from filter")
             for data_list in curs.fetchall():
-                print(data_list)
                 match = re.compile(data_list[0])
                 if match.search(request.form['content']):
                     if data_list[1] == 'X':
