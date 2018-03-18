@@ -780,7 +780,16 @@ def start(conn, data, title):
 
                 backlink += [[title, main_link, '']]
 
-                data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<a ' + link_id + ' href="/w/' + tool.url_pas(main_link) + '">' + see_link + '</a>', data, 1)
+                other_link = re.search('(#.+)$', main_link)
+                if other_link:
+                    other_link = other_link.groups()[0]
+
+                    main_link = re.sub('(#.+)$', '', main_link)
+
+                else:
+                    other_link = ''
+
+                data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<a ' + link_id + ' href="/w/' + tool.url_pas(main_link) + other_link + '">' + see_link + '</a>', data, 1)
         else:
             break
 
