@@ -9,8 +9,8 @@
         <script src="/views/acme/js/jquery.min.js"></script>
         <script src="/views/acme/js/bootstrap.min.js"></script>
         <link rel="stylesheet" href="/views/acme/css/font-awesome/css/font-awesome.min.css">
-        {{!imp[1][5]}}
-        {{!imp[2][3]}}
+        {{imp[1][5]|safe}}
+        {{imp[2][3]|safe}}
         <meta name="twitter:creator" content="@{{imp[1][0]}}">
         <meta name="twitter:title" content="{{imp[0]}}">
         <meta name="twitter:site" content="@{{imp[1][0]}}">
@@ -28,7 +28,7 @@
                         <span class="icon-bar"></span>
                     </button>
                     <a class="navbar-brand" href="/" style="margin-top: 30px;">
-                        {{!imp[1][4]}}
+                        {{imp[1][4]|safe}}
                     </a>
                 </div>
                 <div class="navbar-collapse collapse">
@@ -73,22 +73,18 @@
                         </li>       
                         <li>
                             <a href="/user">
-                                % if(imp[2][2] == 1):
+                                {% if imp[2][2] == 1 %}
                                     <i class="fa fa-user" aria-hidden="true"></i>
-                                % elif(imp[2][2] == 0):
+                                {% elif imp[2][2] == 0 %}
                                     <i class="fa fa-user-times" aria-hidden="true"></i>
-                                % else:
+                                {% else %}
                                     <i class="fa fa-user-secret" aria-hidden="true"></i>
-                                % end
-
-                                % if(imp[2][4] != ''):
-                                    % import hashlib
-                                    % md5_email = hashlib.md5(imp[2][4].encode()).hexdigest()
-                                    
-                                    <img src="http://www.gravatar.com/avatar/{{md5_email}}?s=30">
-                                % else:
+                                {% endif %}
+                                {% if imp[2][4] != '' %}
+                                    <img src="https://www.gravatar.com/avatar/{{imp[2][4]|md5_replace}}?s=30">
+                                {% else %}
                                     사용자
-                                % end
+                                {% endif %}
                             </a>
                         </li>  
                     </ul>
@@ -102,33 +98,28 @@
                         <div class="col-lg-4 col-sm-4">
                             <h1>
                                 {{imp[0]}}
-                                % if(imp[3][0] != 0):
+                                {% if imp[3][0] != 0 %}
                                     <sub>{{imp[3][0]}}</sub>
-                                % end
+                                {% endif %}
                             </h1>
                         </div>
                         <div class="col-lg-8 col-sm-8">
                             <ol class="breadcrumb pull-right">   
                                 <li style="margin: 0;">
-                                    % if(menu != 0):
-                                        % i = 1
-                                        % for sub_d in menu:
-                                            % if(sub_d[1] == 1):
+                                    {% if menu != 0 %}
+                                        {% for sub_d in menu %}
+                                            {% if sub_d[1] == 1 %}
                                                 <a class="menu-item" href="/{{sub_d[0]}}" id="open">토론</a>
-                                            % elif(sub_d[1] == 0):
+                                            {% elif sub_d[1] == 0 %}
                                                 <a class="menu-item" href="/{{sub_d[0]}}">토론</a>
-                                            % else:
+                                            {% else %}
                                                 <a class="menu-item" href="/{{sub_d[0]}}">{{sub_d[1]}}</a>
-                                            % end
-                                            % try:
-                                                % d = menu[i]
+                                            {% endif %}
+                                            {% if menu[loop.index] %}
                                                 ㆍ
-                                            % except:
-                                                % break
-                                            % end
-                                            % i += 1
-                                        % end
-                                    % end
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% endif %}
                                 </li>
                             </ol>
                         </div>
@@ -138,7 +129,7 @@
             <div class="container">
                 <div class="row">
                     <div class="col-md-10 col-md-offset-1 mar-b-30">
-                        {{!data}}
+                        {{data|safe}}
                     </div>
                 </div>
             </div>
@@ -158,7 +149,7 @@
             <div class="container">
                 <div class="row">
                     <div class="copyright">
-                        {{!imp[1][1]}}
+                        {{imp[1][1]|safe}}
                         <span id="left_end" class="pull-right">
                             <a href="https://github.com/2DU/openNAMU">
                                 <img src="/views/acme/img/on2.png" alt="opennamu" style="width: 100px;">

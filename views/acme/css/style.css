@@ -206,6 +206,8 @@ ul.dropdown-menu {
 .copyright {
     color: #fff;
     padding-top: 15px;
+    width: 95%;
+    margin: auto;
 }
 
 #search {
