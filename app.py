@@ -3302,15 +3302,17 @@ def upload():
         if curs.fetchall():
             return re_error(conn, '/error/16')
             
+        ip = ip_check()
+
         if request.form['f_lice']:
             lice = request.form['f_lice']
 
         else:
             if custom(conn)[2] == 0:
-                lice = ip_check() + ' 올림'
+                lice = ip + ' 올림'
 
             else:
-                lice = '[[사용자:' + ip_check() + ']] 올림'
+                lice = '[[사용자:' + ip + ']] 올림'
             
         if os.path.exists(os.path.join('image', e_data)):
             os.remove(os.path.join('image', e_data))

@@ -686,21 +686,27 @@ def start(conn, data, title):
                 see_link = link
 
             if re.search('^(파일|외부):', main_link):
-                width = re.search('width=((?:(?!,).)+)', see_link)
+                file_style = ''
+
+                width = re.search('width=((?:(?!&).)+)', see_link)
                 if width:
                     file_width = width.groups()[0]
-
-                else:
-                    file_width = 'auto'
+                    if re.search('px$', file_width):
+                        file_style += 'width: ' + file_width + ';'
+                    
+                    else:
+                        file_style += 'width: ' + file_width + 'px;'
                 
-                height = re.search('height=((?:(?!,).)+)', see_link)
+                height = re.search('height=((?:(?!&).)+)', see_link)
                 if height:
                     file_height = height.groups()[0]
+                    if re.search('px$', file_height):
+                        file_style += 'height: ' + file_height + ';'
+                    
+                    else:
+                        file_style += 'height: ' + file_height + 'px;'
 
-                else:
-                    file_height = 'auto'
-
-                align = re.search('align=((?:(?!,).)+)', see_link)
+                align = re.search('align=((?:(?!&).)+)', see_link)
                 if align:
                     file_align = align.groups()[0]
                     if file_align == 'center':
@@ -733,7 +739,7 @@ def start(conn, data, title):
                     file_src = '/image/' + tool.sha224(file_name) + '.' + file_end
                     file_alt = '파일:' + file_name + '.' + file_end
                 
-                data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<span style="' + file_align + '"><img width="' + file_width + '" height="' + file_height + '" alt="' + file_alt + '" src="' + file_src + '"></span>', data, 1)
+                data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<span style="' + file_align + '"><img style="' + file_style + '" alt="' + file_alt + '" src="' + file_src + '"></span>', data, 1)
 
             elif re.search('^분류:', main_link):
                 see_link = re.sub('#include', '', see_link)
