@@ -367,8 +367,6 @@ def start(conn, data, title):
         else:
             break
 
-    print(data)
-
     # 수식 처리
     first = 0
     while 1:
