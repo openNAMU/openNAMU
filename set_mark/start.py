@@ -344,7 +344,7 @@ def start(conn, data, title):
 
     # Syntax 처리
     while 1:
-        syntax_data = re.search('<code class="((?:(?!").)+)">((?:(?:(?!<\/code>|<span id="space">).)+\n*)+)<\/code>', data)
+        syntax_data = re.search('<code class="((?:(?!").)+)">((?:(?:(?!<\/code>|<span id="space">)(\n( +)).)+\n*)+)<\/code>', data)
         if syntax_data:
             syntax_data = syntax_data.groups()
 
@@ -362,7 +362,7 @@ def start(conn, data, title):
                 else:
                     break             
 
-            data = re.sub('<code class="((?:(?!").)+)">((?:(?:(?!<\/code>).)+\n*)+)<\/code>', '<code class="' + syntax_data[0] + '">' + syntax_data_replace + '</code>', data, 1)
+            data = re.sub('<code class="((?:(?!").)+)">((?:(?:(?!<\/code>|<span id="space">)(\n( +)).)+\n*)+)<\/code>', '<code class="' + syntax_data[0] + '">' + syntax_data_replace + '</code>', data, 1)
         
         else:
             break
