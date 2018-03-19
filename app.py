@@ -1591,7 +1591,9 @@ def edit(name = None):
 
             leng = leng_check(len(request.form['otent']), len(content))
             if request.args.get('section', None):
-                content = old[0][0].replace(request.form['otent'], content)
+                print(request.form['otent2'])
+                content = request.form['otent2'].replace(request.form['otent'], request.form['content'])
+                content = old[0][0][:len(old[0][0]) - len(request.form['otent2']) - 1] + content
                 
             curs.execute("update data set data = ? where title = ?", [content, name])
         else:
@@ -1614,20 +1616,31 @@ def edit(name = None):
         
         return redirect('/w/' + url_pas(name))
 
-    else:            
+    else:       
         curs.execute("select data from data where title = ?", [name])
         new = curs.fetchall()
         if new:
             if request.args.get('section', None):
                 test_data = '\n' + re.sub('\r\n', '\n', new[0][0]) + '\n'   
+                data_old2 = ''
+
                 section_data = re.findall('((?:={1,6}) ?(?:(?:(?!=).)+) ?={1,6}\n(?:(?:(?!(?:={1,6}) ?(?:(?:(?!=).)+) ?={1,6}\n).)*\n*)*)', test_data)
+                
                 data = section_data[int(request.args.get('section', None)) - 1]
+                
+                for test in section_data[int(request.args.get('section', None)) - 1:]:
+                    data_old2 += test
+                    
             else:
                 data = new[0][0]
+                data_old2 = new[0][0]
+        
         else:
             data = ''
+            data_old2 = ''
             
         data_old = data
+
         if not request.args.get('section', None):
             get_name = '<form method="post" id="get_edit" action="/edit_get/' + url_pas(name) + '"><input placeholder="불러 올 문서" name="name" style="width: 50%;" type="text"><button id="come" type="submit">불러오기</button></form><hr>'
             action = ''
@@ -1648,6 +1661,7 @@ def edit(name = None):
                     <form method="post" action="/edit/' + url_pas(name) + action + '"> \
                         <textarea rows="25" name="content">' + html.escape(re.sub('\n$', '', data)) + '</textarea> \
                         <textarea style="display: none;" name="otent">' + html.escape(re.sub('\n$', '', data_old)) + '</textarea><hr> \
+                        <textarea style="display: none;" name="otent2">' + html.escape(re.sub('\n$', '', data_old2)) + '</textarea><hr> \
                         <input placeholder="사유" name="send" type="text"><hr> \
                         ' + captcha_get(conn) + ' \
                         ' + ip_warring(conn) + ' \
