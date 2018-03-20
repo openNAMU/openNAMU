@@ -1614,7 +1614,7 @@ def edit(name = None):
         
         return redirect('/w/' + url_pas(name))
 
-    else:       
+    else:            
         curs.execute("select data from data where title = ?", [name])
         new = curs.fetchall()
         if new:
