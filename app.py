@@ -17,7 +17,7 @@ import random
 import sys
 
 # 버전 표기
-r_ver = 'v3.0.0-Stable-Fix'
+r_ver = 'v3.0.0-Stable-Fix-02'
 print('Version : ' + r_ver)
 
 # 나머지 불러오기
@@ -1586,12 +1586,51 @@ def edit(name = None):
         curs.execute("select data from data where title = ?", [name])
         old = curs.fetchall()
         if old:
-            if not request.args.get('section', None) and request.form['otent'] != old[0][0]:
-                return re_error(conn, '/error/12')
-
             leng = leng_check(len(request.form['otent']), len(content))
+            
             if request.args.get('section', None):
-                content = old[0][0].replace(request.form['otent'], content)
+                i = 1
+                data = re.sub('\r\n', '\n', '\r\n' + old[0][0] + '\r\n')
+                while 1:
+                    replace_data = re.search('\n(={1,6}) ?((?:(?!=).)+) ?={1,6}\n', data)
+                    if replace_data:
+                        replace_data = replace_data.groups()[0]
+
+                        if i == int(request.args.get('section', None)):
+                            data = re.sub('\n(?P<in>={1,6}) ?(?P<out>(?:(?!=).)+) ?={1,6}\n', '\n<real h' + str(len(replace_data)) + '>\g<out></real h' + str(len(replace_data)) + '>\n', data, 1)
+
+                        else:
+                            data = re.sub('\n(?P<in>={1,6}) ?(?P<out>(?:(?!=).)+) ?={1,6}\n', '\n<h' + str(len(replace_data)) + '>\g<out></h' + str(len(replace_data)) + '>\n', data, 1)
+
+                        i += 1
+                    else:
+                        break
+
+                new_data = re.sub('\r\n', '\n', '\r\n' + request.form['otent'] + '\r\n')
+                while 1:
+                    replace_data = re.search('\n(={1,6}) ?((?:(?!=).)+) ?={1,6}\n', new_data)
+                    if replace_data:
+                        replace_data = replace_data.groups()[0]
+
+                        new_data = re.sub('\n(?P<in>={1,6}) ?(?P<out>(?:(?!=).)+) ?={1,6}\n', '\n<real h' + str(len(replace_data)) + '>\g<out></real h' + str(len(replace_data)) + '>\n', new_data, 1)
+
+                    else:
+                        break
+
+                content = data.replace(new_data, '\n' + content + '\n')
+
+                while 1:
+                    replace_data = re.search('\n<(?:real )?h([1-6])>((?:(?!<h).)+) <\/(?:real )?h[1-6]>\n', content)
+                    if replace_data:
+                        replace_data = replace_data.groups()[0]
+
+                        content = re.sub('\n<(?:real )?h([1-6])>(?P<out>(?:(?!<h).)+) <\/(?:real )?h[1-6]>\n', '\n' + ('=' * int(replace_data)) + ' \g<out> ' + ('=' * int(replace_data)) + '\n', content, 1)
+
+                    else:
+                        break
+
+                content = re.sub('^\n', '', content)
+                content = re.sub('\n$', '', content)
                 
             curs.execute("update data set data = ? where title = ?", [content, name])
         else:
@@ -1620,6 +1659,7 @@ def edit(name = None):
         if new:
             if request.args.get('section', None):
                 test_data = '\n' + re.sub('\r\n', '\n', new[0][0]) + '\n'   
+                
                 section_data = re.findall('((?:={1,6}) ?(?:(?:(?!=).)+) ?={1,6}\n(?:(?:(?!(?:={1,6}) ?(?:(?:(?!=).)+) ?={1,6}\n).)*\n*)*)', test_data)
                 data = section_data[int(request.args.get('section', None)) - 1]
             else:
@@ -1628,6 +1668,7 @@ def edit(name = None):
             data = ''
             
         data_old = data
+        
         if not request.args.get('section', None):
             get_name = '<form method="post" id="get_edit" action="/edit_get/' + url_pas(name) + '"><input placeholder="불러 올 문서" name="name" style="width: 50%;" type="text"><button id="come" type="submit">불러오기</button></form><hr>'
             action = ''
@@ -2566,7 +2607,16 @@ def user_ban(name = None):
         if admin_check(conn, 1, 'ban (' + name + ')') != 1:
             return re_error(conn, '/error/3')
 
-        ban_insert(conn, name, request.form.get('end', ''), request.form.get('why', None), request.form.get('login', None), ip_check())
+        if request.form.get('year', 'no_end') == 'no_end':
+            end = ''
+
+        else:
+            end = request.form.get('year', '') + '-' + request.form.get('month', '') + '-' + request.form.get('day', '')
+
+        if end == '--':
+            end = ''
+
+        ban_insert(conn, name, end, request.form.get('why', ''), request.form.get('login', ''), ip_check())
 
         return redirect('/ban/' + url_pas(name))     
 
@@ -2597,6 +2647,47 @@ def user_ban(name = None):
 
             else:
                 now = '차단'
+
+            now_time = get_time()
+
+            m = re.search('^([0-9]{4})-([0-9]{2})-([0-9]{2})', now_time)
+            g = m.groups()
+
+            year = '<option value="no_end">영구</option>'
+            for i in range(int(g[0]), int(g[0]) + 11):
+                if i == int(g[0]):
+                    year += '<option value="' + str(i) + '" selected>' + str(i) + '</option>'
+
+                else:
+                    year += '<option value="' + str(i) + '">' + str(i) + '</option>'
+
+            month = ''
+            for i in range(1, 13):
+                if int(i / 10) == 0:
+                    num = '0' + str(i)
+                
+                else:
+                    num = str(i)
+
+                if i == int(g[1]):
+                    month += '<option value="' + num + '" selected>' + num + '</option>'
+
+                else:
+                    month += '<option value="' + num + '">' + num + '</option>'
+                
+            day = ''
+            for i in range(1, 32):
+                if int(i / 10) == 0:
+                    num = '0' + str(i)
+                
+                else:
+                    num = str(i)
+
+                if i == int(g[2]):
+                    day += '<option value="' + num + '" selected>' + num + '</option>'
+                    
+                else:
+                    day += '<option value="' + num + '">' + num + '</option>'
             
             if re.search('(\.|:)', name):
                 plus = '<input type="checkbox" name="login"> 로그인 가능<hr>'
@@ -2604,7 +2695,11 @@ def user_ban(name = None):
             else:
                 plus = ''
 
-            data = '<input placeholder="YYYY-MM-DD" name="end" type="text"><br><br>지금 날짜 : ' + re.sub(' .+$', '', get_time()) + '<hr><input placeholder="사유" name="why" type="text"><hr>' + plus
+            data = '<select name="year">' + year + '</select> 년 '
+            data += '<select name="month">' + month + '</select> 월 '
+            data += '<select name="day">' + day + '</select> 일 <hr>'
+
+            data += '<input placeholder="사유" name="why" type="text"><hr>' + plus
 
         return html_minify(render_template(skin_check(conn), 
             imp = [name, wiki_set(conn, 1), custom(conn), other2([' (' + now + ')', 0])],
@@ -3302,15 +3397,17 @@ def upload():
         if curs.fetchall():
             return re_error(conn, '/error/16')
             
+        ip = ip_check()
+
         if request.form['f_lice']:
             lice = request.form['f_lice']
 
         else:
             if custom(conn)[2] == 0:
-                lice = ip_check() + ' 올림'
+                lice = ip + ' 올림'
 
             else:
-                lice = '[[사용자:' + ip_check() + ']] 올림'
+                lice = '[[사용자:' + ip + ']] 올림'
             
         if os.path.exists(os.path.join('image', e_data)):
             os.remove(os.path.join('image', e_data))
