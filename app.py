@@ -1591,9 +1591,7 @@ def edit(name = None):
 
             leng = leng_check(len(request.form['otent']), len(content))
             if request.args.get('section', None):
-                print(request.form['otent2'])
-                content = request.form['otent2'].replace(request.form['otent'], request.form['content'])
-                content = old[0][0][:len(old[0][0]) - len(request.form['otent2']) - 1] + content
+                content = old[0][0].replace(request.form['otent'], content)
                 
             curs.execute("update data set data = ? where title = ?", [content, name])
         else:
@@ -1622,25 +1620,16 @@ def edit(name = None):
         if new:
             if request.args.get('section', None):
                 test_data = '\n' + re.sub('\r\n', '\n', new[0][0]) + '\n'   
-                data_old2 = ''
-
+                
                 section_data = re.findall('((?:={1,6}) ?(?:(?:(?!=).)+) ?={1,6}\n(?:(?:(?!(?:={1,6}) ?(?:(?:(?!=).)+) ?={1,6}\n).)*\n*)*)', test_data)
-                
                 data = section_data[int(request.args.get('section', None)) - 1]
-                
-                for test in section_data[int(request.args.get('section', None)) - 1:]:
-                    data_old2 += test
-                    
             else:
                 data = new[0][0]
-                data_old2 = new[0][0]
-        
         else:
             data = ''
-            data_old2 = ''
             
         data_old = data
-
+        
         if not request.args.get('section', None):
             get_name = '<form method="post" id="get_edit" action="/edit_get/' + url_pas(name) + '"><input placeholder="불러 올 문서" name="name" style="width: 50%;" type="text"><button id="come" type="submit">불러오기</button></form><hr>'
             action = ''
@@ -1661,7 +1650,6 @@ def edit(name = None):
                     <form method="post" action="/edit/' + url_pas(name) + action + '"> \
                         <textarea rows="25" name="content">' + html.escape(re.sub('\n$', '', data)) + '</textarea> \
                         <textarea style="display: none;" name="otent">' + html.escape(re.sub('\n$', '', data_old)) + '</textarea><hr> \
-                        <textarea style="display: none;" name="otent2">' + html.escape(re.sub('\n$', '', data_old2)) + '</textarea><hr> \
                         <input placeholder="사유" name="send" type="text"><hr> \
                         ' + captcha_get(conn) + ' \
                         ' + ip_warring(conn) + ' \
@@ -2580,7 +2568,16 @@ def user_ban(name = None):
         if admin_check(conn, 1, 'ban (' + name + ')') != 1:
             return re_error(conn, '/error/3')
 
-        ban_insert(conn, name, request.form.get('end', ''), request.form.get('why', None), request.form.get('login', None), ip_check())
+        if request.form.get('year', 'no_end') == 'no_end':
+            end = ''
+
+        else:
+            end = request.form.get('year', '') + '-' + request.form.get('month', '') + '-' + request.form.get('day', '')
+
+        if end == '--':
+            end = ''
+
+        ban_insert(conn, name, end, request.form.get('why', ''), request.form.get('login', ''), ip_check())
 
         return redirect('/ban/' + url_pas(name))     
 
@@ -2611,6 +2608,47 @@ def user_ban(name = None):
 
             else:
                 now = '차단'
+
+            now_time = get_time()
+
+            m = re.search('^([0-9]{4})-([0-9]{2})-([0-9]{2})', now_time)
+            g = m.groups()
+
+            year = '<option value="no_end">영구</option>'
+            for i in range(int(g[0]), int(g[0]) + 11):
+                if i == int(g[0]):
+                    year += '<option value="' + str(i) + '" selected>' + str(i) + '</option>'
+
+                else:
+                    year += '<option value="' + str(i) + '">' + str(i) + '</option>'
+
+            month = ''
+            for i in range(1, 13):
+                if int(i / 10) == 0:
+                    num = '0' + str(i)
+                
+                else:
+                    num = str(i)
+
+                if i == int(g[1]):
+                    month += '<option value="' + num + '" selected>' + num + '</option>'
+
+                else:
+                    month += '<option value="' + num + '">' + num + '</option>'
+                
+            day = ''
+            for i in range(1, 32):
+                if int(i / 10) == 0:
+                    num = '0' + str(i)
+                
+                else:
+                    num = str(i)
+
+                if i == int(g[2]):
+                    day += '<option value="' + num + '" selected>' + num + '</option>'
+                    
+                else:
+                    day += '<option value="' + num + '">' + num + '</option>'
             
             if re.search('(\.|:)', name):
                 plus = '<input type="checkbox" name="login"> 로그인 가능<hr>'
@@ -2618,7 +2656,11 @@ def user_ban(name = None):
             else:
                 plus = ''
 
-            data = '<input placeholder="YYYY-MM-DD" name="end" type="text"><br><br>지금 날짜 : ' + re.sub(' .+$', '', get_time()) + '<hr><input placeholder="사유" name="why" type="text"><hr>' + plus
+            data = '<select name="year">' + year + '</select> 년 '
+            data += '<select name="month">' + month + '</select> 월 '
+            data += '<select name="day">' + day + '</select> 일 <hr>'
+
+            data += '<input placeholder="사유" name="why" type="text"><hr>' + plus
 
         return html_minify(render_template(skin_check(conn), 
             imp = [name, wiki_set(conn, 1), custom(conn), other2([' (' + now + ')', 0])],

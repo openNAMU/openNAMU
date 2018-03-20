@@ -434,7 +434,7 @@ def ban_insert(conn, name, end, why, login, blocker):
         curs.execute("delete from ban where block = ?", [name])
 
     else:
-        if login:
+        if login != '':
             login = 'O'
             
         else:
@@ -442,8 +442,6 @@ def ban_insert(conn, name, end, why, login, blocker):
 
         if end != '':
             end += ' 00:00:00'
-
-        print(end)
 
         curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, ?)", [name, end, time, blocker, why, band])
         curs.execute("insert into ban (block, end, why, band, login) values (?, ?, ?, ?, ?)", [name, end, why, band, login])
