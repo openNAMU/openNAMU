@@ -577,10 +577,6 @@ def re_error(conn, data):
             title = '로그인 오류'
             data = '이미 로그인 되어 있습니다.'
 
-        elif num == 12:
-            title = '편집 오류'
-            data = '누군가 먼저 편집 했습니다.'
-
         elif num == 13:
             title = '리캡차 오류'
             data = '리캡차를 통과하세요.'
