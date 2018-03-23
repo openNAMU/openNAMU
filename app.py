@@ -2918,7 +2918,6 @@ def read_view(name = None):
     sub = ''
     acl = ''
     div = ''
-    topic = 0
 
     num = request.args.get('num', None)
     if num:
@@ -2928,7 +2927,7 @@ def read_view(name = None):
     for data in curs.fetchall():
         curs.execute("select title from stop where title = ? and sub = ? and close = 'O'", [name, data[0]])
         if not curs.fetchall():
-            topic = 1
+            sub += ' (토론 O)'
 
             break
                 
@@ -3036,7 +3035,7 @@ def read_view(name = None):
         else:
             curs.execute("select block from ban where block = ?", [g[0]])
             if curs.fetchall():
-                sub = ' (차단)'
+                sub += ' (차단)'
 
             else:
                 acl = ''
@@ -3058,9 +3057,9 @@ def read_view(name = None):
     end_data = namumark(conn, name, else_data, 0)
 
     if data_none == 1:
-        menu = [['edit/' + url_pas(name), '생성'], ['topic/' + url_pas(name), topic], ['history/' + url_pas(name), '역사'], ['move/' + url_pas(name), '이동'], ['xref/' + url_pas(name), '역링크']]
+        menu = [['edit/' + url_pas(name), '생성'], ['topic/' + url_pas(name), '토론'], ['history/' + url_pas(name), '역사'], ['move/' + url_pas(name), '이동'], ['xref/' + url_pas(name), '역링크']]
     else:
-        menu = [['edit/' + url_pas(name), '수정'], ['topic/' + url_pas(name), topic], ['history/' + url_pas(name), '역사'], ['delete/' + url_pas(name), '삭제'], ['move/' + url_pas(name), '이동'], ['raw/' + url_pas(name), '원본'], ['xref/' + url_pas(name), '역링크']]
+        menu = [['edit/' + url_pas(name), '수정'], ['topic/' + url_pas(name), '토론'], ['history/' + url_pas(name), '역사'], ['delete/' + url_pas(name), '삭제'], ['move/' + url_pas(name), '이동'], ['raw/' + url_pas(name), '원본'], ['xref/' + url_pas(name), '역링크']]
         
     if admin_memu == 1:
         menu += [['acl/' + url_pas(name), 'ACL']]
