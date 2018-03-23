@@ -89,11 +89,18 @@ def skin_check(conn):
     skin = './views/acme/'
     
     try:
-        curs.execute('select data from other where name = "skin"')
+        curs.execute('select skin from user where id = ?', [ip_check()])
         skin_exist = curs.fetchall()
-        if skin_exist:
+        if skin_exist and skin_exist[0][0] != '':
             if os.path.exists(os.path.abspath('./views/' + skin_exist[0][0] + '/index.html')) == 1:
                 skin = './views/' + skin_exist[0][0] + '/'
+        
+        else:
+            curs.execute('select data from other where name = "skin"')
+            skin_exist = curs.fetchall()
+            if skin_exist:
+                if os.path.exists(os.path.abspath('./views/' + skin_exist[0][0] + '/index.html')) == 1:
+                    skin = './views/' + skin_exist[0][0] + '/'
 
     except:
         pass
