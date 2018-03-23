@@ -17,7 +17,7 @@ import random
 import sys
 
 # 버전 표기
-r_ver = 'v3.0.1-Beta-180322-01'
+r_ver = 'v3.0.1-Beta-180324-01'
 print('Version : ' + r_ver)
 
 # 나머지 불러오기
@@ -215,7 +215,7 @@ except:
 try:
     curs.execute("alter table user add email text default ''")
 
-    print('user table add email acl')
+    print('user table add column email')
 
 except:
     pass
@@ -229,6 +229,14 @@ try:
                 curs.execute("update filter set sub = '' where name = ?", [filter_delete[0]])
 
         print('filter data fix')
+
+except:
+    pass
+
+try:
+    curs.execute("alter table user add skin text default ''")
+
+    print('user table add column skin')
 
 except:
     pass
@@ -2413,37 +2421,76 @@ def change_password():
         return redirect('/login')
     
     if request.method == 'POST':    
-        if request.form['pw2'] != request.form['pw3']:
-            return re_error(conn, '/error/20')
+        if request.form.get('pw', None):
+            if request.form['pw2'] != request.form['pw3']:
+                return re_error(conn, '/error/20')
 
-        curs.execute("select pw from user where id = ?", [session['DREAMER']])
-        user = curs.fetchall()
-        if not user:
-            return re_error(conn, '/error/10')
+            curs.execute("select pw from user where id = ?", [session['DREAMER']])
+            user = curs.fetchall()
+            if not user:
+                return re_error(conn, '/error/10')
 
-        if not bcrypt.checkpw(bytes(request.form['pw'], 'utf-8'), bytes(user[0][0], 'utf-8')):
-            return re_error(conn, '/error/5')
+            if not bcrypt.checkpw(bytes(request.form['pw'], 'utf-8'), bytes(user[0][0], 'utf-8')):
+                return re_error(conn, '/error/5')
 
-        hashed = bcrypt.hashpw(bytes(request.form['pw2'], 'utf-8'), bcrypt.gensalt())
+            hashed = bcrypt.hashpw(bytes(request.form['pw2'], 'utf-8'), bcrypt.gensalt())
+            
+            curs.execute("update user set pw = ? where id = ?", [hashed.decode(), session['DREAMER']])
         
-        curs.execute("update user set pw = ? where id = ?", [hashed.decode(), session['DREAMER']])
+        curs.execute("update user set email = ? where id = ?", [request.form.get('email', ''), ip_check()])
+        curs.execute("update user set skin = ? where id = ?", [request.form.get('skin', ''), ip_check()])
         conn.commit()
         
-        return redirect('/user')
+        return redirect('/change')
 
     else:        
+        ip = ip_check()
+
+        curs.execute('select email from user where id = ?', [ip])
+        data = curs.fetchall()
+        if data:
+            email = data[0][0]
+
+        else:
+            email = ''
+
+        div2 = ''
+
+        curs.execute('select skin from user where id = ?', [ip])
+        data = curs.fetchall()
+
+        for skin_data in os.listdir(os.path.abspath('views')):
+            if not data:
+                curs.execute('select data from other where name = "skin"')
+                sql_data = curs.fetchall()
+                if sql_data and sql_data[0][0] == skin_data:
+                    div2 = '<option value="' + skin_data + '">' + skin_data + '</option>' + div2
+
+                else:
+                    div2 += '<option value="' + skin_data + '">' + skin_data + '</option>'
+            
+            elif data[0][0] == skin_data:
+                div2 = '<option value="' + skin_data + '">' + skin_data + '</option>' + div2
+                
+            else:
+                div2 += '<option value="' + skin_data + '">' + skin_data + '</option>'
+
         return html_minify(render_template(skin_check(conn),    
-            imp = ['비밀번호 변경', wiki_set(conn, 1), custom(conn), other2([0, 0])],
+            imp = ['내 정보 수정', wiki_set(conn, 1), custom(conn), other2([0, 0])],
             data = '<form method="post"> \
-                        <input placeholder="현재 비밀번호" name="pw" type="password"><hr> \
-                        <input placeholder="변경할 비밀번호" name="pw2" type="password"><hr> \
+                        <span>닉네임 : ' + ip + '</span><hr>\
+                        <input placeholder="현재 비밀번호" name="pw" type="password"><br><br> \
+                        <input placeholder="변경할 비밀번호" name="pw2" type="password"><br><br> \
                         <input placeholder="재 확인" name="pw3" type="password"><hr> \
+                        <input placeholder="이메일" name="email" type="text" value="' + email + '"><hr> \
+                        <span>스킨</span><br><br> \
+                        <select name="skin">' + div2 + '</select><hr> \
                         <button type="submit">변경</button><hr> \
                         <span>주의 : 만약 HTTPS 연결이 아닌 경우 데이터가 유출될 가능성이 있습니다. 이에 대해 책임지지 않습니다.</span> \
                     </form>',
             menu = [['user', '사용자']]
         ))
-                
+
 @app.route('/check/<name>')
 def user_check(name = None):
     if admin_check(conn, 4, 'check (' + name + ')') != 1:
@@ -3477,7 +3524,7 @@ def user_info():
     if custom(conn)[2] != 0:
         ip_user = '<a href="/w/사용자:' + ip + '">' + ip + '</a>'
         
-        plus = '<li><a href="/logout">로그아웃</a></li><li><a href="/change">비밀번호 변경</a></li><li><a href="/email">이메일 수정</a></li>'
+        plus = '<li><a href="/logout">로그아웃</a></li><li><a href="/change">내 정보 변경</a></li>'
 
     else:
         ip_user = ip
@@ -3489,35 +3536,6 @@ def user_info():
         data =  '<h2>상태</h2><ul><li>' + ip_user + ' <a href="/record/' + url_pas(ip) + '">(기록)</a></li><li>권한 상태 : ' + acl + '</li></ul><br><h2>로그인</h2><ul>' + plus + '<li><a href="/register">회원가입</a></li></ul><br><h2>사용자 기능</h2><ul><li><a href="/acl/사용자:' + url_pas(ip) + '">사용자 문서 ACL</a></li><li><a href="/custom_head">사용자 HEAD</a></li></ul><br><h2>기타</h2><ul><li><a href="/alarm">알림</a></li><li><a href="/watch_list">주시 문서</a></li><li><a href="/count">활동 횟수</a></li></ul>',
         menu = 0
     ))
-
-@app.route('/email', methods=['GET', 'POST'])
-def email():
-    if custom(conn)[2] == 0:
-        return re_error(conn, '/error/1')
-
-    if request.method == 'POST':
-        curs.execute("update user set email = ? where id = ?", [request.form.get('email', ''), ip_check()])
-        conn.commit()
-
-        return redirect('/user')
-
-    else:
-        curs.execute('select email from user where id = ?', [ip_check()])
-        data = curs.fetchall()
-        if data:
-            email = data[0][0]
-
-        else:
-            email = ''
-
-        return html_minify(render_template(skin_check(conn),    
-            imp = ['이메일 수정', wiki_set(conn, 1), custom(conn), other2([0, 0])],
-            data = '<form method="post"> \
-                        <input placeholder="이메일" name="email" type="text" value="' + email + '"><hr> \
-                        <button type="submit">변경</button><hr> \
-                    </form>',
-            menu = [['user', '사용자']]
-        ))
 
 @app.route('/watch_list')
 def watch_list():
