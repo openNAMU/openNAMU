@@ -667,6 +667,32 @@ def start(conn, data, title):
         else:
             break
 
+    # 하위 문서
+    while 1:
+        under_link = re.search('\[\[\.\.\/(?:\|((?:(?!]]).)+))?]]', data)
+        if under_link:
+            under_link = under_link.groups()
+
+            title_data = re.search('^(.+)\/(?:(?:(?!\/).)+)$', title)
+            if title_data:
+                title_data = title_data.groups()[0]
+
+                if under_link[0]:
+                    data = re.sub('\[\[\.\.\/(?:\|((?:(?!]]).)+))?]]', '[[' + title_data + '|' + under_link[0] + ']]', data, 1)
+
+                else:
+                    data = re.sub('\[\[\.\.\/(?:\|((?:(?!]]).)+))?]]', '[[' + title_data + ']]', data, 1)
+
+            else:
+                if under_link[0]:
+                    data = re.sub('\[\[\.\.\/(?:\|((?:(?!]]).)+))?]]', '[[' + title + '|' + under_link[0] + ']]', data, 1)
+
+                else:
+                    data = re.sub('\[\[\.\.\/(?:\|((?:(?!]]).)+))?]]', '[[' + title + ']]', data, 1)
+
+        else:
+            break
+
     # 링크 관련 문법 구현
     category = '\n<hr><div id="cate">분류: '
     while 1:
@@ -761,6 +787,28 @@ def start(conn, data, title):
 
             elif re.search('^wiki:', main_link):
                 data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<a id="inside" href="/' + tool.url_pas(re.sub('^wiki:', '', main_link)) + '">' + see_link + '</a>', data, 1)
+
+            elif re.search('^inter:((?:(?!:).)+):', main_link):
+                inter_data = re.search('^inter:((?:(?!:).)+):', main_link)
+                inter_data = inter_data.groups()[0]
+
+                curs.execute('select link from inter where title = ?', [inter_data])
+                inter = curs.fetchall()
+                if inter:
+                    data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<a id="inside" href="' + inter[0][0] + main_link + '">' + inter[0][0] + ':' + see_link + '</a>', data, 1)
+
+                else:
+                    data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '인터위키 정보 없음', data, 1)
+
+            elif re.search('^\/', main_link):
+                under_title = re.search('^(\/(?:.+))$', main_link)
+                under_title = under_title.groups()[0]
+
+                if see_link != main_link:
+                    data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '[[' + title + under_title + '|' + see_link + ']]', data, 1)
+
+                else:
+                    data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '[[' + title + under_title + ']]', data, 1)
 
             elif re.search('^http(s)?:\/\/', main_link):
                 data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<a id="out_link" rel="nofollow" href="' + main_link + '">' + see_link + '</a>', data, 1)

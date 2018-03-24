@@ -62,11 +62,7 @@ compress.init_app(app)
 def md5_replace(data):
     return hashlib.md5(data.encode()).hexdigest()       
 
-def plus_data(first, second):
-    return first + second             
-
 app.jinja_env.filters['md5_replace'] = md5_replace
-app.jinja_env.filters['plus_data'] = plus_data
 
 # 셋업 부분
 curs.execute("create table if not exists data(title text, data text)")
