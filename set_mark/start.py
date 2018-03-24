@@ -789,13 +789,17 @@ def start(conn, data, title):
                 data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<a id="inside" href="/' + tool.url_pas(re.sub('^wiki:', '', main_link)) + '">' + see_link + '</a>', data, 1)
 
             elif re.search('^inter:((?:(?!:).)+):', main_link):
-                inter_data = re.search('^inter:((?:(?!:).)+):', main_link)
-                inter_data = inter_data.groups()[0]
+                inter_data = re.search('^inter:((?:(?!:).)+):((?:(?!\]\]|\|).)+)', main_link)
+                inter_data = inter_data.groups()
 
-                curs.execute('select link from inter where title = ?', [inter_data])
+                curs.execute('select link from inter where title = ?', [inter_data[0]])
                 inter = curs.fetchall()
                 if inter:
-                    data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<a id="inside" href="' + inter[0][0] + main_link + '">' + inter[0][0] + ':' + see_link + '</a>', data, 1)
+                    if see_link != main_link:
+                        data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<a id="inside" href="' + inter[0][0] + inter_data[1] + '">' + inter_data[0] + ':' + see_link + '</a>', data, 1)
+                    
+                    else:
+                        data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<a id="inside" href="' + inter[0][0] + inter_data[1] + '">' + inter_data[0] + ':' + inter_data[1] + '</a>', data, 1)
 
                 else:
                     data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '인터위키 정보 없음', data, 1)
