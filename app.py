@@ -112,6 +112,28 @@ else:
     
     print('Port : ' + str(rep_port))
 
+# robots.txt 점검
+try:
+    if not os.path.exists('robots.txt'):
+        curs.execute("select data from other where name = 'robot'")
+        robot_test = curs.fetchall()
+        if robot_test:
+            fw_test = open('./robots.txt', 'w')
+            fw_test.write(re.sub('\r\n', '\n', robot_test[0][0]))
+            fw_test.close()
+
+        else:
+            fw_test = open('./robots.txt', 'w')
+            fw_test.write('User-agent: *\nDisallow: /\nAllow: /$\nAllow: /w/')
+            fw_test.close()
+
+            curs.execute("insert into other (name, data) values ('robot', 'User-agent: *\nDisallow: /\nAllow: /$\nAllow: /w/')")
+        
+        print('robots.txt create')
+
+except:
+    pass
+
 # 비밀 키 점검
 curs.execute("select data from other where name = 'key'")
 rep_data = curs.fetchall()
@@ -190,20 +212,6 @@ try:
     curs.execute("alter table data drop acl")
 
     print('data table delete column acl')
-
-except:
-    pass
-
-try:
-    if not os.path.exists('robot.txt'):
-        curs.execute("select data from other where name = 'robot'")
-        robot_test = curs.fetchall()
-        if robot_test:
-            fw_test = open('./robots.txt', 'w')
-            fw_test.write(re.sub('\r\n', '\n', robot_test[0][0]))
-            fw_test.close()
-
-            print('robot.txt create')
 
 except:
     pass
@@ -2929,7 +2937,7 @@ def diff_data(name = None):
                 result = '내용이 같습니다.'
             else:            
                 diff_data = difflib.SequenceMatcher(None, first_data, second_data)
-                result = diff(diff_data)
+                result = re.sub('\r', '', diff(diff_data))
             
             return html_minify(render_template(skin_check(conn), 
                 imp = [name, wiki_set(conn, 1), custom(conn), other2([' (비교)', 0])],
