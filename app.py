@@ -17,7 +17,7 @@ import random
 import sys
 
 # 버전 표기
-r_ver = 'v3.0.0-Stable-Fix-02'
+r_ver = 'v3.0.1'
 print('Version : ' + r_ver)
 
 # 나머지 불러오기
@@ -62,21 +62,17 @@ compress.init_app(app)
 def md5_replace(data):
     return hashlib.md5(data.encode()).hexdigest()       
 
-def plus_data(first, second):
-    return first + second             
-
 app.jinja_env.filters['md5_replace'] = md5_replace
-app.jinja_env.filters['plus_data'] = plus_data
 
 # 셋업 부분
 curs.execute("create table if not exists data(title text, data text)")
 curs.execute("create table if not exists history(id text, title text, data text, date text, ip text, send text, leng text, hide text)")
 curs.execute("create table if not exists rd(title text, sub text, date text)")
-curs.execute("create table if not exists user(id text, pw text, acl text, date text)")
-curs.execute("create table if not exists ban(block text, end text, why text, band text)")
+curs.execute("create table if not exists user(id text, pw text, acl text, date text, email text, skin text)")
+curs.execute("create table if not exists ban(block text, end text, why text, band text, login text)")
 curs.execute("create table if not exists topic(id text, title text, sub text, data text, date text, ip text, block text, top text)")
 curs.execute("create table if not exists stop(title text, sub text, close text)")
-curs.execute("create table if not exists rb(block text, end text, today text, blocker text, why text)")
+curs.execute("create table if not exists rb(block text, end text, today text, blocker text, why text, band text)")
 curs.execute("create table if not exists back(title text, link text, type text)")
 curs.execute("create table if not exists agreedis(title text, sub text)")
 curs.execute("create table if not exists custom(user text, css text)")
@@ -115,6 +111,28 @@ else:
     rep_port = rep_data[0][0]
     
     print('Port : ' + str(rep_port))
+
+# robots.txt 점검
+try:
+    if not os.path.exists('robots.txt'):
+        curs.execute("select data from other where name = 'robot'")
+        robot_test = curs.fetchall()
+        if robot_test:
+            fw_test = open('./robots.txt', 'w')
+            fw_test.write(re.sub('\r\n', '\n', robot_test[0][0]))
+            fw_test.close()
+
+        else:
+            fw_test = open('./robots.txt', 'w')
+            fw_test.write('User-agent: *\nDisallow: /\nAllow: /$\nAllow: /w/')
+            fw_test.close()
+
+            curs.execute("insert into other (name, data) values ('robot', 'User-agent: *\nDisallow: /\nAllow: /$\nAllow: /w/')")
+        
+        print('robots.txt create')
+
+except:
+    pass
 
 # 비밀 키 점검
 curs.execute("select data from other where name = 'key'")
@@ -199,23 +217,9 @@ except:
     pass
 
 try:
-    if not os.path.exists('robot.txt'):
-        curs.execute("select data from other where name = 'robot'")
-        robot_test = curs.fetchall()
-        if robot_test:
-            fw_test = open('./robots.txt', 'w')
-            fw_test.write(re.sub('\r\n', '\n', robot_test[0][0]))
-            fw_test.close()
-
-            print('robot.txt create')
-
-except:
-    pass
-
-try:
     curs.execute("alter table user add email text default ''")
 
-    print('user table add email acl')
+    print('user table add column email')
 
 except:
     pass
@@ -229,6 +233,14 @@ try:
                 curs.execute("update filter set sub = '' where name = ?", [filter_delete[0]])
 
         print('filter data fix')
+
+except:
+    pass
+
+try:
+    curs.execute("alter table user add skin text default ''")
+
+    print('user table add column skin')
 
 except:
     pass
@@ -939,16 +951,18 @@ def indexing():
     print('')
 
     curs.execute("select name from sqlite_master where type = 'index'")
-    for delete_index in curs.fetchall():
-        print('Delete : ' + delete_index[0])
+    data = curs.fetchall()
+    if data:
+        for delete_index in data:
+            print('Delete : ' + delete_index[0])
 
-        sql = 'drop index if exists ' + delete_index[0]
-        
-        try:
-            curs.execute(sql)
+            sql = 'drop index if exists ' + delete_index[0]
+            
+            try:
+                curs.execute(sql)
 
-        except:
-            pass
+            except:
+                pass
     else:
         curs.execute("select name from sqlite_master where type in ('table', 'view') and name not like 'sqlite_%' union all select name from sqlite_temp_master where type in ('table', 'view') order by 1;")
         for table in curs.fetchall():            
@@ -1868,7 +1882,7 @@ def manager(num = 1):
     if num == 1:
         return html_minify(render_template(skin_check(conn), 
             imp = ['관리자 메뉴', wiki_set(conn, 1), custom(conn), other2([0, 0])],
-            data = '<h2>목록</h2><ul><li><a href="/manager/2">문서 ACL</a></li><li><a href="/manager/3">사용자 검사</a></li><li><a href="/manager/4">사용자 차단</a></li><li><a href="/manager/5">권한 주기</a></li><li><a href="/big_delete">여러 문서 삭제</a></li><li><a href="/edit_filter">편집 필터</a></li></ul><br><h2>소유자</h2><ul><li><a href="/indexing">인덱싱 (생성 or 삭제)</a></li><li><a href="/manager/8">관리 그룹 생성</a></li><li><a href="/edit_set">설정 편집</a></li><li><a href="/re_start">서버 재 시작</a></li><li><a href="/update">업데이트 (Git 사용)</a></li><!-- <li><a href="/inter_wiki">인터위키</a></li> --></ul>',
+            data = '<h2>목록</h2><ul><li><a href="/manager/2">문서 ACL</a></li><li><a href="/manager/3">사용자 검사</a></li><li><a href="/manager/4">사용자 차단</a></li><li><a href="/manager/5">권한 주기</a></li><li><a href="/big_delete">여러 문서 삭제</a></li><li><a href="/edit_filter">편집 필터</a></li></ul><br><h2>소유자</h2><ul><li><a href="/indexing">인덱싱 (생성 or 삭제)</a></li><li><a href="/manager/8">관리 그룹 생성</a></li><li><a href="/edit_set">설정 편집</a></li><li><a href="/re_start">서버 재 시작</a></li><li><a href="/update">업데이트 (Git 사용)</a></li><li><a href="/inter_wiki">인터위키</a></li></ul>',
             menu = [['other', '기타']]
         ))
     elif num in range(2, 14):
@@ -2413,37 +2427,76 @@ def change_password():
         return redirect('/login')
     
     if request.method == 'POST':    
-        if request.form['pw2'] != request.form['pw3']:
-            return re_error(conn, '/error/20')
+        if request.form.get('pw', None):
+            if request.form['pw2'] != request.form['pw3']:
+                return re_error(conn, '/error/20')
 
-        curs.execute("select pw from user where id = ?", [session['DREAMER']])
-        user = curs.fetchall()
-        if not user:
-            return re_error(conn, '/error/10')
+            curs.execute("select pw from user where id = ?", [session['DREAMER']])
+            user = curs.fetchall()
+            if not user:
+                return re_error(conn, '/error/10')
 
-        if not bcrypt.checkpw(bytes(request.form['pw'], 'utf-8'), bytes(user[0][0], 'utf-8')):
-            return re_error(conn, '/error/5')
+            if not bcrypt.checkpw(bytes(request.form['pw'], 'utf-8'), bytes(user[0][0], 'utf-8')):
+                return re_error(conn, '/error/5')
 
-        hashed = bcrypt.hashpw(bytes(request.form['pw2'], 'utf-8'), bcrypt.gensalt())
+            hashed = bcrypt.hashpw(bytes(request.form['pw2'], 'utf-8'), bcrypt.gensalt())
+            
+            curs.execute("update user set pw = ? where id = ?", [hashed.decode(), session['DREAMER']])
         
-        curs.execute("update user set pw = ? where id = ?", [hashed.decode(), session['DREAMER']])
+        curs.execute("update user set email = ? where id = ?", [request.form.get('email', ''), ip_check()])
+        curs.execute("update user set skin = ? where id = ?", [request.form.get('skin', ''), ip_check()])
         conn.commit()
         
-        return redirect('/user')
+        return redirect('/change')
 
     else:        
+        ip = ip_check()
+
+        curs.execute('select email from user where id = ?', [ip])
+        data = curs.fetchall()
+        if data:
+            email = data[0][0]
+
+        else:
+            email = ''
+
+        div2 = ''
+
+        curs.execute('select skin from user where id = ?', [ip])
+        data = curs.fetchall()
+
+        for skin_data in os.listdir(os.path.abspath('views')):
+            if not data:
+                curs.execute('select data from other where name = "skin"')
+                sql_data = curs.fetchall()
+                if sql_data and sql_data[0][0] == skin_data:
+                    div2 = '<option value="' + skin_data + '">' + skin_data + '</option>' + div2
+
+                else:
+                    div2 += '<option value="' + skin_data + '">' + skin_data + '</option>'
+            
+            elif data[0][0] == skin_data:
+                div2 = '<option value="' + skin_data + '">' + skin_data + '</option>' + div2
+                
+            else:
+                div2 += '<option value="' + skin_data + '">' + skin_data + '</option>'
+
         return html_minify(render_template(skin_check(conn),    
-            imp = ['비밀번호 변경', wiki_set(conn, 1), custom(conn), other2([0, 0])],
+            imp = ['내 정보 수정', wiki_set(conn, 1), custom(conn), other2([0, 0])],
             data = '<form method="post"> \
-                        <input placeholder="현재 비밀번호" name="pw" type="password"><hr> \
-                        <input placeholder="변경할 비밀번호" name="pw2" type="password"><hr> \
+                        <span>닉네임 : ' + ip + '</span><hr>\
+                        <input placeholder="현재 비밀번호" name="pw" type="password"><br><br> \
+                        <input placeholder="변경할 비밀번호" name="pw2" type="password"><br><br> \
                         <input placeholder="재 확인" name="pw3" type="password"><hr> \
+                        <input placeholder="이메일" name="email" type="text" value="' + email + '"><hr> \
+                        <span>스킨</span><br><br> \
+                        <select name="skin">' + div2 + '</select><hr> \
                         <button type="submit">변경</button><hr> \
                         <span>주의 : 만약 HTTPS 연결이 아닌 경우 데이터가 유출될 가능성이 있습니다. 이에 대해 책임지지 않습니다.</span> \
                     </form>',
             menu = [['user', '사용자']]
         ))
-                
+
 @app.route('/check/<name>')
 def user_check(name = None):
     if admin_check(conn, 4, 'check (' + name + ')') != 1:
@@ -2886,7 +2939,7 @@ def diff_data(name = None):
                 result = '내용이 같습니다.'
             else:            
                 diff_data = difflib.SequenceMatcher(None, first_data, second_data)
-                result = diff(diff_data)
+                result = re.sub('\r', '', diff(diff_data))
             
             return html_minify(render_template(skin_check(conn), 
                 imp = [name, wiki_set(conn, 1), custom(conn), other2([' (비교)', 0])],
@@ -2918,7 +2971,6 @@ def read_view(name = None):
     sub = ''
     acl = ''
     div = ''
-    topic = 0
 
     num = request.args.get('num', None)
     if num:
@@ -2928,7 +2980,7 @@ def read_view(name = None):
     for data in curs.fetchall():
         curs.execute("select title from stop where title = ? and sub = ? and close = 'O'", [name, data[0]])
         if not curs.fetchall():
-            topic = 1
+            sub += ' (토론 O)'
 
             break
                 
@@ -2982,8 +3034,12 @@ def read_view(name = None):
 
             div += '</ul>'
             
+            if div == '<br><h2 id="cate_normal">분류</h2><ul></ul>':
+                div = ''
+            
             if u_div != '':
-                div = '<br><h2 id="cate_under">하위 분류</h2><ul>' + u_div + '</ul>' + div
+                div += '<br><h2 id="cate_under">하위 분류</h2><ul>' + u_div + '</ul>'
+
 
     if num:
         curs.execute("select title from history where title = ? and id = ? and hide = 'O'", [name, str(num)])
@@ -3036,7 +3092,7 @@ def read_view(name = None):
         else:
             curs.execute("select block from ban where block = ?", [g[0]])
             if curs.fetchall():
-                sub = ' (차단)'
+                sub += ' (차단)'
 
             else:
                 acl = ''
@@ -3058,9 +3114,9 @@ def read_view(name = None):
     end_data = namumark(conn, name, else_data, 0)
 
     if data_none == 1:
-        menu = [['edit/' + url_pas(name), '생성'], ['topic/' + url_pas(name), topic], ['history/' + url_pas(name), '역사'], ['move/' + url_pas(name), '이동'], ['xref/' + url_pas(name), '역링크']]
+        menu = [['edit/' + url_pas(name), '생성'], ['topic/' + url_pas(name), '토론'], ['history/' + url_pas(name), '역사'], ['move/' + url_pas(name), '이동'], ['xref/' + url_pas(name), '역링크']]
     else:
-        menu = [['edit/' + url_pas(name), '수정'], ['topic/' + url_pas(name), topic], ['history/' + url_pas(name), '역사'], ['delete/' + url_pas(name), '삭제'], ['move/' + url_pas(name), '이동'], ['raw/' + url_pas(name), '원본'], ['xref/' + url_pas(name), '역링크']]
+        menu = [['edit/' + url_pas(name), '수정'], ['topic/' + url_pas(name), '토론'], ['history/' + url_pas(name), '역사'], ['delete/' + url_pas(name), '삭제'], ['move/' + url_pas(name), '이동'], ['raw/' + url_pas(name), '원본'], ['xref/' + url_pas(name), '역링크']]
         
     if admin_memu == 1:
         menu += [['acl/' + url_pas(name), 'ACL']]
@@ -3478,7 +3534,7 @@ def user_info():
     if custom(conn)[2] != 0:
         ip_user = '<a href="/w/사용자:' + ip + '">' + ip + '</a>'
         
-        plus = '<li><a href="/logout">로그아웃</a></li><li><a href="/change">비밀번호 변경</a></li><li><a href="/email">이메일 수정</a></li>'
+        plus = '<li><a href="/logout">로그아웃</a></li><li><a href="/change">내 정보 변경</a></li>'
 
     else:
         ip_user = ip
@@ -3490,35 +3546,6 @@ def user_info():
         data =  '<h2>상태</h2><ul><li>' + ip_user + ' <a href="/record/' + url_pas(ip) + '">(기록)</a></li><li>권한 상태 : ' + acl + '</li></ul><br><h2>로그인</h2><ul>' + plus + '<li><a href="/register">회원가입</a></li></ul><br><h2>사용자 기능</h2><ul><li><a href="/acl/사용자:' + url_pas(ip) + '">사용자 문서 ACL</a></li><li><a href="/custom_head">사용자 HEAD</a></li></ul><br><h2>기타</h2><ul><li><a href="/alarm">알림</a></li><li><a href="/watch_list">주시 문서</a></li><li><a href="/count">활동 횟수</a></li></ul>',
         menu = 0
     ))
-
-@app.route('/email', methods=['GET', 'POST'])
-def email():
-    if custom(conn)[2] == 0:
-        return re_error(conn, '/error/1')
-
-    if request.method == 'POST':
-        curs.execute("update user set email = ? where id = ?", [request.form.get('email', ''), ip_check()])
-        conn.commit()
-
-        return redirect('/user')
-
-    else:
-        curs.execute('select email from user where id = ?', [ip_check()])
-        data = curs.fetchall()
-        if data:
-            email = data[0][0]
-
-        else:
-            email = ''
-
-        return html_minify(render_template(skin_check(conn),    
-            imp = ['이메일 수정', wiki_set(conn, 1), custom(conn), other2([0, 0])],
-            data = '<form method="post"> \
-                        <input placeholder="이메일" name="email" type="text" value="' + email + '"><hr> \
-                        <button type="submit">변경</button><hr> \
-                    </form>',
-            menu = [['user', '사용자']]
-        ))
 
 @app.route('/watch_list')
 def watch_list():
