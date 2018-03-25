@@ -881,10 +881,13 @@ def start(conn, data, title):
         else:
             break
 
+    data = re.sub('\n+$', '', data)
+
     footnote_all += '</ul>'
     if footnote_all == '\n<hr><ul id="footnote_data"></ul>':
         footnote_all = ''
 
+    data += '\n'
     data = re.sub('\n$', footnote_all, data, 1)
 
     # 분류 마지막 처리
@@ -894,7 +897,7 @@ def start(conn, data, title):
     if category == '\n<hr><div id="cate">분류: </div>':
         category = ''
 
-    if data != '\n\n':
+    if data != '\n':
         data += category
 
     else:
