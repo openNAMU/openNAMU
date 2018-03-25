@@ -951,16 +951,18 @@ def indexing():
     print('')
 
     curs.execute("select name from sqlite_master where type = 'index'")
-    for delete_index in curs.fetchall():
-        print('Delete : ' + delete_index[0])
+    data = curs.fetchall()
+    if data:
+        for delete_index in data:
+            print('Delete : ' + delete_index[0])
 
-        sql = 'drop index if exists ' + delete_index[0]
-        
-        try:
-            curs.execute(sql)
+            sql = 'drop index if exists ' + delete_index[0]
+            
+            try:
+                curs.execute(sql)
 
-        except:
-            pass
+            except:
+                pass
     else:
         curs.execute("select name from sqlite_master where type in ('table', 'view') and name not like 'sqlite_%' union all select name from sqlite_temp_master where type in ('table', 'view') order by 1;")
         for table in curs.fetchall():            
