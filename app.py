@@ -3034,8 +3034,12 @@ def read_view(name = None):
 
             div += '</ul>'
             
+            if div == '<br><h2 id="cate_normal">분류</h2><ul></ul>':
+                div = ''
+            
             if u_div != '':
-                div = '<br><h2 id="cate_under">하위 분류</h2><ul>' + u_div + '</ul>' + div
+                div += '<br><h2 id="cate_under">하위 분류</h2><ul>' + u_div + '</ul>'
+
 
     if num:
         curs.execute("select title from history where title = ? and id = ? and hide = 'O'", [name, str(num)])
