@@ -374,11 +374,7 @@ def plus_inter():
     else:
         return html_minify(render_template(skin_check(conn), 
             imp = ['인터위키 목록', wiki_set(conn, 1), custom(conn), other2([0, 0])],
-            data = '<form method="post"> \
-                        <input placeholder="이름" type="text" name="title"><hr> \
-                        <input placeholder="링크" type="text" name="link"><hr> \
-                        <button type="submit">추가</button> \
-                    </form>',
+            data = '<form method="post"><input placeholder="이름" type="text" name="title"><hr><input placeholder="링크" type="text" name="link"><hr><button type="submit">추가</button></form>',
             menu = [['other', '기타']]
         ))
 
@@ -477,27 +473,7 @@ def edit_set(num = 0):
 
             return html_minify(render_template(skin_check(conn), 
                 imp = ['기본 설정', wiki_set(conn, 1), custom(conn), other2([0, 0])],
-                data = '<form method="post"> \
-                            <span>이름</span><br><br> \
-                            <input placeholder="이름" type="text" name="name" value="' + html.escape(d_list[0]) + '"><hr> \
-                            <span>로고 (HTML)</span><br><br> \
-                            <input placeholder="로고" type="text" name="logo" value="' + html.escape(d_list[1]) + '"><hr> \
-                            <span>대문</span><br><br> \
-                            <input placeholder="대문" type="text" name="frontpage" value="' + html.escape(d_list[2]) + '"><hr> \
-                            <span>라이선스 (HTML)</span><br><br> \
-                            <input placeholder="라이선스" type="text" name="license" value="' + html.escape(d_list[3]) + '"><hr> \
-                            <span>파일 크기 [메가]</span><br><br> \
-                            <input placeholder="파일 크기" type="text" name="upload" value="' + html.escape(d_list[4]) + '"><hr> \
-                            <span>백업 간격 [시간] (끄기 : 0) {재시작 필요}</span><br><br> \
-                            <input placeholder="백업 간격" type="text" name="back_up" value="' + html.escape(d_list[9]) + '"><hr> \
-                            <span>스킨</span><br><br> \
-                            <select name="skin">' + div2 + '</select><hr> \
-                            <span>전역 ACL</span><br><br> \
-                            <select name="edit">' + div + '</select><hr> \
-                            <input type="checkbox" name="reg" ' + ch_1 + '> 가입불가<hr> \
-                            <input type="checkbox" name="ip_view" ' + ch_2 + '> 아이피 비공개<hr> \
-                            <button id="save" type="submit">저장</button> \
-                        </form>',
+                data = '<form method="post"><span>이름</span><br><br><input placeholder="이름" type="text" name="name" value="' + html.escape(d_list[0]) + '"><hr><span>로고 (HTML)</span><br><br><input placeholder="로고" type="text" name="logo" value="' + html.escape(d_list[1]) + '"><hr><span>대문</span><br><br><input placeholder="대문" type="text" name="frontpage" value="' + html.escape(d_list[2]) + '"><hr><span>라이선스 (HTML)</span><br><br><input placeholder="라이선스" type="text" name="license" value="' + html.escape(d_list[3]) + '"><hr><span>파일 크기 [메가]</span><br><br><input placeholder="파일 크기" type="text" name="upload" value="' + html.escape(d_list[4]) + '"><hr><span>백업 간격 [시간] (끄기 : 0) {재시작 필요}</span><br><br><input placeholder="백업 간격" type="text" name="back_up" value="' + html.escape(d_list[9]) + '"><hr><span>스킨</span><br><br><select name="skin">' + div2 + '</select><hr><span>전역 ACL</span><br><br><select name="edit">' + div + '</select><hr><input type="checkbox" name="reg" ' + ch_1 + '> 가입불가<hr><input type="checkbox" name="ip_view" ' + ch_2 + '> 아이피 비공개<hr><button id="save" type="submit">저장</button></form>',
                 menu = [['edit_set', '설정']]
             ))
 
@@ -535,13 +511,7 @@ def edit_set(num = 0):
 
             return html_minify(render_template(skin_check(conn), 
                 imp = ['문구 관련', wiki_set(conn, 1), custom(conn), other2([0, 0])],
-                data = '<form method="post"> \
-                            <span>가입 약관</span><br><br> \
-                            <input placeholder="가입 약관" type="text" name="contract" value="' + html.escape(d_list[0]) + '"><hr> \
-                            <span>비 로그인 경고</span><br><br> \
-                            <input placeholder="비 로그인 경고" type="text" name="no_login_warring" value="' + html.escape(d_list[1]) + '"><hr> \
-                            <button id="save" type="submit">저장</button> \
-                        </form>',
+                data = '<form method="post"><span>가입 약관</span><br><br><input placeholder="가입 약관" type="text" name="contract" value="' + html.escape(d_list[0]) + '"><hr><span>비 로그인 경고</span><br><br><input placeholder="비 로그인 경고" type="text" name="no_login_warring" value="' + html.escape(d_list[1]) + '"><hr><button id="save" type="submit">저장</button></form>',
                 menu = [['edit_set', '설정']]
             ))
 
@@ -571,11 +541,7 @@ def edit_set(num = 0):
 
             return html_minify(render_template(skin_check(conn), 
                 imp = ['전역 HEAD', wiki_set(conn, 1), custom(conn), other2([0, 0])],
-                data =  '<span>&lt;style&gt;CSS&lt;/style&gt;<br>&lt;script&gt;JS&lt;/script&gt;</span><hr> \
-                        <form method="post"> \
-                            <textarea rows="25" name="content">' + html.escape(data) + '</textarea><hr> \
-                            <button id="save" type="submit">저장</button> \
-                        </form>',
+                data =  '<span>&lt;style&gt;CSS&lt;/style&gt;<br>&lt;script&gt;JS&lt;/script&gt;</span><hr><form method="post"><textarea rows="25" name="content">' + html.escape(data) + '</textarea><hr><button id="save" type="submit">저장</button></form>',
                 menu = [['edit_set', '설정']]
             ))
 
@@ -616,11 +582,7 @@ def edit_set(num = 0):
 
             return html_minify(render_template(skin_check(conn), 
                 imp = ['robots.txt', wiki_set(conn, 1), custom(conn), other2([0, 0])],
-                data =  '<a href="/robots.txt">(보기)</a><hr> \
-                        <form method="post"> \
-                            <textarea rows="25" name="content">' + html.escape(data) + '</textarea><hr> \
-                            <button id="save" type="submit">저장</button> \
-                        </form>',
+                data =  '<a href="/robots.txt">(보기)</a><hr><form method="post"><textarea rows="25" name="content">' + html.escape(data) + '</textarea><hr><button id="save" type="submit">저장</button></form>',
                 menu = [['edit_set', '설정']]
             ))
 
@@ -657,13 +619,7 @@ def edit_set(num = 0):
 
             return html_minify(render_template(skin_check(conn), 
                 imp = ['구글 관련', wiki_set(conn, 1), custom(conn), other2([0, 0])],
-                data = '<form method="post"> \
-                            <span>리캡차 (HTML)</span><br><br> \
-                            <input placeholder="리캡차 (HTML)" type="text" name="recaptcha" value="' + html.escape(d_list[0]) + '"><hr> \
-                            <span>리캡차 (비밀키)</span><br><br> \
-                            <input placeholder="리캡차 (비밀키)" type="text" name="sec_re" value="' + html.escape(d_list[1]) + '"><hr> \
-                            <button id="save" type="submit">저장</button> \
-                        </form>',
+                data = '<form method="post"><span>리캡차 (HTML)</span><br><br><input placeholder="리캡차 (HTML)" type="text" name="recaptcha" value="' + html.escape(d_list[0]) + '"><hr><span>리캡차 (비밀키)</span><br><br><input placeholder="리캡차 (비밀키)" type="text" name="sec_re" value="' + html.escape(d_list[1]) + '"><hr><button id="save" type="submit">저장</button></form>',
                 menu = [['edit_set', '설정']]
             ))
 
@@ -1430,13 +1386,7 @@ def revert(name = None):
 
         return html_minify(render_template(skin_check(conn), 
             imp = [name, wiki_set(conn, 1), custom(conn), other2([' (되돌리기)', 0])],
-            data =  '<form method="post"> \
-                        <span>' + request.args.get('num', '0') + '판으로 되돌리겠습니까?</span><hr> \
-                        ' + ip_warring(conn) + ' \
-                        <input placeholder="사유" name="send" type="text"><hr> \
-                        ' + captcha_get(conn) + ' \
-                        <button type="submit">되돌리기</button> \
-                    </form>',
+            data =  '<form method="post"><span>' + request.args.get('num', '0') + '판으로 되돌리겠습니까?</span><hr>' + ip_warring(conn) + '<input placeholder="사유" name="send" type="text"><hr>' + captcha_get(conn) + '<button type="submit">되돌리기</button></form>',
             menu = [['history/' + url_pas(name), '역사'], ['recent_changes', '최근 변경']]
         ))            
                     
@@ -1470,12 +1420,7 @@ def big_delete():
     else:
         return html_minify(render_template(skin_check(conn), 
             imp = ['많은 문서 삭제', wiki_set(conn, 1), custom(conn), other2([0, 0])],
-            data = '<span>문서명 A<br>문서명 B<br>문서명 C<hr>이런 식으로 적으세요.</span><hr> \
-                    <form method="post"> \
-                        <textarea rows="25" name="content"></textarea><hr> \
-                        <input placeholder="사유" name="send" type="text"><hr> \
-                        <button type="submit">삭제</button> \
-                    </form>',
+            data = '<span>문서명 A<br>문서명 B<br>문서명 C<hr>이런 식으로 적으세요.</span><hr><form method="post"><textarea rows="25" name="content"></textarea><hr><input placeholder="사유" name="send" type="text"><hr><button type="submit">삭제</button></form>',
             menu = [['manager', '관리자']]
         ))
 
@@ -1557,11 +1502,7 @@ def set_edit_filter(name = None):
 
         return html_minify(render_template(skin_check(conn), 
             imp = [name, wiki_set(conn, 1), custom(conn), other2([' (편집 필터)', 0])],
-            data = '<form method="post"> \
-                        <input ' + stat + ' type="checkbox" ' + time_data + ' name="ban"> 차단<hr> \
-                        <input ' + stat + ' placeholder="정규식" name="content" value="' + html.escape(textarea) + '" type="text"><hr> \
-                        <button ' + stat + ' id="save" type="submit">저장</button> \
-                    </form>',
+            data = '<form method="post"><input ' + stat + ' type="checkbox" ' + time_data + ' name="ban"> 차단<hr><input ' + stat + ' placeholder="정규식" name="content" value="' + html.escape(textarea) + '" type="text"><hr><button ' + stat + ' id="save" type="submit">저장</button></form>',
             menu = [['edit_filter', '목록'], ['edit_filter/' + url_pas(name) + '/delete', '삭제']]
         ))
 
@@ -1699,16 +1640,7 @@ def edit(name = None):
 
         return html_minify(render_template(skin_check(conn), 
             imp = [name, wiki_set(conn, 1), custom(conn), other2([' (수정)', 0])],
-            data = get_name + ' \
-                    <form method="post" action="/edit/' + url_pas(name) + action + '"> \
-                        <textarea rows="25" name="content">' + html.escape(re.sub('\n$', '', data)) + '</textarea> \
-                        <textarea style="display: none;" name="otent">' + html.escape(re.sub('\n$', '', data_old)) + '</textarea><hr> \
-                        <input placeholder="사유" name="send" type="text"><hr> \
-                        ' + captcha_get(conn) + ' \
-                        ' + ip_warring(conn) + ' \
-                        <button id="save" type="submit">저장</button> \
-                        <button id="preview" type="submit" formaction="/preview/' + url_pas(name) + action + '">미리보기</button> \
-                    </form>',
+            data = get_name + '<form method="post" action="/edit/' + url_pas(name) + action + '"><textarea rows="25" name="content">' + html.escape(re.sub('\n$', '', data)) + '</textarea><textarea style="display: none;" name="otent">' + html.escape(re.sub('\n$', '', data_old)) + '</textarea><hr><input placeholder="사유" name="send" type="text"><hr>' + captcha_get(conn) + '' + ip_warring(conn) + '<button id="save" type="submit">저장</button><button id="preview" type="submit" formaction="/preview/' + url_pas(name) + action + '">미리보기</button></form>',
             menu = [['w/' + url_pas(name), '문서'], ['delete/' + url_pas(name), '삭제'], ['move/' + url_pas(name), '이동']]
         ))
         
@@ -1735,14 +1667,7 @@ def preview(name = None):
 
     return html_minify(render_template(skin_check(conn), 
         imp = [name, wiki_set(conn, 1), custom(conn), other2([' (미리보기)', 0])],
-        data = '<form method="post" action="/edit/' + url_pas(name) + action + '"> \
-                    <textarea rows="25" name="content">' + html.escape(request.form['content']) + '</textarea> \
-                    <textarea style="display: none;" name="otent">' + html.escape(request.form['otent']) + '</textarea><hr> \
-                    <input placeholder="사유" name="send" type="text"><hr> \
-                    ' + captcha_get(conn) + ' \
-                    <button id="save" type="submit">저장</button> \
-                    <button id="preview" type="submit" formaction="/preview/' + url_pas(name) + action + '">미리보기</button> \
-                </form><hr>' + end_data,
+        data = '<form method="post" action="/edit/' + url_pas(name) + action + '"><textarea rows="25" name="content">' + html.escape(request.form['content']) + '</textarea><textarea style="display: none;" name="otent">' + html.escape(request.form['otent']) + '</textarea><hr><input placeholder="사유" name="send" type="text"><hr>' + captcha_get(conn) + '<button id="save" type="submit">저장</button><button id="preview" type="submit" formaction="/preview/' + url_pas(name) + action + '">미리보기</button></form><hr>' + end_data,
         menu = [['w/' + url_pas(name), '문서']]
     ))
         
@@ -1784,12 +1709,7 @@ def delete(name = None):
 
         return html_minify(render_template(skin_check(conn), 
             imp = [name, wiki_set(conn, 1), custom(conn), other2([' (삭제)', 0])],
-            data = '<form method="post"> \
-                        ' + ip_warring(conn) + ' \
-                        <input placeholder="사유" name="send" type="text"><hr> \
-                        ' + captcha_get(conn) + ' \
-                        <button type="submit">삭제</button> \
-                    </form>',
+            data = '<form method="post">' + ip_warring(conn) + '<input placeholder="사유" name="send" type="text"><hr>' + captcha_get(conn) + '<button type="submit">삭제</button></form>',
             menu = [['w/' + url_pas(name), '문서']]
         ))            
             
@@ -1856,13 +1776,7 @@ def move(name = None):
     else:            
         return html_minify(render_template(skin_check(conn), 
             imp = [name, wiki_set(conn, 1), custom(conn), other2([' (이동)', 0])],
-            data = '<form method="post"> \
-                        ' + ip_warring(conn) + ' \
-                        <input placeholder="문서명" value="' + name + '" name="title" type="text"><hr> \
-                        <input placeholder="사유" name="send" type="text"><hr> \
-                        ' + captcha_get(conn) + ' \
-                        <button type="submit">이동</button> \
-                    </form>',
+            data = '<form method="post">' + ip_warring(conn) + '<input placeholder="문서명" value="' + name + '" name="title" type="text"><hr><input placeholder="사유" name="send" type="text"><hr>' + captcha_get(conn) + '<button type="submit">이동</button></form>',
             menu = [['w/' + url_pas(name), '문서']]
         ))
             
@@ -1898,10 +1812,7 @@ def manager(num = 1):
 
             return html_minify(render_template(skin_check(conn), 
                 imp = [title_list[(num - 2)][0], wiki_set(conn, 1), custom(conn), other2([0, 0])],
-                data = '<form method="post"> \
-                            <input placeholder="' + placeholder + '" name="name" type="text"><hr> \
-                            <button type="submit">이동</button> \
-                        </form>',
+                data = '<form method="post"><input placeholder="' + placeholder + '" name="name" type="text"><hr><button type="submit">이동</button></form>',
                 menu = [['manager', '관리자']]
             ))
 
@@ -2408,13 +2319,7 @@ def login():
     else:        
         return html_minify(render_template(skin_check(conn),    
             imp = ['로그인', wiki_set(conn, 1), custom(conn), other2([0, 0])],
-            data = '<form method="post"> \
-                        <input placeholder="아이디" name="id" type="text"><hr> \
-                        <input placeholder="비밀번호" name="pw" type="password"><hr> \
-                        ' + captcha_get(conn) + ' \
-                        <button type="submit">로그인</button><hr> \
-                        <span>주의 : 만약 HTTPS 연결이 아닌 경우 데이터가 유출될 가능성이 있습니다. 이에 대해 책임지지 않습니다.</span> \
-                    </form>',
+            data = '<form method="post"><input placeholder="아이디" name="id" type="text"><hr><input placeholder="비밀번호" name="pw" type="password"><hr>' + captcha_get(conn) + '<button type="submit">로그인</button><hr><span>주의 : 만약 HTTPS 연결이 아닌 경우 데이터가 유출될 가능성이 있습니다. 이에 대해 책임지지 않습니다.</span></form>',
             menu = [['user', '사용자']]
         ))
                 
@@ -2483,17 +2388,7 @@ def change_password():
 
         return html_minify(render_template(skin_check(conn),    
             imp = ['내 정보 수정', wiki_set(conn, 1), custom(conn), other2([0, 0])],
-            data = '<form method="post"> \
-                        <span>닉네임 : ' + ip + '</span><hr>\
-                        <input placeholder="현재 비밀번호" name="pw" type="password"><br><br> \
-                        <input placeholder="변경할 비밀번호" name="pw2" type="password"><br><br> \
-                        <input placeholder="재 확인" name="pw3" type="password"><hr> \
-                        <input placeholder="이메일" name="email" type="text" value="' + email + '"><hr> \
-                        <span>스킨</span><br><br> \
-                        <select name="skin">' + div2 + '</select><hr> \
-                        <button type="submit">변경</button><hr> \
-                        <span>주의 : 만약 HTTPS 연결이 아닌 경우 데이터가 유출될 가능성이 있습니다. 이에 대해 책임지지 않습니다.</span> \
-                    </form>',
+            data = '<form method="post"><span>닉네임 : ' + ip + '</span><hr><input placeholder="현재 비밀번호" name="pw" type="password"><br><br><input placeholder="변경할 비밀번호" name="pw2" type="password"><br><br><input placeholder="재 확인" name="pw3" type="password"><hr><input placeholder="이메일" name="email" type="text" value="' + email + '"><hr><span>스킨</span><br><br><select name="skin">' + div2 + '</select><hr><button type="submit">변경</button><hr><span>주의 : 만약 HTTPS 연결이 아닌 경우 데이터가 유출될 가능성이 있습니다. 이에 대해 책임지지 않습니다.</span></form>',
             menu = [['user', '사용자']]
         ))
 
@@ -2568,10 +2463,7 @@ def plus_check(name):
     else:
         return html_minify(render_template(skin_check(conn),
             imp = ['대상 추가', wiki_set(conn, 1), custom(conn), other2([0, 0])],
-            data = '<form method="post"> \
-                        <input placeholder="비교 대상" name="name2" type="text"><hr> \
-                        <button type="submit">이동</button> \
-                    </form>',
+            data = '<form method="post"><input placeholder="비교 대상" name="name2" type="text"><hr><button type="submit">이동</button></form>',
             menu = [['manager', '관리자']]
         ))
                 
@@ -2628,16 +2520,7 @@ def register():
 
         return html_minify(render_template(skin_check(conn),    
             imp = ['회원가입', wiki_set(conn, 1), custom(conn), other2([0, 0])],
-            data = '<form method="post"> \
-                        ' + contract + ' \
-                        <input placeholder="아이디" name="id" type="text"><hr> \
-                        <input placeholder="비밀번호" name="pw" type="password"><hr> \
-                        <input placeholder="다시" name="pw2" type="password"><hr> \
-                        <input placeholder="이메일 (선택)" name="email" type="text"><hr> \
-                        ' + captcha_get(conn) + ' \
-                        <button type="submit">가입</button><hr> \
-                        <span>주의 : 만약 HTTPS 연결이 아닌 경우 데이터가 유출될 가능성이 있습니다. 이에 대해 책임지지 않습니다.</span> \
-                    </form>',
+            data = '<form method="post">' + contract + '<input placeholder="아이디" name="id" type="text"><hr><input placeholder="비밀번호" name="pw" type="password"><hr><input placeholder="다시" name="pw2" type="password"><hr><input placeholder="이메일 (선택)" name="email" type="text"><hr>' + captcha_get(conn) + '<button type="submit">가입</button><hr><span>주의 : 만약 HTTPS 연결이 아닌 경우 데이터가 유출될 가능성이 있습니다. 이에 대해 책임지지 않습니다.</span></form>',
             menu = [['user', '사용자']]
         ))
             
@@ -2843,15 +2726,7 @@ def acl(name = None):
             
         return html_minify(render_template(skin_check(conn), 
             imp = [name, wiki_set(conn, 1), custom(conn), other2([' (ACL)', 0])],
-            data = '<form method="post"> \
-                        <span>현재 ACL : ' + now + '</span><hr> \
-                        <select name="select"> \
-                            ' + plus + ' \
-                            <option value="user" ' + acl_list[1] + '>가입자</option> \
-                            <option value="normal" ' + acl_list[2] + '>일반</option> \
-                        </select><hr> \
-                        <button type="submit">ACL 변경</button> \
-                    </form>',
+            data = '<form method="post"><span>현재 ACL : ' + now + '</span><hr><select name="select">' + plus + '<option value="user" ' + acl_list[1] + '>가입자</option><option value="normal" ' + acl_list[2] + '>일반</option></select><hr><button type="submit">ACL 변경</button></form>',
             menu = [['w/' + url_pas(name), '문서'], ['manager', '관리자']]
         ))
             
@@ -2914,10 +2789,7 @@ def user_admin(name = None):
         
         return html_minify(render_template(skin_check(conn), 
             imp = [name, wiki_set(conn, 1), custom(conn), other2([' (권한 부여)', 0])],
-            data =  '<form method="post"> \
-                        <select name="select">' + div + '</select><hr> \
-                        <button type="submit">변경</button> \
-                    </form>',
+            data =  '<form method="post"><select name="select">' + div + '</select><hr><button type="submit">변경</button></form>',
             menu = [['manager', '관리자']]
         ))
     
@@ -3491,13 +3363,7 @@ def upload():
     else:
         return html_minify(render_template(skin_check(conn), 
             imp = ['파일 올리기', wiki_set(conn, 1), custom(conn), other2([0, 0])],
-            data =  '<form method="post" enctype="multipart/form-data" accept-charset="utf8"> \
-                        <input type="file" name="f_data"><hr> \
-                        <input placeholder="파일 이름" name="f_name" type="text"><hr> \
-                        <input placeholder="라이선스" name="f_lice" type="text"><hr> \
-                        ' + captcha_get(conn) + ' \
-                        <button id="save" type="submit">저장</button> \
-                    </form>',
+            data =  '<form method="post" enctype="multipart/form-data" accept-charset="utf8"><input type="file" name="f_data"><hr><input placeholder="파일 이름" name="f_name" type="text"><hr><input placeholder="라이선스" name="f_lice" type="text"><hr>' + captcha_get(conn) + '<button id="save" type="submit">저장</button></form>',
             menu = [['other', '기타']]
         ))  
         
@@ -3638,11 +3504,7 @@ def custom_head_view():
 
         return html_minify(render_template(skin_check(conn), 
             imp = ['사용자 HEAD', wiki_set(conn, 1), custom(conn), other2([0, 0])],
-            data =  start + ' \
-                    <form method="post"> \
-                        <textarea rows="25" cols="100" name="content">' + data + '</textarea><hr> \
-                        <button id="save" type="submit">저장</button> \
-                    </form>',
+            data =  start + '<form method="post"><textarea rows="25" cols="100" name="content">' + data + '</textarea><hr><button id="save" type="submit">저장</button></form>',
             menu = [['user', '사용자']]
         ))
 
