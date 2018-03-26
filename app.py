@@ -1709,7 +1709,7 @@ def edit(name = None):
                         <button id="save" type="submit">저장</button> \
                         <button id="preview" type="submit" formaction="/preview/' + url_pas(name) + action + '">미리보기</button> \
                     </form>',
-            menu = [['w/' + url_pas(name), '문서']]
+            menu = [['w/' + url_pas(name), '문서'], ['delete/' + url_pas(name), '삭제'], ['move/' + url_pas(name), '이동']]
         ))
         
 @app.route('/edit_get/<path:name>', methods=['POST'])
@@ -3114,9 +3114,11 @@ def read_view(name = None):
     end_data = namumark(conn, name, else_data, 0)
 
     if data_none == 1:
-        menu = [['edit/' + url_pas(name), '생성'], ['topic/' + url_pas(name), '토론'], ['history/' + url_pas(name), '역사'], ['move/' + url_pas(name), '이동'], ['xref/' + url_pas(name), '역링크']]
+        menu = [['edit/' + url_pas(name), '생성']]
     else:
-        menu = [['edit/' + url_pas(name), '수정'], ['topic/' + url_pas(name), '토론'], ['history/' + url_pas(name), '역사'], ['delete/' + url_pas(name), '삭제'], ['move/' + url_pas(name), '이동'], ['raw/' + url_pas(name), '원본'], ['xref/' + url_pas(name), '역링크']]
+        menu = [['edit/' + url_pas(name), '수정']]
+
+    menu += [['topic/' + url_pas(name), '토론'], ['history/' + url_pas(name), '역사'], ['xref/' + url_pas(name), '역링크']]
         
     if admin_memu == 1:
         menu += [['acl/' + url_pas(name), 'ACL']]
@@ -3372,7 +3374,7 @@ def recent_changes(name = None, tool = 'record'):
                 
                 sub += ' (역사)'
                 
-                menu = [['w/' + url_pas(name), '문서'], ['move_data/' + url_pas(name), '이동 기록']]
+                menu = [['w/' + url_pas(name), '문서'], ['raw/' + url_pas(name), '원본'], ['move_data/' + url_pas(name), '이동 기록']]
                 
                 div += next_fix('/history/' + url_pas(name) + '?num=', num, data_list)
             else:
