@@ -295,6 +295,7 @@ select {
 button#save {
     background: lightseagreen;
     border-color: lightseagreen;
+    margin-right: 5px;
 }
 
 button#come {
