@@ -93,7 +93,6 @@ def skin_check(conn):
             if skin_exist:
                 if os.path.exists(os.path.abspath('./views/' + skin_exist[0][0] + '/index.html')) == 1:
                     skin = './views/' + skin_exist[0][0] + '/'
-
     except:
         pass
 

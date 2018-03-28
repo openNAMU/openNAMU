@@ -127,7 +127,6 @@ try:
             curs.execute("insert into other (name, data) values ('robot', 'User-agent: *\nDisallow: /\nAllow: /$\nAllow: /w/')")
         
         print('robots.txt create')
-
 except:
     pass
 
@@ -158,7 +157,6 @@ try:
     curs.execute("drop table move")
 
     print('move table delete')
-
 except:
     pass
 
@@ -172,7 +170,6 @@ try:
     curs.execute("drop table if exists hidhi")
 
     print('move table hidhi')
-
 except:
     pass
 
@@ -180,7 +177,6 @@ try:
     curs.execute("alter table user add date text default ''")
 
     print('user table add column date')
-
 except:
     pass
 
@@ -188,7 +184,6 @@ try:
     curs.execute("alter table rb add band text default ''")
 
     print('rb table add column band')
-
 except:
     pass
 
@@ -196,7 +191,6 @@ try:
     curs.execute("alter table ban add login text default ''")
 
     print('ban table add column login')
-
 except:
     pass
 
@@ -208,7 +202,6 @@ try:
     curs.execute("alter table data drop acl")
 
     print('data table delete column acl')
-
 except:
     pass
 
@@ -216,7 +209,6 @@ try:
     curs.execute("alter table user add email text default ''")
 
     print('user table add column email')
-
 except:
     pass
 
@@ -229,7 +221,6 @@ try:
                 curs.execute("update filter set sub = '' where name = ?", [filter_delete[0]])
 
         print('filter data fix')
-
 except:
     pass
 
@@ -237,7 +228,6 @@ try:
     curs.execute("alter table user add skin text default ''")
 
     print('user table add column skin')
-
 except:
     pass
         
@@ -257,7 +247,6 @@ def back_up():
         shutil.copyfile(set_data['db'] + '.db', 'back_' + set_data['db'] + '.db')
         
         print('Back Up Ok')
-
     except:
         print('Back Up Error')
 
@@ -268,7 +257,6 @@ try:
     back_up_time = curs.fetchall()
     
     back_time = int(back_up_time[0][0])
-
 except:
     back_time = 0
     
@@ -875,7 +863,6 @@ def indexing():
             
             try:
                 curs.execute(sql)
-
             except:
                 pass
     else:
@@ -892,7 +879,6 @@ def indexing():
                 sql = 'create index index_' + table[0] + '_' + n_cul + ' on ' + table[0] + '(' + n_cul + ')'
                 try:
                     curs.execute(sql)
-
                 except:
                     pass
 
