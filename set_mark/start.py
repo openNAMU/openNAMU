@@ -185,8 +185,6 @@ def start(conn, data, title):
                     else:
                         and_data = re.sub('&#x27;', '\'', re.sub('&quot;', '"', in_data[2]))
 
-                    print(and_data)
-
                     data = re.sub('&lt;' + in_data[1] + in_data[2] + '&gt;', '<' + in_data[1] + and_data + '>', data, 1)
                     data = re.sub('&lt;\/' + in_data[1] + '&gt;', '</' + in_data[1] + '>', data, 1)
 
