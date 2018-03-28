@@ -163,6 +163,36 @@ def start(conn, data, title):
     # 개행 정리
     data = re.sub('\r\n', '\n', data)
 
+    # HTML 허용
+    src_list = ["www.youtube.com", "serviceapi.nmv.naver.com", "tv.kakao.com", "www.google.com", "serviceapi.rmcnmv.naver.com"]
+    html_list = ['div', 'span', 'embed', 'iframe', 'ruby', 'rp', 'rt']
+
+    html_data = re.findall('&lt;(\/)?((?:(?!&gt;| ).)+)( (?:(?:(?!&gt;).)+)?)?&gt;', data)
+    for in_data in html_data:
+        if in_data[0] == '':
+            if in_data[1] in html_list:
+                if re.search('&lt;\/' + in_data[1] + '&gt;', data):
+                    src = re.search('src=([^ ]*)', in_data[2])
+                    if src:
+                        v_src = re.search('http(?:s)?:\/\/([^/\'" ]*)', src.groups()[0])
+                        if v_src:
+                            if not v_src.groups()[0] in src_list:
+                                and_data = re.sub('&#x27;', '\'', re.sub('&quot;', '"', re.sub('src=([^ ]*)', '', in_data[2])))
+                            else:
+                                and_data = re.sub('&#x27;', '\'', re.sub('&quot;', '"', in_data[2]))
+                        else:
+                            and_data = re.sub('&#x27;', '\'', re.sub('&quot;', '"', re.sub('src=([^ ]*)', '', in_data[2])))
+                    else:
+                        and_data = re.sub('&#x27;', '\'', re.sub('&quot;', '"', in_data[2]))
+
+                    print(and_data)
+
+                    data = re.sub('&lt;' + in_data[1] + in_data[2] + '&gt;', '<' + in_data[1] + and_data + '>', data, 1)
+                    data = re.sub('&lt;\/' + in_data[1] + '&gt;', '</' + in_data[1] + '>', data, 1)
+
+    position = re.compile('position', re.I)
+    data = position.sub('', data)
+
     # 표 정리
     data = re.sub('\n( +)\|\|', '\n||', data)
     data = re.sub('\|\|( +)\n', '||\n', data)
