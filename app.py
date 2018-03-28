@@ -41,7 +41,6 @@ except:
             set_data = json.loads(json_data)
 
             break
-
         else:
             print('Insert Values')
             
@@ -104,7 +103,6 @@ if not rep_data:
             curs.execute("insert into other (name, data) values ('port', ?)", [rep_port])
             
             break
-
         else:
             pass
 else:
@@ -121,7 +119,6 @@ try:
             fw_test = open('./robots.txt', 'w')
             fw_test.write(re.sub('\r\n', '\n', robot_test[0][0]))
             fw_test.close()
-
         else:
             fw_test = open('./robots.txt', 'w')
             fw_test.write('User-agent: *\nDisallow: /\nAllow: /$\nAllow: /w/')
@@ -146,7 +143,6 @@ if not rep_data:
             curs.execute("insert into other (name, data) values ('key', ?)", [rep_key])
             
             break
-
         else:
             pass
 else:
@@ -282,7 +278,6 @@ if back_time != 0:
     
     if __name__ == '__main__':
         back_up()
-
 else:
     print('No Back Up')
 
@@ -307,7 +302,6 @@ def alarm():
 
         for data_one in data_list:
             data += '<li>' + data_one[0] + ' (' + data_one[1] + ')</li>'
-
     else:
         data += '<li>알림이 없습니다.</li>'
     
@@ -341,7 +335,6 @@ def inter_wiki():
 
         if admin == 1:
             div += '<hr><a href="/plus_inter">(추가)</a>'
-
     else:
         if admin == 1:
             div += '<a href="/plus_inter">(추가)</a>'
@@ -400,7 +393,6 @@ def edit_set(num = 0):
             data = '<h2>메뉴</h2><ul>' + li_data + '</ul>',
             menu = [['manager', '관리자']]
         ))
-
     elif num == 1:
         i_list = ['name', 'logo', 'frontpage', 'license', 'upload', 'skin', 'edit', 'reg', 'ip_view', 'back_up']
         n_list = ['무명위키', '', '위키:대문', 'CC 0', '2', '', 'normal', '', '', '0']
@@ -417,7 +409,6 @@ def edit_set(num = 0):
             admin_check(conn, None, 'edit_set')
 
             return redirect('/edit_set/1')
-
         else:
             d_list = []
             
@@ -428,7 +419,6 @@ def edit_set(num = 0):
                 sql_d = curs.fetchall()
                 if sql_d:
                     d_list += [sql_d[0][0]]
-
                 else:
                     curs.execute('insert into other (name, data) values (?, ?)', [i, n_list[x]])
                     
@@ -444,12 +434,10 @@ def edit_set(num = 0):
                 div += '<option value="login">가입자</option>'
                 div += '<option value="normal">일반</option>'
                 div += '<option value="admin">관리자</option>'
-
             elif d_list[6] == 'admin':
                 div += '<option value="admin">관리자</option>'
                 div += '<option value="login">가입자</option>'
                 div += '<option value="normal">일반</option>'
-
             else:
                 div += '<option value="normal">일반</option>'
                 div += '<option value="admin">관리자</option>'
@@ -467,7 +455,6 @@ def edit_set(num = 0):
             for skin_data in os.listdir(os.path.abspath('views')):
                 if d_list[5] == skin_data:
                     div2 = '<option value="' + skin_data + '">' + skin_data + '</option>' + div2
-                    
                 else:
                     div2 += '<option value="' + skin_data + '">' + skin_data + '</option>'
 
@@ -476,7 +463,6 @@ def edit_set(num = 0):
                 data = '<form method="post"><span>이름</span><br><br><input placeholder="이름" type="text" name="name" value="' + html.escape(d_list[0]) + '"><hr><span>로고 (HTML)</span><br><br><input placeholder="로고" type="text" name="logo" value="' + html.escape(d_list[1]) + '"><hr><span>대문</span><br><br><input placeholder="대문" type="text" name="frontpage" value="' + html.escape(d_list[2]) + '"><hr><span>라이선스 (HTML)</span><br><br><input placeholder="라이선스" type="text" name="license" value="' + html.escape(d_list[3]) + '"><hr><span>파일 크기 [메가]</span><br><br><input placeholder="파일 크기" type="text" name="upload" value="' + html.escape(d_list[4]) + '"><hr><span>백업 간격 [시간] (끄기 : 0) {재시작 필요}</span><br><br><input placeholder="백업 간격" type="text" name="back_up" value="' + html.escape(d_list[9]) + '"><hr><span>스킨</span><br><br><select name="skin">' + div2 + '</select><hr><span>전역 ACL</span><br><br><select name="edit">' + div + '</select><hr><input type="checkbox" name="reg" ' + ch_1 + '> 가입불가<hr><input type="checkbox" name="ip_view" ' + ch_2 + '> 아이피 비공개<hr><button id="save" type="submit">저장</button></form>',
                 menu = [['edit_set', '설정']]
             ))
-
     elif num == 2:
         if request.method == 'POST':
             curs.execute("update other set data = ? where name = ?", [request.form['contract'], 'contract'])
@@ -486,7 +472,6 @@ def edit_set(num = 0):
             admin_check(conn, None, 'edit_set')
 
             return redirect('/edit_set/2')
-
         else:
             i_list = ['contract', 'no_login_warring']
             n_list = ['', '']
@@ -499,7 +484,6 @@ def edit_set(num = 0):
                 sql_d = curs.fetchall()
                 if sql_d:
                     d_list += [sql_d[0][0]]
-
                 else:
                     curs.execute('insert into other (name, data) values (?, ?)', [i, n_list[x]])
                     
@@ -514,13 +498,11 @@ def edit_set(num = 0):
                 data = '<form method="post"><span>가입 약관</span><br><br><input placeholder="가입 약관" type="text" name="contract" value="' + html.escape(d_list[0]) + '"><hr><span>비 로그인 경고</span><br><br><input placeholder="비 로그인 경고" type="text" name="no_login_warring" value="' + html.escape(d_list[1]) + '"><hr><button id="save" type="submit">저장</button></form>',
                 menu = [['edit_set', '설정']]
             ))
-
     elif num == 3:
         if request.method == 'POST':
             curs.execute("select name from other where name = 'head'")
             if curs.fetchall():
                 curs.execute("update other set data = ? where name = 'head'", [request.form['content']])
-
             else:
                 curs.execute("insert into other (name, data) values ('head', ?)", [request.form['content']])
             
@@ -529,13 +511,11 @@ def edit_set(num = 0):
             admin_check(conn, None, 'edit_set')
 
             return redirect('/edit_set/3')
-
         else:
             curs.execute("select data from other where name = 'head'")
             head = curs.fetchall()
             if head:
                 data = head[0][0]
-
             else:
                 data = ''
 
@@ -544,13 +524,11 @@ def edit_set(num = 0):
                 data =  '<span>&lt;style&gt;CSS&lt;/style&gt;<br>&lt;script&gt;JS&lt;/script&gt;</span><hr><form method="post"><textarea rows="25" name="content">' + html.escape(data) + '</textarea><hr><button id="save" type="submit">저장</button></form>',
                 menu = [['edit_set', '설정']]
             ))
-
     elif num == 4:
         if request.method == 'POST':
             curs.execute("select name from other where name = 'robot'")
             if curs.fetchall():
                 curs.execute("update other set data = ? where name = 'robot'", [request.form['content']])
-
             else:
                 curs.execute("insert into other (name, data) values ('robot', ?)", [request.form['content']])
             
@@ -563,13 +541,11 @@ def edit_set(num = 0):
             admin_check(conn, None, 'edit_set')
 
             return redirect('/edit_set/4')
-
         else:
             curs.execute("select data from other where name = 'robot'")
             robot = curs.fetchall()
             if robot:
                 data = robot[0][0]
-
             else:
                 data = ''
 
@@ -585,7 +561,6 @@ def edit_set(num = 0):
                 data =  '<a href="/robots.txt">(보기)</a><hr><form method="post"><textarea rows="25" name="content">' + html.escape(data) + '</textarea><hr><button id="save" type="submit">저장</button></form>',
                 menu = [['edit_set', '설정']]
             ))
-
     elif num == 5:
         if request.method == 'POST':
             curs.execute("update other set data = ? where name = 'recaptcha'", [request.form['recaptcha']])
@@ -595,7 +570,6 @@ def edit_set(num = 0):
             admin_check(conn, None, 'edit_set')
 
             return redirect('/edit_set/5')
-
         else:
             i_list = ['recaptcha', 'sec_re']
             n_list = ['', '']
@@ -622,7 +596,6 @@ def edit_set(num = 0):
                 data = '<form method="post"><span>리캡차 (HTML)</span><br><br><input placeholder="리캡차 (HTML)" type="text" name="recaptcha" value="' + html.escape(d_list[0]) + '"><hr><span>리캡차 (비밀키)</span><br><br><input placeholder="리캡차 (비밀키)" type="text" name="sec_re" value="' + html.escape(d_list[1]) + '"><hr><button id="save" type="submit">저장</button></form>',
                 menu = [['edit_set', '설정']]
             ))
-
     else:
         return redirect('/')
 
@@ -650,7 +623,6 @@ def not_close_topic():
 def image_view(name = None):
     if os.path.exists(os.path.join('image', name)):
         return send_from_directory('./image', name)
-
     else:
         return redirect('/')
 
@@ -664,7 +636,6 @@ def acl_list():
         if not re.search('^사용자:', data[0]) and not re.search('^파일:', data[0]):
             if data[1] == 'admin':
                 acl = '관리자'
-
             else:
                 acl = '가입자'
 
@@ -723,25 +694,18 @@ def admin_plus(name = None):
         for go in acl_list:
             if go[0] == 'ban':
                 exist_list[0] = 'checked="checked"'
-
             elif go[0] == 'mdel':
                 exist_list[1] = 'checked="checked"'
-
             elif go[0] == 'toron':
                 exist_list[2] = 'checked="checked"'
-
             elif go[0] == 'check':
                 exist_list[3] = 'checked="checked"'
-
             elif go[0] == 'acl':
                 exist_list[4] = 'checked="checked"'
-
             elif go[0] == 'hidel':
                 exist_list[5] = 'checked="checked"'
-
             elif go[0] == 'give':
                 exist_list[6] = 'checked="checked"'
-
             elif go[0] == 'owner':
                 exist_list[7] = 'checked="checked"'
 
@@ -794,7 +758,6 @@ def history_hidden(name = None):
         curs.execute("select title from history where title = ? and id = ? and hide = 'O'", [name, str(num)])
         if curs.fetchall():
             curs.execute("update history set hide = '' where title = ? and id = ?", [name, str(num)])
-
         else:
             curs.execute("update history set hide = 'O' where title = ? and id = ?", [name, str(num)])
             
@@ -807,7 +770,6 @@ def user_log():
     num = int(request.args.get('num', 1))
     if num * 50 > 0:
         sql_num = num * 50 - 50
-
     else:
         sql_num = 0
         
@@ -822,7 +784,6 @@ def user_log():
             curs.execute("select block from ban where block = ?", [data[0]])
             if curs.fetchall():
                 ban_button = ' <a href="/ban/' + url_pas(data[0]) + '">(해제)</a>'
-
             else:
                 ban_button = ' <a href="/ban/' + url_pas(data[0]) + '">(차단)</a>'
         else:
@@ -840,7 +801,6 @@ def user_log():
         user_count = curs.fetchall()
         if user_count:
             count = user_count[0][0]
-
         else:
             count = 0
 
@@ -859,7 +819,6 @@ def admin_log():
     num = int(request.args.get('num', 1))
     if num * 50 > 0:
         sql_num = num * 50 - 50
-
     else:
         sql_num = 0
 
@@ -981,7 +940,6 @@ def xref(name = None):
     num = int(request.args.get('num', 1))
     if num * 50 > 0:
         sql_num = num * 50 - 50
-
     else:
         sql_num = 0
         
@@ -995,10 +953,8 @@ def xref(name = None):
         if data[1]:
             if data[1] == 'include':
                 side = '포함'
-
             elif data[1] == 'file':
                 side = '파일'
-
             else:
                 side = '넘겨주기'
                 
@@ -1022,7 +978,6 @@ def please():
     num = int(request.args.get('num', 1))
     if num * 50 > 0:
         sql_num = num * 50 - 50
-
     else:
         sql_num = 0
         
@@ -1055,7 +1010,6 @@ def recent_discuss(tools = 'normal'):
             div += '<a href="/recent_discuss/close">(닫힘)</a>'
            
             m_sub = 0
-
         else:
             div += '<a href="/recent_discuss">(열림)</a>'
             
@@ -1076,7 +1030,6 @@ def recent_discuss(tools = 'normal'):
             curs.execute("select title from stop where title = ? and sub = ? and close = 'O'", [data[0], data[1]])
             if curs.fetchall():
                 close = 1
-
         else:
             curs.execute("select title from stop where title = ? and sub = ? and close = 'O'", [data[0], data[1]])
             if not curs.fetchall():
@@ -1084,7 +1037,6 @@ def recent_discuss(tools = 'normal'):
 
         if close == 0:
             div += '<tr><td><a href="/topic/' + url_pas(data[0]) + '/sub/' + url_pas(data[1]) + '">' + title + '</a> (' + sub + ')</td><td>' + data[2] + '</td></tr>'
-
     else:
         div += '</tbody></table>'
             
@@ -1101,7 +1053,6 @@ def block_log(name = None, tool = None, tool2 = None):
     num = int(request.args.get('num', 1))
     if num * 50 > 0:
         sql_num = num * 50 - 50
-
     else:
         sql_num = 0
     
@@ -1117,7 +1068,6 @@ def block_log(name = None, tool = None, tool2 = None):
             menu = 0
             
             curs.execute("select why, block, blocker, end, today from rb order by today desc limit ?, '50'", [str(sql_num)])
-
         else:
             menu = [['block_log', '일반']]
             
@@ -1125,22 +1075,18 @@ def block_log(name = None, tool = None, tool2 = None):
                 sub = ' (아이피)'
                 
                 curs.execute("select why, block, blocker, end, today from rb where (block like ? or block like ?) order by today desc limit ?, '50'", ['%.%', '%:%', str(sql_num)])
-
             elif tool2 == 'user':
                 sub = ' (가입자)'
                 
                 curs.execute("select why, block, blocker, end, today from rb where not (block like ? or block like ?) order by today desc limit ?, '50'", ['%.%', '%:%', str(sql_num)])
-
             elif tool2 == 'never_end':
                 sub = '(무기한)'
                 
                 curs.execute("select why, block, blocker, end, today from rb where not end like ? and not end like ? order by today desc limit ?, '50'", ['%:%', '%해제%', str(sql_num)])
-
             elif tool2 == 'end':
                 sub = '(해제)'
                 
                 curs.execute("select why, block, blocker, end, today from rb where end = ? order by today desc limit ?, '50'", ['해제', str(sql_num)])
-
             elif tool2 == 'now':
                 sub = '(현재)'
                 
@@ -1151,17 +1097,14 @@ def block_log(name = None, tool = None, tool2 = None):
                     curs.execute("select why, block, blocker, end, today from rb where block = ? order by today desc limit 1", [in_data[0]])
                     
                     data_list = [curs.fetchall()[0]] + data_list
-
             elif tool2 == 'edit_filter':
                 sub = '(편집 필터)'
 
                 curs.execute("select why, block, blocker, end, today from rb where blocker = ? order by today desc limit ?, '50'", ['도구:편집 필터', str(sql_num)])
-
             else:
                 sub = '(기간)'
                 
                 curs.execute("select why, block, blocker, end, today from rb where end like ? order by today desc limit ?, '50'", ['%\-%', str(sql_num)])
-
     else:
         menu = [['block_log', '일반']]
         
@@ -1169,7 +1112,6 @@ def block_log(name = None, tool = None, tool2 = None):
             sub = ' (차단자)'
             
             curs.execute("select why, block, blocker, end, today from rb where block = ? order by today desc limit ?, '50'", [name, str(sql_num)])
-
         else:
             sub = ' (관리자)'
             
@@ -1186,13 +1128,11 @@ def block_log(name = None, tool = None, tool2 = None):
         band = re.search("^([0-9]{1,3}\.[0-9]{1,3})$", data[1])
         if band:
             ip = data[1] + ' (대역)'
-
         else:
             ip = ip_pas(conn, data[1])
 
         if data[3] != '':
             end = data[3]
-
         else:
             end = '무기한'
             
@@ -1204,10 +1144,8 @@ def block_log(name = None, tool = None, tool2 = None):
     if not name:
         if not tool2:
             div += next_fix('/block_log?num=', num, data_list)
-
         else:
             div += next_fix('/block_log/' + url_pas(tool2) + '?num=', num, data_list)
-
     else:
         div += next_fix('/' + url_pas(tool) + '/' + url_pas(name) + '?num=', num, data_list)
                 
@@ -1227,7 +1165,6 @@ def goto():
     data = curs.fetchall()
     if data:
         return redirect('/w/' + url_pas(request.form['search']))
-
     else:
         return redirect('/search/' + url_pas(request.form['search']))
 
@@ -1236,7 +1173,6 @@ def deep_search(name = None):
     num = int(request.args.get('num', 1))
     if num * 50 > 0:
         sql_num = num * 50 - 50
-
     else:
         sql_num = 0
 
@@ -1250,7 +1186,6 @@ def deep_search(name = None):
     curs.execute("select title from data where title = ?", [name])
     if curs.fetchall():
         div = '<ul><li>문서로 <a href="/w/' + url_pas(name) + '">바로가기</a></li></ul><hr><ul>'
-
     else:
         div = '<ul><li>문서가 없습니다. <a id="not_thing" href="/w/' + url_pas(name) + '">바로가기</a></li></ul><hr><ul>'
 
@@ -1266,7 +1201,6 @@ def deep_search(name = None):
                 test = data[1]
 
             div_plus += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a> (' + data[1] + ')</li>'
-
     else:
         div += '<li>검색 결과 없음</li>'
 
@@ -1300,7 +1234,6 @@ def raw_view(name = None, sub_title = None, num = None):
         sub += ' (' + str(num) + '판)'
 
         menu = [['history/' + url_pas(name), '역사']]
-
     elif sub_title:
         curs.execute("select data from topic where id = ? and title = ? and sub = ? and block = ''", [str(num), name, sub_title])
         
@@ -1308,7 +1241,6 @@ def raw_view(name = None, sub_title = None, num = None):
         sub = ' (' + str(num) + '번)'
 
         menu = [['topic/' + url_pas(name) + '/sub/' + url_pas(sub_title) + '#' + str(num), '토론'], ['topic/' + url_pas(name) + '/sub/' + url_pas(sub_title) + '/admin/' + str(num), '도구']]
-
     else:
         curs.execute("select data from data where title = ?", [name])
         
@@ -1324,7 +1256,6 @@ def raw_view(name = None, sub_title = None, num = None):
             data = p_data,
             menu = menu
         ))
-
     else:
         return redirect('/w/' + url_pas(name))
         
@@ -1339,7 +1270,6 @@ def revert(name = None):
     if request.method == 'POST':
         if captcha_post(request.form.get('g-recaptcha-response', None), conn) == 1:
             return re_error(conn, '/error/13')
-
         else:
             captcha_post('', conn, 0)
 
@@ -1361,7 +1291,6 @@ def revert(name = None):
             if data_old:
                 leng = leng_check(len(data_old[0][0]), len(data[0][0]))
                 curs.execute("update data set data = ? where title = ?", [data[0][0], name])
-
             else:
                 leng = '+' + str(len(data[0][0]))
                 curs.execute("insert into data (title, data) values (?, ?)", [name, data[0][0]])
@@ -1437,7 +1366,6 @@ def edit_filter():
 
     if data:
         div += '<hr><a href="/manager/9">(추가)</a>'
-    
     else:
         div = '<a href="/manager/9">(추가)</a>'
 
@@ -1465,14 +1393,12 @@ def set_edit_filter(name = None):
 
         if request.form.get('ban', None):
             end = 'X'
-
         else:
             end = ''
 
         curs.execute("select name from filter where name = ?", [name])
         if curs.fetchall():
             curs.execute("update filter set regex = ?, sub = ? where name = ?", [request.form.get('content', '테스트'), end, name])
-
         else:
             curs.execute("insert into filter (name, regex, sub) values (?, ?, ?)", [name, request.form.get('content', '테스트'), end])
 
@@ -1487,10 +1413,8 @@ def set_edit_filter(name = None):
             
             if exist[0][1] == 'X':
                 time_data = 'checked="checked"'
-            
             else:
                 time_data = ''
-
         else:
             textarea = ''
             time_data = ''
@@ -1525,7 +1449,6 @@ def edit(name = None):
 
         if captcha_post(request.form.get('g-recaptcha-response', None), conn) == 1:
             return re_error(conn, '/error/13')
-
         else:
             captcha_post('', conn, 0)
 
@@ -1553,7 +1476,6 @@ def edit(name = None):
 
                         if i == int(request.args.get('section', None)):
                             data = re.sub('\n(?P<in>={1,6}) ?(?P<out>(?:(?!=).)+) ?={1,6}\n', '\n<real h' + str(len(replace_data)) + '>\g<out></real h' + str(len(replace_data)) + '>\n', data, 1)
-
                         else:
                             data = re.sub('\n(?P<in>={1,6}) ?(?P<out>(?:(?!=).)+) ?={1,6}\n', '\n<h' + str(len(replace_data)) + '>\g<out></h' + str(len(replace_data)) + '>\n', data, 1)
 
@@ -1568,7 +1490,6 @@ def edit(name = None):
                         replace_data = replace_data.groups()[0]
 
                         new_data = re.sub('\n(?P<in>={1,6}) ?(?P<out>(?:(?!=).)+) ?={1,6}\n', '\n<real h' + str(len(replace_data)) + '>\g<out></real h' + str(len(replace_data)) + '>\n', new_data, 1)
-
                     else:
                         break
 
@@ -1580,7 +1501,6 @@ def edit(name = None):
                         replace_data = replace_data.groups()[0]
 
                         content = re.sub('\n<(?:real )?h([1-6])>(?P<out>(?:(?!<h).)+) <\/(?:real )?h[1-6]>\n', '\n' + ('=' * int(replace_data)) + ' \g<out> ' + ('=' * int(replace_data)) + '\n', content, 1)
-
                     else:
                         break
 
@@ -1607,7 +1527,6 @@ def edit(name = None):
         conn.commit()
         
         return redirect('/w/' + url_pas(name))
-
     else:            
         curs.execute("select data from data where title = ?", [name])
         new = curs.fetchall()
@@ -1680,7 +1599,6 @@ def delete(name = None):
     if request.method == 'POST':
         if captcha_post(request.form.get('g-recaptcha-response', None), conn) == 1:
             return re_error(conn, '/error/13')
-
         else:
             captcha_post('', conn, 0)
 
@@ -1701,7 +1619,6 @@ def delete(name = None):
             conn.commit()
             
         return redirect('/w/' + url_pas(name))
-
     else:
         curs.execute("select title from data where title = ?", [name])
         if not curs.fetchall():
@@ -1744,7 +1661,6 @@ def move(name = None):
     if request.method == 'POST':
         if captcha_post(request.form.get('g-recaptcha-response', None), conn) == 1:
             return re_error(conn, '/error/13')
-
         else:
             captcha_post('', conn, 0)
 
@@ -1772,7 +1688,6 @@ def move(name = None):
         conn.commit()
 
         return redirect('/w/' + url_pas(request.form['title']))
-
     else:            
         return html_minify(render_template(skin_check(conn), 
             imp = [name, wiki_set(conn, 1), custom(conn), other2([' (이동)', 0])],
@@ -1802,11 +1717,9 @@ def manager(num = 1):
     elif num in range(2, 14):
         if request.method == 'POST':
             return redirect('/' + title_list[(num - 2)][2] + '/' + url_pas(request.form['name']))
-
         else:
             if title_list[(num - 2)][1] == 0:
                 placeholder = '사용자명'
-
             else:
                 placeholder = title_list[(num - 2)][1]
 
@@ -1815,7 +1728,6 @@ def manager(num = 1):
                 data = '<form method="post"><input placeholder="' + placeholder + '" name="name" type="text"><hr><button type="submit">이동</button></form>',
                 menu = [['manager', '관리자']]
             ))
-
     else:
         return redirect('/')
         
@@ -1825,7 +1737,6 @@ def title_index():
     num = int(request.args.get('num', 100))
     if page * num > 0:
         sql_num = page * num - num
-
     else:
         sql_num = 0
 
@@ -1892,7 +1803,6 @@ def topic_block(name = None, sub = None, num = None):
     if block:
         if block[0][0] == 'O':
             curs.execute("update topic set block = '' where title = ? and sub = ? and id = ?", [name, sub, str(num)])
-
         else:
             curs.execute("update topic set block = 'O' where title = ? and sub = ? and id = ?", [name, sub, str(num)])
         
@@ -1914,7 +1824,6 @@ def topic_top(name = None, sub = None, num = None):
         if top_data:
             if top_data[0][0] == 'O':
                 curs.execute("update topic set top = '' where title = ? and sub = ? and id = ?", [name, sub, str(num)])
-
             else:
                 curs.execute("update topic set top = 'O' where title = ? and sub = ? and id = ?", [name, sub, str(num)])
         
@@ -1928,13 +1837,10 @@ def topic_top(name = None, sub = None, num = None):
 def topic_stop(name = None, sub = None, tool = None):
     if tool == 'close':
         set_list = ['O', '', '토론 닫기', '토론 열림']
-
     elif tool == 'stop':
         set_list = ['', 'O', '토론 정지', '토론 재개']
-
     elif tool == 'agree':
         pass
-
     else:
         return redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub))
 
@@ -1952,17 +1858,14 @@ def topic_stop(name = None, sub = None, tool = None):
             if curs.fetchall():
                 curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, '합의 결렬', ?, ?, '', '1')", [str(int(topic_check[0][0]) + 1), name, sub, time, ip])
                 curs.execute("delete from agreedis where title = ? and sub = ?", [name, sub])
-
             else:
                 curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, '합의 완료', ?, ?, '', '1')", [str(int(topic_check[0][0]) + 1), name, sub, time, ip])
                 curs.execute("insert into agreedis (title, sub) values (?, ?)", [name, sub])
-
         else:
             curs.execute("select title from stop where title = ? and sub = ? and close = ?", [name, sub, set_list[0]])
             if curs.fetchall():
                 curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, ?, ?, ?, '', '1')", [str(int(topic_check[0][0]) + 1), name, sub, set_list[3], time, ip])
                 curs.execute("delete from stop where title = ? and sub = ? and close = ?", [name, sub, set_list[0]])
-
             else:
                 curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, ?, ?, ?, '', '1')", [str(int(topic_check[0][0]) + 1), name, sub, set_list[2], time, ip])
                 curs.execute("insert into stop (title, sub, close) values (?, ?, ?)", [name, sub, set_list[0]])
@@ -1989,7 +1892,6 @@ def topic_admin(name = None, sub = None, num = None):
 
         if data[0][0] == 'O':
             is_ban += '가림 해제'
-
         else:
             is_ban += '가림'
         
@@ -1999,7 +1901,6 @@ def topic_admin(name = None, sub = None, num = None):
         curs.execute("select id from topic where title = ? and sub = ? and id = ? and top = 'O'", [name, sub, str(num)])
         if curs.fetchall():
             is_ban += '공지 해제'
-
         else:
             is_ban += '공지'
         
@@ -2009,7 +1910,6 @@ def topic_admin(name = None, sub = None, num = None):
         curs.execute("select end from ban where block = ?", [data[0][1]])
         if curs.fetchall():
             ban += '차단 해제'
-
         else:
             ban += '차단'
         
@@ -2021,7 +1921,6 @@ def topic_admin(name = None, sub = None, num = None):
     
     if re.search('(\.|:)', data[0][1]):
         ban = '<li>작성인 : ' + data[0][1] + ' <li><a href="/record/' + url_pas(data[0][1]) + '">(기록)</a></li>' + ban
-        
     else:
         ban = '<li>작성인 : <a href="/w/사용자:' + data[0][1] + '">' + data[0][1] + '</a> <a href="/record/' + url_pas(data[0][1]) + '">(기록)</a></li>' + ban
 
@@ -2041,7 +1940,6 @@ def topic(name = None, sub = None):
     if request.method == 'POST':
         if captcha_post(request.form.get('g-recaptcha-response', None), conn) == 1:
             return re_error(conn, '/error/13')
-
         else:
             captcha_post('', conn, 0)
 
@@ -2055,7 +1953,6 @@ def topic(name = None, sub = None):
         old_num = curs.fetchall()
         if old_num:
             num = int(old_num[0][0]) + 1
-
         else:
             num = 1
 
@@ -2098,20 +1995,17 @@ def topic(name = None, sub = None):
         if admin == 1 and topic_exist:
             if close_data:
                 all_data += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/close">(열기)</a> '
-
             else:
                 all_data += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/close">(닫기)</a> '
             
             if stop_data:
                 all_data += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/stop">(재개)</a> '
-
             else:
                 all_data += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/stop">(정지)</a> '
 
             curs.execute("select title from agreedis where title = ? and sub = ?", [name, sub])
             if curs.fetchall():
                 all_data += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/agree">(취소)</a>'
-
             else:
                 all_data += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/agree">(합의)</a>'
             
@@ -2148,7 +2042,6 @@ def topic(name = None, sub = None):
                     who_blind = curs.fetchall()
                     if who_blind:
                         user_write = '[[사용자:' + who_blind[0][0] + ']]님이 가림'
-
                     else:
                         user_write = '관리자가 가림'
             else:
@@ -2171,10 +2064,8 @@ def topic(name = None, sub = None):
                     
             if topic_data[5] == '1':
                 color = '_blue'
-
             elif topic_data[3] == start:
                 color = '_green'
-
             else:
                 color = ''
                 
@@ -2215,7 +2106,6 @@ def close_topic_list(name = None, tool = None):
             if curs.fetchall():
                 if t_num == '':
                     t_num = ' 2'
-
                 else:
                     t_num = ' ' + str(int(t_num.replace(' ', '')) + 1)
             else:
@@ -2230,12 +2120,10 @@ def close_topic_list(name = None, tool = None):
             curs.execute("select sub from stop where title = ? and close = 'O' order by sub asc", [name])
             
             sub = '닫힘'
-
         elif tool == 'agree':
             curs.execute("select sub from agreedis where title = ? order by sub asc", [name])
             
             sub = '합의'
-
         else:
             curs.execute("select sub from rd where title = ? order by date desc", [name])
             
@@ -2278,7 +2166,6 @@ def login():
     curs.execute("select block from ban where block = ? and login = 'O'", [ip])
     if not curs.fetchall():
         ban = ban_check(conn)
-
     else:
         ban = 0
 
@@ -2288,7 +2175,6 @@ def login():
     if request.method == 'POST':        
         if captcha_post(request.form.get('g-recaptcha-response', None), conn) == 1:
             return re_error(conn, '/error/13')
-
         else:
             captcha_post('', conn, 0)
 
@@ -2307,7 +2193,6 @@ def login():
         css_data = curs.fetchall()
         if css_data:
             session['Daydream'] = css_data[0][0]
-
         else:
             session['Daydream'] = ''
         
@@ -2315,7 +2200,6 @@ def login():
         conn.commit()
         
         return redirect('/user')  
-
     else:        
         return html_minify(render_template(skin_check(conn),    
             imp = ['로그인', wiki_set(conn, 1), custom(conn), other2([0, 0])],
@@ -2353,7 +2237,6 @@ def change_password():
         conn.commit()
         
         return redirect('/change')
-
     else:        
         ip = ip_check()
 
@@ -2361,7 +2244,6 @@ def change_password():
         data = curs.fetchall()
         if data:
             email = data[0][0]
-
         else:
             email = ''
 
@@ -2376,13 +2258,10 @@ def change_password():
                 sql_data = curs.fetchall()
                 if sql_data and sql_data[0][0] == skin_data:
                     div2 = '<option value="' + skin_data + '">' + skin_data + '</option>' + div2
-
                 else:
                     div2 += '<option value="' + skin_data + '">' + skin_data + '</option>'
-            
             elif data[0][0] == skin_data:
                 div2 = '<option value="' + skin_data + '">' + skin_data + '</option>' + div2
-                
             else:
                 div2 += '<option value="' + skin_data + '">' + skin_data + '</option>'
 
@@ -2407,20 +2286,15 @@ def user_check(name = None):
         if re.search('(?:\.|:)', name):
             if re.search('(?:\.|:)', request.args.get('plus', None)):
                 curs.execute("select name, ip, ua, today from ua_d where ip = ? or ip = ? order by today desc", [name, request.args.get('plus', None)])
-
             else:
                 curs.execute("select name, ip, ua, today from ua_d where ip = ? or name = ? order by today desc", [name, request.args.get('plus', None)])
-
         else:
             if re.search('(?:\.|:)', request.args.get('plus', None)):
                 curs.execute("select name, ip, ua, today from ua_d where name = ? or ip = ? order by today desc", [name, request.args.get('plus', None)])
-
             else:
                 curs.execute("select name, ip, ua, today from ua_d where name = ? or name = ? order by today desc", [name, request.args.get('plus', None)])
-
     elif re.search('(?:\.|:)', name):
         curs.execute("select name, ip, ua, today from ua_d where ip = ? order by today desc", [name])
-    
     else:
         curs.execute("select name, ip, ua, today from ua_d where name = ? order by today desc", [name])
     
@@ -2428,7 +2302,6 @@ def user_check(name = None):
     if record:
         if not request.args.get('plus', None):
             div = '<a href="/plus_check/' + url_pas(name) + '">(비교)</a><hr>'
-        
         else:
             div = '<a href="/check/' + url_pas(name) + '">(주요 대상)</a> <a href="/check/' + url_pas(request.args.get('plus', None)) + '">(비교 대상)</a><hr>'
 
@@ -2438,7 +2311,6 @@ def user_check(name = None):
         for data in record:
             if data[2]:
                 ua = data[2]
-
             else:
                 ua = '<br>'
 
@@ -2446,7 +2318,6 @@ def user_check(name = None):
             div += '<tr><td colspan="3">' + ua + '</td></tr>'
         
         div += '</tbody></table>'
-
     else:
         return re_error(conn, '/error/5')
             
@@ -2481,7 +2352,6 @@ def register():
     if request.method == 'POST': 
         if captcha_post(request.form.get('g-recaptcha-response', None), conn) == 1:
             return re_error(conn, '/error/13')
-
         else:
             captcha_post('', conn, 0)
 
@@ -2509,7 +2379,6 @@ def register():
         conn.commit()
         
         return redirect('/login')
-
     else:        
         contract = ''
         
@@ -2545,7 +2414,6 @@ def user_ban(name = None):
 
         if request.form.get('year', 'no_end') == 'no_end':
             end = ''
-
         else:
             end = request.form.get('year', '') + '-' + request.form.get('month', '') + '-' + request.form.get('day', '')
 
@@ -2555,7 +2423,6 @@ def user_ban(name = None):
         ban_insert(conn, name, end, request.form.get('why', ''), request.form.get('login', ''), ip_check())
 
         return redirect('/ban/' + url_pas(name))     
-
     else:
         if admin_check(conn, 1, None) != 1:
             return re_error(conn, '/error/3')
@@ -2567,20 +2434,16 @@ def user_ban(name = None):
 
             if end[0][0] == '':
                 data = '<ul><li>무기한 차단</li>'
-
             else:
                 data = '<ul><li>차단 중 : ' + end[0][0] + '</li>'
 
             if end[0][1] != '':
                 data += '<li>사유 : ' + end[0][1] + '</li></ul><hr>'
-
             else:
                 data += '</ul><hr>'
-
         else:
             if re.search("^([0-9]{1,3}\.[0-9]{1,3})$", name):
                 now = '대역 차단'
-
             else:
                 now = '차단'
 
@@ -2593,7 +2456,6 @@ def user_ban(name = None):
             for i in range(int(g[0]), int(g[0]) + 11):
                 if i == int(g[0]):
                     year += '<option value="' + str(i) + '" selected>' + str(i) + '</option>'
-
                 else:
                     year += '<option value="' + str(i) + '">' + str(i) + '</option>'
 
@@ -2601,13 +2463,11 @@ def user_ban(name = None):
             for i in range(1, 13):
                 if int(i / 10) == 0:
                     num = '0' + str(i)
-                
                 else:
                     num = str(i)
 
                 if i == int(g[1]):
                     month += '<option value="' + num + '" selected>' + num + '</option>'
-
                 else:
                     month += '<option value="' + num + '">' + num + '</option>'
                 
@@ -2615,19 +2475,16 @@ def user_ban(name = None):
             for i in range(1, 32):
                 if int(i / 10) == 0:
                     num = '0' + str(i)
-                
                 else:
                     num = str(i)
 
                 if i == int(g[2]):
                     day += '<option value="' + num + '" selected>' + num + '</option>'
-                    
                 else:
                     day += '<option value="' + num + '">' + num + '</option>'
             
             if re.search('(\.|:)', name):
                 plus = '<input type="checkbox" name="login"> 로그인 가능<hr>'
-
             else:
                 plus = ''
 
@@ -2647,7 +2504,6 @@ def user_ban(name = None):
 def acl(name = None):
     if request.method == 'POST':
         check_data = 'acl (' + name + ')'
-
     else:
         check_data = None
     
@@ -2658,11 +2514,9 @@ def acl(name = None):
         
         if custom(conn)[2] == 0:
             return redirect('/login')
-
         elif test[0] != ip:
             if admin_check(conn, 5, check_data) != 1:
                 return re_error(conn, '/error/3')
-
     else:
         if admin_check(conn, 5, check_data) != 1:
             return re_error(conn, '/error/3')
@@ -2670,13 +2524,10 @@ def acl(name = None):
     if request.method == 'POST':
         if request.form['select'] == 'admin':
             sql = 'admin'
-
         elif request.form['select'] == 'all':
             sql = 'all'
-
         elif request.form['select'] == 'user':
             sql = 'user'
-
         else:
             sql = ''
             
@@ -2701,26 +2552,21 @@ def acl(name = None):
             if test and acl_d[0][0] == 'all':
                 now = '모두'
                 acl_list[0] = 'selected="selected"'
-
             elif not test and acl_d[0][0] == 'admin':
                 now = '관리자'
                 acl_list[0] = 'selected="selected"'
-                
             elif acl_d[0][0] == 'user':
                 now = '가입자'
                 acl_list[1] = 'selected="selected"'
-
             else:
                 now = '일반'
                 acl_list[2] = 'selected="selected"'
-
         else:
             now = '일반'
             acl_list[2] = 'selected="selected"'
 
         if test:
             plus = '<option value="all" ' + acl_list[0] + '>모두</option>'
-
         else:
             plus = '<option value="admin" ' + acl_list[0] + '>관리자</option>'
             
@@ -2738,7 +2584,6 @@ def user_admin(name = None):
     user = curs.fetchall()
     if not user:
         return re_error(conn, '/error/5')
-
     else:
         if owner != 1:
             curs.execute('select name from alist where name = ? and acl = "owner"', [user[0][0]])
@@ -2777,13 +2622,11 @@ def user_admin(name = None):
         for data in curs.fetchall():
             if user[0][0] == data[0]:
                 div += '<option value="' + data[0] + '" selected="selected">' + data[0] + '</option>'
-
             else:
                 if owner != 1:
                     curs.execute('select name from alist where name = ? and acl = "owner"', [data[0]])
                     if not curs.fetchall():
                         div += '<option value="' + data[0] + '">' + data[0] + '</option>'
-
                 else:
                     div += '<option value="' + data[0] + '">' + data[0] + '</option>'
         
@@ -2859,20 +2702,17 @@ def read_view(name = None):
     curs.execute("select title from data where title like ?", ['%' + name + '/%'])
     if curs.fetchall():
         down = 1
-
     else:
         down = 0
         
     m = re.search("^(.*)\/(.*)$", name)
     if m:
         uppage = m.groups()[0]
-
     else:
         uppage = 0
         
     if admin_check(conn, 5, None) == 1:
         admin_memu = 1
-
     else:
         admin_memu = 0
         
@@ -2887,20 +2727,16 @@ def read_view(name = None):
             for data in back:    
                 if re.search('^분류:', data[0]):
                     u_div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a></li>'
-
                 elif re.search('^틀:', data[0]):
                     curs.execute("select data from data where title = ?", [data[0]])
                     db_data = curs.fetchall()
                     if db_data:
                         if re.search('\[\[' + name + '#include]]', db_data[0][0]):
                             div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a> <a href="/xref/' + url_pas(data[0]) + '">(역링크)</a></li>'
-
                         else:
                             div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a></li>'
-
                     else:
                         div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a></li>'
-
                 else:
                     div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a></li>'
 
@@ -2926,7 +2762,6 @@ def read_view(name = None):
     if data:
         else_data = data[0][1]
         response_data = 200
-
     else:
         data_none = 1
         response_data = 404
@@ -2938,17 +2773,14 @@ def read_view(name = None):
         if acl_d:
             if acl_d[0][0] == 'admin':
                 acl = ' (관리자)'
-
             elif acl_d[0][0] == 'user':
                 acl = ' (가입자)'
-
         else:
             curs.execute('select data from other where name = "edit"')
             set_data = curs.fetchall()
             if set_data:
                 if set_data[0][0] == 'admin':
                     acl = ' (관리자)'
-
                 elif set_data[0][0] == 'user':
                     acl = ' (가입자)'
 
@@ -2960,12 +2792,10 @@ def read_view(name = None):
         test = curs.fetchall()
         if test and test[0][0] != 'user':
             acl = ' (관리자)'
-
         else:
             curs.execute("select block from ban where block = ?", [g[0]])
             if curs.fetchall():
                 sub += ' (차단)'
-
             else:
                 acl = ''
 
@@ -2974,7 +2804,6 @@ def read_view(name = None):
         if data:
             if data[0][0] == 'all':
                 acl += ' (모두)'
-
             elif data[0][0] == 'user':
                 acl += ' (가입자)'
             
@@ -3010,13 +2839,11 @@ def read_view(name = None):
         sub = ' (' + str(num) + '판)'
         acl = ''
         r_date = 0
-
     else:
         curs.execute("select date from history where title = ? order by date desc limit 1", [name])
         date = curs.fetchall()
         if date:
             r_date = date[0][0]
-
         else:
             r_date = 0
 
@@ -3051,10 +2878,8 @@ def user_topic_list(name = None):
             curs.execute("select * from ban where block = ?", [data[3]])
             if curs.fetchall():
                 ban = ' <a href="/ban/' + url_pas(data[3]) + '">(해제)</a>'
-
             else:
                 ban = ' <a href="/ban/' + url_pas(data[3]) + '">(차단)</a>'
-
         else:
             ban = ''
             
@@ -3082,7 +2907,6 @@ def user_topic_list(name = None):
 def recent_changes(name = None, tool = 'record'):
     if request.method == 'POST':
         return redirect('/diff/' + url_pas(name) + '?first=' + request.form['b'] + '&second=' + request.form['a'])
-
     else:
         one_admin = admin_check(conn, 1, None)
         six_admin = admin_check(conn, 6, None)
@@ -3098,7 +2922,6 @@ def recent_changes(name = None, tool = 'record'):
             num = int(request.args.get('num', 1))
             if num * 50 > 0:
                 sql_num = num * 50 - 50
-
             else:
                 sql_num = 0      
 
@@ -3106,7 +2929,6 @@ def recent_changes(name = None, tool = 'record'):
                 div += '<td style="width: 33.3%;">판</td><td style="width: 33.3%;">편집자</td><td style="width: 33.3%;">시간</td></tr>'
                 
                 curs.execute("select id, title, date, ip, send, leng from history where title = ? order by id + 0 desc limit ?, '50'", [name, str(sql_num)])
-
             else:
                 div += '<td style="width: 33.3%;">문서명</td><td style="width: 33.3%;">편집자</td><td style="width: 33.3%;">시간</td></tr>'
 
@@ -3116,17 +2938,13 @@ def recent_changes(name = None, tool = 'record'):
                     div = '<a href="/record/' + url_pas(name) + '?what=delete">(삭제)</a> ' + div
                     
                     curs.execute("select id, title, date, ip, send, leng from history where ip = ? order by date desc limit ?, '50'", [name, str(sql_num)])
-
                 else:
                     if what == 'delete':
                         sql = '%(삭제)'
-
                     elif what == 'move':
                         sql = '%이동)'
-
                     elif what == 'revert':
                         sql = '%판)'
-
                     else:
                         return redirect('/')
 
@@ -3142,17 +2960,13 @@ def recent_changes(name = None, tool = 'record'):
                 div = '<a href="/recent_discuss">(토론)</a> <a href="/block_log">(차단)</a> <a href="/user_log">(가입)</a> <a href="/admin_log">(권한)</a><hr>' + div
                 
                 curs.execute("select id, title, date, ip, send, leng from history order by date desc limit 50")
-
             else:
                 if what == 'delete':
                     sql = '%(삭제)'
-
                 elif what == 'move':
                     sql = '%이동)'
-
                 elif what == 'revert':
                     sql = '%판)'
-
                 else:
                     return redirect('/')
 
@@ -3169,10 +2983,8 @@ def recent_changes(name = None, tool = 'record'):
             
             if re.search("\+", data[5]):
                 leng = '<span style="color:green;">(' + data[5] + ')</span>'
-
             elif re.search("\-", data[5]):
                 leng = '<span style="color:red;">(' + data[5] + ')</span>'
-
             else:
                 leng = '<span style="color:gray;">(' + data[5] + ')</span>'
                 
@@ -3180,14 +2992,12 @@ def recent_changes(name = None, tool = 'record'):
                 curs.execute("select * from ban where block = ?", [data[3]])
                 if curs.fetchall():
                     ban = ' <a href="/ban/' + url_pas(data[3]) + '">(해제)</a>'
-
                 else:
                     ban = ' <a href="/ban/' + url_pas(data[3]) + '">(차단)</a>'            
                 
             ip = ip_pas(conn, data[3])
             if int(data[0]) - 1 == 0:
                 revert = ''
-
             else:
                 revert = '<a href="/diff/' + url_pas(data[1]) + '?first=' + str(int(data[0]) - 1) + '&second=' + data[0] + '">(비교)</a> <a href="/revert/' + url_pas(data[1]) + '?num=' + str(int(data[0]) - 1) + '">(되돌리기)</a>'
             
@@ -3206,16 +3016,12 @@ def recent_changes(name = None, tool = 'record'):
                     
                     if send == '<br>':
                         send = '(숨김)'
-
                     else:
                         send += ' (숨김)'
-
                 else:
                     hidden = ' <a href="/hidden/' + url_pas(data[1]) + '?num=' + data[0] + '">(숨김)'
-
             elif not hide:
                 hidden = ''
-
             else:
                 ip = ''
                 hidden = ''
@@ -3229,7 +3035,6 @@ def recent_changes(name = None, tool = 'record'):
 
             if tool == 'history':
                 title = '<a href="/w/' + url_pas(name) + '?num=' + data[0] + '">' + data[0] + '판</a> <a href="/raw/' + url_pas(name) + '?num=' + data[0] + '">(원본)</a> '
-
             else:
                 title = '<a href="/w/' + url_pas(data[1]) + '">' + html.escape(data[1]) + '</a> <a href="/history/' + url_pas(data[1]) + '">(' + data[0] + '판)</a> '
                     
@@ -3262,7 +3067,6 @@ def recent_changes(name = None, tool = 'record'):
                 
                 if what != 'all':
                     menu += [['record/' + url_pas(name), '일반']]
-
         else:
             menu = 0
             title = '최근 변경'
@@ -3272,10 +3076,8 @@ def recent_changes(name = None, tool = 'record'):
                 
         if what == 'delete':
             sub += ' (삭제)'
-
         elif what == 'move':
             sub += ' (이동)'
-
         elif what == 'revert':
             sub += ' (되돌리기)'
         
@@ -3296,7 +3098,6 @@ def upload():
     if request.method == 'POST':
         if captcha_post(request.form.get('g-recaptcha-response', None), conn) == 1:
             return re_error(conn, '/error/13')
-
         else:
             captcha_post('', conn, 0)
 
@@ -3313,7 +3114,6 @@ def upload():
     
         if request.form['f_name']:
             name = request.form['f_name'] + value
-
         else:
             name = data.filename
         
@@ -3331,11 +3131,9 @@ def upload():
 
         if request.form['f_lice']:
             lice = request.form['f_lice']
-
         else:
             if custom(conn)[2] == 0:
                 lice = ip + ' 올림'
-
             else:
                 lice = '[[사용자:' + ip + ']] 올림'
             
@@ -3343,7 +3141,6 @@ def upload():
             os.remove(os.path.join('image', e_data))
             
             data.save(os.path.join('image', e_data))
-
         else:
             data.save(os.path.join('image', e_data))
             
@@ -3359,7 +3156,6 @@ def upload():
         conn.commit()
         
         return redirect('/w/파일:' + name)      
-
     else:
         return html_minify(render_template(skin_check(conn), 
             imp = ['파일 올리기', wiki_set(conn, 1), custom(conn), other2([0, 0])],
@@ -3377,13 +3173,10 @@ def user_info():
         if data:
             if data[0][0] != 'user':
                 acl = data[0][0]
-
             else:
                 acl = '가입자'
-
         else:
             acl = '일반'
-
     else:
         acl = '차단'
 
@@ -3392,7 +3185,6 @@ def user_info():
         if block_data:
             if block_data[0][0] != '':
                 acl += ' (' + block_data[0][0] + '까지)'
-
             else:
                 acl += ' (무기한)'
         
@@ -3403,7 +3195,6 @@ def user_info():
         ip_user = '<a href="/w/사용자:' + ip + '">' + ip + '</a>'
         
         plus = '<li><a href="/logout">로그아웃</a></li><li><a href="/change">내 정보 변경</a></li>'
-
     else:
         ip_user = ip
         
@@ -3453,7 +3244,6 @@ def watch_list_name(name = None):
     curs.execute("select title from scan where user = ? and title = ?", [ip, name])
     if curs.fetchall():
         curs.execute("delete from scan where user = ? and title = ?", [ip, name])
-
     else:
         curs.execute("insert into scan (user, title) values (?, ?)", [ip, name])
     
@@ -3470,7 +3260,6 @@ def custom_head_view():
             curs.execute("select user from custom where user = ?", [ip + ' (head)'])
             if curs.fetchall():
                 curs.execute("update custom set css = ? where user = ?", [request.form['content'], ip + ' (head)'])
-
             else:
                 curs.execute("insert into custom (user, css) values (?, ?)", [ip + ' (head)', request.form['content']])
             
@@ -3487,16 +3276,13 @@ def custom_head_view():
             head_data = curs.fetchall()
             if head_data:
                 data = head_data[0][0]
-
             else:
                 data = ''
-
         else:
             start = '<span>비 로그인의 경우에는 로그인하거나 브라우저 닫으면 날아갑니다.</span><hr>'
             
             if 'MyMaiToNight' in session:
                 data = session['MyMaiToNight']
-
             else:
                 data = ''
 
@@ -3513,7 +3299,6 @@ def custom_head_view():
 def count_edit(name = None):
     if name == None:
         that = ip_check()
-
     else:
         that = name
 
@@ -3521,7 +3306,6 @@ def count_edit(name = None):
     count = curs.fetchall()
     if count:
         data = count[0][0]
-
     else:
         data = 0
 
@@ -3529,7 +3313,6 @@ def count_edit(name = None):
     count = curs.fetchall()
     if count:
         t_data = count[0][0]
-
     else:
         t_data = 0
 
@@ -3545,7 +3328,6 @@ def random():
     data = curs.fetchall()
     if data:
         return redirect('/w/' + url_pas(data[0][0]))
-
     else:
         return redirect('/')
     
@@ -3557,11 +3339,9 @@ def views(name = None):
             n = m.groups()
             plus = '/' + n[0]
             rename = n[1]
-
         else:
             plus = ''
             rename = name
-
     else:
         plus = ''
         rename = name
@@ -3574,13 +3354,10 @@ def views(name = None):
 
     if g == 'css':
         return css_minify(send_from_directory('./views' + plus, rename))   
-
     elif g == 'js':
         return js_minify(send_from_directory('./views' + plus, rename))
-
     elif g == 'html':
         return html_minify(send_from_directory('./views' + plus, rename))   
-
     else:
         return send_from_directory('./views' + plus, rename)
 
@@ -3588,7 +3365,6 @@ def views(name = None):
 def main_file(test = None):
     if re.search('\.(txt|html)$', test):
         return send_from_directory('./', test)
-
     else:
         return ''
 

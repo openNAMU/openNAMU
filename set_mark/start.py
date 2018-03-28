@@ -24,7 +24,6 @@ def table_parser(data, cel_data, start_data, num = 0):
     if table_align:
         if table_align.groups()[0] == 'right':
             all_table += 'float: right;'
-
         elif table_align.groups()[0] == 'center':
             all_table += 'margin: auto;'
             
@@ -34,7 +33,6 @@ def table_parser(data, cel_data, start_data, num = 0):
 
         if table_text_align.groups()[0] == 'right':
             all_table += 'text-align: right;'
-
         elif table_text_align.groups()[0] == 'center':
             all_table += 'text-align: center;'
 
@@ -42,17 +40,14 @@ def table_parser(data, cel_data, start_data, num = 0):
     if row_table_align:
         if row_table_align.groups()[0] == 'right':
             row_style += 'text-align: right;'
-
         elif row_table_align.groups()[0] == 'center':
             row_style += 'text-align: center;'
-
         else:
             row_style += 'text-align: left;'
     
     table_cel = re.search("&lt;-((?:(?!&gt;).)*)&gt;", data)
     if table_cel:
         cel = 'colspan="' + table_cel.groups()[0] + '"'
-
     else:
         cel = 'colspan="' + str(round(len(start_data) / 2)) + '"'   
 
@@ -89,20 +84,15 @@ def table_parser(data, cel_data, start_data, num = 0):
     text_left = re.search("&lt;\(&gt;",  data)
     if text_right:
         cel_style += 'text-align: right;'
-
     elif text_center:
         cel_style += 'text-align: center;'
-
     elif text_left:
         cel_style += 'text-align: left;'
-
     elif num == 0:
         if re.search('^ (.*) $', cel_data):
             cel_style += 'text-align: center;'
-
         elif re.search('^ (.*)$', cel_data):
             cel_style += 'text-align: right;'
-
         elif re.search('^(.*) $', cel_data):
             cel_style += 'text-align: left;'
 
@@ -137,7 +127,6 @@ def start(conn, data, title):
             include_data = re.search('^((?:(?!,).)+)', include)
             if include_data:
                 include_data = include_data.groups()[0]
-
             else:
                 include_data = 'Test'
 
@@ -166,10 +155,8 @@ def start(conn, data, title):
                 include_parser = html.escape(include_parser)
 
                 data = re.sub('\[include\(((?:(?!\)\]).)+)\)\]', '\n' + include_parser + '\n', data, 1)
-
             else:
                 data = re.sub('\[include\(((?:(?!\)\]).)+)\)\]', '<a id="not_thing" href="/w/' + tool.url_pas(include_link) + '">' + include_link + '</a>', data, 1)
-
         else:
             break
 
@@ -193,7 +180,6 @@ def start(conn, data, title):
                     middle_stack += 1
                     
                     data = re.sub('(?:{{{((?:(?! |{{{).)*)|(}}}))', '&#123;&#123;&#123;' + middle_data[0], data, 1)
-
                 else:
                     check = 0
                     if check == 0:
@@ -298,14 +284,12 @@ def start(conn, data, title):
                         data = re.sub('(?:{{{((?:(?! |{{{).)*)|(}}}))', '<code>' + middle_data[0], data, 1)
                 
                     middle_number += 1
-
             else:
                 if middle_stack > 0:
                     middle_stack -= 1
 
                 if middle_stack > 0:
                     data = re.sub('(?:{{{((?:(?! |{{{).)*)|(}}}))', '&#125;&#125;&#125;', data, 1)
-
                 else:
                     if middle_number > 0:
                         middle_number -= 1
@@ -319,7 +303,6 @@ def start(conn, data, title):
                         data = re.sub('(?:{{{((?:(?! |{{{).)*)|(}}}))', '</' + middle_list[middle_number] + '>', data, 1)
                     
                     del(middle_list[middle_number])
-
         else:
             break
 
@@ -338,7 +321,6 @@ def start(conn, data, title):
             plus_data += '<script>function func_nowiki_' + str(num) + '() { document.all("nowiki_' + str(num) + '").innerHTML = "' + nowiki_data[0] + '"; }</script>'
 
             data = re.sub('<code>((?:(?:(?!<\/code>).)+\n*)+)<\/code>', '<a href="javascript:void(0);" onclick="func_nowiki_' + str(num) + '();" id="nowiki_' + str(num) + '">(NoWiki 보기)</a>', data, 1)
-
         else:
             break
 
@@ -358,12 +340,10 @@ def start(conn, data, title):
                     space_len = '\n<span id="space">' + syntax_space[0] + '</span>'
 
                     syntax_data_replace = re.sub('\n( +)', space_len, syntax_data_replace, 1)
-
                 else:
                     break             
 
             data = re.sub('<code class="((?:(?!").)+)">((?:(?:(?!<\/code>|<span id="space">)(\n( +)).)+\n*)+)<\/code>', '<code class="' + syntax_data[0] + '">' + syntax_data_replace + '</code>', data, 1)
-        
         else:
             break
 
@@ -382,7 +362,6 @@ def start(conn, data, title):
             data = re.sub('&lt;math&gt;((?:(?!&lt;\/math&gt;).)+)&lt;\/math&gt;', '<span id="math_' + str(first) + '"></span>', data, 1)
 
             plus_data += '<script>katex.render("' + math.replace('\\', '\\\\') +'", document.getElementById("math_' + str(first) + '"));</script>'
-        
         else:
             break
 
@@ -407,7 +386,6 @@ def start(conn, data, title):
             backlink += [[title, redirect, 'redirect']]
             
             data = re.sub('\n#(?:redirect|넘겨주기) (?P<in>(?:(?!\n).)+)\n', '<meta http-equiv="refresh" content="0; url=/w/\g<in>?froms=' + tool.url_pas(title) + '">', data, 1)
-
         else:
             break
 
@@ -415,7 +393,6 @@ def start(conn, data, title):
     if not re.search('\[목차\(없음\)\]\n', data):
         if not re.search('\[목차\]', data):
             data = re.sub('\n(?P<in>={1,6}) ?(?P<out>(?:(?!=).)+) ?={1,6}\n', '\n[목차]\n\g<in> \g<out> \g<in>\n', data, 1)
-
     else:
         data = re.sub('\[목차\(없음\)\]\n', '', data)
 
@@ -455,7 +432,6 @@ def start(conn, data, title):
             data = re.sub('\n(={1,6}) ?((?:(?!=).)+) ?={1,6}\n', '\n<h' + toc_number + ' id="s-' + re.sub('\.$', '', all_stack) + '"><a href="#toc">' + all_stack + '</a> ' + toc[1] + ' <span style="font-size: 12px"><a href="/edit/' + tool.url_pas(title) + '?section=' + str(edit_number) + '">(편집)</a></span></h' + toc_number + '>\n', data, 1)
             
             toc_data += '<span style="margin-left: ' + str((toc_full - toc_top_stack) * 10) + 'px;"><a href="#s-' + re.sub('\.$', '', all_stack) + '">' + all_stack + '</a> ' + toc[1] + '</span>\n'
-        
         else:
             break
 
@@ -467,7 +443,6 @@ def start(conn, data, title):
         hr = re.search('\n-{4,9}\n', data)
         if hr:
             data = re.sub('\n-{4,9}\n', '\n<hr>\n', data, 1)
-        
         else:
             break
 
@@ -507,7 +482,6 @@ def start(conn, data, title):
         
         if re.search('^-', str(e_data.days)):
             e_day = str(e_data.days)
-
         else:
             e_day = '+' + str(e_data.days)
 
@@ -522,25 +496,21 @@ def start(conn, data, title):
             width = re.search(', ?width=((?:(?!,).)+)', video[1])
             if width:
                 video_width = width.groups()[0]
-
             else:
                 video_width = '560'
             
             height = re.search(', ?height=((?:(?!,).)+)', video[1])
             if height:
                 video_height = height.groups()[0]
-
             else:
                 video_height = '315'
 
             code = re.search('^(((?!,).)+)', video[1])
             if code:
                 video_code = code.groups()[0]
-
             else:
                 if video[0] == 'youtube':
                     video_code = 'BQ5PcIUcdUE'
-
                 else:
                     video_code = '66861302'
 
@@ -549,7 +519,6 @@ def start(conn, data, title):
                 video_code = re.sub('^https:\/\/youtu\.be\/', '', video_code)
                 
                 video_src = 'https://www.youtube.com/embed/' + video_code
-
             else:
                 video_code = re.sub('^https:\/\/tv\.kakao\.com\/channel\/9262\/cliplink\/', '', video_code)
                 video_code = re.sub('^http:\/\/tv\.kakao\.com\/v\/', '', video_code)
@@ -557,7 +526,6 @@ def start(conn, data, title):
                 video_src = 'https://tv.kakao.com/embed/player/cliplink/' + video_code +'?service=kakao_tv'
                 
             data = re.sub('\[(youtube|kakaotv)\(((?:(?!\)\]).)+)\)\]', '<iframe width="' + video_width + '" height="' + video_height + '" src="' + video_src + '" allowfullscreen frameborder="0"></iframe>', data, 1)
-
         else:
             break
 
@@ -572,7 +540,6 @@ def start(conn, data, title):
             block = re.sub('\n$', '', block)
             
             data = re.sub('(\n(?:&gt; ?(?:(?:(?!\n).)+)?\n)+)', '\n<blockquote>' + block + '</blockquote>\n', data, 1)
-
         else:
             break
 
@@ -589,17 +556,14 @@ def start(conn, data, title):
                     # 앞의 공백 만큼 margin 먹임
                     if len(sub_li[0]) == 0:
                         margin = 20
-
                     else:
                         margin = len(sub_li[0]) * 20
 
                     li = re.sub('\n(?:( *)\* ?((?:(?!\n).)+))', '<li style="margin-left: ' + str(margin) + 'px;">' + sub_li[1] + '</li>', li, 1)
-
                 else:
                     break
 
             data = re.sub('(\n(?:(?: *)\* ?(?:(?:(?!\n).)+)\n)+)', '\n\n<ul>' + li + '</ul>\n', data, 1)
-
         else:
             break
 
@@ -613,7 +577,6 @@ def start(conn, data, title):
             margin = '<span style="margin-left: 20px;"></span>' * indent
             
             data = re.sub('\n( +)', '\n' + margin, data, 1)
-
         else:
             break
 
@@ -634,7 +597,6 @@ def start(conn, data, title):
                     number = return_table[6]
                     
                     table = re.sub('^((?:\|\|)+)((?:&lt;(?:(?:(?!&gt;).)+)&gt;)*)', '\n<table ' + return_table[5] + ' ' + return_table[0] + '><tbody><tr ' + return_table[1] + '><td ' + return_table[2] + ' ' + return_table[3] + ' ' + return_table[4] + '>\n', table, 1)
-
                 else:
                     break
 
@@ -647,7 +609,6 @@ def start(conn, data, title):
                     return_table = table_parser(row_table[1], row_table[2], row_table[0], number)
                     
                     table = re.sub('\|\|\n((?:\|\|)+)((?:&lt;(?:(?:(?!&gt;).)+)&gt;)*)', '</td></tr><tr ' + return_table[1] + '><td ' + return_table[2] + ' ' + return_table[3] + ' ' + return_table[4] + '>', table, 1)
-
                 else:
                     break
 
@@ -659,7 +620,6 @@ def start(conn, data, title):
                     return_table = table_parser(cel_table[1], re.sub('\n', ' ', cel_table[2]), cel_table[0], number)
                     
                     table = re.sub('((?:\|\|)+)((?:&lt;(?:(?:(?!&gt;).)+)&gt;)*)', '</td><td ' + return_table[2] + ' ' + return_table[3] + ' ' + return_table[4] + '>', table, 1)
-
                 else:
                     break
 
@@ -679,17 +639,13 @@ def start(conn, data, title):
 
                 if under_link[0]:
                     data = re.sub('\[\[\.\.\/(?:\|((?:(?!]]).)+))?]]', '[[' + title_data + '|' + under_link[0] + ']]', data, 1)
-
                 else:
                     data = re.sub('\[\[\.\.\/(?:\|((?:(?!]]).)+))?]]', '[[' + title_data + ']]', data, 1)
-
             else:
                 if under_link[0]:
                     data = re.sub('\[\[\.\.\/(?:\|((?:(?!]]).)+))?]]', '[[' + title + '|' + under_link[0] + ']]', data, 1)
-
                 else:
                     data = re.sub('\[\[\.\.\/(?:\|((?:(?!]]).)+))?]]', '[[' + title + ']]', data, 1)
-
         else:
             break
 
@@ -706,7 +662,6 @@ def start(conn, data, title):
                 
                 main_link = link_split[0]
                 see_link = link_split[1]
-
             else:
                 main_link = link
                 see_link = link
@@ -719,7 +674,6 @@ def start(conn, data, title):
                     file_width = width.groups()[0]
                     if re.search('px$', file_width):
                         file_style += 'width: ' + file_width + ';'
-                    
                     else:
                         file_style += 'width: ' + file_width + 'px;'
                 
@@ -728,7 +682,6 @@ def start(conn, data, title):
                     file_height = height.groups()[0]
                     if re.search('px$', file_height):
                         file_style += 'height: ' + file_height + ';'
-                    
                     else:
                         file_style += 'height: ' + file_height + 'px;'
 
@@ -737,10 +690,8 @@ def start(conn, data, title):
                     file_align = align.groups()[0]
                     if file_align == 'center':
                         file_align = 'display: block; text-align: center;'
-
                     else:
                         file_align = 'float: ' + file_align + ';'
-
                 else:
                     file_align = ''
 
@@ -748,7 +699,6 @@ def start(conn, data, title):
                     file_src = re.sub('^외부:', '', main_link)
             
                     file_alt = main_link
-
                 else:
                     file_data = re.search('^파일:((?:(?!\.).)+)\.(.+)$', main_link)
                     if file_data:
@@ -757,7 +707,6 @@ def start(conn, data, title):
                         file_end = file_data[1]
 
                         backlink += [[title, main_link, 'file']]
-
                     else:
                         file_name = 'TEST'
                         file_end = 'jpg'
@@ -766,7 +715,6 @@ def start(conn, data, title):
                     file_alt = '파일:' + file_name + '.' + file_end
                 
                 data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<span style="' + file_align + '"><img style="' + file_style + '" alt="' + file_alt + '" src="' + file_src + '"></span>', data, 1)
-
             elif re.search('^분류:', main_link):
                 see_link = re.sub('#include', '', see_link)
                 main_link = re.sub('#include', '', main_link)
@@ -776,7 +724,6 @@ def start(conn, data, title):
                     link_id = 'id="inside"'
                     
                     main_link = re.sub('#blur', '', main_link)
-
                 else:
                     link_id = ''
 
@@ -784,10 +731,8 @@ def start(conn, data, title):
 
                 category += '<a ' + link_id + ' href="' + tool.url_pas(main_link) + '">' + re.sub('^분류:', '', see_link) + '</a> / '
                 data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '', data, 1)
-
             elif re.search('^wiki:', main_link):
                 data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<a id="inside" href="/' + tool.url_pas(re.sub('^wiki:', '', main_link)) + '">' + see_link + '</a>', data, 1)
-
             elif re.search('^inter:((?:(?!:).)+):', main_link):
                 inter_data = re.search('^inter:((?:(?!:).)+):((?:(?!\]\]|\|).)+)', main_link)
                 inter_data = inter_data.groups()
@@ -797,26 +742,20 @@ def start(conn, data, title):
                 if inter:
                     if see_link != main_link:
                         data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<a id="inside" href="' + inter[0][0] + inter_data[1] + '">' + inter_data[0] + ':' + see_link + '</a>', data, 1)
-                    
                     else:
                         data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<a id="inside" href="' + inter[0][0] + inter_data[1] + '">' + inter_data[0] + ':' + inter_data[1] + '</a>', data, 1)
-
                 else:
                     data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '인터위키 정보 없음', data, 1)
-
             elif re.search('^\/', main_link):
                 under_title = re.search('^(\/(?:.+))$', main_link)
                 under_title = under_title.groups()[0]
 
                 if see_link != main_link:
                     data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '[[' + title + under_title + '|' + see_link + ']]', data, 1)
-
                 else:
                     data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '[[' + title + under_title + ']]', data, 1)
-
             elif re.search('^http(s)?:\/\/', main_link):
                 data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<a id="out_link" rel="nofollow" href="' + main_link + '">' + see_link + '</a>', data, 1)
-
             else:
                 if re.search('^:', main_link):
                     main_link = re.sub('^:', '', main_link)
@@ -826,7 +765,6 @@ def start(conn, data, title):
                     link_id = 'id="not_thing"'
 
                     backlink += [[title, main_link, 'no']]
-
                 else:
                     link_id = ''
 
@@ -837,7 +775,6 @@ def start(conn, data, title):
                     other_link = other_link.groups()[0]
 
                     main_link = re.sub('(#.+)$', '', main_link)
-
                 else:
                     other_link = ''
 
@@ -859,13 +796,11 @@ def start(conn, data, title):
                 data = re.sub('(?:\[\*((?:(?! ).)*) ((?:(?!\]).)+)\]|(\[각주\]))', footnote_all, data, 1)
                 
                 footnote_all = '\n<hr><ul id="footnote_data">'
-
             else:
                 footnote = footnote_data[1]
                 footnote_name = footnote_data[0]
                 if footnote_name and not footnote:
                     data = re.sub('(?:\[\*((?:(?! |\]).)*)(?: ((?:(?!\]).)+))?\]|(\[각주\]))', '<sup><a href="#fn-' + footnote_dict[footnote_name] + '" id="rfn-' + footnote_dict[footnote_name] + '">(' + footnote_name + ')</a></sup>', data, 1)
-
                 else:
                     footnote_number += 1
 
@@ -877,7 +812,6 @@ def start(conn, data, title):
                     footnote_all += '<li><a href="#rfn-' + str(footnote_number) + '" id="fn-' + str(footnote_number) + '">(' + footnote_name + ')</a> ' + footnote + '</li>'
                     
                     data = re.sub('(?:\[\*((?:(?! |\]).)*)(?: ((?:(?!\]).)+))?\]|(\[각주\]))', '<sup><a href="#fn-' + str(footnote_number) + '" id="rfn-' + str(footnote_number) + '">(' + footnote_name + ')</a></sup>', data, 1)
-                    
         else:
             break
 
