@@ -346,32 +346,23 @@ def start(conn, data, title):
 
             num += 1
 
-            plus_data += '<script>function func_nowiki_' + str(num) + '() { document.all("nowiki_' + str(num) + '").innerHTML = "' + nowiki_data[0] + '"; }</script>'
+            plus_data += '<script>function func_nowiki_' + str(num) + '() { document.all("nowiki_' + str(num) + '").innerHTML = "' + re.sub('\n', '\\\\n', nowiki_data[0]) + '"; } func_nowiki_' + str(num) + '();</script>'
 
-            data = re.sub('<code>((?:(?:(?!<\/code>).)+\n*)+)<\/code>', '<a href="javascript:void(0);" onclick="func_nowiki_' + str(num) + '();" id="nowiki_' + str(num) + '">(NoWiki 보기)</a>', data, 1)
+            data = re.sub('<code>((?:(?:(?!<\/code>).)+\n*)+)<\/code>', '<span id="nowiki_' + str(num) + '">(NoWiki Error)</span>', data, 1)
         else:
             break
 
+    print(data)
+
     # Syntax 처리
     while 1:
-        syntax_data = re.search('<code class="((?:(?!").)+)">((?:(?:(?!<\/code>|<span id="space">)(\n( +)).)+\n*)+)<\/code>', data)
+        syntax_data = re.search('<code class="((?:(?!").)+)">((?:(?:(?:(?!<\/code>|<span id="syntax_)).)+\n*)+)<\/code>', data)
         if syntax_data:
             syntax_data = syntax_data.groups()
 
-            syntax_data_replace = syntax_data[1]
+            plus_data += '<script>function func_syntax_' + str(num) + '() { document.all("syntax_' + str(num) + '").innerHTML = "' + re.sub('\n', '\\\\n', syntax_data[1]) + '"; } func_syntax_' + str(num) + '();</script>'
 
-            while 1:
-                syntax_space = re.search('\n( +)', syntax_data_replace)
-                if syntax_space:
-                    syntax_space = syntax_space.groups()
-
-                    space_len = '\n<span id="space">' + syntax_space[0] + '</span>'
-
-                    syntax_data_replace = re.sub('\n( +)', space_len, syntax_data_replace, 1)
-                else:
-                    break             
-
-            data = re.sub('<code class="((?:(?!").)+)">((?:(?:(?!<\/code>|<span id="space">)(\n( +)).)+\n*)+)<\/code>', '<code class="' + syntax_data[0] + '">' + syntax_data_replace + '</code>', data, 1)
+            data = re.sub('<code class="((?:(?!").)+)">((?:(?:(?:(?!<\/code>|<span id="syntax_)).)+\n*)+)<\/code>', '<code class="' + syntax_data[0] + '"><span id="syntax_' + str(num) + '">(Syntax Error)</span></code>', data, 1)
         else:
             break
 
@@ -871,6 +862,7 @@ def start(conn, data, title):
     data = re.sub('(\n)+<hr><ul id="footnote_data">', '<hr><ul id="footnote_data">', data)
     data = re.sub('(?P<in><td(((?!>).)*)>)\n', '\g<in>', data)
     data = re.sub('(\n)?<hr>(\n)?', '<hr>', data)
+    data = re.sub('<\/ul>\n\n<ul>', '</ul>\n<ul>', data)
     data = re.sub('\n', '<br>', data)
 
     return [data, plus_data, backlink]
