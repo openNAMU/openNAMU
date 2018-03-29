@@ -125,7 +125,7 @@ def wiki_set(conn, num):
         if db_data and db_data[0][0] != '':
             data_list += [db_data[0][0]]
         else:
-            data_list += ['무명위키']
+            data_list += ['Wiki']
 
         curs.execute('select data from other where name = "license"')
         db_data = curs.fetchall()
@@ -153,7 +153,7 @@ def wiki_set(conn, num):
         return data_list
 
     if num == 2:
-        var_data = '위키:대문'
+        var_data = 'FrontPage'
 
         curs.execute('select data from other where name = "frontpage"')
     elif num == 3:
