@@ -352,8 +352,6 @@ def start(conn, data, title):
         else:
             break
 
-    print(data)
-
     # Syntax 처리
     while 1:
         syntax_data = re.search('<code class="((?:(?!").)+)">((?:(?:(?:(?!<\/code>|<span id="syntax_)).)+\n*)+)<\/code>', data)
