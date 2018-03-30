@@ -7,8 +7,6 @@ from tornado.wsgi import WSGIContainer
 from tornado.httpserver import HTTPServer
 from tornado.ioloop import IOLoop
 
-from sqlite3worker import Sqlite3Worker
-
 import platform
 import bcrypt
 import difflib
@@ -49,7 +47,7 @@ except:
             pass
 
 # 디비 연결
-conn = sqlite3.connect(set_data['db'] + '.db')
+conn = sqlite3.connect(set_data['db'] + '.db', check_same_thread = False)
 curs = conn.cursor()
 
 # 기타 설정 변경

@@ -27,7 +27,9 @@ def namumark(conn, title, data, num):
     data = start(conn, data, title)
     if num == 1:        
         for back_data in data[2]:
-            plusing(conn, back_data[0], back_data[1], back_data[2])
+            thread_start = threading.Thread(target = plusing, args = [conn, back_data[0], back_data[1], back_data[2]])
+            thread_start.start()
+            thread_start.join()
 
         conn.commit()
         
