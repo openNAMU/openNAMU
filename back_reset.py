@@ -12,12 +12,12 @@ json_data = open('set.json').read()
 set_data = json.loads(json_data)
 
 # 디비 연결
-conn = sqlite3.connect(set_data['db'] + '.db', check_same_thread = False)
+conn = sqlite3.connect(set_data['db'] + '.db')
 curs = conn.cursor()
 
 # 파싱 해주는 함수
 def parser(data):
-    namumark(conn, data[0], data[1], 1, 0, 0)
+    namumark(conn, data[0], data[1], 1)
 
 # 역링크 전부 삭제
 curs.execute("delete from back")
@@ -32,10 +32,8 @@ for test in data:
     # 제목 프린트
     print(test[0])
 
-    # 스레드 기반으로 처리
-    t = threading.Thread(target = parser, args = [test])
-    t.start()
-    t.join()
+    # 파싱
+    parser(test)
 
 # 커밋
 conn.commit()
