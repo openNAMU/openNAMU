@@ -318,7 +318,7 @@ def start(conn, data, title):
                         
                         middle_stack += 1
                         
-                        data = re.sub('(?:{{{((?:(?! |{{{|}}}).)*) ?|(}}}))', '<code>' + middle_data[0], data, 1)
+                        data = re.sub('(?:{{{((?:(?! |{{{|}}}).)*)|(}}}))', '<code>' + middle_data[0], data, 1)
                 
                     middle_number += 1
             else:
