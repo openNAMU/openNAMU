@@ -393,7 +393,7 @@ def start(conn, data, title):
 
     # 추가 이스케이프
     data = data.replace('\\', '&#92;')
-    
+
     # 텍스트 꾸미기 문법
     data = re.sub('&#x27;&#x27;&#x27;(?P<in>((?!&#x27;&#x27;&#x27;).)+)&#x27;&#x27;&#x27;', '<b>\g<in></b>', data)
     data = re.sub('&#x27;&#x27;(?P<in>((?!&#x27;&#x27;).)+)&#x27;&#x27;', '<i>\g<in></i>', data)
@@ -864,11 +864,12 @@ def start(conn, data, title):
     
     # 마지막 처리
     data = re.sub('(?P<in><\/h[0-9]>)(\n)+', '\g<in>', data)
+    data = re.sub('\n\n<ul>', '\n<ul>', data)
     data = re.sub('<\/ul>\n\n', '</ul>\n', data)
     data = re.sub('^(\n)+', '', data)
     data = re.sub('(\n)+<hr><ul id="footnote_data">', '<hr><ul id="footnote_data">', data)
     data = re.sub('(?P<in><td(((?!>).)*)>)\n', '\g<in>', data)
-    data = re.sub('(\n{1,2})?<hr>(\n{1,2})?', '<hr>', data)
+    data = re.sub('(\n)?<hr>(\n)?', '<hr>', data)
     data = re.sub('<\/ul>\n\n<ul>', '</ul>\n<ul>', data)
     data = re.sub("\[br\]", '\n', data)
     data = re.sub('\n', '<br>', data)
