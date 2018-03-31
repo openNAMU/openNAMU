@@ -14,11 +14,17 @@ def table_parser(data, cel_data, start_data, num = 0):
 
     table_width = re.search("&lt;table ?width=((?:(?!&gt;).)*)&gt;", data)
     if table_width:
-        all_table += 'width: ' + table_width.groups()[0] + 'px;'
+        if re.search('^[0-9]+$', table_width.groups()[0]):
+            all_table += 'width: ' + table_width.groups()[0] + 'px;'
+        else:
+            all_table += 'width: ' + table_width.groups()[0] + ';'
     
     table_height = re.search("&lt;table ?height=((?:(?!&gt;).)*)&gt;", data)
     if table_height:
-        all_table += 'height: ' + table_height.groups()[0] + 'px;'
+        if re.search('^[0-9]+$', table_height.groups()[0]):
+            all_table += 'height: ' + table_height.groups()[0] + 'px;'
+        else:
+            all_table += 'height: ' + table_height.groups()[0] + ';'
     
     table_align = re.search("&lt;table ?align=((?:(?!&gt;).)*)&gt;", data)
     if table_align:
@@ -195,19 +201,22 @@ def start(conn, data, title):
     data = re.sub('\n( +)\|\|', '\n||', data)
     data = re.sub('\|\|( +)\n', '||\n', data)
 
+    # 주석 처리
+    data = re.sub('\n##(((?!\n).)+)', '', data)
+
     # 중괄호 문법 처리
     middle_stack = 0
     middle_list = []
     middle_number = 0
     while 1:
-        middle_data = re.search('(?:{{{((?:(?! |{{{).)*)|(}}}))', data)
+        middle_data = re.search('(?:{{{((?:(?! |{{{|}}}).)*) ?|(}}}))', data)
         if middle_data:
             middle_data = middle_data.groups()
             if not middle_data[1]:
                 if middle_stack > 0:
                     middle_stack += 1
                     
-                    data = re.sub('(?:{{{((?:(?! |{{{).)*)|(}}}))', '&#123;&#123;&#123;' + middle_data[0], data, 1)
+                    data = re.sub('(?:{{{((?:(?! |{{{|}}}).)*) ?|(}}}))', '&#123;&#123;&#123;' + middle_data[0], data, 1)
                 else:
                     check = 0
                     if check == 0:
@@ -219,7 +228,7 @@ def start(conn, data, title):
                             
                             middle_list += ['span']
                             
-                            data = re.sub('(?:{{{((?:(?! |{{{).)*)|(}}}))', '<span style="color: ' + middle_search + ';">', data, 1)
+                            data = re.sub('(?:{{{((?:(?! |{{{|}}}).)*) ?|(}}}))', '<span style="color: ' + middle_search + ';">', data, 1)
                         
                         middle_search = re.search('^(?:#(\w+))', middle_data[0])
                         if middle_search:
@@ -229,7 +238,7 @@ def start(conn, data, title):
                             
                             middle_list += ['span']
                             
-                            data = re.sub('(?:{{{((?:(?! |{{{).)*)|(}}}))', '<span style="color: ' + middle_search + ';">', data, 1)
+                            data = re.sub('(?:{{{((?:(?! |{{{|}}}).)*) ?|(}}}))', '<span style="color: ' + middle_search + ';">', data, 1)
 
                         middle_search = re.search('^(?:@((?:[0-9a-f-A-F]{3}){1,2}))', middle_data[0])
                         if middle_search:
@@ -239,7 +248,7 @@ def start(conn, data, title):
                             
                             middle_list += ['span']
                             
-                            data = re.sub('(?:{{{((?:(?! |{{{).)*)|(}}}))', '<span style="background: #' + middle_search + ';">', data, 1)
+                            data = re.sub('(?:{{{((?:(?! |{{{|}}}).)*) ?|(}}}))', '<span style="background: #' + middle_search + ';">', data, 1)
                         
                         middle_search = re.search('^(?:@(\w+))', middle_data[0])
                         if middle_search:
@@ -249,7 +258,7 @@ def start(conn, data, title):
                             
                             middle_list += ['span']
                             
-                            data = re.sub('(?:{{{((?:(?! |{{{).)*)|(}}}))', '<span style="background: ' + middle_search + ';">', data, 1)
+                            data = re.sub('(?:{{{((?:(?! |{{{|}}}).)*) ?|(}}}))', '<span style="background: ' + middle_search + ';">', data, 1)
 
                         middle_search = re.search('^(\+|-)([1-5])', middle_data[0])
                         if middle_search:
@@ -263,7 +272,7 @@ def start(conn, data, title):
 
                             middle_list += ['span']
                             
-                            data = re.sub('(?:{{{((?:(?! |{{{).)*)|(}}}))', '<span style="font-size: ' + font_size + '%;">', data, 1)
+                            data = re.sub('(?:{{{((?:(?! |{{{|}}}).)*) ?|(}}}))', '<span style="font-size: ' + font_size + '%;">', data, 1)
 
                         middle_search = re.search('^#!wiki', middle_data[0])
                         if middle_search:
@@ -294,7 +303,7 @@ def start(conn, data, title):
 
                             middle_list += ['span']
                             
-                            data = re.sub('(?:{{{((?:(?! |{{{).)*)|(}}}))', '<span>', data, 1)
+                            data = re.sub('(?:{{{((?:(?! |{{{|}}}).)*) ?|(}}}))', '<span>', data, 1)
 
                         middle_search = re.search('^#!folding', middle_data[0])
                         if middle_search:
@@ -302,14 +311,14 @@ def start(conn, data, title):
 
                             middle_list += ['span']
                             
-                            data = re.sub('(?:{{{((?:(?! |{{{).)*)|(}}}))', '<span>', data, 1)
+                            data = re.sub('(?:{{{((?:(?! |{{{|}}}).)*) ?|(}}}))', '<span>', data, 1)
 
                     if not check == 1:
                         middle_list += ['code']
                         
                         middle_stack += 1
                         
-                        data = re.sub('(?:{{{((?:(?! |{{{).)*)|(}}}))', '<code>' + middle_data[0], data, 1)
+                        data = re.sub('(?:{{{((?:(?! |{{{|}}}).)*) ?|(}}}))', '<code>' + middle_data[0], data, 1)
                 
                     middle_number += 1
             else:
@@ -317,18 +326,18 @@ def start(conn, data, title):
                     middle_stack -= 1
 
                 if middle_stack > 0:
-                    data = re.sub('(?:{{{((?:(?! |{{{).)*)|(}}}))', '&#125;&#125;&#125;', data, 1)
+                    data = re.sub('(?:{{{((?:(?! |{{{|}}}).)*) ?|(}}}))', '&#125;&#125;&#125;', data, 1)
                 else:
                     if middle_number > 0:
                         middle_number -= 1
 
                     if middle_list[middle_number] == 'pre':
-                        data = re.sub('(?:{{{((?:(?! |{{{).)*)|(}}}))', '</code></pre>', data, 1)
+                        data = re.sub('(?:{{{((?:(?! |{{{|}}}).)*) ?|(}}}))', '</code></pre>', data, 1)
 
                         del(middle_list[middle_number])
                         middle_number -= 1
                     else:
-                        data = re.sub('(?:{{{((?:(?! |{{{).)*)|(}}}))', '</' + middle_list[middle_number] + '>', data, 1)
+                        data = re.sub('(?:{{{((?:(?! |{{{|}}}).)*) ?|(}}}))', '</' + middle_list[middle_number] + '>', data, 1)
                     
                     del(middle_list[middle_number])
         else:
@@ -384,14 +393,14 @@ def start(conn, data, title):
 
     # 추가 이스케이프
     data = data.replace('\\', '&#92;')
-
+    
     # 텍스트 꾸미기 문법
     data = re.sub('&#x27;&#x27;&#x27;(?P<in>((?!&#x27;&#x27;&#x27;).)+)&#x27;&#x27;&#x27;', '<b>\g<in></b>', data)
     data = re.sub('&#x27;&#x27;(?P<in>((?!&#x27;&#x27;).)+)&#x27;&#x27;', '<i>\g<in></i>', data)
     data = re.sub('~~(?P<in>(?:(?!~~).)+)~~', '<s>\g<in></s>', data)
     data = re.sub('--(?P<in>(?:(?!~~).)+)--', '<s>\g<in></s>', data)
     data = re.sub('__(?P<in>(?:(?!__).)+)__', '<u>\g<in></u>', data)
-    data = re.sub('^^(?P<in>(?:(?!^^).)+)^^', '<sup>\g<in></sup>', data)
+    data = re.sub('\^\^(?P<in>(?:(?!\^\^).)+)\^\^', '<sup>\g<in></sup>', data)
     data = re.sub(',,(?P<in>(?:(?!,,).)+),,', '<sub>\g<in></sub>', data)
 
     # 넘겨주기 변환
@@ -468,7 +477,6 @@ def start(conn, data, title):
     # 일부 매크로 처리
     data = tool.savemark(data)
     
-    data = re.sub("\[br\]", '\n', data)
     data = re.sub("\[anchor\((?P<in>(?:(?!\)\]).)+)\)\]", '<span id="\g<in>"></span>', data)          
     data = re.sub("\[nicovideo\((?P<in>(?:(?!,|\)\]).)+)(?:(?:(?!\)\]).)*)\)\]", "[[http://embed.nicovideo.jp/watch/\g<in>|\g<in>]]", data)
     data = re.sub('\[ruby\((?P<in>(?:(?!,).)+)\, ?(?P<out>(?:(?!\)\]).)+)\)\]', '<ruby>\g<in><rp>(</rp><rt>\g<out></rt><rp>)</rp></ruby>', data)
@@ -605,7 +613,7 @@ def start(conn, data, title):
             
             # return [all_table, row_style, cel_style, row, cel, table_class, num]
             while 1:
-                all_table = re.search('^((?:\|\|)+)((?:&lt;(?:(?:(?!&gt;).)+)&gt;)*)((?:(?!\|\||<\/td>).)+)', table)
+                all_table = re.search('^((?:\|\|)+)((?:&lt;(?:(?:(?!&gt;).)+)&gt;)*)\n*((?:(?!\|\||<\/td>).)+\n*)', table)
                 if all_table:
                     all_table = all_table.groups()
                     
@@ -613,30 +621,31 @@ def start(conn, data, title):
                     
                     number = return_table[6]
                     
-                    table = re.sub('^((?:\|\|)+)((?:&lt;(?:(?:(?!&gt;).)+)&gt;)*)', '\n<table ' + return_table[5] + ' ' + return_table[0] + '><tbody><tr ' + return_table[1] + '><td ' + return_table[2] + ' ' + return_table[3] + ' ' + return_table[4] + '>\n', table, 1)
+                    table = re.sub('^((?:\|\|)+)((?:&lt;(?:(?:(?!&gt;).)+)&gt;)*)\n*', '\n<table ' + return_table[5] + ' ' + return_table[0] + '><tbody><tr ' + return_table[1] + '><td ' + return_table[2] + ' ' + return_table[3] + ' ' + return_table[4] + '>\n', table, 1)
                 else:
                     break
 
             table = re.sub('\|\|\n$', '</td></tr></tbody></table>', table)
+
             while 1:
-                row_table = re.search('\|\|\n((?:\|\|)+)((?:&lt;(?:(?:(?!&gt;).)+)&gt;)*)((?:(?!\|\||<\/td>).)+)', table)
+                row_table = re.search('\|\|\n((?:\|\|)+)((?:&lt;(?:(?:(?!&gt;).)+)&gt;)*)\n*((?:(?!\|\||<\/td>).)+\n*)', table)
                 if row_table:
                     row_table = row_table.groups()
                     
                     return_table = table_parser(row_table[1], row_table[2], row_table[0], number)
                     
-                    table = re.sub('\|\|\n((?:\|\|)+)((?:&lt;(?:(?:(?!&gt;).)+)&gt;)*)', '</td></tr><tr ' + return_table[1] + '><td ' + return_table[2] + ' ' + return_table[3] + ' ' + return_table[4] + '>', table, 1)
+                    table = re.sub('\|\|\n((?:\|\|)+)((?:&lt;(?:(?:(?!&gt;).)+)&gt;)*)\n*', '</td></tr><tr ' + return_table[1] + '><td ' + return_table[2] + ' ' + return_table[3] + ' ' + return_table[4] + '>', table, 1)
                 else:
                     break
 
             while 1:
-                cel_table = re.search('((?:\|\|)+)((?:&lt;(?:(?:(?!&gt;).)+)&gt;)*)((?:(?:(?!\|\||<\/td>).)|\n)+)', table)
+                cel_table = re.search('((?:\|\|)+)((?:&lt;(?:(?:(?!&gt;).)+)&gt;)*)\n*((?:(?:(?!\|\||<\/td>).)|\n)+\n*)', table)
                 if cel_table:
                     cel_table = cel_table.groups()
                     
                     return_table = table_parser(cel_table[1], re.sub('\n', ' ', cel_table[2]), cel_table[0], number)
                     
-                    table = re.sub('((?:\|\|)+)((?:&lt;(?:(?:(?!&gt;).)+)&gt;)*)', '</td><td ' + return_table[2] + ' ' + return_table[3] + ' ' + return_table[4] + '>', table, 1)
+                    table = re.sub('((?:\|\|)+)((?:&lt;(?:(?:(?!&gt;).)+)&gt;)*)\n*', '</td><td ' + return_table[2] + ' ' + return_table[3] + ' ' + return_table[4] + '>', table, 1)
                 else:
                     break
 
@@ -859,8 +868,9 @@ def start(conn, data, title):
     data = re.sub('^(\n)+', '', data)
     data = re.sub('(\n)+<hr><ul id="footnote_data">', '<hr><ul id="footnote_data">', data)
     data = re.sub('(?P<in><td(((?!>).)*)>)\n', '\g<in>', data)
-    data = re.sub('(\n)?<hr>(\n)?', '<hr>', data)
+    data = re.sub('(\n{1,2})?<hr>(\n{1,2})?', '<hr>', data)
     data = re.sub('<\/ul>\n\n<ul>', '</ul>\n<ul>', data)
+    data = re.sub("\[br\]", '\n', data)
     data = re.sub('\n', '<br>', data)
 
     return [data, plus_data, backlink]
