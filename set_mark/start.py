@@ -726,6 +726,7 @@ def start(conn, data, title):
                     file_src = re.sub('^외부:', '', main_link)
             
                     file_alt = main_link
+                    exist = 'Yes'
                 else:
                     file_data = re.search('^파일:((?:(?!\.).)+)\.(.+)$', main_link)
                     if file_data:
@@ -740,8 +741,14 @@ def start(conn, data, title):
 
                     file_src = '/image/' + tool.sha224(file_name) + '.' + file_end
                     file_alt = '파일:' + file_name + '.' + file_end
+
+                    curs.execute("select title from data where title = ?", [file_alt])
+                    exist = curs.fetchall()
                 
-                data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<span style="' + file_align + '"><img style="' + file_style + '" alt="' + file_alt + '" src="' + file_src + '"></span>', data, 1)
+                if exist:
+                    data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<span style="' + file_align + '"><img style="' + file_style + '" alt="' + file_alt + '" src="' + file_src + '"></span>', data, 1)
+                else:
+                    data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<a id="not_thing" href="/w/' + tool.url_pas(file_alt) + '">' + file_alt + '</a>', data, 1)
             elif re.search('^분류:', main_link):
                 see_link = re.sub('#include', '', see_link)
                 main_link = re.sub('#include', '', main_link)

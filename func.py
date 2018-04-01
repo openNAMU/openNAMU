@@ -225,9 +225,8 @@ def admin_check(conn, num, what):
                     break
 
 def ip_pas(conn, raw_ip):
-    hide = 0
-
     curs = conn.cursor()
+    hide = 0
 
     if re.search("(\.|:)", raw_ip):
         if not re.search("^도구:", raw_ip):    
