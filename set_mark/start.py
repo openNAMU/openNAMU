@@ -363,10 +363,13 @@ def start(conn, data, title):
             break
 
     # Syntax 처리
+    num = 0
     while 1:
         syntax_data = re.search('<code class="((?:(?!").)+)">((?:(?:(?:(?!<\/code>|<span id="syntax_)).)+\n*)+)<\/code>', data)
         if syntax_data:
             syntax_data = syntax_data.groups()
+
+            num += 1
 
             plus_data += '<script>function func_syntax_' + str(num) + '() { document.all("syntax_' + str(num) + '").innerHTML = "' + re.sub('\n', '\\\\n', syntax_data[1]) + '"; } func_syntax_' + str(num) + '();</script>'
 
