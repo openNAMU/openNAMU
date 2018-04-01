@@ -123,6 +123,7 @@ def start(conn, data, title):
 
     # XSS 이스케이프
     data = html.escape(data)
+    data = re.sub('&amp;', '&', data)
 
     # 포함 문법 처리
     while 1:
