@@ -272,7 +272,7 @@ def custom(conn):
     else:
         user_icon = 0
 
-    if user_icon == 1:
+    if user_icon != 0:
         curs.execute('select email from user where id = ?', [ip_check()])
         data = curs.fetchall()
         if data:
@@ -282,7 +282,12 @@ def custom(conn):
     else:
         email = ''
 
-    return ['', '', user_icon, user_head, email]
+    if user_icon != 0:
+        user_name = ip_check()
+    else:
+        user_name = ''
+
+    return ['', '', user_icon, user_head, email, user_name]
 
 def acl_check(conn, name):
     curs = conn.cursor()
