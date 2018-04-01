@@ -309,7 +309,7 @@ def alarm():
     curs.execute("select data, date from alarm where name = ? order by date desc", [ip_check()])
     data_list = curs.fetchall()
     if data_list:
-        data = '<a href="/del_alarm">(모두 삭제)</a><hr>' + data
+        data = '<a href="/del_alarm">(삭제)</a><hr>' + data
 
         for data_one in data_list:
             data += '<li>' + data_one[0] + ' (' + data_one[1] + ')</li>'
@@ -3209,14 +3209,23 @@ def user_info():
         ip_user = '<a href="/w/사용자:' + ip + '">' + ip + '</a>'
         
         plus = '<li><a href="/logout">로그아웃</a></li><li><a href="/change">내 정보 변경</a></li>'
+        
+        curs.execute('select name from alarm where name = ? limit 1', [ip_check()])
+        if curs.fetchall():
+            plus2 = '<li><a href="/alarm">알림 (있음)</a></li>'
+        else:
+            plus2 = '<li><a href="/alarm">알림</a></li>'
+
+        plus2 += '<li><a href="/watch_list">주시 ' + lang_data['document'] + '</a></li>'
     else:
         ip_user = ip
         
         plus = '<li><a href="/login">로그인</a></li>'
+        plus2 = ''
 
     return html_minify(render_template(skin_check(conn), 
         imp = ['사용자 메뉴', wiki_set(conn, 1), custom(conn), other2([0, 0])],
-        data =  '<h2>상태</h2><ul><li>' + ip_user + ' <a href="/record/' + url_pas(ip) + '">(기록)</a></li><li>권한 상태 : ' + acl + '</li></ul><br><h2>로그인</h2><ul>' + plus + '<li><a href="/register">회원가입</a></li></ul><br><h2>사용자 기능</h2><ul><li><a href="/acl/사용자:' + url_pas(ip) + '">사용자 ' + lang_data['document'] + ' ACL</a></li><li><a href="/custom_head">사용자 HEAD</a></li></ul><br><h2>기타</h2><ul><li><a href="/alarm">알림</a></li><li><a href="/watch_list">주시 ' + lang_data['document'] + '</a></li><li><a href="/count">활동 횟수</a></li></ul>',
+        data =  '<h2>상태</h2><ul><li>' + ip_user + ' <a href="/record/' + url_pas(ip) + '">(기록)</a></li><li>권한 상태 : ' + acl + '</li></ul><br><h2>로그인</h2><ul>' + plus + '<li><a href="/register">회원가입</a></li></ul><br><h2>사용자 기능</h2><ul><li><a href="/acl/사용자:' + url_pas(ip) + '">사용자 ' + lang_data['document'] + ' ACL</a></li><li><a href="/custom_head">사용자 HEAD</a></li></ul><br><h2>기타</h2><ul>' + plus2 + '<li><a href="/count">활동 횟수</a></li></ul>',
         menu = 0
     ))
 
@@ -3238,7 +3247,7 @@ def watch_list():
     div += '<a href="/manager/13">(추가)</a>'
 
     return html_minify(render_template(skin_check(conn), 
-        imp = ['편집 필터 ' + lang_data['list'], wiki_set(conn, 1), custom(conn), other2([0, 0])],
+        imp = ['주시 문서 ' + lang_data['list'], wiki_set(conn, 1), custom(conn), other2([0, 0])],
         data = div,
         menu = [['manager', lang_data['admin']]]
     ))
