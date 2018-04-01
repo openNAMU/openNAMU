@@ -284,7 +284,7 @@ def custom(conn):
     if user_icon != 0:
         user_name = ip_check()
     else:
-        user_name = ''
+        user_name = '사용자'
 
     return ['', '', user_icon, user_head, email, user_name]
 
