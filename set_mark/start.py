@@ -589,7 +589,7 @@ def start(conn, data, title):
 
     # 표 처리
     while 1:
-        table = re.search('\n((?:(?:(?:(?:\|\|)+(?:(?:(?!\|\|).(?:\n)*)+))+)\|\|(?:\n)?)+)', data)
+        table = re.search('\n((?:(?:(?:(?:\|\|)+(?:(?:(?!\|\|).(?:\n)*)*))+)\|\|(?:\n)?)+)', data)
         if table:
             table = table.groups()[0]
             
@@ -631,7 +631,7 @@ def start(conn, data, title):
                 else:
                     break
 
-            data = re.sub('\n((?:(?:(?:(?:\|\|)+(?:(?:(?!\|\|).(?:\n)*)+))+)\|\|(?:\n)?)+)', table, data, 1)
+            data = re.sub('\n((?:(?:(?:(?:\|\|)+(?:(?:(?!\|\|).(?:\n)*)*))+)\|\|(?:\n)?)+)', table, data, 1)
         else:
             break
 
