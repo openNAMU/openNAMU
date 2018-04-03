@@ -17,7 +17,7 @@ curs = conn.cursor()
 
 # 파싱 해주는 함수
 def parser(data):
-    namumark(conn, data[0], data[1], 1, 0, 0)
+    namumark(conn, data[0], data[1], 1)
 
 # 역링크 전부 삭제
 curs.execute("delete from back")
