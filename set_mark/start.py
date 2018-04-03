@@ -595,7 +595,7 @@ def start(conn, data, title):
             
             # return [all_table, row_style, cel_style, row, cel, table_class, num]
             while 1:
-                all_table = re.search('^((?:\|\|)+)((?:&lt;(?:(?:(?!&gt;).)+)&gt;)*)\n*((?:(?!\|\||<\/td>).)+\n*)', table)
+                all_table = re.search('^((?:\|\|)+)((?:&lt;(?:(?:(?!&gt;).)+)&gt;)*)\n*((?:(?!\|\||<\/td>).)*\n*)', table)
                 if all_table:
                     all_table = all_table.groups()
                     
@@ -610,7 +610,7 @@ def start(conn, data, title):
             table = re.sub('\|\|\n$', '</td></tr></tbody></table>', table)
 
             while 1:
-                row_table = re.search('\|\|\n((?:\|\|)+)((?:&lt;(?:(?:(?!&gt;).)+)&gt;)*)\n*((?:(?!\|\||<\/td>).)+\n*)', table)
+                row_table = re.search('\|\|\n((?:\|\|)+)((?:&lt;(?:(?:(?!&gt;).)+)&gt;)*)\n*((?:(?!\|\||<\/td>).)*\n*)', table)
                 if row_table:
                     row_table = row_table.groups()
                     
@@ -621,7 +621,7 @@ def start(conn, data, title):
                     break
 
             while 1:
-                cel_table = re.search('((?:\|\|)+)((?:&lt;(?:(?:(?!&gt;).)+)&gt;)*)\n*((?:(?:(?!\|\||<\/td>).)|\n)+\n*)', table)
+                cel_table = re.search('((?:\|\|)+)((?:&lt;(?:(?:(?!&gt;).)+)&gt;)*)\n*((?:(?:(?!\|\||<\/td>).)|\n)*\n*)', table)
                 if cel_table:
                     cel_table = cel_table.groups()
                     
