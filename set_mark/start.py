@@ -439,7 +439,7 @@ def start(conn, data, title):
             
             data = re.sub('\n(={1,6}) ?((?:(?!=).)+) ?={1,6}\n', '\n<h' + toc_number + ' id="s-' + re.sub('\.$', '', all_stack) + '"><a href="#toc">' + all_stack + '</a> ' + toc[1] + ' <span style="font-size: 12px"><a href="/edit/' + tool.url_pas(title) + '?section=' + str(edit_number) + '">(편집)</a></span></h' + toc_number + '>\n', data, 1)
             
-            toc_data += '<span style="margin-left: ' + str((toc_full - toc_top_stack) * 10) + 'px;"><a href="#s-' + re.sub('\.$', '', all_stack) + '">' + all_stack + '</a> ' + toc[1] + '</span>\n'
+            toc_data += '<span style="margin-left: ' + str((toc_full - toc_top_stack) * 10) + 'px;"><a href="#s-' + re.sub('\.$', '', all_stack) + '">' + all_stack + '</a> ' + re.sub('\[\*((?:(?! |\]).)*)(?: ((?:(?!\]).)+))?\]', '', toc[1]) + '</span>\n'
         else:
             break
 
@@ -589,7 +589,7 @@ def start(conn, data, title):
 
     # 표 처리
     while 1:
-        table = re.search('\n((?:(?:(?:(?:\|\|)+(?:(?:(?!\|\|).(?:\n)*)+))+)\|\|(?:\n)?)+)', data)
+        table = re.search('\n((?:(?:(?:(?:\|\|)+(?:(?:(?!\|\|).(?:\n)*)*))+)\|\|(?:\n)?)+)', data)
         if table:
             table = table.groups()[0]
             
@@ -631,7 +631,7 @@ def start(conn, data, title):
                 else:
                     break
 
-            data = re.sub('\n((?:(?:(?:(?:\|\|)+(?:(?:(?!\|\|).(?:\n)*)+))+)\|\|(?:\n)?)+)', table, data, 1)
+            data = re.sub('\n((?:(?:(?:(?:\|\|)+(?:(?:(?!\|\|).(?:\n)*)*))+)\|\|(?:\n)?)+)', table, data, 1)
         else:
             break
 
