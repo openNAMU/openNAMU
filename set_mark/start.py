@@ -123,7 +123,6 @@ def start(conn, data, title):
 
     # XSS 이스케이프
     data = html.escape(data)
-    data = re.sub('&amp;', '&', data)
 
     # 포함 문법 처리
     while 1:
@@ -170,6 +169,9 @@ def start(conn, data, title):
     # 개행 정리
     data = re.sub('\r\n', '\n', data)
 
+    # 기타 처리
+    data = re.sub('&amp;', '&', data)
+
     # HTML 허용
     src_list = ["www.youtube.com", "serviceapi.nmv.naver.com", "tv.kakao.com", "www.google.com", "serviceapi.rmcnmv.naver.com"]
     html_list = ['div', 'span', 'embed', 'iframe', 'ruby', 'rp', 'rt']
@@ -213,108 +215,84 @@ def start(conn, data, title):
         middle_data = re.search('(?:{{{((?:(?! |{{{|}}}).)*) ?|(}}}))', data)
         if middle_data:
             middle_data = middle_data.groups()
-            if not middle_data[1]:
+            if middle_data[0]:
                 if middle_stack > 0:
                     middle_stack += 1
                     
                     data = re.sub('(?:{{{((?:(?! |{{{|}}}).)*) ?|(}}}))', '&#123;&#123;&#123;' + middle_data[0], data, 1)
                 else:
-                    check = 0
-                    if check == 0:
+                    if middle_data[0] != '':
                         middle_search = re.search('^(#(?:[0-9a-f-A-F]{3}){1,2})', middle_data[0])
-                        if middle_search:
-                            check = 1
-                            
-                            middle_search = middle_search.groups()[0]
-                            
+                        if middle_search:                            
                             middle_list += ['span']
                             
-                            data = re.sub('(?:{{{((?:(?! |{{{|}}}).)*) ?|(}}}))', '<span style="color: ' + middle_search + ';">', data, 1)
-                        
-                        middle_search = re.search('^(?:#(\w+))', middle_data[0])
-                        if middle_search:
-                            check = 1
-                            
-                            middle_search = middle_search.groups()[0]
-                            
-                            middle_list += ['span']
-                            
-                            data = re.sub('(?:{{{((?:(?! |{{{|}}}).)*) ?|(}}}))', '<span style="color: ' + middle_search + ';">', data, 1)
-
-                        middle_search = re.search('^(?:@((?:[0-9a-f-A-F]{3}){1,2}))', middle_data[0])
-                        if middle_search:
-                            check = 1
-                            
-                            middle_search = middle_search.groups()[0]
-                            
-                            middle_list += ['span']
-                            
-                            data = re.sub('(?:{{{((?:(?! |{{{|}}}).)*) ?|(}}}))', '<span style="background: #' + middle_search + ';">', data, 1)
-                        
-                        middle_search = re.search('^(?:@(\w+))', middle_data[0])
-                        if middle_search:
-                            check = 1
-                            
-                            middle_search = middle_search.groups()[0]
-                            
-                            middle_list += ['span']
-                            
-                            data = re.sub('(?:{{{((?:(?! |{{{|}}}).)*) ?|(}}}))', '<span style="background: ' + middle_search + ';">', data, 1)
-
-                        middle_search = re.search('^(\+|-)([1-5])', middle_data[0])
-                        if middle_search:
-                            check = 1
-                            
-                            middle_search = middle_search.groups()
-                            if middle_search[0] == '+':
-                                font_size = str(int(middle_search[1]) * 20 + 100)
+                            data = re.sub('(?:{{{((?:(?! |{{{|}}}).)*) ?|(}}}))', '<span style="color: ' + middle_search.groups()[0] + ';">', data, 1)
+                        else:
+                            middle_search = re.search('^(?:#(\w+))', middle_data[0])
+                            if middle_search:
+                                middle_list += ['span']
+                                
+                                data = re.sub('(?:{{{((?:(?! |{{{|}}}).)*) ?|(}}}))', '<span style="color: ' + middle_search.groups()[0] + ';">', data, 1)
                             else:
-                                font_size = str(100 - int(middle_search[1]) * 10)
+                                middle_search = re.search('^(?:@((?:[0-9a-f-A-F]{3}){1,2}))', middle_data[0])
+                                if middle_search:
+                                    middle_list += ['span']
+                                    
+                                    data = re.sub('(?:{{{((?:(?! |{{{|}}}).)*) ?|(}}}))', '<span style="background: #' + middle_search.groups()[0] + ';">', data, 1)
+                                else:
+                                    middle_search = re.search('^(?:@(\w+))', middle_data[0])
+                                    if middle_search:
+                                        middle_list += ['span']
+                                        
+                                        data = re.sub('(?:{{{((?:(?! |{{{|}}}).)*) ?|(}}}))', '<span style="background: ' + middle_search.groups()[0] + ';">', data, 1)
+                                    else:
+                                        middle_search = re.search('^(\+|-)([1-5])', middle_data[0])
+                                        if middle_search:
+                                            middle_search = middle_search.groups()
+                                            if middle_search[0] == '+':
+                                                font_size = str(int(middle_search[1]) * 20 + 100)
+                                            else:
+                                                font_size = str(100 - int(middle_search[1]) * 10)
 
-                            middle_list += ['span']
-                            
-                            data = re.sub('(?:{{{((?:(?! |{{{|}}}).)*) ?|(}}}))', '<span style="font-size: ' + font_size + '%;">', data, 1)
+                                            middle_list += ['span']
+                                            
+                                            data = re.sub('(?:{{{((?:(?! |{{{|}}}).)*) ?|(}}}))', '<span style="font-size: ' + font_size + '%;">', data, 1)
+                                        else:
+                                            middle_search = re.search('^#!wiki', middle_data[0])
+                                            if middle_search:
+                                                middle_data_2 = re.search('{{{#!wiki style=(?:&quot;|&#x27;)((?:(?!&quot;|&#x27;).)*)(?:&quot;|&#x27;)\n', data)
+                                                middle_data_2 = middle_data_2.groups()
 
-                        middle_search = re.search('^#!wiki', middle_data[0])
-                        if middle_search:
-                            check = 1
-        
-                            middle_data_2 = re.search('{{{#!wiki style=(?:&quot;|&#x27;)((?:(?!&quot;|&#x27;).)*)(?:&quot;|&#x27;)\n', data)
-                            middle_data_2 = middle_data_2.groups()
+                                                middle_list += ['div']
+                                                
+                                                data = re.sub('{{{#!wiki style=(?:&quot;|&#x27;)((?:(?!&quot;|&#x27;).)*)(?:&quot;|&#x27;)\n', '<div style="' + middle_data_2[0] + '">', data, 1)
+                                            else:
+                                                middle_search = re.search('^#!syntax', middle_data[0])
+                                                if middle_search:
+                                                    middle_data_2 = re.search('{{{#!syntax ((?:(?!\n).)+)\n', data)
+                                                    middle_data_2 = middle_data_2.groups()
 
-                            middle_list += ['div']
-                            
-                            data = re.sub('{{{#!wiki style=(?:&quot;|&#x27;)((?:(?!&quot;|&#x27;).)*)(?:&quot;|&#x27;)\n', '<div style="' + middle_data_2[0] + '">', data, 1)
+                                                    middle_list += ['code', 'pre']
+                                                    middle_number += 1
+                                                    
+                                                    data = re.sub('{{{#!syntax ((?:(?!\n).)+)\n', '<pre id="syntax"><code class="' + middle_data_2[0] + '">', data, 1)
+                                                else:
+                                                    middle_search = re.search('^#!html', middle_data[0])
+                                                    if middle_search:
+                                                        middle_list += ['span']
+                                                        
+                                                        data = re.sub('(?:{{{((?:(?! |{{{|}}}).)*) ?|(}}}))', '<span>', data, 1)
+                                                    else:
+                                                        middle_search = re.search('^#!folding', middle_data[0])
+                                                        if middle_search:
+                                                            middle_list += ['span']
+                                                            
+                                                            data = re.sub('(?:{{{((?:(?! |{{{|}}}).)*) ?|(}}}))', '<span>', data, 1)
+                                                        else:
+                                                            middle_list += ['span']
 
-                        middle_search = re.search('^#!syntax', middle_data[0])
-                        if middle_search:
-                            check = 1
-        
-                            middle_data_2 = re.search('{{{#!syntax ((?:(?!\n).)+)\n', data)
-                            middle_data_2 = middle_data_2.groups()
-
-                            middle_list += ['code', 'pre']
-                            middle_number += 1
-                            
-                            data = re.sub('{{{#!syntax ((?:(?!\n).)+)\n', '<pre id="syntax"><code class="' + middle_data_2[0] + '">', data, 1)
-
-                        middle_search = re.search('^#!html', middle_data[0])
-                        if middle_search:
-                            check = 1
-
-                            middle_list += ['span']
-                            
-                            data = re.sub('(?:{{{((?:(?! |{{{|}}}).)*) ?|(}}}))', '<span>', data, 1)
-
-                        middle_search = re.search('^#!folding', middle_data[0])
-                        if middle_search:
-                            check = 1
-
-                            middle_list += ['span']
-                            
-                            data = re.sub('(?:{{{((?:(?! |{{{|}}}).)*) ?|(}}}))', '<span>', data, 1)
-
-                    if not check == 1:
+                                                            data = re.sub('(?:{{{((?:(?! |{{{|}}}).)*) ?|(}}}))', '<span>', data, 1)
+                    else:
                         middle_list += ['code']
                         
                         middle_stack += 1
