@@ -1262,25 +1262,21 @@ def raw_view(name = None, sub_title = None, num = None):
         return redirect('/w/' + url_pas(name))
         
 @app.route('/revert/<path:name>', methods=['POST', 'GET'])
-def revert(name = None):
-    ip = ip_check()
-    can = acl_check(conn, name)
-    today = get_time()
-    
+def revert(name = None):    
     num = int(request.args.get('num', 0))
+
+    curs.execute("select title from history where title = ? and id = ? and hide = 'O'", [name, str(num)])
+    if curs.fetchall() and admin_check(conn, 6, None) != 1:
+        return re_error(conn, '/error/3')
+
+    if acl_check(conn, name) == 1:
+        return re_error(conn, '/ban')
 
     if request.method == 'POST':
         if captcha_post(request.form.get('g-recaptcha-response', None), conn) == 1:
             return re_error(conn, '/error/13')
         else:
             captcha_post('', conn, 0)
-
-        curs.execute("select title from history where title = ? and id = ? and hide = 'O'", [name, str(num)])
-        if curs.fetchall() and admin_check(conn, 6, None) != 1:
-            return re_error(conn, '/error/3')
-
-        if can == 1:
-            return re_error(conn, '/ban')
 
         curs.execute("delete from back where link = ?", [name])
         conn.commit()
@@ -1297,20 +1293,13 @@ def revert(name = None):
                 leng = '+' + str(len(data[0][0]))
                 curs.execute("insert into data (title, data) values (?, ?)", [name, data[0][0]])
                 
-            history_plus(conn, name, data[0][0], today, ip, request.form['send'] + ' (' + str(num) + lang_data['version'] + ')', leng)
+            history_plus(conn, name, data[0][0], get_time(), ip_check(), request.form['send'] + ' (' + str(num) + lang_data['version'] + ')', leng)
             namumark(conn, name, data[0][0], 1)
             
             conn.commit()
             
             return redirect('/w/' + url_pas(name))
     else:
-        curs.execute("select title from history where title = ? and id = ? and hide = 'O'", [name, str(num)])
-        if curs.fetchall() and admin_check(conn, 6, None) != 1:
-            return re_error(conn, '/error/3')    
-                          
-        if can == 1:
-            return re_error(conn, '/ban')
-
         curs.execute("select title from history where title = ? and id = ?", [name, str(num)])
         if not curs.fetchall():
             return redirect('/w/' + url_pas(name))
