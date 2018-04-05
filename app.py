@@ -177,13 +177,6 @@ print('')
 
 # 호환성 설정
 try:
-    curs.execute("drop table move")
-
-    print('move table delete')
-except:
-    pass
-
-try:
     curs.execute("alter table history add hide text default ''")
     
     curs.execute('select title, re from hidhi')
@@ -2530,63 +2523,42 @@ def acl(name = None):
         if admin_check(conn, 5, check_data) != 1:
             return re_error(conn, '/error/3')
 
-    if request.method == 'POST':
-        if request.form['select'] == 'admin':
-            sql = 'admin'
-        elif request.form['select'] == 'all':
-            sql = 'all'
-        elif request.form['select'] == 'user':
-            sql = 'user'
-        else:
-            sql = ''
-            
-        if sql == '':
+    if request.method == 'POST':            
+        if request.form.get('select') == 'normal':
             curs.execute("delete from acl where title = ?", [name])
         else:
             curs.execute("select title from acl where title = ?", [name])
             if curs.fetchall():
-                curs.execute("update acl set dec = ? where title = ?", [sql, name])
+                curs.execute("update acl set dec = ? where title = ?", [request.form['select'], name])
             else:
-                curs.execute("insert into acl (title, dec, dis, why) values (?, ?, '', '')", [name, sql])
+                curs.execute("insert into acl (title, dec, dis, why) values (?, ?, '', '')", [name, request.form['select']])
 
         conn.commit()
             
         return redirect('/w/' + url_pas(name))            
     else:
-        acl_list = ['', '', '']
+        if re.search('^사용자:', name):
+            acl_list = [['normal', '일반'], ['user', '가입자'], ['all', '모두']]
+        else:
+            acl_list = [['normal', '일반'], ['user', '가입자'], ['admin', '관리자']]
         
         curs.execute("select dec from acl where title = ?", [name])
-        acl_d = curs.fetchall()
-        if acl_d:
-            if test and acl_d[0][0] == 'all':
-                now = '모두'
-                
-                acl_list[0] = 'selected="selected"'
-            elif not test and acl_d[0][0] == 'admin':
-                now = lang_data['admin']
-                
-                acl_list[0] = 'selected="selected"'
-            elif acl_d[0][0] == 'user':
-                now = '가입자'
-                
-                acl_list[1] = 'selected="selected"'
-            else:
-                now = '일반'
-                
-                acl_list[2] = 'selected="selected"'
-        else:
-            now = '일반'
-            
-            acl_list[2] = 'selected="selected"'
+        acl_data = curs.fetchall()
 
-        if test:
-            plus = '<option value="all" ' + acl_list[0] + '>모두</option>'
-        else:
-            plus = '<option value="admin" ' + acl_list[0] + '>' + lang_data['admin'] + '</option>'
+        now = '일반'
+        data = ''
+        for data_list in acl_list:
+            if acl_data and acl_data[0][0] == data_list[0]:
+                now = data_list[1]
+                check = 'selected="selected"'
+            else:
+                check = ''
+            
+            data += '<option value="' + data_list[0] + '" ' + check + '>' + data_list[1] + '</option>'
             
         return html_minify(render_template(skin_check(conn), 
             imp = [name, wiki_set(conn, 1), custom(conn), other2([' (ACL)', 0])],
-            data = '<form method="post"><span>현재 ACL : ' + now + '</span><hr><select name="select">' + plus + '<option value="user" ' + acl_list[1] + '>가입자</option><option value="normal" ' + acl_list[2] + '>일반</option></select><hr><button type="submit">ACL 변경</button></form>',
+            data = '<form method="post"><h2>문서 ACL</h2><select name="select">' + data + '</select><hr><button type="submit">ACL 변경</button></form>',
             menu = [['w/' + url_pas(name), lang_data['document']], ['manager', lang_data['admin']]]
         ))
             
@@ -2783,11 +2755,11 @@ def read_view(name = None):
 
     if not num:
         curs.execute("select dec from acl where title = ?", [name])
-        acl_d = curs.fetchall()
-        if acl_d:
-            if acl_d[0][0] == 'admin':
+        acl_data = curs.fetchall()
+        if acl_data:
+            if acl_data[0][0] == 'admin':
                 acl = ' (' + lang_data['admin'] + ')'
-            elif acl_d[0][0] == 'user':
+            elif acl_data[0][0] == 'user':
                 acl = ' (가입자)'
         else:
             curs.execute('select data from other where name = "edit"')
