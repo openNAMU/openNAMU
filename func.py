@@ -385,10 +385,28 @@ def topic_check(conn, name, sub):
 
     if ban_check(conn) == 1:
         return 1
+        
+    curs.execute("select acl from user where id = ?", [ip])
+    user_data = curs.fetchall()
 
+    curs.execute("select dis from acl where title = ?", [name])
+    acl_data = curs.fetchall()
+    if acl_data:
+        if acl_data[0][0] == 'user':
+            if not user_data:
+                return 1
+
+        if acl_data[0][0] == 'admin':
+            if not user_data:
+                return 1
+
+            if not admin_check(conn, 3, 'topic (' + name + ')') == 1:
+                return 1
+        
     curs.execute("select title from stop where title = ? and sub = ?", [name, sub])
     if curs.fetchall():
-        return 1
+        if not admin_check(conn, 3, 'topic (' + name + ')') == 1:
+            return 1
 
     return 0
 

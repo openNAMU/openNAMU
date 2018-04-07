@@ -1937,7 +1937,7 @@ def topic(name = None, sub = None):
         ip = ip_check()
         today = get_time()
         
-        if ban == 1 and admin != 1:
+        if ban == 1:
             return re_error(conn, '/ban')
         
         curs.execute("select id from topic where title = ? and sub = ? order by id + 0 desc limit 1", [name, sub])
@@ -2493,61 +2493,83 @@ def user_ban(name = None):
                 
 @app.route('/acl/<path:name>', methods=['POST', 'GET'])
 def acl(name = None):
+    check_ok = ''
+    
     if request.method == 'POST':
         check_data = 'acl (' + name + ')'
     else:
         check_data = None
     
-    test = re.search('^사용자:(.+)$', name)
-    if test:
-        test = test.groups()
-        ip = ip_check()
-        
+    user_data = re.search('^사용자:(.+)$', name)
+    if user_data:
         if custom(conn)[2] == 0:
             return redirect('/login')
-        elif test[0] != ip:
+        elif user_data.groups()[0] != ip_check():
             if admin_check(conn, 5, check_data) != 1:
-                return re_error(conn, '/error/3')
+                if check_data:
+                    return re_error(conn, '/error/3')
+                else:
+                    check_ok = 'disable'
     else:
         if admin_check(conn, 5, check_data) != 1:
-            return re_error(conn, '/error/3')
-
-    if request.method == 'POST':            
-        if request.form.get('select') == 'normal':
-            curs.execute("delete from acl where title = ?", [name])
-        else:
-            curs.execute("select title from acl where title = ?", [name])
-            if curs.fetchall():
-                curs.execute("update acl set dec = ? where title = ?", [request.form['select'], name])
+            if check_data:
+                return re_error(conn, '/error/3')
             else:
-                curs.execute("insert into acl (title, dec, dis, why) values (?, ?, '', '')", [name, request.form['select']])
+                check_ok = 'disabled'
+
+    if request.method == 'POST':
+        curs.execute("select title from acl where title = ?", [name])
+        if curs.fetchall():
+            curs.execute("update acl set dec = ? where title = ?", [request.form['dec'], name])
+            curs.execute("update acl set dis = ? where title = ?", [request.form.get('dis', ''), name])
+        else:
+            curs.execute("insert into acl (title, dec, dis, why) values (?, ?, ?, '')", [name, request.form['dec'], request.form.get('dis', '')])
+        
+        curs.execute("select title from acl where title = ? and dec = '' and dis = ''", [name])
+        if curs.fetchall():
+            curs.execute("delete from acl where title = ?", [name])
 
         conn.commit()
             
-        return redirect('/w/' + url_pas(name))            
+        return redirect('/acl/' + url_pas(name))            
     else:
+        data = '<h2>문서 ACL</h2><select name="dec" ' + check_ok + '>'
+    
         if re.search('^사용자:', name):
-            acl_list = [['normal', '일반'], ['user', '가입자'], ['all', '모두']]
+            acl_list = [['', '일반'], ['user', '가입자'], ['all', '모두']]
         else:
-            acl_list = [['normal', '일반'], ['user', '가입자'], ['admin', '관리자']]
+            acl_list = [['', '일반'], ['user', '가입자'], ['admin', '관리자']]
         
         curs.execute("select dec from acl where title = ?", [name])
         acl_data = curs.fetchall()
-
-        now = '일반'
-        data = ''
         for data_list in acl_list:
             if acl_data and acl_data[0][0] == data_list[0]:
-                now = data_list[1]
                 check = 'selected="selected"'
             else:
                 check = ''
             
             data += '<option value="' + data_list[0] + '" ' + check + '>' + data_list[1] + '</option>'
             
+        data += '</select>'
+        
+        if not re.search('^사용자:', name):
+            data += '<br><br><h2>토론 ACL</h2><select name="dis" ' + check_ok + '>'
+        
+            curs.execute("select dis from acl where title = ?", [name])
+            acl_data = curs.fetchall()
+            for data_list in acl_list:
+                if acl_data and acl_data[0][0] == data_list[0]:
+                    check = 'selected="selected"'
+                else:
+                    check = ''
+                    
+                data += '<option value="' + data_list[0] + '" ' + check + '>' + data_list[1] + '</option>'
+                
+            data += '</select>'
+            
         return html_minify(render_template(skin_check(conn), 
             imp = [name, wiki_set(conn, 1), custom(conn), other2([' (ACL)', 0])],
-            data = '<form method="post"><h2>문서 ACL</h2><select name="select">' + data + '</select><hr><button type="submit">ACL 변경</button></form>',
+            data = '<form method="post">' + data + '<hr><button type="submit">ACL 변경</button></form>',
             menu = [['w/' + url_pas(name), lang_data['document']], ['manager', lang_data['admin']]]
         ))
             
@@ -2742,23 +2764,6 @@ def read_view(name = None):
         response_data = 404
         else_data = ''
 
-    if not num:
-        curs.execute("select dec from acl where title = ?", [name])
-        acl_data = curs.fetchall()
-        if acl_data:
-            if acl_data[0][0] == 'admin':
-                acl = ' (' + lang_data['admin'] + ')'
-            elif acl_data[0][0] == 'user':
-                acl = ' (가입자)'
-        else:
-            curs.execute('select data from other where name = "edit"')
-            set_data = curs.fetchall()
-            if set_data:
-                if set_data[0][0] == 'admin':
-                    acl = ' (' + lang_data['admin'] + ')'
-                elif set_data[0][0] == 'user':
-                    acl = ' (가입자)'
-
     m = re.search("^사용자:([^/]*)", name)
     if m:
         g = m.groups()
@@ -2774,13 +2779,10 @@ def read_view(name = None):
             else:
                 acl = ''
 
-        curs.execute("select dec from acl where title = ?", [name])
-        data = curs.fetchall()
-        if data:
-            if data[0][0] == 'all':
-                acl += ' (모두)'
-            elif data[0][0] == 'user':
-                acl += ' (가입자)'
+    curs.execute("select dec from acl where title = ?", [name])
+    data = curs.fetchall()
+    if data:
+        acl += ' (ACL O)'
             
     if request.args.get('froms', None):
         else_data = re.sub('\r\n#(?:redirect|넘겨주기) (?P<in>(?:(?!\r\n).)+)\r\n', ' * [[\g<in>]] 문서로 넘겨주기', '\r\n' + else_data + '\r\n')
@@ -2788,33 +2790,30 @@ def read_view(name = None):
         else_data = re.sub('\r\n$', '', else_data)
             
     end_data = namumark(conn, name, else_data, 0)
-
-    if data_none == 1:
-        menu = [['edit/' + url_pas(name), '생성']]
-    else:
-        menu = [['edit/' + url_pas(name), '수정']]
-
-    menu += [['topic/' + url_pas(name), '토론'], ['history/' + url_pas(name), lang_data['history']], ['xref/' + url_pas(name), '역링크']]
-        
-    if admin_memu == 1:
-        menu += [['acl/' + url_pas(name), 'ACL']]
-
-    if request.args.get('froms', None):
-        menu += [['w/' + url_pas(name), '넘기기']]
-        end_data = '<ul id="redirect"><li><a href="/w/' + url_pas(request.args.get('froms', None)) + '?froms=' + url_pas(name) + '">' + request.args.get('froms', None) + '</a>에서 넘어 왔습니다.</li></ul><br>' + end_data
-
-    if uppage != 0:
-        menu += [['w/' + url_pas(uppage), '상위']]
-
-    if down:
-        menu += [['down/' + url_pas(name), '하위']]
-
+    
     if num:
         menu = [['history/' + url_pas(name), lang_data['history']]]
         sub = ' (' + str(num) + lang_data['version'] + ')'
         acl = ''
         r_date = 0
     else:
+        if data_none == 1:
+            menu = [['edit/' + url_pas(name), '생성']]
+        else:
+            menu = [['edit/' + url_pas(name), '수정']]
+
+        menu += [['topic/' + url_pas(name), '토론'], ['history/' + url_pas(name), lang_data['history']], ['xref/' + url_pas(name), '역링크'], ['acl/' + url_pas(name), 'ACL']]
+
+        if request.args.get('froms', None):
+            menu += [['w/' + url_pas(name), '넘기기']]
+            end_data = '<ul id="redirect"><li><a href="/w/' + url_pas(request.args.get('froms', None)) + '?froms=' + url_pas(name) + '">' + request.args.get('froms', None) + '</a>에서 넘어 왔습니다.</li></ul><br>' + end_data
+
+        if uppage != 0:
+            menu += [['w/' + url_pas(uppage), '상위']]
+
+        if down:
+            menu += [['down/' + url_pas(name), '하위']]
+    
         curs.execute("select date from history where title = ? order by date desc limit 1", [name])
         date = curs.fetchall()
         if date:
