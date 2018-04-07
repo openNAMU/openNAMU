@@ -112,6 +112,20 @@ def table_parser(data, cel_data, start_data, num = 0):
     table_class += '"'
 
     return [all_table, row_style, cel_style, row, cel, table_class, num]
+    
+def link_fix(main_link):
+    if re.search('^:', main_link):
+        main_link = re.sub('^:', '', main_link)
+
+    other_link = re.search('(#.+)$', main_link)
+    if other_link:
+        other_link = other_link.groups()[0]
+
+        main_link = re.sub('(#.+)$', '', main_link)
+    else:
+        other_link = ''
+        
+    return [main_link, other_link]
 
 def start(conn, data, title):
     # DB 지정
@@ -390,7 +404,11 @@ def start(conn, data, title):
     if redirect:
         redirect = redirect.groups()[0]
         
-        data = re.sub('\n#(?:redirect|넘겨주기) (?P<in>(?:(?!\n).)+)\n', '\n#redirect [[\g<in>]]\n', data, 1)
+        return_link = link_fix(redirect)
+        main_link = return_link[0]
+        other_link = return_link[1]
+        
+        data = re.sub('\n#(?:redirect|넘겨주기) (?P<in>(?:(?!\n).)+)\n', '<meta http-equiv="refresh" content="0; url=/w/' + tool.url_pas(main_link) + other_link + '?froms=' + tool.url_pas(title) + '">', data, 1)
 
     # [목차(없음)] 처리
     if not re.search('\[목차\(없음\)\]\n', data):
@@ -767,9 +785,10 @@ def start(conn, data, title):
             elif re.search('^http(s)?:\/\/', main_link):
                 data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<a id="out_link" rel="nofollow" href="' + main_link + '">' + see_link + '</a>', data, 1)
             else:
-                if re.search('^:', main_link):
-                    main_link = re.sub('^:', '', main_link)
-
+                return_link = link_fix(main_link)
+                main_link = return_link[0]
+                other_link = return_link[1]
+                    
                 curs.execute("select title from data where title = ?", [main_link])
                 if not curs.fetchall():
                     link_id = 'id="not_thing"'
@@ -777,16 +796,8 @@ def start(conn, data, title):
                     backlink += [[title, main_link, 'no']]
                 else:
                     link_id = ''
-
+                    
                 backlink += [[title, main_link, '']]
-
-                other_link = re.search('(#.+)$', main_link)
-                if other_link:
-                    other_link = other_link.groups()[0]
-
-                    main_link = re.sub('(#.+)$', '', main_link)
-                else:
-                    other_link = ''
 
                 if main_link != title:
                     if main_link != '':
@@ -797,15 +808,6 @@ def start(conn, data, title):
                     data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<b>' + see_link + '</b>', data, 1)
         else:
             break
-         
-    # 넘겨주기 마지막 처리
-    redirect = re.search('\n#redirect <a (?:id="not_thing")? href="((?:(?!").)+)">(?:(?:(?!<).)+)<\/a>\n', data)
-    if redirect:
-        redirect = redirect.groups()[0]
-        
-        backlink += [[title, redirect, 'redirect']]
-        
-        data = re.sub('\n#redirect <a (?:id="not_thing")? href="(?P<in>(?:(?!").)+)">(?:(?:(?!<).)+)<\/a>\n', '<meta http-equiv="refresh" content="0; url=\g<in>?froms=' + tool.url_pas(title) + '">', data, 1)
 
     # 각주 처리
     footnote_number = 0
