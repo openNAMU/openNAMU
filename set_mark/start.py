@@ -386,16 +386,11 @@ def start(conn, data, title):
     data = re.sub(',,(?P<in>(?:(?!,,).)+),,', '<sub>\g<in></sub>', data)
 
     # 넘겨주기 변환
-    while 1:
-        redirect = re.search('\n#(?:redirect|넘겨주기) ((?:(?!\n).)+)\n', data)
-        if redirect:
-            redirect = redirect.groups()[0]
-            
-            backlink += [[title, redirect, 'redirect']]
-            
-            data = re.sub('\n#(?:redirect|넘겨주기) (?P<in>(?:(?!\n).)+)\n', '<meta http-equiv="refresh" content="0; url=/w/\g<in>?froms=' + tool.url_pas(title) + '">', data, 1)
-        else:
-            break
+    redirect = re.search('\n#(?:redirect|넘겨주기) ((?:(?!\n).)+)\n', data)
+    if redirect:
+        redirect = redirect.groups()[0]
+        
+        data = re.sub('\n#(?:redirect|넘겨주기) (?P<in>(?:(?!\n).)+)\n', '\n#redirect [[\g<in>]]\n', data, 1)
 
     # [목차(없음)] 처리
     if not re.search('\[목차\(없음\)\]\n', data):
@@ -802,6 +797,15 @@ def start(conn, data, title):
                     data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<b>' + see_link + '</b>', data, 1)
         else:
             break
+         
+    # 넘겨주기 마지막 처리
+    redirect = re.search('\n#redirect <a (?:(?:(?!href=).)*)href="((?:(?!").)+)"(?:(?:(?!>).)*)>(?:(?:(?!<).)+)<\/a>\n', data)
+    if redirect:
+        redirect = redirect.groups()[0]
+        
+        backlink += [[title, redirect, 'redirect']]
+        
+        data = re.sub('\n#redirect <a (?:(?:(?!href=).)*)href="(?P<in>(?:(?!").)+)"(?:(?:(?!>).)*)>(?:(?:(?!<).)+)<\/a>\n', '<meta http-equiv="refresh" content="0; url=\g<in>?froms=' + tool.url_pas(title) + '">', data, 1)
 
     # 각주 처리
     footnote_number = 0
