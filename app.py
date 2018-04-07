@@ -724,7 +724,7 @@ def admin_plus(name = None):
         data += '<li><input type="checkbox" ' + state +  ' name="check" ' + exist_list[3] + '> 사용자 검사</li>'
         data += '<li><input type="checkbox" ' + state +  ' name="acl" ' + exist_list[4] + '> ' + lang_data['document'] + ' ACL</li>'
         data += '<li><input type="checkbox" ' + state +  ' name="hidel" ' + exist_list[5] + '> ' + lang_data['history'] + ' ' + lang_data['hide'] + '</li>'
-        data += '<li><input type="checkbox" ' + state +  ' name="give" ' + exist_list[6] + '> 권한 부여</li>'
+        data += '<li><input type="checkbox" ' + state +  ' name="give" ' + exist_list[6] + '> 권한 관리</li>'
         data += '<li><input type="checkbox" ' + state +  ' name="owner" ' + exist_list[7] + '> 소유자</li></ul>'
 
         return html_minify(render_template(skin_check(conn), 
@@ -2520,10 +2520,11 @@ def acl(name = None):
     if request.method == 'POST':
         curs.execute("select title from acl where title = ?", [name])
         if curs.fetchall():
-            curs.execute("update acl set dec = ? where title = ?", [request.form['dec'], name])
+            curs.execute("update acl set dec = ? where title = ?", [request.form.get('dec', ''), name])
             curs.execute("update acl set dis = ? where title = ?", [request.form.get('dis', ''), name])
+            curs.execute("update acl set why = ? where title = ?", [request.form.get('why', ''), name])
         else:
-            curs.execute("insert into acl (title, dec, dis, why) values (?, ?, ?, '')", [name, request.form['dec'], request.form.get('dis', '')])
+            curs.execute("insert into acl (title, dec, dis, why) values (?, ?, ?, ?)", [name, request.form.get('dec', ''), request.form.get('dis', ''), request.form.get('why', '')])
         
         curs.execute("select title from acl where title = ? and dec = '' and dis = ''", [name])
         if curs.fetchall():
@@ -2555,7 +2556,7 @@ def acl(name = None):
         if not re.search('^사용자:', name):
             data += '<br><br><h2>토론 ACL</h2><select name="dis" ' + check_ok + '>'
         
-            curs.execute("select dis from acl where title = ?", [name])
+            curs.execute("select dis, why from acl where title = ?", [name])
             acl_data = curs.fetchall()
             for data_list in acl_list:
                 if acl_data and acl_data[0][0] == data_list[0]:
@@ -2566,6 +2567,9 @@ def acl(name = None):
                 data += '<option value="' + data_list[0] + '" ' + check + '>' + data_list[1] + '</option>'
                 
             data += '</select>'
+                
+            if acl_data:
+                data += '<hr><input value="' + html.escape(acl_data[0][1]) + '" placeholder="사유" name="why" type="text" ' + check_ok + '>'
             
         return html_minify(render_template(skin_check(conn), 
             imp = [name, wiki_set(conn, 1), custom(conn), other2([' (ACL)', 0])],
@@ -2628,7 +2632,7 @@ def user_admin(name = None):
                     div += '<option value="' + data[0] + '">' + data[0] + '</option>'
         
         return html_minify(render_template(skin_check(conn), 
-            imp = [name, wiki_set(conn, 1), custom(conn), other2([' (권한 부여)', 0])],
+            imp = [name, wiki_set(conn, 1), custom(conn), other2([' (권한 관리)', 0])],
             data =  '<form method="post"><select name="select">' + div + '</select><hr><button type="submit">변경</button></form>',
             menu = [['manager', lang_data['admin']]]
         ))
