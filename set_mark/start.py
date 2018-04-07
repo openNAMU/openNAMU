@@ -799,7 +799,7 @@ def start(conn, data, title):
             break
          
     # 넘겨주기 마지막 처리
-    redirect = re.search('\n#redirect <a (?:id="not_thing")? href="(?P<in>(?:(?!").)+)">(?:(?:(?!<).)+)<\/a>\n', data)
+    redirect = re.search('\n#redirect <a (?:id="not_thing")? href="((?:(?!").)+)">(?:(?:(?!<).)+)<\/a>\n', data)
     if redirect:
         redirect = redirect.groups()[0]
         
