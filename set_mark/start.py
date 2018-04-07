@@ -799,13 +799,13 @@ def start(conn, data, title):
             break
          
     # 넘겨주기 마지막 처리
-    redirect = re.search('\n#redirect <a (?:(?:(?!href=).)*)href="((?:(?!").)+)"(?:(?:(?!>).)*)>(?:(?:(?!<).)+)<\/a>\n', data)
+    redirect = re.search('\n#redirect <a (?:id="not_thing")? href="(?P<in>(?:(?!").)+)">(?:(?:(?!<).)+)<\/a>\n', data)
     if redirect:
         redirect = redirect.groups()[0]
         
         backlink += [[title, redirect, 'redirect']]
         
-        data = re.sub('\n#redirect <a (?:(?:(?!href=).)*)href="(?P<in>(?:(?!").)+)"(?:(?:(?!>).)*)>(?:(?:(?!<).)+)<\/a>\n', '<meta http-equiv="refresh" content="0; url=\g<in>?froms=' + tool.url_pas(title) + '">', data, 1)
+        data = re.sub('\n#redirect <a (?:id="not_thing")? href="(?P<in>(?:(?!").)+)">(?:(?:(?!<).)+)<\/a>\n', '<meta http-equiv="refresh" content="0; url=\g<in>?froms=' + tool.url_pas(title) + '">', data, 1)
 
     # 각주 처리
     footnote_number = 0
