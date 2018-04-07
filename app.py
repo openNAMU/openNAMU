@@ -17,7 +17,7 @@ import random
 import sys
 
 # 버전 표기
-r_ver = 'v3.0.3-Beta-02'
+r_ver = 'v3.0.3-Beta-03'
 print('Version : ' + r_ver)
 
 # 나머지 불러오기
@@ -1548,9 +1548,14 @@ def edit(name = None):
                 data = get_data[0][0]
                 get_name = ''
 
+        # https://stackoverflow.com/questions/11076975/insert-text-into-textarea-at-cursor-position-javascript
+        js = '<script>function insertAtCursor(myField, myValue) { if (document.selection) { document.getElementById(myField).focus(); sel = document.selection.createRange(); sel.text = myValue; } else if (document.getElementById(myField).selectionStart || document.getElementById(myField).selectionStart == \'0\') { var startPos = document.getElementById(myField).selectionStart; var endPos = document.getElementById(myField).selectionEnd; document.getElementById(myField).value = document.getElementById(myField).value.substring(0, startPos) + myValue + document.getElementById(myField).value.substring(endPos, document.getElementById(myField).value.length); } else { document.getElementById(myField).value += myValue; }}</script>'
+
+        js_button = '<a href="javascript:void(0);" onclick="insertAtCursor(\'content\', \'[[]]\');">(링크)</a> <a href="javascript:void(0);" onclick="insertAtCursor(\'content\', \'[macro()]\');">(매크로)</a> <a href="javascript:void(0);" onclick="insertAtCursor(\'content\', \'{{{#! }}}\');">(중괄호)</a>'
+
         return html_minify(render_template(skin_check(conn), 
             imp = [name, wiki_set(conn, 1), custom(conn), other2([' (수정)', 0])],
-            data = get_name + '<form method="post" action="/edit/' + url_pas(name) + action + '"><textarea rows="25" name="content">' + html.escape(re.sub('\n$', '', data)) + '</textarea><textarea style="display: none;" name="otent">' + html.escape(re.sub('\n$', '', data_old)) + '</textarea><hr><input placeholder="사유" name="send" type="text"><hr>' + captcha_get(conn) + '' + ip_warring(conn) + '<button id="save" type="submit">저장</button><button id="preview" type="submit" formaction="/preview/' + url_pas(name) + action + '">미리보기</button></form>',
+            data = get_name + js + '<form method="post" action="/edit/' + url_pas(name) + action + '">' + js_button + '<hr><textarea id="content" rows="25" name="content">' + html.escape(re.sub('\n$', '', data)) + '</textarea><textarea style="display: none;" name="otent">' + html.escape(re.sub('\n$', '', data_old)) + '</textarea><hr><input placeholder="사유" name="send" type="text"><hr>' + captcha_get(conn) + '' + ip_warring(conn) + '<button id="save" type="submit">저장</button><button id="preview" type="submit" formaction="/preview/' + url_pas(name) + action + '">미리보기</button></form>',
             menu = [['w/' + url_pas(name), lang_data['document']], ['delete/' + url_pas(name), '삭제'], ['move/' + url_pas(name), lang_data['move']]]
         ))
         
@@ -1575,9 +1580,14 @@ def preview(name = None):
     else:
         action = ''
 
+        # https://stackoverflow.com/questions/11076975/insert-text-into-textarea-at-cursor-position-javascript
+        js = '<script>function insertAtCursor(myField, myValue) { if (document.selection) { document.getElementById(myField).focus(); sel = document.selection.createRange(); sel.text = myValue; } else if (document.getElementById(myField).selectionStart || document.getElementById(myField).selectionStart == \'0\') { var startPos = document.getElementById(myField).selectionStart; var endPos = document.getElementById(myField).selectionEnd; document.getElementById(myField).value = document.getElementById(myField).value.substring(0, startPos) + myValue + document.getElementById(myField).value.substring(endPos, document.getElementById(myField).value.length); } else { document.getElementById(myField).value += myValue; }}</script>'
+
+        js_button = '<a href="javascript:void(0);" onclick="insertAtCursor(\'content\', \'[[]]\');">(링크)</a> <a href="javascript:void(0);" onclick="insertAtCursor(\'content\', \'[macro()]\');">(매크로)</a> <a href="javascript:void(0);" onclick="insertAtCursor(\'content\', \'{{{#! }}}\');">(중괄호)</a>'
+
     return html_minify(render_template(skin_check(conn), 
         imp = [name, wiki_set(conn, 1), custom(conn), other2([' (미리보기)', 0])],
-        data = '<form method="post" action="/edit/' + url_pas(name) + action + '"><textarea rows="25" name="content">' + html.escape(request.form['content']) + '</textarea><textarea style="display: none;" name="otent">' + html.escape(request.form['otent']) + '</textarea><hr><input placeholder="사유" name="send" type="text"><hr>' + captcha_get(conn) + '<button id="save" type="submit">저장</button><button id="preview" type="submit" formaction="/preview/' + url_pas(name) + action + '">미리보기</button></form><hr>' + end_data,
+        data = js + '<form method="post" action="/edit/' + url_pas(name) + action + '">' + js_button + '<hr><textarea id="content" rows="25" name="content">' + html.escape(request.form['content']) + '</textarea><textarea style="display: none;" name="otent">' + html.escape(request.form['otent']) + '</textarea><hr><input placeholder="사유" name="send" type="text"><hr>' + captcha_get(conn) + '<button id="save" type="submit">저장</button><button id="preview" type="submit" formaction="/preview/' + url_pas(name) + action + '">미리보기</button></form><hr>' + end_data,
         menu = [['w/' + url_pas(name), lang_data['document']]]
     ))
         
