@@ -408,7 +408,9 @@ def start(conn, data, title):
         main_link = return_link[0]
         other_link = return_link[1]
         
-        data = re.sub('\n#(?:redirect|넘겨주기) (?P<in>(?:(?!\n).)+)\n', '<meta http-equiv="refresh" content="0; url=/w/' + tool.url_pas(main_link) + other_link + '?froms=' + tool.url_pas(title) + '">', data, 1)
+        backlink += [[title, main_link, 'redirect']]
+        
+        data = re.sub('\n#(?:redirect|넘겨주기) (?P<in>(?:(?!\n).)+)\n', '<meta http-equiv="refresh" content="0; url=/w/' + tool.url_pas(main_link) + '?froms=' + tool.url_pas(title) + other_link + '">', data, 1)
 
     # [목차(없음)] 처리
     if not re.search('\[목차\(없음\)\]\n', data):
@@ -788,22 +790,22 @@ def start(conn, data, title):
                 return_link = link_fix(main_link)
                 main_link = return_link[0]
                 other_link = return_link[1]
-                    
-                curs.execute("select title from data where title = ?", [main_link])
-                if not curs.fetchall():
-                    link_id = 'id="not_thing"'
-
-                    backlink += [[title, main_link, 'no']]
-                else:
-                    link_id = ''
-                    
-                backlink += [[title, main_link, '']]
-
+                  
                 if main_link != title:
                     if main_link != '':
+                        curs.execute("select title from data where title = ?", [main_link])
+                        if not curs.fetchall():
+                            link_id = 'id="not_thing"'
+
+                            backlink += [[title, main_link, 'no']]
+                        else:
+                            link_id = ''
+                    
+                        backlink += [[title, main_link, '']]
+                        
                         data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<a ' + link_id + ' href="/w/' + tool.url_pas(main_link) + other_link + '">' + see_link + '</a>', data, 1)
                     else:
-                        data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<a ' + link_id + ' href="' + other_link + '">' + see_link + '</a>', data, 1)
+                        data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<a href="' + other_link + '">' + see_link + '</a>', data, 1)
                 else:
                     data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<b>' + see_link + '</b>', data, 1)
         else:
