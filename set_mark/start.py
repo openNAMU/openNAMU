@@ -134,9 +134,26 @@ def start(conn, data, title):
     # 초기 설정
     data = '\n' + data + '\n'
     backlink = []
-
+    plus_data = ''
+    end_data= []
+    
     # XSS 이스케이프
     data = html.escape(data)
+    
+    # 한 글자 NoWiki
+    num = 0
+    while 1:
+        one_nowiki = re.search('(?:\\\\){1,2}(.)', data)
+        if one_nowiki:
+            one_nowiki = one_nowiki.groups()
+
+            num += 1
+
+            end_data += [['one_nowiki_' + str(num), one_nowiki[0]]]
+
+            data = re.sub('(?:\\\\){1,2}(.)', '<span id="one_nowiki_' + str(num) + '"></span>', data, 1)
+        else:
+            break
 
     # 포함 문법 처리
     while 1:
@@ -235,7 +252,7 @@ def start(conn, data, title):
                     
                     data = re.sub('(?:{{{((?:(?! |{{{|}}}).)*) ?|(}}}))', '&#123;&#123;&#123;' + middle_data[0], data, 1)
                 else:
-                    if middle_data[0] != '':
+                    if re.search('^(#|@|\+|\-)', middle_data[0]):
                         middle_search = re.search('^(#(?:[0-9a-f-A-F]{3}){1,2})', middle_data[0])
                         if middle_search:                            
                             middle_list += ['span']
@@ -283,6 +300,9 @@ def start(conn, data, title):
                                             else:
                                                 middle_search = re.search('^#!syntax', middle_data[0])
                                                 if middle_search:
+                                                    if plus_data == '':
+                                                        plus_data = '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"><script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script><script>hljs.initHighlightingOnLoad();</script>'
+                                                
                                                     middle_data_2 = re.search('{{{#!syntax ((?:(?!\n).)+)\n', data)
                                                     middle_data_2 = middle_data_2.groups()
 
@@ -315,6 +335,9 @@ def start(conn, data, title):
                 
                     middle_number += 1
             else:
+                if middle_list == []:
+                    break
+            
                 if middle_stack > 0:
                     middle_stack -= 1
 
@@ -336,9 +359,6 @@ def start(conn, data, title):
         else:
             break
 
-    # 추가 데이터 지정
-    plus_data = '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"><script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script><script>hljs.initHighlightingOnLoad();</script>'
-
     # NoWiki 처리
     num = 0
     while 1:
@@ -348,9 +368,9 @@ def start(conn, data, title):
 
             num += 1
 
-            plus_data += '<script>function func_nowiki_' + str(num) + '() { document.all("nowiki_' + str(num) + '").innerHTML = "' + re.sub('\n', '\\\\n', nowiki_data[0]) + '"; } func_nowiki_' + str(num) + '();</script>'
+            end_data += [['nowiki_' + str(num), nowiki_data[0]]]
 
-            data = re.sub('<code>((?:(?:(?!<\/code>).)+\n*)+)<\/code>', '<span id="nowiki_' + str(num) + '">(NoWiki Error)</span>', data, 1)
+            data = re.sub('<code>((?:(?:(?!<\/code>).)+\n*)+)<\/code>', '<span id="nowiki_' + str(num) + '"></span>', data, 1)
         else:
             break
 
@@ -363,9 +383,9 @@ def start(conn, data, title):
 
             num += 1
 
-            plus_data += '<script>function func_syntax_' + str(num) + '() { document.all("syntax_' + str(num) + '").innerHTML = "' + re.sub('\n', '\\\\n', syntax_data[1]) + '"; } func_syntax_' + str(num) + '();</script>'
+            end_data += [['syntax_' + str(num), syntax_data[1]]]
 
-            data = re.sub('<code class="((?:(?!").)+)">((?:(?:(?:(?!<\/code>|<span id="syntax_)).)+\n*)+)<\/code>', '<code class="' + syntax_data[0] + '"><span id="syntax_' + str(num) + '">(Syntax Error)</span></code>', data, 1)
+            data = re.sub('<code class="((?:(?!").)+)">((?:(?:(?:(?!<\/code>|<span id="syntax_)).)+\n*)+)<\/code>', '<code class="' + syntax_data[0] + '"><span id="syntax_' + str(num) + '"></span></code>', data, 1)
         else:
             break
 
@@ -861,6 +881,11 @@ def start(conn, data, title):
         category = ''
 
     data += category
+    
+    # NoWiki 마지막 처리
+    for re_data in end_data:
+        data = data.replace('<span id="' + re_data[0] + '"></span>', re_data[1])
+        data = data.replace(tool.url_pas('<span id="' + re_data[0] + '"></span>'), tool.url_pas(re_data[1]))
     
     # 마지막 처리
     data = re.sub('(?P<in><\/h[0-9]>)(\n)+', '\g<in>', data)
