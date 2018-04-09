@@ -1459,6 +1459,7 @@ def edit(name = None):
             
             if request.args.get('section', None):
                 i = 1
+                
                 data = re.sub('\r\n', '\n', '\r\n' + old[0][0] + '\r\n')
                 while 1:
                     replace_data = re.search('\n(={1,6}) ?((?:(?!=).)+) ?={1,6}\n', data)
@@ -1487,11 +1488,11 @@ def edit(name = None):
                 content = data.replace(new_data, '\n' + content + '\n')
 
                 while 1:
-                    replace_data = re.search('\n<(?:real )?h([1-6])>((?:(?!<h).)+) <\/(?:real )?h[1-6]>\n', content)
+                    replace_data = re.search('\n<(?:real )?h([1-6])>((?:(?!<h).)+) ?<\/(?:real )?h[1-6]>\n', content)
                     if replace_data:
                         replace_data = replace_data.groups()[0]
 
-                        content = re.sub('\n<(?:real )?h([1-6])>(?P<out>(?:(?!<h).)+) <\/(?:real )?h[1-6]>\n', '\n' + ('=' * int(replace_data)) + ' \g<out> ' + ('=' * int(replace_data)) + '\n', content, 1)
+                        content = re.sub('\n<(?:real )?h([1-6])>(?P<out>(?:(?!<h).)+) ?<\/(?:real )?h[1-6]>\n', '\n' + ('=' * int(replace_data)) + ' \g<out> ' + ('=' * int(replace_data)) + '\n', content, 1)
                     else:
                         break
 
@@ -1580,11 +1581,13 @@ def preview(name = None):
     else:
         action = ''
 
-        # https://stackoverflow.com/questions/11076975/insert-text-into-textarea-at-cursor-position-javascript
-        js = '<script>function insertAtCursor(myField, myValue) { if (document.selection) { document.getElementById(myField).focus(); sel = document.selection.createRange(); sel.text = myValue; } else if (document.getElementById(myField).selectionStart || document.getElementById(myField).selectionStart == \'0\') { var startPos = document.getElementById(myField).selectionStart; var endPos = document.getElementById(myField).selectionEnd; document.getElementById(myField).value = document.getElementById(myField).value.substring(0, startPos) + myValue + document.getElementById(myField).value.substring(endPos, document.getElementById(myField).value.length); } else { document.getElementById(myField).value += myValue; }}</script>'
+    # https://stackoverflow.com/questions/11076975/insert-text-into-textarea-at-cursor-position-javascript
+    js = '<script>function insertAtCursor(myField, myValue) { if (document.selection) { document.getElementById(myField).focus(); sel = document.selection.createRange(); sel.text = myValue; } else if (document.getElementById(myField).selectionStart || document.getElementById(myField).selectionStart == \'0\') { var startPos = document.getElementById(myField).selectionStart; var endPos = document.getElementById(myField).selectionEnd; document.getElementById(myField).value = document.getElementById(myField).value.substring(0, startPos) + myValue + document.getElementById(myField).value.substring(endPos, document.getElementById(myField).value.length); } else { document.getElementById(myField).value += myValue; }}</script>'
 
-        js_button = '<a href="javascript:void(0);" onclick="insertAtCursor(\'content\', \'[[]]\');">(링크)</a> <a href="javascript:void(0);" onclick="insertAtCursor(\'content\', \'[macro()]\');">(매크로)</a> <a href="javascript:void(0);" onclick="insertAtCursor(\'content\', \'{{{#! }}}\');">(중괄호)</a>'
+    js_button = '<a href="javascript:void(0);" onclick="insertAtCursor(\'content\', \'[[]]\');">(링크)</a> <a href="javascript:void(0);" onclick="insertAtCursor(\'content\', \'[macro()]\');">(매크로)</a> <a href="javascript:void(0);" onclick="insertAtCursor(\'content\', \'{{{#! }}}\');">(중괄호)</a>'
 
+    print(request.form['otent'])
+    
     return html_minify(render_template(skin_check(conn), 
         imp = [name, wiki_set(conn, 1), custom(conn), other2([' (미리보기)', 0])],
         data = js + '<form method="post" action="/edit/' + url_pas(name) + action + '">' + js_button + '<hr><textarea id="content" rows="25" name="content">' + html.escape(request.form['content']) + '</textarea><textarea style="display: none;" name="otent">' + html.escape(request.form['otent']) + '</textarea><hr><input placeholder="사유" name="send" type="text"><hr>' + captcha_get(conn) + '<button id="save" type="submit">저장</button><button id="preview" type="submit" formaction="/preview/' + url_pas(name) + action + '">미리보기</button></form><hr>' + end_data,
