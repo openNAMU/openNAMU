@@ -362,7 +362,7 @@ def del_inter(name = None):
 @app.route('/plus_inter', methods=['POST', 'GET'])
 def plus_inter():
     if request.method == 'POST':
-        curs.execute('insert into inter (title, link) values (?, ?)', [request.form['title'], request.form['link']])
+        curs.execute('insert into inter (title, link) values (?, ?)', [request.form.get('title', None), request.form.get('link', None)])
         conn.commit()
         
         admin_check(conn, None, 'inter_wiki_plus')
@@ -469,8 +469,8 @@ def edit_set(num = 0):
             ))
     elif num == 2:
         if request.method == 'POST':
-            curs.execute("update other set data = ? where name = ?", [request.form['contract'], 'contract'])
-            curs.execute("update other set data = ? where name = ?", [request.form['no_login_warring'], 'no_login_warring'])
+            curs.execute("update other set data = ? where name = ?", [request.form.get('contract', None), 'contract'])
+            curs.execute("update other set data = ? where name = ?", [request.form.get('no_login_warring', None), 'no_login_warring'])
             conn.commit()
             
             admin_check(conn, None, 'edit_set')
@@ -506,9 +506,9 @@ def edit_set(num = 0):
         if request.method == 'POST':
             curs.execute("select name from other where name = 'head'")
             if curs.fetchall():
-                curs.execute("update other set data = ? where name = 'head'", [request.form['content']])
+                curs.execute("update other set data = ? where name = 'head'", [request.form.get('content', None)])
             else:
-                curs.execute("insert into other (name, data) values ('head', ?)", [request.form['content']])
+                curs.execute("insert into other (name, data) values ('head', ?)", [request.form.get('content', None)])
             
             conn.commit()
 
@@ -532,14 +532,14 @@ def edit_set(num = 0):
         if request.method == 'POST':
             curs.execute("select name from other where name = 'robot'")
             if curs.fetchall():
-                curs.execute("update other set data = ? where name = 'robot'", [request.form['content']])
+                curs.execute("update other set data = ? where name = 'robot'", [request.form.get('content', None)])
             else:
-                curs.execute("insert into other (name, data) values ('robot', ?)", [request.form['content']])
+                curs.execute("insert into other (name, data) values ('robot', ?)", [request.form.get('content', None)])
             
             conn.commit()
             
             fw = open('./robots.txt', 'w')
-            fw.write(re.sub('\r\n', '\n', request.form['content']))
+            fw.write(re.sub('\r\n', '\n', request.form.get('content', None)))
             fw.close()
             
             admin_check(conn, None, 'edit_set')
@@ -567,8 +567,8 @@ def edit_set(num = 0):
             ))
     elif num == 5:
         if request.method == 'POST':
-            curs.execute("update other set data = ? where name = 'recaptcha'", [request.form['recaptcha']])
-            curs.execute("update other set data = ? where name = 'sec_re'", [request.form['sec_re']])
+            curs.execute("update other set data = ? where name = 'recaptcha'", [request.form.get('recaptcha', None)])
+            curs.execute("update other set data = ? where name = 'sec_re'", [request.form.get('sec_re', None)])
             conn.commit()
             
             admin_check(conn, None, 'edit_set')
@@ -1159,16 +1159,16 @@ def block_log(name = None, tool = None, tool2 = None):
             
 @app.route('/search', methods=['POST'])
 def search():
-    return redirect('/search/' + url_pas(request.form['search']))
+    return redirect('/search/' + url_pas(request.form.get('search', None)))
 
 @app.route('/goto', methods=['POST'])
 def goto():
-    curs.execute("select title from data where title = ?", [request.form['search']])
+    curs.execute("select title from data where title = ?", [request.form.get('search', None)])
     data = curs.fetchall()
     if data:
-        return redirect('/w/' + url_pas(request.form['search']))
+        return redirect('/w/' + url_pas(request.form.get('search', None)))
     else:
-        return redirect('/search/' + url_pas(request.form['search']))
+        return redirect('/search/' + url_pas(request.form.get('search', None)))
 
 @app.route('/search/<path:name>')
 def deep_search(name = None):
@@ -1293,7 +1293,7 @@ def revert(name = None):
                 leng = '+' + str(len(data[0][0]))
                 curs.execute("insert into data (title, data) values (?, ?)", [name, data[0][0]])
                 
-            history_plus(conn, name, data[0][0], get_time(), ip_check(), request.form['send'] + ' (' + str(num) + lang_data['version'] + ')', leng)
+            history_plus(conn, name, data[0][0], get_time(), ip_check(), request.form.get('send', None) + ' (' + str(num) + lang_data['version'] + ')', leng)
             namumark(conn, name, data[0][0], 1)
             
             conn.commit()
@@ -1318,7 +1318,7 @@ def big_delete():
     if request.method == 'POST':
         today = get_time()
         ip = ip_check()
-        data = request.form['content'] + '\r\n'
+        data = request.form.get('content', None) + '\r\n'
         
         match = re.findall('(.*)\r\n', data)
         for list_one in match:
@@ -1330,7 +1330,7 @@ def big_delete():
                 
                 leng = '-' + str(len(data_old[0][0]))
                 
-                history_plus(conn, list_one, '', today, ip, request.form['send'] + ' (대량 삭제)', leng)
+                history_plus(conn, list_one, '', today, ip, request.form.get('send', None) + ' (대량 삭제)', leng)
 
             data = re.sub('(.*)\r\n', '', data, 1)
         
@@ -1432,7 +1432,7 @@ def edit(name = None):
             curs.execute("select regex, sub from filter")
             for data_list in curs.fetchall():
                 match = re.compile(data_list[0])
-                if match.search(request.form['content']):
+                if match.search(request.form.get('content', None)):
                     if data_list[1] == 'X':
                         ban_insert(conn, ip, '', '편집 필터에 의한 차단', None, '도구:편집 필터')
                     
@@ -1443,19 +1443,19 @@ def edit(name = None):
         else:
             captcha_post('', conn, 0)
 
-        if len(request.form['send']) > 500:
+        if len(request.form.get('send', None)) > 500:
             return re_error(conn, '/error/15')
 
-        if request.form['otent'] == request.form['content']:
+        if request.form.get('otent', None) == request.form.get('content', None):
             return re_error(conn, '/error/18')
 
         today = get_time()
-        content = savemark(request.form['content'])
+        content = savemark(request.form.get('content', None))
         
         curs.execute("select data from data where title = ?", [name])
         old = curs.fetchall()
         if old:
-            leng = leng_check(len(request.form['otent']), len(content))
+            leng = leng_check(len(request.form.get('otent', None)), len(content))
             
             if request.args.get('section', None):
                 i = 1
@@ -1475,7 +1475,7 @@ def edit(name = None):
                     else:
                         break
 
-                new_data = re.sub('\r\n', '\n', '\r\n' + request.form['otent'] + '\r\n')
+                new_data = re.sub('\r\n', '\n', '\r\n' + request.form.get('otent', None) + '\r\n')
                 while 1:
                     replace_data = re.search('\n(={1,6}) ?((?:(?!=).)+) ?={1,6}\n', new_data)
                     if replace_data:
@@ -1509,7 +1509,7 @@ def edit(name = None):
         for user_data in curs.fetchall():
             curs.execute("insert into alarm (name, data, date) values (?, ?, ?)", [ip, ip + '님이 <a href="/w/' + url_pas(name) + '">' + name + '</a> 문서를 편집 했습니다.', today])
 
-        history_plus(conn, name, content, today, ip, send_parser(request.form['send']), leng)
+        history_plus(conn, name, content, today, ip, send_parser(request.form.get('send', None)), leng)
         
         curs.execute("delete from back where link = ?", [name])
         curs.execute("delete from back where title = ? and type = 'no'", [name])
@@ -1562,7 +1562,7 @@ def edit(name = None):
         
 @app.route('/edit_get/<path:name>', methods=['POST'])
 def edit_get(name = None):
-    return redirect('/edit/' + url_pas(name) + '?froms=' + url_pas(request.form['name']))
+    return redirect('/edit/' + url_pas(name) + '?froms=' + url_pas(request.form.get('name', None)))
 
 @app.route('/preview/<path:name>', methods=['POST'])
 def preview(name = None):
@@ -1570,7 +1570,7 @@ def preview(name = None):
     if acl_check(conn, name) == 1:
         return re_error(conn, '/ban')
          
-    new_data = re.sub('\r\n#(?:redirect|넘겨주기) (?P<in>(?:(?!\r\n).)+)\r\n', ' * [[\g<in>]] 문서로 넘겨주기', '\r\n' + request.form['content'] + '\r\n')
+    new_data = re.sub('\r\n#(?:redirect|넘겨주기) (?P<in>(?:(?!\r\n).)+)\r\n', ' * [[\g<in>]] 문서로 넘겨주기', '\r\n' + request.form.get('content', None) + '\r\n')
     new_data = re.sub('^\r\n', '', new_data)
     new_data = re.sub('\r\n$', '', new_data)
     
@@ -1586,11 +1586,11 @@ def preview(name = None):
 
     js_button = '<a href="javascript:void(0);" onclick="insertAtCursor(\'content\', \'[[]]\');">(링크)</a> <a href="javascript:void(0);" onclick="insertAtCursor(\'content\', \'[macro()]\');">(매크로)</a> <a href="javascript:void(0);" onclick="insertAtCursor(\'content\', \'{{{#! }}}\');">(중괄호)</a>'
 
-    print(request.form['otent'])
+    print(request.form.get('otent', None))
     
     return html_minify(render_template(skin_check(conn), 
         imp = [name, wiki_set(conn, 1), custom(conn), other2([' (미리보기)', 0])],
-        data = js + '<form method="post" action="/edit/' + url_pas(name) + action + '">' + js_button + '<hr><textarea id="content" rows="25" name="content">' + html.escape(request.form['content']) + '</textarea><textarea style="display: none;" name="otent">' + html.escape(request.form['otent']) + '</textarea><hr><input placeholder="사유" name="send" type="text"><hr>' + captcha_get(conn) + '<button id="save" type="submit">저장</button><button id="preview" type="submit" formaction="/preview/' + url_pas(name) + action + '">미리보기</button></form><hr>' + end_data,
+        data = js + '<form method="post" action="/edit/' + url_pas(name) + action + '">' + js_button + '<hr><textarea id="content" rows="25" name="content">' + html.escape(request.form.get('content', None)) + '</textarea><textarea style="display: none;" name="otent">' + html.escape(request.form.get('otent', None)) + '</textarea><hr><input placeholder="사유" name="send" type="text"><hr>' + captcha_get(conn) + '<button id="save" type="submit">저장</button><button id="preview" type="submit" formaction="/preview/' + url_pas(name) + action + '">미리보기</button></form><hr>' + end_data,
         menu = [['w/' + url_pas(name), lang_data['document']]]
     ))
         
@@ -1612,7 +1612,7 @@ def delete(name = None):
             today = get_time()
             leng = '-' + str(len(data[0][0]))
             
-            history_plus(conn, name, '', today, ip, request.form['send'] + ' (삭제)', leng)
+            history_plus(conn, name, '', today, ip, request.form.get('send', None) + ' (삭제)', leng)
             
             curs.execute("select title, link from back where title = ? and not type = 'cat' and not type = 'no'", [name])
             for data in curs.fetchall():
@@ -1668,30 +1668,30 @@ def move(name = None):
         else:
             captcha_post('', conn, 0)
 
-        curs.execute("select title from history where title = ?", [request.form['title']])
+        curs.execute("select title from history where title = ?", [request.form.get('title', None)])
         if curs.fetchall():
             return re_error(conn, '/error/19')
         
         curs.execute("select data from data where title = ?", [name])
         data = curs.fetchall()
         if data:            
-            curs.execute("update data set title = ? where title = ?", [request.form['title'], name])
-            curs.execute("update back set link = ? where link = ?", [request.form['title'], name])
+            curs.execute("update data set title = ? where title = ?", [request.form.get('title', None), name])
+            curs.execute("update back set link = ? where link = ?", [request.form.get('title', None), name])
             
             data_in = data[0][0]
         else:
             data_in = ''
             
-        history_plus(conn, name, data_in, get_time(), ip_check(), request.form['send'] + ' (<a href="/w/' + url_pas(name) + '">' + name + '</a> - <a href="/w/' + url_pas(request.form['title']) + '">' + request.form['title'] + '</a> ' + lang_data['move'] + ')', '0')
+        history_plus(conn, name, data_in, get_time(), ip_check(), request.form.get('send', None) + ' (<a href="/w/' + url_pas(name) + '">' + name + '</a> - <a href="/w/' + url_pas(request.form.get('title', None)) + '">' + request.form.get('title', None) + '</a> ' + lang_data['move'] + ')', '0')
         
         curs.execute("select title, link from back where title = ? and not type = 'cat' and not type = 'no'", [name])
         for data in curs.fetchall():
             curs.execute("insert into back (title, link, type) values (?, ?, 'no')", [data[0], data[1]])
             
-        curs.execute("update history set title = ? where title = ?", [request.form['title'], name])
+        curs.execute("update history set title = ? where title = ?", [request.form.get('title', None), name])
         conn.commit()
 
-        return redirect('/w/' + url_pas(request.form['title']))
+        return redirect('/w/' + url_pas(request.form.get('title', None)))
     else:            
         return html_minify(render_template(skin_check(conn), 
             imp = [name, wiki_set(conn, 1), custom(conn), other2([' (' + lang_data['move'] + ')', 0])],
@@ -1720,7 +1720,7 @@ def manager(num = 1):
         ))
     elif num in range(2, 14):
         if request.method == 'POST':
-            return redirect('/' + title_list[(num - 2)][2] + '/' + url_pas(request.form['name']))
+            return redirect('/' + title_list[(num - 2)][2] + '/' + url_pas(request.form.get('name', None)))
         else:
             if title_list[(num - 2)][1] == 0:
                 placeholder = '사용자명'
@@ -1964,7 +1964,7 @@ def topic(name = None, sub = None):
         if match:
             curs.execute('insert into alarm (name, data, date) values (?, ?, ?)', [match.groups()[0], ip + '님이 <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '">사용자 토론</a>을 시작했습니다.', today])
         
-        data = re.sub("\[\[(분류:(?:(?:(?!\]\]).)*))\]\]", "[br]", request.form['content'])
+        data = re.sub("\[\[(분류:(?:(?:(?!\]\]).)*))\]\]", "[br]", request.form.get('content', None))
         for rd_data in re.findall("(?:#([0-9]+))", data):
             curs.execute("select ip from topic where title = ? and sub = ? and id = ?", [name, sub, rd_data])
             ip_data = curs.fetchall()
@@ -2106,7 +2106,7 @@ def close_topic_list(name = None, tool = None):
         t_num = ''
         
         while 1:
-            curs.execute("select title from topic where title = ? and sub = ? limit 1", [name, request.form['topic'] + t_num])
+            curs.execute("select title from topic where title = ? and sub = ? limit 1", [name, request.form.get('topic', None) + t_num])
             if curs.fetchall():
                 if t_num == '':
                     t_num = ' 2'
@@ -2115,7 +2115,7 @@ def close_topic_list(name = None, tool = None):
             else:
                 break
 
-        return redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(request.form['topic'] + t_num))
+        return redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(request.form.get('topic', None) + t_num))
     else:
         plus = ''
         menu = [['topic/' + url_pas(name), lang_data['list']]]
@@ -2182,25 +2182,25 @@ def login():
         else:
             captcha_post('', conn, 0)
 
-        curs.execute("select pw from user where id = ?", [request.form['id']])
+        curs.execute("select pw from user where id = ?", [request.form.get('id', None)])
         user = curs.fetchall()
         if not user:
             return re_error(conn, '/error/5')
 
-        if not bcrypt.checkpw(bytes(request.form['pw'], 'utf-8'), bytes(user[0][0], 'utf-8')):
+        if not bcrypt.checkpw(bytes(request.form.get('pw', None), 'utf-8'), bytes(user[0][0], 'utf-8')):
             return re_error(conn, '/error/10')
 
         session['Now'] = 1
-        session['DREAMER'] = request.form['id']
+        session['DREAMER'] = request.form.get('id', None)
         
-        curs.execute("select css from custom where user = ?", [request.form['id']])
+        curs.execute("select css from custom where user = ?", [request.form.get('id', None)])
         css_data = curs.fetchall()
         if css_data:
             session['Daydream'] = css_data[0][0]
         else:
             session['Daydream'] = ''
         
-        curs.execute("insert into ua_d (name, ip, ua, today, sub) values (?, ?, ?, ?, '')", [request.form['id'], ip, agent, get_time()])
+        curs.execute("insert into ua_d (name, ip, ua, today, sub) values (?, ?, ?, ?, '')", [request.form.get('id', None), ip, agent, get_time()])
         conn.commit()
         
         return redirect('/user')  
@@ -2221,7 +2221,7 @@ def change_password():
     
     if request.method == 'POST':    
         if request.form.get('pw', None):
-            if request.form['pw2'] != request.form['pw3']:
+            if request.form.get('pw2', None) != request.form.get('pw3', None):
                 return re_error(conn, '/error/20')
 
             curs.execute("select pw from user where id = ?", [session['DREAMER']])
@@ -2229,10 +2229,10 @@ def change_password():
             if not user:
                 return re_error(conn, '/error/10')
 
-            if not bcrypt.checkpw(bytes(request.form['pw'], 'utf-8'), bytes(user[0][0], 'utf-8')):
+            if not bcrypt.checkpw(bytes(request.form.get('pw', None), 'utf-8'), bytes(user[0][0], 'utf-8')):
                 return re_error(conn, '/error/5')
 
-            hashed = bcrypt.hashpw(bytes(request.form['pw2'], 'utf-8'), bcrypt.gensalt())
+            hashed = bcrypt.hashpw(bytes(request.form.get('pw2', None), 'utf-8'), bcrypt.gensalt())
             
             curs.execute("update user set pw = ? where id = ?", [hashed.decode(), session['DREAMER']])
         
@@ -2334,7 +2334,7 @@ def user_check(name = None):
 @app.route('/plus_check/<name>', methods=['POST', 'GET'])
 def plus_check(name):
     if request.method == 'POST':
-        return redirect('/check/' + url_pas(name) + '?plus=' + url_pas(request.form['name2']))
+        return redirect('/check/' + url_pas(name) + '?plus=' + url_pas(request.form.get('name2', None)))
     else:
         return html_minify(render_template(skin_check(conn),
             imp = ['대상 추가', wiki_set(conn, 1), custom(conn), other2([0, 0])],
@@ -2359,26 +2359,26 @@ def register():
         else:
             captcha_post('', conn, 0)
 
-        if request.form['pw'] != request.form['pw2']:
+        if request.form.get('pw', None) != request.form.get('pw2', None):
             return re_error(conn, '/error/20')
 
-        if re.search('(?:[^A-Za-zㄱ-힣0-9 ])', request.form['id']):
+        if re.search('(?:[^A-Za-zㄱ-힣0-9 ])', request.form.get('id', None)):
             return re_error(conn, '/error/8')
 
-        if len(request.form['id']) > 32:
+        if len(request.form.get('id', None)) > 32:
             return re_error(conn, '/error/7')
 
-        curs.execute("select id from user where id = ?", [request.form['id']])
+        curs.execute("select id from user where id = ?", [request.form.get('id', None)])
         if curs.fetchall():
             return re_error(conn, '/error/6')
 
-        hashed = bcrypt.hashpw(bytes(request.form['pw'], 'utf-8'), bcrypt.gensalt())
+        hashed = bcrypt.hashpw(bytes(request.form.get('pw', None), 'utf-8'), bcrypt.gensalt())
         
         curs.execute("select id from user limit 1")
         if not curs.fetchall():
-            curs.execute("insert into user (id, pw, acl, date, email) values (?, ?, 'owner', ?, ?)", [request.form['id'], hashed.decode(), get_time(), request.form.get('email', '')])
+            curs.execute("insert into user (id, pw, acl, date, email) values (?, ?, 'owner', ?, ?)", [request.form.get('id', None), hashed.decode(), get_time(), request.form.get('email', '')])
         else:
-            curs.execute("insert into user (id, pw, acl, date, email) values (?, ?, 'user', ?, ?)", [request.form['id'], hashed.decode(), get_time(), request.form.get('email', '')])
+            curs.execute("insert into user (id, pw, acl, date, email) values (?, ?, 'user', ?, ?)", [request.form.get('id', None), hashed.decode(), get_time(), request.form.get('email', '')])
         
         conn.commit()
         
@@ -2612,14 +2612,14 @@ def user_admin(name = None):
             return re_error(conn, '/error/3')
 
         if owner != 1:
-            curs.execute('select name from alist where name = ? and acl = "owner"', [request.form['select']])
+            curs.execute('select name from alist where name = ? and acl = "owner"', [request.form.get('select', None)])
             if curs.fetchall():
                 return re_error(conn, '/error/3')
 
-        if request.form['select'] == 'X':
+        if request.form.get('select', None) == 'X':
             curs.execute("update user set acl = 'user' where id = ?", [name])
         else:
-            curs.execute("update user set acl = ? where id = ?", [request.form['select'], name])
+            curs.execute("update user set acl = ? where id = ?", [request.form.get('select', None), name])
         
         conn.commit()
         
@@ -2709,7 +2709,7 @@ def read_view(name = None):
     for data in curs.fetchall():
         curs.execute("select title from stop where title = ? and sub = ? and close = 'O'", [name, data[0]])
         if not curs.fetchall():
-            sub += ' (토론 O)'
+            sub += ' (토론)'
 
             break
                 
@@ -2799,7 +2799,7 @@ def read_view(name = None):
     curs.execute("select dec from acl where title = ?", [name])
     data = curs.fetchall()
     if data:
-        acl += ' (ACL O)'
+        acl += ' (ACL)'
             
     if request.args.get('froms', None):
         else_data = re.sub('\r\n#(?:redirect|넘겨주기) (?P<in>(?:(?!\r\n).)+)\r\n', ' * [[\g<in>]] 문서로 넘겨주기', '\r\n' + else_data + '\r\n')
@@ -2897,7 +2897,7 @@ def user_topic_list(name = None):
 @app.route('/<regex("history"):tool>/<path:name>', methods=['POST', 'GET'])
 def recent_changes(name = None, tool = 'record'):
     if request.method == 'POST':
-        return redirect('/diff/' + url_pas(name) + '?first=' + request.form['b'] + '&second=' + request.form['a'])
+        return redirect('/diff/' + url_pas(name) + '?first=' + request.form.get('b', None) + '&second=' + request.form.get('a', None))
     else:
         one_admin = admin_check(conn, 1, None)
         six_admin = admin_check(conn, 6, None)
@@ -3092,7 +3092,7 @@ def upload():
         else:
             captcha_post('', conn, 0)
 
-        data = request.files['f_data']
+        data = request.files.get('f_data', None)
         if not data:
             return re_error(conn, '/error/9')
 
@@ -3103,8 +3103,8 @@ def upload():
         if not value in ['.jpeg', '.jpg', '.gif', '.png', '.webp', '.JPEG', '.JPG', '.GIF', '.PNG', '.WEBP']:
             return re_error(conn, '/error/14')
     
-        if request.form['f_name']:
-            name = request.form['f_name'] + value
+        if request.form.get('f_name', None):
+            name = request.form.get('f_name', None) + value
         else:
             name = data.filename
         
@@ -3120,8 +3120,8 @@ def upload():
             
         ip = ip_check()
 
-        if request.form['f_lice']:
-            lice = request.form['f_lice']
+        if request.form.get('f_lice', None):
+            lice = request.form.get('f_lice', None)
         else:
             if custom(conn)[2] == 0:
                 lice = ip + ' 올림'
@@ -3259,13 +3259,13 @@ def custom_head_view():
         if custom(conn)[2] != 0:
             curs.execute("select user from custom where user = ?", [ip + ' (head)'])
             if curs.fetchall():
-                curs.execute("update custom set css = ? where user = ?", [request.form['content'], ip + ' (head)'])
+                curs.execute("update custom set css = ? where user = ?", [request.form.get('content', None), ip + ' (head)'])
             else:
-                curs.execute("insert into custom (user, css) values (?, ?)", [ip + ' (head)', request.form['content']])
+                curs.execute("insert into custom (user, css) values (?, ?)", [ip + ' (head)', request.form.get('content', None)])
             
             conn.commit()
 
-        session['MyMaiToNight'] = request.form['content']
+        session['MyMaiToNight'] = request.form.get('content', None)
 
         return redirect('/user')
     else:
