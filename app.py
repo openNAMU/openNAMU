@@ -17,7 +17,7 @@ import random
 import sys
 
 # 버전 표기
-r_ver = 'v3.0.3-Beta-03'
+r_ver = 'v3.0.3-Beta-04'
 print('Version : ' + r_ver)
 
 # 나머지 불러오기
@@ -1585,8 +1585,6 @@ def preview(name = None):
     js = '<script>function insertAtCursor(myField, myValue) { if (document.selection) { document.getElementById(myField).focus(); sel = document.selection.createRange(); sel.text = myValue; } else if (document.getElementById(myField).selectionStart || document.getElementById(myField).selectionStart == \'0\') { var startPos = document.getElementById(myField).selectionStart; var endPos = document.getElementById(myField).selectionEnd; document.getElementById(myField).value = document.getElementById(myField).value.substring(0, startPos) + myValue + document.getElementById(myField).value.substring(endPos, document.getElementById(myField).value.length); } else { document.getElementById(myField).value += myValue; }}</script>'
 
     js_button = '<a href="javascript:void(0);" onclick="insertAtCursor(\'content\', \'[[]]\');">(링크)</a> <a href="javascript:void(0);" onclick="insertAtCursor(\'content\', \'[macro()]\');">(매크로)</a> <a href="javascript:void(0);" onclick="insertAtCursor(\'content\', \'{{{#! }}}\');">(중괄호)</a>'
-
-    print(request.form.get('otent', None))
     
     return html_minify(render_template(skin_check(conn), 
         imp = [name, wiki_set(conn, 1), custom(conn), other2([' (미리보기)', 0])],

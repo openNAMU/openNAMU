@@ -4,7 +4,6 @@ from urllib import parse
 import time
 import datetime
 import re
-import json
 import hashlib
 
 def get_time():
