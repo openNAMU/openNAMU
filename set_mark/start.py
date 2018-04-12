@@ -113,6 +113,56 @@ def table_parser(data, cel_data, start_data, num = 0):
 
     return [all_table, row_style, cel_style, row, cel, table_class, num]
     
+def table_start(data):
+    while 1:
+        table = re.search('\n((?:(?:(?:(?:\|\|)+(?:(?:(?!\|\|).(?:\n)*)*))+)\|\|(?:\n)?)+)', data)
+        if table:
+            table = table.groups()[0]
+            
+            # return [all_table, row_style, cel_style, row, cel, table_class, num]
+            while 1:
+                all_table = re.search('^((?:\|\|)+)((?:&lt;(?:(?:(?!&gt;).)+)&gt;)*)\n*((?:(?!\|\|).\n*)*)', table)
+                if all_table:
+                    all_table = all_table.groups()
+                    
+                    return_table = table_parser(all_table[1], all_table[2], all_table[0])
+                    
+                    number = return_table[6]
+                    
+                    table = re.sub('^((?:\|\|)+)((?:&lt;(?:(?:(?!&gt;).)+)&gt;)*)\n*', '\n<table ' + return_table[5] + ' ' + return_table[0] + '><tbody><tr ' + return_table[1] + '><td ' + return_table[2] + ' ' + return_table[3] + ' ' + return_table[4] + '>', table, 1)
+                else:
+                    break
+                    
+            table = re.sub('\|\|\n?$', '</td></tr></tbody></table>', table)
+
+            while 1:
+                row_table = re.search('\|\|\n((?:\|\|)+)((?:&lt;(?:(?:(?!&gt;).)+)&gt;)*)\n*((?:(?!\|\||<\/td>).\n*)*)', table)
+                if row_table:
+                    row_table = row_table.groups()
+                    
+                    return_table = table_parser(row_table[1], row_table[2], row_table[0], number)
+                    
+                    table = re.sub('\|\|\n((?:\|\|)+)((?:&lt;(?:(?:(?!&gt;).)+)&gt;)*)\n*', '</td></tr><tr ' + return_table[1] + '><td ' + return_table[2] + ' ' + return_table[3] + ' ' + return_table[4] + '>', table, 1)
+                else:
+                    break
+
+            while 1:
+                cel_table = re.search('((?:\|\|)+)((?:&lt;(?:(?:(?!&gt;).)+)&gt;)*)\n*((?:(?:(?!\|\||<\/td>).)|\n)*\n*)', table)
+                if cel_table:
+                    cel_table = cel_table.groups()
+                    
+                    return_table = table_parser(cel_table[1], re.sub('\n', ' ', cel_table[2]), cel_table[0], number)
+                    
+                    table = re.sub('((?:\|\|)+)((?:&lt;(?:(?:(?!&gt;).)+)&gt;)*)\n*', '</td><td ' + return_table[2] + ' ' + return_table[3] + ' ' + return_table[4] + '>', table, 1)
+                else:
+                    break
+
+            data = re.sub('\n((?:(?:(?:(?:\|\|)+(?:(?:(?!\|\|).(?:\n)*)*))+)\|\|(?:\n)?)+)', table, data, 1)
+        else:
+            break
+            
+    return data
+    
 def link_fix(main_link):
     if re.search('^:', main_link):
         main_link = re.sub('^:', '', main_link)
@@ -134,26 +184,11 @@ def start(conn, data, title):
     # 초기 설정
     data = '\n' + data + '\n'
     backlink = []
-    plus_data = ''
+    plus_data = '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"><script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script><script>hljs.initHighlightingOnLoad(); function folding(num, test = 0) { var fol = document.getElementById(\'folding_\' + num); if(fol.style.display == \'inline-block\' || fol.style.display == \'block\') { fol.style.display = \'none\'; } else { if(num % 3 == 0 && test != 1) { fol.style.display = \'block\'; } else { fol.style.display = \'inline-block\'; } } }</script>'
     end_data= []
     
     # XSS 이스케이프
     data = html.escape(data)
-    
-    # 한 글자 NoWiki
-    num = 0
-    while 1:
-        one_nowiki = re.search('(?:\\\\){1,2}(.)', data)
-        if one_nowiki:
-            one_nowiki = one_nowiki.groups()
-
-            num += 1
-
-            end_data += [['one_nowiki_' + str(num), one_nowiki[0]]]
-
-            data = re.sub('(?:\\\\){1,2}(.)', '<span id="one_nowiki_' + str(num) + '"></span>', data, 1)
-        else:
-            break
 
     # 포함 문법 처리
     while 1:
@@ -172,6 +207,21 @@ def start(conn, data, title):
             backlink += [[title, include_link, 'include']]
 
             include = re.sub('^((?:(?!,).)+)', '', include)
+            
+            # 틀 NoWiki
+            num = 0
+            while 1:
+                include_one_nowiki = re.search('(?:\\\\){2}(.)', include)
+                if include_one_nowiki:
+                    include_one_nowiki = include_one_nowiki.groups()
+
+                    num += 1
+
+                    end_data += [['include_one_nowiki_' + str(num), include_one_nowiki[0]]]
+
+                    include = re.sub('(?:\\\\){2}(.)', '<span id="include_one_nowiki_' + str(num) + '"></span>', include, 1)
+                else:
+                    break
 
             curs.execute("select data from data where title = ?", [include_data])
             include_data = curs.fetchall()
@@ -206,7 +256,7 @@ def start(conn, data, title):
     # HTML 허용
     src_list = ["www.youtube.com", "serviceapi.nmv.naver.com", "tv.kakao.com", "www.google.com", "serviceapi.rmcnmv.naver.com"]
     html_list = ['div', 'span', 'embed', 'iframe', 'ruby', 'rp', 'rt']
-
+    
     html_data = re.findall('&lt;(\/)?((?:(?!&gt;| ).)+)( (?:(?:(?!&gt;).)+)?)?&gt;', data)
     for in_data in html_data:
         if in_data[0] == '':
@@ -224,8 +274,9 @@ def start(conn, data, title):
                             and_data = re.sub('&#x27;', '\'', re.sub('&quot;', '"', re.sub('src=([^ ]*)', '', in_data[2])))
                     else:
                         and_data = re.sub('&#x27;', '\'', re.sub('&quot;', '"', in_data[2]))
+                        
 
-                    data = re.sub('&lt;' + in_data[1] + in_data[2] + '&gt;', '<' + in_data[1] + and_data + '>', data, 1)
+                    data = data.replace('&lt;' + in_data[1] + in_data[2] + '&gt;', '<' + in_data[1] + and_data + '>', 1)
                     data = re.sub('&lt;\/' + in_data[1] + '&gt;', '</' + in_data[1] + '>', data, 1)
 
     position = re.compile('position', re.I)
@@ -242,15 +293,16 @@ def start(conn, data, title):
     middle_stack = 0
     middle_list = []
     middle_number = 0
+    fol_num = 0
     while 1:
         middle_data = re.search('(?:{{{((?:(?! |{{{|}}}).)*) ?|(}}}))', data)
         if middle_data:
             middle_data = middle_data.groups()
-            if middle_data[0]:
+            if not middle_data[1]:
                 if middle_stack > 0:
                     middle_stack += 1
                     
-                    data = re.sub('(?:{{{((?:(?! |{{{|}}}).)*) ?|(}}}))', '&#123;&#123;&#123;' + middle_data[0], data, 1)
+                    data = re.sub('(?:{{{((?:(?! |{{{|}}}).)*)(?P<in> ?)|(}}}))', '&#123;&#123;&#123;' + middle_data[0] + '\g<in>', data, 1)
                 else:
                     if re.search('^(#|@|\+|\-)', middle_data[0]):
                         middle_search = re.search('^(#(?:[0-9a-f-A-F]{3}){1,2})', middle_data[0])
@@ -291,22 +343,19 @@ def start(conn, data, title):
                                         else:
                                             middle_search = re.search('^#!wiki', middle_data[0])
                                             if middle_search:
-                                                middle_data_2 = re.search('{{{#!wiki style=(?:&quot;|&#x27;)((?:(?!&quot;|&#x27;).)*)(?:&quot;|&#x27;)\n', data)
+                                                middle_data_2 = re.search('{{{#!wiki(?: style=(?:&quot;|&#x27;)((?:(?!&quot;|&#x27;).)*)(?:&quot;|&#x27;))?\n', data)
                                                 middle_data_2 = middle_data_2.groups()
 
                                                 middle_list += ['div']
                                                 
-                                                data = re.sub('{{{#!wiki style=(?:&quot;|&#x27;)((?:(?!&quot;|&#x27;).)*)(?:&quot;|&#x27;)\n', '<div style="' + middle_data_2[0] + '">', data, 1)
+                                                data = re.sub('{{{#!wiki(?: style=(?:&quot;|&#x27;)((?:(?!&quot;|&#x27;).)*)(?:&quot;|&#x27;))?\n', '<div id="wiki_div" style="' + str(middle_data_2[0]) + '">', data, 1)
                                             else:
                                                 middle_search = re.search('^#!syntax', middle_data[0])
-                                                if middle_search:
-                                                    if plus_data == '':
-                                                        plus_data = '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"><script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script><script>hljs.initHighlightingOnLoad();</script>'
-                                                
+                                                if middle_search:                                                
                                                     middle_data_2 = re.search('{{{#!syntax ((?:(?!\n).)+)\n', data)
                                                     middle_data_2 = middle_data_2.groups()
 
-                                                    middle_list += ['code', 'pre']
+                                                    middle_list += ['pre']
                                                     middle_number += 1
                                                     
                                                     data = re.sub('{{{#!syntax ((?:(?!\n).)+)\n', '<pre id="syntax"><code class="' + middle_data_2[0] + '">', data, 1)
@@ -319,9 +368,14 @@ def start(conn, data, title):
                                                     else:
                                                         middle_search = re.search('^#!folding', middle_data[0])
                                                         if middle_search:
-                                                            middle_list += ['span']
+                                                            middle_list += ['2div']
                                                             
-                                                            data = re.sub('(?:{{{((?:(?! |{{{|}}}).)*) ?|(}}}))', '<span>', data, 1)
+                                                            folding_data = re.search('{{{#!folding ?((?:(?!\n).)*)\n', data)
+                                                            folding_data = folding_data.groups()
+                                                            
+                                                            data = re.sub('{{{#!folding ?((?:(?!\n).)*)\n', "<div>" + str(folding_data[0]) + " <div id='folding_" + str(fol_num + 1) + "' style='display: inline-block;'>[<a href='javascript:void(0);' onclick='folding(" + str(fol_num + 1) + "); folding(" + str(fol_num + 2) + "); folding(" + str(fol_num) + ");'>펼치기</a>]</div_end><div id='folding_" + str(fol_num + 2) + "' style='display: none; '>[<a href='javascript:void(0);' onclick='folding(" + str(fol_num + 1) + "); folding(" + str(fol_num + 2) + "); folding(" + str(fol_num) + ");'>접기</a>]</div_end><div id='folding_" + str(fol_num) + "' style='display: none;'>\n", data, 1)
+                                                            
+                                                            fol_num += 3
                                                         else:
                                                             middle_list += ['span']
 
@@ -331,38 +385,37 @@ def start(conn, data, title):
                         
                         middle_stack += 1
                         
-                        data = re.sub('(?:{{{((?:(?! |{{{|}}}).)*)|(}}}))', '<code>' + middle_data[0], data, 1)
+                        data = re.sub('(?:{{{((?:(?! |{{{|}}}).)*)|(}}}))', '<code>' + middle_data[0].replace('\\', '\\\\'), data, 1)
                 
                     middle_number += 1
             else:
                 if middle_list == []:
-                    break
-            
-                if middle_stack > 0:
-                    middle_stack -= 1
-
-                if middle_stack > 0:
                     data = re.sub('(?:{{{((?:(?! |{{{|}}}).)*) ?|(}}}))', '&#125;&#125;&#125;', data, 1)
                 else:
-                    if middle_number > 0:
-                        middle_number -= 1
+                    if middle_stack > 0:
+                        middle_stack -= 1
 
-                    if middle_list[middle_number] == 'pre':
-                        data = re.sub('(?:{{{((?:(?! |{{{|}}}).)*) ?|(}}}))', '</code></pre>', data, 1)
-
-                        del(middle_list[middle_number])
-                        middle_number -= 1
+                    if middle_stack > 0:
+                        data = re.sub('(?:{{{((?:(?! |{{{|}}}).)*) ?|(}}}))', '&#125;&#125;&#125;', data, 1)
                     else:
-                        data = re.sub('(?:{{{((?:(?! |{{{|}}}).)*) ?|(}}}))', '</' + middle_list[middle_number] + '>', data, 1)
-                    
-                    del(middle_list[middle_number])
+                        if middle_number > 0:
+                            middle_number -= 1
+
+                        if middle_list[middle_number] == '2div':
+                            data = re.sub('(?:{{{((?:(?! |{{{|}}}).)*) ?|(}}}))', '</div_end></div_end>', data, 1)
+                        elif middle_list[middle_number] == 'pre':
+                            data = re.sub('(?:{{{((?:(?! |{{{|}}}).)*) ?|(}}}))', '</code></pre>', data, 1)
+                        else:
+                            data = re.sub('(?:{{{((?:(?! |{{{|}}}).)*) ?|(}}}))', '</' + middle_list[middle_number] + '>', data, 1)
+                        
+                        del(middle_list[middle_number])
         else:
             break
 
     # NoWiki 처리
     num = 0
     while 1:
-        nowiki_data = re.search('<code>((?:(?:(?!<\/code>).)+\n*)+)<\/code>', data)
+        nowiki_data = re.search('<code>((?:(?:(?!<\/code>).)*\n*)*)<\/code>', data)
         if nowiki_data:
             nowiki_data = nowiki_data.groups()
 
@@ -370,7 +423,7 @@ def start(conn, data, title):
 
             end_data += [['nowiki_' + str(num), nowiki_data[0]]]
 
-            data = re.sub('<code>((?:(?:(?!<\/code>).)+\n*)+)<\/code>', '<span id="nowiki_' + str(num) + '"></span>', data, 1)
+            data = re.sub('<code>((?:(?:(?!<\/code>).)*\n*)*)<\/code>', '<span id="nowiki_' + str(num) + '"></span>', data, 1)
         else:
             break
 
@@ -388,7 +441,23 @@ def start(conn, data, title):
             data = re.sub('<code class="((?:(?!").)+)">((?:(?:(?:(?!<\/code>|<span id="syntax_)).)+\n*)+)<\/code>', '<code class="' + syntax_data[0] + '"><span id="syntax_' + str(num) + '"></span></code>', data, 1)
         else:
             break
+           
+    # 이중 표 처리
+    while 1:
+        wiki_table_data = re.search('<div id="wiki_div" ((?:(?!>).)+)>((?:(?!<div id="wiki_div"|<\/div>).\n*)+)<\/div>', data)
+        if wiki_table_data:
+            wiki_table_data = wiki_table_data.groups()
+            if re.search('\|\|', wiki_table_data[1]):
+                end_parser = re.sub('\n$', '', re.sub('^\n', '', table_start('\n' + wiki_table_data[1] + '\n')))
+            else:
+                end_parser = wiki_table_data[1]
 
+            data = re.sub('<div id="wiki_div" ((?:(?!>).)+)>((?:(?!<div id="wiki_div"|<\/div>).\n*)+)<\/div>', '<div ' + wiki_table_data[0] + '>' + end_parser + '</div_end>', data, 1)
+        else:
+            break
+            
+    data = re.sub('<\/div_end>', '</div>', data)
+    
     # 수식 처리
     first = 0
     while 1:
@@ -403,7 +472,22 @@ def start(conn, data, title):
             
             data = re.sub('&lt;math&gt;((?:(?!&lt;\/math&gt;).)+)&lt;\/math&gt;', '<span id="math_' + str(first) + '"></span>', data, 1)
 
-            plus_data += '<script>katex.render("' + math.replace('\\', '\\\\') +'", document.getElementById("math_' + str(first) + '"));</script>'
+            plus_data += '<script>katex.render("' + math.replace('\\', '\\\\').replace('&lt;', '<').replace('&gt;', '>') +'", document.getElementById("math_' + str(first) + '"));</script>'
+        else:
+            break
+            
+    # 한 글자 NoWiki
+    num = 0
+    while 1:
+        one_nowiki = re.search('(?:\\\\)(.)', data)
+        if one_nowiki:
+            one_nowiki = one_nowiki.groups()
+
+            num += 1
+
+            end_data += [['one_nowiki_' + str(num), one_nowiki[0]]]
+
+            data = re.sub('(?:\\\\)(.)', '<span id="one_nowiki_' + str(num) + '"></span>', data, 1)
         else:
             break
 
@@ -438,7 +522,7 @@ def start(conn, data, title):
             data = re.sub('\n(?P<in>={1,6}) ?(?P<out>(?:(?!=).)+) ?={1,6}\n', '\n[목차]\n\g<in> \g<out> \g<in>\n', data, 1)
     else:
         data = re.sub('\[목차\(없음\)\]\n', '', data)
-
+        
     # 문단 문법
     toc_full = 0
     toc_top_stack = 6
@@ -446,7 +530,7 @@ def start(conn, data, title):
     edit_number = 0
     toc_data = '<div id="toc"><span style="font-size: 18px;">목차</span>\n\n'
     while 1:
-        toc = re.search('\n(={1,6}) ?((?:(?!=).)+) ?={1,6}\n', data)
+        toc = re.search('\n(={1,6}) ?((?:(?!\n).)+) ?\n', data)
         if toc:
             toc = toc.groups()
             
@@ -472,9 +556,9 @@ def start(conn, data, title):
 
             all_stack = re.sub('0.', '', all_stack)
             
-            data = re.sub('\n(={1,6}) ?((?:(?!=).)+) ?={1,6}\n', '\n<h' + toc_number + ' id="s-' + re.sub('\.$', '', all_stack) + '"><a href="#toc">' + all_stack + '</a> ' + toc[1] + ' <span style="font-size: 12px"><a href="/edit/' + tool.url_pas(title) + '?section=' + str(edit_number) + '">(편집)</a></span></h' + toc_number + '>\n', data, 1)
+            data = re.sub('\n(={1,6}) ?((?:(?!\n).)+) ?\n', '\n<h' + toc_number + ' id="s-' + re.sub('\.$', '', all_stack) + '"><a href="#toc">' + all_stack + '</a> ' + re.sub('=*$', '', toc[1]) + ' <span style="font-size: 12px"><a href="/edit/' + tool.url_pas(title) + '?section=' + str(edit_number) + '">(편집)</a></span></h' + toc_number + '>\n', data, 1)
             
-            toc_data += '<span style="margin-left: ' + str((toc_full - toc_top_stack) * 10) + 'px;"><a href="#s-' + re.sub('\.$', '', all_stack) + '">' + all_stack + '</a> ' + re.sub('\[\*((?:(?! |\]).)*)(?: ((?:(?!\]).)+))?\]', '', toc[1]) + '</span>\n'
+            toc_data += '<span style="margin-left: ' + str((toc_full - toc_top_stack) * 10) + 'px;"><a href="#s-' + re.sub('\.$', '', all_stack) + '">' + all_stack + '</a> ' + re.sub('\[\*((?:(?! |\]).)*)(?: ((?:(?!\]).)+))?\]', '', re.sub('=*$', '', toc[1])) + '</span>\n'
         else:
             break
 
@@ -623,52 +707,7 @@ def start(conn, data, title):
             break
 
     # 표 처리
-    while 1:
-        table = re.search('\n((?:(?:(?:(?:\|\|)+(?:(?:(?!\|\|).(?:\n)*)*))+)\|\|(?:\n)?)+)', data)
-        if table:
-            table = table.groups()[0]
-            
-            # return [all_table, row_style, cel_style, row, cel, table_class, num]
-            while 1:
-                all_table = re.search('^((?:\|\|)+)((?:&lt;(?:(?:(?!&gt;).)+)&gt;)*)\n*((?:(?!\|\||<\/td>).)*\n*)', table)
-                if all_table:
-                    all_table = all_table.groups()
-                    
-                    return_table = table_parser(all_table[1], all_table[2], all_table[0])
-                    
-                    number = return_table[6]
-                    
-                    table = re.sub('^((?:\|\|)+)((?:&lt;(?:(?:(?!&gt;).)+)&gt;)*)\n*', '\n<table ' + return_table[5] + ' ' + return_table[0] + '><tbody><tr ' + return_table[1] + '><td ' + return_table[2] + ' ' + return_table[3] + ' ' + return_table[4] + '>\n', table, 1)
-                else:
-                    break
-
-            table = re.sub('\|\|\n$', '</td></tr></tbody></table>', table)
-
-            while 1:
-                row_table = re.search('\|\|\n((?:\|\|)+)((?:&lt;(?:(?:(?!&gt;).)+)&gt;)*)\n*((?:(?!\|\||<\/td>).)*\n*)', table)
-                if row_table:
-                    row_table = row_table.groups()
-                    
-                    return_table = table_parser(row_table[1], row_table[2], row_table[0], number)
-                    
-                    table = re.sub('\|\|\n((?:\|\|)+)((?:&lt;(?:(?:(?!&gt;).)+)&gt;)*)\n*', '</td></tr><tr ' + return_table[1] + '><td ' + return_table[2] + ' ' + return_table[3] + ' ' + return_table[4] + '>', table, 1)
-                else:
-                    break
-
-            while 1:
-                cel_table = re.search('((?:\|\|)+)((?:&lt;(?:(?:(?!&gt;).)+)&gt;)*)\n*((?:(?:(?!\|\||<\/td>).)|\n)*\n*)', table)
-                if cel_table:
-                    cel_table = cel_table.groups()
-                    
-                    return_table = table_parser(cel_table[1], re.sub('\n', ' ', cel_table[2]), cel_table[0], number)
-                    
-                    table = re.sub('((?:\|\|)+)((?:&lt;(?:(?:(?!&gt;).)+)&gt;)*)\n*', '</td><td ' + return_table[2] + ' ' + return_table[3] + ' ' + return_table[4] + '>', table, 1)
-                else:
-                    break
-
-            data = re.sub('\n((?:(?:(?:(?:\|\|)+(?:(?:(?!\|\|).(?:\n)*)*))+)\|\|(?:\n)?)+)', table, data, 1)
-        else:
-            break
+    data = table_start(data)
 
     # 하위 문서
     while 1:
@@ -810,27 +849,33 @@ def start(conn, data, title):
                 return_link = link_fix(main_link)
                 main_link = return_link[0]
                 other_link = return_link[1]
-                  
-                if main_link != title:
-                    if main_link != '':
-                        curs.execute("select title from data where title = ?", [main_link])
-                        if not curs.fetchall():
-                            link_id = 'id="not_thing"'
+                
+                if not re.search('^\|', main_link):
+                    if main_link != title:
+                        if main_link != '':
+                            curs.execute("select title from data where title = ?", [main_link])
+                            if not curs.fetchall():
+                                link_id = 'id="not_thing"'
 
-                            backlink += [[title, main_link, 'no']]
-                        else:
-                            link_id = ''
-                    
-                        backlink += [[title, main_link, '']]
+                                backlink += [[title, main_link, 'no']]
+                            else:
+                                link_id = ''
                         
-                        data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<a ' + link_id + ' href="/w/' + tool.url_pas(main_link) + other_link + '">' + see_link + '</a>', data, 1)
+                            backlink += [[title, main_link, '']]
+                            
+                            data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<a ' + link_id + ' href="/w/' + tool.url_pas(main_link) + other_link + '">' + see_link + '</a>', data, 1)
+                        else:
+                            data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<a href="' + other_link + '">' + see_link + '</a>', data, 1)
                     else:
-                        data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<a href="' + other_link + '">' + see_link + '</a>', data, 1)
+                        data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<b>' + see_link + '</b>', data, 1)
                 else:
-                    data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<b>' + see_link + '</b>', data, 1)
+                    data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '&#91;&#91;' + link + '&#93;&#93;', data, 1)
         else:
             break
 
+    # br 처리
+    data = re.sub("\[br\]", '<br>', data)
+            
     # 각주 처리
     footnote_number = 0
     footnote_all = '\n<hr><ul id="footnote_data">'
@@ -896,7 +941,6 @@ def start(conn, data, title):
     data = re.sub('(?P<in><td(((?!>).)*)>)\n', '\g<in>', data)
     data = re.sub('(\n)?<hr>(\n)?', '<hr>', data)
     data = re.sub('<\/ul>\n\n<ul>', '</ul>\n<ul>', data)
-    data = re.sub("\[br\]", '\n', data)
     data = re.sub('\n', '<br>', data)
 
     return [data, plus_data, backlink]
