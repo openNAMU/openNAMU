@@ -147,6 +147,7 @@
  * 사용자 스킨 기능
  * 차단 관련 조정
  * 스킨 JinJa로 변경
+ * 파서 완성
 
 
 ## 자세한 내용
@@ -154,12 +155,15 @@
 
 ----
 ## 오픈나무 라이선스
- * BSD 3-Clause License
+ * [BSD 3-Clause License](https://github.com/2DU/openNAMU/blob/master/license.md)
 
 ## 외부 파일 라이선스
  * 인용문 아이콘 [Dave Gandy](http://www.flaticon.com/free-icon/quote-left_25672) CC 3.0 BY
  * 구문 강조 [highlightjs](https://highlightjs.org/)
  * 수식 [MathJax](https://www.mathjax.org/)
+ 
+## 기여자들
+ * [참조](https://github.com/2DU/openNAMU/graphs/contributors)
 
 ## 도움 준 사람들
  * [Team Croatia](https://github.com/TeamCroatia)
@@ -169,7 +173,7 @@
 
 ----
 ## 기타
- * 현재 버전 : v3.0.2
+ * 현재 버전 : v3.0.3
 
 ----
 ## 개발 이념
