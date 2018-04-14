@@ -17,7 +17,7 @@ import random
 import sys
 
 # 버전 표기
-r_ver = 'v3.0.3-Beta-05'
+r_ver = 'v3.0.3-Beta-06'
 print('Version : ' + r_ver)
 
 # 나머지 불러오기
