@@ -1,10 +1,6 @@
 {
     "edit" : "편집",
     "history" : "역사",
-    "delete" : "삭제",
-    "bulk_delete" : "대량 삭제",
-    "example" : "예시",
-    "edit_filter" : "편집 필터",
     "move" : "이동",
     "hide" : "숨김",
     "list" : "목록",
@@ -15,17 +11,6 @@
     "ban" : "차단",
     "admin" : "관리자",
     "release" : "해제",
-    "save" : "저장",
-    "other" : "기타",
-    "tool" : "도구",
-    "plus" : "추가",
-    "user" : "사용자",
-    "alarm" : "알림",
-    "watchlist" : "주시 문서",
-    "my_info" : "내 정보",
-    "recent" : "최근",
-    "recent_changes" : "최근 변경",
-    "discussion" : "토론",
     "user_css_warring" : "비 로그인의 경우에는 사용자 CSS가 로그인하거나 브라우저 닫으면 날아갑니다.",
     "http_warring" : "주의 : 만약 HTTPS 연결이 아닌 경우 데이터가 유출될 가능성이 있습니다. 이에 대해 책임지지 않습니다."
 }
