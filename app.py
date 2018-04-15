@@ -307,12 +307,12 @@ def alarm():
         for data_one in data_list:
             data += '<li>' + data_one[0] + ' (' + data_one[1] + ')</li>'
     else:
-        data += '<li>알림이 없습니다.</li>'
+        data += '<li>' + lang_data['no_alarm'] + '</li>'
     
     data += '</ul>'
 
     return html_minify(render_template(skin_check(conn), 
-        imp = ['알림', wiki_set(conn, 1), custom(conn), other2([0, 0])],
+        imp = ['' + lang_data['alarm'] + '', wiki_set(conn, 1), custom(conn), other2([0, 0])],
         data = data,
         menu = [['user', '사용자']]
     ))
@@ -1340,7 +1340,7 @@ def big_delete():
     else:
         return html_minify(render_template(skin_check(conn), 
             imp = ['많은 문서 삭제', wiki_set(conn, 1), custom(conn), other2([0, 0])],
-            data = '<span>문서명 A<br>문서명 B<br>문서명 C<hr>이런 식으로 적으세요.</span><hr><form method="post"><textarea rows="25" name="content"></textarea><hr><input placeholder="사유" name="send" type="text"><hr><button type="submit">삭제</button></form>',
+            data = '<span>Title A<br>Title B<br>Title C</span><hr><form method="post"><textarea rows="25" name="content"></textarea><hr><input placeholder="사유" name="send" type="text"><hr><button type="submit">삭제</button></form>',
             menu = [['manager', lang_data['admin']]]
         ))
 
@@ -1555,7 +1555,7 @@ def edit(name = None):
         js_button = '<a href="javascript:void(0);" onclick="insertAtCursor(\'content\', \'[[]]\');">(링크)</a> <a href="javascript:void(0);" onclick="insertAtCursor(\'content\', \'[macro()]\');">(매크로)</a> <a href="javascript:void(0);" onclick="insertAtCursor(\'content\', \'{{{#! }}}\');">(중괄호)</a>'
 
         return html_minify(render_template(skin_check(conn), 
-            imp = [name, wiki_set(conn, 1), custom(conn), other2([' (수정)', 0])],
+            imp = [name, wiki_set(conn, 1), custom(conn), other2([' (' + lang_data['edit'] + ')', 0])],
             data = get_name + js + '<form method="post" action="/edit/' + url_pas(name) + action + '">' + js_button + '<hr><textarea id="content" rows="25" name="content">' + html.escape(re.sub('\n$', '', data)) + '</textarea><textarea style="display: none;" name="otent">' + html.escape(re.sub('\n$', '', data_old)) + '</textarea><hr><input placeholder="사유" name="send" type="text"><hr>' + captcha_get(conn) + '' + ip_warring(conn) + '<button id="save" type="submit">저장</button><button id="preview" type="submit" formaction="/preview/' + url_pas(name) + action + '">미리보기</button></form>',
             menu = [['w/' + url_pas(name), lang_data['document']], ['delete/' + url_pas(name), '삭제'], ['move/' + url_pas(name), lang_data['move']]]
         ))
@@ -2268,8 +2268,8 @@ def change_password():
                 div2 += '<option value="' + skin_data + '">' + skin_data + '</option>'
 
         return html_minify(render_template(skin_check(conn),    
-            imp = ['내 정보 수정', wiki_set(conn, 1), custom(conn), other2([0, 0])],
-            data = '<form method="post"><span>닉네임 : ' + ip + '</span><hr><input placeholder="현재 비밀번호" name="pw" type="password"><br><br><input placeholder="변경할 비밀번호" name="pw2" type="password"><br><br><input placeholder="재 확인" name="pw3" type="password"><hr><input placeholder="이메일" name="email" type="text" value="' + email + '"><hr><span>스킨</span><br><br><select name="skin">' + div2 + '</select><hr><button type="submit">변경</button><hr><span>' + lang_data['http_warring'] + '</span></form>',
+            imp = ['' + lang_data['my_info'] + ' ' + lang_data['edit'] + '', wiki_set(conn, 1), custom(conn), other2([0, 0])],
+            data = '<form method="post"><span>닉네임 : ' + ip + '</span><hr><input placeholder="현재 비밀번호" name="pw" type="password"><br><br><input placeholder="변경할 비밀번호" name="pw2" type="password"><br><br><input placeholder="재 확인" name="pw3" type="password"><hr><input placeholder="이메일" name="email" type="text" value="' + email + '"><hr><span>스킨</span><br><br><select name="skin">' + div2 + '</select><hr><button type="submit">' + lang_data['edit'] + '</button><hr><span>' + lang_data['http_warring'] + '</span></form>',
             menu = [['user', '사용자']]
         ))
 
@@ -2584,7 +2584,7 @@ def acl(name = None):
             
         return html_minify(render_template(skin_check(conn), 
             imp = [name, wiki_set(conn, 1), custom(conn), other2([' (ACL)', 0])],
-            data = '<form method="post">' + data + '<hr><button type="submit">ACL 변경</button></form>',
+            data = '<form method="post">' + data + '<hr><button type="submit">ACL ' + lang_data['edit'] + '</button></form>',
             menu = [['w/' + url_pas(name), lang_data['document']], ['manager', lang_data['admin']]]
         ))
             
@@ -2644,7 +2644,7 @@ def user_admin(name = None):
         
         return html_minify(render_template(skin_check(conn), 
             imp = [name, wiki_set(conn, 1), custom(conn), other2([' (권한 관리)', 0])],
-            data =  '<form method="post"><select name="select">' + div + '</select><hr><button type="submit">변경</button></form>',
+            data =  '<form method="post"><select name="select">' + div + '</select><hr><button type="submit">' + lang_data['edit'] + '</button></form>',
             menu = [['manager', lang_data['admin']]]
         ))
     
@@ -2815,7 +2815,7 @@ def read_view(name = None):
         if data_none == 1:
             menu = [['edit/' + url_pas(name), '생성']]
         else:
-            menu = [['edit/' + url_pas(name), '수정']]
+            menu = [['edit/' + url_pas(name), '' + lang_data['edit'] + '']]
 
         menu += [['topic/' + url_pas(name), '토론'], ['history/' + url_pas(name), lang_data['history']], ['xref/' + url_pas(name), '역링크'], ['acl/' + url_pas(name), 'ACL']]
 
@@ -3183,13 +3183,13 @@ def user_info():
     if custom(conn)[2] != 0:
         ip_user = '<a href="/w/사용자:' + ip + '">' + ip + '</a>'
         
-        plus = '<li><a href="/logout">로그아웃</a></li><li><a href="/change">내 정보 변경</a></li>'
+        plus = '<li><a href="/logout">로그아웃</a></li><li><a href="/change">' + lang_data['my_info'] + ' ' + lang_data['edit'] + '</a></li>'
         
         curs.execute('select name from alarm where name = ? limit 1', [ip_check()])
         if curs.fetchall():
-            plus2 = '<li><a href="/alarm">알림 (있음)</a></li>'
+            plus2 = '<li><a href="/alarm">' + lang_data['alarm'] + ' (O)</a></li>'
         else:
-            plus2 = '<li><a href="/alarm">알림</a></li>'
+            plus2 = '<li><a href="/alarm">' + lang_data['alarm'] + '</a></li>'
 
         plus2 += '<li><a href="/watch_list">주시 ' + lang_data['document'] + '</a></li>'
     else:
