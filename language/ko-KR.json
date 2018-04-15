@@ -35,6 +35,8 @@
     "normal" : "일반",
     "subscriber" : "가입자",
     "admin" : "관리자",
+    "owner" : "소유자",
+    "admin_group" : "관리 그룹",
     "user_css_warring" : "비 로그인의 경우에는 사용자 CSS가 로그인하거나 브라우저 닫으면 날아갑니다.",
     "http_warring" : "주의 : 만약 HTTPS 연결이 아닌 경우 데이터가 유출될 가능성이 있습니다. 이에 대해 책임지지 않습니다."
 }
