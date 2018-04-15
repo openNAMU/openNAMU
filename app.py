@@ -1152,7 +1152,7 @@ def block_log(name = None, tool = None, tool2 = None):
         div += next_fix('/' + url_pas(tool) + '/' + url_pas(name) + '?num=', num, data_list)
                 
     return html_minify(render_template(skin_check(conn), 
-        imp = ['최근 ' + lang_data['ban'] + ' ' + lang_data['list'], wiki_set(conn, 1), custom(conn), other2([sub, 0])],
+        imp = ['최근 ' + lang_data['ban'], wiki_set(conn, 1), custom(conn), other2([sub, 0])],
         data = div,
         menu = menu
     ))
