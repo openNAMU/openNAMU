@@ -95,11 +95,11 @@ def table_parser(data, cel_data, start_data, num = 0):
     elif text_left:
         cel_style += 'text-align: left;'
     elif num == 0:
-        if re.search('^ (.*) $', cel_data):
+        if re.search('^ ', cel_data) and re.search(' $', cel_data):
             cel_style += 'text-align: center;'
-        elif re.search('^ (.*)$', cel_data):
+        elif re.search('^ ', cel_data):
             cel_style += 'text-align: right;'
-        elif re.search('^(.*) $', cel_data):
+        elif re.search(' $', cel_data):
             cel_style += 'text-align: left;'
 
     text_class = re.search("&lt;table ?class=((?:(?!&gt;).)+)&gt;", data)
@@ -134,6 +134,8 @@ def table_start(data):
                     break
                     
             table = re.sub('\|\|\n?$', '</td></tr></tbody></table>', table)
+
+            print(table)
 
             while 1:
                 row_table = re.search('\|\|\n((?:\|\|)+)((?:&lt;(?:(?:(?!&gt;).)+)&gt;)*)\n*((?:(?!\|\||<\/td>).\n*)*)', table)
@@ -381,7 +383,7 @@ def start(conn, data, title):
                                                             else:
                                                                 folding_data = ['Test']
                                                             
-                                                            data = re.sub('{{{#!folding ?((?:(?!\n).)*)\n?', "<div>" + str(folding_data[0]) + " <div id='folding_" + str(fol_num + 1) + "' style='display: inline-block;'>[<a href='javascript:void(0);' onclick='folding(" + str(fol_num + 1) + "); folding(" + str(fol_num + 2) + "); folding(" + str(fol_num) + ");'>펼치기</a>]</div_end><div id='folding_" + str(fol_num + 2) + "' style='display: none; '>[<a href='javascript:void(0);' onclick='folding(" + str(fol_num + 1) + "); folding(" + str(fol_num + 2) + "); folding(" + str(fol_num) + ");'>접기</a>]</div_end><div id='folding_" + str(fol_num) + "' style='display: none;'>\n", data, 1)
+                                                            data = re.sub('{{{#!folding ?((?:(?!\n).)*)\n?', "<div>" + str(folding_data[0]) + " <div id='folding_" + str(fol_num + 1) + "' style='display: inline-block;'><a href='javascript:void(0);' onclick='folding(" + str(fol_num + 1) + "); folding(" + str(fol_num + 2) + "); folding(" + str(fol_num) + ");'>[펼치기]</a></div_end><div id='folding_" + str(fol_num + 2) + "' style='display: none; '><a href='javascript:void(0);' onclick='folding(" + str(fol_num + 1) + "); folding(" + str(fol_num + 2) + "); folding(" + str(fol_num) + ");'>[접기]</a></div_end><div id='folding_" + str(fol_num) + "' style='display: none;'>\n", data, 1)
                                                             
                                                             fol_num += 3
                                                         else:
@@ -465,6 +467,7 @@ def start(conn, data, title):
             break
             
     data = re.sub('<\/div_end>', '</div>', data)
+    data = re.sub('<\/td>', '</td_end>', data)
     
     # 수식 처리
     first = 0
@@ -941,6 +944,7 @@ def start(conn, data, title):
         data = data.replace(tool.url_pas('<span id="' + re_data[0] + '"></span>'), tool.url_pas(re_data[1]))
     
     # 마지막 처리
+    data = re.sub('<\/td_end>', '</td>', data)
     data = re.sub('(?P<in><\/h[0-9]>)(\n)+', '\g<in>', data)
     data = re.sub('\n\n<ul>', '\n<ul>', data)
     data = re.sub('<\/ul>\n\n', '</ul>\n', data)
