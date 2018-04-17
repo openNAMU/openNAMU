@@ -135,8 +135,6 @@ def table_start(data):
                     
             table = re.sub('\|\|\n?$', '</td></tr></tbody></table>', table)
 
-            print(table)
-
             while 1:
                 row_table = re.search('\|\|\n((?:\|\|)+)((?:&lt;(?:(?:(?!&gt;).)+)&gt;)*)\n*((?:(?!\|\||<\/td>).\n*)*)', table)
                 if row_table:
@@ -243,7 +241,7 @@ def start(conn, data, title):
                 include_parser = re.sub('\[\[분류:(((?!\]\]|#include).)+)\]\]', '', include_parser)
                 include_parser = html.escape(include_parser)
 
-                data = re.sub('\[include\(((?:(?!\)\]).)+)\)\]', '\n' + include_parser + '\n', data, 1)
+                data = re.sub('\[include\(((?:(?!\)\]).)+)\)\]', '<include>\n<a id="include_link" href="/w/' + tool.url_pas(include_link) + '">[' + include_link + ']</a>\n' + include_parser + '\n</include>', data, 1)
             else:
                 data = re.sub('\[include\(((?:(?!\)\]).)+)\)\]', '<a id="not_thing" href="/w/' + tool.url_pas(include_link) + '">' + include_link + '</a>', data, 1)
         else:
@@ -945,6 +943,9 @@ def start(conn, data, title):
     
     # 마지막 처리
     data = re.sub('<\/td_end>', '</td>', data)
+    data = re.sub('<include>\n', '', data)
+    data = re.sub('\n<\/include>', '', data)
+
     data = re.sub('(?P<in><\/h[0-9]>)(\n)+', '\g<in>', data)
     data = re.sub('\n\n<ul>', '\n<ul>', data)
     data = re.sub('<\/ul>\n\n', '</ul>\n', data)
