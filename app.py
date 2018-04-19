@@ -929,9 +929,6 @@ def update():
 
         ok = os.system('git pull')
         if ok == 0:
-            print('Re Start')
-            print('')
-
             return redirect('/re_start')
     else:
         if platform.system() == 'Windows':
@@ -949,9 +946,6 @@ def update():
                 print('Remove')
                 os.system('rd /s /q openNAMU-stable')
                 os.system('del update.zip')
-
-                print('Re Start')
-                print('')
 
                 return redirect('/re_start')
 
