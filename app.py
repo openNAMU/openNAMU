@@ -20,7 +20,7 @@ import random
 import sys
 
 # 버전 표기
-r_ver = 'v3.0.3'
+r_ver = 'v3.0.4-Beta-01'
 print('Version : ' + r_ver)
 
 # 나머지 불러오기
@@ -934,25 +934,26 @@ def update():
 
             return redirect('/re_start')
     else:
-        print('')
-        print('Download')
-
-        urllib.request.urlretrieve('https://github.com/2DU/openNAMU/archive/stable.zip', 'update.zip')
-
-        print('Zip Extract')
-        zipfile.ZipFile('update.zip').extractall('')
-
-        print('Move')
-        ok = os.system('xcopy /y /r openNAMU-stable .')
-        if ok == 0:
-            print('Remove')
-            os.system('rd /s /y openNAMU-stable')
-            os.system('del update.zip')
-
-            print('Re Start')
+        if platform.system() == 'Windows':
             print('')
+            print('Download')
 
-            return redirect('/re_start')
+            urllib.request.urlretrieve('https://github.com/2DU/openNAMU/archive/stable.zip', 'update.zip')
+
+            print('Zip Extract')
+            zipfile.ZipFile('update.zip').extractall('')
+
+            print('Move')
+            ok = os.system('xcopy /y /r openNAMU-stable .')
+            if ok == 0:
+                print('Remove')
+                os.system('rd /s /q openNAMU-stable')
+                os.system('del update.zip')
+
+                print('Re Start')
+                print('')
+
+                return redirect('/re_start')
 
     return html_minify(render_template(skin_check(conn), 
         imp = ['업데이트', wiki_set(conn, 1), custom(conn), other2([0, 0])],
