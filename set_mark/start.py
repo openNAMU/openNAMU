@@ -254,13 +254,16 @@ def start(conn, data, title):
     data = re.sub('&amp;', '&', data)
 
     # HTML 허용
+    curs.execute('select html from html_filter')
+    html_db = curs.fetchall()
+
     src_list = ["www.youtube.com", "serviceapi.nmv.naver.com", "tv.kakao.com", "www.google.com", "serviceapi.rmcnmv.naver.com"]
     html_list = ['div', 'span', 'embed', 'iframe', 'ruby', 'rp', 'rt']
     
     html_data = re.findall('&lt;(\/)?((?:(?!&gt;| ).)+)( (?:(?:(?!&gt;).)+)?)?&gt;', data)
     for in_data in html_data:
         if in_data[0] == '':
-            if in_data[1] in html_list:
+            if in_data[1] in html_list or in_data[1] in html_db[0]:
                 if re.search('&lt;\/' + in_data[1] + '&gt;', data):
                     src = re.search('src=([^ ]*)', in_data[2])
                     if src:

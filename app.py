@@ -20,7 +20,7 @@ import random
 import sys
 
 # 버전 표기
-r_ver = 'v3.0.4-Beta-01'
+r_ver = 'v3.0.4-Beta-02'
 print('Version : ' + r_ver)
 
 # 나머지 불러오기
@@ -87,6 +87,7 @@ curs.execute("create table if not exists filter(name text, regex text, sub text)
 curs.execute("create table if not exists scan(user text, title text)")
 curs.execute("create table if not exists acl(title text, dec text, dis text, why text)")
 curs.execute("create table if not exists inter(title text, link text)")
+curs.execute("create table if not exists html_filter(html text)")
 
 # owner 존재 확인
 curs.execute("select name from alist where acl = 'owner'")
@@ -320,61 +321,93 @@ def alarm():
         menu = [['user', lang_data['user']]]
     ))
 
-@app.route('/inter_wiki')
-def inter_wiki():
+@app.route('/<regex("inter_wiki|html_filter"):tools>')
+def inter_wiki(tools = None):
     div = ''
     admin = admin_check(conn, None, None)
 
-    curs.execute('select title, link from inter')
+    if tools == 'inter_wiki':
+        del_link = 'del_inter_wiki'
+        plus_link = 'plus_inter_wiki'
+        title = '인터위키 ' + lang_data['list']
+        div = ''
+
+        curs.execute('select title, link from inter')
+    else:
+        del_link = 'del_html_filter'
+        plus_link = 'plus_html_filter'
+        title = 'HTML 필터 ' + lang_data['list']
+        div = '<ul><li>span</li><li>div</li><li>iframe</li></ul>'
+
+        curs.execute('select html from html_filter')
+
     db_data = curs.fetchall()
     if db_data:
-        div = '<ul>'
+        div += '<ul>'
 
         for data in db_data:
-            div += '<li>' + data[0] + ' : ' + data[1]
+            if tools == 'inter_wiki':
+                div += '<li>' + data[0] + ' : <a id="out_link" href="' + data[1] + '">' + data[1] + '</a>'
+            else:
+                div += '<li>' + data[0]
 
             if admin == 1:
-                div += ' <a href="/del_inter/' + url_pas(data[0]) + '">(' + lang_data['delete'] + ')</a>'
+                div += ' <a href="/' + del_link + '/' + url_pas(data[0]) + '">(' + lang_data['delete'] + ')</a>'
 
             div += '</li>'
 
         div += '</ul>'
 
         if admin == 1:
-            div += '<hr><a href="/plus_inter">(' + lang_data['plus'] + ')</a>'
+            div += '<hr><a href="/' + plus_link + '">(' + lang_data['plus'] + ')</a>'
     else:
         if admin == 1:
-            div += '<a href="/plus_inter">(' + lang_data['plus'] + ')</a>'
+            div += '<a href="/' + plus_link + '">(' + lang_data['plus'] + ')</a>'
 
     return html_minify(render_template(skin_check(conn), 
-        imp = ['인터위키 ' + lang_data['list'], wiki_set(conn, 1), custom(conn), other2([0, 0])],
+        imp = [title, wiki_set(conn, 1), custom(conn), other2([0, 0])],
         data = div,
         menu = [['other', '기타']]
     ))
 
-@app.route('/del_inter/<name>')
-def del_inter(name = None):
+@app.route('/<regex("del_(inter_wiki|html_filter)"):tools>/<name>')
+def del_inter(tools = None, name = None):
     if admin_check(conn, None, None) == 1:
-        curs.execute("delete from inter where title = ?", [name])
+        if tools == 'del_inter_wiki':
+            curs.execute("delete from inter where title = ?", [name])
+        else:
+            curs.execute("delete from html_filter where html = ?", [name])
+        
         conn.commit()
 
-        return redirect('/inter_wiki')
+        return redirect('/' + re.sub('^del_', '', tools))
     else:
         return re_error(conn, '/error/3')
 
-@app.route('/plus_inter', methods=['POST', 'GET'])
-def plus_inter():
+@app.route('/<regex("plus_(inter_wiki|html_filter)"):tools>', methods=['POST', 'GET'])
+def plus_inter(tools = None):
     if request.method == 'POST':
-        curs.execute('insert into inter (title, link) values (?, ?)', [request.form.get('title', None), request.form.get('link', None)])
+        if tools == 'plus_inter_wiki':
+            curs.execute('insert into inter (title, link) values (?, ?)', [request.form.get('title', None), request.form.get('link', None)])
+        else:
+            curs.execute('insert into html_filter (html) values (?)', [request.form.get('title', None)])
+        
         conn.commit()
         
         admin_check(conn, None, 'inter_wiki_plus')
     
-        return redirect('/inter_wiki')
+        return redirect('/' + re.sub('^plus_', '', tools))
     else:
+        if tools == 'plus_inter_wiki':
+            title = '인터위키 ' + lang_data['plus']
+            form_data = '<input placeholder="이름" type="text" name="title"><hr><input placeholder="링크" type="text" name="link">'
+        else:
+            title = 'HTML 필터 ' + lang_data['plus']
+            form_data = '<input placeholder="HTML" type="text" name="title">'
+
         return html_minify(render_template(skin_check(conn), 
-            imp = ['인터위키 ' + lang_data['plus'] + '', wiki_set(conn, 1), custom(conn), other2([0, 0])],
-            data = '<form method="post"><input placeholder="이름" type="text" name="title"><hr><input placeholder="링크" type="text" name="link"><hr><button type="submit">' + lang_data['plus'] + '</button></form>',
+            imp = [title, wiki_set(conn, 1), custom(conn), other2([0, 0])],
+            data = '<form method="post">' + form_data + '<hr><button type="submit">' + lang_data['plus'] + '</button></form>',
             menu = [['other', '기타']]
         ))
 
@@ -1719,7 +1752,7 @@ def move(name = None):
 def other():
     return html_minify(render_template(skin_check(conn), 
         imp = ['기타 ' + lang_data['list'], wiki_set(conn, 1), custom(conn), other2([0, 0])],
-        data = '<h2>기록</h2><ul><li><a href="/manager/6">편집 기록</a></li><li><a href="/manager/7">토론 기록</a></li></ul><br><h2>' + lang_data['list'] + '</h2><ul><li><a href="/admin_list">' + lang_data['admin'] + '</a></li><li><a href="/give_log">' + lang_data['admin_group'] + '</a></li><li><a href="/not_close_topic">열린 토론</a></li></ul><br><h2>기타</h2><ul><li><a href="/title_index">' + lang_data['all'] + ' ' + lang_data['document'] + '</a></li><li><a href="/acl_list">ACL 문서</a></li><li><a href="/please">필요한 문서</a></li><li><a href="/upload">파일 올리기</a></li><li><a href="/manager/10">문서 검색</a></li></ul><br><h2>' + lang_data['admin'] + '</h2><ul><li><a href="/manager/1">' + lang_data['admin'] + ' ' + lang_data['tool'] + '</a></li></ul><br><h2>버전</h2><ul><li>이 오픈나무는 <a href="https://github.com/2DU/openNAMU/blob/master/version.md">' + r_ver + '</a> 입니다.</li></ul>',
+        data = '<h2>기록</h2><ul><li><a href="/manager/6">편집 기록</a></li><li><a href="/manager/7">토론 기록</a></li></ul><br><h2>' + lang_data['list'] + '</h2><ul><li><a href="/admin_list">' + lang_data['admin'] + '</a></li><li><a href="/give_log">' + lang_data['admin_group'] + '</a></li><li><a href="/not_close_topic">열린 토론</a></li></ul><br><h2>기타</h2><ul><li><a href="/title_index">' + lang_data['all'] + ' ' + lang_data['document'] + '</a></li><li><a href="/acl_list">ACL 문서</a></li><li><a href="/please">필요한 문서</a></li><li><a href="/upload">파일 올리기</a></li><li><a href="/manager/10">문서 검색</a></li></ul><br><h2>' + lang_data['admin'] + '</h2><ul><li><a href="/manager/1">' + lang_data['admin'] + ' ' + lang_data['tool'] + '</a></li></ul><br><h2>버전</h2><ul><li>이 오픈나무는 <a id="out_link" href="https://github.com/2DU/openNAMU/blob/master/version.md">' + r_ver + '</a> 입니다.</li></ul>',
         menu = 0
     ))
     
@@ -1731,7 +1764,7 @@ def manager(num = 1):
     if num == 1:
         return html_minify(render_template(skin_check(conn), 
             imp = [lang_data['admin'] + ' ' + lang_data['tool'], wiki_set(conn, 1), custom(conn), other2([0, 0])],
-            data = '<h2>' + lang_data['list'] + '</h2><ul><li><a href="/manager/2">' + lang_data['document'] + ' ACL</a></li><li><a href="/manager/3">' + lang_data['user'] + ' 검사</a></li><li><a href="/manager/4">' + lang_data['user'] + ' ' + lang_data['ban'] + '</a></li><li><a href="/manager/5">권한 주기</a></li><li><a href="/big_delete">' + lang_data['bulk_delete'] + '</a></li><li><a href="/edit_filter">' + lang_data['edit_filter'] + '</a></li></ul><br><h2>' + lang_data['owner'] + '</h2><ul><li><a href="/indexing">인덱싱 (생성 or ' + lang_data['delete'] + ')</a></li><li><a href="/manager/8">' + lang_data['admin_group'] + ' 생성</a></li><li><a href="/edit_set">설정 편집</a></li><li><a href="/re_start">서버 재 시작</a></li><li><a href="/update">업데이트 (Git 사용)</a></li><li><a href="/inter_wiki">인터위키</a></li></ul>',
+            data = '<h2>' + lang_data['list'] + '</h2><ul><li><a href="/manager/2">' + lang_data['document'] + ' ACL</a></li><li><a href="/manager/3">' + lang_data['user'] + ' 검사</a></li><li><a href="/manager/4">' + lang_data['user'] + ' ' + lang_data['ban'] + '</a></li><li><a href="/manager/5">권한 주기</a></li><li><a href="/big_delete">' + lang_data['bulk_delete'] + '</a></li><li><a href="/edit_filter">' + lang_data['edit_filter'] + '</a></li></ul><br><h2>' + lang_data['owner'] + '</h2><ul><li><a href="/indexing">인덱싱 (생성 or ' + lang_data['delete'] + ')</a></li><li><a href="/manager/8">' + lang_data['admin_group'] + ' 생성</a></li><li><a href="/edit_set">설정 편집</a></li><li><a href="/re_start">서버 재 시작</a></li><li><a href="/update">업데이트</a></li><li><a href="/inter_wiki">인터위키</a></li></ul>',
             menu = [['other', '기타']]
         ))
     elif num in range(2, 14):
