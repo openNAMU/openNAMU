@@ -941,8 +941,19 @@ def start(conn, data, title):
     
     # NoWiki 마지막 처리
     for re_data in end_data:
-        data = data.replace('<span id="' + re_data[0] + '"></span>', re_data[1])
+        print(end_data)
+        if re.search('\n', re_data[1]):
+            data = data.replace('<span id="' + re_data[0] + '"></span>', '<pre>' + re.sub('^\n', '', re_data[1]) + '</pre>')
+        else:
+            data = data.replace('<span id="' + re_data[0] + '"></span>', '<code>' + re_data[1] + '</code>')
+
         data = data.replace(tool.url_pas('<span id="' + re_data[0] + '"></span>'), tool.url_pas(re_data[1]))
+
+    while 1:
+        if re.search('href="((?:(?!").)+)">((?:(?!>).)*)<code>((?:(?!<).)+)</code>', data):
+            data = re.sub('href="(?P<one>(?:(?!").)+)">(?P<two>(?:(?!>).)*)<code>(?P<three>(?:(?!<).)+)</code>', 'href="\g<one>">\g<two>\g<three>', data, 1)
+        else:
+            break
     
     # 마지막 처리
     data = re.sub('<\/td_end>', '</td>', data)
