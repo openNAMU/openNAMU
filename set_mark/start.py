@@ -941,7 +941,6 @@ def start(conn, data, title):
     
     # NoWiki 마지막 처리
     for re_data in end_data:
-        print(end_data)
         if re.search('\n', re_data[1]):
             data = data.replace('<span id="' + re_data[0] + '"></span>', '<pre>' + re.sub('^\n', '', re_data[1]) + '</pre>')
         else:
