@@ -392,7 +392,7 @@ def start(conn, data, title):
                                                     else:
                                                         middle_search = re.search('^#!folding', middle_data[0])
                                                         if middle_search:
-                                                            middle_list += ['div']
+                                                            middle_list += ['2div']
                                                             
                                                             folding_data = re.search('{{{#!folding ?((?:(?!\n).)*)\n?', data)
                                                             if folding_data:
@@ -400,7 +400,7 @@ def start(conn, data, title):
                                                             else:
                                                                 folding_data = ['Test']
                                                             
-                                                            data = re.sub('{{{#!folding ?((?:(?!\n).)*)\n?', '<div>' + str(folding_data[0]) + ' <a style="display: inline-block;" href="javascript:void(0);" onclick="folding(' + str(fol_num) + ');"><span id="wiki_folding_' + str(fol_num) + '">[작동]</span></a></div_end><div id="folding_' + str(fol_num) + '" style="display: none;">\n', data, 1)
+                                                            data = re.sub('{{{#!folding ?((?:(?!\n).)*)\n?', '<div>' + str(folding_data[0]) + ' <div style="display: inline-block;"><a href="javascript:void(0);" onclick="folding(' + str(fol_num) + ');">[작동]</a></div_end><div id="folding_' + str(fol_num) + '" style="display: none;">', data, 1)
                                                             
                                                             fol_num += 1
                                                         else:
@@ -428,8 +428,8 @@ def start(conn, data, title):
                         if middle_number > 0:
                             middle_number -= 1
                             
-                        if middle_list[middle_number] == 'div':
-                            data = re.sub('(?:{{{((?:(?! |{{{|}}}).)*) ?|(}}}))', '</div_end>', data, 1)
+                        if middle_list[middle_number] == '2div':
+                            data = re.sub('(?:{{{((?:(?! |{{{|}}}).)*) ?|(}}}))', '</div_end></div_end>', data, 1)
                         elif middle_list[middle_number] == 'pre':
                             data = re.sub('(?:{{{((?:(?! |{{{|}}}).)*) ?|(}}}))', '</code></pre>', data, 1)
                         else:
