@@ -184,7 +184,23 @@ def start(conn, data, title):
     # 초기 설정
     data = '\n' + data + '\n'
     backlink = []
-    plus_data = '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"><script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script><script>hljs.initHighlightingOnLoad(); function folding(num, test = 0) { var fol = document.getElementById(\'folding_\' + num); if(fol.style.display == \'inline-block\' || fol.style.display == \'block\') { fol.style.display = \'none\'; } else { if(num % 3 == 0 && test != 1) { fol.style.display = \'block\'; } else { fol.style.display = \'inline-block\'; } } }</script>'
+    plus_data = '''<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css">
+                    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+                    <script>
+                        hljs.initHighlightingOnLoad(); 
+                        function folding(num) { 
+                            var fol = document.getElementById('folding_' + num); 
+                            if(fol.style.display == 'inline-block' || fol.style.display == 'block') { 
+                                fol.style.display = 'none';
+                            } else {
+                                if(num % 2 == 0) { 
+                                    fol.style.display = 'block'; 
+                                } else { 
+                                    fol.style.display = 'inline-block'; 
+                                } 
+                            } 
+                        }
+                    </script>'''
     end_data= []
     
     # XSS 이스케이프
@@ -376,7 +392,7 @@ def start(conn, data, title):
                                                     else:
                                                         middle_search = re.search('^#!folding', middle_data[0])
                                                         if middle_search:
-                                                            middle_list += ['2div']
+                                                            middle_list += ['div']
                                                             
                                                             folding_data = re.search('{{{#!folding ?((?:(?!\n).)*)\n?', data)
                                                             if folding_data:
@@ -384,9 +400,9 @@ def start(conn, data, title):
                                                             else:
                                                                 folding_data = ['Test']
                                                             
-                                                            data = re.sub('{{{#!folding ?((?:(?!\n).)*)\n?', "<div>" + str(folding_data[0]) + " <div id='folding_" + str(fol_num + 1) + "' style='display: inline-block;'><a href='javascript:void(0);' onclick='folding(" + str(fol_num + 1) + "); folding(" + str(fol_num + 2) + "); folding(" + str(fol_num) + ");'>[펼치기]</a></div_end><div id='folding_" + str(fol_num + 2) + "' style='display: none; '><a href='javascript:void(0);' onclick='folding(" + str(fol_num + 1) + "); folding(" + str(fol_num + 2) + "); folding(" + str(fol_num) + ");'>[접기]</a></div_end><div id='folding_" + str(fol_num) + "' style='display: none;'>\n", data, 1)
+                                                            data = re.sub('{{{#!folding ?((?:(?!\n).)*)\n?', '<div>' + str(folding_data[0]) + ' <a style="display: inline-block;" href="javascript:void(0);" onclick="folding(' + str(fol_num) + ');"><span id="wiki_folding_' + str(fol_num) + '">[작동]</span></a></div_end><div id="folding_' + str(fol_num) + '" style="display: none;">\n', data, 1)
                                                             
-                                                            fol_num += 3
+                                                            fol_num += 1
                                                         else:
                                                             middle_list += ['span']
 
@@ -412,8 +428,8 @@ def start(conn, data, title):
                         if middle_number > 0:
                             middle_number -= 1
                             
-                        if middle_list[middle_number] == '2div':
-                            data = re.sub('(?:{{{((?:(?! |{{{|}}}).)*) ?|(}}}))', '</div_end></div_end>', data, 1)
+                        if middle_list[middle_number] == 'div':
+                            data = re.sub('(?:{{{((?:(?! |{{{|}}}).)*) ?|(}}}))', '</div_end>', data, 1)
                         elif middle_list[middle_number] == 'pre':
                             data = re.sub('(?:{{{((?:(?! |{{{|}}}).)*) ?|(}}}))', '</code></pre>', data, 1)
                         else:
