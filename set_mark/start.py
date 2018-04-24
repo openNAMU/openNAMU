@@ -263,7 +263,7 @@ def start(conn, data, title):
     html_data = re.findall('&lt;(\/)?((?:(?!&gt;| ).)+)( (?:(?:(?!&gt;).)+)?)?&gt;', data)
     for in_data in html_data:
         if in_data[0] == '':
-            if in_data[1] in html_list or in_data[1] in html_db[0]:
+            if in_data[1] in html_list or (html_db and in_data[1] in html_db[0]):
                 if re.search('&lt;\/' + in_data[1] + '&gt;', data):
                     src = re.search('src=([^ ]*)', in_data[2])
                     if src:
