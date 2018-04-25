@@ -184,7 +184,23 @@ def start(conn, data, title):
     # 초기 설정
     data = '\n' + data + '\n'
     backlink = []
-    plus_data = '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"><script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script><script>hljs.initHighlightingOnLoad(); function folding(num, test = 0) { var fol = document.getElementById(\'folding_\' + num); if(fol.style.display == \'inline-block\' || fol.style.display == \'block\') { fol.style.display = \'none\'; } else { if(num % 3 == 0 && test != 1) { fol.style.display = \'block\'; } else { fol.style.display = \'inline-block\'; } } }</script>'
+    plus_data = '''<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css">
+                    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+                    <script>
+                        hljs.initHighlightingOnLoad(); 
+                        function folding(num) { 
+                            var fol = document.getElementById('folding_' + num); 
+                            if(fol.style.display == 'inline-block' || fol.style.display == 'block') { 
+                                fol.style.display = 'none';
+                            } else {
+                                if(num % 2 == 0) { 
+                                    fol.style.display = 'block'; 
+                                } else { 
+                                    fol.style.display = 'inline-block'; 
+                                } 
+                            } 
+                        }
+                    </script>'''
     end_data= []
     
     # XSS 이스케이프
@@ -217,7 +233,7 @@ def start(conn, data, title):
 
                     num += 1
 
-                    end_data += [['include_one_nowiki_' + str(num), include_one_nowiki[0]]]
+                    end_data += [['include_one_nowiki_' + str(num), include_one_nowiki[0], 'normal']]
 
                     include = re.sub('(?:\\\\){2}(.)', '<span id="include_one_nowiki_' + str(num) + '"></span>', include, 1)
                 else:
@@ -254,13 +270,16 @@ def start(conn, data, title):
     data = re.sub('&amp;', '&', data)
 
     # HTML 허용
+    curs.execute('select html from html_filter')
+    html_db = curs.fetchall()
+
     src_list = ["www.youtube.com", "serviceapi.nmv.naver.com", "tv.kakao.com", "www.google.com", "serviceapi.rmcnmv.naver.com"]
     html_list = ['div', 'span', 'embed', 'iframe', 'ruby', 'rp', 'rt']
     
     html_data = re.findall('&lt;(\/)?((?:(?!&gt;| ).)+)( (?:(?:(?!&gt;).)+)?)?&gt;', data)
     for in_data in html_data:
         if in_data[0] == '':
-            if in_data[1] in html_list:
+            if in_data[1] in html_list or (html_db and in_data[1] in html_db[0]):
                 if re.search('&lt;\/' + in_data[1] + '&gt;', data):
                     src = re.search('src=([^ ]*)', in_data[2])
                     if src:
@@ -381,9 +400,9 @@ def start(conn, data, title):
                                                             else:
                                                                 folding_data = ['Test']
                                                             
-                                                            data = re.sub('{{{#!folding ?((?:(?!\n).)*)\n?', "<div>" + str(folding_data[0]) + " <div id='folding_" + str(fol_num + 1) + "' style='display: inline-block;'><a href='javascript:void(0);' onclick='folding(" + str(fol_num + 1) + "); folding(" + str(fol_num + 2) + "); folding(" + str(fol_num) + ");'>[펼치기]</a></div_end><div id='folding_" + str(fol_num + 2) + "' style='display: none; '><a href='javascript:void(0);' onclick='folding(" + str(fol_num + 1) + "); folding(" + str(fol_num + 2) + "); folding(" + str(fol_num) + ");'>[접기]</a></div_end><div id='folding_" + str(fol_num) + "' style='display: none;'>\n", data, 1)
+                                                            data = re.sub('{{{#!folding ?((?:(?!\n).)*)\n?', '<div>' + str(folding_data[0]) + ' <div style="display: inline-block;"><a href="javascript:void(0);" onclick="folding(' + str(fol_num) + ');">[작동]</a></div_end><div id="folding_' + str(fol_num) + '" style="display: none;">', data, 1)
                                                             
-                                                            fol_num += 3
+                                                            fol_num += 1
                                                         else:
                                                             middle_list += ['span']
 
@@ -429,7 +448,7 @@ def start(conn, data, title):
 
             num += 1
 
-            end_data += [['nowiki_' + str(num), nowiki_data[0]]]
+            end_data += [['nowiki_' + str(num), nowiki_data[0], 'code']]
 
             data = re.sub('<code>((?:(?:(?!<\/code>).)*\n*)*)<\/code>', '<span id="nowiki_' + str(num) + '"></span>', data, 1)
         else:
@@ -444,7 +463,7 @@ def start(conn, data, title):
 
             num += 1
 
-            end_data += [['syntax_' + str(num), syntax_data[1]]]
+            end_data += [['syntax_' + str(num), syntax_data[1], 'normal']]
 
             data = re.sub('<code class="((?:(?!").)+)">((?:(?:(?:(?!<\/code>|<span id="syntax_)).)+\n*)+)<\/code>', '<code class="' + syntax_data[0] + '"><span id="syntax_' + str(num) + '"></span></code>', data, 1)
         else:
@@ -494,7 +513,7 @@ def start(conn, data, title):
 
             num += 1
 
-            end_data += [['one_nowiki_' + str(num), one_nowiki[0]]]
+            end_data += [['one_nowiki_' + str(num), one_nowiki[0], 'normal']]
 
             data = re.sub('(?:\\\\)(.)', '<span id="one_nowiki_' + str(num) + '"></span>', data, 1)
         else:
@@ -938,14 +957,20 @@ def start(conn, data, title):
     
     # NoWiki 마지막 처리
     for re_data in end_data:
-        data = data.replace('<span id="' + re_data[0] + '"></span>', re_data[1])
-        data = data.replace(tool.url_pas('<span id="' + re_data[0] + '"></span>'), tool.url_pas(re_data[1]))
+        if re_data[2] == 'normal':
+            data = data.replace('<span id="' + re_data[0] + '"></span>', re_data[1])
+            data = data.replace(tool.url_pas('<span id="' + re_data[0] + '"></span>'), tool.url_pas(re_data[1]))
+        else:
+            if re.search('\n', re_data[1]):
+                data = data.replace('<span id="' + re_data[0] + '"></span>', '\n<pre>' + re.sub('^\n', '', re_data[1]) + '</pre>')
+            else:
+                data = data.replace('<span id="' + re_data[0] + '"></span>', '<code>' + re_data[1] + '</code>')
     
     # 마지막 처리
     data = re.sub('<\/td_end>', '</td>', data)
     data = re.sub('<include>\n', '', data)
     data = re.sub('\n<\/include>', '', data)
-
+    
     data = re.sub('(?P<in><\/h[0-9]>)(\n)+', '\g<in>', data)
     data = re.sub('\n\n<ul>', '\n<ul>', data)
     data = re.sub('<\/ul>\n\n', '</ul>\n', data)
