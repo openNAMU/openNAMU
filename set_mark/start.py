@@ -233,7 +233,7 @@ def start(conn, data, title):
 
                     num += 1
 
-                    end_data += [['include_one_nowiki_' + str(num), include_one_nowiki[0]]]
+                    end_data += [['include_one_nowiki_' + str(num), include_one_nowiki[0], 'normal']]
 
                     include = re.sub('(?:\\\\){2}(.)', '<span id="include_one_nowiki_' + str(num) + '"></span>', include, 1)
                 else:
@@ -448,7 +448,7 @@ def start(conn, data, title):
 
             num += 1
 
-            end_data += [['nowiki_' + str(num), nowiki_data[0]]]
+            end_data += [['nowiki_' + str(num), nowiki_data[0], 'code']]
 
             data = re.sub('<code>((?:(?:(?!<\/code>).)*\n*)*)<\/code>', '<span id="nowiki_' + str(num) + '"></span>', data, 1)
         else:
@@ -463,7 +463,7 @@ def start(conn, data, title):
 
             num += 1
 
-            end_data += [['syntax_' + str(num), syntax_data[1]]]
+            end_data += [['syntax_' + str(num), syntax_data[1], 'normal']]
 
             data = re.sub('<code class="((?:(?!").)+)">((?:(?:(?:(?!<\/code>|<span id="syntax_)).)+\n*)+)<\/code>', '<code class="' + syntax_data[0] + '"><span id="syntax_' + str(num) + '"></span></code>', data, 1)
         else:
@@ -513,7 +513,7 @@ def start(conn, data, title):
 
             num += 1
 
-            end_data += [['one_nowiki_' + str(num), one_nowiki[0]]]
+            end_data += [['one_nowiki_' + str(num), one_nowiki[0], 'normal']]
 
             data = re.sub('(?:\\\\)(.)', '<span id="one_nowiki_' + str(num) + '"></span>', data, 1)
         else:
@@ -957,24 +957,20 @@ def start(conn, data, title):
     
     # NoWiki 마지막 처리
     for re_data in end_data:
-        if re.search('\n', re_data[1]):
-            data = data.replace('<span id="' + re_data[0] + '"></span>', '<pre>' + re.sub('^\n', '', re_data[1]) + '</pre>')
+        if re_data[2] == 'normal':
+            data = data.replace('<span id="' + re_data[0] + '"></span>', re_data[1])
+            data = data.replace(tool.url_pas('<span id="' + re_data[0] + '"></span>'), tool.url_pas(re_data[1]))
         else:
-            data = data.replace('<span id="' + re_data[0] + '"></span>', '<code>' + re_data[1] + '</code>')
-
-        data = data.replace(tool.url_pas('<span id="' + re_data[0] + '"></span>'), tool.url_pas(re_data[1]))
-
-    while 1:
-        if re.search('href="((?:(?!").)+)">((?:(?!>).)*)<code>((?:(?!<).)+)</code>', data):
-            data = re.sub('href="(?P<one>(?:(?!").)+)">(?P<two>(?:(?!>).)*)<code>(?P<three>(?:(?!<).)+)</code>', 'href="\g<one>">\g<two>\g<three>', data, 1)
-        else:
-            break
+            if re.search('\n', re_data[1]):
+                data = data.replace('<span id="' + re_data[0] + '"></span>', '\n<pre>' + re.sub('^\n', '', re_data[1]) + '</pre>')
+            else:
+                data = data.replace('<span id="' + re_data[0] + '"></span>', '<code>' + re_data[1] + '</code>')
     
     # 마지막 처리
     data = re.sub('<\/td_end>', '</td>', data)
     data = re.sub('<include>\n', '', data)
     data = re.sub('\n<\/include>', '', data)
-
+    
     data = re.sub('(?P<in><\/h[0-9]>)(\n)+', '\g<in>', data)
     data = re.sub('\n\n<ul>', '\n<ul>', data)
     data = re.sub('<\/ul>\n\n', '</ul>\n', data)
