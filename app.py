@@ -20,7 +20,7 @@ import random
 import sys
 
 # 버전 표기
-r_ver = 'v3.0.4-Beta-02'
+r_ver = 'v3.0.4-Beta-03'
 print('Version : ' + r_ver)
 
 # 나머지 불러오기
@@ -2564,14 +2564,15 @@ def acl(name = None):
     
     user_data = re.search('^' + lang_data['user'] + ':(.+)$', name)
     if user_data:
-        if custom(conn)[2] == 0:
+        if check_data and custom(conn)[2] == 0:
             return redirect('/login')
-        elif user_data.groups()[0] != ip_check():
+        
+        if user_data.groups()[0] != ip_check():
             if admin_check(conn, 5, check_data) != 1:
                 if check_data:
                     return re_error(conn, '/error/3')
                 else:
-                    check_ok = 'disable'
+                    check_ok = 'disabled'
     else:
         if admin_check(conn, 5, check_data) != 1:
             if check_data:
@@ -2758,7 +2759,7 @@ def read_view(name = None):
     for data in curs.fetchall():
         curs.execute("select title from stop where title = ? and sub = ? and close = 'O'", [name, data[0]])
         if not curs.fetchall():
-            sub += ' (토론)'
+            sub += ' (D)'
 
             break
                 
@@ -2830,7 +2831,7 @@ def read_view(name = None):
         response_data = 404
         else_data = ''
 
-    m = re.search("^' + lang_data['user'] + ':([^/]*)", name)
+    m = re.search("^" + lang_data['user'] + ":([^/]*)", name)
     if m:
         g = m.groups()
         
@@ -2848,7 +2849,7 @@ def read_view(name = None):
     curs.execute("select dec from acl where title = ?", [name])
     data = curs.fetchall()
     if data:
-        acl += ' (ACL)'
+        acl += ' (A)'
             
     if request.args.get('froms', None):
         else_data = re.sub('\r\n#(?:redirect|넘겨주기) (?P<in>(?:(?!\r\n).)+)\r\n', ' * [[\g<in>]] 문서로 넘겨주기', '\r\n' + else_data + '\r\n')
