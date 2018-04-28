@@ -368,7 +368,7 @@ def ban_check(conn):
     else:
         band_it = ['Not']
         
-    curs.execute("select block from ban where block = ? and band = 'O'", [band_it[0]])
+    curs.execute("select block from ban where block = ?", [band_it[0]])
     band_d = curs.fetchall()
     
     curs.execute("select block from ban where block = ?", [ip])
@@ -484,7 +484,7 @@ def re_error(conn, data):
             if not end_data:
                 match = re.search("^([0-9]{1,3}\.[0-9]{1,3})", ip)
                 if match:
-                    curs.execute("select end, why from ban where block = ? and band = 'O'", [match.groups()[0]])
+                    curs.execute("select end, why from ban where block = ?", [match.groups()[0]])
                     end_data = curs.fetchall()
             
             if end_data:

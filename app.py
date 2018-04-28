@@ -2218,7 +2218,17 @@ def login():
     
     curs.execute("select block from ban where block = ? and login = 'O'", [ip])
     if not curs.fetchall():
-        ban = ban_check(conn)
+        match = re.search("^([0-9]{1,3}\.[0-9]{1,3})", ip)
+        if match:
+            match = match.groups()[0]
+        else:
+            match = ['Not']
+
+        curs.execute("select block from ban where block = ? and login = 'O'", [match])
+        if not curs.fetchall():
+            ban = ban_check(conn)
+        else:
+            ban = 0
     else:
         ban = 0
 
@@ -3221,16 +3231,25 @@ def user_info():
     else:
         acl = lang_data['ban']
 
-        curs.execute("select end, login from ban where block = ?", [ip])
+        match = re.search("^([0-9]{1,3}\.[0-9]{1,3})", ip)
+        if match:
+            match = match.groups()[0]
+        else:
+            match = ['Not']
+
+        curs.execute("select end, login, band from ban where block = ? or block = ?", [ip, match])
         block_data = curs.fetchall()
         if block_data:
             if block_data[0][0] != '':
                 acl += ' (' + block_data[0][0] + '까지)'
             else:
-                acl += ' (무기한)'
-        
+                acl += ' (무기한)'        
+
             if block_data[0][1] != '':
                 acl += ' (' + lang_data['login'] + ' ' + lang_data['able'] + ')'
+
+            if block_data[0][2] == 'O':
+                acl += ' (대역)'
             
     if custom(conn)[2] != 0:
         ip_user = '<a href="/w/' + lang_data['user'] + ':' + ip + '">' + ip + '</a>'
