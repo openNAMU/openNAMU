@@ -1751,8 +1751,39 @@ def move(name = None):
 @app.route('/other')
 def other():
     return html_minify(render_template(skin_check(conn), 
-        imp = ['기타 ' + lang_data['list'], wiki_set(conn, 1), custom(conn), other2([0, 0])],
-        data = '<h2>기록</h2><ul><li><a href="/manager/6">편집 기록</a></li><li><a href="/manager/7">토론 기록</a></li></ul><br><h2>' + lang_data['list'] + '</h2><ul><li><a href="/admin_list">' + lang_data['admin'] + '</a></li><li><a href="/give_log">' + lang_data['admin_group'] + '</a></li><li><a href="/not_close_topic">열린 토론</a></li></ul><br><h2>기타</h2><ul><li><a href="/title_index">' + lang_data['all'] + ' ' + lang_data['document'] + '</a></li><li><a href="/acl_list">ACL 문서</a></li><li><a href="/please">필요한 문서</a></li><li><a href="/upload">파일 올리기</a></li><li><a href="/manager/10">문서 검색</a></li></ul><br><h2>' + lang_data['admin'] + '</h2><ul><li><a href="/manager/1">' + lang_data['admin'] + ' ' + lang_data['tool'] + '</a></li></ul><br><h2>버전</h2><ul><li>이 오픈나무는 <a id="out_link" href="https://github.com/2DU/openNAMU/blob/master/version.md">' + r_ver + '</a> 입니다.</li></ul>',
+        imp = ['기타 ' + lang_data['tool'], wiki_set(conn, 1), custom(conn), other2([0, 0])],
+        data = '''
+                <h2>기록</h2>
+                <ul>
+                    <li><a href="/manager/6">''' + lang_data['edit'] + '''</a></li>
+                    <li><a href="/manager/7">''' + lang_data['discussion'] + '''</a></li>
+                </ul>
+                <br>
+                <h2>''' + lang_data['list'] + '''</h2>
+                <ul>
+                    <li><a href="/admin_list">''' + lang_data['admin'] + '''</a></li>
+                    <li><a href="/give_log">''' + lang_data['admin_group'] + '''</a></li>
+                    <li><a href="/not_close_topic">열린 ''' + lang_data['discussion'] + '''</a></li>
+                </ul>
+                <br>
+                <h2>기타</h2>
+                    <ul>
+                        <li><a href="/title_index">''' + lang_data['all'] + ' ' + lang_data['document'] + '''</a></li>
+                        <li><a href="/acl_list">ACL ''' + lang_data['document'] + '''</a></li>
+                        <li><a href="/please">필요한 문서</a></li>
+                        <li><a href="/upload">파일 올리기</a></li>
+                        <li><a href="/manager/10">문서 검색</a></li>
+                    </ul>
+                    <br>
+                    <h2>''' + lang_data['admin'] + '''</h2>
+                    <ul>
+                        <li><a href="/manager/1">''' + lang_data['admin'] + ' ' + lang_data['tool'] + '''</a></li>
+                    </ul>
+                    <br>
+                    <h2>버전</h2>
+                    <ul>
+                        <li>이 오픈나무는 <a id="out_link" href="https://github.com/2DU/openNAMU/blob/master/version.md">''' + r_ver + '''</a> 입니다.</li>
+                    </ul>''',
         menu = 0
     ))
     
@@ -1764,7 +1795,27 @@ def manager(num = 1):
     if num == 1:
         return html_minify(render_template(skin_check(conn), 
             imp = [lang_data['admin'] + ' ' + lang_data['tool'], wiki_set(conn, 1), custom(conn), other2([0, 0])],
-            data = '<h2>' + lang_data['list'] + '</h2><ul><li><a href="/manager/2">' + lang_data['document'] + ' ACL</a></li><li><a href="/manager/3">' + lang_data['user'] + ' 검사</a></li><li><a href="/manager/4">' + lang_data['user'] + ' ' + lang_data['ban'] + '</a></li><li><a href="/manager/5">권한 주기</a></li><li><a href="/big_delete">' + lang_data['bulk_delete'] + '</a></li><li><a href="/edit_filter">' + lang_data['edit_filter'] + '</a></li></ul><br><h2>' + lang_data['owner'] + '</h2><ul><li><a href="/indexing">인덱싱 (생성 or ' + lang_data['delete'] + ')</a></li><li><a href="/manager/8">' + lang_data['admin_group'] + ' 생성</a></li><li><a href="/edit_set">설정 편집</a></li><li><a href="/re_start">서버 재 시작</a></li><li><a href="/update">업데이트</a></li><li><a href="/inter_wiki">인터위키</a></li></ul>',
+            data = '''
+                    <h2>''' + lang_data['admin'] + '''</h2>
+                    <ul>
+                        <li><a href="/manager/2">''' + lang_data['document'] + ''' ACL</a></li>
+                        <li><a href="/manager/3">''' + lang_data['user'] + ''' 검사</a></li>
+                        <li><a href="/manager/4">''' + lang_data['user'] + ' ' + lang_data['ban'] + '''</a></li>
+                        <li><a href="/manager/5">권한 주기</a></li>
+                        <li><a href="/big_delete">''' + lang_data['bulk_delete'] + '''</a></li>
+                        <li><a href="/edit_filter">''' + lang_data['edit_filter'] + '''</a></li>
+                    </ul>
+                    <br>
+                    <h2>''' + lang_data['owner'] + '''</h2>
+                    <ul>
+                        <li><a href="/indexing">인덱싱 (생성 or ''' + lang_data['delete'] + ''')</a></li>
+                        <li><a href="/manager/8">''' + lang_data['admin_group'] + ''' 생성</a></li>
+                        <li><a href="/edit_set">설정 편집</a></li>
+                        <li><a href="/re_start">서버 재 시작</a></li>
+                        <li><a href="/update">업데이트</a></li>
+                        <li><a href="/inter_wiki">인터위키</a></li>
+                    </ul>
+                    ''',
             menu = [['other', '기타']]
         ))
     elif num in range(2, 14):
@@ -2222,7 +2273,7 @@ def login():
         if match:
             match = match.groups()[0]
         else:
-            match = ['Not']
+            match = 'Not'
 
         curs.execute("select block from ban where block = ? and login = 'O'", [match])
         if not curs.fetchall():
@@ -3235,7 +3286,7 @@ def user_info():
         if match:
             match = match.groups()[0]
         else:
-            match = ['Not']
+            match = 'Not'
 
         curs.execute("select end, login, band from ban where block = ? or block = ?", [ip, match])
         block_data = curs.fetchall()
@@ -3270,8 +3321,25 @@ def user_info():
         plus2 = ''
 
     return html_minify(render_template(skin_check(conn), 
-        imp = [lang_data['user'] + ' 메뉴', wiki_set(conn, 1), custom(conn), other2([0, 0])],
-        data =  '<h2>상태</h2><ul><li>' + ip_user + ' <a href="/record/' + url_pas(ip) + '">(기록)</a></li><li>권한 상태 : ' + acl + '</li></ul><br><h2>' + lang_data['login'] + '</h2><ul>' + plus + '<li><a href="/register">회원가입</a></li></ul><br><h2>' + lang_data['user'] + ' 기능</h2><ul><li><a href="/acl/' + lang_data['user'] + ':' + url_pas(ip) + '">' + lang_data['user'] + ' ' + lang_data['document'] + ' ACL</a></li><li><a href="/custom_head">' + lang_data['user'] + ' HEAD</a></li></ul><br><h2>기타</h2><ul>' + plus2 + '<li><a href="/count">활동 횟수</a></li></ul>',
+        imp = [lang_data['user'] + ' ' + lang_data['list'], wiki_set(conn, 1), custom(conn), other2([0, 0])],
+        data =  '''
+                <h2>상태</h2>
+                <ul>
+                    <li>''' + ip_user + ''' <a href="/record/''' + url_pas(ip) + '''">(기록)</a></li><li>권한 상태 : ''' + acl + '''</li>
+                </ul>
+                <br>
+                <h2>''' + lang_data['login'] + '''</h2>
+                <ul>
+                    ''' + plus + '''
+                    <li><a href="/register">회원가입</a></li>
+                </ul>
+                <br>
+                <h2>''' + lang_data['user'] + ' ' + lang_data['tool'] + '''</h2>
+                <ul>
+                    <li><a href="/acl/''' + lang_data['user'] + ':' + url_pas(ip) + '">' + lang_data['user'] + ' ' + lang_data['document'] + ''' ACL</a></li>
+                    <li><a href="/custom_head">''' + lang_data['user'] + ''' HEAD</a></li></ul><br><h2>기타</h2><ul>''' + plus2 + '''<li><a href="/count">활동 횟수</a></li>
+                </ul>
+                ''',
         menu = 0
     ))
 

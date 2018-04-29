@@ -364,11 +364,11 @@ def ban_check(conn):
 
     band = re.search("^([0-9]{1,3}\.[0-9]{1,3})", ip)
     if band:
-        band_it = band.groups()
+        band_it = band.groups()[0]
     else:
-        band_it = ['Not']
+        band_it = 'Not'
         
-    curs.execute("select block from ban where block = ?", [band_it[0]])
+    curs.execute("select block from ban where block = ?", [band_it])
     band_d = curs.fetchall()
     
     curs.execute("select block from ban where block = ?", [ip])
