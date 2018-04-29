@@ -57,7 +57,7 @@ elif what_i_do == '3':
 
     # 데이터 삭제
     curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, ?)", [user_data, '해제', get_time(), 'localhost', '', band])
-    curs.execute("delete from ban where block = ?", [user_data]))
+    curs.execute("delete from ban where block = ?", [user_data])
 
 # 커밋
 conn.commit()
