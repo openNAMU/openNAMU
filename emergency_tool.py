@@ -17,6 +17,7 @@ curs = conn.cursor()
 
 print('1. BackLink ReSet')
 print('2. ReCaptcha Delete')
+print('3. Ban Delete')
 print('')
 
 print('select : ', end = '')
@@ -45,6 +46,18 @@ elif what_i_do == '2':
     # 데이터 삭제
     curs.execute("delete from other where name = 'recaptcha'")
     curs.execute("delete from other where name = 'sec_re'")
+elif what_i_do == '3':
+    print('IP or User_Name : ', end = '')
+    user_data = input()
+
+    if re.search("^([0-9]{1,3}\.[0-9]{1,3})$", user_data):
+        band = 'O'
+    else:
+        band = ''
+
+    # 데이터 삭제
+    curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, ?)", [user_data, '해제', get_time(), 'localhost', '', band])
+    curs.execute("delete from ban where block = ?", [user_data]))
 
 # 커밋
 conn.commit()

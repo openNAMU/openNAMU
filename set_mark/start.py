@@ -184,23 +184,25 @@ def start(conn, data, title):
     # 초기 설정
     data = '\n' + data + '\n'
     backlink = []
-    plus_data = '''<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css">
-                    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
-                    <script>
-                        hljs.initHighlightingOnLoad(); 
-                        function folding(num) { 
-                            var fol = document.getElementById('folding_' + num); 
-                            if(fol.style.display == 'inline-block' || fol.style.display == 'block') { 
-                                fol.style.display = 'none';
-                            } else {
-                                if(num % 2 == 0) { 
-                                    fol.style.display = 'block'; 
-                                } else { 
-                                    fol.style.display = 'inline-block'; 
-                                } 
+    plus_data = '''
+                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css">
+                <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+                <script>
+                    hljs.initHighlightingOnLoad(); 
+                    function folding(num) { 
+                        var fol = document.getElementById('folding_' + num); 
+                        if(fol.style.display == 'inline-block' || fol.style.display == 'block') { 
+                            fol.style.display = 'none';
+                        } else {
+                            if(num % 2 == 0) { 
+                                fol.style.display = 'block'; 
+                            } else { 
+                                fol.style.display = 'inline-block'; 
                             } 
-                        }
-                    </script>'''
+                        } 
+                    }
+                </script>
+                '''
     end_data= []
     
     # XSS 이스케이프
