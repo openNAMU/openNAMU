@@ -20,7 +20,7 @@ import random
 import sys
 
 # 버전 표기
-r_ver = 'v3.0.4-Beta-03'
+r_ver = 'v3.0.4-Beta-04'
 print('Version : ' + r_ver)
 
 # 나머지 불러오기
@@ -3334,7 +3334,7 @@ def user_info():
                     <li><a href="/register">회원가입</a></li>
                 </ul>
                 <br>
-                <h2>''' + lang_data['user'] + ' ' + lang_data['tool'] + '''</h2>
+                <h2>''' + lang_data['tool'] + '''</h2>
                 <ul>
                     <li><a href="/acl/''' + lang_data['user'] + ':' + url_pas(ip) + '">' + lang_data['user'] + ' ' + lang_data['document'] + ''' ACL</a></li>
                     <li><a href="/custom_head">''' + lang_data['user'] + ''' HEAD</a></li></ul><br><h2>기타</h2><ul>''' + plus2 + '''<li><a href="/count">활동 횟수</a></li>
