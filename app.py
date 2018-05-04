@@ -434,8 +434,8 @@ def edit_set(num = 0):
             menu = [['manager', lang_data['admin']]]
         ))
     elif num == 1:
-        i_list = ['name', 'logo', 'frontpage', 'license', 'upload', 'skin', 'edit', 'reg', 'ip_view', 'back_up']
-        n_list = ['Wiki', '', 'FrontPage', 'CC 0', '2', '', 'normal', '', '', '0']
+        i_list = ['name', 'logo', 'frontpage', 'license', 'upload', 'skin', 'edit', 'reg', 'ip_view', 'back_up', 'port', 'key']
+        n_list = ['Wiki', '', 'FrontPage', 'CC 0', '2', '', 'normal', '', '', '0', '3000', 'Test']
         
         if request.method == 'POST':
             i = 0
@@ -500,7 +500,65 @@ def edit_set(num = 0):
 
             return html_minify(render_template(skin_check(conn), 
                 imp = ['기본 설정', wiki_set(conn, 1), custom(conn), other2([0, 0])],
-                data = '<form method="post"><span>이름</span><br><br><input placeholder="이름" type="text" name="name" value="' + html.escape(d_list[0]) + '"><hr><span>로고 (HTML)</span><br><br><input placeholder="로고" type="text" name="logo" value="' + html.escape(d_list[1]) + '"><hr><span>대문</span><br><br><input placeholder="대문" type="text" name="frontpage" value="' + html.escape(d_list[2]) + '"><hr><span>라이선스 (HTML)</span><br><br><input placeholder="라이선스" type="text" name="license" value="' + html.escape(d_list[3]) + '"><hr><span>파일 크기 [메가]</span><br><br><input placeholder="파일 크기" type="text" name="upload" value="' + html.escape(d_list[4]) + '"><hr><span>백업 간격 [시간] (끄기 : 0) {재시작 필요}</span><br><br><input placeholder="백업 간격" type="text" name="back_up" value="' + html.escape(d_list[9]) + '"><hr><span>스킨</span><br><br><select name="skin">' + div2 + '</select><hr><span>전역 ACL</span><br><br><select name="edit">' + div + '</select><hr><input type="checkbox" name="reg" ' + ch_1 + '> 가입불가<hr><input type="checkbox" name="ip_view" ' + ch_2 + '> 아이피 비공개<hr><button id="save" type="submit">' + lang_data['save'] + '</button></form>',
+                data = '''
+                        <form method="post">
+                            <span>이름</span>
+                            <br>
+                            <br>
+                            <input placeholder="이름" type="text" name="name" value="''' + html.escape(d_list[0]) + '''">
+                            <hr>
+                            <span>로고 (HTML)</span>
+                            <br>
+                            <br>
+                            <input placeholder="로고" type="text" name="logo" value="''' + html.escape(d_list[1]) + '''">
+                            <hr>
+                            <span>대문</span>
+                            <br>
+                            <br>
+                            <input placeholder="대문" type="text" name="frontpage" value="''' + html.escape(d_list[2]) + '''">
+                            <hr>
+                            <span>라이선스 (HTML)</span>
+                            <br>
+                            <br>
+                            <input placeholder="라이선스" type="text" name="license" value="''' + html.escape(d_list[3]) + '''">
+                            <hr>
+                            <span>파일 크기 [메가]</span>
+                            <br>
+                            <br>
+                            <input placeholder="파일 크기" type="text" name="upload" value="''' + html.escape(d_list[4]) + '''">
+                            <hr>
+                            <span>백업 간격 [시간] (끄기 : 0) {재시작 필요}</span>
+                            <br>
+                            <br>
+                            <input placeholder="백업 간격" type="text" name="back_up" value="''' + html.escape(d_list[9]) + '''">
+                            <hr>
+                            <span>스킨</span>
+                            <br>
+                            <br>
+                            <select name="skin">''' + div2 + '''</select>
+                            <hr>
+                            <span>전역 ACL</span>
+                            <br>
+                            <br>
+                            <select name="edit">''' + div + '''</select>
+                            <hr>
+                            <input type="checkbox" name="reg" ''' + ch_1 + '''> 가입불가
+                            <hr>
+                            <input type="checkbox" name="ip_view" ''' + ch_2 + '''> 아이피 비공개
+                            <hr>
+                            <span>포트</span>
+                            <br>
+                            <br>
+                            <input placeholder="포트" type="text" name="port" value="''' + html.escape(d_list[10]) + '''">
+                            <hr>
+                            <span>비밀 키</span>
+                            <br>
+                            <br>
+                            <input placeholder="비밀 키" type="password" name="key" value="''' + html.escape(d_list[11]) + '''">
+                            <hr>
+                            <button id="save" type="submit">''' + lang_data['save'] + '''</button>
+                        </form>
+                        ''',
                 menu = [['edit_set', '설정']]
             ))
     elif num == 2:
@@ -535,7 +593,21 @@ def edit_set(num = 0):
 
             return html_minify(render_template(skin_check(conn), 
                 imp = ['문구 관련', wiki_set(conn, 1), custom(conn), other2([0, 0])],
-                data = '<form method="post"><span>가입 약관</span><br><br><input placeholder="가입 약관" type="text" name="contract" value="' + html.escape(d_list[0]) + '"><hr><span>비 ' + lang_data['login'] + ' 경고</span><br><br><input placeholder="비 ' + lang_data['login'] + ' 경고" type="text" name="no_login_warring" value="' + html.escape(d_list[1]) + '"><hr><button id="save" type="submit">' + lang_data['save'] + '</button></form>',
+                data = '''
+                        <form method="post">
+                            <span>가입 약관</span>
+                            <br>
+                            <br>
+                            <input placeholder="가입 약관" type="text" name="contract" value="''' + html.escape(d_list[0]) + '''">
+                            <hr>
+                            <span>비 ''' + lang_data['login'] + ''' 경고</span>
+                            <br>
+                            <br>
+                            <input placeholder="비 ''' + lang_data['login'] + ''' 경고" type="text" name="no_login_warring" value="''' + html.escape(d_list[1]) + '''">
+                            <hr>
+                            <button id="save" type="submit">''' + lang_data['save'] + '''</button>
+                        </form>
+                        ''',
                 menu = [['edit_set', '설정']]
             ))
     elif num == 3:
@@ -561,7 +633,13 @@ def edit_set(num = 0):
 
             return html_minify(render_template(skin_check(conn), 
                 imp = ['전역 HEAD', wiki_set(conn, 1), custom(conn), other2([0, 0])],
-                data =  '<span>&lt;style&gt;CSS&lt;/style&gt;<br>&lt;script&gt;JS&lt;/script&gt;</span><hr><form method="post"><textarea rows="25" name="content">' + html.escape(data) + '</textarea><hr><button id="save" type="submit">' + lang_data['save'] + '</button></form>',
+                data = '''
+                        <form method="post">
+                            <textarea rows="25" name="content">''' + html.escape(data) + '''</textarea>
+                            <hr>
+                            <button id="save" type="submit">''' + lang_data['save'] + '''</button>
+                        </form>
+                        ''',
                 menu = [['edit_set', '설정']]
             ))
     elif num == 4:
@@ -598,7 +676,15 @@ def edit_set(num = 0):
 
             return html_minify(render_template(skin_check(conn), 
                 imp = ['robots.txt', wiki_set(conn, 1), custom(conn), other2([0, 0])],
-                data =  '<a href="/robots.txt">(보기)</a><hr><form method="post"><textarea rows="25" name="content">' + html.escape(data) + '</textarea><hr><button id="save" type="submit">' + lang_data['save'] + '</button></form>',
+                data = '''
+                        <a href="/robots.txt">(보기)</a>
+                        <hr>
+                        <form method="post">
+                            <textarea rows="25" name="content">''' + html.escape(data) + '''</textarea>
+                            <hr>
+                            <button id="save" type="submit">''' + lang_data['save'] + '''</button>
+                        </form>
+                        ''',
                 menu = [['edit_set', '설정']]
             ))
     elif num == 5:
@@ -633,7 +719,20 @@ def edit_set(num = 0):
 
             return html_minify(render_template(skin_check(conn), 
                 imp = ['구글 관련', wiki_set(conn, 1), custom(conn), other2([0, 0])],
-                data = '<form method="post"><span>리캡차 (HTML)</span><br><br><input placeholder="리캡차 (HTML)" type="text" name="recaptcha" value="' + html.escape(d_list[0]) + '"><hr><span>리캡차 (비밀키)</span><br><br><input placeholder="리캡차 (비밀키)" type="text" name="sec_re" value="' + html.escape(d_list[1]) + '"><hr><button id="save" type="submit">' + lang_data['save'] + '</button></form>',
+                data = '''
+                        <form method="post">
+                            <span>리캡차 (HTML)</span>
+                            <br>
+                            <br>
+                            <input placeholder="리캡차 (HTML)" type="text" name="recaptcha" value="''' + html.escape(d_list[0]) + '''">
+                            <hr>
+                            <span>리캡차 (비밀키)</span>
+                            <br>
+                            <br>
+                            <input placeholder="리캡차 (비밀키)" type="text" name="sec_re" value="''' + html.escape(d_list[1]) + '''">
+                            <hr>
+                            <button id="save" type="submit">''' + lang_data['save'] + '''</button>
+                        </form>''',
                 menu = [['edit_set', '설정']]
             ))
     else:
