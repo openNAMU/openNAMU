@@ -61,6 +61,29 @@ def captcha_post(test, conn, num = 1):
     else:
         pass
 
+def edit_help_button():
+    # https://stackoverflow.com/questions/11076975/insert-text-into-textarea-at-cursor-position-javascript
+    js = '''<script>
+                function insertAtCursor(myField, myValue) {
+                    if (document.selection) { 
+                        document.getElementById(myField).focus();
+                        sel = document.selection.createRange(); 
+                        sel.text = myValue; 
+                    } else if (document.getElementById(myField).selectionStart || document.getElementById(myField).selectionStart == '0') { 
+                        var startPos = document.getElementById(myField).selectionStart; 
+                        var endPos = document.getElementById(myField).selectionEnd; 
+                        document.getElementById(myField).value = document.getElementById(myField).value.substring(0, startPos) + myValue + document.getElementById(myField).value.substring(endPos, document.getElementById(myField).value.length); 
+                    } else { 
+                        document.getElementById(myField).value += myValue;
+                    }
+                }
+            </script>
+        '''
+
+    js_button = '<a href="javascript:void(0);" onclick="insertAtCursor(\'content\', \'[[]]\');">(링크)</a> <a href="javascript:void(0);" onclick="insertAtCursor(\'content\', \'[macro()]\');">(매크로)</a> <a href="javascript:void(0);" onclick="insertAtCursor(\'content\', \'{{{#! }}}\');">(중괄호)</a>'
+
+    return [js, js_button]
+
 def ip_warring(conn):
     curs = conn.cursor()
 
