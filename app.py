@@ -1214,7 +1214,12 @@ def block_log(name = None, tool = None, tool2 = None):
     
     if not name:
         if not tool2:
-            div = '<a href="/manager/11">(차단자)</a> <a href="/manager/12">(' + lang_data['admin'] + ')</a><hr><a href="/block_log/ip">(아이피)</a> <a href="/block_log/user">(' + lang_data['subscriber'] + ')</a> <a href="/block_log/never_end">(무기한)</a> <a href="/block_log/can_end">(기간)</a> <a href="/block_log/end">(' + lang_data['release'] + ')</a> <a href="/block_log/now">(현재)</a> <a href="/block_log/edit_filter">(' + lang_data['edit_filter'] + ')</a><hr>' + div
+            div = '''
+                    <a href="/manager/11">(차단자)</a> <a href="/manager/12">(''' + lang_data['admin'] + ''')</a>
+                    <hr>
+                    <a href="/block_log/ip">(아이피)</a> <a href="/block_log/user">(''' + lang_data['subscriber'] + ''')</a> <a href="/block_log/never_end">(무기한)</a> <a href="/block_log/can_end">(기간)</a> <a href="/block_log/end">(''' + lang_data['release'] + ''')</a> <a href="/block_log/now">(현재)</a> <a href="/block_log/edit_filter">(''' + lang_data['edit_filter'] + ''')</a>
+                    <hr>
+                    ''' + div
             
             sub = 0
             menu = 0
@@ -1490,7 +1495,23 @@ def big_delete():
     else:
         return html_minify(render_template(skin_check(conn), 
             imp = [lang_data['bulk_delete'], wiki_set(conn, 1), custom(conn), other2([0, 0])],
-            data = '<span>Title A<br>Title B<br>Title C</span><hr><form method="post"><textarea rows="25" name="content"></textarea><hr><input placeholder="사유" name="send" type="text"><hr><button type="submit">' + lang_data['delete'] + '</button></form>',
+            data = '''
+                    <span>
+                        Title A
+                        <br>
+                        Title B
+                        <br>
+                        Title C
+                    </span>
+                    <hr>
+                    <form method="post">
+                        <textarea rows="25" name="content"></textarea>
+                        <hr>
+                        <input placeholder="사유" name="send" type="text">
+                        <hr>
+                        <button type="submit">''' + lang_data['delete'] + '''</button>
+                    </form>
+                    ''',
             menu = [['manager', lang_data['admin']]]
         ))
 
@@ -1567,7 +1588,15 @@ def set_edit_filter(name = None):
 
         return html_minify(render_template(skin_check(conn), 
             imp = [name, wiki_set(conn, 1), custom(conn), other2([' (' + lang_data['edit_filter'] + ')', 0])],
-            data = '<form method="post"><input ' + stat + ' type="checkbox" ' + time_data + ' name="ban"> ' + lang_data['ban'] + '<hr><input ' + stat + ' placeholder="정규식" name="content" value="' + html.escape(textarea) + '" type="text"><hr><button ' + stat + ' id="save" type="submit">' + lang_data['save'] + '</button></form>',
+            data = '''
+                    <form method="post">
+                        <input ''' + stat + ''' type="checkbox" ''' + time_data + ''' name="ban">
+                        ''' + lang_data['ban'] + '''
+                        <hr>
+                        <input ''' + stat + ''' placeholder="정규식" name="content" value="''' + html.escape(textarea) + '''" type="text">
+                        <hr>
+                        <button ''' + stat + ''' id="save" type="submit">''' + lang_data['save'] + '''</button>
+                    </form>''',
             menu = [['edit_filter', lang_data['list']], ['edit_filter/' + url_pas(name) + '/delete', lang_data['delete']]]
         ))
 
@@ -1686,7 +1715,13 @@ def edit(name = None):
         data_old = data
         
         if not request.args.get('section', None):
-            get_name = '<form method="post" id="get_edit" action="/edit_get/' + url_pas(name) + '"><input placeholder="불러 올 문서" name="name" style="width: 50%;" type="text"><button id="come" type="submit">불러오기</button></form><hr>'
+            get_name = '''
+                        <form method="post" id="get_edit" action="/edit_get/''' + url_pas(name) + '''">
+                            <input placeholder="불러 올 문서" name="name" style="width: 50%;" type="text">
+                            <button id="come" type="submit">불러오기</button>
+                        </form>
+                        <hr>
+                        '''
             action = ''
         else:
             get_name = ''
@@ -1703,7 +1738,20 @@ def edit(name = None):
 
         return html_minify(render_template(skin_check(conn), 
             imp = [name, wiki_set(conn, 1), custom(conn), other2([' (' + lang_data['edit'] + ')', 0])],
-            data = get_name + js_data[0] + '<form method="post" action="/edit/' + url_pas(name) + action + '">' + js_data[1] + '<hr><textarea id="content" rows="25" name="content">' + html.escape(re.sub('\n$', '', data)) + '</textarea><textarea style="display: none;" name="otent">' + html.escape(re.sub('\n$', '', data_old)) + '</textarea><hr><input placeholder="사유" name="send" type="text"><hr>' + captcha_get(conn) + ip_warring(conn) + '<button id="save" type="submit">' + lang_data['save'] + '</button><button id="preview" type="submit" formaction="/preview/' + url_pas(name) + action + '">미리보기</button></form>',
+            data = get_name + js_data[0] + '''
+                    <form method="post" action="/edit/''' + url_pas(name) + action + '''">
+                        ''' + js_data[1] + '''
+                        <hr>
+                        <textarea id="content" rows="25" name="content">''' + html.escape(re.sub('\n$', '', data)) + '''</textarea>
+                        <textarea style="display: none;" name="otent">''' + html.escape(re.sub('\n$', '', data_old)) + '''</textarea>
+                        <hr>
+                        <input placeholder="사유" name="send" type="text">
+                        <hr>
+                        ''' + captcha_get(conn) + ip_warring(conn) + '''
+                        <button id="save" type="submit">''' + lang_data['save'] + '''</button>
+                        <button id="preview" type="submit" formaction="/preview/''' + url_pas(name) + action + '''">미리보기</button>
+                    </form>
+                    ''',
             menu = [['w/' + url_pas(name), lang_data['document']], ['delete/' + url_pas(name), lang_data['delete']], ['move/' + url_pas(name), lang_data['move']]]
         ))
         
@@ -1732,7 +1780,21 @@ def preview(name = None):
     
     return html_minify(render_template(skin_check(conn), 
         imp = [name, wiki_set(conn, 1), custom(conn), other2([' (미리보기)', 0])],
-        data = js_data[0] + '<form method="post" action="/edit/' + url_pas(name) + action + '">' + js_data[1] + '<hr><textarea id="content" rows="25" name="content">' + html.escape(request.form.get('content', None)) + '</textarea><textarea style="display: none;" name="otent">' + html.escape(request.form.get('otent', None)) + '</textarea><hr><input placeholder="사유" name="send" type="text"><hr>' + captcha_get(conn) + '<button id="save" type="submit">' + lang_data['save'] + '</button><button id="preview" type="submit" formaction="/preview/' + url_pas(name) + action + '">미리보기</button></form><hr>' + end_data,
+        data = js_data[0] + '''
+                <form method="post" action="/edit/''' + url_pas(name) + action + '''">
+                    ''' + js_data[1] + '''
+                    <hr>
+                    <textarea id="content" rows="25" name="content">''' + html.escape(request.form.get('content', None)) + '''</textarea>
+                    <textarea style="display: none;" name="otent">''' + html.escape(request.form.get('otent', None)) + '''</textarea>
+                    <hr>
+                    <input placeholder="사유" name="send" type="text">
+                    <hr>
+                    ''' + captcha_get(conn) + '''
+                    <button id="save" type="submit">''' + lang_data['save'] + '''</button>
+                    <button id="preview" type="submit" formaction="/preview/''' + url_pas(name) + action + '''">미리보기</button>
+                </form>
+                <hr>
+                ''' + end_data,
         menu = [['w/' + url_pas(name), lang_data['document']]]
     ))
         
@@ -1772,7 +1834,15 @@ def delete(name = None):
 
         return html_minify(render_template(skin_check(conn), 
             imp = [name, wiki_set(conn, 1), custom(conn), other2([' (' + lang_data['delete'] + ')', 0])],
-            data = '<form method="post">' + ip_warring(conn) + '<input placeholder="사유" name="send" type="text"><hr>' + captcha_get(conn) + '<button type="submit">' + lang_data['delete'] + '</button></form>',
+            data = '''
+                    <form method="post">
+                        ''' + ip_warring(conn) + '''
+                        <input placeholder="사유" name="send" type="text">
+                        <hr>
+                        ''' + captcha_get(conn) + '''
+                        <button type="submit">''' + lang_data['delete'] + '''</button>
+                    </form>
+                    ''',
             menu = [['w/' + url_pas(name), lang_data['document']]]
         ))            
             
@@ -1837,7 +1907,17 @@ def move(name = None):
     else:            
         return html_minify(render_template(skin_check(conn), 
             imp = [name, wiki_set(conn, 1), custom(conn), other2([' (' + lang_data['move'] + ')', 0])],
-            data = '<form method="post">' + ip_warring(conn) + '<input placeholder="문서명" value="' + name + '" name="title" type="text"><hr><input placeholder="사유" name="send" type="text"><hr>' + captcha_get(conn) + '<button type="submit">' + lang_data['move'] + '</button></form>',
+            data = '''
+                    <form method="post">
+                        ''' + ip_warring(conn) + '''
+                        <input placeholder="문서명" value="''' + name + '''" name="title" type="text">
+                        <hr>
+                        <input placeholder="사유" name="send" type="text">
+                        <hr>
+                        ''' + captcha_get(conn) + '''
+                        <button type="submit">''' + lang_data['move'] + '''</button>
+                    </form>
+                    ''',
             menu = [['w/' + url_pas(name), lang_data['document']]]
         ))
             
@@ -1860,24 +1940,24 @@ def other():
                 </ul>
                 <br>
                 <h2>기타</h2>
-                    <ul>
-                        <li><a href="/title_index">''' + lang_data['all'] + ' ' + lang_data['document'] + '''</a></li>
-                        <li><a href="/acl_list">ACL ''' + lang_data['document'] + '''</a></li>
-                        <li><a href="/please">필요한 문서</a></li>
-                        <li><a href="/upload">파일 올리기</a></li>
-                        <li><a href="/manager/10">문서 검색</a></li>
-                    </ul>
-                    <br>
-                    <h2>''' + lang_data['admin'] + '''</h2>
-                    <ul>
-                        <li><a href="/manager/1">''' + lang_data['admin'] + ' ' + lang_data['tool'] + '''</a></li>
-                    </ul>
-                    <br>
-                    <h2>버전</h2>
-                    <ul>
-                        <li>이 오픈나무는 <a id="out_link" href="https://github.com/2DU/openNAMU/blob/master/version.md">''' + r_ver + '''</a> 입니다.</li>
-                    </ul>''',
-        menu = 0
+                <ul>
+                    <li><a href="/title_index">''' + lang_data['all'] + ' ' + lang_data['document'] + '''</a></li>
+                    <li><a href="/acl_list">ACL ''' + lang_data['document'] + '''</a></li>
+                    <li><a href="/please">필요한 문서</a></li>
+                    <li><a href="/upload">파일 올리기</a></li>
+                    <li><a href="/manager/10">문서 검색</a></li>
+                </ul>
+                <br>
+                <h2>''' + lang_data['admin'] + '''</h2>
+                <ul>
+                    <li><a href="/manager/1">''' + lang_data['admin'] + ' ' + lang_data['tool'] + '''</a></li>
+                </ul>
+                <br>
+                <h2>버전</h2>
+                <ul>
+                    <li>이 오픈나무는 <a id="out_link" href="https://github.com/2DU/openNAMU/blob/master/version.md">''' + r_ver + '''</a> 입니다.</li>
+                </ul>''',
+    menu = 0
     ))
     
 @app.route('/manager', methods=['POST', 'GET'])
@@ -2276,7 +2356,13 @@ def topic(name = None, sub = None):
             number += 1
 
         if ban != 1 or admin == 1:
-            data += '<a id="reload" href="javascript:void(0);" onclick="location.href.endsWith(\'#reload\')? location.reload(true):location.href=\'#reload\'">(새로고침)</a><form style="' + display + '" method="post"><br><textarea style="height: 100px;" name="content"></textarea><hr>' + captcha_get(conn)
+            data += '''
+                    <a id="reload" href="javascript:void(0);" onclick="location.href.endsWith(\'#reload\')? location.reload(true):location.href=\'#reload\'">(새로고침)</a>
+                    <form style="''' + display + '''" method="post">
+                    <br>
+                    <textarea style="height: 100px;" name="content"></textarea>
+                    <hr>
+                    ''' + captcha_get(conn)
             
             if display == '':
                 data += ip_warring(conn)
@@ -2474,7 +2560,30 @@ def change_password():
 
         return html_minify(render_template(skin_check(conn),    
             imp = [lang_data['my_info'] + ' ' + lang_data['edit'], wiki_set(conn, 1), custom(conn), other2([0, 0])],
-            data = '<form method="post"><span>닉네임 : ' + ip + '</span><hr><input placeholder="현재 비밀번호" name="pw" type="password"><br><br><input placeholder="변경할 비밀번호" name="pw2" type="password"><br><br><input placeholder="재 확인" name="pw3" type="password"><hr><input placeholder="이메일" name="email" type="text" value="' + email + '"><hr><span>스킨</span><br><br><select name="skin">' + div2 + '</select><hr><button type="submit">' + lang_data['edit'] + '</button><hr><span>' + lang_data['http_warring'] + '</span></form>',
+            data = '''
+                    <form method="post">
+                        <span>닉네임 : ''' + ip + '''</span>
+                        <hr>
+                        <input placeholder="현재 비밀번호" name="pw" type="password">
+                        <br>
+                        <br>
+                        <input placeholder="변경할 비밀번호" name="pw2" type="password">
+                        <br>
+                        <br>
+                        <input placeholder="재 확인" name="pw3" type="password">
+                        <hr>
+                        <input placeholder="이메일" name="email" type="text" value="''' + email + '''">
+                        <hr>
+                        <span>스킨</span>
+                        <br>
+                        <br>
+                        <select name="skin">''' + div2 + '''</select>
+                        <hr>
+                        <button type="submit">''' + lang_data['edit'] + '''</button>
+                        <hr>
+                        <span>''' + lang_data['http_warring'] + '''</span>
+                    </form>
+                    ''',
             menu = [['user', lang_data['user']]]
         ))
 
@@ -2541,7 +2650,13 @@ def plus_check(name):
     else:
         return html_minify(render_template(skin_check(conn),
             imp = ['대상 ' + lang_data['plus'] + '', wiki_set(conn, 1), custom(conn), other2([0, 0])],
-            data = '<form method="post"><input placeholder="비교 대상" name="name2" type="text"><hr><button type="submit">' + lang_data['move'] + '</button></form>',
+            data = '''
+                    <form method="post">
+                        <input placeholder="비교 대상" name="name2" type="text">
+                        <hr>
+                        <button type="submit">''' + lang_data['move'] + '''</button>
+                    </form>
+                    ''',
             menu = [['manager', lang_data['admin']]]
         ))
                 
@@ -2596,7 +2711,23 @@ def register():
 
         return html_minify(render_template(skin_check(conn),    
             imp = ['회원가입', wiki_set(conn, 1), custom(conn), other2([0, 0])],
-            data = '<form method="post">' + contract + '<input placeholder="아이디" name="id" type="text"><hr><input placeholder="비밀번호" name="pw" type="password"><hr><input placeholder="다시" name="pw2" type="password"><hr><input placeholder="이메일 (선택)" name="email" type="text"><hr>' + captcha_get(conn) + '<button type="submit">가입</button><hr><span>' + lang_data['http_warring'] + '</span></form>',
+            data = '''
+                    <form method="post">
+                        ''' + contract + '''
+                        <input placeholder="아이디" name="id" type="text">
+                        <hr>
+                        <input placeholder="비밀번호" name="pw" type="password">
+                        <hr>
+                        <input placeholder="다시" name="pw2" type="password">
+                        <hr>
+                        <input placeholder="이메일 (선택)" name="email" type="text">
+                        <hr>
+                        ''' + captcha_get(conn) + '''
+                        <button type="submit">가입</button>
+                        <hr>
+                        <span>''' + lang_data['http_warring'] + '''</span>
+                    </form>
+                    ''',
             menu = [['user', lang_data['user']]]
         ))
             
@@ -3354,7 +3485,18 @@ def upload():
     else:
         return html_minify(render_template(skin_check(conn), 
             imp = ['파일 올리기', wiki_set(conn, 1), custom(conn), other2([0, 0])],
-            data =  '<form method="post" enctype="multipart/form-data" accept-charset="utf8"><input type="file" name="f_data"><hr><input placeholder="파일 이름" name="f_name" type="text"><hr><input placeholder="라이선스" name="f_lice" type="text"><hr>' + captcha_get(conn) + '<button id="save" type="submit">' + lang_data['save'] + '</button></form>',
+            data =  '''
+                    <form method="post" enctype="multipart/form-data" accept-charset="utf8">
+                        <input type="file" name="f_data">
+                        <hr>
+                        <input placeholder="파일 이름" name="f_name" type="text">
+                        <hr>
+                        <input placeholder="라이선스" name="f_lice" type="text">
+                        <hr>
+                        ''' + captcha_get(conn) + '''
+                        <button id="save" type="submit">''' + lang_data['save'] + '''</button>
+                    </form>
+                    ''',
             menu = [['other', '기타']]
         ))  
         
@@ -3520,7 +3662,13 @@ def custom_head_view():
 
         return html_minify(render_template(skin_check(conn), 
             imp = [lang_data['user'] + ' HEAD', wiki_set(conn, 1), custom(conn), other2([0, 0])],
-            data =  start + '<form method="post"><textarea rows="25" cols="100" name="content">' + data + '</textarea><hr><button id="save" type="submit">' + lang_data['save'] + '</button></form>',
+            data =  start + '''
+                    <form method="post">
+                        <textarea rows="25" cols="100" name="content">''' + data + '''</textarea>
+                        <hr>
+                        <button id="save" type="submit">''' + lang_data['save'] + '''</button>
+                    </form>
+                    ''',
             menu = [['user', lang_data['user']]]
         ))
 
@@ -3548,7 +3696,12 @@ def count_edit(name = None):
 
     return html_minify(render_template(skin_check(conn), 
         imp = ['활동 횟수', wiki_set(conn, 1), custom(conn), other2([0, 0])],
-        data = '<ul><li><a href="/record/' + url_pas(that) + '">편집 횟수</a> : ' + str(data) + '</li><li><a href="/topic_record/' + url_pas(that) + '">토론 횟수</a> : ' + str(t_data) + '</a></li></ul>',
+        data = '''
+                <ul>
+                    <li><a href="/record/''' + url_pas(that) + '''">편집 횟수</a> : ''' + str(data) + '''</li>
+                    <li><a href="/topic_record/''' + url_pas(that) + '''">토론 횟수</a> : ''' + str(t_data) + '''</a></li>
+                </ul>
+                ''',
         menu = [['user', lang_data['user']]]
     ))
         
@@ -3600,7 +3753,17 @@ def main_file(test = None):
 
 @app.errorhandler(404)
 def error_404(e):
-    return '<!-- 나니카가 하지마룻테 코토와 오와리니 츠나가루다난테 캉가에테모 미나캇타. 이야, 캉카에타쿠나캇탄다... 아마오토 마도오 타타쿠 소라카라 와타시노 요-나 카나시미 훗테루 토메도나쿠 이마오 누라시테 오모이데 난테 이라나이노 코코로가 쿠루시쿠나루 다케다토 No more! September Rain No more! September Rain 이츠닷테 아나타와 미짓카닷타 와자와자 키모치오 타시카메룻테 코토모 히츠요-쟈나쿠테 시젠니 나카라요쿠 나레타카라 안신시테타노 카모시레나이네 도-시테? 나미니 토이카케루케도 나츠노 하지마리가 츠레테키타 오모이 나츠가 오와루토키 키에챠우모노닷타 난테 시라나쿠테 토키메이테타 아츠이 키세츠 우미베노 소라가 히캇테 토츠젠 쿠모가 나가레 오츠부노 아메 와타시노 나카노 나미다미타이 콘나니 타노시이 나츠가 즛토 츠즈이테쿳테 신지테타요 But now... September Rain But now... September Rain -->' + redirect('/w/' + url_pas(wiki_set(conn, 2)))
+    return '''<!-- 
+            나니카가 하지마룻테 코토와 오와리니 츠나가루다난테 캉가에테모 미나캇타. 이야, 캉카에타쿠나캇탄다...
+            아마오토 마도오 타타쿠 소라카라 와타시노 요-나 카나시미 훗테루 토메도나쿠 이마오 누라시테
+            오모이데 난테 이라나이노 코코로가 쿠루시쿠나루 다케다토 No more! September Rain No more! September Rain
+            
+            이츠닷테 아나타와 미짓카닷타 와자와자 키모치오 타시카메룻테 코토모 히츠요-쟈나쿠테
+            시젠니 나카라요쿠 나레타카라 안신시테타노 카모시레나이네 도-시테? 나미니 토이카케루케도
+            나츠노 하지마리가 츠레테키타 오모이 나츠가 오와루토키 키에챠우모노닷타 난테 시라나쿠테
+            토키메이테타 아츠이 키세츠 우미베노 소라가 히캇테 토츠젠 쿠모가 나가레 오츠부노 아메 와타시노 나카노 나미다미타이
+            콘나니 타노시이 나츠가 즛토 츠즈이테쿳테 신지테타요 But now... September Rain But now... September Rain
+            -->''' + redirect('/w/' + url_pas(wiki_set(conn, 2)))
 
 if __name__=="__main__":
     app.secret_key = rep_key
