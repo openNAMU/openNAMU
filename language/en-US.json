@@ -2,8 +2,8 @@
     "edit" : "Edit",
     "history" : "History",
     "delete" : "Delete",
-    "bulk_delete" : "Bulk delete",
-    "edit_filter" : "Edit filtering",
+    "bulk_delete" : "Bulk Delete",
+    "edit_filter" : "Edit Filtering",
     "move" : "Move",
     "hide" : "Hide",
     "list" : "List",
@@ -17,26 +17,41 @@
     "other" : "Others",
     "tool" : "Tools",
     "plus" : "Add",
+    "open" : "Open",
+    "search" : "Search",
+    "need" : "Needful",
+    "upload" : "File Upload",
+    "record" : "Record",
+    "name" : "Name",
+    "license" : "License",
+    
     "user" : "User",
     "alarm" : "Alarm",
-    "watchlist" : "Watching list",
-    "my_info" : "About me",
+    "watchlist" : "Watching List",
+    "my_info" : "About Me",
+    
     "recent" : "Recently",
-    "recent_changes" : "Recently editted",
+    "recent_changes" : "Recent Changes",
+    
     "discussion" : "Discussions",
+    
     "login" : "Sign in",
     "logout" : "Sign out",
     "register" : "Sign up",
     "no_alarm" : "There is no available alarm",
+    
     "able" : "Able to",
+    
     "year" : "Year",
     "month" : "Month",
     "day" : "Day",
+
     "normal" : "Common",
     "subscriber" : "Member",
     "admin" : "Administrator",
     "owner" : "Owner",
-    "admin_group" : "Moderation group",
+    "admin_group" : "Moderation Group",
+
     "user_css_warring" : "User's CSS will deleted if you close the browser or when you are editting as guest",
     "http_warring" : "Warning : If you are not on HTTPS connection, your information can be leaked. We won't response to that."
 }

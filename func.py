@@ -22,7 +22,7 @@ from set_mark.tool import sha224
 from mark import *
 
 # 서브 언어팩 불러옴
-json_data = open(os.path.join('language', 'ko-KR.json'), 'rt', encoding='utf-8').read()
+json_data = open(os.path.join('language', 'en-US.json'), 'rt', encoding='utf-8').read()
 else_lang = json.loads(json_data)
 
 def captcha_get(conn):
