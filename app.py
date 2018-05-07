@@ -159,7 +159,7 @@ rep_data = curs.fetchall()
 if not rep_data:
     while 1:
         print('Language [ko-KR] : ', end = '')
-        support_language = ['ko-KR']
+        support_language = ['ko-KR', 'en-US']
         
         rep_language = str(input())
         if rep_language in support_language:
