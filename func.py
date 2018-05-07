@@ -21,6 +21,10 @@ from set_mark.tool import sha224
 # 나무마크 불러옴
 from mark import *
 
+# 서브 언어팩 불러옴
+json_data = open(os.path.join('language', 'ko-KR.json'), 'rt', encoding='utf-8').read()
+else_lang = json.loads(json_data)
+
 def captcha_get(conn):
     curs = conn.cursor()
 
@@ -60,6 +64,12 @@ def captcha_post(test, conn, num = 1):
             return 0
     else:
         pass
+
+def load_lang(lang, data):
+    if data in lang:
+        return lang[data]
+    else:
+        return else_lang[data]
 
 def edit_help_button():
     # https://stackoverflow.com/questions/11076975/insert-text-into-textarea-at-cursor-position-javascript
