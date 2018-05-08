@@ -3572,7 +3572,7 @@ def user_info():
                 <h2>''' + load_lang(lang_data, 'tool') + '''</h2>
                 <ul>
                     <li><a href="/acl/''' + load_lang(lang_data, 'user') + ':' + url_pas(ip) + '">' + load_lang(lang_data, 'user') + ' ' + load_lang(lang_data, 'document') + ''' ACL</a></li>
-                    <li><a href="/custom_head">''' + load_lang(lang_data, 'user') + ''' HEAD</a></li></ul><br><h2>' + load_lang(lang_data, 'other') + '</h2><ul>''' + plus2 + '''<li><a href="/count">활동 횟수</a></li>
+                    <li><a href="/custom_head">''' + load_lang(lang_data, 'user') + ''' HEAD</a></li></ul><br><h2>''' + load_lang(lang_data, 'other') + '''</h2><ul>''' + plus2 + '''<li><a href="/count">활동 횟수</a></li>
                 </ul>
                 ''',
         menu = 0
