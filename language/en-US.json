@@ -24,6 +24,16 @@
     "record" : "Record",
     "name" : "Name",
     "license" : "License",
+    "interwiki" : "Inter Wiki",
+    "update" : "Update",
+    "setting" : "Setting",
+    "create" : "Create",
+    "editor" : "Editor",
+    "hour" : "Hour",
+    "time" : "Time",
+    "backlink" : "Back Link",
+    "why" : "Why",
+    "authority" : "Authority",
     
     "user" : "User",
     "alarm" : "Alarm",
@@ -38,7 +48,7 @@
     "login" : "Sign in",
     "logout" : "Sign out",
     "register" : "Sign up",
-    "no_alarm" : "There is no available alarm",
+    "no_alarm" : "There Is No Available Alarm",
     
     "able" : "Able to",
     
@@ -52,6 +62,6 @@
     "owner" : "Owner",
     "admin_group" : "Moderation Group",
 
-    "user_css_warring" : "User's CSS will deleted if you close the browser or when you are editting as guest",
-    "http_warring" : "Warning : If you are not on HTTPS connection, your information can be leaked. We won't response to that."
+    "user_css_warring" : "User's CSS Will Deleted If You Close The Browser Or When You Are Editting As Guest",
+    "http_warring" : "Warning : If You Are Not On HTTPS Connection, Your Information Can Be Leaked. We Won't Response To That."
 }
