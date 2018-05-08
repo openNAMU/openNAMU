@@ -19,13 +19,13 @@ import logging
 import random
 import sys
 
-# 버전 표기
-r_ver = 'v3.0.4-Beta-05'
-print('Version : ' + r_ver)
-
 # 나머지 불러오기
 from func import *
 from set_mark.tool import savemark
+
+# 버전 표기
+r_ver = 'v3.0.4-Beta-' + time.strftime('%y%m%d', time.localtime(os.stat('app.py').st_mtime))
+print('Version : ' + r_ver)
 
 # set.json 설정 확인
 try:
