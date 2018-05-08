@@ -73,7 +73,7 @@ def load_lang(lang, data):
 
 def edit_help_button():
     # https://stackoverflow.com/questions/11076975/insert-text-into-textarea-at-cursor-position-javascript
-    js = '''<script>
+    '''<script>
                 function insertAtCursor(myField, myValue) {
                     if (document.selection) { 
                         document.getElementById(myField).focus();
@@ -90,9 +90,9 @@ def edit_help_button():
             </script>
         '''
 
-    js_button = '<a href="javascript:void(0);" onclick="insertAtCursor(\'content\', \'[[]]\');">(링크)</a> <a href="javascript:void(0);" onclick="insertAtCursor(\'content\', \'[macro()]\');">(매크로)</a> <a href="javascript:void(0);" onclick="insertAtCursor(\'content\', \'{{{#! }}}\');">(중괄호)</a>'
+    '<a href="javascript:void(0);" onclick="insertAtCursor(\'content\', \'[[]]\');">(링크)</a> <a href="javascript:void(0);" onclick="insertAtCursor(\'content\', \'[macro()]\');">(매크로)</a> <a href="javascript:void(0);" onclick="insertAtCursor(\'content\', \'{{{#! }}}\');">(중괄호)</a><hr>'
 
-    return [js, js_button]
+    return ['', '']
 
 def ip_warring(conn):
     curs = conn.cursor()
