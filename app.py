@@ -20,7 +20,7 @@ import random
 import sys
 
 # 버전 표기
-r_ver = 'v3.0.4-Beta-04'
+r_ver = 'v3.0.4-Beta-05'
 print('Version : ' + r_ver)
 
 # 나머지 불러오기
@@ -329,7 +329,7 @@ def inter_wiki(tools = None):
     if tools == 'inter_wiki':
         del_link = 'del_inter_wiki'
         plus_link = 'plus_inter_wiki'
-        title = '인터위키 ' + load_lang(lang_data, 'list')
+        title = load_lang(lang_data, 'interwiki') + ' ' + load_lang(lang_data, 'list')
         div = ''
 
         curs.execute('select title, link from inter')
@@ -367,7 +367,7 @@ def inter_wiki(tools = None):
     return html_minify(render_template(skin_check(conn), 
         imp = [title, wiki_set(conn, 1), custom(conn), other2([0, 0])],
         data = div,
-        menu = [['other', '' + load_lang(lang_data, 'other') + '']]
+        menu = [['other', load_lang(lang_data, 'other')]]
     ))
 
 @app.route('/<regex("del_(inter_wiki|html_filter)"):tools>/<name>')
@@ -399,7 +399,7 @@ def plus_inter(tools = None):
         return redirect('/' + re.sub('^plus_', '', tools))
     else:
         if tools == 'plus_inter_wiki':
-            title = '인터위키 ' + load_lang(lang_data, 'plus')
+            title = load_lang(lang_data, 'interwiki') + ' ' + load_lang(lang_data, 'plus')
             form_data = '<input placeholder="' + load_lang(lang_data, 'name') + '" type="text" name="title"><hr><input placeholder="링크" type="text" name="link">'
         else:
             title = 'HTML 필터 ' + load_lang(lang_data, 'plus')
@@ -408,7 +408,7 @@ def plus_inter(tools = None):
         return html_minify(render_template(skin_check(conn), 
             imp = [title, wiki_set(conn, 1), custom(conn), other2([0, 0])],
             data = '<form method="post">' + form_data + '<hr><button type="submit">' + load_lang(lang_data, 'plus') + '</button></form>',
-            menu = [['other', '' + load_lang(lang_data, 'other') + '']]
+            menu = [['other', load_lang(lang_data, 'other')]]
         ))
 
 @app.route('/edit_set')
@@ -418,7 +418,7 @@ def edit_set(num = 0):
         return re_error(conn, '/ban')
 
     if num == 0:
-        li_list = ['기본 설정', '문구 관련', '전역 HEAD', 'robots.txt', '구글 관련']
+        li_list = ['Normal', 'Set Text', 'Main HEAD', 'robots.txt', 'Google']
         
         x = 0
         
@@ -429,7 +429,7 @@ def edit_set(num = 0):
             li_data += '<li><a href="/edit_set/' + str(x) + '">' + li + '</a></li>'
 
         return html_minify(render_template(skin_check(conn), 
-            imp = ['설정 편집', wiki_set(conn, 1), custom(conn), other2([0, 0])],
+            imp = [load_lang(lang_data, 'setting'), wiki_set(conn, 1), custom(conn), other2([0, 0])],
             data = '<h2>' + load_lang(lang_data, 'list') + '</h2><ul>' + li_data + '</ul>',
             menu = [['manager', load_lang(lang_data, 'admin')]]
         ))
@@ -499,7 +499,7 @@ def edit_set(num = 0):
                     div2 += '<option value="' + skin_data + '">' + skin_data + '</option>'
 
             return html_minify(render_template(skin_check(conn), 
-                imp = ['기본 설정', wiki_set(conn, 1), custom(conn), other2([0, 0])],
+                imp = ['기본', wiki_set(conn, 1), custom(conn), other2([0, 0])],
                 data = '''
                         <form method="post">
                             <span>''' + load_lang(lang_data, 'name') + '''</span>
@@ -507,59 +507,59 @@ def edit_set(num = 0):
                             <br>
                             <input placeholder="''' + load_lang(lang_data, 'name') + '''" type="text" name="name" value="''' + html.escape(d_list[0]) + '''">
                             <hr>
-                            <span>로고 (HTML)</span>
+                            <span>Logo (HTML)</span>
                             <br>
                             <br>
                             <input placeholder="로고" type="text" name="logo" value="''' + html.escape(d_list[1]) + '''">
                             <hr>
-                            <span>대문</span>
+                            <span>FrontPage</span>
                             <br>
                             <br>
-                            <input placeholder="대문" type="text" name="frontpage" value="''' + html.escape(d_list[2]) + '''">
+                            <input placeholder="FrontPage" type="text" name="frontpage" value="''' + html.escape(d_list[2]) + '''">
                             <hr>
                             <span>''' + load_lang(lang_data, 'license') + ''' (HTML)</span>
                             <br>
                             <br>
                             <input placeholder="''' + load_lang(lang_data, 'license') + '''" type="text" name="license" value="''' + html.escape(d_list[3]) + '''">
                             <hr>
-                            <span>파일 크기 [메가]</span>
+                            <span>Maximum File Size [MB]</span>
                             <br>
                             <br>
                             <input placeholder="파일 크기" type="text" name="upload" value="''' + html.escape(d_list[4]) + '''">
                             <hr>
-                            <span>백업 간격 [시간] (끄기 : 0) {재시작 필요}</span>
+                            <span>Back Up Interval [''' + load_lang(lang_data, 'hour') + '''] (OFF : 0) {Need To Restart}</span>
                             <br>
                             <br>
                             <input placeholder="백업 간격" type="text" name="back_up" value="''' + html.escape(d_list[9]) + '''">
                             <hr>
-                            <span>스킨</span>
+                            <span>Skin</span>
                             <br>
                             <br>
                             <select name="skin">''' + div2 + '''</select>
                             <hr>
-                            <span>전역 ACL</span>
+                            <span>Main ACL</span>
                             <br>
                             <br>
                             <select name="edit">''' + div + '''</select>
                             <hr>
                             <input type="checkbox" name="reg" ''' + ch_1 + '''> 가입불가
                             <hr>
-                            <input type="checkbox" name="ip_view" ''' + ch_2 + '''> 아이피 비공개
+                            <input type="checkbox" name="ip_view" ''' + ch_2 + '''> IP 비공개
                             <hr>
-                            <span>포트</span>
+                            <span>Port</span>
                             <br>
                             <br>
-                            <input placeholder="포트" type="text" name="port" value="''' + html.escape(d_list[10]) + '''">
+                            <input placeholder="Port" type="text" name="port" value="''' + html.escape(d_list[10]) + '''">
                             <hr>
-                            <span>비밀 키</span>
+                            <span>Secret Key</span>
                             <br>
                             <br>
-                            <input placeholder="비밀 키" type="password" name="key" value="''' + html.escape(d_list[11]) + '''">
+                            <input placeholder="Secret Key" type="password" name="key" value="''' + html.escape(d_list[11]) + '''">
                             <hr>
                             <button id="save" type="submit">''' + load_lang(lang_data, 'save') + '''</button>
                         </form>
                         ''',
-                menu = [['edit_set', '설정']]
+                menu = [['edit_set', load_lang(lang_data, 'setting')]]
             ))
     elif num == 2:
         if request.method == 'POST':
@@ -592,23 +592,23 @@ def edit_set(num = 0):
             conn.commit()
 
             return html_minify(render_template(skin_check(conn), 
-                imp = ['문구 관련', wiki_set(conn, 1), custom(conn), other2([0, 0])],
+                imp = ['Set Text', wiki_set(conn, 1), custom(conn), other2([0, 0])],
                 data = '''
                         <form method="post">
-                            <span>가입 약관</span>
+                            <span>Register Text</span>
                             <br>
                             <br>
-                            <input placeholder="가입 약관" type="text" name="contract" value="''' + html.escape(d_list[0]) + '''">
+                            <input placeholder="Register Text" type="text" name="contract" value="''' + html.escape(d_list[0]) + '''">
                             <hr>
-                            <span>비 ''' + load_lang(lang_data, 'login') + ''' 경고</span>
+                            <span>Non-Login Alert</span>
                             <br>
                             <br>
-                            <input placeholder="비 ''' + load_lang(lang_data, 'login') + ''' 경고" type="text" name="no_login_warring" value="''' + html.escape(d_list[1]) + '''">
+                            <input placeholder="Non-Login Alert" type="text" name="no_login_warring" value="''' + html.escape(d_list[1]) + '''">
                             <hr>
                             <button id="save" type="submit">''' + load_lang(lang_data, 'save') + '''</button>
                         </form>
                         ''',
-                menu = [['edit_set', '설정']]
+                menu = [['edit_set', load_lang(lang_data, 'setting')]]
             ))
     elif num == 3:
         if request.method == 'POST':
@@ -632,7 +632,7 @@ def edit_set(num = 0):
                 data = ''
 
             return html_minify(render_template(skin_check(conn), 
-                imp = ['전역 HEAD', wiki_set(conn, 1), custom(conn), other2([0, 0])],
+                imp = ['Main HEAD', wiki_set(conn, 1), custom(conn), other2([0, 0])],
                 data = '''
                         <form method="post">
                             <textarea rows="25" name="content">''' + html.escape(data) + '''</textarea>
@@ -640,7 +640,7 @@ def edit_set(num = 0):
                             <button id="save" type="submit">''' + load_lang(lang_data, 'save') + '''</button>
                         </form>
                         ''',
-                menu = [['edit_set', '설정']]
+                menu = [['edit_set', load_lang(lang_data, 'setting')]]
             ))
     elif num == 4:
         if request.method == 'POST':
@@ -677,7 +677,7 @@ def edit_set(num = 0):
             return html_minify(render_template(skin_check(conn), 
                 imp = ['robots.txt', wiki_set(conn, 1), custom(conn), other2([0, 0])],
                 data = '''
-                        <a href="/robots.txt">(보기)</a>
+                        <a href="/robots.txt">(View)</a>
                         <hr>
                         <form method="post">
                             <textarea rows="25" name="content">''' + html.escape(data) + '''</textarea>
@@ -685,7 +685,7 @@ def edit_set(num = 0):
                             <button id="save" type="submit">''' + load_lang(lang_data, 'save') + '''</button>
                         </form>
                         ''',
-                menu = [['edit_set', '설정']]
+                menu = [['edit_set', load_lang(lang_data, 'setting')]]
             ))
     elif num == 5:
         if request.method == 'POST':
@@ -718,22 +718,22 @@ def edit_set(num = 0):
             conn.commit()
 
             return html_minify(render_template(skin_check(conn), 
-                imp = ['구글 관련', wiki_set(conn, 1), custom(conn), other2([0, 0])],
+                imp = ['Google', wiki_set(conn, 1), custom(conn), other2([0, 0])],
                 data = '''
                         <form method="post">
-                            <span>리캡차 (HTML)</span>
+                            <span>reCAPTCHA (HTML)</span>
                             <br>
                             <br>
-                            <input placeholder="리캡차 (HTML)" type="text" name="recaptcha" value="''' + html.escape(d_list[0]) + '''">
+                            <input placeholder="reCAPTCHA (HTML)" type="text" name="recaptcha" value="''' + html.escape(d_list[0]) + '''">
                             <hr>
-                            <span>리캡차 (비밀키)</span>
+                            <span>reCAPTCHA (Secret Key)</span>
                             <br>
                             <br>
-                            <input placeholder="리캡차 (비밀키)" type="text" name="sec_re" value="''' + html.escape(d_list[1]) + '''">
+                            <input placeholder="reCAPTCHA (Secret Key)" type="text" name="sec_re" value="''' + html.escape(d_list[1]) + '''">
                             <hr>
                             <button id="save" type="submit">''' + load_lang(lang_data, 'save') + '''</button>
                         </form>''',
-                menu = [['edit_set', '설정']]
+                menu = [['edit_set', load_lang(lang_data, 'setting')]]
             ))
     else:
         return redirect('/')
@@ -753,7 +753,7 @@ def not_close_topic():
     div += '</ul>'
 
     return html_minify(render_template(skin_check(conn), 
-        imp = ['' + load_lang(lang_data, 'open') + ' ' + load_lang(lang_data, 'discussion') + ' ' + load_lang(lang_data, 'list'), wiki_set(conn, 1), custom(conn), other2([0, 0])],
+        imp = [load_lang(lang_data, 'open') + ' ' + load_lang(lang_data, 'discussion') + ' ' + load_lang(lang_data, 'list'), wiki_set(conn, 1), custom(conn), other2([0, 0])],
         data = div,
         menu = [['manager', load_lang(lang_data, 'admin')]]
     ))
@@ -785,7 +785,7 @@ def acl_list():
     return html_minify(render_template(skin_check(conn), 
         imp = ['ACL ' + load_lang(lang_data, 'document') + ' ' + load_lang(lang_data, 'list'), wiki_set(conn, 1), custom(conn), other2([0, 0])],
         data = div,
-        menu = [['other', '' + load_lang(lang_data, 'other') + '']]
+        menu = [['other', load_lang(lang_data, 'other')]]
     ))
 
 @app.route('/admin_plus/<name>', methods=['POST', 'GET'])
@@ -855,15 +855,15 @@ def admin_plus(name = None):
 
         data += '<li><input type="checkbox" ' + state +  ' name="ban" ' + exist_list[0] + '> ' + load_lang(lang_data, 'ban') + '</li>'
         data += '<li><input type="checkbox" ' + state +  ' name="mdel" ' + exist_list[1] + '> ' + load_lang(lang_data, 'bulk_delete') + '</li>'
-        data += '<li><input type="checkbox" ' + state +  ' name="toron" ' + exist_list[2] + '> ' + load_lang(lang_data, 'discussion') + ' 관리</li>'
+        data += '<li><input type="checkbox" ' + state +  ' name="toron" ' + exist_list[2] + '> ' + load_lang(lang_data, 'discussion') + '</li>'
         data += '<li><input type="checkbox" ' + state +  ' name="check" ' + exist_list[3] + '> ' + load_lang(lang_data, 'user') + ' 검사</li>'
         data += '<li><input type="checkbox" ' + state +  ' name="acl" ' + exist_list[4] + '> ' + load_lang(lang_data, 'document') + ' ACL</li>'
         data += '<li><input type="checkbox" ' + state +  ' name="hidel" ' + exist_list[5] + '> ' + load_lang(lang_data, 'history') + ' ' + load_lang(lang_data, 'hide') + '</li>'
-        data += '<li><input type="checkbox" ' + state +  ' name="give" ' + exist_list[6] + '> 권한 관리</li>'
+        data += '<li><input type="checkbox" ' + state +  ' name="give" ' + exist_list[6] + '> ' + load_lang(lang_data, 'authority') + '</li>'
         data += '<li><input type="checkbox" ' + state +  ' name="owner" ' + exist_list[7] + '> ' + load_lang(lang_data, 'owner') + '</li></ul>'
 
         return html_minify(render_template(skin_check(conn), 
-            imp = [load_lang(lang_data, 'admin_group') + ' ' + load_lang(lang_data, 'plus') + '', wiki_set(conn, 1), custom(conn), other2([0, 0])],
+            imp = [load_lang(lang_data, 'admin_group') + ' ' + load_lang(lang_data, 'plus'), wiki_set(conn, 1), custom(conn), other2([0, 0])],
             data = '<form method="post">' + data + '<hr><button id="save" ' + state +  ' type="submit">' + load_lang(lang_data, 'save') + '</button></form>',
             menu = [['manager', load_lang(lang_data, 'admin')]]
         ))        
@@ -886,7 +886,7 @@ def admin_list():
     return html_minify(render_template(skin_check(conn), 
         imp = [load_lang(lang_data, 'admin') + ' ' + load_lang(lang_data, 'list'), wiki_set(conn, 1), custom(conn), other2([0, 0])],
         data = div,
-        menu = [['other', '' + load_lang(lang_data, 'other') + '']]
+        menu = [['other', load_lang(lang_data, 'other')]]
     ))
         
 @app.route('/hidden/<path:name>')
@@ -972,7 +972,7 @@ def admin_log():
     list_data += next_fix('/admin_log?num=', num, get_list)
 
     return html_minify(render_template(skin_check(conn), 
-        imp = ['최근 권한', wiki_set(conn, 1), custom(conn), other2([0, 0])],
+        imp = ['최근 ' + load_lang(lang_data, 'authority'), wiki_set(conn, 1), custom(conn), other2([0, 0])],
         data = list_data,
         menu = 0
     ))
@@ -989,12 +989,12 @@ def give_log():
 
         list_data += '<li><a href="/admin_plus/' + url_pas(data[0]) + '">' + data[0] + '</a></li>'
     
-    list_data += '</ul><hr><a href="/manager/8">(생성)</a>'
+    list_data += '</ul><hr><a href="/manager/8">(' + load_lang(lang_data, 'create') + ')</a>'
 
     return html_minify(render_template(skin_check(conn), 
         imp = [load_lang(lang_data, 'admin_group') + ' ' + load_lang(lang_data, 'list'), wiki_set(conn, 1), custom(conn), other2([0, 0])],
         data = list_data,
-        menu = [['other', '' + load_lang(lang_data, 'other') + '']]
+        menu = [['other', load_lang(lang_data, 'other')]]
     ))
 
 @app.route('/indexing')
@@ -1082,8 +1082,8 @@ def update():
                 return redirect('/re_start')
 
     return html_minify(render_template(skin_check(conn), 
-        imp = ['업데이트', wiki_set(conn, 1), custom(conn), other2([0, 0])],
-        data = '수동 업데이트를 권장 합니다. <a href="https://github.com/2DU/openNAMU">(깃허브)</a>',
+        imp = [load_lang(lang_data, 'update'), wiki_set(conn, 1), custom(conn), other2([0, 0])],
+        data = 'Auto Update Is Not Support. <a href="https://github.com/2DU/openNAMU">(GitHub)</a>',
         menu = [['manager/1', load_lang(lang_data, 'admin')]]
     ))
         
@@ -1115,12 +1115,12 @@ def xref(name = None):
         div += '</li>'
         
         if re.search('^틀:', data[0]):
-            div += '<li><a id="inside" href="/xref/' + url_pas(data[0]) + '">' + data[0] + '</a> (역링크)</li>'
+            div += '<li><a id="inside" href="/xref/' + url_pas(data[0]) + '">' + data[0] + '</a> (' + load_lang(lang_data, 'backlink') + ')</li>'
       
     div += '</ul>' + next_fix('/xref/' + url_pas(name) + '?num=', num, data_list)
     
     return html_minify(render_template(skin_check(conn), 
-        imp = [name, wiki_set(conn, 1), custom(conn), other2([' (역링크)', 0])],
+        imp = [name, wiki_set(conn, 1), custom(conn), other2([' (' + load_lang(lang_data, 'backlink') + ')', 0])],
         data = div,
         menu = [['w/' + url_pas(name), load_lang(lang_data, 'document')]]
     ))
@@ -1147,9 +1147,9 @@ def please():
     div += '</ul>' + next_fix('/please?num=', num, data_list)
     
     return html_minify(render_template(skin_check(conn), 
-        imp = ['' + load_lang(lang_data, 'need') + ' ' + load_lang(lang_data, 'document'), wiki_set(conn, 1), custom(conn), other2([0, 0])],
+        imp = [load_lang(lang_data, 'need') + ' ' + load_lang(lang_data, 'document'), wiki_set(conn, 1), custom(conn), other2([0, 0])],
         data = div,
-        menu = [['other', '' + load_lang(lang_data, 'other') + '']]
+        menu = [['other', load_lang(lang_data, 'other')]]
     ))
         
 @app.route('/recent_discuss')
@@ -1167,7 +1167,7 @@ def recent_discuss(tools = 'normal'):
             
             m_sub = ' (닫힘)'
 
-        div += '<hr><table style="width: 100%; text-align: center;"><tbody><tr><td style="width: 50%;">' + load_lang(lang_data, 'discussion') + ' ' + load_lang(lang_data, 'name') + '</td><td style="width: 50%;">시간</td></tr>'
+        div += '<hr><table style="width: 100%; text-align: center;"><tbody><tr><td style="width: 50%;">' + load_lang(lang_data, 'discussion') + ' ' + load_lang(lang_data, 'name') + '</td><td style="width: 50%;">' + load_lang(lang_data, 'time') + '</td></tr>'
     else:
         return redirect('/')
     
@@ -1193,7 +1193,7 @@ def recent_discuss(tools = 'normal'):
         div += '</tbody></table>'
             
     return html_minify(render_template(skin_check(conn), 
-        imp = ['최근 ' + load_lang(lang_data, 'discussion') + '', wiki_set(conn, 1), custom(conn), other2([m_sub, 0])],
+        imp = ['최근 ' + load_lang(lang_data, 'discussion'), wiki_set(conn, 1), custom(conn), other2([m_sub, 0])],
         data = div,
         menu = 0
     ))
@@ -1217,7 +1217,7 @@ def block_log(name = None, tool = None, tool2 = None):
             div = '''
                     <a href="/manager/11">(차단자)</a> <a href="/manager/12">(''' + load_lang(lang_data, 'admin') + ''')</a>
                     <hr>
-                    <a href="/block_log/ip">(아이피)</a> <a href="/block_log/user">(''' + load_lang(lang_data, 'subscriber') + ''')</a> <a href="/block_log/never_end">(무기한)</a> <a href="/block_log/can_end">(기간)</a> <a href="/block_log/end">(''' + load_lang(lang_data, 'release') + ''')</a> <a href="/block_log/now">(현재)</a> <a href="/block_log/edit_filter">(''' + load_lang(lang_data, 'edit_filter') + ''')</a>
+                    <a href="/block_log/ip">(IP)</a> <a href="/block_log/user">(''' + load_lang(lang_data, 'subscriber') + ''')</a> <a href="/block_log/never_end">(무기한)</a> <a href="/block_log/can_end">(기간)</a> <a href="/block_log/end">(''' + load_lang(lang_data, 'release') + ''')</a> <a href="/block_log/now">(현재)</a> <a href="/block_log/edit_filter">(''' + load_lang(lang_data, 'edit_filter') + ''')</a>
                     <hr>
                     ''' + div
             
@@ -1229,7 +1229,7 @@ def block_log(name = None, tool = None, tool2 = None):
             menu = [['block_log', load_lang(lang_data, 'normal')]]
             
             if tool2 == 'ip':
-                sub = ' (아이피)'
+                sub = ' (IP)'
                 
                 curs.execute("select why, block, blocker, end, today from rb where (block like ? or block like ?) order by today desc limit ?, '50'", ['%.%', '%:%', str(sql_num)])
             elif tool2 == 'user':
@@ -1394,10 +1394,10 @@ def raw_view(name = None, sub_title = None, num = None):
     elif sub_title:
         curs.execute("select data from topic where id = ? and title = ? and sub = ? and block = ''", [str(num), name, sub_title])
         
-        v_name = '' + load_lang(lang_data, 'discussion') + ' 원본'
+        v_name = load_lang(lang_data, 'discussion') + ' 원본'
         sub = ' (' + str(num) + '번)'
 
-        menu = [['topic/' + url_pas(name) + '/sub/' + url_pas(sub_title) + '#' + str(num), '' + load_lang(lang_data, 'discussion') + ''], ['topic/' + url_pas(name) + '/sub/' + url_pas(sub_title) + '/admin/' + str(num), load_lang(lang_data, 'tool')]]
+        menu = [['topic/' + url_pas(name) + '/sub/' + url_pas(sub_title) + '#' + str(num), load_lang(lang_data, 'discussion')], ['topic/' + url_pas(name) + '/sub/' + url_pas(sub_title) + '/admin/' + str(num), load_lang(lang_data, 'tool')]]
     else:
         curs.execute("select data from data where title = ?", [name])
         
@@ -1461,7 +1461,7 @@ def revert(name = None):
 
         return html_minify(render_template(skin_check(conn), 
             imp = [name, wiki_set(conn, 1), custom(conn), other2([' (' + load_lang(lang_data, 'revert') + ')', 0])],
-            data =  '<form method="post"><span>' + request.args.get('num', '0') + load_lang(lang_data, 'version') + '</span><hr>' + ip_warring(conn) + '<input placeholder="사유" name="send" type="text"><hr>' + captcha_get(conn) + '<button type="submit">' + load_lang(lang_data, 'revert') + '</button></form>',
+            data =  '<form method="post"><span>' + request.args.get('num', '0') + load_lang(lang_data, 'version') + '</span><hr>' + ip_warring(conn) + '<input placeholder="' + load_lang(lang_data, 'why') + '" name="send" type="text"><hr>' + captcha_get(conn) + '<button type="submit">' + load_lang(lang_data, 'revert') + '</button></form>',
             menu = [['history/' + url_pas(name), load_lang(lang_data, 'history')], ['recent_changes', '최근 변경']]
         ))            
                     
@@ -1507,7 +1507,7 @@ def big_delete():
                     <form method="post">
                         <textarea rows="25" name="content"></textarea>
                         <hr>
-                        <input placeholder="사유" name="send" type="text">
+                        <input placeholder="''' + load_lang(lang_data, 'why') + '''" name="send" type="text">
                         <hr>
                         <button type="submit">''' + load_lang(lang_data, 'delete') + '''</button>
                     </form>
@@ -1717,8 +1717,8 @@ def edit(name = None):
         if not request.args.get('section', None):
             get_name = '''
                         <form method="post" id="get_edit" action="/edit_get/''' + url_pas(name) + '''">
-                            <input placeholder="불러 올 ' + load_lang(lang_data, 'document') + '" name="name" style="width: 50%;" type="text">
-                            <button id="come" type="submit">불러오기</button>
+                            <input placeholder="Load Document" name="name" style="width: 50%;" type="text">
+                            <button id="come" type="submit">Load</button>
                         </form>
                         <hr>
                         '''
@@ -1745,7 +1745,7 @@ def edit(name = None):
                         <textarea id="content" rows="25" name="content">''' + html.escape(re.sub('\n$', '', data)) + '''</textarea>
                         <textarea style="display: none;" name="otent">''' + html.escape(re.sub('\n$', '', data_old)) + '''</textarea>
                         <hr>
-                        <input placeholder="사유" name="send" type="text">
+                        <input placeholder="''' + load_lang(lang_data, 'why') + '''" name="send" type="text">
                         <hr>
                         ''' + captcha_get(conn) + ip_warring(conn) + '''
                         <button id="save" type="submit">''' + load_lang(lang_data, 'save') + '''</button>
@@ -1787,7 +1787,7 @@ def preview(name = None):
                     <textarea id="content" rows="25" name="content">''' + html.escape(request.form.get('content', None)) + '''</textarea>
                     <textarea style="display: none;" name="otent">''' + html.escape(request.form.get('otent', None)) + '''</textarea>
                     <hr>
-                    <input placeholder="사유" name="send" type="text">
+                    <input placeholder="''' + load_lang(lang_data, 'why') + '''" name="send" type="text">
                     <hr>
                     ''' + captcha_get(conn) + '''
                     <button id="save" type="submit">''' + load_lang(lang_data, 'save') + '''</button>
@@ -1837,7 +1837,7 @@ def delete(name = None):
             data = '''
                     <form method="post">
                         ''' + ip_warring(conn) + '''
-                        <input placeholder="사유" name="send" type="text">
+                        <input placeholder="''' + load_lang(lang_data, 'why') + '''" name="send" type="text">
                         <hr>
                         ''' + captcha_get(conn) + '''
                         <button type="submit">''' + load_lang(lang_data, 'delete') + '''</button>
@@ -1912,7 +1912,7 @@ def move(name = None):
                         ''' + ip_warring(conn) + '''
                         <input placeholder="''' + load_lang(lang_data, 'document') + ' ' + load_lang(lang_data, 'name') + '" value="' + name + '''" name="title" type="text">
                         <hr>
-                        <input placeholder="사유" name="send" type="text">
+                        <input placeholder="''' + load_lang(lang_data, 'why') + '''" name="send" type="text">
                         <hr>
                         ''' + captcha_get(conn) + '''
                         <button type="submit">''' + load_lang(lang_data, 'move') + '''</button>
@@ -1924,7 +1924,7 @@ def move(name = None):
 @app.route('/other')
 def other():
     return html_minify(render_template(skin_check(conn), 
-        imp = ['' + load_lang(lang_data, 'other') + ' ' + load_lang(lang_data, 'tool'), wiki_set(conn, 1), custom(conn), other2([0, 0])],
+        imp = [load_lang(lang_data, 'other') + ' ' + load_lang(lang_data, 'tool'), wiki_set(conn, 1), custom(conn), other2([0, 0])],
         data = '''
                 <h2>''' + load_lang(lang_data, 'record') + '''</h2>
                 <ul>
@@ -1963,7 +1963,7 @@ def other():
 @app.route('/manager', methods=['POST', 'GET'])
 @app.route('/manager/<int:num>', methods=['POST', 'GET'])
 def manager(num = 1):
-    title_list = [[load_lang(lang_data, 'document') + ' ACL', '' + load_lang(lang_data, 'document') + ' ' + load_lang(lang_data, 'name') + '', 'acl'], [load_lang(lang_data, 'user') + ' 검사', 0, 'check'], [load_lang(lang_data, 'user') + ' ' + load_lang(lang_data, 'ban'), 0, 'ban'], ['권한 주기', 0, 'admin'], ['편집 ' + load_lang(lang_data, 'edit') + '', 0, 'record'], ['' + load_lang(lang_data, 'discussion') + ' ' + load_lang(lang_data, 'edit') + '', 0, 'topic_record'], ['그룹 생성', '그룹 ' + load_lang(lang_data, 'name') + '', 'admin_plus'], [load_lang(lang_data, 'edit_filter') + ' 생성', '필터 ' + load_lang(lang_data, 'name') + '', 'edit_filter'], ['' + load_lang(lang_data, 'search') + '', '' + load_lang(lang_data, 'document') + ' ' + load_lang(lang_data, 'name') + '', 'search'], ['차단자 ' + load_lang(lang_data, 'search') + '', 0, 'block_user'], [load_lang(lang_data, 'admin') + ' ' + load_lang(lang_data, 'search') + '', 0, 'block_admin'], ['주시 ' + load_lang(lang_data, 'document') + ' ' + load_lang(lang_data, 'plus') + '', '' + load_lang(lang_data, 'document') + ' ' + load_lang(lang_data, 'name') + '', 'watch_list']]
+    title_list = [[load_lang(lang_data, 'document') + ' ' + load_lang(lang_data, 'name'), 'acl'], [0, 'check'], [0, 'ban'], [0, 'admin'], [0, 'record'], [0, 'topic_record'], [load_lang(lang_data, 'name'), 'admin_plus'], [load_lang(lang_data, 'name'), 'edit_filter'], [load_lang(lang_data, 'document') + ' ' + load_lang(lang_data, 'name'), 'search'], [0, 'block_user'], [0, 'block_admin'], [load_lang(lang_data, 'document') + ' ' + load_lang(lang_data, 'name'), 'watch_list']]
     
     if num == 1:
         return html_minify(render_template(skin_check(conn), 
@@ -1974,34 +1974,34 @@ def manager(num = 1):
                         <li><a href="/manager/2">''' + load_lang(lang_data, 'document') + ''' ACL</a></li>
                         <li><a href="/manager/3">''' + load_lang(lang_data, 'user') + ''' 검사</a></li>
                         <li><a href="/manager/4">''' + load_lang(lang_data, 'user') + ' ' + load_lang(lang_data, 'ban') + '''</a></li>
-                        <li><a href="/manager/5">권한 주기</a></li>
+                        <li><a href="/manager/5">''' + load_lang(lang_data, 'authority') + '''</a></li>
                         <li><a href="/big_delete">''' + load_lang(lang_data, 'bulk_delete') + '''</a></li>
                         <li><a href="/edit_filter">''' + load_lang(lang_data, 'edit_filter') + '''</a></li>
                     </ul>
                     <br>
                     <h2>''' + load_lang(lang_data, 'owner') + '''</h2>
                     <ul>
-                        <li><a href="/indexing">인덱싱 (생성 or ''' + load_lang(lang_data, 'delete') + ''')</a></li>
-                        <li><a href="/manager/8">''' + load_lang(lang_data, 'admin_group') + ''' 생성</a></li>
-                        <li><a href="/edit_set">설정 편집</a></li>
-                        <li><a href="/re_start">서버 재 시작</a></li>
-                        <li><a href="/update">업데이트</a></li>
-                        <li><a href="/inter_wiki">인터위키</a></li>
+                        <li><a href="/indexing">Indexing (''' + load_lang(lang_data, 'create') + ' or ' + load_lang(lang_data, 'delete') + ''')</a></li>
+                        <li><a href="/manager/8">''' + load_lang(lang_data, 'admin_group') + ' ' + load_lang(lang_data, 'create') + '''</a></li>
+                        <li><a href="/edit_set">''' + load_lang(lang_data, 'setting') + ' ' + load_lang(lang_data, 'edit') + '''</a></li>
+                        <li><a href="/re_start">Server Restart</a></li>
+                        <li><a href="/update">''' + load_lang(lang_data, 'update') + '''</a></li>
+                        <li><a href="/inter_wiki">''' + load_lang(lang_data, 'interwiki') + '''</a></li>
                     </ul>
                     ''',
-            menu = [['other', '' + load_lang(lang_data, 'other') + '']]
+            menu = [['other', load_lang(lang_data, 'other')]]
         ))
     elif num in range(2, 14):
         if request.method == 'POST':
-            return redirect('/' + title_list[(num - 2)][2] + '/' + url_pas(request.form.get('name', None)))
+            return redirect('/' + title_list[(num - 2)][1] + '/' + url_pas(request.form.get('name', None)))
         else:
-            if title_list[(num - 2)][1] == 0:
-                placeholder = load_lang(lang_data, 'user') + ' ' + load_lang(lang_data, 'name') + ''
+            if title_list[(num - 2)][0] == 0:
+                placeholder = load_lang(lang_data, 'user') + ' ' + load_lang(lang_data, 'name')
             else:
-                placeholder = title_list[(num - 2)][1]
+                placeholder = title_list[(num - 2)][0]
 
             return html_minify(render_template(skin_check(conn), 
-                imp = [title_list[(num - 2)][0], wiki_set(conn, 1), custom(conn), other2([0, 0])],
+                imp = ['Redirect', wiki_set(conn, 1), custom(conn), other2([0, 0])],
                 data = '<form method="post"><input placeholder="' + placeholder + '" name="name" type="text"><hr><button type="submit">' + load_lang(lang_data, 'move') + '</button></form>',
                 menu = [['manager', load_lang(lang_data, 'admin')]]
             ))
@@ -2067,7 +2067,7 @@ def title_index():
     return html_minify(render_template(skin_check(conn), 
         imp = [load_lang(lang_data, 'all') + ' ' + load_lang(lang_data, 'document'), wiki_set(conn, 1), custom(conn), other2([sub, 0])],
         data = data,
-        menu = [['other', '' + load_lang(lang_data, 'other') + '']]
+        menu = [['other', load_lang(lang_data, 'other')]]
     ))
         
 @app.route('/topic/<path:name>/sub/<sub>/b/<int:num>')
@@ -2113,9 +2113,9 @@ def topic_top(name = None, sub = None, num = None):
 @app.route('/topic/<path:name>/sub/<sub>/tool/<regex("close|stop|agree"):tool>')
 def topic_stop(name = None, sub = None, tool = None):
     if tool == 'close':
-        set_list = ['O', '', '' + load_lang(lang_data, 'discussion') + ' 닫기', '' + load_lang(lang_data, 'discussion') + ' 열림']
+        set_list = ['O', '', load_lang(lang_data, 'discussion') + ' 닫기', load_lang(lang_data, 'discussion') + ' 열림']
     elif tool == 'stop':
-        set_list = ['', 'O', '' + load_lang(lang_data, 'discussion') + ' 정지', '' + load_lang(lang_data, 'discussion') + ' 재개']
+        set_list = ['', 'O', load_lang(lang_data, 'discussion') + ' 정지', load_lang(lang_data, 'discussion') + ' 재개']
     elif tool == 'agree':
         pass
     else:
@@ -2164,7 +2164,7 @@ def topic_admin(name = None, sub = None, num = None):
     ban = ''
 
     if admin_check(conn, 3, None) == 1:
-        ban += '</ul><br><h2>관리 ' + load_lang(lang_data, 'tool') + '</h2><ul>'
+        ban += '</ul><br><h2>관리자 ' + load_lang(lang_data, 'tool') + '</h2><ul>'
         is_ban = '<li><a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/b/' + str(num) + '">'
 
         if data[0][0] == 'O':
@@ -2194,7 +2194,7 @@ def topic_admin(name = None, sub = None, num = None):
 
     ban += '</ul><br><h2>' + load_lang(lang_data, 'other') + ' ' + load_lang(lang_data, 'tool') + '</h2><ul>'
     ban += '<li><a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/raw/' + str(num) + '">원본</a></li>'
-    ban = '<li>작성 시간 : ' + data[0][2] + '</li>' + ban
+    ban = '<li>' + load_lang(lang_data, 'time') + ' : ' + data[0][2] + '</li>' + ban
     
     if re.search('(\.|:)', data[0][1]):
         ban = '<li>작성인 : ' + data[0][1] + ' <li><a href="/record/' + url_pas(data[0][1]) + '">(' + load_lang(lang_data, 'edit') + ')</a></li>' + ban
@@ -2204,9 +2204,9 @@ def topic_admin(name = None, sub = None, num = None):
     ban = '<h2>정보</h2><ul>' + ban
 
     return html_minify(render_template(skin_check(conn), 
-        imp = ['' + load_lang(lang_data, 'discussion') + ' ' + load_lang(lang_data, 'tool'), wiki_set(conn, 1), custom(conn), other2([' (' + str(num) + '번)', 0])],
+        imp = [load_lang(lang_data, 'discussion') + ' ' + load_lang(lang_data, 'tool'), wiki_set(conn, 1), custom(conn), other2([' (' + str(num) + '번)', 0])],
         data = ban,
-        menu = [['topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '#' + str(num), '' + load_lang(lang_data, 'discussion') + '']]
+        menu = [['topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '#' + str(num), load_lang(lang_data, 'discussion')]]
     ))
 
 @app.route('/topic/<path:name>/sub/<sub>', methods=['POST', 'GET'])
@@ -2410,7 +2410,7 @@ def close_topic_list(name = None, tool = None):
         else:
             curs.execute("select sub from rd where title = ? order by date desc", [name])
             
-            sub = '' + load_lang(lang_data, 'discussion') + ' ' + load_lang(lang_data, 'list')
+            sub = load_lang(lang_data, 'discussion') + ' ' + load_lang(lang_data, 'list')
             
             menu = [['w/' + url_pas(name), load_lang(lang_data, 'document')]]
             
@@ -2421,7 +2421,7 @@ def close_topic_list(name = None, tool = None):
             if curs.fetchall():                
                 it_p = 0
                 
-                if sub == '' + load_lang(lang_data, 'discussion') + ' ' + load_lang(lang_data, 'list'):
+                if sub == load_lang(lang_data, 'discussion') + ' ' + load_lang(lang_data, 'list'):
                     curs.execute("select title from stop where title = ? and sub = ? and close = 'O' order by sub asc", [name, data[0]])
                     if curs.fetchall():
                         it_p = 1
@@ -2622,7 +2622,7 @@ def user_check(name = None):
             div = '<a href="/check/' + url_pas(name) + '">(주요 대상)</a> <a href="/check/' + url_pas(request.args.get('plus', None)) + '">(비교 대상)</a><hr>'
 
         div += '<table style="width: 100%; text-align: center;"><tbody><tr>'
-        div += '<td style="width: 33.3%;">' + load_lang(lang_data, 'name') + '</td><td style="width: 33.3%;">아이피</td><td style="width: 33.3%;">언제</td></tr>'
+        div += '<td style="width: 33.3%;">' + load_lang(lang_data, 'name') + '</td><td style="width: 33.3%;">IP</td><td style="width: 33.3%;">언제</td></tr>'
         
         for data in record:
             if data[2]:
@@ -2649,7 +2649,7 @@ def plus_check(name):
         return redirect('/check/' + url_pas(name) + '?plus=' + url_pas(request.form.get('name2', None)))
     else:
         return html_minify(render_template(skin_check(conn),
-            imp = ['대상 ' + load_lang(lang_data, 'plus') + '', wiki_set(conn, 1), custom(conn), other2([0, 0])],
+            imp = ['대상 ' + load_lang(lang_data, 'plus'), wiki_set(conn, 1), custom(conn), other2([0, 0])],
             data = '''
                     <form method="post">
                         <input placeholder="비교 대상" name="name2" type="text">
@@ -2776,7 +2776,7 @@ def user_ban(name = None):
                 data = '<ul><li>' + load_lang(lang_data, 'ban') + ' : ' + end[0][0] + '</li>'
 
             if end[0][1] != '':
-                data += '<li>사유 : ' + end[0][1] + '</li></ul><hr>'
+                data += '<li>' + load_lang(lang_data, 'why') + ' : ' + end[0][1] + '</li></ul><hr>'
             else:
                 data += '</ul><hr>'
         else:
@@ -2830,7 +2830,7 @@ def user_ban(name = None):
             data += '<select name="month">' + month + '</select> ' + load_lang(lang_data, 'month') + ' '
             data += '<select name="day">' + day + '</select> ' + load_lang(lang_data, 'day') + ' <hr>'
 
-            data += '<input placeholder="사유" name="why" type="text"><hr>' + plus
+            data += '<input placeholder="' + load_lang(lang_data, 'why') + '" name="why" type="text"><hr>' + plus
 
         return html_minify(render_template(skin_check(conn), 
             imp = [name, wiki_set(conn, 1), custom(conn), other2([' (' + now + ')', 0])],
@@ -2917,7 +2917,7 @@ def acl(name = None):
             data += '</select>'
                 
             if acl_data:
-                data += '<hr><input value="' + html.escape(acl_data[0][1]) + '" placeholder="사유" name="why" type="text" ' + check_ok + '>'
+                data += '<hr><input value="' + html.escape(acl_data[0][1]) + '" placeholder="' + load_lang(lang_data, 'why') + '" name="why" type="text" ' + check_ok + '>'
             
         return html_minify(render_template(skin_check(conn), 
             imp = [name, wiki_set(conn, 1), custom(conn), other2([' (ACL)', 0])],
@@ -2980,7 +2980,7 @@ def user_admin(name = None):
                     div += '<option value="' + data[0] + '">' + data[0] + '</option>'
         
         return html_minify(render_template(skin_check(conn), 
-            imp = [name, wiki_set(conn, 1), custom(conn), other2([' (권한 관리)', 0])],
+            imp = [name, wiki_set(conn, 1), custom(conn), other2([' (' + load_lang(lang_data, 'authority') + ')', 0])],
             data =  '<form method="post"><select name="select">' + div + '</select><hr><button type="submit">' + load_lang(lang_data, 'edit') + '</button></form>',
             menu = [['manager', load_lang(lang_data, 'admin')]]
         ))
@@ -3081,7 +3081,7 @@ def read_view(name = None):
                     db_data = curs.fetchall()
                     if db_data:
                         if re.search('\[\[' + name + '#include]]', db_data[0][0]):
-                            div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a> <a href="/xref/' + url_pas(data[0]) + '">(역링크)</a></li>'
+                            div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a> <a href="/xref/' + url_pas(data[0]) + '">(' + load_lang(lang_data, 'backlink') + ')</a></li>'
                         else:
                             div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a></li>'
                     else:
@@ -3150,11 +3150,11 @@ def read_view(name = None):
         r_date = 0
     else:
         if data_none == 1:
-            menu = [['edit/' + url_pas(name), '생성']]
+            menu = [['edit/' + url_pas(name), load_lang(lang_data, 'create')]]
         else:
             menu = [['edit/' + url_pas(name), load_lang(lang_data, 'edit')]]
 
-        menu += [['topic/' + url_pas(name), '' + load_lang(lang_data, 'discussion') + ''], ['history/' + url_pas(name), load_lang(lang_data, 'history')], ['xref/' + url_pas(name), '역링크'], ['acl/' + url_pas(name), 'ACL']]
+        menu += [['topic/' + url_pas(name), load_lang(lang_data, 'discussion')], ['history/' + url_pas(name), load_lang(lang_data, 'history')], ['xref/' + url_pas(name), load_lang(lang_data, 'backlink')], ['acl/' + url_pas(name), 'ACL']]
 
         if request.args.get('froms', None):
             menu += [['w/' + url_pas(name), '넘기기']]
@@ -3192,7 +3192,7 @@ def user_topic_list(name = None):
     one_admin = admin_check(conn, 1, None)
 
     div = '<table style="width: 100%; text-align: center;"><tbody><tr>'
-    div += '<td style="width: 33.3%;">' + load_lang(lang_data, 'discussion') + ' ' + load_lang(lang_data, 'name') + '</td><td style="width: 33.3%;">작성자</td><td style="width: 33.3%;">시간</td></tr>'
+    div += '<td style="width: 33.3%;">' + load_lang(lang_data, 'discussion') + ' ' + load_lang(lang_data, 'name') + '</td><td style="width: 33.3%;">작성자</td><td style="width: 33.3%;">' + load_lang(lang_data, 'time') + '</td></tr>'
     
     curs.execute("select title, id, sub, ip, date from topic where ip = ? order by date desc limit ?, '50'", [name, str(sql_num)])
     data_list = curs.fetchall()
@@ -3222,9 +3222,9 @@ def user_topic_list(name = None):
         sub = 0 
     
     return html_minify(render_template(skin_check(conn), 
-        imp = ['' + load_lang(lang_data, 'discussion') + ' ' + load_lang(lang_data, 'edit') + '', wiki_set(conn, 1), custom(conn), other2([sub, 0])],
+        imp = [load_lang(lang_data, 'discussion') + ' ' + load_lang(lang_data, 'edit'), wiki_set(conn, 1), custom(conn), other2([sub, 0])],
         data = div,
-        menu = [['other', '' + load_lang(lang_data, 'other') + ''], ['user', load_lang(lang_data, 'user')], ['count/' + url_pas(name), '횟수'], ['record/' + url_pas(name), load_lang(lang_data, 'edit')]]
+        menu = [['other', load_lang(lang_data, 'other')], ['user', load_lang(lang_data, 'user')], ['count/' + url_pas(name), '횟수'], ['record/' + url_pas(name), load_lang(lang_data, 'edit')]]
     ))
 
 @app.route('/recent_changes')
@@ -3252,11 +3252,11 @@ def recent_changes(name = None, tool = 'record'):
                 sql_num = 0      
 
             if tool == 'history':
-                div += '<td style="width: 33.3%;">' + load_lang(lang_data, 'version') + '</td><td style="width: 33.3%;">편집자</td><td style="width: 33.3%;">시간</td></tr>'
+                div += '<td style="width: 33.3%;">' + load_lang(lang_data, 'version') + '</td><td style="width: 33.3%;">' + load_lang(lang_data, 'editor') + '</td><td style="width: 33.3%;">' + load_lang(lang_data, 'time') + '</td></tr>'
                 
                 curs.execute("select id, title, date, ip, send, leng from history where title = ? order by id + 0 desc limit ?, '50'", [name, str(sql_num)])
             else:
-                div += '<td style="width: 33.3%;">' + load_lang(lang_data, 'document') + ' ' + load_lang(lang_data, 'name') + '</td><td style="width: 33.3%;">편집자</td><td style="width: 33.3%;">시간</td></tr>'
+                div += '<td style="width: 33.3%;">' + load_lang(lang_data, 'document') + ' ' + load_lang(lang_data, 'name') + '</td><td style="width: 33.3%;">' + load_lang(lang_data, 'editor') + '</td><td style="width: 33.3%;">' + load_lang(lang_data, 'time') + '</td></tr>'
 
                 if what == 'all':
                     div = '<a href="/record/' + url_pas(name) + '?what=revert">(' + load_lang(lang_data, 'revert') + ')</a><hr>' + div
@@ -3276,14 +3276,14 @@ def recent_changes(name = None, tool = 'record'):
 
                     curs.execute("select id, title, date, ip, send, leng from history where ip = ? and send like ? order by date desc limit ?, '50'", [name, sql, str(sql_num)])
         else:
-            div += '<td style="width: 33.3%;">' + load_lang(lang_data, 'document') + ' ' + load_lang(lang_data, 'name') + '</td><td style="width: 33.3%;">편집자</td><td style="width: 33.3%;">시간</td></tr>'
+            div += '<td style="width: 33.3%;">' + load_lang(lang_data, 'document') + ' ' + load_lang(lang_data, 'name') + '</td><td style="width: 33.3%;">' + load_lang(lang_data, 'editor') + '</td><td style="width: 33.3%;">' + load_lang(lang_data, 'time') + '</td></tr>'
             
             if what == 'all':
                 div = '<a href="/recent_changes?what=revert">(' + load_lang(lang_data, 'revert') + ')</a><hr>' + div
                 div = '<a href="/recent_changes?what=move">(' + load_lang(lang_data, 'move') + ')</a> ' + div
                 div = '<a href="/recent_changes?what=delete">(' + load_lang(lang_data, 'delete') + ')</a> ' + div
 
-                div = '<a href="/recent_discuss">(' + load_lang(lang_data, 'discussion') + ')</a> <a href="/block_log">(' + load_lang(lang_data, 'ban') + ')</a> <a href="/user_log">(가입)</a> <a href="/admin_log">(권한)</a><hr>' + div
+                div = '<a href="/recent_discuss">(' + load_lang(lang_data, 'discussion') + ')</a> <a href="/block_log">(' + load_lang(lang_data, 'ban') + ')</a> <a href="/user_log">(가입)</a> <a href="/admin_log">(' + load_lang(lang_data, 'authority') + ')</a><hr>' + div
                 
                 curs.execute("select id, title, date, ip, send, leng from history order by date desc limit 50")
             else:
@@ -3385,9 +3385,9 @@ def recent_changes(name = None, tool = 'record'):
                 if curs.fetchall():
                     sub += ' (' + load_lang(lang_data, 'ban') + ')'
 
-                title = '편집 ' + load_lang(lang_data, 'edit') + ''
+                title = '편집 ' + load_lang(lang_data, 'edit')
                 
-                menu = [['other', '' + load_lang(lang_data, 'other') + ''], ['user', load_lang(lang_data, 'user')], ['count/' + url_pas(name), '횟수'], ['topic_record/' + url_pas(name), '' + load_lang(lang_data, 'discussion') + '']]
+                menu = [['other', load_lang(lang_data, 'other')], ['user', load_lang(lang_data, 'user')], ['count/' + url_pas(name), '횟수'], ['topic_record/' + url_pas(name), load_lang(lang_data, 'discussion')]]
                 
                 div += next_fix('/record/' + url_pas(name) + '/' + url_pas(what) + '?num=', num, data_list)
                 
@@ -3484,7 +3484,7 @@ def upload():
         return redirect('/w/파일:' + name)      
     else:
         return html_minify(render_template(skin_check(conn), 
-            imp = ['' + load_lang(lang_data, 'upload') + '', wiki_set(conn, 1), custom(conn), other2([0, 0])],
+            imp = [load_lang(lang_data, 'upload'), wiki_set(conn, 1), custom(conn), other2([0, 0])],
             data =  '''
                     <form method="post" enctype="multipart/form-data" accept-charset="utf8">
                         <input type="file" name="f_data">
@@ -3497,7 +3497,7 @@ def upload():
                         <button id="save" type="submit">''' + load_lang(lang_data, 'save') + '''</button>
                     </form>
                     ''',
-            menu = [['other', '' + load_lang(lang_data, 'other') + '']]
+            menu = [['other', load_lang(lang_data, 'other')]]
         ))  
         
 @app.route('/user')
@@ -3560,7 +3560,7 @@ def user_info():
         data =  '''
                 <h2>상태</h2>
                 <ul>
-                    <li>''' + ip_user + ''' <a href="/record/''' + url_pas(ip) + '''">(' + load_lang(lang_data, 'edit') + ')</a></li><li>권한 상태 : ''' + acl + '''</li>
+                    <li>''' + ip_user + ''' <a href="/record/''' + url_pas(ip) + '''">(''' + load_lang(lang_data, 'edit') + ''')</a></li><li>''' + load_lang(lang_data, 'authority') + ''' : ''' + acl + '''</li>
                 </ul>
                 <br>
                 <h2>''' + load_lang(lang_data, 'login') + '''</h2>
