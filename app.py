@@ -1462,7 +1462,7 @@ def revert(name = None):
         return html_minify(render_template(skin_check(conn), 
             imp = [name, wiki_set(conn, 1), custom(conn), other2([' (' + load_lang(lang_data, 'revert') + ')', 0])],
             data =  '<form method="post"><span>' + request.args.get('num', '0') + load_lang(lang_data, 'version') + '</span><hr>' + ip_warring(conn) + '<input placeholder="' + load_lang(lang_data, 'why') + '" name="send" type="text"><hr>' + captcha_get(conn) + '<button type="submit">' + load_lang(lang_data, 'revert') + '</button></form>',
-            menu = [['history/' + url_pas(name), load_lang(lang_data, 'history')], ['recent_changes', '최근 변경']]
+            menu = [['history/' + url_pas(name), load_lang(lang_data, 'history')], ['recent_changes', '최근 ' + load_lang(lang_data, 'change') + '']]
         ))            
                     
 @app.route('/big_delete', methods=['POST', 'GET'])
@@ -2560,19 +2560,19 @@ def change_password():
             imp = [load_lang(lang_data, 'my_info') + ' ' + load_lang(lang_data, 'edit'), wiki_set(conn, 1), custom(conn), other2([0, 0])],
             data = '''
                     <form method="post">
-                        <span>닉네임 : ''' + ip + '''</span>
+                        <span>ID : ''' + ip + '''</span>
                         <hr>
-                        <input placeholder="현재 비밀번호" name="pw" type="password">
+                        <input placeholder="Now" name="pw" type="password">
                         <br>
                         <br>
-                        <input placeholder="변경할 비밀번호" name="pw2" type="password">
+                        <input placeholder="Change" name="pw2" type="password">
                         <br>
                         <br>
-                        <input placeholder="재 확인" name="pw3" type="password">
+                        <input placeholder="Re" name="pw3" type="password">
                         <hr>
-                        <input placeholder="이메일" name="email" type="text" value="''' + email + '''">
+                        <input placeholder="Email" name="email" type="text" value="''' + email + '''">
                         <hr>
-                        <span>스킨</span>
+                        <span>Skin</span>
                         <br>
                         <br>
                         <select name="skin">''' + div2 + '''</select>
@@ -3393,7 +3393,7 @@ def recent_changes(name = None, tool = 'record'):
                     menu += [['record/' + url_pas(name), load_lang(lang_data, 'normal')]]
         else:
             menu = 0
-            title = '최근 변경'
+            title = '최근 ' + load_lang(lang_data, 'change') + ''
             
             if what != 'all':
                 menu = [['recent_changes', load_lang(lang_data, 'normal')]]
