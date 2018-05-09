@@ -21,6 +21,10 @@ from set_mark.tool import sha224
 # 나무마크 불러옴
 from mark import *
 
+# 서브 언어팩 불러옴
+json_data = open(os.path.join('language', 'en-US.json'), 'rt', encoding='utf-8').read()
+else_lang = json.loads(json_data)
+
 def captcha_get(conn):
     curs = conn.cursor()
 
@@ -60,6 +64,35 @@ def captcha_post(test, conn, num = 1):
             return 0
     else:
         pass
+
+def load_lang(lang, data):
+    if data in lang:
+        return lang[data]
+    else:
+        return else_lang[data]
+
+def edit_help_button():
+    # https://stackoverflow.com/questions/11076975/insert-text-into-textarea-at-cursor-position-javascript
+    '''<script>
+                function insertAtCursor(myField, myValue) {
+                    if (document.selection) { 
+                        document.getElementById(myField).focus();
+                        sel = document.selection.createRange(); 
+                        sel.text = myValue; 
+                    } else if (document.getElementById(myField).selectionStart || document.getElementById(myField).selectionStart == '0') { 
+                        var startPos = document.getElementById(myField).selectionStart; 
+                        var endPos = document.getElementById(myField).selectionEnd; 
+                        document.getElementById(myField).value = document.getElementById(myField).value.substring(0, startPos) + myValue + document.getElementById(myField).value.substring(endPos, document.getElementById(myField).value.length); 
+                    } else { 
+                        document.getElementById(myField).value += myValue;
+                    }
+                }
+            </script>
+        '''
+
+    '<a href="javascript:void(0);" onclick="insertAtCursor(\'content\', \'[[]]\');">(링크)</a> <a href="javascript:void(0);" onclick="insertAtCursor(\'content\', \'[macro()]\');">(매크로)</a> <a href="javascript:void(0);" onclick="insertAtCursor(\'content\', \'{{{#! }}}\');">(중괄호)</a><hr>'
+
+    return ['', '']
 
 def ip_warring(conn):
     curs = conn.cursor()
@@ -364,11 +397,11 @@ def ban_check(conn):
 
     band = re.search("^([0-9]{1,3}\.[0-9]{1,3})", ip)
     if band:
-        band_it = band.groups()
+        band_it = band.groups()[0]
     else:
-        band_it = ['Not']
+        band_it = 'Not'
         
-    curs.execute("select block from ban where block = ? and band = 'O'", [band_it[0]])
+    curs.execute("select block from ban where block = ?", [band_it])
     band_d = curs.fetchall()
     
     curs.execute("select block from ban where block = ?", [ip])
@@ -484,7 +517,7 @@ def re_error(conn, data):
             if not end_data:
                 match = re.search("^([0-9]{1,3}\.[0-9]{1,3})", ip)
                 if match:
-                    curs.execute("select end, why from ban where block = ? and band = 'O'", [m.groups()[0]])
+                    curs.execute("select end, why from ban where block = ?", [match.groups()[0]])
                     end_data = curs.fetchall()
             
             if end_data:
