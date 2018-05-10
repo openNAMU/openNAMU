@@ -65,7 +65,20 @@ def captcha_post(test, conn, num = 1):
     else:
         pass
 
-def load_lang(lang, data):
+def load_lang(conn, data):
+    curs = conn.cursor()
+
+    global lang
+    try:
+        if lang:
+            pass
+    except:
+        curs.execute("select data from other where name = 'language'")
+        rep_data = curs.fetchall()
+
+        json_data = open(os.path.join('language', rep_data[0][0] + '.json'), 'rt', encoding='utf-8').read()
+        lang = json.loads(json_data)
+
     if data in lang:
         return lang[data]
     else:
@@ -103,7 +116,7 @@ def ip_warring(conn):
         if data and data[0][0] != '':
             text_data = '<span>' + data[0][0] + '</span><hr>'
         else:
-            text_data = '<span>비 로그인 상태입니다. 비 로그인으로 진행 시 아이피가 기록됩니다.</span><hr>'
+            text_data = '<span>' + load_lang(conn, 'no_login_warring') + '</span><hr>'
     else:
         text_data = ''
 
@@ -136,16 +149,16 @@ def next_fix(link, num, page, end = 50):
 
     if num == 1:
         if len(page) == end:
-            list_data += '<hr><a href="' + link + str(num + 1) + '">(이후)</a>'
+            list_data += '<hr><a href="' + link + str(num + 1) + '">(' + load_lang(conn, 'next') + ')</a>'
     elif len(page) != end:
-        list_data += '<hr><a href="' + link + str(num - 1) + '">(이전)</a>'
+        list_data += '<hr><a href="' + link + str(num - 1) + '">(' + load_lang(conn, 'previous') + ')</a>'
     else:
-        list_data += '<hr><a href="' + link + str(num - 1) + '">(이전)</a> <a href="' + link + str(num + 1) + '">(이후)</a>'
+        list_data += '<hr><a href="' + link + str(num - 1) + '">(' + load_lang(conn, 'previous') + ')</a> <a href="' + link + str(num + 1) + '">(' + load_lang(conn, 'next') + ')</a>'
 
     return list_data
 
 def other2(origin):
-    return origin + ['제거 되었음. 스킨 업데이트 필요함.']    
+    return origin + ['Deleted']    
 
 def wiki_set(conn, num):
     curs = conn.cursor()
@@ -262,7 +275,7 @@ def ip_pas(conn, raw_ip):
     hide = 0
 
     if re.search("(\.|:)", raw_ip):
-        if not re.search("^도구:", raw_ip):    
+        if not re.search("^" + load_lang(conn, 'tool') + ":", raw_ip):    
             curs.execute("select data from other where name = 'ip_view'")
             data = curs.fetchall()
             if data and data[0][0] != '':
@@ -276,14 +289,14 @@ def ip_pas(conn, raw_ip):
             ip = raw_ip
             hide = 1
     else:
-        curs.execute("select title from data where title = ?", ['사용자:' + raw_ip])
+        curs.execute("select title from data where title = ?", ['' + load_lang(conn, 'user') + ':' + raw_ip])
         if curs.fetchall():
-            ip = '<a href="/w/' + url_pas('사용자:' + raw_ip) + '">' + raw_ip + '</a>'
+            ip = '<a href="/w/' + url_pas('' + load_lang(conn, 'user') + ':' + raw_ip) + '">' + raw_ip + '</a>'
         else:
-            ip = '<a id="not_thing" href="/w/' + url_pas('사용자:' + raw_ip) + '">' + raw_ip + '</a>'
+            ip = '<a id="not_thing" href="/w/' + url_pas('' + load_lang(conn, 'user') + ':' + raw_ip) + '">' + raw_ip + '</a>'
          
     if hide == 0:
-        ip += ' <a href="/record/' + url_pas(raw_ip) + '">(기록)</a>'
+        ip += ' <a href="/record/' + url_pas(raw_ip) + '">(' + load_lang(conn, 'record') + ')</a>'
 
     return ip
 
@@ -317,7 +330,7 @@ def custom(conn):
     if user_icon != 0:
         user_name = ip_check()
     else:
-        user_name = '사용자'
+        user_name = '' + load_lang(conn, 'user') + ''
 
     return ['', '', user_icon, user_head, email, user_name]
 
@@ -329,14 +342,14 @@ def acl_check(conn, name):
     if ban_check(conn) == 1:
         return 1
 
-    acl_c = re.search("^사용자:([^/]*)", name)
+    acl_c = re.search("^' + load_lang(conn, 'user') + ':([^/]*)", name)
     if acl_c:
         acl_n = acl_c.groups()
 
         if admin_check(conn, 5, None) == 1:
             return 0
 
-        curs.execute("select dec from acl where title = ?", ['사용자:' + acl_n[0]])
+        curs.execute("select dec from acl where title = ?", ['' + load_lang(conn, 'user') + ':' + acl_n[0]])
         acl_data = curs.fetchall()
         if acl_data:
             if acl_data[0][0] == 'all':
@@ -353,7 +366,7 @@ def acl_check(conn, name):
         else:
             return 1
 
-    file_c = re.search("^파일:(.*)", name)
+    file_c = re.search("^" + load_lang(conn, 'file') + ":(.*)", name)
     if file_c and admin_check(conn, 5, 'edit (' + name + ')') != 1:
         return 1
 
@@ -455,7 +468,7 @@ def ban_insert(conn, name, end, why, login, blocker):
 
     curs.execute("select block from ban where block = ?", [name])
     if curs.fetchall():
-        curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, ?)", [name, '해제', time, blocker, '', band])
+        curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, ?)", [name, '' + load_lang(conn, 'release') + '', time, blocker, '', band])
         curs.execute("delete from ban where block = ?", [name])
     else:
         if login != '':
@@ -488,7 +501,7 @@ def history_plus(conn, title, data, date, ip, send, leng):
     if id_data:
         curs.execute("insert into history (id, title, data, date, ip, send, leng) values (?, ?, ?, ?, ?, ?, ?)", [str(int(id_data[0][0]) + 1), title, data, date, ip, send, leng])
     else:
-        curs.execute("insert into history (id, title, data, date, ip, send, leng) values ('1', ?, ?, ?, ?, ?, ?)", [title, data, date, ip, send + ' (새 문서)', leng])
+        curs.execute("insert into history (id, title, data, date, ip, send, leng) values ('1', ?, ?, ?, ?, ?, ?)", [title, data, date, ip, send + ' (' + load_lang(conn, 'new') + ' ' + load_lang(conn, 'document') + ')', leng])
 
 def leng_check(first, second):
     if first < second:
@@ -509,7 +522,7 @@ def re_error(conn, data):
     if data == '/ban':
         ip = ip_check()
 
-        end = '<li>사유 : 권한이 맞지 않는 상태 입니다.</li>'
+        end = '<li>Why : 권한이 맞지 않는 상태 입니다.</li>'
 
         if ban_check(conn) == 1:
             curs.execute("select end, why from ban where block = ?", [ip])
@@ -521,7 +534,7 @@ def re_error(conn, data):
                     end_data = curs.fetchall()
             
             if end_data:
-                end = '<li>상태 : '
+                end = '<li>Info : '
 
                 if end_data[0][0]:
                     now = int(re.sub('(\-| |:)', '', get_time()))
@@ -531,20 +544,20 @@ def re_error(conn, data):
                         curs.execute("delete from ban where block = ?", [ip])
                         conn.commit()
 
-                        end += '차단이 풀렸습니다. 다시 해보세요.'
+                        end += 'Re Try.'
                     else:
-                        end += '차단 중 : ' + end_data[0][0]
+                        end += 'Ban : ' + end_data[0][0]
                 else:
-                    end += '무기한 차단 상태 입니다.'
+                    end += 'Ban : No End'
                 
                 end += '</li>'
 
                 if end_data[0][1] != '':
-                    end += '<li>사유 : ' + end_data[0][1] + '</li>'
+                    end += '<li>Why : ' + end_data[0][1] + '</li>'
 
         return html_minify(render_template(skin_check(conn), 
-            imp = ['권한 오류', wiki_set(conn, 1), custom(conn), other2([0, 0])],
-            data = '<h2>권한 상태</h2><ul>' + end + '</ul>',
+            imp = ['Authority Error', wiki_set(conn, 1), custom(conn), other2([0, 0])],
+            data = '<h2>Info</h2><ul>' + end + '</ul>',
             menu = 0
         ))
 
@@ -552,76 +565,76 @@ def re_error(conn, data):
     if error_data:
         num = int(error_data.groups()[0])
         if num == 1:
-            title = '권한 오류'
+            title = 'Authority Error'
             data = '비 로그인 상태 입니다.'
         elif num == 2:
-            title = '권한 오류'
+            title = 'Authority Error'
             data = '이 계정이 없습니다.'
         elif num == 3:
-            title = '권한 오류'
+            title = 'Authority Error'
             data = '권한이 모자랍니다.'
         elif num == 4:
-            title = '권한 오류'
+            title = 'Authority Error'
             data = '관리자는 차단, 검사 할 수 없습니다.'
         elif num == 5:
-            title = '사용자 오류'
+            title = 'User Error'
             data = '그런 계정이 없습니다.'
         elif num == 6:
-            title = '가입 오류'
+            title = 'Register Error'
             data = '동일한 아이디의 사용자가 있습니다.'
         elif num == 7:
-            title = '가입 오류'
+            title = 'Register Error'
             data = '아이디는 20글자보다 짧아야 합니다.'
         elif num == 8:
-            title = '가입 오류'
+            title = 'Register Error'
             data = '아이디에는 한글과 알파벳과 공백만 허용 됩니다.'
         elif num == 9:
-            title = '파일 올리기 오류'
+            title = 'Upload Error'
             data = '파일이 없습니다.'
         elif num == 10:
-            title = '변경 오류'
+            title = 'PassWord Error'
             data = '비밀번호가 다릅니다.'
         elif num == 11:
-            title = '로그인 오류'
+            title = 'Login Error'
             data = '이미 로그인 되어 있습니다.'
         elif num == 13:
-            title = '리캡차 오류'
+            title = 'reCAPTCHA Error'
             data = '리캡차를 통과하세요.'
         elif num == 14:
-            title = '파일 올리기 오류'
+            title = 'Upload Error'
             data = 'jpg, gif, jpeg, png, webp만 가능 합니다.'
         elif num == 15:
-            title = '편집 오류'
+            title = 'Edit Error'
             data = '편집 기록은 500자를 넘을 수 없습니다.'
         elif num == 16:
-            title = '파일 올리기 오류'
+            title = 'Upload Error'
             data = '동일한 이름의 파일이 있습니다.'
         elif num == 17:
-            title = '파일 올리기 오류'
+            title = 'Upload Error'
             data = '파일 용량은 ' + wiki_set(conn, 3) + 'MB를 넘길 수 없습니다.'
         elif num == 18:
-            title = '편집 오류'
+            title = 'Edit Error'
             data = '내용이 원래 문서와 동일 합니다.'
         elif num == 19:
-            title = '이동 오류'
+            title = 'Move Error'
             data = '이동 하려는 곳에 문서가 이미 있습니다.'
         elif num == 20:
-            title = '비밀번호 오류'
+            title = 'PassWord Error'
             data = '재 확인이랑 비밀번호가 다릅니다.'
         elif num == 21:
-            title = '편집 오류'
+            title = 'Edit Error'
             data = '편집 필터에 의해 검열 되었습니다.'
         elif num == 22:
-            title = '파일 올리기 오류'
+            title = 'Upload Error'
             data = '파일 이름은 알파벳, 한글, 띄어쓰기, 언더바, 빼기표만 허용 됩니다.'
         else:
-            title = '정체 불명의 오류'
+            title = 'Error'
             data = '???'
 
         if title:
             return html_minify(render_template(skin_check(conn), 
                 imp = [title, wiki_set(conn, 1), custom(conn), other2([0, 0])],
-                data = '<h2>오류 발생</h2><ul><li>' + data + '</li></ul>',
+                data = '<h2>Error</h2><ul><li>' + data + '</li></ul>',
                 menu = 0
             ))
         else:
