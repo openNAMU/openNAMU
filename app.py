@@ -306,19 +306,19 @@ def alarm():
     curs.execute("select data, date from alarm where name = ? order by date desc", [ip_check()])
     data_list = curs.fetchall()
     if data_list:
-        data = '<a href="/del_alarm">(' + load_lang(lang_data, 'delete') + ')</a><hr>' + data
+        data = '<a href="/del_alarm">(' + load_lang(conn, 'delete') + ')</a><hr>' + data
 
         for data_one in data_list:
             data += '<li>' + data_one[0] + ' (' + data_one[1] + ')</li>'
     else:
-        data += '<li>' + load_lang(lang_data, 'no_alarm') + '</li>'
+        data += '<li>' + load_lang(conn, 'no_alarm') + '</li>'
     
     data += '</ul>'
 
     return html_minify(render_template(skin_check(conn), 
-        imp = [load_lang(lang_data, 'alarm'), wiki_set(conn, 1), custom(conn), other2([0, 0])],
+        imp = [load_lang(conn, 'alarm'), wiki_set(conn, 1), custom(conn), other2([0, 0])],
         data = data,
-        menu = [['user', load_lang(lang_data, 'user')]]
+        menu = [['user', load_lang(conn, 'user')]]
     ))
 
 @app.route('/<regex("inter_wiki|html_filter"):tools>')
@@ -329,14 +329,14 @@ def inter_wiki(tools = None):
     if tools == 'inter_wiki':
         del_link = 'del_inter_wiki'
         plus_link = 'plus_inter_wiki'
-        title = load_lang(lang_data, 'interwiki') + ' ' + load_lang(lang_data, 'list')
+        title = load_lang(conn, 'interwiki') + ' ' + load_lang(conn, 'list')
         div = ''
 
         curs.execute('select title, link from inter')
     else:
         del_link = 'del_html_filter'
         plus_link = 'plus_html_filter'
-        title = 'HTML Filter ' + load_lang(lang_data, 'list')
+        title = 'HTML Filter ' + load_lang(conn, 'list')
         div = '<ul><li>span</li><li>div</li><li>iframe</li></ul>'
 
         curs.execute('select html from html_filter')
@@ -352,22 +352,22 @@ def inter_wiki(tools = None):
                 div += '<li>' + data[0]
 
             if admin == 1:
-                div += ' <a href="/' + del_link + '/' + url_pas(data[0]) + '">(' + load_lang(lang_data, 'delete') + ')</a>'
+                div += ' <a href="/' + del_link + '/' + url_pas(data[0]) + '">(' + load_lang(conn, 'delete') + ')</a>'
 
             div += '</li>'
 
         div += '</ul>'
 
         if admin == 1:
-            div += '<hr><a href="/' + plus_link + '">(' + load_lang(lang_data, 'plus') + ')</a>'
+            div += '<hr><a href="/' + plus_link + '">(' + load_lang(conn, 'plus') + ')</a>'
     else:
         if admin == 1:
-            div += '<a href="/' + plus_link + '">(' + load_lang(lang_data, 'plus') + ')</a>'
+            div += '<a href="/' + plus_link + '">(' + load_lang(conn, 'plus') + ')</a>'
 
     return html_minify(render_template(skin_check(conn), 
         imp = [title, wiki_set(conn, 1), custom(conn), other2([0, 0])],
         data = div,
-        menu = [['other', load_lang(lang_data, 'other')]]
+        menu = [['other', load_lang(conn, 'other')]]
     ))
 
 @app.route('/<regex("del_(inter_wiki|html_filter)"):tools>/<name>')
@@ -399,16 +399,16 @@ def plus_inter(tools = None):
         return redirect('/' + re.sub('^plus_', '', tools))
     else:
         if tools == 'plus_inter_wiki':
-            title = load_lang(lang_data, 'interwiki') + ' ' + load_lang(lang_data, 'plus')
-            form_data = '<input placeholder="' + load_lang(lang_data, 'name') + '" type="text" name="title"><hr><input placeholder="Link" type="text" name="link">'
+            title = load_lang(conn, 'interwiki') + ' ' + load_lang(conn, 'plus')
+            form_data = '<input placeholder="' + load_lang(conn, 'name') + '" type="text" name="title"><hr><input placeholder="Link" type="text" name="link">'
         else:
-            title = 'HTML Filter ' + load_lang(lang_data, 'plus')
+            title = 'HTML Filter ' + load_lang(conn, 'plus')
             form_data = '<input placeholder="HTML" type="text" name="title">'
 
         return html_minify(render_template(skin_check(conn), 
             imp = [title, wiki_set(conn, 1), custom(conn), other2([0, 0])],
-            data = '<form method="post">' + form_data + '<hr><button type="submit">' + load_lang(lang_data, 'plus') + '</button></form>',
-            menu = [['other', load_lang(lang_data, 'other')]]
+            data = '<form method="post">' + form_data + '<hr><button type="submit">' + load_lang(conn, 'plus') + '</button></form>',
+            menu = [['other', load_lang(conn, 'other')]]
         ))
 
 @app.route('/edit_set')
@@ -429,9 +429,9 @@ def edit_set(num = 0):
             li_data += '<li><a href="/edit_set/' + str(x) + '">' + li + '</a></li>'
 
         return html_minify(render_template(skin_check(conn), 
-            imp = [load_lang(lang_data, 'setting'), wiki_set(conn, 1), custom(conn), other2([0, 0])],
-            data = '<h2>' + load_lang(lang_data, 'list') + '</h2><ul>' + li_data + '</ul>',
-            menu = [['manager', load_lang(lang_data, 'admin')]]
+            imp = [load_lang(conn, 'setting'), wiki_set(conn, 1), custom(conn), other2([0, 0])],
+            data = '<h2>' + load_lang(conn, 'list') + '</h2><ul>' + li_data + '</ul>',
+            menu = [['manager', load_lang(conn, 'admin')]]
         ))
     elif num == 1:
         i_list = ['name', 'logo', 'frontpage', 'license', 'upload', 'skin', 'edit', 'reg', 'ip_view', 'back_up', 'port', 'key']
@@ -471,17 +471,17 @@ def edit_set(num = 0):
             div = ''
             
             if d_list[6] == 'login':
-                div += '<option value="login">' + load_lang(lang_data, 'subscriber') + '</option>'
-                div += '<option value="normal">' + load_lang(lang_data, 'normal') + '</option>'
-                div += '<option value="admin">' + load_lang(lang_data, 'admin') + '</option>'
+                div += '<option value="login">' + load_lang(conn, 'subscriber') + '</option>'
+                div += '<option value="normal">' + load_lang(conn, 'normal') + '</option>'
+                div += '<option value="admin">' + load_lang(conn, 'admin') + '</option>'
             elif d_list[6] == 'admin':
-                div += '<option value="admin">' + load_lang(lang_data, 'admin') + '</option>'
-                div += '<option value="login">' + load_lang(lang_data, 'subscriber') + '</option>'
-                div += '<option value="normal">' + load_lang(lang_data, 'normal') + '</option>'
+                div += '<option value="admin">' + load_lang(conn, 'admin') + '</option>'
+                div += '<option value="login">' + load_lang(conn, 'subscriber') + '</option>'
+                div += '<option value="normal">' + load_lang(conn, 'normal') + '</option>'
             else:
-                div += '<option value="normal">' + load_lang(lang_data, 'normal') + '</option>'
-                div += '<option value="admin">' + load_lang(lang_data, 'admin') + '</option>'
-                div += '<option value="login">' + load_lang(lang_data, 'subscriber') + '</option>'
+                div += '<option value="normal">' + load_lang(conn, 'normal') + '</option>'
+                div += '<option value="admin">' + load_lang(conn, 'admin') + '</option>'
+                div += '<option value="login">' + load_lang(conn, 'subscriber') + '</option>'
 
             ch_1 = ''
             if d_list[7]:
@@ -502,10 +502,10 @@ def edit_set(num = 0):
                 imp = ['Normal', wiki_set(conn, 1), custom(conn), other2([0, 0])],
                 data = '''
                         <form method="post">
-                            <span>''' + load_lang(lang_data, 'name') + '''</span>
+                            <span>''' + load_lang(conn, 'name') + '''</span>
                             <br>
                             <br>
-                            <input placeholder="''' + load_lang(lang_data, 'name') + '''" type="text" name="name" value="''' + html.escape(d_list[0]) + '''">
+                            <input placeholder="''' + load_lang(conn, 'name') + '''" type="text" name="name" value="''' + html.escape(d_list[0]) + '''">
                             <hr>
                             <span>Logo (HTML)</span>
                             <br>
@@ -517,17 +517,17 @@ def edit_set(num = 0):
                             <br>
                             <input placeholder="FrontPage" type="text" name="frontpage" value="''' + html.escape(d_list[2]) + '''">
                             <hr>
-                            <span>''' + load_lang(lang_data, 'license') + ''' (HTML)</span>
+                            <span>''' + load_lang(conn, 'license') + ''' (HTML)</span>
                             <br>
                             <br>
-                            <input placeholder="''' + load_lang(lang_data, 'license') + '''" type="text" name="license" value="''' + html.escape(d_list[3]) + '''">
+                            <input placeholder="''' + load_lang(conn, 'license') + '''" type="text" name="license" value="''' + html.escape(d_list[3]) + '''">
                             <hr>
                             <span>Max File Size [MB]</span>
                             <br>
                             <br>
                             <input placeholder="Max File Size" type="text" name="upload" value="''' + html.escape(d_list[4]) + '''">
                             <hr>
-                            <span>Back Up Interval [''' + load_lang(lang_data, 'hour') + '''] (OFF : 0) {Need To Restart}</span>
+                            <span>Back Up Interval [''' + load_lang(conn, 'hour') + '''] (OFF : 0) {Need To Restart}</span>
                             <br>
                             <br>
                             <input placeholder="Back Up Interval" type="text" name="back_up" value="''' + html.escape(d_list[9]) + '''">
@@ -556,10 +556,10 @@ def edit_set(num = 0):
                             <br>
                             <input placeholder="Secret Key" type="password" name="key" value="''' + html.escape(d_list[11]) + '''">
                             <hr>
-                            <button id="save" type="submit">''' + load_lang(lang_data, 'save') + '''</button>
+                            <button id="save" type="submit">''' + load_lang(conn, 'save') + '''</button>
                         </form>
                         ''',
-                menu = [['edit_set', load_lang(lang_data, 'setting')]]
+                menu = [['edit_set', load_lang(conn, 'setting')]]
             ))
     elif num == 2:
         if request.method == 'POST':
@@ -605,10 +605,10 @@ def edit_set(num = 0):
                             <br>
                             <input placeholder="Non-Login Alert" type="text" name="no_login_warring" value="''' + html.escape(d_list[1]) + '''">
                             <hr>
-                            <button id="save" type="submit">''' + load_lang(lang_data, 'save') + '''</button>
+                            <button id="save" type="submit">''' + load_lang(conn, 'save') + '''</button>
                         </form>
                         ''',
-                menu = [['edit_set', load_lang(lang_data, 'setting')]]
+                menu = [['edit_set', load_lang(conn, 'setting')]]
             ))
     elif num == 3:
         if request.method == 'POST':
@@ -637,10 +637,10 @@ def edit_set(num = 0):
                         <form method="post">
                             <textarea rows="25" name="content">''' + html.escape(data) + '''</textarea>
                             <hr>
-                            <button id="save" type="submit">''' + load_lang(lang_data, 'save') + '''</button>
+                            <button id="save" type="submit">''' + load_lang(conn, 'save') + '''</button>
                         </form>
                         ''',
-                menu = [['edit_set', load_lang(lang_data, 'setting')]]
+                menu = [['edit_set', load_lang(conn, 'setting')]]
             ))
     elif num == 4:
         if request.method == 'POST':
@@ -682,10 +682,10 @@ def edit_set(num = 0):
                         <form method="post">
                             <textarea rows="25" name="content">''' + html.escape(data) + '''</textarea>
                             <hr>
-                            <button id="save" type="submit">''' + load_lang(lang_data, 'save') + '''</button>
+                            <button id="save" type="submit">''' + load_lang(conn, 'save') + '''</button>
                         </form>
                         ''',
-                menu = [['edit_set', load_lang(lang_data, 'setting')]]
+                menu = [['edit_set', load_lang(conn, 'setting')]]
             ))
     elif num == 5:
         if request.method == 'POST':
@@ -731,9 +731,9 @@ def edit_set(num = 0):
                             <br>
                             <input placeholder="reCAPTCHA (Secret Key)" type="text" name="sec_re" value="''' + html.escape(d_list[1]) + '''">
                             <hr>
-                            <button id="save" type="submit">''' + load_lang(lang_data, 'save') + '''</button>
+                            <button id="save" type="submit">''' + load_lang(conn, 'save') + '''</button>
                         </form>''',
-                menu = [['edit_set', load_lang(lang_data, 'setting')]]
+                menu = [['edit_set', load_lang(conn, 'setting')]]
             ))
     else:
         return redirect('/')
@@ -753,9 +753,9 @@ def not_close_topic():
     div += '</ul>'
 
     return html_minify(render_template(skin_check(conn), 
-        imp = [load_lang(lang_data, 'open') + ' ' + load_lang(lang_data, 'discussion') + ' ' + load_lang(lang_data, 'list'), wiki_set(conn, 1), custom(conn), other2([0, 0])],
+        imp = [load_lang(conn, 'open') + ' ' + load_lang(conn, 'discussion') + ' ' + load_lang(conn, 'list'), wiki_set(conn, 1), custom(conn), other2([0, 0])],
         data = div,
-        menu = [['manager', load_lang(lang_data, 'admin')]]
+        menu = [['manager', load_lang(conn, 'admin')]]
     ))
 
 @app.route('/image/<name>')
@@ -772,20 +772,20 @@ def acl_list():
     curs.execute("select title, dec from acl where dec = 'admin' or dec = 'user' order by title desc")
     list_data = curs.fetchall()
     for data in list_data:
-        if not re.search('^' + load_lang(lang_data, 'user') + ':', data[0]) and not re.search('^' + load_lang(lang_data, 'file') + ':', data[0]):
+        if not re.search('^' + load_lang(conn, 'user') + ':', data[0]) and not re.search('^' + load_lang(conn, 'file') + ':', data[0]):
             if data[1] == 'admin':
-                acl = load_lang(lang_data, 'admin')
+                acl = load_lang(conn, 'admin')
             else:
-                acl = load_lang(lang_data, 'subscriber')
+                acl = load_lang(conn, 'subscriber')
 
             div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a> (' + acl + ')</li>'
         
     div += '</ul>'
     
     return html_minify(render_template(skin_check(conn), 
-        imp = ['ACL ' + load_lang(lang_data, 'document') + ' ' + load_lang(lang_data, 'list'), wiki_set(conn, 1), custom(conn), other2([0, 0])],
+        imp = ['ACL ' + load_lang(conn, 'document') + ' ' + load_lang(conn, 'list'), wiki_set(conn, 1), custom(conn), other2([0, 0])],
         data = div,
-        menu = [['other', load_lang(lang_data, 'other')]]
+        menu = [['other', load_lang(conn, 'other')]]
     ))
 
 @app.route('/admin_plus/<name>', methods=['POST', 'GET'])
@@ -853,19 +853,19 @@ def admin_plus(name = None):
         else:
             state = ''
 
-        data += '<li><input type="checkbox" ' + state +  ' name="ban" ' + exist_list[0] + '> ' + load_lang(lang_data, 'ban') + '</li>'
-        data += '<li><input type="checkbox" ' + state +  ' name="mdel" ' + exist_list[1] + '> ' + load_lang(lang_data, 'bulk_delete') + '</li>'
-        data += '<li><input type="checkbox" ' + state +  ' name="toron" ' + exist_list[2] + '> ' + load_lang(lang_data, 'discussion') + '</li>'
-        data += '<li><input type="checkbox" ' + state +  ' name="check" ' + exist_list[3] + '> ' + load_lang(lang_data, 'user') + ' ' + load_lang(lang_data, 'check') + '</li>'
-        data += '<li><input type="checkbox" ' + state +  ' name="acl" ' + exist_list[4] + '> ' + load_lang(lang_data, 'document') + ' ACL</li>'
-        data += '<li><input type="checkbox" ' + state +  ' name="hidel" ' + exist_list[5] + '> ' + load_lang(lang_data, 'history') + ' ' + load_lang(lang_data, 'hide') + '</li>'
-        data += '<li><input type="checkbox" ' + state +  ' name="give" ' + exist_list[6] + '> ' + load_lang(lang_data, 'authority') + '</li>'
-        data += '<li><input type="checkbox" ' + state +  ' name="owner" ' + exist_list[7] + '> ' + load_lang(lang_data, 'owner') + '</li></ul>'
+        data += '<li><input type="checkbox" ' + state +  ' name="ban" ' + exist_list[0] + '> ' + load_lang(conn, 'ban') + '</li>'
+        data += '<li><input type="checkbox" ' + state +  ' name="mdel" ' + exist_list[1] + '> ' + load_lang(conn, 'bulk_delete') + '</li>'
+        data += '<li><input type="checkbox" ' + state +  ' name="toron" ' + exist_list[2] + '> ' + load_lang(conn, 'discussion') + '</li>'
+        data += '<li><input type="checkbox" ' + state +  ' name="check" ' + exist_list[3] + '> ' + load_lang(conn, 'user') + ' ' + load_lang(conn, 'check') + '</li>'
+        data += '<li><input type="checkbox" ' + state +  ' name="acl" ' + exist_list[4] + '> ' + load_lang(conn, 'document') + ' ACL</li>'
+        data += '<li><input type="checkbox" ' + state +  ' name="hidel" ' + exist_list[5] + '> ' + load_lang(conn, 'history') + ' ' + load_lang(conn, 'hide') + '</li>'
+        data += '<li><input type="checkbox" ' + state +  ' name="give" ' + exist_list[6] + '> ' + load_lang(conn, 'authority') + '</li>'
+        data += '<li><input type="checkbox" ' + state +  ' name="owner" ' + exist_list[7] + '> ' + load_lang(conn, 'owner') + '</li></ul>'
 
         return html_minify(render_template(skin_check(conn), 
-            imp = [load_lang(lang_data, 'admin_group') + ' ' + load_lang(lang_data, 'plus'), wiki_set(conn, 1), custom(conn), other2([0, 0])],
-            data = '<form method="post">' + data + '<hr><button id="save" ' + state +  ' type="submit">' + load_lang(lang_data, 'save') + '</button></form>',
-            menu = [['manager', load_lang(lang_data, 'admin')]]
+            imp = [load_lang(conn, 'admin_group') + ' ' + load_lang(conn, 'plus'), wiki_set(conn, 1), custom(conn), other2([0, 0])],
+            data = '<form method="post">' + data + '<hr><button id="save" ' + state +  ' type="submit">' + load_lang(conn, 'save') + '</button></form>',
+            menu = [['manager', load_lang(conn, 'admin')]]
         ))        
         
 @app.route('/admin_list')
@@ -877,16 +877,16 @@ def admin_list():
         name = ip_pas(conn, data[0]) + ' <a href="/admin_plus/' + url_pas(data[1]) + '">(' + data[1] + ')</a>'
         
         if data[2] != '':
-            name += '(' + load_lang(lang_data, 'register') + ' : ' + data[2] + ')'
+            name += '(' + load_lang(conn, 'register') + ' : ' + data[2] + ')'
 
         div += '<li>' + name + '</li>'
         
     div += '</ul>'
                 
     return html_minify(render_template(skin_check(conn), 
-        imp = [load_lang(lang_data, 'admin') + ' ' + load_lang(lang_data, 'list'), wiki_set(conn, 1), custom(conn), other2([0, 0])],
+        imp = [load_lang(conn, 'admin') + ' ' + load_lang(conn, 'list'), wiki_set(conn, 1), custom(conn), other2([0, 0])],
         data = div,
-        menu = [['other', load_lang(lang_data, 'other')]]
+        menu = [['other', load_lang(conn, 'other')]]
     ))
         
 @app.route('/hidden/<path:name>')
@@ -922,16 +922,16 @@ def user_log():
         if admin_one == 1:
             curs.execute("select block from ban where block = ?", [data[0]])
             if curs.fetchall():
-                ban_button = ' <a href="/ban/' + url_pas(data[0]) + '">(' + load_lang(lang_data, 'release') + ')</a>'
+                ban_button = ' <a href="/ban/' + url_pas(data[0]) + '">(' + load_lang(conn, 'release') + ')</a>'
             else:
-                ban_button = ' <a href="/ban/' + url_pas(data[0]) + '">(' + load_lang(lang_data, 'ban') + ')</a>'
+                ban_button = ' <a href="/ban/' + url_pas(data[0]) + '">(' + load_lang(conn, 'ban') + ')</a>'
         else:
             ban_button = ''
             
         list_data += '<li>' + ip_pas(conn, data[0]) + ban_button
         
         if data[1] != '':
-            list_data += ' (' + load_lang(lang_data, 'register') + ' : ' + data[1] + ')'
+            list_data += ' (' + load_lang(conn, 'register') + ' : ' + data[1] + ')'
 
         list_data += '</li>'
 
@@ -948,7 +948,7 @@ def user_log():
     list_data += next_fix('/user_log?num=', num, user_list)
 
     return html_minify(render_template(skin_check(conn), 
-        imp = ['' + load_lang(lang_data, 'recent') + ' ' + load_lang(lang_data, 'register') + '', wiki_set(conn, 1), custom(conn), other2([0, 0])],
+        imp = ['' + load_lang(conn, 'recent') + ' ' + load_lang(conn, 'register') + '', wiki_set(conn, 1), custom(conn), other2([0, 0])],
         data = list_data,
         menu = 0
     ))
@@ -972,7 +972,7 @@ def admin_log():
     list_data += next_fix('/admin_log?num=', num, get_list)
 
     return html_minify(render_template(skin_check(conn), 
-        imp = ['' + load_lang(lang_data, 'recent') + ' ' + load_lang(lang_data, 'authority'), wiki_set(conn, 1), custom(conn), other2([0, 0])],
+        imp = ['' + load_lang(conn, 'recent') + ' ' + load_lang(conn, 'authority'), wiki_set(conn, 1), custom(conn), other2([0, 0])],
         data = list_data,
         menu = 0
     ))
@@ -989,12 +989,12 @@ def give_log():
 
         list_data += '<li><a href="/admin_plus/' + url_pas(data[0]) + '">' + data[0] + '</a></li>'
     
-    list_data += '</ul><hr><a href="/manager/8">(' + load_lang(lang_data, 'create') + ')</a>'
+    list_data += '</ul><hr><a href="/manager/8">(' + load_lang(conn, 'create') + ')</a>'
 
     return html_minify(render_template(skin_check(conn), 
-        imp = [load_lang(lang_data, 'admin_group') + ' ' + load_lang(lang_data, 'list'), wiki_set(conn, 1), custom(conn), other2([0, 0])],
+        imp = [load_lang(conn, 'admin_group') + ' ' + load_lang(conn, 'list'), wiki_set(conn, 1), custom(conn), other2([0, 0])],
         data = list_data,
-        menu = [['other', load_lang(lang_data, 'other')]]
+        menu = [['other', load_lang(conn, 'other')]]
     ))
 
 @app.route('/indexing')
@@ -1082,9 +1082,9 @@ def update():
                 return redirect('/re_start')
 
     return html_minify(render_template(skin_check(conn), 
-        imp = [load_lang(lang_data, 'update'), wiki_set(conn, 1), custom(conn), other2([0, 0])],
+        imp = [load_lang(conn, 'update'), wiki_set(conn, 1), custom(conn), other2([0, 0])],
         data = 'Auto Update Is Not Support. <a href="https://github.com/2DU/openNAMU">(GitHub)</a>',
-        menu = [['manager/1', load_lang(lang_data, 'admin')]]
+        menu = [['manager/1', load_lang(conn, 'admin')]]
     ))
         
 @app.route('/xref/<path:name>')
@@ -1106,7 +1106,7 @@ def xref(name = None):
             if data[1] == 'include':
                 side = '포함'
             elif data[1] == 'file':
-                side = '' + load_lang(lang_data, 'file') + ''
+                side = '' + load_lang(conn, 'file') + ''
             else:
                 side = '넘겨주기'
                 
@@ -1115,14 +1115,14 @@ def xref(name = None):
         div += '</li>'
         
         if re.search('^틀:', data[0]):
-            div += '<li><a id="inside" href="/xref/' + url_pas(data[0]) + '">' + data[0] + '</a> (' + load_lang(lang_data, 'backlink') + ')</li>'
+            div += '<li><a id="inside" href="/xref/' + url_pas(data[0]) + '">' + data[0] + '</a> (' + load_lang(conn, 'backlink') + ')</li>'
       
     div += '</ul>' + next_fix('/xref/' + url_pas(name) + '?num=', num, data_list)
     
     return html_minify(render_template(skin_check(conn), 
-        imp = [name, wiki_set(conn, 1), custom(conn), other2([' (' + load_lang(lang_data, 'backlink') + ')', 0])],
+        imp = [name, wiki_set(conn, 1), custom(conn), other2([' (' + load_lang(conn, 'backlink') + ')', 0])],
         data = div,
-        menu = [['w/' + url_pas(name), load_lang(lang_data, 'document')]]
+        menu = [['w/' + url_pas(name), load_lang(conn, 'document')]]
     ))
 
 @app.route('/please')
@@ -1147,9 +1147,9 @@ def please():
     div += '</ul>' + next_fix('/please?num=', num, data_list)
     
     return html_minify(render_template(skin_check(conn), 
-        imp = [load_lang(lang_data, 'need') + ' ' + load_lang(lang_data, 'document'), wiki_set(conn, 1), custom(conn), other2([0, 0])],
+        imp = [load_lang(conn, 'need') + ' ' + load_lang(conn, 'document'), wiki_set(conn, 1), custom(conn), other2([0, 0])],
         data = div,
-        menu = [['other', load_lang(lang_data, 'other')]]
+        menu = [['other', load_lang(conn, 'other')]]
     ))
         
 @app.route('/recent_discuss')
@@ -1159,15 +1159,15 @@ def recent_discuss(tools = 'normal'):
         div = ''
         
         if tools == 'normal':
-            div += '<a href="/recent_discuss/close">(' + load_lang(lang_data, 'close') + ')</a>'
+            div += '<a href="/recent_discuss/close">(' + load_lang(conn, 'close') + ')</a>'
            
             m_sub = 0
         else:
-            div += '<a href="/recent_discuss">(' + load_lang(lang_data, 'open') + ')</a>'
+            div += '<a href="/recent_discuss">(' + load_lang(conn, 'open') + ')</a>'
             
-            m_sub = ' (' + load_lang(lang_data, 'close') + ')'
+            m_sub = ' (' + load_lang(conn, 'close') + ')'
 
-        div += '<hr><table style="width: 100%; text-align: center;"><tbody><tr><td style="width: 50%;">' + load_lang(lang_data, 'discussion') + ' ' + load_lang(lang_data, 'name') + '</td><td style="width: 50%;">' + load_lang(lang_data, 'time') + '</td></tr>'
+        div += '<hr><table style="width: 100%; text-align: center;"><tbody><tr><td style="width: 50%;">' + load_lang(conn, 'discussion') + ' ' + load_lang(conn, 'name') + '</td><td style="width: 50%;">' + load_lang(conn, 'time') + '</td></tr>'
     else:
         return redirect('/')
     
@@ -1193,7 +1193,7 @@ def recent_discuss(tools = 'normal'):
         div += '</tbody></table>'
             
     return html_minify(render_template(skin_check(conn), 
-        imp = ['' + load_lang(lang_data, 'recent') + ' ' + load_lang(lang_data, 'discussion'), wiki_set(conn, 1), custom(conn), other2([m_sub, 0])],
+        imp = ['' + load_lang(conn, 'recent') + ' ' + load_lang(conn, 'discussion'), wiki_set(conn, 1), custom(conn), other2([m_sub, 0])],
         data = div,
         menu = 0
     ))
@@ -1208,16 +1208,16 @@ def block_log(name = None, tool = None, tool2 = None):
     else:
         sql_num = 0
     
-    div = '<table style="width: 100%; text-align: center;"><tbody><tr><td style="width: 33.3%;">차단자</td><td style="width: 33.3%;">' + load_lang(lang_data, 'admin') + '</td><td style="width: 33.3%;">기간</td></tr>'
+    div = '<table style="width: 100%; text-align: center;"><tbody><tr><td style="width: 33.3%;">차단자</td><td style="width: 33.3%;">' + load_lang(conn, 'admin') + '</td><td style="width: 33.3%;">기간</td></tr>'
     
     data_list = ''
     
     if not name:
         if not tool2:
             div = '''
-                    <a href="/manager/11">(차단자)</a> <a href="/manager/12">(''' + load_lang(lang_data, 'admin') + ''')</a>
+                    <a href="/manager/11">(차단자)</a> <a href="/manager/12">(''' + load_lang(conn, 'admin') + ''')</a>
                     <hr>
-                    <a href="/block_log/ip">(IP)</a> <a href="/block_log/user">(''' + load_lang(lang_data, 'subscriber') + ''')</a> <a href="/block_log/never_end">(무기한)</a> <a href="/block_log/can_end">(기간)</a> <a href="/block_log/end">(''' + load_lang(lang_data, 'release') + ''')</a> <a href="/block_log/now">(현재)</a> <a href="/block_log/edit_filter">(''' + load_lang(lang_data, 'edit_filter') + ''')</a>
+                    <a href="/block_log/ip">(IP)</a> <a href="/block_log/user">(''' + load_lang(conn, 'subscriber') + ''')</a> <a href="/block_log/never_end">(무기한)</a> <a href="/block_log/can_end">(기간)</a> <a href="/block_log/end">(''' + load_lang(conn, 'release') + ''')</a> <a href="/block_log/now">(현재)</a> <a href="/block_log/edit_filter">(''' + load_lang(conn, 'edit_filter') + ''')</a>
                     <hr>
                     ''' + div
             
@@ -1226,24 +1226,24 @@ def block_log(name = None, tool = None, tool2 = None):
             
             curs.execute("select why, block, blocker, end, today from rb order by today desc limit ?, '50'", [str(sql_num)])
         else:
-            menu = [['block_log', load_lang(lang_data, 'normal')]]
+            menu = [['block_log', load_lang(conn, 'normal')]]
             
             if tool2 == 'ip':
                 sub = ' (IP)'
                 
                 curs.execute("select why, block, blocker, end, today from rb where (block like ? or block like ?) order by today desc limit ?, '50'", ['%.%', '%:%', str(sql_num)])
             elif tool2 == 'user':
-                sub = ' (' + load_lang(lang_data, 'subscriber') + ')'
+                sub = ' (' + load_lang(conn, 'subscriber') + ')'
                 
                 curs.execute("select why, block, blocker, end, today from rb where not (block like ? or block like ?) order by today desc limit ?, '50'", ['%.%', '%:%', str(sql_num)])
             elif tool2 == 'never_end':
                 sub = '(무기한)'
                 
-                curs.execute("select why, block, blocker, end, today from rb where not end like ? and not end like ? order by today desc limit ?, '50'", ['%:%', '%' + load_lang(lang_data, 'release') + '%', str(sql_num)])
+                curs.execute("select why, block, blocker, end, today from rb where not end like ? and not end like ? order by today desc limit ?, '50'", ['%:%', '%' + load_lang(conn, 'release') + '%', str(sql_num)])
             elif tool2 == 'end':
-                sub = '(' + load_lang(lang_data, 'release') + ')'
+                sub = '(' + load_lang(conn, 'release') + ')'
                 
-                curs.execute("select why, block, blocker, end, today from rb where end = ? order by today desc limit ?, '50'", [load_lang(lang_data, 'release'), str(sql_num)])
+                curs.execute("select why, block, blocker, end, today from rb where end = ? order by today desc limit ?, '50'", [load_lang(conn, 'release'), str(sql_num)])
             elif tool2 == 'now':
                 sub = '(현재)'
                 
@@ -1255,22 +1255,22 @@ def block_log(name = None, tool = None, tool2 = None):
                     
                     data_list = [curs.fetchall()[0]] + data_list
             elif tool2 == 'edit_filter':
-                sub = '(' + load_lang(lang_data, 'edit_filter') + ')'
+                sub = '(' + load_lang(conn, 'edit_filter') + ')'
 
-                curs.execute("select why, block, blocker, end, today from rb where blocker = ? order by today desc limit ?, '50'", [load_lang(lang_data, 'tool') + ':' + load_lang(lang_data, 'edit_filter'), str(sql_num)])
+                curs.execute("select why, block, blocker, end, today from rb where blocker = ? order by today desc limit ?, '50'", [load_lang(conn, 'tool') + ':' + load_lang(conn, 'edit_filter'), str(sql_num)])
             else:
                 sub = '(기간)'
                 
                 curs.execute("select why, block, blocker, end, today from rb where end like ? order by today desc limit ?, '50'", ['%\-%', str(sql_num)])
     else:
-        menu = [['block_log', load_lang(lang_data, 'normal')]]
+        menu = [['block_log', load_lang(conn, 'normal')]]
         
         if tool == 'block_user':
             sub = ' (차단자)'
             
             curs.execute("select why, block, blocker, end, today from rb where block = ? order by today desc limit ?, '50'", [name, str(sql_num)])
         else:
-            sub = ' (' + load_lang(lang_data, 'admin') + ')'
+            sub = ' (' + load_lang(conn, 'admin') + ')'
             
             curs.execute("select why, block, blocker, end, today from rb where blocker = ? order by today desc limit ?, '50'", [name, str(sql_num)])
 
@@ -1307,7 +1307,7 @@ def block_log(name = None, tool = None, tool2 = None):
         div += next_fix('/' + url_pas(tool) + '/' + url_pas(name) + '?num=', num, data_list)
                 
     return html_minify(render_template(skin_check(conn), 
-        imp = ['' + load_lang(lang_data, 'recent') + ' ' + load_lang(lang_data, 'ban'), wiki_set(conn, 1), custom(conn), other2([sub, 0])],
+        imp = ['' + load_lang(conn, 'recent') + ' ' + load_lang(conn, 'ban'), wiki_set(conn, 1), custom(conn), other2([sub, 0])],
         data = div,
         menu = menu
     ))
@@ -1365,7 +1365,7 @@ def deep_search(name = None):
     div += next_fix('/search/' + url_pas(name) + '?num=', num, all_list)
 
     return html_minify(render_template(skin_check(conn), 
-        imp = [name, wiki_set(conn, 1), custom(conn), other2([' (' + load_lang(lang_data, 'search') + ')', 0])],
+        imp = [name, wiki_set(conn, 1), custom(conn), other2([' (' + load_lang(conn, 'search') + ')', 0])],
         data = div,
         menu = 0
     ))
@@ -1388,20 +1388,20 @@ def raw_view(name = None, sub_title = None, num = None):
         
         curs.execute("select data from history where title = ? and id = ?", [name, str(num)])
         
-        sub += ' (' + str(num) + load_lang(lang_data, 'version') + ')'
+        sub += ' (' + str(num) + load_lang(conn, 'version') + ')'
 
-        menu = [['history/' + url_pas(name), load_lang(lang_data, 'history')]]
+        menu = [['history/' + url_pas(name), load_lang(conn, 'history')]]
     elif sub_title:
         curs.execute("select data from topic where id = ? and title = ? and sub = ? and block = ''", [str(num), name, sub_title])
         
-        v_name = load_lang(lang_data, 'discussion') + ' Raw'
+        v_name = load_lang(conn, 'discussion') + ' Raw'
         sub = ' (' + str(num) + '번)'
 
-        menu = [['topic/' + url_pas(name) + '/sub/' + url_pas(sub_title) + '#' + str(num), load_lang(lang_data, 'discussion')], ['topic/' + url_pas(name) + '/sub/' + url_pas(sub_title) + '/admin/' + str(num), load_lang(lang_data, 'tool')]]
+        menu = [['topic/' + url_pas(name) + '/sub/' + url_pas(sub_title) + '#' + str(num), load_lang(conn, 'discussion')], ['topic/' + url_pas(name) + '/sub/' + url_pas(sub_title) + '/admin/' + str(num), load_lang(conn, 'tool')]]
     else:
         curs.execute("select data from data where title = ?", [name])
         
-        menu = [['w/' + url_pas(name), load_lang(lang_data, 'document')]]
+        menu = [['w/' + url_pas(name), load_lang(conn, 'document')]]
 
     data = curs.fetchall()
     if data:
@@ -1448,7 +1448,7 @@ def revert(name = None):
                 leng = ' +' + str(len(data[0][0]))
                 curs.execute("insert into data (title, data) values (?, ?)", [name, data[0][0]])
                 
-            history_plus(conn, name, data[0][0], get_time(), ip_check(), request.form.get('send', None) + ' (' + str(num) + load_lang(lang_data, 'version') + ')', leng)
+            history_plus(conn, name, data[0][0], get_time(), ip_check(), request.form.get('send', None) + ' (' + str(num) + load_lang(conn, 'version') + ')', leng)
             namumark(conn, name, data[0][0], 1)
             
             conn.commit()
@@ -1460,9 +1460,9 @@ def revert(name = None):
             return redirect('/w/' + url_pas(name))
 
         return html_minify(render_template(skin_check(conn), 
-            imp = [name, wiki_set(conn, 1), custom(conn), other2([' (' + load_lang(lang_data, 'revert') + ')', 0])],
-            data =  '<form method="post"><span>' + request.args.get('num', '0') + load_lang(lang_data, 'version') + '</span><hr>' + ip_warring(conn) + '<input placeholder="' + load_lang(lang_data, 'why') + '" name="send" type="text"><hr>' + captcha_get(conn) + '<button type="submit">' + load_lang(lang_data, 'revert') + '</button></form>',
-            menu = [['history/' + url_pas(name), load_lang(lang_data, 'history')], ['recent_changes', '' + load_lang(lang_data, 'recent') + ' ' + load_lang(lang_data, 'change') + '']]
+            imp = [name, wiki_set(conn, 1), custom(conn), other2([' (' + load_lang(conn, 'revert') + ')', 0])],
+            data =  '<form method="post"><span>' + request.args.get('num', '0') + load_lang(conn, 'version') + '</span><hr>' + ip_warring(conn) + '<input placeholder="' + load_lang(conn, 'why') + '" name="send" type="text"><hr>' + captcha_get(conn) + '<button type="submit">' + load_lang(conn, 'revert') + '</button></form>',
+            menu = [['history/' + url_pas(name), load_lang(conn, 'history')], ['recent_changes', '' + load_lang(conn, 'recent') + ' ' + load_lang(conn, 'change') + '']]
         ))            
                     
 @app.route('/big_delete', methods=['POST', 'GET'])
@@ -1485,7 +1485,7 @@ def big_delete():
                 
                 leng = '-' + str(len(data_old[0][0]))
                 
-                history_plus(conn, list_one, '', today, ip, request.form.get('send', None) + ' (' + load_lang(lang_data, 'bulk_delete') + ')', leng)
+                history_plus(conn, list_one, '', today, ip, request.form.get('send', None) + ' (' + load_lang(conn, 'bulk_delete') + ')', leng)
 
             data = re.sub('(.*)\r\n', '', data, 1)
         
@@ -1494,7 +1494,7 @@ def big_delete():
         return redirect('/')
     else:
         return html_minify(render_template(skin_check(conn), 
-            imp = [load_lang(lang_data, 'bulk_delete'), wiki_set(conn, 1), custom(conn), other2([0, 0])],
+            imp = [load_lang(conn, 'bulk_delete'), wiki_set(conn, 1), custom(conn), other2([0, 0])],
             data = '''
                     <span>
                         Title A
@@ -1507,12 +1507,12 @@ def big_delete():
                     <form method="post">
                         <textarea rows="25" name="content"></textarea>
                         <hr>
-                        <input placeholder="''' + load_lang(lang_data, 'why') + '''" name="send" type="text">
+                        <input placeholder="''' + load_lang(conn, 'why') + '''" name="send" type="text">
                         <hr>
-                        <button type="submit">''' + load_lang(lang_data, 'delete') + '''</button>
+                        <button type="submit">''' + load_lang(conn, 'delete') + '''</button>
                     </form>
                     ''',
-            menu = [['manager', load_lang(lang_data, 'admin')]]
+            menu = [['manager', load_lang(conn, 'admin')]]
         ))
 
 @app.route('/edit_filter')
@@ -1527,14 +1527,14 @@ def edit_filter():
     div += '</ul>'
 
     if data:
-        div += '<hr><a href="/manager/9">(' + load_lang(lang_data, 'plus') + ')</a>'
+        div += '<hr><a href="/manager/9">(' + load_lang(conn, 'plus') + ')</a>'
     else:
-        div = '<a href="/manager/9">(' + load_lang(lang_data, 'plus') + ')</a>'
+        div = '<a href="/manager/9">(' + load_lang(conn, 'plus') + ')</a>'
 
     return html_minify(render_template(skin_check(conn), 
-        imp = [load_lang(lang_data, 'edit_filter') + ' ' + load_lang(lang_data, 'list'), wiki_set(conn, 1), custom(conn), other2([0, 0])],
+        imp = [load_lang(conn, 'edit_filter') + ' ' + load_lang(conn, 'list'), wiki_set(conn, 1), custom(conn), other2([0, 0])],
         data = div,
-        menu = [['manager', load_lang(lang_data, 'admin')]]
+        menu = [['manager', load_lang(conn, 'admin')]]
     ))
 
 @app.route('/edit_filter/<name>/delete', methods=['POST', 'GET'])
@@ -1587,17 +1587,17 @@ def set_edit_filter(name = None):
             stat = ''
 
         return html_minify(render_template(skin_check(conn), 
-            imp = [name, wiki_set(conn, 1), custom(conn), other2([' (' + load_lang(lang_data, 'edit_filter') + ')', 0])],
+            imp = [name, wiki_set(conn, 1), custom(conn), other2([' (' + load_lang(conn, 'edit_filter') + ')', 0])],
             data = '''
                     <form method="post">
                         <input ''' + stat + ''' type="checkbox" ''' + time_data + ''' name="ban">
-                        ''' + load_lang(lang_data, 'ban') + '''
+                        ''' + load_lang(conn, 'ban') + '''
                         <hr>
                         <input ''' + stat + ''' placeholder="정규식" name="content" value="''' + html.escape(textarea) + '''" type="text">
                         <hr>
-                        <button ''' + stat + ''' id="save" type="submit">''' + load_lang(lang_data, 'save') + '''</button>
+                        <button ''' + stat + ''' id="save" type="submit">''' + load_lang(conn, 'save') + '''</button>
                     </form>''',
-            menu = [['edit_filter', load_lang(lang_data, 'list')], ['edit_filter/' + url_pas(name) + '/delete', load_lang(lang_data, 'delete')]]
+            menu = [['edit_filter', load_lang(conn, 'list')], ['edit_filter/' + url_pas(name) + '/delete', load_lang(conn, 'delete')]]
         ))
 
 @app.route('/edit/<path:name>', methods=['POST', 'GET'])
@@ -1613,7 +1613,7 @@ def edit(name = None):
                 match = re.compile(data_list[0])
                 if match.search(request.form.get('content', None)):
                     if data_list[1] == 'X':
-                        ban_insert(conn, ip, '', load_lang(lang_data, 'edit_filter'), None, load_lang(lang_data, 'tool') + ':' + load_lang(lang_data, 'edit_filter'))
+                        ban_insert(conn, ip, '', load_lang(conn, 'edit_filter'), None, load_lang(conn, 'tool') + ':' + load_lang(conn, 'edit_filter'))
                     
                     return re_error(conn, '/error/21')
 
@@ -1737,21 +1737,21 @@ def edit(name = None):
         js_data = edit_help_button()
 
         return html_minify(render_template(skin_check(conn), 
-            imp = [name, wiki_set(conn, 1), custom(conn), other2([' (' + load_lang(lang_data, 'edit') + ')', 0])],
+            imp = [name, wiki_set(conn, 1), custom(conn), other2([' (' + load_lang(conn, 'edit') + ')', 0])],
             data = get_name + js_data[0] + '''
                     <form method="post" action="/edit/''' + url_pas(name) + action + '''">
                         ''' + js_data[1] + '''
                         <textarea id="content" rows="25" name="content">''' + html.escape(re.sub('\n$', '', data)) + '''</textarea>
                         <textarea style="display: none;" name="otent">''' + html.escape(re.sub('\n$', '', data_old)) + '''</textarea>
                         <hr>
-                        <input placeholder="''' + load_lang(lang_data, 'why') + '''" name="send" type="text">
+                        <input placeholder="''' + load_lang(conn, 'why') + '''" name="send" type="text">
                         <hr>
                         ''' + captcha_get(conn) + ip_warring(conn) + '''
-                        <button id="save" type="submit">''' + load_lang(lang_data, 'save') + '''</button>
-                        <button id="preview" type="submit" formaction="/preview/''' + url_pas(name) + action + '''">미리보기</button>
+                        <button id="save" type="submit">''' + load_lang(conn, 'save') + '''</button>
+                        <button id="preview" type="submit" formaction="/preview/''' + url_pas(name) + action + '">' + load_lang(conn, 'preview') + '''</button>
                     </form>
                     ''',
-            menu = [['w/' + url_pas(name), load_lang(lang_data, 'document')], ['delete/' + url_pas(name), load_lang(lang_data, 'delete')], ['move/' + url_pas(name), load_lang(lang_data, 'move')]]
+            menu = [['w/' + url_pas(name), load_lang(conn, 'document')], ['delete/' + url_pas(name), load_lang(conn, 'delete')], ['move/' + url_pas(name), load_lang(conn, 'move')]]
         ))
         
 @app.route('/edit_get/<path:name>', methods=['POST'])
@@ -1778,22 +1778,22 @@ def preview(name = None):
     js_data = edit_help_button()
     
     return html_minify(render_template(skin_check(conn), 
-        imp = [name, wiki_set(conn, 1), custom(conn), other2([' (미리보기)', 0])],
+        imp = [name, wiki_set(conn, 1), custom(conn), other2([' (' + load_lang(conn, 'preview') + ')', 0])],
         data = js_data[0] + '''
                 <form method="post" action="/edit/''' + url_pas(name) + action + '''">
                     ''' + js_data[1] + '''
                     <textarea id="content" rows="25" name="content">''' + html.escape(request.form.get('content', None)) + '''</textarea>
                     <textarea style="display: none;" name="otent">''' + html.escape(request.form.get('otent', None)) + '''</textarea>
                     <hr>
-                    <input placeholder="''' + load_lang(lang_data, 'why') + '''" name="send" type="text">
+                    <input placeholder="''' + load_lang(conn, 'why') + '''" name="send" type="text">
                     <hr>
                     ''' + captcha_get(conn) + '''
-                    <button id="save" type="submit">''' + load_lang(lang_data, 'save') + '''</button>
-                    <button id="preview" type="submit" formaction="/preview/''' + url_pas(name) + action + '''">미리보기</button>
+                    <button id="save" type="submit">''' + load_lang(conn, 'save') + '''</button>
+                    <button id="preview" type="submit" formaction="/preview/''' + url_pas(name) + action + '">' + load_lang(conn, 'preview') + '''</button>
                 </form>
                 <hr>
                 ''' + end_data,
-        menu = [['w/' + url_pas(name), load_lang(lang_data, 'document')]]
+        menu = [['w/' + url_pas(name), load_lang(conn, 'document')]]
     ))
         
 @app.route('/delete/<path:name>', methods=['POST', 'GET'])
@@ -1814,7 +1814,7 @@ def delete(name = None):
             today = get_time()
             leng = '-' + str(len(data[0][0]))
             
-            history_plus(conn, name, '', today, ip, request.form.get('send', None) + ' (' + load_lang(lang_data, 'delete') + ')', leng)
+            history_plus(conn, name, '', today, ip, request.form.get('send', None) + ' (' + load_lang(conn, 'delete') + ')', leng)
             
             curs.execute("select title, link from back where title = ? and not type = 'cat' and not type = 'no'", [name])
             for data in curs.fetchall():
@@ -1831,24 +1831,24 @@ def delete(name = None):
             return redirect('/w/' + url_pas(name))
 
         return html_minify(render_template(skin_check(conn), 
-            imp = [name, wiki_set(conn, 1), custom(conn), other2([' (' + load_lang(lang_data, 'delete') + ')', 0])],
+            imp = [name, wiki_set(conn, 1), custom(conn), other2([' (' + load_lang(conn, 'delete') + ')', 0])],
             data = '''
                     <form method="post">
                         ''' + ip_warring(conn) + '''
-                        <input placeholder="''' + load_lang(lang_data, 'why') + '''" name="send" type="text">
+                        <input placeholder="''' + load_lang(conn, 'why') + '''" name="send" type="text">
                         <hr>
                         ''' + captcha_get(conn) + '''
-                        <button type="submit">''' + load_lang(lang_data, 'delete') + '''</button>
+                        <button type="submit">''' + load_lang(conn, 'delete') + '''</button>
                     </form>
                     ''',
-            menu = [['w/' + url_pas(name), load_lang(lang_data, 'document')]]
+            menu = [['w/' + url_pas(name), load_lang(conn, 'document')]]
         ))            
             
 @app.route('/move_data/<path:name>')
 def move_data(name = None):    
     data = '<ul>'
     
-    curs.execute("select send, date, ip from history where send like ? or send like ? order by date desc", ['%<a href="/w/' + url_pas(name) + '">' + name + '</a> ' + load_lang(lang_data, 'move') + ')%', '%(<a href="/w/' + url_pas(name) + '">' + name + '</a>%'])
+    curs.execute("select send, date, ip from history where send like ? or send like ? order by date desc", ['%<a href="/w/' + url_pas(name) + '">' + name + '</a> ' + load_lang(conn, 'move') + ')%', '%(<a href="/w/' + url_pas(name) + '">' + name + '</a>%'])
     for for_data in curs.fetchall():
         match = re.findall('<a href="\/w\/(?:(?:(?!">).)+)">((?:(?!<\/a>).)+)<\/a>', for_data[0])
         send = re.sub('\([^\)]+\)$', '', for_data[0])
@@ -1862,9 +1862,9 @@ def move_data(name = None):
     data += '</ul>'
     
     return html_minify(render_template(skin_check(conn), 
-        imp = [name, wiki_set(conn, 1), custom(conn), other2([' (' + load_lang(lang_data, 'move') + ' ' + load_lang(lang_data, 'history') + ')', 0])],
+        imp = [name, wiki_set(conn, 1), custom(conn), other2([' (' + load_lang(conn, 'move') + ' ' + load_lang(conn, 'history') + ')', 0])],
         data = data,
-        menu = [['history/' + url_pas(name), load_lang(lang_data, 'history')]]
+        menu = [['history/' + url_pas(name), load_lang(conn, 'history')]]
     ))        
             
 @app.route('/move/<path:name>', methods=['POST', 'GET'])
@@ -1892,7 +1892,7 @@ def move(name = None):
         else:
             data_in = ''
             
-        history_plus(conn, name, data_in, get_time(), ip_check(), request.form.get('send', None) + ' (<a href="/w/' + url_pas(name) + '">' + name + '</a> - <a href="/w/' + url_pas(request.form.get('title', None)) + '">' + request.form.get('title', None) + '</a> ' + load_lang(lang_data, 'move') + ')', '0')
+        history_plus(conn, name, data_in, get_time(), ip_check(), request.form.get('send', None) + ' (<a href="/w/' + url_pas(name) + '">' + name + '</a> - <a href="/w/' + url_pas(request.form.get('title', None)) + '">' + request.form.get('title', None) + '</a> ' + load_lang(conn, 'move') + ')', '0')
         
         curs.execute("select title, link from back where title = ? and not type = 'cat' and not type = 'no'", [name])
         for data in curs.fetchall():
@@ -1904,56 +1904,56 @@ def move(name = None):
         return redirect('/w/' + url_pas(request.form.get('title', None)))
     else:            
         return html_minify(render_template(skin_check(conn), 
-            imp = [name, wiki_set(conn, 1), custom(conn), other2([' (' + load_lang(lang_data, 'move') + ')', 0])],
+            imp = [name, wiki_set(conn, 1), custom(conn), other2([' (' + load_lang(conn, 'move') + ')', 0])],
             data = '''
                     <form method="post">
                         ''' + ip_warring(conn) + '''
-                        <input placeholder="''' + load_lang(lang_data, 'document') + ' ' + load_lang(lang_data, 'name') + '" value="' + name + '''" name="title" type="text">
+                        <input placeholder="''' + load_lang(conn, 'document') + ' ' + load_lang(conn, 'name') + '" value="' + name + '''" name="title" type="text">
                         <hr>
-                        <input placeholder="''' + load_lang(lang_data, 'why') + '''" name="send" type="text">
+                        <input placeholder="''' + load_lang(conn, 'why') + '''" name="send" type="text">
                         <hr>
                         ''' + captcha_get(conn) + '''
-                        <button type="submit">''' + load_lang(lang_data, 'move') + '''</button>
+                        <button type="submit">''' + load_lang(conn, 'move') + '''</button>
                     </form>
                     ''',
-            menu = [['w/' + url_pas(name), load_lang(lang_data, 'document')]]
+            menu = [['w/' + url_pas(name), load_lang(conn, 'document')]]
         ))
             
 @app.route('/other')
 def other():
     return html_minify(render_template(skin_check(conn), 
-        imp = [load_lang(lang_data, 'other') + ' ' + load_lang(lang_data, 'tool'), wiki_set(conn, 1), custom(conn), other2([0, 0])],
+        imp = [load_lang(conn, 'other') + ' ' + load_lang(conn, 'tool'), wiki_set(conn, 1), custom(conn), other2([0, 0])],
         data = '''
-                <h2>''' + load_lang(lang_data, 'record') + '''</h2>
+                <h2>''' + load_lang(conn, 'record') + '''</h2>
                 <ul>
-                    <li><a href="/manager/6">''' + load_lang(lang_data, 'edit') + '''</a></li>
-                    <li><a href="/manager/7">''' + load_lang(lang_data, 'discussion') + '''</a></li>
+                    <li><a href="/manager/6">''' + load_lang(conn, 'edit') + '''</a></li>
+                    <li><a href="/manager/7">''' + load_lang(conn, 'discussion') + '''</a></li>
                 </ul>
                 <br>
-                <h2>''' + load_lang(lang_data, 'list') + '''</h2>
+                <h2>''' + load_lang(conn, 'list') + '''</h2>
                 <ul>
-                    <li><a href="/admin_list">''' + load_lang(lang_data, 'admin') + '''</a></li>
-                    <li><a href="/give_log">''' + load_lang(lang_data, 'admin_group') + '''</a></li>
-                    <li><a href="/not_close_topic">''' + load_lang(lang_data, 'open') + ' ' + load_lang(lang_data, 'discussion') + '''</a></li>
+                    <li><a href="/admin_list">''' + load_lang(conn, 'admin') + '''</a></li>
+                    <li><a href="/give_log">''' + load_lang(conn, 'admin_group') + '''</a></li>
+                    <li><a href="/not_close_topic">''' + load_lang(conn, 'open') + ' ' + load_lang(conn, 'discussion') + '''</a></li>
                 </ul>
                 <br>
-                <h2>''' + load_lang(lang_data, 'other') + '''</h2>
+                <h2>''' + load_lang(conn, 'other') + '''</h2>
                 <ul>
-                    <li><a href="/title_index">''' + load_lang(lang_data, 'all') + ' ' + load_lang(lang_data, 'document') + '''</a></li>
-                    <li><a href="/acl_list">ACL ''' + load_lang(lang_data, 'document') + '''</a></li>
-                    <li><a href="/please">''' + load_lang(lang_data, 'need') + ' ' + load_lang(lang_data, 'document') + '''</a></li>
-                    <li><a href="/upload">''' + load_lang(lang_data, 'upload') + '''</a></li>
-                    <li><a href="/manager/10">''' + load_lang(lang_data, 'document') + ' ' + load_lang(lang_data, 'search') + '''</a></li>
+                    <li><a href="/title_index">''' + load_lang(conn, 'all') + ' ' + load_lang(conn, 'document') + '''</a></li>
+                    <li><a href="/acl_list">ACL ''' + load_lang(conn, 'document') + '''</a></li>
+                    <li><a href="/please">''' + load_lang(conn, 'need') + ' ' + load_lang(conn, 'document') + '''</a></li>
+                    <li><a href="/upload">''' + load_lang(conn, 'upload') + '''</a></li>
+                    <li><a href="/manager/10">''' + load_lang(conn, 'document') + ' ' + load_lang(conn, 'search') + '''</a></li>
                 </ul>
                 <br>
-                <h2>''' + load_lang(lang_data, 'admin') + '''</h2>
+                <h2>''' + load_lang(conn, 'admin') + '''</h2>
                 <ul>
-                    <li><a href="/manager/1">''' + load_lang(lang_data, 'admin') + ' ' + load_lang(lang_data, 'tool') + '''</a></li>
+                    <li><a href="/manager/1">''' + load_lang(conn, 'admin') + ' ' + load_lang(conn, 'tool') + '''</a></li>
                 </ul>
                 <br>
-                <h2>''' + load_lang(lang_data, 'version') + '''</h2>
+                <h2>''' + load_lang(conn, 'version') + '''</h2>
                 <ul>
-                    <li>''' + load_lang(lang_data, 'version') + ' : <a id="out_link" href="https://github.com/2DU/openNAMU/blob/master/version.md">' + r_ver + '''</a></li>
+                    <li>''' + load_lang(conn, 'version') + ' : <a id="out_link" href="https://github.com/2DU/openNAMU/blob/master/version.md">' + r_ver + '''</a></li>
                 </ul>''',
     menu = 0
     ))
@@ -1961,47 +1961,47 @@ def other():
 @app.route('/manager', methods=['POST', 'GET'])
 @app.route('/manager/<int:num>', methods=['POST', 'GET'])
 def manager(num = 1):
-    title_list = [[load_lang(lang_data, 'document') + ' ' + load_lang(lang_data, 'name'), 'acl'], [0, 'check'], [0, 'ban'], [0, 'admin'], [0, 'record'], [0, 'topic_record'], [load_lang(lang_data, 'name'), 'admin_plus'], [load_lang(lang_data, 'name'), 'edit_filter'], [load_lang(lang_data, 'document') + ' ' + load_lang(lang_data, 'name'), 'search'], [0, 'block_user'], [0, 'block_admin'], [load_lang(lang_data, 'document') + ' ' + load_lang(lang_data, 'name'), 'watch_list']]
+    title_list = [[load_lang(conn, 'document') + ' ' + load_lang(conn, 'name'), 'acl'], [0, 'check'], [0, 'ban'], [0, 'admin'], [0, 'record'], [0, 'topic_record'], [load_lang(conn, 'name'), 'admin_plus'], [load_lang(conn, 'name'), 'edit_filter'], [load_lang(conn, 'document') + ' ' + load_lang(conn, 'name'), 'search'], [0, 'block_user'], [0, 'block_admin'], [load_lang(conn, 'document') + ' ' + load_lang(conn, 'name'), 'watch_list']]
     
     if num == 1:
         return html_minify(render_template(skin_check(conn), 
-            imp = [load_lang(lang_data, 'admin') + ' ' + load_lang(lang_data, 'tool'), wiki_set(conn, 1), custom(conn), other2([0, 0])],
+            imp = [load_lang(conn, 'admin') + ' ' + load_lang(conn, 'tool'), wiki_set(conn, 1), custom(conn), other2([0, 0])],
             data = '''
-                    <h2>''' + load_lang(lang_data, 'admin') + '''</h2>
+                    <h2>''' + load_lang(conn, 'admin') + '''</h2>
                     <ul>
-                        <li><a href="/manager/2">''' + load_lang(lang_data, 'document') + ''' ACL</a></li>
-                        <li><a href="/manager/3">''' + load_lang(lang_data, 'user') + ' ' + load_lang(lang_data, 'check') + '''</a></li>
-                        <li><a href="/manager/4">''' + load_lang(lang_data, 'user') + ' ' + load_lang(lang_data, 'ban') + '''</a></li>
-                        <li><a href="/manager/5">''' + load_lang(lang_data, 'authority') + '''</a></li>
-                        <li><a href="/big_delete">''' + load_lang(lang_data, 'bulk_delete') + '''</a></li>
-                        <li><a href="/edit_filter">''' + load_lang(lang_data, 'edit_filter') + '''</a></li>
+                        <li><a href="/manager/2">''' + load_lang(conn, 'document') + ''' ACL</a></li>
+                        <li><a href="/manager/3">''' + load_lang(conn, 'user') + ' ' + load_lang(conn, 'check') + '''</a></li>
+                        <li><a href="/manager/4">''' + load_lang(conn, 'user') + ' ' + load_lang(conn, 'ban') + '''</a></li>
+                        <li><a href="/manager/5">''' + load_lang(conn, 'authority') + '''</a></li>
+                        <li><a href="/big_delete">''' + load_lang(conn, 'bulk_delete') + '''</a></li>
+                        <li><a href="/edit_filter">''' + load_lang(conn, 'edit_filter') + '''</a></li>
                     </ul>
                     <br>
-                    <h2>''' + load_lang(lang_data, 'owner') + '''</h2>
+                    <h2>''' + load_lang(conn, 'owner') + '''</h2>
                     <ul>
-                        <li><a href="/indexing">Indexing (''' + load_lang(lang_data, 'create') + ' or ' + load_lang(lang_data, 'delete') + ''')</a></li>
-                        <li><a href="/manager/8">''' + load_lang(lang_data, 'admin_group') + ' ' + load_lang(lang_data, 'create') + '''</a></li>
-                        <li><a href="/edit_set">''' + load_lang(lang_data, 'setting') + ' ' + load_lang(lang_data, 'edit') + '''</a></li>
+                        <li><a href="/indexing">Indexing (''' + load_lang(conn, 'create') + ' or ' + load_lang(conn, 'delete') + ''')</a></li>
+                        <li><a href="/manager/8">''' + load_lang(conn, 'admin_group') + ' ' + load_lang(conn, 'create') + '''</a></li>
+                        <li><a href="/edit_set">''' + load_lang(conn, 'setting') + ' ' + load_lang(conn, 'edit') + '''</a></li>
                         <li><a href="/re_start">Server Restart</a></li>
-                        <li><a href="/update">''' + load_lang(lang_data, 'update') + '''</a></li>
-                        <li><a href="/inter_wiki">''' + load_lang(lang_data, 'interwiki') + '''</a></li>
+                        <li><a href="/update">''' + load_lang(conn, 'update') + '''</a></li>
+                        <li><a href="/inter_wiki">''' + load_lang(conn, 'interwiki') + '''</a></li>
                     </ul>
                     ''',
-            menu = [['other', load_lang(lang_data, 'other')]]
+            menu = [['other', load_lang(conn, 'other')]]
         ))
     elif num in range(2, 14):
         if request.method == 'POST':
             return redirect('/' + title_list[(num - 2)][1] + '/' + url_pas(request.form.get('name', None)))
         else:
             if title_list[(num - 2)][0] == 0:
-                placeholder = load_lang(lang_data, 'user') + ' ' + load_lang(lang_data, 'name')
+                placeholder = load_lang(conn, 'user') + ' ' + load_lang(conn, 'name')
             else:
                 placeholder = title_list[(num - 2)][0]
 
             return html_minify(render_template(skin_check(conn), 
                 imp = ['Redirect', wiki_set(conn, 1), custom(conn), other2([0, 0])],
-                data = '<form method="post"><input placeholder="' + placeholder + '" name="name" type="text"><hr><button type="submit">' + load_lang(lang_data, 'move') + '</button></form>',
-                menu = [['manager', load_lang(lang_data, 'admin')]]
+                data = '<form method="post"><input placeholder="' + placeholder + '" name="name" type="text"><hr><button type="submit">' + load_lang(conn, 'move') + '</button></form>',
+                menu = [['manager', load_lang(conn, 'admin')]]
             ))
     else:
         return redirect('/')
@@ -2041,7 +2041,7 @@ def title_index():
         else:
             count_end += [0]
 
-        sql_list = ['틀:', '분류:', load_lang(lang_data, 'user') + ':', '' + load_lang(lang_data, 'file') + ':']
+        sql_list = ['틀:', '분류:', load_lang(conn, 'user') + ':', '' + load_lang(conn, 'file') + ':']
         for sql in sql_list:
             curs.execute("select count(title) from data where title like ?", [sql + '%'])
             count = curs.fetchall()
@@ -2063,9 +2063,9 @@ def title_index():
     sub = ' (' + str(num) + '개)'
     
     return html_minify(render_template(skin_check(conn), 
-        imp = [load_lang(lang_data, 'all') + ' ' + load_lang(lang_data, 'document'), wiki_set(conn, 1), custom(conn), other2([sub, 0])],
+        imp = [load_lang(conn, 'all') + ' ' + load_lang(conn, 'document'), wiki_set(conn, 1), custom(conn), other2([sub, 0])],
         data = data,
-        menu = [['other', load_lang(lang_data, 'other')]]
+        menu = [['other', load_lang(conn, 'other')]]
     ))
         
 @app.route('/topic/<path:name>/sub/<sub>/b/<int:num>')
@@ -2111,9 +2111,9 @@ def topic_top(name = None, sub = None, num = None):
 @app.route('/topic/<path:name>/sub/<sub>/tool/<regex("close|stop|agree"):tool>')
 def topic_stop(name = None, sub = None, tool = None):
     if tool == 'close':
-        set_list = ['O', '', load_lang(lang_data, 'discussion') + ' ' + load_lang(lang_data, 'close') + '', load_lang(lang_data, 'discussion') + ' ' + load_lang(lang_data, 'open') + '']
+        set_list = ['O', '', load_lang(conn, 'discussion') + ' ' + load_lang(conn, 'close') + '', load_lang(conn, 'discussion') + ' ' + load_lang(conn, 'open') + '']
     elif tool == 'stop':
-        set_list = ['', 'O', load_lang(lang_data, 'discussion') + ' ' + load_lang(lang_data, 'stop') + '', load_lang(lang_data, 'discussion') + ' ' + load_lang(lang_data, 'restart') + '']
+        set_list = ['', 'O', load_lang(conn, 'discussion') + ' ' + load_lang(conn, 'stop') + '', load_lang(conn, 'discussion') + ' ' + load_lang(conn, 'restart') + '']
     elif tool == 'agree':
         pass
     else:
@@ -2131,10 +2131,10 @@ def topic_stop(name = None, sub = None, tool = None):
         if tool == 'agree':
             curs.execute("select title from agreedis where title = ? and sub = ?", [name, sub])
             if curs.fetchall():
-                curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, '" + load_lang(lang_data, 'agreement') + " Fail', ?, ?, '', '1')", [str(int(topic_check[0][0]) + 1), name, sub, time, ip])
+                curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, '" + load_lang(conn, 'agreement') + " Fail', ?, ?, '', '1')", [str(int(topic_check[0][0]) + 1), name, sub, time, ip])
                 curs.execute("delete from agreedis where title = ? and sub = ?", [name, sub])
             else:
-                curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, '" + load_lang(lang_data, 'agreement') + " OK', ?, ?, '', '1')", [str(int(topic_check[0][0]) + 1), name, sub, time, ip])
+                curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, '" + load_lang(conn, 'agreement') + " OK', ?, ?, '', '1')", [str(int(topic_check[0][0]) + 1), name, sub, time, ip])
                 curs.execute("insert into agreedis (title, sub) values (?, ?)", [name, sub])
         else:
             curs.execute("select title from stop where title = ? and sub = ? and close = ?", [name, sub, set_list[0]])
@@ -2162,20 +2162,20 @@ def topic_admin(name = None, sub = None, num = None):
     ban = ''
 
     if admin_check(conn, 3, None) == 1:
-        ban += '</ul><br><h2>관리자 ' + load_lang(lang_data, 'tool') + '</h2><ul>'
+        ban += '</ul><br><h2>관리자 ' + load_lang(conn, 'tool') + '</h2><ul>'
         is_ban = '<li><a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/b/' + str(num) + '">'
 
         if data[0][0] == 'O':
-            is_ban += load_lang(lang_data, 'hide') + ' ' + load_lang(lang_data, 'release')
+            is_ban += load_lang(conn, 'hide') + ' ' + load_lang(conn, 'release')
         else:
-            is_ban += load_lang(lang_data, 'hide')
+            is_ban += load_lang(conn, 'hide')
         
         is_ban += '</a></li>'
         is_ban += '<li><a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/notice/' + str(num) + '">'
 
         curs.execute("select id from topic where title = ? and sub = ? and id = ? and top = 'O'", [name, sub, str(num)])
         if curs.fetchall():
-            is_ban += '공지 ' + load_lang(lang_data, 'release')
+            is_ban += '공지 ' + load_lang(conn, 'release')
         else:
             is_ban += '공지'
         
@@ -2184,27 +2184,27 @@ def topic_admin(name = None, sub = None, num = None):
 
         curs.execute("select end from ban where block = ?", [data[0][1]])
         if curs.fetchall():
-            ban += load_lang(lang_data, 'ban') + ' ' + load_lang(lang_data, 'release')
+            ban += load_lang(conn, 'ban') + ' ' + load_lang(conn, 'release')
         else:
-            ban += load_lang(lang_data, 'ban')
+            ban += load_lang(conn, 'ban')
         
         ban += '</a></li>' + is_ban
 
-    ban += '</ul><br><h2>' + load_lang(lang_data, 'other') + ' ' + load_lang(lang_data, 'tool') + '</h2><ul>'
+    ban += '</ul><br><h2>' + load_lang(conn, 'other') + ' ' + load_lang(conn, 'tool') + '</h2><ul>'
     ban += '<li><a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/raw/' + str(num) + '">Raw</a></li>'
-    ban = '<li>' + load_lang(lang_data, 'time') + ' : ' + data[0][2] + '</li>' + ban
+    ban = '<li>' + load_lang(conn, 'time') + ' : ' + data[0][2] + '</li>' + ban
     
     if re.search('(\.|:)', data[0][1]):
-        ban = '<li>작성인 : ' + data[0][1] + ' <li><a href="/record/' + url_pas(data[0][1]) + '">(' + load_lang(lang_data, 'record') + ')</a></li>' + ban
+        ban = '<li>작성인 : ' + data[0][1] + ' <li><a href="/record/' + url_pas(data[0][1]) + '">(' + load_lang(conn, 'record') + ')</a></li>' + ban
     else:
-        ban = '<li>작성인 : <a href="/w/' + load_lang(lang_data, 'user') + ':' + data[0][1] + '">' + data[0][1] + '</a> <a href="/record/' + url_pas(data[0][1]) + '">(' + load_lang(lang_data, 'record') + ')</a></li>' + ban
+        ban = '<li>작성인 : <a href="/w/' + load_lang(conn, 'user') + ':' + data[0][1] + '">' + data[0][1] + '</a> <a href="/record/' + url_pas(data[0][1]) + '">(' + load_lang(conn, 'record') + ')</a></li>' + ban
 
     ban = '<h2>정보</h2><ul>' + ban
 
     return html_minify(render_template(skin_check(conn), 
-        imp = [load_lang(lang_data, 'discussion') + ' ' + load_lang(lang_data, 'tool'), wiki_set(conn, 1), custom(conn), other2([' (' + str(num) + '번)', 0])],
+        imp = [load_lang(conn, 'discussion') + ' ' + load_lang(conn, 'tool'), wiki_set(conn, 1), custom(conn), other2([' (' + str(num) + '번)', 0])],
         data = ban,
-        menu = [['topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '#' + str(num), load_lang(lang_data, 'discussion')]]
+        menu = [['topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '#' + str(num), load_lang(conn, 'discussion')]]
     ))
 
 @app.route('/topic/<path:name>/sub/<sub>', methods=['POST', 'GET'])
@@ -2231,16 +2231,16 @@ def topic(name = None, sub = None):
         else:
             num = 1
 
-        match = re.search('^' + load_lang(lang_data, 'user') + ':([^/]+)', name)
+        match = re.search('^' + load_lang(conn, 'user') + ':([^/]+)', name)
         if match:
-            curs.execute('insert into alarm (name, data, date) values (?, ?, ?)', [match.groups()[0], ip + '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '">' + load_lang(lang_data, 'user') + ' - ' + load_lang(lang_data, 'discussion') + '</a> (My)', today])
+            curs.execute('insert into alarm (name, data, date) values (?, ?, ?)', [match.groups()[0], ip + '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '">' + load_lang(conn, 'user') + ' - ' + load_lang(conn, 'discussion') + '</a> (My)', today])
         
         data = re.sub("\[\[(분류:(?:(?:(?!\]\]).)*))\]\]", "[br]", request.form.get('content', None))
         for rd_data in re.findall("(?:#([0-9]+))", data):
             curs.execute("select ip from topic where title = ? and sub = ? and id = ?", [name, sub, rd_data])
             ip_data = curs.fetchall()
             if ip_data and not re.search('(\.|:)', ip_data[0][0]):
-                curs.execute('insert into alarm (name, data, date) values (?, ?, ?)', [ip_data[0][0], ip + ' - <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '#' + str(num) + '">' + load_lang(lang_data, 'discussion') + '</a>', today])
+                curs.execute('insert into alarm (name, data, date) values (?, ?, ?)', [ip_data[0][0], ip + ' - <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '#' + str(num) + '">' + load_lang(conn, 'discussion') + '</a>', today])
             
             data = re.sub("(?P<in>#(?:[0-9]+))", '[[\g<in>]]', data)
 
@@ -2269,20 +2269,20 @@ def topic(name = None, sub = None):
         
         if admin == 1 and topic_exist:
             if close_data:
-                all_data += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/close">(' + load_lang(lang_data, 'open') + ')</a> '
+                all_data += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/close">(' + load_lang(conn, 'open') + ')</a> '
             else:
-                all_data += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/close">(' + load_lang(lang_data, 'close') + ')</a> '
+                all_data += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/close">(' + load_lang(conn, 'close') + ')</a> '
             
             if stop_data:
-                all_data += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/stop">(' + load_lang(lang_data, 'restart') + ')</a> '
+                all_data += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/stop">(' + load_lang(conn, 'restart') + ')</a> '
             else:
-                all_data += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/stop">(' + load_lang(lang_data, 'stop') + ')</a> '
+                all_data += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/stop">(' + load_lang(conn, 'stop') + ')</a> '
 
             curs.execute("select title from agreedis where title = ? and sub = ?", [name, sub])
             if curs.fetchall():
-                all_data += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/agree">(' + load_lang(lang_data, 'release') + ')</a>'
+                all_data += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/agree">(' + load_lang(conn, 'release') + ')</a>'
             else:
-                all_data += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/agree">(' + load_lang(lang_data, 'agreement') + ')</a>'
+                all_data += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/agree">(' + load_lang(conn, 'agreement') + ')</a>'
             
             all_data += '<hr>'
         
@@ -2316,9 +2316,9 @@ def topic(name = None, sub = None):
                     curs.execute("select who from re_admin where what = ? order by time desc limit 1", ['blind (' + name + ' - ' + sub + '#' + str(number) + ')'])
                     who_blind = curs.fetchall()
                     if who_blind:
-                        user_write = '[[' + load_lang(lang_data, 'user') + ':' + who_blind[0][0] + ']] ' + load_lang(lang_data, 'hide')
+                        user_write = '[[' + load_lang(conn, 'user') + ':' + who_blind[0][0] + ']] ' + load_lang(conn, 'hide')
                     else:
-                        user_write = load_lang(lang_data, 'hide')
+                        user_write = load_lang(conn, 'hide')
             else:
                 blind_data = ''
 
@@ -2328,10 +2328,10 @@ def topic(name = None, sub = None):
             curs.execute('select acl from user where id = ?', [topic_data[3]])
             user_acl = curs.fetchall()
             if user_acl and user_acl[0][0] != 'user':
-                ip += ' <a href="javascript:void(0);" title="' + load_lang(lang_data, 'admin') + '">★</a>'
+                ip += ' <a href="javascript:void(0);" title="' + load_lang(conn, 'admin') + '">★</a>'
 
             if admin == 1 or blind_data == '':
-                ip += ' <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/admin/' + str(number) + '">(' + load_lang(lang_data, 'tool') + ')</a>'
+                ip += ' <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/admin/' + str(number) + '">(' + load_lang(conn, 'tool') + ')</a>'
 
             curs.execute("select end from ban where block = ?", [topic_data[3]])
             if curs.fetchall():
@@ -2368,9 +2368,9 @@ def topic(name = None, sub = None):
             data += '<button type="submit">Send</button></form>'
 
         return html_minify(render_template(skin_check(conn), 
-            imp = [name, wiki_set(conn, 1), custom(conn), other2([' (' + load_lang(lang_data, 'discussion') + ')', 0])],
+            imp = [name, wiki_set(conn, 1), custom(conn), other2([' (' + load_lang(conn, 'discussion') + ')', 0])],
             data = '<h2 id="topic_top_title">' + sub + '</h2>' + all_data + data,
-            menu = [['topic/' + url_pas(name), load_lang(lang_data, 'list')]]
+            menu = [['topic/' + url_pas(name), load_lang(conn, 'list')]]
         ))
         
 @app.route('/topic/<path:name>', methods=['POST', 'GET'])
@@ -2395,31 +2395,31 @@ def close_topic_list(name = None, tool = None):
         return redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(request.form.get('topic', None) + t_num))
     else:
         plus = ''
-        menu = [['topic/' + url_pas(name), load_lang(lang_data, 'list')]]
+        menu = [['topic/' + url_pas(name), load_lang(conn, 'list')]]
         
         if tool == 'close':
             curs.execute("select sub from stop where title = ? and close = 'O' order by sub asc", [name])
             
-            sub = '' + load_lang(lang_data, 'close') + ''
+            sub = '' + load_lang(conn, 'close') + ''
         elif tool == 'agree':
             curs.execute("select sub from agreedis where title = ? order by sub asc", [name])
             
-            sub = '' + load_lang(lang_data, 'agreement') + ''
+            sub = '' + load_lang(conn, 'agreement') + ''
         else:
             curs.execute("select sub from rd where title = ? order by date desc", [name])
             
-            sub = load_lang(lang_data, 'discussion') + ' ' + load_lang(lang_data, 'list')
+            sub = load_lang(conn, 'discussion') + ' ' + load_lang(conn, 'list')
             
-            menu = [['w/' + url_pas(name), load_lang(lang_data, 'document')]]
+            menu = [['w/' + url_pas(name), load_lang(conn, 'document')]]
             
-            plus =  '<a href="/topic/' + url_pas(name) + '/close">(' + load_lang(lang_data, 'close') + ')</a> <a href="/topic/' + url_pas(name) + '/agree">(' + load_lang(lang_data, 'agreement') + ')</a><hr><input placeholder="' + load_lang(lang_data, 'discussion') + ' ' + load_lang(lang_data, 'name') + '" name="topic" type="text"><hr><button type="submit">' + load_lang(lang_data, 'open') + '</button>'
+            plus =  '<a href="/topic/' + url_pas(name) + '/close">(' + load_lang(conn, 'close') + ')</a> <a href="/topic/' + url_pas(name) + '/agree">(' + load_lang(conn, 'agreement') + ')</a><hr><input placeholder="' + load_lang(conn, 'discussion') + ' ' + load_lang(conn, 'name') + '" name="topic" type="text"><hr><button type="submit">' + load_lang(conn, 'open') + '</button>'
 
         for data in curs.fetchall():
             curs.execute("select data, date, ip, block from topic where title = ? and sub = ? and id = '1'", [name, data[0]])
             if curs.fetchall():                
                 it_p = 0
                 
-                if sub == load_lang(lang_data, 'discussion') + ' ' + load_lang(lang_data, 'list'):
+                if sub == load_lang(conn, 'discussion') + ' ' + load_lang(conn, 'list'):
                     curs.execute("select title from stop where title = ? and sub = ? and close = 'O' order by sub asc", [name, data[0]])
                     if curs.fetchall():
                         it_p = 1
@@ -2493,9 +2493,9 @@ def login():
         return redirect('/user')  
     else:        
         return html_minify(render_template(skin_check(conn),    
-            imp = [load_lang(lang_data, 'login'), wiki_set(conn, 1), custom(conn), other2([0, 0])],
-            data = '<form method="post"><input placeholder="아이디" name="id" type="text"><hr><input placeholder="비밀번호" name="pw" type="password"><hr>' + captcha_get(conn) + '<button type="submit">' + load_lang(lang_data, 'login') + '</button><hr><span>' + load_lang(lang_data, 'http_warring') + '</span></form>',
-            menu = [['user', load_lang(lang_data, 'user')]]
+            imp = [load_lang(conn, 'login'), wiki_set(conn, 1), custom(conn), other2([0, 0])],
+            data = '<form method="post"><input placeholder="아이디" name="id" type="text"><hr><input placeholder="비밀번호" name="pw" type="password"><hr>' + captcha_get(conn) + '<button type="submit">' + load_lang(conn, 'login') + '</button><hr><span>' + load_lang(conn, 'http_warring') + '</span></form>',
+            menu = [['user', load_lang(conn, 'user')]]
         ))
                 
 @app.route('/change', methods=['POST', 'GET'])
@@ -2557,7 +2557,7 @@ def change_password():
                 div2 += '<option value="' + skin_data + '">' + skin_data + '</option>'
 
         return html_minify(render_template(skin_check(conn),    
-            imp = [load_lang(lang_data, 'my_info') + ' ' + load_lang(lang_data, 'edit'), wiki_set(conn, 1), custom(conn), other2([0, 0])],
+            imp = [load_lang(conn, 'my_info') + ' ' + load_lang(conn, 'edit'), wiki_set(conn, 1), custom(conn), other2([0, 0])],
             data = '''
                     <form method="post">
                         <span>ID : ''' + ip + '''</span>
@@ -2577,12 +2577,12 @@ def change_password():
                         <br>
                         <select name="skin">''' + div2 + '''</select>
                         <hr>
-                        <button type="submit">''' + load_lang(lang_data, 'edit') + '''</button>
+                        <button type="submit">''' + load_lang(conn, 'edit') + '''</button>
                         <hr>
-                        <span>''' + load_lang(lang_data, 'http_warring') + '''</span>
+                        <span>''' + load_lang(conn, 'http_warring') + '''</span>
                     </form>
                     ''',
-            menu = [['user', load_lang(lang_data, 'user')]]
+            menu = [['user', load_lang(conn, 'user')]]
         ))
 
 @app.route('/check/<name>')
@@ -2615,12 +2615,12 @@ def user_check(name = None):
     record = curs.fetchall()
     if record:
         if not request.args.get('plus', None):
-            div = '<a href="/plus_check/' + url_pas(name) + '">(' + load_lang(lang_data, 'compare') + ')</a><hr>'
+            div = '<a href="/plus_check/' + url_pas(name) + '">(' + load_lang(conn, 'compare') + ')</a><hr>'
         else:
             div = '<a href="/check/' + url_pas(name) + '">(Main)</a> <a href="/check/' + url_pas(request.args.get('plus', None)) + '">(Sub)</a><hr>'
 
         div += '<table style="width: 100%; text-align: center;"><tbody><tr>'
-        div += '<td style="width: 33.3%;">' + load_lang(lang_data, 'name') + '</td><td style="width: 33.3%;">IP</td><td style="width: 33.3%;">언제</td></tr>'
+        div += '<td style="width: 33.3%;">' + load_lang(conn, 'name') + '</td><td style="width: 33.3%;">IP</td><td style="width: 33.3%;">언제</td></tr>'
         
         for data in record:
             if data[2]:
@@ -2636,9 +2636,9 @@ def user_check(name = None):
         return re_error(conn, '/error/5')
             
     return html_minify(render_template(skin_check(conn),    
-        imp = ['' + load_lang(lang_data, 'check') + '', wiki_set(conn, 1), custom(conn), other2([0, 0])],
+        imp = ['' + load_lang(conn, 'check') + '', wiki_set(conn, 1), custom(conn), other2([0, 0])],
         data = div,
-        menu = [['manager', load_lang(lang_data, 'admin')]]
+        menu = [['manager', load_lang(conn, 'admin')]]
     ))
 
 @app.route('/plus_check/<name>', methods=['POST', 'GET'])
@@ -2647,15 +2647,15 @@ def plus_check(name):
         return redirect('/check/' + url_pas(name) + '?plus=' + url_pas(request.form.get('name2', None)))
     else:
         return html_minify(render_template(skin_check(conn),
-            imp = ['' + load_lang(lang_data, 'plus'), wiki_set(conn, 1), custom(conn), other2([0, 0])],
+            imp = ['' + load_lang(conn, 'plus'), wiki_set(conn, 1), custom(conn), other2([0, 0])],
             data = '''
                     <form method="post">
-                        <input placeholder="' + load_lang(lang_data, 'compare') + '" name="name2" type="text">
+                        <input placeholder="' + load_lang(conn, 'compare') + '" name="name2" type="text">
                         <hr>
-                        <button type="submit">''' + load_lang(lang_data, 'move') + '''</button>
+                        <button type="submit">''' + load_lang(conn, 'move') + '''</button>
                     </form>
                     ''',
-            menu = [['manager', load_lang(lang_data, 'admin')]]
+            menu = [['manager', load_lang(conn, 'admin')]]
         ))
                 
 @app.route('/register', methods=['POST', 'GET'])
@@ -2708,7 +2708,7 @@ def register():
             contract = data[0][0] + '<hr>'
 
         return html_minify(render_template(skin_check(conn),    
-            imp = ['' + load_lang(lang_data, 'register') + '', wiki_set(conn, 1), custom(conn), other2([0, 0])],
+            imp = ['' + load_lang(conn, 'register') + '', wiki_set(conn, 1), custom(conn), other2([0, 0])],
             data = '''
                     <form method="post">
                         ''' + contract + '''
@@ -2721,12 +2721,12 @@ def register():
                         <input placeholder="Email (Option)" name="email" type="text">
                         <hr>
                         ''' + captcha_get(conn) + '''
-                        <button type="submit">' + load_lang(lang_data, 'register') + '</button>
+                        <button type="submit">' + load_lang(conn, 'register') + '</button>
                         <hr>
-                        <span>''' + load_lang(lang_data, 'http_warring') + '''</span>
+                        <span>''' + load_lang(conn, 'http_warring') + '''</span>
                     </form>
                     ''',
-            menu = [['user', load_lang(lang_data, 'user')]]
+            menu = [['user', load_lang(conn, 'user')]]
         ))
             
 @app.route('/logout')
@@ -2766,22 +2766,22 @@ def user_ban(name = None):
         curs.execute("select end, why from ban where block = ?", [name])
         end = curs.fetchall()
         if end:
-            now = load_lang(lang_data, 'ban') + ' ' + load_lang(lang_data, 'release')
+            now = load_lang(conn, 'ban') + ' ' + load_lang(conn, 'release')
 
             if end[0][0] == '':
-                data = '<ul><li>무기한 ' + load_lang(lang_data, 'ban') + '</li>'
+                data = '<ul><li>무기한 ' + load_lang(conn, 'ban') + '</li>'
             else:
-                data = '<ul><li>' + load_lang(lang_data, 'ban') + ' : ' + end[0][0] + '</li>'
+                data = '<ul><li>' + load_lang(conn, 'ban') + ' : ' + end[0][0] + '</li>'
 
             if end[0][1] != '':
-                data += '<li>' + load_lang(lang_data, 'why') + ' : ' + end[0][1] + '</li></ul><hr>'
+                data += '<li>' + load_lang(conn, 'why') + ' : ' + end[0][1] + '</li></ul><hr>'
             else:
                 data += '</ul><hr>'
         else:
             if re.search("^([0-9]{1,3}\.[0-9]{1,3})$", name):
-                now = '대역 ' + load_lang(lang_data, 'ban')
+                now = '대역 ' + load_lang(conn, 'ban')
             else:
-                now = load_lang(lang_data, 'ban')
+                now = load_lang(conn, 'ban')
 
             now_time = get_time()
 
@@ -2820,20 +2820,20 @@ def user_ban(name = None):
                     day += '<option value="' + num + '">' + num + '</option>'
             
             if re.search('(\.|:)', name):
-                plus = '<input type="checkbox" name="login"> ' + load_lang(lang_data, 'login') + ' ' + load_lang(lang_data, 'able') + '<hr>'
+                plus = '<input type="checkbox" name="login"> ' + load_lang(conn, 'login') + ' ' + load_lang(conn, 'able') + '<hr>'
             else:
                 plus = ''
 
-            data = '<select name="year">' + year + '</select> ' + load_lang(lang_data, 'year') + ' '
-            data += '<select name="month">' + month + '</select> ' + load_lang(lang_data, 'month') + ' '
-            data += '<select name="day">' + day + '</select> ' + load_lang(lang_data, 'day') + ' <hr>'
+            data = '<select name="year">' + year + '</select> ' + load_lang(conn, 'year') + ' '
+            data += '<select name="month">' + month + '</select> ' + load_lang(conn, 'month') + ' '
+            data += '<select name="day">' + day + '</select> ' + load_lang(conn, 'day') + ' <hr>'
 
-            data += '<input placeholder="' + load_lang(lang_data, 'why') + '" name="why" type="text"><hr>' + plus
+            data += '<input placeholder="' + load_lang(conn, 'why') + '" name="why" type="text"><hr>' + plus
 
         return html_minify(render_template(skin_check(conn), 
             imp = [name, wiki_set(conn, 1), custom(conn), other2([' (' + now + ')', 0])],
             data = '<form method="post">' + data + '<button type="submit">' + now + '</button></form>',
-            menu = [['manager', load_lang(lang_data, 'admin')]]
+            menu = [['manager', load_lang(conn, 'admin')]]
         ))            
                 
 @app.route('/acl/<path:name>', methods=['POST', 'GET'])
@@ -2845,7 +2845,7 @@ def acl(name = None):
     else:
         check_data = None
     
-    user_data = re.search('^' + load_lang(lang_data, 'user') + ':(.+)$', name)
+    user_data = re.search('^' + load_lang(conn, 'user') + ':(.+)$', name)
     if user_data:
         if check_data and custom(conn)[2] == 0:
             return redirect('/login')
@@ -2880,12 +2880,12 @@ def acl(name = None):
             
         return redirect('/acl/' + url_pas(name))            
     else:
-        data = '<h2>' + load_lang(lang_data, 'document') + ' ACL</h2><select name="dec" ' + check_ok + '>'
+        data = '<h2>' + load_lang(conn, 'document') + ' ACL</h2><select name="dec" ' + check_ok + '>'
     
-        if re.search('^' + load_lang(lang_data, 'user') + ':', name):
-            acl_list = [['', load_lang(lang_data, 'normal')], ['user', load_lang(lang_data, 'subscriber')], ['all', '모두']]
+        if re.search('^' + load_lang(conn, 'user') + ':', name):
+            acl_list = [['', load_lang(conn, 'normal')], ['user', load_lang(conn, 'subscriber')], ['all', '모두']]
         else:
-            acl_list = [['', load_lang(lang_data, 'normal')], ['user', load_lang(lang_data, 'subscriber')], ['admin', '관리자']]
+            acl_list = [['', load_lang(conn, 'normal')], ['user', load_lang(conn, 'subscriber')], ['admin', '관리자']]
         
         curs.execute("select dec from acl where title = ?", [name])
         acl_data = curs.fetchall()
@@ -2899,8 +2899,8 @@ def acl(name = None):
             
         data += '</select>'
         
-        if not re.search('^' + load_lang(lang_data, 'user') + ':', name):
-            data += '<br><br><h2>' + load_lang(lang_data, 'discussion') + ' ACL</h2><select name="dis" ' + check_ok + '>'
+        if not re.search('^' + load_lang(conn, 'user') + ':', name):
+            data += '<br><br><h2>' + load_lang(conn, 'discussion') + ' ACL</h2><select name="dis" ' + check_ok + '>'
         
             curs.execute("select dis, why from acl where title = ?", [name])
             acl_data = curs.fetchall()
@@ -2915,12 +2915,12 @@ def acl(name = None):
             data += '</select>'
                 
             if acl_data:
-                data += '<hr><input value="' + html.escape(acl_data[0][1]) + '" placeholder="' + load_lang(lang_data, 'why') + '" name="why" type="text" ' + check_ok + '>'
+                data += '<hr><input value="' + html.escape(acl_data[0][1]) + '" placeholder="' + load_lang(conn, 'why') + '" name="why" type="text" ' + check_ok + '>'
             
         return html_minify(render_template(skin_check(conn), 
             imp = [name, wiki_set(conn, 1), custom(conn), other2([' (ACL)', 0])],
-            data = '<form method="post">' + data + '<hr><button type="submit">ACL ' + load_lang(lang_data, 'edit') + '</button></form>',
-            menu = [['w/' + url_pas(name), load_lang(lang_data, 'document')], ['manager', load_lang(lang_data, 'admin')]]
+            data = '<form method="post">' + data + '<hr><button type="submit">ACL ' + load_lang(conn, 'edit') + '</button></form>',
+            menu = [['w/' + url_pas(name), load_lang(conn, 'document')], ['manager', load_lang(conn, 'admin')]]
         ))
             
 @app.route('/admin/<name>', methods=['POST', 'GET'])
@@ -2978,9 +2978,9 @@ def user_admin(name = None):
                     div += '<option value="' + data[0] + '">' + data[0] + '</option>'
         
         return html_minify(render_template(skin_check(conn), 
-            imp = [name, wiki_set(conn, 1), custom(conn), other2([' (' + load_lang(lang_data, 'authority') + ')', 0])],
-            data =  '<form method="post"><select name="select">' + div + '</select><hr><button type="submit">' + load_lang(lang_data, 'edit') + '</button></form>',
-            menu = [['manager', load_lang(lang_data, 'admin')]]
+            imp = [name, wiki_set(conn, 1), custom(conn), other2([' (' + load_lang(conn, 'authority') + ')', 0])],
+            data =  '<form method="post"><select name="select">' + div + '</select><hr><button type="submit">' + load_lang(conn, 'edit') + '</button></form>',
+            menu = [['manager', load_lang(conn, 'admin')]]
         ))
     
 @app.route('/diff/<path:name>')
@@ -3004,9 +3004,9 @@ def diff_data(name = None):
                 result = re.sub('\r', '', diff(diff_data))
             
             return html_minify(render_template(skin_check(conn), 
-                imp = [name, wiki_set(conn, 1), custom(conn), other2([' (' + load_lang(lang_data, 'compare') + ')', 0])],
+                imp = [name, wiki_set(conn, 1), custom(conn), other2([' (' + load_lang(conn, 'compare') + ')', 0])],
                 data = '<pre>' + result + '</pre>',
-                menu = [['history/' + url_pas(name), load_lang(lang_data, 'history')]]
+                menu = [['history/' + url_pas(name), load_lang(conn, 'history')]]
             ))
 
     return redirect('/history/' + url_pas(name))
@@ -3024,7 +3024,7 @@ def down(name = None):
     return html_minify(render_template(skin_check(conn), 
         imp = [name, wiki_set(conn, 1), custom(conn), other2([' (하위)', 0])],
         data = div,
-        menu = [['w/' + url_pas(name), load_lang(lang_data, 'document')]]
+        menu = [['w/' + url_pas(name), load_lang(conn, 'document')]]
     ))
 
 @app.route('/w/<path:name>')
@@ -3079,7 +3079,7 @@ def read_view(name = None):
                     db_data = curs.fetchall()
                     if db_data:
                         if re.search('\[\[' + name + '#include]]', db_data[0][0]):
-                            div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a> <a href="/xref/' + url_pas(data[0]) + '">(' + load_lang(lang_data, 'backlink') + ')</a></li>'
+                            div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a> <a href="/xref/' + url_pas(data[0]) + '">(' + load_lang(conn, 'backlink') + ')</a></li>'
                         else:
                             div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a></li>'
                     else:
@@ -3114,18 +3114,18 @@ def read_view(name = None):
         response_data = 404
         else_data = ''
 
-    m = re.search("^" + load_lang(lang_data, 'user') + ":([^/]*)", name)
+    m = re.search("^" + load_lang(conn, 'user') + ":([^/]*)", name)
     if m:
         g = m.groups()
         
         curs.execute("select acl from user where id = ?", [g[0]])
         test = curs.fetchall()
         if test and test[0][0] != 'user':
-            acl = ' (' + load_lang(lang_data, 'admin') + ')'
+            acl = ' (' + load_lang(conn, 'admin') + ')'
         else:
             curs.execute("select block from ban where block = ?", [g[0]])
             if curs.fetchall():
-                sub += ' (' + load_lang(lang_data, 'ban') + ')'
+                sub += ' (' + load_lang(conn, 'ban') + ')'
             else:
                 acl = ''
 
@@ -3142,17 +3142,17 @@ def read_view(name = None):
     end_data = namumark(conn, name, else_data, 0)
     
     if num:
-        menu = [['history/' + url_pas(name), load_lang(lang_data, 'history')]]
-        sub = ' (' + str(num) + load_lang(lang_data, 'version') + ')'
+        menu = [['history/' + url_pas(name), load_lang(conn, 'history')]]
+        sub = ' (' + str(num) + load_lang(conn, 'version') + ')'
         acl = ''
         r_date = 0
     else:
         if data_none == 1:
-            menu = [['edit/' + url_pas(name), load_lang(lang_data, 'create')]]
+            menu = [['edit/' + url_pas(name), load_lang(conn, 'create')]]
         else:
-            menu = [['edit/' + url_pas(name), load_lang(lang_data, 'edit')]]
+            menu = [['edit/' + url_pas(name), load_lang(conn, 'edit')]]
 
-        menu += [['topic/' + url_pas(name), load_lang(lang_data, 'discussion')], ['history/' + url_pas(name), load_lang(lang_data, 'history')], ['xref/' + url_pas(name), load_lang(lang_data, 'backlink')], ['acl/' + url_pas(name), 'ACL']]
+        menu += [['topic/' + url_pas(name), load_lang(conn, 'discussion')], ['history/' + url_pas(name), load_lang(conn, 'history')], ['xref/' + url_pas(name), load_lang(conn, 'backlink')], ['acl/' + url_pas(name), 'ACL']]
 
         if request.args.get('froms', None):
             menu += [['w/' + url_pas(name), '넘기기']]
@@ -3190,7 +3190,7 @@ def user_topic_list(name = None):
     one_admin = admin_check(conn, 1, None)
 
     div = '<table style="width: 100%; text-align: center;"><tbody><tr>'
-    div += '<td style="width: 33.3%;">' + load_lang(lang_data, 'discussion') + ' ' + load_lang(lang_data, 'name') + '</td><td style="width: 33.3%;">작성자</td><td style="width: 33.3%;">' + load_lang(lang_data, 'time') + '</td></tr>'
+    div += '<td style="width: 33.3%;">' + load_lang(conn, 'discussion') + ' ' + load_lang(conn, 'name') + '</td><td style="width: 33.3%;">작성자</td><td style="width: 33.3%;">' + load_lang(conn, 'time') + '</td></tr>'
     
     curs.execute("select title, id, sub, ip, date from topic where ip = ? order by date desc limit ?, '50'", [name, str(sql_num)])
     data_list = curs.fetchall()
@@ -3201,9 +3201,9 @@ def user_topic_list(name = None):
         if one_admin == 1:
             curs.execute("select * from ban where block = ?", [data[3]])
             if curs.fetchall():
-                ban = ' <a href="/ban/' + url_pas(data[3]) + '">(' + load_lang(lang_data, 'release') + ')</a>'
+                ban = ' <a href="/ban/' + url_pas(data[3]) + '">(' + load_lang(conn, 'release') + ')</a>'
             else:
-                ban = ' <a href="/ban/' + url_pas(data[3]) + '">(' + load_lang(lang_data, 'ban') + ')</a>'
+                ban = ' <a href="/ban/' + url_pas(data[3]) + '">(' + load_lang(conn, 'ban') + ')</a>'
         else:
             ban = ''
             
@@ -3215,14 +3215,14 @@ def user_topic_list(name = None):
     
     curs.execute("select end from ban where block = ?", [name])
     if curs.fetchall():
-        sub = ' (' + load_lang(lang_data, 'ban') + ')'
+        sub = ' (' + load_lang(conn, 'ban') + ')'
     else:
         sub = 0 
     
     return html_minify(render_template(skin_check(conn), 
-        imp = [load_lang(lang_data, 'discussion') + ' ' + load_lang(lang_data, 'record'), wiki_set(conn, 1), custom(conn), other2([sub, 0])],
+        imp = [load_lang(conn, 'discussion') + ' ' + load_lang(conn, 'record'), wiki_set(conn, 1), custom(conn), other2([sub, 0])],
         data = div,
-        menu = [['other', load_lang(lang_data, 'other')], ['user', load_lang(lang_data, 'user')], ['count/' + url_pas(name), '' + load_lang(lang_data, 'count') + ''], ['record/' + url_pas(name), load_lang(lang_data, 'record')]]
+        menu = [['other', load_lang(conn, 'other')], ['user', load_lang(conn, 'user')], ['count/' + url_pas(name), '' + load_lang(conn, 'count') + ''], ['record/' + url_pas(name), load_lang(conn, 'record')]]
     ))
 
 @app.route('/recent_changes')
@@ -3250,47 +3250,47 @@ def recent_changes(name = None, tool = 'record'):
                 sql_num = 0      
 
             if tool == 'history':
-                div += '<td style="width: 33.3%;">' + load_lang(lang_data, 'version') + '</td><td style="width: 33.3%;">' + load_lang(lang_data, 'editor') + '</td><td style="width: 33.3%;">' + load_lang(lang_data, 'time') + '</td></tr>'
+                div += '<td style="width: 33.3%;">' + load_lang(conn, 'version') + '</td><td style="width: 33.3%;">' + load_lang(conn, 'editor') + '</td><td style="width: 33.3%;">' + load_lang(conn, 'time') + '</td></tr>'
                 
                 curs.execute("select id, title, date, ip, send, leng from history where title = ? order by id + 0 desc limit ?, '50'", [name, str(sql_num)])
             else:
-                div += '<td style="width: 33.3%;">' + load_lang(lang_data, 'document') + ' ' + load_lang(lang_data, 'name') + '</td><td style="width: 33.3%;">' + load_lang(lang_data, 'editor') + '</td><td style="width: 33.3%;">' + load_lang(lang_data, 'time') + '</td></tr>'
+                div += '<td style="width: 33.3%;">' + load_lang(conn, 'document') + ' ' + load_lang(conn, 'name') + '</td><td style="width: 33.3%;">' + load_lang(conn, 'editor') + '</td><td style="width: 33.3%;">' + load_lang(conn, 'time') + '</td></tr>'
 
                 if what == 'all':
-                    div = '<a href="/record/' + url_pas(name) + '?what=revert">(' + load_lang(lang_data, 'revert') + ')</a><hr>' + div
-                    div = '<a href="/record/' + url_pas(name) + '?what=move">(' + load_lang(lang_data, 'move') + ')</a> ' + div
-                    div = '<a href="/record/' + url_pas(name) + '?what=delete">(' + load_lang(lang_data, 'delete') + ')</a> ' + div
+                    div = '<a href="/record/' + url_pas(name) + '?what=revert">(' + load_lang(conn, 'revert') + ')</a><hr>' + div
+                    div = '<a href="/record/' + url_pas(name) + '?what=move">(' + load_lang(conn, 'move') + ')</a> ' + div
+                    div = '<a href="/record/' + url_pas(name) + '?what=delete">(' + load_lang(conn, 'delete') + ')</a> ' + div
                     
                     curs.execute("select id, title, date, ip, send, leng from history where ip = ? order by date desc limit ?, '50'", [name, str(sql_num)])
                 else:
                     if what == 'delete':
-                        sql = '%(' + load_lang(lang_data, 'delete') + ')'
+                        sql = '%(' + load_lang(conn, 'delete') + ')'
                     elif what == 'move':
-                        sql = '%' + load_lang(lang_data, 'move') + ')'
+                        sql = '%' + load_lang(conn, 'move') + ')'
                     elif what == 'revert':
-                        sql = '%' + load_lang(lang_data, 'version') + ')'
+                        sql = '%' + load_lang(conn, 'version') + ')'
                     else:
                         return redirect('/')
 
                     curs.execute("select id, title, date, ip, send, leng from history where ip = ? and send like ? order by date desc limit ?, '50'", [name, sql, str(sql_num)])
         else:
-            div += '<td style="width: 33.3%;">' + load_lang(lang_data, 'document') + ' ' + load_lang(lang_data, 'name') + '</td><td style="width: 33.3%;">' + load_lang(lang_data, 'editor') + '</td><td style="width: 33.3%;">' + load_lang(lang_data, 'time') + '</td></tr>'
+            div += '<td style="width: 33.3%;">' + load_lang(conn, 'document') + ' ' + load_lang(conn, 'name') + '</td><td style="width: 33.3%;">' + load_lang(conn, 'editor') + '</td><td style="width: 33.3%;">' + load_lang(conn, 'time') + '</td></tr>'
             
             if what == 'all':
-                div = '<a href="/recent_changes?what=revert">(' + load_lang(lang_data, 'revert') + ')</a><hr>' + div
-                div = '<a href="/recent_changes?what=move">(' + load_lang(lang_data, 'move') + ')</a> ' + div
-                div = '<a href="/recent_changes?what=delete">(' + load_lang(lang_data, 'delete') + ')</a> ' + div
+                div = '<a href="/recent_changes?what=revert">(' + load_lang(conn, 'revert') + ')</a><hr>' + div
+                div = '<a href="/recent_changes?what=move">(' + load_lang(conn, 'move') + ')</a> ' + div
+                div = '<a href="/recent_changes?what=delete">(' + load_lang(conn, 'delete') + ')</a> ' + div
 
-                div = '<a href="/recent_discuss">(' + load_lang(lang_data, 'discussion') + ')</a> <a href="/block_log">(' + load_lang(lang_data, 'ban') + ')</a> <a href="/user_log">(' + load_lang(lang_data, 'register') + ')</a> <a href="/admin_log">(' + load_lang(lang_data, 'authority') + ')</a><hr>' + div
+                div = '<a href="/recent_discuss">(' + load_lang(conn, 'discussion') + ')</a> <a href="/block_log">(' + load_lang(conn, 'ban') + ')</a> <a href="/user_log">(' + load_lang(conn, 'register') + ')</a> <a href="/admin_log">(' + load_lang(conn, 'authority') + ')</a><hr>' + div
                 
                 curs.execute("select id, title, date, ip, send, leng from history order by date desc limit 50")
             else:
                 if what == 'delete':
-                    sql = '%(' + load_lang(lang_data, 'delete') + ')'
+                    sql = '%(' + load_lang(conn, 'delete') + ')'
                 elif what == 'move':
-                    sql = '%' + load_lang(lang_data, 'move') + ')'
+                    sql = '%' + load_lang(conn, 'move') + ')'
                 elif what == 'revert':
-                    sql = '%' + load_lang(lang_data, 'version') + ')'
+                    sql = '%' + load_lang(conn, 'version') + ')'
                 else:
                     return redirect('/')
 
@@ -3315,15 +3315,15 @@ def recent_changes(name = None, tool = 'record'):
             if one_admin == 1:
                 curs.execute("select * from ban where block = ?", [data[3]])
                 if curs.fetchall():
-                    ban = ' <a href="/ban/' + url_pas(data[3]) + '">(' + load_lang(lang_data, 'release') + ')</a>'
+                    ban = ' <a href="/ban/' + url_pas(data[3]) + '">(' + load_lang(conn, 'release') + ')</a>'
                 else:
-                    ban = ' <a href="/ban/' + url_pas(data[3]) + '">(' + load_lang(lang_data, 'ban') + ')</a>'            
+                    ban = ' <a href="/ban/' + url_pas(data[3]) + '">(' + load_lang(conn, 'ban') + ')</a>'            
                 
             ip = ip_pas(conn, data[3])
             if int(data[0]) - 1 == 0:
                 revert = ''
             else:
-                revert = '<a href="/diff/' + url_pas(data[1]) + '?first=' + str(int(data[0]) - 1) + '&second=' + data[0] + '">(' + load_lang(lang_data, 'compare') + ')</a> <a href="/revert/' + url_pas(data[1]) + '?num=' + str(int(data[0]) - 1) + '">(' + load_lang(lang_data, 'revert') + ')</a>'
+                revert = '<a href="/diff/' + url_pas(data[1]) + '?first=' + str(int(data[0]) - 1) + '&second=' + data[0] + '">(' + load_lang(conn, 'compare') + ')</a> <a href="/revert/' + url_pas(data[1]) + '?num=' + str(int(data[0]) - 1) + '">(' + load_lang(conn, 'revert') + ')</a>'
             
             style = ['', '']
             date = data[2]
@@ -3339,11 +3339,11 @@ def recent_changes(name = None, tool = 'record'):
                     style[1] = 'background: gainsboro;'
                     
                     if send == '<br>':
-                        send = '(' + load_lang(lang_data, 'hide') + ')'
+                        send = '(' + load_lang(conn, 'hide') + ')'
                     else:
-                        send += ' (' + load_lang(lang_data, 'hide') + ')'
+                        send += ' (' + load_lang(conn, 'hide') + ')'
                 else:
-                    hidden = ' <a href="/hidden/' + url_pas(data[1]) + '?num=' + data[0] + '">(' + load_lang(lang_data, 'hide') + ')'
+                    hidden = ' <a href="/hidden/' + url_pas(data[1]) + '?num=' + data[0] + '">(' + load_lang(conn, 'hide') + ')'
             elif not hide:
                 hidden = ''
             else:
@@ -3352,15 +3352,15 @@ def recent_changes(name = None, tool = 'record'):
                 ban = ''
                 date = ''
 
-                send = '(' + load_lang(lang_data, 'hide') + ')'
+                send = '(' + load_lang(conn, 'hide') + ')'
 
                 style[0] = 'display: none;'
                 style[1] = 'background: gainsboro;'
 
             if tool == 'history':
-                title = '<a href="/w/' + url_pas(name) + '?num=' + data[0] + '">' + data[0] + load_lang(lang_data, 'version') + '</a> <a href="/raw/' + url_pas(name) + '?num=' + data[0] + '">(Raw)</a> '
+                title = '<a href="/w/' + url_pas(name) + '?num=' + data[0] + '">' + data[0] + load_lang(conn, 'version') + '</a> <a href="/raw/' + url_pas(name) + '?num=' + data[0] + '">(Raw)</a> '
             else:
-                title = '<a href="/w/' + url_pas(data[1]) + '">' + html.escape(data[1]) + '</a> <a href="/history/' + url_pas(data[1]) + '">(' + data[0] + load_lang(lang_data, 'version') + ')</a> '
+                title = '<a href="/w/' + url_pas(data[1]) + '">' + html.escape(data[1]) + '</a> <a href="/history/' + url_pas(data[1]) + '">(' + data[0] + load_lang(conn, 'version') + ')</a> '
                     
             div += '<tr style="' + style[0] + '"><td>' + title + revert + ' ' + leng + '</td>'
             div += '<td>' + ip + ban + hidden + '</td><td>' + date + '</td></tr><tr style="' + style[1] + '"><td colspan="3">' + send + '</td></tr>'
@@ -3370,40 +3370,40 @@ def recent_changes(name = None, tool = 'record'):
 
         if name:
             if tool == 'history':
-                div = '<form method="post"><select name="a">' + select + '</select> <select name="b">' + select + '</select> <button type="submit">' + load_lang(lang_data, 'compare') + '</button></form><hr>' + div
+                div = '<form method="post"><select name="a">' + select + '</select> <select name="b">' + select + '</select> <button type="submit">' + load_lang(conn, 'compare') + '</button></form><hr>' + div
                 title = name
                 
-                sub += ' (' + load_lang(lang_data, 'history') + ')'
+                sub += ' (' + load_lang(conn, 'history') + ')'
                 
-                menu = [['w/' + url_pas(name), load_lang(lang_data, 'document')], ['raw/' + url_pas(name), 'Raw'], ['move_data/' + url_pas(name), load_lang(lang_data, 'move') + ' ' + load_lang(lang_data, 'history')]]
+                menu = [['w/' + url_pas(name), load_lang(conn, 'document')], ['raw/' + url_pas(name), 'Raw'], ['move_data/' + url_pas(name), load_lang(conn, 'move') + ' ' + load_lang(conn, 'history')]]
                 
                 div += next_fix('/history/' + url_pas(name) + '?num=', num, data_list)
             else:
                 curs.execute("select end from ban where block = ?", [name])
                 if curs.fetchall():
-                    sub += ' (' + load_lang(lang_data, 'ban') + ')'
+                    sub += ' (' + load_lang(conn, 'ban') + ')'
 
-                title = '' + load_lang(lang_data, 'edit') + ' ' + load_lang(lang_data, 'record')
+                title = '' + load_lang(conn, 'edit') + ' ' + load_lang(conn, 'record')
                 
-                menu = [['other', load_lang(lang_data, 'other')], ['user', load_lang(lang_data, 'user')], ['count/' + url_pas(name), '' + load_lang(lang_data, 'count') + ''], ['topic_record/' + url_pas(name), load_lang(lang_data, 'discussion')]]
+                menu = [['other', load_lang(conn, 'other')], ['user', load_lang(conn, 'user')], ['count/' + url_pas(name), '' + load_lang(conn, 'count') + ''], ['topic_record/' + url_pas(name), load_lang(conn, 'discussion')]]
                 
                 div += next_fix('/record/' + url_pas(name) + '/' + url_pas(what) + '?num=', num, data_list)
                 
                 if what != 'all':
-                    menu += [['record/' + url_pas(name), load_lang(lang_data, 'normal')]]
+                    menu += [['record/' + url_pas(name), load_lang(conn, 'normal')]]
         else:
             menu = 0
-            title = '' + load_lang(lang_data, 'recent') + ' ' + load_lang(lang_data, 'change') + ''
+            title = '' + load_lang(conn, 'recent') + ' ' + load_lang(conn, 'change') + ''
             
             if what != 'all':
-                menu = [['recent_changes', load_lang(lang_data, 'normal')]]
+                menu = [['recent_changes', load_lang(conn, 'normal')]]
                 
         if what == 'delete':
-            sub += ' (' + load_lang(lang_data, 'delete') + ')'
+            sub += ' (' + load_lang(conn, 'delete') + ')'
         elif what == 'move':
-            sub += ' (' + load_lang(lang_data, 'move') + ')'
+            sub += ' (' + load_lang(conn, 'move') + ')'
         elif what == 'revert':
-            sub += ' (' + load_lang(lang_data, 'revert') + ')'
+            sub += ' (' + load_lang(conn, 'revert') + ')'
         
         if sub == '':
             sub = 0
@@ -3447,7 +3447,7 @@ def upload():
 
         e_data = sha224(piece[0]) + piece[1]
 
-        curs.execute("select title from data where title = ?", ['' + load_lang(lang_data, 'file') + ':' + name])
+        curs.execute("select title from data where title = ?", ['' + load_lang(conn, 'file') + ':' + name])
         if curs.fetchall():
             return re_error(conn, '/error/16')
             
@@ -3459,7 +3459,7 @@ def upload():
             if custom(conn)[2] == 0:
                 lice = ip + ' Upload'
             else:
-                lice = '[[' + load_lang(lang_data, 'user') + ':' + ip + ']] Upload'
+                lice = '[[' + load_lang(conn, 'user') + ':' + ip + ']] Upload'
             
         if os.path.exists(os.path.join('image', e_data)):
             os.remove(os.path.join('image', e_data))
@@ -3468,34 +3468,34 @@ def upload():
         else:
             data.save(os.path.join('image', e_data))
             
-        curs.execute("select title from data where title = ?", ['' + load_lang(lang_data, 'file') + ':' + name])
+        curs.execute("select title from data where title = ?", ['' + load_lang(conn, 'file') + ':' + name])
         if curs.fetchall(): 
-            curs.execute("delete from data where title = ?", ['' + load_lang(lang_data, 'file') + ':' + name])
+            curs.execute("delete from data where title = ?", ['' + load_lang(conn, 'file') + ':' + name])
         
-        curs.execute("insert into data (title, data) values (?, ?)", ['' + load_lang(lang_data, 'file') + ':' + name, '[[' + load_lang(lang_data, 'file') + ':' + name + ']][br][br]{{{[[' + load_lang(lang_data, 'file') + ':' + name + ']]}}}[br][br]' + lice])
-        curs.execute("insert into acl (title, dec, dis, why) values (?, 'admin', '', '')", ['' + load_lang(lang_data, 'file') + ':' + name])
+        curs.execute("insert into data (title, data) values (?, ?)", ['' + load_lang(conn, 'file') + ':' + name, '[[' + load_lang(conn, 'file') + ':' + name + ']][br][br]{{{[[' + load_lang(conn, 'file') + ':' + name + ']]}}}[br][br]' + lice])
+        curs.execute("insert into acl (title, dec, dis, why) values (?, 'admin', '', '')", ['' + load_lang(conn, 'file') + ':' + name])
 
-        history_plus(conn, '' + load_lang(lang_data, 'file') + ':' + name, '[[' + load_lang(lang_data, 'file') + ':' + name + ']][br][br]{{{[[' + load_lang(lang_data, 'file') + ':' + name + ']]}}}[br][br]' + lice, get_time(), ip, '(Upload)', '0')
+        history_plus(conn, '' + load_lang(conn, 'file') + ':' + name, '[[' + load_lang(conn, 'file') + ':' + name + ']][br][br]{{{[[' + load_lang(conn, 'file') + ':' + name + ']]}}}[br][br]' + lice, get_time(), ip, '(Upload)', '0')
         
         conn.commit()
         
-        return redirect('/w/' + load_lang(lang_data, 'file') + ':' + name)      
+        return redirect('/w/' + load_lang(conn, 'file') + ':' + name)      
     else:
         return html_minify(render_template(skin_check(conn), 
-            imp = [load_lang(lang_data, 'upload'), wiki_set(conn, 1), custom(conn), other2([0, 0])],
+            imp = [load_lang(conn, 'upload'), wiki_set(conn, 1), custom(conn), other2([0, 0])],
             data =  '''
                     <form method="post" enctype="multipart/form-data" accept-charset="utf8">
                         <input type="file" name="f_data">
                         <hr>
-                        <input placeholder="''' + load_lang(lang_data, 'name') + '''" name="f_name" type="text">
+                        <input placeholder="''' + load_lang(conn, 'name') + '''" name="f_name" type="text">
                         <hr>
-                        <input placeholder="''' + load_lang(lang_data, 'license') + '''" name="f_lice" type="text">
+                        <input placeholder="''' + load_lang(conn, 'license') + '''" name="f_lice" type="text">
                         <hr>
                         ''' + captcha_get(conn) + '''
-                        <button id="save" type="submit">''' + load_lang(lang_data, 'save') + '''</button>
+                        <button id="save" type="submit">''' + load_lang(conn, 'save') + '''</button>
                     </form>
                     ''',
-            menu = [['other', load_lang(lang_data, 'other')]]
+            menu = [['other', load_lang(conn, 'other')]]
         ))  
         
 @app.route('/user')
@@ -3509,11 +3509,11 @@ def user_info():
             if data[0][0] != 'user':
                 acl = data[0][0]
             else:
-                acl = load_lang(lang_data, 'subscriber')
+                acl = load_lang(conn, 'subscriber')
         else:
-            acl = load_lang(lang_data, 'normal')
+            acl = load_lang(conn, 'normal')
     else:
-        acl = load_lang(lang_data, 'ban')
+        acl = load_lang(conn, 'ban')
 
         match = re.search("^([0-9]{1,3}\.[0-9]{1,3})", ip)
         if match:
@@ -3530,47 +3530,47 @@ def user_info():
                 acl += ' (무기한)'        
 
             if block_data[0][1] != '':
-                acl += ' (' + load_lang(lang_data, 'login') + ' ' + load_lang(lang_data, 'able') + ')'
+                acl += ' (' + load_lang(conn, 'login') + ' ' + load_lang(conn, 'able') + ')'
 
             if block_data[0][2] == 'O':
                 acl += ' (대역)'
             
     if custom(conn)[2] != 0:
-        ip_user = '<a href="/w/' + load_lang(lang_data, 'user') + ':' + ip + '">' + ip + '</a>'
+        ip_user = '<a href="/w/' + load_lang(conn, 'user') + ':' + ip + '">' + ip + '</a>'
         
-        plus = '<li><a href="/logout">로그아웃</a></li><li><a href="/change">' + load_lang(lang_data, 'my_info') + ' ' + load_lang(lang_data, 'edit') + '</a></li>'
+        plus = '<li><a href="/logout">로그아웃</a></li><li><a href="/change">' + load_lang(conn, 'my_info') + ' ' + load_lang(conn, 'edit') + '</a></li>'
         
         curs.execute('select name from alarm where name = ? limit 1', [ip_check()])
         if curs.fetchall():
-            plus2 = '<li><a href="/alarm">' + load_lang(lang_data, 'alarm') + ' (O)</a></li>'
+            plus2 = '<li><a href="/alarm">' + load_lang(conn, 'alarm') + ' (O)</a></li>'
         else:
-            plus2 = '<li><a href="/alarm">' + load_lang(lang_data, 'alarm') + '</a></li>'
+            plus2 = '<li><a href="/alarm">' + load_lang(conn, 'alarm') + '</a></li>'
 
-        plus2 += '<li><a href="/watch_list">' + load_lang(lang_data, 'watchlist') + '</a></li>'
+        plus2 += '<li><a href="/watch_list">' + load_lang(conn, 'watchlist') + '</a></li>'
     else:
         ip_user = ip
         
-        plus = '<li><a href="/login">' + load_lang(lang_data, 'login') + '</a></li>'
+        plus = '<li><a href="/login">' + load_lang(conn, 'login') + '</a></li>'
         plus2 = ''
 
     return html_minify(render_template(skin_check(conn), 
-        imp = [load_lang(lang_data, 'user') + ' ' + load_lang(lang_data, 'list'), wiki_set(conn, 1), custom(conn), other2([0, 0])],
+        imp = [load_lang(conn, 'user') + ' ' + load_lang(conn, 'list'), wiki_set(conn, 1), custom(conn), other2([0, 0])],
         data =  '''
                 <h2>상태</h2>
                 <ul>
-                    <li>''' + ip_user + ''' <a href="/record/''' + url_pas(ip) + '''">(''' + load_lang(lang_data, 'record') + ''')</a></li><li>''' + load_lang(lang_data, 'authority') + ''' : ''' + acl + '''</li>
+                    <li>''' + ip_user + ''' <a href="/record/''' + url_pas(ip) + '''">(''' + load_lang(conn, 'record') + ''')</a></li><li>''' + load_lang(conn, 'authority') + ''' : ''' + acl + '''</li>
                 </ul>
                 <br>
-                <h2>''' + load_lang(lang_data, 'login') + '''</h2>
+                <h2>''' + load_lang(conn, 'login') + '''</h2>
                 <ul>
                     ''' + plus + '''
-                    <li><a href="/register">''' + load_lang(lang_data, 'register') + '''</a></li>
+                    <li><a href="/register">''' + load_lang(conn, 'register') + '''</a></li>
                 </ul>
                 <br>
-                <h2>''' + load_lang(lang_data, 'tool') + '''</h2>
+                <h2>''' + load_lang(conn, 'tool') + '''</h2>
                 <ul>
-                    <li><a href="/acl/''' + load_lang(lang_data, 'user') + ':' + url_pas(ip) + '">' + load_lang(lang_data, 'user') + ' ' + load_lang(lang_data, 'document') + ''' ACL</a></li>
-                    <li><a href="/custom_head">''' + load_lang(lang_data, 'user') + ''' HEAD</a></li></ul><br><h2>''' + load_lang(lang_data, 'other') + '''</h2><ul>''' + plus2 + '''<li><a href="/count">''' + load_lang(lang_data, 'count') + '''</a></li>
+                    <li><a href="/acl/''' + load_lang(conn, 'user') + ':' + url_pas(ip) + '">' + load_lang(conn, 'user') + ' ' + load_lang(conn, 'document') + ''' ACL</a></li>
+                    <li><a href="/custom_head">''' + load_lang(conn, 'user') + ''' HEAD</a></li></ul><br><h2>''' + load_lang(conn, 'other') + '''</h2><ul>''' + plus2 + '''<li><a href="/count">''' + load_lang(conn, 'count') + '''</a></li>
                 </ul>
                 ''',
         menu = 0
@@ -3586,17 +3586,17 @@ def watch_list():
     curs.execute("select title from scan where user = ?", [ip_check()])
     data = curs.fetchall()
     for data_list in data:
-        div += '<li><a href="/w/' + url_pas(data_list[0]) + '">' + data_list[0] + '</a> <a href="/watch_list/' + url_pas(data_list[0]) + '">(' + load_lang(lang_data, 'delete') + ')</a></li>'
+        div += '<li><a href="/w/' + url_pas(data_list[0]) + '">' + data_list[0] + '</a> <a href="/watch_list/' + url_pas(data_list[0]) + '">(' + load_lang(conn, 'delete') + ')</a></li>'
 
     if data:
         div = '<ul>' + div + '</ul><hr>'
 
-    div += '<a href="/manager/13">(' + load_lang(lang_data, 'plus') + ')</a>'
+    div += '<a href="/manager/13">(' + load_lang(conn, 'plus') + ')</a>'
 
     return html_minify(render_template(skin_check(conn), 
-        imp = ['' + load_lang(lang_data, 'watchlist') + ' ' + load_lang(lang_data, 'list'), wiki_set(conn, 1), custom(conn), other2([0, 0])],
+        imp = ['' + load_lang(conn, 'watchlist') + ' ' + load_lang(conn, 'list'), wiki_set(conn, 1), custom(conn), other2([0, 0])],
         data = div,
-        menu = [['manager', load_lang(lang_data, 'admin')]]
+        menu = [['manager', load_lang(conn, 'admin')]]
     ))
 
 @app.route('/watch_list/<path:name>')
@@ -3649,7 +3649,7 @@ def custom_head_view():
             else:
                 data = ''
         else:
-            start = '<span>' + load_lang(lang_data, 'user_css_warring') + '</span><hr>'
+            start = '<span>' + load_lang(conn, 'user_css_warring') + '</span><hr>'
             
             if 'MyMaiToNight' in session:
                 data = session['MyMaiToNight']
@@ -3659,15 +3659,15 @@ def custom_head_view():
         start += '<span>&lt;style&gt;CSS&lt;/style&gt;<br>&lt;script&gt;JS&lt;/script&gt;</span><hr>'
 
         return html_minify(render_template(skin_check(conn), 
-            imp = [load_lang(lang_data, 'user') + ' HEAD', wiki_set(conn, 1), custom(conn), other2([0, 0])],
+            imp = [load_lang(conn, 'user') + ' HEAD', wiki_set(conn, 1), custom(conn), other2([0, 0])],
             data =  start + '''
                     <form method="post">
                         <textarea rows="25" cols="100" name="content">''' + data + '''</textarea>
                         <hr>
-                        <button id="save" type="submit">''' + load_lang(lang_data, 'save') + '''</button>
+                        <button id="save" type="submit">''' + load_lang(conn, 'save') + '''</button>
                     </form>
                     ''',
-            menu = [['user', load_lang(lang_data, 'user')]]
+            menu = [['user', load_lang(conn, 'user')]]
         ))
 
 @app.route('/count')
@@ -3693,14 +3693,14 @@ def count_edit(name = None):
         t_data = 0
 
     return html_minify(render_template(skin_check(conn), 
-        imp = ['' + load_lang(lang_data, 'count') + '', wiki_set(conn, 1), custom(conn), other2([0, 0])],
+        imp = ['' + load_lang(conn, 'count') + '', wiki_set(conn, 1), custom(conn), other2([0, 0])],
         data = '''
                 <ul>
-                    <li><a href="/record/''' + url_pas(that) + '''">''' + load_lang(lang_data, 'edit') + '''</a> : ''' + str(data) + '''</li>
-                    <li><a href="/topic_record/''' + url_pas(that) + '''">''' + load_lang(lang_data, 'discussion') + '''</a> : ''' + str(t_data) + '''</a></li>
+                    <li><a href="/record/''' + url_pas(that) + '''">''' + load_lang(conn, 'edit') + '''</a> : ''' + str(data) + '''</li>
+                    <li><a href="/topic_record/''' + url_pas(that) + '''">''' + load_lang(conn, 'discussion') + '''</a> : ''' + str(t_data) + '''</a></li>
                 </ul>
                 ''',
-        menu = [['user', load_lang(lang_data, 'user')]]
+        menu = [['user', load_lang(conn, 'user')]]
     ))
         
 @app.route('/random')

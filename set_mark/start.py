@@ -370,7 +370,7 @@ def start(conn, data, title):
                                                 else:
                                                     middle_data_2 = ['']
 
-                                                middle_list += ['div']
+                                                middle_list += ['div_end']
                                                 
                                                 data = re.sub('{{{#!wiki(?: style=(?:&quot;|&#x27;)((?:(?!&quot;|&#x27;).)*)(?:&quot;|&#x27;))?\n?', '<div id="wiki_div" style="' + str(middle_data_2[0]) + '">', data, 1)
                                             else:
@@ -481,7 +481,7 @@ def start(conn, data, title):
             else:
                 end_parser = wiki_table_data[1]
 
-            data = re.sub('<div id="wiki_div" ((?:(?!>).)+)>((?:(?!<div id="wiki_div"|<\/div_end>).\n*)+)<\/div_end>', '<div ' + wiki_table_data[0] + '>' + end_parser + '</div_end>', data, 1)
+            data = re.sub('<div id="wiki_div" ((?:(?!>).)+)>((?:(?!<div id="wiki_div"|<\/div_end>).\n*)+)<\/div_end>', '<div ' + wiki_table_data[0] + '>' + end_parser + '</div>', data, 1)
         else:
             break
             

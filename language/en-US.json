@@ -9,6 +9,7 @@
     "list" : "List",
     "revert" : "Undo",
     "version" : " Ver",
+    "new" : "New",
     "document" : "Documents",
     "all" : "Everything",
     "ban" : "Ban",
@@ -45,6 +46,7 @@
     "check" : "Check",
     "user" : "User",
     "alarm" : "Alarm",
+    "preview" : "Preview",
     "watchlist" : "Watching List",
     "my_info" : "About Me",
     "recent" : "Recently",
@@ -56,8 +58,11 @@
     "normal" : "Normal",
     "subscriber" : "User",
     "admin" : "Admin",
+    "next" : "Next",
+    "previous" : "Previous",
     "owner" : "Owner",
     "admin_group" : "MOD group",
     "user_css_warring" : "User's CSS will deleted if you close the browser or when you are editting as guest",
-    "http_warring" : "Warning : If you are not on HTTPS connection, your information can be leaked. We won't response to that."
+    "http_warring" : "Warning : If you are not on HTTPS connection, your information can be leaked. We won't response to that.",
+    "no_login_warring" : "Non-login status. IP is logged when working with non-login."
 }
