@@ -25,9 +25,16 @@ from mark import *
 json_data = open(os.path.join('language', 'en-US.json'), 'rt', encoding='utf-8').read()
 else_lang = json.loads(json_data)
 
-def captcha_get(conn):
+def load_conn(data):
+    global conn
+    global curs
+
+    conn = data
     curs = conn.cursor()
 
+    load_lang2(conn)
+
+def captcha_get(conn):
     data = ''
 
     if custom(conn)[2] == 0:
@@ -41,9 +48,7 @@ def captcha_get(conn):
 
     return data
 
-def captcha_post(test, conn, num = 1):
-    curs = conn.cursor()
-
+def captcha_post(test, num = 1):
     if num == 1:
         if custom(conn)[2] == 0 and captcha_get(conn) != '':
             curs.execute('select data from other where name = "sec_re"')
@@ -65,9 +70,7 @@ def captcha_post(test, conn, num = 1):
     else:
         pass
 
-def load_lang(conn, data):
-    curs = conn.cursor()
-
+def load_lang(data):
     global lang
     try:
         if lang:
@@ -108,23 +111,19 @@ def edit_help_button():
     return ['', '']
 
 def ip_warring(conn):
-    curs = conn.cursor()
-
     if custom(conn)[2] == 0:    
         curs.execute('select data from other where name = "no_login_warring"')
         data = curs.fetchall()
         if data and data[0][0] != '':
             text_data = '<span>' + data[0][0] + '</span><hr>'
         else:
-            text_data = '<span>' + load_lang(conn, 'no_login_warring') + '</span><hr>'
+            text_data = '<span>' + load_lang('no_login_warring') + '</span><hr>'
     else:
         text_data = ''
 
     return text_data
 
 def skin_check(conn):
-    curs = conn.cursor()
-
     skin = './views/acme/'
     
     try:
@@ -149,20 +148,20 @@ def next_fix(link, num, page, end = 50):
 
     if num == 1:
         if len(page) == end:
-            list_data += '<hr><a href="' + link + str(num + 1) + '">(' + load_lang(conn, 'next') + ')</a>'
+            list_data += '<hr><a href="' + link + str(num + 1) + '">(' + load_lang('next') + ')</a>'
     elif len(page) != end:
-        list_data += '<hr><a href="' + link + str(num - 1) + '">(' + load_lang(conn, 'previous') + ')</a>'
+        list_data += '<hr><a href="' + link + str(num - 1) + '">(' + load_lang('previous') + ')</a>'
     else:
-        list_data += '<hr><a href="' + link + str(num - 1) + '">(' + load_lang(conn, 'previous') + ')</a> <a href="' + link + str(num + 1) + '">(' + load_lang(conn, 'next') + ')</a>'
+        list_data += '<hr><a href="' + link + str(num - 1) + '">(' + load_lang('previous') + ')</a> <a href="' + link + str(num + 1) + '">(' + load_lang('next') + ')</a>'
 
     return list_data
 
 def other2(origin):
-    return origin + ['Deleted']    
+    lang_plus = []
 
-def wiki_set(conn, num):
-    curs = conn.cursor()
+    return origin + ['Deleted', [lang_plus]]
 
+def wiki_set(num):
     if num == 1:
         data_list = []
 
@@ -229,10 +228,8 @@ def diff(seqm):
             
     return ''.join(output)
            
-def admin_check(conn, num, what):
+def admin_check(num, what):
     ip = ip_check() 
-
-    curs = conn.cursor()
 
     curs.execute("select acl from user where id = ?", [ip])
     user = curs.fetchall()
@@ -270,18 +267,17 @@ def admin_check(conn, num, what):
                 else:
                     break
 
-def ip_pas(conn, raw_ip):
-    curs = conn.cursor()
+def ip_pas(raw_ip):
     hide = 0
 
     if re.search("(\.|:)", raw_ip):
-        if not re.search("^" + load_lang(conn, 'tool') + ":", raw_ip):    
+        if not re.search("^" + load_lang('tool') + ":", raw_ip):    
             curs.execute("select data from other where name = 'ip_view'")
             data = curs.fetchall()
             if data and data[0][0] != '':
                 ip = '<span style="font-size: 75%;">' + hashlib.md5(bytes(raw_ip, 'utf-8')).hexdigest() + '</span>'
 
-                if not admin_check(conn, 'ban', None):
+                if not admin_check('ban', None):
                     hide = 1
             else:
                 ip = raw_ip
@@ -289,20 +285,18 @@ def ip_pas(conn, raw_ip):
             ip = raw_ip
             hide = 1
     else:
-        curs.execute("select title from data where title = ?", ['' + load_lang(conn, 'user') + ':' + raw_ip])
+        curs.execute("select title from data where title = ?", ['' + load_lang('user') + ':' + raw_ip])
         if curs.fetchall():
-            ip = '<a href="/w/' + url_pas('' + load_lang(conn, 'user') + ':' + raw_ip) + '">' + raw_ip + '</a>'
+            ip = '<a href="/w/' + url_pas('' + load_lang('user') + ':' + raw_ip) + '">' + raw_ip + '</a>'
         else:
-            ip = '<a id="not_thing" href="/w/' + url_pas('' + load_lang(conn, 'user') + ':' + raw_ip) + '">' + raw_ip + '</a>'
+            ip = '<a id="not_thing" href="/w/' + url_pas('' + load_lang('user') + ':' + raw_ip) + '">' + raw_ip + '</a>'
          
     if hide == 0:
-        ip += ' <a href="/record/' + url_pas(raw_ip) + '">(' + load_lang(conn, 'record') + ')</a>'
+        ip += ' <a href="/record/' + url_pas(raw_ip) + '">(' + load_lang('record') + ')</a>'
 
     return ip
 
 def custom(conn):
-    curs = conn.cursor()
-
     if 'MyMaiToNight' in session:
         user_head = session['MyMaiToNight']
     else:
@@ -330,26 +324,24 @@ def custom(conn):
     if user_icon != 0:
         user_name = ip_check()
     else:
-        user_name = '' + load_lang(conn, 'user') + ''
+        user_name = '' + load_lang('user') + ''
 
     return ['', '', user_icon, user_head, email, user_name]
 
-def acl_check(conn, name):
-    curs = conn.cursor()
-
+def acl_check(name):
     ip = ip_check()
 
     if ban_check(conn) == 1:
         return 1
 
-    acl_c = re.search("^' + load_lang(conn, 'user') + ':([^/]*)", name)
+    acl_c = re.search("^' + load_lang('user') + ':([^/]*)", name)
     if acl_c:
         acl_n = acl_c.groups()
 
-        if admin_check(conn, 5, None) == 1:
+        if admin_check(5, None) == 1:
             return 0
 
-        curs.execute("select dec from acl where title = ?", ['' + load_lang(conn, 'user') + ':' + acl_n[0]])
+        curs.execute("select dec from acl where title = ?", ['' + load_lang('user') + ':' + acl_n[0]])
         acl_data = curs.fetchall()
         if acl_data:
             if acl_data[0][0] == 'all':
@@ -366,8 +358,8 @@ def acl_check(conn, name):
         else:
             return 1
 
-    file_c = re.search("^" + load_lang(conn, 'file') + ":(.*)", name)
-    if file_c and admin_check(conn, 5, 'edit (' + name + ')') != 1:
+    file_c = re.search("^" + load_lang('file') + ":(.*)", name)
+    if file_c and admin_check(5, 'edit (' + name + ')') != 1:
         return 1
 
     curs.execute("select acl from user where id = ?", [ip])
@@ -384,7 +376,7 @@ def acl_check(conn, name):
             if not user_data:
                 return 1
 
-            if not admin_check(conn, 5, 'edit (' + name + ')') == 1:
+            if not admin_check(5, 'edit (' + name + ')') == 1:
                 return 1
 
     curs.execute('select data from other where name = "edit"')
@@ -398,15 +390,13 @@ def acl_check(conn, name):
             if not user_data:
                 return 1
 
-            if not admin_check(conn, 5, None) == 1:
+            if not admin_check(5, None) == 1:
                 return 1
 
     return 0
 
 def ban_check(conn):
     ip = ip_check()
-
-    curs = conn.cursor()
 
     band = re.search("^([0-9]{1,3}\.[0-9]{1,3})", ip)
     if band:
@@ -424,10 +414,8 @@ def ban_check(conn):
     
     return 0
         
-def topic_check(conn, name, sub):
+def topic_check(name, sub):
     ip = ip_check()
-
-    curs = conn.cursor()
 
     if ban_check(conn) == 1:
         return 1
@@ -446,19 +434,17 @@ def topic_check(conn, name, sub):
             if not user_data:
                 return 1
 
-            if not admin_check(conn, 3, 'topic (' + name + ')') == 1:
+            if not admin_check(3, 'topic (' + name + ')') == 1:
                 return 1
         
     curs.execute("select title from stop where title = ? and sub = ?", [name, sub])
     if curs.fetchall():
-        if not admin_check(conn, 3, 'topic (' + name + ')') == 1:
+        if not admin_check(3, 'topic (' + name + ')') == 1:
             return 1
 
     return 0
 
-def ban_insert(conn, name, end, why, login, blocker):
-    curs = conn.cursor()
-
+def ban_insert(name, end, why, login, blocker):
     time = get_time()
 
     if re.search("^([0-9]{1,3}\.[0-9]{1,3})$", name):
@@ -468,7 +454,7 @@ def ban_insert(conn, name, end, why, login, blocker):
 
     curs.execute("select block from ban where block = ?", [name])
     if curs.fetchall():
-        curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, ?)", [name, '' + load_lang(conn, 'release') + '', time, blocker, '', band])
+        curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, ?)", [name, '' + load_lang('release') + '', time, blocker, '', band])
         curs.execute("delete from ban where block = ?", [name])
     else:
         if login != '':
@@ -484,24 +470,20 @@ def ban_insert(conn, name, end, why, login, blocker):
     
     conn.commit()
 
-def rd_plus(conn, title, sub, date):
-    curs = conn.cursor()
-
+def rd_plus(title, sub, date):
     curs.execute("select title from rd where title = ? and sub = ?", [title, sub])
     if curs.fetchall():
         curs.execute("update rd set date = ? where title = ? and sub = ?", [date, title, sub])
     else:
         curs.execute("insert into rd (title, sub, date) values (?, ?, ?)", [title, sub, date])
 
-def history_plus(conn, title, data, date, ip, send, leng):
-    curs = conn.cursor()
-
+def history_plus(title, data, date, ip, send, leng):
     curs.execute("select id from history where title = ? order by id + 0 desc limit 1", [title])
     id_data = curs.fetchall()
     if id_data:
         curs.execute("insert into history (id, title, data, date, ip, send, leng) values (?, ?, ?, ?, ?, ?, ?)", [str(int(id_data[0][0]) + 1), title, data, date, ip, send, leng])
     else:
-        curs.execute("insert into history (id, title, data, date, ip, send, leng) values ('1', ?, ?, ?, ?, ?, ?)", [title, data, date, ip, send + ' (' + load_lang(conn, 'new') + ' ' + load_lang(conn, 'document') + ')', leng])
+        curs.execute("insert into history (id, title, data, date, ip, send, leng) values ('1', ?, ?, ?, ?, ?, ?)", [title, data, date, ip, send + ' (' + load_lang('new') + ' ' + load_lang('document') + ')', leng])
 
 def leng_check(first, second):
     if first < second:
@@ -516,9 +498,7 @@ def leng_check(first, second):
 def redirect(data):
     return '<meta http-equiv="refresh" content="0; url=' + data + '">'
 
-def re_error(conn, data):
-    curs = conn.cursor()
-
+def re_error(data):
     if data == '/ban':
         ip = ip_check()
 
@@ -556,7 +536,7 @@ def re_error(conn, data):
                     end += '<li>Why : ' + end_data[0][1] + '</li>'
 
         return html_minify(render_template(skin_check(conn), 
-            imp = ['Authority Error', wiki_set(conn, 1), custom(conn), other2([0, 0])],
+            imp = ['Authority Error', wiki_set(1), custom(conn), other2([0, 0])],
             data = '<h2>Info</h2><ul>' + end + '</ul>',
             menu = 0
         ))
@@ -611,7 +591,7 @@ def re_error(conn, data):
             data = '동일한 이름의 파일이 있습니다.'
         elif num == 17:
             title = 'Upload Error'
-            data = '파일 용량은 ' + wiki_set(conn, 3) + 'MB를 넘길 수 없습니다.'
+            data = '파일 용량은 ' + wiki_set(3) + 'MB를 넘길 수 없습니다.'
         elif num == 18:
             title = 'Edit Error'
             data = '내용이 원래 문서와 동일 합니다.'
@@ -633,7 +613,7 @@ def re_error(conn, data):
 
         if title:
             return html_minify(render_template(skin_check(conn), 
-                imp = [title, wiki_set(conn, 1), custom(conn), other2([0, 0])],
+                imp = [title, wiki_set(1), custom(conn), other2([0, 0])],
                 data = '<h2>Error</h2><ul><li>' + data + '</li></ul>',
                 menu = 0
             ))
