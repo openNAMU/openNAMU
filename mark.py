@@ -7,7 +7,7 @@ from urllib import parse
 import time
 import threading
 
-def load_lang2(data):
+def load_conn2(data):
     global conn
     global curs
 

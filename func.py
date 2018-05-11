@@ -32,7 +32,7 @@ def load_conn(data):
     conn = data
     curs = conn.cursor()
 
-    load_lang2(conn)
+    load_conn2(conn)
 
 def captcha_get(conn):
     data = ''
@@ -72,6 +72,7 @@ def captcha_post(test, num = 1):
 
 def load_lang(data):
     global lang
+
     try:
         if lang:
             pass
@@ -82,10 +83,13 @@ def load_lang(data):
         json_data = open(os.path.join('language', rep_data[0][0] + '.json'), 'rt', encoding='utf-8').read()
         lang = json.loads(json_data)
 
-    if data in lang:
-        return lang[data]
+    if data == 'please_all':
+        return lang
     else:
-        return else_lang[data]
+        if data in lang:
+            return lang[data]
+        else:
+            return else_lang[data]
 
 def edit_help_button():
     # https://stackoverflow.com/questions/11076975/insert-text-into-textarea-at-cursor-position-javascript
@@ -157,9 +161,7 @@ def next_fix(link, num, page, end = 50):
     return list_data
 
 def other2(origin):
-    lang_plus = []
-
-    return origin + ['Deleted', [lang_plus]]
+    return origin + ['Deleted', load_lang('please_all')]
 
 def wiki_set(num):
     if num == 1:
@@ -334,7 +336,7 @@ def acl_check(name):
     if ban_check(conn) == 1:
         return 1
 
-    acl_c = re.search("^' + load_lang('user') + ':([^/]*)", name)
+    acl_c = re.search("^" + load_lang('user') + ":([^/]*)", name)
     if acl_c:
         acl_n = acl_c.groups()
 

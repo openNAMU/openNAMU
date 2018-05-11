@@ -3557,7 +3557,7 @@ def user_info():
         plus2 = ''
 
     return html_minify(render_template(skin_check(conn), 
-        imp = [load_lang('user') + ' ' + load_lang('list'), wiki_set(1), custom(conn), other2([0, 0])],
+        imp = [load_lang('user') + ' ' + load_lang('tool'), wiki_set(1), custom(conn), other2([0, 0])],
         data =  '''
                 <h2>상태</h2>
                 <ul>
