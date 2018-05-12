@@ -908,32 +908,53 @@ def start(conn, data, title):
             
     # 각주 처리
     footnote_number = 0
-    footnote_all = '\n<hr><ul id="footnote_data">'
+    footnote_all = []
     footnote_dict = {}
+    footnote_re = {}
+    footdata_all = '\n<hr><ul id="footnote_data">'
     while 1:
         footnote = re.search('(?:\[\*((?:(?! |\]).)*)(?: ((?:(?!\]).)+))?\]|(\[각주\]))', data)
         if footnote:
             footnote_data = footnote.groups()
             if footnote_data[2]:
-                footnote_all += '</ul>'
+                footnote_all.sort()
                 
-                data = re.sub('(?:\[\*((?:(?! ).)*) ((?:(?!\]).)+)\]|(\[각주\]))', footnote_all, data, 1)
+                for footdata in footnote_all:
+                    footdata_all += '<li><a href="#rfn-' + footdata[0] + '" id="fn-' + footdata[0] + '">(' + footdata[1] + ')</a> ' + footdata[2] + '</li>'
                 
-                footnote_all = '\n<hr><ul id="footnote_data">'
+                data = re.sub('(?:\[\*((?:(?! ).)*) ((?:(?!\]).)+)\]|(\[각주\]))', footdata_all + '</ul>', data, 1)
+                
+                footnote_all = []
+                footdata_all = '\n<hr><ul id="footnote_data">'
             else:
                 footnote = footnote_data[1]
                 footnote_name = footnote_data[0]
                 if footnote_name and not footnote:
-                    data = re.sub('(?:\[\*((?:(?! |\]).)*)(?: ((?:(?!\]).)+))?\]|(\[각주\]))', '<sup><a href="#fn-' + footnote_dict[footnote_name] + '" id="rfn-' + footnote_dict[footnote_name] + '">(' + footnote_name + ')</a></sup>', data, 1)
+                    if footnote_name in footnote_dict:
+                        footnote_re[footnote_name] += 1
+
+                        foot_plus_num = str(footnote_re[footnote_name])
+                        footshort = footnote_dict[footnote_name][0] + '.' + foot_plus_num
+
+                        footnote_all += [[footshort, footshort, footnote_dict[footnote_name][1]]]
+
+                        data = re.sub('(?:\[\*((?:(?! |\]).)*)(?: ((?:(?!\]).)+))?\]|(\[각주\]))', '<sup><a href="#fn-' + footshort + '" id="rfn-' + footshort + '">(' + footshort + ')</a></sup>', data, 1)
+                    else:
+                        data = re.sub('(?:\[\*((?:(?! |\]).)*)(?: ((?:(?!\]).)+))?\]|(\[각주\]))', '<sup><a href="#">(' + footnote_name + ')</a></sup>', data, 1)
                 else:
                     footnote_number += 1
 
                     if not footnote_name:
                         footnote_name = str(footnote_number)
-                    else:
-                        footnote_dict.update({ footnote_name : str(footnote_number) })
 
-                    footnote_all += '<li><a href="#rfn-' + str(footnote_number) + '" id="fn-' + str(footnote_number) + '">(' + footnote_name + ')</a> ' + footnote + '</li>'
+                    footnote_dict.update({ footnote_name : [str(footnote_number), footnote] })
+
+                    if not footnote_name in footnote_re:
+                        footnote_re.update({ footnote_name : 0 })
+                    else:
+                        footnote_re[footnote_name] += 1
+
+                    footnote_all += [[str(footnote_number), footnote_name, footnote]]
                     
                     data = re.sub('(?:\[\*((?:(?! |\]).)*)(?: ((?:(?!\]).)+))?\]|(\[각주\]))', '<sup><a href="#fn-' + str(footnote_number) + '" id="rfn-' + str(footnote_number) + '">(' + footnote_name + ')</a></sup>', data, 1)
         else:
@@ -941,12 +962,21 @@ def start(conn, data, title):
 
     data = re.sub('\n+$', '', data)
 
-    footnote_all += '</ul>'
-    if footnote_all == '\n<hr><ul id="footnote_data"></ul>':
-        footnote_all = ''
+    footnote_all.sort()
 
-    
-    data = re.sub('\n$', footnote_all, data + '\n', 1)
+    for footdata in footnote_all:
+        if footdata[2] == 0:
+            footdata_in = ''
+        else:
+            footdata_in = footdata[2]
+
+        footdata_all += '<li><a href="#rfn-' + footdata[0] + '" id="fn-' + footdata[0] + '">(' + footdata[1] + ')</a> ' + footdata_in + '</li>'
+
+    footdata_all += '</ul>'
+    if footdata_all == '\n<hr><ul id="footnote_data"></ul>':
+        footdata_all = ''
+
+    data = re.sub('\n$', footdata_all, data + '\n', 1)
 
     # 분류 마지막 처리
     category += '</div>'
