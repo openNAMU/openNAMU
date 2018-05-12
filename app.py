@@ -2497,7 +2497,17 @@ def login():
     else:        
         return html_minify(render_template(skin_check(),    
             imp = [load_lang('login'), wiki_set(1), custom(), other2([0, 0])],
-            data = '<form method="post"><input placeholder="아이디" name="id" type="text"><hr><input placeholder="비밀번호" name="pw" type="password"><hr>' + captcha_get() + '<button type="submit">' + load_lang('login') + '</button><hr><span>' + load_lang('http_warring') + '</span></form>',
+            data = '''
+                    <form method="post">
+                        <input placeholder="ID" name="id" type="text">
+                        <hr>
+                        <input placeholder="PassWord" name="pw" type="password">
+                        <hr>
+                        ''' + captcha_get() + '''
+                        <button type="submit">''' + load_lang('login') + '''</button>
+                        <hr>
+                        <span>''' + load_lang('http_warring') + '''</span>
+                    </form>''',
             menu = [['user', load_lang('user')]]
         ))
                 
