@@ -934,9 +934,9 @@ def start(conn, data, title):
                         footnote_re[footnote_name] += 1
 
                         foot_plus_num = str(footnote_re[footnote_name])
-                        footshort = footnote_dict[footnote_name][0] + '.' + foot_plus_num
+                        footshort = footnote_dict[footnote_name] + '.' + foot_plus_num
 
-                        footnote_all += [[footshort, footshort, footnote_dict[footnote_name][1]]]
+                        footnote_all += [[footshort, footshort, 0]]
 
                         data = re.sub('(?:\[\*((?:(?! |\]).)*)(?: ((?:(?!\]).)+))?\]|(\[각주\]))', '<sup><a href="#fn-' + footshort + '" id="rfn-' + footshort + '">(' + footshort + ')</a></sup>', data, 1)
                     else:
@@ -947,7 +947,7 @@ def start(conn, data, title):
                     if not footnote_name:
                         footnote_name = str(footnote_number)
 
-                    footnote_dict.update({ footnote_name : [str(footnote_number), footnote] })
+                    footnote_dict.update({ footnote_name : str(footnote_number) })
 
                     if not footnote_name in footnote_re:
                         footnote_re.update({ footnote_name : 0 })
