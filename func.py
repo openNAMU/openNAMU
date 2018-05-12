@@ -32,7 +32,7 @@ def load_conn(data):
     conn = data
     curs = conn.cursor()
 
-    load_conn2()
+    load_conn2(data)
 
 def captcha_get():
     data = ''
