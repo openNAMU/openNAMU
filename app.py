@@ -54,7 +54,7 @@ conn = sqlite3.connect(set_data['db'] + '.db', check_same_thread = False)
 curs = conn.cursor()
 
 # 보내주기
-load_conn()
+load_conn(conn)
 
 # 기타 설정 변경
 logging.basicConfig(level = logging.ERROR)
@@ -3745,10 +3745,10 @@ def views(name = None):
     else:
         return send_from_directory('./views' + plus, rename)
 
-@app.route('/<test>')
-def main_file(test = None):
-    if re.search('\.(txt|html)$', test):
-        return send_from_directory('./', test)
+@app.route('/<data>')
+def main_file(data = None):
+    if re.search('\.(txt|html)$', data):
+        return send_from_directory('./', data)
     else:
         return ''
 
