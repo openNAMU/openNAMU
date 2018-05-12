@@ -32,12 +32,12 @@ def load_conn(data):
     conn = data
     curs = conn.cursor()
 
-    load_conn2(conn)
+    load_conn2()
 
-def captcha_get(conn):
+def captcha_get():
     data = ''
 
-    if custom(conn)[2] == 0:
+    if custom()[2] == 0:
         curs.execute('select data from other where name = "recaptcha"')
         recaptcha = curs.fetchall()
         if recaptcha and recaptcha[0][0] != '':
@@ -50,7 +50,7 @@ def captcha_get(conn):
 
 def captcha_post(test, num = 1):
     if num == 1:
-        if custom(conn)[2] == 0 and captcha_get(conn) != '':
+        if custom()[2] == 0 and captcha_get() != '':
             curs.execute('select data from other where name = "sec_re"')
             sec_re = curs.fetchall()
             if sec_re and sec_re[0][0] != '':
@@ -114,8 +114,8 @@ def edit_help_button():
 
     return ['', '']
 
-def ip_warring(conn):
-    if custom(conn)[2] == 0:    
+def ip_warring():
+    if custom()[2] == 0:    
         curs.execute('select data from other where name = "no_login_warring"')
         data = curs.fetchall()
         if data and data[0][0] != '':
@@ -127,7 +127,7 @@ def ip_warring(conn):
 
     return text_data
 
-def skin_check(conn):
+def skin_check():
     skin = './views/acme/'
     
     try:
@@ -298,7 +298,7 @@ def ip_pas(raw_ip):
 
     return ip
 
-def custom(conn):
+def custom():
     if 'MyMaiToNight' in session:
         user_head = session['MyMaiToNight']
     else:
@@ -333,7 +333,7 @@ def custom(conn):
 def acl_check(name):
     ip = ip_check()
 
-    if ban_check(conn) == 1:
+    if ban_check() == 1:
         return 1
 
     acl_c = re.search("^" + load_lang('user') + ":([^/]*)", name)
@@ -397,7 +397,7 @@ def acl_check(name):
 
     return 0
 
-def ban_check(conn):
+def ban_check():
     ip = ip_check()
 
     band = re.search("^([0-9]{1,3}\.[0-9]{1,3})", ip)
@@ -419,7 +419,7 @@ def ban_check(conn):
 def topic_check(name, sub):
     ip = ip_check()
 
-    if ban_check(conn) == 1:
+    if ban_check() == 1:
         return 1
         
     curs.execute("select acl from user where id = ?", [ip])
@@ -506,7 +506,7 @@ def re_error(data):
 
         end = '<li>Why : 권한이 맞지 않는 상태 입니다.</li>'
 
-        if ban_check(conn) == 1:
+        if ban_check() == 1:
             curs.execute("select end, why from ban where block = ?", [ip])
             end_data = curs.fetchall()
             if not end_data:
@@ -537,8 +537,8 @@ def re_error(data):
                 if end_data[0][1] != '':
                     end += '<li>Why : ' + end_data[0][1] + '</li>'
 
-        return html_minify(render_template(skin_check(conn), 
-            imp = ['Authority Error', wiki_set(1), custom(conn), other2([0, 0])],
+        return html_minify(render_template(skin_check(), 
+            imp = ['Authority Error', wiki_set(1), custom(), other2([0, 0])],
             data = '<h2>Info</h2><ul>' + end + '</ul>',
             menu = 0
         ))
@@ -614,8 +614,8 @@ def re_error(data):
             data = '???'
 
         if title:
-            return html_minify(render_template(skin_check(conn), 
-                imp = [title, wiki_set(1), custom(conn), other2([0, 0])],
+            return html_minify(render_template(skin_check(), 
+                imp = [title, wiki_set(1), custom(), other2([0, 0])],
                 data = '<h2>Error</h2><ul><li>' + data + '</li></ul>',
                 menu = 0
             ))
