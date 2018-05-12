@@ -373,11 +373,13 @@ td {
 }
 
 s, strike, del {
-    color:gray;
+    color: gray;
 }
 
 s:hover, strike:hover, del:hover {
-    color:#666;background-color:#eee;text-decoration:none;
+    color: #666;
+    background-color: #eee;
+    text-decoration: none;
 }
 
 .scroll-buttons a:link, .scroll-buttons a:visited {
@@ -459,22 +461,12 @@ div.scroll-buttons a {
     background-color: #f3c2c2;
 }
 
-#toron_color {
-    background-color: #d5d5d5;
+#toron_color_blue {
+    background: #c1ebff;
 }
 
-.popup {
-    position: fixed;
-    padding: 10px;
-    background: #f5f5f5;
-    width: 100%;
-    bottom: 0px;
-    left: 0px;
-    text-align: center;
-    box-shadow: 0 -1px 8px 0 rgba(0,0,0,0.35);
-    z-index: 100000;
-    max-height: 30%;
-    overflow-y: scroll;
+#toron_color {
+    background-color: #d5d5d5;
 }
 
 @media (max-width: 768px) {
@@ -503,10 +495,6 @@ textarea {
     font-family: FontAwesome;
 }
 
-#open {
-    color: yellow;
-}
-
 h1, h2, h3, h4, h5, h6 {
     margin-bottom: 10px;
     margin-top: 10px;
@@ -517,10 +505,6 @@ h1, h2, h3, h4, h5, h6 {
 .navbar-brand {
     margin: auto;
     font-size: 28px;
-}
-
-#toron_color_blue {
-    background: #c1ebff;
 }
 
 footer#footer {
