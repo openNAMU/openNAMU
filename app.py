@@ -67,7 +67,11 @@ compress.init_app(app)
 def md5_replace(data):
     return hashlib.md5(data.encode()).hexdigest()       
 
+def load_lang_skin(data):
+    return load_lang(data)
+
 app.jinja_env.filters['md5_replace'] = md5_replace
+app.jinja_env.filters['load_lang_skin'] = load_lang_skin
 
 # 셋업 부분
 curs.execute("create table if not exists data(title text, data text)")
