@@ -161,7 +161,7 @@ def next_fix(link, num, page, end = 50):
     return list_data
 
 def other2(origin):
-    return origin + ['Deleted', load_lang('please_all')]
+    return origin + ['Deleted']
 
 def wiki_set(num):
     if num == 1:
