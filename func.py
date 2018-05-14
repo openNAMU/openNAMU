@@ -9,7 +9,6 @@ import hashlib
 import requests
 import re
 import html
-import time
 import os
 
 # 일부 툴 불러옴
