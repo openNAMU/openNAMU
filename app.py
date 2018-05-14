@@ -24,7 +24,7 @@ from func import *
 from set_mark.tool import savemark
 
 # 버전 표기
-r_ver = 'v3.0.4-Beta-' + time.strftime('%y%m%d', time.localtime(os.stat('app.py').st_mtime))
+r_ver = 'v3.0.4-Beta-' + str(int(datetime.datetime.fromtimestamp(os.path.getmtime('app.py')).strftime("%Y%m%d")))
 print('Version : ' + r_ver)
 
 # set.json 설정 확인
@@ -64,9 +64,6 @@ compress = Compress()
 compress.init_app(app)
 
 # 템플릿 설정
-def md5_replace(data):
-    return hashlib.md5(data.encode()).hexdigest()       
-
 app.jinja_env.filters['md5_replace'] = md5_replace
 app.jinja_env.filters['load_lang'] = load_lang
 
@@ -179,9 +176,6 @@ else:
 
 json_data = open(os.path.join('language', rep_language + '.json'), 'rt', encoding='utf-8').read()
 lang_data = json.loads(json_data)
-
-# 한번 개행
-print('')
 
 # 호환성 설정
 try:
@@ -1006,8 +1000,6 @@ def indexing():
     if admin_check(None, 'indexing') != 1:
         return re_error('/error/3')
 
-    print('')
-
     curs.execute("select name from sqlite_master where type = 'index'")
     data = curs.fetchall()
     if data:
@@ -1039,8 +1031,6 @@ def indexing():
 
     conn.commit()
     
-    print('')
-
     return redirect('/')        
 
 @app.route('/re_start')
@@ -1048,9 +1038,7 @@ def re_start():
     if admin_check(None, 're_start') != 1:
         return re_error('/error/3')
 
-    print('')
     print('Re Start')
-    print('')
 
     os.execl(sys.executable, sys.executable, *sys.argv)
 
@@ -1060,7 +1048,6 @@ def update():
        return re_error('/error/3')
 
     if platform.system() == 'Linux':
-        print('')
         print('Update')
 
         ok = os.system('git pull')
@@ -1068,7 +1055,6 @@ def update():
             return redirect('/re_start')
     else:
         if platform.system() == 'Windows':
-            print('')
             print('Download')
 
             urllib.request.urlretrieve('https://github.com/2DU/openNAMU/archive/stable.zip', 'update.zip')

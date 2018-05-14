@@ -13,10 +13,7 @@ import time
 import os
 
 # 일부 툴 불러옴
-from set_mark.tool import get_time
-from set_mark.tool import ip_check
-from set_mark.tool import url_pas
-from set_mark.tool import sha224
+from set_mark.tool import *
 
 # 나무마크 불러옴
 from mark import *

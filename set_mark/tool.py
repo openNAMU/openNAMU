@@ -1,16 +1,12 @@
 from flask import session, request
 
 from urllib import parse
-import time
 import datetime
 import re
 import hashlib
 
 def get_time():
-    now = time.localtime()
-    date = "%04d-%02d-%02d %02d:%02d:%02d" % (now.tm_year, now.tm_mon, now.tm_mday, now.tm_hour, now.tm_min, now.tm_sec)
-
-    return date
+    return str(datetime.datetime.today().strftime("%Y-%m-%d %H:%M:%S"))
     
 def ip_check():
     if session and ('Now' and 'DREAMER') in session and session['Now'] == 1:
@@ -40,3 +36,6 @@ def url_pas(data):
 
 def sha224(data):
     return hashlib.sha224(bytes(data, 'utf-8')).hexdigest()
+
+def md5_replace(data):
+    return hashlib.md5(data.encode()).hexdigest()
