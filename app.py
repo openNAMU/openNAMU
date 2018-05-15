@@ -1451,7 +1451,17 @@ def revert(name = None):
 
         return html_minify(render_template(skin_check(), 
             imp = [name, wiki_set(1), custom(), other2([' (' + load_lang('revert') + ')', 0])],
-            data =  '<form method="post"><span>' + request.args.get('num', '0') + load_lang('version') + '</span><hr>' + ip_warring() + '<input placeholder="' + load_lang('why') + '" name="send" type="text"><hr>' + captcha_get() + '<button type="submit">' + load_lang('revert') + '</button></form>',
+            data =  '''
+                    <form method="post">
+                        <span>''' + request.args.get('num', '0') + load_lang('version') + '''</span>
+                        <hr>
+                        ''' + ip_warring() + '''
+                        <input placeholder="''' + load_lang('why') + '''" name="send" type="text">
+                        <hr>
+                        ''' + captcha_get() + '''
+                        <button type="submit">''' + load_lang('revert') + '''</button>
+                    </form>
+                    ''',
             menu = [['history/' + url_pas(name), load_lang('history')], ['recent_changes', '' + load_lang('recent') + ' ' + load_lang('change') + '']]
         ))            
                     

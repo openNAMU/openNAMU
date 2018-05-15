@@ -1009,15 +1009,23 @@ def start(conn, data, title):
     data += category
     
     # NoWiki 마지막 처리
-    for re_data in end_data:
-        if re_data[2] == 'normal':
-            data = data.replace('<span id="' + re_data[0] + '"></span>', re_data[1])
-            data = data.replace(tool.url_pas('<span id="' + re_data[0] + '"></span>'), tool.url_pas(re_data[1]))
+    i = 0
+    while 1:
+        try:
+            _ = end_data[i][0]
+        except:
+            break
+
+        if end_data[i][2] == 'normal':
+            data = data.replace('<span id="' + end_data[i][0] + '"></span>', end_data[i][1])
+            data = data.replace(tool.url_pas('<span id="' + end_data[i][0] + '"></span>'), tool.url_pas(end_data[i][1]))
         else:
-            if re.search('\n', re_data[1]):
-                data = data.replace('<span id="' + re_data[0] + '"></span>', '\n<pre>' + re.sub('^\n', '', re_data[1]) + '</pre>')
+            if re.search('\n', end_data[i][1]):
+                data = data.replace('<span id="' + end_data[i][0] + '"></span>', '\n<pre>' + re.sub('^\n', '', end_data[i][1]) + '</pre>')
             else:
-                data = data.replace('<span id="' + re_data[0] + '"></span>', '<code>' + re_data[1] + '</code>')
+                data = data.replace('<span id="' + end_data[i][0] + '"></span>', '<code>' + end_data[i][1] + '</code>')
+
+        i += 1
     
     # 마지막 처리
     data = re.sub('<\/td_end>', '</td>', data)

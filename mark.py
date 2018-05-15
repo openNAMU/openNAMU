@@ -35,7 +35,7 @@ def namumark(title, data, num):
         i = 0
         while 1:
             try:
-                _ = data[2][i]
+                _ = data[2][i][0]
             except:
                 break
 
