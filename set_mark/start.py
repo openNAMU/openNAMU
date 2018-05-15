@@ -626,28 +626,38 @@ def start(conn, data, title):
     time_data = re.search('^([0-9]{4}-[0-9]{2}-[0-9]{2})', now_time)
     time = time_data.groups()
     
-    age_data = re.findall('\[age\(([0-9]{4}-[0-9]{2}-[0-9]{2})\)\]', data)
-    for age in age_data:
-        old = datetime.datetime.strptime(time[0], '%Y-%m-%d')
-        will = datetime.datetime.strptime(age, '%Y-%m-%d')
-        
-        e_data = old - will
-        
-        data = re.sub('\[age\(([0-9]{4})-([0-9]{2})-([0-9]{2})\)\]', str(int(e_data.days / 365)), data, 1)
+    while 1:
+        age_data = re.search('\[age\(([0-9]{4}-[0-9]{2}-[0-9]{2})\)\]', data)
+        if age_data:
+            age = age_data.groups[0]
 
-    dday_data = re.findall('\[dday\(([0-9]{4}-[0-9]{2}-[0-9]{2})\)\]', data)
-    for dday in dday_data:
-        old = datetime.datetime.strptime(time[0], '%Y-%m-%d')
-        will = datetime.datetime.strptime(dday, '%Y-%m-%d')
-        
-        e_data = old - will
-        
-        if re.search('^-', str(e_data.days)):
-            e_day = str(e_data.days)
+            old = datetime.datetime.strptime(time[0], '%Y-%m-%d')
+            will = datetime.datetime.strptime(age, '%Y-%m-%d')
+            
+            e_data = old - will
+            
+            data = re.sub('\[age\(([0-9]{4})-([0-9]{2})-([0-9]{2})\)\]', str(int(e_data.days / 365)), data, 1)
         else:
-            e_day = '+' + str(e_data.days)
+            break
 
-        data = re.sub('\[dday\(([0-9]{4}-[0-9]{2}-[0-9]{2})\)\]', e_day, data, 1)
+    while 1:
+        dday_data = re.search('\[dday\(([0-9]{4}-[0-9]{2}-[0-9]{2})\)\]', data)
+        if dday_data:
+            dday = dday_data.groups[0]
+
+            old = datetime.datetime.strptime(time[0], '%Y-%m-%d')
+            will = datetime.datetime.strptime(dday, '%Y-%m-%d')
+            
+            e_data = old - will
+            
+            if re.search('^-', str(e_data.days)):
+                e_day = str(e_data.days)
+            else:
+                e_day = '+' + str(e_data.days)
+
+            data = re.sub('\[dday\(([0-9]{4}-[0-9]{2}-[0-9]{2})\)\]', e_day, data, 1)
+        else:
+            break
 
     # 유튜브, 카카오 티비 처리
     while 1:

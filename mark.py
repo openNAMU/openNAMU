@@ -31,11 +31,19 @@ def plusing(name, link, backtype):
 
 def namumark(title, data, num):
     data = start(conn, data, title)
-    if num == 1:        
-        for back_data in data[2]:
-            thread_start = threading.Thread(target = plusing, args = [back_data[0], back_data[1], back_data[2]])
+    if num == 1:
+        i = 0
+        while 1:
+            try:
+                _ = data[2][i]
+            except:
+                break
+
+            thread_start = threading.Thread(target = plusing, args = [data[2][i][0], data[2][i][1], data[2][i][2]])
             thread_start.start()
             thread_start.join()
+
+            i += 1
 
         conn.commit()
         
