@@ -87,24 +87,29 @@ def load_lang(data):
 
 def edit_help_button():
     # https://stackoverflow.com/questions/11076975/insert-text-into-textarea-at-cursor-position-javascript
-    '''<script>
-                function insertAtCursor(myField, myValue) {
-                    if (document.selection) { 
-                        document.getElementById(myField).focus();
-                        sel = document.selection.createRange(); 
-                        sel.text = myValue; 
-                    } else if (document.getElementById(myField).selectionStart || document.getElementById(myField).selectionStart == '0') { 
-                        var startPos = document.getElementById(myField).selectionStart; 
-                        var endPos = document.getElementById(myField).selectionEnd; 
-                        document.getElementById(myField).value = document.getElementById(myField).value.substring(0, startPos) + myValue + document.getElementById(myField).value.substring(endPos, document.getElementById(myField).value.length); 
-                    } else { 
-                        document.getElementById(myField).value += myValue;
-                    }
-                }
-            </script>
-        '''
+    '''
+    <script>
+        function insertAtCursor(myField, myValue) {
+            if (document.selection) { 
+                document.getElementById(myField).focus();
 
-    '<a href="javascript:void(0);" onclick="insertAtCursor(\'content\', \'[[]]\');">(링크)</a> <a href="javascript:void(0);" onclick="insertAtCursor(\'content\', \'[macro()]\');">(매크로)</a> <a href="javascript:void(0);" onclick="insertAtCursor(\'content\', \'{{{#! }}}\');">(중괄호)</a><hr>'
+                sel = document.selection.createRange();
+                sel.text = myValue; 
+            } else if (document.getElementById(myField).selectionStart || document.getElementById(myField).selectionStart == '0') {
+                var startPos = document.getElementById(myField).selectionStart;
+                var endPos = document.getElementById(myField).selectionEnd;
+
+                document.getElementById(myField).value = document.getElementById(myField).value.substring(0, startPos) + myValue + document.getElementById(myField).value.substring(endPos, document.getElementById(myField).value.length); 
+            } else {
+                document.getElementById(myField).value += myValue;
+            }
+        }
+    </script>
+    '''
+
+    insert_list = [['[[]]', '링크'], ['[()]', '매크로'], ['{{{#!}}}', '중괄호']]
+
+    '<a href="javascript:void(0);" onclick="insertAtCursor(\'content\', \'B\');">(A)</a>'
 
     return ['', '']
 
@@ -498,7 +503,7 @@ def re_error(data):
     if data == '/ban':
         ip = ip_check()
 
-        end = '<li>Why : 권한이 맞지 않는 상태 입니다.</li>'
+        end = '<li>' + load_lang('why') + ' : ' + load_lang('authority_error') + '</li>'
 
         if ban_check() == 1:
             curs.execute("select end, why from ban where block = ?", [ip])
@@ -510,7 +515,7 @@ def re_error(data):
                     end_data = curs.fetchall()
             
             if end_data:
-                end = '<li>Info : '
+                end = '<li>' + load_lang('state') + ' : '
 
                 if end_data[0][0]:
                     now = int(re.sub('(\-| |:)', '', get_time()))
@@ -532,8 +537,8 @@ def re_error(data):
                     end += '<li>Why : ' + end_data[0][1] + '</li>'
 
         return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
-            imp = ['Authority Error', wiki_set(1), custom(), other2([0, 0])],
-            data = '<h2>Info</h2><ul>' + end + '</ul>',
+            imp = ['Error', wiki_set(1), custom(), other2([0, 0])],
+            data = '<h2>Error</h2><ul>' + end + '</ul>',
             menu = 0
         ))
 
@@ -541,75 +546,53 @@ def re_error(data):
     if error_data:
         num = int(error_data.groups()[0])
         if num == 1:
-            title = 'Authority Error'
             data = '비 로그인 상태 입니다.'
         elif num == 2:
-            title = 'Authority Error'
             data = '이 계정이 없습니다.'
         elif num == 3:
-            title = 'Authority Error'
             data = '권한이 모자랍니다.'
         elif num == 4:
-            title = 'Authority Error'
             data = '관리자는 차단, 검사 할 수 없습니다.'
         elif num == 5:
-            title = 'User Error'
             data = '그런 계정이 없습니다.'
         elif num == 6:
-            title = 'Register Error'
             data = '동일한 아이디의 사용자가 있습니다.'
         elif num == 7:
-            title = 'Register Error'
             data = '아이디는 20글자보다 짧아야 합니다.'
         elif num == 8:
-            title = 'Register Error'
             data = '아이디에는 한글과 알파벳과 공백만 허용 됩니다.'
         elif num == 9:
-            title = 'Upload Error'
             data = '파일이 없습니다.'
         elif num == 10:
-            title = 'PassWord Error'
             data = '비밀번호가 다릅니다.'
         elif num == 11:
-            title = 'Login Error'
             data = '이미 로그인 되어 있습니다.'
         elif num == 13:
-            title = 'reCAPTCHA Error'
             data = '리캡차를 통과하세요.'
         elif num == 14:
-            title = 'Upload Error'
             data = 'jpg, gif, jpeg, png, webp만 가능 합니다.'
         elif num == 15:
-            title = 'Edit Error'
             data = '편집 기록은 500자를 넘을 수 없습니다.'
         elif num == 16:
-            title = 'Upload Error'
             data = '동일한 이름의 파일이 있습니다.'
         elif num == 17:
-            title = 'Upload Error'
             data = '파일 용량은 ' + wiki_set(3) + 'MB를 넘길 수 없습니다.'
         elif num == 18:
-            title = 'Edit Error'
             data = '내용이 원래 문서와 동일 합니다.'
         elif num == 19:
-            title = 'Move Error'
             data = '이동 하려는 곳에 문서가 이미 있습니다.'
         elif num == 20:
-            title = 'PassWord Error'
             data = '재 확인이랑 비밀번호가 다릅니다.'
         elif num == 21:
-            title = 'Edit Error'
             data = '편집 필터에 의해 검열 되었습니다.'
         elif num == 22:
-            title = 'Upload Error'
             data = '파일 이름은 알파벳, 한글, 띄어쓰기, 언더바, 빼기표만 허용 됩니다.'
         else:
-            title = 'Error'
             data = '???'
 
         if title:
             return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
-                imp = [title, wiki_set(1), custom(), other2([0, 0])],
+                imp = ['Error', wiki_set(1), custom(), other2([0, 0])],
                 data = '<h2>Error</h2><ul><li>' + data + '</li></ul>',
                 menu = 0
             ))
