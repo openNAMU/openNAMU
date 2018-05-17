@@ -1,14 +1,10 @@
 # 모듈 불러오기
-from flask import Flask, request, send_from_directory
-from flask_compress import Compress
-from flask_reggie import Reggie
-
-from tornado.wsgi import WSGIContainer
-from tornado.httpserver import HTTPServer
-from tornado.ioloop import IOLoop
-
+import flask_compress
+import flask_reggie
+import tornado.ioloop
+import tornado.httpserver
+import tornado.wsgi
 import urllib.request
-
 import platform
 import zipfile
 import bcrypt
@@ -58,9 +54,9 @@ load_conn(conn)
 
 # 기타 설정 변경
 logging.basicConfig(level = logging.ERROR)
-app = Flask(__name__, template_folder = './')
-Reggie(app)
-compress = Compress()
+app = flask.Flask(__name__, template_folder = './')
+flask_reggie.Reggie(app)
+compress = flask_compress.Compress()
 compress.init_app(app)
 
 # 템플릿 설정
@@ -313,7 +309,7 @@ def alarm():
     
     data += '</ul>'
 
-    return html_minify(render_template(skin_check(), 
+    return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
         imp = [load_lang('alarm'), wiki_set(1), custom(), other2([0, 0])],
         data = data,
         menu = [['user', load_lang('user')]]
@@ -362,7 +358,7 @@ def inter_wiki(tools = None):
         if admin == 1:
             div += '<a href="/' + plus_link + '">(' + load_lang('plus') + ')</a>'
 
-    return html_minify(render_template(skin_check(), 
+    return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
         imp = [title, wiki_set(1), custom(), other2([0, 0])],
         data = div,
         menu = [['other', load_lang('other')]]
@@ -384,11 +380,11 @@ def del_inter(tools = None, name = None):
 
 @app.route('/<regex("plus_(inter_wiki|html_filter)"):tools>', methods=['POST', 'GET'])
 def plus_inter(tools = None):
-    if request.method == 'POST':
+    if flask.request.method == 'POST':
         if tools == 'plus_inter_wiki':
-            curs.execute('insert into inter (title, link) values (?, ?)', [request.form.get('title', None), request.form.get('link', None)])
+            curs.execute('insert into inter (title, link) values (?, ?)', [flask.request.form.get('title', None), flask.request.form.get('link', None)])
         else:
-            curs.execute('insert into html_filter (html) values (?)', [request.form.get('title', None)])
+            curs.execute('insert into html_filter (html) values (?)', [flask.request.form.get('title', None)])
         
         conn.commit()
         
@@ -403,7 +399,7 @@ def plus_inter(tools = None):
             title = 'HTML Filter ' + load_lang('plus')
             form_data = '<input placeholder="HTML" type="text" name="title">'
 
-        return html_minify(render_template(skin_check(), 
+        return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
             imp = [title, wiki_set(1), custom(), other2([0, 0])],
             data = '<form method="post">' + form_data + '<hr><button type="submit">' + load_lang('plus') + '</button></form>',
             menu = [['other', load_lang('other')]]
@@ -426,7 +422,7 @@ def edit_set(num = 0):
             x += 1
             li_data += '<li><a href="/edit_set/' + str(x) + '">' + li + '</a></li>'
 
-        return html_minify(render_template(skin_check(), 
+        return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
             imp = [load_lang('setting'), wiki_set(1), custom(), other2([0, 0])],
             data = '<h2>' + load_lang('list') + '</h2><ul>' + li_data + '</ul>',
             menu = [['manager', load_lang('admin')]]
@@ -435,11 +431,11 @@ def edit_set(num = 0):
         i_list = ['name', 'logo', 'frontpage', 'license', 'upload', 'skin', 'edit', 'reg', 'ip_view', 'back_up', 'port', 'key']
         n_list = ['Wiki', '', 'FrontPage', 'CC 0', '2', '', 'normal', '', '', '0', '3000', 'Test']
         
-        if request.method == 'POST':
+        if flask.request.method == 'POST':
             i = 0
             
             for data in i_list:
-                curs.execute("update other set data = ? where name = ?", [request.form.get(data, n_list[i]), data])
+                curs.execute("update other set data = ? where name = ?", [flask.request.form.get(data, n_list[i]), data])
                 i += 1
 
             conn.commit()
@@ -496,7 +492,7 @@ def edit_set(num = 0):
                 else:
                     div2 += '<option value="' + skin_data + '">' + skin_data + '</option>'
 
-            return html_minify(render_template(skin_check(), 
+            return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
                 imp = ['Normal', wiki_set(1), custom(), other2([0, 0])],
                 data = '''
                         <form method="post">
@@ -560,9 +556,9 @@ def edit_set(num = 0):
                 menu = [['edit_set', load_lang('setting')]]
             ))
     elif num == 2:
-        if request.method == 'POST':
-            curs.execute("update other set data = ? where name = ?", [request.form.get('contract', None), 'contract'])
-            curs.execute("update other set data = ? where name = ?", [request.form.get('no_login_warring', None), 'no_login_warring'])
+        if flask.request.method == 'POST':
+            curs.execute("update other set data = ? where name = ?", [flask.request.form.get('contract', None), 'contract'])
+            curs.execute("update other set data = ? where name = ?", [flask.request.form.get('no_login_warring', None), 'no_login_warring'])
             conn.commit()
             
             admin_check(None, 'edit_set')
@@ -589,7 +585,7 @@ def edit_set(num = 0):
 
             conn.commit()
 
-            return html_minify(render_template(skin_check(), 
+            return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
                 imp = ['Set Text', wiki_set(1), custom(), other2([0, 0])],
                 data = '''
                         <form method="post">
@@ -609,12 +605,12 @@ def edit_set(num = 0):
                 menu = [['edit_set', load_lang('setting')]]
             ))
     elif num == 3:
-        if request.method == 'POST':
+        if flask.request.method == 'POST':
             curs.execute("select name from other where name = 'head'")
             if curs.fetchall():
-                curs.execute("update other set data = ? where name = 'head'", [request.form.get('content', None)])
+                curs.execute("update other set data = ? where name = 'head'", [flask.request.form.get('content', None)])
             else:
-                curs.execute("insert into other (name, data) values ('head', ?)", [request.form.get('content', None)])
+                curs.execute("insert into other (name, data) values ('head', ?)", [flask.request.form.get('content', None)])
             
             conn.commit()
 
@@ -629,7 +625,7 @@ def edit_set(num = 0):
             else:
                 data = ''
 
-            return html_minify(render_template(skin_check(), 
+            return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
                 imp = ['Main HEAD', wiki_set(1), custom(), other2([0, 0])],
                 data = '''
                         <form method="post">
@@ -641,17 +637,17 @@ def edit_set(num = 0):
                 menu = [['edit_set', load_lang('setting')]]
             ))
     elif num == 4:
-        if request.method == 'POST':
+        if flask.request.method == 'POST':
             curs.execute("select name from other where name = 'robot'")
             if curs.fetchall():
-                curs.execute("update other set data = ? where name = 'robot'", [request.form.get('content', None)])
+                curs.execute("update other set data = ? where name = 'robot'", [flask.request.form.get('content', None)])
             else:
-                curs.execute("insert into other (name, data) values ('robot', ?)", [request.form.get('content', None)])
+                curs.execute("insert into other (name, data) values ('robot', ?)", [flask.request.form.get('content', None)])
             
             conn.commit()
             
             fw = open('./robots.txt', 'w')
-            fw.write(re.sub('\r\n', '\n', request.form.get('content', None)))
+            fw.write(re.sub('\r\n', '\n', flask.request.form.get('content', None)))
             fw.close()
             
             admin_check(None, 'edit_set')
@@ -672,7 +668,7 @@ def edit_set(num = 0):
             if not data or data == '':
                 data = ''.join(lines)
 
-            return html_minify(render_template(skin_check(), 
+            return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
                 imp = ['robots.txt', wiki_set(1), custom(), other2([0, 0])],
                 data = '''
                         <a href="/robots.txt">(View)</a>
@@ -686,9 +682,9 @@ def edit_set(num = 0):
                 menu = [['edit_set', load_lang('setting')]]
             ))
     elif num == 5:
-        if request.method == 'POST':
-            curs.execute("update other set data = ? where name = 'recaptcha'", [request.form.get('recaptcha', None)])
-            curs.execute("update other set data = ? where name = 'sec_re'", [request.form.get('sec_re', None)])
+        if flask.request.method == 'POST':
+            curs.execute("update other set data = ? where name = 'recaptcha'", [flask.request.form.get('recaptcha', None)])
+            curs.execute("update other set data = ? where name = 'sec_re'", [flask.request.form.get('sec_re', None)])
             conn.commit()
             
             admin_check(None, 'edit_set')
@@ -715,7 +711,7 @@ def edit_set(num = 0):
 
             conn.commit()
 
-            return html_minify(render_template(skin_check(), 
+            return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
                 imp = ['Google', wiki_set(1), custom(), other2([0, 0])],
                 data = '''
                         <form method="post">
@@ -750,7 +746,7 @@ def not_close_topic():
             
     div += '</ul>'
 
-    return html_minify(render_template(skin_check(), 
+    return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
         imp = [load_lang('open') + ' ' + load_lang('discussion') + ' ' + load_lang('list'), wiki_set(1), custom(), other2([0, 0])],
         data = div,
         menu = [['manager', load_lang('admin')]]
@@ -759,7 +755,7 @@ def not_close_topic():
 @app.route('/image/<name>')
 def image_view(name = None):
     if os.path.exists(os.path.join('image', name)):
-        return send_from_directory('./image', name)
+        return flask.send_from_directory('./image', name)
     else:
         return redirect('/')
 
@@ -780,7 +776,7 @@ def acl_list():
         
     div += '</ul>'
     
-    return html_minify(render_template(skin_check(), 
+    return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
         imp = ['ACL ' + load_lang('document') + ' ' + load_lang('list'), wiki_set(1), custom(), other2([0, 0])],
         data = div,
         menu = [['other', load_lang('other')]]
@@ -788,34 +784,34 @@ def acl_list():
 
 @app.route('/admin_plus/<name>', methods=['POST', 'GET'])
 def admin_plus(name = None):
-    if request.method == 'POST':
+    if flask.request.method == 'POST':
         if admin_check(None, 'admin_plus (' + name + ')') != 1:
             return re_error('/error/3')
 
         curs.execute("delete from alist where name = ?", [name])
         
-        if request.form.get('ban', 0) != 0:
+        if flask.request.form.get('ban', 0) != 0:
             curs.execute("insert into alist (name, acl) values (?, 'ban')", [name])
 
-        if request.form.get('mdel', 0) != 0:
+        if flask.request.form.get('mdel', 0) != 0:
             curs.execute("insert into alist (name, acl) values (?, 'mdel')", [name])   
 
-        if request.form.get('toron', 0) != 0:
+        if flask.request.form.get('toron', 0) != 0:
             curs.execute("insert into alist (name, acl) values (?, 'toron')", [name])
             
-        if request.form.get('check', 0) != 0:
+        if flask.request.form.get('check', 0) != 0:
             curs.execute("insert into alist (name, acl) values (?, 'check')", [name])
 
-        if request.form.get('acl', 0) != 0:
+        if flask.request.form.get('acl', 0) != 0:
             curs.execute("insert into alist (name, acl) values (?, 'acl')", [name])
 
-        if request.form.get('hidel', 0) != 0:
+        if flask.request.form.get('hidel', 0) != 0:
             curs.execute("insert into alist (name, acl) values (?, 'hidel')", [name])
 
-        if request.form.get('give', 0) != 0:
+        if flask.request.form.get('give', 0) != 0:
             curs.execute("insert into alist (name, acl) values (?, 'give')", [name])
 
-        if request.form.get('owner', 0) != 0:
+        if flask.request.form.get('owner', 0) != 0:
             curs.execute("insert into alist (name, acl) values (?, 'owner')", [name])
             
         conn.commit()
@@ -860,7 +856,7 @@ def admin_plus(name = None):
         data += '<li><input type="checkbox" ' + state +  ' name="give" ' + exist_list[6] + '> ' + load_lang('authority') + '</li>'
         data += '<li><input type="checkbox" ' + state +  ' name="owner" ' + exist_list[7] + '> ' + load_lang('owner') + '</li></ul>'
 
-        return html_minify(render_template(skin_check(), 
+        return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
             imp = [load_lang('admin_group') + ' ' + load_lang('plus'), wiki_set(1), custom(), other2([0, 0])],
             data = '<form method="post">' + data + '<hr><button id="save" ' + state +  ' type="submit">' + load_lang('save') + '</button></form>',
             menu = [['manager', load_lang('admin')]]
@@ -881,7 +877,7 @@ def admin_list():
         
     div += '</ul>'
                 
-    return html_minify(render_template(skin_check(), 
+    return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
         imp = [load_lang('admin') + ' ' + load_lang('list'), wiki_set(1), custom(), other2([0, 0])],
         data = div,
         menu = [['other', load_lang('other')]]
@@ -889,7 +885,7 @@ def admin_list():
         
 @app.route('/hidden/<path:name>')
 def history_hidden(name = None):
-    num = int(request.args.get('num', 0))
+    num = int(flask.request.args.get('num', 0))
 
     if admin_check(6, 'history_hidden (' + name + '#' + str(num) + ')') == 1:
         curs.execute("select title from history where title = ? and id = ? and hide = 'O'", [name, str(num)])
@@ -904,7 +900,7 @@ def history_hidden(name = None):
         
 @app.route('/user_log')
 def user_log():
-    num = int(request.args.get('num', 1))
+    num = int(flask.request.args.get('num', 1))
     if num * 50 > 0:
         sql_num = num * 50 - 50
     else:
@@ -945,7 +941,7 @@ def user_log():
 
     list_data += next_fix('/user_log?num=', num, user_list)
 
-    return html_minify(render_template(skin_check(), 
+    return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
         imp = ['' + load_lang('recent') + ' ' + load_lang('register') + '', wiki_set(1), custom(), other2([0, 0])],
         data = list_data,
         menu = 0
@@ -953,7 +949,7 @@ def user_log():
 
 @app.route('/admin_log')
 def admin_log():
-    num = int(request.args.get('num', 1))
+    num = int(flask.request.args.get('num', 1))
     if num * 50 > 0:
         sql_num = num * 50 - 50
     else:
@@ -969,7 +965,7 @@ def admin_log():
     list_data += '</ul>'
     list_data += next_fix('/admin_log?num=', num, get_list)
 
-    return html_minify(render_template(skin_check(), 
+    return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
         imp = ['' + load_lang('recent') + ' ' + load_lang('authority'), wiki_set(1), custom(), other2([0, 0])],
         data = list_data,
         menu = 0
@@ -989,7 +985,7 @@ def give_log():
     
     list_data += '</ul><hr><a href="/manager/8">(' + load_lang('create') + ')</a>'
 
-    return html_minify(render_template(skin_check(), 
+    return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
         imp = [load_lang('admin_group') + ' ' + load_lang('list'), wiki_set(1), custom(), other2([0, 0])],
         data = list_data,
         menu = [['other', load_lang('other')]]
@@ -1071,7 +1067,7 @@ def update():
 
                 return redirect('/re_start')
 
-    return html_minify(render_template(skin_check(), 
+    return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
         imp = [load_lang('update'), wiki_set(1), custom(), other2([0, 0])],
         data = 'Auto Update Is Not Support. <a href="https://github.com/2DU/openNAMU">(GitHub)</a>',
         menu = [['manager/1', load_lang('admin')]]
@@ -1079,7 +1075,7 @@ def update():
         
 @app.route('/xref/<path:name>')
 def xref(name = None):
-    num = int(request.args.get('num', 1))
+    num = int(flask.request.args.get('num', 1))
     if num * 50 > 0:
         sql_num = num * 50 - 50
     else:
@@ -1109,7 +1105,7 @@ def xref(name = None):
       
     div += '</ul>' + next_fix('/xref/' + url_pas(name) + '?num=', num, data_list)
     
-    return html_minify(render_template(skin_check(), 
+    return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
         imp = [name, wiki_set(1), custom(), other2([' (' + load_lang('backlink') + ')', 0])],
         data = div,
         menu = [['w/' + url_pas(name), load_lang('document')]]
@@ -1117,7 +1113,7 @@ def xref(name = None):
 
 @app.route('/please')
 def please():
-    num = int(request.args.get('num', 1))
+    num = int(flask.request.args.get('num', 1))
     if num * 50 > 0:
         sql_num = num * 50 - 50
     else:
@@ -1136,7 +1132,7 @@ def please():
         
     div += '</ul>' + next_fix('/please?num=', num, data_list)
     
-    return html_minify(render_template(skin_check(), 
+    return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
         imp = [load_lang('need') + ' ' + load_lang('document'), wiki_set(1), custom(), other2([0, 0])],
         data = div,
         menu = [['other', load_lang('other')]]
@@ -1182,7 +1178,7 @@ def recent_discuss(tools = 'normal'):
     else:
         div += '</tbody></table>'
             
-    return html_minify(render_template(skin_check(), 
+    return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
         imp = ['' + load_lang('recent') + ' ' + load_lang('discussion'), wiki_set(1), custom(), other2([m_sub, 0])],
         data = div,
         menu = 0
@@ -1192,7 +1188,7 @@ def recent_discuss(tools = 'normal'):
 @app.route('/block_log/<regex("ip|user|never_end|can_end|end|now|edit_filter"):tool2>')
 @app.route('/<regex("block_user|block_admin"):tool>/<name>')
 def block_log(name = None, tool = None, tool2 = None):
-    num = int(request.args.get('num', 1))
+    num = int(flask.request.args.get('num', 1))
     if num * 50 > 0:
         sql_num = num * 50 - 50
     else:
@@ -1296,7 +1292,7 @@ def block_log(name = None, tool = None, tool2 = None):
     else:
         div += next_fix('/' + url_pas(tool) + '/' + url_pas(name) + '?num=', num, data_list)
                 
-    return html_minify(render_template(skin_check(), 
+    return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
         imp = ['' + load_lang('recent') + ' ' + load_lang('ban'), wiki_set(1), custom(), other2([sub, 0])],
         data = div,
         menu = menu
@@ -1304,20 +1300,20 @@ def block_log(name = None, tool = None, tool2 = None):
             
 @app.route('/search', methods=['POST'])
 def search():
-    return redirect('/search/' + url_pas(request.form.get('search', None)))
+    return redirect('/search/' + url_pas(flask.request.form.get('search', None)))
 
 @app.route('/goto', methods=['POST'])
 def goto():
-    curs.execute("select title from data where title = ?", [request.form.get('search', None)])
+    curs.execute("select title from data where title = ?", [flask.request.form.get('search', None)])
     data = curs.fetchall()
     if data:
-        return redirect('/w/' + url_pas(request.form.get('search', None)))
+        return redirect('/w/' + url_pas(flask.request.form.get('search', None)))
     else:
-        return redirect('/search/' + url_pas(request.form.get('search', None)))
+        return redirect('/search/' + url_pas(flask.request.form.get('search', None)))
 
 @app.route('/search/<path:name>')
 def deep_search(name = None):
-    num = int(request.args.get('num', 1))
+    num = int(flask.request.args.get('num', 1))
     if num * 50 > 0:
         sql_num = num * 50 - 50
     else:
@@ -1354,7 +1350,7 @@ def deep_search(name = None):
     div += div_plus + '</ul>'
     div += next_fix('/search/' + url_pas(name) + '?num=', num, all_list)
 
-    return html_minify(render_template(skin_check(), 
+    return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
         imp = [name, wiki_set(1), custom(), other2([' (' + load_lang('search') + ')', 0])],
         data = div,
         menu = 0
@@ -1367,7 +1363,7 @@ def raw_view(name = None, sub_title = None, num = None):
     sub = ' (Raw)'
     
     if not num:
-        num = request.args.get('num', None)
+        num = flask.request.args.get('num', None)
         if num:
             num = int(num)
     
@@ -1398,7 +1394,7 @@ def raw_view(name = None, sub_title = None, num = None):
         p_data = html.escape(data[0][0])
         p_data = '<textarea readonly rows="25">' + p_data + '</textarea>'
         
-        return html_minify(render_template(skin_check(), 
+        return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
             imp = [v_name, wiki_set(1), custom(), other2([sub, 0])],
             data = p_data,
             menu = menu
@@ -1408,7 +1404,7 @@ def raw_view(name = None, sub_title = None, num = None):
         
 @app.route('/revert/<path:name>', methods=['POST', 'GET'])
 def revert(name = None):    
-    num = int(request.args.get('num', 0))
+    num = int(flask.request.args.get('num', 0))
 
     curs.execute("select title from history where title = ? and id = ? and hide = 'O'", [name, str(num)])
     if curs.fetchall() and admin_check(6, None) != 1:
@@ -1417,8 +1413,8 @@ def revert(name = None):
     if acl_check(name) == 1:
         return re_error('/ban')
 
-    if request.method == 'POST':
-        if captcha_post(request.form.get('g-recaptcha-response', None), conn) == 1:
+    if flask.request.method == 'POST':
+        if captcha_post(flask.request.form.get('g-recaptcha-response', None), conn) == 1:
             return re_error('/error/13')
         else:
             captcha_post('', 0)
@@ -1438,7 +1434,7 @@ def revert(name = None):
                 leng = ' +' + str(len(data[0][0]))
                 curs.execute("insert into data (title, data) values (?, ?)", [name, data[0][0]])
                 
-            history_plus(name, data[0][0], get_time(), ip_check(), request.form.get('send', None) + ' (' + str(num) + load_lang('version') + ')', leng)
+            history_plus(name, data[0][0], get_time(), ip_check(), flask.request.form.get('send', None) + ' (' + str(num) + load_lang('version') + ')', leng)
             namumark(name, data[0][0], 1)
             
             conn.commit()
@@ -1449,11 +1445,11 @@ def revert(name = None):
         if not curs.fetchall():
             return redirect('/w/' + url_pas(name))
 
-        return html_minify(render_template(skin_check(), 
+        return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
             imp = [name, wiki_set(1), custom(), other2([' (' + load_lang('revert') + ')', 0])],
             data =  '''
                     <form method="post">
-                        <span>''' + request.args.get('num', '0') + load_lang('version') + '''</span>
+                        <span>''' + flask.request.args.get('num', '0') + load_lang('version') + '''</span>
                         <hr>
                         ''' + ip_warring() + '''
                         <input placeholder="''' + load_lang('why') + '''" name="send" type="text">
@@ -1470,10 +1466,10 @@ def big_delete():
     if admin_check(2, 'big_delete') != 1:
         return re_error('/error/3')
 
-    if request.method == 'POST':
+    if flask.request.method == 'POST':
         today = get_time()
         ip = ip_check()
-        data = request.form.get('content', None) + '\r\n'
+        data = flask.request.form.get('content', None) + '\r\n'
         
         match = re.findall('(.*)\r\n', data)
         for list_one in match:
@@ -1485,7 +1481,7 @@ def big_delete():
                 
                 leng = '-' + str(len(data_old[0][0]))
                 
-                history_plus(list_one, '', today, ip, request.form.get('send', None) + ' (' + load_lang('bulk_delete') + ')', leng)
+                history_plus(list_one, '', today, ip, flask.request.form.get('send', None) + ' (' + load_lang('bulk_delete') + ')', leng)
 
             data = re.sub('(.*)\r\n', '', data, 1)
         
@@ -1493,7 +1489,7 @@ def big_delete():
 
         return redirect('/')
     else:
-        return html_minify(render_template(skin_check(), 
+        return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
             imp = [load_lang('bulk_delete'), wiki_set(1), custom(), other2([0, 0])],
             data = '''
                     <span>
@@ -1531,7 +1527,7 @@ def edit_filter():
     else:
         div = '<a href="/manager/9">(' + load_lang('plus') + ')</a>'
 
-    return html_minify(render_template(skin_check(), 
+    return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
         imp = [load_lang('edit_filter') + ' ' + load_lang('list'), wiki_set(1), custom(), other2([0, 0])],
         data = div,
         menu = [['manager', load_lang('admin')]]
@@ -1549,20 +1545,20 @@ def delete_edit_filter(name = None):
 
 @app.route('/edit_filter/<name>', methods=['POST', 'GET'])
 def set_edit_filter(name = None):
-    if request.method == 'POST':
+    if flask.request.method == 'POST':
         if admin_check(1, 'edit_filter edit') != 1:
             return re_error('/error/3')
 
-        if request.form.get('ban', None):
+        if flask.request.form.get('ban', None):
             end = 'X'
         else:
             end = ''
 
         curs.execute("select name from filter where name = ?", [name])
         if curs.fetchall():
-            curs.execute("update filter set regex = ?, sub = ? where name = ?", [request.form.get('content', '테스트'), end, name])
+            curs.execute("update filter set regex = ?, sub = ? where name = ?", [flask.request.form.get('content', '테스트'), end, name])
         else:
-            curs.execute("insert into filter (name, regex, sub) values (?, ?, ?)", [name, request.form.get('content', '테스트'), end])
+            curs.execute("insert into filter (name, regex, sub) values (?, ?, ?)", [name, flask.request.form.get('content', '테스트'), end])
 
         conn.commit()
     
@@ -1586,7 +1582,7 @@ def set_edit_filter(name = None):
         else:
             stat = ''
 
-        return html_minify(render_template(skin_check(), 
+        return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
             imp = [name, wiki_set(1), custom(), other2([' (' + load_lang('edit_filter') + ')', 0])],
             data = '''
                     <form method="post">
@@ -1606,37 +1602,37 @@ def edit(name = None):
     if acl_check(name) == 1:
         return re_error('/ban')
     
-    if request.method == 'POST':
+    if flask.request.method == 'POST':
         if admin_check(1, 'edit_filter pass') != 1:
             curs.execute("select regex, sub from filter")
             for data_list in curs.fetchall():
                 match = re.compile(data_list[0])
-                if match.search(request.form.get('content', None)):
+                if match.search(flask.request.form.get('content', None)):
                     if data_list[1] == 'X':
                         ban_insert(ip, '', load_lang('edit_filter'), None, load_lang('tool') + ':' + load_lang('edit_filter'))
                     
                     return re_error('/error/21')
 
-        if captcha_post(request.form.get('g-recaptcha-response', None), conn) == 1:
+        if captcha_post(flask.request.form.get('g-recaptcha-response', None), conn) == 1:
             return re_error('/error/13')
         else:
             captcha_post('', 0)
 
-        if len(request.form.get('send', None)) > 500:
+        if len(flask.request.form.get('send', None)) > 500:
             return re_error('/error/15')
 
-        if request.form.get('otent', None) == request.form.get('content', None):
+        if flask.request.form.get('otent', None) == flask.request.form.get('content', None):
             return re_error('/error/18')
 
         today = get_time()
-        content = savemark(request.form.get('content', None))
+        content = savemark(flask.request.form.get('content', None))
         
         curs.execute("select data from data where title = ?", [name])
         old = curs.fetchall()
         if old:
-            leng = leng_check(len(request.form.get('otent', None)), len(content))
+            leng = leng_check(len(flask.request.form.get('otent', None)), len(content))
             
-            if request.args.get('section', None):
+            if flask.request.args.get('section', None):
                 i = 1
                 
                 data = re.sub('\r\n', '\n', '\r\n' + old[0][0] + '\r\n')
@@ -1645,7 +1641,7 @@ def edit(name = None):
                     if replace_data:
                         replace_data = replace_data.groups()[0]
 
-                        if i == int(request.args.get('section', None)):
+                        if i == int(flask.request.args.get('section', None)):
                             data = re.sub('\n(?P<in>={1,6}) ?(?P<out>(?:(?!=).)+) ?={1,6}\n', '\n<real h' + str(len(replace_data)) + '>\g<out></real h' + str(len(replace_data)) + '>\n', data, 1)
                         else:
                             data = re.sub('\n(?P<in>={1,6}) ?(?P<out>(?:(?!=).)+) ?={1,6}\n', '\n<h' + str(len(replace_data)) + '>\g<out></h' + str(len(replace_data)) + '>\n', data, 1)
@@ -1654,7 +1650,7 @@ def edit(name = None):
                     else:
                         break
 
-                new_data = re.sub('\r\n', '\n', '\r\n' + request.form.get('otent', None) + '\r\n')
+                new_data = re.sub('\r\n', '\n', '\r\n' + flask.request.form.get('otent', None) + '\r\n')
                 while 1:
                     replace_data = re.search('\n(={1,6}) ?((?:(?!=).)+) ?={1,6}\n', new_data)
                     if replace_data:
@@ -1688,7 +1684,7 @@ def edit(name = None):
         for user_data in curs.fetchall():
             curs.execute("insert into alarm (name, data, date) values (?, ?, ?)", [ip, ip + ' - <a href="/w/' + url_pas(name) + '">' + name + '</a> (Edit)', today])
 
-        history_plus(name, content, today, ip, send_parser(request.form.get('send', None)), leng)
+        history_plus(name, content, today, ip, send_parser(flask.request.form.get('send', None)), leng)
         
         curs.execute("delete from back where link = ?", [name])
         curs.execute("delete from back where title = ? and type = 'no'", [name])
@@ -1702,11 +1698,11 @@ def edit(name = None):
         curs.execute("select data from data where title = ?", [name])
         new = curs.fetchall()
         if new:
-            if request.args.get('section', None):
+            if flask.request.args.get('section', None):
                 test_data = '\n' + re.sub('\r\n', '\n', new[0][0]) + '\n'   
                 
                 section_data = re.findall('((?:={1,6}) ?(?:(?:(?!=).)+) ?={1,6}\n(?:(?:(?!(?:={1,6}) ?(?:(?:(?!=).)+) ?={1,6}\n).)*\n*)*)', test_data)
-                data = section_data[int(request.args.get('section', None)) - 1]
+                data = section_data[int(flask.request.args.get('section', None)) - 1]
             else:
                 data = new[0][0]
         else:
@@ -1714,7 +1710,7 @@ def edit(name = None):
             
         data_old = data
         
-        if not request.args.get('section', None):
+        if not flask.request.args.get('section', None):
             get_name = '''
                         <form method="post" id="get_edit" action="/edit_get/''' + url_pas(name) + '''">
                             <input placeholder="Load Document" name="name" style="width: 50%;" type="text">
@@ -1725,10 +1721,10 @@ def edit(name = None):
             action = ''
         else:
             get_name = ''
-            action = '?section=' + request.args.get('section', None)
+            action = '?section=' + flask.request.args.get('section', None)
             
-        if request.args.get('froms', None):
-            curs.execute("select data from data where title = ?", [request.args.get('froms', None)])
+        if flask.request.args.get('froms', None):
+            curs.execute("select data from data where title = ?", [flask.request.args.get('froms', None)])
             get_data = curs.fetchall()
             if get_data:
                 data = get_data[0][0]
@@ -1736,7 +1732,7 @@ def edit(name = None):
 
         js_data = edit_help_button()
 
-        return html_minify(render_template(skin_check(), 
+        return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
             imp = [name, wiki_set(1), custom(), other2([' (' + load_lang('edit') + ')', 0])],
             data = get_name + js_data[0] + '''
                     <form method="post" action="/edit/''' + url_pas(name) + action + '''">
@@ -1756,7 +1752,7 @@ def edit(name = None):
         
 @app.route('/edit_get/<path:name>', methods=['POST'])
 def edit_get(name = None):
-    return redirect('/edit/' + url_pas(name) + '?froms=' + url_pas(request.form.get('name', None)))
+    return redirect('/edit/' + url_pas(name) + '?froms=' + url_pas(flask.request.form.get('name', None)))
 
 @app.route('/preview/<path:name>', methods=['POST'])
 def preview(name = None):
@@ -1764,26 +1760,26 @@ def preview(name = None):
     if acl_check(name) == 1:
         return re_error('/ban')
          
-    new_data = re.sub('\r\n#(?:redirect|넘겨주기) (?P<in>(?:(?!\r\n).)+)\r\n', ' * Redirect : [[\g<in>]]', '\r\n' + request.form.get('content', None) + '\r\n')
+    new_data = re.sub('\r\n#(?:redirect|넘겨주기) (?P<in>(?:(?!\r\n).)+)\r\n', ' * Redirect : [[\g<in>]]', '\r\n' + flask.request.form.get('content', None) + '\r\n')
     new_data = re.sub('^\r\n', '', new_data)
     new_data = re.sub('\r\n$', '', new_data)
     
     end_data = namumark(name, new_data, 0)
     
-    if request.args.get('section', None):
-        action = '?section=' + request.args.get('section', None)
+    if flask.request.args.get('section', None):
+        action = '?section=' + flask.request.args.get('section', None)
     else:
         action = ''
 
     js_data = edit_help_button()
     
-    return html_minify(render_template(skin_check(), 
+    return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
         imp = [name, wiki_set(1), custom(), other2([' (' + load_lang('preview') + ')', 0])],
         data = js_data[0] + '''
                 <form method="post" action="/edit/''' + url_pas(name) + action + '''">
                     ''' + js_data[1] + '''
-                    <textarea id="content" rows="25" name="content">''' + html.escape(request.form.get('content', None)) + '''</textarea>
-                    <textarea style="display: none;" name="otent">''' + html.escape(request.form.get('otent', None)) + '''</textarea>
+                    <textarea id="content" rows="25" name="content">''' + html.escape(flask.request.form.get('content', None)) + '''</textarea>
+                    <textarea style="display: none;" name="otent">''' + html.escape(flask.request.form.get('otent', None)) + '''</textarea>
                     <hr>
                     <input placeholder="''' + load_lang('why') + '''" name="send" type="text">
                     <hr>
@@ -1802,8 +1798,8 @@ def delete(name = None):
     if acl_check(name) == 1:
         return re_error('/ban')
     
-    if request.method == 'POST':
-        if captcha_post(request.form.get('g-recaptcha-response', None), conn) == 1:
+    if flask.request.method == 'POST':
+        if captcha_post(flask.request.form.get('g-recaptcha-response', None), conn) == 1:
             return re_error('/error/13')
         else:
             captcha_post('', 0)
@@ -1814,7 +1810,7 @@ def delete(name = None):
             today = get_time()
             leng = '-' + str(len(data[0][0]))
             
-            history_plus(name, '', today, ip, request.form.get('send', None) + ' (' + load_lang('delete') + ')', leng)
+            history_plus(name, '', today, ip, flask.request.form.get('send', None) + ' (' + load_lang('delete') + ')', leng)
             
             curs.execute("select title, link from back where title = ? and not type = 'cat' and not type = 'no'", [name])
             for data in curs.fetchall():
@@ -1830,7 +1826,7 @@ def delete(name = None):
         if not curs.fetchall():
             return redirect('/w/' + url_pas(name))
 
-        return html_minify(render_template(skin_check(), 
+        return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
             imp = [name, wiki_set(1), custom(), other2([' (' + load_lang('delete') + ')', 0])],
             data = '''
                     <form method="post">
@@ -1861,7 +1857,7 @@ def move_data(name = None):
     
     data += '</ul>'
     
-    return html_minify(render_template(skin_check(), 
+    return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
         imp = [name, wiki_set(1), custom(), other2([' (' + load_lang('move') + ' ' + load_lang('history') + ')', 0])],
         data = data,
         menu = [['history/' + url_pas(name), load_lang('history')]]
@@ -1872,38 +1868,38 @@ def move(name = None):
     if acl_check(name) == 1:
         return re_error('/ban')
 
-    if request.method == 'POST':
-        if captcha_post(request.form.get('g-recaptcha-response', None), conn) == 1:
+    if flask.request.method == 'POST':
+        if captcha_post(flask.request.form.get('g-recaptcha-response', None), conn) == 1:
             return re_error('/error/13')
         else:
             captcha_post('', 0)
 
-        curs.execute("select title from history where title = ?", [request.form.get('title', None)])
+        curs.execute("select title from history where title = ?", [flask.request.form.get('title', None)])
         if curs.fetchall():
             return re_error('/error/19')
         
         curs.execute("select data from data where title = ?", [name])
         data = curs.fetchall()
         if data:            
-            curs.execute("update data set title = ? where title = ?", [request.form.get('title', None), name])
-            curs.execute("update back set link = ? where link = ?", [request.form.get('title', None), name])
+            curs.execute("update data set title = ? where title = ?", [flask.request.form.get('title', None), name])
+            curs.execute("update back set link = ? where link = ?", [flask.request.form.get('title', None), name])
             
             data_in = data[0][0]
         else:
             data_in = ''
             
-        history_plus(name, data_in, get_time(), ip_check(), request.form.get('send', None) + ' (<a href="/w/' + url_pas(name) + '">' + name + '</a> - <a href="/w/' + url_pas(request.form.get('title', None)) + '">' + request.form.get('title', None) + '</a> ' + load_lang('move') + ')', '0')
+        history_plus(name, data_in, get_time(), ip_check(), flask.request.form.get('send', None) + ' (<a href="/w/' + url_pas(name) + '">' + name + '</a> - <a href="/w/' + url_pas(flask.request.form.get('title', None)) + '">' + flask.request.form.get('title', None) + '</a> ' + load_lang('move') + ')', '0')
         
         curs.execute("select title, link from back where title = ? and not type = 'cat' and not type = 'no'", [name])
         for data in curs.fetchall():
             curs.execute("insert into back (title, link, type) values (?, ?, 'no')", [data[0], data[1]])
             
-        curs.execute("update history set title = ? where title = ?", [request.form.get('title', None), name])
+        curs.execute("update history set title = ? where title = ?", [flask.request.form.get('title', None), name])
         conn.commit()
 
-        return redirect('/w/' + url_pas(request.form.get('title', None)))
+        return redirect('/w/' + url_pas(flask.request.form.get('title', None)))
     else:            
-        return html_minify(render_template(skin_check(), 
+        return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
             imp = [name, wiki_set(1), custom(), other2([' (' + load_lang('move') + ')', 0])],
             data = '''
                     <form method="post">
@@ -1921,7 +1917,7 @@ def move(name = None):
             
 @app.route('/other')
 def other():
-    return html_minify(render_template(skin_check(), 
+    return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
         imp = [load_lang('other') + ' ' + load_lang('tool'), wiki_set(1), custom(), other2([0, 0])],
         data = '''
                 <h2>''' + load_lang('record') + '''</h2>
@@ -1964,7 +1960,7 @@ def manager(num = 1):
     title_list = [[load_lang('document') + ' ' + load_lang('name'), 'acl'], [0, 'check'], [0, 'ban'], [0, 'admin'], [0, 'record'], [0, 'topic_record'], [load_lang('name'), 'admin_plus'], [load_lang('name'), 'edit_filter'], [load_lang('document') + ' ' + load_lang('name'), 'search'], [0, 'block_user'], [0, 'block_admin'], [load_lang('document') + ' ' + load_lang('name'), 'watch_list']]
     
     if num == 1:
-        return html_minify(render_template(skin_check(), 
+        return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
             imp = [load_lang('admin') + ' ' + load_lang('tool'), wiki_set(1), custom(), other2([0, 0])],
             data = '''
                     <h2>''' + load_lang('admin') + '''</h2>
@@ -1990,15 +1986,15 @@ def manager(num = 1):
             menu = [['other', load_lang('other')]]
         ))
     elif num in range(2, 14):
-        if request.method == 'POST':
-            return redirect('/' + title_list[(num - 2)][1] + '/' + url_pas(request.form.get('name', None)))
+        if flask.request.method == 'POST':
+            return redirect('/' + title_list[(num - 2)][1] + '/' + url_pas(flask.request.form.get('name', None)))
         else:
             if title_list[(num - 2)][0] == 0:
                 placeholder = load_lang('user') + ' ' + load_lang('name')
             else:
                 placeholder = title_list[(num - 2)][0]
 
-            return html_minify(render_template(skin_check(), 
+            return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
                 imp = ['Redirect', wiki_set(1), custom(), other2([0, 0])],
                 data = '<form method="post"><input placeholder="' + placeholder + '" name="name" type="text"><hr><button type="submit">' + load_lang('move') + '</button></form>',
                 menu = [['manager', load_lang('admin')]]
@@ -2008,8 +2004,8 @@ def manager(num = 1):
         
 @app.route('/title_index')
 def title_index():
-    page = int(request.args.get('page', 1))
-    num = int(request.args.get('num', 100))
+    page = int(flask.request.args.get('page', 1))
+    num = int(flask.request.args.get('num', 100))
     if page * num > 0:
         sql_num = page * num - num
     else:
@@ -2062,7 +2058,7 @@ def title_index():
     data += '</ul>' + next_fix('/title_index?num=' + str(num) + '&page=', page, title_list, num)
     sub = ' (' + str(num) + '개)'
     
-    return html_minify(render_template(skin_check(), 
+    return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
         imp = [load_lang('all') + ' ' + load_lang('document'), wiki_set(1), custom(), other2([sub, 0])],
         data = data,
         menu = [['other', load_lang('other')]]
@@ -2201,7 +2197,7 @@ def topic_admin(name = None, sub = None, num = None):
 
     ban = '<h2>정보</h2><ul>' + ban
 
-    return html_minify(render_template(skin_check(), 
+    return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
         imp = [load_lang('discussion') + ' ' + load_lang('tool'), wiki_set(1), custom(), other2([' (' + str(num) + '번)', 0])],
         data = ban,
         menu = [['topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '#' + str(num), load_lang('discussion')]]
@@ -2212,8 +2208,8 @@ def topic(name = None, sub = None):
     ban = topic_check(name, sub)
     admin = admin_check(3, None)
     
-    if request.method == 'POST':
-        if captcha_post(request.form.get('g-recaptcha-response', None), conn) == 1:
+    if flask.request.method == 'POST':
+        if captcha_post(flask.request.form.get('g-recaptcha-response', None), conn) == 1:
             return re_error('/error/13')
         else:
             captcha_post('', 0)
@@ -2235,7 +2231,7 @@ def topic(name = None, sub = None):
         if match:
             curs.execute('insert into alarm (name, data, date) values (?, ?, ?)', [match.groups()[0], ip + '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '">' + load_lang('user') + ' - ' + load_lang('discussion') + '</a> (My)', today])
         
-        data = re.sub("\[\[(분류:(?:(?:(?!\]\]).)*))\]\]", "[br]", request.form.get('content', None))
+        data = re.sub("\[\[(분류:(?:(?:(?!\]\]).)*))\]\]", "[br]", flask.request.form.get('content', None))
         for rd_data in re.findall("(?:#([0-9]+))", data):
             curs.execute("select ip from topic where title = ? and sub = ? and id = ?", [name, sub, rd_data])
             ip_data = curs.fetchall()
@@ -2367,7 +2363,7 @@ def topic(name = None, sub = None):
 
             data += '<button type="submit">Send</button></form>'
 
-        return html_minify(render_template(skin_check(), 
+        return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
             imp = [name, wiki_set(1), custom(), other2([' (' + load_lang('discussion') + ')', 0])],
             data = '<h2 id="topic_top_title">' + sub + '</h2>' + all_data + data,
             menu = [['topic/' + url_pas(name), load_lang('list')]]
@@ -2379,11 +2375,11 @@ def close_topic_list(name = None, tool = None):
     div = ''
     list_d = 0
     
-    if request.method == 'POST':
+    if flask.request.method == 'POST':
         t_num = ''
         
         while 1:
-            curs.execute("select title from topic where title = ? and sub = ? limit 1", [name, request.form.get('topic', None) + t_num])
+            curs.execute("select title from topic where title = ? and sub = ? limit 1", [name, flask.request.form.get('topic', None) + t_num])
             if curs.fetchall():
                 if t_num == '':
                     t_num = ' 2'
@@ -2392,7 +2388,7 @@ def close_topic_list(name = None, tool = None):
             else:
                 break
 
-        return redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(request.form.get('topic', None) + t_num))
+        return redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(flask.request.form.get('topic', None) + t_num))
     else:
         plus = ''
         menu = [['topic/' + url_pas(name), load_lang('list')]]
@@ -2430,7 +2426,7 @@ def close_topic_list(name = None, tool = None):
         if div == '':
             plus = re.sub('^<br>', '', plus)
         
-        return html_minify(render_template(skin_check(), 
+        return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
             imp = [name, wiki_set(1), custom(), other2([' (' + sub + ')', 0])],
             data =  '<form method="post">' + div + plus + '</form>',
             menu = menu
@@ -2438,11 +2434,11 @@ def close_topic_list(name = None, tool = None):
         
 @app.route('/login', methods=['POST', 'GET'])
 def login():
-    if 'Now' in session and session['Now'] == 1:
+    if 'Now' in flask.session and flask.session['Now'] == 1:
         return re_error('/error/11')
 
     ip = ip_check()
-    agent = request.headers.get('User-Agent')
+    agent = flask.request.headers.get('User-Agent')
     
     curs.execute("select block from ban where block = ? and login = 'O'", [ip])
     if not curs.fetchall():
@@ -2463,36 +2459,36 @@ def login():
     if ban == 1:
         return re_error('/ban')
         
-    if request.method == 'POST':        
-        if captcha_post(request.form.get('g-recaptcha-response', None), conn) == 1:
+    if flask.request.method == 'POST':        
+        if captcha_post(flask.request.form.get('g-recaptcha-response', None), conn) == 1:
             return re_error('/error/13')
         else:
             captcha_post('', 0)
 
-        curs.execute("select pw from user where id = ?", [request.form.get('id', None)])
+        curs.execute("select pw from user where id = ?", [flask.request.form.get('id', None)])
         user = curs.fetchall()
         if not user:
             return re_error('/error/5')
 
-        if not bcrypt.checkpw(bytes(request.form.get('pw', None), 'utf-8'), bytes(user[0][0], 'utf-8')):
+        if not bcrypt.checkpw(bytes(flask.request.form.get('pw', None), 'utf-8'), bytes(user[0][0], 'utf-8')):
             return re_error('/error/10')
 
-        session['Now'] = 1
-        session['DREAMER'] = request.form.get('id', None)
+        flask.session['Now'] = 1
+        flask.session['DREAMER'] = flask.request.form.get('id', None)
         
-        curs.execute("select css from custom where user = ?", [request.form.get('id', None)])
+        curs.execute("select css from custom where user = ?", [flask.request.form.get('id', None)])
         css_data = curs.fetchall()
         if css_data:
-            session['Daydream'] = css_data[0][0]
+            flask.session['Daydream'] = css_data[0][0]
         else:
-            session['Daydream'] = ''
+            flask.session['Daydream'] = ''
         
-        curs.execute("insert into ua_d (name, ip, ua, today, sub) values (?, ?, ?, ?, '')", [request.form.get('id', None), ip, agent, get_time()])
+        curs.execute("insert into ua_d (name, ip, ua, today, sub) values (?, ?, ?, ?, '')", [flask.request.form.get('id', None), ip, agent, get_time()])
         conn.commit()
         
         return redirect('/user')  
     else:        
-        return html_minify(render_template(skin_check(),    
+        return css_html_js_minify.html_minify(flask.render_template(skin_check(),    
             imp = [load_lang('login'), wiki_set(1), custom(), other2([0, 0])],
             data = '''
                     <form method="post">
@@ -2516,25 +2512,25 @@ def change_password():
     if custom()[2] == 0:
         return redirect('/login')
     
-    if request.method == 'POST':    
-        if request.form.get('pw', None):
-            if request.form.get('pw2', None) != request.form.get('pw3', None):
+    if flask.request.method == 'POST':    
+        if flask.request.form.get('pw', None):
+            if flask.request.form.get('pw2', None) != flask.request.form.get('pw3', None):
                 return re_error('/error/20')
 
-            curs.execute("select pw from user where id = ?", [session['DREAMER']])
+            curs.execute("select pw from user where id = ?", [flask.session['DREAMER']])
             user = curs.fetchall()
             if not user:
                 return re_error('/error/10')
 
-            if not bcrypt.checkpw(bytes(request.form.get('pw', None), 'utf-8'), bytes(user[0][0], 'utf-8')):
+            if not bcrypt.checkpw(bytes(flask.request.form.get('pw', None), 'utf-8'), bytes(user[0][0], 'utf-8')):
                 return re_error('/error/5')
 
-            hashed = bcrypt.hashpw(bytes(request.form.get('pw2', None), 'utf-8'), bcrypt.gensalt())
+            hashed = bcrypt.hashpw(bytes(flask.request.form.get('pw2', None), 'utf-8'), bcrypt.gensalt())
             
-            curs.execute("update user set pw = ? where id = ?", [hashed.decode(), session['DREAMER']])
+            curs.execute("update user set pw = ? where id = ?", [hashed.decode(), flask.session['DREAMER']])
         
-        curs.execute("update user set email = ? where id = ?", [request.form.get('email', ''), ip_check()])
-        curs.execute("update user set skin = ? where id = ?", [request.form.get('skin', ''), ip_check()])
+        curs.execute("update user set email = ? where id = ?", [flask.request.form.get('email', ''), ip_check()])
+        curs.execute("update user set skin = ? where id = ?", [flask.request.form.get('skin', ''), ip_check()])
         conn.commit()
         
         return redirect('/change')
@@ -2566,7 +2562,7 @@ def change_password():
             else:
                 div2 += '<option value="' + skin_data + '">' + skin_data + '</option>'
 
-        return html_minify(render_template(skin_check(),    
+        return css_html_js_minify.html_minify(flask.render_template(skin_check(),    
             imp = [load_lang('my_info') + ' ' + load_lang('edit'), wiki_set(1), custom(), other2([0, 0])],
             data = '''
                     <form method="post">
@@ -2600,23 +2596,23 @@ def user_check(name = None):
     if admin_check(4, 'check (' + name + ')') != 1:
         return re_error('/error/3')
 
-    curs.execute("select acl from user where id = ? or id = ?", [name, request.args.get('plus', 'None-Data')])
+    curs.execute("select acl from user where id = ? or id = ?", [name, flask.request.args.get('plus', 'None-Data')])
     user = curs.fetchall()
     if user and user[0][0] != 'user':
         if admin_check(None, None) != 1:
             return re_error('/error/4')
     
-    if request.args.get('plus', None):
+    if flask.request.args.get('plus', None):
         if re.search('(?:\.|:)', name):
-            if re.search('(?:\.|:)', request.args.get('plus', None)):
-                curs.execute("select name, ip, ua, today from ua_d where ip = ? or ip = ? order by today desc", [name, request.args.get('plus', None)])
+            if re.search('(?:\.|:)', flask.request.args.get('plus', None)):
+                curs.execute("select name, ip, ua, today from ua_d where ip = ? or ip = ? order by today desc", [name, flask.request.args.get('plus', None)])
             else:
-                curs.execute("select name, ip, ua, today from ua_d where ip = ? or name = ? order by today desc", [name, request.args.get('plus', None)])
+                curs.execute("select name, ip, ua, today from ua_d where ip = ? or name = ? order by today desc", [name, flask.request.args.get('plus', None)])
         else:
-            if re.search('(?:\.|:)', request.args.get('plus', None)):
-                curs.execute("select name, ip, ua, today from ua_d where name = ? or ip = ? order by today desc", [name, request.args.get('plus', None)])
+            if re.search('(?:\.|:)', flask.request.args.get('plus', None)):
+                curs.execute("select name, ip, ua, today from ua_d where name = ? or ip = ? order by today desc", [name, flask.request.args.get('plus', None)])
             else:
-                curs.execute("select name, ip, ua, today from ua_d where name = ? or name = ? order by today desc", [name, request.args.get('plus', None)])
+                curs.execute("select name, ip, ua, today from ua_d where name = ? or name = ? order by today desc", [name, flask.request.args.get('plus', None)])
     elif re.search('(?:\.|:)', name):
         curs.execute("select name, ip, ua, today from ua_d where ip = ? order by today desc", [name])
     else:
@@ -2624,10 +2620,10 @@ def user_check(name = None):
     
     record = curs.fetchall()
     if record:
-        if not request.args.get('plus', None):
+        if not flask.request.args.get('plus', None):
             div = '<a href="/plus_check/' + url_pas(name) + '">(' + load_lang('compare') + ')</a><hr>'
         else:
-            div = '<a href="/check/' + url_pas(name) + '">(Main)</a> <a href="/check/' + url_pas(request.args.get('plus', None)) + '">(Sub)</a><hr>'
+            div = '<a href="/check/' + url_pas(name) + '">(Main)</a> <a href="/check/' + url_pas(flask.request.args.get('plus', None)) + '">(Sub)</a><hr>'
 
         div += '<table style="width: 100%; text-align: center;"><tbody><tr>'
         div += '<td style="width: 33.3%;">' + load_lang('name') + '</td><td style="width: 33.3%;">IP</td><td style="width: 33.3%;">언제</td></tr>'
@@ -2645,7 +2641,7 @@ def user_check(name = None):
     else:
         return re_error('/error/5')
             
-    return html_minify(render_template(skin_check(),    
+    return css_html_js_minify.html_minify(flask.render_template(skin_check(),    
         imp = ['' + load_lang('check') + '', wiki_set(1), custom(), other2([0, 0])],
         data = div,
         menu = [['manager', load_lang('admin')]]
@@ -2653,10 +2649,10 @@ def user_check(name = None):
 
 @app.route('/plus_check/<name>', methods=['POST', 'GET'])
 def plus_check(name):
-    if request.method == 'POST':
-        return redirect('/check/' + url_pas(name) + '?plus=' + url_pas(request.form.get('name2', None)))
+    if flask.request.method == 'POST':
+        return redirect('/check/' + url_pas(name) + '?plus=' + url_pas(flask.request.form.get('name2', None)))
     else:
-        return html_minify(render_template(skin_check(),
+        return css_html_js_minify.html_minify(flask.render_template(skin_check(),
             imp = ['' + load_lang('plus'), wiki_set(1), custom(), other2([0, 0])],
             data = '''
                     <form method="post">
@@ -2679,32 +2675,32 @@ def register():
         if set_d and set_d[0][0] == 'on':
             return re_error('/ban')
     
-    if request.method == 'POST': 
-        if captcha_post(request.form.get('g-recaptcha-response', None), conn) == 1:
+    if flask.request.method == 'POST': 
+        if captcha_post(flask.request.form.get('g-recaptcha-response', None), conn) == 1:
             return re_error('/error/13')
         else:
             captcha_post('', 0)
 
-        if request.form.get('pw', None) != request.form.get('pw2', None):
+        if flask.request.form.get('pw', None) != flask.request.form.get('pw2', None):
             return re_error('/error/20')
 
-        if re.search('(?:[^A-Za-zㄱ-힣0-9 ])', request.form.get('id', None)):
+        if re.search('(?:[^A-Za-zㄱ-힣0-9 ])', flask.request.form.get('id', None)):
             return re_error('/error/8')
 
-        if len(request.form.get('id', None)) > 32:
+        if len(flask.request.form.get('id', None)) > 32:
             return re_error('/error/7')
 
-        curs.execute("select id from user where id = ?", [request.form.get('id', None)])
+        curs.execute("select id from user where id = ?", [flask.request.form.get('id', None)])
         if curs.fetchall():
             return re_error('/error/6')
 
-        hashed = bcrypt.hashpw(bytes(request.form.get('pw', None), 'utf-8'), bcrypt.gensalt())
+        hashed = bcrypt.hashpw(bytes(flask.request.form.get('pw', None), 'utf-8'), bcrypt.gensalt())
         
         curs.execute("select id from user limit 1")
         if not curs.fetchall():
-            curs.execute("insert into user (id, pw, acl, date, email) values (?, ?, 'owner', ?, ?)", [request.form.get('id', None), hashed.decode(), get_time(), request.form.get('email', '')])
+            curs.execute("insert into user (id, pw, acl, date, email) values (?, ?, 'owner', ?, ?)", [flask.request.form.get('id', None), hashed.decode(), get_time(), flask.request.form.get('email', '')])
         else:
-            curs.execute("insert into user (id, pw, acl, date, email) values (?, ?, 'user', ?, ?)", [request.form.get('id', None), hashed.decode(), get_time(), request.form.get('email', '')])
+            curs.execute("insert into user (id, pw, acl, date, email) values (?, ?, 'user', ?, ?)", [flask.request.form.get('id', None), hashed.decode(), get_time(), flask.request.form.get('email', '')])
         
         conn.commit()
         
@@ -2717,7 +2713,7 @@ def register():
         if data and data[0][0] != '':
             contract = data[0][0] + '<hr>'
 
-        return html_minify(render_template(skin_check(),    
+        return css_html_js_minify.html_minify(flask.render_template(skin_check(),    
             imp = ['' + load_lang('register') + '', wiki_set(1), custom(), other2([0, 0])],
             data = '''
                     <form method="post">
@@ -2741,8 +2737,8 @@ def register():
             
 @app.route('/logout')
 def logout():
-    session['Now'] = 0
-    session.pop('DREAMER', None)
+    flask.session['Now'] = 0
+    flask.session.pop('DREAMER', None)
 
     return redirect('/user')
     
@@ -2754,19 +2750,19 @@ def user_ban(name = None):
         if admin_check(None, None) != 1:
             return re_error('/error/4')
 
-    if request.method == 'POST':
+    if flask.request.method == 'POST':
         if admin_check(1, 'ban (' + name + ')') != 1:
             return re_error('/error/3')
 
-        if request.form.get('year', 'no_end') == 'no_end':
+        if flask.request.form.get('year', 'no_end') == 'no_end':
             end = ''
         else:
-            end = request.form.get('year', '') + '-' + request.form.get('month', '') + '-' + request.form.get('day', '')
+            end = flask.request.form.get('year', '') + '-' + flask.request.form.get('month', '') + '-' + flask.request.form.get('day', '')
 
         if end == '--':
             end = ''
 
-        ban_insert(name, end, request.form.get('why', ''), request.form.get('login', ''), ip_check())
+        ban_insert(name, end, flask.request.form.get('why', ''), flask.request.form.get('login', ''), ip_check())
 
         return redirect('/ban/' + url_pas(name))     
     else:
@@ -2840,7 +2836,7 @@ def user_ban(name = None):
 
             data += '<input placeholder="' + load_lang('why') + '" name="why" type="text"><hr>' + plus
 
-        return html_minify(render_template(skin_check(), 
+        return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
             imp = [name, wiki_set(1), custom(), other2([' (' + now + ')', 0])],
             data = '<form method="post">' + data + '<button type="submit">' + now + '</button></form>',
             menu = [['manager', load_lang('admin')]]
@@ -2850,7 +2846,7 @@ def user_ban(name = None):
 def acl(name = None):
     check_ok = ''
     
-    if request.method == 'POST':
+    if flask.request.method == 'POST':
         check_data = 'acl (' + name + ')'
     else:
         check_data = None
@@ -2873,14 +2869,14 @@ def acl(name = None):
             else:
                 check_ok = 'disabled'
 
-    if request.method == 'POST':
+    if flask.request.method == 'POST':
         curs.execute("select title from acl where title = ?", [name])
         if curs.fetchall():
-            curs.execute("update acl set dec = ? where title = ?", [request.form.get('dec', ''), name])
-            curs.execute("update acl set dis = ? where title = ?", [request.form.get('dis', ''), name])
-            curs.execute("update acl set why = ? where title = ?", [request.form.get('why', ''), name])
+            curs.execute("update acl set dec = ? where title = ?", [flask.request.form.get('dec', ''), name])
+            curs.execute("update acl set dis = ? where title = ?", [flask.request.form.get('dis', ''), name])
+            curs.execute("update acl set why = ? where title = ?", [flask.request.form.get('why', ''), name])
         else:
-            curs.execute("insert into acl (title, dec, dis, why) values (?, ?, ?, ?)", [name, request.form.get('dec', ''), request.form.get('dis', ''), request.form.get('why', '')])
+            curs.execute("insert into acl (title, dec, dis, why) values (?, ?, ?, ?)", [name, flask.request.form.get('dec', ''), flask.request.form.get('dis', ''), flask.request.form.get('why', '')])
         
         curs.execute("select title from acl where title = ? and dec = '' and dis = ''", [name])
         if curs.fetchall():
@@ -2927,7 +2923,7 @@ def acl(name = None):
             if acl_data:
                 data += '<hr><input value="' + html.escape(acl_data[0][1]) + '" placeholder="' + load_lang('why') + '" name="why" type="text" ' + check_ok + '>'
             
-        return html_minify(render_template(skin_check(), 
+        return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
             imp = [name, wiki_set(1), custom(), other2([' (ACL)', 0])],
             data = '<form method="post">' + data + '<hr><button type="submit">ACL ' + load_lang('edit') + '</button></form>',
             menu = [['w/' + url_pas(name), load_lang('document')], ['manager', load_lang('admin')]]
@@ -2950,19 +2946,19 @@ def user_admin(name = None):
             if ip_check() == name:
                 return re_error('/error/3')
 
-    if request.method == 'POST':
+    if flask.request.method == 'POST':
         if admin_check(7, 'admin (' + name + ')') != 1:
             return re_error('/error/3')
 
         if owner != 1:
-            curs.execute('select name from alist where name = ? and acl = "owner"', [request.form.get('select', None)])
+            curs.execute('select name from alist where name = ? and acl = "owner"', [flask.request.form.get('select', None)])
             if curs.fetchall():
                 return re_error('/error/3')
 
-        if request.form.get('select', None) == 'X':
+        if flask.request.form.get('select', None) == 'X':
             curs.execute("update user set acl = 'user' where id = ?", [name])
         else:
-            curs.execute("update user set acl = ? where id = ?", [request.form.get('select', None), name])
+            curs.execute("update user set acl = ? where id = ?", [flask.request.form.get('select', None), name])
         
         conn.commit()
         
@@ -2987,7 +2983,7 @@ def user_admin(name = None):
                 else:
                     div += '<option value="' + data[0] + '">' + data[0] + '</option>'
         
-        return html_minify(render_template(skin_check(), 
+        return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
             imp = [name, wiki_set(1), custom(), other2([' (' + load_lang('authority') + ')', 0])],
             data =  '<form method="post"><select name="select">' + div + '</select><hr><button type="submit">' + load_lang('edit') + '</button></form>',
             menu = [['manager', load_lang('admin')]]
@@ -2995,8 +2991,8 @@ def user_admin(name = None):
     
 @app.route('/diff/<path:name>')
 def diff_data(name = None):
-    first = request.args.get('first', '1')
-    second = request.args.get('second', '1')
+    first = flask.request.args.get('first', '1')
+    second = flask.request.args.get('second', '1')
 
     curs.execute("select data from history where id = ? and title = ?", [first, name])
     first_raw_data = curs.fetchall()
@@ -3013,7 +3009,7 @@ def diff_data(name = None):
                 diff_data = difflib.SequenceMatcher(None, first_data, second_data)
                 result = re.sub('\r', '', diff(diff_data))
             
-            return html_minify(render_template(skin_check(), 
+            return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
                 imp = [name, wiki_set(1), custom(), other2([' (' + load_lang('compare') + ')', 0])],
                 data = '<pre>' + result + '</pre>',
                 menu = [['history/' + url_pas(name), load_lang('history')]]
@@ -3031,7 +3027,7 @@ def down(name = None):
         
     div += '</ul>'
     
-    return html_minify(render_template(skin_check(), 
+    return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
         imp = [name, wiki_set(1), custom(), other2([' (하위)', 0])],
         data = div,
         menu = [['w/' + url_pas(name), load_lang('document')]]
@@ -3044,7 +3040,7 @@ def read_view(name = None):
     acl = ''
     div = ''
 
-    num = request.args.get('num', None)
+    num = flask.request.args.get('num', None)
     if num:
         num = int(num)
 
@@ -3144,7 +3140,7 @@ def read_view(name = None):
     if data:
         acl += ' (A)'
             
-    if request.args.get('froms', None):
+    if flask.request.args.get('froms', None):
         else_data = re.sub('\r\n#(?:redirect|넘겨주기) (?P<in>(?:(?!\r\n).)+)\r\n', ' * Redirect : [[\g<in>]]', '\r\n' + else_data + '\r\n')
         else_data = re.sub('^\r\n', '', else_data)
         else_data = re.sub('\r\n$', '', else_data)
@@ -3164,9 +3160,9 @@ def read_view(name = None):
 
         menu += [['topic/' + url_pas(name), load_lang('discussion')], ['history/' + url_pas(name), load_lang('history')], ['xref/' + url_pas(name), load_lang('backlink')], ['acl/' + url_pas(name), 'ACL']]
 
-        if request.args.get('froms', None):
+        if flask.request.args.get('froms', None):
             menu += [['w/' + url_pas(name), '넘기기']]
-            end_data = '<ul id="redirect"><li><a href="/w/' + url_pas(request.args.get('froms', None)) + '?froms=' + url_pas(name) + '">' + request.args.get('froms', None) + '</a>에서 넘어 왔습니다.</li></ul><br>' + end_data
+            end_data = '<ul id="redirect"><li><a href="/w/' + url_pas(flask.request.args.get('froms', None)) + '?froms=' + url_pas(name) + '">' + flask.request.args.get('froms', None) + '</a>에서 넘어 왔습니다.</li></ul><br>' + end_data
 
         if uppage != 0:
             menu += [['w/' + url_pas(uppage), '상위']]
@@ -3183,7 +3179,7 @@ def read_view(name = None):
 
     div = end_data + div
 
-    return html_minify(render_template(skin_check(), 
+    return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
         imp = [name, wiki_set(1), custom(), other2([sub + acl, r_date])],
         data = div,
         menu = menu
@@ -3191,7 +3187,7 @@ def read_view(name = None):
 
 @app.route('/topic_record/<name>')
 def user_topic_list(name = None):
-    num = int(request.args.get('num', 1))
+    num = int(flask.request.args.get('num', 1))
     if num * 50 > 0:
         sql_num = num * 50 - 50
     else:
@@ -3229,7 +3225,7 @@ def user_topic_list(name = None):
     else:
         sub = 0 
     
-    return html_minify(render_template(skin_check(), 
+    return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
         imp = [load_lang('discussion') + ' ' + load_lang('record'), wiki_set(1), custom(), other2([sub, 0])],
         data = div,
         menu = [['other', load_lang('other')], ['user', load_lang('user')], ['count/' + url_pas(name), '' + load_lang('count') + ''], ['record/' + url_pas(name), load_lang('record')]]
@@ -3239,8 +3235,8 @@ def user_topic_list(name = None):
 @app.route('/<regex("record"):tool>/<name>')
 @app.route('/<regex("history"):tool>/<path:name>', methods=['POST', 'GET'])
 def recent_changes(name = None, tool = 'record'):
-    if request.method == 'POST':
-        return redirect('/diff/' + url_pas(name) + '?first=' + request.form.get('b', None) + '&second=' + request.form.get('a', None))
+    if flask.request.method == 'POST':
+        return redirect('/diff/' + url_pas(name) + '?first=' + flask.request.form.get('b', None) + '&second=' + flask.request.form.get('a', None))
     else:
         one_admin = admin_check(1, None)
         six_admin = admin_check(6, None)
@@ -3248,12 +3244,12 @@ def recent_changes(name = None, tool = 'record'):
         ban = ''
         select = ''
 
-        what = request.args.get('what', 'all')
+        what = flask.request.args.get('what', 'all')
 
         div = '<table style="width: 100%; text-align: center;"><tbody><tr>'
         
         if name:
-            num = int(request.args.get('num', 1))
+            num = int(flask.request.args.get('num', 1))
             if num * 50 > 0:
                 sql_num = num * 50 - 50
             else:
@@ -3418,7 +3414,7 @@ def recent_changes(name = None, tool = 'record'):
         if sub == '':
             sub = 0
                 
-        return html_minify(render_template(skin_check(), 
+        return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
             imp = [title, wiki_set(1), custom(), other2([sub, 0])],
             data = div,
             menu = menu
@@ -3429,25 +3425,25 @@ def upload():
     if ban_check() == 1:
         return re_error('/ban')
     
-    if request.method == 'POST':
-        if captcha_post(request.form.get('g-recaptcha-response', None), conn) == 1:
+    if flask.request.method == 'POST':
+        if captcha_post(flask.request.form.get('g-recaptcha-response', None), conn) == 1:
             return re_error('/error/13')
         else:
             captcha_post('', 0)
 
-        data = request.files.get('f_data', None)
+        data = flask.request.files.get('f_data', None)
         if not data:
             return re_error('/error/9')
 
-        if int(wiki_set(3)) * 1024 * 1024 < request.content_length:
+        if int(wiki_set(3)) * 1024 * 1024 < flask.request.content_length:
             return re_error('/error/17')
         
         value = os.path.splitext(data.filename)[1]
         if not value in ['.jpeg', '.jpg', '.gif', '.png', '.webp', '.JPEG', '.JPG', '.GIF', '.PNG', '.WEBP']:
             return re_error('/error/14')
     
-        if request.form.get('f_name', None):
-            name = request.form.get('f_name', None) + value
+        if flask.request.form.get('f_name', None):
+            name = flask.request.form.get('f_name', None) + value
         else:
             name = data.filename
         
@@ -3463,8 +3459,8 @@ def upload():
             
         ip = ip_check()
 
-        if request.form.get('f_lice', None):
-            lice = request.form.get('f_lice', None)
+        if flask.request.form.get('f_lice', None):
+            lice = flask.request.form.get('f_lice', None)
         else:
             if custom()[2] == 0:
                 lice = ip + ' Upload'
@@ -3491,7 +3487,7 @@ def upload():
         
         return redirect('/w/' + load_lang('file') + ':' + name)      
     else:
-        return html_minify(render_template(skin_check(), 
+        return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
             imp = [load_lang('upload'), wiki_set(1), custom(), other2([0, 0])],
             data =  '''
                     <form method="post" enctype="multipart/form-data" accept-charset="utf8">
@@ -3563,7 +3559,7 @@ def user_info():
         plus = '<li><a href="/login">' + load_lang('login') + '</a></li>'
         plus2 = ''
 
-    return html_minify(render_template(skin_check(), 
+    return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
         imp = [load_lang('user') + ' ' + load_lang('tool'), wiki_set(1), custom(), other2([0, 0])],
         data =  '''
                 <h2>상태</h2>
@@ -3603,7 +3599,7 @@ def watch_list():
 
     div += '<a href="/manager/13">(' + load_lang('plus') + ')</a>'
 
-    return html_minify(render_template(skin_check(), 
+    return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
         imp = ['' + load_lang('watchlist') + ' ' + load_lang('list'), wiki_set(1), custom(), other2([0, 0])],
         data = div,
         menu = [['manager', load_lang('admin')]]
@@ -3635,17 +3631,17 @@ def watch_list_name(name = None):
 def custom_head_view():
     ip = ip_check()
 
-    if request.method == 'POST':
+    if flask.request.method == 'POST':
         if custom()[2] != 0:
             curs.execute("select user from custom where user = ?", [ip + ' (head)'])
             if curs.fetchall():
-                curs.execute("update custom set css = ? where user = ?", [request.form.get('content', None), ip + ' (head)'])
+                curs.execute("update custom set css = ? where user = ?", [flask.request.form.get('content', None), ip + ' (head)'])
             else:
-                curs.execute("insert into custom (user, css) values (?, ?)", [ip + ' (head)', request.form.get('content', None)])
+                curs.execute("insert into custom (user, css) values (?, ?)", [ip + ' (head)', flask.request.form.get('content', None)])
             
             conn.commit()
 
-        session['MyMaiToNight'] = request.form.get('content', None)
+        flask.session['MyMaiToNight'] = flask.request.form.get('content', None)
 
         return redirect('/user')
     else:
@@ -3661,14 +3657,14 @@ def custom_head_view():
         else:
             start = '<span>' + load_lang('user_css_warring') + '</span><hr>'
             
-            if 'MyMaiToNight' in session:
-                data = session['MyMaiToNight']
+            if 'MyMaiToNight' in flask.session:
+                data = flask.session['MyMaiToNight']
             else:
                 data = ''
 
         start += '<span>&lt;style&gt;CSS&lt;/style&gt;<br>&lt;script&gt;JS&lt;/script&gt;</span><hr>'
 
-        return html_minify(render_template(skin_check(), 
+        return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
             imp = [load_lang('user') + ' HEAD', wiki_set(1), custom(), other2([0, 0])],
             data =  start + '''
                     <form method="post">
@@ -3702,7 +3698,7 @@ def count_edit(name = None):
     else:
         t_data = 0
 
-    return html_minify(render_template(skin_check(), 
+    return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
         imp = ['' + load_lang('count') + '', wiki_set(1), custom(), other2([0, 0])],
         data = '''
                 <ul>
@@ -3744,18 +3740,18 @@ def views(name = None):
         g = ['']
 
     if g == 'css':
-        return css_minify(send_from_directory('./views' + plus, rename))   
+        return css_html_js_minify.css_minify(flask.send_from_directory('./views' + plus, rename))   
     elif g == 'js':
-        return js_minify(send_from_directory('./views' + plus, rename))
+        return css_html_js_minify.js_minify(flask.send_from_directory('./views' + plus, rename))
     elif g == 'html':
-        return html_minify(send_from_directory('./views' + plus, rename))   
+        return css_html_js_minify.html_minify(flask.send_from_directory('./views' + plus, rename))   
     else:
-        return send_from_directory('./views' + plus, rename)
+        return flask.send_from_directory('./views' + plus, rename)
 
 @app.route('/<data>')
 def main_file(data = None):
     if re.search('\.(txt|html)$', data):
-        return send_from_directory('./', data)
+        return flask.send_from_directory('./', data)
     else:
         return ''
 
@@ -3775,6 +3771,6 @@ def error_404(e):
 
 if __name__=="__main__":
     app.secret_key = rep_key
-    http_server = HTTPServer(WSGIContainer(app))
+    http_server = tornado.httpserver.HTTPServer(tornado.wsgi.WSGIContainer(app))
     http_server.listen(rep_port)
-    IOLoop.instance().start()
+    tornado.ioloop.IOLoop.instance().start()

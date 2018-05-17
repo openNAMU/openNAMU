@@ -1,8 +1,6 @@
 ﻿# 모듈들 불러옴
-from css_html_js_minify import html_minify, js_minify, css_minify
-from flask import session, render_template
-from urllib import parse
-
+import css_html_js_minify
+import flask
 import json
 import sqlite3
 import hashlib
@@ -295,12 +293,12 @@ def ip_pas(raw_ip):
     return ip
 
 def custom():
-    if 'MyMaiToNight' in session:
-        user_head = session['MyMaiToNight']
+    if 'MyMaiToNight' in flask.session:
+        user_head = flask.session['MyMaiToNight']
     else:
         user_head = ''
 
-    if 'Now' in session and session['Now'] == 1:
+    if 'Now' in flask.session and flask.session['Now'] == 1:
         curs.execute('select name from alarm where name = ? limit 1', [ip_check()])
         if curs.fetchall():
             user_icon = 2
@@ -533,7 +531,7 @@ def re_error(data):
                 if end_data[0][1] != '':
                     end += '<li>Why : ' + end_data[0][1] + '</li>'
 
-        return html_minify(render_template(skin_check(), 
+        return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
             imp = ['Authority Error', wiki_set(1), custom(), other2([0, 0])],
             data = '<h2>Info</h2><ul>' + end + '</ul>',
             menu = 0
@@ -610,7 +608,7 @@ def re_error(data):
             data = '???'
 
         if title:
-            return html_minify(render_template(skin_check(), 
+            return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
                 imp = [title, wiki_set(1), custom(), other2([0, 0])],
                 data = '<h2>Error</h2><ul><li>' + data + '</li></ul>',
                 menu = 0
