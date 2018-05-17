@@ -18,7 +18,7 @@
     "tool": "도구",
     "plus": "추가",
     "open": "열린",
-    "search": " 검색",
+    "search": "검색",
     "user": "사용자",
     "alarm": "알림",
     "watchlist": "주시 문서",
@@ -70,5 +70,18 @@
     "preview": "미리보기",
     "next": "다음",
     "previous": "이전",
-    "no_login_warring": "비 로그인 상태로 진행 시 IP가 기록될 수 있습니다."
+    "no_login_warring": "비 로그인 상태로 진행 시 IP가 기록될 수 있습니다.",
+    "state": "상태",
+    "limitless": "무기한",
+    "period": "기간",
+    "now": "현재",
+    "blocked": "차단자",
+    "band": "대역",
+    "notice": "공지",
+    "writer": "작성자",
+    "upper": "상위",
+    "under": "하위",
+    "pass": "통과",
+    "category": "분류",
+    "authority_error": "권한이 부족합니다."
 }

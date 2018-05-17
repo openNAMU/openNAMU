@@ -17,10 +17,9 @@ import sys
 
 # 나머지 불러오기
 from func import *
-from set_mark.tool import savemark
 
 # 버전 표기
-r_ver = 'v3.0.4-Beta-' + str(int(datetime.datetime.fromtimestamp(os.path.getmtime('app.py')).strftime("%Y%m%d")))
+r_ver = 'v3.0.4-Beta-' + str(int(datetime.datetime.fromtimestamp(os.path.getmtime('app.py')).strftime('%Y%m%d')))
 print('Version : ' + r_ver)
 
 # set.json 설정 확인
@@ -33,7 +32,7 @@ except:
         
         new_json = str(input())
         if new_json != '':
-            with open("set.json", "w") as f:
+            with open('set.json', 'w') as f:
                 f.write('{ "db" : "' + new_json + '" }')
             
             json_data = open('set.json').read()
@@ -64,36 +63,36 @@ app.jinja_env.filters['md5_replace'] = md5_replace
 app.jinja_env.filters['load_lang'] = load_lang
 
 # 셋업 부분
-curs.execute("create table if not exists data(title text, data text)")
-curs.execute("create table if not exists history(id text, title text, data text, date text, ip text, send text, leng text, hide text)")
-curs.execute("create table if not exists rd(title text, sub text, date text)")
-curs.execute("create table if not exists user(id text, pw text, acl text, date text, email text, skin text)")
-curs.execute("create table if not exists ban(block text, end text, why text, band text, login text)")
-curs.execute("create table if not exists topic(id text, title text, sub text, data text, date text, ip text, block text, top text)")
-curs.execute("create table if not exists stop(title text, sub text, close text)")
-curs.execute("create table if not exists rb(block text, end text, today text, blocker text, why text, band text)")
-curs.execute("create table if not exists back(title text, link text, type text)")
-curs.execute("create table if not exists agreedis(title text, sub text)")
-curs.execute("create table if not exists custom(user text, css text)")
-curs.execute("create table if not exists other(name text, data text)")
-curs.execute("create table if not exists alist(name text, acl text)")
-curs.execute("create table if not exists re_admin(who text, what text, time text)")
-curs.execute("create table if not exists alarm(name text, data text, date text)")
-curs.execute("create table if not exists ua_d(name text, ip text, ua text, today text, sub text)")
-curs.execute("create table if not exists filter(name text, regex text, sub text)")
-curs.execute("create table if not exists scan(user text, title text)")
-curs.execute("create table if not exists acl(title text, dec text, dis text, why text)")
-curs.execute("create table if not exists inter(title text, link text)")
-curs.execute("create table if not exists html_filter(html text)")
+curs.execute('create table if not exists data(title text, data text)')
+curs.execute('create table if not exists history(id text, title text, data text, date text, ip text, send text, leng text, hide text)')
+curs.execute('create table if not exists rd(title text, sub text, date text)')
+curs.execute('create table if not exists user(id text, pw text, acl text, date text, email text, skin text)')
+curs.execute('create table if not exists ban(block text, end text, why text, band text, login text)')
+curs.execute('create table if not exists topic(id text, title text, sub text, data text, date text, ip text, block text, top text)')
+curs.execute('create table if not exists stop(title text, sub text, close text)')
+curs.execute('create table if not exists rb(block text, end text, today text, blocker text, why text, band text)')
+curs.execute('create table if not exists back(title text, link text, type text)')
+curs.execute('create table if not exists agreedis(title text, sub text)')
+curs.execute('create table if not exists custom(user text, css text)')
+curs.execute('create table if not exists other(name text, data text)')
+curs.execute('create table if not exists alist(name text, acl text)')
+curs.execute('create table if not exists re_admin(who text, what text, time text)')
+curs.execute('create table if not exists alarm(name text, data text, date text)')
+curs.execute('create table if not exists ua_d(name text, ip text, ua text, today text, sub text)')
+curs.execute('create table if not exists filter(name text, regex text, sub text)')
+curs.execute('create table if not exists scan(user text, title text)')
+curs.execute('create table if not exists acl(title text, dec text, dis text, why text)')
+curs.execute('create table if not exists inter(title text, link text)')
+curs.execute('create table if not exists html_filter(html text)')
 
 # owner 존재 확인
-curs.execute("select name from alist where acl = 'owner'")
+curs.execute('select name from alist where acl = "owner"')
 if not curs.fetchall():
-    curs.execute("delete from alist where name = 'owner'")
-    curs.execute("insert into alist (name, acl) values ('owner', 'owner')")
+    curs.execute('delete from alist where name = "owner"')
+    curs.execute('insert into alist (name, acl) values ("owner", "owner")')
 
 # 포트 점검
-curs.execute("select data from other where name = 'port'")
+curs.execute('select data from other where name = "port"')
 rep_data = curs.fetchall()
 if not rep_data:
     while 1:
@@ -101,7 +100,7 @@ if not rep_data:
         
         rep_port = int(input())
         if rep_port:
-            curs.execute("insert into other (name, data) values ('port', ?)", [rep_port])
+            curs.execute('insert into other (name, data) values ("port", ?)', [rep_port])
             
             break
         else:
@@ -114,7 +113,7 @@ else:
 # robots.txt 점검
 try:
     if not os.path.exists('robots.txt'):
-        curs.execute("select data from other where name = 'robot'")
+        curs.execute('select data from other where name = "robot"')
         robot_test = curs.fetchall()
         if robot_test:
             fw_test = open('./robots.txt', 'w')
@@ -125,14 +124,14 @@ try:
             fw_test.write('User-agent: *\nDisallow: /\nAllow: /$\nAllow: /w/')
             fw_test.close()
 
-            curs.execute("insert into other (name, data) values ('robot', 'User-agent: *\nDisallow: /\nAllow: /$\nAllow: /w/')")
+            curs.execute('insert into other (name, data) values ("robot", "User-agent: *\nDisallow: /\nAllow: /$\nAllow: /w/")')
         
         print('robots.txt create')
 except:
     pass
 
 # 비밀 키 점검
-curs.execute("select data from other where name = 'key'")
+curs.execute('select data from other where name = "key"')
 rep_data = curs.fetchall()
 if not rep_data:
     while 1:
@@ -140,7 +139,7 @@ if not rep_data:
         
         rep_key = str(input())
         if rep_key:
-            curs.execute("insert into other (name, data) values ('key', ?)", [rep_key])
+            curs.execute('insert into other (name, data) values ("key", ?)', [rep_key])
             
             break
         else:
@@ -1088,15 +1087,8 @@ def xref(name = None):
     for data in data_list:
         div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a>'
         
-        if data[1]:
-            if data[1] == 'include':
-                side = '포함'
-            elif data[1] == 'file':
-                side = '' + load_lang('file') + ''
-            else:
-                side = '넘겨주기'
-                
-            div += ' (' + side + ')'
+        if data[1]:                
+            div += ' (' + data[1] + ')'
         
         div += '</li>'
         
@@ -1194,16 +1186,16 @@ def block_log(name = None, tool = None, tool2 = None):
     else:
         sql_num = 0
     
-    div = '<table style="width: 100%; text-align: center;"><tbody><tr><td style="width: 33.3%;">차단자</td><td style="width: 33.3%;">' + load_lang('admin') + '</td><td style="width: 33.3%;">기간</td></tr>'
+    div = '<table style="width: 100%; text-align: center;"><tbody><tr><td style="width: 33.3%;">' + load_lang('blocked') + '</td><td style="width: 33.3%;">' + load_lang('admin') + '</td><td style="width: 33.3%;">' + load_lang('period ') + '</td></tr>'
     
     data_list = ''
     
     if not name:
         if not tool2:
             div = '''
-                    <a href="/manager/11">(차단자)</a> <a href="/manager/12">(''' + load_lang('admin') + ''')</a>
+                    <a href="/manager/11">(' + load_lang('blocked') + ')</a> <a href="/manager/12">(''' + load_lang('admin') + ''')</a>
                     <hr>
-                    <a href="/block_log/ip">(IP)</a> <a href="/block_log/user">(''' + load_lang('subscriber') + ''')</a> <a href="/block_log/never_end">(무기한)</a> <a href="/block_log/can_end">(기간)</a> <a href="/block_log/end">(''' + load_lang('release') + ''')</a> <a href="/block_log/now">(현재)</a> <a href="/block_log/edit_filter">(''' + load_lang('edit_filter') + ''')</a>
+                    <a href="/block_log/ip">(IP)</a> <a href="/block_log/user">(''' + load_lang('subscriber') + ')</a> <a href="/block_log/never_end">(' + load_lang('limitless') + ')</a> <a href="/block_log/can_end">(' + load_lang('period ') + ')</a> <a href="/block_log/end">(' + load_lang('release') + ')</a> <a href="/block_log/now">(' + load_lang('now') + ')</a> <a href="/block_log/edit_filter">(' + load_lang('edit_filter') + ''')</a>
                     <hr>
                     ''' + div
             
@@ -1223,7 +1215,7 @@ def block_log(name = None, tool = None, tool2 = None):
                 
                 curs.execute("select why, block, blocker, end, today from rb where not (block like ? or block like ?) order by today desc limit ?, '50'", ['%.%', '%:%', str(sql_num)])
             elif tool2 == 'never_end':
-                sub = '(무기한)'
+                sub = '(' + load_lang('limitless') + ')'
                 
                 curs.execute("select why, block, blocker, end, today from rb where not end like ? and not end like ? order by today desc limit ?, '50'", ['%:%', '%' + load_lang('release') + '%', str(sql_num)])
             elif tool2 == 'end':
@@ -1231,7 +1223,7 @@ def block_log(name = None, tool = None, tool2 = None):
                 
                 curs.execute("select why, block, blocker, end, today from rb where end = ? order by today desc limit ?, '50'", [load_lang('release'), str(sql_num)])
             elif tool2 == 'now':
-                sub = '(현재)'
+                sub = '(' + load_lang('now') + ')'
                 
                 data_list = []
                 
@@ -1245,14 +1237,14 @@ def block_log(name = None, tool = None, tool2 = None):
 
                 curs.execute("select why, block, blocker, end, today from rb where blocker = ? order by today desc limit ?, '50'", [load_lang('tool') + ':' + load_lang('edit_filter'), str(sql_num)])
             else:
-                sub = '(기간)'
+                sub = '(' + load_lang('period ') + ')'
                 
                 curs.execute("select why, block, blocker, end, today from rb where end like ? order by today desc limit ?, '50'", ['%\-%', str(sql_num)])
     else:
         menu = [['block_log', load_lang('normal')]]
         
         if tool == 'block_user':
-            sub = ' (차단자)'
+            sub = ' (' + load_lang('blocked') + ')'
             
             curs.execute("select why, block, blocker, end, today from rb where block = ? order by today desc limit ?, '50'", [name, str(sql_num)])
         else:
@@ -1270,16 +1262,16 @@ def block_log(name = None, tool = None, tool2 = None):
         
         band = re.search("^([0-9]{1,3}\.[0-9]{1,3})$", data[1])
         if band:
-            ip = data[1] + ' (대역)'
+            ip = data[1] + ' (' + load_lang('band') + ')'
         else:
             ip = ip_pas(data[1])
 
         if data[3] != '':
             end = data[3]
         else:
-            end = '무기한'
+            end = '' + load_lang('limitless') + ''
             
-        div += '<tr><td>' + ip + '</td><td>' + ip_pas(data[2]) + '</td><td>시작 : ' + data[4] + '<br>끝 : ' + end + '</td></tr>'
+        div += '<tr><td>' + ip + '</td><td>' + ip_pas(data[2]) + '</td><td>Start : ' + data[4] + '<br>End : ' + end + '</td></tr>'
         div += '<tr><td colspan="3">' + why + '</td></tr>'
 
     div += '</tbody></table>'
@@ -1381,7 +1373,7 @@ def raw_view(name = None, sub_title = None, num = None):
         curs.execute("select data from topic where id = ? and title = ? and sub = ? and block = ''", [str(num), name, sub_title])
         
         v_name = load_lang('discussion') + ' Raw'
-        sub = ' (' + str(num) + '번)'
+        sub = ' (' + str(num) + ')'
 
         menu = [['topic/' + url_pas(name) + '/sub/' + url_pas(sub_title) + '#' + str(num), load_lang('discussion')], ['topic/' + url_pas(name) + '/sub/' + url_pas(sub_title) + '/admin/' + str(num), load_lang('tool')]]
     else:
@@ -1556,9 +1548,9 @@ def set_edit_filter(name = None):
 
         curs.execute("select name from filter where name = ?", [name])
         if curs.fetchall():
-            curs.execute("update filter set regex = ?, sub = ? where name = ?", [flask.request.form.get('content', '테스트'), end, name])
+            curs.execute("update filter set regex = ?, sub = ? where name = ?", [flask.request.form.get('content', 'Test'), end, name])
         else:
-            curs.execute("insert into filter (name, regex, sub) values (?, ?, ?)", [name, flask.request.form.get('content', '테스트'), end])
+            curs.execute("insert into filter (name, regex, sub) values (?, ?, ?)", [name, flask.request.form.get('content', 'Test'), end])
 
         conn.commit()
     
@@ -1589,7 +1581,7 @@ def set_edit_filter(name = None):
                         <input ''' + stat + ''' type="checkbox" ''' + time_data + ''' name="ban">
                         ''' + load_lang('ban') + '''
                         <hr>
-                        <input ''' + stat + ''' placeholder="정규식" name="content" value="''' + html.escape(textarea) + '''" type="text">
+                        <input ''' + stat + ''' placeholder="Regex" name="content" value="''' + html.escape(textarea) + '''" type="text">
                         <hr>
                         <button ''' + stat + ''' id="save" type="submit">''' + load_lang('save') + '''</button>
                     </form>''',
@@ -2037,7 +2029,7 @@ def title_index():
         else:
             count_end += [0]
 
-        sql_list = ['틀:', '분류:', load_lang('user') + ':', '' + load_lang('file') + ':']
+        sql_list = ['틀:', '' + load_lang('category') + ':', load_lang('user') + ':', '' + load_lang('file') + ':']
         for sql in sql_list:
             curs.execute("select count(title) from data where title like ?", [sql + '%'])
             count = curs.fetchall()
@@ -2056,7 +2048,7 @@ def title_index():
         data += '<li>Other : ' + str(count_end[5]) + '</li>'
 
     data += '</ul>' + next_fix('/title_index?num=' + str(num) + '&page=', page, title_list, num)
-    sub = ' (' + str(num) + '개)'
+    sub = ' (' + str(num) + ')'
     
     return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
         imp = [load_lang('all') + ' ' + load_lang('document'), wiki_set(1), custom(), other2([sub, 0])],
@@ -2158,7 +2150,7 @@ def topic_admin(name = None, sub = None, num = None):
     ban = ''
 
     if admin_check(3, None) == 1:
-        ban += '</ul><br><h2>관리자 ' + load_lang('tool') + '</h2><ul>'
+        ban += '</ul><br><h2>' + load_lang('admin') + ' ' + load_lang('tool') + '</h2><ul>'
         is_ban = '<li><a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/b/' + str(num) + '">'
 
         if data[0][0] == 'O':
@@ -2171,9 +2163,9 @@ def topic_admin(name = None, sub = None, num = None):
 
         curs.execute("select id from topic where title = ? and sub = ? and id = ? and top = 'O'", [name, sub, str(num)])
         if curs.fetchall():
-            is_ban += '공지 ' + load_lang('release')
+            is_ban += '' + load_lang('notice') + ' ' + load_lang('release')
         else:
-            is_ban += '공지'
+            is_ban += '' + load_lang('notice') + ''
         
         is_ban += '</a></li></ul>'
         ban += '<li><a href="/ban/' + url_pas(data[0][1]) + '">'
@@ -2191,14 +2183,14 @@ def topic_admin(name = None, sub = None, num = None):
     ban = '<li>' + load_lang('time') + ' : ' + data[0][2] + '</li>' + ban
     
     if re.search('(\.|:)', data[0][1]):
-        ban = '<li>작성인 : ' + data[0][1] + ' <li><a href="/record/' + url_pas(data[0][1]) + '">(' + load_lang('record') + ')</a></li>' + ban
+        ban = '<li>' + load_lang('writer') + ' : ' + data[0][1] + ' <a href="/record/' + url_pas(data[0][1]) + '">(' + load_lang('record') + ')</a></li>' + ban
     else:
-        ban = '<li>작성인 : <a href="/w/' + load_lang('user') + ':' + data[0][1] + '">' + data[0][1] + '</a> <a href="/record/' + url_pas(data[0][1]) + '">(' + load_lang('record') + ')</a></li>' + ban
+        ban = '<li>' + load_lang('writer') + ' : <a href="/w/' + load_lang('user') + ':' + data[0][1] + '">' + data[0][1] + '</a> <a href="/record/' + url_pas(data[0][1]) + '">(' + load_lang('record') + ')</a></li>' + ban
 
-    ban = '<h2>정보</h2><ul>' + ban
+    ban = '<h2>' + load_lang('state') + '</h2><ul>' + ban
 
     return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
-        imp = [load_lang('discussion') + ' ' + load_lang('tool'), wiki_set(1), custom(), other2([' (' + str(num) + '번)', 0])],
+        imp = [load_lang('discussion') + ' ' + load_lang('tool'), wiki_set(1), custom(), other2([' (' + str(num) + ')', 0])],
         data = ban,
         menu = [['topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '#' + str(num), load_lang('discussion')]]
     ))
@@ -2231,7 +2223,7 @@ def topic(name = None, sub = None):
         if match:
             curs.execute('insert into alarm (name, data, date) values (?, ?, ?)', [match.groups()[0], ip + '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '">' + load_lang('user') + ' - ' + load_lang('discussion') + '</a> (My)', today])
         
-        data = re.sub("\[\[(분류:(?:(?:(?!\]\]).)*))\]\]", "[br]", flask.request.form.get('content', None))
+        data = re.sub('\[\[(' + load_lang('category') + ':(?:(?:(?!\]\]).)*))\]\]', '[br]', flask.request.form.get('content', None))
         for rd_data in re.findall("(?:#([0-9]+))", data):
             curs.execute("select ip from topic where title = ? and sub = ? and id = ?", [name, sub, rd_data])
             ip_data = curs.fetchall()
@@ -2331,7 +2323,7 @@ def topic(name = None, sub = None):
 
             curs.execute("select end from ban where block = ?", [topic_data[3]])
             if curs.fetchall():
-                ip += ' <a href="javascript:void(0);" title="차단자">†</a>'
+                ip += ' <a href="javascript:void(0);" title="' + load_lang('blocked') + '">†</a>'
                     
             if topic_data[5] == '1':
                 color = '_blue'
@@ -2626,7 +2618,7 @@ def user_check(name = None):
             div = '<a href="/check/' + url_pas(name) + '">(Main)</a> <a href="/check/' + url_pas(flask.request.args.get('plus', None)) + '">(Sub)</a><hr>'
 
         div += '<table style="width: 100%; text-align: center;"><tbody><tr>'
-        div += '<td style="width: 33.3%;">' + load_lang('name') + '</td><td style="width: 33.3%;">IP</td><td style="width: 33.3%;">언제</td></tr>'
+        div += '<td style="width: 33.3%;">' + load_lang('name') + '</td><td style="width: 33.3%;">IP</td><td style="width: 33.3%;">' + load_lang('time') + '</td></tr>'
         
         for data in record:
             if data[2]:
@@ -2775,7 +2767,7 @@ def user_ban(name = None):
             now = load_lang('ban') + ' ' + load_lang('release')
 
             if end[0][0] == '':
-                data = '<ul><li>무기한 ' + load_lang('ban') + '</li>'
+                data = '<ul><li>' + load_lang('limitless') + ' ' + load_lang('ban') + '</li>'
             else:
                 data = '<ul><li>' + load_lang('ban') + ' : ' + end[0][0] + '</li>'
 
@@ -2785,7 +2777,7 @@ def user_ban(name = None):
                 data += '</ul><hr>'
         else:
             if re.search("^([0-9]{1,3}\.[0-9]{1,3})$", name):
-                now = '대역 ' + load_lang('ban')
+                now = '' + load_lang('band') + ' ' + load_lang('ban')
             else:
                 now = load_lang('ban')
 
@@ -2794,7 +2786,7 @@ def user_ban(name = None):
             m = re.search('^([0-9]{4})-([0-9]{2})-([0-9]{2})', now_time)
             g = m.groups()
 
-            year = '<option value="no_end">영구</option>'
+            year = '<option value="no_end">' + load_lang('limitless') + '</option>'
             for i in range(int(g[0]), int(g[0]) + 11):
                 if i == int(g[0]):
                     year += '<option value="' + str(i) + '" selected>' + str(i) + '</option>'
@@ -2889,9 +2881,9 @@ def acl(name = None):
         data = '<h2>' + load_lang('document') + ' ACL</h2><select name="dec" ' + check_ok + '>'
     
         if re.search('^' + load_lang('user') + ':', name):
-            acl_list = [['', load_lang('normal')], ['user', load_lang('subscriber')], ['all', '모두']]
+            acl_list = [['', load_lang('normal')], ['user', load_lang('subscriber')], ['all', '' + load_lang('all') + '']]
         else:
-            acl_list = [['', load_lang('normal')], ['user', load_lang('subscriber')], ['admin', '관리자']]
+            acl_list = [['', load_lang('normal')], ['user', load_lang('subscriber')], ['admin', '' + load_lang('admin') + '']]
         
         curs.execute("select dec from acl where title = ?", [name])
         acl_data = curs.fetchall()
@@ -3028,7 +3020,7 @@ def down(name = None):
     div += '</ul>'
     
     return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
-        imp = [name, wiki_set(1), custom(), other2([' (하위)', 0])],
+        imp = [name, wiki_set(1), custom(), other2([' (' + load_lang('under') + ')', 0])],
         data = div,
         menu = [['w/' + url_pas(name), load_lang('document')]]
     ))
@@ -3048,7 +3040,7 @@ def read_view(name = None):
     for data in curs.fetchall():
         curs.execute("select title from stop where title = ? and sub = ? and close = 'O'", [name, data[0]])
         if not curs.fetchall():
-            sub += ' (D)'
+            sub += ' (' + load_lang('discussion') + ')'
 
             break
                 
@@ -3069,16 +3061,16 @@ def read_view(name = None):
     else:
         admin_memu = 0
         
-    if re.search("^분류:", name):        
+    if re.search('^' + load_lang('category') + ':', name):        
         curs.execute("select link from back where title = ? and type = 'cat' order by link asc", [name])
         back = curs.fetchall()
         if back:
-            div = '<br><h2 id="cate_normal">분류</h2><ul>'
+            div = '<br><h2 id="cate_normal">' + load_lang('category') + '</h2><ul>'
             u_div = ''
             i = 0
 
             for data in back:    
-                if re.search('^분류:', data[0]):
+                if re.search('^' + load_lang('category') + ':', data[0]):
                     u_div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a></li>'
                 elif re.search('^틀:', data[0]):
                     curs.execute("select data from data where title = ?", [data[0]])
@@ -3095,11 +3087,11 @@ def read_view(name = None):
 
             div += '</ul>'
             
-            if div == '<br><h2 id="cate_normal">분류</h2><ul></ul>':
+            if div == '<br><h2 id="cate_normal">' + load_lang('category') + '</h2><ul></ul>':
                 div = ''
             
             if u_div != '':
-                div += '<br><h2 id="cate_under">하위 분류</h2><ul>' + u_div + '</ul>'
+                div += '<br><h2 id="cate_under">' + load_lang('under') + ' ' + load_lang('category') + '</h2><ul>' + u_div + '</ul>'
 
 
     if num:
@@ -3138,7 +3130,7 @@ def read_view(name = None):
     curs.execute("select dec from acl where title = ?", [name])
     data = curs.fetchall()
     if data:
-        acl += ' (A)'
+        acl += ' (ACL)'
             
     if flask.request.args.get('froms', None):
         else_data = re.sub('\r\n#(?:redirect|넘겨주기) (?P<in>(?:(?!\r\n).)+)\r\n', ' * Redirect : [[\g<in>]]', '\r\n' + else_data + '\r\n')
@@ -3161,14 +3153,14 @@ def read_view(name = None):
         menu += [['topic/' + url_pas(name), load_lang('discussion')], ['history/' + url_pas(name), load_lang('history')], ['xref/' + url_pas(name), load_lang('backlink')], ['acl/' + url_pas(name), 'ACL']]
 
         if flask.request.args.get('froms', None):
-            menu += [['w/' + url_pas(name), '넘기기']]
-            end_data = '<ul id="redirect"><li><a href="/w/' + url_pas(flask.request.args.get('froms', None)) + '?froms=' + url_pas(name) + '">' + flask.request.args.get('froms', None) + '</a>에서 넘어 왔습니다.</li></ul><br>' + end_data
+            menu += [['w/' + url_pas(name), '' + load_lang('pass') + '']]
+            end_data = '<ul id="redirect"><li>Redirect : <a href="/w/' + url_pas(flask.request.args.get('froms', None)) + '?froms=' + url_pas(name) + '">' + flask.request.args.get('froms', None) + '</a></li></ul><br>' + end_data
 
         if uppage != 0:
-            menu += [['w/' + url_pas(uppage), '상위']]
+            menu += [['w/' + url_pas(uppage), '' + load_lang('upper') + '']]
 
         if down:
-            menu += [['down/' + url_pas(name), '하위']]
+            menu += [['down/' + url_pas(name), '' + load_lang('under') + '']]
     
         curs.execute("select date from history where title = ? order by date desc limit 1", [name])
         date = curs.fetchall()
@@ -3196,7 +3188,7 @@ def user_topic_list(name = None):
     one_admin = admin_check(1, None)
 
     div = '<table style="width: 100%; text-align: center;"><tbody><tr>'
-    div += '<td style="width: 33.3%;">' + load_lang('discussion') + ' ' + load_lang('name') + '</td><td style="width: 33.3%;">작성자</td><td style="width: 33.3%;">' + load_lang('time') + '</td></tr>'
+    div += '<td style="width: 33.3%;">' + load_lang('discussion') + ' ' + load_lang('name') + '</td><td style="width: 33.3%;">' + load_lang('writer') + '</td><td style="width: 33.3%;">' + load_lang('time') + '</td></tr>'
     
     curs.execute("select title, id, sub, ip, date from topic where ip = ? order by date desc limit ?, '50'", [name, str(sql_num)])
     data_list = curs.fetchall()
@@ -3339,7 +3331,7 @@ def recent_changes(name = None, tool = 'record'):
             
             if six_admin == 1:
                 if hide:                            
-                    hidden = ' <a href="/hidden/' + url_pas(data[1]) + '?num=' + data[0] + '">(공개)'
+                    hidden = ' <a href="/hidden/' + url_pas(data[1]) + '?num=' + data[0] + '">(' + load_lang('all') + ')'
                     
                     style[0] = 'background: gainsboro;'
                     style[1] = 'background: gainsboro;'
@@ -3531,20 +3523,20 @@ def user_info():
         block_data = curs.fetchall()
         if block_data:
             if block_data[0][0] != '':
-                acl += ' (' + block_data[0][0] + '까지)'
+                acl += ' (End : ' + block_data[0][0] + ')'
             else:
-                acl += ' (무기한)'        
+                acl += ' (' + load_lang('limitless') + ')'        
 
             if block_data[0][1] != '':
                 acl += ' (' + load_lang('login') + ' ' + load_lang('able') + ')'
 
             if block_data[0][2] == 'O':
-                acl += ' (대역)'
+                acl += ' (' + load_lang('band') + ')'
             
     if custom()[2] != 0:
         ip_user = '<a href="/w/' + load_lang('user') + ':' + ip + '">' + ip + '</a>'
         
-        plus = '<li><a href="/logout">로그아웃</a></li><li><a href="/change">' + load_lang('my_info') + ' ' + load_lang('edit') + '</a></li>'
+        plus = '<li><a href="/logout">' + load_lang('logout') + '</a></li><li><a href="/change">' + load_lang('my_info') + ' ' + load_lang('edit') + '</a></li>'
         
         curs.execute('select name from alarm where name = ? limit 1', [ip_check()])
         if curs.fetchall():
@@ -3562,7 +3554,7 @@ def user_info():
     return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
         imp = [load_lang('user') + ' ' + load_lang('tool'), wiki_set(1), custom(), other2([0, 0])],
         data =  '''
-                <h2>상태</h2>
+                <h2>''' + load_lang('state') + '''</h2>
                 <ul>
                     <li>''' + ip_user + ''' <a href="/record/''' + url_pas(ip) + '''">(''' + load_lang('record') + ''')</a></li><li>''' + load_lang('authority') + ''' : ''' + acl + '''</li>
                 </ul>
