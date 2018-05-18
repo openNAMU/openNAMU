@@ -286,11 +286,11 @@ def ip_pas(raw_ip):
             ip = raw_ip
             hide = 1
     else:
-        curs.execute("select title from data where title = ?", ['' + load_lang('user') + ':' + raw_ip])
+        curs.execute("select title from data where title = ?", [load_lang('user') + ':' + raw_ip])
         if curs.fetchall():
-            ip = '<a href="/w/' + url_pas('' + load_lang('user') + ':' + raw_ip) + '">' + raw_ip + '</a>'
+            ip = '<a href="/w/' + url_pas(load_lang('user') + ':' + raw_ip) + '">' + raw_ip + '</a>'
         else:
-            ip = '<a id="not_thing" href="/w/' + url_pas('' + load_lang('user') + ':' + raw_ip) + '">' + raw_ip + '</a>'
+            ip = '<a id="not_thing" href="/w/' + url_pas(load_lang('user') + ':' + raw_ip) + '">' + raw_ip + '</a>'
          
     if hide == 0:
         ip += ' <a href="/record/' + url_pas(raw_ip) + '">(' + load_lang('record') + ')</a>'
@@ -325,7 +325,7 @@ def custom():
     if user_icon != 0:
         user_name = ip_check()
     else:
-        user_name = '' + load_lang('user') + ''
+        user_name = load_lang('user')
 
     return ['', '', user_icon, user_head, email, user_name]
 
@@ -342,7 +342,7 @@ def acl_check(name):
         if admin_check(5, None) == 1:
             return 0
 
-        curs.execute("select dec from acl where title = ?", ['' + load_lang('user') + ':' + acl_n[0]])
+        curs.execute("select dec from acl where title = ?", [load_lang('user') + ':' + acl_n[0]])
         acl_data = curs.fetchall()
         if acl_data:
             if acl_data[0][0] == 'all':
@@ -455,7 +455,7 @@ def ban_insert(name, end, why, login, blocker):
 
     curs.execute("select block from ban where block = ?", [name])
     if curs.fetchall():
-        curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, ?)", [name, '' + load_lang('release') + '', time, blocker, '', band])
+        curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, ?)", [name, load_lang('release'), time, blocker, '', band])
         curs.execute("delete from ban where block = ?", [name])
     else:
         if login != '':
@@ -527,14 +527,14 @@ def re_error(data):
 
                         end += 'Re Try.'
                     else:
-                        end += 'Ban : ' + end_data[0][0]
+                        end += load_lang('why') + ' : ' + end_data[0][0]
                 else:
-                    end += 'Ban : No End'
+                    end += load_lang('why') + ' : ' + load_lang('limitless')
                 
                 end += '</li>'
 
                 if end_data[0][1] != '':
-                    end += '<li>Why : ' + end_data[0][1] + '</li>'
+                    end += '<li>' + load_lang('why') + ' : ' + end_data[0][1] + '</li>'
 
         return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
             imp = ['Error', wiki_set(1), custom(), other2([0, 0])],
@@ -546,47 +546,41 @@ def re_error(data):
     if error_data:
         num = int(error_data.groups()[0])
         if num == 1:
-            data = '비 로그인 상태 입니다.'
+            data = load_lang('no_login_error')
         elif num == 2:
-            data = '이 계정이 없습니다.'
+            data = load_lang('no_exist_user_error')
         elif num == 3:
-            data = '권한이 모자랍니다.'
+            data = load_lang('authority_error')
         elif num == 4:
-            data = '관리자는 차단, 검사 할 수 없습니다.'
-        elif num == 5:
-            data = '그런 계정이 없습니다.'
+            data = load_lang('no_admin_block_error')
         elif num == 6:
-            data = '동일한 아이디의 사용자가 있습니다.'
+            data = load_lang('same_id_exist_error')
         elif num == 7:
-            data = '아이디는 20글자보다 짧아야 합니다.'
+            data = load_lang('long_id_error')
         elif num == 8:
-            data = '아이디에는 한글과 알파벳과 공백만 허용 됩니다.'
+            data = load_lang('id_char_error')
         elif num == 9:
-            data = '파일이 없습니다.'
+            data = load_lang('file_exist_error')
         elif num == 10:
-            data = '비밀번호가 다릅니다.'
-        elif num == 11:
-            data = '이미 로그인 되어 있습니다.'
+            data = load_lang('password_error')
         elif num == 13:
-            data = '리캡차를 통과하세요.'
+            data = load_lang('recaptcha_error')
         elif num == 14:
-            data = 'jpg, gif, jpeg, png, webp만 가능 합니다.'
+            data = load_lang('file_extension_error')
         elif num == 15:
-            data = '편집 기록은 500자를 넘을 수 없습니다.'
+            data = load_lang('edit_record_error')
         elif num == 16:
-            data = '동일한 이름의 파일이 있습니다.'
+            data = load_lang('same_file_error')
         elif num == 17:
-            data = '파일 용량은 ' + wiki_set(3) + 'MB를 넘길 수 없습니다.'
-        elif num == 18:
-            data = '내용이 원래 문서와 동일 합니다.'
+            data = load_lang('file_capacity_error') + ' ' + wiki_set(3)
         elif num == 19:
-            data = '이동 하려는 곳에 문서가 이미 있습니다.'
+            data = load_lang('decument_exist_error')
         elif num == 20:
-            data = '재 확인이랑 비밀번호가 다릅니다.'
+            data = load_lang('password_diffrent_error')
         elif num == 21:
-            data = '편집 필터에 의해 검열 되었습니다.'
+            data = load_lang('edit_filter_error')
         elif num == 22:
-            data = '파일 이름은 알파벳, 한글, 띄어쓰기, 언더바, 빼기표만 허용 됩니다.'
+            data = load_lang('file_name_error')
         else:
             data = '???'
 
