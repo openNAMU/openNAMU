@@ -629,7 +629,7 @@ def start(conn, data, title):
     while 1:
         age_data = re.search('\[age\(([0-9]{4}-[0-9]{2}-[0-9]{2})\)\]', data)
         if age_data:
-            age = age_data.groups[0]
+            age = age_data.groups()[0]
 
             old = datetime.datetime.strptime(time[0], '%Y-%m-%d')
             will = datetime.datetime.strptime(age, '%Y-%m-%d')
@@ -643,7 +643,7 @@ def start(conn, data, title):
     while 1:
         dday_data = re.search('\[dday\(([0-9]{4}-[0-9]{2}-[0-9]{2})\)\]', data)
         if dday_data:
-            dday = dday_data.groups[0]
+            dday = dday_data.groups()[0]
 
             old = datetime.datetime.strptime(time[0], '%Y-%m-%d')
             will = datetime.datetime.strptime(dday, '%Y-%m-%d')
