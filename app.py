@@ -19,7 +19,7 @@ import sys
 from func import *
 
 # 버전 표기
-r_ver = 'v3.0.4-Final-Beta'
+r_ver = 'v3.0.4-Final-Beta-' + re.sub('^[0-9]{2}', '', str(int(datetime.datetime.fromtimestamp(os.path.getmtime('app.py')).strftime('%Y%m%d'))))
 print('Version : ' + r_ver)
 
 # set.json 설정 확인
@@ -1939,9 +1939,9 @@ def other():
                     <li><a href="/manager/1">''' + load_lang('admin') + ' ' + load_lang('tool') + '''</a></li>
                 </ul>
                 <br>
-                <h2>''' + load_lang('version') + '''</h2>
+                <h2>''' + load_lang('normal_version') + '''</h2>
                 <ul>
-                    <li>''' + load_lang('version') + ' : <a id="out_link" href="https://github.com/2DU/openNAMU/blob/master/version.md">' + r_ver + '''</a></li>
+                    <li>''' + load_lang('normal_version') + ' : <a id="out_link" href="https://github.com/2DU/openNAMU/blob/master/version.md">' + r_ver + '''</a></li>
                 </ul>''',
     menu = 0
     ))
