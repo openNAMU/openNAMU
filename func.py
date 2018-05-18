@@ -1,22 +1,16 @@
 ﻿# 모듈들 불러옴
-from css_html_js_minify import html_minify, js_minify, css_minify
-from flask import session, render_template
-from urllib import parse
-
+import css_html_js_minify
+import flask
 import json
 import sqlite3
 import hashlib
 import requests
 import re
 import html
-import time
 import os
 
 # 일부 툴 불러옴
-from set_mark.tool import get_time
-from set_mark.tool import ip_check
-from set_mark.tool import url_pas
-from set_mark.tool import sha224
+from set_mark.tool import *
 
 # 나무마크 불러옴
 from mark import *
@@ -25,12 +19,19 @@ from mark import *
 json_data = open(os.path.join('language', 'en-US.json'), 'rt', encoding='utf-8').read()
 else_lang = json.loads(json_data)
 
-def captcha_get(conn):
+def load_conn(data):
+    global conn
+    global curs
+
+    conn = data
     curs = conn.cursor()
 
+    load_conn2(data)
+
+def captcha_get():
     data = ''
 
-    if custom(conn)[2] == 0:
+    if custom()[2] == 0:
         curs.execute('select data from other where name = "recaptcha"')
         recaptcha = curs.fetchall()
         if recaptcha and recaptcha[0][0] != '':
@@ -41,11 +42,9 @@ def captcha_get(conn):
 
     return data
 
-def captcha_post(test, conn, num = 1):
-    curs = conn.cursor()
-
+def captcha_post(test, num = 1):
     if num == 1:
-        if custom(conn)[2] == 0 and captcha_get(conn) != '':
+        if custom()[2] == 0 and captcha_get() != '':
             curs.execute('select data from other where name = "sec_re"')
             sec_re = curs.fetchall()
             if sec_re and sec_re[0][0] != '':
@@ -65,53 +64,69 @@ def captcha_post(test, conn, num = 1):
     else:
         pass
 
-def load_lang(lang, data):
-    if data in lang:
-        return lang[data]
+def load_lang(data):
+    global lang
+
+    try:
+        if lang:
+            pass
+    except:
+        curs.execute("select data from other where name = 'language'")
+        rep_data = curs.fetchall()
+
+        json_data = open(os.path.join('language', rep_data[0][0] + '.json'), 'rt', encoding='utf-8').read()
+        lang = json.loads(json_data)
+
+    if data == 'please_all':
+        return lang
     else:
-        return else_lang[data]
+        if data in lang:
+            return lang[data]
+        else:
+            return else_lang[data]
 
 def edit_help_button():
     # https://stackoverflow.com/questions/11076975/insert-text-into-textarea-at-cursor-position-javascript
-    '''<script>
-                function insertAtCursor(myField, myValue) {
-                    if (document.selection) { 
-                        document.getElementById(myField).focus();
-                        sel = document.selection.createRange(); 
-                        sel.text = myValue; 
-                    } else if (document.getElementById(myField).selectionStart || document.getElementById(myField).selectionStart == '0') { 
-                        var startPos = document.getElementById(myField).selectionStart; 
-                        var endPos = document.getElementById(myField).selectionEnd; 
-                        document.getElementById(myField).value = document.getElementById(myField).value.substring(0, startPos) + myValue + document.getElementById(myField).value.substring(endPos, document.getElementById(myField).value.length); 
-                    } else { 
-                        document.getElementById(myField).value += myValue;
-                    }
-                }
-            </script>
-        '''
+    '''
+    <script>
+        function insertAtCursor(myField, myValue) {
+            if (document.selection) { 
+                document.getElementById(myField).focus();
 
-    '<a href="javascript:void(0);" onclick="insertAtCursor(\'content\', \'[[]]\');">(링크)</a> <a href="javascript:void(0);" onclick="insertAtCursor(\'content\', \'[macro()]\');">(매크로)</a> <a href="javascript:void(0);" onclick="insertAtCursor(\'content\', \'{{{#! }}}\');">(중괄호)</a><hr>'
+                sel = document.selection.createRange();
+                sel.text = myValue; 
+            } else if (document.getElementById(myField).selectionStart || document.getElementById(myField).selectionStart == '0') {
+                var startPos = document.getElementById(myField).selectionStart;
+                var endPos = document.getElementById(myField).selectionEnd;
+
+                document.getElementById(myField).value = document.getElementById(myField).value.substring(0, startPos) + myValue + document.getElementById(myField).value.substring(endPos, document.getElementById(myField).value.length); 
+            } else {
+                document.getElementById(myField).value += myValue;
+            }
+        }
+    </script>
+    '''
+
+    insert_list = [['[[]]', '링크'], ['[()]', '매크로'], ['{{{#!}}}', '중괄호']]
+
+    '<a href="javascript:void(0);" onclick="insertAtCursor(\'content\', \'B\');">(A)</a>'
 
     return ['', '']
 
-def ip_warring(conn):
-    curs = conn.cursor()
-
-    if custom(conn)[2] == 0:    
+def ip_warring():
+    if custom()[2] == 0:    
         curs.execute('select data from other where name = "no_login_warring"')
         data = curs.fetchall()
         if data and data[0][0] != '':
             text_data = '<span>' + data[0][0] + '</span><hr>'
         else:
-            text_data = '<span>비 로그인 상태입니다. 비 로그인으로 진행 시 아이피가 기록됩니다.</span><hr>'
+            text_data = '<span>' + load_lang('no_login_warring') + '</span><hr>'
     else:
         text_data = ''
 
     return text_data
 
-def skin_check(conn):
-    curs = conn.cursor()
-
+def skin_check():
     skin = './views/acme/'
     
     try:
@@ -136,20 +151,18 @@ def next_fix(link, num, page, end = 50):
 
     if num == 1:
         if len(page) == end:
-            list_data += '<hr><a href="' + link + str(num + 1) + '">(이후)</a>'
+            list_data += '<hr><a href="' + link + str(num + 1) + '">(' + load_lang('next') + ')</a>'
     elif len(page) != end:
-        list_data += '<hr><a href="' + link + str(num - 1) + '">(이전)</a>'
+        list_data += '<hr><a href="' + link + str(num - 1) + '">(' + load_lang('previous') + ')</a>'
     else:
-        list_data += '<hr><a href="' + link + str(num - 1) + '">(이전)</a> <a href="' + link + str(num + 1) + '">(이후)</a>'
+        list_data += '<hr><a href="' + link + str(num - 1) + '">(' + load_lang('previous') + ')</a> <a href="' + link + str(num + 1) + '">(' + load_lang('next') + ')</a>'
 
     return list_data
 
 def other2(origin):
-    return origin + ['제거 되었음. 스킨 업데이트 필요함.']    
+    return origin + ['Deleted']
 
-def wiki_set(conn, num):
-    curs = conn.cursor()
-
+def wiki_set(num):
     if num == 1:
         data_list = []
 
@@ -216,10 +229,8 @@ def diff(seqm):
             
     return ''.join(output)
            
-def admin_check(conn, num, what):
+def admin_check(num, what):
     ip = ip_check() 
-
-    curs = conn.cursor()
 
     curs.execute("select acl from user where id = ?", [ip])
     user = curs.fetchall()
@@ -257,18 +268,17 @@ def admin_check(conn, num, what):
                 else:
                     break
 
-def ip_pas(conn, raw_ip):
-    curs = conn.cursor()
+def ip_pas(raw_ip):
     hide = 0
 
     if re.search("(\.|:)", raw_ip):
-        if not re.search("^도구:", raw_ip):    
+        if not re.search("^" + load_lang('tool') + ":", raw_ip):    
             curs.execute("select data from other where name = 'ip_view'")
             data = curs.fetchall()
             if data and data[0][0] != '':
                 ip = '<span style="font-size: 75%;">' + hashlib.md5(bytes(raw_ip, 'utf-8')).hexdigest() + '</span>'
 
-                if not admin_check(conn, 'ban', None):
+                if not admin_check('ban', None):
                     hide = 1
             else:
                 ip = raw_ip
@@ -276,26 +286,24 @@ def ip_pas(conn, raw_ip):
             ip = raw_ip
             hide = 1
     else:
-        curs.execute("select title from data where title = ?", ['사용자:' + raw_ip])
+        curs.execute("select title from data where title = ?", [load_lang('user') + ':' + raw_ip])
         if curs.fetchall():
-            ip = '<a href="/w/' + url_pas('사용자:' + raw_ip) + '">' + raw_ip + '</a>'
+            ip = '<a href="/w/' + url_pas(load_lang('user') + ':' + raw_ip) + '">' + raw_ip + '</a>'
         else:
-            ip = '<a id="not_thing" href="/w/' + url_pas('사용자:' + raw_ip) + '">' + raw_ip + '</a>'
+            ip = '<a id="not_thing" href="/w/' + url_pas(load_lang('user') + ':' + raw_ip) + '">' + raw_ip + '</a>'
          
     if hide == 0:
-        ip += ' <a href="/record/' + url_pas(raw_ip) + '">(기록)</a>'
+        ip += ' <a href="/record/' + url_pas(raw_ip) + '">(' + load_lang('record') + ')</a>'
 
     return ip
 
-def custom(conn):
-    curs = conn.cursor()
-
-    if 'MyMaiToNight' in session:
-        user_head = session['MyMaiToNight']
+def custom():
+    if 'MyMaiToNight' in flask.session:
+        user_head = flask.session['MyMaiToNight']
     else:
         user_head = ''
 
-    if 'Now' in session and session['Now'] == 1:
+    if 'Now' in flask.session and flask.session['Now'] == 1:
         curs.execute('select name from alarm where name = ? limit 1', [ip_check()])
         if curs.fetchall():
             user_icon = 2
@@ -317,26 +325,24 @@ def custom(conn):
     if user_icon != 0:
         user_name = ip_check()
     else:
-        user_name = '사용자'
+        user_name = load_lang('user')
 
     return ['', '', user_icon, user_head, email, user_name]
 
-def acl_check(conn, name):
-    curs = conn.cursor()
-
+def acl_check(name):
     ip = ip_check()
 
-    if ban_check(conn) == 1:
+    if ban_check() == 1:
         return 1
 
-    acl_c = re.search("^사용자:([^/]*)", name)
+    acl_c = re.search("^" + load_lang('user') + ":([^/]*)", name)
     if acl_c:
         acl_n = acl_c.groups()
 
-        if admin_check(conn, 5, None) == 1:
+        if admin_check(5, None) == 1:
             return 0
 
-        curs.execute("select dec from acl where title = ?", ['사용자:' + acl_n[0]])
+        curs.execute("select dec from acl where title = ?", [load_lang('user') + ':' + acl_n[0]])
         acl_data = curs.fetchall()
         if acl_data:
             if acl_data[0][0] == 'all':
@@ -353,8 +359,8 @@ def acl_check(conn, name):
         else:
             return 1
 
-    file_c = re.search("^파일:(.*)", name)
-    if file_c and admin_check(conn, 5, 'edit (' + name + ')') != 1:
+    file_c = re.search("^" + load_lang('file') + ":(.*)", name)
+    if file_c and admin_check(5, 'edit (' + name + ')') != 1:
         return 1
 
     curs.execute("select acl from user where id = ?", [ip])
@@ -371,7 +377,7 @@ def acl_check(conn, name):
             if not user_data:
                 return 1
 
-            if not admin_check(conn, 5, 'edit (' + name + ')') == 1:
+            if not admin_check(5, 'edit (' + name + ')') == 1:
                 return 1
 
     curs.execute('select data from other where name = "edit"')
@@ -385,15 +391,13 @@ def acl_check(conn, name):
             if not user_data:
                 return 1
 
-            if not admin_check(conn, 5, None) == 1:
+            if not admin_check(5, None) == 1:
                 return 1
 
     return 0
 
-def ban_check(conn):
+def ban_check():
     ip = ip_check()
-
-    curs = conn.cursor()
 
     band = re.search("^([0-9]{1,3}\.[0-9]{1,3})", ip)
     if band:
@@ -411,12 +415,10 @@ def ban_check(conn):
     
     return 0
         
-def topic_check(conn, name, sub):
+def topic_check(name, sub):
     ip = ip_check()
 
-    curs = conn.cursor()
-
-    if ban_check(conn) == 1:
+    if ban_check() == 1:
         return 1
         
     curs.execute("select acl from user where id = ?", [ip])
@@ -433,19 +435,17 @@ def topic_check(conn, name, sub):
             if not user_data:
                 return 1
 
-            if not admin_check(conn, 3, 'topic (' + name + ')') == 1:
+            if not admin_check(3, 'topic (' + name + ')') == 1:
                 return 1
         
     curs.execute("select title from stop where title = ? and sub = ?", [name, sub])
     if curs.fetchall():
-        if not admin_check(conn, 3, 'topic (' + name + ')') == 1:
+        if not admin_check(3, 'topic (' + name + ')') == 1:
             return 1
 
     return 0
 
-def ban_insert(conn, name, end, why, login, blocker):
-    curs = conn.cursor()
-
+def ban_insert(name, end, why, login, blocker):
     time = get_time()
 
     if re.search("^([0-9]{1,3}\.[0-9]{1,3})$", name):
@@ -455,7 +455,7 @@ def ban_insert(conn, name, end, why, login, blocker):
 
     curs.execute("select block from ban where block = ?", [name])
     if curs.fetchall():
-        curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, ?)", [name, '해제', time, blocker, '', band])
+        curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, ?)", [name, load_lang('release'), time, blocker, '', band])
         curs.execute("delete from ban where block = ?", [name])
     else:
         if login != '':
@@ -471,24 +471,20 @@ def ban_insert(conn, name, end, why, login, blocker):
     
     conn.commit()
 
-def rd_plus(conn, title, sub, date):
-    curs = conn.cursor()
-
+def rd_plus(title, sub, date):
     curs.execute("select title from rd where title = ? and sub = ?", [title, sub])
     if curs.fetchall():
         curs.execute("update rd set date = ? where title = ? and sub = ?", [date, title, sub])
     else:
         curs.execute("insert into rd (title, sub, date) values (?, ?, ?)", [title, sub, date])
 
-def history_plus(conn, title, data, date, ip, send, leng):
-    curs = conn.cursor()
-
+def history_plus(title, data, date, ip, send, leng):
     curs.execute("select id from history where title = ? order by id + 0 desc limit 1", [title])
     id_data = curs.fetchall()
     if id_data:
         curs.execute("insert into history (id, title, data, date, ip, send, leng) values (?, ?, ?, ?, ?, ?, ?)", [str(int(id_data[0][0]) + 1), title, data, date, ip, send, leng])
     else:
-        curs.execute("insert into history (id, title, data, date, ip, send, leng) values ('1', ?, ?, ?, ?, ?, ?)", [title, data, date, ip, send + ' (새 문서)', leng])
+        curs.execute("insert into history (id, title, data, date, ip, send, leng) values ('1', ?, ?, ?, ?, ?, ?)", [title, data, date, ip, send + ' (' + load_lang('new') + ' ' + load_lang('document') + ')', leng])
 
 def leng_check(first, second):
     if first < second:
@@ -503,15 +499,13 @@ def leng_check(first, second):
 def redirect(data):
     return '<meta http-equiv="refresh" content="0; url=' + data + '">'
 
-def re_error(conn, data):
-    curs = conn.cursor()
-
+def re_error(data):
     if data == '/ban':
         ip = ip_check()
 
-        end = '<li>사유 : 권한이 맞지 않는 상태 입니다.</li>'
+        end = '<li>' + load_lang('why') + ' : ' + load_lang('authority_error') + '</li>'
 
-        if ban_check(conn) == 1:
+        if ban_check() == 1:
             curs.execute("select end, why from ban where block = ?", [ip])
             end_data = curs.fetchall()
             if not end_data:
@@ -521,7 +515,7 @@ def re_error(conn, data):
                     end_data = curs.fetchall()
             
             if end_data:
-                end = '<li>상태 : '
+                end = '<li>' + load_lang('state') + ' : '
 
                 if end_data[0][0]:
                     now = int(re.sub('(\-| |:)', '', get_time()))
@@ -531,20 +525,20 @@ def re_error(conn, data):
                         curs.execute("delete from ban where block = ?", [ip])
                         conn.commit()
 
-                        end += '차단이 풀렸습니다. 다시 해보세요.'
+                        end += 'Re Try.'
                     else:
-                        end += '차단 중 : ' + end_data[0][0]
+                        end += load_lang('why') + ' : ' + end_data[0][0]
                 else:
-                    end += '무기한 차단 상태 입니다.'
+                    end += load_lang('why') + ' : ' + load_lang('limitless')
                 
                 end += '</li>'
 
                 if end_data[0][1] != '':
-                    end += '<li>사유 : ' + end_data[0][1] + '</li>'
+                    end += '<li>' + load_lang('why') + ' : ' + end_data[0][1] + '</li>'
 
-        return html_minify(render_template(skin_check(conn), 
-            imp = ['권한 오류', wiki_set(conn, 1), custom(conn), other2([0, 0])],
-            data = '<h2>권한 상태</h2><ul>' + end + '</ul>',
+        return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
+            imp = ['Error', wiki_set(1), custom(), other2([0, 0])],
+            data = '<h2>Error</h2><ul>' + end + '</ul>',
             menu = 0
         ))
 
@@ -552,76 +546,48 @@ def re_error(conn, data):
     if error_data:
         num = int(error_data.groups()[0])
         if num == 1:
-            title = '권한 오류'
-            data = '비 로그인 상태 입니다.'
+            data = load_lang('no_login_error')
         elif num == 2:
-            title = '권한 오류'
-            data = '이 계정이 없습니다.'
+            data = load_lang('no_exist_user_error')
         elif num == 3:
-            title = '권한 오류'
-            data = '권한이 모자랍니다.'
+            data = load_lang('authority_error')
         elif num == 4:
-            title = '권한 오류'
-            data = '관리자는 차단, 검사 할 수 없습니다.'
-        elif num == 5:
-            title = '사용자 오류'
-            data = '그런 계정이 없습니다.'
+            data = load_lang('no_admin_block_error')
         elif num == 6:
-            title = '가입 오류'
-            data = '동일한 아이디의 사용자가 있습니다.'
+            data = load_lang('same_id_exist_error')
         elif num == 7:
-            title = '가입 오류'
-            data = '아이디는 20글자보다 짧아야 합니다.'
+            data = load_lang('long_id_error')
         elif num == 8:
-            title = '가입 오류'
-            data = '아이디에는 한글과 알파벳과 공백만 허용 됩니다.'
+            data = load_lang('id_char_error')
         elif num == 9:
-            title = '파일 올리기 오류'
-            data = '파일이 없습니다.'
+            data = load_lang('file_exist_error')
         elif num == 10:
-            title = '변경 오류'
-            data = '비밀번호가 다릅니다.'
-        elif num == 11:
-            title = '로그인 오류'
-            data = '이미 로그인 되어 있습니다.'
+            data = load_lang('password_error')
         elif num == 13:
-            title = '리캡차 오류'
-            data = '리캡차를 통과하세요.'
+            data = load_lang('recaptcha_error')
         elif num == 14:
-            title = '파일 올리기 오류'
-            data = 'jpg, gif, jpeg, png, webp만 가능 합니다.'
+            data = load_lang('file_extension_error')
         elif num == 15:
-            title = '편집 오류'
-            data = '편집 기록은 500자를 넘을 수 없습니다.'
+            data = load_lang('edit_record_error')
         elif num == 16:
-            title = '파일 올리기 오류'
-            data = '동일한 이름의 파일이 있습니다.'
+            data = load_lang('same_file_error')
         elif num == 17:
-            title = '파일 올리기 오류'
-            data = '파일 용량은 ' + wiki_set(conn, 3) + 'MB를 넘길 수 없습니다.'
-        elif num == 18:
-            title = '편집 오류'
-            data = '내용이 원래 문서와 동일 합니다.'
+            data = load_lang('file_capacity_error') + ' ' + wiki_set(3)
         elif num == 19:
-            title = '이동 오류'
-            data = '이동 하려는 곳에 문서가 이미 있습니다.'
+            data = load_lang('decument_exist_error')
         elif num == 20:
-            title = '비밀번호 오류'
-            data = '재 확인이랑 비밀번호가 다릅니다.'
+            data = load_lang('password_diffrent_error')
         elif num == 21:
-            title = '편집 오류'
-            data = '편집 필터에 의해 검열 되었습니다.'
+            data = load_lang('edit_filter_error')
         elif num == 22:
-            title = '파일 올리기 오류'
-            data = '파일 이름은 알파벳, 한글, 띄어쓰기, 언더바, 빼기표만 허용 됩니다.'
+            data = load_lang('file_name_error')
         else:
-            title = '정체 불명의 오류'
             data = '???'
 
         if title:
-            return html_minify(render_template(skin_check(conn), 
-                imp = [title, wiki_set(conn, 1), custom(conn), other2([0, 0])],
-                data = '<h2>오류 발생</h2><ul><li>' + data + '</li></ul>',
+            return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
+                imp = ['Error', wiki_set(1), custom(), other2([0, 0])],
+                data = '<h2>Error</h2><ul><li>' + data + '</li></ul>',
                 menu = 0
             ))
         else:
