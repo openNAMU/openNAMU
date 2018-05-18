@@ -38,35 +38,44 @@
                                 <input style="display: inline-block;" class="form-control search" type="search" name="search" placeholder="Search" id="searchInput" autocomplete="off">
                             </form>                
                         </li>
-                        <li>
-                            <a href="/recent_changes">
-                                <i class="fa fa-refresh" aria-hidden="true"></i>
-                                최근 변경
+                        <li class="dropdown">
+                            <a class="dropdown-toggle" data-close-others="false" data-delay="0" data-hover="dropdown" data-toggle="dropdown" href="javascript:void(0);">
+                                <i class="fa fa-plus-circle" aria-hidden="true"></i>
+                                {{'recent'|load_lang}}
+                                <i class="fa fa-angle-down"></i>
                             </a>
-                        </li>
-                        <li>
-                            <a href="/recent_discuss">
-                                <i class="fa fa-comment" aria-hidden="true"></i>
-                                최근 토론
-                            </a>
+                            <ul role="menu" class="dropdown-menu">
+                                <li>
+                                    <a href="/recent_changes">
+                                        <i class="fa fa-refresh" aria-hidden="true"></i>
+                                        {{'change'|load_lang}}
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/recent_discuss">
+                                        <i class="fa fa-comment" aria-hidden="true"></i>
+                                        {{'discussion'|load_lang}}
+                                    </a>
+                                </li>
+                            </ul>
                         </li>
                         <li class="dropdown">
                             <a class="dropdown-toggle" data-close-others="false" data-delay="0" data-hover="dropdown" data-toggle="dropdown" href="javascript:void(0);">
                                 <i class="fa fa-plus-circle" aria-hidden="true"></i>
-                                나머지
+                                {{'other'|load_lang}}
                                 <i class="fa fa-angle-down"></i>
                             </a>
                             <ul role="menu" class="dropdown-menu">
                                 <li>
                                     <a href="/random">
                                         <i class="fa fa-random" aria-hidden="true"></i>
-                                        무작위
+                                        {{'random'|load_lang}}
                                     </a>
                                 </li>
                                 <li>
                                     <a href="/other">
                                         <i class="fa fa-cogs" aria-hidden="true"></i>
-                                        기타
+                                        {{'tool'|load_lang}}
                                     </a>
                                 </li>
                             </ul>
