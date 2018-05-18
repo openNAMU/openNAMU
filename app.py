@@ -24,7 +24,7 @@ from func import *
 from set_mark.tool import savemark
 
 # 버전 표기
-r_ver = 'v3.0.4-Beta-' + time.strftime('%y%m%d', time.localtime(os.stat('app.py').st_mtime))
+r_ver = 'v3.0.4-Final-Beta'
 print('Version : ' + r_ver)
 
 # set.json 설정 확인
@@ -158,8 +158,8 @@ curs.execute("select data from other where name = 'language'")
 rep_data = curs.fetchall()
 if not rep_data:
     while 1:
-        print('Language [ko-KR, en-US] : ', end = '')
-        support_language = ['ko-KR', 'en-US']
+        print('Language [ko-KR] : ', end = '')
+        support_language = ['ko-KR']
         
         rep_language = str(input())
         if rep_language in support_language:
