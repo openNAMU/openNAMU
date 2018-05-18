@@ -370,7 +370,7 @@ def start(conn, data, title):
                                                 else:
                                                     middle_data_2 = ['']
 
-                                                middle_list += ['div']
+                                                middle_list += ['div_end']
                                                 
                                                 data = re.sub('{{{#!wiki(?: style=(?:&quot;|&#x27;)((?:(?!&quot;|&#x27;).)*)(?:&quot;|&#x27;))?\n?', '<div id="wiki_div" style="' + str(middle_data_2[0]) + '">', data, 1)
                                             else:
@@ -481,7 +481,7 @@ def start(conn, data, title):
             else:
                 end_parser = wiki_table_data[1]
 
-            data = re.sub('<div id="wiki_div" ((?:(?!>).)+)>((?:(?!<div id="wiki_div"|<\/div_end>).\n*)+)<\/div_end>', '<div ' + wiki_table_data[0] + '>' + end_parser + '</div_end>', data, 1)
+            data = re.sub('<div id="wiki_div" ((?:(?!>).)+)>((?:(?!<div id="wiki_div"|<\/div_end>).\n*)+)<\/div_end>', '<div ' + wiki_table_data[0] + '>' + end_parser + '</div>', data, 1)
         else:
             break
             
@@ -494,7 +494,13 @@ def start(conn, data, title):
         math = re.search('&lt;math&gt;((?:(?!&lt;\/math&gt;).)+)&lt;\/math&gt;', data)
         if math:
             if first == 0:
-                plus_data += '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.css" integrity="sha384-TEMocfGvRuD1rIAacqrknm5BQZ7W7uWitoih+jMNFXQIbNl16bO8OZmylH/Vi/Ei" crossorigin="anonymous"><script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.js" integrity="sha384-jmxIlussZWB7qCuB+PgKG1uLjjxbVVIayPJwi6cG6Zb4YKq0JIw+OMnkkEC7kYCq" crossorigin="anonymous"></script>'
+                plus_data += '''
+                            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.css"
+                                integrity="sha384-TEMocfGvRuD1rIAacqrknm5BQZ7W7uWitoih+jMNFXQIbNl16bO8OZmylH/Vi/Ei"
+                                crossorigin="anonymous">
+                            <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.js" 
+                                integrity="sha384-jmxIlussZWB7qCuB+PgKG1uLjjxbVVIayPJwi6cG6Zb4YKq0JIw+OMnkkEC7kYCq"
+                                crossorigin="anonymous"></script>'''
 
             math = math.groups()[0]
             
@@ -620,28 +626,38 @@ def start(conn, data, title):
     time_data = re.search('^([0-9]{4}-[0-9]{2}-[0-9]{2})', now_time)
     time = time_data.groups()
     
-    age_data = re.findall('\[age\(([0-9]{4}-[0-9]{2}-[0-9]{2})\)\]', data)
-    for age in age_data:
-        old = datetime.datetime.strptime(time[0], '%Y-%m-%d')
-        will = datetime.datetime.strptime(age, '%Y-%m-%d')
-        
-        e_data = old - will
-        
-        data = re.sub('\[age\(([0-9]{4})-([0-9]{2})-([0-9]{2})\)\]', str(int(int(e_data.days) / 365)), data, 1)
+    while 1:
+        age_data = re.search('\[age\(([0-9]{4}-[0-9]{2}-[0-9]{2})\)\]', data)
+        if age_data:
+            age = age_data.groups[0]
 
-    dday_data = re.findall('\[dday\(([0-9]{4}-[0-9]{2}-[0-9]{2})\)\]', data)
-    for dday in dday_data:
-        old = datetime.datetime.strptime(time[0], '%Y-%m-%d')
-        will = datetime.datetime.strptime(dday, '%Y-%m-%d')
-        
-        e_data = old - will
-        
-        if re.search('^-', str(e_data.days)):
-            e_day = str(e_data.days)
+            old = datetime.datetime.strptime(time[0], '%Y-%m-%d')
+            will = datetime.datetime.strptime(age, '%Y-%m-%d')
+            
+            e_data = old - will
+            
+            data = re.sub('\[age\(([0-9]{4})-([0-9]{2})-([0-9]{2})\)\]', str(int(e_data.days / 365)), data, 1)
         else:
-            e_day = '+' + str(e_data.days)
+            break
 
-        data = re.sub('\[dday\(([0-9]{4}-[0-9]{2}-[0-9]{2})\)\]', e_day, data, 1)
+    while 1:
+        dday_data = re.search('\[dday\(([0-9]{4}-[0-9]{2}-[0-9]{2})\)\]', data)
+        if dday_data:
+            dday = dday_data.groups[0]
+
+            old = datetime.datetime.strptime(time[0], '%Y-%m-%d')
+            will = datetime.datetime.strptime(dday, '%Y-%m-%d')
+            
+            e_data = old - will
+            
+            if re.search('^-', str(e_data.days)):
+                e_day = str(e_data.days)
+            else:
+                e_day = '+' + str(e_data.days)
+
+            data = re.sub('\[dday\(([0-9]{4}-[0-9]{2}-[0-9]{2})\)\]', e_day, data, 1)
+        else:
+            break
 
     # 유튜브, 카카오 티비 처리
     while 1:
@@ -908,32 +924,58 @@ def start(conn, data, title):
             
     # 각주 처리
     footnote_number = 0
-    footnote_all = '\n<hr><ul id="footnote_data">'
+    footnote_all = []
     footnote_dict = {}
+    footnote_re = {}
+    footdata_all = '\n<hr><ul id="footnote_data">'
     while 1:
         footnote = re.search('(?:\[\*((?:(?! |\]).)*)(?: ((?:(?!\]).)+))?\]|(\[각주\]))', data)
         if footnote:
             footnote_data = footnote.groups()
             if footnote_data[2]:
-                footnote_all += '</ul>'
+                footnote_all.sort()
                 
-                data = re.sub('(?:\[\*((?:(?! ).)*) ((?:(?!\]).)+)\]|(\[각주\]))', footnote_all, data, 1)
+                for footdata in footnote_all:
+                    if footdata[2] == 0:
+                        footdata_in = ''
+                    else:
+                        footdata_in = footdata[2]
+
+                    footdata_all += '<li><a href="#rfn-' + str(footdata[0]) + '" id="fn-' + str(footdata[0]) + '">(' + footdata[1] + ')</a> ' + footdata_in + '</li>'
                 
-                footnote_all = '\n<hr><ul id="footnote_data">'
+                data = re.sub('(?:\[\*((?:(?! ).)*) ((?:(?!\]).)+)\]|(\[각주\]))', footdata_all + '</ul>', data, 1)
+                
+                footnote_all = []
+                footdata_all = '\n<hr><ul id="footnote_data">'
             else:
                 footnote = footnote_data[1]
                 footnote_name = footnote_data[0]
                 if footnote_name and not footnote:
-                    data = re.sub('(?:\[\*((?:(?! |\]).)*)(?: ((?:(?!\]).)+))?\]|(\[각주\]))', '<sup><a href="#fn-' + footnote_dict[footnote_name] + '" id="rfn-' + footnote_dict[footnote_name] + '">(' + footnote_name + ')</a></sup>', data, 1)
+                    if footnote_name in footnote_dict:
+                        footnote_re[footnote_name] += 1
+
+                        foot_plus_num = str(footnote_re[footnote_name])
+                        footshort = footnote_dict[footnote_name] + '.' + foot_plus_num
+
+                        footnote_all += [[float(footshort), footshort, 0]]
+
+                        data = re.sub('(?:\[\*((?:(?! |\]).)*)(?: ((?:(?!\]).)+))?\]|(\[각주\]))', '<sup><a href="#fn-' + footshort + '" id="rfn-' + footshort + '">(' + footshort + ')</a></sup>', data, 1)
+                    else:
+                        data = re.sub('(?:\[\*((?:(?! |\]).)*)(?: ((?:(?!\]).)+))?\]|(\[각주\]))', '<sup><a href="#">(' + footnote_name + ')</a></sup>', data, 1)
                 else:
                     footnote_number += 1
 
                     if not footnote_name:
                         footnote_name = str(footnote_number)
-                    else:
-                        footnote_dict.update({ footnote_name : str(footnote_number) })
 
-                    footnote_all += '<li><a href="#rfn-' + str(footnote_number) + '" id="fn-' + str(footnote_number) + '">(' + footnote_name + ')</a> ' + footnote + '</li>'
+                    footnote_dict.update({ footnote_name : str(footnote_number) })
+
+                    if not footnote_name in footnote_re:
+                        footnote_re.update({ footnote_name : 0 })
+                    else:
+                        footnote_re[footnote_name] += 1
+
+                    footnote_all += [[footnote_number, footnote_name, footnote]]
                     
                     data = re.sub('(?:\[\*((?:(?! |\]).)*)(?: ((?:(?!\]).)+))?\]|(\[각주\]))', '<sup><a href="#fn-' + str(footnote_number) + '" id="rfn-' + str(footnote_number) + '">(' + footnote_name + ')</a></sup>', data, 1)
         else:
@@ -941,12 +983,21 @@ def start(conn, data, title):
 
     data = re.sub('\n+$', '', data)
 
-    footnote_all += '</ul>'
-    if footnote_all == '\n<hr><ul id="footnote_data"></ul>':
-        footnote_all = ''
+    footnote_all.sort()
 
-    
-    data = re.sub('\n$', footnote_all, data + '\n', 1)
+    for footdata in footnote_all:
+        if footdata[2] == 0:
+            footdata_in = ''
+        else:
+            footdata_in = footdata[2]
+
+        footdata_all += '<li><a href="#rfn-' + str(footdata[0]) + '" id="fn-' + str(footdata[0]) + '">(' + footdata[1] + ')</a> ' + footdata_in + '</li>'
+
+    footdata_all += '</ul>'
+    if footdata_all == '\n<hr><ul id="footnote_data"></ul>':
+        footdata_all = ''
+
+    data = re.sub('\n$', footdata_all, data + '\n', 1)
 
     # 분류 마지막 처리
     category += '</div>'
@@ -958,15 +1009,23 @@ def start(conn, data, title):
     data += category
     
     # NoWiki 마지막 처리
-    for re_data in end_data:
-        if re_data[2] == 'normal':
-            data = data.replace('<span id="' + re_data[0] + '"></span>', re_data[1])
-            data = data.replace(tool.url_pas('<span id="' + re_data[0] + '"></span>'), tool.url_pas(re_data[1]))
+    i = 0
+    while 1:
+        try:
+            _ = end_data[i][0]
+        except:
+            break
+
+        if end_data[i][2] == 'normal':
+            data = data.replace('<span id="' + end_data[i][0] + '"></span>', end_data[i][1])
+            data = data.replace(tool.url_pas('<span id="' + end_data[i][0] + '"></span>'), tool.url_pas(end_data[i][1]))
         else:
-            if re.search('\n', re_data[1]):
-                data = data.replace('<span id="' + re_data[0] + '"></span>', '\n<pre>' + re.sub('^\n', '', re_data[1]) + '</pre>')
+            if re.search('\n', end_data[i][1]):
+                data = data.replace('<span id="' + end_data[i][0] + '"></span>', '\n<pre>' + re.sub('^\n', '', end_data[i][1]) + '</pre>')
             else:
-                data = data.replace('<span id="' + re_data[0] + '"></span>', '<code>' + re_data[1] + '</code>')
+                data = data.replace('<span id="' + end_data[i][0] + '"></span>', '<code>' + end_data[i][1] + '</code>')
+
+        i += 1
     
     # 마지막 처리
     data = re.sub('<\/td_end>', '</td>', data)
