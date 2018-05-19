@@ -1186,16 +1186,16 @@ def block_log(name = None, tool = None, tool2 = None):
     else:
         sql_num = 0
     
-    div = '<table style="width: 100%; text-align: center;"><tbody><tr><td style="width: 33.3%;">' + load_lang('blocked') + '</td><td style="width: 33.3%;">' + load_lang('admin') + '</td><td style="width: 33.3%;">' + load_lang('period ') + '</td></tr>'
+    div = '<table style="width: 100%; text-align: center;"><tbody><tr><td style="width: 33.3%;">' + load_lang('blocked') + '</td><td style="width: 33.3%;">' + load_lang('admin') + '</td><td style="width: 33.3%;">' + load_lang('period') + '</td></tr>'
     
     data_list = ''
     
     if not name:
         if not tool2:
             div = '''
-                    <a href="/manager/11">(' + load_lang('blocked') + ')</a> <a href="/manager/12">(''' + load_lang('admin') + ''')</a>
+                    <a href="/manager/11">(''' + load_lang('blocked') + ''')</a> <a href="/manager/12">(''' + load_lang('admin') + ''')</a>
                     <hr>
-                    <a href="/block_log/ip">(IP)</a> <a href="/block_log/user">(''' + load_lang('subscriber') + ')</a> <a href="/block_log/never_end">(' + load_lang('limitless') + ')</a> <a href="/block_log/can_end">(' + load_lang('period ') + ')</a> <a href="/block_log/end">(' + load_lang('release') + ')</a> <a href="/block_log/now">(' + load_lang('now') + ')</a> <a href="/block_log/edit_filter">(' + load_lang('edit_filter') + ''')</a>
+                    <a href="/block_log/ip">(IP)</a> <a href="/block_log/user">(''' + load_lang('subscriber') + ')</a> <a href="/block_log/never_end">(' + load_lang('limitless') + ')</a> <a href="/block_log/can_end">(' + load_lang('period') + ')</a> <a href="/block_log/end">(' + load_lang('release') + ')</a> <a href="/block_log/now">(' + load_lang('now') + ')</a> <a href="/block_log/edit_filter">(' + load_lang('edit_filter') + ''')</a>
                     <hr>
                     ''' + div
             
@@ -1237,7 +1237,7 @@ def block_log(name = None, tool = None, tool2 = None):
 
                 curs.execute("select why, block, blocker, end, today from rb where blocker = ? order by today desc limit ?, '50'", [load_lang('tool') + ':' + load_lang('edit_filter'), str(sql_num)])
             else:
-                sub = '(' + load_lang('period ') + ')'
+                sub = '(' + load_lang('period') + ')'
                 
                 curs.execute("select why, block, blocker, end, today from rb where end like ? order by today desc limit ?, '50'", ['%\-%', str(sql_num)])
     else:
