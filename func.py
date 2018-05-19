@@ -162,7 +162,7 @@ def next_fix(link, num, page, end = 50):
 def other2(origin):
     return origin + ['Deleted']
 
-def wiki_set(num):
+def wiki_set(num = 1):
     if num == 1:
         data_list = []
 

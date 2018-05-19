@@ -309,7 +309,7 @@ def alarm():
     data += '</ul>'
 
     return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
-        imp = [load_lang('alarm'), wiki_set(1), custom(), other2([0, 0])],
+        imp = [load_lang('alarm'), wiki_set(), custom(), other2([0, 0])],
         data = data,
         menu = [['user', load_lang('user')]]
     ))
@@ -358,7 +358,7 @@ def inter_wiki(tools = None):
             div += '<a href="/' + plus_link + '">(' + load_lang('plus') + ')</a>'
 
     return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
-        imp = [title, wiki_set(1), custom(), other2([0, 0])],
+        imp = [title, wiki_set(), custom(), other2([0, 0])],
         data = div,
         menu = [['other', load_lang('other')]]
     ))
@@ -399,7 +399,7 @@ def plus_inter(tools = None):
             form_data = '<input placeholder="HTML" type="text" name="title">'
 
         return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
-            imp = [title, wiki_set(1), custom(), other2([0, 0])],
+            imp = [title, wiki_set(), custom(), other2([0, 0])],
             data = '<form method="post">' + form_data + '<hr><button type="submit">' + load_lang('plus') + '</button></form>',
             menu = [['other', load_lang('other')]]
         ))
@@ -422,7 +422,7 @@ def edit_set(num = 0):
             li_data += '<li><a href="/edit_set/' + str(x) + '">' + li + '</a></li>'
 
         return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
-            imp = [load_lang('setting'), wiki_set(1), custom(), other2([0, 0])],
+            imp = [load_lang('setting'), wiki_set(), custom(), other2([0, 0])],
             data = '<h2>' + load_lang('list') + '</h2><ul>' + li_data + '</ul>',
             menu = [['manager', load_lang('admin')]]
         ))
@@ -492,7 +492,7 @@ def edit_set(num = 0):
                     div2 += '<option value="' + skin_data + '">' + skin_data + '</option>'
 
             return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
-                imp = ['Normal', wiki_set(1), custom(), other2([0, 0])],
+                imp = ['Normal', wiki_set(), custom(), other2([0, 0])],
                 data = '''
                         <form method="post">
                             <span>''' + load_lang('name') + '''</span>
@@ -585,7 +585,7 @@ def edit_set(num = 0):
             conn.commit()
 
             return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
-                imp = ['Set Text', wiki_set(1), custom(), other2([0, 0])],
+                imp = ['Set Text', wiki_set(), custom(), other2([0, 0])],
                 data = '''
                         <form method="post">
                             <span>Register Text</span>
@@ -625,7 +625,7 @@ def edit_set(num = 0):
                 data = ''
 
             return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
-                imp = ['Main HEAD', wiki_set(1), custom(), other2([0, 0])],
+                imp = ['Main HEAD', wiki_set(), custom(), other2([0, 0])],
                 data = '''
                         <form method="post">
                             <textarea rows="25" name="content">''' + html.escape(data) + '''</textarea>
@@ -668,7 +668,7 @@ def edit_set(num = 0):
                 data = ''.join(lines)
 
             return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
-                imp = ['robots.txt', wiki_set(1), custom(), other2([0, 0])],
+                imp = ['robots.txt', wiki_set(), custom(), other2([0, 0])],
                 data = '''
                         <a href="/robots.txt">(View)</a>
                         <hr>
@@ -711,7 +711,7 @@ def edit_set(num = 0):
             conn.commit()
 
             return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
-                imp = ['Google', wiki_set(1), custom(), other2([0, 0])],
+                imp = ['Google', wiki_set(), custom(), other2([0, 0])],
                 data = '''
                         <form method="post">
                             <span>reCAPTCHA (HTML)</span>
@@ -746,7 +746,7 @@ def not_close_topic():
     div += '</ul>'
 
     return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
-        imp = [load_lang('open') + ' ' + load_lang('discussion') + ' ' + load_lang('list'), wiki_set(1), custom(), other2([0, 0])],
+        imp = [load_lang('open') + ' ' + load_lang('discussion') + ' ' + load_lang('list'), wiki_set(), custom(), other2([0, 0])],
         data = div,
         menu = [['manager', load_lang('admin')]]
     ))
@@ -776,7 +776,7 @@ def acl_list():
     div += '</ul>'
     
     return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
-        imp = ['ACL ' + load_lang('document') + ' ' + load_lang('list'), wiki_set(1), custom(), other2([0, 0])],
+        imp = ['ACL ' + load_lang('document') + ' ' + load_lang('list'), wiki_set(), custom(), other2([0, 0])],
         data = div,
         menu = [['other', load_lang('other')]]
     ))
@@ -856,7 +856,7 @@ def admin_plus(name = None):
         data += '<li><input type="checkbox" ' + state +  ' name="owner" ' + exist_list[7] + '> ' + load_lang('owner') + '</li></ul>'
 
         return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
-            imp = [load_lang('admin_group') + ' ' + load_lang('plus'), wiki_set(1), custom(), other2([0, 0])],
+            imp = [load_lang('admin_group') + ' ' + load_lang('plus'), wiki_set(), custom(), other2([0, 0])],
             data = '<form method="post">' + data + '<hr><button id="save" ' + state +  ' type="submit">' + load_lang('save') + '</button></form>',
             menu = [['manager', load_lang('admin')]]
         ))        
@@ -877,7 +877,7 @@ def admin_list():
     div += '</ul>'
                 
     return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
-        imp = [load_lang('admin') + ' ' + load_lang('list'), wiki_set(1), custom(), other2([0, 0])],
+        imp = [load_lang('admin') + ' ' + load_lang('list'), wiki_set(), custom(), other2([0, 0])],
         data = div,
         menu = [['other', load_lang('other')]]
     ))
@@ -941,7 +941,7 @@ def user_log():
     list_data += next_fix('/user_log?num=', num, user_list)
 
     return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
-        imp = [load_lang('recent') + ' ' + load_lang('register'), wiki_set(1), custom(), other2([0, 0])],
+        imp = [load_lang('recent') + ' ' + load_lang('register'), wiki_set(), custom(), other2([0, 0])],
         data = list_data,
         menu = 0
     ))
@@ -965,7 +965,7 @@ def admin_log():
     list_data += next_fix('/admin_log?num=', num, get_list)
 
     return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
-        imp = [load_lang('recent') + ' ' + load_lang('authority'), wiki_set(1), custom(), other2([0, 0])],
+        imp = [load_lang('recent') + ' ' + load_lang('authority'), wiki_set(), custom(), other2([0, 0])],
         data = list_data,
         menu = 0
     ))
@@ -985,7 +985,7 @@ def give_log():
     list_data += '</ul><hr><a href="/manager/8">(' + load_lang('create') + ')</a>'
 
     return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
-        imp = [load_lang('admin_group') + ' ' + load_lang('list'), wiki_set(1), custom(), other2([0, 0])],
+        imp = [load_lang('admin_group') + ' ' + load_lang('list'), wiki_set(), custom(), other2([0, 0])],
         data = list_data,
         menu = [['other', load_lang('other')]]
     ))
@@ -1067,7 +1067,7 @@ def update():
                 return redirect('/re_start')
 
     return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
-        imp = [load_lang('update'), wiki_set(1), custom(), other2([0, 0])],
+        imp = [load_lang('update'), wiki_set(), custom(), other2([0, 0])],
         data = 'Auto Update Is Not Support. <a href="https://github.com/2DU/openNAMU">(GitHub)</a>',
         menu = [['manager/1', load_lang('admin')]]
     ))
@@ -1092,13 +1092,13 @@ def xref(name = None):
         
         div += '</li>'
         
-        if re.search('^틀:', data[0]):
+        if re.search('^' + load_lang('template') + ':', data[0]):
             div += '<li><a id="inside" href="/xref/' + url_pas(data[0]) + '">' + data[0] + '</a> (' + load_lang('backlink') + ')</li>'
       
     div += '</ul>' + next_fix('/xref/' + url_pas(name) + '?num=', num, data_list)
     
     return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
-        imp = [name, wiki_set(1), custom(), other2([' (' + load_lang('backlink') + ')', 0])],
+        imp = [name, wiki_set(), custom(), other2([' (' + load_lang('backlink') + ')', 0])],
         data = div,
         menu = [['w/' + url_pas(name), load_lang('document')]]
     ))
@@ -1125,7 +1125,7 @@ def please():
     div += '</ul>' + next_fix('/please?num=', num, data_list)
     
     return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
-        imp = [load_lang('need') + ' ' + load_lang('document'), wiki_set(1), custom(), other2([0, 0])],
+        imp = [load_lang('need') + ' ' + load_lang('document'), wiki_set(), custom(), other2([0, 0])],
         data = div,
         menu = [['other', load_lang('other')]]
     ))
@@ -1171,7 +1171,7 @@ def recent_discuss(tools = 'normal'):
         div += '</tbody></table>'
             
     return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
-        imp = [load_lang('recent') + ' ' + load_lang('discussion'), wiki_set(1), custom(), other2([m_sub, 0])],
+        imp = [load_lang('recent') + ' ' + load_lang('discussion'), wiki_set(), custom(), other2([m_sub, 0])],
         data = div,
         menu = 0
     ))
@@ -1285,7 +1285,7 @@ def block_log(name = None, tool = None, tool2 = None):
         div += next_fix('/' + url_pas(tool) + '/' + url_pas(name) + '?num=', num, data_list)
                 
     return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
-        imp = [load_lang('recent') + ' ' + load_lang('ban'), wiki_set(1), custom(), other2([sub, 0])],
+        imp = [load_lang('recent') + ' ' + load_lang('ban'), wiki_set(), custom(), other2([sub, 0])],
         data = div,
         menu = menu
     ))
@@ -1343,7 +1343,7 @@ def deep_search(name = None):
     div += next_fix('/search/' + url_pas(name) + '?num=', num, all_list)
 
     return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
-        imp = [name, wiki_set(1), custom(), other2([' (' + load_lang('search') + ')', 0])],
+        imp = [name, wiki_set(), custom(), other2([' (' + load_lang('search') + ')', 0])],
         data = div,
         menu = 0
     ))
@@ -1387,7 +1387,7 @@ def raw_view(name = None, sub_title = None, num = None):
         p_data = '<textarea readonly rows="25">' + p_data + '</textarea>'
         
         return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
-            imp = [v_name, wiki_set(1), custom(), other2([sub, 0])],
+            imp = [v_name, wiki_set(), custom(), other2([sub, 0])],
             data = p_data,
             menu = menu
         ))
@@ -1438,7 +1438,7 @@ def revert(name = None):
             return redirect('/w/' + url_pas(name))
 
         return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
-            imp = [name, wiki_set(1), custom(), other2([' (' + load_lang('revert') + ')', 0])],
+            imp = [name, wiki_set(), custom(), other2([' (' + load_lang('revert') + ')', 0])],
             data =  '''
                     <form method="post">
                         <span>''' + flask.request.args.get('num', '0') + load_lang('version') + '''</span>
@@ -1482,7 +1482,7 @@ def big_delete():
         return redirect('/')
     else:
         return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
-            imp = [load_lang('bulk_delete'), wiki_set(1), custom(), other2([0, 0])],
+            imp = [load_lang('bulk_delete'), wiki_set(), custom(), other2([0, 0])],
             data = '''
                     <span>
                         Title A
@@ -1520,7 +1520,7 @@ def edit_filter():
         div = '<a href="/manager/9">(' + load_lang('plus') + ')</a>'
 
     return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
-        imp = [load_lang('edit_filter') + ' ' + load_lang('list'), wiki_set(1), custom(), other2([0, 0])],
+        imp = [load_lang('edit_filter') + ' ' + load_lang('list'), wiki_set(), custom(), other2([0, 0])],
         data = div,
         menu = [['manager', load_lang('admin')]]
     ))
@@ -1575,7 +1575,7 @@ def set_edit_filter(name = None):
             stat = ''
 
         return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
-            imp = [name, wiki_set(1), custom(), other2([' (' + load_lang('edit_filter') + ')', 0])],
+            imp = [name, wiki_set(), custom(), other2([' (' + load_lang('edit_filter') + ')', 0])],
             data = '''
                     <form method="post">
                         <input ''' + stat + ''' type="checkbox" ''' + time_data + ''' name="ban">
@@ -1725,7 +1725,7 @@ def edit(name = None):
         js_data = edit_help_button()
 
         return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
-            imp = [name, wiki_set(1), custom(), other2([' (' + load_lang('edit') + ')', 0])],
+            imp = [name, wiki_set(), custom(), other2([' (' + load_lang('edit') + ')', 0])],
             data = get_name + js_data[0] + '''
                     <form method="post" action="/edit/''' + url_pas(name) + action + '''">
                         ''' + js_data[1] + '''
@@ -1766,7 +1766,7 @@ def preview(name = None):
     js_data = edit_help_button()
     
     return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
-        imp = [name, wiki_set(1), custom(), other2([' (' + load_lang('preview') + ')', 0])],
+        imp = [name, wiki_set(), custom(), other2([' (' + load_lang('preview') + ')', 0])],
         data = js_data[0] + '''
                 <form method="post" action="/edit/''' + url_pas(name) + action + '''">
                     ''' + js_data[1] + '''
@@ -1819,7 +1819,7 @@ def delete(name = None):
             return redirect('/w/' + url_pas(name))
 
         return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
-            imp = [name, wiki_set(1), custom(), other2([' (' + load_lang('delete') + ')', 0])],
+            imp = [name, wiki_set(), custom(), other2([' (' + load_lang('delete') + ')', 0])],
             data = '''
                     <form method="post">
                         ''' + ip_warring() + '''
@@ -1850,7 +1850,7 @@ def move_data(name = None):
     data += '</ul>'
     
     return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
-        imp = [name, wiki_set(1), custom(), other2([' (' + load_lang('move') + ' ' + load_lang('history') + ')', 0])],
+        imp = [name, wiki_set(), custom(), other2([' (' + load_lang('move') + ' ' + load_lang('history') + ')', 0])],
         data = data,
         menu = [['history/' + url_pas(name), load_lang('history')]]
     ))        
@@ -1892,7 +1892,7 @@ def move(name = None):
         return redirect('/w/' + url_pas(flask.request.form.get('title', None)))
     else:            
         return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
-            imp = [name, wiki_set(1), custom(), other2([' (' + load_lang('move') + ')', 0])],
+            imp = [name, wiki_set(), custom(), other2([' (' + load_lang('move') + ')', 0])],
             data = '''
                     <form method="post">
                         ''' + ip_warring() + '''
@@ -1910,7 +1910,7 @@ def move(name = None):
 @app.route('/other')
 def other():
     return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
-        imp = [load_lang('other') + ' ' + load_lang('tool'), wiki_set(1), custom(), other2([0, 0])],
+        imp = [load_lang('other') + ' ' + load_lang('tool'), wiki_set(), custom(), other2([0, 0])],
         data = '''
                 <h2>''' + load_lang('record') + '''</h2>
                 <ul>
@@ -1953,7 +1953,7 @@ def manager(num = 1):
     
     if num == 1:
         return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
-            imp = [load_lang('admin') + ' ' + load_lang('tool'), wiki_set(1), custom(), other2([0, 0])],
+            imp = [load_lang('admin') + ' ' + load_lang('tool'), wiki_set(), custom(), other2([0, 0])],
             data = '''
                     <h2>''' + load_lang('admin') + '''</h2>
                     <ul>
@@ -1987,7 +1987,7 @@ def manager(num = 1):
                 placeholder = title_list[(num - 2)][0]
 
             return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
-                imp = ['Redirect', wiki_set(1), custom(), other2([0, 0])],
+                imp = ['Redirect', wiki_set(), custom(), other2([0, 0])],
                 data = '<form method="post"><input placeholder="' + placeholder + '" name="name" type="text"><hr><button type="submit">' + load_lang('move') + '</button></form>',
                 menu = [['manager', load_lang('admin')]]
             ))
@@ -2029,7 +2029,7 @@ def title_index():
         else:
             count_end += [0]
 
-        sql_list = ['틀:', load_lang('category') + ':', load_lang('user') + ':', load_lang('file') + ':']
+        sql_list = ['' + load_lang('template') + ':', load_lang('category') + ':', load_lang('user') + ':', load_lang('file') + ':']
         for sql in sql_list:
             curs.execute("select count(title) from data where title like ?", [sql + '%'])
             count = curs.fetchall()
@@ -2051,7 +2051,7 @@ def title_index():
     sub = ' (' + str(num) + ')'
     
     return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
-        imp = [load_lang('all') + ' ' + load_lang('document'), wiki_set(1), custom(), other2([sub, 0])],
+        imp = [load_lang('all') + ' ' + load_lang('document'), wiki_set(), custom(), other2([sub, 0])],
         data = data,
         menu = [['other', load_lang('other')]]
     ))
@@ -2190,7 +2190,7 @@ def topic_admin(name = None, sub = None, num = None):
     ban = '<h2>' + load_lang('state') + '</h2><ul>' + ban
 
     return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
-        imp = [load_lang('discussion') + ' ' + load_lang('tool'), wiki_set(1), custom(), other2([' (' + str(num) + ')', 0])],
+        imp = [load_lang('discussion') + ' ' + load_lang('tool'), wiki_set(), custom(), other2([' (' + str(num) + ')', 0])],
         data = ban,
         menu = [['topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '#' + str(num), load_lang('discussion')]]
     ))
@@ -2356,7 +2356,7 @@ def topic(name = None, sub = None):
             data += '<button type="submit">Send</button></form>'
 
         return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
-            imp = [name, wiki_set(1), custom(), other2([' (' + load_lang('discussion') + ')', 0])],
+            imp = [name, wiki_set(), custom(), other2([' (' + load_lang('discussion') + ')', 0])],
             data = '<h2 id="topic_top_title">' + sub + '</h2>' + all_data + data,
             menu = [['topic/' + url_pas(name), load_lang('list')]]
         ))
@@ -2419,7 +2419,7 @@ def close_topic_list(name = None, tool = None):
             plus = re.sub('^<br>', '', plus)
         
         return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
-            imp = [name, wiki_set(1), custom(), other2([' (' + sub + ')', 0])],
+            imp = [name, wiki_set(), custom(), other2([' (' + sub + ')', 0])],
             data =  '<form method="post">' + div + plus + '</form>',
             menu = menu
         ))
@@ -2481,7 +2481,7 @@ def login():
         return redirect('/user')  
     else:        
         return css_html_js_minify.html_minify(flask.render_template(skin_check(),    
-            imp = [load_lang('login'), wiki_set(1), custom(), other2([0, 0])],
+            imp = [load_lang('login'), wiki_set(), custom(), other2([0, 0])],
             data = '''
                     <form method="post">
                         <input placeholder="ID" name="id" type="text">
@@ -2555,7 +2555,7 @@ def change_password():
                 div2 += '<option value="' + skin_data + '">' + skin_data + '</option>'
 
         return css_html_js_minify.html_minify(flask.render_template(skin_check(),    
-            imp = [load_lang('my_info') + ' ' + load_lang('edit'), wiki_set(1), custom(), other2([0, 0])],
+            imp = [load_lang('my_info') + ' ' + load_lang('edit'), wiki_set(), custom(), other2([0, 0])],
             data = '''
                     <form method="post">
                         <span>ID : ''' + ip + '''</span>
@@ -2634,7 +2634,7 @@ def user_check(name = None):
         return re_error('/error/2')
             
     return css_html_js_minify.html_minify(flask.render_template(skin_check(),    
-        imp = [load_lang('check'), wiki_set(1), custom(), other2([0, 0])],
+        imp = [load_lang('check'), wiki_set(), custom(), other2([0, 0])],
         data = div,
         menu = [['manager', load_lang('admin')]]
     ))
@@ -2645,7 +2645,7 @@ def plus_check(name):
         return redirect('/check/' + url_pas(name) + '?plus=' + url_pas(flask.request.form.get('name2', None)))
     else:
         return css_html_js_minify.html_minify(flask.render_template(skin_check(),
-            imp = [load_lang('plus'), wiki_set(1), custom(), other2([0, 0])],
+            imp = [load_lang('plus'), wiki_set(), custom(), other2([0, 0])],
             data = '''
                     <form method="post">
                         <input placeholder="' + load_lang('compare') + '" name="name2" type="text">
@@ -2706,7 +2706,7 @@ def register():
             contract = data[0][0] + '<hr>'
 
         return css_html_js_minify.html_minify(flask.render_template(skin_check(),    
-            imp = [load_lang('register'), wiki_set(1), custom(), other2([0, 0])],
+            imp = [load_lang('register'), wiki_set(), custom(), other2([0, 0])],
             data = '''
                     <form method="post">
                         ''' + contract + '''
@@ -2829,7 +2829,7 @@ def user_ban(name = None):
             data += '<input placeholder="' + load_lang('why') + '" name="why" type="text"><hr>' + plus
 
         return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
-            imp = [name, wiki_set(1), custom(), other2([' (' + now + ')', 0])],
+            imp = [name, wiki_set(), custom(), other2([' (' + now + ')', 0])],
             data = '<form method="post">' + data + '<button type="submit">' + now + '</button></form>',
             menu = [['manager', load_lang('admin')]]
         ))            
@@ -2916,7 +2916,7 @@ def acl(name = None):
                 data += '<hr><input value="' + html.escape(acl_data[0][1]) + '" placeholder="' + load_lang('why') + '" name="why" type="text" ' + check_ok + '>'
             
         return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
-            imp = [name, wiki_set(1), custom(), other2([' (ACL)', 0])],
+            imp = [name, wiki_set(), custom(), other2([' (ACL)', 0])],
             data = '<form method="post">' + data + '<hr><button type="submit">ACL ' + load_lang('edit') + '</button></form>',
             menu = [['w/' + url_pas(name), load_lang('document')], ['manager', load_lang('admin')]]
         ))
@@ -2976,7 +2976,7 @@ def user_admin(name = None):
                     div += '<option value="' + data[0] + '">' + data[0] + '</option>'
         
         return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
-            imp = [name, wiki_set(1), custom(), other2([' (' + load_lang('authority') + ')', 0])],
+            imp = [name, wiki_set(), custom(), other2([' (' + load_lang('authority') + ')', 0])],
             data =  '<form method="post"><select name="select">' + div + '</select><hr><button type="submit">' + load_lang('edit') + '</button></form>',
             menu = [['manager', load_lang('admin')]]
         ))
@@ -3002,7 +3002,7 @@ def diff_data(name = None):
                 result = re.sub('\r', '', diff(diff_data))
             
             return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
-                imp = [name, wiki_set(1), custom(), other2([' (' + load_lang('compare') + ')', 0])],
+                imp = [name, wiki_set(), custom(), other2([' (' + load_lang('compare') + ')', 0])],
                 data = '<pre>' + result + '</pre>',
                 menu = [['history/' + url_pas(name), load_lang('history')]]
             ))
@@ -3020,7 +3020,7 @@ def down(name = None):
     div += '</ul>'
     
     return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
-        imp = [name, wiki_set(1), custom(), other2([' (' + load_lang('under') + ')', 0])],
+        imp = [name, wiki_set(), custom(), other2([' (' + load_lang('under') + ')', 0])],
         data = div,
         menu = [['w/' + url_pas(name), load_lang('document')]]
     ))
@@ -3072,7 +3072,7 @@ def read_view(name = None):
             for data in back:    
                 if re.search('^' + load_lang('category') + ':', data[0]):
                     u_div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a></li>'
-                elif re.search('^틀:', data[0]):
+                elif re.search('^' + load_lang('template') + ':', data[0]):
                     curs.execute("select data from data where title = ?", [data[0]])
                     db_data = curs.fetchall()
                     if db_data:
@@ -3172,7 +3172,7 @@ def read_view(name = None):
     div = end_data + div
 
     return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
-        imp = [name, wiki_set(1), custom(), other2([sub + acl, r_date])],
+        imp = [name, wiki_set(), custom(), other2([sub + acl, r_date])],
         data = div,
         menu = menu
     )), response_data
@@ -3218,7 +3218,7 @@ def user_topic_list(name = None):
         sub = 0 
     
     return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
-        imp = [load_lang('discussion') + ' ' + load_lang('record'), wiki_set(1), custom(), other2([sub, 0])],
+        imp = [load_lang('discussion') + ' ' + load_lang('record'), wiki_set(), custom(), other2([sub, 0])],
         data = div,
         menu = [['other', load_lang('other')], ['user', load_lang('user')], ['count/' + url_pas(name), load_lang('count')], ['record/' + url_pas(name), load_lang('record')]]
     ))
@@ -3407,7 +3407,7 @@ def recent_changes(name = None, tool = 'record'):
             sub = 0
                 
         return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
-            imp = [title, wiki_set(1), custom(), other2([sub, 0])],
+            imp = [title, wiki_set(), custom(), other2([sub, 0])],
             data = div,
             menu = menu
         ))
@@ -3480,7 +3480,7 @@ def upload():
         return redirect('/w/' + load_lang('file') + ':' + name)      
     else:
         return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
-            imp = [load_lang('upload'), wiki_set(1), custom(), other2([0, 0])],
+            imp = [load_lang('upload'), wiki_set(), custom(), other2([0, 0])],
             data =  '''
                     <form method="post" enctype="multipart/form-data" accept-charset="utf8">
                         <input type="file" name="f_data">
@@ -3552,7 +3552,7 @@ def user_info():
         plus2 = ''
 
     return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
-        imp = [load_lang('user') + ' ' + load_lang('tool'), wiki_set(1), custom(), other2([0, 0])],
+        imp = [load_lang('user') + ' ' + load_lang('tool'), wiki_set(), custom(), other2([0, 0])],
         data =  '''
                 <h2>''' + load_lang('state') + '''</h2>
                 <ul>
@@ -3592,7 +3592,7 @@ def watch_list():
     div += '<a href="/manager/13">(' + load_lang('plus') + ')</a>'
 
     return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
-        imp = [load_lang('watchlist') + ' ' + load_lang('list'), wiki_set(1), custom(), other2([0, 0])],
+        imp = [load_lang('watchlist') + ' ' + load_lang('list'), wiki_set(), custom(), other2([0, 0])],
         data = div,
         menu = [['manager', load_lang('admin')]]
     ))
@@ -3657,7 +3657,7 @@ def custom_head_view():
         start += '<span>&lt;style&gt;CSS&lt;/style&gt;<br>&lt;script&gt;JS&lt;/script&gt;</span><hr>'
 
         return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
-            imp = [load_lang('user') + ' HEAD', wiki_set(1), custom(), other2([0, 0])],
+            imp = [load_lang('user') + ' HEAD', wiki_set(), custom(), other2([0, 0])],
             data =  start + '''
                     <form method="post">
                         <textarea rows="25" cols="100" name="content">''' + data + '''</textarea>
@@ -3691,7 +3691,7 @@ def count_edit(name = None):
         t_data = 0
 
     return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
-        imp = [load_lang('count'), wiki_set(1), custom(), other2([0, 0])],
+        imp = [load_lang('count'), wiki_set(), custom(), other2([0, 0])],
         data = '''
                 <ul>
                     <li><a href="/record/''' + url_pas(that) + '''">''' + load_lang('edit') + '''</a> : ''' + str(data) + '''</li>
