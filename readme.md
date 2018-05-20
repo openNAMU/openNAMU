@@ -9,7 +9,7 @@ NamuMark based wiki engine returns to Python. (3.5 and above)
  * git clone -b master https://github.com/2DU/openNAMU.git
 
 ## Install
- * [참조](http://namu.ml/w/openNAMU/Install)
+ * [Reference](http://namu.ml/w/openNAMU/Install)
  
 ## set.json Explanation
  * db = Database Name
