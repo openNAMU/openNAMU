@@ -8,6 +8,7 @@
     "move" : "Move",
     "hide" : "Hide",
     "list" : "List",
+    "out" : "out",
     "revert" : "Undo",
     "version" : " Ver",
     "normal_version" : "Version",
