@@ -615,7 +615,6 @@ def start(conn, data, title, lang):
     data = tool.savemark(data)
     
     data = re.sub("\[anchor\((?P<in>(?:(?!\)\]).)+)\)\]", '<span id="\g<in>"></span>', data)          
-    data = re.sub("\[nicovideo\((?P<in>(?:(?!,|\)\]).)+)(?:(?:(?!\)\]).)*)\)\]", "[[http://embed.nicovideo.jp/watch/\g<in>|\g<in>]]", data)
     data = re.sub('\[ruby\((?P<in>(?:(?!,).)+)\, ?(?P<out>(?:(?!\)\]).)+)\)\]', '<ruby>\g<in><rp>(</rp><rt>\g<out></rt><rp>)</rp></ruby>', data)
 
     # 원래 코드 재탕
@@ -661,7 +660,7 @@ def start(conn, data, title, lang):
 
     # 유튜브, 카카오 티비 처리
     while 1:
-        video = re.search('\[(youtube|kakaotv)\(((?:(?!\)\]).)+)\)\]', data)
+        video = re.search('\[(youtube|kakaotv|nicovideo)\(((?:(?!\)\]).)+)\)\]', data)
         if video:
             video = video.groups()
             
@@ -691,13 +690,15 @@ def start(conn, data, title, lang):
                 video_code = re.sub('^https:\/\/youtu\.be\/', '', video_code)
                 
                 video_src = 'https://www.youtube.com/embed/' + video_code
-            else:
+            elif video[0] == 'kakaotv':
                 video_code = re.sub('^https:\/\/tv\.kakao\.com\/channel\/9262\/cliplink\/', '', video_code)
                 video_code = re.sub('^http:\/\/tv\.kakao\.com\/v\/', '', video_code)
                 
                 video_src = 'https://tv.kakao.com/embed/player/cliplink/' + video_code +'?service=kakao_tv'
+            else:
+                video_src = 'https://embed.nicovideo.jp/watch/' + video_code
                 
-            data = re.sub('\[(youtube|kakaotv)\(((?:(?!\)\]).)+)\)\]', '<iframe width="' + video_width + '" height="' + video_height + '" src="' + video_src + '" allowfullscreen frameborder="0"></iframe>', data, 1)
+            data = re.sub('\[(youtube|kakaotv|nicovideo)\(((?:(?!\)\]).)+)\)\]', '<iframe width="' + video_width + '" height="' + video_height + '" src="' + video_src + '" allowfullscreen frameborder="0"></iframe>', data, 1)
         else:
             break
 
