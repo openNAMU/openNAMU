@@ -85,6 +85,9 @@ def load_lang(data):
         else:
             return else_lang[data]
 
+def namumark_re(name = '', data = '', set_num = 0):
+    return namumark(name, data, set_num, load_lang('please_all'))
+
 def edit_help_button():
     # https://stackoverflow.com/questions/11076975/insert-text-into-textarea-at-cursor-position-javascript
     '''
@@ -162,7 +165,7 @@ def next_fix(link, num, page, end = 50):
 def other2(origin):
     return origin + ['Deleted']
 
-def wiki_set(num):
+def wiki_set(num = 1):
     if num == 1:
         data_list = []
 
