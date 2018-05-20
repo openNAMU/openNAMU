@@ -555,7 +555,7 @@ def start(conn, data, title, lang):
     # [목차(없음)] 처리
     if not re.search('\[(?:목차|tableofcontents)\((?:없음|no)\)\]\n', data):
         if not re.search('\[(?:목차|tableofcontents)\]', data):
-            data = re.sub('\n(?P<in>={1,6}) ?(?P<out>(?:(?!=).)+) ?={1,6}\n', '\n[(?:목차|tableofcontents)]\n\g<in> \g<out> \g<in>\n', data, 1)
+            data = re.sub('\n(?P<in>={1,6}) ?(?P<out>(?:(?!=).)+) ?={1,6}\n', '\n[목차]\n\g<in> \g<out> \g<in>\n', data, 1)
     else:
         data = re.sub('\[(?:목차|tableofcontents)\((?:없음|no)\)\]\n', '', data)
         
