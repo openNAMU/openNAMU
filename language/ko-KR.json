@@ -4,12 +4,12 @@
     "delete": "삭제",
     "bulk_delete": "대량 삭제",
     "edit_filter": "편집 필터",
-    "move": " 이동",
+    "move": "이동",
     "hide": "숨김",
     "list": "목록",
     "revert": "되돌리기",
     "version": "판",
-    "normal_version" : "버전",
+    "normal_version": "버전",
     "document": "문서",
     "all": "모든",
     "ban": "차단",
@@ -101,5 +101,7 @@
     "decument_exist_error": "내용이 원래 문서와 동일 합니다.",
     "password_diffrent_error": "재 확인 비밀번호와 입력 비밀번호가 다릅니다.",
     "edit_filter_error": "편집 필터에 의해 검열 되었습니다.",
-    "file_name_error": "파일 이름은 알파벳, 한글, 띄어쓰기, 언더바, 빼기표만 허용 됩니다."
+    "file_name_error": "파일 이름은 알파벳, 한글, 띄어쓰기, 언더바, 빼기표만 허용 됩니다.",
+    "template": "틀",
+    "out": "외부"
 }

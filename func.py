@@ -85,6 +85,9 @@ def load_lang(data):
         else:
             return else_lang[data]
 
+def namumark_re(name = '', data = '', set_num = 0):
+    return namumark(name, data, set_num, load_lang('please_all'))
+
 def edit_help_button():
     # https://stackoverflow.com/questions/11076975/insert-text-into-textarea-at-cursor-position-javascript
     '''

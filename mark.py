@@ -29,8 +29,8 @@ def plusing(name, link, backtype):
     if not curs.fetchall():
         curs.execute("insert into back (title, link, type) values (?, ?, ?)", [link, name, backtype])
 
-def namumark(title, data, num):
-    data = start(conn, data, title)
+def namumark(title, data, num, lang):
+    data = start(conn, data, title, lang)
     if num == 1:
         i = 0
         while 1:

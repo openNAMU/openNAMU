@@ -19,7 +19,7 @@ import sys
 from func import *
 
 # 버전 표기
-r_ver = 'v3.0.4-Final-Beta-' + re.sub('^[0-9]{2}', '', str(int(datetime.datetime.fromtimestamp(os.path.getmtime('app.py')).strftime('%Y%m%d'))))
+r_ver = 'v3.0.4-Stable-' + re.sub('^[0-9]{2}', '', str(int(datetime.datetime.fromtimestamp(os.path.getmtime('app.py')).strftime('%Y%m%d'))))
 print('Version : ' + r_ver)
 
 # set.json 설정 확인
@@ -1427,7 +1427,11 @@ def revert(name = None):
                 curs.execute("insert into data (title, data) values (?, ?)", [name, data[0][0]])
                 
             history_plus(name, data[0][0], get_time(), ip_check(), flask.request.form.get('send', None) + ' (' + str(num) + load_lang('version') + ')', leng)
-            namumark(name, data[0][0], 1)
+            namumark_re(
+                name = name,
+                data = data[0][0],
+                set_num = 1
+            )
             
             conn.commit()
             
@@ -1681,7 +1685,11 @@ def edit(name = None):
         curs.execute("delete from back where link = ?", [name])
         curs.execute("delete from back where title = ? and type = 'no'", [name])
         
-        namumark(name, content, 1)
+        namumark_re(
+            name = name,
+            data = content,
+            set_num = 1
+        )
         
         conn.commit()
         
@@ -1756,7 +1764,10 @@ def preview(name = None):
     new_data = re.sub('^\r\n', '', new_data)
     new_data = re.sub('\r\n$', '', new_data)
     
-    end_data = namumark(name, new_data, 0)
+    end_data = namumark_re(
+        name = name,
+        data = new_data
+    )
     
     if flask.request.args.get('section', None):
         action = '?section=' + flask.request.args.get('section', None)
@@ -2029,7 +2040,7 @@ def title_index():
         else:
             count_end += [0]
 
-        sql_list = ['' + load_lang('template') + ':', load_lang('category') + ':', load_lang('user') + ':', load_lang('file') + ':']
+        sql_list = [load_lang('template') + ':', load_lang('category') + ':', load_lang('user') + ':', load_lang('file') + ':']
         for sql in sql_list:
             curs.execute("select count(title) from data where title like ?", [sql + '%'])
             count = curs.fetchall()
@@ -2041,10 +2052,10 @@ def title_index():
         count_end += [count_end[0] - count_end[1]  - count_end[2]  - count_end[3]  - count_end[4]]
         
         data += '</ul><hr><ul><li>All : ' + str(count_end[0]) + '</li></ul><hr><ul>'
-        data += '<li>Template : ' + str(count_end[1]) + '</li>'
-        data += '<li>Category : ' + str(count_end[2]) + '</li>'
-        data += '<li>User : ' + str(count_end[3]) + '</li>'
-        data += '<li>File : ' + str(count_end[4]) + '</li>'
+        data += '<li>' + load_lang('template') + ' : ' + str(count_end[1]) + '</li>'
+        data += '<li>' + load_lang('category') + ' : ' + str(count_end[2]) + '</li>'
+        data += '<li>' + load_lang('user') + ' : ' + str(count_end[3]) + '</li>'
+        data += '<li>' + load_lang('file') + ' : ' + str(count_end[4]) + '</li>'
         data += '<li>Other : ' + str(count_end[5]) + '</li>'
 
     data += '</ul>' + next_fix('/title_index?num=' + str(num) + '&page=', page, title_list, num)
@@ -2291,7 +2302,7 @@ def topic(name = None, sub = None):
                                 
             all_data += '<table id="toron"><tbody><tr><td id="toron_color_red">'
             all_data += '<a href="#' + topic_data[1] + '">#' + topic_data[1] + '</a> ' + ip_pas(topic_data[3]) + who_plus + ' <span style="float: right;">' + topic_data[2] + '</span>'
-            all_data += '</td></tr><tr><td>' + namumark('', topic_data[0], 0) + '</td></tr></tbody></table><br>'    
+            all_data += '</td></tr><tr><td>' + namumark_re(data = topic_data[0]) + '</td></tr></tbody></table><br>'    
 
         for topic_data in topic:
             if number == 1:
@@ -2310,7 +2321,7 @@ def topic(name = None, sub = None):
             else:
                 blind_data = ''
 
-            user_write = namumark('', topic_data[0], 0)
+            user_write = namumark_re(data = topic_data[0])
             ip = ip_pas(topic_data[3])
             
             curs.execute('select acl from user where id = ?', [topic_data[3]])
@@ -3137,7 +3148,10 @@ def read_view(name = None):
         else_data = re.sub('^\r\n', '', else_data)
         else_data = re.sub('\r\n$', '', else_data)
             
-    end_data = namumark(name, else_data, 0)
+    end_data = namumark_re(
+        name = name,
+        data = else_data
+    )
     
     if num:
         menu = [['history/' + url_pas(name), load_lang('history')]]
