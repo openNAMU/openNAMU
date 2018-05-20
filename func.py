@@ -544,50 +544,49 @@ def re_error(data):
             data = '<h2>Error</h2><ul>' + end + '</ul>',
             menu = 0
         ))
+    else:
+        error_data = re.search('\/error\/([0-9]+)', data)
+        if error_data:
+            num = int(error_data.groups()[0])
+            if num == 1:
+                data = load_lang('no_login_error')
+            elif num == 2:
+                data = load_lang('no_exist_user_error')
+            elif num == 3:
+                data = load_lang('authority_error')
+            elif num == 4:
+                data = load_lang('no_admin_block_error')
+            elif num == 6:
+                data = load_lang('same_id_exist_error')
+            elif num == 7:
+                data = load_lang('long_id_error')
+            elif num == 8:
+                data = load_lang('id_char_error')
+            elif num == 9:
+                data = load_lang('file_exist_error')
+            elif num == 10:
+                data = load_lang('password_error')
+            elif num == 13:
+                data = load_lang('recaptcha_error')
+            elif num == 14:
+                data = load_lang('file_extension_error')
+            elif num == 15:
+                data = load_lang('edit_record_error')
+            elif num == 16:
+                data = load_lang('same_file_error')
+            elif num == 17:
+                data = load_lang('file_capacity_error') + ' ' + wiki_set(3)
+            elif num == 19:
+                data = load_lang('decument_exist_error')
+            elif num == 20:
+                data = load_lang('password_diffrent_error')
+            elif num == 21:
+                data = load_lang('edit_filter_error')
+            elif num == 22:
+                data = load_lang('file_name_error')
+            else:
+                data = '???'
 
-    error_data = re.search('\/error\/([0-9]+)', data)
-    if error_data:
-        num = int(error_data.groups()[0])
-        if num == 1:
-            data = load_lang('no_login_error')
-        elif num == 2:
-            data = load_lang('no_exist_user_error')
-        elif num == 3:
-            data = load_lang('authority_error')
-        elif num == 4:
-            data = load_lang('no_admin_block_error')
-        elif num == 6:
-            data = load_lang('same_id_exist_error')
-        elif num == 7:
-            data = load_lang('long_id_error')
-        elif num == 8:
-            data = load_lang('id_char_error')
-        elif num == 9:
-            data = load_lang('file_exist_error')
-        elif num == 10:
-            data = load_lang('password_error')
-        elif num == 13:
-            data = load_lang('recaptcha_error')
-        elif num == 14:
-            data = load_lang('file_extension_error')
-        elif num == 15:
-            data = load_lang('edit_record_error')
-        elif num == 16:
-            data = load_lang('same_file_error')
-        elif num == 17:
-            data = load_lang('file_capacity_error') + ' ' + wiki_set(3)
-        elif num == 19:
-            data = load_lang('decument_exist_error')
-        elif num == 20:
-            data = load_lang('password_diffrent_error')
-        elif num == 21:
-            data = load_lang('edit_filter_error')
-        elif num == 22:
-            data = load_lang('file_name_error')
-        else:
-            data = '???'
-
-        if title:
             return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
                 imp = ['Error', wiki_set(1), custom(), other2([0, 0])],
                 data = '<h2>Error</h2><ul><li>' + data + '</li></ul>',
@@ -595,5 +594,3 @@ def re_error(data):
             ))
         else:
             return redirect('/')
-    else:
-        return redirect('/')
