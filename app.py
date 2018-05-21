@@ -19,7 +19,7 @@ import sys
 from func import *
 
 # 버전 표기
-r_ver = 'v3.0.4-Stable-' + re.sub('^[0-9]{2}', '', str(int(datetime.datetime.fromtimestamp(os.path.getmtime('app.py')).strftime('%Y%m%d'))))
+r_ver = 'v3.0.5-Master-' + re.sub('^[0-9]{2}', '', str(int(datetime.datetime.fromtimestamp(os.path.getmtime('app.py')).strftime('%Y%m%d'))))
 print('Version : ' + r_ver)
 
 # set.json 설정 확인
@@ -411,7 +411,7 @@ def edit_set(num = 0):
         return re_error('/ban')
 
     if num == 0:
-        li_list = ['Normal', 'Set Text', 'Main HEAD', 'robots.txt', 'Google']
+        li_list = ['Main', 'Set Text', 'Main HEAD', 'robots.txt', 'Google']
         
         x = 0
         
@@ -427,8 +427,8 @@ def edit_set(num = 0):
             menu = [['manager', load_lang('admin')]]
         ))
     elif num == 1:
-        i_list = ['name', 'logo', 'frontpage', 'license', 'upload', 'skin', 'edit', 'reg', 'ip_view', 'back_up', 'port', 'key']
-        n_list = ['Wiki', '', 'FrontPage', 'CC 0', '2', '', 'normal', '', '', '0', '3000', 'Test']
+        i_list = ['name', 'logo', 'frontpage', 'license', 'upload', 'skin', 'edit', 'reg', 'ip_view', 'back_up', 'port', 'key', 'update']
+        n_list = ['Wiki', '', 'FrontPage', 'CC 0', '2', '', 'normal', '', '', '0', '3000', 'Test', 'stable']
         
         if flask.request.method == 'POST':
             i = 0
@@ -491,8 +491,16 @@ def edit_set(num = 0):
                 else:
                     div2 += '<option value="' + skin_data + '">' + skin_data + '</option>'
 
+            div3 =''
+            if d_list[12] == 'stable':
+                div3 += '<option value="stable">stable</option>'
+                div3 += '<option value="master">master</option>'
+            else:
+                div3 += '<option value="master">master</option>'
+                div3 += '<option value="stable">stable</option>'
+
             return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
-                imp = ['Normal', wiki_set(), custom(), other2([0, 0])],
+                imp = ['Main', wiki_set(), custom(), other2([0, 0])],
                 data = '''
                         <form method="post">
                             <span>''' + load_lang('name') + '''</span>
@@ -548,6 +556,11 @@ def edit_set(num = 0):
                             <br>
                             <br>
                             <input placeholder="Secret Key" type="password" name="key" value="''' + html.escape(d_list[11]) + '''">
+                            <hr>
+                            <span>Update Branch</span>
+                            <br>
+                            <br>
+                            <select name="update">''' + div3 + '''</select>
                             <hr>
                             <button id="save" type="submit">''' + load_lang('save') + '''</button>
                         </form>
