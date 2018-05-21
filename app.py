@@ -1079,8 +1079,6 @@ def update():
         else:
             ok = os.system('git pull')
             if ok == 0:
-                return redirect('/re_start')
-            else:
                 return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
                     imp = [load_lang('update'), wiki_set(), custom(), other2([0, 0])],
                     data = 'Select Branche Fail <a href="/re_start">(' + load_lang('restart') + ')</a>',
