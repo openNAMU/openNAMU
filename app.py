@@ -1041,40 +1041,55 @@ def indexing():
     
     return redirect('/')        
 
-@app.route('/re_start')
+@app.route('/re_start', methods=['POST', 'GET'])
 def re_start():
     if admin_check(None, 're_start') != 1:
         return re_error('/error/3')
 
-    print('Re Start')
+    if flask.request.method == 'POST':
+        os.execl(sys.executable, sys.executable, *sys.argv)
+    else:
+        print('Re Start')
 
-    os.execl(sys.executable, sys.executable, *sys.argv)
+        return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
+            imp = [load_lang('server') + ' ' + load_lang('restart'), wiki_set(), custom(), other2([0, 0])],
+            data = '<form method="post"><button type="submit">' + load_lang('restart') + '</button></form>',
+            menu = [['manager', load_lang('admin')]]
+        ))       
 
 @app.route('/update')
 def update():
     if admin_check(None, 'update') != 1:
        return re_error('/error/3')
 
+    curs.execute('select data from other where name = "update"')
+    up_data = curs.fetchall()
+    if up_data:
+        up_data = up_data[0][0]
+    else:
+        up_data = 'stable'
+
     if platform.system() == 'Linux':
         print('Update')
 
-        ok = os.system('git pull')
+        os.system('git remote add origin https://github.com/2DU/openNAMU.git')
+        ok = os.system('git pull origin ' + up_data)
         if ok == 0:
             return redirect('/re_start')
     else:
         if platform.system() == 'Windows':
             print('Download')
 
-            urllib.request.urlretrieve('https://github.com/2DU/openNAMU/archive/stable.zip', 'update.zip')
+            urllib.request.urlretrieve('https://github.com/2DU/openNAMU/archive/' + up_data + '.zip', 'update.zip')
 
             print('Zip Extract')
             zipfile.ZipFile('update.zip').extractall('')
 
             print('Move')
-            ok = os.system('xcopy /y /r openNAMU-stable .')
+            ok = os.system('xcopy /y /r openNAMU-' + up_data + ' .')
             if ok == 0:
                 print('Remove')
-                os.system('rd /s /q openNAMU-stable')
+                os.system('rd /s /q openNAMU-' + up_data)
                 os.system('del update.zip')
 
                 return redirect('/re_start')
@@ -1994,7 +2009,7 @@ def manager(num = 1):
                         <li><a href="/indexing">Indexing (''' + load_lang('create') + ' or ' + load_lang('delete') + ''')</a></li>
                         <li><a href="/manager/8">''' + load_lang('admin_group') + ' ' + load_lang('create') + '''</a></li>
                         <li><a href="/edit_set">''' + load_lang('setting') + ' ' + load_lang('edit') + '''</a></li>
-                        <li><a href="/re_start">Server Restart</a></li>
+                        <li><a href="/re_start">''' + load_lang('server') + ' ' + load_lang('restart') + '''</a></li>
                         <li><a href="/update">''' + load_lang('update') + '''</a></li>
                         <li><a href="/inter_wiki">''' + load_lang('interwiki') + '''</a></li>
                     </ul>
@@ -2743,7 +2758,7 @@ def register():
                         <input placeholder="Email (Option)" name="email" type="text">
                         <hr>
                         ''' + captcha_get() + '''
-                        <button type="submit">' + load_lang('register') + '</button>
+                        <button type="submit">''' + load_lang('register') + '''</button>
                         <hr>
                         <span>''' + load_lang('http_warring') + '''</span>
                     </form>
