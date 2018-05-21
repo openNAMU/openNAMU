@@ -1072,8 +1072,8 @@ def update():
     if platform.system() == 'Linux':
         print('Update')
 
-        os.system('git remote add origin https://github.com/2DU/openNAMU.git')
-        ok = os.system('git pull origin ' + up_data)
+        os.system('git remote add opennamu https://github.com/2DU/openNAMU.git')
+        ok = os.system('git pull openmau ' + up_data)
         if ok == 0:
             return redirect('/re_start')
     else:
