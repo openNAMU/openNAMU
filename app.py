@@ -154,8 +154,8 @@ curs.execute("select data from other where name = 'language'")
 rep_data = curs.fetchall()
 if not rep_data:
     while 1:
-        print('Language [ko-KR] : ', end = '')
-        support_language = ['ko-KR']
+        print('Language [ko-KR, en-US] : ', end = '')
+        support_language = ['ko-KR', 'en-US']
         
         rep_language = str(input())
         if rep_language in support_language:
@@ -1083,7 +1083,7 @@ def update():
             else:
                 return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
                     imp = [load_lang('update'), wiki_set(), custom(), other2([0, 0])],
-                    data = 'Select Branche Fail',
+                    data = 'Select Branche Fail <a href="/re_start">(' + load_lang('restart') + ')</a>',
                     menu = [['manager/1', load_lang('admin')]]
                 ))
     else:
