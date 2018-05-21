@@ -1072,6 +1072,7 @@ def update():
     if platform.system() == 'Linux':
         print('Update')
 
+        os.system('git remote rm origin')
         os.system('git remote add origin https://github.com/2DU/openNAMU.git')
         ok = os.system('git reset --hard origin/' + up_data)
         if ok == 0:
