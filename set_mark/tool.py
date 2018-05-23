@@ -14,6 +14,7 @@ def ip_check():
         try:
             ip = flask.request.environ.get('HTTP_X_REAL_IP', flask.request.remote_addr)
             
+            print(flask.request.environ.get('HTTP_X_FORWARDED_FOR', flask.request.remote_addr))
             if ip == ('::1' or '127.0.0.1'):
                 ip = flask.request.environ.get('HTTP_X_FORWARDED_FOR', flask.request.remote_addr)
         except:
