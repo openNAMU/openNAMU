@@ -12,7 +12,7 @@ def ip_check():
         ip = flask.session['DREAMER']
     else:
         try:
-            ip = flask.request.environ.get('HTTP_X_REAL_IP', flask.request.remote_addr)
+            ip = flask.request.environ.get('HTTP_X_FORWARDED_FOR', flask.request.remote_addr)
         except:
             ip = 'None'
 
