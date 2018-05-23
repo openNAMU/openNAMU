@@ -21,10 +21,11 @@ def ip_check():
 def savemark(data):
     data = re.sub("\[date\(now\)\]", get_time(), data)
     
-    if not re.search("\.", ip_check()):
-        name = '[[사용자:' + ip_check() + '|' + ip_check() + ']]'
+    ip = ip_check()
+    if not re.search("\.", ip):
+        name = '[[사용자:' + ip + '|' + ip + ']]'
     else:
-        name = ip_check()
+        name = ip
         
     data = re.sub("\[name\]", name, data)
 
