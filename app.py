@@ -1,4 +1,5 @@
 # 모듈 불러오기
+import werkzeug.contrib.fixers
 import flask_compress
 import flask_reggie
 import tornado.ioloop
@@ -54,6 +55,7 @@ load_conn(conn)
 # 기타 설정 변경
 logging.basicConfig(level = logging.ERROR)
 app = flask.Flask(__name__, template_folder = './')
+app.wsgi_app = werkzeug.contrib.fixers.ProxyFix(app.wsgi_app)
 flask_reggie.Reggie(app)
 compress = flask_compress.Compress()
 compress.init_app(app)
