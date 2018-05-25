@@ -539,14 +539,14 @@ def edit_set(num = 0):
                             <br>
                             <select name="skin">''' + div2 + '''</select>
                             <hr>
-                            <span>Main ACL</span>
+                            <span>Default ACL</span>
                             <br>
                             <br>
                             <select name="edit">''' + div + '''</select>
                             <hr>
-                            <input type="checkbox" name="reg" ''' + ch_1 + '''> No Register
+                            <input type="checkbox" name="reg" ''' + ch_1 + '''> Unable Register
                             <hr>
-                            <input type="checkbox" name="ip_view" ''' + ch_2 + '''> IP Hide
+                            <input type="checkbox" name="ip_view" ''' + ch_2 + '''> IP Hidden
                             <hr>
                             <span>Port</span>
                             <br>
@@ -884,7 +884,7 @@ def admin_list():
         name = ip_pas(data[0]) + ' <a href="/admin_plus/' + url_pas(data[1]) + '">(' + data[1] + ')</a>'
         
         if data[2] != '':
-            name += '(' + load_lang('register') + ' : ' + data[2] + ')'
+            name += '(' + data[2] + ')'
 
         div += '<li>' + name + '</li>'
         
@@ -938,7 +938,7 @@ def user_log():
         list_data += '<li>' + ip_pas(data[0]) + ban_button
         
         if data[1] != '':
-            list_data += ' (' + load_lang('register') + ' : ' + data[1] + ')'
+            list_data += ' (' + data[1] + ')'
 
         list_data += '</li>'
 
@@ -955,7 +955,7 @@ def user_log():
     list_data += next_fix('/user_log?num=', num, user_list)
 
     return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
-        imp = [load_lang('recent') + ' ' + load_lang('register'), wiki_set(), custom(), other2([0, 0])],
+        imp = [load_lang('recent') + ' ' + load_lang('subscriber'), wiki_set(), custom(), other2([0, 0])],
         data = list_data,
         menu = 0
     ))
@@ -2002,7 +2002,7 @@ def manager(num = 1):
                         <li><a href="/manager/2">''' + load_lang('document') + ''' ACL</a></li>
                         <li><a href="/manager/3">''' + load_lang('user') + ' ' + load_lang('check') + '''</a></li>
                         <li><a href="/manager/4">''' + load_lang('user') + ' ' + load_lang('ban') + '''</a></li>
-                        <li><a href="/manager/5">''' + load_lang('authority') + '''</a></li>
+                        <li><a href="/manager/5">''' + load_lang('subscriber') + ' ' + load_lang('authority') + '''</a></li>
                         <li><a href="/big_delete">''' + load_lang('bulk_delete') + '''</a></li>
                         <li><a href="/edit_filter">''' + load_lang('edit_filter') + '''</a></li>
                     </ul>
@@ -2632,6 +2632,12 @@ def change_password():
 def user_check(name = None):
     if admin_check(4, 'check (' + name + ')') != 1:
         return re_error('/error/3')
+        
+    num = int(flask.request.args.get('num', 1))
+    if num * 50 > 0:
+        sql_num = num * 50 - 50
+    else:
+        sql_num = 0
 
     curs.execute("select acl from user where id = ? or id = ?", [name, flask.request.args.get('plus', 'None-Data')])
     user = curs.fetchall()
@@ -2640,20 +2646,25 @@ def user_check(name = None):
             return re_error('/error/4')
     
     if flask.request.args.get('plus', None):
+        end_check = 1
+    
         if ip_or_user(name) == 1:
             if ip_or_user(flask.request.args.get('plus', None)) == 1:
-                curs.execute("select name, ip, ua, today from ua_d where ip = ? or ip = ? order by today desc", [name, flask.request.args.get('plus', None)])
+                curs.execute("select name, ip, ua, today from ua_d where ip = ? or ip = ? order by today desc limit ?, '50'", [name, flask.request.args.get('plus', None), sql_num])
             else:
-                curs.execute("select name, ip, ua, today from ua_d where ip = ? or name = ? order by today desc", [name, flask.request.args.get('plus', None)])
+                curs.execute("select name, ip, ua, today from ua_d where ip = ? or name = ? order by today desc limit ?, '50'", [name, flask.request.args.get('plus', None), sql_num])
         else:
             if ip_or_user(flask.request.args.get('plus', None)) == 1:
-                curs.execute("select name, ip, ua, today from ua_d where name = ? or ip = ? order by today desc", [name, flask.request.args.get('plus', None)])
+                curs.execute("select name, ip, ua, today from ua_d where name = ? or ip = ? order by today desc limit ?, '50'", [name, flask.request.args.get('plus', None), sql_num])
             else:
-                curs.execute("select name, ip, ua, today from ua_d where name = ? or name = ? order by today desc", [name, flask.request.args.get('plus', None)])
-    elif ip_or_user(name) == 1:
-        curs.execute("select name, ip, ua, today from ua_d where ip = ? order by today desc", [name])
+                curs.execute("select name, ip, ua, today from ua_d where name = ? or name = ? order by today desc limit ?, '50'", [name, flask.request.args.get('plus', None), sql_num])
     else:
-        curs.execute("select name, ip, ua, today from ua_d where name = ? order by today desc", [name])
+        end_check = 0
+        
+        if ip_or_user(name) == 1:
+            curs.execute("select name, ip, ua, today from ua_d where ip = ? order by today desc limit ?, '50'", [name, sql_num])
+        else:
+            curs.execute("select name, ip, ua, today from ua_d where name = ? order by today desc limit ?, '50'", [name, sql_num])
     
     record = curs.fetchall()
     if record:
@@ -2677,6 +2688,11 @@ def user_check(name = None):
         div += '</tbody></table>'
     else:
         return re_error('/error/2')
+        
+    if end_check == 1:
+        div += next_fix('/check/' + url_pas(name) + '?plus=' + flask.request.args.get('plus', None) + '&num=', num, record)
+    else:
+        div += next_fix('/check/' + url_pas(name) + '?num=', num, record)
             
     return css_html_js_minify.html_minify(flask.render_template(skin_check(),    
         imp = [load_lang('check'), wiki_set(), custom(), other2([0, 0])],
@@ -3310,7 +3326,7 @@ def recent_changes(name = None, tool = 'record'):
                 div = '<a href="/recent_changes?what=move">(' + load_lang('move') + ')</a> ' + div
                 div = '<a href="/recent_changes?what=delete">(' + load_lang('delete') + ')</a> ' + div
 
-                div = '<a href="/recent_discuss">(' + load_lang('discussion') + ')</a> <a href="/block_log">(' + load_lang('ban') + ')</a> <a href="/user_log">(' + load_lang('register') + ')</a> <a href="/admin_log">(' + load_lang('authority') + ')</a><hr>' + div
+                div = '<a href="/recent_discuss">(' + load_lang('discussion') + ')</a> <a href="/block_log">(' + load_lang('ban') + ')</a> <a href="/user_log">(' + load_lang('subscriber') + ')</a> <a href="/admin_log">(' + load_lang('authority') + ')</a><hr>' + div
                 
                 curs.execute("select id, title, date, ip, send, leng from history order by date desc limit 50")
             else:
