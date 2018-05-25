@@ -84,6 +84,12 @@ def load_lang(data):
             return lang[data]
         else:
             return else_lang[data]
+            
+def ip_or_user(data):
+    if re.search('(\.|:)', data):
+        return 1
+    else:
+        return 0
 
 def namumark_re(name = '', data = '', set_num = 0):
     return namumark(name, data, set_num, load_lang('please_all'))
