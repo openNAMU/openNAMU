@@ -1991,7 +1991,7 @@ def other():
 @app.route('/manager', methods=['POST', 'GET'])
 @app.route('/manager/<int:num>', methods=['POST', 'GET'])
 def manager(num = 1):
-    title_list = [[load_lang('document') + ' ' + load_lang('name'), 'acl'], [0, 'check'], [0, 'ban'], [0, 'admin'], [0, 'record'], [0, 'topic_record'], [load_lang('name'), 'admin_plus'], [load_lang('name'), 'edit_filter'], [load_lang('document') + ' ' + load_lang('name'), 'search'], [0, 'block_user'], [0, 'block_admin'], [load_lang('document') + ' ' + load_lang('name'), 'watch_list']]
+    title_list = [[load_lang('document') + ' ' + load_lang('name'), 'acl'], [0, 'check'], [0, 'ban'], [0, 'admin'], [0, 'record'], [0, 'topic_record'], [load_lang('name'), 'admin_plus'], [load_lang('name'), 'edit_filter'], [load_lang('document') + ' ' + load_lang('name'), 'search'], [0, 'block_user'], [0, 'block_admin'], [load_lang('document') + ' ' + load_lang('name'), 'watch_list'], [load_lang('compare'), 'check']]
     
     if num == 1:
         return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
@@ -2019,9 +2019,12 @@ def manager(num = 1):
                     ''',
             menu = [['other', load_lang('other')]]
         ))
-    elif num in range(2, 14):
+    elif num in range(2, 15):
         if flask.request.method == 'POST':
-            return redirect('/' + title_list[(num - 2)][1] + '/' + url_pas(flask.request.form.get('name', None)))
+            if flask.request.args.get('plus', None):
+                return redirect('/' + title_list[(num - 2)][1] + '/' + url_pas(flask.request.args.get('plus', None)) + '?plus=' + flask.request.form.get('name', None))
+            else:
+                return redirect('/' + title_list[(num - 2)][1] + '/' + url_pas(flask.request.form.get('name', None)))
         else:
             if title_list[(num - 2)][0] == 0:
                 placeholder = load_lang('user') + ' ' + load_lang('name')
@@ -2655,9 +2658,9 @@ def user_check(name = None):
     record = curs.fetchall()
     if record:
         if not flask.request.args.get('plus', None):
-            div = '<a href="/plus_check/' + url_pas(name) + '">(' + load_lang('compare') + ')</a><hr>'
+            div = '<a href="/manager/14?plus=' + url_pas(name) + '">(' + load_lang('compare') + ')</a><hr>'
         else:
-            div = '<a href="/check/' + url_pas(name) + '">(Main)</a> <a href="/check/' + url_pas(flask.request.args.get('plus', None)) + '">(Sub)</a><hr>'
+            div = '<a href="/check/' + url_pas(name) + '">(' + name + ')</a> <a href="/check/' + url_pas(flask.request.args.get('plus', None)) + '">(' + flask.request.args.get('plus', None) + ')</a><hr>'
 
         div += '<table style="width: 100%; text-align: center;"><tbody><tr>'
         div += '<td style="width: 33.3%;">' + load_lang('name') + '</td><td style="width: 33.3%;">IP</td><td style="width: 33.3%;">' + load_lang('time') + '</td></tr>'
@@ -2680,23 +2683,6 @@ def user_check(name = None):
         data = div,
         menu = [['manager', load_lang('admin')]]
     ))
-
-@app.route('/plus_check/<name>', methods=['POST', 'GET'])
-def plus_check(name):
-    if flask.request.method == 'POST':
-        return redirect('/check/' + url_pas(name) + '?plus=' + url_pas(flask.request.form.get('name2', None)))
-    else:
-        return css_html_js_minify.html_minify(flask.render_template(skin_check(),
-            imp = [load_lang('plus'), wiki_set(), custom(), other2([0, 0])],
-            data = '''
-                    <form method="post">
-                        <input placeholder="' + load_lang('compare') + '" name="name2" type="text">
-                        <hr>
-                        <button type="submit">''' + load_lang('move') + '''</button>
-                    </form>
-                    ''',
-            menu = [['manager', load_lang('admin')]]
-        ))
                 
 @app.route('/register', methods=['POST', 'GET'])
 def register():
