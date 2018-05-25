@@ -2224,7 +2224,7 @@ def topic_admin(name = None, sub = None, num = None):
     ban += '<li><a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/raw/' + str(num) + '">Raw</a></li>'
     ban = '<li>' + load_lang('time') + ' : ' + data[0][2] + '</li>' + ban
     
-    if re.search('(\.|:)', data[0][1]):
+    if ip_or_user(data[0][1]) == 1:
         ban = '<li>' + load_lang('writer') + ' : ' + data[0][1] + ' <a href="/record/' + url_pas(data[0][1]) + '">(' + load_lang('record') + ')</a></li>' + ban
     else:
         ban = '<li>' + load_lang('writer') + ' : <a href="/w/' + load_lang('user') + ':' + data[0][1] + '">' + data[0][1] + '</a> <a href="/record/' + url_pas(data[0][1]) + '">(' + load_lang('record') + ')</a></li>' + ban
@@ -2269,7 +2269,7 @@ def topic(name = None, sub = None):
         for rd_data in re.findall("(?:#([0-9]+))", data):
             curs.execute("select ip from topic where title = ? and sub = ? and id = ?", [name, sub, rd_data])
             ip_data = curs.fetchall()
-            if ip_data and not re.search('(\.|:)', ip_data[0][0]):
+            if ip_data and ip_or_user(ip_data[0][0]) == 0:
                 curs.execute('insert into alarm (name, data, date) values (?, ?, ?)', [ip_data[0][0], ip + ' - <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '#' + str(num) + '">' + load_lang('discussion') + '</a>', today])
             
             data = re.sub("(?P<in>#(?:[0-9]+))", '[[\g<in>]]', data)
@@ -2637,17 +2637,17 @@ def user_check(name = None):
             return re_error('/error/4')
     
     if flask.request.args.get('plus', None):
-        if re.search('(?:\.|:)', name):
-            if re.search('(?:\.|:)', flask.request.args.get('plus', None)):
+        if ip_or_user(name) == 1:
+            if ip_or_user(flask.request.args.get('plus', None)) == 1:
                 curs.execute("select name, ip, ua, today from ua_d where ip = ? or ip = ? order by today desc", [name, flask.request.args.get('plus', None)])
             else:
                 curs.execute("select name, ip, ua, today from ua_d where ip = ? or name = ? order by today desc", [name, flask.request.args.get('plus', None)])
         else:
-            if re.search('(?:\.|:)', flask.request.args.get('plus', None)):
+            if ip_or_user(flask.request.args.get('plus', None)) == 1:
                 curs.execute("select name, ip, ua, today from ua_d where name = ? or ip = ? order by today desc", [name, flask.request.args.get('plus', None)])
             else:
                 curs.execute("select name, ip, ua, today from ua_d where name = ? or name = ? order by today desc", [name, flask.request.args.get('plus', None)])
-    elif re.search('(?:\.|:)', name):
+    elif ip_or_user(name) == 1:
         curs.execute("select name, ip, ua, today from ua_d where ip = ? order by today desc", [name])
     else:
         curs.execute("select name, ip, ua, today from ua_d where name = ? order by today desc", [name])
@@ -2859,7 +2859,7 @@ def user_ban(name = None):
                 else:
                     day += '<option value="' + num + '">' + num + '</option>'
             
-            if re.search('(\.|:)', name):
+            if ip_or_user(name) == 1:
                 plus = '<input type="checkbox" name="login"> ' + load_lang('login') + ' ' + load_lang('able') + '<hr>'
             else:
                 plus = ''
@@ -3562,7 +3562,7 @@ def user_info():
         if match:
             match = match.groups()[0]
         else:
-            match = 'Not'
+            match = 'Error'
 
         curs.execute("select end, login, band from ban where block = ? or block = ?", [ip, match])
         block_data = curs.fetchall()
