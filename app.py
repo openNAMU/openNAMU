@@ -1162,23 +1162,19 @@ def please():
     ))
         
 @app.route('/recent_discuss')
-@app.route('/recent_discuss/<regex("close"):tools>')
-def recent_discuss(tools = 'normal'):
-    if tools == 'normal' or tools == 'close':
-        div = ''
-        
-        if tools == 'normal':
-            div += '<a href="/recent_discuss/close">(' + load_lang('close') + ')</a>'
-           
-            m_sub = 0
-        else:
-            div += '<a href="/recent_discuss">(' + load_lang('open') + ')</a>'
-            
-            m_sub = ' (' + load_lang('close') + ')'
-
-        div += '<hr><table style="width: 100%; text-align: center;"><tbody><tr><td style="width: 50%;">' + load_lang('discussion') + ' ' + load_lang('name') + '</td><td style="width: 50%;">' + load_lang('time') + '</td></tr>'
+def recent_discuss():
+    div = ''
+    
+    if flask.request.args.get('what', 'normal') == 'normal':
+        div += '<a href="/recent_discuss?what=close">(' + load_lang('close') + ')</a>'
+       
+        m_sub = 0
     else:
-        return redirect('/')
+        div += '<a href="/recent_discuss">(' + load_lang('open') + ')</a>'
+        
+        m_sub = ' (' + load_lang('close') + ')'
+
+    div += '<hr><table style="width: 100%; text-align: center;"><tbody><tr><td style="width: 50%;">' + load_lang('discussion') + ' ' + load_lang('name') + '</td><td style="width: 50%;">' + load_lang('time') + '</td></tr>'
     
     curs.execute("select title, sub, date from rd order by date desc limit 50")
     for data in curs.fetchall():
@@ -1187,7 +1183,7 @@ def recent_discuss(tools = 'normal'):
         
         close = 0
         
-        if tools == 'normal':
+        if flask.request.args.get('what', 'normal') == 'normal':
             curs.execute("select title from stop where title = ? and sub = ? and close = 'O'", [data[0], data[1]])
             if curs.fetchall():
                 close = 1
@@ -1711,7 +1707,7 @@ def edit(name = None):
         for user_data in curs.fetchall():
             curs.execute("insert into alarm (name, data, date) values (?, ?, ?)", [ip, ip + ' - <a href="/w/' + url_pas(name) + '">' + name + '</a> (Edit)', today])
 
-        history_plus(name, content, today, ip, send_parser(flask.request.form.get('send', None)), leng)
+        history_plus(name, content, today, ip, flask.request.form.get('send', None), leng)
         
         curs.execute("delete from back where link = ?", [name])
         curs.execute("delete from back where title = ? and type = 'no'", [name])
@@ -3408,7 +3404,7 @@ def recent_changes(name = None, tool = 'record'):
                 title = '<a href="/w/' + url_pas(data[1]) + '">' + html.escape(data[1]) + '</a> <a href="/history/' + url_pas(data[1]) + '">(' + data[0] + load_lang('version') + ')</a> '
                     
             div += '<tr style="' + style[0] + '"><td>' + title + revert + ' ' + leng + '</td>'
-            div += '<td>' + ip + ban + hidden + '</td><td>' + date + '</td></tr><tr style="' + style[1] + '"><td colspan="3">' + send + '</td></tr>'
+            div += '<td>' + ip + ban + hidden + '</td><td>' + date + '</td></tr><tr style="' + style[1] + '"><td colspan="3">' + send_parser(send) + '</td></tr>'
 
         div += '</tbody></table>'
         sub = ''

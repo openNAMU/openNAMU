@@ -15,12 +15,14 @@ def load_conn2(data):
     curs = conn.cursor()
 
 def send_parser(data):
-    data = html.escape(data)
-    
-    javascript = re.compile('javascript:', re.I)
-    
-    data = javascript.sub('', data)
-    data = re.sub('&lt;a href="(?:[^"]*)"&gt;(?P<in>(?:(?!&lt;).)*)&lt;\/a&gt;', '<a href="' + parse.quote('\g<in>').replace('/','%2F') + '">\g<in></a>', data)  
+    if not re.search('^<br>$', data):
+        data = html.escape(data)
+        
+        javascript = re.compile('javascript:', re.I)
+        
+        data = javascript.sub('', data)
+        print(data)
+        data = re.sub('&lt;a href=&quot;(?:(?:(?!&quot;).)*)&quot;&gt;(?P<in>(?:(?!&lt;).)*)&lt;\/a&gt;', '<a href="' + parse.quote('\g<in>').replace('/','%2F') + '">\g<in></a>', data)
     
     return data
     
