@@ -42,13 +42,13 @@ def captcha_get():
 
     return data
 
-def captcha_post(test, num = 1):
+def captcha_post(re_data, num = 1):
     if num == 1:
         if custom()[2] == 0 and captcha_get() != '':
             curs.execute('select data from other where name = "sec_re"')
             sec_re = curs.fetchall()
             if sec_re and sec_re[0][0] != '':
-                data = requests.get('https://www.google.com/recaptcha/api/siteverify', params = { 'secret' : sec_re, 'response' : test })
+                data = requests.get('https://www.google.com/recaptcha/api/siteverify', params = { 'secret' : sec_re, 'response' : re_data })
                 if not data:
                     return 0
                 else:
@@ -168,8 +168,8 @@ def next_fix(link, num, page, end = 50):
 
     return list_data
 
-def other2(origin):
-    return origin + ['Deleted']
+def other2(data):
+    return data + ['Deleted']
 
 def wiki_set(num = 1):
     if num == 1:
