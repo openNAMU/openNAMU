@@ -1,6 +1,7 @@
 {
     "edit" : "편집",
     "history" : "역사",
+    "easy" : "간단",
     "delete" : "삭제",
     "server" : "서버",
     "bulk_delete" : "대량 삭제",

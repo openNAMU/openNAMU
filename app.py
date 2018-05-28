@@ -2626,6 +2626,12 @@ def change_password():
 
 @app.route('/check/<name>')
 def user_check(name = None):
+    curs.execute("select acl from user where id = ? or id = ?", [name, flask.request.args.get('plus', 'Yes-Error')])
+    user = curs.fetchall()
+    if user and user[0][0] != 'user':
+        if admin_check(None, None) != 1:
+            return re_error('/error/4')
+
     if admin_check(4, 'check (' + name + ')') != 1:
         return re_error('/error/3')
         
@@ -2634,12 +2640,6 @@ def user_check(name = None):
         sql_num = num * 50 - 50
     else:
         sql_num = 0
-
-    curs.execute("select acl from user where id = ? or id = ?", [name, flask.request.args.get('plus', 'None-Data')])
-    user = curs.fetchall()
-    if user and user[0][0] != 'user':
-        if admin_check(None, None) != 1:
-            return re_error('/error/4')
     
     if flask.request.args.get('plus', None):
         end_check = 1
@@ -2665,7 +2665,7 @@ def user_check(name = None):
     record = curs.fetchall()
     if record:
         if not flask.request.args.get('plus', None):
-            div = '<a href="/manager/14?plus=' + url_pas(name) + '">(' + load_lang('compare') + ')</a><hr>'
+            div = '<a href="/manager/14?plus=' + url_pas(name) + '">(' + load_lang('compare') + ')</a> <a href="/easy_check/' + url_pas(name) + '">(' + load_lang('easy') + ')</a><hr>'
         else:
             div = '<a href="/check/' + url_pas(name) + '">(' + name + ')</a> <a href="/check/' + url_pas(flask.request.args.get('plus', None)) + '">(' + flask.request.args.get('plus', None) + ')</a><hr>'
 
@@ -2694,6 +2694,32 @@ def user_check(name = None):
         imp = [load_lang('check'), wiki_set(), custom(), other2([0, 0])],
         data = div,
         menu = [['manager', load_lang('admin')]]
+    ))
+
+@app.route('/easy_check/<name>')
+def user_easy_check(name = None):
+    curs.execute("select acl from user where id = ? or id = ?", [name, flask.request.args.get('plus', 'Yes-Error')])
+    user = curs.fetchall()
+    if user and user[0][0] != 'user':
+        if admin_check(None, None) != 1:
+            return re_error('/error/4')
+
+    if admin_check(4, 'easy check (' + name + ')') != 1:
+        return re_error('/error/3')
+        
+    num = int(flask.request.args.get('num', 1))
+    if num * 50 > 0:
+        sql_num = num * 50 - 50
+    else:
+        sql_num = 0
+        
+    div = ''
+    div += next_fix('/easy_check/' + url_pas(name) + '?num=', num, [])
+            
+    return css_html_js_minify.html_minify(flask.render_template(skin_check(),    
+        imp = [load_lang('easy') + ' ' + load_lang('check'), wiki_set(), custom(), other2([0, 0])],
+        data = div,
+        menu = [['check/' + url_pas(name), load_lang('normal')]]
     ))
                 
 @app.route('/register', methods=['POST', 'GET'])

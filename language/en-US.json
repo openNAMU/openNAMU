@@ -2,6 +2,7 @@
     "edit" : "Edit",
     "history" : "History",
     "delete" : "Delete",
+    "easy" : "Easy",
     "server" : "Server",
     "bulk_delete" : "Bulk Delete",
     "edit_filter" : "Edit Filtering",
