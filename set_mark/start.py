@@ -402,7 +402,7 @@ def start(conn, data, title, lang):
                                                             else:
                                                                 folding_data = ['Test']
                                                             
-                                                            data = re.sub('{{{#!folding ?((?:(?!\n).)*)\n?', '<div>' + str(folding_data[0]) + ' <div style="display: inline-block;"><a href="javascript:void(0);" onclick="folding(' + str(fol_num) + ');">[Do]</a></div_end><div id="folding_' + str(fol_num) + '" style="display: none;"><div id="wiki_div" style="">', data, 1)
+                                                            data = re.sub('{{{#!folding ?((?:(?!\n).)*)\n?', '<div>' + str(folding_data[0]) + ' <div style="display: inline-block;"><a href="javascript:void(0);" onclick="folding(' + str(fol_num) + ');">[0to1]</a></div_end><div id="folding_' + str(fol_num) + '" style="display: none;"><div id="wiki_div" style="">', data, 1)
                                                             
                                                             fol_num += 1
                                                         else:
@@ -494,13 +494,14 @@ def start(conn, data, title, lang):
         math = re.search('&lt;math&gt;((?:(?!&lt;\/math&gt;).)+)&lt;\/math&gt;', data)
         if math:
             if first == 0:
-                plus_data += '''
-                            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.css"
-                                integrity="sha384-TEMocfGvRuD1rIAacqrknm5BQZ7W7uWitoih+jMNFXQIbNl16bO8OZmylH/Vi/Ei"
-                                crossorigin="anonymous">
-                            <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.js" 
-                                integrity="sha384-jmxIlussZWB7qCuB+PgKG1uLjjxbVVIayPJwi6cG6Zb4YKq0JIw+OMnkkEC7kYCq"
-                                crossorigin="anonymous"></script>'''
+                plus_data +=    '''
+                                <link   rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.css"
+                                        integrity="sha384-TEMocfGvRuD1rIAacqrknm5BQZ7W7uWitoih+jMNFXQIbNl16bO8OZmylH/Vi/Ei"
+                                        crossorigin="anonymous">
+                                <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.js" 
+                                        integrity="sha384-jmxIlussZWB7qCuB+PgKG1uLjjxbVVIayPJwi6cG6Zb4YKq0JIw+OMnkkEC7kYCq"
+                                        crossorigin="anonymous"></script>
+                                '''
 
             math = math.groups()[0]
             

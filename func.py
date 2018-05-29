@@ -249,8 +249,6 @@ def admin_check(num, what):
         while 1:
             if num == 1 and reset == 0:
                 check = 'ban'
-            elif num == 2 and reset == 0:
-                check = 'mdel'
             elif num == 3 and reset == 0:
                 check = 'toron'
             elif num == 4 and reset == 0:
