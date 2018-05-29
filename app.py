@@ -1,5 +1,4 @@
 # 모듈 불러오기
-import werkzeug.contrib.fixers
 import flask_compress
 import flask_reggie
 import tornado.ioloop
@@ -502,7 +501,7 @@ def edit_set(num = 0):
 
             return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
                 imp = ['Main', wiki_set(), custom(), other2([0, 0])],
-                data = '''
+                data =  '''
                         <form method="post">
                             <span>''' + load_lang('name') + '''</span>
                             <br>
@@ -600,7 +599,7 @@ def edit_set(num = 0):
 
             return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
                 imp = ['Set Text', wiki_set(), custom(), other2([0, 0])],
-                data = '''
+                data =  '''
                         <form method="post">
                             <span>Register Text</span>
                             <br>
@@ -640,7 +639,7 @@ def edit_set(num = 0):
 
             return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
                 imp = ['Main HEAD', wiki_set(), custom(), other2([0, 0])],
-                data = '''
+                data =  '''
                         <form method="post">
                             <textarea rows="25" name="content">''' + html.escape(data) + '''</textarea>
                             <hr>
@@ -683,7 +682,7 @@ def edit_set(num = 0):
 
             return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
                 imp = ['robots.txt', wiki_set(), custom(), other2([0, 0])],
-                data = '''
+                data =  '''
                         <a href="/robots.txt">(View)</a>
                         <hr>
                         <form method="post">
@@ -726,7 +725,7 @@ def edit_set(num = 0):
 
             return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
                 imp = ['Google', wiki_set(), custom(), other2([0, 0])],
-                data = '''
+                data =  '''
                         <form method="post">
                             <span>reCAPTCHA (HTML)</span>
                             <br>
@@ -806,9 +805,6 @@ def admin_plus(name = None):
         if flask.request.form.get('ban', 0) != 0:
             curs.execute("insert into alist (name, acl) values (?, 'ban')", [name])
 
-        if flask.request.form.get('mdel', 0) != 0:
-            curs.execute("insert into alist (name, acl) values (?, 'mdel')", [name])   
-
         if flask.request.form.get('toron', 0) != 0:
             curs.execute("insert into alist (name, acl) values (?, 'toron')", [name])
             
@@ -840,8 +836,6 @@ def admin_plus(name = None):
         for go in acl_list:
             if go[0] == 'ban':
                 exist_list[0] = 'checked="checked"'
-            elif go[0] == 'mdel':
-                exist_list[1] = 'checked="checked"'
             elif go[0] == 'toron':
                 exist_list[2] = 'checked="checked"'
             elif go[0] == 'check':
@@ -861,7 +855,6 @@ def admin_plus(name = None):
             state = ''
 
         data += '<li><input type="checkbox" ' + state +  ' name="ban" ' + exist_list[0] + '> ' + load_lang('ban') + '</li>'
-        data += '<li><input type="checkbox" ' + state +  ' name="mdel" ' + exist_list[1] + '> ' + load_lang('bulk_delete') + '</li>'
         data += '<li><input type="checkbox" ' + state +  ' name="toron" ' + exist_list[2] + '> ' + load_lang('discussion') + '</li>'
         data += '<li><input type="checkbox" ' + state +  ' name="check" ' + exist_list[3] + '> ' + load_lang('user') + ' ' + load_lang('check') + '</li>'
         data += '<li><input type="checkbox" ' + state +  ' name="acl" ' + exist_list[4] + '> ' + load_lang('document') + ' ACL</li>'
@@ -1219,7 +1212,7 @@ def block_log(name = None, tool = None, tool2 = None):
     
     if not name:
         if not tool2:
-            div = '''
+            div =   '''
                     <a href="/manager/11">(''' + load_lang('blocked') + ''')</a> <a href="/manager/12">(''' + load_lang('admin') + ''')</a>
                     <hr>
                     <a href="/block_log/ip">(IP)</a> <a href="/block_log/user">(''' + load_lang('subscriber') + ')</a> <a href="/block_log/never_end">(' + load_lang('limitless') + ')</a> <a href="/block_log/can_end">(' + load_lang('period') + ')</a> <a href="/block_log/end">(' + load_lang('release') + ')</a> <a href="/block_log/now">(' + load_lang('now') + ')</a> <a href="/block_log/edit_filter">(' + load_lang('edit_filter') + ''')</a>
@@ -1482,56 +1475,6 @@ def revert(name = None):
                     </form>
                     ''',
             menu = [['history/' + url_pas(name), load_lang('history')], ['recent_changes', load_lang('recent') + ' ' + load_lang('change')]]
-        ))            
-                    
-@app.route('/big_delete', methods=['POST', 'GET'])
-def big_delete():
-    if admin_check(2, 'big_delete') != 1:
-        return re_error('/error/3')
-
-    if flask.request.method == 'POST':
-        today = get_time()
-        ip = ip_check()
-        data = flask.request.form.get('content', None) + '\r\n'
-        
-        match = re.findall('(.*)\r\n', data)
-        for list_one in match:
-            curs.execute("select data from data where title = ?", [list_one])
-            data_old = curs.fetchall()
-            if data_old:
-                curs.execute("delete from back where title = ?", [list_one])
-                curs.execute("delete from data where title = ?", [list_one])
-                
-                leng = '-' + str(len(data_old[0][0]))
-                
-                history_plus(list_one, '', today, ip, flask.request.form.get('send', None) + ' (' + load_lang('bulk_delete') + ')', leng)
-
-            data = re.sub('(.*)\r\n', '', data, 1)
-        
-        conn.commit()
-
-        return redirect('/')
-    else:
-        return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
-            imp = [load_lang('bulk_delete'), wiki_set(), custom(), other2([0, 0])],
-            data = '''
-                    <span>
-                        Title A
-                        <br>
-                        Title B
-                        <br>
-                        Title C
-                    </span>
-                    <hr>
-                    <form method="post">
-                        <textarea rows="25" name="content"></textarea>
-                        <hr>
-                        <input placeholder="''' + load_lang('why') + '''" name="send" type="text">
-                        <hr>
-                        <button type="submit">''' + load_lang('delete') + '''</button>
-                    </form>
-                    ''',
-            menu = [['manager', load_lang('admin')]]
         ))
 
 @app.route('/edit_filter')
@@ -1607,7 +1550,7 @@ def set_edit_filter(name = None):
 
         return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
             imp = [name, wiki_set(), custom(), other2([' (' + load_lang('edit_filter') + ')', 0])],
-            data = '''
+            data =  '''
                     <form method="post">
                         <input ''' + stat + ''' type="checkbox" ''' + time_data + ''' name="ban">
                         ''' + load_lang('ban') + '''
@@ -1738,7 +1681,7 @@ def edit(name = None):
         data_old = data
         
         if not flask.request.args.get('section', None):
-            get_name = '''
+            get_name =  '''
                         <form method="post" id="get_edit" action="/edit_get/''' + url_pas(name) + '''">
                             <input placeholder="Load Document" name="name" style="width: 50%;" type="text">
                             <button id="come" type="submit">Load</button>
@@ -1761,7 +1704,7 @@ def edit(name = None):
 
         return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
             imp = [name, wiki_set(), custom(), other2([' (' + load_lang('edit') + ')', 0])],
-            data = get_name + js_data[0] + '''
+            data =  get_name + js_data[0] + '''
                     <form method="post" action="/edit/''' + url_pas(name) + action + '''">
                         ''' + js_data[1] + '''
                         <textarea id="content" rows="25" name="content">''' + html.escape(re.sub('\n$', '', data)) + '''</textarea>
@@ -1805,7 +1748,7 @@ def preview(name = None):
     
     return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
         imp = [name, wiki_set(), custom(), other2([' (' + load_lang('preview') + ')', 0])],
-        data = js_data[0] + '''
+        data =  js_data[0] + '''
                 <form method="post" action="/edit/''' + url_pas(name) + action + '''">
                     ''' + js_data[1] + '''
                     <textarea id="content" rows="25" name="content">''' + html.escape(flask.request.form.get('content', None)) + '''</textarea>
@@ -1858,7 +1801,7 @@ def delete(name = None):
 
         return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
             imp = [name, wiki_set(), custom(), other2([' (' + load_lang('delete') + ')', 0])],
-            data = '''
+            data =  '''
                     <form method="post">
                         ''' + ip_warring() + '''
                         <input placeholder="''' + load_lang('why') + '''" name="send" type="text">
@@ -1931,7 +1874,7 @@ def move(name = None):
     else:            
         return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
             imp = [name, wiki_set(), custom(), other2([' (' + load_lang('move') + ')', 0])],
-            data = '''
+            data =  '''
                     <form method="post">
                         ''' + ip_warring() + '''
                         <input placeholder="''' + load_lang('document') + ' ' + load_lang('name') + '" value="' + name + '''" name="title" type="text">
@@ -1949,7 +1892,7 @@ def move(name = None):
 def other():
     return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
         imp = [load_lang('other') + ' ' + load_lang('tool'), wiki_set(), custom(), other2([0, 0])],
-        data = '''
+        data =  '''
                 <h2>''' + load_lang('record') + '''</h2>
                 <ul>
                     <li><a href="/manager/6">''' + load_lang('edit') + '''</a></li>
@@ -1980,7 +1923,8 @@ def other():
                 <h2>''' + load_lang('normal_version') + '''</h2>
                 <ul>
                     <li>''' + load_lang('normal_version') + ' : <a id="out_link" href="https://github.com/2DU/openNAMU/blob/master/version.md">' + r_ver + '''</a></li>
-                </ul>''',
+                </ul>
+                ''',
     menu = 0
     ))
     
@@ -1992,14 +1936,13 @@ def manager(num = 1):
     if num == 1:
         return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
             imp = [load_lang('admin') + ' ' + load_lang('tool'), wiki_set(), custom(), other2([0, 0])],
-            data = '''
+            data =  '''
                     <h2>''' + load_lang('admin') + '''</h2>
                     <ul>
                         <li><a href="/manager/2">''' + load_lang('document') + ''' ACL</a></li>
                         <li><a href="/manager/3">''' + load_lang('user') + ' ' + load_lang('check') + '''</a></li>
                         <li><a href="/manager/4">''' + load_lang('user') + ' ' + load_lang('ban') + '''</a></li>
                         <li><a href="/manager/5">''' + load_lang('subscriber') + ' ' + load_lang('authority') + '''</a></li>
-                        <li><a href="/big_delete">''' + load_lang('bulk_delete') + '''</a></li>
                         <li><a href="/edit_filter">''' + load_lang('edit_filter') + '''</a></li>
                     </ul>
                     <br>
@@ -2523,7 +2466,7 @@ def login():
     else:        
         return css_html_js_minify.html_minify(flask.render_template(skin_check(),    
             imp = [load_lang('login'), wiki_set(), custom(), other2([0, 0])],
-            data = '''
+            data =  '''
                     <form method="post">
                         <input placeholder="ID" name="id" type="text">
                         <hr>
@@ -2533,7 +2476,8 @@ def login():
                         <button type="submit">''' + load_lang('login') + '''</button>
                         <hr>
                         <span>''' + load_lang('http_warring') + '''</span>
-                    </form>''',
+                    </form>
+                    ''',
             menu = [['user', load_lang('user')]]
         ))
                 
@@ -2597,7 +2541,7 @@ def change_password():
 
         return css_html_js_minify.html_minify(flask.render_template(skin_check(),    
             imp = [load_lang('my_info') + ' ' + load_lang('edit'), wiki_set(), custom(), other2([0, 0])],
-            data = '''
+            data =  '''
                     <form method="post">
                         <span>ID : ''' + ip + '''</span>
                         <hr>
@@ -2773,7 +2717,7 @@ def register():
 
         return css_html_js_minify.html_minify(flask.render_template(skin_check(),    
             imp = [load_lang('register'), wiki_set(), custom(), other2([0, 0])],
-            data = '''
+            data =  '''
                     <form method="post">
                         ''' + contract + '''
                         <input placeholder="ID" name="id" type="text">
@@ -3761,7 +3705,7 @@ def count_edit(name = None):
 
     return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
         imp = [load_lang('count'), wiki_set(), custom(), other2([0, 0])],
-        data = '''
+        data =  '''
                 <ul>
                     <li><a href="/record/''' + url_pas(that) + '''">''' + load_lang('edit') + '''</a> : ''' + str(data) + '''</li>
                     <li><a href="/topic_record/''' + url_pas(that) + '''">''' + load_lang('discussion') + '''</a> : ''' + str(t_data) + '''</a></li>
@@ -3818,7 +3762,7 @@ def main_file(data = None):
 
 @app.errorhandler(404)
 def error_404(e):
-    return '''
+    return  '''
             <!-- 
             우리가 바라보았던 그 물결이 지금도 떠오르는걸. 모래 위에 끄적여 새겼던 말들과 돌아선 너의 뒷모습.
             돌아오는 파도가 발밑을 지나가면서 무언갈 쓸어가네. 해가 질 무렵 쯤에 저녁 노을만이 파도를 따라 흘러가...
