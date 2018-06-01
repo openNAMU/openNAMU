@@ -2,21 +2,24 @@
 <html>
     <head>
         <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>{{imp[0]}} - {{imp[1][0]}}</title>
-        <link rel="stylesheet" href="/views/acme/css/bootstrap.min.css">
-        <link rel="stylesheet" href="/views/acme/css/style.css">
-        <link rel="stylesheet" href="/views/acme/css/style-responsive.css">
-        <script src="/views/acme/js/jquery.min.js"></script>
-        <script src="/views/acme/js/bootstrap.min.js"></script>
-        <link rel="stylesheet" href="/views/acme/css/font-awesome/css/font-awesome.min.css">
-        {{imp[1][5]|safe}}
-        {{imp[2][3]|safe}}
         <meta name="twitter:creator" content="@{{imp[1][0]}}">
         <meta name="twitter:title" content="{{imp[0]}}">
         <meta name="twitter:site" content="@{{imp[1][0]}}">
         <meta name="twitter:card" content="summary">
-        <link rel="shortcut icon" href="/views/acme/img/on.ico">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="/views/acme/assets/css/bootstrap.min.css">
+        <link rel="stylesheet" href="/views/acme/assets/css/style.min.css">
+        <link rel="stylesheet" href="/views/acme/assets/css/style-responsive.min.css">
+        <script
+          src="https://code.jquery.com/jquery-3.1.1.min.js"
+          integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+          crossorigin="anonymous"></script>
+        <script src="/views/acme/assets/js/bootstrap.min.js"></script>
+        <link rel="stylesheet" href="/views/acme/assets/css/font-awesome.min.css">
+        {{imp[1][5]|safe}}
+        {{imp[2][3]|safe}}
+        <link rel="shortcut icon" href="/views/acme/assets/img/on.ico">
     </head>
     <body>
         <header class="head-section">
@@ -36,7 +39,7 @@
                         <li id="right-search">
                             <form method="post" action="/search" id="searchform" role="search">
                                 <input style="display: inline-block;" class="form-control search" type="search" name="search" placeholder="Search" id="searchInput" autocomplete="off">
-                            </form>                
+                            </form>
                         </li>
                         <li class="dropdown">
                             <a class="dropdown-toggle" data-close-others="false" data-delay="0" data-hover="dropdown" data-toggle="dropdown" href="javascript:void(0);">
@@ -79,7 +82,7 @@
                                     </a>
                                 </li>
                             </ul>
-                        </li>       
+                        </li>
                         <li>
                             <a href="/user">
                                 {% if imp[2][2] == 1 %}
@@ -95,7 +98,7 @@
                                     {{imp[2][5]}}
                                 {% endif %}
                             </a>
-                        </li>  
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -113,7 +116,7 @@
                             </h1>
                         </div>
                         <div class="col-lg-8 col-sm-8">
-                            <ol class="breadcrumb pull-right">   
+                            <ol class="breadcrumb pull-right">
                                 <li style="margin: 0;">
                                     {% if menu != 0 %}
                                         {% for sub_d in menu %}
@@ -155,10 +158,10 @@
                         {{imp[1][1]|safe}}
                         <span id="left_end" class="pull-right">
                             <a href="https://github.com/2DU/openNAMU">
-                                <img src="/views/acme/img/on2.png" alt="opennamu" style="width: 100px;">
+                                <img src="/views/acme/assets/img/on2.png" alt="opennamu" style="width: 100px;">
                             </a>
-                            <a href="/views/acme/list.html">기여자</a>
-                        </span>    
+                            <a href="/views/acme/assets/list.html">기여자</a>
+                        </span>
                     </div>
                 </div>
             </div>
