@@ -1447,10 +1447,10 @@ def revert(name = None):
                 curs.execute("insert into data (title, data) values (?, ?)", [name, data[0][0]])
                 
             history_plus(name, data[0][0], get_time(), ip_check(), flask.request.form.get('send', None) + ' (' + str(num) + load_lang('version') + ')', leng)
-            namumark_re(
-                name = name,
+            namumark(
+                title = name,
                 data = data[0][0],
-                set_num = 1
+                num = 1
             )
             
             conn.commit()
@@ -1655,10 +1655,10 @@ def edit(name = None):
         curs.execute("delete from back where link = ?", [name])
         curs.execute("delete from back where title = ? and type = 'no'", [name])
         
-        namumark_re(
-            name = name,
+        namumark(
+            title = name,
             data = content,
-            set_num = 1
+            num = 1
         )
         
         conn.commit()
@@ -1734,8 +1734,8 @@ def preview(name = None):
     new_data = re.sub('^\r\n', '', new_data)
     new_data = re.sub('\r\n$', '', new_data)
     
-    end_data = namumark_re(
-        name = name,
+    end_data = namumark(
+        title = name,
         data = new_data
     )
     
@@ -2275,7 +2275,7 @@ def topic(name = None, sub = None):
                                 
             all_data += '<table id="toron"><tbody><tr><td id="toron_color_red">'
             all_data += '<a href="#' + topic_data[1] + '">#' + topic_data[1] + '</a> ' + ip_pas(topic_data[3]) + who_plus + ' <span style="float: right;">' + topic_data[2] + '</span>'
-            all_data += '</td></tr><tr><td>' + namumark_re(data = topic_data[0]) + '</td></tr></tbody></table><br>'    
+            all_data += '</td></tr><tr><td>' + namumark(data = topic_data[0]) + '</td></tr></tbody></table><br>'    
 
         for topic_data in topic:
             if number == 1:
@@ -2294,7 +2294,7 @@ def topic(name = None, sub = None):
             else:
                 blind_data = ''
 
-            user_write = namumark_re(data = topic_data[0])
+            user_write = namumark(data = topic_data[0])
             ip = ip_pas(topic_data[3])
             
             curs.execute('select acl from user where id = ?', [topic_data[3]])
@@ -3147,8 +3147,8 @@ def read_view(name = None):
         else_data = re.sub('^\r\n', '', else_data)
         else_data = re.sub('\r\n$', '', else_data)
             
-    end_data = namumark_re(
-        name = name,
+    end_data = namumark(
+        title = name,
         data = else_data
     )
     
