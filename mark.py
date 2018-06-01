@@ -1,4 +1,4 @@
-from set_mark.start import start
+from set_mark.namu import namu
 
 import re
 import html
@@ -30,8 +30,8 @@ def plusing(name, link, backtype):
     if not curs.fetchall():
         curs.execute("insert into back (title, link, type) values (?, ?, ?)", [link, name, backtype])
 
-def namumark(title, data, num, lang):
-    data = start(conn, data, title, lang)
+def namumark(title = '', data = '', num = 0):
+    data = namu(conn, data, title)
     if num == 1:
         i = 0
         while 1:

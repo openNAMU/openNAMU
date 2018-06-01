@@ -177,7 +177,7 @@ def link_fix(main_link):
         
     return [main_link, other_link]
 
-def start(conn, data, title, lang):
+def namu(conn, data, title,):
     # DB 지정
     curs = conn.cursor()
 
@@ -256,7 +256,7 @@ def start(conn, data, title, lang):
                     else:
                         break
 
-                include_parser = re.sub('\[\[' + lang['template'] + ':(((?!\]\]|#include).)+)\]\]', '', include_parser)
+                include_parser = re.sub('\[\[(?:category|분류):(((?!\]\]|#include).)+)\]\]', '', include_parser)
                 include_parser = html.escape(include_parser)
 
                 data = re.sub('\[include\(((?:(?!\)\]).)+)\)\]', '<include>\n<a id="include_link" href="/w/' + tool.url_pas(include_link) + '">[' + include_link + ']</a>\n' + include_parser + '\n</include>', data, 1)
@@ -593,7 +593,7 @@ def start(conn, data, title, lang):
 
             all_stack = re.sub('0.', '', all_stack)
             
-            data = re.sub('\n(={1,6}) ?((?:(?!\n).)+) ?\n', '\n<h' + toc_number + ' id="s-' + re.sub('\.$', '', all_stack) + '"><a href="#toc">' + all_stack + '</a> ' + re.sub('=*$', '', toc[1]) + ' <span style="font-size: 12px"><a href="/edit/' + tool.url_pas(title) + '?section=' + str(edit_number) + '">(' + lang['edit'] + ')</a></span></h' + toc_number + '>\n', data, 1)
+            data = re.sub('\n(={1,6}) ?((?:(?!\n).)+) ?\n', '\n<h' + toc_number + ' id="s-' + re.sub('\.$', '', all_stack) + '"><a href="#toc">' + all_stack + '</a> ' + re.sub('=*$', '', toc[1]) + ' <span style="font-size: 12px"><a href="/edit/' + tool.url_pas(title) + '?section=' + str(edit_number) + '">(Edit)</a></span></h' + toc_number + '>\n', data, 1)
             
             toc_data += '<span style="margin-left: ' + str((toc_full - toc_top_stack) * 10) + 'px;"><a href="#s-' + re.sub('\.$', '', all_stack) + '">' + all_stack + '</a> ' + re.sub('\[\*((?:(?! |\]).)*)(?: ((?:(?!\]).)+))?\]', '', re.sub('=*$', '', toc[1])) + '</span>\n'
         else:
@@ -780,7 +780,7 @@ def start(conn, data, title, lang):
             break
 
     # 링크 관련 문법 구현
-    category = '\n<hr><div id="cate">' + lang['category'] + ': '
+    category = '\n<hr><div id="cate">Category : '
     while 1:
         link = re.search('\[\[((?:(?!\[\[|\]\]).)+)\]\]', data)
         if link:
@@ -796,7 +796,7 @@ def start(conn, data, title, lang):
                 main_link = link
                 see_link = link
 
-            if re.search('^(' + lang['file'] + '|' + lang['out'] + '):', main_link):
+            if re.search('^((?:file|파일)|(?:out|외부)):', main_link):
                 file_style = ''
 
                 width = re.search('width=((?:(?!&).)+)', see_link)
@@ -825,13 +825,13 @@ def start(conn, data, title, lang):
                 else:
                     file_align = ''
 
-                if re.search('^' + lang['out'] + ':', main_link):
-                    file_src = re.sub('^' + lang['out'] + ':', '', main_link)
+                if re.search('^(?:out|외부):', main_link):
+                    file_src = re.sub('^(?:out|외부):', '', main_link)
             
                     file_alt = main_link
                     exist = 'Yes'
                 else:
-                    file_data = re.search('^' + lang['file'] + ':((?:(?!\.).)+)\.(.+)$', main_link)
+                    file_data = re.search('^(?:file|파일):((?:(?!\.).)+)\.(.+)$', main_link)
                     if file_data:
                         file_data = file_data.groups()
                         file_name = file_data[0]
@@ -843,7 +843,7 @@ def start(conn, data, title, lang):
                         file_end = 'jpg'
 
                     file_src = '/image/' + tool.sha224(file_name) + '.' + file_end
-                    file_alt = '' + lang['file'] + ':' + file_name + '.' + file_end
+                    file_alt = 'File:' + file_name + '.' + file_end
 
                     curs.execute("select title from data where title = ?", [file_alt])
                     exist = curs.fetchall()
@@ -852,7 +852,7 @@ def start(conn, data, title, lang):
                     data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<span style="' + file_align + '"><img style="' + file_style + '" alt="' + file_alt + '" src="' + file_src + '"></span>', data, 1)
                 else:
                     data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<a id="not_thing" href="/w/' + tool.url_pas(file_alt) + '">' + file_alt + '</a>', data, 1)
-            elif re.search('^' + lang['category'] + ':', main_link):
+            elif re.search('^(?:category|분류):', main_link):
                 see_link = re.sub('#include', '', see_link)
                 main_link = re.sub('#include', '', main_link)
 
@@ -866,7 +866,7 @@ def start(conn, data, title, lang):
 
                 backlink += [[title, main_link, 'cat']]
 
-                category += '<a ' + link_id + ' href="' + tool.url_pas(main_link) + '">' + re.sub('^' + lang['category'] + ':', '', see_link) + '</a> / '
+                category += '<a ' + link_id + ' href="' + tool.url_pas(main_link) + '">' + re.sub('^(?:category|분류):', '', see_link) + '</a> / '
                 data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '', data, 1)
             elif re.search('^wiki:', main_link):
                 data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<a id="inside" href="/' + tool.url_pas(re.sub('^wiki:', '', main_link)) + '">' + see_link + '</a>', data, 1)
@@ -1005,7 +1005,7 @@ def start(conn, data, title, lang):
     category += '</div>'
     category = re.sub(' / <\/div>$', '</div>', category)
 
-    if category == '\n<hr><div id="cate">' + lang['category'] + ': </div>':
+    if category == '\n<hr><div id="cate">Category : </div>':
         category = ''
 
     data += category
