@@ -27,3 +27,17 @@ SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
 CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+## External File License
+ * Quotes icon [Dave Gandy](http://www.flaticon.com/free-icon/quote-left_25672) CC 3.0 BY
+ * Syntax highlighting [highlightjs](https://highlightjs.org/)
+ * Numerical expression [MathJax](https://www.mathjax.org/)
+
+## Contributors
+ * [Reference](https://github.com/2DU/openNAMU/graphs/contributors)
+
+## Helpful people
+ * [Team Croatia](https://github.com/TeamCroatia)
+ * Basix
+ * Efrit
+ * Other chat rooms

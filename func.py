@@ -1,22 +1,16 @@
 ﻿# 모듈들 불러옴
-from css_html_js_minify import html_minify, js_minify, css_minify
-from flask import session, render_template
-from urllib import parse
-
+import css_html_js_minify
+import flask
 import json
 import sqlite3
 import hashlib
 import requests
 import re
 import html
-import time
 import os
 
 # 일부 툴 불러옴
-from set_mark.tool import get_time
-from set_mark.tool import ip_check
-from set_mark.tool import url_pas
-from set_mark.tool import sha224
+from set_mark.tool import *
 
 # 나무마크 불러옴
 from mark import *
@@ -91,26 +85,34 @@ def load_lang(data):
         else:
             return else_lang[data]
 
+def namumark_re(name = '', data = '', set_num = 0):
+    return namumark(name, data, set_num, load_lang('please_all'))
+
 def edit_help_button():
     # https://stackoverflow.com/questions/11076975/insert-text-into-textarea-at-cursor-position-javascript
-    '''<script>
-                function insertAtCursor(myField, myValue) {
-                    if (document.selection) { 
-                        document.getElementById(myField).focus();
-                        sel = document.selection.createRange(); 
-                        sel.text = myValue; 
-                    } else if (document.getElementById(myField).selectionStart || document.getElementById(myField).selectionStart == '0') { 
-                        var startPos = document.getElementById(myField).selectionStart; 
-                        var endPos = document.getElementById(myField).selectionEnd; 
-                        document.getElementById(myField).value = document.getElementById(myField).value.substring(0, startPos) + myValue + document.getElementById(myField).value.substring(endPos, document.getElementById(myField).value.length); 
-                    } else { 
-                        document.getElementById(myField).value += myValue;
-                    }
-                }
-            </script>
-        '''
+    '''
+    <script>
+        function insertAtCursor(myField, myValue) {
+            if (document.selection) { 
+                document.getElementById(myField).focus();
 
-    '<a href="javascript:void(0);" onclick="insertAtCursor(\'content\', \'[[]]\');">(링크)</a> <a href="javascript:void(0);" onclick="insertAtCursor(\'content\', \'[macro()]\');">(매크로)</a> <a href="javascript:void(0);" onclick="insertAtCursor(\'content\', \'{{{#! }}}\');">(중괄호)</a><hr>'
+                sel = document.selection.createRange();
+                sel.text = myValue; 
+            } else if (document.getElementById(myField).selectionStart || document.getElementById(myField).selectionStart == '0') {
+                var startPos = document.getElementById(myField).selectionStart;
+                var endPos = document.getElementById(myField).selectionEnd;
+
+                document.getElementById(myField).value = document.getElementById(myField).value.substring(0, startPos) + myValue + document.getElementById(myField).value.substring(endPos, document.getElementById(myField).value.length); 
+            } else {
+                document.getElementById(myField).value += myValue;
+            }
+        }
+    </script>
+    '''
+
+    insert_list = [['[[]]', '링크'], ['[()]', '매크로'], ['{{{#!}}}', '중괄호']]
+
+    '<a href="javascript:void(0);" onclick="insertAtCursor(\'content\', \'B\');">(A)</a>'
 
     return ['', '']
 
@@ -161,9 +163,9 @@ def next_fix(link, num, page, end = 50):
     return list_data
 
 def other2(origin):
-    return origin + ['Deleted', load_lang('please_all')]
+    return origin + ['Deleted']
 
-def wiki_set(num):
+def wiki_set(num = 1):
     if num == 1:
         data_list = []
 
@@ -287,11 +289,11 @@ def ip_pas(raw_ip):
             ip = raw_ip
             hide = 1
     else:
-        curs.execute("select title from data where title = ?", ['' + load_lang('user') + ':' + raw_ip])
+        curs.execute("select title from data where title = ?", [load_lang('user') + ':' + raw_ip])
         if curs.fetchall():
-            ip = '<a href="/w/' + url_pas('' + load_lang('user') + ':' + raw_ip) + '">' + raw_ip + '</a>'
+            ip = '<a href="/w/' + url_pas(load_lang('user') + ':' + raw_ip) + '">' + raw_ip + '</a>'
         else:
-            ip = '<a id="not_thing" href="/w/' + url_pas('' + load_lang('user') + ':' + raw_ip) + '">' + raw_ip + '</a>'
+            ip = '<a id="not_thing" href="/w/' + url_pas(load_lang('user') + ':' + raw_ip) + '">' + raw_ip + '</a>'
          
     if hide == 0:
         ip += ' <a href="/record/' + url_pas(raw_ip) + '">(' + load_lang('record') + ')</a>'
@@ -299,12 +301,12 @@ def ip_pas(raw_ip):
     return ip
 
 def custom():
-    if 'MyMaiToNight' in session:
-        user_head = session['MyMaiToNight']
+    if 'MyMaiToNight' in flask.session:
+        user_head = flask.session['MyMaiToNight']
     else:
         user_head = ''
 
-    if 'Now' in session and session['Now'] == 1:
+    if 'Now' in flask.session and flask.session['Now'] == 1:
         curs.execute('select name from alarm where name = ? limit 1', [ip_check()])
         if curs.fetchall():
             user_icon = 2
@@ -326,7 +328,7 @@ def custom():
     if user_icon != 0:
         user_name = ip_check()
     else:
-        user_name = '' + load_lang('user') + ''
+        user_name = load_lang('user')
 
     return ['', '', user_icon, user_head, email, user_name]
 
@@ -343,7 +345,7 @@ def acl_check(name):
         if admin_check(5, None) == 1:
             return 0
 
-        curs.execute("select dec from acl where title = ?", ['' + load_lang('user') + ':' + acl_n[0]])
+        curs.execute("select dec from acl where title = ?", [load_lang('user') + ':' + acl_n[0]])
         acl_data = curs.fetchall()
         if acl_data:
             if acl_data[0][0] == 'all':
@@ -456,7 +458,7 @@ def ban_insert(name, end, why, login, blocker):
 
     curs.execute("select block from ban where block = ?", [name])
     if curs.fetchall():
-        curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, ?)", [name, '' + load_lang('release') + '', time, blocker, '', band])
+        curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, ?)", [name, load_lang('release'), time, blocker, '', band])
         curs.execute("delete from ban where block = ?", [name])
     else:
         if login != '':
@@ -504,7 +506,7 @@ def re_error(data):
     if data == '/ban':
         ip = ip_check()
 
-        end = '<li>Why : 권한이 맞지 않는 상태 입니다.</li>'
+        end = '<li>' + load_lang('why') + ' : ' + load_lang('authority_error') + '</li>'
 
         if ban_check() == 1:
             curs.execute("select end, why from ban where block = ?", [ip])
@@ -516,7 +518,7 @@ def re_error(data):
                     end_data = curs.fetchall()
             
             if end_data:
-                end = '<li>Info : '
+                end = '<li>' + load_lang('state') + ' : '
 
                 if end_data[0][0]:
                     now = int(re.sub('(\-| |:)', '', get_time()))
@@ -528,98 +530,67 @@ def re_error(data):
 
                         end += 'Re Try.'
                     else:
-                        end += 'Ban : ' + end_data[0][0]
+                        end += load_lang('why') + ' : ' + end_data[0][0]
                 else:
-                    end += 'Ban : No End'
+                    end += load_lang('why') + ' : ' + load_lang('limitless')
                 
                 end += '</li>'
 
                 if end_data[0][1] != '':
-                    end += '<li>Why : ' + end_data[0][1] + '</li>'
+                    end += '<li>' + load_lang('why') + ' : ' + end_data[0][1] + '</li>'
 
-        return html_minify(render_template(skin_check(), 
-            imp = ['Authority Error', wiki_set(1), custom(), other2([0, 0])],
-            data = '<h2>Info</h2><ul>' + end + '</ul>',
+        return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
+            imp = ['Error', wiki_set(1), custom(), other2([0, 0])],
+            data = '<h2>Error</h2><ul>' + end + '</ul>',
             menu = 0
         ))
+    else:
+        error_data = re.search('\/error\/([0-9]+)', data)
+        if error_data:
+            num = int(error_data.groups()[0])
+            if num == 1:
+                data = load_lang('no_login_error')
+            elif num == 2:
+                data = load_lang('no_exist_user_error')
+            elif num == 3:
+                data = load_lang('authority_error')
+            elif num == 4:
+                data = load_lang('no_admin_block_error')
+            elif num == 6:
+                data = load_lang('same_id_exist_error')
+            elif num == 7:
+                data = load_lang('long_id_error')
+            elif num == 8:
+                data = load_lang('id_char_error')
+            elif num == 9:
+                data = load_lang('file_exist_error')
+            elif num == 10:
+                data = load_lang('password_error')
+            elif num == 13:
+                data = load_lang('recaptcha_error')
+            elif num == 14:
+                data = load_lang('file_extension_error')
+            elif num == 15:
+                data = load_lang('edit_record_error')
+            elif num == 16:
+                data = load_lang('same_file_error')
+            elif num == 17:
+                data = load_lang('file_capacity_error') + ' ' + wiki_set(3)
+            elif num == 19:
+                data = load_lang('decument_exist_error')
+            elif num == 20:
+                data = load_lang('password_diffrent_error')
+            elif num == 21:
+                data = load_lang('edit_filter_error')
+            elif num == 22:
+                data = load_lang('file_name_error')
+            else:
+                data = '???'
 
-    error_data = re.search('\/error\/([0-9]+)', data)
-    if error_data:
-        num = int(error_data.groups()[0])
-        if num == 1:
-            title = 'Authority Error'
-            data = '비 로그인 상태 입니다.'
-        elif num == 2:
-            title = 'Authority Error'
-            data = '이 계정이 없습니다.'
-        elif num == 3:
-            title = 'Authority Error'
-            data = '권한이 모자랍니다.'
-        elif num == 4:
-            title = 'Authority Error'
-            data = '관리자는 차단, 검사 할 수 없습니다.'
-        elif num == 5:
-            title = 'User Error'
-            data = '그런 계정이 없습니다.'
-        elif num == 6:
-            title = 'Register Error'
-            data = '동일한 아이디의 사용자가 있습니다.'
-        elif num == 7:
-            title = 'Register Error'
-            data = '아이디는 20글자보다 짧아야 합니다.'
-        elif num == 8:
-            title = 'Register Error'
-            data = '아이디에는 한글과 알파벳과 공백만 허용 됩니다.'
-        elif num == 9:
-            title = 'Upload Error'
-            data = '파일이 없습니다.'
-        elif num == 10:
-            title = 'PassWord Error'
-            data = '비밀번호가 다릅니다.'
-        elif num == 11:
-            title = 'Login Error'
-            data = '이미 로그인 되어 있습니다.'
-        elif num == 13:
-            title = 'reCAPTCHA Error'
-            data = '리캡차를 통과하세요.'
-        elif num == 14:
-            title = 'Upload Error'
-            data = 'jpg, gif, jpeg, png, webp만 가능 합니다.'
-        elif num == 15:
-            title = 'Edit Error'
-            data = '편집 기록은 500자를 넘을 수 없습니다.'
-        elif num == 16:
-            title = 'Upload Error'
-            data = '동일한 이름의 파일이 있습니다.'
-        elif num == 17:
-            title = 'Upload Error'
-            data = '파일 용량은 ' + wiki_set(3) + 'MB를 넘길 수 없습니다.'
-        elif num == 18:
-            title = 'Edit Error'
-            data = '내용이 원래 문서와 동일 합니다.'
-        elif num == 19:
-            title = 'Move Error'
-            data = '이동 하려는 곳에 문서가 이미 있습니다.'
-        elif num == 20:
-            title = 'PassWord Error'
-            data = '재 확인이랑 비밀번호가 다릅니다.'
-        elif num == 21:
-            title = 'Edit Error'
-            data = '편집 필터에 의해 검열 되었습니다.'
-        elif num == 22:
-            title = 'Upload Error'
-            data = '파일 이름은 알파벳, 한글, 띄어쓰기, 언더바, 빼기표만 허용 됩니다.'
-        else:
-            title = 'Error'
-            data = '???'
-
-        if title:
-            return html_minify(render_template(skin_check(), 
-                imp = [title, wiki_set(1), custom(), other2([0, 0])],
+            return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
+                imp = ['Error', wiki_set(1), custom(), other2([0, 0])],
                 data = '<h2>Error</h2><ul><li>' + data + '</li></ul>',
                 menu = 0
             ))
         else:
             return redirect('/')
-    else:
-        return redirect('/')

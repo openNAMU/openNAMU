@@ -177,7 +177,7 @@ def link_fix(main_link):
         
     return [main_link, other_link]
 
-def start(conn, data, title):
+def start(conn, data, title, lang):
     # DB 지정
     curs = conn.cursor()
 
@@ -256,7 +256,7 @@ def start(conn, data, title):
                     else:
                         break
 
-                include_parser = re.sub('\[\[분류:(((?!\]\]|#include).)+)\]\]', '', include_parser)
+                include_parser = re.sub('\[\[' + lang['template'] + ':(((?!\]\]|#include).)+)\]\]', '', include_parser)
                 include_parser = html.escape(include_parser)
 
                 data = re.sub('\[include\(((?:(?!\)\]).)+)\)\]', '<include>\n<a id="include_link" href="/w/' + tool.url_pas(include_link) + '">[' + include_link + ']</a>\n' + include_parser + '\n</include>', data, 1)
@@ -402,7 +402,7 @@ def start(conn, data, title):
                                                             else:
                                                                 folding_data = ['Test']
                                                             
-                                                            data = re.sub('{{{#!folding ?((?:(?!\n).)*)\n?', '<div>' + str(folding_data[0]) + ' <div style="display: inline-block;"><a href="javascript:void(0);" onclick="folding(' + str(fol_num) + ');">[작동]</a></div_end><div id="folding_' + str(fol_num) + '" style="display: none;"><div id="wiki_div" style="">', data, 1)
+                                                            data = re.sub('{{{#!folding ?((?:(?!\n).)*)\n?', '<div>' + str(folding_data[0]) + ' <div style="display: inline-block;"><a href="javascript:void(0);" onclick="folding(' + str(fol_num) + ');">[Do]</a></div_end><div id="folding_' + str(fol_num) + '" style="display: none;"><div id="wiki_div" style="">', data, 1)
                                                             
                                                             fol_num += 1
                                                         else:
@@ -494,7 +494,13 @@ def start(conn, data, title):
         math = re.search('&lt;math&gt;((?:(?!&lt;\/math&gt;).)+)&lt;\/math&gt;', data)
         if math:
             if first == 0:
-                plus_data += '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.css" integrity="sha384-TEMocfGvRuD1rIAacqrknm5BQZ7W7uWitoih+jMNFXQIbNl16bO8OZmylH/Vi/Ei" crossorigin="anonymous"><script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.js" integrity="sha384-jmxIlussZWB7qCuB+PgKG1uLjjxbVVIayPJwi6cG6Zb4YKq0JIw+OMnkkEC7kYCq" crossorigin="anonymous"></script>'
+                plus_data += '''
+                            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.css"
+                                integrity="sha384-TEMocfGvRuD1rIAacqrknm5BQZ7W7uWitoih+jMNFXQIbNl16bO8OZmylH/Vi/Ei"
+                                crossorigin="anonymous">
+                            <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.js" 
+                                integrity="sha384-jmxIlussZWB7qCuB+PgKG1uLjjxbVVIayPJwi6cG6Zb4YKq0JIw+OMnkkEC7kYCq"
+                                crossorigin="anonymous"></script>'''
 
             math = math.groups()[0]
             
@@ -547,18 +553,18 @@ def start(conn, data, title):
         data = re.sub('\n#(?:redirect|넘겨주기) (?P<in>(?:(?!\n).)+)\n', '<meta http-equiv="refresh" content="0; url=/w/' + tool.url_pas(main_link) + '?froms=' + tool.url_pas(title) + other_link + '">', data, 1)
 
     # [목차(없음)] 처리
-    if not re.search('\[목차\(없음\)\]\n', data):
-        if not re.search('\[목차\]', data):
+    if not re.search('\[(?:목차|tableofcontents)\((?:없음|no)\)\]\n', data):
+        if not re.search('\[(?:목차|tableofcontents)\]', data):
             data = re.sub('\n(?P<in>={1,6}) ?(?P<out>(?:(?!=).)+) ?={1,6}\n', '\n[목차]\n\g<in> \g<out> \g<in>\n', data, 1)
     else:
-        data = re.sub('\[목차\(없음\)\]\n', '', data)
+        data = re.sub('\[(?:목차|tableofcontents)\((?:없음|no)\)\]\n', '', data)
         
     # 문단 문법
     toc_full = 0
     toc_top_stack = 6
     toc_stack = [0, 0, 0, 0, 0, 0]
     edit_number = 0
-    toc_data = '<div id="toc"><span style="font-size: 18px;">목차</span>\n\n'
+    toc_data = '<div id="toc"><span style="font-size: 18px;">TOC</span>\n\n'
     while 1:
         toc = re.search('\n(={1,6}) ?((?:(?!\n).)+) ?\n', data)
         if toc:
@@ -586,7 +592,7 @@ def start(conn, data, title):
 
             all_stack = re.sub('0.', '', all_stack)
             
-            data = re.sub('\n(={1,6}) ?((?:(?!\n).)+) ?\n', '\n<h' + toc_number + ' id="s-' + re.sub('\.$', '', all_stack) + '"><a href="#toc">' + all_stack + '</a> ' + re.sub('=*$', '', toc[1]) + ' <span style="font-size: 12px"><a href="/edit/' + tool.url_pas(title) + '?section=' + str(edit_number) + '">(편집)</a></span></h' + toc_number + '>\n', data, 1)
+            data = re.sub('\n(={1,6}) ?((?:(?!\n).)+) ?\n', '\n<h' + toc_number + ' id="s-' + re.sub('\.$', '', all_stack) + '"><a href="#toc">' + all_stack + '</a> ' + re.sub('=*$', '', toc[1]) + ' <span style="font-size: 12px"><a href="/edit/' + tool.url_pas(title) + '?section=' + str(edit_number) + '">(' + lang['edit'] + ')</a></span></h' + toc_number + '>\n', data, 1)
             
             toc_data += '<span style="margin-left: ' + str((toc_full - toc_top_stack) * 10) + 'px;"><a href="#s-' + re.sub('\.$', '', all_stack) + '">' + all_stack + '</a> ' + re.sub('\[\*((?:(?! |\]).)*)(?: ((?:(?!\]).)+))?\]', '', re.sub('=*$', '', toc[1])) + '</span>\n'
         else:
@@ -594,7 +600,7 @@ def start(conn, data, title):
 
     toc_data += '</div>'
     
-    data = re.sub('\[목차\]', toc_data, data)
+    data = re.sub('\[(?:목차|tableofcontents)\]', toc_data, data)
     
     while 1:
         hr = re.search('\n-{4,9}\n', data)
@@ -609,7 +615,6 @@ def start(conn, data, title):
     data = tool.savemark(data)
     
     data = re.sub("\[anchor\((?P<in>(?:(?!\)\]).)+)\)\]", '<span id="\g<in>"></span>', data)          
-    data = re.sub("\[nicovideo\((?P<in>(?:(?!,|\)\]).)+)(?:(?:(?!\)\]).)*)\)\]", "[[http://embed.nicovideo.jp/watch/\g<in>|\g<in>]]", data)
     data = re.sub('\[ruby\((?P<in>(?:(?!,).)+)\, ?(?P<out>(?:(?!\)\]).)+)\)\]', '<ruby>\g<in><rp>(</rp><rt>\g<out></rt><rp>)</rp></ruby>', data)
 
     # 원래 코드 재탕
@@ -620,32 +625,42 @@ def start(conn, data, title):
     time_data = re.search('^([0-9]{4}-[0-9]{2}-[0-9]{2})', now_time)
     time = time_data.groups()
     
-    age_data = re.findall('\[age\(([0-9]{4}-[0-9]{2}-[0-9]{2})\)\]', data)
-    for age in age_data:
-        old = datetime.datetime.strptime(time[0], '%Y-%m-%d')
-        will = datetime.datetime.strptime(age, '%Y-%m-%d')
-        
-        e_data = old - will
-        
-        data = re.sub('\[age\(([0-9]{4})-([0-9]{2})-([0-9]{2})\)\]', str(int(int(e_data.days) / 365)), data, 1)
+    while 1:
+        age_data = re.search('\[age\(([0-9]{4}-[0-9]{2}-[0-9]{2})\)\]', data)
+        if age_data:
+            age = age_data.groups()[0]
 
-    dday_data = re.findall('\[dday\(([0-9]{4}-[0-9]{2}-[0-9]{2})\)\]', data)
-    for dday in dday_data:
-        old = datetime.datetime.strptime(time[0], '%Y-%m-%d')
-        will = datetime.datetime.strptime(dday, '%Y-%m-%d')
-        
-        e_data = old - will
-        
-        if re.search('^-', str(e_data.days)):
-            e_day = str(e_data.days)
+            old = datetime.datetime.strptime(time[0], '%Y-%m-%d')
+            will = datetime.datetime.strptime(age, '%Y-%m-%d')
+            
+            e_data = old - will
+            
+            data = re.sub('\[age\(([0-9]{4})-([0-9]{2})-([0-9]{2})\)\]', str(int(e_data.days / 365)), data, 1)
         else:
-            e_day = '+' + str(e_data.days)
+            break
 
-        data = re.sub('\[dday\(([0-9]{4}-[0-9]{2}-[0-9]{2})\)\]', e_day, data, 1)
+    while 1:
+        dday_data = re.search('\[dday\(([0-9]{4}-[0-9]{2}-[0-9]{2})\)\]', data)
+        if dday_data:
+            dday = dday_data.groups()[0]
+
+            old = datetime.datetime.strptime(time[0], '%Y-%m-%d')
+            will = datetime.datetime.strptime(dday, '%Y-%m-%d')
+            
+            e_data = old - will
+            
+            if re.search('^-', str(e_data.days)):
+                e_day = str(e_data.days)
+            else:
+                e_day = '+' + str(e_data.days)
+
+            data = re.sub('\[dday\(([0-9]{4}-[0-9]{2}-[0-9]{2})\)\]', e_day, data, 1)
+        else:
+            break
 
     # 유튜브, 카카오 티비 처리
     while 1:
-        video = re.search('\[(youtube|kakaotv)\(((?:(?!\)\]).)+)\)\]', data)
+        video = re.search('\[(youtube|kakaotv|nicovideo)\(((?:(?!\)\]).)+)\)\]', data)
         if video:
             video = video.groups()
             
@@ -675,13 +690,15 @@ def start(conn, data, title):
                 video_code = re.sub('^https:\/\/youtu\.be\/', '', video_code)
                 
                 video_src = 'https://www.youtube.com/embed/' + video_code
-            else:
+            elif video[0] == 'kakaotv':
                 video_code = re.sub('^https:\/\/tv\.kakao\.com\/channel\/9262\/cliplink\/', '', video_code)
                 video_code = re.sub('^http:\/\/tv\.kakao\.com\/v\/', '', video_code)
                 
                 video_src = 'https://tv.kakao.com/embed/player/cliplink/' + video_code +'?service=kakao_tv'
+            else:
+                video_src = 'https://embed.nicovideo.jp/watch/' + video_code
                 
-            data = re.sub('\[(youtube|kakaotv)\(((?:(?!\)\]).)+)\)\]', '<iframe width="' + video_width + '" height="' + video_height + '" src="' + video_src + '" allowfullscreen frameborder="0"></iframe>', data, 1)
+            data = re.sub('\[(youtube|kakaotv|nicovideo)\(((?:(?!\)\]).)+)\)\]', '<iframe width="' + video_width + '" height="' + video_height + '" src="' + video_src + '" allowfullscreen frameborder="0"></iframe>', data, 1)
         else:
             break
 
@@ -762,7 +779,7 @@ def start(conn, data, title):
             break
 
     # 링크 관련 문법 구현
-    category = '\n<hr><div id="cate">분류: '
+    category = '\n<hr><div id="cate">' + lang['category'] + ': '
     while 1:
         link = re.search('\[\[((?:(?!\[\[|\]\]).)+)\]\]', data)
         if link:
@@ -778,7 +795,7 @@ def start(conn, data, title):
                 main_link = link
                 see_link = link
 
-            if re.search('^(파일|외부):', main_link):
+            if re.search('^(' + lang['file'] + '|' + lang['out'] + '):', main_link):
                 file_style = ''
 
                 width = re.search('width=((?:(?!&).)+)', see_link)
@@ -807,13 +824,13 @@ def start(conn, data, title):
                 else:
                     file_align = ''
 
-                if re.search('^외부:', main_link):
-                    file_src = re.sub('^외부:', '', main_link)
+                if re.search('^' + lang['out'] + ':', main_link):
+                    file_src = re.sub('^' + lang['out'] + ':', '', main_link)
             
                     file_alt = main_link
                     exist = 'Yes'
                 else:
-                    file_data = re.search('^파일:((?:(?!\.).)+)\.(.+)$', main_link)
+                    file_data = re.search('^' + lang['file'] + ':((?:(?!\.).)+)\.(.+)$', main_link)
                     if file_data:
                         file_data = file_data.groups()
                         file_name = file_data[0]
@@ -825,7 +842,7 @@ def start(conn, data, title):
                         file_end = 'jpg'
 
                     file_src = '/image/' + tool.sha224(file_name) + '.' + file_end
-                    file_alt = '파일:' + file_name + '.' + file_end
+                    file_alt = '' + lang['file'] + ':' + file_name + '.' + file_end
 
                     curs.execute("select title from data where title = ?", [file_alt])
                     exist = curs.fetchall()
@@ -834,12 +851,12 @@ def start(conn, data, title):
                     data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<span style="' + file_align + '"><img style="' + file_style + '" alt="' + file_alt + '" src="' + file_src + '"></span>', data, 1)
                 else:
                     data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<a id="not_thing" href="/w/' + tool.url_pas(file_alt) + '">' + file_alt + '</a>', data, 1)
-            elif re.search('^분류:', main_link):
+            elif re.search('^' + lang['category'] + ':', main_link):
                 see_link = re.sub('#include', '', see_link)
                 main_link = re.sub('#include', '', main_link)
 
                 if re.search('#blur', main_link):
-                    see_link = '스포일러'
+                    see_link = 'Hidden'
                     link_id = 'id="inside"'
                     
                     main_link = re.sub('#blur', '', main_link)
@@ -848,7 +865,7 @@ def start(conn, data, title):
 
                 backlink += [[title, main_link, 'cat']]
 
-                category += '<a ' + link_id + ' href="' + tool.url_pas(main_link) + '">' + re.sub('^분류:', '', see_link) + '</a> / '
+                category += '<a ' + link_id + ' href="' + tool.url_pas(main_link) + '">' + re.sub('^' + lang['category'] + ':', '', see_link) + '</a> / '
                 data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '', data, 1)
             elif re.search('^wiki:', main_link):
                 data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<a id="inside" href="/' + tool.url_pas(re.sub('^wiki:', '', main_link)) + '">' + see_link + '</a>', data, 1)
@@ -864,7 +881,7 @@ def start(conn, data, title):
                     else:
                         data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<a id="inside" href="' + inter[0][0] + inter_data[1] + '">' + inter_data[0] + ':' + inter_data[1] + '</a>', data, 1)
                 else:
-                    data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '인터위키 정보 없음', data, 1)
+                    data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', 'Not exist', data, 1)
             elif re.search('^\/', main_link):
                 under_title = re.search('^(\/(?:.+))$', main_link)
                 under_title = under_title.groups()[0]
@@ -908,65 +925,108 @@ def start(conn, data, title):
             
     # 각주 처리
     footnote_number = 0
-    footnote_all = '\n<hr><ul id="footnote_data">'
+    footnote_all = []
     footnote_dict = {}
+    footnote_re = {}
+    footdata_all = '\n<hr><ul id="footnote_data">'
     while 1:
-        footnote = re.search('(?:\[\*((?:(?! |\]).)*)(?: ((?:(?!\]).)+))?\]|(\[각주\]))', data)
+        footnote = re.search('(?:\[\*((?:(?! |\]).)*)(?: ((?:(?!\]).)+))?\]|(\[(?:각주|footnote)\]))', data)
         if footnote:
             footnote_data = footnote.groups()
             if footnote_data[2]:
-                footnote_all += '</ul>'
+                footnote_all.sort()
                 
-                data = re.sub('(?:\[\*((?:(?! ).)*) ((?:(?!\]).)+)\]|(\[각주\]))', footnote_all, data, 1)
+                for footdata in footnote_all:
+                    if footdata[2] == 0:
+                        footdata_in = ''
+                    else:
+                        footdata_in = footdata[2]
+
+                    footdata_all += '<li><a href="#rfn-' + str(footdata[0]) + '" id="fn-' + str(footdata[0]) + '">(' + footdata[1] + ')</a> ' + footdata_in + '</li>'
                 
-                footnote_all = '\n<hr><ul id="footnote_data">'
+                data = re.sub('(?:\[\*((?:(?! ).)*) ((?:(?!\]).)+)\]|(\[(?:각주|footnote)\]))', footdata_all + '</ul>', data, 1)
+                
+                footnote_all = []
+                footdata_all = '\n<hr><ul id="footnote_data">'
             else:
                 footnote = footnote_data[1]
                 footnote_name = footnote_data[0]
                 if footnote_name and not footnote:
-                    data = re.sub('(?:\[\*((?:(?! |\]).)*)(?: ((?:(?!\]).)+))?\]|(\[각주\]))', '<sup><a href="#fn-' + footnote_dict[footnote_name] + '" id="rfn-' + footnote_dict[footnote_name] + '">(' + footnote_name + ')</a></sup>', data, 1)
+                    if footnote_name in footnote_dict:
+                        footnote_re[footnote_name] += 1
+
+                        foot_plus_num = str(footnote_re[footnote_name])
+                        footshort = footnote_dict[footnote_name] + '.' + foot_plus_num
+
+                        footnote_all += [[float(footshort), footshort, 0]]
+
+                        data = re.sub('(?:\[\*((?:(?! |\]).)*)(?: ((?:(?!\]).)+))?\]|(\[(?:각주|footnote)\]))', '<sup><a href="#fn-' + footshort + '" id="rfn-' + footshort + '">(' + footshort + ')</a></sup>', data, 1)
+                    else:
+                        data = re.sub('(?:\[\*((?:(?! |\]).)*)(?: ((?:(?!\]).)+))?\]|(\[(?:각주|footnote)\]))', '<sup><a href="#">(' + footnote_name + ')</a></sup>', data, 1)
                 else:
                     footnote_number += 1
 
                     if not footnote_name:
                         footnote_name = str(footnote_number)
-                    else:
-                        footnote_dict.update({ footnote_name : str(footnote_number) })
 
-                    footnote_all += '<li><a href="#rfn-' + str(footnote_number) + '" id="fn-' + str(footnote_number) + '">(' + footnote_name + ')</a> ' + footnote + '</li>'
+                    footnote_dict.update({ footnote_name : str(footnote_number) })
+
+                    if not footnote_name in footnote_re:
+                        footnote_re.update({ footnote_name : 0 })
+                    else:
+                        footnote_re[footnote_name] += 1
+
+                    footnote_all += [[footnote_number, footnote_name, footnote]]
                     
-                    data = re.sub('(?:\[\*((?:(?! |\]).)*)(?: ((?:(?!\]).)+))?\]|(\[각주\]))', '<sup><a href="#fn-' + str(footnote_number) + '" id="rfn-' + str(footnote_number) + '">(' + footnote_name + ')</a></sup>', data, 1)
+                    data = re.sub('(?:\[\*((?:(?! |\]).)*)(?: ((?:(?!\]).)+))?\]|(\[(?:각주|footnote)\]))', '<sup><a href="#fn-' + str(footnote_number) + '" id="rfn-' + str(footnote_number) + '">(' + footnote_name + ')</a></sup>', data, 1)
         else:
             break
 
     data = re.sub('\n+$', '', data)
 
-    footnote_all += '</ul>'
-    if footnote_all == '\n<hr><ul id="footnote_data"></ul>':
-        footnote_all = ''
+    footnote_all.sort()
 
-    
-    data = re.sub('\n$', footnote_all, data + '\n', 1)
+    for footdata in footnote_all:
+        if footdata[2] == 0:
+            footdata_in = ''
+        else:
+            footdata_in = footdata[2]
+
+        footdata_all += '<li><a href="#rfn-' + str(footdata[0]) + '" id="fn-' + str(footdata[0]) + '">(' + footdata[1] + ')</a> ' + footdata_in + '</li>'
+
+    footdata_all += '</ul>'
+    if footdata_all == '\n<hr><ul id="footnote_data"></ul>':
+        footdata_all = ''
+
+    data = re.sub('\n$', footdata_all, data + '\n', 1)
 
     # 분류 마지막 처리
     category += '</div>'
     category = re.sub(' / <\/div>$', '</div>', category)
 
-    if category == '\n<hr><div id="cate">분류: </div>':
+    if category == '\n<hr><div id="cate">' + lang['category'] + ': </div>':
         category = ''
 
     data += category
     
     # NoWiki 마지막 처리
-    for re_data in end_data:
-        if re_data[2] == 'normal':
-            data = data.replace('<span id="' + re_data[0] + '"></span>', re_data[1])
-            data = data.replace(tool.url_pas('<span id="' + re_data[0] + '"></span>'), tool.url_pas(re_data[1]))
+    i = 0
+    while 1:
+        try:
+            _ = end_data[i][0]
+        except:
+            break
+
+        if end_data[i][2] == 'normal':
+            data = data.replace('<span id="' + end_data[i][0] + '"></span>', end_data[i][1])
+            data = data.replace(tool.url_pas('<span id="' + end_data[i][0] + '"></span>'), tool.url_pas(end_data[i][1]))
         else:
-            if re.search('\n', re_data[1]):
-                data = data.replace('<span id="' + re_data[0] + '"></span>', '\n<pre>' + re.sub('^\n', '', re_data[1]) + '</pre>')
+            if re.search('\n', end_data[i][1]):
+                data = data.replace('<span id="' + end_data[i][0] + '"></span>', '\n<pre>' + re.sub('^\n', '', end_data[i][1]) + '</pre>')
             else:
-                data = data.replace('<span id="' + re_data[0] + '"></span>', '<code>' + re_data[1] + '</code>')
+                data = data.replace('<span id="' + end_data[i][0] + '"></span>', '<code>' + end_data[i][1] + '</code>')
+
+        i += 1
     
     # 마지막 처리
     data = re.sub('<\/td_end>', '</td>', data)
