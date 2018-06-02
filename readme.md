@@ -1,20 +1,21 @@
-﻿## Introduction
+﻿## Intro
 NamuMark based wiki engine returns to Python. (3.5 and above)
 
-## Commands for cloning
-### openNAMU:stable
-```text
-git clone https://github.com/2DU/openNAMU.git
-```
-### openNAMU:master
-```text
-git clone -b master https://github.com/2DU/openNAMU.git
-```
-### Installations
-[Documentations and references are here](https://namu.ml/w/openNAMU/Install)
-### What is the 'set.json'?
-The file 'set.json' is the file for setting the database name for openNAMU.
-<br>You can create the new file with deleting the file.
-### ETC
-[Open demo site (Korean)](https://namu.ml)
-<br>The member who signed up first will become a owner.
+## Clone command
+### Stable
+ * git clone https://github.com/2DU/openNAMU.git
+
+### Master
+ * git clone -b master https://github.com/2DU/openNAMU.git
+
+## Install
+ * [Reference](http://namu.ml/w/openNAMU/Install)
+ 
+## set.json Explanation
+ * db = Database Name
+
+You can create a new set.json by deleting it.
+
+## Other
+ * [Test Server (Ko)](http://namu.ml/)
+ * The first registor is granted owner privileges.
