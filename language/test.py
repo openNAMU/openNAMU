@@ -15,4 +15,4 @@ for a_in in a_json:
         c = input()
         b_json[a_in] = c
         
-print(str(b_json).replace('", ', '",\n    ').replace('{', '{\n    ').replace('}', '\n}').replace('\'', '"'))
+print(str(b_json).replace(', ', ',\n    ').replace('{', '{\n    ').replace('}', '\n}').replace('\'', '"'))
