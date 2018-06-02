@@ -80,7 +80,7 @@
     "notice" : "Annoncements",
     "writer" : "Author",
     "upper" : "Upper possition",
-    "lower" : "Lower possition",
+    "under" : "Lower possition",
     "pass" : "Pass",
     "category" : "Category",
     "user_css_warring" : "User's CSS will deleted if you close the browser or when you are editting as guest",
