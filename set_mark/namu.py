@@ -843,7 +843,7 @@ def namu(conn, data, title,):
                         file_end = 'jpg'
 
                     file_src = '/image/' + tool.sha224(file_name) + '.' + file_end
-                    file_alt = 'File:' + file_name + '.' + file_end
+                    file_alt = 'file:' + file_name + '.' + file_end
 
                     curs.execute("select title from data where title = ?", [file_alt])
                     exist = curs.fetchall()
