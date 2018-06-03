@@ -118,14 +118,14 @@ def update():
     # 3.0.5 사용자 문서, 파일 문서, 분류 문서 영어화
     try:
         all_rep = [['사용자:', 'user:'], ['파일:', 'file:'], ['분류:', 'category:']]
-        all_rep2 = ['data', 'history', 'acl', 'topic', 'back', 'back']
+        all_rep2 = ['data', 'history', 'acl', 'topic', 'back']
 
         for i in range(3):
             for j in range(6):
                 if not j == 5:
                     curs.execute('select title from ' + all_rep2[j] + ' where title like ?', [all_rep[i][0] + '%'])
                 else:
-                    curs.execute('select link from ' + all_rep2[j] + ' where title like ?', [all_rep[i][0] + '%'])
+                    curs.execute('select link from back where link like ?', [all_rep[i][0] + '%'])
 
                 user_rep = curs.fetchall()
                 for user_rep2 in user_rep:
