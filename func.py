@@ -129,7 +129,6 @@ def update():
 
                 user_rep = curs.fetchall()
                 for user_rep2 in user_rep:
-                    print(str(j) + ' : ' + user_rep2[0])
                     first = re.sub('^' + all_rep[i][0], all_rep[i][1], user_rep2[0])
 
                     if j == 0:
