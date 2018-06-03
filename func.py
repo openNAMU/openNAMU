@@ -116,24 +116,38 @@ def update():
         pass
 
     # 3.0.5 사용자 문서, 파일 문서, 분류 문서 영어화
-    try:
-        all_rep = [['사용자:', 'user:'], ['파일:', 'file:'], ['분류:', 'category:']]
+    # try:
+    all_rep = [['사용자:', 'user:'], ['파일:', 'file:'], ['분류:', 'category:']]
+    all_rep2 = ['data', 'history', 'acl', 'topic', 'back', 'back']
 
-        for i in range(3):
-            curs.execute('select title from data where title like ?', [all_rep[i][0] + '%'])
+    for i in range(3):
+        for j in range(6):
+            if not j == 5:
+                curs.execute('select title from ' + all_rep2[j] + ' where title like ?', [all_rep[i][0] + '%'])
+            else:
+                curs.execute('select link from ' + all_rep2[j] + ' where title like ?', [all_rep[i][0] + '%'])
+
             user_rep = curs.fetchall()
-
             for user_rep2 in user_rep:
-                curs.execute("update data set title = ? where title = ?", [re.sub('^' + all_rep[i][0], all_rep[i][1], user_rep2[0]), user_rep2[0]])
-                curs.execute("update history set title = ? where title = ?", [re.sub('^' + all_rep[i][0], all_rep[i][1], user_rep2[0]), user_rep2[0]])
-                curs.execute("update acl set title = ? where title = ?", [re.sub('^' + all_rep[i][0], all_rep[i][1], user_rep2[0]), user_rep2[0]])
-                curs.execute("update topic set title = ? where title = ?", [re.sub('^' + all_rep[i][0], all_rep[i][1], user_rep2[0]), user_rep2[0]])
-                curs.execute("update back set title = ? where title = ?", [re.sub('^' + all_rep[i][0], all_rep[i][1], user_rep2[0]), user_rep2[0]])
-                curs.execute("update back set link = ? where link = ?", [re.sub('^' + all_rep[i][0], all_rep[i][1], user_rep2[0]), user_rep2[0]])
+                print(str(j) + ' : ' + user_rep2[0])
+                first = re.sub('^' + all_rep[i][0], all_rep[i][1], user_rep2[0])
 
-        print('사용자 to user, 파일 to file, 분류 to category')
-    except:
-        pass
+                if j == 0:
+                    curs.execute("update data set title = ? where title = ?", [first, user_rep2[0]])
+                elif j == 1:
+                    curs.execute("update history set title = ? where title = ?", [first, user_rep2[0]])
+                elif j == 2:
+                    curs.execute("update acl set title = ? where title = ?", [first, user_rep2[0]])
+                elif j == 3:
+                    curs.execute("update topic set title = ? where title = ?", [first, user_rep2[0]])
+                elif j == 4:
+                    curs.execute("update back set title = ? where title = ?", [first, user_rep2[0]])
+                elif j == 5:
+                    curs.execute("update back set link = ? where link = ?", [first, user_rep2[0]])
+
+    print('사용자 to user, 파일 to file, 분류 to category')
+    # except:
+    #    pass
 
     conn.commit()
 
