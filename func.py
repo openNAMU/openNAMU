@@ -117,10 +117,17 @@ def update():
 
     # 3.0.5 사용자 문서, 파일 문서, 분류 문서 영어화
     try:
-        curs.execute('select name, sub from filter where sub != "X" and sub != ""')
-        _ = curs.fetchall()
-        for _2 in _:
-            pass
+        all_rep = [['사용자:', 'user:'], ['파일:', 'file:'], ['분류:', 'category:']]
+
+        for i in range(3):
+            curs.execute('select title from data where title like ?', [all_rep[i][0] + '%'])
+            user_rep = curs.fetchall()
+
+            for user_rep2 in user_rep:
+                curs.execute("update data set title = ? where title = ?", [re.sub('^' + all_rep[i][0], all_rep[i][1], user_rep2[0]), user_rep2[0]])
+                curs.execute("update history set title = ? where title = ?", [re.sub('^' + all_rep[i][0], all_rep[i][1], user_rep2[0]), user_rep2[0]])
+
+        print('사용자 to user, 파일 to file, 분류 to category')
     except:
         pass
 
@@ -374,14 +381,14 @@ def ip_pas(raw_ip):
             ip = raw_ip
             hide = 1
     else:
-        curs.execute("select title from data where title = ?", [load_lang('user') + ':' + raw_ip])
+        curs.execute("select title from data where title = ?", ['user:' + raw_ip])
         if curs.fetchall():
-            ip = '<a href="/w/' + url_pas(load_lang('user') + ':' + raw_ip) + '">' + raw_ip + '</a>'
+            ip = '<a href="/w/' + url_pas('user:' + raw_ip) + '">' + raw_ip + '</a>'
         else:
-            ip = '<a id="not_thing" href="/w/' + url_pas(load_lang('user') + ':' + raw_ip) + '">' + raw_ip + '</a>'
+            ip = '<a id="not_thing" href="/w/' + url_pas('user:' + raw_ip) + '">' + raw_ip + '</a>'
          
     if hide == 0:
-        ip += ' <a href="/record/' + url_pas(raw_ip) + '">(' + load_lang('record') + ')</a>'
+        ip += ' <a href="/record/' + url_pas('user:' + raw_ip) + '">(' + load_lang('record') + ')</a>'
 
     return ip
 
@@ -423,14 +430,14 @@ def acl_check(name):
     if ban_check() == 1:
         return 1
 
-    acl_c = re.search("^" + load_lang('user') + ":([^/]*)", name)
+    acl_c = re.search("^user:([^/]*)", name)
     if acl_c:
         acl_n = acl_c.groups()
 
         if admin_check(5, None) == 1:
             return 0
 
-        curs.execute("select dec from acl where title = ?", [load_lang('user') + ':' + acl_n[0]])
+        curs.execute("select dec from acl where title = ?", ['user:' + acl_n[0]])
         acl_data = curs.fetchall()
         if acl_data:
             if acl_data[0][0] == 'all':
@@ -447,7 +454,7 @@ def acl_check(name):
         else:
             return 1
 
-    file_c = re.search("^" + load_lang('file') + ":(.*)", name)
+    file_c = re.search("^file:(.*)", name)
     if file_c and admin_check(5, 'edit (' + name + ')') != 1:
         return 1
 

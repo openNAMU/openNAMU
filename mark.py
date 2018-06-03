@@ -31,21 +31,24 @@ def plusing(name, link, backtype):
         curs.execute("insert into back (title, link, type) values (?, ?, ?)", [link, name, backtype])
 
 def namumark(title = '', data = '', num = 0):
-    data = namu(conn, data, title)
-    if num == 1:
-        i = 0
-        while 1:
-            try:
-                _ = data[2][i][0]
-            except:
-                break
+    if not data == '':
+        data = namu(conn, data, title)
+        if num == 1:
+            i = 0
+            while 1:
+                try:
+                    _ = data[2][i][0]
+                except:
+                    break
 
-            thread_start = threading.Thread(target = plusing, args = [data[2][i][0], data[2][i][1], data[2][i][2]])
-            thread_start.start()
-            thread_start.join()
+                thread_start = threading.Thread(target = plusing, args = [data[2][i][0], data[2][i][1], data[2][i][2]])
+                thread_start.start()
+                thread_start.join()
 
-            i += 1
+                i += 1
 
-        conn.commit()
-        
-    return data[0] + data[1]
+            conn.commit()
+            
+        return data[0] + data[1]
+    else:
+        return '404 Not Found.'
