@@ -172,89 +172,18 @@ else:
 json_data = open(os.path.join('language', rep_language + '.json'), 'rt', encoding='utf-8').read()
 lang_data = json.loads(json_data)
 
-# 호환성 설정
-try:
-    curs.execute("alter table history add hide text default ''")
-    
-    curs.execute('select title, re from hidhi')
-    for rep in curs.fetchall():
-        curs.execute("update history set hide = 'O' where title = ? and id = ?", [rep[0], rep[1]])
+# update
+update()
 
-    curs.execute("drop table if exists hidhi")
-
-    print('move table hidhi')
-except:
-    pass
-
-try:
-    curs.execute("alter table user add date text default ''")
-
-    print('user table add column date')
-except:
-    pass
-
-try:
-    curs.execute("alter table rb add band text default ''")
-
-    print('rb table add column band')
-except:
-    pass
-
-try:
-    curs.execute("alter table ban add login text default ''")
-
-    print('ban table add column login')
-except:
-    pass
-
-try:
-    curs.execute("select title, acl from data where acl != ''")
-    for rep in curs.fetchall():
-        curs.execute("insert into acl (title, dec, dis, why) values (?, ?, '', '')", [rep[0], rep[1]])
-
-    curs.execute("alter table data drop acl")
-
-    print('data table delete column acl')
-except:
-    pass
-
-try:
-    curs.execute("alter table user add email text default ''")
-
-    print('user table add column email')
-except:
-    pass
-
-try:
-    curs.execute('select name, sub from filter where sub != "X" and sub != ""')
-    filter_name = curs.fetchall()
-    if filter_name:
-        for filter_delete in filter_name:
-            if filter_delete[1] != '' or filter_delete[1] != 'X':
-                curs.execute("update filter set sub = '' where name = ?", [filter_delete[0]])
-
-        print('filter data fix')
-except:
-    pass
-
-try:
-    curs.execute("alter table user add skin text default ''")
-
-    print('user table add column skin')
-except:
-    pass
-        
-conn.commit()
-
-# 이미지 폴더 생성
+# image folder create
 if not os.path.exists('image'):
     os.makedirs('image')
     
-# 스킨 폴더 생성
+# views folder create
 if not os.path.exists('views'):
     os.makedirs('views')
 
-# 백업 설정
+# backup set
 def back_up():
     try:
         shutil.copyfile(set_data['db'] + '.db', 'back_' + set_data['db'] + '.db')
@@ -273,7 +202,7 @@ try:
 except:
     back_time = 0
     
-# 백업 여부 확인
+# backup off or run
 if back_time != 0:
     print(str(back_time) + '-Hours Interval Back Up')
     

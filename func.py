@@ -42,6 +42,90 @@ def captcha_get():
 
     return data
 
+def update():
+    # 호환성 설정
+    try:
+        curs.execute("alter table history add hide text default ''")
+        
+        curs.execute('select title, re from hidhi')
+        for rep in curs.fetchall():
+            curs.execute("update history set hide = 'O' where title = ? and id = ?", [rep[0], rep[1]])
+
+        curs.execute("drop table if exists hidhi")
+
+        print('move table hidhi')
+    except:
+        pass
+
+    try:
+        curs.execute("alter table user add date text default ''")
+
+        print('user table add column date')
+    except:
+        pass
+
+    try:
+        curs.execute("alter table rb add band text default ''")
+
+        print('rb table add column band')
+    except:
+        pass
+
+    try:
+        curs.execute("alter table ban add login text default ''")
+
+        print('ban table add column login')
+    except:
+        pass
+
+    try:
+        curs.execute("select title, acl from data where acl != ''")
+        for rep in curs.fetchall():
+            curs.execute("insert into acl (title, dec, dis, why) values (?, ?, '', '')", [rep[0], rep[1]])
+
+        curs.execute("alter table data drop acl")
+
+        print('data table delete column acl')
+    except:
+        pass
+
+    try:
+        curs.execute("alter table user add email text default ''")
+
+        print('user table add column email')
+    except:
+        pass
+
+    try:
+        curs.execute('select name, sub from filter where sub != "X" and sub != ""')
+        filter_name = curs.fetchall()
+        if filter_name:
+            for filter_delete in filter_name:
+                if filter_delete[1] != '' or filter_delete[1] != 'X':
+                    curs.execute("update filter set sub = '' where name = ?", [filter_delete[0]])
+
+            print('filter data fix')
+    except:
+        pass
+
+    try:
+        curs.execute("alter table user add skin text default ''")
+
+        print('user table add column skin')
+    except:
+        pass
+
+    # 3.0.5 사용자 문서, 파일 문서, 분류 문서 영어화
+    try:
+        curs.execute('select name, sub from filter where sub != "X" and sub != ""')
+        _ = curs.fetchall()
+        for _2 in _:
+            pass
+    except:
+        pass
+
+    conn.commit()
+
 def captcha_post(re_data, num = 1):
     if num == 1:
         if custom()[2] == 0 and captcha_get() != '':
