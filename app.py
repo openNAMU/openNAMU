@@ -707,7 +707,7 @@ def acl_list():
     curs.execute("select title, dec from acl where dec = 'admin' or dec = 'user' order by title desc")
     list_data = curs.fetchall()
     for data in list_data:
-        if not re.search('^' + load_lang('user') + ':', data[0]) and not re.search('^' + load_lang('file') + ':', data[0]):
+        if not re.search('^user:', data[0]) and not re.search('^file:', data[0]):
             if data[1] == 'admin':
                 acl = load_lang('admin')
             else:
@@ -1942,7 +1942,7 @@ def title_index():
         else:
             count_end += [0]
 
-        sql_list = [load_lang('template') + ':', load_lang('category') + ':', load_lang('user') + ':', load_lang('file') + ':']
+        sql_list = [load_lang('template') + ':', 'category:', 'user:', 'file:']
         for sql in sql_list:
             curs.execute("select count(title) from data where title like ?", [sql + '%'])
             count = curs.fetchall()
@@ -2098,7 +2098,7 @@ def topic_admin(name = None, sub = None, num = None):
     if ip_or_user(data[0][1]) == 1:
         ban = '<li>' + load_lang('writer') + ' : ' + data[0][1] + ' <a href="/record/' + url_pas(data[0][1]) + '">(' + load_lang('record') + ')</a></li>' + ban
     else:
-        ban = '<li>' + load_lang('writer') + ' : <a href="/w/' + load_lang('user') + ':' + data[0][1] + '">' + data[0][1] + '</a> <a href="/record/' + url_pas(data[0][1]) + '">(' + load_lang('record') + ')</a></li>' + ban
+        ban = '<li>' + load_lang('writer') + ' : <a href="/w/user:' + data[0][1] + '">' + data[0][1] + '</a> <a href="/record/' + url_pas(data[0][1]) + '">(' + load_lang('record') + ')</a></li>' + ban
 
     ban = '<h2>' + load_lang('state') + '</h2><ul>' + ban
 
@@ -2132,11 +2132,11 @@ def topic(name = None, sub = None):
         else:
             num = 1
 
-        match = re.search('^' + load_lang('user') + ':([^/]+)', name)
+        match = re.search('^user:([^/]+)', name)
         if match:
             curs.execute('insert into alarm (name, data, date) values (?, ?, ?)', [match.groups()[0], ip + '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '">' + load_lang('user') + ' - ' + load_lang('discussion') + '</a> (My)', today])
         
-        data = re.sub('\[\[(' + load_lang('category') + ':(?:(?:(?!\]\]).)*))\]\]', '[br]', flask.request.form.get('content', None))
+        data = re.sub('\[\[((?:분류|category):(?:(?:(?!\]\]).)*))\]\]', '[br]', flask.request.form.get('content', None))
         for rd_data in re.findall("(?:#([0-9]+))", data):
             curs.execute("select ip from topic where title = ? and sub = ? and id = ?", [name, sub, rd_data])
             ip_data = curs.fetchall()
@@ -2217,7 +2217,7 @@ def topic(name = None, sub = None):
                     curs.execute("select who from re_admin where what = ? order by time desc limit 1", ['blind (' + name + ' - ' + sub + '#' + str(number) + ')'])
                     who_blind = curs.fetchall()
                     if who_blind:
-                        user_write = '[[' + load_lang('user') + ':' + who_blind[0][0] + ']] ' + load_lang('hide')
+                        user_write = '[[user:' + who_blind[0][0] + ']] ' + load_lang('hide')
                     else:
                         user_write = load_lang('hide')
             else:
@@ -2782,7 +2782,7 @@ def acl(name = None):
     else:
         check_data = None
     
-    user_data = re.search('^' + load_lang('user') + ':(.+)$', name)
+    user_data = re.search('^user:(.+)$', name)
     if user_data:
         if check_data and custom()[2] == 0:
             return redirect('/login')
@@ -2819,7 +2819,7 @@ def acl(name = None):
     else:
         data = '<h2>' + load_lang('document') + ' ACL</h2><select name="dec" ' + check_ok + '>'
     
-        if re.search('^' + load_lang('user') + ':', name):
+        if re.search('^user:', name):
             acl_list = [['', load_lang('normal')], ['user', load_lang('subscriber')], ['all', load_lang('all')]]
         else:
             acl_list = [['', load_lang('normal')], ['user', load_lang('subscriber')], ['admin', load_lang('admin')]]
@@ -2836,7 +2836,7 @@ def acl(name = None):
             
         data += '</select>'
         
-        if not re.search('^' + load_lang('user') + ':', name):
+        if not re.search('^user:', name):
             data += '<br><br><h2>' + load_lang('discussion') + ' ACL</h2><select name="dis" ' + check_ok + '>'
         
             curs.execute("select dis, why from acl where title = ?", [name])
@@ -3000,7 +3000,7 @@ def read_view(name = None):
     else:
         admin_memu = 0
         
-    if re.search('^' + load_lang('category') + ':', name):        
+    if re.search('^category:', name):        
         curs.execute("select link from back where title = ? and type = 'cat' order by link asc", [name])
         back = curs.fetchall()
         if back:
@@ -3009,7 +3009,7 @@ def read_view(name = None):
             i = 0
 
             for data in back:    
-                if re.search('^' + load_lang('category') + ':', data[0]):
+                if re.search('^category:', data[0]):
                     u_div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a></li>'
                 elif re.search('^' + load_lang('template') + ':', data[0]):
                     curs.execute("select data from data where title = ?", [data[0]])
@@ -3051,7 +3051,7 @@ def read_view(name = None):
         response_data = 404
         else_data = ''
 
-    m = re.search("^" + load_lang('user') + ":([^/]*)", name)
+    m = re.search("^user:([^/]*)", name)
     if m:
         g = m.groups()
         
@@ -3387,7 +3387,7 @@ def upload():
 
         e_data = sha224(piece[0]) + piece[1]
 
-        curs.execute("select title from data where title = ?", [load_lang('file') + ':' + name])
+        curs.execute("select title from data where title = ?", ['file:' + name])
         if curs.fetchall():
             return re_error('/error/16')
             
@@ -3399,7 +3399,7 @@ def upload():
             if custom()[2] == 0:
                 lice = ip + ' Upload'
             else:
-                lice = '[[' + load_lang('user') + ':' + ip + ']] Upload'
+                lice = '[[user:' + ip + ']] Upload'
             
         if os.path.exists(os.path.join('image', e_data)):
             os.remove(os.path.join('image', e_data))
@@ -3408,18 +3408,18 @@ def upload():
         else:
             data.save(os.path.join('image', e_data))
             
-        curs.execute("select title from data where title = ?", [load_lang('file') + ':' + name])
+        curs.execute("select title from data where title = ?", ['file:' + name])
         if curs.fetchall(): 
-            curs.execute("delete from data where title = ?", [load_lang('file') + ':' + name])
+            curs.execute("delete from data where title = ?", ['file:' + name])
         
-        curs.execute("insert into data (title, data) values (?, ?)", [load_lang('file') + ':' + name, '[[' + load_lang('file') + ':' + name + ']][br][br]{{{[[' + load_lang('file') + ':' + name + ']]}}}[br][br]' + lice])
-        curs.execute("insert into acl (title, dec, dis, why) values (?, 'admin', '', '')", [load_lang('file') + ':' + name])
+        curs.execute("insert into data (title, data) values (?, ?)", ['file:' + name, '[[file:' + name + ']][br][br]{{{[[file:' + name + ']]}}}[br][br]' + lice])
+        curs.execute("insert into acl (title, dec, dis, why) values (?, 'admin', '', '')", ['file:' + name])
 
-        history_plus(load_lang('file') + ':' + name, '[[' + load_lang('file') + ':' + name + ']][br][br]{{{[[' + load_lang('file') + ':' + name + ']]}}}[br][br]' + lice, get_time(), ip, '(Upload)', '0')
+        history_plus('file:' + name, '[[file:' + name + ']][br][br]{{{[[file:' + name + ']]}}}[br][br]' + lice, get_time(), ip, '(Upload)', '0')
         
         conn.commit()
         
-        return redirect('/w/' + load_lang('file') + ':' + name)      
+        return redirect('/w/file:' + name)      
     else:
         return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
             imp = [load_lang('upload'), wiki_set(), custom(), other2([0, 0])],
@@ -3476,7 +3476,7 @@ def user_info():
                 acl += ' (' + load_lang('band') + ')'
             
     if custom()[2] != 0:
-        ip_user = '<a href="/w/' + load_lang('user') + ':' + ip + '">' + ip + '</a>'
+        ip_user = '<a href="/w/user:' + ip + '">' + ip + '</a>'
         
         plus = '<li><a href="/logout">' + load_lang('logout') + '</a></li><li><a href="/change">' + load_lang('my_info') + ' ' + load_lang('edit') + '</a></li>'
         
@@ -3509,7 +3509,7 @@ def user_info():
                 <br>
                 <h2>''' + load_lang('tool') + '''</h2>
                 <ul>
-                    <li><a href="/acl/''' + load_lang('user') + ':' + url_pas(ip) + '">' + load_lang('user') + ' ' + load_lang('document') + ''' ACL</a></li>
+                    <li><a href="/acl/user:''' + url_pas(ip) + '">' + load_lang('user') + ' ' + load_lang('document') + ''' ACL</a></li>
                     <li><a href="/custom_head">''' + load_lang('user') + ''' HEAD</a></li></ul><br><h2>''' + load_lang('other') + '''</h2><ul>''' + plus2 + '''<li><a href="/count">''' + load_lang('count') + '''</a></li>
                 </ul>
                 ''',
