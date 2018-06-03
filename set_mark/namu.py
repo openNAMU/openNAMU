@@ -858,7 +858,7 @@ def namu(conn, data, title,):
                     data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<a id="not_thing" href="/w/' + tool.url_pas(file_alt) + '">' + file_alt + '</a>', data, 1)
             elif re.search('^(?:category|분류):', main_link):
                 see_link = re.sub('#include', '', see_link)
-                main_link = re.sub('#include', '', main_link)
+                main_link = re.sub('#include', '', re.sub('^(?:category|분류):', 'category:', main_link))
 
                 if re.search('#blur', main_link):
                     see_link = 'Hidden'
@@ -870,7 +870,7 @@ def namu(conn, data, title,):
 
                 backlink += [[title, main_link, 'cat']]
 
-                category += '<a ' + link_id + ' href="' + tool.url_pas(re.sub('^(?:category|분류):', 'category:', main_link)) + '">' + re.sub('^(?:category|분류):', '', see_link) + '</a> / '
+                category += '<a ' + link_id + ' href="' + tool.url_pas(main_link) + '">' + re.sub('^(?:category|분류):', '', see_link) + '</a> / '
                 data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '', data, 1)
             elif re.search('^wiki:', main_link):
                 data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<a id="inside" href="/' + tool.url_pas(re.sub('^wiki:', '', main_link)) + '">' + see_link + '</a>', data, 1)
