@@ -126,6 +126,7 @@ def update():
             for user_rep2 in user_rep:
                 curs.execute("update data set title = ? where title = ?", [re.sub('^' + all_rep[i][0], all_rep[i][1], user_rep2[0]), user_rep2[0]])
                 curs.execute("update history set title = ? where title = ?", [re.sub('^' + all_rep[i][0], all_rep[i][1], user_rep2[0]), user_rep2[0]])
+                curs.execute("update acl set title = ? where title = ?", [re.sub('^' + all_rep[i][0], all_rep[i][1], user_rep2[0]), user_rep2[0]])
 
         print('사용자 to user, 파일 to file, 분류 to category')
     except:
