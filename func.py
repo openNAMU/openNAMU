@@ -42,13 +42,121 @@ def captcha_get():
 
     return data
 
-def captcha_post(test, num = 1):
+def update():
+    # 호환성 설정
+    try:
+        curs.execute("alter table history add hide text default ''")
+        
+        curs.execute('select title, re from hidhi')
+        for rep in curs.fetchall():
+            curs.execute("update history set hide = 'O' where title = ? and id = ?", [rep[0], rep[1]])
+
+        curs.execute("drop table if exists hidhi")
+
+        print('move table hidhi')
+    except:
+        pass
+
+    try:
+        curs.execute("alter table user add date text default ''")
+
+        print('user table add column date')
+    except:
+        pass
+
+    try:
+        curs.execute("alter table rb add band text default ''")
+
+        print('rb table add column band')
+    except:
+        pass
+
+    try:
+        curs.execute("alter table ban add login text default ''")
+
+        print('ban table add column login')
+    except:
+        pass
+
+    try:
+        curs.execute("select title, acl from data where acl != ''")
+        for rep in curs.fetchall():
+            curs.execute("insert into acl (title, dec, dis, why) values (?, ?, '', '')", [rep[0], rep[1]])
+
+        curs.execute("alter table data drop acl")
+
+        print('data table delete column acl')
+    except:
+        pass
+
+    try:
+        curs.execute("alter table user add email text default ''")
+
+        print('user table add column email')
+    except:
+        pass
+
+    try:
+        curs.execute('select name, sub from filter where sub != "X" and sub != ""')
+        filter_name = curs.fetchall()
+        if filter_name:
+            for filter_delete in filter_name:
+                if filter_delete[1] != '' or filter_delete[1] != 'X':
+                    curs.execute("update filter set sub = '' where name = ?", [filter_delete[0]])
+
+            print('filter data fix')
+    except:
+        pass
+
+    try:
+        curs.execute("alter table user add skin text default ''")
+
+        print('user table add column skin')
+    except:
+        pass
+
+    # 3.0.5 사용자 문서, 파일 문서, 분류 문서 영어화
+    try:
+        all_rep = [['사용자:', 'user:'], ['파일:', 'file:'], ['분류:', 'category:']]
+        all_rep2 = ['data', 'history', 'acl', 'topic', 'back']
+
+        for i in range(3):
+            for j in range(6):
+                if not j == 5:
+                    curs.execute('select title from ' + all_rep2[j] + ' where title like ?', [all_rep[i][0] + '%'])
+                else:
+                    curs.execute('select link from back where link like ?', [all_rep[i][0] + '%'])
+
+                user_rep = curs.fetchall()
+                for user_rep2 in user_rep:
+                    first = re.sub('^' + all_rep[i][0], all_rep[i][1], user_rep2[0])
+
+                    if j == 0:
+                        curs.execute("update data set title = ? where title = ?", [first, user_rep2[0]])
+                    elif j == 1:
+                        curs.execute("update history set title = ? where title = ?", [first, user_rep2[0]])
+                    elif j == 2:
+                        curs.execute("update acl set title = ? where title = ?", [first, user_rep2[0]])
+                    elif j == 3:
+                        curs.execute("update topic set title = ? where title = ?", [first, user_rep2[0]])
+                    elif j == 4:
+                        curs.execute("update back set title = ? where title = ?", [first, user_rep2[0]])
+                    elif j == 5:
+                        curs.execute("update back set link = ? where link = ?", [first, user_rep2[0]])
+
+        print('사용자 to user, 파일 to file, 분류 to category')
+    except:
+        pass
+
+    conn.commit()
+
+def captcha_post(re_data, num = 1):
     if num == 1:
         if custom()[2] == 0 and captcha_get() != '':
             curs.execute('select data from other where name = "sec_re"')
             sec_re = curs.fetchall()
             if sec_re and sec_re[0][0] != '':
-                data = requests.get('https://www.google.com/recaptcha/api/siteverify', params = { 'secret' : sec_re, 'response' : test })
+                data = requests.get('https://www.google.com/recaptcha/api/siteverify', params = { 'secret' : sec_re, 'response' : re_data })
                 if not data:
                     return 0
                 else:
@@ -84,9 +192,12 @@ def load_lang(data):
             return lang[data]
         else:
             return else_lang[data]
-
-def namumark_re(name = '', data = '', set_num = 0):
-    return namumark(name, data, set_num, load_lang('please_all'))
+            
+def ip_or_user(data):
+    if re.search('(\.|:)', data):
+        return 1
+    else:
+        return 0
 
 def edit_help_button():
     # https://stackoverflow.com/questions/11076975/insert-text-into-textarea-at-cursor-position-javascript
@@ -162,8 +273,8 @@ def next_fix(link, num, page, end = 50):
 
     return list_data
 
-def other2(origin):
-    return origin + ['Deleted']
+def other2(data):
+    return data + ['Deleted']
 
 def wiki_set(num = 1):
     if num == 1:
@@ -243,8 +354,6 @@ def admin_check(num, what):
         while 1:
             if num == 1 and reset == 0:
                 check = 'ban'
-            elif num == 2 and reset == 0:
-                check = 'mdel'
             elif num == 3 and reset == 0:
                 check = 'toron'
             elif num == 4 and reset == 0:
@@ -289,14 +398,14 @@ def ip_pas(raw_ip):
             ip = raw_ip
             hide = 1
     else:
-        curs.execute("select title from data where title = ?", [load_lang('user') + ':' + raw_ip])
+        curs.execute("select title from data where title = ?", ['user:' + raw_ip])
         if curs.fetchall():
-            ip = '<a href="/w/' + url_pas(load_lang('user') + ':' + raw_ip) + '">' + raw_ip + '</a>'
+            ip = '<a href="/w/' + url_pas('user:' + raw_ip) + '">' + raw_ip + '</a>'
         else:
-            ip = '<a id="not_thing" href="/w/' + url_pas(load_lang('user') + ':' + raw_ip) + '">' + raw_ip + '</a>'
+            ip = '<a id="not_thing" href="/w/' + url_pas('user:' + raw_ip) + '">' + raw_ip + '</a>'
          
     if hide == 0:
-        ip += ' <a href="/record/' + url_pas(raw_ip) + '">(' + load_lang('record') + ')</a>'
+        ip += ' <a href="/record/' + url_pas('user:' + raw_ip) + '">(' + load_lang('record') + ')</a>'
 
     return ip
 
@@ -338,14 +447,14 @@ def acl_check(name):
     if ban_check() == 1:
         return 1
 
-    acl_c = re.search("^" + load_lang('user') + ":([^/]*)", name)
+    acl_c = re.search("^user:([^/]*)", name)
     if acl_c:
         acl_n = acl_c.groups()
 
         if admin_check(5, None) == 1:
             return 0
 
-        curs.execute("select dec from acl where title = ?", [load_lang('user') + ':' + acl_n[0]])
+        curs.execute("select dec from acl where title = ?", ['user:' + acl_n[0]])
         acl_data = curs.fetchall()
         if acl_data:
             if acl_data[0][0] == 'all':
@@ -362,7 +471,7 @@ def acl_check(name):
         else:
             return 1
 
-    file_c = re.search("^" + load_lang('file') + ":(.*)", name)
+    file_c = re.search("^file:(.*)", name)
     if file_c and admin_check(5, 'edit (' + name + ')') != 1:
         return 1
 

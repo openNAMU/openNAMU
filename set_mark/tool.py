@@ -12,19 +12,23 @@ def ip_check():
         ip = flask.session['DREAMER']
     else:
         try:
-            ip = flask.request.environ.get('HTTP_X_FORWARDED_FOR', flask.request.remote_addr)
+            ip = flask.request.environ.get('HTTP_X_REAL_IP', flask.request.environ.get('HTTP_X_FORWARDED_FOR', flask.request.remote_addr))
+            
+            if ip == ('::1' or '127.0.0.1'):
+                ip = flask.request.environ.get('HTTP_X_FORWARDED_FOR', flask.request.remote_addr)
         except:
-            ip = 'None'
+            ip = 'Error'
 
     return str(ip)
 
 def savemark(data):
     data = re.sub("\[date\(now\)\]", get_time(), data)
     
-    if not re.search("\.", ip_check()):
-        name = '[[사용자:' + ip_check() + '|' + ip_check() + ']]'
+    ip = ip_check()
+    if not re.search("\.", ip):
+        name = '[[사용자:' + ip + '|' + ip + ']]'
     else:
-        name = ip_check()
+        name = ip
         
     data = re.sub("\[name\]", name, data)
 
