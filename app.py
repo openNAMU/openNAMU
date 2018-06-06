@@ -19,7 +19,7 @@ import sys
 from func import *
 
 # 버전 표기
-r_ver = 'v3.0.4-Stable-' + re.sub('^[0-9]{2}', '', str(int(datetime.datetime.fromtimestamp(os.path.getmtime('app.py')).strftime('%Y%m%d'))))
+r_ver = 'v3.0.5-Proven_Beta-01'
 print('Version : ' + r_ver)
 
 # set.json 설정 확인
