@@ -2856,7 +2856,7 @@ def acl(name = None):
             
         return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
             imp = [name, wiki_set(), custom(), other2([' (ACL)', 0])],
-            data = '<form method="post">' + data + '<hr><button type="submit">ACL ' + load_lang('edit') + '</button></form>',
+            data = '<form method="post">' + data + '<hr><button type="submit" ' + check_ok + '>ACL ' + load_lang('edit') + '</button></form>',
             menu = [['w/' + url_pas(name), load_lang('document')], ['manager', load_lang('admin')]]
         ))
             
