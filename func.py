@@ -44,9 +44,7 @@ def captcha_get():
 
 def update():
     # 호환성 설정
-    try:
-        curs.execute("alter table history add hide text default ''")
-        
+    try:        
         curs.execute('select title, re from hidhi')
         for rep in curs.fetchall():
             curs.execute("update history set hide = 'O' where title = ? and id = ?", [rep[0], rep[1]])
@@ -54,27 +52,6 @@ def update():
         curs.execute("drop table if exists hidhi")
 
         print('move table hidhi')
-    except:
-        pass
-
-    try:
-        curs.execute("alter table user add date text default ''")
-
-        print('user table add column date')
-    except:
-        pass
-
-    try:
-        curs.execute("alter table rb add band text default ''")
-
-        print('rb table add column band')
-    except:
-        pass
-
-    try:
-        curs.execute("alter table ban add login text default ''")
-
-        print('ban table add column login')
     except:
         pass
 
@@ -90,13 +67,6 @@ def update():
         pass
 
     try:
-        curs.execute("alter table user add email text default ''")
-
-        print('user table add column email')
-    except:
-        pass
-
-    try:
         curs.execute('select name, sub from filter where sub != "X" and sub != ""')
         filter_name = curs.fetchall()
         if filter_name:
@@ -108,17 +78,12 @@ def update():
     except:
         pass
 
-    try:
-        curs.execute("alter table user add skin text default ''")
-
-        print('user table add column skin')
-    except:
-        pass
-
     # 3.0.5 사용자 문서, 파일 문서, 분류 문서 영어화
     try:
         all_rep = [['사용자:', 'user:'], ['파일:', 'file:'], ['분류:', 'category:']]
         all_rep2 = ['data', 'history', 'acl', 'topic', 'back']
+
+        test = 0
 
         for i in range(3):
             for j in range(6):
@@ -129,6 +94,8 @@ def update():
 
                 user_rep = curs.fetchall()
                 for user_rep2 in user_rep:
+                    test = 1
+
                     first = re.sub('^' + all_rep[i][0], all_rep[i][1], user_rep2[0])
 
                     if j == 0:
@@ -144,7 +111,8 @@ def update():
                     elif j == 5:
                         curs.execute("update back set link = ? where link = ?", [first, user_rep2[0]])
 
-        print('사용자 to user, 파일 to file, 분류 to category')
+        if test == 1:
+            print('사용자 to user, 파일 to file, 분류 to category')
     except:
         pass
 

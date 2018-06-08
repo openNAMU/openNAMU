@@ -63,27 +63,66 @@ app.jinja_env.filters['md5_replace'] = md5_replace
 app.jinja_env.filters['load_lang'] = load_lang
 
 # 셋업 부분
-curs.execute('create table if not exists data(title text, data text)')
-curs.execute('create table if not exists history(id text, title text, data text, date text, ip text, send text, leng text, hide text)')
-curs.execute('create table if not exists rd(title text, sub text, date text)')
-curs.execute('create table if not exists user(id text, pw text, acl text, date text, email text, skin text)')
-curs.execute('create table if not exists ban(block text, end text, why text, band text, login text)')
-curs.execute('create table if not exists topic(id text, title text, sub text, data text, date text, ip text, block text, top text)')
-curs.execute('create table if not exists stop(title text, sub text, close text)')
-curs.execute('create table if not exists rb(block text, end text, today text, blocker text, why text, band text)')
-curs.execute('create table if not exists back(title text, link text, type text)')
-curs.execute('create table if not exists agreedis(title text, sub text)')
-curs.execute('create table if not exists custom(user text, css text)')
-curs.execute('create table if not exists other(name text, data text)')
-curs.execute('create table if not exists alist(name text, acl text)')
-curs.execute('create table if not exists re_admin(who text, what text, time text)')
-curs.execute('create table if not exists alarm(name text, data text, date text)')
-curs.execute('create table if not exists ua_d(name text, ip text, ua text, today text, sub text)')
-curs.execute('create table if not exists filter(name text, regex text, sub text)')
-curs.execute('create table if not exists scan(user text, title text)')
-curs.execute('create table if not exists acl(title text, dec text, dis text, why text)')
-curs.execute('create table if not exists inter(title text, link text)')
-curs.execute('create table if not exists html_filter(html text)')
+curs.execute('create table if not exists data(test text)')
+curs.execute('create table if not exists history(test text)')
+curs.execute('create table if not exists rd(test text)')
+curs.execute('create table if not exists user(test text)')
+curs.execute('create table if not exists ban(test text)')
+curs.execute('create table if not exists topic(test text)')
+curs.execute('create table if not exists stop(test text)')
+curs.execute('create table if not exists rb(test text)')
+curs.execute('create table if not exists back(test text)')
+curs.execute('create table if not exists agreedis(test text)')
+curs.execute('create table if not exists custom(test text)')
+curs.execute('create table if not exists other(test text)')
+curs.execute('create table if not exists alist(test text)')
+curs.execute('create table if not exists re_admin(test text)')
+curs.execute('create table if not exists alarm(test text)')
+curs.execute('create table if not exists ua_d(test text)')
+curs.execute('create table if not exists filter(test text)')
+curs.execute('create table if not exists scan(test text)')
+curs.execute('create table if not exists acl(test text)')
+curs.execute('create table if not exists inter(test text)')
+curs.execute('create table if not exists html_filter(test text)')
+
+create_data = {}
+
+create_data['all_data'] = ['data', 'history', 'rd', 'user', 'ban', 'topic', 'stop', 'rb', 'back', 'agreedis', 'custom', 'other', 'alist', 're_admin', 'alarm', 'ua_d', 'filter', 'scan', 'acl', 'inter', 'html_filter']
+
+create_data['data'] = ['title', 'data']
+create_data['history'] = ['id', 'title', 'data', 'date', 'ip', 'send', 'leng', 'hide']
+create_data['rd'] = ['title', 'sub', 'date', 'band']
+create_data['user'] = ['id', 'pw', 'acl', 'date', 'email', 'skin']
+create_data['ban'] = ['block', 'end', 'why', 'band', 'login']
+create_data['topic'] = ['id', 'title', 'sub', 'data', 'date', 'ip', 'block', 'top']
+create_data['stop'] = ['title', 'sub', 'close']
+create_data['rb'] = ['block', 'end', 'today', 'blocker', 'why', 'band']
+create_data['back'] = ['title', 'link', 'type']
+create_data['agreedis'] = ['title', 'sub']
+create_data['custom'] = ['user', 'css']
+create_data['other'] = ['name', 'data']
+create_data['alist'] = ['name', 'acl']
+create_data['re_admin'] = ['who', 'what', 'time']
+create_data['alarm'] = ['name', 'data', 'date']
+create_data['ua_d'] = ['name', 'ip', 'ua', 'today', 'sub']
+create_data['filter'] = ['name', 'regex', 'sub']
+create_data['scan'] = ['user', 'title']
+create_data['acl'] = ['title', 'dec', 'dis', 'why']
+create_data['inter'] = ['title', 'link']
+create_data['html_filter'] = ['html']
+
+for create_table in create_data['all_data']:
+    for create in create_data[create_table]:
+        try:
+            curs.execute('select ' + create + ' from ' + create_table + ' limit 1')
+        except:
+            curs.execute("alter table " + create_table + " add " + create + " text default ''")
+    
+    try:
+        curs.execute('select test from ' + create_table + ' limit 1')
+        curs.execute("alter table " + create_table + " drop test")
+    except:
+        pass
 
 # owner 존재 확인
 curs.execute('select name from alist where acl = "owner"')
