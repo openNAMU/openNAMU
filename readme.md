@@ -18,4 +18,8 @@ You can create a new set.json by deleting it.
 
 ## Other
  * [Test Server (Ko)](http://namu.ml/)
+ * [Test Server (En)](http://en.namu.ml/)
  * The first registor is granted owner privileges.
+
+## 한국어
+ * [참조](https://github.com/2DU/openNAMU/blob/master/Readme-Ko.md)
