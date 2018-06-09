@@ -3,10 +3,10 @@ NamuMark based wiki engine returns to Python. (3.5 and above)
 
 ## Clone command
 ### Stable
- * git clone https://github.com/2DU/openNAMU.git
+ * `git clone https://github.com/2DU/openNAMU.git`
 
 ### Master
- * git clone -b master https://github.com/2DU/openNAMU.git
+ * `git clone -b master https://github.com/2DU/openNAMU.git`
 
 ## Install
  * [Reference](https://en.namu.ml/w/openNAMU%2FInstall)
