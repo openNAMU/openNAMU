@@ -159,7 +159,10 @@ def load_lang(data):
         if data in lang:
             return lang[data]
         else:
-            return else_lang[data]
+            if data in else_lang:
+                return else_lang[data]
+            else:
+                return data + ' (Missing)'
             
 def ip_or_user(data):
     if re.search('(\.|:)', data):

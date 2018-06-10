@@ -5,8 +5,8 @@ set_mark/__pycache__
 /app_session
 .vscode
 
-opennamu.db
-back_opennamu.db
+study.db
+back_test2.db
 Test.db
 Test2.db
 image
