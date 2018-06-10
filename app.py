@@ -501,7 +501,7 @@ def edit_set(num = 0):
                             <br>
                             <input placeholder="Back Up Interval" type="text" name="back_up" value="''' + html.escape(d_list[9]) + '''">
                             <hr>
-                            <span>Skin</span>
+                            <span>''' + load_lang('skin') + '''</span>
                             <br>
                             <br>
                             <select name="skin">''' + div2 + '''</select>
@@ -2523,7 +2523,7 @@ def change_password():
                         <hr>
                         <input placeholder="Email" name="email" type="text" value="''' + email + '''">
                         <hr>
-                        <span>Skin</span>
+                        <span>''' + load_lang('user') + ' ' + load_lang('skin') + '''</span>
                         <br>
                         <br>
                         <select name="skin">''' + div2 + '''</select>
@@ -3690,6 +3690,14 @@ def random():
         return redirect('/w/' + url_pas(data[0][0]))
     else:
         return redirect('/')
+
+@app.route('/skin_set')
+def skin_set():
+    return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
+        imp = [load_lang('skin') + ' ' + load_lang('setting'), wiki_set(), custom(), other2([0, 0])],
+        data =  'This skin is not support setting.',
+        menu = 0
+    ))
     
 @app.route('/views/<path:name>')
 def views(name = None):
