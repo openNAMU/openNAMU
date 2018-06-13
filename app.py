@@ -19,7 +19,8 @@ import sys
 from func import *
 
 # 버전 표기
-r_ver = 'v3.0.5-Master-' + re.sub('^[0-9]{2}', '', str(int(datetime.datetime.fromtimestamp(os.path.getmtime('app.py')).strftime('%Y%m%d'))))
+r_ver = 'v3.0.5-Master-10'
+c_ver = '30510'
 print('Version : ' + r_ver)
 
 # set.json 설정 확인
@@ -43,6 +44,11 @@ except:
             print('Insert Values')
             
             pass
+
+if os.path.exists(set_data['db'] + '.db'):
+    setup_tool = 0
+else:
+    setup_tool = 1
 
 # 디비 연결
 conn = sqlite3.connect(set_data['db'] + '.db', check_same_thread = False)
@@ -85,142 +91,158 @@ curs.execute('create table if not exists acl(test text)')
 curs.execute('create table if not exists inter(test text)')
 curs.execute('create table if not exists html_filter(test text)')
 
-create_data = {}
+if setup_tool == 0:
+    curs.execute('select data from other where name = "ver"')
+    ver_set_data = curs.fetchall()
+    if not ver_set_data:
+        setup_tool = 2
+    else:
+        if c_ver > ver_set_data[0][0]:
+            setup_tool = 2
 
-create_data['all_data'] = ['data', 'history', 'rd', 'user', 'ban', 'topic', 'stop', 'rb', 'back', 'agreedis', 'custom', 'other', 'alist', 're_admin', 'alarm', 'ua_d', 'filter', 'scan', 'acl', 'inter', 'html_filter']
+if setup_tool != 0:
+    # create table
+    create_data = {}
 
-create_data['data'] = ['title', 'data']
-create_data['history'] = ['id', 'title', 'data', 'date', 'ip', 'send', 'leng', 'hide']
-create_data['rd'] = ['title', 'sub', 'date', 'band']
-create_data['user'] = ['id', 'pw', 'acl', 'date', 'email', 'skin']
-create_data['ban'] = ['block', 'end', 'why', 'band', 'login']
-create_data['topic'] = ['id', 'title', 'sub', 'data', 'date', 'ip', 'block', 'top']
-create_data['stop'] = ['title', 'sub', 'close']
-create_data['rb'] = ['block', 'end', 'today', 'blocker', 'why', 'band']
-create_data['back'] = ['title', 'link', 'type']
-create_data['agreedis'] = ['title', 'sub']
-create_data['custom'] = ['user', 'css']
-create_data['other'] = ['name', 'data']
-create_data['alist'] = ['name', 'acl']
-create_data['re_admin'] = ['who', 'what', 'time']
-create_data['alarm'] = ['name', 'data', 'date']
-create_data['ua_d'] = ['name', 'ip', 'ua', 'today', 'sub']
-create_data['filter'] = ['name', 'regex', 'sub']
-create_data['scan'] = ['user', 'title']
-create_data['acl'] = ['title', 'dec', 'dis', 'why']
-create_data['inter'] = ['title', 'link']
-create_data['html_filter'] = ['html']
+    create_data['all_data'] = ['data', 'history', 'rd', 'user', 'ban', 'topic', 'stop', 'rb', 'back', 'agreedis', 'custom', 'other', 'alist', 're_admin', 'alarm', 'ua_d', 'filter', 'scan', 'acl', 'inter', 'html_filter']
 
-for create_table in create_data['all_data']:
-    for create in create_data[create_table]:
+    create_data['data'] = ['title', 'data']
+    create_data['history'] = ['id', 'title', 'data', 'date', 'ip', 'send', 'leng', 'hide']
+    create_data['rd'] = ['title', 'sub', 'date', 'band']
+    create_data['user'] = ['id', 'pw', 'acl', 'date', 'email', 'skin']
+    create_data['ban'] = ['block', 'end', 'why', 'band', 'login']
+    create_data['topic'] = ['id', 'title', 'sub', 'data', 'date', 'ip', 'block', 'top']
+    create_data['stop'] = ['title', 'sub', 'close']
+    create_data['rb'] = ['block', 'end', 'today', 'blocker', 'why', 'band']
+    create_data['back'] = ['title', 'link', 'type']
+    create_data['agreedis'] = ['title', 'sub']
+    create_data['custom'] = ['user', 'css']
+    create_data['other'] = ['name', 'data']
+    create_data['alist'] = ['name', 'acl']
+    create_data['re_admin'] = ['who', 'what', 'time']
+    create_data['alarm'] = ['name', 'data', 'date']
+    create_data['ua_d'] = ['name', 'ip', 'ua', 'today', 'sub']
+    create_data['filter'] = ['name', 'regex', 'sub']
+    create_data['scan'] = ['user', 'title']
+    create_data['acl'] = ['title', 'dec', 'dis', 'why']
+    create_data['inter'] = ['title', 'link']
+    create_data['html_filter'] = ['html']
+
+    for create_table in create_data['all_data']:
+        for create in create_data[create_table]:
+            try:
+                curs.execute('select ' + create + ' from ' + create_table + ' limit 1')
+            except:
+                curs.execute("alter table " + create_table + " add " + create + " text default ''")
+        
         try:
-            curs.execute('select ' + create + ' from ' + create_table + ' limit 1')
+            curs.execute('select test from ' + create_table + ' limit 1')
+            curs.execute("alter table " + create_table + " drop test")
         except:
-            curs.execute("alter table " + create_table + " add " + create + " text default ''")
-    
-    try:
-        curs.execute('select test from ' + create_table + ' limit 1')
-        curs.execute("alter table " + create_table + " drop test")
-    except:
-        pass
-
-# owner 존재 확인
-curs.execute('select name from alist where acl = "owner"')
-if not curs.fetchall():
-    curs.execute('delete from alist where name = "owner"')
-    curs.execute('insert into alist (name, acl) values ("owner", "owner")')
-
-# 포트 점검
-curs.execute('select data from other where name = "port"')
-rep_data = curs.fetchall()
-if not rep_data:
-    while 1:
-        print('Port : ', end = '')
-        
-        rep_port = int(input())
-        if rep_port:
-            curs.execute('insert into other (name, data) values ("port", ?)', [rep_port])
-            
-            break
-        else:
             pass
-else:
-    rep_port = rep_data[0][0]
-    
-    print('Port : ' + str(rep_port))
 
-# robots.txt 점검
-try:
-    if not os.path.exists('robots.txt'):
-        curs.execute('select data from other where name = "robot"')
-        robot_test = curs.fetchall()
-        if robot_test:
-            fw_test = open('./robots.txt', 'w')
-            fw_test.write(re.sub('\r\n', '\n', robot_test[0][0]))
-            fw_test.close()
+    # update
+    update()
+
+    if setup_tool == 1:
+        # owner 존재 확인
+        curs.execute('select name from alist where acl = "owner"')
+        if not curs.fetchall():
+            curs.execute('delete from alist where name = "owner"')
+            curs.execute('insert into alist (name, acl) values ("owner", "owner")')
+
+        # 포트 점검
+        curs.execute('select data from other where name = "port"')
+        rep_data = curs.fetchall()
+        if not rep_data:
+            while 1:
+                print('Port : ', end = '')
+                
+                rep_port = int(input())
+                if rep_port:
+                    curs.execute('insert into other (name, data) values ("port", ?)', [rep_port])
+                    
+                    break
+                else:
+                    pass
         else:
-            fw_test = open('./robots.txt', 'w')
-            fw_test.write('User-agent: *\nDisallow: /\nAllow: /$\nAllow: /w/')
-            fw_test.close()
-
-            curs.execute('insert into other (name, data) values ("robot", "User-agent: *\nDisallow: /\nAllow: /$\nAllow: /w/")')
-        
-        print('robots.txt create')
-except:
-    pass
-
-# 비밀 키 점검
-curs.execute('select data from other where name = "key"')
-rep_data = curs.fetchall()
-if not rep_data:
-    while 1:
-        print('Secret Key : ', end = '')
-        
-        rep_key = str(input())
-        if rep_key:
-            curs.execute('insert into other (name, data) values ("key", ?)', [rep_key])
+            rep_port = rep_data[0][0]
             
-            break
-        else:
+            print('Port : ' + str(rep_port))
+
+        # robots.txt 점검
+        try:
+            if not os.path.exists('robots.txt'):
+                curs.execute('select data from other where name = "robot"')
+                robot_test = curs.fetchall()
+                if robot_test:
+                    fw_test = open('./robots.txt', 'w')
+                    fw_test.write(re.sub('\r\n', '\n', robot_test[0][0]))
+                    fw_test.close()
+                else:
+                    fw_test = open('./robots.txt', 'w')
+                    fw_test.write('User-agent: *\nDisallow: /\nAllow: /$\nAllow: /w/')
+                    fw_test.close()
+
+                    curs.execute('insert into other (name, data) values ("robot", "User-agent: *\nDisallow: /\nAllow: /$\nAllow: /w/")')
+                
+                print('robots.txt create')
+        except:
             pass
-else:
-    rep_key = rep_data[0][0]
 
-    print('Secret Key : ' + rep_key)
+        # 비밀 키 점검
+        curs.execute('select data from other where name = "key"')
+        rep_data = curs.fetchall()
+        if not rep_data:
+            while 1:
+                print('Secret Key : ', end = '')
+                
+                rep_key = str(input())
+                if rep_key:
+                    curs.execute('insert into other (name, data) values ("key", ?)', [rep_key])
+                    
+                    break
+                else:
+                    pass
+        else:
+            rep_key = rep_data[0][0]
 
-# 언어 점검
-curs.execute("select data from other where name = 'language'")
-rep_data = curs.fetchall()
-if not rep_data:
-    while 1:
-        print('Language [ko-KR, en-US] : ', end = '')
-        support_language = ['ko-KR', 'en-US']
-        
-        rep_language = str(input())
-        if rep_language in support_language:
-            curs.execute("insert into other (name, data) values ('language', ?)", [rep_language])
+            print('Secret Key : ' + rep_key)
+
+        # 언어 점검
+        curs.execute("select data from other where name = 'language'")
+        rep_data = curs.fetchall()
+        if not rep_data:
+            while 1:
+                print('Language [ko-KR, en-US] : ', end = '')
+                support_language = ['ko-KR', 'en-US']
+                
+                rep_language = str(input())
+                if rep_language in support_language:
+                    curs.execute("insert into other (name, data) values ('language', ?)", [rep_language])
+                    
+                    break
+                else:
+                    pass
+        else:
+            rep_language = rep_data[0][0]
             
-            break
-        else:
-            pass
-else:
-    rep_language = rep_data[0][0]
-    
-    print('Language : ' + str(rep_language))
+            print('Language : ' + str(rep_language))
+
+        # image folder create
+        if not os.path.exists('image'):
+            os.makedirs('image')
+            
+        # views folder create
+        if not os.path.exists('views'):
+            os.makedirs('views')
+
+# ver 갱신
+curs.execute('delete from alist where name = "ver"')
+curs.execute('insert into alist (name, acl) values ("ver", ?)', [c_ver])
 
 json_data = open(os.path.join('language', rep_language + '.json'), 'rt', encoding='utf-8').read()
 lang_data = json.loads(json_data)
-
-# update
-update()
-
-# image folder create
-if not os.path.exists('image'):
-    os.makedirs('image')
-    
-# views folder create
-if not os.path.exists('views'):
-    os.makedirs('views')
 
 # backup set
 def back_up():
@@ -249,6 +271,8 @@ if back_time != 0:
         back_up()
 else:
     print('Back Up OFF')
+
+conn.commit()
 
 @app.route('/del_alarm')
 def del_alarm():
@@ -1001,7 +1025,7 @@ def indexing():
 
     conn.commit()
     
-    return redirect('/')        
+    return redirect('/')     
 
 @app.route('/re_start', methods=['POST', 'GET'])
 def re_start():
