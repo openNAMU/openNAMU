@@ -116,8 +116,6 @@ def update():
     except:
         pass
 
-    conn.commit()
-
 def captcha_post(re_data, num = 1):
     if num == 1:
         if custom()[2] == 0 and captcha_get() != '':
