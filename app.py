@@ -95,10 +95,10 @@ if setup_tool == 0:
     curs.execute('select data from other where name = "ver"')
     ver_set_data = curs.fetchall()
     if not ver_set_data:
-        setup_tool = 2
+        setup_tool = 1
     else:
         if c_ver > ver_set_data[0][0]:
-            setup_tool = 2
+            setup_tool = 1
 
 if setup_tool != 0:
     # create table
@@ -144,98 +144,97 @@ if setup_tool != 0:
     # update
     update()
 
-    if setup_tool == 1:
-        # owner 존재 확인
-        curs.execute('select name from alist where acl = "owner"')
-        if not curs.fetchall():
-            curs.execute('delete from alist where name = "owner"')
-            curs.execute('insert into alist (name, acl) values ("owner", "owner")')
+# owner 존재 확인
+curs.execute('select name from alist where acl = "owner"')
+if not curs.fetchall():
+    curs.execute('delete from alist where name = "owner"')
+    curs.execute('insert into alist (name, acl) values ("owner", "owner")')
 
-        # 포트 점검
-        curs.execute('select data from other where name = "port"')
-        rep_data = curs.fetchall()
-        if not rep_data:
-            while 1:
-                print('Port : ', end = '')
-                
-                rep_port = int(input())
-                if rep_port:
-                    curs.execute('insert into other (name, data) values ("port", ?)', [rep_port])
-                    
-                    break
-                else:
-                    pass
-        else:
-            rep_port = rep_data[0][0]
+# image folder create
+if not os.path.exists('image'):
+    os.makedirs('image')
+    
+# views folder create
+if not os.path.exists('views'):
+    os.makedirs('views')
+
+# 포트 점검
+curs.execute('select data from other where name = "port"')
+rep_data = curs.fetchall()
+if not rep_data:
+    while 1:
+        print('Port : ', end = '')
+        
+        rep_port = int(input())
+        if rep_port:
+            curs.execute('insert into other (name, data) values ("port", ?)', [rep_port])
             
-            print('Port : ' + str(rep_port))
-
-        # robots.txt 점검
-        try:
-            if not os.path.exists('robots.txt'):
-                curs.execute('select data from other where name = "robot"')
-                robot_test = curs.fetchall()
-                if robot_test:
-                    fw_test = open('./robots.txt', 'w')
-                    fw_test.write(re.sub('\r\n', '\n', robot_test[0][0]))
-                    fw_test.close()
-                else:
-                    fw_test = open('./robots.txt', 'w')
-                    fw_test.write('User-agent: *\nDisallow: /\nAllow: /$\nAllow: /w/')
-                    fw_test.close()
-
-                    curs.execute('insert into other (name, data) values ("robot", "User-agent: *\nDisallow: /\nAllow: /$\nAllow: /w/")')
-                
-                print('robots.txt create')
-        except:
+            break
+        else:
             pass
+else:
+    rep_port = rep_data[0][0]
+    
+    print('Port : ' + str(rep_port))
 
-        # 비밀 키 점검
-        curs.execute('select data from other where name = "key"')
-        rep_data = curs.fetchall()
-        if not rep_data:
-            while 1:
-                print('Secret Key : ', end = '')
-                
-                rep_key = str(input())
-                if rep_key:
-                    curs.execute('insert into other (name, data) values ("key", ?)', [rep_key])
-                    
-                    break
-                else:
-                    pass
+# robots.txt 점검
+try:
+    if not os.path.exists('robots.txt'):
+        curs.execute('select data from other where name = "robot"')
+        robot_test = curs.fetchall()
+        if robot_test:
+            fw_test = open('./robots.txt', 'w')
+            fw_test.write(re.sub('\r\n', '\n', robot_test[0][0]))
+            fw_test.close()
         else:
-            rep_key = rep_data[0][0]
+            fw_test = open('./robots.txt', 'w')
+            fw_test.write('User-agent: *\nDisallow: /\nAllow: /$\nAllow: /w/')
+            fw_test.close()
 
-            print('Secret Key : ' + rep_key)
+            curs.execute('insert into other (name, data) values ("robot", "User-agent: *\nDisallow: /\nAllow: /$\nAllow: /w/")')
+        
+        print('robots.txt create')
+except:
+    pass
 
-        # 언어 점검
-        curs.execute("select data from other where name = 'language'")
-        rep_data = curs.fetchall()
-        if not rep_data:
-            while 1:
-                print('Language [ko-KR, en-US] : ', end = '')
-                support_language = ['ko-KR', 'en-US']
-                
-                rep_language = str(input())
-                if rep_language in support_language:
-                    curs.execute("insert into other (name, data) values ('language', ?)", [rep_language])
-                    
-                    break
-                else:
-                    pass
+# 비밀 키 점검
+curs.execute('select data from other where name = "key"')
+rep_data = curs.fetchall()
+if not rep_data:
+    while 1:
+        print('Secret Key : ', end = '')
+        
+        rep_key = str(input())
+        if rep_key:
+            curs.execute('insert into other (name, data) values ("key", ?)', [rep_key])
+            
+            break
         else:
-            rep_language = rep_data[0][0]
-            
-            print('Language : ' + str(rep_language))
+            pass
+else:
+    rep_key = rep_data[0][0]
 
-        # image folder create
-        if not os.path.exists('image'):
-            os.makedirs('image')
+    print('Secret Key : ' + rep_key)
+
+# 언어 점검
+curs.execute("select data from other where name = 'language'")
+rep_data = curs.fetchall()
+if not rep_data:
+    while 1:
+        print('Language [ko-KR, en-US] : ', end = '')
+        support_language = ['ko-KR', 'en-US']
+        
+        rep_language = str(input())
+        if rep_language in support_language:
+            curs.execute("insert into other (name, data) values ('language', ?)", [rep_language])
             
-        # views folder create
-        if not os.path.exists('views'):
-            os.makedirs('views')
+            break
+        else:
+            pass
+else:
+    rep_language = rep_data[0][0]
+    
+    print('Language : ' + str(rep_language))
 
 # ver 갱신
 curs.execute('delete from alist where name = "ver"')
