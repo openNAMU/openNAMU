@@ -26,7 +26,7 @@ def savemark(data):
     
     ip = ip_check()
     if not re.search("\.", ip):
-        name = '[[사용자:' + ip + '|' + ip + ']]'
+        name = '[[user:' + ip + '|' + ip + ']]'
     else:
         name = ip
         
