@@ -729,7 +729,8 @@ def setting(num = 0):
                             <input placeholder="reCAPTCHA (Secret Key)" type="text" name="sec_re" value="''' + html.escape(d_list[1]) + '''">
                             <hr>
                             <button id="save" type="submit">''' + load_lang('save') + '''</button>
-                        </form>''',
+                        </form>
+                        ''',
                 menu = [['setting', load_lang('setting')]]
             ))
     else:
@@ -1549,7 +1550,8 @@ def set_edit_filter(name = None):
                         <input ''' + stat + ''' placeholder="Regex" name="content" value="''' + html.escape(textarea) + '''" type="text">
                         <hr>
                         <button ''' + stat + ''' id="save" type="submit">''' + load_lang('save') + '''</button>
-                    </form>''',
+                    </form>
+                    ''',
             menu = [['edit_filter', load_lang('list')], ['edit_filter/' + url_pas(name) + '/delete', load_lang('delete')]]
         ))
 
@@ -3721,6 +3723,28 @@ def skin_set():
         data =  'This skin is not support setting.',
         menu = 0
     ))
+    
+@app.route('/api/w/<path:name>')
+def api_w(name = None):
+    curs.execute("select data from data where title = ?", [name])
+    data = curs.fetchall()
+    if data:
+        json_data = { "title" : name, "data" : namumark(data = data[0][0]) }
+    
+        return flask.jsonify(json_data)
+    else:
+        return redirect('/')
+    
+@app.route('/api/raw/<path:name>')
+def api_raw(name = None):
+    curs.execute("select data from data where title = ?", [name])
+    data = curs.fetchall()
+    if data:
+        json_data = { "title" : name, "data" : data[0][0] }
+    
+        return flask.jsonify(json_data)
+    else:
+        return redirect('/')
     
 @app.route('/views/<path:name>')
 def views(name = None):
