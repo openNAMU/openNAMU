@@ -491,7 +491,7 @@ def setting(num = 0):
                 div3 += '<option value="stable">stable</option>'
 
             return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
-                imp = ['Main', wiki_set(), custom(), other2([0, 0])],
+                imp = [load_lang('main'), wiki_set(), custom(), other2([0, 0])],
                 data =  '''
                         <form method="post">
                             <span>''' + load_lang('name') + '''</span>
@@ -589,7 +589,7 @@ def setting(num = 0):
             conn.commit()
 
             return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
-                imp = ['Set Text', wiki_set(), custom(), other2([0, 0])],
+                imp = [load_lang('set_text'), wiki_set(), custom(), other2([0, 0])],
                 data =  '''
                         <form method="post">
                             <span>Register Text</span>
@@ -629,7 +629,7 @@ def setting(num = 0):
                 data = ''
 
             return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
-                imp = ['Main HEAD', wiki_set(), custom(), other2([0, 0])],
+                imp = [load_lang('main_head'), wiki_set(), custom(), other2([0, 0])],
                 data =  '''
                         <form method="post">
                             <textarea rows="25" name="content">''' + html.escape(data) + '''</textarea>
