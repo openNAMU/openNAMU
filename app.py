@@ -402,7 +402,7 @@ def setting(num = 0):
         return re_error('/ban')
 
     if num == 0:
-        li_list = ['Main', 'Set Text', 'Main HEAD', 'robots.txt', 'Google']
+        li_list = [load_lang('main'), load_lang('set_text'), load_lang('main_head'), 'robots.txt', 'Google']
         
         x = 0
         
@@ -499,56 +499,56 @@ def setting(num = 0):
                             <br>
                             <input placeholder="''' + load_lang('name') + '''" type="text" name="name" value="''' + html.escape(d_list[0]) + '''">
                             <hr>
-                            <span>Logo (HTML)</span>
+                            <span>''' + load_lang('logo') + ''' (HTML)</span>
                             <br>
                             <br>
-                            <input placeholder="Logo" type="text" name="logo" value="''' + html.escape(d_list[1]) + '''">
+                            <input placeholder="''' + load_lang('logo') + '''" type="text" name="logo" value="''' + html.escape(d_list[1]) + '''">
                             <hr>
-                            <span>FrontPage</span>
+                            <span>''' + load_lang('frontpage') + '''</span>
                             <br>
                             <br>
-                            <input placeholder="FrontPage" type="text" name="frontpage" value="''' + html.escape(d_list[2]) + '''">
+                            <input placeholder="''' + load_lang('frontpage') + '''" type="text" name="frontpage" value="''' + html.escape(d_list[2]) + '''">
                             <hr>
                             <span>''' + load_lang('license') + ''' (HTML)</span>
                             <br>
                             <br>
                             <input placeholder="''' + load_lang('license') + '''" type="text" name="license" value="''' + html.escape(d_list[3]) + '''">
                             <hr>
-                            <span>Max File Size [MB]</span>
+                            <span>''' + load_lang('max_file_size') + ''' [MB]</span>
                             <br>
                             <br>
-                            <input placeholder="Max File Size" type="text" name="upload" value="''' + html.escape(d_list[4]) + '''">
+                            <input placeholder="''' + load_lang('max_file_size') + '''" type="text" name="upload" value="''' + html.escape(d_list[4]) + '''">
                             <hr>
-                            <span>Back Up Interval [''' + load_lang('hour') + '''] (OFF : 0) {Need To Restart}</span>
+                            <span>''' + load_lang('back_up_interval') + ' [' + load_lang('hour') + '''] (OFF : 0) {''' + load_lang('need_to_restart') + '''}</span>
                             <br>
                             <br>
-                            <input placeholder="Back Up Interval" type="text" name="back_up" value="''' + html.escape(d_list[9]) + '''">
+                            <input placeholder="''' + load_lang('back_up_interval') + '''" type="text" name="back_up" value="''' + html.escape(d_list[9]) + '''">
                             <hr>
                             <span>''' + load_lang('skin') + '''</span>
                             <br>
                             <br>
                             <select name="skin">''' + div2 + '''</select>
                             <hr>
-                            <span>Default ACL</span>
+                            <span>''' + load_lang('default_acl') + '''</span>
                             <br>
                             <br>
                             <select name="edit">''' + div + '''</select>
                             <hr>
-                            <input type="checkbox" name="reg" ''' + ch_1 + '''> Unable Register
+                            <input type="checkbox" name="reg" ''' + ch_1 + '''> ''' + load_lang('unable_register') + '''
                             <hr>
-                            <input type="checkbox" name="ip_view" ''' + ch_2 + '''> IP Hidden
+                            <input type="checkbox" name="ip_view" ''' + ch_2 + '''> ''' + load_lang('ip_hidden') + '''
                             <hr>
-                            <span>Port</span>
+                            <span>''' + load_lang('port') + '''</span>
                             <br>
                             <br>
-                            <input placeholder="Port" type="text" name="port" value="''' + html.escape(d_list[10]) + '''">
+                            <input placeholder="''' + load_lang('port') + '''" type="text" name="port" value="''' + html.escape(d_list[10]) + '''">
                             <hr>
-                            <span>Secret Key</span>
+                            <span>''' + load_lang('secret_key') + '''</span>
                             <br>
                             <br>
-                            <input placeholder="Secret Key" type="password" name="key" value="''' + html.escape(d_list[11]) + '''">
+                            <input placeholder="''' + load_lang('secret_key') + '''" type="password" name="key" value="''' + html.escape(d_list[11]) + '''">
                             <hr>
-                            <span>Update Branch</span>
+                            <span>''' + load_lang('update_branch') + '''</span>
                             <br>
                             <br>
                             <select name="update">''' + div3 + '''</select>
@@ -1939,7 +1939,7 @@ def manager(num = 1):
                     <br>
                     <h2>''' + load_lang('owner') + '''</h2>
                     <ul>
-                        <li><a href="/indexing">Indexing (''' + load_lang('create') + ' or ' + load_lang('delete') + ''')</a></li>
+                        <li><a href="/indexing">''' + load_lang('indexing') + ' (' + load_lang('create') + ' or ' + load_lang('delete') + ''')</a></li>
                         <li><a href="/manager/8">''' + load_lang('admin_group') + ' ' + load_lang('create') + '''</a></li>
                         <li><a href="/setting">''' + load_lang('setting') + ' ' + load_lang('edit') + '''</a></li>
                         <li><a href="/re_start">''' + load_lang('server') + ' ' + load_lang('restart') + '''</a></li>
