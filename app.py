@@ -395,9 +395,9 @@ def plus_inter(tools = None):
             menu = [['other', load_lang('other')]]
         ))
 
-@app.route('/edit_set')
-@app.route('/edit_set/<int:num>', methods=['POST', 'GET'])
-def edit_set(num = 0):
+@app.route('/setting')
+@app.route('/setting/<int:num>', methods=['POST', 'GET'])
+def setting(num = 0):
     if num != 0 and admin_check(None, None) != 1:
         return re_error('/ban')
 
@@ -410,7 +410,7 @@ def edit_set(num = 0):
         
         for li in li_list:
             x += 1
-            li_data += '<li><a href="/edit_set/' + str(x) + '">' + li + '</a></li>'
+            li_data += '<li><a href="/setting/' + str(x) + '">' + li + '</a></li>'
 
         return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
             imp = [load_lang('setting'), wiki_set(), custom(), other2([0, 0])],
@@ -432,7 +432,7 @@ def edit_set(num = 0):
 
             admin_check(None, 'edit_set')
 
-            return redirect('/edit_set/1')
+            return redirect('/setting/1')
         else:
             d_list = []
             
@@ -556,7 +556,7 @@ def edit_set(num = 0):
                             <button id="save" type="submit">''' + load_lang('save') + '''</button>
                         </form>
                         ''',
-                menu = [['edit_set', load_lang('setting')]]
+                menu = [['setting', load_lang('setting')]]
             ))
     elif num == 2:
         if flask.request.method == 'POST':
@@ -566,7 +566,7 @@ def edit_set(num = 0):
             
             admin_check(None, 'edit_set')
 
-            return redirect('/edit_set/2')
+            return redirect('/setting/2')
         else:
             i_list = ['contract', 'no_login_warring']
             n_list = ['', '']
@@ -605,7 +605,7 @@ def edit_set(num = 0):
                             <button id="save" type="submit">''' + load_lang('save') + '''</button>
                         </form>
                         ''',
-                menu = [['edit_set', load_lang('setting')]]
+                menu = [['setting', load_lang('setting')]]
             ))
     elif num == 3:
         if flask.request.method == 'POST':
@@ -619,7 +619,7 @@ def edit_set(num = 0):
 
             admin_check(None, 'edit_set')
 
-            return redirect('/edit_set/3')
+            return redirect('/setting/3')
         else:
             curs.execute("select data from other where name = 'head'")
             head = curs.fetchall()
@@ -637,7 +637,7 @@ def edit_set(num = 0):
                             <button id="save" type="submit">''' + load_lang('save') + '''</button>
                         </form>
                         ''',
-                menu = [['edit_set', load_lang('setting')]]
+                menu = [['setting', load_lang('setting')]]
             ))
     elif num == 4:
         if flask.request.method == 'POST':
@@ -655,7 +655,7 @@ def edit_set(num = 0):
             
             admin_check(None, 'edit_set')
 
-            return redirect('/edit_set/4')
+            return redirect('/setting/4')
         else:
             curs.execute("select data from other where name = 'robot'")
             robot = curs.fetchall()
@@ -682,7 +682,7 @@ def edit_set(num = 0):
                             <button id="save" type="submit">''' + load_lang('save') + '''</button>
                         </form>
                         ''',
-                menu = [['edit_set', load_lang('setting')]]
+                menu = [['setting', load_lang('setting')]]
             ))
     elif num == 5:
         if flask.request.method == 'POST':
@@ -692,7 +692,7 @@ def edit_set(num = 0):
             
             admin_check(None, 'edit_set')
 
-            return redirect('/edit_set/5')
+            return redirect('/setting/5')
         else:
             i_list = ['recaptcha', 'sec_re']
             n_list = ['', '']
@@ -730,7 +730,7 @@ def edit_set(num = 0):
                             <hr>
                             <button id="save" type="submit">''' + load_lang('save') + '''</button>
                         </form>''',
-                menu = [['edit_set', load_lang('setting')]]
+                menu = [['setting', load_lang('setting')]]
             ))
     else:
         return redirect('/')
@@ -1941,7 +1941,7 @@ def manager(num = 1):
                     <ul>
                         <li><a href="/indexing">Indexing (''' + load_lang('create') + ' or ' + load_lang('delete') + ''')</a></li>
                         <li><a href="/manager/8">''' + load_lang('admin_group') + ' ' + load_lang('create') + '''</a></li>
-                        <li><a href="/edit_set">''' + load_lang('setting') + ' ' + load_lang('edit') + '''</a></li>
+                        <li><a href="/setting">''' + load_lang('setting') + ' ' + load_lang('edit') + '''</a></li>
                         <li><a href="/re_start">''' + load_lang('server') + ' ' + load_lang('restart') + '''</a></li>
                         <li><a href="/update">''' + load_lang('update') + '''</a></li>
                         <li><a href="/inter_wiki">''' + load_lang('interwiki') + '''</a></li>
