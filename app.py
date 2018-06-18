@@ -1,4 +1,5 @@
 # 모듈 불러오기
+import werkzeug.routing
 import flask_compress
 import flask_reggie
 import tornado.ioloop
@@ -64,9 +65,14 @@ flask_reggie.Reggie(app)
 compress = flask_compress.Compress()
 compress.init_app(app)
 
+class EverythingConverter(werkzeug.routing.PathConverter):
+    regex = '.*?'
+
 # 템플릿 설정
 app.jinja_env.filters['md5_replace'] = md5_replace
 app.jinja_env.filters['load_lang'] = load_lang
+
+app.url_map.converters['everything'] = EverythingConverter
 
 # 셋업 부분
 curs.execute('create table if not exists data(test text)')
@@ -881,7 +887,7 @@ def admin_list():
         menu = [['other', load_lang('other')]]
     ))
         
-@app.route('/hidden/<path:name>')
+@app.route('/hidden/<everything:name>')
 def history_hidden(name = None):
     num = int(flask.request.args.get('num', 0))
 
@@ -1088,7 +1094,7 @@ def update():
         menu = [['manager/1', load_lang('admin')]]
     ))
         
-@app.route('/xref/<path:name>')
+@app.route('/xref/<everything:name>')
 def xref(name = None):
     num = int(flask.request.args.get('num', 1))
     if num * 50 > 0:
@@ -1315,7 +1321,7 @@ def goto():
     else:
         return redirect('/search/' + url_pas(flask.request.form.get('search', None)))
 
-@app.route('/search/<path:name>')
+@app.route('/search/<everything:name>')
 def deep_search(name = None):
     num = int(flask.request.args.get('num', 1))
     if num * 50 > 0:
@@ -1360,8 +1366,8 @@ def deep_search(name = None):
         menu = 0
     ))
          
-@app.route('/raw/<path:name>')
-@app.route('/topic/<path:name>/sub/<sub_title>/raw/<int:num>')
+@app.route('/raw/<everything:name>')
+@app.route('/topic/<everything:name>/sub/<sub_title>/raw/<int:num>')
 def raw_view(name = None, sub_title = None, num = None):
     v_name = name
     sub = ' (Raw)'
@@ -1406,7 +1412,7 @@ def raw_view(name = None, sub_title = None, num = None):
     else:
         return redirect('/w/' + url_pas(name))
         
-@app.route('/revert/<path:name>', methods=['POST', 'GET'])
+@app.route('/revert/<everything:name>', methods=['POST', 'GET'])
 def revert(name = None):    
     num = int(flask.request.args.get('num', 0))
 
@@ -1555,7 +1561,7 @@ def set_edit_filter(name = None):
             menu = [['edit_filter', load_lang('list')], ['edit_filter/' + url_pas(name) + '/delete', load_lang('delete')]]
         ))
 
-@app.route('/edit/<path:name>', methods=['POST', 'GET'])
+@app.route('/edit/<everything:name>', methods=['POST', 'GET'])
 def edit(name = None):
     ip = ip_check()
     if acl_check(name) == 1:
@@ -1713,11 +1719,11 @@ def edit(name = None):
             menu = [['w/' + url_pas(name), load_lang('document')], ['delete/' + url_pas(name), load_lang('delete')], ['move/' + url_pas(name), load_lang('move')]]
         ))
         
-@app.route('/edit_get/<path:name>', methods=['POST'])
+@app.route('/edit_get/<everything:name>', methods=['POST'])
 def edit_get(name = None):
     return redirect('/edit/' + url_pas(name) + '?froms=' + url_pas(flask.request.form.get('name', None)))
 
-@app.route('/preview/<path:name>', methods=['POST'])
+@app.route('/preview/<everything:name>', methods=['POST'])
 def preview(name = None):
     ip = ip_check()
     if acl_check(name) == 1:
@@ -1758,7 +1764,7 @@ def preview(name = None):
         menu = [['w/' + url_pas(name), load_lang('document')]]
     ))
         
-@app.route('/delete/<path:name>', methods=['POST', 'GET'])
+@app.route('/delete/<everything:name>', methods=['POST', 'GET'])
 def delete(name = None):
     ip = ip_check()
     if acl_check(name) == 1:
@@ -1806,7 +1812,7 @@ def delete(name = None):
             menu = [['w/' + url_pas(name), load_lang('document')]]
         ))            
             
-@app.route('/move_data/<path:name>')
+@app.route('/move_data/<everything:name>')
 def move_data(name = None):    
     data = '<ul>'
     
@@ -1829,7 +1835,7 @@ def move_data(name = None):
         menu = [['history/' + url_pas(name), load_lang('history')]]
     ))        
             
-@app.route('/move/<path:name>', methods=['POST', 'GET'])
+@app.route('/move/<everything:name>', methods=['POST', 'GET'])
 def move(name = None):
     if acl_check(name) == 1:
         return re_error('/ban')
@@ -2033,7 +2039,7 @@ def title_index():
         menu = [['other', load_lang('other')]]
     ))
         
-@app.route('/topic/<path:name>/sub/<sub>/b/<int:num>')
+@app.route('/topic/<everything:name>/sub/<sub>/b/<int:num>')
 def topic_block(name = None, sub = None, num = None):
     if admin_check(3, 'blind (' + name + ' - ' + sub + '#' + str(num) + ')') != 1:
         return re_error('/error/3')
@@ -2052,7 +2058,7 @@ def topic_block(name = None, sub = None, num = None):
         
     return redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '#' + str(num))
         
-@app.route('/topic/<path:name>/sub/<sub>/notice/<int:num>')
+@app.route('/topic/<everything:name>/sub/<sub>/notice/<int:num>')
 def topic_top(name = None, sub = None, num = None):
     if admin_check(3, 'notice (' + name + ' - ' + sub + '#' + str(num) + ')') != 1:
         return re_error('/error/3')
@@ -2073,7 +2079,7 @@ def topic_top(name = None, sub = None, num = None):
 
     return redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '#' + str(num))        
         
-@app.route('/topic/<path:name>/sub/<sub>/tool/<regex("close|stop|agree"):tool>')
+@app.route('/topic/<everything:name>/sub/<sub>/tool/<regex("close|stop|agree"):tool>')
 def topic_stop(name = None, sub = None, tool = None):
     if tool == 'close':
         set_list = ['O', '', load_lang('discussion') + ' ' + load_lang('close'), load_lang('discussion') + ' ' + load_lang('open')]
@@ -2117,7 +2123,7 @@ def topic_stop(name = None, sub = None, tool = None):
         
     return redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub))    
 
-@app.route('/topic/<path:name>/sub/<sub>/admin/<int:num>')
+@app.route('/topic/<everything:name>/sub/<sub>/admin/<int:num>')
 def topic_admin(name = None, sub = None, num = None):
     curs.execute("select block, ip, date from topic where title = ? and sub = ? and id = ?", [name, sub, str(num)])
     data = curs.fetchall()
@@ -2172,7 +2178,7 @@ def topic_admin(name = None, sub = None, num = None):
         menu = [['topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '#' + str(num), load_lang('discussion')]]
     ))
 
-@app.route('/topic/<path:name>/sub/<sub>', methods=['POST', 'GET'])
+@app.route('/topic/<everything:name>/sub/<sub>', methods=['POST', 'GET'])
 def topic(name = None, sub = None):
     ban = topic_check(name, sub)
     admin = admin_check(3, None)
@@ -2338,8 +2344,8 @@ def topic(name = None, sub = None):
             menu = [['topic/' + url_pas(name), load_lang('list')]]
         ))
         
-@app.route('/topic/<path:name>', methods=['POST', 'GET'])
-@app.route('/topic/<path:name>/<regex("close|agree"):tool>', methods=['GET'])
+@app.route('/topic/<everything:name>', methods=['POST', 'GET'])
+@app.route('/topic/<everything:name>/<regex("close|agree"):tool>', methods=['GET'])
 def close_topic_list(name = None, tool = None):
     div = ''
     list_d = 0
@@ -2837,7 +2843,7 @@ def user_ban(name = None):
             menu = [['manager', load_lang('admin')]]
         ))            
                 
-@app.route('/acl/<path:name>', methods=['POST', 'GET'])
+@app.route('/acl/<everything:name>', methods=['POST', 'GET'])
 def acl(name = None):
     check_ok = ''
     
@@ -2984,7 +2990,7 @@ def user_admin(name = None):
             menu = [['manager', load_lang('admin')]]
         ))
     
-@app.route('/diff/<path:name>')
+@app.route('/diff/<everything:name>')
 def diff_data(name = None):
     first = flask.request.args.get('first', '1')
     second = flask.request.args.get('second', '1')
@@ -3012,7 +3018,7 @@ def diff_data(name = None):
 
     return redirect('/history/' + url_pas(name))
         
-@app.route('/down/<path:name>')
+@app.route('/down/<everything:name>')
 def down(name = None):
     div = '<ul>'
 
@@ -3028,7 +3034,7 @@ def down(name = None):
         menu = [['w/' + url_pas(name), load_lang('document')]]
     ))
 
-@app.route('/w/<path:name>')
+@app.route('/w/<everything:name>')
 def read_view(name = None):
     data_none = 0
     sub = ''
@@ -3231,7 +3237,7 @@ def user_topic_list(name = None):
 
 @app.route('/recent_changes')
 @app.route('/<regex("record"):tool>/<name>')
-@app.route('/<regex("history"):tool>/<path:name>', methods=['POST', 'GET'])
+@app.route('/<regex("history"):tool>/<everything:name>', methods=['POST', 'GET'])
 def recent_changes(name = None, tool = 'record'):
     if flask.request.method == 'POST':
         return redirect('/diff/' + url_pas(name) + '?first=' + flask.request.form.get('b', None) + '&second=' + flask.request.form.get('a', None))
@@ -3603,7 +3609,7 @@ def watch_list():
         menu = [['manager', load_lang('admin')]]
     ))
 
-@app.route('/watch_list/<path:name>')
+@app.route('/watch_list/<everything:name>')
 def watch_list_name(name = None):
     if custom()[2] == 0:
         return redirect('/login')
@@ -3724,7 +3730,7 @@ def skin_set():
         menu = 0
     ))
     
-@app.route('/api/w/<path:name>')
+@app.route('/api/w/<everything:name>')
 def api_w(name = None):
     curs.execute("select data from data where title = ?", [name])
     data = curs.fetchall()
@@ -3735,7 +3741,7 @@ def api_w(name = None):
     else:
         return redirect('/')
     
-@app.route('/api/raw/<path:name>')
+@app.route('/api/raw/<everything:name>')
 def api_raw(name = None):
     curs.execute("select data from data where title = ?", [name])
     data = curs.fetchall()
@@ -3746,7 +3752,7 @@ def api_raw(name = None):
     else:
         return redirect('/')
     
-@app.route('/views/<path:name>')
+@app.route('/views/<everything:name>')
 def views(name = None):
     if re.search('\/', name):
         m = re.search('^(.*)\/(.*)$', name)
