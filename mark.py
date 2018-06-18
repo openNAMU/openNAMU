@@ -33,7 +33,7 @@ def plusing(name, link, backtype):
 def namumark(title = '', data = '', num = 0):
     if not data == '':
         data = namu(conn, data, title, num)
-        
+
         if num == 1:
             i = 0
             while 1:
@@ -52,4 +52,4 @@ def namumark(title = '', data = '', num = 0):
             
         return data[0] + data[1]
     else:
-        return '404 Not Found.'
+        return '404'
