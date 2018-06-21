@@ -595,7 +595,13 @@ def namu(conn, data, title, main_num):
             for i in range(0, 6):
                 all_stack += str(toc_stack[i]) + '.'
 
-            all_stack = re.sub('0.', '', all_stack)
+            while 1:
+                if re.search('[^0-9]0\.', all_stack):
+                    all_stack = re.sub('[^0-9]0\.', '.', all_stack)
+                else:
+                    break
+
+            all_stack = re.sub('^0\.', '', all_stack)
             
             data = re.sub('\n(={1,6}) ?((?:(?!\n).)+) ?\n', '\n<h' + toc_number + ' id="s-' + re.sub('\.$', '', all_stack) + '"><a href="#toc">' + all_stack + '</a> ' + re.sub('=*$', '', toc[1]) + ' <span style="font-size: 12px"><a href="/edit/' + tool.url_pas(title) + '?section=' + str(edit_number) + '">(Edit)</a></span></h' + toc_number + '>\n', data, 1)
             
