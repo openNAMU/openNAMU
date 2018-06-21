@@ -1355,7 +1355,7 @@ def deep_search(name = None):
 
             div_plus += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a> (' + data[1] + ')</li>'
     else:
-        div += '<li>Not Found.</li>'
+        div += '<li>404</li>'
 
     div += div_plus + '</ul>'
     div += next_fix('/search/' + url_pas(name) + '?num=', num, all_list)
