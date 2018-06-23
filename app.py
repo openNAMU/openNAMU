@@ -20,8 +20,8 @@ import sys
 from func import *
 
 # 버전 표기
-r_ver = 'v3.0.5-Master-10'
-c_ver = '30510'
+r_ver = 'v3.0.5-Master-11'
+c_ver = ''.join(re.findall('[0-9]', r_ver))
 print('Version : ' + r_ver)
 
 # set.json 설정 확인
