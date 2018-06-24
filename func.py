@@ -138,7 +138,7 @@ def captcha_post(re_data, num = 1):
     else:
         pass
 
-def load_lang(data):
+def load_lang(data, num = 0):
     global lang
 
     try:
@@ -353,7 +353,7 @@ def ip_pas(raw_ip):
     hide = 0
 
     if re.search("(\.|:)", raw_ip):
-        if not re.search("^" + load_lang('tool') + ":", raw_ip):    
+        if not re.search("^" + load_lang('tool', 1) + ":", raw_ip):    
             curs.execute("select data from other where name = 'ip_view'")
             data = curs.fetchall()
             if data and data[0][0] != '':
@@ -536,7 +536,7 @@ def ban_insert(name, end, why, login, blocker):
 
     curs.execute("select block from ban where block = ?", [name])
     if curs.fetchall():
-        curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, ?)", [name, load_lang('release'), time, blocker, '', band])
+        curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, ?)", [name, load_lang('release', 1), time, blocker, '', band])
         curs.execute("delete from ban where block = ?", [name])
     else:
         if login != '':
@@ -565,7 +565,7 @@ def history_plus(title, data, date, ip, send, leng):
     if id_data:
         curs.execute("insert into history (id, title, data, date, ip, send, leng) values (?, ?, ?, ?, ?, ?, ?)", [str(int(id_data[0][0]) + 1), title, data, date, ip, send, leng])
     else:
-        curs.execute("insert into history (id, title, data, date, ip, send, leng) values ('1', ?, ?, ?, ?, ?, ?)", [title, data, date, ip, send + ' (' + load_lang('new') + ' ' + load_lang('document') + ')', leng])
+        curs.execute("insert into history (id, title, data, date, ip, send, leng) values ('1', ?, ?, ?, ?, ?, ?)", [title, data, date, ip, send + ' (' + load_lang('new', 1) + ' ' + load_lang('document', 1) + ')', leng])
 
 def leng_check(first, second):
     if first < second:
