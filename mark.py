@@ -22,8 +22,16 @@ def send_parser(data):
         javascript = re.compile('javascript:', re.I)
         
         data = javascript.sub('', data)
-        data = re.sub('&lt;a href=&quot;(?:(?:(?!&quot;).)*)&quot;&gt;(?P<in>(?:(?!&lt;).)*)&lt;\/a&gt;', '<a href="' + urllib.parse.quote('\g<in>').replace('/','%2F') + '">\g<in></a>', data)
-    
+
+        while 1:
+            re_data = re.search('&lt;a(?: (?:(?:(?!&gt;).)*))?&gt;(?P<in>(?:(?!&lt;).)*)&lt;\/a&gt;', data)
+            if re_data:
+                re_data = re_data.groups()[0]
+
+                data = re.sub('&lt;a(?: (?:(?:(?!&gt;).)*))?&gt;(?P<in>(?:(?!&lt;).)*)&lt;\/a&gt;', '<a href="/w/' + urllib.parse.quote(re_data).replace('/','%2F') + '">' + re_data + '</a>', data, 1)
+            else:
+                break
+        
     return data
     
 def plusing(data):
