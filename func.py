@@ -1,5 +1,17 @@
-﻿# 모듈들 불러옴
-import css_html_js_minify
+# 모듈들 불러옴
+try:
+    import css_html_js_minify
+except:
+	class css_html_js_minify:
+		def html_minify(data):
+			return data
+			
+		def css_minify(data):
+			return data
+			
+		def js_minify(data):
+			return data
+	
 import flask
 import json
 import sqlite3
