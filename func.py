@@ -2,15 +2,20 @@
 try:
     import css_html_js_minify
 except:
+	def easy_minify(data):
+		data = re.sub('\n +', '\n', data)
+		
+		return data
+	
 	class css_html_js_minify:
 		def html_minify(data):
-			return data
+			return easy_minify(data)
 			
 		def css_minify(data):
-			return data
+			return easy_minify(data)
 			
 		def js_minify(data):
-			return data
+			return easy_minify(data)
 	
 import flask
 import json
