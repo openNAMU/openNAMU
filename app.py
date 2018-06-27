@@ -20,7 +20,7 @@ import sys
 from func import *
 
 # 버전 표기
-r_ver = 'v3.0.5-Master-12'
+r_ver = 'v3.0.5-Master-13'
 c_ver = ''.join(re.findall('[0-9]', r_ver))
 print('Version : ' + r_ver)
 
@@ -79,6 +79,7 @@ curs.execute('create table if not exists data(test text)')
 curs.execute('create table if not exists history(test text)')
 curs.execute('create table if not exists rd(test text)')
 curs.execute('create table if not exists user(test text)')
+curs.execute('create table if not exists user_set(test text)')
 curs.execute('create table if not exists ban(test text)')
 curs.execute('create table if not exists topic(test text)')
 curs.execute('create table if not exists stop(test text)')
@@ -116,6 +117,7 @@ if setup_tool != 0:
     create_data['history'] = ['id', 'title', 'data', 'date', 'ip', 'send', 'leng', 'hide']
     create_data['rd'] = ['title', 'sub', 'date', 'band']
     create_data['user'] = ['id', 'pw', 'acl', 'date', 'email', 'skin']
+    create_data['user_set'] = ['name', 'data']
     create_data['ban'] = ['block', 'end', 'why', 'band', 'login']
     create_data['topic'] = ['id', 'title', 'sub', 'data', 'date', 'ip', 'block', 'top']
     create_data['stop'] = ['title', 'sub', 'close']
