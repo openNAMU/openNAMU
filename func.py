@@ -2,21 +2,21 @@
 try:
     import css_html_js_minify
 except:
-	def easy_minify(data):
-		data = re.sub('\n +', '\n', data)
-		
-		return data
-	
-	class css_html_js_minify:
-		def html_minify(data):
-			return easy_minify(data)
-			
-		def css_minify(data):
-			return easy_minify(data)
-			
-		def js_minify(data):
-			return easy_minify(data)
-	
+    def easy_minify(data):
+        data = re.sub('\n +', '\n', data)
+        
+        return data
+    
+    class css_html_js_minify:
+        def html_minify(data):
+            return easy_minify(data)
+            
+        def css_minify(data):
+            return easy_minify(data)
+            
+        def js_minify(data):
+            return easy_minify(data)
+    
 import flask
 import json
 import sqlite3
@@ -187,8 +187,8 @@ def ip_or_user(data):
 
 def edit_help_button():
     # https://stackoverflow.com/questions/11076975/insert-text-into-textarea-at-cursor-position-javascript
-    '''
-    <script>
+    js_data = '''
+        <script>
         function insertAtCursor(myField, myValue) {
             if (document.selection) { 
                 document.getElementById(myField).focus();
@@ -207,11 +207,13 @@ def edit_help_button():
     </script>
     '''
 
-    insert_list = [['[[]]', '링크'], ['[()]', '매크로'], ['{{{#!}}}', '중괄호']]
+    insert_list = [['[[]]', 'Link'], ['[()]', 'Macro'], ['{{{#!}}}', 'Middle']]
 
-    '<a href="javascript:void(0);" onclick="insertAtCursor(\'content\', \'B\');">(A)</a>'
+    data = ''
+    for insert_data in insert_list:
+        data += '<a href="javascript:void(0);" onclick="insertAtCursor(\'content\', \'' + insert_data[0] + '\');">(' + insert_data[1] + ')</a>'
 
-    return ['', '']
+    return [js_data, data + '<hr>']
 
 def ip_warring():
     if custom()[2] == 0:    
