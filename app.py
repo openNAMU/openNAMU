@@ -20,7 +20,7 @@ import sys
 from func import *
 
 # 버전 표기
-r_ver = 'v3.0.5-Master-13'
+r_ver = 'v3.0.5-Master-14'
 c_ver = ''.join(re.findall('[0-9]', r_ver))
 print('Version : ' + r_ver)
 
@@ -3344,8 +3344,14 @@ def recent_changes(name = None, tool = 'record'):
                     else:
                         return redirect('/')
 
-                    curs.execute("select id, title, date, ip, send, leng from history where ip = ? and send like ? order by date desc limit ?, '50'", [name, sql, str(sql_num)])
+                    curs.execute("select id, title, date, ip, send, leng from history where ip = ? and send like ? order by date desc limit ?, 50", [name, sql, str(sql_num)])
         else:
+            num = int(flask.request.args.get('num', 1))
+            if num * 50 > 0:
+                sql_num = num * 50 - 50
+            else:
+                sql_num = 0            
+            
             div += '<td style="width: 33.3%;">' + load_lang('document') + ' ' + load_lang('name') + '</td><td style="width: 33.3%;">' + load_lang('editor') + '</td><td style="width: 33.3%;">' + load_lang('time') + '</td></tr>'
             
             if what == 'all':
@@ -3355,7 +3361,7 @@ def recent_changes(name = None, tool = 'record'):
 
                 div = '<a href="/recent_discuss">(' + load_lang('discussion') + ')</a> <a href="/block_log">(' + load_lang('ban') + ')</a> <a href="/user_log">(' + load_lang('subscriber') + ')</a> <a href="/admin_log">(' + load_lang('authority') + ')</a><hr>' + div
                 
-                curs.execute("select id, title, date, ip, send, leng from history order by date desc limit 50")
+                curs.execute("select id, title, date, ip, send, leng from history order by date desc limit  ?, 50", [str(sql_num)])
             else:
                 if what == 'delete':
                     sql = '%(' + load_lang('delete', 1) + ')'
@@ -3366,7 +3372,7 @@ def recent_changes(name = None, tool = 'record'):
                 else:
                     return redirect('/')
 
-                curs.execute("select id, title, date, ip, send, leng from history where send like ? order by date desc limit 50", [sql])
+                curs.execute("select id, title, date, ip, send, leng from history where send like ? order by date desc limit ?, 50", [sql, str(sql_num)])
 
         data_list = curs.fetchall()
         for data in data_list:    
@@ -3469,6 +3475,8 @@ def recent_changes(name = None, tool = 'record'):
             
             if what != 'all':
                 menu = [['recent_changes', load_lang('normal')]]
+                
+            div += next_fix('/recent_change?num=', num, data_list)
                 
         if what == 'delete':
             sub += ' (' + load_lang('delete') + ')'
