@@ -3246,7 +3246,7 @@ def read_view(name = None):
     div = end_data + div
 
     return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
-        imp = [name, wiki_set(), custom(), other2([sub + acl, r_date])],
+        imp = [flask.request.args.get('show', name), wiki_set(), custom(), other2([sub + acl, r_date])],
         data = div,
         menu = menu
     )), response_data
