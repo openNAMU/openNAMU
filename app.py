@@ -1701,10 +1701,7 @@ def edit(name = None):
         
         if not flask.request.args.get('section', None):
             get_name =  '''
-                        <form method="post" id="get_edit" action="/edit_get/''' + url_pas(name) + '''">
-                            <input placeholder="Load Document" name="name" style="width: 50%;" type="text">
-                            <button id="come" type="submit">Load</button>
-                        </form>
+                        <a href="/manager/15?plus=''' + url_pas(name) + '''">(Load)</a>
                         <hr>
                         '''
             action = ''
@@ -1712,8 +1709,8 @@ def edit(name = None):
             get_name = ''
             action = '?section=' + flask.request.args.get('section', None)
             
-        if flask.request.args.get('froms', None):
-            curs.execute("select data from data where title = ?", [flask.request.args.get('froms', None)])
+        if flask.request.args.get('plus', None):
+            curs.execute("select data from data where title = ?", [flask.request.args.get('plus', None)])
             get_data = curs.fetchall()
             if get_data:
                 data = get_data[0][0]
@@ -1738,10 +1735,6 @@ def edit(name = None):
                     ''',
             menu = [['w/' + url_pas(name), load_lang('document')], ['delete/' + url_pas(name), load_lang('delete')], ['move/' + url_pas(name), load_lang('move')]]
         ))
-        
-@app.route('/edit_get/<everything:name>', methods=['POST'])
-def edit_get(name = None):
-    return redirect('/edit/' + url_pas(name) + '?froms=' + url_pas(flask.request.form.get('name', None)))
 
 @app.route('/preview/<everything:name>', methods=['POST'])
 def preview(name = None):
@@ -1964,7 +1957,22 @@ def other():
 @app.route('/manager', methods=['POST', 'GET'])
 @app.route('/manager/<int:num>', methods=['POST', 'GET'])
 def manager(num = 1):
-    title_list = [[load_lang('document') + ' ' + load_lang('name'), 'acl'], [0, 'check'], [0, 'ban'], [0, 'admin'], [0, 'record'], [0, 'topic_record'], [load_lang('name'), 'admin_plus'], [load_lang('name'), 'edit_filter'], [load_lang('document') + ' ' + load_lang('name'), 'search'], [0, 'block_user'], [0, 'block_admin'], [load_lang('document') + ' ' + load_lang('name'), 'watch_list'], [load_lang('compare'), 'check']]
+    title_list = [
+        [load_lang('document') + ' ' + load_lang('name'), 'acl'], 
+        [0, 'check'], 
+        [0, 'ban'], 
+        [0, 'admin'], 
+        [0, 'record'], 
+        [0, 'topic_record'], 
+        [load_lang('name'), 'admin_plus'], 
+        [load_lang('name'), 'edit_filter'], 
+        [load_lang('document') + ' ' + load_lang('name'), 'search'], 
+        [0, 'block_user'], 
+        [0, 'block_admin'], 
+        [load_lang('document') + ' ' + load_lang('name'), 'watch_list'], 
+        [load_lang('compare'), 'check'], 
+        [load_lang('document') + ' ' + load_lang('name'), 'edit']
+    ]
     
     if num == 1:
         return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
@@ -1991,7 +1999,7 @@ def manager(num = 1):
                     ''',
             menu = [['other', load_lang('other')]]
         ))
-    elif num in range(2, 15):
+    elif not num - 1 > len(title_list):
         if flask.request.method == 'POST':
             if flask.request.args.get('plus', None):
                 return redirect('/' + title_list[(num - 2)][1] + '/' + url_pas(flask.request.args.get('plus', None)) + '?plus=' + flask.request.form.get('name', None))
