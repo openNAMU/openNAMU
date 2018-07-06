@@ -2459,7 +2459,7 @@ def close_topic_list(name = None, tool = None):
         
 @app.route('/login', methods=['POST', 'GET'])
 def login():
-    if 'Now' in flask.session and flask.session['Now'] == 1:
+    if custom()[2] != 0:
         return redirect('/user')
 
     ip = ip_check()
@@ -2720,6 +2720,9 @@ def register():
     if ban_check() == 1:
         return re_error('/ban')
 
+    if custom()[2] != 0:
+        return redirect('/user')
+
     if not admin_check(None, None) == 1:
         curs.execute('select data from other where name = "reg"')
         set_d = curs.fetchall()
@@ -2750,12 +2753,27 @@ def register():
         curs.execute("select id from user limit 1")
         if not curs.fetchall():
             curs.execute("insert into user (id, pw, acl, date, email) values (?, ?, 'owner', ?, ?)", [flask.request.form.get('id', None), hashed.decode(), get_time(), flask.request.form.get('email', '')])
+
+            first = 1
         else:
             curs.execute("insert into user (id, pw, acl, date, email) values (?, ?, 'user', ?, ?)", [flask.request.form.get('id', None), hashed.decode(), get_time(), flask.request.form.get('email', '')])
+
+            first = 0
+
+        flask.session['Now'] = 1
+        flask.session['DREAMER'] = flask.request.form.get('id', None)
+        flask.session['Daydream'] = ''
+
+        ip = ip_check()
+        agent = flask.request.headers.get('User-Agent')
         
+        curs.execute("insert into ua_d (name, ip, ua, today, sub) values (?, ?, ?, ?, '')", [flask.request.form.get('id', None), ip, agent, get_time()])        
         conn.commit()
         
-        return redirect('/login')
+        if first == 0:
+            return redirect('/user')
+        else:
+            return redirect('/setting/1')
     else:        
         contract = ''
         
@@ -3630,7 +3648,7 @@ def user_info():
     else:
         ip_user = ip
         
-        plus = '<li><a href="/login">' + load_lang('login') + '</a></li>'
+        plus = '<li><a href="/login">' + load_lang('login') + '</a></li><li><a href="/register">' + load_lang('register') + '</a></li>'
         plus2 = ''
 
     return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
@@ -3644,7 +3662,6 @@ def user_info():
                 <h2>''' + load_lang('login') + '''</h2>
                 <ul>
                     ''' + plus + '''
-                    <li><a href="/register">''' + load_lang('register') + '''</a></li>
                 </ul>
                 <br>
                 <h2>''' + load_lang('tool') + '''</h2>
