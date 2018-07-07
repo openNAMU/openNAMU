@@ -3502,7 +3502,7 @@ def recent_changes(name = None, tool = 'record'):
             if what != 'all':
                 menu = [['recent_changes', load_lang('normal')]]
                 
-            div += next_fix('/recent_change?num=', num, data_list)
+            div += next_fix('/recent_changes?num=', num, data_list)
                 
         if what == 'delete':
             sub += ' (' + load_lang('delete') + ')'
