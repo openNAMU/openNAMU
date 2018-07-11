@@ -3437,7 +3437,7 @@ def recent_changes(name = None, tool = 'record'):
             
             if six_admin == 1:
                 if hide:                            
-                    hidden = ' <a href="/hidden/' + url_pas(data[1]) + '?num=' + data[0] + '">(' + load_lang('all') + ')'
+                    hidden = ' <a href="/hidden/' + url_pas(data[1]) + '?num=' + data[0] + '">(' + load_lang('release') + ')'
                     
                     style[0] = 'background: gainsboro;'
                     style[1] = 'background: gainsboro;'
