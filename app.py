@@ -1384,7 +1384,7 @@ def deep_search(name = None):
 @app.route('/topic/<everything:name>/sub/<sub_title>/raw/<int:num>')
 def raw_view(name = None, sub_title = None, num = None):
     v_name = name
-    sub = ' (Raw)'
+    sub = ' (' + load_lang('raw') + ')'
     
     if not num:
         num = flask.request.args.get('num', None)
@@ -3462,7 +3462,7 @@ def recent_changes(name = None, tool = 'record'):
                 style[1] = 'background: gainsboro;'
 
             if tool == 'history':
-                title = '<a href="/w/' + url_pas(name) + '?num=' + data[0] + '">' + data[0] + load_lang('version') + '</a> <a href="/raw/' + url_pas(name) + '?num=' + data[0] + '">(Raw)</a> '
+                title = '<a href="/w/' + url_pas(name) + '?num=' + data[0] + '">' + data[0] + load_lang('version') + '</a> <a href="/raw/' + url_pas(name) + '?num=' + data[0] + '">(' + load_lang('raw') + ')</a> '
             else:
                 title = '<a href="/w/' + url_pas(data[1]) + '">' + html.escape(data[1]) + '</a> <a href="/history/' + url_pas(data[1]) + '">(' + data[0] + load_lang('version') + ')</a> '
                     
