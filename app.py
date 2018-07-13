@@ -1218,7 +1218,15 @@ def block_log(name = None, tool = None, tool2 = None):
     else:
         sql_num = 0
     
-    div = '<table style="width: 100%; text-align: center;"><tbody><tr><td style="width: 33.3%;">' + load_lang('blocked') + '</td><td style="width: 33.3%;">' + load_lang('admin') + '</td><td style="width: 33.3%;">' + load_lang('period') + '</td></tr>'
+    div =   '''
+            <table style="width: 100%; text-align: center;">
+                <tbody>
+                    <tr>
+                        <td style="width: 33.3%;">''' + load_lang('blocked') + '''</td>
+                        <td style="width: 33.3%;">''' + load_lang('admin') + '''</td>
+                        <td style="width: 33.3%;">''' + load_lang('period') + '''</td>
+                    </tr>
+            '''
     
     data_list = ''
     
