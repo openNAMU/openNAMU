@@ -1,5 +1,22 @@
-﻿# 모듈들 불러옴
-import css_html_js_minify
+# 모듈들 불러옴
+try:
+    import css_html_js_minify
+except:
+    def easy_minify(data):
+        data = re.sub('\n +', '\n', data)
+        
+        return data
+    
+    class css_html_js_minify:
+        def html_minify(data):
+            return easy_minify(data)
+            
+        def css_minify(data):
+            return easy_minify(data)
+            
+        def js_minify(data):
+            return easy_minify(data)
+    
 import flask
 import json
 import sqlite3
@@ -44,9 +61,7 @@ def captcha_get():
 
 def update():
     # 호환성 설정
-    try:
-        curs.execute("alter table history add hide text default ''")
-        
+    try:        
         curs.execute('select title, re from hidhi')
         for rep in curs.fetchall():
             curs.execute("update history set hide = 'O' where title = ? and id = ?", [rep[0], rep[1]])
@@ -54,27 +69,6 @@ def update():
         curs.execute("drop table if exists hidhi")
 
         print('move table hidhi')
-    except:
-        pass
-
-    try:
-        curs.execute("alter table user add date text default ''")
-
-        print('user table add column date')
-    except:
-        pass
-
-    try:
-        curs.execute("alter table rb add band text default ''")
-
-        print('rb table add column band')
-    except:
-        pass
-
-    try:
-        curs.execute("alter table ban add login text default ''")
-
-        print('ban table add column login')
     except:
         pass
 
@@ -90,13 +84,6 @@ def update():
         pass
 
     try:
-        curs.execute("alter table user add email text default ''")
-
-        print('user table add column email')
-    except:
-        pass
-
-    try:
         curs.execute('select name, sub from filter where sub != "X" and sub != ""')
         filter_name = curs.fetchall()
         if filter_name:
@@ -108,17 +95,12 @@ def update():
     except:
         pass
 
-    try:
-        curs.execute("alter table user add skin text default ''")
-
-        print('user table add column skin')
-    except:
-        pass
-
     # 3.0.5 사용자 문서, 파일 문서, 분류 문서 영어화
     try:
         all_rep = [['사용자:', 'user:'], ['파일:', 'file:'], ['분류:', 'category:']]
         all_rep2 = ['data', 'history', 'acl', 'topic', 'back']
+
+        test = 0
 
         for i in range(3):
             for j in range(6):
@@ -129,6 +111,8 @@ def update():
 
                 user_rep = curs.fetchall()
                 for user_rep2 in user_rep:
+                    test = 1
+
                     first = re.sub('^' + all_rep[i][0], all_rep[i][1], user_rep2[0])
 
                     if j == 0:
@@ -144,11 +128,10 @@ def update():
                     elif j == 5:
                         curs.execute("update back set link = ? where link = ?", [first, user_rep2[0]])
 
-        print('사용자 to user, 파일 to file, 분류 to category')
+        if test == 1:
+            print('사용자 to user, 파일 to file, 분류 to category')
     except:
         pass
-
-    conn.commit()
 
 def captcha_post(re_data, num = 1):
     if num == 1:
@@ -172,7 +155,7 @@ def captcha_post(re_data, num = 1):
     else:
         pass
 
-def load_lang(data):
+def load_lang(data, num = 0):
     global lang
 
     try:
@@ -191,7 +174,10 @@ def load_lang(data):
         if data in lang:
             return lang[data]
         else:
-            return else_lang[data]
+            if data in else_lang:
+                return else_lang[data]
+            else:
+                return data + ' (Missing)'
             
 def ip_or_user(data):
     if re.search('(\.|:)', data):
@@ -201,8 +187,8 @@ def ip_or_user(data):
 
 def edit_help_button():
     # https://stackoverflow.com/questions/11076975/insert-text-into-textarea-at-cursor-position-javascript
-    '''
-    <script>
+    js_data = '''
+        <script>
         function insertAtCursor(myField, myValue) {
             if (document.selection) { 
                 document.getElementById(myField).focus();
@@ -221,11 +207,13 @@ def edit_help_button():
     </script>
     '''
 
-    insert_list = [['[[]]', '링크'], ['[()]', '매크로'], ['{{{#!}}}', '중괄호']]
+    insert_list = [['[[|]]', 'Link'], ['[()]', 'Macro'], ['{{{#!}}}', 'Middle'], ['||<>||', 'table']]
 
-    '<a href="javascript:void(0);" onclick="insertAtCursor(\'content\', \'B\');">(A)</a>'
+    data = ''
+    for insert_data in insert_list:
+        data += '<a href="javascript:void(0);" onclick="insertAtCursor(\'content\', \'' + insert_data[0] + '\');">(' + insert_data[1] + ')</a>'
 
-    return ['', '']
+    return [js_data, data + '<hr>']
 
 def ip_warring():
     if custom()[2] == 0:    
@@ -384,7 +372,7 @@ def ip_pas(raw_ip):
     hide = 0
 
     if re.search("(\.|:)", raw_ip):
-        if not re.search("^" + load_lang('tool') + ":", raw_ip):    
+        if not re.search("^" + load_lang('tool', 1) + ":", raw_ip):    
             curs.execute("select data from other where name = 'ip_view'")
             data = curs.fetchall()
             if data and data[0][0] != '':
@@ -567,7 +555,7 @@ def ban_insert(name, end, why, login, blocker):
 
     curs.execute("select block from ban where block = ?", [name])
     if curs.fetchall():
-        curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, ?)", [name, load_lang('release'), time, blocker, '', band])
+        curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, ?)", [name, load_lang('release', 1), time, blocker, '', band])
         curs.execute("delete from ban where block = ?", [name])
     else:
         if login != '':
@@ -596,7 +584,7 @@ def history_plus(title, data, date, ip, send, leng):
     if id_data:
         curs.execute("insert into history (id, title, data, date, ip, send, leng) values (?, ?, ?, ?, ?, ?, ?)", [str(int(id_data[0][0]) + 1), title, data, date, ip, send, leng])
     else:
-        curs.execute("insert into history (id, title, data, date, ip, send, leng) values ('1', ?, ?, ?, ?, ?, ?)", [title, data, date, ip, send + ' (' + load_lang('new') + ' ' + load_lang('document') + ')', leng])
+        curs.execute("insert into history (id, title, data, date, ip, send, leng) values ('1', ?, ?, ?, ?, ?, ?)", [title, data, date, ip, send + ' (' + load_lang('new', 1) + ' ' + load_lang('document', 1) + ')', leng])
 
 def leng_check(first, second):
     if first < second:

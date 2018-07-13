@@ -181,7 +181,7 @@ def link_fix(main_link):
         
     return [main_link, other_link]
 
-def namu(conn, data, title,):
+def namu(conn, data, title, main_num):
     # DB 지정
     curs = conn.cursor()
 
@@ -595,7 +595,13 @@ def namu(conn, data, title,):
             for i in range(0, 6):
                 all_stack += str(toc_stack[i]) + '.'
 
-            all_stack = re.sub('0.', '', all_stack)
+            while 1:
+                if re.search('[^0-9]0\.', all_stack):
+                    all_stack = re.sub('[^0-9]0\.', '.', all_stack)
+                else:
+                    break
+
+            all_stack = re.sub('^0\.', '', all_stack)
             
             data = re.sub('\n(={1,6}) ?((?:(?!\n).)+) ?\n', '\n<h' + toc_number + ' id="s-' + re.sub('\.$', '', all_stack) + '"><a href="#toc">' + all_stack + '</a> ' + re.sub('=*$', '', toc[1]) + ' <span style="font-size: 12px"><a href="/edit/' + tool.url_pas(title) + '?section=' + str(edit_number) + '">(Edit)</a></span></h' + toc_number + '>\n', data, 1)
             
@@ -621,6 +627,9 @@ def namu(conn, data, title,):
     
     data = re.sub("\[anchor\((?P<in>(?:(?!\)\]).)+)\)\]", '<span id="\g<in>"></span>', data)          
     data = re.sub('\[ruby\((?P<in>(?:(?!,).)+)\, ?(?P<out>(?:(?!\)\]).)+)\)\]', '<ruby>\g<in><rp>(</rp><rt>\g<out></rt><rp>)</rp></ruby>', data)
+
+    # 글 상자 끼어들기
+    data = re.sub('{{\|(?P<in>(?:(?:(?!\|}}).)*\n*)+)\|}}', '<table><tbody><tr><td>\g<in></td></tbody></table>', data)
 
     # 원래 코드 재탕
     now_time = tool.get_time()
@@ -761,28 +770,6 @@ def namu(conn, data, title,):
     # 표 처리
     data = table_start(data)
 
-    # 하위 문서
-    while 1:
-        under_link = re.search('\[\[\.\.\/(?:\|((?:(?!]]).)+))?]]', data)
-        if under_link:
-            under_link = under_link.groups()
-
-            title_data = re.search('^(.+)\/(?:(?:(?!\/).)+)$', title)
-            if title_data:
-                title_data = title_data.groups()[0]
-
-                if under_link[0]:
-                    data = re.sub('\[\[\.\.\/(?:\|((?:(?!]]).)+))?]]', '[[' + title_data + '|' + under_link[0] + ']]', data, 1)
-                else:
-                    data = re.sub('\[\[\.\.\/(?:\|((?:(?!]]).)+))?]]', '[[' + title_data + ']]', data, 1)
-            else:
-                if under_link[0]:
-                    data = re.sub('\[\[\.\.\/(?:\|((?:(?!]]).)+))?]]', '[[' + title + '|' + under_link[0] + ']]', data, 1)
-                else:
-                    data = re.sub('\[\[\.\.\/(?:\|((?:(?!]]).)+))?]]', '[[' + title + ']]', data, 1)
-        else:
-            break
-
     # 링크 관련 문법 구현
     category = '\n<hr><div id="cate">Category : '
     while 1:
@@ -901,6 +888,13 @@ def namu(conn, data, title,):
                 return_link = link_fix(main_link)
                 main_link = return_link[0]
                 other_link = return_link[1]
+
+                if re.search('^\/', main_link):
+                    main_link = re.sub('^\/', title + '/', main_link)
+                elif re.search('\.\.\/\/', main_link):
+                    main_link = re.sub('\.\.\/\/', '/', main_link)
+                elif re.search('^\.\.\/', main_link):
+                    main_link = re.sub('^\.\.\/', re.sub('(?P<in>.+)\/.*$', '\g<in>', title), main_link)
                 
                 if not re.search('^\|', main_link):
                     if main_link != title:
@@ -1032,6 +1026,33 @@ def namu(conn, data, title,):
                 data = data.replace('<span id="' + end_data[i][0] + '"></span>', '<code>' + end_data[i][1] + '</code>')
 
         i += 1
+
+    if main_num == 1:
+        # 역링크에도
+        i = 0
+        while 1:
+            try:
+                _ = backlink[i][0]
+            except:
+                break
+
+            find_data = re.search('<span id="(one_nowiki_[0-9]+)">', backlink[i][1])
+            if find_data:
+                j = 0
+                find_data = find_data.groups()[0]
+
+                while 1:
+                    try:
+                        _ = end_data[j][0]
+                    except:
+                        break
+
+                    if end_data[j][0] == find_data:
+                        backlink[i][1] = backlink[i][1].replace('<span id="' + end_data[j][0] + '"></span>', end_data[j][1])
+
+                    j += 1
+
+            i += 1
     
     # 마지막 처리
     data = re.sub('<\/td_end>', '</td>', data)

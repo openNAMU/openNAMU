@@ -1,4 +1,5 @@
 # 모듈 불러오기
+import werkzeug.routing
 import flask_compress
 import flask_reggie
 import tornado.ioloop
@@ -19,7 +20,9 @@ import sys
 from func import *
 
 # 버전 표기
-r_ver = 'v3.0.5-Proven_Beta-01'
+r_ver = 'v3.0.5-Stable-99'
+c_ver = ''.join(re.findall('[0-9]', r_ver))
+
 print('Version : ' + r_ver)
 
 # set.json 설정 확인
@@ -44,6 +47,11 @@ except:
             
             pass
 
+if os.path.exists(set_data['db'] + '.db'):
+    setup_tool = 0
+else:
+    setup_tool = 1
+
 # 디비 연결
 conn = sqlite3.connect(set_data['db'] + '.db', check_same_thread = False)
 curs = conn.cursor()
@@ -58,38 +66,106 @@ flask_reggie.Reggie(app)
 compress = flask_compress.Compress()
 compress.init_app(app)
 
+class EverythingConverter(werkzeug.routing.PathConverter):
+    regex = '.*?'
+
 # 템플릿 설정
 app.jinja_env.filters['md5_replace'] = md5_replace
 app.jinja_env.filters['load_lang'] = load_lang
 
+app.url_map.converters['everything'] = EverythingConverter
+
 # 셋업 부분
-curs.execute('create table if not exists data(title text, data text)')
-curs.execute('create table if not exists history(id text, title text, data text, date text, ip text, send text, leng text, hide text)')
-curs.execute('create table if not exists rd(title text, sub text, date text)')
-curs.execute('create table if not exists user(id text, pw text, acl text, date text, email text, skin text)')
-curs.execute('create table if not exists ban(block text, end text, why text, band text, login text)')
-curs.execute('create table if not exists topic(id text, title text, sub text, data text, date text, ip text, block text, top text)')
-curs.execute('create table if not exists stop(title text, sub text, close text)')
-curs.execute('create table if not exists rb(block text, end text, today text, blocker text, why text, band text)')
-curs.execute('create table if not exists back(title text, link text, type text)')
-curs.execute('create table if not exists agreedis(title text, sub text)')
-curs.execute('create table if not exists custom(user text, css text)')
-curs.execute('create table if not exists other(name text, data text)')
-curs.execute('create table if not exists alist(name text, acl text)')
-curs.execute('create table if not exists re_admin(who text, what text, time text)')
-curs.execute('create table if not exists alarm(name text, data text, date text)')
-curs.execute('create table if not exists ua_d(name text, ip text, ua text, today text, sub text)')
-curs.execute('create table if not exists filter(name text, regex text, sub text)')
-curs.execute('create table if not exists scan(user text, title text)')
-curs.execute('create table if not exists acl(title text, dec text, dis text, why text)')
-curs.execute('create table if not exists inter(title text, link text)')
-curs.execute('create table if not exists html_filter(html text)')
+curs.execute('create table if not exists data(test text)')
+curs.execute('create table if not exists history(test text)')
+curs.execute('create table if not exists rd(test text)')
+curs.execute('create table if not exists user(test text)')
+curs.execute('create table if not exists user_set(test text)')
+curs.execute('create table if not exists ban(test text)')
+curs.execute('create table if not exists topic(test text)')
+curs.execute('create table if not exists stop(test text)')
+curs.execute('create table if not exists rb(test text)')
+curs.execute('create table if not exists back(test text)')
+curs.execute('create table if not exists agreedis(test text)')
+curs.execute('create table if not exists custom(test text)')
+curs.execute('create table if not exists other(test text)')
+curs.execute('create table if not exists alist(test text)')
+curs.execute('create table if not exists re_admin(test text)')
+curs.execute('create table if not exists alarm(test text)')
+curs.execute('create table if not exists ua_d(test text)')
+curs.execute('create table if not exists filter(test text)')
+curs.execute('create table if not exists scan(test text)')
+curs.execute('create table if not exists acl(test text)')
+curs.execute('create table if not exists inter(test text)')
+curs.execute('create table if not exists html_filter(test text)')
+
+if setup_tool == 0:
+    curs.execute('select data from other where name = "ver"')
+    ver_set_data = curs.fetchall()
+    if not ver_set_data:
+        setup_tool = 1
+    else:
+        if c_ver > ver_set_data[0][0]:
+            setup_tool = 1
+
+if setup_tool != 0:
+    # create table
+    create_data = {}
+
+    create_data['all_data'] = ['data', 'history', 'rd', 'user', 'ban', 'topic', 'stop', 'rb', 'back', 'agreedis', 'custom', 'other', 'alist', 're_admin', 'alarm', 'ua_d', 'filter', 'scan', 'acl', 'inter', 'html_filter']
+
+    create_data['data'] = ['title', 'data']
+    create_data['history'] = ['id', 'title', 'data', 'date', 'ip', 'send', 'leng', 'hide']
+    create_data['rd'] = ['title', 'sub', 'date', 'band']
+    create_data['user'] = ['id', 'pw', 'acl', 'date', 'email', 'skin']
+    create_data['user_set'] = ['name', 'data']
+    create_data['ban'] = ['block', 'end', 'why', 'band', 'login']
+    create_data['topic'] = ['id', 'title', 'sub', 'data', 'date', 'ip', 'block', 'top']
+    create_data['stop'] = ['title', 'sub', 'close']
+    create_data['rb'] = ['block', 'end', 'today', 'blocker', 'why', 'band']
+    create_data['back'] = ['title', 'link', 'type']
+    create_data['agreedis'] = ['title', 'sub']
+    create_data['custom'] = ['user', 'css']
+    create_data['other'] = ['name', 'data']
+    create_data['alist'] = ['name', 'acl']
+    create_data['re_admin'] = ['who', 'what', 'time']
+    create_data['alarm'] = ['name', 'data', 'date']
+    create_data['ua_d'] = ['name', 'ip', 'ua', 'today', 'sub']
+    create_data['filter'] = ['name', 'regex', 'sub']
+    create_data['scan'] = ['user', 'title']
+    create_data['acl'] = ['title', 'dec', 'dis', 'why']
+    create_data['inter'] = ['title', 'link']
+    create_data['html_filter'] = ['html']
+
+    for create_table in create_data['all_data']:
+        for create in create_data[create_table]:
+            try:
+                curs.execute('select ' + create + ' from ' + create_table + ' limit 1')
+            except:
+                curs.execute("alter table " + create_table + " add " + create + " text default ''")
+        
+        try:
+            curs.execute('select test from ' + create_table + ' limit 1')
+            curs.execute("alter table " + create_table + " drop test")
+        except:
+            pass
+
+    # update
+    update()
 
 # owner 존재 확인
 curs.execute('select name from alist where acl = "owner"')
 if not curs.fetchall():
     curs.execute('delete from alist where name = "owner"')
     curs.execute('insert into alist (name, acl) values ("owner", "owner")')
+
+# image folder create
+if not os.path.exists('image'):
+    os.makedirs('image')
+    
+# views folder create
+if not os.path.exists('views'):
+    os.makedirs('views')
 
 # 포트 점검
 curs.execute('select data from other where name = "port"')
@@ -169,19 +245,12 @@ else:
     
     print('Language : ' + str(rep_language))
 
+# ver 갱신
+curs.execute('delete from alist where name = "ver"')
+curs.execute('insert into alist (name, acl) values ("ver", ?)', [c_ver])
+
 json_data = open(os.path.join('language', rep_language + '.json'), 'rt', encoding='utf-8').read()
 lang_data = json.loads(json_data)
-
-# update
-update()
-
-# image folder create
-if not os.path.exists('image'):
-    os.makedirs('image')
-    
-# views folder create
-if not os.path.exists('views'):
-    os.makedirs('views')
 
 # backup set
 def back_up():
@@ -210,6 +279,8 @@ if back_time != 0:
         back_up()
 else:
     print('Back Up OFF')
+
+conn.commit()
 
 @app.route('/del_alarm')
 def del_alarm():
@@ -258,7 +329,7 @@ def inter_wiki(tools = None):
     else:
         del_link = 'del_html_filter'
         plus_link = 'plus_html_filter'
-        title = 'HTML Filter ' + load_lang('list')
+        title = 'HTML' + load_lang('filter') + ' ' + load_lang('list')
         div = '<ul><li>span</li><li>div</li><li>iframe</li></ul>'
 
         curs.execute('select html from html_filter')
@@ -324,23 +395,29 @@ def plus_inter(tools = None):
             title = load_lang('interwiki') + ' ' + load_lang('plus')
             form_data = '<input placeholder="' + load_lang('name') + '" type="text" name="title"><hr><input placeholder="Link" type="text" name="link">'
         else:
-            title = 'HTML Filter ' + load_lang('plus')
+            title = 'HTML ' + load_lang('filter') + ' ' + load_lang('plus')
             form_data = '<input placeholder="HTML" type="text" name="title">'
 
         return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
             imp = [title, wiki_set(), custom(), other2([0, 0])],
-            data = '<form method="post">' + form_data + '<hr><button type="submit">' + load_lang('plus') + '</button></form>',
+            data =  '''
+                    <form method="post">
+                        ''' + form_data + '''
+                        <hr>
+                        <button type="submit">''' + load_lang('plus') + '''</button>
+                    </form>
+                    ''',
             menu = [['other', load_lang('other')]]
         ))
 
-@app.route('/edit_set')
-@app.route('/edit_set/<int:num>', methods=['POST', 'GET'])
-def edit_set(num = 0):
+@app.route('/setting')
+@app.route('/setting/<int:num>', methods=['POST', 'GET'])
+def setting(num = 0):
     if num != 0 and admin_check(None, None) != 1:
         return re_error('/ban')
 
     if num == 0:
-        li_list = ['Main', 'Set Text', 'Main HEAD', 'robots.txt', 'Google']
+        li_list = [load_lang('main'), load_lang('set_text'), load_lang('main_head'), 'robots.txt', 'Google']
         
         x = 0
         
@@ -348,7 +425,7 @@ def edit_set(num = 0):
         
         for li in li_list:
             x += 1
-            li_data += '<li><a href="/edit_set/' + str(x) + '">' + li + '</a></li>'
+            li_data += '<li><a href="/setting/' + str(x) + '">' + li + '</a></li>'
 
         return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
             imp = [load_lang('setting'), wiki_set(), custom(), other2([0, 0])],
@@ -370,7 +447,7 @@ def edit_set(num = 0):
 
             admin_check(None, 'edit_set')
 
-            return redirect('/edit_set/1')
+            return redirect('/setting/1')
         else:
             d_list = []
             
@@ -429,7 +506,7 @@ def edit_set(num = 0):
                 div3 += '<option value="stable">stable</option>'
 
             return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
-                imp = ['Main', wiki_set(), custom(), other2([0, 0])],
+                imp = [load_lang('main'), wiki_set(), custom(), other2([0, 0])],
                 data =  '''
                         <form method="post">
                             <span>''' + load_lang('name') + '''</span>
@@ -437,56 +514,56 @@ def edit_set(num = 0):
                             <br>
                             <input placeholder="''' + load_lang('name') + '''" type="text" name="name" value="''' + html.escape(d_list[0]) + '''">
                             <hr>
-                            <span>Logo (HTML)</span>
+                            <span>''' + load_lang('logo') + ''' (HTML)</span>
                             <br>
                             <br>
-                            <input placeholder="Logo" type="text" name="logo" value="''' + html.escape(d_list[1]) + '''">
+                            <input placeholder="''' + load_lang('logo') + '''" type="text" name="logo" value="''' + html.escape(d_list[1]) + '''">
                             <hr>
-                            <span>FrontPage</span>
+                            <span>''' + load_lang('frontpage') + '''</span>
                             <br>
                             <br>
-                            <input placeholder="FrontPage" type="text" name="frontpage" value="''' + html.escape(d_list[2]) + '''">
+                            <input placeholder="''' + load_lang('frontpage') + '''" type="text" name="frontpage" value="''' + html.escape(d_list[2]) + '''">
                             <hr>
                             <span>''' + load_lang('license') + ''' (HTML)</span>
                             <br>
                             <br>
                             <input placeholder="''' + load_lang('license') + '''" type="text" name="license" value="''' + html.escape(d_list[3]) + '''">
                             <hr>
-                            <span>Max File Size [MB]</span>
+                            <span>''' + load_lang('max_file_size') + ''' [MB]</span>
                             <br>
                             <br>
-                            <input placeholder="Max File Size" type="text" name="upload" value="''' + html.escape(d_list[4]) + '''">
+                            <input placeholder="''' + load_lang('max_file_size') + '''" type="text" name="upload" value="''' + html.escape(d_list[4]) + '''">
                             <hr>
-                            <span>Back Up Interval [''' + load_lang('hour') + '''] (OFF : 0) {Need To Restart}</span>
+                            <span>''' + load_lang('back_up_interval') + ' [' + load_lang('hour') + '] (OFF : 0) {' + load_lang('need_to_restart') + '''}</span>
                             <br>
                             <br>
-                            <input placeholder="Back Up Interval" type="text" name="back_up" value="''' + html.escape(d_list[9]) + '''">
+                            <input placeholder="''' + load_lang('back_up_interval') + '''" type="text" name="back_up" value="''' + html.escape(d_list[9]) + '''">
                             <hr>
-                            <span>Skin</span>
+                            <span>''' + load_lang('skin') + '''</span>
                             <br>
                             <br>
                             <select name="skin">''' + div2 + '''</select>
                             <hr>
-                            <span>Default ACL</span>
+                            <span>''' + load_lang('default_acl') + '''</span>
                             <br>
                             <br>
                             <select name="edit">''' + div + '''</select>
                             <hr>
-                            <input type="checkbox" name="reg" ''' + ch_1 + '''> Unable Register
+                            <input type="checkbox" name="reg" ''' + ch_1 + '''> ''' + load_lang('unable_register') + '''
                             <hr>
-                            <input type="checkbox" name="ip_view" ''' + ch_2 + '''> IP Hidden
+                            <input type="checkbox" name="ip_view" ''' + ch_2 + '''> ''' + load_lang('ip_hidden') + '''
                             <hr>
-                            <span>Port</span>
+                            <span>''' + load_lang('port') + '''</span>
                             <br>
                             <br>
-                            <input placeholder="Port" type="text" name="port" value="''' + html.escape(d_list[10]) + '''">
+                            <input placeholder="''' + load_lang('port') + '''" type="text" name="port" value="''' + html.escape(d_list[10]) + '''">
                             <hr>
-                            <span>Secret Key</span>
+                            <span>''' + load_lang('secret_key') + '''</span>
                             <br>
                             <br>
-                            <input placeholder="Secret Key" type="password" name="key" value="''' + html.escape(d_list[11]) + '''">
+                            <input placeholder="''' + load_lang('secret_key') + '''" type="password" name="key" value="''' + html.escape(d_list[11]) + '''">
                             <hr>
-                            <span>Update Branch</span>
+                            <span>''' + load_lang('update_branch') + '''</span>
                             <br>
                             <br>
                             <select name="update">''' + div3 + '''</select>
@@ -494,7 +571,7 @@ def edit_set(num = 0):
                             <button id="save" type="submit">''' + load_lang('save') + '''</button>
                         </form>
                         ''',
-                menu = [['edit_set', load_lang('setting')]]
+                menu = [['setting', load_lang('setting')]]
             ))
     elif num == 2:
         if flask.request.method == 'POST':
@@ -504,7 +581,7 @@ def edit_set(num = 0):
             
             admin_check(None, 'edit_set')
 
-            return redirect('/edit_set/2')
+            return redirect('/setting/2')
         else:
             i_list = ['contract', 'no_login_warring']
             n_list = ['', '']
@@ -527,7 +604,7 @@ def edit_set(num = 0):
             conn.commit()
 
             return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
-                imp = ['Set Text', wiki_set(), custom(), other2([0, 0])],
+                imp = [load_lang('set_text'), wiki_set(), custom(), other2([0, 0])],
                 data =  '''
                         <form method="post">
                             <span>Register Text</span>
@@ -543,7 +620,7 @@ def edit_set(num = 0):
                             <button id="save" type="submit">''' + load_lang('save') + '''</button>
                         </form>
                         ''',
-                menu = [['edit_set', load_lang('setting')]]
+                menu = [['setting', load_lang('setting')]]
             ))
     elif num == 3:
         if flask.request.method == 'POST':
@@ -557,7 +634,7 @@ def edit_set(num = 0):
 
             admin_check(None, 'edit_set')
 
-            return redirect('/edit_set/3')
+            return redirect('/setting/3')
         else:
             curs.execute("select data from other where name = 'head'")
             head = curs.fetchall()
@@ -567,7 +644,7 @@ def edit_set(num = 0):
                 data = ''
 
             return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
-                imp = ['Main HEAD', wiki_set(), custom(), other2([0, 0])],
+                imp = [load_lang('main_head'), wiki_set(), custom(), other2([0, 0])],
                 data =  '''
                         <form method="post">
                             <textarea rows="25" name="content">''' + html.escape(data) + '''</textarea>
@@ -575,7 +652,7 @@ def edit_set(num = 0):
                             <button id="save" type="submit">''' + load_lang('save') + '''</button>
                         </form>
                         ''',
-                menu = [['edit_set', load_lang('setting')]]
+                menu = [['setting', load_lang('setting')]]
             ))
     elif num == 4:
         if flask.request.method == 'POST':
@@ -593,7 +670,7 @@ def edit_set(num = 0):
             
             admin_check(None, 'edit_set')
 
-            return redirect('/edit_set/4')
+            return redirect('/setting/4')
         else:
             curs.execute("select data from other where name = 'robot'")
             robot = curs.fetchall()
@@ -620,7 +697,7 @@ def edit_set(num = 0):
                             <button id="save" type="submit">''' + load_lang('save') + '''</button>
                         </form>
                         ''',
-                menu = [['edit_set', load_lang('setting')]]
+                menu = [['setting', load_lang('setting')]]
             ))
     elif num == 5:
         if flask.request.method == 'POST':
@@ -630,7 +707,7 @@ def edit_set(num = 0):
             
             admin_check(None, 'edit_set')
 
-            return redirect('/edit_set/5')
+            return redirect('/setting/5')
         else:
             i_list = ['recaptcha', 'sec_re']
             n_list = ['', '']
@@ -667,8 +744,9 @@ def edit_set(num = 0):
                             <input placeholder="reCAPTCHA (Secret Key)" type="text" name="sec_re" value="''' + html.escape(d_list[1]) + '''">
                             <hr>
                             <button id="save" type="submit">''' + load_lang('save') + '''</button>
-                        </form>''',
-                menu = [['edit_set', load_lang('setting')]]
+                        </form>
+                        ''',
+                menu = [['setting', load_lang('setting')]]
             ))
     else:
         return redirect('/')
@@ -793,7 +871,13 @@ def admin_plus(name = None):
 
         return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
             imp = [load_lang('admin_group') + ' ' + load_lang('plus'), wiki_set(), custom(), other2([0, 0])],
-            data = '<form method="post">' + data + '<hr><button id="save" ' + state +  ' type="submit">' + load_lang('save') + '</button></form>',
+            data =  '''
+                    <form method="post">
+                        ''' + data + '''
+                        <hr>
+                        <button id="save" ''' + state +  ''' type="submit">''' + load_lang('save') + '''</button>
+                    </form>
+                    ''',
             menu = [['manager', load_lang('admin')]]
         ))        
         
@@ -818,7 +902,7 @@ def admin_list():
         menu = [['other', load_lang('other')]]
     ))
         
-@app.route('/hidden/<path:name>')
+@app.route('/hidden/<everything:name>')
 def history_hidden(name = None):
     num = int(flask.request.args.get('num', 0))
 
@@ -962,7 +1046,7 @@ def indexing():
 
     conn.commit()
     
-    return redirect('/')        
+    return redirect('/')     
 
 @app.route('/re_start', methods=['POST', 'GET'])
 def re_start():
@@ -1021,11 +1105,11 @@ def update():
 
     return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
         imp = [load_lang('update'), wiki_set(), custom(), other2([0, 0])],
-        data = 'Auto Update Is Not Support. <a href="https://github.com/2DU/openNAMU">(GitHub)</a>',
+        data = 'Auto update is not support. <a href="https://github.com/2DU/openNAMU">(GitHub)</a>',
         menu = [['manager/1', load_lang('admin')]]
     ))
         
-@app.route('/xref/<path:name>')
+@app.route('/xref/<everything:name>')
 def xref(name = None):
     num = int(flask.request.args.get('num', 1))
     if num * 50 > 0:
@@ -1045,7 +1129,7 @@ def xref(name = None):
         
         div += '</li>'
         
-        if re.search('^' + load_lang('template') + ':', data[0]):
+        if re.search('^' + load_lang('template', 1) + ':', data[0]):
             div += '<li><a id="inside" href="/xref/' + url_pas(data[0]) + '">' + data[0] + '</a> (' + load_lang('backlink') + ')</li>'
       
     div += '</ul>' + next_fix('/xref/' + url_pas(name) + '?num=', num, data_list)
@@ -1135,7 +1219,15 @@ def block_log(name = None, tool = None, tool2 = None):
     else:
         sql_num = 0
     
-    div = '<table style="width: 100%; text-align: center;"><tbody><tr><td style="width: 33.3%;">' + load_lang('blocked') + '</td><td style="width: 33.3%;">' + load_lang('admin') + '</td><td style="width: 33.3%;">' + load_lang('period') + '</td></tr>'
+    div =   '''
+            <table style="width: 100%; text-align: center;">
+                <tbody>
+                    <tr>
+                        <td style="width: 33.3%;">''' + load_lang('blocked') + '''</td>
+                        <td style="width: 33.3%;">''' + load_lang('admin') + '''</td>
+                        <td style="width: 33.3%;">''' + load_lang('period') + '''</td>
+                    </tr>
+            '''
     
     data_list = ''
     
@@ -1144,7 +1236,7 @@ def block_log(name = None, tool = None, tool2 = None):
             div =   '''
                     <a href="/manager/11">(''' + load_lang('blocked') + ''')</a> <a href="/manager/12">(''' + load_lang('admin') + ''')</a>
                     <hr>
-                    <a href="/block_log/ip">(IP)</a> <a href="/block_log/user">(''' + load_lang('subscriber') + ')</a> <a href="/block_log/never_end">(' + load_lang('limitless') + ')</a> <a href="/block_log/can_end">(' + load_lang('period') + ')</a> <a href="/block_log/end">(' + load_lang('release') + ')</a> <a href="/block_log/now">(' + load_lang('now') + ')</a> <a href="/block_log/edit_filter">(' + load_lang('edit_filter') + ''')</a>
+                    <a href="/block_log/ip">(IP)</a> <a href="/block_log/user">(''' + load_lang('subscriber') + ')</a> <a href="/block_log/never_end">(' + load_lang('limitless') + ')</a> <a href="/block_log/can_end">(' + load_lang('period') + ')</a> <a href="/block_log/end">(' + load_lang('release') + ')</a> <a href="/block_log/now">(' + load_lang('now') + ')</a> <a href="/block_log/edit_filter">(' + load_lang('edit') + ' ' + load_lang('filter') + ''')</a>
                     <hr>
                     ''' + div
             
@@ -1166,11 +1258,11 @@ def block_log(name = None, tool = None, tool2 = None):
             elif tool2 == 'never_end':
                 sub = '(' + load_lang('limitless') + ')'
                 
-                curs.execute("select why, block, blocker, end, today from rb where not end like ? and not end like ? order by today desc limit ?, '50'", ['%:%', '%' + load_lang('release') + '%', str(sql_num)])
+                curs.execute("select why, block, blocker, end, today from rb where not end like ? and not end like ? order by today desc limit ?, '50'", ['%:%', '%' + load_lang('release', 1) + '%', str(sql_num)])
             elif tool2 == 'end':
                 sub = '(' + load_lang('release') + ')'
                 
-                curs.execute("select why, block, blocker, end, today from rb where end = ? order by today desc limit ?, '50'", [load_lang('release'), str(sql_num)])
+                curs.execute("select why, block, blocker, end, today from rb where end = ? order by today desc limit ?, '50'", [load_lang('release', 1), str(sql_num)])
             elif tool2 == 'now':
                 sub = '(' + load_lang('now') + ')'
                 
@@ -1182,9 +1274,9 @@ def block_log(name = None, tool = None, tool2 = None):
                     
                     data_list = [curs.fetchall()[0]] + data_list
             elif tool2 == 'edit_filter':
-                sub = '(' + load_lang('edit_filter') + ')'
+                sub = '(' + load_lang('edit') + ' ' + load_lang('filter') + ')'
 
-                curs.execute("select why, block, blocker, end, today from rb where blocker = ? order by today desc limit ?, '50'", [load_lang('tool') + ':' + load_lang('edit_filter'), str(sql_num)])
+                curs.execute("select why, block, blocker, end, today from rb where blocker = ? order by today desc limit ?, '50'", [load_lang('tool', 1) + ':' + load_lang('edit', 1) + ' ' + load_lang('filter', 1), str(sql_num)])
             else:
                 sub = '(' + load_lang('period') + ')'
                 
@@ -1252,7 +1344,7 @@ def goto():
     else:
         return redirect('/search/' + url_pas(flask.request.form.get('search', None)))
 
-@app.route('/search/<path:name>')
+@app.route('/search/<everything:name>')
 def deep_search(name = None):
     num = int(flask.request.args.get('num', 1))
     if num * 50 > 0:
@@ -1286,7 +1378,7 @@ def deep_search(name = None):
 
             div_plus += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a> (' + data[1] + ')</li>'
     else:
-        div += '<li>Not Found.</li>'
+        div += '<li>404</li>'
 
     div += div_plus + '</ul>'
     div += next_fix('/search/' + url_pas(name) + '?num=', num, all_list)
@@ -1297,11 +1389,11 @@ def deep_search(name = None):
         menu = 0
     ))
          
-@app.route('/raw/<path:name>')
-@app.route('/topic/<path:name>/sub/<sub_title>/raw/<int:num>')
+@app.route('/raw/<everything:name>')
+@app.route('/topic/<everything:name>/sub/<sub_title>/raw/<int:num>')
 def raw_view(name = None, sub_title = None, num = None):
     v_name = name
-    sub = ' (Raw)'
+    sub = ' (' + load_lang('raw') + ')'
     
     if not num:
         num = flask.request.args.get('num', None)
@@ -1343,7 +1435,7 @@ def raw_view(name = None, sub_title = None, num = None):
     else:
         return redirect('/w/' + url_pas(name))
         
-@app.route('/revert/<path:name>', methods=['POST', 'GET'])
+@app.route('/revert/<everything:name>', methods=['POST', 'GET'])
 def revert(name = None):    
     num = int(flask.request.args.get('num', 0))
 
@@ -1355,7 +1447,7 @@ def revert(name = None):
         return re_error('/ban')
 
     if flask.request.method == 'POST':
-        if captcha_post(flask.request.form.get('g-recaptcha-response', None), conn) == 1:
+        if captcha_post(flask.request.form.get('g-recaptcha-response', None)) == 1:
             return re_error('/error/13')
         else:
             captcha_post('', 0)
@@ -1375,7 +1467,7 @@ def revert(name = None):
                 leng = ' +' + str(len(data[0][0]))
                 curs.execute("insert into data (title, data) values (?, ?)", [name, data[0][0]])
                 
-            history_plus(name, data[0][0], get_time(), ip_check(), flask.request.form.get('send', None) + ' (' + str(num) + load_lang('version') + ')', leng)
+            history_plus(name, data[0][0], get_time(), ip_check(), flask.request.form.get('send', None) + ' (' + str(num) + load_lang('version', 1) + ')', leng)
             namumark(
                 title = name,
                 data = data[0][0],
@@ -1423,7 +1515,7 @@ def edit_filter():
         div = '<a href="/manager/9">(' + load_lang('plus') + ')</a>'
 
     return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
-        imp = [load_lang('edit_filter') + ' ' + load_lang('list'), wiki_set(), custom(), other2([0, 0])],
+        imp = [load_lang('edit') + ' ' + load_lang('filter') + ' ' + load_lang('list'), wiki_set(), custom(), other2([0, 0])],
         data = div,
         menu = [['manager', load_lang('admin')]]
     ))
@@ -1478,7 +1570,7 @@ def set_edit_filter(name = None):
             stat = ''
 
         return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
-            imp = [name, wiki_set(), custom(), other2([' (' + load_lang('edit_filter') + ')', 0])],
+            imp = [name, wiki_set(), custom(), other2([' (' + load_lang('edit') + ' ' + load_lang('filter') + ')', 0])],
             data =  '''
                     <form method="post">
                         <input ''' + stat + ''' type="checkbox" ''' + time_data + ''' name="ban">
@@ -1487,11 +1579,12 @@ def set_edit_filter(name = None):
                         <input ''' + stat + ''' placeholder="Regex" name="content" value="''' + html.escape(textarea) + '''" type="text">
                         <hr>
                         <button ''' + stat + ''' id="save" type="submit">''' + load_lang('save') + '''</button>
-                    </form>''',
+                    </form>
+                    ''',
             menu = [['edit_filter', load_lang('list')], ['edit_filter/' + url_pas(name) + '/delete', load_lang('delete')]]
         ))
 
-@app.route('/edit/<path:name>', methods=['POST', 'GET'])
+@app.route('/edit/<everything:name>', methods=['POST', 'GET'])
 def edit(name = None):
     ip = ip_check()
     if acl_check(name) == 1:
@@ -1504,11 +1597,17 @@ def edit(name = None):
                 match = re.compile(data_list[0])
                 if match.search(flask.request.form.get('content', None)):
                     if data_list[1] == 'X':
-                        ban_insert(ip, '', load_lang('edit_filter'), None, load_lang('tool') + ':' + load_lang('edit_filter'))
+                        ban_insert(
+                            ip, 
+                            '', 
+                            load_lang('edit', 1) + ' ' + load_lang('filter', 1), 
+                            None, 
+                            load_lang('tool', 1) + ':' + load_lang('edit', 1) + ' ' + load_lang('filter', 1)
+                        )
                     
                     return re_error('/error/21')
 
-        if captcha_post(flask.request.form.get('g-recaptcha-response', None), conn) == 1:
+        if captcha_post(flask.request.form.get('g-recaptcha-response', None)) == 1:
             return re_error('/error/13')
         else:
             captcha_post('', 0)
@@ -1611,10 +1710,7 @@ def edit(name = None):
         
         if not flask.request.args.get('section', None):
             get_name =  '''
-                        <form method="post" id="get_edit" action="/edit_get/''' + url_pas(name) + '''">
-                            <input placeholder="Load Document" name="name" style="width: 50%;" type="text">
-                            <button id="come" type="submit">Load</button>
-                        </form>
+                        <a href="/manager/15?plus=''' + url_pas(name) + '''">(Load)</a>
                         <hr>
                         '''
             action = ''
@@ -1622,8 +1718,8 @@ def edit(name = None):
             get_name = ''
             action = '?section=' + flask.request.args.get('section', None)
             
-        if flask.request.args.get('froms', None):
-            curs.execute("select data from data where title = ?", [flask.request.args.get('froms', None)])
+        if flask.request.args.get('plus', None):
+            curs.execute("select data from data where title = ?", [flask.request.args.get('plus', None)])
             get_data = curs.fetchall()
             if get_data:
                 data = get_data[0][0]
@@ -1648,12 +1744,8 @@ def edit(name = None):
                     ''',
             menu = [['w/' + url_pas(name), load_lang('document')], ['delete/' + url_pas(name), load_lang('delete')], ['move/' + url_pas(name), load_lang('move')]]
         ))
-        
-@app.route('/edit_get/<path:name>', methods=['POST'])
-def edit_get(name = None):
-    return redirect('/edit/' + url_pas(name) + '?froms=' + url_pas(flask.request.form.get('name', None)))
 
-@app.route('/preview/<path:name>', methods=['POST'])
+@app.route('/preview/<everything:name>', methods=['POST'])
 def preview(name = None):
     ip = ip_check()
     if acl_check(name) == 1:
@@ -1694,14 +1786,14 @@ def preview(name = None):
         menu = [['w/' + url_pas(name), load_lang('document')]]
     ))
         
-@app.route('/delete/<path:name>', methods=['POST', 'GET'])
+@app.route('/delete/<everything:name>', methods=['POST', 'GET'])
 def delete(name = None):
     ip = ip_check()
     if acl_check(name) == 1:
         return re_error('/ban')
     
     if flask.request.method == 'POST':
-        if captcha_post(flask.request.form.get('g-recaptcha-response', None), conn) == 1:
+        if captcha_post(flask.request.form.get('g-recaptcha-response', None)) == 1:
             return re_error('/error/13')
         else:
             captcha_post('', 0)
@@ -1712,7 +1804,14 @@ def delete(name = None):
             today = get_time()
             leng = '-' + str(len(data[0][0]))
             
-            history_plus(name, '', today, ip, flask.request.form.get('send', None) + ' (' + load_lang('delete') + ')', leng)
+            history_plus(
+                name, 
+                '', 
+                today, 
+                ip, 
+                flask.request.form.get('send', None) + ' (' + load_lang('delete', 1) + ')', 
+                leng
+            )
             
             curs.execute("select title, link from back where title = ? and not type = 'cat' and not type = 'no'", [name])
             for data in curs.fetchall():
@@ -1742,11 +1841,11 @@ def delete(name = None):
             menu = [['w/' + url_pas(name), load_lang('document')]]
         ))            
             
-@app.route('/move_data/<path:name>')
+@app.route('/move_data/<everything:name>')
 def move_data(name = None):    
     data = '<ul>'
     
-    curs.execute("select send, date, ip from history where send like ? or send like ? order by date desc", ['%<a href="/w/' + url_pas(name) + '">' + name + '</a> ' + load_lang('move') + ')%', '%(<a href="/w/' + url_pas(name) + '">' + name + '</a>%'])
+    curs.execute("select send, date, ip from history where send like ? or send like ? order by date desc", ['%<a href="/w/' + url_pas(name) + '">' + name + '</a> ' + load_lang('move', 1) + ')%', '%(<a href="/w/' + url_pas(name) + '">' + name + '</a>%'])
     for for_data in curs.fetchall():
         match = re.findall('<a href="\/w\/(?:(?:(?!">).)+)">((?:(?!<\/a>).)+)<\/a>', for_data[0])
         send = re.sub('\([^\)]+\)$', '', for_data[0])
@@ -1765,13 +1864,13 @@ def move_data(name = None):
         menu = [['history/' + url_pas(name), load_lang('history')]]
     ))        
             
-@app.route('/move/<path:name>', methods=['POST', 'GET'])
+@app.route('/move/<everything:name>', methods=['POST', 'GET'])
 def move(name = None):
     if acl_check(name) == 1:
         return re_error('/ban')
 
     if flask.request.method == 'POST':
-        if captcha_post(flask.request.form.get('g-recaptcha-response', None), conn) == 1:
+        if captcha_post(flask.request.form.get('g-recaptcha-response', None)) == 1:
             return re_error('/error/13')
         else:
             captcha_post('', 0)
@@ -1790,7 +1889,14 @@ def move(name = None):
         else:
             data_in = ''
             
-        history_plus(name, data_in, get_time(), ip_check(), flask.request.form.get('send', None) + ' (<a href="/w/' + url_pas(name) + '">' + name + '</a> - <a href="/w/' + url_pas(flask.request.form.get('title', None)) + '">' + flask.request.form.get('title', None) + '</a> ' + load_lang('move') + ')', '0')
+        history_plus(
+            name, 
+            data_in, 
+            get_time(), 
+            ip_check(), 
+            flask.request.form.get('send', None) + ' (<a>' + name + '</a> - <a>' + flask.request.form.get('title', None) + '</a> ' + load_lang('move', 1) + ')', 
+            '0'
+        )
         
         curs.execute("select title, link from back where title = ? and not type = 'cat' and not type = 'no'", [name])
         for data in curs.fetchall():
@@ -1860,7 +1966,22 @@ def other():
 @app.route('/manager', methods=['POST', 'GET'])
 @app.route('/manager/<int:num>', methods=['POST', 'GET'])
 def manager(num = 1):
-    title_list = [[load_lang('document') + ' ' + load_lang('name'), 'acl'], [0, 'check'], [0, 'ban'], [0, 'admin'], [0, 'record'], [0, 'topic_record'], [load_lang('name'), 'admin_plus'], [load_lang('name'), 'edit_filter'], [load_lang('document') + ' ' + load_lang('name'), 'search'], [0, 'block_user'], [0, 'block_admin'], [load_lang('document') + ' ' + load_lang('name'), 'watch_list'], [load_lang('compare'), 'check']]
+    title_list = [
+        [load_lang('document') + ' ' + load_lang('name'), 'acl'], 
+        [0, 'check'], 
+        [0, 'ban'], 
+        [0, 'admin'], 
+        [0, 'record'], 
+        [0, 'topic_record'], 
+        [load_lang('name'), 'admin_plus'], 
+        [load_lang('name'), 'edit_filter'], 
+        [load_lang('document') + ' ' + load_lang('name'), 'search'], 
+        [0, 'block_user'], 
+        [0, 'block_admin'], 
+        [load_lang('document') + ' ' + load_lang('name'), 'watch_list'], 
+        [load_lang('compare'), 'check'], 
+        [load_lang('document') + ' ' + load_lang('name'), 'edit']
+    ]
     
     if num == 1:
         return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
@@ -1872,14 +1993,14 @@ def manager(num = 1):
                         <li><a href="/manager/3">''' + load_lang('user') + ' ' + load_lang('check') + '''</a></li>
                         <li><a href="/manager/4">''' + load_lang('user') + ' ' + load_lang('ban') + '''</a></li>
                         <li><a href="/manager/5">''' + load_lang('subscriber') + ' ' + load_lang('authority') + '''</a></li>
-                        <li><a href="/edit_filter">''' + load_lang('edit_filter') + '''</a></li>
+                        <li><a href="/edit_filter">''' + load_lang('edit') + ' ' + load_lang('filter') + '''</a></li>
                     </ul>
                     <br>
                     <h2>''' + load_lang('owner') + '''</h2>
                     <ul>
-                        <li><a href="/indexing">Indexing (''' + load_lang('create') + ' or ' + load_lang('delete') + ''')</a></li>
+                        <li><a href="/indexing">''' + load_lang('indexing') + ' (' + load_lang('create') + ' or ' + load_lang('delete') + ''')</a></li>
                         <li><a href="/manager/8">''' + load_lang('admin_group') + ' ' + load_lang('create') + '''</a></li>
-                        <li><a href="/edit_set">''' + load_lang('setting') + ' ' + load_lang('edit') + '''</a></li>
+                        <li><a href="/setting">''' + load_lang('setting') + ' ' + load_lang('edit') + '''</a></li>
                         <li><a href="/re_start">''' + load_lang('server') + ' ' + load_lang('restart') + '''</a></li>
                         <li><a href="/update">''' + load_lang('update') + '''</a></li>
                         <li><a href="/inter_wiki">''' + load_lang('interwiki') + '''</a></li>
@@ -1887,7 +2008,7 @@ def manager(num = 1):
                     ''',
             menu = [['other', load_lang('other')]]
         ))
-    elif num in range(2, 15):
+    elif not num - 1 > len(title_list):
         if flask.request.method == 'POST':
             if flask.request.args.get('plus', None):
                 return redirect('/' + title_list[(num - 2)][1] + '/' + url_pas(flask.request.args.get('plus', None)) + '?plus=' + flask.request.form.get('name', None))
@@ -1901,7 +2022,13 @@ def manager(num = 1):
 
             return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
                 imp = ['Redirect', wiki_set(), custom(), other2([0, 0])],
-                data = '<form method="post"><input placeholder="' + placeholder + '" name="name" type="text"><hr><button type="submit">' + load_lang('move') + '</button></form>',
+                data =  '''
+                        <form method="post">
+                            <input placeholder="''' + placeholder + '''" name="name" type="text">
+                            <hr>
+                            <button type="submit">''' + load_lang('move') + '''</button>
+                        </form>
+                        ''',
                 menu = [['manager', load_lang('admin')]]
             ))
     else:
@@ -1942,7 +2069,7 @@ def title_index():
         else:
             count_end += [0]
 
-        sql_list = [load_lang('template') + ':', 'category:', 'user:', 'file:']
+        sql_list = [load_lang('template', 1) + ':', 'category:', 'user:', 'file:']
         for sql in sql_list:
             curs.execute("select count(title) from data where title like ?", [sql + '%'])
             count = curs.fetchall()
@@ -1969,7 +2096,7 @@ def title_index():
         menu = [['other', load_lang('other')]]
     ))
         
-@app.route('/topic/<path:name>/sub/<sub>/b/<int:num>')
+@app.route('/topic/<everything:name>/sub/<sub>/b/<int:num>')
 def topic_block(name = None, sub = None, num = None):
     if admin_check(3, 'blind (' + name + ' - ' + sub + '#' + str(num) + ')') != 1:
         return re_error('/error/3')
@@ -1988,7 +2115,7 @@ def topic_block(name = None, sub = None, num = None):
         
     return redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '#' + str(num))
         
-@app.route('/topic/<path:name>/sub/<sub>/notice/<int:num>')
+@app.route('/topic/<everything:name>/sub/<sub>/notice/<int:num>')
 def topic_top(name = None, sub = None, num = None):
     if admin_check(3, 'notice (' + name + ' - ' + sub + '#' + str(num) + ')') != 1:
         return re_error('/error/3')
@@ -2009,12 +2136,22 @@ def topic_top(name = None, sub = None, num = None):
 
     return redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '#' + str(num))        
         
-@app.route('/topic/<path:name>/sub/<sub>/tool/<regex("close|stop|agree"):tool>')
+@app.route('/topic/<everything:name>/sub/<sub>/tool/<regex("close|stop|agree"):tool>')
 def topic_stop(name = None, sub = None, tool = None):
     if tool == 'close':
-        set_list = ['O', '', load_lang('discussion') + ' ' + load_lang('close'), load_lang('discussion') + ' ' + load_lang('open')]
+        set_list = [
+            'O', 
+            '', 
+            load_lang('discussion', 1) + ' ' + load_lang('close', 1), 
+            load_lang('discussion', 1) + ' ' + load_lang('open', 1)
+        ]
     elif tool == 'stop':
-        set_list = ['', 'O', load_lang('discussion') + ' ' + load_lang('stop'), load_lang('discussion') + ' ' + load_lang('restart')]
+        set_list = [
+            '', 
+            'O', 
+            load_lang('discussion', 1) + ' ' + load_lang('stop', 1), 
+            load_lang('discussion', 1) + ' ' + load_lang('restart', 1)
+        ]
     elif tool == 'agree':
         pass
     else:
@@ -2032,10 +2169,10 @@ def topic_stop(name = None, sub = None, tool = None):
         if tool == 'agree':
             curs.execute("select title from agreedis where title = ? and sub = ?", [name, sub])
             if curs.fetchall():
-                curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, '" + load_lang('agreement') + " Fail', ?, ?, '', '1')", [str(int(topic_check[0][0]) + 1), name, sub, time, ip])
+                curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, '" + load_lang('agreement', 1) + " Fail', ?, ?, '', '1')", [str(int(topic_check[0][0]) + 1), name, sub, time, ip])
                 curs.execute("delete from agreedis where title = ? and sub = ?", [name, sub])
             else:
-                curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, '" + load_lang('agreement') + " OK', ?, ?, '', '1')", [str(int(topic_check[0][0]) + 1), name, sub, time, ip])
+                curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, '" + load_lang('agreement', 1) + " OK', ?, ?, '', '1')", [str(int(topic_check[0][0]) + 1), name, sub, time, ip])
                 curs.execute("insert into agreedis (title, sub) values (?, ?)", [name, sub])
         else:
             curs.execute("select title from stop where title = ? and sub = ? and close = ?", [name, sub, set_list[0]])
@@ -2053,7 +2190,7 @@ def topic_stop(name = None, sub = None, tool = None):
         
     return redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub))    
 
-@app.route('/topic/<path:name>/sub/<sub>/admin/<int:num>')
+@app.route('/topic/<everything:name>/sub/<sub>/admin/<int:num>')
 def topic_admin(name = None, sub = None, num = None):
     curs.execute("select block, ip, date from topic where title = ? and sub = ? and id = ?", [name, sub, str(num)])
     data = curs.fetchall()
@@ -2108,13 +2245,13 @@ def topic_admin(name = None, sub = None, num = None):
         menu = [['topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '#' + str(num), load_lang('discussion')]]
     ))
 
-@app.route('/topic/<path:name>/sub/<sub>', methods=['POST', 'GET'])
+@app.route('/topic/<everything:name>/sub/<sub>', methods=['POST', 'GET'])
 def topic(name = None, sub = None):
     ban = topic_check(name, sub)
     admin = admin_check(3, None)
     
     if flask.request.method == 'POST':
-        if captcha_post(flask.request.form.get('g-recaptcha-response', None), conn) == 1:
+        if captcha_post(flask.request.form.get('g-recaptcha-response', None)) == 1:
             return re_error('/error/13')
         else:
             captcha_post('', 0)
@@ -2134,14 +2271,14 @@ def topic(name = None, sub = None):
 
         match = re.search('^user:([^/]+)', name)
         if match:
-            curs.execute('insert into alarm (name, data, date) values (?, ?, ?)', [match.groups()[0], ip + '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '">' + load_lang('user') + ' - ' + load_lang('discussion') + '</a> (My)', today])
+            curs.execute('insert into alarm (name, data, date) values (?, ?, ?)', [match.groups()[0], ip + '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '">' + load_lang('user', 1) + ' - ' + load_lang('discussion', 1) + '</a> (My)', today])
         
         data = re.sub('\[\[((?:분류|category):(?:(?:(?!\]\]).)*))\]\]', '[br]', flask.request.form.get('content', None))
         for rd_data in re.findall("(?:#([0-9]+))", data):
             curs.execute("select ip from topic where title = ? and sub = ? and id = ?", [name, sub, rd_data])
             ip_data = curs.fetchall()
             if ip_data and ip_or_user(ip_data[0][0]) == 0:
-                curs.execute('insert into alarm (name, data, date) values (?, ?, ?)', [ip_data[0][0], ip + ' - <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '#' + str(num) + '">' + load_lang('discussion') + '</a>', today])
+                curs.execute('insert into alarm (name, data, date) values (?, ?, ?)', [ip_data[0][0], ip + ' - <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '#' + str(num) + '">' + load_lang('discussion', 1) + '</a>', today])
             
             data = re.sub("(?P<in>#(?:[0-9]+))", '[[\g<in>]]', data)
 
@@ -2274,8 +2411,8 @@ def topic(name = None, sub = None):
             menu = [['topic/' + url_pas(name), load_lang('list')]]
         ))
         
-@app.route('/topic/<path:name>', methods=['POST', 'GET'])
-@app.route('/topic/<path:name>/<regex("close|agree"):tool>', methods=['GET'])
+@app.route('/topic/<everything:name>', methods=['POST', 'GET'])
+@app.route('/topic/<everything:name>/<regex("close|agree"):tool>', methods=['GET'])
 def close_topic_list(name = None, tool = None):
     div = ''
     list_d = 0
@@ -2339,7 +2476,7 @@ def close_topic_list(name = None, tool = None):
         
 @app.route('/login', methods=['POST', 'GET'])
 def login():
-    if 'Now' in flask.session and flask.session['Now'] == 1:
+    if custom()[2] != 0:
         return redirect('/user')
 
     ip = ip_check()
@@ -2365,7 +2502,7 @@ def login():
         return re_error('/ban')
         
     if flask.request.method == 'POST':        
-        if captcha_post(flask.request.form.get('g-recaptcha-response', None), conn) == 1:
+        if captcha_post(flask.request.form.get('g-recaptcha-response', None)) == 1:
             return re_error('/error/13')
         else:
             captcha_post('', 0)
@@ -2484,7 +2621,7 @@ def change_password():
                         <hr>
                         <input placeholder="Email" name="email" type="text" value="''' + email + '''">
                         <hr>
-                        <span>Skin</span>
+                        <span>''' + load_lang('user') + ' ' + load_lang('skin') + '''</span>
                         <br>
                         <br>
                         <select name="skin">''' + div2 + '''</select>
@@ -2600,6 +2737,9 @@ def register():
     if ban_check() == 1:
         return re_error('/ban')
 
+    if custom()[2] != 0:
+        return redirect('/user')
+
     if not admin_check(None, None) == 1:
         curs.execute('select data from other where name = "reg"')
         set_d = curs.fetchall()
@@ -2607,7 +2747,7 @@ def register():
             return re_error('/ban')
     
     if flask.request.method == 'POST': 
-        if captcha_post(flask.request.form.get('g-recaptcha-response', None), conn) == 1:
+        if captcha_post(flask.request.form.get('g-recaptcha-response', None)) == 1:
             return re_error('/error/13')
         else:
             captcha_post('', 0)
@@ -2630,12 +2770,27 @@ def register():
         curs.execute("select id from user limit 1")
         if not curs.fetchall():
             curs.execute("insert into user (id, pw, acl, date, email) values (?, ?, 'owner', ?, ?)", [flask.request.form.get('id', None), hashed.decode(), get_time(), flask.request.form.get('email', '')])
+
+            first = 1
         else:
             curs.execute("insert into user (id, pw, acl, date, email) values (?, ?, 'user', ?, ?)", [flask.request.form.get('id', None), hashed.decode(), get_time(), flask.request.form.get('email', '')])
+
+            first = 0
+
+        flask.session['Now'] = 1
+        flask.session['DREAMER'] = flask.request.form.get('id', None)
+        flask.session['Daydream'] = ''
+
+        ip = ip_check()
+        agent = flask.request.headers.get('User-Agent')
         
+        curs.execute("insert into ua_d (name, ip, ua, today, sub) values (?, ?, ?, ?, '')", [flask.request.form.get('id', None), ip, agent, get_time()])        
         conn.commit()
         
-        return redirect('/login')
+        if first == 0:
+            return redirect('/user')
+        else:
+            return redirect('/setting/1')
     else:        
         contract = ''
         
@@ -2773,7 +2928,7 @@ def user_ban(name = None):
             menu = [['manager', load_lang('admin')]]
         ))            
                 
-@app.route('/acl/<path:name>', methods=['POST', 'GET'])
+@app.route('/acl/<everything:name>', methods=['POST', 'GET'])
 def acl(name = None):
     check_ok = ''
     
@@ -2856,7 +3011,13 @@ def acl(name = None):
             
         return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
             imp = [name, wiki_set(), custom(), other2([' (ACL)', 0])],
-            data = '<form method="post">' + data + '<hr><button type="submit">ACL ' + load_lang('edit') + '</button></form>',
+            data =  '''
+                    <form method="post">
+                        ''' + data + '''
+                        <hr>
+                        <button type="submit" ''' + check_ok + '''>ACL ''' + load_lang('edit') + '''</button>
+                    </form>
+                    ''',
             menu = [['w/' + url_pas(name), load_lang('document')], ['manager', load_lang('admin')]]
         ))
             
@@ -2916,11 +3077,17 @@ def user_admin(name = None):
         
         return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
             imp = [name, wiki_set(), custom(), other2([' (' + load_lang('authority') + ')', 0])],
-            data =  '<form method="post"><select name="select">' + div + '</select><hr><button type="submit">' + load_lang('edit') + '</button></form>',
+            data =  '''
+                    <form method="post">
+                        <select name="select">''' + div + '''</select>
+                        <hr>
+                        <button type="submit">''' + load_lang('edit') + '''</button>
+                    </form>
+                    ''',
             menu = [['manager', load_lang('admin')]]
         ))
     
-@app.route('/diff/<path:name>')
+@app.route('/diff/<everything:name>')
 def diff_data(name = None):
     first = flask.request.args.get('first', '1')
     second = flask.request.args.get('second', '1')
@@ -2948,7 +3115,7 @@ def diff_data(name = None):
 
     return redirect('/history/' + url_pas(name))
         
-@app.route('/down/<path:name>')
+@app.route('/down/<everything:name>')
 def down(name = None):
     div = '<ul>'
 
@@ -2964,7 +3131,7 @@ def down(name = None):
         menu = [['w/' + url_pas(name), load_lang('document')]]
     ))
 
-@app.route('/w/<path:name>')
+@app.route('/w/<everything:name>')
 def read_view(name = None):
     data_none = 0
     sub = ''
@@ -3011,7 +3178,7 @@ def read_view(name = None):
             for data in back:    
                 if re.search('^category:', data[0]):
                     u_div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a></li>'
-                elif re.search('^' + load_lang('template') + ':', data[0]):
+                elif re.search('^' + load_lang('template', 1) + ':', data[0]):
                     curs.execute("select data from data where title = ?", [data[0]])
                     db_data = curs.fetchall()
                     if db_data:
@@ -3114,7 +3281,7 @@ def read_view(name = None):
     div = end_data + div
 
     return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
-        imp = [name, wiki_set(), custom(), other2([sub + acl, r_date])],
+        imp = [flask.request.args.get('show', name), wiki_set(), custom(), other2([sub + acl, r_date])],
         data = div,
         menu = menu
     )), response_data
@@ -3167,7 +3334,7 @@ def user_topic_list(name = None):
 
 @app.route('/recent_changes')
 @app.route('/<regex("record"):tool>/<name>')
-@app.route('/<regex("history"):tool>/<path:name>', methods=['POST', 'GET'])
+@app.route('/<regex("history"):tool>/<everything:name>', methods=['POST', 'GET'])
 def recent_changes(name = None, tool = 'record'):
     if flask.request.method == 'POST':
         return redirect('/diff/' + url_pas(name) + '?first=' + flask.request.form.get('b', None) + '&second=' + flask.request.form.get('a', None))
@@ -3204,16 +3371,22 @@ def recent_changes(name = None, tool = 'record'):
                     curs.execute("select id, title, date, ip, send, leng from history where ip = ? order by date desc limit ?, '50'", [name, str(sql_num)])
                 else:
                     if what == 'delete':
-                        sql = '%(' + load_lang('delete') + ')'
+                        sql = '%(' + load_lang('delete', 1) + ')'
                     elif what == 'move':
-                        sql = '%' + load_lang('move') + ')'
+                        sql = '%' + load_lang('move', 1) + ')'
                     elif what == 'revert':
-                        sql = '%' + load_lang('version') + ')'
+                        sql = '%' + load_lang('version', 1) + ')'
                     else:
                         return redirect('/')
 
-                    curs.execute("select id, title, date, ip, send, leng from history where ip = ? and send like ? order by date desc limit ?, '50'", [name, sql, str(sql_num)])
+                    curs.execute("select id, title, date, ip, send, leng from history where ip = ? and send like ? order by date desc limit ?, 50", [name, sql, str(sql_num)])
         else:
+            num = int(flask.request.args.get('num', 1))
+            if num * 50 > 0:
+                sql_num = num * 50 - 50
+            else:
+                sql_num = 0            
+            
             div += '<td style="width: 33.3%;">' + load_lang('document') + ' ' + load_lang('name') + '</td><td style="width: 33.3%;">' + load_lang('editor') + '</td><td style="width: 33.3%;">' + load_lang('time') + '</td></tr>'
             
             if what == 'all':
@@ -3223,18 +3396,18 @@ def recent_changes(name = None, tool = 'record'):
 
                 div = '<a href="/recent_discuss">(' + load_lang('discussion') + ')</a> <a href="/block_log">(' + load_lang('ban') + ')</a> <a href="/user_log">(' + load_lang('subscriber') + ')</a> <a href="/admin_log">(' + load_lang('authority') + ')</a><hr>' + div
                 
-                curs.execute("select id, title, date, ip, send, leng from history order by date desc limit 50")
+                curs.execute("select id, title, date, ip, send, leng from history order by date desc limit  ?, 50", [str(sql_num)])
             else:
                 if what == 'delete':
-                    sql = '%(' + load_lang('delete') + ')'
+                    sql = '%(' + load_lang('delete', 1) + ')'
                 elif what == 'move':
-                    sql = '%' + load_lang('move') + ')'
+                    sql = '%' + load_lang('move', 1) + ')'
                 elif what == 'revert':
-                    sql = '%' + load_lang('version') + ')'
+                    sql = '%' + load_lang('version', 1) + ')'
                 else:
                     return redirect('/')
 
-                curs.execute("select id, title, date, ip, send, leng from history where send like ? order by date desc limit 50", [sql])
+                curs.execute("select id, title, date, ip, send, leng from history where send like ? order by date desc limit ?, 50", [sql, str(sql_num)])
 
         data_list = curs.fetchall()
         for data in data_list:    
@@ -3273,7 +3446,7 @@ def recent_changes(name = None, tool = 'record'):
             
             if six_admin == 1:
                 if hide:                            
-                    hidden = ' <a href="/hidden/' + url_pas(data[1]) + '?num=' + data[0] + '">(' + load_lang('all') + ')'
+                    hidden = ' <a href="/hidden/' + url_pas(data[1]) + '?num=' + data[0] + '">(' + load_lang('release') + ')'
                     
                     style[0] = 'background: gainsboro;'
                     style[1] = 'background: gainsboro;'
@@ -3298,7 +3471,7 @@ def recent_changes(name = None, tool = 'record'):
                 style[1] = 'background: gainsboro;'
 
             if tool == 'history':
-                title = '<a href="/w/' + url_pas(name) + '?num=' + data[0] + '">' + data[0] + load_lang('version') + '</a> <a href="/raw/' + url_pas(name) + '?num=' + data[0] + '">(Raw)</a> '
+                title = '<a href="/w/' + url_pas(name) + '?num=' + data[0] + '">' + data[0] + load_lang('version') + '</a> <a href="/raw/' + url_pas(name) + '?num=' + data[0] + '">(' + load_lang('raw') + ')</a> '
             else:
                 title = '<a href="/w/' + url_pas(data[1]) + '">' + html.escape(data[1]) + '</a> <a href="/history/' + url_pas(data[1]) + '">(' + data[0] + load_lang('version') + ')</a> '
                     
@@ -3338,6 +3511,8 @@ def recent_changes(name = None, tool = 'record'):
             if what != 'all':
                 menu = [['recent_changes', load_lang('normal')]]
                 
+            div += next_fix('/recent_changes?num=', num, data_list)
+                
         if what == 'delete':
             sub += ' (' + load_lang('delete') + ')'
         elif what == 'move':
@@ -3360,7 +3535,7 @@ def upload():
         return re_error('/ban')
     
     if flask.request.method == 'POST':
-        if captcha_post(flask.request.form.get('g-recaptcha-response', None), conn) == 1:
+        if captcha_post(flask.request.form.get('g-recaptcha-response', None)) == 1:
             return re_error('/error/13')
         else:
             captcha_post('', 0)
@@ -3467,7 +3642,7 @@ def user_info():
             if block_data[0][0] != '':
                 acl += ' (End : ' + block_data[0][0] + ')'
             else:
-                acl += ' (' + load_lang('limitless') + ')'        
+                acl += ' (End : ' + load_lang('limitless') + ')'        
 
             if block_data[0][1] != '':
                 acl += ' (' + load_lang('login') + ' ' + load_lang('able') + ')'
@@ -3490,7 +3665,7 @@ def user_info():
     else:
         ip_user = ip
         
-        plus = '<li><a href="/login">' + load_lang('login') + '</a></li>'
+        plus = '<li><a href="/login">' + load_lang('login') + '</a></li><li><a href="/register">' + load_lang('register') + '</a></li>'
         plus2 = ''
 
     return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
@@ -3504,7 +3679,6 @@ def user_info():
                 <h2>''' + load_lang('login') + '''</h2>
                 <ul>
                     ''' + plus + '''
-                    <li><a href="/register">''' + load_lang('register') + '''</a></li>
                 </ul>
                 <br>
                 <h2>''' + load_lang('tool') + '''</h2>
@@ -3539,7 +3713,7 @@ def watch_list():
         menu = [['manager', load_lang('admin')]]
     ))
 
-@app.route('/watch_list/<path:name>')
+@app.route('/watch_list/<everything:name>')
 def watch_list_name(name = None):
     if custom()[2] == 0:
         return redirect('/login')
@@ -3651,8 +3825,38 @@ def random():
         return redirect('/w/' + url_pas(data[0][0]))
     else:
         return redirect('/')
+
+@app.route('/skin_set')
+def skin_set():
+    return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
+        imp = [load_lang('skin') + ' ' + load_lang('setting'), wiki_set(), custom(), other2([0, 0])],
+        data =  'This skin is not support setting.',
+        menu = 0
+    ))
     
-@app.route('/views/<path:name>')
+@app.route('/api/w/<everything:name>')
+def api_w(name = None):
+    curs.execute("select data from data where title = ?", [name])
+    data = curs.fetchall()
+    if data:
+        json_data = { "title" : name, "data" : namumark(data = data[0][0]) }
+    
+        return flask.jsonify(json_data)
+    else:
+        return redirect('/')
+    
+@app.route('/api/raw/<everything:name>')
+def api_raw(name = None):
+    curs.execute("select data from data where title = ?", [name])
+    data = curs.fetchall()
+    if data:
+        json_data = { "title" : name, "data" : data[0][0] }
+    
+        return flask.jsonify(json_data)
+    else:
+        return redirect('/')
+    
+@app.route('/views/<everything:name>')
 def views(name = None):
     if re.search('\/', name):
         m = re.search('^(.*)\/(.*)$', name)

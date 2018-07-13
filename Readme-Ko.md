@@ -1,12 +1,12 @@
 ﻿## 개요
-나무마크 기반의 파이썬 위키 엔진. (3.5 이상)
+나무마크 기반의 파이썬 위키 엔진 입니다. (3.5 이상)
 
 ## 클론 명령어
 ### 일반
- * git clone https://github.com/2DU/openNAMU.git
+ * `git clone https://github.com/2DU/openNAMU.git`
 
 ### 베타
- * git clone -b master https://github.com/2DU/openNAMU.git
+ * `git clone -b master https://github.com/2DU/openNAMU.git`
 
 ## 설치법
  * [참조](http://namu.ml/w/오픈나무%2F설치법)

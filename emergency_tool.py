@@ -5,7 +5,7 @@ import threading
 
 # 기타 코드 불러옴
 from func import *
-from mark import namumark
+from mark import load_conn2, namumark
 
 # JSON 불러옴
 json_data = open('set.json').read()
@@ -14,6 +14,9 @@ set_data = json.loads(json_data)
 # 디비 연결
 conn = sqlite3.connect(set_data['db'] + '.db', check_same_thread = False)
 curs = conn.cursor()
+
+# 연결 전달
+load_conn2(conn)
 
 print('1. BackLink ReSet')
 print('2. ReCaptcha Delete')
@@ -26,7 +29,7 @@ what_i_do = input()
 if what_i_do == '1':
     # 파싱 해주는 함수
     def parser(data):
-        namumark(conn, data[0], data[1], 1)
+        namumark(data[0], data[1], 1)
 
     # 역링크 전부 삭제
     curs.execute("delete from back")
