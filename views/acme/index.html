@@ -8,6 +8,7 @@
         <link rel="stylesheet" href="/views/acme/css/style-responsive.css">
         <script src="/views/acme/js/jquery.min.js"></script>
         <script src="/views/acme/js/bootstrap.min.js"></script>
+        <script src="/views/acme/js/skin_set.js"></script>
         <link rel="stylesheet" href="/views/acme/css/font-awesome/css/font-awesome.min.css">
         {{imp[1][5]|safe}}
         {{imp[2][3]|safe}}
@@ -74,8 +75,14 @@
                                 </li>
                                 <li>
                                     <a href="/other">
-                                        <i class="fa fa-cogs" aria-hidden="true"></i>
+                                        <i class="fa fa-wrench" aria-hidden="true"></i>
                                         {{'tool'|load_lang}}
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/skin_set">
+                                        <i class="fa fa-cog" aria-hidden="true"></i>
+                                        {{'skin'|load_lang}} {{'setting'|load_lang}}
                                     </a>
                                 </li>
                             </ul>
@@ -105,7 +112,7 @@
                 <div class="container">
                     <div class="row">
                         <div class="col-lg-4 col-sm-4">
-                            <h1>
+                            <h1 id="fix_title">
                                 {{imp[0]}}
                                 {% if imp[3][0] != 0 %}
                                     <sub>{{imp[3][0]}}</sub>
@@ -131,7 +138,7 @@
             </div>
             <div class="container">
                 <div class="row">
-                    <div class="col-md-10 col-md-offset-1 mar-b-30">
+                    <div id="fix_data" class="col-md-10 col-md-offset-1 mar-b-30">
                         {{data|safe}}
                     </div>
                 </div>

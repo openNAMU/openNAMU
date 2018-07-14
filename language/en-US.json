@@ -109,6 +109,7 @@
     "no_login_error" : "Non-login status.",
     "no_exist_user_error" : "Account does not exist.",
     "no_admin_block_error" : "Administrators can not block, check.",
+    "skin_error" : "This skin is not support setting.",
     "same_id_exist_error" : "There are users with the same ID.",
     "long_id_error" : "ID must be shorter than 20 characters.",
     "id_char_error" : "Only hangul, alphabet and space are allowed for ID.",

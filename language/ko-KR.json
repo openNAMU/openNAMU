@@ -91,6 +91,7 @@
     "no_login_error": "비 로그인 상태 입니다.",
     "no_exist_user_error": "계정이 없습니다.",
     "no_admin_block_error": "관리자는 차단, 검사 할 수 없습니다.",
+    "skin_error" : "이 스킨은 스킨 설정을 지원하지 않습니다.",
     "same_id_exist_error": "동일한 아이디의 사용자가 있습니다.",
     "long_id_error": "아이디는 20글자보다 짧아야 합니다.",
     "id_char_error": "아이디에는 한글과 알파벳과 공백만 허용 됩니다.",
