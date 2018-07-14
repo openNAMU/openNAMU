@@ -20,7 +20,7 @@ import sys
 from func import *
 
 # 버전 표기
-r_ver = 'v3.0.5-Stable-99'
+r_ver = 'v3.0.6-Master-01'
 c_ver = ''.join(re.findall('[0-9]', r_ver))
 
 print('Version : ' + r_ver)
@@ -3828,11 +3828,7 @@ def random():
 
 @app.route('/skin_set')
 def skin_set():
-    return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
-        imp = [load_lang('skin') + ' ' + load_lang('setting'), wiki_set(), custom(), other2([0, 0])],
-        data =  'This skin is not support setting.',
-        menu = 0
-    ))
+    return re_error('/error/5')
     
 @app.route('/api/w/<everything:name>')
 def api_w(name = None):
