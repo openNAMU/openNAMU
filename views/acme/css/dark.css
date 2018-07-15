@@ -1,0 +1,33 @@
+body {
+    background: black;
+    color: white;
+}
+
+.head-section {
+    border-bottom: 1px solid black;
+}
+
+.head-section .navbar-default {
+    background-color: black;
+    color: white;
+}
+
+.head-section .nav li a, .head-section .nav li.active ul.dropdown-menu li a {
+    color: white;
+}
+
+.head-section .nav li .dropdown-menu {
+    background: black;
+}
+
+.navbar-default .navbar-brand {
+    color: white;
+}
+
+table {
+    background: black;
+}
+
+pre {
+    background: black;
+}
