@@ -59,43 +59,9 @@ def captcha_get():
 
     return data
 
+# 호환성 설정
 def update():
-    # 호환성 설정
-    try:        
-        curs.execute('select title, re from hidhi')
-        for rep in curs.fetchall():
-            curs.execute("update history set hide = 'O' where title = ? and id = ?", [rep[0], rep[1]])
-
-        curs.execute("drop table if exists hidhi")
-
-        print('move table hidhi')
-    except:
-        pass
-
-    try:
-        curs.execute("select title, acl from data where acl != ''")
-        for rep in curs.fetchall():
-            curs.execute("insert into acl (title, dec, dis, why) values (?, ?, '', '')", [rep[0], rep[1]])
-
-        curs.execute("alter table data drop acl")
-
-        print('data table delete column acl')
-    except:
-        pass
-
-    try:
-        curs.execute('select name, sub from filter where sub != "X" and sub != ""')
-        filter_name = curs.fetchall()
-        if filter_name:
-            for filter_delete in filter_name:
-                if filter_delete[1] != '' or filter_delete[1] != 'X':
-                    curs.execute("update filter set sub = '' where name = ?", [filter_delete[0]])
-
-            print('filter data fix')
-    except:
-        pass
-
-    # 3.0.5 사용자 문서, 파일 문서, 분류 문서 영어화
+    # v3.0.5 사용자 문서, 파일 문서, 분류 문서 영어화
     try:
         all_rep = [['사용자:', 'user:'], ['파일:', 'file:'], ['분류:', 'category:']]
         all_rep2 = ['data', 'history', 'acl', 'topic', 'back']
@@ -132,6 +98,13 @@ def update():
             print('사용자 to user, 파일 to file, 분류 to category')
     except:
         pass
+
+    # v3.0.6 사용자 설정 분리
+    # try:
+    #     curs.execute("alter table user drop email")
+    #     curs.execute("alter table user drop skin")
+    # except:
+    #    pass
 
 def captcha_post(re_data, num = 1):
     if num == 1:
