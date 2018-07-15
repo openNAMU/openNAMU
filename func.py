@@ -597,7 +597,11 @@ def leng_check(first, second):
     return all_plus
 
 def redirect(data):
-    return '<meta http-equiv="refresh" content="0; url=' + data + '">'
+    return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
+        imp = ["Redirect", wiki_set(), custom(), other2([0, 0])],
+        data = '<meta http-equiv="refresh" content="0; url=' + data + '">',
+        menu = 0
+    ))
 
 def re_error(data):
     if data == '/ban':
