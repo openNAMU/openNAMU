@@ -16,11 +16,15 @@ import logging
 import random
 import sys
 
+# 주의. user 테이블에서 email, skin 이전
+# user_set 테이블로 이동바람
+# 기타 설비로 이동 해야함
+
 # 나머지 불러오기
 from func import *
 
 # 버전 표기
-r_ver = 'v3.0.6-Master-01'
+r_ver = 'v3.0.6-Master-02'
 c_ver = ''.join(re.findall('[0-9]', r_ver))
 
 print('Version : ' + r_ver)
@@ -77,6 +81,7 @@ app.url_map.converters['everything'] = EverythingConverter
 
 # 셋업 부분
 curs.execute('create table if not exists data(test text)')
+curs.execute('create table if not exists cache_data(test text)')
 curs.execute('create table if not exists history(test text)')
 curs.execute('create table if not exists rd(test text)')
 curs.execute('create table if not exists user(test text)')
@@ -112,13 +117,37 @@ if setup_tool != 0:
     # create table
     create_data = {}
 
-    create_data['all_data'] = ['data', 'history', 'rd', 'user', 'ban', 'topic', 'stop', 'rb', 'back', 'agreedis', 'custom', 'other', 'alist', 're_admin', 'alarm', 'ua_d', 'filter', 'scan', 'acl', 'inter', 'html_filter']
+    create_data['all_data'] = [
+        'data', 
+        'cache_data', 
+        'history', 
+        'rd', 
+        'user', 
+        'ban', 
+        'topic', 
+        'stop', 
+        'rb', 
+        'back', 
+        'agreedis', 
+        'custom', 
+        'other', 
+        'alist', 
+        're_admin', 
+        'alarm', 
+        'ua_d', 
+        'filter', 
+        'scan', 
+        'acl', 
+        'inter', 
+        'html_filter'
+    ]
 
     create_data['data'] = ['title', 'data']
+    create_data['cache_data'] = ['title', 'data']
     create_data['history'] = ['id', 'title', 'data', 'date', 'ip', 'send', 'leng', 'hide']
     create_data['rd'] = ['title', 'sub', 'date', 'band']
-    create_data['user'] = ['id', 'pw', 'acl', 'date', 'email', 'skin']
-    create_data['user_set'] = ['name', 'data']
+    create_data['user'] = ['id', 'pw', 'acl', 'date']
+    create_data['user_set'] = ['name', 'id', 'data']
     create_data['ban'] = ['block', 'end', 'why', 'band', 'login']
     create_data['topic'] = ['id', 'title', 'sub', 'data', 'date', 'ip', 'block', 'top']
     create_data['stop'] = ['title', 'sub', 'close']
@@ -2788,7 +2817,7 @@ def register():
         conn.commit()
         
         if first == 0:
-            return redirect('/user')
+            return redirect('/change')
         else:
             return redirect('/setting/1')
     else:        
