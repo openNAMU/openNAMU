@@ -1,4 +1,3 @@
-# 모듈들 불러옴
 try:
     import css_html_js_minify
 except:
@@ -26,13 +25,9 @@ import re
 import html
 import os
 
-# 일부 툴 불러옴
 from set_mark.tool import *
-
-# 나무마크 불러옴
 from mark import *
 
-# 서브 언어팩 불러옴
 json_data = open(os.path.join('language', 'en-US.json'), 'rt', encoding='utf-8').read()
 else_lang = json.loads(json_data)
 
@@ -59,7 +54,6 @@ def captcha_get():
 
     return data
 
-# 호환성 설정
 def update():
     # v3.0.5 사용자 문서, 파일 문서, 분류 문서 영어화
     try:
