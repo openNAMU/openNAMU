@@ -1,4 +1,3 @@
-# 모듈 불러오기
 import werkzeug.routing
 import flask_compress
 import flask_reggie
@@ -16,16 +15,13 @@ import logging
 import random
 import sys
 
-# 나머지 불러오기
 from func import *
 
-# 버전 표기
 r_ver = 'v3.0.6-Master-04'
 c_ver = ''.join(re.findall('[0-9]', r_ver))
 
 print('Version : ' + r_ver)
 
-# set.json 설정 확인
 try:
     json_data = open('set.json').read()
     set_data = json.loads(json_data)
@@ -52,14 +48,11 @@ if os.path.exists(set_data['db'] + '.db'):
 else:
     setup_tool = 1
 
-# 디비 연결
 conn = sqlite3.connect(set_data['db'] + '.db', check_same_thread = False)
 curs = conn.cursor()
 
-# 보내주기
 load_conn(conn)
 
-# 기타 설정 변경
 logging.basicConfig(level = logging.ERROR)
 app = flask.Flask(__name__, template_folder = './')
 flask_reggie.Reggie(app)
@@ -69,13 +62,11 @@ compress.init_app(app)
 class EverythingConverter(werkzeug.routing.PathConverter):
     regex = '.*?'
 
-# 템플릿 설정
 app.jinja_env.filters['md5_replace'] = md5_replace
 app.jinja_env.filters['load_lang'] = load_lang
 
 app.url_map.converters['everything'] = EverythingConverter
 
-# 셋업 부분
 curs.execute('create table if not exists data(test text)')
 curs.execute('create table if not exists cache_data(test text)')
 curs.execute('create table if not exists history(test text)')
@@ -110,8 +101,7 @@ if setup_tool == 0:
             setup_tool = 1
 
 if setup_tool != 0:
-    # create table
-    create_data = {}
+        create_data = {}
 
     create_data['all_data'] = [
         'data', 
@@ -170,24 +160,19 @@ if setup_tool != 0:
             except:
                 curs.execute("alter table " + create_table + " add " + create + " text default ''")
 
-    # update
-    update()
+        update()
 
-# owner 존재 확인
 curs.execute('select name from alist where acl = "owner"')
 if not curs.fetchall():
     curs.execute('delete from alist where name = "owner"')
     curs.execute('insert into alist (name, acl) values ("owner", "owner")')
 
-# image folder create
 if not os.path.exists('image'):
     os.makedirs('image')
     
-# views folder create
 if not os.path.exists('views'):
     os.makedirs('views')
 
-# 포트 점검
 curs.execute('select data from other where name = "port"')
 rep_data = curs.fetchall()
 if not rep_data:
@@ -206,7 +191,6 @@ else:
     
     print('Port : ' + str(rep_port))
 
-# robots.txt 점검
 try:
     if not os.path.exists('robots.txt'):
         curs.execute('select data from other where name = "robot"')
@@ -226,7 +210,6 @@ try:
 except:
     pass
 
-# 비밀 키 점검
 curs.execute('select data from other where name = "key"')
 rep_data = curs.fetchall()
 if not rep_data:
@@ -245,7 +228,6 @@ else:
 
     print('Secret Key : ' + rep_key)
 
-# 언어 점검
 curs.execute("select data from other where name = 'language'")
 rep_data = curs.fetchall()
 if not rep_data:
@@ -265,14 +247,12 @@ else:
     
     print('Language : ' + str(rep_language))
 
-# ver 갱신
 curs.execute('delete from alist where name = "ver"')
 curs.execute('insert into alist (name, acl) values ("ver", ?)', [c_ver])
 
 json_data = open(os.path.join('language', rep_language + '.json'), 'rt', encoding='utf-8').read()
 lang_data = json.loads(json_data)
 
-# backup set
 def back_up():
     try:
         shutil.copyfile(set_data['db'] + '.db', 'back_' + set_data['db'] + '.db')
@@ -291,7 +271,6 @@ try:
 except:
     back_time = 0
     
-# backup off or run
 if back_time != 0:
     print(str(back_time) + '-Hours Interval Back Up')
     
