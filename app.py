@@ -1780,7 +1780,7 @@ def preview(name = None):
     if acl_check(name) == 1:
         return re_error('/ban')
          
-    new_data = re.sub('\r\n#(?:redirect|넘겨주기) (?P<in>(?:(?!\r\n).)+)\r\n', ' * Redirect : [[\g<in>]]', '\r\n' + flask.request.form.get('content', None) + '\r\n')
+    new_data = re.sub('\r\n#(?:redirect|넘겨주기) (?P<in>(?:(?!\r\n).)+)\r\n', ' * Redirect to [[\g<in>]]', '\r\n' + flask.request.form.get('content', None) + '\r\n')
     new_data = re.sub('^\r\n', '', new_data)
     new_data = re.sub('\r\n$', '', new_data)
     
@@ -3268,7 +3268,7 @@ def read_view(name = None):
         acl += ' (ACL)'
             
     if flask.request.args.get('froms', None):
-        else_data = re.sub('\r\n#(?:redirect|넘겨주기) (?P<in>(?:(?!\r\n).)+)\r\n', ' * Redirect : [[\g<in>]]', '\r\n' + else_data + '\r\n')
+        else_data = re.sub('\r\n#(?:redirect|넘겨주기) (?P<in>(?:(?!\r\n).)+)\r\n', ' * Redirect to [[\g<in>]]', '\r\n' + else_data + '\r\n')
         else_data = re.sub('^\r\n', '', else_data)
         else_data = re.sub('\r\n$', '', else_data)
             
@@ -3292,7 +3292,7 @@ def read_view(name = None):
 
         if flask.request.args.get('froms', None):
             menu += [['w/' + url_pas(name), load_lang('pass')]]
-            end_data = '<ul id="redirect"><li>Redirect : <a href="/w/' + url_pas(flask.request.args.get('froms', None)) + '?froms=' + url_pas(name) + '">' + flask.request.args.get('froms', None) + '</a></li></ul><br>' + end_data
+            end_data = '<ul id="redirect"><li>Redirect from <a href="/w/' + url_pas(flask.request.args.get('froms', None)) + '?froms=' + url_pas(name) + '">' + flask.request.args.get('froms', None) + '</a></li></ul><br>' + end_data
 
         if uppage != 0:
             menu += [['w/' + url_pas(uppage), load_lang('upper')]]
