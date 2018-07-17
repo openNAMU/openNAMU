@@ -24,7 +24,7 @@ import sys
 from func import *
 
 # 버전 표기
-r_ver = 'v3.0.6-Master-02'
+r_ver = 'v3.0.6-Master-04'
 c_ver = ''.join(re.findall('[0-9]', r_ver))
 
 print('Version : ' + r_ver)
@@ -122,7 +122,8 @@ if setup_tool != 0:
         'cache_data', 
         'history', 
         'rd', 
-        'user', 
+        'user',
+        'user_set',
         'ban', 
         'topic', 
         'stop', 
@@ -172,12 +173,6 @@ if setup_tool != 0:
                 curs.execute('select ' + create + ' from ' + create_table + ' limit 1')
             except:
                 curs.execute("alter table " + create_table + " add " + create + " text default ''")
-        
-        try:
-            curs.execute('select test from ' + create_table + ' limit 1')
-            curs.execute("alter table " + create_table + " drop test")
-        except:
-            pass
 
     # update
     update()
@@ -2583,6 +2578,8 @@ def change_password():
 
     if custom()[2] == 0:
         return redirect('/login')
+
+    ip = ip_check()
     
     if flask.request.method == 'POST':    
         if flask.request.form.get('pw', None):
@@ -2600,16 +2597,24 @@ def change_password():
             hashed = bcrypt.hashpw(bytes(flask.request.form.get('pw2', None), 'utf-8'), bcrypt.gensalt())
             
             curs.execute("update user set pw = ? where id = ?", [hashed.decode(), flask.session['DREAMER']])
-        
-        curs.execute("update user set email = ? where id = ?", [flask.request.form.get('email', ''), ip_check()])
-        curs.execute("update user set skin = ? where id = ?", [flask.request.form.get('skin', ''), ip_check()])
+
+        curs.execute('select data from user_set where name = "email" and id = ?', [ip])
+        if curs.fetchall():
+            curs.execute("update user_set set data = ? where name = 'email' and id = ?", [flask.request.form.get('email', ''), ip])
+        else:
+            curs.execute("insert into user_set (name, id, data) values ('email', ?, ?)", [ip, flask.request.form.get('email', '')])
+
+        curs.execute('select data from user_set where name = "skin" and id = ?', [ip])
+        if curs.fetchall():
+            curs.execute("update user_set set skin = ? where name = 'skin' and id = ?", [flask.request.form.get('skin', ''), ip])
+        else:
+            curs.execute("insert into user_set (name, id, data) values ('skin', ?, ?)", [ip, flask.request.form.get('skin', '')])
+
         conn.commit()
         
         return redirect('/change')
     else:        
-        ip = ip_check()
-
-        curs.execute('select email from user where id = ?', [ip])
+        curs.execute('select data from user_set where name = "email" and id = ?', [ip])
         data = curs.fetchall()
         if data:
             email = data[0][0]
@@ -2618,9 +2623,8 @@ def change_password():
 
         div2 = ''
 
-        curs.execute('select skin from user where id = ?', [ip])
+        curs.execute('select data from user_set where name = "skin" and id = ?', [ip])
         data = curs.fetchall()
-
         for skin_data in os.listdir(os.path.abspath('views')):
             if not data:
                 curs.execute('select data from other where name = "skin"')
@@ -2798,11 +2802,11 @@ def register():
         
         curs.execute("select id from user limit 1")
         if not curs.fetchall():
-            curs.execute("insert into user (id, pw, acl, date, email) values (?, ?, 'owner', ?, ?)", [flask.request.form.get('id', None), hashed.decode(), get_time(), flask.request.form.get('email', '')])
+            curs.execute("insert into user (id, pw, acl, date) values (?, ?, 'owner', ?)", [flask.request.form.get('id', None), hashed.decode(), get_time()])
 
             first = 1
         else:
-            curs.execute("insert into user (id, pw, acl, date, email) values (?, ?, 'user', ?, ?)", [flask.request.form.get('id', None), hashed.decode(), get_time(), flask.request.form.get('email', '')])
+            curs.execute("insert into user (id, pw, acl, date) values (?, ?, 'user', ?)", [flask.request.form.get('id', None), hashed.decode(), get_time()])
 
             first = 0
 
@@ -2838,8 +2842,6 @@ def register():
                         <input placeholder="PassWord" name="pw" type="password">
                         <hr>
                         <input placeholder="Re" name="pw2" type="password">
-                        <hr>
-                        <input placeholder="Email (Option)" name="email" type="text">
                         <hr>
                         ''' + captcha_get() + '''
                         <button type="submit">''' + load_lang('register') + '''</button>

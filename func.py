@@ -100,11 +100,11 @@ def update():
         pass
 
     # v3.0.6 사용자 설정 분리
-    # try:
-    #     curs.execute("alter table user drop email")
-    #     curs.execute("alter table user drop skin")
-    # except:
-    #    pass
+    try:
+        curs.execute("alter table user drop email")
+        curs.execute("alter table user drop skin")
+    except:
+       pass
 
 def captcha_post(re_data, num = 1):
     if num == 1:
@@ -205,7 +205,7 @@ def skin_check():
     skin = './views/acme/'
     
     try:
-        curs.execute('select skin from user where id = ?', [ip_check()])
+        curs.execute('select data from user_set where name = "skin" and id = ?', [ip_check()])
         skin_exist = curs.fetchall()
         if skin_exist and skin_exist[0][0] != '':
             if os.path.exists(os.path.abspath('./views/' + skin_exist[0][0] + '/index.html')) == 1:
@@ -386,7 +386,7 @@ def custom():
         user_icon = 0
 
     if user_icon != 0:
-        curs.execute('select email from user where id = ?', [ip_check()])
+        curs.execute('select data from user_set where name = "email" and id = ?', [ip_check()])
         data = curs.fetchall()
         if data:
             email = data[0][0]
