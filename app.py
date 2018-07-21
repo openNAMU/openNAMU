@@ -214,7 +214,7 @@ curs.execute('select data from other where name = "key"')
 rep_data = curs.fetchall()
 if not rep_data:
     while 1:
-        print('Secret Key : ', end = '')
+        print('Secret key : ', end = '')
         
         rep_key = str(input())
         if rep_key:
@@ -226,7 +226,7 @@ if not rep_data:
 else:
     rep_key = rep_data[0][0]
 
-    print('Secret Key : ' + rep_key)
+    print('Secret key : ' + rep_key)
 
 curs.execute("select data from other where name = 'language'")
 rep_data = curs.fetchall()
@@ -257,9 +257,9 @@ def back_up():
     try:
         shutil.copyfile(set_data['db'] + '.db', 'back_' + set_data['db'] + '.db')
         
-        print('Back Up Ok')
+        print('Back up : Ok')
     except:
-        print('Back Up Error')
+        print('Back up : Error')
 
     threading.Timer(60 * 60 * back_time, back_up).start()
 
@@ -272,12 +272,12 @@ except:
     back_time = 0
     
 if back_time != 0:
-    print(str(back_time) + '-Hours Interval Back Up')
+    print('Back up state : ' + str(back_time) + ' hours interval')
     
     if __name__ == '__main__':
         back_up()
 else:
-    print('Back Up OFF')
+    print('Back up state : Turn off')
 
 conn.commit()
 
@@ -737,10 +737,10 @@ def setting(num = 0):
                             <br>
                             <input placeholder="reCAPTCHA (HTML)" type="text" name="recaptcha" value="''' + html.escape(d_list[0]) + '''">
                             <hr>
-                            <span>reCAPTCHA (Secret Key)</span>
+                            <span>reCAPTCHA (Secret key)</span>
                             <br>
                             <br>
-                            <input placeholder="reCAPTCHA (Secret Key)" type="text" name="sec_re" value="''' + html.escape(d_list[1]) + '''">
+                            <input placeholder="reCAPTCHA (Secret key)" type="text" name="sec_re" value="''' + html.escape(d_list[1]) + '''">
                             <hr>
                             <button id="save" type="submit">''' + load_lang('save') + '''</button>
                         </form>
