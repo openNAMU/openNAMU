@@ -247,8 +247,8 @@ else:
     
     print('Language : ' + str(rep_language))
 
-curs.execute('delete from alist where name = "ver"')
-curs.execute('insert into alist (name, acl) values ("ver", ?)', [c_ver])
+curs.execute('delete from other where name = "ver"')
+curs.execute('insert into other (name, data) values ("ver", ?)', [c_ver])
 
 json_data = open(os.path.join('language', rep_language + '.json'), 'rt', encoding='utf-8').read()
 lang_data = json.loads(json_data)
@@ -1938,13 +1938,13 @@ def other():
                     <li><a href="/admin_list">''' + load_lang('admin') + '''</a></li>
                     <li><a href="/give_log">''' + load_lang('admin_group') + '''</a></li>
                     <li><a href="/not_close_topic">''' + load_lang('open') + ' ' + load_lang('discussion') + '''</a></li>
+                    <li><a href="/title_index">''' + load_lang('all') + ' ' + load_lang('document') + '''</a></li>
+                    <li><a href="/acl_list">ACL ''' + load_lang('document') + '''</a></li>
+                    <li><a href="/please">''' + load_lang('need') + ' ' + load_lang('document') + '''</a></li>
                 </ul>
                 <br>
                 <h2>''' + load_lang('other') + '''</h2>
                 <ul>
-                    <li><a href="/title_index">''' + load_lang('all') + ' ' + load_lang('document') + '''</a></li>
-                    <li><a href="/acl_list">ACL ''' + load_lang('document') + '''</a></li>
-                    <li><a href="/please">''' + load_lang('need') + ' ' + load_lang('document') + '''</a></li>
                     <li><a href="/upload">''' + load_lang('upload') + '''</a></li>
                     <li><a href="/manager/10">''' + load_lang('document') + ' ' + load_lang('search') + '''</a></li>
                 </ul>
