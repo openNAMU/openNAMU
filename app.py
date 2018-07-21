@@ -101,7 +101,7 @@ if setup_tool == 0:
             setup_tool = 1
 
 if setup_tool != 0:
-        create_data = {}
+    create_data = {}
 
     create_data['all_data'] = [
         'data', 
@@ -1965,22 +1965,22 @@ def other():
 @app.route('/manager', methods=['POST', 'GET'])
 @app.route('/manager/<int:num>', methods=['POST', 'GET'])
 def manager(num = 1):
-    title_list = [
-        [load_lang('document') + ' ' + load_lang('name'), 'acl'], 
-        [0, 'check'], 
-        [0, 'ban'], 
-        [0, 'admin'], 
-        [0, 'record'], 
-        [0, 'topic_record'], 
-        [load_lang('name'), 'admin_plus'], 
-        [load_lang('name'), 'edit_filter'], 
-        [load_lang('document') + ' ' + load_lang('name'), 'search'], 
-        [0, 'block_user'], 
-        [0, 'block_admin'], 
-        [load_lang('document') + ' ' + load_lang('name'), 'watch_list'], 
-        [load_lang('compare'), 'check'], 
-        [load_lang('document') + ' ' + load_lang('name'), 'edit']
-    ]
+    title_list = {
+        0 : [load_lang('document') + ' ' + load_lang('name'), 'acl'], 
+        1 : [0, 'check'], 
+        2 : [0, 'ban'], 
+        3 : [0, 'admin'], 
+        4 : [0, 'record'], 
+        5 : [0, 'topic_record'], 
+        6 : [load_lang('name'), 'admin_plus'], 
+        7 : [load_lang('name'), 'edit_filter'], 
+        8 : [load_lang('document') + ' ' + load_lang('name'), 'search'], 
+        9 : [0, 'block_user'], 
+        10 : [0, 'block_admin'], 
+        11 : [load_lang('document') + ' ' + load_lang('name'), 'watch_list'], 
+        12 : [load_lang('compare'), 'check'], 
+        13 : [load_lang('document') + ' ' + load_lang('name'), 'edit']
+    }
     
     if num == 1:
         return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
