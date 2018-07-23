@@ -101,7 +101,7 @@ if setup_tool == 0:
             setup_tool = 1
 
 if setup_tool != 0:
-        create_data = {}
+    create_data = {}
 
     create_data['all_data'] = [
         'data', 
@@ -2392,7 +2392,7 @@ def topic(name = None, sub = None):
 
         if ban != 1 or admin == 1:
             data += '''
-                    <a id="reload" href="javascript:void(0);" onclick="location.href.endsWith(\'#reload\')? location.reload(true):location.href=\'#reload\'">(Reload)</a>
+                    <a id="reload" href="javascript:void(0);" onclick="location.href.endsWith(\'#reload\')? location.reload(true):location.href=\'#reload\'">(''' + load_lang('reload') + ''')</a>
                     <form style="''' + display + '''" method="post">
                     <br>
                     <textarea style="height: 100px;" name="content"></textarea>
@@ -2402,7 +2402,7 @@ def topic(name = None, sub = None):
             if display == '':
                 data += ip_warring()
 
-            data += '<button type="submit">Send</button></form>'
+            data += '<button type="submit">' + load_lang('send') + '</button></form>'
 
         return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
             imp = [name, wiki_set(), custom(), other2([' (' + load_lang('discussion') + ')', 0])],
@@ -2449,7 +2449,13 @@ def close_topic_list(name = None, tool = None):
             
             menu = [['w/' + url_pas(name), load_lang('document')]]
             
-            plus =  '<a href="/topic/' + url_pas(name) + '/close">(' + load_lang('close') + ')</a> <a href="/topic/' + url_pas(name) + '/agree">(' + load_lang('agreement') + ')</a><hr><input placeholder="' + load_lang('discussion') + ' ' + load_lang('name') + '" name="topic" type="text"><hr><button type="submit">' + load_lang('open') + '</button>'
+            plus =  '''
+                    <a href="/topic/''' + url_pas(name) + '''/close">(''' + load_lang('close') + ''')</a> <a href="/topic/''' + url_pas(name) + '''/agree">(''' + load_lang('agreement') + ''')</a>
+                    <hr>
+                    <input placeholder="''' + load_lang('discussion') + ' ' + load_lang('name') + '''" name="topic" type="text">
+                    <hr>
+                    <button type="submit">''' + load_lang('open') + '''</button>
+                    '''
 
         for data in curs.fetchall():
             curs.execute("select data, date, ip, block from topic where title = ? and sub = ? and id = '1'", [name, data[0]])
@@ -3769,7 +3775,7 @@ def custom_head_view():
             else:
                 data = ''
         else:
-            start = '<span>' + load_lang('user_css_warring') + '</span><hr>'
+            start = '<span>' + load_lang('user_head_warring') + '</span><hr>'
             
             if 'MyMaiToNight' in flask.session:
                 data = flask.session['MyMaiToNight']

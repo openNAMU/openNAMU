@@ -100,8 +100,10 @@
     "pass" : "Pass",
     "category" : "Category",
     "filter" : "Filter",
+    "send" : "Send",
+    "reload" : "Reload",
 
-    "user_css_warring" : "User's CSS will deleted if you close the browser or when you are editting as guest",
+    "user_head_warring" : "User's HEAD will deleted if you close the browser or when you are editting as guest",
     "http_warring" : "Warning : If you are not on HTTPS connection, your information can be leaked. We won't response to that.",
     "no_login_warring" : "Non-login status. IP is logged when working with non-login.",
     
