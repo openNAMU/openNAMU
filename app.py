@@ -214,7 +214,7 @@ curs.execute('select data from other where name = "key"')
 rep_data = curs.fetchall()
 if not rep_data:
     while 1:
-        print('Secret Key : ', end = '')
+        print('Secret key : ', end = '')
         
         rep_key = str(input())
         if rep_key:
@@ -226,7 +226,7 @@ if not rep_data:
 else:
     rep_key = rep_data[0][0]
 
-    print('Secret Key : ' + rep_key)
+    print('Secret key : ' + rep_key)
 
 curs.execute("select data from other where name = 'language'")
 rep_data = curs.fetchall()
@@ -247,8 +247,8 @@ else:
     
     print('Language : ' + str(rep_language))
 
-curs.execute('delete from alist where name = "ver"')
-curs.execute('insert into alist (name, acl) values ("ver", ?)', [c_ver])
+curs.execute('delete from other where name = "ver"')
+curs.execute('insert into other (name, data) values ("ver", ?)', [c_ver])
 
 json_data = open(os.path.join('language', rep_language + '.json'), 'rt', encoding='utf-8').read()
 lang_data = json.loads(json_data)
@@ -257,9 +257,9 @@ def back_up():
     try:
         shutil.copyfile(set_data['db'] + '.db', 'back_' + set_data['db'] + '.db')
         
-        print('Back Up Ok')
+        print('Back up : Ok')
     except:
-        print('Back Up Error')
+        print('Back up : Error')
 
     threading.Timer(60 * 60 * back_time, back_up).start()
 
@@ -272,12 +272,12 @@ except:
     back_time = 0
     
 if back_time != 0:
-    print(str(back_time) + '-Hours Interval Back Up')
+    print('Back up state : ' + str(back_time) + ' hours interval')
     
     if __name__ == '__main__':
         back_up()
 else:
-    print('Back Up OFF')
+    print('Back up state : Turn off')
 
 conn.commit()
 
@@ -737,10 +737,10 @@ def setting(num = 0):
                             <br>
                             <input placeholder="reCAPTCHA (HTML)" type="text" name="recaptcha" value="''' + html.escape(d_list[0]) + '''">
                             <hr>
-                            <span>reCAPTCHA (Secret Key)</span>
+                            <span>reCAPTCHA (Secret key)</span>
                             <br>
                             <br>
-                            <input placeholder="reCAPTCHA (Secret Key)" type="text" name="sec_re" value="''' + html.escape(d_list[1]) + '''">
+                            <input placeholder="reCAPTCHA (Secret key)" type="text" name="sec_re" value="''' + html.escape(d_list[1]) + '''">
                             <hr>
                             <button id="save" type="submit">''' + load_lang('save') + '''</button>
                         </form>
@@ -1938,13 +1938,13 @@ def other():
                     <li><a href="/admin_list">''' + load_lang('admin') + '''</a></li>
                     <li><a href="/give_log">''' + load_lang('admin_group') + '''</a></li>
                     <li><a href="/not_close_topic">''' + load_lang('open') + ' ' + load_lang('discussion') + '''</a></li>
+                    <li><a href="/title_index">''' + load_lang('all') + ' ' + load_lang('document') + '''</a></li>
+                    <li><a href="/acl_list">ACL ''' + load_lang('document') + '''</a></li>
+                    <li><a href="/please">''' + load_lang('need') + ' ' + load_lang('document') + '''</a></li>
                 </ul>
                 <br>
                 <h2>''' + load_lang('other') + '''</h2>
                 <ul>
-                    <li><a href="/title_index">''' + load_lang('all') + ' ' + load_lang('document') + '''</a></li>
-                    <li><a href="/acl_list">ACL ''' + load_lang('document') + '''</a></li>
-                    <li><a href="/please">''' + load_lang('need') + ' ' + load_lang('document') + '''</a></li>
                     <li><a href="/upload">''' + load_lang('upload') + '''</a></li>
                     <li><a href="/manager/10">''' + load_lang('document') + ' ' + load_lang('search') + '''</a></li>
                 </ul>
@@ -1965,22 +1965,22 @@ def other():
 @app.route('/manager', methods=['POST', 'GET'])
 @app.route('/manager/<int:num>', methods=['POST', 'GET'])
 def manager(num = 1):
-    title_list = [
-        [load_lang('document') + ' ' + load_lang('name'), 'acl'], 
-        [0, 'check'], 
-        [0, 'ban'], 
-        [0, 'admin'], 
-        [0, 'record'], 
-        [0, 'topic_record'], 
-        [load_lang('name'), 'admin_plus'], 
-        [load_lang('name'), 'edit_filter'], 
-        [load_lang('document') + ' ' + load_lang('name'), 'search'], 
-        [0, 'block_user'], 
-        [0, 'block_admin'], 
-        [load_lang('document') + ' ' + load_lang('name'), 'watch_list'], 
-        [load_lang('compare'), 'check'], 
-        [load_lang('document') + ' ' + load_lang('name'), 'edit']
-    ]
+    title_list = {
+        0 : [load_lang('document') + ' ' + load_lang('name'), 'acl'], 
+        1 : [0, 'check'], 
+        2 : [0, 'ban'], 
+        3 : [0, 'admin'], 
+        4 : [0, 'record'], 
+        5 : [0, 'topic_record'], 
+        6 : [load_lang('name'), 'admin_plus'], 
+        7 : [load_lang('name'), 'edit_filter'], 
+        8 : [load_lang('document') + ' ' + load_lang('name'), 'search'], 
+        9 : [0, 'block_user'], 
+        10 : [0, 'block_admin'], 
+        11 : [load_lang('document') + ' ' + load_lang('name'), 'watch_list'], 
+        12 : [load_lang('compare'), 'check'], 
+        13 : [load_lang('document') + ' ' + load_lang('name'), 'edit']
+    }
     
     if num == 1:
         return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
