@@ -489,12 +489,7 @@ def setting(num = 0):
             if d_list[8]:
                 ch_2 = 'checked="checked"'
             
-            div2 = ''
-            for skin_data in os.listdir(os.path.abspath('views')):
-                if d_list[5] == skin_data:
-                    div2 = '<option value="' + skin_data + '">' + skin_data + '</option>' + div2
-                else:
-                    div2 += '<option value="' + skin_data + '">' + skin_data + '</option>'
+            div2 = load_skin(d_list[5])
 
             div3 =''
             if d_list[12] == 'stable':
@@ -2602,25 +2597,10 @@ def change_password():
         else:
             email = ''
 
-        div2 = ''
-
-        curs.execute('select data from user_set where name = "skin" and id = ?', [ip])
-        data = curs.fetchall()
-        for skin_data in os.listdir(os.path.abspath('views')):
-            if not data:
-                curs.execute('select data from other where name = "skin"')
-                sql_data = curs.fetchall()
-                if sql_data and sql_data[0][0] == skin_data:
-                    div2 = '<option value="' + skin_data + '">' + skin_data + '</option>' + div2
-                else:
-                    div2 += '<option value="' + skin_data + '">' + skin_data + '</option>'
-            elif data[0][0] == skin_data:
-                div2 = '<option value="' + skin_data + '">' + skin_data + '</option>' + div2
-            else:
-                div2 += '<option value="' + skin_data + '">' + skin_data + '</option>'
+        div2 = load_skin()
 
         return css_html_js_minify.html_minify(flask.render_template(skin_check(),    
-            imp = [load_lang('my_info') + ' ' + load_lang('edit'), wiki_set(), custom(), other2([0, 0])],
+            imp = [load_lang('user') + ' ' + load_lang('setting') + ' ' + load_lang('edit'), wiki_set(), custom(), other2([0, 0])],
             data =  '''
                     <form method="post">
                         <span>ID : ''' + ip + '''</span>
@@ -3665,7 +3645,7 @@ def user_info():
     if custom()[2] != 0:
         ip_user = '<a href="/w/user:' + ip + '">' + ip + '</a>'
         
-        plus = '<li><a href="/logout">' + load_lang('logout') + '</a></li><li><a href="/change">' + load_lang('my_info') + ' ' + load_lang('edit') + '</a></li>'
+        plus = '<li><a href="/logout">' + load_lang('logout') + '</a></li><li><a href="/change">' + load_lang('user') + ' ' + load_lang('setting') + ' ' + load_lang('edit') + '</a></li>'
         
         curs.execute('select name from alarm where name = ? limit 1', [ip_check()])
         if curs.fetchall():

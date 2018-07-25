@@ -151,10 +151,6 @@ input {
     }
 }
 
-a:link {
-    color: #0093FF;
-}
-
 button {
     border: 1px solid deepskyblue;
     border-radius: 0.25rem;
@@ -197,13 +193,6 @@ input#searchInput:focus {
     word-break: break-all;
 }
 
-#in {
-    margin-left: 20px;
-}
-
-#out {
-    margin-left: 5px;
-}
 
 input {
     max-width: 100%;
@@ -368,20 +357,6 @@ td {
     margin-bottom: 20px;
 }
 
-#toc-name {
-    font-size: 18px;
-}
-
-s, strike, del {
-    color: gray;
-}
-
-s:hover, strike:hover, del:hover {
-    color: #666;
-    background-color: #eee;
-    text-decoration: none;
-}
-
 .scroll-buttons a:link, .scroll-buttons a:visited {
     color: white;
 }
@@ -449,26 +424,6 @@ div.scroll-buttons a {
     text-align: center;
 }
 
-#toron {
-    width: 100%;
-}
-
-#toron_color_green {
-    background-color: #B0D3AD;
-}
-
-#toron_color_red {
-    background-color: #f3c2c2;
-}
-
-#toron_color_blue {
-    background: #c1ebff;
-}
-
-#toron_color {
-    background-color: #d5d5d5;
-}
-
 @media (max-width: 768px) {
     table {
         min-width: 100%;
@@ -477,22 +432,6 @@ div.scroll-buttons a {
 
 textarea {
     width: 100%;
-}
-
-#not_thing {
-    color: #bf4c4c;
-}
-
-#out_link {
-    color: #008000;
-}
-
-#out_link::before {
-    padding: 0px;
-    background: transparent;
-    color: green;
-    content: "\f14c";
-    font-family: FontAwesome;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -552,4 +491,4 @@ ul#redirect {
 html, body { 
     max-width: 100%; 
     overflow-x: hidden; 
-} 
+}
