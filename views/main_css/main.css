@@ -1,0 +1,29 @@
+textarea { width: 100%; }
+input { width: 100%; }
+hr#last { margin-top: 30px; }
+div#toc { border: 1px solid; padding: 20px; width: fit-content; width: -moz-fit-content; margin-top: 10px; }
+#toc-name { font-size: 18px; }
+table { border-collapse: collapse; }
+td { border: 1px solid; padding: 5px; }
+a { text-decoration: none; }
+#not_thing { color: red; }
+#inside, #out_link, #open { color: green; }
+#out_link::before { background: green; color: white; content: "E"; }
+input[type="checkbox"] { width: auto; }
+.popup { position: fixed; bottom: 0; padding: 10px; left: 0; background: lightgray; width: 100%; }
+ul#list { padding: 10px; }
+td#toron_color_green { background: darkseagreen; }
+td#toron_color_blue { background: skyblue; }
+div#cate { border: 1px solid; padding: 5px; }
+td#toron_color_red { background: indianred; }
+#toron { width: 100%; }
+@media (max-width: 768px) { table { min-width: 100%; } }
+@media (min-width: 1024px) { body { width: 80%; margin: auto; padding: 10px; border: 1px solid; } }
+@media (min-width: 1920px) { body { width: 60%; } }
+blockquote { border: 1px solid; padding: 15px; margin: 0; margin-top: 10px; }
+img, iframe { max-width: 100%; }
+pre { border: 1px solid; padding: 10px; white-space: pre-wrap; }
+#in { margin-left: 20px; }
+#out { margin-left: 5px; }
+s, strike, del { color: gray; }
+s:hover, strike:hover, del:hover { color: #666; background-color: #eee; text-decoration: none; }

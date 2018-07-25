@@ -396,6 +396,37 @@ def custom():
 
     return ['', '', user_icon, user_head, email, user_name]
 
+def load_skin(data = ''):
+    div2 = ''
+
+    if data == '':
+        ip = ip_check()
+
+        curs.execute('select data from user_set where name = "skin" and id = ?', [ip])
+        data = curs.fetchall()
+        for skin_data in os.listdir(os.path.abspath('views')):
+            if not skin_data == 'main_css':
+                if not data:
+                    curs.execute('select data from other where name = "skin"')
+                    sql_data = curs.fetchall()
+                    if sql_data and sql_data[0][0] == skin_data:
+                        div2 = '<option value="' + skin_data + '">' + skin_data + '</option>' + div2
+                    else:
+                        div2 += '<option value="' + skin_data + '">' + skin_data + '</option>'
+                elif data[0][0] == skin_data:
+                    div2 = '<option value="' + skin_data + '">' + skin_data + '</option>' + div2
+                else:
+                    div2 += '<option value="' + skin_data + '">' + skin_data + '</option>'
+    else:
+        for skin_data in os.listdir(os.path.abspath('views')):
+            if not skin_data == 'main_css':
+                if data == skin_data:
+                    div2 = '<option value="' + skin_data + '">' + skin_data + '</option>' + div2
+                else:
+                    div2 += '<option value="' + skin_data + '">' + skin_data + '</option>'
+
+    return div2
+
 def acl_check(name):
     ip = ip_check()
 
