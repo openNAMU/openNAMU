@@ -76,6 +76,4 @@ $(document).ready(function() {
         title.innerHTML = get_title;
         data.innerHTML = get_data;
     }
-
-
 });
