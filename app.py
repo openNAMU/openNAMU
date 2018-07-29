@@ -1567,10 +1567,10 @@ def set_edit_filter(name = None):
             imp = [name, wiki_set(), custom(), other2([' (' + load_lang('edit') + ' ' + load_lang('filter') + ')', 0])],
             data =  '''
                     <form method="post">
+                        <input ''' + stat + ''' placeholder="Regex" name="content" value="''' + html.escape(textarea) + '''" type="text">
+                        <hr>
                         <input ''' + stat + ''' type="checkbox" ''' + time_data + ''' name="ban">
                         ''' + load_lang('ban') + '''
-                        <hr>
-                        <input ''' + stat + ''' placeholder="Regex" name="content" value="''' + html.escape(textarea) + '''" type="text">
                         <hr>
                         <button ''' + stat + ''' id="save" type="submit">''' + load_lang('save') + '''</button>
                     </form>
