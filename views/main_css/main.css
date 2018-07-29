@@ -17,9 +17,6 @@ td#toron_color_blue { background: skyblue; }
 div#cate { border: 1px solid; padding: 5px; }
 td#toron_color_red { background: indianred; }
 #toron { width: 100%; }
-@media (max-width: 768px) { table { min-width: 100%; } }
-@media (min-width: 1024px) { body { width: 80%; margin: auto; padding: 10px; border: 1px solid; } }
-@media (min-width: 1920px) { body { width: 60%; } }
 blockquote { border: 1px solid; padding: 15px; margin: 0; margin-top: 10px; }
 img, iframe { max-width: 100%; }
 pre { border: 1px solid; padding: 10px; white-space: pre-wrap; }
