@@ -2824,6 +2824,9 @@ def logout():
 def user_ban(name = None):
     curs.execute("select acl from user where id = ?", [name])
     user = curs.fetchall()
+    if not user:
+        return re_error('/error/2')
+
     if user and user[0][0] != 'user':
         if admin_check(None, None) != 1:
             return re_error('/error/4')
@@ -2832,13 +2835,10 @@ def user_ban(name = None):
         if admin_check(1, 'ban (' + name + ')') != 1:
             return re_error('/error/3')
 
-        if flask.request.form.get('year', 'no_end') == 'no_end':
-            end = ''
+        if flask.request.form.get('limitless', '') == '':
+            end = flask.request.form.get('second', '0')
         else:
-            end = flask.request.form.get('year', '') + '-' + flask.request.form.get('month', '') + '-' + flask.request.form.get('day', '')
-
-        if end == '--':
-            end = ''
+            end = '0'
 
         ban_insert(name, end, flask.request.form.get('why', ''), flask.request.form.get('login', ''), ip_check())
 
@@ -2850,7 +2850,7 @@ def user_ban(name = None):
         curs.execute("select end, why from ban where block = ?", [name])
         end = curs.fetchall()
         if end:
-            now = load_lang('ban') + ' ' + load_lang('release')
+            now = load_lang('release')
 
             if end[0][0] == '':
                 data = '<ul><li>' + load_lang('limitless') + ' ' + load_lang('ban') + '</li>'
@@ -2871,47 +2871,13 @@ def user_ban(name = None):
 
             m = re.search('^([0-9]{4})-([0-9]{2})-([0-9]{2})', now_time)
             g = m.groups()
-
-            year = '<option value="no_end">' + load_lang('limitless') + '</option>'
-            for i in range(int(g[0]), int(g[0]) + 11):
-                if i == int(g[0]):
-                    year += '<option value="' + str(i) + '" selected>' + str(i) + '</option>'
-                else:
-                    year += '<option value="' + str(i) + '">' + str(i) + '</option>'
-
-            month = ''
-            for i in range(1, 13):
-                if int(i / 10) == 0:
-                    num = '0' + str(i)
-                else:
-                    num = str(i)
-
-                if i == int(g[1]):
-                    month += '<option value="' + num + '" selected>' + num + '</option>'
-                else:
-                    month += '<option value="' + num + '">' + num + '</option>'
-                
-            day = ''
-            for i in range(1, 32):
-                if int(i / 10) == 0:
-                    num = '0' + str(i)
-                else:
-                    num = str(i)
-
-                if i == int(g[2]):
-                    day += '<option value="' + num + '" selected>' + num + '</option>'
-                else:
-                    day += '<option value="' + num + '">' + num + '</option>'
             
             if ip_or_user(name) == 1:
                 plus = '<input type="checkbox" name="login"> ' + load_lang('login') + ' ' + load_lang('able') + '<hr>'
             else:
                 plus = ''
 
-            data = '<select name="year">' + year + '</select> ' + load_lang('year') + ' '
-            data += '<select name="month">' + month + '</select> ' + load_lang('month') + ' '
-            data += '<select name="day">' + day + '</select> ' + load_lang('day') + ' <hr>'
-
+            data = '<input placeholder="' + load_lang('second') + '" name="second" type="text"><hr><input type="checkbox" name="limitless"> ' + load_lang('limitless') + '<hr>'
             data += '<input placeholder="' + load_lang('why') + '" name="why" type="text"><hr>' + plus
 
         return css_html_js_minify.html_minify(flask.render_template(skin_check(), 

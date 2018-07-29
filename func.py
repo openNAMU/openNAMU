@@ -561,11 +561,15 @@ def ban_insert(name, end, why, login, blocker):
         else:
             login = ''
 
-        if end != '':
-            end += ' 00:00:00'
+        if end != '0':
+            time = datetime.datetime.now()
+            plus = datetime.timedelta(seconds = int(end))
+            r_time = (time + plus).strftime("%Y-%m-%d %H:%M:%S")
+        else:
+            r_time = ''
 
-        curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, ?)", [name, end, time, blocker, why, band])
-        curs.execute("insert into ban (block, end, why, band, login) values (?, ?, ?, ?, ?)", [name, end, why, band, login])
+        curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, ?)", [name, r_time, time, blocker, why, band])
+        curs.execute("insert into ban (block, end, why, band, login) values (?, ?, ?, ?, ?)", [name, r_time, why, band, login])
     
     conn.commit()
 
