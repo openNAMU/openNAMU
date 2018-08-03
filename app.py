@@ -173,23 +173,26 @@ if not os.path.exists('image'):
 if not os.path.exists('views'):
     os.makedirs('views')
 
-curs.execute('select data from other where name = "port"')
-rep_data = curs.fetchall()
-if not rep_data:
-    while 1:
-        print('Port : ', end = '')
-        
-        rep_port = int(input())
-        if rep_port:
-            curs.execute('insert into other (name, data) values ("port", ?)', [rep_port])
-            
-            break
-        else:
-            pass
+if os.getenv('NAMU_PORT') is not None:
+    rep_port = os.getenv('NAMU_PORT')
 else:
-    rep_port = rep_data[0][0]
+    curs.execute('select data from other where name = "port"')
+    rep_data = curs.fetchall()
+    if not rep_data:
+        while 1:
+            print('Port : ', end = '')
+        
+            rep_port = int(input())
+            if rep_port:
+                curs.execute('insert into other (name, data) values ("port", ?)', [rep_port])
     
-    print('Port : ' + str(rep_port))
+                break
+            else:
+                pass
+    else:
+        rep_port = rep_data[0][0]
+    
+print('Port : ' + str(rep_port))
 
 try:
     if not os.path.exists('robots.txt'):
@@ -213,35 +216,32 @@ except:
 curs.execute('select data from other where name = "key"')
 rep_data = curs.fetchall()
 if not rep_data:
-    while 1:
-        print('Secret key : ', end = '')
-        
-        rep_key = str(input())
-        if rep_key:
-            curs.execute('insert into other (name, data) values ("key", ?)', [rep_key])
-            
-            break
-        else:
-            pass
+    rep_key = ''.join(random.choice("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ") for i in range(16))
+    if rep_key:
+        curs.execute('insert into other (name, data) values ("key", ?)', [rep_key])
 else:
     rep_key = rep_data[0][0]
-
-    print('Secret key : ' + rep_key)
 
 curs.execute("select data from other where name = 'language'")
 rep_data = curs.fetchall()
 if not rep_data:
-    while 1:
-        print('Language [ko-KR, en-US] : ', end = '')
-        support_language = ['ko-KR', 'en-US']
-        
-        rep_language = str(input())
-        if rep_language in support_language:
-            curs.execute("insert into other (name, data) values ('language', ?)", [rep_language])
-            
-            break
+    support_language = ['ko-KR', 'en-US']
+    if os.getenv('NAMU_LANG') is not None:
+        if os.getenv('NAMU_LANG') in support_language:
+            curs.execute("insert into other (name, data) values ('language', ?)", [os.getenv('NAMU_LANG')])
+            rep_language = os.getenv('NAMU_LANG')
         else:
-            pass
+            print('Language {} is not supported!'.format(os.getenv('NAMU_LANG')))
+            rep_language = 'en-US'
+    else:
+        while 1:
+            print('Language [{}] : '.format(' '.join(support_language)))
+            rep_language = str(input())
+            if rep_language in support_language:
+                curs.execute("insert into other (name, data) values ('language', ?)", [rep_language])
+                break
+            else:
+                pass
 else:
     rep_language = rep_data[0][0]
     
@@ -2871,7 +2871,7 @@ def user_ban(name = None):
 
             m = re.search('^([0-9]{4})-([0-9]{2})-([0-9]{2})', now_time)
             g = m.groups()
-            
+
             if ip_or_user(name) == 1:
                 plus = '<input type="checkbox" name="login"> ' + load_lang('login') + ' ' + load_lang('able') + '<hr>'
             else:
@@ -3839,37 +3839,6 @@ def views(name = None):
         return css_html_js_minify.html_minify(flask.send_from_directory('./views' + plus, rename))   
     else:
         return flask.send_from_directory('./views' + plus, rename)
-
-@app.route('/test')
-def main_test():
-    return  '''
-            <iframe width="560" height="315" src="https://www.youtube.com/embed/Al-C1dQnE0o" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-            <br>
-            <br>
-            <div>
-                우리가 바라보았던 그 물결이 지금도 떠오르는걸. 모래 위에 끄적여 새겼던 말들과 돌아선 너의 뒷모습. <br>
-                돌아오는 파도가 발밑을 지나가면서 무언갈 쓸어가네. 해가 질 무렵 쯤에 저녁 노을만이 파도를 따라 흘러가... <br>
-                <br>                
-                팟하면서 피어나는 불꽃놀이를 바라봐. 아직 끝이 나지 않은 여름이. <br>
-                애매할 뿐인 마음을 풀고선 다시 엮어서 오늘 밤이 계속 되길 바랬어... <br>
-                <br>
-                앞으로 더 얼마나 너와 같은 불꽃놀이를 볼 수 있을까? 웃고 있는 네 얼굴에 나는 말을 잃어버려. <br>
-                상처받게되고, 기뻐하게되고 파도처럼 반복된 감정, 초조, 떠나는 열차 소리. <br>
-                몇번이고 나는 또다시 널 부르게 될 꺼야 파도와 함께 너와 한번 더 더 더 더. <br>
-                두번 다시 슬프지않도록 끝나게끔... <br>
-                <br>
-                팟하면서 들이키면 사라질 듯한 불빛이. 아직 여기 마음에 남아있어. <br>
-                손을 뻗어보면 닿았던 따스한 듯한 미래가. 조용하게 우리를 지켜봤어... <br>
-                <br> 
-                팟 한 불꽃들이.  (팟 한 불꽃들이) 오늘 밤 피었어. (오늘 밤 피었어) 오늘 밤 피어선. (오늘 밤 피어선) <br>
-                조용히 사라져. (조용히 사라져) 놓치지 말아줘. (떠나지 말아줘) 조금만 이대로. (조금만 이대로) <br>
-                조금만 이대로 여기에 있어... <br>
-                <br>
-                우리가 바라보았던 그 물결이 지금도 떠오르는걸. 모래 위에 끄적여 새겼던 말들과 돌아선 너의 뒷모습... <br>
-                팟하면서 피어나는 불꽃놀이를 바라봐. 아직 끝이 나지 않은 여름이. <br>
-                애매할 뿐인 마음을 풀고선 다시 엮어서 오늘 밤이 계속 되길 바랬어...
-            </div>
-            '''
 
 @app.route('/<data>')
 def main_file(data = None):

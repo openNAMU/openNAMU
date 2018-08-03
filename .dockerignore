@@ -1,4 +1,8 @@
-set.json
+.git
+.gitignore
+Dockerfile
+.dockerignore
+*.md
 
 set_mark/__pycache__
 /__pycache__
@@ -6,8 +10,6 @@ set_mark/__pycache__
 .vscode
 
 *.db
-image
-robots.txt
 
 views/liberty
 views/yousoro
