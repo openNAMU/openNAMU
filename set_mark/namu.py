@@ -730,6 +730,8 @@ def namu(conn, data, title, main_num):
         else:
             break
 
+    data = re.sub('(?P<in>\n +\* (?:(?:(?!\|\|).)+))\|\|', '\g<in>\n ||', data)
+
     # 리스트 구현
     while 1:
         li = re.search('(\n(?:(?: *)\* ?(?:(?:(?!\n).)+)\n)+)', data)
@@ -753,6 +755,8 @@ def namu(conn, data, title, main_num):
             data = re.sub('(\n(?:(?: *)\* ?(?:(?:(?!\n).)+)\n)+)', '\n\n<ul>' + li + '</ul>\n', data, 1)
         else:
             break
+
+    data = re.sub('<\/ul>\n \|\|', '</ul>||', data)
 
     # 들여쓰기 구현
     while 1:
