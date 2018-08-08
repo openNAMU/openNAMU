@@ -630,7 +630,7 @@ def namu(conn, data, title, main_num):
             
             data = re.sub('\n(={1,6}) ?((?:(?!\n).)+) ?\n', '\n<h' + toc_number + ' id="s-' + re.sub('\.$', '', all_stack) + '"><a href="#toc">' + all_stack + '</a> ' + re.sub('=*$', '', toc[1]) + ' <span style="font-size: 12px"><a href="/edit/' + tool.url_pas(title) + '?section=' + str(edit_number) + '">(Edit)</a></span></h' + toc_number + '>\n', data, 1)
             
-            toc_data += '<span style="margin-left: ' + str((toc_full - toc_top_stack) * 10) + 'px;"><a href="#s-' + re.sub('\.$', '', all_stack) + '">' + all_stack + '</a> ' + re.sub('\[\*((?:(?! |\]).)*)(?: ((?:(?!\]).)+))?\]', '', re.sub('=*$', '', toc[1])) + '</span>\n'
+            toc_data += '<span style="margin-left: ' + str((toc_full - toc_top_stack) * 10) + 'px;"><a href="#s-' + re.sub('\.$', '', all_stack) + '">' + all_stack + '</a> ' + re.sub('\[\*((?:(?! |\]).)*)(?: ((?:(?!(\[\*(?:(?:(?!\]).)+)\]|\])).)+))?\]', '', re.sub('=*$', '', toc[1])) + '</span>\n'
         else:
             break
 
@@ -949,7 +949,7 @@ def namu(conn, data, title, main_num):
     footnote_re = {}
     footdata_all = '\n<hr><ul id="footnote_data">'
     while 1:
-        footnote = re.search('(?:\[\*((?:(?! |\]).)*)(?: ((?:(?!\]).)+))?\]|(\[(?:각주|footnote)\]))', data)
+        footnote = re.search('(?:\[\*((?:(?! |\]).)*)(?: ((?:(?!(\[\*(?:(?:(?!\]).)+)\]|\])).)+))?\]|(\[(?:각주|footnote)\]))', data)
         if footnote:
             footnote_data = footnote.groups()
             if footnote_data[2]:
@@ -979,9 +979,9 @@ def namu(conn, data, title, main_num):
 
                         footnote_all += [[float(footshort), footshort, 0]]
 
-                        data = re.sub('(?:\[\*((?:(?! |\]).)*)(?: ((?:(?!\]).)+))?\]|(\[(?:각주|footnote)\]))', '<sup><a href="#fn-' + footshort + '" id="rfn-' + footshort + '">(' + footshort + ')</a></sup>', data, 1)
+                        data = re.sub('(?:\[\*((?:(?! |\]).)*)(?: ((?:(?!(\[\*(?:(?:(?!\]).)+)\]|\])).)+))?\]|(\[(?:각주|footnote)\]))', '<sup><a href="#fn-' + footshort + '" id="rfn-' + footshort + '">(' + footshort + ')</a></sup>', data, 1)
                     else:
-                        data = re.sub('(?:\[\*((?:(?! |\]).)*)(?: ((?:(?!\]).)+))?\]|(\[(?:각주|footnote)\]))', '<sup><a href="#">(' + footnote_name + ')</a></sup>', data, 1)
+                        data = re.sub('(?:\[\*((?:(?! |\]).)*)(?: ((?:(?!(\[\*(?:(?:(?!\]).)+)\]|\])).)+))?\]|(\[(?:각주|footnote)\]))', '<sup><a href="#">(' + footnote_name + ')</a></sup>', data, 1)
                 else:
                     footnote_number += 1
 
@@ -997,7 +997,7 @@ def namu(conn, data, title, main_num):
 
                     footnote_all += [[footnote_number, footnote_name, footnote]]
                     
-                    data = re.sub('(?:\[\*((?:(?! |\]).)*)(?: ((?:(?!\]).)+))?\]|(\[(?:각주|footnote)\]))', '<sup><a href="#fn-' + str(footnote_number) + '" id="rfn-' + str(footnote_number) + '">(' + footnote_name + ')</a></sup>', data, 1)
+                    data = re.sub('(?:\[\*((?:(?! |\]).)*)(?: ((?:(?!(\[\*(?:(?:(?!\]).)+)\]|\])).)+))?\]|(\[(?:각주|footnote)\]))', '<sup><a href="#fn-' + str(footnote_number) + '" id="rfn-' + str(footnote_number) + '">(' + footnote_name + ')</a></sup>', data, 1)
         else:
             break
 
