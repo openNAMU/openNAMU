@@ -162,157 +162,9 @@ def table_start(data):
             break
             
     return data
-    
-def link_fix(main_link):
-    if re.search('^:', main_link):
-        main_link = re.sub('^:', '', main_link)
 
-    main_link = re.sub('^사용자:', 'user:', main_link)
-    main_link = re.sub('^파일:', 'file:', main_link)
-    main_link = re.sub('^분류:', 'category:', main_link)
-
-    other_link = re.search('(#.+)$', main_link)
-    if other_link:
-        other_link = other_link.groups()[0]
-
-        main_link = re.sub('(#.+)$', '', main_link)
-    else:
-        other_link = ''
-        
-    return [main_link, other_link]
-
-def namu(conn, data, title, main_num):
-    # DB 지정
-    curs = conn.cursor()
-
-    # 초기 설정
-    data = '\n' + data + '\n'
-    backlink = []
-    plus_data = '''
-                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css">
-                <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
-                <script>
-                    hljs.initHighlightingOnLoad(); 
-                    function folding(num) { 
-                        var fol = document.getElementById('folding_' + num); 
-                        if(fol.style.display == 'inline-block' || fol.style.display == 'block') { 
-                            fol.style.display = 'none';
-                        } else {
-                            if(num % 2 == 0) { 
-                                fol.style.display = 'block'; 
-                            } else { 
-                                fol.style.display = 'inline-block'; 
-                            } 
-                        } 
-                    }
-                </script>
-                '''
-    end_data= []
-    
-    # XSS 이스케이프
-    data = html.escape(data)
-
-    # 포함 문법 처리
-    while 1:
-        include = re.search('\[include\(((?:(?!\)\]).)+)\)\]', data)
-        if include:
-            include = include.groups()[0]
-    
-            include_data = re.search('^((?:(?!,).)+)', include)
-            if include_data:
-                include_data = include_data.groups()[0]
-            else:
-                include_data = 'Test'
-
-            include_link = include_data
-
-            backlink += [[title, include_link, 'include']]
-
-            include = re.sub('^((?:(?!,).)+)', '', include)
-            
-            # 틀 NoWiki
-            num = 0
-            while 1:
-                include_one_nowiki = re.search('(?:\\\\){2}(.)', include)
-                if include_one_nowiki:
-                    include_one_nowiki = include_one_nowiki.groups()
-
-                    num += 1
-
-                    end_data += [['include_one_nowiki_' + str(num), include_one_nowiki[0], 'normal']]
-
-                    include = re.sub('(?:\\\\){2}(.)', '<span id="include_one_nowiki_' + str(num) + '"></span>', include, 1)
-                else:
-                    break
-
-            curs.execute("select data from data where title = ?", [include_data])
-            include_data = curs.fetchall()
-            if include_data:
-                include_parser = include_data[0][0]
-
-                while 1:
-                    include_plus = re.search(', ?((?:(?!=).)+)=((?:(?!,).)+)', include)
-                    if include_plus:
-                        include_plus = include_plus.groups()
-                        include_parser = re.sub('@' + include_plus[0] + '@', include_plus[1], include_parser)
-
-                        include = re.sub(', ?((?:(?!=).)+)=((?:(?!,).)+)', '', include, 1)
-                    else:
-                        break
-
-                include_parser = re.sub('\[\[(?:category|분류):(((?!\]\]|#include).)+)\]\]', '', include_parser)
-                include_parser = html.escape(include_parser)
-
-                data = re.sub('\[include\(((?:(?!\)\]).)+)\)\]', '<include>\n<a id="include_link" href="/w/' + tool.url_pas(include_link) + '">[' + include_link + ']</a>\n' + include_parser + '\n</include>', data, 1)
-            else:
-                data = re.sub('\[include\(((?:(?!\)\]).)+)\)\]', '<a id="not_thing" href="/w/' + tool.url_pas(include_link) + '">' + include_link + '</a>', data, 1)
-        else:
-            break
-
-    # 개행 정리
-    data = re.sub('\r\n', '\n', data)
-
-    # 기타 처리
-    data = re.sub('&amp;', '&', data)
-
-    # HTML 허용
-    curs.execute('select html from html_filter')
-    html_db = curs.fetchall()
-
-    src_list = ["www.youtube.com", "serviceapi.nmv.naver.com", "tv.kakao.com", "www.google.com", "serviceapi.rmcnmv.naver.com"]
-    html_list = ['div', 'span', 'embed', 'iframe', 'ruby', 'rp', 'rt']
-    
-    html_data = re.findall('&lt;(\/)?((?:(?!&gt;| ).)+)( (?:(?:(?!&gt;).)+)?)?&gt;', data)
-    for in_data in html_data:
-        if in_data[0] == '':
-            if in_data[1] in html_list or (html_db and in_data[1] in html_db[0]):
-                if re.search('&lt;\/' + in_data[1] + '&gt;', data):
-                    src = re.search('src=([^ ]*)', in_data[2])
-                    if src:
-                        v_src = re.search('http(?:s)?:\/\/([^/\'" ]*)', src.groups()[0])
-                        if v_src:
-                            if not v_src.groups()[0] in src_list:
-                                and_data = re.sub('&#x27;', '\'', re.sub('&quot;', '"', re.sub('src=([^ ]*)', '', in_data[2])))
-                            else:
-                                and_data = re.sub('&#x27;', '\'', re.sub('&quot;', '"', in_data[2]))
-                        else:
-                            and_data = re.sub('&#x27;', '\'', re.sub('&quot;', '"', re.sub('src=([^ ]*)', '', in_data[2])))
-                    else:
-                        and_data = re.sub('&#x27;', '\'', re.sub('&quot;', '"', in_data[2]))
-                        
-
-                    data = data.replace('&lt;' + in_data[1] + in_data[2] + '&gt;', '<' + in_data[1] + and_data + '>', 1)
-                    data = re.sub('&lt;\/' + in_data[1] + '&gt;', '</' + in_data[1] + '>', data, 1)
-
-    position = re.compile('position', re.I)
-    data = position.sub('', data)
-
-    # 표 정리
-    data = re.sub('\n( +)\|\|', '\n||', data)
-    data = re.sub('\|\|( +)\n', '||\n', data)
-
-    # 주석 처리
-    data = re.sub('\n##(((?!\n).)+)', '', data)
+def middle_parser(data):
+    global end_data
 
     # 중괄호 문법 처리
     middle_stack = 0
@@ -329,7 +181,7 @@ def namu(conn, data, title, main_num):
                     
                     data = re.sub('(?:{{{((?:(?! |{{{|}}}).)*)(?P<in> ?)|(}}}))', '&#123;&#123;&#123;' + middle_data[0] + '\g<in>', data, 1)
                 else:
-                    if re.search('^(#|@|\+|\-)', middle_data[0]):
+                    if re.search('^(#|@|\+|\-)', middle_data[0]) and not re.search('^(#|@|\+|\-){2}', middle_data[0]):
                         middle_search = re.search('^(#(?:[0-9a-f-A-F]{3}){1,2})', middle_data[0])
                         if middle_search:                            
                             middle_list += ['span']
@@ -474,6 +326,169 @@ def namu(conn, data, title, main_num):
             data = re.sub('<code class="((?:(?!").)+)">((?:(?:(?:(?!<\/code>|<span id="syntax_)).)+\n*)+)<\/code>', '<code class="' + syntax_data[0] + '"><span id="syntax_' + str(num) + '"></span></code>', data, 1)
         else:
             break
+
+    return data
+    
+def link_fix(main_link):
+    if re.search('^:', main_link):
+        main_link = re.sub('^:', '', main_link)
+
+    main_link = re.sub('^사용자:', 'user:', main_link)
+    main_link = re.sub('^파일:', 'file:', main_link)
+    main_link = re.sub('^분류:', 'category:', main_link)
+
+    other_link = re.search('(#.+)$', main_link)
+    if other_link:
+        other_link = other_link.groups()[0]
+
+        main_link = re.sub('(#.+)$', '', main_link)
+    else:
+        other_link = ''
+        
+    return [main_link, other_link]
+
+def namu(conn, data, title, main_num):
+    # DB 지정
+    curs = conn.cursor()
+
+    # 초기 설정
+    data = '\n' + data + '\n'
+    backlink = []
+    plus_data = '''
+                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css">
+                <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+                <script>
+                    hljs.initHighlightingOnLoad(); 
+                    function folding(num) { 
+                        var fol = document.getElementById('folding_' + num); 
+                        if(fol.style.display == 'inline-block' || fol.style.display == 'block') { 
+                            fol.style.display = 'none';
+                        } else {
+                            if(num % 2 == 0) { 
+                                fol.style.display = 'block'; 
+                            } else { 
+                                fol.style.display = 'inline-block'; 
+                            } 
+                        } 
+                    }
+                </script>
+                '''
+    global end_data
+    end_data = []
+    
+    # XSS 이스케이프
+    data = html.escape(data)
+
+    # 개행 정리 1
+    data = re.sub('\r\n', '\n', data)
+
+    # 중괄호 파싱 1
+    data = middle_parser(data)
+
+    # 포함 문법 처리
+    while 1:
+        include = re.search('\[include\(((?:(?!\)\]).)+)\)\]', data)
+        if include:
+            include = include.groups()[0]
+    
+            include_data = re.search('^((?:(?!,).)+)', include)
+            if include_data:
+                include_data = include_data.groups()[0]
+            else:
+                include_data = 'Test'
+
+            include_link = include_data
+
+            backlink += [[title, include_link, 'include']]
+
+            include = re.sub('^((?:(?!,).)+)', '', include)
+            
+            # 틀 NoWiki
+            num = 0
+            while 1:
+                include_one_nowiki = re.search('(?:\\\\){2}(.)', include)
+                if include_one_nowiki:
+                    include_one_nowiki = include_one_nowiki.groups()
+
+                    num += 1
+
+                    end_data += [['include_one_nowiki_' + str(num), include_one_nowiki[0], 'normal']]
+
+                    include = re.sub('(?:\\\\){2}(.)', '<span id="include_one_nowiki_' + str(num) + '"></span>', include, 1)
+                else:
+                    break
+
+            curs.execute("select data from data where title = ?", [include_data])
+            include_data = curs.fetchall()
+            if include_data:
+                include_parser = include_data[0][0]
+
+                while 1:
+                    include_plus = re.search(', ?((?:(?!=).)+)=((?:(?!,).)+)', include)
+                    if include_plus:
+                        include_plus = include_plus.groups()
+                        include_parser = re.sub('@' + include_plus[0] + '@', include_plus[1], include_parser)
+
+                        include = re.sub(', ?((?:(?!=).)+)=((?:(?!,).)+)', '', include, 1)
+                    else:
+                        break
+
+                include_parser = re.sub('\[\[(?:category|분류):(((?!\]\]|#include).)+)\]\]', '', include_parser)
+                include_parser = html.escape(include_parser)
+
+                data = re.sub('\[include\(((?:(?!\)\]).)+)\)\]', '<include>\n<a id="include_link" href="/w/' + tool.url_pas(include_link) + '">[' + include_link + ']</a>\n' + include_parser + '\n</include>', data, 1)
+            else:
+                data = re.sub('\[include\(((?:(?!\)\]).)+)\)\]', '<a id="not_thing" href="/w/' + tool.url_pas(include_link) + '">' + include_link + '</a>', data, 1)
+        else:
+            break
+
+    # 개행 정리 2
+    data = re.sub('\r\n', '\n', data)
+
+    # 중괄호 파싱 2
+    data = middle_parser(data)
+
+    # 기타 처리
+    data = re.sub('&amp;', '&', data)
+
+    # HTML 허용
+    curs.execute('select html from html_filter')
+    html_db = curs.fetchall()
+
+    src_list = ["www.youtube.com", "serviceapi.nmv.naver.com", "tv.kakao.com", "www.google.com", "serviceapi.rmcnmv.naver.com"]
+    html_list = ['div', 'span', 'embed', 'iframe', 'ruby', 'rp', 'rt']
+    
+    html_data = re.findall('&lt;(\/)?((?:(?!&gt;| ).)+)( (?:(?:(?!&gt;).)+)?)?&gt;', data)
+    for in_data in html_data:
+        if in_data[0] == '':
+            if in_data[1] in html_list or (html_db and in_data[1] in html_db[0]):
+                if re.search('&lt;\/' + in_data[1] + '&gt;', data):
+                    src = re.search('src=([^ ]*)', in_data[2])
+                    if src:
+                        v_src = re.search('http(?:s)?:\/\/([^/\'" ]*)', src.groups()[0])
+                        if v_src:
+                            if not v_src.groups()[0] in src_list:
+                                and_data = re.sub('&#x27;', '\'', re.sub('&quot;', '"', re.sub('src=([^ ]*)', '', in_data[2])))
+                            else:
+                                and_data = re.sub('&#x27;', '\'', re.sub('&quot;', '"', in_data[2]))
+                        else:
+                            and_data = re.sub('&#x27;', '\'', re.sub('&quot;', '"', re.sub('src=([^ ]*)', '', in_data[2])))
+                    else:
+                        and_data = re.sub('&#x27;', '\'', re.sub('&quot;', '"', in_data[2]))
+                        
+
+                    data = data.replace('&lt;' + in_data[1] + in_data[2] + '&gt;', '<' + in_data[1] + and_data + '>', 1)
+                    data = re.sub('&lt;\/' + in_data[1] + '&gt;', '</' + in_data[1] + '>', data, 1)
+
+    position = re.compile('position', re.I)
+    data = position.sub('', data)
+
+    # 표 정리
+    data = re.sub('\n( +)\|\|', '\n||', data)
+    data = re.sub('\|\|( +)\n', '||\n', data)
+
+    # 주석 처리
+    data = re.sub('\n##(((?!\n).)+)', '', data)
            
     # 이중 표 처리
     while 1:
@@ -531,6 +546,16 @@ def namu(conn, data, title, main_num):
             data = re.sub('(?:\\\\)(.)', '<span id="one_nowiki_' + str(num) + '"></span>', data, 1)
         else:
             break
+
+    # 수평줄
+    while 1:
+        hr = re.search('\n-{4,9}\n', data)
+        if hr:
+            data = re.sub('\n-{4,9}\n', '\n<hr>\n', data, 1)
+        else:
+            break
+
+    data += '\n'
 
     # 추가 이스케이프
     data = data.replace('\\', '&#92;')
@@ -612,15 +637,6 @@ def namu(conn, data, title, main_num):
     toc_data += '</div>'
     
     data = re.sub('\[(?:목차|tableofcontents)\]', toc_data, data)
-    
-    while 1:
-        hr = re.search('\n-{4,9}\n', data)
-        if hr:
-            data = re.sub('\n-{4,9}\n', '\n<hr>\n', data, 1)
-        else:
-            break
-
-    data += '\n'
 
     # 일부 매크로 처리
     data = tool.savemark(data)
@@ -730,7 +746,7 @@ def namu(conn, data, title, main_num):
         else:
             break
 
-    data = re.sub('(?P<in>\n +\* (?:(?:(?!\|\|).)+))\|\|', '\g<in>\n ||', data)
+    data = re.sub('(?P<in>\n +\* ?(?:(?:(?!\|\|).)+))\|\|', '\g<in>\n ||', data)
 
     # 리스트 구현
     while 1:
