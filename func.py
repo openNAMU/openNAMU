@@ -360,7 +360,7 @@ def ip_pas(raw_ip):
             ip = '<a id="not_thing" href="/w/' + url_pas('user:' + raw_ip) + '">' + raw_ip + '</a>'
          
     if hide == 0:
-        ip += ' <a href="/record/' + url_pas('user:' + raw_ip) + '">(' + load_lang('record') + ')</a>'
+        ip += ' <a href="/record/' + url_pas(raw_ip) + '">(' + load_lang('record') + ')</a>'
 
     return ip
 
