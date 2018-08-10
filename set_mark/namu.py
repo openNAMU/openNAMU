@@ -580,7 +580,7 @@ def namu(conn, data, title, main_num):
         
         backlink += [[title, main_link, 'redirect']]
         
-        data = re.sub('\n#(?:redirect|넘겨주기) (?P<in>(?:(?!\n).)+)\n', '<meta http-equiv="refresh" content="0; url=/w/' + tool.url_pas(main_link) + '?froms=' + tool.url_pas(title) + other_link + '">', data, 1)
+        data = re.sub('\n#(?:redirect|넘겨주기) (?P<in>(?:(?!\n).)+)\n', '<script>location.href="/w/' + tool.url_pas(main_link) + '?froms=' + tool.url_pas(title) + other_link + '";</script>', data, 1)
 
     # [목차(없음)] 처리
     if not re.search('\[(?:목차|tableofcontents)\((?:없음|no)\)\]\n', data):

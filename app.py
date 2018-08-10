@@ -192,7 +192,7 @@ else:
     else:
         rep_port = rep_data[0][0]
     
-print('Port : ' + str(rep_port))
+        print('Port : ' + str(rep_port))
 
 try:
     if not os.path.exists('robots.txt'):
