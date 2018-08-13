@@ -4,7 +4,7 @@
  * 랜덤 구현
 
 ## 0.2 ~ 0.9 (베타)
- * 그 외 엄청나게 많은 기능 구현 (기존 [오픈나무](https://github.com/2DU/Old-openNAMU) 기능에서 로그인 필요한 기능 빼고 구현)
+ * 그 외 엄청나게 많은 기능 구현 (기존 [오픈나무](https://github.com/2DU/Discard-openNAMU-Legacy) 기능에서 로그인 필요한 기능 빼고 구현)
 
 ## 1.0
  * 로그인 구현
@@ -154,10 +154,11 @@
  * [참조](https://github.com/2DU/openNAMU/commits/master)
 
 ----
-## 오픈나무 라이선스
+## 라이선스
+### 오픈나무
  * [BSD 3-Clause License](https://github.com/2DU/openNAMU/blob/master/license.md)
 
-## 외부 파일 라이선스
+### 외부 파일
  * 인용문 아이콘 [Dave Gandy](http://www.flaticon.com/free-icon/quote-left_25672) CC 3.0 BY
  * 구문 강조 [highlightjs](https://highlightjs.org/)
  * 수식 [MathJax](https://www.mathjax.org/)
@@ -173,7 +174,7 @@
 
 ----
 ## 기타
- * 현재 버전 : v3.0.4
+ * 현재 버전 : v3.0.6
 
 ----
 ## 개발 이념
