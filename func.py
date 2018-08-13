@@ -1,22 +1,3 @@
-# 모듈들 불러옴
-try:
-    import css_html_js_minify
-except:
-    def easy_minify(data):
-        data = re.sub('\n +', '\n', data)
-        
-        return data
-    
-    class css_html_js_minify:
-        def html_minify(data):
-            return easy_minify(data)
-            
-        def css_minify(data):
-            return easy_minify(data)
-            
-        def js_minify(data):
-            return easy_minify(data)
-    
 import flask
 import json
 import sqlite3
@@ -26,13 +7,9 @@ import re
 import html
 import os
 
-# 일부 툴 불러옴
 from set_mark.tool import *
-
-# 나무마크 불러옴
 from mark import *
 
-# 서브 언어팩 불러옴
 json_data = open(os.path.join('language', 'en-US.json'), 'rt', encoding='utf-8').read()
 else_lang = json.loads(json_data)
 
@@ -44,6 +21,11 @@ def load_conn(data):
     curs = conn.cursor()
 
     load_conn2(data)
+
+def easy_minify(data):
+    data = re.sub('\n +', '\n', data)
+    
+    return data
 
 def captcha_get():
     data = ''
@@ -60,42 +42,7 @@ def captcha_get():
     return data
 
 def update():
-    # 호환성 설정
-    try:        
-        curs.execute('select title, re from hidhi')
-        for rep in curs.fetchall():
-            curs.execute("update history set hide = 'O' where title = ? and id = ?", [rep[0], rep[1]])
-
-        curs.execute("drop table if exists hidhi")
-
-        print('move table hidhi')
-    except:
-        pass
-
-    try:
-        curs.execute("select title, acl from data where acl != ''")
-        for rep in curs.fetchall():
-            curs.execute("insert into acl (title, dec, dis, why) values (?, ?, '', '')", [rep[0], rep[1]])
-
-        curs.execute("alter table data drop acl")
-
-        print('data table delete column acl')
-    except:
-        pass
-
-    try:
-        curs.execute('select name, sub from filter where sub != "X" and sub != ""')
-        filter_name = curs.fetchall()
-        if filter_name:
-            for filter_delete in filter_name:
-                if filter_delete[1] != '' or filter_delete[1] != 'X':
-                    curs.execute("update filter set sub = '' where name = ?", [filter_delete[0]])
-
-            print('filter data fix')
-    except:
-        pass
-
-    # 3.0.5 사용자 문서, 파일 문서, 분류 문서 영어화
+    # v3.0.5 사용자 문서, 파일 문서, 분류 문서 영어화
     try:
         all_rep = [['사용자:', 'user:'], ['파일:', 'file:'], ['분류:', 'category:']]
         all_rep2 = ['data', 'history', 'acl', 'topic', 'back']
@@ -132,6 +79,13 @@ def update():
             print('사용자 to user, 파일 to file, 분류 to category')
     except:
         pass
+
+    # v3.0.6 사용자 설정 분리
+    try:
+        curs.execute("alter table user drop email")
+        curs.execute("alter table user drop skin")
+    except:
+       pass
 
 def captcha_post(re_data, num = 1):
     if num == 1:
@@ -207,7 +161,7 @@ def edit_help_button():
     </script>
     '''
 
-    insert_list = [['[[|]]', 'Link'], ['[()]', 'Macro'], ['{{{#!}}}', 'Middle'], ['||<>||', 'table']]
+    insert_list = [['[[|]]', 'Link'], ['[()]', 'Macro'], ['{{{#!}}}', 'Middle'], ['||<>||', 'Table']]
 
     data = ''
     for insert_data in insert_list:
@@ -232,7 +186,7 @@ def skin_check():
     skin = './views/acme/'
     
     try:
-        curs.execute('select skin from user where id = ?', [ip_check()])
+        curs.execute('select data from user_set where name = "skin" and id = ?', [ip_check()])
         skin_exist = curs.fetchall()
         if skin_exist and skin_exist[0][0] != '':
             if os.path.exists(os.path.abspath('./views/' + skin_exist[0][0] + '/index.html')) == 1:
@@ -393,7 +347,7 @@ def ip_pas(raw_ip):
             ip = '<a id="not_thing" href="/w/' + url_pas('user:' + raw_ip) + '">' + raw_ip + '</a>'
          
     if hide == 0:
-        ip += ' <a href="/record/' + url_pas('user:' + raw_ip) + '">(' + load_lang('record') + ')</a>'
+        ip += ' <a href="/record/' + url_pas(raw_ip) + '">(' + load_lang('record') + ')</a>'
 
     return ip
 
@@ -413,7 +367,7 @@ def custom():
         user_icon = 0
 
     if user_icon != 0:
-        curs.execute('select email from user where id = ?', [ip_check()])
+        curs.execute('select data from user_set where name = "email" and id = ?', [ip_check()])
         data = curs.fetchall()
         if data:
             email = data[0][0]
@@ -428,6 +382,37 @@ def custom():
         user_name = load_lang('user')
 
     return ['', '', user_icon, user_head, email, user_name]
+
+def load_skin(data = ''):
+    div2 = ''
+
+    if data == '':
+        ip = ip_check()
+
+        curs.execute('select data from user_set where name = "skin" and id = ?', [ip])
+        data = curs.fetchall()
+        for skin_data in os.listdir(os.path.abspath('views')):
+            if not skin_data == 'main_css':
+                if not data:
+                    curs.execute('select data from other where name = "skin"')
+                    sql_data = curs.fetchall()
+                    if sql_data and sql_data[0][0] == skin_data:
+                        div2 = '<option value="' + skin_data + '">' + skin_data + '</option>' + div2
+                    else:
+                        div2 += '<option value="' + skin_data + '">' + skin_data + '</option>'
+                elif data[0][0] == skin_data:
+                    div2 = '<option value="' + skin_data + '">' + skin_data + '</option>' + div2
+                else:
+                    div2 += '<option value="' + skin_data + '">' + skin_data + '</option>'
+    else:
+        for skin_data in os.listdir(os.path.abspath('views')):
+            if not skin_data == 'main_css':
+                if data == skin_data:
+                    div2 = '<option value="' + skin_data + '">' + skin_data + '</option>' + div2
+                else:
+                    div2 += '<option value="' + skin_data + '">' + skin_data + '</option>'
+
+    return div2
 
 def acl_check(name):
     ip = ip_check()
@@ -563,11 +548,15 @@ def ban_insert(name, end, why, login, blocker):
         else:
             login = ''
 
-        if end != '':
-            end += ' 00:00:00'
+        if end != '0':
+            time = datetime.datetime.now()
+            plus = datetime.timedelta(seconds = int(end))
+            r_time = (time + plus).strftime("%Y-%m-%d %H:%M:%S")
+        else:
+            r_time = ''
 
-        curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, ?)", [name, end, time, blocker, why, band])
-        curs.execute("insert into ban (block, end, why, band, login) values (?, ?, ?, ?, ?)", [name, end, why, band, login])
+        curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, ?)", [name, r_time, time, blocker, why, band])
+        curs.execute("insert into ban (block, end, why, band, login) values (?, ?, ?, ?, ?)", [name, r_time, why, band, login])
     
     conn.commit()
 
@@ -597,7 +586,7 @@ def leng_check(first, second):
     return all_plus
 
 def redirect(data):
-    return '<meta http-equiv="refresh" content="0; url=' + data + '">'
+    return flask.redirect(data)
 
 def re_error(data):
     if data == '/ban':
@@ -636,7 +625,7 @@ def re_error(data):
                 if end_data[0][1] != '':
                     end += '<li>' + load_lang('why') + ' : ' + end_data[0][1] + '</li>'
 
-        return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
+        return easy_minify(flask.render_template(skin_check(), 
             imp = ['Error', wiki_set(1), custom(), other2([0, 0])],
             data = '<h2>Error</h2><ul>' + end + '</ul>',
             menu = 0
@@ -653,6 +642,8 @@ def re_error(data):
                 data = load_lang('authority_error')
             elif num == 4:
                 data = load_lang('no_admin_block_error')
+            elif num == 5:
+                data = load_lang('skin_error')
             elif num == 6:
                 data = load_lang('same_id_exist_error')
             elif num == 7:
@@ -684,7 +675,7 @@ def re_error(data):
             else:
                 data = '???'
 
-            return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
+            return easy_minify(flask.render_template(skin_check(), 
                 imp = ['Error', wiki_set(1), custom(), other2([0, 0])],
                 data = '<h2>Error</h2><ul><li>' + data + '</li></ul>',
                 menu = 0

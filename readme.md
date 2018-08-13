@@ -17,8 +17,7 @@ NamuMark based wiki engine returns to Python. (3.5 and above)
 You can create a new set.json by deleting it.
 
 ## Other
- * [Test Server (Ko)](http://namu.ml/)
- * [Test Server (En)](http://en.namu.ml/)
+ * [Test Server](http://namu.ml) ([Sub Domain](http://kwee.ga))
  * The first registor is granted owner privileges.
 
 ## 한국어
