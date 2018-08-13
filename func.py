@@ -1,21 +1,3 @@
-try:
-    import css_html_js_minify
-except:
-    def easy_minify(data):
-        data = re.sub('\n +', '\n', data)
-        
-        return data
-    
-    class css_html_js_minify:
-        def html_minify(data):
-            return easy_minify(data)
-            
-        def css_minify(data):
-            return easy_minify(data)
-            
-        def js_minify(data):
-            return easy_minify(data)
-    
 import flask
 import json
 import sqlite3
@@ -39,6 +21,11 @@ def load_conn(data):
     curs = conn.cursor()
 
     load_conn2(data)
+
+def easy_minify(data):
+    data = re.sub('\n +', '\n', data)
+    
+    return data
 
 def captcha_get():
     data = ''
@@ -638,7 +625,7 @@ def re_error(data):
                 if end_data[0][1] != '':
                     end += '<li>' + load_lang('why') + ' : ' + end_data[0][1] + '</li>'
 
-        return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
+        return easy_minify(flask.render_template(skin_check(), 
             imp = ['Error', wiki_set(1), custom(), other2([0, 0])],
             data = '<h2>Error</h2><ul>' + end + '</ul>',
             menu = 0
@@ -688,7 +675,7 @@ def re_error(data):
             else:
                 data = '???'
 
-            return css_html_js_minify.html_minify(flask.render_template(skin_check(), 
+            return easy_minify(flask.render_template(skin_check(), 
                 imp = ['Error', wiki_set(1), custom(), other2([0, 0])],
                 data = '<h2>Error</h2><ul><li>' + data + '</li></ul>',
                 menu = 0
