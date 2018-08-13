@@ -3,12 +3,15 @@
     <head>
         <meta charset="utf-8">
         <title>{{imp[0]}} - {{imp[1][0]}}</title>
+        <link rel="stylesheet" href="/views/main_css/main.css">
         <link rel="stylesheet" href="/views/acme/css/bootstrap.min.css">
         <link rel="stylesheet" href="/views/acme/css/style.css">
         <link rel="stylesheet" href="/views/acme/css/style-responsive.css">
+        <link rel="stylesheet" href="/views/acme/css/font-awesome/css/font-awesome.min.css">
+        <link rel="stylesheet" href="/views/acme/css/set_css/dark.css" id="set_dark">
         <script src="/views/acme/js/jquery.min.js"></script>
         <script src="/views/acme/js/bootstrap.min.js"></script>
-        <link rel="stylesheet" href="/views/acme/css/font-awesome/css/font-awesome.min.css">
+        <script src="/views/acme/js/skin_set.js"></script>
         {{imp[1][5]|safe}}
         {{imp[2][3]|safe}}
         <meta name="twitter:creator" content="@{{imp[1][0]}}">
@@ -35,7 +38,7 @@
                     <ul class="nav navbar-nav">
                         <li id="right-search">
                             <form method="post" action="/search" id="searchform" role="search">
-                                <input style="display: inline-block;" class="form-control search" type="search" name="search" placeholder="Search" id="searchInput" autocomplete="off">
+                                <input style="display: inline-block;" class="form-control search" type="search" name="search" placeholder="{{'search'|load_lang}}" id="searchInput" autocomplete="off">
                             </form>                
                         </li>
                         <li class="dropdown">
@@ -74,8 +77,14 @@
                                 </li>
                                 <li>
                                     <a href="/other">
-                                        <i class="fa fa-cogs" aria-hidden="true"></i>
+                                        <i class="fa fa-wrench" aria-hidden="true"></i>
                                         {{'tool'|load_lang}}
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/skin_set">
+                                        <i class="fa fa-cog" aria-hidden="true"></i>
+                                        {{'skin'|load_lang}} {{'setting'|load_lang}}
                                     </a>
                                 </li>
                             </ul>
@@ -105,7 +114,7 @@
                 <div class="container">
                     <div class="row">
                         <div class="col-lg-4 col-sm-4">
-                            <h1>
+                            <h1 id="fix_title">
                                 {{imp[0]}}
                                 {% if imp[3][0] != 0 %}
                                     <sub>{{imp[3][0]}}</sub>
@@ -131,7 +140,7 @@
             </div>
             <div class="container">
                 <div class="row">
-                    <div class="col-md-10 col-md-offset-1 mar-b-30">
+                    <div id="fix_data" class="col-md-10 col-md-offset-1 mar-b-30">
                         {{data|safe}}
                     </div>
                 </div>
