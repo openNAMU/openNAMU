@@ -161,7 +161,7 @@ def edit_help_button():
     </script>
     '''
 
-    insert_list = [['[[|]]', 'Link'], ['[()]', 'Macro'], ['{{{#!}}}', 'Middle'], ['||<>||', 'table']]
+    insert_list = [['[[|]]', 'Link'], ['[()]', 'Macro'], ['{{{#!}}}', 'Middle'], ['||<>||', 'Table']]
 
     data = ''
     for insert_data in insert_list:
