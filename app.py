@@ -2163,10 +2163,10 @@ def topic_stop(name = None, sub = None, tool = None):
         if tool == 'agree':
             curs.execute("select title from agreedis where title = ? and sub = ?", [name, sub])
             if curs.fetchall():
-                curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, '" + load_lang('agreement', 1) + " Fail', ?, ?, '', '1')", [str(int(topic_check[0][0]) + 1), name, sub, time, ip])
+                curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, '" + load_lang('agreement', 1) + " X', ?, ?, '', '1')", [str(int(topic_check[0][0]) + 1), name, sub, time, ip])
                 curs.execute("delete from agreedis where title = ? and sub = ?", [name, sub])
             else:
-                curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, '" + load_lang('agreement', 1) + " OK', ?, ?, '', '1')", [str(int(topic_check[0][0]) + 1), name, sub, time, ip])
+                curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, '" + load_lang('agreement', 1) + " O', ?, ?, '', '1')", [str(int(topic_check[0][0]) + 1), name, sub, time, ip])
                 curs.execute("insert into agreedis (title, sub) values (?, ?)", [name, sub])
         else:
             curs.execute("select title from stop where title = ? and sub = ? and close = ?", [name, sub, set_list[0]])
@@ -2342,7 +2342,7 @@ def topic(name = None, sub = None):
                 start = topic_data[3]
 
             if topic_data[4] == 'O':
-                blind_data = 'style="background: gainsboro;"'
+                blind_data = 'id="toron_color_grey"'
                 
                 if admin != 1:
                     curs.execute("select who from re_admin where what = ? order by time desc limit 1", ['blind (' + name + ' - ' + sub + '#' + str(number) + ')'])
@@ -3406,8 +3406,8 @@ def recent_changes(name = None, tool = 'record'):
                 if hide:                            
                     hidden = ' <a href="/hidden/' + url_pas(data[1]) + '?num=' + data[0] + '">(' + load_lang('release') + ')'
                     
-                    style[0] = 'background: gainsboro;'
-                    style[1] = 'background: gainsboro;'
+                    style[0] = 'id="toron_color_grey"'
+                    style[1] = 'id="toron_color_grey"'
                     
                     if send == '<br>':
                         send = '(' + load_lang('hide') + ')'
@@ -3425,16 +3425,16 @@ def recent_changes(name = None, tool = 'record'):
 
                 send = '(' + load_lang('hide') + ')'
 
-                style[0] = 'display: none;'
-                style[1] = 'background: gainsboro;'
+                style[0] = 'style="display: none;"'
+                style[1] = 'id="toron_color_grey"'
 
             if tool == 'history':
                 title = '<a href="/w/' + url_pas(name) + '?num=' + data[0] + '">' + data[0] + load_lang('version') + '</a> <a href="/raw/' + url_pas(name) + '?num=' + data[0] + '">(' + load_lang('raw') + ')</a> '
             else:
                 title = '<a href="/w/' + url_pas(data[1]) + '">' + html.escape(data[1]) + '</a> <a href="/history/' + url_pas(data[1]) + '">(' + data[0] + load_lang('version') + ')</a> '
                     
-            div += '<tr style="' + style[0] + '"><td>' + title + revert + ' ' + leng + '</td>'
-            div += '<td>' + ip + ban + hidden + '</td><td>' + date + '</td></tr><tr style="' + style[1] + '"><td colspan="3">' + send_parser(send) + '</td></tr>'
+            div += '<tr ' + style[0] + '><td>' + title + revert + ' ' + leng + '</td>'
+            div += '<td>' + ip + ban + hidden + '</td><td>' + date + '</td></tr><tr ' + style[1] + '><td colspan="3">' + send_parser(send) + '</td></tr>'
 
         div += '</tbody></table>'
         sub = ''
