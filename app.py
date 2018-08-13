@@ -1349,8 +1349,6 @@ def deep_search(name = None):
     div = '<ul>'
     
     div_plus = ''
-    no = 0
-    start = 2
     test = ''
     
     curs.execute("select title from data where title = ?", [name])
@@ -1669,7 +1667,7 @@ def edit(name = None):
             curs.execute("insert into data (title, data) values (?, ?)", [name, content])
 
         curs.execute("select user from scan where title = ?", [name])
-        for user_data in curs.fetchall():
+        for _ in curs.fetchall():
             curs.execute("insert into alarm (name, data, date) values (?, ?, ?)", [ip, ip + ' - <a href="/w/' + url_pas(name) + '">' + name + '</a> (Edit)', today])
 
         history_plus(name, content, today, ip, flask.request.form.get('send', None), leng)
@@ -1741,7 +1739,6 @@ def edit(name = None):
 
 @app.route('/preview/<everything:name>', methods=['POST'])
 def preview(name = None):
-    ip = ip_check()
     if acl_check(name) == 1:
         return re_error('/ban')
          
@@ -2409,7 +2406,6 @@ def topic(name = None, sub = None):
 @app.route('/topic/<everything:name>/<regex("close|agree"):tool>', methods=['GET'])
 def close_topic_list(name = None, tool = None):
     div = ''
-    list_d = 0
     
     if flask.request.method == 'POST':
         t_num = ''
@@ -2700,6 +2696,7 @@ def user_check(name = None):
         menu = [['manager', load_lang('admin')]]
     ))
 
+'''
 @app.route('/easy_check/<name>')
 def user_easy_check(name = None):
     curs.execute("select acl from user where id = ? or id = ?", [name, flask.request.args.get('plus', 'Yes-Error')])
@@ -2725,6 +2722,7 @@ def user_easy_check(name = None):
         data = div,
         menu = [['check/' + url_pas(name), load_lang('normal')]]
     ))
+'''
                 
 @app.route('/register', methods=['POST', 'GET'])
 def register():
@@ -2866,12 +2864,7 @@ def user_ban(name = None):
                 now = load_lang('band') + ' ' + load_lang('ban')
             else:
                 now = load_lang('ban')
-
-            now_time = get_time()
-
-            m = re.search('^([0-9]{4})-([0-9]{2})-([0-9]{2})', now_time)
-            g = m.groups()
-
+                
             if ip_or_user(name) == 1:
                 plus = '<input type="checkbox" name="login"> ' + load_lang('login') + ' ' + load_lang('able') + '<hr>'
             else:
@@ -3018,8 +3011,6 @@ def user_admin(name = None):
             return re_error('/error/3')            
 
         div = '<option value="X">X</option>'
-        i = 0
-        name_rem = ''
         
         curs.execute('select distinct name from alist order by name asc')
         for data in curs.fetchall():
@@ -3120,18 +3111,12 @@ def read_view(name = None):
     else:
         uppage = 0
         
-    if admin_check(5, None) == 1:
-        admin_memu = 1
-    else:
-        admin_memu = 0
-        
     if re.search('^category:', name):        
         curs.execute("select link from back where title = ? and type = 'cat' order by link asc", [name])
         back = curs.fetchall()
         if back:
             div = '<br><h2 id="cate_normal">' + load_lang('category') + '</h2><ul>'
             u_div = ''
-            i = 0
 
             for data in back:    
                 if re.search('^category:', data[0]):
