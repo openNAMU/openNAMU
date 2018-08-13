@@ -1174,7 +1174,7 @@ def recent_discuss():
         
         m_sub = ' (' + load_lang('close') + ')'
 
-    div += '<hr><table style="width: 100%; text-align: center;"><tbody><tr><td style="width: 50%;">' + load_lang('discussion') + ' ' + load_lang('name') + '</td><td style="width: 50%;">' + load_lang('time') + '</td></tr>'
+    div += '<hr><table id="main_table_set"><tbody><tr><td id="main_table_width_half">' + load_lang('discussion') + ' ' + load_lang('name') + '</td><td id="main_table_width_half">' + load_lang('time') + '</td></tr>'
     
     curs.execute("select title, sub, date from rd order by date desc limit 50")
     for data in curs.fetchall():
@@ -1214,12 +1214,12 @@ def block_log(name = None, tool = None, tool2 = None):
         sql_num = 0
     
     div =   '''
-            <table style="width: 100%; text-align: center;">
+            <table id="main_table_set">
                 <tbody>
                     <tr>
-                        <td style="width: 33.3%;">''' + load_lang('blocked') + '''</td>
-                        <td style="width: 33.3%;">''' + load_lang('admin') + '''</td>
-                        <td style="width: 33.3%;">''' + load_lang('period') + '''</td>
+                        <td id="main_table_width">''' + load_lang('blocked') + '''</td>
+                        <td id="main_table_width">''' + load_lang('admin') + '''</td>
+                        <td id="main_table_width">''' + load_lang('period') + '''</td>
                     </tr>
             '''
     
@@ -2673,8 +2673,8 @@ def user_check(name = None):
         else:
             div = '<a href="/check/' + url_pas(name) + '">(' + name + ')</a> <a href="/check/' + url_pas(flask.request.args.get('plus', None)) + '">(' + flask.request.args.get('plus', None) + ')</a><hr>'
 
-        div += '<table style="width: 100%; text-align: center;"><tbody><tr>'
-        div += '<td style="width: 33.3%;">' + load_lang('name') + '</td><td style="width: 33.3%;">IP</td><td style="width: 33.3%;">' + load_lang('time') + '</td></tr>'
+        div += '<table id="main_table_set"><tbody><tr>'
+        div += '<td id="main_table_width">' + load_lang('name') + '</td><td id="main_table_width">IP</td><td id="main_table_width">' + load_lang('time') + '</td></tr>'
         
         for data in record:
             if data[2]:
@@ -3254,8 +3254,8 @@ def user_topic_list(name = None):
     
     one_admin = admin_check(1, None)
 
-    div = '<table style="width: 100%; text-align: center;"><tbody><tr>'
-    div += '<td style="width: 33.3%;">' + load_lang('discussion') + ' ' + load_lang('name') + '</td><td style="width: 33.3%;">' + load_lang('writer') + '</td><td style="width: 33.3%;">' + load_lang('time') + '</td></tr>'
+    div = '<table id="main_table_set"><tbody><tr>'
+    div += '<td id="main_table_width">' + load_lang('discussion') + ' ' + load_lang('name') + '</td><td id="main_table_width">' + load_lang('writer') + '</td><td id="main_table_width">' + load_lang('time') + '</td></tr>'
     
     curs.execute("select title, id, sub, ip, date from topic where ip = ? order by date desc limit ?, '50'", [name, str(sql_num)])
     data_list = curs.fetchall()
@@ -3305,7 +3305,7 @@ def recent_changes(name = None, tool = 'record'):
 
         what = flask.request.args.get('what', 'all')
 
-        div = '<table style="width: 100%; text-align: center;"><tbody><tr>'
+        div = '<table id="main_table_set"><tbody><tr>'
         
         if name:
             num = int(flask.request.args.get('num', 1))
@@ -3315,11 +3315,11 @@ def recent_changes(name = None, tool = 'record'):
                 sql_num = 0      
 
             if tool == 'history':
-                div += '<td style="width: 33.3%;">' + load_lang('version') + '</td><td style="width: 33.3%;">' + load_lang('editor') + '</td><td style="width: 33.3%;">' + load_lang('time') + '</td></tr>'
+                div += '<td id="main_table_width">' + load_lang('version') + '</td><td id="main_table_width">' + load_lang('editor') + '</td><td id="main_table_width">' + load_lang('time') + '</td></tr>'
                 
                 curs.execute("select id, title, date, ip, send, leng from history where title = ? order by id + 0 desc limit ?, '50'", [name, str(sql_num)])
             else:
-                div += '<td style="width: 33.3%;">' + load_lang('document') + ' ' + load_lang('name') + '</td><td style="width: 33.3%;">' + load_lang('editor') + '</td><td style="width: 33.3%;">' + load_lang('time') + '</td></tr>'
+                div += '<td id="main_table_width">' + load_lang('document') + ' ' + load_lang('name') + '</td><td id="main_table_width">' + load_lang('editor') + '</td><td id="main_table_width">' + load_lang('time') + '</td></tr>'
 
                 if what == 'all':
                     div = '<a href="/record/' + url_pas(name) + '?what=revert">(' + load_lang('revert') + ')</a><hr>' + div
@@ -3345,7 +3345,7 @@ def recent_changes(name = None, tool = 'record'):
             else:
                 sql_num = 0            
             
-            div += '<td style="width: 33.3%;">' + load_lang('document') + ' ' + load_lang('name') + '</td><td style="width: 33.3%;">' + load_lang('editor') + '</td><td style="width: 33.3%;">' + load_lang('time') + '</td></tr>'
+            div += '<td id="main_table_width">' + load_lang('document') + ' ' + load_lang('name') + '</td><td id="main_table_width">' + load_lang('editor') + '</td><td id="main_table_width">' + load_lang('time') + '</td></tr>'
             
             if what == 'all':
                 div = '<a href="/recent_changes?what=revert">(' + load_lang('revert') + ')</a><hr>' + div
