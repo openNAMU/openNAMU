@@ -17,7 +17,7 @@ import sys
 
 from func import *
 
-r_ver = 'v3.0.6-Master-04'
+r_ver = 'v3.0.6-Stable-99'
 c_ver = ''.join(re.findall('[0-9]', r_ver))
 
 print('Version : ' + r_ver)
