@@ -6,6 +6,7 @@
     "skin": "스킨",
     "delete": "삭제",
     "regex" : "정규표현식",
+    "language" : "언어",
     "server": "서버",
     "filter": "필터",
     "move": "이동",

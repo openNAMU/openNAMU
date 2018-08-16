@@ -222,10 +222,11 @@ if not rep_data:
 else:
     rep_key = rep_data[0][0]
 
+support_language = ['ko-KR', 'en-US']
+
 curs.execute("select data from other where name = 'language'")
 rep_data = curs.fetchall()
 if not rep_data:
-    support_language = ['ko-KR', 'en-US']
     if os.getenv('NAMU_LANG') is not None:
         if os.getenv('NAMU_LANG') in support_language:
             curs.execute("insert into other (name, data) values ('language', ?)", [os.getenv('NAMU_LANG')])
@@ -2549,6 +2550,8 @@ def login():
                 
 @app.route('/change', methods=['POST', 'GET'])
 def change_password():
+    global support_language
+
     if ban_check() == 1:
         return re_error('/ban')
 
@@ -2574,17 +2577,14 @@ def change_password():
             
             curs.execute("update user set pw = ? where id = ?", [hashed.decode(), flask.session['DREAMER']])
 
-        curs.execute('select data from user_set where name = "email" and id = ?', [ip])
-        if curs.fetchall():
-            curs.execute("update user_set set data = ? where name = 'email' and id = ?", [flask.request.form.get('email', ''), ip])
-        else:
-            curs.execute("insert into user_set (name, id, data) values ('email', ?, ?)", [ip, flask.request.form.get('email', '')])
+        auto_list = ['email', 'skin', 'lang']
 
-        curs.execute('select data from user_set where name = "skin" and id = ?', [ip])
-        if curs.fetchall():
-            curs.execute("update user_set set skin = ? where name = 'skin' and id = ?", [flask.request.form.get('skin', ''), ip])
-        else:
-            curs.execute("insert into user_set (name, id, data) values ('skin', ?, ?)", [ip, flask.request.form.get('skin', '')])
+        for auto_data in auto_list:
+            curs.execute('select data from user_set where name = ? and id = ?', [auto_data, ip])
+            if curs.fetchall():
+                curs.execute("update user_set set data = ? where name = ? and id = ?", [flask.request.form.get(auto_data, ''), auto_data, ip])
+            else:
+                curs.execute("insert into user_set (name, id, data) values (?, ?, ?)", [auto_data, ip, flask.request.form.get(auto_data, '')])
 
         conn.commit()
         
@@ -2598,6 +2598,20 @@ def change_password():
             email = ''
 
         div2 = load_skin()
+        
+        div3 = ''
+        var_div3 = ''
+
+        curs.execute('select data from user_set where name = "lang" and id = ?', [ip])
+        data = curs.fetchall()
+
+        for lang_data in support_language:
+            if data and data[0][0] == lang_data:
+                div3 = '<option value="' + lang_data + '">' + lang_data + '</option>'
+            else:
+                var_div3 += '<option value="' + lang_data + '">' + lang_data + '</option>'
+
+        div3 += var_div3
 
         return easy_minify(flask.render_template(skin_check(),    
             imp = [load_lang('user') + ' ' + load_lang('setting') + ' ' + load_lang('edit'), wiki_set(), custom(), other2([0, 0])],
@@ -2619,6 +2633,11 @@ def change_password():
                         <br>
                         <br>
                         <select name="skin">''' + div2 + '''</select>
+                        <hr>
+                        <span>''' + load_lang('user') + ' ' + load_lang('language') + '''</span>
+                        <br>
+                        <br>
+                        <select name="lang">''' + div3 + '''</select>
                         <hr>
                         <button type="submit">''' + load_lang('edit') + '''</button>
                         <hr>
