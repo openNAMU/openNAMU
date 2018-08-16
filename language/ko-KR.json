@@ -5,6 +5,7 @@
     "easy": "간단",
     "skin": "스킨",
     "delete": "삭제",
+    "regex" : "정규표현식",
     "server": "서버",
     "filter": "필터",
     "move": "이동",
