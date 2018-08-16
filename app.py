@@ -1528,10 +1528,10 @@ def set_edit_filter(name = None):
         if admin_check(1, 'edit_filter edit') != 1:
             return re_error('/error/3')
 
-        if flask.request.form.get('ban', None):
+        if flask.request.form.get('limitless', '') != '':
             end = 'X'
         else:
-            end = ''
+            end = flask.request.form.get('second', 'X')
 
         curs.execute("select name from filter where name = ?", [name])
         if curs.fetchall():
@@ -1549,11 +1549,14 @@ def set_edit_filter(name = None):
             textarea = exist[0][0]
             
             if exist[0][1] == 'X':
-                time_data = 'checked="checked"'
-            else:
+                time_check = 'checked="checked"'
                 time_data = ''
+            else:
+                time_check = ''
+                time_data = exist[0][1]
         else:
             textarea = ''
+            time_check = ''
             time_data = ''
 
         if admin_check(1, None) != 1:
@@ -1565,10 +1568,11 @@ def set_edit_filter(name = None):
             imp = [name, wiki_set(), custom(), other2([' (' + load_lang('edit') + ' ' + load_lang('filter') + ')', 0])],
             data =  '''
                     <form method="post">
-                        <input ''' + stat + ''' placeholder="Regex" name="content" value="''' + html.escape(textarea) + '''" type="text">
+                        <input placeholder="''' + load_lang('second') + '''" name="second" type="text" value="''' + html.escape(time_data) + '''">
                         <hr>
-                        <input ''' + stat + ''' type="checkbox" ''' + time_data + ''' name="ban">
-                        ''' + load_lang('ban') + '''
+                        <input ''' + stat + ''' type="checkbox" ''' + time_check + ''' name="limitless"> ''' + load_lang('limitless') + '''
+                        <hr>
+                        <input ''' + stat + ''' placeholder="''' + load_lang('regex') + '''" name="content" value="''' + html.escape(textarea) + '''" type="text">
                         <hr>
                         <button ''' + stat + ''' id="save" type="submit">''' + load_lang('save') + '''</button>
                     </form>
@@ -1588,14 +1592,14 @@ def edit(name = None):
             for data_list in curs.fetchall():
                 match = re.compile(data_list[0])
                 if match.search(flask.request.form.get('content', None)):
-                    if data_list[1] == 'X':
-                        ban_insert(
-                            ip, 
-                            '', 
-                            load_lang('edit', 1) + ' ' + load_lang('filter', 1), 
-                            None, 
-                            load_lang('tool', 1) + ':' + load_lang('edit', 1) + ' ' + load_lang('filter', 1)
-                        )
+                    print(data_list[1])
+                    ban_insert(
+                        ip, 
+                        '0' if data_list[1] == 'X' else data_list[1], 
+                        load_lang('edit', 1) + ' ' + load_lang('filter', 1), 
+                        None, 
+                        load_lang('tool', 1) + ':' + load_lang('edit', 1) + ' ' + load_lang('filter', 1)
+                    )
                     
                     return re_error('/error/21')
 

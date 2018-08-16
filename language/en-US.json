@@ -4,6 +4,7 @@
     "history" : "History",
     "delete" : "Delete",
     "logo" : "Logo",
+    "regex" : "Regex",
     "frontpage" : "Front page",
     "max_file_size" : "Max file size",
     "back_up_interval" : "Backup interval",

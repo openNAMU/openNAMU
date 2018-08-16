@@ -614,7 +614,7 @@ def re_error(data):
                         curs.execute("delete from ban where block = ?", [ip])
                         conn.commit()
 
-                        end += 'Re Try.'
+                        end += '<script>location.reload();</script>'
                     else:
                         end += load_lang('why') + ' : ' + end_data[0][0]
                 else:
