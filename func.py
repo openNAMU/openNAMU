@@ -112,27 +112,49 @@ def captcha_post(re_data, num = 1):
 def load_lang(data, num = 0):
     global lang
 
-    try:
-        if lang:
-            pass
-    except:
-        curs.execute("select data from other where name = 'language'")
+    if num == 1:
+        try:
+            if lang:
+                pass
+        except:
+            curs.execute("select data from other where name = 'language'")
+            rep_data = curs.fetchall()
+
+            json_data = open(os.path.join('language', rep_data[0][0] + '.json'), 'rt', encoding='utf-8').read()
+            lang = json.loads(json_data)
+
+        if data == 'please_all':
+            return lang
+        else:
+            if data in lang:
+                return lang[data]
+            else:
+                if data in else_lang:
+                    return else_lang[data]
+                else:
+                    return data + ' (Missing)'
+    else:
+        curs.execute('select data from user_set where name = "lang" and id = ?', [ip_check()])
         rep_data = curs.fetchall()
 
         json_data = open(os.path.join('language', rep_data[0][0] + '.json'), 'rt', encoding='utf-8').read()
         lang = json.loads(json_data)
 
-    if data == 'please_all':
-        return lang
-    else:
-        if data in lang:
-            return lang[data]
-        else:
-            if data in else_lang:
-                return else_lang[data]
-            else:
-                return data + ' (Missing)'
-            
+        try:
+            if lang:
+                if data == 'please_all':
+                    return lang
+                else:
+                    if data in lang:
+                        return lang[data]
+                    else:
+                        if data in else_lang:
+                            return else_lang[data]
+                        else:
+                            return data + ' (Missing)'
+        except:
+            load_lang(data, 1)
+
 def ip_or_user(data):
     if re.search('(\.|:)', data):
         return 1

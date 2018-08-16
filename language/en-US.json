@@ -9,6 +9,7 @@
     "max_file_size" : "Max file size",
     "back_up_interval" : "Backup interval",
     "default_acl" : "Default ACL",
+    "language" : "Language",
     "port" : "Port",
     "secret_key" : "Secret key",
     "update_branch" : "Update branch",
