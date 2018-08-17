@@ -561,7 +561,7 @@ def ban_insert(name, end, why, login, blocker):
 
     curs.execute("select block from ban where block = ?", [name])
     if curs.fetchall():
-        curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, ?)", [name, load_lang('release', 1), time, blocker, '', band])
+        curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, ?)", [name, load_lang('release', 1), now_time, blocker, '', band])
         curs.execute("delete from ban where block = ?", [name])
     else:
         if login != '':
