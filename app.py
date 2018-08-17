@@ -2537,7 +2537,7 @@ def login():
                     <form method="post">
                         <input placeholder="ID" name="id" type="text">
                         <hr>
-                        <input placeholder="PassWord" name="pw" type="password">
+                        <input placeholder="''' + load_lang('password') + '''" name="pw" type="password">
                         <hr>
                         ''' + captcha_get() + '''
                         <button type="submit">''' + load_lang('login') + '''</button>
@@ -2619,13 +2619,13 @@ def change_password():
                     <form method="post">
                         <span>ID : ''' + ip + '''</span>
                         <hr>
-                        <input placeholder="Now" name="pw" type="password">
+                        <input placeholder="''' + load_lang('now') + ' ' + load_lang('password') + '''" name="pw" type="password">
                         <br>
                         <br>
-                        <input placeholder="Change" name="pw2" type="password">
+                        <input placeholder="''' + load_lang('new') + ' ' + load_lang('password') + '''" name="pw2" type="password">
                         <br>
                         <br>
-                        <input placeholder="Re" name="pw3" type="password">
+                        <input placeholder="''' + load_lang('reconfirm') + '''" name="pw3" type="password">
                         <hr>
                         <input placeholder="Email" name="email" type="text" value="''' + email + '''">
                         <hr>
@@ -2805,7 +2805,7 @@ def register():
         if first == 0:
             return redirect('/change')
         else:
-            return redirect('/setting/1')
+            return redirect('/setting')
     else:        
         contract = ''
         
@@ -2821,9 +2821,9 @@ def register():
                         ''' + contract + '''
                         <input placeholder="ID" name="id" type="text">
                         <hr>
-                        <input placeholder="PassWord" name="pw" type="password">
+                        <input placeholder="''' + load_lang('password') + '''" name="pw" type="password">
                         <hr>
-                        <input placeholder="Re" name="pw2" type="password">
+                        <input placeholder="''' + load_lang('reconfirm') + '''" name="pw2" type="password">
                         <hr>
                         ''' + captcha_get() + '''
                         <button type="submit">''' + load_lang('register') + '''</button>
