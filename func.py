@@ -552,7 +552,7 @@ def topic_check(name, sub):
     return 0
 
 def ban_insert(name, end, why, login, blocker):
-    time = get_time()
+    now_time = get_time()
 
     if re.search("^([0-9]{1,3}\.[0-9]{1,3})$", name):
         band = 'O'
@@ -576,7 +576,7 @@ def ban_insert(name, end, why, login, blocker):
         else:
             r_time = ''
 
-        curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, ?)", [name, r_time, time, blocker, why, band])
+        curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, ?)", [name, r_time, now_time, blocker, why, band])
         curs.execute("insert into ban (block, end, why, band, login) values (?, ?, ?, ?, ?)", [name, r_time, why, band, login])
     
     conn.commit()
