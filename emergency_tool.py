@@ -21,7 +21,6 @@ load_conn2(conn)
 print('1. BackLink ReSet')
 print('2. ReCaptcha Delete')
 print('3. Ban Delete')
-print('')
 
 print('select : ', end = '')
 what_i_do = input()
@@ -59,7 +58,7 @@ elif what_i_do == '3':
         band = ''
 
     # 데이터 삭제
-    curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, ?)", [user_data, '해제', get_time(), 'localhost', '', band])
+    curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, ?)", [user_data, 'Emergency Release', get_time(), 'localhost', '', band])
     curs.execute("delete from ban where block = ?", [user_data])
 
 # 커밋
