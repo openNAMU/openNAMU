@@ -126,5 +126,7 @@
     "indexing" : "인덱싱",
     "unable_register" : "가입 방지",
     "ip_hidden" : "IP 숨기기",
-    "need_to_restart" : "재시작 필요"
+    "need_to_restart" : "재시작 필요",
+    "register_text" : "회원가입 문구",
+    "non_login_alert" : "비 로그인 경고문"
 }
