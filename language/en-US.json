@@ -37,7 +37,7 @@
     "ban" : "Ban",
     "release" : "Release",
     "save" : "Save",
-    "other" : "Others",
+    "other" : "Other",
     "tool" : "Tools",
     "plus" : "Add",
     "open" : "Open",
@@ -102,6 +102,8 @@
     "filter" : "Filter",
     "send" : "Send",
     "reload" : "Reload",
+    "password" : "Password",
+    "reconfirm" : "Reconfirm",
 
     "user_head_warring" : "User's HEAD will deleted if you close the browser or when you are editting as guest",
     "http_warring" : "Warning : If you are not on HTTPS connection, your information can be leaked. We won't response to that.",

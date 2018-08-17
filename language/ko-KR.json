@@ -89,6 +89,8 @@
     "category": "분류",
     "send" : "전송",
     "reload" : "새로고침",
+    "password" : "암호",
+    "reconfirm" : "재확인",
     "authority_error": "권한이  부족합니다.",
     "no_login_error": "비 로그인 상태 입니다.",
     "no_exist_user_error": "계정이 없습니다.",
