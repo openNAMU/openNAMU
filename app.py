@@ -1263,7 +1263,7 @@ def block_log(name = None, tool = None, tool2 = None):
                 
                 data_list = []
                 
-                curs.execute("select block from ban limit ?, '50'", [str(sql_num)])
+                curs.execute("select block from ban where end > ? limit ?, '50'", [get_time(), str(sql_num)])
                 for in_data in curs.fetchall():
                     curs.execute("select why, block, blocker, end, today from rb where block = ? order by today desc limit 1", [in_data[0]])
                     
