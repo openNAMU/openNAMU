@@ -127,5 +127,8 @@
     "decument_exist_error" : "The document already exists where you want to move it.",
     "password_diffrent_error" : "Reconfirm password and input password are different.",
     "edit_filter_error" : "Censored by edit filter.",
-    "file_name_error" : "Only alphabet, hangul, space, underscore, and minus signs are allowed for file names."
+    "file_name_error" : "Only alphabet, hangul, space, underscore, and minus signs are allowed for file names.",
+
+    "register_text" : "Register Text",
+    "non_login_alert" : "Non-Login Alert"
 }

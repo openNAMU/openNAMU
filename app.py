@@ -602,15 +602,15 @@ def setting(num = 0):
                 imp = [load_lang('set_text'), wiki_set(), custom(), other2([0, 0])],
                 data =  '''
                         <form method="post">
-                            <span>Register Text</span>
+                            <span>''' + load_lang('register_text') + '''</span>
                             <br>
                             <br>
-                            <input placeholder="Register Text" type="text" name="contract" value="''' + html.escape(d_list[0]) + '''">
+                            <input placeholder="''' + load_lang('register_text') + '''" type="text" name="contract" value="''' + html.escape(d_list[0]) + '''">
                             <hr>
-                            <span>Non-Login Alert</span>
+                            <span>''' + load_lang('non_login_alert') + '''</span>
                             <br>
                             <br>
-                            <input placeholder="Non-Login Alert" type="text" name="no_login_warring" value="''' + html.escape(d_list[1]) + '''">
+                            <input placeholder="''' + load_lang('non_login_alert') + '''" type="text" name="no_login_warring" value="''' + html.escape(d_list[1]) + '''">
                             <hr>
                             <button id="save" type="submit">''' + load_lang('save') + '''</button>
                         </form>

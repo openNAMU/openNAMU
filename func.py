@@ -137,10 +137,9 @@ def load_lang(data, num = 0):
         curs.execute('select data from user_set where name = "lang" and id = ?', [ip_check()])
         rep_data = curs.fetchall()
 
-        json_data = open(os.path.join('language', rep_data[0][0] + '.json'), 'rt', encoding='utf-8').read()
-        lang = json.loads(json_data)
-
         try:
+            json_data = open(os.path.join('language', rep_data[0][0] + '.json'), 'rt', encoding='utf-8').read()
+            lang = json.loads(json_data)
             if lang:
                 if data == 'please_all':
                     return lang
@@ -153,7 +152,7 @@ def load_lang(data, num = 0):
                         else:
                             return data + ' (Missing)'
         except:
-            load_lang(data, 1)
+            return load_lang(data, 1)
 
 def ip_or_user(data):
     if re.search('(\.|:)', data):
