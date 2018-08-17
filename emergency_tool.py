@@ -16,7 +16,7 @@ conn = sqlite3.connect(set_data['db'] + '.db', check_same_thread = False)
 curs = conn.cursor()
 
 # 연결 전달
-load_conn2(conn)
+load_conn(conn)
 
 print('1. BackLink ReSet')
 print('2. ReCaptcha Delete')
@@ -58,8 +58,10 @@ elif what_i_do == '3':
         band = ''
 
     # 데이터 삭제
-    curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, ?)", [user_data, 'Emergency Release', get_time(), 'localhost', '', band])
+    curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, ?)", [user_data, load_lang('release', 1), get_time(), load_lang('tool', 1) + ':Emergency', '', band])
     curs.execute("delete from ban where block = ?", [user_data])
+
+print('OK')
 
 # 커밋
 conn.commit()

@@ -251,9 +251,6 @@ else:
 curs.execute('delete from other where name = "ver"')
 curs.execute('insert into other (name, data) values ("ver", ?)', [c_ver])
 
-json_data = open(os.path.join('language', rep_language + '.json'), 'rt', encoding='utf-8').read()
-lang_data = json.loads(json_data)
-
 def back_up():
     try:
         shutil.copyfile(set_data['db'] + '.db', 'back_' + set_data['db'] + '.db')
