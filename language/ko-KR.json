@@ -121,7 +121,7 @@
     "secret_key": "비밀키",
     "update_branch": "업데이트 브랜치",
     "main": "메인",
-    "set_text": "안내문 설정",
+    "set_text": "안내문",
     "main_head": "메인 HEAD",
     "indexing" : "인덱싱",
     "unable_register" : "가입 방지",
