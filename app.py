@@ -1457,7 +1457,15 @@ def revert(name = None):
                 leng = ' +' + str(len(data[0][0]))
                 curs.execute("insert into data (title, data) values (?, ?)", [name, data[0][0]])
                 
-            history_plus(name, data[0][0], get_time(), ip_check(), flask.request.form.get('send', None) + ' (' + str(num) + load_lang('version', 1) + ')', leng)
+            history_plus(
+                name, 
+                data[0][0], 
+                get_time(), 
+                ip_check(), 
+                flask.request.form.get('send', None) + ' (' + str(num) + load_lang('version', 1) + ')', 
+                leng
+            )
+
             namumark(
                 title = name,
                 data = data[0][0],
@@ -1672,7 +1680,14 @@ def edit(name = None):
         for _ in curs.fetchall():
             curs.execute("insert into alarm (name, data, date) values (?, ?, ?)", [ip, ip + ' - <a href="/w/' + url_pas(name) + '">' + name + '</a> (Edit)', today])
 
-        history_plus(name, content, today, ip, flask.request.form.get('send', None), leng)
+        history_plus(
+            name,
+            content,
+            today,
+            ip,
+            flask.request.form.get('send', None),
+            leng
+        )
         
         curs.execute("delete from back where link = ?", [name])
         curs.execute("delete from back where title = ? and type = 'no'", [name])
@@ -3535,9 +3550,9 @@ def upload():
             lice = flask.request.form.get('f_lice', None)
         else:
             if custom()[2] == 0:
-                lice = ip + ' Upload'
+                lice = ip + ' ' + load_lang('upload', 1)
             else:
-                lice = '[[user:' + ip + ']] Upload'
+                lice = '[[user:' + ip + ']] ' + load_lang('upload', 1)
             
         if os.path.exists(os.path.join('image', e_data)):
             os.remove(os.path.join('image', e_data))
@@ -3553,7 +3568,13 @@ def upload():
         curs.execute("insert into data (title, data) values (?, ?)", ['file:' + name, '[[file:' + name + ']][br][br]{{{[[file:' + name + ']]}}}[br][br]' + lice])
         curs.execute("insert into acl (title, dec, dis, why) values (?, 'admin', '', '')", ['file:' + name])
 
-        history_plus('file:' + name, '[[file:' + name + ']][br][br]{{{[[file:' + name + ']]}}}[br][br]' + lice, get_time(), ip, '(Upload)', '0')
+        history_plus(
+            'file:' + name, '[[file:' + name + ']][br][br]{{{[[file:' + name + ']]}}}[br][br]' + lice,
+            get_time(), 
+            ip, 
+            load_lang('upload', 1), 
+            '0'
+        )
         
         conn.commit()
         
