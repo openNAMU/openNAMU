@@ -4,7 +4,6 @@ import re
 import html
 import sqlite3
 import urllib.parse
-import time
 import threading
 import multiprocessing
 
