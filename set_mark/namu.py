@@ -1086,7 +1086,7 @@ def namu(conn, data, title, main_num):
     
     data = re.sub('(?P<in><\/h[0-9]>)(\n)+', '\g<in>', data)
     data = re.sub('\n\n<ul>', '\n<ul>', data)
-    data = re.sub('<\/ul>\n\n', '</ul>\n', data)
+    data = re.sub('<\/ul>\n\n', '</ul>', data)
     data = re.sub('^(\n)+', '', data)
     data = re.sub('(\n)+<hr><ul id="footnote_data">', '<hr><ul id="footnote_data">', data)
     data = re.sub('(?P<in><td(((?!>).)*)>)\n', '\g<in>', data)
