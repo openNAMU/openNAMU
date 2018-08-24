@@ -1,5 +1,5 @@
 ﻿## Intro
-NamuMark based wiki engine returns to Python. (3.5 and above)
+NamuMark based wiki engine returns to Python. (Python 3.5 or later)
 
 ## Clone command
 ### Stable
