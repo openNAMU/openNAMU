@@ -23,7 +23,7 @@ def load_conn(data):
     load_conn2(data)
 
 def easy_minify(data):
-    data = re.sub('\n +', '\n', data)
+    data = re.sub('\n +<', '\n<', data)
     
     return data
 
