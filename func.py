@@ -202,17 +202,6 @@ def ip_warring():
         text_data = ''
 
     return text_data
-    
-def ban_check(data):
-    curs.execute("select end from ban where block = ?", [data])
-    data = curs.fetchall()
-    if data:
-        if data[0][0] > get_time():
-            return 1
-        else:
-            return 0
-    else:
-        return 0
 
 def skin_check():
     skin = './views/acme/'
@@ -513,24 +502,29 @@ def acl_check(name):
 
     return 0
 
-def ban_check():
-    ip = ip_check()
-
+def ban_check(ip = ip_check()):
     band = re.search("^([0-9]{1,3}\.[0-9]{1,3})", ip)
     if band:
         band_it = band.groups()[0]
     else:
-        band_it = 'Not'
+        band_it = '-'
         
-    curs.execute("select block from ban where block = ?", [band_it])
+    curs.execute("select end from ban where block = ?", [band_it])
     band_d = curs.fetchall()
     
-    curs.execute("select block from ban where block = ?", [ip])
+    curs.execute("select end from ban where block = ?", [ip])
     ban_d = curs.fetchall()
     if band_d or ban_d:
-        return 1
-    
-    return 0
+        data = band_d or ban_d
+        if data:
+            if data[0][0] > get_time():
+                return 1
+            else:
+                return 0
+        else:
+            return 0
+    else:
+        return 0
         
 def topic_check(name, sub):
     ip = ip_check()
