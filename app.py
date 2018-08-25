@@ -236,7 +236,7 @@ if not rep_data:
             rep_language = 'en-US'
     else:
         while 1:
-            print('Language [{}] : '.format(' '.join(support_language)))
+            print('Language [{}] : '.format(' '.join(support_language)), end = '')
             rep_language = str(input())
             if rep_language in support_language:
                 curs.execute("insert into other (name, data) values ('language', ?)", [rep_language])
