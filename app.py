@@ -3205,8 +3205,7 @@ def read_view(name = None):
         if test and test[0][0] != 'user':
             acl = ' (' + load_lang('admin') + ')'
         else:
-            curs.execute("select block from ban where block = ?", [g[0]])
-            if curs.fetchall():
+            if ban_check(g[0]) == 1:
                 sub += ' (' + load_lang('ban') + ')'
             else:
                 acl = ''
