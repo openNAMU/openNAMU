@@ -202,6 +202,17 @@ def ip_warring():
         text_data = ''
 
     return text_data
+    
+def ban_check(data):
+    curs.execute("select end from ban where block = ?", [data])
+    data = curs.fetchall()
+    if data:
+        if data[0][0] > get_time():
+            return 1
+        else:
+            return 0
+    else:
+        return 0
 
 def skin_check():
     skin = './views/acme/'
