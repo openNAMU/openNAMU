@@ -502,29 +502,31 @@ def acl_check(name):
 
     return 0
 
-def ban_check(ip = ip_check()):
+def ban_check(ip = None, tool = None):
+    if not ip:
+        ip = ip_check()
+
     band = re.search("^([0-9]{1,3}\.[0-9]{1,3})", ip)
     if band:
         band_it = band.groups()[0]
     else:
         band_it = '-'
-        
-    curs.execute("select end from ban where block = ?", [band_it])
+    
+    curs.execute("select end, login from ban where block = ?", [band_it])
     band_d = curs.fetchall()
     
-    curs.execute("select end from ban where block = ?", [ip])
+    curs.execute("select end, login from ban where block = ?", [ip])
     ban_d = curs.fetchall()
-    if band_d or ban_d:
-        data = band_d or ban_d
-        if data:
-            if data[0][0] > get_time():
-                return 1
-            else:
+    
+    data = band_d or ban_d
+    if data and (data[0][0] == '' or data[0][0] > get_time()):
+        if tool and tool == 'login':                    
+            if data[0][1] == 'O':
                 return 0
-        else:
-            return 0
-    else:
-        return 0
+                
+        return 1
+
+    return 0
         
 def topic_check(name, sub):
     ip = ip_check()
@@ -630,7 +632,7 @@ def re_error(data):
                     end_data = curs.fetchall()
             
             if end_data:
-                end = '<li>' + load_lang('state') + ' : '
+                end = '<li>' + load_lang('state') + ' : ' + load_lang('ban') + '</li><li>'
 
                 if end_data[0][0]:
                     now = int(re.sub('(\-| |:)', '', get_time()))
@@ -642,9 +644,9 @@ def re_error(data):
 
                         end += '<script>location.reload();</script>'
                     else:
-                        end += load_lang('why') + ' : ' + end_data[0][0]
+                        end += 'End : ' + end_data[0][0]
                 else:
-                    end += load_lang('why') + ' : ' + load_lang('limitless')
+                    end += load_lang('limitless')
                 
                 end += '</li>'
 

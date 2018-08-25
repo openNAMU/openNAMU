@@ -2495,23 +2495,7 @@ def login():
     ip = ip_check()
     agent = flask.request.headers.get('User-Agent')
     
-    curs.execute("select block from ban where block = ? and login = 'O'", [ip])
-    if not curs.fetchall():
-        match = re.search("^([0-9]{1,3}\.[0-9]{1,3})", ip)
-        if match:
-            match = match.groups()[0]
-        else:
-            match = 'Not'
-
-        curs.execute("select block from ban where block = ? and login = 'O'", [match])
-        if not curs.fetchall():
-            ban = ban_check()
-        else:
-            ban = 0
-    else:
-        ban = 0
-
-    if ban == 1:
+    if ban_check(tool = 'login') == 1:
         return re_error('/ban')
         
     if flask.request.method == 'POST':        
@@ -2855,15 +2839,19 @@ def logout():
     
 @app.route('/ban/<name>', methods=['POST', 'GET'])
 def user_ban(name = None):
-    curs.execute("select acl from user where id = ?", [name])
-    user = curs.fetchall()
-    if not user:
-        return re_error('/error/2')
+    if ip_or_user(name) == 0:
+        curs.execute("select acl from user where id = ?", [name])
+        user = curs.fetchall()
+        if not user:
+            return re_error('/error/2')
 
-    if user and user[0][0] != 'user':
-        if admin_check(None, None) != 1:
-            return re_error('/error/4')
+        if user and user[0][0] != 'user':
+            if admin_check(None, None) != 1:
+                return re_error('/error/4')
 
+    if ban_check(ip = ip_check(), tool = 'login') == 1:
+        return re_error('/ban')
+                
     if flask.request.method == 'POST':
         if admin_check(1, 'ban (' + name + ')') != 1:
             return re_error('/error/3')
@@ -2889,6 +2877,10 @@ def user_ban(name = None):
                 data = '<ul><li>' + load_lang('limitless') + ' ' + load_lang('ban') + '</li>'
             else:
                 data = '<ul><li>' + load_lang('ban') + ' : ' + end[0][0] + '</li>'
+                
+            curs.execute("select block from ban where block = ? and login = 'O'", [name])
+            if curs.fetchall():
+                data += '<li>' + load_lang('login') + ' ' + load_lang('able') + '</li>'
 
             if end[0][1] != '':
                 data += '<li>' + load_lang('why') + ' : ' + end[0][1] + '</li></ul><hr>'
@@ -3617,7 +3609,7 @@ def user_info():
         if match:
             match = match.groups()[0]
         else:
-            match = 'Error'
+            match = '-'
 
         curs.execute("select end, login, band from ban where block = ? or block = ?", [ip, match])
         block_data = curs.fetchall()
@@ -3625,7 +3617,7 @@ def user_info():
             if block_data[0][0] != '':
                 acl += ' (End : ' + block_data[0][0] + ')'
             else:
-                acl += ' (End : ' + load_lang('limitless') + ')'        
+                acl += ' (' + load_lang('limitless') + ')'        
 
             if block_data[0][1] != '':
                 acl += ' (' + load_lang('login') + ' ' + load_lang('able') + ')'
