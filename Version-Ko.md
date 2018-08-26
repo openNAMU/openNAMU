@@ -4,7 +4,7 @@
  * 랜덤 구현
 
 ## 0.2 ~ 0.9 (베타)
- * 그 외 엄청나게 많은 기능 구현 (기존 [오픈나무](https://github.com/2DU/Discard-openNAMU-Legacy) 기능에서 로그인 필요한 기능 빼고 구현)
+ * 그 외 엄청나게 많은 기능 구현 (기존 [오픈나무](https://github.com/2DU/Discard-opennamu-Legacy) 기능에서 로그인 필요한 기능 빼고 구현)
 
 ## 1.0
  * 로그인 구현
@@ -151,12 +151,12 @@
 
 
 ## 자세한 내용
- * [참조](https://github.com/2DU/openNAMU/commits/master)
+ * [참조](https://github.com/2DU/opennamu/commits/master)
 
 ----
 ## 라이선스
 ### 오픈나무
- * [BSD 3-Clause License](https://github.com/2DU/openNAMU/blob/master/license.md)
+ * [BSD 3-Clause License](https://github.com/2DU/opennamu/blob/master/license.md)
 
 ### 외부 파일
  * 인용문 아이콘 [Dave Gandy](http://www.flaticon.com/free-icon/quote-left_25672) CC 3.0 BY
@@ -164,7 +164,7 @@
  * 수식 [MathJax](https://www.mathjax.org/)
  
 ## 기여자들
- * [참조](https://github.com/2DU/openNAMU/graphs/contributors)
+ * [참조](https://github.com/2DU/opennamu/graphs/contributors)
 
 ## 도움 준 사람들
  * [Team Croatia](https://github.com/TeamCroatia)
