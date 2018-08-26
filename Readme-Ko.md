@@ -3,10 +3,10 @@
 
 ## 클론 명령어
 ### 일반
- * `git clone -b stable https://github.com/2DU/openNAMU.git`
+ * `git clone -b stable https://github.com/2DU/opennamu.git`
 
 ### 베타
- * `git clone -b master https://github.com/2DU/openNAMU.git`
+ * `git clone -b master https://github.com/2DU/opennamu.git`
 
 ## 설치법
  * [참조](http://namu.ml/w/오픈나무%2F설치법)
