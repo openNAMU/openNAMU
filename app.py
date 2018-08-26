@@ -1072,7 +1072,7 @@ def now_update():
         print('Update')
 
         os.system('git remote rm origin')
-        os.system('git remote add origin https://github.com/2DU/openNAMU.git')
+        os.system('git remote add origin https://github.com/2DU/opennamu.git')
         ok = os.system('git fetch origin ' + up_data)
         ok = os.system('git reset --hard origin/' + up_data)
         if ok == 0:
@@ -1081,23 +1081,23 @@ def now_update():
         if platform.system() == 'Windows':
             print('Download')
 
-            urllib.request.urlretrieve('https://github.com/2DU/openNAMU/archive/' + up_data + '.zip', 'update.zip')
+            urllib.request.urlretrieve('https://github.com/2DU/opennamu/archive/' + up_data + '.zip', 'update.zip')
 
             print('Zip Extract')
             zipfile.ZipFile('update.zip').extractall('')
 
             print('Move')
-            ok = os.system('xcopy /y /r openNAMU-' + up_data + ' .')
+            ok = os.system('xcopy /y /r opennamu-' + up_data + ' .')
             if ok == 0:
                 print('Remove')
-                os.system('rd /s /q openNAMU-' + up_data)
+                os.system('rd /s /q opennamu-' + up_data)
                 os.system('del update.zip')
 
                 return redirect('/re_start')
 
     return easy_minify(flask.render_template(skin_check(), 
         imp = [load_lang('update'), wiki_set(), custom(), other2([0, 0])],
-        data = 'Auto update is not support. <a href="https://github.com/2DU/openNAMU">(GitHub)</a>',
+        data = 'Auto update is not support. <a href="https://github.com/2DU/opennamu">(GitHub)</a>',
         menu = [['manager/1', load_lang('admin')]]
     ))
         
@@ -1965,7 +1965,7 @@ def other():
                 <br>
                 <h2>''' + load_lang('normal_version') + '''</h2>
                 <ul>
-                    <li>''' + load_lang('normal_version') + ' : <a id="out_link" href="https://github.com/2DU/openNAMU/blob/master/version.md">' + r_ver + '''</a></li>
+                    <li>''' + load_lang('normal_version') + ' : <a id="out_link" href="https://github.com/2DU/opennamu/blob/master/version.md">' + r_ver + '''</a></li>
                 </ul>
                 ''',
     menu = 0
