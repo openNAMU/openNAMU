@@ -69,6 +69,7 @@
     "check" : "check",
     "user" : "user",
     "alarm" : "alarm",
+    "id" : "id",
     "preview" : "preview",
     "watchlist" : "watching list",
     "my_info" : "user set",

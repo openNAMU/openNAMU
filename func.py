@@ -129,7 +129,7 @@ def load_lang(data, num = 0):
             if data in else_lang:
                 return else_lang[data]
             else:
-                return data + ' (Missing)'
+                return data + ' (missing)'
     else:
         curs.execute('select data from user_set where name = "lang" and id = ?', [ip_check()])
         rep_data = curs.fetchall()
@@ -176,7 +176,7 @@ def edit_help_button():
     </script>
     '''
 
-    insert_list = [['[[|]]', 'Link'], ['[()]', 'Macro'], ['{{{#!}}}', 'Middle'], ['||<>||', 'Table']]
+    insert_list = [['[[|]]', 'link'], ['[()]', 'macro'], ['{{{#!}}}', 'middle'], ['||<>||', 'table']]
 
     data = ''
     for insert_data in insert_list:
@@ -231,7 +231,7 @@ def next_fix(link, num, page, end = 50):
     return list_data
 
 def other2(data):
-    return data + ['Deleted']
+    return data + ['']
 
 def wiki_set(num = 1):
     if num == 1:
@@ -242,7 +242,7 @@ def wiki_set(num = 1):
         if db_data and db_data[0][0] != '':
             data_list += [db_data[0][0]]
         else:
-            data_list += ['Wiki']
+            data_list += ['wiki']
 
         curs.execute('select data from other where name = "license"')
         db_data = curs.fetchall()
@@ -638,7 +638,7 @@ def re_error(data):
 
                         end += '<script>location.reload();</script>'
                     else:
-                        end += 'End : ' + end_data[0][0]
+                        end += 'end : ' + end_data[0][0]
                 else:
                     end += load_lang('limitless')
                 
@@ -648,8 +648,8 @@ def re_error(data):
                     end += '<li>' + load_lang('why') + ' : ' + end_data[0][1] + '</li>'
 
         return easy_minify(flask.render_template(skin_check(), 
-            imp = ['Error', wiki_set(1), custom(), other2([0, 0])],
-            data = '<h2>Error</h2><ul>' + end + '</ul>',
+            imp = ['error', wiki_set(1), custom(), other2([0, 0])],
+            data = '<h2>error</h2><ul>' + end + '</ul>',
             menu = 0
         ))
     else:
@@ -698,8 +698,8 @@ def re_error(data):
                 data = '???'
 
             return easy_minify(flask.render_template(skin_check(), 
-                imp = ['Error', wiki_set(1), custom(), other2([0, 0])],
-                data = '<h2>Error</h2><ul><li>' + data + '</li></ul>',
+                imp = ['error', wiki_set(1), custom(), other2([0, 0])],
+                data = '<h2>error</h2><ul><li>' + data + '</li></ul>',
                 menu = 0
             ))
         else:

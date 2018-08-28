@@ -431,7 +431,7 @@ def setting(num = 0):
         ))
     elif num == 1:
         i_list = ['name', 'logo', 'frontpage', 'license', 'upload', 'skin', 'edit', 'reg', 'ip_view', 'back_up', 'port', 'key', 'update']
-        n_list = ['wiki', '', 'frontPage', 'CC 0', '2', '', 'normal', '', '', '0', '3000', 'test', 'stable']
+        n_list = ['wiki', '', 'FrontPage', 'CC 0', '2', '', 'normal', '', '', '0', '3000', 'test', 'stable']
         
         if flask.request.method == 'POST':
             i = 0
@@ -1172,7 +1172,15 @@ def recent_discuss():
         
         m_sub = ' (' + load_lang('close') + ')'
 
-    div += '<hr><table id="main_table_set"><tbody><tr><td id="main_table_width_half">' + load_lang('discussion') + ' ' + load_lang('name') + '</td><td id="main_table_width_half">' + load_lang('time') + '</td></tr>'
+    div +=  '''
+            <hr>
+            <table id="main_table_set">
+                <tbody>
+                    <tr>
+                        <td id="main_table_width_half">''' + load_lang('discussion') + ' ' + load_lang('name') + '''</td>
+                        <td id="main_table_width_half">''' + load_lang('time') + '''</td>
+                    </tr>
+            '''
     
     curs.execute("select title, sub, date from rd order by date desc limit 50")
     for data in curs.fetchall():
@@ -2531,7 +2539,7 @@ def login():
             imp = [load_lang('login'), wiki_set(), custom(), other2([0, 0])],
             data =  '''
                     <form method="post">
-                        <input placeholder="id" name="id" type="text">
+                        <input placeholder="''' + load_lang('id') + '''" name="id" type="text">
                         <hr>
                         <input placeholder="''' + load_lang('password') + '''" name="pw" type="password">
                         <hr>
@@ -2613,7 +2621,7 @@ def change_password():
             imp = [load_lang('user') + ' ' + load_lang('setting') + ' ' + load_lang('edit'), wiki_set(), custom(), other2([0, 0])],
             data =  '''
                     <form method="post">
-                        <span>id : ''' + ip + '''</span>
+                        <span>''' + load_lang('id') +  ' : ' + ip + '''</span>
                         <hr>
                         <input placeholder="''' + load_lang('now') + ' ' + load_lang('password') + '''" name="pw" type="password">
                         <br>
@@ -2787,7 +2795,7 @@ def register():
             data =  '''
                     <form method="post">
                         ''' + contract + '''
-                        <input placeholder="id" name="id" type="text">
+                        <input placeholder="''' + load_lang('id') + '''" name="id" type="text">
                         <hr>
                         <input placeholder="''' + load_lang('password') + '''" name="pw" type="password">
                         <hr>
