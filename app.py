@@ -17,17 +17,17 @@ import sys
 
 from func import *
 
-r_ver = 'v3.0.7-Master-03'
+r_ver = 'v3.0.7-master-03'
 c_ver = ''.join(re.findall('[0-9]', r_ver))
 
-print('Version : ' + r_ver)
+print('version : ' + r_ver)
 
 try:
     json_data = open('set.json').read()
     set_data = json.loads(json_data)
 except:
     while 1:
-        print('DB Name : ', end = '')
+        print('db name : ', end = '')
         
         new_json = str(input())
         if new_json != '':
@@ -39,7 +39,7 @@ except:
 
             break
         else:
-            print('Insert Values')
+            print('insert value')
             
             pass
 
@@ -180,7 +180,7 @@ else:
     rep_data = curs.fetchall()
     if not rep_data:
         while 1:
-            print('Port : ', end = '')
+            print('port : ', end = '')
         
             rep_port = int(input())
             if rep_port:
@@ -192,7 +192,7 @@ else:
     else:
         rep_port = rep_data[0][0]
     
-        print('Port : ' + str(rep_port))
+        print('port : ' + str(rep_port))
 
 try:
     if not os.path.exists('robots.txt'):
@@ -232,11 +232,11 @@ if not rep_data:
             curs.execute("insert into other (name, data) values ('language', ?)", [os.getenv('NAMU_LANG')])
             rep_language = os.getenv('NAMU_LANG')
         else:
-            print('Language {} is not supported!'.format(os.getenv('NAMU_LANG')))
+            print('language {} is not supported!'.format(os.getenv('NAMU_LANG')))
             rep_language = 'en-US'
     else:
         while 1:
-            print('Language [{}] : '.format(' '.join(support_language)), end = '')
+            print('language [{}] : '.format(' '.join(support_language)), end = '')
             rep_language = str(input())
             if rep_language in support_language:
                 curs.execute("insert into other (name, data) values ('language', ?)", [rep_language])
@@ -246,7 +246,7 @@ if not rep_data:
 else:
     rep_language = rep_data[0][0]
     
-    print('Language : ' + str(rep_language))
+    print('language : ' + str(rep_language))
 
 curs.execute('delete from other where name = "ver"')
 curs.execute('insert into other (name, data) values ("ver", ?)', [c_ver])
@@ -255,9 +255,9 @@ def back_up():
     try:
         shutil.copyfile(set_data['db'] + '.db', 'back_' + set_data['db'] + '.db')
         
-        print('Back up : Ok')
+        print('back up : ok')
     except:
-        print('Back up : Error')
+        print('back up : error')
 
     threading.Timer(60 * 60 * back_time, back_up).start()
 
@@ -270,12 +270,12 @@ except:
     back_time = 0
     
 if back_time != 0:
-    print('Back up state : ' + str(back_time) + ' hours interval')
+    print('back up state : ' + str(back_time) + ' hours interval')
     
     if __name__ == '__main__':
         back_up()
 else:
-    print('Back up state : Turn off')
+    print('back up state : turn off')
 
 conn.commit()
 
@@ -326,7 +326,7 @@ def inter_wiki(tools = None):
     else:
         del_link = 'del_html_filter'
         plus_link = 'plus_html_filter'
-        title = 'HTML' + load_lang('filter') + ' ' + load_lang('list')
+        title = 'html' + load_lang('filter') + ' ' + load_lang('list')
         div = '<ul><li>span</li><li>div</li><li>iframe</li></ul>'
 
         curs.execute('select html from html_filter')
@@ -390,10 +390,10 @@ def plus_inter(tools = None):
     else:
         if tools == 'plus_inter_wiki':
             title = load_lang('interwiki') + ' ' + load_lang('plus')
-            form_data = '<input placeholder="' + load_lang('name') + '" type="text" name="title"><hr><input placeholder="Link" type="text" name="link">'
+            form_data = '<input placeholder="' + load_lang('name') + '" type="text" name="title"><hr><input placeholder="link" type="text" name="link">'
         else:
-            title = 'HTML ' + load_lang('filter') + ' ' + load_lang('plus')
-            form_data = '<input placeholder="HTML" type="text" name="title">'
+            title = 'html ' + load_lang('filter') + ' ' + load_lang('plus')
+            form_data = '<input placeholder="html" type="text" name="title">'
 
         return easy_minify(flask.render_template(skin_check(), 
             imp = [title, wiki_set(), custom(), other2([0, 0])],
@@ -414,7 +414,7 @@ def setting(num = 0):
         return re_error('/ban')
 
     if num == 0:
-        li_list = [load_lang('main'), load_lang('set_text'), load_lang('main_head'), 'robots.txt', 'Google']
+        li_list = [load_lang('main'), load_lang('set_text'), load_lang('main_head'), 'robots.txt', 'google']
         
         x = 0
         
@@ -431,7 +431,7 @@ def setting(num = 0):
         ))
     elif num == 1:
         i_list = ['name', 'logo', 'frontpage', 'license', 'upload', 'skin', 'edit', 'reg', 'ip_view', 'back_up', 'port', 'key', 'update']
-        n_list = ['Wiki', '', 'FrontPage', 'CC 0', '2', '', 'normal', '', '', '0', '3000', 'Test', 'stable']
+        n_list = ['wiki', '', 'frontPage', 'CC 0', '2', '', 'normal', '', '', '0', '3000', 'test', 'stable']
         
         if flask.request.method == 'POST':
             i = 0
@@ -506,7 +506,7 @@ def setting(num = 0):
                             <br>
                             <input placeholder="''' + load_lang('name') + '''" type="text" name="name" value="''' + html.escape(d_list[0]) + '''">
                             <hr>
-                            <span>''' + load_lang('logo') + ''' (HTML)</span>
+                            <span>''' + load_lang('logo') + ''' (html)</span>
                             <br>
                             <br>
                             <input placeholder="''' + load_lang('logo') + '''" type="text" name="logo" value="''' + html.escape(d_list[1]) + '''">
@@ -516,17 +516,17 @@ def setting(num = 0):
                             <br>
                             <input placeholder="''' + load_lang('frontpage') + '''" type="text" name="frontpage" value="''' + html.escape(d_list[2]) + '''">
                             <hr>
-                            <span>''' + load_lang('license') + ''' (HTML)</span>
+                            <span>''' + load_lang('license') + ''' (html)</span>
                             <br>
                             <br>
                             <input placeholder="''' + load_lang('license') + '''" type="text" name="license" value="''' + html.escape(d_list[3]) + '''">
                             <hr>
-                            <span>''' + load_lang('max_file_size') + ''' [MB]</span>
+                            <span>''' + load_lang('max_file_size') + ''' [mb]</span>
                             <br>
                             <br>
                             <input placeholder="''' + load_lang('max_file_size') + '''" type="text" name="upload" value="''' + html.escape(d_list[4]) + '''">
                             <hr>
-                            <span>''' + load_lang('back_up_interval') + ' [' + load_lang('hour') + '] (OFF : 0) {' + load_lang('need_to_restart') + '''}</span>
+                            <span>''' + load_lang('back_up_interval') + ' [' + load_lang('hour') + '] (off : 0) {' + load_lang('need_to_restart') + '''}</span>
                             <br>
                             <br>
                             <input placeholder="''' + load_lang('back_up_interval') + '''" type="text" name="back_up" value="''' + html.escape(d_list[9]) + '''">
@@ -681,7 +681,7 @@ def setting(num = 0):
             return easy_minify(flask.render_template(skin_check(), 
                 imp = ['robots.txt', wiki_set(), custom(), other2([0, 0])],
                 data =  '''
-                        <a href="/robots.txt">(View)</a>
+                        <a href="/robots.txt">(view)</a>
                         <hr>
                         <form method="post">
                             <textarea rows="25" name="content">''' + html.escape(data) + '''</textarea>
@@ -722,18 +722,18 @@ def setting(num = 0):
             conn.commit()
 
             return easy_minify(flask.render_template(skin_check(), 
-                imp = ['Google', wiki_set(), custom(), other2([0, 0])],
+                imp = ['google', wiki_set(), custom(), other2([0, 0])],
                 data =  '''
                         <form method="post">
-                            <span>reCAPTCHA (HTML)</span>
+                            <span>reCAPTCHA (html)</span>
                             <br>
                             <br>
-                            <input placeholder="reCAPTCHA (HTML)" type="text" name="recaptcha" value="''' + html.escape(d_list[0]) + '''">
+                            <input placeholder="reCAPTCHA (html)" type="text" name="recaptcha" value="''' + html.escape(d_list[0]) + '''">
                             <hr>
-                            <span>reCAPTCHA (Secret key)</span>
+                            <span>reCAPTCHA (secret key)</span>
                             <br>
                             <br>
-                            <input placeholder="reCAPTCHA (Secret key)" type="text" name="sec_re" value="''' + html.escape(d_list[1]) + '''">
+                            <input placeholder="reCAPTCHA (secret key)" type="text" name="sec_re" value="''' + html.escape(d_list[1]) + '''">
                             <hr>
                             <button id="save" type="submit">''' + load_lang('save') + '''</button>
                         </form>
@@ -788,7 +788,7 @@ def acl_list():
     div += '</ul>'
     
     return easy_minify(flask.render_template(skin_check(), 
-        imp = ['ACL ' + load_lang('document') + ' ' + load_lang('list'), wiki_set(), custom(), other2([0, 0])],
+        imp = ['acl ' + load_lang('document') + ' ' + load_lang('list'), wiki_set(), custom(), other2([0, 0])],
         data = div,
         menu = [['other', load_lang('other')]]
     ))
@@ -856,7 +856,7 @@ def admin_plus(name = None):
         data += '<li><input type="checkbox" ' + state +  ' name="ban" ' + exist_list[0] + '> ' + load_lang('ban') + '</li>'
         data += '<li><input type="checkbox" ' + state +  ' name="toron" ' + exist_list[2] + '> ' + load_lang('discussion') + '</li>'
         data += '<li><input type="checkbox" ' + state +  ' name="check" ' + exist_list[3] + '> ' + load_lang('user') + ' ' + load_lang('check') + '</li>'
-        data += '<li><input type="checkbox" ' + state +  ' name="acl" ' + exist_list[4] + '> ' + load_lang('document') + ' ACL</li>'
+        data += '<li><input type="checkbox" ' + state +  ' name="acl" ' + exist_list[4] + '> ' + load_lang('document') + ' acl</li>'
         data += '<li><input type="checkbox" ' + state +  ' name="hidel" ' + exist_list[5] + '> ' + load_lang('history') + ' ' + load_lang('hide') + '</li>'
         data += '<li><input type="checkbox" ' + state +  ' name="give" ' + exist_list[6] + '> ' + load_lang('authority') + '</li>'
         data += '<li><input type="checkbox" ' + state +  ' name="owner" ' + exist_list[7] + '> ' + load_lang('owner') + '</li></ul>'
@@ -948,7 +948,7 @@ def user_log():
         else:
             count = 0
 
-        list_data += '</ul><hr><ul><li>All : ' + str(count) + '</li></ul>'
+        list_data += '</ul><hr><ul><li>all : ' + str(count) + '</li></ul>'
 
     list_data += next_fix('/user_log?num=', num, user_list)
 
@@ -1011,7 +1011,7 @@ def indexing():
     data = curs.fetchall()
     if data:
         for delete_index in data:
-            print('Delete : ' + delete_index[0])
+            print('delete : ' + delete_index[0])
 
             sql = 'drop index if exists ' + delete_index[0]
             
@@ -1028,7 +1028,7 @@ def indexing():
             r_cul = re.findall('(?:([^ (]*) text)', str(cul[0]))
             
             for n_cul in r_cul:
-                print('Create : index_' + table[0] + '_' + n_cul)
+                print('create : index_' + table[0] + '_' + n_cul)
 
                 sql = 'create index index_' + table[0] + '_' + n_cul + ' on ' + table[0] + '(' + n_cul + ')'
                 try:
@@ -1069,7 +1069,7 @@ def now_update():
         up_data = 'stable'
 
     if platform.system() == 'Linux':
-        print('Update')
+        print('update')
 
         os.system('git remote rm origin')
         os.system('git remote add origin https://github.com/2DU/opennamu.git')
@@ -1079,17 +1079,17 @@ def now_update():
             return redirect('/re_start')
     else:
         if platform.system() == 'Windows':
-            print('Download')
+            print('download')
 
             urllib.request.urlretrieve('https://github.com/2DU/opennamu/archive/' + up_data + '.zip', 'update.zip')
 
-            print('Zip Extract')
+            print('zip Extract')
             zipfile.ZipFile('update.zip').extractall('')
 
-            print('Move')
+            print('move')
             ok = os.system('xcopy /y /r opennamu-' + up_data + ' .')
             if ok == 0:
-                print('Remove')
+                print('remove')
                 os.system('rd /s /q opennamu-' + up_data)
                 os.system('del update.zip')
 
@@ -1097,7 +1097,7 @@ def now_update():
 
     return easy_minify(flask.render_template(skin_check(), 
         imp = [load_lang('update'), wiki_set(), custom(), other2([0, 0])],
-        data = 'Auto update is not support. <a href="https://github.com/2DU/opennamu">(GitHub)</a>',
+        data = 'auto update is not support. <a href="https://github.com/2DU/opennamu">(github)</a>',
         menu = [['manager/1', load_lang('admin')]]
     ))
         
@@ -1228,7 +1228,7 @@ def block_log(name = None, tool = None, tool2 = None):
             div =   '''
                     <a href="/manager/11">(''' + load_lang('blocked') + ''')</a> <a href="/manager/12">(''' + load_lang('admin') + ''')</a>
                     <hr>
-                    <a href="/block_log/ip">(IP)</a> <a href="/block_log/user">(''' + load_lang('subscriber') + ')</a> <a href="/block_log/never_end">(' + load_lang('limitless') + ')</a> <a href="/block_log/can_end">(' + load_lang('period') + ')</a> <a href="/block_log/end">(' + load_lang('release') + ')</a> <a href="/block_log/now">(' + load_lang('now') + ')</a> <a href="/block_log/edit_filter">(' + load_lang('edit') + ' ' + load_lang('filter') + ''')</a>
+                    <a href="/block_log/ip">(ip)</a> <a href="/block_log/user">(''' + load_lang('subscriber') + ')</a> <a href="/block_log/never_end">(' + load_lang('limitless') + ')</a> <a href="/block_log/can_end">(' + load_lang('period') + ')</a> <a href="/block_log/end">(' + load_lang('release') + ')</a> <a href="/block_log/now">(' + load_lang('now') + ')</a> <a href="/block_log/edit_filter">(' + load_lang('edit') + ' ' + load_lang('filter') + ''')</a>
                     <hr>
                     ''' + div
             
@@ -1240,7 +1240,7 @@ def block_log(name = None, tool = None, tool2 = None):
             menu = [['block_log', load_lang('normal')]]
             
             if tool2 == 'ip':
-                sub = ' (IP)'
+                sub = ' (ip)'
                 
                 curs.execute("select why, block, blocker, end, today from rb where (block like ? or block like ?) order by today desc limit ?, '50'", ['%.%', '%:%', str(sql_num)])
             elif tool2 == 'user':
@@ -1304,7 +1304,7 @@ def block_log(name = None, tool = None, tool2 = None):
         else:
             end = load_lang('limitless') + ''
             
-        div += '<tr><td>' + ip + '</td><td>' + ip_pas(data[2]) + '</td><td>Start : ' + data[4] + '<br>End : ' + end + '</td></tr>'
+        div += '<tr><td>' + ip + '</td><td>' + ip_pas(data[2]) + '</td><td>start : ' + data[4] + '<br>end : ' + end + '</td></tr>'
         div += '<tr><td colspan="3">' + why + '</td></tr>'
 
     div += '</tbody></table>'
@@ -1541,9 +1541,9 @@ def set_edit_filter(name = None):
 
         curs.execute("select name from filter where name = ?", [name])
         if curs.fetchall():
-            curs.execute("update filter set regex = ?, sub = ? where name = ?", [flask.request.form.get('content', 'Test'), end, name])
+            curs.execute("update filter set regex = ?, sub = ? where name = ?", [flask.request.form.get('content', 'test'), end, name])
         else:
-            curs.execute("insert into filter (name, regex, sub) values (?, ?, ?)", [name, flask.request.form.get('content', 'Test'), end])
+            curs.execute("insert into filter (name, regex, sub) values (?, ?, ?)", [name, flask.request.form.get('content', 'test'), end])
 
         conn.commit()
     
@@ -1719,7 +1719,7 @@ def edit(name = None):
         
         if not flask.request.args.get('section', None):
             get_name =  '''
-                        <a href="/manager/15?plus=''' + url_pas(name) + '''">(Load)</a>
+                        <a href="/manager/15?plus=''' + url_pas(name) + '''">(load)</a>
                         <hr>
                         '''
             action = ''
@@ -1759,7 +1759,7 @@ def preview(name = None):
     if acl_check(name) == 1:
         return re_error('/ban')
          
-    new_data = re.sub('\r\n#(?:redirect|넘겨주기) (?P<in>(?:(?!\r\n).)+)\r\n', ' * Redirect to [[\g<in>]]', '\r\n' + flask.request.form.get('content', None) + '\r\n')
+    new_data = re.sub('\r\n#(?:redirect|넘겨주기) (?P<in>(?:(?!\r\n).)+)\r\n', ' * redirect to [[\g<in>]]', '\r\n' + flask.request.form.get('content', None) + '\r\n')
     new_data = re.sub('^\r\n', '', new_data)
     new_data = re.sub('\r\n$', '', new_data)
     
@@ -1948,7 +1948,7 @@ def other():
                     <li><a href="/give_log">''' + load_lang('admin_group') + '''</a></li>
                     <li><a href="/not_close_topic">''' + load_lang('open') + ' ' + load_lang('discussion') + '''</a></li>
                     <li><a href="/title_index">''' + load_lang('all') + ' ' + load_lang('document') + '''</a></li>
-                    <li><a href="/acl_list">ACL ''' + load_lang('document') + '''</a></li>
+                    <li><a href="/acl_list">acl ''' + load_lang('document') + '''</a></li>
                     <li><a href="/please">''' + load_lang('need') + ' ' + load_lang('document') + '''</a></li>
                 </ul>
                 <br>
@@ -1997,7 +1997,7 @@ def manager(num = 1):
             data =  '''
                     <h2>''' + load_lang('admin') + '''</h2>
                     <ul>
-                        <li><a href="/manager/2">''' + load_lang('document') + ''' ACL</a></li>
+                        <li><a href="/manager/2">''' + load_lang('document') + ''' acl</a></li>
                         <li><a href="/manager/3">''' + load_lang('user') + ' ' + load_lang('check') + '''</a></li>
                         <li><a href="/manager/4">''' + load_lang('user') + ' ' + load_lang('ban') + '''</a></li>
                         <li><a href="/manager/5">''' + load_lang('subscriber') + ' ' + load_lang('authority') + '''</a></li>
@@ -2088,12 +2088,12 @@ def title_index():
 
         count_end += [count_end[0] - count_end[1]  - count_end[2]  - count_end[3]  - count_end[4]]
         
-        data += '</ul><hr><ul><li>All : ' + str(count_end[0]) + '</li></ul><hr><ul>'
+        data += '</ul><hr><ul><li>all : ' + str(count_end[0]) + '</li></ul><hr><ul>'
         data += '<li>' + load_lang('template') + ' : ' + str(count_end[1]) + '</li>'
         data += '<li>' + load_lang('category') + ' : ' + str(count_end[2]) + '</li>'
         data += '<li>' + load_lang('user') + ' : ' + str(count_end[3]) + '</li>'
         data += '<li>' + load_lang('file') + ' : ' + str(count_end[4]) + '</li>'
-        data += '<li>Other : ' + str(count_end[5]) + '</li>'
+        data += '<li>other : ' + str(count_end[5]) + '</li>'
 
     data += '</ul>' + next_fix('/title_index?num=' + str(num) + '&page=', page, title_list, num)
     sub = ' (' + str(num) + ')'
@@ -2237,7 +2237,7 @@ def topic_admin(name = None, sub = None, num = None):
         ban += '</a></li>' + is_ban
 
     ban += '</ul><br><h2>' + load_lang('other') + ' ' + load_lang('tool') + '</h2><ul>'
-    ban += '<li><a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/raw/' + str(num) + '">Raw</a></li>'
+    ban += '<li><a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/raw/' + str(num) + '">raw</a></li>'
     ban = '<li>' + load_lang('time') + ' : ' + data[0][2] + '</li>' + ban
     
     if ip_or_user(data[0][1]) == 1:
@@ -2279,7 +2279,7 @@ def topic(name = None, sub = None):
 
         match = re.search('^user:([^/]+)', name)
         if match:
-            curs.execute('insert into alarm (name, data, date) values (?, ?, ?)', [match.groups()[0], ip + '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '">' + load_lang('user', 1) + ' - ' + load_lang('discussion', 1) + '</a> (My)', today])
+            curs.execute('insert into alarm (name, data, date) values (?, ?, ?)', [match.groups()[0], ip + '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '">' + load_lang('user', 1) + ' - ' + load_lang('discussion', 1) + '</a> (my)', today])
         
         data = re.sub('\[\[((?:분류|category):(?:(?:(?!\]\]).)*))\]\]', '[br]', flask.request.form.get('content', None))
         for rd_data in re.findall("(?:#([0-9]+))", data):
@@ -2531,7 +2531,7 @@ def login():
             imp = [load_lang('login'), wiki_set(), custom(), other2([0, 0])],
             data =  '''
                     <form method="post">
-                        <input placeholder="ID" name="id" type="text">
+                        <input placeholder="id" name="id" type="text">
                         <hr>
                         <input placeholder="''' + load_lang('password') + '''" name="pw" type="password">
                         <hr>
@@ -2613,7 +2613,7 @@ def change_password():
             imp = [load_lang('user') + ' ' + load_lang('setting') + ' ' + load_lang('edit'), wiki_set(), custom(), other2([0, 0])],
             data =  '''
                     <form method="post">
-                        <span>ID : ''' + ip + '''</span>
+                        <span>id : ''' + ip + '''</span>
                         <hr>
                         <input placeholder="''' + load_lang('now') + ' ' + load_lang('password') + '''" name="pw" type="password">
                         <br>
@@ -2623,7 +2623,7 @@ def change_password():
                         <br>
                         <input placeholder="''' + load_lang('reconfirm') + '''" name="pw3" type="password">
                         <hr>
-                        <input placeholder="Email" name="email" type="text" value="''' + email + '''">
+                        <input placeholder="email" name="email" type="text" value="''' + email + '''">
                         <hr>
                         <span>''' + load_lang('user') + ' ' + load_lang('skin') + '''</span>
                         <br>
@@ -2645,7 +2645,7 @@ def change_password():
 
 @app.route('/check/<name>')
 def user_check(name = None):
-    curs.execute("select acl from user where id = ? or id = ?", [name, flask.request.args.get('plus', 'Yes-Error')])
+    curs.execute("select acl from user where id = ? or id = ?", [name, flask.request.args.get('plus', '-')])
     user = curs.fetchall()
     if user and user[0][0] != 'user':
         if admin_check(None, None) != 1:
@@ -2689,7 +2689,7 @@ def user_check(name = None):
             div = '<a href="/check/' + url_pas(name) + '">(' + name + ')</a> <a href="/check/' + url_pas(flask.request.args.get('plus', None)) + '">(' + flask.request.args.get('plus', None) + ')</a><hr>'
 
         div += '<table id="main_table_set"><tbody><tr>'
-        div += '<td id="main_table_width">' + load_lang('name') + '</td><td id="main_table_width">IP</td><td id="main_table_width">' + load_lang('time') + '</td></tr>'
+        div += '<td id="main_table_width">' + load_lang('name') + '</td><td id="main_table_width">ip</td><td id="main_table_width">' + load_lang('time') + '</td></tr>'
         
         for data in record:
             if data[2]:
@@ -2714,34 +2714,6 @@ def user_check(name = None):
         data = div,
         menu = [['manager', load_lang('admin')]]
     ))
-
-'''
-@app.route('/easy_check/<name>')
-def user_easy_check(name = None):
-    curs.execute("select acl from user where id = ? or id = ?", [name, flask.request.args.get('plus', 'Yes-Error')])
-    user = curs.fetchall()
-    if user and user[0][0] != 'user':
-        if admin_check(None, None) != 1:
-            return re_error('/error/4')
-
-    if admin_check(4, 'easy check (' + name + ')') != 1:
-        return re_error('/error/3')
-        
-    num = int(flask.request.args.get('num', 1))
-    if num * 50 > 0:
-        sql_num = num * 50 - 50
-    else:
-        sql_num = 0
-        
-    div = ''
-    div += next_fix('/easy_check/' + url_pas(name) + '?num=', num, [])
-            
-    return easy_minify(flask.render_template(skin_check(),    
-        imp = [load_lang('easy') + ' ' + load_lang('check'), wiki_set(), custom(), other2([0, 0])],
-        data = div,
-        menu = [['check/' + url_pas(name), load_lang('normal')]]
-    ))
-'''
                 
 @app.route('/register', methods=['POST', 'GET'])
 def register():
@@ -2815,7 +2787,7 @@ def register():
             data =  '''
                     <form method="post">
                         ''' + contract + '''
-                        <input placeholder="ID" name="id" type="text">
+                        <input placeholder="id" name="id" type="text">
                         <hr>
                         <input placeholder="''' + load_lang('password') + '''" name="pw" type="password">
                         <hr>
@@ -2970,7 +2942,7 @@ def acl(name = None):
         data += '</select>'
         
         if not re.search('^user:', name):
-            data += '<br><br><h2>' + load_lang('discussion') + ' ACL</h2><select name="dis" ' + check_ok + '>'
+            data += '<br><br><h2>' + load_lang('discussion') + ' acl</h2><select name="dis" ' + check_ok + '>'
         
             curs.execute("select dis, why from acl where title = ?", [name])
             acl_data = curs.fetchall()
@@ -2988,12 +2960,12 @@ def acl(name = None):
                 data += '<hr><input value="' + html.escape(acl_data[0][1]) + '" placeholder="' + load_lang('why') + '" name="why" type="text" ' + check_ok + '>'
             
         return easy_minify(flask.render_template(skin_check(), 
-            imp = [name, wiki_set(), custom(), other2([' (ACL)', 0])],
+            imp = [name, wiki_set(), custom(), other2([' (acl)', 0])],
             data =  '''
                     <form method="post">
                         ''' + data + '''
                         <hr>
-                        <button type="submit" ''' + check_ok + '''>ACL ''' + load_lang('edit') + '''</button>
+                        <button type="submit" ''' + check_ok + '''>acl ''' + load_lang('edit') + '''</button>
                     </form>
                     ''',
             menu = [['w/' + url_pas(name), load_lang('document')], ['manager', load_lang('admin')]]
@@ -3078,7 +3050,7 @@ def diff_data(name = None):
             second_data = html.escape(second_raw_data[0][0])
 
             if first == second:
-                result = 'Same.'
+                result = '-'
             else:            
                 diff_data = difflib.SequenceMatcher(None, first_data, second_data)
                 result = re.sub('\r', '', diff(diff_data))
@@ -3205,10 +3177,10 @@ def read_view(name = None):
     curs.execute("select dec from acl where title = ?", [name])
     data = curs.fetchall()
     if data:
-        acl += ' (ACL)'
+        acl += ' (acl)'
             
     if flask.request.args.get('froms', None):
-        else_data = re.sub('\r\n#(?:redirect|넘겨주기) (?P<in>(?:(?!\r\n).)+)\r\n', ' * Redirect to [[\g<in>]]', '\r\n' + else_data + '\r\n')
+        else_data = re.sub('\r\n#(?:redirect|넘겨주기) (?P<in>(?:(?!\r\n).)+)\r\n', ' * redirect to [[\g<in>]]', '\r\n' + else_data + '\r\n')
         else_data = re.sub('^\r\n', '', else_data)
         else_data = re.sub('\r\n$', '', else_data)
             
@@ -3228,11 +3200,11 @@ def read_view(name = None):
         else:
             menu = [['edit/' + url_pas(name), load_lang('edit')]]
 
-        menu += [['topic/' + url_pas(name), load_lang('discussion')], ['history/' + url_pas(name), load_lang('history')], ['xref/' + url_pas(name), load_lang('backlink')], ['acl/' + url_pas(name), 'ACL']]
+        menu += [['topic/' + url_pas(name), load_lang('discussion')], ['history/' + url_pas(name), load_lang('history')], ['xref/' + url_pas(name), load_lang('backlink')], ['acl/' + url_pas(name), 'acl']]
 
         if flask.request.args.get('froms', None):
             menu += [['w/' + url_pas(name), load_lang('pass')]]
-            end_data = '<ul id="redirect"><li>Redirect from <a href="/w/' + url_pas(flask.request.args.get('froms', None)) + '?froms=' + url_pas(name) + '">' + flask.request.args.get('froms', None) + '</a></li></ul><br>' + end_data
+            end_data = '<ul id="redirect"><li>redirect from <a href="/w/' + url_pas(flask.request.args.get('froms', None)) + '?froms=' + url_pas(name) + '">' + flask.request.args.get('froms', None) + '</a></li></ul><br>' + end_data
 
         if uppage != 0:
             menu += [['w/' + url_pas(uppage), load_lang('upper')]]
@@ -3457,7 +3429,7 @@ def recent_changes(name = None, tool = 'record'):
                 
                 sub += ' (' + load_lang('history') + ')'
                 
-                menu = [['w/' + url_pas(name), load_lang('document')], ['raw/' + url_pas(name), 'Raw'], ['move_data/' + url_pas(name), load_lang('move') + ' ' + load_lang('history')]]
+                menu = [['w/' + url_pas(name), load_lang('document')], ['raw/' + url_pas(name), 'raw'], ['move_data/' + url_pas(name), load_lang('move') + ' ' + load_lang('history')]]
                 
                 div += next_fix('/history/' + url_pas(name) + '?num=', num, data_list)
             else:
@@ -3615,7 +3587,7 @@ def user_info():
         block_data = curs.fetchall()
         if block_data:
             if block_data[0][0] != '':
-                acl += ' (End : ' + block_data[0][0] + ')'
+                acl += ' (end : ' + block_data[0][0] + ')'
             else:
                 acl += ' (' + load_lang('limitless') + ')'        
 
@@ -3658,8 +3630,8 @@ def user_info():
                 <br>
                 <h2>''' + load_lang('tool') + '''</h2>
                 <ul>
-                    <li><a href="/acl/user:''' + url_pas(ip) + '">' + load_lang('user') + ' ' + load_lang('document') + ''' ACL</a></li>
-                    <li><a href="/custom_head">''' + load_lang('user') + ''' HEAD</a></li></ul><br><h2>''' + load_lang('other') + '''</h2><ul>''' + plus2 + '''<li><a href="/count">''' + load_lang('count') + '''</a></li>
+                    <li><a href="/acl/user:''' + url_pas(ip) + '">' + load_lang('user') + ' ' + load_lang('document') + ''' acl</a></li>
+                    <li><a href="/custom_head">''' + load_lang('user') + ''' head</a></li></ul><br><h2>''' + load_lang('other') + '''</h2><ul>''' + plus2 + '''<li><a href="/count">''' + load_lang('count') + '''</a></li>
                 </ul>
                 ''',
         menu = 0
@@ -3667,7 +3639,7 @@ def user_info():
 
 @app.route('/watch_list')
 def watch_list():
-    div = 'Limit : 10<hr>'
+    div = 'limit : 10<hr>'
     
     if custom()[2] == 0:
         return redirect('/login')
@@ -3745,10 +3717,10 @@ def custom_head_view():
             else:
                 data = ''
 
-        start += '<span>&lt;style&gt;CSS&lt;/style&gt;<br>&lt;script&gt;JS&lt;/script&gt;</span><hr>'
+        start += '<span>&lt;style&gt;css&lt;/style&gt;<br>&lt;script&gt;js&lt;/script&gt;</span><hr>'
 
         return easy_minify(flask.render_template(skin_check(), 
-            imp = [load_lang('user') + ' HEAD', wiki_set(), custom(), other2([0, 0])],
+            imp = [load_lang('user') + ' head', wiki_set(), custom(), other2([0, 0])],
             data =  start + '''
                     <form method="post">
                         <textarea rows="25" cols="100" name="content">''' + data + '''</textarea>
