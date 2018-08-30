@@ -2563,93 +2563,97 @@ def change_password():
         return redirect('/login')
 
     ip = ip_check()
+    user_state = flask.request.args.get('user', 'ip')
     
-    if flask.request.method == 'POST':    
-        if flask.request.form.get('pw', None):
-            if flask.request.form.get('pw2', None) != flask.request.form.get('pw3', None):
-                return re_error('/error/20')
+    if user_state == 'ip':
+        if flask.request.method == 'POST':    
+            if flask.request.form.get('pw', None):
+                if flask.request.form.get('pw2', None) != flask.request.form.get('pw3', None):
+                    return re_error('/error/20')
 
-            curs.execute("select pw from user where id = ?", [flask.session['DREAMER']])
-            user = curs.fetchall()
-            if not user:
-                return re_error('/error/10')
+                curs.execute("select pw from user where id = ?", [flask.session['DREAMER']])
+                user = curs.fetchall()
+                if not user:
+                    return re_error('/error/10')
 
-            if not bcrypt.checkpw(bytes(flask.request.form.get('pw', None), 'utf-8'), bytes(user[0][0], 'utf-8')):
-                return re_error('/error/2')
+                if not bcrypt.checkpw(bytes(flask.request.form.get('pw', None), 'utf-8'), bytes(user[0][0], 'utf-8')):
+                    return re_error('/error/2')
 
-            hashed = bcrypt.hashpw(bytes(flask.request.form.get('pw2', None), 'utf-8'), bcrypt.gensalt())
+                hashed = bcrypt.hashpw(bytes(flask.request.form.get('pw2', None), 'utf-8'), bcrypt.gensalt())
+                
+                curs.execute("update user set pw = ? where id = ?", [hashed.decode(), flask.session['DREAMER']])
+
+            auto_list = ['email', 'skin', 'lang']
+
+            for auto_data in auto_list:
+                curs.execute('select data from user_set where name = ? and id = ?', [auto_data, ip])
+                if curs.fetchall():
+                    curs.execute("update user_set set data = ? where name = ? and id = ?", [flask.request.form.get(auto_data, ''), auto_data, ip])
+                else:
+                    curs.execute("insert into user_set (name, id, data) values (?, ?, ?)", [auto_data, ip, flask.request.form.get(auto_data, '')])
+
+            conn.commit()
             
-            curs.execute("update user set pw = ? where id = ?", [hashed.decode(), flask.session['DREAMER']])
-
-        auto_list = ['email', 'skin', 'lang']
-
-        for auto_data in auto_list:
-            curs.execute('select data from user_set where name = ? and id = ?', [auto_data, ip])
-            if curs.fetchall():
-                curs.execute("update user_set set data = ? where name = ? and id = ?", [flask.request.form.get(auto_data, ''), auto_data, ip])
+            return redirect('/change')
+        else:        
+            curs.execute('select data from user_set where name = "email" and id = ?', [ip])
+            data = curs.fetchall()
+            if data:
+                email = data[0][0]
             else:
-                curs.execute("insert into user_set (name, id, data) values (?, ?, ?)", [auto_data, ip, flask.request.form.get(auto_data, '')])
+                email = ''
 
-        conn.commit()
-        
-        return redirect('/change')
-    else:        
-        curs.execute('select data from user_set where name = "email" and id = ?', [ip])
-        data = curs.fetchall()
-        if data:
-            email = data[0][0]
-        else:
-            email = ''
+            div2 = load_skin()
+            
+            div3 = ''
+            var_div3 = ''
 
-        div2 = load_skin()
-        
-        div3 = ''
-        var_div3 = ''
+            curs.execute('select data from user_set where name = "lang" and id = ?', [ip])
+            data = curs.fetchall()
 
-        curs.execute('select data from user_set where name = "lang" and id = ?', [ip])
-        data = curs.fetchall()
+            for lang_data in support_language:
+                if data and data[0][0] == lang_data:
+                    div3 = '<option value="' + lang_data + '">' + lang_data + '</option>'
+                else:
+                    var_div3 += '<option value="' + lang_data + '">' + lang_data + '</option>'
 
-        for lang_data in support_language:
-            if data and data[0][0] == lang_data:
-                div3 = '<option value="' + lang_data + '">' + lang_data + '</option>'
-            else:
-                var_div3 += '<option value="' + lang_data + '">' + lang_data + '</option>'
+            div3 += var_div3
 
-        div3 += var_div3
-
-        return easy_minify(flask.render_template(skin_check(),    
-            imp = [load_lang('user') + ' ' + load_lang('setting') + ' ' + load_lang('edit'), wiki_set(), custom(), other2([0, 0])],
-            data =  '''
-                    <form method="post">
-                        <span>''' + load_lang('id') +  ' : ' + ip + '''</span>
-                        <hr>
-                        <input placeholder="''' + load_lang('now') + ' ' + load_lang('password') + '''" name="pw" type="password">
-                        <br>
-                        <br>
-                        <input placeholder="''' + load_lang('new') + ' ' + load_lang('password') + '''" name="pw2" type="password">
-                        <br>
-                        <br>
-                        <input placeholder="''' + load_lang('reconfirm') + '''" name="pw3" type="password">
-                        <hr>
-                        <input placeholder="email" name="email" type="text" value="''' + email + '''">
-                        <hr>
-                        <span>''' + load_lang('user') + ' ' + load_lang('skin') + '''</span>
-                        <br>
-                        <br>
-                        <select name="skin">''' + div2 + '''</select>
-                        <hr>
-                        <span>''' + load_lang('user') + ' ' + load_lang('language') + '''</span>
-                        <br>
-                        <br>
-                        <select name="lang">''' + div3 + '''</select>
-                        <hr>
-                        <button type="submit">''' + load_lang('edit') + '''</button>
-                        <hr>
-                        <span>''' + load_lang('http_warring') + '''</span>
-                    </form>
-                    ''',
-            menu = [['user', load_lang('user')]]
-        ))
+            return easy_minify(flask.render_template(skin_check(),    
+                imp = [load_lang('user') + ' ' + load_lang('setting') + ' ' + load_lang('edit'), wiki_set(), custom(), other2([0, 0])],
+                data =  '''
+                        <form method="post">
+                            <span>''' + load_lang('id') +  ' : ' + ip + '''</span>
+                            <hr>
+                            <input placeholder="''' + load_lang('now') + ' ' + load_lang('password') + '''" name="pw" type="password">
+                            <br>
+                            <br>
+                            <input placeholder="''' + load_lang('new') + ' ' + load_lang('password') + '''" name="pw2" type="password">
+                            <br>
+                            <br>
+                            <input placeholder="''' + load_lang('reconfirm') + '''" name="pw3" type="password">
+                            <hr>
+                            <input placeholder="email" name="email" type="text" value="''' + email + '''">
+                            <hr>
+                            <span>''' + load_lang('user') + ' ' + load_lang('skin') + '''</span>
+                            <br>
+                            <br>
+                            <select name="skin">''' + div2 + '''</select>
+                            <hr>
+                            <span>''' + load_lang('user') + ' ' + load_lang('language') + '''</span>
+                            <br>
+                            <br>
+                            <select name="lang">''' + div3 + '''</select>
+                            <hr>
+                            <button type="submit">''' + load_lang('edit') + '''</button>
+                            <hr>
+                            <span>''' + load_lang('http_warring') + '''</span>
+                        </form>
+                        ''',
+                menu = [['user', load_lang('user')]]
+            ))
+    else:
+        pass
 
 @app.route('/check/<name>')
 def user_check(name = None):
@@ -3608,7 +3612,10 @@ def user_info():
     if custom()[2] != 0:
         ip_user = '<a href="/w/user:' + ip + '">' + ip + '</a>'
         
-        plus = '<li><a href="/logout">' + load_lang('logout') + '</a></li><li><a href="/change">' + load_lang('user') + ' ' + load_lang('setting') + ' ' + load_lang('edit') + '</a></li>'
+        plus =  '''
+                <li><a href="/logout">''' + load_lang('logout') + '''</a></li>
+                <li><a href="/change">''' + load_lang('user') + ' ' + load_lang('setting') + ' ' + load_lang('edit') + '''</a></li>
+                '''
         
         curs.execute('select name from alarm where name = ? limit 1', [ip_check()])
         if curs.fetchall():
