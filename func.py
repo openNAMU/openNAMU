@@ -133,7 +133,6 @@ def load_lang(data, num = 0):
     else:
         curs.execute('select data from user_set where name = "lang" and id = ?', [ip_check()])
         rep_data = curs.fetchall()
-
         if rep_data:
             try:
                 json_data = open(os.path.join('language', rep_data[0][0] + '.json'), 'rt', encoding='utf-8').read()
