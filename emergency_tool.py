@@ -17,6 +17,7 @@ print('1. backlink reset')
 print('2. reCAPTCHA delete')
 print('3. ban delete')
 print('4. change port')
+print('5. change skin')
 
 print('select : ', end = '')
 what_i_do = input()
@@ -54,6 +55,11 @@ elif what_i_do == '4':
     port = input()
 
     curs.execute("update other set data = ? where name = 'port'", [port])
+elif what_i_do == '5':
+    print('skin name : ', end = '')
+    skin = input()
+
+    curs.execute("update other set data = ? where name = 'skin'", [skin])
 
 conn.commit()
 
