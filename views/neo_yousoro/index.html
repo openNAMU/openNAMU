@@ -1,0 +1,154 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>{{imp[0]}} - {{imp[1][0]}}</title>
+        <link rel="stylesheet" href="/views/main_css/main.css">
+        <link rel="stylesheet" href="/views/neo_yousoro/css/main.css">
+        <script src="/views/neo_yousoro/js/main.js"></script>
+        <link   rel="stylesheet"
+                href="https://use.fontawesome.com/releases/v5.2.0/css/all.css"
+                integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ"
+                crossorigin="anonymous">
+        <link rel="shortcut icon" href="/views/main_css/file/favicon.ico">
+        {{imp[1][5]|safe}}
+        {{imp[2][3]|safe}}
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    </head>
+    <body>
+        <div id="background">
+            <div id="top">
+                <div id="top_main">
+                    <div id="logo">
+                        <a href="/">{{imp[1][4]|safe}}</a>
+                    </div>
+                    <div id="top_tool" class="not_mobile">
+                        <div id="top_tool_cel">
+                            <a href="javascript:void(0);" onclick="opening('recent_cel');">
+                                <i class="fas fa-exclamation-circle"></i>
+                                {{'recent'|load_lang}}
+                                <i class="fas fa-angle-down"></i>
+                            </a>
+                            <div id="recent_cel" class="cel_in_cel" style="display: none;">
+                                <a href="/recent_changes">
+                                    <i class="fas fa-sync-alt"></i>
+                                    {{'change'|load_lang}}
+                                </a>
+                                <hr>
+                                <a href="/recent_discuss">
+                                    <i class="fas fa-comment"></i>
+                                    {{'discussion'|load_lang}}
+                                </a>
+                            </div>
+                        </div>
+                        |
+                        <div id="top_tool_cel">
+                            <a href="javascript:void(0);" onclick="opening('other_cel');">
+                                <i class="fas fa-plus-circle"></i>
+                                {{'other'|load_lang}}
+                                <i class="fas fa-angle-down"></i>
+                            </a>
+                            <div id="other_cel" class="cel_in_cel" style="display: none;">
+                                <a href="/random">
+                                    <i class="fas fa-random"></i>
+                                    {{'random'|load_lang}}
+                                </a>
+                                <hr>
+                                <a href="/other">
+                                    <i class="fas fa-wrench"></i>
+                                    {{'tool'|load_lang}}
+                                </a>
+                                <hr>
+                                <a href="/skin_set">
+                                    <i class="fas fa-cog"></i>
+                                    {{'skin'|load_lang}} {{'setting'|load_lang}}
+                                </a>
+                            </div>
+                        </div>
+                        |
+                        <div id="top_tool_cel">
+                            {% if imp[2][2] == 1 %}
+                                <i class="fas fa-user"></i>
+                            {% elif imp[2][2] == 0 %}
+                                <i class="fas fa-user-times"></i>
+                            {% else %}
+                                <i class="fas fa-user-secret"></i>
+                            {% endif %}
+                            <a href="/user">
+                                {{imp[2][5]}}
+                            </a>
+                        </div>
+                        |
+                        <form method="post" action="/search" id="search" role="search">
+                            <input id="search_input" name="search" placeholder="검색" autocomplete="off" type="search">
+                        </form>
+                    </div>
+                    <div id="top_tool_mobile" class="is_mobile">
+                        <a href="javascript:void(0);" onclick="opening('mobile_menu');">
+                            <i class="fas fa-bars"></i> {{'tool'|load_lang}}
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div id="mobile_menu" class="is_mobile" style="display: none;">
+                <div id="mobile_menu_main">
+                    <div id="close_top">
+                        <a href="javascript:void(0);" onclick="opening('mobile_menu');">
+                            <i class="fas fa-bars"></i>
+                        </a>
+                    </div>
+                    <h2>{{'recent'|load_lang}}</h2>
+                    <li><a href="/recent_changes">{{'change'|load_lang}}</a></li>
+                    <li><a href="/recent_discuss">{{'discussion'|load_lang}}</a></li>
+                    <h2>{{'other'|load_lang}}</h2>
+                    <li><a href="/random">{{'random'|load_lang}}</a></li>
+                    <li><a href="/other">{{'tool'|load_lang}}</a></li>
+                    <li><a href="/skin_set">{{'skin'|load_lang}} {{'setting'|load_lang}}</a></li>
+                    <h2>{{'user'|load_lang}}</h2>
+                    <li><a href="/user">{{imp[2][5]}}</a></li>
+                </div>
+            </div>
+            <div id="main">
+                <div id="main_top">
+                    {% if menu != 0 %}
+                        <div id="tool" class="not_mobile">
+                            {% for sub_d in menu %}
+                                <div id="tool_cel">
+                                    <a class="menu-item" href="/{{sub_d[0]}}">{{sub_d[1]}}</a>
+                                </div>
+                                {% if menu[loop.index] %}
+                                    |
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    <h1>
+                        {{imp[0]}}
+                        {% if imp[3][0] != 0 %}
+                            <sub>{{imp[3][0]}}</sub>
+                        {% endif %}
+                    </h1>
+                    {% if menu != 0 %}
+                        <div id="tool" class="is_mobile">
+                            {% for sub_d in menu %}
+                                <div id="tool_cel">
+                                    <a class="menu-item" href="/{{sub_d[0]}}">{{sub_d[1]}}</a>
+                                </div>
+                                {% if menu[loop.index] %}
+                                    |
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                <div id="main_data">
+                    {{data|safe}}
+                </div>
+            </div>
+        </div>
+        <div id="bottom">
+            <div id="bottom_main">
+                {{imp[1][1]|safe}}
+            </div>
+        </div>
+    </body>
+</html>
