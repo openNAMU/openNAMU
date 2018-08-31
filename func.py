@@ -130,6 +130,14 @@ def load_lang(data, num = 0):
                 return else_lang[data]
             else:
                 return data + ' (missing)'
+    elif num == 2:
+        curs.execute('select data from user_set where name = "lang" and id = ?', [ip_check()])
+        rep_data = curs.fetchall()
+        if not rep_data:
+            curs.execute("select data from other where name = 'language'")
+            rep_data = curs.fetchall()
+
+        return rep_data[0][0]
     else:
         curs.execute('select data from user_set where name = "lang" and id = ?', [ip_check()])
         rep_data = curs.fetchall()
@@ -390,7 +398,7 @@ def custom():
     else:
         user_name = load_lang('user')
 
-    return ['', '', user_icon, user_head, email, user_name]
+    return ['', '', user_icon, user_head, email, user_name, load_lang(num = 2)]
 
 def load_skin(data = ''):
     div2 = ''
