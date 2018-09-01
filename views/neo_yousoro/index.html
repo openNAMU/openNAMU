@@ -66,14 +66,14 @@
                         </div>
                         |
                         <div id="top_tool_cel">
-                            {% if imp[2][2] == 1 %}
-                                <i class="fas fa-user"></i>
-                            {% elif imp[2][2] == 0 %}
-                                <i class="fas fa-user-times"></i>
-                            {% else %}
-                                <i class="fas fa-user-secret"></i>
-                            {% endif %}
                             <a href="/user">
+                                {% if imp[2][2] == 1 %}
+                                    <i class="fas fa-user"></i>
+                                {% elif imp[2][2] == 0 %}
+                                    <i class="fas fa-user-times"></i>
+                                {% else %}
+                                    <i class="fas fa-user-secret"></i>
+                                {% endif %}
                                 {{imp[2][5]}}
                             </a>
                         </div>
