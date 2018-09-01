@@ -163,31 +163,31 @@ def ip_or_user(data):
 
 def edit_help_button():
     # https://stackoverflow.com/questions/11076975/insert-text-into-textarea-at-cursor-position-javascript
-    js_data = '''
-        <script>
-        function insertAtCursor(myField, myValue) {
-            if (document.selection) { 
-                document.getElementById(myField).focus();
+    js_data =   '''
+                <script>
+                    function insert_data(name, data) {
+                        if(document.selection) { 
+                            document.getElementById(name).focus();
 
-                sel = document.selection.createRange();
-                sel.text = myValue; 
-            } else if (document.getElementById(myField).selectionStart || document.getElementById(myField).selectionStart == '0') {
-                var startPos = document.getElementById(myField).selectionStart;
-                var endPos = document.getElementById(myField).selectionEnd;
+                            sel = document.selection.createRange();
+                            sel.text = data; 
+                        } else if(document.getElementById(name).selectionStart || document.getElementById(name).selectionStart == '0') {
+                            var startPos = document.getElementById(name).selectionStart;
+                            var endPos = document.getElementById(name).selectionEnd;
 
-                document.getElementById(myField).value = document.getElementById(myField).value.substring(0, startPos) + myValue + document.getElementById(myField).value.substring(endPos, document.getElementById(myField).value.length); 
-            } else {
-                document.getElementById(myField).value += myValue;
-            }
-        }
-    </script>
-    '''
+                            document.getElementById(name).value = document.getElementById(name).value.substring(0, startPos) + data + document.getElementById(name).value.substring(endPos, document.getElementById(name).value.length); 
+                        } else {
+                            document.getElementById(name).value += data;
+                        }
+                    }
+                </script>
+                '''
 
     insert_list = [['[[|]]', 'link'], ['[()]', 'macro'], ['{{{#!}}}', 'middle'], ['||<>||', 'table']]
 
     data = ''
     for insert_data in insert_list:
-        data += '<a href="javascript:void(0);" onclick="insertAtCursor(\'content\', \'' + insert_data[0] + '\');">(' + insert_data[1] + ')</a>'
+        data += '<a href="javascript:void(0);" onclick="insert_data(\'content\', \'' + insert_data[0] + '\');">(' + insert_data[1] + ')</a>'
 
     return [js_data, data + '<hr>']
 
@@ -398,7 +398,7 @@ def custom():
     else:
         user_name = load_lang('user')
 
-    return ['', '', user_icon, user_head, email, user_name, load_lang(num = 2)]
+    return ['', '', user_icon, user_head, email, user_name, load_lang(data = '', num = 2)]
 
 def load_skin(data = ''):
     div2 = ''
