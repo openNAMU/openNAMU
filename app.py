@@ -1083,7 +1083,7 @@ def now_update():
 
             urllib.request.urlretrieve('https://github.com/2DU/opennamu/archive/' + up_data + '.zip', 'update.zip')
 
-            print('zip Extract')
+            print('zip extract')
             zipfile.ZipFile('update.zip').extractall('')
 
             print('move')
@@ -1727,7 +1727,7 @@ def edit(name = None):
         
         if not flask.request.args.get('section', None):
             get_name =  '''
-                        <a href="/manager/15?plus=''' + url_pas(name) + '''">(load)</a>
+                        <a href="/manager/15?plus=''' + url_pas(name) + '">(' + load_lang('load') + ''')</a>
                         <hr>
                         '''
             action = ''
