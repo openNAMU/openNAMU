@@ -31,11 +31,17 @@ if what_i_do == '1':
 
     curs.execute("select title, data from data")
     data = curs.fetchall()
+    num = 0
 
     for test in data:
+        num += 1
+
         t = threading.Thread(target = parser, args = [test])
         t.start()
         t.join()
+
+        if num % 10 == 0:
+            print(num)
 elif what_i_do == '2':
     curs.execute("delete from other where name = 'recaptcha'")
     curs.execute("delete from other where name = 'sec_re'")

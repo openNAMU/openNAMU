@@ -1893,35 +1893,78 @@ def move(name = None):
 
         curs.execute("select title from history where title = ?", [flask.request.form.get('title', None)])
         if curs.fetchall():
-            return re_error('/error/19')
-        
-        curs.execute("select data from data where title = ?", [name])
-        data = curs.fetchall()
-        if data:            
-            curs.execute("update data set title = ? where title = ?", [flask.request.form.get('title', None), name])
-            curs.execute("update back set link = ? where link = ?", [flask.request.form.get('title', None), name])
-            
-            data_in = data[0][0]
-        else:
-            data_in = ''
-            
-        history_plus(
-            name, 
-            data_in, 
-            get_time(), 
-            ip_check(), 
-            flask.request.form.get('send', None) + ' (<a>' + name + '</a> - <a>' + flask.request.form.get('title', None) + '</a> ' + load_lang('move', 1) + ')', 
-            '0'
-        )
-        
-        curs.execute("select title, link from back where title = ? and not type = 'cat' and not type = 'no'", [name])
-        for data in curs.fetchall():
-            curs.execute("insert into back (title, link, type) values (?, ?, 'no')", [data[0], data[1]])
-            
-        curs.execute("update history set title = ? where title = ?", [flask.request.form.get('title', None), name])
-        conn.commit()
+            if admin_check(None, 'merge documents') == 1:
+                curs.execute("select data from data where title = ?", [flask.request.form.get('title', None)])
+                data = curs.fetchall()
+                if data:            
+                    curs.execute("delete from data where title = ?", [flask.request.form.get('title', None)])
+                    curs.execute("delete from back where link = ?", [flask.request.form.get('title', None)])
+                
+                curs.execute("select data from data where title = ?", [name])
+                data = curs.fetchall()
+                if data:            
+                    curs.execute("update data set title = ? where title = ?", [flask.request.form.get('title', None), name])
+                    curs.execute("update back set link = ? where link = ?", [flask.request.form.get('title', None), name])
+                    
+                    data_in = data[0][0]
+                else:
+                    data_in = ''
 
-        return redirect('/w/' + url_pas(flask.request.form.get('title', None)))
+                history_plus(
+                    name, 
+                    data_in, 
+                    get_time(), 
+                    ip_check(), 
+                    flask.request.form.get('send', None) + ' (marge <a>' + name + '</a> - <a>' + flask.request.form.get('title', None) + '</a> ' + load_lang('move', 1) + ')', 
+                    '0'
+                )
+
+                curs.execute("update back set type = 'no' where title = ? and not type = 'cat' and not type = 'no'", [name])
+                curs.execute("delete from back where title = ? and not type = 'cat' and type = 'no'", [flask.request.form.get('title', None)])
+
+                curs.execute("select id from history where title = ? order by id + 0 desc limit 1", [flask.request.form.get('title', None)])
+                data = curs.fetchall()
+                
+                num = data[0][0]
+
+                curs.execute("select id from history where title = ? order by id + 0 asc", [name])
+                data = curs.fetchall()
+                for move in data:
+                    print(str(int(num) + int(move[0])))
+                    curs.execute("update history set title = ?, id = ? where title = ? and id = ?", [flask.request.form.get('title', None), str(int(num) + int(move[0])), name, move[0]])
+
+                conn.commit()
+
+                return redirect('/w/' + url_pas(flask.request.form.get('title', None)))
+            else:
+                return re_error('/error/19')
+        else:
+            curs.execute("select data from data where title = ?", [name])
+            data = curs.fetchall()
+            if data:            
+                curs.execute("update data set title = ? where title = ?", [flask.request.form.get('title', None), name])
+                curs.execute("update back set link = ? where link = ?", [flask.request.form.get('title', None), name])
+                
+                data_in = data[0][0]
+            else:
+                data_in = ''
+                
+            history_plus(
+                name, 
+                data_in, 
+                get_time(), 
+                ip_check(), 
+                flask.request.form.get('send', None) + ' (<a>' + name + '</a> - <a>' + flask.request.form.get('title', None) + '</a> ' + load_lang('move', 1) + ')', 
+                '0'
+            )
+            
+            curs.execute("update back set type = 'no' where title = ? and not type = 'cat' and not type = 'no'", [name])
+            curs.execute("delete from back where title = ? and not type = 'cat' and type = 'no'", [flask.request.form.get('title', None)])
+
+            curs.execute("update history set title = ? where title = ?", [flask.request.form.get('title', None), name])
+            conn.commit()
+
+            return redirect('/w/' + url_pas(flask.request.form.get('title', None)))
     else:            
         return easy_minify(flask.render_template(skin_check(), 
             imp = [name, wiki_set(), custom(), other2([' (' + load_lang('move') + ')', 0])],
