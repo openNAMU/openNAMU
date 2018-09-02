@@ -80,6 +80,10 @@
                         |
                         <form method="post" action="/search" id="search" role="search">
                             <input id="search_input" name="search" placeholder="검색" autocomplete="off" type="search">
+                            |
+                            <button type="submit" formaction="/goto"><i class="fas fa-sign-in-alt"></i></button>
+                            |
+                            <button type="submit" formaction="/search"><i class="fas fa-search"></i></button>
                         </form>
                     </div>
                     <div id="top_tool_mobile" class="is_mobile">
@@ -91,6 +95,13 @@
             </div>
             <div id="mobile_menu" class="is_mobile" style="display: none;">
                 <div id="mobile_menu_main">
+                    <form method="post" action="/search" id="mobile_search" role="search">
+                        <input id="mobile_search_input" name="search" placeholder="검색" autocomplete="off" type="search">
+                        <br>
+                        <button id="mobile_button_first" type="submit" formaction="/goto"><i class="fas fa-sign-in-alt"></i></button>
+                        |
+                        <button type="submit" formaction="/search"><i class="fas fa-search"></i></button>
+                    </form>
                     <div id="close_top">
                         <a href="javascript:void(0);" onclick="opening('mobile_menu');">
                             <i class="fas fa-bars"></i>
