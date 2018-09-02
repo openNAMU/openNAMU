@@ -216,7 +216,31 @@ h6 {
 
 #search {
     display: inline-block;
-    width: 200px;
+    width: 300px;
+}
+
+#mobile_search {
+    width: 100%;
+}
+
+#search_input {
+    width: 80%;
+}
+
+#search button {
+    padding: 0;
+    border: none;
+    background: transparent;
+}
+
+#mobile_search button {
+    padding: 0;
+    border: none;
+    background: transparent;
+}
+
+#mobile_button_first {
+    margin-top: 10px;
 }
 
 #top_tool_mobile {
