@@ -299,8 +299,38 @@ def diff(seqm):
         elif opcode == 'replace':
             output += ["<span style='background:#FDD;'>" + seqm.a[a0:a1] + "</span>"]
             output += ["<span style='background:#CFC;'>" + seqm.b[b0:b1] + "</span>"]
+
+    end = ''.join(output)
+    end = end.replace('\r\n', '\n')
+    sub = ''
+
+    num = 0
+    left = 1
+    while 1:
+        data = re.search('((?:(?!\n).)*)\n', end)
+        if data:
+            data = data.groups()[0]
             
-    return ''.join(output)
+            left += 1
+            if re.search('<span style=\'(?:(?:(?!\').)+)\'>', data):
+                num += 1
+                if re.search('<\/span>', data):
+                    num -= 1
+
+                sub += str(left) + ' : ' + re.sub('(?P<in>(?:(?!\n).)*)\n', '\g<in>', data, 1) + '<br>'
+            else:
+                if re.search('<\/span>', data):
+                    num -= 1
+                    sub += str(left) + ' : ' + re.sub('(?P<in>(?:(?!\n).)*)\n', '\g<in>', data, 1) + '<br>'
+                else:
+                    if num > 0:
+                        sub += str(left) + ' : ' + re.sub('(?P<in>.*)\n', '\g<in>', data, 1) + '<br>'
+
+            end = re.sub('((?:(?!\n).)*)\n', '', end, 1)
+        else:
+            break
+            
+    return sub
            
 def admin_check(num, what):
     ip = ip_check() 
