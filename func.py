@@ -205,6 +205,8 @@ def ip_warring():
     return text_data
 
 def skin_check():
+    skin = './views/neo_yousoro/'
+
     curs.execute('select data from other where name = "skin"')
     skin_exist = curs.fetchall()
     if skin_exist and skin_exist[0][0] != '':
