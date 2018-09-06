@@ -334,24 +334,34 @@ def middle_parser(data):
             html_data = html_data.groups()
             html_data_2 = html_data[0]
 
-            while 1:
-                test = re.search('&lt;span((?:(?!&gt;).)*)&gt;', html_data_2)
-                if test:
-                    test = test.groups()[0]
-                    test = re.sub('&quot;', '"', test)
-                    
-                    html_data_2 = re.sub('&lt;span((?:(?!&gt;).)*)&gt;', '<span' + test + '>', html_data_2, 1)
-                else:
-                    break
+            print(html_data_2)
 
-            span_num = re.findall('<span(?:(?:(?!>).)*)>', html_data_2)
-            span_num = len(span_num)
-            span_end_num = re.findall('<\/span>', html_data_2)
-            span_end_num = len(span_end_num)
+            can_html = ['b', 'span']
+            dic = {}
 
-            re_num = span_num - span_end_num
+            for i in can_html:
+                while 1:
+                    test = re.search('&lt;' + i + '((?:(?!&gt;).)*)&gt;', html_data_2)
+                    if test:
+                        test = test.groups()[0]
+                        test = re.sub('&quot;', '"', test)
+                        
+                        html_data_2 = re.sub('&lt;' + i + '((?:(?!&gt;).)*)&gt;', '<' + i + test + '>', html_data_2, 1)
+                    else:
+                        break
 
-            data = re.sub('<span id="html">((?:(?:(?:(?!<\/span>)).)+\n*)+)<\/span>', '<span id="end_html">' + html_data_2 + ('</span>' * re_num) + '<\/span>', data, 1)
+            for i in can_html:
+                span_num = re.findall('<' + i + '(?:(?:(?!>).)*)>', html_data_2)
+                span_num = len(span_num)
+                span_end_num = re.findall('<\/' + i + '>', html_data_2)
+                span_end_num = len(span_end_num)
+                
+                dic[i] = span_num - span_end_num
+
+            for i in can_html:
+                html_data_2 += ('</' + i + '>' * dic[i])
+
+            data = re.sub('<span id="html">((?:(?:(?:(?!<\/span>)).)+\n*)+)<\/span>', '<span id="end_html">' + html_data_2 + '<\/span>', data, 1)
         else:
             break
 
@@ -484,7 +494,7 @@ def namu(conn, data, title, main_num):
     html_db = curs.fetchall()
 
     src_list = ["www.youtube.com", "serviceapi.nmv.naver.com", "tv.kakao.com", "www.google.com", "serviceapi.rmcnmv.naver.com"]
-    html_list = ['div', 'span', 'embed', 'iframe', 'ruby', 'rp', 'rt']
+    html_list = ['div', 'span', 'embed', 'iframe', 'ruby', 'rp', 'rt', 'b']
     
     html_data = re.findall('&lt;(\/)?((?:(?!&gt;| ).)+)( (?:(?:(?!&gt;).)+)?)?&gt;', data)
     for in_data in html_data:
