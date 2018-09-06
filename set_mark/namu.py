@@ -334,8 +334,6 @@ def middle_parser(data):
             html_data = html_data.groups()
             html_data_2 = html_data[0]
 
-            print(html_data_2)
-
             can_html = ['b', 'span']
             dic = {}
 

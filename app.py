@@ -1040,15 +1040,15 @@ def indexing():
     
     return redirect('/')     
 
-@app.route('/re_start', methods=['POST', 'GET'])
-def re_start():
-    if admin_check(None, 're_start') != 1:
+@app.route('/restart', methods=['POST', 'GET'])
+def restart():
+    if admin_check(None, 'restart') != 1:
         return re_error('/error/3')
 
     if flask.request.method == 'POST':
         os.execl(sys.executable, sys.executable, *sys.argv)
     else:
-        print('Re Start')
+        print('restart')
 
         return easy_minify(flask.render_template(skin_check(), 
             imp = [load_lang('server') + ' ' + load_lang('restart'), wiki_set(), custom(), other2([0, 0])],
@@ -1076,7 +1076,7 @@ def now_update():
         ok = os.system('git fetch origin ' + up_data)
         ok = os.system('git reset --hard origin/' + up_data)
         if ok == 0:
-            return redirect('/re_start')
+            return redirect('/restart')
     else:
         if platform.system() == 'Windows':
             print('download')
@@ -1093,7 +1093,7 @@ def now_update():
                 os.system('rd /s /q opennamu-' + up_data)
                 os.system('del update.zip')
 
-                return redirect('/re_start')
+                return redirect('/restart')
 
     return easy_minify(flask.render_template(skin_check(), 
         imp = [load_lang('update'), wiki_set(), custom(), other2([0, 0])],
@@ -1606,7 +1606,6 @@ def edit(name = None):
             for data_list in curs.fetchall():
                 match = re.compile(data_list[0])
                 if match.search(flask.request.form.get('content', None)):
-                    print(data_list[1])
                     ban_insert(
                         ip, 
                         '0' if data_list[1] == 'X' else data_list[1], 
@@ -1891,7 +1890,6 @@ def move(name = None):
                 curs.execute("select id from history where title = ? order by id + 0 asc", [name])
                 data = curs.fetchall()
                 for move in data:
-                    print(str(int(num) + int(move[0])))
                     curs.execute("update history set title = ?, id = ? where title = ? and id = ?", [flask.request.form.get('title', None), str(int(num) + int(move[0])), name, move[0]])
 
                 conn.commit()
@@ -2021,7 +2019,7 @@ def manager(num = 1):
                         <li><a href="/indexing">''' + load_lang('indexing') + ' (' + load_lang('create') + ' or ' + load_lang('delete') + ''')</a></li>
                         <li><a href="/manager/8">''' + load_lang('admin_group') + ' ' + load_lang('create') + '''</a></li>
                         <li><a href="/setting">''' + load_lang('setting') + ' ' + load_lang('edit') + '''</a></li>
-                        <li><a href="/re_start">''' + load_lang('server') + ' ' + load_lang('restart') + '''</a></li>
+                        <li><a href="/restart">''' + load_lang('server') + ' ' + load_lang('restart') + '''</a></li>
                         <li><a href="/update">''' + load_lang('update') + '''</a></li>
                         <li><a href="/inter_wiki">''' + load_lang('interwiki') + '''</a></li>
                     </ul>
