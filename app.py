@@ -1637,46 +1637,7 @@ def edit(name = None):
             leng = leng_check(len(flask.request.form.get('otent', None)), len(content))
             
             if flask.request.args.get('section', None):
-                i = 1
-                
-                data = re.sub('\r\n', '\n', '\r\n' + old[0][0] + '\r\n')
-                while 1:
-                    replace_data = re.search('\n(={1,6}) ?((?:(?!=).)+) ?={1,6}\n', data)
-                    if replace_data:
-                        replace_data = replace_data.groups()[0]
-
-                        if i == int(flask.request.args.get('section', None)):
-                            data = re.sub('\n(?P<in>={1,6}) ?(?P<out>(?:(?!=).)+) ?={1,6}\n', '\n<real h' + str(len(replace_data)) + '>\g<out></real h' + str(len(replace_data)) + '>\n', data, 1)
-                        else:
-                            data = re.sub('\n(?P<in>={1,6}) ?(?P<out>(?:(?!=).)+) ?={1,6}\n', '\n<h' + str(len(replace_data)) + '>\g<out></h' + str(len(replace_data)) + '>\n', data, 1)
-
-                        i += 1
-                    else:
-                        break
-
-                new_data = re.sub('\r\n', '\n', '\r\n' + flask.request.form.get('otent', None) + '\r\n')
-                while 1:
-                    replace_data = re.search('\n(={1,6}) ?((?:(?!=).)+) ?={1,6}\n', new_data)
-                    if replace_data:
-                        replace_data = replace_data.groups()[0]
-
-                        new_data = re.sub('\n(?P<in>={1,6}) ?(?P<out>(?:(?!=).)+) ?={1,6}\n', '\n<real h' + str(len(replace_data)) + '>\g<out></real h' + str(len(replace_data)) + '>\n', new_data, 1)
-                    else:
-                        break
-
-                content = data.replace(new_data, '\n' + content + '\n')
-
-                while 1:
-                    replace_data = re.search('\n<(?:real )?h([1-6])>((?:(?!<h).)+) ?<\/(?:real )?h[1-6]>\n', content)
-                    if replace_data:
-                        replace_data = replace_data.groups()[0]
-
-                        content = re.sub('\n<(?:real )?h([1-6])>(?P<out>(?:(?!<h).)+) ?<\/(?:real )?h[1-6]>\n', '\n' + ('=' * int(replace_data)) + ' \g<out> ' + ('=' * int(replace_data)) + '\n', content, 1)
-                    else:
-                        break
-
-                content = re.sub('^\n', '', content)
-                content = re.sub('\n$', '', content)
+                content = old[0][0].replace(flask.request.form.get('otent', None), content)
                 
             curs.execute("update data set data = ? where title = ?", [content, name])
         else:
