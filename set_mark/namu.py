@@ -492,7 +492,7 @@ def namu(conn, data, title, main_num):
     html_db = curs.fetchall()
 
     src_list = ["www.youtube.com", "serviceapi.nmv.naver.com", "tv.kakao.com", "www.google.com", "serviceapi.rmcnmv.naver.com"]
-    html_list = ['div', 'span', 'embed', 'iframe', 'ruby', 'rp', 'rt', 'b']
+    html_list = ['div', 'span', 'embed', 'iframe', 'ruby', 'rp', 'rt']
     
     html_data = re.findall('&lt;(\/)?((?:(?!&gt;| ).)+)( (?:(?:(?!&gt;).)+)?)?&gt;', data)
     for in_data in html_data:
