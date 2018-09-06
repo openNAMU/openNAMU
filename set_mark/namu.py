@@ -415,7 +415,7 @@ def namu(conn, data, title, main_num):
 
     # 포함 문법 처리
     while 1:
-        include = re.search('\[include\(((?:(?!\)\]).)+)\)\]', data)
+        include = re.search('\[[Ii]nclude\(((?:(?!\)\]).)+)\)\]', data)
         if include:
             include = include.groups()[0]
     
@@ -464,9 +464,9 @@ def namu(conn, data, title, main_num):
                 include_parser = re.sub('\[\[(?:category|분류):(((?!\]\]|#include).)+)\]\]', '', include_parser)
                 include_parser = html.escape(include_parser)
 
-                data = re.sub('\[include\(((?:(?!\)\]).)+)\)\]', '<include>\n<a id="include_link" href="/w/' + tool.url_pas(include_link) + '">[' + include_link + ']</a>\n' + include_parser + '\n</include>', data, 1)
+                data = re.sub('\[[Ii]nclude\(((?:(?!\)\]).)+)\)\]', '<include>\n<a id="include_link" href="/w/' + tool.url_pas(include_link) + '">[' + include_link + ']</a>\n' + include_parser + '\n</include>', data, 1)
             else:
-                data = re.sub('\[include\(((?:(?!\)\]).)+)\)\]', '<a id="not_thing" href="/w/' + tool.url_pas(include_link) + '">' + include_link + '</a>', data, 1)
+                data = re.sub('\[[Ii]nclude\(((?:(?!\)\]).)+)\)\]', '<a id="not_thing" href="/w/' + tool.url_pas(include_link) + '">' + include_link + '</a>', data, 1)
         else:
             break
 
@@ -538,7 +538,7 @@ def namu(conn, data, title, main_num):
     # 수식 처리
     first = 0
     while 1:
-        math = re.search('&lt;math&gt;((?:(?!&lt;\/math&gt;).)+)&lt;\/math&gt;', data)
+        math = re.search('&lt;[Mm]ath&gt;((?:(?!&lt;\/[Mm]ath&gt;).)+)&lt;\/[Mm]ath&gt;', data)
         if math:
             if first == 0:
                 plus_data +=    '''
@@ -554,7 +554,7 @@ def namu(conn, data, title, main_num):
             
             first += 1
             
-            data = re.sub('&lt;math&gt;((?:(?!&lt;\/math&gt;).)+)&lt;\/math&gt;', '<span id="math_' + str(first) + '"></span>', data, 1)
+            data = re.sub('&lt;[Mm]ath&gt;((?:(?!&lt;\/[Mm]ath&gt;).)+)&lt;\/[Mm]ath&gt;', '<span id="math_' + str(first) + '"></span>', data, 1)
 
             plus_data += '<script>katex.render("' + math.replace('\\', '\\\\').replace('&lt;', '<').replace('&gt;', '>') +'", document.getElementById("math_' + str(first) + '"));</script>'
         else:
@@ -598,7 +598,7 @@ def namu(conn, data, title, main_num):
     data = re.sub(',,(?P<in>(?:(?!,,).)+),,', '<sub>\g<in></sub>', data)
 
     # 넘겨주기 변환
-    redirect = re.search('\n#(?:redirect|넘겨주기) ((?:(?!\n).)+)\n', data)
+    redirect = re.search('\n#(?:[Rr]edirect|넘겨주기) ((?:(?!\n).)+)\n', data)
     if redirect:
         redirect = redirect.groups()[0]
         
@@ -608,21 +608,21 @@ def namu(conn, data, title, main_num):
         
         backlink += [[title, main_link, 'redirect']]
         
-        data = re.sub('\n#(?:redirect|넘겨주기) (?P<in>(?:(?!\n).)+)\n', '<script>location.href="/w/' + tool.url_pas(main_link) + '?froms=' + tool.url_pas(title) + other_link + '";</script>', data, 1)
+        data = re.sub('\n#(?:[Rr]edirect|넘겨주기) (?P<in>(?:(?!\n).)+)\n', '<script>location.href="/w/' + tool.url_pas(main_link) + '?froms=' + tool.url_pas(title) + other_link + '";</script>', data, 1)
 
-    # [목차(없음)] 처리
-    if not re.search('\[(?:목차|tableofcontents)\((?:없음|no)\)\]\n', data):
-        if not re.search('\[(?:목차|tableofcontents)\]', data):
-            data = re.sub('\n(?P<in>={1,6}) ?(?P<out>(?:(?!=).)+) ?={1,6}\n', '\n[목차]\n\g<in> \g<out> \g<in>\n', data, 1)
+    # [목차(-)] 처리
+    if not re.search('\[(?:목차|[Tt]oc)\((?:no)\)\]\n', data):
+        if not re.search('\[(?:목차|[Tt]oc)\]', data):
+            data = re.sub('\n(?P<in>={1,6}) ?(?P<out>(?:(?!=).)+) ?={1,6}\n', '\n[toc]\n\g<in> \g<out> \g<in>\n', data, 1)
     else:
-        data = re.sub('\[(?:목차|tableofcontents)\((?:없음|no)\)\]\n', '', data)
+        data = re.sub('\[(?:목차|[Tt]oc)\((?:no)\)\]\n', '', data)
         
     # 문단 문법
     toc_full = 0
     toc_top_stack = 6
     toc_stack = [0, 0, 0, 0, 0, 0]
     edit_number = 0
-    toc_data = '<div id="toc"><span style="font-size: 18px;">TOC</span>\n\n'
+    toc_data = '<div id="toc"><span style="font-size: 18px;">toc</span>\n\n'
     while 1:
         toc = re.search('\n(={1,6}) ?((?:(?!\n).)+) ?\n', data)
         if toc:
@@ -669,13 +669,13 @@ def namu(conn, data, title, main_num):
 
     toc_data += '</div>'
     
-    data = re.sub('\[(?:목차|tableofcontents)\]', toc_data, data)
+    data = re.sub('\[(?:목차|[Tt]oc)\]', toc_data, data)
 
     # 일부 매크로 처리
     data = tool.savemark(data)
     
-    data = re.sub("\[anchor\((?P<in>(?:(?!\)\]).)+)\)\]", '<span id="\g<in>"></span>', data)          
-    data = re.sub('\[ruby\((?P<in>(?:(?!,).)+)\, ?(?P<out>(?:(?!\)\]).)+)\)\]', '<ruby>\g<in><rp>(</rp><rt>\g<out></rt><rp>)</rp></ruby>', data)
+    data = re.sub("\[[Aa]nchor\((?P<in>(?:(?!\)\]).)+)\)\]", '<span id="\g<in>"></span>', data)          
+    data = re.sub('\[[Rr]uby\((?P<in>(?:(?!,).)+)\, ?(?P<out>(?:(?!\)\]).)+)\)\]', '<ruby>\g<in><rp>(</rp><rt>\g<out></rt><rp>)</rp></ruby>', data)
 
     # 글 상자 끼어들기
     data = re.sub('{{\|(?P<in>(?:(?:(?!\|}}).)*\n*)+)\|}}', '<table><tbody><tr><td>\g<in></td></tbody></table>', data)
@@ -683,13 +683,13 @@ def namu(conn, data, title, main_num):
     # 원래 코드 재탕
     now_time = tool.get_time()
 
-    data = re.sub('\[date\]', now_time, data)
+    data = re.sub('\[[Dd]ate\]', now_time, data)
     
     time_data = re.search('^([0-9]{4}-[0-9]{2}-[0-9]{2})', now_time)
     time = time_data.groups()
     
     while 1:
-        age_data = re.search('\[age\(([0-9]{4}-[0-9]{2}-[0-9]{2})\)\]', data)
+        age_data = re.search('\[[Aa]ge\(([0-9]{4}-[0-9]{2}-[0-9]{2})\)\]', data)
         if age_data:
             age = age_data.groups()[0]
 
@@ -698,12 +698,12 @@ def namu(conn, data, title, main_num):
             
             e_data = old - will
             
-            data = re.sub('\[age\(([0-9]{4})-([0-9]{2})-([0-9]{2})\)\]', str(int(e_data.days / 365)), data, 1)
+            data = re.sub('\[[Aa]ge\(([0-9]{4})-([0-9]{2})-([0-9]{2})\)\]', str(int(e_data.days / 365)), data, 1)
         else:
             break
 
     while 1:
-        dday_data = re.search('\[dday\(([0-9]{4}-[0-9]{2}-[0-9]{2})\)\]', data)
+        dday_data = re.search('\[[Dd]day\(([0-9]{4}-[0-9]{2}-[0-9]{2})\)\]', data)
         if dday_data:
             dday = dday_data.groups()[0]
 
@@ -717,13 +717,13 @@ def namu(conn, data, title, main_num):
             else:
                 e_day = '+' + str(e_data.days)
 
-            data = re.sub('\[dday\(([0-9]{4}-[0-9]{2}-[0-9]{2})\)\]', e_day, data, 1)
+            data = re.sub('\[[Dd]day\(([0-9]{4}-[0-9]{2}-[0-9]{2})\)\]', e_day, data, 1)
         else:
             break
 
     # 유튜브, 카카오 티비 처리
     while 1:
-        video = re.search('\[(youtube|kakaotv|nicovideo)\(((?:(?!\)\]).)+)\)\]', data)
+        video = re.search('\[([Yy]outube|[Kk]akaotv|[Nn]icovideo)\(((?:(?!\)\]).)+)\)\]', data)
         if video:
             video = video.groups()
             
@@ -743,17 +743,14 @@ def namu(conn, data, title, main_num):
             if code:
                 video_code = code.groups()[0]
             else:
-                if video[0] == 'youtube':
-                    video_code = 'BQ5PcIUcdUE'
-                else:
-                    video_code = '66861302'
+                video_code = ''
 
-            if video[0] == 'youtube':
+            if video[0] == ('youtube' or 'Youtube'):
                 video_code = re.sub('^https:\/\/www\.youtube\.com\/watch\?v=', '', video_code)
                 video_code = re.sub('^https:\/\/youtu\.be\/', '', video_code)
                 
                 video_src = 'https://www.youtube.com/embed/' + video_code
-            elif video[0] == 'kakaotv':
+            elif video[0] == ('kakaotv' or 'Kakaotv'):
                 video_code = re.sub('^https:\/\/tv\.kakao\.com\/channel\/9262\/cliplink\/', '', video_code)
                 video_code = re.sub('^http:\/\/tv\.kakao\.com\/v\/', '', video_code)
                 
@@ -761,7 +758,7 @@ def namu(conn, data, title, main_num):
             else:
                 video_src = 'https://embed.nicovideo.jp/watch/' + video_code
                 
-            data = re.sub('\[(youtube|kakaotv|nicovideo)\(((?:(?!\)\]).)+)\)\]', '<iframe width="' + video_width + '" height="' + video_height + '" src="' + video_src + '" allowfullscreen frameborder="0"></iframe>', data, 1)
+            data = re.sub('\[([Yy]outube|[Kk]akaotv|[Nn]icovideo)\(((?:(?!\)\]).)+)\)\]', '<iframe width="' + video_width + '" height="' + video_height + '" src="' + video_src + '" allowfullscreen frameborder="0"></iframe>', data, 1)
         else:
             break
 
@@ -824,7 +821,7 @@ def namu(conn, data, title, main_num):
     data = table_start(data)
 
     # 링크 관련 문법 구현
-    category = '\n<hr><div id="cate">Category : '
+    category = '\n<hr><div id="cate">category : '
     while 1:
         link = re.search('\[\[((?:(?!\[\[|\]\]).)+)\]\]', data)
         if link:
@@ -896,9 +893,9 @@ def namu(conn, data, title, main_num):
                     data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<span style="' + file_align + '"><img style="' + file_style + '" alt="' + file_alt + '" src="' + file_src + '"></span>', data, 1)
                 else:
                     data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<a id="not_thing" href="/w/' + tool.url_pas(file_alt) + '">' + file_alt + '</a>', data, 1)
-            elif re.search('^(?:category|분류):', main_link):
+            elif re.search('^(?:[Cc]ategory|분류):', main_link):
                 see_link = re.sub('#include', '', see_link)
-                main_link = re.sub('#include', '', re.sub('^(?:category|분류):', 'category:', main_link))
+                main_link = re.sub('#include', '', re.sub('^(?:[Cc]ategory|분류):', 'category:', main_link))
 
                 if re.search('#blur', main_link):
                     see_link = 'Hidden'
@@ -910,7 +907,7 @@ def namu(conn, data, title, main_num):
 
                 backlink += [[title, main_link, 'cat']]
 
-                category += '<a ' + link_id + ' href="' + tool.url_pas(main_link) + '">' + re.sub('^(?:category|분류):', '', see_link) + '</a> / '
+                category += '<a ' + link_id + ' href="' + tool.url_pas(main_link) + '">' + re.sub('^(?:[Cc]ategory|분류):', '', see_link) + '</a> / '
                 data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '', data, 1)
             elif re.search('^wiki:', main_link):
                 data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<a id="inside" href="/' + tool.url_pas(re.sub('^wiki:', '', main_link)) + '">' + see_link + '</a>', data, 1)
@@ -973,7 +970,7 @@ def namu(conn, data, title, main_num):
             break
 
     # br 처리
-    data = re.sub("\[br\]", '<br>', data)
+    data = re.sub("\[[Bb]r\]", '<br>', data)
             
     # 각주 처리
     footnote_number = 0
