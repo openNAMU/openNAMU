@@ -3225,7 +3225,7 @@ def read_view(name = None):
 
         if flask.request.args.get('from', None):
             menu += [['w/' + url_pas(name), load_lang('pass')]]
-            end_data = '<div id="redirect">redirect from <a href="/w/' + url_pas(flask.request.args.get('from', None)) + '?from=' + url_pas(name) + '">' + flask.request.args.get('from', None) + '</div><br>' + end_data
+            end_data = '<div id="redirect"><a href="/w/' + url_pas(flask.request.args.get('from', None)) + '?from=' + url_pas(name) + '">' + flask.request.args.get('from', None) + '</a> - ' + name + '</div><br>' + end_data
 
         if uppage != 0:
             menu += [['w/' + url_pas(uppage), load_lang('upper')]]

@@ -601,7 +601,7 @@ def namu(conn, data, title, main_num):
         
         backlink += [[title, main_link, 'redirect']]
         
-        data = redirect_re.sub('\n * redirect to [[' + main_link + ']]\n', data, 1)
+        data = redirect_re.sub('\n * ' + title + ' - [[' + main_link + ']]\n', data, 1)
 
     # [목차(-)] 처리
     no_toc_re = re.compile('\[(?:목차|toc)\((?:no)\)\]\n', re.I)
