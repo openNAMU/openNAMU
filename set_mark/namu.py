@@ -393,7 +393,7 @@ def namu(conn, data, title, main_num):
     plus_data = '''
                 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css">
                 <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
-                <script src="/views/main_css/parser.js"</script>
+                <script src="/views/main_css/parser.js"></script>
                 '''
     global end_data
     end_data = []
