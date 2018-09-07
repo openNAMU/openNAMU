@@ -161,7 +161,7 @@
 ### 외부 파일
  * 인용문 아이콘 [Dave Gandy](http://www.flaticon.com/free-icon/quote-left_25672) CC 3.0 BY
  * 구문 강조 [highlightjs](https://highlightjs.org/)
- * 수식 [MathJax](https://www.mathjax.org/)
+ * 수식 [KaTeX](https://github.com/Khan/KaTeX)
  
 ## 기여자들
  * [참조](https://github.com/2DU/opennamu/graphs/contributors)
