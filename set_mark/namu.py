@@ -73,7 +73,7 @@ def table_parser(data, cel_data, start_data, num = 0):
     if table_bgcolor:
         all_table += 'background: ' + table_bgcolor.groups()[0] + ';'
         
-    bgcolor = re.search("&lt;(?:bgcolor=)?(#(?:[0-9a-f-A-F]{3}){1,2}|\w+)&gt;", data)
+    bgcolor = re.search("&lt;bgcolor=(#(?:[0-9a-f-A-F]{3}){1,2}|\w+)&gt;", data)
     if bgcolor:
         cel_style += 'background: ' + bgcolor.groups()[0] + ';'
         
