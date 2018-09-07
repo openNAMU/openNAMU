@@ -57,23 +57,24 @@ def update():
                     curs.execute('select link from back where link like ?', [all_rep[i][0] + '%'])
 
                 user_rep = curs.fetchall()
-                for user_rep2 in user_rep:
-                    test = 1
+                if user_rep:
+                    for user_rep2 in user_rep:
+                        test = 1
 
-                    first = re.sub('^' + all_rep[i][0], all_rep[i][1], user_rep2[0])
+                        first = re.sub('^' + all_rep[i][0], all_rep[i][1], user_rep2[0])
 
-                    if j == 0:
-                        curs.execute("update data set title = ? where title = ?", [first, user_rep2[0]])
-                    elif j == 1:
-                        curs.execute("update history set title = ? where title = ?", [first, user_rep2[0]])
-                    elif j == 2:
-                        curs.execute("update acl set title = ? where title = ?", [first, user_rep2[0]])
-                    elif j == 3:
-                        curs.execute("update topic set title = ? where title = ?", [first, user_rep2[0]])
-                    elif j == 4:
-                        curs.execute("update back set title = ? where title = ?", [first, user_rep2[0]])
-                    elif j == 5:
-                        curs.execute("update back set link = ? where link = ?", [first, user_rep2[0]])
+                        if j == 0:
+                            curs.execute("update data set title = ? where title = ?", [first, user_rep2[0]])
+                        elif j == 1:
+                            curs.execute("update history set title = ? where title = ?", [first, user_rep2[0]])
+                        elif j == 2:
+                            curs.execute("update acl set title = ? where title = ?", [first, user_rep2[0]])
+                        elif j == 3:
+                            curs.execute("update topic set title = ? where title = ?", [first, user_rep2[0]])
+                        elif j == 4:
+                            curs.execute("update back set title = ? where title = ?", [first, user_rep2[0]])
+                        elif j == 5:
+                            curs.execute("update back set link = ? where link = ?", [first, user_rep2[0]])
 
         if test == 1:
             print('사용자 to user, 파일 to file, 분류 to category')
