@@ -311,3 +311,7 @@ input {
 #syntax code {
     background: transparent;
 }
+
+#redirect {
+    border: 2px solid gainsboro;
+}
