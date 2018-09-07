@@ -1119,12 +1119,10 @@ def xref(name = None):
         if data[1]:                
             div += ' (' + data[1] + ')'
         
-        curs.execute("select title from back where title = ? and type = 'include'", [data[0]])
-        db_data = curs.fetchall()
-        if db_data:
-            div += ' <a id="inside" href="/xref/' + url_pas(data[0]) + '">(' + load_lang('backlink') + ')</a>'
-
         div += '</li>'
+        
+        if re.search('^' + load_lang('template', 1) + ':', data[0]):
+            div += '<li><a id="inside" href="/xref/' + url_pas(data[0]) + '">' + data[0] + '</a> (' + load_lang('backlink') + ')</li>'
       
     div += '</ul>' + next_fix('/xref/' + url_pas(name) + '?num=', num, data_list)
     
@@ -3144,13 +3142,18 @@ def read_view(name = None):
             for data in back:    
                 if re.search('^category:', data[0]):
                     u_div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a></li>'
-                else:
-                    curs.execute("select title from back where title = ? and type = 'include'", [data[0]])
+                elif re.search('^' + load_lang('template', 1) + ':', data[0]):
+                    curs.execute("select data from data where title = ?", [data[0]])
                     db_data = curs.fetchall()
                     if db_data:
-                        div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a> <a id="inside" href="/xref/' + url_pas(data[0]) + '">(' + load_lang('backlink') + ')</a></li>'
-                    else: 
+                        if re.search('\[\[' + name + '#include]]', db_data[0][0]):
+                            div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a> <a href="/xref/' + url_pas(data[0]) + '">(' + load_lang('backlink') + ')</a></li>'
+                        else:
+                            div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a></li>'
+                    else:
                         div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a></li>'
+                else:
+                    div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a></li>'
 
             div += '</ul>'
             
