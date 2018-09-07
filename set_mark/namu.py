@@ -675,9 +675,6 @@ def namu(conn, data, title, main_num):
     ruby_re = re.compile("\[ruby\((?P<in>(?:(?!,).)+)\, ?(?P<out>(?:(?!\)\]).)+)\)\]", re.I)
     data = ruby_re.sub('<ruby>\g<in><rp>(</rp><rt>\g<out></rt><rp>)</rp></ruby>', data)
 
-    # 글 상자 끼어들기
-    data = re.sub('{{\|(?P<in>(?:(?:(?!\|}}).)*\n*)+)\|}}', '<table><tbody><tr><td>\g<in></td></tbody></table>', data)
-
     # 원래 코드 재탕
     now_time = tool.get_time()
 
