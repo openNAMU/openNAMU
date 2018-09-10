@@ -5,6 +5,7 @@ import tornado.ioloop
 import tornado.httpserver
 import tornado.wsgi
 import urllib.request
+import email.mime.text
 import platform
 import zipfile
 import bcrypt
@@ -13,6 +14,7 @@ import shutil
 import threading
 import logging
 import random
+import smtplib
 import sys
 
 from func import *
@@ -54,10 +56,29 @@ curs = conn.cursor()
 load_conn(conn)
 
 logging.basicConfig(level = logging.ERROR)
+
 app = flask.Flask(__name__, template_folder = './')
 flask_reggie.Reggie(app)
+
 compress = flask_compress.Compress()
 compress.init_app(app)
+
+smtp = smtplib.SMTP('smtp.gmail.com', 587)
+smtp.ehlo()
+smtp.starttls()
+
+curs.execute('select name, data from other where name = "g_email" or name = "g_pass"')
+rep_data = curs.fetchall()
+if rep_data:
+    g_email = ''
+    g_pass = ''
+    for i in rep_data:
+        if i[0] == 'g_email':
+            g_email = i[1]
+        else:
+            g_pass = i[1]
+
+    smtp.login(g_email, g_pass)
 
 class EverythingConverter(werkzeug.routing.PathConverter):
     regex = '.*?'
@@ -692,17 +713,19 @@ def setting(num = 0):
                 menu = [['setting', load_lang('setting')]]
             ))
     elif num == 5:
+        i_list = ['recaptcha', 'sec_re', 'g_email', 'g_pass']
+
         if flask.request.method == 'POST':
-            curs.execute("update other set data = ? where name = 'recaptcha'", [flask.request.form.get('recaptcha', None)])
-            curs.execute("update other set data = ? where name = 'sec_re'", [flask.request.form.get('sec_re', None)])
+            for data in i_list:
+                curs.execute("update other set data = ? where name = ?", [flask.request.form.get(data, ''), data])
+
             conn.commit()
             
             admin_check(None, 'edit_set')
 
             return redirect('/setting/5')
         else:
-            i_list = ['recaptcha', 'sec_re']
-            n_list = ['', '']
+            n_list = ['', '', '', '']
             d_list = []
             
             x = 0
@@ -725,15 +748,27 @@ def setting(num = 0):
                 imp = ['google', wiki_set(), custom(), other2([0, 0])],
                 data =  '''
                         <form method="post">
-                            <span>reCAPTCHA (html)</span>
+                            <h2>recaptcha</h2>
+                            <span>recaptcha (html)</span>
                             <br>
                             <br>
-                            <input placeholder="reCAPTCHA (html)" type="text" name="recaptcha" value="''' + html.escape(d_list[0]) + '''">
+                            <input placeholder="recaptcha (html)" type="text" name="recaptcha" value="''' + html.escape(d_list[0]) + '''">
                             <hr>
-                            <span>reCAPTCHA (secret key)</span>
+                            <span>recaptcha (secret key)</span>
                             <br>
                             <br>
-                            <input placeholder="reCAPTCHA (secret key)" type="text" name="sec_re" value="''' + html.escape(d_list[1]) + '''">
+                            <input placeholder="recaptcha (secret key)" type="text" name="sec_re" value="''' + html.escape(d_list[1]) + '''">
+                            <hr>
+                            <h2>google imap {''' + load_lang('need_to_restart') + '''}</h1>
+                            <span>google email</span>
+                            <br>
+                            <br>
+                            <input placeholder="google email" type="text" name="g_email" value="''' + html.escape(d_list[2]) + '''">
+                            <hr>
+                            <span>google password</span>
+                            <br>
+                            <br>
+                            <input placeholder="google password" type="password" name="g_pass" value="''' + html.escape(d_list[3]) + '''">
                             <hr>
                             <button id="save" type="submit">''' + load_lang('save') + '''</button>
                         </form>
