@@ -1689,7 +1689,7 @@ def edit(name = None):
         
         if not flask.request.args.get('section', None):
             get_name =  '''
-                        <a href="/manager/15?plus=''' + url_pas(name) + '">(' + load_lang('load') + ''')</a>
+                        <a href="/manager/15?plus=''' + url_pas(name) + '">(' + load_lang('load') + ')</a> <a href="/edit_filter">(' + load_lang('edit') + ' ' + load_lang('filter') + ''')</a>
                         <hr>
                         '''
             action = ''
@@ -1729,7 +1729,7 @@ def preview(name = None):
     if acl_check(name) == 1:
         return re_error('/ban')
          
-    new_data = re.sub('^\r\n', '', new_data)
+    new_data = re.sub('^\r\n', '', flask.request.form.get('content', None))
     new_data = re.sub('\r\n$', '', new_data)
     
     end_data = namumark(
@@ -1746,7 +1746,7 @@ def preview(name = None):
     
     return easy_minify(flask.render_template(skin_check(), 
         imp = [name, wiki_set(), custom(), other2([' (' + load_lang('preview') + ')', 0])],
-        data =  js_data[0] + '''
+        data =  '<a href="/edit_filter">(' + load_lang('edit') + ' ' + load_lang('filter') + ')</a>' + js_data[0] + '''
                 <form method="post" action="/edit/''' + url_pas(name) + action + '''">
                     ''' + js_data[1] + '''
                     <textarea id="content" rows="25" name="content">''' + html.escape(flask.request.form.get('content', None)) + '''</textarea>
