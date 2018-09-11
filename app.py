@@ -5,7 +5,6 @@ import tornado.ioloop
 import tornado.httpserver
 import tornado.wsgi
 import urllib.request
-import email.mime.text
 import platform
 import zipfile
 import bcrypt
@@ -14,7 +13,6 @@ import shutil
 import threading
 import logging
 import random
-import smtplib
 import sys
 
 from func import *
@@ -61,24 +59,7 @@ app = flask.Flask(__name__, template_folder = './')
 flask_reggie.Reggie(app)
 
 compress = flask_compress.Compress()
-compress.init_app(app)
-
-smtp = smtplib.SMTP('smtp.gmail.com', 587)
-smtp.ehlo()
-smtp.starttls()
-
-curs.execute('select name, data from other where name = "g_email" or name = "g_pass"')
-rep_data = curs.fetchall()
-if rep_data:
-    g_email = ''
-    g_pass = ''
-    for i in rep_data:
-        if i[0] == 'g_email':
-            g_email = i[1]
-        else:
-            g_pass = i[1]
-
-    smtp.login(g_email, g_pass)
+# compress.init_app(app)
 
 class EverythingConverter(werkzeug.routing.PathConverter):
     regex = '.*?'
@@ -322,7 +303,7 @@ def alarm():
         for data_one in data_list:
             data += '<li>' + data_one[0] + ' (' + data_one[1] + ')</li>'
     else:
-        data += '<li>' + load_lang('no_alarm') + '</li>'
+        data += '<li>-</li>'
     
     data += '</ul>'
 
@@ -435,7 +416,7 @@ def setting(num = 0):
         return re_error('/ban')
 
     if num == 0:
-        li_list = [load_lang('main'), load_lang('set_text'), load_lang('main_head'), 'robots.txt', 'google']
+        li_list = [load_lang('main'), load_lang('set_text'), load_lang('main') + ' head', 'robots.txt', 'google']
         
         x = 0
         
@@ -451,8 +432,8 @@ def setting(num = 0):
             menu = [['manager', load_lang('admin')]]
         ))
     elif num == 1:
-        i_list = ['name', 'logo', 'frontpage', 'license', 'upload', 'skin', 'edit', 'reg', 'ip_view', 'back_up', 'port', 'key', 'update']
-        n_list = ['wiki', '', 'FrontPage', 'CC 0', '2', '', 'normal', '', '', '0', '3000', 'test', 'stable']
+        i_list = ['name', 'logo', 'frontpage', 'license', 'upload', 'skin', 'edit', 'reg', 'ip_view', 'back_up', 'port', 'key', 'update', 'email_have']
+        n_list = ['wiki', '', 'FrontPage', 'CC 0', '2', '', 'normal', '', '', '0', '3000', 'test', 'stable', '']
         
         if flask.request.method == 'POST':
             i = 0
@@ -508,6 +489,10 @@ def setting(num = 0):
             if d_list[8]:
                 ch_2 = 'checked="checked"'
             
+            ch_3 = ''
+            if d_list[13]:
+                ch_3 = 'checked="checked"'
+
             div2 = load_skin(d_list[5])
 
             div3 =''
@@ -547,24 +532,26 @@ def setting(num = 0):
                             <br>
                             <input placeholder="''' + load_lang('max_file_size') + '''" type="text" name="upload" value="''' + html.escape(d_list[4]) + '''">
                             <hr>
-                            <span>''' + load_lang('back_up_interval') + ' [' + load_lang('hour') + '] (off : 0) {' + load_lang('need_to_restart') + '''}</span>
+                            <span>''' + load_lang('backup_interval') + ' [' + load_lang('hour') + '''] (off : 0) {restart}</span>
                             <br>
                             <br>
-                            <input placeholder="''' + load_lang('back_up_interval') + '''" type="text" name="back_up" value="''' + html.escape(d_list[9]) + '''">
+                            <input placeholder="''' + load_lang('backup_interval') + '''" type="text" name="back_up" value="''' + html.escape(d_list[9]) + '''">
                             <hr>
                             <span>''' + load_lang('skin') + '''</span>
                             <br>
                             <br>
                             <select name="skin">''' + div2 + '''</select>
                             <hr>
-                            <span>''' + load_lang('default_acl') + '''</span>
+                            <span>''' + load_lang('default') + ''' acl</span>
                             <br>
                             <br>
                             <select name="edit">''' + div + '''</select>
                             <hr>
-                            <input type="checkbox" name="reg" ''' + ch_1 + '''> ''' + load_lang('unable_register') + '''
+                            <input type="checkbox" name="reg" ''' + ch_1 + '''> ''' + load_lang('register') + ''' X
                             <hr>
-                            <input type="checkbox" name="ip_view" ''' + ch_2 + '''> ''' + load_lang('ip_hidden') + '''
+                            <input type="checkbox" name="ip_view" ''' + ch_2 + '''> ip ''' + load_lang('hide') + '''
+                            <hr>
+                            <input type="checkbox" name="email_have" ''' + ch_3 + '''> must have email
                             <hr>
                             <span>''' + load_lang('port') + '''</span>
                             <br>
@@ -657,7 +644,7 @@ def setting(num = 0):
                 data = ''
 
             return easy_minify(flask.render_template(skin_check(), 
-                imp = [load_lang('main_head'), wiki_set(), custom(), other2([0, 0])],
+                imp = [load_lang('main') + ' head', wiki_set(), custom(), other2([0, 0])],
                 data =  '''
                         <form method="post">
                             <textarea rows="25" name="content">''' + html.escape(data) + '''</textarea>
@@ -748,7 +735,7 @@ def setting(num = 0):
                 imp = ['google', wiki_set(), custom(), other2([0, 0])],
                 data =  '''
                         <form method="post">
-                            <h2>recaptcha</h2>
+                            <h2><a href="https://www.google.com/recaptcha/admin">recaptcha</a></h2>
                             <span>recaptcha (html)</span>
                             <br>
                             <br>
@@ -759,16 +746,16 @@ def setting(num = 0):
                             <br>
                             <input placeholder="recaptcha (secret key)" type="text" name="sec_re" value="''' + html.escape(d_list[1]) + '''">
                             <hr>
-                            <h2>google imap {''' + load_lang('need_to_restart') + '''}</h1>
+                            <h2><a href="https://support.google.com/mail/answer/7126229">google imap</a> {restart}</h1>
                             <span>google email</span>
                             <br>
                             <br>
                             <input placeholder="google email" type="text" name="g_email" value="''' + html.escape(d_list[2]) + '''">
                             <hr>
-                            <span>google password</span>
+                            <span><a href="https://security.google.com/settings/security/apppasswords">google app password</a></span>
                             <br>
                             <br>
-                            <input placeholder="google password" type="password" name="g_pass" value="''' + html.escape(d_list[3]) + '''">
+                            <input placeholder="google app password" type="password" name="g_pass" value="''' + html.escape(d_list[3]) + '''">
                             <hr>
                             <button id="save" type="submit">''' + load_lang('save') + '''</button>
                         </form>
@@ -2577,9 +2564,9 @@ def login():
             imp = [load_lang('login'), wiki_set(), custom(), other2([0, 0])],
             data =  '''
                     <form method="post">
-                        <input placeholder="''' + load_lang('id') + '''" name="id" type="text">
+                        <input placeholder="id" name="id" type="text">
                         <hr>
-                        <input placeholder="''' + load_lang('password') + '''" name="pw" type="password">
+                        <input placeholder="password" name="pw" type="password">
                         <hr>
                         ''' + captcha_get() + '''
                         <button type="submit">''' + load_lang('login') + '''</button>
@@ -2663,13 +2650,13 @@ def change_password():
                         <form method="post">
                             <span>''' + load_lang('id') +  ' : ' + ip + '''</span>
                             <hr>
-                            <input placeholder="''' + load_lang('now') + ' ' + load_lang('password') + '''" name="pw" type="password">
+                            <input placeholder="''' + load_lang('now') + ''' password" name="pw" type="password">
                             <br>
                             <br>
-                            <input placeholder="''' + load_lang('new') + ' ' + load_lang('password') + '''" name="pw2" type="password">
+                            <input placeholder="''' + load_lang('new') + ''' password" name="pw2" type="password">
                             <br>
                             <br>
-                            <input placeholder="''' + load_lang('reconfirm') + '''" name="pw3" type="password">
+                            <input placeholder="password ''' + load_lang('confirm') + '''" name="pw3" type="password">
                             <hr>
                             <input placeholder="email" name="email" type="text" value="''' + email + '''">
                             <hr>
@@ -2837,11 +2824,11 @@ def register():
             data =  '''
                     <form method="post">
                         ''' + contract + '''
-                        <input placeholder="''' + load_lang('id') + '''" name="id" type="text">
+                        <input placeholder="id" name="id" type="text">
                         <hr>
-                        <input placeholder="''' + load_lang('password') + '''" name="pw" type="password">
+                        <input placeholder="password" name="pw" type="password">
                         <hr>
-                        <input placeholder="''' + load_lang('reconfirm') + '''" name="pw2" type="password">
+                        <input placeholder="''' + load_lang('confirm') + '''" name="pw2" type="password">
                         <hr>
                         ''' + captcha_get() + '''
                         <button type="submit">''' + load_lang('register') + '''</button>

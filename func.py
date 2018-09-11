@@ -1,8 +1,10 @@
+import email.mime.text
 import flask
 import json
 import sqlite3
 import hashlib
 import requests
+import smtplib
 import re
 import html
 import os
@@ -21,6 +23,31 @@ def load_conn(data):
     curs = conn.cursor()
 
     load_conn2(data)
+
+def send_email(who, title, data):
+    smtp = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+
+    curs.execute('select name, data from other where name = "g_email" or name = "g_pass"')
+    rep_data = curs.fetchall()
+    if rep_data:
+        g_email = ''
+        g_pass = ''
+        for i in rep_data:
+            if i[0] == 'g_email':
+                g_email = i[1]
+            else:
+                g_pass = i[1]
+
+        try:
+            smtp.login(g_email, g_pass)
+        except:
+            print('error : email login error')
+
+    msg = email.mime.text.MIMEText(data)
+    msg['Subject'] = title
+    smtp.sendmail(g_email, who, msg.as_string())
+
+    smtp.quit()
 
 def easy_minify(data):
     data = re.sub('\n +<', '\n<', data)
