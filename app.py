@@ -2045,6 +2045,7 @@ def manager(num = 1):
                         <li><a href="/restart">''' + load_lang('server') + ' ' + load_lang('restart') + '''</a></li>
                         <li><a href="/update">''' + load_lang('update') + '''</a></li>
                         <li><a href="/inter_wiki">''' + load_lang('interwiki') + '''</a></li>
+                        <li><a href="/html_filter">html ''' + load_lang('filter') + '''</a></li>
                     </ul>
                     ''',
             menu = [['other', load_lang('other')]]
