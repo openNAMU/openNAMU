@@ -2615,7 +2615,7 @@ def change_password():
                 imp = [load_lang('user') + ' ' + load_lang('setting') + ' ' + load_lang('edit'), wiki_set(), custom(), other2([0, 0])],
                 data =  '''
                         <form method="post">
-                            <span>''' + load_lang('id') +  ' : ' + ip + '''</span>
+                            <span>id : ''' + ip + '''</span>
                             <hr>
                             <input placeholder="''' + load_lang('now') + ''' password" name="pw" type="password">
                             <br>
