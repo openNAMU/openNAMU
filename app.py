@@ -313,7 +313,7 @@ def alarm():
         menu = [['user', load_lang('user')]]
     ))
 
-@app.route('/<regex("inter_wiki|html_filter"):tools>')
+@app.route('/<regex("inter_wiki|html_filter|edit_filter"):tools>')
 def inter_wiki(tools = None):
     div = ''
     admin = admin_check(None, None)
@@ -325,13 +325,20 @@ def inter_wiki(tools = None):
         div = ''
 
         curs.execute('select title, link from inter')
-    else:
+    elif tools == 'html_filter':
         del_link = 'del_html_filter'
         plus_link = 'plus_html_filter'
         title = 'html' + load_lang('filter') + ' ' + load_lang('list')
         div = '<ul><li>span</li><li>div</li><li>iframe</li></ul>'
 
         curs.execute('select html from html_filter')
+    else:
+        del_link = 'del_edit_filter'
+        plus_link = 'manager/9'
+        title = load_lang('edit') + ' ' + load_lang('filter') + ' ' + load_lang('list')
+        div = ''
+
+        curs.execute("select name from filter")
 
     db_data = curs.fetchall()
     if db_data:
@@ -340,8 +347,10 @@ def inter_wiki(tools = None):
         for data in db_data:
             if tools == 'inter_wiki':
                 div += '<li>' + data[0] + ' : <a id="out_link" href="' + data[1] + '">' + data[1] + '</a>'
-            else:
+            elif tools == 'html_filter':
                 div += '<li>' + data[0]
+            else:
+                div += '<li><a href="/plus_edit_filter/' + url_pas(data[0]) + '">' + data[0] + '</a>'
 
             if admin == 1:
                 div += ' <a href="/' + del_link + '/' + url_pas(data[0]) + '">(' + load_lang('delete') + ')</a>'
@@ -362,13 +371,15 @@ def inter_wiki(tools = None):
         menu = [['other', load_lang('other')]]
     ))
 
-@app.route('/<regex("del_(inter_wiki|html_filter)"):tools>/<name>')
+@app.route('/<regex("del_(inter_wiki|html_filter|edit_filter)"):tools>/<name>')
 def del_inter(tools = None, name = None):
-    if admin_check(None, None) == 1:
+    if admin_check(None, tools) == 1:
         if tools == 'del_inter_wiki':
             curs.execute("delete from inter where title = ?", [name])
-        else:
+        elif tools == 'del_html_filter':
             curs.execute("delete from html_filter where html = ?", [name])
+        else:
+            curs.execute("delete from filter where name = ?", [name])
         
         conn.commit()
 
@@ -377,25 +388,70 @@ def del_inter(tools = None, name = None):
         return re_error('/error/3')
 
 @app.route('/<regex("plus_(inter_wiki|html_filter)"):tools>', methods=['POST', 'GET'])
-def plus_inter(tools = None):
+@app.route('/<regex("plus_edit_filter"):tools>/<name>', methods=['POST', 'GET'])
+def plus_inter(tools = None, name = None):
     if flask.request.method == 'POST':
         if tools == 'plus_inter_wiki':
             curs.execute('insert into inter (title, link) values (?, ?)', [flask.request.form.get('title', None), flask.request.form.get('link', None)])
-        else:
+            admin_check(None, 'inter_wiki_plus')
+        elif tools == 'plus_html_filter':
             curs.execute('insert into html_filter (html) values (?)', [flask.request.form.get('title', None)])
+            admin_check(None, 'html_filter edit')
+        else:
+            if admin_check(1, 'edit_filter edit') != 1:
+                return re_error('/error/3')
+
+            if flask.request.form.get('limitless', '') != '':
+                end = 'X'
+            else:
+                end = flask.request.form.get('second', 'X')
+
+            curs.execute("select name from filter where name = ?", [name])
+            if curs.fetchall():
+                curs.execute("update filter set regex = ?, sub = ? where name = ?", [flask.request.form.get('content', 'test'), end, name])
+            else:
+                curs.execute("insert into filter (name, regex, sub) values (?, ?, ?)", [name, flask.request.form.get('content', 'test'), end])
         
         conn.commit()
-        
-        admin_check(None, 'inter_wiki_plus')
     
         return redirect('/' + re.sub('^plus_', '', tools))
     else:
+        if admin_check(1, None) != 1:
+            stat = 'disabled'
+        else:
+            stat = ''
+
         if tools == 'plus_inter_wiki':
             title = load_lang('interwiki') + ' ' + load_lang('plus')
             form_data = '<input placeholder="' + load_lang('name') + '" type="text" name="title"><hr><input placeholder="link" type="text" name="link">'
-        else:
+        elif tools == 'plus_html_filter':
             title = 'html ' + load_lang('filter') + ' ' + load_lang('plus')
             form_data = '<input placeholder="html" type="text" name="title">'
+        else:
+            curs.execute("select regex, sub from filter where name = ?", [name])
+            exist = curs.fetchall()
+            if exist:
+                textarea = exist[0][0]
+                
+                if exist[0][1] == 'X':
+                    time_check = 'checked="checked"'
+                    time_data = ''
+                else:
+                    time_check = ''
+                    time_data = exist[0][1]
+            else:
+                textarea = ''
+                time_check = ''
+                time_data = ''
+
+            title = load_lang('edit') + ' ' + load_lang('filter') + ' ' + load_lang('plus')
+            form_data = '''
+                        <input placeholder="''' + load_lang('second') + '''" name="second" type="text" value="''' + html.escape(time_data) + '''">
+                        <hr>
+                        <input ''' + stat + ''' type="checkbox" ''' + time_check + ''' name="limitless"> ''' + load_lang('limitless') + '''
+                        <hr>
+                        <input ''' + stat + ''' placeholder="''' + load_lang('regex') + '''" name="content" value="''' + html.escape(textarea) + '''" type="text">
+                        '''
 
         return easy_minify(flask.render_template(skin_check(), 
             imp = [title, wiki_set(), custom(), other2([0, 0])],
@@ -403,10 +459,10 @@ def plus_inter(tools = None):
                     <form method="post">
                         ''' + form_data + '''
                         <hr>
-                        <button type="submit">''' + load_lang('plus') + '''</button>
+                        <button ''' + stat + ''' type="submit">''' + load_lang('plus') + '''</button>
                     </form>
                     ''',
-            menu = [['other', load_lang('other')]]
+            menu = [['other', load_lang('other')], [re.sub('^plus_', '', tools), load_lang('list')]]
         ))
 
 @app.route('/setting')
@@ -1528,96 +1584,6 @@ def revert(name = None):
             menu = [['history/' + url_pas(name), load_lang('history')], ['recent_changes', load_lang('recent') + ' ' + load_lang('change')]]
         ))
 
-@app.route('/edit_filter')
-def edit_filter():
-    div = '<ul>'
-    
-    curs.execute("select name from filter")
-    data = curs.fetchall()
-    for data_list in data:
-        div += '<li><a href="/edit_filter/' + url_pas(data_list[0]) + '">' + data_list[0] + '</a></li>'
-
-    div += '</ul>'
-
-    if data:
-        div += '<hr><a href="/manager/9">(' + load_lang('plus') + ')</a>'
-    else:
-        div = '<a href="/manager/9">(' + load_lang('plus') + ')</a>'
-
-    return easy_minify(flask.render_template(skin_check(), 
-        imp = [load_lang('edit') + ' ' + load_lang('filter') + ' ' + load_lang('list'), wiki_set(), custom(), other2([0, 0])],
-        data = div,
-        menu = [['manager', load_lang('admin')]]
-    ))
-
-@app.route('/edit_filter/<name>/delete', methods=['POST', 'GET'])
-def delete_edit_filter(name = None):
-    if admin_check(1, 'edit_filter delete') != 1:
-        return re_error('/error/3')
-
-    curs.execute("delete from filter where name = ?", [name])
-    conn.commit()
-
-    return redirect('/edit_filter')
-
-@app.route('/edit_filter/<name>', methods=['POST', 'GET'])
-def set_edit_filter(name = None):
-    if flask.request.method == 'POST':
-        if admin_check(1, 'edit_filter edit') != 1:
-            return re_error('/error/3')
-
-        if flask.request.form.get('limitless', '') != '':
-            end = 'X'
-        else:
-            end = flask.request.form.get('second', 'X')
-
-        curs.execute("select name from filter where name = ?", [name])
-        if curs.fetchall():
-            curs.execute("update filter set regex = ?, sub = ? where name = ?", [flask.request.form.get('content', 'test'), end, name])
-        else:
-            curs.execute("insert into filter (name, regex, sub) values (?, ?, ?)", [name, flask.request.form.get('content', 'test'), end])
-
-        conn.commit()
-    
-        return redirect('/edit_filter/' + url_pas(name))
-    else:
-        curs.execute("select regex, sub from filter where name = ?", [name])
-        exist = curs.fetchall()
-        if exist:
-            textarea = exist[0][0]
-            
-            if exist[0][1] == 'X':
-                time_check = 'checked="checked"'
-                time_data = ''
-            else:
-                time_check = ''
-                time_data = exist[0][1]
-        else:
-            textarea = ''
-            time_check = ''
-            time_data = ''
-
-        if admin_check(1, None) != 1:
-            stat = 'disabled'
-        else:
-            stat = ''
-
-        return easy_minify(flask.render_template(skin_check(), 
-            imp = [name, wiki_set(), custom(), other2([' (' + load_lang('edit') + ' ' + load_lang('filter') + ')', 0])],
-            data =  '''
-                    <form method="post">
-                        <input placeholder="''' + load_lang('second') + '''" name="second" type="text" value="''' + html.escape(time_data) + '''">
-                        <hr>
-                        <input ''' + stat + ''' type="checkbox" ''' + time_check + ''' name="limitless"> ''' + load_lang('limitless') + '''
-                        <hr>
-                        <input ''' + stat + ''' placeholder="''' + load_lang('regex') + '''" name="content" value="''' + html.escape(textarea) + '''" type="text">
-                        <hr>
-                        <button ''' + stat + ''' id="save" type="submit">''' + load_lang('save') + '''</button>
-                    </form>
-                    ''',
-            menu = [['edit_filter', load_lang('list')], ['edit_filter/' + url_pas(name) + '/delete', load_lang('delete')]]
-        ))
-
 @app.route('/edit/<everything:name>', methods=['POST', 'GET'])
 def edit(name = None):
     ip = ip_check()
@@ -2015,7 +1981,7 @@ def manager(num = 1):
         4 : [0, 'record'], 
         5 : [0, 'topic_record'], 
         6 : [load_lang('name'), 'admin_plus'], 
-        7 : [load_lang('name'), 'edit_filter'], 
+        7 : [load_lang('name'), 'plus_edit_filter'], 
         8 : [load_lang('document') + ' ' + load_lang('name'), 'search'], 
         9 : [0, 'block_user'], 
         10 : [0, 'block_admin'], 
