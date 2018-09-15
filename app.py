@@ -234,11 +234,11 @@ if not rep_data:
             curs.execute("insert into other (name, data) values ('language', ?)", [os.getenv('NAMU_LANG')])
             rep_language = os.getenv('NAMU_LANG')
         else:
-            print('language {} is not supported!'.format(os.getenv('NAMU_LANG')))
+            print('language ' + str(os.getenv('NAMU_LANG')) + ' is not supported!')
             rep_language = 'en-US'
     else:
         while 1:
-            print('language [{}] : '.format(' '.join(support_language)), end = '')
+            print('language [' + ', '.join(support_language) + '] : ', end = '')
             rep_language = str(input())
             if rep_language in support_language:
                 curs.execute("insert into other (name, data) values ('language', ?)", [rep_language])
@@ -249,6 +249,26 @@ else:
     rep_language = rep_data[0][0]
     
     print('language : ' + str(rep_language))
+
+support_mark = ['namumark', 'html', 'markdown']
+	
+curs.execute('select data from other where name = "markup"')
+rep_data = curs.fetchall()
+if not rep_data:
+	while 1:
+		print('markup [' + ', '.join(support_mark) + '] : ', end = '')
+	
+		rep_mark = str(input())
+		if rep_mark:
+			curs.execute('insert into other (name, data) values ("markup", ?)', [rep_mark])
+
+			break
+		else:
+			pass
+else:
+	rep_mark = rep_data[0][0]
+
+	print('markup : ' + str(rep_mark))
 
 curs.execute('delete from other where name = "ver"')
 curs.execute('insert into other (name, data) values ("ver", ?)', [c_ver])
