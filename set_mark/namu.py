@@ -118,8 +118,6 @@ def table_start(data):
         table = re.search('\n((?:(?:(?:(?:\|\|)+(?:(?:(?!\|\|).(?:\n)*)*))+)\|\|(?:\n)?)+)', data)
         if table:
             table = table.groups()[0]
-            
-            # return [all_table, row_style, cel_style, row, cel, table_class, num]
             while 1:
                 all_table = re.search('^((?:\|\|)+)((?:&lt;(?:(?:(?!&gt;).)+)&gt;)*)\n*((?:(?!\|\|).\n*)*)', table)
                 if all_table:
@@ -166,7 +164,6 @@ def table_start(data):
 def middle_parser(data):
     global end_data
 
-    # 중괄호 문법 처리
     middle_stack = 0
     middle_list = []
     middle_number = 0
@@ -297,7 +294,6 @@ def middle_parser(data):
         else:
             break
 
-    # NoWiki 처리
     num = 0
     while 1:
         nowiki_data = re.search('<code>((?:(?:(?!<\/code>).)*\n*)*)<\/code>', data)
@@ -312,7 +308,6 @@ def middle_parser(data):
         else:
             break
 
-    # Syntax 처리
     num = 0
     while 1:
         syntax_data = re.search('<code class="((?:(?!").)+)">((?:(?:(?:(?!<\/code>|<span id="syntax_)).)+\n*)+)<\/code>', data)
@@ -327,7 +322,6 @@ def middle_parser(data):
         else:
             break
 
-    # HTML 처리
     while 1:
         html_data = re.search('<span id="html">((?:(?:(?:(?!<\/span>)).)+\n*)+)<\/span>', data)
         if html_data:
@@ -384,10 +378,8 @@ def link_fix(main_link):
     return [main_link, other_link]
 
 def namu(conn, data, title, main_num):
-    # DB 지정
     curs = conn.cursor()
 
-    # 초기 설정
     data = '\n' + data + '\n'
     backlink = []
     plus_data = '''
@@ -398,16 +390,12 @@ def namu(conn, data, title, main_num):
     global end_data
     end_data = []
     
-    # XSS 이스케이프
     data = html.escape(data)
 
-    # 개행 정리 1
     data = re.sub('\r\n', '\n', data)
 
-    # 중괄호 파싱 1
     data = middle_parser(data)
 
-    # 포함 문법 처리
     include_re = re.compile('\[include\(((?:(?!\)\]).)+)\)\]', re.I)
     while 1:
         include = include_re.search(data)
@@ -426,7 +414,6 @@ def namu(conn, data, title, main_num):
 
             include = re.sub('^((?:(?!,).)+)', '', include)
             
-            # 틀 NoWiki
             num = 0
             while 1:
                 include_one_nowiki = re.search('(?:\\\\){2}(.)', include)
@@ -465,16 +452,12 @@ def namu(conn, data, title, main_num):
         else:
             break
 
-    # 개행 정리 2
     data = re.sub('\r\n', '\n', data)
 
-    # 중괄호 파싱 2
     data = middle_parser(data)
 
-    # 기타 처리
     data = re.sub('&amp;', '&', data)
 
-    # HTML 허용
     curs.execute('select html from html_filter')
     html_db = curs.fetchall()
 
@@ -506,14 +489,11 @@ def namu(conn, data, title, main_num):
     position = re.compile('position', re.I)
     data = position.sub('', data)
 
-    # 표 정리
     data = re.sub('\n( +)\|\|', '\n||', data)
     data = re.sub('\|\|( +)\n', '||\n', data)
 
-    # 주석 처리
     data = re.sub('\n##(((?!\n).)+)', '', data)
            
-    # 이중 표 처리
     while 1:
         wiki_table_data = re.search('<div id="wiki_div" ((?:(?!>).)+)>((?:(?!<div id="wiki_div"|<\/div_end>).\n*)+)<\/div_end>', data)
         if wiki_table_data:
@@ -530,7 +510,6 @@ def namu(conn, data, title, main_num):
     data = re.sub('<\/div_end>', '</div>', data)
     data = re.sub('<\/td>', '</td_end>', data)
     
-    # 수식 처리
     first = 0
     math_re = re.compile('\[math\(((?:(?!\)\]).)+)\)\]', re.I)
     while 1:
@@ -552,7 +531,6 @@ def namu(conn, data, title, main_num):
         else:
             break
             
-    # 한 글자 NoWiki
     num = 0
     while 1:
         one_nowiki = re.search('(?:\\\\)(.)', data)
@@ -567,7 +545,6 @@ def namu(conn, data, title, main_num):
         else:
             break
 
-    # 수평줄
     while 1:
         hr = re.search('\n-{4,9}\n', data)
         if hr:
@@ -577,10 +554,8 @@ def namu(conn, data, title, main_num):
 
     data += '\n'
 
-    # 추가 이스케이프
     data = data.replace('\\', '&#92;')
 
-    # 텍스트 꾸미기 문법
     data = re.sub('&#x27;&#x27;&#x27;(?P<in>((?!&#x27;&#x27;&#x27;).)+)&#x27;&#x27;&#x27;', '<b>\g<in></b>', data)
     data = re.sub('&#x27;&#x27;(?P<in>((?!&#x27;&#x27;).)+)&#x27;&#x27;', '<i>\g<in></i>', data)
     data = re.sub('~~(?P<in>(?:(?!~~).)+)~~', '<s>\g<in></s>', data)
@@ -589,7 +564,6 @@ def namu(conn, data, title, main_num):
     data = re.sub('\^\^(?P<in>(?:(?!\^\^).)+)\^\^', '<sup>\g<in></sup>', data)
     data = re.sub(',,(?P<in>(?:(?!,,).)+),,', '<sub>\g<in></sub>', data)
 
-    # 넘겨주기 변환
     redirect_re = re.compile('\n#(?:redirect|넘겨주기) ((?:(?!\n).)+)\n', re.I)
     redirect = redirect_re.search(data)
     if redirect:
@@ -603,7 +577,6 @@ def namu(conn, data, title, main_num):
         
         data = redirect_re.sub('\n * ' + title + ' - [[' + main_link + ']]\n', data, 1)
 
-    # [목차(-)] 처리
     no_toc_re = re.compile('\[(?:목차|toc)\((?:no)\)\]\n', re.I)
     toc_re = re.compile('\[(?:목차|toc)\]', re.I)
     if not no_toc_re.search(data):
@@ -612,7 +585,6 @@ def namu(conn, data, title, main_num):
     else:
         data = no_toc_re.sub('', data)
         
-    # 문단 문법
     toc_full = 0
     toc_top_stack = 6
     toc_stack = [0, 0, 0, 0, 0, 0]
@@ -626,7 +598,6 @@ def namu(conn, data, title, main_num):
             toc_number = len(toc[0])
             edit_number += 1
 
-            # 더 크면 그 전 스택은 초기화
             if toc_full > toc_number:
                 for i in range(toc_number, 6):
                     toc_stack[i] = 0
@@ -639,7 +610,6 @@ def namu(conn, data, title, main_num):
             toc_number = str(toc_number)
             all_stack = ''
 
-            # 스택 합치기
             for i in range(0, 6):
                 all_stack += str(toc_stack[i]) + '.'
 
@@ -666,7 +636,6 @@ def namu(conn, data, title, main_num):
     
     data = toc_re.sub(toc_data, data)
 
-    # 일부 매크로 처리
     data = tool.savemark(data)
     
     anchor_re = re.compile("\[anchor\((?P<in>(?:(?!\)\]).)+)\)\]", re.I)
@@ -675,7 +644,6 @@ def namu(conn, data, title, main_num):
     ruby_re = re.compile("\[ruby\((?P<in>(?:(?!,).)+)\, ?(?P<out>(?:(?!\)\]).)+)\)\]", re.I)
     data = ruby_re.sub('<ruby>\g<in><rp>(</rp><rt>\g<out></rt><rp>)</rp></ruby>', data)
 
-    # 원래 코드 재탕
     now_time = tool.get_time()
 
     date_re = re.compile('\[date\]', re.I)
@@ -719,7 +687,6 @@ def namu(conn, data, title, main_num):
         else:
             break
 
-    # 유튜브, 카카오 티비 처리
     video_re = re.compile('\[(youtube|kakaotv|nicovideo)\(((?:(?!\)\]).)+)\)\]', re.I)
     youtube_re = re.compile('youtube', re.I)
     kakaotv_re = re.compile('kakaotv', re.I)
@@ -763,7 +730,6 @@ def namu(conn, data, title, main_num):
         else:
             break
 
-    # 인용문 구현
     while 1:
         block = re.search('(\n(?:&gt; ?(?:(?:(?!\n).)+)?\n)+)', data)
         if block:
@@ -779,7 +745,6 @@ def namu(conn, data, title, main_num):
 
     data = re.sub('(?P<in>\n +\* ?(?:(?:(?!\|\|).)+))\|\|', '\g<in>\n ||', data)
 
-    # 리스트 구현
     while 1:
         li = re.search('(\n(?:(?: *)\* ?(?:(?:(?!\n).)+)\n)+)', data)
         if li:
@@ -789,7 +754,6 @@ def namu(conn, data, title, main_num):
                 if sub_li:
                     sub_li = sub_li.groups()
 
-                    # 앞의 공백 만큼 margin 먹임
                     if len(sub_li[0]) == 0:
                         margin = 20
                     else:
@@ -805,23 +769,19 @@ def namu(conn, data, title, main_num):
 
     data = re.sub('<\/ul>\n \|\|', '</ul>||', data)
 
-    # 들여쓰기 구현
     while 1:
         indent = re.search('\n( +)', data)
         if indent:
             indent = len(indent.groups()[0])
             
-            # 앞에 공백 만큼 margin 먹임
             margin = '<span style="margin-left: 20px;"></span>' * indent
             
             data = re.sub('\n( +)', '\n' + margin, data, 1)
         else:
             break
 
-    # 표 처리
     data = table_start(data)
 
-    # 링크 관련 문법 구현
     category = '\n<hr><div id="cate">category : '
     category_re = re.compile('^(?:category|분류):', re.I)
     while 1:
@@ -971,11 +931,9 @@ def namu(conn, data, title, main_num):
         else:
             break
 
-    # br 처리
     br_re = re.compile('\[br\]', re.I)
     data = br_re.sub('<br>', data)
             
-    # 각주 처리
     footnote_number = 0
     footnote_all = []
     footnote_dict = {}
@@ -1052,7 +1010,6 @@ def namu(conn, data, title, main_num):
 
     data = re.sub('\n$', footdata_all, data + '\n', 1)
 
-    # 분류 마지막 처리
     category += '</div>'
     category = re.sub(' / <\/div>$', '</div>', category)
 
@@ -1061,7 +1018,6 @@ def namu(conn, data, title, main_num):
 
     data += category
     
-    # NoWiki 마지막 처리
     i = 0
     while 1:
         try:
@@ -1081,7 +1037,6 @@ def namu(conn, data, title, main_num):
         i += 1
 
     if main_num == 1:
-        # 역링크에도
         i = 0
         while 1:
             try:
@@ -1107,7 +1062,6 @@ def namu(conn, data, title, main_num):
 
             i += 1
     
-    # 마지막 처리
     data = re.sub('<\/td_end>', '</td>', data)
     data = re.sub('<include>\n', '', data)
     data = re.sub('\n<\/include>', '', data)
