@@ -2645,8 +2645,6 @@ def change_password():
                             <br>
                             <input placeholder="password ''' + load_lang('confirm') + '''" name="pw3" type="password">
                             <hr>
-                            <input placeholder="email" name="email" type="text" value="''' + email + '''">
-                            <hr>
                             <span>''' + load_lang('user') + ' ' + load_lang('skin') + '''</span>
                             <br>
                             <br>
