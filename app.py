@@ -2774,30 +2774,39 @@ def register():
 
         hashed = bcrypt.hashpw(bytes(flask.request.form.get('pw', None), 'utf-8'), bcrypt.gensalt())
         
-        curs.execute("select id from user limit 1")
-        if not curs.fetchall():
-            curs.execute("insert into user (id, pw, acl, date) values (?, ?, 'owner', ?)", [flask.request.form.get('id', None), hashed.decode(), get_time()])
+        curs.execute('select data from other where name = "email_have"')
+        sql_data = curs.fetchall()
+        if sql_data:
+            flask.session['c_id'] = flask.request.form.get('id', None)
+            flask.session['c_pw'] = hashed.decode()
+            flask.session['c_key'] = ''.join(random.choice("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ") for i in range(16))
 
-            first = 1
+            return redirect('/need_email')
         else:
-            curs.execute("insert into user (id, pw, acl, date) values (?, ?, 'user', ?)", [flask.request.form.get('id', None), hashed.decode(), get_time()])
+            curs.execute("select id from user limit 1")
+            if not curs.fetchall():
+                curs.execute("insert into user (id, pw, acl, date) values (?, ?, 'owner', ?)", [flask.request.form.get('id', None), hashed.decode(), get_time()])
 
-            first = 0
+                first = 1
+            else:
+                curs.execute("insert into user (id, pw, acl, date) values (?, ?, 'user', ?)", [flask.request.form.get('id', None), hashed.decode(), get_time()])
 
-        flask.session['state'] = 1
-        flask.session['id'] = flask.request.form.get('id', None)
-        flask.session['head'] = ''
+                first = 0
 
-        ip = ip_check()
-        agent = flask.request.headers.get('User-Agent')
-        
-        curs.execute("insert into ua_d (name, ip, ua, today, sub) values (?, ?, ?, ?, '')", [flask.request.form.get('id', None), ip, agent, get_time()])        
-        conn.commit()
-        
-        if first == 0:
-            return redirect('/change')
-        else:
-            return redirect('/setting')
+            flask.session['state'] = 1
+            flask.session['id'] = flask.request.form.get('id', None)
+            flask.session['head'] = ''
+
+            ip = ip_check()
+            agent = flask.request.headers.get('User-Agent')
+            
+            curs.execute("insert into ua_d (name, ip, ua, today, sub) values (?, ?, ?, ?, '')", [flask.request.form.get('id', None), ip, agent, get_time()])        
+            conn.commit()
+            
+            if first == 0:
+                return redirect('/change')
+            else:
+                return redirect('/setting')
     else:        
         contract = ''
         
@@ -2825,7 +2834,94 @@ def register():
                     ''',
             menu = [['user', load_lang('user')]]
         ))
+
+@app.route('/need_email', methods=['POST', 'GET'])
+def need_email():
+    if flask.request.method == 'POST':
+        if 'c_id' in flask.session and re.search('@(naver|gmail)\.com$', flask.request.form.get('email', None)):
+            curs.execute('select id from user_set where name = "email" and data = ?', [flask.request.form.get('email', None)])
+            if curs.fetchall():
+                flask.session.pop('c_id', None)
+                flask.session.pop('c_pw', None)
+                flask.session.pop('c_key', None)
+
+                return redirect('/register')
+            else:
+                send_email(flask.request.form.get('email', None), flask.request.host + ' key', 'key : ' + flask.session['c_key'])
+
+                return redirect('/check_key')
+        else:
+            return redirect('/need_email')
+    else:
+        return easy_minify(flask.render_template(skin_check(),    
+            imp = ['email', wiki_set(), custom(), other2([0, 0])],
+            data =  '''
+                    <h2>email white list</h2>
+                    <li>naver.com</li>
+                    <li>gmail.com</li>
+                    <hr>
+                    <form method="post">
+                        <input placeholder="email" name="email" type="text">
+                        <hr>
+                        <button type="submit">''' + load_lang('save') + '''</button>
+                    </form>
+                    ''',
+            menu = [['user', load_lang('user')]]
+        ))
+
+@app.route('/check_key', methods=['POST', 'GET'])
+def check_key():
+    if flask.request.method == 'POST':
+        if 'c_id' in flask.session and flask.session['c_key'] == flask.request.form.get('key', None):
+            curs.execute("select id from user limit 1")
+            if not curs.fetchall():
+                curs.execute("insert into user (id, pw, acl, date) values (?, ?, 'owner', ?)", [flask.session['c_id'], flask.session['c_pw'], get_time()])
+
+                first = 1
+            else:
+                curs.execute("insert into user (id, pw, acl, date) values (?, ?, 'user', ?)", [flask.session['c_id'], flask.session['c_pw'], get_time()])
+
+                first = 0
+
+            curs.execute("insert into user_set (name, id, data) values ('email', ?, ?)", [flask.session['c_id'], flask.session['c_email']])
+
+            flask.session['state'] = 1
+            flask.session['id'] = flask.session['c_id']
+            flask.session['head'] = ''
+
+            ip = ip_check()
+            agent = flask.request.headers.get('User-Agent')
             
+            curs.execute("insert into ua_d (name, ip, ua, today, sub) values (?, ?, ?, ?, '')", [flask.session['c_id'], ip, agent, get_time()])        
+            conn.commit()
+            
+            flask.session.pop('c_id', None)
+            flask.session.pop('c_pw', None)
+            flask.session.pop('c_key', None)
+
+            if first == 0:
+                return redirect('/change')
+            else:
+                return redirect('/setting')
+        else:
+            flask.session.pop('c_id', None)
+            flask.session.pop('c_pw', None)
+            flask.session.pop('c_key', None)
+
+            return redirect('/register')
+    else:
+        return easy_minify(flask.render_template(skin_check(),    
+            imp = ['check', wiki_set(), custom(), other2([0, 0])],
+            data =  '''
+                    <form method="post">
+                        <input placeholder="key" name="key" type="text">
+                        <hr>
+                        <button type="submit">''' + load_lang('save') + '''</button>
+                    </form>
+                    ''',
+            menu = [['user', load_lang('user')]]
+        ))
+           
 @app.route('/logout')
 def logout():
     flask.session['state'] = 0
