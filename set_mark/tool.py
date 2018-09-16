@@ -8,8 +8,8 @@ def get_time():
     return str(datetime.datetime.today().strftime("%Y-%m-%d %H:%M:%S"))
     
 def ip_check():
-    if flask.session and ('Now' and 'DREAMER') in flask.session and flask.session['Now'] == 1:
-        ip = flask.session['DREAMER']
+    if flask.session and ('state' and 'id') in flask.session and flask.session['state'] == 1:
+        ip = flask.session['id']
     else:
         try:
             ip = flask.request.environ.get('HTTP_X_REAL_IP', flask.request.environ.get('HTTP_X_FORWARDED_FOR', flask.request.remote_addr))

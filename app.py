@@ -2512,15 +2512,15 @@ def login():
         if not bcrypt.checkpw(bytes(flask.request.form.get('pw', None), 'utf-8'), bytes(user[0][0], 'utf-8')):
             return re_error('/error/10')
 
-        flask.session['Now'] = 1
-        flask.session['DREAMER'] = flask.request.form.get('id', None)
+        flask.session['state'] = 1
+        flask.session['id'] = flask.request.form.get('id', None)
         
         curs.execute("select css from custom where user = ?", [flask.request.form.get('id', None)])
         css_data = curs.fetchall()
         if css_data:
-            flask.session['Daydream'] = css_data[0][0]
+            flask.session['head'] = css_data[0][0]
         else:
-            flask.session['Daydream'] = ''
+            flask.session['head'] = ''
         
         curs.execute("insert into ua_d (name, ip, ua, today, sub) values (?, ?, ?, ?, '')", [flask.request.form.get('id', None), ip, agent, get_time()])
         conn.commit()
@@ -2563,7 +2563,7 @@ def change_password():
                 if flask.request.form.get('pw2', None) != flask.request.form.get('pw3', None):
                     return re_error('/error/20')
 
-                curs.execute("select pw from user where id = ?", [flask.session['DREAMER']])
+                curs.execute("select pw from user where id = ?", [flask.session['id']])
                 user = curs.fetchall()
                 if not user:
                     return re_error('/error/10')
@@ -2573,7 +2573,7 @@ def change_password():
 
                 hashed = bcrypt.hashpw(bytes(flask.request.form.get('pw2', None), 'utf-8'), bcrypt.gensalt())
                 
-                curs.execute("update user set pw = ? where id = ?", [hashed.decode(), flask.session['DREAMER']])
+                curs.execute("update user set pw = ? where id = ?", [hashed.decode(), flask.session['id']])
 
             auto_list = ['email', 'skin', 'lang']
 
@@ -2764,9 +2764,9 @@ def register():
 
             first = 0
 
-        flask.session['Now'] = 1
-        flask.session['DREAMER'] = flask.request.form.get('id', None)
-        flask.session['Daydream'] = ''
+        flask.session['state'] = 1
+        flask.session['id'] = flask.request.form.get('id', None)
+        flask.session['head'] = ''
 
         ip = ip_check()
         agent = flask.request.headers.get('User-Agent')
@@ -2808,8 +2808,8 @@ def register():
             
 @app.route('/logout')
 def logout():
-    flask.session['Now'] = 0
-    flask.session.pop('DREAMER', None)
+    flask.session['state'] = 0
+    flask.session.pop('id', None)
 
     return redirect('/user')
     
@@ -3710,7 +3710,7 @@ def custom_head_view():
             
             conn.commit()
 
-        flask.session['MyMaiToNight'] = flask.request.form.get('content', None)
+        flask.session['head'] = flask.request.form.get('content', None)
 
         return redirect('/user')
     else:
@@ -3726,8 +3726,8 @@ def custom_head_view():
         else:
             start = '<span>' + load_lang('user_head_warring') + '</span><hr>'
             
-            if 'MyMaiToNight' in flask.session:
-                data = flask.session['MyMaiToNight']
+            if 'head' in flask.session:
+                data = flask.session['head']
             else:
                 data = ''
 

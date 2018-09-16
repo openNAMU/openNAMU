@@ -429,12 +429,12 @@ def ip_pas(raw_ip):
     return ip
 
 def custom():
-    if 'MyMaiToNight' in flask.session:
-        user_head = flask.session['MyMaiToNight']
+    if 'head' in flask.session:
+        user_head = flask.session['head']
     else:
         user_head = ''
 
-    if 'Now' in flask.session and flask.session['Now'] == 1:
+    if 'state' in flask.session and flask.session['state'] == 1:
         curs.execute('select name from alarm where name = ? limit 1', [ip_check()])
         if curs.fetchall():
             user_icon = 2
