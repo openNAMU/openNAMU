@@ -627,7 +627,7 @@ def setting(num = 0):
                             <hr>
                             <input type="checkbox" name="ip_view" ''' + ch_2 + '''> ip ''' + load_lang('hide') + '''
                             <hr>
-                            <input type="checkbox" name="email_have" ''' + ch_3 + '''> must have email
+                            <input type="checkbox" name="email_have" ''' + ch_3 + '''> must have email {<a href="/setting/5">must set google imap</a>}
                             <hr>
                             <span>''' + load_lang('port') + '''</span>
                             <br>
