@@ -54,6 +54,12 @@ def easy_minify(data):
     
     return data
 
+def render_set(title = '', data = '', num = 0):
+    if acl_check(title, 'render') == 1:
+        return 'http request 401.3'
+    else:
+        return namumark(title, data, num)
+
 def captcha_get():
     data = ''
 
@@ -491,7 +497,7 @@ def load_skin(data = ''):
 
     return div2
 
-def acl_check(name):
+def acl_check(name, tool = ''):
     ip = ip_check()
 
     if ban_check() == 1:
@@ -528,7 +534,7 @@ def acl_check(name):
     curs.execute("select acl from user where id = ?", [ip])
     user_data = curs.fetchall()
 
-    curs.execute("select dec from acl where title = ?", [name])
+    curs.execute("select dec, view from acl where title = ?", [name])
     acl_data = curs.fetchall()
     if acl_data:
         if acl_data[0][0] == 'user':
@@ -541,6 +547,18 @@ def acl_check(name):
 
             if not admin_check(5, 'edit (' + name + ')') == 1:
                 return 1
+
+        if tool == 'render':
+            if acl_data[0][1] == 'user':
+                if not user_data:
+                    return 1
+
+            if acl_data[0][1] == 'admin':
+                if not user_data:
+                    return 1
+
+                if not admin_check(5, 'view (' + name + ')') == 1:
+                    return 1
 
     curs.execute('select data from other where name = "edit"')
     set_data = curs.fetchall()

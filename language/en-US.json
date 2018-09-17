@@ -20,6 +20,7 @@
     "server" : "server",
     "load" : "load",
     "skin" : "skin",
+    "view" : "view",
     "template" : "template",
     "move" : "move",
     "hide" : "hide",
