@@ -492,7 +492,7 @@ def setting(num = 0):
         return re_error('/ban')
 
     if num == 0:
-        li_list = [load_lang('main'), load_lang('set_text'), load_lang('main') + ' head', 'robots.txt', 'google']
+        li_list = [load_lang('main'), load_lang('text') + ' ' + load_lang('setting'), load_lang('main') + ' head', 'robots.txt', 'google']
         
         x = 0
         
@@ -598,10 +598,10 @@ def setting(num = 0):
                             <br>
                             <input placeholder="''' + load_lang('frontpage') + '''" type="text" name="frontpage" value="''' + html.escape(d_list[2]) + '''">
                             <hr>
-                            <span>''' + load_lang('license') + ''' (html)</span>
+                            <span>''' + load_lang('bottom') + ' ' + load_lang('text') + ''' (html)</span>
                             <br>
                             <br>
-                            <input placeholder="''' + load_lang('license') + '''" type="text" name="license" value="''' + html.escape(d_list[3]) + '''">
+                            <input placeholder="''' + load_lang('bottom') + ' ' + load_lang('text') + '''" type="text" name="license" value="''' + html.escape(d_list[3]) + '''">
                             <hr>
                             <span>''' + load_lang('max_file_size') + ''' [mb]</span>
                             <br>
@@ -680,7 +680,7 @@ def setting(num = 0):
             conn.commit()
 
             return easy_minify(flask.render_template(skin_check(), 
-                imp = [load_lang('set_text'), wiki_set(), custom(), other2([0, 0])],
+                imp = [load_lang('text') + ' ' + load_lang('setting'), wiki_set(), custom(), other2([0, 0])],
                 data =  '''
                         <form method="post">
                             <span>''' + load_lang('register_text') + '''</span>

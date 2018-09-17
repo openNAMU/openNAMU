@@ -50,6 +50,8 @@
     "record": "기록",
     "name": "이름",
     "license": "라이선스",
+    "bottom" : "하단",
+    "text" : "문구",
     "interwiki": "인터위키",
     "update": "업데이트",
     "setting": "설정",
@@ -122,7 +124,6 @@
     "secret_key": "비밀키",
     "update_branch": "업데이트 브랜치",
     "main": "메인",
-    "set_text": "안내문",
     "indexing" : "인덱싱",
     "register_text" : "회원가입 문구",
     "non_login_alert" : "비 로그인 경고문"
