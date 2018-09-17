@@ -17,7 +17,7 @@ import sys
 
 from func import *
 
-r_ver = 'v3.0.7-master-07'
+r_ver = 'v3.0.7-master-08'
 c_ver = ''.join(re.findall('[0-9]', r_ver))
 
 print('version : ' + r_ver)
@@ -151,7 +151,7 @@ if setup_tool != 0:
     create_data['ua_d'] = ['name', 'ip', 'ua', 'today', 'sub']
     create_data['filter'] = ['name', 'regex', 'sub']
     create_data['scan'] = ['user', 'title']
-    create_data['acl'] = ['title', 'dec', 'dis', 'why']
+    create_data['acl'] = ['title', 'dec', 'dis', 'view', 'why']
     create_data['inter'] = ['title', 'link']
     create_data['html_filter'] = ['html']
 
@@ -1476,7 +1476,7 @@ def deep_search(name = None):
 
             div_plus += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a> (' + data[1] + ')</li>'
     else:
-        div += '<li>404</li>'
+        div += '<li>-</li>'
 
     div += div_plus + '</ul>'
     div += next_fix('/search/' + url_pas(name) + '?num=', num, all_list)
@@ -1574,7 +1574,7 @@ def revert(name = None):
                 leng
             )
 
-            namumark(
+            render_set(
                 title = name,
                 data = data[0][0],
                 num = 1
@@ -1670,7 +1670,7 @@ def edit(name = None):
         curs.execute("delete from back where link = ?", [name])
         curs.execute("delete from back where title = ? and type = 'no'", [name])
         
-        namumark(
+        render_set(
             title = name,
             data = content,
             num = 1
@@ -1740,7 +1740,7 @@ def preview(name = None):
     new_data = re.sub('^\r\n', '', flask.request.form.get('content', None))
     new_data = re.sub('\r\n$', '', new_data)
     
-    end_data = namumark(
+    end_data = render_set(
         title = name,
         data = new_data
     )
@@ -2369,7 +2369,7 @@ def topic(name = None, sub = None):
                                 
             all_data += '<table id="toron"><tbody><tr><td id="toron_color_red">'
             all_data += '<a href="#' + topic_data[1] + '">#' + topic_data[1] + '</a> ' + ip_pas(topic_data[3]) + who_plus + ' <span style="float: right;">' + topic_data[2] + '</span>'
-            all_data += '</td></tr><tr><td>' + namumark(data = topic_data[0]) + '</td></tr></tbody></table><br>'    
+            all_data += '</td></tr><tr><td>' + render_set(data = topic_data[0]) + '</td></tr></tbody></table><br>'    
 
         for topic_data in topic:
             if number == 1:
@@ -2388,7 +2388,7 @@ def topic(name = None, sub = None):
             else:
                 blind_data = ''
 
-            user_write = namumark(data = topic_data[0])
+            user_write = render_set(data = topic_data[0])
             ip = ip_pas(topic_data[3])
             
             curs.execute('select acl from user where id = ?', [topic_data[3]])
@@ -3029,8 +3029,9 @@ def acl(name = None):
             curs.execute("update acl set dec = ? where title = ?", [flask.request.form.get('dec', ''), name])
             curs.execute("update acl set dis = ? where title = ?", [flask.request.form.get('dis', ''), name])
             curs.execute("update acl set why = ? where title = ?", [flask.request.form.get('why', ''), name])
+            curs.execute("update acl set view = ? where title = ?", [flask.request.form.get('view', ''), name])
         else:
-            curs.execute("insert into acl (title, dec, dis, why) values (?, ?, ?, ?)", [name, flask.request.form.get('dec', ''), flask.request.form.get('dis', ''), flask.request.form.get('why', '')])
+            curs.execute("insert into acl (title, dec, dis, why, view) values (?, ?, ?, ?, ?)", [name, flask.request.form.get('dec', ''), flask.request.form.get('dis', ''), flask.request.form.get('why', ''), flask.request.form.get('view', '')])
         
         curs.execute("select title from acl where title = ? and dec = '' and dis = ''", [name])
         if curs.fetchall():
@@ -3040,7 +3041,7 @@ def acl(name = None):
             
         return redirect('/acl/' + url_pas(name))            
     else:
-        data = '<h2>' + load_lang('document') + ' ACL</h2><select name="dec" ' + check_ok + '>'
+        data = '' + load_lang('document') + ' acl<br><br><select name="dec" ' + check_ok + '>'
     
         if re.search('^user:', name):
             acl_list = [['', load_lang('normal')], ['user', load_lang('subscriber')], ['all', load_lang('all')]]
@@ -3060,12 +3061,23 @@ def acl(name = None):
         data += '</select>'
         
         if not re.search('^user:', name):
-            data += '<br><br><h2>' + load_lang('discussion') + ' acl</h2><select name="dis" ' + check_ok + '>'
+            data += '<hr>' + load_lang('discussion') + ' acl<br><br><select name="dis" ' + check_ok + '>'
         
-            curs.execute("select dis, why from acl where title = ?", [name])
+            curs.execute("select dis, why, view from acl where title = ?", [name])
             acl_data = curs.fetchall()
             for data_list in acl_list:
                 if acl_data and acl_data[0][0] == data_list[0]:
+                    check = 'selected="selected"'
+                else:
+                    check = ''
+                    
+                data += '<option value="' + data_list[0] + '" ' + check + '>' + data_list[1] + '</option>'
+                
+            data += '</select>'
+
+            data += '<hr>' + load_lang('view') + ' acl<br><br><select name="view" ' + check_ok + '>'
+            for data_list in acl_list:
+                if acl_data and acl_data[0][2] == data_list[0]:
                     check = 'selected="selected"'
                 else:
                     check = ''
@@ -3305,10 +3317,13 @@ def read_view(name = None):
         else_data = re.sub('^\r\n', '', else_data)
         else_data = re.sub('\r\n$', '', else_data)
             
-    end_data = namumark(
+    end_data = render_set(
         title = name,
         data = else_data
     )
+
+    if end_data == 'http request 401.3':
+        response_data = 401
     
     if num:
         menu = [['history/' + url_pas(name), load_lang('history')]]
@@ -3654,7 +3669,7 @@ def upload():
             curs.execute("delete from data where title = ?", ['file:' + name])
         
         curs.execute("insert into data (title, data) values (?, ?)", ['file:' + name, '[[file:' + name + ']][br][br]{{{[[file:' + name + ']]}}}[br][br]' + lice])
-        curs.execute("insert into acl (title, dec, dis, why) values (?, 'admin', '', '')", ['file:' + name])
+        curs.execute("insert into acl (title, dec, dis, why, view) values (?, 'admin', '', '', '')", ['file:' + name])
 
         history_plus(
             'file:' + name, '[[file:' + name + ']][br][br]{{{[[file:' + name + ']]}}}[br][br]' + lice,
@@ -3910,7 +3925,7 @@ def api_w(name = None):
     curs.execute("select data from data where title = ?", [name])
     data = curs.fetchall()
     if data:
-        json_data = { "title" : name, "data" : namumark(data = data[0][0]) }
+        json_data = { "title" : name, "data" : render_set(data = data[0][0]) }
     
         return flask.jsonify(json_data)
     else:
