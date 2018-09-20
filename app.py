@@ -529,8 +529,8 @@ def setting(num = 0):
             menu = [['manager', load_lang('admin')]]
         ))
     elif num == 1:
-        i_list = ['name', 'logo', 'frontpage', 'license', 'upload', 'skin', 'edit', 'reg', 'ip_view', 'back_up', 'port', 'key', 'update', 'email_have']
-        n_list = ['wiki', '', 'FrontPage', 'CC 0', '2', '', 'normal', '', '', '0', '3000', 'test', 'stable', '']
+        i_list = ['name', 'logo', 'frontpage', 'license', 'upload', 'skin', 'edit', 'reg', 'ip_view', 'back_up', 'port', 'key', 'update', 'email_have', 'discussion']
+        n_list = ['wiki', '', 'FrontPage', 'CC 0', '2', '', 'normal', '', '', '0', '3000', 'test', 'stable', '', 'normal']
         
         if flask.request.method == 'POST':
             i = 0
@@ -564,19 +564,19 @@ def setting(num = 0):
             conn.commit()
             
             div = ''
-            
-            if d_list[6] == 'login':
-                div += '<option value="login">' + load_lang('subscriber') + '</option>'
-                div += '<option value="normal">' + load_lang('normal') + '</option>'
-                div += '<option value="admin">' + load_lang('admin') + '</option>'
-            elif d_list[6] == 'admin':
-                div += '<option value="admin">' + load_lang('admin') + '</option>'
-                div += '<option value="login">' + load_lang('subscriber') + '</option>'
-                div += '<option value="normal">' + load_lang('normal') + '</option>'
-            else:
-                div += '<option value="normal">' + load_lang('normal') + '</option>'
-                div += '<option value="admin">' + load_lang('admin') + '</option>'
-                div += '<option value="login">' + load_lang('subscriber') + '</option>'
+            acl_list = [[load_lang('subscriber'), 'login'], [load_lang('normal'), 'normal'], [load_lang('admin'), 'admin']]
+            for i in acl_list:
+                if i[1] == d_list[6]:
+                    div = '<option value="' + i[1] + '">' + i[0] + '</option>' + div
+                else:
+                    div += '<option value="' + i[1] + '">' + i[0] + '</option>'
+
+            div4 = ''
+            for i in acl_list:
+                if i[1] == d_list[14]:
+                    div4 = '<option value="' + i[1] + '">' + i[0] + '</option>' + div4
+                else:
+                    div4 += '<option value="' + i[1] + '">' + i[0] + '</option>'
 
             ch_1 = ''
             if d_list[7]:
@@ -643,6 +643,11 @@ def setting(num = 0):
                             <br>
                             <br>
                             <select name="edit">''' + div + '''</select>
+                            <hr>
+                            <span>''' + load_lang('default') + ' ' + load_lang('discussion') + ''' acl</span>
+                            <br>
+                            <br>
+                            <select name="discussion">''' + div4 + '''</select>
                             <hr>
                             <input type="checkbox" name="reg" ''' + ch_1 + '''> ''' + load_lang('register') + ''' X
                             <hr>
@@ -2053,6 +2058,7 @@ def manager(num = 1):
                         <li><a href="/update">''' + load_lang('update') + '''</a></li>
                         <li><a href="/inter_wiki">''' + load_lang('interwiki') + '''</a></li>
                         <li><a href="/html_filter">html ''' + load_lang('filter') + '''</a></li>
+                        <li><a href="/email_filter">email ''' + load_lang('filter') + '''</a></li>
                     </ul>
                     ''',
             menu = [['other', load_lang('other')]]

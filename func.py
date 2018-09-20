@@ -611,6 +611,20 @@ def topic_check(name, sub):
     curs.execute("select acl from user where id = ?", [ip])
     user_data = curs.fetchall()
 
+    curs.execute('select data from other where name = "discussion"')
+    acl_data = curs.fetchall()
+    if acl_data:
+        if acl_data[0][0] == 'login':
+            if not user_data:
+                return 1
+
+        if acl_data[0][0] == 'admin':
+            if not user_data:
+                return 1
+
+            if not admin_check(3, 'topic (' + name + ')') == 1:
+                return 1
+
     curs.execute("select dis from acl where title = ?", [name])
     acl_data = curs.fetchall()
     if acl_data:
