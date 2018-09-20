@@ -17,7 +17,7 @@ import sys
 
 from func import *
 
-r_ver = 'v3.0.7-master-08'
+r_ver = 'v3.0.7-master-09'
 c_ver = ''.join(re.findall('[0-9]', r_ver))
 
 print('version : ' + r_ver)
@@ -153,7 +153,7 @@ if setup_tool != 0:
     create_data['scan'] = ['user', 'title']
     create_data['acl'] = ['title', 'dec', 'dis', 'view', 'why']
     create_data['inter'] = ['title', 'link']
-    create_data['html_filter'] = ['html']
+    create_data['html_filter'] = ['html', 'kind']
 
     for create_table in create_data['all_data']:
         for create in create_data[create_table]:
@@ -333,7 +333,7 @@ def alarm():
         menu = [['user', load_lang('user')]]
     ))
 
-@app.route('/<regex("inter_wiki|html_filter|edit_filter"):tools>')
+@app.route('/<regex("inter_wiki|(?:html|edit|email)_filter"):tools>')
 def inter_wiki(tools = None):
     div = ''
     admin = admin_check(None, None)
@@ -349,16 +349,29 @@ def inter_wiki(tools = None):
         del_link = 'del_html_filter'
         plus_link = 'plus_html_filter'
         title = 'html' + load_lang('filter') + ' ' + load_lang('list')
-        div = '<ul><li>span</li><li>div</li><li>iframe</li></ul>'
+        div =   '''
+                <ul>
+                    <li>span</li>
+                    <li>div</li>
+                    <li>iframe</li>
+                </ul>
+                '''
 
-        curs.execute('select html from html_filter')
-    else:
-        del_link = 'del_edit_filter'
-        plus_link = 'manager/9'
-        title = load_lang('edit') + ' ' + load_lang('filter') + ' ' + load_lang('list')
-        div = ''
+        curs.execute('select html from html_filter where kind = ""')
+    elif tools == 'email_filter':
+        del_link = 'del_email_filter'
+        plus_link = 'plus_email_filter'
+        title = 'email ' + load_lang('filter') + ' ' + load_lang('list')
+        div =   '''
+                <ul>
+                    <li>gmail.com</li>
+                    <li>naver.com</li>
+                    <li>daum.net</li>
+                    <li>hanmail.net</li>
+                </ul>
+                '''
 
-        curs.execute("select name from filter")
+        curs.execute("select html from html_filter where kind = 'email'")
 
     db_data = curs.fetchall()
     if db_data:
@@ -367,10 +380,10 @@ def inter_wiki(tools = None):
         for data in db_data:
             if tools == 'inter_wiki':
                 div += '<li>' + data[0] + ' : <a id="out_link" href="' + data[1] + '">' + data[1] + '</a>'
-            elif tools == 'html_filter':
-                div += '<li>' + data[0]
-            else:
+            elif tools == 'edit_filter':
                 div += '<li><a href="/plus_edit_filter/' + url_pas(data[0]) + '">' + data[0] + '</a>'
+            else:
+                div += '<li>' + data[0]
 
             if admin == 1:
                 div += ' <a href="/' + del_link + '/' + url_pas(data[0]) + '">(' + load_lang('delete') + ')</a>'
@@ -391,15 +404,17 @@ def inter_wiki(tools = None):
         menu = [['other', load_lang('other')]]
     ))
 
-@app.route('/<regex("del_(inter_wiki|html_filter|edit_filter)"):tools>/<name>')
+@app.route('/<regex("del_(?:inter_wiki|(?:html|edit|email)_filter)"):tools>/<name>')
 def del_inter(tools = None, name = None):
     if admin_check(None, tools) == 1:
         if tools == 'del_inter_wiki':
             curs.execute("delete from inter where title = ?", [name])
         elif tools == 'del_html_filter':
-            curs.execute("delete from html_filter where html = ?", [name])
-        else:
+            curs.execute("delete from html_filter where html = ? and kind = ''", [name])
+        elif tools == 'del_edit_filter':
             curs.execute("delete from filter where name = ?", [name])
+        else:
+            curs.execute("delete from html_filter where html = ? and kind = 'email'", [name])
         
         conn.commit()
 
@@ -407,7 +422,7 @@ def del_inter(tools = None, name = None):
     else:
         return re_error('/error/3')
 
-@app.route('/<regex("plus_(inter_wiki|html_filter)"):tools>', methods=['POST', 'GET'])
+@app.route('/<regex("plus_(?:inter_wiki|(?:html|edit|email)_filter)"):tools>', methods=['POST', 'GET'])
 @app.route('/<regex("plus_edit_filter"):tools>/<name>', methods=['POST', 'GET'])
 def plus_inter(tools = None, name = None):
     if flask.request.method == 'POST':
@@ -415,9 +430,9 @@ def plus_inter(tools = None, name = None):
             curs.execute('insert into inter (title, link) values (?, ?)', [flask.request.form.get('title', None), flask.request.form.get('link', None)])
             admin_check(None, 'inter_wiki_plus')
         elif tools == 'plus_html_filter':
-            curs.execute('insert into html_filter (html) values (?)', [flask.request.form.get('title', None)])
+            curs.execute('insert into html_filter (html, kind) values (?, "")', [flask.request.form.get('title', None)])
             admin_check(None, 'html_filter edit')
-        else:
+        elif tools == 'plus_edit_filter':
             if admin_check(1, 'edit_filter edit') != 1:
                 return re_error('/error/3')
 
@@ -431,6 +446,9 @@ def plus_inter(tools = None, name = None):
                 curs.execute("update filter set regex = ?, sub = ? where name = ?", [flask.request.form.get('content', 'test'), end, name])
             else:
                 curs.execute("insert into filter (name, regex, sub) values (?, ?, ?)", [name, flask.request.form.get('content', 'test'), end])
+        else:
+            curs.execute('insert into html_filter (html, kind) values (?, "email")', [flask.request.form.get('title', None)])
+            admin_check(None, 'email_filter edit')
         
         conn.commit()
     
@@ -444,10 +462,7 @@ def plus_inter(tools = None, name = None):
         if tools == 'plus_inter_wiki':
             title = load_lang('interwiki') + ' ' + load_lang('plus')
             form_data = '<input placeholder="' + load_lang('name') + '" type="text" name="title"><hr><input placeholder="link" type="text" name="link">'
-        elif tools == 'plus_html_filter':
-            title = 'html ' + load_lang('filter') + ' ' + load_lang('plus')
-            form_data = '<input placeholder="html" type="text" name="title">'
-        else:
+        elif tools == 'plus_edit_filter':
             curs.execute("select regex, sub from filter where name = ?", [name])
             exist = curs.fetchall()
             if exist:
@@ -472,6 +487,12 @@ def plus_inter(tools = None, name = None):
                         <hr>
                         <input ''' + stat + ''' placeholder="''' + load_lang('regex') + '''" name="content" value="''' + html.escape(textarea) + '''" type="text">
                         '''
+        elif tools == 'plus_html_filter':
+            title = 'html ' + load_lang('filter') + ' ' + load_lang('plus')
+            form_data = '<input placeholder="html" type="text" name="title">'
+        else:
+            title = 'email ' + load_lang('filter') + ' ' + load_lang('plus')
+            form_data = '<input placeholder="email" type="text" name="title">'
 
         return easy_minify(flask.render_template(skin_check(), 
             imp = [title, wiki_set(), custom(), other2([0, 0])],
@@ -2836,27 +2857,33 @@ def register():
 @app.route('/need_email', methods=['POST', 'GET'])
 def need_email():
     if flask.request.method == 'POST':
-        if 'c_id' in flask.session and re.search('@(naver|gmail)\.com$', flask.request.form.get('email', None)):
-            curs.execute('select id from user_set where name = "email" and data = ?', [flask.request.form.get('email', None)])
-            if curs.fetchall():
-                flask.session.pop('c_id', None)
-                flask.session.pop('c_pw', None)
-                flask.session.pop('c_key', None)
+        if 'c_id' in flask.session:
+            main_email = ['naver.com', 'gmail.com', 'daum.net', 'hanmail.net']
+            data = re.search('@([^@]+)$', flask.request.form.get('email', None))
+            if data:
+                data = data.groups()[0]
 
-                return redirect('/register')
-            else:
-                send_email(flask.request.form.get('email', None), flask.request.host + ' key', 'key : ' + flask.session['c_key'])
+                curs.execute("select html from html_filter where html = ? and kind = 'email'", [data])
+                if curs.fetchall() or (data in main_email):
+                    curs.execute('select id from user_set where name = "email" and data = ?', [flask.request.form.get('email', None)])
+                    if curs.fetchall():
+                        flask.session.pop('c_id', None)
+                        flask.session.pop('c_pw', None)
+                        flask.session.pop('c_key', None)
 
-                return redirect('/check_key')
-        else:
-            return redirect('/need_email')
+                        return redirect('/register')
+                    else:
+                        send_email(flask.request.form.get('email', None), flask.request.host + ' key', 'key : ' + flask.session['c_key'])
+                        flask.session['c_email'] = flask.request.form.get('email', None)
+
+                        return redirect('/check_key')
+
+        return redirect('/need_email')
     else:
         return easy_minify(flask.render_template(skin_check(),    
             imp = ['email', wiki_set(), custom(), other2([0, 0])],
             data =  '''
-                    <h2>email white list</h2>
-                    <li>naver.com</li>
-                    <li>gmail.com</li>
+                    <a href="/email_filter">(email ''' + load_lang('list') + ''')</a>
                     <hr>
                     <form method="post">
                         <input placeholder="email" name="email" type="text">
@@ -2896,6 +2923,7 @@ def check_key():
             flask.session.pop('c_id', None)
             flask.session.pop('c_pw', None)
             flask.session.pop('c_key', None)
+            flask.session.pop('c_email', None)
 
             if first == 0:
                 return redirect('/change')
@@ -2905,6 +2933,7 @@ def check_key():
             flask.session.pop('c_id', None)
             flask.session.pop('c_pw', None)
             flask.session.pop('c_key', None)
+            flask.session.pop('c_email', None)
 
             return redirect('/register')
     else:
