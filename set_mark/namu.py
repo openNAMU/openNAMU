@@ -458,7 +458,7 @@ def namu(conn, data, title, main_num):
 
     data = re.sub('&amp;', '&', data)
 
-    curs.execute('select html from html_filter')
+    curs.execute('select html from html_filter where kind = ""')
     html_db = curs.fetchall()
 
     src_list = ["www.youtube.com", "serviceapi.nmv.naver.com", "tv.kakao.com", "www.google.com", "serviceapi.rmcnmv.naver.com"]
