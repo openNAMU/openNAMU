@@ -127,7 +127,8 @@ def captcha_post(re_data, num = 1):
             curs.execute('select data from other where name = "sec_re"')
             sec_re = curs.fetchall()
             if sec_re and sec_re[0][0] != '':
-                data = urllib.request.urlopen('https://www.google.com/recaptcha/api/siteverify?secret=' + sec_re[0][0] + '&response=' + re_data).read()
+                data = urllib.request.urlopen('https://www.google.com/recaptcha/api/siteverify?secret=' + sec_re[0][0] + '&response=' + re_data)
+                data = data.read().decode(data.headers.get_content_charset())
                 print(data)
                 if not data:
                     return 0
