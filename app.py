@@ -2051,14 +2051,17 @@ def manager(num = 1):
                     <br>
                     <h2>''' + load_lang('owner') + '''</h2>
                     <ul>
-                        <li><a href="/indexing">''' + load_lang('indexing') + ' (' + load_lang('create') + ' or ' + load_lang('delete') + ''')</a></li>
                         <li><a href="/manager/8">''' + load_lang('admin_group') + ' ' + load_lang('create') + '''</a></li>
                         <li><a href="/setting">''' + load_lang('setting') + ' ' + load_lang('edit') + '''</a></li>
-                        <li><a href="/restart">''' + load_lang('server') + ' ' + load_lang('restart') + '''</a></li>
-                        <li><a href="/update">''' + load_lang('update') + '''</a></li>
                         <li><a href="/inter_wiki">''' + load_lang('interwiki') + '''</a></li>
                         <li><a href="/html_filter">html ''' + load_lang('filter') + '''</a></li>
                         <li><a href="/email_filter">email ''' + load_lang('filter') + '''</a></li>
+                    </ul>
+                    <h2>''' + load_lang('server') + '''</h2>
+                    <ul>
+                        <li><a href="/indexing">''' + load_lang('indexing') + ' (' + load_lang('create') + ' or ' + load_lang('delete') + ''')</a></li>
+                        <li><a href="/restart">''' + load_lang('server') + ' ' + load_lang('restart') + '''</a></li>
+                        <li><a href="/update">''' + load_lang('update') + '''</a></li>
                     </ul>
                     ''',
             menu = [['other', load_lang('other')]]
