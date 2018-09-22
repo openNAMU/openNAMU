@@ -14,7 +14,7 @@ curs = conn.cursor()
 load_conn(conn)
 
 print('1. backlink reset')
-print('2. reCAPTCHA delete')
+print('2. recaptcha delete')
 print('3. ban delete')
 print('4. change port')
 print('5. change skin')

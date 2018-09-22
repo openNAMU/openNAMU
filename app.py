@@ -1571,7 +1571,7 @@ def revert(name = None):
         return re_error('/ban')
 
     if flask.request.method == 'POST':
-        if captcha_post(flask.request.form.get('g-recaptcha-response', None)) == 1:
+        if captcha_post(flask.request.form.get('g-recaptcha-response', '')) == 1:
             return re_error('/error/13')
         else:
             captcha_post('', 0)
@@ -1652,7 +1652,7 @@ def edit(name = None):
                     
                     return re_error('/error/21')
 
-        if captcha_post(flask.request.form.get('g-recaptcha-response', None)) == 1:
+        if captcha_post(flask.request.form.get('g-recaptcha-response', '')) == 1:
             return re_error('/error/13')
         else:
             captcha_post('', 0)
@@ -1804,7 +1804,7 @@ def delete(name = None):
         return re_error('/ban')
     
     if flask.request.method == 'POST':
-        if captcha_post(flask.request.form.get('g-recaptcha-response', None)) == 1:
+        if captcha_post(flask.request.form.get('g-recaptcha-response', '')) == 1:
             return re_error('/error/13')
         else:
             captcha_post('', 0)
@@ -1881,7 +1881,7 @@ def move(name = None):
         return re_error('/ban')
 
     if flask.request.method == 'POST':
-        if captcha_post(flask.request.form.get('g-recaptcha-response', None)) == 1:
+        if captcha_post(flask.request.form.get('g-recaptcha-response', '')) == 1:
             return re_error('/error/13')
         else:
             captcha_post('', 0)
@@ -2309,7 +2309,7 @@ def topic(name = None, sub = None):
     admin = admin_check(3, None)
     
     if flask.request.method == 'POST':
-        if captcha_post(flask.request.form.get('g-recaptcha-response', None)) == 1:
+        if captcha_post(flask.request.form.get('g-recaptcha-response', '')) == 1:
             return re_error('/error/13')
         else:
             captcha_post('', 0)
@@ -2549,7 +2549,7 @@ def login():
         return re_error('/ban')
         
     if flask.request.method == 'POST':        
-        if captcha_post(flask.request.form.get('g-recaptcha-response', None)) == 1:
+        if captcha_post(flask.request.form.get('g-recaptcha-response', '')) == 1:
             return re_error('/error/13')
         else:
             captcha_post('', 0)
@@ -2782,7 +2782,7 @@ def register():
             return re_error('/ban')
     
     if flask.request.method == 'POST': 
-        if captcha_post(flask.request.form.get('g-recaptcha-response', None)) == 1:
+        if captcha_post(flask.request.form.get('g-recaptcha-response', '')) == 1:
             return re_error('/error/13')
         else:
             captcha_post('', 0)
@@ -3654,7 +3654,7 @@ def upload():
         return re_error('/ban')
     
     if flask.request.method == 'POST':
-        if captcha_post(flask.request.form.get('g-recaptcha-response', None)) == 1:
+        if captcha_post(flask.request.form.get('g-recaptcha-response', '')) == 1:
             return re_error('/error/13')
         else:
             captcha_post('', 0)
