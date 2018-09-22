@@ -1,6 +1,5 @@
 tornado
 bcrypt
-requests
 flask
 flask-Reggie
 flask-compress
