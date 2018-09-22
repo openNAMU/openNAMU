@@ -3,7 +3,7 @@ import flask
 import json
 import sqlite3
 import hashlib
-import requests
+import urllib.request
 import smtplib
 import re
 import html
@@ -127,7 +127,7 @@ def captcha_post(re_data, num = 1):
             curs.execute('select data from other where name = "sec_re"')
             sec_re = curs.fetchall()
             if sec_re and sec_re[0][0] != '':
-                data = requests.get('https://www.google.com/recaptcha/api/siteverify', params = { 'secret' : sec_re, 'response' : re_data })
+                data = urllib.request.urlopen('https://www.google.com/recaptcha/api/siteverify?secret=' + sec_re + '&response=' + re_data).read()
                 if not data:
                     return 0
                 else:
