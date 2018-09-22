@@ -21,4 +21,4 @@ You can create a new set.json by deleting it.
  * The first registor is granted owner privileges.
 
 ## 한국어
- * [참조](https://github.com/2DU/opennamu/blob/master/Readme-Ko.md)
+ * [참조](https://github.com/2du/opennamu/blob/master/readme-ko.md)
