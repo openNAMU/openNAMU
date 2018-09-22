@@ -1,8 +1,10 @@
+import email.mime.text
 import flask
 import json
 import sqlite3
 import hashlib
 import requests
+import smtplib
 import re
 import html
 import os
@@ -22,10 +24,41 @@ def load_conn(data):
 
     load_conn2(data)
 
+def send_email(who, title, data):
+    smtp = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+
+    curs.execute('select name, data from other where name = "g_email" or name = "g_pass"')
+    rep_data = curs.fetchall()
+    if rep_data:
+        g_email = ''
+        g_pass = ''
+        for i in rep_data:
+            if i[0] == 'g_email':
+                g_email = i[1]
+            else:
+                g_pass = i[1]
+
+        try:
+            smtp.login(g_email, g_pass)
+        except:
+            print('error : email login error')
+
+    msg = email.mime.text.MIMEText(data)
+    msg['Subject'] = title
+    smtp.sendmail(g_email, who, msg.as_string())
+
+    smtp.quit()
+
 def easy_minify(data):
-    data = re.sub('\n +', '\n', data)
+    data = re.sub('\n +<', '\n<', data)
     
     return data
+
+def render_set(title = '', data = '', num = 0):
+    if acl_check(title, 'render') == 1:
+        return 'http request 401.3'
+    else:
+        return namumark(title, data, num)
 
 def captcha_get():
     data = ''
@@ -57,23 +90,24 @@ def update():
                     curs.execute('select link from back where link like ?', [all_rep[i][0] + '%'])
 
                 user_rep = curs.fetchall()
-                for user_rep2 in user_rep:
-                    test = 1
+                if user_rep:
+                    for user_rep2 in user_rep:
+                        test = 1
 
-                    first = re.sub('^' + all_rep[i][0], all_rep[i][1], user_rep2[0])
+                        first = re.sub('^' + all_rep[i][0], all_rep[i][1], user_rep2[0])
 
-                    if j == 0:
-                        curs.execute("update data set title = ? where title = ?", [first, user_rep2[0]])
-                    elif j == 1:
-                        curs.execute("update history set title = ? where title = ?", [first, user_rep2[0]])
-                    elif j == 2:
-                        curs.execute("update acl set title = ? where title = ?", [first, user_rep2[0]])
-                    elif j == 3:
-                        curs.execute("update topic set title = ? where title = ?", [first, user_rep2[0]])
-                    elif j == 4:
-                        curs.execute("update back set title = ? where title = ?", [first, user_rep2[0]])
-                    elif j == 5:
-                        curs.execute("update back set link = ? where link = ?", [first, user_rep2[0]])
+                        if j == 0:
+                            curs.execute("update data set title = ? where title = ?", [first, user_rep2[0]])
+                        elif j == 1:
+                            curs.execute("update history set title = ? where title = ?", [first, user_rep2[0]])
+                        elif j == 2:
+                            curs.execute("update acl set title = ? where title = ?", [first, user_rep2[0]])
+                        elif j == 3:
+                            curs.execute("update topic set title = ? where title = ?", [first, user_rep2[0]])
+                        elif j == 4:
+                            curs.execute("update back set title = ? where title = ?", [first, user_rep2[0]])
+                        elif j == 5:
+                            curs.execute("update back set link = ? where link = ?", [first, user_rep2[0]])
 
         if test == 1:
             print('사용자 to user, 파일 to file, 분류 to category')
@@ -112,27 +146,49 @@ def captcha_post(re_data, num = 1):
 def load_lang(data, num = 0):
     global lang
 
-    try:
-        if lang:
-            pass
-    except:
-        curs.execute("select data from other where name = 'language'")
-        rep_data = curs.fetchall()
+    if num == 1:
+        try:
+            if lang:
+                pass
+        except:
+            curs.execute("select data from other where name = 'language'")
+            rep_data = curs.fetchall()
 
-        json_data = open(os.path.join('language', rep_data[0][0] + '.json'), 'rt', encoding='utf-8').read()
-        lang = json.loads(json_data)
+            json_data = open(os.path.join('language', rep_data[0][0] + '.json'), 'rt', encoding='utf-8').read()
+            lang = json.loads(json_data)
 
-    if data == 'please_all':
-        return lang
-    else:
         if data in lang:
             return lang[data]
         else:
             if data in else_lang:
                 return else_lang[data]
             else:
-                return data + ' (Missing)'
-            
+                return data + ' (missing)'
+    elif num == 2:
+        curs.execute('select data from user_set where name = "lang" and id = ?', [ip_check()])
+        rep_data = curs.fetchall()
+        if not rep_data:
+            curs.execute("select data from other where name = 'language'")
+            rep_data = curs.fetchall()
+
+        return rep_data[0][0]
+    else:
+        curs.execute('select data from user_set where name = "lang" and id = ?', [ip_check()])
+        rep_data = curs.fetchall()
+        if rep_data:
+            try:
+                json_data = open(os.path.join('language', rep_data[0][0] + '.json'), 'rt', encoding='utf-8').read()
+                lang = json.loads(json_data)
+            except:
+                return load_lang(data, 1)
+
+            if data in lang:
+                return lang[data]
+            else:
+                return load_lang(data, 1)
+        else:
+            return load_lang(data, 1)
+
 def ip_or_user(data):
     if re.search('(\.|:)', data):
         return 1
@@ -141,31 +197,31 @@ def ip_or_user(data):
 
 def edit_help_button():
     # https://stackoverflow.com/questions/11076975/insert-text-into-textarea-at-cursor-position-javascript
-    js_data = '''
-        <script>
-        function insertAtCursor(myField, myValue) {
-            if (document.selection) { 
-                document.getElementById(myField).focus();
+    js_data =   '''
+                <script>
+                    function insert_data(name, data) {
+                        if(document.selection) { 
+                            document.getElementById(name).focus();
 
-                sel = document.selection.createRange();
-                sel.text = myValue; 
-            } else if (document.getElementById(myField).selectionStart || document.getElementById(myField).selectionStart == '0') {
-                var startPos = document.getElementById(myField).selectionStart;
-                var endPos = document.getElementById(myField).selectionEnd;
+                            sel = document.selection.createRange();
+                            sel.text = data; 
+                        } else if(document.getElementById(name).selectionStart || document.getElementById(name).selectionStart == '0') {
+                            var startPos = document.getElementById(name).selectionStart;
+                            var endPos = document.getElementById(name).selectionEnd;
 
-                document.getElementById(myField).value = document.getElementById(myField).value.substring(0, startPos) + myValue + document.getElementById(myField).value.substring(endPos, document.getElementById(myField).value.length); 
-            } else {
-                document.getElementById(myField).value += myValue;
-            }
-        }
-    </script>
-    '''
+                            document.getElementById(name).value = document.getElementById(name).value.substring(0, startPos) + data + document.getElementById(name).value.substring(endPos, document.getElementById(name).value.length); 
+                        } else {
+                            document.getElementById(name).value += data;
+                        }
+                    }
+                </script>
+                '''
 
-    insert_list = [['[[|]]', 'Link'], ['[()]', 'Macro'], ['{{{#!}}}', 'Middle'], ['||<>||', 'Table']]
+    insert_list = [['[[|]]', 'link'], ['[()]', 'macro'], ['{{{#!}}}', 'middle'], ['||<>||', 'table']]
 
     data = ''
     for insert_data in insert_list:
-        data += '<a href="javascript:void(0);" onclick="insertAtCursor(\'content\', \'' + insert_data[0] + '\');">(' + insert_data[1] + ')</a>'
+        data += '<a href="javascript:void(0);" onclick="insert_data(\'content\', \'' + insert_data[0] + '\');">(' + insert_data[1] + ')</a>'
 
     return [js_data, data + '<hr>']
 
@@ -183,22 +239,19 @@ def ip_warring():
     return text_data
 
 def skin_check():
-    skin = './views/acme/'
+    skin = './views/neo_yousoro/'
+
+    curs.execute('select data from other where name = "skin"')
+    skin_exist = curs.fetchall()
+    if skin_exist and skin_exist[0][0] != '':
+        if os.path.exists(os.path.abspath('./views/' + skin_exist[0][0] + '/index.html')) == 1:
+            skin = './views/' + skin_exist[0][0] + '/'
     
-    try:
-        curs.execute('select data from user_set where name = "skin" and id = ?', [ip_check()])
-        skin_exist = curs.fetchall()
-        if skin_exist and skin_exist[0][0] != '':
-            if os.path.exists(os.path.abspath('./views/' + skin_exist[0][0] + '/index.html')) == 1:
-                skin = './views/' + skin_exist[0][0] + '/'
-        else:
-            curs.execute('select data from other where name = "skin"')
-            skin_exist = curs.fetchall()
-            if skin_exist:
-                if os.path.exists(os.path.abspath('./views/' + skin_exist[0][0] + '/index.html')) == 1:
-                    skin = './views/' + skin_exist[0][0] + '/'
-    except:
-        pass
+    curs.execute('select data from user_set where name = "skin" and id = ?', [ip_check()])
+    skin_exist = curs.fetchall()
+    if skin_exist and skin_exist[0][0] != '':
+        if os.path.exists(os.path.abspath('./views/' + skin_exist[0][0] + '/index.html')) == 1:
+            skin = './views/' + skin_exist[0][0] + '/'
 
     return skin + 'index.html'
 
@@ -216,7 +269,7 @@ def next_fix(link, num, page, end = 50):
     return list_data
 
 def other2(data):
-    return data + ['Deleted']
+    return data + ['']
 
 def wiki_set(num = 1):
     if num == 1:
@@ -227,7 +280,7 @@ def wiki_set(num = 1):
         if db_data and db_data[0][0] != '':
             data_list += [db_data[0][0]]
         else:
-            data_list += ['Wiki']
+            data_list += ['wiki']
 
         curs.execute('select data from other where name = "license"')
         db_data = curs.fetchall()
@@ -282,8 +335,38 @@ def diff(seqm):
         elif opcode == 'replace':
             output += ["<span style='background:#FDD;'>" + seqm.a[a0:a1] + "</span>"]
             output += ["<span style='background:#CFC;'>" + seqm.b[b0:b1] + "</span>"]
+
+    end = ''.join(output)
+    end = end.replace('\r\n', '\n')
+    sub = ''
+
+    num = 0
+    left = 1
+    while 1:
+        data = re.search('((?:(?!\n).)*)\n', end)
+        if data:
+            data = data.groups()[0]
             
-    return ''.join(output)
+            left += 1
+            if re.search('<span style=\'(?:(?:(?!\').)+)\'>', data):
+                num += 1
+                if re.search('<\/span>', data):
+                    num -= 1
+
+                sub += str(left) + ' : ' + re.sub('(?P<in>(?:(?!\n).)*)\n', '\g<in>', data, 1) + '<br>'
+            else:
+                if re.search('<\/span>', data):
+                    num -= 1
+                    sub += str(left) + ' : ' + re.sub('(?P<in>(?:(?!\n).)*)\n', '\g<in>', data, 1) + '<br>'
+                else:
+                    if num > 0:
+                        sub += str(left) + ' : ' + re.sub('(?P<in>.*)\n', '\g<in>', data, 1) + '<br>'
+
+            end = re.sub('((?:(?!\n).)*)\n', '', end, 1)
+        else:
+            break
+            
+    return sub
            
 def admin_check(num, what):
     ip = ip_check() 
@@ -352,12 +435,12 @@ def ip_pas(raw_ip):
     return ip
 
 def custom():
-    if 'MyMaiToNight' in flask.session:
-        user_head = flask.session['MyMaiToNight']
+    if 'head' in flask.session:
+        user_head = flask.session['head']
     else:
         user_head = ''
 
-    if 'Now' in flask.session and flask.session['Now'] == 1:
+    if 'state' in flask.session and flask.session['state'] == 1:
         curs.execute('select name from alarm where name = ? limit 1', [ip_check()])
         if curs.fetchall():
             user_icon = 2
@@ -381,7 +464,7 @@ def custom():
     else:
         user_name = load_lang('user')
 
-    return ['', '', user_icon, user_head, email, user_name]
+    return ['', '', user_icon, user_head, email, user_name, load_lang(data = '', num = 2)]
 
 def load_skin(data = ''):
     div2 = ''
@@ -414,7 +497,7 @@ def load_skin(data = ''):
 
     return div2
 
-def acl_check(name):
+def acl_check(name, tool = ''):
     ip = ip_check()
 
     if ban_check() == 1:
@@ -451,7 +534,7 @@ def acl_check(name):
     curs.execute("select acl from user where id = ?", [ip])
     user_data = curs.fetchall()
 
-    curs.execute("select dec from acl where title = ?", [name])
+    curs.execute("select dec, view from acl where title = ?", [name])
     acl_data = curs.fetchall()
     if acl_data:
         if acl_data[0][0] == 'user':
@@ -464,6 +547,18 @@ def acl_check(name):
 
             if not admin_check(5, 'edit (' + name + ')') == 1:
                 return 1
+
+        if tool == 'render':
+            if acl_data[0][1] == 'user':
+                if not user_data:
+                    return 1
+
+            if acl_data[0][1] == 'admin':
+                if not user_data:
+                    return 1
+
+                if not admin_check(5, 'view (' + name + ')') == 1:
+                    return 1
 
     curs.execute('select data from other where name = "edit"')
     set_data = curs.fetchall()
@@ -481,23 +576,30 @@ def acl_check(name):
 
     return 0
 
-def ban_check():
-    ip = ip_check()
+def ban_check(ip = None, tool = None):
+    if not ip:
+        ip = ip_check()
 
     band = re.search("^([0-9]{1,3}\.[0-9]{1,3})", ip)
     if band:
         band_it = band.groups()[0]
     else:
-        band_it = 'Not'
-        
-    curs.execute("select block from ban where block = ?", [band_it])
+        band_it = '-'
+    
+    curs.execute("select end, login from ban where block = ?", [band_it])
     band_d = curs.fetchall()
     
-    curs.execute("select block from ban where block = ?", [ip])
+    curs.execute("select end, login from ban where block = ?", [ip])
     ban_d = curs.fetchall()
-    if band_d or ban_d:
-        return 1
     
+    data = band_d or ban_d
+    if data and (data[0][0] == '' or data[0][0] > get_time()):
+        if tool and tool == 'login':                    
+            if data[0][1] == 'O':
+                return 0
+                
+        return 1
+
     return 0
         
 def topic_check(name, sub):
@@ -508,6 +610,20 @@ def topic_check(name, sub):
         
     curs.execute("select acl from user where id = ?", [ip])
     user_data = curs.fetchall()
+
+    curs.execute('select data from other where name = "discussion"')
+    acl_data = curs.fetchall()
+    if acl_data:
+        if acl_data[0][0] == 'login':
+            if not user_data:
+                return 1
+
+        if acl_data[0][0] == 'admin':
+            if not user_data:
+                return 1
+
+            if not admin_check(3, 'topic (' + name + ')') == 1:
+                return 1
 
     curs.execute("select dis from acl where title = ?", [name])
     acl_data = curs.fetchall()
@@ -531,7 +647,7 @@ def topic_check(name, sub):
     return 0
 
 def ban_insert(name, end, why, login, blocker):
-    time = get_time()
+    now_time = get_time()
 
     if re.search("^([0-9]{1,3}\.[0-9]{1,3})$", name):
         band = 'O'
@@ -540,7 +656,7 @@ def ban_insert(name, end, why, login, blocker):
 
     curs.execute("select block from ban where block = ?", [name])
     if curs.fetchall():
-        curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, ?)", [name, load_lang('release', 1), time, blocker, '', band])
+        curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, ?)", [name, load_lang('release', 1), now_time, blocker, '', band])
         curs.execute("delete from ban where block = ?", [name])
     else:
         if login != '':
@@ -555,7 +671,7 @@ def ban_insert(name, end, why, login, blocker):
         else:
             r_time = ''
 
-        curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, ?)", [name, r_time, time, blocker, why, band])
+        curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, ?)", [name, r_time, now_time, blocker, why, band])
         curs.execute("insert into ban (block, end, why, band, login) values (?, ?, ?, ?, ?)", [name, r_time, why, band, login])
     
     conn.commit()
@@ -604,7 +720,7 @@ def re_error(data):
                     end_data = curs.fetchall()
             
             if end_data:
-                end = '<li>' + load_lang('state') + ' : '
+                end = '<li>' + load_lang('state') + ' : ' + load_lang('ban') + '</li><li>'
 
                 if end_data[0][0]:
                     now = int(re.sub('(\-| |:)', '', get_time()))
@@ -614,11 +730,11 @@ def re_error(data):
                         curs.execute("delete from ban where block = ?", [ip])
                         conn.commit()
 
-                        end += 'Re Try.'
+                        end += '<script>location.reload();</script>'
                     else:
-                        end += load_lang('why') + ' : ' + end_data[0][0]
+                        end += 'end : ' + end_data[0][0]
                 else:
-                    end += load_lang('why') + ' : ' + load_lang('limitless')
+                    end += load_lang('limitless')
                 
                 end += '</li>'
 
@@ -626,8 +742,8 @@ def re_error(data):
                     end += '<li>' + load_lang('why') + ' : ' + end_data[0][1] + '</li>'
 
         return easy_minify(flask.render_template(skin_check(), 
-            imp = ['Error', wiki_set(1), custom(), other2([0, 0])],
-            data = '<h2>Error</h2><ul>' + end + '</ul>',
+            imp = ['error', wiki_set(1), custom(), other2([0, 0])],
+            data = '<h2>error</h2><ul>' + end + '</ul>',
             menu = 0
         ))
     else:
@@ -676,8 +792,8 @@ def re_error(data):
                 data = '???'
 
             return easy_minify(flask.render_template(skin_check(), 
-                imp = ['Error', wiki_set(1), custom(), other2([0, 0])],
-                data = '<h2>Error</h2><ul><li>' + data + '</li></ul>',
+                imp = ['error', wiki_set(1), custom(), other2([0, 0])],
+                data = '<h2>error</h2><ul><li>' + data + '</li></ul>',
                 menu = 0
             ))
         else:
