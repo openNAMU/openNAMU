@@ -128,11 +128,11 @@ def captcha_post(re_data, num = 1):
             sec_re = curs.fetchall()
             if sec_re and sec_re[0][0] != '':
                 data = urllib.request.urlopen('https://www.google.com/recaptcha/api/siteverify?secret=' + sec_re[0][0] + '&response=' + re_data)
-                data = data.read().decode(data.headers.get_content_charset())
-                data = json.loads(data)
                 if not data:
                     return 0
                 else:
+                    data = data.read().decode(data.headers.get_content_charset())
+                    data = json.loads(data)
                     json_data = data.json()
                     if data.status_code == 200 and json_data['success'] == True:
                         return 0
