@@ -4,7 +4,6 @@ import re
 import html
 import sqlite3
 import urllib.parse
-import time
 import threading
 import multiprocessing
 
@@ -64,4 +63,4 @@ def namumark(title = '', data = '', num = 0):
             
         return data[0] + data[1]
     else:
-        return '404'
+        return 'http request 404'

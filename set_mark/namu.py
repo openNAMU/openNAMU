@@ -73,7 +73,7 @@ def table_parser(data, cel_data, start_data, num = 0):
     if table_bgcolor:
         all_table += 'background: ' + table_bgcolor.groups()[0] + ';'
         
-    bgcolor = re.search("&lt;(?:bgcolor=)?(#(?:[0-9a-f-A-F]{3}){1,2}|\w+)&gt;", data)
+    bgcolor = re.search("&lt;bgcolor=(#(?:[0-9a-f-A-F]{3}){1,2}|\w+)&gt;", data)
     if bgcolor:
         cel_style += 'background: ' + bgcolor.groups()[0] + ';'
         
@@ -118,8 +118,6 @@ def table_start(data):
         table = re.search('\n((?:(?:(?:(?:\|\|)+(?:(?:(?!\|\|).(?:\n)*)*))+)\|\|(?:\n)?)+)', data)
         if table:
             table = table.groups()[0]
-            
-            # return [all_table, row_style, cel_style, row, cel, table_class, num]
             while 1:
                 all_table = re.search('^((?:\|\|)+)((?:&lt;(?:(?:(?!&gt;).)+)&gt;)*)\n*((?:(?!\|\|).\n*)*)', table)
                 if all_table:
@@ -166,45 +164,44 @@ def table_start(data):
 def middle_parser(data):
     global end_data
 
-    # 중괄호 문법 처리
     middle_stack = 0
     middle_list = []
     middle_number = 0
     fol_num = 0
     while 1:
-        middle_data = re.search('(?:{{{((?:(?! |{{{|}}}).)*) ?|(}}}))', data)
+        middle_data = re.search('(?:{{{((?:(?! |{{{|}}}|&lt;).)*) ?|(}}}))', data)
         if middle_data:
             middle_data = middle_data.groups()
             if not middle_data[1]:
                 if middle_stack > 0:
                     middle_stack += 1
                     
-                    data = re.sub('(?:{{{((?:(?! |{{{|}}}).)*)(?P<in> ?)|(}}}))', '&#123;&#123;&#123;' + middle_data[0] + '\g<in>', data, 1)
+                    data = re.sub('(?:{{{((?:(?! |{{{|}}}|&lt;).)*)(?P<in> ?)|(}}}))', '&#123;&#123;&#123;' + middle_data[0] + '\g<in>', data, 1)
                 else:
                     if re.search('^(#|@|\+|\-)', middle_data[0]) and not re.search('^(#|@|\+|\-){2}', middle_data[0]):
                         middle_search = re.search('^(#(?:[0-9a-f-A-F]{3}){1,2})', middle_data[0])
                         if middle_search:                            
                             middle_list += ['span']
                             
-                            data = re.sub('(?:{{{((?:(?! |{{{|}}}).)*) ?|(}}}))', '<span style="color: ' + middle_search.groups()[0] + ';">', data, 1)
+                            data = re.sub('(?:{{{((?:(?! |{{{|}}}|&lt;).)*) ?|(}}}))', '<span style="color: ' + middle_search.groups()[0] + ';">', data, 1)
                         else:
                             middle_search = re.search('^(?:#(\w+))', middle_data[0])
                             if middle_search:
                                 middle_list += ['span']
                                 
-                                data = re.sub('(?:{{{((?:(?! |{{{|}}}).)*) ?|(}}}))', '<span style="color: ' + middle_search.groups()[0] + ';">', data, 1)
+                                data = re.sub('(?:{{{((?:(?! |{{{|}}}|&lt;).)*) ?|(}}}))', '<span style="color: ' + middle_search.groups()[0] + ';">', data, 1)
                             else:
                                 middle_search = re.search('^(?:@((?:[0-9a-f-A-F]{3}){1,2}))', middle_data[0])
                                 if middle_search:
                                     middle_list += ['span']
                                     
-                                    data = re.sub('(?:{{{((?:(?! |{{{|}}}).)*) ?|(}}}))', '<span style="background: #' + middle_search.groups()[0] + ';">', data, 1)
+                                    data = re.sub('(?:{{{((?:(?! |{{{|}}}|&lt;).)*) ?|(}}}))', '<span style="background: #' + middle_search.groups()[0] + ';">', data, 1)
                                 else:
                                     middle_search = re.search('^(?:@(\w+))', middle_data[0])
                                     if middle_search:
                                         middle_list += ['span']
                                         
-                                        data = re.sub('(?:{{{((?:(?! |{{{|}}}).)*) ?|(}}}))', '<span style="background: ' + middle_search.groups()[0] + ';">', data, 1)
+                                        data = re.sub('(?:{{{((?:(?! |{{{|}}}|&lt;).)*) ?|(}}}))', '<span style="background: ' + middle_search.groups()[0] + ';">', data, 1)
                                     else:
                                         middle_search = re.search('^(\+|-)([1-5])', middle_data[0])
                                         if middle_search:
@@ -216,7 +213,7 @@ def middle_parser(data):
 
                                             middle_list += ['span']
                                             
-                                            data = re.sub('(?:{{{((?:(?! |{{{|}}}).)*) ?|(}}}))', '<span style="font-size: ' + font_size + '%;">', data, 1)
+                                            data = re.sub('(?:{{{((?:(?! |{{{|}}}|&lt;).)*) ?|(}}}))', '<span style="font-size: ' + font_size + '%;">', data, 1)
                                         else:
                                             middle_search = re.search('^#!wiki', middle_data[0])
                                             if middle_search:
@@ -240,13 +237,13 @@ def middle_parser(data):
 
                                                     middle_list += ['pre']
                                                     
-                                                    data = re.sub('{{{#!syntax ((?:(?!\n).)+)\n?', '<pre id="syntax"><code class="' + middle_data_2[0] + '">', data, 1)
+                                                    data = re.sub('{{{#!syntax ?((?:(?!\n).)*)\n?', '<pre id="syntax"><code class="' + middle_data_2[0] + '">', data, 1)
                                                 else:
                                                     middle_search = re.search('^#!html', middle_data[0])
                                                     if middle_search:
                                                         middle_list += ['span']
                                                         
-                                                        data = re.sub('(?:{{{((?:(?! |{{{|}}}).)*) ?|(}}}))', '<span>', data, 1)
+                                                        data = re.sub('(?:{{{((?:(?! |{{{|}}}|&lt;).)*) ?|(}}}))', '<span id="html">', data, 1)
                                                     else:
                                                         middle_search = re.search('^#!folding', middle_data[0])
                                                         if middle_search:
@@ -258,46 +255,45 @@ def middle_parser(data):
                                                             else:
                                                                 folding_data = ['Test']
                                                             
-                                                            data = re.sub('{{{#!folding ?((?:(?!\n).)*)\n?', '<div>' + str(folding_data[0]) + ' <div style="display: inline-block;"><a href="javascript:void(0);" onclick="folding(' + str(fol_num) + ');">[Work]</a></div_end><div id="folding_' + str(fol_num) + '" style="display: none;"><div id="wiki_div" style="">', data, 1)
+                                                            data = re.sub('{{{#!folding ?((?:(?!\n).)*)\n?', '<div>' + str(folding_data[0]) + ' <div style="display: inline-block;"><a href="javascript:void(0);" onclick="folding(' + str(fol_num) + ');">[do]</a></div_end><div id="folding_' + str(fol_num) + '" style="display: none;"><div id="wiki_div" style="">', data, 1)
                                                             
                                                             fol_num += 1
                                                         else:
                                                             middle_list += ['span']
 
-                                                            data = re.sub('(?:{{{((?:(?! |{{{|}}}).)*) ?|(}}}))', '<span>', data, 1)
+                                                            data = re.sub('(?:{{{((?:(?! |{{{|}}}|&lt;).)*) ?|(}}}))', '<span>', data, 1)
                     else:
                         middle_list += ['code']
                         
                         middle_stack += 1
                         
-                        data = re.sub('(?:{{{((?:(?! |{{{|}}}).)*)|(}}}))', '<code>' + middle_data[0].replace('\\', '\\\\'), data, 1)
+                        data = re.sub('(?:{{{((?:(?! |{{{|}}}|&lt;).)*)|(}}}))', '<code>' + middle_data[0].replace('\\', '\\\\'), data, 1)
                 
                     middle_number += 1
             else:
                 if middle_list == []:
-                    data = re.sub('(?:{{{((?:(?! |{{{|}}}).)*) ?|(}}}))', '&#125;&#125;&#125;', data, 1)
+                    data = re.sub('(?:{{{((?:(?! |{{{|}}}|&lt;).)*) ?|(}}}))', '&#125;&#125;&#125;', data, 1)
                 else:
                     if middle_stack > 0:
                         middle_stack -= 1
 
                     if middle_stack > 0:
-                        data = re.sub('(?:{{{((?:(?! |{{{|}}}).)*) ?|(}}}))', '&#125;&#125;&#125;', data, 1)
+                        data = re.sub('(?:{{{((?:(?! |{{{|}}}|&lt;).)*) ?|(}}}))', '&#125;&#125;&#125;', data, 1)
                     else:                    
                         if middle_number > 0:
                             middle_number -= 1
                             
                         if middle_list[middle_number] == '2div':
-                            data = re.sub('(?:{{{((?:(?! |{{{|}}}).)*) ?|(}}}))', '</div_end></div_end></div_end>', data, 1)
+                            data = re.sub('(?:{{{((?:(?! |{{{|}}}|&lt;).)*) ?|(}}}))', '</div_end></div_end></div_end>', data, 1)
                         elif middle_list[middle_number] == 'pre':
-                            data = re.sub('(?:{{{((?:(?! |{{{|}}}).)*) ?|(}}}))', '</code></pre>', data, 1)
+                            data = re.sub('(?:{{{((?:(?! |{{{|}}}|&lt;).)*) ?|(}}}))', '</code></pre>', data, 1)
                         else:
-                            data = re.sub('(?:{{{((?:(?! |{{{|}}}).)*) ?|(}}}))', '</' + middle_list[middle_number] + '>', data, 1)
+                            data = re.sub('(?:{{{((?:(?! |{{{|}}}|&lt;).)*) ?|(}}}))', '</' + middle_list[middle_number] + '>', data, 1)
                         
                         del(middle_list[middle_number])
         else:
             break
 
-    # NoWiki 처리
     num = 0
     while 1:
         nowiki_data = re.search('<code>((?:(?:(?!<\/code>).)*\n*)*)<\/code>', data)
@@ -312,7 +308,6 @@ def middle_parser(data):
         else:
             break
 
-    # Syntax 처리
     num = 0
     while 1:
         syntax_data = re.search('<code class="((?:(?!").)+)">((?:(?:(?:(?!<\/code>|<span id="syntax_)).)+\n*)+)<\/code>', data)
@@ -324,6 +319,41 @@ def middle_parser(data):
             end_data += [['syntax_' + str(num), syntax_data[1], 'normal']]
 
             data = re.sub('<code class="((?:(?!").)+)">((?:(?:(?:(?!<\/code>|<span id="syntax_)).)+\n*)+)<\/code>', '<code class="' + syntax_data[0] + '"><span id="syntax_' + str(num) + '"></span></code>', data, 1)
+        else:
+            break
+
+    while 1:
+        html_data = re.search('<span id="html">((?:(?:(?:(?!<\/span>)).)+\n*)+)<\/span>', data)
+        if html_data:
+            html_data = html_data.groups()
+            html_data_2 = html_data[0]
+
+            can_html = ['b', 'span']
+            dic = {}
+
+            for i in can_html:
+                while 1:
+                    test = re.search('&lt;' + i + '((?:(?!&gt;).)*)&gt;', html_data_2)
+                    if test:
+                        test = test.groups()[0]
+                        test = re.sub('&quot;', '"', test)
+                        
+                        html_data_2 = re.sub('&lt;' + i + '((?:(?!&gt;).)*)&gt;', '<' + i + test + '>', html_data_2, 1)
+                    else:
+                        break
+
+            for i in can_html:
+                span_num = re.findall('<' + i + '(?:(?:(?!>).)*)>', html_data_2)
+                span_num = len(span_num)
+                span_end_num = re.findall('<\/' + i + '>', html_data_2)
+                span_end_num = len(span_end_num)
+                
+                dic[i] = span_num - span_end_num
+
+            for i in can_html:
+                html_data_2 += ('</' + i + '>' * dic[i])
+
+            data = re.sub('<span id="html">((?:(?:(?:(?!<\/span>)).)+\n*)+)<\/span>', '<span id="end_html">' + html_data_2 + '<\/span>', data, 1)
         else:
             break
 
@@ -348,46 +378,27 @@ def link_fix(main_link):
     return [main_link, other_link]
 
 def namu(conn, data, title, main_num):
-    # DB 지정
     curs = conn.cursor()
 
-    # 초기 설정
     data = '\n' + data + '\n'
     backlink = []
     plus_data = '''
                 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css">
                 <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
-                <script>
-                    hljs.initHighlightingOnLoad(); 
-                    function folding(num) { 
-                        var fol = document.getElementById('folding_' + num); 
-                        if(fol.style.display == 'inline-block' || fol.style.display == 'block') { 
-                            fol.style.display = 'none';
-                        } else {
-                            if(num % 2 == 0) { 
-                                fol.style.display = 'block'; 
-                            } else { 
-                                fol.style.display = 'inline-block'; 
-                            } 
-                        } 
-                    }
-                </script>
+                <script src="/views/main_css/parser.js"></script>
                 '''
     global end_data
     end_data = []
     
-    # XSS 이스케이프
     data = html.escape(data)
 
-    # 개행 정리 1
     data = re.sub('\r\n', '\n', data)
 
-    # 중괄호 파싱 1
     data = middle_parser(data)
 
-    # 포함 문법 처리
+    include_re = re.compile('\[include\(((?:(?!\)\]).)+)\)\]', re.I)
     while 1:
-        include = re.search('\[include\(((?:(?!\)\]).)+)\)\]', data)
+        include = include_re.search(data)
         if include:
             include = include.groups()[0]
     
@@ -403,7 +414,6 @@ def namu(conn, data, title, main_num):
 
             include = re.sub('^((?:(?!,).)+)', '', include)
             
-            # 틀 NoWiki
             num = 0
             while 1:
                 include_one_nowiki = re.search('(?:\\\\){2}(.)', include)
@@ -436,23 +446,19 @@ def namu(conn, data, title, main_num):
                 include_parser = re.sub('\[\[(?:category|분류):(((?!\]\]|#include).)+)\]\]', '', include_parser)
                 include_parser = html.escape(include_parser)
 
-                data = re.sub('\[include\(((?:(?!\)\]).)+)\)\]', '<include>\n<a id="include_link" href="/w/' + tool.url_pas(include_link) + '">[' + include_link + ']</a>\n' + include_parser + '\n</include>', data, 1)
+                data = include_re.sub('<include>\n<a id="include_link" href="/w/' + tool.url_pas(include_link) + '">[' + include_link + ']</a>\n' + include_parser + '\n</include>', data, 1)
             else:
-                data = re.sub('\[include\(((?:(?!\)\]).)+)\)\]', '<a id="not_thing" href="/w/' + tool.url_pas(include_link) + '">' + include_link + '</a>', data, 1)
+                data = include_re.sub('<a id="not_thing" href="/w/' + tool.url_pas(include_link) + '">' + include_link + '</a>', data, 1)
         else:
             break
 
-    # 개행 정리 2
     data = re.sub('\r\n', '\n', data)
 
-    # 중괄호 파싱 2
     data = middle_parser(data)
 
-    # 기타 처리
     data = re.sub('&amp;', '&', data)
 
-    # HTML 허용
-    curs.execute('select html from html_filter')
+    curs.execute('select html from html_filter where kind = ""')
     html_db = curs.fetchall()
 
     src_list = ["www.youtube.com", "serviceapi.nmv.naver.com", "tv.kakao.com", "www.google.com", "serviceapi.rmcnmv.naver.com"]
@@ -483,14 +489,11 @@ def namu(conn, data, title, main_num):
     position = re.compile('position', re.I)
     data = position.sub('', data)
 
-    # 표 정리
     data = re.sub('\n( +)\|\|', '\n||', data)
     data = re.sub('\|\|( +)\n', '||\n', data)
 
-    # 주석 처리
     data = re.sub('\n##(((?!\n).)+)', '', data)
            
-    # 이중 표 처리
     while 1:
         wiki_table_data = re.search('<div id="wiki_div" ((?:(?!>).)+)>((?:(?!<div id="wiki_div"|<\/div_end>).\n*)+)<\/div_end>', data)
         if wiki_table_data:
@@ -507,32 +510,27 @@ def namu(conn, data, title, main_num):
     data = re.sub('<\/div_end>', '</div>', data)
     data = re.sub('<\/td>', '</td_end>', data)
     
-    # 수식 처리
     first = 0
+    math_re = re.compile('\[math\(((?:(?!\)\]).)+)\)\]', re.I)
     while 1:
-        math = re.search('&lt;math&gt;((?:(?!&lt;\/math&gt;).)+)&lt;\/math&gt;', data)
+        math = math_re.search(data)
         if math:
             if first == 0:
                 plus_data +=    '''
-                                <link   rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.css"
-                                        integrity="sha384-TEMocfGvRuD1rIAacqrknm5BQZ7W7uWitoih+jMNFXQIbNl16bO8OZmylH/Vi/Ei"
-                                        crossorigin="anonymous">
-                                <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.js" 
-                                        integrity="sha384-jmxIlussZWB7qCuB+PgKG1uLjjxbVVIayPJwi6cG6Zb4YKq0JIw+OMnkkEC7kYCq"
-                                        crossorigin="anonymous"></script>
+                                <link rel="stylesheet" href="/views/main_css/katex/katex.min.css">
+                                <script src="/views/main_css/katex/katex.min.js"></script>
                                 '''
 
             math = math.groups()[0]
             
             first += 1
             
-            data = re.sub('&lt;math&gt;((?:(?!&lt;\/math&gt;).)+)&lt;\/math&gt;', '<span id="math_' + str(first) + '"></span>', data, 1)
+            data = math_re.sub('<span id="math_' + str(first) + '"></span>', data, 1)
 
             plus_data += '<script>katex.render("' + math.replace('\\', '\\\\').replace('&lt;', '<').replace('&gt;', '>') +'", document.getElementById("math_' + str(first) + '"));</script>'
         else:
             break
             
-    # 한 글자 NoWiki
     num = 0
     while 1:
         one_nowiki = re.search('(?:\\\\)(.)', data)
@@ -547,7 +545,6 @@ def namu(conn, data, title, main_num):
         else:
             break
 
-    # 수평줄
     while 1:
         hr = re.search('\n-{4,9}\n', data)
         if hr:
@@ -557,10 +554,8 @@ def namu(conn, data, title, main_num):
 
     data += '\n'
 
-    # 추가 이스케이프
     data = data.replace('\\', '&#92;')
 
-    # 텍스트 꾸미기 문법
     data = re.sub('&#x27;&#x27;&#x27;(?P<in>((?!&#x27;&#x27;&#x27;).)+)&#x27;&#x27;&#x27;', '<b>\g<in></b>', data)
     data = re.sub('&#x27;&#x27;(?P<in>((?!&#x27;&#x27;).)+)&#x27;&#x27;', '<i>\g<in></i>', data)
     data = re.sub('~~(?P<in>(?:(?!~~).)+)~~', '<s>\g<in></s>', data)
@@ -569,8 +564,8 @@ def namu(conn, data, title, main_num):
     data = re.sub('\^\^(?P<in>(?:(?!\^\^).)+)\^\^', '<sup>\g<in></sup>', data)
     data = re.sub(',,(?P<in>(?:(?!,,).)+),,', '<sub>\g<in></sub>', data)
 
-    # 넘겨주기 변환
-    redirect = re.search('\n#(?:redirect|넘겨주기) ((?:(?!\n).)+)\n', data)
+    redirect_re = re.compile('\n#(?:redirect|넘겨주기) ((?:(?!\n).)+)\n', re.I)
+    redirect = redirect_re.search(data)
     if redirect:
         redirect = redirect.groups()[0]
         
@@ -580,21 +575,21 @@ def namu(conn, data, title, main_num):
         
         backlink += [[title, main_link, 'redirect']]
         
-        data = re.sub('\n#(?:redirect|넘겨주기) (?P<in>(?:(?!\n).)+)\n', '<script>location.href="/w/' + tool.url_pas(main_link) + '?froms=' + tool.url_pas(title) + other_link + '";</script>', data, 1)
+        data = redirect_re.sub('\n * ' + title + ' - [[' + main_link + ']]\n', data, 1)
 
-    # [목차(없음)] 처리
-    if not re.search('\[(?:목차|tableofcontents)\((?:없음|no)\)\]\n', data):
-        if not re.search('\[(?:목차|tableofcontents)\]', data):
-            data = re.sub('\n(?P<in>={1,6}) ?(?P<out>(?:(?!=).)+) ?={1,6}\n', '\n[목차]\n\g<in> \g<out> \g<in>\n', data, 1)
+    no_toc_re = re.compile('\[(?:목차|toc)\((?:no)\)\]\n', re.I)
+    toc_re = re.compile('\[(?:목차|toc)\]', re.I)
+    if not no_toc_re.search(data):
+        if not toc_re.search(data):
+            data = re.sub('\n(?P<in>={1,6}) ?(?P<out>(?:(?!=).)+) ?={1,6}\n', '\n[toc]\n\g<in> \g<out> \g<in>\n', data, 1)
     else:
-        data = re.sub('\[(?:목차|tableofcontents)\((?:없음|no)\)\]\n', '', data)
+        data = no_toc_re.sub('', data)
         
-    # 문단 문법
     toc_full = 0
     toc_top_stack = 6
     toc_stack = [0, 0, 0, 0, 0, 0]
     edit_number = 0
-    toc_data = '<div id="toc"><span style="font-size: 18px;">TOC</span>\n\n'
+    toc_data = '<div id="toc"><span style="font-size: 18px;">toc</span>\n\n'
     while 1:
         toc = re.search('\n(={1,6}) ?((?:(?!\n).)+) ?\n', data)
         if toc:
@@ -603,7 +598,6 @@ def namu(conn, data, title, main_num):
             toc_number = len(toc[0])
             edit_number += 1
 
-            # 더 크면 그 전 스택은 초기화
             if toc_full > toc_number:
                 for i in range(toc_number, 6):
                     toc_stack[i] = 0
@@ -616,7 +610,6 @@ def namu(conn, data, title, main_num):
             toc_number = str(toc_number)
             all_stack = ''
 
-            # 스택 합치기
             for i in range(0, 6):
                 all_stack += str(toc_stack[i]) + '.'
 
@@ -641,27 +634,27 @@ def namu(conn, data, title, main_num):
 
     toc_data += '</div>'
     
-    data = re.sub('\[(?:목차|tableofcontents)\]', toc_data, data)
+    data = toc_re.sub(toc_data, data)
 
-    # 일부 매크로 처리
     data = tool.savemark(data)
     
-    data = re.sub("\[anchor\((?P<in>(?:(?!\)\]).)+)\)\]", '<span id="\g<in>"></span>', data)          
-    data = re.sub('\[ruby\((?P<in>(?:(?!,).)+)\, ?(?P<out>(?:(?!\)\]).)+)\)\]', '<ruby>\g<in><rp>(</rp><rt>\g<out></rt><rp>)</rp></ruby>', data)
+    anchor_re = re.compile("\[anchor\((?P<in>(?:(?!\)\]).)+)\)\]", re.I)
+    data = anchor_re.sub('<span id="\g<in>"></span>', data)
 
-    # 글 상자 끼어들기
-    data = re.sub('{{\|(?P<in>(?:(?:(?!\|}}).)*\n*)+)\|}}', '<table><tbody><tr><td>\g<in></td></tbody></table>', data)
+    ruby_re = re.compile("\[ruby\((?P<in>(?:(?!,).)+)\, ?(?P<out>(?:(?!\)\]).)+)\)\]", re.I)
+    data = ruby_re.sub('<ruby>\g<in><rp>(</rp><rt>\g<out></rt><rp>)</rp></ruby>', data)
 
-    # 원래 코드 재탕
     now_time = tool.get_time()
 
-    data = re.sub('\[date\]', now_time, data)
+    date_re = re.compile('\[date\]', re.I)
+    data = date_re.sub(now_time, data)
     
     time_data = re.search('^([0-9]{4}-[0-9]{2}-[0-9]{2})', now_time)
     time = time_data.groups()
     
+    age_re = re.compile('\[age\(([0-9]{4}-[0-9]{2}-[0-9]{2})\)\]', re.I)
     while 1:
-        age_data = re.search('\[age\(([0-9]{4}-[0-9]{2}-[0-9]{2})\)\]', data)
+        age_data = age_re.search(data)
         if age_data:
             age = age_data.groups()[0]
 
@@ -670,12 +663,13 @@ def namu(conn, data, title, main_num):
             
             e_data = old - will
             
-            data = re.sub('\[age\(([0-9]{4})-([0-9]{2})-([0-9]{2})\)\]', str(int(e_data.days / 365)), data, 1)
+            data = age_re.sub(str(int(e_data.days / 365)), data, 1)
         else:
             break
 
+    dday_re = re.compile('\[dday\(([0-9]{4}-[0-9]{2}-[0-9]{2})\)\]', re.I)
     while 1:
-        dday_data = re.search('\[dday\(([0-9]{4}-[0-9]{2}-[0-9]{2})\)\]', data)
+        dday_data = dday_re.search(data)
         if dday_data:
             dday = dday_data.groups()[0]
 
@@ -689,13 +683,15 @@ def namu(conn, data, title, main_num):
             else:
                 e_day = '+' + str(e_data.days)
 
-            data = re.sub('\[dday\(([0-9]{4}-[0-9]{2}-[0-9]{2})\)\]', e_day, data, 1)
+            data = dday_re.sub(e_day, data, 1)
         else:
             break
 
-    # 유튜브, 카카오 티비 처리
+    video_re = re.compile('\[(youtube|kakaotv|nicovideo)\(((?:(?!\)\]).)+)\)\]', re.I)
+    youtube_re = re.compile('youtube', re.I)
+    kakaotv_re = re.compile('kakaotv', re.I)
     while 1:
-        video = re.search('\[(youtube|kakaotv|nicovideo)\(((?:(?!\)\]).)+)\)\]', data)
+        video = video_re.search(data)
         if video:
             video = video.groups()
             
@@ -711,21 +707,18 @@ def namu(conn, data, title, main_num):
             else:
                 video_height = '315'
 
-            code = re.search('^(((?!,).)+)', video[1])
+            code = re.search('^((?:(?!,).)+)', video[1])
             if code:
                 video_code = code.groups()[0]
             else:
-                if video[0] == 'youtube':
-                    video_code = 'BQ5PcIUcdUE'
-                else:
-                    video_code = '66861302'
+                video_code = ''
 
-            if video[0] == 'youtube':
+            if youtube_re.search(video[0]):
                 video_code = re.sub('^https:\/\/www\.youtube\.com\/watch\?v=', '', video_code)
                 video_code = re.sub('^https:\/\/youtu\.be\/', '', video_code)
                 
                 video_src = 'https://www.youtube.com/embed/' + video_code
-            elif video[0] == 'kakaotv':
+            elif kakaotv_re.search(video[0]):
                 video_code = re.sub('^https:\/\/tv\.kakao\.com\/channel\/9262\/cliplink\/', '', video_code)
                 video_code = re.sub('^http:\/\/tv\.kakao\.com\/v\/', '', video_code)
                 
@@ -733,11 +726,10 @@ def namu(conn, data, title, main_num):
             else:
                 video_src = 'https://embed.nicovideo.jp/watch/' + video_code
                 
-            data = re.sub('\[(youtube|kakaotv|nicovideo)\(((?:(?!\)\]).)+)\)\]', '<iframe width="' + video_width + '" height="' + video_height + '" src="' + video_src + '" allowfullscreen frameborder="0"></iframe>', data, 1)
+            data = video_re.sub('<iframe width="' + video_width + '" height="' + video_height + '" src="' + video_src + '" allowfullscreen frameborder="0"></iframe>', data, 1)
         else:
             break
 
-    # 인용문 구현
     while 1:
         block = re.search('(\n(?:&gt; ?(?:(?:(?!\n).)+)?\n)+)', data)
         if block:
@@ -753,7 +745,6 @@ def namu(conn, data, title, main_num):
 
     data = re.sub('(?P<in>\n +\* ?(?:(?:(?!\|\|).)+))\|\|', '\g<in>\n ||', data)
 
-    # 리스트 구현
     while 1:
         li = re.search('(\n(?:(?: *)\* ?(?:(?:(?!\n).)+)\n)+)', data)
         if li:
@@ -763,7 +754,6 @@ def namu(conn, data, title, main_num):
                 if sub_li:
                     sub_li = sub_li.groups()
 
-                    # 앞의 공백 만큼 margin 먹임
                     if len(sub_li[0]) == 0:
                         margin = 20
                     else:
@@ -779,24 +769,21 @@ def namu(conn, data, title, main_num):
 
     data = re.sub('<\/ul>\n \|\|', '</ul>||', data)
 
-    # 들여쓰기 구현
     while 1:
         indent = re.search('\n( +)', data)
         if indent:
             indent = len(indent.groups()[0])
             
-            # 앞에 공백 만큼 margin 먹임
             margin = '<span style="margin-left: 20px;"></span>' * indent
             
             data = re.sub('\n( +)', '\n' + margin, data, 1)
         else:
             break
 
-    # 표 처리
     data = table_start(data)
 
-    # 링크 관련 문법 구현
-    category = '\n<hr><div id="cate">Category : '
+    category = '\n<hr><div id="cate">category : '
+    category_re = re.compile('^(?:category|분류):', re.I)
     while 1:
         link = re.search('\[\[((?:(?!\[\[|\]\]).)+)\]\]', data)
         if link:
@@ -868,9 +855,9 @@ def namu(conn, data, title, main_num):
                     data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<span style="' + file_align + '"><img style="' + file_style + '" alt="' + file_alt + '" src="' + file_src + '"></span>', data, 1)
                 else:
                     data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<a id="not_thing" href="/w/' + tool.url_pas(file_alt) + '">' + file_alt + '</a>', data, 1)
-            elif re.search('^(?:category|분류):', main_link):
+            elif category_re.search(main_link):
                 see_link = re.sub('#include', '', see_link)
-                main_link = re.sub('#include', '', re.sub('^(?:category|분류):', 'category:', main_link))
+                main_link = re.sub('#include', '', category_re.sub('category:', main_link))
 
                 if re.search('#blur', main_link):
                     see_link = 'Hidden'
@@ -882,7 +869,7 @@ def namu(conn, data, title, main_num):
 
                 backlink += [[title, main_link, 'cat']]
 
-                category += '<a ' + link_id + ' href="' + tool.url_pas(main_link) + '">' + re.sub('^(?:category|분류):', '', see_link) + '</a> / '
+                category += '<a ' + link_id + ' href="' + tool.url_pas(main_link) + '">' + category_re.sub('', see_link) + '</a> / '
                 data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '', data, 1)
             elif re.search('^wiki:', main_link):
                 data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<a id="inside" href="/' + tool.url_pas(re.sub('^wiki:', '', main_link)) + '">' + see_link + '</a>', data, 1)
@@ -944,17 +931,16 @@ def namu(conn, data, title, main_num):
         else:
             break
 
-    # br 처리
-    data = re.sub("\[br\]", '<br>', data)
+    br_re = re.compile('\[br\]', re.I)
+    data = br_re.sub('<br>', data)
             
-    # 각주 처리
     footnote_number = 0
     footnote_all = []
     footnote_dict = {}
     footnote_re = {}
     footdata_all = '\n<hr><ul id="footnote_data">'
     while 1:
-        footnote = re.search('(?:\[\*((?:(?! |\]).)*)(?: ((?:(?!(\[\*(?:(?:(?!\]).)+)\]|\])).)+))?\]|(\[(?:각주|footnote)\]))', data)
+        footnote = re.search('(?:\[\*((?:(?! |\]).)*)(?: ((?:(?!(?:\[\*(?:(?:(?!\]).)+)\]|\])).)+))?\]|(\[(?:각주|footnote)\]))', data)
         if footnote:
             footnote_data = footnote.groups()
             if footnote_data[2]:
@@ -984,9 +970,9 @@ def namu(conn, data, title, main_num):
 
                         footnote_all += [[float(footshort), footshort, 0]]
 
-                        data = re.sub('(?:\[\*((?:(?! |\]).)*)(?: ((?:(?!(\[\*(?:(?:(?!\]).)+)\]|\])).)+))?\]|(\[(?:각주|footnote)\]))', '<sup><a href="#fn-' + footshort + '" id="rfn-' + footshort + '">(' + footshort + ')</a></sup>', data, 1)
+                        data = re.sub('(?:\[\*((?:(?! |\]).)*)(?: ((?:(?!(?:\[\*(?:(?:(?!\]).)+)\]|\])).)+))?\]|(\[(?:각주|footnote)\]))', '<sup><a href="#fn-' + footshort + '" id="rfn-' + footshort + '">(' + footshort + ')</a></sup>', data, 1)
                     else:
-                        data = re.sub('(?:\[\*((?:(?! |\]).)*)(?: ((?:(?!(\[\*(?:(?:(?!\]).)+)\]|\])).)+))?\]|(\[(?:각주|footnote)\]))', '<sup><a href="#">(' + footnote_name + ')</a></sup>', data, 1)
+                        data = re.sub('(?:\[\*((?:(?! |\]).)*)(?: ((?:(?!(?:\[\*(?:(?:(?!\]).)+)\]|\])).)+))?\]|(\[(?:각주|footnote)\]))', '<sup><a href="#">(' + footnote_name + ')</a></sup>', data, 1)
                 else:
                     footnote_number += 1
 
@@ -1002,7 +988,7 @@ def namu(conn, data, title, main_num):
 
                     footnote_all += [[footnote_number, footnote_name, footnote]]
                     
-                    data = re.sub('(?:\[\*((?:(?! |\]).)*)(?: ((?:(?!(\[\*(?:(?:(?!\]).)+)\]|\])).)+))?\]|(\[(?:각주|footnote)\]))', '<sup><a href="#fn-' + str(footnote_number) + '" id="rfn-' + str(footnote_number) + '">(' + footnote_name + ')</a></sup>', data, 1)
+                    data = re.sub('(?:\[\*((?:(?! |\]).)*)(?: ((?:(?!(?:\[\*(?:(?:(?!\]).)+)\]|\])).)+))?\]|(\[(?:각주|footnote)\]))', '<sup><a href="#fn-' + str(footnote_number) + '" id="rfn-' + str(footnote_number) + '">(' + footnote_name + ')</a></sup>', data, 1)
         else:
             break
 
@@ -1024,16 +1010,14 @@ def namu(conn, data, title, main_num):
 
     data = re.sub('\n$', footdata_all, data + '\n', 1)
 
-    # 분류 마지막 처리
     category += '</div>'
     category = re.sub(' / <\/div>$', '</div>', category)
 
-    if category == '\n<hr><div id="cate">Category : </div>':
+    if category == '\n<hr><div id="cate">category : </div>':
         category = ''
 
     data += category
     
-    # NoWiki 마지막 처리
     i = 0
     while 1:
         try:
@@ -1053,7 +1037,6 @@ def namu(conn, data, title, main_num):
         i += 1
 
     if main_num == 1:
-        # 역링크에도
         i = 0
         while 1:
             try:
@@ -1079,14 +1062,13 @@ def namu(conn, data, title, main_num):
 
             i += 1
     
-    # 마지막 처리
     data = re.sub('<\/td_end>', '</td>', data)
     data = re.sub('<include>\n', '', data)
     data = re.sub('\n<\/include>', '', data)
     
     data = re.sub('(?P<in><\/h[0-9]>)(\n)+', '\g<in>', data)
     data = re.sub('\n\n<ul>', '\n<ul>', data)
-    data = re.sub('<\/ul>\n\n', '</ul>\n', data)
+    data = re.sub('<\/ul>\n\n', '</ul>', data)
     data = re.sub('^(\n)+', '', data)
     data = re.sub('(\n)+<hr><ul id="footnote_data">', '<hr><ul id="footnote_data">', data)
     data = re.sub('(?P<in><td(((?!>).)*)>)\n', '\g<in>', data)

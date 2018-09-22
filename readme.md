@@ -1,15 +1,15 @@
 ﻿## Intro
-NamuMark based wiki engine returns to Python. (3.5 and above)
+NamuMark based wiki engine returns to Python. (Python 3.5 or later)
 
 ## Clone command
 ### Stable
- * `git clone https://github.com/2DU/openNAMU.git`
+ * `git clone -b stable https://github.com/2du/opennamu.git`
 
 ### Master
- * `git clone -b master https://github.com/2DU/openNAMU.git`
+ * `git clone -b master https://github.com/2du/opennamu.git`
 
 ## Install
- * [Reference](https://en.namu.ml/w/openNAMU%2FInstall)
+ * [Reference](https://namu.ml/w/opennamu%2FInstall)
  
 ## set.json Explanation
  * db = Database Name
@@ -21,4 +21,4 @@ You can create a new set.json by deleting it.
  * The first registor is granted owner privileges.
 
 ## 한국어
- * [참조](https://github.com/2DU/openNAMU/blob/master/Readme-Ko.md)
+ * [참조](https://github.com/2DU/opennamu/blob/master/Readme-Ko.md)

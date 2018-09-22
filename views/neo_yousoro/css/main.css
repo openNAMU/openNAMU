@@ -1,0 +1,317 @@
+body {
+    max-width: 100%;
+    word-break: break-all;
+    word-wrap: break-word;
+    margin: 0;
+    font-family: '나눔고딕', 'nanumgothic', "Nanum Gothic","KoPub Dotum","Malgun Gothic","맑은 고딕",sans-serif;
+}
+
+ul {
+    padding: 0;
+    padding-left: 10px;
+}
+
+input {
+    padding: 5px;
+}
+
+select {
+    padding: 5px;
+}
+
+hr {
+    border: 0;
+    border-top: 1px solid gainsboro;
+}
+
+button {
+    padding: 10px;
+    border: 2px solid gainsboro;
+    background: white;
+    cursor: pointer;
+}
+
+code {
+    background: gainsboro;
+}
+
+td {
+    border: 1px solid gainsboro;
+}
+
+li {
+    margin-left: 20px;
+}
+
+#background {
+    background: gainsboro;
+}
+
+#top {
+    width: 100%;
+    border-bottom: 2px solid gainsboro;
+    background: #fff;
+    padding: 10px;
+    padding-right: 0;
+    padding-left: 0;
+    position: relative;
+    top: 0;
+    left: 0;
+    height: 20px;
+}
+
+#main {
+    margin: auto;
+    margin-top: -20px;
+    padding: 10px;
+    padding-bottom: 20px;
+    background: white;
+}
+
+#bottom {
+    width: 100%;
+    border-top: 2px solid gainsboro;
+    background: white;
+    padding-bottom: 20px;
+}
+
+#top_main {
+    margin: auto;
+}
+
+#bottom_main {
+    margin: auto;
+    margin-top: 20px;
+}
+
+#tool {
+    float: right;
+    border: 2px solid gainsboro;
+    padding: 10px;
+}
+
+@media (min-width: 1024px) and (max-width: 1600px) {
+    #main {
+        border-left: 2px solid gainsboro;
+        border-right: 2px solid gainsboro;
+        width: 70%;
+    }
+
+    #top_main {
+        width: 70%;
+    }
+
+    #bottom_main {
+        width: 70%;
+    }
+
+    .is_mobile {
+        display: none;
+    }
+}
+
+@media (min-width: 1600px) {
+    #main {
+        border-left: 2px solid white;
+        border-right: 2px solid white;
+        width: 55%;
+    }
+
+    #top_main {
+        width: 55%;
+    }
+
+    #bottom_main {
+        width: 55%;
+    }
+
+    .is_mobile {
+        display: none;
+    }
+}
+
+@media (max-width: 1024px) {
+    #main {
+        width: 90%;
+    }
+
+    #top_main {
+        width: 90%;
+    }
+
+    #bottom_main {
+        width: 90%;
+    }
+
+    .not_mobile {
+        display: none;
+    }
+
+    #tool {
+        float: none;
+        width: 90%;
+        margin-bottom: 10px;
+    }
+}
+
+h1 {
+    border-bottom: 1px solid gainsboro;
+    padding-bottom: 10px;
+}
+
+h2 {
+    border-bottom: 1px solid gainsboro;
+    padding-bottom: 10px;
+}
+
+h3 {
+    border-bottom: 1px solid gainsboro;
+    padding-bottom: 10px;
+}
+
+h4 {
+    border-bottom: 1px solid gainsboro;
+    padding-bottom: 10px;
+}
+
+h5 {
+    border-bottom: 1px solid gainsboro;
+    padding-bottom: 10px;
+}
+
+h6 {
+    border-bottom: 1px solid gainsboro;
+    padding-bottom: 10px;
+}
+
+#tool_cel {
+    display: inline-block;
+}
+
+#main_top {
+    width: 100%;
+}
+
+#logo {
+    display: inline-block;
+}
+
+#top_tool {
+    float: right;
+    margin-top: -5px;
+}
+
+.cel_in_cel {
+    border: 2px solid gainsboro;
+    padding: 10px;
+    position: absolute;
+    background: white;
+    margin-top: 10px;
+    width: 100px;
+}
+
+#top_tool_cel {
+    display: inline-block;
+}
+
+#search {
+    display: inline-block;
+    width: 300px;
+}
+
+#mobile_search {
+    width: 100%;
+}
+
+#search_input {
+    width: 80%;
+}
+
+#search button {
+    padding: 0;
+    border: none;
+    background: transparent;
+}
+
+#mobile_search button {
+    padding: 0;
+    border: none;
+    background: transparent;
+}
+
+#mobile_button_first {
+    margin-top: 10px;
+}
+
+#top_tool_mobile {
+    float: right;
+}
+
+#mobile_menu {
+    width: 200px;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    right: 0;
+    background: white;
+    border-left: 2px solid gainsboro;
+}
+
+#mobile_menu_main {
+    width: 90%;
+    margin: auto;
+    margin-top: 5%;
+}
+
+#close_top {
+    float: right;
+    margin-right: 10px;
+}
+
+#toc {
+    max-width: 300px;
+}
+
+#top a {
+    color: black;
+}
+
+a {
+    color: dodgerblue;
+}
+
+#syntax {
+    background: #f0f0f0;
+    padding: 5px;
+}
+
+pre {
+    border: 2px solid gainsboro;
+}
+
+textarea {
+    border: 2px solid gainsboro;
+    font-family: '나눔고딕', 'nanumgothic', "Nanum Gothic","KoPub Dotum","Malgun Gothic","맑은 고딕",sans-serif;
+    padding: 5px;
+}
+
+input {
+    border: 2px solid gainsboro;
+    font-family: '나눔고딕', 'nanumgothic', "Nanum Gothic","KoPub Dotum","Malgun Gothic","맑은 고딕",sans-serif;
+}
+
+#toc {
+    border: 2px solid gainsboro;
+}
+
+#cate {
+    border: 2px solid gainsboro;
+}
+
+#syntax code {
+    background: transparent;
+}
+
+#redirect {
+    border: 2px solid gainsboro;
+}
