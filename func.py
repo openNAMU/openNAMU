@@ -129,7 +129,7 @@ def captcha_post(re_data, num = 1):
             if sec_re and sec_re[0][0] != '':
                 data = urllib.request.urlopen('https://www.google.com/recaptcha/api/siteverify?secret=' + sec_re[0][0] + '&response=' + re_data)
                 data = data.read().decode(data.headers.get_content_charset())
-                print(data)
+                data = json.loads(data)
                 if not data:
                     return 0
                 else:
