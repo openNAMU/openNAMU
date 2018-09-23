@@ -564,7 +564,7 @@ def acl_check(name, tool = ''):
     curs.execute('select data from other where name = "edit"')
     set_data = curs.fetchall()
     if set_data:
-        if set_data[0][0] == 'user':
+        if set_data[0][0] == 'login':
             if not user_data:
                 return 1
 
