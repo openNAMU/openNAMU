@@ -1588,7 +1588,7 @@ def revert(name = None):
                 leng = leng_check(len(data_old[0][0]), len(data[0][0]))
                 curs.execute("update data set data = ? where title = ?", [data[0][0], name])
             else:
-                leng = ' +' + str(len(data[0][0]))
+                leng = '+' + str(len(data[0][0]))
                 curs.execute("insert into data (title, data) values (?, ?)", [name, data[0][0]])
                 
             history_plus(
@@ -1676,7 +1676,7 @@ def edit(name = None):
                 
             curs.execute("update data set data = ? where title = ?", [content, name])
         else:
-            leng = ' +' + str(len(content))
+            leng = '+' + str(len(content))
             
             curs.execute("insert into data (title, data) values (?, ?)", [name, content])
 
