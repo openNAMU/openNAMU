@@ -500,82 +500,87 @@ def load_skin(data = ''):
 
 def acl_check(name, tool = ''):
     ip = ip_check()
-
-    if ban_check() == 1:
-        return 1
-
-    acl_c = re.search("^user:([^/]*)", name)
-    if acl_c:
-        acl_n = acl_c.groups()
-
-        if admin_check(5, None) == 1:
-            return 0
-
-        curs.execute("select dec from acl where title = ?", ['user:' + acl_n[0]])
+    
+    if tool == 'render':
+        curs.execute("select view from acl where title = ?", [name])
         acl_data = curs.fetchall()
         if acl_data:
-            if acl_data[0][0] == 'all':
-                return 0
-
-            if acl_data[0][0] == 'user' and not re.search("(\.|:)", ip):
-                return 0
-
-            if ip != acl_n[0] or re.search("(\.|:)", ip):
-                return 1
-        
-        if ip == acl_n[0] and not re.search("(\.|:)", ip) and not re.search("(\.|:)", acl_n[0]):
-            return 0
-        else:
-            return 1
-
-    file_c = re.search("^file:(.*)", name)
-    if file_c and admin_check(5, 'edit (' + name + ')') != 1:
-        return 1
-
-    curs.execute("select acl from user where id = ?", [ip])
-    user_data = curs.fetchall()
-
-    curs.execute("select dec, view from acl where title = ?", [name])
-    acl_data = curs.fetchall()
-    if acl_data:
-        if acl_data[0][0] == 'user':
-            if not user_data:
-                return 1
-
-        if acl_data[0][0] == 'admin':
-            if not user_data:
-                return 1
-
-            if not admin_check(5, 'edit (' + name + ')') == 1:
-                return 1
-
-        if tool == 'render':
-            if acl_data[0][1] == 'user':
+            if acl_data[0][0] == 'user':
                 if not user_data:
                     return 1
 
-            if acl_data[0][1] == 'admin':
+            if acl_data[0][0] == 'admin':
                 if not user_data:
                     return 1
 
                 if not admin_check(5, 'view (' + name + ')') == 1:
                     return 1
 
-    curs.execute('select data from other where name = "edit"')
-    set_data = curs.fetchall()
-    if set_data:
-        if set_data[0][0] == 'login':
-            if not user_data:
+        return 0
+    else:
+        if ban_check() == 1:
+            return 1
+
+        acl_c = re.search("^user:([^/]*)", name)
+        if acl_c:
+            acl_n = acl_c.groups()
+
+            if admin_check(5, None) == 1:
+                return 0
+
+            curs.execute("select dec from acl where title = ?", ['user:' + acl_n[0]])
+            acl_data = curs.fetchall()
+            if acl_data:
+                if acl_data[0][0] == 'all':
+                    return 0
+
+                if acl_data[0][0] == 'user' and not re.search("(\.|:)", ip):
+                    return 0
+
+                if ip != acl_n[0] or re.search("(\.|:)", ip):
+                    return 1
+            
+            if ip == acl_n[0] and not re.search("(\.|:)", ip) and not re.search("(\.|:)", acl_n[0]):
+                return 0
+            else:
                 return 1
 
-        if set_data[0][0] == 'admin':
-            if not user_data:
-                return 1
+        file_c = re.search("^file:(.*)", name)
+        if file_c and admin_check(5, 'edit (' + name + ')') != 1:
+            return 1
 
-            if not admin_check(5, None) == 1:
-                return 1
+        curs.execute("select acl from user where id = ?", [ip])
+        user_data = curs.fetchall()
 
-    return 0
+        curs.execute("select dec from acl where title = ?", [name])
+        acl_data = curs.fetchall()
+        if acl_data:
+            if acl_data[0][0] == 'user':
+                if not user_data:
+                    return 1
+
+            if acl_data[0][0] == 'admin':
+                if not user_data:
+                    return 1
+
+                if not admin_check(5, 'edit (' + name + ')') == 1:
+                    return 1
+
+        curs.execute('select data from other where name = "edit"')
+        set_data = curs.fetchall()
+        if set_data:
+            if set_data[0][0] == 'login':
+                if not user_data:
+                    return 1
+
+            if set_data[0][0] == 'admin':
+                if not user_data:
+                    return 1
+
+                if not admin_check(5, None) == 1:
+                    return 1
+
+        return 0
 
 def ban_check(ip = None, tool = None):
     if not ip:
