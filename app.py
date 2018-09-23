@@ -3801,7 +3801,8 @@ def user_info():
         data =  '''
                 <h2>''' + load_lang('state') + '''</h2>
                 <ul>
-                    <li>''' + ip_user + ''' <a href="/record/''' + url_pas(ip) + '''">(''' + load_lang('record') + ''')</a></li><li>''' + load_lang('authority') + ''' : ''' + acl + '''</li>
+                    <li>''' + ip_user + ''' <a href="/record/''' + url_pas(ip) + '''">(''' + load_lang('record') + ''')</a></li>
+                    <li>''' + load_lang('authority') + ''' : ''' + acl + '''</li>
                 </ul>
                 <br>
                 <h2>''' + load_lang('login') + '''</h2>
@@ -3812,7 +3813,15 @@ def user_info():
                 <h2>''' + load_lang('tool') + '''</h2>
                 <ul>
                     <li><a href="/acl/user:''' + url_pas(ip) + '">' + load_lang('user') + ' ' + load_lang('document') + ''' acl</a></li>
-                    <li><a href="/custom_head">''' + load_lang('user') + ''' head</a></li></ul><br><h2>''' + load_lang('other') + '''</h2><ul>''' + plus2 + '''<li><a href="/count">''' + load_lang('count') + '''</a></li>
+                    <li><a href="/custom_head">''' + load_lang('user') + ''' head</a></li>
+                </ul>
+                <br>
+                <h2>''' + load_lang('other') + '''</h2>
+                <ul>
+                ''' + plus2 + '''
+                <li>
+                    <a href="/count">''' + load_lang('count') + '''</a>
+                </li>
                 </ul>
                 ''',
         menu = 0
