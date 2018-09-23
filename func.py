@@ -476,7 +476,7 @@ def load_skin(data = ''):
         curs.execute('select data from user_set where name = "skin" and id = ?', [ip])
         data = curs.fetchall()
         for skin_data in os.listdir(os.path.abspath('views')):
-            if not skin_data == 'main_css':
+            if not skin_data == ('main_css' or 'easter_egg.html'):
                 if not data:
                     curs.execute('select data from other where name = "skin"')
                     sql_data = curs.fetchall()
@@ -490,7 +490,7 @@ def load_skin(data = ''):
                     div2 += '<option value="' + skin_data + '">' + skin_data + '</option>'
     else:
         for skin_data in os.listdir(os.path.abspath('views')):
-            if not skin_data == 'main_css':
+            if not skin_data == ('main_css' or 'easter_egg.html'):
                 if data == skin_data:
                     div2 = '<option value="' + skin_data + '">' + skin_data + '</option>' + div2
                 else:
