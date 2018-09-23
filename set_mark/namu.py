@@ -431,7 +431,7 @@ def namu(conn, data, title, main_num):
             curs.execute("select data from data where title = ?", [include_data])
             include_data = curs.fetchall()
             if include_data:
-                include_parser = include_data[0][0]
+                include_parser = include_re.sub('', include_data[0][0])
 
                 while 1:
                     include_plus = re.search(', ?((?:(?!=).)+)=((?:(?!,).)+)', include)
