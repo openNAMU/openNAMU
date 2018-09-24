@@ -58,7 +58,10 @@ def render_set(title = '', data = '', num = 0):
     if acl_check(title, 'render') == 1:
         return 'http request 401.3'
     else:
-        return namumark(title, data, num)
+        curs.execute('select data from other where name = "markup"')
+        markup = curs.fetchall()
+
+        return namumark(title, data, num, markup[0][0])
 
 def captcha_get():
     data = ''
