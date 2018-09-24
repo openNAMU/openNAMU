@@ -250,7 +250,7 @@ else:
     
     print('language : ' + str(rep_language))
 
-support_mark = ['namumark', 'html', 'markdown']
+support_mark = ['namumark', 'html']
 	
 curs.execute('select data from other where name = "markup"')
 rep_data = curs.fetchall()
