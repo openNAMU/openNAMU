@@ -896,20 +896,30 @@ def image_view(name = None):
 
 @app.route('/acl_list')
 def acl_list():
-    div = '<ul>'
+    div =   '''
+            <table id="main_table_set">
+                <tbody>
+                    <tr>
+                        <td id="main_table_width_quarter">''' + load_lang('document') + ' ' + load_lang('name') + '''</td>
+                        <td id="main_table_width_quarter">''' + load_lang('document') + ''' acl</td>
+                        <td id="main_table_width_quarter">''' + load_lang('discussion') + ''' acl</td>
+                        <td id="main_table_width_quarter">''' + load_lang('view') + ''' acl</td>
+            '''
     
-    curs.execute("select title, dec from acl where dec = 'admin' or dec = 'user' order by title desc")
+    curs.execute("select title, dec, dis, view, why from acl where dec = 'admin' or dec = 'user' or dis = 'admin' or dis = 'user' or view = 'admin' or view = 'user' order by title desc")
     list_data = curs.fetchall()
     for data in list_data:
         if not re.search('^user:', data[0]) and not re.search('^file:', data[0]):
-            if data[1] == 'admin':
-                acl = load_lang('admin')
-            else:
-                acl = load_lang('subscriber')
+            acl = []
+            for i in range(1, 4):
+                if data[i] == 'admin':
+                    acl += [load_lang('admin')]
+                else:
+                    acl += [load_lang('subscriber')]
 
-            div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a> (' + acl + ')</li>'
+            div += '<tr><td><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a></td><td>' + acl[0] + '</td><td>' + acl[1] + '</td><td>' + acl[2] + '</td></tr>'
         
-    div += '</ul>'
+    div += '</tbody></table>'
     
     return easy_minify(flask.render_template(skin_check(), 
         imp = ['acl ' + load_lang('document') + ' ' + load_lang('list'), wiki_set(), custom(), other2([0, 0])],
@@ -3469,7 +3479,7 @@ def recent_changes(name = None, tool = 'record'):
 
         what = flask.request.args.get('what', 'all')
 
-        div = '<table id="main_table_set"><tbody><tr>'
+        div = '''<table id="main_table_set"><tbody><tr>'''
         
         if name:
             num = int(flask.request.args.get('num', 1))
@@ -3479,7 +3489,11 @@ def recent_changes(name = None, tool = 'record'):
                 sql_num = 0      
 
             if tool == 'history':
-                div += '<td id="main_table_width">' + load_lang('version') + '</td><td id="main_table_width">' + load_lang('editor') + '</td><td id="main_table_width">' + load_lang('time') + '</td></tr>'
+                div +=  '''
+                        <td id="main_table_width">''' + load_lang('version') + '''</td>
+                        <td id="main_table_width">''' + load_lang('editor') + '''</td>
+                        <td id="main_table_width">''' + load_lang('time') + '''</td></tr>
+                        '''
                 
                 curs.execute("select id, title, date, ip, send, leng from history where title = ? order by id + 0 desc limit ?, '50'", [name, str(sql_num)])
             else:
