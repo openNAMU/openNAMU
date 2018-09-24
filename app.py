@@ -17,7 +17,7 @@ import sys
 
 from func import *
 
-r_ver = 'v3.0.7-stable-99'
+r_ver = 'v3.0.8-master-01'
 c_ver = ''.join(re.findall('[0-9]', r_ver))
 
 print('version : ' + r_ver)
@@ -3124,8 +3124,11 @@ def acl(name = None):
                 
             data += '</select>'
                 
-            if acl_data:
-                data += '<hr><input value="' + html.escape(acl_data[0][1]) + '" placeholder="' + load_lang('why') + '" name="why" type="text" ' + check_ok + '>'
+            if check_ok == '':
+                if acl_data:
+                    data += '<hr><input value="' + html.escape(acl_data[0][1]) + '" placeholder="' + load_lang('why') + '" name="why" type="text" ' + check_ok + '>'
+                else:
+                    data += '<hr><input placeholder="' + load_lang('why') + '" name="why" type="text" ' + check_ok + '>'
             
         return easy_minify(flask.render_template(skin_check(), 
             imp = [name, wiki_set(), custom(), other2([' (acl)', 0])],
