@@ -1,4 +1,5 @@
 from set_mark.namu import namu
+from set_mark.html_only import html_only
 
 import re
 import html
@@ -39,9 +40,14 @@ def plusing(data):
         if not curs.fetchall():
             curs.execute("insert into back (title, link, type) values (?, ?, ?)", [data_in[1], data_in[0], data_in[2]])
 
-def namumark(title = '', data = '', num = 0):
+def namumark(title = '', data = '', num = 0, markup = 'namumark'):
     if not data == '':
-        data = namu(conn, data, title, num)
+        if markup == 'namumark':
+            data = namu(conn, data, title, num)
+        elif markup == 'html':
+            data = html_only(conn, data, title, num)
+        else:
+            data = ['', '', []]
 
         if num == 1:
             data_num = len(data[2]) 
