@@ -27,27 +27,27 @@ def load_conn(data):
 def send_email(who, title, data):
     smtp = smtplib.SMTP_SSL('smtp.gmail.com', 465)
 
-    curs.execute('select name, data from other where name = "g_email" or name = "g_pass"')
-    rep_data = curs.fetchall()
-    if rep_data:
-        g_email = ''
-        g_pass = ''
-        for i in rep_data:
-            if i[0] == 'g_email':
-                g_email = i[1]
-            else:
-                g_pass = i[1]
+    try:
+        curs.execute('select name, data from other where name = "g_email" or name = "g_pass"')
+        rep_data = curs.fetchall()
+        if rep_data:
+            g_email = ''
+            g_pass = ''
+            for i in rep_data:
+                if i[0] == 'g_email':
+                    g_email = i[1]
+                else:
+                    g_pass = i[1]
 
-        try:
-            smtp.login(g_email, g_pass)
-        except:
-            print('error : email login error')
+                smtp.login(g_email, g_pass)
 
-    msg = email.mime.text.MIMEText(data)
-    msg['Subject'] = title
-    smtp.sendmail(g_email, who, msg.as_string())
+        msg = email.mime.text.MIMEText(data)
+        msg['Subject'] = title
+        smtp.sendmail(g_email, who, msg.as_string())
 
-    smtp.quit()
+        smtp.quit()
+    except:
+        print('error : email login error')
 
 def easy_minify(data):
     data = re.sub('\n +<', '\n<', data)
