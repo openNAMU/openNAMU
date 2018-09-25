@@ -2814,7 +2814,7 @@ def register():
         
         curs.execute('select data from other where name = "email_have"')
         sql_data = curs.fetchall()
-        if sql_data:
+        if sql_data and sql_data[0][0] != '':
             flask.session['c_id'] = flask.request.form.get('id', None)
             flask.session['c_pw'] = hashed.decode()
             flask.session['c_key'] = ''.join(random.choice("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ") for i in range(16))
