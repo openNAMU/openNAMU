@@ -2419,6 +2419,8 @@ def topic(name = None, sub = None):
             all_data += '</td></tr><tr><td>' + render_set(data = topic_data[0]) + '</td></tr></tbody></table><br>'    
 
         for topic_data in topic:
+            user_write = topic_data[0]
+
             if number == 1:
                 start = topic_data[3]
 
@@ -2435,7 +2437,7 @@ def topic(name = None, sub = None):
             else:
                 blind_data = ''
 
-            user_write = render_set(data = topic_data[0])
+            user_write = render_set(data = user_write)
             ip = ip_pas(topic_data[3])
             
             curs.execute('select acl from user where id = ?', [topic_data[3]])
