@@ -39,7 +39,7 @@ def send_email(who, title, data):
                 else:
                     g_pass = i[1]
 
-                smtp.login(g_email, g_pass)
+            smtp.login(g_email, g_pass)
 
         msg = email.mime.text.MIMEText(data)
         msg['Subject'] = title
