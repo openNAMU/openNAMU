@@ -144,19 +144,13 @@ def captcha_post(re_data, num = 1):
     else:
         pass
 
-def load_lang(data, num = 0):
-    global lang
-
+def load_lang(data, num = 1):
     if num == 1:
-        try:
-            if lang:
-                pass
-        except:
-            curs.execute("select data from other where name = 'language'")
-            rep_data = curs.fetchall()
+        curs.execute("select data from other where name = 'language'")
+        rep_data = curs.fetchall()
 
-            json_data = open(os.path.join('language', rep_data[0][0] + '.json'), 'rt', encoding='utf-8').read()
-            lang = json.loads(json_data)
+        json_data = open(os.path.join('language', rep_data[0][0] + '.json'), 'rt', encoding='utf-8').read()
+        lang = json.loads(json_data)
 
         if data in lang:
             return lang[data]
