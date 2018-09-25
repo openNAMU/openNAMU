@@ -2558,9 +2558,6 @@ def close_topic_list(name = None, tool = None):
 def login():
     if custom()[2] != 0:
         return redirect('/user')
-
-    ip = ip_check()
-    agent = flask.request.headers.get('User-Agent')
     
     if ban_check(tool = 'login') == 1:
         return re_error('/ban')
@@ -2570,6 +2567,9 @@ def login():
             return re_error('/error/13')
         else:
             captcha_post('', 0)
+
+        ip = ip_check()
+        agent = flask.request.headers.get('User-Agent')
 
         curs.execute("insert into ua_d (name, ip, ua, today, sub) values (?, ?, ?, ?, '')", [flask.request.form.get('id', None), ip, agent, get_time()])
 
@@ -2839,14 +2839,15 @@ def register():
 
                 first = 0
 
+            ip = ip_check()
+            agent = flask.request.headers.get('User-Agent')
+
+            curs.execute("insert into ua_d (name, ip, ua, today, sub) values (?, ?, ?, ?, '')", [flask.request.form.get('id', None), ip, agent, get_time()])  
+
             flask.session['state'] = 1
             flask.session['id'] = flask.request.form.get('id', None)
             flask.session['head'] = ''
-
-            ip = ip_check()
-            agent = flask.request.headers.get('User-Agent')
-            
-            curs.execute("insert into ua_d (name, ip, ua, today, sub) values (?, ?, ?, ?, '')", [flask.request.form.get('id', None), ip, agent, get_time()])        
+                  
             conn.commit()
             
             if first == 0:
@@ -2900,7 +2901,7 @@ def need_email():
 
                         return redirect('/register')
                     else:
-                        send_email(flask.request.form.get('email', None), flask.request.host + ' key', 'key : ' + flask.session['c_key'])
+                        send_email(flask.request.form.get('email', None), wiki_set()[0] + ' key', 'key : ' + flask.session['c_key'])
                         flask.session['c_email'] = flask.request.form.get('email', None)
 
                         return redirect('/check_key')
@@ -2935,16 +2936,16 @@ def check_key():
 
                 first = 0
 
+            ip = ip_check()
+            agent = flask.request.headers.get('User-Agent')
+
             curs.execute("insert into user_set (name, id, data) values ('email', ?, ?)", [flask.session['c_id'], flask.session['c_email']])
+            curs.execute("insert into ua_d (name, ip, ua, today, sub) values (?, ?, ?, ?, '')", [flask.session['c_id'], ip, agent, get_time()])
 
             flask.session['state'] = 1
             flask.session['id'] = flask.session['c_id']
             flask.session['head'] = ''
-
-            ip = ip_check()
-            agent = flask.request.headers.get('User-Agent')
-            
-            curs.execute("insert into ua_d (name, ip, ua, today, sub) values (?, ?, ?, ?, '')", [flask.session['c_id'], ip, agent, get_time()])        
+                    
             conn.commit()
             
             flask.session.pop('c_id', None)
