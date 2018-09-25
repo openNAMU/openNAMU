@@ -372,6 +372,13 @@ def inter_wiki(tools = None):
                 '''
 
         curs.execute("select html from html_filter where kind = 'email'")
+    else:
+        del_link = 'del_edit_filter'
+        plus_link = 'manager/9'
+        title = load_lang('edit') + ' ' + load_lang('filter') + ' ' + load_lang('list')
+        div = ''
+
+        curs.execute("select name from filter")
 
     db_data = curs.fetchall()
     if db_data:
