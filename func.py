@@ -12,9 +12,6 @@ import os
 from set_mark.tool import *
 from mark import *
 
-json_data = open(os.path.join('language', 'en-US.json'), 'rt', encoding='utf-8').read()
-else_lang = json.loads(json_data)
-
 def load_conn(data):
     global conn
     global curs
@@ -164,10 +161,7 @@ def load_lang(data, num = 0):
         if data in lang:
             return lang[data]
         else:
-            if data in else_lang:
-                return else_lang[data]
-            else:
-                return data + ' (missing)'
+            return data + ' (missing)'
     elif num == 2:
         curs.execute('select data from user_set where name = "lang" and id = ?', [ip_check()])
         rep_data = curs.fetchall()
