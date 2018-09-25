@@ -2074,6 +2074,7 @@ def manager(num = 1):
                         <li><a href="/html_filter">html ''' + load_lang('filter') + '''</a></li>
                         <li><a href="/email_filter">email ''' + load_lang('filter') + '''</a></li>
                     </ul>
+                    <br>
                     <h2>''' + load_lang('server') + '''</h2>
                     <ul>
                         <li><a href="/indexing">''' + load_lang('indexing') + ' (' + load_lang('create') + ' or ' + load_lang('delete') + ''')</a></li>
