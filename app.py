@@ -2571,6 +2571,8 @@ def login():
         else:
             captcha_post('', 0)
 
+        curs.execute("insert into ua_d (name, ip, ua, today, sub) values (?, ?, ?, ?, '')", [flask.request.form.get('id', None), ip, agent, get_time()])
+
         curs.execute("select pw from user where id = ?", [flask.request.form.get('id', None)])
         user = curs.fetchall()
         if not user:
@@ -2588,8 +2590,7 @@ def login():
             flask.session['head'] = css_data[0][0]
         else:
             flask.session['head'] = ''
-        
-        curs.execute("insert into ua_d (name, ip, ua, today, sub) values (?, ?, ?, ?, '')", [flask.request.form.get('id', None), ip, agent, get_time()])
+
         conn.commit()
         
         return redirect('/user')  
