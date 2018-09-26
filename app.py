@@ -3539,7 +3539,7 @@ def recent_changes(name = None, tool = 'record'):
 
         what = flask.request.args.get('what', 'all')
 
-        div = '''<table id="main_table_set"><tbody><tr>'''
+        div = '<table id="main_table_set"><tbody><tr>'
         
         if name:
             num = int(flask.request.args.get('num', 1))
@@ -3592,7 +3592,7 @@ def recent_changes(name = None, tool = 'record'):
 
                 div = '<a href="/recent_discuss">(' + load_lang('discussion') + ')</a> <a href="/block_log">(' + load_lang('ban') + ')</a> <a href="/user_log">(' + load_lang('subscriber') + ')</a> <a href="/admin_log">(' + load_lang('authority') + ')</a><hr>' + div
                 
-                curs.execute("select id, title, date, ip, send, leng from history order by date desc limit  ?, 50", [str(sql_num)])
+                curs.execute("select id, title, date, ip, send, leng from history where not title like 'user:%' order by date desc limit ?, 50", [str(sql_num)])
             else:
                 if what == 'delete':
                     sql = '%(' + load_lang('delete', 1) + ')'
@@ -3603,7 +3603,7 @@ def recent_changes(name = None, tool = 'record'):
                 else:
                     return redirect('/')
 
-                curs.execute("select id, title, date, ip, send, leng from history where send like ? order by date desc limit ?, 50", [sql, str(sql_num)])
+                curs.execute("select id, title, date, ip, send, leng from history where send like ? and not title like 'user:%' order by date desc limit ?, 50", [sql, str(sql_num)])
 
         data_list = curs.fetchall()
         for data in data_list:    
