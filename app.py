@@ -2915,9 +2915,9 @@ def need_email(tool = 'pass_find'):
             curs.execute("select id from user where id = ? and email = ?", [flask.request.form.get('id', ''), flask.request.form.get('email', '')])
             if curs.fetchall():
                 flask.session['c_key'] = ''.join(random.choice("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ") for i in range(16))
+                flask.session['c_id'] = flask.request.form.get('id', '')
 
                 send_email(flask.request.form.get('email', ''), wiki_set()[0] + ' password find key', 'key : ' + flask.session['c_key'])
-                flask.session['c_id'] = flask.request.form.get('id', '')
 
                 return redirect('/check_pass_key')
     else:
@@ -2953,7 +2953,7 @@ def need_email(tool = 'pass_find'):
 @app.route('/<regex("check_key|check_pass_key"):tool>', methods=['POST', 'GET'])
 def check_key(tool = 'check_pass_key'):
     if flask.request.method == 'POST':
-        if tool == 'check_pass_key':
+        if tool == 'check_key':
             if 'c_id' in flask.session and flask.session['c_key'] == flask.request.form.get('key', None):
                 curs.execute("select id from user limit 1")
                 if not curs.fetchall():
@@ -2996,13 +2996,20 @@ def check_key(tool = 'check_pass_key'):
         else:
             if 'c_id' in flask.session and flask.session['c_key'] == flask.request.form.get('key', None):
                 hashed = bcrypt.hashpw(bytes(flask.session['c_key'], 'utf-8'), bcrypt.gensalt()).decode()
-                curs.execute("update user set pw = ? where id = ?", [hashed, flask.session['id']])
+                curs.execute("update user set pw = ? where id = ?", [hashed, flask.session['c_id']])
+
+                id = flask.session['c_id']
+                pw = flask.session['c_key']
+
+                flask.session.pop('c_id', None)
+                flask.session.pop('c_key', None)
 
                 return easy_minify(flask.render_template(skin_check(),    
                     imp = ['check', wiki_set(), custom(), other2([0, 0])],
                     data =  '''
-                            id : ''' + flask.session['id'] + '''
-                            password : ''' + flask.session['c_key'] + '''
+                            id : ''' + id + '''
+                            <br>
+                            password : ''' + pw + '''
                             ''',
                     menu = [['user', load_lang('user')]]
                 ))
@@ -3866,9 +3873,13 @@ def user_info():
         plus =  '''
                 <li><a href="/login">''' + load_lang('login') + '''</a></li>
                 <li><a href="/register">''' + load_lang('register') + '''</a></li>
-                <li><a href="/pass_find">password ''' + load_lang('search') + '''</a></li>
                 '''
         plus2 = ''
+
+        curs.execute("select data from other where name = 'email_have'")
+        test = curs.fetchall()
+        if test and test[0][0] != '':
+            plus += '<li><a href="/pass_find">password ' + load_lang('search') + '</a></li>'
 
     return easy_minify(flask.render_template(skin_check(), 
         imp = [load_lang('user') + ' ' + load_lang('tool'), wiki_set(), custom(), other2([0, 0])],
