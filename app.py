@@ -3574,7 +3574,7 @@ def recent_changes(name = None, tool = 'record'):
                 leng = '<span style="color:gray;">(' + data[5] + ')</span>'
                 
             if one_admin == 1:
-                curs.execute("select * from ban where block = ?", [data[3]])
+                curs.execute("select block from ban where block = ?", [data[3]])
                 if curs.fetchall():
                     ban = ' <a href="/ban/' + url_pas(data[3]) + '">(' + load_lang('release') + ')</a>'
                 else:
