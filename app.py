@@ -4109,7 +4109,7 @@ def main_file(data = None):
     if re.search('\.(txt|html)$', data):
         return flask.send_from_directory('./', data)
     else:
-        return ''
+        return redirect('/w/' + url_pas(wiki_set(2)))
 
 @app.errorhandler(404)
 def error_404(e):
