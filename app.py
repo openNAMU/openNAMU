@@ -2365,7 +2365,7 @@ def topic(name = None, sub = None):
         curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, ?, ?, ?, '', '')", [str(num), name, sub, data, today, ip])
         conn.commit()
         
-        return redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub))
+        return redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '#reload')
     else:
         curs.execute("select title from stop where title = ? and sub = ? and close = 'O'", [name, sub])
         close_data = curs.fetchall()
