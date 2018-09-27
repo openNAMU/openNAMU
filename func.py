@@ -209,11 +209,11 @@ def edit_help_button():
                 </script>
                 '''
 
-    insert_list = [['[[|]]', 'link'], ['[()]', 'macro'], ['{{{#!}}}', 'middle'], ['||<>||', 'table']]
+    insert_list = [['[[|]]', '[[|]]'], ['[()]', '[()]'], ['{{{#!}}}', '{{{#!}}}'], ['||<>||', '||<>||'], ["\\'\\'\\'", "\'\'\'"]]
 
     data = ''
     for insert_data in insert_list:
-        data += '<a href="javascript:void(0);" onclick="insert_data(\'content\', \'' + insert_data[0] + '\');">(' + insert_data[1] + ')</a>'
+        data += '<a href="javascript:void(0);" onclick="insert_data(\'content\', \'' + insert_data[0] + '\');">(' + insert_data[1] + ')</a> '
 
     return [js_data, data + '<hr>']
 
