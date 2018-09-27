@@ -316,10 +316,6 @@ input {
     border: 2px solid gainsboro;
 }
 
-#nav_bar {
-    font-size: 24px;
-}
-
 #go_toc {
     display: inline-block;
     padding: 10px;
