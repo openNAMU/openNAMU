@@ -2644,7 +2644,12 @@ def change_password():
                 if not user:
                     return re_error('/error/10')
 
-                if not bcrypt.checkpw(bytes(flask.request.form.get('pw', None), 'utf-8'), bytes(user[0][0], 'utf-8')):
+                salt = bcrypt.gensalt()
+                
+                hashed = bytes(user[0][0], 'utf-8')
+                hashed.find(salt)
+
+                if not hashed == bcrypt.hashpw(bytes(flask.request.form.get('pw', None), 'utf-8'), hashed):
                     return re_error('/error/2')
 
                 hashed = bcrypt.hashpw(bytes(flask.request.form.get('pw2', None), 'utf-8'), bcrypt.gensalt()).decode()
