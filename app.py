@@ -2581,7 +2581,12 @@ def login():
         if not user:
             return re_error('/error/2')
 
-        if not bcrypt.checkpw(bytes(flask.request.form.get('pw', None), 'utf-8'), bytes(user[0][0], 'utf-8')):
+        salt = bcrypt.gensalt()
+        
+        hashed = bytes(user[0][0], 'utf-8')
+        hashed.find(salt)
+
+        if not hashed == bcrypt.hashpw(bytes(flask.request.form.get('pw', None), 'utf-8'), hashed):
             return re_error('/error/10')
 
         flask.session['state'] = 1
@@ -4053,7 +4058,7 @@ def skin_set():
     return re_error('/error/5')
     
 @app.route('/api/w/<everything:name>')
-def api_w(name = None):
+def api_w(name = ''):
     curs.execute("select data from data where title = ?", [name])
     data = curs.fetchall()
     if data:
@@ -4064,11 +4069,30 @@ def api_w(name = None):
         return redirect('/')
     
 @app.route('/api/raw/<everything:name>')
-def api_raw(name = None):
+def api_raw(name = ''):
     curs.execute("select data from data where title = ?", [name])
     data = curs.fetchall()
     if data:
         json_data = { "title" : name, "data" : data[0][0] }
+    
+        return flask.jsonify(json_data)
+    else:
+        return redirect('/')
+
+@app.route('/api/topic/<everything:name>/sub/<sub>')
+def api_topic_sub(name = '', sub = ''):
+    if flask.request.args.get('time', None):
+        curs.execute("select id, data, ip from topic where title = ? and sub = ? and date >= ?", [name, sub, flask.request.args.get('time', None)])
+    else:
+        curs.execute("select id, data, ip from topic where title = ? and sub = ?", [name, sub])
+    data = curs.fetchall()
+    if data:
+        json_data = {}
+        for i in data:
+            json_data[i[0]] =   {
+                                    "data" : i[1],
+                                    "id" : i[2]
+                                }
     
         return flask.jsonify(json_data)
     else:
