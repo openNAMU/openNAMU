@@ -56,6 +56,8 @@ load_conn(conn)
 logging.basicConfig(level = logging.ERROR)
 
 app = flask.Flask(__name__, template_folder = './')
+app.config['JSON_AS_ASCII'] = False
+
 flask_reggie.Reggie(app)
 
 compress = flask_compress.Compress()
@@ -2471,6 +2473,9 @@ def topic(name = None, sub = None):
 
         if ban != 1 or admin == 1:
             data += '''
+                    <div id="plus"></div>
+                    <script type="text/javascript" src="/views/main_css/topic_reload.js"></script>
+                    <script>topic_load("''' + name + '''", "''' + sub + '''");</script>
                     <a id="reload" href="javascript:void(0);" onclick="location.href.endsWith(\'#reload\')? location.reload(true):location.href=\'#reload\'">(''' + load_lang('reload') + ''')</a>
                     <form style="''' + display + '''" method="post">
                     <br>
@@ -4071,7 +4076,7 @@ def api_w(name = ''):
     
         return flask.jsonify(json_data)
     else:
-        return redirect('/')
+        return flask.jsonify({})
     
 @app.route('/api/raw/<everything:name>')
 def api_raw(name = ''):
@@ -4082,14 +4087,14 @@ def api_raw(name = ''):
     
         return flask.jsonify(json_data)
     else:
-        return redirect('/')
+        return flask.jsonify({})
 
 @app.route('/api/topic/<everything:name>/sub/<sub>')
-def api_topic_sub(name = '', sub = ''):
+def api_topic_sub(name = '', sub = '', time = ''):
     if flask.request.args.get('time', None):
-        curs.execute("select id, data, ip from topic where title = ? and sub = ? and date >= ?", [name, sub, flask.request.args.get('time', None)])
+        curs.execute("select id, data, ip from topic where title = ? and sub = ? and date >= ? order by id + 0 asc", [name, sub, flask.request.args.get('time', None)])
     else:
-        curs.execute("select id, data, ip from topic where title = ? and sub = ?", [name, sub])
+        curs.execute("select id, data, ip from topic where title = ? and sub = ? order by id + 0 asc", [name, sub])
     data = curs.fetchall()
     if data:
         json_data = {}
@@ -4098,10 +4103,10 @@ def api_topic_sub(name = '', sub = ''):
                                     "data" : i[1],
                                     "id" : i[2]
                                 }
-    
+
         return flask.jsonify(json_data)
     else:
-        return redirect('/')
+        return flask.jsonify({})
     
 @app.route('/views/<everything:name>')
 def views(name = None):
