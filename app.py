@@ -2358,7 +2358,7 @@ def topic(name = None, sub = None):
             if ip_data and ip_or_user(ip_data[0][0]) == 0:
                 curs.execute('insert into alarm (name, data, date) values (?, ?, ?)', [ip_data[0][0], ip + ' - <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '#' + str(num) + '">' + load_lang('discussion', 1) + '</a>', today])
             
-            data = re.sub("(?P<in>#(?:[0-9]+))", '[[\g<in>]]', data)
+        data = re.sub("(?P<in>#(?:[0-9]+))", '[[\g<in>]]', data)
 
         data = savemark(data)
 
