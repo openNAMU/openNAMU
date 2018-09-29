@@ -163,11 +163,13 @@ def table_start(data):
 
 def middle_parser(data):
     global end_data
+    global plus_data
 
     middle_stack = 0
     middle_list = []
     middle_number = 0
     fol_num = 0
+    syntax_num = 0
     while 1:
         middle_data = re.search('(?:{{{((?:(?! |{{{|}}}|&lt;).)*) ?|(}}}))', data)
         if middle_data:
@@ -235,6 +237,14 @@ def middle_parser(data):
                                                     else:
                                                         middle_data_2 = ['python']
 
+                                                    if syntax_num == 0:
+                                                        plus_data +=    '''
+                                                                        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css">
+                                                                        <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+                                                                        '''
+
+                                                        syntax_num = 1
+
                                                     middle_list += ['pre']
                                                     
                                                     data = re.sub('{{{#!syntax ?((?:(?!\n).)*)\n?', '<pre id="syntax"><code class="' + middle_data_2[0] + '">', data, 1)
@@ -254,6 +264,11 @@ def middle_parser(data):
                                                                 folding_data = folding_data.groups()
                                                             else:
                                                                 folding_data = ['Test']
+
+                                                            if folding_num == 0:
+                                                                plus_data += '<script src="/views/main_css/parser.js"></script>'
+
+                                                                folding_num = 1
                                                             
                                                             data = re.sub('{{{#!folding ?((?:(?!\n).)*)\n?', '<div>' + str(folding_data[0]) + ' <div style="display: inline-block;"><a href="javascript:void(0);" onclick="folding(' + str(fol_num) + ');">[do]</a></div_end><div id="folding_' + str(fol_num) + '" style="display: none;"><div id="wiki_div" style="">', data, 1)
                                                             
@@ -380,14 +395,13 @@ def link_fix(main_link):
 def namu(conn, data, title, main_num):
     curs = conn.cursor()
 
-    data = '\n' + data + '\n'
-    backlink = []
-    plus_data = '''
-                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css">
-                <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
-                <script src="/views/main_css/parser.js"></script>
-                '''
+    global plus_data
     global end_data
+
+    data = '\n' + data + '\n'
+    plus_data = ''
+
+    backlink = []
     end_data = []
     
     data = html.escape(data)
