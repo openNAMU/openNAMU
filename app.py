@@ -252,7 +252,7 @@ else:
     
     print('language : ' + str(rep_language))
 
-support_mark = ['namumark', 'html']
+support_mark = ['namumark']
 	
 curs.execute('select data from other where name = "markup"')
 rep_data = curs.fetchall()
@@ -335,7 +335,7 @@ def alarm():
         menu = [['user', load_lang('user')]]
     ))
 
-@app.route('/<regex("inter_wiki|(?:html|edit|email)_filter"):tools>')
+@app.route('/<regex("inter_wiki|(?:edit|email)_filter"):tools>')
 def inter_wiki(tools = None):
     div = ''
     admin = admin_check(None, None)
@@ -347,19 +347,6 @@ def inter_wiki(tools = None):
         div = ''
 
         curs.execute('select title, link from inter')
-    elif tools == 'html_filter':
-        del_link = 'del_html_filter'
-        plus_link = 'plus_html_filter'
-        title = 'html' + load_lang('filter') + ' ' + load_lang('list')
-        div =   '''
-                <ul>
-                    <li>span</li>
-                    <li>div</li>
-                    <li>iframe</li>
-                </ul>
-                '''
-
-        curs.execute('select html from html_filter where kind = ""')
     elif tools == 'email_filter':
         del_link = 'del_email_filter'
         plus_link = 'plus_email_filter'
@@ -413,13 +400,11 @@ def inter_wiki(tools = None):
         menu = [['other', load_lang('other')]]
     ))
 
-@app.route('/<regex("del_(?:inter_wiki|(?:html|edit|email)_filter)"):tools>/<name>')
+@app.route('/<regex("del_(?:inter_wiki|(?:edit|email)_filter)"):tools>/<name>')
 def del_inter(tools = None, name = None):
     if admin_check(None, tools) == 1:
         if tools == 'del_inter_wiki':
             curs.execute("delete from inter where title = ?", [name])
-        elif tools == 'del_html_filter':
-            curs.execute("delete from html_filter where html = ? and kind = ''", [name])
         elif tools == 'del_edit_filter':
             curs.execute("delete from filter where name = ?", [name])
         else:
@@ -431,16 +416,13 @@ def del_inter(tools = None, name = None):
     else:
         return re_error('/error/3')
 
-@app.route('/<regex("plus_(?:inter_wiki|(?:html|edit|email)_filter)"):tools>', methods=['POST', 'GET'])
+@app.route('/<regex("plus_(?:inter_wiki|(?:edit|email)_filter)"):tools>', methods=['POST', 'GET'])
 @app.route('/<regex("plus_edit_filter"):tools>/<name>', methods=['POST', 'GET'])
 def plus_inter(tools = None, name = None):
     if flask.request.method == 'POST':
         if tools == 'plus_inter_wiki':
             curs.execute('insert into inter (title, link) values (?, ?)', [flask.request.form.get('title', None), flask.request.form.get('link', None)])
             admin_check(None, 'inter_wiki_plus')
-        elif tools == 'plus_html_filter':
-            curs.execute('insert into html_filter (html, kind) values (?, "")', [flask.request.form.get('title', None)])
-            admin_check(None, 'html_filter edit')
         elif tools == 'plus_edit_filter':
             if admin_check(1, 'edit_filter edit') != 1:
                 return re_error('/error/3')
@@ -496,9 +478,6 @@ def plus_inter(tools = None, name = None):
                         <hr>
                         <input ''' + stat + ''' placeholder="''' + load_lang('regex') + '''" name="content" value="''' + html.escape(textarea) + '''" type="text">
                         '''
-        elif tools == 'plus_html_filter':
-            title = 'html ' + load_lang('filter') + ' ' + load_lang('plus')
-            form_data = '<input placeholder="html" type="text" name="title">'
         else:
             title = 'email ' + load_lang('filter') + ' ' + load_lang('plus')
             form_data = '<input placeholder="email" type="text" name="title">'

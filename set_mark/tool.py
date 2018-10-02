@@ -42,36 +42,3 @@ def sha224(data):
 
 def md5_replace(data):
     return hashlib.md5(data.encode()).hexdigest()
-
-def xss_protect(curs, data, ok_list = []):
-    curs.execute('select html from html_filter where kind = ""')
-    html_db = curs.fetchall()
-
-    src_list = ["www.youtube.com", "serviceapi.nmv.naver.com", "tv.kakao.com", "www.google.com", "serviceapi.rmcnmv.naver.com"]
-    html_list = ['div', 'span', 'embed', 'iframe', 'ruby', 'rp', 'rt'] + ok_list
-    
-    html_data = re.findall('&lt;(\/)?((?:(?!&gt;| ).)+)( (?:(?:(?!&gt;).)+)?)?&gt;', data)
-    for in_data in html_data:
-        if in_data[0] == '':
-            if in_data[1] in html_list or (html_db and in_data[1] in html_db[0]):
-                if re.search('&lt;\/' + in_data[1] + '&gt;', data):
-                    src = re.search('src=([^ ]*)', in_data[2])
-                    if src:
-                        v_src = re.search('http(?:s)?:\/\/([^/\'" ]*)', src.groups()[0])
-                        if v_src:
-                            if not v_src.groups()[0] in src_list:
-                                and_data = re.sub('&#x27;', '\'', re.sub('&quot;', '"', re.sub('src=([^ ]*)', '', in_data[2])))
-                            else:
-                                and_data = re.sub('&#x27;', '\'', re.sub('&quot;', '"', in_data[2]))
-                        else:
-                            and_data = re.sub('&#x27;', '\'', re.sub('&quot;', '"', re.sub('src=([^ ]*)', '', in_data[2])))
-                    else:
-                        and_data = re.sub('&#x27;', '\'', re.sub('&quot;', '"', in_data[2]))
-                        
-                    data = data.replace('&lt;' + in_data[1] + in_data[2] + '&gt;', '<' + in_data[1] + and_data + '>', 1)
-                    data = re.sub('&lt;\/' + in_data[1] + '&gt;', '</' + in_data[1] + '>', data, 1)
-
-    position = re.compile('position', re.I)
-    data = position.sub('', data)
-
-    return data
