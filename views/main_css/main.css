@@ -31,3 +31,4 @@ s:hover, strike:hover, del:hover { color: gray; background-color: gainsboro; tex
 #main_table_width_half { width: 50%; }
 #main_table_width_quarter { width: 25%; }
 #redirect { border: 1px solid; padding: 10px; }
+body { word-break: break-all; }
