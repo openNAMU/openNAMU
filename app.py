@@ -2619,7 +2619,7 @@ def change_password():
     
     if user_state == 'ip':
         if flask.request.method == 'POST':    
-            if flask.request.form.get('pw', None):
+            if flask.request.form.get('pw4', None):
                 if flask.request.form.get('pw2', None) != flask.request.form.get('pw3', None):
                     return re_error('/error/20')
 
@@ -2633,7 +2633,7 @@ def change_password():
                 hashed = bytes(user[0][0], 'utf-8')
                 hashed.find(salt)
 
-                if not hashed == bcrypt.hashpw(bytes(flask.request.form.get('pw', None), 'utf-8'), hashed):
+                if not hashed == bcrypt.hashpw(bytes(flask.request.form.get('pw4', None), 'utf-8'), hashed):
                     return re_error('/error/2')
 
                 hashed = bcrypt.hashpw(bytes(flask.request.form.get('pw2', None), 'utf-8'), bcrypt.gensalt()).decode()
@@ -2682,7 +2682,7 @@ def change_password():
                         <form method="post">
                             <span>id : ''' + ip + '''</span>
                             <hr>
-                            <input placeholder="''' + load_lang('now') + ''' password" name="pw" type="password">
+                            <input placeholder="''' + load_lang('now') + ''' password" name="pw4" type="password">
                             <br>
                             <br>
                             <input placeholder="''' + load_lang('new') + ''' password" name="pw2" type="password">
