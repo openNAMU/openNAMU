@@ -1,24 +1,24 @@
-﻿## Intro
-NamuMark based wiki engine returns to Python. (Python 3.5 or later)
+﻿## intro
+wiki engine made python. (python 3.5 or later)
 
-## Clone command
-### Stable
+## clone command
+### stable
  * `git clone -b stable https://github.com/2du/opennamu.git`
 
-### Master
+### master
  * `git clone -b master https://github.com/2du/opennamu.git`
 
-## Install
- * [Reference](https://namu.ml/w/opennamu%2FInstall)
+## install
+ * [reference](https://namu.ml/w/opennamu%2Finstall)
  
-## set.json Explanation
+## set.json explanation
  * db = Database Name
 
-You can create a new set.json by deleting it.
+you can create a new set.json by deleting it.
 
-## Other
- * [Test Server](http://namu.ml) ([Sub Domain](http://kwee.ga))
- * The first registor is granted owner privileges.
+## other
+ * [test Server](http://namu.ml)
+ * the first registor is granted owner privileges.
 
 ## 한국어
  * [참조](https://github.com/2du/opennamu/blob/master/readme-ko.md)
