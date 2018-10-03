@@ -1,5 +1,4 @@
 from set_mark.namu import namu
-from set_mark.html_only import html_only
 
 import re
 import html
@@ -44,8 +43,6 @@ def namumark(title = '', data = '', num = 0, markup = 'namumark'):
     if not data == '':
         if markup == 'namumark':
             data = namu(conn, data, title, num)
-        elif markup == 'html':
-            data = html_only(conn, data, title, num)
         else:
             data = ['', '', []]
 

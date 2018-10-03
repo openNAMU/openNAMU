@@ -703,6 +703,8 @@ def redirect(data):
     return flask.redirect(data)
 
 def re_error(data):
+    conn.commit()
+    
     if data == '/ban':
         ip = ip_check()
 
