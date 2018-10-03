@@ -249,34 +249,28 @@ def middle_parser(data):
                                                     
                                                     data = re.sub('{{{#!syntax ?((?:(?!\n).)*)\n?', '<pre id="syntax"><code class="' + middle_data_2[0] + '">', data, 1)
                                                 else:
-                                                    middle_search = re.search('^#!html', middle_data[0])
+                                                    middle_search = re.search('^#!folding', middle_data[0])
                                                     if middle_search:
-                                                        middle_list += ['span']
+                                                        middle_list += ['2div']
                                                         
-                                                        data = re.sub('(?:{{{((?:(?! |{{{|}}}|&lt;).)*) ?|(}}}))', '<span id="html">', data, 1)
-                                                    else:
-                                                        middle_search = re.search('^#!folding', middle_data[0])
-                                                        if middle_search:
-                                                            middle_list += ['2div']
-                                                            
-                                                            folding_data = re.search('{{{#!folding ?((?:(?!\n).)*)\n?', data)
-                                                            if folding_data:
-                                                                folding_data = folding_data.groups()
-                                                            else:
-                                                                folding_data = ['Test']
-
-                                                            if folding_num == 0:
-                                                                plus_data += '<script src="/views/main_css/parser.js"></script>'
-
-                                                                folding_num = 1
-                                                            
-                                                            data = re.sub('{{{#!folding ?((?:(?!\n).)*)\n?', '<div>' + str(folding_data[0]) + ' <div style="display: inline-block;"><a href="javascript:void(0);" onclick="folding(' + str(fol_num) + ');">[do]</a></div_end><div id="folding_' + str(fol_num) + '" style="display: none;"><div id="wiki_div" style="">', data, 1)
-                                                            
-                                                            fol_num += 1
+                                                        folding_data = re.search('{{{#!folding ?((?:(?!\n).)*)\n?', data)
+                                                        if folding_data:
+                                                            folding_data = folding_data.groups()
                                                         else:
-                                                            middle_list += ['span']
+                                                            folding_data = ['Test']
 
-                                                            data = re.sub('(?:{{{((?:(?! |{{{|}}}|&lt;).)*) ?|(}}}))', '<span>', data, 1)
+                                                        if folding_num == 0:
+                                                            plus_data += '<script src="/views/main_css/parser.js"></script>'
+
+                                                            folding_num = 1
+                                                        
+                                                        data = re.sub('{{{#!folding ?((?:(?!\n).)*)\n?', '<div>' + str(folding_data[0]) + ' <div style="display: inline-block;"><a href="javascript:void(0);" onclick="folding(' + str(fol_num) + ');">[do]</a></div_end><div id="folding_' + str(fol_num) + '" style="display: none;"><div id="wiki_div" style="">', data, 1)
+                                                        
+                                                        fol_num += 1
+                                                    else:
+                                                        middle_list += ['span']
+
+                                                        data = re.sub('(?:{{{((?:(?! |{{{|}}}|&lt;).)*) ?|(}}}))', '<span>', data, 1)
                     else:
                         middle_list += ['code']
                         
@@ -334,41 +328,6 @@ def middle_parser(data):
             end_data += [['syntax_' + str(num), syntax_data[1], 'normal']]
 
             data = re.sub('<code class="((?:(?!").)+)">((?:(?:(?:(?!<\/code>|<span id="syntax_)).)+\n*)+)<\/code>', '<code class="' + syntax_data[0] + '"><span id="syntax_' + str(num) + '"></span></code>', data, 1)
-        else:
-            break
-
-    while 1:
-        html_data = re.search('<span id="html">((?:(?:(?:(?!<\/span>)).)+\n*)+)<\/span>', data)
-        if html_data:
-            html_data = html_data.groups()
-            html_data_2 = html_data[0]
-
-            can_html = ['b', 'span']
-            dic = {}
-
-            for i in can_html:
-                while 1:
-                    test = re.search('&lt;' + i + '((?:(?!&gt;).)*)&gt;', html_data_2)
-                    if test:
-                        test = test.groups()[0]
-                        test = re.sub('&quot;', '"', test)
-                        
-                        html_data_2 = re.sub('&lt;' + i + '((?:(?!&gt;).)*)&gt;', '<' + i + test + '>', html_data_2, 1)
-                    else:
-                        break
-
-            for i in can_html:
-                span_num = re.findall('<' + i + '(?:(?:(?!>).)*)>', html_data_2)
-                span_num = len(span_num)
-                span_end_num = re.findall('<\/' + i + '>', html_data_2)
-                span_end_num = len(span_end_num)
-                
-                dic[i] = span_num - span_end_num
-
-            for i in can_html:
-                html_data_2 += ('</' + i + '>' * dic[i])
-
-            data = re.sub('<span id="html">((?:(?:(?:(?!<\/span>)).)+\n*)+)<\/span>', '<span id="end_html">' + html_data_2 + '<\/span>', data, 1)
         else:
             break
 
