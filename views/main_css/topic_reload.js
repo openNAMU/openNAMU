@@ -7,30 +7,31 @@ function topic_load(name, sub) {
         return i;
     }
 
-    setInterval(
-        function() {
+    setTimeout(function() {
+        var test = setInterval(function() {
             var d = new Date();
             d.setSeconds(d.getSeconds() - 3);
             
-            var date = d.getFullYear() + '-' + addZero(d.getMonth() + 1) + '-' + d.getDate() + ' ' + addZero(d.getHours()) + ':' + addZero(d.getMinutes()) + ':' + addZero(d.getSeconds());
+            var date = d.getFullYear() + '-' + addZero(d.getMonth() + 1) + '-' + addZero(d.getDate());
+            date += ' ' + addZero(d.getHours()) + ':' + addZero(d.getMinutes()) + ':' + addZero(d.getSeconds());
+
             var url = "/api/topic/" + name + "/sub/" + sub + "?time=" + date;
             var xhr = new XMLHttpRequest();
-
-            doc_data = document.getElementById("plus");
-
-            test = '';
-
-            xhr.onreadystatechange = function() {
-                if(xhr.status == 200) {
-                    if(xhr.responseText != "{}\n" && test != xhr.responseText) {
-                        test = xhr.responseText;
-                        doc_data.innerText += xhr.responseText + '\n';
-                    }
-                }
-            }
+            var doc_data = document.getElementById("plus");
 
             xhr.open("GET", url);
-            xhr.send();
-        }
-    , 3000);
+            xhr.send(null);
+
+            xhr.onreadystatechange = function() {
+                if(this.readyState == XMLHttpRequest.DONE && xhr.status == 200 && xhr.responseText != "{}\n") {
+                    console.log(xhr.responseText);
+                    console.log(url);
+
+                    doc_data.innerText += '(new topic)\n\n';
+
+                    clearInterval(test);
+                }
+            }
+        }, 3000)
+    }, 4000);
 }

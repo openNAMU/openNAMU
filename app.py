@@ -2444,10 +2444,21 @@ def topic(name = None, sub = None):
             if user_write == '':
                 user_write = '<br>'
                          
-            all_data += '<table id="toron"><tbody><tr><td id="toron_color' + color + '">'
-            all_data += '<a href="javascript:void(0);" id="' + str(number) + '">#' + str(number) + '</a> ' + ip + '</span>'
-            all_data += '</td></tr><tr ' + blind_data + '><td>' + user_write + '</td></tr></tbody></table><br>'
-           
+            all_data += '''
+                        <table id="toron">
+                            <tbody>
+                                <tr>
+                                    <td id="toron_color''' + color + '''">
+                                        <a href="javascript:void(0);" id="''' + str(number) + '">#' + str(number) + '</a> ' + ip + '''</span>
+                                    </td>
+                                </tr>
+                                <tr ''' + blind_data + '''>
+                                    <td>''' + user_write + '''</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <br>
+                        '''
             number += 1
 
         if ban != 1 or admin == 1:
@@ -2558,19 +2569,13 @@ def login():
         ip = ip_check()
         agent = flask.request.headers.get('User-Agent')
 
-        curs.execute("insert into ua_d (name, ip, ua, today, sub) values (?, ?, ?, ?, '')", [flask.request.form.get('id', None), ip, agent, get_time()])
-
         curs.execute("select pw from user where id = ?", [flask.request.form.get('id', None)])
         user = curs.fetchall()
         if not user:
             return re_error('/error/2')
 
-        salt = bcrypt.gensalt()
-        
         hashed = bytes(user[0][0], 'utf-8')
-        hashed.find(salt)
-
-        if not hashed == bcrypt.hashpw(bytes(flask.request.form.get('pw', None), 'utf-8'), hashed):
+        if not bcrypt.hashpw(bytes(flask.request.form.get('pw', ''), 'utf-8'), hashed) == hashed:
             return re_error('/error/10')
 
         flask.session['state'] = 1
@@ -2582,6 +2587,8 @@ def login():
             flask.session['head'] = css_data[0][0]
         else:
             flask.session['head'] = ''
+
+        curs.execute("insert into ua_d (name, ip, ua, today, sub) values (?, ?, ?, ?, '')", [flask.request.form.get('id', None), ip_check(1), agent, get_time()])
 
         conn.commit()
         
@@ -2626,15 +2633,11 @@ def change_password():
                 curs.execute("select pw from user where id = ?", [flask.session['id']])
                 user = curs.fetchall()
                 if not user:
-                    return re_error('/error/10')
-
-                salt = bcrypt.gensalt()
+                    return re_error('/error/2')
                 
                 hashed = bytes(user[0][0], 'utf-8')
-                hashed.find(salt)
-
-                if not hashed == bcrypt.hashpw(bytes(flask.request.form.get('pw4', None), 'utf-8'), hashed):
-                    return re_error('/error/2')
+                if not bcrypt.hashpw(bytes(flask.request.form.get('pw4', ''), 'utf-8'), hashed) == hashed:
+                    return re_error('/error/10')
 
                 hashed = bcrypt.hashpw(bytes(flask.request.form.get('pw2', None), 'utf-8'), bcrypt.gensalt()).decode()
                 

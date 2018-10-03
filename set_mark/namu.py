@@ -472,8 +472,6 @@ def namu(conn, data, title, main_num):
 
     data = re.sub('&amp;', '&', data)
 
-    data = tool.xss_protect(curs, data)
-
     data = re.sub('\n( +)\|\|', '\n||', data)
     data = re.sub('\|\|( +)\n', '||\n', data)
 
