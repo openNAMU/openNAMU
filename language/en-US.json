@@ -26,6 +26,7 @@
     "move" : "move",
     "hide" : "hide",
     "list" : "list",
+    "id" : "id",
     "out" : "out",
     "revert" : "undo",
     "version" : " ver",
