@@ -170,6 +170,7 @@ def middle_parser(data):
     middle_number = 0
     fol_num = 0
     syntax_num = 0
+    folding_num = 0
     while 1:
         middle_data = re.search('(?:{{{((?:(?! |{{{|}}}|&lt;).)*) ?|(}}}))', data)
         if middle_data:
