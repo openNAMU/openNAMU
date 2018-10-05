@@ -2483,6 +2483,21 @@ def topic(name = None, sub = None):
             data = '<h2 id="topic_top_title">' + sub + '</h2>' + all_data + data,
             menu = [['topic/' + url_pas(name), load_lang('list')]]
         ))
+
+@app.route('/tool/<name>')
+def user_tool(name = None):
+    data =  '''
+            <h2>''' + load_lang('tool') + '''</h2>
+            <ul>
+                <li><a href="/record/''' + url_pas(name) + '''">''' + load_lang('record') + '''</li>
+            </ul>
+            '''
+
+    return easy_minify(flask.render_template(skin_check(), 
+        imp = [name, wiki_set(), custom(), other2([' (' + load_lang('tool') + ')', 0])],
+        data = data,
+        menu = [['topic/' + url_pas(name), load_lang('list')]]
+    ))
         
 @app.route('/topic/<everything:name>', methods=['POST', 'GET'])
 @app.route('/topic/<everything:name>/<regex("close|agree"):tool>', methods=['GET'])
@@ -3560,6 +3575,7 @@ def recent_changes(name = None, tool = 'record'):
                     div = '<a href="/record/' + url_pas(name) + '?what=revert">(' + load_lang('revert') + ')</a><hr>' + div
                     div = '<a href="/record/' + url_pas(name) + '?what=move">(' + load_lang('move') + ')</a> ' + div
                     div = '<a href="/record/' + url_pas(name) + '?what=delete">(' + load_lang('delete') + ')</a> ' + div
+                    div = '<a href="/topic_record/' + url_pas(name) + '">(' + load_lang('discussion') + ')</a> ' + div
                     
                     curs.execute("select id, title, date, ip, send, leng from history where ip = ? order by date desc limit ?, '50'", [name, str(sql_num)])
                 else:
@@ -3691,7 +3707,7 @@ def recent_changes(name = None, tool = 'record'):
 
                 title = load_lang('edit') + ' ' + load_lang('record')
                 
-                menu = [['other', load_lang('other')], ['user', load_lang('user')], ['count/' + url_pas(name), load_lang('count')], ['topic_record/' + url_pas(name), load_lang('discussion')]]
+                menu = [['other', load_lang('other')], ['user', load_lang('user')], ['count/' + url_pas(name), load_lang('count')]]
                 
                 div += next_fix('/record/' + url_pas(name) + '/' + url_pas(what) + '?num=', num, data_list)
                 
