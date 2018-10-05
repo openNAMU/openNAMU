@@ -2613,9 +2613,9 @@ def login():
             imp = [load_lang('login'), wiki_set(), custom(), other2([0, 0])],
             data =  '''
                     <form method="post">
-                        <input placeholder="id" name="id" type="text">
+                        <input placeholder="''' + load_lang('id') + '''" name="id" type="text">
                         <hr>
-                        <input placeholder="password" name="pw" type="password">
+                        <input placeholder="''' + load_lang('password') + '''" name="pw" type="password">
                         <hr>
                         ''' + captcha_get() + '''
                         <button type="submit">''' + load_lang('login') + '''</button>
@@ -2700,13 +2700,13 @@ def change_password():
                         <form method="post">
                             <span>id : ''' + ip + '''</span>
                             <hr>
-                            <input placeholder="''' + load_lang('now') + ''' password" name="pw4" type="password">
+                            <input placeholder="''' + load_lang('now') + ' ' + load_lang('password') + '''" name="pw4" type="password">
                             <br>
                             <br>
-                            <input placeholder="''' + load_lang('new') + ''' password" name="pw2" type="password">
+                            <input placeholder="''' + load_lang('new') + ' ' + load_lang('password') + '''" name="pw2" type="password">
                             <br>
                             <br>
-                            <input placeholder="password ''' + load_lang('confirm') + '''" name="pw3" type="password">
+                            <input placeholder="''' + load_lang('password') + ' ' + load_lang('confirm') + '''" name="pw3" type="password">
                             <hr>
                             <span>''' + load_lang('user') + ' ' + load_lang('skin') + '''</span>
                             <br>
@@ -2882,9 +2882,9 @@ def register():
             data =  '''
                     <form method="post">
                         ''' + contract + '''
-                        <input placeholder="id" name="id" type="text">
+                        <input placeholder="''' + load_lang('id') + '''" name="id" type="text">
                         <hr>
-                        <input placeholder="password" name="pw" type="password">
+                        <input placeholder="''' + load_lang('password') + '''" name="pw" type="password">
                         <hr>
                         <input placeholder="''' + load_lang('confirm') + '''" name="pw2" type="password">
                         <hr>
@@ -2929,7 +2929,7 @@ def need_email(tool = 'pass_find'):
                 flask.session['c_key'] = ''.join(random.choice("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ") for i in range(16))
                 flask.session['c_id'] = flask.request.form.get('id', '')
 
-                send_email(flask.request.form.get('email', ''), wiki_set()[0] + ' password find key', 'key : ' + flask.session['c_key'])
+                send_email(flask.request.form.get('email', ''), wiki_set()[0] + ' ' + load_lang('password') + ' ' + load_lang('search') + ' key', 'key : ' + flask.session['c_key'])
 
                 return redirect('/check_pass_key')
     else:
@@ -2949,10 +2949,10 @@ def need_email(tool = 'pass_find'):
             ))
         else:
             return easy_minify(flask.render_template(skin_check(),    
-                imp = ['password ' + load_lang('search'), wiki_set(), custom(), other2([0, 0])],
+                imp = [load_lang('password') + ' ' + load_lang('search'), wiki_set(), custom(), other2([0, 0])],
                 data =  '''
                         <form method="post">
-                            <input placeholder="id" name="id" type="text">
+                            <input placeholder="''' + load_lang('id') + '''" name="id" type="text">
                             <hr>
                             <input placeholder="email" name="email" type="text">
                             <hr>
@@ -3010,7 +3010,7 @@ def check_key(tool = 'check_pass_key'):
                 hashed = bcrypt.hashpw(bytes(flask.session['c_key'], 'utf-8'), bcrypt.gensalt()).decode()
                 curs.execute("update user set pw = ? where id = ?", [hashed, flask.session['c_id']])
 
-                id = flask.session['c_id']
+                d_id = flask.session['c_id']
                 pw = flask.session['c_key']
 
                 flask.session.pop('c_id', None)
@@ -3019,9 +3019,9 @@ def check_key(tool = 'check_pass_key'):
                 return easy_minify(flask.render_template(skin_check(),    
                     imp = ['check', wiki_set(), custom(), other2([0, 0])],
                     data =  '''
-                            id : ''' + id + '''
+                            ''' + load_lang('id') + ' : ' + d_id + '''
                             <br>
-                            password : ''' + pw + '''
+                            ''' + load_lang('password') + ' : ' + pw + '''
                             ''',
                     menu = [['user', load_lang('user')]]
                 ))
@@ -3892,7 +3892,7 @@ def user_info():
         curs.execute("select data from other where name = 'email_have'")
         test = curs.fetchall()
         if test and test[0][0] != '':
-            plus += '<li><a href="/pass_find">password ' + load_lang('search') + '</a></li>'
+            plus += '<li><a href="/pass_find">' + load_lang('password') + ' ' + load_lang('search') + '</a></li>'
 
     return easy_minify(flask.render_template(skin_check(), 
         imp = [load_lang('user') + ' ' + load_lang('tool'), wiki_set(), custom(), other2([0, 0])],
