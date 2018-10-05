@@ -66,6 +66,8 @@ li {
     padding: 10px;
     padding-bottom: 20px;
     background: white;
+    border-left: 2px solid gainsboro;
+    border-right: 2px solid gainsboro;
 }
 
 #bottom {
@@ -90,49 +92,66 @@ li {
     padding: 10px;
 }
 
-@media (min-width: 1024px) and (max-width: 1600px) {
-    #main {
-        border-left: 2px solid gainsboro;
-        border-right: 2px solid gainsboro;
-        width: 70%;
-    }
-
-    #top_main {
-        width: 70%;
-    }
-
-    #bottom_main {
-        width: 70%;
-    }
-
-    .is_mobile {
-        display: none;
-    }
-}
-
-@media (min-width: 1600px) {
-    #main {
-        border-left: 2px solid white;
-        border-right: 2px solid white;
-        width: 55%;
-    }
-
-    #top_main {
-        width: 55%;
-    }
-
-    #bottom_main {
-        width: 55%;
-    }
-
-    .is_mobile {
-        display: none;
-    }
-}
-
-@media (max-width: 1024px) {
+@media (min-width: 780px) and (max-width: 1350px) {
     #main {
         width: 90%;
+    }
+
+    #top_main {
+        width: 90%;
+    }
+
+    #bottom_main {
+        width: 90%;
+    }
+
+    .is_mobile {
+        display: none;
+    }
+}
+
+
+@media (min-width: 1350px) and (max-width: 1590px) {
+    #main {
+        width: 70%;
+    }
+
+    #top_main {
+        width: 70%;
+    }
+
+    #bottom_main {
+        width: 70%;
+    }
+
+    .is_mobile {
+        display: none;
+    }
+}
+
+@media (min-width: 1590px) {
+    #main {
+        width: 55%;
+    }
+
+    #top_main {
+        width: 55%;
+    }
+
+    #bottom_main {
+        width: 55%;
+    }
+
+    .is_mobile {
+        display: none;
+    }
+}
+
+@media (max-width: 780px) {
+    #main {
+        width: 90%;
+        border-left: none;
+        border-right: none;
     }
 
     #top_main {
