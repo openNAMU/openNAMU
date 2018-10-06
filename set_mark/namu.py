@@ -411,7 +411,7 @@ def namu(conn, data, title, main_num):
                     include_plus = re.search(', ?((?:(?!=).)+)=((?:(?!,).)+)', include)
                     if include_plus:
                         include_plus = include_plus.groups()
-                        include_parser = re.sub('@' + include_plus[0] + '@', include_plus[1], include_parser)
+                        include_parser = include_parser.replace('@' + include_plus[0] + '@', include_plus[1])
 
                         include = re.sub(', ?((?:(?!=).)+)=((?:(?!,).)+)', '', include, 1)
                     else:
