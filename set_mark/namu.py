@@ -161,16 +161,14 @@ def table_start(data):
             
     return data
 
-def middle_parser(data):
+def middle_parser(data, fol_num, syntax_num, folding_num):
     global end_data
     global plus_data
 
     middle_stack = 0
     middle_list = []
     middle_number = 0
-    fol_num = 0
-    syntax_num = 0
-    folding_num = 0
+
     while 1:
         middle_data = re.search('(?:{{{((?:(?! |{{{|}}}|&lt;).)*) ?|(}}}))', data)
         if middle_data:
@@ -332,7 +330,7 @@ def middle_parser(data):
         else:
             break
 
-    return data
+    return [data, [fol_num, syntax_num, folding_num]]
     
 def link_fix(main_link):
     if re.search('^:', main_link):
@@ -368,7 +366,8 @@ def namu(conn, data, title, main_num):
 
     data = re.sub('\r\n', '\n', data)
 
-    data = middle_parser(data)
+    t_data = middle_parser(data, 0, 0, 0)
+    data = t_data[0]
 
     include_re = re.compile('\[include\(((?:(?!\)\]).)+)\)\]', re.I)
     while 1:
@@ -406,6 +405,7 @@ def namu(conn, data, title, main_num):
             include_data = curs.fetchall()
             if include_data:
                 include_parser = include_re.sub('', include_data[0][0])
+                include_parser = html.escape(include_parser)
 
                 while 1:
                     include_plus = re.search(', ?((?:(?!=).)+)=((?:(?!,).)+)', include)
@@ -418,7 +418,6 @@ def namu(conn, data, title, main_num):
                         break
 
                 include_parser = re.sub('\[\[(?:category|분류):(((?!\]\]|#include).)+)\]\]', '', include_parser)
-                include_parser = html.escape(include_parser)
 
                 data = include_re.sub('<include>\n<a id="include_link" href="/w/' + tool.url_pas(include_link) + '">[' + include_link + ']</a>\n' + include_parser + '\n</include>', data, 1)
             else:
@@ -428,7 +427,8 @@ def namu(conn, data, title, main_num):
 
     data = re.sub('\r\n', '\n', data)
 
-    data = middle_parser(data)
+    t_data = middle_parser(data, t_data[1][0], t_data[1][1], t_data[1][2])
+    data = t_data[0]
 
     data = re.sub('&amp;', '&', data)
 
