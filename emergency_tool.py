@@ -1,5 +1,6 @@
 import json
 import sqlite3
+import bcrypt
 import threading
 
 from func import *
@@ -18,6 +19,7 @@ print('2. recaptcha delete')
 print('3. ban delete')
 print('4. change port')
 print('5. change skin')
+print('6. change password')
 
 print('select : ', end = '')
 what_i_do = input()
@@ -66,6 +68,20 @@ elif what_i_do == '5':
     skin = input()
 
     curs.execute("update other set data = ? where name = 'skin'", [skin])
+elif what_i_do == '6':
+    print('1. bcrypt')
+    print('select : ', end = '')
+    what_i_do = input()
+
+    print('user name : ', end = '')
+    user_name = input()
+
+    print('user password : ', end = '')
+    user_pw = input()
+
+    if what_i_do == '1':
+        hashed = bcrypt.hashpw(bytes(user_pw, 'utf-8'), bcrypt.gensalt()).decode()
+        curs.execute("update user set pw = ? where id = ?", [hashed, user_name])
 
 conn.commit()
 
