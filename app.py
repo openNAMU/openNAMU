@@ -2641,7 +2641,7 @@ def change_password():
     
     if user_state == 'ip':
         if flask.request.method == 'POST':    
-            if flask.request.form.get('pw4', None):
+            if flask.request.form.get('pw4', None) and flask.request.form.get('pw2', None):
                 if flask.request.form.get('pw2', None) != flask.request.form.get('pw3', None):
                     return re_error('/error/20')
 
