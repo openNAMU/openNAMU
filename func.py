@@ -5,6 +5,7 @@ import sqlite3
 import hashlib
 import urllib.request
 import smtplib
+import bcrypt
 import re
 import html
 import os
@@ -114,12 +115,52 @@ def update():
     except:
         pass
 
-    # v3.0.6 사용자 설정 분리
-    try:
-        curs.execute("alter table user drop email")
-        curs.execute("alter table user drop skin")
-    except:
-       pass
+def pw_encode(data, data2 = '', type_d = ''):
+    if type_d == '':
+        curs.execute('select data from other where name = "encode"')
+        set_data = curs.fetchall()
+
+        type_d = set_data[0][0]
+
+    if type_d == 'sha256':
+        return hashlib.sha256(bytes(data, 'utf-8')).hexdigest()
+    else:
+        if data2 != '':
+            salt_data = bytes(data2, 'utf-8')
+        else:
+            salt_data = bcrypt.gensalt()
+            
+        return bcrypt.hashpw(bytes(data, 'utf-8'), salt_data).decode()
+
+def pw_check(data, data2, type_d = 'no', id_d = ''):
+    curs.execute('select data from other where name = "encode"')
+    db_data = curs.fetchall()
+
+    if type_d != 'no':
+        if type_d == '':
+            set_data = 'bcrypt'
+        else:
+            set_data = type_d
+    else:
+        set_data = db_data[0][0]
+    
+    if set_data == 'sha256':
+        data = pw_encode(data)
+
+        if data == data2:
+            re_data = 1
+        else:
+            re_data = 0
+    else:
+        if pw_encode(data, data2, 'bcrypt') == data2:
+            re_data = 1
+        else:
+            re_data = 0
+
+    if db_data[0][0] != set_data and re_data == 1 and id_d != '':
+        curs.execute("update user set pw = ?, encode = ? where id = ?", [pw_encode(data), db_data[0][0], id_d])
+
+    return re_data
 
 def captcha_post(re_data, num = 1):
     if num == 1:
