@@ -7,7 +7,6 @@ import tornado.wsgi
 import urllib.request
 import platform
 import zipfile
-import bcrypt
 import difflib
 import shutil
 import threading
@@ -17,7 +16,7 @@ import sys
 
 from func import *
 
-r_ver = 'v3.0.8-master-03'
+r_ver = 'v3.0.8-master-04'
 c_ver = ''.join(re.findall('[0-9]', r_ver))
 
 print('version : ' + r_ver)
@@ -137,7 +136,7 @@ if setup_tool != 0:
     create_data['cache_data'] = ['title', 'data']
     create_data['history'] = ['id', 'title', 'data', 'date', 'ip', 'send', 'leng', 'hide']
     create_data['rd'] = ['title', 'sub', 'date', 'band']
-    create_data['user'] = ['id', 'pw', 'acl', 'date']
+    create_data['user'] = ['id', 'pw', 'acl', 'date', 'encode']
     create_data['user_set'] = ['name', 'id', 'data']
     create_data['ban'] = ['block', 'end', 'why', 'band', 'login']
     create_data['topic'] = ['id', 'title', 'sub', 'data', 'date', 'ip', 'block', 'top']
@@ -164,7 +163,7 @@ if setup_tool != 0:
             except:
                 curs.execute("alter table " + create_table + " add " + create + " text default ''")
 
-        update()
+    update()
 
 curs.execute('select name from alist where acl = "owner"')
 if not curs.fetchall():
@@ -252,25 +251,25 @@ else:
     
     print('language : ' + str(rep_language))
 
-support_mark = ['namumark']
-	
-curs.execute('select data from other where name = "markup"')
-rep_data = curs.fetchall()
-if not rep_data:
-	while 1:
-		print('markup [' + ', '.join(support_mark) + '] : ', end = '')
-	
-		rep_mark = str(input())
-		if rep_mark:
-			curs.execute('insert into other (name, data) values ("markup", ?)', [rep_mark])
+ask_this = [[['markup', 'markup'], ['namumark']], [['encryption method', 'encode'], ['sha256', 'bcrypt']]]
+for ask_data in ask_this:
+    curs.execute('select data from other where name = ?', [ask_data[0][1]])
+    rep_data = curs.fetchall()
+    if not rep_data:
+        while 1:
+            print(ask_data[0][0] + ' [' + ', '.join(ask_data[1]) + '] : ', end = '')
+        
+            rep_mark = str(input())
+            if rep_mark and rep_mark in ask_data[1]:
+                curs.execute('insert into other (name, data) values (?, ?)', [ask_data[0][1], rep_mark])
 
-			break
-		else:
-			pass
-else:
-	rep_mark = rep_data[0][0]
+                break
+            else:
+                pass
+    else:
+        rep_mark = rep_data[0][0]
 
-	print('markup : ' + str(rep_mark))
+        print(ask_data[0][1] + ' : ' + str(rep_mark))
 
 curs.execute('delete from other where name = "ver"')
 curs.execute('insert into other (name, data) values ("ver", ?)', [c_ver])
@@ -335,7 +334,7 @@ def alarm():
         menu = [['user', load_lang('user')]]
     ))
 
-@app.route('/<regex("inter_wiki|(?:edit|email)_filter"):tools>')
+@app.route('/<regex("inter_wiki|(?:edit|email|name)_filter"):tools>')
 def inter_wiki(tools = None):
     div = ''
     admin = admin_check(None, None)
@@ -400,7 +399,7 @@ def inter_wiki(tools = None):
         menu = [['other', load_lang('other')]]
     ))
 
-@app.route('/<regex("del_(?:inter_wiki|(?:edit|email)_filter)"):tools>/<name>')
+@app.route('/<regex("del_(?:inter_wiki|(?:edit|email|name)_filter)"):tools>/<name>')
 def del_inter(tools = None, name = None):
     if admin_check(None, tools) == 1:
         if tools == 'del_inter_wiki':
@@ -416,7 +415,7 @@ def del_inter(tools = None, name = None):
     else:
         return re_error('/error/3')
 
-@app.route('/<regex("plus_(?:inter_wiki|(?:edit|email)_filter)"):tools>', methods=['POST', 'GET'])
+@app.route('/<regex("plus_(?:inter_wiki|(?:edit|email|name)_filter)"):tools>', methods=['POST', 'GET'])
 @app.route('/<regex("plus_edit_filter"):tools>/<name>', methods=['POST', 'GET'])
 def plus_inter(tools = None, name = None):
     if flask.request.method == 'POST':
@@ -2584,13 +2583,18 @@ def login():
         ip = ip_check()
         agent = flask.request.headers.get('User-Agent')
 
-        curs.execute("select pw from user where id = ?", [flask.request.form.get('id', None)])
+        curs.execute("select pw, encode from user where id = ?", [flask.request.form.get('id', None)])
         user = curs.fetchall()
         if not user:
             return re_error('/error/2')
 
-        hashed = bytes(user[0][0], 'utf-8')
-        if not bcrypt.hashpw(bytes(flask.request.form.get('pw', ''), 'utf-8'), hashed) == hashed:
+        pw_check_d = pw_check(
+            flask.request.form.get('pw', ''), 
+            user[0][0],
+            user[0][1],
+            flask.request.form.get('id', None)
+        )
+        if pw_check_d != 1:
             return re_error('/error/10')
 
         flask.session['state'] = 1
@@ -2645,16 +2649,21 @@ def change_password():
                 if flask.request.form.get('pw2', None) != flask.request.form.get('pw3', None):
                     return re_error('/error/20')
 
-                curs.execute("select pw from user where id = ?", [flask.session['id']])
+                curs.execute("select pw, encode from user where id = ?", [flask.session['id']])
                 user = curs.fetchall()
                 if not user:
                     return re_error('/error/2')
                 
-                hashed = bytes(user[0][0], 'utf-8')
-                if not bcrypt.hashpw(bytes(flask.request.form.get('pw4', ''), 'utf-8'), hashed) == hashed:
+                pw_check_d = pw_check(
+                    flask.request.form.get('pw4', ''), 
+                    user[0][0],
+                    user[0][1],
+                    flask.request.form.get('id', None)
+                )
+                if pw_check_d != 1:
                     return re_error('/error/10')
 
-                hashed = bcrypt.hashpw(bytes(flask.request.form.get('pw2', None), 'utf-8'), bcrypt.gensalt()).decode()
+                hashed = pw_encode(flask.request.form.get('pw2', None))
                 
                 curs.execute("update user set pw = ? where id = ?", [hashed, flask.session['id']])
 
@@ -2833,7 +2842,7 @@ def register():
         if curs.fetchall():
             return re_error('/error/6')
 
-        hashed = bcrypt.hashpw(bytes(flask.request.form.get('pw', None), 'utf-8'), bcrypt.gensalt()).decode()
+        hashed = pw_encode(flask.request.form.get('pw', None))
         
         curs.execute('select data from other where name = "email_have"')
         sql_data = curs.fetchall()
@@ -3007,7 +3016,7 @@ def check_key(tool = 'check_pass_key'):
                 return redirect('/register')
         else:
             if 'c_id' in flask.session and flask.session['c_key'] == flask.request.form.get('key', None):
-                hashed = bcrypt.hashpw(bytes(flask.session['c_key'], 'utf-8'), bcrypt.gensalt()).decode()
+                hashed = pw_encode(flask.session['c_key'])
                 curs.execute("update user set pw = ? where id = ?", [hashed, flask.session['c_id']])
 
                 d_id = flask.session['c_id']
