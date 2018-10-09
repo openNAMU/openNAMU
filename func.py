@@ -365,6 +365,9 @@ def diff(seqm):
     end = end.replace('\r\n', '\n')
     sub = ''
 
+    if not re.search('\n', end):
+        end += '\n'
+
     num = 0
     left = 1
     while 1:
