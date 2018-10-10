@@ -176,7 +176,7 @@ if not os.path.exists('image'):
 if not os.path.exists('views'):
     os.makedirs('views')
 
-if os.getenv('NAMU_PORT') is not None:
+if os.getenv('NAMU_PORT') != None:
     rep_port = os.getenv('NAMU_PORT')
 else:
     curs.execute('select data from other where name = "port"')
@@ -230,7 +230,7 @@ support_language = ['ko-KR', 'en-US']
 curs.execute("select data from other where name = 'language'")
 rep_data = curs.fetchall()
 if not rep_data:
-    if os.getenv('NAMU_LANG') is not None:
+    if os.getenv('NAMU_LANG') != None:
         if os.getenv('NAMU_LANG') in support_language:
             curs.execute("insert into other (name, data) values ('language', ?)", [os.getenv('NAMU_LANG')])
             rep_language = os.getenv('NAMU_LANG')

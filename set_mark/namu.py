@@ -169,40 +169,41 @@ def middle_parser(data, fol_num, syntax_num, folding_num):
     middle_list = []
     middle_number = 0
 
+    middle_re = '(?:{{{((?:(?! |{{{|}}}|&lt;).)*) ?|(}}}))'
     while 1:
-        middle_data = re.search('(?:{{{((?:(?! |{{{|}}}|&lt;).)*) ?|(}}}))', data)
+        middle_data = middle_re.search(data)
         if middle_data:
             middle_data = middle_data.groups()
             if not middle_data[1]:
                 if middle_stack > 0:
                     middle_stack += 1
                     
-                    data = re.sub('(?:{{{((?:(?! |{{{|}}}|&lt;).)*)(?P<in> ?)|(}}}))', '&#123;&#123;&#123;' + middle_data[0] + '\g<in>', data, 1)
+                    data = middle_re.sub('(?:{{{((?:(?! |{{{|}}}|&lt;).)*)(?P<in> ?)|(}}}))', '&#123;&#123;&#123;' + middle_data[0] + '\g<in>', data, 1)
                 else:
                     if re.search('^(#|@|\+|\-)', middle_data[0]) and not re.search('^(#|@|\+|\-){2}', middle_data[0]):
                         middle_search = re.search('^(#(?:[0-9a-f-A-F]{3}){1,2})', middle_data[0])
                         if middle_search:                            
                             middle_list += ['span']
                             
-                            data = re.sub('(?:{{{((?:(?! |{{{|}}}|&lt;).)*) ?|(}}}))', '<span style="color: ' + middle_search.groups()[0] + ';">', data, 1)
+                            data = middle_re.sub('<span style="color: ' + middle_search.groups()[0] + ';">', data, 1)
                         else:
                             middle_search = re.search('^(?:#(\w+))', middle_data[0])
                             if middle_search:
                                 middle_list += ['span']
                                 
-                                data = re.sub('(?:{{{((?:(?! |{{{|}}}|&lt;).)*) ?|(}}}))', '<span style="color: ' + middle_search.groups()[0] + ';">', data, 1)
+                                data = middle_re.sub('<span style="color: ' + middle_search.groups()[0] + ';">', data, 1)
                             else:
                                 middle_search = re.search('^(?:@((?:[0-9a-f-A-F]{3}){1,2}))', middle_data[0])
                                 if middle_search:
                                     middle_list += ['span']
                                     
-                                    data = re.sub('(?:{{{((?:(?! |{{{|}}}|&lt;).)*) ?|(}}}))', '<span style="background: #' + middle_search.groups()[0] + ';">', data, 1)
+                                    data = middle_re.sub('<span style="background: #' + middle_search.groups()[0] + ';">', data, 1)
                                 else:
                                     middle_search = re.search('^(?:@(\w+))', middle_data[0])
                                     if middle_search:
                                         middle_list += ['span']
                                         
-                                        data = re.sub('(?:{{{((?:(?! |{{{|}}}|&lt;).)*) ?|(}}}))', '<span style="background: ' + middle_search.groups()[0] + ';">', data, 1)
+                                        data = middle_re.sub('<span style="background: ' + middle_search.groups()[0] + ';">', data, 1)
                                     else:
                                         middle_search = re.search('^(\+|-)([1-5])', middle_data[0])
                                         if middle_search:
@@ -214,7 +215,7 @@ def middle_parser(data, fol_num, syntax_num, folding_num):
 
                                             middle_list += ['span']
                                             
-                                            data = re.sub('(?:{{{((?:(?! |{{{|}}}|&lt;).)*) ?|(}}}))', '<span style="font-size: ' + font_size + '%;">', data, 1)
+                                            data = middle_re.sub('<span style="font-size: ' + font_size + '%;">', data, 1)
                                         else:
                                             middle_search = re.search('^#!wiki', middle_data[0])
                                             if middle_search:
@@ -269,34 +270,34 @@ def middle_parser(data, fol_num, syntax_num, folding_num):
                                                     else:
                                                         middle_list += ['span']
 
-                                                        data = re.sub('(?:{{{((?:(?! |{{{|}}}|&lt;).)*) ?|(}}}))', '<span>', data, 1)
+                                                        data = middle_re.sub('<span>', data, 1)
                     else:
                         middle_list += ['code']
                         
                         middle_stack += 1
                         
-                        data = re.sub('(?:{{{((?:(?! |{{{|}}}|&lt;).)*)|(}}}))', '<code>' + middle_data[0].replace('\\', '\\\\'), data, 1)
+                        data = middle_re.sub('<code>' + middle_data[0].replace('\\', '\\\\'), data, 1)
                 
                     middle_number += 1
             else:
                 if middle_list == []:
-                    data = re.sub('(?:{{{((?:(?! |{{{|}}}|&lt;).)*) ?|(}}}))', '&#125;&#125;&#125;', data, 1)
+                    data = middle_re.sub('&#125;&#125;&#125;', data, 1)
                 else:
                     if middle_stack > 0:
                         middle_stack -= 1
 
                     if middle_stack > 0:
-                        data = re.sub('(?:{{{((?:(?! |{{{|}}}|&lt;).)*) ?|(}}}))', '&#125;&#125;&#125;', data, 1)
+                        data = middle_re.sub('&#125;&#125;&#125;', data, 1)
                     else:                    
                         if middle_number > 0:
                             middle_number -= 1
                             
                         if middle_list[middle_number] == '2div':
-                            data = re.sub('(?:{{{((?:(?! |{{{|}}}|&lt;).)*) ?|(}}}))', '</div_end></div_end></div_end>', data, 1)
+                            data = middle_re.sub('</div_end></div_end></div_end>', data, 1)
                         elif middle_list[middle_number] == 'pre':
-                            data = re.sub('(?:{{{((?:(?! |{{{|}}}|&lt;).)*) ?|(}}}))', '</code></pre>', data, 1)
+                            data = middle_re.sub('</code></pre>', data, 1)
                         else:
-                            data = re.sub('(?:{{{((?:(?! |{{{|}}}|&lt;).)*) ?|(}}}))', '</' + middle_list[middle_number] + '>', data, 1)
+                            data = middle_re.sub('</' + middle_list[middle_number] + '>', data, 1)
                         
                         del(middle_list[middle_number])
         else:
