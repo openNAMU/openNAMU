@@ -169,7 +169,7 @@ def middle_parser(data, fol_num, syntax_num, folding_num):
     middle_list = []
     middle_number = 0
 
-    middle_re = '(?:{{{((?:(?! |{{{|}}}|&lt;).)*) ?|(}}}))'
+    middle_re = re.compile('(?:{{{((?:(?! |{{{|}}}|&lt;).)*) ?|(}}}))')
     while 1:
         middle_data = middle_re.search(data)
         if middle_data:
@@ -178,7 +178,7 @@ def middle_parser(data, fol_num, syntax_num, folding_num):
                 if middle_stack > 0:
                     middle_stack += 1
                     
-                    data = middle_re.sub('(?:{{{((?:(?! |{{{|}}}|&lt;).)*)(?P<in> ?)|(}}}))', '&#123;&#123;&#123;' + middle_data[0] + '\g<in>', data, 1)
+                    data = re.sub('(?:{{{((?:(?! |{{{|}}}|&lt;).)*)(?P<in> ?)|(}}}))', '&#123;&#123;&#123;' + middle_data[0] + '\g<in>', data, 1)
                 else:
                     if re.search('^(#|@|\+|\-)', middle_data[0]) and not re.search('^(#|@|\+|\-){2}', middle_data[0]):
                         middle_search = re.search('^(#(?:[0-9a-f-A-F]{3}){1,2})', middle_data[0])
