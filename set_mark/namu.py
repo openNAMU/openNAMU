@@ -882,12 +882,16 @@ def namu(conn, data, title, main_num):
     data = br_re.sub('<br>', data)
             
     footnote_number = 0
+    
     footnote_all = []
     footnote_dict = {}
     footnote_re = {}
+    
     footdata_all = '\n<hr><ul id="footnote_data">'
+    
+    re_footnote = re.compile('(?:\[\*((?:(?! |\]).)*)(?: ((?:(?!(?:\[\*|\])).)+))?\]|(\[(?:각주|footnote)\]))')
     while 1:
-        footnote = re.search('(?:\[\*((?:(?! |\]).)*)(?: ((?:(?!(?:\[\*(?:(?:(?!\]).)+)\]|\])).)+))?\]|(\[(?:각주|footnote)\]))', data)
+        footnote = re_footnote.search(data)
         if footnote:
             footnote_data = footnote.groups()
             if footnote_data[2]:
@@ -901,7 +905,7 @@ def namu(conn, data, title, main_num):
 
                     footdata_all += '<li><a href="#rfn-' + str(footdata[0]) + '" id="fn-' + str(footdata[0]) + '">(' + footdata[1] + ')</a> ' + footdata_in + '</li>'
                 
-                data = re.sub('(?:\[\*((?:(?! ).)*) ((?:(?!\]).)+)\]|(\[(?:각주|footnote)\]))', footdata_all + '</ul>', data, 1)
+                data = re_footnote.sub(footdata_all + '</ul>', data, 1)
                 
                 footnote_all = []
                 footdata_all = '\n<hr><ul id="footnote_data">'
@@ -917,9 +921,9 @@ def namu(conn, data, title, main_num):
 
                         footnote_all += [[float(footshort), footshort, 0]]
 
-                        data = re.sub('(?:\[\*((?:(?! |\]).)*)(?: ((?:(?!(?:\[\*(?:(?:(?!\]).)+)\]|\])).)+))?\]|(\[(?:각주|footnote)\]))', '<sup><a href="#fn-' + footshort + '" id="rfn-' + footshort + '">(' + footshort + ')</a></sup>', data, 1)
+                        data = re_footnote.sub('<sup><a href="#fn-' + footshort + '" id="rfn-' + footshort + '">(' + footshort + ')</a></sup>', data, 1)
                     else:
-                        data = re.sub('(?:\[\*((?:(?! |\]).)*)(?: ((?:(?!(?:\[\*(?:(?:(?!\]).)+)\]|\])).)+))?\]|(\[(?:각주|footnote)\]))', '<sup><a href="#">(' + footnote_name + ')</a></sup>', data, 1)
+                        data = re_footnote.sub('<sup><a href="#">(' + footnote_name + ')</a></sup>', data, 1)
                 else:
                     footnote_number += 1
 
@@ -935,7 +939,7 @@ def namu(conn, data, title, main_num):
 
                     footnote_all += [[footnote_number, footnote_name, footnote]]
                     
-                    data = re.sub('(?:\[\*((?:(?! |\]).)*)(?: ((?:(?!(?:\[\*(?:(?:(?!\]).)+)\]|\])).)+))?\]|(\[(?:각주|footnote)\]))', '<sup><a href="#fn-' + str(footnote_number) + '" id="rfn-' + str(footnote_number) + '">(' + footnote_name + ')</a></sup>', data, 1)
+                    data = re_footnote.sub('<sup><a href="#fn-' + str(footnote_number) + '" id="rfn-' + str(footnote_number) + '">(' + footnote_name + ')</a></sup>', data, 1)
         else:
             break
 
