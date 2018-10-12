@@ -49,6 +49,7 @@ def send_email(who, title, data):
 
 def easy_minify(data):
     data = re.sub('\n +<', '\n<', data)
+    data = re.sub('>(\n| )+<', '><', data)
     
     return data
 

@@ -3517,8 +3517,15 @@ def user_topic_list(name = None):
     
     one_admin = admin_check(1, None)
 
-    div = '<table id="main_table_set"><tbody><tr>'
-    div += '<td id="main_table_width">' + load_lang('discussion') + ' ' + load_lang('name') + '</td><td id="main_table_width">' + load_lang('writer') + '</td><td id="main_table_width">' + load_lang('time') + '</td></tr>'
+    div =   '''
+            <table id="main_table_set">
+                <tbody>
+                    <tr>
+                        <td id="main_table_width">''' + load_lang('discussion') + ' ' + load_lang('name') + '''</td>
+                        <td id="main_table_width">''' + load_lang('writer') + '''</td>
+                        <td id="main_table_width">''' + load_lang('time') + '''</td>
+                    </tr>
+            '''
     
     curs.execute("select title, id, sub, ip, date from topic where ip = ? order by date desc limit ?, '50'", [name, str(sql_num)])
     data_list = curs.fetchall()
