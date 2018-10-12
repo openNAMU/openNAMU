@@ -16,7 +16,7 @@ import sys
 
 from func import *
 
-r_ver = 'v3.0.8-master-04'
+r_ver = 'v3.0.8-master-05'
 c_ver = ''.join(re.findall('[0-9]', r_ver))
 
 print('version : ' + r_ver)
@@ -134,7 +134,7 @@ if setup_tool != 0:
 
     create_data['data'] = ['title', 'data']
     create_data['cache_data'] = ['title', 'data']
-    create_data['history'] = ['id', 'title', 'data', 'date', 'ip', 'send', 'leng', 'hide']
+    create_data['history'] = ['id', 'title', 'data', 'date', 'ip', 'send', 'leng', 'hide', 'type']
     create_data['rd'] = ['title', 'sub', 'date', 'band']
     create_data['user'] = ['id', 'pw', 'acl', 'date', 'encode']
     create_data['user_set'] = ['name', 'id', 'data']
@@ -451,7 +451,11 @@ def plus_inter(tools = None, name = None):
 
         if tools == 'plus_inter_wiki':
             title = load_lang('interwiki') + ' ' + load_lang('plus')
-            form_data = '<input placeholder="' + load_lang('name') + '" type="text" name="title"><hr><input placeholder="link" type="text" name="link">'
+            form_data = '''
+                        <input placeholder="''' + load_lang('name') + '''" type="text" name="title">
+                        <hr>
+                        <input placeholder="link" type="text" name="link">
+                        '''
         elif tools == 'plus_edit_filter':
             curs.execute("select regex, sub from filter where name = ?", [name])
             exist = curs.fetchall()
@@ -1173,7 +1177,11 @@ def restart():
 
         return easy_minify(flask.render_template(skin_check(), 
             imp = [load_lang('server') + ' ' + load_lang('restart'), wiki_set(), custom(), other2([0, 0])],
-            data = '<form method="post"><button type="submit">' + load_lang('restart') + '</button></form>',
+            data =  '''
+                    <form method="post">
+                        <button type="submit">''' + load_lang('restart') + '''</button>
+                    </form>
+                    ''',
             menu = [['manager', load_lang('admin')]]
         ))       
 
@@ -3424,7 +3432,7 @@ def read_view(name = None):
     else:
         data_none = 1
         response_data = 404
-        else_data = ''
+        else_data = None
 
     m = re.search("^user:([^/]*)", name)
     if m:
