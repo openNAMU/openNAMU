@@ -49,7 +49,7 @@ def send_email(who, title, data):
 
 def easy_minify(data):
     data = re.sub('\n +<', '\n<', data)
-    data = re.sub('>(\n| )+<', '><', data)
+    data = re.sub('>(\n| )+<', '> <', data)
     
     return data
 
@@ -735,6 +735,24 @@ def leng_check(first, second):
         all_plus = '0'
         
     return all_plus
+
+def edit_filter_do(data):
+    if admin_check(1, 'edit_filter pass') != 1:
+        curs.execute("select regex, sub from filter")
+        for data_list in curs.fetchall():
+            match = re.compile(data_list[0])
+            if match.search(data):
+                ban_insert(
+                    ip_check(), 
+                    '0' if data_list[1] == 'X' else data_list[1], 
+                    load_lang('edit', 1) + ' ' + load_lang('filter', 1), 
+                    None, 
+                    load_lang('tool', 1) + ':' + load_lang('edit', 1) + ' ' + load_lang('filter', 1)
+                )
+                
+                return 1
+    
+    return 0
 
 def redirect(data):
     return flask.redirect(data)

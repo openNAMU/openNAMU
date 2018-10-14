@@ -1593,12 +1593,16 @@ def revert(name = None):
             return re_error('/error/13')
         else:
             captcha_post('', 0)
+    
+        curs.execute("select data from history where title = ? and id = ?", [name, str(num)])
+        data = curs.fetchall()
+        if data:
+            if edit_filter_do(data[0][0]) == 1:
+                return re_error('/error/21')
 
         curs.execute("delete from back where link = ?", [name])
         conn.commit()
         
-        curs.execute("select data from history where title = ? and id = ?", [name, str(num)])
-        data = curs.fetchall()
         if data:                                
             curs.execute("select data from data where title = ?", [name])
             data_old = curs.fetchall()
@@ -1626,7 +1630,7 @@ def revert(name = None):
             
             conn.commit()
             
-            return redirect('/w/' + url_pas(name))
+        return redirect('/w/' + url_pas(name))
     else:
         curs.execute("select title from history where title = ? and id = ?", [name, str(num)])
         if not curs.fetchall():
@@ -1655,31 +1659,19 @@ def edit(name = None):
         return re_error('/ban')
     
     if flask.request.method == 'POST':
-        if admin_check(1, 'edit_filter pass') != 1:
-            curs.execute("select regex, sub from filter")
-            for data_list in curs.fetchall():
-                match = re.compile(data_list[0])
-                if match.search(flask.request.form.get('content', None)):
-                    ban_insert(
-                        ip, 
-                        '0' if data_list[1] == 'X' else data_list[1], 
-                        load_lang('edit', 1) + ' ' + load_lang('filter', 1), 
-                        None, 
-                        load_lang('tool', 1) + ':' + load_lang('edit', 1) + ' ' + load_lang('filter', 1)
-                    )
-                    
-                    return re_error('/error/21')
-
         if captcha_post(flask.request.form.get('g-recaptcha-response', '')) == 1:
             return re_error('/error/13')
         else:
             captcha_post('', 0)
-
+            
         if len(flask.request.form.get('send', None)) > 500:
             return re_error('/error/15')
 
         if flask.request.form.get('otent', None) == flask.request.form.get('content', None):
             return redirect('/w/' + url_pas(name))
+            
+        if edit_filter_do(flask.request.form.get('content', '')) == 1:
+            return re_error('/error/21')
 
         today = get_time()
         content = savemark(flask.request.form.get('content', None))
