@@ -1,6 +1,7 @@
 import json
 import sqlite3
 import bcrypt
+import hashlib
 import threading
 
 from func import *
@@ -69,7 +70,8 @@ elif what_i_do == '5':
 
     curs.execute("update other set data = ? where name = 'skin'", [skin])
 elif what_i_do == '6':
-    print('1. bcrypt')
+    print('1. sha256')
+    print('2. bcrypt')
     print('select : ', end = '')
     what_i_do = input()
 
@@ -80,8 +82,11 @@ elif what_i_do == '6':
     user_pw = input()
 
     if what_i_do == '1':
+        hashed = hashlib.sha256(bytes(user_pw, 'utf-8')).hexdigest()
+    elif what_i_do == '2':
         hashed = bcrypt.hashpw(bytes(user_pw, 'utf-8'), bcrypt.gensalt()).decode()
-        curs.execute("update user set pw = ? where id = ?", [hashed, user_name])
+       
+    curs.execute("update user set pw = ? where id = ?", [hashed, user_name])
 
 conn.commit()
 
