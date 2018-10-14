@@ -520,8 +520,8 @@ def setting(num = 0):
             menu = [['manager', load_lang('admin')]]
         ))
     elif num == 1:
-        i_list = ['name', 'logo', 'frontpage', 'license', 'upload', 'skin', 'edit', 'reg', 'ip_view', 'back_up', 'port', 'key', 'update', 'email_have', 'discussion']
-        n_list = ['wiki', '', 'FrontPage', 'CC 0', '2', '', 'normal', '', '', '0', '3000', 'test', 'stable', '', 'normal']
+        i_list = ['name', 'logo', 'frontpage', 'license', 'upload', 'skin', 'edit', 'reg', 'ip_view', 'back_up', 'port', 'key', 'update', 'email_have', 'discussion', 'encode']
+        n_list = ['wiki', '', 'FrontPage', 'CC 0', '2', '', 'normal', '', '', '0', '3000', 'test', 'stable', '', 'normal', 'sha256']
         
         if flask.request.method == 'POST':
             i = 0
@@ -590,6 +590,14 @@ def setting(num = 0):
             else:
                 div3 += '<option value="master">master</option>'
                 div3 += '<option value="stable">stable</option>'
+                
+            div5 =''
+            if d_list[15] == 'sha256':
+                div5 += '<option value="sha256">sha256</option>'
+                div5 += '<option value="bcrypt">bcrypt</option>'
+            else:
+                div5 += '<option value="bcrypt">bcrypt</option>'
+                div5 += '<option value="sha256">sha256</option>'
 
             return easy_minify(flask.render_template(skin_check(), 
                 imp = [load_lang('main'), wiki_set(), custom(), other2([0, 0])],
@@ -660,6 +668,11 @@ def setting(num = 0):
                             <br>
                             <br>
                             <select name="update">''' + div3 + '''</select>
+                            <hr>
+                            <span>encryption method</span>
+                            <br>
+                            <br>
+                            <select name="encode">''' + div5 + '''</select>
                             <hr>
                             <button id="save" type="submit">''' + load_lang('save') + '''</button>
                         </form>
