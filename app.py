@@ -1456,10 +1456,22 @@ def block_log(name = None, tool = None, tool2 = None):
         else:
             end = load_lang('limitless') + ''
             
-        div += '<tr><td>' + ip + '</td><td>' + ip_pas(data[2]) + '</td><td>start : ' + data[4] + '<br>end : ' + end + '</td></tr>'
-        div += '<tr><td colspan="3">' + why + '</td></tr>'
-
-    div += '</tbody></table>'
+        div +=  '''
+                        <tr>
+                            <td>''' + ip + '''</td>
+                            <td>''' + ip_pas(data[2]) + '''</td>
+                            <td>
+                                start : ''' + data[4] + '''
+                                <br>
+                                end : ''' + end + '''
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="3">''' + why + '''</td>
+                        </tr>
+                    </tbody>
+                </table>
+                '''
     
     if not name:
         if not tool2:
