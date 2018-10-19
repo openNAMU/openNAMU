@@ -1,14 +1,18 @@
 import email.mime.text
-import flask
-import json
+import urllib.request
 import sqlite3
 import hashlib
-import urllib.request
 import smtplib
 import bcrypt
-import re
+import flask
+import json
 import html
+import sys
+import re
 import os
+
+if sys.version_info < (3, 6):
+    import sha3
 
 from set_mark.tool import *
 from mark import *
@@ -125,11 +129,16 @@ def pw_encode(data, data2 = '', type_d = ''):
 
     if type_d == 'sha256':
         return hashlib.sha256(bytes(data, 'utf-8')).hexdigest()
+    elif type_d == 'sha3':
+        if sys.version_info < (3, 6):
+            return sha3.sha3_256(bytes(data, 'utf-8')).hexdigest()
+        else:
+            return hashlib.sha3_256(bytes(data, 'utf-8')).hexdigest()
     else:
         if data2 != '':
             salt_data = bytes(data2, 'utf-8')
         else:
-            salt_data = bcrypt.gensalt()
+            salt_data = bcrypt.gensalt(11)
             
         return bcrypt.hashpw(bytes(data, 'utf-8'), salt_data).decode()
 
@@ -145,10 +154,9 @@ def pw_check(data, data2, type_d = 'no', id_d = ''):
     else:
         set_data = db_data[0][0]
     
-    if set_data == 'sha256':
-        data = pw_encode(data)
-
-        if data == data2:
+    if set_data in ['sha256', 'sha3']:
+        data3 = pw_encode(data = data, type_d = set_data)
+        if data3 == data2:
             re_data = 1
         else:
             re_data = 0

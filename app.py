@@ -12,11 +12,10 @@ import shutil
 import threading
 import logging
 import random
-import sys
 
 from func import *
 
-r_ver = 'v3.0.8-master-05'
+r_ver = 'v3.0.8-master-06'
 c_ver = ''.join(re.findall('[0-9]', r_ver))
 
 print('version : ' + r_ver)
@@ -251,7 +250,7 @@ else:
     
     print('language : ' + str(rep_language))
 
-ask_this = [[['markup', 'markup'], ['namumark']], [['encryption method', 'encode'], ['sha256', 'bcrypt']]]
+ask_this = [[['markup', 'markup'], ['namumark']], [['encryption method', 'encode'], ['sha256', 'sha3', 'bcrypt']]]
 for ask_data in ask_this:
     curs.execute('select data from other where name = ?', [ask_data[0][1]])
     rep_data = curs.fetchall()
@@ -592,12 +591,12 @@ def setting(num = 0):
                 div3 += '<option value="stable">stable</option>'
                 
             div5 =''
-            if d_list[15] == 'sha256':
-                div5 += '<option value="sha256">sha256</option>'
-                div5 += '<option value="bcrypt">bcrypt</option>'
-            else:
-                div5 += '<option value="bcrypt">bcrypt</option>'
-                div5 += '<option value="sha256">sha256</option>'
+            encode_data = ['sha256', 'sha3', 'bcrypt']
+            for i in encode_data:
+                if d_list[15] == i:
+                    div5 = '<option value="' + i + '">' + i + '</option>' + div5
+                else:
+                    div5 += '<option value="' + i + '">' + i + '</option>'
 
             return easy_minify(flask.render_template(skin_check(), 
                 imp = [load_lang('main'), wiki_set(), custom(), other2([0, 0])],
