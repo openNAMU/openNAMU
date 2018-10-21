@@ -4,6 +4,8 @@
 
 opennamu is a Python-based wiki engine. If you install Python and its underlying modules, you will be able to create wikis.
 
+ * [(README for korean)](./readme-ko.md)
+
 ### Index
  * [Getting Started](#getting-started)
  * [Clone](#clone)
