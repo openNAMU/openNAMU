@@ -2,7 +2,7 @@ opennamu
 ====
 ![Python 3.5 Required](https://img.shields.io/badge/python-3.5-blue.svg?longCache=true&style=flat-square)
 
-opennamu는 파이썬 기반의 위키 엔진입니다. 파이썬과 그 의존성 모듈만 설치하면 사용할 수 있으며, 코드를 직접 수정하여 좀 더 주제에 특화된 위키를 만들 수 있습니다.
+오픈나무는 파이썬 기반의 위키 엔진입니다. 파이썬과 그 의존성 모듈만 설치하면 사용할 수 있으며, 코드를 직접 수정하여 좀 더 주제에 특화된 위키를 만들 수 있습니다.
 
 ### 목차
  * [시작하기](#시작하기)
@@ -24,11 +24,11 @@ opennamu는 파이썬 기반의 위키 엔진입니다. 파이썬과 그 의존�
  * `git clone -b master https://github.com/2du/opennamu.git`
 
 # 기여
-opennamu에는 검증되지 않은 몇가지 버그가 존재할 수 있습니다. 당신의 opennamu사용과 버그 발견은  opennamu의 발전을 돕습니다.
+오픈나무에는 검증되지 않은 몇가지 버그가 존재할 수 있습니다. 당신의 오픈나무 사용과 버그 발견은 오픈나무의 발전을 돕습니다.
 [이슈 생성하기](https://github.com/2du/opennamu/issues/new)
 
-opennamu는 완전한 오픈소스 소프트웨어입니다. 새로운 기능을 추가하고 Pull Request를 해보세요. [다음 절차]에 따라 기여할 수 있습니다.
-[Pull Request 생성하기](https://github.com/2du/opennamu/compare)
+오픈나무는 완전한 오픈소스 프로젝트입니다. 새로운 기능을 추가하고 Pull Request를 해보세요. [다음 절차]에 따라 기여할 수 있습니다.
+[Pull Requests 생성하기](https://github.com/2du/opennamu/compare)
 
 # 라이선스
 오픈나무는 [BSD 3-Clause License](./LICENSE)에 의해 보호받고 있습니다. 자세한 내용은 문서를 참고하세요.
@@ -39,7 +39,7 @@ opennamu는 완전한 오픈소스 소프트웨어입니다. 새로운 기능을
  * Numerical expression [MathJax](https://www.mathjax.org/)
 
 # 기여자 목록
- * [참고](https://github.com/2DU/openNAMU/graphs/contributors)
+ * [참고](https://github.com/2DU/opennamu/graphs/contributors)
 
 ## 도움을 주신 분들
  * [Team Croatia](https://github.com/TeamCroatia)
@@ -51,7 +51,7 @@ opennamu는 완전한 오픈소스 소프트웨어입니다. 새로운 기능을
 `set.json`은 몇가지 로컬 설정을 저장하는 설정 파일입니다.
  * db = 데이터베이스 이름
 
-set.json은 삭제해도 다시 새로 만들 수 있습니다.
+`set.json`은 삭제해도 다시 새로 만들 수 있습니다.
 
 [테스트 서버](http://namu.ml/)
 

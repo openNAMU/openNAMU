@@ -1,24 +1,57 @@
-﻿## intro
-wiki engine made python. (python 3.5 or later)
+﻿opennamu
+====
+![Python 3.5 Required](https://img.shields.io/badge/python-3.5-blue.svg?longCache=true&style=flat-square)
 
-## clone command
-### stable
+opennamu is a Python-based wiki engine. If you install Python and its underlying modules, you will be able to create wikis.
+
+### Index
+ * [Getting Started](#getting-started)
+ * [Clone](#clone)
+ * [Contribute](#contribute)
+ * [License](#license)
+ * [Authors](#authors)
+ * [Etc.](#etc.)
+
+# Getting Started
+
+# Clone
+You can clone this repository by entering the following command at the terminal (command prompt):
+## Stable
  * `git clone -b stable https://github.com/2du/opennamu.git`
 
-### master
+## Beta
  * `git clone -b master https://github.com/2du/opennamu.git`
 
-## install
- * [reference](https://namu.ml/w/opennamu%2Finstall)
- 
-## set.json explanation
- * db = Database Name
+# Contribute
+opennamu may have some untested bugs. Your use of opennamu and bug discovery will help develop opennamu.
+[Create Issues](https://github.com/2du/opennamu/issues/new)
 
-you can create a new set.json by deleting it.
+opennamu is open source project. Add new features and request pull requests. 
+[Create Pull Requests](https://github.com/2du/opennamu/compare)
 
-## other
- * [test Server](http://namu.ml)
- * the first registor is granted owner privileges.
+# Lisence
+opennamu is protected by [BSD 3-Clause License](./LICNESE). Please refer to the documentation for details.
 
-## 한국어
- * [참조](https://github.com/2du/opennamu/blob/master/readme-ko.md)
+## External Projects
+ * Quotes icon [Dave Gandy](http://www.flaticon.com/free-icon/quote-left_25672) CC 3.0 BY
+ * Syntax highlighting [highlightjs](https://highlightjs.org/)
+ * Numerical expression [MathJax](https://www.mathjax.org/)
+
+# Authors
+ * [Reference](https://github.com/2DU/opennamu/graphs/contributors)
+
+## Special Thanks
+ * [Team Croatia](https://github.com/TeamCroatia)
+ * Basix
+ * Efrit
+ * Other chat rooms
+
+# Etc.
+`set.json` is a configuration file that stores some local settings.
+ * db = Database name
+
+If you delete `set.json`, you can create a new one again.
+
+[Test Server](http://namu.ml/)
+
+Owner rights are granted to the first registor.
