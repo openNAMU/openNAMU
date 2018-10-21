@@ -1,6 +1,6 @@
 ﻿opennamu
 ====
-![Python 3.5 Required](https://img.shields.io/badge/python-3.5-blue.svg?longCache=true&style=flat-square)
+![Python 3.5 or later Required](https://img.shields.io/badge/python-3.5%20%7C%203.6%20%7C%203.7-blue.svg)
 
 opennamu is a Python-based wiki engine. If you install Python and its underlying modules, you will be able to create wikis.
 
