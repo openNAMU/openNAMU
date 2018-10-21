@@ -21,6 +21,7 @@ print('3. ban delete')
 print('4. change port')
 print('5. change skin')
 print('6. change password')
+print('7. reset version')
 
 print('select : ', end = '')
 what_i_do = input()
@@ -87,6 +88,8 @@ elif what_i_do == '6':
         hashed = bcrypt.hashpw(bytes(user_pw, 'utf-8'), bcrypt.gensalt()).decode()
        
     curs.execute("update user set pw = ? where id = ?", [hashed, user_name])
+elif what_i_do == '7':
+    curs.execute("update other set data = '00000' where name = 'ver'")
 
 conn.commit()
 
