@@ -116,6 +116,21 @@ def update():
             print('사용자 to user, 파일 to file, 분류 to category')
     except:
         pass
+        
+    # v3.0.8 rd 테이블, stop 테이블 통합
+    try:
+        curs.execute("select title from stop")
+        if curs.fetchall():
+            curs.execute("select title, sub from rd")
+            for data in curs.fetchall():
+                curs.execute("select title from stop where title = ? and sub = ? and close = 'O'", [data[0], data[1]])
+                if curs.fetchall():
+                    curs.execute("update rd set stop = 'O' where title = ? and sub = ?", [data[0], data[1]])
+                
+        curs.execute("drop table stop")
+    except:
+        pass
+    
 
 def pw_encode(data, data2 = '', type_d = ''):
     if type_d == '':
@@ -679,7 +694,7 @@ def topic_check(name, sub):
             if not admin_check(3, 'topic (' + name + ')') == 1:
                 return 1
         
-    curs.execute("select title from stop where title = ? and sub = ?", [name, sub])
+    curs.execute("select title from rd where title = ? and sub = ? and not stop = ''", [name, sub])
     if curs.fetchall():
         if not admin_check(3, 'topic (' + name + ')') == 1:
             return 1
