@@ -15,7 +15,7 @@ import random
 
 from func import *
 
-r_ver = 'v3.0.8-master-07'
+r_ver = 'v3.0.8-master-08'
 c_ver = ''.join(re.findall('[0-9]', r_ver))
 
 print('version : ' + r_ver)
@@ -77,10 +77,8 @@ curs.execute('create table if not exists user(test text)')
 curs.execute('create table if not exists user_set(test text)')
 curs.execute('create table if not exists ban(test text)')
 curs.execute('create table if not exists topic(test text)')
-curs.execute('create table if not exists stop(test text)')
 curs.execute('create table if not exists rb(test text)')
 curs.execute('create table if not exists back(test text)')
-curs.execute('create table if not exists agreedis(test text)')
 curs.execute('create table if not exists custom(test text)')
 curs.execute('create table if not exists other(test text)')
 curs.execute('create table if not exists alist(test text)')
@@ -114,10 +112,8 @@ if setup_tool != 0:
         'user_set',
         'ban', 
         'topic', 
-        'stop', 
         'rb', 
         'back', 
-        'agreedis', 
         'custom', 
         'other', 
         'alist', 
@@ -134,15 +130,13 @@ if setup_tool != 0:
     create_data['data'] = ['title', 'data']
     create_data['cache_data'] = ['title', 'data']
     create_data['history'] = ['id', 'title', 'data', 'date', 'ip', 'send', 'leng', 'hide', 'type']
-    create_data['rd'] = ['title', 'sub', 'date', 'band', 'stop']
+    create_data['rd'] = ['title', 'sub', 'date', 'band', 'stop', 'agree']
     create_data['user'] = ['id', 'pw', 'acl', 'date', 'encode']
     create_data['user_set'] = ['name', 'id', 'data']
     create_data['ban'] = ['block', 'end', 'why', 'band', 'login']
     create_data['topic'] = ['id', 'title', 'sub', 'data', 'date', 'ip', 'block', 'top']
-    create_data['stop'] = ['title', 'sub', 'close']
     create_data['rb'] = ['block', 'end', 'today', 'blocker', 'why', 'band']
     create_data['back'] = ['title', 'link', 'type']
-    create_data['agreedis'] = ['title', 'sub']
     create_data['custom'] = ['user', 'css']
     create_data['other'] = ['name', 'data']
     create_data['alist'] = ['name', 'acl']
@@ -2239,13 +2233,13 @@ def topic_stop(name = None, sub = None, tool = None):
     topic_check = curs.fetchall()
     if topic_check:
         if tool == 'agree':
-            curs.execute("select title from agreedis where title = ? and sub = ?", [name, sub])
+            curs.execute("select title from rd where title = ? and sub = ? and agree = 'O'", [name, sub])
             if curs.fetchall():
                 curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, '" + load_lang('agreement', 1) + " X', ?, ?, '', '1')", [str(int(topic_check[0][0]) + 1), name, sub, time, ip])
-                curs.execute("delete from agreedis where title = ? and sub = ?", [name, sub])
+                curs.execute("update rd set agree = '' where title = ? and sub = ?", [name, sub])
             else:
                 curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, '" + load_lang('agreement', 1) + " O', ?, ?, '', '1')", [str(int(topic_check[0][0]) + 1), name, sub, time, ip])
-                curs.execute("insert into agreedis (title, sub) values (?, ?)", [name, sub])
+                curs.execute("update rd set agree = 'O' where title = ? and sub = ?", [name, sub])
         else:
             curs.execute("select title from rd where title = ? and sub = ? and stop = ?", [name, sub, set_list[0]])
             if curs.fetchall():
@@ -2387,7 +2381,7 @@ def topic(name = None, sub = None):
             else:
                 all_data += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/stop">(' + load_lang('stop') + ')</a> '
 
-            curs.execute("select title from agreedis where title = ? and sub = ?", [name, sub])
+            curs.execute("select title from rd where title = ? and sub = ? and agree = 'O'", [name, sub])
             if curs.fetchall():
                 all_data += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/agree">(' + load_lang('release') + ')</a>'
             else:
@@ -2541,7 +2535,7 @@ def close_topic_list(name = None, tool = None):
             
             sub = load_lang('close') + ''
         elif tool == 'agree':
-            curs.execute("select sub from agreedis where title = ? order by sub asc", [name])
+            curs.execute("select sub from rd where title = ? and agree = 'O' order by sub asc", [name])
             
             sub = load_lang('agreement') + ''
         else:

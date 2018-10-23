@@ -117,20 +117,29 @@ def update():
     except:
         pass
         
-    # v3.0.8 rd 테이블, stop 테이블 통합
+    # v3.0.8 rd, agreedis, stop 테이블 통합
     try:
-        curs.execute("select title from stop")
-        if curs.fetchall():
-            curs.execute("select title, sub from rd")
-            for data in curs.fetchall():
-                curs.execute("select title from stop where title = ? and sub = ? and close = 'O'", [data[0], data[1]])
-                if curs.fetchall():
-                    curs.execute("update rd set stop = 'O' where title = ? and sub = ?", [data[0], data[1]])
-                
-        curs.execute("drop table stop")
+        curs.execute("select title, sub, close from stop")
+        for i in curs.fetchall():
+            if i[2] == '':
+                curs.execute("update rd set stop = 'S' where title = ? and sub = ?", [i[0], i[1]])
+            else:
+                curs.execute("update rd set stop = 'O' where title = ? and sub = ?", [i[0], i[1]])
     except:
         pass
-    
+        
+    try:
+        curs.execute("select title, sub from agreedis")
+        for i in curs.fetchall():
+            curs.execute("update rd set agree = 'O' where title = ? and sub = ?", [i[0], i[1]])
+    except:
+        pass
+         
+    try:
+        curs.execute("drop table if exists stop")
+        curs.execute("drop table if exists agreedis")
+    except:
+        pass
 
 def pw_encode(data, data2 = '', type_d = ''):
     if type_d == '':
