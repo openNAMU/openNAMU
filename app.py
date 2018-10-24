@@ -15,7 +15,7 @@ import random
 
 from func import *
 
-r_ver = 'v3.0.8-master-06'
+r_ver = 'v3.0.8-master-08'
 c_ver = ''.join(re.findall('[0-9]', r_ver))
 
 print('version : ' + r_ver)
@@ -77,10 +77,8 @@ curs.execute('create table if not exists user(test text)')
 curs.execute('create table if not exists user_set(test text)')
 curs.execute('create table if not exists ban(test text)')
 curs.execute('create table if not exists topic(test text)')
-curs.execute('create table if not exists stop(test text)')
 curs.execute('create table if not exists rb(test text)')
 curs.execute('create table if not exists back(test text)')
-curs.execute('create table if not exists agreedis(test text)')
 curs.execute('create table if not exists custom(test text)')
 curs.execute('create table if not exists other(test text)')
 curs.execute('create table if not exists alist(test text)')
@@ -114,10 +112,8 @@ if setup_tool != 0:
         'user_set',
         'ban', 
         'topic', 
-        'stop', 
         'rb', 
         'back', 
-        'agreedis', 
         'custom', 
         'other', 
         'alist', 
@@ -134,15 +130,13 @@ if setup_tool != 0:
     create_data['data'] = ['title', 'data']
     create_data['cache_data'] = ['title', 'data']
     create_data['history'] = ['id', 'title', 'data', 'date', 'ip', 'send', 'leng', 'hide', 'type']
-    create_data['rd'] = ['title', 'sub', 'date', 'band']
+    create_data['rd'] = ['title', 'sub', 'date', 'band', 'stop', 'agree']
     create_data['user'] = ['id', 'pw', 'acl', 'date', 'encode']
     create_data['user_set'] = ['name', 'id', 'data']
     create_data['ban'] = ['block', 'end', 'why', 'band', 'login']
     create_data['topic'] = ['id', 'title', 'sub', 'data', 'date', 'ip', 'block', 'top']
-    create_data['stop'] = ['title', 'sub', 'close']
     create_data['rb'] = ['block', 'end', 'today', 'blocker', 'why', 'band']
     create_data['back'] = ['title', 'link', 'type']
-    create_data['agreedis'] = ['title', 'sub']
     create_data['custom'] = ['user', 'css']
     create_data['other'] = ['name', 'data']
     create_data['alist'] = ['name', 'acl']
@@ -877,7 +871,7 @@ def not_close_topic():
     curs.execute('select title, sub from rd order by date desc')
     n_list = curs.fetchall()
     for data in n_list:
-        curs.execute('select * from stop where title = ? and sub = ? and close = "O"', [data[0], data[1]])
+        curs.execute('select * from rd where title = ? and sub = ? and close = "O"', [data[0], data[1]])
         is_close = curs.fetchall()
         if not is_close:
             div += '<li><a href="/topic/' + url_pas(data[0]) + '/sub/' + url_pas(data[1]) + '">' + data[0] + ' (' + data[1] + ')</a></li>'
@@ -1325,26 +1319,18 @@ def recent_discuss():
                     </tr>
             '''
     
-    curs.execute("select title, sub, date from rd order by date desc limit 50")
+    if m_sub == 0:
+        curs.execute("select title, sub, date from rd where not stop = 'O' order by date desc limit 50")
+    else:
+        curs.execute("select title, sub, date from rd where stop = 'O' order by date desc limit 50")
+        
     for data in curs.fetchall():
         title = html.escape(data[0])
         sub = html.escape(data[1])
-        
-        close = 0
-        
-        if flask.request.args.get('what', 'normal') == 'normal':
-            curs.execute("select title from stop where title = ? and sub = ? and close = 'O'", [data[0], data[1]])
-            if curs.fetchall():
-                close = 1
-        else:
-            curs.execute("select title from stop where title = ? and sub = ? and close = 'O'", [data[0], data[1]])
-            if not curs.fetchall():
-                close = 1
 
-        if close == 0:
-            div += '<tr><td><a href="/topic/' + url_pas(data[0]) + '/sub/' + url_pas(data[1]) + '">' + title + '</a> (' + sub + ')</td><td>' + data[2] + '</td></tr>'
-    else:
-        div += '</tbody></table>'
+        div += '<tr><td><a href="/topic/' + url_pas(data[0]) + '/sub/' + url_pas(data[1]) + '">' + title + '</a> (' + sub + ')</td><td>' + data[2] + '</td></tr>'
+    
+    div += '</tbody></table>'
             
     return easy_minify(flask.render_template(skin_check(), 
         imp = [load_lang('recent') + ' ' + load_lang('discussion'), wiki_set(), custom(), other2([m_sub, 0])],
@@ -2221,7 +2207,7 @@ def topic_stop(name = None, sub = None, tool = None):
     if tool == 'close':
         set_list = [
             'O', 
-            '', 
+            'S', 
             load_lang('discussion', 1) + ' ' + load_lang('close', 1), 
             load_lang('discussion', 1) + ' ' + load_lang('open', 1)
         ]
@@ -2247,22 +2233,21 @@ def topic_stop(name = None, sub = None, tool = None):
     topic_check = curs.fetchall()
     if topic_check:
         if tool == 'agree':
-            curs.execute("select title from agreedis where title = ? and sub = ?", [name, sub])
+            curs.execute("select title from rd where title = ? and sub = ? and agree = 'O'", [name, sub])
             if curs.fetchall():
                 curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, '" + load_lang('agreement', 1) + " X', ?, ?, '', '1')", [str(int(topic_check[0][0]) + 1), name, sub, time, ip])
-                curs.execute("delete from agreedis where title = ? and sub = ?", [name, sub])
+                curs.execute("update rd set agree = '' where title = ? and sub = ?", [name, sub])
             else:
                 curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, '" + load_lang('agreement', 1) + " O', ?, ?, '', '1')", [str(int(topic_check[0][0]) + 1), name, sub, time, ip])
-                curs.execute("insert into agreedis (title, sub) values (?, ?)", [name, sub])
+                curs.execute("update rd set agree = 'O' where title = ? and sub = ?", [name, sub])
         else:
-            curs.execute("select title from stop where title = ? and sub = ? and close = ?", [name, sub, set_list[0]])
+            curs.execute("select title from rd where title = ? and sub = ? and stop = ?", [name, sub, set_list[0]])
             if curs.fetchall():
                 curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, ?, ?, ?, '', '1')", [str(int(topic_check[0][0]) + 1), name, sub, set_list[3], time, ip])
-                curs.execute("delete from stop where title = ? and sub = ? and close = ?", [name, sub, set_list[0]])
+                curs.execute("update rd set stop = '' where title = ? and sub = ?", [name, sub])
             else:
                 curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, ?, ?, ?, '', '1')", [str(int(topic_check[0][0]) + 1), name, sub, set_list[2], time, ip])
-                curs.execute("insert into stop (title, sub, close) values (?, ?, ?)", [name, sub, set_list[0]])
-                curs.execute("delete from stop where title = ? and sub = ? and close = ?", [name, sub, set_list[1]])
+                curs.execute("update rd set stop = ? where title = ? and sub = ?", [set_list[0], name, sub])
         
         rd_plus(name, sub, time)
         
@@ -2371,10 +2356,10 @@ def topic(name = None, sub = None):
         
         return redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '#reload')
     else:
-        curs.execute("select title from stop where title = ? and sub = ? and close = 'O'", [name, sub])
+        curs.execute("select title from rd where title = ? and sub = ? and stop = 'O'", [name, sub])
         close_data = curs.fetchall()
         
-        curs.execute("select title from stop where title = ? and sub = ? and close = ''", [name, sub])
+        curs.execute("select title from rd where title = ? and sub = ? and stop = 'S'", [name, sub])
         stop_data = curs.fetchall()
         
         curs.execute("select id from topic where title = ? and sub = ? limit 1", [name, sub])
@@ -2396,7 +2381,7 @@ def topic(name = None, sub = None):
             else:
                 all_data += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/stop">(' + load_lang('stop') + ')</a> '
 
-            curs.execute("select title from agreedis where title = ? and sub = ?", [name, sub])
+            curs.execute("select title from rd where title = ? and sub = ? and agree = 'O'", [name, sub])
             if curs.fetchall():
                 all_data += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/agree">(' + load_lang('release') + ')</a>'
             else:
@@ -2546,11 +2531,11 @@ def close_topic_list(name = None, tool = None):
         menu = [['topic/' + url_pas(name), load_lang('list')]]
         
         if tool == 'close':
-            curs.execute("select sub from stop where title = ? and close = 'O' order by sub asc", [name])
+            curs.execute("select sub from rd where title = ? and stop = 'O' order by sub asc", [name])
             
             sub = load_lang('close') + ''
         elif tool == 'agree':
-            curs.execute("select sub from agreedis where title = ? order by sub asc", [name])
+            curs.execute("select sub from rd where title = ? and agree = 'O' order by sub asc", [name])
             
             sub = load_lang('agreement') + ''
         else:
@@ -2574,7 +2559,7 @@ def close_topic_list(name = None, tool = None):
                 it_p = 0
                 
                 if sub == load_lang('discussion') + ' ' + load_lang('list'):
-                    curs.execute("select title from stop where title = ? and sub = ? and close = 'O' order by sub asc", [name, data[0]])
+                    curs.execute("select title from rd where title = ? and sub = ? and stop = 'O' order by sub asc", [name, data[0]])
                     if curs.fetchall():
                         it_p = 1
                 
@@ -3382,14 +3367,9 @@ def read_view(name = None):
             if redirect_data:
                 return redirect('/w/' + redirect_data[0][0] + '?from=' + name)
 
-
-    curs.execute("select sub from rd where title = ? order by date desc", [name])
-    for data in curs.fetchall():
-        curs.execute("select title from stop where title = ? and sub = ? and close = 'O'", [name, data[0]])
-        if not curs.fetchall():
-            sub += ' (' + load_lang('discussion') + ')'
-
-            break
+    curs.execute("select sub from rd where title = ? and not stop = 'O' order by date desc", [name])
+    if curs.fetchall():
+        sub += ' (' + load_lang('discussion') + ')'
 
     curs.execute("select link from back where title = ? and type = 'cat' order by link asc", [name])
                 
@@ -4110,7 +4090,7 @@ def api_w(name = ''):
     curs.execute("select data from data where title = ?", [name])
     data = curs.fetchall()
     if data:
-        json_data = { "title" : name, "data" : render_set(data = data[0][0]) }
+        json_data = { "title" : name, "data" : render_set(title = name, data = data[0][0]) }
     
         return flask.jsonify(json_data)
     else:

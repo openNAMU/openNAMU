@@ -61,10 +61,7 @@ def render_set(title = '', data = '', num = 0):
     if acl_check(title, 'render') == 1:
         return 'http request 401.3'
     else:
-        curs.execute('select data from other where name = "markup"')
-        markup = curs.fetchall()
-
-        return namumark(title, data, num, markup[0][0])
+        return namumark(title, data, num)
 
 def captcha_get():
     data = ''
@@ -117,6 +114,30 @@ def update():
 
         if test == 1:
             print('사용자 to user, 파일 to file, 분류 to category')
+    except:
+        pass
+        
+    # v3.0.8 rd, agreedis, stop 테이블 통합
+    try:
+        curs.execute("select title, sub, close from stop")
+        for i in curs.fetchall():
+            if i[2] == '':
+                curs.execute("update rd set stop = 'S' where title = ? and sub = ?", [i[0], i[1]])
+            else:
+                curs.execute("update rd set stop = 'O' where title = ? and sub = ?", [i[0], i[1]])
+    except:
+        pass
+        
+    try:
+        curs.execute("select title, sub from agreedis")
+        for i in curs.fetchall():
+            curs.execute("update rd set agree = 'O' where title = ? and sub = ?", [i[0], i[1]])
+    except:
+        pass
+         
+    try:
+        curs.execute("drop table if exists stop")
+        curs.execute("drop table if exists agreedis")
     except:
         pass
 
@@ -682,7 +703,7 @@ def topic_check(name, sub):
             if not admin_check(3, 'topic (' + name + ')') == 1:
                 return 1
         
-    curs.execute("select title from stop where title = ? and sub = ?", [name, sub])
+    curs.execute("select title from rd where title = ? and sub = ? and not stop = ''", [name, sub])
     if curs.fetchall():
         if not admin_check(3, 'topic (' + name + ')') == 1:
             return 1
