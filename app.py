@@ -330,7 +330,7 @@ def alarm():
 @app.route('/<regex("inter_wiki|(?:edit|email|name)_filter"):tools>')
 def inter_wiki(tools = None):
     div = ''
-    admin = admin_check(None, None)
+    admin = admin_check()
 
     if tools == 'inter_wiki':
         del_link = 'del_inter_wiki'
@@ -437,7 +437,7 @@ def plus_inter(tools = None, name = None):
     
         return redirect('/' + re.sub('^plus_', '', tools))
     else:
-        if admin_check(1, None) != 1:
+        if admin_check(1) != 1:
             stat = 'disabled'
         else:
             stat = ''
@@ -493,7 +493,7 @@ def plus_inter(tools = None, name = None):
 @app.route('/setting')
 @app.route('/setting/<int:num>', methods=['POST', 'GET'])
 def setting(num = 0):
-    if num != 0 and admin_check(None, None) != 1:
+    if num != 0 and admin_check() != 1:
         return re_error('/ban')
 
     if num == 0:
@@ -979,7 +979,7 @@ def admin_plus(name = None):
             elif go[0] == 'owner':
                 exist_list[7] = 'checked="checked"'
 
-        if admin_check(None, None) != 1:
+        if admin_check() != 1:
             state = 'disabled'
         else:
             state = ''
@@ -1050,7 +1050,7 @@ def user_log():
         
     list_data = '<ul>'
 
-    admin_one = admin_check(1, None)
+    admin_one = admin_check(1)
     
     curs.execute("select id, date from user order by date desc limit ?, '50'", [str(sql_num)])
     user_list = curs.fetchall()
@@ -1541,7 +1541,7 @@ def raw_view(name = None, sub_title = None, num = None):
     
     if not sub_title and num:
         curs.execute("select title from history where title = ? and id = ? and hide = 'O'", [name, str(num)])
-        if curs.fetchall() and admin_check(6, None) != 1:
+        if curs.fetchall() and admin_check(6) != 1:
             return re_error('/error/3')
         
         curs.execute("select data from history where title = ? and id = ?", [name, str(num)])
@@ -1579,7 +1579,7 @@ def revert(name = None):
     num = int(flask.request.args.get('num', 0))
 
     curs.execute("select title from history where title = ? and id = ? and hide = 'O'", [name, str(num)])
-    if curs.fetchall() and admin_check(6, None) != 1:
+    if curs.fetchall() and admin_check(6) != 1:
         return re_error('/error/3')
 
     if acl_check(name) == 1:
@@ -2264,7 +2264,7 @@ def topic_admin(name = None, sub = None, num = None):
 
     ban = ''
 
-    if admin_check(3, None) == 1:
+    if admin_check(3) == 1:
         ban += '</ul><br><h2>' + load_lang('admin') + ' ' + load_lang('tool') + '</h2><ul>'
         is_ban = '<li><a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/b/' + str(num) + '">'
 
@@ -2313,7 +2313,7 @@ def topic_admin(name = None, sub = None, num = None):
 @app.route('/topic/<everything:name>/sub/<sub>', methods=['POST', 'GET'])
 def topic(name = None, sub = None):
     ban = topic_check(name, sub)
-    admin = admin_check(3, None)
+    admin = admin_check(3)
     
     if flask.request.method == 'POST':
         if captcha_post(flask.request.form.get('g-recaptcha-response', '')) == 1:
@@ -2404,9 +2404,23 @@ def topic(name = None, sub = None):
             if topic_data_top:
                 who_plus += ' <span style="margin-right: 5px;">@' + topic_data_top[0][0] + ' </span>'
                                 
-            all_data += '<table id="toron"><tbody><tr><td id="toron_color_red">'
-            all_data += '<a href="#' + topic_data[1] + '">#' + topic_data[1] + '</a> ' + ip_pas(topic_data[3]) + who_plus + ' <span style="float: right;">' + topic_data[2] + '</span>'
-            all_data += '</td></tr><tr><td>' + render_set(data = topic_data[0]) + '</td></tr></tbody></table><br>'    
+            all_data += '''
+                        <table id="toron">
+                            <tbody>
+                                <tr>
+                                    <td id="toron_color_red">
+                                        <a href="#''' + topic_data[1] + '''">
+                                            #''' + topic_data[1] + '''
+                                        </a> ''' + ip_pas(topic_data[3]) + who_plus + ''' <span style="float: right;">''' + topic_data[2] + '''</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>''' + render_set(data = topic_data[0]) + '''</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <br>
+                        '''    
 
         for topic_data in topic:
             user_write = topic_data[0]
@@ -2436,7 +2450,7 @@ def topic(name = None, sub = None):
                 ip += ' <a href="javascript:void(0);" title="' + load_lang('admin') + '">★</a>'
 
             if admin == 1 or blind_data == '':
-                ip += ' <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/admin/' + str(number) + '">(' + load_lang('tool') + ')</a>'
+                ip += ' <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/admin/' + str(number) + '">(' + load_lang('discussion') + ' ' + load_lang('tool') + ')</a>'
 
             curs.execute("select end from ban where block = ?", [topic_data[3]])
             if curs.fetchall():
@@ -2484,7 +2498,10 @@ def topic(name = None, sub = None):
             if display == '':
                 data += ip_warring()
 
-            data += '<button type="submit">' + load_lang('send') + '</button></form>'
+            data += '''
+                        <button type="submit">''' + load_lang('send') + '''</button>
+                    </form>
+                    '''
 
         return easy_minify(flask.render_template(skin_check(), 
             imp = [name, wiki_set(), custom(), other2([' (' + load_lang('discussion') + ')', 0])],
@@ -2497,9 +2514,24 @@ def user_tool(name = None):
     data =  '''
             <h2>''' + load_lang('tool') + '''</h2>
             <ul>
-                <li><a href="/record/''' + url_pas(name) + '''">''' + load_lang('record') + '''</li>
+                <li><a href="/record/''' + url_pas(name) + '''">''' + load_lang('record') + '''</a></li>
             </ul>
             '''
+            
+    if admin_check(1) == 1:
+        curs.execute("select block from ban where block = ?", [name])
+        if curs.fetchall():
+            ban_name = load_lang('release')
+        else:
+            ban_name = load_lang('ban')
+    
+        data += '''
+                <h2>''' + load_lang('admin') + '''</h2>
+                <ul>
+                    <li><a href="/ban/''' + url_pas(name) + '''">''' + ban_name + '''</a></li>
+                    <li><a href="/check/''' + url_pas(name) + '''">''' + load_lang('check') + '''</a></li>
+                </ul>
+                '''
 
     return easy_minify(flask.render_template(skin_check(), 
         imp = [name, wiki_set(), custom(), other2([' (' + load_lang('tool') + ')', 0])],
@@ -2751,7 +2783,7 @@ def user_check(name = None):
     curs.execute("select acl from user where id = ? or id = ?", [name, flask.request.args.get('plus', '-')])
     user = curs.fetchall()
     if user and user[0][0] != 'user':
-        if admin_check(None, None) != 1:
+        if admin_check() != 1:
             return re_error('/error/4')
 
     if admin_check(4, 'check (' + name + ')') != 1:
@@ -2787,12 +2819,19 @@ def user_check(name = None):
     record = curs.fetchall()
     if record:
         if not flask.request.args.get('plus', None):
-            div = '<a href="/manager/14?plus=' + url_pas(name) + '">(' + load_lang('compare') + ')</a> <a href="/easy_check/' + url_pas(name) + '">(' + load_lang('easy') + ')</a><hr>'
+            div = '<a href="/manager/14?plus=' + url_pas(name) + '">(' + load_lang('compare') + ')</a><hr>'
         else:
             div = '<a href="/check/' + url_pas(name) + '">(' + name + ')</a> <a href="/check/' + url_pas(flask.request.args.get('plus', None)) + '">(' + flask.request.args.get('plus', None) + ')</a><hr>'
 
-        div += '<table id="main_table_set"><tbody><tr>'
-        div += '<td id="main_table_width">' + load_lang('name') + '</td><td id="main_table_width">ip</td><td id="main_table_width">' + load_lang('time') + '</td></tr>'
+        div +=  '''
+                <table id="main_table_set">
+                    <tbody>
+                        <tr>
+                            <td id="main_table_width">''' + load_lang('name') + '''</td>
+                            <td id="main_table_width">ip</td>
+                            <td id="main_table_width">''' + load_lang('time') + '''</td>
+                        </tr>
+                '''
         
         for data in record:
             if data[2]:
@@ -2800,10 +2839,21 @@ def user_check(name = None):
             else:
                 ua = '<br>'
 
-            div += '<tr><td>' + ip_pas(data[0]) + '</td><td>' + ip_pas(data[1]) + '</td><td>' + data[3] + '</td></tr>'
-            div += '<tr><td colspan="3">' + ua + '</td></tr>'
+            div +=  '''
+                    <tr>
+                        <td>''' + ip_pas(data[0]) + '''</td>
+                        <td>''' + ip_pas(data[1]) + '''</td>
+                        <td>''' + data[3] + '''</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">''' + ua + '''</td>
+                    </tr>
+                    '''
         
-        div += '</tbody></table>'
+        div +=  '''
+                    </tbody>
+                </table>
+                '''
     else:
         return re_error('/error/2')
         
@@ -2826,7 +2876,7 @@ def register():
     if custom()[2] != 0:
         return redirect('/user')
 
-    if not admin_check(None, None) == 1:
+    if not admin_check() == 1:
         curs.execute('select data from other where name = "reg"')
         set_d = curs.fetchall()
         if set_d and set_d[0][0] == 'on':
@@ -3074,7 +3124,7 @@ def user_ban(name = None):
             return re_error('/error/2')
 
         if user and user[0][0] != 'user':
-            if admin_check(None, None) != 1:
+            if admin_check() != 1:
                 return re_error('/error/4')
 
     if ban_check(ip = ip_check(), tool = 'login') == 1:
@@ -3093,7 +3143,7 @@ def user_ban(name = None):
 
         return redirect('/ban/' + url_pas(name))     
     else:
-        if admin_check(1, None) != 1:
+        if admin_check(1) != 1:
             return re_error('/error/3')
 
         curs.execute("select end, why from ban where block = ?", [name])
@@ -3125,12 +3175,23 @@ def user_ban(name = None):
             else:
                 plus = ''
 
-            data = '<input placeholder="' + load_lang('second') + '" name="second" type="text"><hr><input type="checkbox" name="limitless"> ' + load_lang('limitless') + '<hr>'
-            data += '<input placeholder="' + load_lang('why') + '" name="why" type="text"><hr>' + plus
+            data =  '''
+                    <input placeholder="''' + load_lang('second') + '''" name="second" type="text">
+                    <hr>
+                    <input type="checkbox" name="limitless"> ''' + load_lang('limitless') + '''
+                    <hr>
+                    <input placeholder="''' + load_lang('why') + '''" name="why" type="text">
+                    <hr>
+                    ''' + plus
 
         return easy_minify(flask.render_template(skin_check(), 
             imp = [name, wiki_set(), custom(), other2([' (' + now + ')', 0])],
-            data = '<form method="post">' + data + '<button type="submit">' + now + '</button></form>',
+            data =  '''
+                    <form method="post">
+                        ''' + data + '''
+                        <button type="submit">''' + now + '''</button>
+                    </form>
+                    ''',
             menu = [['manager', load_lang('admin')]]
         ))            
                 
@@ -3244,7 +3305,7 @@ def acl(name = None):
             
 @app.route('/admin/<name>', methods=['POST', 'GET'])
 def user_admin(name = None):
-    owner = admin_check(None, None)
+    owner = admin_check()
     
     curs.execute("select acl from user where id = ?", [name])
     user = curs.fetchall()
@@ -3277,7 +3338,7 @@ def user_admin(name = None):
         
         return redirect('/admin/' + url_pas(name))            
     else:
-        if admin_check(7, None) != 1:
+        if admin_check(7) != 1:
             return re_error('/error/3')            
 
         div = '<option value="X">X</option>'
@@ -3414,7 +3475,7 @@ def read_view(name = None):
 
     if num:
         curs.execute("select title from history where title = ? and id = ? and hide = 'O'", [name, str(num)])
-        if curs.fetchall() and admin_check(6, None) != 1:
+        if curs.fetchall() and admin_check(6) != 1:
             return redirect('/history/' + url_pas(name))
 
         curs.execute("select title, data from history where title = ? and id = ?", [name, str(num)])
@@ -3449,7 +3510,7 @@ def read_view(name = None):
     if data:
         acl += ' (acl)'
             
-    if flask.request.args.get('from', None):
+    if flask.request.args.get('from', None) and else_data:
         else_data = re.sub('^\r\n', '', else_data)
         else_data = re.sub('\r\n$', '', else_data)
             
@@ -3511,7 +3572,7 @@ def user_topic_list(name = None):
     else:
         sql_num = 0
     
-    one_admin = admin_check(1, None)
+    one_admin = admin_check(1)
 
     div =   '''
             <table id="main_table_set">
@@ -3563,15 +3624,19 @@ def recent_changes(name = None, tool = 'record'):
     if flask.request.method == 'POST':
         return redirect('/diff/' + url_pas(name) + '?first=' + flask.request.form.get('b', None) + '&second=' + flask.request.form.get('a', None))
     else:
-        one_admin = admin_check(1, None)
-        six_admin = admin_check(6, None)
+        one_admin = admin_check(1)
+        six_admin = admin_check(6)
         
         ban = ''
         select = ''
 
         what = flask.request.args.get('what', 'all')
 
-        div = '<table id="main_table_set"><tbody><tr>'
+        div =   '''
+                <table id="main_table_set">
+                    <tbody>
+                        <tr>
+                '''
         
         if name:
             num = int(flask.request.args.get('num', 1))
@@ -3589,13 +3654,15 @@ def recent_changes(name = None, tool = 'record'):
                 
                 curs.execute("select id, title, date, ip, send, leng from history where title = ? order by id + 0 desc limit ?, '50'", [name, str(sql_num)])
             else:
-                div += '<td id="main_table_width">' + load_lang('document') + ' ' + load_lang('name') + '</td><td id="main_table_width">' + load_lang('editor') + '</td><td id="main_table_width">' + load_lang('time') + '</td></tr>'
+                div +=  '''
+                            <td id="main_table_width">''' + load_lang('document') + ' ' + load_lang('name') + '''</td>
+                            <td id="main_table_width">''' + load_lang('editor') + '''</td>
+                            <td id="main_table_width">''' + load_lang('time') + '''</td>
+                        </tr>
+                        '''
 
                 if what == 'all':
-                    div = '<a href="/record/' + url_pas(name) + '?what=revert">(' + load_lang('revert') + ')</a><hr>' + div
-                    div = '<a href="/record/' + url_pas(name) + '?what=move">(' + load_lang('move') + ')</a> ' + div
-                    div = '<a href="/record/' + url_pas(name) + '?what=delete">(' + load_lang('delete') + ')</a> ' + div
-                    div = '<a href="/topic_record/' + url_pas(name) + '">(' + load_lang('discussion') + ')</a> ' + div
+                    div = '<a href="/topic_record/' + url_pas(name) + '">(' + load_lang('discussion') + ')</a> <a href="/record/' + url_pas(name) + '?what=delete">(' + load_lang('delete') + ')</a> <a href="/record/' + url_pas(name) + '?what=move">(' + load_lang('move') + ')</a> <a href="/record/' + url_pas(name) + '?what=revert">(' + load_lang('revert') + ')</a><hr>' + div
                     
                     curs.execute("select id, title, date, ip, send, leng from history where ip = ? order by date desc limit ?, '50'", [name, str(sql_num)])
                 else:
@@ -3616,12 +3683,15 @@ def recent_changes(name = None, tool = 'record'):
             else:
                 sql_num = 0            
             
-            div += '<td id="main_table_width">' + load_lang('document') + ' ' + load_lang('name') + '</td><td id="main_table_width">' + load_lang('editor') + '</td><td id="main_table_width">' + load_lang('time') + '</td></tr>'
+            div +=  '''
+                        <td id="main_table_width">''' + load_lang('document') + ' ' + load_lang('name') + '''</td>
+                        <td id="main_table_width">''' + load_lang('editor') + '''</td>
+                        <td id="main_table_width">''' + load_lang('time') + '''</td>
+                    </tr>
+                    '''
             
             if what == 'all':
-                div = '<a href="/recent_changes?what=revert">(' + load_lang('revert') + ')</a><hr>' + div
-                div = '<a href="/recent_changes?what=move">(' + load_lang('move') + ')</a> ' + div
-                div = '<a href="/recent_changes?what=delete">(' + load_lang('delete') + ')</a> ' + div
+                div = '<a href="/recent_changes?what=delete">(' + load_lang('delete') + ')</a> <a href="/recent_changes?what=move">(' + load_lang('move') + ')</a> <a href="/recent_changes?what=revert">(' + load_lang('revert') + ')</a><hr>' + div
 
                 div = '<a href="/recent_discuss">(' + load_lang('discussion') + ')</a> <a href="/block_log">(' + load_lang('ban') + ')</a> <a href="/user_log">(' + load_lang('subscriber') + ')</a> <a href="/admin_log">(' + load_lang('authority') + ')</a><hr>' + div
                 
@@ -3653,13 +3723,6 @@ def recent_changes(name = None, tool = 'record'):
                 leng = '<span style="color:red;">(' + data[5] + ')</span>'
             else:
                 leng = '<span style="color:gray;">(' + data[5] + ')</span>'
-                
-            if one_admin == 1:
-                curs.execute("select block from ban where block = ?", [data[3]])
-                if curs.fetchall():
-                    ban = ' <a href="/ban/' + url_pas(data[3]) + '">(' + load_lang('release') + ')</a>'
-                else:
-                    ban = ' <a href="/ban/' + url_pas(data[3]) + '">(' + load_lang('ban') + ')</a>'            
                 
             ip = ip_pas(data[3])
             if int(data[0]) - 1 == 0:
