@@ -426,7 +426,7 @@ def diff(seqm):
             
     return sub
            
-def admin_check(num, what):
+def admin_check(num = None, what = None):
     ip = ip_check() 
 
     curs.execute("select acl from user where id = ?", [ip])
@@ -462,6 +462,8 @@ def admin_check(num, what):
                     reset = 1
                 else:
                     break
+                    
+    return 0
 
 def ip_pas(raw_ip):
     hide = 0
