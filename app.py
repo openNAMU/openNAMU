@@ -3767,20 +3767,39 @@ def recent_changes(name = None, tool = 'record'):
             else:
                 title = '<a href="/w/' + url_pas(data[1]) + '">' + html.escape(data[1]) + '</a> <a href="/history/' + url_pas(data[1]) + '">(' + data[0] + load_lang('version') + ')</a> '
                     
-            div += '<tr ' + style[0] + '><td>' + title + revert + ' ' + leng + '</td>'
-            div += '<td>' + ip + ban + hidden + '</td><td>' + date + '</td></tr><tr ' + style[1] + '><td colspan="3">' + send_parser(send) + '</td></tr>'
+            div +=  '''
+                    <tr ''' + style[0] + '''>
+                        <td>''' + title + revert + ' ' + leng + '''</td>
+                        <td>''' + ip + ban + hidden + '''</td>
+                        <td>''' + date + '''</td>
+                    </tr>
+                    <tr ''' + style[1] + '''>
+                        <td colspan="3">''' + send_parser(send) + '''</td>
+                    </tr>
+                    '''
 
-        div += '</tbody></table>'
+        div +=  '''
+                    </tbody>
+                </table>
+                '''
         sub = ''
 
         if name:
             if tool == 'history':
-                div = '<form method="post"><select name="a">' + select + '</select> <select name="b">' + select + '</select> <button type="submit">' + load_lang('compare') + '</button></form><hr>' + div
+                div =   '''
+                        <form method="post">
+                            <select name="a">''' + select + '''</select> <select name="b">''' + select + '''</select>
+                            <button type="submit">''' + load_lang('compare') + '''</button>
+                        </form>
+                        <hr>
+                        <a href="/move_data/''' + url_pas(name) + '''">(''' + load_lang('move') + ''')</a>
+                        <hr>
+                        ''' + div
                 title = name
                 
                 sub += ' (' + load_lang('history') + ')'
                 
-                menu = [['w/' + url_pas(name), load_lang('document')], ['raw/' + url_pas(name), 'raw'], ['move_data/' + url_pas(name), load_lang('move') + ' ' + load_lang('history')]]
+                menu = [['w/' + url_pas(name), load_lang('document')], ['raw/' + url_pas(name), 'raw']]
                 
                 div += next_fix('/history/' + url_pas(name) + '?num=', num, data_list)
             else:
