@@ -2265,7 +2265,12 @@ def topic_admin(name = None, sub = None, num = None):
     ban = ''
 
     if admin_check(3) == 1:
-        ban += '</ul><br><h2>' + load_lang('admin') + ' ' + load_lang('tool') + '</h2><ul>'
+        ban +=  '''
+                </ul>
+                <br>
+                <h2>''' + load_lang('admin') + ' ' + load_lang('tool') + '''</h2>
+                <ul>
+                '''
         is_ban = '<li><a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/b/' + str(num) + '">'
 
         if data[0][0] == 'O':
@@ -2273,8 +2278,12 @@ def topic_admin(name = None, sub = None, num = None):
         else:
             is_ban += load_lang('hide')
         
-        is_ban += '</a></li>'
-        is_ban += '<li><a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/notice/' + str(num) + '">'
+        is_ban +=   '''
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/topic/''' + url_pas(name) + '/sub/' + url_pas(sub) + '/notice/' + str(num) + '''">
+                    '''
 
         curs.execute("select id from topic where title = ? and sub = ? and id = ? and top = 'O'", [name, sub, str(num)])
         if curs.fetchall():
@@ -2293,14 +2302,25 @@ def topic_admin(name = None, sub = None, num = None):
         
         ban += '</a></li>' + is_ban
 
-    ban += '</ul><br><h2>' + load_lang('other') + ' ' + load_lang('tool') + '</h2><ul>'
-    ban += '<li><a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/raw/' + str(num) + '">raw</a></li>'
+    ban +=  '''
+            </ul>
+            <br>
+            <h2>''' + load_lang('other') + ' ' + load_lang('tool') + '''</h2>
+            <ul>
+                <li>
+                    <a href="/topic/''' + url_pas(name) + '/sub/' + url_pas(sub) + '/raw/' + str(num) + '''">raw</a>
+                </li>
+            '''
     ban = '<li>' + load_lang('time') + ' : ' + data[0][2] + '</li>' + ban
     
     if ip_or_user(data[0][1]) == 1:
         ban = '<li>' + load_lang('writer') + ' : ' + data[0][1] + ' <a href="/record/' + url_pas(data[0][1]) + '">(' + load_lang('record') + ')</a></li>' + ban
     else:
-        ban = '<li>' + load_lang('writer') + ' : <a href="/w/user:' + data[0][1] + '">' + data[0][1] + '</a> <a href="/record/' + url_pas(data[0][1]) + '">(' + load_lang('record') + ')</a></li>' + ban
+        ban =   '''
+                <li>
+                    ''' + load_lang('writer') + ' : <a href="/w/user:' + data[0][1] + '">' + data[0][1] + '</a> <a href="/record/' + url_pas(data[0][1]) + '">(' + load_lang('record') + ''')</a>
+                </li>
+                ''' + ban
 
     ban = '<h2>' + load_lang('state') + '</h2><ul>' + ban
 
@@ -4240,7 +4260,7 @@ def views(name = None):
 
 @app.route('/<data>')
 def main_file(data = None):
-    if re.search('\.(txt|html)$', data):
+    if re.search('\.txt$', data):
         return flask.send_from_directory('./', data)
     else:
         return redirect('/w/' + url_pas(wiki_set(2)))
