@@ -4230,9 +4230,9 @@ def views(name = None):
         g = ['']
 
     if g == 'css':
-        return easy_minify(flask.send_from_directory('./views' + plus, rename))   
+        return easy_minify(flask.send_from_directory('./views' + plus, rename), 'css')   
     elif g == 'js':
-        return easy_minify(flask.send_from_directory('./views' + plus, rename))
+        return easy_minify(flask.send_from_directory('./views' + plus, rename), 'js')
     elif g == 'html':
         return easy_minify(flask.send_from_directory('./views' + plus, rename))   
     else:

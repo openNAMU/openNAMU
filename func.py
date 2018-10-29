@@ -10,6 +10,10 @@ import html
 import sys
 import re
 import os
+try:
+    import css_html_js_minify
+except:
+    pass
 
 if sys.version_info < (3, 6):
     import sha3
@@ -51,9 +55,18 @@ def send_email(who, title, data):
     except:
         print('error : email login error')
 
-def easy_minify(data):
-    data = re.sub('\n +<', '\n<', data)
-    data = re.sub('>(\n| )+<', '> <', data)
+def easy_minify(data, tool = None):
+    try:
+        if not tool:
+            data = css_html_js_minify.html_minify(data)
+        else:
+            if tool == 'css':
+                data = css_html_js_minify.css_minify(data)
+            elif tool == 'js':
+                data = css_html_js_minify.js_minify(data)
+    except:
+        data = re.sub('\n +<', '\n<', data)
+        data = re.sub('>(\n| )+<', '> <', data)
     
     return data
 
