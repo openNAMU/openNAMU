@@ -784,7 +784,7 @@ def edit_filter_do(data):
     if admin_check(1, 'edit_filter pass') != 1:
         curs.execute("select regex, sub from filter")
         for data_list in curs.fetchall():
-            match = re.compile(data_list[0])
+            match = re.compile(data_list[0], re.I)
             if match.search(data):
                 ban_insert(
                     ip_check(), 
@@ -864,7 +864,7 @@ def re_error(data):
             elif num == 7:
                 data = load_lang('long_id_error')
             elif num == 8:
-                data = load_lang('id_char_error')
+                data = load_lang('id_char_error') + ' <a href="/name_filter">(' + load_lang('id') + ' ' + load_lang('filter') + ')</a>'
             elif num == 9:
                 data = load_lang('file_exist_error')
             elif num == 10:
