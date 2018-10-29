@@ -914,9 +914,21 @@ def acl_list():
                 else:
                     acl += [load_lang('subscriber')]
 
-            div += '<tr><td><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a></td><td>' + acl[0] + '</td><td>' + acl[1] + '</td><td>' + acl[2] + '</td></tr>'
+            div +=  '''
+                    <tr>
+                        <td>
+                            <a href="/w/''' + url_pas(data[0]) + '">' + data[0] + '''</a>
+                        </td>
+                        <td>''' + acl[0] + '''</td>
+                        <td>''' + acl[1] + '''</td>
+                        <td>''' + acl[2] + '''</td>
+                    </tr>
+                    '''
         
-    div += '</tbody></table>'
+    div +=  '''
+                </tbody>
+            </table>
+            '''
     
     return easy_minify(flask.render_template(skin_check(), 
         imp = ['acl ' + load_lang('document') + ' ' + load_lang('list'), wiki_set(), custom(), other2([0, 0])],
@@ -1079,7 +1091,13 @@ def user_log():
         else:
             count = 0
 
-        list_data += '</ul><hr><ul><li>all : ' + str(count) + '</li></ul>'
+        list_data +=    '''
+                        </ul>
+                        <hr>
+                        <ul>
+                            <li>all : ''' + str(count) + '''</li>
+                        </ul>
+                        '''
 
     list_data += next_fix('/user_log?num=', num, user_list)
 
@@ -1500,9 +1518,19 @@ def deep_search(name = None):
     
     curs.execute("select title from data where title = ?", [name])
     if curs.fetchall():
-        div = '<ul><li><a href="/w/' + url_pas(name) + '">' + name + '</a></li></ul><hr><ul>'
+        link_id = ''
     else:
-        div = '<ul><li><a id="not_thing" href="/w/' + url_pas(name) + '">' + name + '</a></li></ul><hr><ul>'
+        link_id = 'id="not_thing"'
+    
+    div =   '''
+            <ul>
+                <li>
+                    <a ''' + link_id + ' href="/w/' + url_pas(name) + '">' + name + '''</a>
+                </li>
+            </ul>
+            <hr>
+            <ul>
+            '''
 
     curs.execute("select distinct title, case when title like ? then '제목' else '내용' end from data where title like ? or data like ? order by case when title like ? then 1 else 2 end limit ?, '50'", ['%' + name + '%', '%' + name + '%', '%' + name + '%', '%' + name + '%', str(sql_num)])
     all_list = curs.fetchall()
@@ -2146,12 +2174,20 @@ def title_index():
 
         count_end += [count_end[0] - count_end[1]  - count_end[2]  - count_end[3]  - count_end[4]]
         
-        data += '</ul><hr><ul><li>all : ' + str(count_end[0]) + '</li></ul><hr><ul>'
-        data += '<li>' + load_lang('template') + ' : ' + str(count_end[1]) + '</li>'
-        data += '<li>' + load_lang('category') + ' : ' + str(count_end[2]) + '</li>'
-        data += '<li>' + load_lang('user') + ' : ' + str(count_end[3]) + '</li>'
-        data += '<li>' + load_lang('file') + ' : ' + str(count_end[4]) + '</li>'
-        data += '<li>other : ' + str(count_end[5]) + '</li>'
+        data += '''
+                </ul>
+                <hr>
+                <ul>
+                    <li>all : ''' + str(count_end[0]) + '''</li>
+                </ul>
+                <hr>
+                <ul>
+                    <li>''' + load_lang('template') + ' : ' + str(count_end[1]) + '''</li>
+                    <li>''' + load_lang('category') + ' : ' + str(count_end[2]) + '''</li>
+                    <li>''' + load_lang('user') + ' : ' + str(count_end[3]) + '''</li>
+                    <li>''' + load_lang('file') + ' : ' + str(count_end[4]) + '''</li>
+                    <li>other : ''' + str(count_end[5]) + '''</li>
+                '''
 
     data += '</ul>' + next_fix('/title_index?num=' + str(num) + '&page=', page, title_list, num)
     sub = ' (' + str(num) + ')'
