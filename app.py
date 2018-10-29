@@ -15,7 +15,7 @@ import random
 
 from func import *
 
-r_ver = 'v3.0.8-master-08'
+r_ver = 'v3.0.8-master-09'
 c_ver = ''.join(re.findall('[0-9]', r_ver))
 
 print('version : ' + r_ver)
@@ -353,6 +353,13 @@ def inter_wiki(tools = None):
                 '''
 
         curs.execute("select html from html_filter where kind = 'email'")
+    elif tools == 'name_filter':
+        del_link = 'del_name_filter'
+        plus_link = 'plus_name_filter'
+        title = load_lang('id') + ' ' + load_lang('filter') + ' ' + load_lang('list')
+        div = ''
+
+        curs.execute("select html from html_filter where kind = 'name'")
     else:
         del_link = 'del_edit_filter'
         plus_link = 'manager/9'
@@ -399,6 +406,8 @@ def del_inter(tools = None, name = None):
             curs.execute("delete from inter where title = ?", [name])
         elif tools == 'del_edit_filter':
             curs.execute("delete from filter where name = ?", [name])
+        elif tools == 'del_name_filter':
+            curs.execute("delete from html_filter where html = ? and kind = 'name'", [name])
         else:
             curs.execute("delete from html_filter where html = ? and kind = 'email'", [name])
         
@@ -430,8 +439,14 @@ def plus_inter(tools = None, name = None):
             else:
                 curs.execute("insert into filter (name, regex, sub) values (?, ?, ?)", [name, flask.request.form.get('content', 'test'), end])
         else:
-            curs.execute('insert into html_filter (html, kind) values (?, "email")', [flask.request.form.get('title', None)])
-            admin_check(None, 'email_filter edit')
+            if tools == 'plus_name_filter':
+                admin_check(None, 'name_filter edit')
+                type_d = 'name'
+            else:
+                admin_check(None, 'email_filter edit')
+                type_d = 'email'
+            
+            curs.execute('insert into html_filter (html, kind) values (?, ?)', [flask.request.form.get('title', 'test'), type_d])
         
         conn.commit()
     
@@ -474,6 +489,9 @@ def plus_inter(tools = None, name = None):
                         <hr>
                         <input ''' + stat + ''' placeholder="''' + load_lang('regex') + '''" name="content" value="''' + html.escape(textarea) + '''" type="text">
                         '''
+        elif tools == 'plus_name_filter':
+            title = load_lang('id') + ' ' + load_lang('filter') + ' ' + load_lang('plus')
+            form_data = '<input placeholder="' + load_lang('id') + ' ' + load_lang('regex') + '" type="text" name="title">'
         else:
             title = 'email ' + load_lang('filter') + ' ' + load_lang('plus')
             form_data = '<input placeholder="email" type="text" name="title">'
@@ -996,13 +1014,16 @@ def admin_plus(name = None):
         else:
             state = ''
 
-        data += '<li><input type="checkbox" ' + state +  ' name="ban" ' + exist_list[0] + '> ' + load_lang('ban') + '</li>'
-        data += '<li><input type="checkbox" ' + state +  ' name="toron" ' + exist_list[2] + '> ' + load_lang('discussion') + '</li>'
-        data += '<li><input type="checkbox" ' + state +  ' name="check" ' + exist_list[3] + '> ' + load_lang('user') + ' ' + load_lang('check') + '</li>'
-        data += '<li><input type="checkbox" ' + state +  ' name="acl" ' + exist_list[4] + '> ' + load_lang('document') + ' acl</li>'
-        data += '<li><input type="checkbox" ' + state +  ' name="hidel" ' + exist_list[5] + '> ' + load_lang('history') + ' ' + load_lang('hide') + '</li>'
-        data += '<li><input type="checkbox" ' + state +  ' name="give" ' + exist_list[6] + '> ' + load_lang('authority') + '</li>'
-        data += '<li><input type="checkbox" ' + state +  ' name="owner" ' + exist_list[7] + '> ' + load_lang('owner') + '</li></ul>'
+        data += '''
+                    <li><input type="checkbox" ''' + state +  ' name="ban" ' + exist_list[0] + '> ' + load_lang('ban') + '''</li>
+                    <li><input type="checkbox" ''' + state +  ' name="toron" ' + exist_list[2] + '> ' + load_lang('discussion') + '''</li>
+                    <li><input type="checkbox" ''' + state +  ' name="check" ' + exist_list[3] + '> ' + load_lang('user') + ' ' + load_lang('check') + '''</li>
+                    <li><input type="checkbox" ''' + state +  ' name="acl" ' + exist_list[4] + '> ' + load_lang('document') + ''' acl</li>
+                    <li><input type="checkbox" ''' + state +  ' name="hidel" ' + exist_list[5] + '> ' + load_lang('history') + ' ' + load_lang('hide') + '''</li>
+                    <li><input type="checkbox" ''' + state +  ' name="give" ' + exist_list[6] + '> ' + load_lang('authority') + '''</li>
+                    <li><input type="checkbox" ''' + state +  ' name="owner" ' + exist_list[7] + '> ' + load_lang('owner') + '''</li>
+                </ul>
+                '''
 
         return easy_minify(flask.render_template(skin_check(), 
             imp = [load_lang('admin_group') + ' ' + load_lang('plus'), wiki_set(), custom(), other2([0, 0])],
@@ -2091,6 +2112,7 @@ def manager(num = 1):
                         <li><a href="/inter_wiki">''' + load_lang('interwiki') + '''</a></li>
                         <li><a href="/html_filter">html ''' + load_lang('filter') + '''</a></li>
                         <li><a href="/email_filter">email ''' + load_lang('filter') + '''</a></li>
+                        <li><a href="/name_filter">''' + load_lang('id') + ' ' + load_lang('filter') + '''</a></li>
                     </ul>
                     <br>
                     <h2>''' + load_lang('server') + '''</h2>
@@ -2949,6 +2971,13 @@ def register():
 
         if re.search('(?:[^A-Za-zㄱ-힣0-9 ])', flask.request.form.get('id', None)):
             return re_error('/error/8')
+            
+        curs.execute('select html from html_filter where kind = "name"')
+        set_d = curs.fetchall()
+        for i in set_d:
+            check_r = re.compile(i[0], re.I)
+            if check_r.search(flask.request.form.get('id', None)):
+                return re_error('/error/8')
 
         if len(flask.request.form.get('id', None)) > 32:
             return re_error('/error/7')
