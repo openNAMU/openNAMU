@@ -515,7 +515,7 @@ def setting(num = 0):
         return re_error('/ban')
 
     if num == 0:
-        li_list = [load_lang('main'), load_lang('text') + ' ' + load_lang('setting'), load_lang('main') + ' head', 'robots.txt', 'google']
+        li_list = [load_lang('main'), load_lang('text') + ' ' + load_lang('setting'), load_lang('main') + ' head', load_lang('main') + ' body', 'robots.txt', 'google']
         
         x = 0
         
@@ -739,21 +739,34 @@ def setting(num = 0):
                         ''',
                 menu = [['setting', load_lang('setting')]]
             ))
-    elif num == 3:
+    elif num == 3 or num == 4:
         if flask.request.method == 'POST':
-            curs.execute("select name from other where name = 'head'")
-            if curs.fetchall():
-                curs.execute("update other set data = ? where name = 'head'", [flask.request.form.get('content', None)])
+            if num == 4:
+                info_d = 'body'
+                end_r = '4'
             else:
-                curs.execute("insert into other (name, data) values ('head', ?)", [flask.request.form.get('content', None)])
+                info_d = 'head'
+                end_r = '3'
+            
+            curs.execute("select name from other where name = ?", [info_d])
+            if curs.fetchall():
+                curs.execute("update other set data = ? where name = ?", [flask.request.form.get('content', ''), info_d])
+            else:
+                curs.execute("insert into other (name, data) values (?, ?)", [info_d, flask.request.form.get('content', '')])
             
             conn.commit()
 
             admin_check(None, 'edit_set')
 
-            return redirect('/setting/3')
+            return redirect('/setting/' + end_r)
         else:
-            curs.execute("select data from other where name = 'head'")
+            if num == 4:
+                curs.execute("select data from other where name = 'body'")
+                title = 'body'
+            else:
+                curs.execute("select data from other where name = 'head'")
+                title = 'head'
+                
             head = curs.fetchall()
             if head:
                 data = head[0][0]
@@ -761,7 +774,7 @@ def setting(num = 0):
                 data = ''
 
             return easy_minify(flask.render_template(skin_check(), 
-                imp = [load_lang('main') + ' head', wiki_set(), custom(), other2([0, 0])],
+                imp = [load_lang('main') + ' ' + title, wiki_set(), custom(), other2([0, 0])],
                 data =  '''
                         <form method="post">
                             <textarea rows="25" name="content">''' + html.escape(data) + '''</textarea>
@@ -771,7 +784,7 @@ def setting(num = 0):
                         ''',
                 menu = [['setting', load_lang('setting')]]
             ))
-    elif num == 4:
+    elif num == 5:
         if flask.request.method == 'POST':
             curs.execute("select name from other where name = 'robot'")
             if curs.fetchall():
@@ -816,7 +829,7 @@ def setting(num = 0):
                         ''',
                 menu = [['setting', load_lang('setting')]]
             ))
-    elif num == 5:
+    elif num == 6:
         i_list = ['recaptcha', 'sec_re', 'g_email', 'g_pass']
 
         if flask.request.method == 'POST':
@@ -3642,6 +3655,11 @@ def read_view(name = None):
             r_date = 0
 
     div = end_data + div
+            
+    curs.execute("select data from other where name = 'body'")
+    body = curs.fetchall()
+    if body:
+        div = body[0][0] + '<hr>' + div
 
     return easy_minify(flask.render_template(skin_check(), 
         imp = [flask.request.args.get('show', name), wiki_set(), custom(), other2([sub + acl, r_date])],
