@@ -15,7 +15,7 @@ try:
 except:
     pass
 
-if sys.version_info < (3, 6):
+if sys.version_info > (3, 6):
     import sha3
 
 from set_mark.tool import *
@@ -164,7 +164,7 @@ def pw_encode(data, data2 = '', type_d = ''):
     if type_d == 'sha256':
         return hashlib.sha256(bytes(data, 'utf-8')).hexdigest()
     elif type_d == 'sha3':
-        if sys.version_info < (3, 6):
+        if sys.version_info > (3, 6):
             return sha3.sha3_256(bytes(data, 'utf-8')).hexdigest()
         else:
             return hashlib.sha3_256(bytes(data, 'utf-8')).hexdigest()
