@@ -15,7 +15,7 @@ try:
 except:
     pass
 
-if sys.version_info > (3, 6):
+if sys.version_info < (3, 6):
     import sha3
 
 from set_mark.tool import *
