@@ -2122,6 +2122,9 @@ def manager(num = 1):
                     <ul>
                         <li><a href="/manager/8">''' + load_lang('admin_group') + ' ' + load_lang('create') + '''</a></li>
                         <li><a href="/setting">''' + load_lang('setting') + ' ' + load_lang('edit') + '''</a></li>
+                    </ul>
+                    <h3>''' + load_lang('filter') + '''</h3>
+                    <ul>
                         <li><a href="/inter_wiki">''' + load_lang('interwiki') + '''</a></li>
                         <li><a href="/html_filter">html ''' + load_lang('filter') + '''</a></li>
                         <li><a href="/email_filter">email ''' + load_lang('filter') + '''</a></li>
