@@ -763,7 +763,10 @@ def rd_plus(title, sub, date):
         curs.execute("insert into rd (title, sub, date) values (?, ?, ?)", [title, sub, date])
 
 def history_plus(title, data, date, ip, send, leng):
-    curs.execute("insert into history (id, title, data, date, ip, send, leng, hide) values (?, ?, ?, ?, ?, ?, ?, '')", [str(int(id_data[0][0]) + 1), title, data, date, ip, send, leng])
+    curs.execute("select id from history where title = ? order by id + 0 desc limit 1", [title])
+    id_data = curs.fetchall()
+    
+    curs.execute("insert into history (id, title, data, date, ip, send, leng, hide) values (?, ?, ?, ?, ?, ?, ?, '')", [str(int(id_data[0][0]) + 1) if id_data else '1', title, data, date, ip, send, leng])
 
 def leng_check(first, second):
     if first < second:
