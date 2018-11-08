@@ -161,15 +161,17 @@ def table_start(data):
             
     return data
 
-def middle_parser(data):
+def middle_parser(data, fol_num, syntax_num, folding_num):
     global end_data
+    global plus_data
 
     middle_stack = 0
     middle_list = []
     middle_number = 0
-    fol_num = 0
+
+    middle_re = re.compile('(?:{{{((?:(?:(?! |{{{|}}}|&lt;).)*) ?)|(}}}))')
     while 1:
-        middle_data = re.search('(?:{{{((?:(?! |{{{|}}}|&lt;).)*) ?|(}}}))', data)
+        middle_data = middle_re.search(data)
         if middle_data:
             middle_data = middle_data.groups()
             if not middle_data[1]:
@@ -183,25 +185,25 @@ def middle_parser(data):
                         if middle_search:                            
                             middle_list += ['span']
                             
-                            data = re.sub('(?:{{{((?:(?! |{{{|}}}|&lt;).)*) ?|(}}}))', '<span style="color: ' + middle_search.groups()[0] + ';">', data, 1)
+                            data = middle_re.sub('<span style="color: ' + middle_search.groups()[0] + ';">', data, 1)
                         else:
                             middle_search = re.search('^(?:#(\w+))', middle_data[0])
                             if middle_search:
                                 middle_list += ['span']
                                 
-                                data = re.sub('(?:{{{((?:(?! |{{{|}}}|&lt;).)*) ?|(}}}))', '<span style="color: ' + middle_search.groups()[0] + ';">', data, 1)
+                                data = middle_re.sub('<span style="color: ' + middle_search.groups()[0] + ';">', data, 1)
                             else:
                                 middle_search = re.search('^(?:@((?:[0-9a-f-A-F]{3}){1,2}))', middle_data[0])
                                 if middle_search:
                                     middle_list += ['span']
                                     
-                                    data = re.sub('(?:{{{((?:(?! |{{{|}}}|&lt;).)*) ?|(}}}))', '<span style="background: #' + middle_search.groups()[0] + ';">', data, 1)
+                                    data = middle_re.sub('<span style="background: #' + middle_search.groups()[0] + ';">', data, 1)
                                 else:
                                     middle_search = re.search('^(?:@(\w+))', middle_data[0])
                                     if middle_search:
                                         middle_list += ['span']
                                         
-                                        data = re.sub('(?:{{{((?:(?! |{{{|}}}|&lt;).)*) ?|(}}}))', '<span style="background: ' + middle_search.groups()[0] + ';">', data, 1)
+                                        data = middle_re.sub('<span style="background: ' + middle_search.groups()[0] + ';">', data, 1)
                                     else:
                                         middle_search = re.search('^(\+|-)([1-5])', middle_data[0])
                                         if middle_search:
@@ -213,7 +215,7 @@ def middle_parser(data):
 
                                             middle_list += ['span']
                                             
-                                            data = re.sub('(?:{{{((?:(?! |{{{|}}}|&lt;).)*) ?|(}}}))', '<span style="font-size: ' + font_size + '%;">', data, 1)
+                                            data = middle_re.sub('<span style="font-size: ' + font_size + '%;">', data, 1)
                                         else:
                                             middle_search = re.search('^#!wiki', middle_data[0])
                                             if middle_search:
@@ -235,60 +237,67 @@ def middle_parser(data):
                                                     else:
                                                         middle_data_2 = ['python']
 
+                                                    if syntax_num == 0:
+                                                        plus_data +=    '''
+                                                                        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css">
+                                                                        <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+                                                                        '''
+
+                                                        syntax_num = 1
+
                                                     middle_list += ['pre']
                                                     
                                                     data = re.sub('{{{#!syntax ?((?:(?!\n).)*)\n?', '<pre id="syntax"><code class="' + middle_data_2[0] + '">', data, 1)
                                                 else:
-                                                    middle_search = re.search('^#!html', middle_data[0])
+                                                    middle_search = re.search('^#!folding', middle_data[0])
                                                     if middle_search:
-                                                        middle_list += ['span']
+                                                        middle_list += ['2div']
                                                         
-                                                        data = re.sub('(?:{{{((?:(?! |{{{|}}}|&lt;).)*) ?|(}}}))', '<span id="html">', data, 1)
-                                                    else:
-                                                        middle_search = re.search('^#!folding', middle_data[0])
-                                                        if middle_search:
-                                                            middle_list += ['2div']
-                                                            
-                                                            folding_data = re.search('{{{#!folding ?((?:(?!\n).)*)\n?', data)
-                                                            if folding_data:
-                                                                folding_data = folding_data.groups()
-                                                            else:
-                                                                folding_data = ['Test']
-                                                            
-                                                            data = re.sub('{{{#!folding ?((?:(?!\n).)*)\n?', '<div>' + str(folding_data[0]) + ' <div style="display: inline-block;"><a href="javascript:void(0);" onclick="folding(' + str(fol_num) + ');">[do]</a></div_end><div id="folding_' + str(fol_num) + '" style="display: none;"><div id="wiki_div" style="">', data, 1)
-                                                            
-                                                            fol_num += 1
+                                                        folding_data = re.search('{{{#!folding ?((?:(?!\n).)*)\n?', data)
+                                                        if folding_data:
+                                                            folding_data = folding_data.groups()
                                                         else:
-                                                            middle_list += ['span']
+                                                            folding_data = ['Test']
 
-                                                            data = re.sub('(?:{{{((?:(?! |{{{|}}}|&lt;).)*) ?|(}}}))', '<span>', data, 1)
+                                                        if folding_num == 0:
+                                                            plus_data += '<script src="/views/main_css/parser.js"></script>'
+
+                                                            folding_num = 1
+                                                        
+                                                        data = re.sub('{{{#!folding ?((?:(?!\n).)*)\n?', '<div>' + str(folding_data[0]) + ' <div style="display: inline-block;"><a href="javascript:void(0);" onclick="folding(' + str(fol_num) + ');">[do]</a></div_end><div id="folding_' + str(fol_num) + '" style="display: none;"><div id="wiki_div" style="">', data, 1)
+                                                        
+                                                        fol_num += 1
+                                                    else:
+                                                        middle_list += ['span']
+
+                                                        data = middle_re.sub('<span>', data, 1)
                     else:
                         middle_list += ['code']
                         
                         middle_stack += 1
                         
-                        data = re.sub('(?:{{{((?:(?! |{{{|}}}|&lt;).)*)|(}}}))', '<code>' + middle_data[0].replace('\\', '\\\\'), data, 1)
+                        data = middle_re.sub('<code>' + middle_data[0].replace('\\', '\\\\'), data, 1)
                 
                     middle_number += 1
             else:
                 if middle_list == []:
-                    data = re.sub('(?:{{{((?:(?! |{{{|}}}|&lt;).)*) ?|(}}}))', '&#125;&#125;&#125;', data, 1)
+                    data = middle_re.sub('&#125;&#125;&#125;', data, 1)
                 else:
                     if middle_stack > 0:
                         middle_stack -= 1
 
                     if middle_stack > 0:
-                        data = re.sub('(?:{{{((?:(?! |{{{|}}}|&lt;).)*) ?|(}}}))', '&#125;&#125;&#125;', data, 1)
+                        data = middle_re.sub('&#125;&#125;&#125;', data, 1)
                     else:                    
                         if middle_number > 0:
                             middle_number -= 1
                             
                         if middle_list[middle_number] == '2div':
-                            data = re.sub('(?:{{{((?:(?! |{{{|}}}|&lt;).)*) ?|(}}}))', '</div_end></div_end></div_end>', data, 1)
+                            data = middle_re.sub('</div_end></div_end></div_end>', data, 1)
                         elif middle_list[middle_number] == 'pre':
-                            data = re.sub('(?:{{{((?:(?! |{{{|}}}|&lt;).)*) ?|(}}}))', '</code></pre>', data, 1)
+                            data = middle_re.sub('</code></pre>', data, 1)
                         else:
-                            data = re.sub('(?:{{{((?:(?! |{{{|}}}|&lt;).)*) ?|(}}}))', '</' + middle_list[middle_number] + '>', data, 1)
+                            data = middle_re.sub('</' + middle_list[middle_number] + '>', data, 1)
                         
                         del(middle_list[middle_number])
         else:
@@ -322,42 +331,7 @@ def middle_parser(data):
         else:
             break
 
-    while 1:
-        html_data = re.search('<span id="html">((?:(?:(?:(?!<\/span>)).)+\n*)+)<\/span>', data)
-        if html_data:
-            html_data = html_data.groups()
-            html_data_2 = html_data[0]
-
-            can_html = ['b', 'span']
-            dic = {}
-
-            for i in can_html:
-                while 1:
-                    test = re.search('&lt;' + i + '((?:(?!&gt;).)*)&gt;', html_data_2)
-                    if test:
-                        test = test.groups()[0]
-                        test = re.sub('&quot;', '"', test)
-                        
-                        html_data_2 = re.sub('&lt;' + i + '((?:(?!&gt;).)*)&gt;', '<' + i + test + '>', html_data_2, 1)
-                    else:
-                        break
-
-            for i in can_html:
-                span_num = re.findall('<' + i + '(?:(?:(?!>).)*)>', html_data_2)
-                span_num = len(span_num)
-                span_end_num = re.findall('<\/' + i + '>', html_data_2)
-                span_end_num = len(span_end_num)
-                
-                dic[i] = span_num - span_end_num
-
-            for i in can_html:
-                html_data_2 += ('</' + i + '>' * dic[i])
-
-            data = re.sub('<span id="html">((?:(?:(?:(?!<\/span>)).)+\n*)+)<\/span>', '<span id="end_html">' + html_data_2 + '<\/span>', data, 1)
-        else:
-            break
-
-    return data
+    return [data, [fol_num, syntax_num, folding_num]]
     
 def link_fix(main_link):
     if re.search('^:', main_link):
@@ -380,21 +354,21 @@ def link_fix(main_link):
 def namu(conn, data, title, main_num):
     curs = conn.cursor()
 
-    data = '\n' + data + '\n'
-    backlink = []
-    plus_data = '''
-                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css">
-                <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
-                <script src="/views/main_css/parser.js"></script>
-                '''
+    global plus_data
     global end_data
+
+    data = '\n' + data + '\n'
+    plus_data = ''
+
+    backlink = []
     end_data = []
     
     data = html.escape(data)
 
     data = re.sub('\r\n', '\n', data)
 
-    data = middle_parser(data)
+    t_data = middle_parser(data, 0, 0, 0)
+    data = t_data[0]
 
     include_re = re.compile('\[include\(((?:(?!\)\]).)+)\)\]', re.I)
     while 1:
@@ -431,20 +405,20 @@ def namu(conn, data, title, main_num):
             curs.execute("select data from data where title = ?", [include_data])
             include_data = curs.fetchall()
             if include_data:
-                include_parser = include_data[0][0]
+                include_parser = include_re.sub('', include_data[0][0])
+                include_parser = html.escape(include_parser)
 
                 while 1:
                     include_plus = re.search(', ?((?:(?!=).)+)=((?:(?!,).)+)', include)
                     if include_plus:
                         include_plus = include_plus.groups()
-                        include_parser = re.sub('@' + include_plus[0] + '@', include_plus[1], include_parser)
+                        include_parser = include_parser.replace('@' + include_plus[0] + '@', include_plus[1])
 
                         include = re.sub(', ?((?:(?!=).)+)=((?:(?!,).)+)', '', include, 1)
                     else:
                         break
 
                 include_parser = re.sub('\[\[(?:category|분류):(((?!\]\]|#include).)+)\]\]', '', include_parser)
-                include_parser = html.escape(include_parser)
 
                 data = include_re.sub('<include>\n<a id="include_link" href="/w/' + tool.url_pas(include_link) + '">[' + include_link + ']</a>\n' + include_parser + '\n</include>', data, 1)
             else:
@@ -454,40 +428,10 @@ def namu(conn, data, title, main_num):
 
     data = re.sub('\r\n', '\n', data)
 
-    data = middle_parser(data)
+    t_data = middle_parser(data, t_data[1][0], t_data[1][1], t_data[1][2])
+    data = t_data[0]
 
     data = re.sub('&amp;', '&', data)
-
-    curs.execute('select html from html_filter where kind = ""')
-    html_db = curs.fetchall()
-
-    src_list = ["www.youtube.com", "serviceapi.nmv.naver.com", "tv.kakao.com", "www.google.com", "serviceapi.rmcnmv.naver.com"]
-    html_list = ['div', 'span', 'embed', 'iframe', 'ruby', 'rp', 'rt']
-    
-    html_data = re.findall('&lt;(\/)?((?:(?!&gt;| ).)+)( (?:(?:(?!&gt;).)+)?)?&gt;', data)
-    for in_data in html_data:
-        if in_data[0] == '':
-            if in_data[1] in html_list or (html_db and in_data[1] in html_db[0]):
-                if re.search('&lt;\/' + in_data[1] + '&gt;', data):
-                    src = re.search('src=([^ ]*)', in_data[2])
-                    if src:
-                        v_src = re.search('http(?:s)?:\/\/([^/\'" ]*)', src.groups()[0])
-                        if v_src:
-                            if not v_src.groups()[0] in src_list:
-                                and_data = re.sub('&#x27;', '\'', re.sub('&quot;', '"', re.sub('src=([^ ]*)', '', in_data[2])))
-                            else:
-                                and_data = re.sub('&#x27;', '\'', re.sub('&quot;', '"', in_data[2]))
-                        else:
-                            and_data = re.sub('&#x27;', '\'', re.sub('&quot;', '"', re.sub('src=([^ ]*)', '', in_data[2])))
-                    else:
-                        and_data = re.sub('&#x27;', '\'', re.sub('&quot;', '"', in_data[2]))
-                        
-
-                    data = data.replace('&lt;' + in_data[1] + in_data[2] + '&gt;', '<' + in_data[1] + and_data + '>', 1)
-                    data = re.sub('&lt;\/' + in_data[1] + '&gt;', '</' + in_data[1] + '>', data, 1)
-
-    position = re.compile('position', re.I)
-    data = position.sub('', data)
 
     data = re.sub('\n( +)\|\|', '\n||', data)
     data = re.sub('\|\|( +)\n', '||\n', data)
@@ -559,7 +503,7 @@ def namu(conn, data, title, main_num):
     data = re.sub('&#x27;&#x27;&#x27;(?P<in>((?!&#x27;&#x27;&#x27;).)+)&#x27;&#x27;&#x27;', '<b>\g<in></b>', data)
     data = re.sub('&#x27;&#x27;(?P<in>((?!&#x27;&#x27;).)+)&#x27;&#x27;', '<i>\g<in></i>', data)
     data = re.sub('~~(?P<in>(?:(?!~~).)+)~~', '<s>\g<in></s>', data)
-    data = re.sub('--(?P<in>(?:(?!~~).)+)--', '<s>\g<in></s>', data)
+    data = re.sub('--(?P<in>(?:(?!--).)+)--', '<s>\g<in></s>', data)
     data = re.sub('__(?P<in>(?:(?!__).)+)__', '<u>\g<in></u>', data)
     data = re.sub('\^\^(?P<in>(?:(?!\^\^).)+)\^\^', '<sup>\g<in></sup>', data)
     data = re.sub(',,(?P<in>(?:(?!,,).)+),,', '<sub>\g<in></sub>', data)
@@ -641,8 +585,8 @@ def namu(conn, data, title, main_num):
     anchor_re = re.compile("\[anchor\((?P<in>(?:(?!\)\]).)+)\)\]", re.I)
     data = anchor_re.sub('<span id="\g<in>"></span>', data)
 
-    ruby_re = re.compile("\[ruby\((?P<in>(?:(?!,).)+)\, ?(?P<out>(?:(?!\)\]).)+)\)\]", re.I)
-    data = ruby_re.sub('<ruby>\g<in><rp>(</rp><rt>\g<out></rt><rp>)</rp></ruby>', data)
+    ruby_re = re.compile("\[ruby\((?P<in>(?:(?!,).)+)\, ?ruby=(?P<out>(?:(?!\)\]|,).)+)(?:\, ?color=(?P<under>(?:(?!\)\]).)+))?\)\]", re.I)
+    data = ruby_re.sub('<ruby>\g<in><rp>(</rp><rt style="color: \g<under>">\g<out></rt><rp>)</rp></ruby>', data)
 
     now_time = tool.get_time()
 
@@ -925,7 +869,10 @@ def namu(conn, data, title, main_num):
                         else:
                             data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<a href="' + other_link + '">' + see_link + '</a>', data, 1)
                     else:
-                        data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<b>' + see_link + '</b>', data, 1)
+                        if re.search('^#', other_link):
+                            data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<a href="' + other_link + '">' + other_link + '</a>', data, 1)
+                        else:
+                            data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<b>' + see_link + '</b>', data, 1)
                 else:
                     data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '&#91;&#91;' + link + '&#93;&#93;', data, 1)
         else:
@@ -935,12 +882,16 @@ def namu(conn, data, title, main_num):
     data = br_re.sub('<br>', data)
             
     footnote_number = 0
+    
     footnote_all = []
     footnote_dict = {}
     footnote_re = {}
+    
     footdata_all = '\n<hr><ul id="footnote_data">'
+    
+    re_footnote = re.compile('(?:\[\*((?:(?! |\]).)*)(?: ((?:(?!(?:\[\*|\])).)+))?\]|(\[(?:각주|footnote)\]))')
     while 1:
-        footnote = re.search('(?:\[\*((?:(?! |\]).)*)(?: ((?:(?!(?:\[\*(?:(?:(?!\]).)+)\]|\])).)+))?\]|(\[(?:각주|footnote)\]))', data)
+        footnote = re_footnote.search(data)
         if footnote:
             footnote_data = footnote.groups()
             if footnote_data[2]:
@@ -954,7 +905,7 @@ def namu(conn, data, title, main_num):
 
                     footdata_all += '<li><a href="#rfn-' + str(footdata[0]) + '" id="fn-' + str(footdata[0]) + '">(' + footdata[1] + ')</a> ' + footdata_in + '</li>'
                 
-                data = re.sub('(?:\[\*((?:(?! ).)*) ((?:(?!\]).)+)\]|(\[(?:각주|footnote)\]))', footdata_all + '</ul>', data, 1)
+                data = re_footnote.sub(footdata_all + '</ul>', data, 1)
                 
                 footnote_all = []
                 footdata_all = '\n<hr><ul id="footnote_data">'
@@ -970,9 +921,9 @@ def namu(conn, data, title, main_num):
 
                         footnote_all += [[float(footshort), footshort, 0]]
 
-                        data = re.sub('(?:\[\*((?:(?! |\]).)*)(?: ((?:(?!(?:\[\*(?:(?:(?!\]).)+)\]|\])).)+))?\]|(\[(?:각주|footnote)\]))', '<sup><a href="#fn-' + footshort + '" id="rfn-' + footshort + '">(' + footshort + ')</a></sup>', data, 1)
+                        data = re_footnote.sub('<sup><a href="#fn-' + footshort + '" id="rfn-' + footshort + '">(' + footshort + ')</a></sup>', data, 1)
                     else:
-                        data = re.sub('(?:\[\*((?:(?! |\]).)*)(?: ((?:(?!(?:\[\*(?:(?:(?!\]).)+)\]|\])).)+))?\]|(\[(?:각주|footnote)\]))', '<sup><a href="#">(' + footnote_name + ')</a></sup>', data, 1)
+                        data = re_footnote.sub('<sup><a href="#">(' + footnote_name + ')</a></sup>', data, 1)
                 else:
                     footnote_number += 1
 
@@ -988,7 +939,7 @@ def namu(conn, data, title, main_num):
 
                     footnote_all += [[footnote_number, footnote_name, footnote]]
                     
-                    data = re.sub('(?:\[\*((?:(?! |\]).)*)(?: ((?:(?!(?:\[\*(?:(?:(?!\]).)+)\]|\])).)+))?\]|(\[(?:각주|footnote)\]))', '<sup><a href="#fn-' + str(footnote_number) + '" id="rfn-' + str(footnote_number) + '">(' + footnote_name + ')</a></sup>', data, 1)
+                    data = re_footnote.sub('<sup><a href="#fn-' + str(footnote_number) + '" id="rfn-' + str(footnote_number) + '">(' + footnote_name + ')</a></sup>', data, 1)
         else:
             break
 
