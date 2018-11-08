@@ -1,6 +1,8 @@
-tornado >= 4.5.2
-bcrypt >= 3.1.3
-requests >= 2.13.0
-flask >= 0.12.2
-flask-Reggie >= 0.0.2
-flask-compress >= 1.4.0
+tornado
+bcrypt
+flask
+flask-Reggie
+flask-compress
+pysha3; python_version < "3.6"
+css-html-js-minify==2.2.2; python_version < "3.6"
+css-html-js-minify; python_version >= "3.6"
