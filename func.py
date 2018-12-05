@@ -10,6 +10,10 @@ import html
 import sys
 import re
 import os
+try:
+    import css_html_js_minify
+except:
+    pass
 
 if sys.version_info < (3, 6):
     import sha3
@@ -51,9 +55,18 @@ def send_email(who, title, data):
     except:
         print('error : email login error')
 
-def easy_minify(data):
-    data = re.sub('\n +<', '\n<', data)
-    data = re.sub('>(\n| )+<', '> <', data)
+def easy_minify(data, tool = None):
+    try:
+        if not tool:
+            data = css_html_js_minify.html_minify(data)
+        else:
+            if tool == 'css':
+                data = css_html_js_minify.css_minify(data)
+            elif tool == 'js':
+                data = css_html_js_minify.js_minify(data)
+    except:
+        data = re.sub('\n +<', '\n<', data)
+        data = re.sub('>(\n| )+<', '> <', data)
     
     return data
 
@@ -426,7 +439,7 @@ def diff(seqm):
             
     return sub
            
-def admin_check(num, what):
+def admin_check(num = None, what = None):
     ip = ip_check() 
 
     curs.execute("select acl from user where id = ?", [ip])
@@ -462,6 +475,8 @@ def admin_check(num, what):
                     reset = 1
                 else:
                     break
+                    
+    return 0
 
 def ip_pas(raw_ip):
     hide = 0
@@ -750,10 +765,8 @@ def rd_plus(title, sub, date):
 def history_plus(title, data, date, ip, send, leng):
     curs.execute("select id from history where title = ? order by id + 0 desc limit 1", [title])
     id_data = curs.fetchall()
-    if id_data:
-        curs.execute("insert into history (id, title, data, date, ip, send, leng, hide) values (?, ?, ?, ?, ?, ?, ?, '')", [str(int(id_data[0][0]) + 1), title, data, date, ip, send, leng])
-    else:
-        curs.execute("insert into history (id, title, data, date, ip, send, leng, hide) values ('1', ?, ?, ?, ?, ?, ?, '')", [title, data, date, ip, send + ' (' + load_lang('new', 1) + ' ' + load_lang('document', 1) + ')', leng])
+    
+    curs.execute("insert into history (id, title, data, date, ip, send, leng, hide) values (?, ?, ?, ?, ?, ?, ?, '')", [str(int(id_data[0][0]) + 1) if id_data else '1', title, data, date, ip, send, leng])
 
 def leng_check(first, second):
     if first < second:
@@ -769,7 +782,7 @@ def edit_filter_do(data):
     if admin_check(1, 'edit_filter pass') != 1:
         curs.execute("select regex, sub from filter")
         for data_list in curs.fetchall():
-            match = re.compile(data_list[0])
+            match = re.compile(data_list[0], re.I)
             if match.search(data):
                 ban_insert(
                     ip_check(), 
@@ -849,7 +862,7 @@ def re_error(data):
             elif num == 7:
                 data = load_lang('long_id_error')
             elif num == 8:
-                data = load_lang('id_char_error')
+                data = load_lang('id_char_error') + ' <a href="/name_filter">(' + load_lang('id') + ' ' + load_lang('filter') + ')</a>'
             elif num == 9:
                 data = load_lang('file_exist_error')
             elif num == 10:
