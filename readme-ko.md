@@ -27,7 +27,7 @@ opennamu
 오픈나무에는 검증되지 않은 몇가지 버그가 존재할 수 있습니다. 당신의 오픈나무 사용과 버그 발견은 오픈나무의 발전을 돕습니다.
 [이슈 생성하기](https://github.com/2du/opennamu/issues/new)
 
-오픈나무는 완전한 오픈소스 프로젝트입니다. 새로운 기능을 추가하고 Pull Request를 해보세요. [다음 절차]에 따라 기여할 수 있습니다.
+오픈나무는 완전한 오픈소스 프로젝트입니다. 새로운 기능을 추가하고 Pull Request를 생성해보세요.
 [Pull Requests 생성하기](https://github.com/2du/opennamu/compare)
 
 # 라이선스
