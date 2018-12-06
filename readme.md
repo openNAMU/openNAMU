@@ -12,7 +12,7 @@ opennamu is a Python-based wiki engine. You can use opennamu by installing Pytho
  * [Contribute](#contribute)
  * [License](#license)
  * [Authors](#authors)
- * [Etc.](#etc.)
+ * [Etc.](#etc)
 
 # Getting Started
 
