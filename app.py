@@ -1287,6 +1287,23 @@ def now_update():
         data = 'auto update is not support. <a href="https://github.com/2DU/opennamu">(github)</a>',
         menu = [['manager/1', load_lang('admin')]]
     ))
+
+#OAuth Developing (hoparkgo9ma)
+@app.route('/oauth_settings')
+def oauth_settings():
+    if admin_check(None, 'indexing') != 1:
+        return re_error('/error/3')
+    oauth_supported = load_oauth('_README')['support']
+    body_content = ''
+    for i in range(len(oauth_supported)):
+        oauth_data = load_oauth(oauth_supported[i])
+        for j in range(2):
+            if j == 0:
+                load_target = 'id'
+            elif j == 1:
+                load_target = 'secret'
+            body_content += '<input placeholder="{}_client_{}" name="{}_client_{}" value="{}" type="text">'.format(oauth_supported[i], load_target, oauth_supported[i], load_target, oauth_data['client_{}'.format(load_target)])
+    return body_content
         
 @app.route('/xref/<everything:name>')
 def xref(name = None):
@@ -2136,6 +2153,7 @@ def manager(num = 1):
                         <li><a href="/indexing">''' + load_lang('indexing') + ' (' + load_lang('create') + ' or ' + load_lang('delete') + ''')</a></li>
                         <li><a href="/restart">''' + load_lang('server') + ' ' + load_lang('restart') + '''</a></li>
                         <li><a href="/update">''' + load_lang('update') + '''</a></li>
+                        <li><a href="/oauth_settings">''' + load_lang('oauth_settings') + '''</a></li>
                     </ul>
                     ''',
             menu = [['other', load_lang('other')]]
@@ -2757,7 +2775,7 @@ def login():
                         <input placeholder="''' + load_lang('password') + '''" name="pw" type="password">
                         <hr>
                         ''' + captcha_get() + '''
-                        <button type="submit">''' + load_lang('login') + '''</button>
+                        <button type="submit">''' + load_lang('login') + '''</button><a href="/register">''' + load_lang('register_suggest') + '''</a>
                         <hr>
                         <span>''' + load_lang('http_warring') + '''</span>
                     </form>
