@@ -182,23 +182,31 @@ def pw_check(data, data2, type_d = 'no', id_d = ''):
 
     if type_d != 'no':
         if type_d == '':
-            set_data = db_data[0][0]
+            set_data = 'bcrypt'
         else:
             set_data = type_d
     else:
         set_data = db_data[0][0]
     
-    if set_data in ['sha256', 'sha3']:
-        data3 = pw_encode(data = data, type_d = set_data)
-        if data3 == data2:
-            re_data = 1
+    while 1:
+        if set_data in ['sha256', 'sha3']:
+            data3 = pw_encode(data = data, type_d = set_data)
+            if data3 == data2:
+                re_data = 1
+            else:
+                re_data = 0
+
+            break
         else:
-            re_data = 0
-    else:
-        if pw_encode(data, data2, 'bcrypt') == data2:
-            re_data = 1
-        else:
-            re_data = 0
+            try:
+                if pw_encode(data, data2, 'bcrypt') == data2:
+                    re_data = 1
+                else:
+                    re_data = 0
+
+                break
+            except:
+                set_data = db_data[0][0]
 
     if db_data[0][0] != set_data and re_data == 1 and id_d != '':
         curs.execute("update user set pw = ?, encode = ? where id = ?", [pw_encode(data), db_data[0][0], id_d])
