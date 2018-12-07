@@ -257,6 +257,13 @@ def load_lang(data, num = 2):
         else:
             return load_lang(data, 1)
 
+# oauth settings #
+def load_oauth(provider):
+    oauth_native = open('oauthsettings.json', encoding='utf-8').read()
+    oauth = json.loads(oauth_native)
+    return oauth[provider]
+# end #
+
 def ip_or_user(data):
     if re.search('(\.|:)', data):
         return 1

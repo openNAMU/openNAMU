@@ -2764,6 +2764,27 @@ def login():
                     ''',
             menu = [['user', load_lang('user')]]
         ))
+
+@app.route('/oauth/<regex("naver|facebook"):platform>/<regex("init|callback"):func>')
+def login_oauth(platform = None, func = None):
+    publish_url = load_oauth('publish_url')
+    oauth_data = load_oauth(platform)
+    if func == 'init':
+        if oauth_data['client_id'] == '' or oauth_data['client_secret'] == '':
+            return '관리자가 이 기능을 비활성화시켰습니다.'
+        elif publish_url == 'https://':
+            return '관리자가 이 기능을 사용하는데 대한 정보를 제공하지 않았습니다.'
+    
+        data = {
+            'client_id' : oauth_data['client_id'],
+            'redirect_uri' : publish_url + '/oauth/' + platform + '/callback',
+            'state' : 'RAMDOMVALUE'
+        }
+        return redirect('https://www.facebook.com/v3.1/dialog/oauth?client_id={}&redirect_uri={}&state={}'.format(
+            data['client_id'], data['redirect_uri'], data['state']
+        ))
+
+    return str(load_oauth(platform))
                 
 @app.route('/change', methods=['POST', 'GET'])
 def change_password():
