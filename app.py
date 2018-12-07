@@ -1294,7 +1294,7 @@ def oauth_settings():
     if admin_check(None, 'indexing') != 1:
         return re_error('/error/3')
     oauth_supported = load_oauth('_README')['support']
-    body_content = ''
+    body_content = '<form action="" accept-charset="utf-8" name="" method="post">'
     for i in range(len(oauth_supported)):
         oauth_data = load_oauth(oauth_supported[i])
         for j in range(2):
@@ -1303,6 +1303,7 @@ def oauth_settings():
             elif j == 1:
                 load_target = 'secret'
             body_content += '<input placeholder="{}_client_{}" name="{}_client_{}" value="{}" type="text">'.format(oauth_supported[i], load_target, oauth_supported[i], load_target, oauth_data['client_{}'.format(load_target)])
+    body_content += '</form>'
     return body_content
         
 @app.route('/xref/<everything:name>')
