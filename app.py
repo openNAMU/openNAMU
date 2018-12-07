@@ -3010,13 +3010,16 @@ def register():
 
             return redirect('/need_email')
         else:
+            curs.execute('select data from other where name = "encode"')
+            db_data = curs.fetchall()
+
             curs.execute("select id from user limit 1")
             if not curs.fetchall():
-                curs.execute("insert into user (id, pw, acl, date) values (?, ?, 'owner', ?)", [flask.request.form.get('id', None), hashed, get_time()])
+                curs.execute("insert into user (id, pw, acl, date, encode) values (?, ?, 'owner', ?, ?)", [flask.request.form.get('id', None), hashed, get_time(), db_data[0][0]])
 
                 first = 1
             else:
-                curs.execute("insert into user (id, pw, acl, date) values (?, ?, 'user', ?)", [flask.request.form.get('id', None), hashed, get_time()])
+                curs.execute("insert into user (id, pw, acl, date, encode) values (?, ?, 'user', ?, ?)", [flask.request.form.get('id', None), hashed, get_time(), db_data[0][0]])
 
                 first = 0
 
@@ -3133,13 +3136,16 @@ def check_key(tool = 'check_pass_key'):
     if flask.request.method == 'POST':
         if tool == 'check_key':
             if 'c_id' in flask.session and flask.session['c_key'] == flask.request.form.get('key', None):
+                curs.execute('select data from other where name = "encode"')
+                db_data = curs.fetchall()
+
                 curs.execute("select id from user limit 1")
                 if not curs.fetchall():
-                    curs.execute("insert into user (id, pw, acl, date) values (?, ?, 'owner', ?)", [flask.session['c_id'], flask.session['c_pw'], get_time()])
+                    curs.execute("insert into user (id, pw, acl, date, encode) values (?, ?, 'owner', ?)", [flask.session['c_id'], flask.session['c_pw'], get_time(), db_data[0][0]])
 
                     first = 1
                 else:
-                    curs.execute("insert into user (id, pw, acl, date) values (?, ?, 'user', ?)", [flask.session['c_id'], flask.session['c_pw'], get_time()])
+                    curs.execute("insert into user (id, pw, acl, date, encode) values (?, ?, 'user', ?)", [flask.session['c_id'], flask.session['c_pw'], get_time(), db_data[0][0]])
 
                     first = 0
 
