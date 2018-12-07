@@ -899,13 +899,10 @@ def setting(num = 0):
 def not_close_topic():
     div = '<ul>'
     
-    curs.execute('select title, sub from rd order by date desc')
+    curs.execute('select title, sub from rd where stop != "O" order by date desc')
     n_list = curs.fetchall()
     for data in n_list:
-        curs.execute('select * from rd where title = ? and sub = ? and close = "O"', [data[0], data[1]])
-        is_close = curs.fetchall()
-        if not is_close:
-            div += '<li><a href="/topic/' + url_pas(data[0]) + '/sub/' + url_pas(data[1]) + '">' + data[0] + ' (' + data[1] + ')</a></li>'
+        div += '<li><a href="/topic/' + url_pas(data[0]) + '/sub/' + url_pas(data[1]) + '">' + html.escape(data[0]) + ' (' + data[1] + ')</a></li>'
             
     div += '</ul>'
 
