@@ -182,7 +182,7 @@ def pw_check(data, data2, type_d = 'no', id_d = ''):
 
     if type_d != 'no':
         if type_d == '':
-            set_data = 'bcrypt'
+            set_data = db_data[0][0]
         else:
             set_data = type_d
     else:
