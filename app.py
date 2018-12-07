@@ -90,6 +90,7 @@ curs.execute('create table if not exists scan(test text)')
 curs.execute('create table if not exists acl(test text)')
 curs.execute('create table if not exists inter(test text)')
 curs.execute('create table if not exists html_filter(test text)')
+curs.execute('create table if not exists oauth_conn(test text)')
 
 if setup_tool == 0:
     curs.execute('select data from other where name = "ver"')
@@ -124,7 +125,8 @@ if setup_tool != 0:
         'scan', 
         'acl', 
         'inter', 
-        'html_filter'
+        'html_filter',
+        'oauth_conn'
     ]
 
     create_data['data'] = ['title', 'data']
@@ -148,6 +150,7 @@ if setup_tool != 0:
     create_data['acl'] = ['title', 'dec', 'dis', 'view', 'why']
     create_data['inter'] = ['title', 'link']
     create_data['html_filter'] = ['html', 'kind']
+    create_data['oauth_conn'] = ['provider', 'wiki_id', 'sns_id']
 
     for create_table in create_data['all_data']:
         for create in create_data[create_table]:
@@ -1302,9 +1305,10 @@ def oauth_settings():
                 load_target = 'id'
             elif j == 1:
                 load_target = 'secret'
-            body_content += '<input placeholder="{}_client_{}" name="{}_client_{}" value="{}" type="text">'.format(oauth_supported[i], load_target, oauth_supported[i], load_target, oauth_data['client_{}'.format(load_target)])
-    body_content += '</form>'
-    return body_content
+            body_content += '<input id="{}_client_{}" type="checkbox"><input placeholder="{}_client_{}" name="{}_client_{}" value="{}" type="text" style="width: 80%;"><hr>'.format(oauth_supported[i], load_target, oauth_supported[i], load_target, oauth_supported[i], load_target, oauth_data['client_{}'.format(load_target)])
+    body_content += '<button id="save" type="submit">' + load_lang('save') + '</button></form>'
+    return easy_minify(flask.render_template(skin_check(), imp = [load_lang('oauth_settings'), wiki_set(), custom(), other2([0, 0])], data = body_content, menu = [['other', load_lang('other')]]))
+
         
 @app.route('/xref/<everything:name>')
 def xref(name = None):
