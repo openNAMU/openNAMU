@@ -2765,26 +2765,66 @@ def login():
             menu = [['user', load_lang('user')]]
         ))
 
-@app.route('/oauth/<regex("naver|facebook"):platform>/<regex("init|callback"):func>')
+@app.route('/oauth/<regex("naver|facebook"):platform>/<regex("init|callback"):func>', methods=['GET', 'POST'])
 def login_oauth(platform = None, func = None):
     publish_url = load_oauth('publish_url')
     oauth_data = load_oauth(platform)
+    api_url = {}
+    data = {
+        'client_id' : oauth_data['client_id'],
+        'client_secret' : oauth_data['client_secret'],
+        'redirect_uri' : publish_url + '/oauth/' + platform + '/callback',
+        'state' : 'RAMDOMVALUE'
+    }
+
+    if platform == 'naver':
+        api_url['redirect'] = 'https://nid.naver.com/oauth2.0/authorize'
+        api_url['token'] = 'https://nid.naver.com/oauth2.0/token'
+        api_url['profile'] = 'https://openapi.naver.com/v1/nid/me'
+    elif platform == 'facebook':
+        api_url['redirect'] = 'https://www.facebook.com/v3.1/dialog/oauth'
+        api_url['token'] = 'https://graph.facebook.com/v3.1/oauth/access_token'
+        api_url['profile'] = 'https://graph.facebook.com/me'
+
     if func == 'init':
         if oauth_data['client_id'] == '' or oauth_data['client_secret'] == '':
             return '관리자가 이 기능을 비활성화시켰습니다.'
         elif publish_url == 'https://':
             return '관리자가 이 기능을 사용하는데 대한 정보를 제공하지 않았습니다.'
-    
-        data = {
-            'client_id' : oauth_data['client_id'],
-            'redirect_uri' : publish_url + '/oauth/' + platform + '/callback',
-            'state' : 'RAMDOMVALUE'
-        }
-        return redirect('https://www.facebook.com/v3.1/dialog/oauth?client_id={}&redirect_uri={}&state={}'.format(
-            data['client_id'], data['redirect_uri'], data['state']
-        ))
+        if platform == 'naver':
+            return redirect(api_url['redirect']+'?response_type=code&client_id={}&redirect_uri={}&state={}'.format(data['client_id'], data['redirect_uri'], data['state']))
+        elif platform == 'facebook':
+            return redirect(api_url['redirect']+'?client_id={}&redirect_uri={}&state={}'.format(data['client_id'], data['redirect_uri'], data['state']))
 
-    return str(load_oauth(platform))
+    elif func == 'callback':
+        try:
+            code = flask.request.args.get('code')
+            state = flask.request.args.get('state')
+        except:
+            return '잘못된 callback입니다.'
+        if platform == 'naver':
+            token_access = api_url['token']+'?grant_type=authorization_code&client_id={}&client_secret={}&code={}&state={}'.format(data['client_id'], data['client_secret'], code, state)
+            token_result = urllib.request.urlopen(token_access).read().decode('utf-8')
+            token_result_json = json.loads(token_result)
+
+            headers = {'Authorization': 'Bearer {}'.format(token_result_json['access_token'])}
+            profile_access = urllib.request.Request(api_url['profile'], headers = headers)
+            profile_result = urllib.request.urlopen(profile_access).read().decode('utf-8')
+            profile_result_json = json.loads(profile_result)
+
+            stand_json = {'id' : profile_result_json['response']['id'], 'name' : profile_result_json['response']['name'], 'picture' : profile_result_json['response']['profile_image']}
+            return str(stand_json)
+        elif platform == 'facebook':
+            token_access = api_url['token']+'?client_id={}&redirect_uri={}&client_secret={}&code={}'.format(data['client_id'], data['redirect_uri'], data['client_secret'], code)
+            token_result = urllib.request.urlopen(token_access).read().decode('utf-8')
+            token_result_json = json.loads(token_result)
+
+            profile_access = api_url['profile']+'?fields=id,name,picture&access_token={}'.format(token_result_json['access_token'])
+            profile_result = urllib.request.urlopen(profile_access).read().decode('utf-8')
+            profile_result_json = json.loads(profile_result)
+
+            stand_json = {'id': profile_result_json['id'], 'name': profile_result_json['name'], 'picture': profile_result_json['picture']['data']['url']}
+            return str(stand_json)
                 
 @app.route('/change', methods=['POST', 'GET'])
 def change_password():
