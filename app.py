@@ -312,7 +312,7 @@ def alarm():
     curs.execute("select data, date from alarm where name = ? order by date desc", [ip_check()])
     data_list = curs.fetchall()
     if data_list:
-        data = '<a href="/del_alarm">(' + load_lang('delete') + ')</a><hr>' + data
+        data = '<a href="/del_alarm">(' + load_lang('delete') + ')</a><hr class=\"main_hr\">' + data
 
         for data_one in data_list:
             data += '<li>' + data_one[0] + ' (' + data_one[1] + ')</li>'
@@ -388,7 +388,7 @@ def inter_wiki(tools = None):
         div += '</ul>'
 
         if admin == 1:
-            div += '<hr><a href="/' + plus_link + '">(' + load_lang('plus') + ')</a>'
+            div += '<hr class=\"main_hr\"><a href="/' + plus_link + '">(' + load_lang('plus') + ')</a>'
     else:
         if admin == 1:
             div += '<a href="/' + plus_link + '">(' + load_lang('plus') + ')</a>'
@@ -461,7 +461,7 @@ def plus_inter(tools = None, name = None):
             title = load_lang('interwiki') + ' ' + load_lang('plus')
             form_data = '''
                         <input placeholder="''' + load_lang('name') + '''" type="text" name="title">
-                        <hr>
+                        <hr class=\"main_hr\">
                         <input placeholder="link" type="text" name="link">
                         '''
         elif tools == 'plus_edit_filter':
@@ -484,9 +484,9 @@ def plus_inter(tools = None, name = None):
             title = load_lang('edit') + ' ' + load_lang('filter') + ' ' + load_lang('plus')
             form_data = '''
                         <input placeholder="''' + load_lang('second') + '''" name="second" type="text" value="''' + html.escape(time_data) + '''">
-                        <hr>
+                        <hr class=\"main_hr\">
                         <input ''' + stat + ''' type="checkbox" ''' + time_check + ''' name="limitless"> ''' + load_lang('limitless') + '''
-                        <hr>
+                        <hr class=\"main_hr\">
                         <input ''' + stat + ''' placeholder="''' + load_lang('regex') + '''" name="content" value="''' + html.escape(textarea) + '''" type="text">
                         '''
         elif tools == 'plus_name_filter':
@@ -501,7 +501,7 @@ def plus_inter(tools = None, name = None):
             data =  '''
                     <form method="post">
                         ''' + form_data + '''
-                        <hr>
+                        <hr class=\"main_hr\">
                         <button ''' + stat + ''' type="submit">''' + load_lang('plus') + '''</button>
                     </form>
                     ''',
@@ -618,73 +618,73 @@ def setting(num = 0):
                             <br>
                             <br>
                             <input placeholder="''' + load_lang('name') + '''" type="text" name="name" value="''' + html.escape(d_list[0]) + '''">
-                            <hr>
+                            <hr class=\"main_hr\">
                             <span>''' + load_lang('logo') + ''' (html)</span>
                             <br>
                             <br>
                             <input placeholder="''' + load_lang('logo') + '''" type="text" name="logo" value="''' + html.escape(d_list[1]) + '''">
-                            <hr>
+                            <hr class=\"main_hr\">
                             <span>''' + load_lang('frontpage') + '''</span>
                             <br>
                             <br>
                             <input placeholder="''' + load_lang('frontpage') + '''" type="text" name="frontpage" value="''' + html.escape(d_list[2]) + '''">
-                            <hr>
+                            <hr class=\"main_hr\">
                             <span>''' + load_lang('bottom') + ' ' + load_lang('text') + ''' (html)</span>
                             <br>
                             <br>
                             <input placeholder="''' + load_lang('bottom') + ' ' + load_lang('text') + '''" type="text" name="license" value="''' + html.escape(d_list[3]) + '''">
-                            <hr>
+                            <hr class=\"main_hr\">
                             <span>''' + load_lang('max_file_size') + ''' [mb]</span>
                             <br>
                             <br>
                             <input placeholder="''' + load_lang('max_file_size') + '''" type="text" name="upload" value="''' + html.escape(d_list[4]) + '''">
-                            <hr>
+                            <hr class=\"main_hr\">
                             <span>''' + load_lang('backup_interval') + ' [' + load_lang('hour') + '''] (off : 0) {restart}</span>
                             <br>
                             <br>
                             <input placeholder="''' + load_lang('backup_interval') + '''" type="text" name="back_up" value="''' + html.escape(d_list[9]) + '''">
-                            <hr>
+                            <hr class=\"main_hr\">
                             <span>''' + load_lang('skin') + '''</span>
                             <br>
                             <br>
                             <select name="skin">''' + div2 + '''</select>
-                            <hr>
+                            <hr class=\"main_hr\">
                             <span>''' + load_lang('default') + ''' acl</span>
                             <br>
                             <br>
                             <select name="edit">''' + div + '''</select>
-                            <hr>
+                            <hr class=\"main_hr\">
                             <span>''' + load_lang('default') + ' ' + load_lang('discussion') + ''' acl</span>
                             <br>
                             <br>
                             <select name="discussion">''' + div4 + '''</select>
-                            <hr>
+                            <hr class=\"main_hr\">
                             <input type="checkbox" name="reg" ''' + ch_1 + '''> ''' + load_lang('register') + ''' X
-                            <hr>
+                            <hr class=\"main_hr\">
                             <input type="checkbox" name="ip_view" ''' + ch_2 + '''> ip ''' + load_lang('hide') + '''
-                            <hr>
+                            <hr class=\"main_hr\">
                             <input type="checkbox" name="email_have" ''' + ch_3 + '''> must have email {<a href="/setting/5">must set google imap</a>}
-                            <hr>
+                            <hr class=\"main_hr\">
                             <span>''' + load_lang('port') + '''</span>
                             <br>
                             <br>
                             <input placeholder="''' + load_lang('port') + '''" type="text" name="port" value="''' + html.escape(d_list[10]) + '''">
-                            <hr>
+                            <hr class=\"main_hr\">
                             <span>''' + load_lang('secret_key') + '''</span>
                             <br>
                             <br>
                             <input placeholder="''' + load_lang('secret_key') + '''" type="password" name="key" value="''' + html.escape(d_list[11]) + '''">
-                            <hr>
+                            <hr class=\"main_hr\">
                             <span>''' + load_lang('update_branch') + '''</span>
                             <br>
                             <br>
                             <select name="update">''' + div3 + '''</select>
-                            <hr>
+                            <hr class=\"main_hr\">
                             <span>encryption method</span>
                             <br>
                             <br>
                             <select name="encode">''' + div5 + '''</select>
-                            <hr>
+                            <hr class=\"main_hr\">
                             <button id="save" type="submit">''' + load_lang('save') + '''</button>
                         </form>
                         ''',
@@ -728,12 +728,12 @@ def setting(num = 0):
                             <br>
                             <br>
                             <input placeholder="''' + load_lang('register_text') + '''" type="text" name="contract" value="''' + html.escape(d_list[0]) + '''">
-                            <hr>
+                            <hr class=\"main_hr\">
                             <span>''' + load_lang('non_login_alert') + '''</span>
                             <br>
                             <br>
                             <input placeholder="''' + load_lang('non_login_alert') + '''" type="text" name="no_login_warring" value="''' + html.escape(d_list[1]) + '''">
-                            <hr>
+                            <hr class=\"main_hr\">
                             <button id="save" type="submit">''' + load_lang('save') + '''</button>
                         </form>
                         ''',
@@ -778,7 +778,7 @@ def setting(num = 0):
                 data =  '''
                         <form method="post">
                             <textarea rows="25" name="content">''' + html.escape(data) + '''</textarea>
-                            <hr>
+                            <hr class=\"main_hr\">
                             <button id="save" type="submit">''' + load_lang('save') + '''</button>
                         </form>
                         ''',
@@ -820,10 +820,10 @@ def setting(num = 0):
                 imp = ['robots.txt', wiki_set(), custom(), other2([0, 0])],
                 data =  '''
                         <a href="/robots.txt">(view)</a>
-                        <hr>
+                        <hr class=\"main_hr\">
                         <form method="post">
                             <textarea rows="25" name="content">''' + html.escape(data) + '''</textarea>
-                            <hr>
+                            <hr class=\"main_hr\">
                             <button id="save" type="submit">''' + load_lang('save') + '''</button>
                         </form>
                         ''',
@@ -870,23 +870,23 @@ def setting(num = 0):
                             <br>
                             <br>
                             <input placeholder="recaptcha (html)" type="text" name="recaptcha" value="''' + html.escape(d_list[0]) + '''">
-                            <hr>
+                            <hr class=\"main_hr\">
                             <span>recaptcha (secret key)</span>
                             <br>
                             <br>
                             <input placeholder="recaptcha (secret key)" type="text" name="sec_re" value="''' + html.escape(d_list[1]) + '''">
-                            <hr>
+                            <hr class=\"main_hr\">
                             <h2><a href="https://support.google.com/mail/answer/7126229">google imap</a> {restart}</h1>
                             <span>google email</span>
                             <br>
                             <br>
                             <input placeholder="google email" type="text" name="g_email" value="''' + html.escape(d_list[2]) + '''">
-                            <hr>
+                            <hr class=\"main_hr\">
                             <span><a href="https://security.google.com/settings/security/apppasswords">google app password</a></span>
                             <br>
                             <br>
                             <input placeholder="google app password" type="password" name="g_pass" value="''' + html.escape(d_list[3]) + '''">
-                            <hr>
+                            <hr class=\"main_hr\">
                             <button id="save" type="submit">''' + load_lang('save') + '''</button>
                         </form>
                         ''',
@@ -1040,7 +1040,7 @@ def admin_plus(name = None):
             data =  '''
                     <form method="post">
                         ''' + data + '''
-                        <hr>
+                        <hr class=\"main_hr\">
                         <button id="save" ''' + state +  ''' type="submit">''' + load_lang('save') + '''</button>
                     </form>
                     ''',
@@ -1124,7 +1124,7 @@ def user_log():
 
         list_data +=    '''
                         </ul>
-                        <hr>
+                        <hr class=\"main_hr\">
                         <ul>
                             <li>all : ''' + str(count) + '''</li>
                         </ul>
@@ -1174,7 +1174,7 @@ def give_log():
 
         list_data += '<li><a href="/admin_plus/' + url_pas(data[0]) + '">' + data[0] + '</a></li>'
     
-    list_data += '</ul><hr><a href="/manager/8">(' + load_lang('create') + ')</a>'
+    list_data += '</ul><hr class=\"main_hr\"><a href="/manager/8">(' + load_lang('create') + ')</a>'
 
     return easy_minify(flask.render_template(skin_check(), 
         imp = [load_lang('admin_group') + ' ' + load_lang('list'), wiki_set(), custom(), other2([0, 0])],
@@ -1359,7 +1359,7 @@ def recent_discuss():
         m_sub = ' (' + load_lang('close') + ')'
 
     div +=  '''
-            <hr>
+            <hr class=\"main_hr\">
             <table id="main_table_set">
                 <tbody>
                     <tr>
@@ -1413,9 +1413,9 @@ def block_log(name = None, tool = None, tool2 = None):
         if not tool2:
             div =   '''
                     <a href="/manager/11">(''' + load_lang('blocked') + ''')</a> <a href="/manager/12">(''' + load_lang('admin') + ''')</a>
-                    <hr>
+                    <hr class=\"main_hr\">
                     <a href="/block_log/ip">(ip)</a> <a href="/block_log/user">(''' + load_lang('subscriber') + ')</a> <a href="/block_log/never_end">(' + load_lang('limitless') + ')</a> <a href="/block_log/can_end">(' + load_lang('period') + ')</a> <a href="/block_log/end">(' + load_lang('release') + ')</a> <a href="/block_log/now">(' + load_lang('now') + ')</a> <a href="/block_log/edit_filter">(' + load_lang('edit') + ' ' + load_lang('filter') + ''')</a>
-                    <hr>
+                    <hr class=\"main_hr\">
                     ''' + div
             
             sub = 0
@@ -1559,7 +1559,7 @@ def deep_search(name = None):
                     <a ''' + link_id + ' href="/w/' + url_pas(name) + '">' + name + '''</a>
                 </li>
             </ul>
-            <hr>
+            <hr class=\"main_hr\">
             <ul>
             '''
 
@@ -1570,7 +1570,7 @@ def deep_search(name = None):
         
         for data in all_list:
             if data[1] != test:
-                div_plus += '</ul><hr><ul>'
+                div_plus += '</ul><hr class=\"main_hr\"><ul>'
                 
                 test = data[1]
 
@@ -1697,10 +1697,10 @@ def revert(name = None):
             data =  '''
                     <form method="post">
                         <span>''' + flask.request.args.get('num', '0') + load_lang('version') + '''</span>
-                        <hr>
+                        <hr class=\"main_hr\">
                         ''' + ip_warring() + '''
                         <input placeholder="''' + load_lang('why') + '''" name="send" type="text">
-                        <hr>
+                        <hr class=\"main_hr\">
                         ''' + captcha_get() + '''
                         <button type="submit">''' + load_lang('revert') + '''</button>
                     </form>
@@ -1790,7 +1790,7 @@ def edit(name = None):
         if not flask.request.args.get('section', None):
             get_name =  '''
                         <a href="/manager/15?plus=''' + url_pas(name) + '">(' + load_lang('load') + ')</a> <a href="/edit_filter">(' + load_lang('edit') + ' ' + load_lang('filter') + ''')</a>
-                        <hr>
+                        <hr class=\"main_hr\">
                         '''
             action = ''
         else:
@@ -1813,9 +1813,9 @@ def edit(name = None):
                         ''' + js_data[1] + '''
                         <textarea id="content" rows="25" name="content">''' + html.escape(re.sub('\n$', '', data)) + '''</textarea>
                         <textarea style="display: none;" name="otent">''' + html.escape(re.sub('\n$', '', data_old)) + '''</textarea>
-                        <hr>
+                        <hr class=\"main_hr\">
                         <input placeholder="''' + load_lang('why') + '''" name="send" type="text">
-                        <hr>
+                        <hr class=\"main_hr\">
                         ''' + captcha_get() + ip_warring() + '''
                         <button id="save" type="submit">''' + load_lang('save') + '''</button>
                         <button id="preview" type="submit" formaction="/preview/''' + url_pas(name) + action + '">' + load_lang('preview') + '''</button>
@@ -1851,14 +1851,14 @@ def preview(name = None):
                     ''' + js_data[1] + '''
                     <textarea id="content" rows="25" name="content">''' + html.escape(flask.request.form.get('content', None)) + '''</textarea>
                     <textarea style="display: none;" name="otent">''' + html.escape(flask.request.form.get('otent', None)) + '''</textarea>
-                    <hr>
+                    <hr class=\"main_hr\">
                     <input placeholder="''' + load_lang('why') + '''" name="send" type="text">
-                    <hr>
+                    <hr class=\"main_hr\">
                     ''' + captcha_get() + '''
                     <button id="save" type="submit">''' + load_lang('save') + '''</button>
                     <button id="preview" type="submit" formaction="/preview/''' + url_pas(name) + action + '">' + load_lang('preview') + '''</button>
                 </form>
-                <hr>
+                <hr class=\"main_hr\">
                 ''' + end_data,
         menu = [['w/' + url_pas(name), load_lang('document')]]
     ))
@@ -1910,7 +1910,7 @@ def delete(name = None):
                     <form method="post">
                         ''' + ip_warring() + '''
                         <input placeholder="''' + load_lang('why') + '''" name="send" type="text">
-                        <hr>
+                        <hr class=\"main_hr\">
                         ''' + captcha_get() + '''
                         <button type="submit">''' + load_lang('delete') + '''</button>
                     </form>
@@ -2032,9 +2032,9 @@ def move(name = None):
                     <form method="post">
                         ''' + ip_warring() + '''
                         <input placeholder="''' + load_lang('document') + ' ' + load_lang('name') + '" value="' + name + '''" name="title" type="text">
-                        <hr>
+                        <hr class=\"main_hr\">
                         <input placeholder="''' + load_lang('why') + '''" name="send" type="text">
-                        <hr>
+                        <hr class=\"main_hr\">
                         ''' + captcha_get() + '''
                         <button type="submit">''' + load_lang('move') + '''</button>
                     </form>
@@ -2154,7 +2154,7 @@ def manager(num = 1):
                 data =  '''
                         <form method="post">
                             <input placeholder="''' + placeholder + '''" name="name" type="text">
-                            <hr>
+                            <hr class=\"main_hr\">
                             <button type="submit">''' + load_lang('move') + '''</button>
                         </form>
                         ''',
@@ -2182,7 +2182,7 @@ def title_index():
     curs.execute("select title from data order by title asc limit ?, ?", [str(sql_num), str(num)])
     title_list = curs.fetchall()
     if title_list:
-        data += '<hr><ul>'
+        data += '<hr class=\"main_hr\"><ul>'
 
     for list_data in title_list:
         data += '<li>' + str(all_list) + '. <a href="/w/' + url_pas(list_data[0]) + '">' + list_data[0] + '</a></li>'        
@@ -2211,11 +2211,11 @@ def title_index():
         
         data += '''
                 </ul>
-                <hr>
+                <hr class=\"main_hr\">
                 <ul>
                     <li>all : ''' + str(count_end[0]) + '''</li>
                 </ul>
-                <hr>
+                <hr class=\"main_hr\">
                 <ul>
                     <li>''' + load_lang('template') + ' : ' + str(count_end[1]) + '''</li>
                     <li>''' + load_lang('category') + ' : ' + str(count_end[2]) + '''</li>
@@ -2478,7 +2478,7 @@ def topic(name = None, sub = None):
             else:
                 all_data += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/agree">(' + load_lang('agreement') + ')</a>'
             
-            all_data += '<hr>'
+            all_data += '<hr class=\"main_hr\">'
         
         if (close_data or stop_data) and admin != 1:
             display = 'display: none;'
@@ -2583,7 +2583,7 @@ def topic(name = None, sub = None):
                     <form style="''' + display + '''" method="post">
                     <br>
                     <textarea style="height: 100px;" name="content"></textarea>
-                    <hr>
+                    <hr class=\"main_hr\">
                     ''' + captcha_get()
             
             if display == '':
@@ -2670,9 +2670,9 @@ def close_topic_list(name = None, tool = None):
             
             plus =  '''
                     <a href="/topic/''' + url_pas(name) + '''/close">(''' + load_lang('close') + ''')</a> <a href="/topic/''' + url_pas(name) + '''/agree">(''' + load_lang('agreement') + ''')</a>
-                    <hr>
+                    <hr class=\"main_hr\">
                     <input placeholder="''' + load_lang('discussion') + ' ' + load_lang('name') + '''" name="topic" type="text">
-                    <hr>
+                    <hr class=\"main_hr\">
                     <button type="submit">''' + load_lang('open') + '''</button>
                     '''
 
@@ -2750,12 +2750,12 @@ def login():
             data =  '''
                     <form method="post">
                         <input placeholder="''' + load_lang('id') + '''" name="id" type="text">
-                        <hr>
+                        <hr class=\"main_hr\">
                         <input placeholder="''' + load_lang('password') + '''" name="pw" type="password">
-                        <hr>
+                        <hr class=\"main_hr\">
                         ''' + captcha_get() + '''
                         <button type="submit">''' + load_lang('login') + '''</button>
-                        <hr>
+                        <hr class=\"main_hr\">
                         <span>''' + load_lang('http_warring') + '''</span>
                     </form>
                     ''',
@@ -2840,7 +2840,7 @@ def change_password():
                 data =  '''
                         <form method="post">
                             <span>id : ''' + ip + '''</span>
-                            <hr>
+                            <hr class=\"main_hr\">
                             <input placeholder="''' + load_lang('now') + ' ' + load_lang('password') + '''" name="pw4" type="password">
                             <br>
                             <br>
@@ -2848,19 +2848,19 @@ def change_password():
                             <br>
                             <br>
                             <input placeholder="''' + load_lang('password') + ' ' + load_lang('confirm') + '''" name="pw3" type="password">
-                            <hr>
+                            <hr class=\"main_hr\">
                             <span>''' + load_lang('user') + ' ' + load_lang('skin') + '''</span>
                             <br>
                             <br>
                             <select name="skin">''' + div2 + '''</select>
-                            <hr>
+                            <hr class=\"main_hr\">
                             <span>''' + load_lang('user') + ' ' + load_lang('language') + '''</span>
                             <br>
                             <br>
                             <select name="lang">''' + div3 + '''</select>
-                            <hr>
+                            <hr class=\"main_hr\">
                             <button type="submit">''' + load_lang('edit') + '''</button>
-                            <hr>
+                            <hr class=\"main_hr\">
                             <span>''' + load_lang('http_warring') + '''</span>
                         </form>
                         ''',
@@ -2910,9 +2910,9 @@ def user_check(name = None):
     record = curs.fetchall()
     if record:
         if not flask.request.args.get('plus', None):
-            div = '<a href="/manager/14?plus=' + url_pas(name) + '">(' + load_lang('compare') + ')</a><hr>'
+            div = '<a href="/manager/14?plus=' + url_pas(name) + '">(' + load_lang('compare') + ')</a><hr class=\"main_hr\">'
         else:
-            div = '<a href="/check/' + url_pas(name) + '">(' + name + ')</a> <a href="/check/' + url_pas(flask.request.args.get('plus', None)) + '">(' + flask.request.args.get('plus', None) + ')</a><hr>'
+            div = '<a href="/check/' + url_pas(name) + '">(' + name + ')</a> <a href="/check/' + url_pas(flask.request.args.get('plus', None)) + '">(' + flask.request.args.get('plus', None) + ')</a><hr class=\"main_hr\">'
 
         div +=  '''
                 <table id="main_table_set">
@@ -3044,7 +3044,7 @@ def register():
         curs.execute('select data from other where name = "contract"')
         data = curs.fetchall()
         if data and data[0][0] != '':
-            contract = data[0][0] + '<hr>'
+            contract = data[0][0] + '<hr class=\"main_hr\">'
 
         return easy_minify(flask.render_template(skin_check(),    
             imp = [load_lang('register'), wiki_set(), custom(), other2([0, 0])],
@@ -3052,14 +3052,14 @@ def register():
                     <form method="post">
                         ''' + contract + '''
                         <input placeholder="''' + load_lang('id') + '''" name="id" type="text">
-                        <hr>
+                        <hr class=\"main_hr\">
                         <input placeholder="''' + load_lang('password') + '''" name="pw" type="password">
-                        <hr>
+                        <hr class=\"main_hr\">
                         <input placeholder="''' + load_lang('confirm') + '''" name="pw2" type="password">
-                        <hr>
+                        <hr class=\"main_hr\">
                         ''' + captcha_get() + '''
                         <button type="submit">''' + load_lang('register') + '''</button>
-                        <hr>
+                        <hr class=\"main_hr\">
                         <span>''' + load_lang('http_warring') + '''</span>
                     </form>
                     ''',
@@ -3107,10 +3107,10 @@ def need_email(tool = 'pass_find'):
                 imp = ['email', wiki_set(), custom(), other2([0, 0])],
                 data =  '''
                         <a href="/email_filter">(email ''' + load_lang('list') + ''')</a>
-                        <hr>
+                        <hr class=\"main_hr\">
                         <form method="post">
                             <input placeholder="email" name="email" type="text">
-                            <hr>
+                            <hr class=\"main_hr\">
                             <button type="submit">''' + load_lang('save') + '''</button>
                         </form>
                         ''',
@@ -3122,9 +3122,9 @@ def need_email(tool = 'pass_find'):
                 data =  '''
                         <form method="post">
                             <input placeholder="''' + load_lang('id') + '''" name="id" type="text">
-                            <hr>
+                            <hr class=\"main_hr\">
                             <input placeholder="email" name="email" type="text">
-                            <hr>
+                            <hr class=\"main_hr\">
                             <button type="submit">''' + load_lang('save') + '''</button>
                         </form>
                         ''',
@@ -3205,7 +3205,7 @@ def check_key(tool = 'check_pass_key'):
             data =  '''
                     <form method="post">
                         <input placeholder="key" name="key" type="text">
-                        <hr>
+                        <hr class=\"main_hr\">
                         <button type="submit">''' + load_lang('save') + '''</button>
                     </form>
                     ''',
@@ -3265,9 +3265,9 @@ def user_ban(name = None):
                 data += '<li>' + load_lang('login') + ' ' + load_lang('able') + '</li>'
 
             if end[0][1] != '':
-                data += '<li>' + load_lang('why') + ' : ' + end[0][1] + '</li></ul><hr>'
+                data += '<li>' + load_lang('why') + ' : ' + end[0][1] + '</li></ul><hr class=\"main_hr\">'
             else:
-                data += '</ul><hr>'
+                data += '</ul><hr class=\"main_hr\">'
         else:
             if re.search("^([0-9]{1,3}\.[0-9]{1,3})$", name):
                 now = load_lang('band') + ' ' + load_lang('ban')
@@ -3275,17 +3275,17 @@ def user_ban(name = None):
                 now = load_lang('ban')
                 
             if ip_or_user(name) == 1:
-                plus = '<input type="checkbox" name="login"> ' + load_lang('login') + ' ' + load_lang('able') + '<hr>'
+                plus = '<input type="checkbox" name="login"> ' + load_lang('login') + ' ' + load_lang('able') + '<hr class=\"main_hr\">'
             else:
                 plus = ''
 
             data =  '''
                     <input placeholder="''' + load_lang('second') + '''" name="second" type="text">
-                    <hr>
+                    <hr class=\"main_hr\">
                     <input type="checkbox" name="limitless"> ''' + load_lang('limitless') + '''
-                    <hr>
+                    <hr class=\"main_hr\">
                     <input placeholder="''' + load_lang('why') + '''" name="why" type="text">
-                    <hr>
+                    <hr class=\"main_hr\">
                     ''' + plus
 
         return easy_minify(flask.render_template(skin_check(), 
@@ -3364,7 +3364,7 @@ def acl(name = None):
         data += '</select>'
         
         if not re.search('^user:', name):
-            data += '<hr>' + load_lang('discussion') + ' acl<br><br><select name="dis" ' + check_ok + '>'
+            data += '<hr class=\"main_hr\">' + load_lang('discussion') + ' acl<br><br><select name="dis" ' + check_ok + '>'
         
             curs.execute("select dis, why, view from acl where title = ?", [name])
             acl_data = curs.fetchall()
@@ -3378,7 +3378,7 @@ def acl(name = None):
                 
             data += '</select>'
 
-            data += '<hr>' + load_lang('view') + ' acl<br><br><select name="view" ' + check_ok + '>'
+            data += '<hr class=\"main_hr\">' + load_lang('view') + ' acl<br><br><select name="view" ' + check_ok + '>'
             for data_list in acl_list:
                 if acl_data and acl_data[0][2] == data_list[0]:
                     check = 'selected="selected"'
@@ -3391,16 +3391,16 @@ def acl(name = None):
                 
             if check_ok == '':
                 if acl_data:
-                    data += '<hr><input value="' + html.escape(acl_data[0][1]) + '" placeholder="' + load_lang('why') + '" name="why" type="text" ' + check_ok + '>'
+                    data += '<hr class=\"main_hr\"><input value="' + html.escape(acl_data[0][1]) + '" placeholder="' + load_lang('why') + '" name="why" type="text" ' + check_ok + '>'
                 else:
-                    data += '<hr><input placeholder="' + load_lang('why') + '" name="why" type="text" ' + check_ok + '>'
+                    data += '<hr class=\"main_hr\"><input placeholder="' + load_lang('why') + '" name="why" type="text" ' + check_ok + '>'
             
         return easy_minify(flask.render_template(skin_check(), 
             imp = [name, wiki_set(), custom(), other2([' (acl)', 0])],
             data =  '''
                     <form method="post">
                         ''' + data + '''
-                        <hr>
+                        <hr class=\"main_hr\">
                         <button type="submit" ''' + check_ok + '''>acl ''' + load_lang('edit') + '''</button>
                     </form>
                     ''',
@@ -3464,7 +3464,7 @@ def user_admin(name = None):
             data =  '''
                     <form method="post">
                         <select name="select">''' + div + '''</select>
-                        <hr>
+                        <hr class=\"main_hr\">
                         <button type="submit">''' + load_lang('edit') + '''</button>
                     </form>
                     ''',
@@ -3665,7 +3665,7 @@ def read_view(name = None):
     curs.execute("select data from other where name = 'body'")
     body = curs.fetchall()
     if body:
-        div = body[0][0] + '<hr>' + div
+        div = body[0][0] + '<hr class=\"main_hr\">' + div
 
     return easy_minify(flask.render_template(skin_check(), 
         imp = [flask.request.args.get('show', name), wiki_set(), custom(), other2([sub + acl, r_date])],
@@ -3771,7 +3771,7 @@ def recent_changes(name = None, tool = 'record'):
                         '''
 
                 if what == 'all':
-                    div = '<a href="/topic_record/' + url_pas(name) + '">(' + load_lang('discussion') + ')</a> <a href="/record/' + url_pas(name) + '?what=delete">(' + load_lang('delete') + ')</a> <a href="/record/' + url_pas(name) + '?what=move">(' + load_lang('move') + ')</a> <a href="/record/' + url_pas(name) + '?what=revert">(' + load_lang('revert') + ')</a><hr>' + div
+                    div = '<a href="/topic_record/' + url_pas(name) + '">(' + load_lang('discussion') + ')</a> <a href="/record/' + url_pas(name) + '?what=delete">(' + load_lang('delete') + ')</a> <a href="/record/' + url_pas(name) + '?what=move">(' + load_lang('move') + ')</a> <a href="/record/' + url_pas(name) + '?what=revert">(' + load_lang('revert') + ')</a><hr class=\"main_hr\">' + div
                     
                     curs.execute("select id, title, date, ip, send, leng from history where ip = ? order by date desc limit ?, '50'", [name, str(sql_num)])
                 else:
@@ -3800,9 +3800,9 @@ def recent_changes(name = None, tool = 'record'):
                     '''
             
             if what == 'all':
-                div = '<a href="/recent_changes?what=delete">(' + load_lang('delete') + ')</a> <a href="/recent_changes?what=move">(' + load_lang('move') + ')</a> <a href="/recent_changes?what=revert">(' + load_lang('revert') + ')</a><hr>' + div
+                div = '<a href="/recent_changes?what=delete">(' + load_lang('delete') + ')</a> <a href="/recent_changes?what=move">(' + load_lang('move') + ')</a> <a href="/recent_changes?what=revert">(' + load_lang('revert') + ')</a><hr class=\"main_hr\">' + div
 
-                div = '<a href="/recent_discuss">(' + load_lang('discussion') + ')</a> <a href="/block_log">(' + load_lang('ban') + ')</a> <a href="/user_log">(' + load_lang('subscriber') + ')</a> <a href="/admin_log">(' + load_lang('authority') + ')</a><hr>' + div
+                div = '<a href="/recent_discuss">(' + load_lang('discussion') + ')</a> <a href="/block_log">(' + load_lang('ban') + ')</a> <a href="/user_log">(' + load_lang('subscriber') + ')</a> <a href="/admin_log">(' + load_lang('authority') + ')</a><hr class=\"main_hr\">' + div
                 
                 curs.execute("select id, title, date, ip, send, leng from history where not title like 'user:%' order by date desc limit ?, 50", [str(sql_num)])
             else:
@@ -3900,9 +3900,9 @@ def recent_changes(name = None, tool = 'record'):
                             <select name="a">''' + select + '''</select> <select name="b">''' + select + '''</select>
                             <button type="submit">''' + load_lang('compare') + '''</button>
                         </form>
-                        <hr>
+                        <hr class=\"main_hr\">
                         <a href="/move_data/''' + url_pas(name) + '''">(''' + load_lang('move') + ''')</a>
-                        <hr>
+                        <hr class=\"main_hr\">
                         ''' + div
                 title = name
                 
@@ -4027,11 +4027,11 @@ def upload():
             data =  '''
                     <form method="post" enctype="multipart/form-data" accept-charset="utf8">
                         <input type="file" name="f_data">
-                        <hr>
+                        <hr class=\"main_hr\">
                         <input placeholder="''' + load_lang('name') + '''" name="f_name" type="text">
-                        <hr>
+                        <hr class=\"main_hr\">
                         <input placeholder="''' + load_lang('license') + '''" name="f_lice" type="text">
-                        <hr>
+                        <hr class=\"main_hr\">
                         ''' + captcha_get() + '''
                         <button id="save" type="submit">''' + load_lang('save') + '''</button>
                     </form>
@@ -4138,7 +4138,7 @@ def user_info():
 
 @app.route('/watch_list')
 def watch_list():
-    div = 'limit : 10<hr>'
+    div = 'limit : 10<hr class=\"main_hr\">'
     
     if custom()[2] == 0:
         return redirect('/login')
@@ -4149,7 +4149,7 @@ def watch_list():
         div += '<li><a href="/w/' + url_pas(data_list[0]) + '">' + data_list[0] + '</a> <a href="/watch_list/' + url_pas(data_list[0]) + '">(' + load_lang('delete') + ')</a></li>'
 
     if data:
-        div = '<ul>' + div + '</ul><hr>'
+        div = '<ul>' + div + '</ul><hr class=\"main_hr\">'
 
     div += '<a href="/manager/13">(' + load_lang('plus') + ')</a>'
 
@@ -4209,21 +4209,21 @@ def custom_head_view():
             else:
                 data = ''
         else:
-            start = '<span>' + load_lang('user_head_warring') + '</span><hr>'
+            start = '<span>' + load_lang('user_head_warring') + '</span><hr class=\"main_hr\">'
             
             if 'head' in flask.session:
                 data = flask.session['head']
             else:
                 data = ''
 
-        start += '<span>&lt;style&gt;css&lt;/style&gt;<br>&lt;script&gt;js&lt;/script&gt;</span><hr>'
+        start += '<span>&lt;style&gt;css&lt;/style&gt;<br>&lt;script&gt;js&lt;/script&gt;</span><hr class=\"main_hr\">'
 
         return easy_minify(flask.render_template(skin_check(), 
             imp = [load_lang('user') + ' head', wiki_set(), custom(), other2([0, 0])],
             data =  start + '''
                     <form method="post">
                         <textarea rows="25" cols="100" name="content">''' + data + '''</textarea>
-                        <hr>
+                        <hr class=\"main_hr\">
                         <button id="save" type="submit">''' + load_lang('save') + '''</button>
                     </form>
                     ''',
