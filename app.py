@@ -150,7 +150,7 @@ if setup_tool != 0:
     create_data['acl'] = ['title', 'dec', 'dis', 'view', 'why']
     create_data['inter'] = ['title', 'link']
     create_data['html_filter'] = ['html', 'kind']
-    create_data['oauth_conn'] = ['provider', 'wiki_id', 'sns_id']
+    create_data['oauth_conn'] = ['provider', 'wiki_id', 'sns_id', 'name', 'picture']
 
     for create_table in create_data['all_data']:
         for create in create_data[create_table]:
@@ -2726,6 +2726,7 @@ def close_topic_list(name = None, tool = None):
         
 @app.route('/login', methods=['POST', 'GET'])
 def login():
+    print(flask.request.referrer)
     if custom()[2] != 0:
         return redirect('/user')
     
@@ -2770,7 +2771,12 @@ def login():
         conn.commit()
         
         return redirect('/user')  
-    else:        
+    else:
+        oauth_content = '<ul>'
+        oauth_supported = load_oauth('_README')['support']
+        for i in range(len(oauth_supported)):
+            oauth_content += '<li><a href="/oauth/{}/init" class="oauth_{}">{}</a></li>'.format(oauth_supported[i], oauth_supported[i], oauth_supported[i] + '로 로그인') # oauth_{} 클래스는 이후 oauth button 부분을 손대기 위해 추가한 것, 어순 어떻게 좀 해봐
+        oauth_content += '</ul>'
         return easy_minify(flask.render_template(skin_check(),    
             imp = [load_lang('login'), wiki_set(), custom(), other2([0, 0])],
             data =  '''
@@ -2778,6 +2784,8 @@ def login():
                         <input placeholder="''' + load_lang('id') + '''" name="id" type="text">
                         <hr>
                         <input placeholder="''' + load_lang('password') + '''" name="pw" type="password">
+                        <hr>
+                        ''' + oauth_content + '''
                         <hr>
                         ''' + captcha_get() + '''
                         <button type="submit">''' + load_lang('login') + '''</button><a href="/register">''' + load_lang('register_suggest') + '''</a>
@@ -2810,10 +2818,18 @@ def login_oauth(platform = None, func = None):
         api_url['profile'] = 'https://graph.facebook.com/me'
 
     if func == 'init':
+        referrer_re = re.compile(r'(?P<host>^(https?):\/\/([^\/]+))\/(?P<refer>[^\/?]+)')
+        referrer = referrer_re.search(flask.request.referrer)
+        if referrer.group('host') != load_oauth('publish_url'):
+            return redirect('/')
+        else:
+            flask.session['referrer'] = referrer.group('refer')
+
         if oauth_data['client_id'] == '' or oauth_data['client_secret'] == '':
             return '관리자가 이 기능을 비활성화시켰습니다.'
         elif publish_url == 'https://':
             return '관리자가 이 기능을 사용하는데 대한 정보를 제공하지 않았습니다.'
+        flask.session['refer'] = flask.request.referrer
         if platform == 'naver':
             return redirect(api_url['redirect']+'?response_type=code&client_id={}&redirect_uri={}&state={}'.format(data['client_id'], data['redirect_uri'], data['state']))
         elif platform == 'facebook':
@@ -2836,7 +2852,6 @@ def login_oauth(platform = None, func = None):
             profile_result_json = json.loads(profile_result)
 
             stand_json = {'id' : profile_result_json['response']['id'], 'name' : profile_result_json['response']['name'], 'picture' : profile_result_json['response']['profile_image']}
-            return str(stand_json)
         elif platform == 'facebook':
             token_access = api_url['token']+'?client_id={}&redirect_uri={}&client_secret={}&code={}'.format(data['client_id'], data['redirect_uri'], data['client_secret'], code)
             token_result = urllib.request.urlopen(token_access).read().decode('utf-8')
@@ -2847,7 +2862,24 @@ def login_oauth(platform = None, func = None):
             profile_result_json = json.loads(profile_result)
 
             stand_json = {'id': profile_result_json['id'], 'name': profile_result_json['name'], 'picture': profile_result_json['picture']['data']['url']}
-            return str(stand_json)
+        
+        if flask.session['referrer'][0:6] == 'change':
+            curs.execute('select * from oauth_conn where wiki_id = ? and provider = ?', [flask.session['id'], platform])
+            oauth_result = curs.fetchall()
+            if len(oauth_result) == 0:
+                curs.execute('insert into oauth_conn (provider, wiki_id, sns_id, name, picture) values(?, ?, ?, ?, ?)', [platform, flask.session['id'], stand_json['id'], stand_json['name'], stand_json['picture']])
+            else:
+                curs.execute('update oauth_conn set name = ? picture = ? where wiki_id = ?', [stand_json['name'], stand_json['pricture'], flask.session['id']])
+            conn.commit()
+        elif flask.session['referrer'][0:5] == 'login':
+            curs.execute('select * from oauth_conn where provider = ? and sns_id = ?', [platform, stand_json['id']])
+            curs_result = curs.fetchall()
+            if len(curs_result) == 0:
+                return re_error('/error/2')
+            else:
+                flask.session['state'] = 1
+                flask.session['id'] = curs_result[0][2]
+        return redirect(flask.session['refer'])
                 
 @app.route('/change', methods=['POST', 'GET'])
 def change_password():
@@ -2911,7 +2943,7 @@ def change_password():
             div3 = ''
             var_div3 = ''
 
-            curs.execute('select data from user_set where name = "lang" and id = ?', [ip])
+            curs.execute('select data from user_set where name = "lang" and id = ?', [flask.session['id']])
             data = curs.fetchall()
 
             for lang_data in support_language:
@@ -2921,6 +2953,17 @@ def change_password():
                     var_div3 += '<option value="' + lang_data + '">' + lang_data + '</option>'
 
             div3 += var_div3
+
+            oauth_provider = load_oauth('_README')['support']
+            oauth_content = '<ul>'
+            for i in range(len(oauth_provider)):
+                curs.execute('select * from oauth_conn where wiki_id = ? and provider = ?', [flask.session['id'], oauth_provider[i]])
+                oauth_data = curs.fetchall()
+                if len(oauth_data) == 1:
+                    oauth_content += '<li>{} - {}</li>'.format(oauth_provider[i], load_lang('connection') + load_lang('oauth_conn_done') + ': <img src="{}" width="17px" height="17px">{}'.format(oauth_data[0][5], oauth_data[0][4]))
+                else:
+                    oauth_content += '<li>{} - {}</li>'.format(oauth_provider[i], load_lang('connection') + load_lang('oauth_conn_not') + '. <a href="/oauth/{}/init">{}</a>'.format(oauth_provider[i], load_lang('oauth_conn_new')))
+            oauth_content += '</ul>'
 
             return easy_minify(flask.render_template(skin_check(),    
                 imp = [load_lang('user') + ' ' + load_lang('setting') + ' ' + load_lang('edit'), wiki_set(), custom(), other2([0, 0])],
@@ -2945,6 +2988,9 @@ def change_password():
                             <br>
                             <br>
                             <select name="lang">''' + div3 + '''</select>
+                            <hr>
+                            <span>OAuth ''' + load_lang('connection') + '''</span>
+                            ''' + oauth_content + '''
                             <hr>
                             <button type="submit">''' + load_lang('edit') + '''</button>
                             <hr>
