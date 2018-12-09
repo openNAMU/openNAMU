@@ -2819,9 +2819,9 @@ def login_oauth(platform = None, func = None):
 
     if func == 'init':
         if oauth_data['client_id'] == '' or oauth_data['client_secret'] == '':
-            return easy_minify(flask.render_template(skin_check(), imp = [load_lang('login'), wiki_set(), custom(), other2([0, 0])], data =  load_lang('oauth_disabled'), menu = [['user', load_lang('user')]]))
+            return easy_minify(flask.render_template(skin_check(), imp = [load_lang('login'), wiki_set(), custom(), other2([0, 0])], data = load_lang('oauth_disabled'), menu = [['user', load_lang('user')]]))
         elif publish_url == 'https://':
-            return easy_minify(flask.render_template(skin_check(), imp = [load_lang('login'), wiki_set(), custom(), other2([0, 0])], data =  load_lang('oauth_settings_not_found'), menu = [['user', load_lang('user')]]))
+            return easy_minify(flask.render_template(skin_check(), imp = [load_lang('login'), wiki_set(), custom(), other2([0, 0])], data = load_lang('oauth_settings_not_found'), menu = [['user', load_lang('user')]]))
 
         referrer_re = re.compile(r'(?P<host>^(https?):\/\/([^\/]+))\/(?P<refer>[^\/?]+)')
         if flask.request.referrer != None:
@@ -2833,18 +2833,24 @@ def login_oauth(platform = None, func = None):
         else:
             return redirect('/')
         flask.session['refer'] = flask.request.referrer
-        
+
         if platform == 'naver':
             return redirect(api_url['redirect']+'?response_type=code&client_id={}&redirect_uri={}&state={}'.format(data['client_id'], data['redirect_uri'], data['state']))
         elif platform == 'facebook':
             return redirect(api_url['redirect']+'?client_id={}&redirect_uri={}&state={}'.format(data['client_id'], data['redirect_uri'], data['state']))
 
     elif func == 'callback':
-        try:
-            code = flask.request.args.get('code')
-            state = flask.request.args.get('state')
-        except:
-            return '잘못된 callback입니다.'
+        code = flask.request.args.get('code')
+        state = flask.request.args.get('state')
+        if code == None or state == None:
+            return easy_minify(flask.render_template(skin_check(), imp = [load_lang('inter_error'), wiki_set(), custom(), other2([0, 0])], data = 
+            '''<p>''' + load_lang('inter_error_detail') + '''</p>
+            <hr>
+            <code>ie_wrong_callback</code>
+            <p>''' + load_lang('ie_wrong_callback') + '''</p>
+            '''
+            , menu = [['user', load_lang('user')]]))
+
         if platform == 'naver':
             token_access = api_url['token']+'?grant_type=authorization_code&client_id={}&client_secret={}&code={}&state={}'.format(data['client_id'], data['client_secret'], code, state)
             token_result = urllib.request.urlopen(token_access).read().decode('utf-8')
