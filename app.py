@@ -2772,11 +2772,11 @@ def login():
         
         return redirect('/user')  
     else:
-        oauth_content = '<ul>'
+        oauth_content = '<div class="oauth-wrapper"><ul class="oauth-list">'
         oauth_supported = load_oauth('_README')['support']
         for i in range(len(oauth_supported)):
-            oauth_content += '<li><a href="/oauth/{}/init" class="oauth_{}">{}</a></li>'.format(oauth_supported[i], oauth_supported[i], oauth_supported[i] + '로 로그인') # oauth_{} 클래스는 이후 oauth button 부분을 손대기 위해 추가한 것, 어순 어떻게 좀 해봐
-        oauth_content += '</ul>'
+            oauth_content += '<link rel="stylesheet" href="/views/oauth.css"><li><a href="/oauth/{}/init"><div class="oauth-btn oauth-btn-{}"><div class="oauth-btn-logo oauth-btn-{}"></div>{}</div></a></li>'.format(oauth_supported[i], oauth_supported[i], oauth_supported[i], load_lang('oauth_signin_' + oauth_supported[i]))
+        oauth_content += '</ul></div>'
         return easy_minify(flask.render_template(skin_check(),    
             imp = [load_lang('login'), wiki_set(), custom(), other2([0, 0])],
             data =  '''
@@ -2785,10 +2785,10 @@ def login():
                         <hr>
                         <input placeholder="''' + load_lang('password') + '''" name="pw" type="password">
                         <hr>
-                        ''' + oauth_content + '''
-                        <hr>
                         ''' + captcha_get() + '''
                         <button type="submit">''' + load_lang('login') + '''</button><a href="/register">''' + load_lang('register_suggest') + '''</a>
+                        <hr>
+                        ''' + oauth_content + '''
                         <hr>
                         <span>''' + load_lang('http_warring') + '''</span>
                     </form>
@@ -2819,12 +2819,14 @@ def login_oauth(platform = None, func = None):
 
     if func == 'init':
         referrer_re = re.compile(r'(?P<host>^(https?):\/\/([^\/]+))\/(?P<refer>[^\/?]+)')
-        referrer = referrer_re.search(flask.request.referrer)
-        if referrer.group('host') != load_oauth('publish_url'):
-            return redirect('/')
+        if flask.request.referrer != None:
+            referrer = referrer_re.search(flask.request.referrer)
+            if referrer.group('host') != load_oauth('publish_url'):
+                return redirect('/')
+            else:
+                flask.session['referrer'] = referrer.group('refer')
         else:
-            flask.session['referrer'] = referrer.group('refer')
-
+            return redirect('/')
         if oauth_data['client_id'] == '' or oauth_data['client_secret'] == '':
             return '관리자가 이 기능을 비활성화시켰습니다.'
         elif publish_url == 'https://':
