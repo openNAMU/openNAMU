@@ -2775,7 +2775,9 @@ def login():
         oauth_content = '<div class="oauth-wrapper"><ul class="oauth-list">'
         oauth_supported = load_oauth('_README')['support']
         for i in range(len(oauth_supported)):
-            oauth_content += '<link rel="stylesheet" href="/views/oauth.css"><li><a href="/oauth/{}/init"><div class="oauth-btn oauth-btn-{}"><div class="oauth-btn-logo oauth-btn-{}"></div>{}</div></a></li>'.format(oauth_supported[i], oauth_supported[i], oauth_supported[i], load_lang('oauth_signin_' + oauth_supported[i]))
+            oauth_data = load_oauth(oauth_supported[i])
+            if oauth_data['client_id'] != '' and oauth_data['client_secret'] != '':
+                oauth_content += '<link rel="stylesheet" href="/views/oauth.css"><li><a href="/oauth/{}/init"><div class="oauth-btn oauth-btn-{}"><div class="oauth-btn-logo oauth-btn-{}"></div>{}</div></a></li>'.format(oauth_supported[i], oauth_supported[i], oauth_supported[i], load_lang('oauth_signin_' + oauth_supported[i]))
         oauth_content += '</ul></div>'
         return easy_minify(flask.render_template(skin_check(),    
             imp = [load_lang('login'), wiki_set(), custom(), other2([0, 0])],
