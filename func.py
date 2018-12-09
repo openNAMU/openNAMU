@@ -265,6 +265,19 @@ def load_lang(data, num = 2):
         else:
             return load_lang(data, 1)
 
+def load_oauth(provider):
+    oauth_native = open('oauthsettings.json', encoding='utf-8').read()
+    oauth = json.loads(oauth_native)
+    return oauth[provider]
+
+def update_oauth(provider, target, content):
+    oauth_native = open('oauthsettings.json', encoding='utf-8').read()
+    oauth = json.loads(oauth_native)
+    oauth[provider][target] = content
+    with open('oauthsettings.json', 'w', encoding='utf-8') as f:
+        json.dump(oauth, f)
+    return 'Done'
+
 def ip_or_user(data):
     if re.search('(\.|:)', data):
         return 1
