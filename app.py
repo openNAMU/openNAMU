@@ -1347,7 +1347,7 @@ def adsense_settings():
                 data =  '''
                         <p>''' + load_lang('inter_error_detail') + '''</p>
                         <hr>
-                        <code>ie_wrong_callback</code>
+                        <code>ie_no_data_required</code>
                         <p>''' + load_lang('ie_no_data_required') + '''</p>
                         ''',
                 menu = [['other', load_lang('other')]]
