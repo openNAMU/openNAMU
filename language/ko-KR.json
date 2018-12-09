@@ -100,6 +100,8 @@
     "oauth_conn_done" : "됨",
     "oauth_conn_not" : "없음",
     "oauth_conn_new" : "연결하기",
+    "oauth_signin_facebook" : "Facebook으로 로그인",
+    "oauth_signin_naver" : "네이버 아이디로 로그인",
 
     "authority_error" : "권한이  부족합니다.",
     "no_login_error" : "비 로그인 상태 입니다.",
