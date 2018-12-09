@@ -1342,7 +1342,16 @@ def adsense_settings():
             adsense_enabled = flask.request.form.get('adsense_enabled')
             adsense_code = flask.request.form['adsense_code']
         except:
-            return 'error'
+            return easy_minify(flask.render_template(skin_check(),
+                imp = [load_lang('inter_error'), wiki_set(), custom(), other2([0, 0])],
+                data =  '''
+                        <p>''' + load_lang('inter_error_detail') + '''</p>
+                        <hr>
+                        <code>ie_wrong_callback</code>
+                        <p>''' + load_lang('ie_no_data_required') + '''</p>
+                        ''',
+                menu = [['other', load_lang('other')]]
+            ))
         
         if adsense_enabled == 'on':
             curs.execute('update other set data = "True" where name = "adsense"')
