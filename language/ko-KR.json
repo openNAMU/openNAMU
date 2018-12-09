@@ -108,6 +108,9 @@
     "oauth_settings_not_found" : "관리자가 이 기능을 사용하는데 대한 정보를 제공하지 않았습니다.",
     "oauth_disabled" : "관리자가 이 기능을 비활성화시켰습니다.",
 
+    "adsense" : "애드센스",
+    "enable" : "활성화",
+
     "authority_error" : "권한이  부족합니다.",
     "no_login_error" : "비 로그인 상태 입니다.",
     "no_exist_user_error" : "계정이 없습니다.",
