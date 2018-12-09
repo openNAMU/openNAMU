@@ -2789,13 +2789,12 @@ def login():
         
         return redirect('/user')  
     else:
-        oauth_content = '<div class="oauth-wrapper"><ul class="oauth-list">'
+        oauth_content = '<link rel="stylesheet" href="/views/main_css/oauth.css"><div class="oauth-wrapper"><ul class="oauth-list">'
         oauth_supported = load_oauth('_README')['support']
         for i in range(len(oauth_supported)):
             oauth_data = load_oauth(oauth_supported[i])
             if oauth_data['client_id'] != '' and oauth_data['client_secret'] != '':
                 oauth_content +=    '''
-                                    <link rel="stylesheet" href="/views/main_css/oauth.css">
                                     <li>
                                         <a href="/oauth/{}/init">
                                             <div class="oauth-btn oauth-btn-{}">
