@@ -4286,6 +4286,7 @@ def user_info():
             plus2 = '<li><a href="/alarm">' + load_lang('alarm') + '</a></li>'
 
         plus2 += '<li><a href="/watch_list">' + load_lang('watchlist') + '</a></li>'
+        plus3 = '<li><a href="/acl/user:' + url_pas(ip) + '">' + load_lang('user') + ' ' + load_lang('document') + ' acl</a></li>'
     else:
         ip_user = ip
         
@@ -4294,6 +4295,7 @@ def user_info():
                 <li><a href="/register">''' + load_lang('register') + '''</a></li>
                 '''
         plus2 = ''
+        plus3 = ''
 
         curs.execute("select data from other where name = 'email_have'")
         test = curs.fetchall()
@@ -4316,7 +4318,7 @@ def user_info():
                 <br>
                 <h2>''' + load_lang('tool') + '''</h2>
                 <ul>
-                    <li><a href="/acl/user:''' + url_pas(ip) + '">' + load_lang('user') + ' ' + load_lang('document') + ''' acl</a></li>
+                    ''' + plus3 + '''
                     <li><a href="/custom_head">''' + load_lang('user') + ''' head</a></li>
                 </ul>
                 <br>
