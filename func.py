@@ -86,7 +86,7 @@ def captcha_get():
             curs.execute('select data from other where name = "sec_re"')
             sec_re = curs.fetchall()
             if sec_re and sec_re[0][0] != '':
-                data += recaptcha[0][0] + '<hr>'
+                data += recaptcha[0][0] + '<hr class=\"main_hr\">'
 
     return data
 
@@ -188,17 +188,25 @@ def pw_check(data, data2, type_d = 'no', id_d = ''):
     else:
         set_data = db_data[0][0]
     
-    if set_data in ['sha256', 'sha3']:
-        data3 = pw_encode(data = data, type_d = set_data)
-        if data3 == data2:
-            re_data = 1
+    while 1:
+        if set_data in ['sha256', 'sha3']:
+            data3 = pw_encode(data = data, type_d = set_data)
+            if data3 == data2:
+                re_data = 1
+            else:
+                re_data = 0
+
+            break
         else:
-            re_data = 0
-    else:
-        if pw_encode(data, data2, 'bcrypt') == data2:
-            re_data = 1
-        else:
-            re_data = 0
+            try:
+                if pw_encode(data, data2, 'bcrypt') == data2:
+                    re_data = 1
+                else:
+                    re_data = 0
+
+                break
+            except:
+                set_data = db_data[0][0]
 
     if db_data[0][0] != set_data and re_data == 1 and id_d != '':
         curs.execute("update user set pw = ?, encode = ? where id = ?", [pw_encode(data), db_data[0][0], id_d])
@@ -304,16 +312,16 @@ def edit_help_button():
     for insert_data in insert_list:
         data += '<a href="javascript:void(0);" onclick="insert_data(\'content\', \'' + insert_data[0] + '\');">(' + insert_data[1] + ')</a> '
 
-    return [js_data, data + '<hr>']
+    return [js_data, data + '<hr class=\"main_hr\">']
 
 def ip_warring():
     if custom()[2] == 0:    
         curs.execute('select data from other where name = "no_login_warring"')
         data = curs.fetchall()
         if data and data[0][0] != '':
-            text_data = '<span>' + data[0][0] + '</span><hr>'
+            text_data = '<span>' + data[0][0] + '</span><hr class=\"main_hr\">'
         else:
-            text_data = '<span>' + load_lang('no_login_warring') + '</span><hr>'
+            text_data = '<span>' + load_lang('no_login_warring') + '</span><hr class=\"main_hr\">'
     else:
         text_data = ''
 
@@ -341,11 +349,11 @@ def next_fix(link, num, page, end = 50):
 
     if num == 1:
         if len(page) == end:
-            list_data += '<hr><a href="' + link + str(num + 1) + '">(' + load_lang('next') + ')</a>'
+            list_data += '<hr class=\"main_hr\"><a href="' + link + str(num + 1) + '">(' + load_lang('next') + ')</a>'
     elif len(page) != end:
-        list_data += '<hr><a href="' + link + str(num - 1) + '">(' + load_lang('previous') + ')</a>'
+        list_data += '<hr class=\"main_hr\"><a href="' + link + str(num - 1) + '">(' + load_lang('previous') + ')</a>'
     else:
-        list_data += '<hr><a href="' + link + str(num - 1) + '">(' + load_lang('previous') + ')</a> <a href="' + link + str(num + 1) + '">(' + load_lang('next') + ')</a>'
+        list_data += '<hr class=\"main_hr\"><a href="' + link + str(num - 1) + '">(' + load_lang('previous') + ')</a> <a href="' + link + str(num + 1) + '">(' + load_lang('next') + ')</a>'
 
     return list_data
 
