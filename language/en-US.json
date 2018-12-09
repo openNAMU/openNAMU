@@ -110,6 +110,8 @@
     "oauth_conn_new" : "Connect..",
     "oauth_signin_facebook" : "Sign in with facebook",
     "oauth_signin_naver" : "Sign in with NAVER",
+    "oauth_settings_not_found" : "Administrator has not provided any data about using this feature.",
+    "oauth_disabled" : "Administrator has disabled this feature.",
 
     "user_head_warring" : "user's head will deleted if you close the browser or when you are editting as guest",
     "http_warring" : "warning : if you are not on https connection, your information can be leaked. we won't response to that.",
