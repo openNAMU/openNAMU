@@ -90,6 +90,7 @@ curs.execute('create table if not exists scan(test text)')
 curs.execute('create table if not exists acl(test text)')
 curs.execute('create table if not exists inter(test text)')
 curs.execute('create table if not exists html_filter(test text)')
+curs.execute('create table if not exists oauth_conn(test text)')
 
 if setup_tool == 0:
     curs.execute('select data from other where name = "ver"')
@@ -124,7 +125,8 @@ if setup_tool != 0:
         'scan', 
         'acl', 
         'inter', 
-        'html_filter'
+        'html_filter',
+        'oauth_conn'
     ]
 
     create_data['data'] = ['title', 'data']
@@ -148,6 +150,7 @@ if setup_tool != 0:
     create_data['acl'] = ['title', 'dec', 'dis', 'view', 'why']
     create_data['inter'] = ['title', 'link']
     create_data['html_filter'] = ['html', 'kind']
+    create_data['oauth_conn'] = ['provider', 'wiki_id', 'sns_id', 'name', 'picture']
 
     for create_table in create_data['all_data']:
         for create in create_data[create_table]:
@@ -1284,6 +1287,25 @@ def now_update():
         data = 'auto update is not support. <a href="https://github.com/2DU/opennamu">(github)</a>',
         menu = [['manager/1', load_lang('admin')]]
     ))
+
+#OAuth Developing (hoparkgo9ma)
+@app.route('/oauth_settings')
+def oauth_settings():
+    if admin_check(None, 'indexing') != 1:
+        return re_error('/error/3')
+    oauth_supported = load_oauth('_README')['support']
+    body_content = '<form action="" accept-charset="utf-8" name="" method="post">'
+    for i in range(len(oauth_supported)):
+        oauth_data = load_oauth(oauth_supported[i])
+        for j in range(2):
+            if j == 0:
+                load_target = 'id'
+            elif j == 1:
+                load_target = 'secret'
+            body_content += '<input id="{}_client_{}" type="checkbox"><input placeholder="{}_client_{}" name="{}_client_{}" value="{}" type="text" style="width: 80%;"><hr>'.format(oauth_supported[i], load_target, oauth_supported[i], load_target, oauth_supported[i], load_target, oauth_data['client_{}'.format(load_target)])
+    body_content += '<button id="save" type="submit">' + load_lang('save') + '</button></form>'
+    return easy_minify(flask.render_template(skin_check(), imp = [load_lang('oauth_settings'), wiki_set(), custom(), other2([0, 0])], data = body_content, menu = [['other', load_lang('other')]]))
+
         
 @app.route('/xref/<everything:name>')
 def xref(name = None):
@@ -2133,6 +2155,7 @@ def manager(num = 1):
                         <li><a href="/indexing">''' + load_lang('indexing') + ' (' + load_lang('create') + ' or ' + load_lang('delete') + ''')</a></li>
                         <li><a href="/restart">''' + load_lang('server') + ' ' + load_lang('restart') + '''</a></li>
                         <li><a href="/update">''' + load_lang('update') + '''</a></li>
+                        <li><a href="/oauth_settings">''' + load_lang('oauth_settings') + '''</a></li>
                     </ul>
                     ''',
             menu = [['other', load_lang('other')]]
@@ -2700,6 +2723,7 @@ def close_topic_list(name = None, tool = None):
         
 @app.route('/login', methods=['POST', 'GET'])
 def login():
+    print(flask.request.referrer)
     if custom()[2] != 0:
         return redirect('/user')
     
@@ -2744,7 +2768,14 @@ def login():
         conn.commit()
         
         return redirect('/user')  
-    else:        
+    else:
+        oauth_content = '<div class="oauth-wrapper"><ul class="oauth-list">'
+        oauth_supported = load_oauth('_README')['support']
+        for i in range(len(oauth_supported)):
+            oauth_data = load_oauth(oauth_supported[i])
+            if oauth_data['client_id'] != '' and oauth_data['client_secret'] != '':
+                oauth_content += '<link rel="stylesheet" href="/views/oauth.css"><li><a href="/oauth/{}/init"><div class="oauth-btn oauth-btn-{}"><div class="oauth-btn-logo oauth-btn-{}"></div>{}</div></a></li>'.format(oauth_supported[i], oauth_supported[i], oauth_supported[i], load_lang('oauth_signin_' + oauth_supported[i]))
+        oauth_content += '</ul></div>'
         return easy_minify(flask.render_template(skin_check(),    
             imp = [load_lang('login'), wiki_set(), custom(), other2([0, 0])],
             data =  '''
@@ -2754,13 +2785,110 @@ def login():
                         <input placeholder="''' + load_lang('password') + '''" name="pw" type="password">
                         <hr class=\"main_hr\">
                         ''' + captcha_get() + '''
-                        <button type="submit">''' + load_lang('login') + '''</button>
+                        <button type="submit">''' + load_lang('login') + '''</button><a href="/register">''' + load_lang('register_suggest') + '''</a>
+                        <hr class=\"main_hr\">
+                        ''' + oauth_content + '''
                         <hr class=\"main_hr\">
                         <span>''' + load_lang('http_warring') + '''</span>
                     </form>
                     ''',
             menu = [['user', load_lang('user')]]
         ))
+
+@app.route('/oauth/<regex("naver|facebook"):platform>/<regex("init|callback"):func>', methods=['GET', 'POST'])
+def login_oauth(platform = None, func = None):
+    publish_url = load_oauth('publish_url')
+    oauth_data = load_oauth(platform)
+    api_url = {}
+    data = {
+        'client_id' : oauth_data['client_id'],
+        'client_secret' : oauth_data['client_secret'],
+        'redirect_uri' : publish_url + '/oauth/' + platform + '/callback',
+        'state' : 'RAMDOMVALUE'
+    }
+
+    if platform == 'naver':
+        api_url['redirect'] = 'https://nid.naver.com/oauth2.0/authorize'
+        api_url['token'] = 'https://nid.naver.com/oauth2.0/token'
+        api_url['profile'] = 'https://openapi.naver.com/v1/nid/me'
+    elif platform == 'facebook':
+        api_url['redirect'] = 'https://www.facebook.com/v3.1/dialog/oauth'
+        api_url['token'] = 'https://graph.facebook.com/v3.1/oauth/access_token'
+        api_url['profile'] = 'https://graph.facebook.com/me'
+
+    if func == 'init':
+        if oauth_data['client_id'] == '' or oauth_data['client_secret'] == '':
+            return easy_minify(flask.render_template(skin_check(), imp = [load_lang('login'), wiki_set(), custom(), other2([0, 0])], data = load_lang('oauth_disabled'), menu = [['user', load_lang('user')]]))
+        elif publish_url == 'https://':
+            return easy_minify(flask.render_template(skin_check(), imp = [load_lang('login'), wiki_set(), custom(), other2([0, 0])], data = load_lang('oauth_settings_not_found'), menu = [['user', load_lang('user')]]))
+
+        referrer_re = re.compile(r'(?P<host>^(https?):\/\/([^\/]+))\/(?P<refer>[^\/?]+)')
+        if flask.request.referrer != None:
+            referrer = referrer_re.search(flask.request.referrer)
+            if referrer.group('host') != load_oauth('publish_url'):
+                return redirect('/')
+            else:
+                flask.session['referrer'] = referrer.group('refer')
+        else:
+            return redirect('/')
+        flask.session['refer'] = flask.request.referrer
+
+        if platform == 'naver':
+            return redirect(api_url['redirect']+'?response_type=code&client_id={}&redirect_uri={}&state={}'.format(data['client_id'], data['redirect_uri'], data['state']))
+        elif platform == 'facebook':
+            return redirect(api_url['redirect']+'?client_id={}&redirect_uri={}&state={}'.format(data['client_id'], data['redirect_uri'], data['state']))
+
+    elif func == 'callback':
+        code = flask.request.args.get('code')
+        state = flask.request.args.get('state')
+        if code == None or state == None:
+            return easy_minify(flask.render_template(skin_check(), imp = [load_lang('inter_error'), wiki_set(), custom(), other2([0, 0])], data = 
+            '''<p>''' + load_lang('inter_error_detail') + '''</p>
+            <hr>
+            <code>ie_wrong_callback</code>
+            <p>''' + load_lang('ie_wrong_callback') + '''</p>
+            '''
+            , menu = [['user', load_lang('user')]]))
+
+        if platform == 'naver':
+            token_access = api_url['token']+'?grant_type=authorization_code&client_id={}&client_secret={}&code={}&state={}'.format(data['client_id'], data['client_secret'], code, state)
+            token_result = urllib.request.urlopen(token_access).read().decode('utf-8')
+            token_result_json = json.loads(token_result)
+
+            headers = {'Authorization': 'Bearer {}'.format(token_result_json['access_token'])}
+            profile_access = urllib.request.Request(api_url['profile'], headers = headers)
+            profile_result = urllib.request.urlopen(profile_access).read().decode('utf-8')
+            profile_result_json = json.loads(profile_result)
+
+            stand_json = {'id' : profile_result_json['response']['id'], 'name' : profile_result_json['response']['name'], 'picture' : profile_result_json['response']['profile_image']}
+        elif platform == 'facebook':
+            token_access = api_url['token']+'?client_id={}&redirect_uri={}&client_secret={}&code={}'.format(data['client_id'], data['redirect_uri'], data['client_secret'], code)
+            token_result = urllib.request.urlopen(token_access).read().decode('utf-8')
+            token_result_json = json.loads(token_result)
+
+            profile_access = api_url['profile']+'?fields=id,name,picture&access_token={}'.format(token_result_json['access_token'])
+            profile_result = urllib.request.urlopen(profile_access).read().decode('utf-8')
+            profile_result_json = json.loads(profile_result)
+
+            stand_json = {'id': profile_result_json['id'], 'name': profile_result_json['name'], 'picture': profile_result_json['picture']['data']['url']}
+        
+        if flask.session['referrer'][0:6] == 'change':
+            curs.execute('select * from oauth_conn where wiki_id = ? and provider = ?', [flask.session['id'], platform])
+            oauth_result = curs.fetchall()
+            if len(oauth_result) == 0:
+                curs.execute('insert into oauth_conn (provider, wiki_id, sns_id, name, picture) values(?, ?, ?, ?, ?)', [platform, flask.session['id'], stand_json['id'], stand_json['name'], stand_json['picture']])
+            else:
+                curs.execute('update oauth_conn set name = ? picture = ? where wiki_id = ?', [stand_json['name'], stand_json['pricture'], flask.session['id']])
+            conn.commit()
+        elif flask.session['referrer'][0:5] == 'login':
+            curs.execute('select * from oauth_conn where provider = ? and sns_id = ?', [platform, stand_json['id']])
+            curs_result = curs.fetchall()
+            if len(curs_result) == 0:
+                return re_error('/error/2')
+            else:
+                flask.session['state'] = 1
+                flask.session['id'] = curs_result[0][2]
+        return redirect(flask.session['refer'])
                 
 @app.route('/change', methods=['POST', 'GET'])
 def change_password():
@@ -2824,7 +2952,7 @@ def change_password():
             div3 = ''
             var_div3 = ''
 
-            curs.execute('select data from user_set where name = "lang" and id = ?', [ip])
+            curs.execute('select data from user_set where name = "lang" and id = ?', [flask.session['id']])
             data = curs.fetchall()
 
             for lang_data in support_language:
@@ -2834,6 +2962,17 @@ def change_password():
                     var_div3 += '<option value="' + lang_data + '">' + lang_data + '</option>'
 
             div3 += var_div3
+
+            oauth_provider = load_oauth('_README')['support']
+            oauth_content = '<ul>'
+            for i in range(len(oauth_provider)):
+                curs.execute('select * from oauth_conn where wiki_id = ? and provider = ?', [flask.session['id'], oauth_provider[i]])
+                oauth_data = curs.fetchall()
+                if len(oauth_data) == 1:
+                    oauth_content += '<li>{} - {}</li>'.format(oauth_provider[i], load_lang('connection') + load_lang('oauth_conn_done') + ': <img src="{}" width="17px" height="17px">{}'.format(oauth_data[0][5], oauth_data[0][4]))
+                else:
+                    oauth_content += '<li>{} - {}</li>'.format(oauth_provider[i], load_lang('connection') + load_lang('oauth_conn_not') + '. <a href="/oauth/{}/init">{}</a>'.format(oauth_provider[i], load_lang('oauth_conn_new')))
+            oauth_content += '</ul>'
 
             return easy_minify(flask.render_template(skin_check(),    
                 imp = [load_lang('user') + ' ' + load_lang('setting') + ' ' + load_lang('edit'), wiki_set(), custom(), other2([0, 0])],
@@ -2858,6 +2997,9 @@ def change_password():
                             <br>
                             <br>
                             <select name="lang">''' + div3 + '''</select>
+                            <hr class=\"main_hr\">
+                            <span>OAuth ''' + load_lang('connection') + '''</span>
+                            ''' + oauth_content + '''
                             <hr class=\"main_hr\">
                             <button type="submit">''' + load_lang('edit') + '''</button>
                             <hr class=\"main_hr\">
