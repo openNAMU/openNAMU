@@ -247,6 +247,12 @@ else:
     
     print('language : ' + str(rep_language))
 
+curs.execute('select data from other where name = "adsense"')
+adsense_result = curs.fetchall()
+if not adsense_result:
+    curs.execute('insert into other (name, data) values ("adsense", "False")')
+    curs.execute('insert into other (name, data) values ("adsense_code", "")')
+
 ask_this = [[['markup', 'markup'], ['namumark']], [['encryption method', 'encode'], ['sha256', 'sha3', 'bcrypt']]]
 for ask_data in ask_this:
     curs.execute('select data from other where name = ?', [ask_data[0][1]])
@@ -1288,7 +1294,6 @@ def now_update():
         menu = [['manager/1', load_lang('admin')]]
     ))
 
-#OAuth Developing (hoparkgo9ma)
 @app.route('/oauth_settings')
 def oauth_settings():
     if admin_check(None, 'oauth_settings') != 1:
@@ -1327,6 +1332,74 @@ def oauth_settings():
         menu = [['other', load_lang('other')]]
     ))
 
+@app.route('/adsense_settings', methods=['GET', 'POST'])
+def adsense_settings():
+    if admin_check(None, 'oauth_settings') != 1:
+        return re_error('/error/3')
+    
+    if flask.request.method == 'POST':
+        try:
+            adsense_enabled = flask.request.form.get('adsense_enabled')
+            adsense_code = flask.request.form['adsense_code']
+        except:
+            return easy_minify(flask.render_template(skin_check(),
+                imp = [load_lang('inter_error'), wiki_set(), custom(), other2([0, 0])],
+                data =  '''
+                        <p>''' + load_lang('inter_error_detail') + '''</p>
+                        <hr>
+                        <code>ie_no_data_required</code>
+                        <p>''' + load_lang('ie_no_data_required') + '''</p>
+                        ''',
+                menu = [['other', load_lang('other')]]
+            ))
+        
+        if adsense_enabled == 'on':
+            curs.execute('update other set data = "True" where name = "adsense"')
+        else:
+            curs.execute('update other set data = "False" where name = "adsense"')
+        curs.execute('update other set data = ? where name = "adsense_code"', [adsense_code])
+        conn.commit()
+        return redirect('/adsense_settings')
+
+    body_content = ''
+
+    curs.execute('select data from other where name = "adsense"')
+    adsense_enabled = curs.fetchall()[0][0]
+
+    curs.execute('select data from other where name = "adsense_code"')
+    adsense_code = curs.fetchall()[0][0]
+
+    template = '''
+        <form action="" accept-charset="utf-8" method="post">
+            <div class="form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" name="adsense_enabled" type="checkbox" %_html:adsense_enabled_%>
+                    %_lang:adsense_enabled_%
+                </label>
+            </div>
+            <hr>
+            <div class="form-group">
+                <textarea class="form-control" id="adsense_code" name="adsense_code" rows="12">%_html:adsense_code_%</textarea>
+            </div>
+            <button type="submit" value="publish">%_lang:save_%</button>
+        </form>
+    '''
+    
+    if adsense_enabled == 'True':
+        template = template.replace('%_html:adsense_enabled_%', 'checked')
+    else:
+        template = template.replace('%_html:adsense_enabled_%', '')
+    template = template.replace('%_lang:adsense_enabled_%', load_lang('adsense') + ' ' + load_lang('enable'))
+    template = template.replace('%_lang:save_%', load_lang('save'))
+    template = template.replace('%_html:adsense_code_%', adsense_code)
+
+    body_content += template
+
+    return easy_minify(flask.render_template(skin_check(),
+        imp = [load_lang('adsense') + ' ' + load_lang('setting'), wiki_set(), custom(), other2([0, 0])],
+        data = body_content,
+        menu = [['other', load_lang('other')]]
+    ))
         
 @app.route('/xref/<everything:name>')
 def xref(name = None):
@@ -2177,6 +2250,7 @@ def manager(num = 1):
                         <li><a href="/restart">''' + load_lang('server') + ' ' + load_lang('restart') + '''</a></li>
                         <li><a href="/update">''' + load_lang('update') + '''</a></li>
                         <li><a href="/oauth_settings">''' + load_lang('oauth_settings') + '''</a></li>
+                        <li><a href="/adsense_settings">''' + load_lang('adsense') + ' ' + load_lang('setting') + '''</a></li>
                     </ul>
                     ''',
             menu = [['other', load_lang('other')]]
@@ -2789,13 +2863,12 @@ def login():
         
         return redirect('/user')  
     else:
-        oauth_content = '<div class="oauth-wrapper"><ul class="oauth-list">'
+        oauth_content = '<link rel="stylesheet" href="/views/main_css/oauth.css"><div class="oauth-wrapper"><ul class="oauth-list">'
         oauth_supported = load_oauth('_README')['support']
         for i in range(len(oauth_supported)):
             oauth_data = load_oauth(oauth_supported[i])
             if oauth_data['client_id'] != '' and oauth_data['client_secret'] != '':
                 oauth_content +=    '''
-                                    <link rel="stylesheet" href="/views/main_css/oauth.css">
                                     <li>
                                         <a href="/oauth/{}/init">
                                             <div class="oauth-btn oauth-btn-{}">
@@ -3857,11 +3930,20 @@ def read_view(name = None):
 
     div = end_data + div
             
+    curs.execute("select data from other where name = 'adsense'")
+    adsense_enabled = curs.fetchall()[0][0]
+    adsense_code = '<div align="center" style="display: block; margin-bottom: 10px;">%_adsense_code_%</div>'
+    if adsense_enabled == 'True':
+        curs.execute("select data from other where name = 'adsense_code'")
+        adsense_code = adsense_code.replace('%_adsense_code_%', curs.fetchall()[0][0])
+    else:
+        adsense_code = adsense_code.replace('%_adsense_code_%', '')
     curs.execute("select data from other where name = 'body'")
     body = curs.fetchall()
     if body:
         div = body[0][0] + '<hr class=\"main_hr\">' + div
-
+    
+    div = adsense_code + '<div>' + div + '</div>'
     return easy_minify(flask.render_template(skin_check(), 
         imp = [flask.request.args.get('show', name), wiki_set(), custom(), other2([sub + acl, r_date])],
         data = div,
