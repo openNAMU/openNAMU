@@ -15,7 +15,7 @@ import random
 
 from func import *
 
-r_ver = 'v3.0.8-stable-99'
+r_ver = 'v3.0.8-master-100'
 c_ver = ''.join(re.findall('[0-9]', r_ver))
 
 print('version : ' + r_ver)
@@ -172,6 +172,25 @@ if not os.path.exists('image'):
 if not os.path.exists('views'):
     os.makedirs('views')
 
+if os.getenv('NAMU_HOST') != None:
+    rep_host = os.getenv('NAMU_HOST')
+else:
+    curs.execute('select data from other where name = "host"')
+    rep_data = curs.fetchall()
+    if not rep_data:
+        while 1:
+            print('host [0.0.0.0] : ', end = '')
+            rep_host = input()
+            if rep_host:
+                curs.execute('insert into other (name, data) values ("host", ?)', [rep_host])
+                break
+            else:
+                pass
+    else:
+        rep_host = rep_data[0][0]
+    
+        print('host : ' + str(rep_host))
+
 if os.getenv('NAMU_PORT') != None:
     rep_port = os.getenv('NAMU_PORT')
 else:
@@ -180,11 +199,9 @@ else:
     if not rep_data:
         while 1:
             print('port : ', end = '')
-        
             rep_port = int(input())
             if rep_port:
                 curs.execute('insert into other (name, data) values ("port", ?)', [rep_port])
-    
                 break
             else:
                 pass
@@ -208,7 +225,7 @@ try:
 
             curs.execute('insert into other (name, data) values ("robot", "User-agent: *\nDisallow: /\nAllow: /$\nAllow: /w/")')
         
-        print('robots.txt create')
+        print('robots.txt have created')
 except:
     pass
 
@@ -302,6 +319,7 @@ if back_time != 0:
 else:
     print('back up state : turn off')
 
+print('\n------ daemon started ------')
 conn.commit()
 
 @app.route('/del_alarm')
@@ -358,6 +376,7 @@ def inter_wiki(tools = None):
                     <li>naver.com</li>
                     <li>daum.net</li>
                     <li>hanmail.net</li>
+                    <li>daum.net</li>
                 </ul>
                 '''
 
@@ -4640,5 +4659,5 @@ def error_404(e):
 if __name__=="__main__":
     app.secret_key = rep_key
     http_server = tornado.httpserver.HTTPServer(tornado.wsgi.WSGIContainer(app))
-    http_server.listen(rep_port)
+    http_server.listen(rep_port, address=rep_host)
     tornado.ioloop.IOLoop.instance().start()

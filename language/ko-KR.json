@@ -138,6 +138,7 @@
     "max_file_size" : "최대 파일 크기",
     "backup_interval" : "백업 간격",
     "default" : "기본",
+    "host" : "호스트",
     "port" : "포트",
     "secret_key" : "비밀키",
     "update_branch" : "업데이트 브랜치",
