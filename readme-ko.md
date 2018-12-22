@@ -15,48 +15,7 @@ opennamu
  * [기타](#기타)
 
 # 시작하기
-오픈나무는 파이썬 환경에서 동작하는 파이썬 애플리케이션으로, 파이썬 환경을 필요로 합니다.
-
-## 환경 구성
-### 파이썬 설치
-[파이썬 설치 가이드](https://github.com/404-sdok/how-to-python/blob/master/0.md)를 참고하여 파이썬을 설치합니다.
-
-### 릴리즈 다운로드
-[릴리즈](https://github.com/2du/openNAMU/releases)에서 opennamu의 릴리즈 판을 다운로드 받고, 압축을 해제합니다. 레포지토리를 클론하여 릴리즈를 적용하는 것도 가능합니다. 자세한 내용은 [클론](#클론)문단을 참고하세요.
-
-### 모듈 설치
-다음 명령어로 opennamu 구성 파일이 위치한 디렉토리로 이동합니다.
-```
-cd [path]
-```
-
-
-다음 명령어로 opennamu 실행에 필요한 모듈을 설치합니다.
-```
-pip install -r requirements.txt
-```
-리눅스 환경의 경우 다음 명령으로 실행해야 합니다.
-```
-pip3 install -r requirements.txt
-```
-## 애플리케이션 시작
-### 애플리케이션 시작
-opennamu를 시작합니다.
-```
-python app.py
-```
-리눅스 환경의 경우 다음 명령으로 실행해야 합니다.
-```
-python3 app.py
-```
-
-* opennamu의 첫 계정은 소유자 계정으로 설정됩니다.
-
-### 애플리케이션 공개
-현재 opennamu에서 권장하는 애플리케이션 공개 방법은 아파치나 nginx와 같은 웹서버 호스팅 소프트웨어를 통해 리버스 프록시를 설정하는 것입니다.
-
-* ([apache 설정 파일 예시](./conf_example/apache/), [nginx 설정 파일 예시](./conf_example/nginx.conf))
-
+ * 오픈나무 위키에 명시되어 있습니다. [참조](http://namu.ml/w/오픈나무%2F설치법)
 
 # 클론
 아래 명령을 터미널(명령 프롬프트)에 입력하여 본 리포지토리를 클론할 수 있습니다.

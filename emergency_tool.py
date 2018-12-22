@@ -7,8 +7,15 @@ import threading
 from func import *
 from mark import load_conn2, namumark
 
+try:
+    f = open('set.json', 'r')
+except:
+    print('Error: set.json not found. please run setup script first.')
+    exit()
+else:
+    f.close()
 json_data = open('set.json').read()
-set_data = json.loads(json_data)
+set_data = json.loads(data)
 
 conn = sqlite3.connect(set_data['db'] + '.db', check_same_thread = False)
 curs = conn.cursor()
@@ -18,10 +25,11 @@ load_conn(conn)
 print('1. backlink reset')
 print('2. recaptcha delete')
 print('3. ban delete')
-print('4. change port')
-print('5. change skin')
-print('6. change password')
-print('7. reset version')
+print('4. change host')
+print('5. change port')
+print('6. change skin')
+print('7. change password')
+print('8. reset version')
 
 print('select : ', end = '')
 what_i_do = input()
@@ -61,20 +69,26 @@ elif what_i_do == '3':
         curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, ?)", [user_data, load_lang('release', 1), get_time(), load_lang('tool', 1) + ':emergency', '', band])
     curs.execute("delete from ban where block = ?", [user_data])
 elif what_i_do == '4':
+    print('host : ', end = '')
+    host = input()
+
+    curs.execute("update other set data = ? where name = 'host'", [host])
+elif what_i_do == '5':
     print('port : ', end = '')
-    port = input()
+    port = int(input())
 
     curs.execute("update other set data = ? where name = 'port'", [port])
-elif what_i_do == '5':
+elif what_i_do == '6':
     print('skin name : ', end = '')
     skin = input()
 
     curs.execute("update other set data = ? where name = 'skin'", [skin])
-elif what_i_do == '6':
+elif what_i_do == '7':
     print('1. sha256')
-    print('2. bcrypt')
+    print('2. sha3')
+    print('3. bcrypt')
     print('select : ', end = '')
-    what_i_do = input()
+    what_i_do = int(input())
 
     print('user name : ', end = '')
     user_name = input()
@@ -85,10 +99,12 @@ elif what_i_do == '6':
     if what_i_do == '1':
         hashed = hashlib.sha256(bytes(user_pw, 'utf-8')).hexdigest()
     elif what_i_do == '2':
+        hashed = sha3.sha3_256(bytes(user_pw, 'utf-8')).hexdigest()
+    elif what_i_do == '3':
         hashed = bcrypt.hashpw(bytes(user_pw, 'utf-8'), bcrypt.gensalt()).decode()
        
     curs.execute("update user set pw = ? where id = ?", [hashed, user_name])
-elif what_i_do == '7':
+elif what_i_do == '8':
     curs.execute("update other set data = '00000' where name = 'ver'")
 
 conn.commit()
