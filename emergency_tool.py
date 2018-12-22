@@ -15,7 +15,7 @@ except:
 else:
     f.close()
 json_data = open('set.json').read()
-set_data = json.loads(data)
+set_data = json.loads(json_data)
 
 conn = sqlite3.connect(set_data['db'] + '.db', check_same_thread = False)
 curs = conn.cursor()

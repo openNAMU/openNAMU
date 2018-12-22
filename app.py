@@ -376,7 +376,7 @@ def inter_wiki(tools = None):
                     <li>naver.com</li>
                     <li>daum.net</li>
                     <li>hanmail.net</li>
-                    <li>daum.net</li>
+                    <li>hanmail2.net</li>
                 </ul>
                 '''
 
@@ -559,8 +559,8 @@ def setting(num = 0):
             menu = [['manager', load_lang('admin')]]
         ))
     elif num == 1:
-        i_list = ['name', 'logo', 'frontpage', 'license', 'upload', 'skin', 'edit', 'reg', 'ip_view', 'back_up', 'port', 'key', 'update', 'email_have', 'discussion', 'encode']
-        n_list = ['wiki', '', 'FrontPage', 'CC 0', '2', '', 'normal', '', '', '0', '3000', 'test', 'stable', '', 'normal', 'sha256']
+        i_list = ['name', 'logo', 'frontpage', 'license', 'upload', 'skin', 'edit', 'reg', 'ip_view', 'back_up', 'port', 'key', 'update', 'email_have', 'discussion', 'encode', 'host']
+        n_list = ['wiki', '', 'FrontPage', 'CC 0', '2', '', 'normal', '', '', '0', '3000', 'test', 'stable', '', 'normal', 'sha256', '0.0.0.0']
         
         if flask.request.method == 'POST':
             i = 0
@@ -692,6 +692,11 @@ def setting(num = 0):
                             <input type="checkbox" name="ip_view" ''' + ch_2 + '''> ip ''' + load_lang('hide') + '''
                             <hr class=\"main_hr\">
                             <input type="checkbox" name="email_have" ''' + ch_3 + '''> must have email {<a href="/setting/5">must set google imap</a>}
+                            <hr class=\"main_hr\">
+                            <span>''' + load_lang('host') + '''</span>
+                            <br>
+                            <br>
+                            <input placeholder="''' + load_lang('host') + '''" type="text" name="host" value="''' + html.escape(d_list[16]) + '''">
                             <hr class=\"main_hr\">
                             <span>''' + load_lang('port') + '''</span>
                             <br>
@@ -3358,7 +3363,7 @@ def need_email(tool = 'pass_find'):
     if flask.request.method == 'POST':
         if tool == 'need_email':
             if 'c_id' in flask.session:
-                main_email = ['naver.com', 'gmail.com', 'daum.net', 'hanmail.net']
+                main_email = ['naver.com', 'gmail.com', 'daum.net', 'hanmail.net', 'hanmail2.net']
                 data = re.search('@([^@]+)$', flask.request.form.get('email', ''))
                 if data:
                     data = data.groups()[0]
