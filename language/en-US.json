@@ -10,6 +10,7 @@
     "backup_interval" : "backup interval",
     "default" : "default",
     "language" : "language",
+    "host" : "host",
     "port" : "port",
     "secret_key" : "secret key",
     "update_branch" : "update branch",
