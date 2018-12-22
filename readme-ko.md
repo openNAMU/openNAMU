@@ -76,10 +76,10 @@ python3 app.py
 # 라이선스
 오픈나무는 [BSD 3-Clause License](./LICENSE)에 의해 보호받고 있습니다. 자세한 내용은 문서를 참고하세요.
 
-## 외부 프로젝트 라이선스
- * Quotes icon [Dave Gandy](http://www.flaticon.com/free-icon/quote-left_25672) CC 3.0 BY
- * Syntax highlighting [highlightjs](https://highlightjs.org/)
- * Numerical expression [MathJax](https://www.mathjax.org/)
+## 포함된 외부 프로젝트
+ * Quotes icon - [Dave Gandy](http://www.flaticon.com/free-icon/quote-left_25672) - CC 3.0 BY
+ * Syntax highlighting - [highlightjs](https://highlightjs.org/) - [BSD License](https://github.com/highlightjs/highlight.js/blob/master/LICENSE)
+ * Numerical expression - [MathJax](https://www.mathjax.org/) - [Apache License 2.0](https://github.com/mathjax/MathJax/blob/master/LICENSE)
 
 # 기여자 목록
  * [참고](https://github.com/2DU/opennamu/graphs/contributors)
