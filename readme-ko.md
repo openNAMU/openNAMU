@@ -22,7 +22,7 @@ opennamu
 [파이썬 설치 가이드](https://github.com/404-sdok/how-to-python/blob/master/0.md)를 참고하여 파이썬을 설치합니다.
 
 ### 릴리즈 다운로드
-[릴리즈](https://github.com/2du/openNAMU/releases)에서 opennamu의 릴리즈 판을 다운로드 받고, 압축을 해제합니다.
+[릴리즈](https://github.com/2du/openNAMU/releases)에서 opennamu의 릴리즈 판을 다운로드 받고, 압축을 해제합니다. 레포지토리를 클론하여 릴리즈를 적용하는 것도 가능합니다. 자세한 내용은 [클론](#클론)문단을 참고하세요.
 
 ### 모듈 설치
 다음 명령어로 opennamu 구성 파일이 위치한 디렉토리로 이동합니다.
