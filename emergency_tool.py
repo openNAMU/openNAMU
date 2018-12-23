@@ -9,8 +9,8 @@ from mark import load_conn2, namumark
 
 try:
     f = open('set.json', 'r')
-except:
-    print('Error: set.json not found. please run setup script first.')
+except FileNotFoundError as e:
+    print('Error: set.json is not found. please run setup script first.')
     exit()
 else:
     f.close()
@@ -74,8 +74,12 @@ elif what_i_do == '4':
 
     curs.execute("update other set data = ? where name = 'host'", [host])
 elif what_i_do == '5':
-    print('port : ', end = '')
-    port = int(input())
+    try:
+        print('port : ', end = '')
+        port = int(input())
+    except ValueError:
+            print('Error: Please input int value')
+            exit()
 
     curs.execute("update other set data = ? where name = 'port'", [port])
 elif what_i_do == '6':
@@ -84,11 +88,15 @@ elif what_i_do == '6':
 
     curs.execute("update other set data = ? where name = 'skin'", [skin])
 elif what_i_do == '7':
-    print('1. sha256')
-    print('2. sha3')
-    print('3. bcrypt')
-    print('select : ', end = '')
-    what_i_do = int(input())
+    try:
+        print('1. sha256')
+        print('2. sha3')
+        print('3. bcrypt')
+        print('select : ', end = '')
+        what_i_do = int(input())
+    except ValueError:
+        print('Error: Please input int value')
+        exit()
 
     print('user name : ', end = '')
     user_name = input()
@@ -99,7 +107,7 @@ elif what_i_do == '7':
     if what_i_do == '1':
         hashed = hashlib.sha256(bytes(user_pw, 'utf-8')).hexdigest()
     elif what_i_do == '2':
-        hashed = sha3.sha3_256(bytes(user_pw, 'utf-8')).hexdigest()
+        hashed = sha3_256(bytes(user_pw, 'utf-8')).hexdigest()
     elif what_i_do == '3':
         hashed = bcrypt.hashpw(bytes(user_pw, 'utf-8'), bcrypt.gensalt()).decode()
        
