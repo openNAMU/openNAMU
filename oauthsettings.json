@@ -1,7 +1,7 @@
 {
     "_README" : {
-        "en" : "To use the oauth login feature, you must set the 'publish_url' value to a domain address that includes the https protocol, and actually support https connections.",
-        "ko" : "oauth 로그인 기능을 사용하려면 'publish_url'값을 https 프로토콜을 포함한 도메인 주소로 설정하고, 실제로 https 연결을 지원해야합니다.",
+        "en" : "To use the oAuth login feature, you must set the 'publish_url' value to a domain address that includes the HTTPS protocol, and actually support HTTPS connections.",
+        "ko" : "oAuth 로그인 기능을 사용하려면 'publish_url' 값을 HTTPS 프로토콜을 포함한 도메인 주소로 설정하고, 실제로 HTTPS 연결을 지원해야 합니다.",
         "support" : ["facebook", "naver"]
     },
     "publish_url" : "https://",
