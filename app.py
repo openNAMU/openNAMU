@@ -1376,10 +1376,12 @@ def oauth_settings():
 
             body_content += '''
                             <input id="{}_client_{}" type="checkbox">
-                            <input placeholder="{}_client_{}" name="{}_client_{}" value="{}" type="text" style="width: 80%;">
+                            <input placeholder="{}_client_{}" id="{}_client_{}" name="{}_client_{}" value="{}" type="text" style="width: 80%;">
                             <hr>
                             '''.format(
                                 oauth_supported[i],
+                                load_target, 
+                                oauth_supported[i], 
                                 load_target, 
                                 oauth_supported[i], 
                                 load_target, 
