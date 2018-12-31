@@ -1318,10 +1318,50 @@ def now_update():
         menu = [['manager/1', load_lang('admin')]]
     ))
 
-@app.route('/oauth_settings')
+@app.route('/oauth_settings', methods=['GET', 'POST'])
 def oauth_settings():
     if admin_check(None, 'oauth_settings') != 1:
         return re_error('/error/3')
+
+    if flask.request.method == 'POST':
+        try:
+            facebook_client_id = flask.request.form['facebook_client_id']
+            facebook_client_secret = flask.request.form['facebook_client_secret']
+            naver_client_id = flask.request.form['naver_client_id']
+            naver_client_secret = flask.request.form['naver_client_secret']
+        except:
+            return easy_minify(flask.render_template(skin_check(),
+                imp = [load_lang('inter_error'), wiki_set(), custom(), other2([0, 0])],
+                data =  '''
+                        <p>''' + load_lang('inter_error_detail') + '''</p>
+                        <hr>
+                        <code>ie_no_data_required</code>
+                        <p>''' + load_lang('ie_no_data_required') + '''</p>
+                        ''',
+                menu = [['other', load_lang('other')]]
+            ))
+        with open('oauthsettings.json', 'r', encoding='utf-8') as f:
+            legacy = json.loads(f.read())
+        with open('oauthsettings.json', 'w', encoding='utf-8') as f:
+            f.write(
+"""{
+    "_README" : {
+        "en" : \"""" + legacy['_README']['en'] + """\",
+        "ko" : \"""" + legacy['_README']['ko'] + """\",
+        "support" : """ + str(legacy['_README']['support']).replace("'", '"') + """
+    },
+    "publish_url" : \"""" + legacy['publish_url'] + """\",
+    "facebook" : {
+        "client_id" : \"""" + facebook_client_id + """\",
+        "client_secret" : \"""" + facebook_client_secret + """\"
+    },
+    "naver" : {
+        "client_id" : \"""" + naver_client_id + """\",
+        "client_secret" : \"""" + naver_client_secret + """\"
+    }
+}"""
+            )
+        return flask.redirect('/oauth_settings')
 
     oauth_supported = load_oauth('_README')['support']
     body_content = '<form method="post">'
