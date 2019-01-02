@@ -1,6 +1,7 @@
 openNAMU
 ====
-![Python 3.5 이상 필요](https://img.shields.io/badge/python-%3E%3D%203.5-blue.svg)
+[![Python 3.5 이상의 버전 필요](https://img.shields.io/badge/python-3.5%20or%20higher-blue.svg)](https://python.org)
+[![라이선스](https://img.shields.io/badge/license-BSD%203--Clause-lightgrey.svg)](./LICENSE)
 
 ![](./logo.png)
 
