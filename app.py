@@ -1377,7 +1377,6 @@ def oauth_settings():
     </script>'''
     body_content += '<form method="post">'
 
-    onload = ''
     for i in range(len(oauth_supported)):
         oauth_data = load_oauth(oauth_supported[i])
         for j in range(2):
@@ -1386,19 +1385,13 @@ def oauth_settings():
             elif j == 1:
                 load_target = 'secret'
 
-            if oauth_data['client_{}'.format(load_target)] == '':
-                checked = ''
-            else:
-                checked = 'checked'
-
             body_content += '''
-                            <input id="{}_client_{}_box" type="checkbox" {} disabled>
+                            <input id="{}_client_{}_box" type="checkbox" disabled>
                             <input placeholder="{}_client_{}" id="{}_client_{}" name="{}_client_{}" value="{}" type="text" onChange="check_value(this)" style="width: 80%;">
                             <hr>
                             '''.format(
                                 oauth_supported[i],
                                 load_target,
-                                checked,
                                 oauth_supported[i], 
                                 load_target, 
                                 oauth_supported[i], 
@@ -1407,10 +1400,8 @@ def oauth_settings():
                                 load_target, 
                                 oauth_data['client_{}'.format(load_target)]
                             )
-            onload += 'check_value(document.getElementById(\'{}_client_{}\'));'.format(oauth_supported[i],load_target)
     
     body_content += '<button id="save" type="submit">' + load_lang('save') + '</button></form>'
-    body_content = body_content.replace('%_onload_%', onload)
     
     return easy_minify(flask.render_template(skin_check(),
         imp = [load_lang('oauth_settings'), wiki_set(), custom(), other2([0, 0])],
