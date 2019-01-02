@@ -6,7 +6,7 @@
 
 openNAMU is a Python-based wiki engine. You can use openNAMU by installing Python and its dependency modules, and you can modify the code yourself to create more specialized wikis.
 
- * [(README for korean)](./readme-ko.md)
+ * [(README for Korean)](./readme-ko.md)
 
 ### Index
  * [Getting Started](#getting-started)
@@ -17,6 +17,18 @@ openNAMU is a Python-based wiki engine. You can use openNAMU by installing Pytho
  * [Etc.](#etc)
 
 # Getting Started
+openNAMU is based upon Python, and it requires a Python environment.
+
+## Set-Ups
+### Install Python
+See [Python Installation Guide(KR)](https://github.com/404-sdok/how-to-python/blob/master/0.md).
+
+### Download Releases
+Download the [release version of openNAMU](https://github.com/2du/openNAMU/releases), and unzip the file. It is also possible to download releases by [cloning this repository](#Clone).
+
+## Install Modules
+
+## Launching the application
 
 # Clone
 You can clone this repository by entering the following command at the terminal (command prompt):
