@@ -27,9 +27,28 @@ See [Python Installation Guide(KR)](https://github.com/404-sdok/how-to-python/bl
 ### Download Releases
 Download the [release version of openNAMU](https://github.com/2du/openNAMU/releases), and unzip the file. It is also possible to download releases by [cloning this repository](#Clone).
 
-## Install Modules
+### Install Modules
+Windows
+```
+pip install -r requirements.txt
+```
 
-## Launching the application
+Linux
+```
+pip3 install -r requirements.txt
+```
+## Launching Application
+Windows
+```
+python app.py
+```
+
+Linux
+```
+python3 app.py
+```
+
+## Publishing Application
 
 # Clone
 You can clone this repository by entering the following command at the terminal (command prompt):
