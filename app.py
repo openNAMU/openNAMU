@@ -1375,6 +1375,8 @@ def oauth_settings():
             target_box.checked = false;
         } }
     </script>'''
+
+    init_js = ''
     body_content += '<form method="post">'
 
     for i in range(len(oauth_supported)):
@@ -1384,6 +1386,8 @@ def oauth_settings():
                 load_target = 'id'
             elif j == 1:
                 load_target = 'secret'
+
+            init_js += 'check_value(document.getElementById("{}_client_{}"));'.format(oauth_supported[i], load_target)
 
             body_content += '''
                             <input id="{}_client_{}_box" type="checkbox" disabled>
@@ -1402,6 +1406,7 @@ def oauth_settings():
                             )
     
     body_content += '<button id="save" type="submit">' + load_lang('save') + '</button></form>'
+    body_content += '<script>' + init_js + '</script>'
     
     return easy_minify(flask.render_template(skin_check(),
         imp = [load_lang('oauth_settings'), wiki_set(), custom(), other2([0, 0])],
