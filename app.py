@@ -3173,10 +3173,10 @@ def change_password():
             oauth_provider = load_oauth('_README')['support']
             oauth_content = '<ul>'
             for i in range(len(oauth_provider)):
-                curs.execute('select * from oauth_conn where wiki_id = ? and provider = ?', [flask.session['id'], oauth_provider[i]])
+                curs.execute('select name, picture from oauth_conn where wiki_id = ? and provider = ?', [flask.session['id'], oauth_provider[i]])
                 oauth_data = curs.fetchall()
                 if len(oauth_data) == 1:
-                    oauth_content += '<li>{} - {}</li>'.format(oauth_provider[i], load_lang('connection') + load_lang('oauth_conn_done') + ': <img src="{}" width="17px" height="17px">{}'.format(oauth_data[0][5], oauth_data[0][4]))
+                    oauth_content += '<li>{} - {}</li>'.format(oauth_provider[i], load_lang('connection') + load_lang('oauth_conn_done') + ': <img src="{}" width="17px" height="17px">{}'.format(oauth_data[0][1], oauth_data[0][0]))
                 else:
                     oauth_content += '<li>{} - {}</li>'.format(oauth_provider[i], load_lang('connection') + load_lang('oauth_conn_not') + '. <a href="/oauth/{}/init">{}</a>'.format(oauth_provider[i], load_lang('oauth_conn_new')))
             
