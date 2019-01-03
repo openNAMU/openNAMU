@@ -77,7 +77,7 @@ python3 app.py
 [Pull Request 생성하기](https://github.com/2du/openNAMU/compare)
 
 # 라이선스
-opennamu 프로젝트는 [BSD 3-Clause License](./LICENSE)(이하 BSD-3 라이선스)의 보호를 받고 있으며, opennamu 프로젝트를 사용하고자 한다면 BSD-3 라이선스를 준수해야 합니다. 본 라이선스를 위반할 경우 개발자는 DMCA Takedown 등 관련 제재를 관계자에게 요청할 권리가 있으며, 그 책임은 모두 라이선스 위반 사용자에게 있습니다. 자세한 내용은 문서를 참고하세요.
+openNAMU 프로젝트는 [BSD 3-Clause License](./LICENSE)(이하 BSD-3 라이선스)의 보호를 받고 있으며, openNAMU 프로젝트를 사용하고자 한다면 BSD-3 라이선스를 준수해야 합니다. 본 라이선스를 위반할 경우 개발자는 DMCA Takedown 등 관련 제재를 관계자에게 요청할 권리가 있으며, 그 책임은 모두 라이선스 위반 사용자에게 있습니다. 자세한 내용은 문서를 참고하세요.
 
 ## 포함된 외부 프로젝트
  * Quotes icon - [Dave Gandy](http://www.flaticon.com/free-icon/quote-left_25672) - CC 3.0 BY
