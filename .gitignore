@@ -1,6 +1,7 @@
 set.json
 
 set_mark/__pycache__
+views/__pycache__
 /__pycache__
 /app_session
 .vscode
