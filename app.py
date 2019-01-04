@@ -14,6 +14,7 @@ import logging
 import random
 
 from func import *
+from views.easter_egg import *
 
 r_ver = 'v3.0.8-master-100'
 c_ver = ''.join(re.findall('[0-9]', r_ver))
@@ -4714,6 +4715,10 @@ def main_file(data = None):
         return flask.send_from_directory('./', data)
     else:
         return redirect('/w/' + url_pas(wiki_set(2)))
+
+@app.route('/request/egg')
+def request_egg():
+    return easter_egg[random.randint(0, len(easter_egg) - 1)]
 
 @app.errorhandler(404)
 def error_404(e):
