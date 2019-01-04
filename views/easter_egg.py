@@ -8,9 +8,6 @@ easter_egg = [
 </div>
 """,
 """
-<iframe width="560" height="315" src="https://www.youtube.com/embed/Y0xMbCp8t4s?autoplay=1" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-""",
-"""
 <iframe width="560" height="315" src="https://www.youtube.com/embed/qnYWeY6aybg?autoplay=1&start=97" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 <br>
 <br>
