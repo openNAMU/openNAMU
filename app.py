@@ -271,6 +271,11 @@ if not adsense_result:
     curs.execute('insert into other (name, data) values ("adsense", "False")')
     curs.execute('insert into other (name, data) values ("adsense_code", "")')
 
+curs.execute('select data from other where name = "easter_egg"')
+sc_egg_result = curs.fetchall()
+if not sc_egg_result:
+    curs.execute('insert into other (name, data) values ("easter_egg", "True")')
+
 ask_this = [[['markup', 'markup'], ['namumark']], [['encryption method', 'encode'], ['sha256', 'sha3', 'bcrypt']]]
 for ask_data in ask_this:
     curs.execute('select data from other where name = ?', [ask_data[0][1]])
@@ -2305,6 +2310,31 @@ def manager(num = 1):
         return easy_minify(flask.render_template(skin_check(), 
             imp = [load_lang('admin') + ' ' + load_lang('tool'), wiki_set(), custom(), other2([0, 0])],
             data =  '''
+                    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script></head>
+                    <script>
+                    function config_easter_egg (target) {
+                        if (target.checked === true) {
+                            console.log('okay')
+                        }
+                        else {
+                            console.log('fucku')
+                        }
+                        
+                        $.ajax({
+                            type: 'POST',
+                            url : '/request/scrambled_eggs',
+                            data : {"config_easter_egg" : "True"},
+                            contentType : 'application/json',
+                            dataType : 'json',
+                            success : function(data) {
+                                console.log(data)
+                            },
+                            error : function(e) {
+                                console.log(e.responseText)
+                            }
+                        })
+                    }
+                    </script>
                     <h2>''' + load_lang('admin') + '''</h2>
                     <ul>
                         <li><a href="/manager/2">''' + load_lang('document') + ''' acl</a></li>
@@ -2319,7 +2349,7 @@ def manager(num = 1):
                         <li><a href="/manager/8">''' + load_lang('admin_group') + ' ' + load_lang('create') + '''</a></li>
                         <li><a href="/setting">''' + load_lang('setting') + ' ' + load_lang('edit') + '''</a></li>
                     </ul>
-                    <h3>''' + load_lang('filter') + '''</h3>
+                    <h2>''' + load_lang('filter') + '''</h2>
                     <ul>
                         <li><a href="/inter_wiki">''' + load_lang('interwiki') + '''</a></li>
                         <li><a href="/html_filter">html ''' + load_lang('filter') + '''</a></li>
@@ -2334,6 +2364,10 @@ def manager(num = 1):
                         <li><a href="/update">''' + load_lang('update') + '''</a></li>
                         <li><a href="/oauth_settings">''' + load_lang('oauth_settings') + '''</a></li>
                         <li><a href="/adsense_settings">''' + load_lang('adsense') + ' ' + load_lang('setting') + '''</a></li>
+                    </ul>
+                    <h2>''' + load_lang('other') + '''</h2>
+                    <ul>
+                        <li><label for="enable_easter_egg"><input type="checkbox" id="enable_easter_egg" name="enable_easter_egg" onChange="config_easter_egg(this)">이스터에그 활성화</label</li>
                     </ul>
                     ''',
             menu = [['other', load_lang('other')]]
@@ -4719,6 +4753,30 @@ def main_file(data = None):
 @app.route('/request/egg')
 def request_egg():
     return easter_egg[random.randint(0, len(easter_egg) - 1)]
+
+@app.route('/request/scrambled_eggs', methods=['POST'])
+def request_sc_egg():
+    #if admin_check(None, 'update') != 1:
+    #   return '{"request" : "err", "err_code" : "err_authority_not_enough"}'
+
+    #req = flask.request.form
+    #print(req)
+    #config = bool(flask.request.form.getlist('config_easter_egg'))
+
+    #curs.execute('update other set data = ? where name = "easter_egg"', [str(config)])
+    #conn.commit()
+
+    print(flask.request.headers['Content-Type'])
+    if flask.request.headers['Content-Type'] == 'application/json':
+        print(flask.request)
+        #print(flask.request.json())
+        print(flask.request.form.get('config_easter_egg'))
+
+    config = "True"
+    data = {'request' : "success", 'now' : config}
+    return str(data)
+    #else:
+    #    return '{"request" : "err", "err_code" : "err_no_data_required"}'
 
 @app.errorhandler(404)
 def error_404(e):

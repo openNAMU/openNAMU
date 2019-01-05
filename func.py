@@ -395,6 +395,26 @@ def wiki_set(num = 1):
         else:
             data_list += ['']
 
+        curs.execute("select data from other where name = 'easter_egg'")
+        db_data = curs.fetchall()
+        if db_data:
+            data_list[5] += '''
+            <script>
+            easter_count = 0;
+
+            let log = document.getElementById('bottom_main');
+            document.onclick = easter;
+
+            function easter(e) {
+                easter_count++;
+                if (easter_count > 3) {
+                    console.log('easteregg')
+                }
+            }
+            </script>
+            '''
+
+        print(data_list)
         return data_list
 
     if num == 2:
