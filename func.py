@@ -399,6 +399,8 @@ def wiki_set(num = 1):
         db_data = curs.fetchall()
         if db_data:
             data_list[5] += '''
+            <link rel="stylesheet" href="/views/main_css/egg.css">
+            <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script></head>
             <script>
             easter_count = 0;
 
@@ -408,13 +410,33 @@ def wiki_set(num = 1):
             function easter(e) {
                 easter_count++;
                 if (easter_count > 3) {
-                    console.log('easteregg')
+                    data = get_egg();
+                    console.log(data);
+                    egg_overlay = document.getElementById('egg');
+                    egg.innerHTML = data;
+                    egg.style.display = 'block';
                 }
             }
+
+            function get_egg(e) {
+                $.ajax({
+                    type: 'GET',
+                    url : '/request/egg',
+                    dataType : 'text',
+                    success : function(e) {
+                        return e.responseText;
+                    },
+                    error : function(e) {
+                        return e.responseText;
+                    }
+                })
+            }
             </script>
+
+            <div id="egg">
+            </div>
             '''
 
-        print(data_list)
         return data_list
 
     if num == 2:
