@@ -2310,7 +2310,6 @@ def manager(num = 1):
         return easy_minify(flask.render_template(skin_check(), 
             imp = [load_lang('admin') + ' ' + load_lang('tool'), wiki_set(), custom(), other2([0, 0])],
             data =  '''
-                    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script></head>
                     <script>
                     function config_easter_egg (target) {
                         if (target.checked === true) {
