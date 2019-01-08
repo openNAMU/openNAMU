@@ -394,49 +394,6 @@ def wiki_set(num = 1):
             data_list += [db_data[0][0]]
         else:
             data_list += ['']
-
-        curs.execute("select data from other where name = 'easter_egg'")
-        db_data = curs.fetchall()
-        if db_data:
-            data_list[5] += '''
-            <link rel="stylesheet" href="/views/main_css/egg.css">
-            <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script></head>
-            <script>
-            easter_count = 0;
-
-            let log = document.getElementById('bottom_main');
-            document.onclick = easter;
-
-            function easter(e) {
-                easter_count++;
-                if (easter_count > 3) {
-                    data = get_egg();
-                    console.log(data);
-                    egg_overlay = document.getElementById('egg');
-                    egg.innerHTML = data;
-                    egg.style.display = 'block';
-                }
-            }
-
-            function get_egg(e) {
-                $.ajax({
-                    type: 'GET',
-                    url : '/request/egg',
-                    dataType : 'text',
-                    success : function(e) {
-                        return e.responseText;
-                    },
-                    error : function(e) {
-                        return e.responseText;
-                    }
-                })
-            }
-            </script>
-
-            <div id="egg">
-            </div>
-            '''
-
         return data_list
 
     if num == 2:
@@ -453,6 +410,52 @@ def wiki_set(num = 1):
         return db_data[0][0]
     else:
         return var_data
+
+def load_script():
+    script = []
+    script += [''] # script[0] = head(top)
+    curs.execute("select data from other where name = 'easter_egg'")
+    db_data = curs.fetchall()
+    if db_data[0][0] == 'True':
+        script += ['''
+        <link rel="stylesheet" href="/views/main_css/egg.css">
+        <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+        <script>
+        var easter_count = 0;
+        let log = document.getElementById('bottom_main');
+        document.getElementById('bottom_main').onclick = function() {
+            easter_count++;
+            if (easter_count > 3) {
+                data = get_egg();
+                console.log(data);
+                egg_overlay = document.getElementById('egg');
+                egg.innerHTML = data;
+                egg.style.display = 'block';
+            }
+        };
+        function get_egg(e) {
+            $.ajax({
+                type: 'GET',
+                url : '/request/egg',
+                dataType : 'text',
+                success : function(e) {
+                    return e.responseText
+                    },
+                error : function(e) {
+                    return e.responseText
+                }
+            });
+        }
+        </script>
+
+        <div id="egg">
+        </div>
+        ''']
+        # script[1] = on the </body>(bottom)
+    else:
+        script[1] += ['']
+    return script
+
 
 def diff(seqm):
     output = []
