@@ -9,6 +9,7 @@ set_mark/__pycache__
 image
 robots.txt
 
+views/__pycache__
 views/liberty
 views/yousoro
 views/super_lite
