@@ -14,6 +14,7 @@ import logging
 import random
 
 from func import *
+from views.easter_egg import *
 
 r_ver = 'v3.0.8-master-100'
 c_ver = ''.join(re.findall('[0-9]', r_ver))
