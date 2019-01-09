@@ -15,6 +15,14 @@ easter_egg = [
     사람들은 알수 있어 누가 착한지 나쁜지
 </div>
 """,
+"""
+<iframe width="560" height="315" src="https://www.youtube.com/embed/oIa3BFBHJFI?autoplay=1&loop=1" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<br>
+<br>
+<div>
+    @(^0^)==@태보는 지금 전 세계적으로 선풍적인 인기를 끌고 있는데요!!!!!!!!!!!@==(^0^)@
+</div>
+""",
 """<iframe width="560" height="315" src="https://www.youtube.com/embed/kxopViU98Xo?autoplay=1" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>""",
 """<iframe width="560" height="315" src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>"""
 ]
