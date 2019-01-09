@@ -270,6 +270,11 @@ if not adsense_result:
     curs.execute('insert into other (name, data) values ("adsense", "False")')
     curs.execute('insert into other (name, data) values ("adsense_code", "")')
 
+curs.execute('select data from other where name = "easter_egg"')
+sc_egg_result = curs.fetchall()
+if not sc_egg_result:
+    curs.execute('insert into other (name, data) values ("easter_egg", "True")')
+
 ask_this = [[['markup', 'markup'], ['namumark']], [['encryption method', 'encode'], ['sha256', 'sha3', 'bcrypt']]]
 for ask_data in ask_this:
     curs.execute('select data from other where name = ?', [ask_data[0][1]])
@@ -351,7 +356,8 @@ def alarm():
     return easy_minify(flask.render_template(skin_check(), 
         imp = [load_lang('alarm'), wiki_set(), custom(), other2([0, 0])],
         data = data,
-        menu = [['user', load_lang('user')]]
+        menu = [['user', load_lang('user')]],
+        script = load_script()
     ))
 
 @app.route('/<regex("inter_wiki|(?:edit|email|name)_filter"):tools>')
@@ -424,7 +430,8 @@ def inter_wiki(tools = None):
     return easy_minify(flask.render_template(skin_check(), 
         imp = [title, wiki_set(), custom(), other2([0, 0])],
         data = div,
-        menu = [['other', load_lang('other')]]
+        menu = [['other', load_lang('other')]],
+        script = load_script()
     ))
 
 @app.route('/<regex("del_(?:inter_wiki|(?:edit|email|name)_filter)"):tools>/<name>')
@@ -533,7 +540,8 @@ def plus_inter(tools = None, name = None):
                         <button ''' + stat + ''' type="submit">''' + load_lang('plus') + '''</button>
                     </form>
                     ''',
-            menu = [['other', load_lang('other')], [re.sub('^plus_', '', tools), load_lang('list')]]
+            menu = [['other', load_lang('other')], [re.sub('^plus_', '', tools), load_lang('list')]],
+            script = load_script()
         ))
 
 @app.route('/setting')
@@ -556,7 +564,8 @@ def setting(num = 0):
         return easy_minify(flask.render_template(skin_check(), 
             imp = [load_lang('setting'), wiki_set(), custom(), other2([0, 0])],
             data = '<h2>' + load_lang('list') + '</h2><ul>' + li_data + '</ul>',
-            menu = [['manager', load_lang('admin')]]
+            menu = [['manager', load_lang('admin')]],
+            script = load_script()
         ))
     elif num == 1:
         i_list = ['name', 'logo', 'frontpage', 'license', 'upload', 'skin', 'edit', 'reg', 'ip_view', 'back_up', 'port', 'key', 'update', 'email_have', 'discussion', 'encode', 'host']
@@ -721,7 +730,8 @@ def setting(num = 0):
                             <button id="save" type="submit">''' + load_lang('save') + '''</button>
                         </form>
                         ''',
-                menu = [['setting', load_lang('setting')]]
+                menu = [['setting', load_lang('setting')]],
+                script = load_script()
             ))
     elif num == 2:
         if flask.request.method == 'POST':
@@ -770,7 +780,8 @@ def setting(num = 0):
                             <button id="save" type="submit">''' + load_lang('save') + '''</button>
                         </form>
                         ''',
-                menu = [['setting', load_lang('setting')]]
+                menu = [['setting', load_lang('setting')]],
+                script = load_script()
             ))
     elif num == 3 or num == 4:
         if flask.request.method == 'POST':
@@ -815,7 +826,8 @@ def setting(num = 0):
                             <button id="save" type="submit">''' + load_lang('save') + '''</button>
                         </form>
                         ''',
-                menu = [['setting', load_lang('setting')]]
+                menu = [['setting', load_lang('setting')]],
+                script = load_script()
             ))
     elif num == 5:
         if flask.request.method == 'POST':
@@ -860,7 +872,8 @@ def setting(num = 0):
                             <button id="save" type="submit">''' + load_lang('save') + '''</button>
                         </form>
                         ''',
-                menu = [['setting', load_lang('setting')]]
+                menu = [['setting', load_lang('setting')]],
+                script = load_script()
             ))
     elif num == 6:
         i_list = ['recaptcha', 'sec_re', 'g_email', 'g_pass']
@@ -923,7 +936,8 @@ def setting(num = 0):
                             <button id="save" type="submit">''' + load_lang('save') + '''</button>
                         </form>
                         ''',
-                menu = [['setting', load_lang('setting')]]
+                menu = [['setting', load_lang('setting')]],
+                script = load_script()
             ))
     else:
         return redirect('/')
@@ -942,7 +956,8 @@ def not_close_topic():
     return easy_minify(flask.render_template(skin_check(), 
         imp = [load_lang('open') + ' ' + load_lang('discussion') + ' ' + load_lang('list'), wiki_set(), custom(), other2([0, 0])],
         data = div,
-        menu = [['manager', load_lang('admin')]]
+        menu = [['manager', load_lang('admin')]],
+        script = load_script()
     ))
 
 @app.route('/image/<name>')
@@ -994,7 +1009,8 @@ def acl_list():
     return easy_minify(flask.render_template(skin_check(), 
         imp = ['acl ' + load_lang('document') + ' ' + load_lang('list'), wiki_set(), custom(), other2([0, 0])],
         data = div,
-        menu = [['other', load_lang('other')]]
+        menu = [['other', load_lang('other')]],
+        script = load_script()
     ))
 
 @app.route('/admin_plus/<name>', methods=['POST', 'GET'])
@@ -1077,7 +1093,8 @@ def admin_plus(name = None):
                         <button id="save" ''' + state +  ''' type="submit">''' + load_lang('save') + '''</button>
                     </form>
                     ''',
-            menu = [['manager', load_lang('admin')]]
+            menu = [['manager', load_lang('admin')]],
+            script = load_script()
         ))        
         
 @app.route('/admin_list')
@@ -1098,7 +1115,8 @@ def admin_list():
     return easy_minify(flask.render_template(skin_check(), 
         imp = [load_lang('admin') + ' ' + load_lang('list'), wiki_set(), custom(), other2([0, 0])],
         data = div,
-        menu = [['other', load_lang('other')]]
+        menu = [['other', load_lang('other')]],
+        script = load_script()
     ))
         
 @app.route('/hidden/<everything:name>')
@@ -1168,7 +1186,8 @@ def user_log():
     return easy_minify(flask.render_template(skin_check(), 
         imp = [load_lang('recent') + ' ' + load_lang('subscriber'), wiki_set(), custom(), other2([0, 0])],
         data = list_data,
-        menu = 0
+        menu = 0,
+        script = load_script()
     ))
 
 @app.route('/admin_log')
@@ -1192,7 +1211,8 @@ def admin_log():
     return easy_minify(flask.render_template(skin_check(), 
         imp = [load_lang('recent') + ' ' + load_lang('authority'), wiki_set(), custom(), other2([0, 0])],
         data = list_data,
-        menu = 0
+        menu = 0,
+        script = load_script()
     ))
 
 @app.route('/give_log')
@@ -1212,7 +1232,8 @@ def give_log():
     return easy_minify(flask.render_template(skin_check(), 
         imp = [load_lang('admin_group') + ' ' + load_lang('list'), wiki_set(), custom(), other2([0, 0])],
         data = list_data,
-        menu = [['other', load_lang('other')]]
+        menu = [['other', load_lang('other')]],
+        script = load_script()
     ))
 
 @app.route('/indexing')
@@ -1270,7 +1291,8 @@ def restart():
                         <button type="submit">''' + load_lang('restart') + '''</button>
                     </form>
                     ''',
-            menu = [['manager', load_lang('admin')]]
+            menu = [['manager', load_lang('admin')]],
+            script = load_script()
         ))       
 
 @app.route('/update')
@@ -1315,7 +1337,8 @@ def now_update():
     return easy_minify(flask.render_template(skin_check(), 
         imp = [load_lang('update'), wiki_set(), custom(), other2([0, 0])],
         data = 'auto update is not support. <a href="https://github.com/2DU/opennamu">(github)</a>',
-        menu = [['manager/1', load_lang('admin')]]
+        menu = [['manager/1', load_lang('admin')]],
+        script = load_script()
     ))
 
 @app.route('/oauth_settings', methods=['GET', 'POST'])
@@ -1338,7 +1361,8 @@ def oauth_settings():
                         <code>ie_no_data_required</code>
                         <p>''' + load_lang('ie_no_data_required') + '''</p>
                         ''',
-                menu = [['other', load_lang('other')]]
+                menu = [['other', load_lang('other')]],
+                script = load_script()
             ))
         with open('oauthsettings.json', 'r', encoding='utf-8') as f:
             legacy = json.loads(f.read())
@@ -1411,7 +1435,8 @@ def oauth_settings():
     return easy_minify(flask.render_template(skin_check(),
         imp = [load_lang('oauth_settings'), wiki_set(), custom(), other2([0, 0])],
         data = body_content,
-        menu = [['other', load_lang('other')]]
+        menu = [['other', load_lang('other')]],
+        script = load_script()
     ))
 
 @app.route('/adsense_settings', methods=['GET', 'POST'])
@@ -1432,7 +1457,8 @@ def adsense_settings():
                         <code>ie_no_data_required</code>
                         <p>''' + load_lang('ie_no_data_required') + '''</p>
                         ''',
-                menu = [['other', load_lang('other')]]
+                menu = [['other', load_lang('other')]],
+                script = load_script()
             ))
         
         if adsense_enabled == 'on':
@@ -1480,7 +1506,8 @@ def adsense_settings():
     return easy_minify(flask.render_template(skin_check(),
         imp = [load_lang('adsense') + ' ' + load_lang('setting'), wiki_set(), custom(), other2([0, 0])],
         data = body_content,
-        menu = [['other', load_lang('other')]]
+        menu = [['other', load_lang('other')]],
+        script = load_script()
     ))
         
 @app.route('/xref/<everything:name>')
@@ -1513,7 +1540,8 @@ def xref(name = None):
     return easy_minify(flask.render_template(skin_check(), 
         imp = [name, wiki_set(), custom(), other2([' (' + load_lang('backlink') + ')', 0])],
         data = div,
-        menu = [['w/' + url_pas(name), load_lang('document')]]
+        menu = [['w/' + url_pas(name), load_lang('document')]],
+        script = load_script()
     ))
 
 @app.route('/please')
@@ -1540,7 +1568,8 @@ def please():
     return easy_minify(flask.render_template(skin_check(), 
         imp = [load_lang('need') + ' ' + load_lang('document'), wiki_set(), custom(), other2([0, 0])],
         data = div,
-        menu = [['other', load_lang('other')]]
+        menu = [['other', load_lang('other')]],
+        script = load_script()
     ))
         
 @app.route('/recent_discuss')
@@ -1582,7 +1611,8 @@ def recent_discuss():
     return easy_minify(flask.render_template(skin_check(), 
         imp = [load_lang('recent') + ' ' + load_lang('discussion'), wiki_set(), custom(), other2([m_sub, 0])],
         data = div,
-        menu = 0
+        menu = 0,
+        script = load_script()
     ))
 
 @app.route('/block_log')
@@ -1716,7 +1746,8 @@ def block_log(name = None, tool = None, tool2 = None):
     return easy_minify(flask.render_template(skin_check(), 
         imp = [load_lang('recent') + ' ' + load_lang('ban'), wiki_set(), custom(), other2([sub, 0])],
         data = div,
-        menu = menu
+        menu = menu,
+        script = load_script()
     ))
             
 @app.route('/search', methods=['POST'])
@@ -1782,7 +1813,8 @@ def deep_search(name = None):
     return easy_minify(flask.render_template(skin_check(), 
         imp = [name, wiki_set(), custom(), other2([' (' + load_lang('search') + ')', 0])],
         data = div,
-        menu = 0
+        menu = 0,
+        script = load_script()
     ))
          
 @app.route('/raw/<everything:name>')
@@ -1826,7 +1858,8 @@ def raw_view(name = None, sub_title = None, num = None):
         return easy_minify(flask.render_template(skin_check(), 
             imp = [v_name, wiki_set(), custom(), other2([sub, 0])],
             data = p_data,
-            menu = menu
+            menu = menu,
+            script = load_script()
         ))
     else:
         return redirect('/w/' + url_pas(name))
@@ -1903,7 +1936,8 @@ def revert(name = None):
                         <button type="submit">''' + load_lang('revert') + '''</button>
                     </form>
                     ''',
-            menu = [['history/' + url_pas(name), load_lang('history')], ['recent_changes', load_lang('recent') + ' ' + load_lang('change')]]
+            menu = [['history/' + url_pas(name), load_lang('history')], ['recent_changes', load_lang('recent') + ' ' + load_lang('change')]],
+            script = load_script()
         ))
 
 @app.route('/edit/<everything:name>', methods=['POST', 'GET'])
@@ -2019,7 +2053,8 @@ def edit(name = None):
                         <button id="preview" type="submit" formaction="/preview/''' + url_pas(name) + action + '">' + load_lang('preview') + '''</button>
                     </form>
                     ''',
-            menu = [['w/' + url_pas(name), load_lang('document')], ['delete/' + url_pas(name), load_lang('delete')], ['move/' + url_pas(name), load_lang('move')]]
+            menu = [['w/' + url_pas(name), load_lang('document')], ['delete/' + url_pas(name), load_lang('delete')], ['move/' + url_pas(name), load_lang('move')]],
+            script = load_script()
         ))
 
 @app.route('/preview/<everything:name>', methods=['POST'])
@@ -2058,7 +2093,8 @@ def preview(name = None):
                 </form>
                 <hr class=\"main_hr\">
                 ''' + end_data,
-        menu = [['w/' + url_pas(name), load_lang('document')]]
+        menu = [['w/' + url_pas(name), load_lang('document')]],
+        script = load_script()
     ))
         
 @app.route('/delete/<everything:name>', methods=['POST', 'GET'])
@@ -2113,7 +2149,8 @@ def delete(name = None):
                         <button type="submit">''' + load_lang('delete') + '''</button>
                     </form>
                     ''',
-            menu = [['w/' + url_pas(name), load_lang('document')]]
+            menu = [['w/' + url_pas(name), load_lang('document')]],
+            script = load_script()
         ))            
             
 @app.route('/move_data/<everything:name>')
@@ -2136,7 +2173,8 @@ def move_data(name = None):
     return easy_minify(flask.render_template(skin_check(), 
         imp = [name, wiki_set(), custom(), other2([' (' + load_lang('move') + ' ' + load_lang('history') + ')', 0])],
         data = data,
-        menu = [['history/' + url_pas(name), load_lang('history')]]
+        menu = [['history/' + url_pas(name), load_lang('history')]],
+        script = load_script()
     ))        
             
 @app.route('/move/<everything:name>', methods=['POST', 'GET'])
@@ -2237,7 +2275,8 @@ def move(name = None):
                         <button type="submit">''' + load_lang('move') + '''</button>
                     </form>
                     ''',
-            menu = [['w/' + url_pas(name), load_lang('document')]]
+            menu = [['w/' + url_pas(name), load_lang('document')]],
+            script = load_script()
         ))
             
 @app.route('/other')
@@ -2277,7 +2316,8 @@ def other():
                     <li>''' + load_lang('normal_version') + ' : <a id="out_link" href="https://github.com/2DU/opennamu/blob/master/version.md">' + r_ver + '''</a></li>
                 </ul>
                 ''',
-    menu = 0
+    menu = 0,
+    script = load_script()
     ))
     
 @app.route('/manager', methods=['POST', 'GET'])
@@ -2335,7 +2375,8 @@ def manager(num = 1):
                         <li><a href="/adsense_settings">''' + load_lang('adsense') + ' ' + load_lang('setting') + '''</a></li>
                     </ul>
                     ''',
-            menu = [['other', load_lang('other')]]
+            menu = [['other', load_lang('other')]],
+            script = load_script()
         ))
     elif not num - 1 > len(title_list):
         if flask.request.method == 'POST':
@@ -2358,7 +2399,8 @@ def manager(num = 1):
                             <button type="submit">''' + load_lang('move') + '''</button>
                         </form>
                         ''',
-                menu = [['manager', load_lang('admin')]]
+                menu = [['manager', load_lang('admin')]],
+                script = load_script()
             ))
     else:
         return redirect('/')
@@ -2430,7 +2472,8 @@ def title_index():
     return easy_minify(flask.render_template(skin_check(), 
         imp = [load_lang('all') + ' ' + load_lang('document'), wiki_set(), custom(), other2([sub, 0])],
         data = data,
-        menu = [['other', load_lang('other')]]
+        menu = [['other', load_lang('other')]],
+        script = load_script()
     ))
         
 @app.route('/topic/<everything:name>/sub/<sub>/b/<int:num>')
@@ -2598,7 +2641,8 @@ def topic_admin(name = None, sub = None, num = None):
     return easy_minify(flask.render_template(skin_check(), 
         imp = [load_lang('discussion') + ' ' + load_lang('tool'), wiki_set(), custom(), other2([' (' + str(num) + ')', 0])],
         data = ban,
-        menu = [['topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '#' + str(num), load_lang('discussion')]]
+        menu = [['topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '#' + str(num), load_lang('discussion')]],
+        script = load_script()
     ))
 
 @app.route('/topic/<everything:name>/sub/<sub>', methods=['POST', 'GET'])
@@ -2797,7 +2841,8 @@ def topic(name = None, sub = None):
         return easy_minify(flask.render_template(skin_check(), 
             imp = [name, wiki_set(), custom(), other2([' (' + load_lang('discussion') + ')', 0])],
             data = '<h2 id="topic_top_title">' + sub + '</h2>' + all_data + data,
-            menu = [['topic/' + url_pas(name), load_lang('list')]]
+            menu = [['topic/' + url_pas(name), load_lang('list')]],
+            script = load_script()
         ))
 
 @app.route('/tool/<name>')
@@ -2827,7 +2872,8 @@ def user_tool(name = None):
     return easy_minify(flask.render_template(skin_check(), 
         imp = [name, wiki_set(), custom(), other2([' (' + load_lang('tool') + ')', 0])],
         data = data,
-        menu = [['topic/' + url_pas(name), load_lang('list')]]
+        menu = [['topic/' + url_pas(name), load_lang('list')]],
+        script = load_script()
     ))
         
 @app.route('/topic/<everything:name>', methods=['POST', 'GET'])
@@ -2895,7 +2941,8 @@ def close_topic_list(name = None, tool = None):
         return easy_minify(flask.render_template(skin_check(), 
             imp = [name, wiki_set(), custom(), other2([' (' + sub + ')', 0])],
             data =  '<form method="post">' + div + plus + '</form>',
-            menu = menu
+            menu = menu,
+            script = load_script()
         ))
         
 @app.route('/login', methods=['POST', 'GET'])
@@ -2984,7 +3031,8 @@ def login():
                         <span>''' + load_lang('http_warring') + '''</span>
                     </form>
                     ''',
-            menu = [['user', load_lang('user')]]
+            menu = [['user', load_lang('user')]],
+            script = load_script()
         ))
 
 @app.route('/oauth/<regex("naver|facebook"):platform>/<regex("init|callback"):func>', methods=['GET', 'POST'])
@@ -3013,13 +3061,15 @@ def login_oauth(platform = None, func = None):
             return easy_minify(flask.render_template(skin_check(), 
                 imp = [load_lang('login'), wiki_set(), custom(), other2([0, 0])], 
                 data = load_lang('oauth_disabled'), 
-                menu = [['user', load_lang('user')]]
+                menu = [['user', load_lang('user')]],
+                script = load_script()
             ))
         elif publish_url == 'https://':
             return easy_minify(flask.render_template(skin_check(), 
                 imp = [load_lang('login'), wiki_set(), custom(), other2([0, 0])], 
                 data = load_lang('oauth_settings_not_found'), 
-                menu = [['user', load_lang('user')]]
+                menu = [['user', load_lang('user')]],
+                script = load_script()
             ))
 
         referrer_re = re.compile(r'(?P<host>^(https?):\/\/([^\/]+))\/(?P<refer>[^\/?]+)')
@@ -3051,7 +3101,8 @@ def login_oauth(platform = None, func = None):
                         <code>ie_wrong_callback</code>
                         <p>''' + load_lang('ie_wrong_callback') + '''</p>
                         ''',
-                menu = [['user', load_lang('user')]]
+                menu = [['user', load_lang('user')]],
+                script = load_script()
             ))
 
         if platform == 'naver':
@@ -3214,7 +3265,8 @@ def change_password():
                             <span>''' + load_lang('http_warring') + '''</span>
                         </form>
                         ''',
-                menu = [['user', load_lang('user')]]
+                menu = [['user', load_lang('user')]],
+                script = load_script()
             ))
     else:
         pass
@@ -3306,7 +3358,8 @@ def user_check(name = None):
     return easy_minify(flask.render_template(skin_check(),    
         imp = [load_lang('check'), wiki_set(), custom(), other2([0, 0])],
         data = div,
-        menu = [['manager', load_lang('admin')]]
+        menu = [['manager', load_lang('admin')]],
+        script = load_script()
     ))
                 
 @app.route('/register', methods=['POST', 'GET'])
@@ -3413,7 +3466,8 @@ def register():
                         <span>''' + load_lang('http_warring') + '''</span>
                     </form>
                     ''',
-            menu = [['user', load_lang('user')]]
+            menu = [['user', load_lang('user')]],
+            script = load_script()
         ))
 
 @app.route('/<regex("need_email|pass_find"):tool>', methods=['POST', 'GET'])
@@ -3464,7 +3518,8 @@ def need_email(tool = 'pass_find'):
                             <button type="submit">''' + load_lang('save') + '''</button>
                         </form>
                         ''',
-                menu = [['user', load_lang('user')]]
+                menu = [['user', load_lang('user')]],
+                script = load_script()
             ))
         else:
             return easy_minify(flask.render_template(skin_check(),    
@@ -3478,7 +3533,8 @@ def need_email(tool = 'pass_find'):
                             <button type="submit">''' + load_lang('save') + '''</button>
                         </form>
                         ''',
-                menu = [['user', load_lang('user')]]
+                menu = [['user', load_lang('user')]],
+                script = load_script()
             ))
 
 @app.route('/<regex("check_key|check_pass_key"):tool>', methods=['POST', 'GET'])
@@ -3545,7 +3601,8 @@ def check_key(tool = 'check_pass_key'):
                             <br>
                             ''' + load_lang('password') + ' : ' + pw + '''
                             ''',
-                    menu = [['user', load_lang('user')]]
+                    menu = [['user', load_lang('user')]],
+                    script = load_script()
                 ))
             else:
                 return redirect('/pass_find')
@@ -3559,7 +3616,8 @@ def check_key(tool = 'check_pass_key'):
                         <button type="submit">''' + load_lang('save') + '''</button>
                     </form>
                     ''',
-            menu = [['user', load_lang('user')]]
+            menu = [['user', load_lang('user')]],
+            script = load_script()
         ))
            
 @app.route('/logout')
@@ -3646,7 +3704,8 @@ def user_ban(name = None):
                         <button type="submit">''' + now + '''</button>
                     </form>
                     ''',
-            menu = [['manager', load_lang('admin')]]
+            menu = [['manager', load_lang('admin')]],
+            script = load_script()
         ))            
                 
 @app.route('/acl/<everything:name>', methods=['POST', 'GET'])
@@ -3754,7 +3813,8 @@ def acl(name = None):
                         <button type="submit" ''' + check_ok + '''>acl ''' + load_lang('edit') + '''</button>
                     </form>
                     ''',
-            menu = [['w/' + url_pas(name), load_lang('document')], ['manager', load_lang('admin')]]
+            menu = [['w/' + url_pas(name), load_lang('document')], ['manager', load_lang('admin')]],
+            script = load_script()
         ))
             
 @app.route('/admin/<name>', methods=['POST', 'GET'])
@@ -3818,7 +3878,8 @@ def user_admin(name = None):
                         <button type="submit">''' + load_lang('edit') + '''</button>
                     </form>
                     ''',
-            menu = [['manager', load_lang('admin')]]
+            menu = [['manager', load_lang('admin')]],
+            script = load_script()
         ))
     
 @app.route('/diff/<everything:name>')
@@ -3844,7 +3905,8 @@ def diff_data(name = None):
             return easy_minify(flask.render_template(skin_check(), 
                 imp = [name, wiki_set(), custom(), other2([' (' + load_lang('compare') + ')', 0])],
                 data = '<pre>' + result + '</pre>',
-                menu = [['history/' + url_pas(name), load_lang('history')]]
+                menu = [['history/' + url_pas(name), load_lang('history')]],
+                script = load_script()
             ))
 
     return redirect('/history/' + url_pas(name))
@@ -3862,7 +3924,8 @@ def down(name = None):
     return easy_minify(flask.render_template(skin_check(), 
         imp = [name, wiki_set(), custom(), other2([' (' + load_lang('under') + ')', 0])],
         data = div,
-        menu = [['w/' + url_pas(name), load_lang('document')]]
+        menu = [['w/' + url_pas(name), load_lang('document')]],
+        script = load_script()
     ))
 
 @app.route('/w/<everything:name>')
@@ -4029,7 +4092,8 @@ def read_view(name = None):
     return easy_minify(flask.render_template(skin_check(), 
         imp = [flask.request.args.get('show', name), wiki_set(), custom(), other2([sub + acl, r_date])],
         data = div,
-        menu = menu
+        menu = menu,
+        script = load_script()
     )), response_data
 
 @app.route('/topic_record/<name>')
@@ -4082,7 +4146,8 @@ def user_topic_list(name = None):
     return easy_minify(flask.render_template(skin_check(), 
         imp = [load_lang('discussion') + ' ' + load_lang('record'), wiki_set(), custom(), other2([sub, 0])],
         data = div,
-        menu = [['other', load_lang('other')], ['user', load_lang('user')], ['count/' + url_pas(name), load_lang('count')], ['record/' + url_pas(name), load_lang('record')]]
+        menu = [['other', load_lang('other')], ['user', load_lang('user')], ['count/' + url_pas(name), load_lang('count')], ['record/' + url_pas(name), load_lang('record')]],
+        script = load_script()
     ))
 
 @app.route('/recent_changes')
@@ -4305,7 +4370,8 @@ def recent_changes(name = None, tool = 'record'):
         return easy_minify(flask.render_template(skin_check(), 
             imp = [title, wiki_set(), custom(), other2([sub, 0])],
             data = div,
-            menu = menu
+            menu = menu,
+            script = load_script()
         ))
     
 @app.route('/upload', methods=['GET', 'POST'])
@@ -4395,7 +4461,8 @@ def upload():
                         <button id="save" type="submit">''' + load_lang('save') + '''</button>
                     </form>
                     ''',
-            menu = [['other', load_lang('other')]]
+            menu = [['other', load_lang('other')]],
+            script = load_script()
         ))  
         
 @app.route('/user')
@@ -4494,7 +4561,8 @@ def user_info():
                 </li>
                 </ul>
                 ''',
-        menu = 0
+        menu = 0,
+        script = load_script()
     ))
 
 @app.route('/watch_list')
@@ -4517,7 +4585,8 @@ def watch_list():
     return easy_minify(flask.render_template(skin_check(), 
         imp = [load_lang('watchlist') + ' ' + load_lang('list'), wiki_set(), custom(), other2([0, 0])],
         data = div,
-        menu = [['manager', load_lang('admin')]]
+        menu = [['manager', load_lang('admin')]],
+        script = load_script()
     ))
 
 @app.route('/watch_list/<everything:name>')
@@ -4588,7 +4657,8 @@ def custom_head_view():
                         <button id="save" type="submit">''' + load_lang('save') + '''</button>
                     </form>
                     ''',
-            menu = [['user', load_lang('user')]]
+            menu = [['user', load_lang('user')]],
+            script = load_script()
         ))
 
 @app.route('/count')
@@ -4621,7 +4691,8 @@ def count_edit(name = None):
                     <li><a href="/topic_record/''' + url_pas(that) + '''">''' + load_lang('discussion') + '''</a> : ''' + str(t_data) + '''</a></li>
                 </ul>
                 ''',
-        menu = [['user', load_lang('user')]]
+        menu = [['user', load_lang('user')]],
+        script = load_script()
     ))
         
 @app.route('/random')
@@ -4714,6 +4785,10 @@ def main_file(data = None):
         return flask.send_from_directory('./', data)
     else:
         return redirect('/w/' + url_pas(wiki_set(2)))
+
+@app.route('/request/egg')
+def request_egg():
+    return easter_egg[random.randint(0, len(easter_egg) - 1)]
 
 @app.errorhandler(404)
 def error_404(e):
