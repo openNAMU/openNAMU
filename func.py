@@ -422,33 +422,31 @@ def load_script():
         <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
         <script>
         var easter_count = 0;
-        let log = document.getElementById('bottom_main');
         document.getElementById('bottom_main').onclick = function() {
             easter_count++;
             if (easter_count > 3) {
-                data = get_egg();
-                console.log(data);
-                egg_overlay = document.getElementById('egg');
-                egg.innerHTML = data;
-                egg.style.display = 'block';
+                $.get('/request/egg', function (data) {
+                    document.getElementById("egg_content").innerHTML = data;
+                });
+                document.getElementById("egg_container").style.display = 'block';
             }
         };
-        function get_egg(e) {
-            $.ajax({
-                type: 'GET',
-                url : '/request/egg',
-                dataType : 'text',
-                success : function(e) {
-                    return e.responseText
-                    },
-                error : function(e) {
-                    return e.responseText
-                }
-            });
+        </script>
+        <script>
+        function overlay_off() {
+            document.getElementById("egg_content").innerHTML = '';
+            document.getElementById("egg_container").style.display = "none";
         }
         </script>
 
-        <div id="egg">
+        <div id="egg_container">
+            <div id="egg_inner">
+                <div id="egg_close" onclick="overlay_off()">
+                    <i class="fas fa-times"></i>
+                </div>
+                <div id="egg_content">
+                </div>
+            </div>
         </div>
         ''']
         # script[1] = on the </body>(bottom)

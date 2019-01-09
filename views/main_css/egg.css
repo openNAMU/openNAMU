@@ -1,4 +1,4 @@
-#egg {
+#egg_container {
     position: fixed;
     display: none;
     width: 100%;
@@ -9,4 +9,29 @@
     bottom: 0;
     background-color: rgba(0,0,0,0.5);
     z-index: 2;
+}
+
+#egg_inner {
+    width: 50vw;
+    max-width: 620px;
+    max-height: 380px;
+    padding: 50px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    background-color: white;
+    border-radius: 10px;
+    transform: translate(-50%,-50%);
+    -ms-transform: translate(-50%,-50%);
+}
+
+#egg_content {
+    text-align: center;
+}
+
+#egg_close {
+    text-align: right;
+    margin: 0;
+    padding: 0;
+    padding-bottom: 10px;
 }
