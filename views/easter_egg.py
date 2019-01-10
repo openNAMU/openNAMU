@@ -26,3 +26,19 @@ easter_egg = [
 """<iframe width="560" height="315" src="https://www.youtube.com/embed/kxopViU98Xo?autoplay=1" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>""",
 """<iframe width="560" height="315" src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>"""
 ]
+
+easter_egg_config_js = '''
+<script>
+document.getElementById('enable-easter-egg').addEventListener("change", function() {
+    $.ajax({
+        type: "POST",
+        url: "/request/egg_config",
+        data: {request: "config", data: document.getElementById('enable-easter-egg').checked},
+        dataType: "json",
+        success: function (data) {
+            document.getElementById('easter-egg-status').innerHTML = '서버에 변경 사항이 저장되었습니다.';
+        }
+    });
+});
+</script>
+'''

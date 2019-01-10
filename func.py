@@ -413,45 +413,44 @@ def wiki_set(num = 1):
 
 def load_script():
     script = []
-    script += [''] # script[0] = head(top)
+    script += ['<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>'] # script[0] = head(top)
     curs.execute("select data from other where name = 'easter_egg'")
     db_data = curs.fetchall()
-    if db_data[0][0] == 'True':
-        script += ['''
-        <link rel="stylesheet" href="/views/main_css/egg.css">
-        <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-        <script>
-        var easter_count = 0;
-        document.getElementById('bottom_main').onclick = function() {
-            easter_count++;
-            if (easter_count > 3) {
-                $.get('/request/egg', function (data) {
-                    document.getElementById("egg_content").innerHTML = data;
-                });
-                document.getElementById("egg_container").style.display = 'block';
-            }
-        };
-        </script>
-        <script>
-        function overlay_off() {
-            document.getElementById("egg_content").innerHTML = '';
-            document.getElementById("egg_container").style.display = "none";
+    script += ['''
+    <link rel="stylesheet" href="/views/main_css/egg.css">
+    <script>
+    var easter_count = 0;
+    document.getElementById('bottom_main').onclick = function() {
+        easter_count++;
+        if (easter_count > 3) {
+            $.get('/request/egg', function (data) {
+                document.getElementById("egg_content").innerHTML = data;
+                if (data != '') {
+                    document.getElementById("egg_container").style.display = 'block';
+                }
+            });
         }
-        </script>
+    };
+    </script>
+    <script>
+    function overlay_off() {
+        document.getElementById("egg_content").innerHTML = '';
+        document.getElementById("egg_container").style.display = "none";
+    }
+    </script>
 
-        <div id="egg_container">
-            <div id="egg_inner">
-                <div id="egg_close" onclick="overlay_off()">
-                    <i class="fas fa-times"></i>
-                </div>
-                <div id="egg_content">
-                </div>
+    <div id="egg_container" class="egg_container">
+        <div id="egg_outer" class="egg_container" onclick="overlay_off()"></div>
+        <div id="egg_inner">
+            <div id="egg_close" onclick="overlay_off()">
+                <i class="fas fa-times"></i>
             </div>
-        </div>
-        ''']
-        # script[1] = on the </body>(bottom)
-    else:
-        script[1] += ['']
+            <div id="egg_content">
+            </div>
+         </div>
+    </div>
+    ''']
+    # script[1] = on the </body>(bottom)
     return script
 
 
