@@ -36,7 +36,10 @@ document.getElementById('enable-easter-egg').addEventListener("change", function
         data: {request: "config", data: document.getElementById('enable-easter-egg').checked},
         dataType: "json",
         success: function (data) {
-            document.getElementById('easter-egg-status').innerHTML = '서버에 변경 사항이 저장되었습니다.';
+            document.getElementById('easter-egg-status').innerHTML = '<i class="fas fa-check"></i> 서버에 변경 사항이 저장되었습니다.';
+        },
+        error: function (data) {
+            document.getElementById('easter-egg-status').innerHTML = '<i class="fas fa-times"></i> 서버와 통신 중 문제가 발생했습니다. 변경 사항이 저장되지 않습니다. <br> 오류 메시지: ' + data.responseText
         }
     });
 });
