@@ -4802,7 +4802,7 @@ def main_file(data = None):
 @app.route('/request/egg_config', methods=['GET', 'POST'])
 def request_egg_config():
     if admin_check(None, 'update') != 1:
-       abort(401)
+       flask.abort(401)
     request_config = flask.request.form['data']
     request_config = request_config.replace(request_config[0], request_config[0].upper())
     curs.execute('update other set data = ? where name = "easter_egg"', [request_config])
