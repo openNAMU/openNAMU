@@ -2342,6 +2342,12 @@ def manager(num = 1):
     }
     
     if num == 1:
+        curs.execute('select data from other where name = "easter_egg"')
+        result = curs.fetchall()[0][0]
+        if result == 'True':
+            easter_egg_status = 'checked'
+        else:
+            easter_egg_status = ''
         return easy_minify(flask.render_template(skin_check(), 
             imp = [load_lang('admin') + ' ' + load_lang('tool'), wiki_set(), custom(), other2([0, 0])],
             data =  '''
@@ -2375,7 +2381,13 @@ def manager(num = 1):
                         <li><a href="/oauth_settings">''' + load_lang('oauth_settings') + '''</a></li>
                         <li><a href="/adsense_settings">''' + load_lang('adsense') + ' ' + load_lang('setting') + '''</a></li>
                     </ul>
-                    ''',
+                    <h2>Easter Egg</h2>
+                    <div>
+                        <input type="checkbox" id="enable-easter-egg"''' + easter_egg_status + '''>
+                        <label for="enable-easter-egg">enable easteregg</label>
+                        <p id="easter-egg-status"></p>
+                    </div>
+                    ''' + easter_egg_config_js,
             menu = [['other', load_lang('other')]],
             script = load_script()
         ))
@@ -4787,9 +4799,24 @@ def main_file(data = None):
     else:
         return redirect('/w/' + url_pas(wiki_set(2)))
 
+@app.route('/request/egg_config', methods=['GET', 'POST'])
+def request_egg_config():
+    if admin_check(None, 'update') != 1:
+       abort(401)
+    request_config = flask.request.form['data']
+    request_config = request_config.replace(request_config[0], request_config[0].upper())
+    curs.execute('update other set data = ? where name = "easter_egg"', [request_config])
+    conn.commit()
+    return flask.jsonify({"request": "response", "data": "done", "now": request_config})
+
 @app.route('/request/egg')
 def request_egg():
-    return easter_egg[random.randint(0, len(easter_egg) - 1)]
+    curs.execute('select data from other where name = "easter_egg"')
+    result = curs.fetchall()[0][0]
+    if result == 'True':
+        return easter_egg[random.randint(0, len(easter_egg) - 1)]
+    else:
+        return ''
 
 @app.errorhandler(404)
 def error_404(e):
