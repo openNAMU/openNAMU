@@ -1,0 +1,8 @@
+{
+  "common" : {
+    "<target>" : "<content>"
+  },
+  "<function>" : {
+    "<target>" : "<content>"
+  }
+ }
