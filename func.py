@@ -265,6 +265,43 @@ def load_lang(data, num = 2):
         else:
             return load_lang(data, 1)
 
+## new load lang ##
+def load_langs(index, data, num = 2):
+    if num == 1:
+        curs.execute("select data from other where name = 'language'")
+        rep_data = curs.fetchall()
+
+        json_data = open(os.path.join('languages', rep_data[0][0] + '.json'), 'rt', encoding='utf-8').read()
+        lang = json.loads(json_data)
+
+        if index in lang:
+            if data in lang[index]:
+                return lang[index][data]
+            else:
+                return data + ' (missing)'
+        else:
+            return data + ' (missing)'
+    else:
+        curs.execute('select data from user_set where name = "lang" and id = ?', [ip_check()])
+        rep_data = curs.fetchall()
+        if rep_data:
+            try:
+                json_data = open(os.path.join('languages', rep_data[0][0] + '.json'), 'rt', encoding='utf-8').read()
+                lang = json.loads(json_data)
+            except:
+                return load_langs(index, data, 1)
+
+            if index in lang:
+                if data in lang[index]:
+                    return lang[index][data]
+                else:
+                    return data + ' (missing)'
+            else:
+                return load_langs(index, data, 1)
+        else:
+            return load_langs(index, data, 1)
+
+
 def load_oauth(provider):
     oauth = json.loads(open('oauthsettings.json', encoding='utf-8').read())
 
