@@ -2385,6 +2385,7 @@ def manager(num = 1):
                     <div>
                         <input type="checkbox" id="enable-easter-egg"''' + easter_egg_status + '''>
                         <label for="enable-easter-egg">enable easteregg</label>
+                        <li><a href="/egg/wiki.json">wiki.json</a></li>
                         <p id="easter-egg-status"></p>
                     </div>
                     ''' + easter_egg_config_js,
@@ -4817,6 +4818,15 @@ def request_egg():
         return easter_egg[random.randint(0, len(easter_egg) - 1)]
     else:
         return ''
+
+@app.route('/egg/wiki.json')
+def wiki_json():
+    curs.execute('select title, data from data')
+    result = curs.fetchall()
+    wiki_json = {}
+    for i in range(len(result)):
+        wiki_json[result[i][0]] = result[i][1]
+    return str(wiki_json)
 
 @app.errorhandler(404)
 def error_404(e):
