@@ -67,6 +67,7 @@ class EverythingConverter(werkzeug.routing.PathConverter):
 
 app.jinja_env.filters['md5_replace'] = md5_replace
 app.jinja_env.filters['load_lang'] = load_lang
+app.jinja_env.filters['load_langs'] = load_langs
 
 app.url_map.converters['everything'] = EverythingConverter
 
@@ -345,7 +346,7 @@ def alarm():
     curs.execute("select data, date from alarm where name = ? order by date desc", [ip_check()])
     data_list = curs.fetchall()
     if data_list:
-        data = '<a href="/del_alarm">(' + load_lang('delete') + ')</a><hr class=\"main_hr\">' + data
+        data = '<a href="/del_alarm">(' + load_langs('common', 'delete') + ')</a><hr class=\"main_hr\">' + data
 
         for data_one in data_list:
             data += '<li>' + data_one[0] + ' (' + data_one[1] + ')</li>'
@@ -355,9 +356,9 @@ def alarm():
     data += '</ul>'
 
     return easy_minify(flask.render_template(skin_check(), 
-        imp = [load_lang('alarm'), wiki_set(), custom(), other2([0, 0])],
+        imp = [load_langs('common', 'notice'), wiki_set(), custom(), other2([0, 0])],
         data = data,
-        menu = [['user', load_lang('user')]],
+        menu = [['user', load_langs('common', 'user')]],
         script = load_script()
     ))
 
@@ -369,14 +370,14 @@ def inter_wiki(tools = None):
     if tools == 'inter_wiki':
         del_link = 'del_inter_wiki'
         plus_link = 'plus_inter_wiki'
-        title = load_lang('interwiki') + ' ' + load_lang('list')
+        title = load_langs('filter', 'interwiki_list')
         div = ''
 
         curs.execute('select title, link from inter')
     elif tools == 'email_filter':
         del_link = 'del_email_filter'
         plus_link = 'plus_email_filter'
-        title = 'email ' + load_lang('filter') + ' ' + load_lang('list')
+        title = load_langs('filter', 'email_filter_list')
         div =   '''
                 <ul>
                     <li>gmail.com</li>
@@ -391,14 +392,14 @@ def inter_wiki(tools = None):
     elif tools == 'name_filter':
         del_link = 'del_name_filter'
         plus_link = 'plus_name_filter'
-        title = load_lang('id') + ' ' + load_lang('filter') + ' ' + load_lang('list')
+        title = load_langs('filter', 'id_filter_list')
         div = ''
 
         curs.execute("select html from html_filter where kind = 'name'")
     else:
         del_link = 'del_edit_filter'
         plus_link = 'manager/9'
-        title = load_lang('edit') + ' ' + load_lang('filter') + ' ' + load_lang('list')
+        title = load_langs('filter', 'edit_filter_list')
         div = ''
 
         curs.execute("select name from filter")
@@ -416,22 +417,22 @@ def inter_wiki(tools = None):
                 div += '<li>' + data[0]
 
             if admin == 1:
-                div += ' <a href="/' + del_link + '/' + url_pas(data[0]) + '">(' + load_lang('delete') + ')</a>'
+                div += ' <a href="/' + del_link + '/' + url_pas(data[0]) + '">(' + load_langs('common', 'delete') + ')</a>'
 
             div += '</li>'
 
         div += '</ul>'
 
         if admin == 1:
-            div += '<hr class=\"main_hr\"><a href="/' + plus_link + '">(' + load_lang('plus') + ')</a>'
+            div += '<hr class=\"main_hr\"><a href="/' + plus_link + '">(' + load_langs('common', 'add') + ')</a>'
     else:
         if admin == 1:
-            div += '<a href="/' + plus_link + '">(' + load_lang('plus') + ')</a>'
+            div += '<a href="/' + plus_link + '">(' + load_langs('common', 'add') + ')</a>'
 
     return easy_minify(flask.render_template(skin_check(), 
         imp = [title, wiki_set(), custom(), other2([0, 0])],
         data = div,
-        menu = [['other', load_lang('other')]],
+        menu = [['other', load_langs('common', 'etc')]],
         script = load_script()
     ))
 
@@ -494,9 +495,9 @@ def plus_inter(tools = None, name = None):
             stat = ''
 
         if tools == 'plus_inter_wiki':
-            title = load_lang('interwiki') + ' ' + load_lang('plus')
+            title = load_langs('filter', 'interwiki_list')
             form_data = '''
-                        <input placeholder="''' + load_lang('name') + '''" type="text" name="title">
+                        <input placeholder="''' + load_langs('common', 'name') + '''" type="text" name="title">
                         <hr class=\"main_hr\">
                         <input placeholder="link" type="text" name="link">
                         '''
@@ -517,13 +518,13 @@ def plus_inter(tools = None, name = None):
                 time_check = ''
                 time_data = ''
 
-            title = load_lang('edit') + ' ' + load_lang('filter') + ' ' + load_lang('plus')
+            title = load_langs('common', 'edit_filter_add')
             form_data = '''
-                        <input placeholder="''' + load_lang('second') + '''" name="second" type="text" value="''' + html.escape(time_data) + '''">
+                        <input placeholder="''' + load_langs('time', 'sec') + '''" name="second" type="text" value="''' + html.escape(time_data) + '''">
                         <hr class=\"main_hr\">
-                        <input ''' + stat + ''' type="checkbox" ''' + time_check + ''' name="limitless"> ''' + load_lang('limitless') + '''
+                        <input ''' + stat + ''' type="checkbox" ''' + time_check + ''' name="limitless"> ''' + load_langs('time', 'limitless') + '''
                         <hr class=\"main_hr\">
-                        <input ''' + stat + ''' placeholder="''' + load_lang('regex') + '''" name="content" value="''' + html.escape(textarea) + '''" type="text">
+                        <input ''' + stat + ''' placeholder="''' + load_langs('common', 'regex') + '''" name="content" value="''' + html.escape(textarea) + '''" type="text">
                         '''
         elif tools == 'plus_name_filter':
             title = load_lang('id') + ' ' + load_lang('filter') + ' ' + load_lang('plus')

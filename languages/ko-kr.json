@@ -5,9 +5,9 @@
     "delete" : "삭제",
     "etc" : "기타",
     "filter" : "필터",
-    "interwiki" : "인터위키",
     "list" : "목록",
     "name" : "이름",
+    "notice" : "알림",
     "user" : "사용자",
     "regex" : "정규표현식",
     "server" : "서버",
@@ -57,6 +57,7 @@
     "email_filter_add" : "이메일 필터 추가",
     "id_filter_list" : "아이디 필터 목록",
     "id_filter_add" : "아이디 필터 추가",
+    "interwiki" : "인터위키",
     "interwiki_list" : "인터위키 목록",
     "interwiki_add" : "인터위키 추가"
   },
@@ -92,5 +93,11 @@
     "other" : "기타",
     "template" : "틀",
     "user" : "사용자"
+  },
+  "time" : {
+    "sec" : "초",
+    "min" : "분",
+    "hour" : "시간",
+    "limitless" : "제한 없음"
   }
 }
