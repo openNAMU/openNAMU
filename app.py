@@ -527,10 +527,10 @@ def plus_inter(tools = None, name = None):
                         <input ''' + stat + ''' placeholder="''' + load_langs('common', 'regex') + '''" name="content" value="''' + html.escape(textarea) + '''" type="text">
                         '''
         elif tools == 'plus_name_filter':
-            title = load_lang('id') + ' ' + load_lang('filter') + ' ' + load_lang('plus')
-            form_data = '<input placeholder="' + load_lang('id') + ' ' + load_lang('regex') + '" type="text" name="title">'
+            title = load_langs('filter', 'id_filter_add')
+            form_data = '<input placeholder="' + load_langs('common', 'id') + ' ' + load_langs('common', 'regex') + '" type="text" name="title">'
         else:
-            title = 'email ' + load_lang('filter') + ' ' + load_lang('plus')
+            title = load_langs('filter', 'email_filter_add')
             form_data = '<input placeholder="email" type="text" name="title">'
 
         return easy_minify(flask.render_template(skin_check(), 
@@ -539,10 +539,10 @@ def plus_inter(tools = None, name = None):
                     <form method="post">
                         ''' + form_data + '''
                         <hr class=\"main_hr\">
-                        <button ''' + stat + ''' type="submit">''' + load_lang('plus') + '''</button>
+                        <button ''' + stat + ''' type="submit">''' + load_langs('common', 'add') + '''</button>
                     </form>
                     ''',
-            menu = [['other', load_lang('other')], [re.sub('^plus_', '', tools), load_lang('list')]],
+            menu = [['other', load_langs('common', 'etc')], [re.sub('^plus_', '', tools), load_langs('common', 'list')]],
             script = load_script()
         ))
 
@@ -553,7 +553,7 @@ def setting(num = 0):
         return re_error('/ban')
 
     if num == 0:
-        li_list = [load_lang('main'), load_lang('text') + ' ' + load_lang('setting'), load_lang('main') + ' head', load_lang('main') + ' body', 'robots.txt', 'google']
+        li_list = [load_langs('common', 'main'), load_langs('settings', 'text_settings'), load_langs('common', 'main') + ' head', load_langs('common', 'main') + ' body', 'robots.txt', 'google']
         
         x = 0
         
@@ -564,9 +564,9 @@ def setting(num = 0):
             li_data += '<li><a href="/setting/' + str(x) + '">' + li + '</a></li>'
 
         return easy_minify(flask.render_template(skin_check(), 
-            imp = [load_lang('setting'), wiki_set(), custom(), other2([0, 0])],
-            data = '<h2>' + load_lang('list') + '</h2><ul>' + li_data + '</ul>',
-            menu = [['manager', load_lang('admin')]],
+            imp = [load_langs('settings', 'settings'), wiki_set(), custom(), other2([0, 0])],
+            data = '<h2>' + load_langs('common', 'list') + '</h2><ul>' + li_data + '</ul>',
+            menu = [['manager', load_langs('acl_list', 'admin')]],
             script = load_script()
         ))
     elif num == 1:
@@ -605,7 +605,7 @@ def setting(num = 0):
             conn.commit()
             
             div = ''
-            acl_list = [[load_lang('subscriber'), 'login'], [load_lang('normal'), 'normal'], [load_lang('admin'), 'admin']]
+            acl_list = [[load_langs('common', 'user'), 'login'], [load_langs('common', 'not_signed_in'), 'normal'], [load_langs('acl_list', 'admin'), 'admin']]
             for i in acl_list:
                 if i[1] == d_list[6]:
                     div = '<option value="' + i[1] + '">' + i[0] + '</option>' + div
@@ -650,23 +650,23 @@ def setting(num = 0):
                     div5 += '<option value="' + i + '">' + i + '</option>'
 
             return easy_minify(flask.render_template(skin_check(), 
-                imp = [load_lang('main'), wiki_set(), custom(), other2([0, 0])],
+                imp = [load_langs('common', 'main'), wiki_set(), custom(), other2([0, 0])],
                 data =  '''
                         <form method="post">
-                            <span>''' + load_lang('name') + '''</span>
+                            <span>''' + load_langs('common', 'name') + '''</span>
                             <br>
                             <br>
-                            <input placeholder="''' + load_lang('name') + '''" type="text" name="name" value="''' + html.escape(d_list[0]) + '''">
+                            <input placeholder="''' + load_langs('common', 'name') + '''" type="text" name="name" value="''' + html.escape(d_list[0]) + '''">
                             <hr class=\"main_hr\">
-                            <span>''' + load_lang('logo') + ''' (html)</span>
+                            <span>''' + load_langs('common', 'logo') + ''' (html)</span>
                             <br>
                             <br>
-                            <input placeholder="''' + load_lang('logo') + '''" type="text" name="logo" value="''' + html.escape(d_list[1]) + '''">
+                            <input placeholder="''' + load_langs('common', 'logo') + '''" type="text" name="logo" value="''' + html.escape(d_list[1]) + '''">
                             <hr class=\"main_hr\">
-                            <span>''' + load_lang('frontpage') + '''</span>
+                            <span>''' + load_langs('common', 'frontpage') + '''</span>
                             <br>
                             <br>
-                            <input placeholder="''' + load_lang('frontpage') + '''" type="text" name="frontpage" value="''' + html.escape(d_list[2]) + '''">
+                            <input placeholder="''' + load_langs('common', 'frontpage') + '''" type="text" name="frontpage" value="''' + html.escape(d_list[2]) + '''">
                             <hr class=\"main_hr\">
                             <span>''' + load_lang('bottom') + ' ' + load_lang('text') + ''' (html)</span>
                             <br>
@@ -956,7 +956,7 @@ def not_close_topic():
     div += '</ul>'
 
     return easy_minify(flask.render_template(skin_check(), 
-        imp = [load_lang('open') + ' ' + load_lang('discussion') + ' ' + load_lang('list'), wiki_set(), custom(), other2([0, 0])],
+        imp = [load_lang('open') + ' ' + load_lang('discussion') + ' ' + load_langs('common', 'list'), wiki_set(), custom(), other2([0, 0])],
         data = div,
         menu = [['manager', load_lang('admin')]],
         script = load_script()
@@ -975,7 +975,7 @@ def acl_list():
             <table id="main_table_set">
                 <tbody>
                     <tr>
-                        <td id="main_table_width_quarter">''' + load_lang('document') + ' ' + load_lang('name') + '''</td>
+                        <td id="main_table_width_quarter">''' + load_lang('document') + ' ' + load_langs('common', 'name') + '''</td>
                         <td id="main_table_width_quarter">''' + load_lang('document') + ''' acl</td>
                         <td id="main_table_width_quarter">''' + load_lang('discussion') + ''' acl</td>
                         <td id="main_table_width_quarter">''' + load_lang('view') + ''' acl</td>
@@ -1009,7 +1009,7 @@ def acl_list():
             '''
     
     return easy_minify(flask.render_template(skin_check(), 
-        imp = ['acl ' + load_lang('document') + ' ' + load_lang('list'), wiki_set(), custom(), other2([0, 0])],
+        imp = ['acl ' + load_lang('document') + ' ' + load_langs('common', 'list'), wiki_set(), custom(), other2([0, 0])],
         data = div,
         menu = [['other', load_lang('other')]],
         script = load_script()
@@ -1115,7 +1115,7 @@ def admin_list():
     div += '</ul>'
                 
     return easy_minify(flask.render_template(skin_check(), 
-        imp = [load_lang('admin') + ' ' + load_lang('list'), wiki_set(), custom(), other2([0, 0])],
+        imp = [load_lang('admin') + ' ' + load_langs('common', 'list'), wiki_set(), custom(), other2([0, 0])],
         data = div,
         menu = [['other', load_lang('other')]],
         script = load_script()
@@ -1232,7 +1232,7 @@ def give_log():
     list_data += '</ul><hr class=\"main_hr\"><a href="/manager/8">(' + load_lang('create') + ')</a>'
 
     return easy_minify(flask.render_template(skin_check(), 
-        imp = [load_lang('admin_group') + ' ' + load_lang('list'), wiki_set(), custom(), other2([0, 0])],
+        imp = [load_lang('admin_group') + ' ' + load_langs('common', 'list'), wiki_set(), custom(), other2([0, 0])],
         data = list_data,
         menu = [['other', load_lang('other')]],
         script = load_script()
@@ -1592,7 +1592,7 @@ def recent_discuss():
             <table id="main_table_set">
                 <tbody>
                     <tr>
-                        <td id="main_table_width_half">''' + load_lang('discussion') + ' ' + load_lang('name') + '''</td>
+                        <td id="main_table_width_half">''' + load_lang('discussion') + ' ' + load_langs('common', 'name') + '''</td>
                         <td id="main_table_width_half">''' + load_lang('time') + '''</td>
                     </tr>
             '''
@@ -2269,7 +2269,7 @@ def move(name = None):
             data =  '''
                     <form method="post">
                         ''' + ip_warring() + '''
-                        <input placeholder="''' + load_lang('document') + ' ' + load_lang('name') + '" value="' + name + '''" name="title" type="text">
+                        <input placeholder="''' + load_lang('document') + ' ' + load_langs('common', 'name') + '" value="' + name + '''" name="title" type="text">
                         <hr class=\"main_hr\">
                         <input placeholder="''' + load_lang('why') + '''" name="send" type="text">
                         <hr class=\"main_hr\">
@@ -2292,7 +2292,7 @@ def other():
                     <li><a href="/manager/7">''' + load_lang('discussion') + '''</a></li>
                 </ul>
                 <br>
-                <h2>''' + load_lang('list') + '''</h2>
+                <h2>''' + load_langs('common', 'list') + '''</h2>
                 <ul>
                     <li><a href="/admin_list">''' + load_lang('admin') + '''</a></li>
                     <li><a href="/give_log">''' + load_lang('admin_group') + '''</a></li>
@@ -2326,20 +2326,20 @@ def other():
 @app.route('/manager/<int:num>', methods=['POST', 'GET'])
 def manager(num = 1):
     title_list = {
-        0 : [load_lang('document') + ' ' + load_lang('name'), 'acl'], 
+        0 : [load_lang('document') + ' ' + load_langs('common', 'name'), 'acl'], 
         1 : [0, 'check'], 
         2 : [0, 'ban'], 
         3 : [0, 'admin'], 
         4 : [0, 'record'], 
         5 : [0, 'topic_record'], 
-        6 : [load_lang('name'), 'admin_plus'], 
-        7 : [load_lang('name'), 'plus_edit_filter'], 
-        8 : [load_lang('document') + ' ' + load_lang('name'), 'search'], 
+        6 : [load_langs('common', 'name'), 'admin_plus'], 
+        7 : [load_langs('common', 'name'), 'plus_edit_filter'], 
+        8 : [load_lang('document') + ' ' + load_langs('common', 'name'), 'search'], 
         9 : [0, 'block_user'], 
         10 : [0, 'block_admin'], 
-        11 : [load_lang('document') + ' ' + load_lang('name'), 'watch_list'], 
+        11 : [load_lang('document') + ' ' + load_langs('common', 'name'), 'watch_list'], 
         12 : [load_lang('compare'), 'check'], 
-        13 : [load_lang('document') + ' ' + load_lang('name'), 'edit']
+        13 : [load_lang('document') + ' ' + load_langs('common', 'name'), 'edit']
     }
     
     if num == 1:
@@ -2401,7 +2401,7 @@ def manager(num = 1):
                 return redirect('/' + title_list[(num - 2)][1] + '/' + url_pas(flask.request.form.get('name', None)))
         else:
             if title_list[(num - 2)][0] == 0:
-                placeholder = load_lang('user') + ' ' + load_lang('name')
+                placeholder = load_lang('user') + ' ' + load_langs('common', 'name')
             else:
                 placeholder = title_list[(num - 2)][0]
 
@@ -2856,7 +2856,7 @@ def topic(name = None, sub = None):
         return easy_minify(flask.render_template(skin_check(), 
             imp = [name, wiki_set(), custom(), other2([' (' + load_lang('discussion') + ')', 0])],
             data = '<h2 id="topic_top_title">' + sub + '</h2>' + all_data + data,
-            menu = [['topic/' + url_pas(name), load_lang('list')]],
+            menu = [['topic/' + url_pas(name), load_langs('common', 'list')]],
             script = load_script()
         ))
 
@@ -2887,7 +2887,7 @@ def user_tool(name = None):
     return easy_minify(flask.render_template(skin_check(), 
         imp = [name, wiki_set(), custom(), other2([' (' + load_lang('tool') + ')', 0])],
         data = data,
-        menu = [['topic/' + url_pas(name), load_lang('list')]],
+        menu = [['topic/' + url_pas(name), load_langs('common', 'list')]],
         script = load_script()
     ))
         
@@ -2912,7 +2912,7 @@ def close_topic_list(name = None, tool = None):
         return redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(flask.request.form.get('topic', None) + t_num))
     else:
         plus = ''
-        menu = [['topic/' + url_pas(name), load_lang('list')]]
+        menu = [['topic/' + url_pas(name), load_langs('common', 'list')]]
         
         if tool == 'close':
             curs.execute("select sub from rd where title = ? and stop = 'O' order by sub asc", [name])
@@ -2925,14 +2925,14 @@ def close_topic_list(name = None, tool = None):
         else:
             curs.execute("select sub from rd where title = ? order by date desc", [name])
             
-            sub = load_lang('discussion') + ' ' + load_lang('list')
+            sub = load_lang('discussion') + ' ' + load_langs('common', 'list')
             
             menu = [['w/' + url_pas(name), load_lang('document')]]
             
             plus =  '''
                     <a href="/topic/''' + url_pas(name) + '''/close">(''' + load_lang('close') + ''')</a> <a href="/topic/''' + url_pas(name) + '''/agree">(''' + load_lang('agreement') + ''')</a>
                     <hr class=\"main_hr\">
-                    <input placeholder="''' + load_lang('discussion') + ' ' + load_lang('name') + '''" name="topic" type="text">
+                    <input placeholder="''' + load_lang('discussion') + ' ' + load_langs('common', 'name') + '''" name="topic" type="text">
                     <hr class=\"main_hr\">
                     <button type="submit">''' + load_lang('open') + '''</button>
                     '''
@@ -2942,7 +2942,7 @@ def close_topic_list(name = None, tool = None):
             if curs.fetchall():                
                 it_p = 0
                 
-                if sub == load_lang('discussion') + ' ' + load_lang('list'):
+                if sub == load_lang('discussion') + ' ' + load_langs('common', 'list'):
                     curs.execute("select title from rd where title = ? and sub = ? and stop = 'O' order by sub asc", [name, data[0]])
                     if curs.fetchall():
                         it_p = 1
@@ -3335,7 +3335,7 @@ def user_check(name = None):
                 <table id="main_table_set">
                     <tbody>
                         <tr>
-                            <td id="main_table_width">''' + load_lang('name') + '''</td>
+                            <td id="main_table_width">''' + load_langs('common', 'name') + '''</td>
                             <td id="main_table_width">ip</td>
                             <td id="main_table_width">''' + load_lang('time') + '''</td>
                         </tr>
@@ -3525,7 +3525,7 @@ def need_email(tool = 'pass_find'):
             return easy_minify(flask.render_template(skin_check(),    
                 imp = ['email', wiki_set(), custom(), other2([0, 0])],
                 data =  '''
-                        <a href="/email_filter">(email ''' + load_lang('list') + ''')</a>
+                        <a href="/email_filter">(email ''' + load_langs('common', 'list') + ''')</a>
                         <hr class=\"main_hr\">
                         <form method="post">
                             <input placeholder="email" name="email" type="text">
@@ -4125,7 +4125,7 @@ def user_topic_list(name = None):
             <table id="main_table_set">
                 <tbody>
                     <tr>
-                        <td id="main_table_width">''' + load_lang('discussion') + ' ' + load_lang('name') + '''</td>
+                        <td id="main_table_width">''' + load_lang('discussion') + ' ' + load_langs('common', 'name') + '''</td>
                         <td id="main_table_width">''' + load_lang('writer') + '''</td>
                         <td id="main_table_width">''' + load_lang('time') + '''</td>
                     </tr>
@@ -4203,7 +4203,7 @@ def recent_changes(name = None, tool = 'record'):
                 curs.execute("select id, title, date, ip, send, leng from history where title = ? order by id + 0 desc limit ?, '50'", [name, str(sql_num)])
             else:
                 div +=  '''
-                            <td id="main_table_width">''' + load_lang('document') + ' ' + load_lang('name') + '''</td>
+                            <td id="main_table_width">''' + load_lang('document') + ' ' + load_langs('common', 'name') + '''</td>
                             <td id="main_table_width">''' + load_lang('editor') + '''</td>
                             <td id="main_table_width">''' + load_lang('time') + '''</td>
                         </tr>
@@ -4232,7 +4232,7 @@ def recent_changes(name = None, tool = 'record'):
                 sql_num = 0            
             
             div +=  '''
-                        <td id="main_table_width">''' + load_lang('document') + ' ' + load_lang('name') + '''</td>
+                        <td id="main_table_width">''' + load_lang('document') + ' ' + load_langs('common', 'name') + '''</td>
                         <td id="main_table_width">''' + load_lang('editor') + '''</td>
                         <td id="main_table_width">''' + load_lang('time') + '''</td>
                     </tr>
@@ -4468,7 +4468,7 @@ def upload():
                     <form method="post" enctype="multipart/form-data" accept-charset="utf8">
                         <input type="file" name="f_data">
                         <hr class=\"main_hr\">
-                        <input placeholder="''' + load_lang('name') + '''" name="f_name" type="text">
+                        <input placeholder="''' + load_langs('common', 'name') + '''" name="f_name" type="text">
                         <hr class=\"main_hr\">
                         <input placeholder="''' + load_lang('license') + '''" name="f_lice" type="text">
                         <hr class=\"main_hr\">
@@ -4598,7 +4598,7 @@ def watch_list():
     div += '<a href="/manager/13">(' + load_lang('plus') + ')</a>'
 
     return easy_minify(flask.render_template(skin_check(), 
-        imp = [load_lang('watchlist') + ' ' + load_lang('list'), wiki_set(), custom(), other2([0, 0])],
+        imp = [load_lang('watchlist') + ' ' + load_langs('common', 'list'), wiki_set(), custom(), other2([0, 0])],
         data = div,
         menu = [['manager', load_lang('admin')]],
         script = load_script()
