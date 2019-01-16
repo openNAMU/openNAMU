@@ -5,8 +5,10 @@
     "delete" : "삭제",
     "etc" : "기타",
     "filter" : "필터",
+    "frontpage" : "대문",
     "id" : "아이디",
     "list" : "목록",
+    "logo" : "로고",
     "main" : "메인",
     "name" : "이름",
     "notice" : "알림",
@@ -19,7 +21,8 @@
   "acl_list" : {
     "owner" : "소유자",
     "admin" : "관리자",
-    "user" : "사용자"
+    "user" : "사용자",
+    "not_signed_in" : "비로그인 상태"
   },
   "adsense" : {
     "adsense" : "애드센스",
@@ -88,6 +91,10 @@
     "connection_new" : "연결하기",
     "sign_in_facebook" : "Facebook으로 로그인",
     "sign_in_naver" : "네이버 아이디로 로그인"
+  },
+  "settings" : {
+    "settings" : "설정",
+    "text_settings" : "문구 설정"
   },
   "title_index" : {
     "all" : "전체",
