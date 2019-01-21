@@ -51,7 +51,7 @@ python app.py
 python3 app.py
 ```
 
-* openNAMU의 첫 계정은 소유자 계정으로 설정됩니다.
+* openNAMU의 첫 계정에게 소유자 권한이 부여됩니다.
 
 ### 애플리케이션 공개
 현재 openNAMU에서 권장하는 애플리케이션 공개 방법은 아파치나 nginx와 같은 웹 서버 구동 소프트웨어를 통해 리버스 프록시를 설정하는 것입니다.
@@ -100,5 +100,3 @@ openNAMU 프로젝트는 [BSD 3-Clause License](./LICENSE)(이하 BSD-3 라이�
 `set.json`은 삭제해도 다시 새로 만들 수 있습니다.
 
 [테스트 서버](http://namu.ml/)
-
-첫 번째 가입자에게 소유자 권한이 부여됩니다.
