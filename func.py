@@ -10,6 +10,7 @@ import html
 import sys
 import re
 import os
+
 try:
     import css_html_js_minify
 except:
@@ -72,7 +73,7 @@ def easy_minify(data, tool = None):
 
 def render_set(title = '', data = '', num = 0):
     if acl_check(title, 'render') == 1:
-        return 'http request 401.3'
+        return 'HTTP Request 401.3'
     else:
         return namumark(title, data, num)
 
@@ -91,45 +92,6 @@ def captcha_get():
     return data
 
 def update():
-    # v3.0.5 사용자 문서, 파일 문서, 분류 문서 영어화
-    try:
-        all_rep = [['사용자:', 'user:'], ['파일:', 'file:'], ['분류:', 'category:']]
-        all_rep2 = ['data', 'history', 'acl', 'topic', 'back']
-
-        test = 0
-
-        for i in range(3):
-            for j in range(6):
-                if not j == 5:
-                    curs.execute('select title from ' + all_rep2[j] + ' where title like ?', [all_rep[i][0] + '%'])
-                else:
-                    curs.execute('select link from back where link like ?', [all_rep[i][0] + '%'])
-
-                user_rep = curs.fetchall()
-                if user_rep:
-                    for user_rep2 in user_rep:
-                        test = 1
-
-                        first = re.sub('^' + all_rep[i][0], all_rep[i][1], user_rep2[0])
-
-                        if j == 0:
-                            curs.execute("update data set title = ? where title = ?", [first, user_rep2[0]])
-                        elif j == 1:
-                            curs.execute("update history set title = ? where title = ?", [first, user_rep2[0]])
-                        elif j == 2:
-                            curs.execute("update acl set title = ? where title = ?", [first, user_rep2[0]])
-                        elif j == 3:
-                            curs.execute("update topic set title = ? where title = ?", [first, user_rep2[0]])
-                        elif j == 4:
-                            curs.execute("update back set title = ? where title = ?", [first, user_rep2[0]])
-                        elif j == 5:
-                            curs.execute("update back set link = ? where link = ?", [first, user_rep2[0]])
-
-        if test == 1:
-            print('사용자 to user, 파일 to file, 분류 to category')
-    except:
-        pass
-        
     # v3.0.8 rd, agreedis, stop 테이블 통합
     try:
         curs.execute("select title, sub, close from stop")
@@ -241,7 +203,7 @@ def load_lang(data, num = 2):
         curs.execute("select data from other where name = 'language'")
         rep_data = curs.fetchall()
 
-        json_data = open(os.path.join('language', rep_data[0][0] + '.json'), 'rt', encoding='utf-8').read()
+        json_data = open(os.path.join('lang', rep_data[0][0] + '.json'), 'rt', encoding='utf-8').read()
         lang = json.loads(json_data)
 
         if data in lang:
@@ -253,7 +215,7 @@ def load_lang(data, num = 2):
         rep_data = curs.fetchall()
         if rep_data:
             try:
-                json_data = open(os.path.join('language', rep_data[0][0] + '.json'), 'rt', encoding='utf-8').read()
+                json_data = open(os.path.join('lang', rep_data[0][0] + '.json'), 'rt', encoding='utf-8').read()
                 lang = json.loads(json_data)
             except:
                 return load_lang(data, 1)
@@ -264,43 +226,6 @@ def load_lang(data, num = 2):
                 return load_lang(data, 1)
         else:
             return load_lang(data, 1)
-
-## new load lang ##
-def load_langs(index, data, num = 2):
-    if num == 1:
-        curs.execute("select data from other where name = 'language'")
-        rep_data = curs.fetchall()
-
-        json_data = open(os.path.join('languages', rep_data[0][0] + '.json'), 'rt', encoding='utf-8').read()
-        lang = json.loads(json_data)
-
-        if index in lang:
-            if data in lang[index]:
-                return lang[index][data]
-            else:
-                return data + ' (missing)'
-        else:
-            return data + ' (missing)'
-    else:
-        curs.execute('select data from user_set where name = "lang" and id = ?', [ip_check()])
-        rep_data = curs.fetchall()
-        if rep_data:
-            try:
-                json_data = open(os.path.join('languages', rep_data[0][0] + '.json'), 'rt', encoding='utf-8').read()
-                lang = json.loads(json_data)
-            except:
-                return load_langs(index, data, 1)
-
-            if index in lang:
-                if data in lang[index]:
-                    return lang[index][data]
-                else:
-                    return data + ' (missing)'
-            else:
-                return load_langs(index, data, 1)
-        else:
-            return load_langs(index, data, 1)
-
 
 def load_oauth(provider):
     oauth = json.loads(open('oauthsettings.json', encoding='utf-8').read())
@@ -448,49 +373,6 @@ def wiki_set(num = 1):
     else:
         return var_data
 
-def load_script():
-    script = []
-    script += ['<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>'] # script[0] = head(top)
-    curs.execute("select data from other where name = 'easter_egg'")
-    db_data = curs.fetchall()
-    script += ['''
-    <link rel="stylesheet" href="/views/main_css/egg.css">
-    <script>
-    var easter_count = 0;
-    document.getElementById('bottom_main').onclick = function() {
-        easter_count++;
-        if (easter_count > 3) {
-            $.get('/request/egg', function (data) {
-                document.getElementById("egg_content").innerHTML = data;
-                if (data != '') {
-                    document.getElementById("egg_container").style.display = 'block';
-                }
-            });
-        }
-    };
-    </script>
-    <script>
-    function overlay_off() {
-        document.getElementById("egg_content").innerHTML = '';
-        document.getElementById("egg_container").style.display = "none";
-    }
-    </script>
-
-    <div id="egg_container" class="egg_container">
-        <div id="egg_outer" class="egg_container" onclick="overlay_off()"></div>
-        <div id="egg_inner">
-            <div id="egg_close" onclick="overlay_off()">
-                <i class="fas fa-times"></i>
-            </div>
-            <div id="egg_content">
-            </div>
-         </div>
-    </div>
-    ''']
-    # script[1] = on the </body>(bottom)
-    return script
-
-
 def diff(seqm):
     output = []
 
@@ -583,7 +465,7 @@ def ip_pas(raw_ip):
     hide = 0
 
     if re.search("(\.|:)", raw_ip):
-        if not re.search("^" + load_lang('tool', 1) + ":", raw_ip):    
+        if not re.search("^tool:", raw_ip):    
             curs.execute("select data from other where name = 'ip_view'")
             data = curs.fetchall()
             if data and data[0][0] != '':
@@ -638,7 +520,7 @@ def custom():
     else:
         user_name = load_lang('user')
 
-    return ['', '', user_icon, user_head, email, user_name, load_lang(data = '', num = 2)]
+    return ['', '', user_icon, user_head, email, user_name]
 
 def load_skin(data = ''):
     div2 = ''

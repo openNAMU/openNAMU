@@ -68,4 +68,4 @@ def namumark(title = '', data = None, num = 0):
             
         return data[0] + data[1]
     else:
-        return 'http request 404'
+        return 'HTTP Request 404'
