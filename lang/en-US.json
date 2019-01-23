@@ -73,6 +73,7 @@
         "error" : "Error",
         "next" : "Next",
         "previous" : "Previous",
+        "authority" : "Authority",
         "_comment_1.1_" : "Time",
             "second" : "Second(s)",
             "hour" : "Hour(s)",
