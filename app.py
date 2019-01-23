@@ -653,10 +653,10 @@ def setting(num = 0):
                             <br>
                             <input placeholder="''' + load_lang('wiki_name') + '''" type="text" name="name" value="''' + html.escape(d_list[0]) + '''">
                             <hr class=\"main_hr\">
-                            <span>''' + load_langs('wiki_logo') + ''' (HTML)</span>
+                            <span>''' + load_lang('wiki_logo') + ''' (HTML)</span>
                             <br>
                             <br>
-                            <input placeholder="''' + load_langs('wiki_logo') + '''" type="text" name="logo" value="''' + html.escape(d_list[1]) + '''">
+                            <input placeholder="''' + load_lang('wiki_logo') + '''" type="text" name="logo" value="''' + html.escape(d_list[1]) + '''">
                             <hr class=\"main_hr\">
                             <span>''' + load_lang('main_page') + '''</span>
                             <br>
@@ -2193,7 +2193,7 @@ def other():
                     <li><a href="/manager/7">''' + load_lang('discussion_record') + '''</a></li>
                 </ul>
                 <br>
-                <h2>''' + load_langs('list') + '''</h2>
+                <h2>''' + load_lang('list') + '''</h2>
                 <ul>
                     <li><a href="/admin_list">''' + load_lang('admin_list') + '''</a></li>
                     <li><a href="/give_log">''' + load_lang('admin_group_list') + '''</a></li>
@@ -4282,7 +4282,7 @@ def upload():
                     <form method="post" enctype="multipart/form-data" accept-charset="utf8">
                         <input type="file" name="f_data">
                         <hr class=\"main_hr\">
-                        <input placeholder="''' + load_langs('name') + '''" name="f_name" type="text">
+                        <input placeholder="''' + load_lang('name') + '''" name="f_name" type="text">
                         <hr class=\"main_hr\">
                         <input placeholder="''' + load_lang('license') + '''" name="f_lice" type="text">
                         <hr class=\"main_hr\">
