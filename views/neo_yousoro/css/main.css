@@ -68,6 +68,7 @@ li {
     background: white;
     border-left: 2px solid gainsboro;
     border-right: 2px solid gainsboro;
+    min-height: 350px;
 }
 
 #bottom {
