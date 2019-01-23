@@ -4187,7 +4187,7 @@ def recent_changes(name = None, tool = 'record'):
                 
                 menu = [['other', load_lang('other')], ['user', load_lang('user')], ['count/' + url_pas(name), load_lang('count')]]
                 
-                div += next_fix('/record/' + url_pas(name) + '/' + url_pas(what) + '?num=', num, data_list)
+                div += next_fix('/record/' + url_pas(name) + '?num=', num, data_list)
         else:
             menu = 0
             title = load_lang('recent_change')
