@@ -115,7 +115,7 @@
         "ban_release" : "Unblock",
         "discussion_tool" : "Discussion tools",
         "discussion_raw" : "Discussion's raw",
-        "oauth_signin_facebook" : "Sign-in with facebook",
+        "oauth_signin_facebook" : "Sign-in with Facebook",
         "oauth_signin_naver" : "Sign-in with NAVER",
         "connection" : "Connection",
         "new_connection" : "Connect...",
