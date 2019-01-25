@@ -807,7 +807,7 @@ def setting(num = 0):
                 data = ''
 
             return easy_minify(flask.render_template(skin_check(), 
-                imp = [load_lang('main' + title), wiki_set(), custom(), other2([0, 0])],
+                imp = [html.unescape(load_lang('main' + title)), wiki_set(), custom(), other2([0, 0])],
                 data =  '''
                         <form method="post">
                             <textarea rows="25" name="content">''' + html.escape(data) + '''</textarea>
@@ -4339,7 +4339,7 @@ def user_info():
             plus2 = '<li><a href="/alarm">' + load_lang('alarm') + '</a></li>'
 
         plus2 += '<li><a href="/watch_list">' + load_lang('watchlist') + '</a></li>'
-        plus3 = '<li><a href="/acl/user:' + url_pas(ip) + '">' + load_lang('user_document') + ' acl</a></li>'
+        plus3 = '<li><a href="/acl/user:' + url_pas(ip) + '">' + load_lang('user_document_acl') + '</a></li>'
     else:
         ip_user = ip
         
@@ -4470,7 +4470,7 @@ def custom_head_view():
         start += '<span>&lt;style&gt;css&lt;/style&gt;<br>&lt;script&gt;js&lt;/script&gt;</span><hr class=\"main_hr\">'
 
         return easy_minify(flask.render_template(skin_check(), 
-            imp = [load_lang('user_head'), wiki_set(), custom(), other2([0, 0])],
+            imp = [html.unescape(load_lang('user_head')), wiki_set(), custom(), other2([0, 0])],
             data =  start + '''
                     <form method="post">
                         <textarea rows="25" cols="100" name="content">''' + data + '''</textarea>
