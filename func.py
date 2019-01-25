@@ -10,7 +10,10 @@ import html
 import sys
 import re
 import os
-import css_html_js_minify
+try:
+    import css_html_js_minify
+except:
+    pass
 
 if sys.version_info < (3, 6):
     import sha3
