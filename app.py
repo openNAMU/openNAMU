@@ -18,14 +18,14 @@ from func import *
 r_ver = 'v3.0.9-master-001'
 c_ver = ''.join(re.findall('[0-9]', r_ver))
 
-print('version : ' + r_ver)
+print('Version : ' + r_ver)
 
 try:
     json_data = open('set.json').read()
     set_data = json.loads(json_data)
 except:
     while 1:
-        print('db name : ', end = '')
+        print('DB\'s name : ', end = '')
         
         new_json = str(input())
         if new_json != '':
@@ -36,10 +36,6 @@ except:
             set_data = json.loads(json_data)
 
             break
-        else:
-            print('insert value')
-            
-            pass
 
 if os.path.exists(set_data['db'] + '.db'):
     setup_tool = 0
@@ -270,7 +266,7 @@ if not adsense_result:
     curs.execute('insert into other (name, data) values ("adsense", "False")')
     curs.execute('insert into other (name, data) values ("adsense_code", "")')
 
-ask_this = [[['Markup', 'markup'], ['namumark']], [['Encryption method', 'encode'], ['sha256', 'sha3', 'bcrypt']]]
+ask_this = [[['Markup', 'markup'], ['namumark']], [['Encryption method', 'encode'], ['sha256', 'sha3']]]
 for ask_data in ask_this:
     curs.execute('select data from other where name = ?', [ask_data[0][1]])
     rep_data = curs.fetchall()
@@ -342,8 +338,6 @@ def alarm():
 
         for data_one in data_list:
             data += '<li>' + data_one[0] + ' (' + data_one[1] + ')</li>'
-    else:
-        data += '<li>-</li>'
     
     data += '</ul>'
 

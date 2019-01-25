@@ -10,11 +10,7 @@ import html
 import sys
 import re
 import os
-
-try:
-    import css_html_js_minify
-except:
-    pass
+import css_html_js_minify
 
 if sys.version_info < (3, 6):
     import sha3
@@ -207,9 +203,9 @@ def load_lang(data, num = 2):
         lang = json.loads(json_data)
 
         if data in lang:
-            return lang[data]
+            return html.escape(lang[data])
         else:
-            return data + ' (missing)'
+            return html.escape(data + ' (M)')
     else:
         curs.execute('select data from user_set where name = "lang" and id = ?', [ip_check()])
         rep_data = curs.fetchall()
@@ -221,7 +217,7 @@ def load_lang(data, num = 2):
                 return load_lang(data, 1)
 
             if data in lang:
-                return lang[data]
+                return html.escape(lang[data])
             else:
                 return load_lang(data, 1)
         else:
