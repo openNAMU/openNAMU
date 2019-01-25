@@ -926,7 +926,7 @@ def setting(num = 0):
                 menu = [['setting', load_lang('return')]]
             ))
     else:
-        return redirect('/')
+        return redirect()
 
 @app.route('/not_close_topic')
 def not_close_topic():
@@ -950,7 +950,7 @@ def image_view(name = None):
     if os.path.exists(os.path.join('image', name)):
         return flask.send_from_directory('./image', name)
     else:
-        return redirect('/')
+        return redirect()
 
 @app.route('/acl_list')
 def acl_list():
@@ -1252,7 +1252,7 @@ def indexing():
 
     conn.commit()
     
-    return redirect('/')     
+    return redirect()     
 
 @app.route('/restart', methods=['POST', 'GET'])
 def restart():
@@ -2297,7 +2297,7 @@ def manager(num = 1):
                 menu = [['manager', load_lang('return')]]
             ))
     else:
-        return redirect('/')
+        return redirect()
         
 @app.route('/title_index')
 def title_index():
@@ -2962,11 +2962,11 @@ def login_oauth(platform = None, func = None):
         if flask.request.referrer != None:
             referrer = referrer_re.search(flask.request.referrer)
             if referrer.group('host') != load_oauth('publish_url'):
-                return redirect('/')
+                return redirect()
             else:
                 flask.session['referrer'] = referrer.group('refer')
         else:
-            return redirect('/')
+            return redirect()
 
         flask.session['refer'] = flask.request.referrer
 
@@ -4522,7 +4522,7 @@ def title_random():
     if data:
         return redirect('/w/' + url_pas(data[0][0]))
     else:
-        return redirect('/')
+        return redirect()
 
 @app.route('/skin_set')
 def skin_set():
