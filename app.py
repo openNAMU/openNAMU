@@ -1692,6 +1692,9 @@ def goto():
 
 @app.route('/search/<everything:name>')
 def deep_search(name = None):
+    if name == '':
+        return redirect()
+
     num = int(flask.request.args.get('num', 1))
     if num * 50 > 0:
         sql_num = num * 50 - 50
@@ -1731,8 +1734,6 @@ def deep_search(name = None):
                 test = data[1]
 
             div_plus += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a> (' + data[1] + ')</li>'
-    else:
-        div += '<li>-</li>'
 
     div += div_plus + '</ul>'
     div += next_fix('/search/' + url_pas(name) + '?num=', num, all_list)

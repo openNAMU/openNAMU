@@ -778,7 +778,7 @@ def edit_filter_do(data):
     
     return 0
 
-def redirect(data):
+def redirect(data = '/'):
     return flask.redirect(data)
 
 def re_error(data):
