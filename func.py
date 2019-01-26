@@ -70,9 +70,11 @@ def easy_minify(data, tool = None):
     
     return data
 
-def render_set(title = '', data = '', num = 0):
+def render_set(title = '', data = '', num = 0, s_data = 0):
     if acl_check(title, 'render') == 1:
         return 'HTTP Request 401.3'
+    elif s_data == 1:
+        return data
     else:
         return namumark(title, data, num)
 

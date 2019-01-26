@@ -15,8 +15,8 @@ import random
 
 from func import *
 
-r_ver = 'v3.0.9-master-001'
-c_ver = ''.join(re.findall('[0-9]', r_ver))
+r_ver = 'v3.0.9-master-002'
+c_ver = '309001'
 
 print('Version : ' + r_ver)
 
