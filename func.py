@@ -53,7 +53,7 @@ def send_email(who, title, data):
 
         smtp.quit()
     except:
-        print('error : email login error')
+        print('Error : Email login error')
 
 def easy_minify(data, tool = None):
     try:
@@ -561,14 +561,14 @@ def acl_check(name, tool = ''):
         acl_data = curs.fetchall()
         if acl_data:
             if acl_data[0][0] == 'user':
-                if not user_data:
+                if ip_or_user(ip):
                     return 1
 
             if acl_data[0][0] == 'admin':
-                if not user_data:
+                if ip_or_user(ip):
                     return 1
 
-                if not admin_check(5, 'view (' + name + ')') == 1:
+                if admin_check(5, 'view (' + name + ')') != 1:
                     return 1
 
         return 0
