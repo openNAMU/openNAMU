@@ -3610,14 +3610,21 @@ def acl(name = None):
                 check_ok = 'disabled'
 
     if flask.request.method == 'POST':
+        if flask.request.form.get('dec', '') != flask.request.form.get('view', ''):
+            dec = flask.request.form.get('view', '')
+            view = flask.request.form.get('view', '')
+        else:
+            dec = flask.request.form.get('dec', '')
+            view = flask.request.form.get('view', '')
+
         curs.execute("select title from acl where title = ?", [name])
         if curs.fetchall():
-            curs.execute("update acl set dec = ? where title = ?", [flask.request.form.get('dec', ''), name])
+            curs.execute("update acl set dec = ? where title = ?", [dec, name])
             curs.execute("update acl set dis = ? where title = ?", [flask.request.form.get('dis', ''), name])
             curs.execute("update acl set why = ? where title = ?", [flask.request.form.get('why', ''), name])
-            curs.execute("update acl set view = ? where title = ?", [flask.request.form.get('view', ''), name])
+            curs.execute("update acl set view = ? where title = ?", [view, name])
         else:
-            curs.execute("insert into acl (title, dec, dis, why, view) values (?, ?, ?, ?, ?)", [name, flask.request.form.get('dec', ''), flask.request.form.get('dis', ''), flask.request.form.get('why', ''), flask.request.form.get('view', '')])
+            curs.execute("insert into acl (title, dec, dis, why, view) values (?, ?, ?, ?, ?)", [name, dec, flask.request.form.get('dis', ''), flask.request.form.get('why', ''), view])
         
         curs.execute("select title from acl where title = ? and dec = '' and dis = ''", [name])
         if curs.fetchall():
@@ -3679,14 +3686,14 @@ def acl(name = None):
                     data += '<hr class=\"main_hr\"><input placeholder="' + load_lang('why') + '" name="why" type="text" ' + check_ok + '>'
             
         return easy_minify(flask.render_template(skin_check(), 
-            imp = [name, wiki_set(), custom(), other2([' (acl)', 0])],
+            imp = [name, wiki_set(), custom(), other2([' (' + load_lang('acl') + ')', 0])],
             data =  '''
-                    <form method="post">
-                        ''' + data + '''
-                        <hr class=\"main_hr\">
-                        <button type="submit" ''' + check_ok + '''>''' + load_lang('save') + '''</button>
-                    </form>
-                    ''',
+                <form method="post">
+                    ''' + data + '''
+                    <hr class=\"main_hr\">
+                    <button type="submit" ''' + check_ok + '''>''' + load_lang('save') + '''</button>
+                </form>
+            ''',
             menu = [['w/' + url_pas(name), load_lang('document')], ['manager', load_lang('admin')]]
         ))
             
@@ -4544,7 +4551,7 @@ def api_raw(name = ''):
     curs.execute("select data from data where title = ?", [name])
     data = curs.fetchall()
     if data:
-        json_data = { "title" : name, "data" : data[0][0] }
+        json_data = { "title" : name, "data" : render_set(title = name, data = data[0][0], s_data = 1) }
     
         return flask.jsonify(json_data)
     else:
