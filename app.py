@@ -1390,20 +1390,20 @@ def oauth_settings():
             init_js += 'check_value(document.getElementById("{}_client_{}"));'.format(oauth_supported[i], load_target)
 
             body_content += '''
-                            <input id="{}_client_{}_box" type="checkbox" disabled>
-                            <input placeholder="{}_client_{}" id="{}_client_{}" name="{}_client_{}" value="{}" type="text" onChange="check_value(this)" style="width: 80%;">
-                            <hr>
-                            '''.format(
-                                oauth_supported[i],
-                                load_target,
-                                oauth_supported[i], 
-                                load_target, 
-                                oauth_supported[i], 
-                                load_target, 
-                                oauth_supported[i], 
-                                load_target, 
-                                oauth_data['client_{}'.format(load_target)]
-                            )
+                <input id="{}_client_{}_box" type="checkbox" disabled>
+                <input placeholder="{}_client_{}" id="{}_client_{}" name="{}_client_{}" value="{}" type="text" onChange="check_value(this)" style="width: 80%;">
+                <hr>
+            '''.format(
+                oauth_supported[i],
+                load_target,
+                oauth_supported[i], 
+                load_target, 
+                oauth_supported[i], 
+                load_target, 
+                oauth_supported[i], 
+                load_target, 
+                oauth_data['client_{}'.format(load_target)]
+            )
     
     body_content += '<button id="save" type="submit">' + load_lang('save') + '</button></form>'
     body_content += '<script>' + init_js + '</script>'
@@ -1452,28 +1452,24 @@ def adsense_settings():
         <form action="" accept-charset="utf-8" method="post">
             <div class="form-check">
                 <label class="form-check-label">
-                    <input class="form-check-input" name="adsense_enabled" type="checkbox" %_html:adsense_enabled_%>
-                    %_lang:adsense_enabled_%
+                    <input class="form-check-input" name="adsense_enabled" type="checkbox" {}>
+                    {}
                 </label>
             </div>
             <hr>
             <div class="form-group">
-                <textarea class="form-control" id="adsense_code" name="adsense_code" rows="12">%_html:adsense_code_%</textarea>
+                <textarea class="form-control" id="adsense_code" name="adsense_code" rows="12">{}</textarea>
             </div>
-            <button type="submit" value="publish">%_lang:save_%</button>
+            <button type="submit" value="publish">{}</button>
         </form>
     '''
     
-    if adsense_enabled == 'True':
-        template = template.replace('%_html:adsense_enabled_%', 'checked')
-    else:
-        template = template.replace('%_html:adsense_enabled_%', '')
-
-    template = template.replace('%_lang:adsense_enabled_%', load_lang('adsense_enable'))
-    template = template.replace('%_lang:save_%', load_lang('save'))
-    template = template.replace('%_html:adsense_code_%', adsense_code)
-
-    body_content += template
+    body_content += template.format(
+        'checked' if adsense_enabled == 'True' else template.format(''),
+        load_lang('adsense_enable'),
+        load_lang('save')
+        adsense_code
+    )
 
     return easy_minify(flask.render_template(skin_check(),
         imp = [load_lang('adsense_setting'), wiki_set(), custom(), other2([0, 0])],
@@ -3952,20 +3948,23 @@ def read_view(name = None):
 
     div = end_data + div
             
+    adsense_code = '<div align="center" style="display: block; margin-bottom: 10px;">{}</div>'
+
     curs.execute("select data from other where name = 'adsense'")
     adsense_enabled = curs.fetchall()[0][0]
-    adsense_code = '<div align="center" style="display: block; margin-bottom: 10px;">%_adsense_code_%</div>'
     if adsense_enabled == 'True':
         curs.execute("select data from other where name = 'adsense_code'")
-        adsense_code = adsense_code.replace('%_adsense_code_%', curs.fetchall()[0][0])
+        adsense_code = adsense_code.format(curs.fetchall()[0][0])
     else:
-        adsense_code = adsense_code.replace('%_adsense_code_%', '')
+        adsense_code = adsense_code.format('')
+
     curs.execute("select data from other where name = 'body'")
     body = curs.fetchall()
     if body:
         div = body[0][0] + '<hr class=\"main_hr\">' + div
     
     div = adsense_code + '<div>' + div + '</div>'
+    
     return easy_minify(flask.render_template(skin_check(), 
         imp = [flask.request.args.get('show', name), wiki_set(), custom(), other2([sub + acl, r_date])],
         data = div,
