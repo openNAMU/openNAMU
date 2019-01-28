@@ -275,6 +275,7 @@ h6 {
     right: 0;
     background: white;
     border-left: 2px solid gainsboro;
+    z-index: 1;
 }
 
 #mobile_menu_main {
