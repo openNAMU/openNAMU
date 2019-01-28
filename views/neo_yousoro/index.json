@@ -1,0 +1,8 @@
+{
+    "button" : {
+        "require" : {
+            "id" : "preview"
+        },
+        "class" : "btn-button"
+    }
+}
