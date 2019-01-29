@@ -50,11 +50,11 @@ def namumark(title = '', data = None, num = 0):
 
         if num == 1:
             data_num = len(data[2]) 
-            data_in_num = int(data_num / 8)
+            data_in_num = int(data_num / multiprocessing.cpu_count())
             data_in = []
 
-            for i in range(8):
-                if not i == 7:
+            for i in range(multiprocessing.cpu_count()):
+                if i != multiprocessing.cpu_count() - 1:
                     data_in += [data[2][data_in_num * i:data_in_num * (i + 1)]]
                 else:
                     data_in += [data[2][data_in_num * i:]]
