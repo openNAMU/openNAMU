@@ -1467,7 +1467,7 @@ def adsense_settings():
     body_content += template.format(
         'checked' if adsense_enabled == 'True' else template.format(''),
         load_lang('adsense_enable'),
-        load_lang('save')
+        load_lang('save'),
         adsense_code
     )
 
