@@ -21,8 +21,7 @@ c_ver = '309001'
 print('Version : ' + r_ver)
 
 try:
-    json_data = open('set.json').read()
-    set_data = json.loads(json_data)
+    set_data = json.loads(open('set.json').read())
 except:
     while 1:
         print('DB\'s name : ', end = '')
@@ -32,8 +31,7 @@ except:
             with open('set.json', 'w') as f:
                 f.write('{ "db" : "' + new_json + '" }')
             
-            json_data = open('set.json').read()
-            set_data = json.loads(json_data)
+            set_data = json.loads(open('set.json').read())
 
             break
 

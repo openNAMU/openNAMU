@@ -55,6 +55,40 @@ def send_email(who, title, data):
     except:
         print('Error : Email login error')
 
+def last_change(data):
+    json_address = re.sub("\.html$", ".json", skin_check())
+    try:
+        json_data = json.loads(open(json_address).read())
+    except:
+        json_data = 0
+
+    if json_data != 0:
+        for j_data in json_data:
+            if "class" in json_data[j_data]:
+                if "require" in json_data[j_data]:
+                    re_data = re.compile("<((?:" + j_data + ")( (?:(?!>).)*)?)>")
+                    s_data = re_data.findall(data)
+                    for i_data in s_data:
+                        e_data = 0
+
+                        for j_i_data in json_data[j_data]["require"]:
+                            re_data_2 = re.compile("( |^)" + j_i_data + " *= *[\'\"]" + json_data[j_data]["require"][j_i_data] + "[\'\"]")
+                            if not re_data_2.search(i_data[1]):
+                                re_data_2 = re.compile("( |^)" + j_i_data + "=" + json_data[j_data]["require"][j_i_data] + "(?: |$)")
+                                if not re_data_2.search(i_data[1]):
+                                    e_data = 1
+
+                                    break
+
+                        if e_data == 0:
+                            re_data_3 = re.compile("<" + i_data[0] + ">")
+                            data = re_data_3.sub("<" + i_data[0] + " class=\"" + json_data[j_data]["class"] + "\">", data)        
+                else:
+                    re_data = re.compile("<(?P<in>" + j_data + "(?: (?:(?!>).)*)?)>")
+                    data = re_data.sub("<\g<in> class=\"" + json_data[j_data]["class"] + "\">", data)        
+
+    return data
+
 def easy_minify(data, tool = None):
     try:
         if not tool:
@@ -68,7 +102,7 @@ def easy_minify(data, tool = None):
         data = re.sub('\n +<', '\n<', data)
         data = re.sub('>(\n| )+<', '> <', data)
     
-    return data
+    return last_change(data)
 
 def render_set(title = '', data = '', num = 0, s_data = 0):
     if acl_check(title, 'render') == 1:
