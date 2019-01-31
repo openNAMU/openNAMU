@@ -15,7 +15,7 @@ import random
 
 from func import *
 
-r_ver = 'v3.0.9-master-002'
+r_ver = 'v3.0.9-master-003'
 c_ver = '309001'
 
 print('Version : ' + r_ver)
@@ -53,7 +53,7 @@ app.config['JSON_AS_ASCII'] = False
 flask_reggie.Reggie(app)
 
 compress = flask_compress.Compress()
-# compress.init_app(app)
+compress.init_app(app)
 
 class EverythingConverter(werkzeug.routing.PathConverter):
     regex = '.*?'
@@ -1213,44 +1213,65 @@ def give_log():
         menu = [['other', load_lang('return')]]
     ))
 
-# 인덱싱에 버튼 추가하시오 (실수 방지)
-@app.route('/indexing')
+@app.route('/indexing', methods=['POST', 'GET'])
 def indexing():
-    if admin_check(None, 'indexing') != 1:
+    if admin_check(None, None) != 1:
         return re_error('/error/3')
 
-    curs.execute("select name from sqlite_master where type = 'index'")
-    data = curs.fetchall()
-    if data:
-        for delete_index in data:
-            print('Delete : ' + delete_index[0])
+    if flask.request.method == 'POST':
+        admin_check(None, 'indexing')
 
-            sql = 'drop index if exists ' + delete_index[0]
-            
-            try:
-                curs.execute(sql)
-            except:
-                pass
-    else:
-        curs.execute("select name from sqlite_master where type in ('table', 'view') and name not like 'sqlite_%' union all select name from sqlite_temp_master where type in ('table', 'view') order by 1;")
-        for table in curs.fetchall():            
-            curs.execute('select sql from sqlite_master where name = ?', [table[0]])
-            cul = curs.fetchall()
-            
-            r_cul = re.findall('(?:([^ (]*) text)', str(cul[0]))
-            
-            for n_cul in r_cul:
-                print('Create : index_' + table[0] + '_' + n_cul)
+        curs.execute("select name from sqlite_master where type = 'index'")
+        data = curs.fetchall()
+        if data:
+            for delete_index in data:
+                print('Delete : ' + delete_index[0])
 
-                sql = 'create index index_' + table[0] + '_' + n_cul + ' on ' + table[0] + '(' + n_cul + ')'
+                sql = 'drop index if exists ' + delete_index[0]
+                
                 try:
                     curs.execute(sql)
                 except:
                     pass
+        else:
+            curs.execute("select name from sqlite_master where type in ('table', 'view') and name not like 'sqlite_%' union all select name from sqlite_temp_master where type in ('table', 'view') order by 1;")
+            for table in curs.fetchall():            
+                curs.execute('select sql from sqlite_master where name = ?', [table[0]])
+                cul = curs.fetchall()
+                
+                r_cul = re.findall('(?:([^ (]*) text)', str(cul[0]))
+                
+                for n_cul in r_cul:
+                    print('Create : index_' + table[0] + '_' + n_cul)
 
-    conn.commit()
-    
-    return redirect()     
+                    sql = 'create index index_' + table[0] + '_' + n_cul + ' on ' + table[0] + '(' + n_cul + ')'
+                    try:
+                        curs.execute(sql)
+                    except:
+                        pass
+
+        conn.commit()
+        
+        return redirect()  
+    else:
+        curs.execute("select name from sqlite_master where type = 'index'")
+        data = curs.fetchall()
+        if data:
+            b_data = load_lang('delete')
+        else:
+            b_data = load_lang('create')
+
+        return easy_minify(flask.render_template(skin_check(), 
+            imp = [load_lang('indexing'), wiki_set(), custom(), other2([0, 0])],
+            data =  '''
+                    <form method="post">
+                        <button type="submit">''' + b_data + '''</button>
+                    </form>
+                    ''',
+            menu = [['manager', load_lang('return')]]
+        ))       
+
+   
 
 @app.route('/restart', methods=['POST', 'GET'])
 def restart():
@@ -1272,7 +1293,6 @@ def restart():
             menu = [['manager', load_lang('return')]]
         ))       
 
-# 여기부터 해야함
 @app.route('/update')
 def now_update():
     if admin_check(None, 'update') != 1:
@@ -2170,7 +2190,6 @@ def move(name = None):
             menu = [['w/' + url_pas(name), load_lang('return')]]
         ))
 
-# 여기까지 함
 @app.route('/other')
 def other():
     return easy_minify(flask.render_template(skin_check(), 
@@ -3144,7 +3163,6 @@ def change_password():
     else:
         pass
 
-# 여기까지 작업함
 @app.route('/check/<name>')
 def user_check(name = None):
     curs.execute("select acl from user where id = ? or id = ?", [name, flask.request.args.get('plus', '-')])
@@ -3342,7 +3360,6 @@ def register():
             menu = [['user', load_lang('return')]]
         ))
 
-# 여기까지 함
 @app.route('/<regex("need_email|pass_find"):tool>', methods=['POST', 'GET'])
 def need_email(tool = 'pass_find'):
     if flask.request.method == 'POST':
@@ -4391,7 +4408,6 @@ def user_info():
         menu = 0
     ))
 
-# 여기까지 함
 @app.route('/watch_list')
 def watch_list():
     div = 'limit : 10<hr class=\"main_hr\">'
