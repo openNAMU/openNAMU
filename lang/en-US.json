@@ -1,5 +1,7 @@
 {
     "_comment_1_" : "Common",
+        "server" : "Server",
+        "filter" : "Filter",
         "delete" : "Delete",
         "notice" : "Notice",
         "add" : "Add",

@@ -1,5 +1,7 @@
 {
     "_comment_1_" : "공통",
+        "server" : "서버",
+        "filter" : "필터",
         "delete" : "삭제",
         "notice" : "알림",
         "add" : "추가",
