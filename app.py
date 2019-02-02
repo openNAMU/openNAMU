@@ -2936,7 +2936,7 @@ def login():
             menu = [['user', load_lang('return')]]
         ))
 
-@app.route('/oauth/<regex("naver|facebook"):platform>/<regex("init|callback"):func>', methods=['GET', 'POST'])
+@app.route('/oauth/<regex("discord|naver|facebook"):platform>/<regex("init|callback"):func>', methods=['GET', 'POST'])
 def login_oauth(platform = None, func = None):
     publish_url = load_oauth('publish_url')
     oauth_data = load_oauth(platform)
@@ -2948,7 +2948,11 @@ def login_oauth(platform = None, func = None):
         'state' : 'RAMDOMVALUE'
     }
 
-    if platform == 'naver':
+    if platform == 'discord':
+        api_url['redirect'] = 'https://discordapp.com/api/v6/oauth2/authorize'
+        api_url['token'] = 'https://discordapp.com/api/v6/api/oauth2/token'
+        api_url['profile'] = ''
+    elif platform == 'naver':
         api_url['redirect'] = 'https://nid.naver.com/oauth2.0/authorize'
         api_url['token'] = 'https://nid.naver.com/oauth2.0/token'
         api_url['profile'] = 'https://openapi.naver.com/v1/nid/me'
@@ -2983,7 +2987,9 @@ def login_oauth(platform = None, func = None):
 
         flask.session['refer'] = flask.request.referrer
 
-        if platform == 'naver':
+        if platform == 'discord':
+            return redirect(api_url['redirect'] + '?response_type=code&client_id={}&scope=identify&redirect_uri={}&state={}'.format(data['client_id'], data['redirect_uri'], data['state']))
+        elif platform == 'naver':
             return redirect(api_url['redirect'] + '?response_type=code&client_id={}&redirect_uri={}&state={}'.format(data['client_id'], data['redirect_uri'], data['state']))
         elif platform == 'facebook':
             return redirect(api_url['redirect'] + '?client_id={}&redirect_uri={}&state={}'.format(data['client_id'], data['redirect_uri'], data['state']))
@@ -2991,6 +2997,8 @@ def login_oauth(platform = None, func = None):
     elif func == 'callback':
         code = flask.request.args.get('code')
         state = flask.request.args.get('state')
+        print(code)
+        print(state)
         if code == None or state == None:
             return easy_minify(flask.render_template(skin_check(),
                 imp = [load_lang('inter_error'), wiki_set(), custom(), other2([0, 0])],
@@ -2998,7 +3006,31 @@ def login_oauth(platform = None, func = None):
                 menu = [['user', load_lang('return')]]
             ))
 
-        if platform == 'naver':
+        if platform == 'discord':
+            #token_access = api_url['token']
+            #token_result = urllib.request.urlopen(token_access).read().decode('utf-8')
+            #token_result_json = json.loads(token_result)
+            #return token_result
+
+            token_access_data = {
+                'client_id': oauth_data['client_id'],
+                'client_secret': oauth_data['client_secret'],
+                'grant_type': 'authorization_code',
+                'code': code,
+                'redirect_uri': data['redirect_uri'],
+                'scope': 'identify'
+            }
+            headers = {'Content-Type': 'application/x-www-form-urlencoded'}
+
+            print(str(token_access_data))
+            token_access = urllib.request.Request(api_url['token'], data = json.dumps(token_access_data), headers = headers)
+            token_result = urllib.request.urlopen(token_access_data)
+            #token_result = urllib.request.urlopen(token_access_data).read().decode('utf-8')
+            print(token_result)
+            #profile_result_json = json.loads(profile_result)
+
+            #stand_json = {'id' : profile_result_json['response']['id'], 'name' : profile_result_json['response']['name'], 'picture' : profile_result_json['response']['profile_image']}
+        elif platform == 'naver':
             token_access = api_url['token']+'?grant_type=authorization_code&client_id={}&client_secret={}&code={}&state={}'.format(data['client_id'], data['client_secret'], code, state)
             token_result = urllib.request.urlopen(token_access).read().decode('utf-8')
             token_result_json = json.loads(token_result)
