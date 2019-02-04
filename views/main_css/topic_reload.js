@@ -27,7 +27,7 @@ function topic_load(name, sub) {
                     console.log(xhr.responseText);
                     console.log(url);
 
-                    doc_data.innerText += '(new topic)\n\n';
+                    doc_data.innerText += '(New)\n\n';
 
                     clearInterval(test);
                 }
