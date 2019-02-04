@@ -5,6 +5,10 @@
         "support" : ["facebook", "naver"]
     },
     "publish_url" : "https://",
+    "discord" : {
+        "client_id" : "",
+        "client_secret" : ""
+    },
     "facebook" : {
         "client_id" : "",
         "client_secret" : ""
