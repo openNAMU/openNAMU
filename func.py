@@ -238,7 +238,7 @@ def load_lang(data, num = 2):
         curs.execute("select data from other where name = 'language'")
         rep_data = curs.fetchall()
 
-        json_data = open(os.path.join('lang', rep_data[0][0] + '.json'), 'rt', encoding='utf-8').read()
+        json_data = open(os.path.join('language', rep_data[0][0] + '.json'), 'rt', encoding='utf-8').read()
         lang = json.loads(json_data)
 
         if data in lang:
@@ -250,7 +250,7 @@ def load_lang(data, num = 2):
         rep_data = curs.fetchall()
         if rep_data:
             try:
-                json_data = open(os.path.join('lang', rep_data[0][0] + '.json'), 'rt', encoding='utf-8').read()
+                json_data = open(os.path.join('language', rep_data[0][0] + '.json'), 'rt', encoding='utf-8').read()
                 lang = json.loads(json_data)
             except:
                 return load_lang(data, 1)
