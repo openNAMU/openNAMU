@@ -1,4 +1,5 @@
 from route.read_view import *
+from route.delete import *
 
 r_ver = 'v3.0.9-master-003'
 c_ver = '309001'
@@ -2021,58 +2022,7 @@ def preview(name = None):
         
 @app.route('/delete/<everything:name>', methods=['POST', 'GET'])
 def delete(name = None):
-    ip = ip_check()
-    if acl_check(name) == 1:
-        return re_error('/ban')
-    
-    if flask.request.method == 'POST':
-        if captcha_post(flask.request.form.get('g-recaptcha-response', '')) == 1:
-            return re_error('/error/13')
-        else:
-            captcha_post('', 0)
-
-        curs.execute("select data from data where title = ?", [name])
-        data = curs.fetchall()
-        if data:
-            today = get_time()
-            leng = '-' + str(len(data[0][0]))
-            
-            history_plus(
-                name, 
-                '', 
-                today, 
-                ip, 
-                flask.request.form.get('send', None) + ' (delete)', 
-                leng
-            )
-            
-            curs.execute("select title, link from back where title = ? and not type = 'cat' and not type = 'no'", [name])
-            for data in curs.fetchall():
-                curs.execute("insert into back (title, link, type) values (?, ?, 'no')", [data[0], data[1]])
-            
-            curs.execute("delete from back where link = ?", [name])
-            curs.execute("delete from data where title = ?", [name])
-            conn.commit()
-            
-        return redirect('/w/' + url_pas(name))
-    else:
-        curs.execute("select title from data where title = ?", [name])
-        if not curs.fetchall():
-            return redirect('/w/' + url_pas(name))
-
-        return easy_minify(flask.render_template(skin_check(), 
-            imp = [name, wiki_set(), custom(), other2([' (' + load_lang('delete') + ')', 0])],
-            data =  '''
-                    <form method="post">
-                        ''' + ip_warring() + '''
-                        <input placeholder="''' + load_lang('why') + '''" name="send" type="text">
-                        <hr class=\"main_hr\">
-                        ''' + captcha_get() + '''
-                        <button type="submit">''' + load_lang('delete') + '''</button>
-                    </form>
-                    ''',
-            menu = [['w/' + url_pas(name), load_lang('return')]]
-        ))             
+    return delete_2(conn, name)        
             
 @app.route('/move/<everything:name>', methods=['POST', 'GET'])
 def move(name = None):
@@ -2973,17 +2923,28 @@ def login_oauth(platform = None, func = None):
         flask.session['refer'] = flask.request.referrer
 
         if platform == 'discord':
-            return redirect(api_url['redirect'] + '?response_type=code&client_id={}&scope=identify&redirect_uri={}&state={}'.format(data['client_id'], data['redirect_uri'], data['state']))
+            return redirect(api_url['redirect'] + '?response_type=code&client_id={}&scope=identify&redirect_uri={}&state={}'.format(
+                data['client_id'], 
+                data['redirect_uri'], 
+                data['state']
+            ))
         elif platform == 'naver':
-            return redirect(api_url['redirect'] + '?response_type=code&client_id={}&redirect_uri={}&state={}'.format(data['client_id'], data['redirect_uri'], data['state']))
+            return redirect(api_url['redirect'] + '?response_type=code&client_id={}&redirect_uri={}&state={}'.format(
+                data['client_id'], 
+                data['redirect_uri'], 
+                data['state']
+            ))
         elif platform == 'facebook':
-            return redirect(api_url['redirect'] + '?client_id={}&redirect_uri={}&state={}'.format(data['client_id'], data['redirect_uri'], data['state']))
+            return redirect(api_url['redirect'] + '?client_id={}&redirect_uri={}&state={}'.format(
+                data['client_id'], 
+                data['redirect_uri'], 
+                data['state']
+            ))
 
     elif func == 'callback':
         code = flask.request.args.get('code')
         state = flask.request.args.get('state')
-        print(code)
-        print(state)
+
         if code == None or state == None:
             return easy_minify(flask.render_template(skin_check(),
                 imp = [load_lang('inter_error'), wiki_set(), custom(), other2([0, 0])],
@@ -3005,44 +2966,74 @@ def login_oauth(platform = None, func = None):
                 'redirect_uri': data['redirect_uri'],
                 'scope': 'identify'
             }
-            headers = {'Content-Type': 'application/x-www-form-urlencoded'}
+            headers = {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
 
-            print(str(token_access_data))
             token_access = urllib.request.Request(api_url['token'], data = json.dumps(token_access_data), headers = headers)
             token_result = urllib.request.urlopen(token_access_data)
-            #token_result = urllib.request.urlopen(token_access_data).read().decode('utf-8')
-            print(token_result)
-            #profile_result_json = json.loads(profile_result)
+            # token_result = urllib.request.urlopen(token_access_data).read().decode('utf-8')
+            # profile_result_json = json.loads(profile_result)
 
-            #stand_json = {'id' : profile_result_json['response']['id'], 'name' : profile_result_json['response']['name'], 'picture' : profile_result_json['response']['profile_image']}
+            # stand_json = {
+            #     'id' : profile_result_json['response']['id'], 
+            #     'name' : profile_result_json['response']['name'],
+            #     'picture' : profile_result_json['response']['profile_image']
+            # }
         elif platform == 'naver':
-            token_access = api_url['token']+'?grant_type=authorization_code&client_id={}&client_secret={}&code={}&state={}'.format(data['client_id'], data['client_secret'], code, state)
+            token_access = api_url['token'] + '?grant_type=authorization_code&client_id={}&client_secret={}&code={}&state={}'.format(
+                data['client_id'], 
+                data['client_secret'], 
+                code, 
+                state
+            )
             token_result = urllib.request.urlopen(token_access).read().decode('utf-8')
             token_result_json = json.loads(token_result)
 
-            headers = {'Authorization': 'Bearer {}'.format(token_result_json['access_token'])}
+            headers = {
+                'Authorization': 'Bearer {}'.format(token_result_json['access_token'])
+            }
 
             profile_access = urllib.request.Request(api_url['profile'], headers = headers)
             profile_result = urllib.request.urlopen(profile_access).read().decode('utf-8')
             profile_result_json = json.loads(profile_result)
 
-            stand_json = {'id' : profile_result_json['response']['id'], 'name' : profile_result_json['response']['name'], 'picture' : profile_result_json['response']['profile_image']}
+            stand_json = {
+                'id' : profile_result_json['response']['id'],
+                'name' : profile_result_json['response']['name'],
+                'picture' : profile_result_json['response']['profile_image']
+            }
         elif platform == 'facebook':
-            token_access = api_url['token']+'?client_id={}&redirect_uri={}&client_secret={}&code={}'.format(data['client_id'], data['redirect_uri'], data['client_secret'], code)
+            token_access = api_url['token'] + '?client_id={}&redirect_uri={}&client_secret={}&code={}'.format(
+                data['client_id'], 
+                data['redirect_uri'], 
+                data['client_secret'], 
+                code
+            )
             token_result = urllib.request.urlopen(token_access).read().decode('utf-8')
             token_result_json = json.loads(token_result)
 
-            profile_access = api_url['profile']+'?fields=id,name,picture&access_token={}'.format(token_result_json['access_token'])
+            profile_access = api_url['profile'] + '?fields=id,name,picture&access_token={}'.format(token_result_json['access_token'])
             profile_result = urllib.request.urlopen(profile_access).read().decode('utf-8')
             profile_result_json = json.loads(profile_result)
 
-            stand_json = {'id': profile_result_json['id'], 'name': profile_result_json['name'], 'picture': profile_result_json['picture']['data']['url']}
+            stand_json = {
+                'id': profile_result_json['id'], 
+                'name': profile_result_json['name'], 
+                'picture': profile_result_json['picture']['data']['url']
+            }
         
         if flask.session['referrer'][0:6] == 'change':
             curs.execute('select * from oauth_conn where wiki_id = ? and provider = ?', [flask.session['id'], platform])
             oauth_result = curs.fetchall()
             if len(oauth_result) == 0:
-                curs.execute('insert into oauth_conn (provider, wiki_id, sns_id, name, picture) values(?, ?, ?, ?, ?)', [platform, flask.session['id'], stand_json['id'], stand_json['name'], stand_json['picture']])
+                curs.execute('insert into oauth_conn (provider, wiki_id, sns_id, name, picture) values(?, ?, ?, ?, ?)', [
+                    platform, 
+                    flask.session['id'], 
+                    stand_json['id'], 
+                    stand_json['name'], 
+                    stand_json['picture']
+                ])
             else:
                 curs.execute('update oauth_conn set name = ? picture = ? where wiki_id = ?', [stand_json['name'], stand_json['pricture'], flask.session['id']])
 
@@ -3835,173 +3826,7 @@ def down(name = None):
 
 @app.route('/w/<everything:name>')
 def read_view(name = None):
-    data_none = 0
-    sub = ''
-    acl = ''
-    div = ''
-
-    num = flask.request.args.get('num', None)
-    if num:
-        num = int(num)
-    else:
-        if not flask.request.args.get('from', None):
-            curs.execute("select title from back where link = ? and type = 'redirect'", [name])
-            redirect_data = curs.fetchall()
-            if redirect_data:
-                return redirect('/w/' + redirect_data[0][0] + '?from=' + name)
-
-    curs.execute("select sub from rd where title = ? and not stop = 'O' order by date desc", [name])
-    if curs.fetchall():
-        sub += ' (' + load_lang('discussion') + ')'
-
-    curs.execute("select link from back where title = ? and type = 'cat' order by link asc", [name])
-                
-    curs.execute("select title from data where title like ?", ['%' + name + '/%'])
-    if curs.fetchall():
-        down = 1
-    else:
-        down = 0
-        
-    m = re.search("^(.*)\/(.*)$", name)
-    if m:
-        uppage = m.groups()[0]
-    else:
-        uppage = 0
-        
-    if re.search('^category:', name):        
-        curs.execute("select link from back where title = ? and type = 'cat' order by link asc", [name])
-        back = curs.fetchall()
-        if back:
-            div = '<br><h2 id="cate_normal">' + load_lang('category') + '</h2><ul>'
-            u_div = ''
-
-            for data in back:    
-                if re.search('^category:', data[0]):
-                    u_div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a></li>'
-                else:
-                    curs.execute("select title from back where title = ? and type = 'include'", [data[0]])
-                    db_data = curs.fetchall()
-                    if db_data:
-                        div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a> <a id="inside" href="/xref/' + url_pas(data[0]) + '">(' + load_lang('backlink') + ')</a></li>'
-                    else: 
-                        div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a></li>'
-
-            div += '</ul>'
-            
-            if div == '<br><h2 id="cate_normal">' + load_lang('category') + '</h2><ul></ul>':
-                div = ''
-            
-            if u_div != '':
-                div += '<br><h2 id="cate_under">' + load_lang('under_category') + '</h2><ul>' + u_div + '</ul>'
-
-
-    if num:
-        curs.execute("select title from history where title = ? and id = ? and hide = 'O'", [name, str(num)])
-        if curs.fetchall() and admin_check(6) != 1:
-            return redirect('/history/' + url_pas(name))
-
-        curs.execute("select title, data from history where title = ? and id = ?", [name, str(num)])
-    else:
-        curs.execute("select title, data from data where title = ?", [name])
-    
-    data = curs.fetchall()
-    if data:
-        else_data = data[0][1]
-        response_data = 200
-    else:
-        data_none = 1
-        response_data = 404
-        else_data = None
-
-    m = re.search("^user:([^/]*)", name)
-    if m:
-        g = m.groups()
-        
-        curs.execute("select acl from user where id = ?", [g[0]])
-        test = curs.fetchall()
-        if test and test[0][0] != 'user':
-            acl = ' (' + load_lang('admin') + ')'
-        else:
-            if ban_check(g[0]) == 1:
-                sub += ' (' + load_lang('blocked') + ')'
-            else:
-                acl = ''
-
-    curs.execute("select dec from acl where title = ?", [name])
-    data = curs.fetchall()
-    if data:
-        acl += ' (' + load_lang('acl') + ')'
-            
-    if flask.request.args.get('from', None) and else_data:
-        else_data = re.sub('^\r\n', '', else_data)
-        else_data = re.sub('\r\n$', '', else_data)
-            
-    end_data = render_set(
-        title = name,
-        data = else_data
-    )
-
-    if end_data == 'HTTP Request 401.3':
-        response_data = 401
-    
-    if num:
-        menu = [['history/' + url_pas(name), load_lang('history')]]
-        sub = ' (r' + str(num) + ')'
-        acl = ''
-        r_date = 0
-    else:
-        if data_none == 1:
-            menu = [['edit/' + url_pas(name), load_lang('create')]]
-        else:
-            menu = [['edit/' + url_pas(name), load_lang('edit')]]
-
-        menu += [['topic/' + url_pas(name), load_lang('discussion')], ['history/' + url_pas(name), load_lang('history')], ['xref/' + url_pas(name), load_lang('backlink')], ['acl/' + url_pas(name), load_lang('acl')]]
-
-        if flask.request.args.get('from', None):
-            menu += [['w/' + url_pas(name), load_lang('pass')]]
-            end_data =  '''
-                        <div id="redirect">
-                            <a href="/w/''' + url_pas(flask.request.args.get('from', None)) + '?from=' + url_pas(name) + '">' + flask.request.args.get('from', None) + '</a> - ' + name + '''
-                        </div>
-                        <br>''' + end_data
-
-        if uppage != 0:
-            menu += [['w/' + url_pas(uppage), load_lang('upper')]]
-
-        if down:
-            menu += [['down/' + url_pas(name), load_lang('sub')]]
-    
-        curs.execute("select date from history where title = ? order by date desc limit 1", [name])
-        date = curs.fetchall()
-        if date:
-            r_date = date[0][0]
-        else:
-            r_date = 0
-
-    div = end_data + div
-            
-    adsense_code = '<div align="center" style="display: block; margin-bottom: 10px;">{}</div>'
-
-    curs.execute("select data from other where name = 'adsense'")
-    adsense_enabled = curs.fetchall()[0][0]
-    if adsense_enabled == 'True':
-        curs.execute("select data from other where name = 'adsense_code'")
-        adsense_code = adsense_code.format(curs.fetchall()[0][0])
-    else:
-        adsense_code = adsense_code.format('')
-
-    curs.execute("select data from other where name = 'body'")
-    body = curs.fetchall()
-    if body:
-        div = body[0][0] + '<hr class=\"main_hr\">' + div
-    
-    div = adsense_code + '<div>' + div + '</div>'
-    
-    return easy_minify(flask.render_template(skin_check(), 
-        imp = [flask.request.args.get('show', name), wiki_set(), custom(), other2([sub + acl, r_date])],
-        data = div,
-        menu = menu
-    )), response_data
+    return read_view_2(conn, name)
 
 @app.route('/topic_record/<name>')
 def user_topic_list(name = None):
