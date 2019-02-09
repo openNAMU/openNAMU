@@ -1,4 +1,4 @@
-from func import *
+from route.read_view import *
 
 r_ver = 'v3.0.9-master-003'
 c_ver = '309001'
