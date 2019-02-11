@@ -33,8 +33,8 @@ except:
 if sys.version_info < (3, 6):
     import sha3
 
-from set_mark.tool import *
-from mark import *
+from .set_mark.tool import *
+from .mark import *
 
 def load_conn(data):
     global conn
