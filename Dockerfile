@@ -1,4 +1,4 @@
-FROM python:3
+FROM python:3.7-alpine3.9
 
 ENV NAMU_PORT=3000
 ENV NAMU_LANG=en-US
