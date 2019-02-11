@@ -3,8 +3,8 @@ import sqlite3
 import hashlib
 import threading
 
-from func import *
-from mark import load_conn2, namumark
+from route.tool.func import *
+from route.tool.mark import load_conn2, namumark
 
 try:
     f = open('set.json', 'r')
