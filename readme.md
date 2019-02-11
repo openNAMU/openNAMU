@@ -3,7 +3,7 @@
 [![Python 3.5 or later Required](https://img.shields.io/badge/python-3.5%20or%20higher-blue.svg)](https://python.org)
 [![LICENSE](https://img.shields.io/badge/license-BSD%203--Clause-lightgrey.svg)](./LICENSE)
 
-![](/.github/logo.png)
+![](https://raw.githubusercontent.com/2du/openNAMU/master/.github/logo.png)
 
 openNAMU is a Python-based wiki engine. You can use openNAMU by installing Python and its dependency modules, and you can modify the code yourself to create more specialized wikis.
 
