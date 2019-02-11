@@ -1,4 +1,4 @@
-from set_mark.namu import namu
+from .set_mark.namu import namu
 
 import re
 import html
