@@ -1,4 +1,4 @@
-FROM python:3.7-alpine3.9
+FROM python:3
 
 ENV NAMU_DB=data
 ENV NAMU_HOST=0.0.0.0
