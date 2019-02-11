@@ -9,17 +9,20 @@ print('Version : ' + r_ver)
 try:
     set_data = json.loads(open('set.json').read())
 except:
-    while 1:
-        print('DB\'s name : ', end = '')
+    if os.getenv('NAMU_DB') != None:
+        set_data = { "db" : os.getenv('NAMU_DB') }
+    else:
+        while 1:
+            print('DB\'s name : ', end = '')
         
-        new_json = str(input())
-        if new_json != '':
-            with open('set.json', 'w') as f:
-                f.write('{ "db" : "' + new_json + '" }')
+            new_json = str(input())
+            if new_json != '':
+                with open('set.json', 'w') as f:
+                    f.write('{ "db" : "' + new_json + '" }')
             
-            set_data = json.loads(open('set.json').read())
+                set_data = json.loads(open('set.json').read())
 
-            break
+                break
 
 if os.path.exists(set_data['db'] + '.db'):
     setup_tool = 0
@@ -169,7 +172,7 @@ else:
     else:
         rep_host = rep_data[0][0]
     
-        print('Host : ' + str(rep_host))
+print('Host : ' + str(rep_host))
 
 if os.getenv('NAMU_PORT') != None:
     rep_port = os.getenv('NAMU_PORT')
@@ -188,7 +191,7 @@ else:
     else:
         rep_port = rep_data[0][0]
     
-        print('Port : ' + str(rep_port))
+print('Port : ' + str(rep_port))
 
 try:
     if not os.path.exists('robots.txt'):
@@ -241,8 +244,8 @@ if not rep_data:
                 pass
 else:
     rep_language = rep_data[0][0]
-    
-    print('Language : ' + str(rep_language))
+  
+print('Language : ' + str(rep_language))
 
 curs.execute('select data from other where name = "adsense"')
 adsense_result = curs.fetchall()
@@ -268,7 +271,7 @@ for ask_data in ask_this:
     else:
         rep_mark = rep_data[0][0]
 
-        print(ask_data[0][1] + ' : ' + str(rep_mark))
+print(ask_data[0][1] + ' : ' + str(rep_mark))
 
 curs.execute('delete from other where name = "ver"')
 curs.execute('insert into other (name, data) values ("ver", ?)', [c_ver])
