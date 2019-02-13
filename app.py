@@ -1,7 +1,9 @@
 from route.read_view import *
 from route.delete import *
+from route.del_alarm import *
+from route.alarm import *
 
-r_ver = 'v3.0.9-master-003'
+r_ver = 'v3.0.9-master-004'
 c_ver = '309001'
 
 print('Version : ' + r_ver)
@@ -12,18 +14,19 @@ except:
     if os.getenv('NAMU_DB') != None:
         set_data = { "db" : os.getenv('NAMU_DB') }
     else:
-        while 1:
-            print('DB\'s name : ', end = '')
+        print('DB\'s name (data) : ', end = '')
         
-            new_json = str(input())
-            if new_json != '':
-                with open('set.json', 'w') as f:
-                    f.write('{ "db" : "' + new_json + '" }')
+        new_json = str(input())
+        if new_json == '':
+            new_json = 'data'
             
-                set_data = json.loads(open('set.json').read())
-
-                break
-
+        with open('set.json', 'w') as f:
+            f.write('{ "db" : "' + new_json + '" }')
+            
+        set_data = json.loads(open('set.json').read())
+        
+print('DB\'s name : ' + set_data['db'])
+            
 if os.path.exists(set_data['db'] + '.db'):
     setup_tool = 0
 else:
@@ -161,14 +164,14 @@ else:
     curs.execute('select data from other where name = "host"')
     rep_data = curs.fetchall()
     if not rep_data:
-        while 1:
-            print('Host [0.0.0.0] : ', end = '')
-            rep_host = input()
-            if rep_host:
-                curs.execute('insert into other (name, data) values ("host", ?)', [rep_host])
-                break
-            else:
-                pass
+        print('Host (0.0.0.0) : ', end = '')
+        rep_host = input()
+        if rep_host:
+            curs.execute('insert into other (name, data) values ("host", ?)', [rep_host])
+        else:
+            rep_host = '0.0.0.0'
+            
+            curs.execute('insert into other (name, data) values ("host", "0.0.0.0")') 
     else:
         rep_host = rep_data[0][0]
     
@@ -180,14 +183,14 @@ else:
     curs.execute('select data from other where name = "port"')
     rep_data = curs.fetchall()
     if not rep_data:
-        while 1:
-            print('Port : ', end = '')
-            rep_port = int(input())
-            if rep_port:
-                curs.execute('insert into other (name, data) values ("port", ?)', [rep_port])
-                break
-            else:
-                pass
+        print('Port (3000) : ', end = '')
+        rep_port = input()
+        if rep_port:
+            curs.execute('insert into other (name, data) values ("port", ?)', [rep_port])
+        else:
+            rep_port = '3000'
+            
+            curs.execute('insert into other (name, data) values ("port", "3000")')
     else:
         rep_port = rep_data[0][0]
     
@@ -235,13 +238,19 @@ if not rep_data:
             rep_language = 'en-US'
     else:
         while 1:
-            print('Language [' + ', '.join(support_language) + '] : ', end = '')
-            rep_language = str(input())
-            if rep_language in support_language:
-                curs.execute("insert into other (name, data) values ('language', ?)", [rep_language])
-                break
+            print('Language (en-US) [' + ', '.join(support_language) + '] : ', end = '')
+            rep_language = input()
+            if rep_language:
+                if rep_language in support_language:
+                    curs.execute("insert into other (name, data) values ('language', ?)", [rep_language])
+                    
+                    break
             else:
-                pass
+                rep_language = 'en-US'
+                
+                curs.execute("insert into other (name, data) values ('language', 'en-US')")
+                
+                break
 else:
     rep_language = rep_data[0][0]
   
@@ -259,19 +268,23 @@ for ask_data in ask_this:
     rep_data = curs.fetchall()
     if not rep_data:
         while 1:
-            print(ask_data[0][0] + ' [' + ', '.join(ask_data[1]) + '] : ', end = '')
+            print(ask_data[0][0] + ' (' + ask_data[1][0] + ') [' + ', '.join(ask_data[1]) + '] : ', end = '')
         
-            rep_mark = str(input())
-            if rep_mark and rep_mark in ask_data[1]:
-                curs.execute('insert into other (name, data) values (?, ?)', [ask_data[0][1], rep_mark])
-
-                break
+            rep_mark = input()
+            if rep_mark:
+                if rep_mark in ask_data[1]:
+                    curs.execute('insert into other (name, data) values (?, ?)', [ask_data[0][1], rep_mark])
+                    
+                    break
             else:
-                pass
+                rep_mark = ask_data[1][0]
+                curs.execute('insert into other (name, data) values (?, ?)', [ask_data[0][1], rep_mark])
+                
+                break
     else:
         rep_mark = rep_data[0][0]
 
-print(ask_data[0][1] + ' : ' + str(rep_mark))
+    print(ask_data[0][0] + ' : ' + str(rep_mark))
 
 curs.execute('delete from other where name = "ver"')
 curs.execute('insert into other (name, data) values ("ver", ?)', [c_ver])
@@ -306,33 +319,11 @@ conn.commit()
 
 @app.route('/del_alarm')
 def del_alarm():
-    curs.execute("delete from alarm where name = ?", [ip_check()])
-    conn.commit()
-
-    return redirect('/alarm')
+    return del_alarm_2(conn)
 
 @app.route('/alarm')
 def alarm():
-    if custom()[2] == 0:
-        return redirect('/login')    
-
-    data = '<ul>'    
-    
-    curs.execute("select data, date from alarm where name = ? order by date desc", [ip_check()])
-    data_list = curs.fetchall()
-    if data_list:
-        data = '<a href="/del_alarm">(' + load_lang('delete') + ')</a><hr class=\"main_hr\">' + data
-
-        for data_one in data_list:
-            data += '<li>' + data_one[0] + ' (' + data_one[1] + ')</li>'
-    
-    data += '</ul>'
-
-    return easy_minify(flask.render_template(skin_check(), 
-        imp = [load_lang('notice'), wiki_set(), custom(), other2([0, 0])],
-        data = data,
-        menu = [['user', load_lang('return')]]
-    ))
+    return alarm_2(conn)
 
 @app.route('/<regex("inter_wiki|(?:edit|email|name)_filter"):tools>')
 def inter_wiki(tools = None):
