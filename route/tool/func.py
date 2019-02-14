@@ -248,7 +248,7 @@ def captcha_post(re_data, num = 1):
     else:
         pass
 
-def load_lang(data, num = 2):
+def load_lang(data, num = 2, safe = 0):
     if num == 1:
         curs.execute("select data from other where name = 'language'")
         rep_data = curs.fetchall()
@@ -257,7 +257,10 @@ def load_lang(data, num = 2):
         lang = json.loads(json_data)
 
         if data in lang:
-            return html.escape(lang[data])
+            if safe == 1:
+                return lang[data]
+            else:
+                return html.escape(lang[data])
         else:
             return html.escape(data + ' (M)')
     else:
@@ -268,14 +271,17 @@ def load_lang(data, num = 2):
                 json_data = open(os.path.join('language', rep_data[0][0] + '.json'), 'rt', encoding='utf-8').read()
                 lang = json.loads(json_data)
             except:
-                return load_lang(data, 1)
+                return load_lang(data, 1, safe)
 
             if data in lang:
-                return html.escape(lang[data])
+                if safe == 1:
+                    return lang[data]
+                else:
+                    return html.escape(lang[data])
             else:
-                return load_lang(data, 1)
+                return load_lang(data, 1, safe)
         else:
-            return load_lang(data, 1)
+            return load_lang(data, 1, safe)
 
 def load_oauth(provider):
     oauth = json.loads(open('oauthsettings.json', encoding='utf-8').read())
@@ -382,7 +388,7 @@ def wiki_set(num = 1):
         if db_data and db_data[0][0] != '':
             data_list += [db_data[0][0]]
         else:
-            data_list += ['wiki']
+            data_list += ['Wiki']
 
         curs.execute('select data from other where name = "license"')
         db_data = curs.fetchall()
