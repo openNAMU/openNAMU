@@ -1365,6 +1365,9 @@ def other():
                     <li><a href="/title_index">''' + load_lang('all_document_list') + '''</a></li>
                     <li><a href="/acl_list">''' + load_lang('acl_document_list') + '''</a></li>
                     <li><a href="/please">''' + load_lang('need_document') + '''</a></li>
+                    <li><a href="/block_log">''' + load_lang('recent_ban') + '''</a></li>
+                    <li><a href="/user_log">''' + load_lang('member_list') + '''</a></li>
+                    <li><a href="/admin_log">''' + load_lang('authority_use_list') + '''</a></li>
                 </ul>
                 <br>
                 <h2>''' + load_lang('other') + '''</h2>
@@ -3160,8 +3163,6 @@ def recent_changes(name = None, tool = 'record'):
                         <td id="main_table_width">''' + load_lang('time') + '''</td>
                     </tr>
                     '''
-            
-            div = '<a href="/recent_discuss">(' + load_lang('discussion') + ')</a> <a href="/block_log">(' + load_lang('blocked') + ')</a> <a href="/user_log">(' + load_lang('member') + ')</a> <a href="/admin_log">(' + load_lang('authority') + ')</a><hr class=\"main_hr\">' + div
             
             curs.execute("select id, title, date, ip, send, leng from history where not title like 'user:%' order by date desc limit ?, 50", [str(sql_num)])
 
