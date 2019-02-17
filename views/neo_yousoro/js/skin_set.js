@@ -50,7 +50,7 @@ if(getCookie("set_strike") == "1") {
 
 window.onload = function () {
     if(window.location.pathname == '/skin_set') {
-        document.getElementById("main_top").innerHTML = '<h1>skin setting</h1>';
+        document.getElementById("main_top").innerHTML = '<h1>Skin setting</h1>';
         data = document.getElementById("main_data")
         
         set_data = {};
@@ -58,11 +58,11 @@ window.onload = function () {
             set_data["strike"] = "checked";
         } 
         
-        data.innerHTML =    `
-                            <input ` + set_data["strike"] + ` type="checkbox" id="strike" name="strike" value="strike"> remove strikethrough
-                            <hr>
-                            <button onclick="get_post();">Save</button>
-                            `;
+        data.innerHTML = ' \
+            <input ' + set_data["strike"] + ' type="checkbox" id="strike" name="strike" value="strike"> Remove strikethrough \
+            <hr> \
+            <button onclick="get_post();">Save</button> \
+        ';
                             
         document.title = document.title.replace(/.*(\- .*)$/, "skin setting $1");
     }
