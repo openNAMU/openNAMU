@@ -354,233 +354,31 @@ def not_close_topic():
 
 @app.route('/image/<name>')
 def image_view(name = None):
-    if os.path.exists(os.path.join('image', name)):
-        return flask.send_from_directory('./image', name)
-    else:
-        return redirect()
+    return image_view_2(conn, name)
 
 @app.route('/acl_list')
 def acl_list():
-    div =   '''
-            <table id="main_table_set">
-                <tbody>
-                    <tr>
-                        <td id="main_table_width_quarter">''' + load_lang('document_name') + '''</td>
-                        <td id="main_table_width_quarter">''' + load_lang('document') + ''' acl</td>
-                        <td id="main_table_width_quarter">''' + load_lang('discussion') + ''' acl</td>
-                        <td id="main_table_width_quarter">''' + load_lang('acl_required') + '''</td>
-            '''
-    
-    curs.execute("select title, dec, dis, view, why from acl where dec = 'admin' or dec = 'user' or dis = 'admin' or dis = 'user' or view = 'admin' or view = 'user' order by title desc")
-    list_data = curs.fetchall()
-    for data in list_data:
-        if not re.search('^user:', data[0]) and not re.search('^file:', data[0]):
-            acl = []
-            for i in range(1, 4):
-                if data[i] == 'admin':
-                    acl += [load_lang('admin')]
-                else:
-                    acl += [load_lang('member')]
-
-            div +=  '''
-                    <tr>
-                        <td>
-                            <a href="/w/''' + url_pas(data[0]) + '">' + data[0] + '''</a>
-                        </td>
-                        <td>''' + acl[0] + '''</td>
-                        <td>''' + acl[1] + '''</td>
-                        <td>''' + acl[2] + '''</td>
-                    </tr>
-                    '''
-        
-    div +=  '''
-                </tbody>
-            </table>
-            '''
-    
-    return easy_minify(flask.render_template(skin_check(), 
-        imp = [load_lang('acl_document_list'), wiki_set(), custom(), other2([0, 0])],
-        data = div,
-        menu = [['other', load_lang('return')]]
-    ))
+    return acl_list_2(conn)
 
 @app.route('/admin_plus/<name>', methods=['POST', 'GET'])
 def admin_plus(name = None):
-    if flask.request.method == 'POST':
-        if admin_check(None, 'admin_plus (' + name + ')') != 1:
-            return re_error('/error/3')
-
-        curs.execute("delete from alist where name = ?", [name])
-        
-        if flask.request.form.get('ban', 0) != 0:
-            curs.execute("insert into alist (name, acl) values (?, 'ban')", [name])
-
-        if flask.request.form.get('toron', 0) != 0:
-            curs.execute("insert into alist (name, acl) values (?, 'toron')", [name])
-            
-        if flask.request.form.get('check', 0) != 0:
-            curs.execute("insert into alist (name, acl) values (?, 'check')", [name])
-
-        if flask.request.form.get('acl', 0) != 0:
-            curs.execute("insert into alist (name, acl) values (?, 'acl')", [name])
-
-        if flask.request.form.get('hidel', 0) != 0:
-            curs.execute("insert into alist (name, acl) values (?, 'hidel')", [name])
-
-        if flask.request.form.get('give', 0) != 0:
-            curs.execute("insert into alist (name, acl) values (?, 'give')", [name])
-
-        if flask.request.form.get('owner', 0) != 0:
-            curs.execute("insert into alist (name, acl) values (?, 'owner')", [name])
-            
-        conn.commit()
-        
-        return redirect('/admin_plus/' + url_pas(name))
-    else:        
-        data = '<ul>'
-        
-        exist_list = ['', '', '', '', '', '', '', '']
-
-        curs.execute('select acl from alist where name = ?', [name])
-        acl_list = curs.fetchall()    
-        for go in acl_list:
-            if go[0] == 'ban':
-                exist_list[0] = 'checked="checked"'
-            elif go[0] == 'toron':
-                exist_list[2] = 'checked="checked"'
-            elif go[0] == 'check':
-                exist_list[3] = 'checked="checked"'
-            elif go[0] == 'acl':
-                exist_list[4] = 'checked="checked"'
-            elif go[0] == 'hidel':
-                exist_list[5] = 'checked="checked"'
-            elif go[0] == 'give':
-                exist_list[6] = 'checked="checked"'
-            elif go[0] == 'owner':
-                exist_list[7] = 'checked="checked"'
-
-        if admin_check() != 1:
-            state = 'disabled'
-        else:
-            state = ''
-
-        data += '''
-                    <li><input type="checkbox" ''' + state +  ' name="ban" ' + exist_list[0] + '> ' + load_lang('ban_authority') + '''</li>
-                    <li><input type="checkbox" ''' + state +  ' name="toron" ' + exist_list[2] + '> ' + load_lang('discussion_authority') + '''</li>
-                    <li><input type="checkbox" ''' + state +  ' name="check" ' + exist_list[3] + '> ' + load_lang('user_check_authority') + '''</li>
-                    <li><input type="checkbox" ''' + state +  ' name="acl" ' + exist_list[4] + '> ' + load_lang('document_acl_authority') + '''</li>
-                    <li><input type="checkbox" ''' + state +  ' name="hidel" ' + exist_list[5] + '> ' + load_lang('history_hide_authority') + '''</li>
-                    <li><input type="checkbox" ''' + state +  ' name="give" ' + exist_list[6] + '> ' + load_lang('authorization_authority') + '''</li>
-                    <li><input type="checkbox" ''' + state +  ' name="owner" ' + exist_list[7] + '> ' + load_lang('owner_authority') + '''</li>
-                </ul>
-                '''
-
-        return easy_minify(flask.render_template(skin_check(), 
-            imp = [load_lang('admin_group_add'), wiki_set(), custom(), other2([0, 0])],
-            data =  '''
-                    <form method="post">
-                        ''' + data + '''
-                        <hr class=\"main_hr\">
-                        <button id="save" ''' + state +  ''' type="submit">''' + load_lang('save') + '''</button>
-                    </form>
-                    ''',
-            menu = [['manager', load_lang('return')]]
-        ))        
+    return admin_plus_2(conn)
         
 @app.route('/admin_list')
 def admin_list():
-    div = '<ul>'
-    
-    curs.execute("select id, acl, date from user where not acl = 'user' order by date desc")
-    for data in curs.fetchall():
-        name = ip_pas(data[0]) + ' <a href="/admin_plus/' + url_pas(data[1]) + '">(' + data[1] + ')</a>'
-        
-        if data[2] != '':
-            name += '(' + data[2] + ')'
-
-        div += '<li>' + name + '</li>'
-        
-    div += '</ul>'
-                
-    return easy_minify(flask.render_template(skin_check(), 
-        imp = [load_lang('admin_list'), wiki_set(), custom(), other2([0, 0])],
-        data = div,
-        menu = [['other', load_lang('return')]]
-    ))
+    return admin_list_2(conn)
         
 @app.route('/hidden/<everything:name>')
 def history_hidden(name = None):
-    num = int(flask.request.args.get('num', 0))
-
-    if admin_check(6, 'history_hidden (' + name + '#' + str(num) + ')') == 1:
-        curs.execute("select title from history where title = ? and id = ? and hide = 'O'", [name, str(num)])
-        if curs.fetchall():
-            curs.execute("update history set hide = '' where title = ? and id = ?", [name, str(num)])
-        else:
-            curs.execute("update history set hide = 'O' where title = ? and id = ?", [name, str(num)])
-            
-        conn.commit()
-    
-    return redirect('/history/' + url_pas(name))
+    return history_hidden_2(name)
         
 @app.route('/user_log')
 def user_log():
-    num = int(flask.request.args.get('num', 1))
-    if num * 50 > 0:
-        sql_num = num * 50 - 50
-    else:
-        sql_num = 0
-        
-    list_data = '<ul>'
-
-    admin_one = admin_check(1)
-    
-    curs.execute("select id, date from user order by date desc limit ?, '50'", [str(sql_num)])
-    user_list = curs.fetchall()
-    for data in user_list:
-        if admin_one == 1:
-            curs.execute("select block from ban where block = ?", [data[0]])
-            if curs.fetchall():
-                ban_button = ' <a href="/ban/' + url_pas(data[0]) + '">(' + load_lang('ban_release') + ')</a>'
-            else:
-                ban_button = ' <a href="/ban/' + url_pas(data[0]) + '">(' + load_lang('ban') + ')</a>'
-        else:
-            ban_button = ''
-            
-        list_data += '<li>' + ip_pas(data[0]) + ban_button
-        
-        if data[1] != '':
-            list_data += ' (' + data[1] + ')'
-
-        list_data += '</li>'
-
-    if num == 1:
-        curs.execute("select count(id) from user")
-        user_count = curs.fetchall()
-        if user_count:
-            count = user_count[0][0]
-        else:
-            count = 0
-
-        list_data +=    '''
-                        </ul>
-                        <hr class=\"main_hr\">
-                        <ul>
-                            <li>all : ''' + str(count) + '''</li>
-                        </ul>
-                        '''
-
-    list_data += next_fix('/user_log?num=', num, user_list)
-
-    return easy_minify(flask.render_template(skin_check(), 
-        imp = [load_lang('member_list'), wiki_set(), custom(), other2([0, 0])],
-        data = list_data,
-        menu = [['other', load_lang('return')]]
-    ))
+    return user_log_2(conn)
 
 @app.route('/admin_log')
 def admin_log():
-    num = int(flask.request.args.get('num', 1))
+    num = int(number_check(flask.request.args.get('num', '1')))
     if num * 50 > 0:
         sql_num = num * 50 - 50
     else:
@@ -624,7 +422,7 @@ def give_log():
 
 @app.route('/indexing', methods=['POST', 'GET'])
 def indexing():
-    if admin_check(None, None) != 1:
+    if admin_check() != 1:
         return re_error('/error/3')
 
     if flask.request.method == 'POST':
@@ -906,7 +704,7 @@ def adsense_settings():
         
 @app.route('/xref/<everything:name>')
 def xref(name = None):
-    num = int(flask.request.args.get('num', 1))
+    num = int(number_check(flask.request.args.get('num', '1')))
     if num * 50 > 0:
         sql_num = num * 50 - 50
     else:
@@ -939,7 +737,7 @@ def xref(name = None):
 
 @app.route('/please')
 def please():
-    num = int(flask.request.args.get('num', 1))
+    num = int(number_check(flask.request.args.get('num', '1')))
     if num * 50 > 0:
         sql_num = num * 50 - 50
     else:
@@ -1009,7 +807,7 @@ def recent_discuss():
 @app.route('/block_log')
 @app.route('/<regex("block_user|block_admin"):tool>/<name>')
 def block_log(name = None, tool = None):
-    num = int(flask.request.args.get('num', 1))
+    num = int(number_check(flask.request.args.get('num', '1')))
     if num * 50 > 0:
         sql_num = num * 50 - 50
     else:
@@ -1118,7 +916,7 @@ def deep_search(name = None):
     if name == '':
         return redirect()
 
-    num = int(flask.request.args.get('num', 1))
+    num = int(number_check(flask.request.args.get('num', '1')))
     if num * 50 > 0:
         sql_num = num * 50 - 50
     else:
@@ -1176,7 +974,7 @@ def raw_view(name = None, sub_title = None, num = None):
     if not num:
         num = flask.request.args.get('num', None)
         if num:
-            num = int(num)
+            num = int(number_check(num))
     
     if not sub_title and num:
         curs.execute("select title from history where title = ? and id = ? and hide = 'O'", [name, str(num)])
@@ -1215,7 +1013,7 @@ def raw_view(name = None, sub_title = None, num = None):
         
 @app.route('/revert/<everything:name>', methods=['POST', 'GET'])
 def revert(name = None):    
-    num = int(flask.request.args.get('num', 0))
+    num = int(number_check(flask.request.args.get('num', '1')))
 
     curs.execute("select title from history where title = ? and id = ? and hide = 'O'", [name, str(num)])
     if curs.fetchall() and admin_check(6) != 1:
@@ -1672,8 +1470,8 @@ def manager(num = 1):
         
 @app.route('/title_index')
 def title_index():
-    page = int(flask.request.args.get('page', 1))
-    num = int(flask.request.args.get('num', 100))
+    page = int(number_check(flask.request.args.get('page', '1')))
+    num = int(number_check(flask.request.args.get('num', '100')))
     if page * num > 0:
         sql_num = page * num - num
     else:
@@ -1741,7 +1539,7 @@ def title_index():
     ))
         
 @app.route('/topic/<everything:name>/sub/<sub>/b/<int:num>')
-def topic_block(name = None, sub = None, num = None):
+def topic_block(name = None, sub = None, num = 1):
     if admin_check(3, 'blind (' + name + ' - ' + sub + '#' + str(num) + ')') != 1:
         return re_error('/error/3')
 
@@ -1760,7 +1558,7 @@ def topic_block(name = None, sub = None, num = None):
     return redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '#' + str(num))
         
 @app.route('/topic/<everything:name>/sub/<sub>/notice/<int:num>')
-def topic_top(name = None, sub = None, num = None):
+def topic_top(name = None, sub = None, num = 1):
     if admin_check(3, 'notice (' + name + ' - ' + sub + '#' + str(num) + ')') != 1:
         return re_error('/error/3')
 
@@ -1834,7 +1632,7 @@ def topic_stop(name = None, sub = None, tool = None):
     return redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub))    
 
 @app.route('/topic/<everything:name>/sub/<sub>/admin/<int:num>')
-def topic_admin(name = None, sub = None, num = None):
+def topic_admin(name = None, sub = None, num = 1):
     curs.execute("select block, ip, date from topic where title = ? and sub = ? and id = ?", [name, sub, str(num)])
     data = curs.fetchall()
     if not data:
@@ -2605,7 +2403,7 @@ def user_check(name = None):
     if admin_check(4, 'check (' + name + ')') != 1:
         return re_error('/error/3')
         
-    num = int(flask.request.args.get('num', 1))
+    num = int(number_check(flask.request.args.get('num', '1')))
     if num * 50 > 0:
         sql_num = num * 50 - 50
     else:
@@ -3253,7 +3051,7 @@ def read_view(name = None):
 
 @app.route('/topic_record/<name>')
 def user_topic_list(name = None):
-    num = int(flask.request.args.get('num', 1))
+    num = int(number_check(flask.request.args.get('num', '1')))
     if num * 50 > 0:
         sql_num = num * 50 - 50
     else:
@@ -3324,7 +3122,7 @@ def recent_changes(name = None, tool = 'record'):
                 '''
         
         if name:
-            num = int(flask.request.args.get('num', 1))
+            num = int(number_check(flask.request.args.get('num', '1')))
             if num * 50 > 0:
                 sql_num = num * 50 - 50
             else:
@@ -3350,7 +3148,7 @@ def recent_changes(name = None, tool = 'record'):
                 
                 curs.execute("select id, title, date, ip, send, leng from history where ip = ? order by date desc limit ?, '50'", [name, str(sql_num)])
         else:
-            num = int(flask.request.args.get('num', 1))
+            num = int(number_check(flask.request.args.get('num', '1')))
             if num * 50 > 0:
                 sql_num = num * 50 - 50
             else:

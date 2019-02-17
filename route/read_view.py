@@ -10,7 +10,7 @@ def read_view_2(conn, name):
 
     num = flask.request.args.get('num', None)
     if num:
-        num = int(num)
+        num = int(number_check(num))
     else:
         if not flask.request.args.get('from', None):
             curs.execute("select title from back where link = ? and type = 'redirect'", [name])
