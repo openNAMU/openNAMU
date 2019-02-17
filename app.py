@@ -826,16 +826,15 @@ def block_log(name = None, tool = None):
     data_list = ''
     
     if not name:
-        if not tool2:
-            div =   '''
-                    <a href="/manager/11">(''' + load_lang('blocked') + ''')</a> <a href="/manager/12">(''' + load_lang('admin') + ''')</a>
-                    <hr class=\"main_hr\">
-                    ''' + div
-            
-            sub = 0
-            menu = 0
-            
-            curs.execute("select why, block, blocker, end, today from rb order by today desc limit ?, '50'", [str(sql_num)])
+        div =   '''
+                <a href="/manager/11">(''' + load_lang('blocked') + ''')</a> <a href="/manager/12">(''' + load_lang('admin') + ''')</a>
+                <hr class=\"main_hr\">
+                ''' + div
+        
+        sub = 0
+        menu = 0
+        
+        curs.execute("select why, block, blocker, end, today from rb order by today desc limit ?, '50'", [str(sql_num)])
     else:
         menu = [['block_log', load_lang('normal')]]
         
@@ -868,27 +867,24 @@ def block_log(name = None, tool = None):
             end = load_lang('limitless') + ''
             
         div +=  '''
-                        <tr>
-                            <td>''' + ip + '''</td>
-                            <td>''' + ip_pas(data[2]) + '''</td>
-                            <td>
-                                start : ''' + data[4] + '''
-                                <br>
-                                end : ''' + end + '''
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="3">''' + why + '''</td>
-                        </tr>
-                    </tbody>
-                </table>
-                '''
+            <tr>
+                <td>''' + ip + '''</td>
+                <td>''' + ip_pas(data[2]) + '''</td>
+                <td>
+                    start : ''' + data[4] + '''
+                    <br>
+                    end : ''' + end + '''
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3">''' + why + '''</td>
+            </tr>
+        '''
+
+    div += '</tbody></table>'
     
     if not name:
-        if not tool2:
-            div += next_fix('/block_log?num=', num, data_list)
-        else:
-            div += next_fix('/block_log/' + url_pas(tool2) + '?num=', num, data_list)
+        div += next_fix('/block_log?num=', num, data_list)
     else:
         div += next_fix('/' + url_pas(tool) + '/' + url_pas(name) + '?num=', num, data_list)
                 
@@ -2354,7 +2350,7 @@ def change_password():
                 if len(oauth_data) == 1:
                     oauth_content += '<li>{} - {}</li>'.format(oauth_provider[i], load_lang('connection') + ' : <img src="{}" width="17px" height="17px">{}'.format(oauth_data[0][1], oauth_data[0][0]))
                 else:
-                    oauth_content += '<li>{} - {}</li>'.format(oauth_provider[i], load_lang('connection') + ' : <a href="/oauth/{}/init">{}</a>'.format(oauth_provider[i], load_lang('oauth_conn_new')))
+                    oauth_content += '<li>{} - {}</li>'.format(oauth_provider[i], load_lang('connection') + ' : <a href="/oauth/{}/init">{}</a>'.format(oauth_provider[i], load_lang('connect')))
             
             oauth_content += '</ul>'
 
@@ -2365,21 +2361,17 @@ def change_password():
                             <span>id : ''' + ip + '''</span>
                             <hr class=\"main_hr\">
                             <input placeholder="''' + load_lang('now_password') + '''" name="pw4" type="password">
-                            <br>
-                            <br>
+                            <hr class=\"main_hr\">
                             <input placeholder="''' + load_lang('new_password') + '''" name="pw2" type="password">
-                            <br>
-                            <br>
+                            <hr class=\"main_hr\">
                             <input placeholder="''' + load_lang('password_confirm') + '''" name="pw3" type="password">
                             <hr class=\"main_hr\">
                             <span>''' + load_lang('skin') + '''</span>
-                            <br>
-                            <br>
+                            <hr class=\"main_hr\">
                             <select name="skin">''' + div2 + '''</select>
                             <hr class=\"main_hr\">
                             <span>''' + load_lang('language') + '''</span>
-                            <br>
-                            <br>
+                            <hr class=\"main_hr\">
                             <select name="lang">''' + div3 + '''</select>
                             <hr class=\"main_hr\">
                             <span>''' + load_lang('oauth_connection') + '''</span>
