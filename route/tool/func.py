@@ -783,8 +783,10 @@ def ban_insert(name, end, why, login, blocker):
             login = ''
 
         if end != '0':
+            end = int(number_check(end))
+
             time = datetime.datetime.now()
-            plus = datetime.timedelta(seconds = int(end))
+            plus = datetime.timedelta(seconds = end)
             r_time = (time + plus).strftime("%Y-%m-%d %H:%M:%S")
         else:
             r_time = ''
@@ -818,10 +820,13 @@ def leng_check(first, second):
     return all_plus
 
 def number_check(data):
-    if re.search('[^0-9]', data):
+    if not data:
         return '1'
     else:
-        return data
+        if re.search('[^0-9]', data):
+            return '1'
+        else:
+            return data
 
 def edit_filter_do(data):
     if admin_check(1, 'edit_filter pass') != 1:
