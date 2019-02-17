@@ -527,7 +527,7 @@ def ip_pas(raw_ip):
             if data and data[0][0] != '':
                 ip = '<span style="font-size: 75%;">' + hashlib.md5(bytes(raw_ip, 'utf-8')).hexdigest() + '</span>'
 
-                if not admin_check('ban', None):
+                if not admin_check(1):
                     hide = 1
             else:
                 ip = raw_ip
@@ -637,7 +637,7 @@ def acl_check(name, tool = ''):
         if acl_c:
             acl_n = acl_c.groups()
 
-            if admin_check(5, None) == 1:
+            if admin_check(5) == 1:
                 return 0
 
             curs.execute("select dec from acl where title = ?", ['user:' + acl_n[0]])
@@ -689,7 +689,7 @@ def acl_check(name, tool = ''):
                 if not user_data:
                     return 1
 
-                if not admin_check(5, None) == 1:
+                if not admin_check(5) == 1:
                     return 1
 
         return 0
@@ -816,6 +816,12 @@ def leng_check(first, second):
         all_plus = '0'
         
     return all_plus
+
+def number_check(data):
+    if re.search('[^0-9]', data):
+        return '1'
+    else:
+        return data
 
 def edit_filter_do(data):
     if admin_check(1, 'edit_filter pass') != 1:
