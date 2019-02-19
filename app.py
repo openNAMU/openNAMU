@@ -17,7 +17,7 @@ try:
     set_data = json.loads(open('data/set.json').read())
 except:
     if os.getenv('NAMU_DB') != None:
-        set_data = { "db" : os.getenv('NAMU_DB') }
+        set_data = { "db" : 'data/' + os.getenv('NAMU_DB') }
     else:
         print('DB\'s name (data) : ', end = '')
         
@@ -26,7 +26,7 @@ except:
             new_json = 'data'
             
         with open('data/set.json', 'w') as f:
-            f.write('{ "db" : "' + new_json + '" }')
+            f.write('{ "db" : "data/' + new_json + '" }')
             
         set_data = json.loads(open('data/set.json').read())
         
