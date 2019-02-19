@@ -2236,7 +2236,7 @@ def login_oauth(platform = None, func = None):
                 
 @app.route('/change', methods=['POST', 'GET'])
 def change_password():
-    global support_language
+    support_language = server_init.server_set_var['language']['list']
 
     if ban_check() == 1:
         return re_error('/ban')
