@@ -1,4 +1,4 @@
-FROM python:3.6.8-stretch
+FROM arm64v8/python:3.6.8-stretch
 
 MAINTAINER 2du <min08101@naver.com>
 MAINTAINER hoparkgo9ma <me@ho9.me>
