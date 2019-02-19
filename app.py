@@ -14,7 +14,7 @@ c_ver = '309001'
 print('Version : ' + r_ver)
 
 try:
-    set_data = json.loads(open('set.json').read())
+    set_data = json.loads(open('data/set.json').read())
 except:
     if os.getenv('NAMU_DB') != None:
         set_data = { "db" : os.getenv('NAMU_DB') }
@@ -25,10 +25,10 @@ except:
         if new_json == '':
             new_json = 'data'
             
-        with open('set.json', 'w') as f:
+        with open('data/set.json', 'w') as f:
             f.write('{ "db" : "' + new_json + '" }')
             
-        set_data = json.loads(open('set.json').read())
+        set_data = json.loads(open('data/set.json').read())
         
 print('DB\'s name : ' + set_data['db'])
             
@@ -157,8 +157,8 @@ if not curs.fetchall():
     curs.execute('delete from alist where name = "owner"')
     curs.execute('insert into alist (name, acl) values ("owner", "owner")')
 
-if not os.path.exists('image'):
-    os.makedirs('image')
+if not os.path.exists('data/image'):
+    os.makedirs('data/image')
     
 if not os.path.exists('views'):
     os.makedirs('views')
@@ -560,10 +560,10 @@ def oauth_settings():
                 menu = [['other', load_lang('return')]]
             ))
 
-        with open('oauthsettings.json', 'r', encoding='utf-8') as f:
+        with open('data/oauthsettings.json', 'r', encoding='utf-8') as f:
             legacy = json.loads(f.read())
 
-        with open('oauthsettings.json', 'w', encoding='utf-8') as f:
+        with open('data/oauthsettings.json', 'w', encoding='utf-8') as f:
             f.write("""
                 {
                     "_README" : {
@@ -3329,12 +3329,12 @@ def upload():
             else:
                 lice = '[[user:' + ip + ']]'
             
-        if os.path.exists(os.path.join('image', e_data)):
-            os.remove(os.path.join('image', e_data))
+        if os.path.exists(os.path.join('data/image', e_data)):
+            os.remove(os.path.join('data/image', e_data))
             
-            data.save(os.path.join('image', e_data))
+            data.save(os.path.join('data/image', e_data))
         else:
-            data.save(os.path.join('image', e_data))
+            data.save(os.path.join('data/image', e_data))
             
         curs.execute("select title from data where title = ?", ['file:' + name])
         if curs.fetchall(): 
