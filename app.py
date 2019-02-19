@@ -2104,9 +2104,9 @@ def login_oauth(platform = None, func = None):
     }
 
     if platform == 'discord':
-        api_url['redirect'] = 'https://discordapp.com/api/v6/oauth2/authorize'
-        api_url['token'] = 'https://discordapp.com/api/v6/api/oauth2/token'
-        api_url['profile'] = ''
+        api_url['redirect'] = 'https://discordapp.com/api/oauth2/authorize'
+        api_url['token'] = 'https://discordapp.com/api/oauth2/token'
+        api_url['profile'] = 'https://discordapp.com/api/users/@me'
     elif platform == 'naver':
         api_url['redirect'] = 'https://nid.naver.com/oauth2.0/authorize'
         api_url['token'] = 'https://nid.naver.com/oauth2.0/token'
@@ -2143,10 +2143,9 @@ def login_oauth(platform = None, func = None):
         flask.session['refer'] = flask.request.referrer
 
         if platform == 'discord':
-            return redirect(api_url['redirect'] + '?response_type=code&client_id={}&scope=identify&redirect_uri={}&state={}'.format(
+            return redirect(api_url['redirect'] + '?client_id={}&redirect_uri={}&response_type=code&scope=identify'.format(
                 data['client_id'], 
-                data['redirect_uri'], 
-                data['state']
+                data['redirect_uri']
             ))
         elif platform == 'naver':
             return redirect(api_url['redirect'] + '?response_type=code&client_id={}&redirect_uri={}&state={}'.format(
@@ -2165,7 +2164,7 @@ def login_oauth(platform = None, func = None):
         code = flask.request.args.get('code')
         state = flask.request.args.get('state')
 
-        if code == None or state == None:
+        if code == None:
             return easy_minify(flask.render_template(skin_check(),
                 imp = [load_lang('inter_error'), wiki_set(), custom(), other2([0, 0])],
                 data = '<h2>ie_wrong_callback</h2>' + load_lang('ie_wrong_callback'),
@@ -2173,33 +2172,41 @@ def login_oauth(platform = None, func = None):
             ))
 
         if platform == 'discord':
-            #token_access = api_url['token']
-            #token_result = urllib.request.urlopen(token_access).read().decode('utf-8')
-            #token_result_json = json.loads(token_result)
-            #return token_result
-
-            token_access_data = {
-                'client_id': oauth_data['client_id'],
-                'client_secret': oauth_data['client_secret'],
-                'grant_type': 'authorization_code',
-                'code': code,
-                'redirect_uri': data['redirect_uri'],
-                'scope': 'identify'
+            data = {
+                'client_id'     : data['client_id'],
+                'client_secret' : data['client_secret'],
+                'grant_type'    : 'authorization_code',
+                'redirect_uri'  : data['redirect_uri'],
+                'scope'         : 'identify',
+                'code'          : code
             }
             headers = {
-                'Content-Type': 'application/x-www-form-urlencoded'
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'User-Agent': 'Mozilla/5.0'
             }
+            token_exchange = urllib.request.Request(
+                'https://discordapp.com/api/oauth2/token',
+                data = bytes(urllib.parse.urlencode(data).encode()),
+                headers = headers
+            )
+            token_result = urllib.request.urlopen(token_exchange).read()
+            token_json = json.loads(token_result)
 
-            token_access = urllib.request.Request(api_url['token'], data = json.dumps(token_access_data), headers = headers)
-            token_result = urllib.request.urlopen(token_access_data)
-            # token_result = urllib.request.urlopen(token_access_data).read().decode('utf-8')
-            # profile_result_json = json.loads(profile_result)
-
-            # stand_json = {
-            #     'id' : profile_result_json['response']['id'], 
-            #     'name' : profile_result_json['response']['name'],
-            #     'picture' : profile_result_json['response']['profile_image']
-            # }
+            headers = {
+                'User-Agent'    : 'Mozilla/5.0',
+                'Authorization' : 'Bearer ' + token_json['access_token']
+            }
+            profile_exchange = urllib.request.Request(
+                'https://discordapp.com/api/users/@me',
+                headers = headers
+            )
+            profile_result =  urllib.request.urlopen(profile_exchange).read().decode('utf-8')
+            profile_result_json = json.loads(profile_result)
+            stand_json = {
+                'id'        : profile_result_json['id'], 
+                'name'      : profile_result_json['username'] + '#' + profile_result_json['discriminator'],
+                'picture'   : profile_result_json['avatar']
+            }
         elif platform == 'naver':
             token_access = api_url['token'] + '?grant_type=authorization_code&client_id={}&client_secret={}&code={}&state={}'.format(
                 data['client_id'], 
@@ -2219,9 +2226,9 @@ def login_oauth(platform = None, func = None):
             profile_result_json = json.loads(profile_result)
 
             stand_json = {
-                'id' : profile_result_json['response']['id'],
-                'name' : profile_result_json['response']['name'],
-                'picture' : profile_result_json['response']['profile_image']
+                'id'        : profile_result_json['response']['id'],
+                'name'      : profile_result_json['response']['name'],
+                'picture'   : profile_result_json['response']['profile_image']
             }
         elif platform == 'facebook':
             token_access = api_url['token'] + '?client_id={}&redirect_uri={}&client_secret={}&code={}'.format(
