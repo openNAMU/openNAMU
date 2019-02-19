@@ -289,11 +289,11 @@ def load_oauth(provider):
     return oauth[provider]
 
 def update_oauth(provider, target, content):
-    oauth = json.loads(open('data/oauthsettings.json', encoding='utf-8').read())    
+    oauth = json.loads(open('data/oauthsettings.json', encoding='utf-8').read())
     oauth[provider][target] = content
 
-    with open('data/oauthsettings.json', 'w', encoding='utf-8') as f:
-        json.dump(oauth, f)
+    with open('data/oauthsettings.json', 'w') as f:
+        f.write(json.dumps(oauth, sort_keys=True, indent=4))
 
     return 'Done'
 

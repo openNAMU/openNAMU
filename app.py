@@ -13,6 +13,38 @@ c_ver = '309001'
 
 print('Version : ' + r_ver)
 
+
+
+# Start Data Migration Code
+
+'''
+3.0.9-master-004 -> next release
+
+ * Dockerizing
+ * Add OAuth Provider: Discord
+'''
+if os.path.exists('image'):
+    os.rename('image', 'data/images')
+if os.path.exists('set.json'):
+    os.rename('set.json', 'data/set.json')
+if os.path.exists('oauthsettings.json'):
+    os.rename('oauthsettings.json', 'data/oauthsettings.json')
+
+try:
+    load_oauth('discord')
+except KeyError:
+    old_oauth_data = json.loads(open('data/oauthsettings.json', encoding='utf-8').read())
+
+    if 'discord' not in old_oauth_data['_README']['support']:
+        old_oauth_data['_README']['support'] += ['discord']
+    old_oauth_data['discord'] = {}
+    old_oauth_data['discord']['client_id'] = ''
+    old_oauth_data['discord']['client_secret'] = ''
+    with open('data/oauthsettings.json', 'w') as f:
+        f.write(json.dumps(old_oauth_data, sort_keys=True, indent=4))
+
+# -> End Data Migration Code
+
 try:
     set_data = json.loads(open('data/set.json').read())
 except:
@@ -157,8 +189,6 @@ if not curs.fetchall():
     curs.execute('delete from alist where name = "owner"')
     curs.execute('insert into alist (name, acl) values ("owner", "owner")')
 
-if os.path.exists('image'): # Data Migration Code
-    os.rename('image', 'data/images')
 if not os.path.exists('data/images'):
     os.makedirs('data/images')
     
