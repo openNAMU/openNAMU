@@ -163,43 +163,23 @@ if not os.path.exists('data/image'):
 if not os.path.exists('views'):
     os.makedirs('views')
 
-if os.getenv('NAMU_HOST') != None:
-    rep_host = os.getenv('NAMU_HOST')
-else:
-    curs.execute('select data from other where name = "host"')
-    rep_data = curs.fetchall()
-    if not rep_data:
-        print('Host (0.0.0.0) : ', end = '')
-        rep_host = input()
-        if rep_host:
-            curs.execute('insert into other (name, data) values ("host", ?)', [rep_host])
-        else:
-            rep_host = '0.0.0.0'
-            
-            curs.execute('insert into other (name, data) values ("host", "0.0.0.0")') 
-    else:
-        rep_host = rep_data[0][0]
-    
-print('Host : ' + str(rep_host))
+# ==========================
+import route.tool.init as server_init
+server_set_key = ['host', 'port', 'language', 'markup', 'encode']
+server_set = {}
 
-if os.getenv('NAMU_PORT') != None:
-    rep_port = os.getenv('NAMU_PORT')
-else:
-    curs.execute('select data from other where name = "port"')
-    rep_data = curs.fetchall()
-    if not rep_data:
-        print('Port (3000) : ', end = '')
-        rep_port = input()
-        if rep_port:
-            curs.execute('insert into other (name, data) values ("port", ?)', [rep_port])
-        else:
-            rep_port = '3000'
-            
-            curs.execute('insert into other (name, data) values ("port", "3000")')
+for i in range(len(server_set_key)):
+    curs.execute('select data from other where name = ?', [server_set_key[i]])
+    server_set_val = curs.fetchall()
+    if not server_set_val:
+        server_set_val = server_init.init(server_set_key[i])
+        curs.execute('insert into other (name, data) values (?, ?)', [server_set_key[i], server_set_val])
+        conn.commit()
     else:
-        rep_port = rep_data[0][0]
-    
-print('Port : ' + str(rep_port))
+        server_set_val = server_set_val[0][0]
+    print(server_set_key[i] + ' : ' + server_set_val)
+    server_set[server_set_key[i]] = server_set_val
+# ==========================
 
 try:
     if not os.path.exists('robots.txt'):
@@ -229,37 +209,6 @@ if not rep_data:
 else:
     rep_key = rep_data[0][0]
 
-support_language = ['ko-KR', 'en-US']
-
-curs.execute("select data from other where name = 'language'")
-rep_data = curs.fetchall()
-if not rep_data:
-    if os.getenv('NAMU_LANG') != None:
-        if os.getenv('NAMU_LANG') in support_language:
-            curs.execute("insert into other (name, data) values ('language', ?)", [os.getenv('NAMU_LANG')])
-            rep_language = os.getenv('NAMU_LANG')
-        else:
-            print('Language ' + str(os.getenv('NAMU_LANG')) + ' is not supported!')
-            rep_language = 'en-US'
-    else:
-        while 1:
-            print('Language (en-US) [' + ', '.join(support_language) + '] : ', end = '')
-            rep_language = input()
-            if rep_language:
-                if rep_language in support_language:
-                    curs.execute("insert into other (name, data) values ('language', ?)", [rep_language])
-                    
-                    break
-            else:
-                rep_language = 'en-US'
-                
-                curs.execute("insert into other (name, data) values ('language', 'en-US')")
-                
-                break
-else:
-    rep_language = rep_data[0][0]
-  
-print('Language : ' + str(rep_language))
 
 curs.execute('select data from other where name = "adsense"')
 adsense_result = curs.fetchall()
@@ -267,29 +216,6 @@ if not adsense_result:
     curs.execute('insert into other (name, data) values ("adsense", "False")')
     curs.execute('insert into other (name, data) values ("adsense_code", "")')
 
-ask_this = [[['Markup', 'markup'], ['namumark']], [['Encryption method', 'encode'], ['sha256', 'sha3']]]
-for ask_data in ask_this:
-    curs.execute('select data from other where name = ?', [ask_data[0][1]])
-    rep_data = curs.fetchall()
-    if not rep_data:
-        while 1:
-            print(ask_data[0][0] + ' (' + ask_data[1][0] + ') [' + ', '.join(ask_data[1]) + '] : ', end = '')
-        
-            rep_mark = input()
-            if rep_mark:
-                if rep_mark in ask_data[1]:
-                    curs.execute('insert into other (name, data) values (?, ?)', [ask_data[0][1], rep_mark])
-                    
-                    break
-            else:
-                rep_mark = ask_data[1][0]
-                curs.execute('insert into other (name, data) values (?, ?)', [ask_data[0][1], rep_mark])
-                
-                break
-    else:
-        rep_mark = rep_data[0][0]
-
-    print(ask_data[0][0] + ' : ' + str(rep_mark))
 
 curs.execute('delete from other where name = "ver"')
 curs.execute('insert into other (name, data) values ("ver", ?)', [c_ver])
@@ -3696,5 +3622,5 @@ def error_404(e):
 if __name__=="__main__":
     app.secret_key = rep_key
     http_server = tornado.httpserver.HTTPServer(tornado.wsgi.WSGIContainer(app))
-    http_server.listen(rep_port, address=rep_host)
+    http_server.listen(server_set['port'], address=server_set['host'])
     tornado.ioloop.IOLoop.instance().start()
