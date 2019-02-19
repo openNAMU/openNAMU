@@ -34,8 +34,8 @@ server_set_var = {
     'encode' : {
         'display' : 'Encrypt Method',
         'require' : 'select',
-        'default' : 'sha256',
-        'list' : ['sha256', 'sha3']
+        'default' : 'sha3',
+        'list' : ['sha3', 'sha256']
     }
 }
 
