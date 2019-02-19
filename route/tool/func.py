@@ -284,15 +284,15 @@ def load_lang(data, num = 2, safe = 0):
             return load_lang(data, 1, safe)
 
 def load_oauth(provider):
-    oauth = json.loads(open('oauthsettings.json', encoding='utf-8').read())
+    oauth = json.loads(open('data/oauthsettings.json', encoding='utf-8').read())
 
     return oauth[provider]
 
 def update_oauth(provider, target, content):
-    oauth = json.loads(open('oauthsettings.json', encoding='utf-8').read())    
+    oauth = json.loads(open('data/oauthsettings.json', encoding='utf-8').read())    
     oauth[provider][target] = content
 
-    with open('oauthsettings.json', 'w', encoding='utf-8') as f:
+    with open('data/oauthsettings.json', 'w', encoding='utf-8') as f:
         json.dump(oauth, f)
 
     return 'Done'
