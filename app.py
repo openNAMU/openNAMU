@@ -157,8 +157,10 @@ if not curs.fetchall():
     curs.execute('delete from alist where name = "owner"')
     curs.execute('insert into alist (name, acl) values ("owner", "owner")')
 
-if not os.path.exists('data/image'):
-    os.makedirs('data/image')
+if os.path.exists('image'): # Data Migration Code
+    os.rename('image', 'data/images')
+if not os.path.exists('data/images'):
+    os.makedirs('data/images')
     
 if not os.path.exists('views'):
     os.makedirs('views')
@@ -3255,12 +3257,12 @@ def upload():
             else:
                 lice = '[[user:' + ip + ']]'
             
-        if os.path.exists(os.path.join('data/image', e_data)):
-            os.remove(os.path.join('data/image', e_data))
+        if os.path.exists(os.path.join('data/images', e_data)):
+            os.remove(os.path.join('data/images', e_data))
             
-            data.save(os.path.join('data/image', e_data))
+            data.save(os.path.join('data/images', e_data))
         else:
-            data.save(os.path.join('data/image', e_data))
+            data.save(os.path.join('data/images', e_data))
             
         curs.execute("select title from data where title = ?", ['file:' + name])
         if curs.fetchall(): 
