@@ -6,7 +6,7 @@ __pycache__
 
 *.db
 *.db-journal
-image
+images
 robots.txt
 
 views/liberty
