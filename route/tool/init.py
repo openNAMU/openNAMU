@@ -43,14 +43,18 @@ def init(key):
     if env_dict[key] != None:
         return env_dict[key]
     else:
-        while(1):
+        while 1:
             if server_set_var[key]['require'] == 'select':
                 list_ = '[' + ', '.join(server_set_var[key]['list']) + '] '
             else:
                 list_ = ''
-            print('{display} ({default}) {list}:'.format(
-                display = server_set_var[key]['display'], default = server_set_var[key]['default'], list = list_
+
+            print('{} ({}) {}:'.format(
+                server_set_var[key]['display'],
+                server_set_var[key]['default'],
+                list_
             ), end = '')
+
             server_set_val = input()
             if server_set_val:
                 if server_set_var[key]['require'] == 'select':
