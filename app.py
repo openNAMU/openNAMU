@@ -17,16 +17,17 @@ APPVAR = json.loads(open('data/app_variables.json', encoding='utf-8').read())
 
 # Start Data Migration Code
 
-'''
-3.0.9-master-004 -> next release
+# 3.0.9-master-004 -> next release
 
- * Dockerizing
- * Add OAuth Provider: Discord
-'''
+# * Dockerizing
+# * Add OAuth Provider: Discord
+
 if os.path.exists('image'):
     os.rename('image', APPVAR['PATH_DATA_IMAGES'])
+
 if os.path.exists('set.json'):
     os.rename('set.json', APPVAR['PATH_SET_JSON'])
+
 if os.path.exists('oauthsettings.json'):
     os.rename('oauthsettings.json', APPVAR['PATH_OAUTHSETTINGS'])
 
@@ -37,9 +38,11 @@ except KeyError:
 
     if 'discord' not in old_oauth_data['_README']['support']:
         old_oauth_data['_README']['support'] += ['discord']
+
     old_oauth_data['discord'] = {}
     old_oauth_data['discord']['client_id'] = ''
     old_oauth_data['discord']['client_secret'] = ''
+
     with open(APPVAR['PATH_OAUTHSETTINGS'], 'w') as f:
         f.write(json.dumps(old_oauth_data, sort_keys=True, indent=4))
 
@@ -197,6 +200,7 @@ if not os.path.exists('views'):
 
 # ==========================
 import route.tool.init as server_init
+
 server_set_key = ['host', 'port', 'language', 'markup', 'encode']
 server_set = {}
 
@@ -209,7 +213,9 @@ for i in range(len(server_set_key)):
         conn.commit()
     else:
         server_set_val = server_set_val[0][0]
+    
     print(server_set_key[i] + ' : ' + server_set_val)
+    
     server_set[server_set_key[i]] = server_set_val
 # ==========================
 
