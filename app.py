@@ -11,11 +11,6 @@ for i_data in os.listdir("route"):
 r_ver = 'v3.0.9-master-005'
 c_ver = '309002'
 
-# 3.0.9-master-004 -> next release
-
-# * Dockerizing
-# * Add OAuth Provider: Discord
-
 print('Version : ' + r_ver)
 
 app_var = json.loads(open('data/app_variables.json', encoding='utf-8').read())
@@ -182,9 +177,9 @@ if not os.path.exists(app_var['PATH_DATA_IMAGES']):
 if not os.path.exists('views'):
     os.makedirs('views')
 
-# ==========================
 import route.tool.init as server_init
 
+dislay_set_key = ['Host', 'Port', 'Language', 'Markup', 'Encrypt Method']
 server_set_key = ['host', 'port', 'language', 'markup', 'encode']
 server_set = {}
 
@@ -199,10 +194,9 @@ for i in range(len(server_set_key)):
     else:
         server_set_val = server_set_val[0][0]
     
-    print(server_set_key[i] + ' : ' + server_set_val)
+    print(dislay_set_key[i] + ' : ' + server_set_val)
     
     server_set[server_set_key[i]] = server_set_val
-# ==========================
 
 try:
     if not os.path.exists('robots.txt'):
