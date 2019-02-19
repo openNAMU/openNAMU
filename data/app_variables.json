@@ -1,0 +1,6 @@
+{
+    "_README" : "DO NOT MODIFY THIS FILE.",
+    "PATH_OAUTHSETTINGS" : "data/oauthsettings.json",
+    "PATH_SET_JSON" : "data/set.json",
+    "PATH_DATA_IMAGES" : "data/images"
+}

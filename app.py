@@ -13,7 +13,7 @@ c_ver = '309001'
 
 print('Version : ' + r_ver)
 
-
+APPVAR = json.loads(open('data/app_variables.json', encoding='utf-8').read())
 
 # Start Data Migration Code
 
@@ -24,29 +24,29 @@ print('Version : ' + r_ver)
  * Add OAuth Provider: Discord
 '''
 if os.path.exists('image'):
-    os.rename('image', 'data/images')
+    os.rename('image', APPVAR['PATH_DATA_IMAGES'])
 if os.path.exists('set.json'):
-    os.rename('set.json', 'data/set.json')
+    os.rename('set.json', APPVAR['PATH_SET_JSON'])
 if os.path.exists('oauthsettings.json'):
-    os.rename('oauthsettings.json', 'data/oauthsettings.json')
+    os.rename('oauthsettings.json', APPVAR['PATH_OAUTHSETTINGS'])
 
 try:
     load_oauth('discord')
 except KeyError:
-    old_oauth_data = json.loads(open('data/oauthsettings.json', encoding='utf-8').read())
+    old_oauth_data = json.loads(open(APPVAR['PATH_OAUTHSETTINGS'], encoding='utf-8').read())
 
     if 'discord' not in old_oauth_data['_README']['support']:
         old_oauth_data['_README']['support'] += ['discord']
     old_oauth_data['discord'] = {}
     old_oauth_data['discord']['client_id'] = ''
     old_oauth_data['discord']['client_secret'] = ''
-    with open('data/oauthsettings.json', 'w') as f:
+    with open(APPVAR['PATH_OAUTHSETTINGS'], 'w') as f:
         f.write(json.dumps(old_oauth_data, sort_keys=True, indent=4))
 
 # -> End Data Migration Code
 
 try:
-    set_data = json.loads(open('data/set.json').read())
+    set_data = json.loads(open(APPVAR['PATH_SET_JSON']).read())
 except:
     if os.getenv('NAMU_DB') != None:
         set_data = { "db" : 'data/' + os.getenv('NAMU_DB') }
@@ -57,10 +57,10 @@ except:
         if new_json == '':
             new_json = 'data'
             
-        with open('data/set.json', 'w') as f:
+        with open(APPVAR['PATH_SET_JSON'], 'w') as f:
             f.write('{ "db" : "data/' + new_json + '" }')
             
-        set_data = json.loads(open('data/set.json').read())
+        set_data = json.loads(open(APPVAR['PATH_SET_JSON']).read())
         
 print('DB\'s name : ' + set_data['db'])
             
@@ -189,8 +189,8 @@ if not curs.fetchall():
     curs.execute('delete from alist where name = "owner"')
     curs.execute('insert into alist (name, acl) values ("owner", "owner")')
 
-if not os.path.exists('data/images'):
-    os.makedirs('data/images')
+if not os.path.exists(APPVAR['PATH_DATA_IMAGES']):
+    os.makedirs(APPVAR['PATH_DATA_IMAGES'])
     
 if not os.path.exists('views'):
     os.makedirs('views')
@@ -518,10 +518,10 @@ def oauth_settings():
                 menu = [['other', load_lang('return')]]
             ))
 
-        with open('data/oauthsettings.json', 'r', encoding='utf-8') as f:
+        with open(APPVAR['PATH_OAUTHSETTINGS'], 'r', encoding='utf-8') as f:
             legacy = json.loads(f.read())
 
-        with open('data/oauthsettings.json', 'w', encoding='utf-8') as f:
+        with open(APPVAR['PATH_OAUTHSETTINGS'], 'w', encoding='utf-8') as f:
             f.write("""
                 {
                     "_README" : {
@@ -3287,12 +3287,12 @@ def upload():
             else:
                 lice = '[[user:' + ip + ']]'
             
-        if os.path.exists(os.path.join('data/images', e_data)):
-            os.remove(os.path.join('data/images', e_data))
+        if os.path.exists(os.path.join(APPVAR['PATH_DATA_IMAGES'], e_data)):
+            os.remove(os.path.join(APPVAR['PATH_DATA_IMAGES'], e_data))
             
-            data.save(os.path.join('data/images', e_data))
+            data.save(os.path.join(APPVAR['PATH_DATA_IMAGES'], e_data))
         else:
-            data.save(os.path.join('data/images', e_data))
+            data.save(os.path.join(APPVAR['PATH_DATA_IMAGES'], e_data))
             
         curs.execute("select title from data where title = ?", ['file:' + name])
         if curs.fetchall(): 
