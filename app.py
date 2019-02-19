@@ -8,71 +8,52 @@ for i_data in os.listdir("route"):
 
         exec("from route." + f_src + " import *")
 
-r_ver = 'v3.0.9-master-004'
-c_ver = '309001'
-
-print('Version : ' + r_ver)
-
-APPVAR = json.loads(open('data/app_variables.json', encoding='utf-8').read())
-
-# Start Data Migration Code
+r_ver = 'v3.0.9-master-005'
+c_ver = '309002'
 
 # 3.0.9-master-004 -> next release
 
 # * Dockerizing
 # * Add OAuth Provider: Discord
 
-if os.path.exists('image'):
-    os.rename('image', APPVAR['PATH_DATA_IMAGES'])
+print('Version : ' + r_ver)
 
-if os.path.exists('set.json'):
-    os.rename('set.json', APPVAR['PATH_SET_JSON'])
+app_var = json.loads(open('data/app_variables.json', encoding='utf-8').read())
 
-if os.path.exists('oauthsettings.json'):
-    os.rename('oauthsettings.json', APPVAR['PATH_OAUTHSETTINGS'])
+all_src = []
+for i_data in os.listdir("."):
+    f_src = re.search("(.+)\.db$", i_data)
+    if f_src:
+        all_src += [f_src.groups()[0]]
 
-try:
-    load_oauth('discord')
-except KeyError:
-    old_oauth_data = json.loads(open(APPVAR['PATH_OAUTHSETTINGS'], encoding='utf-8').read())
+if len(all_src) == 0:
+    print('DB\'s name (data) : ', end = '')
+    
+    db_name = input()
+    if db_name == '':
+        db_name = 'data'
+elif len(all_src) > 1:
+    db_num = 1
 
-    if 'discord' not in old_oauth_data['_README']['support']:
-        old_oauth_data['_README']['support'] += ['discord']
+    for i_data in all_src:
+        print(str(db_num) + ' : ' + i_data)
 
-    old_oauth_data['discord'] = {}
-    old_oauth_data['discord']['client_id'] = ''
-    old_oauth_data['discord']['client_secret'] = ''
+        db_num += 1
 
-    with open(APPVAR['PATH_OAUTHSETTINGS'], 'w') as f:
-        f.write(json.dumps(old_oauth_data, sort_keys=True, indent=4))
+    print('Number : ', end = '')    
+    db_name = all_src[int(number_check(input())) - 1]
+else:
+    db_name = all_src[0]
 
-# -> End Data Migration Code
-
-try:
-    set_data = json.loads(open(APPVAR['PATH_SET_JSON']).read())
-except:
-    if os.getenv('NAMU_DB') != None:
-        set_data = { "db" : 'data/' + os.getenv('NAMU_DB') }
-    else:
-        print('DB\'s name (data) : ', end = '')
-        
-        new_json = str(input())
-        if new_json == '':
-            new_json = 'data'
+if len(all_src) == 1:
+    print('DB\'s name : ' + db_name)
             
-        with open(APPVAR['PATH_SET_JSON'], 'w') as f:
-            f.write('{ "db" : "data/' + new_json + '" }')
-            
-        set_data = json.loads(open(APPVAR['PATH_SET_JSON']).read())
-        
-print('DB\'s name : ' + set_data['db'])
-            
-if os.path.exists(set_data['db'] + '.db'):
+if os.path.exists(db_name + '.db'):
     setup_tool = 0
 else:
     setup_tool = 1
 
-conn = sqlite3.connect(set_data['db'] + '.db', check_same_thread = False)
+conn = sqlite3.connect(db_name + '.db', check_same_thread = False)
 curs = conn.cursor()
 
 load_conn(conn)
@@ -119,13 +100,16 @@ curs.execute('create table if not exists html_filter(test text)')
 curs.execute('create table if not exists oauth_conn(test text)')
 
 if setup_tool == 0:
-    curs.execute('select data from other where name = "ver"')
-    ver_set_data = curs.fetchall()
-    if not ver_set_data:
-        setup_tool = 1
-    else:
-        if c_ver > ver_set_data[0][0]:
+    try:
+        curs.execute('select data from other where name = "ver"')
+        ver_set_data = curs.fetchall()
+        if not ver_set_data:
             setup_tool = 1
+        else:
+            if c_ver > ver_set_data[0][0]:
+                setup_tool = 1
+    except:
+        setup_tool = 1
 
 if setup_tool != 0:
     create_data = {}
@@ -192,8 +176,8 @@ if not curs.fetchall():
     curs.execute('delete from alist where name = "owner"')
     curs.execute('insert into alist (name, acl) values ("owner", "owner")')
 
-if not os.path.exists(APPVAR['PATH_DATA_IMAGES']):
-    os.makedirs(APPVAR['PATH_DATA_IMAGES'])
+if not os.path.exists(app_var['PATH_DATA_IMAGES']):
+    os.makedirs(app_var['PATH_DATA_IMAGES'])
     
 if not os.path.exists('views'):
     os.makedirs('views')
@@ -209,6 +193,7 @@ for i in range(len(server_set_key)):
     server_set_val = curs.fetchall()
     if not server_set_val:
         server_set_val = server_init.init(server_set_key[i])
+        
         curs.execute('insert into other (name, data) values (?, ?)', [server_set_key[i], server_set_val])
         conn.commit()
     else:
@@ -260,7 +245,7 @@ curs.execute('insert into other (name, data) values ("ver", ?)', [c_ver])
 
 def back_up():
     try:
-        shutil.copyfile(set_data['db'] + '.db', 'back_' + set_data['db'] + '.db')
+        shutil.copyfile(db_name + '.db', 'back_' + db_name + '.db')
         
         print('Back up : OK')
     except:
@@ -524,10 +509,10 @@ def oauth_settings():
                 menu = [['other', load_lang('return')]]
             ))
 
-        with open(APPVAR['PATH_OAUTHSETTINGS'], 'r', encoding='utf-8') as f:
+        with open(app_var['PATH_OAUTHSETTINGS'], 'r', encoding='utf-8') as f:
             legacy = json.loads(f.read())
 
-        with open(APPVAR['PATH_OAUTHSETTINGS'], 'w', encoding='utf-8') as f:
+        with open(app_var['PATH_OAUTHSETTINGS'], 'w', encoding='utf-8') as f:
             f.write("""
                 {
                     "_README" : {
@@ -3293,12 +3278,12 @@ def upload():
             else:
                 lice = '[[user:' + ip + ']]'
             
-        if os.path.exists(os.path.join(APPVAR['PATH_DATA_IMAGES'], e_data)):
-            os.remove(os.path.join(APPVAR['PATH_DATA_IMAGES'], e_data))
+        if os.path.exists(os.path.join(app_var['PATH_DATA_IMAGES'], e_data)):
+            os.remove(os.path.join(app_var['PATH_DATA_IMAGES'], e_data))
             
-            data.save(os.path.join(APPVAR['PATH_DATA_IMAGES'], e_data))
+            data.save(os.path.join(app_var['PATH_DATA_IMAGES'], e_data))
         else:
-            data.save(os.path.join(APPVAR['PATH_DATA_IMAGES'], e_data))
+            data.save(os.path.join(app_var['PATH_DATA_IMAGES'], e_data))
             
         curs.execute("select title from data where title = ?", ['file:' + name])
         if curs.fetchall(): 
