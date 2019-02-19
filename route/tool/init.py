@@ -5,7 +5,7 @@ env_dict = {
     'port'      : os.getenv('NAMU_PORT'),
     'language'  : os.getenv('NAMU_LANG'),
     'markup'    : os.getenv('NAMU_MARKUP'),
-    'encode'    : os.getenv('NAMU_ENCRUPT')
+    'encode'    : os.getenv('NAMU_ENCRYPT')
 }
 
 server_set_var = {
