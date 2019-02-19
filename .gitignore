@@ -5,6 +5,7 @@ __pycache__
 .vscode
 
 *.db
+*.db-journal
 image
 robots.txt
 
