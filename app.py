@@ -839,19 +839,19 @@ def block_log(name = None, tool = None):
             
 @app.route('/search', methods=['POST'])
 def search():
-    return redirect('/search/' + url_pas(flask.request.form.get('search', None)))
+    return redirect('/search/' + url_pas(flask.request.form.get('search', 'test')))
 
 @app.route('/goto', methods=['POST'])
 def goto():
-    curs.execute("select title from data where title = ?", [flask.request.form.get('search', None)])
+    curs.execute("select title from data where title = ?", [flask.request.form.get('search', 'test')])
     data = curs.fetchall()
     if data:
-        return redirect('/w/' + url_pas(flask.request.form.get('search', None)))
+        return redirect('/w/' + url_pas(flask.request.form.get('search', 'test')))
     else:
-        return redirect('/search/' + url_pas(flask.request.form.get('search', None)))
+        return redirect('/search/' + url_pas(flask.request.form.get('search', 'test')))
 
 @app.route('/search/<everything:name>')
-def deep_search(name = None):
+def deep_search(name = ''):
     if name == '':
         return redirect()
 
