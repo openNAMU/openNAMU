@@ -171,8 +171,8 @@ if not curs.fetchall():
     curs.execute('delete from alist where name = "owner"')
     curs.execute('insert into alist (name, acl) values ("owner", "owner")')
 
-if not os.path.exists(app_var['PATH_DATA_IMAGES']):
-    os.makedirs(app_var['PATH_DATA_IMAGES'])
+if not os.path.exists(app_var['path_data_image']):
+    os.makedirs(app_var['path_data_image'])
     
 if not os.path.exists('views'):
     os.makedirs('views')
@@ -321,521 +321,48 @@ def user_log():
 
 @app.route('/admin_log')
 def admin_log():
-    num = int(number_check(flask.request.args.get('num', '1')))
-    if num * 50 > 0:
-        sql_num = num * 50 - 50
-    else:
-        sql_num = 0
-
-    list_data = '<ul>'
-
-    curs.execute("select who, what, time from re_admin order by time desc limit ?, '50'", [str(sql_num)])
-    get_list = curs.fetchall()
-    for data in get_list:            
-        list_data += '<li>' + ip_pas(data[0]) + ' / ' + data[1] + ' / ' + data[2] + '</li>'
-
-    list_data += '</ul>'
-    list_data += next_fix('/admin_log?num=', num, get_list)
-
-    return easy_minify(flask.render_template(skin_check(), 
-        imp = [load_lang('authority_use_list'), wiki_set(), custom(), other2([0, 0])],
-        data = list_data,
-        menu = [['other', load_lang('return')]]
-    ))
+    return admin_log_2(conn)
 
 @app.route('/give_log')
 def give_log():        
-    list_data = '<ul>'
-    back = ''
-
-    curs.execute("select distinct name from alist order by name asc")
-    for data in curs.fetchall():                      
-        if back != data[0]:
-            back = data[0]
-
-        list_data += '<li><a href="/admin_plus/' + url_pas(data[0]) + '">' + data[0] + '</a></li>'
-    
-    list_data += '</ul><hr class=\"main_hr\"><a href="/manager/8">(' + load_lang('add') + ')</a>'
-
-    return easy_minify(flask.render_template(skin_check(), 
-        imp = [load_lang('admin_group_list'), wiki_set(), custom(), other2([0, 0])],
-        data = list_data,
-        menu = [['other', load_lang('return')]]
-    ))
+    return give_log_2(conn)
 
 @app.route('/indexing', methods=['POST', 'GET'])
 def indexing():
-    if admin_check() != 1:
-        return re_error('/error/3')
-
-    if flask.request.method == 'POST':
-        admin_check(None, 'indexing')
-
-        curs.execute("select name from sqlite_master where type = 'index'")
-        data = curs.fetchall()
-        if data:
-            for delete_index in data:
-                print('Delete : ' + delete_index[0])
-
-                sql = 'drop index if exists ' + delete_index[0]
-                
-                try:
-                    curs.execute(sql)
-                except:
-                    pass
-        else:
-            curs.execute("select name from sqlite_master where type in ('table', 'view') and name not like 'sqlite_%' union all select name from sqlite_temp_master where type in ('table', 'view') order by 1;")
-            for table in curs.fetchall():            
-                curs.execute('select sql from sqlite_master where name = ?', [table[0]])
-                cul = curs.fetchall()
-                
-                r_cul = re.findall('(?:([^ (]*) text)', str(cul[0]))
-                
-                for n_cul in r_cul:
-                    print('Create : index_' + table[0] + '_' + n_cul)
-
-                    sql = 'create index index_' + table[0] + '_' + n_cul + ' on ' + table[0] + '(' + n_cul + ')'
-                    try:
-                        curs.execute(sql)
-                    except:
-                        pass
-
-        conn.commit()
-        
-        return redirect()  
-    else:
-        curs.execute("select name from sqlite_master where type = 'index'")
-        data = curs.fetchall()
-        if data:
-            b_data = load_lang('delete')
-        else:
-            b_data = load_lang('create')
-
-        return easy_minify(flask.render_template(skin_check(), 
-            imp = [load_lang('indexing'), wiki_set(), custom(), other2([0, 0])],
-            data =  '''
-                    <form method="post">
-                        <button type="submit">''' + b_data + '''</button>
-                    </form>
-                    ''',
-            menu = [['manager', load_lang('return')]]
-        ))       
-
-   
+    return indexing_2(conn)       
 
 @app.route('/restart', methods=['POST', 'GET'])
 def restart():
-    if admin_check(None, 'restart') != 1:
-        return re_error('/error/3')
-
-    if flask.request.method == 'POST':
-        os.execl(sys.executable, sys.executable, *sys.argv)
-    else:
-        print('Restart')
-
-        return easy_minify(flask.render_template(skin_check(), 
-            imp = [load_lang('wiki_restart'), wiki_set(), custom(), other2([0, 0])],
-            data =  '''
-                    <form method="post">
-                        <button type="submit">''' + load_lang('restart') + '''</button>
-                    </form>
-                    ''',
-            menu = [['manager', load_lang('return')]]
-        ))       
+    return restart_2(conn)
 
 @app.route('/update')
 def now_update():
-    if admin_check(None, 'update') != 1:
-       return re_error('/error/3')
+    return now_update_2(conn)
 
-    curs.execute('select data from other where name = "update"')
-    up_data = curs.fetchall()
-    if up_data:
-        up_data = up_data[0][0]
-    else:
-        up_data = 'stable'
+@app.route('/oauth_setting', methods=['GET', 'POST'])
+def oauth_setting():
+    return oauth_setting_2(conn)
 
-    if platform.system() == 'Linux':
-        print('Update')
-
-        os.system('git remote rm origin')
-        os.system('git remote add origin https://github.com/2DU/opennamu.git')
-        ok = os.system('git fetch origin ' + up_data)
-        ok = os.system('git reset --hard origin/' + up_data)
-        if ok == 0:
-            return redirect('/restart')
-    else:
-        if platform.system() == 'Windows':
-            print('Update')
-
-            urllib.request.urlretrieve('https://github.com/2DU/opennamu/archive/' + up_data + '.zip', 'update.zip')
-            zipfile.ZipFile('update.zip').extractall('')
-            ok = os.system('xcopy /y /r opennamu-' + up_data + ' .')
-            if ok == 0:
-                print('Remove')
-                os.system('rd /s /q opennamu-' + up_data)
-                os.system('del update.zip')
-
-                return redirect('/restart')
-
-    return easy_minify(flask.render_template(skin_check(), 
-        imp = [load_lang('update'), wiki_set(), custom(), other2([0, 0])],
-        data = load_lang("update_error") + ' <a href="https://github.com/2DU/opennamu">(Github)</a>',
-        menu = [['manager/1', load_lang('return')]]
-    ))
-
-@app.route('/oauth_settings', methods=['GET', 'POST'])
-def oauth_settings():
-    if admin_check(None, 'oauth_settings') != 1:
-        return re_error('/error/3')
-
-    if flask.request.method == 'POST':
-        try:
-            facebook_client_id = flask.request.form['facebook_client_id']
-            facebook_client_secret = flask.request.form['facebook_client_secret']
-            
-            naver_client_id = flask.request.form['naver_client_id']
-            naver_client_secret = flask.request.form['naver_client_secret']
-        except:
-            return easy_minify(flask.render_template(skin_check(),
-                imp = [load_lang('inter_error'), wiki_set(), custom(), other2([0, 0])],
-                data = '<h2>ie_no_data_required</h2>' + load_lang('ie_no_data_required'),
-                menu = [['other', load_lang('return')]]
-            ))
-
-        with open(app_var['PATH_OAUTHSETTINGS'], 'r', encoding='utf-8') as f:
-            legacy = json.loads(f.read())
-
-        with open(app_var['PATH_OAUTHSETTINGS'], 'w', encoding='utf-8') as f:
-            f.write("""
-                {
-                    "_README" : {
-                        "en" : \"""" + legacy['_README']['en'] + """\",
-                        "ko" : \"""" + legacy['_README']['ko'] + """\",
-                        "support" : """ + str(legacy['_README']['support']).replace("'", '"') + """
-                    },
-                    "publish_url" : \"""" + legacy['publish_url'] + """\",
-                    "facebook" : {
-                        "client_id" : \"""" + facebook_client_id + """\",
-                        "client_secret" : \"""" + facebook_client_secret + """\"
-                    },
-                    "naver" : {
-                        "client_id" : \"""" + naver_client_id + """\",
-                        "client_secret" : \"""" + naver_client_secret + """\"
-                    }
-                }
-            """)
-        
-        return flask.redirect('/oauth_settings')
-
-    oauth_supported = load_oauth('_README')['support']
-
-    body_content = ''
-    body_content += '''
-        <script>
-            function check_value (target) {
-                target_box = document.getElementById(target.id + "_box");
-                if (target.value !== "") {
-                    target_box.checked = true;
-                } else {
-                    target_box.checked = false;
-                } 
-            }
-        </script>
-    '''
-
-    init_js = ''
-    body_content += '<form method="post">'
-
-    for i in range(len(oauth_supported)):
-        oauth_data = load_oauth(oauth_supported[i])
-        for j in range(2):
-            if j == 0:
-                load_target = 'id'
-            elif j == 1:
-                load_target = 'secret'
-
-            init_js += 'check_value(document.getElementById("{}_client_{}"));'.format(oauth_supported[i], load_target)
-
-            body_content += '''
-                <input id="{}_client_{}_box" type="checkbox" disabled>
-                <input placeholder="{}_client_{}" id="{}_client_{}" name="{}_client_{}" value="{}" type="text" onChange="check_value(this)" style="width: 80%;">
-                <hr>
-            '''.format(
-                oauth_supported[i],
-                load_target,
-                oauth_supported[i], 
-                load_target, 
-                oauth_supported[i], 
-                load_target, 
-                oauth_supported[i], 
-                load_target, 
-                oauth_data['client_{}'.format(load_target)]
-            )
-    
-    body_content += '<button id="save" type="submit">' + load_lang('save') + '</button></form>'
-    body_content += '<script>' + init_js + '</script>'
-    
-    return easy_minify(flask.render_template(skin_check(),
-        imp = [load_lang('oauth_setting'), wiki_set(), custom(), other2([0, 0])],
-        data = body_content,
-        menu = [['other', load_lang('return')]]
-    ))
-
-@app.route('/adsense_settings', methods=['GET', 'POST'])
-def adsense_settings():
-    if admin_check(None, 'adsense_settings') != 1:
-        return re_error('/error/3')
-    
-    if flask.request.method == 'POST':
-        try:
-            adsense_enabled = flask.request.form.get('adsense_enabled')
-            adsense_code = flask.request.form['adsense_code']
-        except:
-            return easy_minify(flask.render_template(skin_check(),
-                imp = [load_lang('inter_error'), wiki_set(), custom(), other2([0, 0])],
-                data = '<h2>ie_no_data_required</h2>' + load_lang('ie_no_data_required'),
-                menu = [['other', load_lang('return')]]
-            ))
-        
-        if adsense_enabled == 'on':
-            curs.execute('update other set data = "True" where name = "adsense"')
-        else:
-            curs.execute('update other set data = "False" where name = "adsense"')
-        
-        curs.execute('update other set data = ? where name = "adsense_code"', [adsense_code])
-        conn.commit()
-        
-        return redirect('/adsense_settings')
-
-    body_content = ''
-
-    curs.execute('select data from other where name = "adsense"')
-    adsense_enabled = curs.fetchall()[0][0]
-
-    curs.execute('select data from other where name = "adsense_code"')
-    adsense_code = curs.fetchall()[0][0]
-
-    template = '''
-        <form action="" accept-charset="utf-8" method="post">
-            <div class="form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" name="adsense_enabled" type="checkbox" {}>
-                    {}
-                </label>
-            </div>
-            <hr>
-            <div class="form-group">
-                <textarea class="form-control" id="adsense_code" name="adsense_code" rows="12">{}</textarea>
-            </div>
-            <button type="submit" value="publish">{}</button>
-        </form>
-    '''
-    
-    body_content += template.format(
-        'checked' if adsense_enabled == 'True' else template.format(''),
-        load_lang('adsense_enable'),
-        load_lang('save'),
-        adsense_code
-    )
-
-    return easy_minify(flask.render_template(skin_check(),
-        imp = [load_lang('adsense_setting'), wiki_set(), custom(), other2([0, 0])],
-        data = body_content,
-        menu = [['other', load_lang('return')]]
-    ))
+@app.route('/adsense_setting', methods=['GET', 'POST'])
+def adsense_setting():
+    return adsense_setting_2(conn)
         
 @app.route('/xref/<everything:name>')
 def xref(name = None):
-    num = int(number_check(flask.request.args.get('num', '1')))
-    if num * 50 > 0:
-        sql_num = num * 50 - 50
-    else:
-        sql_num = 0
-        
-    div = '<ul>'
-    
-    curs.execute("select link, type from back where title = ? and not type = 'cat' and not type = 'no' order by link asc limit ?, '50'", [name, str(sql_num)])
-    data_list = curs.fetchall()
-    for data in data_list:
-        div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a>'
-        
-        if data[1]:                
-            div += ' (' + data[1] + ')'
-        
-        curs.execute("select title from back where title = ? and type = 'include'", [data[0]])
-        db_data = curs.fetchall()
-        if db_data:
-            div += ' <a id="inside" href="/xref/' + url_pas(data[0]) + '">(' + load_lang('backlink') + ')</a>'
-
-        div += '</li>'
-      
-    div += '</ul>' + next_fix('/xref/' + url_pas(name) + '?num=', num, data_list)
-    
-    return easy_minify(flask.render_template(skin_check(), 
-        imp = [name, wiki_set(), custom(), other2([' (' + load_lang('backlink') + ')', 0])],
-        data = div,
-        menu = [['w/' + url_pas(name), load_lang('return')]]
-    ))
+    return xref_2(conn, name)
 
 @app.route('/please')
 def please():
-    num = int(number_check(flask.request.args.get('num', '1')))
-    if num * 50 > 0:
-        sql_num = num * 50 - 50
-    else:
-        sql_num = 0
-        
-    div = '<ul>'
-    var = ''
-    
-    curs.execute("select distinct title from back where type = 'no' order by title asc limit ?, '50'", [str(sql_num)])
-    data_list = curs.fetchall()
-    for data in data_list:
-        if var != data[0]:
-            div += '<li><a id="not_thing" href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a></li>'   
-
-            var = data[0]
-        
-    div += '</ul>' + next_fix('/please?num=', num, data_list)
-    
-    return easy_minify(flask.render_template(skin_check(), 
-        imp = [load_lang('need_document'), wiki_set(), custom(), other2([0, 0])],
-        data = div,
-        menu = [['other', load_lang('return')]]
-    ))
+    return please_2(conn)
         
 @app.route('/recent_discuss')
 def recent_discuss():
-    div = ''
-    
-    if flask.request.args.get('what', 'normal') == 'normal':
-        div += '<a href="/recent_discuss?what=close">(' + load_lang('close_discussion') + ')</a>'
-       
-        m_sub = 0
-    else:
-        div += '<a href="/recent_discuss">(' + load_lang('open_discussion') + ')</a>'
-        
-        m_sub = ' (' + load_lang('closed') + ')'
-
-    div +=  '''
-            <hr class=\"main_hr\">
-            <table id="main_table_set">
-                <tbody>
-                    <tr>
-                        <td id="main_table_width_half">''' + load_lang('discussion_name') + '''</td>
-                        <td id="main_table_width_half">''' + load_lang('time') + '''</td>
-                    </tr>
-            '''
-    
-    if m_sub == 0:
-        curs.execute("select title, sub, date from rd where not stop = 'O' order by date desc limit 50")
-    else:
-        curs.execute("select title, sub, date from rd where stop = 'O' order by date desc limit 50")
-        
-    for data in curs.fetchall():
-        title = html.escape(data[0])
-        sub = html.escape(data[1])
-
-        div += '<tr><td><a href="/topic/' + url_pas(data[0]) + '/sub/' + url_pas(data[1]) + '">' + title + '</a> (' + sub + ')</td><td>' + data[2] + '</td></tr>'
-    
-    div += '</tbody></table>'
-            
-    return easy_minify(flask.render_template(skin_check(), 
-        imp = [load_lang('recent_discussion'), wiki_set(), custom(), other2([m_sub, 0])],
-        data = div,
-        menu = 0
-    ))
+    return recent_discuss_2(conn)
 
 @app.route('/block_log')
 @app.route('/<regex("block_user|block_admin"):tool>/<name>')
 def block_log(name = None, tool = None):
-    num = int(number_check(flask.request.args.get('num', '1')))
-    if num * 50 > 0:
-        sql_num = num * 50 - 50
-    else:
-        sql_num = 0
-    
-    div =   '''
-            <table id="main_table_set">
-                <tbody>
-                    <tr>
-                        <td id="main_table_width">''' + load_lang('blocked') + '''</td>
-                        <td id="main_table_width">''' + load_lang('admin') + '''</td>
-                        <td id="main_table_width">''' + load_lang('period') + '''</td>
-                    </tr>
-            '''
-    
-    data_list = ''
-    
-    if not name:
-        div =   '''
-                <a href="/manager/11">(''' + load_lang('blocked') + ''')</a> <a href="/manager/12">(''' + load_lang('admin') + ''')</a>
-                <hr class=\"main_hr\">
-                ''' + div
-        
-        sub = 0
-        menu = 0
-        
-        curs.execute("select why, block, blocker, end, today from rb order by today desc limit ?, '50'", [str(sql_num)])
-    else:
-        menu = [['block_log', load_lang('normal')]]
-        
-        if tool == 'block_user':
-            sub = ' (' + load_lang('blocked') + ')'
-            
-            curs.execute("select why, block, blocker, end, today from rb where block = ? order by today desc limit ?, '50'", [name, str(sql_num)])
-        else:
-            sub = ' (' + load_lang('admin') + ')'
-            
-            curs.execute("select why, block, blocker, end, today from rb where blocker = ? order by today desc limit ?, '50'", [name, str(sql_num)])
-
-    if data_list == '':
-        data_list = curs.fetchall()
-
-    for data in data_list:
-        why = html.escape(data[0])
-        if why == '':
-            why = '<br>'
-        
-        band = re.search("^([0-9]{1,3}\.[0-9]{1,3})$", data[1])
-        if band:
-            ip = data[1] + ' (' + load_lang('range') + ')'
-        else:
-            ip = ip_pas(data[1])
-
-        if data[3] != '':
-            end = data[3]
-        else:
-            end = load_lang('limitless') + ''
-            
-        div +=  '''
-            <tr>
-                <td>''' + ip + '''</td>
-                <td>''' + ip_pas(data[2]) + '''</td>
-                <td>
-                    start : ''' + data[4] + '''
-                    <br>
-                    end : ''' + end + '''
-                </td>
-            </tr>
-            <tr>
-                <td colspan="3">''' + why + '''</td>
-            </tr>
-        '''
-
-    div += '</tbody></table>'
-    
-    if not name:
-        div += next_fix('/block_log?num=', num, data_list)
-    else:
-        div += next_fix('/' + url_pas(tool) + '/' + url_pas(name) + '?num=', num, data_list)
-                
-    return easy_minify(flask.render_template(skin_check(), 
-        imp = [load_lang('recent_ban'), wiki_set(), custom(), other2([sub, 0])],
-        data = div,
-        menu = menu
-    ))
+    return block_log_2(conn, name, tool)
             
 @app.route('/search', methods=['POST'])
 def search():
@@ -852,333 +379,24 @@ def goto():
 
 @app.route('/search/<everything:name>')
 def deep_search(name = ''):
-    if name == '':
-        return redirect()
-
-    num = int(number_check(flask.request.args.get('num', '1')))
-    if num * 50 > 0:
-        sql_num = num * 50 - 50
-    else:
-        sql_num = 0
-
-    div = '<ul>'
-    
-    div_plus = ''
-    test = ''
-    
-    curs.execute("select title from data where title = ?", [name])
-    if curs.fetchall():
-        link_id = ''
-    else:
-        link_id = 'id="not_thing"'
-    
-    div =   '''
-            <ul>
-                <li>
-                    <a ''' + link_id + ' href="/w/' + url_pas(name) + '">' + name + '''</a>
-                </li>
-            </ul>
-            <hr class=\"main_hr\">
-            <ul>
-            '''
-
-    curs.execute("select distinct title, case when title like ? then '제목' else '내용' end from data where title like ? or data like ? order by case when title like ? then 1 else 2 end limit ?, '50'", ['%' + name + '%', '%' + name + '%', '%' + name + '%', '%' + name + '%', str(sql_num)])
-    all_list = curs.fetchall()
-    if all_list:
-        test = all_list[0][1]
-        
-        for data in all_list:
-            if data[1] != test:
-                div_plus += '</ul><hr class=\"main_hr\"><ul>'
-                
-                test = data[1]
-
-            div_plus += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a> (' + data[1] + ')</li>'
-
-    div += div_plus + '</ul>'
-    div += next_fix('/search/' + url_pas(name) + '?num=', num, all_list)
-
-    return easy_minify(flask.render_template(skin_check(), 
-        imp = [name, wiki_set(), custom(), other2([' (' + load_lang('search') + ')', 0])],
-        data = div,
-        menu = 0
-    ))
+    return deep_search_2(conn, name)
          
 @app.route('/raw/<everything:name>')
 @app.route('/topic/<everything:name>/sub/<sub_title>/raw/<int:num>')
 def raw_view(name = None, sub_title = None, num = None):
-    v_name = name
-    sub = ' (' + load_lang('raw') + ')'
-    
-    if not num:
-        num = flask.request.args.get('num', None)
-        if num:
-            num = int(number_check(num))
-    
-    if not sub_title and num:
-        curs.execute("select title from history where title = ? and id = ? and hide = 'O'", [name, str(num)])
-        if curs.fetchall() and admin_check(6) != 1:
-            return re_error('/error/3')
-        
-        curs.execute("select data from history where title = ? and id = ?", [name, str(num)])
-        
-        sub += ' (r' + str(num) + ')'
-
-        menu = [['history/' + url_pas(name), load_lang('history')]]
-    elif sub_title:
-        curs.execute("select data from topic where id = ? and title = ? and sub = ? and block = ''", [str(num), name, sub_title])
-        
-        v_name = load_lang('discussion_raw')
-        sub = ' (' + str(num) + ')'
-
-        menu = [['topic/' + url_pas(name) + '/sub/' + url_pas(sub_title) + '#' + str(num), load_lang('discussion')], ['topic/' + url_pas(name) + '/sub/' + url_pas(sub_title) + '/admin/' + str(num), load_lang('return')]]
-    else:
-        curs.execute("select data from data where title = ?", [name])
-        
-        menu = [['w/' + url_pas(name), load_lang('return')]]
-
-    data = curs.fetchall()
-    if data:
-        p_data = html.escape(data[0][0])
-        p_data = '<textarea readonly rows="25">' + p_data + '</textarea>'
-        
-        return easy_minify(flask.render_template(skin_check(), 
-            imp = [v_name, wiki_set(), custom(), other2([sub, 0])],
-            data = p_data,
-            menu = menu
-        ))
-    else:
-        return redirect('/w/' + url_pas(name))
+    return raw_view_2(conn, name, sub_title, num)
         
 @app.route('/revert/<everything:name>', methods=['POST', 'GET'])
 def revert(name = None):    
-    num = int(number_check(flask.request.args.get('num', '1')))
-
-    curs.execute("select title from history where title = ? and id = ? and hide = 'O'", [name, str(num)])
-    if curs.fetchall() and admin_check(6) != 1:
-        return re_error('/error/3')
-
-    if acl_check(name) == 1:
-        return re_error('/ban')
-
-    if flask.request.method == 'POST':
-        if captcha_post(flask.request.form.get('g-recaptcha-response', '')) == 1:
-            return re_error('/error/13')
-        else:
-            captcha_post('', 0)
-    
-        curs.execute("select data from history where title = ? and id = ?", [name, str(num)])
-        data = curs.fetchall()
-        if data:
-            if edit_filter_do(data[0][0]) == 1:
-                return re_error('/error/21')
-
-        curs.execute("delete from back where link = ?", [name])
-        conn.commit()
-        
-        if data:                                
-            curs.execute("select data from data where title = ?", [name])
-            data_old = curs.fetchall()
-            if data_old:
-                leng = leng_check(len(data_old[0][0]), len(data[0][0]))
-                curs.execute("update data set data = ? where title = ?", [data[0][0], name])
-            else:
-                leng = '+' + str(len(data[0][0]))
-                curs.execute("insert into data (title, data) values (?, ?)", [name, data[0][0]])
-                
-            history_plus(
-                name, 
-                data[0][0], 
-                get_time(), 
-                ip_check(), 
-                flask.request.form.get('send', None) + ' (r' + str(num) + ')', 
-                leng
-            )
-
-            render_set(
-                title = name,
-                data = data[0][0],
-                num = 1
-            )
-            
-            conn.commit()
-            
-        return redirect('/w/' + url_pas(name))
-    else:
-        curs.execute("select title from history where title = ? and id = ?", [name, str(num)])
-        if not curs.fetchall():
-            return redirect('/w/' + url_pas(name))
-
-        return easy_minify(flask.render_template(skin_check(), 
-            imp = [name, wiki_set(), custom(), other2([' (' + load_lang('revert') + ')', 0])],
-            data =  '''
-                    <form method="post">
-                        <span>r''' + flask.request.args.get('num', '0') + '''</span>
-                        <hr class=\"main_hr\">
-                        ''' + ip_warring() + '''
-                        <input placeholder="''' + load_lang('why') + '''" name="send" type="text">
-                        <hr class=\"main_hr\">
-                        ''' + captcha_get() + '''
-                        <button type="submit">''' + load_lang('revert') + '''</button>
-                    </form>
-                    ''',
-            menu = [['history/' + url_pas(name), load_lang('history')], ['recent_changes', load_lang('recent_change')]]
-        ))
+    return revert_2(conn, name)
 
 @app.route('/edit/<everything:name>', methods=['POST', 'GET'])
 def edit(name = None):
-    ip = ip_check()
-    if acl_check(name) == 1:
-        return re_error('/ban')
-    
-    if flask.request.method == 'POST':
-        if captcha_post(flask.request.form.get('g-recaptcha-response', '')) == 1:
-            return re_error('/error/13')
-        else:
-            captcha_post('', 0)
-            
-        if len(flask.request.form.get('send', None)) > 500:
-            return re_error('/error/15')
-
-        if flask.request.form.get('otent', None) == flask.request.form.get('content', None):
-            return redirect('/w/' + url_pas(name))
-            
-        if edit_filter_do(flask.request.form.get('content', '')) == 1:
-            return re_error('/error/21')
-
-        today = get_time()
-        content = savemark(flask.request.form.get('content', None))
-        
-        curs.execute("select data from data where title = ?", [name])
-        old = curs.fetchall()
-        if old:
-            leng = leng_check(len(flask.request.form.get('otent', None)), len(content))
-            
-            if flask.request.args.get('section', None):
-                content = old[0][0].replace(flask.request.form.get('otent', None), content)
-                
-            curs.execute("update data set data = ? where title = ?", [content, name])
-        else:
-            leng = '+' + str(len(content))
-            
-            curs.execute("insert into data (title, data) values (?, ?)", [name, content])
-
-        curs.execute("select user from scan where title = ?", [name])
-        for _ in curs.fetchall():
-            curs.execute("insert into alarm (name, data, date) values (?, ?, ?)", [ip, ip + ' - <a href="/w/' + url_pas(name) + '">' + name + '</a> (Edit)', today])
-
-        history_plus(
-            name,
-            content,
-            today,
-            ip,
-            flask.request.form.get('send', None),
-            leng
-        )
-        
-        curs.execute("delete from back where link = ?", [name])
-        curs.execute("delete from back where title = ? and type = 'no'", [name])
-        
-        render_set(
-            title = name,
-            data = content,
-            num = 1
-        )
-        
-        conn.commit()
-        
-        return redirect('/w/' + url_pas(name))
-    else:            
-        curs.execute("select data from data where title = ?", [name])
-        new = curs.fetchall()
-        if new:
-            if flask.request.args.get('section', None):
-                test_data = '\n' + re.sub('\r\n', '\n', new[0][0]) + '\n'   
-                
-                section_data = re.findall('((?:={1,6}) ?(?:(?:(?!={1,6}\n).)+) ?={1,6}\n(?:(?:(?!(?:={1,6}) ?(?:(?:(?!={1,6}\n).)+) ?={1,6}\n).)*\n*)*)', test_data)
-                data = section_data[int(flask.request.args.get('section', None)) - 1]
-            else:
-                data = new[0][0]
-        else:
-            data = ''
-            
-        data_old = data
-        
-        if not flask.request.args.get('section', None):
-            get_name =  '''
-                        <a href="/manager/15?plus=''' + url_pas(name) + '">(' + load_lang('load') + ')</a> <a href="/edit_filter">(' + load_lang('edit_filter_rule') + ''')</a>
-                        <hr class=\"main_hr\">
-                        '''
-            action = ''
-        else:
-            get_name = ''
-            action = '?section=' + flask.request.args.get('section', None)
-            
-        if flask.request.args.get('plus', None):
-            curs.execute("select data from data where title = ?", [flask.request.args.get('plus', None)])
-            get_data = curs.fetchall()
-            if get_data:
-                data = get_data[0][0]
-                get_name = ''
-
-        js_data = edit_help_button()
-
-        return easy_minify(flask.render_template(skin_check(), 
-            imp = [name, wiki_set(), custom(), other2([' (' + load_lang('edit') + ')', 0])],
-            data =  get_name + js_data[0] + '''
-                    <form method="post" action="/edit/''' + url_pas(name) + action + '''">
-                        ''' + js_data[1] + '''
-                        <textarea id="content" rows="25" name="content">''' + html.escape(re.sub('\n$', '', data)) + '''</textarea>
-                        <textarea style="display: none;" name="otent">''' + html.escape(re.sub('\n$', '', data_old)) + '''</textarea>
-                        <hr class=\"main_hr\">
-                        <input placeholder="''' + load_lang('why') + '''" name="send" type="text">
-                        <hr class=\"main_hr\">
-                        ''' + captcha_get() + ip_warring() + '''
-                        <button id="save" type="submit">''' + load_lang('save') + '''</button>
-                        <button id="preview" type="submit" formaction="/preview/''' + url_pas(name) + action + '">' + load_lang('preview') + '''</button>
-                    </form>
-                    ''',
-            menu = [['w/' + url_pas(name), load_lang('return')], ['delete/' + url_pas(name), load_lang('delete')], ['move/' + url_pas(name), load_lang('move')]]
-        ))
+    return edit_2(conn, name)
 
 @app.route('/preview/<everything:name>', methods=['POST'])
 def preview(name = None):
-    if acl_check(name) == 1:
-        return re_error('/ban')
-         
-    new_data = re.sub('^\r\n', '', flask.request.form.get('content', None))
-    new_data = re.sub('\r\n$', '', new_data)
-    
-    end_data = render_set(
-        title = name,
-        data = new_data
-    )
-    
-    if flask.request.args.get('section', None):
-        action = '?section=' + flask.request.args.get('section', None)
-    else:
-        action = ''
-
-    js_data = edit_help_button()
-    
-    return easy_minify(flask.render_template(skin_check(), 
-        imp = [name, wiki_set(), custom(), other2([' (' + load_lang('preview') + ')', 0])],
-        data =  '<a href="/edit_filter">(' + load_lang('edit_filter_rule') + ')</a>' + js_data[0] + '''
-                <form method="post" action="/edit/''' + url_pas(name) + action + '''">
-                    ''' + js_data[1] + '''
-                    <textarea id="content" rows="25" name="content">''' + html.escape(flask.request.form.get('content', None)) + '''</textarea>
-                    <textarea style="display: none;" name="otent">''' + html.escape(flask.request.form.get('otent', None)) + '''</textarea>
-                    <hr class=\"main_hr\">
-                    <input placeholder="''' + load_lang('why') + '''" name="send" type="text">
-                    <hr class=\"main_hr\">
-                    ''' + captcha_get() + '''
-                    <button id="save" type="submit">''' + load_lang('save') + '''</button>
-                    <button id="preview" type="submit" formaction="/preview/''' + url_pas(name) + action + '">' + load_lang('preview') + '''</button>
-                </form>
-                <hr class=\"main_hr\">
-                ''' + end_data,
-        menu = [['w/' + url_pas(name), load_lang('return')]]
-    ))
+    return preview_2(conn, name)
         
 @app.route('/delete/<everything:name>', methods=['POST', 'GET'])
 def delete(name = None):
@@ -1186,104 +404,7 @@ def delete(name = None):
             
 @app.route('/move/<everything:name>', methods=['POST', 'GET'])
 def move(name = None):
-    if acl_check(name) == 1:
-        return re_error('/ban')
-
-    if flask.request.method == 'POST':
-        if captcha_post(flask.request.form.get('g-recaptcha-response', '')) == 1:
-            return re_error('/error/13')
-        else:
-            captcha_post('', 0)
-
-        curs.execute("select title from history where title = ?", [flask.request.form.get('title', None)])
-        if curs.fetchall():
-            if admin_check(None, 'merge documents') == 1:
-                curs.execute("select data from data where title = ?", [flask.request.form.get('title', None)])
-                data = curs.fetchall()
-                if data:            
-                    curs.execute("delete from data where title = ?", [flask.request.form.get('title', None)])
-                    curs.execute("delete from back where link = ?", [flask.request.form.get('title', None)])
-                
-                curs.execute("select data from data where title = ?", [name])
-                data = curs.fetchall()
-                if data:            
-                    curs.execute("update data set title = ? where title = ?", [flask.request.form.get('title', None), name])
-                    curs.execute("update back set link = ? where link = ?", [flask.request.form.get('title', None), name])
-                    
-                    data_in = data[0][0]
-                else:
-                    data_in = ''
-
-                history_plus(
-                    name, 
-                    data_in, 
-                    get_time(), 
-                    ip_check(), 
-                    flask.request.form.get('send', None) + ' (marge <a>' + name + '</a> - <a>' + flask.request.form.get('title', None) + '</a> move)', 
-                    '0'
-                )
-
-                curs.execute("update back set type = 'no' where title = ? and not type = 'cat' and not type = 'no'", [name])
-                curs.execute("delete from back where title = ? and not type = 'cat' and type = 'no'", [flask.request.form.get('title', None)])
-
-                curs.execute("select id from history where title = ? order by id + 0 desc limit 1", [flask.request.form.get('title', None)])
-                data = curs.fetchall()
-                
-                num = data[0][0]
-
-                curs.execute("select id from history where title = ? order by id + 0 asc", [name])
-                data = curs.fetchall()
-                for move in data:
-                    curs.execute("update history set title = ?, id = ? where title = ? and id = ?", [flask.request.form.get('title', None), str(int(num) + int(move[0])), name, move[0]])
-
-                conn.commit()
-
-                return redirect('/w/' + url_pas(flask.request.form.get('title', None)))
-            else:
-                return re_error('/error/19')
-        else:
-            curs.execute("select data from data where title = ?", [name])
-            data = curs.fetchall()
-            if data:            
-                curs.execute("update data set title = ? where title = ?", [flask.request.form.get('title', None), name])
-                curs.execute("update back set link = ? where link = ?", [flask.request.form.get('title', None), name])
-                
-                data_in = data[0][0]
-            else:
-                data_in = ''
-                
-            history_plus(
-                name, 
-                data_in, 
-                get_time(), 
-                ip_check(), 
-                flask.request.form.get('send', None) + ' (<a>' + name + '</a> - <a>' + flask.request.form.get('title', None) + '</a> move)', 
-                '0'
-            )
-            
-            curs.execute("update back set type = 'no' where title = ? and not type = 'cat' and not type = 'no'", [name])
-            curs.execute("delete from back where title = ? and not type = 'cat' and type = 'no'", [flask.request.form.get('title', None)])
-
-            curs.execute("update history set title = ? where title = ?", [flask.request.form.get('title', None), name])
-            conn.commit()
-
-            return redirect('/w/' + url_pas(flask.request.form.get('title', None)))
-    else:            
-        return easy_minify(flask.render_template(skin_check(), 
-            imp = [name, wiki_set(), custom(), other2([' (' + load_lang('move') + ')', 0])],
-            data =  '''
-                    <form method="post">
-                        ''' + ip_warring() + '''
-                        <input placeholder="''' + load_lang('document_name') + '" value="' + name + '''" name="title" type="text">
-                        <hr class=\"main_hr\">
-                        <input placeholder="''' + load_lang('why') + '''" name="send" type="text">
-                        <hr class=\"main_hr\">
-                        ''' + captcha_get() + '''
-                        <button type="submit">''' + load_lang('move') + '''</button>
-                    </form>
-                    ''',
-            menu = [['w/' + url_pas(name), load_lang('return')]]
-        ))
+    return move_2(conn, name)
 
 @app.route('/other')
 def other():
@@ -1378,8 +499,8 @@ def manager(num = 1):
                         <li><a href="/indexing">''' + load_lang('indexing') + '''</a></li>
                         <li><a href="/restart">''' + load_lang('wiki_restart') + '''</a></li>
                         <li><a href="/update">''' + load_lang('update') + '''</a></li>
-                        <li><a href="/oauth_settings">''' + load_lang('oauth_setting') + '''</a></li>
-                        <li><a href="/adsense_settings">''' + load_lang('adsense_setting') + '''</a></li>
+                        <li><a href="/oauth_setting">''' + load_lang('oauth_setting') + '''</a></li>
+                        <li><a href="/adsense_setting">''' + load_lang('adsense_setting') + '''</a></li>
                     </ul>
                     ''',
             menu = [['other', load_lang('return')]]
@@ -2069,7 +1190,7 @@ def login_oauth(platform = None, func = None):
         elif publish_url == 'https://':
             return easy_minify(flask.render_template(skin_check(), 
                 imp = [load_lang('error'), wiki_set(), custom(), other2([0, 0])], 
-                data = load_lang('oauth_settings_not_found'), 
+                data = load_lang('oauth_setting_not_found'), 
                 menu = [['user', load_lang('return')]]
             ))
 
@@ -3272,12 +2393,12 @@ def upload():
             else:
                 lice = '[[user:' + ip + ']]'
             
-        if os.path.exists(os.path.join(app_var['PATH_DATA_IMAGES'], e_data)):
-            os.remove(os.path.join(app_var['PATH_DATA_IMAGES'], e_data))
+        if os.path.exists(os.path.join(app_var['path_data_image'], e_data)):
+            os.remove(os.path.join(app_var['path_data_image'], e_data))
             
-            data.save(os.path.join(app_var['PATH_DATA_IMAGES'], e_data))
+            data.save(os.path.join(app_var['path_data_image'], e_data))
         else:
-            data.save(os.path.join(app_var['PATH_DATA_IMAGES'], e_data))
+            data.save(os.path.join(app_var['path_data_image'], e_data))
             
         curs.execute("select title from data where title = ?", ['file:' + name])
         if curs.fetchall(): 
