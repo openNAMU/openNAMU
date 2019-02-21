@@ -36,7 +36,7 @@ if sys.version_info < (3, 6):
 from .set_mark.tool import *
 from .mark import *
 
-APPVAR = json.loads(open('data/app_variables.json', encoding='utf-8').read())
+app_var = json.loads(open('data/app_variables.json', encoding='utf-8').read())
 
 def load_conn(data):
     global conn
@@ -168,6 +168,32 @@ def update():
     except:
         pass
 
+    # Start Data Migration Code
+    app_var = json.loads(open(os.path.abspath('./data/app_variables.json'), encoding='utf-8').read())
+
+    if os.path.exists('image'):
+        os.rename('image', app_var['PATH_DATA_IMAGES'])
+
+    if os.path.exists('oauthsettings.json'):
+        os.rename('oauthsettings.json', app_var['PATH_OAUTHSETTINGS'])
+
+    try:
+        load_oauth('discord')
+    except KeyError:
+        old_oauth_data = json.loads(open(app_var['PATH_OAUTHSETTINGS'], encoding='utf-8').read())
+
+        if 'discord' not in old_oauth_data['_README']['support']:
+            old_oauth_data['_README']['support'] += ['discord']
+
+        old_oauth_data['discord'] = {}
+        old_oauth_data['discord']['client_id'] = ''
+        old_oauth_data['discord']['client_secret'] = ''
+
+        with open(app_var['PATH_OAUTHSETTINGS'], 'w') as f:
+            f.write(json.dumps(old_oauth_data, sort_keys = True, indent = 4))
+
+    # -> End Data Migration Code
+
 def pw_encode(data, data2 = '', type_d = ''):
     if type_d == '':
         curs.execute('select data from other where name = "encode"')
@@ -286,15 +312,15 @@ def load_lang(data, num = 2, safe = 0):
             return load_lang(data, 1, safe)
 
 def load_oauth(provider):
-    oauth = json.loads(open(APPVAR['PATH_OAUTHSETTINGS'], encoding='utf-8').read())
+    oauth = json.loads(open(app_var['PATH_OAUTHSETTINGS'], encoding='utf-8').read())
 
     return oauth[provider]
 
 def update_oauth(provider, target, content):
-    oauth = json.loads(open(APPVAR['PATH_OAUTHSETTINGS'], encoding='utf-8').read())
+    oauth = json.loads(open(app_var['PATH_OAUTHSETTINGS'], encoding='utf-8').read())
     oauth[provider][target] = content
 
-    with open(APPVAR['PATH_OAUTHSETTINGS'], 'w') as f:
+    with open(app_var['PATH_OAUTHSETTINGS'], 'w') as f:
         f.write(json.dumps(oauth, sort_keys=True, indent=4))
 
     return 'Done'
