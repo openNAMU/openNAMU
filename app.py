@@ -335,7 +335,7 @@ def indexing():
 def restart():
     return restart_2(conn)
 
-@app.route('/update')
+@app.route('/update', methods=['GET', 'POST'])
 def now_update():
     return now_update_2(conn)
 
