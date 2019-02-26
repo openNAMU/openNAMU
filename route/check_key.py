@@ -11,11 +11,11 @@ def check_key_2(conn, tool):
 
                 curs.execute("select id from user limit 1")
                 if not curs.fetchall():
-                    curs.execute("insert into user (id, pw, acl, date, encode) values (?, ?, 'owner', ?)", [flask.session['c_id'], flask.session['c_pw'], get_time(), db_data[0][0]])
+                    curs.execute("insert into user (id, pw, acl, date, encode) values (?, ?, 'owner', ?, ?)", [flask.session['c_id'], flask.session['c_pw'], get_time(), db_data[0][0]])
 
                     first = 1
                 else:
-                    curs.execute("insert into user (id, pw, acl, date, encode) values (?, ?, 'user', ?)", [flask.session['c_id'], flask.session['c_pw'], get_time(), db_data[0][0]])
+                    curs.execute("insert into user (id, pw, acl, date, encode) values (?, ?, 'user', ?, ?)", [flask.session['c_id'], flask.session['c_pw'], get_time(), db_data[0][0]])
 
                     first = 0
 
