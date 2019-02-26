@@ -408,7 +408,7 @@ def move(name = None):
 
 @app.route('/other')
 def other():
-    return other_2(conn)
+    return other_2(conn, r_ver)
     
 @app.route('/manager', methods=['POST', 'GET'])
 @app.route('/manager/<int:num>', methods=['POST', 'GET'])
