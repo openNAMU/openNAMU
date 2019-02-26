@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def other_2(conn):
+def other_2(conn, r_ver):
     curs = conn.cursor()
     
     return easy_minify(flask.render_template(skin_check(), 
