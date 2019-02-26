@@ -3,7 +3,8 @@ body {
     word-break: break-all;
     word-wrap: break-word;
     margin: 0;
-    font-family: '나눔고딕', 'nanumgothic', "Nanum Gothic","KoPub Dotum","Malgun Gothic","맑은 고딕",sans-serif;
+    font-family: "나눔고딕", "nanumgothic", "Nanum Gothic", "KoPub Dotum", "Malgun Gothic", "맑은 고딕", "sans-serif";
+    overflow: auto;
 }
 
 ul {
