@@ -22,6 +22,7 @@ openNAMU
 가이드 목록
  * [파이썬 설치](https://github.com/Make-openNAMU/guide/blob/master/articles/ko-kr/install-python.md)
  * [오픈나무 시작](https://github.com/Make-openNAMU/guide/blob/master/articles/ko-kr/start-opennamu.md)
+   * [오픈나무 도커 시작(실험적 기능)](https://github.com/Make-openNAMU/guide/blob/master/articles/ko-kr/docker-install.md)
 
 # 클론
 아래 명령을 터미널(명령 프롬프트)에 입력하여 본 리포지토리를 클론할 수 있습니다.
