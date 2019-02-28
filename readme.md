@@ -83,11 +83,5 @@ openNAMU is protected by [BSD 3-Clause License](./LICNESE). Please refer to the 
  * Other chat rooms
 
 # Etc.
-`set.json` is a configuration file that stores some local settings.
- * [filename].db = Database name
-
-If you delete `set.json`, you can create a new one again.
-
-[Test Server](http://namu.ml/)
-
-Owner rights are granted to the first registor.
+ * [Test Server](http://namu.ml/)
+ * Owner rights are granted to the first registor.

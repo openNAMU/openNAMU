@@ -57,9 +57,5 @@ openNAMU 프로젝트는 [BSD 3-Clause License](./LICENSE)(이하 BSD-3 라이�
  * Other chat rooms
 
 # 기타
-`set.json`은 몇가지 로컬 설정을 저장하는 설정 파일입니다.
- * [filename].db = 데이터베이스 이름
-
-`set.json`은 삭제해도 다시 새로 만들 수 있습니다.
-
-[테스트 서버](http://namu.ml/)
+ * [테스트 서버](http://namu.ml/)
+ * 첫 가입자에게 소유자 권한이 부여됩니다.
