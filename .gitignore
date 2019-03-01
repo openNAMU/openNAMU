@@ -1,12 +1,12 @@
 set.json
 
-set_mark/__pycache__
-/__pycache__
+__pycache__
 /app_session
 .vscode
 
 *.db
-image
+*.db-journal
+images
 robots.txt
 
 views/liberty

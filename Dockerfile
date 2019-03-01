@@ -1,15 +1,19 @@
-FROM ubuntu:16.04
+FROM python:3.6.8-stretch
 
-MAINTAINER Hoto Cocoa <cocoa@hoto.us>
+MAINTAINER 2du <min08101@naver.com>
+MAINTAINER hoparkgo9ma <me@ho9.me>
 
-ENV NAMU_PORT=3000
-ENV NAMU_LANG=en-US
+ENV NAMU_DB = data
+ENV NAMU_HOST = 0.0.0.0
+ENV NAMU_PORT = 3000
+ENV NAMU_LANG = en-US
+ENV NAMU_MARKUP = namumark
+ENV NAMU_ENCRYPT = sha3
 
 ADD . /app
-
 WORKDIR /app
 
-RUN apt update && apt install -y --no-install-recommends python3 python3-dev python3-pip python3-setuptools
-RUN python3 -m pip install pip --upgrade && python3 -m pip install -r requirements.txt
+RUN pip install -r requirements.txt
+EXPOSE 3000
 
-CMD python3 app.py
+CMD [ "python", "./app.py" ]

@@ -1,0 +1,20 @@
+{
+    "_README" : {
+        "en" : "To use the oAuth login feature, you must set the 'publish_url' value to a domain address that includes the HTTPS protocol, and actually support HTTPS connections.",
+        "ko" : "oAuth 로그인 기능을 사용하려면 'publish_url' 값을 HTTPS 프로토콜을 포함한 도메인 주소로 설정하고, 실제로 HTTPS 연결을 지원해야 합니다.",
+        "support" : ["discord", "facebook", "naver"]
+    },
+    "publish_url" : "https://",
+    "discord" : {
+        "client_id" : "",
+        "client_secret" : ""
+    },
+    "facebook" : {
+        "client_id" : "",
+        "client_secret" : ""
+    },
+    "naver" : {
+        "client_id" : "",
+        "client_secret" : ""
+    }
+}

@@ -3,7 +3,8 @@ body {
     word-break: break-all;
     word-wrap: break-word;
     margin: 0;
-    font-family: '나눔고딕', 'nanumgothic', "Nanum Gothic","KoPub Dotum","Malgun Gothic","맑은 고딕",sans-serif;
+    font-family: "나눔고딕", "nanumgothic", "Nanum Gothic", "KoPub Dotum", "Malgun Gothic", "맑은 고딕", "sans-serif";
+    overflow: auto;
 }
 
 ul {
@@ -50,8 +51,8 @@ li {
 #top {
     width: 100%;
     border-bottom: 2px solid gainsboro;
-    background: #fff;
-    padding: 10px;
+    background: skyblue;
+    padding: 15px;
     padding-right: 0;
     padding-left: 0;
     position: relative;
@@ -68,6 +69,7 @@ li {
     background: white;
     border-left: 2px solid gainsboro;
     border-right: 2px solid gainsboro;
+    min-height: 350px;
 }
 
 #bottom {
@@ -274,6 +276,7 @@ h6 {
     right: 0;
     background: white;
     border-left: 2px solid gainsboro;
+    z-index: 1;
 }
 
 #mobile_menu_main {
@@ -338,14 +341,14 @@ input {
 #go_toc {
     display: inline-block;
     padding: 10px;
-    border-left: 2px solid white;
+    border-left: 2px solid gainsboro;
     width: 25px;
 }
 
 #go_top {
     display: inline-block;
     padding: 10px;
-    border-right: 2px solid white;
+    border-right: 2px solid gainsboro;
     width: 25px;
 }
 
@@ -361,7 +364,11 @@ input {
     position: fixed;
     bottom: 0;
     right: 0;
-    border: 2px solid white;
-    background: gainsboro;
+    border: 2px solid gainsboro;
+    background: skyblue;
     text-align: center;
+}
+
+#nav_bar a {
+    color: black;
 }

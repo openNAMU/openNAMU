@@ -1,15 +1,30 @@
+import werkzeug.routing
+import flask_compress
+import flask_reggie
+import tornado.ioloop
+import tornado.httpserver
+import tornado.wsgi
+import urllib.request
 import email.mime.text
 import urllib.request
 import sqlite3
 import hashlib
 import smtplib
 import bcrypt
+import platform
+import zipfile
+import difflib
+import shutil
+import threading
+import logging
+import random
 import flask
 import json
 import html
 import sys
 import re
 import os
+
 try:
     import css_html_js_minify
 except:
@@ -18,8 +33,10 @@ except:
 if sys.version_info < (3, 6):
     import sha3
 
-from set_mark.tool import *
-from mark import *
+from .set_mark.tool import *
+from .mark import *
+
+app_var = json.loads(open('data/app_variables.json', encoding='utf-8').read())
 
 def load_conn(data):
     global conn
@@ -53,7 +70,41 @@ def send_email(who, title, data):
 
         smtp.quit()
     except:
-        print('error : email login error')
+        print('Error : Email login error')
+
+def last_change(data):
+    json_address = re.sub("\.html$", ".json", skin_check())
+    try:
+        json_data = json.loads(open(json_address).read())
+    except:
+        json_data = 0
+
+    if json_data != 0:
+        for j_data in json_data:
+            if "class" in json_data[j_data]:
+                if "require" in json_data[j_data]:
+                    re_data = re.compile("<((?:" + j_data + ")( (?:(?!>).)*)?)>")
+                    s_data = re_data.findall(data)
+                    for i_data in s_data:
+                        e_data = 0
+
+                        for j_i_data in json_data[j_data]["require"]:
+                            re_data_2 = re.compile("( |^)" + j_i_data + " *= *[\'\"]" + json_data[j_data]["require"][j_i_data] + "[\'\"]")
+                            if not re_data_2.search(i_data[1]):
+                                re_data_2 = re.compile("( |^)" + j_i_data + "=" + json_data[j_data]["require"][j_i_data] + "(?: |$)")
+                                if not re_data_2.search(i_data[1]):
+                                    e_data = 1
+
+                                    break
+
+                        if e_data == 0:
+                            re_data_3 = re.compile("<" + i_data[0] + ">")
+                            data = re_data_3.sub("<" + i_data[0] + " class=\"" + json_data[j_data]["class"] + "\">", data)        
+                else:
+                    re_data = re.compile("<(?P<in>" + j_data + "(?: (?:(?!>).)*)?)>")
+                    data = re_data.sub("<\g<in> class=\"" + json_data[j_data]["class"] + "\">", data)        
+
+    return data
 
 def easy_minify(data, tool = None):
     try:
@@ -68,11 +119,13 @@ def easy_minify(data, tool = None):
         data = re.sub('\n +<', '\n<', data)
         data = re.sub('>(\n| )+<', '> <', data)
     
-    return data
+    return last_change(data)
 
-def render_set(title = '', data = '', num = 0):
+def render_set(title = '', data = '', num = 0, s_data = 0):
     if acl_check(title, 'render') == 1:
-        return 'http request 401.3'
+        return 'HTTP Request 401.3'
+    elif s_data == 1:
+        return data
     else:
         return namumark(title, data, num)
 
@@ -86,50 +139,11 @@ def captcha_get():
             curs.execute('select data from other where name = "sec_re"')
             sec_re = curs.fetchall()
             if sec_re and sec_re[0][0] != '':
-                data += recaptcha[0][0] + '<hr>'
+                data += recaptcha[0][0] + '<hr class=\"main_hr\">'
 
     return data
 
 def update():
-    # v3.0.5 사용자 문서, 파일 문서, 분류 문서 영어화
-    try:
-        all_rep = [['사용자:', 'user:'], ['파일:', 'file:'], ['분류:', 'category:']]
-        all_rep2 = ['data', 'history', 'acl', 'topic', 'back']
-
-        test = 0
-
-        for i in range(3):
-            for j in range(6):
-                if not j == 5:
-                    curs.execute('select title from ' + all_rep2[j] + ' where title like ?', [all_rep[i][0] + '%'])
-                else:
-                    curs.execute('select link from back where link like ?', [all_rep[i][0] + '%'])
-
-                user_rep = curs.fetchall()
-                if user_rep:
-                    for user_rep2 in user_rep:
-                        test = 1
-
-                        first = re.sub('^' + all_rep[i][0], all_rep[i][1], user_rep2[0])
-
-                        if j == 0:
-                            curs.execute("update data set title = ? where title = ?", [first, user_rep2[0]])
-                        elif j == 1:
-                            curs.execute("update history set title = ? where title = ?", [first, user_rep2[0]])
-                        elif j == 2:
-                            curs.execute("update acl set title = ? where title = ?", [first, user_rep2[0]])
-                        elif j == 3:
-                            curs.execute("update topic set title = ? where title = ?", [first, user_rep2[0]])
-                        elif j == 4:
-                            curs.execute("update back set title = ? where title = ?", [first, user_rep2[0]])
-                        elif j == 5:
-                            curs.execute("update back set link = ? where link = ?", [first, user_rep2[0]])
-
-        if test == 1:
-            print('사용자 to user, 파일 to file, 분류 to category')
-    except:
-        pass
-        
     # v3.0.8 rd, agreedis, stop 테이블 통합
     try:
         curs.execute("select title, sub, close from stop")
@@ -153,6 +167,32 @@ def update():
         curs.execute("drop table if exists agreedis")
     except:
         pass
+
+    # Start Data Migration Code
+    app_var = json.loads(open(os.path.abspath('./data/app_variables.json'), encoding='utf-8').read())
+
+    if os.path.exists('image'):
+        os.rename('image', app_var['path_data_image'])
+
+    if os.path.exists('oauthsettings.json'):
+        os.rename('oauthsettings.json', app_var['path_oauth_setting'])
+
+    try:
+        load_oauth('discord')
+    except KeyError:
+        old_oauth_data = json.loads(open(app_var['path_oauth_setting'], encoding='utf-8').read())
+
+        if 'discord' not in old_oauth_data['_README']['support']:
+            old_oauth_data['_README']['support'] += ['discord']
+
+        old_oauth_data['discord'] = {}
+        old_oauth_data['discord']['client_id'] = ''
+        old_oauth_data['discord']['client_secret'] = ''
+
+        with open(app_var['path_oauth_setting'], 'w') as f:
+            f.write(json.dumps(old_oauth_data, sort_keys = True, indent = 4))
+
+    # -> End Data Migration Code
 
 def pw_encode(data, data2 = '', type_d = ''):
     if type_d == '':
@@ -188,17 +228,25 @@ def pw_check(data, data2, type_d = 'no', id_d = ''):
     else:
         set_data = db_data[0][0]
     
-    if set_data in ['sha256', 'sha3']:
-        data3 = pw_encode(data = data, type_d = set_data)
-        if data3 == data2:
-            re_data = 1
+    while 1:
+        if set_data in ['sha256', 'sha3']:
+            data3 = pw_encode(data = data, type_d = set_data)
+            if data3 == data2:
+                re_data = 1
+            else:
+                re_data = 0
+
+            break
         else:
-            re_data = 0
-    else:
-        if pw_encode(data, data2, 'bcrypt') == data2:
-            re_data = 1
-        else:
-            re_data = 0
+            try:
+                if pw_encode(data, data2, 'bcrypt') == data2:
+                    re_data = 1
+                else:
+                    re_data = 0
+
+                break
+            except:
+                set_data = db_data[0][0]
 
     if db_data[0][0] != set_data and re_data == 1 and id_d != '':
         curs.execute("update user set pw = ?, encode = ? where id = ?", [pw_encode(data), db_data[0][0], id_d])
@@ -228,7 +276,7 @@ def captcha_post(re_data, num = 1):
     else:
         pass
 
-def load_lang(data, num = 2):
+def load_lang(data, num = 2, safe = 0):
     if num == 1:
         curs.execute("select data from other where name = 'language'")
         rep_data = curs.fetchall()
@@ -237,9 +285,12 @@ def load_lang(data, num = 2):
         lang = json.loads(json_data)
 
         if data in lang:
-            return lang[data]
+            if safe == 1:
+                return lang[data]
+            else:
+                return html.escape(lang[data])
         else:
-            return data + ' (missing)'
+            return html.escape(data + ' (M)')
     else:
         curs.execute('select data from user_set where name = "lang" and id = ?', [ip_check()])
         rep_data = curs.fetchall()
@@ -248,14 +299,31 @@ def load_lang(data, num = 2):
                 json_data = open(os.path.join('language', rep_data[0][0] + '.json'), 'rt', encoding='utf-8').read()
                 lang = json.loads(json_data)
             except:
-                return load_lang(data, 1)
+                return load_lang(data, 1, safe)
 
             if data in lang:
-                return lang[data]
+                if safe == 1:
+                    return lang[data]
+                else:
+                    return html.escape(lang[data])
             else:
-                return load_lang(data, 1)
+                return load_lang(data, 1, safe)
         else:
-            return load_lang(data, 1)
+            return load_lang(data, 1, safe)
+
+def load_oauth(provider):
+    oauth = json.loads(open(app_var['path_oauth_setting'], encoding='utf-8').read())
+
+    return oauth[provider]
+
+def update_oauth(provider, target, content):
+    oauth = json.loads(open(app_var['path_oauth_setting'], encoding='utf-8').read())
+    oauth[provider][target] = content
+
+    with open(app_var['path_oauth_setting'], 'w') as f:
+        f.write(json.dumps(oauth, sort_keys=True, indent=4))
+
+    return 'Done'
 
 def ip_or_user(data):
     if re.search('(\.|:)', data):
@@ -266,24 +334,24 @@ def ip_or_user(data):
 def edit_help_button():
     # https://stackoverflow.com/questions/11076975/insert-text-into-textarea-at-cursor-position-javascript
     js_data =   '''
-                <script>
-                    function insert_data(name, data) {
-                        if(document.selection) { 
-                            document.getElementById(name).focus();
+        <script>
+            function insert_data(name, data) {
+                if(document.selection) { 
+                    document.getElementById(name).focus();
 
-                            sel = document.selection.createRange();
-                            sel.text = data; 
-                        } else if(document.getElementById(name).selectionStart || document.getElementById(name).selectionStart == '0') {
-                            var startPos = document.getElementById(name).selectionStart;
-                            var endPos = document.getElementById(name).selectionEnd;
+                    sel = document.selection.createRange();
+                    sel.text = data; 
+                } else if(document.getElementById(name).selectionStart || document.getElementById(name).selectionStart == '0') {
+                    var startPos = document.getElementById(name).selectionStart;
+                    var endPos = document.getElementById(name).selectionEnd;
 
-                            document.getElementById(name).value = document.getElementById(name).value.substring(0, startPos) + data + document.getElementById(name).value.substring(endPos, document.getElementById(name).value.length); 
-                        } else {
-                            document.getElementById(name).value += data;
-                        }
-                    }
-                </script>
-                '''
+                    document.getElementById(name).value = document.getElementById(name).value.substring(0, startPos) + data + document.getElementById(name).value.substring(endPos, document.getElementById(name).value.length); 
+                } else {
+                    document.getElementById(name).value += data;
+                }
+            }
+        </script>
+    '''
 
     insert_list = [['[[|]]', '[[|]]'], ['[*()]', '[*()]'], ['{{{#!}}}', '{{{#!}}}'], ['||<>||', '||<>||'], ["\\'\\'\\'", "\'\'\'"]]
 
@@ -291,16 +359,16 @@ def edit_help_button():
     for insert_data in insert_list:
         data += '<a href="javascript:void(0);" onclick="insert_data(\'content\', \'' + insert_data[0] + '\');">(' + insert_data[1] + ')</a> '
 
-    return [js_data, data + '<hr>']
+    return [js_data, data + '<hr class=\"main_hr\">']
 
 def ip_warring():
     if custom()[2] == 0:    
         curs.execute('select data from other where name = "no_login_warring"')
         data = curs.fetchall()
         if data and data[0][0] != '':
-            text_data = '<span>' + data[0][0] + '</span><hr>'
+            text_data = '<span>' + data[0][0] + '</span><hr class=\"main_hr\">'
         else:
-            text_data = '<span>' + load_lang('no_login_warring') + '</span><hr>'
+            text_data = '<span>' + load_lang('no_login_warring') + '</span><hr class=\"main_hr\">'
     else:
         text_data = ''
 
@@ -328,11 +396,11 @@ def next_fix(link, num, page, end = 50):
 
     if num == 1:
         if len(page) == end:
-            list_data += '<hr><a href="' + link + str(num + 1) + '">(' + load_lang('next') + ')</a>'
+            list_data += '<hr class=\"main_hr\"><a href="' + link + str(num + 1) + '">(' + load_lang('next') + ')</a>'
     elif len(page) != end:
-        list_data += '<hr><a href="' + link + str(num - 1) + '">(' + load_lang('previous') + ')</a>'
+        list_data += '<hr class=\"main_hr\"><a href="' + link + str(num - 1) + '">(' + load_lang('previous') + ')</a>'
     else:
-        list_data += '<hr><a href="' + link + str(num - 1) + '">(' + load_lang('previous') + ')</a> <a href="' + link + str(num + 1) + '">(' + load_lang('next') + ')</a>'
+        list_data += '<hr class=\"main_hr\"><a href="' + link + str(num - 1) + '">(' + load_lang('previous') + ')</a> <a href="' + link + str(num + 1) + '">(' + load_lang('next') + ')</a>'
 
     return list_data
 
@@ -348,7 +416,7 @@ def wiki_set(num = 1):
         if db_data and db_data[0][0] != '':
             data_list += [db_data[0][0]]
         else:
-            data_list += ['wiki']
+            data_list += ['Wiki']
 
         curs.execute('select data from other where name = "license"')
         db_data = curs.fetchall()
@@ -372,7 +440,6 @@ def wiki_set(num = 1):
             data_list += [db_data[0][0]]
         else:
             data_list += ['']
-
         return data_list
 
     if num == 2:
@@ -482,13 +549,13 @@ def ip_pas(raw_ip):
     hide = 0
 
     if re.search("(\.|:)", raw_ip):
-        if not re.search("^" + load_lang('tool', 1) + ":", raw_ip):    
+        if not re.search("^tool:", raw_ip):    
             curs.execute("select data from other where name = 'ip_view'")
             data = curs.fetchall()
             if data and data[0][0] != '':
                 ip = '<span style="font-size: 75%;">' + hashlib.md5(bytes(raw_ip, 'utf-8')).hexdigest() + '</span>'
 
-                if not admin_check('ban', None):
+                if not admin_check(1):
                     hide = 1
             else:
                 ip = raw_ip
@@ -537,7 +604,7 @@ def custom():
     else:
         user_name = load_lang('user')
 
-    return ['', '', user_icon, user_head, email, user_name, load_lang(data = '', num = 2)]
+    return ['', '', user_icon, user_head, email, user_name]
 
 def load_skin(data = ''):
     div2 = ''
@@ -579,14 +646,14 @@ def acl_check(name, tool = ''):
         acl_data = curs.fetchall()
         if acl_data:
             if acl_data[0][0] == 'user':
-                if not user_data:
+                if ip_or_user(ip):
                     return 1
 
             if acl_data[0][0] == 'admin':
-                if not user_data:
+                if ip_or_user(ip):
                     return 1
 
-                if not admin_check(5, 'view (' + name + ')') == 1:
+                if admin_check(5, 'view (' + name + ')') != 1:
                     return 1
 
         return 0
@@ -598,7 +665,7 @@ def acl_check(name, tool = ''):
         if acl_c:
             acl_n = acl_c.groups()
 
-            if admin_check(5, None) == 1:
+            if admin_check(5) == 1:
                 return 0
 
             curs.execute("select dec from acl where title = ?", ['user:' + acl_n[0]])
@@ -650,7 +717,7 @@ def acl_check(name, tool = ''):
                 if not user_data:
                     return 1
 
-                if not admin_check(5, None) == 1:
+                if not admin_check(5) == 1:
                     return 1
 
         return 0
@@ -744,8 +811,10 @@ def ban_insert(name, end, why, login, blocker):
             login = ''
 
         if end != '0':
+            end = int(number_check(end))
+
             time = datetime.datetime.now()
-            plus = datetime.timedelta(seconds = int(end))
+            plus = datetime.timedelta(seconds = end)
             r_time = (time + plus).strftime("%Y-%m-%d %H:%M:%S")
         else:
             r_time = ''
@@ -778,6 +847,15 @@ def leng_check(first, second):
         
     return all_plus
 
+def number_check(data):
+    if not data:
+        return '1'
+    else:
+        if re.search('[^0-9]', data):
+            return '1'
+        else:
+            return data
+
 def edit_filter_do(data):
     if admin_check(1, 'edit_filter pass') != 1:
         curs.execute("select regex, sub from filter")
@@ -796,7 +874,7 @@ def edit_filter_do(data):
     
     return 0
 
-def redirect(data):
+def redirect(data = '/'):
     return flask.redirect(data)
 
 def re_error(data):
