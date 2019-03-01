@@ -121,6 +121,7 @@
         "discussion_raw" : "Discussion[s] raw",
         "oauth_signin_facebook" : "Sign-in with Facebook",
         "oauth_signin_naver" : "Sign-in with NAVER",
+        "oauth_signin_discord" : "Sign-in with Discord",
         "connection" : "Connection",
         "new_connection" : "Connect...",
         "user_setting" : "User settings",
