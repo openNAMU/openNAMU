@@ -8,8 +8,8 @@ for i_data in os.listdir("route"):
 
         exec("from route." + f_src + " import *")
 
-r_ver = 'v3.0.9-master-006'
-c_ver = '309002'
+r_ver = 'v3.0.9-stable'
+c_ver = '400000'
 
 print('Version : ' + r_ver)
 

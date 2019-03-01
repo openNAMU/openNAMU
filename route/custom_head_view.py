@@ -36,7 +36,7 @@ def custom_head_view_2(conn):
             else:
                 data = ''
 
-        start += '<span>&lt;style&gt;css&lt;/style&gt;<br>&lt;script&gt;js&lt;/script&gt;</span><hr class=\"main_hr\">'
+        start += '<span>&lt;style&gt;CSS&lt;/style&gt;<br>&lt;script&gt;JS&lt;/script&gt;</span><hr class=\"main_hr\">'
 
         return easy_minify(flask.render_template(skin_check(), 
             imp = [load_lang(data = 'user_head', safe = 1), wiki_set(), custom(), other2([0, 0])],

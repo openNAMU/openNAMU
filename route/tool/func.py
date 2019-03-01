@@ -172,15 +172,15 @@ def update():
     app_var = json.loads(open(os.path.abspath('./data/app_variables.json'), encoding='utf-8').read())
 
     if os.path.exists('image'):
-        os.rename('image', app_var['PATH_DATA_IMAGES'])
+        os.rename('image', app_var['path_data_image'])
 
     if os.path.exists('oauthsettings.json'):
-        os.rename('oauthsettings.json', app_var['PATH_OAUTHSETTINGS'])
+        os.rename('oauthsettings.json', app_var['path_oauth_setting'])
 
     try:
         load_oauth('discord')
     except KeyError:
-        old_oauth_data = json.loads(open(app_var['PATH_OAUTHSETTINGS'], encoding='utf-8').read())
+        old_oauth_data = json.loads(open(app_var['path_oauth_setting'], encoding='utf-8').read())
 
         if 'discord' not in old_oauth_data['_README']['support']:
             old_oauth_data['_README']['support'] += ['discord']
@@ -189,7 +189,7 @@ def update():
         old_oauth_data['discord']['client_id'] = ''
         old_oauth_data['discord']['client_secret'] = ''
 
-        with open(app_var['PATH_OAUTHSETTINGS'], 'w') as f:
+        with open(app_var['path_oauth_setting'], 'w') as f:
             f.write(json.dumps(old_oauth_data, sort_keys = True, indent = 4))
 
     # -> End Data Migration Code
@@ -312,15 +312,15 @@ def load_lang(data, num = 2, safe = 0):
             return load_lang(data, 1, safe)
 
 def load_oauth(provider):
-    oauth = json.loads(open(app_var['PATH_OAUTHSETTINGS'], encoding='utf-8').read())
+    oauth = json.loads(open(app_var['path_oauth_setting'], encoding='utf-8').read())
 
     return oauth[provider]
 
 def update_oauth(provider, target, content):
-    oauth = json.loads(open(app_var['PATH_OAUTHSETTINGS'], encoding='utf-8').read())
+    oauth = json.loads(open(app_var['path_oauth_setting'], encoding='utf-8').read())
     oauth[provider][target] = content
 
-    with open(app_var['PATH_OAUTHSETTINGS'], 'w') as f:
+    with open(app_var['path_oauth_setting'], 'w') as f:
         f.write(json.dumps(oauth, sort_keys=True, indent=4))
 
     return 'Done'
