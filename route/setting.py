@@ -267,9 +267,11 @@ def setting_2(conn, num):
             if num == 4:
                 curs.execute("select data from other where name = 'body'")
                 title = '_body'
+                start = ''
             else:
                 curs.execute("select data from other where name = 'head'")
                 title = '_head'
+                start = '<span>&lt;style&gt;CSS&lt;/style&gt;<br>&lt;script&gt;JS&lt;/script&gt;</span><hr class=\"main_hr\">'
                 
             head = curs.fetchall()
             if head:
@@ -281,6 +283,7 @@ def setting_2(conn, num):
                 imp = [load_lang(data = 'main' + title, safe = 1), wiki_set(), custom(), other2([0, 0])],
                 data =  '''
                         <form method="post">
+                            ''' + start + '''
                             <textarea rows="25" name="content">''' + html.escape(data) + '''</textarea>
                             <hr class=\"main_hr\">
                             <button id="save" type="submit">''' + load_lang('save') + '''</button>
