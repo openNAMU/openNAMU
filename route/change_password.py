@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def change_password_2(conn):
+def change_password_2(conn, server_init):
     curs = conn.cursor()
 
     support_language = server_init.server_set_var['language']['list']
