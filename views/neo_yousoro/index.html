@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
     <head>
         <meta charset="utf-8">
@@ -5,9 +6,10 @@
         <link rel="stylesheet" href="/views/main_css/main.css">
         <link rel="stylesheet" href="/views/neo_yousoro/css/main.css">
         <script src="/views/neo_yousoro/js/main.js"></script>
+        <script src="/views/neo_yousoro/js/skin_set.js"></script>
         <link   rel="stylesheet"
-                href="https://use.fontawesome.com/releases/v5.2.0/css/all.css"
-                integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ"
+                href="https://use.fontawesome.com/releases/v5.7.2/css/all.css"
+                integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr"
                 crossorigin="anonymous">
         <link rel="shortcut icon" href="/views/main_css/file/favicon.ico">
         {{imp[1][5]|safe}}
@@ -31,7 +33,7 @@
                             <div id="recent_cel" class="cel_in_cel" style="display: none;">
                                 <a href="/recent_changes">
                                     <i class="fas fa-sync-alt"></i>
-                                    {{'change'|load_lang}}
+                                    {{'edit'|load_lang}}
                                 </a>
                                 <hr>
                                 <a href="/recent_discuss">
@@ -60,7 +62,7 @@
                                 <hr>
                                 <a href="/skin_set">
                                     <i class="fas fa-cog"></i>
-                                    {{'skin'|load_lang}} {{'setting'|load_lang}}
+                                    {{'skin_setting'|load_lang}}
                                 </a>
                             </div>
                         </div>
@@ -108,12 +110,12 @@
                         </a>
                     </div>
                     <h2>{{'recent'|load_lang}}</h2>
-                    <li><a href="/recent_changes">{{'change'|load_lang}}</a></li>
+                    <li><a href="/recent_changes">{{'edit'|load_lang}}</a></li>
                     <li><a href="/recent_discuss">{{'discussion'|load_lang}}</a></li>
                     <h2>{{'other'|load_lang}}</h2>
                     <li><a href="/random">{{'random'|load_lang}}</a></li>
                     <li><a href="/other">{{'tool'|load_lang}}</a></li>
-                    <li><a href="/skin_set">{{'skin'|load_lang}} {{'setting'|load_lang}}</a></li>
+                    <li><a href="/skin_set">{{'skin_setting'|load_lang}}</a></li>
                     <h2>{{'user'|load_lang}}</h2>
                     <li><a href="/user">{{imp[2][5]}}</a></li>
                 </div>
@@ -159,6 +161,9 @@
         <div id="bottom">
             <div id="bottom_main">
                 {{imp[1][1]|safe}}
+                <br>
+                <br>
+                <a href="https://github.com/2du/openNAMU"><img id="b_logo" src="/views/main_css/file/s_logo.png"></a>
             </div>
         </div>
         <div id="nav_bar">

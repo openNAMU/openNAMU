@@ -1,11 +1,10 @@
 ## Installation
 ```
-docker pull hotococoa/opennamu
+docker pull opennamu/stable
 ```
 
-## Setting
+## Start
 ```
-export NAMU_PORT=port
-export NAMU_LANG=lang
+docker run -p 3000:3000 -v data:/app/data --name opennamu opennamu/stable
+docker run -p <host-port>:3000 -v <host-data_directory>:/app/data --name <docker-containername> opennamu/stable
 ```
-Default: Port 3000, en-US

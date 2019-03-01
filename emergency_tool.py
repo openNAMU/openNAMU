@@ -1,29 +1,50 @@
+import os
 import json
 import sqlite3
-import bcrypt
 import hashlib
 import threading
 
-from func import *
-from mark import load_conn2, namumark
+from route.tool.func import *
+from route.tool.mark import load_conn2, namumark
 
-json_data = open('set.json').read()
-set_data = json.loads(json_data)
+all_src = []
+for i_data in os.listdir("."):
+    f_src = re.search("(.+)\.db$", i_data)
+    if f_src:
+        all_src += [f_src.groups()[0]]
 
-conn = sqlite3.connect(set_data['db'] + '.db', check_same_thread = False)
+if len(all_src) == 0:
+    exit()
+elif len(all_src) > 1:
+    db_num = 1
+
+    for i_data in all_src:
+        print(str(db_num) + ' : ' + i_data)
+
+    print('Number : ', end = '')    
+    db_name = all_src[int(number_check(input())) - 1]
+else:
+    db_name = all_src[0]
+
+if len(all_src) == 1:
+    print('DB\'s name : ' + db_name)
+
+conn = sqlite3.connect(db_name + '.db', check_same_thread = False)
 curs = conn.cursor()
 
 load_conn(conn)
 
-print('1. backlink reset')
-print('2. recaptcha delete')
-print('3. ban delete')
-print('4. change port')
-print('5. change skin')
-print('6. change password')
-print('7. reset version')
+print('1. Backlink reset')
+print('2. reCAPTCHA delete')
+print('3. Ban delete')
+print('4. Change host')
+print('5. Change port')
+print('6. Change skin')
+print('7. Change password')
+print('8. Reset version')
+print('9. New DB create')
 
-print('select : ', end = '')
+print('Select : ', end = '')
 what_i_do = input()
 
 if what_i_do == '1':
@@ -50,7 +71,7 @@ elif what_i_do == '2':
     curs.execute("delete from other where name = 'recaptcha'")
     curs.execute("delete from other where name = 'sec_re'")
 elif what_i_do == '3':
-    print('ip or name : ', end = '')
+    print('IP or Name : ', end = '')
     user_data = input()
 
     if re.search("^([0-9]{1,3}\.[0-9]{1,3})$", user_data):
@@ -61,36 +82,49 @@ elif what_i_do == '3':
         curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, ?)", [user_data, load_lang('release', 1), get_time(), load_lang('tool', 1) + ':emergency', '', band])
     curs.execute("delete from ban where block = ?", [user_data])
 elif what_i_do == '4':
-    print('port : ', end = '')
-    port = input()
+    print('Host : ', end = '')
+    host = input()
+
+    curs.execute("update other set data = ? where name = 'host'", [host])
+elif what_i_do == '5':
+    print('Port : ', end = '')
+    port = int(input())
 
     curs.execute("update other set data = ? where name = 'port'", [port])
-elif what_i_do == '5':
-    print('skin name : ', end = '')
+elif what_i_do == '6':
+    print('Skin\'s name : ', end = '')
     skin = input()
 
     curs.execute("update other set data = ? where name = 'skin'", [skin])
-elif what_i_do == '6':
+elif what_i_do == '7':
     print('1. sha256')
-    print('2. bcrypt')
-    print('select : ', end = '')
-    what_i_do = input()
+    print('2. sha3')
+    print('Select : ', end = '')
+    what_i_do = int(input())
 
-    print('user name : ', end = '')
+    print('User\'s name : ', end = '')
     user_name = input()
 
-    print('user password : ', end = '')
+    print('User\'s password : ', end = '')
     user_pw = input()
 
     if what_i_do == '1':
         hashed = hashlib.sha256(bytes(user_pw, 'utf-8')).hexdigest()
     elif what_i_do == '2':
-        hashed = bcrypt.hashpw(bytes(user_pw, 'utf-8'), bcrypt.gensalt()).decode()
+        hashed = sha3_256(bytes(user_pw, 'utf-8')).hexdigest()
        
     curs.execute("update user set pw = ? where id = ?", [hashed, user_name])
-elif what_i_do == '7':
+elif what_i_do == '8':
     curs.execute("update other set data = '00000' where name = 'ver'")
+elif what_i_do == '9':
+    print('DB\'s name (data) : ', end = '')
+    
+    db_name = input()
+    if db_name == '':
+        db_name = 'data'
+
+    sqlite3.connect(db_name + '.db', check_same_thread = False)
 
 conn.commit()
 
-print('ok')
+print('OK')
