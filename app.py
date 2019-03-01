@@ -458,7 +458,7 @@ def login_oauth(platform = None, func = None):
                 
 @app.route('/change', methods=['POST', 'GET'])
 def change_password():
-    return change_password_2(conn)
+    return change_password_2(conn, server_init)
 
 @app.route('/check/<name>')
 def user_check(name = None):
