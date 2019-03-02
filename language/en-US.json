@@ -122,6 +122,7 @@
         "oauth_signin_facebook" : "Sign-in with Facebook",
         "oauth_signin_naver" : "Sign-in with NAVER",
         "oauth_signin_discord" : "Sign-in with Discord",
+        "oauth_signin_kakao" : "Sign-in with Kakao",
         "connection" : "Connection",
         "new_connection" : "Connect...",
         "user_setting" : "User settings",

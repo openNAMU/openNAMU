@@ -28,7 +28,7 @@ def login_oauth_2(conn, platform, func):
     elif platform == 'kakao':
         api_url['redirect'] = 'https://kauth.kakao.com/oauth/authorize'
         api_url['token'] = 'https://kauth.kakao.com/oauth/token'
-        api_url['profile'] = 'https://kapi.kakao.com/v1/api/talk/profile'
+        api_url['profile'] = 'https://kapi.kakao.com/v2/user/me'
 
     if func == 'init':
         if oauth_data['client_id'] == '' or oauth_data['client_secret'] == '':
@@ -181,7 +181,7 @@ def login_oauth_2(conn, platform, func):
                 'User-Agent': 'Mozilla/5.0'
             }
             token_exchange = urllib.request.Request(
-                url['token'],
+                api_url['token'],
                 data = bytes(urllib.parse.urlencode(data).encode()),
                 headers = headers
             )
@@ -193,15 +193,15 @@ def login_oauth_2(conn, platform, func):
                 'Authorization' : 'Bearer ' + token_json['access_token']
             }
             profile_exchange = urllib.request.Request(
-                url['profile'],
+                api_url['profile'],
                 headers = headers
             )
             profile_result =  urllib.request.urlopen(profile_exchange).read().decode('utf-8')
             profile_result_json = json.loads(profile_result)
             stand_json = {
-                'id'        : profile_result_json['account_email'], 
-                'name'      : profile_result_json['nickName'],
-                'picture'   : profile_result_json['profileImageURL']
+                'id'        : profile_result_json['id'], 
+                'name'      : profile_result_json['properties']['nickname'],
+                'picture'   : profile_result_json['properties']['profile_image']
             }
         
         if flask.session['referrer'][0:6] == 'change':
