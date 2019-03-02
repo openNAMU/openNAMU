@@ -49,7 +49,7 @@ def login_2(conn):
         return redirect('/user')  
     else:
         oauth_check = 0
-        oauth_content = '<link rel="stylesheet" href="/views/main_css/oauth.css"><div class="oauth-wrapper"><ul class="oauth-list">'
+        oauth_content = '<link rel="stylesheet" href="/views/main_css/oauth.css"><hr class=\"main_hr\"><div class="oauth-wrapper"><ul class="oauth-list">'
         oauth_supported = load_oauth('_README')['support']
         for i in range(len(oauth_supported)):
             oauth_data = load_oauth(oauth_supported[i])
@@ -72,11 +72,12 @@ def login_2(conn):
 
                 oauth_check = 1
         
-        oauth_content += '</ul></div><hr class=\"main_hr\">'
+        oauth_content += '</ul></div>'
 
         if oauth_check == 0:
             oauth_content = ''
 
+        print(flask.request.host_url)
         if not re.search('^https:\/\/', flask.request.host_url):
             http_warring = '<hr class=\"main_hr\"><span>' + load_lang('http_warring') + '</span>'
         else:
@@ -92,7 +93,6 @@ def login_2(conn):
                         <hr class=\"main_hr\">
                         ''' + captcha_get() + '''
                         <button type="submit">''' + load_lang('login') + '''</button>
-                        <hr class=\"main_hr\">
                         ''' + oauth_content + '''
                         ''' + http_warring + '''
                     </form>
