@@ -445,7 +445,7 @@ def close_topic_list(name = None, tool = None):
 def login():
     return login_2(conn)
 
-@app.route('/oauth/<regex("discord|naver|facebook"):platform>/<regex("init|callback"):func>', methods=['GET', 'POST'])
+@app.route('/oauth/<regex("discord|naver|facebook|kakao"):platform>/<regex("init|callback"):func>', methods=['GET', 'POST'])
 def login_oauth(platform = None, func = None):
     return login_oauth_2(conn, platform, func)
                 
