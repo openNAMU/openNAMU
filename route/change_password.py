@@ -86,7 +86,8 @@ def change_password_2(conn, server_init):
             
             oauth_content += '</ul>'
 
-            if not re.search('^https:\/\/', flask.request.host_url):
+            forwarded_protocol = request.headers.get('X-Forwarded-Proto', None)
+            if forwarded_protocol == 'http':
                 http_warring = '<hr class=\"main_hr\"><span>' + load_lang('http_warring') + '</span>'
             else:
                 http_warring = ''
