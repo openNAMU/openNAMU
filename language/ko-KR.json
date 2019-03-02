@@ -122,6 +122,7 @@
         "oauth_signin_facebook" : "Facebook 아이디로 로그인",
         "oauth_signin_naver" : "네이버 아이디로 로그인",
         "oauth_signin_discord" : "디스코드 아이디로 로그인",
+        "oauth_signin_kakao" : "카카오톡 아이디로 로그인",
         "connection" : "연결",
         "new_connection" : "연결...",
         "user_setting" : "사용자 설정",

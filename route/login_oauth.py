@@ -25,6 +25,10 @@ def login_oauth_2(conn, platform, func):
         api_url['redirect'] = 'https://www.facebook.com/v3.1/dialog/oauth'
         api_url['token'] = 'https://graph.facebook.com/v3.1/oauth/access_token'
         api_url['profile'] = 'https://graph.facebook.com/me'
+    elif platform == 'kakao':
+        api_url['redirect'] = 'https://kauth.kakao.com/oauth/authorize'
+        api_url['token'] = 'https://kauth.kakao.com/oauth/token'
+        api_url['profile'] = 'https://kapi.kakao.com/v2/user/me'
 
     if func == 'init':
         if oauth_data['client_id'] == '' or oauth_data['client_secret'] == '':
@@ -69,6 +73,11 @@ def login_oauth_2(conn, platform, func):
                 data['redirect_uri'], 
                 data['state']
             ))
+        elif platform == 'kakao':
+            return redirect(api_url['redirect'] + '?client_id={}&redirect_uri={}&response_type=code'.format(
+                data['client_id'], 
+                data['redirect_uri']
+            ))
 
     elif func == 'callback':
         code = flask.request.args.get('code')
@@ -95,7 +104,7 @@ def login_oauth_2(conn, platform, func):
                 'User-Agent': 'Mozilla/5.0'
             }
             token_exchange = urllib.request.Request(
-                'https://discordapp.com/api/oauth2/token',
+                api_url['token'],
                 data = bytes(urllib.parse.urlencode(data).encode()),
                 headers = headers
             )
@@ -107,7 +116,7 @@ def login_oauth_2(conn, platform, func):
                 'Authorization' : 'Bearer ' + token_json['access_token']
             }
             profile_exchange = urllib.request.Request(
-                'https://discordapp.com/api/users/@me',
+                api_url['profile'],
                 headers = headers
             )
             profile_result =  urllib.request.urlopen(profile_exchange).read().decode('utf-8')
@@ -158,6 +167,41 @@ def login_oauth_2(conn, platform, func):
                 'id': profile_result_json['id'], 
                 'name': profile_result_json['name'], 
                 'picture': profile_result_json['picture']['data']['url']
+            }
+        elif platform == 'kakao':
+            data = {
+                'client_id'     : data['client_id'],
+                'client_secret' : data['client_secret'],
+                'grant_type'    : 'authorization_code',
+                'redirect_uri'  : data['redirect_uri'],
+                'code'          : code
+            }
+            headers = {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'User-Agent': 'Mozilla/5.0'
+            }
+            token_exchange = urllib.request.Request(
+                api_url['token'],
+                data = bytes(urllib.parse.urlencode(data).encode()),
+                headers = headers
+            )
+            token_result = urllib.request.urlopen(token_exchange).read()
+            token_json = json.loads(token_result)
+
+            headers = {
+                'User-Agent'    : 'Mozilla/5.0',
+                'Authorization' : 'Bearer ' + token_json['access_token']
+            }
+            profile_exchange = urllib.request.Request(
+                api_url['profile'],
+                headers = headers
+            )
+            profile_result =  urllib.request.urlopen(profile_exchange).read().decode('utf-8')
+            profile_result_json = json.loads(profile_result)
+            stand_json = {
+                'id'        : profile_result_json['id'], 
+                'name'      : profile_result_json['properties']['nickname'],
+                'picture'   : profile_result_json['properties']['profile_image']
             }
         
         if flask.session['referrer'][0:6] == 'change':
