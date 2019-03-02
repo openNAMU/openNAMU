@@ -48,28 +48,39 @@ def login_2(conn):
         
         return redirect('/user')  
     else:
+        oauth_check = 0
         oauth_content = '<link rel="stylesheet" href="/views/main_css/oauth.css"><div class="oauth-wrapper"><ul class="oauth-list">'
         oauth_supported = load_oauth('_README')['support']
         for i in range(len(oauth_supported)):
             oauth_data = load_oauth(oauth_supported[i])
             if oauth_data['client_id'] != '' and oauth_data['client_secret'] != '':
-                oauth_content +=    '''
-                                    <li>
-                                        <a href="/oauth/{}/init">
-                                            <div class="oauth-btn oauth-btn-{}">
-                                                <div class="oauth-btn-logo oauth-btn-{}"></div>
-                                                {}
-                                            </div>
-                                        </a>
-                                    </li>
-                                    '''.format(
-                                        oauth_supported[i], 
-                                        oauth_supported[i], 
-                                        oauth_supported[i], 
-                                        load_lang('oauth_signin_' + oauth_supported[i])
-                                    )
+                oauth_content += '''
+                    <li>
+                        <a href="/oauth/{}/init">
+                            <div class="oauth-btn oauth-btn-{}">
+                                <div class="oauth-btn-logo oauth-btn-{}"></div>
+                                {}
+                            </div>
+                        </a>
+                    </li>
+                '''.format(
+                    oauth_supported[i], 
+                    oauth_supported[i], 
+                    oauth_supported[i], 
+                    load_lang('oauth_signin_' + oauth_supported[i])
+                )
+
+                oauth_check = 1
         
-        oauth_content += '</ul></div>'
+        oauth_content += '</ul></div><hr class=\"main_hr\">'
+
+        if oauth_check == 0:
+            oauth_content = ''
+
+        if not re.search('^https:\/\/', flask.request.host_url):
+            http_warring = '<hr class=\"main_hr\"><span>' + load_lang('http_warring') + '</span>'
+        else:
+            http_warring = ''
         
         return easy_minify(flask.render_template(skin_check(),    
             imp = [load_lang('login'), wiki_set(), custom(), other2([0, 0])],
@@ -83,8 +94,7 @@ def login_2(conn):
                         <button type="submit">''' + load_lang('login') + '''</button>
                         <hr class=\"main_hr\">
                         ''' + oauth_content + '''
-                        <hr class=\"main_hr\">
-                        <span>''' + load_lang('http_warring') + '''</span>
+                        ''' + http_warring + '''
                     </form>
                     ''',
             menu = [['user', load_lang('return')]]

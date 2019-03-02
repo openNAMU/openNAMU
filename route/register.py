@@ -88,6 +88,11 @@ def register_2(conn):
         if data and data[0][0] != '':
             contract = data[0][0] + '<hr class=\"main_hr\">'
 
+        if not re.search('^https:\/\/', flask.request.host_url):
+            http_warring = '<hr class=\"main_hr\"><span>' + load_lang('http_warring') + '</span>'
+        else:
+            http_warring = ''
+
         return easy_minify(flask.render_template(skin_check(),    
             imp = [load_lang('register'), wiki_set(), custom(), other2([0, 0])],
             data =  '''
@@ -101,8 +106,7 @@ def register_2(conn):
                         <hr class=\"main_hr\">
                         ''' + captcha_get() + '''
                         <button type="submit">''' + load_lang('save') + '''</button>
-                        <hr class=\"main_hr\">
-                        <span>''' + load_lang('http_warring') + '''</span>
+                        ''' + http_warring + '''
                     </form>
                     ''',
             menu = [['user', load_lang('return')]]
