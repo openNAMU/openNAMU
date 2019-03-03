@@ -8,7 +8,7 @@ for i_data in os.listdir("route"):
 
         exec("from route." + f_src + " import *")
 
-r_ver = 'v3.0.9-stable'
+r_ver = 'v3.0.9-stable-04'
 c_ver = '400000'
 
 print('Version : ' + r_ver)
@@ -226,13 +226,11 @@ if not rep_data:
 else:
     rep_key = rep_data[0][0]
 
-
 curs.execute('select data from other where name = "adsense"')
 adsense_result = curs.fetchall()
 if not adsense_result:
     curs.execute('insert into other (name, data) values ("adsense", "False")')
     curs.execute('insert into other (name, data) values ("adsense_code", "")')
-
 
 curs.execute('delete from other where name = "ver"')
 curs.execute('insert into other (name, data) values ("ver", ?)', [c_ver])
@@ -370,12 +368,7 @@ def search():
 
 @app.route('/goto', methods=['POST'])
 def goto():
-    curs.execute("select title from data where title = ?", [flask.request.form.get('search', 'test')])
-    data = curs.fetchall()
-    if data:
-        return redirect('/w/' + url_pas(flask.request.form.get('search', 'test')))
-    else:
-        return redirect('/search/' + url_pas(flask.request.form.get('search', 'test')))
+    return goto_2(conn)
 
 @app.route('/search/<everything:name>')
 def deep_search(name = ''):
@@ -452,7 +445,7 @@ def close_topic_list(name = None, tool = None):
 def login():
     return login_2(conn)
 
-@app.route('/oauth/<regex("discord|naver|facebook"):platform>/<regex("init|callback"):func>', methods=['GET', 'POST'])
+@app.route('/oauth/<regex("discord|naver|facebook|kakao"):platform>/<regex("init|callback"):func>', methods=['GET', 'POST'])
 def login_oauth(platform = None, func = None):
     return login_oauth_2(conn, platform, func)
                 
@@ -544,12 +537,7 @@ def count_edit(name = None):
         
 @app.route('/random')
 def title_random():
-    curs.execute("select title from data order by random() limit 1")
-    data = curs.fetchall()
-    if data:
-        return redirect('/w/' + url_pas(data[0][0]))
-    else:
-        return redirect()
+    return title_random_2(conn)
 
 @app.route('/skin_set')
 def skin_set():
@@ -557,74 +545,19 @@ def skin_set():
     
 @app.route('/api/w/<everything:name>')
 def api_w(name = ''):
-    curs.execute("select data from data where title = ?", [name])
-    data = curs.fetchall()
-    if data:
-        json_data = { "title" : name, "data" : render_set(title = name, data = data[0][0]) }
-    
-        return flask.jsonify(json_data)
-    else:
-        return flask.jsonify({})
+    return api_w_2(conn, name)
     
 @app.route('/api/raw/<everything:name>')
 def api_raw(name = ''):
-    curs.execute("select data from data where title = ?", [name])
-    data = curs.fetchall()
-    if data:
-        json_data = { "title" : name, "data" : render_set(title = name, data = data[0][0], s_data = 1) }
-    
-        return flask.jsonify(json_data)
-    else:
-        return flask.jsonify({})
+    return api_raw_2(conn, name)
 
 @app.route('/api/topic/<everything:name>/sub/<sub>')
 def api_topic_sub(name = '', sub = '', time = ''):
-    if flask.request.args.get('time', None):
-        curs.execute("select id, data, ip from topic where title = ? and sub = ? and date >= ? order by id + 0 asc", [name, sub, flask.request.args.get('time', None)])
-    else:
-        curs.execute("select id, data, ip from topic where title = ? and sub = ? order by id + 0 asc", [name, sub])
-    data = curs.fetchall()
-    if data:
-        json_data = {}
-        for i in data:
-            json_data[i[0]] =   {
-                "data" : i[1],
-                "id" : i[2]
-            }
-
-        return flask.jsonify(json_data)
-    else:
-        return flask.jsonify({})
+    return api_topic_sub_2(conn, name, sub, time)
     
 @app.route('/views/<everything:name>')
 def views(name = None):
-    if re.search('\/', name):
-        m = re.search('^(.*)\/(.*)$', name)
-        if m:
-            n = m.groups()
-            plus = '/' + n[0]
-            rename = n[1]
-        else:
-            plus = ''
-            rename = name
-    else:
-        plus = ''
-        rename = name
-
-    m = re.search('\.(.+)$', name)
-    if m:
-        g = m.groups()
-    else:
-        g = ['']
-
-    if g == 'css':
-        return easy_minify(flask.send_from_directory('./views' + plus, rename), 'css')   
-    elif g == 'js':
-        return easy_minify(flask.send_from_directory('./views' + plus, rename), 'js')
-    elif g == 'html':
-        return easy_minify(flask.send_from_directory('./views' + plus, rename))   
-    else:
-        return flask.send_from_directory('./views' + plus, rename)
+    return views_2(conn, name)
 
 @app.route('/<data>')
 def main_file(data = None):
