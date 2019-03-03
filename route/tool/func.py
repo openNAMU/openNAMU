@@ -475,7 +475,7 @@ def diff(seqm):
     end = end.replace('\r\n', '\n')
     sub = ''
 
-    if not re.search('\n', end):
+    if not re.search('\n$', end):
         end += '\n'
 
     num = 0
@@ -495,6 +495,7 @@ def diff(seqm):
             else:
                 if re.search('<\/span>', data):
                     num -= 1
+                    print(num)
                     sub += str(left) + ' : ' + re.sub('(?P<in>(?:(?!\n).)*)\n', '\g<in>', data, 1) + '<br>'
                 else:
                     if num > 0:
