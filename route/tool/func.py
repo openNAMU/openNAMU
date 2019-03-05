@@ -833,7 +833,7 @@ def history_plus(title, data, date, ip, send, leng):
     curs.execute("select id from history where title = ? order by id + 0 desc limit 1", [title])
     id_data = curs.fetchall()
 
-    get_type = re.search('(\((?:(?:(?!\)).)+)\))', get_type)
+    get_type = re.search('(\((?:(?:(?!\)).)+)\))$', send)
 
     send = re.sub('\(|\)|<|>', '', send)
 
