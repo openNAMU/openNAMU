@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def delete_2(conn, name):
+def delete_2(conn, name, app_var):
     curs = conn.cursor()
 
     ip = ip_check()
@@ -24,7 +24,7 @@ def delete_2(conn, name):
                 '', 
                 today, 
                 ip, 
-                flask.request.form.get('send', None) + ' (delete)', 
+                flask.request.form.get('send', '') + ' (delete)', 
                 leng
             )
             
@@ -35,6 +35,14 @@ def delete_2(conn, name):
             curs.execute("delete from back where link = ?", [name])
             curs.execute("delete from data where title = ?", [name])
             conn.commit()
+
+        file_check = re.search('^file:(.+)\.(.+)$', name)
+        if file_check:
+            file_check = file_check.groups()
+            os.remove(os.path.join(
+                app_var['path_data_image'],
+                hashlib.sha224(bytes(file_check[0], 'utf-8')).hexdigest() + '.' + file_check[1]
+            ))
             
         return redirect('/w/' + url_pas(name))
     else:
