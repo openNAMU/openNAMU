@@ -1,11 +1,9 @@
 from .tool.func import *
 
-APPVAR = json.loads(open('data/app_variables.json', encoding='utf-8').read())
-
-def image_view_2(conn, name):
+def image_view_2(conn, name, app_var):
     curs = conn.cursor()
     
-    if os.path.exists(os.path.join(APPVAR['PATH_DATA_IMAGES'], name)):
-        return flask.send_from_directory('.'+APPVAR['PATH_DATA_IMAGES'], name)
+    if os.path.exists(os.path.join(app_var['path_data_image'], name)):
+        return flask.send_from_directory('./' + app_var['path_data_image'], name)
     else:
         return redirect()
