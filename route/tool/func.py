@@ -834,6 +834,7 @@ def history_plus(title, data, date, ip, send, leng):
     id_data = curs.fetchall()
 
     get_type = re.search('(\((?:(?:(?!\)).)+)\))$', send)
+    send = re.sub('(\((?:(?:(?!\)).)+)\))$', '', send)
 
     send = re.sub('\(|\)|<|>', '', send)
 
