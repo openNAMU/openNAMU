@@ -841,7 +841,10 @@ def history_plus(title, data, date, ip, send, leng):
         send = send[:128]
 
     if get_type:
-        send += get_type.groups()[0]
+        if send == '':
+            send = get_type.groups()[0]
+        else:
+            send += ' ' + get_type.groups()[0]
     
     curs.execute("insert into history (id, title, data, date, ip, send, leng, hide) values (?, ?, ?, ?, ?, ?, ?, '')", [
         str(int(id_data[0][0]) + 1) if id_data else '1',
