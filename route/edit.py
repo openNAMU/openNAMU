@@ -12,9 +12,6 @@ def edit_2(conn, name):
             return re_error('/error/13')
         else:
             captcha_post('', 0)
-            
-        if len(flask.request.form.get('send', None)) > 500:
-            return re_error('/error/15')
 
         if flask.request.form.get('otent', None) == flask.request.form.get('content', None):
             return redirect('/w/' + url_pas(name))
