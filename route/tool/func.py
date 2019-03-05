@@ -6,7 +6,6 @@ import tornado.httpserver
 import tornado.wsgi
 import urllib.request
 import email.mime.text
-import urllib.request
 import sqlite3
 import hashlib
 import smtplib
@@ -661,7 +660,7 @@ def acl_check(name, tool = ''):
         if ban_check() == 1:
             return 1
 
-        acl_c = re.search("^user:([^/]*)", name)
+        acl_c = re.search("^user:((?:(?!\/).)*)", name)
         if acl_c:
             acl_n = acl_c.groups()
 
@@ -685,8 +684,7 @@ def acl_check(name, tool = ''):
             else:
                 return 1
 
-        file_c = re.search("^file:(.*)", name)
-        if file_c and admin_check(5, 'edit (' + name + ')') != 1:
+        if re.search("^file:", name) and admin_check(None, 'file edit (' + name + ')') != 1:
             return 1
 
         curs.execute("select acl from user where id = ?", [ip])
