@@ -8,7 +8,7 @@ for i_data in os.listdir("route"):
 
         exec("from route." + f_src + " import *")
 
-r_ver = 'v3.0.9-stable-04'
+r_ver = 'v3.0.9-stable-05'
 c_ver = '400000'
 
 print('Version : ' + r_ver)
@@ -295,7 +295,7 @@ def not_close_topic():
 
 @app.route('/image/<name>')
 def image_view(name = None):
-    return image_view_2(conn, name)
+    return image_view_2(conn, name, app_var)
 
 @app.route('/acl_list')
 def acl_list():
@@ -393,7 +393,7 @@ def preview(name = None):
         
 @app.route('/delete/<everything:name>', methods=['POST', 'GET'])
 def delete(name = None):
-    return delete_2(conn, name)        
+    return delete_2(conn, name, app_var)        
             
 @app.route('/move/<everything:name>', methods=['POST', 'GET'])
 def move(name = None):

@@ -5,6 +5,7 @@
         "delete" : "삭제",
         "notice" : "알림",
         "add" : "추가",
+        "license" : "저작권",
         "etc" : "기타",
         "name" : "이름",
         "regex" : "정규표현식",
