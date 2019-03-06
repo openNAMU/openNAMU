@@ -45,7 +45,7 @@ def edit_2(conn, name):
             content,
             today,
             ip,
-            flask.request.form.get('send', None),
+            flask.request.form.get('send', ''),
             leng
         )
         
