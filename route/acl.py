@@ -29,9 +29,19 @@ def acl_2(conn, name):
                 check_ok = 'disabled'
 
     if flask.request.method == 'POST':
-        if flask.request.form.get('dec', '') != flask.request.form.get('view', ''):
-            dec = flask.request.form.get('view', '')
-            view = flask.request.form.get('view', '')
+        if flask.request.form.get('view', None):
+            if flask.request.form.get('dec', '') != flask.request.form.get('view', ''):
+                dec = flask.request.form.get('view', '')
+                view = flask.request.form.get('view', '')
+
+                if view == 'normal':
+                    dec = flask.request.form.get('dec', '') 
+                elif view == 'user':
+                    if dec == 'admin':
+                        dec = flask.request.form.get('dec', '')
+            else:
+                dec = flask.request.form.get('dec', '')
+                view = flask.request.form.get('view', '')
         else:
             dec = flask.request.form.get('dec', '')
             view = flask.request.form.get('view', '')
