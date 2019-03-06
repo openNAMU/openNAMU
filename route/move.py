@@ -36,8 +36,9 @@ def move_2(conn, name):
                     data_in, 
                     get_time(), 
                     ip_check(), 
-                    flask.request.form.get('send', None) + ' (marge <a>' + name + '</a> - <a>' + flask.request.form.get('title', None) + '</a> move)', 
-                    '0'
+                    flask.request.form.get('send', ''), 
+                    '0',
+                    'marge <a>' + name + '</a> - <a>' + flask.request.form.get('title', 'test') + '</a> move'
                 )
 
                 curs.execute("update back set type = 'no' where title = ? and not type = 'cat' and not type = 'no'", [name])
@@ -74,8 +75,9 @@ def move_2(conn, name):
                 data_in, 
                 get_time(), 
                 ip_check(), 
-                flask.request.form.get('send', None) + ' (<a>' + name + '</a> - <a>' + flask.request.form.get('title', None) + '</a> move)', 
-                '0'
+                flask.request.form.get('send', ''), 
+                '0',
+                '<a>' + name + '</a> - <a>' + flask.request.form.get('title', 'test') + '</a> move'
             )
             
             curs.execute("update back set type = 'no' where title = ? and not type = 'cat' and not type = 'no'", [name])

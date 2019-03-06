@@ -42,8 +42,9 @@ def revert_2(conn, name):
                 data[0][0], 
                 get_time(), 
                 ip_check(), 
-                flask.request.form.get('send', None) + ' (r' + str(num) + ')', 
-                leng
+                flask.request.form.get('send', ''), 
+                leng,
+                'r' + str(num) + ''
             )
 
             render_set(
