@@ -24,8 +24,9 @@ def delete_2(conn, name, app_var):
                 '', 
                 today, 
                 ip, 
-                flask.request.form.get('send', '') + ' (delete)', 
-                leng
+                flask.request.form.get('send', ''), 
+                leng,
+                'delete'
             )
             
             curs.execute("select title, link from back where title = ? and not type = 'cat' and not type = 'no'", [name])
