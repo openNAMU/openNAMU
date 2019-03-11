@@ -332,7 +332,7 @@ def ip_or_user(data):
 
 def edit_help_button():
     # https://stackoverflow.com/questions/11076975/insert-text-into-textarea-at-cursor-position-javascript
-    js_data =   '''
+    js_data = '''
         <script>
             function insert_data(name, data) {
                 if(document.selection) { 

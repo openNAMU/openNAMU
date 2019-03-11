@@ -73,7 +73,7 @@ def table_parser(data, cel_data, start_data, num = 0):
     if table_bgcolor:
         all_table += 'background: ' + table_bgcolor.groups()[0] + ';'
         
-    bgcolor = re.search("&lt;bgcolor=(#(?:[0-9a-f-A-F]{3}){1,2}|\w+)&gt;", data)
+    bgcolor = re.search("&lt;(?:bgcolor=)?(#(?:[0-9a-f-A-F]{3}){1,2}|\w+)&gt;", data)
     if bgcolor:
         cel_style += 'background: ' + bgcolor.groups()[0] + ';'
         
@@ -460,10 +460,10 @@ def namu(conn, data, title, main_num):
         math = math_re.search(data)
         if math:
             if first == 0:
-                plus_data +=    '''
-                                <link rel="stylesheet" href="/views/main_css/katex/katex.min.css">
-                                <script src="/views/main_css/katex/katex.min.js"></script>
-                                '''
+                plus_data += '''
+                    <link rel="stylesheet" href="/views/main_css/katex/katex.min.css">
+                    <script src="/views/main_css/katex/katex.min.js"></script>
+                '''
 
             math = math.groups()[0]
             
@@ -726,7 +726,7 @@ def namu(conn, data, title, main_num):
 
     data = table_start(data)
 
-    category = '\n<hr><div id="cate">category : '
+    category = '\n<hr><div id="cate">Category : '
     category_re = re.compile('^(?:category|분류):', re.I)
     while 1:
         link = re.search('\[\[((?:(?!\[\[|\]\]).)+)\]\]', data)
@@ -903,7 +903,7 @@ def namu(conn, data, title, main_num):
                     else:
                         footdata_in = footdata[2]
 
-                    footdata_all += '<li><a href="#rfn-' + str(footdata[0]) + '" id="fn-' + str(footdata[0]) + '">(' + footdata[1] + ')</a> ' + footdata_in + '</li>'
+                    footdata_all += '<li><a href="#rfn-' + str(footdata[0]) + '">(' + footdata[1] + ')</a> <span id="fn-' + str(footdata[0]) + '">' + footdata_in + '</span></li>'
                 
                 data = re_footnote.sub(footdata_all + '</ul>', data, 1)
                 
@@ -921,7 +921,7 @@ def namu(conn, data, title, main_num):
 
                         footnote_all += [[float(footshort), footshort, 0]]
 
-                        data = re_footnote.sub('<sup><a href="#fn-' + footshort + '" id="rfn-' + footshort + '">(' + footshort + ')</a></sup>', data, 1)
+                        data = re_footnote.sub('<sup><a href="javascript:open_foot(\'fn-' + footshort + '\')" id="rfn-' + footshort + '">(' + footshort + ')</a></sup><span class="foot_plus" id="cfn-' + footshort + '"></span>', data, 1)
                     else:
                         data = re_footnote.sub('<sup><a href="#">(' + footnote_name + ')</a></sup>', data, 1)
                 else:
@@ -939,7 +939,7 @@ def namu(conn, data, title, main_num):
 
                     footnote_all += [[footnote_number, footnote_name, footnote]]
                     
-                    data = re_footnote.sub('<sup><a href="#fn-' + str(footnote_number) + '" id="rfn-' + str(footnote_number) + '">(' + footnote_name + ')</a></sup>', data, 1)
+                    data = re_footnote.sub('<sup><a href="javascript:open_foot(\'fn-' + str(footnote_number) + '\')" id="rfn-' + str(footnote_number) + '">(' + footnote_name + ')</a></sup><span class="foot_plus" id="cfn-' + str(footnote_number) + '"></span>', data, 1)
         else:
             break
 
@@ -953,7 +953,7 @@ def namu(conn, data, title, main_num):
         else:
             footdata_in = footdata[2]
 
-        footdata_all += '<li><a href="#rfn-' + str(footdata[0]) + '" id="fn-' + str(footdata[0]) + '">(' + footdata[1] + ')</a> ' + footdata_in + '</li>'
+        footdata_all += '<li><a href="#rfn-' + str(footdata[0]) + '">(' + footdata[1] + ')</a> <span id="fn-' + str(footdata[0]) + '">' + footdata_in + '</span></li>'
 
     footdata_all += '</ul>'
     if footdata_all == '\n<hr><ul id="footnote_data"></ul>':
@@ -964,7 +964,7 @@ def namu(conn, data, title, main_num):
     category += '</div>'
     category = re.sub(' / <\/div>$', '</div>', category)
 
-    if category == '\n<hr><div id="cate">category : </div>':
+    if category == '\n<hr><div id="cate">Category : </div>':
         category = ''
 
     data += category
