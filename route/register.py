@@ -89,7 +89,7 @@ def register_2(conn):
             contract = data[0][0] + '<hr class=\"main_hr\">'
         
         forwarded_protocol = flask.request.headers.get('X-Forwarded-Proto', None)
-        if forwarded_protocol == 'http':
+        if not forwarded_protocol or forwarded_protocol == 'http':
             http_warring = '<hr class=\"main_hr\"><span>' + load_lang('http_warring') + '</span>'
         else:
             http_warring = ''
