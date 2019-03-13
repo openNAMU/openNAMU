@@ -88,10 +88,7 @@ def register_2(conn):
         if data and data[0][0] != '':
             contract = data[0][0] + '<hr class=\"main_hr\">'
         
-        if flask.request.url.startswith('http://'):
-            http_warring = '<hr class=\"main_hr\"><span>' + load_lang('http_warring') + '</span>'
-        else:
-            http_warring = ''
+        http_warring = '<hr class=\"main_hr\"><span>' + load_lang('http_warring') + '</span>'
 
         return easy_minify(flask.render_template(skin_check(),    
             imp = [load_lang('register'), wiki_set(), custom(), other2([0, 0])],
