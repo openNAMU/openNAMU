@@ -78,8 +78,8 @@ def login_2(conn):
         if oauth_check == 0:
             oauth_content = ''
 
-        print(request.url)
-        if request.url.startswith('http://'):
+        print(request.headers.get('X-Forwarded-Proto', 'http'))
+        if request.headers.get('X-Forwarded-Proto', 'http') != 'https':
             http_warring = '<hr class=\"main_hr\"><span>' + load_lang('http_warring') + '</span>'
         else:
             http_warring = ''
