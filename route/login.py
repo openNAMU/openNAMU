@@ -1,4 +1,5 @@
 from .tool.func import *
+from flask import request
 
 def login_2(conn):
     curs = conn.cursor()
@@ -77,7 +78,8 @@ def login_2(conn):
         if oauth_check == 0:
             oauth_content = ''
 
-        if flask.request.url.startswith('http://'):
+        print(request.url)
+        if request.url.startswith('http://'):
             http_warring = '<hr class=\"main_hr\"><span>' + load_lang('http_warring') + '</span>'
         else:
             http_warring = ''
