@@ -77,8 +77,7 @@ def login_2(conn):
         if oauth_check == 0:
             oauth_content = ''
 
-        forwarded_protocol = flask.request.headers.get('X-Forwarded-Proto', None)
-        if not forwarded_protocol or forwarded_protocol == 'http':
+        if flask.request.url.startswith('http://'):
             http_warring = '<hr class=\"main_hr\"><span>' + load_lang('http_warring') + '</span>'
         else:
             http_warring = ''
