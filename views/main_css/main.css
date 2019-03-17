@@ -33,3 +33,5 @@ s:hover, strike:hover, del:hover { color: gray; background-color: gainsboro; tex
 #redirect { border: 1px solid; padding: 10px; }
 body { word-break: break-all; overflow: scroll; }
 hr.main_hr { border: none; }
+#include_link { display: none; }
+.foot_plus { background: gainsboro; }
