@@ -301,14 +301,36 @@ def middle_parser(data, fol_num, syntax_num, folding_num):
                         
                         del(middle_list[middle_number])
         else:
-            break
+            if middle_stack == 0:
+                break
+            else:
+                if middle_list == []:
+                    data += '&#125;&#125;&#125;'
+                else:
+                    if middle_stack > 0:
+                        middle_stack -= 1
+
+                    if middle_stack > 0:
+                        data += '&#125;&#125;&#125;'
+                    else:                    
+                        if middle_number > 0:
+                            middle_number -= 1
+                            
+                        if middle_list[middle_number] == '2div':
+                            data += '</div_end></div_end></div_end>'
+                        elif middle_list[middle_number] == 'pre':
+                            data += '</code></pre>'
+                        else:
+                            data += '</' + middle_list[middle_number] + '>'
+                        
+                        del(middle_list[middle_number])
 
     num = 0
     while 1:
         nowiki_data = re.search('<code>((?:(?:(?!<\/code>).)*\n*)*)<\/code>', data)
         if nowiki_data:
             nowiki_data = nowiki_data.groups()
-
+            
             num += 1
 
             end_data += [['nowiki_' + str(num), nowiki_data[0], 'code']]
