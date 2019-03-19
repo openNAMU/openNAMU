@@ -364,7 +364,7 @@ def block_log(name = None, tool = None):
             
 @app.route('/search', methods=['POST'])
 def search():
-    return redirect('/search/' + url_pas(flask.request.form.get('search', 'test')))
+    return search_2(conn)
 
 @app.route('/goto', methods=['POST'])
 def goto():
@@ -471,10 +471,7 @@ def check_key(tool = 'check_pass_key'):
            
 @app.route('/logout')
 def logout():
-    flask.session['state'] = 0
-    flask.session.pop('id', None)
-
-    return redirect('/user')
+    return logout_2(conn)
     
 @app.route('/ban/<name>', methods=['POST', 'GET'])
 def user_ban(name = None):
@@ -565,14 +562,11 @@ def views(name = None):
 
 @app.route('/<data>')
 def main_file(data = None):
-    if re.search('\.txt$', data):
-        return flask.send_from_directory('./', data)
-    else:
-        return redirect('/w/' + url_pas(wiki_set(2)))
+    return main_file_2(conn, data)
 
 @app.errorhandler(404)
 def error_404(e):
-    return redirect('/w/' + url_pas(wiki_set(2)))
+    return error_404_2(conn)
 
 if __name__=="__main__":
     app.secret_key = rep_key
