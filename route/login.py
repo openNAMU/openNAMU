@@ -1,5 +1,4 @@
 from .tool.func import *
-from flask import request
 
 def login_2(conn):
     curs = conn.cursor()
