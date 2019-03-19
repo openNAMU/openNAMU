@@ -8,7 +8,7 @@ for i_data in os.listdir("route"):
 
         exec("from route." + f_src + " import *")
 
-r_ver = 'v3.0.9-stable-07'
+r_ver = 'v3.1.0-master-01'
 c_ver = '400000'
 
 print('Version : ' + r_ver)
@@ -555,6 +555,10 @@ def api_raw(name = ''):
 def api_topic_sub(name = '', sub = '', time = ''):
     return api_topic_sub_2(conn, name, sub, time)
     
+@app.route('/views/easter_egg.html')
+def easter_egg():
+    return easter_egg_2(conn)
+
 @app.route('/views/<everything:name>')
 def views(name = None):
     return views_2(conn, name)
