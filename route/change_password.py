@@ -81,9 +81,9 @@ def change_password_2(conn, server_init):
                 curs.execute('select name, picture from oauth_conn where wiki_id = ? and provider = ?', [flask.session['id'], oauth_provider[i]])
                 oauth_data = curs.fetchall()
                 if len(oauth_data) == 1:
-                    oauth_content += '<li>{} - {}</li>'.format(oauth_provider[i], load_lang('connection') + ' : <img src="{}" width="17px" height="17px">{}'.format(oauth_data[0][1], oauth_data[0][0]))
+                    oauth_content += '<li>{} - {}</li>'.format(oauth_provider[i].capitalize(), load_lang('connection') + ' : <img src="{}" width="17px" height="17px">{}'.format(oauth_data[0][1], oauth_data[0][0]))
                 else:
-                    oauth_content += '<li>{} - {}</li>'.format(oauth_provider[i], load_lang('connection') + ' : <a href="/oauth/{}/init">{}</a>'.format(oauth_provider[i], load_lang('connect')))
+                    oauth_content += '<li>{} - {}</li>'.format(oauth_provider[i].capitalize(), load_lang('connection') + ' : <a href="/oauth/{}/init">{}</a>'.format(oauth_provider[i], load_lang('connect')))
             
             oauth_content += '</ul>'
 
@@ -93,7 +93,7 @@ def change_password_2(conn, server_init):
                 imp = [load_lang('user_setting'), wiki_set(), custom(), other2([0, 0])],
                 data =  '''
                         <form method="post">
-                            <span>id : ''' + ip + '''</span>
+                            <span>''' + load_lang('id') + ''' : ''' + ip + '''</span>
                             <hr class=\"main_hr\">
                             <input placeholder="''' + load_lang('now_password') + '''" name="pw4" type="password">
                             <hr class=\"main_hr\">
