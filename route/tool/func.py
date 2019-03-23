@@ -614,16 +614,16 @@ def load_skin(data = ''):
 
         curs.execute('select data from user_set where name = "skin" and id = ?', [ip])
         data = curs.fetchall()
+
+        if not data:
+            curs.execute('select data from other where name = "skin"')
+            data = curs.fetchall()
+            if not data:
+                data = [['neo_yousoro']]
+
         for skin_data in os.listdir(os.path.abspath('views')):
             if not skin_data in system_file:
-                if not data:
-                    curs.execute('select data from other where name = "skin"')
-                    sql_data = curs.fetchall()
-                    if sql_data and sql_data[0][0] == skin_data:
-                        div2 = '<option value="' + skin_data + '">' + skin_data + '</option>' + div2
-                    else:
-                        div2 += '<option value="' + skin_data + '">' + skin_data + '</option>'
-                elif data[0][0] == skin_data:
+                if data[0][0] == skin_data:
                     div2 = '<option value="' + skin_data + '">' + skin_data + '</option>' + div2
                 else:
                     div2 += '<option value="' + skin_data + '">' + skin_data + '</option>'
