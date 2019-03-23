@@ -177,7 +177,6 @@ def topic_2(conn, name, sub):
         if ban != 1 or admin == 1:
             data += '''
                     <div id="plus"></div>
-                    <script type="text/javascript" src="/views/main_css/topic_reload.js"></script>
                     <script>topic_load("''' + name + '''", "''' + sub + '''");</script>
                     <a id="reload" href="javascript:void(0);" onclick="location.href.endsWith(\'#reload\')? location.reload(true):location.href=\'#reload\'">(''' + load_lang('reload') + ''')</a>
                     <form style="''' + display + '''" method="post">
