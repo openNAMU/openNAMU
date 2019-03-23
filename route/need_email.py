@@ -33,7 +33,7 @@ def need_email_2(conn, tool):
                 flask.session['c_key'] = ''.join(random.choice("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ") for i in range(16))
                 flask.session['c_id'] = flask.request.form.get('id', '')
 
-                send_email(flask.request.form.get('email', ''), wiki_set()[0] + ' ' + load_lang('password_search') + ' key', 'key : ' + flask.session['c_key'])
+                send_email(flask.request.form.get('email', ''), wiki_set()[0] + '\'s key', 'Key : ' + flask.session['c_key'])
 
                 return redirect('/check_pass_key')
     else:
@@ -58,7 +58,7 @@ def need_email_2(conn, tool):
                         <form method="post">
                             <input placeholder="''' + load_lang('id') + '''" name="id" type="text">
                             <hr class=\"main_hr\">
-                            <input placeholder="email" name="email" type="text">
+                            <input placeholder="''' + load_lang('email') + '''" name="email" type="text">
                             <hr class=\"main_hr\">
                             <button type="submit">''' + load_lang('save') + '''</button>
                         </form>
