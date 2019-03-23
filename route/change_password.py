@@ -59,20 +59,21 @@ def change_password_2(conn, server_init):
                 email = ''
 
             div2 = load_skin()
-            
             div3 = ''
-            var_div3 = ''
 
             curs.execute('select data from user_set where name = "lang" and id = ?', [flask.session['id']])
             data = curs.fetchall()
+            if not data:
+                curs.execute('select data from other where name = "language"')
+                data = curs.fetchall()
+                if not data:
+                    data = [['en-US']]
 
             for lang_data in support_language:
                 if data and data[0][0] == lang_data:
-                    div3 = '<option value="' + lang_data + '">' + lang_data + '</option>'
+                    div3 = '<option value="' + lang_data + '">' + lang_data + '</option>' + div3
                 else:
-                    var_div3 += '<option value="' + lang_data + '">' + lang_data + '</option>'
-
-            div3 += var_div3
+                    div3 += '<option value="' + lang_data + '">' + lang_data + '</option>'
 
             oauth_provider = load_oauth('_README')['support']
             oauth_content = '<ul>'
