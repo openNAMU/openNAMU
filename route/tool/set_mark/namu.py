@@ -260,8 +260,6 @@ def middle_parser(data, fol_num, syntax_num, folding_num):
                                                             folding_data = ['Test']
 
                                                         if folding_num == 0:
-                                                            plus_data += '<script src="/views/main_css/parser.js"></script>'
-
                                                             folding_num = 1
                                                         
                                                         data = re.sub('{{{#!folding ?((?:(?!\n).)*)\n?', '<div>' + str(folding_data[0]) + ' <div style="display: inline-block;"><a href="javascript:void(0);" onclick="folding(' + str(fol_num) + ');">[do]</a></div_end><div id="folding_' + str(fol_num) + '" style="display: none;"><div id="wiki_div" style="">', data, 1)
