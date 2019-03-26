@@ -1,10 +1,14 @@
 function get_post() {
     check = document.getElementById('strike');
-    if(check.checked === true) {
-        document.cookie = 'del_strike=true;';
+    if(check.value === 'normal') {
+        document.cookie = 'del_strike=0;';
+    } else if(check.value === 'change') {
+        document.cookie = 'del_strike=1;';
     } else {
-        document.cookie = 'del_strike=false;';
+        document.cookie = 'del_strike=2;';
     }
+
+    console.log(document.cookie);
 
     check = document.getElementById('include');
     if(check.checked === true) {
@@ -13,7 +17,7 @@ function get_post() {
         document.cookie = 'include_link=false;';
     }
 
-    window.location.reload(true);
+    history.go(0);
 }
 
 function regex_data(data) {
@@ -26,11 +30,12 @@ cookies = document.cookie;
 
 function main_load() {
     head_data = document.querySelector('head');
-    if(
-        cookies.match(regex_data('del_strike')) &&
-        cookies.match(regex_data('del_strike'))[1] === 'true'
-    ) {
-        head_data.innerHTML += '<style>s { display: none; }</style>';
+    if(cookies.match(regex_data('del_strike'))) {
+        if(cookies.match(regex_data('del_strike'))[1] === '1') {
+            head_data.innerHTML += '<style>s { text-decoration: none; } s:hover { background-color: transparent; }</style>';
+        } else if(cookies.match(regex_data('del_strike'))[1] === '2') {
+            head_data.innerHTML += '<style>s { display: none; }</style>';
+        }
     }
 
     if(
@@ -51,12 +56,33 @@ window.onload = function () {
         data = document.getElementById("main_data");
         set_data = {};
 
-        if(
-            cookies.match(regex_data('del_strike')) &&
-            cookies.match(regex_data('del_strike'))[1] === 'true'
-        ) {
-            set_data["strike"] = "checked";
-        } 
+        if(cookies.match(regex_data('del_strike'))) {
+            if(cookies.match(regex_data('del_strike'))[1] === '0') {
+                set_data["strike"] = ' \
+                    <option value="normal">Normal</option> \
+                    <option value="change">Change to normal text</option> \
+                    <option value="delete">Delete</option> \
+                ';
+            } else if(cookies.match(regex_data('del_strike'))[1] === '1') {
+                set_data["strike"] = ' \
+                    <option value="change">Change to normal text</option> \
+                    <option value="normal">Normal</option> \
+                    <option value="delete">Delete</option> \
+                ';
+            } else {
+                set_data["strike"] = ' \
+                    <option value="delete">Delete</option> \
+                    <option value="normal">Normal</option> \
+                    <option value="change">Change to normal text</option> \
+                ';
+            }
+        } else {
+            set_data["strike"] = ' \
+                <option value="normal">Normal</option> \
+                <option value="change">Change to normal text</option> \
+                <option value="delete">Delete</option> \
+            ';
+        }
         
         if(
             cookies.match(regex_data('include_link')) &&
@@ -66,8 +92,12 @@ window.onload = function () {
         }
 
         data.innerHTML = ' \
-            <input ' + set_data["strike"] + ' type="checkbox" id="strike" name="strike" value="strike"> Remove strikethrough \
+            <h2>Strike</h2> \
             <hr class="main_hr"> \
+            <select id="strike" name="strike"> \
+                ' + set_data["strike"] + ' \
+            </select> \
+            <h2>Other</h2> \
             <input ' + set_data["include"] + ' type="checkbox" id="include" name="include" value="include"> Using include link \
             <hr class="main_hr"> \
             <button onclick="get_post();">Save</button> \
