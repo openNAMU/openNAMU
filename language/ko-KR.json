@@ -245,5 +245,6 @@
             "decument_exist_error" : "이동하려는 이름에 이미 문서가 존재합니다.",
             "password_diffrent_error" : "입력한 비밀번호와 비밀번호 확인이 서로 다릅니다.",
             "edit_filter_error" : "편집 필터에 의해 금지된 단어가 사용되었습니다.",
-            "file_name_error" : "파일 이름에는 알파벳, 한글, 공백, 밑줄 과 빼기 기호만 사용할 수 있습니다."
+            "file_name_error" : "파일 이름에는 알파벳, 한글, 공백, 밑줄 과 빼기 기호만 사용할 수 있습니다.",
+            "topic_long_error" : "토론 이름이 256자를 넘지 않아야 합니다."
 }
