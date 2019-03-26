@@ -5,6 +5,11 @@ def topic_2(conn, name, sub):
     
     ban = topic_check(name, sub)
     admin = admin_check(3)
+
+    curs.execute("select id from topic where title = ? and sub = ? limit 1", [name, sub])
+    topic_exist = curs.fetchall()
+    if not topic_exist and len(sub) > 256:
+        return re_error('/error/11')
     
     if flask.request.method == 'POST':
         if captcha_post(flask.request.form.get('g-recaptcha-response', '')) == 1:
@@ -52,9 +57,6 @@ def topic_2(conn, name, sub):
         
         curs.execute("select title from rd where title = ? and sub = ? and stop = 'S'", [name, sub])
         stop_data = curs.fetchall()
-        
-        curs.execute("select id from topic where title = ? and sub = ? limit 1", [name, sub])
-        topic_exist = curs.fetchall()
         
         display = ''
         all_data = ''

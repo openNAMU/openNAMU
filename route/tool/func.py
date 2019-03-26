@@ -959,6 +959,8 @@ def re_error(data):
                 data = load_lang('file_exist_error')
             elif num == 10:
                 data = load_lang('password_error')
+            elif num == 11:
+                data = load_lang('topic_long_error')
             elif num == 13:
                 data = load_lang('recaptcha_error')
             elif num == 14:
