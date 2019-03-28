@@ -8,7 +8,14 @@ function get_post() {
         document.cookie = 'del_strike=2;';
     }
 
-    console.log(document.cookie);
+    check = document.getElementById('bold');
+    if(check.value === 'normal') {
+        document.cookie = 'del_bold=0;';
+    } else if(check.value === 'change') {
+        document.cookie = 'del_bold=1;';
+    } else {
+        document.cookie = 'del_bold=2;';
+    }
 
     check = document.getElementById('include');
     if(check.checked === true) {
@@ -38,6 +45,14 @@ function main_load() {
         }
     }
 
+    if(cookies.match(regex_data('del_bold'))) {
+        if(cookies.match(regex_data('del_bold'))[1] === '1') {
+            head_data.innerHTML += '<style>b { font-weight: normal; }</style>';
+        } else if(cookies.match(regex_data('del_bold'))[1] === '2') {
+            head_data.innerHTML += '<style>b { display: none; }</style>';
+        }
+    }
+
     if(
         cookies.match(regex_data('include_link')) &&
         cookies.match(regex_data('include_link'))[1] === 'true'
@@ -50,8 +65,8 @@ main_load();
 
 window.onload = function () {
     if(window.location.pathname === '/skin_set') {
-        document.getElementById("main_top").innerHTML = '<h1>Skin setting</h1>';
-        document.title = document.title.replace(/.*(\- .*)$/, "Skin setting $1");
+        document.getElementById("main_top").innerHTML = '<h1>Skin settings</h1>';
+        document.title = document.title.replace(/.*(\- .*)$/, "Skin settings $1");
         
         data = document.getElementById("main_data");
         set_data = {};
@@ -59,26 +74,54 @@ window.onload = function () {
         if(cookies.match(regex_data('del_strike'))) {
             if(cookies.match(regex_data('del_strike'))[1] === '0') {
                 set_data["strike"] = ' \
-                    <option value="normal">Normal</option> \
+                    <option value="normal">Default</option> \
                     <option value="change">Change to normal text</option> \
                     <option value="delete">Delete</option> \
                 ';
             } else if(cookies.match(regex_data('del_strike'))[1] === '1') {
                 set_data["strike"] = ' \
                     <option value="change">Change to normal text</option> \
-                    <option value="normal">Normal</option> \
+                    <option value="normal">Default</option> \
                     <option value="delete">Delete</option> \
                 ';
             } else {
                 set_data["strike"] = ' \
                     <option value="delete">Delete</option> \
-                    <option value="normal">Normal</option> \
+                    <option value="normal">Default</option> \
                     <option value="change">Change to normal text</option> \
                 ';
             }
         } else {
             set_data["strike"] = ' \
-                <option value="normal">Normal</option> \
+                <option value="normal">Default</option> \
+                <option value="change">Change to normal text</option> \
+                <option value="delete">Delete</option> \
+            ';
+        }
+
+        if(cookies.match(regex_data('del_bold'))) {
+            if(cookies.match(regex_data('del_bold'))[1] === '0') {
+                set_data["bold"] = ' \
+                    <option value="normal">Default</option> \
+                    <option value="change">Change to normal text</option> \
+                    <option value="delete">Delete</option> \
+                ';
+            } else if(cookies.match(regex_data('del_bold'))[1] === '1') {
+                set_data["bold"] = ' \
+                    <option value="change">Change to normal text</option> \
+                    <option value="normal">Default</option> \
+                    <option value="delete">Delete</option> \
+                ';
+            } else {
+                set_data["bold"] = ' \
+                    <option value="delete">Delete</option> \
+                    <option value="normal">Default</option> \
+                    <option value="change">Change to normal text</option> \
+                ';
+            }
+        } else {
+            set_data["bold"] = ' \
+                <option value="normal">Default</option> \
                 <option value="change">Change to normal text</option> \
                 <option value="delete">Delete</option> \
             ';
@@ -96,6 +139,10 @@ window.onload = function () {
             <hr class="main_hr"> \
             <select id="strike" name="strike"> \
                 ' + set_data["strike"] + ' \
+            </select> \
+            <h2>Bold</h2> \
+            <select id="bold" name="bold"> \
+                ' + set_data["bold"] + ' \
             </select> \
             <h2>Other</h2> \
             <input ' + set_data["include"] + ' type="checkbox" id="include" name="include" value="include"> Using include link \
