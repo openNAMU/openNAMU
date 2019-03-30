@@ -237,7 +237,7 @@
             "id_char_error" : "오직 한글과 알파벳, 공백만 사용 가능합니다.",
             "file_exist_error" : "파일이 존재하지 않습니다.",
             "password_error" : "비밀번호가 다릅니다.",
-            "recaptcha_error" : "'나는 로봇이 아닙니다'를 통해 reCaptcha를 수행하세요.",
+            "recaptcha_error" : "'나는 로봇이 아닙니다'를 통해 reCAPTCHA를 수행하세요.",
             "file_extension_error" : "오직 jpg, gif, jpeg, png, webp 만 업로드할 수 있습니다.",
             "edit_record_error" : "수정 요약은 500자를 넘길 수 없습니다.",
             "same_file_error" : "똑같은 이름의 파일이 존재합니다.",
