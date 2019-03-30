@@ -15,6 +15,7 @@ print('Version : ' + r_ver)
 
 app_var = json.loads(open('data/app_variables.json', encoding='utf-8').read())
 
+# DB
 all_src = []
 for i_data in os.listdir("."):
     f_src = re.search("(.+)\.db$", i_data)
@@ -166,6 +167,7 @@ if setup_tool != 0:
 
     update()
 
+# Init
 curs.execute('select name from alist where acl = "owner"')
 if not curs.fetchall():
     curs.execute('delete from alist where name = "owner"')
@@ -263,6 +265,7 @@ else:
 
 conn.commit()
 
+## Func
 @app.route('/del_alarm')
 def del_alarm():
     return del_alarm_2(conn)
@@ -540,6 +543,7 @@ def title_random():
 def skin_set():
     return re_error('/error/5')
     
+# API
 @app.route('/api/w/<everything:name>')
 def api_w(name = ''):
     return api_w_2(conn, name)
@@ -548,10 +552,16 @@ def api_w(name = ''):
 def api_raw(name = ''):
     return api_raw_2(conn, name)
 
+
+@app.route('/api/version')
+def api_version():
+    return api_version_2(conn, r_ver, c_ver)
+
 @app.route('/api/topic/<everything:name>/sub/<sub>')
 def api_topic_sub(name = '', sub = '', time = ''):
     return api_topic_sub_2(conn, name, sub, time)
     
+## File
 @app.route('/views/easter_egg.html')
 def easter_egg():
     return easter_egg_2(conn)
@@ -564,6 +574,7 @@ def views(name = None):
 def main_file(data = None):
     return main_file_2(conn, data)
 
+## End
 @app.errorhandler(404)
 def error_404(e):
     return error_404_2(conn)
