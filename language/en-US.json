@@ -237,7 +237,7 @@
             "id_char_error" : "Only hangul, alphabet and space are allowed for ID.",
             "file_exist_error" : "File does not exist.",
             "password_error" : "The password is different.",
-            "recaptcha_error" : "Go through the recaptcha.",
+            "recaptcha_error" : "Go through the reCAPTCHA.",
             "file_extension_error" : "Only jpg, gif, jpeg, png, webp is possible.",
             "edit_record_error" : "Edit reason can not be more than 500 characters.",
             "same_file_error" : "A file with the same name exists.",

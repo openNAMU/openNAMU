@@ -14,7 +14,7 @@ def api_version_2(conn, r_ver, c_ver):
 
     if data and data.getcode() == 200:
         try:
-            json_data = json.loads(data.read().decode(data.headers.get_content_charset()))
+            json_data = json.loads(data.read().decode())
             if 'version' in json_data:
                 new_ver = json_data['version']
         except:
