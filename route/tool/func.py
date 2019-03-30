@@ -258,7 +258,11 @@ def captcha_post(re_data, num = 1):
             curs.execute('select data from other where name = "sec_re"')
             sec_re = curs.fetchall()
             if sec_re and sec_re[0][0] != '':
-                data = urllib.request.urlopen('https://www.google.com/recaptcha/api/siteverify?secret=' + sec_re[0][0] + '&response=' + re_data)
+                try:
+                    data = urllib.request.urlopen('https://www.google.com/recaptcha/api/siteverify?secret=' + sec_re[0][0] + '&response=' + re_data)
+                except:
+                    pass
+                    
                 if data and data.getcode() == 200:
                     json_data = json.loads(data.read().decode(data.headers.get_content_charset()))
                     if json_data['success'] == True:

@@ -5,7 +5,12 @@ def api_version_2(conn, r_ver, c_ver):
 
     new_ver = ''
 
-    data = urllib.request.urlopen('https://namu.ml/api/version')
+    try:
+        if flask.request.host != 'namu.ml':
+            data = urllib.request.urlopen('https://namu.ml/api/version')
+    except:
+        pass
+
     if data and data.getcode() == 200:
         try:
             json_data = json.loads(data.read().decode(data.headers.get_content_charset()))
