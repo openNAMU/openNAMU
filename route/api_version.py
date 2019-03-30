@@ -4,6 +4,7 @@ def api_version_2(conn, r_ver, c_ver):
     curs = conn.cursor()
 
     new_ver = ''
+    data = None
 
     try:
         if flask.request.host != 'namu.ml':
