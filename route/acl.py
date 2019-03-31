@@ -110,11 +110,11 @@ def acl_2(conn, name):
                 </select>
                 <h2>''' + load_lang('explanation') + '''</h2>
                 <ul>
-                    <li>normal : ''' + load_lang('normal') + '''</li>
-                    <li>admin : ''' + load_lang('admin') + '''</li>
-                    <li>member : ''' + load_lang('member') + '''</li>
-                    <li>50 edit : ''' + load_lang('50_edit') + ''' (+ member)</li>
-                    <li>all : ''' + load_lang('all') + '''</li>
+                    <li>normal : ''' + load_lang('default') + '''</li>
+                    <li>admin : ''' + load_lang('admin_acl') + '''</li>
+                    <li>member : ''' + load_lang('member_acl') + '''</li>
+                    <li>50 edit : ''' + load_lang('50_edit_acl') + '''</li>
+                    <li>all : ''' + load_lang('all_acl') + '''</li>
                 </ul>
             '''
                 
