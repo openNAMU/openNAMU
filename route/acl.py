@@ -66,9 +66,9 @@ def acl_2(conn, name):
         data = '<h2>' + load_lang('document_acl') + '</h2><hr class=\"main_hr\"><select name="dec" ' + check_ok + '>'
     
         if re.search('^user:', name):
-            acl_list = [['', load_lang('normal')], ['user', load_lang('member')], ['all', load_lang('all')]]
+            acl_list = [['', 'normal'], ['user', 'member'], ['all', 'all']]
         else:
-            acl_list = [['', load_lang('normal')], ['user', load_lang('member')], ['admin', load_lang('admin')]]
+            acl_list = [['', 'normal'], ['user', 'member'], ['admin', 'admin'], ['50_edit', '50 edit']]
         
         curs.execute("select dec from acl where title = ?", [name])
         acl_data = curs.fetchall()
@@ -106,7 +106,17 @@ def acl_2(conn, name):
                     
                 data += '<option value="' + data_list[0] + '" ' + check + '>' + data_list[1] + '</option>'
                 
-            data += '</select>'
+            data += '''
+                </select>
+                <h2>''' + load_lang('explanation') + '''</h2>
+                <ul>
+                    <li>normal : ''' + load_lang('normal') + '''</li>
+                    <li>admin : ''' + load_lang('admin') + '''</li>
+                    <li>member : ''' + load_lang('member') + '''</li>
+                    <li>50 edit : ''' + load_lang('50_edit') + ''' (+ member)</li>
+                    <li>all : ''' + load_lang('all') + '''</li>
+                </ul>
+            '''
                 
             if check_ok == '':
                 if acl_data:

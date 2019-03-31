@@ -167,7 +167,7 @@ def update():
     except:
         pass
 
-    # Start Data Migration Code
+    # Start : Data Migration Code
     app_var = json.loads(open(os.path.abspath('./data/app_variables.json'), encoding='utf-8').read())
 
     if os.path.exists('image'):
@@ -191,7 +191,7 @@ def update():
         with open(app_var['path_oauth_setting'], 'w') as f:
             f.write(json.dumps(old_oauth_data, sort_keys = True, indent = 4))
 
-    # -> End Data Migration Code
+    # End
 
 def pw_encode(data, data2 = '', type_d = ''):
     if type_d == '':
@@ -651,6 +651,22 @@ def acl_check(name, tool = ''):
                 if ip_or_user(ip):
                     return 1
 
+            if acl_data[0][0] == '50_edit':
+                if ip_or_user(ip):
+                    return 1
+                
+                if admin_check(5, 'view (' + name + ')') != 1:
+                    curs.execute("select count(title) from history where ip = ?", [ip])
+                    count = curs.fetchall()
+                    if count:
+                        count = count[0][0]
+                    else:
+                        count = 0
+
+                    if count < 50:
+                        return 1
+
+
             if acl_data[0][0] == 'admin':
                 if ip_or_user(ip):
                     return 1
@@ -690,36 +706,63 @@ def acl_check(name, tool = ''):
         if re.search("^file:", name) and admin_check(None, 'file edit (' + name + ')') != 1:
             return 1
 
-        curs.execute("select acl from user where id = ?", [ip])
-        user_data = curs.fetchall()
-
         curs.execute("select dec from acl where title = ?", [name])
         acl_data = curs.fetchall()
         if acl_data:
             if acl_data[0][0] == 'user':
-                if not user_data:
+                if ip_or_user(ip):
                     return 1
 
             if acl_data[0][0] == 'admin':
-                if not user_data:
+                if ip_or_user(ip):
                     return 1
 
-                if not admin_check(5, 'edit (' + name + ')') == 1:
+                if admin_check(5, 'topic send (' + name + ')') != 1:
                     return 1
+
+            if acl_data[0][0] == '50_edit':
+                if ip_or_user(ip):
+                    return 1
+                
+                if admin_check(5, 'topic send (' + name + ')') != 1:
+                    curs.execute("select count(title) from history where ip = ?", [ip])
+                    count = curs.fetchall()
+                    if count:
+                        count = count[0][0]
+                    else:
+                        count = 0
+
+                    if count < 50:
+                        return 1
 
         curs.execute('select data from other where name = "edit"')
         set_data = curs.fetchall()
         if set_data:
             if set_data[0][0] == 'login':
-                if not user_data:
+                if ip_or_user(ip):
                     return 1
 
             if set_data[0][0] == 'admin':
-                if not user_data:
+                if ip_or_user(ip):
                     return 1
 
-                if not admin_check(5) == 1:
+                if admin_check(5, 'edit (' + name + ')') != 1:
                     return 1
+
+            if acl_data[0][0] == '50_edit':
+                if ip_or_user(ip):
+                    return 1
+                
+                if admin_check(5, 'edit (' + name + ')') != 1:
+                    curs.execute("select count(title) from history where ip = ?", [ip])
+                    count = curs.fetchall()
+                    if count:
+                        count = count[0][0]
+                    else:
+                        count = 0
+
+                    if count < 50:
+                        return 1
 
         return 0
 
