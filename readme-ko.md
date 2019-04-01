@@ -1,24 +1,24 @@
-oriNAMU
+openNAMU
 ====
 [![Python 3.5 이상의 버전 필요](https://img.shields.io/badge/python-3.5%20or%20higher-blue.svg)](https://python.org)
 [![라이선스](https://img.shields.io/badge/license-BSD%203--Clause-lightgrey.svg)](./LICENSE)
 
 ![](https://raw.githubusercontent.com/2du/openNAMU/master/.github/logo.png)
 
-오리나무는 파이썬 기반의 위키 엔진입니다. 파이썬과 그 의존성 모듈만 설치하면 사용할 수 있으며, 코드를 직접 수정하여 좀 더 주제에 특화된 위키를 만들 수 있습니다.
+openNAMU는 파이썬 기반의 위키 엔진입니다. 파이썬과 그 의존성 모듈만 설치하면 사용할 수 있으며, 코드를 직접 수정하여 좀 더 주제에 특화된 위키를 만들 수 있습니다.
 
 ### 목차
 [클론](#클론) | [기여](#기여) | [라이선스](#라이선스) | [기여자 목록](#기여자-목록) | [기타](#기타)
 
 ## 시작하기
-오리나무는 파이썬 환경에서 동작하는 파이썬 애플리케이션으로, 파이썬 환경을 필요로 합니다.
+openNAMU는 파이썬 환경에서 동작하는 파이썬 애플리케이션으로, 파이썬 환경을 필요로 합니다.
 
-쉬운 오리나무 설치를 위해 오리나무 가이드를 따로 생성해두었으며, [이곳](https://github.com/Make-openNAMU/guide)에서 확인하실 수 있습니다.
+쉬운 openNAMU 설치를 위해 openNAMU 가이드를 따로 생성해두었으며, [이곳](https://github.com/Make-openNAMU/guide)에서 확인하실 수 있습니다.
 
 ### 가이드 목록
  * [파이썬 설치](https://github.com/Make-openNAMU/guide/blob/master/articles/ko-kr/install-python.md)
- * [오리나무 시작](https://github.com/Make-openNAMU/guide/blob/master/articles/ko-kr/start-opennamu.md)
-   * [오리나무 도커 시작(실험적 기능)](https://github.com/Make-openNAMU/guide/blob/master/articles/ko-kr/docker-install.md)
+ * [openNAMU 시작](https://github.com/Make-openNAMU/guide/blob/master/articles/ko-kr/start-opennamu.md)
+   * [openNAMU 도커 시작(실험적 기능)](https://github.com/Make-openNAMU/guide/blob/master/articles/ko-kr/docker-install.md)
 
 ## 클론
 아래 명령을 터미널(명령 프롬프트)에 입력하여 본 리포지토리를 클론할 수 있습니다.
@@ -29,10 +29,10 @@ oriNAMU
  * `git clone -b master https://github.com/2du/openNAMU.git`
 
 ## 기여
-오리나무에는 검증되지 않은 몇가지 버그가 존재할 수 있습니다. 당신의 오리나무 사용과 버그 발견은 오리나무의 발전을 돕습니다.
+openNAMU에는 검증되지 않은 몇가지 버그가 존재할 수 있습니다. 당신의 openNAMU 사용과 버그 발견은 openNAMU의 발전을 돕습니다.
 [이슈 생성하기](https://github.com/2du/openNAMU/issues/new)
 
-오리나무는 완전한 오픈소스 프로젝트입니다. 새로운 기능을 추가하고 Pull Request를 생성해보세요.
+openNAMU는 완전한 오픈소스 프로젝트입니다. 새로운 기능을 추가하고 Pull Request를 생성해보세요.
 [Pull Request 생성하기](https://github.com/2du/openNAMU/compare)
 
 ## 라이선스
