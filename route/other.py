@@ -21,10 +21,7 @@ def other_2(conn, r_ver):
             pass
 
     if n_ver != '':
-        if n_ver != r_ver:
-            n_ver = '<li>' + load_lang('lastest') + ' : ' + n_ver + '</li>'
-        else:
-            n_ver = ''
+        n_ver = '<li>' + load_lang('lastest') + ' : ' + n_ver + '</li>'
     
     return easy_minify(flask.render_template(skin_check(), 
         imp = [load_lang('other_tool'), wiki_set(), custom(), other2([0, 0])],
