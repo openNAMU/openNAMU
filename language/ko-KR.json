@@ -81,6 +81,7 @@
         "connect" : "연결",
         "explanation" : "설명",
         "default" : "기본값",
+        "lastest" : "최신",
         "_comment_1.1_" : "시간",
             "second" : "초",
             "hour" : "시간",
