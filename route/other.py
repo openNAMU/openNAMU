@@ -2,6 +2,29 @@ from .tool.func import *
 
 def other_2(conn, r_ver):
     curs = conn.cursor()
+
+    n_ver = ''
+    data = None
+
+    try:
+        if flask.request.host != 'namu.ml':
+            data = urllib.request.urlopen('https://namu.ml/api/version')
+    except:
+        pass
+
+    if data and data.getcode() == 200:
+        try:
+            json_data = json.loads(data.read().decode())
+            if 'version' in json_data:
+                n_ver = json_data['version']
+        except:
+            pass
+
+    if n_ver != '':
+        if n_ver != r_ver:
+            n_ver = '<li>' + load_lang('lastest') + ' : ' + n_ver + '</li>'
+        else:
+            n_ver = ''
     
     return easy_minify(flask.render_template(skin_check(), 
         imp = [load_lang('other_tool'), wiki_set(), custom(), other2([0, 0])],
@@ -38,7 +61,8 @@ def other_2(conn, r_ver):
                 <br>
                 <h2>''' + load_lang('version') + '''</h2>
                 <ul>
-                    <li>''' + load_lang('version') + ' : <a id="out_link" href="https://github.com/2DU/opennamu/blob/master/version.md">' + r_ver + '''</a></li>
+                    <li>''' + load_lang('version') + ' : ' + r_ver + '''</li>
+                    ''' + n_ver + '''
                 </ul>
                 ''',
         menu = 0

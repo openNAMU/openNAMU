@@ -3,7 +3,7 @@ from .tool.func import *
 def api_version_2(conn, r_ver, c_ver):
     curs = conn.cursor()
 
-    new_ver = ''
+    n_ver = ''
     data = None
 
     try:
@@ -16,10 +16,10 @@ def api_version_2(conn, r_ver, c_ver):
         try:
             json_data = json.loads(data.read().decode())
             if 'version' in json_data:
-                new_ver = json_data['version']
+                n_ver = json_data['version']
         except:
             pass
         
-    json_data = { "version" : r_ver, "db_version" : c_ver, "lastest_version" : new_ver  }
+    json_data = { "version" : r_ver, "db_version" : c_ver, "lastest_version" : n_ver  }
 
     return flask.jsonify(json_data)

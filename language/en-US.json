@@ -81,6 +81,7 @@
         "connect" : "Connect",
         "explanation" : "Explanation",
         "default" : "Default",
+        "lastest" : "Lastest",
         "_comment_1.1_" : "Time",
             "second" : "Second(s)",
             "hour" : "Hour(s)",
