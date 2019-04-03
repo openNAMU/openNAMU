@@ -1,39 +1,56 @@
-import werkzeug.routing
-import flask_compress
-import flask_reggie
-import tornado.ioloop
-import tornado.httpserver
-import tornado.wsgi
-import urllib.request
-import email.mime.text
-import sqlite3
-import hashlib
-import smtplib
-import bcrypt
-import platform
-import zipfile
-import difflib
-import shutil
-import threading
-import logging
-import random
-import flask
-import json
-import html
-import sys
-import re
 import os
+import sys
+import platform
 
-try:
-    import css_html_js_minify
-except:
-    pass
+for i in range(0, 2):
+    try:
+        import werkzeug.routing
+        import flask_compress
+        import flask_reggie
+        import tornado.ioloop
+        import tornado.httpserver
+        import tornado.wsgi
+        import urllib.request
+        import email.mime.text
+        import sqlite3
+        import hashlib
+        import smtplib
+        import bcrypt
+        import zipfile
+        import difflib
+        import shutil
+        import threading
+        import logging
+        import random
+        import flask
+        import json
+        import html
+        import re
 
-if sys.version_info < (3, 6):
-    import sha3
+        try:
+            import css_html_js_minify
+        except:
+            pass
 
-from .set_mark.tool import *
-from .mark import *
+        if sys.version_info < (3, 6):
+            import sha3
+
+        from .set_mark.tool import *
+        from .mark import *
+    except ImportError as e:
+        if i == 0:
+            if platform.system() == 'Linux':
+                os.system('python3 -m pip install -r requirements.txt')
+                os.execl(sys.executable, sys.executable, *sys.argv)
+            elif platform.system() == 'Windows':
+                os.system('python -m pip install -r requirements.txt')
+                os.execl(sys.executable, sys.executable, *sys.argv)
+            else:
+                print(e)
+                raise
+        else:
+            print(e)
+            raise
 
 app_var = json.loads(open('data/app_variables.json', encoding='utf-8').read())
 
