@@ -19,11 +19,13 @@ def now_update_2(conn):
         if platform.system() == 'Linux':
             print('Update')
 
-            os.system('git remote rm origin')
-            os.system('git remote add origin https://github.com/2DU/opennamu.git')
-            ok = os.system('git fetch origin ' + up_data)
-            ok = os.system('git reset --hard origin/' + up_data)
-            if ok == 0:
+            ok = []
+
+            ok += [os.system('git remote rm origin')]
+            ok += [os.system('git remote add origin https://github.com/2DU/opennamu.git')]
+            ok += [os.system('git fetch origin ' + up_data)]
+            ok += [os.system('git reset --hard origin/' + up_data)]
+            if ok[0] == 0 and ok[1] == 0 and ok[2] == 0 and ok[3] == 0:
                 return redirect('/restart')
         else:
             if platform.system() == 'Windows':
