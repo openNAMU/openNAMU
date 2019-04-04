@@ -19,6 +19,7 @@ for i in range(0, 2):
         import zipfile
         import difflib
         import shutil
+        import request
         import threading
         import logging
         import random
@@ -40,11 +41,17 @@ for i in range(0, 2):
     except ImportError as e:
         if i == 0:
             if platform.system() == 'Linux':
-                os.system('python3 -m pip install -r requirements.txt')
-                os.execl(sys.executable, sys.executable, *sys.argv)
+                ok = os.system('python3 -m pip install -r requirements.txt')
+                if ok == 0:
+                    os.execl(sys.executable, sys.executable, *sys.argv)
+                else:
+                    raise
             elif platform.system() == 'Windows':
-                os.system('python -m pip install -r requirements.txt')
-                os.execl(sys.executable, sys.executable, *sys.argv)
+                ok = os.system('python -m pip install -r requirements.txt')
+                if ok == 0:
+                    os.execl(sys.executable, sys.executable, *sys.argv)
+                else:
+                    raise
             else:
                 print(e)
                 raise
@@ -665,11 +672,11 @@ def acl_check(name, tool = ''):
         acl_data = curs.fetchall()
         if acl_data:
             if acl_data[0][0] == 'user':
-                if ip_or_user(ip):
+                if ip_or_user(ip) == 1:
                     return 1
 
             if acl_data[0][0] == '50_edit':
-                if ip_or_user(ip):
+                if ip_or_user(ip) == 1:
                     return 1
                 
                 if admin_check(5, 'view (' + name + ')') != 1:
@@ -683,9 +690,8 @@ def acl_check(name, tool = ''):
                     if count < 50:
                         return 1
 
-
             if acl_data[0][0] == 'admin':
-                if ip_or_user(ip):
+                if ip_or_user(ip) == 1:
                     return 1
 
                 if admin_check(5, 'view (' + name + ')') != 1:
@@ -727,18 +733,18 @@ def acl_check(name, tool = ''):
         acl_data = curs.fetchall()
         if acl_data:
             if acl_data[0][0] == 'user':
-                if ip_or_user(ip):
+                if ip_or_user(ip) == 1:
                     return 1
 
             if acl_data[0][0] == 'admin':
-                if ip_or_user(ip):
+                if ip_or_user(ip) == 1:
                     return 1
 
                 if admin_check(5, 'topic send (' + name + ')') != 1:
                     return 1
 
             if acl_data[0][0] == '50_edit':
-                if ip_or_user(ip):
+                if ip_or_user(ip) == 1:
                     return 1
                 
                 if admin_check(5, 'topic send (' + name + ')') != 1:
@@ -756,18 +762,18 @@ def acl_check(name, tool = ''):
         set_data = curs.fetchall()
         if set_data:
             if set_data[0][0] == 'login':
-                if ip_or_user(ip):
+                if ip_or_user(ip) == 1:
                     return 1
 
             if set_data[0][0] == 'admin':
-                if ip_or_user(ip):
+                if ip_or_user(ip) == 1:
                     return 1
 
                 if admin_check(5, 'edit (' + name + ')') != 1:
                     return 1
 
             if acl_data[0][0] == '50_edit':
-                if ip_or_user(ip):
+                if ip_or_user(ip) == 1:
                     return 1
                 
                 if admin_check(5, 'edit (' + name + ')') != 1:
@@ -814,41 +820,53 @@ def topic_check(name, sub):
 
     if ban_check() == 1:
         return 1
-        
-    curs.execute("select acl from user where id = ?", [ip])
-    user_data = curs.fetchall()
 
     curs.execute('select data from other where name = "discussion"')
     acl_data = curs.fetchall()
     if acl_data:
         if acl_data[0][0] == 'login':
-            if not user_data:
+            if ip_or_user(ip) == 1:
                 return 1
 
         if acl_data[0][0] == 'admin':
-            if not user_data:
+            if ip_or_user(ip) == 1:
                 return 1
 
-            if not admin_check(3, 'topic (' + name + ')') == 1:
+            if admin_check(3, 'topic (' + name + ')') != 1:
                 return 1
 
     curs.execute("select dis from acl where title = ?", [name])
     acl_data = curs.fetchall()
     if acl_data:
         if acl_data[0][0] == 'user':
-            if not user_data:
+            if ip_or_user(ip) == 1:
                 return 1
+
+        if acl_data[0][0] == '50_edit':
+            if ip_or_user(ip) == 1:
+                return 1
+            
+            if admin_check(3, 'topic (' + name + ')') != 1:
+                curs.execute("select count(title) from history where ip = ?", [ip])
+                count = curs.fetchall()
+                if count:
+                    count = count[0][0]
+                else:
+                    count = 0
+
+                if count < 50:
+                    return 1
 
         if acl_data[0][0] == 'admin':
-            if not user_data:
+            if ip_or_user(ip) == 1:
                 return 1
 
-            if not admin_check(3, 'topic (' + name + ')') == 1:
+            if admin_check(3, 'topic (' + name + ')') != 1:
                 return 1
         
     curs.execute("select title from rd where title = ? and sub = ? and not stop = ''", [name, sub])
     if curs.fetchall():
-        if not admin_check(3, 'topic (' + name + ')') == 1:
+        if admin_check(3, 'topic (' + name + ')') != 1:
             return 1
 
     return 0
