@@ -82,7 +82,7 @@
                         </div>
                         |
                         <form method="post" action="/search" id="search" role="search">
-                            <input id="search_input" name="search" placeholder="검색" autocomplete="off" type="search">
+                            <input id="search_input" name="search" placeholder="{{'search'|load_lang}}" autocomplete="off" type="search">
                             |
                             <button type="submit" formaction="/goto"><i class="fas fa-sign-in-alt"></i></button>
                             |
@@ -99,7 +99,7 @@
             <div id="mobile_menu" class="is_mobile" style="display: none;">
                 <div id="mobile_menu_main">
                     <form method="post" action="/search" id="mobile_search" role="search">
-                        <input id="mobile_search_input" name="search" placeholder="검색" autocomplete="off" type="search">
+                        <input id="mobile_search_input" name="search" placeholder="{{'search'|load_lang}}" autocomplete="off" type="search">
                         <br>
                         <button id="mobile_button_first" type="submit" formaction="/goto"><i class="fas fa-sign-in-alt"></i></button>
                         |
