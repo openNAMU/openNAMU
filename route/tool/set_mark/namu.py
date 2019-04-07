@@ -482,8 +482,13 @@ def namu(conn, data, title, main_num):
         if math:
             if first == 0:
                 plus_data += '''
-                    <link rel="stylesheet" href="/views/main_css/katex/katex.min.css">
-                    <script src="/views/main_css/katex/katex.min.js"></script>
+                    <link   rel="stylesheet"
+                            href="https://cdn.jsdelivr.net/npm/katex@0.10.1/dist/katex.min.css"
+                            integrity="sha384-dbVIfZGuN1Yq7/1Ocstc1lUEm+AT+/rCkibIcC/OmWo5f0EA48Vf8CytHzGrSwbQ"
+                            crossorigin="anonymous">
+                    <script src="https://cdn.jsdelivr.net/npm/katex@0.10.1/dist/katex.min.js"
+                            integrity="sha384-2BKqo+exmr9su6dir+qCw08N2ZKRucY4PrGQPPWU1A7FtlCGjmEGFqXCv5nyM5Ij"
+                            crossorigin="anonymous"></script>
                 '''
 
             math = math.groups()[0]
@@ -492,7 +497,14 @@ def namu(conn, data, title, main_num):
             
             data = math_re.sub('<span id="math_' + str(first) + '"></span>', data, 1)
 
-            plus_data += '<script>katex.render("' + math.replace('\\', '\\\\').replace('&lt;', '<').replace('&gt;', '>') +'", document.getElementById("math_' + str(first) + '"));</script>'
+            plus_data += '''
+                <script>
+                    katex.render(
+                        "''' + math.replace('\\', '\\\\').replace('&lt;', '<').replace('&gt;', '>') + '''",
+                        document.getElementById("math_''' + str(first) + '''")
+                    );
+            </script>
+            '''
         else:
             break
             
