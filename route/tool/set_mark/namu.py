@@ -384,6 +384,7 @@ def namu(conn, data, title, main_num):
     backlink = []
     end_data = []
     
+    data = re.sub('<math>(?P<in>(?:(?!<\/math>).)+)<\/math>', '[math(\g<in>)]', data)
     data = html.escape(data)
 
     data = re.sub('\r\n', '\n', data)
