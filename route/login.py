@@ -14,8 +14,7 @@ def login_2(conn):
             return re_error('/error/13')
         else:
             captcha_post('', 0)
-
-        ip = ip_check()
+            
         agent = flask.request.headers.get('User-Agent')
 
         curs.execute("select pw, encode from user where id = ?", [flask.request.form.get('id', None)])
