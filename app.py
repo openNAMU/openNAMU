@@ -566,7 +566,6 @@ def api_w(name = ''):
 def api_raw(name = ''):
     return api_raw_2(conn, name)
 
-
 @app.route('/api/version')
 def api_version():
     return api_version_2(conn, r_ver, c_ver)
