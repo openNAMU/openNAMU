@@ -36,7 +36,7 @@ function topic_load(name, sub) {
             xhr.send(null);
 
             xhr.onreadystatechange = function() {
-                if(this.readyState == XMLHttpRequest.DONE && xhr.status == 200 && xhr.responseText != "{}\n") {
+                if(this.readyState === XMLHttpRequest.DONE && xhr.status === 200 && xhr.responseText !== "{}\n") {
                     console.log(xhr.responseText);
                     console.log(url);
 
@@ -51,7 +51,7 @@ function topic_load(name, sub) {
 
 function folding(num) { 
     var fol = document.getElementById('folding_' + num); 
-    if(fol.style.display == 'inline-block' || fol.style.display == 'block') { 
+    if(fol.style.display === 'inline-block' || fol.style.display === 'block') { 
         fol.style.display = 'none';
     } else {
         fol.style.display = 'block'; 
