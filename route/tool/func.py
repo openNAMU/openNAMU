@@ -125,7 +125,7 @@ def last_change(data):
                             data = re_data_3.sub("<" + i_data[0] + " class=\"" + json_data[j_data]["class"] + "\">", data)        
                 else:
                     re_data = re.compile("<(?P<in>" + j_data + "(?: (?:(?!>).)*)?)>")
-                    data = re_data.sub("<\g<in> class=\"" + json_data[j_data]["class"] + "\">", data)        
+                    data = re_data.sub("<\g<in> class=\"" + json_data[j_data]["class"] + "\">", data)
 
     return data
 
@@ -431,7 +431,12 @@ def next_fix(link, num, page, end = 50):
     return list_data
 
 def other2(data):
-    return data + ['']
+    data += ['', '''
+        <link rel="stylesheet" href="/views/main_css/main.css">
+        <script src="/views/main_css/main.js"></script>
+    ''']
+
+    return data
 
 def wiki_set(num = 1):
     if num == 1:
