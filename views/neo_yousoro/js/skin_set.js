@@ -68,7 +68,7 @@ window.onload = function () {
         set_language = {
             "en-US" : {
                 "default" : "Default",
-                "change_to_noraml" : "Change to normal text",
+                "change_to_normal" : "Change to normal text",
                 "delete" : "Delete",
                 "skin_setting" : "Skin settings",
                 "include_link" : "Using include link",
@@ -78,7 +78,7 @@ window.onload = function () {
                 "other" : "Other"
             }, "ko-KR" : {
                 "default" : "기본값",
-                "change_to_noraml" : "일반 텍스트로 변경",
+                "change_to_normal" : "일반 텍스트로 변경",
                 "delete" : "삭제",
                 "skin_setting" : "스킨 설정",
                 "include_link" : "틀 링크 사용",

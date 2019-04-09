@@ -974,6 +974,26 @@ def edit_filter_do(data):
     
     return 0
 
+def load_version():
+    n_ver = ''
+    data = None
+
+    try:
+        if flask.request.host != 'namu.ml':
+            data = urllib.request.urlopen('https://namu.ml/api/version')
+    except:
+        pass
+
+    if data and data.getcode() == 200:
+        try:
+            json_data = json.loads(data.read().decode())
+            if 'version' in json_data:
+                n_ver = json_data['version']
+        except:
+            pass
+
+    return n_ver
+
 def redirect(data = '/'):
     return flask.redirect(data)
 
