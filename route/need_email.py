@@ -21,7 +21,7 @@ def need_email_2(conn, tool):
 
                             return redirect('/register')
                         else:
-                            send_email(flask.request.form.get('email', ''), wiki_set()[0] + ' key', 'key : ' + flask.session['c_key'])
+                            send_email(flask.request.form.get('email', ''), wiki_set()[0] + '\'s Key', 'Key : ' + flask.session['c_key'])
                             flask.session['c_email'] = flask.request.form.get('email', '')
 
                             return redirect('/check_key')

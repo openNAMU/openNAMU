@@ -71,7 +71,7 @@ def check_key_2(conn, tool):
                 return redirect('/pass_find')
     else:
         return easy_minify(flask.render_template(skin_check(),    
-            imp = ['check', wiki_set(), custom(), other2([0, 0])],
+            imp = ['Check', wiki_set(), custom(), other2([0, 0])],
             data =  '''
                     <form method="post">
                         <input placeholder="''' + load_lang('key') + '''" name="key" type="text">
