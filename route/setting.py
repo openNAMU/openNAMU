@@ -184,7 +184,7 @@ def setting_2(conn, num):
                             <br>
                             <select name="update">''' + div3 + '''</select>
                             <hr class=\"main_hr\">
-                            <span>encryption method</span>
+                            <span>''' + load_lang('encryption_method') + '''</span>
                             <br>
                             <br>
                             <select name="encode">''' + div5 + '''</select>

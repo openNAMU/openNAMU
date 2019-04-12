@@ -151,6 +151,7 @@
         "member_acl" : "Member only",
         "50_edit_acl" : "Only members with 50 or more all document edits",
         "all_acl" : "All Users",
+        "encryption_method" : "Encryption method",
         "_comment_2.1_" : "Filter",
             "_comment_2.1.1_" : "List",
                 "interwiki_list" : "Interwiki(s) list",
