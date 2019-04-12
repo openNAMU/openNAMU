@@ -151,6 +151,7 @@
         "member_acl" : "가입자만",
         "50_edit_acl" : "기여 횟수 총합 50회 이상 가입자만",
         "all_acl" : "모든 사용자",
+        "encryption_method" : "암호화 방식",
         "_comment_2.1_" : "필터",
             "_comment_2.1.1_" : "목록",
                 "interwiki_list" : "인터위키 목록",
