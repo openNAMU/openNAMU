@@ -347,7 +347,7 @@ def setting_2(conn, num):
             
             admin_check(None, 'edit_set')
 
-            return redirect('/setting/5')
+            return redirect('/setting/6')
         else:
             n_list = ['', '', '', '']
             d_list = []
