@@ -341,7 +341,12 @@ def setting_2(conn, num):
 
         if flask.request.method == 'POST':
             for data in i_list:
-                curs.execute("update other set data = ? where name = ?", [flask.request.form.get(data, ''), data])
+                if data == 'g_email':
+                    into_data = re.sub('@.*$', '', flask.request.form.get(data, ''))
+                else:
+                    into_data = flask.request.form.get(data, '')
+
+                curs.execute("update other set data = ? where name = ?", [into_data, data])
 
             conn.commit()
             
@@ -369,7 +374,7 @@ def setting_2(conn, num):
             conn.commit()
 
             return easy_minify(flask.render_template(skin_check(), 
-                imp = ['google', wiki_set(), custom(), other2([0, 0])],
+                imp = ['Google', wiki_set(), custom(), other2([0, 0])],
                 data =  '''
                         <form method="post">
                             <h2><a href="https://www.google.com/recaptcha/admin">recaptcha</a></h2>
