@@ -777,7 +777,7 @@ def acl_check(name, tool = ''):
                 if admin_check(5, 'edit (' + name + ')') != 1:
                     return 1
 
-            if acl_data[0][0] == '50_edit':
+            if set_data[0][0] == '50_edit':
                 if ip_or_user(ip) == 1:
                     return 1
                 
