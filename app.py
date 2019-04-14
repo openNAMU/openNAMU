@@ -558,7 +558,7 @@ def skin_set():
     return data
     
 # API
-@app.route('/api/w/<everything:name>')
+@app.route('/api/w/<everything:name>', methods=['POST', 'GET'])
 def api_w(name = ''):
     return api_w_2(conn, name)
     

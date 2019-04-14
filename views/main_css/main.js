@@ -32,20 +32,17 @@ function topic_load(name, sub) {
             var xhr = new XMLHttpRequest();
             var doc_data = document.getElementById("plus");
 
-            xhr.open("GET", url);
+            xhr.open("GET", url, true);
             xhr.send(null);
 
             xhr.onreadystatechange = function() {
-                if(this.readyState === XMLHttpRequest.DONE && xhr.status === 200 && xhr.responseText !== "{}\n") {
-                    console.log(xhr.responseText);
-                    console.log(url);
-
+                if(this.readyState === 4 && this.status === 200 && this.responseText !== "{}\n") {
                     doc_data.innerText += '(New)\n\n';
 
                     clearInterval(test);
                 }
             }
-        }, 3000)
+        }, 1000)
     }, 4000);
 }
 
@@ -56,4 +53,24 @@ function folding(num) {
     } else {
         fol.style.display = 'block'; 
     } 
+}
+
+function do_preview(name) {
+    var o_data = document.getElementById('content');
+    var p_data = document.getElementById('see_preview');
+
+    var s_data = new FormData();
+    s_data.append('data', o_data.value);
+
+    var url = "/api/w/" + name;
+    
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", url, true);
+    xhr.send(s_data);
+
+    xhr.onreadystatechange = function() {
+        if(this.readyState === 4 && this.status === 200) {
+            p_data.innerHTML = JSON.parse(this.responseText)['data'];
+        }
+    }
 }
