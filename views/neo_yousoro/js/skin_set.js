@@ -95,6 +95,10 @@ window.onload = function () {
             language = user_language;
         }
 
+        if(!language in set_language) {
+            language = "en-US";
+        }
+
         document.getElementById("main_top").innerHTML = '<h1>' + set_language[language]['skin_setting'] + '</h1>';
         document.title = document.title.replace(/.*(\- .*)$/, set_language[language]['skin_setting'] + " $1");
         
