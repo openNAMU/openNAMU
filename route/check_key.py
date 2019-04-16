@@ -59,25 +59,27 @@ def check_key_2(conn, tool):
                 flask.session.pop('c_key', None)
 
                 return easy_minify(flask.render_template(skin_check(),    
-                    imp = ['check', wiki_set(), custom(), other2([0, 0])],
+                    imp = [load_lang('reset_user_ok'), wiki_set(), custom(), other2([0, 0])],
                     data =  '''
-                            ''' + load_lang('id') + ' : ' + d_id + '''
-                            <br>
-                            ''' + load_lang('password') + ' : ' + pw + '''
-                            ''',
+                        ''' + load_lang('id') + '''
+                        <hr class=\"main_hr\">
+                        ''' + load_lang('id') + ' : ' + d_id + '''
+                        <br>
+                        ''' + load_lang('password') + ' : ' + pw + '''
+                    ''',
                     menu = [['user', load_lang('return')]]
                 ))
             else:
                 return redirect('/pass_find')
     else:
         return easy_minify(flask.render_template(skin_check(),    
-            imp = ['Check', wiki_set(), custom(), other2([0, 0])],
+            imp = [load_lang('key_check'), wiki_set(), custom(), other2([0, 0])],
             data =  '''
-                    <form method="post">
-                        <input placeholder="''' + load_lang('key') + '''" name="key" type="text">
-                        <hr class=\"main_hr\">
-                        <button type="submit">''' + load_lang('save') + '''</button>
-                    </form>
-                    ''',
+                <form method="post">
+                    <input placeholder="''' + load_lang('key') + '''" name="key" type="text">
+                    <hr class=\"main_hr\">
+                    <button type="submit">''' + load_lang('save') + '''</button>
+                </form>
+            ''',
             menu = [['user', load_lang('return')]]
         ))

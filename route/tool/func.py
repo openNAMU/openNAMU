@@ -1037,8 +1037,8 @@ def re_error(data):
                     end += '<li>' + load_lang('why') + ' : ' + end_data[0][1] + '</li>'
 
         return easy_minify(flask.render_template(skin_check(), 
-            imp = ['error', wiki_set(1), custom(), other2([0, 0])],
-            data = '<h2>error</h2><ul>' + end + '</ul>',
+            imp = [load_lang('error'), wiki_set(1), custom(), other2([0, 0])],
+            data = '<h2>' + load_lang('error') + '</h2><ul>' + end + '</ul>',
             menu = 0
         ))
     else:
@@ -1065,6 +1065,8 @@ def re_error(data):
                 data = load_lang('password_error')
             elif num == 11:
                 data = load_lang('topic_long_error')
+            elif num == 12:
+                data = load_lang('email_error')
             elif num == 13:
                 data = load_lang('recaptcha_error')
             elif num == 14:
@@ -1087,8 +1089,8 @@ def re_error(data):
                 data = '???'
 
             return easy_minify(flask.render_template(skin_check(), 
-                imp = ['error', wiki_set(1), custom(), other2([0, 0])],
-                data = '<h2>error</h2><ul><li>' + data + '</li></ul>',
+                imp = [load_lang('error'), wiki_set(1), custom(), other2([0, 0])],
+                data = '<h2>' + load_lang('error') + '</h2><ul><li>' + data + '</li></ul>',
                 menu = 0
             ))
         else:

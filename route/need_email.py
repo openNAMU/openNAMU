@@ -28,7 +28,10 @@ def need_email_2(conn, tool):
 
             return redirect('/register')
         else:
-            curs.execute("select id from user where id = ? and email = ?", [flask.request.form.get('id', ''), flask.request.form.get('email', '')])
+            curs.execute("select id from user_set where id = ? and name = 'email' and data = ?", [
+                flask.request.form.get('id', ''),
+                flask.request.form.get('email', '')
+            ])
             if curs.fetchall():
                 flask.session['c_key'] = ''.join(random.choice("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ") for i in range(16))
                 flask.session['c_id'] = flask.request.form.get('id', '')
@@ -36,6 +39,8 @@ def need_email_2(conn, tool):
                 send_email(flask.request.form.get('email', ''), wiki_set()[0] + '\'s key', 'Key : ' + flask.session['c_key'])
 
                 return redirect('/check_pass_key')
+            else:
+                return re_error('/error/12')
     else:
         if tool == 'need_email':
             return easy_minify(flask.render_template(skin_check(),    

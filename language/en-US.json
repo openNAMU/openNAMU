@@ -152,6 +152,8 @@
         "50_edit_acl" : "Only members with 50 or more all document edits",
         "all_acl" : "All Users",
         "encryption_method" : "Encryption method",
+        "check_key" : "Check Authentication Key",
+        "reset_user_ok" : "Check Success",
         "_comment_2.1_" : "Filter",
             "_comment_2.1.1_" : "List",
                 "interwiki_list" : "Interwiki(s) list",
@@ -232,6 +234,7 @@
         "http_warring" : "Warning : If you are not on HTTPS connection, Your information can be leaked. We won't response to that.",
         "user_head_warring" : "User[s] <head> will deleted if you close the browser or sign-in",
         "no_login_warring" : "Non-login status. IP is logged when working with non-login.",
+        "user_reset_sign" : "Your account information has changed like this.",
         "_comment_3.1_" : "Error",
             "update_error" : "Auto update is not support.",
             "inter_error" : "Internal error.",
@@ -254,5 +257,6 @@
             "password_diffrent_error" : "Reconfirm password and input password are different.",
             "edit_filter_error" : "Censored by edit filter.",
             "file_name_error" : "Only alphabet, hangul, space, underscore, and minus signs are allowed for file names.",
-            "topic_long_error" : "The discussion name must not exceed 256 characters."
+            "topic_long_error" : "The discussion name must not exceed 256 characters.",
+            "email_error" : "No one has this email."
 }
