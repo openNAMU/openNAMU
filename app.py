@@ -8,8 +8,9 @@ for i_data in os.listdir("route"):
 
         exec("from route." + f_src + " import *")
 
-r_ver = 'v3.1.0-master-04'
+r_ver = 'v3.1.0-master-05'
 c_ver = '400000'
+s_ver = '1'
 
 print('Version : ' + r_ver)
 
@@ -264,6 +265,19 @@ else:
     print('Back up state : Turn off')
 
 conn.commit()
+
+curs.execute('select data from other where name = "s_ver"')
+ver_set_data = curs.fetchall()
+if not ver_set_data:
+    curs.execute('insert into other (name, data) values ("s_ver", ?)', [s_ver])
+
+    print('Skin update required')
+else:
+    if int(ver_set_data[0][0]) < int(s_ver):
+        curs.execute('delete from other where name = "s_ver"')
+        curs.execute('insert into other (name, data) values ("s_ver", ?)', [s_ver])
+
+        print('Skin update required')
 
 ## Func
 @app.route('/del_alarm')
