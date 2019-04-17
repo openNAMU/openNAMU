@@ -238,11 +238,7 @@ def middle_parser(data, fol_num, syntax_num, folding_num):
                                                         middle_data_2 = ['python']
 
                                                     if syntax_num == 0:
-                                                        plus_data +=    '''
-                                                                        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css">
-                                                                        <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
-                                                                        <script>hljs.initHighlightingOnLoad();</script>
-                                                                        '''
+                                                        plus_data += '<script>hljs.initHighlightingOnLoad();</script>'
 
                                                         syntax_num = 1
 
@@ -481,17 +477,6 @@ def namu(conn, data, title, main_num):
     while 1:
         math = math_re.search(data)
         if math:
-            if first == 0:
-                plus_data += '''
-                    <link   rel="stylesheet"
-                            href="https://cdn.jsdelivr.net/npm/katex@0.10.1/dist/katex.min.css"
-                            integrity="sha384-dbVIfZGuN1Yq7/1Ocstc1lUEm+AT+/rCkibIcC/OmWo5f0EA48Vf8CytHzGrSwbQ"
-                            crossorigin="anonymous">
-                    <script src="https://cdn.jsdelivr.net/npm/katex@0.10.1/dist/katex.min.js"
-                            integrity="sha384-2BKqo+exmr9su6dir+qCw08N2ZKRucY4PrGQPPWU1A7FtlCGjmEGFqXCv5nyM5Ij"
-                            crossorigin="anonymous"></script>
-                '''
-
             math = math.groups()[0]
             
             first += 1
