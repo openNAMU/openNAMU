@@ -116,7 +116,7 @@ def change_password_2(conn, server_init):
                             ''' + http_warring + '''
                         </form>
                         <script>
-                        skin_json = ''' + str(package) + '''
+                        skin_package = ''' + str(package) + '''
                         </script>
                         ''',
                 menu = [['user', load_lang('return')]]
