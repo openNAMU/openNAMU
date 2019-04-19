@@ -172,6 +172,7 @@
             "adsense_setting" : "애드센스 설정",
             "adsense_enable" : "애드센스 사용",
             "skin_setting" : "스킨 설정",
+            "skin_support" : "오픈나무 버전 %_version_% 이상 지원",
             "_comment_2.2.1_" : "목록",
                 "main_setting" : "메인 설정",
                 "text_setting" : "문자 설정",

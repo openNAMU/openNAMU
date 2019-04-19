@@ -172,6 +172,7 @@
             "adsense_setting" : "Adsense settings",
             "adsense_enable" : "Adsense enable",
             "skin_setting" : "Skin settings",
+            "skin_support" : "Support for version %_version_% or later",
             "_comment_2.2.1_" : "List",
                 "main_setting" : "Main settings",
                 "text_setting" : "Text settings",
