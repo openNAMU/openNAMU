@@ -58,7 +58,7 @@ def change_password_2(conn, server_init):
             else:
                 email = ''
 
-            div2 = load_skin()
+            div2, package = load_skin()
             div3 = ''
 
             curs.execute('select data from user_set where name = "lang" and id = ?', [flask.session['id']])
@@ -115,6 +115,9 @@ def change_password_2(conn, server_init):
                             <button type="submit">''' + load_lang('save') + '''</button>
                             ''' + http_warring + '''
                         </form>
+                        <script>
+                        skin_json = ''' + str(package) + '''
+                        </script>
                         ''',
                 menu = [['user', load_lang('return')]]
             ))

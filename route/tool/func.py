@@ -666,21 +666,35 @@ def load_skin(data = ''):
             if not data:
                 data = [['neo_yousoro']]
 
-        for skin_data in os.listdir(os.path.abspath('views')):
-            if not skin_data in system_file:
-                if data[0][0] == skin_data:
-                    div2 = '<option value="' + skin_data + '">' + skin_data + '</option>' + div2
-                else:
-                    div2 += '<option value="' + skin_data + '">' + skin_data + '</option>'
+        div2, package = load_skin_subprocess(data[0][0], system_file)
     else:
-        for skin_data in os.listdir(os.path.abspath('views')):
-            if not skin_data in system_file:
-                if data == skin_data:
-                    div2 = '<option value="' + skin_data + '">' + skin_data + '</option>' + div2
-                else:
-                    div2 += '<option value="' + skin_data + '">' + skin_data + '</option>'
+        div2, package = load_skin_subprocess(data, system_file)
 
-    return div2
+    return div2, package
+
+def load_skin_subprocess(data, system_file):
+    div2 = ''
+    package = {}
+    for skin_data in os.listdir(os.path.abspath('views')):
+        if not skin_data in system_file:
+            if data == skin_data:
+                div2 = '<option value="' + skin_data + '">' + skin_data + '</option>' + div2
+            else:
+                div2 += '<option value="' + skin_data + '">' + skin_data + '</option>'
+            package_path = 'views/{}/package.json'.format(skin_data)
+            if os.path.exists(package_path):
+                package[skin_data] = json.loads(open(package_path, encoding='utf-8').read())
+            else:
+                package[skin_data] = {
+                    'name' : skin_data,
+                    'support' : {
+                        'r_ver' : '',
+                        'c_ver' : '',
+                        's_ver' : ''
+                    },
+                    'thumbnail' : ''
+                }
+    return div2, package
 
 def acl_check(name, tool = ''):
     ip = ip_check()
