@@ -1,0 +1,9 @@
+{
+    "name" : "neo_yousoro",
+    "support" : {
+        "r_ver" : "v3.1.0-master-05",
+        "c_ver" : "400000",
+        "s_ver" : "1"
+    },
+    "thumbnail" : ""
+}
