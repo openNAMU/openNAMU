@@ -584,6 +584,10 @@ def api_raw(name = ''):
 def api_version():
     return api_version_2(conn, r_ver, c_ver)
 
+@app.route('/api/skin_info')
+def api_skin_info():
+    return api_skin_info_2(conn)
+
 @app.route('/api/topic/<everything:name>/sub/<sub>')
 def api_topic_sub(name = '', sub = '', time = ''):
     return api_topic_sub_2(conn, name, sub, time)

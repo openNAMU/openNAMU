@@ -96,7 +96,7 @@ def send_email(who, title, data):
         print('Error : Email login error')
 
 def last_change(data):
-    json_address = re.sub("\.html$", ".json", skin_check())
+    json_address = re.sub("(((?!\.|\/).)+)\.html$", "set.json", skin_check())
     try:
         json_data = json.loads(open(json_address).read())
     except:
@@ -357,35 +357,14 @@ def ip_or_user(data):
     else:
         return 0
 
-def edit_help_button():
-    # https://stackoverflow.com/questions/11076975/insert-text-into-textarea-at-cursor-position-javascript
-    js_data = '''
-        <script>
-            function insert_data(name, data) {
-                if(document.selection) { 
-                    document.getElementById(name).focus();
-
-                    sel = document.selection.createRange();
-                    sel.text = data; 
-                } else if(document.getElementById(name).selectionStart || document.getElementById(name).selectionStart == '0') {
-                    var startPos = document.getElementById(name).selectionStart;
-                    var endPos = document.getElementById(name).selectionEnd;
-
-                    document.getElementById(name).value = document.getElementById(name).value.substring(0, startPos) + data + document.getElementById(name).value.substring(endPos, document.getElementById(name).value.length); 
-                } else {
-                    document.getElementById(name).value += data;
-                }
-            }
-        </script>
-    '''
-
+def edit_button():
     insert_list = [['[[|]]', '[[|]]'], ['[*()]', '[*()]'], ['{{{#!}}}', '{{{#!}}}'], ['||<>||', '||<>||'], ["\\'\\'\\'", "\'\'\'"]]
 
     data = ''
     for insert_data in insert_list:
         data += '<a href="javascript:void(0);" onclick="insert_data(\'content\', \'' + insert_data[0] + '\');">(' + insert_data[1] + ')</a> '
 
-    return [js_data, data + '<hr class=\"main_hr\">']
+    return data + '<hr class=\"main_hr\">'
 
 def ip_warring():
     if custom()[2] == 0:    
@@ -444,6 +423,7 @@ def other2(data):
         <script src="/views/main_css/js/topic_load.js"></script>
         <script src="/views/main_css/js/do_preview.js"></script>
         <script src="/views/main_css/js/load_ver.js"></script>
+        <script src="/views/main_css/js/insert_data.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/katex@0.10.1/dist/katex.min.js"
                 integrity="sha384-2BKqo+exmr9su6dir+qCw08N2ZKRucY4PrGQPPWU1A7FtlCGjmEGFqXCv5nyM5Ij"
                 crossorigin="anonymous"></script>
