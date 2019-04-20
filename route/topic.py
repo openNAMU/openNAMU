@@ -98,22 +98,22 @@ def topic_2(conn, name, sub):
                 who_plus += ' <span style="margin-right: 5px;">@' + topic_data_top[0][0] + ' </span>'
                                 
             all_data += '''
-                        <table id="toron">
-                            <tbody>
-                                <tr>
-                                    <td id="toron_color_red">
-                                        <a href="#''' + topic_data[1] + '''">
-                                            #''' + topic_data[1] + '''
-                                        </a> ''' + ip_pas(topic_data[3]) + who_plus + ''' <span style="float: right;">''' + topic_data[2] + '''</span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>''' + render_set(data = topic_data[0]) + '''</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <br>
-                        '''    
+                <table id="toron">
+                    <tbody>
+                        <tr>
+                            <td id="toron_color_red">
+                                <a href="#''' + topic_data[1] + '''">
+                                    #''' + topic_data[1] + '''
+                                </a> ''' + ip_pas(topic_data[3]) + who_plus + ''' <span style="float: right;">''' + topic_data[2] + '''</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>''' + render_set(data = topic_data[0]) + '''</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <br>
+            '''    
 
         for topic_data in topic:
             user_write = topic_data[0]
@@ -160,40 +160,40 @@ def topic_2(conn, name, sub):
                 user_write = '<br>'
                          
             all_data += '''
-                        <table id="toron">
-                            <tbody>
-                                <tr>
-                                    <td id="toron_color''' + color + '''">
-                                        <a href="javascript:void(0);" id="''' + str(number) + '">#' + str(number) + '</a> ' + ip + '''</span>
-                                    </td>
-                                </tr>
-                                <tr ''' + blind_data + '''>
-                                    <td>''' + user_write + '''</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <br>
-                        '''
+                <table id="toron">
+                    <tbody>
+                        <tr>
+                            <td id="toron_color''' + color + '''">
+                                <a href="javascript:void(0);" id="''' + str(number) + '">#' + str(number) + '</a> ' + ip + '''</span>
+                            </td>
+                        </tr>
+                        <tr ''' + blind_data + '''>
+                            <td>''' + user_write + '''</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <br>
+            '''
             number += 1
 
         if ban != 1 or admin == 1:
             data += '''
-                    <div id="plus"></div>
-                    <script>topic_load("''' + name + '''", "''' + sub + '''");</script>
-                    <a id="reload" href="javascript:void(0);" onclick="location.href.endsWith(\'#reload\')? location.reload(true):location.href=\'#reload\'">(''' + load_lang('reload') + ''')</a>
-                    <form style="''' + display + '''" method="post">
-                    <br>
-                    <textarea style="height: 100px;" name="content"></textarea>
-                    <hr class=\"main_hr\">
-                    ''' + captcha_get()
+                <div id="plus"></div>
+                <script>topic_load("''' + name + '''", "''' + sub + '''");</script>
+                <a id="reload" href="javascript:void(0);" onclick="location.href.endsWith(\'#reload\')? location.reload(true):location.href=\'#reload\'">(''' + load_lang('reload') + ''')</a>
+                <form style="''' + display + '''" method="post">
+                <br>
+                <textarea style="height: 100px;" name="content"></textarea>
+                <hr class=\"main_hr\">
+            ''' + captcha_get()
             
             if display == '':
                 data += ip_warring()
 
             data += '''
-                        <button type="submit">''' + load_lang('send') + '''</button>
-                    </form>
-                    '''
+                    <button type="submit">''' + load_lang('send') + '''</button>
+                </form>
+            '''
 
         return easy_minify(flask.render_template(skin_check(), 
             imp = [name, wiki_set(), custom(), other2([' (' + load_lang('discussion') + ')', 0])],
