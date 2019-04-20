@@ -34,7 +34,8 @@ def topic_2(conn, name, sub):
         if match:
             curs.execute('insert into alarm (name, data, date) values (?, ?, ?)', [match.groups()[0], ip + ' - <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '">' + load_lang('user_discussion', 1) + '</a>', today])
         
-        data = re.sub('\[\[((?:분류|category):(?:(?:(?!\]\]).)*))\]\]', '[br]', flask.request.form.get('content', None))
+        cate_re = re.compile('\[\[((?:분류|category):(?:(?:(?!\]\]).)*))\]\]', re.I)
+        data = cate_re.sub('[br]', flask.request.form.get('content', 'Test'))
         for rd_data in re.findall("(?:#([0-9]+))", data):
             curs.execute("select ip from topic where title = ? and sub = ? and id = ?", [name, sub, rd_data])
             ip_data = curs.fetchall()
