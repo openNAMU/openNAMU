@@ -443,6 +443,7 @@ def other2(data):
         <script src="/views/main_css/js/folding.js"></script>
         <script src="/views/main_css/js/topic_load.js"></script>
         <script src="/views/main_css/js/do_preview.js"></script>
+        <script src="/views/main_css/js/load_ver.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/katex@0.10.1/dist/katex.min.js"
                 integrity="sha384-2BKqo+exmr9su6dir+qCw08N2ZKRucY4PrGQPPWU1A7FtlCGjmEGFqXCv5nyM5Ij"
                 crossorigin="anonymous"></script>
@@ -899,7 +900,14 @@ def ban_insert(name, end, why, login, blocker):
 
     curs.execute("select block from ban where block = ?", [name])
     if curs.fetchall():
-        curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, ?)", [name, load_lang('release', 1), now_time, blocker, '', band])
+        curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, ?)", [
+            name, 
+            load_lang('release', 1),
+            now_time, 
+            blocker, 
+            '', 
+            band
+        ])
         curs.execute("delete from ban where block = ?", [name])
     else:
         if login != '':
@@ -986,26 +994,6 @@ def edit_filter_do(data):
                 return 1
     
     return 0
-
-def load_version():
-    n_ver = ''
-    data = None
-
-    try:
-        if flask.request.host != 'namu.ml':
-            data = urllib.request.urlopen('https://namu.ml/api/version')
-    except:
-        pass
-
-    if data and data.getcode() == 200:
-        try:
-            json_data = json.loads(data.read().decode())
-            if 'version' in json_data:
-                n_ver = json_data['version']
-        except:
-            pass
-
-    return n_ver
 
 def redirect(data = '/'):
     return flask.redirect(data)
