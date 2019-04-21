@@ -196,8 +196,8 @@ def setting_2(conn, num):
             ))
     elif num == 2:
         if flask.request.method == 'POST':
-            curs.execute("update other set data = ? where name = ?", [flask.request.form.get('contract', None), 'contract'])
-            curs.execute("update other set data = ? where name = ?", [flask.request.form.get('no_login_warring', None), 'no_login_warring'])
+            curs.execute("update other set data = ? where name = ?", [flask.request.form.get('contract', ''), 'contract'])
+            curs.execute("update other set data = ? where name = ?", [flask.request.form.get('no_login_warring', ''), 'no_login_warring'])
             conn.commit()
             
             admin_check(None, 'edit_set')
@@ -248,30 +248,44 @@ def setting_2(conn, num):
             if num == 4:
                 info_d = 'body'
                 end_r = '4'
+                coverage = ''
             else:
                 info_d = 'head'
                 end_r = '3'
-            
-            curs.execute("select name from other where name = ?", [info_d])
+                if flask.request.args.get('skin', '') == '':
+                    coverage = ''
+                else:
+                    coverage = flask.request.args.get('skin', '')
+                
+            curs.execute("select name from other where name = ? and coverage = ?", [info_d, coverage])
             if curs.fetchall():
-                curs.execute("update other set data = ? where name = ?", [flask.request.form.get('content', ''), info_d])
+                curs.execute("update other set data = ?, coverage = ? where name = ?", [
+                    flask.request.form.get('content', ''),
+                    coverage,
+                    info_d
+                ])
             else:
-                curs.execute("insert into other (name, data) values (?, ?)", [info_d, flask.request.form.get('content', '')])
+                curs.execute("insert into other (name, data, coverage) values (?, ?, ?)", [info_d, flask.request.form.get('content', ''), coverage])
             
             conn.commit()
 
             admin_check(None, 'edit_set')
 
-            return redirect('/setting/' + end_r)
+            return redirect('/setting/' + end_r + '?skin=' + flask.request.args.get('skin', ''))
         else:
             if num == 4:
                 curs.execute("select data from other where name = 'body'")
                 title = '_body'
                 start = ''
             else:
-                curs.execute("select data from other where name = 'head'")
+                curs.execute("select data from other where name = 'head' and coverage = ?", [flask.request.args.get('skin', '')])
                 title = '_head'
-                start = '<span>&lt;style&gt;CSS&lt;/style&gt;<br>&lt;script&gt;JS&lt;/script&gt;</span><hr class=\"main_hr\">'
+                start = '<a href="?">(' + load_lang('all') + ')</a> ' + \
+                        ' '.join(['<a href="?skin=' + i + '">(' + i + ')</a>' for i in load_skin('', 1)]) + \
+                        '''
+                            <hr class=\"main_hr\">
+                            <span>&lt;style&gt;CSS&lt;/style&gt;<br>&lt;script&gt;JS&lt;/script&gt;</span><hr class=\"main_hr\">
+                        '''
                 
             head = curs.fetchall()
             if head:
@@ -281,28 +295,28 @@ def setting_2(conn, num):
 
             return easy_minify(flask.render_template(skin_check(), 
                 imp = [load_lang(data = 'main' + title, safe = 1), wiki_set(), custom(), other2([0, 0])],
-                data =  '''
-                        <form method="post">
-                            ''' + start + '''
-                            <textarea rows="25" name="content">''' + html.escape(data) + '''</textarea>
-                            <hr class=\"main_hr\">
-                            <button id="save" type="submit">''' + load_lang('save') + '''</button>
-                        </form>
-                        ''',
+                data = '''
+                    <form method="post">
+                        ''' + start + '''
+                        <textarea rows="25" name="content">''' + html.escape(data) + '''</textarea>
+                        <hr class=\"main_hr\">
+                        <button id="save" type="submit">''' + load_lang('save') + '''</button>
+                    </form>
+                ''',
                 menu = [['setting', load_lang('return')]]
             ))
     elif num == 5:
         if flask.request.method == 'POST':
             curs.execute("select name from other where name = 'robot'")
             if curs.fetchall():
-                curs.execute("update other set data = ? where name = 'robot'", [flask.request.form.get('content', None)])
+                curs.execute("update other set data = ? where name = 'robot'", [flask.request.form.get('content', '')])
             else:
-                curs.execute("insert into other (name, data) values ('robot', ?)", [flask.request.form.get('content', None)])
+                curs.execute("insert into other (name, data) values ('robot', ?)", [flask.request.form.get('content', '')])
             
             conn.commit()
             
             fw = open('./robots.txt', 'w')
-            fw.write(re.sub('\r\n', '\n', flask.request.form.get('content', None)))
+            fw.write(re.sub('\r\n', '\n', flask.request.form.get('content', '')))
             fw.close()
             
             admin_check(None, 'edit_set')
