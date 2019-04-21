@@ -379,22 +379,25 @@ def ip_warring():
 
     return text_data
 
-def skin_check():
-    skin = './views/neo_yousoro/'
+def skin_check(set_n = 0):
+    skin = 'neo_yousoro'
 
     curs.execute('select data from other where name = "skin"')
     skin_exist = curs.fetchall()
     if skin_exist and skin_exist[0][0] != '':
         if os.path.exists(os.path.abspath('./views/' + skin_exist[0][0] + '/index.html')) == 1:
-            skin = './views/' + skin_exist[0][0] + '/'
+            skin = skin_exist[0][0]
     
     curs.execute('select data from user_set where name = "skin" and id = ?', [ip_check()])
     skin_exist = curs.fetchall()
     if skin_exist and skin_exist[0][0] != '':
         if os.path.exists(os.path.abspath('./views/' + skin_exist[0][0] + '/index.html')) == 1:
-            skin = './views/' + skin_exist[0][0] + '/'
+            skin = skin_exist[0][0]
 
-    return skin + 'index.html'
+    if set_n == 0:
+        return './views/' + skin + '/index.html'
+    else:
+        return skin
 
 def next_fix(link, num, page, end = 50):
     list_data = ''
@@ -459,12 +462,18 @@ def wiki_set(num = 1):
         else:
             data_list += [data_list[0]]
             
-        curs.execute("select data from other where name = 'head'")
+        curs.execute("select data from other where name = 'head' and coverage = ?", [skin_check(1)])
         db_data = curs.fetchall()
         if db_data and db_data[0][0] != '':
             data_list += [db_data[0][0]]
         else:
-            data_list += ['']
+            curs.execute("select data from other where name = 'head' and coverage = ''")
+            db_data = curs.fetchall()
+            if db_data and db_data[0][0] != '':
+                data_list += [db_data[0][0]]
+            else:
+                data_list += ['']
+
         return data_list
 
     if num == 2:
@@ -631,8 +640,9 @@ def custom():
 
     return ['', '', user_icon, user_head, email, user_name]
 
-def load_skin(data = ''):
+def load_skin(data = '', set_n = 0):
     div2 = ''
+    div3 = []
     system_file = ['main_css', 'easter_egg.html']
 
     if data == '':
@@ -647,19 +657,37 @@ def load_skin(data = ''):
             if not data:
                 data = [['neo_yousoro']]
 
-        for skin_data in os.listdir(os.path.abspath('views')):
-            if not skin_data in system_file:
-                if data[0][0] == skin_data:
-                    div2 = '<option value="' + skin_data + '">' + skin_data + '</option>' + div2
-                else:
-                    div2 += '<option value="' + skin_data + '">' + skin_data + '</option>'
+        if set_n == 0:
+            for skin_data in os.listdir(os.path.abspath('views')):
+                if not skin_data in system_file:
+                    if data[0][0] == skin_data:
+                        div2 = '<option value="' + skin_data + '">' + skin_data + '</option>' + div2
+                    else:
+                        div2 += '<option value="' + skin_data + '">' + skin_data + '</option>'
+        else:
+            div2 = []
+            for skin_data in os.listdir(os.path.abspath('views')):
+                if not skin_data in system_file:
+                    if data[0][0] == skin_data:
+                        div2 = [skin_data] + div2
+                    else:
+                        div2 += [skin_data]
     else:
-        for skin_data in os.listdir(os.path.abspath('views')):
-            if not skin_data in system_file:
-                if data == skin_data:
-                    div2 = '<option value="' + skin_data + '">' + skin_data + '</option>' + div2
-                else:
-                    div2 += '<option value="' + skin_data + '">' + skin_data + '</option>'
+        if set_n == 0:
+            for skin_data in os.listdir(os.path.abspath('views')):
+                if not skin_data in system_file:
+                    if data == skin_data:
+                        div2 = '<option value="' + skin_data + '">' + skin_data + '</option>' + div2
+                    else:
+                        div2 += '<option value="' + skin_data + '">' + skin_data + '</option>'
+        else:
+            div2 = []
+            for skin_data in os.listdir(os.path.abspath('views')):
+                if not skin_data in system_file:
+                    if data == skin_data:
+                        div2 = [skin_data] + div2
+                    else:
+                        div2 += [skin_data]
 
     return div2
 
