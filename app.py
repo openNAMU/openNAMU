@@ -10,7 +10,7 @@ for i_data in os.listdir("route"):
 
 r_ver = 'v3.1.0-master-06'
 c_ver = '400001'
-s_ver = '1'
+s_ver = '2'
 
 print('Version : ' + r_ver)
 
