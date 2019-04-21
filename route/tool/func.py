@@ -435,6 +435,9 @@ def other2(data):
 
     return data
 
+def cut_100(data):
+    return re.sub('<(((?!>).)*)>', '', data)[0:100] + '...'
+
 def wiki_set(num = 1):
     if num == 1:
         data_list = []

@@ -259,10 +259,10 @@ def setting_2(conn, num):
                 
             curs.execute("select name from other where name = ? and coverage = ?", [info_d, coverage])
             if curs.fetchall():
-                curs.execute("update other set data = ?, coverage = ? where name = ?", [
+                curs.execute("update other set data = ? where name = ? and coverage = ?", [
                     flask.request.form.get('content', ''),
-                    coverage,
-                    info_d
+                    info_d,
+                    coverage
                 ])
             else:
                 curs.execute("insert into other (name, data, coverage) values (?, ?, ?)", [info_d, flask.request.form.get('content', ''), coverage])
