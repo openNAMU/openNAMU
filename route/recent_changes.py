@@ -4,7 +4,11 @@ def recent_changes_2(conn, name, tool):
     curs = conn.cursor()
 
     if flask.request.method == 'POST':
-        return redirect('/diff/' + url_pas(name) + '?first=' + flask.request.form.get('b', None) + '&second=' + flask.request.form.get('a', None))
+        return redirect(
+            '/diff/' + url_pas(name) +
+            '?first=' + flask.request.form.get('b', '1') +
+            '&second=' + flask.request.form.get('a', '1')
+        )
     else:
         one_admin = admin_check(1)
         six_admin = admin_check(6)
@@ -13,10 +17,10 @@ def recent_changes_2(conn, name, tool):
         select = ''
 
         div =   '''
-                <table id="main_table_set">
-                    <tbody>
-                        <tr>
-                '''
+            <table id="main_table_set">
+                <tbody>
+                    <tr>
+        '''
         
         if name:
             num = int(number_check(flask.request.args.get('num', '1')))
@@ -27,19 +31,42 @@ def recent_changes_2(conn, name, tool):
 
             if tool == 'history':
                 div +=  '''
-                        <td id="main_table_width">''' + load_lang('version') + '''</td>
-                        <td id="main_table_width">''' + load_lang('editor') + '''</td>
-                        <td id="main_table_width">''' + load_lang('time') + '''</td></tr>
-                        '''
+                    <td id="main_table_width">''' + load_lang('version') + '''</td>
+                    <td id="main_table_width">''' + load_lang('editor') + '''</td>
+                    <td id="main_table_width">''' + load_lang('time') + '''</td></tr>
+                '''
                 
-                curs.execute("select id, title, date, ip, send, leng from history where title = ? order by id + 0 desc limit ?, '50'", [name, str(sql_num)])
+                # 기본적인 move만 구현
+                tool_select = flask.request.args.get('tool', None)
+                if tool_select:
+                    if tool_select == 'move':
+                        curs.execute('''
+                            select id, title, date, ip, send, leng from history
+                            where send like ? or send like ?
+                            order by id + 0 desc
+                            limit ?, '50'
+                        ''', ['%(<a>' + name +'</a>%', '%<a>' + name + '</a> move)', str(sql_num)])
+                    else:
+                        curs.execute('''
+                            select id, title, date, ip, send, leng from history
+                            where title = ?
+                            order by id + 0 desc
+                            limit ?, '50'
+                        ''', [name, str(sql_num)])
+                else:
+                    curs.execute('''
+                        select id, title, date, ip, send, leng from history
+                        where title = ?
+                        order by id + 0 desc
+                        limit ?, '50'
+                    ''', [name, str(sql_num)])
             else:
                 div +=  '''
-                            <td id="main_table_width">''' + load_lang('document_name') + '''</td>
-                            <td id="main_table_width">''' + load_lang('editor') + '''</td>
-                            <td id="main_table_width">''' + load_lang('time') + '''</td>
-                        </tr>
-                        '''
+                        <td id="main_table_width">''' + load_lang('document_name') + '''</td>
+                        <td id="main_table_width">''' + load_lang('editor') + '''</td>
+                        <td id="main_table_width">''' + load_lang('time') + '''</td>
+                    </tr>
+                '''
 
                 div = '<a href="/topic_record/' + url_pas(name) + '">(' + load_lang('discussion') + ')</a><hr class=\"main_hr\">' + div
                 
@@ -52,13 +79,18 @@ def recent_changes_2(conn, name, tool):
                 sql_num = 0            
             
             div +=  '''
-                        <td id="main_table_width">''' + load_lang('document_name') + '''</td>
-                        <td id="main_table_width">''' + load_lang('editor') + '''</td>
-                        <td id="main_table_width">''' + load_lang('time') + '''</td>
-                    </tr>
-                    '''
+                    <td id="main_table_width">''' + load_lang('document_name') + '''</td>
+                    <td id="main_table_width">''' + load_lang('editor') + '''</td>
+                    <td id="main_table_width">''' + load_lang('time') + '''</td>
+                </tr>
+            '''
             
-            curs.execute("select id, title, date, ip, send, leng from history where not title like 'user:%' order by date desc limit ?, 50", [str(sql_num)])
+            curs.execute('''
+                select id, title, date, ip, send, leng from history 
+                where not title like 'user:%' 
+                order by date desc 
+                limit ?, 50
+            ''', [str(sql_num)])
 
         data_list = curs.fetchall()
         for data in data_list:    
@@ -80,12 +112,16 @@ def recent_changes_2(conn, name, tool):
             if int(data[0]) - 1 == 0:
                 revert = ''
             else:
-                revert = '<a href="/diff/' + url_pas(data[1]) + '?first=' + str(int(data[0]) - 1) + '&second=' + data[0] + '">(' + load_lang('compare') + ')</a> <a href="/revert/' + url_pas(data[1]) + '?num=' + str(int(data[0]) - 1) + '">(' + load_lang('revert') + ')</a>'
+                revert = '<a href="/diff/' + url_pas(data[1]) + '?first=' + str(int(data[0]) - 1) + '&second=' + data[0] + '">(' + load_lang('compare') + ')</a>'
+                revert += ' <a href="/revert/' + url_pas(data[1]) + '?num=' + str(int(data[0]) - 1) + '">(' + load_lang('revert') + ')</a>'
             
             style = ['', '']
             date = data[2]
 
-            curs.execute("select title from history where title = ? and id = ? and hide = 'O'", [data[1], data[0]])
+            curs.execute('''
+                select title from history
+                where title = ? and id = ? and hide = 'O'
+            ''', [data[1], data[0]])
             hide = curs.fetchall()
             
             if six_admin == 1:
@@ -115,41 +151,49 @@ def recent_changes_2(conn, name, tool):
                 style[1] = 'id="toron_color_grey"'
 
             if tool == 'history':
-                title = '<a href="/w/' + url_pas(name) + '?num=' + data[0] + '">r' + data[0] + '</a> <a href="/raw/' + url_pas(name) + '?num=' + data[0] + '">(' + load_lang('raw') + ')</a> '
+                title = '<a href="/w/' + url_pas(name) + '?num=' + data[0] + '">r' + data[0] + '</a> '
+                title += '<a href="/raw/' + url_pas(name) + '?num=' + data[0] + '">(' + load_lang('raw') + ')</a> '
             else:
-                title = '<a href="/w/' + url_pas(data[1]) + '">' + html.escape(data[1]) + '</a> <a href="/history/' + url_pas(data[1]) + '">(r' + data[0] + ')</a> '
-                    
+                title = '<a href="/w/' + url_pas(data[1]) + '">' + html.escape(data[1]) + '</a> '
+                title += '<a href="/history/' + url_pas(data[1]) + '">(r' + data[0] + ')</a> '
+
             div +=  '''
-                    <tr ''' + style[0] + '''>
-                        <td>''' + title + revert + ' ' + leng + '''</td>
-                        <td>''' + ip + ban + hidden + '''</td>
-                        <td>''' + date + '''</td>
-                    </tr>
-                    <tr ''' + style[1] + '''>
-                        <td colspan="3">''' + send_parser(send) + '''</td>
-                    </tr>
-                    '''
+                <tr ''' + style[0] + '''>
+                    <td>''' + title + revert + ' ' + leng + '''</td>
+                    <td>''' + ip + ban + hidden + '''</td>
+                    <td>''' + date + '''</td>
+                </tr>
+                <tr ''' + style[1] + '''>
+                    <td colspan="3">''' + send_parser(send) + '''</td>
+                </tr>
+            '''
 
         div +=  '''
-                    </tbody>
-                </table>
-                '''
+                </tbody>
+            </table>
+        '''
         sub = ''
 
         if name:
             if tool == 'history':
-                div =   '''
-                        <form method="post">
-                            <select name="a">''' + select + '''</select> <select name="b">''' + select + '''</select>
-                            <button type="submit">''' + load_lang('compare') + '''</button>
-                        </form>
+                if not tool_select:
+                    div = '''
+                        <a href="?tool=move">(''' + load_lang('move') + ''')</a>
                         <hr class=\"main_hr\">
-                        ''' + div
+                    ''' + div
+                    
+                div = '''
+                    <form method="post">
+                        <select name="a">''' + select + '''</select> <select name="b">''' + select + '''</select>
+                        <button type="submit">''' + load_lang('compare') + '''</button>
+                    </form>
+                    <hr class=\"main_hr\">
+                ''' + div
                 title = name
                 
                 sub += ' (' + load_lang('history') + ')'
                 
-                menu = [['w/' + url_pas(name), load_lang('document')], ['raw/' + url_pas(name), 'raw']]
+                menu = [['w/' + url_pas(name), load_lang('document')], ['raw/' + url_pas(name), load_lang('raw')]]
                 
                 div += next_fix('/history/' + url_pas(name) + '?num=', num, data_list)
             else:

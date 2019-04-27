@@ -5,6 +5,11 @@ def topic_2(conn, name, sub):
     
     ban = topic_check(name, sub)
     admin = admin_check(3)
+
+    curs.execute("select id from topic where title = ? and sub = ? limit 1", [name, sub])
+    topic_exist = curs.fetchall()
+    if not topic_exist and len(sub) > 256:
+        return re_error('/error/11')
     
     if flask.request.method == 'POST':
         if captcha_post(flask.request.form.get('g-recaptcha-response', '')) == 1:
@@ -29,7 +34,9 @@ def topic_2(conn, name, sub):
         if match:
             curs.execute('insert into alarm (name, data, date) values (?, ?, ?)', [match.groups()[0], ip + ' - <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '">' + load_lang('user_discussion', 1) + '</a>', today])
         
-        data = re.sub('\[\[((?:분류|category):(?:(?:(?!\]\]).)*))\]\]', '[br]', flask.request.form.get('content', None))
+        cate_re = re.compile('\[\[((?:분류|category):(?:(?:(?!\]\]).)*))\]\]', re.I)
+        data = cate_re.sub('[br]', flask.request.form.get('content', 'Test'))
+        
         for rd_data in re.findall("(?:#([0-9]+))", data):
             curs.execute("select ip from topic where title = ? and sub = ? and id = ?", [name, sub, rd_data])
             ip_data = curs.fetchall()
@@ -52,9 +59,6 @@ def topic_2(conn, name, sub):
         
         curs.execute("select title from rd where title = ? and sub = ? and stop = 'S'", [name, sub])
         stop_data = curs.fetchall()
-        
-        curs.execute("select id from topic where title = ? and sub = ? limit 1", [name, sub])
-        topic_exist = curs.fetchall()
         
         display = ''
         all_data = ''
@@ -96,22 +100,22 @@ def topic_2(conn, name, sub):
                 who_plus += ' <span style="margin-right: 5px;">@' + topic_data_top[0][0] + ' </span>'
                                 
             all_data += '''
-                        <table id="toron">
-                            <tbody>
-                                <tr>
-                                    <td id="toron_color_red">
-                                        <a href="#''' + topic_data[1] + '''">
-                                            #''' + topic_data[1] + '''
-                                        </a> ''' + ip_pas(topic_data[3]) + who_plus + ''' <span style="float: right;">''' + topic_data[2] + '''</span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>''' + render_set(data = topic_data[0]) + '''</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <br>
-                        '''    
+                <table id="toron">
+                    <tbody>
+                        <tr>
+                            <td id="toron_color_red">
+                                <a href="#''' + topic_data[1] + '''">
+                                    #''' + topic_data[1] + '''
+                                </a> ''' + ip_pas(topic_data[3]) + who_plus + ''' <span style="float: right;">''' + topic_data[2] + '''</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>''' + render_set(data = topic_data[0]) + '''</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <br>
+            '''    
 
         for topic_data in topic:
             user_write = topic_data[0]
@@ -158,41 +162,40 @@ def topic_2(conn, name, sub):
                 user_write = '<br>'
                          
             all_data += '''
-                        <table id="toron">
-                            <tbody>
-                                <tr>
-                                    <td id="toron_color''' + color + '''">
-                                        <a href="javascript:void(0);" id="''' + str(number) + '">#' + str(number) + '</a> ' + ip + '''</span>
-                                    </td>
-                                </tr>
-                                <tr ''' + blind_data + '''>
-                                    <td>''' + user_write + '''</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <br>
-                        '''
+                <table id="toron">
+                    <tbody>
+                        <tr>
+                            <td id="toron_color''' + color + '''">
+                                <a href="javascript:void(0);" id="''' + str(number) + '">#' + str(number) + '</a> ' + ip + '''</span>
+                            </td>
+                        </tr>
+                        <tr ''' + blind_data + '''>
+                            <td>''' + user_write + '''</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <br>
+            '''
             number += 1
 
         if ban != 1 or admin == 1:
             data += '''
-                    <div id="plus"></div>
-                    <script type="text/javascript" src="/views/main_css/topic_reload.js"></script>
-                    <script>topic_load("''' + name + '''", "''' + sub + '''");</script>
-                    <a id="reload" href="javascript:void(0);" onclick="location.href.endsWith(\'#reload\')? location.reload(true):location.href=\'#reload\'">(''' + load_lang('reload') + ''')</a>
-                    <form style="''' + display + '''" method="post">
-                    <br>
-                    <textarea style="height: 100px;" name="content"></textarea>
-                    <hr class=\"main_hr\">
-                    ''' + captcha_get()
+                <div id="plus"></div>
+                <script>topic_load("''' + name + '''", "''' + sub + '''");</script>
+                <a id="reload" href="javascript:void(0);" onclick="location.href.endsWith(\'#reload\')? location.reload(true):location.href=\'#reload\'">(''' + load_lang('reload') + ''')</a>
+                <form style="''' + display + '''" method="post">
+                <br>
+                <textarea style="height: 100px;" name="content"></textarea>
+                <hr class=\"main_hr\">
+            ''' + captcha_get()
             
             if display == '':
                 data += ip_warring()
 
             data += '''
-                        <button type="submit">''' + load_lang('send') + '''</button>
-                    </form>
-                    '''
+                    <button type="submit">''' + load_lang('send') + '''</button>
+                </form>
+            '''
 
         return easy_minify(flask.render_template(skin_check(), 
             imp = [name, wiki_set(), custom(), other2([' (' + load_lang('discussion') + ')', 0])],

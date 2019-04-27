@@ -8,12 +8,12 @@ def acl_list_2(conn):
             <tbody>
                 <tr>
                     <td id="main_table_width_quarter">''' + load_lang('document_name') + '''</td>
-                    <td id="main_table_width_quarter">''' + load_lang('document') + ''' acl</td>
-                    <td id="main_table_width_quarter">''' + load_lang('discussion') + ''' acl</td>
-                    <td id="main_table_width_quarter">''' + load_lang('acl_required') + '''</td>
+                    <td id="main_table_width_quarter">''' + load_lang('document_acl') + '''</td>
+                    <td id="main_table_width_quarter">''' + load_lang('discussion_acl') + '''</td>
+                    <td id="main_table_width_quarter">''' + load_lang('view_acl') + '''</td>
     '''
     
-    curs.execute("select title, dec, dis, view, why from acl where dec = 'admin' or dec = 'user' or dis = 'admin' or dis = 'user' or view = 'admin' or view = 'user' order by title desc")
+    curs.execute("select title, dec, dis, view, why from acl where dec != '' or dis != '' or view != '' order by title desc")
     list_data = curs.fetchall()
     for data in list_data:
         if not re.search('^user:', data[0]) and not re.search('^file:', data[0]):
@@ -21,8 +21,12 @@ def acl_list_2(conn):
             for i in range(1, 4):
                 if data[i] == 'admin':
                     acl += [load_lang('admin')]
-                else:
+                elif data[i] == 'user':
                     acl += [load_lang('member')]
+                elif data[i] == '':
+                    acl += [load_lang('normal')]
+                else:
+                    acl += [data[i]]
 
             div +=  '''
                 <tr>

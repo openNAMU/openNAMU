@@ -18,7 +18,7 @@ def close_topic_list_2(conn, name, tool):
             else:
                 break
 
-        return redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(flask.request.form.get('topic', None) + t_num))
+        return redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(flask.request.form.get('topic', 'test') + t_num))
     else:
         plus = ''
         menu = [['topic/' + url_pas(name), load_lang('return')]]

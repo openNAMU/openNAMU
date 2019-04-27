@@ -54,7 +54,7 @@ def topic_admin_2(conn, name, sub, num):
             <h2>''' + load_lang('other_tool') + '''</h2>
             <ul>
                 <li>
-                    <a href="/topic/''' + url_pas(name) + '/sub/' + url_pas(sub) + '/raw/' + str(num) + '''">raw</a>
+                    <a href="/topic/''' + url_pas(name) + '/sub/' + url_pas(sub) + '/raw/' + str(num) + '''">''' + load_lang('raw') + '''</a>
                 </li>
             '''
     ban = '<li>' + load_lang('time') + ' : ' + data[0][2] + '</li>' + ban

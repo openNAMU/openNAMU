@@ -4,7 +4,6 @@ body {
     word-wrap: break-word;
     margin: 0;
     font-family: "나눔고딕", "nanumgothic", "Nanum Gothic", "KoPub Dotum", "Malgun Gothic", "맑은 고딕", "sans-serif";
-    overflow: auto;
 }
 
 ul {
@@ -228,7 +227,6 @@ h6 {
     position: absolute;
     background: white;
     margin-top: 10px;
-    width: 100px;
 }
 
 #top_tool_cel {

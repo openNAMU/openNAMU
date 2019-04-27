@@ -3,8 +3,7 @@
     <head>
         <meta charset="utf-8">
         <title>{{imp[0]}} - {{imp[1][0]}}</title>
-        <link rel="stylesheet" href="/views/main_css/main.css">
-        <script src="/views/main_css/main.js"></script>
+        {{imp[3][3]|safe}}
         <link rel="stylesheet" href="/views/neo_yousoro/css/main.css">
         <script src="/views/neo_yousoro/js/main.js"></script>
         <script src="/views/neo_yousoro/js/skin_set.js"></script>
@@ -15,6 +14,9 @@
         <link rel="shortcut icon" href="/views/main_css/file/favicon.ico">
         {{imp[1][5]|safe}}
         {{imp[2][3]|safe}}
+        <meta name="title" content="{{imp[0]}} - {{imp[1][0]}}">
+        <meta name="keywords" content="{{imp[1][0]}}">
+        <meta name="description" content="{{data|cut_100}}">
         <meta name="viewport" content="width=device-width, initial-scale=1">
     </head>
     <body>
@@ -82,7 +84,7 @@
                         </div>
                         |
                         <form method="post" action="/search" id="search" role="search">
-                            <input id="search_input" name="search" placeholder="검색" autocomplete="off" type="search">
+                            <input id="search_input" name="search" placeholder="{{'search'|load_lang}}" autocomplete="off" type="search">
                             |
                             <button type="submit" formaction="/goto"><i class="fas fa-sign-in-alt"></i></button>
                             |
@@ -99,7 +101,7 @@
             <div id="mobile_menu" class="is_mobile" style="display: none;">
                 <div id="mobile_menu_main">
                     <form method="post" action="/search" id="mobile_search" role="search">
-                        <input id="mobile_search_input" name="search" placeholder="검색" autocomplete="off" type="search">
+                        <input id="mobile_search_input" name="search" placeholder="{{'search'|load_lang}}" autocomplete="off" type="search">
                         <br>
                         <button id="mobile_button_first" type="submit" formaction="/goto"><i class="fas fa-sign-in-alt"></i></button>
                         |
