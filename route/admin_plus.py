@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def admin_plus_2(conn):
+def admin_plus_2(conn, name):
     curs = conn.cursor()
     
     if flask.request.method == 'POST':
@@ -62,24 +62,24 @@ def admin_plus_2(conn):
             state = ''
 
         data += '''
-                    <li><input type="checkbox" ''' + state +  ' name="ban" ' + exist_list[0] + '> ' + load_lang('ban_authority') + '''</li>
-                    <li><input type="checkbox" ''' + state +  ' name="toron" ' + exist_list[2] + '> ' + load_lang('discussion_authority') + '''</li>
-                    <li><input type="checkbox" ''' + state +  ' name="check" ' + exist_list[3] + '> ' + load_lang('user_check_authority') + '''</li>
-                    <li><input type="checkbox" ''' + state +  ' name="acl" ' + exist_list[4] + '> ' + load_lang('document_acl_authority') + '''</li>
-                    <li><input type="checkbox" ''' + state +  ' name="hidel" ' + exist_list[5] + '> ' + load_lang('history_hide_authority') + '''</li>
-                    <li><input type="checkbox" ''' + state +  ' name="give" ' + exist_list[6] + '> ' + load_lang('authorization_authority') + '''</li>
-                    <li><input type="checkbox" ''' + state +  ' name="owner" ' + exist_list[7] + '> ' + load_lang('owner_authority') + '''</li>
-                </ul>
-                '''
+                <li><input type="checkbox" ''' + state +  ' name="ban" ' + exist_list[0] + '> ' + load_lang('ban_authority') + '''</li>
+                <li><input type="checkbox" ''' + state +  ' name="toron" ' + exist_list[2] + '> ' + load_lang('discussion_authority') + '''</li>
+                <li><input type="checkbox" ''' + state +  ' name="check" ' + exist_list[3] + '> ' + load_lang('user_check_authority') + '''</li>
+                <li><input type="checkbox" ''' + state +  ' name="acl" ' + exist_list[4] + '> ' + load_lang('document_acl_authority') + '''</li>
+                <li><input type="checkbox" ''' + state +  ' name="hidel" ' + exist_list[5] + '> ' + load_lang('history_hide_authority') + '''</li>
+                <li><input type="checkbox" ''' + state +  ' name="give" ' + exist_list[6] + '> ' + load_lang('authorization_authority') + '''</li>
+                <li><input type="checkbox" ''' + state +  ' name="owner" ' + exist_list[7] + '> ' + load_lang('owner_authority') + '''</li>
+            </ul>
+        '''
 
         return easy_minify(flask.render_template(skin_check(), 
             imp = [load_lang('admin_group_add'), wiki_set(), custom(), other2([0, 0])],
             data =  '''
-                    <form method="post">
-                        ''' + data + '''
-                        <hr class=\"main_hr\">
-                        <button id="save" ''' + state +  ''' type="submit">''' + load_lang('save') + '''</button>
-                    </form>
-                    ''',
+                <form method="post">
+                    ''' + data + '''
+                    <hr class=\"main_hr\">
+                    <button id="save" ''' + state +  ''' type="submit">''' + load_lang('save') + '''</button>
+                </form>
+            ''',
             menu = [['manager', load_lang('return')]]
         ))     
