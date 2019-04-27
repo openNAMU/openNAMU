@@ -9,7 +9,7 @@ def get_time():
     
 def ip_check(d_type = 0):
     if d_type == 0:
-        if flask.session and ('state' and 'id') in flask.session and flask.session['state'] == 1:
+        if flask.session and ('state' and 'id') in flask.session:
             ip = flask.session['id']
         else:
             try:

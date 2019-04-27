@@ -13,22 +13,22 @@ def edit_2(conn, name):
         else:
             captcha_post('', 0)
 
-        if flask.request.form.get('otent', None) == flask.request.form.get('content', None):
+        if flask.request.form.get('otent', '') == flask.request.form.get('content', ''):
             return redirect('/w/' + url_pas(name))
             
         if edit_filter_do(flask.request.form.get('content', '')) == 1:
             return re_error('/error/21')
 
         today = get_time()
-        content = savemark(flask.request.form.get('content', None))
+        content = savemark(flask.request.form.get('content', ''))
         
         curs.execute("select data from data where title = ?", [name])
         old = curs.fetchall()
         if old:
-            leng = leng_check(len(flask.request.form.get('otent', None)), len(content))
+            leng = leng_check(len(flask.request.form.get('otent', '')), len(content))
             
             if flask.request.args.get('section', None):
-                content = old[0][0].replace(flask.request.form.get('otent', None), content)
+                content = old[0][0].replace(flask.request.form.get('otent', ''), content)
                 
             curs.execute("update data set data = ? where title = ?", [content, name])
         else:
@@ -69,7 +69,7 @@ def edit_2(conn, name):
                 test_data = '\n' + re.sub('\r\n', '\n', new[0][0]) + '\n'   
                 
                 section_data = re.findall('((?:={1,6}) ?(?:(?:(?!={1,6}\n).)+) ?={1,6}\n(?:(?:(?!(?:={1,6}) ?(?:(?:(?!={1,6}\n).)+) ?={1,6}\n).)*\n*)*)', test_data)
-                data = section_data[int(flask.request.args.get('section', None)) - 1]
+                data = section_data[int(flask.request.args.get('section', '1')) - 1]
             else:
                 data = new[0][0]
         else:
@@ -79,37 +79,35 @@ def edit_2(conn, name):
         
         if not flask.request.args.get('section', None):
             get_name =  '''
-                        <a href="/manager/15?plus=''' + url_pas(name) + '">(' + load_lang('load') + ')</a> <a href="/edit_filter">(' + load_lang('edit_filter_rule') + ''')</a>
-                        <hr class=\"main_hr\">
-                        '''
-            action = ''
+                <a href="/manager/15?plus=''' + url_pas(name) + '">(' + load_lang('load') + ')</a> <a href="/edit_filter">(' + load_lang('edit_filter_rule') + ''')</a>
+                <hr class=\"main_hr\">
+            '''
         else:
             get_name = ''
-            action = '?section=' + flask.request.args.get('section', None)
             
         if flask.request.args.get('plus', None):
-            curs.execute("select data from data where title = ?", [flask.request.args.get('plus', None)])
+            curs.execute("select data from data where title = ?", [flask.request.args.get('plus', 'test')])
             get_data = curs.fetchall()
             if get_data:
                 data = get_data[0][0]
                 get_name = ''
 
-        js_data = edit_help_button()
-
         return easy_minify(flask.render_template(skin_check(), 
             imp = [name, wiki_set(), custom(), other2([' (' + load_lang('edit') + ')', 0])],
-            data =  get_name + js_data[0] + '''
-                    <form method="post" action="/edit/''' + url_pas(name) + action + '''">
-                        ''' + js_data[1] + '''
-                        <textarea id="content" rows="25" name="content">''' + html.escape(re.sub('\n$', '', data)) + '''</textarea>
-                        <textarea style="display: none;" name="otent">''' + html.escape(re.sub('\n$', '', data_old)) + '''</textarea>
-                        <hr class=\"main_hr\">
-                        <input placeholder="''' + load_lang('why') + '''" name="send" type="text">
-                        <hr class=\"main_hr\">
-                        ''' + captcha_get() + ip_warring() + '''
-                        <button id="save" type="submit">''' + load_lang('save') + '''</button>
-                        <button id="preview" type="submit" formaction="/preview/''' + url_pas(name) + action + '">' + load_lang('preview') + '''</button>
-                    </form>
-                    ''',
+            data =  get_name + '''
+                <form method="post">
+                    ''' + edit_button() + '''
+                    <textarea id="content" rows="25" id="content" name="content">''' + html.escape(re.sub('\n$', '', data)) + '''</textarea>
+                    <textarea style="display: none;" name="otent">''' + html.escape(re.sub('\n$', '', data_old)) + '''</textarea>
+                    <hr class=\"main_hr\">
+                    <input placeholder="''' + load_lang('why') + '''" name="send" type="text">
+                    <hr class=\"main_hr\">
+                    ''' + captcha_get() + ip_warring() + '''
+                    <button id="save" type="submit">''' + load_lang('save') + '''</button>
+                    <button id="preview" type="button" onclick="do_preview(\'''' + name + '\')">' + load_lang('preview') + '''</button>
+                </form>
+                <hr class=\"main_hr\">
+                <div id="see_preview"></div>
+            ''',
             menu = [['w/' + url_pas(name), load_lang('return')], ['delete/' + url_pas(name), load_lang('delete')], ['move/' + url_pas(name), load_lang('move')]]
         ))

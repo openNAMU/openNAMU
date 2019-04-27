@@ -8,13 +8,15 @@ for i_data in os.listdir("route"):
 
         exec("from route." + f_src + " import *")
 
-r_ver = 'v3.0.9-stable-07'
-c_ver = '400000'
+r_ver = 'v3.1.0-master-06'
+c_ver = '400001'
+s_ver = '2'
 
 print('Version : ' + r_ver)
 
 app_var = json.loads(open('data/app_variables.json', encoding='utf-8').read())
 
+# DB
 all_src = []
 for i_data in os.listdir("."):
     f_src = re.search("(.+)\.db$", i_data)
@@ -68,6 +70,7 @@ class EverythingConverter(werkzeug.routing.PathConverter):
 
 app.jinja_env.filters['md5_replace'] = md5_replace
 app.jinja_env.filters['load_lang'] = load_lang
+app.jinja_env.filters['cut_100'] = cut_100
 
 app.url_map.converters['everything'] = EverythingConverter
 
@@ -145,7 +148,7 @@ if setup_tool != 0:
     create_data['rb'] = ['block', 'end', 'today', 'blocker', 'why', 'band']
     create_data['back'] = ['title', 'link', 'type']
     create_data['custom'] = ['user', 'css']
-    create_data['other'] = ['name', 'data']
+    create_data['other'] = ['name', 'data', 'coverage']
     create_data['alist'] = ['name', 'acl']
     create_data['re_admin'] = ['who', 'what', 'time']
     create_data['alarm'] = ['name', 'data', 'date']
@@ -166,6 +169,7 @@ if setup_tool != 0:
 
     update()
 
+# Init
 curs.execute('select name from alist where acl = "owner"')
 if not curs.fetchall():
     curs.execute('delete from alist where name = "owner"')
@@ -263,6 +267,20 @@ else:
 
 conn.commit()
 
+curs.execute('select data from other where name = "s_ver"')
+ver_set_data = curs.fetchall()
+if not ver_set_data:
+    curs.execute('insert into other (name, data) values ("s_ver", ?)', [s_ver])
+
+    print('Skin update required')
+else:
+    if int(ver_set_data[0][0]) < int(s_ver):
+        curs.execute('delete from other where name = "s_ver"')
+        curs.execute('insert into other (name, data) values ("s_ver", ?)', [s_ver])
+
+        print('Skin update required')
+
+## Func
 @app.route('/del_alarm')
 def del_alarm():
     return del_alarm_2(conn)
@@ -303,7 +321,7 @@ def acl_list():
 
 @app.route('/admin_plus/<name>', methods=['POST', 'GET'])
 def admin_plus(name = None):
-    return admin_plus_2(conn)
+    return admin_plus_2(conn, name)
         
 @app.route('/admin_list')
 def admin_list():
@@ -364,7 +382,7 @@ def block_log(name = None, tool = None):
             
 @app.route('/search', methods=['POST'])
 def search():
-    return redirect('/search/' + url_pas(flask.request.form.get('search', 'test')))
+    return search_2(conn)
 
 @app.route('/goto', methods=['POST'])
 def goto():
@@ -471,10 +489,7 @@ def check_key(tool = 'check_pass_key'):
            
 @app.route('/logout')
 def logout():
-    flask.session['state'] = 0
-    flask.session.pop('id', None)
-
-    return redirect('/user')
+    return logout_2(conn)
     
 @app.route('/ban/<name>', methods=['POST', 'GET'])
 def user_ban(name = None):
@@ -541,9 +556,24 @@ def title_random():
 
 @app.route('/skin_set')
 def skin_set():
-    return re_error('/error/5')
+    data = flask.make_response(re_error('/error/5'))
+
+    curs.execute("select data from other where name = 'language'")
+    main_data = curs.fetchall()
+
+    data.set_cookie('language', main_data[0][0])
+
+    curs.execute('select data from user_set where name = "lang" and id = ?', [ip_check()])
+    user_data = curs.fetchall()
+    if user_data:
+        data.set_cookie('user_language', user_data[0][0])
+    else:
+        data.set_cookie('user_language', main_data[0][0])
+
+    return data
     
-@app.route('/api/w/<everything:name>')
+# API
+@app.route('/api/w/<everything:name>', methods=['POST', 'GET'])
 def api_w(name = ''):
     return api_w_2(conn, name)
     
@@ -551,24 +581,35 @@ def api_w(name = ''):
 def api_raw(name = ''):
     return api_raw_2(conn, name)
 
+@app.route('/api/version')
+def api_version():
+    return api_version_2(conn, r_ver, c_ver)
+
+@app.route('/api/skin_info')
+def api_skin_info():
+    return api_skin_info_2(conn)
+
 @app.route('/api/topic/<everything:name>/sub/<sub>')
 def api_topic_sub(name = '', sub = '', time = ''):
     return api_topic_sub_2(conn, name, sub, time)
     
+## File
+@app.route('/views/easter_egg.html')
+def easter_egg():
+    return easter_egg_2(conn)
+
 @app.route('/views/<everything:name>')
 def views(name = None):
     return views_2(conn, name)
 
 @app.route('/<data>')
 def main_file(data = None):
-    if re.search('\.txt$', data):
-        return flask.send_from_directory('./', data)
-    else:
-        return redirect('/w/' + url_pas(wiki_set(2)))
+    return main_file_2(conn, data)
 
+## End
 @app.errorhandler(404)
 def error_404(e):
-    return redirect('/w/' + url_pas(wiki_set(2)))
+    return error_404_2(conn)
 
 if __name__=="__main__":
     app.secret_key = rep_key

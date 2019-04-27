@@ -63,12 +63,12 @@ def acl_2(conn, name):
             
         return redirect('/acl/' + url_pas(name))            
     else:
-        data = '' + load_lang('document_acl') + '<br><br><select name="dec" ' + check_ok + '>'
+        data = '<h2>' + load_lang('document_acl') + '</h2><hr class=\"main_hr\"><select name="dec" ' + check_ok + '>'
     
         if re.search('^user:', name):
-            acl_list = [['', load_lang('normal')], ['user', load_lang('member')], ['all', load_lang('all')]]
+            acl_list = [['', 'normal'], ['user', 'member'], ['all', 'all']]
         else:
-            acl_list = [['', load_lang('normal')], ['user', load_lang('member')], ['admin', load_lang('admin')]]
+            acl_list = [['', 'normal'], ['user', 'member'], ['admin', 'admin'], ['50_edit', '50 edit']]
         
         curs.execute("select dec from acl where title = ?", [name])
         acl_data = curs.fetchall()
@@ -83,7 +83,7 @@ def acl_2(conn, name):
         data += '</select>'
         
         if not re.search('^user:', name):
-            data += '<hr class=\"main_hr\">' + load_lang('discussion_acl') + '<br><br><select name="dis" ' + check_ok + '>'
+            data += '<hr class=\"main_hr\"><h2>' + load_lang('discussion_acl') + '</h2><hr class=\"main_hr\"><select name="dis" ' + check_ok + '>'
         
             curs.execute("select dis, why, view from acl where title = ?", [name])
             acl_data = curs.fetchall()
@@ -97,7 +97,7 @@ def acl_2(conn, name):
                 
             data += '</select>'
 
-            data += '<hr class=\"main_hr\">' + load_lang('view_acl') + '<br><br><select name="view" ' + check_ok + '>'
+            data += '<hr class=\"main_hr\"><h2>' + load_lang('view_acl') + '</h2><hr class=\"main_hr\"><select name="view" ' + check_ok + '>'
             for data_list in acl_list:
                 if acl_data and acl_data[0][2] == data_list[0]:
                     check = 'selected="selected"'
@@ -106,7 +106,17 @@ def acl_2(conn, name):
                     
                 data += '<option value="' + data_list[0] + '" ' + check + '>' + data_list[1] + '</option>'
                 
-            data += '</select>'
+            data += '''
+                </select>
+                <h2>''' + load_lang('explanation') + '''</h2>
+                <ul>
+                    <li>normal : ''' + load_lang('default') + '''</li>
+                    <li>admin : ''' + load_lang('admin_acl') + '''</li>
+                    <li>member : ''' + load_lang('member_acl') + '''</li>
+                    <li>50 edit : ''' + load_lang('50_edit_acl') + '''</li>
+                    <li>all : ''' + load_lang('all_acl') + '''</li>
+                </ul>
+            '''
                 
             if check_ok == '':
                 if acl_data:

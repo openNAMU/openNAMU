@@ -59,20 +59,21 @@ def change_password_2(conn, server_init):
                 email = ''
 
             div2 = load_skin()
-            
             div3 = ''
-            var_div3 = ''
 
             curs.execute('select data from user_set where name = "lang" and id = ?', [flask.session['id']])
             data = curs.fetchall()
+            if not data:
+                curs.execute('select data from other where name = "language"')
+                data = curs.fetchall()
+                if not data:
+                    data = [['en-US']]
 
             for lang_data in support_language:
                 if data and data[0][0] == lang_data:
-                    div3 = '<option value="' + lang_data + '">' + lang_data + '</option>'
+                    div3 = '<option value="' + lang_data + '">' + lang_data + '</option>' + div3
                 else:
-                    var_div3 += '<option value="' + lang_data + '">' + lang_data + '</option>'
-
-            div3 += var_div3
+                    div3 += '<option value="' + lang_data + '">' + lang_data + '</option>'
 
             oauth_provider = load_oauth('_README')['support']
             oauth_content = '<ul>'
@@ -80,9 +81,9 @@ def change_password_2(conn, server_init):
                 curs.execute('select name, picture from oauth_conn where wiki_id = ? and provider = ?', [flask.session['id'], oauth_provider[i]])
                 oauth_data = curs.fetchall()
                 if len(oauth_data) == 1:
-                    oauth_content += '<li>{} - {}</li>'.format(oauth_provider[i], load_lang('connection') + ' : <img src="{}" width="17px" height="17px">{}'.format(oauth_data[0][1], oauth_data[0][0]))
+                    oauth_content += '<li>{} - {}</li>'.format(oauth_provider[i].capitalize(), load_lang('connection') + ' : <img src="{}" width="17px" height="17px">{}'.format(oauth_data[0][1], oauth_data[0][0]))
                 else:
-                    oauth_content += '<li>{} - {}</li>'.format(oauth_provider[i], load_lang('connection') + ' : <a href="/oauth/{}/init">{}</a>'.format(oauth_provider[i], load_lang('connect')))
+                    oauth_content += '<li>{} - {}</li>'.format(oauth_provider[i].capitalize(), load_lang('connection') + ' : <a href="/oauth/{}/init">{}</a>'.format(oauth_provider[i], load_lang('connect')))
             
             oauth_content += '</ul>'
 
@@ -92,7 +93,7 @@ def change_password_2(conn, server_init):
                 imp = [load_lang('user_setting'), wiki_set(), custom(), other2([0, 0])],
                 data =  '''
                         <form method="post">
-                            <span>id : ''' + ip + '''</span>
+                            <span>''' + load_lang('id') + ''' : ''' + ip + '''</span>
                             <hr class=\"main_hr\">
                             <input placeholder="''' + load_lang('now_password') + '''" name="pw4" type="password">
                             <hr class=\"main_hr\">

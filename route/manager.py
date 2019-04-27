@@ -26,11 +26,11 @@ def manager_2(conn, num):
             data =  '''
                     <h2>''' + load_lang('admin') + '''</h2>
                     <ul>
-                        <li><a href="/manager/2">''' + load_lang('acl_document_list') + '''</a></li>
                         <li><a href="/manager/3">''' + load_lang('check_user') + '''</a></li>
                         <li><a href="/manager/4">''' + load_lang('ban') + '''</a></li>
                         <li><a href="/manager/5">''' + load_lang('authorize') + '''</a></li>
                         <li><a href="/edit_filter">''' + load_lang('edit_filter_list') + '''</a></li>
+                        <li><a href="/give_log">''' + load_lang('admin_group_list') + '''</a></li>
                     </ul>
                     <br>
                     <h2>''' + load_lang('owner') + '''</h2>

@@ -238,10 +238,7 @@ def middle_parser(data, fol_num, syntax_num, folding_num):
                                                         middle_data_2 = ['python']
 
                                                     if syntax_num == 0:
-                                                        plus_data +=    '''
-                                                                        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css">
-                                                                        <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
-                                                                        '''
+                                                        plus_data += '<script>hljs.initHighlightingOnLoad();</script>'
 
                                                         syntax_num = 1
 
@@ -260,8 +257,6 @@ def middle_parser(data, fol_num, syntax_num, folding_num):
                                                             folding_data = ['Test']
 
                                                         if folding_num == 0:
-                                                            plus_data += '<script src="/views/main_css/parser.js"></script>'
-
                                                             folding_num = 1
                                                         
                                                         data = re.sub('{{{#!folding ?((?:(?!\n).)*)\n?', '<div>' + str(folding_data[0]) + ' <div style="display: inline-block;"><a href="javascript:void(0);" onclick="folding(' + str(fol_num) + ');">[do]</a></div_end><div id="folding_' + str(fol_num) + '" style="display: none;"><div id="wiki_div" style="">', data, 1)
@@ -385,6 +380,7 @@ def namu(conn, data, title, main_num):
     backlink = []
     end_data = []
     
+    data = re.sub('<math>(?P<in>(?:(?!<\/math>).)+)<\/math>', '[math(\g<in>)]', data)
     data = html.escape(data)
 
     data = re.sub('\r\n', '\n', data)
@@ -481,19 +477,20 @@ def namu(conn, data, title, main_num):
     while 1:
         math = math_re.search(data)
         if math:
-            if first == 0:
-                plus_data += '''
-                    <link rel="stylesheet" href="/views/main_css/katex/katex.min.css">
-                    <script src="/views/main_css/katex/katex.min.js"></script>
-                '''
-
             math = math.groups()[0]
             
             first += 1
             
             data = math_re.sub('<span id="math_' + str(first) + '"></span>', data, 1)
 
-            plus_data += '<script>katex.render("' + math.replace('\\', '\\\\').replace('&lt;', '<').replace('&gt;', '>') +'", document.getElementById("math_' + str(first) + '"));</script>'
+            plus_data += '''
+                <script>
+                    katex.render(
+                        "''' + math.replace('\\', '\\\\').replace('&lt;', '<').replace('&gt;', '>') + '''",
+                        document.getElementById("math_''' + str(first) + '''")
+                    );
+            </script>
+            '''
         else:
             break
             
@@ -943,7 +940,7 @@ def namu(conn, data, title, main_num):
 
                         footnote_all += [[float(footshort), footshort, 0]]
 
-                        data = re_footnote.sub('<sup><a href="javascript:open_foot(\'fn-' + footshort + '\')" id="rfn-' + footshort + '">(' + footshort + ')</a></sup><span class="foot_plus" id="cfn-' + footshort + '"></span>', data, 1)
+                        data = re_footnote.sub('<sup><a href="javascript:open_foot(\'fn-' + footshort + '\')" id="rfn-' + footshort + '">(' + footnote_name + ')</a></sup><span class="foot_plus" id="cfn-' + footshort + '"></span>', data, 1)
                     else:
                         data = re_footnote.sub('<sup><a href="#">(' + footnote_name + ')</a></sup>', data, 1)
                 else:
