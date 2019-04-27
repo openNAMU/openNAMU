@@ -321,7 +321,7 @@ def acl_list():
 
 @app.route('/admin_plus/<name>', methods=['POST', 'GET'])
 def admin_plus(name = None):
-    return admin_plus_2(conn)
+    return admin_plus_2(conn, name)
         
 @app.route('/admin_list')
 def admin_list():
