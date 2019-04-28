@@ -62,13 +62,13 @@ def user_ban_2(conn, name):
                 plus = ''
 
             data =  '''
-                    <input placeholder="''' + load_lang('second') + '''" name="second" type="text">
-                    <hr class=\"main_hr\">
-                    <input type="checkbox" name="limitless"> ''' + load_lang('limitless') + '''
-                    <hr class=\"main_hr\">
-                    <input placeholder="''' + load_lang('why') + '''" name="why" type="text">
-                    <hr class=\"main_hr\">
-                    ''' + plus
+                <input placeholder="''' + load_lang('second') + '''" name="second" type="text">
+                <hr class=\"main_hr\">
+                <input type="checkbox" name="limitless"> ''' + load_lang('limitless') + '''
+                <hr class=\"main_hr\">
+                <input placeholder="''' + load_lang('why') + '''" name="why" type="text">
+                <hr class=\"main_hr\">
+            ''' + plus
 
         return easy_minify(flask.render_template(skin_check(), 
             imp = [name, wiki_set(), custom(), other2([' (' + now + ')', 0])],

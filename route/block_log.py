@@ -9,23 +9,23 @@ def block_log_2(conn, name, tool):
     else:
         sql_num = 0
     
-    div =   '''
-            <table id="main_table_set">
-                <tbody>
-                    <tr>
-                        <td id="main_table_width">''' + load_lang('blocked') + '''</td>
-                        <td id="main_table_width">''' + load_lang('admin') + '''</td>
-                        <td id="main_table_width">''' + load_lang('period') + '''</td>
-                    </tr>
-            '''
+    div = '''
+        <table id="main_table_set">
+            <tbody>
+                <tr>
+                    <td id="main_table_width">''' + load_lang('blocked') + '''</td>
+                    <td id="main_table_width">''' + load_lang('admin') + '''</td>
+                    <td id="main_table_width">''' + load_lang('period') + '''</td>
+                </tr>
+    '''
     
     data_list = ''
     
     if not name:
-        div =   '''
-                <a href="/manager/11">(''' + load_lang('blocked') + ''')</a> <a href="/manager/12">(''' + load_lang('admin') + ''')</a>
-                <hr class=\"main_hr\">
-                ''' + div
+        div = '''
+            <a href="/manager/11">(''' + load_lang('blocked') + ''')</a> <a href="/manager/12">(''' + load_lang('admin') + ''')</a>
+            <hr class=\"main_hr\">
+        ''' + div
         
         sub = 0
         menu = 0
@@ -62,7 +62,7 @@ def block_log_2(conn, name, tool):
         else:
             end = load_lang('limitless') + ''
             
-        div +=  '''
+        div += '''
             <tr>
                 <td>''' + ip + '''</td>
                 <td>''' + ip_pas(data[2]) + '''</td>
