@@ -33,18 +33,7 @@ def user_log_2(conn):
         list_data += '</li>'
 
     if num == 1:
-        curs.execute("select count(id) from user")
-        user_count = curs.fetchall()
-        if user_count:
-            count = user_count[0][0]
-        else:
-            count = 0
-
         list_data +=    '''
-            </ul>
-            <hr class=\"main_hr\">
-            <ul>
-                <li>all : ''' + str(count) + '''</li>
             </ul>
         '''
 
