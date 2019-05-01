@@ -33,7 +33,7 @@ def user_log_2(conn):
         list_data += '</li>'
 
     if num == 1:
-        list_data +=    '''
+        list_data += '''
             </ul>
         '''
 

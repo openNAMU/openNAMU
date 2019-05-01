@@ -154,6 +154,7 @@
         "encryption_method" : "Encryption method",
         "check_key" : "Check Authentication Key",
         "reset_user_ok" : "Check Success",
+        "name_or_ip_or_regex" : "ID or IP or Regex",
         "_comment_2.1_" : "Filter",
             "_comment_2.1.1_" : "List",
                 "interwiki_list" : "Interwiki(s) list",
