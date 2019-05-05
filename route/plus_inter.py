@@ -19,16 +19,13 @@ def plus_inter_2(conn, tools, name):
             try:
                 re.compile(flask.request.form.get('content', 'test'))
 
-                i = 0
-            except:
-                i = 1
-
-            if i == 0:
                 curs.execute("select name from filter where name = ?", [name])
                 if curs.fetchall():
                     curs.execute("update filter set regex = ?, sub = ? where name = ?", [flask.request.form.get('content', 'test'), end, name])
                 else:
                     curs.execute("insert into filter (name, regex, sub) values (?, ?, ?)", [name, flask.request.form.get('content', 'test'), end])
+            except:
+                return re_error('/error/23')                
         else:
             if tools == 'plus_name_filter':
                 admin_check(None, 'name_filter edit')

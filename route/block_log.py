@@ -20,28 +20,37 @@ def block_log_2(conn, name, tool):
     '''
     
     data_list = ''
+
+    curs.execute("delete from ban where (end < ? and end like '2%')", [get_time()])
+    conn.commit()
     
-    if not name:
-        div = '''
-            <a href="/manager/11">(''' + load_lang('blocked') + ''')</a> <a href="/manager/12">(''' + load_lang('admin') + ''')</a>
-            <hr class=\"main_hr\">
-        ''' + div
-        
-        sub = 0
-        menu = 0
-        
-        curs.execute("select why, block, blocker, end, today from rb order by today desc limit ?, '50'", [str(sql_num)])
+    if not name:        
+        if flask.request.args.get('type', '') == 'ongoing':
+            sub = ' (' + load_lang('in_progress') + ')'
+            menu = [['block_log', load_lang('normal')]]
+
+            curs.execute("select why, block, '', end, '', band from ban where ((end > ? and end like '2%') or end = '') order by end desc limit ?, '50'", [get_time(), str(sql_num)])
+        else:
+            sub = 0
+            menu = 0
+
+            div = '''
+                <a href="/manager/11">(''' + load_lang('blocked') + ''')</a> <a href="/manager/12">(''' + load_lang('admin') + ''')</a> <a href="?type=ongoing">(''' + load_lang('in_progress') + ''')</a>
+                <hr class=\"main_hr\">
+            ''' + div
+            
+            curs.execute("select why, block, blocker, end, today, band from rb order by today desc limit ?, '50'", [str(sql_num)])
     else:
         menu = [['block_log', load_lang('normal')]]
         
         if tool == 'block_user':
             sub = ' (' + load_lang('blocked') + ')'
             
-            curs.execute("select why, block, blocker, end, today from rb where block = ? order by today desc limit ?, '50'", [name, str(sql_num)])
+            curs.execute("select why, block, blocker, end, today, band from rb where block = ? order by today desc limit ?, '50'", [name, str(sql_num)])
         else:
             sub = ' (' + load_lang('admin') + ')'
             
-            curs.execute("select why, block, blocker, end, today from rb where blocker = ? order by today desc limit ?, '50'", [name, str(sql_num)])
+            curs.execute("select why, block, blocker, end, today, band from rb where blocker = ? order by today desc limit ?, '50'", [name, str(sql_num)])
 
     if data_list == '':
         data_list = curs.fetchall()
@@ -51,25 +60,38 @@ def block_log_2(conn, name, tool):
         if why == '':
             why = '<br>'
         
-        band = re.search("^([0-9]{1,3}\.[0-9]{1,3})$", data[1])
-        if band:
+        if data[5] == 'O':
             ip = data[1] + ' (' + load_lang('range') + ')'
+        elif data[5] == 'regex':
+            ip = data[1] + ' (' + load_lang('regex') + ')'
         else:
             ip = ip_pas(data[1])
 
-        if data[3] != '':
-            end = data[3]
+        if data[3] == '':
+            end = load_lang('limitless')
+        elif data[3] == 'release':
+            end = load_lang('release')
         else:
-            end = load_lang('limitless') + ''
+            end = data[3]
+
+        if data[2] == '':
+            admin = ''
+        else:
+            admin = ip_pas(data[2])
+
+        if data[4] == '':
+            start = ''
+        else:
+            start = load_lang('start') + ' : ' + data[4]
             
         div += '''
             <tr>
                 <td>''' + ip + '''</td>
-                <td>''' + ip_pas(data[2]) + '''</td>
+                <td>''' + admin + '''</td>
                 <td>
-                    start : ''' + data[4] + '''
+                    ''' + start + '''
                     <br>
-                    end : ''' + end + '''
+                    ''' + load_lang('end') + ' : ' + end + '''
                 </td>
             </tr>
             <tr>

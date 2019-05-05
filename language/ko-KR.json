@@ -82,6 +82,9 @@
         "explanation" : "설명",
         "default" : "기본값",
         "lastest" : "최신",
+        "type" : "유형",
+        "in_progress" : "진행중",
+        "start" : "시작",
         "_comment_1.1_" : "시간",
             "second" : "초",
             "hour" : "시간",
@@ -155,6 +158,8 @@
         "check_key" : "인증키 검사",
         "reset_user_ok" : "검사 성공",
         "name_or_ip_or_regex" : "ID or IP or 정규식",
+        "ban_period" : "차단 기간",
+        "not_sure" : "확실하지 않음",
         "_comment_2.1_" : "필터",
             "_comment_2.1.1_" : "목록",
                 "interwiki_list" : "인터위키 목록",
@@ -236,6 +241,7 @@
         "user_head_warring" : "비로그인시 브라우저를 닫거나 로그인시 사용자의 <head>는 삭제됩니다.",
         "no_login_warring" : "비로그인 상태입니다. 편집시 지금 접속한 IP 명의로 기록됩니다.",
         "user_reset_sign" : "사용자의 계정 정보가 다음과 같이 변경 되었습니다.",
+        "ban_explanation" : "차단 기간이 정해지지 않으면 무기한 차단 입니다.",
         "_comment_3.1_" : "오류",
             "update_error" : "자동 업데이트가 지원되지 않습니다.",
             "inter_error" : "내부 오류.",
@@ -259,5 +265,6 @@
             "edit_filter_error" : "편집 필터에 의해 금지된 단어가 사용되었습니다.",
             "file_name_error" : "파일 이름에는 알파벳, 한글, 공백, 밑줄 과 빼기 기호만 사용할 수 있습니다.",
             "topic_long_error" : "토론 이름이 256자를 넘지 않아야 합니다.",
-            "email_error" : "이런 이메일을 가진 사용자가 없습니다."
+            "email_error" : "이런 이메일을 가진 사용자가 없습니다.",
+            "regex_error" : "정규표현식에 오류가 있습니다."
 }

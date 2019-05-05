@@ -6,7 +6,6 @@ def manager_2(conn, num):
     title_list = {
         0 : [load_lang('document_name'), 'acl'], 
         1 : [0, 'check'], 
-        2 : [0, 'ban'], 
         3 : [0, 'admin'], 
         4 : [0, 'record'], 
         5 : [0, 'topic_record'], 
@@ -27,7 +26,7 @@ def manager_2(conn, num):
                     <h2>''' + load_lang('admin') + '''</h2>
                     <ul>
                         <li><a href="/manager/3">''' + load_lang('check_user') + '''</a></li>
-                        <li><a href="/manager/4">''' + load_lang('ban') + '''</a></li>
+                        <li><a href="/ban">''' + load_lang('ban') + '''</a></li>
                         <li><a href="/manager/5">''' + load_lang('authorize') + '''</a></li>
                         <li><a href="/edit_filter">''' + load_lang('edit_filter_list') + '''</a></li>
                         <li><a href="/give_log">''' + load_lang('admin_group_list') + '''</a></li>
