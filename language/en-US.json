@@ -82,6 +82,9 @@
         "explanation" : "Explanation",
         "default" : "Default",
         "lastest" : "Lastest",
+        "type" : "Type",
+        "in_progress" : "In progress",
+        "start" : "Start",
         "_comment_1.1_" : "Time",
             "second" : "Second(s)",
             "hour" : "Hour(s)",
@@ -155,6 +158,8 @@
         "check_key" : "Check Authentication Key",
         "reset_user_ok" : "Check Success",
         "name_or_ip_or_regex" : "ID or IP or Regex",
+        "ban_period" : "Period to block",
+        "not_sure" : "Not sure",
         "_comment_2.1_" : "Filter",
             "_comment_2.1.1_" : "List",
                 "interwiki_list" : "Interwiki(s) list",
@@ -236,6 +241,7 @@
         "user_head_warring" : "User[s] <head> will deleted if you close the browser or sign-in",
         "no_login_warring" : "Non-login status. IP is logged when working with non-login.",
         "user_reset_sign" : "Your account information has changed like this.",
+        "ban_explanation" : "If the blockout period is not set, it is an indefinite block.",
         "_comment_3.1_" : "Error",
             "update_error" : "Auto update is not support.",
             "inter_error" : "Internal error.",
@@ -259,5 +265,6 @@
             "edit_filter_error" : "Censored by edit filter.",
             "file_name_error" : "Only alphabet, hangul, space, underscore, and minus signs are allowed for file names.",
             "topic_long_error" : "The discussion name must not exceed 256 characters.",
-            "email_error" : "No one has this email."
+            "email_error" : "No one has this email.",
+            "regex_error" : "There is an error in the regular expression."
 }

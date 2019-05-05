@@ -8,7 +8,7 @@ for i_data in os.listdir("route"):
 
         exec("from route." + f_src + " import *")
 
-r_ver = 'v3.1.0-master-06'
+r_ver = 'v3.1.0-master-07'
 c_ver = '400001'
 s_ver = '2'
 
@@ -491,6 +491,7 @@ def check_key(tool = 'check_pass_key'):
 def logout():
     return logout_2(conn)
     
+@app.route('/ban', methods=['POST', 'GET'])
 @app.route('/ban/<name>', methods=['POST', 'GET'])
 def user_ban(name = None):
     return user_ban_2(conn, name)         
