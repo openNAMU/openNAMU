@@ -85,6 +85,7 @@
         "type" : "Type",
         "in_progress" : "In progress",
         "start" : "Start",
+        "pass" : "Passing",
         "_comment_1.1_" : "Time",
             "second" : "Second(s)",
             "hour" : "Hour(s)",
