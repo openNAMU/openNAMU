@@ -204,6 +204,7 @@
             "_comment_2.2.3_" : "Text",
                 "register_text" : "Terms of sign-up",
                 "non_login_alert" : "Non-login alert",
+                "edit_bottom_text" : "Editing textarea bottom notice",
             "_comment_2.2.4_" : "Google",
                 "recaptcha" : "reCAPTCHA",
                 "google_imap" : "Google IMAP",

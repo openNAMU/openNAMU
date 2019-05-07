@@ -116,32 +116,32 @@ def setting_2(conn, num):
                             <span>''' + load_lang('wiki_name') + '''</span>
                             <br>
                             <br>
-                            <input placeholder="''' + load_lang('wiki_name') + '''" type="text" name="name" value="''' + html.escape(d_list[0]) + '''">
+                            <input type="text" name="name" value="''' + html.escape(d_list[0]) + '''">
                             <hr class=\"main_hr\">
                             <span>''' + load_lang('wiki_logo') + ''' (HTML)</span>
                             <br>
                             <br>
-                            <input placeholder="''' + load_lang('wiki_logo') + '''" type="text" name="logo" value="''' + html.escape(d_list[1]) + '''">
+                            <input type="text" name="logo" value="''' + html.escape(d_list[1]) + '''">
                             <hr class=\"main_hr\">
                             <span>''' + load_lang('main_page') + '''</span>
                             <br>
                             <br>
-                            <input placeholder="''' + load_lang('main_page') + '''" type="text" name="frontpage" value="''' + html.escape(d_list[2]) + '''">
+                            <input type="text" name="frontpage" value="''' + html.escape(d_list[2]) + '''">
                             <hr class=\"main_hr\">
                             <span>''' + load_lang('bottom_text') + ''' (HTML)</span>
                             <br>
                             <br>
-                            <input placeholder="''' + load_lang('bottom_text') + '''" type="text" name="license" value="''' + html.escape(d_list[3]) + '''">
+                            <input type="text" name="license" value="''' + html.escape(d_list[3]) + '''">
                             <hr class=\"main_hr\">
                             <span>''' + load_lang('max_file_size') + ''' [MB]</span>
                             <br>
                             <br>
-                            <input placeholder="''' + load_lang('max_file_size') + '''" type="text" name="upload" value="''' + html.escape(d_list[4]) + '''">
+                            <input type="text" name="upload" value="''' + html.escape(d_list[4]) + '''">
                             <hr class=\"main_hr\">
                             <span>''' + load_lang('backup_interval') + ' [' + load_lang('hour') + '''] (off : 0) {restart}</span>
                             <br>
                             <br>
-                            <input placeholder="''' + load_lang('backup_interval') + '''" type="text" name="back_up" value="''' + html.escape(d_list[9]) + '''">
+                            <input type="text" name="back_up" value="''' + html.escape(d_list[9]) + '''">
                             <hr class=\"main_hr\">
                             <span>''' + load_lang('wiki_skin') + '''</span>
                             <br>
@@ -167,17 +167,17 @@ def setting_2(conn, num):
                             <span>''' + load_lang('wiki_host') + '''</span>
                             <br>
                             <br>
-                            <input placeholder="''' + load_lang('wiki_host') + '''" type="text" name="host" value="''' + html.escape(d_list[16]) + '''">
+                            <input type="text" name="host" value="''' + html.escape(d_list[16]) + '''">
                             <hr class=\"main_hr\">
                             <span>''' + load_lang('wiki_port') + '''</span>
                             <br>
                             <br>
-                            <input placeholder="''' + load_lang('wiki_port') + '''" type="text" name="port" value="''' + html.escape(d_list[10]) + '''">
+                            <input type="text" name="port" value="''' + html.escape(d_list[10]) + '''">
                             <hr class=\"main_hr\">
                             <span>''' + load_lang('wiki_secret_key') + '''</span>
                             <br>
                             <br>
-                            <input placeholder="''' + load_lang('wiki_secret_key') + '''" type="password" name="key" value="''' + html.escape(d_list[11]) + '''">
+                            <input type="password" name="key" value="''' + html.escape(d_list[11]) + '''">
                             <hr class=\"main_hr\">
                             <span>''' + load_lang('update_branch') + '''</span>
                             <br>
@@ -195,17 +195,18 @@ def setting_2(conn, num):
                 menu = [['setting', load_lang('return')]]
             ))
     elif num == 2:
+        i_list = ['contract', 'no_login_warring', 'edit_bottom_text']
         if flask.request.method == 'POST':
-            curs.execute("update other set data = ? where name = ?", [flask.request.form.get('contract', ''), 'contract'])
-            curs.execute("update other set data = ? where name = ?", [flask.request.form.get('no_login_warring', ''), 'no_login_warring'])
+            for i in i_list:
+                curs.execute("update other set data = ? where name = ?", [flask.request.form.get(i, ''), i])
+
             conn.commit()
             
             admin_check(None, 'edit_set')
 
             return redirect('/setting/2')
         else:
-            i_list = ['contract', 'no_login_warring']
-            n_list = ['', '']
+            n_list = ['', '', '']
             d_list = []
             
             x = 0
@@ -231,12 +232,17 @@ def setting_2(conn, num):
                             <span>''' + load_lang('register_text') + '''</span>
                             <br>
                             <br>
-                            <input placeholder="''' + load_lang('register_text') + '''" type="text" name="contract" value="''' + html.escape(d_list[0]) + '''">
+                            <input type="text" name="contract" value="''' + html.escape(d_list[0]) + '''">
                             <hr class=\"main_hr\">
                             <span>''' + load_lang('non_login_alert') + '''</span>
                             <br>
                             <br>
-                            <input placeholder="''' + load_lang('non_login_alert') + '''" type="text" name="no_login_warring" value="''' + html.escape(d_list[1]) + '''">
+                            <input type="text" name="no_login_warring" value="''' + html.escape(d_list[1]) + '''">
+                            <hr class=\"main_hr\">
+                            <span>''' + load_lang('edit_bottom_text') + '''</span>
+                            <br>
+                            <br>
+                            <input type="text" name="edit_bottom_text" value="''' + html.escape(d_list[2]) + '''">
                             <hr class=\"main_hr\">
                             <button id="save" type="submit">''' + load_lang('save') + '''</button>
                         </form>
