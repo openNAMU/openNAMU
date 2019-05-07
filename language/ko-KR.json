@@ -85,6 +85,7 @@
         "type" : "유형",
         "in_progress" : "진행중",
         "start" : "시작",
+        "pass" : "넘기기",
         "_comment_1.1_" : "시간",
             "second" : "초",
             "hour" : "시간",
