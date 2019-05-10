@@ -16,3 +16,16 @@ views/buma
 views/before_namu
 views/acme/
 views/sl-open/
+
+### VirtualEnv ###
+.Python
+[Bb]in
+[Ii]nclude
+[Ll]ib
+[Ll]ib64
+[Ll]ocal
+[Ss]cripts
+tcl
+pyvenv.cfg
+.venv
+pip-selfcheck.json
