@@ -6,6 +6,7 @@ def main_manager_2(conn, num):
     title_list = {
         0 : [load_lang('document_name'), 'acl'], 
         1 : [0, 'check'], 
+        2 : [load_lang('file_name'), 'plus_file_filter'],
         3 : [0, 'admin'], 
         4 : [0, 'record'], 
         5 : [0, 'topic_record'], 
@@ -42,6 +43,7 @@ def main_manager_2(conn, num):
                         <li><a href="/inter_wiki">''' + load_lang('interwiki_list') + '''</a></li>
                         <li><a href="/email_filter">''' + load_lang('email_filter_list') + '''</a></li>
                         <li><a href="/name_filter">''' + load_lang('id_filter_list') + '''</a></li>
+                        <li><a href="/file_filter">''' + load_lang('file_filter_list') + '''</a></li>
                     </ul>
                     <br>
                     <h2>''' + load_lang('server') + '''</h2>

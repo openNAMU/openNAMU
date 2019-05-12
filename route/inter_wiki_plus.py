@@ -6,6 +6,7 @@ def inter_wiki_plus_2(conn, tools, name):
     if flask.request.method == 'POST':
         if tools == 'plus_inter_wiki':
             curs.execute('insert into inter (title, link) values (?, ?)', [flask.request.form.get('title', None), flask.request.form.get('link', None)])
+            
             admin_check(None, 'inter_wiki_plus')
         elif tools == 'plus_edit_filter':
             if admin_check(1, 'edit_filter edit') != 1:
@@ -28,10 +29,26 @@ def inter_wiki_plus_2(conn, tools, name):
                 return re_error('/error/23')                
         else:
             if tools == 'plus_name_filter':
+                try:
+                    re.compile(flask.request.form.get('title', 'test'))
+                except:
+                    return re_error('/error/23') 
+
                 admin_check(None, 'name_filter edit')
+                
                 type_d = 'name'
+            elif tools == 'plus_file_filter':
+                try:
+                    re.compile(flask.request.form.get('title', 'test'))
+                except:
+                    return re_error('/error/23') 
+                
+                admin_check(None, 'file_filter edit')
+                
+                type_d = 'file'
             else:
                 admin_check(None, 'email_filter edit')
+                
                 type_d = 'email'
             
             curs.execute('insert into html_filter (html, kind) values (?, ?)', [flask.request.form.get('title', 'test'), type_d])
@@ -48,10 +65,10 @@ def inter_wiki_plus_2(conn, tools, name):
         if tools == 'plus_inter_wiki':
             title = load_lang('interwiki_add')
             form_data = '''
-                        <input placeholder="''' + load_lang('name') + '''" type="text" name="title">
-                        <hr class=\"main_hr\">
-                        <input placeholder="link" type="text" name="link">
-                        '''
+                <input placeholder="''' + load_lang('name') + '''" type="text" name="title">
+                <hr class=\"main_hr\">
+                <input placeholder="link" type="text" name="link">
+            '''
         elif tools == 'plus_edit_filter':
             curs.execute("select regex, sub from filter where name = ?", [name])
             exist = curs.fetchall()
@@ -71,18 +88,22 @@ def inter_wiki_plus_2(conn, tools, name):
 
             title = load_lang('edit_filter_add')
             form_data = '''
-                        <input placeholder="''' + load_lang('second') + '''" name="second" type="text" value="''' + html.escape(time_data) + '''">
-                        <hr class=\"main_hr\">
-                        <input ''' + stat + ''' type="checkbox" ''' + time_check + ''' name="limitless"> ''' + load_lang('limitless') + '''
-                        <hr class=\"main_hr\">
-                        <input ''' + stat + ''' placeholder="''' + load_lang('regex') + '''" name="content" value="''' + html.escape(textarea) + '''" type="text">
-                        '''
+                <input placeholder="''' + load_lang('second') + '''" name="second" type="text" value="''' + html.escape(time_data) + '''">
+                <hr class=\"main_hr\">
+                <input ''' + stat + ''' type="checkbox" ''' + time_check + ''' name="limitless"> ''' + load_lang('limitless') + '''
+                <hr class=\"main_hr\">
+                <input ''' + stat + ''' placeholder="''' + load_lang('regex') + '''" name="content" value="''' + html.escape(textarea) + '''" type="text">
+            '''
         elif tools == 'plus_name_filter':
             title = load_lang('id_filter_add')
-            form_data = '<input placeholder="' + load_lang('id') + ' ' + load_lang('regex') + '" type="text" name="title">'
+            form_data = '<input placeholder="' + load_lang('regex') + '" type="text" name="title">'
+        elif tools == 'plus_file_filter':
+            title = load_lang('file_filter_add')
+            form_data = '<input placeholder="' + load_lang('regex') + '" type="text" name="title">'
         else:
             title = load_lang('email_filter_add')
             form_data = '<input placeholder="email" type="text" name="title">'
+
 
         return easy_minify(flask.render_template(skin_check(), 
             imp = [title, wiki_set(), custom(), other2([0, 0])],

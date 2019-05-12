@@ -37,6 +37,13 @@ def func_upload_2(conn):
         curs.execute("select title from data where title = ?", ['file:' + name])
         if curs.fetchall():
             return re_error('/error/16')
+
+        curs.execute("select html from html_filter where kind = 'file'")
+        db_data = curs.fetchall()
+        for i in db_data:
+            t_re = re.compile(i[0])
+            if t_re.search(name):
+                return redirect('/file_filter')
             
         ip = ip_check()
 
@@ -54,10 +61,6 @@ def func_upload_2(conn):
             data.save(os.path.join(app_var['path_data_image'], e_data))
         else:
             data.save(os.path.join(app_var['path_data_image'], e_data))
-            
-        curs.execute("select title from data where title = ?", ['file:' + name])
-        if curs.fetchall(): 
-            curs.execute("delete from data where title = ?", ['file:' + name])
         
         curs.execute("insert into data (title, data) values (?, ?)", ['file:' + name, '[[file:' + name + ']][br][br]{{{[[file:' + name + ']]}}}[br][br]' + lice])
         curs.execute("insert into acl (title, dec, dis, why, view) values (?, 'admin', '', '', '')", ['file:' + name])
@@ -77,16 +80,18 @@ def func_upload_2(conn):
         return easy_minify(flask.render_template(skin_check(), 
             imp = [load_lang('upload'), wiki_set(), custom(), other2([0, 0])],
             data =  '''
-                    <form method="post" enctype="multipart/form-data" accept-charset="utf8">
-                        <input type="file" name="f_data">
-                        <hr class=\"main_hr\">
-                        <input placeholder="''' + load_lang('name') + '''" name="f_name" type="text">
-                        <hr class=\"main_hr\">
-                        <input placeholder="''' + load_lang('license') + '''" name="f_lice" type="text">
-                        <hr class=\"main_hr\">
-                        ''' + captcha_get() + '''
-                        <button id="save" type="submit">''' + load_lang('save') + '''</button>
-                    </form>
-                    ''',
+                <a href="/file_filter">(''' + load_lang('file_filter_list') + ''')</a>
+                <hr class=\"main_hr\">
+                <form method="post" enctype="multipart/form-data" accept-charset="utf8">
+                    <input type="file" name="f_data">
+                    <hr class=\"main_hr\">
+                    <input placeholder="''' + load_lang('file_name') + '''" name="f_name" type="text">
+                    <hr class=\"main_hr\">
+                    <input placeholder="''' + load_lang('license') + '''" name="f_lice" type="text">
+                    <hr class=\"main_hr\">
+                    ''' + captcha_get() + '''
+                    <button id="save" type="submit">''' + load_lang('save') + '''</button>
+                </form>
+            ''',
             menu = [['other', load_lang('return')]]
         ))  

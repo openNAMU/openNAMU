@@ -10,6 +10,8 @@ def inter_wiki_del_2(conn, tools, name):
             curs.execute("delete from filter where name = ?", [name])
         elif tools == 'del_name_filter':
             curs.execute("delete from html_filter where html = ? and kind = 'name'", [name])
+        elif tools == 'del_file_filter':
+            curs.execute("delete from html_filter where html = ? and kind = 'file'", [name])
         else:
             curs.execute("delete from html_filter where html = ? and kind = 'email'", [name])
         
