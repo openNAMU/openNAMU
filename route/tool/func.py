@@ -41,13 +41,13 @@ for i in range(0, 2):
     except ImportError as e:
         if i == 0:
             if platform.system() == 'Linux':
-                ok = os.system('python3 -m pip install -r requirements.txt')
+                ok = os.system('python3 -m pip install --user -r requirements.txt')
                 if ok == 0:
                     os.execl(sys.executable, sys.executable, *sys.argv)
                 else:
                     raise
             elif platform.system() == 'Windows':
-                ok = os.system('python -m pip install -r requirements.txt')
+                ok = os.system('python -m pip install --user -r requirements.txt')
                 if ok == 0:
                     os.execl(sys.executable, sys.executable, *sys.argv)
                 else:
