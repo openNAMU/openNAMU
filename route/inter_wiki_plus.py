@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def plus_inter_2(conn, tools, name):
+def inter_wiki_plus_2(conn, tools, name):
     curs = conn.cursor()
     
     if flask.request.method == 'POST':

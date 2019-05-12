@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def del_inter_2(conn, tools, name):
+def inter_wiki_del_2(conn, tools, name):
     curs = conn.cursor()
     
     if admin_check(None, tools) == 1:
