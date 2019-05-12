@@ -295,12 +295,12 @@ def inter_wiki(tools = None):
 
 @app.route('/<regex("del_(?:inter_wiki|(?:edit|email|name)_filter)"):tools>/<name>')
 def del_inter(tools = None, name = None):
-    return del_inter_2(conn, tools, name)
+    return inter_wiki_del_2(conn, tools, name)
 
 @app.route('/<regex("plus_(?:inter_wiki|(?:edit|email|name)_filter)"):tools>', methods=['POST', 'GET'])
 @app.route('/<regex("plus_edit_filter"):tools>/<name>', methods=['POST', 'GET'])
 def plus_inter(tools = None, name = None):
-    return plus_inter_2(conn, tools, name)
+    return inter_wiki_plus_2(conn, tools, name)
 
 @app.route('/setting')
 @app.route('/setting/<int:num>', methods=['POST', 'GET'])
