@@ -114,7 +114,7 @@ def topic_2(conn, name, sub):
                         </tr>
                     </tbody>
                 </table>
-                <br>
+                <hr class=\"main_hr\">
             '''    
 
         for topic_data in topic:
@@ -174,7 +174,7 @@ def topic_2(conn, name, sub):
                         </tr>
                     </tbody>
                 </table>
-                <br>
+                <hr class=\"main_hr\">
             '''
             number += 1
 
@@ -183,10 +183,10 @@ def topic_2(conn, name, sub):
                 <div id="plus"></div>
                 <script>topic_load("''' + name + '''", "''' + sub + '''");</script>
                 <a id="reload" href="javascript:void(0);" onclick="location.href.endsWith(\'#reload\')? location.reload(true):location.href=\'#reload\'">(''' + load_lang('reload') + ''')</a>
-                <form style="''' + display + '''" method="post">
-                <br>
-                <textarea style="height: 100px;" name="content"></textarea>
                 <hr class=\"main_hr\">
+                <form style="''' + display + '''" method="post">
+                    <textarea style="height: 100px;" name="content"></textarea>
+                    <hr class=\"main_hr\">
             ''' + captcha_get()
             
             if display == '':
