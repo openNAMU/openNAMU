@@ -7,6 +7,7 @@ def user_tool_2(conn, name):
         <h2>''' + load_lang('tool') + '''</h2>
         <ul>
             <li><a href="/record/''' + url_pas(name) + '''">''' + load_lang('record') + '''</a></li>
+            <li><a href="/topic/user:''' + url_pas(name) + '''">''' + load_lang('user_discussion') + '''</a></li>
         </ul>
     '''
             

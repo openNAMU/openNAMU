@@ -617,8 +617,9 @@ def custom():
     else:
         user_head = ''
 
-    if 'state' in flask.session and flask.session['state'] == 1:
-        curs.execute('select name from alarm where name = ? limit 1', [ip_check()])
+    ip = ip_check()
+    if ip_or_user(ip) == 0:
+        curs.execute('select name from alarm where name = ? limit 1', [ip])
         if curs.fetchall():
             user_icon = 2
         else:
@@ -627,7 +628,7 @@ def custom():
         user_icon = 0
 
     if user_icon != 0:
-        curs.execute('select data from user_set where name = "email" and id = ?', [ip_check()])
+        curs.execute('select data from user_set where name = "email" and id = ?', [ip])
         data = curs.fetchall()
         if data:
             email = data[0][0]
@@ -637,7 +638,7 @@ def custom():
         email = ''
 
     if user_icon != 0:
-        user_name = ip_check()
+        user_name = ip
     else:
         user_name = load_lang('user')
 
