@@ -247,6 +247,7 @@
         "no_login_warring" : "Non-login status. IP is logged when working with non-login.",
         "user_reset_sign" : "Your account information has changed like this.",
         "ban_explanation" : "If the blockout period is not set, it is an indefinite block.",
+        "update_warring" : "Manual updates are recommended if your version is 0.2 or lower than the latest version.",
         "_comment_3.1_" : "Error",
             "update_error" : "Auto update is not support.",
             "inter_error" : "Internal error.",

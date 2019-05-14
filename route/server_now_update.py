@@ -49,11 +49,13 @@ def server_now_update_2(conn):
     else:
         return easy_minify(flask.render_template(skin_check(), 
             imp = [load_lang('update'), wiki_set(), custom(), other2([0, 0])],
-            data =  '''
-                    <form method="post">
-                        <button type="submit">''' + load_lang('update') + '''</button>
-                    </form>
-                    ''',
+            data = '''
+                ''' + load_lang('update_warring') + '''
+                <hr class=\"main_hr\">
+                <form method="post">
+                    <button type="submit">''' + load_lang('update') + '''</button>
+                </form>
+            ''',
             menu = [['manager', load_lang('return')]]
         ))
 
