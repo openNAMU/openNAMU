@@ -215,15 +215,15 @@ def setting_2(conn, num):
                 imp = [load_lang('text_setting'), wiki_set(), custom(), other2([0, 0])],
                 data =  '''
                         <form method="post">
-                            <span>''' + load_lang('register_text') + '''</span>
+                            <span>''' + load_lang('register_text') + ''' (HTML)</span>
                             <hr class=\"main_hr\">
                             <input type="text" name="contract" value="''' + html.escape(d_list[0]) + '''">
                             <hr class=\"main_hr\">
-                            <span>''' + load_lang('non_login_alert') + '''</span>
+                            <span>''' + load_lang('non_login_alert') + ''' (HTML)</span>
                             <hr class=\"main_hr\">
                             <input type="text" name="no_login_warring" value="''' + html.escape(d_list[1]) + '''">
                             <hr class=\"main_hr\">
-                            <span>''' + load_lang('edit_bottom_text') + '''</span>
+                            <span>''' + load_lang('edit_bottom_text') + ''' (HTML)</span>
                             <hr class=\"main_hr\">
                             <input type="text" name="edit_bottom_text" value="''' + html.escape(d_list[2]) + '''">
                             <hr class=\"main_hr\">
