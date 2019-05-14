@@ -32,7 +32,29 @@ def topic_2(conn, name, sub):
 
         match = re.search('^user:([^/]+)', name)
         if match:
-            curs.execute('insert into alarm (name, data, date) values (?, ?, ?)', [match.groups()[0], ip + ' - <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '">' + load_lang('user_discussion', 1) + '</a>', today])
+            y_check = 0
+            if ip_or_user(match.groups()[0]) == 1:
+                curs.execute("select ip from history where ip = ? limit 1", [match.groups()[0]])
+                u_data = curs.fetchall()
+                if u_data:
+                    y_check = 1
+                else:
+                    curs.execute("select ip from topic where ip = ? limit 1", [match.groups()[0]])
+                    u_data = curs.fetchall()
+                    if u_data:
+                        y_check = 1
+            else:
+                curs.execute("select id from user where id = ?", [match.groups()[0]])
+                u_data = curs.fetchall()
+                if u_data:
+                    y_check = 1
+
+            if y_check == 1:
+                curs.execute('insert into alarm (name, data, date) values (?, ?, ?)', [
+                    match.groups()[0], 
+                    ip + ' - <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '">' + load_lang('user_discussion', 1) + '</a>', 
+                    today
+                ])
         
         cate_re = re.compile('\[\[((?:분류|category):(?:(?:(?!\]\]).)*))\]\]', re.I)
         data = cate_re.sub('[br]', flask.request.form.get('content', 'Test'))
