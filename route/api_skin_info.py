@@ -12,4 +12,4 @@ def api_skin_info_2(conn):
     if json_data:    
         return flask.jsonify(json_data)
     else:
-        return flask.jsonify({})
+        return flask.jsonify({}), 404
