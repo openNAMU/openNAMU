@@ -413,25 +413,24 @@ def next_fix(link, num, page, end = 50):
     return list_data
 
 def other2(data):
+    req_list = ''
+    for i_data in os.listdir(os.path.join("views", "main_css", "css")):
+        req_list += '<link rel="stylesheet" href="/views/main_css/css/' + i_data + '">'
+    
+    for i_data in os.listdir(os.path.join("views", "main_css", "js")):
+        req_list += '<script src="/views/main_css/js/' + i_data + '"></script>'
+
     data += ['', '''
-        <link rel="stylesheet" href="/views/main_css/css/main.css">
-        <link rel="stylesheet" href="/views/main_css/css/oauth.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css">
         <link   rel="stylesheet"
                 href="https://cdn.jsdelivr.net/npm/katex@0.10.1/dist/katex.min.css"
                 integrity="sha384-dbVIfZGuN1Yq7/1Ocstc1lUEm+AT+/rCkibIcC/OmWo5f0EA48Vf8CytHzGrSwbQ"
                 crossorigin="anonymous">
-        <script src="/views/main_css/js/open_foot.js"></script>
-        <script src="/views/main_css/js/folding.js"></script>
-        <script src="/views/main_css/js/topic_load.js"></script>
-        <script src="/views/main_css/js/do_preview.js"></script>
-        <script src="/views/main_css/js/load_ver.js"></script>
-        <script src="/views/main_css/js/insert_data.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/katex@0.10.1/dist/katex.min.js"
                 integrity="sha384-2BKqo+exmr9su6dir+qCw08N2ZKRucY4PrGQPPWU1A7FtlCGjmEGFqXCv5nyM5Ij"
                 crossorigin="anonymous"></script>
         <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
-    ''']
+    ''' + req_list]
 
     return data
 

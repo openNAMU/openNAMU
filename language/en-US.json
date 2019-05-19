@@ -162,6 +162,7 @@
         "name_or_ip_or_regex" : "ID or IP or Regex",
         "ban_period" : "Period to block",
         "not_sure" : "Not sure",
+        "use_push_alarm" : "Enable Push Notification",
         "_comment_2.1_" : "Filter",
             "_comment_2.1.1_" : "List",
                 "interwiki_list" : "Interwiki(s) list",
