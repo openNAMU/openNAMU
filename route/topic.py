@@ -205,7 +205,7 @@ def topic_2(conn, name, sub):
             data += '''
                 <div id="plus"></div>
                 <script>topic_load("''' + name + '''", "''' + sub + '''", "''' + str(number) + '''");</script>
-                <a id="reload" href="javascript:void(0);" onclick="location.href.endsWith(\'#reload\')? location.reload(true):location.href=\'#reload\'">(''' + load_lang('reload') + ''')</a>
+                <a id="reload" href="javascript:void(0);" onclick="reload();">(''' + load_lang('reload') + ''')</a> <a id="reload" href="javascript:void(0);" onclick="req_alarm();">(''' + load_lang('use_push_alarm') + ''')</a>
                 <hr class=\"main_hr\">
                 <form style="''' + display + '''" method="post">
                     <textarea style="height: 100px;" name="content"></textarea>

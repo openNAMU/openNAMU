@@ -12,6 +12,17 @@ function topic_load(name, sub, num) {
                 if(this.responseText) {
                     doc_data.innerHTML += '<hr class="main_hr">(New)<hr class="main_hr">';
 
+                    // https://programmingsummaries.tistory.com/379
+                    var options = {
+                        body: 'New topic'
+                    }
+                   
+                    var notification = new Notification("openNAMU", options);
+                    
+                    setTimeout(function () {
+                        notification.close();
+                    }, 5000);
+
                     clearInterval(test);
                 }
             }
