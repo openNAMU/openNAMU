@@ -32,4 +32,4 @@ def api_topic_sub_2(conn, name, sub, time):
 
         return flask.jsonify(json_data)
     else:
-        return flask.jsonify({})
+        return flask.jsonify({}), 404

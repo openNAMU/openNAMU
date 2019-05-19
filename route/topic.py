@@ -198,12 +198,13 @@ def topic_2(conn, name, sub):
                 </table>
                 <hr class=\"main_hr\">
             '''
+
             number += 1
 
         if ban != 1 or admin == 1:
             data += '''
                 <div id="plus"></div>
-                <script>topic_load("''' + name + '''", "''' + sub + '''");</script>
+                <script>topic_load("''' + name + '''", "''' + sub + '''", "''' + str(number) + '''");</script>
                 <a id="reload" href="javascript:void(0);" onclick="location.href.endsWith(\'#reload\')? location.reload(true):location.href=\'#reload\'">(''' + load_lang('reload') + ''')</a>
                 <hr class=\"main_hr\">
                 <form style="''' + display + '''" method="post">
