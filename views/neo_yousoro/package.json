@@ -1,0 +1,12 @@
+{
+  "name": "neo_yousoro",
+  "version": "1.0.0",
+  "description": "YouSoro 스킨의 공식적인 후속 스킨 입니다. 폴더명을 `neo_yousoro`로 변경한 후 `views` 폴더에 넣어주세요.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

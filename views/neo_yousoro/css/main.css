@@ -50,7 +50,7 @@ li {
 #top {
     width: 100%;
     border-bottom: 2px solid gainsboro;
-    background: skyblue;
+    background: #ffab00;
     padding: 15px;
     padding-right: 0;
     padding-left: 0;
@@ -68,14 +68,15 @@ li {
     background: white;
     border-left: 2px solid gainsboro;
     border-right: 2px solid gainsboro;
-    min-height: 350px;
+    min-height: 1140px;
 }
+
 
 #bottom {
     width: 100%;
     border-top: 2px solid gainsboro;
     background: white;
-    padding-bottom: 20px;
+    /* padding-bottom: 20px; */
 }
 
 #top_main {
