@@ -552,7 +552,7 @@ def namu(conn, data, title, main_num):
     toc_top_stack = 6
     toc_stack = [0, 0, 0, 0, 0, 0]
     edit_number = 0
-    toc_data = '<div id="toc"><span style="font-size: 18px;">toc</span>\n\n'
+    toc_data = '<div id="toc"><span style="font-size: 18px;">목차</span>\n\n'
     while 1:
         toc = re.search('\n(={1,6}) ?((?:(?!\n).)+) ?\n', data)
         if toc:
