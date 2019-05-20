@@ -2,9 +2,6 @@ from .tool.func import *
 
 def alarm_2(conn):
     curs = conn.cursor()
-    
-    if custom()[2] == 0:
-        return redirect('/login')    
 
     data = '<ul>'    
     

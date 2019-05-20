@@ -41,13 +41,13 @@ for i in range(0, 2):
     except ImportError as e:
         if i == 0:
             if platform.system() == 'Linux':
-                ok = os.system('python3 -m pip install -r requirements.txt')
+                ok = os.system('python3 -m pip install --user -r requirements.txt')
                 if ok == 0:
                     os.execl(sys.executable, sys.executable, *sys.argv)
                 else:
                     raise
             elif platform.system() == 'Windows':
-                ok = os.system('python -m pip install -r requirements.txt')
+                ok = os.system('python -m pip install --user -r requirements.txt')
                 if ok == 0:
                     os.execl(sys.executable, sys.executable, *sys.argv)
                 else:
@@ -413,25 +413,24 @@ def next_fix(link, num, page, end = 50):
     return list_data
 
 def other2(data):
+    req_list = ''
+    for i_data in os.listdir(os.path.join("views", "main_css", "css")):
+        req_list += '<link rel="stylesheet" href="/views/main_css/css/' + i_data + '">'
+    
+    for i_data in os.listdir(os.path.join("views", "main_css", "js")):
+        req_list += '<script src="/views/main_css/js/' + i_data + '"></script>'
+
     data += ['', '''
-        <link rel="stylesheet" href="/views/main_css/css/main.css">
-        <link rel="stylesheet" href="/views/main_css/css/oauth.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css">
         <link   rel="stylesheet"
                 href="https://cdn.jsdelivr.net/npm/katex@0.10.1/dist/katex.min.css"
                 integrity="sha384-dbVIfZGuN1Yq7/1Ocstc1lUEm+AT+/rCkibIcC/OmWo5f0EA48Vf8CytHzGrSwbQ"
                 crossorigin="anonymous">
-        <script src="/views/main_css/js/open_foot.js"></script>
-        <script src="/views/main_css/js/folding.js"></script>
-        <script src="/views/main_css/js/topic_load.js"></script>
-        <script src="/views/main_css/js/do_preview.js"></script>
-        <script src="/views/main_css/js/load_ver.js"></script>
-        <script src="/views/main_css/js/insert_data.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/katex@0.10.1/dist/katex.min.js"
                 integrity="sha384-2BKqo+exmr9su6dir+qCw08N2ZKRucY4PrGQPPWU1A7FtlCGjmEGFqXCv5nyM5Ij"
                 crossorigin="anonymous"></script>
         <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
-    ''']
+    ''' + req_list]
 
     return data
 
@@ -617,8 +616,9 @@ def custom():
     else:
         user_head = ''
 
-    if 'state' in flask.session and flask.session['state'] == 1:
-        curs.execute('select name from alarm where name = ? limit 1', [ip_check()])
+    ip = ip_check()
+    if ip_or_user(ip) == 0:
+        curs.execute('select name from alarm where name = ? limit 1', [ip])
         if curs.fetchall():
             user_icon = 2
         else:
@@ -627,7 +627,7 @@ def custom():
         user_icon = 0
 
     if user_icon != 0:
-        curs.execute('select data from user_set where name = "email" and id = ?', [ip_check()])
+        curs.execute('select data from user_set where name = "email" and id = ?', [ip])
         data = curs.fetchall()
         if data:
             email = data[0][0]
@@ -637,7 +637,7 @@ def custom():
         email = ''
 
     if user_icon != 0:
-        user_name = ip_check()
+        user_name = ip
     else:
         user_name = load_lang('user')
 

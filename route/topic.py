@@ -32,7 +32,29 @@ def topic_2(conn, name, sub):
 
         match = re.search('^user:([^/]+)', name)
         if match:
-            curs.execute('insert into alarm (name, data, date) values (?, ?, ?)', [match.groups()[0], ip + ' - <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '">' + load_lang('user_discussion', 1) + '</a>', today])
+            y_check = 0
+            if ip_or_user(match.groups()[0]) == 1:
+                curs.execute("select ip from history where ip = ? limit 1", [match.groups()[0]])
+                u_data = curs.fetchall()
+                if u_data:
+                    y_check = 1
+                else:
+                    curs.execute("select ip from topic where ip = ? limit 1", [match.groups()[0]])
+                    u_data = curs.fetchall()
+                    if u_data:
+                        y_check = 1
+            else:
+                curs.execute("select id from user where id = ?", [match.groups()[0]])
+                u_data = curs.fetchall()
+                if u_data:
+                    y_check = 1
+
+            if y_check == 1:
+                curs.execute('insert into alarm (name, data, date) values (?, ?, ?)', [
+                    match.groups()[0], 
+                    ip + ' - <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '">' + load_lang('user_discussion', 1) + '</a>', 
+                    today
+                ])
         
         cate_re = re.compile('\[\[((?:분류|category):(?:(?:(?!\]\]).)*))\]\]', re.I)
         data = cate_re.sub('[br]', flask.request.form.get('content', 'Test'))
@@ -114,7 +136,7 @@ def topic_2(conn, name, sub):
                         </tr>
                     </tbody>
                 </table>
-                <br>
+                <hr class=\"main_hr\">
             '''    
 
         for topic_data in topic:
@@ -174,19 +196,20 @@ def topic_2(conn, name, sub):
                         </tr>
                     </tbody>
                 </table>
-                <br>
+                <hr class=\"main_hr\">
             '''
+
             number += 1
 
         if ban != 1 or admin == 1:
             data += '''
                 <div id="plus"></div>
-                <script>topic_load("''' + name + '''", "''' + sub + '''");</script>
-                <a id="reload" href="javascript:void(0);" onclick="location.href.endsWith(\'#reload\')? location.reload(true):location.href=\'#reload\'">(''' + load_lang('reload') + ''')</a>
-                <form style="''' + display + '''" method="post">
-                <br>
-                <textarea style="height: 100px;" name="content"></textarea>
+                <script>topic_load("''' + name + '''", "''' + sub + '''", "''' + str(number) + '''");</script>
+                <a id="reload" href="javascript:void(0);" onclick="reload();">(''' + load_lang('reload') + ''')</a> <a id="reload" href="javascript:void(0);" onclick="req_alarm();">(''' + load_lang('use_push_alarm') + ''')</a>
                 <hr class=\"main_hr\">
+                <form style="''' + display + '''" method="post">
+                    <textarea style="height: 100px;" name="content"></textarea>
+                    <hr class=\"main_hr\">
             ''' + captcha_get()
             
             if display == '':

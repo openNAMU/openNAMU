@@ -1,34 +1,31 @@
-function topic_load(name, sub) {
-    function addZero(i) {
-        if(i < 10) {
-            i = "0" + i;
-        }
-        
-        return i;
-    }
+function topic_load(name, sub, num) {
+    var test = setInterval(function() {
+        var url = "/api/topic/" + name + "/sub/" + sub + "?num=" + num;
+        var doc_data = document.getElementById("plus");
 
-    setTimeout(function() {
-        var test = setInterval(function() {
-            var d = new Date();
-            d.setSeconds(d.getSeconds() - 3);
-            
-            var date = d.getFullYear() + '-' + addZero(d.getMonth() + 1) + '-' + addZero(d.getDate());
-            date += ' ' + addZero(d.getHours()) + ':' + addZero(d.getMinutes()) + ':' + addZero(d.getSeconds());
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", url, true);
+        xhr.send(null);
 
-            var url = "/api/topic/" + name + "/sub/" + sub + "?time=" + date;
-            var xhr = new XMLHttpRequest();
-            var doc_data = document.getElementById("plus");
+        xhr.onreadystatechange = function() {
+            if(this.readyState === 4 && this.status === 200) {
+                if(this.responseText) {
+                    doc_data.innerHTML += '<hr class="main_hr">(New)<hr class="main_hr">';
 
-            xhr.open("GET", url, true);
-            xhr.send(null);
-
-            xhr.onreadystatechange = function() {
-                if(this.readyState === 4 && this.status === 200 && this.responseText !== "{}\n") {
-                    doc_data.innerText += '(New)\n\n';
+                    // https://programmingsummaries.tistory.com/379
+                    var options = {
+                        body: 'New topic'
+                    }
+                   
+                    var notification = new Notification("openNAMU", options);
+                    
+                    setTimeout(function () {
+                        notification.close();
+                    }, 5000);
 
                     clearInterval(test);
                 }
             }
-        }, 1000)
-    }, 4000);
+        }
+    }, 2000);
 }

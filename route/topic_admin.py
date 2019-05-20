@@ -12,11 +12,11 @@ def topic_admin_2(conn, name, sub, num):
 
     if admin_check(3) == 1:
         ban +=  '''
-                </ul>
-                <br>
-                <h2>''' + load_lang('admin_tool') + '''</h2>
-                <ul>
-                '''
+            </ul>
+            <br>
+            <h2>''' + load_lang('admin_tool') + '''</h2>
+            <ul>
+        '''
         is_ban = '<li><a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/b/' + str(num) + '">'
 
         if data[0][0] == 'O':

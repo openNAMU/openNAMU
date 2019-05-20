@@ -15,4 +15,4 @@ def api_w_2(conn, name):
         
             return flask.jsonify(json_data)
         else:
-            return flask.jsonify({})
+            return flask.jsonify({}), 404
