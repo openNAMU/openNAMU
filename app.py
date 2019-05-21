@@ -183,7 +183,7 @@ if not os.path.exists('views'):
 
 import route.tool.init as server_init
 
-dislay_set_key = ['Host', 'Port', 'Language', 'Markup', 'Encrypt Method']
+dislay_set_key = ['Host', 'Port', 'Language', 'Markup', 'Encryption method']
 server_set_key = ['host', 'port', 'language', 'markup', 'encode']
 server_set = {}
 
