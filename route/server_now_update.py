@@ -16,9 +16,10 @@ def server_now_update_2(conn):
         else:
             up_data = 'stable'
 
-        if platform.system() == 'Linux':
-            print('Update')
+        print('----')
+        print('Update')
 
+        if platform.system() == 'Linux':
             ok = []
 
             ok += [os.system('git remote rm origin')]
@@ -27,19 +28,19 @@ def server_now_update_2(conn):
             ok += [os.system('git reset --hard origin/' + up_data)]
             if (ok[0] and ok[1] and ok[2] and ok[3]) == 0:
                 return redirect('/restart')
-        else:
-            if platform.system() == 'Windows':
-                print('Update')
+            else:
+                print('Update error')
+        elif platform.system() == 'Windows':
+            urllib.request.urlretrieve('https://github.com/2DU/opennamu/archive/' + up_data + '.zip', 'update.zip')
+            zipfile.ZipFile('update.zip').extractall('')
+            ok = os.system('xcopy /y /r opennamu-' + up_data + ' .')
+            if ok == 0:
+                os.system('rd /s /q opennamu-' + up_data)
+                os.system('del update.zip')
 
-                urllib.request.urlretrieve('https://github.com/2DU/opennamu/archive/' + up_data + '.zip', 'update.zip')
-                zipfile.ZipFile('update.zip').extractall('')
-                ok = os.system('xcopy /y /r opennamu-' + up_data + ' .')
-                if ok == 0:
-                    print('Remove')
-                    os.system('rd /s /q opennamu-' + up_data)
-                    os.system('del update.zip')
-
-                    return redirect('/restart')
+                return redirect('/restart')
+            else:
+                print('Update error')
 
         return easy_minify(flask.render_template(skin_check(), 
             imp = [load_lang('update'), wiki_set(), custom(), other2([0, 0])],
