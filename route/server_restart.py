@@ -9,6 +9,7 @@ def server_restart_2(conn):
     if flask.request.method == 'POST':
         admin_check(None, 'restart')
 
+        print('----')
         print('Restart')
 
         os.execl(sys.executable, sys.executable, *sys.argv)

@@ -53,9 +53,11 @@ for i in range(0, 2):
                 else:
                     raise
             else:
+                print('----')
                 print(e)
                 raise
         else:
+            print('----')
             print(e)
             raise
 
@@ -93,7 +95,8 @@ def send_email(who, title, data):
 
         smtp.quit()
     except:
-        print('Error : Email login error')
+        print('----')
+        print('Error : Email send error')
 
 def last_change(data):
     json_address = re.sub("(((?!\.|\/).)+)\.html$", "set.json", skin_check())

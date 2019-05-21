@@ -217,6 +217,7 @@ try:
 
             curs.execute('insert into other (name, data) values ("robot", "User-agent: *\nDisallow: /\nAllow: /$\nAllow: /w/")')
         
+        print('----')
         print('Engine made robots.txt')
 except:
     pass
@@ -240,6 +241,7 @@ curs.execute('delete from other where name = "ver"')
 curs.execute('insert into other (name, data) values ("ver", ?)', [c_ver])
 
 def back_up():
+    print('----')
     try:
         shutil.copyfile(db_name + '.db', 'back_' + db_name + '.db')
         
@@ -257,6 +259,7 @@ try:
 except:
     back_time = 0
     
+print('----')
 if back_time != 0:
     print('Back up state : ' + str(back_time) + ' hours')
     
