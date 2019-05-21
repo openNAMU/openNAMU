@@ -53,6 +53,8 @@ def server_now_update_2(conn):
             data = '''
                 ''' + load_lang('update_warring') + '''
                 <hr class=\"main_hr\">
+                <a href="https://github.com/2du/openNAMU/blob/master/app.py">(Master)</a> <a href="https://github.com/2du/openNAMU/blob/stable/app.py">(Stable)</a>
+                <hr class=\"main_hr\">
                 <form method="post">
                     <button type="submit">''' + load_lang('update') + '''</button>
                 </form>
