@@ -35,3 +35,4 @@ body { word-break: break-all; overflow: auto; }
 hr.main_hr { border: none; }
 #include_link { display: none; }
 .foot_plus { background: gainsboro; }
+#toc_title { font-size: 18px; }
