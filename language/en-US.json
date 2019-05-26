@@ -163,6 +163,8 @@
         "ban_period" : "Period to block",
         "not_sure" : "Not sure",
         "use_push_alarm" : "Enable Push Notification",
+        "topic_tool" : "Discussion tool",
+        "topic_state" : "Discussion state",
         "_comment_2.1_" : "Filter",
             "_comment_2.1.1_" : "List",
                 "interwiki_list" : "Interwiki(s) list",

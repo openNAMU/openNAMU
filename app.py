@@ -437,6 +437,10 @@ def topic_top(name = None, sub = None, num = 1):
 def topic_stop(name = None, sub = None, tool = None):
     return topic_stop_2(conn, name, sub, tool)
 
+@app.route('/topic/<everything:name>/sub/<sub>/tool')
+def topic_tool(name = None, sub = None):
+    return topic_tool_2(conn, name, sub)
+
 @app.route('/topic/<everything:name>/sub/<sub>/admin/<int:num>')
 def topic_admin(name = None, sub = None, num = 1):
     return topic_admin_2(conn, name, sub, num)
