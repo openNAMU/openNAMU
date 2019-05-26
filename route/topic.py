@@ -191,12 +191,7 @@ def topic_2(conn, name, sub):
                 <form style="''' + display + '''" method="post">
                     <textarea style="height: 100px;" name="content"></textarea>
                     <hr class=\"main_hr\">
-            ''' + captcha_get()
-            
-            if display == '':
-                data += ip_warring()
-
-            data += '''
+                    ''' + captcha_get() + (ip_warring() if display == '' else '') + '''
                     <button type="submit">''' + load_lang('send') + '''</button>
                 </form>
             '''
