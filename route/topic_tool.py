@@ -15,25 +15,25 @@ def topic_tool_2(conn, name, sub):
 
         curs.execute("select title from rd where title = ? and sub = ? and stop = 'O'", [name, sub])
         if curs.fetchall():
-            all_data += load_lang('open')
+            all_data += load_lang('topic_open')
         else:
-            all_data += load_lang('close')
+            all_data += load_lang('topic_close')
         
         all_data += '</a></li><li><a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/stop">'
 
         curs.execute("select title from rd where title = ? and sub = ? and stop = 'S'", [name, sub])
         if curs.fetchall():
-            all_data += load_lang('restart')
+            all_data += load_lang('topic_restart')
         else:
-            all_data += load_lang('stop')
+            all_data += load_lang('topic_stop')
             
         all_data += '</a></li><li><a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/agree">'
         
         curs.execute("select title from rd where title = ? and sub = ? and agree = 'O'", [name, sub])
         if curs.fetchall():
-            all_data += load_lang('destruction')
+            all_data += load_lang('topic_destruction')
         else:
-            all_data += load_lang('agreement')
+            all_data += load_lang('topic_agreement')
         
         all_data += '</a></li></ul>'
 
