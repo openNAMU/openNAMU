@@ -87,25 +87,6 @@ def topic_2(conn, name, sub):
         data = ''
         number = 1
         
-        if admin == 1 and topic_exist:
-            if close_data:
-                all_data += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/close">(' + load_lang('open') + ')</a> '
-            else:
-                all_data += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/close">(' + load_lang('close') + ')</a> '
-            
-            if stop_data:
-                all_data += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/stop">(' + load_lang('restart') + ')</a> '
-            else:
-                all_data += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/stop">(' + load_lang('stop') + ')</a> '
-
-            curs.execute("select title from rd where title = ? and sub = ? and agree = 'O'", [name, sub])
-            if curs.fetchall():
-                all_data += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/agree">(' + load_lang('destruction') + ')</a>'
-            else:
-                all_data += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/agree">(' + load_lang('agreement') + ')</a>'
-            
-            all_data += '<hr class=\"main_hr\">'
-        
         if (close_data or stop_data) and admin != 1:
             display = 'display: none;'
         
@@ -205,7 +186,7 @@ def topic_2(conn, name, sub):
             data += '''
                 <div id="plus"></div>
                 <script>topic_load("''' + name + '''", "''' + sub + '''", "''' + str(number) + '''");</script>
-                <a id="reload" href="javascript:void(0);" onclick="reload();">(''' + load_lang('reload') + ''')</a> <a id="reload" href="javascript:void(0);" onclick="req_alarm();">(''' + load_lang('use_push_alarm') + ''')</a>
+                <a id="reload" href="javascript:void(0);" onclick="reload();">(''' + load_lang('reload') + ''')</a> <a href="/topic/''' + url_pas(name) + '''/sub/''' + url_pas(sub) + '''/tool">(''' + load_lang('topic_tool') + ''')</a>
                 <hr class=\"main_hr\">
                 <form style="''' + display + '''" method="post">
                     <textarea style="height: 100px;" name="content"></textarea>

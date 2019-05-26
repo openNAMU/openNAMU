@@ -163,6 +163,8 @@
         "ban_period" : "차단 기간",
         "not_sure" : "확실하지 않음",
         "use_push_alarm" : "푸쉬 알림 사용",
+        "topic_tool" : "토론 도구",
+        "topic_state" : "토론 상태",
         "_comment_2.1_" : "필터",
             "_comment_2.1.1_" : "목록",
                 "interwiki_list" : "인터위키 목록",
