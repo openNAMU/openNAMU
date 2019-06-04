@@ -19,9 +19,16 @@ function get_post() {
 
     check = document.getElementById('include');
     if(check.checked === true) {
-        document.cookie = 'include_link=true;';
+        document.cookie = 'include_link=1;';
     } else {
-        document.cookie = 'include_link=false;';
+        document.cookie = 'include_link=0;';
+    }
+
+    check = document.getElementById('invert');
+    if(check.checked === true) {
+        document.cookie = 'invert=1;';
+    } else {
+        document.cookie = 'invert=0;';
     }
 
     history.go(0);
@@ -55,9 +62,16 @@ function main_load() {
 
     if(
         cookies.match(regex_data('include_link')) &&
-        cookies.match(regex_data('include_link'))[1] === 'true'
+        cookies.match(regex_data('include_link'))[1] === '1'
     ) {
         head_data.innerHTML += '<style>#include_link { display: inline; }</style>';
+    }
+
+    if(
+        cookies.match(regex_data('invert')) &&
+        cookies.match(regex_data('invert'))[1] === '1'
+    ) {
+        head_data.innerHTML += '<style>body { -webkit-filter: invert(100%); filter: invert(100%); background: black; }</style>';
     }
 }
 
@@ -75,7 +89,8 @@ window.onload = function () {
                 "save" : "Save",
                 "strike" : "Strike",
                 "bold" : "Bold",
-                "other" : "Other"
+                "other" : "Other",
+                "invert" : "Reversal of color"
             }, "ko-KR" : {
                 "default" : "기본값",
                 "change_to_normal" : "일반 텍스트로 변경",
@@ -85,7 +100,8 @@ window.onload = function () {
                 "save" : "저장",
                 "strike" : "취소선",
                 "bold" : "볼드체",
-                "other" : "기타"
+                "other" : "기타",
+                "invert" : "색 반전"
             }
         }
 
@@ -163,9 +179,16 @@ window.onload = function () {
         
         if(
             cookies.match(regex_data('include_link')) &&
-            cookies.match(regex_data('include_link'))[1] === 'true'
+            cookies.match(regex_data('include_link'))[1] === '1'
         ) {
             set_data["include"] = "checked";
+        }
+
+        if(
+            cookies.match(regex_data('invert')) &&
+            cookies.match(regex_data('invert'))[1] === '1'
+        ) {
+            set_data["invert"] = "checked";
         }
 
         data.innerHTML = ' \
@@ -180,6 +203,8 @@ window.onload = function () {
             </select> \
             <h2>' + set_language[language]['other'] + '</h2> \
             <input ' + set_data["include"] + ' type="checkbox" id="include" name="include" value="include"> ' + set_language[language]['include_link'] + ' \
+            <hr class="main_hr"> \
+            <input ' + set_data["invert"] + ' type="checkbox" id="invert" name="invert" value="invert"> ' + set_language[language]['invert'] + ' \
             <hr class="main_hr"> \
             <button onclick="get_post();">' + set_language[language]['save'] + '</button> \
         ';
