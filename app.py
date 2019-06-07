@@ -285,7 +285,7 @@ else:
 
 ## Func
 @app.route('/del_alarm')
-def del_alarm():
+def alarm_del():
     return alarm_del_2(conn)
 
 @app.route('/alarm')
@@ -297,12 +297,12 @@ def inter_wiki(tools = None):
     return inter_wiki_2(conn, tools)
 
 @app.route('/<regex("del_(?:inter_wiki|(?:edit|email|file|name)_filter)"):tools>/<name>')
-def del_inter(tools = None, name = None):
+def inter_wiki_del(tools = None, name = None):
     return inter_wiki_del_2(conn, tools, name)
 
 @app.route('/<regex("plus_(?:inter_wiki|(?:edit|email|file|name)_filter)"):tools>', methods=['POST', 'GET'])
 @app.route('/<regex("plus_edit_filter"):tools>/<name>', methods=['POST', 'GET'])
-def plus_inter(tools = None, name = None):
+def inter_wiki_plus(tools = None, name = None):
     return inter_wiki_plus_2(conn, tools, name)
 
 @app.route('/setting')
@@ -311,63 +311,63 @@ def setting(num = 0):
     return setting_2(conn, num)
 
 @app.route('/not_close_topic')
-def not_close_topic():
+def list_not_close_topic():
     return list_not_close_topic_2(conn)
 
 @app.route('/acl_list')
-def acl_list():
+def list_acl():
     return list_acl_2(conn)
 
 @app.route('/admin_plus/<name>', methods=['POST', 'GET'])
-def admin_plus(name = None):
+def give_admin_groups(name = None):
     return give_admin_groups_2(conn, name)
         
 @app.route('/admin_list')
-def admin_list():
+def list_admin():
     return list_admin_2(conn)
         
 @app.route('/hidden/<everything:name>')
-def history_hidden(name = None):
+def give_history_hidden(name = None):
     return give_history_hidden_2(name)
         
 @app.route('/user_log')
-def user_log():
+def list_user():
     return list_user_2(conn)
 
 @app.route('/admin_log')
-def admin_log():
+def list_admin_use():
     return list_admin_use_2(conn)
 
 @app.route('/give_log')
-def give_log():        
+def list_give():
     return list_give_2(conn)
 
 @app.route('/indexing', methods=['POST', 'GET'])
-def indexing():
+def server_indexing():
     return server_indexing_2(conn)       
 
 @app.route('/restart', methods=['POST', 'GET'])
-def restart():
+def server_restart():
     return server_restart_2(conn)
 
 @app.route('/update', methods=['GET', 'POST'])
-def now_update():
+def server_now_update():
     return server_now_update_2(conn)
 
 @app.route('/oauth_setting', methods=['GET', 'POST'])
-def oauth_setting():
+def setting_oauth():
     return setting_oauth_2(conn)
 
 @app.route('/adsense_setting', methods=['GET', 'POST'])
-def adsense_setting():
+def setting_adsense():
     return setting_adsense_2(conn)
         
 @app.route('/xref/<everything:name>')
-def xref(name = None):
+def view_xref(name = None):
     return view_xref_2(conn, name)
 
 @app.route('/please')
-def please():
+def list_please():
     return list_please_2(conn)
         
 @app.route('/recent_discuss')
@@ -376,7 +376,7 @@ def recent_discuss():
 
 @app.route('/block_log')
 @app.route('/<regex("block_user|block_admin"):tool>/<name>')
-def block_log(name = None, tool = None):
+def list_block(name = None, tool = None):
     return list_block_2(conn, name, tool)
             
 @app.route('/search', methods=['POST'])
@@ -384,20 +384,20 @@ def search():
     return search_2(conn)
 
 @app.route('/goto', methods=['POST'])
-def goto():
+def search_goto():
     return search_goto_2(conn)
 
 @app.route('/search/<everything:name>')
-def deep_search(name = ''):
+def search_deep(name = ''):
     return search_deep_2(conn, name)
          
 @app.route('/raw/<everything:name>')
 @app.route('/topic/<everything:name>/sub/<sub_title>/raw/<int:num>')
-def raw_view(name = None, sub_title = None, num = None):
+def view_raw(name = None, sub_title = None, num = None):
     return view_raw_2(conn, name, sub_title, num)
         
 @app.route('/revert/<everything:name>', methods=['POST', 'GET'])
-def revert(name = None):    
+def edit_revert(name = None):
     return edit_revert_2(conn, name)
 
 @app.route('/edit/<everything:name>', methods=['POST', 'GET'])
@@ -405,24 +405,24 @@ def edit(name = None):
     return edit_2(conn, name)
         
 @app.route('/delete/<everything:name>', methods=['POST', 'GET'])
-def delete(name = None):
+def edit_delete(name = None):
     return edit_delete_2(conn, name, app_var)        
             
 @app.route('/move/<everything:name>', methods=['POST', 'GET'])
-def move(name = None):
+def edit_move(name = None):
     return edit_move_2(conn, name)
 
 @app.route('/other')
-def other():
+def main_other():
     return main_other_2(conn, r_ver)
     
 @app.route('/manager', methods=['POST', 'GET'])
 @app.route('/manager/<int:num>', methods=['POST', 'GET'])
-def manager(num = 1):
+def main_manager(num = 1):
     return main_manager_2(conn, num)
         
 @app.route('/title_index')
-def title_index():
+def list_title_index():
     return list_title_index_2(conn)
                 
 @app.route('/topic/<everything:name>/sub/<sub>/b/<int:num>')
@@ -451,7 +451,7 @@ def topic(name = None, sub = None):
         
 @app.route('/topic/<everything:name>', methods=['POST', 'GET'])
 @app.route('/topic/<everything:name>/<regex("close|agree"):tool>', methods=['GET'])
-def close_topic_list(name = None, tool = None):
+def topic_close_list(name = None, tool = None):
     return topic_close_list_2(conn, name, tool)
 
 @app.route('/tool/<name>')
@@ -467,56 +467,56 @@ def login_oauth(platform = None, func = None):
     return login_oauth_2(conn, platform, func)
                 
 @app.route('/change', methods=['POST', 'GET'])
-def change_password():
+def login_change_password():
     return login_change_password_2(conn, server_init)
 
 @app.route('/check/<name>')
-def user_check(name = None):
+def give_user_check(name = None):
     return give_user_check_2(conn, name)
                 
 @app.route('/register', methods=['POST', 'GET'])
-def register():
+def login_register():
     return login_register_2(conn)
 
 @app.route('/<regex("need_email|pass_find"):tool>', methods=['POST', 'GET'])
-def need_email(tool = 'pass_find'):
+def login_need_email(tool = 'pass_find'):
     return login_need_email_2(conn, tool)
 
 @app.route('/<regex("check_key|check_pass_key"):tool>', methods=['POST', 'GET'])
-def check_key(tool = 'check_pass_key'):
+def login_check_key(tool = 'check_pass_key'):
     return login_check_key_2(conn, tool)
            
 @app.route('/logout')
-def logout():
+def login_logout():
     return login_logout_2(conn)
     
 @app.route('/ban', methods=['POST', 'GET'])
 @app.route('/ban/<name>', methods=['POST', 'GET'])
-def user_ban(name = None):
+def give_user_ban(name = None):
     return give_user_ban_2(conn, name)         
                 
 @app.route('/acl/<everything:name>', methods=['POST', 'GET'])
-def acl(name = None):
+def give_acl(name = None):
     return give_acl_2(conn, name)
             
 @app.route('/admin/<name>', methods=['POST', 'GET'])
-def user_admin(name = None):
+def give_admin(name = None):
     return give_admin_2(conn, name)
     
 @app.route('/diff/<everything:name>')
-def diff_data(name = None):
+def view_diff_data(name = None):
     return view_diff_data_2(conn, name)
         
 @app.route('/down/<everything:name>')
-def down(name = None):
+def view_down(name = None):
     return view_down_2(conn, name)   
 
 @app.route('/w/<everything:name>')
-def read_view(name = None):
+def view_read(name = None):
     return view_read_2(conn, name)
 
 @app.route('/topic_record/<name>')
-def user_topic_list(name = None):
+def list_user_topic(name = None):
     return list_user_topic_2(conn, name)
 
 @app.route('/recent_changes')
@@ -526,7 +526,7 @@ def recent_changes(name = None, tool = 'record'):
     return recent_changes_2(conn, name, tool)
     
 @app.route('/upload', methods=['GET', 'POST'])
-def upload():
+def func_upload():
     return func_upload_2(conn)
         
 @app.route('/user')
@@ -542,24 +542,24 @@ def watch_list_name(name = None):
     return watch_list_name_2(conn, name)
 
 @app.route('/custom_head', methods=['GET', 'POST'])
-def custom_head_view():
+def user_custom_head_view():
     return user_custom_head_view_2(conn)
 
 @app.route('/count')
 @app.route('/count/<name>')
-def count_edit(name = None):
+def user_count_edit(name = None):
     return user_count_edit_2(conn, name)
         
 @app.route('/random')
-def title_random():
+def func_title_random():
     return func_title_random_2(conn)
 
 @app.route('/image/<name>')
-def image_view(name = None):
+def main_image_view(name = None):
     return main_image_view_2(conn, name, app_var)
 
 @app.route('/skin_set')
-def skin_set():
+def main_skin_set():
     return main_skin_set_2(conn)
     
 # API
@@ -585,11 +585,11 @@ def api_topic_sub(name = '', sub = '', time = ''):
     
 ## File
 @app.route('/views/easter_egg.html')
-def easter_egg():
+def main_easter_egg():
     return main_easter_egg_2(conn)
 
 @app.route('/views/<everything:name>')
-def views(name = None):
+def main_views(name = None):
     return main_views_2(conn, name)
 
 @app.route('/<data>')
@@ -598,7 +598,7 @@ def main_file(data = None):
 
 ## End
 @app.errorhandler(404)
-def error_404(e):
+def main_error_404(e):
     return main_error_404_2(conn)
 
 if __name__=="__main__":

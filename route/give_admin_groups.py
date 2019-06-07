@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def give_admin_plus_2(conn, name):
+def give_admin_groups_2(conn, name):
     curs = conn.cursor()
     
     if flask.request.method == 'POST':
