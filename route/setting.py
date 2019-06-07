@@ -114,48 +114,39 @@ def setting_2(conn, num):
                 data =  '''
                         <form method="post">
                             <span>''' + load_lang('wiki_name') + '''</span>
-                            <br>
-                            <br>
-                            <input placeholder="''' + load_lang('wiki_name') + '''" type="text" name="name" value="''' + html.escape(d_list[0]) + '''">
+                            <hr class=\"main_hr\">
+                            <input type="text" name="name" value="''' + html.escape(d_list[0]) + '''">
                             <hr class=\"main_hr\">
                             <span>''' + load_lang('wiki_logo') + ''' (HTML)</span>
-                            <br>
-                            <br>
-                            <input placeholder="''' + load_lang('wiki_logo') + '''" type="text" name="logo" value="''' + html.escape(d_list[1]) + '''">
+                            <hr class=\"main_hr\">
+                            <input type="text" name="logo" value="''' + html.escape(d_list[1]) + '''">
                             <hr class=\"main_hr\">
                             <span>''' + load_lang('main_page') + '''</span>
-                            <br>
-                            <br>
-                            <input placeholder="''' + load_lang('main_page') + '''" type="text" name="frontpage" value="''' + html.escape(d_list[2]) + '''">
+                            <hr class=\"main_hr\">
+                            <input type="text" name="frontpage" value="''' + html.escape(d_list[2]) + '''">
                             <hr class=\"main_hr\">
                             <span>''' + load_lang('bottom_text') + ''' (HTML)</span>
-                            <br>
-                            <br>
-                            <input placeholder="''' + load_lang('bottom_text') + '''" type="text" name="license" value="''' + html.escape(d_list[3]) + '''">
+                            <hr class=\"main_hr\">
+                            <input type="text" name="license" value="''' + html.escape(d_list[3]) + '''">
                             <hr class=\"main_hr\">
                             <span>''' + load_lang('max_file_size') + ''' [MB]</span>
-                            <br>
-                            <br>
-                            <input placeholder="''' + load_lang('max_file_size') + '''" type="text" name="upload" value="''' + html.escape(d_list[4]) + '''">
+                            <hr class=\"main_hr\">
+                            <input type="text" name="upload" value="''' + html.escape(d_list[4]) + '''">
                             <hr class=\"main_hr\">
                             <span>''' + load_lang('backup_interval') + ' [' + load_lang('hour') + '''] (off : 0) {restart}</span>
-                            <br>
-                            <br>
-                            <input placeholder="''' + load_lang('backup_interval') + '''" type="text" name="back_up" value="''' + html.escape(d_list[9]) + '''">
+                            <hr class=\"main_hr\">
+                            <input type="text" name="back_up" value="''' + html.escape(d_list[9]) + '''">
                             <hr class=\"main_hr\">
                             <span>''' + load_lang('wiki_skin') + '''</span>
-                            <br>
-                            <br>
+                            <hr class=\"main_hr\">
                             <select name="skin">''' + div2 + '''</select>
                             <hr class=\"main_hr\">
                             <span>''' + load_lang('default_acl') + '''</span>
-                            <br>
-                            <br>
+                            <hr class=\"main_hr\">
                             <select name="edit">''' + div + '''</select>
                             <hr class=\"main_hr\">
                             <span>''' + load_lang('default_discussion_acl') + '''</span>
-                            <br>
-                            <br>
+                            <hr class=\"main_hr\">
                             <select name="discussion">''' + div4 + '''</select>
                             <hr class=\"main_hr\">
                             <input type="checkbox" name="reg" ''' + ch_1 + '''> ''' + load_lang('no_register') + '''
@@ -165,28 +156,23 @@ def setting_2(conn, num):
                             <input type="checkbox" name="email_have" ''' + ch_3 + '''> ''' + load_lang('email_required') + ''' {<a href="/setting/5">''' + load_lang('google_imap_required') + '''</a>}
                             <hr class=\"main_hr\">
                             <span>''' + load_lang('wiki_host') + '''</span>
-                            <br>
-                            <br>
-                            <input placeholder="''' + load_lang('wiki_host') + '''" type="text" name="host" value="''' + html.escape(d_list[16]) + '''">
+                            <hr class=\"main_hr\">
+                            <input type="text" name="host" value="''' + html.escape(d_list[16]) + '''">
                             <hr class=\"main_hr\">
                             <span>''' + load_lang('wiki_port') + '''</span>
-                            <br>
-                            <br>
-                            <input placeholder="''' + load_lang('wiki_port') + '''" type="text" name="port" value="''' + html.escape(d_list[10]) + '''">
+                            <hr class=\"main_hr\">
+                            <input type="text" name="port" value="''' + html.escape(d_list[10]) + '''">
                             <hr class=\"main_hr\">
                             <span>''' + load_lang('wiki_secret_key') + '''</span>
-                            <br>
-                            <br>
-                            <input placeholder="''' + load_lang('wiki_secret_key') + '''" type="password" name="key" value="''' + html.escape(d_list[11]) + '''">
+                            <hr class=\"main_hr\">
+                            <input type="password" name="key" value="''' + html.escape(d_list[11]) + '''">
                             <hr class=\"main_hr\">
                             <span>''' + load_lang('update_branch') + '''</span>
-                            <br>
-                            <br>
+                            <hr class=\"main_hr\">
                             <select name="update">''' + div3 + '''</select>
                             <hr class=\"main_hr\">
                             <span>''' + load_lang('encryption_method') + '''</span>
-                            <br>
-                            <br>
+                            <hr class=\"main_hr\">
                             <select name="encode">''' + div5 + '''</select>
                             <hr class=\"main_hr\">
                             <button id="save" type="submit">''' + load_lang('save') + '''</button>
@@ -195,17 +181,18 @@ def setting_2(conn, num):
                 menu = [['setting', load_lang('return')]]
             ))
     elif num == 2:
+        i_list = ['contract', 'no_login_warring', 'edit_bottom_text']
         if flask.request.method == 'POST':
-            curs.execute("update other set data = ? where name = ?", [flask.request.form.get('contract', ''), 'contract'])
-            curs.execute("update other set data = ? where name = ?", [flask.request.form.get('no_login_warring', ''), 'no_login_warring'])
+            for i in i_list:
+                curs.execute("update other set data = ? where name = ?", [flask.request.form.get(i, ''), i])
+
             conn.commit()
             
             admin_check(None, 'edit_set')
 
             return redirect('/setting/2')
         else:
-            i_list = ['contract', 'no_login_warring']
-            n_list = ['', '']
+            n_list = ['', '', '']
             d_list = []
             
             x = 0
@@ -228,15 +215,17 @@ def setting_2(conn, num):
                 imp = [load_lang('text_setting'), wiki_set(), custom(), other2([0, 0])],
                 data =  '''
                         <form method="post">
-                            <span>''' + load_lang('register_text') + '''</span>
-                            <br>
-                            <br>
-                            <input placeholder="''' + load_lang('register_text') + '''" type="text" name="contract" value="''' + html.escape(d_list[0]) + '''">
+                            <span>''' + load_lang('register_text') + ''' (HTML)</span>
                             <hr class=\"main_hr\">
-                            <span>''' + load_lang('non_login_alert') + '''</span>
-                            <br>
-                            <br>
-                            <input placeholder="''' + load_lang('non_login_alert') + '''" type="text" name="no_login_warring" value="''' + html.escape(d_list[1]) + '''">
+                            <input type="text" name="contract" value="''' + html.escape(d_list[0]) + '''">
+                            <hr class=\"main_hr\">
+                            <span>''' + load_lang('non_login_alert') + ''' (HTML)</span>
+                            <hr class=\"main_hr\">
+                            <input type="text" name="no_login_warring" value="''' + html.escape(d_list[1]) + '''">
+                            <hr class=\"main_hr\">
+                            <span>''' + load_lang('edit_bottom_text') + ''' (HTML)</span>
+                            <hr class=\"main_hr\">
+                            <input type="text" name="edit_bottom_text" value="''' + html.escape(d_list[2]) + '''">
                             <hr class=\"main_hr\">
                             <button id="save" type="submit">''' + load_lang('save') + '''</button>
                         </form>
@@ -393,24 +382,20 @@ def setting_2(conn, num):
                         <form method="post">
                             <h2><a href="https://www.google.com/recaptcha/admin">recaptcha</a></h2>
                             <span>''' + load_lang('recaptcha') + ''' (HTML)</span>
-                            <br>
-                            <br>
+                            <hr class=\"main_hr\">
                             <input placeholder="''' + load_lang('recaptcha') + ''' (HTML)" type="text" name="recaptcha" value="''' + html.escape(d_list[0]) + '''">
                             <hr class=\"main_hr\">
                             <span>''' + load_lang('recaptcha') + ' (' + load_lang('secret_key') + ''')</span>
-                            <br>
-                            <br>
+                            <hr class=\"main_hr\">
                             <input placeholder="''' + load_lang('recaptcha') + ' (' + load_lang('secret_key') + ''')" type="text" name="sec_re" value="''' + html.escape(d_list[1]) + '''">
                             <hr class=\"main_hr\">
                             <h2><a href="https://support.google.com/mail/answer/7126229">''' + load_lang('google_imap') + '</a> {' + load_lang('restart_required') + '''}</h1>
                             <span>''' + load_lang('google_email') + '''</span>
-                            <br>
-                            <br>
+                            <hr class=\"main_hr\">
                             <input placeholder="''' + load_lang('google_email') + '''" type="text" name="g_email" value="''' + html.escape(d_list[2]) + '''">
                             <hr class=\"main_hr\">
                             <span><a href="https://security.google.com/settings/security/apppasswords">''' + load_lang('google_app_password') + '''</a></span>
-                            <br>
-                            <br>
+                            <hr class=\"main_hr\">
                             <input placeholder="''' + load_lang('google_app_password') + '''" type="password" name="g_pass" value="''' + html.escape(d_list[3]) + '''">
                             <hr class=\"main_hr\">
                             <button id="save" type="submit">''' + load_lang('save') + '''</button>

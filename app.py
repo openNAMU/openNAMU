@@ -8,7 +8,7 @@ for i_data in os.listdir("route"):
 
         exec("from route." + f_src + " import *")
 
-r_ver = 'v3.1.0-master-06'
+r_ver = 'v3.1.0-stable-99'
 c_ver = '400001'
 s_ver = '2'
 
@@ -183,7 +183,7 @@ if not os.path.exists('views'):
 
 import route.tool.init as server_init
 
-dislay_set_key = ['Host', 'Port', 'Language', 'Markup', 'Encrypt Method']
+dislay_set_key = ['Host', 'Port', 'Language', 'Markup', 'Encryption method']
 server_set_key = ['host', 'port', 'language', 'markup', 'encode']
 server_set = {}
 
@@ -217,6 +217,7 @@ try:
 
             curs.execute('insert into other (name, data) values ("robot", "User-agent: *\nDisallow: /\nAllow: /$\nAllow: /w/")')
         
+        print('----')
         print('Engine made robots.txt')
 except:
     pass
@@ -240,6 +241,7 @@ curs.execute('delete from other where name = "ver"')
 curs.execute('insert into other (name, data) values ("ver", ?)', [c_ver])
 
 def back_up():
+    print('----')
     try:
         shutil.copyfile(db_name + '.db', 'back_' + db_name + '.db')
         
@@ -257,6 +259,7 @@ try:
 except:
     back_time = 0
     
+print('----')
 if back_time != 0:
     print('Back up state : ' + str(back_time) + ' hours')
     
@@ -282,25 +285,25 @@ else:
 
 ## Func
 @app.route('/del_alarm')
-def del_alarm():
-    return del_alarm_2(conn)
+def alarm_del():
+    return alarm_del_2(conn)
 
 @app.route('/alarm')
 def alarm():
     return alarm_2(conn)
 
-@app.route('/<regex("inter_wiki|(?:edit|email|name)_filter"):tools>')
+@app.route('/<regex("inter_wiki|(?:edit|email|file|name)_filter"):tools>')
 def inter_wiki(tools = None):
     return inter_wiki_2(conn, tools)
 
-@app.route('/<regex("del_(?:inter_wiki|(?:edit|email|name)_filter)"):tools>/<name>')
-def del_inter(tools = None, name = None):
-    return del_inter_2(conn, tools, name)
+@app.route('/<regex("del_(?:inter_wiki|(?:edit|email|file|name)_filter)"):tools>/<name>')
+def inter_wiki_del(tools = None, name = None):
+    return inter_wiki_del_2(conn, tools, name)
 
-@app.route('/<regex("plus_(?:inter_wiki|(?:edit|email|name)_filter)"):tools>', methods=['POST', 'GET'])
+@app.route('/<regex("plus_(?:inter_wiki|(?:edit|email|file|name)_filter)"):tools>', methods=['POST', 'GET'])
 @app.route('/<regex("plus_edit_filter"):tools>/<name>', methods=['POST', 'GET'])
-def plus_inter(tools = None, name = None):
-    return plus_inter_2(conn, tools, name)
+def inter_wiki_plus(tools = None, name = None):
+    return inter_wiki_plus_2(conn, tools, name)
 
 @app.route('/setting')
 @app.route('/setting/<int:num>', methods=['POST', 'GET'])
@@ -308,68 +311,64 @@ def setting(num = 0):
     return setting_2(conn, num)
 
 @app.route('/not_close_topic')
-def not_close_topic():
-    return not_close_topic_2(conn)
-
-@app.route('/image/<name>')
-def image_view(name = None):
-    return image_view_2(conn, name, app_var)
+def list_not_close_topic():
+    return list_not_close_topic_2(conn)
 
 @app.route('/acl_list')
-def acl_list():
-    return acl_list_2(conn)
+def list_acl():
+    return list_acl_2(conn)
 
 @app.route('/admin_plus/<name>', methods=['POST', 'GET'])
-def admin_plus(name = None):
-    return admin_plus_2(conn, name)
+def give_admin_groups(name = None):
+    return give_admin_groups_2(conn, name)
         
 @app.route('/admin_list')
-def admin_list():
-    return admin_list_2(conn)
+def list_admin():
+    return list_admin_2(conn)
         
 @app.route('/hidden/<everything:name>')
-def history_hidden(name = None):
-    return history_hidden_2(name)
+def give_history_hidden(name = None):
+    return give_history_hidden_2(name)
         
 @app.route('/user_log')
-def user_log():
-    return user_log_2(conn)
+def list_user():
+    return list_user_2(conn)
 
 @app.route('/admin_log')
-def admin_log():
-    return admin_log_2(conn)
+def list_admin_use():
+    return list_admin_use_2(conn)
 
 @app.route('/give_log')
-def give_log():        
-    return give_log_2(conn)
+def list_give():
+    return list_give_2(conn)
 
 @app.route('/indexing', methods=['POST', 'GET'])
-def indexing():
-    return indexing_2(conn)       
+def server_indexing():
+    return server_indexing_2(conn)       
 
 @app.route('/restart', methods=['POST', 'GET'])
-def restart():
-    return restart_2(conn)
+def server_restart():
+    return server_restart_2(conn)
 
 @app.route('/update', methods=['GET', 'POST'])
-def now_update():
-    return now_update_2(conn)
+def server_now_update():
+    return server_now_update_2(conn)
 
 @app.route('/oauth_setting', methods=['GET', 'POST'])
-def oauth_setting():
-    return oauth_setting_2(conn)
+def setting_oauth():
+    return setting_oauth_2(conn)
 
 @app.route('/adsense_setting', methods=['GET', 'POST'])
-def adsense_setting():
-    return adsense_setting_2(conn)
+def setting_adsense():
+    return setting_adsense_2(conn)
         
 @app.route('/xref/<everything:name>')
-def xref(name = None):
-    return xref_2(conn, name)
+def view_xref(name = None):
+    return view_xref_2(conn, name)
 
 @app.route('/please')
-def please():
-    return please_2(conn)
+def list_please():
+    return list_please_2(conn)
         
 @app.route('/recent_discuss')
 def recent_discuss():
@@ -377,58 +376,54 @@ def recent_discuss():
 
 @app.route('/block_log')
 @app.route('/<regex("block_user|block_admin"):tool>/<name>')
-def block_log(name = None, tool = None):
-    return block_log_2(conn, name, tool)
+def list_block(name = None, tool = None):
+    return list_block_2(conn, name, tool)
             
 @app.route('/search', methods=['POST'])
 def search():
     return search_2(conn)
 
 @app.route('/goto', methods=['POST'])
-def goto():
-    return goto_2(conn)
+def search_goto():
+    return search_goto_2(conn)
 
 @app.route('/search/<everything:name>')
-def deep_search(name = ''):
-    return deep_search_2(conn, name)
+def search_deep(name = ''):
+    return search_deep_2(conn, name)
          
 @app.route('/raw/<everything:name>')
 @app.route('/topic/<everything:name>/sub/<sub_title>/raw/<int:num>')
-def raw_view(name = None, sub_title = None, num = None):
-    return raw_view_2(conn, name, sub_title, num)
+def view_raw(name = None, sub_title = None, num = None):
+    return view_raw_2(conn, name, sub_title, num)
         
 @app.route('/revert/<everything:name>', methods=['POST', 'GET'])
-def revert(name = None):    
-    return revert_2(conn, name)
+def edit_revert(name = None):
+    return edit_revert_2(conn, name)
 
 @app.route('/edit/<everything:name>', methods=['POST', 'GET'])
 def edit(name = None):
     return edit_2(conn, name)
-
-@app.route('/preview/<everything:name>', methods=['POST'])
-def preview(name = None):
-    return preview_2(conn, name)
         
 @app.route('/delete/<everything:name>', methods=['POST', 'GET'])
-def delete(name = None):
-    return delete_2(conn, name, app_var)        
+def edit_delete(name = None):
+    return edit_delete_2(conn, name, app_var)        
             
 @app.route('/move/<everything:name>', methods=['POST', 'GET'])
-def move(name = None):
-    return move_2(conn, name)
+def edit_move(name = None):
+    return edit_move_2(conn, name)
 
 @app.route('/other')
-def other():
-    return other_2(conn, r_ver)
+def main_other():
+    return main_other_2(conn, r_ver)
     
 @app.route('/manager', methods=['POST', 'GET'])
 @app.route('/manager/<int:num>', methods=['POST', 'GET'])
-def manager(num = 1):
-    return manager_2(conn, num)
+def main_manager(num = 1):
+    return main_manager_2(conn, num)
         
 @app.route('/title_index')
-def title_index():
-    return title_index_2(conn)
+def list_title_index():
+    return list_title_index_2(conn)
                 
 @app.route('/topic/<everything:name>/sub/<sub>/b/<int:num>')
 def topic_block(name = None, sub = None, num = 1):
@@ -438,9 +433,13 @@ def topic_block(name = None, sub = None, num = 1):
 def topic_top(name = None, sub = None, num = 1):
     return topic_top_2(conn, name, sub, num)
                 
-@app.route('/topic/<everything:name>/sub/<sub>/tool/<regex("close|stop|agree"):tool>')
+@app.route('/topic/<everything:name>/sub/<sub>/tool/<regex("close|stop|agree"):tool>', methods=['POST', 'GET'])
 def topic_stop(name = None, sub = None, tool = None):
     return topic_stop_2(conn, name, sub, tool)
+
+@app.route('/topic/<everything:name>/sub/<sub>/tool')
+def topic_tool(name = None, sub = None):
+    return topic_tool_2(conn, name, sub)
 
 @app.route('/topic/<everything:name>/sub/<sub>/admin/<int:num>')
 def topic_admin(name = None, sub = None, num = 1):
@@ -449,15 +448,15 @@ def topic_admin(name = None, sub = None, num = 1):
 @app.route('/topic/<everything:name>/sub/<sub>', methods=['POST', 'GET'])
 def topic(name = None, sub = None):
     return topic_2(conn, name, sub)
+        
+@app.route('/topic/<everything:name>', methods=['POST', 'GET'])
+@app.route('/topic/<everything:name>/<regex("close|agree"):tool>', methods=['GET'])
+def topic_close_list(name = None, tool = None):
+    return topic_close_list_2(conn, name, tool)
 
 @app.route('/tool/<name>')
 def user_tool(name = None):
     return user_tool_2(conn, name)
-        
-@app.route('/topic/<everything:name>', methods=['POST', 'GET'])
-@app.route('/topic/<everything:name>/<regex("close|agree"):tool>', methods=['GET'])
-def close_topic_list(name = None, tool = None):
-    return close_topic_list_2(conn, name, tool)
             
 @app.route('/login', methods=['POST', 'GET'])
 def login():
@@ -468,56 +467,57 @@ def login_oauth(platform = None, func = None):
     return login_oauth_2(conn, platform, func)
                 
 @app.route('/change', methods=['POST', 'GET'])
-def change_password():
-    return change_password_2(conn, server_init)
+def login_change_password():
+    return login_change_password_2(conn, server_init)
 
 @app.route('/check/<name>')
-def user_check(name = None):
-    return user_check_2(conn, name)
+def give_user_check(name = None):
+    return give_user_check_2(conn, name)
                 
 @app.route('/register', methods=['POST', 'GET'])
-def register():
-    return register_2(conn)
+def login_register():
+    return login_register_2(conn)
 
 @app.route('/<regex("need_email|pass_find"):tool>', methods=['POST', 'GET'])
-def need_email(tool = 'pass_find'):
-    return need_email_2(conn, tool)
+def login_need_email(tool = 'pass_find'):
+    return login_need_email_2(conn, tool)
 
 @app.route('/<regex("check_key|check_pass_key"):tool>', methods=['POST', 'GET'])
-def check_key(tool = 'check_pass_key'):
-    return check_key_2(conn, tool)
+def login_check_key(tool = 'check_pass_key'):
+    return login_check_key_2(conn, tool)
            
 @app.route('/logout')
-def logout():
-    return logout_2(conn)
+def login_logout():
+    return login_logout_2(conn)
     
+@app.route('/ban', methods=['POST', 'GET'])
 @app.route('/ban/<name>', methods=['POST', 'GET'])
-def user_ban(name = None):
-    return user_ban_2(conn, name)         
+def give_user_ban(name = None):
+    return give_user_ban_2(conn, name)         
                 
 @app.route('/acl/<everything:name>', methods=['POST', 'GET'])
-def acl(name = None):
-    return acl_2(conn, name)
+def give_acl(name = None):
+    return give_acl_2(conn, name)
             
 @app.route('/admin/<name>', methods=['POST', 'GET'])
-def user_admin(name = None):
-    return user_admin_2(conn, name)
+def give_admin(name = None):
+    return give_admin_2(conn, name)
     
 @app.route('/diff/<everything:name>')
-def diff_data(name = None):
-    return diff_data_2(conn, name)
+def view_diff_data(name = None):
+    return view_diff_data_2(conn, name)
         
 @app.route('/down/<everything:name>')
-def down(name = None):
-    return down_2(conn, name)   
+def view_down(name = None):
+    return view_down_2(conn, name)   
 
 @app.route('/w/<everything:name>')
-def read_view(name = None):
-    return read_view_2(conn, name)
+def view_read(name = None):
+    return view_read_2(conn, name)
 
 @app.route('/topic_record/<name>')
-def user_topic_list(name = None):
-    return user_topic_list_2(conn, name)
+def list_user_topic(name = None):
+    return list_user_topic_2(conn, name)
 
 @app.route('/recent_changes')
 @app.route('/<regex("record"):tool>/<name>')
@@ -526,8 +526,8 @@ def recent_changes(name = None, tool = 'record'):
     return recent_changes_2(conn, name, tool)
     
 @app.route('/upload', methods=['GET', 'POST'])
-def upload():
-    return upload_2(conn)
+def func_upload():
+    return func_upload_2(conn)
         
 @app.route('/user')
 def user_info():
@@ -542,35 +542,25 @@ def watch_list_name(name = None):
     return watch_list_name_2(conn, name)
 
 @app.route('/custom_head', methods=['GET', 'POST'])
-def custom_head_view():
-    return custom_head_view_2(conn)
+def user_custom_head_view():
+    return user_custom_head_view_2(conn)
 
 @app.route('/count')
 @app.route('/count/<name>')
-def count_edit(name = None):
-    return count_edit_2(conn, name)
+def user_count_edit(name = None):
+    return user_count_edit_2(conn, name)
         
 @app.route('/random')
-def title_random():
-    return title_random_2(conn)
+def func_title_random():
+    return func_title_random_2(conn)
+
+@app.route('/image/<name>')
+def main_image_view(name = None):
+    return main_image_view_2(conn, name, app_var)
 
 @app.route('/skin_set')
-def skin_set():
-    data = flask.make_response(re_error('/error/5'))
-
-    curs.execute("select data from other where name = 'language'")
-    main_data = curs.fetchall()
-
-    data.set_cookie('language', main_data[0][0])
-
-    curs.execute('select data from user_set where name = "lang" and id = ?', [ip_check()])
-    user_data = curs.fetchall()
-    if user_data:
-        data.set_cookie('user_language', user_data[0][0])
-    else:
-        data.set_cookie('user_language', main_data[0][0])
-
-    return data
+def main_skin_set():
+    return main_skin_set_2(conn)
     
 # API
 @app.route('/api/w/<everything:name>', methods=['POST', 'GET'])
@@ -595,12 +585,12 @@ def api_topic_sub(name = '', sub = '', time = ''):
     
 ## File
 @app.route('/views/easter_egg.html')
-def easter_egg():
-    return easter_egg_2(conn)
+def main_easter_egg():
+    return main_easter_egg_2(conn)
 
 @app.route('/views/<everything:name>')
-def views(name = None):
-    return views_2(conn, name)
+def main_views(name = None):
+    return main_views_2(conn, name)
 
 @app.route('/<data>')
 def main_file(data = None):
@@ -608,11 +598,13 @@ def main_file(data = None):
 
 ## End
 @app.errorhandler(404)
-def error_404(e):
-    return error_404_2(conn)
+def main_error_404(e):
+    return main_error_404_2(conn)
 
 if __name__=="__main__":
     app.secret_key = rep_key
+
     http_server = tornado.httpserver.HTTPServer(tornado.wsgi.WSGIContainer(app))
     http_server.listen(server_set['port'], address=server_set['host'])
+    
     tornado.ioloop.IOLoop.instance().start()

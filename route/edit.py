@@ -92,6 +92,13 @@ def edit_2(conn, name):
                 data = get_data[0][0]
                 get_name = ''
 
+        curs.execute('select data from other where name = "edit_bottom_text"')
+        sql_d = curs.fetchall()
+        if sql_d and sql_d[0][0] != '':
+            b_text = '<hr class=\"main_hr\">' + sql_d[0][0]
+        else:
+            b_text = ''
+
         return easy_minify(flask.render_template(skin_check(), 
             imp = [name, wiki_set(), custom(), other2([' (' + load_lang('edit') + ')', 0])],
             data =  get_name + '''
@@ -106,6 +113,7 @@ def edit_2(conn, name):
                     <button id="save" type="submit">''' + load_lang('save') + '''</button>
                     <button id="preview" type="button" onclick="do_preview(\'''' + name + '\')">' + load_lang('preview') + '''</button>
                 </form>
+                ''' + b_text + '''
                 <hr class=\"main_hr\">
                 <div id="see_preview"></div>
             ''',

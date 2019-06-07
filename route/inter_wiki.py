@@ -35,13 +35,20 @@ def inter_wiki_2(conn, tools):
         div = ''
 
         curs.execute("select html from html_filter where kind = 'name'")
-    else:
+    elif tools == 'edit_filter':
         del_link = 'del_edit_filter'
         plus_link = 'manager/9'
         title = load_lang('edit_filter_list')
         div = ''
 
         curs.execute("select name from filter")
+    else:
+        del_link = 'del_file_filter'
+        plus_link = 'plus_file_filter'
+        title = load_lang('file_filter_list')
+        div = ''
+
+        curs.execute("select html from html_filter where kind = 'file'")
 
     db_data = curs.fetchall()
     if db_data:
