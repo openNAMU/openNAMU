@@ -1,11 +1,11 @@
 import os
 
 env_dict = {
-    'host'      : os.getenv('NAMU_HOST'),
-    'port'      : os.getenv('NAMU_PORT'),
-    'language'  : os.getenv('NAMU_LANG'),
-    'markup'    : os.getenv('NAMU_MARKUP'),
-    'encode'    : os.getenv('NAMU_ENCRYPT')
+    'host' : os.getenv('NAMU_HOST'),
+    'port' : os.getenv('NAMU_PORT'),
+    'language' : os.getenv('NAMU_LANG'),
+    'markup' : os.getenv('NAMU_MARKUP'),
+    'encode' : os.getenv('NAMU_ENCRYPT')
 }
 
 server_set_var = {

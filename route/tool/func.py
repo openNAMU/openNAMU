@@ -41,21 +41,23 @@ for i in range(0, 2):
     except ImportError as e:
         if i == 0:
             if platform.system() == 'Linux':
-                ok = os.system('python3 -m pip install -r requirements.txt')
+                ok = os.system('python3 -m pip install --user -r requirements.txt')
                 if ok == 0:
                     os.execl(sys.executable, sys.executable, *sys.argv)
                 else:
                     raise
             elif platform.system() == 'Windows':
-                ok = os.system('python -m pip install -r requirements.txt')
+                ok = os.system('python -m pip install --user -r requirements.txt')
                 if ok == 0:
                     os.execl(sys.executable, sys.executable, *sys.argv)
                 else:
                     raise
             else:
+                print('----')
                 print(e)
                 raise
         else:
+            print('----')
             print(e)
             raise
 
@@ -93,7 +95,8 @@ def send_email(who, title, data):
 
         smtp.quit()
     except:
-        print('Error : Email login error')
+        print('----')
+        print('Error : Email send error')
 
 def last_change(data):
     json_address = re.sub("(((?!\.|\/).)+)\.html$", "set.json", skin_check())
@@ -413,25 +416,24 @@ def next_fix(link, num, page, end = 50):
     return list_data
 
 def other2(data):
+    req_list = ''
+    for i_data in os.listdir(os.path.join("views", "main_css", "css")):
+        req_list += '<link rel="stylesheet" href="/views/main_css/css/' + i_data + '">'
+    
+    for i_data in os.listdir(os.path.join("views", "main_css", "js")):
+        req_list += '<script src="/views/main_css/js/' + i_data + '"></script>'
+
     data += ['', '''
-        <link rel="stylesheet" href="/views/main_css/css/main.css">
-        <link rel="stylesheet" href="/views/main_css/css/oauth.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css">
         <link   rel="stylesheet"
                 href="https://cdn.jsdelivr.net/npm/katex@0.10.1/dist/katex.min.css"
                 integrity="sha384-dbVIfZGuN1Yq7/1Ocstc1lUEm+AT+/rCkibIcC/OmWo5f0EA48Vf8CytHzGrSwbQ"
                 crossorigin="anonymous">
-        <script src="/views/main_css/js/open_foot.js"></script>
-        <script src="/views/main_css/js/folding.js"></script>
-        <script src="/views/main_css/js/topic_load.js"></script>
-        <script src="/views/main_css/js/do_preview.js"></script>
-        <script src="/views/main_css/js/load_ver.js"></script>
-        <script src="/views/main_css/js/insert_data.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/katex@0.10.1/dist/katex.min.js"
                 integrity="sha384-2BKqo+exmr9su6dir+qCw08N2ZKRucY4PrGQPPWU1A7FtlCGjmEGFqXCv5nyM5Ij"
                 crossorigin="anonymous"></script>
         <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
-    ''']
+    ''' + req_list]
 
     return data
 
@@ -617,8 +619,9 @@ def custom():
     else:
         user_head = ''
 
-    if 'state' in flask.session and flask.session['state'] == 1:
-        curs.execute('select name from alarm where name = ? limit 1', [ip_check()])
+    ip = ip_check()
+    if ip_or_user(ip) == 0:
+        curs.execute('select name from alarm where name = ? limit 1', [ip])
         if curs.fetchall():
             user_icon = 2
         else:
@@ -627,7 +630,7 @@ def custom():
         user_icon = 0
 
     if user_icon != 0:
-        curs.execute('select data from user_set where name = "email" and id = ?', [ip_check()])
+        curs.execute('select data from user_set where name = "email" and id = ?', [ip])
         data = curs.fetchall()
         if data:
             email = data[0][0]
@@ -637,7 +640,7 @@ def custom():
         email = ''
 
     if user_icon != 0:
-        user_name = ip_check()
+        user_name = ip
     else:
         user_name = load_lang('user')
 
@@ -828,20 +831,38 @@ def ban_check(ip = None, tool = None):
         band_it = band.groups()[0]
     else:
         band_it = '-'
+
+    curs.execute("delete from ban where (end < ? and end like '2%')", [get_time()])
+    conn.commit()
+
+    curs.execute("select login, block from ban where ((end > ? and end like '2%') or end = '') and band = 'regex'", [get_time()])
+    regex_d = curs.fetchall()
+    for test_r in regex_d:
+        g_regex = re.compile(test_r[1])
+        if g_regex.search(ip):
+            if tool and tool == 'login':
+                if test_r[0] != 'O':
+                    return 1
+            else:
+                return 1
     
-    curs.execute("select end, login from ban where block = ?", [band_it])
+    curs.execute("select login from ban where ((end > ? and end like '2%') or end = '') and block = ? and band = 'O'", [get_time(), band_it])
     band_d = curs.fetchall()
-    
-    curs.execute("select end, login from ban where block = ?", [ip])
+    if band_d:
+        if tool and tool == 'login':
+            if data[0][0] != 'O':
+                return 1
+        else:
+            return 1
+
+    curs.execute("select login from ban where ((end > ? and end like '2%') or end = '') and block = ? and band = ''", [get_time(), ip])
     ban_d = curs.fetchall()
-    
-    data = band_d or ban_d
-    if data and (data[0][0] == '' or data[0][0] > get_time()):
-        if tool and tool == 'login':                    
-            if data[0][1] == 'O':
-                return 0
-                
-        return 1
+    if ban_d:
+        if tool and tool == 'login':
+            if data[0][0] != 'O':
+                return 1
+        else:
+            return 1
 
     return 0
         
@@ -901,25 +922,30 @@ def topic_check(name, sub):
 
     return 0
 
-def ban_insert(name, end, why, login, blocker):
+def ban_insert(name, end, why, login, blocker, type_d = None):
     now_time = get_time()
 
-    if re.search("^([0-9]{1,3}\.[0-9]{1,3})$", name):
-        band = 'O'
+    if type_d:
+        band = type_d
     else:
-        band = ''
+        if re.search("^([0-9]{1,3}\.[0-9]{1,3})$", name):
+            band = 'O'
+        else:
+            band = ''
 
-    curs.execute("select block from ban where block = ?", [name])
+    curs.execute("delete from ban where (end < ? and end like '2%')", [get_time()])
+
+    curs.execute("select block from ban where ((end > ? and end like '2%') or end = '') and block = ? and band = ?", [name, band])
     if curs.fetchall():
         curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, ?)", [
             name, 
-            load_lang('release', 1),
+            'release',
             now_time, 
             blocker, 
             '', 
             band
         ])
-        curs.execute("delete from ban where block = ?", [name])
+        curs.execute("delete from ban where block = ? and band = ?", [name, band])
     else:
         if login != '':
             login = 'O'
@@ -1018,35 +1044,49 @@ def re_error(data):
         end = '<li>' + load_lang('why') + ' : ' + load_lang('authority_error') + '</li>'
 
         if ban_check() == 1:
-            curs.execute("select end, why from ban where block = ?", [ip])
-            end_data = curs.fetchall()
-            if not end_data:
-                match = re.search("^([0-9]{1,3}\.[0-9]{1,3})", ip)
-                if match:
-                    curs.execute("select end, why from ban where block = ?", [match.groups()[0]])
-                    end_data = curs.fetchall()
+            end = '<li>' + load_lang('state') + ' : ' + load_lang('ban') + '</li>'
+            ok_sign = 1
+
+            band = re.search("^([0-9]{1,3}\.[0-9]{1,3})", ip)
+            if band:
+                band_it = band.groups()[0]
+            else:
+                band_it = '-'
+
+            curs.execute("delete from ban where (end < ? and end like '2%')", [get_time()])
+            conn.commit()
+
+            curs.execute("select login, block, end from ban where ((end > ? and end like '2%') or end = '') and band = 'regex'", [get_time()])
+            regex_d = curs.fetchall()
+            for test_r in regex_d:
+                g_regex = re.compile(test_r[1])
+                if g_regex.search(ip):
+                    end += '<li>' + load_lang('type') + ' : regex ban</li>'
+                    end += '<li>' + load_lang('end') + ' : ' + test_r[2] + '</li>'
+                    if test_r[0] != 'O':
+                        end += '<li>' + load_lang('login_able') + ' (' + load_lang('not_sure') + ')</li>'
+
+                    end += '<hr class=\"main_hr\">'
             
-            if end_data:
-                end = '<li>' + load_lang('state') + ' : ' + load_lang('ban') + '</li><li>'
+            curs.execute("select login, end from ban where ((end > ? and end like '2%') or end = '') and block = ?", [get_time(), band_it])
+            band_d = curs.fetchall()
+            if band_d:
+                end += '<li>' + load_lang('type') + ' : band ban</li>'
+                end += '<li>' + load_lang('end') + ' : ' + band_d[0][1] + '</li>'
+                if data[0][0] != 'O':
+                    end += '<li>' + load_lang('login_able') + ' (' + load_lang('not_sure') + ')</li>'
 
-                if end_data[0][0]:
-                    now = int(re.sub('(\-| |:)', '', get_time()))
-                    day = int(re.sub('(\-| |:)', '', end_data[0][0]))
-                    
-                    if now >= day:
-                        curs.execute("delete from ban where block = ?", [ip])
-                        conn.commit()
+                end += '<hr class=\"main_hr\">'
 
-                        end += '<script>location.reload();</script>'
-                    else:
-                        end += 'end : ' + end_data[0][0]
-                else:
-                    end += load_lang('limitless')
-                
-                end += '</li>'
+            curs.execute("select login, end from ban where ((end > ? and end like '2%') or end = '') and block = ?", [get_time(), ip])
+            ban_d = curs.fetchall()
+            if ban_d:
+                end += '<li>' + load_lang('type') + ' : ban</li>'
+                end += '<li>' + load_lang('end') + ' : ' + ban_d[0][1] + '</li>'
+                if data[0][0] != 'O':
+                    end += '<li>' + load_lang('login_able') + ' (' + load_lang('not_sure') + ')</li>'
 
-                if end_data[0][1] != '':
-                    end += '<li>' + load_lang('why') + ' : ' + end_data[0][1] + '</li>'
+                end += '<hr class=\"main_hr\">'
 
         return easy_minify(flask.render_template(skin_check(), 
             imp = [load_lang('error'), wiki_set(1), custom(), other2([0, 0])],
@@ -1097,6 +1137,8 @@ def re_error(data):
                 data = load_lang('edit_filter_error')
             elif num == 22:
                 data = load_lang('file_name_error')
+            elif num == 23:
+                data = load_lang('regex_error')
             else:
                 data = '???'
 

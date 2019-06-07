@@ -32,7 +32,29 @@ def topic_2(conn, name, sub):
 
         match = re.search('^user:([^/]+)', name)
         if match:
-            curs.execute('insert into alarm (name, data, date) values (?, ?, ?)', [match.groups()[0], ip + ' - <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '">' + load_lang('user_discussion', 1) + '</a>', today])
+            y_check = 0
+            if ip_or_user(match.groups()[0]) == 1:
+                curs.execute("select ip from history where ip = ? limit 1", [match.groups()[0]])
+                u_data = curs.fetchall()
+                if u_data:
+                    y_check = 1
+                else:
+                    curs.execute("select ip from topic where ip = ? limit 1", [match.groups()[0]])
+                    u_data = curs.fetchall()
+                    if u_data:
+                        y_check = 1
+            else:
+                curs.execute("select id from user where id = ?", [match.groups()[0]])
+                u_data = curs.fetchall()
+                if u_data:
+                    y_check = 1
+
+            if y_check == 1:
+                curs.execute('insert into alarm (name, data, date) values (?, ?, ?)', [
+                    match.groups()[0], 
+                    ip + ' - <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '">' + load_lang('user_discussion', 1) + '</a>', 
+                    today
+                ])
         
         cate_re = re.compile('\[\[((?:분류|category):(?:(?:(?!\]\]).)*))\]\]', re.I)
         data = cate_re.sub('[br]', flask.request.form.get('content', 'Test'))
@@ -65,25 +87,6 @@ def topic_2(conn, name, sub):
         data = ''
         number = 1
         
-        if admin == 1 and topic_exist:
-            if close_data:
-                all_data += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/close">(' + load_lang('open') + ')</a> '
-            else:
-                all_data += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/close">(' + load_lang('close') + ')</a> '
-            
-            if stop_data:
-                all_data += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/stop">(' + load_lang('restart') + ')</a> '
-            else:
-                all_data += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/stop">(' + load_lang('stop') + ')</a> '
-
-            curs.execute("select title from rd where title = ? and sub = ? and agree = 'O'", [name, sub])
-            if curs.fetchall():
-                all_data += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/agree">(' + load_lang('destruction') + ')</a>'
-            else:
-                all_data += '<a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/agree">(' + load_lang('agreement') + ')</a>'
-            
-            all_data += '<hr class=\"main_hr\">'
-        
         if (close_data or stop_data) and admin != 1:
             display = 'display: none;'
         
@@ -114,7 +117,7 @@ def topic_2(conn, name, sub):
                         </tr>
                     </tbody>
                 </table>
-                <br>
+                <hr class=\"main_hr\">
             '''    
 
         for topic_data in topic:
@@ -174,25 +177,21 @@ def topic_2(conn, name, sub):
                         </tr>
                     </tbody>
                 </table>
-                <br>
+                <hr class=\"main_hr\">
             '''
+
             number += 1
 
         if ban != 1 or admin == 1:
             data += '''
                 <div id="plus"></div>
-                <script>topic_load("''' + name + '''", "''' + sub + '''");</script>
-                <a id="reload" href="javascript:void(0);" onclick="location.href.endsWith(\'#reload\')? location.reload(true):location.href=\'#reload\'">(''' + load_lang('reload') + ''')</a>
-                <form style="''' + display + '''" method="post">
-                <br>
-                <textarea style="height: 100px;" name="content"></textarea>
+                <script>topic_load("''' + name + '''", "''' + sub + '''", "''' + str(number) + '''");</script>
+                <a id="reload" href="javascript:void(0);" onclick="reload();">(''' + load_lang('reload') + ''')</a> <a href="/topic/''' + url_pas(name) + '''/sub/''' + url_pas(sub) + '''/tool">(''' + load_lang('topic_tool') + ''')</a>
                 <hr class=\"main_hr\">
-            ''' + captcha_get()
-            
-            if display == '':
-                data += ip_warring()
-
-            data += '''
+                <form style="''' + display + '''" method="post">
+                    <textarea style="height: 100px;" name="content"></textarea>
+                    <hr class=\"main_hr\">
+                    ''' + captcha_get() + (ip_warring() if display == '' else '') + '''
                     <button type="submit">''' + load_lang('send') + '''</button>
                 </form>
             '''
