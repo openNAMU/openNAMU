@@ -314,10 +314,11 @@ def load_lang(data, num = 2, safe = 0):
         lang = json.loads(json_data)
 
         if data in lang:
+            t_data = re.sub('\[s\]', '\'s', lang[data])
             if safe == 1:
-                return lang[data]
+                return t_data
             else:
-                return html.escape(lang[data])
+                return html.escape(t_data)
         else:
             return html.escape(data + ' (M)')
     else:
@@ -331,10 +332,11 @@ def load_lang(data, num = 2, safe = 0):
                 return load_lang(data, 1, safe)
 
             if data in lang:
+                t_data = re.sub('\[s\]', '\'s', lang[data])
                 if safe == 1:
-                    return lang[data]
+                    return t_data
                 else:
-                    return html.escape(lang[data])
+                    return html.escape(t_data)
             else:
                 return load_lang(data, 1, safe)
         else:
@@ -587,20 +589,16 @@ def admin_check(num = None, what = None):
 def ip_pas(raw_ip):
     hide = 0
 
-    if re.search("(\.|:)", raw_ip):
-        if not re.search("^tool:", raw_ip):    
-            curs.execute("select data from other where name = 'ip_view'")
-            data = curs.fetchall()
-            if data and data[0][0] != '':
-                ip = '<span style="font-size: 75%;">' + hashlib.md5(bytes(raw_ip, 'utf-8')).hexdigest() + '</span>'
+    if re.search("(\.|:)", raw_ip):    
+        curs.execute("select data from other where name = 'ip_view'")
+        data = curs.fetchall()
+        if data and data[0][0] != '':
+            ip = '<span style="font-size: 75%;">' + hashlib.md5(bytes(raw_ip, 'utf-8')).hexdigest() + '</span>'
 
-                if not admin_check(1):
-                    hide = 1
-            else:
-                ip = raw_ip
+            if not admin_check(1):
+                hide = 1
         else:
             ip = raw_ip
-            hide = 1
     else:
         curs.execute("select title from data where title = ?", ['user:' + raw_ip])
         if curs.fetchall():
@@ -1023,9 +1021,9 @@ def edit_filter_do(data):
                 ban_insert(
                     ip_check(), 
                     '0' if data_list[1] == 'X' else data_list[1], 
-                    load_lang('edit', 1) + ' ' + load_lang('filter', 1), 
+                    'edit filter', 
                     None, 
-                    load_lang('tool', 1) + ':' + load_lang('edit', 1) + ' ' + load_lang('filter', 1)
+                    'tool:edit filter'
                 )
                 
                 return 1
