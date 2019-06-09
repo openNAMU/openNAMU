@@ -328,7 +328,7 @@ def list_admin():
         
 @app.route('/hidden/<everything:name>')
 def give_history_hidden(name = None):
-    return give_history_hidden_2(name)
+    return give_history_hidden_2(conn, name)
         
 @app.route('/user_log')
 def list_user():
