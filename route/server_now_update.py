@@ -18,7 +18,7 @@ def server_now_update_2(conn):
 
         print('----')
         print('Update')
-
+        print('----')
         if platform.system() == 'Linux':
             ok = []
 
@@ -31,9 +31,10 @@ def server_now_update_2(conn):
             else:
                 print('Update error')
         elif platform.system() == 'Windows':
+            os.system('rd /s /q route')
             urllib.request.urlretrieve('https://github.com/2DU/opennamu/archive/' + up_data + '.zip', 'update.zip')
             zipfile.ZipFile('update.zip').extractall('')
-            ok = os.system('xcopy /y /r opennamu-' + up_data + ' .')
+            ok = os.system('xcopy /y /s /r opennamu-' + up_data + ' .')
             if ok == 0:
                 os.system('rd /s /q opennamu-' + up_data)
                 os.system('del update.zip')
