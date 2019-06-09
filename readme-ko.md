@@ -53,5 +53,4 @@ openNAMU 프로젝트는 [BSD 3-Clause License](./LICENSE)(이하 이용허락)�
  * Other chat rooms
 
 ## 기타
- * [테스트 서버](http://namu.ml/)
  * 첫 가입자에게 소유자 권한이 부여됩니다.
