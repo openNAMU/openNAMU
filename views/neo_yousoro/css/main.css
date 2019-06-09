@@ -312,7 +312,7 @@ pre {
 textarea {
     border: 2px solid gainsboro;
     font-family: '나눔고딕', 'nanumgothic', "Nanum Gothic","KoPub Dotum","Malgun Gothic","맑은 고딕",sans-serif;
-    padding: 5px;
+    padding: 0;
 }
 
 input {
