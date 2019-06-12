@@ -41,11 +41,12 @@ def login_change_password_2(conn, server_init):
             auto_list = ['email', 'skin', 'lang']
 
             for auto_data in auto_list:
-                curs.execute('select data from user_set where name = ? and id = ?', [auto_data, ip])
-                if curs.fetchall():
-                    curs.execute("update user_set set data = ? where name = ? and id = ?", [flask.request.form.get(auto_data, ''), auto_data, ip])
-                else:
-                    curs.execute("insert into user_set (name, id, data) values (?, ?, ?)", [auto_data, ip, flask.request.form.get(auto_data, '')])
+                if flask.request.form.get(auto_data, '') != '':
+                    curs.execute('select data from user_set where name = ? and id = ?', [auto_data, ip])
+                    if curs.fetchall():
+                        curs.execute("update user_set set data = ? where name = ? and id = ?", [flask.request.form.get(auto_data, ''), auto_data, ip])
+                    else:
+                        curs.execute("insert into user_set (name, id, data) values (?, ?, ?)", [auto_data, ip, flask.request.form.get(auto_data, '')])
 
             conn.commit()
             
