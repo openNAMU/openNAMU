@@ -31,7 +31,7 @@ def setting_2(conn, num):
         ))
     elif num == 1:
         i_list = ['name', 'logo', 'frontpage', 'license', 'upload', 'skin', 'edit', 'reg', 'ip_view', 'back_up', 'port', 'key', 'update', 'email_have', 'discussion', 'encode', 'host']
-        n_list = ['wiki', '', 'FrontPage', 'CC 0', '2', '', 'normal', '', '', '0', '3000', 'test', 'stable', '', 'normal', 'sha256', '0.0.0.0']
+        n_list = ['Wiki', '', 'FrontPage', 'CC 0', '2', '', 'normal', '', '', '0', '3000', 'test', 'stable', '', 'normal', 'sha256', '0.0.0.0']
         
         if flask.request.method == 'POST':
             i = 0
