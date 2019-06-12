@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def setting_adsense_setting_2(conn):
+def setting_adsense_2(conn):
     curs = conn.cursor()
 
     if admin_check(None, 'adsense setting') != 1:

@@ -933,7 +933,7 @@ def ban_insert(name, end, why, login, blocker, type_d = None):
 
     curs.execute("delete from ban where (end < ? and end like '2%')", [get_time()])
 
-    curs.execute("select block from ban where ((end > ? and end like '2%') or end = '') and block = ? and band = ?", [name, band])
+    curs.execute("select block from ban where ((end > ? and end like '2%') or end = '') and block = ? and band = ?", [get_time(), name, band])
     if curs.fetchall():
         curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, ?)", [
             name, 

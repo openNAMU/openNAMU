@@ -83,5 +83,4 @@ openNAMU is protected by [BSD 3-Clause License](./LICNESE). Please refer to the 
  * Other chat rooms
 
 # Etc.
- * [Test Server](http://namu.ml/)
  * Owner rights are granted to the first registor.
