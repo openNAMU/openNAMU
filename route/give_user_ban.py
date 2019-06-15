@@ -69,6 +69,8 @@ def give_user_ban_2(conn, name):
                 data += '</ul><hr class=\"main_hr\">'
         else:
             if name:
+                main_name = name
+                
                 if name and re.search("^([0-9]{1,3}\.[0-9]{1,3})$", name):
                     b_now = load_lang('band_ban')
                 else:
@@ -84,14 +86,29 @@ def give_user_ban_2(conn, name):
                 name += '<hr class=\"main_hr\">'
                 regex = ''
             else:
+                main_name = load_lang('ban')
                 name = '<input placeholder="' + load_lang('name_or_ip_or_regex') + '" name="name" type="text"><hr class=\"main_hr\">'
                 regex = '<input type="checkbox" name="regex"> ' + load_lang('regex') + '<hr class=\"main_hr\">'
                 plus = '<input type="checkbox" name="login"> ' + load_lang('login_able') + '<hr class=\"main_hr\">'
                 now = 0
                 b_now = load_lang('ban')
+                
+            time_data = [
+                ['604800', '7 days'],
+                ['2592000', '30 days'],
+                ['31536000', '365 days'],
+                ['157680000', '5 years'],
+                ['0', 'No end']
+            ]
+            insert_data = ''
+            for i in time_data:
+                insert_data += '<a href="javascript:insert_v(\'second\', \'' + i[0] + '\')">(' + i[1] + ')</a> '
+            # 언어 적용 필요
 
             data = name + '''
-                <input placeholder="''' + load_lang('ban_period') + ''' (''' + load_lang('second') + ''')" name="second" type="text">
+                <script>function insert_v(name, data) { document.getElementById(name).value = data; }</script>''' + insert_data + '''                
+                <hr class=\"main_hr\">
+                <input placeholder="''' + load_lang('ban_period') + ''' (''' + load_lang('second') + ''')" name="second" id="second" type="text">
                 <hr class=\"main_hr\">
                 ''' + regex + '''
                 <input placeholder="''' + load_lang('why') + '''" name="why" type="text">
@@ -99,7 +116,7 @@ def give_user_ban_2(conn, name):
             ''' + plus
 
         return easy_minify(flask.render_template(skin_check(), 
-            imp = [load_lang('ban'), wiki_set(), custom(), other2([now, 0])],
+            imp = [main_name, wiki_set(), custom(), other2([now, 0])],
             data = '''
                 <form method="post">
                     ''' + data + '''
