@@ -94,11 +94,12 @@ def give_user_ban_2(conn, name):
                 b_now = load_lang('ban')
                 
             time_data = [
-                ['604800', '7 days'],
-                ['2592000', '30 days'],
-                ['31536000', '365 days'],
-                ['157680000', '5 years'],
-                ['0', 'No end']
+                ['86400', load_lang('1_day')],
+                ['432000‬', load_lang('5_day')],
+                ['2592000', load_lang('30_day')],
+                ['15552000', load_lang('180_day')],
+                ['31104000‬', load_lang('360_day')],
+                ['0', load_lang('limitless')]
             ]
             insert_data = ''
             for i in time_data:
@@ -122,10 +123,6 @@ def give_user_ban_2(conn, name):
                     ''' + data + '''
                     <button type="submit">''' + b_now + '''</button>
                 </form>
-                <h2>''' + load_lang('explanation') + '''</h2>
-                <ul>
-                    <li>''' + load_lang('ban_explanation') + '''</li>
-                </ul>
             ''',
             menu = [['manager', load_lang('return')]]
         ))   
