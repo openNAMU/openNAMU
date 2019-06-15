@@ -8,9 +8,11 @@ for i_data in os.listdir("route"):
 
         exec("from route." + f_src + " import *")
 
-r_ver = 'v3.1.0-stable-04'
-c_ver = '400001'
-s_ver = '2'
+version_list = json.loads(open('version.json', encoding='utf-8').read())
+
+r_ver = version_list['master']['r_ver']
+c_ver = version_list['master']['c_ver']
+s_ver = version_list['master']['s_ver']
 
 print('Version : ' + r_ver)
 
