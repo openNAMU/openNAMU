@@ -52,7 +52,9 @@ def give_user_ban_2(conn, name):
         curs.execute("select end, why from ban where block = ?", [name])
         end = curs.fetchall()
         if end:
-            now = load_lang('release')
+            main_name = name
+            b_now = load_lang('release')
+            now = '(' + b_now + ')'
 
             if end[0][0] == '':
                 data = '<ul><li>' + load_lang('limitless') + '</li>'
