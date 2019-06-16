@@ -6,17 +6,12 @@ def api_version_2(conn, r_ver, c_ver):
     n_ver = ''
     data = None
 
-    try:
-        if flask.request.host != 'namu.ml':
-            data = urllib.request.urlopen('https://namu.ml/api/version')
-    except:
-        pass
-
+    data = urllib.request.urlopen('https://raw.githubusercontent.com/2du/openNAMU/master/version.json')
     if data and data.getcode() == 200:
         try:
             json_data = json.loads(data.read().decode())
-            if 'version' in json_data:
-                n_ver = json_data['version']
+            if 'master' in json_data:
+                n_ver = json_data['master']['r_ver']
         except:
             pass
         

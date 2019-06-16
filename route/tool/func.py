@@ -314,11 +314,10 @@ def load_lang(data, num = 2, safe = 0):
         lang = json.loads(json_data)
 
         if data in lang:
-            t_data = re.sub('\[s\]', '\'s', lang[data])
             if safe == 1:
-                return t_data
+                return lang[data]
             else:
-                return html.escape(t_data)
+                return html.escape(lang[data])
         else:
             return html.escape(data + ' (M)')
     else:
@@ -332,11 +331,10 @@ def load_lang(data, num = 2, safe = 0):
                 return load_lang(data, 1, safe)
 
             if data in lang:
-                t_data = re.sub('\[s\]', '\'s', lang[data])
                 if safe == 1:
-                    return t_data
+                    return lang[data]
                 else:
-                    return html.escape(t_data)
+                    return html.escape(lang[data])
             else:
                 return load_lang(data, 1, safe)
         else:
@@ -363,11 +361,17 @@ def ip_or_user(data):
         return 0
 
 def edit_button():
-    insert_list = [['[[|]]', '[[|]]'], ['[*()]', '[*()]'], ['{{{#!}}}', '{{{#!}}}'], ['||<>||', '||<>||'], ["\\'\\'\\'", "\'\'\'"]]
+    insert_list = [
+        ['[[|]]', '[[|]]'], 
+        ['[*()]', '[*()]'], 
+        ['{{{#!}}}', '{{{#!}}}'], 
+        ['||<>||', '||<>||'], 
+        ["\\'\\'\\'", "\'\'\'"]
+    ]
 
     data = ''
     for insert_data in insert_list:
-        data += '<a href="javascript:void(0);" onclick="insert_data(\'content\', \'' + insert_data[0] + '\');">(' + insert_data[1] + ')</a> '
+        data += '<a href="javascript:insert_data(\'content\', \'' + insert_data[0] + '\')">(' + insert_data[1] + ')</a> '
 
     return data + '<hr class=\"main_hr\">'
 
