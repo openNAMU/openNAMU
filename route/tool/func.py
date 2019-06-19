@@ -362,11 +362,14 @@ def ip_or_user(data):
 
 def edit_button():
     insert_list = [
-        ['[[|]]', '[[|]]'], 
-        ['[*()]', '[*()]'], 
-        ['{{{#!}}}', '{{{#!}}}'], 
-        ['||<>||', '||<>||'], 
-        ["\\'\\'\\'", "\'\'\'"]
+        ['[[name|view]]', load_lang('edit_button_link')], 
+        ['[* data]', load_lang('edit_button_footnote')], 
+        ['[macro(data)]', load_lang('edit_button_macro')],
+        ['{{{#color data}}}', load_lang('edit_button_color')], 
+        ["\\'\\'\\'data\\'\\'\\'", load_lang('edit_button_bold')],
+        ["~~data~~", load_lang('edit_button_strike')],
+        ["{{{+number data}}}", load_lang('edit_button_big')],
+        ["== name ==", load_lang('edit_button_paragraph')]
     ]
 
     data = ''
