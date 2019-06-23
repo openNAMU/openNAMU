@@ -76,9 +76,16 @@ def login_check_key_2(conn, tool):
                 flask.session.pop('c_id', None)
                 flask.session.pop('c_key', None)
 
+                curs.execute('select data from other where name = "reset_user_text"')
+                sql_d = curs.fetchall()
+                if sql_d and sql_d[0][0] != '':
+                    b_text = sql_d[0][0] + '<hr class=\"main_hr\">'
+                else:
+                    b_text = ''
+
                 return easy_minify(flask.render_template(skin_check(),    
                     imp = [load_lang('reset_user_ok'), wiki_set(), custom(), other2([0, 0])],
-                    data = load_lang('id') + ' : ' + d_id + '<br>' + load_lang('password') + ' : ' + pw,
+                    data = b_text + load_lang('id') + ' : ' + d_id + '<br>' + load_lang('password') + ' : ' + pw,
                     menu = [['user', load_lang('return')]]
                 ))
             else:
