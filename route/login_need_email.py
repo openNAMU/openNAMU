@@ -50,18 +50,40 @@ def login_need_email_2(conn, tool):
                 flask.session['c_key'] = ''.join(random.choice("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ") for i in range(16))
                 flask.session['c_id'] = flask.request.form.get('id', '')
 
-                send_email(flask.request.form.get('email', ''), wiki_set()[0] + '\'s key', 'Key : ' + flask.session['c_key'])
+                curs.execute('select data from other where name = "email_title"')
+                sql_d = curs.fetchall()
+                if sql_d and sql_d[0][0] != '':
+                    t_text = html.escape(sql_d[0][0])
+                else:
+                    t_text = wiki_set()[0] + '\'s Key'
+
+                curs.execute('select data from other where name = "email_text"')
+                sql_d = curs.fetchall()
+                if sql_d and sql_d[0][0] != '':
+                    i_text = html.escape(sql_d[0][0]) + '\n\nKey : ' + flask.session['c_key']
+                else:
+                    i_text = 'Key : ' + flask.session['c_key']
+
+                send_email(flask.request.form.get('email', ''), t_text, i_text)
 
                 return redirect('/check_pass_key')
             else:
                 return re_error('/error/12')
     else:
         if tool == 'need_email':
+            curs.execute('select data from other where name = "email_insert_text"')
+            sql_d = curs.fetchall()
+            if sql_d and sql_d[0][0] != '':
+                b_text = sql_d[0][0] + '<hr class=\"main_hr\">'
+            else:
+                b_text = ''
+
             return easy_minify(flask.render_template(skin_check(),    
                 imp = [load_lang('email'), wiki_set(), custom(), other2([0, 0])],
                 data =  '''
                         <a href="/email_filter">(''' + load_lang('email_filter_list') + ''')</a>
                         <hr class=\"main_hr\">
+                        ''' + b_text + '''
                         <form method="post">
                             <input placeholder="''' + load_lang('email') + '''" name="email" type="text">
                             <hr class=\"main_hr\">
@@ -71,9 +93,16 @@ def login_need_email_2(conn, tool):
                 menu = [['user', load_lang('return')]]
             ))
         else:
+            curs.execute('select data from other where name = "password_search_text"')
+            sql_d = curs.fetchall()
+            if sql_d and sql_d[0][0] != '':
+                b_text = sql_d[0][0] + '<hr class=\"main_hr\">'
+            else:
+                b_text = ''
+
             return easy_minify(flask.render_template(skin_check(),    
                 imp = [load_lang('password_search'), wiki_set(), custom(), other2([0, 0])],
-                data =  '''
+                data =  b_text + '''
                         <form method="post">
                             <input placeholder="''' + load_lang('id') + '''" name="id" type="text">
                             <hr class=\"main_hr\">
