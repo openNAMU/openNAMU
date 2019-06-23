@@ -21,7 +21,21 @@ def login_need_email_2(conn, tool):
 
                             return redirect('/register')
                         else:
-                            send_email(flask.request.form.get('email', ''), wiki_set()[0] + '\'s Key', 'Key : ' + flask.session['c_key'])
+                            curs.execute('select data from other where name = "email_title"')
+                            sql_d = curs.fetchall()
+                            if sql_d and sql_d[0][0] != '':
+                                t_text = html.escape(sql_d[0][0])
+                            else:
+                                t_text = wiki_set()[0] + '\'s Key'
+
+                            curs.execute('select data from other where name = "email_text"')
+                            sql_d = curs.fetchall()
+                            if sql_d and sql_d[0][0] != '':
+                                i_text = html.escape(sql_d[0][0]) + '\n\nKey : ' + flask.session['c_key']
+                            else:
+                                i_text = 'Key : ' + flask.session['c_key']
+
+                            send_email(flask.request.form.get('email', ''), t_text, i_text)
                             flask.session['c_email'] = flask.request.form.get('email', '')
 
                             return redirect('/check_key')
