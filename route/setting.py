@@ -192,7 +192,7 @@ def setting_2(conn, num):
 
             return redirect('/setting/2')
         else:
-            n_list = ['', '', '']
+            n_list = ['', '', '', '', '', '']
             d_list = []
             
             x = 0
@@ -226,6 +226,18 @@ def setting_2(conn, num):
                             <span>''' + load_lang('edit_bottom_text') + ''' (HTML)</span>
                             <hr class=\"main_hr\">
                             <input type="text" name="edit_bottom_text" value="''' + html.escape(d_list[2]) + '''">
+                            <hr class=\"main_hr\">
+                            <span>''' + load_lang('check_key_text') + ''' (HTML)</span>
+                            <hr class=\"main_hr\">
+                            <input type="text" name="check_key_text" value="''' + html.escape(d_list[3]) + '''">
+                            <hr class=\"main_hr\">
+                            <span>''' + load_lang('email_title') + '''</span>
+                            <hr class=\"main_hr\">
+                            <input type="text" name="email_title" value="''' + html.escape(d_list[4]) + '''">
+                            <hr class=\"main_hr\">
+                            <span>''' + load_lang('email_text') + '''</span>
+                            <hr class=\"main_hr\">
+                            <input type="text" name="email_text" value="''' + html.escape(d_list[5]) + '''">
                             <hr class=\"main_hr\">
                             <button id="save" type="submit">''' + load_lang('save') + '''</button>
                         </form>

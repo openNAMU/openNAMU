@@ -194,7 +194,7 @@ def update():
     except:
         pass
 
-    # Start : Data Migration Code
+    # Start : Data migration code
     app_var = json.loads(open(os.path.abspath('./data/app_variables.json'), encoding='utf-8').read())
 
     if os.path.exists('image'):

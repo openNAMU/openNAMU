@@ -11,19 +11,37 @@ def login_check_key_2(conn, tool):
 
                 curs.execute("select id from user limit 1")
                 if not curs.fetchall():
-                    curs.execute("insert into user (id, pw, acl, date, encode) values (?, ?, 'owner', ?, ?)", [flask.session['c_id'], flask.session['c_pw'], get_time(), db_data[0][0]])
+                    curs.execute("insert into user (id, pw, acl, date, encode) values (?, ?, 'owner', ?, ?)", [
+                        flask.session['c_id'], 
+                        flask.session['c_pw'], 
+                        get_time(), 
+                        db_data[0][0]
+                    ])
 
                     first = 1
                 else:
-                    curs.execute("insert into user (id, pw, acl, date, encode) values (?, ?, 'user', ?, ?)", [flask.session['c_id'], flask.session['c_pw'], get_time(), db_data[0][0]])
+                    curs.execute("insert into user (id, pw, acl, date, encode) values (?, ?, 'user', ?, ?)", [
+                        flask.session['c_id'], 
+                        flask.session['c_pw'], 
+                        get_time(), 
+                        db_data[0][0]
+                    ])
 
                     first = 0
 
                 ip = ip_check()
                 agent = flask.request.headers.get('User-Agent')
 
-                curs.execute("insert into user_set (name, id, data) values ('email', ?, ?)", [flask.session['c_id'], flask.session['c_email']])
-                curs.execute("insert into ua_d (name, ip, ua, today, sub) values (?, ?, ?, ?, '')", [flask.session['c_id'], ip, agent, get_time()])
+                curs.execute("insert into user_set (name, id, data) values ('email', ?, ?)", [
+                    flask.session['c_id'], 
+                    flask.session['c_email']
+                ])
+                curs.execute("insert into ua_d (name, ip, ua, today, sub) values (?, ?, ?, ?, '')", [
+                    flask.session['c_id'], 
+                    ip, 
+                    agent, 
+                    get_time()]
+                )
 
                 flask.session['state'] = 1
                 flask.session['id'] = flask.session['c_id']
@@ -60,22 +78,24 @@ def login_check_key_2(conn, tool):
 
                 return easy_minify(flask.render_template(skin_check(),    
                     imp = [load_lang('reset_user_ok'), wiki_set(), custom(), other2([0, 0])],
-                    data =  '''
-                        ''' + load_lang('id') + '''
-                        <hr class=\"main_hr\">
-                        ''' + load_lang('id') + ' : ' + d_id + '''
-                        <br>
-                        ''' + load_lang('password') + ' : ' + pw + '''
-                    ''',
+                    data = load_lang('id') + ' : ' + d_id + '<br>' + load_lang('password') + ' : ' + pw,
                     menu = [['user', load_lang('return')]]
                 ))
             else:
                 return redirect('/pass_find')
     else:
+        curs.execute('select data from other where name = "check_key_text"')
+        sql_d = curs.fetchall()
+        if sql_d and sql_d[0][0] != '':
+            b_text = sql_d[0][0] + '<hr class=\"main_hr\">'
+        else:
+            b_text = ''
+
         return easy_minify(flask.render_template(skin_check(),    
-            imp = [load_lang('key_check'), wiki_set(), custom(), other2([0, 0])],
+            imp = [load_lang('check_key'), wiki_set(), custom(), other2([0, 0])],
             data =  '''
                 <form method="post">
+                    ''' + b_text + '''
                     <input placeholder="''' + load_lang('key') + '''" name="key" type="text">
                     <hr class=\"main_hr\">
                     <button type="submit">''' + load_lang('save') + '''</button>
