@@ -44,11 +44,13 @@ for i in range(0, 2):
                 ok = os.system('python3 -m pip install --user -r requirements.txt')
                 if ok == 0:
                     os.execl(sys.executable, sys.executable, *sys.argv)
+                    print('----')
                 else:
                     raise
             elif platform.system() == 'Windows':
                 ok = os.system('python -m pip install --user -r requirements.txt')
                 if ok == 0:
+                    print('----')
                     os.execl(sys.executable, sys.executable, *sys.argv)
                 else:
                     raise
