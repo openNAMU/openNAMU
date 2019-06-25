@@ -181,7 +181,17 @@ def setting_2(conn, num):
                 menu = [['setting', load_lang('return')]]
             ))
     elif num == 2:
-        i_list = ['contract', 'no_login_warring', 'edit_bottom_text']
+        i_list = [
+            'contract', 
+            'no_login_warring', 
+            'edit_bottom_text',
+            'check_key_text',
+            'email_title',
+            'email_text',
+            'email_insert_text',
+            'password_search_text',
+            'reset_user_text'
+        ]
         if flask.request.method == 'POST':
             for i in i_list:
                 curs.execute("update other set data = ? where name = ?", [flask.request.form.get(i, ''), i])
