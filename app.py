@@ -472,8 +472,12 @@ def login_oauth(platform = None, func = None):
     return login_oauth_2(conn, platform, func)
                 
 @app.route('/change', methods=['POST', 'GET'])
-def login_change_password():
-    return login_change_password_2(conn, server_init)
+def user_setting():
+    return user_setting_2(conn, server_init)
+    
+@app.route('/pw_change', methods=['POST', 'GET'])
+def login_pw_change():
+    return login_pw_change_2(conn)
 
 @app.route('/check/<name>')
 def give_user_check(name = None):
