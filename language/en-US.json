@@ -186,6 +186,7 @@
         "edit_button_big" : "Big",
         "edit_button_paragraph" : "Paragraph",
         "password_change" : "Password change",
+        "email_change" : "Email change",
         "_comment_2.1_" : "Filter",
             "_comment_2.1.1_" : "List",
                 "interwiki_list" : "Interwiki(s) list",

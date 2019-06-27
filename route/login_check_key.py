@@ -4,7 +4,34 @@ def login_check_key_2(conn, tool):
     curs = conn.cursor()
 
     if flask.request.method == 'POST':
-        if tool == ('check_key' or 'email_replace'):
+        if tool == 'check_pass_key':
+            if 'c_id' in flask.session and flask.session['c_key'] == flask.request.form.get('key', None):
+                hashed = pw_encode(flask.session['c_key'])
+
+                curs.execute("update user set pw = ? where id = ?", [hashed, flask.session['c_id']])
+                conn.commit()
+
+                d_id = flask.session['c_id']
+                pw = flask.session['c_key']
+
+                flask.session.pop('c_id', None)
+                flask.session.pop('c_key', None)
+
+                curs.execute('select data from other where name = "reset_user_text"')
+                sql_d = curs.fetchall()
+                if sql_d and sql_d[0][0] != '':
+                    b_text = sql_d[0][0] + '<hr class=\"main_hr\">'
+                else:
+                    b_text = ''
+
+                return easy_minify(flask.render_template(skin_check(),    
+                    imp = [load_lang('reset_user_ok'), wiki_set(), custom(), other2([0, 0])],
+                    data = b_text + load_lang('id') + ' : ' + d_id + '<br>' + load_lang('password') + ' : ' + pw,
+                    menu = [['user', load_lang('return')]]
+                ))
+            else:
+                return redirect('/pass_find')
+        else:
             ip = ip_check()
             
             if 'c_id' in flask.session and flask.session['c_key'] == flask.request.form.get('key', None):
@@ -72,33 +99,6 @@ def login_check_key_2(conn, tool):
                 flask.session.pop('c_email', None)
 
                 return redirect('/user')
-        else:
-            if 'c_id' in flask.session and flask.session['c_key'] == flask.request.form.get('key', None):
-                hashed = pw_encode(flask.session['c_key'])
-
-                curs.execute("update user set pw = ? where id = ?", [hashed, flask.session['c_id']])
-                conn.commit()
-
-                d_id = flask.session['c_id']
-                pw = flask.session['c_key']
-
-                flask.session.pop('c_id', None)
-                flask.session.pop('c_key', None)
-
-                curs.execute('select data from other where name = "reset_user_text"')
-                sql_d = curs.fetchall()
-                if sql_d and sql_d[0][0] != '':
-                    b_text = sql_d[0][0] + '<hr class=\"main_hr\">'
-                else:
-                    b_text = ''
-
-                return easy_minify(flask.render_template(skin_check(),    
-                    imp = [load_lang('reset_user_ok'), wiki_set(), custom(), other2([0, 0])],
-                    data = b_text + load_lang('id') + ' : ' + d_id + '<br>' + load_lang('password') + ' : ' + pw,
-                    menu = [['user', load_lang('return')]]
-                ))
-            else:
-                return redirect('/pass_find')
     else:
         curs.execute('select data from other where name = "check_key_text"')
         sql_d = curs.fetchall()
