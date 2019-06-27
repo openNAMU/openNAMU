@@ -76,6 +76,8 @@ def user_setting_2(conn, server_init):
                         <hr class=\"main_hr\">
                         <a href="/pw_change">(''' + load_lang('password_change') + ''')</a>
                         <hr class=\"main_hr\">
+                        <a href="/email_change">(e_ch)</a>
+                        <hr class=\"main_hr\">
                         <span>''' + load_lang('skin') + '''</span>
                         <hr class=\"main_hr\">
                         <select name="skin">''' + div2 + '''</select>
