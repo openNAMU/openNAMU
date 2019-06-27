@@ -4,10 +4,38 @@ def login_need_email_2(conn, tool):
     curs = conn.cursor()
 
     if flask.request.method == 'POST':
-        if tool == ('need_email' or 'email_change'):
-            if tool == 'email_change':
+        if tool == 'pass_find':
+            curs.execute("select id from user_set where id = ? and name = 'email' and data = ?", [
+                flask.request.form.get('id', ''),
+                flask.request.form.get('email', '')
+            ])
+            if curs.fetchall():
                 flask.session['c_key'] = ''.join(random.choice("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ") for i in range(16))
                 flask.session['c_id'] = flask.request.form.get('id', '')
+
+                curs.execute('select data from other where name = "email_title"')
+                sql_d = curs.fetchall()
+                if sql_d and sql_d[0][0] != '':
+                    t_text = html.escape(sql_d[0][0])
+                else:
+                    t_text = wiki_set()[0] + ' key'
+
+                curs.execute('select data from other where name = "email_text"')
+                sql_d = curs.fetchall()
+                if sql_d and sql_d[0][0] != '':
+                    i_text = html.escape(sql_d[0][0]) + '\n\nKey : ' + flask.session['c_key']
+                else:
+                    i_text = 'Key : ' + flask.session['c_key']
+
+                send_email(flask.request.form.get('email', ''), t_text, i_text)
+                
+                return redirect('/check_pass_key')
+            else:
+                return re_error('/error/12')
+        else:
+            if tool == 'email_change':
+                flask.session['c_key'] = ''.join(random.choice("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ") for i in range(16))
+                flask.session['c_id'] = ip_check()
                 flask.session['c_pw'] = ''
             
             if 'c_id' in flask.session:
@@ -48,36 +76,10 @@ def login_need_email_2(conn, tool):
                                 return redirect('/email_replace')
                             else:
                                 return redirect('/check_key')
-            else:
-                return redirect('/register')
-        else:
-            curs.execute("select id from user_set where id = ? and name = 'email' and data = ?", [
-                flask.request.form.get('id', ''),
-                flask.request.form.get('email', '')
-            ])
-            if curs.fetchall():
-                flask.session['c_key'] = ''.join(random.choice("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ") for i in range(16))
-                flask.session['c_id'] = flask.request.form.get('id', '')
-
-                curs.execute('select data from other where name = "email_title"')
-                sql_d = curs.fetchall()
-                if sql_d and sql_d[0][0] != '':
-                    t_text = html.escape(sql_d[0][0])
-                else:
-                    t_text = wiki_set()[0] + ' key'
-
-                curs.execute('select data from other where name = "email_text"')
-                sql_d = curs.fetchall()
-                if sql_d and sql_d[0][0] != '':
-                    i_text = html.escape(sql_d[0][0]) + '\n\nKey : ' + flask.session['c_key']
-                else:
-                    i_text = 'Key : ' + flask.session['c_key']
-
-                send_email(flask.request.form.get('email', ''), t_text, i_text)
-                
-                return redirect('/check_pass_key')
-            else:
-                return re_error('/error/12')
+                    else:
+                        return redirect('/email_filter')
+            
+            return redirect('/user')
     else:
         if tool == 'pass_find':
             curs.execute('select data from other where name = "password_search_text"')

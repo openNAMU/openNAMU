@@ -35,7 +35,7 @@ def user_setting_2(conn, server_init):
             if data:
                 email = data[0][0]
             else:
-                email = ''
+                email = '-'
 
             div2 = load_skin()
             div3 = ''
@@ -76,7 +76,7 @@ def user_setting_2(conn, server_init):
                         <hr class=\"main_hr\">
                         <a href="/pw_change">(''' + load_lang('password_change') + ''')</a>
                         <hr class=\"main_hr\">
-                        <a href="/email_change">(e_ch)</a>
+                        <span>''' + load_lang('email') + ''' : ''' + email + '''</span> <a href="/email_change">(''' + load_lang('email_change') + ''')</a>
                         <hr class=\"main_hr\">
                         <span>''' + load_lang('skin') + '''</span>
                         <hr class=\"main_hr\">

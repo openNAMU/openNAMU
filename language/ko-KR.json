@@ -186,6 +186,7 @@
         "edit_button_big" : "크게",
         "edit_button_paragraph" : "문단",
         "password_change" : "비밀번호 변경",
+        "email_change" : "이메일 변경",
         "_comment_2.1_" : "필터",
             "_comment_2.1.1_" : "목록",
                 "interwiki_list" : "인터위키 목록",
