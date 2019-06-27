@@ -44,11 +44,13 @@ for i in range(0, 2):
                 ok = os.system('python3 -m pip install --user -r requirements.txt')
                 if ok == 0:
                     os.execl(sys.executable, sys.executable, *sys.argv)
+                    print('----')
                 else:
                     raise
             elif platform.system() == 'Windows':
                 ok = os.system('python -m pip install --user -r requirements.txt')
                 if ok == 0:
+                    print('----')
                     os.execl(sys.executable, sys.executable, *sys.argv)
                 else:
                     raise
@@ -855,7 +857,7 @@ def ban_check(ip = None, tool = None):
     band_d = curs.fetchall()
     if band_d:
         if tool and tool == 'login':
-            if data[0][0] != 'O':
+            if band_d[0][0] != 'O':
                 return 1
         else:
             return 1
@@ -864,7 +866,7 @@ def ban_check(ip = None, tool = None):
     ban_d = curs.fetchall()
     if ban_d:
         if tool and tool == 'login':
-            if data[0][0] != 'O':
+            if ban_d[0][0] != 'O':
                 return 1
         else:
             return 1
