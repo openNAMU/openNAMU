@@ -419,12 +419,12 @@ def edit_move(name = None):
 
 @app.route('/other')
 def main_other():
-    return main_other_2(conn, r_ver)
+    return main_other_2(conn)
     
 @app.route('/manager', methods=['POST', 'GET'])
 @app.route('/manager/<int:num>', methods=['POST', 'GET'])
 def main_manager(num = 1):
-    return main_manager_2(conn, num)
+    return main_manager_2(conn, num, r_ver)
         
 @app.route('/title_index')
 def list_title_index():
