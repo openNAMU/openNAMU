@@ -31,6 +31,8 @@ def login_pw_change_2(conn):
             hashed = pw_encode(flask.request.form.get('pw2', None))
                 
             curs.execute("update user set pw = ? where id = ?", [hashed, ip_check()])
+
+            return redirect('/user')
     else:
         return easy_minify(flask.render_template(skin_check(), 
             imp = [load_lang('password_change'), wiki_set(), custom(), other2([0, 0])],
