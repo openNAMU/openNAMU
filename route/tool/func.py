@@ -43,8 +43,8 @@ for i in range(0, 2):
             if platform.system() == 'Linux':
                 ok = os.system('python3 -m pip install --user -r requirements.txt')
                 if ok == 0:
-                    os.execl(sys.executable, sys.executable, *sys.argv)
                     print('----')
+                    os.execl(sys.executable, sys.executable, *sys.argv)
                 else:
                     raise
             elif platform.system() == 'Windows':
