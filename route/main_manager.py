@@ -26,6 +26,7 @@ def main_manager_2(conn, num):
             data =  '''
                     <h2>''' + load_lang('admin') + '''</h2>
                     <ul>
+                        <li><a href="/manager/2">''' + load_lang('acl_change') + '''</a></li>
                         <li><a href="/manager/3">''' + load_lang('check_user') + '''</a></li>
                         <li><a href="/ban">''' + load_lang('ban') + '''</a></li>
                         <li><a href="/manager/5">''' + load_lang('authorize') + '''</a></li>
