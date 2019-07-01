@@ -78,7 +78,14 @@ elif what_i_do == '3':
     else:
         band = ''
 
-        curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, ?)", [user_data, load_lang('release', 1), get_time(), load_lang('tool', 1) + ':emergency', '', band])
+        curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, ?)", 
+            [user_data, 
+            'release', 
+            get_time(), 
+            'tool:emergency', 
+            '', 
+            band
+        ])
     curs.execute("delete from ban where block = ?", [user_data])
 elif what_i_do == '4':
     print('Host : ', end = '')
@@ -109,13 +116,16 @@ elif what_i_do == '7':
 
     if what_i_do == '1':
         hashed = hashlib.sha256(bytes(user_pw, 'utf-8')).hexdigest()
-    elif what_i_do == '2':
-        hashed = sha3_256(bytes(user_pw, 'utf-8')).hexdigest()
+    else:
+        if sys.version_info < (3, 6):
+            return sha3.sha3_256(bytes(data, 'utf-8')).hexdigest()
+        else:
+            return hashlib.sha3_256(bytes(data, 'utf-8')).hexdigest()
        
     curs.execute("update user set pw = ? where id = ?", [hashed, user_name])
 elif what_i_do == '8':
     curs.execute("update other set data = '00000' where name = 'ver'")
-elif what_i_do == '9':
+else:
     print('DB\'s name (data) : ', end = '')
     
     db_name = input()
