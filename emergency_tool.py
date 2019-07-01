@@ -113,9 +113,9 @@ elif what_i_do == '7':
         hashed = hashlib.sha256(bytes(user_pw, 'utf-8')).hexdigest()
     else:
         if sys.version_info < (3, 6):
-            hashed = sha3.sha3_256(bytes(data, 'utf-8')).hexdigest()
+            hashed = sha3.sha3_256(bytes(user_pw, 'utf-8')).hexdigest()
         else:
-            hashed = hashlib.sha3_256(bytes(data, 'utf-8')).hexdigest()
+            hashed = hashlib.sha3_256(bytes(user_pw, 'utf-8')).hexdigest()
        
     curs.execute("update user set pw = ? where id = ?", [hashed, user_name])
 elif what_i_do == '8':
