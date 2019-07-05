@@ -72,6 +72,7 @@ openNAMU is protected by [BSD 3-Clause License](./LICNESE). Please refer to the 
  * Quotes icon [Dave Gandy](http://www.flaticon.com/free-icon/quote-left_25672) CC 3.0 BY
  * Syntax highlighting [highlightjs](https://highlightjs.org/)
  * Numerical expression [MathJax](https://www.mathjax.org/)
+ * Handling Keyboard Shortcuts [shortcut.js](http://www.openjs.com/scripts/events/keyboard_shortcuts/)
 
 # Authors
  * [Reference](https://github.com/2DU/openNAMU/graphs/contributors)
