@@ -43,9 +43,10 @@ openNAMU는 완전한 오픈소스 프로젝트입니다. 새로운 기능을 �
 openNAMU 프로젝트는 [BSD 3-Clause License](./LICENSE)(이하 이용허락)의 보호를 받고 있으며, openNAMU 프로젝트를 사용하고자 한다면 를 준수해야 합니다. 본 이용허락를 위반할 경우 개발자는 DMCA Takedown 등 관련 제재를 관계자에게 요청할 권리가 있으며, 그 책임은 모두 이용허락 위반 사용자에게 있습니다. 자세한 내용은 문서를 참고하세요.
 
 ### 포함된 외부 프로젝트
- * Quotes icon - [Dave Gandy](http://www.flaticon.com/free-icon/quote-left_25672) - CC 3.0 BY
- * Syntax highlighting - [highlightjs](https://highlightjs.org/) - [BSD License](https://github.com/highlightjs/highlight.js/blob/master/LICENSE)
- * Numerical expression - [MathJax](https://www.mathjax.org/) - [Apache License 2.0](https://github.com/mathjax/MathJax/blob/master/LICENSE)
+ * Quotes icon - [Dave Gandy](http://www.flaticon.com/free-icon/quote-left_25672)
+ * Syntax highlighting - [highlightjs](https://highlightjs.org/) 
+ * Numerical expression - [MathJax](https://www.mathjax.org/)
+ * Handling Keyboard Shortcuts [shortcut.js](http://www.openjs.com/scripts/events/keyboard_shortcuts/)
 
 ## 기여자 목록
  * [참고](https://github.com/2DU/openNAMU/graphs/contributors)
