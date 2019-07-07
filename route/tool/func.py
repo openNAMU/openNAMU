@@ -780,14 +780,14 @@ def acl_check(name, tool = ''):
                 if ip_or_user(ip) == 1:
                     return 1
 
-                if admin_check(5, 'topic send (' + name + ')') != 1:
+                if admin_check(5) != 1:
                     return 1
 
             if acl_data[0][0] == '50_edit':
                 if ip_or_user(ip) == 1:
                     return 1
                 
-                if admin_check(5, 'topic send (' + name + ')') != 1:
+                if admin_check(5) != 1:
                     curs.execute("select count(title) from history where ip = ?", [ip])
                     count = curs.fetchall()
                     if count:
@@ -796,6 +796,16 @@ def acl_check(name, tool = ''):
                         count = 0
 
                     if count < 50:
+                        return 1
+
+            if acl_data[0][0] == 'email':
+                if ip_or_user(ip) == 1:
+                    return 1
+                
+                if admin_check(5) != 1:
+                    curs.execute("select data from user_set where id = ? and name = 'email'", [ip])
+                    email = curs.fetchall()
+                    if not email:
                         return 1
 
         curs.execute('select data from other where name = "edit"')
