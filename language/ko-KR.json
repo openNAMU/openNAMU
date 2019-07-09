@@ -234,7 +234,7 @@
                 "acl_document_list" : "ACL 문서 목록",
                 "acl_required" : "ACL 필요",
             "_comment_2.3.2_" : "ACL 목록",
-                "admin_group_add" : "관리자 그룹 추가",
+                "admin_group_add" : "관리자 그룹 권한 부여",
                 "ban_authority" : "차단 권한",
                 "discussion_authority" : "토론 관리 권한",
                 "user_check_authority" : "사용자 검사 권한",
