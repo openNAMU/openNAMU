@@ -234,7 +234,7 @@
                 "acl_document_list" : "ACL document(s) list",
                 "acl_required" : "Required ACL",
             "_comment_2.3.2_" : "ACL List",
-                "admin_group_add" : "Admin group add",
+                "admin_group_add" : "Authorize Administrators Group",
                 "ban_authority" : "Block authority",
                 "discussion_authority" : "Discussion manage authority",
                 "user_check_authority" : "User check authority",
