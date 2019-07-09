@@ -16,7 +16,9 @@ def recent_changes_2(conn, name, tool):
         ban = ''
         select = ''
 
-        div =   '''
+        div = '''
+            <a href="?set=user">(''' + load_lang('user_document') + ''')</a>
+            <hr class=\"main_hr\">
             <table id="main_table_set">
                 <tbody>
                     <tr>
@@ -30,7 +32,7 @@ def recent_changes_2(conn, name, tool):
                 sql_num = 0      
 
             if tool == 'history':
-                div +=  '''
+                div += '''
                     <td id="main_table_width">''' + load_lang('version') + '''</td>
                     <td id="main_table_width">''' + load_lang('editor') + '''</td>
                     <td id="main_table_width">''' + load_lang('time') + '''</td></tr>
