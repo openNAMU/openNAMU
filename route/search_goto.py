@@ -1,11 +1,16 @@
 from .tool.func import *
 
-def search_goto_2(conn):
+def search_goto_2(conn, name):
     curs = conn.cursor()
 
-    curs.execute("select title from data where title = ?", [flask.request.form.get('search', 'test')])
-    data = curs.fetchall()
-    if data:
-        return redirect('/w/' + url_pas(flask.request.form.get('search', 'test')))
+    if flask.request.form.get('search', None):
+        data = flask.request.form.get('search', 'test')
     else:
-        return redirect('/search/' + url_pas(flask.request.form.get('search', 'test')))
+        data = name
+
+    curs.execute("select title from data where title = ?", [data])
+    t_data = curs.fetchall()
+    if t_data:
+        return redirect('/w/' + url_pas(data))
+    else:
+        return redirect('/search/' + url_pas(data))

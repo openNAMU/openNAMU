@@ -389,11 +389,12 @@ def search():
     return search_2(conn)
 
 @app.route('/goto', methods=['POST'])
-def search_goto():
-    return search_goto_2(conn)
+@app.route('/goto/<everything:name>', methods=['POST'])
+def search_goto(name = 'test'):
+    return search_goto_2(conn, name)
 
 @app.route('/search/<everything:name>')
-def search_deep(name = ''):
+def search_deep(name = 'test'):
     return search_deep_2(conn, name)
          
 @app.route('/raw/<everything:name>')
