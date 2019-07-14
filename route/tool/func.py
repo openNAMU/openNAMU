@@ -602,7 +602,7 @@ def ip_pas(raw_ip):
         curs.execute("select data from other where name = 'ip_view'")
         data = curs.fetchall()
         if data and data[0][0] != '':
-            ip = '<span style="font-size: 75%;">' + hashlib.md5(bytes(raw_ip, 'utf-8')).hexdigest() + '</span>'
+            ip = re.sub('((?:(?!\.).)+)$', 'xxx', raw_ip)
 
             if not admin_check(1):
                 hide = 1
