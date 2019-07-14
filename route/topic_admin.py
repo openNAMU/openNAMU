@@ -71,7 +71,7 @@ def topic_admin_2(conn, name, sub, num):
     ban = '<h2>' + load_lang('state') + '</h2><ul>' + ban
 
     return easy_minify(flask.render_template(skin_check(), 
-        imp = [load_lang('discussion_tool'), wiki_set(), custom(), other2([' (' + str(num) + ')', 0])],
+        imp = [load_lang('discussion_tool'), wiki_set(), custom(), other2([' (#' + str(num) + ')', 0])],
         data = ban,
         menu = [['topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '#' + str(num), load_lang('return')]]
     ))
