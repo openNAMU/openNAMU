@@ -114,6 +114,8 @@ def table_parser(data, cel_data, start_data, num = 0):
     return [all_table, row_style, cel_style, row, cel, table_class, num]
     
 def table_start(data):
+    data = re.sub('\|\|\n(?P<in>(?:(?:(?:(?!\|\|).)+)\n?)+)\n\|\|', '|| \n\g<in> ||', data)
+
     while 1:
         table = re.search('\n((?:(?:(?:(?:\|\|)+(?:(?:(?!\|\|).(?:\n)*)*))+)\|\|(?:\n)?)+)', data)
         if table:
@@ -452,7 +454,7 @@ def namu(conn, data, title, main_num):
     data = re.sub('&amp;', '&', data)
 
     data = re.sub('\n( +)\|\|', '\n||', data)
-    data = re.sub('\|\|( +)\n', '||\n', data)
+    data = re.sub('\|\|( +)\n', '|| \n', data)
 
     data = re.sub('\n##(((?!\n).)+)', '', data)
            
