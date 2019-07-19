@@ -389,11 +389,12 @@ def search():
     return search_2(conn)
 
 @app.route('/goto', methods=['POST'])
-def search_goto():
-    return search_goto_2(conn)
+@app.route('/goto/<everything:name>', methods=['POST'])
+def search_goto(name = 'test'):
+    return search_goto_2(conn, name)
 
 @app.route('/search/<everything:name>')
-def search_deep(name = ''):
+def search_deep(name = 'test'):
     return search_deep_2(conn, name)
          
 @app.route('/raw/<everything:name>')
@@ -419,12 +420,12 @@ def edit_move(name = None):
 
 @app.route('/other')
 def main_other():
-    return main_other_2(conn, r_ver)
+    return main_other_2(conn)
     
 @app.route('/manager', methods=['POST', 'GET'])
 @app.route('/manager/<int:num>', methods=['POST', 'GET'])
 def main_manager(num = 1):
-    return main_manager_2(conn, num)
+    return main_manager_2(conn, num, r_ver)
         
 @app.route('/title_index')
 def list_title_index():
@@ -472,8 +473,12 @@ def login_oauth(platform = None, func = None):
     return login_oauth_2(conn, platform, func)
                 
 @app.route('/change', methods=['POST', 'GET'])
-def login_change_password():
-    return login_change_password_2(conn, server_init)
+def user_setting():
+    return user_setting_2(conn, server_init)
+    
+@app.route('/pw_change', methods=['POST', 'GET'])
+def login_pw_change():
+    return login_pw_change_2(conn)
 
 @app.route('/check/<name>')
 def give_user_check(name = None):
@@ -483,11 +488,11 @@ def give_user_check(name = None):
 def login_register():
     return login_register_2(conn)
 
-@app.route('/<regex("need_email|pass_find"):tool>', methods=['POST', 'GET'])
+@app.route('/<regex("need_email|pass_find|email_change"):tool>', methods=['POST', 'GET'])
 def login_need_email(tool = 'pass_find'):
     return login_need_email_2(conn, tool)
 
-@app.route('/<regex("check_key|check_pass_key"):tool>', methods=['POST', 'GET'])
+@app.route('/<regex("check_key|check_pass_key|email_replace"):tool>', methods=['POST', 'GET'])
 def login_check_key(tool = 'check_pass_key'):
     return login_check_key_2(conn, tool)
            

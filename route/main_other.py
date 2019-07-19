@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def main_other_2(conn, r_ver):
+def main_other_2(conn):
     curs = conn.cursor()
     
     return easy_minify(flask.render_template(skin_check(), 
@@ -14,7 +14,6 @@ def main_other_2(conn, r_ver):
             <br>
             <h2>''' + load_lang('list') + '''</h2>
             <ul>
-                <li><a href="/manager/2">''' + load_lang('acl_document_list') + '''</a></li>
                 <li><a href="/admin_list">''' + load_lang('admin_list') + '''</a></li>
                 <li><a href="/not_close_topic">''' + load_lang('open_discussion_list') + '''</a></li>
                 <li><a href="/title_index">''' + load_lang('all_document_list') + '''</a></li>
@@ -35,13 +34,6 @@ def main_other_2(conn, r_ver):
             <ul>
                 <li><a href="/manager/1">''' + load_lang('admin_tool') + '''</a></li>
             </ul>
-            <br>
-            <h2>''' + load_lang('version') + '''</h2>
-            <ul>
-                <li>''' + load_lang('version') + ' : ' + r_ver + '''</li>
-                <li id="ver_send" style="display: none;">''' + load_lang('lastest') + ''' : </li>
-            </ul>
-            <script>load_ver();</script>
         ''',
         menu = 0
     ))

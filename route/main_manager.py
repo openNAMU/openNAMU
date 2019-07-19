@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def main_manager_2(conn, num):
+def main_manager_2(conn, num, r_ver):
     curs = conn.cursor()
     
     title_list = {
@@ -26,6 +26,7 @@ def main_manager_2(conn, num):
             data =  '''
                     <h2>''' + load_lang('admin') + '''</h2>
                     <ul>
+                        <li><a href="/manager/2">''' + load_lang('acl_change') + '''</a></li>
                         <li><a href="/manager/3">''' + load_lang('check_user') + '''</a></li>
                         <li><a href="/ban">''' + load_lang('ban') + '''</a></li>
                         <li><a href="/manager/5">''' + load_lang('authorize') + '''</a></li>
@@ -54,6 +55,13 @@ def main_manager_2(conn, num):
                         <li><a href="/oauth_setting">''' + load_lang('oauth_setting') + '''</a></li>
                         <li><a href="/adsense_setting">''' + load_lang('adsense_setting') + '''</a></li>
                     </ul>
+                    <br>
+                    <h2>''' + load_lang('version') + '''</h2>
+                    <ul>
+                        <li>''' + load_lang('version') + ' : ' + r_ver + '''</li>
+                        <li id="ver_send" style="display: none;">''' + load_lang('lastest') + ''' : </li>
+                    </ul>
+                    <script>load_ver();</script>
                     ''',
             menu = [['other', load_lang('return')]]
         ))

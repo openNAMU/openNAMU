@@ -16,7 +16,8 @@ def recent_changes_2(conn, name, tool):
         ban = ''
         select = ''
 
-        div =   '''
+        div = '''
+            <hr class=\"main_hr\">
             <table id="main_table_set">
                 <tbody>
                     <tr>
@@ -30,7 +31,7 @@ def recent_changes_2(conn, name, tool):
                 sql_num = 0      
 
             if tool == 'history':
-                div +=  '''
+                div += '''
                     <td id="main_table_width">''' + load_lang('version') + '''</td>
                     <td id="main_table_width">''' + load_lang('editor') + '''</td>
                     <td id="main_table_width">''' + load_lang('time') + '''</td></tr>
@@ -84,13 +85,22 @@ def recent_changes_2(conn, name, tool):
                     <td id="main_table_width">''' + load_lang('time') + '''</td>
                 </tr>
             '''
-            
-            curs.execute('''
-                select id, title, date, ip, send, leng from history 
-                where not title like 'user:%' 
-                order by date desc 
-                limit ?, 50
-            ''', [str(sql_num)])
+            if flask.request.args.get('set', 'normal') == 'user':
+                curs.execute('''
+                    select id, title, date, ip, send, leng from history 
+                    where title like 'user:%' 
+                    order by date desc 
+                    limit ?, 50
+                ''', [str(sql_num)])
+            else:
+                div = '<a href="?set=user">(' + load_lang('user_document') + ')</a>' + div
+
+                curs.execute('''
+                    select id, title, date, ip, send, leng from history 
+                    where not title like 'user:%' 
+                    order by date desc 
+                    limit ?, 50
+                ''', [str(sql_num)])
 
         data_list = curs.fetchall()
         for data in data_list:    
@@ -211,6 +221,10 @@ def recent_changes_2(conn, name, tool):
             title = load_lang('recent_change')
                 
             div += next_fix('/recent_changes?num=', num, data_list)
+
+            if flask.request.args.get('set', 'normal') == 'user':
+                sub = ' (' + load_lang('user') + ')'
+                menu = [['recent_changes', load_lang('return')]]
         
         if sub == '':
             sub = 0

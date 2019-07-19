@@ -114,6 +114,8 @@ def table_parser(data, cel_data, start_data, num = 0):
     return [all_table, row_style, cel_style, row, cel, table_class, num]
     
 def table_start(data):
+    data = re.sub('\|\|\n(?P<in>(?:(?:(?:(?!\|\|).)+)\n?)+)\n\|\|', '|| \n\g<in> ||', data)
+
     while 1:
         table = re.search('\n((?:(?:(?:(?:\|\|)+(?:(?:(?!\|\|).(?:\n)*)*))+)\|\|(?:\n)?)+)', data)
         if table:
@@ -180,7 +182,7 @@ def middle_parser(data, fol_num, syntax_num, folding_num):
                     
                     data = re.sub('(?:{{{((?:(?! |{{{|}}}|&lt;).)*)(?P<in> ?)|(}}}))', '&#123;&#123;&#123;' + middle_data[0] + '\g<in>', data, 1)
                 else:
-                    if re.search('^(#|@|\+|\-)', middle_data[0]) and not re.search('^(#|@|\+|\-){2}', middle_data[0]):
+                    if re.search('^(#|@|\+|\-)', middle_data[0]) and not re.search('^(#|@|\+|\-){2}|(#|@|\+|\-)\\\\', middle_data[0]):
                         middle_search = re.search('^(#(?:[0-9a-f-A-F]{3}){1,2})', middle_data[0])
                         if middle_search:                            
                             middle_list += ['span']
@@ -452,7 +454,7 @@ def namu(conn, data, title, main_num):
     data = re.sub('&amp;', '&', data)
 
     data = re.sub('\n( +)\|\|', '\n||', data)
-    data = re.sub('\|\|( +)\n', '||\n', data)
+    data = re.sub('\|\|( +)\n', '|| \n', data)
 
     data = re.sub('\n##(((?!\n).)+)', '', data)
            

@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def login_change_password_2(conn, server_init):
+def user_setting_2(conn, server_init):
     curs = conn.cursor()
 
     support_language = server_init.server_set_var['language']['list']
@@ -16,28 +16,6 @@ def login_change_password_2(conn, server_init):
     
     if user_state == 'ip':
         if flask.request.method == 'POST':    
-            if flask.request.form.get('pw4', None) and flask.request.form.get('pw2', None):
-                if flask.request.form.get('pw2', None) != flask.request.form.get('pw3', None):
-                    return re_error('/error/20')
-
-                curs.execute("select pw, encode from user where id = ?", [flask.session['id']])
-                user = curs.fetchall()
-                if not user:
-                    return re_error('/error/2')
-                
-                pw_check_d = pw_check(
-                    flask.request.form.get('pw4', ''), 
-                    user[0][0],
-                    user[0][1],
-                    flask.request.form.get('id', None)
-                )
-                if pw_check_d != 1:
-                    return re_error('/error/10')
-
-                hashed = pw_encode(flask.request.form.get('pw2', None))
-                
-                curs.execute("update user set pw = ? where id = ?", [hashed, flask.session['id']])
-
             auto_list = ['email', 'skin', 'lang']
 
             for auto_data in auto_list:
@@ -57,7 +35,7 @@ def login_change_password_2(conn, server_init):
             if data:
                 email = data[0][0]
             else:
-                email = ''
+                email = '-'
 
             div2 = load_skin()
             div3 = ''
@@ -92,31 +70,29 @@ def login_change_password_2(conn, server_init):
 
             return easy_minify(flask.render_template(skin_check(),    
                 imp = [load_lang('user_setting'), wiki_set(), custom(), other2([0, 0])],
-                data =  '''
-                        <form method="post">
-                            <span>''' + load_lang('id') + ''' : ''' + ip + '''</span>
-                            <hr class=\"main_hr\">
-                            <input placeholder="''' + load_lang('now_password') + '''" name="pw4" type="password">
-                            <hr class=\"main_hr\">
-                            <input placeholder="''' + load_lang('new_password') + '''" name="pw2" type="password">
-                            <hr class=\"main_hr\">
-                            <input placeholder="''' + load_lang('password_confirm') + '''" name="pw3" type="password">
-                            <hr class=\"main_hr\">
-                            <span>''' + load_lang('skin') + '''</span>
-                            <hr class=\"main_hr\">
-                            <select name="skin">''' + div2 + '''</select>
-                            <hr class=\"main_hr\">
-                            <span>''' + load_lang('language') + '''</span>
-                            <hr class=\"main_hr\">
-                            <select name="lang">''' + div3 + '''</select>
-                            <hr class=\"main_hr\">
-                            <span>''' + load_lang('oauth_connection') + '''</span>
-                            ''' + oauth_content + '''
-                            <hr class=\"main_hr\">
-                            <button type="submit">''' + load_lang('save') + '''</button>
-                            ''' + http_warring + '''
-                        </form>
-                        ''',
+                data = '''
+                    <form method="post">
+                        <span>''' + load_lang('id') + ''' : ''' + ip + '''</span>
+                        <hr class=\"main_hr\">
+                        <a href="/pw_change">(''' + load_lang('password_change') + ''')</a>
+                        <hr class=\"main_hr\">
+                        <span>''' + load_lang('email') + ''' : ''' + email + '''</span> <a href="/email_change">(''' + load_lang('email_change') + ''')</a>
+                        <hr class=\"main_hr\">
+                        <span>''' + load_lang('skin') + '''</span>
+                        <hr class=\"main_hr\">
+                        <select name="skin">''' + div2 + '''</select>
+                        <hr class=\"main_hr\">
+                        <span>''' + load_lang('language') + '''</span>
+                        <hr class=\"main_hr\">
+                        <select name="lang">''' + div3 + '''</select>
+                        <hr class=\"main_hr\">
+                        <span>''' + load_lang('oauth_connection') + '''</span>
+                        ''' + oauth_content + '''
+                        <hr class=\"main_hr\">
+                        <button type="submit">''' + load_lang('save') + '''</button>
+                        ''' + http_warring + '''
+                    </form>
+                ''',
                 menu = [['user', load_lang('return')]]
             ))
     else:

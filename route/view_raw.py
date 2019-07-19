@@ -22,10 +22,13 @@ def view_raw_2(conn, name, sub_title, num):
 
         menu = [['history/' + url_pas(name), load_lang('history')]]
     elif sub_title:
-        curs.execute("select data from topic where id = ? and title = ? and sub = ? and block = ''", [str(num), name, sub_title])
+        if admin_check(6) != 1:
+            curs.execute("select data from topic where id = ? and title = ? and sub = ? and block = ''", [str(num), name, sub_title])
+        else:
+            curs.execute("select data from topic where id = ? and title = ? and sub = ?", [str(num), name, sub_title])
         
         v_name = load_lang('discussion_raw')
-        sub = ' (' + str(num) + ')'
+        sub = ' (#' + str(num) + ')'
 
         menu = [['topic/' + url_pas(name) + '/sub/' + url_pas(sub_title) + '#' + str(num), load_lang('discussion')], ['topic/' + url_pas(name) + '/sub/' + url_pas(sub_title) + '/admin/' + str(num), load_lang('return')]]
     else:
@@ -44,4 +47,4 @@ def view_raw_2(conn, name, sub_title, num):
             menu = menu
         ))
     else:
-        return redirect('/w/' + url_pas(name))
+        return re_error('/error/3')
