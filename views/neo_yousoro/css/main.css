@@ -370,3 +370,13 @@ input {
 #nav_bar a {
     color: black;
 }
+
+blockquote {
+    padding: 1em calc(2em + 25px) 1em 1em;
+    margin: 1em 0em 0em;
+    background: #eeeeee;
+    display: block;
+    border: 2px dashed #ccc;
+    border-left: 5px solid skyblue;
+    font-size: 14px;
+}
