@@ -69,9 +69,10 @@ openNAMU is open source project. Add new features and request pull requests.
 openNAMU is protected by [BSD 3-Clause License](./LICNESE). Please refer to the documentation for details.
 
 ## External Projects
- * Quotes icon [Dave Gandy](http://www.flaticon.com/free-icon/quote-left_25672) CC 3.0 BY
+ * Quotes icon [Dave Gandy](http://www.flaticon.com/free-icon/quote-left_25672)
  * Syntax highlighting [highlightjs](https://highlightjs.org/)
  * Numerical expression [MathJax](https://www.mathjax.org/)
+ * Handling Keyboard Shortcuts [shortcut.js](http://www.openjs.com/scripts/events/keyboard_shortcuts/)
 
 # Authors
  * [Reference](https://github.com/2DU/openNAMU/graphs/contributors)

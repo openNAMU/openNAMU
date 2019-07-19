@@ -43,12 +43,14 @@ for i in range(0, 2):
             if platform.system() == 'Linux':
                 ok = os.system('python3 -m pip install --user -r requirements.txt')
                 if ok == 0:
+                    print('----')
                     os.execl(sys.executable, sys.executable, *sys.argv)
                 else:
                     raise
             elif platform.system() == 'Windows':
                 ok = os.system('python -m pip install --user -r requirements.txt')
                 if ok == 0:
+                    print('----')
                     os.execl(sys.executable, sys.executable, *sys.argv)
                 else:
                     raise
@@ -194,7 +196,7 @@ def update():
     except:
         pass
 
-    # Start : Data Migration Code
+    # Start : Data migration code
     app_var = json.loads(open(os.path.abspath('./data/app_variables.json'), encoding='utf-8').read())
 
     if os.path.exists('image'):
@@ -362,11 +364,14 @@ def ip_or_user(data):
 
 def edit_button():
     insert_list = [
-        ['[[|]]', '[[|]]'], 
-        ['[*()]', '[*()]'], 
-        ['{{{#!}}}', '{{{#!}}}'], 
-        ['||<>||', '||<>||'], 
-        ["\\'\\'\\'", "\'\'\'"]
+        ['[[name|view]]', load_lang('edit_button_link')], 
+        ['[* data]', load_lang('edit_button_footnote')], 
+        ['[macro(data)]', load_lang('edit_button_macro')],
+        ['{{{#color data}}}', load_lang('edit_button_color')], 
+        ["\\'\\'\\'data\\'\\'\\'", load_lang('edit_button_bold')],
+        ["~~data~~", load_lang('edit_button_strike')],
+        ["{{{+number data}}}", load_lang('edit_button_big')],
+        ["== name ==", load_lang('edit_button_paragraph')]
     ]
 
     data = ''
@@ -597,7 +602,7 @@ def ip_pas(raw_ip):
         curs.execute("select data from other where name = 'ip_view'")
         data = curs.fetchall()
         if data and data[0][0] != '':
-            ip = '<span style="font-size: 75%;">' + hashlib.md5(bytes(raw_ip, 'utf-8')).hexdigest() + '</span>'
+            ip = re.sub('((?:(?!\.).)+)$', 'xxx', raw_ip)
 
             if not admin_check(1):
                 hide = 1
@@ -775,14 +780,14 @@ def acl_check(name, tool = ''):
                 if ip_or_user(ip) == 1:
                     return 1
 
-                if admin_check(5, 'topic send (' + name + ')') != 1:
+                if admin_check(5) != 1:
                     return 1
 
             if acl_data[0][0] == '50_edit':
                 if ip_or_user(ip) == 1:
                     return 1
                 
-                if admin_check(5, 'topic send (' + name + ')') != 1:
+                if admin_check(5) != 1:
                     curs.execute("select count(title) from history where ip = ?", [ip])
                     count = curs.fetchall()
                     if count:
@@ -791,6 +796,16 @@ def acl_check(name, tool = ''):
                         count = 0
 
                     if count < 50:
+                        return 1
+
+            if acl_data[0][0] == 'email':
+                if ip_or_user(ip) == 1:
+                    return 1
+                
+                if admin_check(5) != 1:
+                    curs.execute("select data from user_set where id = ? and name = 'email'", [ip])
+                    email = curs.fetchall()
+                    if not email:
                         return 1
 
         curs.execute('select data from other where name = "edit"')
@@ -852,7 +867,7 @@ def ban_check(ip = None, tool = None):
     band_d = curs.fetchall()
     if band_d:
         if tool and tool == 'login':
-            if data[0][0] != 'O':
+            if band_d[0][0] != 'O':
                 return 1
         else:
             return 1
@@ -861,7 +876,7 @@ def ban_check(ip = None, tool = None):
     ban_d = curs.fetchall()
     if ban_d:
         if tool and tool == 'login':
-            if data[0][0] != 'O':
+            if ban_d[0][0] != 'O':
                 return 1
         else:
             return 1

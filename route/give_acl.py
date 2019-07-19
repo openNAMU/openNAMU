@@ -29,22 +29,8 @@ def give_acl_2(conn, name):
                 check_ok = 'disabled'
 
     if flask.request.method == 'POST':
-        if flask.request.form.get('view', None):
-            if flask.request.form.get('dec', '') != flask.request.form.get('view', ''):
-                dec = flask.request.form.get('view', '')
-                view = flask.request.form.get('view', '')
-
-                if view == 'normal':
-                    dec = flask.request.form.get('dec', '') 
-                elif view == 'user':
-                    if dec == 'admin':
-                        dec = flask.request.form.get('dec', '')
-            else:
-                dec = flask.request.form.get('dec', '')
-                view = flask.request.form.get('view', '')
-        else:
-            dec = flask.request.form.get('dec', '')
-            view = flask.request.form.get('view', '')
+        dec = flask.request.form.get('dec', '')
+        view = flask.request.form.get('view', '')
 
         curs.execute("select title from acl where title = ?", [name])
         if curs.fetchall():
@@ -68,7 +54,7 @@ def give_acl_2(conn, name):
         if re.search('^user:', name):
             acl_list = [['', 'normal'], ['user', 'member'], ['all', 'all']]
         else:
-            acl_list = [['', 'normal'], ['user', 'member'], ['admin', 'admin'], ['50_edit', '50 edit']]
+            acl_list = [['', 'normal'], ['user', 'member'], ['admin', 'admin'], ['50_edit', '50 edit'], ['email', 'email']]
         
         curs.execute("select dec from acl where title = ?", [name])
         acl_data = curs.fetchall()
@@ -115,6 +101,7 @@ def give_acl_2(conn, name):
                     <li>member : ''' + load_lang('member_acl') + '''</li>
                     <li>50 edit : ''' + load_lang('50_edit_acl') + '''</li>
                     <li>all : ''' + load_lang('all_acl') + '''</li>
+                    <li>all : ''' + load_lang('email_acl') + '''</li>
                 </ul>
             '''
                 
