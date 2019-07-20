@@ -9,18 +9,32 @@ def list_admin_use_2(conn):
     else:
         sql_num = 0
 
-    list_data = '<ul>'
+    if flask.request.method == 'POST':
+        return redirect('/admin_log?search=' + flask.request.form.get('search', 'normal'))
+    else:
+        list_data = '<ul>'
 
-    curs.execute("select who, what, time from re_admin order by time desc limit ?, '50'", [str(sql_num)])
-    get_list = curs.fetchall()
-    for data in get_list:            
-        list_data += '<li>' + ip_pas(data[0]) + ' / ' + data[1] + ' / ' + data[2] + '</li>'
+        if flask.request.args.get('search', 'normal') == 'normal':
+            curs.execute("select who, what, time from re_admin order by time desc limit ?, '50'", [str(sql_num)])
+        else:
+            curs.execute("select who, what, time from re_admin where what like ? order by time desc limit ?, '50'", [
+                flask.request.args.get('search', 'normal') + "%",
+                str(sql_num)
+            ])
 
-    list_data += '</ul>'
-    list_data += next_fix('/admin_log?num=', num, get_list)
+        get_list = curs.fetchall()
+        for data in get_list:            
+            list_data += '<li>' + ip_pas(data[0]) + ' / ' + data[1] + ' / ' + data[2] + '</li>'
 
-    return easy_minify(flask.render_template(skin_check(), 
-        imp = [load_lang('authority_use_list'), wiki_set(), custom(), other2([0, 0])],
-        data = list_data,
-        menu = [['other', load_lang('return')]]
-    ))
+        list_data += '</ul>'
+        list_data += next_fix('/admin_log?num=', num, get_list)
+
+        return easy_minify(flask.render_template(skin_check(), 
+            imp = [load_lang('authority_use_list'), wiki_set(), custom(), other2([0, 0])],
+            data = '''
+                <form method="post">
+                    <input name="search" id="admin_log_search"> <button type="submit">''' + load_lang('search') + '''</button>
+                </form>
+            ''' + list_data,
+            menu = [['other', load_lang('return')]]
+        ))
