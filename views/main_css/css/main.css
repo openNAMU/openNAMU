@@ -37,3 +37,4 @@ hr.main_hr { border: none; }
 .foot_plus { background: gainsboro; }
 #toc_title { font-size: 18px; }
 blockquote { background-image: url(/views/acme/img/quote.png); background-position: calc(100% - 10px) 10px; background-repeat: no-repeat; background-size: 25px; }
+#admin_log_search { width: 100px; }
