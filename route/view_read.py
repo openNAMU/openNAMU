@@ -3,7 +3,6 @@ from .tool.func import *
 def view_read_2(conn, name):
     curs = conn.cursor()
 
-    data_none = 0
     sub = ''
     acl = ''
     div = ''
@@ -75,10 +74,7 @@ def view_read_2(conn, name):
     data = curs.fetchall()
     if data:
         else_data = data[0][1]
-        response_data = 200
     else:
-        data_none = 1
-        response_data = 404
         else_data = None
 
     m = re.search("^user:([^/]*)", name)
@@ -111,9 +107,10 @@ def view_read_2(conn, name):
 
     if end_data == 'HTTP Request 401.3':
         response_data = 401
-        end_return_401 = 1
+    elif end_data == 'HTTP Request 404':
+        response_data = 404
     else:
-        end_return_401 = 0
+        response_data = 200
     
     if num:
         menu = [['history/' + url_pas(name), load_lang('history')]]
@@ -121,7 +118,7 @@ def view_read_2(conn, name):
         acl = ''
         r_date = 0
     else:
-        if data_none == 1:
+        if response_data == 404:
             menu = [['edit/' + url_pas(name), load_lang('create')]]
         else:
             menu = [['edit/' + url_pas(name), load_lang('edit')]]
@@ -169,7 +166,7 @@ def view_read_2(conn, name):
     
     div = adsense_code + '<div>' + div + '</div>'
     
-    if end_return_401 == 1:
+    if response_data == 401:
         return re_error('/error/3')
     else:
         return easy_minify(flask.render_template(skin_check(), 
