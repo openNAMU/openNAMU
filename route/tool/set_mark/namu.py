@@ -510,13 +510,6 @@ def namu(conn, data, title, main_num):
         else:
             break
 
-    while 1:
-        hr = re.search('\n-{4,9}\n', data)
-        if hr:
-            data = re.sub('\n-{4,9}\n', '\n<hr>\n', data, 1)
-        else:
-            break
-
     data += '\n'
 
     data = data.replace('\\', '&#92;')
@@ -705,6 +698,13 @@ def namu(conn, data, title, main_num):
             block = re.sub('\n$', '', block)
             
             data = re.sub('(\n(?:&gt; ?(?:(?:(?!\n).)+)?\n)+)', '\n<blockquote>' + block + '</blockquote>\n', data, 1)
+        else:
+            break
+
+    while 1:
+        hr = re.search('\n-{4,9}\n', data)
+        if hr:
+            data = re.sub('\n-{4,9}\n', '\n<hr>\n', data, 1)
         else:
             break
 
