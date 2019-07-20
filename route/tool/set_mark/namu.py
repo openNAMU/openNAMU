@@ -747,7 +747,7 @@ def namu(conn, data, title, main_num):
 
     data = table_start(data)
 
-    category = '\n<hr><div id="cate">Category : '
+    category = '\n<div id="cate_all"><hr><div id="cate">Category : '
     category_re = re.compile('^(?:category|분류):', re.I)
     while 1:
         link = re.search('\[\[((?:(?!\[\[|\]\]).)+)\]\]', data)
@@ -834,7 +834,7 @@ def namu(conn, data, title, main_num):
 
                 backlink += [[title, main_link, 'cat']]
 
-                category += '<a ' + link_id + ' href="' + tool.url_pas(main_link) + '">' + category_re.sub('', see_link) + '</a> / '
+                category += '<a ' + link_id + ' href="' + tool.url_pas(main_link) + '">' + category_re.sub('', see_link) + '</a> | '
                 data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '', data, 1)
             elif re.search('^wiki:', main_link):
                 data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<a id="inside" href="/' + tool.url_pas(re.sub('^wiki:', '', main_link)) + '">' + see_link + '</a>', data, 1)
@@ -982,10 +982,9 @@ def namu(conn, data, title, main_num):
 
     data = re.sub('\n$', footdata_all, data + '\n', 1)
 
-    category += '</div>'
-    category = re.sub(' / <\/div>$', '</div>', category)
+    category += '</div></div>'
 
-    if category == '\n<hr><div id="cate">Category : </div>':
+    if category == '\n<div id="cate_all"><hr><div id="cate">Category : </div></div>':
         category = ''
 
     data += category
