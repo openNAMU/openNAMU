@@ -107,8 +107,10 @@ def view_read_2(conn, name):
 
     if end_data == 'HTTP Request 401.3':
         response_data = 401
+        end_data = '<h2>' + load_lang('error') + '</h2><ul><li>' + load_lang('authority_error') + '</li></ul>'
     elif end_data == 'HTTP Request 404':
         response_data = 404
+        end_data = '<h2>' + load_lang('error') + '</h2><ul><li>' + load_lang('decument_404_error') + '</li></ul>'
     else:
         response_data = 200
     
@@ -165,12 +167,9 @@ def view_read_2(conn, name):
         div = body[0][0] + '<hr class=\"main_hr\">' + div
     
     div = adsense_code + '<div>' + div + '</div>'
-    
-    if response_data == 401:
-        return re_error('/error/3')
-    else:
-        return easy_minify(flask.render_template(skin_check(), 
-            imp = [flask.request.args.get('show', name), wiki_set(), custom(), other2([sub + acl, r_date])],
-            data = div,
-            menu = menu
-        )), response_data
+
+    return easy_minify(flask.render_template(skin_check(), 
+        imp = [flask.request.args.get('show', name), wiki_set(), custom(), other2([sub + acl, r_date])],
+        data = div,
+        menu = menu
+    )), response_data

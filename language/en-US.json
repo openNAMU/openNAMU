@@ -308,5 +308,6 @@
             "file_name_error" : "Only alphabet, hangul, space, underscore, and minus signs are allowed for file names.",
             "topic_long_error" : "The discussion name must not exceed 256 characters.",
             "email_error" : "No one has this email.",
-            "regex_error" : "There is an error in the regular expression."
+            "regex_error" : "There is an error in the regular expression.",
+            "decument_404_error" : "This document does not exist."
 }
