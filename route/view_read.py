@@ -111,6 +111,9 @@ def view_read_2(conn, name):
 
     if end_data == 'HTTP Request 401.3':
         response_data = 401
+        end_return_401 = 1
+    else:
+        end_return_401 = 0
     
     if num:
         menu = [['history/' + url_pas(name), load_lang('history')]]
@@ -166,8 +169,11 @@ def view_read_2(conn, name):
     
     div = adsense_code + '<div>' + div + '</div>'
     
-    return easy_minify(flask.render_template(skin_check(), 
-        imp = [flask.request.args.get('show', name), wiki_set(), custom(), other2([sub + acl, r_date])],
-        data = div,
-        menu = menu
-    )), response_data
+    if end_return_401 == 1:
+        return re_error('/error/3')
+    else:
+        return easy_minify(flask.render_template(skin_check(), 
+            imp = [flask.request.args.get('show', name), wiki_set(), custom(), other2([sub + acl, r_date])],
+            data = div,
+            menu = menu
+        )), response_data

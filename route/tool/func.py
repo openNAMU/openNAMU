@@ -1163,6 +1163,6 @@ def re_error(data):
                 imp = [load_lang('error'), wiki_set(1), custom(), other2([0, 0])],
                 data = '<h2>' + load_lang('error') + '</h2><ul><li>' + data + '</li></ul>',
                 menu = 0
-            ))
+            )), 401
         else:
             return redirect('/')
