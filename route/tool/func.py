@@ -155,7 +155,10 @@ def render_set(title = '', data = '', num = 0, s_data = 0):
     elif s_data == 1:
         return data
     else:
-        return namumark(title, data, num)
+        if data != None:
+            return namumark(title, data, num)
+        else:
+            return 'HTTP Request 404'
 
 def captcha_get():
     data = ''
