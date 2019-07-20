@@ -12,7 +12,7 @@ def inter_wiki_plus_2(conn, tools, name):
             if admin_check(1, 'edit_filter edit') != 1:
                 return re_error('/error/3')
 
-            if flask.request.form.get('limitless', '') != '':
+            if flask.request.form.get('second', '0') == '0':
                 end = 'X'
             else:
                 end = flask.request.form.get('second', 'X')
@@ -86,11 +86,23 @@ def inter_wiki_plus_2(conn, tools, name):
                 time_check = ''
                 time_data = ''
 
+            t_data = [
+                ['86400', load_lang('1_day')],
+                ['432000‬', load_lang('5_day')],
+                ['2592000', load_lang('30_day')],
+                ['15552000', load_lang('180_day')],
+                ['31104000‬', load_lang('360_day')],
+                ['0', load_lang('limitless')]
+            ]
+            insert_data = ''
+            for i in t_data:
+                insert_data += '<a href="javascript:insert_v(\'second\', \'' + i[0] + '\')">(' + i[1] + ')</a> '
+
             title = load_lang('edit_filter_add')
             form_data = '''
-                <input placeholder="''' + load_lang('second') + '''" name="second" type="text" value="''' + html.escape(time_data) + '''">
+                <script>function insert_v(name, data) { document.getElementById(name).value = data; }</script>''' + insert_data + '''                
                 <hr class=\"main_hr\">
-                <input ''' + stat + ''' type="checkbox" ''' + time_check + ''' name="limitless"> ''' + load_lang('limitless') + '''
+                <input placeholder="''' + load_lang('second') + '''" id="second" name="second" type="text" value="''' + html.escape(time_data) + '''">
                 <hr class=\"main_hr\">
                 <input ''' + stat + ''' placeholder="''' + load_lang('regex') + '''" name="content" value="''' + html.escape(textarea) + '''" type="text">
             '''
