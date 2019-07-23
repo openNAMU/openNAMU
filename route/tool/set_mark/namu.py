@@ -438,7 +438,7 @@ def namu(conn, data, title, main_num):
 
                 include_parser = re.sub('\[\[(?:category|분류):(((?!\]\]|#include).)+)\]\]', '', include_parser)
 
-                data = include_re.sub('<include>\n<a id="include_link" href="/w/' + tool.url_pas(include_link) + '">[' + include_link + ']</a>\n' + include_parser + '\n</include>', data, 1)
+                data = include_re.sub('<include><a id="include_link" href="/w/' + tool.url_pas(include_link) + '">\n[' + include_link + ']</a>\n' + include_parser + '\n</include>', data, 1)
             else:
                 data = include_re.sub('<a id="not_thing" href="/w/' + tool.url_pas(include_link) + '">' + include_link + '</a>', data, 1)
         else:
@@ -1032,7 +1032,7 @@ def namu(conn, data, title, main_num):
             i += 1
     
     data = re.sub('<\/td_end>', '</td>', data)
-    data = re.sub('<include>\n', '', data)
+    data = re.sub('<include>', '', data)
     data = re.sub('\n<\/include>', '', data)
     
     data = re.sub('(?P<in><\/h[0-9]>)(\n)+', '\g<in>', data)
