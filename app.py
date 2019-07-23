@@ -339,7 +339,7 @@ def give_history_hidden(name = None):
 def list_user():
     return list_user_2(conn)
 
-@app.route('/admin_log')
+@app.route('/admin_log', methods=['POST', 'GET'])
 def list_admin_use():
     return list_admin_use_2(conn)
 

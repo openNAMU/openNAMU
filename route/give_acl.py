@@ -39,9 +39,15 @@ def give_acl_2(conn, name):
             curs.execute("update acl set why = ? where title = ?", [flask.request.form.get('why', ''), name])
             curs.execute("update acl set view = ? where title = ?", [view, name])
         else:
-            curs.execute("insert into acl (title, dec, dis, why, view) values (?, ?, ?, ?, ?)", [name, dec, flask.request.form.get('dis', ''), flask.request.form.get('why', ''), view])
+            curs.execute("insert into acl (title, dec, dis, why, view) values (?, ?, ?, ?, ?)", [
+                name, 
+                dec, 
+                flask.request.form.get('dis', ''), 
+                flask.request.form.get('why', ''), 
+                view
+            ])
         
-        curs.execute("select title from acl where title = ? and dec = '' and dis = ''", [name])
+        curs.execute("select title from acl where title = ? and dec = '' and dis = '' and view = ''", [name])
         if curs.fetchall():
             curs.execute("delete from acl where title = ?", [name])
 

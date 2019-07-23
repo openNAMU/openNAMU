@@ -155,7 +155,10 @@ def render_set(title = '', data = '', num = 0, s_data = 0):
     elif s_data == 1:
         return data
     else:
-        return namumark(title, data, num)
+        if data != None:
+            return namumark(title, data, num)
+        else:
+            return 'HTTP Request 404'
 
 def captcha_get():
     data = ''
@@ -1163,6 +1166,6 @@ def re_error(data):
                 imp = [load_lang('error'), wiki_set(1), custom(), other2([0, 0])],
                 data = '<h2>' + load_lang('error') + '</h2><ul><li>' + data + '</li></ul>',
                 menu = 0
-            ))
+            )), 401
         else:
             return redirect('/')
