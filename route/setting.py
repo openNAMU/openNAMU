@@ -182,19 +182,22 @@ def setting_2(conn, num):
             ))
     elif num == 2:
         i_list = [
-            'contract', 
-            'no_login_warring', 
-            'edit_bottom_text',
-            'check_key_text',
-            'email_title',
-            'email_text',
-            'email_insert_text',
-            'password_search_text',
-            'reset_user_text'
+            ['contract', ''], 
+            ['no_login_warring', ''], 
+            ['edit_bottom_text', ''],
+            ['check_key_text', ''],
+            ['email_title', ''],
+            ['email_text', ''],
+            ['email_insert_text', ''],
+            ['password_search_text', ''],
+            ['reset_user_text', '']
         ]
         if flask.request.method == 'POST':
             for i in i_list:
-                curs.execute("update other set data = ? where name = ?", [flask.request.form.get(i, ''), i])
+                curs.execute("update other set data = ? where name = ?", [
+                    flask.request.form.get(i[0], ''), 
+                    i[0]
+                ])
 
             conn.commit()
             
@@ -202,22 +205,17 @@ def setting_2(conn, num):
 
             return redirect('/setting/2')
         else:
-            n_list = ['', '', '', '', '', '', '', '', '']
             d_list = []
             
-            x = 0
-            
             for i in i_list:
-                curs.execute('select data from other where name = ?', [i])
+                curs.execute('select data from other where name = ?', [i[0]])
                 sql_d = curs.fetchall()
                 if sql_d:
                     d_list += [sql_d[0][0]]
                 else:
-                    curs.execute('insert into other (name, data) values (?, ?)', [i, n_list[x]])
+                    curs.execute('insert into other (name, data) values (?, ?)', [i[0], i[1]])
                     
-                    d_list += [n_list[x]]
-
-                x += 1
+                    d_list += [i[1]]
 
             conn.commit()
 
@@ -227,39 +225,39 @@ def setting_2(conn, num):
                         <form method="post">
                             <span>''' + load_lang('register_text') + ''' (HTML)</span>
                             <hr class=\"main_hr\">
-                            <input type="text" name="contract" value="''' + html.escape(d_list[0]) + '''">
+                            <input name="''' + i_list[0][0] + '''" value="''' + html.escape(d_list[0]) + '''">
                             <hr class=\"main_hr\">
                             <span>''' + load_lang('non_login_alert') + ''' (HTML)</span>
                             <hr class=\"main_hr\">
-                            <input type="text" name="no_login_warring" value="''' + html.escape(d_list[1]) + '''">
+                            <input name="''' + i_list[1][0] + '''" value="''' + html.escape(d_list[1]) + '''">
                             <hr class=\"main_hr\">
                             <span>''' + load_lang('edit_bottom_text') + ''' (HTML)</span>
                             <hr class=\"main_hr\">
-                            <input type="text" name="edit_bottom_text" value="''' + html.escape(d_list[2]) + '''">
+                            <input name="''' + i_list[2][0] + '''" value="''' + html.escape(d_list[2]) + '''">
                             <hr class=\"main_hr\">
                             <span>''' + load_lang('check_key_text') + ''' (HTML)</span>
                             <hr class=\"main_hr\">
-                            <input type="text" name="check_key_text" value="''' + html.escape(d_list[3]) + '''">
+                            <input name="''' + i_list[3][0] + '''" value="''' + html.escape(d_list[3]) + '''">
                             <hr class=\"main_hr\">
                             <span>''' + load_lang('email_title') + '''</span>
                             <hr class=\"main_hr\">
-                            <input type="text" name="email_title" value="''' + html.escape(d_list[4]) + '''">
+                            <input name="''' + i_list[4][0] + '''" value="''' + html.escape(d_list[4]) + '''">
                             <hr class=\"main_hr\">
                             <span>''' + load_lang('email_text') + '''</span>
                             <hr class=\"main_hr\">
-                            <input type="text" name="email_text" value="''' + html.escape(d_list[5]) + '''">
+                            <input name="''' + i_list[5][0] + '''" value="''' + html.escape(d_list[5]) + '''">
                             <hr class=\"main_hr\">
                             <span>''' + load_lang('email_insert_text') + '''</span>
                             <hr class=\"main_hr\">
-                            <input type="text" name="email_insert_text" value="''' + html.escape(d_list[6]) + '''">
+                            <input name="''' + i_list[6][0] + '''" value="''' + html.escape(d_list[6]) + '''">
                             <hr class=\"main_hr\">
                             <span>''' + load_lang('password_search_text') + '''</span>
                             <hr class=\"main_hr\">
-                            <input type="text" name="password_search_text" value="''' + html.escape(d_list[7]) + '''">
+                            <input name="''' + i_list[7][0] + '''" value="''' + html.escape(d_list[7]) + '''">
                             <hr class=\"main_hr\">
                             <span>''' + load_lang('reset_user_text') + '''</span>
                             <hr class=\"main_hr\">
-                            <input type="text" name="reset_user_text" value="''' + html.escape(d_list[8]) + '''">
+                            <input name="''' + i_list[8][0] + '''" value="''' + html.escape(d_list[8]) + '''">
                             <hr class=\"main_hr\">
                             <button id="save" type="submit">''' + load_lang('save') + '''</button>
                         </form>
