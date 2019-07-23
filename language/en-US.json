@@ -210,7 +210,7 @@
                 "register_text" : "Terms of sign-up",
                 "non_login_alert" : "Non-login alert",
                 "edit_bottom_text" : "Editing textarea bottom notice",
-                "Check authentication key" : "Check authentication key notice",
+                "check_key_text" : "Check authentication key notice",
                 "email_title" : "Email subject",
                 "email_text" : "Email content",
                 "email_insert_text" : "Email input box text",
