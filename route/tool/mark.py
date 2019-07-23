@@ -40,32 +40,29 @@ def plusing(data):
             curs.execute("insert into back (title, link, type) values (?, ?, ?)", [data_in[1], data_in[0], data_in[2]])
 
 def namumark(title = '', data = None, num = 0):
-    if data != None:
-        curs.execute('select data from other where name = "markup"')
-        rep_data = curs.fetchall()
-        if rep_data[0][0] == 'namumark':
-            data = namu(conn, data, title, num)
-        else:
-            data = ['', '', []]
-
-        if num == 1:
-            data_num = len(data[2]) 
-            data_in_num = int(data_num / multiprocessing.cpu_count())
-            data_in = []
-
-            for i in range(multiprocessing.cpu_count()):
-                if i != multiprocessing.cpu_count() - 1:
-                    data_in += [data[2][data_in_num * i:data_in_num * (i + 1)]]
-                else:
-                    data_in += [data[2][data_in_num * i:]]
-
-            for data_in_for in data_in:
-                thread_start = threading.Thread(target = plusing, args = [data_in_for])
-                thread_start.start()
-                thread_start.join()
-            
-            conn.commit()
-            
-        return data[0] + data[1]
+    curs.execute('select data from other where name = "markup"')
+    rep_data = curs.fetchall()
+    if rep_data[0][0] == 'namumark':
+        data = namu(conn, data, title, num)
     else:
-        return 'HTTP Request 404'
+        data = ['', '', []]
+
+    if num == 1:
+        data_num = len(data[2]) 
+        data_in_num = int(data_num / multiprocessing.cpu_count())
+        data_in = []
+
+        for i in range(multiprocessing.cpu_count()):
+            if i != multiprocessing.cpu_count() - 1:
+                data_in += [data[2][data_in_num * i:data_in_num * (i + 1)]]
+            else:
+                data_in += [data[2][data_in_num * i:]]
+
+        for data_in_for in data_in:
+            thread_start = threading.Thread(target = plusing, args = [data_in_for])
+            thread_start.start()
+            thread_start.join()
+        
+        conn.commit()
+        
+    return data[0] + data[1]

@@ -3,7 +3,6 @@ from .tool.func import *
 def view_read_2(conn, name):
     curs = conn.cursor()
 
-    data_none = 0
     sub = ''
     acl = ''
     div = ''
@@ -75,10 +74,7 @@ def view_read_2(conn, name):
     data = curs.fetchall()
     if data:
         else_data = data[0][1]
-        response_data = 200
     else:
-        data_none = 1
-        response_data = 404
         else_data = None
 
     m = re.search("^user:([^/]*)", name)
@@ -111,6 +107,12 @@ def view_read_2(conn, name):
 
     if end_data == 'HTTP Request 401.3':
         response_data = 401
+        end_data = '<h2>' + load_lang('error') + '</h2><ul><li>' + load_lang('authority_error') + '</li></ul>'
+    elif end_data == 'HTTP Request 404':
+        response_data = 404
+        end_data = '<h2>' + load_lang('error') + '</h2><ul><li>' + load_lang('decument_404_error') + '</li></ul>'
+    else:
+        response_data = 200
     
     if num:
         menu = [['history/' + url_pas(name), load_lang('history')]]
@@ -118,7 +120,7 @@ def view_read_2(conn, name):
         acl = ''
         r_date = 0
     else:
-        if data_none == 1:
+        if response_data == 404:
             menu = [['edit/' + url_pas(name), load_lang('create')]]
         else:
             menu = [['edit/' + url_pas(name), load_lang('edit')]]
@@ -165,7 +167,7 @@ def view_read_2(conn, name):
         div = body[0][0] + '<hr class=\"main_hr\">' + div
     
     div = adsense_code + '<div>' + div + '</div>'
-    
+
     return easy_minify(flask.render_template(skin_check(), 
         imp = [flask.request.args.get('show', name), wiki_set(), custom(), other2([sub + acl, r_date])],
         data = div,
