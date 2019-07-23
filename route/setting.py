@@ -30,8 +30,44 @@ def setting_2(conn, num):
             menu = [['manager', load_lang('return')]]
         ))
     elif num == 1:
-        i_list = ['name', 'logo', 'frontpage', 'license', 'upload', 'skin', 'edit', 'reg', 'ip_view', 'back_up', 'port', 'key', 'update', 'email_have', 'discussion', 'encode', 'host']
-        n_list = ['Wiki', '', 'FrontPage', 'CC 0', '2', '', 'normal', '', '', '0', '3000', 'test', 'stable', '', 'normal', 'sha256', '0.0.0.0']
+        i_list = {
+            0 : 'name', 
+            1 : 'logo', 
+            2 : 'frontpage', 
+            3 : 'license', 
+            4 : 'upload', 
+            5 : 'skin', 
+            6 : 'edit', 
+            7 : 'reg', 
+            8 : 'ip_view', 
+            9 : 'back_up', 
+            10 : 'port', 
+            11 : 'key', 
+            12 : 'update', 
+            13 : 'email_have', 
+            14 : 'discussion', 
+            15 : 'encode', 
+            16 : 'host'
+        }
+        n_list = {
+            0 : 'Wiki', 
+            1 : '', 
+            2 : 'FrontPage', 
+            3 : 'CC 0', 
+            4 : '2', 
+            5 : '', 
+            6 : 'normal', 
+            7 : '', 
+            8 : '', 
+            9 : '0', 
+            10 : '3000', 
+            11 : 'test', 
+            12 : 'stable', 
+            13 : '', 
+            14 : 'normal', 
+            15 : 'sha3', 
+            16 : '0.0.0.0'
+        }
         
         if flask.request.method == 'POST':
             i = 0
@@ -182,21 +218,21 @@ def setting_2(conn, num):
             ))
     elif num == 2:
         i_list = [
-            ['contract', ''], 
-            ['no_login_warring', ''], 
-            ['edit_bottom_text', ''],
-            ['check_key_text', ''],
-            ['email_title', ''],
-            ['email_text', ''],
-            ['email_insert_text', ''],
-            ['password_search_text', ''],
-            ['reset_user_text', '']
+            'contract', 
+            'no_login_warring', 
+            'edit_bottom_text',
+            'check_key_text',
+            'email_title',
+            'email_text',
+            'email_insert_text',
+            'password_search_text',
+            'reset_user_text'
         ]
         if flask.request.method == 'POST':
             for i in i_list:
                 curs.execute("update other set data = ? where name = ?", [
-                    flask.request.form.get(i[0], ''), 
-                    i[0]
+                    flask.request.form.get(i, ''), 
+                    i
                 ])
 
             conn.commit()
@@ -208,60 +244,60 @@ def setting_2(conn, num):
             d_list = []
             
             for i in i_list:
-                curs.execute('select data from other where name = ?', [i[0]])
+                curs.execute('select data from other where name = ?', [i])
                 sql_d = curs.fetchall()
                 if sql_d:
                     d_list += [sql_d[0][0]]
                 else:
-                    curs.execute('insert into other (name, data) values (?, ?)', [i[0], i[1]])
+                    curs.execute('insert into other (name, data) values (?, ?)', [i, ''])
                     
-                    d_list += [i[1]]
+                    d_list += ['']
 
             conn.commit()
 
             return easy_minify(flask.render_template(skin_check(), 
                 imp = [load_lang('text_setting'), wiki_set(), custom(), other2([0, 0])],
-                data =  '''
-                        <form method="post">
-                            <span>''' + load_lang('register_text') + ''' (HTML)</span>
-                            <hr class=\"main_hr\">
-                            <input name="''' + i_list[0][0] + '''" value="''' + html.escape(d_list[0]) + '''">
-                            <hr class=\"main_hr\">
-                            <span>''' + load_lang('non_login_alert') + ''' (HTML)</span>
-                            <hr class=\"main_hr\">
-                            <input name="''' + i_list[1][0] + '''" value="''' + html.escape(d_list[1]) + '''">
-                            <hr class=\"main_hr\">
-                            <span>''' + load_lang('edit_bottom_text') + ''' (HTML)</span>
-                            <hr class=\"main_hr\">
-                            <input name="''' + i_list[2][0] + '''" value="''' + html.escape(d_list[2]) + '''">
-                            <hr class=\"main_hr\">
-                            <span>''' + load_lang('check_key_text') + ''' (HTML)</span>
-                            <hr class=\"main_hr\">
-                            <input name="''' + i_list[3][0] + '''" value="''' + html.escape(d_list[3]) + '''">
-                            <hr class=\"main_hr\">
-                            <span>''' + load_lang('email_title') + '''</span>
-                            <hr class=\"main_hr\">
-                            <input name="''' + i_list[4][0] + '''" value="''' + html.escape(d_list[4]) + '''">
-                            <hr class=\"main_hr\">
-                            <span>''' + load_lang('email_text') + '''</span>
-                            <hr class=\"main_hr\">
-                            <input name="''' + i_list[5][0] + '''" value="''' + html.escape(d_list[5]) + '''">
-                            <hr class=\"main_hr\">
-                            <span>''' + load_lang('email_insert_text') + '''</span>
-                            <hr class=\"main_hr\">
-                            <input name="''' + i_list[6][0] + '''" value="''' + html.escape(d_list[6]) + '''">
-                            <hr class=\"main_hr\">
-                            <span>''' + load_lang('password_search_text') + '''</span>
-                            <hr class=\"main_hr\">
-                            <input name="''' + i_list[7][0] + '''" value="''' + html.escape(d_list[7]) + '''">
-                            <hr class=\"main_hr\">
-                            <span>''' + load_lang('reset_user_text') + '''</span>
-                            <hr class=\"main_hr\">
-                            <input name="''' + i_list[8][0] + '''" value="''' + html.escape(d_list[8]) + '''">
-                            <hr class=\"main_hr\">
-                            <button id="save" type="submit">''' + load_lang('save') + '''</button>
-                        </form>
-                        ''',
+                data = '''
+                    <form method="post">
+                        <span>''' + load_lang('register_text') + ''' (HTML)</span>
+                        <hr class=\"main_hr\">
+                        <input name="''' + i_list[0] + '''" value="''' + html.escape(d_list[0]) + '''">
+                        <hr class=\"main_hr\">
+                        <span>''' + load_lang('non_login_alert') + ''' (HTML)</span>
+                        <hr class=\"main_hr\">
+                        <input name="''' + i_list[1] + '''" value="''' + html.escape(d_list[1]) + '''">
+                        <hr class=\"main_hr\">
+                        <span>''' + load_lang('edit_bottom_text') + ''' (HTML)</span>
+                        <hr class=\"main_hr\">
+                        <input name="''' + i_list[2] + '''" value="''' + html.escape(d_list[2]) + '''">
+                        <hr class=\"main_hr\">
+                        <span>''' + load_lang('check_key_text') + ''' (HTML)</span>
+                        <hr class=\"main_hr\">
+                        <input name="''' + i_list[3] + '''" value="''' + html.escape(d_list[3]) + '''">
+                        <hr class=\"main_hr\">
+                        <span>''' + load_lang('email_title') + '''</span>
+                        <hr class=\"main_hr\">
+                        <input name="''' + i_list[4] + '''" value="''' + html.escape(d_list[4]) + '''">
+                        <hr class=\"main_hr\">
+                        <span>''' + load_lang('email_text') + '''</span>
+                        <hr class=\"main_hr\">
+                        <input name="''' + i_list[5] + '''" value="''' + html.escape(d_list[5]) + '''">
+                        <hr class=\"main_hr\">
+                        <span>''' + load_lang('email_insert_text') + '''</span>
+                        <hr class=\"main_hr\">
+                        <input name="''' + i_list[6] + '''" value="''' + html.escape(d_list[6]) + '''">
+                        <hr class=\"main_hr\">
+                        <span>''' + load_lang('password_search_text') + '''</span>
+                        <hr class=\"main_hr\">
+                        <input name="''' + i_list[7] + '''" value="''' + html.escape(d_list[7]) + '''">
+                        <hr class=\"main_hr\">
+                        <span>''' + load_lang('reset_user_text') + '''</span>
+                        <hr class=\"main_hr\">
+                        <input name="''' + i_list[8] + '''" value="''' + html.escape(d_list[8]) + '''">
+                        <hr class=\"main_hr\">
+                        <button id="save" type="submit">''' + load_lang('save') + '''</button>
+                    </form>
+                ''',
                 menu = [['setting', load_lang('return')]]
             ))
     elif num == 3 or num == 4:
@@ -302,11 +338,12 @@ def setting_2(conn, num):
                 curs.execute("select data from other where name = 'head' and coverage = ?", [flask.request.args.get('skin', '')])
                 title = '_head'
                 start = '<a href="?">(' + load_lang('all') + ')</a> ' + \
-                        ' '.join(['<a href="?skin=' + i + '">(' + i + ')</a>' for i in load_skin('', 1)]) + \
-                        '''
-                            <hr class=\"main_hr\">
-                            <span>&lt;style&gt;CSS&lt;/style&gt;<br>&lt;script&gt;JS&lt;/script&gt;</span><hr class=\"main_hr\">
-                        '''
+                ' '.join(['<a href="?skin=' + i + '">(' + i + ')</a>' for i in load_skin('', 1)]) + \
+                '''
+                    <hr class=\"main_hr\">
+                    <span>&lt;style&gt;CSS&lt;/style&gt;<br>&lt;script&gt;JS&lt;/script&gt;</span>
+                    <hr class=\"main_hr\">
+                '''
                 
             head = curs.fetchall()
             if head:
@@ -360,19 +397,24 @@ def setting_2(conn, num):
 
             return easy_minify(flask.render_template(skin_check(), 
                 imp = ['robots.txt', wiki_set(), custom(), other2([0, 0])],
-                data =  '''
-                        <a href="/robots.txt">(view)</a>
+                data = '''
+                    <a href="/robots.txt">(view)</a>
+                    <hr class=\"main_hr\">
+                    <form method="post">
+                        <textarea rows="25" name="content">''' + html.escape(data) + '''</textarea>
                         <hr class=\"main_hr\">
-                        <form method="post">
-                            <textarea rows="25" name="content">''' + html.escape(data) + '''</textarea>
-                            <hr class=\"main_hr\">
-                            <button id="save" type="submit">''' + load_lang('save') + '''</button>
-                        </form>
-                        ''',
+                        <button id="save" type="submit">''' + load_lang('save') + '''</button>
+                    </form>
+                ''',
                 menu = [['setting', load_lang('return')]]
             ))
     elif num == 6:
-        i_list = ['recaptcha', 'sec_re', 'g_email', 'g_pass']
+        i_list = [
+            'recaptcha', 
+            'sec_re', 
+            'g_email', 
+            'g_pass'
+        ]
 
         if flask.request.method == 'POST':
             for data in i_list:
@@ -389,7 +431,6 @@ def setting_2(conn, num):
 
             return redirect('/setting/6')
         else:
-            n_list = ['', '', '', '']
             d_list = []
             
             x = 0
@@ -400,9 +441,9 @@ def setting_2(conn, num):
                 if sql_d:
                     d_list += [sql_d[0][0]]
                 else:
-                    curs.execute('insert into other (name, data) values (?, ?)', [i, n_list[x]])
+                    curs.execute('insert into other (name, data) values (?, ?)', [i, ''])
                     
-                    d_list += [n_list[x]]
+                    d_list += ['']
 
                 x += 1
 
@@ -410,29 +451,29 @@ def setting_2(conn, num):
 
             return easy_minify(flask.render_template(skin_check(), 
                 imp = ['Google', wiki_set(), custom(), other2([0, 0])],
-                data =  '''
-                        <form method="post">
-                            <h2><a href="https://www.google.com/recaptcha/admin">recaptcha</a></h2>
-                            <span>''' + load_lang('recaptcha') + ''' (HTML)</span>
-                            <hr class=\"main_hr\">
-                            <input placeholder="''' + load_lang('recaptcha') + ''' (HTML)" type="text" name="recaptcha" value="''' + html.escape(d_list[0]) + '''">
-                            <hr class=\"main_hr\">
-                            <span>''' + load_lang('recaptcha') + ' (' + load_lang('secret_key') + ''')</span>
-                            <hr class=\"main_hr\">
-                            <input placeholder="''' + load_lang('recaptcha') + ' (' + load_lang('secret_key') + ''')" type="text" name="sec_re" value="''' + html.escape(d_list[1]) + '''">
-                            <hr class=\"main_hr\">
-                            <h2><a href="https://support.google.com/mail/answer/7126229">''' + load_lang('google_imap') + '</a> {' + load_lang('restart_required') + '''}</h1>
-                            <span>''' + load_lang('google_email') + '''</span>
-                            <hr class=\"main_hr\">
-                            <input placeholder="''' + load_lang('google_email') + '''" type="text" name="g_email" value="''' + html.escape(d_list[2]) + '''">
-                            <hr class=\"main_hr\">
-                            <span><a href="https://security.google.com/settings/security/apppasswords">''' + load_lang('google_app_password') + '''</a></span>
-                            <hr class=\"main_hr\">
-                            <input placeholder="''' + load_lang('google_app_password') + '''" type="password" name="g_pass" value="''' + html.escape(d_list[3]) + '''">
-                            <hr class=\"main_hr\">
-                            <button id="save" type="submit">''' + load_lang('save') + '''</button>
-                        </form>
-                        ''',
+                data = '''
+                    <form method="post">
+                        <h2><a href="https://www.google.com/recaptcha/admin">recaptcha</a></h2>
+                        <span>''' + load_lang('recaptcha') + ''' (HTML)</span>
+                        <hr class=\"main_hr\">
+                        <input name="recaptcha" value="''' + html.escape(d_list[0]) + '''">
+                        <hr class=\"main_hr\">
+                        <span>''' + load_lang('recaptcha') + ' (' + load_lang('secret_key') + ''')</span>
+                        <hr class=\"main_hr\">
+                        <input name="sec_re" value="''' + html.escape(d_list[1]) + '''">
+                        <hr class=\"main_hr\">
+                        <h2><a href="https://support.google.com/mail/answer/7126229">''' + load_lang('google_imap') + '</a> {' + load_lang('restart_required') + '''}</h1>
+                        <span>''' + load_lang('google_email') + '''</span>
+                        <hr class=\"main_hr\">
+                        <input name="g_email" value="''' + html.escape(d_list[2]) + '''">
+                        <hr class=\"main_hr\">
+                        <span><a href="https://security.google.com/settings/security/apppasswords">''' + load_lang('google_app_password') + '''</a></span>
+                        <hr class=\"main_hr\">
+                        <input type="password" name="g_pass" value="''' + html.escape(d_list[3]) + '''">
+                        <hr class=\"main_hr\">
+                        <button id="save" type="submit">''' + load_lang('save') + '''</button>
+                    </form>
+                ''',
                 menu = [['setting', load_lang('return')]]
             ))
     else:
