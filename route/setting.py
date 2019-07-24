@@ -71,8 +71,6 @@ def setting_2(conn, num):
         
         if flask.request.method == 'POST':
             for i in i_list:
-                print(i_list[i])
-                print(n_list[i])
                 curs.execute("update other set data = ? where name = ?", [
                     flask.request.form.get(i_list[i], n_list[i]), 
                     i_list[i]]
