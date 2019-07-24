@@ -15,6 +15,9 @@ c_ver = version_list['master']['c_ver']
 s_ver = version_list['master']['s_ver']
 
 print('Version : ' + r_ver)
+print('DB set version : ' + c_ver)
+print('Skin set version : ' + s_ver)
+print('----')
 
 app_var = json.loads(open('data/app_variables.json', encoding='utf-8').read())
 
@@ -26,7 +29,7 @@ for i_data in os.listdir("."):
         all_src += [f_src.groups()[0]]
 
 if len(all_src) == 0:
-    print('DB\'s name (data) : ', end = '')
+    print('DB name (data) : ', end = '')
     
     db_name = input()
     if db_name == '':
