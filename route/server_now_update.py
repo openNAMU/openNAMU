@@ -51,8 +51,7 @@ def server_now_update_2(conn):
     else:
         return easy_minify(flask.render_template(skin_check(), 
             imp = [load_lang('update'), wiki_set(), custom(), other2([0, 0])],
-            data = '''
-                ''' + load_lang('update_warring') + '''
+            data = load_lang('update_warring') + '''
                 <hr class=\"main_hr\">
                 <a href="https://github.com/2du/openNAMU/blob/master/app.py">(Master)</a> <a href="https://github.com/2du/openNAMU/blob/stable/app.py">(Stable)</a>
                 <hr class=\"main_hr\">
