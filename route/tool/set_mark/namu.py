@@ -1032,7 +1032,7 @@ def namu(conn, data, title, main_num):
             i += 1
     
     data = re.sub('<\/td_end>', '</td>', data)
-    data = re.sub('<include>', '', data)
+    data = re.sub('<include>(?P<in><a (?:[^>]+)>)\n', '\g<in>', data)
     data = re.sub('\n<\/include>', '', data)
     
     data = re.sub('(?P<in><\/h[0-9]>)(\n)+', '\g<in>', data)
