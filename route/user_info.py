@@ -69,7 +69,7 @@ def user_info_2(conn):
             plus += '<li><a href="/pass_find">' + load_lang('password_search') + '</a></li>'
 
     return easy_minify(flask.render_template(skin_check(), 
-        imp = [load_lang('user') + ' ' + load_lang('tool'), wiki_set(), custom(), other2([0, 0])],
+        imp = [load_lang('user_tool'), wiki_set(), custom(), other2([0, 0])],
         data = '''
             <h2>''' + load_lang('state') + '''</h2>
             <ul>

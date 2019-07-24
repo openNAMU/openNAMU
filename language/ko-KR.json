@@ -286,5 +286,6 @@
     "topic_long_error" : "토론 이름이 256자를 넘지 않아야 합니다.",
     "email_error" : "이런 이메일을 가진 사용자가 없습니다.",
     "regex_error" : "정규표현식에 오류가 있습니다.",
-    "decument_404_error" : "이 문서는 존재하지 않습니다."
+    "decument_404_error" : "이 문서는 존재하지 않습니다.",
+    "user_tool" : "사용자 도구",
 }
