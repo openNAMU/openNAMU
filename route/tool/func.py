@@ -5,6 +5,7 @@ import platform
 for i in range(0, 2):
     try:
         import werkzeug.routing
+        import werkzeug.debug
         import flask_compress
         import flask_reggie
         import tornado.ioloop
