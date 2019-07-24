@@ -70,11 +70,13 @@ def setting_2(conn, num):
         }
         
         if flask.request.method == 'POST':
-            i = 0
-            
-            for data in i_list:
-                curs.execute("update other set data = ? where name = ?", [flask.request.form.get(data, n_list[i]), data])
-                i += 1
+            for i in i_list:
+                print(i_list[i])
+                print(n_list[i])
+                curs.execute("update other set data = ? where name = ?", [
+                    flask.request.form.get(i_list[i], n_list[i]), 
+                    i_list[i]]
+                )
 
             conn.commit()
 
@@ -84,24 +86,24 @@ def setting_2(conn, num):
         else:
             d_list = []
             
-            x = 0
-            
             for i in i_list:
-                curs.execute('select data from other where name = ?', [i])
+                curs.execute('select data from other where name = ?', [i_list[i]])
                 sql_d = curs.fetchall()
                 if sql_d:
                     d_list += [sql_d[0][0]]
                 else:
-                    curs.execute('insert into other (name, data) values (?, ?)', [i, n_list[x]])
+                    curs.execute('insert into other (name, data) values (?, ?)', [i_list[i], n_list[i]])
                     
-                    d_list += [n_list[x]]
-
-                x += 1
+                    d_list += [n_list[i]]
 
             conn.commit()
             
             div = ''
-            acl_list = [[load_lang('member'), 'login'], [load_lang('ip'), 'normal'], [load_lang('admin'), 'admin']]
+            acl_list = [
+                [load_lang('member'), 'login'], 
+                [load_lang('ip'), 'normal'], 
+                [load_lang('admin'), 'admin']
+            ]
             for i in acl_list:
                 if i[1] == d_list[6]:
                     div = '<option value="' + i[1] + '">' + i[0] + '</option>' + div
