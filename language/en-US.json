@@ -217,6 +217,8 @@
                 "email_insert_text" : "Email input box text",
                 "password_search_text" : "Password finder text",
                 "reset_user_text" : "Password reset complete text",
+                "error_401" : "ACL view limited document notice",
+                "error_404" : "Missing document notice",
             "_comment_2.2.4_" : "Google",
                 "recaptcha" : "reCAPTCHA",
                 "google_imap" : "Google IMAP",

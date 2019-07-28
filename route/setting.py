@@ -226,7 +226,9 @@ def setting_2(conn, num):
             'email_text',
             'email_insert_text',
             'password_search_text',
-            'reset_user_text'
+            'reset_user_text',
+            'error_401',
+            'error_404'
         ]
         if flask.request.method == 'POST':
             for i in i_list:
@@ -294,6 +296,14 @@ def setting_2(conn, num):
                         <span>''' + load_lang('reset_user_text') + '''</span>
                         <hr class=\"main_hr\">
                         <input name="''' + i_list[8] + '''" value="''' + html.escape(d_list[8]) + '''">
+                        <hr class=\"main_hr\">
+                        <span>''' + load_lang('error_401') + '''</span>
+                        <hr class=\"main_hr\">
+                        <input name="''' + i_list[9] + '''" value="''' + html.escape(d_list[9]) + '''">
+                        <hr class=\"main_hr\">
+                        <span>''' + load_lang('error_404') + '''</span>
+                        <hr class=\"main_hr\">
+                        <input name="''' + i_list[10] + '''" value="''' + html.escape(d_list[10]) + '''">
                         <hr class=\"main_hr\">
                         <button id="save" type="submit">''' + load_lang('save') + '''</button>
                     </form>
