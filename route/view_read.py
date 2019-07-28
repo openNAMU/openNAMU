@@ -107,10 +107,22 @@ def view_read_2(conn, name):
 
     if end_data == 'HTTP Request 401.3':
         response_data = 401
-        end_data = '<h2>' + load_lang('error') + '</h2><ul><li>' + load_lang('authority_error') + '</li></ul>'
+        
+        curs.execute('select data from other where name = "error_401"')
+        sql_d = curs.fetchall()
+        if sql_d and sql_d[0][0] != '':
+            end_data = '<h2>' + load_lang('error') + '</h2><ul><li>' + sql_d[0][0] + '</li></ul>'
+        else:
+            end_data = '<h2>' + load_lang('error') + '</h2><ul><li>' + load_lang('authority_error') + '</li></ul>'
     elif end_data == 'HTTP Request 404':
         response_data = 404
-        end_data = '<h2>' + load_lang('error') + '</h2><ul><li>' + load_lang('decument_404_error') + '</li></ul>'
+        
+        curs.execute('select data from other where name = "error_404"')
+        sql_d = curs.fetchall()
+        if sql_d and sql_d[0][0] != '':
+            end_data = '<h2>' + load_lang('error') + '</h2><ul><li>' + sql_d[0][0] + '</li></ul>'
+        else:
+            end_data = '<h2>' + load_lang('error') + '</h2><ul><li>' + load_lang('decument_404_error') + '</li></ul>'
     else:
         response_data = 200
     
