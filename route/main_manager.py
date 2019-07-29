@@ -58,6 +58,7 @@ def main_manager_2(conn, num, r_ver):
                     <br>
                     <h2>''' + load_lang('version') + '''</h2>
                     <ul>
+                        <li><a href="/api/skin_info?all=true">''' + load_lang('skin_info') + '''</a></li>
                         <li>''' + load_lang('version') + ' : ' + r_ver + '''</li>
                         <li id="ver_send" style="display: none;">''' + load_lang('lastest') + ''' : </li>
                     </ul>
