@@ -164,6 +164,7 @@
         "email_change" : "Email change",
         "acl_change" : "Change document ACL",
         "user_tool" : "User tool",
+        "skin_info" : "Skin info",
         "_comment_2.1_" : "Filter",
             "_comment_2.1.1_" : "List",
                 "interwiki_list" : "Interwiki(s) list",
