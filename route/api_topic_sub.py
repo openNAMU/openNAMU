@@ -36,6 +36,14 @@ def api_topic_sub_2(conn, name, sub, time):
             if flask.request.args.get('render', None):
                 if i[0] == '1':
                     s_user = i[3]
+                else:
+                    if flask.request.args.get('num', None):
+                        curs.execute("select ip from topic where title = ? and sub = ? order by id + 0 asc limit 1", [name, sub])
+                        g_data = curs.fetchall()
+                        if g_data:
+                            s_user = g_data[0][0]
+                        else:
+                            s_user = ''
                     
                 if flask.request.args.get('top', None):
                     t_color = 'toron_color_red'
