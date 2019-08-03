@@ -43,19 +43,20 @@ def setting_adsense_2(conn):
                     {}
                 </label>
             </div>
-            <hr>
+            <hr class=\"main_hr\">
             <div class="form-group">
                 <textarea class="form-control" id="adsense_code" name="adsense_code" rows="12">{}</textarea>
             </div>
+            <hr class=\"main_hr\">
             <button type="submit" value="publish">{}</button>
         </form>
     '''
     
     body_content += template.format(
-        'checked' if adsense_enabled == 'True' else template.format(''),
+        'checked' if adsense_enabled == 'True' else '',
         load_lang('adsense_enable'),
-        load_lang('save'),
-        adsense_code
+        adsense_code,
+        load_lang('save')
     )
 
     return easy_minify(flask.render_template(skin_check(),
