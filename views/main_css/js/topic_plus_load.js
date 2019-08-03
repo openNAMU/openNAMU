@@ -1,7 +1,7 @@
-function topic_load(name, sub, num) {
+function topic_plus_load(name, sub, num) {
     var test = setInterval(function() {
         var url = "/api/topic/" + name + "/sub/" + sub + "?num=" + num;
-        var doc_data = document.getElementById("plus");
+        var doc_data = document.getElementById("plus_topic");
 
         var xhr = new XMLHttpRequest();
         xhr.open("GET", url, true);

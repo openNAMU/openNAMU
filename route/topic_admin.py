@@ -24,18 +24,18 @@ def topic_admin_2(conn, name, sub, num):
         else:
             is_ban += load_lang('hide')
         
-        is_ban +=   '''
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/topic/''' + url_pas(name) + '/sub/' + url_pas(sub) + '/notice/' + str(num) + '''">
-                    '''
+        is_ban += '''
+                </a>
+            </li>
+            <li>
+                <a href="/topic/''' + url_pas(name) + '/sub/' + url_pas(sub) + '/notice/' + str(num) + '''">
+        '''
 
         curs.execute("select id from topic where title = ? and sub = ? and id = ? and top = 'O'", [name, sub, str(num)])
         if curs.fetchall():
-            is_ban += load_lang('notice_release')
+            is_ban += load_lang('pinned_release')
         else:
-            is_ban += load_lang('notice') + ''
+            is_ban += load_lang('pinned') + ''
         
         is_ban += '</a></li></ul>'
         ban += '<li><a href="/ban/' + url_pas(data[0][1]) + '">'

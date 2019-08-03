@@ -53,7 +53,7 @@
     "file" : "파일",
     "writer" : "작성자",
     "editor" : "에디터",
-    "hide" : "숨김",
+    "hide" : "숨기기",
     "check" : "검사",
     "destruction" : "취소",
     "tool" : "도구",
@@ -118,8 +118,8 @@
     "compare_target" : "비교 대상 이름",
     "authorize" : "권한 부여",
     "indexing" : "DB 인덱싱",
-    "hide_release" : "표시",
-    "notice_release" : "릴리즈 노트",
+    "hide_release" : "숨김 해제",
+    "pinned_release" : "고정 해제",
     "ban_release" : "차단 해제",
     "discussion_tool" : "토론 도구",
     "discussion_raw" : "토론 원본",
@@ -290,5 +290,6 @@
     "user_tool" : "사용자 도구",
     "error_401" : "ACL 보기 제한 문서 문구",
     "error_404" : "없는 문서 문구",
-    "skin_info" : "스킨 정보"
+    "skin_info" : "스킨 정보",
+    "pinned" : "고정"
 }
