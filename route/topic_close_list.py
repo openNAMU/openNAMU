@@ -62,7 +62,6 @@ def topic_close_list_2(conn, name, tool):
                 if it_p != 1:
                     curs.execute("select id from topic where title = ? and sub = ? order by date desc limit 1", [name, data[0]])
                     t_data = curs.fetchall()
-                    print(t_data)
                 
                     div += '''
                         <h2><a href="/topic/''' + url_pas(name) + '''/sub/''' + url_pas(data[0]) + '''">''' + str(t_num) + '''. ''' + data[0] + '''</a></h2>
