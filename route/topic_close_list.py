@@ -46,7 +46,10 @@ def topic_close_list_2(conn, name, tool):
                 <button type="submit">''' + load_lang('go') + '''</button>
             '''
 
+        t_num = 0
         for data in curs.fetchall():
+            t_num += 1
+            
             curs.execute("select data, date, ip, block from topic where title = ? and sub = ? and id = '1'", [name, data[0]])
             if curs.fetchall():                
                 it_p = 0
@@ -59,9 +62,18 @@ def topic_close_list_2(conn, name, tool):
                 if it_p != 1:
                     curs.execute("select id from topic where title = ? and sub = ? order by date desc limit 1", [name, data[0]])
                     t_data = curs.fetchall()
+                    print(t_data)
                 
                     div += '''
-                        <h2><a href="/topic/''' + url_pas(name) + '''/sub/''' + url_pas(data[0]) + '''">''' + data[0] + '''</a></h2>
+                        <h2><a href="/topic/''' + url_pas(name) + '''/sub/''' + url_pas(data[0]) + '''">''' + str(t_num) + '''. ''' + data[0] + '''</a></h2>
+                        <div id="topic_pre_''' + str(t_num) + '''"></div>
+                        <div id="topic_back_pre_''' + str(t_num) + '''"></div>
+                        <script>
+                            topic_list_load("''' + name + '''", "''' + data[0] + '''", "1", "topic_pre_''' + str(t_num) + '''");
+                            if("''' + str(t_num) + '''" !== "1") {
+                                topic_list_load("''' + name + '''", "''' + data[0] + '''", "''' + t_data[0][0] + '''", "topic_back_pre_''' + str(t_num) + '''");
+                            }
+                        </script>
                     '''
 
         if div == '':

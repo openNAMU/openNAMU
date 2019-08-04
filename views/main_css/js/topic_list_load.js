@@ -1,6 +1,6 @@
-function topic_top_load(name, sub) {
-    var o_data = document.getElementById('top_topic');
-    var url = "/api/topic/" + encodeURI(name) + "/sub/" + encodeURI(sub) + "?top=1&render=1";
+function topic_list_load(name, sub, s_num, where) {
+    var o_data = document.getElementById(where);
+    var url = "/api/topic/" + encodeURI(name) + "/sub/" + encodeURI(sub) + "?render=1&num=" + s_num;
     var n_data = "";
     var num = 1;
     
@@ -17,7 +17,6 @@ function topic_top_load(name, sub) {
             }
             
             o_data.innerHTML = n_data;
-            topic_main_load(name, sub);
         }
     }
     

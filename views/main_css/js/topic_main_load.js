@@ -1,6 +1,10 @@
-function topic_main_load(name, sub) {
+function topic_main_load(name, sub, s_num = null) {
     var o_data = document.getElementById('main_topic');
-    var url = "/api/topic/" + name + "/sub/" + sub + "?render=1";
+    if(s_num) {
+        var url = "/api/topic/" + name + "/sub/" + sub + "?render=1&num=" + s_num;
+    } else {
+        var url = "/api/topic/" + name + "/sub/" + sub + "?render=1";
+    }
     var n_data = "";
     var num = 1;
     
@@ -17,7 +21,9 @@ function topic_main_load(name, sub) {
             }
             
             o_data.innerHTML = n_data;
-            topic_plus_load(name, sub, String(Number(num) + 1));
+            if(!s_num) {
+                topic_plus_load(name, sub, String(Number(num) + 1));
+            }
         }
     }
     

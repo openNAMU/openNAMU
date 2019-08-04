@@ -1,6 +1,6 @@
 function topic_plus_load(name, sub, num) {
     var test = setInterval(function() {
-        var url = "/api/topic/" + name + "/sub/" + sub + "?num=" + num + "&render=1";
+        var url = "/api/topic/" + encodeURI(name) + "/sub/" + encodeURI(sub) + "?num=" + num + "&render=1";
         var p_data = document.getElementById("plus_topic");
         var n_data = '';
         var n_num = 1;
