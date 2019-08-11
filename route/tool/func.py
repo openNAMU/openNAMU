@@ -64,7 +64,7 @@ for i in range(0, 2):
             print(e)
             raise
 
-app_var = json.loads(open('data/app_variables.json', encoding='utf-8').read())
+app_var = json.loads(open('data/app_var.json', encoding='utf-8').read())
 
 def load_conn(data):
     global conn
@@ -176,55 +176,11 @@ def captcha_get():
     return data
 
 def update():
-    # v3.0.8 rd, agreedis, stop 테이블 통합
+    # v3.1.2
     try:
-        curs.execute("select title, sub, close from stop")
-        for i in curs.fetchall():
-            if i[2] == '':
-                curs.execute("update rd set stop = 'S' where title = ? and sub = ?", [i[0], i[1]])
-            else:
-                curs.execute("update rd set stop = 'O' where title = ? and sub = ?", [i[0], i[1]])
+        os.rename('data/oauthsettings.json', 'data/oauth.json')
     except:
         pass
-        
-    try:
-        curs.execute("select title, sub from agreedis")
-        for i in curs.fetchall():
-            curs.execute("update rd set agree = 'O' where title = ? and sub = ?", [i[0], i[1]])
-    except:
-        pass
-         
-    try:
-        curs.execute("drop table if exists stop")
-        curs.execute("drop table if exists agreedis")
-    except:
-        pass
-
-    # Start : Data migration code
-    app_var = json.loads(open(os.path.abspath('./data/app_variables.json'), encoding='utf-8').read())
-
-    if os.path.exists('image'):
-        os.rename('image', app_var['path_data_image'])
-
-    if os.path.exists('oauthsettings.json'):
-        os.rename('oauthsettings.json', app_var['path_oauth_setting'])
-
-    try:
-        load_oauth('discord')
-    except KeyError:
-        old_oauth_data = json.loads(open(app_var['path_oauth_setting'], encoding='utf-8').read())
-
-        if 'discord' not in old_oauth_data['_README']['support']:
-            old_oauth_data['_README']['support'] += ['discord']
-
-        old_oauth_data['discord'] = {}
-        old_oauth_data['discord']['client_id'] = ''
-        old_oauth_data['discord']['client_secret'] = ''
-
-        with open(app_var['path_oauth_setting'], 'w') as f:
-            f.write(json.dumps(old_oauth_data, sort_keys = True, indent = 4))
-
-    # End
 
 def pw_encode(data, data2 = '', type_d = ''):
     if type_d == '':

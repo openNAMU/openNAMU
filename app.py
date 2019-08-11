@@ -19,7 +19,7 @@ print('DB set version : ' + c_ver)
 print('Skin set version : ' + s_ver)
 print('----')
 
-app_var = json.loads(open('data/app_variables.json', encoding='utf-8').read())
+app_var = json.loads(open('data/app_var.json', encoding='utf-8').read())
 
 # DB
 all_src = []
@@ -42,8 +42,10 @@ elif len(all_src) > 1:
 
         db_num += 1
 
-    print('Number : ', end = '')    
+    print('----')
+    print('Number : ', end = '')
     db_name = all_src[int(number_check(input())) - 1]
+    print('----')
 else:
     db_name = all_src[0]
 
