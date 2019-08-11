@@ -981,6 +981,7 @@ def namu(conn, data, title, main_num):
     data = re.sub('\n$', footdata_all, data + '\n', 1)
 
     category += '</div></div>'
+    category = re.sub(' \| <\/div><\/div>$', '</div></div>', category)
 
     if category == '\n<div id="cate_all"><hr><div id="cate">Category : </div></div>':
         category = ''
