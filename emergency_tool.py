@@ -14,13 +14,17 @@ elif len(all_src) > 1:
 
     for i_data in all_src:
         print(str(db_num) + ' : ' + i_data)
+        
+        db_num += 1
 
+    print('----')
     print('Number : ', end = '')    
     db_name = all_src[int(number_check(input())) - 1]
 else:
     db_name = all_src[0]
 
 if len(all_src) == 1:
+    print('----')
     print('DB\'s name : ' + db_name)
 
 conn = sqlite3.connect(db_name + '.db', check_same_thread = False)
@@ -28,6 +32,7 @@ curs = conn.cursor()
 
 load_conn(conn)
 
+print('----')
 print('1. Backlink reset')
 print('2. reCAPTCHA delete')
 print('3. Ban delete')
@@ -38,6 +43,7 @@ print('7. Change password')
 print('8. Reset version')
 print('9. New DB create')
 
+print('----')
 print('Select : ', end = '')
 what_i_do = input()
 
@@ -65,6 +71,7 @@ elif what_i_do == '2':
     curs.execute("delete from other where name = 'recaptcha'")
     curs.execute("delete from other where name = 'sec_re'")
 elif what_i_do == '3':
+    print('----')
     print('IP or Name : ', end = '')
     user_data = input()
 
@@ -83,29 +90,37 @@ elif what_i_do == '3':
         ])
     curs.execute("delete from ban where block = ?", [user_data])
 elif what_i_do == '4':
+    print('----')
     print('Host : ', end = '')
     host = input()
 
     curs.execute("update other set data = ? where name = 'host'", [host])
 elif what_i_do == '5':
+    print('----')
     print('Port : ', end = '')
     port = int(input())
 
     curs.execute("update other set data = ? where name = 'port'", [port])
 elif what_i_do == '6':
+    print('----')
     print('Skin\'s name : ', end = '')
     skin = input()
 
     curs.execute("update other set data = ? where name = 'skin'", [skin])
 elif what_i_do == '7':
+    print('----')
     print('1. sha256')
     print('2. sha3')
+    
+    print('----')
     print('Select : ', end = '')
     what_i_do = int(input())
 
+    print('----')
     print('User\'s name : ', end = '')
     user_name = input()
 
+    print('----')
     print('User\'s password : ', end = '')
     user_pw = input()
 
@@ -121,6 +136,7 @@ elif what_i_do == '7':
 elif what_i_do == '8':
     curs.execute("update other set data = '00000' where name = 'ver'")
 else:
+    print('----')
     print('DB\'s name (data) : ', end = '')
     
     db_name = input()
@@ -131,4 +147,5 @@ else:
 
 conn.commit()
 
+print('----')
 print('OK')
