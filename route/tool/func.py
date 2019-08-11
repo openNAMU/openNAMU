@@ -176,11 +176,7 @@ def captcha_get():
     return data
 
 def update():
-    # v3.1.2
-    try:
-        os.rename('data/oauthsettings.json', 'data/oauth.json')
-    except:
-        pass
+    pass
 
 def pw_encode(data, data2 = '', type_d = ''):
     if type_d == '':
