@@ -293,7 +293,7 @@ else:
         
 conn.commit()
 
-## Func
+# Func
 @app.route('/del_alarm')
 def alarm_del():
     return alarm_del_2(conn)
@@ -599,7 +599,7 @@ def api_skin_info(name = ''):
 def api_topic_sub(name = '', sub = '', time = ''):
     return api_topic_sub_2(conn, name, sub, time)
     
-## File
+# File
 @app.route('/views/easter_egg.html')
 def main_easter_egg():
     return main_easter_egg_2(conn)
@@ -612,7 +612,7 @@ def main_views(name = None):
 def main_file(data = None):
     return main_file_2(conn, data)
 
-## End
+# End
 @app.errorhandler(404)
 def main_error_404(e):
     return main_error_404_2(conn)
