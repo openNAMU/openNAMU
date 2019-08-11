@@ -349,24 +349,6 @@ def middle_parser(data, fol_num, syntax_num, folding_num):
             break
 
     return [data, [fol_num, syntax_num, folding_num]]
-    
-def link_fix(main_link):
-    if re.search('^:', main_link):
-        main_link = re.sub('^:', '', main_link)
-
-    main_link = re.sub('^사용자:', 'user:', main_link)
-    main_link = re.sub('^파일:', 'file:', main_link)
-    main_link = re.sub('^분류:', 'category:', main_link)
-
-    other_link = re.search('(#.+)$', main_link)
-    if other_link:
-        other_link = other_link.groups()[0]
-
-        main_link = re.sub('(#.+)$', '', main_link)
-    else:
-        other_link = ''
-        
-    return [main_link, other_link]
 
 def namu(conn, data, title, main_num):
     curs = conn.cursor()
@@ -525,13 +507,13 @@ def namu(conn, data, title, main_num):
     if redirect:
         redirect = redirect.groups()[0]
         
-        return_link = link_fix(redirect)
+        return_link = tool.link_fix(redirect)
         main_link = return_link[0]
         other_link = return_link[1]
         
-        backlink += [[title, main_link, 'redirect']]
+        backlink += [[title, main_link + other_link, 'redirect']]
         
-        data = redirect_re.sub('\n * ' + title + ' - [[' + main_link + ']]\n', data, 1)
+        data = redirect_re.sub('\n * ' + title + ' - [[' + main_link + other_link + ']]\n', data, 1)
 
     no_toc_re = re.compile('\[(?:목차|toc)\((?:no)\)\]\n', re.I)
     toc_re = re.compile('\[(?:목차|toc)\]', re.I)
@@ -860,7 +842,7 @@ def namu(conn, data, title, main_num):
             elif re.search('^http(s)?:\/\/', main_link):
                 data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<a id="out_link" rel="nofollow" href="' + main_link + '">' + see_link + '</a>', data, 1)
             else:
-                return_link = link_fix(main_link)
+                return_link = tool.link_fix(main_link)
                 main_link = return_link[0]
                 other_link = return_link[1]
 

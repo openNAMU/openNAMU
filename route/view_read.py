@@ -13,9 +13,11 @@ def view_read_2(conn, name):
     else:
         if not flask.request.args.get('from', None):
             curs.execute("select title from back where link = ? and type = 'redirect'", [name])
-            redirect_data = curs.fetchall()
-            if redirect_data:
-                return redirect('/w/' + redirect_data[0][0] + '?from=' + name)
+            r_db = curs.fetchall()
+            if r_db:
+                r_data = link_fix(r_db[0][0])
+            
+                return redirect('/w/' + r_data[0] + '?from=' + name + r_data[1])
 
     curs.execute("select sub from rd where title = ? and not stop = 'O' order by date desc", [name])
     if curs.fetchall():
