@@ -13,7 +13,19 @@ function do_preview(name) {
 
     xhr.onreadystatechange = function() {
         if(this.readyState === 4 && this.status === 200) {
-            p_data.innerHTML = JSON.parse(this.responseText)['data'];
+            g_data = JSON.parse(this.responseText)['data'];
+            p_data.innerHTML = g_data;
+            
+            while(1) {
+                m_data = g_data.match(/<script>((?:(?!<\/script>).)+)<\/script>/);
+                if(m_data) {
+                    eval(m_data[1]);
+                    
+                    g_data = g_data.replace(/<script>((?:(?!<\/script>).)+)<\/script>/, '', 1);
+                } else {
+                    break;
+                }
+            }
         }
     }
 }
