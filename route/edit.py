@@ -66,18 +66,18 @@ def edit_2(conn, name):
         new = curs.fetchall()
         if new:
             if flask.request.args.get('section', None):
-                data = '\n' + re.sub('\r\n', '\n', new[0][0]) + '\n'
+                data = re.sub('\n(?P<in>={1,6})', '<br>\g<in>', '\n' + re.sub('\r\n', '\n', new[0][0]) + '\n')
                 i = 0
 
                 while 1:
-                    g_data = re.search('\n((?:={1,6}) ?(?:(?:(?!\n).)+) ?\n(?:(?:(?:(?!(?:={1,6}) ?(?:(?:(?!\n).)+) ?\n).)+\n+)+))', data)
+                    g_data = re.search('((?:<br>={1,6})(?:(?:(?!\n).)+)\n(?:(?:(?:(?!<br>(?:={1,6})).)+\n*)+))', data)
                     if g_data:
                         if int(flask.request.args.get('section', '1')) - 1 == i:
-                            data = g_data.groups()[0]
+                            data = re.sub('<br>(?P<in>={1,6})', '\n\g<in>', g_data.groups()[0])
                             
                             break
                         else:
-                            data = re.sub('\n((?:={1,6}) ?(?:(?:(?!\n).)+) ?\n(?:(?:(?:(?!(?:={1,6}) ?(?:(?:(?!\n).)+) ?\n).)+\n+)+))', '\n', data, 1)
+                            data = re.sub('((?:<br>={1,6})(?:(?:(?!\n).)+)\n(?:(?:(?:(?!<br>(?:={1,6})).)+\n*)+))', '\n', data, 1)
 
                         i += 1
                     else:
