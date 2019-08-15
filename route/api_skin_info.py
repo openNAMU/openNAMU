@@ -35,6 +35,6 @@ def api_skin_info_2(conn, name):
                 a_data = {**a_data, **{ i : json_data }}
 
         if a_data == {}:
-            return flask.jsonify({}), 404
+            return flask.jsonify({})
         else:
             return flask.jsonify(a_data)
