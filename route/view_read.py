@@ -125,6 +125,22 @@ def view_read_2(conn, name):
             end_data = '<h2>' + load_lang('error') + '</h2><ul><li>' + sql_d[0][0] + '</li></ul>'
         else:
             end_data = '<h2>' + load_lang('error') + '</h2><ul><li>' + load_lang('decument_404_error') + '</li></ul>'
+            
+        curs.execute('select ip, date, leng, send from history where title = ? order by id desc limit 3', [name])
+        sql_d = curs.fetchall()
+        if sql_d:
+            end_data += '<h2>' + load_lang('history') + '</h2><ul>'
+            for i in sql_d:
+                if re.search("\+", i[2]):
+                    leng = '<span style="color:green;">(' + i[2] + ')</span>'
+                elif re.search("\-", i[2]):
+                    leng = '<span style="color:red;">(' + i[2] + ')</span>'
+                else:
+                    leng = '<span style="color:gray;">(' + i[2] + ')</span>'
+            
+                end_data += '<li>' + i[1] + ' | ' + ip_pas(i[0]) + ' | ' + leng + (' | ' + i[3] if i[3] != '' else '') + '</li>'
+                
+            end_data += '<li><a href="/history/' + url_pas(name) + '">(...)</a></li></ul>'
     else:
         response_data = 200
     
