@@ -70,14 +70,14 @@ def edit_2(conn, name):
                 i = 0
 
                 while 1:
-                    g_data = re.search('((?:<br>={1,6})(?:(?:(?!\n).)+)\n(?:(?:(?:(?!<br>(?:={1,6})).)+\n*)+))', data)
+                    g_data = re.search('((?:<br>)(?:(?:(?!\n|<br>).)+)(?:\n*(?:(?:(?!<br>).)+\n*)+)?)', data)
                     if g_data:
                         if int(flask.request.args.get('section', '1')) - 1 == i:
                             data = re.sub('<br>(?P<in>={1,6})', '\n\g<in>', g_data.groups()[0])
                             
                             break
                         else:
-                            data = re.sub('((?:<br>={1,6})(?:(?:(?!\n).)+)\n(?:(?:(?:(?!<br>(?:={1,6})).)+\n*)+))', '\n', data, 1)
+                            data = re.sub('((?:<br>)(?:(?:(?!\n|<br>).)+)(?:\n*(?:(?:(?!<br>).)+\n*)+)?)', '\n', data, 1)
 
                         i += 1
                     else:
