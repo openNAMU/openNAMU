@@ -86,21 +86,20 @@ def topic_2(conn, name, sub):
         else:
             display = ''
 
-        if ban != 1 or admin == 1:
-            data += '''
-                <div id="top_topic"></div>
-                <div id="main_topic"></div>
-                <div id="plus_topic"></div>
-                <script>topic_top_load("''' + name + '''", "''' + sub + '''");</script>
-                <a id="reload" href="javascript:void(0);" onclick="topic_reload();">(''' + load_lang('reload') + ''')</a> <a href="/topic/''' + url_pas(name) + '''/sub/''' + url_pas(sub) + '''/tool">(''' + load_lang('topic_tool') + ''')</a>
+        data += '''
+            <div id="top_topic"></div>
+            <div id="main_topic"></div>
+            <div id="plus_topic"></div>
+            <script>topic_top_load("''' + name + '''", "''' + sub + '''");</script>
+            <a id="reload" href="javascript:void(0);" onclick="topic_reload();">(''' + load_lang('reload') + ''')</a> <a href="/topic/''' + url_pas(name) + '''/sub/''' + url_pas(sub) + '''/tool">(''' + load_lang('topic_tool') + ''')</a>
+            <hr class=\"main_hr\">
+            <form style="''' + display + '''" method="post">
+                <textarea style="height: 100px;" name="content"></textarea>
                 <hr class=\"main_hr\">
-                <form style="''' + display + '''" method="post">
-                    <textarea style="height: 100px;" name="content"></textarea>
-                    <hr class=\"main_hr\">
-                    ''' + captcha_get() + (ip_warring() if display == '' else '') + '''
-                    <button type="submit">''' + load_lang('send') + '''</button>
-                </form>
-            '''
+                ''' + captcha_get() + (ip_warring() if display == '' else '') + '''
+                <button type="submit">''' + load_lang('send') + '''</button>
+            </form>
+        '''
 
         return easy_minify(flask.render_template(skin_check(), 
             imp = [name, wiki_set(), custom(), other2([' (' + load_lang('discussion') + ')', 0])],

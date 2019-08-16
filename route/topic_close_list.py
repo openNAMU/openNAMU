@@ -26,11 +26,11 @@ def topic_close_list_2(conn, name, tool):
         if tool == 'close':
             curs.execute("select sub from rd where title = ? and stop = 'O' order by sub asc", [name])
             
-            sub = load_lang('close')
+            sub = load_lang('closed_discussion')
         elif tool == 'agree':
             curs.execute("select sub from rd where title = ? and agree = 'O' order by sub asc", [name])
             
-            sub = load_lang('agreement')
+            sub = load_lang('agreed_discussion')
         else:
             curs.execute("select sub from rd where title = ? order by date desc", [name])
             
@@ -39,7 +39,7 @@ def topic_close_list_2(conn, name, tool):
             menu = [['w/' + url_pas(name), load_lang('document')]]
             
             plus =  '''
-                <a href="/topic/''' + url_pas(name) + '''/close">(''' + load_lang('close') + ''')</a> <a href="/topic/''' + url_pas(name) + '''/agree">(''' + load_lang('agreement') + ''')</a>
+                <a href="/topic/''' + url_pas(name) + '''/close">(''' + load_lang('closed_discussion') + ''')</a> <a href="/topic/''' + url_pas(name) + '''/agree">(''' + load_lang('agreed_discussion') + ''')</a>
                 <hr class=\"main_hr\">
                 <input placeholder="''' + load_lang('discussion_name') + '''" name="topic" type="text">
                 <hr class=\"main_hr\">

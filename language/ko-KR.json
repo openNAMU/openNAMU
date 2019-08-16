@@ -291,5 +291,7 @@
     "error_401" : "ACL 보기 제한 문서 문구",
     "error_404" : "없는 문서 문구",
     "skin_info" : "스킨 정보",
-    "pinned" : "고정"
+    "pinned" : "고정",
+    "closed_discussion" : "닫힌 토론",
+    "agreed_discussion" : "합의된 토론"
 }
