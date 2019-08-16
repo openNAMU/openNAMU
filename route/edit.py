@@ -66,14 +66,14 @@ def edit_2(conn, name):
         new = curs.fetchall()
         if new:
             if flask.request.args.get('section', None):
-                data = re.sub('\n(?P<in>={1,6})', '<br>\g<in>', '\n' + re.sub('\r\n', '\n', new[0][0]) + '\n')
+                data = re.sub('\n(?P<in>={1,6})', '<br>\g<in>', html.escape('\n' + re.sub('\r\n', '\n', new[0][0]) + '\n'))
                 i = 0
 
                 while 1:
                     g_data = re.search('((?:<br>)(?:(?:(?!\n|<br>).)+)(?:\n*(?:(?:(?!<br>).)+\n*)+)?)', data)
                     if g_data:
                         if int(flask.request.args.get('section', '1')) - 1 == i:
-                            data = re.sub('<br>(?P<in>={1,6})', '\n\g<in>', g_data.groups()[0])
+                            data = html.unescape(re.sub('<br>(?P<in>={1,6})', '\n\g<in>', g_data.groups()[0]))
                             
                             break
                         else:
