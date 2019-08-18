@@ -60,17 +60,17 @@ except FileNotFoundError:   # 예외 처리
 with open("DB_Data.json") as fileRead:
     db_data = json.load(fileRead)
 
-mariaConn = pymysql.connect( host=db_data["db_host"], port=db_data["db_port"], user=db_data["db_username"],
+conn = pymysql.connect( host=db_data["db_host"], port=db_data["db_port"], user=db_data["db_username"],
                                  passwd=db_data["db_passwd"], charset="utf8", autocommit=True )
-mariaCurs = mariaConn.cursor()
+curs = conn.cursor()
 
 try:
-    mariaCurs.execute("create database " + db_data["db_name"])
+    curs.execute("create database " + db_data["db_name"])
 except pymysql.err.ProgrammingError:   # 예외 처리
     setup_tool = 0
     pass
 
-mariaCurs.execute("use " + db_data["db_name"])
+curs.execute("use " + db_data["db_name"])
 
 logging.basicConfig(level = logging.ERROR)
 
@@ -91,28 +91,28 @@ app.jinja_env.filters['cut_100'] = cut_100
 
 app.url_map.converters['everything'] = EverythingConverter
 
-mariaCurs.execute('CREATE TABLE IF NOT EXISTS `data`(test text)')
-mariaCurs.execute('CREATE TABLE IF NOT EXISTS `cache_data`(test text)')
-mariaCurs.execute('CREATE TABLE IF NOT EXISTS `history`(test text)')
-mariaCurs.execute('CREATE TABLE IF NOT EXISTS `rd`(test text)')
-mariaCurs.execute('CREATE TABLE IF NOT EXISTS `user`(test text)')
-mariaCurs.execute('CREATE TABLE IF NOT EXISTS `user_set`(test text)')
-mariaCurs.execute('CREATE TABLE IF NOT EXISTS `ban`(test text)')
-mariaCurs.execute('CREATE TABLE IF NOT EXISTS `topic`(test text)')
-mariaCurs.execute('CREATE TABLE IF NOT EXISTS `rb`(test text)')
-mariaCurs.execute('CREATE TABLE IF NOT EXISTS `back`(test text)')
-mariaCurs.execute('CREATE TABLE IF NOT EXISTS `custom`(test text)')
-mariaCurs.execute('CREATE TABLE IF NOT EXISTS `other`(test text)')
-mariaCurs.execute('CREATE TABLE IF NOT EXISTS `alist`(test text)')
-mariaCurs.execute('CREATE TABLE IF NOT EXISTS `re_admin`(test text)')
-mariaCurs.execute('CREATE TABLE IF NOT EXISTS `alarm`(test text)')
-mariaCurs.execute('CREATE TABLE IF NOT EXISTS `ua_d`(test text)')
-mariaCurs.execute('CREATE TABLE IF NOT EXISTS `filter`(test text)')
-mariaCurs.execute('CREATE TABLE IF NOT EXISTS `scan`(test text)')
-mariaCurs.execute('CREATE TABLE IF NOT EXISTS `acl`(test text)')
-mariaCurs.execute('CREATE TABLE IF NOT EXISTS `inter`(test text)')
-mariaCurs.execute('CREATE TABLE IF NOT EXISTS `html_filter`(test text)')
-mariaCurs.execute('CREATE TABLE IF NOT EXISTS `oauth_conn`(test text)')
+curs.execute('CREATE TABLE IF NOT EXISTS `data`(test text)')
+curs.execute('CREATE TABLE IF NOT EXISTS `cache_data`(test text)')
+curs.execute('CREATE TABLE IF NOT EXISTS `history`(test text)')
+curs.execute('CREATE TABLE IF NOT EXISTS `rd`(test text)')
+curs.execute('CREATE TABLE IF NOT EXISTS `user`(test text)')
+curs.execute('CREATE TABLE IF NOT EXISTS `user_set`(test text)')
+curs.execute('CREATE TABLE IF NOT EXISTS `ban`(test text)')
+curs.execute('CREATE TABLE IF NOT EXISTS `topic`(test text)')
+curs.execute('CREATE TABLE IF NOT EXISTS `rb`(test text)')
+curs.execute('CREATE TABLE IF NOT EXISTS `back`(test text)')
+curs.execute('CREATE TABLE IF NOT EXISTS `custom`(test text)')
+curs.execute('CREATE TABLE IF NOT EXISTS `other`(test text)')
+curs.execute('CREATE TABLE IF NOT EXISTS `alist`(test text)')
+curs.execute('CREATE TABLE IF NOT EXISTS `re_admin`(test text)')
+curs.execute('CREATE TABLE IF NOT EXISTS `alarm`(test text)')
+curs.execute('CREATE TABLE IF NOT EXISTS `ua_d`(test text)')
+curs.execute('CREATE TABLE IF NOT EXISTS `filter`(test text)')
+curs.execute('CREATE TABLE IF NOT EXISTS `scan`(test text)')
+curs.execute('CREATE TABLE IF NOT EXISTS `acl`(test text)')
+curs.execute('CREATE TABLE IF NOT EXISTS `inter`(test text)')
+curs.execute('CREATE TABLE IF NOT EXISTS `html_filter`(test text)')
+curs.execute('CREATE TABLE IF NOT EXISTS `oauth_conn`(test text)')
 
 if setup_tool == 0:
     try:
@@ -180,17 +180,17 @@ if setup_tool != 0:
     for create_table in create_data['all_data']:
         for create in create_data[create_table]:
             try:
-                mariaCurs.execute('SELECT ' + create + ' FROM ' + create_table + ' LIMIT 1')
+                curs.execute('SELECT ' + create + ' FROM ' + create_table + ' LIMIT 1')
             except:
-                mariaCurs.execute("alter table " + create_table + " add " + create + " text default ''")
+                curs.execute("alter table " + create_table + " add " + create + " text default ''")
                 
     update()
 
 # Init
-mariaCurs.execute('SELECT name FROM alist WHERE acl = "owner"')
-if not mariaCurs.fetchall():
-    mariaCurs.execute('delete FROM alist WHERE name = "owner"')
-    mariaCurs.execute('INSERT into alist (name, acl) values ("owner", "owner")')
+curs.execute('SELECT name FROM alist WHERE acl = "owner"')
+if not curs.fetchall():
+    curs.execute('delete FROM alist WHERE name = "owner"')
+    curs.execute('INSERT into alist (name, acl) values ("owner", "owner")')
 
 if not os.path.exists(app_var['path_data_image']):
     os.makedirs(app_var['path_data_image'])
@@ -205,11 +205,11 @@ server_set_key = ['host', 'port', 'language', 'markup', 'encode']
 server_set = {}
 
 for i in range(len(server_set_key)):
-    mariaCurs.execute('SELECT data FROM other WHERE name = %s', [server_set_key[i]])
-    server_set_val = mariaCurs.fetchall()
+    curs.execute('SELECT data FROM other WHERE name = %s', [server_set_key[i]])
+    server_set_val = curs.fetchall()
     if not server_set_val:
         server_set_val = server_init.init(server_set_key[i])
-        mariaCurs.execute('INSERT into other (name, data) values (%s, %s)', [server_set_key[i], server_set_val])
+        curs.execute('INSERT into other (name, data) values (%s, %s)', [server_set_key[i], server_set_val])
     else:
         server_set_val = server_set_val[0][0]
     
@@ -219,8 +219,8 @@ for i in range(len(server_set_key)):
 
 try:
     if not os.path.exists('robots.txt'):
-        mariaCurs.execute('SELECT data FROM other WHERE name = "robot"')
-        robot_test = mariaCurs.fetchall()
+        curs.execute('SELECT data FROM other WHERE name = "robot"')
+        robot_test = curs.fetchall()
         if robot_test:
             fw_test = open('./robots.txt', 'w')
             fw_test.write(re.sub('\r\n', '\n', robot_test[0][0]))
@@ -230,34 +230,34 @@ try:
             fw_test.write('User-agent: *\nDisallow: /\nAllow: /$\nAllow: /w/')
             fw_test.close()
 
-            mariaCurs.execute('INSERT into other (name, data) values ("robot", "User-agent: *\nDisallow: /\nAllow: /$\nAllow: /w/")')
+            curs.execute('INSERT into other (name, data) values ("robot", "User-agent: *\nDisallow: /\nAllow: /$\nAllow: /w/")')
         
         print('----')
         print('Engine made robots.txt')
 except:
     pass
 
-mariaCurs.execute('SELECT data FROM other WHERE name = "key"')
-rep_data = mariaCurs.fetchall()
+curs.execute('SELECT data FROM other WHERE name = "key"')
+rep_data = curs.fetchall()
 if not rep_data:
     rep_key = ''.join(random.choice("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ") for i in range(16))
     if rep_key:
-        mariaCurs.execute('INSERT into other (name, data) values ("key", %s)', [rep_key])
+        curs.execute('INSERT into other (name, data) values ("key", %s)', [rep_key])
 else:
     rep_key = rep_data[0][0]
 
-mariaCurs.execute('SELECT data FROM other WHERE name = "adsense"')
-adsense_result = mariaCurs.fetchall()
+curs.execute('SELECT data FROM other WHERE name = "adsense"')
+adsense_result = curs.fetchall()
 if not adsense_result:
-    mariaCurs.execute('INSERT into other (name, data) values ("adsense", "False")')
-    mariaCurs.execute('INSERT into other (name, data) values ("adsense_code", "")')
+    curs.execute('INSERT into other (name, data) values ("adsense", "False")')
+    curs.execute('INSERT into other (name, data) values ("adsense_code", "")')
 
-mariaCurs.execute('delete FROM other WHERE name = "ver"')
-mariaCurs.execute('INSERT into other (name, data) values ("ver", %s)', [c_ver])
+curs.execute('delete FROM other WHERE name = "ver"')
+curs.execute('INSERT into other (name, data) values ("ver", %s)', [c_ver])
 
 try:
-    mariaCurs.execute('SELECT data FROM other WHERE name = "back_up"')
-    back_up_time = mariaCurs.fetchall()
+    curs.execute('SELECT data FROM other WHERE name = "back_up"')
+    back_up_time = curs.fetchall()
     
     back_time = int(back_up_time[0][0])
 except:
@@ -272,23 +272,23 @@ if back_time != 0:
 else:
     print('Back up state : Turn off')
 
-mariaCurs.execute('SELECT data FROM other WHERE name = "s_ver"')
-ver_set_data = mariaCurs.fetchall()
+curs.execute('SELECT data FROM other WHERE name = "s_ver"')
+ver_set_data = curs.fetchall()
 if not ver_set_data:
-    mariaCurs.execute('INSERT into other (name, data) values ("s_ver", %s)', [s_ver])
+    curs.execute('INSERT into other (name, data) values ("s_ver", %s)', [s_ver])
     
     if setup_tool == 0:
         print('----')
         print('Skin update required')
 else:
     if int(ver_set_data[0][0]) < int(s_ver):
-        mariaCurs.execute('delete FROM other WHERE name = "s_ver"')
-        mariaCurs.execute('INSERT into other (name, data) values ("s_ver", %s)', [s_ver])
+        curs.execute('delete FROM other WHERE name = "s_ver"')
+        curs.execute('INSERT into other (name, data) values ("s_ver", %s)', [s_ver])
 
         print('----')
         print('Skin update required')
 
-mariaConn.close()
+conn.close()
 # DB Connect End
 
 # Func
