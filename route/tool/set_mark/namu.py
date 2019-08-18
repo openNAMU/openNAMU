@@ -713,6 +713,7 @@ def namu(conn, data, title, main_num):
             break
 
     data = re.sub('<\/ul>\n \|\|', '</ul>||', data)
+    data = re.sub('<\/ul>\n', '</ul>', data)
 
     while 1:
         indent = re.search('\n( +)', data)
