@@ -1,4 +1,5 @@
 from .tool.func import *
+import pymysql
 
 def user_custom_head_view_2(conn):
     curs = conn.cursor()
@@ -7,11 +8,11 @@ def user_custom_head_view_2(conn):
 
     if flask.request.method == 'POST':
         if custom()[2] != 0:
-            curs.execute("select user from custom where user = ?", [ip + ' (head)'])
+            curs.execute("select user from custom where user = %s", [ip + ' (head)'])
             if curs.fetchall():
-                curs.execute("update custom set css = ? where user = ?", [flask.request.form.get('content', None), ip + ' (head)'])
+                curs.execute("update custom set css = %s where user = %s", [flask.request.form.get('content', None), ip + ' (head)'])
             else:
-                curs.execute("insert into custom (user, css) values (?, ?)", [ip + ' (head)', flask.request.form.get('content', None)])
+                curs.execute("insert into custom (user, css) values (%s, %s)", [ip + ' (head)', flask.request.form.get('content', None)])
             
             conn.commit()
 
@@ -22,7 +23,7 @@ def user_custom_head_view_2(conn):
         if custom()[2] != 0:
             start = ''
 
-            curs.execute("select css from custom where user = ?", [ip + ' (head)'])
+            curs.execute("select css from custom where user = %s", [ip + ' (head)'])
             head_data = curs.fetchall()
             if head_data:
                 data = head_data[0][0]

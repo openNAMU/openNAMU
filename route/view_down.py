@@ -1,11 +1,12 @@
 from .tool.func import *
+import pymysql
 
 def view_down_2(conn, name):
     curs = conn.cursor()
 
     div = '<ul>'
 
-    curs.execute("select title from data where title like ?", ['%' + name + '/%'])
+    curs.execute("select title from data where title like %s", ['%' + name + '/%'])
     for data in curs.fetchall():
         div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a></li>'
         

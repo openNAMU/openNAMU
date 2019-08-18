@@ -1,4 +1,5 @@
 from .tool.func import *
+import pymysql
 
 def api_w_2(conn, name):
     curs = conn.cursor()
@@ -8,7 +9,7 @@ def api_w_2(conn, name):
         
         return flask.jsonify(json_data)
     else:
-        curs.execute("select data from data where title = ?", [name])
+        curs.execute("select data from data where title = %s", [name])
         data = curs.fetchall()
         if data:
             json_data = { "title" : name, "data" : render_set(title = name, data = data[0][0]) }

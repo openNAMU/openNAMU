@@ -1,4 +1,5 @@
 from .tool.func import *
+import pymysql
 
 def list_user_topic_2(conn, name):
     curs = conn.cursor()
@@ -21,14 +22,14 @@ def list_user_topic_2(conn, name):
                     </tr>
             '''
     
-    curs.execute("select title, id, sub, ip, date from topic where ip = ? order by date desc limit ?, '50'", [name, str(sql_num)])
+    curs.execute("select title, id, sub, ip, date from topic where ip = %s order by date desc limit %s, '50'", [name, str(sql_num)])
     data_list = curs.fetchall()
     for data in data_list:
         title = html.escape(data[0])
         sub = html.escape(data[2])
         
         if one_admin == 1:
-            curs.execute("select * from ban where block = ?", [data[3]])
+            curs.execute("select * from ban where block = %s", [data[3]])
             if curs.fetchall():
                 ban = ' <a href="/ban/' + url_pas(data[3]) + '">(' + load_lang('release') + ')</a>'
             else:
@@ -42,7 +43,7 @@ def list_user_topic_2(conn, name):
     div += '</tbody></table>'
     div += next_fix('/topic_record/' + url_pas(name) + '?num=', num, data_list)      
     
-    curs.execute("select end from ban where block = ?", [name])
+    curs.execute("select end from ban where block = %s", [name])
     if curs.fetchall():
         sub = ' (' + load_lang('blocked') + ')'
     else:

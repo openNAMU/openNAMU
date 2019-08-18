@@ -80,7 +80,7 @@ elif what_i_do == '3':
     else:
         band = ''
 
-        curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, ?)", 
+        curs.execute("insert into rb (block, end, today, blocker, why, band) values (%s, %s, %s, %s, %s, %s)", 
             [user_data, 
             'release', 
             get_time(), 
@@ -88,25 +88,25 @@ elif what_i_do == '3':
             '', 
             band
         ])
-    curs.execute("delete from ban where block = ?", [user_data])
+    curs.execute("delete from ban where block = %s", [user_data])
 elif what_i_do == '4':
     print('----')
     print('Host : ', end = '')
     host = input()
 
-    curs.execute("update other set data = ? where name = 'host'", [host])
+    curs.execute("update other set data = %s where name = 'host'", [host])
 elif what_i_do == '5':
     print('----')
     print('Port : ', end = '')
     port = int(input())
 
-    curs.execute("update other set data = ? where name = 'port'", [port])
+    curs.execute("update other set data = %s where name = 'port'", [port])
 elif what_i_do == '6':
     print('----')
     print('Skin\'s name : ', end = '')
     skin = input()
 
-    curs.execute("update other set data = ? where name = 'skin'", [skin])
+    curs.execute("update other set data = %s where name = 'skin'", [skin])
 elif what_i_do == '7':
     print('----')
     print('1. sha256')
@@ -132,7 +132,7 @@ elif what_i_do == '7':
         else:
             hashed = hashlib.sha3_256(bytes(user_pw, 'utf-8')).hexdigest()
        
-    curs.execute("update user set pw = ? where id = ?", [hashed, user_name])
+    curs.execute("update user set pw = %s where id = %s", [hashed, user_name])
 elif what_i_do == '8':
     curs.execute("update other set data = '00000' where name = 'ver'")
 else:

@@ -1,4 +1,5 @@
 from .tool.func import *
+import pymysql
 
 def login_pw_change_2(conn):
     curs = conn.cursor()
@@ -14,7 +15,7 @@ def login_pw_change_2(conn):
             if flask.request.form.get('pw2', None) != flask.request.form.get('pw3', None):
                 return re_error('/error/20')
 
-            curs.execute("select pw, encode from user where id = ?", [flask.session['id']])
+            curs.execute("select pw, encode from user where id = %s", [flask.session['id']])
             user = curs.fetchall()
             if not user:
                 return re_error('/error/2')
@@ -30,7 +31,7 @@ def login_pw_change_2(conn):
 
             hashed = pw_encode(flask.request.form.get('pw2', None))
                 
-            curs.execute("update user set pw = ? where id = ?", [hashed, ip_check()])
+            curs.execute("update user set pw = %s where id = %s", [hashed, ip_check()])
 
             return redirect('/user')
     else:

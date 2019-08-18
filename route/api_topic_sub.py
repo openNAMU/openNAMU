@@ -1,18 +1,19 @@
 from .tool.func import *
+import pymysql
 
 def api_topic_sub_2(conn, name, sub, time):
     curs = conn.cursor()
 
     if flask.request.args.get('num', None):
-        curs.execute("select id, data, date, ip, block, top from topic where title = ? and sub = ? and id + 0 = ? + 0 order by id + 0 asc", [
+        curs.execute("select id, data, date, ip, block, top from topic where title = %s and sub = %s and id + 0 = %s + 0 order by id + 0 asc", [
             name, 
             sub, 
             flask.request.args.get('num', '')
         ])
     elif flask.request.args.get('top', None):
-        curs.execute("select id, data, date, ip, block, top from topic where title = ? and sub = ? and top = 'O' order by id + 0 asc", [name, sub])
+        curs.execute("select id, data, date, ip, block, top from topic where title = %s and sub = %s and top = 'O' order by id + 0 asc", [name, sub])
     else:
-        curs.execute("select id, data, date, ip, block, top from topic where title = ? and sub = ? order by id + 0 asc", [name, sub])
+        curs.execute("select id, data, date, ip, block, top from topic where title = %s and sub = %s order by id + 0 asc", [name, sub])
 
     data = curs.fetchall()
     if data:
@@ -24,7 +25,7 @@ def api_topic_sub_2(conn, name, sub, time):
                 t_data_f = i[1]
                 b_color = ''
             else:
-                curs.execute("select who from re_admin where what = ? order by time desc limit 1", ['blind (' + name + ' - ' + sub + '#' + str(i[0]) + ')'])
+                curs.execute("select who from re_admin where what = %s order by time desc limit 1", ['blind (' + name + ' - ' + sub + '#' + str(i[0]) + ')'])
                 who_blind = curs.fetchall()
                 if who_blind:
                     t_data_f = '[[user:' + who_blind[0][0] + ']] block'
@@ -38,7 +39,7 @@ def api_topic_sub_2(conn, name, sub, time):
                     s_user = i[3]
                 else:
                     if flask.request.args.get('num', None):
-                        curs.execute("select ip from topic where title = ? and sub = ? order by id + 0 asc limit 1", [name, sub])
+                        curs.execute("select ip from topic where title = %s and sub = %s order by id + 0 asc limit 1", [name, sub])
                         g_data = curs.fetchall()
                         if g_data:
                             s_user = g_data[0][0]
@@ -56,7 +57,7 @@ def api_topic_sub_2(conn, name, sub, time):
                     
                 ip = ip_pas(i[3])
                 
-                curs.execute('select acl from user where id = ?', [i[3]])
+                curs.execute('select acl from user where id = %s', [i[3]])
                 u_acl = curs.fetchall()
                 if u_acl and u_acl[0][0] != 'user':
                     ip += ' <a href="javascript:void(0);" title="' + load_lang('admin') + '">★</a>'
@@ -64,7 +65,7 @@ def api_topic_sub_2(conn, name, sub, time):
                 if admin == 1 or b_color != 'toron_color_grey':
                     ip += ' <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/admin/' + i[0] + '">(' + load_lang('discussion_tool') + ')</a>'
 
-                curs.execute("select end from ban where block = ?", [i[3]])
+                curs.execute("select end from ban where block = %s", [i[3]])
                 if curs.fetchall():
                     ip += ' <a href="javascript:void(0);" title="' + load_lang('blocked') + '">†</a>'
                     

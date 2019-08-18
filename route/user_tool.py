@@ -1,4 +1,5 @@
 from .tool.func import *
+import pymysql
 
 def user_tool_2(conn, name):
     curs = conn.cursor()
@@ -12,7 +13,7 @@ def user_tool_2(conn, name):
     '''
             
     if admin_check(1) == 1:
-        curs.execute("select block from ban where block = ?", [name])
+        curs.execute("select block from ban where block = %s", [name])
         if curs.fetchall():
             ban_name = load_lang('ban_release')
         else:

@@ -1,4 +1,5 @@
 from .tool.func import *
+import pymysql
 
 def server_indexing_2(conn):
     curs = conn.cursor()
@@ -24,7 +25,7 @@ def server_indexing_2(conn):
         else:
             curs.execute("select name from sqlite_master where type in ('table', 'view') and name not like 'sqlite_%' union all select name from sqlite_temp_master where type in ('table', 'view') order by 1;")
             for table in curs.fetchall():            
-                curs.execute('select sql from sqlite_master where name = ?', [table[0]])
+                curs.execute('select sql from sqlite_master where name = %s', [table[0]])
                 cul = curs.fetchall()
                 
                 r_cul = re.findall('(?:([^ (]*) text)', str(cul[0]))

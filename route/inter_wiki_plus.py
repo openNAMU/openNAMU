@@ -1,11 +1,12 @@
 from .tool.func import *
+import pymysql
 
 def inter_wiki_plus_2(conn, tools, name):
     curs = conn.cursor()
     
     if flask.request.method == 'POST':
         if tools == 'plus_inter_wiki':
-            curs.execute('insert into inter (title, link) values (?, ?)', [flask.request.form.get('title', None), flask.request.form.get('link', None)])
+            curs.execute('insert into inter (title, link) values (%s, %s)', [flask.request.form.get('title', None), flask.request.form.get('link', None)])
             
             admin_check(None, 'inter_wiki_plus')
         elif tools == 'plus_edit_filter':
@@ -20,11 +21,11 @@ def inter_wiki_plus_2(conn, tools, name):
             try:
                 re.compile(flask.request.form.get('content', 'test'))
 
-                curs.execute("select name from filter where name = ?", [name])
+                curs.execute("select name from filter where name = %s", [name])
                 if curs.fetchall():
-                    curs.execute("update filter set regex = ?, sub = ? where name = ?", [flask.request.form.get('content', 'test'), end, name])
+                    curs.execute("update filter set regex = %s, sub = %s where name = %s", [flask.request.form.get('content', 'test'), end, name])
                 else:
-                    curs.execute("insert into filter (name, regex, sub) values (?, ?, ?)", [name, flask.request.form.get('content', 'test'), end])
+                    curs.execute("insert into filter (name, regex, sub) values (%s, %s, %s)", [name, flask.request.form.get('content', 'test'), end])
             except:
                 return re_error('/error/23')                
         else:
@@ -51,7 +52,7 @@ def inter_wiki_plus_2(conn, tools, name):
                 
                 type_d = 'email'
             
-            curs.execute('insert into html_filter (html, kind) values (?, ?)', [flask.request.form.get('title', 'test'), type_d])
+            curs.execute('insert into html_filter (html, kind) values (%s, %s)', [flask.request.form.get('title', 'test'), type_d])
         
         conn.commit()
     
@@ -70,7 +71,7 @@ def inter_wiki_plus_2(conn, tools, name):
                 <input placeholder="link" type="text" name="link">
             '''
         elif tools == 'plus_edit_filter':
-            curs.execute("select regex, sub from filter where name = ?", [name])
+            curs.execute("select regex, sub from filter where name = %s", [name])
             exist = curs.fetchall()
             if exist:
                 textarea = exist[0][0]

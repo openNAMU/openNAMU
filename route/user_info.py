@@ -1,11 +1,12 @@
 from .tool.func import *
+import pymysql
 
 def user_info_2(conn):
     curs = conn.cursor()
 
     ip = ip_check()
     
-    curs.execute("select acl from user where id = ?", [ip])
+    curs.execute("select acl from user where id = %s", [ip])
     data = curs.fetchall()
     if ban_check() == 0:
         if data:
@@ -24,7 +25,7 @@ def user_info_2(conn):
         else:
             match = '-'
 
-        curs.execute("select end, login, band from ban where block = ? or block = ?", [ip, match])
+        curs.execute("select end, login, band from ban where block = %s or block = %s", [ip, match])
         block_data = curs.fetchall()
         if block_data:
             if block_data[0][0] != '':
@@ -38,7 +39,7 @@ def user_info_2(conn):
             if block_data[0][2] == 'O':
                 acl += ' (' + load_lang('band_blocked') + ')'
 
-    curs.execute('select name from alarm where name = ? limit 1', [ip_check()])
+    curs.execute('select name from alarm where name = %s limit 1', [ip_check()])
     if curs.fetchall():
         plus2 = '<li><a href="/alarm">' + load_lang('alarm') + ' (O)</a></li>'
     else:

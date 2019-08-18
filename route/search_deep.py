@@ -1,4 +1,5 @@
 from .tool.func import *
+import pymysql
 
 def search_deep_2(conn, name):
     curs = conn.cursor()
@@ -17,7 +18,7 @@ def search_deep_2(conn, name):
     div_plus = ''
     test = ''
     
-    curs.execute("select title from data where title = ?", [name])
+    curs.execute("select title from data where title = %s", [name])
     if curs.fetchall():
         link_id = ''
     else:
@@ -34,9 +35,9 @@ def search_deep_2(conn, name):
             '''
 
     curs.execute(
-        "select distinct title, case when title like ? then '제목' else '내용' \
-        end from data where title like ? or data like ? order by case \
-        when title like ? then 1 else 2 end limit ?, '50'",
+        "select distinct title, case when title like %s then '제목' else '내용' "
+        "end from data where title like %s or data like %s order by case"
+        "when title like %s then 1 else 2 end limit %s, '50'",
         ['%' + name + '%', '%' + name + '%', '%' + name + '%', '%' + name + '%', str(sql_num)]
     )
     all_list = curs.fetchall()

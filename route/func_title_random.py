@@ -1,4 +1,5 @@
 from .tool.func import *
+import pymysql
 
 def func_title_random_2(conn):
     curs = conn.cursor()

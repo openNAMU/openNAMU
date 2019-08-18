@@ -1,4 +1,5 @@
 from .tool.func import *
+import pymysql
 
 def list_admin_2(conn):
     curs = conn.cursor()

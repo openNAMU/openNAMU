@@ -1,4 +1,5 @@
 from .tool.func import *
+import pymysql
 
 def watch_list_2(conn):
     curs = conn.cursor()
@@ -8,7 +9,7 @@ def watch_list_2(conn):
     if custom()[2] == 0:
         return redirect('/login')
 
-    curs.execute("select title from scan where user = ?", [ip_check()])
+    curs.execute("select title from scan where user = %s", [ip_check()])
     data = curs.fetchall()
     for data_list in data:
         div += '<li><a href="/w/' + url_pas(data_list[0]) + '">' + data_list[0] + '</a> <a href="/watch_list/' + url_pas(data_list[0]) + '">(' + load_lang('delete') + ')</a></li>'

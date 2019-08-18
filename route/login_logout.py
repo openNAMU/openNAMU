@@ -1,4 +1,5 @@
 from .tool.func import *
+import pymysql
 
 def login_logout_2(conn):
     curs = conn.cursor()

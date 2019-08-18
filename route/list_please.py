@@ -1,4 +1,5 @@
 from .tool.func import *
+import pymysql
 
 def list_please_2(conn):
     curs = conn.cursor()
@@ -12,7 +13,7 @@ def list_please_2(conn):
     div = '<ul>'
     var = ''
     
-    curs.execute("select distinct title from back where type = 'no' order by title asc limit ?, '50'", [str(sql_num)])
+    curs.execute("select distinct title from back where type = 'no' order by title asc limit %s, '50'", [str(sql_num)])
     data_list = curs.fetchall()
     for data in data_list:
         if var != data[0]:

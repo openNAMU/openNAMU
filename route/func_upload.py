@@ -1,4 +1,5 @@
 from .tool.func import *
+import pymysql
 
 def func_upload_2(conn):
     curs = conn.cursor()
@@ -34,7 +35,7 @@ def func_upload_2(conn):
 
         e_data = sha224(piece[0]) + piece[1]
 
-        curs.execute("select title from data where title = ?", ['file:' + name])
+        curs.execute("select title from data where title = %s", ['file:' + name])
         if curs.fetchall():
             return re_error('/error/16')
 
@@ -63,7 +64,7 @@ def func_upload_2(conn):
             data.save(os.path.join(app_var['path_data_image'], e_data))
         
         curs.execute("insert into data (title, data) values (?, ?)", ['file:' + name, '[[file:' + name + ']][br][br]{{{[[file:' + name + ']]}}}[br][br]' + lice])
-        curs.execute("insert into acl (title, dec, dis, why, view) values (?, 'admin', '', '', '')", ['file:' + name])
+        curs.execute("insert into acl (title, decu, dis, why, view) values (?, 'admin', '', '', '')", ['file:' + name])
 
         history_plus(
             'file:' + name, '[[file:' + name + ']][br][br]{{{[[file:' + name + ']]}}}[br][br]' + lice,

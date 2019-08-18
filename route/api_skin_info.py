@@ -1,4 +1,5 @@
 from .tool.func import *
+import pymysql
 
 def api_skin_info_2(conn, name):
     curs = conn.cursor()

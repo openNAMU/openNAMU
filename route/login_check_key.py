@@ -1,4 +1,5 @@
 from .tool.func import *
+import pymysql
 
 def login_check_key_2(conn, tool):
     curs = conn.cursor()
@@ -8,7 +9,7 @@ def login_check_key_2(conn, tool):
             if 'c_id' in flask.session and flask.session['c_key'] == flask.request.form.get('key', None):
                 hashed = pw_encode(flask.session['c_key'])
 
-                curs.execute("update user set pw = ? where id = ?", [hashed, flask.session['c_id']])
+                curs.execute("update user set pw = %s where id = %s", [hashed, flask.session['c_id']])
                 conn.commit()
 
                 d_id = flask.session['c_id']
@@ -41,7 +42,7 @@ def login_check_key_2(conn, tool):
                 if tool == 'check_key':
                     curs.execute("select id from user limit 1")
                     if not curs.fetchall():
-                        curs.execute("insert into user (id, pw, acl, date, encode) values (?, ?, 'owner', ?, ?)", [
+                        curs.execute("insert into user (id, pw, acl, date, encode) values (%s, %s, 'owner', %s, %s)", [
                             flask.session['c_id'], 
                             flask.session['c_pw'], 
                             get_time(), 
@@ -50,7 +51,7 @@ def login_check_key_2(conn, tool):
     
                         first = 1
                     else:
-                        curs.execute("insert into user (id, pw, acl, date, encode) values (?, ?, 'user', ?, ?)", [
+                        curs.execute("insert into user (id, pw, acl, date, encode) values (%s, %s, 'user', %s, %s)", [
                             flask.session['c_id'], 
                             flask.session['c_pw'], 
                             get_time(), 
@@ -61,11 +62,11 @@ def login_check_key_2(conn, tool):
     
                     agent = flask.request.headers.get('User-Agent')
     
-                    curs.execute("insert into user_set (name, id, data) values ('email', ?, ?)", [
+                    curs.execute("insert into user_set (name, id, data) values ('email', %s, %s)", [
                         flask.session['c_id'], 
                         flask.session['c_email']
                     ])
-                    curs.execute("insert into ua_d (name, ip, ua, today, sub) values (?, ?, ?, ?, '')", [
+                    curs.execute("insert into ua_d (name, ip, ua, today, sub) values (%s, %s, %s, %s, '')", [
                         flask.session['c_id'], 
                         ip, 
                         agent, 
@@ -78,8 +79,8 @@ def login_check_key_2(conn, tool):
                             
                     conn.commit()
                 else:
-                    curs.execute('delete from user_set where name = "email" and id = ?', [ip])
-                    curs.execute('insert into user_set (name, id, data) values ("email", ?, ?)', [ip, flask.session['c_email']])
+                    curs.execute('delete from user_set where name = "email" and id = %s', [ip])
+                    curs.execute('insert into user_set (name, id, data) values ("email", %s, %s)', [ip, flask.session['c_email']])
                     
                     first = 0
                           

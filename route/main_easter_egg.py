@@ -1,4 +1,5 @@
 from .tool.func import *
+import pymysql
 
 def main_easter_egg_2(conn):
     curs = conn.cursor()

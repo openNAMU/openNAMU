@@ -1,4 +1,5 @@
 from .tool.func import *
+import pymysql
 
 def main_file_2(conn, data):
     curs = conn.cursor()

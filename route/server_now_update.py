@@ -1,4 +1,5 @@
 from .tool.func import *
+import pymysql
 
 def server_now_update_2(conn):
     curs = conn.cursor()

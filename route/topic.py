@@ -1,4 +1,5 @@
 from .tool.func import *
+import pymysql
 
 def topic_2(conn, name, sub):
     curs = conn.cursor()
@@ -6,7 +7,7 @@ def topic_2(conn, name, sub):
     ban = topic_check(name, sub)
     admin = admin_check(3)
 
-    curs.execute("select id from topic where title = ? and sub = ? limit 1", [name, sub])
+    curs.execute("select id from topic where title = %s and sub = %s limit 1", [name, sub])
     topic_exist = curs.fetchall()
     if not topic_exist and len(sub) > 256:
         return re_error('/error/11')
@@ -23,7 +24,7 @@ def topic_2(conn, name, sub):
         if ban == 1:
             return re_error('/ban')
         
-        curs.execute("select id from topic where title = ? and sub = ? order by id + 0 desc limit 1", [name, sub])
+        curs.execute("select id from topic where title = %s and sub = %s order by id + 0 desc limit 1", [name, sub])
         old_num = curs.fetchall()
         if old_num:
             num = int(old_num[0][0]) + 1
@@ -34,23 +35,23 @@ def topic_2(conn, name, sub):
         if match:
             y_check = 0
             if ip_or_user(match.groups()[0]) == 1:
-                curs.execute("select ip from history where ip = ? limit 1", [match.groups()[0]])
+                curs.execute("select ip from history where ip = %s limit 1", [match.groups()[0]])
                 u_data = curs.fetchall()
                 if u_data:
                     y_check = 1
                 else:
-                    curs.execute("select ip from topic where ip = ? limit 1", [match.groups()[0]])
+                    curs.execute("select ip from topic where ip = %s limit 1", [match.groups()[0]])
                     u_data = curs.fetchall()
                     if u_data:
                         y_check = 1
             else:
-                curs.execute("select id from user where id = ?", [match.groups()[0]])
+                curs.execute("select id from user where id = %s", [match.groups()[0]])
                 u_data = curs.fetchall()
                 if u_data:
                     y_check = 1
 
             if y_check == 1:
-                curs.execute('insert into alarm (name, data, date) values (?, ?, ?)', [
+                curs.execute('insert into alarm (name, data, date) values (%s, %s, %s)', [
                     match.groups()[0], 
                     ip + ' - <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '">' + load_lang('user_discussion', 1) + '</a>', 
                     today
@@ -60,10 +61,10 @@ def topic_2(conn, name, sub):
         data = cate_re.sub('[br]', flask.request.form.get('content', 'Test'))
         
         for rd_data in re.findall("(?:#([0-9]+))", data):
-            curs.execute("select ip from topic where title = ? and sub = ? and id = ?", [name, sub, rd_data])
+            curs.execute("select ip from topic where title = %s and sub = %s and id = %s", [name, sub, rd_data])
             ip_data = curs.fetchall()
             if ip_data and ip_or_user(ip_data[0][0]) == 0:
-                curs.execute('insert into alarm (name, data, date) values (?, ?, ?)', [ip_data[0][0], ip + ' - <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '#' + str(num) + '">' + load_lang('discussion', 1) + '</a>', today])
+                curs.execute('insert into alarm (name, data, date) values (%s, %s, %s)', [ip_data[0][0], ip + ' - <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '#' + str(num) + '">' + load_lang('discussion', 1) + '</a>', today])
             
         data = re.sub("(?P<in>#(?:[0-9]+))", '[[\g<in>]]', data)
 
@@ -71,14 +72,14 @@ def topic_2(conn, name, sub):
 
         rd_plus(name, sub, today)
 
-        curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, ?, ?, ?, '', '')", [str(num), name, sub, data, today, ip])
+        curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (%s, %s, %s, %s, %s, %s, '', '')", [str(num), name, sub, data, today, ip])
         conn.commit()
         
         return redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '#reload')
     else:
         data = ''
     
-        curs.execute("select title from rd where title = ? and sub = ? and (stop = 'O' or stop = 'S')", [name, sub])
+        curs.execute("select title from rd where title = %s and sub = %s and (stop = 'O' or stop = 'S')", [name, sub])
         close_data = curs.fetchall()
         
         if close_data and admin != 1:

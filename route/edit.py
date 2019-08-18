@@ -1,4 +1,5 @@
 from .tool.func import *
+import pymysql
 
 def edit_2(conn, name):
     curs = conn.cursor()
@@ -22,7 +23,7 @@ def edit_2(conn, name):
         today = get_time()
         content = savemark(flask.request.form.get('content', ''))
         
-        curs.execute("select data from data where title = ?", [name])
+        curs.execute("select data from data where title = %s", [name])
         old = curs.fetchall()
         if old:
             leng = leng_check(len(flask.request.form.get('otent', '')), len(content))
@@ -30,15 +31,15 @@ def edit_2(conn, name):
             if flask.request.args.get('section', None):
                 content = old[0][0].replace(flask.request.form.get('otent', ''), content)
                 
-            curs.execute("update data set data = ? where title = ?", [content, name])
+            curs.execute("update data set data = %s where title = %s", [content, name])
         else:
             leng = '+' + str(len(content))
             
-            curs.execute("insert into data (title, data) values (?, ?)", [name, content])
+            curs.execute("insert into data (title, data) values (%s, %s)", [name, content])
 
-        curs.execute("select user from scan where title = ?", [name])
+        curs.execute("select user from scan where title = %s", [name])
         for _ in curs.fetchall():
-            curs.execute("insert into alarm (name, data, date) values (?, ?, ?)", [ip, ip + ' - <a href="/w/' + url_pas(name) + '">' + name + '</a> (Edit)', today])
+            curs.execute("insert into alarm (name, data, date) values (%s, %s, %s)", [ip, ip + ' - <a href="/w/' + url_pas(name) + '">' + name + '</a> (Edit)', today])
 
         history_plus(
             name,
@@ -49,8 +50,8 @@ def edit_2(conn, name):
             leng
         )
         
-        curs.execute("delete from back where link = ?", [name])
-        curs.execute("delete from back where title = ? and type = 'no'", [name])
+        curs.execute("delete from back where link = %s", [name])
+        curs.execute("delete from back where title = %s and type = 'no'", [name])
         
         render_set(
             title = name,
@@ -62,7 +63,7 @@ def edit_2(conn, name):
         
         return redirect('/w/' + url_pas(name))
     else:            
-        curs.execute("select data from data where title = ?", [name])
+        curs.execute("select data from data where title = %s", [name])
         new = curs.fetchall()
         if new:
             if flask.request.args.get('section', None):
@@ -98,7 +99,7 @@ def edit_2(conn, name):
             get_name = ''
             
         if flask.request.args.get('plus', None):
-            curs.execute("select data from data where title = ?", [flask.request.args.get('plus', 'test')])
+            curs.execute("select data from data where title = %s", [flask.request.args.get('plus', 'test')])
             get_data = curs.fetchall()
             if get_data:
                 data = get_data[0][0]

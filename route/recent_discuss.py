@@ -1,4 +1,5 @@
 from .tool.func import *
+import pymysql
 
 def recent_discuss_2(conn):
     curs = conn.cursor()

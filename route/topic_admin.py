@@ -1,9 +1,10 @@
 from .tool.func import *
+import pymysql
 
 def topic_admin_2(conn, name, sub, num):
     curs = conn.cursor()
 
-    curs.execute("select block, ip, date from topic where title = ? and sub = ? and id = ?", [name, sub, str(num)])
+    curs.execute("select block, ip, date from topic where title = %s and sub = %s and id = %s", [name, sub, str(num)])
     data = curs.fetchall()
     if not data:
         return redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub))
@@ -31,7 +32,7 @@ def topic_admin_2(conn, name, sub, num):
                 <a href="/topic/''' + url_pas(name) + '/sub/' + url_pas(sub) + '/notice/' + str(num) + '''">
         '''
 
-        curs.execute("select id from topic where title = ? and sub = ? and id = ? and top = 'O'", [name, sub, str(num)])
+        curs.execute("select id from topic where title = %s and sub = %s and id = %s and top = 'O'", [name, sub, str(num)])
         if curs.fetchall():
             is_ban += load_lang('pinned_release')
         else:
@@ -40,7 +41,7 @@ def topic_admin_2(conn, name, sub, num):
         is_ban += '</a></li></ul>'
         ban += '<li><a href="/ban/' + url_pas(data[0][1]) + '">'
 
-        curs.execute("select end from ban where block = ?", [data[0][1]])
+        curs.execute("select end from ban where block = %s", [data[0][1]])
         if curs.fetchall():
             ban += load_lang('ban_release')
         else:

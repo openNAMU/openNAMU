@@ -1,10 +1,11 @@
 from .tool.func import *
+import pymysql
 
 def give_user_ban_2(conn, name):
     curs = conn.cursor()
 
     if name and ip_or_user(name) == 0:
-        curs.execute("select acl from user where id = ?", [name])
+        curs.execute("select acl from user where id = %s", [name])
         user = curs.fetchall()
         if not user:
             return re_error('/error/2')
@@ -49,7 +50,7 @@ def give_user_ban_2(conn, name):
         if admin_check(1) != 1:
             return re_error('/error/3')
 
-        curs.execute("select end, why from ban where block = ?", [name])
+        curs.execute("select end, why from ban where block = %s", [name])
         end = curs.fetchall()
         if end:
             main_name = name
@@ -61,7 +62,7 @@ def give_user_ban_2(conn, name):
             else:
                 data = '<ul><li>' + load_lang('period') + ' : ' + end[0][0] + '</li>'
                 
-            curs.execute("select block from ban where block = ? and login = 'O'", [name])
+            curs.execute("select block from ban where block = %s and login = 'O'", [name])
             if curs.fetchall():
                 data += '<li>' + load_lang('login_able') + '</li>'
 

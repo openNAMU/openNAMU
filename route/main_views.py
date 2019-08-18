@@ -1,4 +1,5 @@
 from .tool.func import *
+import pymysql
 
 def main_views_2(conn, name):
     curs = conn.cursor()

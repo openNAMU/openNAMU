@@ -64,6 +64,8 @@ conn = pymysql.connect( host=db_data["db_host"], port=db_data["db_port"], user=d
                                  passwd=db_data["db_passwd"], charset="utf8", autocommit=True )
 curs = conn.cursor()
 
+load_conn(conn)
+
 try:
     curs.execute("create database " + db_data["db_name"])
 except pymysql.err.ProgrammingError:   # 예외 처리
@@ -90,6 +92,8 @@ app.jinja_env.filters['load_lang'] = load_lang
 app.jinja_env.filters['cut_100'] = cut_100
 
 app.url_map.converters['everything'] = EverythingConverter
+
+curs.execute('SET @@global.sql_mode= \'NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION\';')
 
 curs.execute('CREATE TABLE IF NOT EXISTS `data`(test text)')
 curs.execute('CREATE TABLE IF NOT EXISTS `cache_data`(test text)')
@@ -287,9 +291,6 @@ else:
 
         print('----')
         print('Skin update required')
-
-conn.close()
-# DB Connect End
 
 # Func
 @app.route('/del_alarm')

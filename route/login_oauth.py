@@ -1,4 +1,5 @@
 from .tool.func import *
+import pymysql
 
 def login_oauth_2(conn, platform, func):
     curs = conn.cursor()
@@ -57,24 +58,24 @@ def login_oauth_2(conn, platform, func):
         flask.session['refer'] = flask.request.referrer
 
         if platform == 'discord':
-            return redirect(api_url['redirect'] + '?client_id={}&redirect_uri={}&response_type=code&scope=identify'.format(
+            return redirect(api_url['redirect'] + '%sclient_id={}&redirect_uri={}&response_type=code&scope=identify'.format(
                 data['client_id'], 
                 data['redirect_uri']
             ))
         elif platform == 'naver':
-            return redirect(api_url['redirect'] + '?response_type=code&client_id={}&redirect_uri={}&state={}'.format(
+            return redirect(api_url['redirect'] + '%sresponse_type=code&client_id={}&redirect_uri={}&state={}'.format(
                 data['client_id'], 
                 data['redirect_uri'], 
                 data['state']
             ))
         elif platform == 'facebook':
-            return redirect(api_url['redirect'] + '?client_id={}&redirect_uri={}&state={}'.format(
+            return redirect(api_url['redirect'] + '%sclient_id={}&redirect_uri={}&state={}'.format(
                 data['client_id'], 
                 data['redirect_uri'], 
                 data['state']
             ))
         elif platform == 'kakao':
-            return redirect(api_url['redirect'] + '?client_id={}&redirect_uri={}&response_type=code'.format(
+            return redirect(api_url['redirect'] + '%sclient_id={}&redirect_uri={}&response_type=code'.format(
                 data['client_id'], 
                 data['redirect_uri']
             ))
@@ -205,10 +206,10 @@ def login_oauth_2(conn, platform, func):
             }
         
         if flask.session['referrer'][0:6] == 'change':
-            curs.execute('select * from oauth_conn where wiki_id = ? and provider = ?', [flask.session['id'], platform])
+            curs.execute('select * from oauth_conn where wiki_id = %s and provider = %s', [flask.session['id'], platform])
             oauth_result = curs.fetchall()
             if len(oauth_result) == 0:
-                curs.execute('insert into oauth_conn (provider, wiki_id, sns_id, name, picture) values(?, ?, ?, ?, ?)', [
+                curs.execute('insert into oauth_conn (provider, wiki_id, sns_id, name, picture) values(%s, %s, %s, %s, %s)', [
                     platform, 
                     flask.session['id'], 
                     stand_json['id'], 
@@ -216,11 +217,11 @@ def login_oauth_2(conn, platform, func):
                     stand_json['picture']
                 ])
             else:
-                curs.execute('update oauth_conn set name = ? picture = ? where wiki_id = ?', [stand_json['name'], stand_json['pricture'], flask.session['id']])
+                curs.execute('update oauth_conn set name = %s picture = %s where wiki_id = %s', [stand_json['name'], stand_json['pricture'], flask.session['id']])
 
             conn.commit()
         elif flask.session['referrer'][0:5] == 'login':
-            curs.execute('select * from oauth_conn where provider = ? and sns_id = ?', [platform, stand_json['id']])
+            curs.execute('select * from oauth_conn where provider = %s and sns_id = %s', [platform, stand_json['id']])
             curs_result = curs.fetchall()
             if len(curs_result) == 0:
                 return re_error('/error/2')

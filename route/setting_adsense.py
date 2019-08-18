@@ -1,4 +1,5 @@
 from .tool.func import *
+import pymysql
 
 def setting_adsense_2(conn):
     curs = conn.cursor()
@@ -22,7 +23,7 @@ def setting_adsense_2(conn):
         else:
             curs.execute('update other set data = "False" where name = "adsense"')
         
-        curs.execute('update other set data = ? where name = "adsense_code"', [adsense_code])
+        curs.execute('update other set data = %s where name = "adsense_code"', [adsense_code])
         conn.commit()
         
         return redirect('/adsense_setting')

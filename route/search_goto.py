@@ -1,4 +1,5 @@
 from .tool.func import *
+import pymysql
 
 def search_goto_2(conn, name):
     curs = conn.cursor()
@@ -8,7 +9,7 @@ def search_goto_2(conn, name):
     else:
         data = name
 
-    curs.execute("select title from data where title = ?", [data])
+    curs.execute("select title from data where title = %s", [data])
     t_data = curs.fetchall()
     if t_data:
         return redirect('/w/' + url_pas(data))

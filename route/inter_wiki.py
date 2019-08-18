@@ -1,4 +1,5 @@
 from .tool.func import *
+import pymysql
 
 def inter_wiki_2(conn, tools):
     curs = conn.cursor()

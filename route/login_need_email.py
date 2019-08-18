@@ -1,11 +1,12 @@
 from .tool.func import *
+import pymysql
 
 def login_need_email_2(conn, tool):
     curs = conn.cursor()
 
     if flask.request.method == 'POST':
         if tool == 'pass_find':
-            curs.execute("select id from user_set where id = ? and name = 'email' and data = ?", [
+            curs.execute("select id from user_set where id = %s and name = 'email' and data = %s", [
                 flask.request.form.get('id', ''),
                 flask.request.form.get('email', '')
             ])
@@ -44,9 +45,9 @@ def login_need_email_2(conn, tool):
                 if data:
                     data = data.groups()[0]
 
-                    curs.execute("select html from html_filter where html = ? and kind = 'email'", [data])
+                    curs.execute("select html from html_filter where html = %s and kind = 'email'", [data])
                     if curs.fetchall() or (data in main_email):
-                        curs.execute('select id from user_set where name = "email" and data = ?', [flask.request.form.get('email', '')])
+                        curs.execute('select id from user_set where name = "email" and data = %s', [flask.request.form.get('email', '')])
                         if curs.fetchall():
                             flask.session.pop('c_id', None)
                             flask.session.pop('c_pw', None)

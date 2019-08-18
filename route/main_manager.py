@@ -1,4 +1,5 @@
 from .tool.func import *
+import pymysql
 
 def main_manager_2(conn, num, r_ver):
     curs = conn.cursor()

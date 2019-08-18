@@ -1,4 +1,5 @@
 from .tool.func import *
+import pymysql
 
 def login_register_2(conn):
     curs = conn.cursor()
@@ -37,7 +38,7 @@ def login_register_2(conn):
         if len(flask.request.form.get('id', None)) > 32:
             return re_error('/error/7')
 
-        curs.execute("select id from user where id = ?", [flask.request.form.get('id', None)])
+        curs.execute("select id from user where id = %s", [flask.request.form.get('id', None)])
         if curs.fetchall():
             return re_error('/error/6')
 
@@ -57,18 +58,18 @@ def login_register_2(conn):
 
             curs.execute("select id from user limit 1")
             if not curs.fetchall():
-                curs.execute("insert into user (id, pw, acl, date, encode) values (?, ?, 'owner', ?, ?)", [flask.request.form.get('id', None), hashed, get_time(), db_data[0][0]])
+                curs.execute("insert into user (id, pw, acl, date, encode) values (%s, %s, 'owner', %s, %s)", [flask.request.form.get('id', None), hashed, get_time(), db_data[0][0]])
 
                 first = 1
             else:
-                curs.execute("insert into user (id, pw, acl, date, encode) values (?, ?, 'user', ?, ?)", [flask.request.form.get('id', None), hashed, get_time(), db_data[0][0]])
+                curs.execute("insert into user (id, pw, acl, date, encode) values (%s, %s, 'user', %s, %s)", [flask.request.form.get('id', None), hashed, get_time(), db_data[0][0]])
 
                 first = 0
 
             ip = ip_check()
             agent = flask.request.headers.get('User-Agent')
 
-            curs.execute("insert into ua_d (name, ip, ua, today, sub) values (?, ?, ?, ?, '')", [flask.request.form.get('id', None), ip, agent, get_time()])  
+            curs.execute("insert into ua_d (name, ip, ua, today, sub) values (%s, %s, %s, %s, '')", [flask.request.form.get('id', None), ip, agent, get_time()])  
 
             flask.session['state'] = 1
             flask.session['id'] = flask.request.form.get('id', None)

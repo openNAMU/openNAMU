@@ -1,4 +1,5 @@
 from .tool.func import *
+import pymysql
 
 def list_not_close_topic_2(conn):
     curs = conn.cursor()

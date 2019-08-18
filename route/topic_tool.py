@@ -1,9 +1,10 @@
 from .tool.func import *
+import pymysql
 
 def topic_tool_2(conn, name, sub):
     curs = conn.cursor()
     
-    curs.execute("select id from topic where title = ? and sub = ? limit 1", [name, sub])
+    curs.execute("select id from topic where title = %s and sub = %s limit 1", [name, sub])
     topic_exist = curs.fetchall()
     if not topic_exist:
         return re_error('/topic/' + url_pas(name) + '/sub/' + url_pas(sub))
@@ -13,7 +14,7 @@ def topic_tool_2(conn, name, sub):
     if admin_check(3) == 1:
         all_data = '<h2>' + load_lang('topic_state') + '</h2><ul><li><a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/close">'
 
-        curs.execute("select title from rd where title = ? and sub = ? and stop = 'O'", [name, sub])
+        curs.execute("select title from rd where title = %s and sub = %s and stop = 'O'", [name, sub])
         if curs.fetchall():
             all_data += load_lang('topic_open')
         else:
@@ -21,7 +22,7 @@ def topic_tool_2(conn, name, sub):
         
         all_data += '</a></li><li><a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/stop">'
 
-        curs.execute("select title from rd where title = ? and sub = ? and stop = 'S'", [name, sub])
+        curs.execute("select title from rd where title = %s and sub = %s and stop = 'S'", [name, sub])
         if curs.fetchall():
             all_data += load_lang('topic_restart')
         else:
@@ -29,7 +30,7 @@ def topic_tool_2(conn, name, sub):
             
         all_data += '</a></li><li><a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool/agree">'
         
-        curs.execute("select title from rd where title = ? and sub = ? and agree = 'O'", [name, sub])
+        curs.execute("select title from rd where title = %s and sub = %s and agree = 'O'", [name, sub])
         if curs.fetchall():
             all_data += load_lang('topic_destruction')
         else:

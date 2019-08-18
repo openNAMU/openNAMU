@@ -1,4 +1,5 @@
 from .tool.func import *
+import pymysql
 
 def view_xref_2(conn, name):
     curs = conn.cursor()
@@ -11,7 +12,7 @@ def view_xref_2(conn, name):
         
     div = '<ul>'
     
-    curs.execute("select link, type from back where title = ? and not type = 'cat' and not type = 'no' order by link asc limit ?, '50'", [name, str(sql_num)])
+    curs.execute("select link, type from back where title = %s and not type = 'cat' and not type = 'no' order by link asc limit %s, '50'", [name, str(sql_num)])
     data_list = curs.fetchall()
     for data in data_list:
         div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a>'
@@ -19,7 +20,7 @@ def view_xref_2(conn, name):
         if data[1]:                
             div += ' (' + data[1] + ')'
         
-        curs.execute("select title from back where title = ? and type = 'include'", [data[0]])
+        curs.execute("select title from back where title = %s and type = 'include'", [data[0]])
         db_data = curs.fetchall()
         if db_data:
             div += ' <a id="inside" href="/xref/' + url_pas(data[0]) + '">(' + load_lang('backlink') + ')</a>'

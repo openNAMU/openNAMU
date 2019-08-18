@@ -1,4 +1,5 @@
 from .tool.func import *
+import pymysql
 
 def user_count_edit_2(conn, name):
     curs = conn.cursor()
@@ -8,14 +9,14 @@ def user_count_edit_2(conn, name):
     else:
         that = name
 
-    curs.execute("select count(title) from history where ip = ?", [that])
+    curs.execute("select count(title) from history where ip = %s", [that])
     count = curs.fetchall()
     if count:
         data = count[0][0]
     else:
         data = 0
 
-    curs.execute("select count(title) from topic where ip = ?", [that])
+    curs.execute("select count(title) from topic where ip = %s", [that])
     count = curs.fetchall()
     if count:
         t_data = count[0][0]

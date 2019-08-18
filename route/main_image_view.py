@@ -1,4 +1,5 @@
 from .tool.func import *
+import pymysql
 
 def main_image_view_2(conn, name, app_var):
     curs = conn.cursor()

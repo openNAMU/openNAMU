@@ -1,4 +1,5 @@
 from .tool.func import *
+import pymysql
 
 def view_diff_data_2(conn, name):
     curs = conn.cursor()
@@ -6,10 +7,10 @@ def view_diff_data_2(conn, name):
     first = flask.request.args.get('first', '1')
     second = flask.request.args.get('second', '1')
 
-    curs.execute("select data from history where id = ? and title = ?", [first, name])
+    curs.execute("select data from history where id = %s and title = %s", [first, name])
     first_raw_data = curs.fetchall()
     if first_raw_data:
-        curs.execute("select data from history where id = ? and title = ?", [second, name])
+        curs.execute("select data from history where id = %s and title = %s", [second, name])
         second_raw_data = curs.fetchall()
         if second_raw_data:
             first_data = html.escape(first_raw_data[0][0])            

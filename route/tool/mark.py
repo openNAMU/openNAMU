@@ -36,9 +36,9 @@ def send_parser(data):
     
 def plusing(data):
     for data_in in data:
-        curs.execute("select title from back where title = ? and link = ? and type = ?", [data_in[1], data_in[0], data_in[2]])
+        curs.execute("select title from back where title = %s and link = %s and type = %s", [data_in[1], data_in[0], data_in[2]])
         if not curs.fetchall():
-            curs.execute("insert into back (title, link, type) values (?, ?, ?)", [data_in[1], data_in[0], data_in[2]])
+            curs.execute("insert into back (title, link, type) values (%s, %s, %s)", [data_in[1], data_in[0], data_in[2]])
 
 def namumark(title = '', data = None, num = 0):
     curs.execute('select data from other where name = "markup"')

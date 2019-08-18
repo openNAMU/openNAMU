@@ -402,7 +402,7 @@ def namu(conn, data, title, main_num):
                 else:
                     break
 
-            curs.execute("select data from data where title = ?", [include_data])
+            curs.execute("select data from data where title = %s", [include_data])
             include_data = curs.fetchall()
             if include_data:
                 include_parser = include_re.sub('', include_data[0][0])
@@ -713,6 +713,7 @@ def namu(conn, data, title, main_num):
             break
 
     data = re.sub('<\/ul>\n \|\|', '</ul>||', data)
+    data = re.sub('<\/ul>\n', '</ul>', data)
 
     while 1:
         indent = re.search('\n( +)', data)
@@ -793,7 +794,7 @@ def namu(conn, data, title, main_num):
                     file_src = '/image/' + tool.sha224(file_name) + '.' + file_end
                     file_alt = 'file:' + file_name + '.' + file_end
 
-                    curs.execute("select title from data where title = ?", [file_alt])
+                    curs.execute("select title from data where title = %s", [file_alt])
                     exist = curs.fetchall()
                 
                 if exist:
@@ -822,7 +823,7 @@ def namu(conn, data, title, main_num):
                 inter_data = re.search('^inter:((?:(?!:).)+):((?:(?!\]\]|\|).)+)', main_link)
                 inter_data = inter_data.groups()
 
-                curs.execute('select link from inter where title = ?', [inter_data[0]])
+                curs.execute('select link from inter where title = %s', [inter_data[0]])
                 inter = curs.fetchall()
                 if inter:
                     if see_link != main_link:
@@ -856,7 +857,7 @@ def namu(conn, data, title, main_num):
                 if not re.search('^\|', main_link):
                     if main_link != title:
                         if main_link != '':
-                            curs.execute("select title from data where title = ?", [main_link])
+                            curs.execute("select title from data where title = %s", [main_link])
                             if not curs.fetchall():
                                 link_id = 'id="not_thing"'
 

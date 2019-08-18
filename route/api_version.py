@@ -1,4 +1,5 @@
 from .tool.func import *
+import pymysql
 
 def api_version_2(conn, r_ver, c_ver):
     curs = conn.cursor()
