@@ -29,25 +29,25 @@ def give_acl_2(conn, name):
                 check_ok = 'disabled'
 
     if flask.request.method == 'POST':
-        dec = flask.request.form.get('dec', '')
+        decu = flask.request.form.get('decu', '')
         view = flask.request.form.get('view', '')
 
         curs.execute("select title from acl where title = ?", [name])
         if curs.fetchall():
-            curs.execute("update acl set dec = ? where title = ?", [dec, name])
+            curs.execute("update acl set decu = ? where title = ?", [decu, name])
             curs.execute("update acl set dis = ? where title = ?", [flask.request.form.get('dis', ''), name])
             curs.execute("update acl set why = ? where title = ?", [flask.request.form.get('why', ''), name])
             curs.execute("update acl set view = ? where title = ?", [view, name])
         else:
-            curs.execute("insert into acl (title, dec, dis, why, view) values (?, ?, ?, ?, ?)", [
+            curs.execute("insert into acl (title, decu, dis, why, view) values (?, ?, ?, ?, ?)", [
                 name, 
-                dec, 
+                decu, 
                 flask.request.form.get('dis', ''), 
                 flask.request.form.get('why', ''), 
                 view
             ])
         
-        curs.execute("select title from acl where title = ? and dec = '' and dis = '' and view = ''", [name])
+        curs.execute("select title from acl where title = ? and decu = '' and dis = '' and view = ''", [name])
         if curs.fetchall():
             curs.execute("delete from acl where title = ?", [name])
 
@@ -55,14 +55,14 @@ def give_acl_2(conn, name):
             
         return redirect('/acl/' + url_pas(name))            
     else:
-        data = '<h2>' + load_lang('document_acl') + '</h2><hr class=\"main_hr\"><select name="dec" ' + check_ok + '>'
+        data = '<h2>' + load_lang('document_acl') + '</h2><hr class=\"main_hr\"><select name="decu" ' + check_ok + '>'
     
         if re.search('^user:', name):
             acl_list = [['', 'normal'], ['user', 'member'], ['all', 'all']]
         else:
             acl_list = [['', 'normal'], ['user', 'member'], ['admin', 'admin'], ['50_edit', '50 edit'], ['email', 'email']]
         
-        curs.execute("select dec from acl where title = ?", [name])
+        curs.execute("select decu from acl where title = ?", [name])
         acl_data = curs.fetchall()
         for data_list in acl_list:
             if acl_data and acl_data[0][0] == data_list[0]:

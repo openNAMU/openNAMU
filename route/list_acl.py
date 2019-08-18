@@ -13,7 +13,7 @@ def list_acl_2(conn):
                     <td id="main_table_width_quarter">''' + load_lang('view_acl') + '''</td>
     '''
     
-    curs.execute("select title, dec, dis, view, why from acl where dec != '' or dis != '' or view != '' order by title desc")
+    curs.execute("select title, decu, dis, view, why from acl where decu != '' or dis != '' or view != '' order by title desc")
     list_data = curs.fetchall()
     for data in list_data:
         if not re.search('^user:', data[0]) and not re.search('^file:', data[0]):
