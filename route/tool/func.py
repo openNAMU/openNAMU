@@ -41,6 +41,8 @@ for i in range(0, 2):
         from .mark import *
     except ImportError as e:
         if i == 0:
+            print(e)
+            print('----')
             if platform.system() == 'Linux':
                 ok = os.system('python3 -m pip install --user -r requirements.txt')
                 if ok == 0:
@@ -176,7 +178,19 @@ def captcha_get():
     return data
 
 def update():
-    pass
+    #v3.1.2
+    try:
+        curs.execute('select title, dec from acl where dec != ""')
+        db_data = curs.fetchall()
+        for i in db_data:
+            curs.execute("update acl set decu = ? where title = ?", [i[1], i[0]])
+
+        print('fix table acl column dec to decu')
+        print('----')
+    except:
+        pass
+
+    conn.commit()
 
 def pw_encode(data, data2 = '', type_d = ''):
     if type_d == '':
@@ -705,7 +719,7 @@ def acl_check(name, tool = ''):
             if admin_check(5) == 1:
                 return 0
 
-            curs.execute("select dec from acl where title = ?", ['user:' + acl_n[0]])
+            curs.execute("select decu from acl where title = ?", ['user:' + acl_n[0]])
             acl_data = curs.fetchall()
             if acl_data:
                 if acl_data[0][0] == 'all':
@@ -725,7 +739,7 @@ def acl_check(name, tool = ''):
         if re.search("^file:", name) and admin_check(None, 'file edit (' + name + ')') != 1:
             return 1
 
-        curs.execute("select dec from acl where title = ?", [name])
+        curs.execute("select decu from acl where title = ?", [name])
         acl_data = curs.fetchall()
         if acl_data:
             if acl_data[0][0] == 'user':
