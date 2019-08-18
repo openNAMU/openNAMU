@@ -58,24 +58,24 @@ def login_oauth_2(conn, platform, func):
         flask.session['refer'] = flask.request.referrer
 
         if platform == 'discord':
-            return redirect(api_url['redirect'] + '%sclient_id={}&redirect_uri={}&response_type=code&scope=identify'.format(
+            return redirect(api_url['redirect'] + '?client_id={}&redirect_uri={}&response_type=code&scope=identify'.format(
                 data['client_id'], 
                 data['redirect_uri']
             ))
         elif platform == 'naver':
-            return redirect(api_url['redirect'] + '%sresponse_type=code&client_id={}&redirect_uri={}&state={}'.format(
+            return redirect(api_url['redirect'] + '?response_type=code&client_id={}&redirect_uri={}&state={}'.format(
                 data['client_id'], 
                 data['redirect_uri'], 
                 data['state']
             ))
         elif platform == 'facebook':
-            return redirect(api_url['redirect'] + '%sclient_id={}&redirect_uri={}&state={}'.format(
+            return redirect(api_url['redirect'] + '?client_id={}&redirect_uri={}&state={}'.format(
                 data['client_id'], 
                 data['redirect_uri'], 
                 data['state']
             ))
         elif platform == 'kakao':
-            return redirect(api_url['redirect'] + '%sclient_id={}&redirect_uri={}&response_type=code'.format(
+            return redirect(api_url['redirect'] + '?client_id={}&redirect_uri={}&response_type=code'.format(
                 data['client_id'], 
                 data['redirect_uri']
             ))
