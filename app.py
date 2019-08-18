@@ -1,5 +1,6 @@
 import os
 import re
+import json
 import pymysql
 
 for i_data in os.listdir("route"):
@@ -22,43 +23,54 @@ print('----')
 
 app_var = json.loads(open('data/app_var.json', encoding='utf-8').read())
 
-
-
-
-
-
-
-
-
-
 #DB
 setup_tool = 0
+db_data = {}
 
 # DB Connect(MariaDB)
-conn = pymysql.connect( host='localhost', port=3306, user="root",
-                                 passwd="mocha00", charset="utf8", autocommit=True )
-mariaCurs = conn.cursor()
-    
 try:
-    open('dbname.txt', mode='r', encoding='utf-8')
+    open('DB_Data.json', mode='r', encoding='utf-8')
 except FileNotFoundError:   # 예외 처리
+    db_data["db_host"] = input('MariaDB Host (default: localhost) : ')
+    if db_data["db_host"] == '':
+        db_data["db_host"] = 'localhost'
+        
+    db_data["db_port"] = input('MariaDB Port (default: 3306) : ')
+    if db_data["db_port"] == '':
+        db_data["db_port"] = 3306
+    else:
+        db_data["db_port"] = int(db_data["db_port"])
+    
+    db_data["db_username"] = input('MariaDB Username (default: root) : ')
+    if db_data["db_username"] == '':
+        db_data["db_username"] = 'root'
+    
+    db_data["db_passwd"] = input('MariaDB Password : ')
+    
     setup_tool = 1
-    print('DB name (data) : ', end = '')
-    db_name = input()
-    if db_name == '':
-        db_name = 'data'
-    open('dbname.txt', mode='wt', encoding='utf-8').write(db_name)
+    
+    db_data["db_name"] = input('DB name (default: data) : ')
+    if db_data["db_name"] == '':
+        db_data["db_name"] = 'data'
+    
+    with open('DB_Data.json', mode='w', encoding='utf-8') as fileMake:
+        json.dump(db_data, fileMake, ensure_ascii=False, indent="\t")
     pass
 
-db_name = open('dbname.txt', mode='rt', encoding='utf-8').read(100)
+with open("DB_Data.json") as fileRead:
+    db_data = json.load(fileRead)
+
+mariaConn = pymysql.connect( host=db_data["db_host"], port=db_data["db_port"], user=db_data["db_username"],
+                                 passwd=db_data["db_passwd"], charset="utf8", autocommit=True )
+mariaCurs = mariaConn.cursor()
 
 try:
-    mariaCurs.execute("create database " + db_name)
+    mariaCurs.execute("create database " + db_data["db_name"])
 except pymysql.err.ProgrammingError:   # 예외 처리
     setup_tool = 0
     pass
 
-mariaCurs.execute("use " + db_name)
+mariaCurs.execute("use " + db_data["db_name"])
 
 logging.basicConfig(level = logging.ERROR)
 
@@ -276,18 +288,8 @@ else:
         print('----')
         print('Skin update required')
 
-conn.close()
+mariaConn.close()
 # DB Connect End
-
-
-
-
-
-
-
-
-
-
 
 # Func
 @app.route('/del_alarm')
