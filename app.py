@@ -93,8 +93,6 @@ app.jinja_env.filters['cut_100'] = cut_100
 
 app.url_map.converters['everything'] = EverythingConverter
 
-curs.execute('SET @@global.sql_mode= \'NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION\';')
-
 curs.execute('CREATE TABLE IF NOT EXISTS `data`(test text)')
 curs.execute('CREATE TABLE IF NOT EXISTS `cache_data`(test text)')
 curs.execute('CREATE TABLE IF NOT EXISTS `history`(test text)')
@@ -117,6 +115,7 @@ curs.execute('CREATE TABLE IF NOT EXISTS `acl`(test text)')
 curs.execute('CREATE TABLE IF NOT EXISTS `inter`(test text)')
 curs.execute('CREATE TABLE IF NOT EXISTS `html_filter`(test text)')
 curs.execute('CREATE TABLE IF NOT EXISTS `oauth_conn`(test text)')
+curs.execute('SET @@global.sql_mode= \'NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION\';')
 
 if setup_tool == 0:
     try:
