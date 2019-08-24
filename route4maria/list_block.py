@@ -47,11 +47,11 @@ def list_block_2(conn, name, tool):
         if tool == 'block_user':
             sub = ' (' + load_lang('blocked') + ')'
             
-            curs.execute("select why, block, blocker, end, today, band from rb where block = %s order by today desc limit %s, 50", [name, str(sql_num)])
+            curs.execute("select why, block, blocker, end, today, band from rb where block = %s order by today desc limit %s, 50", [name, sql_num])
         else:
             sub = ' (' + load_lang('admin') + ')'
             
-            curs.execute("select why, block, blocker, end, today, band from rb where blocker = %s order by today desc limit %s, 50", [name, str(sql_num)])
+            curs.execute("select why, block, blocker, end, today, band from rb where blocker = %s order by today desc limit %s, 50", [name, sql_num])
 
     if data_list == '':
         data_list = curs.fetchall()
