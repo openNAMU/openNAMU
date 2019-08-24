@@ -10,7 +10,7 @@ function topic_plus_load(name, sub, num) {
         xhr.send(null);
 
         xhr.onreadystatechange = function() {
-            if(this.readyState === 4 && this.status === 200 && this.responseText && this.responseText !== {}) {                
+            if(this.readyState === 4 && this.status === 200 && this.responseText !== '{}\n') {                
                 t_data = JSON.parse(this.responseText);
                 for(key in t_data) {
                     n_data += t_data[key]['data'];
