@@ -22,7 +22,7 @@ def list_user_topic_2(conn, name):
                     </tr>
             '''
     
-    curs.execute("select title, id, sub, ip, date from topic where ip = %s order by date desc limit %s, 50", [name, str(sql_num)])
+    curs.execute("select title, id, sub, ip, date from topic where ip = %s order by date desc limit %s, 50", [name, sql_num])
     data_list = curs.fetchall()
     for data in data_list:
         title = html.escape(data[0])

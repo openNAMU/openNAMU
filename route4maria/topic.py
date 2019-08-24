@@ -64,7 +64,7 @@ def topic_2(conn, name, sub):
             curs.execute("select ip from topic where title = %s and sub = %s and id = %s", [name, sub, rd_data])
             ip_data = curs.fetchall()
             if ip_data and ip_or_user(ip_data[0][0]) == 0:
-                curs.execute('insert into alarm (name, data, date) values (%s, %s, %s)', [ip_data[0][0], ip + ' - <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '#' + str(num) + '">' + load_lang('discussion', 1) + '</a>', today])
+                curs.execute('insert into alarm (name, data, date) values (%s, %s, %s)', [ip_data[0][0], ip + ' - <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '#' + num + '">' + load_lang('discussion', 1) + '</a>', today])
             
         data = re.sub("(?P<in>#(?:[0-9]+))", '[[\g<in>]]', data)
 
@@ -72,7 +72,7 @@ def topic_2(conn, name, sub):
 
         rd_plus(name, sub, today)
 
-        curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (%s, %s, %s, %s, %s, %s, '', '')", [str(num), name, sub, data, today, ip])
+        curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (%s, %s, %s, %s, %s, %s, '', '')", [num, name, sub, data, today, ip])
         conn.commit()
         
         return redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '#reload')

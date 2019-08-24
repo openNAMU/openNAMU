@@ -63,8 +63,8 @@ def func_upload_2(conn):
         else:
             data.save(os.path.join(app_var['path_data_image'], e_data))
         
-        curs.execute("insert into data (title, data) values (?, ?)", ['file:' + name, '[[file:' + name + ']][br][br]{{{[[file:' + name + ']]}}}[br][br]' + lice])
-        curs.execute("insert into acl (title, decu, dis, why, view) values (?, 'admin', '', '', '')", ['file:' + name])
+        curs.execute("insert into data (title, data) values (%s, %s)", ['file:' + name, '[[file:' + name + ']][br][br]{{{[[file:' + name + ']]}}}[br][br]' + lice])
+        curs.execute("insert into acl (title, decu, dis, why, view) values (%s, 'admin', '', '', '')", ['file:' + name])
 
         history_plus(
             'file:' + name, '[[file:' + name + ']][br][br]{{{[[file:' + name + ']]}}}[br][br]' + lice,

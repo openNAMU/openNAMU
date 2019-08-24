@@ -18,7 +18,7 @@ def list_title_index_2(conn):
 
     data = '<a href="/title_index?num=250">(250)</a> <a href="/title_index?num=500">(500)</a> <a href="/title_index?num=1000">(1000)</a>'
 
-    curs.execute("select title from data order by title asc limit %s, %s", [str(sql_num), str(num)])
+    curs.execute("select title from data order by title asc limit %s, %s", [sql_num, num])
     title_list = curs.fetchall()
     if title_list:
         data += '<hr class=\"main_hr\"><ul>'

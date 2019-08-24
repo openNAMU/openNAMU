@@ -46,19 +46,19 @@ def recent_changes_2(conn, name, tool):
                             "select id, title, date, ip, send, leng from history "
                             "where send like %s or send like %s "
                             "order by id + 0 desc "
-                            "limit %s, 50" , ['%(<a>' + name +'</a>%', '%<a>' + name + '</a> move)', str(sql_num)])
+                            "limit %s, 50" , ['%(<a>' + name +'</a>%', '%<a>' + name + '</a> move)', sql_num])
                     else:
                         curs.execute(
                             "select id, title, date, ip, send, leng from history "
                             "where title = %s "
                             "order by id + 0 desc "
-                            "limit %s, 50", [name, str(sql_num)])
+                            "limit %s, 50", [name, sql_num])
                 else:
                     curs.execute(
                         "select id, title, date, ip, send, leng from history "
                         "where title = %s "
                         "order by id + 0 desc "
-                        "limit %s, 50", [name, str(sql_num)])
+                        "limit %s, 50", [name, sql_num])
             else:
                 div +=  '''
                         <td id="main_table_width">''' + load_lang('document_name') + '''</td>
@@ -69,7 +69,7 @@ def recent_changes_2(conn, name, tool):
 
                 div = '<a href="/topic_record/' + url_pas(name) + '">(' + load_lang('discussion') + ')</a><hr class=\"main_hr\">' + div
                 
-                curs.execute("select id, title, date, ip, send, leng from history where ip = %s order by date desc limit %s, 50", [name, str(sql_num)])
+                curs.execute("select id, title, date, ip, send, leng from history where ip = %s order by date desc limit %s, 50", [name, sql_num])
         else:
             num = int(number_check(flask.request.args.get('num', '1')))
             if num * 50 > 0:

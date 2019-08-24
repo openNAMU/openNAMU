@@ -13,20 +13,20 @@ def view_raw_2(conn, name, sub_title, num):
             num = int(number_check(num))
     
     if not sub_title and num:
-        curs.execute("select title from history where title = %s and id = %s and hide = 'O'", [name, str(num)])
+        curs.execute("select title from history where title = %s and id = %s and hide = 'O'", [name, num])
         if curs.fetchall() and admin_check(6) != 1:
             return re_error('/error/3')
         
-        curs.execute("select data from history where title = %s and id = %s", [name, str(num)])
+        curs.execute("select data from history where title = %s and id = %s", [name, num])
         
         sub += ' (r' + str(num) + ')'
 
         menu = [['history/' + url_pas(name), load_lang('history')]]
     elif sub_title:
         if admin_check(6) != 1:
-            curs.execute("select data from topic where id = %s and title = %s and sub = %s and block = ''", [str(num), name, sub_title])
+            curs.execute("select data from topic where id = %s and title = %s and sub = %s and block = ''", [num, name, sub_title])
         else:
-            curs.execute("select data from topic where id = %s and title = %s and sub = %s", [str(num), name, sub_title])
+            curs.execute("select data from topic where id = %s and title = %s and sub = %s", [num, name, sub_title])
         
         v_name = load_lang('discussion_raw')
         sub = ' (#' + str(num) + ')'

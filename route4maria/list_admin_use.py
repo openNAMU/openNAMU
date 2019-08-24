@@ -20,7 +20,7 @@ def list_admin_use_2(conn):
         else:
             curs.execute("select who, what, time from re_admin where what like %s order by time desc limit %s, 50", [
                 flask.request.args.get('search', 'normal') + "%",
-                str(sql_num)
+                sql_num
             ])
 
         get_list = curs.fetchall()
