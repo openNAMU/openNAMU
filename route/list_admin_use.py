@@ -16,9 +16,9 @@ def list_admin_use_2(conn):
         list_data = '<ul>'
 
         if flask.request.args.get('search', 'normal') == 'normal':
-            curs.execute("select who, what, time from re_admin order by time desc limit %s, '50'", [str(sql_num)])
+            curs.execute("select who, what, time from re_admin order by time desc limit %s, 50", sql_num)
         else:
-            curs.execute("select who, what, time from re_admin where what like %s order by time desc limit %s, '50'", [
+            curs.execute("select who, what, time from re_admin where what like %s order by time desc limit %s, 50", [
                 flask.request.args.get('search', 'normal') + "%",
                 str(sql_num)
             ])

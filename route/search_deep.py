@@ -34,11 +34,13 @@ def search_deep_2(conn, name):
             <ul>
             '''
 
+    # 여기 개선 필요
     curs.execute(
-        "select distinct title, case when title like %s then '제목' else '내용' "
-        "end from data where title like %s or data like %s order by case"
-        "when title like %s then 1 else 2 end limit %s, '50'",
-        ['%' + name + '%', '%' + name + '%', '%' + name + '%', '%' + name + '%', str(sql_num)]
+        "select distinct title, case when title like %s then "
+        "%s else %s end from data where title like %s or data like %s "
+        "order by case when title like %s "
+        "then 1 else 2 end limit %s, 50",
+        ("%" + name + "%", "제목", "내용", "%" + name + "%", "%" + name + "%", "%" + name + "%", sql_num)
     )
     all_list = curs.fetchall()
     if all_list:

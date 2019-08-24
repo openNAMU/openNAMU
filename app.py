@@ -119,7 +119,7 @@ curs.execute('SET @@global.sql_mode= \'NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTIO
 
 if setup_tool == 0:
     try:
-        curs.execute('select data from other where name = "ver"')
+        curs.execute('SELECT data FROM other WHERE name = "ver"')
         ver_set_data = curs.fetchall()
         if not ver_set_data:
             setup_tool = 1

@@ -12,7 +12,7 @@ def view_xref_2(conn, name):
         
     div = '<ul>'
     
-    curs.execute("select link, type from back where title = %s and not type = 'cat' and not type = 'no' order by link asc limit %s, '50'", [name, str(sql_num)])
+    curs.execute("select link, type from back where title = %s and not type = 'cat' and not type = 'no' order by link asc limit %s, 50", [name, str(sql_num)])
     data_list = curs.fetchall()
     for data in data_list:
         div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a>'

@@ -24,21 +24,21 @@ def give_user_check_2(conn, name):
     
         if ip_or_user(name) == 1:
             if ip_or_user(flask.request.args.get('plus', None)) == 1:
-                curs.execute("select name, ip, ua, today from ua_d where ip = %s or ip = %s order by today desc limit %s, '50'", [name, flask.request.args.get('plus', None), sql_num])
+                curs.execute("select name, ip, ua, today from ua_d where ip = %s or ip = %s order by today desc limit %s, 50", [name, flask.request.args.get('plus', None), sql_num])
             else:
-                curs.execute("select name, ip, ua, today from ua_d where ip = %s or name = %s order by today desc limit %s, '50'", [name, flask.request.args.get('plus', None), sql_num])
+                curs.execute("select name, ip, ua, today from ua_d where ip = %s or name = %s order by today desc limit %s, 50", [name, flask.request.args.get('plus', None), sql_num])
         else:
             if ip_or_user(flask.request.args.get('plus', None)) == 1:
-                curs.execute("select name, ip, ua, today from ua_d where name = %s or ip = %s order by today desc limit %s, '50'", [name, flask.request.args.get('plus', None), sql_num])
+                curs.execute("select name, ip, ua, today from ua_d where name = %s or ip = %s order by today desc limit %s, 50", [name, flask.request.args.get('plus', None), sql_num])
             else:
-                curs.execute("select name, ip, ua, today from ua_d where name = %s or name = %s order by today desc limit %s, '50'", [name, flask.request.args.get('plus', None), sql_num])
+                curs.execute("select name, ip, ua, today from ua_d where name = %s or name = %s order by today desc limit %s, 50", [name, flask.request.args.get('plus', None), sql_num])
     else:
         end_check = 0
         
         if ip_or_user(name) == 1:
-            curs.execute("select name, ip, ua, today from ua_d where ip = %s order by today desc limit %s, '50'", [name, sql_num])
+            curs.execute("select name, ip, ua, today from ua_d where ip = %s order by today desc limit %s, 50", [name, sql_num])
         else:
-            curs.execute("select name, ip, ua, today from ua_d where name = %s order by today desc limit %s, '50'", [name, sql_num])
+            curs.execute("select name, ip, ua, today from ua_d where name = %s order by today desc limit %s, 50", [name, sql_num])
     
     record = curs.fetchall()
     if record:

@@ -14,7 +14,7 @@ def list_user_2(conn):
 
     admin_one = admin_check(1)
     
-    curs.execute("select id, date from user order by date desc limit %s, '50'", [str(sql_num)])
+    curs.execute("select id, date from user order by date desc limit %s, 50", sql_num)
     user_list = curs.fetchall()
     for data in user_list:
         if admin_one == 1:
