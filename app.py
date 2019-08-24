@@ -594,6 +594,10 @@ def api_version():
 def api_skin_info(name = ''):
     return api_skin_info_2(conn, name)
 
+@app.route('/api/markup')
+def api_markup(name = ''):
+    return api_markup_2(conn, name)
+
 @app.route('/api/topic/<everything:name>/sub/<sub>')
 def api_topic_sub(name = '', sub = '', time = ''):
     return api_topic_sub_2(conn, name, sub, time)

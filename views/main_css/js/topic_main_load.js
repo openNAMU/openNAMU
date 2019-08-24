@@ -5,6 +5,7 @@ function topic_main_load(name, sub, s_num = null) {
     } else {
         var url = "/api/topic/" + name + "/sub/" + sub + "?render=1";
     }
+    var url_2 = "/api/markup";
     var n_data = "";
     var num = 1;
     
@@ -12,9 +13,13 @@ function topic_main_load(name, sub, s_num = null) {
     xhr.open("GET", url, true);
     xhr.send(null);
 
+    var xhr_2 = new XMLHttpRequest();
+    xhr_2.open("GET", url_2, true);
+    xhr_2.send(null);
+
     xhr.onreadystatechange = function() {
-        if(this.readyState === 4 && this.status === 200) {
-            t_data = JSON.parse(this.responseText);
+        if(xhr.readyState === 4 && xhr.status === 200) {
+            t_data = JSON.parse(xhr.responseText);
             for(key in t_data) {
                 n_data += t_data[key]['data'];
                 num = key;
@@ -23,6 +28,17 @@ function topic_main_load(name, sub, s_num = null) {
             o_data.innerHTML = n_data;
             if(!s_num) {
                 topic_plus_load(name, sub, String(Number(num) + 1));
+            }
+
+            // 여기 수정 필요
+            xhr_2.onreadystatechange = function() {
+                if(xhr_2.readyState === 4 && xhr_2.status === 200) {
+                    markup = JSON.parse(xhr_2.responseText)['markup'];
+
+                    if(markup === 'markdown') {
+                        render_markdown();
+                    }
+                }
             }
         }
     }
