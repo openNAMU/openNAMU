@@ -6,7 +6,7 @@ def edit_revert_2(conn, name):
 
     num = int(number_check(flask.request.args.get('num', '1')))
 
-    curs.execute("select title from history where title = %s and id = %s and hide = 'O'", [name, str(num)])
+    curs.execute("select title from history where title = %s and id = %s and hide = 'O'", [name, num])
     if curs.fetchall() and admin_check(6) != 1:
         return re_error('/error/3')
 
@@ -19,7 +19,7 @@ def edit_revert_2(conn, name):
         else:
             captcha_post('', 0)
     
-        curs.execute("select data from history where title = %s and id = %s", [name, str(num)])
+        curs.execute("select data from history where title = %s and id = %s", [name, num])
         data = curs.fetchall()
         if data:
             if edit_filter_do(data[0][0]) == 1:
@@ -58,7 +58,7 @@ def edit_revert_2(conn, name):
             
         return redirect('/w/' + url_pas(name))
     else:
-        curs.execute("select title from history where title = %s and id = %s", [name, str(num)])
+        curs.execute("select title from history where title = %s and id = %s", [name, num])
         if not curs.fetchall():
             return redirect('/w/' + url_pas(name))
 

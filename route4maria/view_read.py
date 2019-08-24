@@ -66,11 +66,11 @@ def view_read_2(conn, name):
 
 
     if num:
-        curs.execute("select title from history where title = %s and id = %s and hide = 'O'", [name, str(num)])
+        curs.execute("select title from history where title = %s and id = %s and hide = 'O'", [name, num])
         if curs.fetchall() and admin_check(6) != 1:
             return redirect('/history/' + url_pas(name))
 
-        curs.execute("select title, data from history where title = %s and id = %s", [name, str(num)])
+        curs.execute("select title, data from history where title = %s and id = %s", [name, num])
     else:
         curs.execute("select title, data from data where title = %s", [name])
     
