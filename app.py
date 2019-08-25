@@ -443,9 +443,9 @@ def topic_block(name = None, sub = None, num = 1):
 def topic_top(name = None, sub = None, num = 1):
     return topic_top_2(conn, name, sub, num)
                 
-@app.route('/topic/<everything:name>/sub/<sub>/tool/<regex("close|stop|agree"):tool>', methods=['POST', 'GET'])
-def topic_stop(name = None, sub = None, tool = None):
-    return topic_stop_2(conn, name, sub, tool)
+@app.route('/topic/<everything:name>/sub/<sub>/setting', methods=['POST', 'GET'])
+def topic_stop(name = None, sub = None):
+    return topic_stop_2(conn, name, sub)
 
 @app.route('/topic/<everything:name>/sub/<sub>/tool')
 def topic_tool(name = None, sub = None):
