@@ -123,7 +123,7 @@ def edit_2(conn, name):
                     <hr class=\"main_hr\">
                     ''' + captcha_get() + ip_warring() + '''
                     <button id="save" type="submit">''' + load_lang('save') + '''</button>
-                    <button id="preview" type="button" onclick="do_preview(\'''' + name + '\')">' + load_lang('preview') + '''</button>
+                    <button id="preview" type="button" onclick="load_preview(\'''' + name + '\')">' + load_lang('preview') + '''</button>
                 </form>
                 ''' + b_text + '''
                 <hr class=\"main_hr\">

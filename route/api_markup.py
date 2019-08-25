@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def api_markup_2(conn, name):
+def api_markup_2(conn):
     curs = conn.cursor()
 
     curs.execute('select data from other where name = "markup"')

@@ -71,9 +71,21 @@ def api_topic_sub_2(conn, name, sub, time):
                 if t_data_f == '':
                     t_data_f = '[br]'
             
-                all_data = '<table id="toron"><tbody><tr><td id="' + t_color + '">'
-                all_data += '<a href="#' + i[0] + '">#' + i[0] + '</a> ' + ip + ' <span style="float: right;">' + i[2] + '</span>'
-                all_data += '</td></tr><tr><td id="' + b_color + '">' + render_set(data = t_data_f) + '</td></tr></tbody></table><hr class=\"main_hr\">'
+                all_data = '''
+                    <table id="toron">
+                        <tbody>
+                            <tr>
+                                <td id="''' + t_color + '''">
+                                    <a href="#''' + i[0] + '">#' + i[0] + '</a> ' + ip + ' <span style="float: right;">' + i[2] + '''</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td id="''' + b_color + '">' + render_set(data = t_data_f) + '''</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <hr class="main_hr">
+                '''
                 
                 json_data[i[0]] = {
                     "data" : all_data
