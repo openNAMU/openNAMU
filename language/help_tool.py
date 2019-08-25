@@ -1,19 +1,18 @@
 import re
 import json
 
-print('o_name : ', end = '')
-o_name = input()
-o_json = json.loads(open(o_name + '.json', encoding='utf-8').read())
+o_json = json.loads(open('en-US.json', encoding='utf-8').read())
 
 print('n_name : ', end = '')
 n_name = input()
 n_json = json.loads(open(n_name + '.json', encoding='utf-8').read())
 
-for i in n_json:
+print()
+for i in list(n_json):
     if not i in o_json:
         del n_json[i]
 
-for i in o_json:
+for i in list(o_json):
     if not re.search('^_', i[0]):
         if not i in n_json:
             print('o_title : ' + i)
