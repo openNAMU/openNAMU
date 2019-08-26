@@ -1,14 +1,12 @@
 import os
 import re
-import json
-import sqlite3
 
-for i_data in os.listdir("route4sqlite"):
+for i_data in os.listdir("route"):
     f_src = re.search("(.+)\.py$", i_data)
     if f_src:
         f_src = f_src.groups()[0]
 
-        exec("from route4sqlite." + f_src + " import *")
+        exec("from route." + f_src + " import *")
 
 version_list = json.loads(open('version.json', encoding='utf-8').read())
 
@@ -189,7 +187,7 @@ if not os.path.exists(app_var['path_data_image']):
 if not os.path.exists('views'):
     os.makedirs('views')
 
-import route4sqlite.tool.init as server_init
+import route.tool.init as server_init
 
 dislay_set_key = ['Host', 'Port', 'Language', 'Markup', 'Encryption method']
 server_set_key = ['host', 'port', 'language', 'markup', 'encode']
@@ -402,7 +400,7 @@ def search_goto(name = 'test'):
 @app.route('/search/<everything:name>')
 def search_deep(name = 'test'):
     return search_deep_2(conn, name)
-        
+         
 @app.route('/raw/<everything:name>')
 @app.route('/topic/<everything:name>/sub/<sub_title>/raw/<int:num>')
 def view_raw(name = None, sub_title = None, num = None):
@@ -501,7 +499,7 @@ def login_need_email(tool = 'pass_find'):
 @app.route('/<regex("check_key|check_pass_key|email_replace"):tool>', methods=['POST', 'GET'])
 def login_check_key(tool = 'check_pass_key'):
     return login_check_key_2(conn, tool)
-        
+           
 @app.route('/logout')
 def login_logout():
     return login_logout_2(conn)
