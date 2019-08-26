@@ -1002,7 +1002,7 @@ def number_check(data):
             return data
 
 def edit_filter_do(data):
-    if admin_check(1, 'edit_filter pass') != 1:
+    if admin_check(1) != 1:
         curs.execute("select regex, sub from filter")
         for data_list in curs.fetchall():
             match = re.compile(data_list[0], re.I)

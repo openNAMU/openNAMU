@@ -6,8 +6,6 @@ def view_read_2(conn, name):
     sub = ''
     acl = ''
     div = ''
-    plus_d = ''
-    plus_t = []
 
     num = flask.request.args.get('num', None)
     if num:
@@ -187,62 +185,16 @@ def view_read_2(conn, name):
     div = adsense_code + '<div>' + div + '</div>'
 
     # 이 부분 개선 필요
-    m = re.search("^user:([^/]*)", name)
-    if m:
-        g = m.groups()
-
-        plus_d = '''
-            <table>
-                <tbody>
-                    <tr>
-                        <td>''' + load_lang('authority') + '''</td>
-                        <td>{}</td>
-                    </tr>
-                    <tr>
-                        <td>''' + load_lang('state') + '''</td>
-                        <td>{}</td>
-                    </tr>
-                </tbody>
-            </table>
-        '''
+    match = re.search("^user:([^/]*)", name)
+    if match:
+        user_name = match.groups()[0]
+        div = '''
+            <div id="get_user_info"></div>
+            <script>load_user_info("''' + user_name + '''");</script>
+        ''' + div
         
-        curs.execute("select acl from user where id = ?", [g[0]])
-        data = curs.fetchall()
-        if data:
-            if data[0][0] != 'user':
-                plus_t += [data[0][0]]
-            else:
-                plus_t += [load_lang('member')]
-        else:
-            plus_t += [load_lang('normal')]
-
-        if ban_check(g[0]) == 0:
-            plus_t += [load_lang('normal')]
-        else:
-            match = re.search("^([0-9]{1,3}\.[0-9]{1,3})", g[0])
-            if match:
-                match = match.groups()[0]
-            else:
-                match = '-'
-
-            curs.execute("select end, login, band from ban where block = ? or block = ?", [g[0], match])
-            block_data = curs.fetchall()
-            if block_data:
-                if block_data[0][0] != '':
-                    plus_t += [load_lang('period') + ' : ' + block_data[0][0]]
-                else:
-                    plus_t += [load_lang('limitless')]
-
-                if block_data[0][1] != '':
-                    plus_t += [load_lang('login_able')]
-
-                if block_data[0][2] == 'O':
-                    plus_t += [load_lang('band_blocked')]
-
-        plus_d = plus_d.format(plus_t[0], plus_t[1])
-
     return easy_minify(flask.render_template(skin_check(), 
         imp = [flask.request.args.get('show', name), wiki_set(), custom(), other2([sub + acl, r_date])],
-        data = plus_d + div,
+        data = div,
         menu = menu
     )), response_data

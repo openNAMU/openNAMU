@@ -80,20 +80,6 @@ def view_read_2(conn, name):
     else:
         else_data = None
 
-    m = re.search("^user:([^/]*)", name)
-    if m:
-        g = m.groups()
-        
-        curs.execute("select acl from user where id = %s", [g[0]])
-        test = curs.fetchall()
-        if test and test[0][0] != 'user':
-            acl = ' (' + load_lang('admin') + ')'
-        else:
-            if ban_check(g[0]) == 1:
-                sub += ' (' + load_lang('blocked') + ')'
-            else:
-                acl = ''
-
     curs.execute("select decu from acl where title = %s", [name])
     data = curs.fetchall()
     if data:
@@ -199,6 +185,15 @@ def view_read_2(conn, name):
     
     div = adsense_code + '<div>' + div + '</div>'
 
+    # 이 부분 개선 필요
+    match = re.search("^user:([^/]*)", name)
+    if match:
+        user_name = match.groups()[0]
+        div = '''
+            <div id="get_user_info"></div>
+            <script>load_user_info("''' + user_name + '''");</script>
+        ''' + div
+        
     return easy_minify(flask.render_template(skin_check(), 
         imp = [flask.request.args.get('show', name), wiki_set(), custom(), other2([sub + acl, r_date])],
         data = div,

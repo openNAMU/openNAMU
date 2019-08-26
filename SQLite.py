@@ -445,9 +445,9 @@ def topic_block(name = None, sub = None, num = 1):
 def topic_top(name = None, sub = None, num = 1):
     return topic_top_2(conn, name, sub, num)
                 
-@app.route('/topic/<everything:name>/sub/<sub>/tool/<regex("close|stop|agree"):tool>', methods=['POST', 'GET'])
-def topic_stop(name = None, sub = None, tool = None):
-    return topic_stop_2(conn, name, sub, tool)
+@app.route('/topic/<everything:name>/sub/<sub>/setting', methods=['POST', 'GET'])
+def topic_stop(name = None, sub = None):
+    return topic_stop_2(conn, name, sub)
 
 @app.route('/topic/<everything:name>/sub/<sub>/tool')
 def topic_tool(name = None, sub = None):
@@ -595,6 +595,14 @@ def api_version():
 @app.route('/api/skin_info/<name>')
 def api_skin_info(name = ''):
     return api_skin_info_2(conn, name)
+
+@app.route('/api/markup')
+def api_markup():
+    return api_markup_2(conn)
+
+@app.route('/api/user_info/<name>')
+def api_user_info(name = ''):
+    return api_user_info_2(conn, name)
 
 @app.route('/api/topic/<everything:name>/sub/<sub>')
 def api_topic_sub(name = '', sub = '', time = ''):

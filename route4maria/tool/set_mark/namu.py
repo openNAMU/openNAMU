@@ -713,7 +713,6 @@ def namu(conn, data, title, main_num):
             break
 
     data = re.sub('<\/ul>\n \|\|', '</ul>||', data)
-    data = re.sub('<\/ul>\n', '</ul>', data)
 
     while 1:
         indent = re.search('\n( +)', data)
@@ -1018,6 +1017,7 @@ def namu(conn, data, title, main_num):
     data = re.sub('<\/td_end>', '</td>', data)
     data = re.sub('<include>(?P<in><a (?:[^>]+)>)\n', '\g<in>', data)
     data = re.sub('\n<\/include>', '', data)
+    data = re.sub('<\/ul>\n', '</ul>', data)
     
     data = re.sub('(?P<in><\/h[0-9]>)(\n)+', '\g<in>', data)
     data = re.sub('\n\n<ul>', '\n<ul>', data)

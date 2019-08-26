@@ -79,7 +79,7 @@ def topic_2(conn, name, sub):
     else:
         data = ''
     
-        curs.execute("select title from rd where title = %s and sub = %s and (stop = 'O' or stop = 'S')", [name, sub])
+        curs.execute("select stop from rd where title = %s and sub = %s and stop != ''", [name, sub])
         close_data = curs.fetchall()
         
         if close_data and admin != 1:
@@ -104,6 +104,8 @@ def topic_2(conn, name, sub):
 
         return easy_minify(flask.render_template(skin_check(), 
             imp = [name, wiki_set(), custom(), other2([' (' + load_lang('discussion') + ')', 0])],
-            data = '<h2 id="topic_top_title">' + sub + '</h2>' + data,
+            data = '''
+                <h2 id="topic_top_title">''' + sub + '''</h2>
+                ''' + data,
             menu = [['topic/' + url_pas(name), load_lang('list')]]
         ))
