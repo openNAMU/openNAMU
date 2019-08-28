@@ -6,4 +6,4 @@ flask-compress
 pysha3; python_version < "3.6"
 css-html-js-minify==2.2.2; python_version < "3.6"
 css-html-js-minify; python_version >= "3.6"
-request
+requests
