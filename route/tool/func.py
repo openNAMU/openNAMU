@@ -993,13 +993,11 @@ def leng_check(first, second):
     return all_plus
 
 def number_check(data):
-    if not data:
+    try:
+        int(data)
+        return data
+    except:
         return '1'
-    else:
-        if re.search('[^0-9]', data):
-            return '1'
-        else:
-            return data
 
 def edit_filter_do(data):
     if admin_check(1) != 1:

@@ -538,6 +538,10 @@ def list_user_topic(name = None):
 @app.route('/<regex("history"):tool>/<everything:name>', methods=['POST', 'GET'])
 def recent_changes(name = None, tool = 'record'):
     return recent_changes_2(conn, name, tool)
+
+@app.route('/history_tool/<everything:name>')
+def recent_history_tool(name = None):
+    return recent_history_tool_2(conn, name)
     
 @app.route('/upload', methods=['GET', 'POST'])
 def func_upload():
