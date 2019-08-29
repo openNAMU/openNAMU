@@ -20,7 +20,6 @@ for i in range(0, 2):
         import zipfile
         import difflib
         import shutil
-        import request
         import threading
         import logging
         import random
