@@ -28,11 +28,6 @@ for i in range(0, 2):
         import html
         import re
 
-        try:
-            import css_html_js_minify
-        except:
-            pass
-
         if sys.version_info < (3, 6):
             import sha3
 
@@ -136,19 +131,7 @@ def last_change(data):
 
     return data
 
-def easy_minify(data, tool = None):
-    try:
-        if not tool:
-            data = css_html_js_minify.html_minify(data)
-        else:
-            if tool == 'css':
-                data = css_html_js_minify.css_minify(data)
-            elif tool == 'js':
-                data = css_html_js_minify.js_minify(data)
-    except:
-        data = re.sub('\n +<', '\n<', data)
-        data = re.sub('>(\n| )+<', '> <', data)
-    
+def easy_minify(data, tool = None):    
     return last_change(data)
 
 def render_set(title = '', data = '', num = 0, s_data = 0):
@@ -412,7 +395,7 @@ def other2(data):
         <script src="https://cdn.jsdelivr.net/npm/katex@0.10.1/dist/katex.min.js"
                 integrity="sha384-2BKqo+exmr9su6dir+qCw08N2ZKRucY4PrGQPPWU1A7FtlCGjmEGFqXCv5nyM5Ij"
                 crossorigin="anonymous"></script>
-        <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
     ''' + req_list]
 
     return data
