@@ -942,6 +942,8 @@ def rd_plus(title, sub, date):
     else:
         curs.execute("insert into rd (title, sub, date) values (?, ?, ?)", [title, sub, date])
 
+    conn.commit()
+
 def history_plus(title, data, date, ip, send, leng, t_check = ''):
     curs.execute("select id from history where title = ? order by id + 0 desc limit 1", [title])
     id_data = curs.fetchall()
