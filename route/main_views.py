@@ -25,7 +25,17 @@ def main_views_2(conn, name):
         c_open.close()
         return flask.Response(easy_minify(f_open), mimetype="text/html")
     else:
-        c_open = open('./views/' + name, encoding='utf-8')
-        f_open = c_open.read()
-        c_open.close()
-        return flask.Response(f_open, mimetype="text/plain")
+        if re.search('\/', name):
+            m = re.search('^(.*)\/(.*)$', name)
+            if m:
+                n = m.groups()
+                plus = '/' + n[0]
+                rename = n[1]
+            else:
+                plus = ''
+                rename = name
+        else:
+            plus = ''
+            rename = name
+
+        return flask.send_from_directory('./views' + plus, rename)
