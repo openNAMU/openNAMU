@@ -1027,6 +1027,7 @@ def namu(conn, data, title, main_num):
     data = re.sub('(?P<in><td(((?!>).)*)>)\n', '\g<in>', data)
     data = re.sub('(\n)?<hr>(\n)?', '<hr>', data)
     data = re.sub('<\/ul>\n\n<ul>', '</ul>\n<ul>', data)
+
     data = re.sub('\n', '<br>', data)
 
     return [data, plus_data, backlink]
