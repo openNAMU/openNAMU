@@ -17,7 +17,7 @@ function topic_top_load(name, sub) {
             }
             
             o_data.innerHTML = n_data;
-            topic_main_load(name, sub);
+            topic_main_load(name, sub, null);
         }
     }
     
