@@ -27,7 +27,7 @@ def user_setting_2(conn, server_init):
                     else:
                         curs.execute("insert into user_set (name, id, data) values (%s, %s, %s)", [auto_data, ip, flask.request.form.get(auto_data, '')])
 
-            conn.commit()
+            
             
             return redirect('/change')
         else:        

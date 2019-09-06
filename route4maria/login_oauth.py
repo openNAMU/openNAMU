@@ -219,7 +219,7 @@ def login_oauth_2(conn, platform, func):
             else:
                 curs.execute('update oauth_conn set name = %s picture = %s where wiki_id = %s', [stand_json['name'], stand_json['pricture'], flask.session['id']])
 
-            conn.commit()
+            
         elif flask.session['referrer'][0:5] == 'login':
             curs.execute('select * from oauth_conn where provider = %s and sns_id = %s', [platform, stand_json['id']])
             curs_result = curs.fetchall()

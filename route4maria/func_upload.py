@@ -74,7 +74,7 @@ def func_upload_2(conn):
             '0'
         )
         
-        conn.commit()
+        
         
         return redirect('/w/file:' + name)      
     else:

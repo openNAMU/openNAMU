@@ -31,7 +31,7 @@ def give_admin_groups_2(conn, name):
         if flask.request.form.get('owner', 0) != 0:
             curs.execute("insert into alist (name, acl) values (%s, 'owner')", [name])
             
-        conn.commit()
+        
         
         return redirect('/admin_plus/' + url_pas(name))
     else:        

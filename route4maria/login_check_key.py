@@ -10,7 +10,7 @@ def login_check_key_2(conn, tool):
                 hashed = pw_encode(flask.session['c_key'])
 
                 curs.execute("update user set pw = %s where id = %s", [hashed, flask.session['c_id']])
-                conn.commit()
+                
 
                 d_id = flask.session['c_id']
                 pw = flask.session['c_key']
@@ -77,7 +77,7 @@ def login_check_key_2(conn, tool):
                     flask.session['id'] = flask.session['c_id']
                     flask.session['head'] = ''
                             
-                    conn.commit()
+                    
                 else:
                     curs.execute('delete from user_set where name = "email" and id = %s', [ip])
                     curs.execute('insert into user_set (name, id, data) values ("email", %s, %s)', [ip, flask.session['c_email']])

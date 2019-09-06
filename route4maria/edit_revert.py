@@ -26,7 +26,7 @@ def edit_revert_2(conn, name):
                 return re_error('/error/21')
 
         curs.execute("delete from back where link = %s", [name])
-        conn.commit()
+        
         
         if data:                                
             curs.execute("select data from data where title = %s", [name])
@@ -54,7 +54,7 @@ def edit_revert_2(conn, name):
                 num = 1
             )
             
-            conn.commit()
+            
             
         return redirect('/w/' + url_pas(name))
     else:

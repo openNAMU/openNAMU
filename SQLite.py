@@ -200,7 +200,7 @@ for i in range(len(server_set_key)):
         server_set_val = server_init.init(server_set_key[i])
         
         curs.execute('insert into other (name, data) values (?, ?)', [server_set_key[i], server_set_val])
-        conn.commit()
+        
     else:
         server_set_val = server_set_val[0][0]
     
@@ -290,7 +290,7 @@ else:
         print('----')
         print('Skin update required')
         
-conn.commit()
+
 
 # Func
 @app.route('/del_alarm')

@@ -259,7 +259,7 @@ def middle_parser(data, fol_num, syntax_num, folding_num):
                                                         if folding_num == 0:
                                                             folding_num = 1
                                                         
-                                                        data = re.sub('{{{#!folding ?((?:(?!\n).)*)\n?', '<div>' + str(folding_data[0]) + ' <div style="display: inline-block;"><a href="javascript:void(0);" onclick="folding(' + str(fol_num) + ');">[do]</a></div_end><div id="folding_' + str(fol_num) + '" style="display: none;"><div id="wiki_div" style="">', data, 1)
+                                                        data = re.sub('{{{#!folding ?((?:(?!\n).)*)\n?', '<div>' + str(folding_data[0]) + ' <div style="display: inline-block;"><a href="javascript:void(0);" onclick="folding(' + str(fol_num) + ');">[+]</a></div_end><div id="folding_' + str(fol_num) + '" style="display: none;"><div id="wiki_div" style="">', data, 1)
                                                         
                                                         fol_num += 1
                                                     else:
@@ -727,7 +727,7 @@ def namu(conn, data, title, main_num):
 
     data = table_start(data)
 
-    category = '\n<div id="cate_all"><hr><div id="cate">Category : '
+    category = '<div id="cate_all"><hr><div id="cate">Category : '
     category_re = re.compile('^(?:category|분류):', re.I)
     while 1:
         link = re.search('\[\[((?:(?!\[\[|\]\]).)+)\]\]', data)
@@ -888,7 +888,7 @@ def namu(conn, data, title, main_num):
     footnote_dict = {}
     footnote_re = {}
     
-    footdata_all = '\n<hr><ul id="footnote_data">'
+    footdata_all = '<hr><ul id="footnote_data">'
     
     re_footnote = re.compile('(?:\[\*((?:(?! |\]).)*)(?: ((?:(?!(?:\[\*|\])).)+))?\]|(\[(?:각주|footnote)\]))')
     while 1:
@@ -909,7 +909,7 @@ def namu(conn, data, title, main_num):
                 data = re_footnote.sub(footdata_all + '</ul>', data, 1)
                 
                 footnote_all = []
-                footdata_all = '\n<hr><ul id="footnote_data">'
+                footdata_all = '<hr><ul id="footnote_data">'
             else:
                 footnote = footnote_data[1]
                 footnote_name = footnote_data[0]
@@ -957,7 +957,7 @@ def namu(conn, data, title, main_num):
         footdata_all += '<li><a href="#rfn-' + str(footdata[0]) + '">(' + footdata[1] + ')</a> <span id="fn-' + str(footdata[0]) + '">' + footdata_in + '</span></li>'
 
     footdata_all += '</ul>'
-    if footdata_all == '\n<hr><ul id="footnote_data"></ul>':
+    if footdata_all == '<hr><ul id="footnote_data"></ul>':
         footdata_all = ''
 
     data = re.sub('\n$', footdata_all, data + '\n', 1)
@@ -965,7 +965,7 @@ def namu(conn, data, title, main_num):
     category += '</div></div>'
     category = re.sub(' \| <\/div><\/div>$', '</div></div>', category)
 
-    if category == '\n<div id="cate_all"><hr><div id="cate">Category : </div></div>':
+    if category == '<div id="cate_all"><hr><div id="cate">Category : </div></div>':
         category = ''
 
     data += category
@@ -1026,7 +1026,11 @@ def namu(conn, data, title, main_num):
     data = re.sub('(\n)+<hr><ul id="footnote_data">', '<hr><ul id="footnote_data">', data)
     data = re.sub('(?P<in><td(((?!>).)*)>)\n', '\g<in>', data)
     data = re.sub('(\n)?<hr>(\n)?', '<hr>', data)
+
     data = re.sub('<\/ul>\n\n<ul>', '</ul>\n<ul>', data)
+    data = re.sub('<\/ul>\n<ul>', '</ul><ul>', data)
+    data = re.sub('\n<\/ul>', '</ul>', data)
+
     data = re.sub('\n', '<br>', data)
 
     return [data, plus_data, backlink]

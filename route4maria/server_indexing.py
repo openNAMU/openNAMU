@@ -39,7 +39,7 @@ def server_indexing_2(conn):
                     except:
                         pass
 
-        conn.commit()
+        
         
         return redirect()  
     else:

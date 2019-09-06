@@ -14,7 +14,7 @@ def user_custom_head_view_2(conn):
             else:
                 curs.execute("insert into custom (user, css) values (%s, %s)", [ip + ' (head)', flask.request.form.get('content', None)])
             
-            conn.commit()
+            
 
         flask.session['head'] = flask.request.form.get('content', None)
 

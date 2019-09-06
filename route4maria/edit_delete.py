@@ -36,7 +36,7 @@ def edit_delete_2(conn, name, app_var):
             
             curs.execute("delete from back where link = %s", [name])
             curs.execute("delete from data where title = %s", [name])
-            conn.commit()
+            
 
         file_check = re.search('^file:(.+)\.(.+)$', name)
         if file_check:

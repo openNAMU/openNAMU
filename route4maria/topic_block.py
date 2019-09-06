@@ -17,6 +17,6 @@ def topic_block_2(conn, name, sub, num):
         
         rd_plus(name, sub, get_time())
         
-        conn.commit()
+        
         
     return redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '#' + str(num))

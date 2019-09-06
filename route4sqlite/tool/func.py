@@ -20,7 +20,6 @@ for i in range(0, 2):
         import zipfile
         import difflib
         import shutil
-        import request
         import threading
         import logging
         import random
@@ -28,11 +27,6 @@ for i in range(0, 2):
         import json
         import html
         import re
-
-        try:
-            import css_html_js_minify
-        except:
-            pass
 
         if sys.version_info < (3, 6):
             import sha3
@@ -137,19 +131,7 @@ def last_change(data):
 
     return data
 
-def easy_minify(data, tool = None):
-    try:
-        if not tool:
-            data = css_html_js_minify.html_minify(data)
-        else:
-            if tool == 'css':
-                data = css_html_js_minify.css_minify(data)
-            elif tool == 'js':
-                data = css_html_js_minify.js_minify(data)
-    except:
-        data = re.sub('\n +<', '\n<', data)
-        data = re.sub('>(\n| )+<', '> <', data)
-    
+def easy_minify(data, tool = None):    
     return last_change(data)
 
 def render_set(title = '', data = '', num = 0, s_data = 0):
@@ -413,7 +395,7 @@ def other2(data):
         <script src="https://cdn.jsdelivr.net/npm/katex@0.10.1/dist/katex.min.js"
                 integrity="sha384-2BKqo+exmr9su6dir+qCw08N2ZKRucY4PrGQPPWU1A7FtlCGjmEGFqXCv5nyM5Ij"
                 crossorigin="anonymous"></script>
-        <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
     ''' + req_list]
 
     return data
@@ -960,6 +942,8 @@ def rd_plus(title, sub, date):
     else:
         curs.execute("insert into rd (title, sub, date) values (?, ?, ?)", [title, sub, date])
 
+    conn.commit()
+
 def history_plus(title, data, date, ip, send, leng, t_check = ''):
     curs.execute("select id from history where title = ? order by id + 0 desc limit 1", [title])
     id_data = curs.fetchall()
@@ -993,13 +977,11 @@ def leng_check(first, second):
     return all_plus
 
 def number_check(data):
-    if not data:
+    try:
+        int(data)
+        return data
+    except:
         return '1'
-    else:
-        if re.search('[^0-9]', data):
-            return '1'
-        else:
-            return data
 
 def edit_filter_do(data):
     if admin_check(1) != 1:

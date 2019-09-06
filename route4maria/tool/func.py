@@ -21,7 +21,6 @@ for i in range(0, 2):
         import zipfile
         import difflib
         import shutil
-        import request
         import threading
         import logging
         import random
@@ -29,11 +28,6 @@ for i in range(0, 2):
         import json
         import html
         import re
-
-        try:
-            import css_html_js_minify
-        except:
-            pass
 
         if sys.version_info < (3, 6):
             import sha3
@@ -137,18 +131,6 @@ def last_change(data):
     return data
 
 def easy_minify(data, tool = None):
-    try:
-        if not tool:
-            data = css_html_js_minify.html_minify(data)
-        else:
-            if tool == 'css':
-                data = css_html_js_minify.css_minify(data)
-            elif tool == 'js':
-                data = css_html_js_minify.js_minify(data)
-    except:
-        data = re.sub('\n +<', '\n<', data)
-        data = re.sub('>(\n| )+<', '> <', data)
-    
     return last_change(data)
 
 def render_set(title = '', data = '', num = 0, s_data = 0):
@@ -400,7 +382,7 @@ def other2(data):
         <script src="https://cdn.jsdelivr.net/npm/katex@0.10.1/dist/katex.min.js"
                 integrity="sha384-2BKqo+exmr9su6dir+qCw08N2ZKRucY4PrGQPPWU1A7FtlCGjmEGFqXCv5nyM5Ij"
                 crossorigin="anonymous"></script>
-        <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
     ''' + req_list]
 
     return data
@@ -541,7 +523,7 @@ def admin_check(num = None, what = None):
             if curs.fetchall():
                 if what:
                     curs.execute("insert into re_admin (who, what, time) values (%s, %s, %s)", [ip, what, get_time()])
-                    conn.commit()
+                    
 
                 return 1
             else:
@@ -936,8 +918,6 @@ def ban_insert(name, end, why, login, blocker, type_d = None):
 
         curs.execute("insert into rb (block, end, today, blocker, why, band) values (%s, %s, %s, %s, %s, %s)", [name, r_time, now_time, blocker, why, band])
         curs.execute("insert into ban (block, end, why, band, login) values (%s, %s, %s, %s, %s)", [name, r_time, why, band, login])
-    
-    conn.commit()
 
 def rd_plus(title, sub, date):
     curs.execute("select title from rd where title = %s and sub = %s", [title, sub])
@@ -1009,7 +989,7 @@ def redirect(data = '/'):
     return flask.redirect(data)
 
 def re_error(data):
-    conn.commit()
+    
     
     if data == '/ban':
         ip = ip_check()
@@ -1027,7 +1007,7 @@ def re_error(data):
                 band_it = '-'
 
             curs.execute("delete from ban where (end < now() and end like '2%%')")
-            conn.commit()
+            
 
             curs.execute("select login, block, end from ban where ((end > now() and end like '2%%') or end = '') and band = 'regex'")
             regex_d = curs.fetchall()

@@ -1,4 +1,4 @@
-function topic_main_load(name, sub, s_num = null) {
+function topic_main_load(name, sub, s_num) {
   var o_data = document.getElementById("main_topic");
   if (s_num) {
     var url = "/api/topic/" + name + "/sub/" + sub + "?render=1&num=" + s_num;
@@ -30,7 +30,6 @@ function topic_main_load(name, sub, s_num = null) {
         topic_plus_load(name, sub, String(Number(num) + 1));
       }
 
-      // 여기 수정 필요
       xhr_2.onreadystatechange = function() {
         if (xhr_2.readyState === 4 && xhr_2.status === 200) {
           markup = JSON.parse(xhr_2.responseText)["markup"];

@@ -33,7 +33,7 @@ def give_admin_2(conn, name):
         else:
             curs.execute("update user set acl = %s where id = %s", [flask.request.form.get('select', None), name])
         
-        conn.commit()
+        
         
         return redirect('/admin/' + url_pas(name))            
     else:

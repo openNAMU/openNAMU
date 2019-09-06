@@ -73,7 +73,7 @@ def topic_2(conn, name, sub):
         rd_plus(name, sub, today)
 
         curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (%s, %s, %s, %s, %s, %s, '', '')", [num, name, sub, data, today, ip])
-        conn.commit()
+        
         
         return redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '#reload')
     else:

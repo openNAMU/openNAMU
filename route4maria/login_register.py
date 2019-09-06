@@ -75,7 +75,7 @@ def login_register_2(conn):
             flask.session['id'] = flask.request.form.get('id', None)
             flask.session['head'] = ''
                   
-            conn.commit()
+            
             
             if first == 0:
                 return redirect('/change')

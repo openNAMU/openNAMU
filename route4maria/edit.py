@@ -59,7 +59,7 @@ def edit_2(conn, name):
             num = 1
         )
         
-        conn.commit()
+        
         
         return redirect('/w/' + url_pas(name))
     else:            

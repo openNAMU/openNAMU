@@ -20,6 +20,6 @@ def watch_list_name_2(conn, name):
     else:
         curs.execute("insert into scan (user, title) values (%s, %s)", [ip, name])
     
-    conn.commit()
+    
 
     return redirect('/watch_list')

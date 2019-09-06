@@ -13,6 +13,6 @@ def give_history_hidden_2(conn, name):
         else:
             curs.execute("update history set hide = 'O' where title = %s and id = %s", [name, num])
             
-        conn.commit()
+        
     
     return redirect('/history/' + url_pas(name))

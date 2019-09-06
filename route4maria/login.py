@@ -44,7 +44,7 @@ def login_2(conn):
 
         curs.execute("insert into ua_d (name, ip, ua, today, sub) values (%s, %s, %s, %s, '')", [flask.request.form.get('id', None), ip_check(1), agent, get_time()])
 
-        conn.commit()
+        
         
         return redirect('/user')  
     else:

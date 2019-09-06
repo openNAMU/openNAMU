@@ -52,7 +52,7 @@ def give_acl_2(conn, name):
         if curs.fetchall():
             curs.execute("delete from acl where title = %s", [name])
 
-        conn.commit()
+        
             
         return redirect('/acl/' + url_pas(name))            
     else:

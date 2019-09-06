@@ -16,7 +16,7 @@ def inter_wiki_del_2(conn, tools, name):
         else:
             curs.execute("delete from html_filter where html = %s and kind = 'email'", [name])
         
-        conn.commit()
+        
 
         return redirect('/' + re.sub('^del_', '', tools))
     else:

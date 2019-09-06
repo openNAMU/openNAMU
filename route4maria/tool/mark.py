@@ -66,6 +66,6 @@ def namumark(title = '', data = None, num = 0):
             thread_start.start()
             thread_start.join()
         
-        conn.commit()
+        
         
     return data[0] + data[1]

@@ -77,7 +77,7 @@ def setting_2(conn, num):
                     i_list[i]]
                 )
 
-            conn.commit()
+            
 
             admin_check(None, 'edit_set')
 
@@ -95,7 +95,7 @@ def setting_2(conn, num):
                     
                     d_list += [n_list[i]]
 
-            conn.commit()
+            
             
             div = ''
             acl_list = [
@@ -238,7 +238,7 @@ def setting_2(conn, num):
                     i
                 ])
 
-            conn.commit()
+            
             
             admin_check(None, 'edit_set')
 
@@ -256,7 +256,7 @@ def setting_2(conn, num):
                     
                     d_list += ['']
 
-            conn.commit()
+            
 
             return easy_minify(flask.render_template(skin_check(), 
                 imp = [load_lang('text_setting'), wiki_set(), custom(), other2([0, 0])],
@@ -335,7 +335,7 @@ def setting_2(conn, num):
             else:
                 curs.execute("insert into other (name, data, coverage) values (%s, %s, %s)", [info_d, flask.request.form.get('content', ''), coverage])
             
-            conn.commit()
+            
 
             admin_check(None, 'edit_set')
 
@@ -382,7 +382,7 @@ def setting_2(conn, num):
             else:
                 curs.execute("insert into other (name, data) values ('robot', %s)", [flask.request.form.get('content', '')])
             
-            conn.commit()
+            
             
             fw = open('./robots.txt', 'w')
             fw.write(re.sub('\r\n', '\n', flask.request.form.get('content', '')))
@@ -436,7 +436,7 @@ def setting_2(conn, num):
 
                 curs.execute("update other set data = %s where name = %s", [into_data, data])
 
-            conn.commit()
+            
             
             admin_check(None, 'edit_set')
 
@@ -458,7 +458,7 @@ def setting_2(conn, num):
 
                 x += 1
 
-            conn.commit()
+            
 
             return easy_minify(flask.render_template(skin_check(), 
                 imp = ['Google', wiki_set(), custom(), other2([0, 0])],

@@ -23,7 +23,7 @@ def list_block_2(conn, name, tool):
     data_list = ''
 
     curs.execute("delete from ban where (end < %s and end like '2%%')", (get_time()))
-    conn.commit()
+    
     
     if not name:        
         if flask.request.args.get('type', '') == 'ongoing':

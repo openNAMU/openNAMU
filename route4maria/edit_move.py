@@ -55,7 +55,7 @@ def edit_move_2(conn, name):
                 for move in data:
                     curs.execute("update history set title = %s, id = %s where title = %s and id = %s", [flask.request.form.get('title', None), str(int(num) + int(move[0])), name, move[0]])
 
-                conn.commit()
+                
 
                 return redirect('/w/' + url_pas(flask.request.form.get('title', None)))
             else:
@@ -85,7 +85,7 @@ def edit_move_2(conn, name):
             curs.execute("delete from back where title = %s and not type = 'cat' and type = 'no'", [flask.request.form.get('title', None)])
 
             curs.execute("update history set title = %s where title = %s", [flask.request.form.get('title', None), name])
-            conn.commit()
+            
 
             return redirect('/w/' + url_pas(flask.request.form.get('title', None)))
     else:            

@@ -54,7 +54,7 @@ def inter_wiki_plus_2(conn, tools, name):
             
             curs.execute('insert into html_filter (html, kind) values (%s, %s)', [flask.request.form.get('title', 'test'), type_d])
         
-        conn.commit()
+        
     
         return redirect('/' + re.sub('^plus_', '', tools))
     else:

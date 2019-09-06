@@ -52,7 +52,7 @@ if what_i_do == '1':
         namumark(data[0], data[1], 1)
 
     curs.execute("delete from back")
-    conn.commit()
+    
 
     curs.execute("select title, data from data")
     data = curs.fetchall()
@@ -145,7 +145,7 @@ else:
 
     sqlite3.connect(db_name + '.db', check_same_thread = False)
 
-conn.commit()
+
 
 print('----')
 print('OK')
