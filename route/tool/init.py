@@ -29,10 +29,10 @@ server_set_var = {
         'display' : 'Markup',
         'require' : 'select',
         'default' : 'namumark',
-        'list' : ['namumark']
+        'list' : ['namumark', 'markdown']
     },
     'encode' : {
-        'display' : 'Encrypt Method',
+        'display' : 'Encryption method',
         'require' : 'select',
         'default' : 'sha3',
         'list' : ['sha3', 'sha256']
@@ -45,11 +45,11 @@ def init(key):
     else:
         while 1:
             if server_set_var[key]['require'] == 'select':
-                list_ = '[' + ', '.join(server_set_var[key]['list']) + '] '
+                list_ = '[' + ', '.join(server_set_var[key]['list']) + ']'
             else:
                 list_ = ''
 
-            print('{} ({}) {}:'.format(
+            print('{} ({}) {} : '.format(
                 server_set_var[key]['display'],
                 server_set_var[key]['default'],
                 list_

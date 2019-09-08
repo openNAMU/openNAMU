@@ -189,7 +189,7 @@ def setting_2(conn, num):
                         <hr class=\"main_hr\">
                         <input type="checkbox" name="ip_view" ''' + ch_2 + '''> ''' + load_lang('hide_ip') + '''
                         <hr class=\"main_hr\">
-                        <input type="checkbox" name="email_have" ''' + ch_3 + '''> ''' + load_lang('email_required') + ''' {<a href="/setting/5">''' + load_lang('google_imap_required') + '''</a>}
+                        <input type="checkbox" name="email_have" ''' + ch_3 + '''> ''' + load_lang('email_required') + ''' {<a href="/setting/6">''' + load_lang('google_imap_required') + '''</a>}
                         <hr class=\"main_hr\">
                         <span>''' + load_lang('wiki_host') + '''</span>
                         <hr class=\"main_hr\">
@@ -226,7 +226,9 @@ def setting_2(conn, num):
             'email_text',
             'email_insert_text',
             'password_search_text',
-            'reset_user_text'
+            'reset_user_text',
+            'error_401',
+            'error_404'
         ]
         if flask.request.method == 'POST':
             for i in i_list:
@@ -294,6 +296,14 @@ def setting_2(conn, num):
                         <span>''' + load_lang('reset_user_text') + '''</span>
                         <hr class=\"main_hr\">
                         <input name="''' + i_list[8] + '''" value="''' + html.escape(d_list[8]) + '''">
+                        <hr class=\"main_hr\">
+                        <span>''' + load_lang('error_401') + '''</span>
+                        <hr class=\"main_hr\">
+                        <input name="''' + i_list[9] + '''" value="''' + html.escape(d_list[9]) + '''">
+                        <hr class=\"main_hr\">
+                        <span>''' + load_lang('error_404') + '''</span>
+                        <hr class=\"main_hr\">
+                        <input name="''' + i_list[10] + '''" value="''' + html.escape(d_list[10]) + '''">
                         <hr class=\"main_hr\">
                         <button id="save" type="submit">''' + load_lang('save') + '''</button>
                     </form>

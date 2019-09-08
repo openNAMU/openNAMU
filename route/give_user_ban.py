@@ -106,7 +106,6 @@ def give_user_ban_2(conn, name):
             insert_data = ''
             for i in time_data:
                 insert_data += '<a href="javascript:insert_v(\'second\', \'' + i[0] + '\')">(' + i[1] + ')</a> '
-            # 언어 적용 필요
 
             data = name + '''
                 <script>function insert_v(name, data) { document.getElementById(name).value = data; }</script>''' + insert_data + '''                

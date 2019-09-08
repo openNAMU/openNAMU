@@ -19,7 +19,7 @@ input[type="checkbox"] { width: auto; }
 #toron_color_red { background: indianred; }
 #toron_color_grey { background: gainsboro; }
 #cate { border: 1px solid; padding: 5px; }
-blockquote { border: 1px solid; padding: 15px; margin: 0; margin-top: 10px; }
+blockquote { border: 1px solid; padding: 15px; margin: 0; margin-top: 10px; display: inline-block; }
 img, iframe { max-width: 100%; }
 pre { border: 1px solid; padding: 10px; white-space: pre-wrap; }
 #in { margin-left: 20px; }
@@ -38,3 +38,4 @@ hr.main_hr { border: none; }
 #toc_title { font-size: 18px; }
 blockquote { background-image: url(/views/acme/img/quote.png); background-position: calc(100% - 10px) 10px; background-repeat: no-repeat; background-size: 25px; }
 #admin_log_search { width: 100px; }
+@media (max-width: 768px) { table { min-width: 100%; }}

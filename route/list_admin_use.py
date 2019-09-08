@@ -35,6 +35,7 @@ def list_admin_use_2(conn):
                 <form method="post">
                     <input name="search" id="admin_log_search"> <button type="submit">''' + load_lang('search') + '''</button>
                 </form>
+                <hr class=\"main_hr\">
             ''' + list_data,
             menu = [['other', load_lang('return')]]
         ))

@@ -20,7 +20,6 @@ for i in range(0, 2):
         import zipfile
         import difflib
         import shutil
-        import request
         import threading
         import logging
         import random
@@ -29,11 +28,6 @@ for i in range(0, 2):
         import html
         import re
 
-        try:
-            import css_html_js_minify
-        except:
-            pass
-
         if sys.version_info < (3, 6):
             import sha3
 
@@ -41,6 +35,8 @@ for i in range(0, 2):
         from .mark import *
     except ImportError as e:
         if i == 0:
+            print(e)
+            print('----')
             if platform.system() == 'Linux':
                 ok = os.system('python3 -m pip install --user -r requirements.txt')
                 if ok == 0:
@@ -64,7 +60,7 @@ for i in range(0, 2):
             print(e)
             raise
 
-app_var = json.loads(open('data/app_variables.json', encoding='utf-8').read())
+app_var = json.loads(open('data/app_var.json', encoding='utf-8').read())
 
 def load_conn(data):
     global conn
@@ -135,19 +131,7 @@ def last_change(data):
 
     return data
 
-def easy_minify(data, tool = None):
-    try:
-        if not tool:
-            data = css_html_js_minify.html_minify(data)
-        else:
-            if tool == 'css':
-                data = css_html_js_minify.css_minify(data)
-            elif tool == 'js':
-                data = css_html_js_minify.js_minify(data)
-    except:
-        data = re.sub('\n +<', '\n<', data)
-        data = re.sub('>(\n| )+<', '> <', data)
-    
+def easy_minify(data, tool = None):    
     return last_change(data)
 
 def render_set(title = '', data = '', num = 0, s_data = 0):
@@ -176,55 +160,19 @@ def captcha_get():
     return data
 
 def update():
-    # v3.0.8 rd, agreedis, stop 테이블 통합
+    #v3.1.2
     try:
-        curs.execute("select title, sub, close from stop")
-        for i in curs.fetchall():
-            if i[2] == '':
-                curs.execute("update rd set stop = 'S' where title = ? and sub = ?", [i[0], i[1]])
-            else:
-                curs.execute("update rd set stop = 'O' where title = ? and sub = ?", [i[0], i[1]])
-    except:
-        pass
-        
-    try:
-        curs.execute("select title, sub from agreedis")
-        for i in curs.fetchall():
-            curs.execute("update rd set agree = 'O' where title = ? and sub = ?", [i[0], i[1]])
-    except:
-        pass
-         
-    try:
-        curs.execute("drop table if exists stop")
-        curs.execute("drop table if exists agreedis")
+        curs.execute('select title, dec from acl where dec != ""')
+        db_data = curs.fetchall()
+        for i in db_data:
+            curs.execute("update acl set decu = ? where title = ?", [i[1], i[0]])
+
+        print('fix table acl column dec to decu')
+        print('----')
     except:
         pass
 
-    # Start : Data migration code
-    app_var = json.loads(open(os.path.abspath('./data/app_variables.json'), encoding='utf-8').read())
-
-    if os.path.exists('image'):
-        os.rename('image', app_var['path_data_image'])
-
-    if os.path.exists('oauthsettings.json'):
-        os.rename('oauthsettings.json', app_var['path_oauth_setting'])
-
-    try:
-        load_oauth('discord')
-    except KeyError:
-        old_oauth_data = json.loads(open(app_var['path_oauth_setting'], encoding='utf-8').read())
-
-        if 'discord' not in old_oauth_data['_README']['support']:
-            old_oauth_data['_README']['support'] += ['discord']
-
-        old_oauth_data['discord'] = {}
-        old_oauth_data['discord']['client_id'] = ''
-        old_oauth_data['discord']['client_secret'] = ''
-
-        with open(app_var['path_oauth_setting'], 'w') as f:
-            f.write(json.dumps(old_oauth_data, sort_keys = True, indent = 4))
-
-    # End
+    conn.commit()
 
 def pw_encode(data, data2 = '', type_d = ''):
     if type_d == '':
@@ -377,6 +325,11 @@ def edit_button():
         ["{{{+number data}}}", load_lang('edit_button_big')],
         ["== name ==", load_lang('edit_button_paragraph')]
     ]
+    
+    curs.execute("select html, plus from html_filter where kind = 'edit_top'")
+    db_data = curs.fetchall()
+    for get_data in db_data:
+        insert_list += [[get_data[1], get_data[0]]]
 
     data = ''
     for insert_data in insert_list:
@@ -447,7 +400,7 @@ def other2(data):
         <script src="https://cdn.jsdelivr.net/npm/katex@0.10.1/dist/katex.min.js"
                 integrity="sha384-2BKqo+exmr9su6dir+qCw08N2ZKRucY4PrGQPPWU1A7FtlCGjmEGFqXCv5nyM5Ij"
                 crossorigin="anonymous"></script>
-        <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
     ''' + req_list]
 
     return data
@@ -753,7 +706,7 @@ def acl_check(name, tool = ''):
             if admin_check(5) == 1:
                 return 0
 
-            curs.execute("select dec from acl where title = ?", ['user:' + acl_n[0]])
+            curs.execute("select decu from acl where title = ?", ['user:' + acl_n[0]])
             acl_data = curs.fetchall()
             if acl_data:
                 if acl_data[0][0] == 'all':
@@ -773,7 +726,7 @@ def acl_check(name, tool = ''):
         if re.search("^file:", name) and admin_check(None, 'file edit (' + name + ')') != 1:
             return 1
 
-        curs.execute("select dec from acl where title = ?", [name])
+        curs.execute("select decu from acl where title = ?", [name])
         acl_data = curs.fetchall()
         if acl_data:
             if acl_data[0][0] == 'user':
@@ -994,6 +947,8 @@ def rd_plus(title, sub, date):
     else:
         curs.execute("insert into rd (title, sub, date) values (?, ?, ?)", [title, sub, date])
 
+    conn.commit()
+
 def history_plus(title, data, date, ip, send, leng, t_check = ''):
     curs.execute("select id from history where title = ? order by id + 0 desc limit 1", [title])
     id_data = curs.fetchall()
@@ -1027,16 +982,14 @@ def leng_check(first, second):
     return all_plus
 
 def number_check(data):
-    if not data:
+    try:
+        int(data)
+        return data
+    except:
         return '1'
-    else:
-        if re.search('[^0-9]', data):
-            return '1'
-        else:
-            return data
 
 def edit_filter_do(data):
-    if admin_check(1, 'edit_filter pass') != 1:
+    if admin_check(1) != 1:
         curs.execute("select regex, sub from filter")
         for data_list in curs.fetchall():
             match = re.compile(data_list[0], re.I)

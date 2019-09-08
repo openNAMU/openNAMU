@@ -76,128 +76,35 @@ def topic_2(conn, name, sub):
         
         return redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '#reload')
     else:
-        curs.execute("select title from rd where title = ? and sub = ? and stop = 'O'", [name, sub])
+        data = ''
+    
+        curs.execute("select stop from rd where title = ? and sub = ? and stop != ''", [name, sub])
         close_data = curs.fetchall()
         
-        curs.execute("select title from rd where title = ? and sub = ? and stop = 'S'", [name, sub])
-        stop_data = curs.fetchall()
-        
-        display = ''
-        all_data = ''
-        data = ''
-        number = 1
-        
-        if (close_data or stop_data) and admin != 1:
+        if close_data and admin != 1:
             display = 'display: none;'
-        
-        curs.execute("select data, id, date, ip, block, top from topic where title = ? and sub = ? order by id + 0 asc", [name, sub])
-        topic = curs.fetchall()
-        
-        curs.execute("select data, id, date, ip from topic where title = ? and sub = ? and top = 'O' order by id + 0 asc", [name, sub])
-        for topic_data in curs.fetchall():                   
-            who_plus = ''
-            
-            curs.execute("select who from re_admin where what = ? order by time desc limit 1", ['notice (' + name + ' - ' + sub + '#' + topic_data[1] + ')'])
-            topic_data_top = curs.fetchall()
-            if topic_data_top:
-                who_plus += ' <span style="margin-right: 5px;">@' + topic_data_top[0][0] + ' </span>'
-                                
-            all_data += '''
-                <table id="toron">
-                    <tbody>
-                        <tr>
-                            <td id="toron_color_red">
-                                <a href="#''' + topic_data[1] + '''">
-                                    #''' + topic_data[1] + '''
-                                </a> ''' + ip_pas(topic_data[3]) + who_plus + ''' <span style="float: right;">''' + topic_data[2] + '''</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>''' + render_set(data = topic_data[0]) + '''</td>
-                        </tr>
-                    </tbody>
-                </table>
+        else:
+            display = ''
+
+        data += '''
+            <div id="top_topic"></div>
+            <div id="main_topic"></div>
+            <div id="plus_topic"></div>
+            <script>topic_top_load("''' + name + '''", "''' + sub + '''");</script>
+            <a id="reload" href="javascript:void(0);" onclick="topic_reload();">(''' + load_lang('reload') + ''')</a> <a href="/topic/''' + url_pas(name) + '''/sub/''' + url_pas(sub) + '''/tool">(''' + load_lang('topic_tool') + ''')</a>
+            <hr class=\"main_hr\">
+            <form style="''' + display + '''" method="post">
+                <textarea style="height: 100px;" name="content"></textarea>
                 <hr class=\"main_hr\">
-            '''    
-
-        for topic_data in topic:
-            user_write = topic_data[0]
-
-            if number == 1:
-                start = topic_data[3]
-
-            if topic_data[4] == 'O':
-                blind_data = 'id="toron_color_grey"'
-                
-                if admin != 1:
-                    curs.execute("select who from re_admin where what = ? order by time desc limit 1", ['blind (' + name + ' - ' + sub + '#' + str(number) + ')'])
-                    who_blind = curs.fetchall()
-                    if who_blind:
-                        user_write = '[[user:' + who_blind[0][0] + ']] ' + load_lang('hide')
-                    else:
-                        user_write = load_lang('hide')
-            else:
-                blind_data = ''
-
-            user_write = render_set(data = user_write)
-            ip = ip_pas(topic_data[3])
-            
-            curs.execute('select acl from user where id = ?', [topic_data[3]])
-            user_acl = curs.fetchall()
-            if user_acl and user_acl[0][0] != 'user':
-                ip += ' <a href="javascript:void(0);" title="' + load_lang('admin') + '">★</a>'
-
-            if admin == 1 or blind_data == '':
-                ip += ' <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/admin/' + str(number) + '">(' + load_lang('discussion_tool') + ')</a>'
-
-            curs.execute("select end from ban where block = ?", [topic_data[3]])
-            if curs.fetchall():
-                ip += ' <a href="javascript:void(0);" title="' + load_lang('blocked') + '">†</a>'
-                    
-            if topic_data[5] == '1':
-                color = '_blue'
-            elif topic_data[3] == start:
-                color = '_green'
-            else:
-                color = ''
-                
-            if user_write == '':
-                user_write = '<br>'
-                         
-            all_data += '''
-                <table id="toron">
-                    <tbody>
-                        <tr>
-                            <td id="toron_color''' + color + '''">
-                                <a href="javascript:void(0);" id="''' + str(number) + '">#' + str(number) + '</a> ' + ip + '''</span>
-                            </td>
-                        </tr>
-                        <tr ''' + blind_data + '''>
-                            <td>''' + user_write + '''</td>
-                        </tr>
-                    </tbody>
-                </table>
-                <hr class=\"main_hr\">
-            '''
-
-            number += 1
-
-        if ban != 1 or admin == 1:
-            data += '''
-                <div id="plus"></div>
-                <script>topic_load("''' + name + '''", "''' + sub + '''", "''' + str(number) + '''");</script>
-                <a id="reload" href="javascript:void(0);" onclick="reload();">(''' + load_lang('reload') + ''')</a> <a href="/topic/''' + url_pas(name) + '''/sub/''' + url_pas(sub) + '''/tool">(''' + load_lang('topic_tool') + ''')</a>
-                <hr class=\"main_hr\">
-                <form style="''' + display + '''" method="post">
-                    <textarea style="height: 100px;" name="content"></textarea>
-                    <hr class=\"main_hr\">
-                    ''' + captcha_get() + (ip_warring() if display == '' else '') + '''
-                    <button type="submit">''' + load_lang('send') + '''</button>
-                </form>
-            '''
+                ''' + captcha_get() + (ip_warring() if display == '' else '') + '''
+                <button type="submit">''' + load_lang('send') + '''</button>
+            </form>
+        '''
 
         return easy_minify(flask.render_template(skin_check(), 
             imp = [name, wiki_set(), custom(), other2([' (' + load_lang('discussion') + ')', 0])],
-            data = '<h2 id="topic_top_title">' + sub + '</h2>' + all_data + data,
+            data = '''
+                <h2 id="topic_top_title">''' + sub + '''</h2>
+                ''' + data,
             menu = [['topic/' + url_pas(name), load_lang('list')]]
         ))
