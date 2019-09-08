@@ -301,15 +301,15 @@ def alarm_del():
 def alarm():
     return alarm_2(conn)
 
-@app.route('/<regex("inter_wiki|edit_top|(?:edit|email|file|name)_filter"):tools>')
+@app.route('/<regex("inter_wiki|edit_top|image_license|(?:edit|email|file|name)_filter"):tools>')
 def inter_wiki(tools = None):
     return inter_wiki_2(conn, tools)
 
-@app.route('/<regex("del_(?:inter_wiki|edit_top|(?:edit|email|file|name)_filter)"):tools>/<name>')
+@app.route('/<regex("del_(?:inter_wiki|edit_top|image_license|(?:edit|email|file|name)_filter)"):tools>/<name>')
 def inter_wiki_del(tools = None, name = None):
     return inter_wiki_del_2(conn, tools, name)
 
-@app.route('/<regex("plus_(?:inter_wiki|edit_top|(?:edit|email|file|name)_filter)"):tools>', methods=['POST', 'GET'])
+@app.route('/<regex("plus_(?:inter_wiki|edit_top|image_license|(?:edit|email|file|name)_filter)"):tools>', methods=['POST', 'GET'])
 @app.route('/<regex("plus_edit_filter"):tools>/<name>', methods=['POST', 'GET'])
 def inter_wiki_plus(tools = None, name = None):
     return inter_wiki_plus_2(conn, tools, name)

@@ -47,13 +47,22 @@ def func_upload_2(conn):
             
         ip = ip_check()
 
-        if flask.request.form.get('f_lice', None):
-            lice = flask.request.form.get('f_lice', None)
-        else:
-            if custom()[2] == 0:
-                lice = ip
+        if flask.request.form.get('f_lice_sel', 'direct_input') == 'direct_input':
+            if flask.request.form.get('f_lice', None):
+                lice = flask.request.form.get('f_lice', None)
             else:
-                lice = '[[user:' + ip + ']]'
+                if custom()[2] == 0:
+                    lice = ip
+                else:
+                    lice = '[[user:' + ip + ']]'
+
+            lice += '[[category:direct_input]]'
+        else:
+            lice = flask.request.form.get('f_lice_sel', None)
+            if flask.request.form.get('f_lice', None):
+                lice += ' : '  + flask.request.form.get('f_lice', None)
+
+            lice += '[[category:' + re.sub('\]', '_', flask.request.form.get('f_lice_sel', None)) + ']]'
             
         if os.path.exists(os.path.join(app_var['path_data_image'], e_data)):
             os.remove(os.path.join(app_var['path_data_image'], e_data))
@@ -61,12 +70,21 @@ def func_upload_2(conn):
             data.save(os.path.join(app_var['path_data_image'], e_data))
         else:
             data.save(os.path.join(app_var['path_data_image'], e_data))
+
+        file_d = '[[file:' + name + ']][br][br]{{{[[file:' + name + ']]}}}[br][br]' + lice
         
-        curs.execute("insert into data (title, data) values (?, ?)", ['file:' + name, '[[file:' + name + ']][br][br]{{{[[file:' + name + ']]}}}[br][br]' + lice])
+        curs.execute("insert into data (title, data) values (?, ?)", ['file:' + name, file_d])
         curs.execute("insert into acl (title, decu, dis, why, view) values (?, 'admin', '', '', '')", ['file:' + name])
 
+        render_set(
+            title = name,
+            data = file_d,
+            num = 1
+        )
+
         history_plus(
-            'file:' + name, '[[file:' + name + ']][br][br]{{{[[file:' + name + ']]}}}[br][br]' + lice,
+            'file:' + name,
+            file_d,
             get_time(), 
             ip, 
             '(upload)',
@@ -77,15 +95,32 @@ def func_upload_2(conn):
         
         return redirect('/w/file:' + name)      
     else:
+        license_list = '''
+            <option value="direct_input">''' + load_lang('direct_input') + '''</option>
+        '''
+
+        curs.execute("select html from html_filter where kind = 'image_license'")
+        db_data = curs.fetchall()
+        for i in db_data:
+            license_list += '''
+                <option value="''' + i[0] + '''">''' + i[0] + '''</option>
+            '''
+
         return easy_minify(flask.render_template(skin_check(), 
             imp = [load_lang('upload'), wiki_set(), custom(), other2([0, 0])],
             data =  '''
                 <a href="/file_filter">(''' + load_lang('file_filter_list') + ''')</a>
                 <hr class=\"main_hr\">
+                ''' + load_lang('max_file_size') + ''' : ''' + wiki_set(3) + '''MB
+                <hr class=\"main_hr\">
                 <form method="post" enctype="multipart/form-data" accept-charset="utf8">
                     <input type="file" name="f_data">
                     <hr class=\"main_hr\">
                     <input placeholder="''' + load_lang('file_name') + '''" name="f_name" type="text">
+                    <hr class=\"main_hr\">
+                    <select name="f_lice_sel">
+                        ''' + license_list + '''
+                    </select>
                     <hr class=\"main_hr\">
                     <input placeholder="''' + load_lang('license') + '''" name="f_lice" type="text">
                     <hr class=\"main_hr\">

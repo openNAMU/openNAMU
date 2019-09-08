@@ -52,6 +52,10 @@ def inter_wiki_plus_2(conn, tools, name):
                 admin_check(None, 'email_filter edit')
                 
                 type_d = 'email'
+            elif tools == 'plus_image_license':
+                admin_check(None, 'image_license edit')
+                
+                type_d = 'image_license'
             else:
                 admin_check(None, 'edit_top edit')
                 
@@ -122,6 +126,9 @@ def inter_wiki_plus_2(conn, tools, name):
         elif tools == 'plus_email_filter':
             title = load_lang('email_filter_add')
             form_data = '<input placeholder="' + load_lang('email') + '" type="text" name="title">'
+        elif tools == 'plus_image_license':
+            title = load_lang('image_license_add')
+            form_data = '<input placeholder="' + load_lang('license') + '" type="text" name="title">'
         else:
             title = load_lang('edit_tool_add')
             form_data = '''

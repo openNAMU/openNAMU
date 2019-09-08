@@ -120,7 +120,7 @@
     "now_password": "현재 비밀번호",
     "same_file_error": "똑같은 이름의 파일이 존재합니다.",
     "same_id_exist_error": "이미 같은 이름의 계정이 있습니다.",
-    "max_file_size": "파일 최대 파일 크기",
+    "max_file_size": "최대 파일 크기",
     "new_password": "새 비밀번호",
     "authority_use_list": "권한 사용 목록",
     "alarm": "알림",
@@ -278,7 +278,7 @@
     "1_day": "1일",
     "regex_error": "정규표현식에 오류가 있습니다.",
     "backup_interval": "백업 주기",
-    "license": "저작권",
+    "license": "라이선스",
     "hide_release": "숨김 해제",
     "360_day": "360일",
     "inter_error": "내부 오류.",
@@ -292,5 +292,8 @@
     "markup": "문법",
     "title": "제목",
     "edit_tool_list": "편집 도구 목록",
-    "edit_tool_add": "편집 도구 추가"
+    "edit_tool_add": "편집 도구 추가",
+    "image_license_list": "이미지 라이선스 목록",
+    "image_license_add": "이미지 라이선스 추가",
+    "direct_input": "직접 입력"
 }
