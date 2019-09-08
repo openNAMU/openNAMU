@@ -325,6 +325,11 @@ def edit_button():
         ["{{{+number data}}}", load_lang('edit_button_big')],
         ["== name ==", load_lang('edit_button_paragraph')]
     ]
+    
+    curs.execute("select html, plus from html_filter where kind = 'edit_top'")
+    db_data = curs.fetchall()
+    for get_data in db_data:
+        insert_list += [[get_data[1], get_data[0]]]
 
     data = ''
     for insert_data in insert_list:

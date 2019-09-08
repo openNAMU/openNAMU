@@ -28,6 +28,8 @@ def inter_wiki_plus_2(conn, tools, name):
             except:
                 return re_error('/error/23')                
         else:
+            plus_d = ''
+
             if tools == 'plus_name_filter':
                 try:
                     re.compile(flask.request.form.get('title', 'test'))
@@ -46,12 +48,17 @@ def inter_wiki_plus_2(conn, tools, name):
                 admin_check(None, 'file_filter edit')
                 
                 type_d = 'file'
-            else:
+            elif tools == 'plus_email_filter':
                 admin_check(None, 'email_filter edit')
                 
                 type_d = 'email'
+            else:
+                admin_check(None, 'edit_top edit')
+                
+                type_d = 'edit_top'
+                plus_d = flask.request.form.get('markup', 'test')
             
-            curs.execute('insert into html_filter (html, kind) values (?, ?)', [flask.request.form.get('title', 'test'), type_d])
+            curs.execute('insert into html_filter (html, kind, plus) values (?, ?, ?)', [flask.request.form.get('title', 'test'), type_d, plus_d])
         
         conn.commit()
     
@@ -112,10 +119,16 @@ def inter_wiki_plus_2(conn, tools, name):
         elif tools == 'plus_file_filter':
             title = load_lang('file_filter_add')
             form_data = '<input placeholder="' + load_lang('regex') + '" type="text" name="title">'
-        else:
+        elif tools == 'plus_email_filter':
             title = load_lang('email_filter_add')
-            form_data = '<input placeholder="email" type="text" name="title">'
-
+            form_data = '<input placeholder="' + load_lang('email') + '" type="text" name="title">'
+        else:
+            title = load_lang('edit_tool_add')
+            form_data = '''
+                <input placeholder="''' + load_lang('title') + '''" type="text" name="title">
+                <hr class=\"main_hr\">
+                <input placeholder="''' + load_lang('markup') + '''" type="text" name="markup">
+            '''
 
         return easy_minify(flask.render_template(skin_check(), 
             imp = [title, wiki_set(), custom(), other2([0, 0])],

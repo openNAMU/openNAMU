@@ -42,13 +42,20 @@ def inter_wiki_2(conn, tools):
         div = ''
 
         curs.execute("select name from filter")
-    else:
+    elif tools == 'file_filter':
         del_link = 'del_file_filter'
         plus_link = 'plus_file_filter'
         title = load_lang('file_filter_list')
         div = ''
 
         curs.execute("select html from html_filter where kind = 'file'")
+    else:
+        del_link = 'del_edit_top'
+        plus_link = 'plus_edit_top'
+        title = load_lang('edit_tool_list')
+        div = ''
+
+        curs.execute("select html, plus from html_filter where kind = 'edit_top'")
 
     db_data = curs.fetchall()
     if db_data:
@@ -61,6 +68,9 @@ def inter_wiki_2(conn, tools):
                 div += '<li><a href="/plus_edit_filter/' + url_pas(data[0]) + '">' + data[0] + '</a>'
             else:
                 div += '<li>' + data[0]
+
+                if tools == 'edit_top':
+                    div += ' : ' + data[1]
 
             if admin == 1:
                 div += ' <a href="/' + del_link + '/' + url_pas(data[0]) + '">(' + load_lang('delete') + ')</a>'
