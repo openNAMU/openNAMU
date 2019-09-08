@@ -49,6 +49,20 @@ def inter_wiki_2(conn, tools):
         div = ''
 
         curs.execute("select html from html_filter where kind = 'file'")
+    elif tools == 'file_filter':
+        del_link = 'del_file_filter'
+        plus_link = 'plus_file_filter'
+        title = load_lang('file_filter_list')
+        div = ''
+
+        curs.execute("select html from html_filter where kind = 'file'")  
+    elif tools == 'image_license':
+        del_link = 'del_image_license'
+        plus_link = 'plus_image_license'
+        title = load_lang('image_license_list')
+        div = ''
+
+        curs.execute("select html from html_filter where kind = 'image_license'")  
     else:
         del_link = 'del_edit_top'
         plus_link = 'plus_edit_top'

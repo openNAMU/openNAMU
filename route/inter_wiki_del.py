@@ -14,6 +14,8 @@ def inter_wiki_del_2(conn, tools, name):
             curs.execute("delete from html_filter where html = ? and kind = 'file'", [name])
         elif tools == 'del_email_filter':
             curs.execute("delete from html_filter where html = ? and kind = 'email'", [name])
+        elif tools == 'del_image_license':
+            curs.execute("delete from html_filter where html = ? and kind = 'image_license'", [name])    
         else:
             curs.execute("delete from html_filter where html = ? and kind = 'edit_top'", [name])
         
