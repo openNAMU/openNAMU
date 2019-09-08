@@ -163,7 +163,7 @@ if setup_tool != 0:
     create_data['scan'] = ['user', 'title']
     create_data['acl'] = ['title', 'decu', 'dis', 'view', 'why']
     create_data['inter'] = ['title', 'link']
-    create_data['html_filter'] = ['html', 'kind']
+    create_data['html_filter'] = ['html', 'kind', 'plus']
     create_data['oauth_conn'] = ['provider', 'wiki_id', 'sns_id', 'name', 'picture']
 
     for create_table in create_data['all_data']:
@@ -301,15 +301,15 @@ def alarm_del():
 def alarm():
     return alarm_2(conn)
 
-@app.route('/<regex("inter_wiki|(?:edit|email|file|name)_filter"):tools>')
+@app.route('/<regex("inter_wiki|edit_top|(?:edit|email|file|name)_filter"):tools>')
 def inter_wiki(tools = None):
     return inter_wiki_2(conn, tools)
 
-@app.route('/<regex("del_(?:inter_wiki|(?:edit|email|file|name)_filter)"):tools>/<name>')
+@app.route('/<regex("del_(?:inter_wiki|edit_top|(?:edit|email|file|name)_filter)"):tools>/<name>')
 def inter_wiki_del(tools = None, name = None):
     return inter_wiki_del_2(conn, tools, name)
 
-@app.route('/<regex("plus_(?:inter_wiki|(?:edit|email|file|name)_filter)"):tools>', methods=['POST', 'GET'])
+@app.route('/<regex("plus_(?:inter_wiki|edit_top|(?:edit|email|file|name)_filter)"):tools>', methods=['POST', 'GET'])
 @app.route('/<regex("plus_edit_filter"):tools>/<name>', methods=['POST', 'GET'])
 def inter_wiki_plus(tools = None, name = None):
     return inter_wiki_plus_2(conn, tools, name)

@@ -288,5 +288,9 @@
     "list": "목록",
     "release": "차단 해제",
     "category": "분류",
-    "history_delete": "역사 삭제"
+    "history_delete": "역사 삭제",
+    "markup": "문법",
+    "title": "제목",
+    "edit_tool_list": "편집 도구 목록",
+    "edit_tool_add": "편집 도구 추가"
 }
