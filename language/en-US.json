@@ -168,6 +168,7 @@
         "skin_info" : "Skin info",
         "closed_discussion" : "Closed discussion",
         "agreed_discussion" : "Agreed discussion",
+        "history_delete" : "History delete",
         "_comment_2.1_" : "Filter",
             "_comment_2.1.1_" : "List",
                 "interwiki_list" : "Interwiki(s) list",

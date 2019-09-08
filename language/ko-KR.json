@@ -287,5 +287,6 @@
     "adsense_enable": "애드센스 사용",
     "list": "목록",
     "release": "차단 해제",
-    "category": "분류"
+    "category": "분류",
+    "history_delete": "역사 삭제"
 }

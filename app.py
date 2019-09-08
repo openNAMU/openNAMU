@@ -543,6 +543,10 @@ def recent_changes(name = None, tool = 'record'):
 def recent_history_tool(name = None):
     return recent_history_tool_2(conn, name)
     
+@app.route('/history_delete/<everything:name>', methods=['POST', 'GET'])
+def recent_history_delete(name = None):
+    return recent_history_delete_2(conn, name)
+
 @app.route('/upload', methods=['GET', 'POST'])
 def func_upload():
     return func_upload_2(conn)
