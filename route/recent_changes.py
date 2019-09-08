@@ -119,11 +119,7 @@ def recent_changes_2(conn, name, tool):
                 leng = '<span style="color:gray;">(' + data[5] + ')</span>'
                 
             ip = ip_pas(data[3])
-            if int(data[0]) - 1 == 0:
-                revert = ''
-            else:
-                revert = '<a href="/diff/' + url_pas(data[1]) + '?first=' + str(int(data[0]) - 1) + '&second=' + data[0] + '">(' + load_lang('compare') + ')</a>'
-                revert += ' <a href="/revert/' + url_pas(data[1]) + '?num=' + str(int(data[0]) - 1) + '">(' + load_lang('revert') + ')</a>'
+            m_tool = '<a href="/history_tool/' + url_pas(data[1]) + '?num=' + data[0] + '">(' + load_lang('tool') + ')</a>'
             
             style = ['', '']
             date = data[2]
@@ -135,9 +131,7 @@ def recent_changes_2(conn, name, tool):
             hide = curs.fetchall()
             
             if six_admin == 1:
-                if hide:                            
-                    hidden = ' <a href="/hidden/' + url_pas(data[1]) + '?num=' + data[0] + '">(' + load_lang('hide_release') + ')'
-                    
+                if hide:                    
                     style[0] = 'id="toron_color_grey"'
                     style[1] = 'id="toron_color_grey"'
                     
@@ -145,13 +139,10 @@ def recent_changes_2(conn, name, tool):
                         send = '(' + load_lang('hide') + ')'
                     else:
                         send += ' (' + load_lang('hide') + ')'
-                else:
-                    hidden = ' <a href="/hidden/' + url_pas(data[1]) + '?num=' + data[0] + '">(' + load_lang('hide') + ')'
             elif not hide:
-                hidden = ''
+                pass
             else:
                 ip = ''
-                hidden = ''
                 ban = ''
                 date = ''
 
@@ -162,15 +153,14 @@ def recent_changes_2(conn, name, tool):
 
             if tool == 'history':
                 title = '<a href="/w/' + url_pas(name) + '?num=' + data[0] + '">r' + data[0] + '</a> '
-                title += '<a href="/raw/' + url_pas(name) + '?num=' + data[0] + '">(' + load_lang('raw') + ')</a> '
             else:
                 title = '<a href="/w/' + url_pas(data[1]) + '">' + html.escape(data[1]) + '</a> '
                 title += '<a href="/history/' + url_pas(data[1]) + '">(r' + data[0] + ')</a> '
 
             div +=  '''
                 <tr ''' + style[0] + '''>
-                    <td>''' + title + revert + ' ' + leng + '''</td>
-                    <td>''' + ip + ban + hidden + '''</td>
+                    <td>''' + title + m_tool + ' ' + leng + '''</td>
+                    <td>''' + ip + ban + '''</td>
                     <td>''' + date + '''</td>
                 </tr>
                 <tr ''' + style[1] + '''>

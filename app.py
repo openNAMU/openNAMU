@@ -15,8 +15,11 @@ c_ver = version_list['master']['c_ver']
 s_ver = version_list['master']['s_ver']
 
 print('Version : ' + r_ver)
+print('DB set version : ' + c_ver)
+print('Skin set version : ' + s_ver)
+print('----')
 
-app_var = json.loads(open('data/app_variables.json', encoding='utf-8').read())
+app_var = json.loads(open('data/app_var.json', encoding='utf-8').read())
 
 # DB
 all_src = []
@@ -26,7 +29,7 @@ for i_data in os.listdir("."):
         all_src += [f_src.groups()[0]]
 
 if len(all_src) == 0:
-    print('DB\'s name (data) : ', end = '')
+    print('DB name (data) : ', end = '')
     
     db_name = input()
     if db_name == '':
@@ -39,8 +42,10 @@ elif len(all_src) > 1:
 
         db_num += 1
 
-    print('Number : ', end = '')    
+    print('----')
+    print('Number : ', end = '')
     db_name = all_src[int(number_check(input())) - 1]
+    print('----')
 else:
     db_name = all_src[0]
 
@@ -113,7 +118,6 @@ if setup_tool == 0:
 
 if setup_tool != 0:
     create_data = {}
-
     create_data['all_data'] = [
         'data', 
         'cache_data', 
@@ -157,9 +161,9 @@ if setup_tool != 0:
     create_data['ua_d'] = ['name', 'ip', 'ua', 'today', 'sub']
     create_data['filter'] = ['name', 'regex', 'sub']
     create_data['scan'] = ['user', 'title']
-    create_data['acl'] = ['title', 'dec', 'dis', 'view', 'why']
+    create_data['acl'] = ['title', 'decu', 'dis', 'view', 'why']
     create_data['inter'] = ['title', 'link']
-    create_data['html_filter'] = ['html', 'kind']
+    create_data['html_filter'] = ['html', 'kind', 'plus']
     create_data['oauth_conn'] = ['provider', 'wiki_id', 'sns_id', 'name', 'picture']
 
     for create_table in create_data['all_data']:
@@ -288,7 +292,7 @@ else:
         
 conn.commit()
 
-## Func
+# Func
 @app.route('/del_alarm')
 def alarm_del():
     return alarm_del_2(conn)
@@ -297,15 +301,15 @@ def alarm_del():
 def alarm():
     return alarm_2(conn)
 
-@app.route('/<regex("inter_wiki|(?:edit|email|file|name)_filter"):tools>')
+@app.route('/<regex("inter_wiki|edit_top|image_license|(?:edit|email|file|name)_filter"):tools>')
 def inter_wiki(tools = None):
     return inter_wiki_2(conn, tools)
 
-@app.route('/<regex("del_(?:inter_wiki|(?:edit|email|file|name)_filter)"):tools>/<name>')
+@app.route('/<regex("del_(?:inter_wiki|edit_top|image_license|(?:edit|email|file|name)_filter)"):tools>/<name>')
 def inter_wiki_del(tools = None, name = None):
     return inter_wiki_del_2(conn, tools, name)
 
-@app.route('/<regex("plus_(?:inter_wiki|(?:edit|email|file|name)_filter)"):tools>', methods=['POST', 'GET'])
+@app.route('/<regex("plus_(?:inter_wiki|edit_top|image_license|(?:edit|email|file|name)_filter)"):tools>', methods=['POST', 'GET'])
 @app.route('/<regex("plus_edit_filter"):tools>/<name>', methods=['POST', 'GET'])
 def inter_wiki_plus(tools = None, name = None):
     return inter_wiki_plus_2(conn, tools, name)
@@ -439,9 +443,9 @@ def topic_block(name = None, sub = None, num = 1):
 def topic_top(name = None, sub = None, num = 1):
     return topic_top_2(conn, name, sub, num)
                 
-@app.route('/topic/<everything:name>/sub/<sub>/tool/<regex("close|stop|agree"):tool>', methods=['POST', 'GET'])
-def topic_stop(name = None, sub = None, tool = None):
-    return topic_stop_2(conn, name, sub, tool)
+@app.route('/topic/<everything:name>/sub/<sub>/setting', methods=['POST', 'GET'])
+def topic_stop(name = None, sub = None):
+    return topic_stop_2(conn, name, sub)
 
 @app.route('/topic/<everything:name>/sub/<sub>/tool')
 def topic_tool(name = None, sub = None):
@@ -534,7 +538,15 @@ def list_user_topic(name = None):
 @app.route('/<regex("history"):tool>/<everything:name>', methods=['POST', 'GET'])
 def recent_changes(name = None, tool = 'record'):
     return recent_changes_2(conn, name, tool)
+
+@app.route('/history_tool/<everything:name>')
+def recent_history_tool(name = None):
+    return recent_history_tool_2(conn, name)
     
+@app.route('/history_delete/<everything:name>', methods=['POST', 'GET'])
+def recent_history_delete(name = None):
+    return recent_history_delete_2(conn, name)
+
 @app.route('/upload', methods=['GET', 'POST'])
 def func_upload():
     return func_upload_2(conn)
@@ -586,14 +598,23 @@ def api_version():
     return api_version_2(conn, r_ver, c_ver)
 
 @app.route('/api/skin_info')
-def api_skin_info():
-    return api_skin_info_2(conn)
+@app.route('/api/skin_info/<name>')
+def api_skin_info(name = ''):
+    return api_skin_info_2(conn, name)
+
+@app.route('/api/markup')
+def api_markup():
+    return api_markup_2(conn)
+
+@app.route('/api/user_info/<name>')
+def api_user_info(name = ''):
+    return api_user_info_2(conn, name)
 
 @app.route('/api/topic/<everything:name>/sub/<sub>')
 def api_topic_sub(name = '', sub = '', time = ''):
     return api_topic_sub_2(conn, name, sub, time)
     
-## File
+# File
 @app.route('/views/easter_egg.html')
 def main_easter_egg():
     return main_easter_egg_2(conn)
@@ -606,7 +627,7 @@ def main_views(name = None):
 def main_file(data = None):
     return main_file_2(conn, data)
 
-## End
+# End
 @app.errorhandler(404)
 def main_error_404(e):
     return main_error_404_2(conn)

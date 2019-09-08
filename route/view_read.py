@@ -13,9 +13,11 @@ def view_read_2(conn, name):
     else:
         if not flask.request.args.get('from', None):
             curs.execute("select title from back where link = ? and type = 'redirect'", [name])
-            redirect_data = curs.fetchall()
-            if redirect_data:
-                return redirect('/w/' + redirect_data[0][0] + '?from=' + name)
+            r_db = curs.fetchall()
+            if r_db:
+                r_data = link_fix(r_db[0][0])
+            
+                return redirect('/w/' + r_data[0] + '?from=' + name + r_data[1])
 
     curs.execute("select sub from rd where title = ? and not stop = 'O' order by date desc", [name])
     if curs.fetchall():
@@ -77,21 +79,7 @@ def view_read_2(conn, name):
     else:
         else_data = None
 
-    m = re.search("^user:([^/]*)", name)
-    if m:
-        g = m.groups()
-        
-        curs.execute("select acl from user where id = ?", [g[0]])
-        test = curs.fetchall()
-        if test and test[0][0] != 'user':
-            acl = ' (' + load_lang('admin') + ')'
-        else:
-            if ban_check(g[0]) == 1:
-                sub += ' (' + load_lang('blocked') + ')'
-            else:
-                acl = ''
-
-    curs.execute("select dec from acl where title = ?", [name])
+    curs.execute("select decu from acl where title = ?", [name])
     data = curs.fetchall()
     if data:
         acl += ' (' + load_lang('acl') + ')'
@@ -107,10 +95,38 @@ def view_read_2(conn, name):
 
     if end_data == 'HTTP Request 401.3':
         response_data = 401
-        end_data = '<h2>' + load_lang('error') + '</h2><ul><li>' + load_lang('authority_error') + '</li></ul>'
+        
+        curs.execute('select data from other where name = "error_401"')
+        sql_d = curs.fetchall()
+        if sql_d and sql_d[0][0] != '':
+            end_data = '<h2>' + load_lang('error') + '</h2><ul><li>' + sql_d[0][0] + '</li></ul>'
+        else:
+            end_data = '<h2>' + load_lang('error') + '</h2><ul><li>' + load_lang('authority_error') + '</li></ul>'
     elif end_data == 'HTTP Request 404':
         response_data = 404
-        end_data = '<h2>' + load_lang('error') + '</h2><ul><li>' + load_lang('decument_404_error') + '</li></ul>'
+        
+        curs.execute('select data from other where name = "error_404"')
+        sql_d = curs.fetchall()
+        if sql_d and sql_d[0][0] != '':
+            end_data = '<h2>' + load_lang('error') + '</h2><ul><li>' + sql_d[0][0] + '</li></ul>'
+        else:
+            end_data = '<h2>' + load_lang('error') + '</h2><ul><li>' + load_lang('decument_404_error') + '</li></ul>'
+            
+        curs.execute('select ip, date, leng, send from history where title = ? order by id desc limit 3', [name])
+        sql_d = curs.fetchall()
+        if sql_d:
+            end_data += '<h2>' + load_lang('history') + '</h2><ul>'
+            for i in sql_d:
+                if re.search("\+", i[2]):
+                    leng = '<span style="color:green;">(' + i[2] + ')</span>'
+                elif re.search("\-", i[2]):
+                    leng = '<span style="color:red;">(' + i[2] + ')</span>'
+                else:
+                    leng = '<span style="color:gray;">(' + i[2] + ')</span>'
+            
+                end_data += '<li>' + i[1] + ' | ' + ip_pas(i[0]) + ' | ' + leng + (' | ' + i[3] if i[3] != '' else '') + '</li>'
+                
+            end_data += '<li><a href="/history/' + url_pas(name) + '">(...)</a></li></ul>'
     else:
         response_data = 200
     
@@ -168,6 +184,15 @@ def view_read_2(conn, name):
     
     div = adsense_code + '<div>' + div + '</div>'
 
+    # 이 부분 개선 필요
+    match = re.search("^user:([^/]*)", name)
+    if match:
+        user_name = match.groups()[0]
+        div = '''
+            <div id="get_user_info"></div>
+            <script>load_user_info("''' + user_name + '''");</script>
+        ''' + div
+        
     return easy_minify(flask.render_template(skin_check(), 
         imp = [flask.request.args.get('show', name), wiki_set(), custom(), other2([sub + acl, r_date])],
         data = div,

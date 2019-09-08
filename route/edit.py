@@ -66,10 +66,22 @@ def edit_2(conn, name):
         new = curs.fetchall()
         if new:
             if flask.request.args.get('section', None):
-                test_data = '\n' + re.sub('\r\n', '\n', new[0][0]) + '\n'   
-                
-                section_data = re.findall('((?:={1,6}) ?(?:(?:(?!={1,6}\n).)+) ?={1,6}\n(?:(?:(?!(?:={1,6}) ?(?:(?:(?!={1,6}\n).)+) ?={1,6}\n).)*\n*)*)', test_data)
-                data = section_data[int(flask.request.args.get('section', '1')) - 1]
+                data = re.sub('\n(?P<in>={1,6})', '<br>\g<in>', html.escape('\n' + re.sub('\r\n', '\n', new[0][0]) + '\n'))
+                i = 0
+
+                while 1:
+                    g_data = re.search('((?:<br>)(?:(?:(?!\n|<br>).)+)(?:\n*(?:(?:(?!<br>).)+\n*)+)?)', data)
+                    if g_data:
+                        if int(flask.request.args.get('section', '1')) - 1 == i:
+                            data = html.unescape(re.sub('<br>(?P<in>={1,6})', '\n\g<in>', g_data.groups()[0]))
+                            
+                            break
+                        else:
+                            data = re.sub('((?:<br>)(?:(?:(?!\n|<br>).)+)(?:\n*(?:(?:(?!<br>).)+\n*)+)?)', '\n', data, 1)
+
+                        i += 1
+                    else:
+                        break
             else:
                 data = new[0][0]
         else:
@@ -111,7 +123,7 @@ def edit_2(conn, name):
                     <hr class=\"main_hr\">
                     ''' + captcha_get() + ip_warring() + '''
                     <button id="save" type="submit">''' + load_lang('save') + '''</button>
-                    <button id="preview" type="button" onclick="do_preview(\'''' + name + '\')">' + load_lang('preview') + '''</button>
+                    <button id="preview" type="button" onclick="load_preview(\'''' + name + '\')">' + load_lang('preview') + '''</button>
                 </form>
                 ''' + b_text + '''
                 <hr class=\"main_hr\">

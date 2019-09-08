@@ -1,4 +1,5 @@
 from .set_mark.namu import namu
+from .set_mark.markdown import markdown
 
 import re
 import html
@@ -44,6 +45,8 @@ def namumark(title = '', data = None, num = 0):
     rep_data = curs.fetchall()
     if rep_data[0][0] == 'namumark':
         data = namu(conn, data, title, num)
+    elif rep_data[0][0] == 'markdown':
+        data = markdown(conn, data, title, num)
     else:
         data = ['', '', []]
 
