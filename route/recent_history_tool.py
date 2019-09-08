@@ -35,6 +35,13 @@ def recent_history_tool_2(conn, name):
             </li>
         '''
 
+    if admin_check() == 1:
+        data += '''
+            <li>
+                <a href="/history_delete/''' + url_pas(name) + '?num=' + num + '">' + load_lang('history_delete') + '''
+            </li>
+        '''
+
     data += '''
         </ul>
     '''
