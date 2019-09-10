@@ -513,7 +513,7 @@ def namu(conn, data, title, main_num):
         
         backlink += [[title, main_link + other_link, 'redirect']]
         
-        data = redirect_re.sub('<br><ul><li>' + title + ' - <a href="' + tool.url_pas(main_link) + other_link + '">' + main_link + other_link + '</a></li></ul><br>', data, 1)
+        data = redirect_re.sub('\n<ul><li>' + title + ' - <a href="' + tool.url_pas(main_link) + other_link + '">' + main_link + other_link + '</a></li></ul>\n', data, 1)
 
     no_toc_re = re.compile('\[(?:목차|toc)\((?:no)\)\]\n', re.I)
     toc_re = re.compile('\[(?:목차|toc)\]', re.I)
