@@ -216,7 +216,11 @@ def login_oauth_2(conn, platform, func):
                     stand_json['picture']
                 ])
             else:
-                curs.execute('update oauth_conn set name = ? picture = ? where wiki_id = ?', [stand_json['name'], stand_json['pricture'], flask.session['id']])
+                curs.execute('update oauth_conn set name = ? picture = ? where wiki_id = ?', [
+                    stand_json['name'], 
+                    stand_json['picture'], 
+                    flask.session['id']
+                ])
 
             conn.commit()
         elif flask.session['referrer'][0:5] == 'login':
