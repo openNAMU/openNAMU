@@ -76,7 +76,7 @@ def api_topic_sub_2(conn, name, sub, time):
                         <tbody>
                             <tr>
                                 <td id="''' + t_color + '''">
-                                    <a href="#''' + i[0] + '">#' + i[0] + '</a> ' + ip + ' <span style="float: right;">' + i[2] + '''</span>
+                                    <a href="javascript:void(0);" id="''' + i[0] + '">#' + i[0] + '</a> ' + ip + ' <span style="float: right;">' + i[2] + '''</span>
                                 </td>
                             </tr>
                             <tr>
