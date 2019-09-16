@@ -1,10 +1,10 @@
 from .tool.func import *
 
-def func_title_random_2(conn):
-    curs = conn.cursor()
+def func_title_random_2():
+    
 
-    curs.execute("select title from data order by random() limit 1")
-    data = curs.fetchall()
+    sqlQuery("select title from data order by random() limit 1")
+    data = sqlQuery("fetchall")
     if data:
         return redirect('/w/' + url_pas(data[0][0]))
     else:

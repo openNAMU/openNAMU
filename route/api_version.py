@@ -1,7 +1,7 @@
 from .tool.func import *
 
-def api_version_2(conn, r_ver, c_ver):
-    curs = conn.cursor()
+def api_version_2(r_ver, c_ver):
+    
 
     n_ver = ''
     data = None

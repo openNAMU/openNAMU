@@ -1,7 +1,7 @@
 from .tool.func import *
 
-def api_user_info_2(conn, name):
-    curs = conn.cursor()
+def api_user_info_2(name):
+    
 
     if flask.request.args.get('render', None):
         plus_d = ''
@@ -26,8 +26,8 @@ def api_user_info_2(conn, name):
             </table>
         '''
         
-        curs.execute("select acl from user where id = ?", [name])
-        data = curs.fetchall()
+        sqlQuery("select acl from user where id = ?", [name])
+        data = sqlQuery("fetchall")
         if data:
             if data[0][0] != 'user':
                 plus_t += [data[0][0]]
@@ -45,8 +45,8 @@ def api_user_info_2(conn, name):
             else:
                 match = '-'
 
-            curs.execute("select end, login, band from ban where block = ? or block = ?", [name, match])
-            block_data = curs.fetchall()
+            sqlQuery("select end, login, band from ban where block = ? or block = ?", [name, match])
+            block_data = sqlQuery("fetchall")
             if block_data:
                 if block_data[0][0] != '':
                     plus_t += [load_lang('period') + ' : ' + block_data[0][0]]

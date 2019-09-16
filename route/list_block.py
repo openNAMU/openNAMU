@@ -1,7 +1,7 @@
 from .tool.func import *
 
-def list_block_2(conn, name, tool):
-    curs = conn.cursor()
+def list_block_2(name, tool):
+    
 
     num = int(number_check(flask.request.args.get('num', '1')))
     if num * 50 > 0:
@@ -21,15 +21,15 @@ def list_block_2(conn, name, tool):
     
     data_list = ''
 
-    curs.execute("delete from ban where (end < ? and end like '2%')", [get_time()])
-    conn.commit()
+    sqlQuery('delete from ban where (end < ? and end like "2%")', [get_time()])
+    sqlQuery("commit")
     
     if not name:        
         if flask.request.args.get('type', '') == 'ongoing':
             sub = ' (' + load_lang('in_progress') + ')'
             menu = [['block_log', load_lang('normal')]]
 
-            curs.execute("select why, block, '', end, '', band from ban where ((end > ? and end like '2%') or end = '') order by end desc limit ?, '50'", [get_time(), str(sql_num)])
+            sqlQuery('select why, block, '', end, '', band from ban where ((end > ? and end like "2%") or end = "") order by end desc limit ?, "50"', [get_time(), str(sql_num)])
         else:
             sub = 0
             menu = 0
@@ -39,21 +39,21 @@ def list_block_2(conn, name, tool):
                 <hr class=\"main_hr\">
             ''' + div
             
-            curs.execute("select why, block, blocker, end, today, band from rb order by today desc limit ?, '50'", [str(sql_num)])
+            sqlQuery('select why, block, blocker, end, today, band from rb order by today desc limit ?, "50"', [str(sql_num)])
     else:
         menu = [['block_log', load_lang('normal')]]
         
         if tool == 'block_user':
             sub = ' (' + load_lang('blocked') + ')'
             
-            curs.execute("select why, block, blocker, end, today, band from rb where block = ? order by today desc limit ?, '50'", [name, str(sql_num)])
+            sqlQuery('select why, block, blocker, end, today, band from rb where block = ? order by today desc limit ?, "50"', [name, str(sql_num)])
         else:
             sub = ' (' + load_lang('admin') + ')'
             
-            curs.execute("select why, block, blocker, end, today, band from rb where blocker = ? order by today desc limit ?, '50'", [name, str(sql_num)])
+            sqlQuery('select why, block, blocker, end, today, band from rb where blocker = ? order by today desc limit ?, "50"', [name, str(sql_num)])
 
     if data_list == '':
-        data_list = curs.fetchall()
+        data_list = sqlQuery("fetchall")
 
     for data in data_list:
         why = html.escape(data[0])

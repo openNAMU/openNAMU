@@ -1,7 +1,7 @@
 from .tool.func import *
 
-def login_oauth_2(conn, platform, func):
-    curs = conn.cursor()
+def login_oauth_2(platform, func):
+    
 
     publish_url = load_oauth('publish_url')
     oauth_data = load_oauth(platform)
@@ -205,10 +205,10 @@ def login_oauth_2(conn, platform, func):
             }
         
         if flask.session['referrer'][0:6] == 'change':
-            curs.execute('select * from oauth_conn where wiki_id = ? and provider = ?', [flask.session['id'], platform])
-            oauth_result = curs.fetchall()
+            sqlQuery('select * from oauth_conn where wiki_id = ? and provider = ?', [flask.session['id'], platform])
+            oauth_result = sqlQuery("fetchall")
             if len(oauth_result) == 0:
-                curs.execute('insert into oauth_conn (provider, wiki_id, sns_id, name, picture) values(?, ?, ?, ?, ?)', [
+                sqlQuery('insert into oauth_conn (provider, wiki_id, sns_id, name, picture) values(?, ?, ?, ?, ?)', [
                     platform, 
                     flask.session['id'], 
                     stand_json['id'], 
@@ -216,16 +216,16 @@ def login_oauth_2(conn, platform, func):
                     stand_json['picture']
                 ])
             else:
-                curs.execute('update oauth_conn set name = ? picture = ? where wiki_id = ?', [
+                sqlQuery('update oauth_conn set name = ? picture = ? where wiki_id = ?', [
                     stand_json['name'], 
                     stand_json['picture'], 
                     flask.session['id']
                 ])
 
-            conn.commit()
+            sqlQuery("commit")
         elif flask.session['referrer'][0:5] == 'login':
-            curs.execute('select * from oauth_conn where provider = ? and sns_id = ?', [platform, stand_json['id']])
-            curs_result = curs.fetchall()
+            sqlQuery('select * from oauth_conn where provider = ? and sns_id = ?', [platform, stand_json['id']])
+            curs_result = sqlQuery("fetchall")
             if len(curs_result) == 0:
                 return re_error('/error/2')
             else:

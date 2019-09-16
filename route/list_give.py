@@ -1,13 +1,13 @@
 from .tool.func import *
 
-def list_give_2(conn):
-    curs = conn.cursor()
+def list_give_2():
+    
 
     list_data = '<ul>'
     back = ''
 
-    curs.execute("select distinct name from alist order by name asc")
-    for data in curs.fetchall():                      
+    sqlQuery("select distinct name from alist order by name asc")
+    for data in sqlQuery("fetchall"):                      
         if back != data[0]:
             back = data[0]
 

@@ -1,12 +1,12 @@
 from .tool.func import *
 
-def list_not_close_topic_2(conn):
-    curs = conn.cursor()
+def list_not_close_topic_2():
+    
 
     div = '<ul>'
     
-    curs.execute('select title, sub from rd where stop != "O" order by date desc')
-    n_list = curs.fetchall()
+    sqlQuery('select title, sub from rd where stop != "O" order by date desc')
+    n_list = sqlQuery("fetchall")
     for data in n_list:
         div += '<li><a href="/topic/' + url_pas(data[0]) + '/sub/' + url_pas(data[1]) + '">' + html.escape(data[0]) + ' (' + data[1] + ')</a></li>'
             

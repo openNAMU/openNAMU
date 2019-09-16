@@ -4,8 +4,8 @@ import datetime
 import html
 import re
 
-def markdown(conn, data, title, main_num):
-    curs = conn.cursor()
+def markdown(data, title, main_num):
+    
     
     data = '<div id="render_contect">' + re.sub('\r\n', '<br>', html.escape(data)) + '</div>'
     plus_data = '<script>render_markdown();</script>'

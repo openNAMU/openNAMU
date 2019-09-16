@@ -1,7 +1,7 @@
 from .tool.func import *
 
-def recent_changes_2(conn, name, tool):
-    curs = conn.cursor()
+def recent_changes_2(name, tool):
+    
 
     if flask.request.method == 'POST':
         return redirect(
@@ -41,26 +41,20 @@ def recent_changes_2(conn, name, tool):
                 tool_select = flask.request.args.get('tool', None)
                 if tool_select:
                     if tool_select == 'move':
-                        curs.execute('''
-                            select id, title, date, ip, send, leng from history
-                            where send like ? or send like ?
-                            order by id + 0 desc
-                            limit ?, '50'
-                        ''', ['%(<a>' + name +'</a>%', '%<a>' + name + '</a> move)', str(sql_num)])
+                        sqlQuery("select id, title, date, ip, send, leng from history \
+                            where send like ? or send like ? \
+                            order by id + 0 desc \
+                            limit ?, '50'", ['%(<a>' + name +'</a>%', '%<a>' + name + '</a> move)', str(sql_num)])
                     else:
-                        curs.execute('''
-                            select id, title, date, ip, send, leng from history
-                            where title = ?
-                            order by id + 0 desc
-                            limit ?, '50'
-                        ''', [name, str(sql_num)])
+                        sqlQuery("select id, title, date, ip, send, leng from history \
+                            where title = ? \
+                            order by id + 0 desc\
+                            limit ?, '50'", [name, str(sql_num)])
                 else:
-                    curs.execute('''
-                        select id, title, date, ip, send, leng from history
-                        where title = ?
-                        order by id + 0 desc
-                        limit ?, '50'
-                    ''', [name, str(sql_num)])
+                    sqlQuery("select id, title, date, ip, send, leng from history \
+                        where title = ? \
+                        order by id + 0 desc \
+                        limit ?, '50'", [name, str(sql_num)])
             else:
                 div +=  '''
                         <td id="main_table_width">''' + load_lang('document_name') + '''</td>
@@ -71,7 +65,7 @@ def recent_changes_2(conn, name, tool):
 
                 div = '<a href="/topic_record/' + url_pas(name) + '">(' + load_lang('discussion') + ')</a><hr class=\"main_hr\">' + div
                 
-                curs.execute("select id, title, date, ip, send, leng from history where ip = ? order by date desc limit ?, '50'", [name, str(sql_num)])
+                sqlQuery("select id, title, date, ip, send, leng from history where ip = ? order by date desc limit ?, '50'", [name, str(sql_num)])
         else:
             num = int(number_check(flask.request.args.get('num', '1')))
             if num * 50 > 0:
@@ -86,23 +80,19 @@ def recent_changes_2(conn, name, tool):
                 </tr>
             '''
             if flask.request.args.get('set', 'normal') == 'user':
-                curs.execute('''
-                    select id, title, date, ip, send, leng from history 
-                    where title like 'user:%' 
-                    order by date desc 
-                    limit ?, 50
-                ''', [str(sql_num)])
+                sqlQuery("select id, title, date, ip, send, leng from history \
+                    where title like 'user:%' \
+                    order by date desc \
+                    limit ?, '50'", [str(sql_num)])
             else:
                 div = '<a href="?set=user">(' + load_lang('user_document') + ')</a>' + div
 
-                curs.execute('''
-                    select id, title, date, ip, send, leng from history 
-                    where not title like 'user:%' 
-                    order by date desc 
-                    limit ?, 50
-                ''', [str(sql_num)])
+                sqlQuery("select id, title, date, ip, send, leng from history \
+                    where not title like 'user:%' \
+                    order by date desc \
+                    limit ?, '50'", [str(sql_num)])
 
-        data_list = curs.fetchall()
+        data_list = sqlQuery("fetchall")
         for data in data_list:    
             select += '<option value="' + data[0] + '">' + data[0] + '</option>'     
             send = '<br>'
@@ -124,11 +114,8 @@ def recent_changes_2(conn, name, tool):
             style = ['', '']
             date = data[2]
 
-            curs.execute('''
-                select title from history
-                where title = ? and id = ? and hide = 'O'
-            ''', [data[1], data[0]])
-            hide = curs.fetchall()
+            sqlQuery("select title from history where title = ? and id = ? and hide = 'O'", [data[1], data[0]])
+            hide = sqlQuery("fetchall")
             
             if six_admin == 1:
                 if hide:                    
@@ -197,8 +184,8 @@ def recent_changes_2(conn, name, tool):
                 
                 div += next_fix('/history/' + url_pas(name) + '?num=', num, data_list)
             else:
-                curs.execute("select end from ban where block = ?", [name])
-                if curs.fetchall():
+                sqlQuery("select end from ban where block = ?", [name])
+                if sqlQuery("fetchall"):
                     sub += ' (' + load_lang('blocked') + ')'
 
                 title = load_lang('edit_record')

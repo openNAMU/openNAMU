@@ -3,7 +3,10 @@ from .set_mark.markdown import markdown
 
 import re
 import html
+import json
+import pymysql
 import sqlite3
+# import psycopg2 as pg2
 import urllib.parse
 import threading
 import multiprocessing
@@ -14,6 +17,61 @@ def load_conn2(data):
 
     conn = data
     curs = conn.cursor()
+
+def q_mariadb2(query, *arg):
+    with open("DB_Data.json") as fileRead:
+        db_data = json.load(fileRead)
+
+    curs.execute(f'USE {db_data["db_name"]};')
+    curs.execute('SET @@global.sql_mode= \'NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION\';')
+    
+    if arg:
+        qarg = tuple(arg[0])
+        sql = query.replace("%", "%%")
+        sql = sql.replace("?", "%s")
+        sql = sql.replace("'", '"')
+
+        return curs.execute(sql, qarg)
+    elif not arg:
+        sql = query.replace("%", "%%")
+        sql = sql.replace("'", '"')
+        sql = sql.replace("random()", "RAND()")
+
+        return curs.execute(sql)
+
+def q_sqlite2(query, *arg):
+    if arg:
+        qarg = arg[0]
+        return curs.execute(query, qarg)
+    elif not arg:
+        return curs.execute(query)
+
+def sqlQuery2(query, *arg):
+    db_type = {}
+    try:
+        open('DB_Type.json', mode='r', encoding='utf-8')
+    except FileNotFoundError:
+        print("error!")
+
+    with open("DB_Type.json") as fileRead:
+        db_type = json.load(fileRead)
+
+    if db_type["DBMS"] == "mariadb":
+        if query == "fetchall":
+            return curs.fetchall()
+        elif query == "commit":
+            pass
+        else:
+            return q_mariadb2(query, *arg)
+    elif db_type["DBMS"] == "sqlite":
+        if query == "fetchall":
+            return curs.fetchall()
+        elif query == "commit":
+            return conn.commit()
+        else:
+            return q_sqlite2(query, *arg)
+    else:
+        print("DBMS Type Error")
 
 def send_parser(data):
     if not re.search('^<br>$', data):
@@ -36,13 +94,13 @@ def send_parser(data):
     
 def plusing(data):
     for data_in in data:
-        curs.execute("select title from back where title = ? and link = ? and type = ?", [data_in[1], data_in[0], data_in[2]])
-        if not curs.fetchall():
-            curs.execute("insert into back (title, link, type) values (?, ?, ?)", [data_in[1], data_in[0], data_in[2]])
+        sqlQuery2("select title from back where title = ? and link = ? and type = ?", [data_in[1], data_in[0], data_in[2]])
+        if not sqlQuery2("fetchall"):
+            sqlQuery2("insert into back (title, link, type) values (?, ?, ?)", [data_in[1], data_in[0], data_in[2]])
 
-def namumark(title = '', data = None, num = 0):
-    curs.execute('select data from other where name = "markup"')
-    rep_data = curs.fetchall()
+def namumark(conn, title = '', data = None, num = 0):
+    sqlQuery2('select data from other where name = "markup"')
+    rep_data = sqlQuery2("fetchall")
     if rep_data[0][0] == 'namumark':
         data = namu(conn, data, title, num)
     elif rep_data[0][0] == 'markdown':
@@ -66,6 +124,6 @@ def namumark(title = '', data = None, num = 0):
             thread_start.start()
             thread_start.join()
         
-        conn.commit()
+        sqlQuery2("commit")
         
     return data[0] + data[1]

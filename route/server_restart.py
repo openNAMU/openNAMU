@@ -1,7 +1,7 @@
 from .tool.func import *
 
-def server_restart_2(conn):
-    curs = conn.cursor()
+def server_restart_2():
+    
 
     if admin_check() != 1:
         return re_error('/error/3')

@@ -1,7 +1,7 @@
 from .tool.func import *
 
-def func_upload_2(conn):
-    curs = conn.cursor()
+def func_upload_2():
+    
 
     if ban_check() == 1:
         return re_error('/ban')
@@ -34,12 +34,12 @@ def func_upload_2(conn):
 
         e_data = sha224(piece[0]) + piece[1]
 
-        curs.execute("select title from data where title = ?", ['file:' + name])
-        if curs.fetchall():
+        sqlQuery("select title from data where title = ?", ['file:' + name])
+        if sqlQuery("fetchall"):
             return re_error('/error/16')
 
-        curs.execute("select html from html_filter where kind = 'file'")
-        db_data = curs.fetchall()
+        sqlQuery("select html from html_filter where kind = 'file'")
+        db_data = sqlQuery("fetchall")
         for i in db_data:
             t_re = re.compile(i[0])
             if t_re.search(name):
@@ -73,8 +73,8 @@ def func_upload_2(conn):
 
         file_d = '[[file:' + name + ']][br][br]{{{[[file:' + name + ']]}}}[br][br]' + lice
         
-        curs.execute("insert into data (title, data) values (?, ?)", ['file:' + name, file_d])
-        curs.execute("insert into acl (title, decu, dis, why, view) values (?, 'admin', '', '', '')", ['file:' + name])
+        sqlQuery("insert into data (title, data) values (?, ?)", ['file:' + name, file_d])
+        sqlQuery("insert into acl (title, decu, dis, why, view) values (?, 'admin', '', '', '')", ['file:' + name])
 
         render_set(
             title = name,
@@ -91,7 +91,7 @@ def func_upload_2(conn):
             '0'
         )
         
-        conn.commit()
+        sqlQuery("commit")
         
         return redirect('/w/file:' + name)      
     else:
@@ -99,8 +99,8 @@ def func_upload_2(conn):
             <option value="direct_input">''' + load_lang('direct_input') + '''</option>
         '''
 
-        curs.execute("select html from html_filter where kind = 'image_license'")
-        db_data = curs.fetchall()
+        sqlQuery("select html from html_filter where kind = 'image_license'")
+        db_data = sqlQuery("fetchall")
         for i in db_data:
             license_list += '''
                 <option value="''' + i[0] + '''">''' + i[0] + '''</option>

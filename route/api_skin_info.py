@@ -1,7 +1,7 @@
 from .tool.func import *
 
-def api_skin_info_2(conn, name):
-    curs = conn.cursor()
+def api_skin_info_2(name):
+    
 
     if name == '':
         name = skin_check()

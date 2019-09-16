@@ -1,7 +1,7 @@
 from .tool.func import *
 
-def view_xref_2(conn, name):
-    curs = conn.cursor()
+def view_xref_2(name):
+    
 
     num = int(number_check(flask.request.args.get('num', '1')))
     if num * 50 > 0:
@@ -11,16 +11,16 @@ def view_xref_2(conn, name):
         
     div = '<ul>'
     
-    curs.execute("select link, type from back where title = ? and not type = 'cat' and not type = 'no' order by link asc limit ?, '50'", [name, str(sql_num)])
-    data_list = curs.fetchall()
+    sqlQuery("select link, type from back where title = ? and not type = 'cat' and not type = 'no' order by link asc limit ?, '50'", [name, str(sql_num)])
+    data_list = sqlQuery("fetchall")
     for data in data_list:
         div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a>'
         
         if data[1]:                
             div += ' (' + data[1] + ')'
         
-        curs.execute("select title from back where title = ? and type = 'include'", [data[0]])
-        db_data = curs.fetchall()
+        sqlQuery("select title from back where title = ? and type = 'include'", [data[0]])
+        db_data = sqlQuery("fetchall")
         if db_data:
             div += ' <a id="inside" href="/xref/' + url_pas(data[0]) + '">(' + load_lang('backlink') + ')</a>'
 

@@ -1,20 +1,20 @@
 from .tool.func import *
 
-def view_diff_data_2(conn, name):
-    curs = conn.cursor()
+def view_diff_data_2(name):
+    
 
     first = number_check(flask.request.args.get('first', '1'))
     second = number_check(flask.request.args.get('second', '1'))
 
-    curs.execute("select title from history where title = ? and (id = ? or id = ?) and hide = 'O'", [name, first, second])
-    if curs.fetchall() and admin_check(6) != 1:
+    sqlQuery("select title from history where title = ? and (id = ? or id = ?) and hide = 'O'", [name, first, second])
+    if sqlQuery("fetchall") and admin_check(6) != 1:
         return re_error('/error/3')
 
-    curs.execute("select data from history where id = ? and title = ?", [first, name])
-    first_raw_data = curs.fetchall()
+    sqlQuery("select data from history where id = ? and title = ?", [first, name])
+    first_raw_data = sqlQuery("fetchall")
     if first_raw_data:
-        curs.execute("select data from history where id = ? and title = ?", [second, name])
-        second_raw_data = curs.fetchall()
+        sqlQuery("select data from history where id = ? and title = ?", [second, name])
+        second_raw_data = sqlQuery("fetchall")
         if second_raw_data:
             first_data = html.escape(first_raw_data[0][0])            
             second_data = html.escape(second_raw_data[0][0])

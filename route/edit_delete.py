@@ -1,7 +1,7 @@
 from .tool.func import *
 
-def edit_delete_2(conn, name, app_var):
-    curs = conn.cursor()
+def edit_delete_2(name, app_var):
+    
 
     ip = ip_check()
     if acl_check(name) == 1:
@@ -13,8 +13,8 @@ def edit_delete_2(conn, name, app_var):
         else:
             captcha_post('', 0)
 
-        curs.execute("select data from data where title = ?", [name])
-        data = curs.fetchall()
+        sqlQuery("select data from data where title = ?", [name])
+        data = sqlQuery("fetchall")
         if data:
             today = get_time()
             leng = '-' + str(len(data[0][0]))
@@ -29,13 +29,13 @@ def edit_delete_2(conn, name, app_var):
                 'delete'
             )
             
-            curs.execute("select title, link from back where title = ? and not type = 'cat' and not type = 'no'", [name])
-            for data in curs.fetchall():
-                curs.execute("insert into back (title, link, type) values (?, ?, 'no')", [data[0], data[1]])
+            sqlQuery("select title, link from back where title = ? and not type = 'cat' and not type = 'no'", [name])
+            for data in sqlQuery("fetchall"):
+                sqlQuery("insert into back (title, link, type) values (?, ?, 'no')", [data[0], data[1]])
             
-            curs.execute("delete from back where link = ?", [name])
-            curs.execute("delete from data where title = ?", [name])
-            conn.commit()
+            sqlQuery("delete from back where link = ?", [name])
+            sqlQuery("delete from data where title = ?", [name])
+            sqlQuery("commit")
 
         file_check = re.search('^file:(.+)\.(.+)$', name)
         if file_check:
@@ -47,8 +47,8 @@ def edit_delete_2(conn, name, app_var):
             
         return redirect('/w/' + url_pas(name))
     else:
-        curs.execute("select title from data where title = ?", [name])
-        if not curs.fetchall():
+        sqlQuery("select title from data where title = ?", [name])
+        if not sqlQuery("fetchall"):
             return redirect('/w/' + url_pas(name))
 
         return easy_minify(flask.render_template(skin_check(), 

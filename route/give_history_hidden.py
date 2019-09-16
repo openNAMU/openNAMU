@@ -1,17 +1,17 @@
 from .tool.func import *
 
-def give_history_hidden_2(conn, name):
-    curs = conn.cursor()
+def give_history_hidden_2(name):
+    
 
     num = number_check(flask.request.args.get('num', '1'))
 
     if admin_check(6, 'history_hidden (' + name + '#' + num + ')') == 1:
-        curs.execute("select title from history where title = ? and id = ? and hide = 'O'", [name, num])
-        if curs.fetchall():
-            curs.execute("update history set hide = '' where title = ? and id = ?", [name, num])
+        sqlQuery("select title from history where title = ? and id = ? and hide = 'O'", [name, num])
+        if sqlQuery("fetchall"):
+            sqlQuery("update history set hide = '' where title = ? and id = ?", [name, num])
         else:
-            curs.execute("update history set hide = 'O' where title = ? and id = ?", [name, num])
+            sqlQuery("update history set hide = 'O' where title = ? and id = ?", [name, num])
             
-        conn.commit()
+        sqlQuery("commit")
     
     return redirect('/history/' + url_pas(name))

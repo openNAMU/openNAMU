@@ -28,7 +28,7 @@ if len(all_src) == 1:
     print('DB\'s name : ' + db_name)
 
 conn = sqlite3.connect(db_name + '.db', check_same_thread = False)
-curs = conn.cursor()
+
 
 load_conn(conn)
 
@@ -51,11 +51,11 @@ if what_i_do == '1':
     def parser(data):
         namumark(data[0], data[1], 1)
 
-    curs.execute("delete from back")
-    conn.commit()
+    sqlQuery("delete from back")
+    sqlQuery("commit")
 
-    curs.execute("select title, data from data")
-    data = curs.fetchall()
+    sqlQuery("select title, data from data")
+    data = sqlQuery("fetchall")
     num = 0
 
     for test in data:
@@ -68,8 +68,8 @@ if what_i_do == '1':
         if num % 10 == 0:
             print(num)
 elif what_i_do == '2':
-    curs.execute("delete from other where name = 'recaptcha'")
-    curs.execute("delete from other where name = 'sec_re'")
+    sqlQuery("delete from other where name = 'recaptcha'")
+    sqlQuery("delete from other where name = 'sec_re'")
 elif what_i_do == '3':
     print('----')
     print('IP or Name : ', end = '')
@@ -80,7 +80,7 @@ elif what_i_do == '3':
     else:
         band = ''
 
-        curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, ?)", 
+        sqlQuery("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, ?)", 
             [user_data, 
             'release', 
             get_time(), 
@@ -88,25 +88,25 @@ elif what_i_do == '3':
             '', 
             band
         ])
-    curs.execute("delete from ban where block = ?", [user_data])
+    sqlQuery("delete from ban where block = ?", [user_data])
 elif what_i_do == '4':
     print('----')
     print('Host : ', end = '')
     host = input()
 
-    curs.execute("update other set data = ? where name = 'host'", [host])
+    sqlQuery("update other set data = ? where name = 'host'", [host])
 elif what_i_do == '5':
     print('----')
     print('Port : ', end = '')
     port = int(input())
 
-    curs.execute("update other set data = ? where name = 'port'", [port])
+    sqlQuery("update other set data = ? where name = 'port'", [port])
 elif what_i_do == '6':
     print('----')
     print('Skin\'s name : ', end = '')
     skin = input()
 
-    curs.execute("update other set data = ? where name = 'skin'", [skin])
+    sqlQuery("update other set data = ? where name = 'skin'", [skin])
 elif what_i_do == '7':
     print('----')
     print('1. sha256')
@@ -132,9 +132,9 @@ elif what_i_do == '7':
         else:
             hashed = hashlib.sha3_256(bytes(user_pw, 'utf-8')).hexdigest()
        
-    curs.execute("update user set pw = ? where id = ?", [hashed, user_name])
+    sqlQuery("update user set pw = ? where id = ?", [hashed, user_name])
 elif what_i_do == '8':
-    curs.execute("update other set data = '00000' where name = 'ver'")
+    sqlQuery("update other set data = '00000' where name = 'ver'")
 else:
     print('----')
     print('DB\'s name (data) : ', end = '')
@@ -145,7 +145,7 @@ else:
 
     sqlite3.connect(db_name + '.db', check_same_thread = False)
 
-conn.commit()
+sqlQuery("commit")
 
 print('----')
 print('OK')

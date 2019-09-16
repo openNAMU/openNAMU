@@ -1,7 +1,7 @@
 from .tool.func import *
 
-def recent_history_delete_2(conn, name):
-    curs = conn.cursor()
+def recent_history_delete_2(name):
+    
 
     num = str(int(number_check(flask.request.args.get('num', '1'))))
 
@@ -11,8 +11,8 @@ def recent_history_delete_2(conn, name):
     if flask.request.method == 'POST':
         admin_check(None, 'history delete r' + num)
 
-        curs.execute("delete from history where id = ? and title = ?", [num, name])
-        conn.commit()
+        sqlQuery("delete from history where id = ? and title = ?", [num, name])
+        sqlQuery("commit")
 
         return redirect('/history/' + url_pas(name))
     else:

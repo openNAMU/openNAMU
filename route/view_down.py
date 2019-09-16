@@ -1,12 +1,12 @@
 from .tool.func import *
 
-def view_down_2(conn, name):
-    curs = conn.cursor()
+def view_down_2(name):
+    
 
     div = '<ul>'
 
-    curs.execute("select title from data where title like ?", [name + '/%'])
-    for data in curs.fetchall():
+    sqlQuery("select title from data where title like ?", [name + '/%'])
+    for data in sqlQuery("fetchall"):
         div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a></li>'
         
     div += '</ul>'

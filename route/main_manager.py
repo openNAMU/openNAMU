@@ -1,7 +1,7 @@
 from .tool.func import *
 
-def main_manager_2(conn, num, r_ver):
-    curs = conn.cursor()
+def main_manager_2(num, r_ver):
+    
     
     title_list = {
         0 : [load_lang('document_name'), 'acl'], 

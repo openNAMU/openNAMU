@@ -1,7 +1,7 @@
 from .tool.func import *
 
-def topic_stop_2(conn, name, sub):
-    curs = conn.cursor()
+def topic_stop_2(name, sub):
+    
 
     if admin_check(3) != 1:
         return re_error('/error/3')
@@ -10,14 +10,14 @@ def topic_stop_2(conn, name, sub):
     time = get_time()
 
     if flask.request.method == 'POST':
-        curs.execute("select id from topic where title = ? and sub = ? order by id + 0 desc limit 1", [name, sub])
-        topic_check = curs.fetchall()
+        sqlQuery("select id from topic where title = ? and sub = ? order by id + 0 desc limit 1", [name, sub])
+        topic_check = sqlQuery("fetchall")
         if topic_check:
             stop_d = flask.request.form.get('stop_d', '')
             why_d = flask.request.form.get('why', '')
             agree_d = flask.request.form.get('agree', '')
 
-            curs.execute("update rd set stop = ?, agree = ? where title = ? and sub = ?", [
+            sqlQuery("update rd set stop = ?, agree = ? where title = ? and sub = ?", [
                 stop_d,
                 agree_d,
                 name, 
@@ -31,7 +31,7 @@ def topic_stop_2(conn, name, sub):
             else:
                 t_state = 'Normal'
 
-            curs.execute("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, ?, ?, ?, '', '1')", [
+            sqlQuery("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, ?, ?, ?, '', '1')", [
                 str(int(topic_check[0][0]) + 1), 
                 name, 
                 sub, 
@@ -47,8 +47,8 @@ def topic_stop_2(conn, name, sub):
         stop_d_list = ''
         agree_check = ''
 
-        curs.execute("select stop, agree from rd where title = ? and sub = ? limit 1", [name, sub])
-        rd_d = curs.fetchall()
+        sqlQuery("select stop, agree from rd where title = ? and sub = ? limit 1", [name, sub])
+        rd_d = sqlQuery("fetchall")
         if rd_d[0][0] == 'O':
             stop_d_list += '''
                 <option value="O">Close</option>

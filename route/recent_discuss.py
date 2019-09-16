@@ -1,7 +1,7 @@
 from .tool.func import *
 
-def recent_discuss_2(conn):
-    curs = conn.cursor()
+def recent_discuss_2():
+    
 
     div = ''
     
@@ -25,11 +25,11 @@ def recent_discuss_2(conn):
             '''
     
     if m_sub == 0:
-        curs.execute("select title, sub, date from rd where not stop = 'O' order by date desc limit 50")
+        sqlQuery("select title, sub, date from rd where not stop = 'O' order by date desc limit 50")
     else:
-        curs.execute("select title, sub, date from rd where stop = 'O' order by date desc limit 50")
+        sqlQuery("select title, sub, date from rd where stop = 'O' order by date desc limit 50")
         
-    for data in curs.fetchall():
+    for data in sqlQuery("fetchall"):
         title = html.escape(data[0])
         sub = html.escape(data[1])
 

@@ -1,7 +1,7 @@
 from .tool.func import *
 
-def list_admin_use_2(conn):
-    curs = conn.cursor()
+def list_admin_use_2():
+    
     
     num = int(number_check(flask.request.args.get('num', '1')))
     if num * 50 > 0:
@@ -15,14 +15,14 @@ def list_admin_use_2(conn):
         list_data = '<ul>'
 
         if flask.request.args.get('search', 'normal') == 'normal':
-            curs.execute("select who, what, time from re_admin order by time desc limit ?, '50'", [str(sql_num)])
+            sqlQuery("select who, what, time from re_admin order by time desc limit ?, '50'", [str(sql_num)])
         else:
-            curs.execute("select who, what, time from re_admin where what like ? order by time desc limit ?, '50'", [
+            sqlQuery("select who, what, time from re_admin where what like ? order by time desc limit ?, '50'", [
                 flask.request.args.get('search', 'normal') + "%",
                 str(sql_num)
             ])
 
-        get_list = curs.fetchall()
+        get_list = sqlQuery("fetchall")
         for data in get_list:            
             list_data += '<li>' + ip_pas(data[0]) + ' / ' + data[1] + ' / ' + data[2] + '</li>'
 

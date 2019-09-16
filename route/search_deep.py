@@ -1,7 +1,7 @@
 from .tool.func import *
 
-def search_deep_2(conn, name):
-    curs = conn.cursor()
+def search_deep_2(name):
+    
 
     if name == '':
         return redirect()
@@ -17,8 +17,8 @@ def search_deep_2(conn, name):
     div_plus = ''
     test = ''
     
-    curs.execute("select title from data where title = ?", [name])
-    if curs.fetchall():
+    sqlQuery("select title from data where title = ?", [name])
+    if sqlQuery("fetchall"):
         link_id = ''
     else:
         link_id = 'id="not_thing"'
@@ -33,13 +33,13 @@ def search_deep_2(conn, name):
             <ul>
             '''
 
-    curs.execute(
-        "select distinct title, case when title like ? then '제목' else '내용' \
+    sqlQuery(
+        'select distinct title, case when title like ? then "제목" else "내용" \
         end from data where title like ? or data like ? order by case \
-        when title like ? then 1 else 2 end limit ?, '50'",
+        when title like ? then 1 else 2 end limit ?, "50"',
         ['%' + name + '%', '%' + name + '%', '%' + name + '%', '%' + name + '%', str(sql_num)]
     )
-    all_list = curs.fetchall()
+    all_list = sqlQuery("fetchall")
     if all_list:
         test = all_list[0][1]
         

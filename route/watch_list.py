@@ -1,7 +1,7 @@
 from .tool.func import *
 
-def watch_list_2(conn):
-    curs = conn.cursor()
+def watch_list_2():
+    
 
     div = 'Limit : 10<hr class=\"main_hr\">'
     
@@ -10,11 +10,11 @@ def watch_list_2(conn):
 
     ip = ip_check()
 
-    curs.execute("delete from scan where user = ? and title = ''", [ip])
-    conn.commit()
+    sqlQuery("delete from scan where user = ? and title = ''", [ip])
+    sqlQuery("commit")
 
-    curs.execute("select title from scan where user = ?", [ip])
-    data = curs.fetchall()
+    sqlQuery("select title from scan where user = ?", [ip])
+    data = sqlQuery("fetchall")
     for data_list in data:
         div += '<li><a href="/w/' + url_pas(data_list[0]) + '">' + data_list[0] + '</a> <a href="/watch_list/' + url_pas(data_list[0]) + '">(' + load_lang('delete') + ')</a></li>'
 

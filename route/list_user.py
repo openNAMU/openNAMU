@@ -1,7 +1,7 @@
 from .tool.func import *
 
-def list_user_2(conn):
-    curs = conn.cursor()
+def list_user_2():
+    
 
     num = int(number_check(flask.request.args.get('num', '1')))
     if num * 50 > 0:
@@ -13,12 +13,12 @@ def list_user_2(conn):
 
     admin_one = admin_check(1)
     
-    curs.execute("select id, date from user order by date desc limit ?, '50'", [str(sql_num)])
-    user_list = curs.fetchall()
+    sqlQuery("select id, date from user order by date desc limit ?, '50'", [str(sql_num)])
+    user_list = sqlQuery("fetchall")
     for data in user_list:
         if admin_one == 1:
-            curs.execute("select block from ban where block = ?", [data[0]])
-            if curs.fetchall():
+            sqlQuery("select block from ban where block = ?", [data[0]])
+            if sqlQuery("fetchall"):
                 ban_button = ' <a href="/ban/' + url_pas(data[0]) + '">(' + load_lang('ban_release') + ')</a>'
             else:
                 ban_button = ' <a href="/ban/' + url_pas(data[0]) + '">(' + load_lang('ban') + ')</a>'

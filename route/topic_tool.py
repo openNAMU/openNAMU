@@ -1,12 +1,12 @@
 from .tool.func import *
 
-def topic_tool_2(conn, name, sub):
-    curs = conn.cursor()
+def topic_tool_2(name, sub):
+    
 
     data = ''
 
-    curs.execute("select stop, agree from rd where title = ? and sub = ?", [name, sub])
-    close_data = curs.fetchall()
+    sqlQuery("select stop, agree from rd where title = ? and sub = ?", [name, sub])
+    close_data = sqlQuery("fetchall")
     if close_data:
         if close_data[0][0] == 'S':
             t_state = 'Stop'

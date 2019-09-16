@@ -1,7 +1,7 @@
 from .tool.func import *
 
-def view_read_2(conn, name):
-    curs = conn.cursor()
+def view_read_2(name):
+    
 
     sub = ''
     acl = ''
@@ -12,21 +12,21 @@ def view_read_2(conn, name):
         num = int(number_check(num))
     else:
         if not flask.request.args.get('from', None):
-            curs.execute("select title from back where link = ? and type = 'redirect'", [name])
-            r_db = curs.fetchall()
+            sqlQuery("select title from back where link = ? and type = 'redirect'", [name])
+            r_db = sqlQuery("fetchall")
             if r_db:
                 r_data = link_fix(r_db[0][0])
             
                 return redirect('/w/' + r_data[0] + '?from=' + name + r_data[1])
 
-    curs.execute("select sub from rd where title = ? and not stop = 'O' order by date desc", [name])
-    if curs.fetchall():
+    sqlQuery("select sub from rd where title = ? and not stop = 'O' order by date desc", [name])
+    if sqlQuery("fetchall"):
         sub += ' (' + load_lang('discussion') + ')'
 
-    curs.execute("select link from back where title = ? and type = 'cat' order by link asc", [name])
+    sqlQuery("select link from back where title = ? and type = 'cat' order by link asc", [name])
                 
-    curs.execute("select title from data where title like ?", ['%' + name + '/%'])
-    if curs.fetchall():
+    sqlQuery("select title from data where title like ?", ['%' + name + '/%'])
+    if sqlQuery("fetchall"):
         down = 1
     else:
         down = 0
@@ -38,8 +38,8 @@ def view_read_2(conn, name):
         uppage = 0
         
     if re.search('^category:', name):        
-        curs.execute("select link from back where title = ? and type = 'cat' order by link asc", [name])
-        back = curs.fetchall()
+        sqlQuery("select link from back where title = ? and type = 'cat' order by link asc", [name])
+        back = sqlQuery("fetchall")
         if back:
             div = '<br><h2 id="cate_normal">' + load_lang('category') + '</h2><ul>'
             u_div = ''
@@ -48,8 +48,8 @@ def view_read_2(conn, name):
                 if re.search('^category:', data[0]):
                     u_div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a></li>'
                 else:
-                    curs.execute("select title from back where title = ? and type = 'include'", [data[0]])
-                    db_data = curs.fetchall()
+                    sqlQuery("select title from back where title = ? and type = 'include'", [data[0]])
+                    db_data = sqlQuery("fetchall")
                     if db_data:
                         div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a> <a id="inside" href="/xref/' + url_pas(data[0]) + '">(' + load_lang('backlink') + ')</a></li>'
                     else: 
@@ -65,22 +65,22 @@ def view_read_2(conn, name):
 
 
     if num:
-        curs.execute("select title from history where title = ? and id = ? and hide = 'O'", [name, str(num)])
-        if curs.fetchall() and admin_check(6) != 1:
+        sqlQuery("select title from history where title = ? and id = ? and hide = 'O'", [name, str(num)])
+        if sqlQuery("fetchall") and admin_check(6) != 1:
             return redirect('/history/' + url_pas(name))
 
-        curs.execute("select title, data from history where title = ? and id = ?", [name, str(num)])
+        sqlQuery("select title, data from history where title = ? and id = ?", [name, str(num)])
     else:
-        curs.execute("select title, data from data where title = ?", [name])
+        sqlQuery("select title, data from data where title = ?", [name])
     
-    data = curs.fetchall()
+    data = sqlQuery("fetchall")
     if data:
         else_data = data[0][1]
     else:
         else_data = None
 
-    curs.execute("select decu from acl where title = ?", [name])
-    data = curs.fetchall()
+    sqlQuery("select decu from acl where title = ?", [name])
+    data = sqlQuery("fetchall")
     if data:
         acl += ' (' + load_lang('acl') + ')'
             
@@ -96,8 +96,8 @@ def view_read_2(conn, name):
     if end_data == 'HTTP Request 401.3':
         response_data = 401
         
-        curs.execute('select data from other where name = "error_401"')
-        sql_d = curs.fetchall()
+        sqlQuery('select data from other where name = "error_401"')
+        sql_d = sqlQuery("fetchall")
         if sql_d and sql_d[0][0] != '':
             end_data = '<h2>' + load_lang('error') + '</h2><ul><li>' + sql_d[0][0] + '</li></ul>'
         else:
@@ -105,15 +105,15 @@ def view_read_2(conn, name):
     elif end_data == 'HTTP Request 404':
         response_data = 404
         
-        curs.execute('select data from other where name = "error_404"')
-        sql_d = curs.fetchall()
+        sqlQuery('select data from other where name = "error_404"')
+        sql_d = sqlQuery("fetchall")
         if sql_d and sql_d[0][0] != '':
             end_data = '<h2>' + load_lang('error') + '</h2><ul><li>' + sql_d[0][0] + '</li></ul>'
         else:
             end_data = '<h2>' + load_lang('error') + '</h2><ul><li>' + load_lang('decument_404_error') + '</li></ul>'
             
-        curs.execute('select ip, date, leng, send from history where title = ? order by id desc limit 3', [name])
-        sql_d = curs.fetchall()
+        sqlQuery('select ip, date, leng, send from history where title = ? order by id desc limit 3', [name])
+        sql_d = sqlQuery("fetchall")
         if sql_d:
             end_data += '<h2>' + load_lang('history') + '</h2><ul>'
             for i in sql_d:
@@ -158,8 +158,8 @@ def view_read_2(conn, name):
         if down:
             menu += [['down/' + url_pas(name), load_lang('sub')]]
     
-        curs.execute("select date from history where title = ? order by date desc limit 1", [name])
-        date = curs.fetchall()
+        sqlQuery("select date from history where title = ? order by date desc limit 1", [name])
+        date = sqlQuery("fetchall")
         if date:
             r_date = date[0][0]
         else:
@@ -169,16 +169,16 @@ def view_read_2(conn, name):
             
     adsense_code = '<div align="center" style="display: block; margin-bottom: 10px;">{}</div>'
 
-    curs.execute("select data from other where name = 'adsense'")
-    adsense_enabled = curs.fetchall()[0][0]
+    sqlQuery("select data from other where name = 'adsense'")
+    adsense_enabled = sqlQuery("fetchall")[0][0]
     if adsense_enabled == 'True':
-        curs.execute("select data from other where name = 'adsense_code'")
-        adsense_code = adsense_code.format(curs.fetchall()[0][0])
+        sqlQuery("select data from other where name = 'adsense_code'")
+        adsense_code = adsense_code.format(sqlQuery("fetchall")[0][0])
     else:
         adsense_code = adsense_code.format('')
 
-    curs.execute("select data from other where name = 'body'")
-    body = curs.fetchall()
+    sqlQuery("select data from other where name = 'body'")
+    body = sqlQuery("fetchall")
     if body:
         div = body[0][0] + '<hr class=\"main_hr\">' + div
     

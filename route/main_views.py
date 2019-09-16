@@ -1,7 +1,7 @@
 from .tool.func import *
 
-def main_views_2(conn, name):
-    curs = conn.cursor()
+def main_views_2(name):
+    
 
     m = re.search('\.([^.]+)$', name)
     if m:

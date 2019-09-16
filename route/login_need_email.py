@@ -1,27 +1,27 @@
 from .tool.func import *
 
-def login_need_email_2(conn, tool):
-    curs = conn.cursor()
+def login_need_email_2(tool):
+    
 
     if flask.request.method == 'POST':
         if tool == 'pass_find':
-            curs.execute("select id from user_set where id = ? and name = 'email' and data = ?", [
+            sqlQuery("select id from user_set where id = ? and name = 'email' and data = ?", [
                 flask.request.form.get('id', ''),
                 flask.request.form.get('email', '')
             ])
-            if curs.fetchall():
+            if sqlQuery("fetchall"):
                 flask.session['c_key'] = ''.join(random.choice("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ") for i in range(16))
                 flask.session['c_id'] = flask.request.form.get('id', '')
 
-                curs.execute('select data from other where name = "email_title"')
-                sql_d = curs.fetchall()
+                sqlQuery('select data from other where name = "email_title"')
+                sql_d = sqlQuery("fetchall")
                 if sql_d and sql_d[0][0] != '':
                     t_text = html.escape(sql_d[0][0])
                 else:
                     t_text = wiki_set()[0] + ' key'
 
-                curs.execute('select data from other where name = "email_text"')
-                sql_d = curs.fetchall()
+                sqlQuery('select data from other where name = "email_text"')
+                sql_d = sqlQuery("fetchall")
                 if sql_d and sql_d[0][0] != '':
                     i_text = html.escape(sql_d[0][0]) + '\n\nKey : ' + flask.session['c_key']
                 else:
@@ -44,10 +44,10 @@ def login_need_email_2(conn, tool):
                 if data:
                     data = data.groups()[0]
 
-                    curs.execute("select html from html_filter where html = ? and kind = 'email'", [data])
-                    if curs.fetchall() or (data in main_email):
-                        curs.execute('select id from user_set where name = "email" and data = ?', [flask.request.form.get('email', '')])
-                        if curs.fetchall():
+                    sqlQuery("select html from html_filter where html = ? and kind = 'email'", [data])
+                    if sqlQuery("fetchall") or (data in main_email):
+                        sqlQuery('select id from user_set where name = "email" and data = ?', [flask.request.form.get('email', '')])
+                        if sqlQuery("fetchall"):
                             flask.session.pop('c_id', None)
                             flask.session.pop('c_pw', None)
                             flask.session.pop('c_key', None)
@@ -55,15 +55,15 @@ def login_need_email_2(conn, tool):
                             # user 대신 오류 화면 보여주게 수정 필요
                             return redirect('/user')
                         else:
-                            curs.execute('select data from other where name = "email_title"')
-                            sql_d = curs.fetchall()
+                            sqlQuery('select data from other where name = "email_title"')
+                            sql_d = sqlQuery("fetchall")
                             if sql_d and sql_d[0][0] != '':
                                 t_text = html.escape(sql_d[0][0])
                             else:
                                 t_text = wiki_set()[0] + ' key'
 
-                            curs.execute('select data from other where name = "email_text"')
-                            sql_d = curs.fetchall()
+                            sqlQuery('select data from other where name = "email_text"')
+                            sql_d = sqlQuery("fetchall")
                             if sql_d and sql_d[0][0] != '':
                                 i_text = html.escape(sql_d[0][0]) + '\n\nKey : ' + flask.session['c_key']
                             else:
@@ -82,8 +82,8 @@ def login_need_email_2(conn, tool):
             return redirect('/user')
     else:
         if tool == 'pass_find':
-            curs.execute('select data from other where name = "password_search_text"')
-            sql_d = curs.fetchall()
+            sqlQuery('select data from other where name = "password_search_text"')
+            sql_d = sqlQuery("fetchall")
             if sql_d and sql_d[0][0] != '':
                 b_text = sql_d[0][0] + '<hr class=\"main_hr\">'
             else:
@@ -103,8 +103,8 @@ def login_need_email_2(conn, tool):
                 menu = [['user', load_lang('return')]]
             ))
         else:
-            curs.execute('select data from other where name = "email_insert_text"')
-            sql_d = curs.fetchall()
+            sqlQuery('select data from other where name = "email_insert_text"')
+            sql_d = sqlQuery("fetchall")
             if sql_d and sql_d[0][0] != '':
                 b_text = sql_d[0][0] + '<hr class=\"main_hr\">'
             else:

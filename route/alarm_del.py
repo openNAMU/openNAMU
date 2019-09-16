@@ -1,9 +1,9 @@
 from .tool.func import *
 
-def alarm_del_2(conn):
-    curs = conn.cursor()
+def alarm_del_2():
     
-    curs.execute("delete from alarm where name = ?", [ip_check()])
-    conn.commit()
+    
+    sqlQuery("delete from alarm where name = ?", [ip_check()])
+    sqlQuery("commit")
 
     return redirect('/alarm')

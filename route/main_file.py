@@ -1,7 +1,7 @@
 from .tool.func import *
 
-def main_file_2(conn, data):
-    curs = conn.cursor()
+def main_file_2(data):
+    
 
     if re.search('\.txt$', data):
         return flask.send_from_directory('./', data)

@@ -1,11 +1,11 @@
 from .tool.func import *
 
-def inter_wiki_plus_2(conn, tools, name):
-    curs = conn.cursor()
+def inter_wiki_plus_2(tools, name):
+    
     
     if flask.request.method == 'POST':
         if tools == 'plus_inter_wiki':
-            curs.execute('insert into inter (title, link) values (?, ?)', [flask.request.form.get('title', None), flask.request.form.get('link', None)])
+            sqlQuery('insert into inter (title, link) values (?, ?)', [flask.request.form.get('title', None), flask.request.form.get('link', None)])
             
             admin_check(None, 'inter_wiki_plus')
         elif tools == 'plus_edit_filter':
@@ -20,11 +20,11 @@ def inter_wiki_plus_2(conn, tools, name):
             try:
                 re.compile(flask.request.form.get('content', 'test'))
 
-                curs.execute("select name from filter where name = ?", [name])
-                if curs.fetchall():
-                    curs.execute("update filter set regex = ?, sub = ? where name = ?", [flask.request.form.get('content', 'test'), end, name])
+                sqlQuery("select name from filter where name = ?", [name])
+                if sqlQuery("fetchall"):
+                    sqlQuery("update filter set regex = ?, sub = ? where name = ?", [flask.request.form.get('content', 'test'), end, name])
                 else:
-                    curs.execute("insert into filter (name, regex, sub) values (?, ?, ?)", [name, flask.request.form.get('content', 'test'), end])
+                    sqlQuery("insert into filter (name, regex, sub) values (?, ?, ?)", [name, flask.request.form.get('content', 'test'), end])
             except:
                 return re_error('/error/23')                
         else:
@@ -62,9 +62,9 @@ def inter_wiki_plus_2(conn, tools, name):
                 type_d = 'edit_top'
                 plus_d = flask.request.form.get('markup', 'test')
             
-            curs.execute('insert into html_filter (html, kind, plus) values (?, ?, ?)', [flask.request.form.get('title', 'test'), type_d, plus_d])
+            sqlQuery('insert into html_filter (html, kind, plus) values (?, ?, ?)', [flask.request.form.get('title', 'test'), type_d, plus_d])
         
-        conn.commit()
+        sqlQuery("commit")
     
         return redirect('/' + re.sub('^plus_', '', tools))
     else:
@@ -81,8 +81,8 @@ def inter_wiki_plus_2(conn, tools, name):
                 <input placeholder="link" type="text" name="link">
             '''
         elif tools == 'plus_edit_filter':
-            curs.execute("select regex, sub from filter where name = ?", [name])
-            exist = curs.fetchall()
+            sqlQuery("select regex, sub from filter where name = ?", [name])
+            exist = sqlQuery("fetchall")
             if exist:
                 textarea = exist[0][0]
                 

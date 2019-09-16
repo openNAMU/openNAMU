@@ -1,7 +1,7 @@
 from .tool.func import *
 
-def setting_oauth_2(conn):
-    curs = conn.cursor()
+def setting_oauth_2():
+    
 
     if admin_check(None, 'oauth setting') != 1:
         return re_error('/error/3')

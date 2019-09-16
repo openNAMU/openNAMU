@@ -1,8 +1,68 @@
 from . import tool
 
+import json
+import pymysql
+import sqlite3
+# import psycopg2 as pg2
+
 import datetime
 import html
 import re
+
+def q_mariadb2(query, *arg):
+    with open("DB_Data.json") as fileRead:
+        db_data = json.load(fileRead)
+
+    curs.execute(f'USE {db_data["db_name"]};')
+    curs.execute('SET @@global.sql_mode= \'NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION\';')
+    
+    if arg:
+        qarg = tuple(arg[0])
+        sql = query.replace("%", "%%")
+        sql = sql.replace("?", "%s")
+        sql = sql.replace("'", '"')
+
+        return curs.execute(sql, qarg)
+    elif not arg:
+        sql = query.replace("%", "%%")
+        sql = sql.replace("'", '"')
+        sql = sql.replace("random()", "RAND()")
+
+        return curs.execute(sql)
+
+def q_sqlite2(query, *arg):
+    if arg:
+        qarg = arg[0]
+        return curs.execute(query, qarg)
+    elif not arg:
+        return curs.execute(query)
+
+def sqlQuery2(query, *arg):
+    db_type = {}
+    try:
+        open('DB_Type.json', mode='r', encoding='utf-8')
+    except FileNotFoundError:
+        print("error!")
+
+    with open("DB_Type.json") as fileRead:
+        db_type = json.load(fileRead)
+
+    if db_type["DBMS"] == "mariadb":
+        if query == "fetchall":
+            return curs.fetchall()
+        elif query == "commit":
+            pass
+        else:
+            return q_mariadb2(query, *arg)
+    elif db_type["DBMS"] == "sqlite":
+        if query == "fetchall":
+            return curs.fetchall()
+        elif query == "commit":
+            return conn.commit()
+        else:
+            return q_sqlite2(query, *arg)
+    else:
+        print("DBMS Type Error")
 
 def table_parser(data, cel_data, start_data, num = 0):
     table_class = 'class="'
@@ -351,8 +411,12 @@ def middle_parser(data, fol_num, syntax_num, folding_num):
     return [data, [fol_num, syntax_num, folding_num]]
 
 def namu(conn, data, title, main_num):
-    curs = conn.cursor()
+    global q_conn
+    global curs
 
+    q_conn = conn
+    curs = q_conn.cursor()
+    
     global plus_data
     global end_data
 
@@ -402,8 +466,8 @@ def namu(conn, data, title, main_num):
                 else:
                     break
 
-            curs.execute("select data from data where title = ?", [include_data])
-            include_data = curs.fetchall()
+            sqlQuery2("select data from data where title = ?", [include_data])
+            include_data = sqlQuery2("fetchall")
             if include_data:
                 include_parser = include_re.sub('', include_data[0][0])
                 include_parser = html.escape(include_parser)
@@ -793,8 +857,8 @@ def namu(conn, data, title, main_num):
                     file_src = '/image/' + tool.sha224(file_name) + '.' + file_end
                     file_alt = 'file:' + file_name + '.' + file_end
 
-                    curs.execute("select title from data where title = ?", [file_alt])
-                    exist = curs.fetchall()
+                    sqlQuery2("select title from data where title = ?", [file_alt])
+                    exist = sqlQuery2("fetchall")
                 
                 if exist:
                     data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<span style="' + file_align + '"><img style="' + file_style + '" alt="' + file_alt + '" src="' + file_src + '"></span>', data, 1)
@@ -822,8 +886,8 @@ def namu(conn, data, title, main_num):
                 inter_data = re.search('^inter:((?:(?!:).)+):((?:(?!\]\]|\|).)+)', main_link)
                 inter_data = inter_data.groups()
 
-                curs.execute('select link from inter where title = ?', [inter_data[0]])
-                inter = curs.fetchall()
+                sqlQuery2('select link from inter where title = ?', [inter_data[0]])
+                inter = sqlQuery2("fetchall")
                 if inter:
                     if see_link != main_link:
                         data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<a id="inside" href="' + inter[0][0] + inter_data[1] + '">' + inter_data[0] + ':' + see_link + '</a>', data, 1)
@@ -856,8 +920,8 @@ def namu(conn, data, title, main_num):
                 if not re.search('^\|', main_link):
                     if main_link != title:
                         if main_link != '':
-                            curs.execute("select title from data where title = ?", [main_link])
-                            if not curs.fetchall():
+                            sqlQuery2("select title from data where title = ?", [main_link])
+                            if not sqlQuery2("fetchall"):
                                 link_id = 'id="not_thing"'
 
                                 backlink += [[title, main_link, 'no']]

@@ -1,12 +1,12 @@
 from .tool.func import *
 
-def edit_revert_2(conn, name):
-    curs = conn.cursor()
+def edit_revert_2(name):
+    
 
     num = int(number_check(flask.request.args.get('num', '1')))
 
-    curs.execute("select title from history where title = ? and id = ? and hide = 'O'", [name, str(num)])
-    if curs.fetchall() and admin_check(6) != 1:
+    sqlQuery("select title from history where title = ? and id = ? and hide = 'O'", [name, str(num)])
+    if sqlQuery("fetchall") and admin_check(6) != 1:
         return re_error('/error/3')
 
     if acl_check(name) == 1:
@@ -18,24 +18,24 @@ def edit_revert_2(conn, name):
         else:
             captcha_post('', 0)
     
-        curs.execute("select data from history where title = ? and id = ?", [name, str(num)])
-        data = curs.fetchall()
+        sqlQuery("select data from history where title = ? and id = ?", [name, str(num)])
+        data = sqlQuery("fetchall")
         if data:
             if edit_filter_do(data[0][0]) == 1:
                 return re_error('/error/21')
 
-        curs.execute("delete from back where link = ?", [name])
-        conn.commit()
+        sqlQuery("delete from back where link = ?", [name])
+        sqlQuery("commit")
         
         if data:                                
-            curs.execute("select data from data where title = ?", [name])
-            data_old = curs.fetchall()
+            sqlQuery("select data from data where title = ?", [name])
+            data_old = sqlQuery("fetchall")
             if data_old:
                 leng = leng_check(len(data_old[0][0]), len(data[0][0]))
-                curs.execute("update data set data = ? where title = ?", [data[0][0], name])
+                sqlQuery("update data set data = ? where title = ?", [data[0][0], name])
             else:
                 leng = '+' + str(len(data[0][0]))
-                curs.execute("insert into data (title, data) values (?, ?)", [name, data[0][0]])
+                sqlQuery("insert into data (title, data) values (?, ?)", [name, data[0][0]])
                 
             history_plus(
                 name, 
@@ -53,12 +53,12 @@ def edit_revert_2(conn, name):
                 num = 1
             )
             
-            conn.commit()
+            sqlQuery("commit")
             
         return redirect('/w/' + url_pas(name))
     else:
-        curs.execute("select title from history where title = ? and id = ?", [name, str(num)])
-        if not curs.fetchall():
+        sqlQuery("select title from history where title = ? and id = ?", [name, str(num)])
+        if not sqlQuery("fetchall"):
             return redirect('/w/' + url_pas(name))
 
         return easy_minify(flask.render_template(skin_check(), 

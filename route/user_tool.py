@@ -1,7 +1,7 @@
 from .tool.func import *
 
-def user_tool_2(conn, name):
-    curs = conn.cursor()
+def user_tool_2(name):
+    
     
     data = '''
         <h2>''' + load_lang('tool') + '''</h2>
@@ -12,8 +12,8 @@ def user_tool_2(conn, name):
     '''
             
     if admin_check(1) == 1:
-        curs.execute("select block from ban where block = ?", [name])
-        if curs.fetchall():
+        sqlQuery("select block from ban where block = ?", [name])
+        if sqlQuery("fetchall"):
             ban_name = load_lang('ban_release')
         else:
             ban_name = load_lang('ban')

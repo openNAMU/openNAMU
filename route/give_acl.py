@@ -1,7 +1,7 @@
 from .tool.func import *
 
-def give_acl_2(conn, name):
-    curs = conn.cursor()
+def give_acl_2(name):
+    
 
     check_ok = ''
     
@@ -32,14 +32,14 @@ def give_acl_2(conn, name):
         decu = flask.request.form.get('decu', '')
         view = flask.request.form.get('view', '')
 
-        curs.execute("select title from acl where title = ?", [name])
-        if curs.fetchall():
-            curs.execute("update acl set decu = ? where title = ?", [decu, name])
-            curs.execute("update acl set dis = ? where title = ?", [flask.request.form.get('dis', ''), name])
-            curs.execute("update acl set why = ? where title = ?", [flask.request.form.get('why', ''), name])
-            curs.execute("update acl set view = ? where title = ?", [view, name])
+        sqlQuery("select title from acl where title = ?", [name])
+        if sqlQuery("fetchall"):
+            sqlQuery("update acl set decu = ? where title = ?", [decu, name])
+            sqlQuery("update acl set dis = ? where title = ?", [flask.request.form.get('dis', ''), name])
+            sqlQuery("update acl set why = ? where title = ?", [flask.request.form.get('why', ''), name])
+            sqlQuery("update acl set view = ? where title = ?", [view, name])
         else:
-            curs.execute("insert into acl (title, decu, dis, why, view) values (?, ?, ?, ?, ?)", [
+            sqlQuery("insert into acl (title, decu, dis, why, view) values (?, ?, ?, ?, ?)", [
                 name, 
                 decu, 
                 flask.request.form.get('dis', ''), 
@@ -47,11 +47,11 @@ def give_acl_2(conn, name):
                 view
             ])
         
-        curs.execute("select title from acl where title = ? and decu = '' and dis = '' and view = ''", [name])
-        if curs.fetchall():
-            curs.execute("delete from acl where title = ?", [name])
+        sqlQuery("select title from acl where title = ? and decu = '' and dis = '' and view = ''", [name])
+        if sqlQuery("fetchall"):
+            sqlQuery("delete from acl where title = ?", [name])
 
-        conn.commit()
+        sqlQuery("commit")
             
         return redirect('/acl/' + url_pas(name))            
     else:
@@ -62,8 +62,8 @@ def give_acl_2(conn, name):
         else:
             acl_list = [['', 'normal'], ['user', 'member'], ['admin', 'admin'], ['50_edit', '50 edit'], ['email', 'email']]
         
-        curs.execute("select decu from acl where title = ?", [name])
-        acl_data = curs.fetchall()
+        sqlQuery("select decu from acl where title = ?", [name])
+        acl_data = sqlQuery("fetchall")
         for data_list in acl_list:
             if acl_data and acl_data[0][0] == data_list[0]:
                 check = 'selected="selected"'
@@ -77,8 +77,8 @@ def give_acl_2(conn, name):
         if not re.search('^user:', name):
             data += '<hr class=\"main_hr\"><h2>' + load_lang('discussion_acl') + '</h2><hr class=\"main_hr\"><select name="dis" ' + check_ok + '>'
         
-            curs.execute("select dis, why, view from acl where title = ?", [name])
-            acl_data = curs.fetchall()
+            sqlQuery("select dis, why, view from acl where title = ?", [name])
+            acl_data = sqlQuery("fetchall")
             for data_list in acl_list:
                 if acl_data and acl_data[0][0] == data_list[0]:
                     check = 'selected="selected"'

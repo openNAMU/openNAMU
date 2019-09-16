@@ -1,7 +1,7 @@
 from .tool.func import *
 
-def inter_wiki_2(conn, tools):
-    curs = conn.cursor()
+def inter_wiki_2(tools):
+    
     
     div = ''
     admin = admin_check()
@@ -12,7 +12,7 @@ def inter_wiki_2(conn, tools):
         title = load_lang('interwiki_list')
         div = ''
 
-        curs.execute('select title, link from inter')
+        sqlQuery('select title, link from inter')
     elif tools == 'email_filter':
         del_link = 'del_email_filter'
         plus_link = 'plus_email_filter'
@@ -27,51 +27,51 @@ def inter_wiki_2(conn, tools):
                 </ul>
                 '''
 
-        curs.execute("select html from html_filter where kind = 'email'")
+        sqlQuery("select html from html_filter where kind = 'email'")
     elif tools == 'name_filter':
         del_link = 'del_name_filter'
         plus_link = 'plus_name_filter'
         title = load_lang('id_filter_list')
         div = ''
 
-        curs.execute("select html from html_filter where kind = 'name'")
+        sqlQuery("select html from html_filter where kind = 'name'")
     elif tools == 'edit_filter':
         del_link = 'del_edit_filter'
         plus_link = 'manager/9'
         title = load_lang('edit_filter_list')
         div = ''
 
-        curs.execute("select name from filter")
+        sqlQuery("select name from filter")
     elif tools == 'file_filter':
         del_link = 'del_file_filter'
         plus_link = 'plus_file_filter'
         title = load_lang('file_filter_list')
         div = ''
 
-        curs.execute("select html from html_filter where kind = 'file'")
+        sqlQuery("select html from html_filter where kind = 'file'")
     elif tools == 'file_filter':
         del_link = 'del_file_filter'
         plus_link = 'plus_file_filter'
         title = load_lang('file_filter_list')
         div = ''
 
-        curs.execute("select html from html_filter where kind = 'file'")  
+        sqlQuery("select html from html_filter where kind = 'file'")  
     elif tools == 'image_license':
         del_link = 'del_image_license'
         plus_link = 'plus_image_license'
         title = load_lang('image_license_list')
         div = ''
 
-        curs.execute("select html from html_filter where kind = 'image_license'")  
+        sqlQuery("select html from html_filter where kind = 'image_license'")  
     else:
         del_link = 'del_edit_top'
         plus_link = 'plus_edit_top'
         title = load_lang('edit_tool_list')
         div = ''
 
-        curs.execute("select html, plus from html_filter where kind = 'edit_top'")
+        sqlQuery("select html, plus from html_filter where kind = 'edit_top'")
 
-    db_data = curs.fetchall()
+    db_data = sqlQuery("fetchall")
     if db_data:
         div += '<ul>'
 

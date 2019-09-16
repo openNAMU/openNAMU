@@ -1,7 +1,7 @@
 from .tool.func import *
 
-def recent_history_tool_2(conn, name):
-    curs = conn.cursor()
+def recent_history_tool_2(name):
+    
 
     num = str(int(number_check(flask.request.args.get('num', '1'))))
 
@@ -24,11 +24,8 @@ def recent_history_tool_2(conn, name):
         '''
 
     if admin_check(6) == 1:
-        curs.execute('''
-            select title from history
-            where title = ? and id = ? and hide = 'O'
-        ''', [name, num])
-        hide = curs.fetchall()
+        sqlQuery("select title from history where title = ? and id = ? and hide = 'O'", [name, num])
+        hide = sqlQuery("fetchall")
         data += '''
             <li>
                 <a href="/hidden/''' + url_pas(name) + '?num=' + num + '">' + (load_lang('hide_release') if hide else load_lang('hide')) + '''

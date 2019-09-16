@@ -1,7 +1,7 @@
 from .tool.func import *
 
-def list_title_index_2(conn):
-    curs = conn.cursor()
+def list_title_index_2():
+    
     
     page = int(number_check(flask.request.args.get('page', '1')))
     num = int(number_check(flask.request.args.get('num', '100')))
@@ -17,8 +17,8 @@ def list_title_index_2(conn):
 
     data = '<a href="/title_index?num=250">(250)</a> <a href="/title_index?num=500">(500)</a> <a href="/title_index?num=1000">(1000)</a>'
 
-    curs.execute("select title from data order by title asc limit ?, ?", [str(sql_num), str(num)])
-    title_list = curs.fetchall()
+    sqlQuery("select title from data order by title asc limit ?, ?", [str(sql_num), str(num)])
+    title_list = sqlQuery("fetchall")
     if title_list:
         data += '<hr class=\"main_hr\"><ul>'
 
@@ -29,8 +29,8 @@ def list_title_index_2(conn):
     if page == 1:
         count_end = []
 
-        curs.execute("select count(title) from data")
-        count = curs.fetchall()
+        sqlQuery("select count(title) from data")
+        count = sqlQuery("fetchall")
         if count:
             count_end += [count[0][0]]
         else:
@@ -38,8 +38,8 @@ def list_title_index_2(conn):
 
         sql_list = [load_lang('template', 1).lower() + ':', 'category:', 'user:', 'file:']
         for sql in sql_list:
-            curs.execute("select count(title) from data where title like ?", [sql + '%'])
-            count = curs.fetchall()
+            sqlQuery("select count(title) from data where title like ?", [sql + '%'])
+            count = sqlQuery("fetchall")
             if count:
                 count_end += [count[0][0]]
             else:

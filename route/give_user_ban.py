@@ -1,11 +1,11 @@
 from .tool.func import *
 
-def give_user_ban_2(conn, name):
-    curs = conn.cursor()
+def give_user_ban_2(name):
+    
 
     if name and ip_or_user(name) == 0:
-        curs.execute("select acl from user where id = ?", [name])
-        user = curs.fetchall()
+        sqlQuery("select acl from user where id = ?", [name])
+        user = sqlQuery("fetchall")
         if not user:
             return re_error('/error/2')
 
@@ -49,8 +49,8 @@ def give_user_ban_2(conn, name):
         if admin_check(1) != 1:
             return re_error('/error/3')
 
-        curs.execute("select end, why from ban where block = ?", [name])
-        end = curs.fetchall()
+        sqlQuery("select end, why from ban where block = ?", [name])
+        end = sqlQuery("fetchall")
         if end:
             main_name = name
             b_now = load_lang('release')
@@ -61,8 +61,8 @@ def give_user_ban_2(conn, name):
             else:
                 data = '<ul><li>' + load_lang('period') + ' : ' + end[0][0] + '</li>'
                 
-            curs.execute("select block from ban where block = ? and login = 'O'", [name])
-            if curs.fetchall():
+            sqlQuery("select block from ban where block = ? and login = 'O'", [name])
+            if sqlQuery("fetchall"):
                 data += '<li>' + load_lang('login_able') + '</li>'
 
             if end[0][1] != '':

@@ -1,22 +1,22 @@
 from .tool.func import *
 
-def user_count_edit_2(conn, name):
-    curs = conn.cursor()
+def user_count_edit_2(name):
+    
 
     if name == None:
         that = ip_check()
     else:
         that = name
 
-    curs.execute("select count(title) from history where ip = ?", [that])
-    count = curs.fetchall()
+    sqlQuery("select count(title) from history where ip = ?", [that])
+    count = sqlQuery("fetchall")
     if count:
         data = count[0][0]
     else:
         data = 0
 
-    curs.execute("select count(title) from topic where ip = ?", [that])
-    count = curs.fetchall()
+    sqlQuery("select count(title) from topic where ip = ?", [that])
+    count = sqlQuery("fetchall")
     if count:
         t_data = count[0][0]
     else:

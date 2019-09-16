@@ -1,7 +1,7 @@
 from .tool.func import *
 
-def list_user_topic_2(conn, name):
-    curs = conn.cursor()
+def list_user_topic_2(name):
+    
 
     num = int(number_check(flask.request.args.get('num', '1')))
     if num * 50 > 0:
@@ -21,15 +21,15 @@ def list_user_topic_2(conn, name):
                     </tr>
             '''
     
-    curs.execute("select title, id, sub, ip, date from topic where ip = ? order by date desc limit ?, '50'", [name, str(sql_num)])
-    data_list = curs.fetchall()
+    sqlQuery("select title, id, sub, ip, date from topic where ip = ? order by date desc limit ?, '50'", [name, str(sql_num)])
+    data_list = sqlQuery("fetchall")
     for data in data_list:
         title = html.escape(data[0])
         sub = html.escape(data[2])
         
         if one_admin == 1:
-            curs.execute("select * from ban where block = ?", [data[3]])
-            if curs.fetchall():
+            sqlQuery("select * from ban where block = ?", [data[3]])
+            if sqlQuery("fetchall"):
                 ban = ' <a href="/ban/' + url_pas(data[3]) + '">(' + load_lang('release') + ')</a>'
             else:
                 ban = ' <a href="/ban/' + url_pas(data[3]) + '">(' + load_lang('ban') + ')</a>'
@@ -42,8 +42,8 @@ def list_user_topic_2(conn, name):
     div += '</tbody></table>'
     div += next_fix('/topic_record/' + url_pas(name) + '?num=', num, data_list)      
     
-    curs.execute("select end from ban where block = ?", [name])
-    if curs.fetchall():
+    sqlQuery("select end from ban where block = ?", [name])
+    if sqlQuery("fetchall"):
         sub = ' (' + load_lang('blocked') + ')'
     else:
         sub = 0 

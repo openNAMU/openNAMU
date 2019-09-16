@@ -1,7 +1,7 @@
 from .tool.func import *
 
-def server_now_update_2(conn):
-    curs = conn.cursor()
+def server_now_update_2():
+    
 
     if admin_check() != 1:
         return re_error('/error/3')
@@ -9,8 +9,8 @@ def server_now_update_2(conn):
     if flask.request.method == 'POST':
         admin_check(None, 'update')
 
-        curs.execute('select data from other where name = "update"')
-        up_data = curs.fetchall()
+        sqlQuery('select data from other where name = "update"')
+        up_data = sqlQuery("fetchall")
         if up_data:
             up_data = up_data[0][0]
         else:

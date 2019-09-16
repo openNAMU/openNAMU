@@ -1,15 +1,15 @@
 from .tool.func import *
 
-def login_check_key_2(conn, tool):
-    curs = conn.cursor()
+def login_check_key_2(tool):
+    
 
     if flask.request.method == 'POST':
         if tool == 'check_pass_key':
             if 'c_id' in flask.session and flask.session['c_key'] == flask.request.form.get('key', None):
                 hashed = pw_encode(flask.session['c_key'])
 
-                curs.execute("update user set pw = ? where id = ?", [hashed, flask.session['c_id']])
-                conn.commit()
+                sqlQuery("update user set pw = ? where id = ?", [hashed, flask.session['c_id']])
+                sqlQuery("commit")
 
                 d_id = flask.session['c_id']
                 pw = flask.session['c_key']
@@ -17,8 +17,8 @@ def login_check_key_2(conn, tool):
                 flask.session.pop('c_id', None)
                 flask.session.pop('c_key', None)
 
-                curs.execute('select data from other where name = "reset_user_text"')
-                sql_d = curs.fetchall()
+                sqlQuery('select data from other where name = "reset_user_text"')
+                sql_d = sqlQuery("fetchall")
                 if sql_d and sql_d[0][0] != '':
                     b_text = sql_d[0][0] + '<hr class=\"main_hr\">'
                 else:
@@ -35,13 +35,13 @@ def login_check_key_2(conn, tool):
             ip = ip_check()
             
             if 'c_id' in flask.session and flask.session['c_key'] == flask.request.form.get('key', None):
-                curs.execute('select data from other where name = "encode"')
-                db_data = curs.fetchall()
+                sqlQuery('select data from other where name = "encode"')
+                db_data = sqlQuery("fetchall")
                 
                 if tool == 'check_key':
-                    curs.execute("select id from user limit 1")
-                    if not curs.fetchall():
-                        curs.execute("insert into user (id, pw, acl, date, encode) values (?, ?, 'owner', ?, ?)", [
+                    sqlQuery("select id from user limit 1")
+                    if not sqlQuery("fetchall"):
+                        sqlQuery("insert into user (id, pw, acl, date, encode) values (?, ?, 'owner', ?, ?)", [
                             flask.session['c_id'], 
                             flask.session['c_pw'], 
                             get_time(), 
@@ -50,7 +50,7 @@ def login_check_key_2(conn, tool):
     
                         first = 1
                     else:
-                        curs.execute("insert into user (id, pw, acl, date, encode) values (?, ?, 'user', ?, ?)", [
+                        sqlQuery("insert into user (id, pw, acl, date, encode) values (?, ?, 'user', ?, ?)", [
                             flask.session['c_id'], 
                             flask.session['c_pw'], 
                             get_time(), 
@@ -61,11 +61,11 @@ def login_check_key_2(conn, tool):
     
                     agent = flask.request.headers.get('User-Agent')
     
-                    curs.execute("insert into user_set (name, id, data) values ('email', ?, ?)", [
+                    sqlQuery("insert into user_set (name, id, data) values ('email', ?, ?)", [
                         flask.session['c_id'], 
                         flask.session['c_email']
                     ])
-                    curs.execute("insert into ua_d (name, ip, ua, today, sub) values (?, ?, ?, ?, '')", [
+                    sqlQuery("insert into ua_d (name, ip, ua, today, sub) values (?, ?, ?, ?, '')", [
                         flask.session['c_id'], 
                         ip, 
                         agent, 
@@ -76,10 +76,10 @@ def login_check_key_2(conn, tool):
                     flask.session['id'] = flask.session['c_id']
                     flask.session['head'] = ''
                             
-                    conn.commit()
+                    sqlQuery("commit")
                 else:
-                    curs.execute('delete from user_set where name = "email" and id = ?', [ip])
-                    curs.execute('insert into user_set (name, id, data) values ("email", ?, ?)', [ip, flask.session['c_email']])
+                    sqlQuery('delete from user_set where name = "email" and id = ?', [ip])
+                    sqlQuery('insert into user_set (name, id, data) values ("email", ?, ?)', [ip, flask.session['c_email']])
                     
                     first = 0
                           
@@ -100,8 +100,8 @@ def login_check_key_2(conn, tool):
 
                 return redirect('/user')
     else:
-        curs.execute('select data from other where name = "check_key_text"')
-        sql_d = curs.fetchall()
+        sqlQuery('select data from other where name = "check_key_text"')
+        sql_d = sqlQuery("fetchall")
         if sql_d and sql_d[0][0] != '':
             b_text = sql_d[0][0] + '<hr class=\"main_hr\">'
         else:

@@ -1,12 +1,12 @@
 from .tool.func import *
 
-def user_info_2(conn):
-    curs = conn.cursor()
+def user_info_2():
+    
 
     ip = ip_check()
 
-    curs.execute('select name from alarm where name = ? limit 1', [ip_check()])
-    if curs.fetchall():
+    sqlQuery('select name from alarm where name = ? limit 1', [ip_check()])
+    if sqlQuery("fetchall"):
         plus2 = '<li><a href="/alarm">' + load_lang('alarm') + ' (O)</a></li>'
     else:
         plus2 = '<li><a href="/alarm">' + load_lang('alarm') + '</a></li>'
@@ -26,8 +26,8 @@ def user_info_2(conn):
         '''
         plus3 = ''
 
-        curs.execute("select data from other where name = 'email_have'")
-        test = curs.fetchall()
+        sqlQuery("select data from other where name = 'email_have'")
+        test = sqlQuery("fetchall")
         if test and test[0][0] != '':
             plus += '<li><a href="/pass_find">' + load_lang('password_search') + '</a></li>'
 

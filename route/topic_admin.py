@@ -1,10 +1,10 @@
 from .tool.func import *
 
-def topic_admin_2(conn, name, sub, num):
-    curs = conn.cursor()
+def topic_admin_2(name, sub, num):
+    
 
-    curs.execute("select block, ip, date from topic where title = ? and sub = ? and id = ?", [name, sub, str(num)])
-    data = curs.fetchall()
+    sqlQuery("select block, ip, date from topic where title = ? and sub = ? and id = ?", [name, sub, str(num)])
+    data = sqlQuery("fetchall")
     if not data:
         return redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub))
 
@@ -24,11 +24,11 @@ def topic_admin_2(conn, name, sub, num):
     '''
 
     if admin_check(3) == 1:
-        curs.execute("select id from topic where title = ? and sub = ? and id = ? and top = 'O'", [name, sub, str(num)])
-        top_topic_d = curs.fetchall()
+        sqlQuery("select id from topic where title = ? and sub = ? and id = ? and top = 'O'", [name, sub, str(num)])
+        top_topic_d = sqlQuery("fetchall")
 
-        curs.execute("select end from ban where block = ?", [data[0][1]])
-        user_ban_d = curs.fetchall()
+        sqlQuery("select end from ban where block = ?", [data[0][1]])
+        user_ban_d = sqlQuery("fetchall")
         
         ban += '''
             <br>

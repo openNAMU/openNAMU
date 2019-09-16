@@ -1,24 +1,24 @@
 from .tool.func import *
 
-def watch_list_name_2(conn, name):
-    curs = conn.cursor()
+def watch_list_name_2(name):
+    
     
     if custom()[2] == 0:
         return redirect('/login')
 
     ip = ip_check()
 
-    curs.execute("select count(title) from scan where user = ?", [ip])
-    count = curs.fetchall()
+    sqlQuery("select count(title) from scan where user = ?", [ip])
+    count = sqlQuery("fetchall")
     if count and count[0][0] > 9:
         return redirect('/watch_list')
 
-    curs.execute("select title from scan where user = ? and title = ?", [ip, name])
-    if curs.fetchall():
-        curs.execute("delete from scan where user = ? and title = ?", [ip, name])
+    sqlQuery("select title from scan where user = ? and title = ?", [ip, name])
+    if sqlQuery("fetchall"):
+        sqlQuery("delete from scan where user = ? and title = ?", [ip, name])
     else:
-        curs.execute("insert into scan (user, title) values (?, ?)", [ip, name])
+        sqlQuery("insert into scan (user, title) values (?, ?)", [ip, name])
     
-    conn.commit()
+    sqlQuery("commit")
 
     return redirect('/watch_list')
