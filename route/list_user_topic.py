@@ -21,7 +21,7 @@ def list_user_topic_2(name):
                     </tr>
             '''
     
-    sqlQuery("select title, id, sub, ip, date from topic where ip = ? order by date desc limit ?, '50'", [name, str(sql_num)])
+    sqlQuery("select title, id, sub, ip, date from topic where ip = ? order by date desc limit ?, 50", [name, sql_num])
     data_list = sqlQuery("fetchall")
     for data in data_list:
         title = html.escape(data[0])

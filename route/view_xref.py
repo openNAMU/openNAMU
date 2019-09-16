@@ -11,7 +11,7 @@ def view_xref_2(name):
         
     div = '<ul>'
     
-    sqlQuery("select link, type from back where title = ? and not type = 'cat' and not type = 'no' order by link asc limit ?, '50'", [name, str(sql_num)])
+    sqlQuery("select link, type from back where title = ? and not type = 'cat' and not type = 'no' order by link asc limit ?, 50", [name, sql_num])
     data_list = sqlQuery("fetchall")
     for data in data_list:
         div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a>'

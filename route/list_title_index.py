@@ -17,7 +17,7 @@ def list_title_index_2():
 
     data = '<a href="/title_index?num=250">(250)</a> <a href="/title_index?num=500">(500)</a> <a href="/title_index?num=1000">(1000)</a>'
 
-    sqlQuery("select title from data order by title asc limit ?, ?", [str(sql_num), str(num)])
+    sqlQuery("select title from data order by title asc limit ?, ?", [sql_num, str(num)])
     title_list = sqlQuery("fetchall")
     if title_list:
         data += '<hr class=\"main_hr\"><ul>'

@@ -12,7 +12,7 @@ def list_please_2():
     div = '<ul>'
     var = ''
     
-    sqlQuery("select distinct title from back where type = 'no' order by title asc limit ?, '50'", [str(sql_num)])
+    sqlQuery("select distinct title from back where type = 'no' order by title asc limit ?, 50", [sql_num])
     data_list = sqlQuery("fetchall")
     for data in data_list:
         if var != data[0]:

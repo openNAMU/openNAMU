@@ -15,11 +15,11 @@ def list_admin_use_2():
         list_data = '<ul>'
 
         if flask.request.args.get('search', 'normal') == 'normal':
-            sqlQuery("select who, what, time from re_admin order by time desc limit ?, '50'", [str(sql_num)])
+            sqlQuery("select who, what, time from re_admin order by time desc limit ?, 50", [sql_num])
         else:
-            sqlQuery("select who, what, time from re_admin where what like ? order by time desc limit ?, '50'", [
+            sqlQuery("select who, what, time from re_admin where what like ? order by time desc limit ?, 50", [
                 flask.request.args.get('search', 'normal') + "%",
-                str(sql_num)
+                sql_num
             ])
 
         get_list = sqlQuery("fetchall")

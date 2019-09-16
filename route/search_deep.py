@@ -36,8 +36,8 @@ def search_deep_2(name):
     sqlQuery(
         'select distinct title, case when title like ? then "제목" else "내용" \
         end from data where title like ? or data like ? order by case \
-        when title like ? then 1 else 2 end limit ?, "50"',
-        ['%' + name + '%', '%' + name + '%', '%' + name + '%', '%' + name + '%', str(sql_num)]
+        when title like ? then 1 else 2 end limit ?, 50',
+        ['%' + name + '%', '%' + name + '%', '%' + name + '%', '%' + name + '%', sql_num]
     )
     all_list = sqlQuery("fetchall")
     if all_list:
