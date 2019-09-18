@@ -8,7 +8,7 @@ def api_w_2(conn, name):
         if curs.fetchall():
             return flask.jsonify({ "exist" : "1" })
         else:
-            return flask.jsonify({ "exsit" : "0" })
+            return flask.jsonify({})
     else:
         if acl_check(name, 'render') != 1:
             if flask.request.method == 'POST':
