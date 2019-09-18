@@ -3,11 +3,11 @@ from .tool.func import *
 def view_diff_data_2(conn, name):
     curs = conn.cursor()
 
-    first = number_check(flask.request.args.get('first', '1'))
-    second = number_check(flask.request.args.get('second', '1'))
-    
     if acl_check(name, 'render') == 1:
         return re_error('/ban')
+
+    first = number_check(flask.request.args.get('first', '1'))
+    second = number_check(flask.request.args.get('second', '1'))
 
     curs.execute("select title from history where title = ? and (id = ? or id = ?) and hide = 'O'", [name, first, second])
     if curs.fetchall() and admin_check(6) != 1:
