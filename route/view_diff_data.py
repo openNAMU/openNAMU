@@ -3,6 +3,9 @@ from .tool.func import *
 def view_diff_data_2(conn, name):
     curs = conn.cursor()
 
+    if acl_check(name, 'render') == 1:
+        return re_error('/ban')
+
     first = number_check(flask.request.args.get('first', '1'))
     second = number_check(flask.request.args.get('second', '1'))
 
