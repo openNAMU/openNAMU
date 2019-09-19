@@ -5,7 +5,7 @@ function load_preview(name) {
     var s_data = new FormData();
     s_data.append('data', o_data.value);
 
-    var url = "/api/w/" + encodeURI(name);
+    var url = "/api/w/" + name;
     var url_2 = "/api/markup";
     
     var xhr = new XMLHttpRequest();

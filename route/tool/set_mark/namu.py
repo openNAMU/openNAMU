@@ -548,7 +548,7 @@ def namu(conn, data, title, main_num):
             toc_main_data = toc[1]
             toc_main_data = re.sub('=*$', '', toc_main_data)
             toc_main_data = re.sub('\[\*((?:(?! |\]).)*)(?: ((?:(?!(\[\*(?:(?:(?!\]).)+)\]|\])).)+))?\]', '', toc_main_data)
-            toc_main_data = re.sub('<span id="math_[0-9]"><\/span>', '(수식)', toc_main_data)
+            toc_main_data = re.sub('<span id="math_[0-9]"><\/span>', '(Math)', toc_main_data)
             
             toc_data += '<span style="margin-left: ' + str((toc_full - toc_top_stack) * 10) + 'px;"><a href="#s-' + re.sub('\.$', '', all_stack) + '">' + all_stack + '</a> ' + toc_main_data + '</span>\n'
         else:
@@ -785,9 +785,6 @@ def namu(conn, data, title, main_num):
                 else:
                     data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<a id="not_thing" href="/w/' + tool.url_pas(file_alt) + '">' + file_alt + '</a>', data, 1)
             elif category_re.search(main_link):
-                see_link = re.sub('#include', '', see_link)
-                main_link = re.sub('#include', '', category_re.sub('category:', main_link))
-
                 if re.search('#blur', main_link):
                     see_link = 'Hidden'
                     link_id = 'id="inside"'
@@ -827,7 +824,7 @@ def namu(conn, data, title, main_num):
                 data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<a id="out_link" rel="nofollow" href="' + main_link + '">' + see_link + '</a>', data, 1)
             else:
                 return_link = tool.link_fix(main_link)
-                main_link = return_link[0]
+                main_link = html.unescape(return_link[0])
                 other_link = return_link[1]
 
                 if re.search('^\/', main_link):
