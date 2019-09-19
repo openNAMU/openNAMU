@@ -3,6 +3,9 @@ from .tool.func import *
 def view_raw_2(name, sub_title, num):
     
 
+    if acl_check(name, 'render') == 1:
+        return re_error('/ban')
+    
     v_name = name
     sub = ' (' + load_lang('raw') + ')'
     

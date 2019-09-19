@@ -1,7 +1,10 @@
 from .tool.func import *
 
 def view_xref_2(name):
+    curs = conn.cursor()
     
+    if acl_check(name, 'render') == 1:
+        return re_error('/ban')
 
     num = int(number_check(flask.request.args.get('num', '1')))
     if num * 50 > 0:

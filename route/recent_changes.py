@@ -109,7 +109,10 @@ def recent_changes_2(name, tool):
                 leng = '<span style="color:gray;">(' + data[5] + ')</span>'
                 
             ip = ip_pas(data[3])
-            m_tool = '<a href="/history_tool/' + url_pas(data[1]) + '?num=' + data[0] + '">(' + load_lang('tool') + ')</a>'
+            if tool == 'history':
+                m_tool = '<a href="/history_tool/' + url_pas(data[1]) + '?num=' + data[0] + '&type=history">(' + load_lang('tool') + ')</a>'
+            else:
+                m_tool = '<a href="/history_tool/' + url_pas(data[1]) + '?num=' + data[0] + '">(' + load_lang('tool') + ')</a>'
             
             style = ['', '']
             date = data[2]
