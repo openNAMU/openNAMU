@@ -13,17 +13,21 @@ def api_w_2(conn, name):
         if acl_check(name, 'render') != 1:
             if flask.request.method == 'POST':
                 g_data = render_set(title = name, data = flask.request.form.get('data', ''), num = 2)
-                json_data = { "title" : name, "data" : g_data[0], "js_data" : g_data[1] }
                 
-                return flask.jsonify(json_data)
+                return flask.jsonify({ "title" : name, "data" : g_data[0], "js_data" : g_data[1] })
             else:
                 curs.execute("select data from data where title = ?", [name])
                 data = curs.fetchall()
                 if data:
-                    g_data = render_set(title = name, data = data[0][0], num = 2)
-                    json_data = { "title" : name, "data" : g_data[0], "js_data" : g_data[1] }
-                
-                    return flask.jsonify(json_data)
+                    if flask.request.args.get('include', '1'):
+                        include_re = re.compile('\[include\(((?:(?!\)\]).)+)\)\]', re.I)
+                        json_data = include_re.sub('', data[0][0])
+                    else:
+                        json_data = g_data[0]
+
+                    g_data = render_set(title = name, data = json_data, num = 2)
+
+                    return flask.jsonify({ "title" : name, "data" : g_data[0], "js_data" : g_data[1] })
                 else:
                     return flask.jsonify({})
         else:
