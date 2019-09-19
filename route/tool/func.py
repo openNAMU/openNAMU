@@ -990,7 +990,7 @@ def number_check(data):
 
 def edit_filter_do(data):
     if admin_check(1) != 1:
-        curs.execute("select regex, sub from filter")
+        curs.execute("select regex, sub from filter where regex != ''")
         for data_list in curs.fetchall():
             match = re.compile(data_list[0], re.I)
             if match.search(data):

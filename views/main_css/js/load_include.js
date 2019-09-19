@@ -1,16 +1,12 @@
-function load_preview(name) {
-    var o_data = document.getElementById('content');
-    var p_data = document.getElementById('see_preview');
+function load_include(title, name, p_data) {
+    var o_data = document.getElementById(name);
 
-    var s_data = new FormData();
-    s_data.append('data', o_data.value);
-
-    var url = "/api/w/" + encodeURI(name);
+    var url = "/api/w/" + encodeURI(title) + "?include=1";
     var url_2 = "/api/markup";
     
     var xhr = new XMLHttpRequest();
-    xhr.open("POST", url, true);
-    xhr.send(s_data);
+    xhr.open("GET", url, true);
+    xhr.send(null);
 
     var xhr_2 = new XMLHttpRequest();
     xhr_2.open("GET", url_2, true);
@@ -19,8 +15,16 @@ function load_preview(name) {
     xhr.onreadystatechange = function() {
         if(xhr.readyState === 4 && xhr.status === 200) {
             var o_p_data = JSON.parse(xhr.responseText);
+            var g_data = o_p_data['data'];
+            
+            for(key in p_data) {
+                try {
+                    patt = new RegExp('@' + p_data[key][0] + '@');
+                    g_data = g_data.replace(patt, p_data[key][1]);
+                } catch {}
+            }
 
-            p_data.innerHTML = o_p_data['data'];
+            o_data.innerHTML = g_data;
 
             js_data = o_p_data['js_data'];
             js_data = js_data.replace(/<script>/g, '');

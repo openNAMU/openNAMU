@@ -68,4 +68,7 @@ def namumark(title = '', data = None, num = 0):
         
         conn.commit()
         
-    return data[0] + data[1]
+    if num == 2:
+        return [data[0], data[1]]
+    else:
+        return data[0] + data[1]
