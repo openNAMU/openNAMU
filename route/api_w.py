@@ -4,8 +4,8 @@ def api_w_2(name):
     
 
     if flask.request.args.get('exist', None):
-        curs.execute("select title from data where title = ?", [name])
-        if curs.fetchall():
+        sqlQuery("select title from data where title = ?", [name])
+        if sqlQuery("fetchall"):
             return flask.jsonify({ "exist" : "1" })
         else:
             return flask.jsonify({})
@@ -16,8 +16,8 @@ def api_w_2(name):
                 
                 return flask.jsonify(json_data)
             else:
-                curs.execute("select data from data where title = ?", [name])
-                data = curs.fetchall()
+                sqlQuery("select data from data where title = ?", [name])
+                data = sqlQuery("fetchall")
                 if data:
                     json_data = { "title" : name, "data" : render_set(title = name, data = data[0][0]) }
                 
