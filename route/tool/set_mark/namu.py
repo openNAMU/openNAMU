@@ -371,7 +371,10 @@ def namu(conn, data, title, main_num):
     data = t_data[0]
 
     include_re = re.compile('\[include\(((?:(?!\)\]).)+)\)\]', re.I)
+    i = 0
     while 1:
+        i += 1
+
         include = include_re.search(data)
         if include:
             include = include.groups()[0]
@@ -386,41 +389,22 @@ def namu(conn, data, title, main_num):
 
             backlink += [[title, include_link, 'include']]
 
-            include = re.sub('^((?:(?!,).)+)', '', include)
-            
-            num = 0
-            while 1:
-                include_one_nowiki = re.search('(?:\\\\){2}(.)', include)
-                if include_one_nowiki:
-                    include_one_nowiki = include_one_nowiki.groups()
+            curs.execute("select title from data where title = ?", [include_data])
+            if curs.fetchall():
+                data = include_re.sub('<div id="include_' + str(i) + '"></div>', data, 1)
 
-                    num += 1
-
-                    end_data += [['include_one_nowiki_' + str(num), include_one_nowiki[0], 'normal']]
-
-                    include = re.sub('(?:\\\\){2}(.)', '<span id="include_one_nowiki_' + str(num) + '"></span>', include, 1)
-                else:
-                    break
-
-            curs.execute("select data from data where title = ?", [include_data])
-            include_data = curs.fetchall()
-            if include_data:
-                include_parser = include_re.sub('', include_data[0][0])
-                include_parser = html.escape(include_parser)
-
+                include_plus_data = []
                 while 1:
                     include_plus = re.search(', ?((?:(?!=).)+)=((?:(?!,).)+)', include)
                     if include_plus:
                         include_plus = include_plus.groups()
-                        include_parser = include_parser.replace('@' + include_plus[0] + '@', include_plus[1])
+                        include_plus_data += [[include_plus[0], include_plus[1]]]
 
                         include = re.sub(', ?((?:(?!=).)+)=((?:(?!,).)+)', '', include, 1)
                     else:
                         break
 
-                include_parser = re.sub('\[\[(?:category|분류):(((?!\]\]|#include).)+)\]\]', '', include_parser)
-
-                data = include_re.sub('<include><a id="include_link" href="/w/' + tool.url_pas(include_link) + '">\n[' + include_link + ']</a>\n' + include_parser + '\n</include>', data, 1)
+                plus_data += '<script>load_include("' + include_link + '", "include_' + str(i) + '", ' + str(include_plus_data) + ');</script>'
             else:
                 data = include_re.sub('<a id="not_thing" href="/w/' + tool.url_pas(include_link) + '">' + include_link + '</a>', data, 1)
         else:
@@ -471,7 +455,7 @@ def namu(conn, data, title, main_num):
                         "''' + math.replace('\\', '\\\\').replace('&lt;', '<').replace('&gt;', '>') + '''",
                         document.getElementById("math_''' + str(first) + '''")
                     );
-            </script>
+                </script>
             '''
         else:
             break
