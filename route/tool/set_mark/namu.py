@@ -513,7 +513,7 @@ def namu(conn, data, title, main_num):
     edit_number = 0
     toc_data = '<div id="toc"><span id="toc_title">TOC</span>\n\n'
     while 1:
-        toc = re.search('\n(={1,6}) ?((?:(?!\n).)+) ?\n', data)
+        toc = re.search('\n(={1,6}) ?((?:(?!\n).)+) ?(?:={1,6})\n', data)
         if toc:
             toc = toc.groups()
             
