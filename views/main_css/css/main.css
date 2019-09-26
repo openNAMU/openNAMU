@@ -34,8 +34,13 @@ s:hover, strike:hover, del:hover { color: gray; background-color: gainsboro; tex
 body { word-break: break-all; overflow: auto; }
 hr.main_hr { border: none; }
 #include_link { display: none; }
-.foot_plus { background: gainsboro; }
+.foot_plus { background: white; border: 5px solid gainsboro; padding: 5px; width: 300px; height: 300px; position: fixed; top: calc(50% - 150px); right: calc(50% - 150px); display: none; z-index: 100; }
 #toc_title { font-size: 18px; }
 blockquote { background-image: url(/views/acme/img/quote.png); background-position: calc(100% - 10px) 10px; background-repeat: no-repeat; background-size: 25px; }
 #admin_log_search { width: 100px; }
 @media (max-width: 768px) { table { min-width: 100%; }}
+.foot_close { text-align: center; border-top: 5px solid gainsboro; width: 100%; left: 0px; bottom: 0px; position: absolute; height: 20px; }
+@media (max-width: 400px) { .foot_plus { width: 80%; right: calc(100% - 92%); }}
+@media (max-height: 400px) { .foot_plus { height: 80%; top: calc(100% - 92%); }}
+.foot_in { overflow-y: scroll; height: calc(100% - 20px); }
+.foot_close:active, .foot_close:hover { text-decoration: none; }

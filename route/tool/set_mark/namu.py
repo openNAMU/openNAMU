@@ -905,7 +905,7 @@ def namu(conn, data, title, main_num):
 
                         footnote_all += [[float(footshort), footshort, 0]]
 
-                        data = re_footnote.sub('<sup><a href="javascript:open_foot(\'fn-' + footshort + '\')" id="rfn-' + footshort + '">(' + footnote_name + ')</a></sup><span class="foot_plus" id="cfn-' + footshort + '"></span>', data, 1)
+                        data = re_footnote.sub('<sup><a href="javascript:do_open_foot(\'fn-' + footshort + '\')" id="rfn-' + footshort + '">(' + footnote_name + ')</a></sup><span class="foot_plus" id="cfn-' + footshort + '"></span>', data, 1)
                     else:
                         data = re_footnote.sub('<sup><a href="#">(' + footnote_name + ')</a></sup>', data, 1)
                 else:
@@ -923,7 +923,7 @@ def namu(conn, data, title, main_num):
 
                     footnote_all += [[footnote_number, footnote_name, footnote]]
                     
-                    data = re_footnote.sub('<sup><a href="javascript:open_foot(\'fn-' + str(footnote_number) + '\')" id="rfn-' + str(footnote_number) + '">(' + footnote_name + ')</a></sup><span class="foot_plus" id="cfn-' + str(footnote_number) + '"></span>', data, 1)
+                    data = re_footnote.sub('<sup><a href="javascript:do_open_foot(\'fn-' + str(footnote_number) + '\')" id="rfn-' + str(footnote_number) + '">(' + footnote_name + ')</a></sup><div class="foot_plus" id="cfn-' + str(footnote_number) + '"></div>', data, 1)
         else:
             break
 
