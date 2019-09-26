@@ -785,6 +785,8 @@ def namu(conn, data, title, main_num):
                 else:
                     data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<a id="not_thing" href="/w/' + tool.url_pas(file_alt) + '">' + file_alt + '</a>', data, 1)
             elif category_re.search(main_link):
+                main_link = category_re.sub('category:', main_link)
+                
                 if re.search('#blur', main_link):
                     see_link = 'Hidden'
                     link_id = 'id="inside"'
