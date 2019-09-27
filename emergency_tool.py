@@ -137,7 +137,7 @@ elif what_i_do == '8':
     curs.execute("update other set data = '00000' where name = 'ver'")
 else:
     print('----')
-    print('DB\'s name (data) : ', end = '')
+    print('DB name (data) : ', end = '')
     
     db_name = input()
     if db_name == '':
