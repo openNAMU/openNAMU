@@ -49,14 +49,14 @@ def sqlQuery2(query, *arg):
 
     if db_type["DBMS"] == "mariadb":
         if query == "fetchall":
-            return curs.fetchall()
+            return sqlQuery("fetchall")
         elif query == "commit":
             pass
         else:
             return q_mariadb2(query, *arg)
     elif db_type["DBMS"] == "sqlite":
         if query == "fetchall":
-            return curs.fetchall()
+            return sqlQuery("fetchall")
         elif query == "commit":
             return conn.commit()
         else:
@@ -453,8 +453,8 @@ def namu(conn, data, title, main_num):
 
             backlink += [[title, include_link, 'include']]
 
-            curs.execute("select title from data where title = ?", [include_data])
-            if curs.fetchall():
+            sqlQuery2("select title from data where title = ?", [include_data])
+            if sqlQuery2("fetchall"):
                 data = include_re.sub('<div id="include_' + str(i) + '"></div>', data, 1)
 
                 include_plus_data = []

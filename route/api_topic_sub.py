@@ -94,8 +94,8 @@ def api_topic_sub_2(name, sub, time):
                 if i[4] != 'O' or (i[4] == 'O' and admin == 1):
                     t_data_f = i[1]
                 else:
-                    curs.execute("select who from re_admin where what = ? order by time desc limit 1", ['blind (' + name + ' - ' + sub + '#' + str(i[0]) + ')'])
-                    who_blind = curs.fetchall()
+                    sqlQuery("select who from re_admin where what = ? order by time desc limit 1", ['blind (' + name + ' - ' + sub + '#' + str(i[0]) + ')'])
+                    who_blind = sqlQuery("fetchall")
                     if who_blind:
                         t_data_f = '[[user:' + who_blind[0][0] + ']] block'
                     else:

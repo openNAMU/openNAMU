@@ -129,7 +129,7 @@ elif what_i_do == '7':
        
     sqlQuery("update user set pw = ? where id = ?", [hashed, user_name])
 elif what_i_do == '8':
-    curs.execute("update other set data = '00000' where name = 'ver'")
+    sqlQuery("update other set data = '00000' where name = 'ver'")
 elif what_i_do == '9':
     print('----')
     print('DB name (data) : ', end = '')

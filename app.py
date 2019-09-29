@@ -81,12 +81,12 @@ if db_type["DBMS"] == "mariadb":
     load_conn(conn)
 
     try:
-        curs.execute("CREATE DATABASE " + db_data["db_name"])
+        sqlQuery("CREATE DATABASE " + db_data["db_name"])
     except:   # 예외 처리
         setup_tool = 0
         pass
 
-    curs.execute("USE " + db_data["db_name"])
+    sqlQuery("USE " + db_data["db_name"])
 elif db_type["DBMS"] == "sqlite":
     all_src = []
     for i_data in os.listdir("."):

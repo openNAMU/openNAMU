@@ -113,14 +113,14 @@ def sqlQuery(query, *arg):
 
     if db_type["DBMS"] == "mariadb":
         if query == "fetchall":
-            return curs.fetchall()
+            return sqlQuery("fetchall")
         elif query == "commit":
             pass
         else:
             return q_mariadb(query, *arg)
     elif db_type["DBMS"] == "sqlite":
         if query == "fetchall":
-            return curs.fetchall()
+            return sqlQuery("fetchall")
         elif query == "commit":
             return conn.commit()
         else:
@@ -742,8 +742,8 @@ def load_skin(data = '', set_n = 0):
 def view_check(name):
     ip = ip_check()
     
-    curs.execute("select view from acl where title = ?", [name])
-    acl_data = curs.fetchall()
+    sqlQuery("select view from acl where title = ?", [name])
+    acl_data = sqlQuery("fetchall")
     if acl_data:
         if acl_data[0][0] == 'user':
             if ip_or_user(ip) == 1:
@@ -754,8 +754,8 @@ def view_check(name):
                 return 1
             
             if admin_check(5, 'view (' + name + ')') != 1:
-                curs.execute("select count(title) from history where ip = ?", [ip])
-                count = curs.fetchall()
+                sqlQuery("select count(title) from history where ip = ?", [ip])
+                count = sqlQuery("fetchall")
                 if count:
                     count = count[0][0]
                 else:
@@ -1076,8 +1076,8 @@ def number_check(data):
 
 def edit_filter_do(data):
     if admin_check(1) != 1:
-        curs.execute("select regex, sub from filter where regex != ''")
-        for data_list in curs.fetchall():
+        sqlQuery("select regex, sub from filter where regex != ''")
+        for data_list in sqlQuery("fetchall"):
             match = re.compile(data_list[0], re.I)
             if match.search(data):
                 ban_insert(
