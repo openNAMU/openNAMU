@@ -438,12 +438,18 @@ def wiki_set(num = 1):
         curs.execute("select data from other where name = 'head' and coverage = ?", [skin_check(1)])
         db_data = curs.fetchall()
         if db_data and db_data[0][0] != '':
-            data_list += [db_data[0][0]]
+            if len(re.findall('<', db_data[0][0])) % 2 != 1:
+                data_list += [db_data[0][0]]
+            else:
+                data_list += ['']
         else:
             curs.execute("select data from other where name = 'head' and coverage = ''")
             db_data = curs.fetchall()
             if db_data and db_data[0][0] != '':
-                data_list += [db_data[0][0]]
+                if len(re.findall('<', db_data[0][0])) % 2 != 1:
+                    data_list += [db_data[0][0]]
+                else:
+                    data_list += ['']
             else:
                 data_list += ['']
 
@@ -589,7 +595,10 @@ def ip_pas(raw_ip):
 
 def custom():
     if 'head' in flask.session:
-        user_head = flask.session['head']
+        if len(re.findall('<', flask.session['head'])) % 2 != 1:
+            user_head = flask.session['head']
+        else:
+            user_head = ''
     else:
         user_head = ''
 
