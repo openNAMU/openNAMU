@@ -88,36 +88,26 @@ if db_type["DBMS"] == "mariadb":
 
     sqlQuery("USE " + db_data["db_name"])
 elif db_type["DBMS"] == "sqlite":
-    all_src = []
-    for i_data in os.listdir("."):
-        f_src = re.search("(.+)\.db$", i_data)
-        if f_src:
-            all_src += [f_src.groups()[0]]
+    try:
+        set_data = json.loads(open('data/set.json').read())
+    except:
+        if os.getenv('NAMU_DB') != None:
+            set_data = { "db" : os.getenv('NAMU_DB') }
+        else:
+            print('DB name (data) : ', end = '')
 
-    if len(all_src) == 0:
-        print('DB name (data) : ', end = '')
-        
-        db_name = input()
-        if db_name == '':
-            db_name = 'data'
-    elif len(all_src) > 1:
-        db_num = 1
+            new_json = str(input())
+            if new_json == '':
+                new_json = 'data'
 
-        for i_data in all_src:
-            print(str(db_num) + ' : ' + i_data)
+            with open('set.json', 'w') as f:
+                f.write('{ "db" : "' + new_json + '" }')
 
-            db_num += 1
+            set_data = json.loads(open('data/set.json').read())
 
-        print('----')
-        print('Number : ', end = '')
-        db_name = all_src[int(number_check(input())) - 1]
-        print('----')
-    else:
-        db_name = all_src[0]
-
-    if len(all_src) == 1:
-        print('DB\'s name : ' + db_name)
-                
+    print('DB\'s name : ' + set_data['db'])
+    db_name = set_data['db']
+                    
     if os.path.exists(db_name + '.db'):
         setup_tool = 0
     else:
