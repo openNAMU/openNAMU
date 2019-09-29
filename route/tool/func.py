@@ -521,18 +521,21 @@ def admin_check(num = None, what = None):
     if user:
         reset = 0
 
+        back_num = num
         while 1:
-            if num == 1 and reset == 0:
+            if num == 1:
                 check = 'ban'
-            elif num == 3 and reset == 0:
+            elif num == 2:
+                check = 'nothing'
+            elif num == 3:
                 check = 'toron'
-            elif num == 4 and reset == 0:
+            elif num == 4:
                 check = 'check'
-            elif num == 5 and reset == 0:
+            elif num == 5:
                 check = 'acl'
-            elif num == 6 and reset == 0:
+            elif num == 6:
                 check = 'hidel'
-            elif num == 7 and reset == 0:
+            elif num == 7:
                 check = 'give'
             else:
                 check = 'owner'
@@ -545,8 +548,15 @@ def admin_check(num = None, what = None):
 
                 return 1
             else:
-                if reset == 0:
-                    reset = 1
+                if back_num == 'all':
+                    if num == 'all':
+                        num = 1
+                    elif num != 8:
+                        num += 1
+                    else:
+                        break
+                elif num:
+                    num = None
                 else:
                     break
                     
@@ -607,8 +617,18 @@ def custom():
         user_name = ip
     else:
         user_name = load_lang('user')
+        
+    if admin_check('all') == 1:
+        user_admin = '1'
+    else:
+        user_admin = '0'
+        
+    if ban_check() == 1:
+        user_ban = '1'
+    else:
+        user_ban = '0'
 
-    return ['', '', user_icon, user_head, email, user_name]
+    return ['', '', user_icon, user_head, email, user_name, user_admin, user_ban]
 
 def load_skin(data = '', set_n = 0):
     div2 = ''
