@@ -579,18 +579,21 @@ def admin_check(num = None, what = None):
     if user:
         reset = 0
 
+        back_num = num
         while 1:
-            if num == 1 and reset == 0:
+            if num == 1:
                 check = 'ban'
-            elif num == 3 and reset == 0:
+            elif num == 2:
+                check = 'nothing'
+            elif num == 3:
                 check = 'toron'
-            elif num == 4 and reset == 0:
+            elif num == 4:
                 check = 'check'
-            elif num == 5 and reset == 0:
+            elif num == 5:
                 check = 'acl'
-            elif num == 6 and reset == 0:
+            elif num == 6:
                 check = 'hidel'
-            elif num == 7 and reset == 0:
+            elif num == 7:
                 check = 'give'
             else:
                 check = 'owner'
@@ -603,8 +606,15 @@ def admin_check(num = None, what = None):
 
                 return 1
             else:
-                if reset == 0:
-                    reset = 1
+                if back_num == 'all':
+                    if num == 'all':
+                        num = 1
+                    elif num != 8:
+                        num += 1
+                    else:
+                        break
+                elif num:
+                    num = None
                 else:
                     break
                     
@@ -665,8 +675,18 @@ def custom():
         user_name = ip
     else:
         user_name = load_lang('user')
+        
+    if admin_check('all') == 1:
+        user_admin = '1'
+    else:
+        user_admin = '0'
+        
+    if ban_check() == 1:
+        user_ban = '1'
+    else:
+        user_ban = '0'
 
-    return ['', '', user_icon, user_head, email, user_name]
+    return ['', '', user_icon, user_head, email, user_name, user_admin, user_ban]
 
 def load_skin(data = '', set_n = 0):
     div2 = ''
@@ -718,41 +738,46 @@ def load_skin(data = '', set_n = 0):
                         div2 += [skin_data]
 
     return div2
+    
+def view_check(name):
+    ip = ip_check()
+    
+    curs.execute("select view from acl where title = ?", [name])
+    acl_data = curs.fetchall()
+    if acl_data:
+        if acl_data[0][0] == 'user':
+            if ip_or_user(ip) == 1:
+                return 1
+
+        if acl_data[0][0] == '50_edit':
+            if ip_or_user(ip) == 1:
+                return 1
+            
+            if admin_check(5, 'view (' + name + ')') != 1:
+                curs.execute("select count(title) from history where ip = ?", [ip])
+                count = curs.fetchall()
+                if count:
+                    count = count[0][0]
+                else:
+                    count = 0
+
+                if count < 50:
+                    return 1
+
+        if acl_data[0][0] == 'admin':
+            if ip_or_user(ip) == 1:
+                return 1
+
+            if admin_check(5, 'view (' + name + ')') != 1:
+                return 1
+
+    return 0
 
 def acl_check(name, tool = ''):
     ip = ip_check()
     
     if tool == 'render':
-        sqlQuery("select view from acl where title = ?", [name])
-        acl_data = sqlQuery("fetchall")
-        if acl_data:
-            if acl_data[0][0] == 'user':
-                if ip_or_user(ip) == 1:
-                    return 1
-
-            if acl_data[0][0] == '50_edit':
-                if ip_or_user(ip) == 1:
-                    return 1
-                
-                if admin_check(5, 'view (' + name + ')') != 1:
-                    sqlQuery("select count(title) from history where ip = ?", [ip])
-                    count = sqlQuery("fetchall")
-                    if count:
-                        count = count[0][0]
-                    else:
-                        count = 0
-
-                    if count < 50:
-                        return 1
-
-            if acl_data[0][0] == 'admin':
-                if ip_or_user(ip) == 1:
-                    return 1
-
-                if admin_check(5, 'view (' + name + ')') != 1:
-                    return 1
-
-        return 0
+        return view_check(name)
     else:
         if ban_check() == 1:
             return 1
@@ -826,6 +851,9 @@ def acl_check(name, tool = ''):
         sqlQuery('select data from other where name = "edit"')
         set_data = sqlQuery("fetchall")
         if set_data:
+            if view_check(name) == 1:
+                return 1
+        
             if set_data[0][0] == 'login':
                 if ip_or_user(ip) == 1:
                     return 1
@@ -1048,8 +1076,8 @@ def number_check(data):
 
 def edit_filter_do(data):
     if admin_check(1) != 1:
-        sqlQuery("select regex, sub from filter")
-        for data_list in sqlQuery("fetchall"):
+        curs.execute("select regex, sub from filter where regex != ''")
+        for data_list in curs.fetchall():
             match = re.compile(data_list[0], re.I)
             if match.search(data):
                 ban_insert(

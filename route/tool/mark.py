@@ -126,4 +126,7 @@ def namumark(conn, title = '', data = None, num = 0):
         
         sqlQuery2("commit")
         
-    return data[0] + data[1]
+    if num == 2:
+        return [data[0], data[1]]
+    else:
+        return data[0] + data[1]
