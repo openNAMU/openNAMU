@@ -49,14 +49,14 @@ def sqlQuery2(query, *arg):
 
     if db_type["DBMS"] == "mariadb":
         if query == "fetchall":
-            return sqlQuery("fetchall")
+            return curs.fetchall()
         elif query == "commit":
             pass
         else:
             return q_mariadb2(query, *arg)
     elif db_type["DBMS"] == "sqlite":
         if query == "fetchall":
-            return sqlQuery("fetchall")
+            return curs.fetchall()
         elif query == "commit":
             return conn.commit()
         else:
