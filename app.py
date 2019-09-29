@@ -622,11 +622,12 @@ def main_file(data = None):
 def main_error_404(e):
     return main_error_404_2(conn)
 
-app.secret_key = rep_key
-app.wsgi_app = werkzeug.debug.DebuggedApplication(app.wsgi_app, True)
-app.debug = True
+if __name__ == "__main__":
+    app.secret_key = rep_key
+    app.wsgi_app = werkzeug.debug.DebuggedApplication(app.wsgi_app, True)
+    app.debug = True
 
-http_server = tornado.httpserver.HTTPServer(tornado.wsgi.WSGIContainer(app))
-http_server.listen(server_set['port'], address = server_set['host'])
-
-tornado.ioloop.IOLoop.instance().start()
+    http_server = tornado.httpserver.HTTPServer(tornado.wsgi.WSGIContainer(app))
+    http_server.listen(server_set['port'], address = server_set['host'])
+    
+    tornado.ioloop.IOLoop.instance().start()
