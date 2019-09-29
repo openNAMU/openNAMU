@@ -95,19 +95,19 @@ elif db_type["DBMS"] == "sqlite":
             set_data = { "db" : os.getenv('NAMU_DB') }
         else:
             print('DB name (data) : ', end = '')
-
+            
             new_json = str(input())
             if new_json == '':
                 new_json = 'data'
-
-            with open('set.json', 'w') as f:
+                
+            with open('data/set.json', 'w') as f:
                 f.write('{ "db" : "' + new_json + '" }')
-
+                
             set_data = json.loads(open('data/set.json').read())
-
-    print('DB\'s name : ' + set_data['db'])
+            
+    print('DB name : ' + set_data['db'])
     db_name = set_data['db']
-                    
+                
     if os.path.exists(db_name + '.db'):
         setup_tool = 0
     else:
