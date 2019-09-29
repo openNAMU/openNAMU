@@ -1,8 +1,6 @@
 function do_open_foot(name) {
     var o_data = document.getElementById('c' + name);
-    
-    name = name.replace(/\.([0-9]+)$/, '');
-    var g_data = document.getElementById(name);
+    var g_data = document.getElementById(name.replace(/\.([0-9]+)$/, ''));
 
     if(o_data.innerHTML === '') {
         o_data.style.display = 'block';
