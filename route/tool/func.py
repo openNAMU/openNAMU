@@ -682,6 +682,8 @@ def load_skin(data = '', set_n = 0):
     return div2
     
 def view_check(name):
+    ip = ip_check()
+    
     curs.execute("select view from acl where title = ?", [name])
     acl_data = curs.fetchall()
     if acl_data:
