@@ -680,41 +680,44 @@ def load_skin(data = '', set_n = 0):
                         div2 += [skin_data]
 
     return div2
+    
+def view_check(name):
+    curs.execute("select view from acl where title = ?", [name])
+    acl_data = curs.fetchall()
+    if acl_data:
+        if acl_data[0][0] == 'user':
+            if ip_or_user(ip) == 1:
+                return 1
+
+        if acl_data[0][0] == '50_edit':
+            if ip_or_user(ip) == 1:
+                return 1
+            
+            if admin_check(5, 'view (' + name + ')') != 1:
+                curs.execute("select count(title) from history where ip = ?", [ip])
+                count = curs.fetchall()
+                if count:
+                    count = count[0][0]
+                else:
+                    count = 0
+
+                if count < 50:
+                    return 1
+
+        if acl_data[0][0] == 'admin':
+            if ip_or_user(ip) == 1:
+                return 1
+
+            if admin_check(5, 'view (' + name + ')') != 1:
+                return 1
+
+    return 0
 
 def acl_check(name, tool = ''):
     ip = ip_check()
     
     if tool == 'render':
-        curs.execute("select view from acl where title = ?", [name])
-        acl_data = curs.fetchall()
-        if acl_data:
-            if acl_data[0][0] == 'user':
-                if ip_or_user(ip) == 1:
-                    return 1
-
-            if acl_data[0][0] == '50_edit':
-                if ip_or_user(ip) == 1:
-                    return 1
-                
-                if admin_check(5, 'view (' + name + ')') != 1:
-                    curs.execute("select count(title) from history where ip = ?", [ip])
-                    count = curs.fetchall()
-                    if count:
-                        count = count[0][0]
-                    else:
-                        count = 0
-
-                    if count < 50:
-                        return 1
-
-            if acl_data[0][0] == 'admin':
-                if ip_or_user(ip) == 1:
-                    return 1
-
-                if admin_check(5, 'view (' + name + ')') != 1:
-                    return 1
-
-        return 0
+        return view_check(name)
     else:
         if ban_check() == 1:
             return 1
@@ -788,6 +791,9 @@ def acl_check(name, tool = ''):
         curs.execute('select data from other where name = "edit"')
         set_data = curs.fetchall()
         if set_data:
+            if view_check(name) == 1:
+                return 1
+        
             if set_data[0][0] == 'login':
                 if ip_or_user(ip) == 1:
                     return 1
