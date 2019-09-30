@@ -21,7 +21,10 @@ def api_w_2(name):
                 if data:
                     if flask.request.args.get('include', '1'):
                         include_re = re.compile('\[include\(((?:(?!\)\]).)+)\)\]', re.I)
+                        category_re = re.compile('\[\[(?:(?:category|분류):(?:(?!\[\[|\]\]).)+)\]\]', re.I)
+                        
                         json_data = include_re.sub('', data[0][0])
+                        json_data = category_re.sub('', json_data)
                     else:
                         json_data = g_data[0]
 

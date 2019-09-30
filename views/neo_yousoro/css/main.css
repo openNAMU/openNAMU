@@ -49,8 +49,7 @@ li {
 
 #top {
     width: 100%;
-    border-bottom: 2px solid gainsboro;
-    background: skyblue;
+    background: black;
     padding: 15px;
     padding-right: 0;
     padding-left: 0;
@@ -63,17 +62,14 @@ li {
 #main {
     margin: auto;
     margin-top: -20px;
-    padding: 10px;
+    padding: 20px;
     padding-bottom: 20px;
     background: white;
-    border-left: 2px solid gainsboro;
-    border-right: 2px solid gainsboro;
     min-height: 350px;
 }
 
 #bottom {
     width: 100%;
-    border-top: 2px solid gainsboro;
     background: white;
     padding-bottom: 20px;
 }
@@ -283,16 +279,15 @@ h6 {
     margin-top: 5%;
 }
 
-#close_top {
-    float: right;
-    margin-right: 10px;
-}
-
 #toc {
     max-width: 300px;
 }
 
 #top a {
+    color: white;
+}
+
+#top .cel_in_cel a {
     color: black;
 }
 
@@ -339,14 +334,14 @@ input {
 #go_toc {
     display: inline-block;
     padding: 10px;
-    border-left: 2px solid skyblue;
+    border-left: 2px solid black;
     width: 25px;
 }
 
 #go_top {
     display: inline-block;
     padding: 10px;
-    border-right: 2px solid skyblue;
+    border-right: 2px solid black;
     width: 25px;
 }
 
@@ -362,7 +357,7 @@ input {
     position: fixed;
     bottom: 0;
     right: 0;
-    border: 2px solid skyblue;
+    border: 2px solid black;
     background: white;
     text-align: center;
 }
@@ -376,5 +371,5 @@ blockquote {
     margin: 1em 0em 0em;
     background: #eeeeee;
     border: 2px dashed #ccc;
-    border-left: 5px solid skyblue;
+    border-left: 5px solid black;
 }
