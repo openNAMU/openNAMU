@@ -690,7 +690,7 @@ def main_file(data = None):
 # End
 @app.errorhandler(404)
 def main_error_404(e):
-    return main_error_404_2(conn)
+    return main_error_404_2()
     
 app.secret_key = rep_key
 app.wsgi_app = werkzeug.debug.DebuggedApplication(app.wsgi_app, True)
