@@ -231,7 +231,7 @@ if setup_tool != 0:
             try:
                 sqlQuery('select ' + create + ' from ' + create_table + ' limit 1')
             except:
-                sqlQuery("alter table " + create_table + " add " + create + " text default ''")
+                sqlQuery("alter table " + create_table + " add " + create + " LONGTEXT default ''")
 
     update()
 
