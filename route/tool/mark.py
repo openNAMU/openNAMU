@@ -19,11 +19,6 @@ def load_conn2(data):
     curs = conn.cursor()
 
 def q_mariadb2(query, *arg):
-    with open("DB_Data.json") as fileRead:
-        db_data = json.load(fileRead)
-
-    curs.execute(f'USE {db_data["db_name"]};')
-    
     if arg:
         qarg = tuple(arg[0])
         sql = query.replace("%", "%%")

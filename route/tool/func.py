@@ -74,13 +74,6 @@ def load_conn(data):
     load_conn2(data)
 
 def q_mariadb(query, *arg):
-    ## 아 속도 느려지는 소리가 여기까지 들린다
-    ## TODO: 개선 예정
-    with open("DB_Data.json") as fileRead:
-        db_data = json.load(fileRead)
-
-    curs.execute(f'USE {db_data["db_name"]};')
-    
     if arg:
         qarg = tuple(arg[0])
         sql = query.replace("%", "%%")
