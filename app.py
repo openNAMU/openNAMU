@@ -87,6 +87,7 @@ if db_type["DBMS"] == "mariadb":
         pass
 
     sqlQuery("USE " + db_data["db_name"])
+    curs.execute('SET @@global.sql_mode = "ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION";')
 elif db_type["DBMS"] == "sqlite":
     try:
         set_data = json.loads(open('data/set.json').read())
@@ -139,28 +140,29 @@ app.jinja_env.filters['cut_100'] = cut_100
 
 app.url_map.converters['everything'] = EverythingConverter
 
-sqlQuery('create table if not exists data(test text)')
-sqlQuery('create table if not exists cache_data(test text)')
-sqlQuery('create table if not exists history(test text)')
-sqlQuery('create table if not exists rd(test text)')
-sqlQuery('create table if not exists user(test text)')
-sqlQuery('create table if not exists user_set(test text)')
-sqlQuery('create table if not exists ban(test text)')
-sqlQuery('create table if not exists topic(test text)')
-sqlQuery('create table if not exists rb(test text)')
-sqlQuery('create table if not exists back(test text)')
-sqlQuery('create table if not exists custom(test text)')
-sqlQuery('create table if not exists other(test text)')
-sqlQuery('create table if not exists alist(test text)')
-sqlQuery('create table if not exists re_admin(test text)')
-sqlQuery('create table if not exists alarm(test text)')
-sqlQuery('create table if not exists ua_d(test text)')
-sqlQuery('create table if not exists filter(test text)')
-sqlQuery('create table if not exists scan(test text)')
-sqlQuery('create table if not exists acl(test text)')
-sqlQuery('create table if not exists inter(test text)')
-sqlQuery('create table if not exists html_filter(test text)')
-sqlQuery('create table if not exists oauth_conn(test text)')
+sqlQuery('create table if not exists data(test LONGTEXT)')
+sqlQuery('create table if not exists cache_data(test LONGTEXT)')
+sqlQuery('create table if not exists history(test LONGTEXT)')
+sqlQuery('create table if not exists rd(test LONGTEXT)')
+sqlQuery('create table if not exists user(test LONGTEXT)')
+sqlQuery('create table if not exists user_set(test LONGTEXT)')
+sqlQuery('create table if not exists ban(test LONGTEXT)')
+sqlQuery('create table if not exists topic(test LONGTEXT)')
+sqlQuery('create table if not exists rb(test LONGTEXT)')
+sqlQuery('create table if not exists back(test LONGTEXT)')
+sqlQuery('create table if not exists custom(test LONGTEXT)')
+sqlQuery('create table if not exists other(test LONGTEXT)')
+sqlQuery('create table if not exists alist(test LONGTEXT)')
+sqlQuery('create table if not exists re_admin(test LONGTEXT)')
+sqlQuery('create table if not exists alarm(test LONGTEXT)')
+sqlQuery('create table if not exists ua_d(test LONGTEXT)')
+sqlQuery('create table if not exists filter(test LONGTEXT)')
+sqlQuery('create table if not exists scan(test LONGTEXT)')
+sqlQuery('create table if not exists acl(test LONGTEXT)')
+sqlQuery('create table if not exists inter(test LONGTEXT)')
+sqlQuery('create table if not exists html_filter(test LONGTEXT)')
+sqlQuery('create table if not exists oauth_conn(test LONGTEXT)')
+## MARIADB & SQLITE 공통 호환
 
 if setup_tool == 0:
     try:

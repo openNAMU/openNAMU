@@ -23,7 +23,6 @@ def q_mariadb2(query, *arg):
         db_data = json.load(fileRead)
 
     curs.execute(f'USE {db_data["db_name"]};')
-    curs.execute('SET @@global.sql_mode= \'NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION\';')
     
     if arg:
         qarg = tuple(arg[0])
