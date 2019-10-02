@@ -295,5 +295,6 @@
     "edit_tool_add": "편집 도구 추가",
     "image_license_list": "이미지 라이선스 목록",
     "image_license_add": "이미지 라이선스 추가",
-    "direct_input": "직접 입력"
+    "direct_input": "직접 입력",
+    "acl_record": "ACL 기록"
 }
