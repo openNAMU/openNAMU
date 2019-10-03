@@ -1082,8 +1082,8 @@ def re_error(data):
                 g_regex = re.compile(test_r[1])
                 if g_regex.search(ip):
                     end += '<li>' + load_lang('type') + ' : regex ban</li>'
-                    end += '<li>' + load_lang('end') + ' : ' + test_r[2] + '</li>'
-                    if test_r[0] != 'O':
+                    end += '<li>' + load_lang('end') + ' : ' + (test_r[2] if test_r[2] != '' else load_lang('limitless')) + '</li>'
+                    if test_r[0] == 'O':
                         end += '<li>' + load_lang('login_able') + ' (' + load_lang('not_sure') + ')</li>'
 
                     end += '<hr class=\"main_hr\">'
@@ -1092,8 +1092,8 @@ def re_error(data):
             band_d = curs.fetchall()
             if band_d:
                 end += '<li>' + load_lang('type') + ' : band ban</li>'
-                end += '<li>' + load_lang('end') + ' : ' + band_d[0][1] + '</li>'
-                if band_d[0][0] != 'O':
+                end += '<li>' + load_lang('end') + ' : ' + (band_d[0][1] if band_d[0][1] != '' else load_lang('limitless')) + '</li>'
+                if band_d[0][0] == 'O':
                     end += '<li>' + load_lang('login_able') + ' (' + load_lang('not_sure') + ')</li>'
 
                 end += '<hr class=\"main_hr\">'
@@ -1102,8 +1102,8 @@ def re_error(data):
             ban_d = curs.fetchall()
             if ban_d:
                 end += '<li>' + load_lang('type') + ' : ban</li>'
-                end += '<li>' + load_lang('end') + ' : ' + ban_d[0][1] + '</li>'
-                if ban_d[0][0] != 'O':
+                end += '<li>' + load_lang('end') + ' : ' + (ban_d[0][1] if ban_d[0][1] != '' else load_lang('limitless')) + '</li>'
+                if ban_d[0][0] == 'O':
                     end += '<li>' + load_lang('login_able') + ' (' + load_lang('not_sure') + ')</li>'
 
                 end += '<hr class=\"main_hr\">'
