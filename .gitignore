@@ -10,9 +10,8 @@ images
 robots.txt
 
 views/liberty
-views/yousoro
-views/super_lite
 views/buma
 views/before_namu
 views/acme
-views/sl-open
+views/sl_open
+views/nitori
