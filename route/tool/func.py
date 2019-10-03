@@ -167,7 +167,7 @@ def update():
         for i in db_data:
             curs.execute("update acl set decu = ? where title = ?", [i[1], i[0]])
 
-        print('fix table acl column dec to decu')
+        print('Fix table acl column dec to decu')
         print('----')
     except:
         pass
@@ -1093,7 +1093,7 @@ def re_error(data):
             if band_d:
                 end += '<li>' + load_lang('type') + ' : band ban</li>'
                 end += '<li>' + load_lang('end') + ' : ' + band_d[0][1] + '</li>'
-                if data[0][0] != 'O':
+                if band_d[0][0] != 'O':
                     end += '<li>' + load_lang('login_able') + ' (' + load_lang('not_sure') + ')</li>'
 
                 end += '<hr class=\"main_hr\">'
@@ -1103,7 +1103,7 @@ def re_error(data):
             if ban_d:
                 end += '<li>' + load_lang('type') + ' : ban</li>'
                 end += '<li>' + load_lang('end') + ' : ' + ban_d[0][1] + '</li>'
-                if data[0][0] != 'O':
+                if ban_d[0][0] != 'O':
                     end += '<li>' + load_lang('login_able') + ' (' + load_lang('not_sure') + ')</li>'
 
                 end += '<hr class=\"main_hr\">'
