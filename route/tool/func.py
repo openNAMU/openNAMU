@@ -385,11 +385,20 @@ def next_fix(link, num, page, end = 50):
 
 def other2(data):
     req_list = ''
-    for i_data in os.listdir(os.path.join("views", "main_css", "css")):
-        req_list += '<link rel="stylesheet" href="/views/main_css/css/' + i_data + '">'
     
+    css_filter = {}
+    for i_data in os.listdir(os.path.join("views", "main_css", "css")):
+        if i_data in css_filter:
+            req_list += '<link rel="stylesheet" href="/views/main_css/css/' + i_data + '?ver=' + css_filter[i_data] + '">'
+        else:
+            req_list += '<link rel="stylesheet" href="/views/main_css/css/' + i_data + '?ver=1">'
+    
+    js_filter = {}
     for i_data in os.listdir(os.path.join("views", "main_css", "js")):
-        req_list += '<script src="/views/main_css/js/' + i_data + '"></script>'
+        if i_data in js_filter:
+            req_list += '<script src="/views/main_css/js/' + i_data + '?ver=' + js_filter[i_data] + '"></script>'
+        else:
+            req_list += '<script src="/views/main_css/js/' + i_data + '?ver=1"></script>'
 
     data += ['', '''
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css">
