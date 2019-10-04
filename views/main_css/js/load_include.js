@@ -2,15 +2,10 @@ function load_include(title, name, p_data) {
     var o_data = document.getElementById(name);
 
     var url = "/api/w/" + encodeURI(title) + "?include=1";
-    var url_2 = "/api/markup";
     
     var xhr = new XMLHttpRequest();
     xhr.open("GET", url, true);
     xhr.send(null);
-
-    var xhr_2 = new XMLHttpRequest();
-    xhr_2.open("GET", url_2, true);
-    xhr_2.send(null);
 
     xhr.onreadystatechange = function() {
         if(xhr.readyState === 4 && xhr.status === 200) {
@@ -19,9 +14,11 @@ function load_include(title, name, p_data) {
             
             for(key in p_data) {
                 try {
-                    patt = new RegExp('@' + p_data[key][0] + '@');
+                    var patt = new RegExp('@' + p_data[key][0] + '@', 'g');
                     g_data = g_data.replace(patt, p_data[key][1]);
-                } catch {}
+                } catch(e) {
+                    console.log(e);
+                }
             }
 
             o_data.innerHTML = g_data;

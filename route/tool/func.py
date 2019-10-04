@@ -393,7 +393,9 @@ def other2(data):
         else:
             req_list += '<link rel="stylesheet" href="/views/main_css/css/' + i_data + '?ver=1">'
     
-    js_filter = {}
+    js_filter = {
+        'load_include.js' : '2'
+    }
     for i_data in os.listdir(os.path.join("views", "main_css", "js")):
         if i_data in js_filter:
             req_list += '<script src="/views/main_css/js/' + i_data + '?ver=' + js_filter[i_data] + '"></script>'
