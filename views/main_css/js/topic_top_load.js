@@ -11,7 +11,7 @@ function topic_top_load(name, sub) {
     xhr.onreadystatechange = function() {
         if(this.readyState === 4 && this.status === 200) {
             t_data = JSON.parse(this.responseText);
-            for(key in t_data) {
+            for(var key in t_data) {
                 n_data += t_data[key]['data'];
                 num = key;
             }

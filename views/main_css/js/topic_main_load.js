@@ -20,7 +20,7 @@ function topic_main_load(name, sub, s_num) {
     xhr.onreadystatechange = function() {
         if(xhr.readyState === 4 && xhr.status === 200) {
             t_data = JSON.parse(xhr.responseText);
-            for(key in t_data) {
+            for(var key in t_data) {
                 n_data += t_data[key]['data'];
                 num = key;
             }
