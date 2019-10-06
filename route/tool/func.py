@@ -327,7 +327,7 @@ def edit_button():
         data += '<a href="javascript:insert_data(\'content\', \'' + insert_data[0] + '\')">(' + insert_data[1] + ')</a> '
 
     if admin_check() == 1:
-        data += (' ' if data != '' else '') + '<a href="/edit_top">(' + load_lang('add') + ')'
+        data += (' ' if data != '' else '') + '<a href="/edit_top">(' + load_lang('add') + ')</a>'
 
     return data + '<hr class=\"main_hr\">'
 
