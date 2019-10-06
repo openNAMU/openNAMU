@@ -1,7 +1,7 @@
 function load_include(title, name, p_data) {
     var o_data = document.getElementById(name);
 
-    var url = "/api/w/" + encodeURI(title) + "?include=1";
+    var url = "/api/w/" + encodeURI(title) + "?include=" + name;
     
     var xhr = new XMLHttpRequest();
     xhr.open("GET", url, true);
