@@ -1039,8 +1039,10 @@ def namu(conn, data, title, main_num, include_num):
     data = re.sub('\n<\/ul>', '</ul>', data)
 
     data = re.sub('\n', '<br>', data)
-    data = '<div id="render_contect">' + data + '</div>'
-    
-    plus_data += '<script>render_html();</script>'
+    if include_num == '':
+        data = '<div id="render_contect">' + data + '</div>'
+        plus_data = '<script>render_html();</script>' + plus_data
+    else:
+        plus_data = '<script>render_html(\'' + re.sub('\-$', '', include_num) + '\');</script>' + plus_data
 
     return [data, plus_data, backlink]

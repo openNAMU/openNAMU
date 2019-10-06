@@ -1,5 +1,9 @@
-function render_html() {
-    data = document.getElementById('render_contect').innerHTML;
+function render_html(name = '') {
+    if(name === '') {
+        data = document.getElementById('render_contect').innerHTML;
+    } else {
+        data = document.getElementById(name).innerHTML;
+    }
 
     t_data = ['b', 'i', 's', 'del']
     for(var key in t_data) {
@@ -7,5 +11,9 @@ function render_html() {
         data = data.replace(patt, '<' + t_data[key] + '>$1</' + t_data[key] + '>');
     }
     
-    // document.getElementById('render_contect').innerHTML = data;
+    if(name === '') {
+        document.getElementById('render_contect').innerHTML = data;
+    } else {
+        document.getElementById(name).innerHTML = data;
+    }
 }
