@@ -147,7 +147,7 @@ def view_read_2(conn, name):
             menu += [['w/' + url_pas(name), load_lang('pass')]]
             end_data = '''
                 <div id="redirect">
-                    <a href="/w/''' + url_pas(flask.request.args.get('from', None)) + '?from=' + url_pas(name) + '">' + flask.request.args.get('from', None) + '</a> → ' + name + '''
+                    <a href="/w/''' + url_pas(flask.request.args.get('from', None)) + '?from=' + url_pas(name) + '">' + flask.request.args.get('from', None) + '</a> to <b>' + name + '''</b>
                 </div>
                 <br>
             ''' + end_data
