@@ -351,7 +351,7 @@ def server_restart():
 
 @app.route('/update', methods=['GET', 'POST'])
 def server_now_update():
-    return server_now_update_2(conn)
+    return server_now_update_2(conn, r_ver)
 
 @app.route('/oauth_setting', methods=['GET', 'POST'])
 def setting_oauth():

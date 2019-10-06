@@ -315,16 +315,7 @@ def ip_or_user(data):
         return 0
 
 def edit_button():
-    insert_list = [
-        ['[[name|view]]', load_lang('edit_button_link')], 
-        ['[* data]', load_lang('edit_button_footnote')], 
-        ['[macro(data)]', load_lang('edit_button_macro')],
-        ['{{{#color data}}}', load_lang('edit_button_color')], 
-        ["\\'\\'\\'data\\'\\'\\'", load_lang('edit_button_bold')],
-        ["~~data~~", load_lang('edit_button_strike')],
-        ["{{{+number data}}}", load_lang('edit_button_big')],
-        ["== name ==", load_lang('edit_button_paragraph')]
-    ]
+    insert_list = []
     
     curs.execute("select html, plus from html_filter where kind = 'edit_top'")
     db_data = curs.fetchall()
@@ -334,6 +325,9 @@ def edit_button():
     data = ''
     for insert_data in insert_list:
         data += '<a href="javascript:insert_data(\'content\', \'' + insert_data[0] + '\')">(' + insert_data[1] + ')</a> '
+
+    if admin_check() == 1:
+        data += (' ' if data != '' else '') + '<a href="/edit_top">(' + load_lang('add') + ')'
 
     return data + '<hr class=\"main_hr\">'
 
