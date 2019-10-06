@@ -47,6 +47,8 @@ def namumark(title, data, num, include):
         data = namu(conn, data, title, num, include)
     elif rep_data[0][0] == 'markdown':
         data = markdown(conn, data, title, num)
+    elif rep_data[0][0] == 'raw':
+        data = [data, '', []]
     else:
         data = ['', '', []]
 
