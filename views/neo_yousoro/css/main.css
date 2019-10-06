@@ -383,3 +383,19 @@ blockquote {
     border: 2px dashed #ccc;
     border-left: 5px solid black;
 }
+
+#out_link::before {
+    font-family: "Font Awesome 5 Free";
+    content: "\f360";
+    font-weight: 900;
+    background: transparent;
+    color: green;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+#mobile_menu a:hover, #top a:hover {
+    text-decoration: none;
+}
