@@ -399,3 +399,7 @@ a:hover {
 #mobile_menu a:hover, #top a:hover {
     text-decoration: none;
 }
+
+.foot_plus {
+    border-radius: 10px;
+}
