@@ -350,7 +350,7 @@ def middle_parser(data, fol_num, syntax_num, folding_num):
 
     return [data, [fol_num, syntax_num, folding_num]]
 
-def namu(conn, data, title, main_num):
+def namu(conn, data, title, main_num, include_num):
     curs = conn.cursor()
 
     global plus_data
@@ -873,6 +873,8 @@ def namu(conn, data, title, main_num):
     
     footdata_all = '<hr><ul id="footnote_data">'
     
+    include_num = include_num + '-' if include_num else ''
+    
     re_footnote = re.compile('(?:\[\*((?:(?! |\]).)*)(?: ((?:(?!(?:\[\*|\])).)+))?\]|(\[(?:각주|footnote)\]))')
     while 1:
         footnote = re_footnote.search(data)
@@ -887,7 +889,13 @@ def namu(conn, data, title, main_num):
                     else:
                         footdata_in = footdata[2]
 
-                    footdata_all += '<li><a href="#rfn-' + str(footdata[0]) + '">(' + footdata[1] + ')</a> <span id="fn-' + str(footdata[0]) + '">' + footdata_in + '</span></li>'
+                    footdata_all += '' + \
+                        '<li>' + \
+                            '<a href="#' + include_num + 'rfn-' + str(footdata[0]) + '">' + \
+                                '(' + footdata[1] + ')' + \
+                            '</a> <span id="' + include_num + 'fn-' + str(footdata[0]) + '">' + footdata_in + '</span>' + \
+                        '</li>' + \
+                    ''
                 
                 data = re_footnote.sub(footdata_all + '</ul>', data, 1)
                 
@@ -905,9 +913,15 @@ def namu(conn, data, title, main_num):
 
                         footnote_all += [[float(footshort), footshort, 0]]
 
-                        data = re_footnote.sub('<sup><a href="javascript:do_open_foot(\'fn-' + footshort + '\')" id="rfn-' + footshort + '">(' + footnote_name + ')</a></sup><span class="foot_plus" id="cfn-' + footshort + '"></span>', data, 1)
+                        data = re_footnote.sub('' + \
+                            '<sup>' + \
+                                '<a href="javascript:do_open_foot(\'' + include_num + 'fn-' + footshort + '\')" id="' + include_num + 'rfn-' + footshort + '">' + \
+                                    '(' + footnote_name + ')' + \
+                                '</a>' + \
+                            '</sup> <div class="foot_plus" id="' + include_num + 'cfn-' + footshort + '"></div>' + \
+                        '', data, 1)
                     else:
-                        data = re_footnote.sub('<sup><a href="#">(' + footnote_name + ')</a></sup>', data, 1)
+                        data = re_footnote.sub('<sup><a href="javascript:void(0);">(' + footnote_name + ')</a></sup>', data, 1)
                 else:
                     footnote_number += 1
 
@@ -923,7 +937,13 @@ def namu(conn, data, title, main_num):
 
                     footnote_all += [[footnote_number, footnote_name, footnote]]
                     
-                    data = re_footnote.sub('<sup><a href="javascript:do_open_foot(\'fn-' + str(footnote_number) + '\')" id="rfn-' + str(footnote_number) + '">(' + footnote_name + ')</a></sup><div class="foot_plus" id="cfn-' + str(footnote_number) + '"></div>', data, 1)
+                    data = re_footnote.sub('' + \
+                        '<sup>' + \
+                            '<a href="javascript:do_open_foot(\'' + include_num + 'fn-' + str(footnote_number) + '\')" id="' + include_num + 'rfn-' + str(footnote_number) + '">' + \
+                                '(' + footnote_name + ')' + \
+                            '</a>' + \
+                        '</sup> <div class="foot_plus" id="' + include_num + 'cfn-' + str(footnote_number) + '"></div>' + \
+                    '', data, 1)
         else:
             break
 
@@ -937,7 +957,11 @@ def namu(conn, data, title, main_num):
         else:
             footdata_in = footdata[2]
 
-        footdata_all += '<li><a href="#rfn-' + str(footdata[0]) + '">(' + footdata[1] + ')</a> <span id="fn-' + str(footdata[0]) + '">' + footdata_in + '</span></li>'
+        footdata_all += '' + \
+            '<li>' + \
+                '<a href="#' + include_num + 'rfn-' + str(footdata[0]) + '">(' + footdata[1] + ')</a> <span id="' + include_num + 'fn-' + str(footdata[0]) + '">' + footdata_in + '</span>' + \
+            '</li>' + \
+        ''
 
     footdata_all += '</ul>'
     if footdata_all == '<hr><ul id="footnote_data"></ul>':

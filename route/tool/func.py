@@ -134,14 +134,14 @@ def last_change(data):
 def easy_minify(data, tool = None):    
     return last_change(data)
 
-def render_set(title = '', data = '', num = 0, s_data = 0):
+def render_set(title = '', data = '', num = 0, s_data = 0, include = None):
     if acl_check(title, 'render') == 1:
         return 'HTTP Request 401.3'
     elif s_data == 1:
         return data
     else:
         if data != None:
-            return namumark(title, data, num)
+            return namumark(title, data, num, include)
         else:
             return 'HTTP Request 404'
 
