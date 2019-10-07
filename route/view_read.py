@@ -181,6 +181,11 @@ def view_read_2(conn, name):
     body = curs.fetchall()
     if body:
         div = body[0][0] + '<hr class=\"main_hr\">' + div
+        
+    curs.execute("select data from other where name = 'bottom_body'")
+    body = curs.fetchall()
+    if body:
+        div += '<hr class=\"main_hr\">' + body[0][0]
     
     div = adsense_code + '<div>' + div + '</div>'
 
