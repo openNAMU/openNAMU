@@ -13,7 +13,8 @@ def setting_2(conn, num):
             load_lang('main_head'),
             load_lang('main_body'),
             'robots.txt',
-            'Google'
+            'Google',
+            load_lang('main_bottom_body'),
         ]
         
         x = 0
@@ -310,11 +311,15 @@ def setting_2(conn, num):
                 ''',
                 menu = [['setting', load_lang('return')]]
             ))
-    elif num == 3 or num == 4:
+    elif num == 3 or num == 4 or num == 7:
         if flask.request.method == 'POST':
             if num == 4:
                 info_d = 'body'
                 end_r = '4'
+                coverage = ''
+            elif num == 7:
+                info_d = 'bottom_body'
+                end_r = '7'
                 coverage = ''
             else:
                 info_d = 'head'
@@ -343,6 +348,10 @@ def setting_2(conn, num):
             if num == 4:
                 curs.execute("select data from other where name = 'body'")
                 title = '_body'
+                start = ''
+            elif num == 7:
+                curs.execute("select data from other where name = 'bottom_body'")
+                title = '_bottom_body'
                 start = ''
             else:
                 curs.execute("select data from other where name = 'head' and coverage = ?", [flask.request.args.get('skin', '')])

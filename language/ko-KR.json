@@ -120,7 +120,7 @@
     "new_password": "새 비밀번호",
     "authority_use_list": "권한 사용 목록",
     "alarm": "알림",
-    "main_body": "전역 <BODY>",
+    "main_body": "본문 상단",
     "all_document_list": "모든 문서 목록",
     "update": "업데이트",
     "login_able": "로그인 가능",
@@ -289,5 +289,6 @@
     "image_license_list": "이미지 라이선스 목록",
     "image_license_add": "이미지 라이선스 추가",
     "direct_input": "직접 입력",
-    "acl_record": "ACL 기록"
+    "acl_record": "ACL 기록",
+    "main_bottom_body": "본문 하단"
 }
