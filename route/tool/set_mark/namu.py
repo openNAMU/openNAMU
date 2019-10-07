@@ -433,6 +433,7 @@ def namu(conn, data, title, main_num, include_num):
     data = re.sub('\|\|( +)\n', '||\n', data)
 
     data = re.sub('\n##(((?!\n).)+)', '', data)
+    data = re.sub('<div id="wiki_div" style="">\n', '<div id="wiki_div" style="">', data)
            
     while 1:
         wiki_table_data = re.search('<div id="wiki_div" ((?:(?!>).)+)>((?:(?!<div id="wiki_div"|<\/div_end>).\n*)+)<\/div_end>', data)
