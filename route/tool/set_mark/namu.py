@@ -79,11 +79,17 @@ def table_parser(data, cel_data, start_data, num = 0):
         
     cel_width = re.search("&lt;width=((?:(?!&gt;).)*)&gt;", data)
     if cel_width:
-        cel_style += 'width: ' + cel_width.groups()[0] + 'px;'
+        if re.search('^[0-9]+$', cel_width.groups()[0]):
+            cel_style += 'width: ' + cel_width.groups()[0] + 'px;'
+        else:
+            cel_style += 'width: ' + cel_width.groups()[0] + ';'
 
     cel_height = re.search("&lt;height=((?:(?!&gt;).)*)&gt;", data)
     if cel_height:
-        cel_style += 'height: ' + cel_height.groups()[0] + 'px;'
+        if re.search('^[0-9]+$', cel_height.groups()[0]):
+            cel_style += 'height: ' + cel_height.groups()[0] + 'px;'
+        else:
+            cel_style += 'height: ' + cel_height.groups()[0] + ';'
         
     text_right = re.search("&lt;\)&gt;", data)
     text_center = re.search("&lt;:&gt;", data)
