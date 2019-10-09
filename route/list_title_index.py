@@ -29,38 +29,47 @@ def list_title_index_2(conn):
     if page == 1:
         count_end = []
 
-        curs.execute("select count(title) from data")
-        count = curs.fetchall()
-        if count:
-            count_end += [count[0][0]]
-        else:
-            count_end += [0]
-
-        sql_list = [load_lang('template', 1).lower() + ':', 'category:', 'user:', 'file:']
-        for sql in sql_list:
-            curs.execute("select count(title) from data where title like ?", [sql + '%'])
+        curs.execute('select data from other where name = "count_all_title"')
+        all_title = curs.fetchall()
+        if int(all_title[0][0]) < 50000:
+            curs.execute("select count(title) from data")
             count = curs.fetchall()
             if count:
                 count_end += [count[0][0]]
             else:
                 count_end += [0]
 
-        count_end += [count_end[0] - count_end[1]  - count_end[2]  - count_end[3]  - count_end[4]]
+            sql_list = ['category:', 'user:', 'file:']
+            for sql in sql_list:
+                curs.execute("select count(title) from data where title like ?", [sql + '%'])
+                count = curs.fetchall()
+                if count:
+                    count_end += [count[0][0]]
+                else:
+                    count_end += [0]
+
+            count_end += [count_end[0] - count_end[1]  - count_end[2]  - count_end[3]]
         
-        data += '''
+            data += '''
                 </ul>
                 <hr class=\"main_hr\">
                 <ul>
-                    <li>all : ''' + str(count_end[0]) + '''</li>
+                    <li>''' + load_lang('all') + ' : ' + str(count_end[0]) + '''</li>
                 </ul>
                 <hr class=\"main_hr\">
                 <ul>
-                    <li>''' + load_lang('template') + ' : ' + str(count_end[1]) + '''</li>
-                    <li>''' + load_lang('category') + ' : ' + str(count_end[2]) + '''</li>
-                    <li>''' + load_lang('user') + ' : ' + str(count_end[3]) + '''</li>
-                    <li>''' + load_lang('file') + ' : ' + str(count_end[4]) + '''</li>
-                    <li>other : ''' + str(count_end[5]) + '''</li>
-                '''
+                    <li>''' + load_lang('category') + ' : ' + str(count_end[1]) + '''</li>
+                    <li>''' + load_lang('user_document') + ' : ' + str(count_end[2]) + '''</li>
+                    <li>''' + load_lang('file') + ' : ' + str(count_end[3]) + '''</li>
+                    <li>''' + load_lang('other') + ' : ' + str(count_end[4]) + '''</li>
+            '''
+        else:
+            data += '''
+                </ul>
+                <hr class=\"main_hr\">
+                <ul>
+                    <li>''' + load_lang('all') + ' : ' + all_title[0][0] + '''</li>
+            '''
 
     data += '</ul>' + next_fix('/title_index?num=' + str(num) + '&page=', page, title_list, num)
     sub = ' (' + str(num) + ')'
