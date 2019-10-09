@@ -7,8 +7,6 @@
 
 openNAMU is a Python-based wiki engine. You can use openNAMU by installing Python and its dependency modules, and you can modify the code yourself to create more specialized wikis.
 
- * [(README for Korean)](./readme-ko.md)
-
 ### Index
  * [Getting Started](#getting-started)
  * [Clone](#clone)
