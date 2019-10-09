@@ -259,8 +259,7 @@ print('----')
 if back_time != 0:
     print('Back up state : ' + str(back_time) + ' hours')
     
-    if __name__ == '__main__':
-        back_up()
+    back_up()
 else:
     print('Back up state : Turn off')
 
@@ -279,8 +278,30 @@ else:
 
         print('----')
         print('Skin update required')
-        
+
 conn.commit()
+
+def count_all_title():
+    curs.execute("select count(title) from data")
+    count_data = curs.fetchall()
+    if count_data:
+        count_data = count_data[0][0]
+    else:
+        count_data = 0
+
+    curs.execute('delete from other where name = "count_all_title"')
+    curs.execute('insert into other (name, data) values ("count_all_title", ?)', [str(count_data)])
+
+    conn.commit()
+
+    threading.Timer(60 * 60 * 24, count_all_title).start()
+
+curs.execute('select data from other where name = "count_all_title"')
+all_title = curs.fetchall()
+if not all_title:
+    curs.execute('insert into other (name, data) values ("count_all_title", "0")')
+
+count_all_title()  
 
 # Func
 @app.route('/del_alarm')

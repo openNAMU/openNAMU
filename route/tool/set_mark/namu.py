@@ -583,6 +583,13 @@ def namu(conn, data, title, main_num, include_num):
 
     date_re = re.compile('\[date\]', re.I)
     data = date_re.sub(now_time, data)
+
+    pagecount_re = re.compile('\[pagecount\]', re.I)
+
+    curs.execute('select data from other where name = "count_all_title"')
+    all_title = curs.fetchall()
+
+    data = pagecount_re.sub(all_title[0][0], data)
     
     time_data = re.search('^([0-9]{4}-[0-9]{2}-[0-9]{2})', now_time)
     time = time_data.groups()
