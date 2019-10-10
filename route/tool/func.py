@@ -730,7 +730,7 @@ def view_check(name):
 
     return 0
 
-def acl_check(name, tool = ''):
+def acl_check(name, tool = '', sub):
     ip = ip_check()
     
     if tool == 'render':
@@ -739,102 +739,95 @@ def acl_check(name, tool = ''):
         if ban_check() == 1:
             return 1
 
-        acl_c = re.search("^user:((?:(?!\/).)*)", name)
-        if acl_c:
-            acl_n = acl_c.groups()
+        if tool != 'topic':
+            acl_c = re.search("^user:((?:(?!\/).)*)", name)
+            if acl_c:
+                acl_n = acl_c.groups()
 
-            if admin_check(5) == 1:
-                return 0
-
-            curs.execute("select decu from acl where title = ?", ['user:' + acl_n[0]])
-            acl_data = curs.fetchall()
-            if acl_data:
-                if acl_data[0][0] == 'all':
+                if admin_check(5) == 1:
                     return 0
 
-                if acl_data[0][0] == 'user' and not re.search("(\.|:)", ip):
-                    return 0
+                curs.execute("select decu from acl where title = ?", ['user:' + acl_n[0]])
+                acl_data = curs.fetchall()
+                if acl_data:
+                    if acl_data[0][0] == 'all':
+                        return 0
 
-                if ip != acl_n[0] or re.search("(\.|:)", ip):
+                    if acl_data[0][0] == 'user' and not re.search("(\.|:)", ip):
+                        return 0
+
+                    if ip != acl_n[0] or re.search("(\.|:)", ip):
+                        return 1
+                
+                if ip == acl_n[0] and not re.search("(\.|:)", ip) and not re.search("(\.|:)", acl_n[0]):
+                    return 0
+                else:
                     return 1
-            
-            if ip == acl_n[0] and not re.search("(\.|:)", ip) and not re.search("(\.|:)", acl_n[0]):
-                return 0
+
+            if re.search("^file:", name) and admin_check(None, 'file edit (' + name + ')') != 1:
+                return 1
+
+        for i in range(0, 2):
+            if tool != 'topic':
+                if i == 0:
+                    curs.execute("select decu from acl where title = ?", [name])
+                    acl_data = curs.fetchall()
+                else:
+                    curs.execute('select data from other where name = "edit"')
+                    acl_data = curs.fetchall()
             else:
-                return 1
+                if i == 0:
+                    curs.execute("select dis from acl where title = ?", [name])
+                    acl_data = curs.fetchall()
+                else:
+                    curs.execute('select data from other where name = "discussion"')
+                    acl_data = curs.fetchall()
 
-        if re.search("^file:", name) and admin_check(None, 'file edit (' + name + ')') != 1:
-            return 1
-
-        curs.execute("select decu from acl where title = ?", [name])
-        acl_data = curs.fetchall()
-        if acl_data:
-            if acl_data[0][0] == 'user':
-                if ip_or_user(ip) == 1:
-                    return 1
-
-            if acl_data[0][0] == 'admin':
-                if ip_or_user(ip) == 1:
-                    return 1
-
-                if admin_check(5) != 1:
-                    return 1
-
-            if acl_data[0][0] == '50_edit':
-                if ip_or_user(ip) == 1:
-                    return 1
-                
-                if admin_check(5) != 1:
-                    curs.execute("select count(title) from history where ip = ?", [ip])
-                    count = curs.fetchall()
-                    if count:
-                        count = count[0][0]
-                    else:
-                        count = 0
-
-                    if count < 50:
+            if acl_data and acl_data[0][0] != 'normal':
+                if acl_data[0][0] == 'user':
+                    if ip_or_user(ip) == 1:
                         return 1
 
-            if acl_data[0][0] == 'email':
-                if ip_or_user(ip) == 1:
-                    return 1
-                
-                if admin_check(5) != 1:
-                    curs.execute("select data from user_set where id = ? and name = 'email'", [ip])
-                    email = curs.fetchall()
-                    if not email:
+                if acl_data[0][0] == 'admin':
+                    if ip_or_user(ip) == 1:
                         return 1
 
-        curs.execute('select data from other where name = "edit"')
-        set_data = curs.fetchall()
-        if set_data:
-            if view_check(name) == 1:
-                return 1
-        
-            if set_data[0][0] == 'login':
-                if ip_or_user(ip) == 1:
-                    return 1
+                    if admin_check(5) != 1:
+                        return 1
 
-            if set_data[0][0] == 'admin':
-                if ip_or_user(ip) == 1:
-                    return 1
+                if acl_data[0][0] == '50_edit':
+                    if ip_or_user(ip) == 1:
+                        return 1
+                    
+                    if admin_check(5) != 1:
+                        curs.execute("select count(title) from history where ip = ?", [ip])
+                        count = curs.fetchall()
+                        if count:
+                            count = count[0][0]
+                        else:
+                            count = 0
 
-                if admin_check(5, 'edit (' + name + ')') != 1:
-                    return 1
+                        if count < 50:
+                            return 1
 
-            if set_data[0][0] == '50_edit':
-                if ip_or_user(ip) == 1:
-                    return 1
-                
-                if admin_check(5, 'edit (' + name + ')') != 1:
-                    curs.execute("select count(title) from history where ip = ?", [ip])
-                    count = curs.fetchall()
-                    if count:
-                        count = count[0][0]
-                    else:
-                        count = 0
+                if acl_data[0][0] == 'email':
+                    if ip_or_user(ip) == 1:
+                        return 1
+                    
+                    if admin_check(5) != 1:
+                        curs.execute("select data from user_set where id = ? and name = 'email'", [ip])
+                        email = curs.fetchall()
+                        if not email:
+                            return 1
 
-                    if count < 50:
+                if acl_data[0][0] == 'owner':
+                    if admin_check() != 1:
+                        return 1
+
+            if tool == 'topic':
+                curs.execute("select title from rd where title = ? and sub = ? and not stop = ''", [name, sub])
+                if curs.fetchall():
+                    if admin_check(3, 'topic (' + name + ')') != 1:
                         return 1
 
         return 0
@@ -884,60 +877,7 @@ def ban_check(ip = None, tool = None):
     return 0
         
 def topic_check(name, sub):
-    ip = ip_check()
-
-    if ban_check() == 1:
-        return 1
-
-    curs.execute('select data from other where name = "discussion"')
-    acl_data = curs.fetchall()
-    if acl_data:
-        if acl_data[0][0] == 'login':
-            if ip_or_user(ip) == 1:
-                return 1
-
-        if acl_data[0][0] == 'admin':
-            if ip_or_user(ip) == 1:
-                return 1
-
-            if admin_check(3, 'topic (' + name + ')') != 1:
-                return 1
-
-    curs.execute("select dis from acl where title = ?", [name])
-    acl_data = curs.fetchall()
-    if acl_data:
-        if acl_data[0][0] == 'user':
-            if ip_or_user(ip) == 1:
-                return 1
-
-        if acl_data[0][0] == '50_edit':
-            if ip_or_user(ip) == 1:
-                return 1
-            
-            if admin_check(3, 'topic (' + name + ')') != 1:
-                curs.execute("select count(title) from history where ip = ?", [ip])
-                count = curs.fetchall()
-                if count:
-                    count = count[0][0]
-                else:
-                    count = 0
-
-                if count < 50:
-                    return 1
-
-        if acl_data[0][0] == 'admin':
-            if ip_or_user(ip) == 1:
-                return 1
-
-            if admin_check(3, 'topic (' + name + ')') != 1:
-                return 1
-        
-    curs.execute("select title from rd where title = ? and sub = ? and not stop = ''", [name, sub])
-    if curs.fetchall():
-        if admin_check(3, 'topic (' + name + ')') != 1:
-            return 1
-
-    return 0
+    return acl_check(name, 'topic', sub)
 
 def ban_insert(name, end, why, login, blocker, type_d = None):
     now_time = get_time()

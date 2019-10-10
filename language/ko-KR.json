@@ -290,5 +290,6 @@
     "image_license_add": "이미지 라이선스 추가",
     "direct_input": "직접 입력",
     "acl_record": "ACL 기록",
-    "main_bottom_body": "본문 하단"
+    "main_bottom_body": "본문 하단",
+    "reference" : "참고"
 }

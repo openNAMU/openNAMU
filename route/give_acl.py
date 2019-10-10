@@ -48,18 +48,18 @@ def give_acl_2(conn, name):
         if curs.fetchall():
             curs.execute("delete from acl where title = ?", [name])
             
-        all = ''
+        all_d = ''
         for i in ['decu', 'dis', 'view']:
             if flask.request.form.get(i, '') == '':
-                all += 'normal'
+                all_d += 'normal'
                 if i != 'view':
-                    all += ' | '
+                    all_d += ' | '
             else:
-                all += flask.request.form.get(i, '')
+                all_d += flask.request.form.get(i, '')
                 if i != 'view':
-                    all += ' | '
+                    all_d += ' | '
             
-        admin_check(5, check_data + ' (' + all + ')')
+        admin_check(5, check_data + ' (' + all_d + ')')
 
         conn.commit()
             
@@ -70,7 +70,7 @@ def give_acl_2(conn, name):
         if re.search('^user:', name):
             acl_list = ['', 'user', 'all']
         else:
-            acl_list = ['', 'user', 'admin', '50_edit', 'email']
+            acl_list = ['', 'user', 'admin', 'owner', '50_edit', 'email']
         
         curs.execute("select decu from acl where title = ?", [name])
         acl_data = curs.fetchall()
@@ -115,7 +115,7 @@ def give_acl_2(conn, name):
                     <li>normal : ''' + load_lang('default') + '''</li>
                     <li>admin : ''' + load_lang('admin_acl') + '''</li>
                     <li>user : ''' + load_lang('member_acl') + '''</li>
-                    <li>50 edit : ''' + load_lang('50_edit_acl') + '''</li>
+                    <li>50_edit : ''' + load_lang('50_edit_acl') + '''</li>
                     <li>all : ''' + load_lang('all_acl') + '''</li>
                     <li>email : ''' + load_lang('email_acl') + '''</li>
                 </ul>
