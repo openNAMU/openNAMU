@@ -98,23 +98,19 @@ def setting_2(conn, num):
             conn.commit()
             
             div = ''
-            acl_list = [
-                [load_lang('member'), 'login'], 
-                [load_lang('ip'), 'normal'], 
-                [load_lang('admin'), 'admin']
-            ]
+            acl_list = ['normal', 'user', 'admin', 'owner', '50_edit', 'email']
             for i in acl_list:
-                if i[1] == d_list[6]:
-                    div = '<option value="' + i[1] + '">' + i[0] + '</option>' + div
+                if i == d_list[6]:
+                    div = '<option value="' + i + '">' + i + '</option>' + div
                 else:
-                    div += '<option value="' + i[1] + '">' + i[0] + '</option>'
+                    div += '<option value="' + i + '">' + i + '</option>'
 
             div4 = ''
             for i in acl_list:
-                if i[1] == d_list[14]:
-                    div4 = '<option value="' + i[1] + '">' + i[0] + '</option>' + div4
+                if i == d_list[14]:
+                    div4 = '<option value="' + i + '">' + i + '</option>' + div4
                 else:
-                    div4 += '<option value="' + i[1] + '">' + i[0] + '</option>'
+                    div4 += '<option value="' + i + '">' + i + '</option>'
 
             ch_1 = ''
             if d_list[7]:
@@ -178,7 +174,7 @@ def setting_2(conn, num):
                         <hr class=\"main_hr\">
                         <select name="skin">''' + div2 + '''</select>
                         <hr class=\"main_hr\">
-                        <span>''' + load_lang('default_acl') + '''</span>
+                        <span>''' + load_lang('default_acl') + '</span> <a href="/acl/TEST">(' + load_lang('reference') + ''')</a>
                         <hr class=\"main_hr\">
                         <select name="edit">''' + div + '''</select>
                         <hr class=\"main_hr\">
@@ -190,7 +186,7 @@ def setting_2(conn, num):
                         <hr class=\"main_hr\">
                         <input type="checkbox" name="ip_view" ''' + ch_2 + '''> ''' + load_lang('hide_ip') + '''
                         <hr class=\"main_hr\">
-                        <input type="checkbox" name="email_have" ''' + ch_3 + '''> ''' + load_lang('email_required') + ''' {<a href="/setting/6">''' + load_lang('google_imap_required') + '''</a>}
+                        <input type="checkbox" name="email_have" ''' + ch_3 + '''> ''' + load_lang('email_required') + ' <a href="/setting/6">{' + load_lang('google_imap_required') + '''}</a>
                         <hr class=\"main_hr\">
                         <span>''' + load_lang('wiki_host') + '''</span>
                         <hr class=\"main_hr\">

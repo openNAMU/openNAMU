@@ -90,6 +90,7 @@
         "pinned" : "Pinned",
         "markup" : "Markup",
         "title" : "Title",
+        "reference" : "Reference",
         "_comment_1.1_" : "Time",
             "second" : "Second(s)",
             "hour" : "Hour(s)",
