@@ -189,7 +189,6 @@ def view_read_2(conn, name):
     
     div = adsense_code + '<div>' + div + '</div>'
 
-    # 이 부분 개선 필요
     match = re.search("^user:([^/]*)", name)
     if match:
         user_name = match.groups()[0]

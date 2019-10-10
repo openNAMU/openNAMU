@@ -51,7 +51,7 @@ def func_upload_2(conn):
             if flask.request.form.get('f_lice', None):
                 lice = flask.request.form.get('f_lice', None)
             else:
-                if custom()[2] == 0:
+                if ip_or_user(ip) != 0:
                     lice = ip
                 else:
                     lice = '[[user:' + ip + ']]'

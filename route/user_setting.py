@@ -4,14 +4,14 @@ def user_setting_2(conn, server_init):
     curs = conn.cursor()
 
     support_language = server_init.server_set_var['language']['list']
+    ip = ip_check()
 
     if ban_check() == 1:
         return re_error('/ban')
 
-    if custom()[2] == 0:
+    if ip_or_user(ip) != 0:
         return redirect('/login')
 
-    ip = ip_check()
     user_state = flask.request.args.get('user', 'ip')
     
     if user_state == 'ip':

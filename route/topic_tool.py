@@ -24,8 +24,6 @@ def topic_tool_2(conn, name, sub):
                 <li><a href="/topic/''' + url_pas(name) + '/sub/' + url_pas(sub) + '''/setting"> Topic setting</a></li>
             </ul>
         '''
-
-    print(close_data)
     data += '''
         <h2>''' + load_lang('tool') + '''</h2>
         <ul>
