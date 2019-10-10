@@ -3,10 +3,9 @@ from .tool.func import *
 def watch_list_name_2(conn, name):
     curs = conn.cursor()
     
-    if custom()[2] == 0:
-        return redirect('/login')
-
     ip = ip_check()
+    if ip_or_user(ip) != 0:
+        return redirect('/login')
 
     curs.execute("select count(title) from scan where user = ?", [ip])
     count = curs.fetchall()

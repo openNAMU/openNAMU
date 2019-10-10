@@ -11,7 +11,7 @@ def user_info_2(conn):
     else:
         plus2 = '<li><a href="/alarm">' + load_lang('alarm') + '</a></li>'
 
-    if custom()[2] != 0:        
+    if ip_or_user(ip) == 0:  
         plus = '''
             <li><a href="/logout">''' + load_lang('logout') + '''</a></li>
             <li><a href="/change">''' + load_lang('user_setting') + '''</a></li>

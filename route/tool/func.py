@@ -147,8 +147,9 @@ def render_set(title = '', data = '', num = 0, s_data = 0, include = None):
 
 def captcha_get():
     data = ''
+    ip = ip_check()
 
-    if custom()[2] == 0:
+    if ip_or_user(ip) != 0:
         curs.execute('select data from other where name = "recaptcha"')
         recaptcha = curs.fetchall()
         if recaptcha and recaptcha[0][0] != '':
@@ -234,8 +235,10 @@ def pw_check(data, data2, type_d = 'no', id_d = ''):
     return re_data
 
 def captcha_post(re_data, num = 1):
+    ip = ip_check()
+
     if num == 1:
-        if custom()[2] == 0 and captcha_get() != '':
+        if ip_or_user(ip) != 0 and captcha_get() != '':
             curs.execute('select data from other where name = "sec_re"')
             sec_re = curs.fetchall()
             if sec_re and sec_re[0][0] != '':
@@ -332,7 +335,7 @@ def edit_button():
     return data + '<hr class=\"main_hr\">'
 
 def ip_warring():
-    if custom()[2] == 0:    
+    if ip_or_user(ip) != 0:
         curs.execute('select data from other where name = "no_login_warring"')
         data = curs.fetchall()
         if data and data[0][0] != '':
@@ -610,11 +613,7 @@ def custom():
 
     ip = ip_check()
     if ip_or_user(ip) == 0:
-        curs.execute('select name from alarm where name = ? limit 1', [ip])
-        if curs.fetchall():
-            user_icon = 2
-        else:
-            user_icon = 1
+        user_icon = 1
     else:
         user_icon = 0
 
@@ -643,7 +642,17 @@ def custom():
     else:
         user_ban = '0'
 
-    return ['', '', user_icon, user_head, email, user_name, user_admin, user_ban]
+    if user_icon == 1:
+        curs.execute("select count(name) from alarm where name = ?", [ip])
+        count = curs.fetchall()
+        if count:
+            user_notice = str(count[0][0])
+        else:
+            user_notice = '0'
+    else:
+        user_notice = '0'
+
+    return ['', '', user_icon, user_head, email, user_name, user_admin, user_ban, user_notice]
 
 def load_skin(data = '', set_n = 0):
     div2 = ''

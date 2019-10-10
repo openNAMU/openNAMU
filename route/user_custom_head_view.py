@@ -6,7 +6,7 @@ def user_custom_head_view_2(conn):
     ip = ip_check()
 
     if flask.request.method == 'POST':
-        if custom()[2] != 0:
+        if ip_or_user(ip) == 0:
             curs.execute("select user from custom where user = ?", [ip + ' (head)'])
             if curs.fetchall():
                 curs.execute("update custom set css = ? where user = ?", [flask.request.form.get('content', None), ip + ' (head)'])
@@ -19,7 +19,7 @@ def user_custom_head_view_2(conn):
 
         return redirect('/user')
     else:
-        if custom()[2] != 0:
+        if ip_or_user(ip) == 0:
             start = ''
 
             curs.execute("select css from custom where user = ?", [ip + ' (head)'])

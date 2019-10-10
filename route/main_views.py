@@ -13,17 +13,17 @@ def main_views_2(conn, name):
         c_open = open('./views/' + name, encoding='utf-8')
         f_open = c_open.read()
         c_open.close()
-        return flask.Response(easy_minify(f_open, 'css'), mimetype="text/css")
+        return flask.Response(easy_minify(f_open, 'css'), mimetype = "text/css")
     elif g[0] == 'js':
         c_open = open('./views/' + name, encoding='utf-8')
         f_open = c_open.read()
         c_open.close()
-        return flask.Response(easy_minify(f_open, 'js'), mimetype="text/js")
+        return flask.Response(easy_minify(f_open, 'js'), mimetype = "text/js")
     elif g[0] == 'html':
         c_open = open('./views/' + name, encoding='utf-8')
         f_open = c_open.read()
         c_open.close()
-        return flask.Response(easy_minify(f_open), mimetype="text/html")
+        return flask.Response(easy_minify(f_open), mimetype = "text/html")
     else:
         if re.search('\/', name):
             m = re.search('^(.*)\/(.*)$', name)

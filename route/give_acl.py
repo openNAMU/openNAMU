@@ -4,6 +4,7 @@ def give_acl_2(conn, name):
     curs = conn.cursor()
 
     check_ok = ''
+    ip = ip_check()
     
     if flask.request.method == 'POST':
         check_data = 'acl (' + name + ')'
@@ -12,7 +13,7 @@ def give_acl_2(conn, name):
     
     user_data = re.search('^user:(.+)$', name)
     if user_data:
-        if check_data and custom()[2] == 0:
+        if check_data and ip_or_user(ip) != 0:
             return redirect('/login')
         
         if user_data.groups()[0] != ip_check():
