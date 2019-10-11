@@ -12,8 +12,8 @@ function do_open_foot(name) {
         o_data.style.display = 'block';
         o_data.innerHTML += '' + 
             '<div class="foot_in">' + 
-                '<a onclick="do_open_foot(\'' + name + '\')" href="#' + name + '">(Go)</a> ' + g_data.innerHTML + 
-            '</div> <a class="foot_close" onclick="do_open_foot(\'' + name + '\')" href="javascript:void(0);">(X)</a>' + 
+                '<a onclick="do_open_foot(\'' + name + '\')" href="javascript:void(0);">(X)</a> <a onclick="do_open_foot(\'' + name + '\')" href="#' + name + '">(Go)</a> ' + g_data.innerHTML + 
+            '</div>' + 
         '';
     } else {
         o_data.style.display = 'none';
