@@ -147,9 +147,8 @@ def render_set(title = '', data = '', num = 0, s_data = 0, include = None):
 
 def captcha_get():
     data = ''
-    ip = ip_check()
 
-    if ip_or_user(ip) != 0:
+    if ip_or_user() != 0:
         curs.execute('select data from other where name = "recaptcha"')
         recaptcha = curs.fetchall()
         if recaptcha and recaptcha[0][0] != '':
@@ -235,10 +234,8 @@ def pw_check(data, data2, type_d = 'no', id_d = ''):
     return re_data
 
 def captcha_post(re_data, num = 1):
-    ip = ip_check()
-
     if num == 1:
-        if ip_or_user(ip) != 0 and captcha_get() != '':
+        if ip_or_user() != 0 and captcha_get() != '':
             curs.execute('select data from other where name = "sec_re"')
             sec_re = curs.fetchall()
             if sec_re and sec_re[0][0] != '':
@@ -311,7 +308,10 @@ def update_oauth(provider, target, content):
 
     return 'Done'
 
-def ip_or_user(data):
+def ip_or_user(data = ''):
+    if data == '':
+        data = ip_check()
+
     if re.search('(\.|:)', data):
         return 1
     else:
@@ -335,7 +335,7 @@ def edit_button():
     return data + '<hr class=\"main_hr\">'
 
 def ip_warring():
-    if ip_or_user(ip) != 0:
+    if ip_or_user() != 0:
         curs.execute('select data from other where name = "no_login_warring"')
         data = curs.fetchall()
         if data and data[0][0] != '':
