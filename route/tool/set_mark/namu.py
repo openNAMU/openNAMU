@@ -915,7 +915,9 @@ def namu(conn, data, title, main_num, include_num):
 
                     footdata_all += '' + \
                         '<li>' + \
-                            '<a href="#' + include_num + 'rfn-' + str(footdata[0]) + '">' + \
+                            '<a href="#' + include_num + 'rfn-' + str(footdata[0]) + '" ' + \
+                                'id="' + include_num + 'cfn-' + str(footdata[0]) + '" ' + \
+                                'onclick="do_open_foot(\'' + include_num + 'fn-' + str(footdata[0]) + '\', 1);">' + \
                                 '(' + footdata[1] + ')' + \
                             '</a> <span id="' + include_num + 'fn-' + str(footdata[0]) + '">' + footdata_in + '</span>' + \
                         '</li>' + \
@@ -939,10 +941,12 @@ def namu(conn, data, title, main_num, include_num):
 
                         data = re_footnote.sub('' + \
                             '<sup>' + \
-                                '<a href="javascript:do_open_foot(\'' + include_num + 'fn-' + footshort + '\')" id="' + include_num + 'rfn-' + footshort + '">' + \
+                                '<a href="#' + include_num + 'fn-' + footshort + '" ' + \
+                                    'id="' + include_num + 'rfn-' + footshort + '" ' + \
+                                    'onclick="do_open_foot(\'' + include_num + 'fn-' + footshort + '\');">' + \
                                     '(' + footnote_name + ')' + \
                                 '</a>' + \
-                            '</sup> <div class="foot_plus" id="' + include_num + 'cfn-' + footshort + '"></div>' + \
+                            '</sup>' + \
                         '', data, 1)
                     else:
                         data = re_footnote.sub('<sup><a href="javascript:void(0);">(' + footnote_name + ')</a></sup>', data, 1)
@@ -963,10 +967,12 @@ def namu(conn, data, title, main_num, include_num):
                     
                     data = re_footnote.sub('' + \
                         '<sup>' + \
-                            '<a href="javascript:do_open_foot(\'' + include_num + 'fn-' + str(footnote_number) + '\')" id="' + include_num + 'rfn-' + str(footnote_number) + '">' + \
+                            '<a href="#' + include_num + 'fn-' + str(footnote_number) + '" ' + \
+                                'id="' + include_num + 'rfn-' + str(footnote_number) + '" ' + \
+                                'onclick="do_open_foot(\'' + include_num + 'fn-' + str(footnote_number) + '\');">' + \
                                 '(' + footnote_name + ')' + \
                             '</a>' + \
-                        '</sup> <div class="foot_plus" id="' + include_num + 'cfn-' + str(footnote_number) + '"></div>' + \
+                        '</sup>' + \
                     '', data, 1)
         else:
             break
@@ -983,7 +989,11 @@ def namu(conn, data, title, main_num, include_num):
 
         footdata_all += '' + \
             '<li>' + \
-                '<a href="#' + include_num + 'rfn-' + str(footdata[0]) + '">(' + footdata[1] + ')</a> <span id="' + include_num + 'fn-' + str(footdata[0]) + '">' + footdata_in + '</span>' + \
+                '<a href="#' + include_num + 'rfn-' + str(footdata[0]) + '" ' + \
+                    'id="' + include_num + 'cfn-' + str(footdata[0]) + '" ' + \
+                    'onclick="do_open_foot(\'' + include_num + 'fn-' + str(footdata[0]) + '\', 1);">' + \
+                    '(' + footdata[1] + ')' + \
+                '</a> <span id="' + include_num + 'fn-' + str(footdata[0]) + '">' + footdata_in + '</span>' + \
             '</li>' + \
         ''
 
