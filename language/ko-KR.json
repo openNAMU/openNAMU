@@ -189,7 +189,7 @@
     "editor": "에디터",
     "wiki_secret_key": "위키 비밀키",
     "band_ban": "대역 차단",
-    "http_warring": "경고: HTTPS 연결을 사용하지 않는다면 개인정보가 유출될 수 있습니다. 이 사항에 의해 입는 피해는 사용자에게 책임이 있음을 알려드립니다.",
+    "http_warring": "경고 : HTTPS 연결을 사용하지 않는다면 개인정보가 유출될 수 있습니다. 이 사항에 의해 입는 피해는 사용자에게 책임이 있음을 알려드립니다.",
     "update_warring": "최신 버전보다 0.2 버전 이상 낮은 경우 수동 업데이트를 권장 드립니다. 윈도우의 경우 route 폴더의 내용이 사라집니다.",
     "discussion_name": "토론명",
     "discussion": "토론",
@@ -212,7 +212,7 @@
     "name": "이름",
     "period": "기간",
     "writer": "작성자",
-    "oauth_signin_facebook": "Facebook 아이디로 로그인",
+    "oauth_signin_facebook": "페이스북 아이디로 로그인",
     "long_id_error": "ID는 20자보다 짧아야 합니다.",
     "edit_record_error": "수정 요약은 500자를 넘길 수 없습니다.",
     "revert": "복원",
@@ -291,5 +291,6 @@
     "direct_input": "직접 입력",
     "acl_record": "ACL 기록",
     "main_bottom_body": "본문 하단",
-    "reference" : "참고"
+    "reference" : "참고",
+    "owner_acl" : "소유자만"
 }

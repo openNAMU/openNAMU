@@ -119,6 +119,7 @@ def give_acl_2(conn, name):
                     <li>50_edit : ''' + load_lang('50_edit_acl') + '''</li>
                     <li>all : ''' + load_lang('all_acl') + '''</li>
                     <li>email : ''' + load_lang('email_acl') + '''</li>
+                    <li>owner : ''' + load_lang('owner_acl') + '''</li>
                 </ul>
             '''
                 
