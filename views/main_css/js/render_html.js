@@ -1,7 +1,6 @@
 function render_html(name = '') {
     var num = 0;
     while(1) {
-        console.log(name + 'render_contect_' + String(num));
         num += 1
         if(document.getElementById(name + 'render_contect_' + String(num))) {
             data = document.getElementById(name + 'render_contect_' + String(num)).innerHTML;
