@@ -130,7 +130,11 @@
                         <div id="tool" class="not_mobile">
                             {% for sub_d in menu %}
                                 <div id="tool_cel">
-                                    <a class="menu-item" href="/{{sub_d[0]}}">{{sub_d[1]}}</a>
+                                    {% if sub_d|length > 2 and sub_d[2] == 1 %}
+                                        <a class="menu-item" href="/{{sub_d[0]}}" id="topic_color">{{sub_d[1]}}</a>
+                                    {% else %}
+                                        <a class="menu-item" href="/{{sub_d[0]}}">{{sub_d[1]}}</a>
+                                    {% endif %}
                                 </div>
                                 {% if menu[loop.index] %}
                                     |
@@ -138,17 +142,26 @@
                             {% endfor %}
                         </div>
                     {% endif %}
-                    <h1>
+                    <h1 id="title">
                         {{imp[0]}}
                         {% if imp[3][0] != 0 %}
                             <sub>{{imp[3][0]}}</sub>
                         {% endif %}
                     </h1>
+                    <div id="last_edit">
+                        {% if imp[3][1] != 0 %}
+                            {{'last_edit_time'|load_lang}} : {{imp[3][1]}}
+                        {% endif %}
+                    </div>
                     {% if menu != 0 %}
                         <div id="tool" class="is_mobile">
                             {% for sub_d in menu %}
                                 <div id="tool_cel">
-                                    <a class="menu-item" href="/{{sub_d[0]}}">{{sub_d[1]}}</a>
+                                    {% if sub_d|length > 2 and sub_d[2] == 1 %}
+                                        <a class="menu-item" href="/{{sub_d[0]}}" id="topic_color">{{sub_d[1]}}</a>
+                                    {% else %}
+                                        <a class="menu-item" href="/{{sub_d[0]}}">{{sub_d[1]}}</a>
+                                    {% endif %}
                                 </div>
                                 {% if menu[loop.index] %}
                                     |

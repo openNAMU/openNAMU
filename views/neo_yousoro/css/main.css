@@ -400,6 +400,14 @@ a:hover {
     text-decoration: none;
 }
 
-.foot_plus {
-    border-radius: 10px;
+h1#title {
+    margin-bottom: 10px;
+}
+
+div#last_edit {
+    margin-bottom: 20px;
+}
+
+#topic_color {
+    color: limegreen;
 }
