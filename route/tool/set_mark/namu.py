@@ -79,11 +79,17 @@ def table_parser(data, cel_data, start_data, num = 0):
         
     cel_width = re.search("&lt;width=((?:(?!&gt;).)*)&gt;", data)
     if cel_width:
-        cel_style += 'width: ' + cel_width.groups()[0] + 'px;'
+        if re.search('^[0-9]+$', cel_width.groups()[0]):
+            cel_style += 'width: ' + cel_width.groups()[0] + 'px;'
+        else:
+            cel_style += 'width: ' + cel_width.groups()[0] + ';'
 
     cel_height = re.search("&lt;height=((?:(?!&gt;).)*)&gt;", data)
     if cel_height:
-        cel_style += 'height: ' + cel_height.groups()[0] + 'px;'
+        if re.search('^[0-9]+$', cel_height.groups()[0]):
+            cel_style += 'height: ' + cel_height.groups()[0] + 'px;'
+        else:
+            cel_style += 'height: ' + cel_height.groups()[0] + ';'
         
     text_right = re.search("&lt;\)&gt;", data)
     text_center = re.search("&lt;:&gt;", data)
@@ -161,13 +167,14 @@ def table_start(data):
             
     return data
 
-def middle_parser(data, fol_num, syntax_num, folding_num):
+def middle_parser(data, fol_num, syntax_num, folding_num, include_num):
     global end_data
     global plus_data
 
     middle_stack = 0
     middle_list = []
     middle_number = 0
+    html_number = 0
 
     middle_re = re.compile('(?:{{{((?:(?:(?! |{{{|}}}|&lt;).)*) ?)|(}}}))')
     while 1:
@@ -259,13 +266,22 @@ def middle_parser(data, fol_num, syntax_num, folding_num):
                                                         if folding_num == 0:
                                                             folding_num = 1
                                                         
-                                                        data = re.sub('{{{#!folding ?((?:(?!\n).)*)\n?', '<div>' + str(folding_data[0]) + ' <div style="display: inline-block;"><a href="javascript:void(0);" onclick="folding(' + str(fol_num) + ');">[+]</a></div_end><div id="folding_' + str(fol_num) + '" style="display: none;"><div id="wiki_div" style="">', data, 1)
+                                                        data = re.sub('{{{#!folding ?((?:(?!\n).)*)\n?', '<div>' + str(folding_data[0]) + ' <div style="display: inline-block;"><a href="javascript:void(0);" onclick="do_open_folding(' + str(fol_num) + ', \'' + include_num + '\');">[+]</a></div_end><div id="' + include_num + 'folding_' + str(fol_num) + '" style="display: none;"><div id="wiki_div" style="">\n', data, 1)
                                                         
                                                         fol_num += 1
-                                                    else:
-                                                        middle_list += ['span']
 
-                                                        data = middle_re.sub('<span>', data, 1)
+                                                    else:
+                                                        middle_search = re.search('^#!html', middle_data[0])
+                                                        if middle_search:
+                                                            middle_list += ['div_end']
+                                                            
+                                                            html_number += 1
+                                                        
+                                                            data = middle_re.sub('<div id="' + include_num + 'render_contect_' + str(html_number) + '">', data, 1)
+                                                        else:
+                                                            middle_list += ['span']
+
+                                                            data = middle_re.sub('<span>', data, 1)
                     else:
                         middle_list += ['code']
                         
@@ -350,7 +366,7 @@ def middle_parser(data, fol_num, syntax_num, folding_num):
 
     return [data, [fol_num, syntax_num, folding_num]]
 
-def namu(conn, data, title, main_num):
+def namu(conn, data, title, main_num, include_num):
     curs = conn.cursor()
 
     global plus_data
@@ -362,16 +378,21 @@ def namu(conn, data, title, main_num):
     backlink = []
     end_data = []
     
+    include_num = include_num + '-' if include_num else ''
+    
     data = re.sub('<math>(?P<in>(?:(?!<\/math>).)+)<\/math>', '[math(\g<in>)]', data)
     data = html.escape(data)
 
     data = re.sub('\r\n', '\n', data)
 
-    t_data = middle_parser(data, 0, 0, 0)
+    t_data = middle_parser(data, 0, 0, 0, include_num)
     data = t_data[0]
 
     include_re = re.compile('\[include\(((?:(?!\)\]).)+)\)\]', re.I)
+    i = 0
     while 1:
+        i += 1
+
         include = include_re.search(data)
         if include:
             include = include.groups()[0]
@@ -386,41 +407,22 @@ def namu(conn, data, title, main_num):
 
             backlink += [[title, include_link, 'include']]
 
-            include = re.sub('^((?:(?!,).)+)', '', include)
-            
-            num = 0
-            while 1:
-                include_one_nowiki = re.search('(?:\\\\){2}(.)', include)
-                if include_one_nowiki:
-                    include_one_nowiki = include_one_nowiki.groups()
+            curs.execute("select title from data where title = ?", [include_data])
+            if curs.fetchall():
+                data = include_re.sub('<div id="include_' + str(i) + '"></div>', data, 1)
 
-                    num += 1
-
-                    end_data += [['include_one_nowiki_' + str(num), include_one_nowiki[0], 'normal']]
-
-                    include = re.sub('(?:\\\\){2}(.)', '<span id="include_one_nowiki_' + str(num) + '"></span>', include, 1)
-                else:
-                    break
-
-            curs.execute("select data from data where title = ?", [include_data])
-            include_data = curs.fetchall()
-            if include_data:
-                include_parser = include_re.sub('', include_data[0][0])
-                include_parser = html.escape(include_parser)
-
+                include_plus_data = []
                 while 1:
                     include_plus = re.search(', ?((?:(?!=).)+)=((?:(?!,).)+)', include)
                     if include_plus:
                         include_plus = include_plus.groups()
-                        include_parser = include_parser.replace('@' + include_plus[0] + '@', include_plus[1])
+                        include_plus_data += [[include_plus[0], include_plus[1]]]
 
                         include = re.sub(', ?((?:(?!=).)+)=((?:(?!,).)+)', '', include, 1)
                     else:
                         break
 
-                include_parser = re.sub('\[\[(?:category|분류):(((?!\]\]|#include).)+)\]\]', '', include_parser)
-
-                data = include_re.sub('<include><a id="include_link" href="/w/' + tool.url_pas(include_link) + '">\n[' + include_link + ']</a>\n' + include_parser + '\n</include>', data, 1)
+                plus_data += '<script>load_include("' + include_link + '", "include_' + str(i) + '", ' + str(include_plus_data) + ');</script>'
             else:
                 data = include_re.sub('<a id="not_thing" href="/w/' + tool.url_pas(include_link) + '">' + include_link + '</a>', data, 1)
         else:
@@ -428,7 +430,7 @@ def namu(conn, data, title, main_num):
 
     data = re.sub('\r\n', '\n', data)
 
-    t_data = middle_parser(data, t_data[1][0], t_data[1][1], t_data[1][2])
+    t_data = middle_parser(data, t_data[1][0], t_data[1][1], t_data[1][2], include_num)
     data = t_data[0]
 
     data = re.sub('&amp;', '&', data)
@@ -437,6 +439,7 @@ def namu(conn, data, title, main_num):
     data = re.sub('\|\|( +)\n', '||\n', data)
 
     data = re.sub('\n##(((?!\n).)+)', '', data)
+    data = re.sub('<div id="wiki_div" style="">\n', '<div id="wiki_div" style="">', data)
            
     while 1:
         wiki_table_data = re.search('<div id="wiki_div" ((?:(?!>).)+)>((?:(?!<div id="wiki_div"|<\/div_end>).\n*)+)<\/div_end>', data)
@@ -471,7 +474,7 @@ def namu(conn, data, title, main_num):
                         "''' + math.replace('\\', '\\\\').replace('&lt;', '<').replace('&gt;', '>') + '''",
                         document.getElementById("math_''' + str(first) + '''")
                     );
-            </script>
+                </script>
             '''
         else:
             break
@@ -529,7 +532,7 @@ def namu(conn, data, title, main_num):
     edit_number = 0
     toc_data = '<div id="toc"><span id="toc_title">TOC</span>\n\n'
     while 1:
-        toc = re.search('\n(={1,6}) ?((?:(?!\n).)+) ?\n', data)
+        toc = re.search('\n(={1,6}) ?((?:(?!\n).)+) ?(?:={1,6})\n', data)
         if toc:
             toc = toc.groups()
             
@@ -564,7 +567,7 @@ def namu(conn, data, title, main_num):
             toc_main_data = toc[1]
             toc_main_data = re.sub('=*$', '', toc_main_data)
             toc_main_data = re.sub('\[\*((?:(?! |\]).)*)(?: ((?:(?!(\[\*(?:(?:(?!\]).)+)\]|\])).)+))?\]', '', toc_main_data)
-            toc_main_data = re.sub('<span id="math_[0-9]"><\/span>', '(수식)', toc_main_data)
+            toc_main_data = re.sub('<span id="math_[0-9]"><\/span>', '(Math)', toc_main_data)
             
             toc_data += '<span style="margin-left: ' + str((toc_full - toc_top_stack) * 10) + 'px;"><a href="#s-' + re.sub('\.$', '', all_stack) + '">' + all_stack + '</a> ' + toc_main_data + '</span>\n'
         else:
@@ -586,6 +589,13 @@ def namu(conn, data, title, main_num):
 
     date_re = re.compile('\[date\]', re.I)
     data = date_re.sub(now_time, data)
+
+    pagecount_re = re.compile('\[pagecount\]', re.I)
+
+    curs.execute('select data from other where name = "count_all_title"')
+    all_title = curs.fetchall()
+
+    data = pagecount_re.sub(all_title[0][0], data)
     
     time_data = re.search('^([0-9]{4}-[0-9]{2}-[0-9]{2})', now_time)
     time = time_data.groups()
@@ -801,9 +811,8 @@ def namu(conn, data, title, main_num):
                 else:
                     data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<a id="not_thing" href="/w/' + tool.url_pas(file_alt) + '">' + file_alt + '</a>', data, 1)
             elif category_re.search(main_link):
-                see_link = re.sub('#include', '', see_link)
-                main_link = re.sub('#include', '', category_re.sub('category:', main_link))
-
+                main_link = category_re.sub('category:', main_link)
+                
                 if re.search('#blur', main_link):
                     see_link = 'Hidden'
                     link_id = 'id="inside"'
@@ -843,7 +852,7 @@ def namu(conn, data, title, main_num):
                 data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<a id="out_link" rel="nofollow" href="' + main_link + '">' + see_link + '</a>', data, 1)
             else:
                 return_link = tool.link_fix(main_link)
-                main_link = return_link[0]
+                main_link = html.unescape(return_link[0])
                 other_link = return_link[1]
 
                 if re.search('^\/', main_link):
@@ -904,7 +913,15 @@ def namu(conn, data, title, main_num):
                     else:
                         footdata_in = footdata[2]
 
-                    footdata_all += '<li><a href="#rfn-' + str(footdata[0]) + '">(' + footdata[1] + ')</a> <span id="fn-' + str(footdata[0]) + '">' + footdata_in + '</span></li>'
+                    footdata_all += '' + \
+                        '<li>' + \
+                            '<a href="#' + include_num + 'rfn-' + str(footdata[0]) + '" ' + \
+                                'id="' + include_num + 'cfn-' + str(footdata[0]) + '" ' + \
+                                'onclick="do_open_foot(\'' + include_num + 'fn-' + str(footdata[0]) + '\', 1);">' + \
+                                '(' + footdata[1] + ')' + \
+                            '</a> <span id="' + include_num + 'fn-' + str(footdata[0]) + '">' + footdata_in + '</span>' + \
+                        '</li>' + \
+                    ''
                 
                 data = re_footnote.sub(footdata_all + '</ul>', data, 1)
                 
@@ -922,9 +939,17 @@ def namu(conn, data, title, main_num):
 
                         footnote_all += [[float(footshort), footshort, 0]]
 
-                        data = re_footnote.sub('<sup><a href="javascript:open_foot(\'fn-' + footshort + '\')" id="rfn-' + footshort + '">(' + footnote_name + ')</a></sup><span class="foot_plus" id="cfn-' + footshort + '"></span>', data, 1)
+                        data = re_footnote.sub('' + \
+                            '<sup>' + \
+                                '<a href="#' + include_num + 'fn-' + footshort + '" ' + \
+                                    'id="' + include_num + 'rfn-' + footshort + '" ' + \
+                                    'onclick="do_open_foot(\'' + include_num + 'fn-' + footshort + '\');">' + \
+                                    '(' + footnote_name + ')' + \
+                                '</a>' + \
+                            '</sup>' + \
+                        '', data, 1)
                     else:
-                        data = re_footnote.sub('<sup><a href="#">(' + footnote_name + ')</a></sup>', data, 1)
+                        data = re_footnote.sub('<sup><a href="javascript:void(0);">(' + footnote_name + ')</a></sup>', data, 1)
                 else:
                     footnote_number += 1
 
@@ -940,7 +965,15 @@ def namu(conn, data, title, main_num):
 
                     footnote_all += [[footnote_number, footnote_name, footnote]]
                     
-                    data = re_footnote.sub('<sup><a href="javascript:open_foot(\'fn-' + str(footnote_number) + '\')" id="rfn-' + str(footnote_number) + '">(' + footnote_name + ')</a></sup><span class="foot_plus" id="cfn-' + str(footnote_number) + '"></span>', data, 1)
+                    data = re_footnote.sub('' + \
+                        '<sup>' + \
+                            '<a href="#' + include_num + 'fn-' + str(footnote_number) + '" ' + \
+                                'id="' + include_num + 'rfn-' + str(footnote_number) + '" ' + \
+                                'onclick="do_open_foot(\'' + include_num + 'fn-' + str(footnote_number) + '\');">' + \
+                                '(' + footnote_name + ')' + \
+                            '</a>' + \
+                        '</sup>' + \
+                    '', data, 1)
         else:
             break
 
@@ -954,7 +987,15 @@ def namu(conn, data, title, main_num):
         else:
             footdata_in = footdata[2]
 
-        footdata_all += '<li><a href="#rfn-' + str(footdata[0]) + '">(' + footdata[1] + ')</a> <span id="fn-' + str(footdata[0]) + '">' + footdata_in + '</span></li>'
+        footdata_all += '' + \
+            '<li>' + \
+                '<a href="#' + include_num + 'rfn-' + str(footdata[0]) + '" ' + \
+                    'id="' + include_num + 'cfn-' + str(footdata[0]) + '" ' + \
+                    'onclick="do_open_foot(\'' + include_num + 'fn-' + str(footdata[0]) + '\', 1);">' + \
+                    '(' + footdata[1] + ')' + \
+                '</a> <span id="' + include_num + 'fn-' + str(footdata[0]) + '">' + footdata_in + '</span>' + \
+            '</li>' + \
+        ''
 
     footdata_all += '</ul>'
     if footdata_all == '<hr><ul id="footnote_data"></ul>':
@@ -1032,5 +1073,9 @@ def namu(conn, data, title, main_num):
     data = re.sub('\n<\/ul>', '</ul>', data)
 
     data = re.sub('\n', '<br>', data)
+    if include_num == '':
+        plus_data = '<script>render_html();</script>' + plus_data
+    else:
+        plus_data = '<script>render_html(\'' + include_num + '\');</script>' + plus_data
 
     return [data, plus_data, backlink]

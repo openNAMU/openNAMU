@@ -22,6 +22,9 @@ def view_read_2(conn, name):
     curs.execute("select sub from rd where title = ? and not stop = 'O' order by date desc", [name])
     if curs.fetchall():
         sub += ' (' + load_lang('discussion') + ')'
+        topic = 1
+    else:
+        topic = 0
 
     curs.execute("select link from back where title = ? and type = 'cat' order by link asc", [name])
                 
@@ -141,13 +144,13 @@ def view_read_2(conn, name):
         else:
             menu = [['edit/' + url_pas(name), load_lang('edit')]]
 
-        menu += [['topic/' + url_pas(name), load_lang('discussion')], ['history/' + url_pas(name), load_lang('history')], ['xref/' + url_pas(name), load_lang('backlink')], ['acl/' + url_pas(name), load_lang('acl')]]
+        menu += [['topic/' + url_pas(name), load_lang('discussion'), topic], ['history/' + url_pas(name), load_lang('history')], ['xref/' + url_pas(name), load_lang('backlink')], ['acl/' + url_pas(name), load_lang('acl')]]
 
         if flask.request.args.get('from', None):
             menu += [['w/' + url_pas(name), load_lang('pass')]]
             end_data = '''
                 <div id="redirect">
-                    <a href="/w/''' + url_pas(flask.request.args.get('from', None)) + '?from=' + url_pas(name) + '">' + flask.request.args.get('from', None) + '</a> → ' + name + '''
+                    <a href="/w/''' + url_pas(flask.request.args.get('from', None)) + '?from=' + url_pas(name) + '">' + flask.request.args.get('from', None) + '</a> ⇨ <b>' + name + '''</b>
                 </div>
                 <br>
             ''' + end_data
@@ -181,10 +184,14 @@ def view_read_2(conn, name):
     body = curs.fetchall()
     if body:
         div = body[0][0] + '<hr class=\"main_hr\">' + div
+        
+    curs.execute("select data from other where name = 'bottom_body'")
+    body = curs.fetchall()
+    if body:
+        div += '<hr class=\"main_hr\">' + body[0][0]
     
     div = adsense_code + '<div>' + div + '</div>'
 
-    # 이 부분 개선 필요
     match = re.search("^user:([^/]*)", name)
     if match:
         user_name = match.groups()[0]

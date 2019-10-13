@@ -4,6 +4,7 @@ def give_acl_2(conn, name):
     curs = conn.cursor()
 
     check_ok = ''
+    ip = ip_check()
     
     if flask.request.method == 'POST':
         check_data = 'acl (' + name + ')'
@@ -12,44 +13,54 @@ def give_acl_2(conn, name):
     
     user_data = re.search('^user:(.+)$', name)
     if user_data:
-        if check_data and custom()[2] == 0:
+        if check_data and ip_or_user(ip) != 0:
             return redirect('/login')
         
         if user_data.groups()[0] != ip_check():
-            if admin_check(5, check_data) != 1:
+            if admin_check(5) != 1:
                 if check_data:
                     return re_error('/error/3')
                 else:
                     check_ok = 'disabled'
     else:
-        if admin_check(5, check_data) != 1:
+        if admin_check(5) != 1:
             if check_data:
                 return re_error('/error/3')
             else:
                 check_ok = 'disabled'
 
     if flask.request.method == 'POST':
-        decu = flask.request.form.get('decu', '')
-        view = flask.request.form.get('view', '')
-
         curs.execute("select title from acl where title = ?", [name])
         if curs.fetchall():
-            curs.execute("update acl set decu = ? where title = ?", [decu, name])
+            curs.execute("update acl set decu = ? where title = ?", [flask.request.form.get('decu', ''), name])
             curs.execute("update acl set dis = ? where title = ?", [flask.request.form.get('dis', ''), name])
             curs.execute("update acl set why = ? where title = ?", [flask.request.form.get('why', ''), name])
-            curs.execute("update acl set view = ? where title = ?", [view, name])
+            curs.execute("update acl set view = ? where title = ?", [flask.request.form.get('view', ''), name])
         else:
             curs.execute("insert into acl (title, decu, dis, why, view) values (?, ?, ?, ?, ?)", [
                 name, 
-                decu, 
+                flask.request.form.get('decu', ''), 
                 flask.request.form.get('dis', ''), 
                 flask.request.form.get('why', ''), 
-                view
+                flask.request.form.get('view', '')
             ])
         
         curs.execute("select title from acl where title = ? and decu = '' and dis = '' and view = ''", [name])
         if curs.fetchall():
             curs.execute("delete from acl where title = ?", [name])
+            
+        all_d = ''
+        for i in ['decu', 'dis', 'view']:
+            if flask.request.form.get(i, '') == '':
+                all_d += 'normal'
+                if i != 'view':
+                    all_d += ' | '
+            else:
+                all_d += flask.request.form.get(i, '')
+                if i != 'view':
+                    all_d += ' | '
+            
+        admin_check(5, check_data + ' (' + all_d + ')')
 
         conn.commit()
             
@@ -58,19 +69,19 @@ def give_acl_2(conn, name):
         data = '<h2>' + load_lang('document_acl') + '</h2><hr class=\"main_hr\"><select name="decu" ' + check_ok + '>'
     
         if re.search('^user:', name):
-            acl_list = [['', 'normal'], ['user', 'member'], ['all', 'all']]
+            acl_list = ['', 'user', 'all']
         else:
-            acl_list = [['', 'normal'], ['user', 'member'], ['admin', 'admin'], ['50_edit', '50 edit'], ['email', 'email']]
+            acl_list = ['', 'user', 'admin', 'owner', '50_edit', 'email']
         
         curs.execute("select decu from acl where title = ?", [name])
         acl_data = curs.fetchall()
         for data_list in acl_list:
-            if acl_data and acl_data[0][0] == data_list[0]:
+            if acl_data and acl_data[0][0] == data_list:
                 check = 'selected="selected"'
             else:
                 check = ''
             
-            data += '<option value="' + data_list[0] + '" ' + check + '>' + data_list[1] + '</option>'
+            data += '<option value="' + data_list + '" ' + check + '>' + (data_list if data_list != '' else 'normal') + '</option>'
             
         data += '</select>'
         
@@ -80,23 +91,23 @@ def give_acl_2(conn, name):
             curs.execute("select dis, why, view from acl where title = ?", [name])
             acl_data = curs.fetchall()
             for data_list in acl_list:
-                if acl_data and acl_data[0][0] == data_list[0]:
+                if acl_data and acl_data[0][0] == data_list:
                     check = 'selected="selected"'
                 else:
                     check = ''
                     
-                data += '<option value="' + data_list[0] + '" ' + check + '>' + data_list[1] + '</option>'
+                data += '<option value="' + data_list + '" ' + check + '>' + (data_list if data_list != '' else 'normal') + '</option>'
                 
             data += '</select>'
 
             data += '<hr class=\"main_hr\"><h2>' + load_lang('view_acl') + '</h2><hr class=\"main_hr\"><select name="view" ' + check_ok + '>'
             for data_list in acl_list:
-                if acl_data and acl_data[0][2] == data_list[0]:
+                if acl_data and acl_data[0][2] == data_list:
                     check = 'selected="selected"'
                 else:
                     check = ''
                     
-                data += '<option value="' + data_list[0] + '" ' + check + '>' + data_list[1] + '</option>'
+                data += '<option value="' + data_list + '" ' + check + '>' + (data_list if data_list != '' else 'normal') + '</option>'
                 
             data += '''
                 </select>
@@ -104,10 +115,11 @@ def give_acl_2(conn, name):
                 <ul>
                     <li>normal : ''' + load_lang('default') + '''</li>
                     <li>admin : ''' + load_lang('admin_acl') + '''</li>
-                    <li>member : ''' + load_lang('member_acl') + '''</li>
-                    <li>50 edit : ''' + load_lang('50_edit_acl') + '''</li>
+                    <li>user : ''' + load_lang('member_acl') + '''</li>
+                    <li>50_edit : ''' + load_lang('50_edit_acl') + '''</li>
                     <li>all : ''' + load_lang('all_acl') + '''</li>
                     <li>email : ''' + load_lang('email_acl') + '''</li>
+                    <li>owner : ''' + load_lang('owner_acl') + '''</li>
                 </ul>
             '''
                 
@@ -126,5 +138,5 @@ def give_acl_2(conn, name):
                     <button type="submit" ''' + check_ok + '''>''' + load_lang('save') + '''</button>
                 </form>
             ''',
-            menu = [['w/' + url_pas(name), load_lang('document')], ['manager', load_lang('admin')]]
+            menu = [['w/' + url_pas(name), load_lang('document')], ['manager', load_lang('admin')], ['admin_log?search=' + url_pas('acl (' + name + ')'), load_lang('acl_record')]]
         ))

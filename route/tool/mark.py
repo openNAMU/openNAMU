@@ -40,13 +40,15 @@ def plusing(data):
         if not curs.fetchall():
             curs.execute("insert into back (title, link, type) values (?, ?, ?)", [data_in[1], data_in[0], data_in[2]])
 
-def namumark(title = '', data = None, num = 0):
+def namumark(title, data, num, include):
     curs.execute('select data from other where name = "markup"')
     rep_data = curs.fetchall()
     if rep_data[0][0] == 'namumark':
-        data = namu(conn, data, title, num)
+        data = namu(conn, data, title, num, include)
     elif rep_data[0][0] == 'markdown':
         data = markdown(conn, data, title, num)
+    elif rep_data[0][0] == 'raw':
+        data = [data, '', []]
     else:
         data = ['', '', []]
 
@@ -68,4 +70,7 @@ def namumark(title = '', data = None, num = 0):
         
         conn.commit()
         
-    return data[0] + data[1]
+    if num == 2:
+        return [data[0], data[1]]
+    else:
+        return data[0] + data[1]

@@ -80,8 +80,7 @@ def topic_2(conn, name, sub):
     
         curs.execute("select stop from rd where title = ? and sub = ? and stop != ''", [name, sub])
         close_data = curs.fetchall()
-        
-        if close_data and admin != 1:
+        if (close_data and admin != 1) or topic_check(name, sub) == 1:
             display = 'display: none;'
         else:
             display = ''

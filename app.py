@@ -22,35 +22,25 @@ print('----')
 app_var = json.loads(open('data/app_var.json', encoding='utf-8').read())
 
 # DB
-all_src = []
-for i_data in os.listdir("."):
-    f_src = re.search("(.+)\.db$", i_data)
-    if f_src:
-        all_src += [f_src.groups()[0]]
-
-if len(all_src) == 0:
-    print('DB name (data) : ', end = '')
-    
-    db_name = input()
-    if db_name == '':
-        db_name = 'data'
-elif len(all_src) > 1:
-    db_num = 1
-
-    for i_data in all_src:
-        print(str(db_num) + ' : ' + i_data)
-
-        db_num += 1
-
-    print('----')
-    print('Number : ', end = '')
-    db_name = all_src[int(number_check(input())) - 1]
-    print('----')
-else:
-    db_name = all_src[0]
-
-if len(all_src) == 1:
-    print('DB\'s name : ' + db_name)
+try:
+    set_data = json.loads(open('data/set.json').read())
+except:
+    if os.getenv('NAMU_DB') != None:
+        set_data = { "db" : os.getenv('NAMU_DB') }
+    else:
+        print('DB name (data) : ', end = '')
+        
+        new_json = str(input())
+        if new_json == '':
+            new_json = 'data'
+            
+        with open('data/set.json', 'w') as f:
+            f.write('{ "db" : "' + new_json + '" }')
+            
+        set_data = json.loads(open('data/set.json').read())
+        
+print('DB name : ' + set_data['db'])
+db_name = set_data['db']
             
 if os.path.exists(db_name + '.db'):
     setup_tool = 0
@@ -269,8 +259,7 @@ print('----')
 if back_time != 0:
     print('Back up state : ' + str(back_time) + ' hours')
     
-    if __name__ == '__main__':
-        back_up()
+    back_up()
 else:
     print('Back up state : Turn off')
 
@@ -289,8 +278,30 @@ else:
 
         print('----')
         print('Skin update required')
-        
+
 conn.commit()
+
+def count_all_title():
+    curs.execute("select count(title) from data")
+    count_data = curs.fetchall()
+    if count_data:
+        count_data = count_data[0][0]
+    else:
+        count_data = 0
+
+    curs.execute('delete from other where name = "count_all_title"')
+    curs.execute('insert into other (name, data) values ("count_all_title", ?)', [str(count_data)])
+
+    conn.commit()
+
+    threading.Timer(60 * 60 * 24, count_all_title).start()
+
+curs.execute('select data from other where name = "count_all_title"')
+all_title = curs.fetchall()
+if not all_title:
+    curs.execute('insert into other (name, data) values ("count_all_title", "0")')
+
+count_all_title()  
 
 # Func
 @app.route('/del_alarm')
@@ -361,7 +372,7 @@ def server_restart():
 
 @app.route('/update', methods=['GET', 'POST'])
 def server_now_update():
-    return server_now_update_2(conn)
+    return server_now_update_2(conn, r_ver)
 
 @app.route('/oauth_setting', methods=['GET', 'POST'])
 def setting_oauth():
@@ -631,12 +642,12 @@ def main_file(data = None):
 @app.errorhandler(404)
 def main_error_404(e):
     return main_error_404_2(conn)
+    
+app.secret_key = rep_key
+app.wsgi_app = werkzeug.debug.DebuggedApplication(app.wsgi_app, True)
+app.debug = True
 
-if __name__=="__main__":
-    app.secret_key = rep_key
-    app.wsgi_app = werkzeug.debug.DebuggedApplication(app.wsgi_app, True)
-    app.debug = True
-
+if __name__ == "__main__":
     http_server = tornado.httpserver.HTTPServer(tornado.wsgi.WSGIContainer(app))
     http_server.listen(server_set['port'], address = server_set['host'])
     

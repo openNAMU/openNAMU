@@ -4,14 +4,14 @@
         <meta charset="utf-8">
         <title>{{imp[0]}} - {{imp[1][0]}}</title>
         {{imp[3][3]|safe}}
-        <link rel="stylesheet" href="/views/neo_yousoro/css/main.css">
-        <script src="/views/neo_yousoro/js/main.js"></script>
-        <script src="/views/neo_yousoro/js/skin_set.js"></script>
+        <link rel="stylesheet" href="/views/neo_yousoro/css/main.css?ver=3">
+        <script src="/views/neo_yousoro/js/main.js?ver=1"></script>
+        <script src="/views/neo_yousoro/js/skin_set.js?ver=1"></script>
         <link   rel="stylesheet"
                 href="https://use.fontawesome.com/releases/v5.7.2/css/all.css"
                 integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr"
                 crossorigin="anonymous">
-        <link rel="shortcut icon" href="/views/main_css/file/favicon.ico">
+        <link rel="shortcut icon" href="/views/main_css/file/favicon.ico?ver=1">
         {{imp[1][5]|safe}}
         {{imp[2][3]|safe}}
         <meta name="title" content="{{imp[0]}} - {{imp[1][0]}}">
@@ -45,7 +45,7 @@
                                 </a>
                             </div>
                         </div>
-                        |
+                         
                         <div id="top_tool_cel">
                             <a href="javascript:void(0);" onclick="opening('other_cel');">
                                 <i class="fas fa-plus-circle"></i>
@@ -69,20 +69,22 @@
                                 </a>
                             </div>
                         </div>
-                        |
+                         
                         <div id="top_tool_cel">
                             <a href="/user">
                                 {% if imp[2][2] == 1 %}
-                                    <i class="fas fa-user"></i>
-                                {% elif imp[2][2] == 0 %}
-                                    <i class="fas fa-user-times"></i>
+                                    {% if imp[2][8] != 0 %}
+                                        <i class="fas fa-user-secret"></i>
+                                    {% else %}
+                                        <i class="fas fa-user"></i>
+                                    {% endif %}
                                 {% else %}
-                                    <i class="fas fa-user-secret"></i>
+                                    <i class="fas fa-user-times"></i>
                                 {% endif %}
                                 {{imp[2][5]}}
                             </a>
                         </div>
-                        |
+                         
                         <form method="post" action="/search" id="search" role="search">
                             <input id="search_input" name="search" placeholder="{{'search'|load_lang}}" autocomplete="off" type="search">
                             |
@@ -106,12 +108,11 @@
                         <button id="mobile_button_first" type="submit" formaction="/goto"><i class="fas fa-sign-in-alt"></i></button>
                         |
                         <button type="submit" formaction="/search"><i class="fas fa-search"></i></button>
-                    </form>
-                    <div id="close_top">
+                        |
                         <a href="javascript:void(0);" onclick="opening('mobile_menu');">
                             <i class="fas fa-bars"></i>
                         </a>
-                    </div>
+                    </form>
                     <h2>{{'recent'|load_lang}}</h2>
                     <li><a href="/recent_changes">{{'edit'|load_lang}}</a></li>
                     <li><a href="/recent_discuss">{{'discussion'|load_lang}}</a></li>
@@ -129,7 +130,11 @@
                         <div id="tool" class="not_mobile">
                             {% for sub_d in menu %}
                                 <div id="tool_cel">
-                                    <a class="menu-item" href="/{{sub_d[0]}}">{{sub_d[1]}}</a>
+                                    {% if sub_d|length > 2 and sub_d[2] == 1 %}
+                                        <a class="menu-item" href="/{{sub_d[0]}}" id="topic_color">{{sub_d[1]}}</a>
+                                    {% else %}
+                                        <a class="menu-item" href="/{{sub_d[0]}}">{{sub_d[1]}}</a>
+                                    {% endif %}
                                 </div>
                                 {% if menu[loop.index] %}
                                     |
@@ -137,17 +142,26 @@
                             {% endfor %}
                         </div>
                     {% endif %}
-                    <h1>
+                    <h1 id="title">
                         {{imp[0]}}
                         {% if imp[3][0] != 0 %}
                             <sub>{{imp[3][0]}}</sub>
                         {% endif %}
                     </h1>
+                    <div id="last_edit">
+                        {% if imp[3][1] != 0 %}
+                            {{'last_edit_time'|load_lang}} : {{imp[3][1]}}
+                        {% endif %}
+                    </div>
                     {% if menu != 0 %}
                         <div id="tool" class="is_mobile">
                             {% for sub_d in menu %}
                                 <div id="tool_cel">
-                                    <a class="menu-item" href="/{{sub_d[0]}}">{{sub_d[1]}}</a>
+                                    {% if sub_d|length > 2 and sub_d[2] == 1 %}
+                                        <a class="menu-item" href="/{{sub_d[0]}}" id="topic_color">{{sub_d[1]}}</a>
+                                    {% else %}
+                                        <a class="menu-item" href="/{{sub_d[0]}}">{{sub_d[1]}}</a>
+                                    {% endif %}
                                 </div>
                                 {% if menu[loop.index] %}
                                     |

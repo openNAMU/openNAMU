@@ -4,17 +4,12 @@ def user_setting_2(conn, server_init):
     curs = conn.cursor()
 
     support_language = server_init.server_set_var['language']['list']
+    ip = ip_check()
 
     if ban_check() == 1:
         return re_error('/ban')
 
-    if custom()[2] == 0:
-        return redirect('/login')
-
-    ip = ip_check()
-    user_state = flask.request.args.get('user', 'ip')
-    
-    if user_state == 'ip':
+    if ip_or_user(ip) == 0:
         if flask.request.method == 'POST':    
             auto_list = ['email', 'skin', 'lang']
 
@@ -60,9 +55,9 @@ def user_setting_2(conn, server_init):
                 curs.execute('select name, picture from oauth_conn where wiki_id = ? and provider = ?', [flask.session['id'], oauth_provider[i]])
                 oauth_data = curs.fetchall()
                 if len(oauth_data) == 1:
-                    oauth_content += '<li>{} - {}</li>'.format(oauth_provider[i].capitalize(), load_lang('connection') + ' : <img src="{}" width="17px" height="17px">{}'.format(oauth_data[0][1], oauth_data[0][0]))
+                    oauth_content += '<li>{}</li>'.format(oauth_provider[i].capitalize() + ' : <img src="{}" width="17px" height="17px"> {}'.format(oauth_data[0][1], oauth_data[0][0]))
                 else:
-                    oauth_content += '<li>{} - {}</li>'.format(oauth_provider[i].capitalize(), load_lang('connection') + ' : <a href="/oauth/{}/init">{}</a>'.format(oauth_provider[i], load_lang('connect')))
+                    oauth_content += '<li>{}</li>'.format(oauth_provider[i].capitalize() + ' <a href="/oauth/{}/init">({})</a>'.format(oauth_provider[i], load_lang('connect')))
             
             oauth_content += '</ul>'
 
@@ -96,4 +91,4 @@ def user_setting_2(conn, server_init):
                 menu = [['user', load_lang('return')]]
             ))
     else:
-        pass
+        return redirect('/login')

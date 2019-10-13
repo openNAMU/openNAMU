@@ -5,7 +5,7 @@ function load_preview(name) {
     var s_data = new FormData();
     s_data.append('data', o_data.value);
 
-    var url = "/api/w/" + encodeURI(name);
+    var url = "/api/w/" + name;
     var url_2 = "/api/markup";
     
     var xhr = new XMLHttpRequest();
@@ -18,17 +18,15 @@ function load_preview(name) {
 
     xhr.onreadystatechange = function() {
         if(xhr.readyState === 4 && xhr.status === 200) {
-            p_data.innerHTML = JSON.parse(xhr.responseText)['data'];
+            var o_p_data = JSON.parse(xhr.responseText);
 
-            xhr_2.onreadystatechange = function() {
-                if(xhr_2.readyState === 4 && xhr_2.status === 200) {
-                    markup = JSON.parse(xhr_2.responseText)['markup'];
+            p_data.innerHTML = o_p_data['data'];
 
-                    if(markup === 'markdown') {
-                        render_markdown();
-                    }
-                }
-            }
+            js_data = o_p_data['js_data'];
+            js_data = js_data.replace(/<script>/g, '');
+            js_data = js_data.replace(/<\/script>/g, '\n');
+
+            eval(js_data)
         }
     }
 }

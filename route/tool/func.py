@@ -134,21 +134,21 @@ def last_change(data):
 def easy_minify(data, tool = None):    
     return last_change(data)
 
-def render_set(title = '', data = '', num = 0, s_data = 0):
+def render_set(title = '', data = '', num = 0, s_data = 0, include = None):
     if acl_check(title, 'render') == 1:
         return 'HTTP Request 401.3'
     elif s_data == 1:
         return data
     else:
         if data != None:
-            return namumark(title, data, num)
+            return namumark(title, data, num, include)
         else:
             return 'HTTP Request 404'
 
 def captcha_get():
     data = ''
 
-    if custom()[2] == 0:
+    if ip_or_user() != 0:
         curs.execute('select data from other where name = "recaptcha"')
         recaptcha = curs.fetchall()
         if recaptcha and recaptcha[0][0] != '':
@@ -167,7 +167,7 @@ def update():
         for i in db_data:
             curs.execute("update acl set decu = ? where title = ?", [i[1], i[0]])
 
-        print('fix table acl column dec to decu')
+        print('Fix table acl column dec to decu')
         print('----')
     except:
         pass
@@ -235,7 +235,7 @@ def pw_check(data, data2, type_d = 'no', id_d = ''):
 
 def captcha_post(re_data, num = 1):
     if num == 1:
-        if custom()[2] == 0 and captcha_get() != '':
+        if ip_or_user() != 0 and captcha_get() != '':
             curs.execute('select data from other where name = "sec_re"')
             sec_re = curs.fetchall()
             if sec_re and sec_re[0][0] != '':
@@ -308,23 +308,17 @@ def update_oauth(provider, target, content):
 
     return 'Done'
 
-def ip_or_user(data):
+def ip_or_user(data = ''):
+    if data == '':
+        data = ip_check()
+
     if re.search('(\.|:)', data):
         return 1
     else:
         return 0
 
 def edit_button():
-    insert_list = [
-        ['[[name|view]]', load_lang('edit_button_link')], 
-        ['[* data]', load_lang('edit_button_footnote')], 
-        ['[macro(data)]', load_lang('edit_button_macro')],
-        ['{{{#color data}}}', load_lang('edit_button_color')], 
-        ["\\'\\'\\'data\\'\\'\\'", load_lang('edit_button_bold')],
-        ["~~data~~", load_lang('edit_button_strike')],
-        ["{{{+number data}}}", load_lang('edit_button_big')],
-        ["== name ==", load_lang('edit_button_paragraph')]
-    ]
+    insert_list = []
     
     curs.execute("select html, plus from html_filter where kind = 'edit_top'")
     db_data = curs.fetchall()
@@ -333,12 +327,15 @@ def edit_button():
 
     data = ''
     for insert_data in insert_list:
-        data += '<a href="javascript:insert_data(\'content\', \'' + insert_data[0] + '\')">(' + insert_data[1] + ')</a> '
+        data += '<a href="javascript:do_insert_data(\'content\', \'' + insert_data[0] + '\')">(' + insert_data[1] + ')</a> '
+
+    if admin_check() == 1:
+        data += (' ' if data != '' else '') + '<a href="/edit_top">(' + load_lang('add') + ')</a>'
 
     return data + '<hr class=\"main_hr\">'
 
 def ip_warring():
-    if custom()[2] == 0:    
+    if ip_or_user() != 0:
         curs.execute('select data from other where name = "no_login_warring"')
         data = curs.fetchall()
         if data and data[0][0] != '':
@@ -385,11 +382,23 @@ def next_fix(link, num, page, end = 50):
 
 def other2(data):
     req_list = ''
-    for i_data in os.listdir(os.path.join("views", "main_css", "css")):
-        req_list += '<link rel="stylesheet" href="/views/main_css/css/' + i_data + '">'
     
+    css_filter = {}
+    for i_data in os.listdir(os.path.join("views", "main_css", "css")):
+        if i_data in css_filter:
+            req_list += '<link rel="stylesheet" href="/views/main_css/css/' + i_data + '?ver=' + css_filter[i_data] + '">'
+        else:
+            req_list += '<link rel="stylesheet" href="/views/main_css/css/' + i_data + '?ver=1">'
+    
+    js_filter = {
+        'load_include.js' : '2',
+        'do_open_foot.js' : '4'
+    }
     for i_data in os.listdir(os.path.join("views", "main_css", "js")):
-        req_list += '<script src="/views/main_css/js/' + i_data + '"></script>'
+        if i_data in js_filter:
+            req_list += '<script src="/views/main_css/js/' + i_data + '?ver=' + js_filter[i_data] + '"></script>'
+        else:
+            req_list += '<script src="/views/main_css/js/' + i_data + '?ver=1"></script>'
 
     data += ['', '''
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css">
@@ -438,12 +447,18 @@ def wiki_set(num = 1):
         curs.execute("select data from other where name = 'head' and coverage = ?", [skin_check(1)])
         db_data = curs.fetchall()
         if db_data and db_data[0][0] != '':
-            data_list += [db_data[0][0]]
+            if len(re.findall('<', db_data[0][0])) % 2 != 1:
+                data_list += [db_data[0][0]]
+            else:
+                data_list += ['']
         else:
             curs.execute("select data from other where name = 'head' and coverage = ''")
             db_data = curs.fetchall()
             if db_data and db_data[0][0] != '':
-                data_list += [db_data[0][0]]
+                if len(re.findall('<', db_data[0][0])) % 2 != 1:
+                    data_list += [db_data[0][0]]
+                else:
+                    data_list += ['']
             else:
                 data_list += ['']
 
@@ -521,18 +536,21 @@ def admin_check(num = None, what = None):
     if user:
         reset = 0
 
+        back_num = num
         while 1:
-            if num == 1 and reset == 0:
+            if num == 1:
                 check = 'ban'
-            elif num == 3 and reset == 0:
+            elif num == 2:
+                check = 'nothing'
+            elif num == 3:
                 check = 'toron'
-            elif num == 4 and reset == 0:
+            elif num == 4:
                 check = 'check'
-            elif num == 5 and reset == 0:
+            elif num == 5:
                 check = 'acl'
-            elif num == 6 and reset == 0:
+            elif num == 6:
                 check = 'hidel'
-            elif num == 7 and reset == 0:
+            elif num == 7:
                 check = 'give'
             else:
                 check = 'owner'
@@ -545,8 +563,15 @@ def admin_check(num = None, what = None):
 
                 return 1
             else:
-                if reset == 0:
-                    reset = 1
+                if back_num == 'all':
+                    if num == 'all':
+                        num = 1
+                    elif num != 8:
+                        num += 1
+                    else:
+                        break
+                elif num:
+                    num = None
                 else:
                     break
                     
@@ -579,17 +604,16 @@ def ip_pas(raw_ip):
 
 def custom():
     if 'head' in flask.session:
-        user_head = flask.session['head']
+        if len(re.findall('<', flask.session['head'])) % 2 != 1:
+            user_head = flask.session['head']
+        else:
+            user_head = ''
     else:
         user_head = ''
 
     ip = ip_check()
     if ip_or_user(ip) == 0:
-        curs.execute('select name from alarm where name = ? limit 1', [ip])
-        if curs.fetchall():
-            user_icon = 2
-        else:
-            user_icon = 1
+        user_icon = 1
     else:
         user_icon = 0
 
@@ -607,8 +631,28 @@ def custom():
         user_name = ip
     else:
         user_name = load_lang('user')
+        
+    if admin_check('all') == 1:
+        user_admin = '1'
+    else:
+        user_admin = '0'
+        
+    if ban_check() == 1:
+        user_ban = '1'
+    else:
+        user_ban = '0'
 
-    return ['', '', user_icon, user_head, email, user_name]
+    if user_icon == 1:
+        curs.execute("select count(name) from alarm where name = ?", [ip])
+        count = curs.fetchall()
+        if count:
+            user_notice = str(count[0][0])
+        else:
+            user_notice = '0'
+    else:
+        user_notice = '0'
+
+    return ['', '', user_icon, user_head, email, user_name, user_admin, user_ban, user_notice]
 
 def load_skin(data = '', set_n = 0):
     div2 = ''
@@ -661,44 +705,13 @@ def load_skin(data = '', set_n = 0):
 
     return div2
 
-def acl_check(name, tool = ''):
+def acl_check(name = 'test', tool = '', sub = 'test'):
     ip = ip_check()
     
-    if tool == 'render':
-        curs.execute("select view from acl where title = ?", [name])
-        acl_data = curs.fetchall()
-        if acl_data:
-            if acl_data[0][0] == 'user':
-                if ip_or_user(ip) == 1:
-                    return 1
+    if ban_check() == 1:
+        return 1
 
-            if acl_data[0][0] == '50_edit':
-                if ip_or_user(ip) == 1:
-                    return 1
-                
-                if admin_check(5, 'view (' + name + ')') != 1:
-                    curs.execute("select count(title) from history where ip = ?", [ip])
-                    count = curs.fetchall()
-                    if count:
-                        count = count[0][0]
-                    else:
-                        count = 0
-
-                    if count < 50:
-                        return 1
-
-            if acl_data[0][0] == 'admin':
-                if ip_or_user(ip) == 1:
-                    return 1
-
-                if admin_check(5, 'view (' + name + ')') != 1:
-                    return 1
-
-        return 0
-    else:
-        if ban_check() == 1:
-            return 1
-
+    if tool != 'topic' and tool != 'render':
         acl_c = re.search("^user:((?:(?!\/).)*)", name)
         if acl_c:
             acl_n = acl_c.groups()
@@ -726,9 +739,32 @@ def acl_check(name, tool = ''):
         if re.search("^file:", name) and admin_check(None, 'file edit (' + name + ')') != 1:
             return 1
 
-        curs.execute("select decu from acl where title = ?", [name])
-        acl_data = curs.fetchall()
-        if acl_data:
+    for i in range(0, (2 if tool != 'render' else 1)):
+        if tool == '':
+            if i == 0:
+                curs.execute("select decu from acl where title = ?", [name])
+                acl_data = curs.fetchall()
+            else:
+                curs.execute('select data from other where name = "edit"')
+                acl_data = curs.fetchall()
+
+            num = 5
+        elif tool == 'topic':
+            if i == 0:
+                curs.execute("select dis from acl where title = ?", [name])
+                acl_data = curs.fetchall()
+            else:
+                curs.execute('select data from other where name = "discussion"')
+                acl_data = curs.fetchall()
+
+            num = 3
+        else:
+            curs.execute("select view from acl where title = ?", [name])
+            acl_data = curs.fetchall()
+
+            num = 5
+
+        if acl_data and acl_data[0][0] != 'normal':
             if acl_data[0][0] == 'user':
                 if ip_or_user(ip) == 1:
                     return 1
@@ -737,14 +773,14 @@ def acl_check(name, tool = ''):
                 if ip_or_user(ip) == 1:
                     return 1
 
-                if admin_check(5) != 1:
+                if admin_check(num) != 1:
                     return 1
 
             if acl_data[0][0] == '50_edit':
                 if ip_or_user(ip) == 1:
                     return 1
                 
-                if admin_check(5) != 1:
+                if admin_check(num) != 1:
                     curs.execute("select count(title) from history where ip = ?", [ip])
                     count = curs.fetchall()
                     if count:
@@ -759,42 +795,23 @@ def acl_check(name, tool = ''):
                 if ip_or_user(ip) == 1:
                     return 1
                 
-                if admin_check(5) != 1:
+                if admin_check(num) != 1:
                     curs.execute("select data from user_set where id = ? and name = 'email'", [ip])
                     email = curs.fetchall()
                     if not email:
                         return 1
 
-        curs.execute('select data from other where name = "edit"')
-        set_data = curs.fetchall()
-        if set_data:
-            if set_data[0][0] == 'login':
-                if ip_or_user(ip) == 1:
+            if acl_data[0][0] == 'owner':
+                if admin_check() != 1:
                     return 1
 
-            if set_data[0][0] == 'admin':
-                if ip_or_user(ip) == 1:
+        if tool == 'topic':
+            curs.execute("select title from rd where title = ? and sub = ? and not stop = ''", [name, sub])
+            if curs.fetchall():
+                if admin_check(3, 'topic (' + name + ')') != 1:
                     return 1
 
-                if admin_check(5, 'edit (' + name + ')') != 1:
-                    return 1
-
-            if set_data[0][0] == '50_edit':
-                if ip_or_user(ip) == 1:
-                    return 1
-                
-                if admin_check(5, 'edit (' + name + ')') != 1:
-                    curs.execute("select count(title) from history where ip = ?", [ip])
-                    count = curs.fetchall()
-                    if count:
-                        count = count[0][0]
-                    else:
-                        count = 0
-
-                    if count < 50:
-                        return 1
-
-        return 0
+    return 0
 
 def ban_check(ip = None, tool = None):
     if not ip:
@@ -841,60 +858,7 @@ def ban_check(ip = None, tool = None):
     return 0
         
 def topic_check(name, sub):
-    ip = ip_check()
-
-    if ban_check() == 1:
-        return 1
-
-    curs.execute('select data from other where name = "discussion"')
-    acl_data = curs.fetchall()
-    if acl_data:
-        if acl_data[0][0] == 'login':
-            if ip_or_user(ip) == 1:
-                return 1
-
-        if acl_data[0][0] == 'admin':
-            if ip_or_user(ip) == 1:
-                return 1
-
-            if admin_check(3, 'topic (' + name + ')') != 1:
-                return 1
-
-    curs.execute("select dis from acl where title = ?", [name])
-    acl_data = curs.fetchall()
-    if acl_data:
-        if acl_data[0][0] == 'user':
-            if ip_or_user(ip) == 1:
-                return 1
-
-        if acl_data[0][0] == '50_edit':
-            if ip_or_user(ip) == 1:
-                return 1
-            
-            if admin_check(3, 'topic (' + name + ')') != 1:
-                curs.execute("select count(title) from history where ip = ?", [ip])
-                count = curs.fetchall()
-                if count:
-                    count = count[0][0]
-                else:
-                    count = 0
-
-                if count < 50:
-                    return 1
-
-        if acl_data[0][0] == 'admin':
-            if ip_or_user(ip) == 1:
-                return 1
-
-            if admin_check(3, 'topic (' + name + ')') != 1:
-                return 1
-        
-    curs.execute("select title from rd where title = ? and sub = ? and not stop = ''", [name, sub])
-    if curs.fetchall():
-        if admin_check(3, 'topic (' + name + ')') != 1:
-            return 1
-
-    return 0
+    return acl_check(name, 'topic', sub)
 
 def ban_insert(name, end, why, login, blocker, type_d = None):
     now_time = get_time()
@@ -990,7 +954,7 @@ def number_check(data):
 
 def edit_filter_do(data):
     if admin_check(1) != 1:
-        curs.execute("select regex, sub from filter")
+        curs.execute("select regex, sub from filter where regex != ''")
         for data_list in curs.fetchall():
             match = re.compile(data_list[0], re.I)
             if match.search(data):
@@ -1036,8 +1000,8 @@ def re_error(data):
                 g_regex = re.compile(test_r[1])
                 if g_regex.search(ip):
                     end += '<li>' + load_lang('type') + ' : regex ban</li>'
-                    end += '<li>' + load_lang('end') + ' : ' + test_r[2] + '</li>'
-                    if test_r[0] != 'O':
+                    end += '<li>' + load_lang('end') + ' : ' + (test_r[2] if test_r[2] != '' else load_lang('limitless')) + '</li>'
+                    if test_r[0] == 'O':
                         end += '<li>' + load_lang('login_able') + ' (' + load_lang('not_sure') + ')</li>'
 
                     end += '<hr class=\"main_hr\">'
@@ -1046,8 +1010,8 @@ def re_error(data):
             band_d = curs.fetchall()
             if band_d:
                 end += '<li>' + load_lang('type') + ' : band ban</li>'
-                end += '<li>' + load_lang('end') + ' : ' + band_d[0][1] + '</li>'
-                if data[0][0] != 'O':
+                end += '<li>' + load_lang('end') + ' : ' + (band_d[0][1] if band_d[0][1] != '' else load_lang('limitless')) + '</li>'
+                if band_d[0][0] == 'O':
                     end += '<li>' + load_lang('login_able') + ' (' + load_lang('not_sure') + ')</li>'
 
                 end += '<hr class=\"main_hr\">'
@@ -1056,8 +1020,8 @@ def re_error(data):
             ban_d = curs.fetchall()
             if ban_d:
                 end += '<li>' + load_lang('type') + ' : ban</li>'
-                end += '<li>' + load_lang('end') + ' : ' + ban_d[0][1] + '</li>'
-                if data[0][0] != 'O':
+                end += '<li>' + load_lang('end') + ' : ' + (ban_d[0][1] if ban_d[0][1] != '' else load_lang('limitless')) + '</li>'
+                if ban_d[0][0] == 'O':
                     end += '<li>' + load_lang('login_able') + ' (' + load_lang('not_sure') + ')</li>'
 
                 end += '<hr class=\"main_hr\">'

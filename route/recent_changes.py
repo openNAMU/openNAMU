@@ -39,28 +39,20 @@ def recent_changes_2(conn, name, tool):
                 
                 # 기본적인 move만 구현
                 tool_select = flask.request.args.get('tool', None)
-                if tool_select:
-                    if tool_select == 'move':
-                        curs.execute('''
-                            select id, title, date, ip, send, leng from history
-                            where send like ? or send like ?
-                            order by id + 0 desc
-                            limit ?, '50'
-                        ''', ['%(<a>' + name +'</a>%', '%<a>' + name + '</a> move)', str(sql_num)])
-                    else:
-                        curs.execute('''
-                            select id, title, date, ip, send, leng from history
-                            where title = ?
-                            order by id + 0 desc
-                            limit ?, '50'
-                        ''', [name, str(sql_num)])
+                if tool_select and tool_select == 'move':
+                    curs.execute('' + \
+                        'select id, title, date, ip, send, leng from history ' + \
+                        'where send like ? or send like ? ' + \
+                        'order by id + 0 desc ' + \
+                        "limit ?, '50'" + \
+                    '', ['%(<a>' + name +'</a>%', '%<a>' + name + '</a> move)', str(sql_num)])
                 else:
-                    curs.execute('''
-                        select id, title, date, ip, send, leng from history
-                        where title = ?
-                        order by id + 0 desc
-                        limit ?, '50'
-                    ''', [name, str(sql_num)])
+                    curs.execute('' + \
+                        'select id, title, date, ip, send, leng from history ' + \
+                        'where title = ? ' + \
+                        'order by id + 0 desc ' + \
+                        "limit ?, '50'" + \
+                    '', [name, str(sql_num)])
             else:
                 div +=  '''
                         <td id="main_table_width">''' + load_lang('document_name') + '''</td>
@@ -85,22 +77,17 @@ def recent_changes_2(conn, name, tool):
                     <td id="main_table_width">''' + load_lang('time') + '''</td>
                 </tr>
             '''
-            if flask.request.args.get('set', 'normal') == 'user':
-                curs.execute('''
-                    select id, title, date, ip, send, leng from history 
-                    where title like 'user:%' 
-                    order by date desc 
-                    limit ?, 50
-                ''', [str(sql_num)])
-            else:
+
+            set_user = flask.request.args.get('set', 'normal')
+            if set_user == 'normal':
                 div = '<a href="?set=user">(' + load_lang('user_document') + ')</a>' + div
 
-                curs.execute('''
-                    select id, title, date, ip, send, leng from history 
-                    where not title like 'user:%' 
-                    order by date desc 
-                    limit ?, 50
-                ''', [str(sql_num)])
+            curs.execute('' + \
+                'select id, title, date, ip, send, leng from history ' + \
+                "where " + ('' if set_user == 'user' else 'not ') + "title like 'user:%' " + \
+                'order by date desc ' + \
+                'limit ?, 50' + \
+            '', [str(sql_num)])
 
         data_list = curs.fetchall()
         for data in data_list:    
@@ -119,7 +106,10 @@ def recent_changes_2(conn, name, tool):
                 leng = '<span style="color:gray;">(' + data[5] + ')</span>'
                 
             ip = ip_pas(data[3])
-            m_tool = '<a href="/history_tool/' + url_pas(data[1]) + '?num=' + data[0] + '">(' + load_lang('tool') + ')</a>'
+            if tool == 'history':
+                m_tool = '<a href="/history_tool/' + url_pas(data[1]) + '?num=' + data[0] + '&type=history">(' + load_lang('tool') + ')</a>'
+            else:
+                m_tool = '<a href="/history_tool/' + url_pas(data[1]) + '?num=' + data[0] + '">(' + load_lang('tool') + ')</a>'
             
             style = ['', '']
             date = data[2]
@@ -212,7 +202,7 @@ def recent_changes_2(conn, name, tool):
                 
             div += next_fix('/recent_changes?num=', num, data_list)
 
-            if flask.request.args.get('set', 'normal') == 'user':
+            if set_user == 'user':
                 sub = ' (' + load_lang('user') + ')'
                 menu = [['recent_changes', load_lang('return')]]
         

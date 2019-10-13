@@ -1,6 +1,6 @@
 // https://stackoverflow.com/questions/11076975/insert-text-into-textarea-at-cursor-position-javascript
 
-function insert_data(name, data) {
+function do_insert_data(name, data) {
     if(document.selection) { 
         document.getElementById(name).focus();
 
