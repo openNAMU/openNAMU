@@ -1,31 +1,25 @@
 from route.tool.func import *
 from route.tool.mark import load_conn2, namumark
 
-all_src = []
-for i_data in os.listdir("."):
-    f_src = re.search("(.+)\.db$", i_data)
-    if f_src:
-        all_src += [f_src.groups()[0]]
-
-if len(all_src) == 0:
-    exit()
-elif len(all_src) > 1:
-    db_num = 1
-
-    for i_data in all_src:
-        print(str(db_num) + ' : ' + i_data)
+try:
+    set_data = json.loads(open('data/set.json').read())
+except:
+    if os.getenv('NAMU_DB') != None:
+        set_data = { "db" : os.getenv('NAMU_DB') }
+    else:
+        print('DB name (data) : ', end = '')
         
-        db_num += 1
-
-    print('----')
-    print('Number : ', end = '')    
-    db_name = all_src[int(number_check(input())) - 1]
-else:
-    db_name = all_src[0]
-
-if len(all_src) == 1:
-    print('----')
-    print('DB\'s name : ' + db_name)
+        new_json = str(input())
+        if new_json == '':
+            new_json = 'data'
+            
+        with open('data/set.json', 'w') as f:
+            f.write('{ "db" : "' + new_json + '" }')
+            
+        set_data = json.loads(open('data/set.json').read())
+        
+print('DB name : ' + set_data['db'])
+db_name = set_data['db']
 
 conn = sqlite3.connect(db_name + '.db', check_same_thread = False)
 curs = conn.cursor()
@@ -42,6 +36,7 @@ print('6. Change skin')
 print('7. Change password')
 print('8. Reset version')
 print('9. New DB create')
+print('10. Delete set.json')
 
 print('----')
 print('Select : ', end = '')
@@ -135,15 +130,20 @@ elif what_i_do == '7':
     curs.execute("update user set pw = ? where id = ?", [hashed, user_name])
 elif what_i_do == '8':
     curs.execute("update other set data = '00000' where name = 'ver'")
-else:
+elif what_i_do == '9':
     print('----')
-    print('DB\'s name (data) : ', end = '')
+    print('DB name (data) : ', end = '')
     
     db_name = input()
     if db_name == '':
         db_name = 'data'
 
     sqlite3.connect(db_name + '.db', check_same_thread = False)
+elif what_i_do == '10':
+    try:
+        os.remove('data/set.json')
+    except:
+        pass
 
 conn.commit()
 

@@ -49,8 +49,7 @@ li {
 
 #top {
     width: 100%;
-    border-bottom: 2px solid gainsboro;
-    background: skyblue;
+    background: #4a4a4a;
     padding: 15px;
     padding-right: 0;
     padding-left: 0;
@@ -63,17 +62,14 @@ li {
 #main {
     margin: auto;
     margin-top: -20px;
-    padding: 10px;
+    padding: 20px;
     padding-bottom: 20px;
     background: white;
-    border-left: 2px solid gainsboro;
-    border-right: 2px solid gainsboro;
     min-height: 350px;
 }
 
 #bottom {
     width: 100%;
-    border-top: 2px solid gainsboro;
     background: white;
     padding-bottom: 20px;
 }
@@ -91,6 +87,7 @@ li {
     float: right;
     border: 2px solid gainsboro;
     padding: 10px;
+    border-radius: 10px;
 }
 
 @media (min-width: 780px) and (max-width: 1350px) {
@@ -218,6 +215,7 @@ h6 {
 
 #top_tool {
     float: right;
+    color: white;
     margin-top: -5px;
 }
 
@@ -227,6 +225,7 @@ h6 {
     position: absolute;
     background: white;
     margin-top: 10px;
+    border-radius: 10px;
 }
 
 #top_tool_cel {
@@ -244,12 +243,15 @@ h6 {
 
 #search_input {
     width: 80%;
+    border: 1px solid #4a4a4a;
+    border-radius: 10px;
 }
 
 #search button {
     padding: 0;
     border: none;
     background: transparent;
+    color: white;
 }
 
 #mobile_search button {
@@ -283,16 +285,15 @@ h6 {
     margin-top: 5%;
 }
 
-#close_top {
-    float: right;
-    margin-right: 10px;
-}
-
 #toc {
     max-width: 300px;
 }
 
 #top a {
+    color: white;
+}
+
+#top .cel_in_cel a {
     color: black;
 }
 
@@ -303,10 +304,12 @@ a {
 #syntax {
     background: #f0f0f0;
     padding: 5px;
+    border-radius: 10px;
 }
 
 pre {
     border: 2px solid gainsboro;
+    border-radius: 10px;
 }
 
 textarea {
@@ -322,10 +325,12 @@ input {
 
 #toc {
     border: 2px solid gainsboro;
+    border-radius: 10px;
 }
 
 #cate {
     border: 2px solid gainsboro;
+    border-radius: 10px;
 }
 
 #syntax code {
@@ -334,19 +339,18 @@ input {
 
 #redirect {
     border: 2px solid gainsboro;
+    border-radius: 10px;
 }
 
 #go_toc {
     display: inline-block;
     padding: 10px;
-    border-left: 2px solid skyblue;
     width: 25px;
 }
 
 #go_top {
     display: inline-block;
     padding: 10px;
-    border-right: 2px solid skyblue;
     width: 25px;
 }
 
@@ -362,13 +366,14 @@ input {
     position: fixed;
     bottom: 0;
     right: 0;
-    border: 2px solid skyblue;
-    background: white;
+    border: 2px solid #4a4a4a;
+    background: #4a4a4a;
     text-align: center;
+    border-radius: 10px 0px 0px 0px;
 }
 
 #nav_bar a {
-    color: black;
+    color: white;
 }
 
 blockquote {
@@ -376,5 +381,33 @@ blockquote {
     margin: 1em 0em 0em;
     background: #eeeeee;
     border: 2px dashed #ccc;
-    border-left: 5px solid skyblue;
+    border-left: 5px solid black;
+}
+
+#out_link::before {
+    font-family: "Font Awesome 5 Free";
+    content: "\f360";
+    font-weight: 900;
+    background: transparent;
+    color: green;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+#mobile_menu a:hover, #top a:hover {
+    text-decoration: none;
+}
+
+h1#title {
+    margin-bottom: 10px;
+}
+
+div#last_edit {
+    margin-bottom: 20px;
+}
+
+#topic_color {
+    color: limegreen;
 }

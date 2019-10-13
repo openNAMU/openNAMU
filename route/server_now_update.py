@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def server_now_update_2(conn):
+def server_now_update_2(conn, r_ver):
     curs = conn.cursor()
 
     if admin_check() != 1:
@@ -53,11 +53,16 @@ def server_now_update_2(conn):
             imp = [load_lang('update'), wiki_set(), custom(), other2([0, 0])],
             data = load_lang('update_warring') + '''
                 <hr class=\"main_hr\">
-                <a href="https://github.com/2du/openNAMU/blob/master/app.py">(Master)</a> <a href="https://github.com/2du/openNAMU/blob/stable/app.py">(Stable)</a>
+                <ul>
+                    <li>''' + load_lang('version') + ' : ' + r_ver + '''</li>
+                    <li id="ver_send" style="display: none;">''' + load_lang('lastest') + ''' : </li>
+                </ul>
+                <a href="https://github.com/2du/openNAMU">(Master)</a> <a href="https://github.com/2du/openNAMU/tree/stable">(Stable)</a>
                 <hr class=\"main_hr\">
                 <form method="post">
                     <button type="submit">''' + load_lang('update') + '''</button>
                 </form>
+                <script>load_ver();</script>
             ''',
             menu = [['manager', load_lang('return')]]
         ))

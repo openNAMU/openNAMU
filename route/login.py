@@ -3,7 +3,8 @@ from .tool.func import *
 def login_2(conn):
     curs = conn.cursor()
 
-    if custom()[2] != 0:
+    ip = ip_check()
+    if ip_or_user(ip) == 0:
         return redirect('/user')
     
     if ban_check(tool = 'login') == 1:

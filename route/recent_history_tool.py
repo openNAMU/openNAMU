@@ -18,6 +18,16 @@ def recent_history_tool_2(conn, name):
             <li>
                 <a href="/diff/''' + url_pas(name) + '?first=''' + str(int(num) - 1) + '&second=' + num + '">' + load_lang('compare') + '''</a>
             </li>
+        '''
+
+    if flask.request.args.get('type', '') == 'history':
+        data += '''
+            <li>
+                <a href="/revert/''' + url_pas(name) + '?num=' + num + '">' + load_lang('revert') + '''</a>
+            </li>
+        '''
+    elif (int(num) - 1) > 0:
+        data += '''
             <li>
                 <a href="/revert/''' + url_pas(name) + '?num=' + str(int(num) - 1) + '">' + load_lang('revert') + '''</a>
             </li>

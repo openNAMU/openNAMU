@@ -55,21 +55,28 @@ def api_topic_sub_2(conn, name, sub, time):
                     t_color = 'toron_color'
                     
                 ip = ip_pas(i[3])
+                plus_ip = ''
                 
                 curs.execute('select acl from user where id = ?', [i[3]])
                 u_acl = curs.fetchall()
                 if u_acl and u_acl[0][0] != 'user':
-                    ip += ' <a href="javascript:void(0);" title="' + load_lang('admin') + '">★</a>'
+                    plus_ip = '<b>' + i[3] + '</b>'
 
                 if admin == 1 or b_color != 'toron_color_grey':
                     ip += ' <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/admin/' + i[0] + '">(' + load_lang('discussion_tool') + ')</a>'
 
                 curs.execute("select end from ban where block = ?", [i[3]])
                 if curs.fetchall():
-                    ip += ' <a href="javascript:void(0);" title="' + load_lang('blocked') + '">†</a>'
+                    if plus_ip != '':
+                        plus_ip = '<s>' + plus_ip + '</s>'
+                    else:
+                        plus_ip = '<s>' + i[3] + '</s>'
                     
                 if t_data_f == '':
                     t_data_f = '[br]'
+                    
+                if plus_ip != '':
+                    ip = ip.replace('>' + i[3] + '<', '>' + plus_ip + '<')
             
                 all_data = '''
                     <table id="toron">
@@ -91,6 +98,16 @@ def api_topic_sub_2(conn, name, sub, time):
                     "data" : all_data
                 }
             else:
+                if i[4] != 'O' or (i[4] == 'O' and admin == 1):
+                    t_data_f = i[1]
+                else:
+                    curs.execute("select who from re_admin where what = ? order by time desc limit 1", ['blind (' + name + ' - ' + sub + '#' + str(i[0]) + ')'])
+                    who_blind = curs.fetchall()
+                    if who_blind:
+                        t_data_f = '[[user:' + who_blind[0][0] + ']] block'
+                    else:
+                        t_data_f = 'block'
+
                 json_data[i[0]] = {
                     "data" : t_data_f,
                     "date" : i[2],

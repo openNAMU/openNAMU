@@ -6,7 +6,8 @@ def login_register_2(conn):
     if ban_check() == 1:
         return re_error('/ban')
 
-    if custom()[2] != 0:
+    ip = ip_check()
+    if ip_or_user(ip) == 0:
         return redirect('/user')
 
     if not admin_check() == 1:

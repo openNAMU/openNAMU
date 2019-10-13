@@ -13,7 +13,8 @@ def setting_2(conn, num):
             load_lang('main_head'),
             load_lang('main_body'),
             'robots.txt',
-            'Google'
+            'Google',
+            load_lang('main_bottom_body'),
         ]
         
         x = 0
@@ -97,23 +98,19 @@ def setting_2(conn, num):
             conn.commit()
             
             div = ''
-            acl_list = [
-                [load_lang('member'), 'login'], 
-                [load_lang('ip'), 'normal'], 
-                [load_lang('admin'), 'admin']
-            ]
+            acl_list = ['normal', 'user', 'admin', 'owner', '50_edit', 'email']
             for i in acl_list:
-                if i[1] == d_list[6]:
-                    div = '<option value="' + i[1] + '">' + i[0] + '</option>' + div
+                if i == d_list[6]:
+                    div = '<option value="' + i + '">' + i + '</option>' + div
                 else:
-                    div += '<option value="' + i[1] + '">' + i[0] + '</option>'
+                    div += '<option value="' + i + '">' + i + '</option>'
 
             div4 = ''
             for i in acl_list:
-                if i[1] == d_list[14]:
-                    div4 = '<option value="' + i[1] + '">' + i[0] + '</option>' + div4
+                if i == d_list[14]:
+                    div4 = '<option value="' + i + '">' + i + '</option>' + div4
                 else:
-                    div4 += '<option value="' + i[1] + '">' + i[0] + '</option>'
+                    div4 += '<option value="' + i + '">' + i + '</option>'
 
             ch_1 = ''
             if d_list[7]:
@@ -177,7 +174,7 @@ def setting_2(conn, num):
                         <hr class=\"main_hr\">
                         <select name="skin">''' + div2 + '''</select>
                         <hr class=\"main_hr\">
-                        <span>''' + load_lang('default_acl') + '''</span>
+                        <span>''' + load_lang('default_acl') + '</span> <a href="/acl/TEST">(' + load_lang('reference') + ''')</a>
                         <hr class=\"main_hr\">
                         <select name="edit">''' + div + '''</select>
                         <hr class=\"main_hr\">
@@ -189,7 +186,7 @@ def setting_2(conn, num):
                         <hr class=\"main_hr\">
                         <input type="checkbox" name="ip_view" ''' + ch_2 + '''> ''' + load_lang('hide_ip') + '''
                         <hr class=\"main_hr\">
-                        <input type="checkbox" name="email_have" ''' + ch_3 + '''> ''' + load_lang('email_required') + ''' {<a href="/setting/6">''' + load_lang('google_imap_required') + '''</a>}
+                        <input type="checkbox" name="email_have" ''' + ch_3 + '''> ''' + load_lang('email_required') + ' <a href="/setting/6">{' + load_lang('google_imap_required') + '''}</a>
                         <hr class=\"main_hr\">
                         <span>''' + load_lang('wiki_host') + '''</span>
                         <hr class=\"main_hr\">
@@ -310,11 +307,15 @@ def setting_2(conn, num):
                 ''',
                 menu = [['setting', load_lang('return')]]
             ))
-    elif num == 3 or num == 4:
+    elif num == 3 or num == 4 or num == 7:
         if flask.request.method == 'POST':
             if num == 4:
                 info_d = 'body'
                 end_r = '4'
+                coverage = ''
+            elif num == 7:
+                info_d = 'bottom_body'
+                end_r = '7'
                 coverage = ''
             else:
                 info_d = 'head'
@@ -343,6 +344,10 @@ def setting_2(conn, num):
             if num == 4:
                 curs.execute("select data from other where name = 'body'")
                 title = '_body'
+                start = ''
+            elif num == 7:
+                curs.execute("select data from other where name = 'bottom_body'")
+                title = '_bottom_body'
                 start = ''
             else:
                 curs.execute("select data from other where name = 'head' and coverage = ?", [flask.request.args.get('skin', '')])
