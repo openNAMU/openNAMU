@@ -22,6 +22,9 @@ def view_read_2(conn, name):
     curs.execute("select sub from rd where title = ? and not stop = 'O' order by date desc", [name])
     if curs.fetchall():
         sub += ' (' + load_lang('discussion') + ')'
+        topic = 1
+    else:
+        topic = 0
 
     curs.execute("select link from back where title = ? and type = 'cat' order by link asc", [name])
                 
@@ -141,7 +144,7 @@ def view_read_2(conn, name):
         else:
             menu = [['edit/' + url_pas(name), load_lang('edit')]]
 
-        menu += [['topic/' + url_pas(name), load_lang('discussion')], ['history/' + url_pas(name), load_lang('history')], ['xref/' + url_pas(name), load_lang('backlink')], ['acl/' + url_pas(name), load_lang('acl')]]
+        menu += [['topic/' + url_pas(name), load_lang('discussion'), topic], ['history/' + url_pas(name), load_lang('history')], ['xref/' + url_pas(name), load_lang('backlink')], ['acl/' + url_pas(name), load_lang('acl')]]
 
         if flask.request.args.get('from', None):
             menu += [['w/' + url_pas(name), load_lang('pass')]]

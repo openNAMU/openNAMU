@@ -292,5 +292,6 @@
     "acl_record": "ACL 기록",
     "main_bottom_body": "본문 하단",
     "reference" : "참고",
-    "owner_acl" : "소유자만"
+    "owner_acl" : "소유자만",
+    "last_edit_time" : "최근 수정 시각"
 }
