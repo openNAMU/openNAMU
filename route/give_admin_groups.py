@@ -61,25 +61,32 @@ def give_admin_groups_2(conn, name):
         else:
             state = ''
 
-        data += '''
-                <li><input type="checkbox" ''' + state +  ' name="ban" ' + exist_list[0] + '> ' + load_lang('ban_authority') + '''</li>
-                <li><input type="checkbox" ''' + state +  ' name="toron" ' + exist_list[2] + '> ' + load_lang('discussion_authority') + '''</li>
-                <li><input type="checkbox" ''' + state +  ' name="check" ' + exist_list[3] + '> ' + load_lang('user_check_authority') + '''</li>
-                <li><input type="checkbox" ''' + state +  ' name="acl" ' + exist_list[4] + '> ' + load_lang('document_acl_authority') + '''</li>
-                <li><input type="checkbox" ''' + state +  ' name="hidel" ' + exist_list[5] + '> ' + load_lang('history_hide_authority') + '''</li>
-                <li><input type="checkbox" ''' + state +  ' name="give" ' + exist_list[6] + '> ' + load_lang('authorization_authority') + '''</li>
-                <li><input type="checkbox" ''' + state +  ' name="owner" ' + exist_list[7] + '> ' + load_lang('owner_authority') + '''</li>
-            </ul>
-        '''
+        acl_name_list = ['ban', 'nothing', 'toron', 'check', 'acl', 'hidel', 'give', 'owner']
+        for i in range(0, 8):
+            if i != 2:
+                data += '<li><input type="checkbox" ''' + state +  ' name="' + acl_name_list[i] + '" ' + exist_list[i] + '> ' + acl_name_list[i] + '</li>'
+
+        data += '</ul>'
 
         return easy_minify(flask.render_template(skin_check(), 
-            imp = [load_lang('admin_group_add'), wiki_set(), custom(), other2([0, 0])],
+            imp = [name, wiki_set(), custom(), other2(['(' + load_lang('admin_group') + ')', 0])],
             data =  '''
                 <form method="post">
                     ''' + data + '''
                     <hr class=\"main_hr\">
-                    <button id="save" ''' + state +  ''' type="submit">''' + load_lang('save') + '''</button>
+                    <h2>''' + load_lang('explanation') + '''</h2>
+                    <ul>
+                        <li>ban : ''' + load_lang('ban_authority') + '''</li>
+                        <li>toron : ''' + load_lang('discussion_authority') + '''</li>
+                        <li>check : ''' + load_lang('user_check_authority') + '''</li>
+                        <li>acl : ''' + load_lang('document_acl_authority') + '''</li>
+                        <li>hidel : ''' + load_lang('history_hide_authority') + '''</li>
+                        <li>give : ''' + load_lang('authorization_authority') + '''</li>
+                        <li>owner : ''' + load_lang('owner_authority') + '''</li>
+                    </ul>
+                    <hr class=\"main_hr\">
+                    <button ''' + state +  ''' type="submit">''' + load_lang('save') + '''</button>
                 </form>
             ''',
-            menu = [['manager', load_lang('return')]]
+            menu = [['give_log', load_lang('return')]]
         ))     
