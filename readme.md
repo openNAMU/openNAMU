@@ -1,6 +1,6 @@
 오픈나무
 ====
-[![Python 3.5 이상](https://img.shields.io/badge/>=%20python-3.5-blue.svg)](https://python.org)
+[![Python 3.5 이상](https://img.shields.io/badge/python->=%203.5-blue.svg)](https://python.org)
 [![라이선스](https://img.shields.io/badge/license-BSD%203--Clause-lightgrey.svg)](./LICENSE)
 
 ![](https://raw.githubusercontent.com/2du/openNAMU/master/.github/logo.png)

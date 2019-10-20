@@ -1,6 +1,6 @@
 ﻿openNAMU
 ====
-[![Up to Python 3.5](https://img.shields.io/badge/>=%20python-3.5-blue.svg)](https://python.org)
+[![Up to Python 3.5](https://img.shields.io/badge/python->=%203.5-blue.svg)](https://python.org)
 [![LICENSE](https://img.shields.io/badge/license-BSD%203--Clause-lightgrey.svg)](./LICENSE)
 
 ![](https://raw.githubusercontent.com/2du/openNAMU/master/.github/logo.png)
