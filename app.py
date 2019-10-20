@@ -71,28 +71,33 @@ app.jinja_env.filters['cut_100'] = cut_100
 
 app.url_map.converters['everything'] = EverythingConverter
 
-curs.execute('create table if not exists data(test text)')
-curs.execute('create table if not exists cache_data(test text)')
-curs.execute('create table if not exists history(test text)')
-curs.execute('create table if not exists rd(test text)')
-curs.execute('create table if not exists user(test text)')
-curs.execute('create table if not exists user_set(test text)')
-curs.execute('create table if not exists ban(test text)')
-curs.execute('create table if not exists topic(test text)')
-curs.execute('create table if not exists rb(test text)')
-curs.execute('create table if not exists back(test text)')
-curs.execute('create table if not exists custom(test text)')
-curs.execute('create table if not exists other(test text)')
-curs.execute('create table if not exists alist(test text)')
-curs.execute('create table if not exists re_admin(test text)')
-curs.execute('create table if not exists alarm(test text)')
-curs.execute('create table if not exists ua_d(test text)')
-curs.execute('create table if not exists filter(test text)')
-curs.execute('create table if not exists scan(test text)')
-curs.execute('create table if not exists acl(test text)')
-curs.execute('create table if not exists inter(test text)')
-curs.execute('create table if not exists html_filter(test text)')
-curs.execute('create table if not exists oauth_conn(test text)')
+create_data = {}
+create_data['all_data'] = [
+    'data', 
+    'cache_data', 
+    'history', 
+    'rd', 
+    'user',
+    'user_set',
+    'ban', 
+    'topic', 
+    'rb', 
+    'back', 
+    'custom', 
+    'other', 
+    'alist', 
+    're_admin', 
+    'alarm', 
+    'ua_d', 
+    'filter', 
+    'scan', 
+    'acl', 
+    'inter', 
+    'html_filter',
+    'oauth_conn'
+]
+for i in create_data['all_data']:
+    curs.execute('create table if not exists ' + i + '(test longtext)')
 
 if setup_tool == 0:
     try:
@@ -107,32 +112,6 @@ if setup_tool == 0:
         setup_tool = 1
 
 if setup_tool != 0:
-    create_data = {}
-    create_data['all_data'] = [
-        'data', 
-        'cache_data', 
-        'history', 
-        'rd', 
-        'user',
-        'user_set',
-        'ban', 
-        'topic', 
-        'rb', 
-        'back', 
-        'custom', 
-        'other', 
-        'alist', 
-        're_admin', 
-        'alarm', 
-        'ua_d', 
-        'filter', 
-        'scan', 
-        'acl', 
-        'inter', 
-        'html_filter',
-        'oauth_conn'
-    ]
-
     create_data['data'] = ['title', 'data']
     create_data['cache_data'] = ['title', 'data']
     create_data['history'] = ['id', 'title', 'data', 'date', 'ip', 'send', 'leng', 'hide', 'type']
