@@ -18,5 +18,5 @@ def list_give_2(conn):
     return easy_minify(flask.render_template(skin_check(), 
         imp = [load_lang('admin_group_list'), wiki_set(), custom(), other2([0, 0])],
         data = list_data,
-        menu = [['other', load_lang('return')]]
+        menu = [['manager', load_lang('return')]]
     ))    

@@ -55,28 +55,12 @@ def api_topic_sub_2(conn, name, sub, time):
                     t_color = 'toron_color'
                     
                 ip = ip_pas(i[3])
-                plus_ip = ''
-                
-                curs.execute('select acl from user where id = ?', [i[3]])
-                u_acl = curs.fetchall()
-                if u_acl and u_acl[0][0] != 'user':
-                    plus_ip = '<b>' + i[3] + '</b>'
 
                 if admin == 1 or b_color != 'toron_color_grey':
                     ip += ' <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/admin/' + i[0] + '">(' + load_lang('discussion_tool') + ')</a>'
-
-                curs.execute("select end from ban where block = ?", [i[3]])
-                if curs.fetchall():
-                    if plus_ip != '':
-                        plus_ip = '<s>' + plus_ip + '</s>'
-                    else:
-                        plus_ip = '<s>' + i[3] + '</s>'
                     
                 if t_data_f == '':
                     t_data_f = '[br]'
-                    
-                if plus_ip != '':
-                    ip = ip.replace('>' + i[3] + '<', '>' + plus_ip + '<')
             
                 all_data = '''
                     <table id="toron">

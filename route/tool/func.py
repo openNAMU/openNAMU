@@ -528,8 +528,11 @@ def diff(seqm):
             
     return sub
            
-def admin_check(num = None, what = None):
-    ip = ip_check() 
+def admin_check(num = None, what = None, name = ''):
+    if name == '':
+        ip = ip_check()
+    else:
+        ip = name
 
     curs.execute("select acl from user where id = ?", [ip])
     user = curs.fetchall()
@@ -580,7 +583,7 @@ def admin_check(num = None, what = None):
 def ip_pas(raw_ip):
     hide = 0
 
-    if re.search("(\.|:)", raw_ip):    
+    if ip_or_user(raw_ip) != 0:    
         curs.execute("select data from other where name = 'ip_view'")
         data = curs.fetchall()
         if data and data[0][0] != '':
@@ -596,6 +599,12 @@ def ip_pas(raw_ip):
             ip = '<a href="/w/' + url_pas('user:' + raw_ip) + '">' + raw_ip + '</a>'
         else:
             ip = '<a id="not_thing" href="/w/' + url_pas('user:' + raw_ip) + '">' + raw_ip + '</a>'
+
+        if admin_check('all', None, raw_ip) == 1:
+            ip = '<b>' + ip + '</b>'
+
+    if ban_check(raw_ip) == 1:
+        ip = '<s>' + ip + '</s>'
          
     if hide == 0:
         ip += ' <a href="/tool/' + url_pas(raw_ip) + '">(' + load_lang('tool') + ')</a>'
