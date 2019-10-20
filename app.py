@@ -263,22 +263,6 @@ if back_time != 0:
 else:
     print('Back up state : Turn off')
 
-curs.execute('select data from other where name = "s_ver"')
-ver_set_data = curs.fetchall()
-if not ver_set_data:
-    curs.execute('insert into other (name, data) values ("s_ver", ?)', [s_ver])
-
-    if setup_tool == 0:
-        print('----')
-        print('Skin update required')
-else:
-    if int(ver_set_data[0][0]) < int(s_ver):
-        curs.execute('delete from other where name = "s_ver"')
-        curs.execute('insert into other (name, data) values ("s_ver", ?)', [s_ver])
-
-        print('----')
-        print('Skin update required')
-
 conn.commit()
 
 def count_all_title():
