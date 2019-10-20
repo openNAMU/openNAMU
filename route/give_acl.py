@@ -111,6 +111,7 @@ def give_acl_2(conn, name):
                 
             data += '''
                 </select>
+                <hr class=\"main_hr\">
                 <h2>''' + load_lang('explanation') + '''</h2>
                 <ul>
                     <li>normal : ''' + load_lang('default') + '''</li>
