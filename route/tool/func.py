@@ -634,8 +634,23 @@ def custom():
         
     if admin_check('all') == 1:
         user_admin = '1'
+
+        curs.execute("select acl from user where id = ?", [ip])
+        user_acl = curs.fetchall()
+
+        user_acl_list = []
+        curs.execute('select acl from alist where name = ?', [user_acl[0][0]])
+        user_acl = curs.fetchall()
+        for i in user_acl:
+            user_acl_list += [i[0]]
+
+        if user_acl != []:
+            user_acl_list = user_acl_list
+        else:
+            user_acl_list = '0'
     else:
         user_admin = '0'
+        user_acl_list = '0'
         
     if ban_check() == 1:
         user_ban = '1'
@@ -652,7 +667,7 @@ def custom():
     else:
         user_notice = '0'
 
-    return ['', '', user_icon, user_head, email, user_name, user_admin, user_ban, user_notice]
+    return ['', '', user_icon, user_head, email, user_name, user_admin, user_ban, user_notice, user_acl_list]
 
 def load_skin(data = '', set_n = 0):
     div2 = ''
