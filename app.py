@@ -140,7 +140,7 @@ if setup_tool != 0:
             try:
                 curs.execute('select ' + create + ' from ' + create_table + ' limit 1')
             except:
-                curs.execute("alter table " + create_table + " add " + create + " text default ''")
+                curs.execute("alter table " + create_table + " add " + create + " longtext default ''")
 
     update()
 
