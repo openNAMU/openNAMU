@@ -40,8 +40,8 @@ def topic_admin_2(conn, name, sub, num):
                     </a>
                 </li>
                 <li>
-                    <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/b/' + str(num) + '">
-                    ''' + (load_lang('hide_release') if data[0][0] == 'O' else load_lang('hide')) + '''
+                    <a href="/topic/''' + url_pas(name) + '/sub/' + url_pas(sub) + '/b/' + str(num) + '''">
+                        ''' + (load_lang('hide_release') if data[0][0] == 'O' else load_lang('hide')) + '''
                     </a>
                 </li>
                 <li>

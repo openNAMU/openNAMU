@@ -1,6 +1,6 @@
 오픈나무
 ====
-[![Python 3.5 이상의 버전 필요](https://img.shields.io/badge/python-3.5%20or%20higher-blue.svg)](https://python.org)
+[![Python 3.5 이상](https://img.shields.io/badge/python->=%203.5-blue.svg)](https://python.org)
 [![라이선스](https://img.shields.io/badge/license-BSD%203--Clause-lightgrey.svg)](./LICENSE)
 
 ![](https://raw.githubusercontent.com/2du/openNAMU/master/.github/logo.png)
@@ -29,11 +29,9 @@
  * `git clone -b master https://github.com/2du/openNAMU.git`
 
 ## 기여
-오픈나무에는 검증되지 않은 몇가지 버그가 존재할 수 있습니다. 당신의 오픈나무 사용과 버그 발견은 오픈나무의 발전을 돕습니다.
-[이슈 생성하기](https://github.com/2du/openNAMU/issues/new)
+오픈나무에는 검증되지 않은 몇가지 버그가 존재할 수 있습니다. 당신의 오픈나무 사용과 버그 발견은 오픈나무의 발전을 돕습니다. [(이슈 생성하기)](https://github.com/2du/openNAMU/issues/new)
 
-오픈나무는 완전한 오픈소스 프로젝트입니다. 새로운 기능을 추가하고 Pull Request를 생성해보세요.
-[Pull Request 생성하기](https://github.com/2du/openNAMU/compare)
+오픈나무는 완전한 오픈소스 프로젝트입니다. 새로운 기능을 추가하고 Pull Request를 생성해보세요. [(Pull Request 생성하기)](https://github.com/2du/openNAMU/compare)
 
 ## 라이선스
 오픈나무 프로젝트는 [BSD 3-Clause License](./LICENSE)(이하 이용허락)의 보호를 받고 있으며, 오픈나무 프로젝트를 사용하고자 한다면 라이선스를 준수해야 합니다. 본 이용허락를 위반할 경우 개발자는 DMCA Takedown 등 관련 제재를 관계자에게 요청할 권리가 있으며, 그 책임은 모두 이용허락 위반 사용자에게 있습니다. 자세한 내용은 문서를 참고하세요.

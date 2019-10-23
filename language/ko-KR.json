@@ -158,7 +158,7 @@
     "admin": "관리자",
     "edit_filter_list": "편집 필터 목록",
     "wiki_skin": "위키 스킨",
-    "admin_group_add": "관리자 그룹 권한 부여",
+    "admin_group" : "관리자 그룹",
     "all": "전체",
     "skin_error": "이 스킨은 설정을 지원하지 않습니다.",
     "member": "가입자",
