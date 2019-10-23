@@ -71,28 +71,33 @@ app.jinja_env.filters['cut_100'] = cut_100
 
 app.url_map.converters['everything'] = EverythingConverter
 
-curs.execute('create table if not exists data(test text)')
-curs.execute('create table if not exists cache_data(test text)')
-curs.execute('create table if not exists history(test text)')
-curs.execute('create table if not exists rd(test text)')
-curs.execute('create table if not exists user(test text)')
-curs.execute('create table if not exists user_set(test text)')
-curs.execute('create table if not exists ban(test text)')
-curs.execute('create table if not exists topic(test text)')
-curs.execute('create table if not exists rb(test text)')
-curs.execute('create table if not exists back(test text)')
-curs.execute('create table if not exists custom(test text)')
-curs.execute('create table if not exists other(test text)')
-curs.execute('create table if not exists alist(test text)')
-curs.execute('create table if not exists re_admin(test text)')
-curs.execute('create table if not exists alarm(test text)')
-curs.execute('create table if not exists ua_d(test text)')
-curs.execute('create table if not exists filter(test text)')
-curs.execute('create table if not exists scan(test text)')
-curs.execute('create table if not exists acl(test text)')
-curs.execute('create table if not exists inter(test text)')
-curs.execute('create table if not exists html_filter(test text)')
-curs.execute('create table if not exists oauth_conn(test text)')
+create_data = {}
+create_data['all_data'] = [
+    'data', 
+    'cache_data', 
+    'history', 
+    'rd', 
+    'user',
+    'user_set',
+    'ban', 
+    'topic', 
+    'rb', 
+    'back', 
+    'custom', 
+    'other', 
+    'alist', 
+    're_admin', 
+    'alarm', 
+    'ua_d', 
+    'filter', 
+    'scan', 
+    'acl', 
+    'inter', 
+    'html_filter',
+    'oauth_conn'
+]
+for i in create_data['all_data']:
+    curs.execute('create table if not exists ' + i + '(test longtext)')
 
 if setup_tool == 0:
     try:
@@ -107,32 +112,6 @@ if setup_tool == 0:
         setup_tool = 1
 
 if setup_tool != 0:
-    create_data = {}
-    create_data['all_data'] = [
-        'data', 
-        'cache_data', 
-        'history', 
-        'rd', 
-        'user',
-        'user_set',
-        'ban', 
-        'topic', 
-        'rb', 
-        'back', 
-        'custom', 
-        'other', 
-        'alist', 
-        're_admin', 
-        'alarm', 
-        'ua_d', 
-        'filter', 
-        'scan', 
-        'acl', 
-        'inter', 
-        'html_filter',
-        'oauth_conn'
-    ]
-
     create_data['data'] = ['title', 'data']
     create_data['cache_data'] = ['title', 'data']
     create_data['history'] = ['id', 'title', 'data', 'date', 'ip', 'send', 'leng', 'hide', 'type']
@@ -161,7 +140,7 @@ if setup_tool != 0:
             try:
                 curs.execute('select ' + create + ' from ' + create_table + ' limit 1')
             except:
-                curs.execute("alter table " + create_table + " add " + create + " text default ''")
+                curs.execute("alter table " + create_table + " add " + create + " longtext default ''")
 
     update()
 
@@ -262,22 +241,6 @@ if back_time != 0:
     back_up()
 else:
     print('Back up state : Turn off')
-
-curs.execute('select data from other where name = "s_ver"')
-ver_set_data = curs.fetchall()
-if not ver_set_data:
-    curs.execute('insert into other (name, data) values ("s_ver", ?)', [s_ver])
-
-    if setup_tool == 0:
-        print('----')
-        print('Skin update required')
-else:
-    if int(ver_set_data[0][0]) < int(s_ver):
-        curs.execute('delete from other where name = "s_ver"')
-        curs.execute('insert into other (name, data) values ("s_ver", ?)', [s_ver])
-
-        print('----')
-        print('Skin update required')
 
 conn.commit()
 

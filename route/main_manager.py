@@ -31,12 +31,11 @@ def main_manager_2(conn, num, r_ver):
                         <li><a href="/ban">''' + load_lang('ban') + '''</a></li>
                         <li><a href="/manager/5">''' + load_lang('authorize') + '''</a></li>
                         <li><a href="/edit_filter">''' + load_lang('edit_filter_list') + '''</a></li>
-                        <li><a href="/give_log">''' + load_lang('admin_group_list') + '''</a></li>
                     </ul>
                     <br>
                     <h2>''' + load_lang('owner') + '''</h2>
                     <ul>
-                        <li><a href="/manager/8">''' + load_lang('admin_group_add') + '''</a></li>
+                        <li><a href="/give_log">''' + load_lang('admin_group_list') + '''</a></li>
                         <li><a href="/setting">''' + load_lang('setting') + '''</a></li>
                     </ul>
                     <h3>''' + load_lang('filter') + '''</h3>
