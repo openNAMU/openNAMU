@@ -587,6 +587,10 @@ def api_user_info(name = ''):
 @app.route('/api/topic/<everything:name>/sub/<sub>')
 def api_topic_sub(name = '', sub = '', time = ''):
     return api_topic_sub_2(conn, name, sub, time)
+
+@app.route('/api/search/<name>')
+def api_search(name = ''):
+    return api_search_2(conn, name)
     
 # File
 @app.route('/views/easter_egg.html')
