@@ -242,9 +242,23 @@ h6 {
 }
 
 #search_input {
-    width: 80%;
-    border: 1px solid #4a4a4a;
+    width: 220px;
     border-radius: 10px;
+}
+
+div#pre_search {
+    padding: 10px;
+    border: 2px solid #4a4a4a;
+    width: 200px;
+    color: black;
+    margin-top: 5px;
+    background: white;
+    border-radius: 10px;
+    position: absolute;
+}
+
+div#pre_search a {
+    color: dodgerblue;
 }
 
 #search button {
