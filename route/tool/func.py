@@ -1068,6 +1068,8 @@ def re_error(data):
                 data = load_lang('authority_error')
             elif num == 4:
                 data = load_lang('no_admin_block_error')
+            elif num == 5:
+                data = load_lang('skin_error')
             elif num == 6:
                 data = load_lang('same_id_exist_error')
             elif num == 7:

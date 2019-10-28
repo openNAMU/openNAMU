@@ -1,6 +1,5 @@
-window.onload = function () {
-    var before = '';
-    setInterval(function() {
+function search_do() {
+    function search_load() {
         var data = document.getElementById("search_input").value;
         if(before !== data && data !== '') {
             before = data;
@@ -30,5 +29,8 @@ window.onload = function () {
             before = '';
             document.getElementById("pre_search").style.display = 'none';
         }
-    }, 1000);
+    }
+
+    var before = '';
+    setInterval(search_load, 1000);
 }

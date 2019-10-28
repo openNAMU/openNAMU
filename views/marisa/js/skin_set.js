@@ -1,83 +1,83 @@
-function get_post() {
-    check = document.getElementById('strike');
-    if(check.value === 'normal') {
-        document.cookie = 'del_strike=0;';
-    } else if(check.value === 'change') {
-        document.cookie = 'del_strike=1;';
-    } else {
-        document.cookie = 'del_strike=2;';
+function skin_set() {
+    function get_post() {
+        check = document.getElementById('strike');
+        if(check.value === 'normal') {
+            document.cookie = 'del_strike=0;';
+        } else if(check.value === 'change') {
+            document.cookie = 'del_strike=1;';
+        } else {
+            document.cookie = 'del_strike=2;';
+        }
+
+        check = document.getElementById('bold');
+        if(check.value === 'normal') {
+            document.cookie = 'del_bold=0;';
+        } else if(check.value === 'change') {
+            document.cookie = 'del_bold=1;';
+        } else {
+            document.cookie = 'del_bold=2;';
+        }
+
+        check = document.getElementById('include');
+        if(check.checked === true) {
+            document.cookie = 'include_link=1;';
+        } else {
+            document.cookie = 'include_link=0;';
+        }
+
+        check = document.getElementById('invert');
+        if(check.checked === true) {
+            document.cookie = 'invert=1;';
+        } else {
+            document.cookie = 'invert=0;';
+        }
+
+        history.go(0);
     }
 
-    check = document.getElementById('bold');
-    if(check.value === 'normal') {
-        document.cookie = 'del_bold=0;';
-    } else if(check.value === 'change') {
-        document.cookie = 'del_bold=1;';
-    } else {
-        document.cookie = 'del_bold=2;';
+    function regex_data(data) {
+        r_data = new RegExp('(?:^|; )' + data + '=([^;]*)')
+
+        return r_data;
     }
 
-    check = document.getElementById('include');
-    if(check.checked === true) {
-        document.cookie = 'include_link=1;';
-    } else {
-        document.cookie = 'include_link=0;';
-    }
+    cookies = document.cookie;
 
-    check = document.getElementById('invert');
-    if(check.checked === true) {
-        document.cookie = 'invert=1;';
-    } else {
-        document.cookie = 'invert=0;';
-    }
+    function main_load() {
+        head_data = document.querySelector('head');
+        if(cookies.match(regex_data('del_strike'))) {
+            if(cookies.match(regex_data('del_strike'))[1] === '1') {
+                head_data.innerHTML += '<style>s { text-decoration: none; } s:hover { background-color: transparent; }</style>';
+            } else if(cookies.match(regex_data('del_strike'))[1] === '2') {
+                head_data.innerHTML += '<style>s { display: none; }</style>';
+            }
+        }
 
-    history.go(0);
-}
+        if(cookies.match(regex_data('del_bold'))) {
+            if(cookies.match(regex_data('del_bold'))[1] === '1') {
+                head_data.innerHTML += '<style>b { font-weight: normal; }</style>';
+            } else if(cookies.match(regex_data('del_bold'))[1] === '2') {
+                head_data.innerHTML += '<style>b { display: none; }</style>';
+            }
+        }
 
-function regex_data(data) {
-    r_data = new RegExp('(?:^|; )' + data + '=([^;]*)')
+        if(
+            cookies.match(regex_data('include_link')) &&
+            cookies.match(regex_data('include_link'))[1] === '1'
+        ) {
+            head_data.innerHTML += '<style>#include_link { display: inline; }</style>';
+        }
 
-    return r_data;
-}
-
-cookies = document.cookie;
-
-function main_load() {
-    head_data = document.querySelector('head');
-    if(cookies.match(regex_data('del_strike'))) {
-        if(cookies.match(regex_data('del_strike'))[1] === '1') {
-            head_data.innerHTML += '<style>s { text-decoration: none; } s:hover { background-color: transparent; }</style>';
-        } else if(cookies.match(regex_data('del_strike'))[1] === '2') {
-            head_data.innerHTML += '<style>s { display: none; }</style>';
+        if(
+            cookies.match(regex_data('invert')) &&
+            cookies.match(regex_data('invert'))[1] === '1'
+        ) {
+            head_data.innerHTML += '<style>body { -webkit-filter: invert(100%); filter: invert(100%); background: black; }</style>';
         }
     }
 
-    if(cookies.match(regex_data('del_bold'))) {
-        if(cookies.match(regex_data('del_bold'))[1] === '1') {
-            head_data.innerHTML += '<style>b { font-weight: normal; }</style>';
-        } else if(cookies.match(regex_data('del_bold'))[1] === '2') {
-            head_data.innerHTML += '<style>b { display: none; }</style>';
-        }
-    }
+    main_load();
 
-    if(
-        cookies.match(regex_data('include_link')) &&
-        cookies.match(regex_data('include_link'))[1] === '1'
-    ) {
-        head_data.innerHTML += '<style>#include_link { display: inline; }</style>';
-    }
-
-    if(
-        cookies.match(regex_data('invert')) &&
-        cookies.match(regex_data('invert'))[1] === '1'
-    ) {
-        head_data.innerHTML += '<style>body { -webkit-filter: invert(100%); filter: invert(100%); background: black; }</style>';
-    }
-}
-
-main_load();
-
-window.onload = function () {
     if(window.location.pathname === '/skin_set') {
         set_language = {
             "en-US" : {
