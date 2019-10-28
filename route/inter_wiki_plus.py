@@ -5,7 +5,11 @@ def inter_wiki_plus_2(conn, tools, name):
     
     if flask.request.method == 'POST':
         if tools == 'plus_inter_wiki':
-            curs.execute('insert into inter (title, link) values (?, ?)', [flask.request.form.get('title', None), flask.request.form.get('link', None)])
+            curs.execute('insert into inter (title, link, icon) values (?, ?, ?)', [
+                flask.request.form.get('title', None), 
+                flask.request.form.get('link', None),
+                flask.request.form.get('icon', None)
+            ])
             
             admin_check(None, 'inter_wiki_plus')
         elif tools == 'plus_edit_filter':
@@ -78,7 +82,9 @@ def inter_wiki_plus_2(conn, tools, name):
             form_data = '''
                 <input placeholder="''' + load_lang('name') + '''" type="text" name="title">
                 <hr class=\"main_hr\">
-                <input placeholder="link" type="text" name="link">
+                <input placeholder="''' + load_lang('link') + '''" type="text" name="link">
+                <hr class=\"main_hr\">
+                <input placeholder="''' + load_lang('icon') + ''' (HTML)" type="text" name="icon">
             '''
         elif tools == 'plus_edit_filter':
             curs.execute("select regex, sub from filter where name = ?", [name])

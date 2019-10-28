@@ -25,6 +25,8 @@ def table_parser(data, cel_data, start_data, num = 0):
             all_table += 'height: ' + table_height.groups()[0] + 'px;'
         else:
             all_table += 'height: ' + table_height.groups()[0] + ';'
+
+    # width, height
     
     table_align = re.search("&lt;table ?align=((?:(?!&gt;).)*)&gt;", data)
     if table_align:
@@ -50,6 +52,8 @@ def table_parser(data, cel_data, start_data, num = 0):
             row_style += 'text-align: center;'
         else:
             row_style += 'text-align: left;'
+        
+    # align
     
     table_cel = re.search("&lt;-((?:(?!&gt;).)*)&gt;", data)
     if table_cel:
@@ -61,9 +65,17 @@ def table_parser(data, cel_data, start_data, num = 0):
     if table_row:
         row = 'rowspan="' + table_row.groups()[0] + '"'
 
+    # <>
+
     row_bgcolor = re.search("&lt;rowbgcolor=(#(?:[0-9a-f-A-F]{3}){1,2}|\w+)&gt;", data)
     if row_bgcolor:
         row_style += 'background: ' + row_bgcolor.groups()[0] + ';'
+
+    row_bgcolor = re.search("&lt;rowcolor=(#(?:[0-9a-f-A-F]{3}){1,2}|\w+)&gt;", data)
+    if row_bgcolor:
+        row_style += 'color: ' + row_bgcolor.groups()[0] + ';'
+
+    # row
         
     table_border = re.search("&lt;table ?bordercolor=(#(?:[0-9a-f-A-F]{3}){1,2}|\w+)&gt;", data)
     if table_border:
@@ -72,10 +84,20 @@ def table_parser(data, cel_data, start_data, num = 0):
     table_bgcolor = re.search("&lt;table ?bgcolor=(#(?:[0-9a-f-A-F]{3}){1,2}|\w+)&gt;", data)
     if table_bgcolor:
         all_table += 'background: ' + table_bgcolor.groups()[0] + ';'
+
+    table_bgcolor = re.search("&lt;table ?color=(#(?:[0-9a-f-A-F]{3}){1,2}|\w+)&gt;", data)
+    if table_bgcolor:
+        all_table += 'color: ' + table_bgcolor.groups()[0] + ';'
+
+    # all
         
     bgcolor = re.search("&lt;(?:bgcolor=)?(#(?:[0-9a-f-A-F]{3}){1,2}|\w+)&gt;", data)
     if bgcolor:
         cel_style += 'background: ' + bgcolor.groups()[0] + ';'
+
+    bgcolor = re.search("&lt;color=(#(?:[0-9a-f-A-F]{3}){1,2}|\w+)&gt;", data)
+    if bgcolor:
+        cel_style += 'color: ' + bgcolor.groups()[0] + ';'
         
     cel_width = re.search("&lt;width=((?:(?!&gt;).)*)&gt;", data)
     if cel_width:
@@ -90,6 +112,8 @@ def table_parser(data, cel_data, start_data, num = 0):
             cel_style += 'height: ' + cel_height.groups()[0] + 'px;'
         else:
             cel_style += 'height: ' + cel_height.groups()[0] + ';'
+
+    # cel
         
     text_right = re.search("&lt;\)&gt;", data)
     text_center = re.search("&lt;:&gt;", data)
@@ -831,13 +855,28 @@ def namu(conn, data, title, main_num, include_num):
                 inter_data = re.search('^inter:((?:(?!:).)+):((?:(?!\]\]|\|).)+)', main_link)
                 inter_data = inter_data.groups()
 
-                curs.execute('select link from inter where title = ?', [inter_data[0]])
+                curs.execute('select link, icon from inter where title = ?', [inter_data[0]])
                 inter = curs.fetchall()
                 if inter:
-                    if see_link != main_link:
-                        data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<a id="inside" href="' + inter[0][0] + inter_data[1] + '">' + inter_data[0] + ':' + see_link + '</a>', data, 1)
+                    if inter[0][1] != '':
+                        inter_view = inter[0][1]
                     else:
-                        data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<a id="inside" href="' + inter[0][0] + inter_data[1] + '">' + inter_data[0] + ':' + inter_data[1] + '</a>', data, 1)
+                        inter_view = inter_data[0] + ':'
+
+                    if see_link != main_link:
+                        data = re.sub(
+                            '\[\[((?:(?!\[\[|\]\]).)+)\]\]',
+                            '<a id="inside" href="' + inter[0][0] + inter_data[1] + '">' + inter_view + see_link + '</a>',
+                            data, 
+                            1
+                        )
+                    else:
+                        data = re.sub(
+                            '\[\[((?:(?!\[\[|\]\]).)+)\]\]',
+                            '<a id="inside" href="' + inter[0][0] + inter_data[1] + '">' + inter_view + inter_data[1] + '</a>', 
+                            data, 
+                            1
+                        )
                 else:
                     data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', 'Not exist', data, 1)
             elif re.search('^\/', main_link):
