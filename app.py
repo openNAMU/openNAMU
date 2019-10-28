@@ -131,7 +131,7 @@ if setup_tool != 0:
     create_data['filter'] = ['name', 'regex', 'sub']
     create_data['scan'] = ['user', 'title']
     create_data['acl'] = ['title', 'decu', 'dis', 'view', 'why']
-    create_data['inter'] = ['title', 'link']
+    create_data['inter'] = ['title', 'link', 'icon']
     create_data['html_filter'] = ['html', 'kind', 'plus']
     create_data['oauth_conn'] = ['provider', 'wiki_id', 'sns_id', 'name', 'picture']
 
