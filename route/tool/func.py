@@ -348,7 +348,7 @@ def ip_warring():
     return text_data
 
 def skin_check(set_n = 0):
-    skin = 'neo_yousoro'
+    skin = 'marisa'
 
     curs.execute('select data from other where name = "skin"')
     skin_exist = curs.fetchall()
@@ -694,7 +694,7 @@ def load_skin(data = '', set_n = 0):
             curs.execute('select data from other where name = "skin"')
             data = curs.fetchall()
             if not data:
-                data = [['neo_yousoro']]
+                data = [['marisa']]
 
         if set_n == 0:
             for skin_data in os.listdir(os.path.abspath('views')):
@@ -1068,6 +1068,8 @@ def re_error(data):
                 data = load_lang('authority_error')
             elif num == 4:
                 data = load_lang('no_admin_block_error')
+            elif num == 5:
+                data = load_lang('skin_error')
             elif num == 6:
                 data = load_lang('same_id_exist_error')
             elif num == 7:
