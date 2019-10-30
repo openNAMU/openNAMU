@@ -131,7 +131,7 @@ if setup_tool != 0:
     create_data['filter'] = ['name', 'regex', 'sub']
     create_data['scan'] = ['user', 'title']
     create_data['acl'] = ['title', 'decu', 'dis', 'view', 'why']
-    create_data['inter'] = ['title', 'link']
+    create_data['inter'] = ['title', 'link', 'icon']
     create_data['html_filter'] = ['html', 'kind', 'plus']
     create_data['oauth_conn'] = ['provider', 'wiki_id', 'sns_id', 'name', 'picture']
 
@@ -587,6 +587,10 @@ def api_user_info(name = ''):
 @app.route('/api/topic/<everything:name>/sub/<sub>')
 def api_topic_sub(name = '', sub = '', time = ''):
     return api_topic_sub_2(conn, name, sub, time)
+
+@app.route('/api/search/<name>')
+def api_search(name = ''):
+    return api_search_2(conn, name)
     
 # File
 @app.route('/views/easter_egg.html')

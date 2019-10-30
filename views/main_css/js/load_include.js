@@ -8,8 +8,8 @@ function load_include(title, name, p_data) {
     xhr.send(null);
 
     xhr.onreadystatechange = function() {
-        if(xhr.readyState === 4 && xhr.status === 200) {
-            var o_p_data = JSON.parse(xhr.responseText);
+        if(this.readyState === 4 && this.status === 200) {
+            var o_p_data = JSON.parse(this.responseText);
             var g_data = o_p_data['data'];
             
             for(key in p_data) {
