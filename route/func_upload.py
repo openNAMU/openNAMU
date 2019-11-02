@@ -116,7 +116,7 @@ def func_upload_2(conn):
                 <form method="post" enctype="multipart/form-data" accept-charset="utf8">
                     <input type="file" name="f_data">
                     <hr class=\"main_hr\">
-                    <input placeholder="''' + load_lang('file_name') + '''" name="f_name" type="text">
+                    <input placeholder="''' + load_lang('file_name') + '''" name="f_name" type="text" value="''' + flask.request.args.get('name', '') + '''">
                     <hr class=\"main_hr\">
                     <select name="f_lice_sel">
                         ''' + license_list + '''

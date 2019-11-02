@@ -781,31 +781,37 @@ def namu(conn, data, title, main_num, include_num):
             if re.search('^((?:file|파일)|(?:out|외부)):', main_link):
                 file_style = ''
 
-                width = re.search('width=((?:(?!&).)+)', see_link)
-                if width:
-                    file_width = width.groups()[0]
+                file_width = re.search('width=((?:(?!&).)+)', see_link)
+                if file_width:
+                    file_width = file_width.groups()[0]
                     if re.search('px$', file_width):
                         file_style += 'width: ' + file_width + ';'
                     else:
                         file_style += 'width: ' + file_width + 'px;'
                 
-                height = re.search('height=((?:(?!&).)+)', see_link)
-                if height:
-                    file_height = height.groups()[0]
+                file_height = re.search('height=((?:(?!&).)+)', see_link)
+                if file_height:
+                    file_height = file_height.groups()[0]
                     if re.search('px$', file_height):
                         file_style += 'height: ' + file_height + ';'
                     else:
                         file_style += 'height: ' + file_height + 'px;'
 
-                align = re.search('align=((?:(?!&).)+)', see_link)
-                if align:
-                    file_align = align.groups()[0]
+                file_align = re.search('align=((?:(?!&).)+)', see_link)
+                if file_align:
+                    file_align = file_align.groups()[0]
                     if file_align == 'center':
                         file_align = 'display: block; text-align: center;'
                     else:
                         file_align = 'float: ' + file_align + ';'
                 else:
                     file_align = ''
+
+                file_color = re.search('bgcolor=((?:(?!&).)+)', see_link)
+                if file_color:
+                    file_color = 'background: ' + file_color.groups()[0] + '; display: inline-block;'
+                else:
+                    file_color = ''
 
                 if re.search('^(?:out|외부):', main_link):
                     file_src = re.sub('^(?:out|외부):', '', main_link)
@@ -831,9 +837,18 @@ def namu(conn, data, title, main_num, include_num):
                     exist = curs.fetchall()
                 
                 if exist:
-                    data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<span style="' + file_align + '"><img style="' + file_style + '" alt="' + file_alt + '" src="' + file_src + '"></span>', data, 1)
+                    data = re.sub(
+                        '\[\[((?:(?!\[\[|\]\]).)+)\]\]', 
+                        '<span style="' + file_align + '">' + \
+                            '<span style="' + file_color + '">' + \
+                                '<img style="' + file_style + '" alt="' + file_alt + '" src="' + file_src + '">' + \
+                            '</span>' + \
+                        '</span>', 
+                        data, 
+                        1
+                    )
                 else:
-                    data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<a id="not_thing" href="/w/' + tool.url_pas(file_alt) + '">' + file_alt + '</a>', data, 1)
+                    data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<a id="not_thing" href="/upload?name=' + tool.url_pas(file_name) + '">' + file_alt + '</a>', data, 1)
             elif category_re.search(main_link):
                 main_link = category_re.sub('category:', main_link)
                 

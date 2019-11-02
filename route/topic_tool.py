@@ -21,7 +21,7 @@ def topic_tool_2(conn, name, sub):
         data = '''
             <h2>''' + load_lang('admin_tool') + '''</h2>
             <ul>
-                <li><a href="/topic/''' + url_pas(name) + '/sub/' + url_pas(sub) + '''/setting"> Topic setting</a></li>
+                <li><a href="/topic/''' + url_pas(name) + '/sub/' + url_pas(sub) + '''/setting">''' + load_lang('topic_setting') + '''</a></li>
             </ul>
         '''
     data += '''

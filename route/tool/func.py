@@ -764,13 +764,23 @@ def acl_check(name = 'test', tool = '', sub = 'test'):
         if re.search("^file:", name) and admin_check(None, 'file edit (' + name + ')') != 1:
             return 1
 
-    for i in range(0, (2 if tool != 'render' else 1)):
+    if tool == '':
+        end = 3
+    elif tool == 'topic':
+        end = 2
+    else:
+        end = 1
+
+    for i in range(0, end):
         if tool == '':
             if i == 0:
                 curs.execute("select decu from acl where title = ?", [name])
                 acl_data = curs.fetchall()
-            else:
+            elif i == 1:
                 curs.execute('select data from other where name = "edit"')
+                acl_data = curs.fetchall()
+            else:
+                curs.execute("select view from acl where title = ?", [name])
                 acl_data = curs.fetchall()
 
             num = 5

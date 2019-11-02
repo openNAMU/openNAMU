@@ -3,7 +3,7 @@ body {
     word-break: break-all;
     word-wrap: break-word;
     margin: 0;
-    font-family: "나눔고딕", "nanumgothic", "Nanum Gothic", "KoPub Dotum", "Malgun Gothic", "맑은 고딕", "sans-serif";
+    font-family: 'Noto Sans KR', '나눔고딕', 'Nanum Gothic', 'Malgun Gothic', '맑은 고딕', sans-serif;
 }
 
 ul {
@@ -50,7 +50,7 @@ li {
 #top {
     width: 100%;
     background: #4a4a4a;
-    padding: 15px;
+    padding: 20px;
     padding-right: 0;
     padding-left: 0;
     position: relative;
@@ -80,14 +80,12 @@ li {
 
 #bottom_main {
     margin: auto;
-    margin-top: 20px;
+    padding-top: 20px;
 }
 
 #tool {
     float: right;
-    border: 2px solid gainsboro;
-    padding: 10px;
-    border-radius: 10px;
+    border: none;
 }
 
 @media (min-width: 780px) and (max-width: 1350px) {
@@ -243,7 +241,26 @@ h6 {
 
 #search_input {
     width: 220px;
-    border-radius: 10px;
+    height: 35px;
+    border-radius: 17.5px;
+    padding-left: 10px;
+    background-color: gray;
+    border: solid 1px gray;
+    color: #fff;
+    transition: .2s ease-in-out;
+    outline: none;
+}
+#search_input::placeholder {
+    color: #fff;
+}
+#search_input:hover, #search_input:focus {
+    border-color: #ababab;
+    background-color: #eaeaea;
+    color: #000;
+    transition: .2s ease-in-out;
+}
+#search_input:hover::placeholder, #search_input:focus::placeholder {
+    color: #000;
 }
 
 div#pre_search {
@@ -333,13 +350,13 @@ pre {
 
 textarea {
     border: 2px solid gainsboro;
-    font-family: '나눔고딕', 'nanumgothic', "Nanum Gothic","KoPub Dotum","Malgun Gothic","맑은 고딕",sans-serif;
+    font-family: 'Noto Sans KR', '나눔고딕', 'Nanum Gothic', 'Malgun Gothic', '맑은 고딕', sans-serif;
     padding: 0;
 }
 
 input {
     border: 2px solid gainsboro;
-    font-family: '나눔고딕', 'nanumgothic', "Nanum Gothic","KoPub Dotum","Malgun Gothic","맑은 고딕",sans-serif;
+    font-family: 'Noto Sans KR', '나눔고딕', 'Nanum Gothic', 'Malgun Gothic', '맑은 고딕', sans-serif;
 }
 
 #toc {
@@ -347,18 +364,13 @@ input {
     border-radius: 10px;
 }
 
-#cate {
+#cate, #redirect {
     border: 2px solid gainsboro;
     border-radius: 10px;
 }
 
 #syntax code {
     background: transparent;
-}
-
-#redirect {
-    border: 2px solid gainsboro;
-    border-radius: 10px;
 }
 
 #go_toc {
@@ -404,8 +416,8 @@ blockquote {
 }
 
 #out_link::before {
-    font-family: "Font Awesome 5 Free";
-    content: "\f360";
+    font-family: 'Font Awesome 5 Free';
+    content: '\f360';
     font-weight: 900;
     background: transparent;
     color: green;
@@ -429,4 +441,8 @@ div#last_edit {
 
 #topic_color {
     color: limegreen;
+}
+
+#mobile_search_input {
+    border-radius: 10px;
 }
