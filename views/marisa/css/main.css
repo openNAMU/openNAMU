@@ -80,7 +80,7 @@ li {
 
 #bottom_main {
     margin: auto;
-    margin-top: 20px;
+    padding-top: 20px;
 }
 
 #tool {
@@ -347,18 +347,13 @@ input {
     border-radius: 10px;
 }
 
-#cate {
+#cate, #redirect {
     border: 2px solid gainsboro;
     border-radius: 10px;
 }
 
 #syntax code {
     background: transparent;
-}
-
-#redirect {
-    border: 2px solid gainsboro;
-    border-radius: 10px;
 }
 
 #go_toc {
