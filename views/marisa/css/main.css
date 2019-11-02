@@ -416,8 +416,7 @@ blockquote {
 }
 
 #out_link::before {
-    font-family: 'Font Awesome 5 Free';
-    content: '\f360';
+    content: 'ⓔ';
     font-weight: 900;
     background: transparent;
     color: green;
