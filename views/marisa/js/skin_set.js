@@ -1,83 +1,80 @@
+function get_post() {
+    check = document.getElementById('strike');
+    if(check.value === 'normal') {
+        document.cookie = 'del_strike=0;';
+    } else if(check.value === 'change') {
+        document.cookie = 'del_strike=1;';
+    } else {
+        document.cookie = 'del_strike=2;';
+    }
+
+    check = document.getElementById('bold');
+    if(check.value === 'normal') {
+        document.cookie = 'del_bold=0;';
+    } else if(check.value === 'change') {
+        document.cookie = 'del_bold=1;';
+    } else {
+        document.cookie = 'del_bold=2;';
+    }
+
+    check = document.getElementById('include');
+    if(check.checked === true) {
+        document.cookie = 'include_link=1;';
+    } else {
+        document.cookie = 'include_link=0;';
+    }
+
+    check = document.getElementById('invert');
+    if(check.checked === true) {
+        document.cookie = 'invert=1;';
+    } else {
+        document.cookie = 'invert=0;';
+    }
+
+    history.go(0);
+}
+
+function main_load() {
+    head_data = document.querySelector('head');
+    if(cookies.match(regex_data('del_strike'))) {
+        if(cookies.match(regex_data('del_strike'))[1] === '1') {
+            head_data.innerHTML += '<style>s { text-decoration: none; } s:hover { background-color: transparent; }</style>';
+        } else if(cookies.match(regex_data('del_strike'))[1] === '2') {
+            head_data.innerHTML += '<style>s { display: none; }</style>';
+        }
+    }
+
+    if(cookies.match(regex_data('del_bold'))) {
+        if(cookies.match(regex_data('del_bold'))[1] === '1') {
+            head_data.innerHTML += '<style>b { font-weight: normal; }</style>';
+        } else if(cookies.match(regex_data('del_bold'))[1] === '2') {
+            head_data.innerHTML += '<style>b { display: none; }</style>';
+        }
+    }
+
+    if(
+        cookies.match(regex_data('include_link')) &&
+        cookies.match(regex_data('include_link'))[1] === '1'
+    ) {
+        head_data.innerHTML += '<style>#include_link { display: inline; }</style>';
+    }
+
+    if(
+        cookies.match(regex_data('invert')) &&
+        cookies.match(regex_data('invert'))[1] === '1'
+    ) {
+        head_data.innerHTML += '<link rel="stylesheet" href="/views/marisa/css/dark.css?ver=1">';
+    }
+}
+
+function regex_data(data) {
+    return new RegExp('(?:^|; )' + data + '=([^;]*)');
+}
+
+cookies = document.cookie;
+main_load();
+
 function skin_set() {
-    function get_post() {
-        check = document.getElementById('strike');
-        if(check.value === 'normal') {
-            document.cookie = 'del_strike=0;';
-        } else if(check.value === 'change') {
-            document.cookie = 'del_strike=1;';
-        } else {
-            document.cookie = 'del_strike=2;';
-        }
-
-        check = document.getElementById('bold');
-        if(check.value === 'normal') {
-            document.cookie = 'del_bold=0;';
-        } else if(check.value === 'change') {
-            document.cookie = 'del_bold=1;';
-        } else {
-            document.cookie = 'del_bold=2;';
-        }
-
-        check = document.getElementById('include');
-        if(check.checked === true) {
-            document.cookie = 'include_link=1;';
-        } else {
-            document.cookie = 'include_link=0;';
-        }
-
-        check = document.getElementById('invert');
-        if(check.checked === true) {
-            document.cookie = 'invert=1;';
-        } else {
-            document.cookie = 'invert=0;';
-        }
-
-        history.go(0);
-    }
-
-    function regex_data(data) {
-        r_data = new RegExp('(?:^|; )' + data + '=([^;]*)')
-
-        return r_data;
-    }
-
-    cookies = document.cookie;
-
-    function main_load() {
-        head_data = document.querySelector('head');
-        if(cookies.match(regex_data('del_strike'))) {
-            if(cookies.match(regex_data('del_strike'))[1] === '1') {
-                head_data.innerHTML += '<style>s { text-decoration: none; } s:hover { background-color: transparent; }</style>';
-            } else if(cookies.match(regex_data('del_strike'))[1] === '2') {
-                head_data.innerHTML += '<style>s { display: none; }</style>';
-            }
-        }
-
-        if(cookies.match(regex_data('del_bold'))) {
-            if(cookies.match(regex_data('del_bold'))[1] === '1') {
-                head_data.innerHTML += '<style>b { font-weight: normal; }</style>';
-            } else if(cookies.match(regex_data('del_bold'))[1] === '2') {
-                head_data.innerHTML += '<style>b { display: none; }</style>';
-            }
-        }
-
-        if(
-            cookies.match(regex_data('include_link')) &&
-            cookies.match(regex_data('include_link'))[1] === '1'
-        ) {
-            head_data.innerHTML += '<style>#include_link { display: inline; }</style>';
-        }
-
-        if(
-            cookies.match(regex_data('invert')) &&
-            cookies.match(regex_data('invert'))[1] === '1'
-        ) {
-            head_data.innerHTML += '<style>body { -webkit-filter: invert(100%); filter: invert(100%); background: black; }</style>';
-        }
-    }
-
-    main_load();
-
     if(window.location.pathname === '/skin_set') {
         set_language = {
             "en-US" : {
@@ -90,7 +87,7 @@ function skin_set() {
                 "strike" : "Strike",
                 "bold" : "Bold",
                 "other" : "Other",
-                "invert" : "Reversal of color"
+                "darkmode" : "Darkmode"
             }, "ko-KR" : {
                 "default" : "기본값",
                 "change_to_normal" : "일반 텍스트로 변경",
@@ -101,7 +98,7 @@ function skin_set() {
                 "strike" : "취소선",
                 "bold" : "볼드체",
                 "other" : "기타",
-                "invert" : "색 반전"
+                "darkmode" : "다크모드"
             }
         }
 
@@ -204,7 +201,7 @@ function skin_set() {
             <h2>' + set_language[language]['other'] + '</h2> \
             <input ' + set_data["include"] + ' type="checkbox" id="include" name="include" value="include"> ' + set_language[language]['include_link'] + ' \
             <hr class="main_hr"> \
-            <input ' + set_data["invert"] + ' type="checkbox" id="invert" name="invert" value="invert"> ' + set_language[language]['invert'] + ' \
+            <input ' + set_data["invert"] + ' type="checkbox" id="invert" name="invert" value="invert"> ' + set_language[language]['darkmode'] + ' \
             <hr class="main_hr"> \
             <button onclick="get_post();">' + set_language[language]['save'] + '</button> \
         ';
