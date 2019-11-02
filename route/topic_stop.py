@@ -74,7 +74,7 @@ def topic_stop_2(conn, name, sub):
             agree_check = ''
 
         return easy_minify(flask.render_template(skin_check(),
-            imp = [name, wiki_set(), custom(), other2([' (topic_tool)', 0])],
+            imp = [name, wiki_set(), custom(), other2([' (' + load_lang('topic_setting') + ')', 0])],
             data = '''
                 <hr class=\"main_hr\">
                 <form method="post">
@@ -84,9 +84,7 @@ def topic_stop_2(conn, name, sub):
                     <hr class=\"main_hr\">
                     <input type="checkbox" name="agree" value="O" ''' + agree_check + '''> Agree
                     <hr class=\"main_hr\">
-                    <input placeholder="''' + load_lang('why') + '''" name="why" type="text">
-                    <hr class=\"main_hr\">
-                    <span>''' + load_lang('markup_enabled') + '''</span>
+                    <input placeholder="''' + load_lang('why') + ''' (''' + load_lang('markup_enabled') + ''')" name="why" type="text">
                     <hr class=\"main_hr\">
                     <button type="submit">''' + load_lang('save') + '''</button>
                 </form>
