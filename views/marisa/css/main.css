@@ -442,3 +442,7 @@ div#last_edit {
 #topic_color {
     color: limegreen;
 }
+
+#mobile_search_input {
+    border-radius: 10px;
+}

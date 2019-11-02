@@ -3,7 +3,7 @@ html, #main {
     color: white;
 }
 
-.cel_in_cel, #background, div#pre_search, #toc, #cate, #redirect {
+.cel_in_cel, #background, div#pre_search, #toc, #cate, #redirect, #mobile_menu {
     background: #1f2023;
     border-color: #1f2023;
 }
@@ -21,4 +21,9 @@ textarea, input, button, select {
     background: #1f2023;
     color: white;
     border-color: #1f2023;
+}
+
+#mobile_search_input, #mobile_search_input::placeholder {
+    background: gray;
+    color: white;
 }
