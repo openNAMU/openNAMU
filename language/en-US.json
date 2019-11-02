@@ -178,6 +178,7 @@
         "acl_record" : "ACL record",
         "last_edit_time" : "Last edited time",
         "admin_group" : "Admin group",
+        "topic_setting" : "Topic setting(s)",
         "_comment_2.1_" : "Filter",
             "_comment_2.1.1_" : "List",
                 "interwiki_list" : "Interwiki(s) list",

@@ -22,7 +22,7 @@ def api_topic_sub_2(conn, name, sub, time):
         for i in data:
             if i[4] != 'O' or (i[4] == 'O' and admin == 1):
                 t_data_f = i[1]
-                b_color = ''
+                b_color = 'toron_color_grey'
             else:
                 curs.execute("select who from re_admin where what = ? order by time desc limit 1", ['blind (' + name + ' - ' + sub + '#' + str(i[0]) + ')'])
                 who_blind = curs.fetchall()
