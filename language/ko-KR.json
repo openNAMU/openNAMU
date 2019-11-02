@@ -295,5 +295,6 @@
     "owner_acl": "소유자만",
     "last_edit_time": "최근 수정 시각",
     "link": "링크",
-    "icon": "아이콘"
+    "icon": "아이콘",
+    "topic_setting" : "토론 설정"
 }
