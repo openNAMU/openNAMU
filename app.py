@@ -297,6 +297,10 @@ def setting(num = 0):
 def list_not_close_topic():
     return list_not_close_topic_2(conn)
 
+@app.route('/old_page')
+def list_old_page():
+    return list_old_page_2(conn)
+
 @app.route('/acl_list')
 def list_acl():
     return list_acl_2(conn)

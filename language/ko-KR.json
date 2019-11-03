@@ -296,5 +296,6 @@
     "last_edit_time": "최근 수정 시각",
     "link": "링크",
     "icon": "아이콘",
-    "topic_setting" : "토론 설정"
+    "topic_setting" : "토론 설정",
+    "old_page" : "오래된 문서"
 }
