@@ -13,8 +13,21 @@ def view_xref_2(conn, name):
         sql_num = 0
         
     div = '<ul>'
+
+    if re.search('#', name):
+        name = re.sub('#', '\\\\#', name)
+
+    print(name + '#s-%')
     
-    curs.execute("select link, type from back where title = ? and not type = 'cat' and not type = 'no' order by link asc limit ?, '50'", [name, str(sql_num)])
+    curs.execute("" + \
+        "select link, type from back " + \
+        "where (title = ? and not type = 'cat' and not type = 'no') or (title like ? and type = 'redirect')" + \
+        "order by link asc limit ?, '50'" + \
+    "", [
+        name,
+        name + '#s-%',
+        str(sql_num)
+    ])
     data_list = curs.fetchall()
     for data in data_list:
         div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a>'

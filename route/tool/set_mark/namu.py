@@ -533,10 +533,14 @@ def namu(conn, data, title, main_num, include_num):
     redirect = redirect_re.search(data)
     if redirect:
         redirect = redirect.groups()[0]
+        print(redirect)
         
         return_link = tool.link_fix(redirect)
         main_link = return_link[0]
         other_link = return_link[1]
+
+        print(main_link)
+        print(other_link)
         
         backlink += [[title, main_link + other_link, 'redirect']]
         
@@ -1103,7 +1107,10 @@ def namu(conn, data, title, main_num, include_num):
                         break
 
                     if end_data[j][0] == find_data:
-                        backlink[i][1] = backlink[i][1].replace('<span id="' + end_data[j][0] + '"></span>', end_data[j][1])
+                        if backlink[i][2] != 'redirect':
+                            backlink[i][1] = backlink[i][1].replace('<span id="' + end_data[j][0] + '"></span>', end_data[j][1])
+                        else:
+                            backlink[i][1] = backlink[i][1].replace('<span id="' + end_data[j][0] + '"></span>', '\\' + end_data[j][1])
 
                     j += 1
 
