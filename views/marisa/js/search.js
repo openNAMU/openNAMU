@@ -3,7 +3,7 @@ function search_do() {
         var data = document.getElementById("search_input").value;
         if(before !== data && data !== '') {
             before = data;
-            var url = "/api/search/" + encodeURI(data) + "?num=10";
+            var url = "/api/search/" + encodeURI(data);
         
             var xhr = new XMLHttpRequest();
             xhr.open("GET", url, true);
@@ -18,7 +18,7 @@ function search_do() {
 
                     if(this.responseText !== "{}\n") {
                         for(key in get_data) {
-                            document.getElementById("pre_search").innerHTML += '<a href="/w/' + encodeURI(get_data[key][0]) + '">' + get_data[key][0] + '</a><br>';
+                            document.getElementById("pre_search").innerHTML += '<a href="/w/' + encodeURI(get_data[key][0]).replace('#', '%23') + '">' + get_data[key][0] + '</a><br>';
                         }
                     } else {
                         document.getElementById("pre_search").style.display = 'none';

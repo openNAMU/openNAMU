@@ -3,7 +3,7 @@ from .tool.func import *
 def api_search_2(conn, name):
     curs = conn.cursor()
 
-    num = int(number_check(flask.request.args.get('num', '1')))
+    num = int(number_check(flask.request.args.get('num', '10')))
     if not num > 0:
         num = 1
 
