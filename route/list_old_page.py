@@ -15,6 +15,7 @@ def list_old_page_2(conn):
         'select title, date from history h ' + \
         "where title not like 'user:%' and title not like 'category:%' and title not like 'file:%' and " + \
         "exists (select title from data where title = h.title) " + \
+        "and not exists (select title from back where link = h.title and type = 'redirect') " + \
         'group by title ' + \
         'order by date asc ' + \
         'limit ?, "50"' + \
