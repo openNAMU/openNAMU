@@ -177,26 +177,6 @@ for i in range(len(server_set_key)):
     
     server_set[server_set_key[i]] = server_set_val
 
-try:
-    if not os.path.exists('robots.txt'):
-        curs.execute('select data from other where name = "robot"')
-        robot_test = curs.fetchall()
-        if robot_test:
-            fw_test = open('./robots.txt', 'w')
-            fw_test.write(re.sub('\r\n', '\n', robot_test[0][0]))
-            fw_test.close()
-        else:
-            fw_test = open('./robots.txt', 'w')
-            fw_test.write('User-agent: *\nDisallow: /\nAllow: /$\nAllow: /w/')
-            fw_test.close()
-
-            curs.execute('insert into other (name, data) values ("robot", "User-agent: *\nDisallow: /\nAllow: /$\nAllow: /w/")')
-        
-        print('----')
-        print('Engine made robots.txt')
-except:
-    pass
-
 curs.execute('select data from other where name = "key"')
 rep_data = curs.fetchall()
 if not rep_data:

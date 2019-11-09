@@ -396,6 +396,20 @@ def setting_2(conn, num):
 
             return redirect('/setting/4')
         else:
+            if not os.path.exists('robots.txt'):
+                curs.execute('select data from other where name = "robot"')
+                robot_test = curs.fetchall()
+                if robot_test:
+                    fw_test = open('./robots.txt', 'w')
+                    fw_test.write(re.sub('\r\n', '\n', robot_test[0][0]))
+                    fw_test.close()
+                else:
+                    fw_test = open('./robots.txt', 'w')
+                    fw_test.write('User-agent: *\nDisallow: /\nAllow: /$\nAllow: /w/')
+                    fw_test.close()
+
+                    curs.execute('insert into other (name, data) values ("robot", "User-agent: *\nDisallow: /\nAllow: /$\nAllow: /w/")')
+
             curs.execute("select data from other where name = 'robot'")
             robot = curs.fetchall()
             if robot:
@@ -413,7 +427,7 @@ def setting_2(conn, num):
             return easy_minify(flask.render_template(skin_check(), 
                 imp = ['robots.txt', wiki_set(), custom(), other2([0, 0])],
                 data = '''
-                    <a href="/robots.txt">(view)</a>
+                    <a href="/robots.txt">(''' + load_lang('view') + ''')</a>
                     <hr class=\"main_hr\">
                     <form method="post">
                         <textarea rows="25" name="content">''' + html.escape(data) + '''</textarea>

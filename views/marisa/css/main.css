@@ -3,7 +3,7 @@ body {
     word-break: break-all;
     word-wrap: break-word;
     margin: 0;
-    font-family: 'Noto Sans KR', '나눔고딕', 'Nanum Gothic', 'Malgun Gothic', '맑은 고딕', sans-serif;
+    font-family: '나눔고딕', 'Nanum Gothic', 'Noto Sans KR', 'Malgun Gothic', '맑은 고딕', sans-serif;
 }
 
 ul {

@@ -93,6 +93,7 @@
         "title" : "Title",
         "reference" : "Reference",
         "icon" : "Icon",
+        "view" : "View",
         "_comment_1.1_" : "Time",
             "second" : "Second(s)",
             "hour" : "Hour(s)",
