@@ -87,8 +87,9 @@ def func_upload_2(conn):
             file_d,
             get_time(), 
             ip, 
-            '(upload)',
-            '0'
+            ip,
+            '0',
+            'upload'
         )
         
         conn.commit()
