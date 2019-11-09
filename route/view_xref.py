@@ -16,8 +16,6 @@ def view_xref_2(conn, name):
 
     if re.search('#', name):
         name = re.sub('#', '\\\\#', name)
-
-    print(name + '#s-%')
     
     curs.execute("" + \
         "select link, type from back " + \
