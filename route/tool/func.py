@@ -35,6 +35,7 @@ for i in range(0, 2):
         from .mark import *
     except ImportError as e:
         if i == 0:
+            print('----')
             print(e)
             print('----')
             if platform.system() == 'Linux':

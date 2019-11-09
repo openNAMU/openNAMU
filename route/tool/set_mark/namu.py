@@ -533,14 +533,10 @@ def namu(conn, data, title, main_num, include_num):
     redirect = redirect_re.search(data)
     if redirect:
         redirect = redirect.groups()[0]
-        print(redirect)
         
         return_link = tool.link_fix(redirect)
         main_link = return_link[0]
         other_link = return_link[1]
-
-        print(main_link)
-        print(other_link)
         
         backlink += [[title, main_link + other_link, 'redirect']]
         
@@ -689,7 +685,13 @@ def namu(conn, data, title, main_num, include_num):
             else:
                 video_code = ''
 
+            video_start = ''
+
             if youtube_re.search(video[0]):
+                start = re.search(', ?(start=(?:(?!,).)+)', video[1])
+                if start:
+                    video_start = '?' + start.groups()[0]
+
                 video_code = re.sub('^https:\/\/www\.youtube\.com\/watch\?v=', '', video_code)
                 video_code = re.sub('^https:\/\/youtu\.be\/', '', video_code)
                 
@@ -702,7 +704,7 @@ def namu(conn, data, title, main_num, include_num):
             else:
                 video_src = 'https://embed.nicovideo.jp/watch/' + video_code
                 
-            data = video_re.sub('<iframe width="' + video_width + '" height="' + video_height + '" src="' + video_src + '" allowfullscreen frameborder="0"></iframe>', data, 1)
+            data = video_re.sub('<iframe width="' + video_width + '" height="' + video_height + '" src="' + video_src + video_start + '" allowfullscreen frameborder="0"></iframe>', data, 1)
         else:
             break
 
