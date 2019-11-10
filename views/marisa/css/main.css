@@ -401,7 +401,7 @@ blockquote {
 }
 
 #out_link::before {
-    content: 'ⓔ';
+    content: '🅴';
     font-weight: lighter;
     background: transparent;
     color: green;
