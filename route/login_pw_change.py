@@ -24,14 +24,14 @@ def login_pw_change_2(conn):
                 flask.request.form.get('pw4', ''), 
                 user[0][0],
                 user[0][1],
-                flask.request.form.get('id', None)
+                ip
             )
             if pw_check_d != 1:
                 return re_error('/error/10')
 
             hashed = pw_encode(flask.request.form.get('pw2', None))
                 
-            curs.execute("update user set pw = ? where id = ?", [hashed, ip_check()])
+            curs.execute("update user set pw = ? where id = ?", [hashed, ip])
 
             return redirect('/user')
     else:
@@ -45,7 +45,7 @@ def login_pw_change_2(conn):
                     <hr class=\"main_hr\">
                     <input placeholder="''' + load_lang('password_confirm') + '''" name="pw3" type="password">
                     <hr class=\"main_hr\">
-                    <button type="submit">''' + load_lang('restart') + '''</button>
+                    <button type="submit">''' + load_lang('save') + '''</button>
                 </form>
             ''',
             menu = [['change', load_lang('return')]]
