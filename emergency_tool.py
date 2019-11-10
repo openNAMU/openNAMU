@@ -35,8 +35,8 @@ print('5. Change port')
 print('6. Change skin')
 print('7. Change password')
 print('8. Reset version')
-print('9. New DB create')
-print('10. Delete set.json')
+print('9. Delete set.json')
+print('10. Change name')
 
 print('----')
 print('Select : ', end = '')
@@ -98,7 +98,7 @@ elif what_i_do == '5':
     curs.execute("update other set data = ? where name = 'port'", [port])
 elif what_i_do == '6':
     print('----')
-    print('Skin\'s name : ', end = '')
+    print('Skin name : ', end = '')
     skin = input()
 
     curs.execute("update other set data = ? where name = 'skin'", [skin])
@@ -112,11 +112,11 @@ elif what_i_do == '7':
     what_i_do = int(input())
 
     print('----')
-    print('User\'s name : ', end = '')
+    print('User name : ', end = '')
     user_name = input()
 
     print('----')
-    print('User\'s password : ', end = '')
+    print('User password : ', end = '')
     user_pw = input()
 
     if what_i_do == '1':
@@ -131,19 +131,20 @@ elif what_i_do == '7':
 elif what_i_do == '8':
     curs.execute("update other set data = '00000' where name = 'ver'")
 elif what_i_do == '9':
-    print('----')
-    print('DB name (data) : ', end = '')
-    
-    db_name = input()
-    if db_name == '':
-        db_name = 'data'
-
-    sqlite3.connect(db_name + '.db', check_same_thread = False)
-elif what_i_do == '10':
     try:
         os.remove('data/set.json')
     except:
         pass
+else:
+    print('----')
+    print('User name : ', end = '')
+    user_name = input()
+
+    print('----')
+    print('New name : ', end = '')
+    new_name = input()
+
+    curs.execute("update user set id = ? where id = ?", [new_name, user_name])
 
 conn.commit()
 
