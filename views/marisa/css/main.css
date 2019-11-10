@@ -11,10 +11,6 @@ ul {
     padding-left: 10px;
 }
 
-input {
-    padding: 5px;
-}
-
 select {
     padding: 5px;
 }
@@ -29,6 +25,7 @@ button {
     border: 2px solid gainsboro;
     background: white;
     cursor: pointer;
+    border-radius: 10px;
 }
 
 code {
@@ -343,29 +340,17 @@ a {
     border-radius: 10px;
 }
 
-pre {
+pre, #toc, #cate, #redirect {
     border: 2px solid gainsboro;
     border-radius: 10px;
 }
 
-textarea {
+textarea, input {
     border: 2px solid gainsboro;
-    font-family: 'Noto Sans KR', '나눔고딕', 'Nanum Gothic', 'Malgun Gothic', '맑은 고딕', sans-serif;
-    padding: 0;
-}
-
-input {
-    border: 2px solid gainsboro;
-    font-family: 'Noto Sans KR', '나눔고딕', 'Nanum Gothic', 'Malgun Gothic', '맑은 고딕', sans-serif;
-}
-
-#toc {
-    border: 2px solid gainsboro;
-    border-radius: 10px;
-}
-
-#cate, #redirect {
-    border: 2px solid gainsboro;
+    font-family: '나눔고딕', 'Nanum Gothic', 'Noto Sans KR', 'Malgun Gothic', '맑은 고딕', sans-serif;
+    border-radius: inherit;
+    padding: 5px;
+    margin-left: -5px;
     border-radius: 10px;
 }
 
@@ -417,7 +402,7 @@ blockquote {
 
 #out_link::before {
     content: 'ⓔ';
-    font-weight: 900;
+    font-weight: lighter;
     background: transparent;
     color: green;
 }
