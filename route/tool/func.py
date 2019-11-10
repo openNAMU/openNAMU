@@ -417,7 +417,13 @@ def other2(data):
     return data
 
 def cut_100(data):
-    return re.sub('<(((?!>).)*)>', '', data)[0:100] + '...'
+    data = re.sub('<(((?!>).)*)>', ' ', data)
+    data = re.sub('\n', ' ', data)
+    data = re.sub('^ +', '', data)
+    data = re.sub(' +$', '', data)
+    data = re.sub(' {2,}', ' ', data)
+
+    return data[0:100] + '...'
 
 def wiki_set(num = 1):
     if num == 1:
