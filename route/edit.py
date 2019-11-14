@@ -117,7 +117,7 @@ def edit_2(conn, name):
                 <form method="post">
                     <script>do_stop_exit()</script>
                     ''' + edit_button() + '''
-                    <textarea id="content" rows="25" id="content" name="content">''' + html.escape(re.sub('\n$', '', data)) + '''</textarea>
+                    <textarea rows="25" id="content" name="content">''' + html.escape(re.sub('\n$', '', data)) + '''</textarea>
                     <textarea style="display: none;" name="otent">''' + html.escape(re.sub('\n$', '', data_old)) + '''</textarea>
                     <hr class=\"main_hr\">
                     <input placeholder="''' + load_lang('why') + '''" name="send" type="text">
