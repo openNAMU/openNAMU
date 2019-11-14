@@ -13,11 +13,11 @@ input[type="checkbox"] { width: auto; }
 .popup { position: fixed; bottom: 0; padding: 10px; left: 0; background: lightgray; width: 100%; }
 #list { padding: 10px; }
 #toron { width: 100%; }
-#toron_color { background: khaki; }
-#toron_color_green { background: darkseagreen; }
+#toron_color_green { background: lightgreen; }
 #toron_color_blue { background: skyblue; }
 #toron_color_red { background: indianred; }
 #toron_color_grey { background: gainsboro; }
+#toron_color_not { display: none; }
 #cate { border: 1px solid; padding: 5px; }
 blockquote { border: 1px solid; padding: 15px; margin: 0; margin-top: 10px; display: inline-block; }
 img, iframe { max-width: 100%; }

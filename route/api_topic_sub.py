@@ -20,18 +20,25 @@ def api_topic_sub_2(conn, name, sub, time):
         admin = admin_check(3)
                     
         for i in data:
-            if i[4] != 'O' or (i[4] == 'O' and admin == 1):
+            ip = ip_pas(i[3])
+
+            if i[4] != 'O':
                 t_data_f = i[1]
-                b_color = 'toron_color_grey'
+                b_color = 'toron_color'
             else:
+                if admin == 1:
+                    t_data_f = i[1]
+                    b_color = 'toron_color_grey'
+                else:
+                    t_data_f = ''
+                    b_color = 'toron_color_not'
+
                 curs.execute("select who from re_admin where what = ? order by time desc limit 1", ['blind (' + name + ' - ' + sub + '#' + str(i[0]) + ')'])
                 who_blind = curs.fetchall()
                 if who_blind:
-                    t_data_f = '[[user:' + who_blind[0][0] + ']] block'
-                    b_color = 'toron_color_grey'
+                    ip += ' (' + who_blind[0][0] + ' B)'
                 else:
-                    t_data_f = 'block'
-                    b_color = 'toron_color_grey'
+                    ip += ' (B)'
 
             if flask.request.args.get('render', None):
                 if i[0] == '1':
@@ -53,10 +60,8 @@ def api_topic_sub_2(conn, name, sub, time):
                     t_color = 'toron_color_blue'
                 else:
                     t_color = 'toron_color'
-                    
-                ip = ip_pas(i[3])
 
-                if admin == 1 or b_color != 'toron_color_grey':
+                if admin == 1 or b_color != 'toron_color_not':
                     ip += ' <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/admin/' + i[0] + '">(' + load_lang('discussion_tool') + ')</a>'
                     
                 if t_data_f == '':
