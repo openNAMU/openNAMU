@@ -27,3 +27,19 @@ textarea, input, button, select {
     background: gray;
     color: white;
 }
+
+#toron_color_grey {
+    background: #4a4a4a;
+}
+
+#toron_color_green {
+    background: #2e4a2e;
+}
+
+#toron_color_red {
+    background: #803737;
+}
+
+#toron_color_blue {
+    background: #314c56;
+}
