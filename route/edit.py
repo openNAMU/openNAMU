@@ -115,6 +115,7 @@ def edit_2(conn, name):
             imp = [name, wiki_set(), custom(), other2([' (' + load_lang('edit') + ')', 0])],
             data =  get_name + '''
                 <form method="post">
+                    <script>do_stop_exit()</script>
                     ''' + edit_button() + '''
                     <textarea id="content" rows="25" id="content" name="content">''' + html.escape(re.sub('\n$', '', data)) + '''</textarea>
                     <textarea style="display: none;" name="otent">''' + html.escape(re.sub('\n$', '', data_old)) + '''</textarea>
