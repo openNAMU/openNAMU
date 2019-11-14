@@ -93,11 +93,14 @@ def topic_2(conn, name, sub):
             <a href="/topic/''' + url_pas(name) + '''/sub/''' + url_pas(sub) + '''/tool">(''' + load_lang('topic_tool') + ''')</a>
             <hr class=\"main_hr\">
             <form style="''' + display + '''" method="post">
-                <textarea style="height: 100px;" name="content"></textarea>
+                <textarea id="content" style="height: 100px;" name="content"></textarea>
                 <hr class=\"main_hr\">
                 ''' + captcha_get() + (ip_warring() if display == '' else '') + '''
                 <button type="submit">''' + load_lang('send') + '''</button>
+                <button id="preview" type="button" onclick="load_preview(\'''' + url_pas(name) + '\')">' + load_lang('preview') + '''</button>
             </form>
+            <hr class=\"main_hr\">
+            <div id="see_preview"></div>
         '''
 
         return easy_minify(flask.render_template(skin_check(), 
