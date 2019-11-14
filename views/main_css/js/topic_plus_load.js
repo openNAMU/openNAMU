@@ -21,7 +21,7 @@ function topic_plus_load(name, sub, num) {
 
                 // https://programmingsummaries.tistory.com/379
                 var options = {
-                    body: 'New ' + n_num + ' topic'
+                    body: '#' + n_num
                 }
                
                 var notification = new Notification("openNAMU", options);
@@ -29,6 +29,20 @@ function topic_plus_load(name, sub, num) {
                 setTimeout(function () {
                     notification.close();
                 }, 5000);
+
+                xhr_2.onreadystatechange = function() {
+                    if(xhr_2.readyState === 4 && xhr_2.status === 200) {
+                        markup = JSON.parse(xhr_2.responseText)['markup'];
+    
+                        if(markup === 'markdown') {
+                            render_markdown();
+                        } else {
+                            for(var key in t_data) {
+                                render_html('topic_' + String(key) + '-');
+                            }
+                        }
+                    }
+                }
 
                 topic_plus_load(name, sub, String(Number(num) + 1));
                 clearInterval(test);

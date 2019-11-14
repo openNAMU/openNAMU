@@ -394,7 +394,9 @@ def other2(data):
     js_filter = {
         'load_include.js' : '2',
         'render_html.js' : '2',
-        'do_open_foot.js' : '4'
+        'do_open_foot.js' : '4',
+        'topic_main_load.js' : '2',
+        'topic_plus_load.js' : '2'
     }
     for i_data in os.listdir(os.path.join("views", "main_css", "js")):
         if i_data in js_filter:

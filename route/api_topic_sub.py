@@ -76,7 +76,7 @@ def api_topic_sub_2(conn, name, sub, time):
                                 </td>
                             </tr>
                             <tr>
-                                <td id="''' + b_color + '">' + render_set(data = t_data_f) + '''</td>
+                                <td id="''' + b_color + '">' + render_set(data = t_data_f, include = 'topic_' + i[0]) + '''</td>
                             </tr>
                         </tbody>
                     </table>
