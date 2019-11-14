@@ -28,7 +28,7 @@ textarea, input, button, select {
     color: white;
 }
 
-#toron_color_grey {
+#toron_color_grey, code {
     background: #4a4a4a;
 }
 
