@@ -384,7 +384,9 @@ def next_fix(link, num, page, end = 50):
 def other2(data):
     req_list = ''
     
-    css_filter = {}
+    css_filter = {
+        'main.css' : '2'
+    }
     for i_data in os.listdir(os.path.join("views", "main_css", "css")):
         if i_data in css_filter:
             req_list += '<link rel="stylesheet" href="/views/main_css/css/' + i_data + '?ver=' + css_filter[i_data] + '">'
@@ -396,7 +398,8 @@ def other2(data):
         'render_html.js' : '2',
         'do_open_foot.js' : '4',
         'topic_main_load.js' : '2',
-        'topic_plus_load.js' : '2'
+        'topic_plus_load.js' : '2',
+        'do_stop_exit.js' : '2'
     }
     for i_data in os.listdir(os.path.join("views", "main_css", "js")):
         if i_data in js_filter:

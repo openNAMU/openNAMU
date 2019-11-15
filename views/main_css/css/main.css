@@ -42,3 +42,4 @@ blockquote { background-image: url(/views/acme/img/quote.png); background-positi
 @media (max-width: 400px) { .foot_plus { width: 80%; right: calc(100% - 92%); }}
 @media (max-height: 400px) { .foot_plus { height: 80%; top: calc(100% - 92%); }}
 .foot_in { overflow-y: scroll; height: calc(100% - 20px); }
+#origin { display: none; }

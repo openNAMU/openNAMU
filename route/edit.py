@@ -115,15 +115,15 @@ def edit_2(conn, name):
             imp = [name, wiki_set(), custom(), other2([' (' + load_lang('edit') + ')', 0])],
             data =  get_name + '''
                 <form method="post">
-                    <script>do_stop_exit()</script>
+                    <script>do_stop_exit();</script>
                     ''' + edit_button() + '''
                     <textarea rows="25" id="content" name="content">''' + html.escape(re.sub('\n$', '', data)) + '''</textarea>
-                    <textarea style="display: none;" name="otent">''' + html.escape(re.sub('\n$', '', data_old)) + '''</textarea>
+                    <textarea id="origin" name="otent">''' + html.escape(re.sub('\n$', '', data_old)) + '''</textarea>
                     <hr class=\"main_hr\">
                     <input placeholder="''' + load_lang('why') + '''" name="send" type="text">
                     <hr class=\"main_hr\">
                     ''' + captcha_get() + ip_warring() + '''
-                    <button id="save" type="submit">''' + load_lang('save') + '''</button>
+                    <button id="save" type="submit" onclick="go_save_zone = 1;">''' + load_lang('save') + '''</button>
                     <button id="preview" type="button" onclick="load_preview(\'''' + url_pas(name) + '\')">' + load_lang('preview') + '''</button>
                 </form>
                 ''' + b_text + '''
