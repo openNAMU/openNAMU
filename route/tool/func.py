@@ -14,6 +14,7 @@ for i in range(0, 2):
         import urllib.request
         import email.mime.text
         import sqlite3
+        import pymysql
         import hashlib
         import smtplib
         import bcrypt
@@ -35,7 +36,6 @@ for i in range(0, 2):
         from .mark import *
     except ImportError as e:
         if i == 0:
-            print('----')
             print(e)
             print('----')
             if platform.system() == 'Linux':
@@ -1129,10 +1129,17 @@ def re_error(data):
             else:
                 data = '???'
 
-            return easy_minify(flask.render_template(skin_check(), 
-                imp = [load_lang('error'), wiki_set(1), custom(), other2([0, 0])],
-                data = '<h2>' + load_lang('error') + '</h2><ul><li>' + data + '</li></ul>',
-                menu = 0
-            )), 401
+            if num == 5:
+                return easy_minify(flask.render_template(skin_check(), 
+                    imp = [load_lang('skin_set'), wiki_set(1), custom(), other2([0, 0])],
+                    data = '<div id="main_skin_set"><h2>' + load_lang('error') + '</h2><ul><li>' + data + '</li></ul></div>',
+                    menu = 0
+                ))
+            else:
+                return easy_minify(flask.render_template(skin_check(), 
+                    imp = [load_lang('error'), wiki_set(1), custom(), other2([0, 0])],
+                    data = '<h2>' + load_lang('error') + '</h2><ul><li>' + data + '</li></ul>',
+                    menu = 0
+                )), 401
         else:
             return redirect('/')

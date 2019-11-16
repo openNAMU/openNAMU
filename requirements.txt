@@ -3,4 +3,5 @@ bcrypt
 flask
 flask-Reggie
 flask-compress
+pymysql
 pysha3; python_version < "3.6"
