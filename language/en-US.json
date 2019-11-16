@@ -181,6 +181,7 @@
         "admin_group" : "Admin group",
         "topic_setting" : "Topic setting(s)",
         "old_page" : "Old decument(s)",
+        "skin_set" : "Skin setting(s)",
         "_comment_2.1_" : "Filter",
             "_comment_2.1.1_" : "List",
                 "interwiki_list" : "Interwiki(s) list",
