@@ -22,22 +22,54 @@ print('----')
 app_var = json.loads(open('data/app_var.json', encoding='utf-8').read())
 
 # DB
-try:
-    set_data = json.loads(open('data/set.json').read())
-except:
-    if os.getenv('NAMU_DB') != None:
-        set_data = { "db" : os.getenv('NAMU_DB') }
-    else:
-        print('DB name (data) : ', end = '')
-        
-        new_json = str(input())
-        if new_json == '':
-            new_json = 'data'
-            
-        with open('data/set.json', 'w') as f:
-            f.write('{ "db" : "' + new_json + '" }')
-            
+while 1:
+    try:
         set_data = json.loads(open('data/set.json').read())
+        if not 'db_type' in set_data:
+            try:
+                os.remove('data/set.json')
+            except:
+                print('Please delete set.json')
+        else:
+            break
+    except:
+        if os.getenv('NAMU_DB') != None or os.getenv('NAMU_DB_TYPE') != None:
+            set_data = { 
+                "db" : os.getenv('NAMU_DB') if os.getenv('NAMU_DB') else 'data', 
+                "db_type" : os.getenv('NAMU_DB_TYPE') if os.getenv('NAMU_DB_TYPE') else 'sqlite'
+            }
+
+            break
+        else:        
+            new_json = ['', '']
+
+            print('DB type (sqlite, mysql) : ', end = '')
+            new_json[0] = str(input())
+            normal_db_type = ['sqlite', 'mysql']
+            if new_json[0] == '' or not new_json[0] in normal_db_type:
+                new_json[0] = 'sqlite'
+
+            all_src = []
+            for i_data in os.listdir("."):
+                f_src = re.search("(.+)\.db$", i_data)
+                if f_src:
+                    all_src += [f_src.groups()[0]]
+
+            if all_src != []:
+                print('DB name (' + ', '.join(all_src) + ') : ', end = '')
+            else:
+                print('DB name (data) : ', end = '')
+
+            new_json[1] = str(input())
+            if new_json[1] == '':
+                new_json[1] = 'data'
+                
+            with open('data/set.json', 'w') as f:
+                f.write('{ "db" : "' + new_json[1] + '", "db_type" : "' + new_json[0] + '" }')
+                
+            set_data = json.loads(open('data/set.json').read())
+            
+            break
         
 print('DB name : ' + set_data['db'])
 db_name = set_data['db']
