@@ -430,6 +430,9 @@ def cut_100(data):
 
     return data[0:100] + '...'
 
+def change_space(data):
+    return re.sub(' ', ' ', data)
+
 def wiki_set(num = 1):
     if num == 1:
         data_list = []
