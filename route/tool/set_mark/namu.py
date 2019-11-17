@@ -290,7 +290,7 @@ def middle_parser(data, fol_num, syntax_num, folding_num, include_num):
                                                         if folding_num == 0:
                                                             folding_num = 1
                                                         
-                                                        data = re.sub('{{{#!folding ?((?:(?!\n).)*)\n?', '<div>' + str(folding_data[0]) + ' <div style="display: inline-block;"><a href="javascript:void(0);" onclick="do_open_folding(' + str(fol_num) + ', \'' + include_num + '\');">[+]</a></div_2><div id="' + include_num + 'folding_' + str(fol_num) + '" style="display: none;"><div id="wiki_div" style="">\n', data, 1)
+                                                        data = re.sub('{{{#!folding ?((?:(?!\n).)*)\n?', '<div>' + str(folding_data[0]) + ' <div style="display: inline-block;"><a href="javascript:void(0);" onclick="do_open_folding(' + str(fol_num) + ', \'' + include_num + '\');">[+]</a></div_2><div id="' + include_num + 'folding_' + str(fol_num) + '" style="display: none;"><div id="wiki_div" style="">', data, 1)
                                                         
                                                         fol_num += 1
 
@@ -729,6 +729,7 @@ def namu(conn, data, title, main_num, include_num):
             break
 
     data = re.sub('(?P<in>\n +\* ?(?:(?:(?!\|\|).)+))\|\|', '\g<in>\n ||', data)
+    data = re.sub('(?P<in><div id="folding_(?:[0-9]+)" style="display: none;"><div style="">)(?P<out> )?\* ', '\g<in>\n\g<out>* ', data)
 
     while 1:
         li = re.search('(\n(?:(?: *)\* ?(?:(?:(?!\n).)+)\n)+)', data)
