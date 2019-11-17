@@ -256,9 +256,9 @@ def middle_parser(data, fol_num, syntax_num, folding_num, include_num):
                                                 else:
                                                     middle_data_2 = ['']
 
-                                                middle_list += ['div_end']
+                                                middle_list += ['div_1']
                                                 
-                                                data = re.sub('{{{#!wiki(?: style=(?:&quot;|&#x27;)((?:(?!&quot;|&#x27;).)*)(?:&quot;|&#x27;))?\n?', '<div id="wiki_div" style="' + str(middle_data_2[0]) + '">', data, 1)
+                                                data = re.sub('{{{#!wiki(?: style=(?:&quot;|&#x27;)((?:(?!&quot;|&#x27;).)*)(?:&quot;|&#x27;))?\n?', '<div id="wiki_div" style="' + str(middle_data_2[0] if middle_data_2[0] else '') + '">', data, 1)
                                             else:
                                                 middle_search = re.search('^#!syntax', middle_data[0])
                                                 if middle_search:                                                
@@ -290,14 +290,14 @@ def middle_parser(data, fol_num, syntax_num, folding_num, include_num):
                                                         if folding_num == 0:
                                                             folding_num = 1
                                                         
-                                                        data = re.sub('{{{#!folding ?((?:(?!\n).)*)\n?', '<div>' + str(folding_data[0]) + ' <div style="display: inline-block;"><a href="javascript:void(0);" onclick="do_open_folding(' + str(fol_num) + ', \'' + include_num + '\');">[+]</a></div_end><div id="' + include_num + 'folding_' + str(fol_num) + '" style="display: none;"><div id="wiki_div" style="">\n', data, 1)
+                                                        data = re.sub('{{{#!folding ?((?:(?!\n).)*)\n?', '<div>' + str(folding_data[0]) + ' <div style="display: inline-block;"><a href="javascript:void(0);" onclick="do_open_folding(' + str(fol_num) + ', \'' + include_num + '\');">[+]</a></div_2><div id="' + include_num + 'folding_' + str(fol_num) + '" style="display: none;"><div id="wiki_div" style="">\n', data, 1)
                                                         
                                                         fol_num += 1
 
                                                     else:
                                                         middle_search = re.search('^#!html', middle_data[0])
                                                         if middle_search:
-                                                            middle_list += ['div_end']
+                                                            middle_list += ['div_2']
                                                             
                                                             html_number += 1
                                                         
@@ -328,7 +328,7 @@ def middle_parser(data, fol_num, syntax_num, folding_num, include_num):
                             middle_number -= 1
                             
                         if middle_list[middle_number] == '2div':
-                            data = middle_re.sub('</div_end></div_end></div_end>', data, 1)
+                            data = middle_re.sub('</div_1></div_2></div_2>', data, 1)
                         elif middle_list[middle_number] == 'pre':
                             data = middle_re.sub('</code></pre>', data, 1)
                         else:
@@ -352,7 +352,7 @@ def middle_parser(data, fol_num, syntax_num, folding_num, include_num):
                             middle_number -= 1
                             
                         if middle_list[middle_number] == '2div':
-                            data += '</div_end></div_end></div_end>'
+                            data += '</div_1></div_2></div_2>'
                         elif middle_list[middle_number] == 'pre':
                             data += '</code></pre>'
                         else:
@@ -466,7 +466,7 @@ def namu(conn, data, title, main_num, include_num):
     data = re.sub('<div id="wiki_div" style="">\n', '<div id="wiki_div" style="">', data)
            
     while 1:
-        wiki_table_data = re.search('<div id="wiki_div" ((?:(?!>).)+)>((?:(?!<div id="wiki_div"|<\/div_end>).\n*)+)<\/div_end>', data)
+        wiki_table_data = re.search('<div id="wiki_div" ((?:(?!>).)+)>((?:(?!<div id="wiki_div"|<\/div_1>).\n*)+)<\/div_1>', data)
         if wiki_table_data:
             wiki_table_data = wiki_table_data.groups()
             if re.search('\|\|', wiki_table_data[1]):
@@ -474,12 +474,12 @@ def namu(conn, data, title, main_num, include_num):
             else:
                 end_parser = wiki_table_data[1]
 
-            data = re.sub('<div id="wiki_div" ((?:(?!>).)+)>((?:(?!<div id="wiki_div"|<\/div_end>).\n*)+)<\/div_end>', '<div ' + wiki_table_data[0] + '>' + end_parser + '</div>', data, 1)
+            data = re.sub('<div id="wiki_div" ((?:(?!>).)+)>((?:(?!<div id="wiki_div"|<\/div_1>).\n*)+)<\/div_1>', '<div ' + wiki_table_data[0] + '>' + end_parser + '</div_2>', data, 1)
         else:
             break
-            
-    data = re.sub('<\/div_end>', '</div>', data)
-    data = re.sub('<\/td>', '</td_end>', data)
+
+    data = re.sub('<\/div_2>', '</div>', data)
+    data = re.sub('<\/td>', '</td_1>', data)
     
     first = 0
     math_re = re.compile('\[math\(((?:(?!\)\]).)+)\)\]', re.I)
@@ -1118,9 +1118,7 @@ def namu(conn, data, title, main_num, include_num):
 
             i += 1
     
-    data = re.sub('<\/td_end>', '</td>', data)
-    data = re.sub('<include>(?P<in><a (?:[^>]+)>)\n', '\g<in>', data)
-    data = re.sub('\n<\/include>', '', data)
+    data = re.sub('<\/td_1>', '</td>', data)
     data = re.sub('<\/ul>\n', '</ul>', data)
     
     data = re.sub('(?P<in><\/h[0-9]>)(\n)+', '\g<in>', data)
