@@ -5,7 +5,7 @@ def alarm_2(conn):
 
     data = '<ul>'    
     
-    curs.execute("select data, date from alarm where name = ? order by date desc", [ip_check()])
+    curs.execute(db_change("select data, date from alarm where name = ? order by date desc"), [ip_check()])
     data_list = curs.fetchall()
     if data_list:
         data = '<a href="/del_alarm">(' + load_lang('delete') + ')</a><hr class=\"main_hr\">' + data

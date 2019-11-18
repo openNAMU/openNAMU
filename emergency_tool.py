@@ -46,10 +46,10 @@ if what_i_do == '1':
     def parser(data):
         namumark(data[0], data[1], 1)
 
-    curs.execute("delete from back")
+    curs.execute(db_change("delete from back"))
     conn.commit()
 
-    curs.execute("select title, data from data")
+    curs.execute(db_change("select title, data from data"))
     data = curs.fetchall()
     num = 0
 
@@ -63,8 +63,8 @@ if what_i_do == '1':
         if num % 10 == 0:
             print(num)
 elif what_i_do == '2':
-    curs.execute("delete from other where name = 'recaptcha'")
-    curs.execute("delete from other where name = 'sec_re'")
+    curs.execute(db_change("delete from other where name = 'recaptcha'"))
+    curs.execute(db_change("delete from other where name = 'sec_re'"))
 elif what_i_do == '3':
     print('----')
     print('IP or Name : ', end = '')
@@ -75,7 +75,7 @@ elif what_i_do == '3':
     else:
         band = ''
 
-        curs.execute("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, ?)", 
+        curs.execute(db_change("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, ?)"), 
             [user_data, 
             'release', 
             get_time(), 
@@ -83,25 +83,25 @@ elif what_i_do == '3':
             '', 
             band
         ])
-    curs.execute("delete from ban where block = ?", [user_data])
+    curs.execute(db_change("delete from ban where block = ?"), [user_data])
 elif what_i_do == '4':
     print('----')
     print('Host : ', end = '')
     host = input()
 
-    curs.execute("update other set data = ? where name = 'host'", [host])
+    curs.execute(db_change("update other set data = ? where name = 'host'"), [host])
 elif what_i_do == '5':
     print('----')
     print('Port : ', end = '')
     port = int(input())
 
-    curs.execute("update other set data = ? where name = 'port'", [port])
+    curs.execute(db_change("update other set data = ? where name = 'port'"), [port])
 elif what_i_do == '6':
     print('----')
     print('Skin name : ', end = '')
     skin = input()
 
-    curs.execute("update other set data = ? where name = 'skin'", [skin])
+    curs.execute(db_change("update other set data = ? where name = 'skin'"), [skin])
 elif what_i_do == '7':
     print('----')
     print('1. sha256')
@@ -127,9 +127,9 @@ elif what_i_do == '7':
         else:
             hashed = hashlib.sha3_256(bytes(user_pw, 'utf-8')).hexdigest()
        
-    curs.execute("update user set pw = ? where id = ?", [hashed, user_name])
+    curs.execute(db_change("update user set pw = ? where id = ?"), [hashed, user_name])
 elif what_i_do == '8':
-    curs.execute("update other set data = '00000' where name = 'ver'")
+    curs.execute(db_change("update other set data = '00000' where name = 'ver'"))
 elif what_i_do == '9':
     try:
         os.remove('data/set.json')
@@ -144,7 +144,7 @@ else:
     print('New name : ', end = '')
     new_name = input()
 
-    curs.execute("update user set id = ? where id = ?", [new_name, user_name])
+    curs.execute(db_change("update user set id = ? where id = ?"), [new_name, user_name])
 
 conn.commit()
 

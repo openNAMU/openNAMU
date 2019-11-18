@@ -4,15 +4,15 @@ def api_topic_sub_2(conn, name, sub, time):
     curs = conn.cursor()
 
     if flask.request.args.get('num', None):
-        curs.execute("select id, data, date, ip, block, top from topic where title = ? and sub = ? and id + 0 = ? + 0 order by id + 0 asc", [
+        curs.execute(db_change("select id, data, date, ip, block, top from topic where title = ? and sub = ? and id + 0 = ? + 0 order by id + 0 asc"), [
             name, 
             sub, 
             flask.request.args.get('num', '')
         ])
     elif flask.request.args.get('top', None):
-        curs.execute("select id, data, date, ip, block, top from topic where title = ? and sub = ? and top = 'O' order by id + 0 asc", [name, sub])
+        curs.execute(db_change("select id, data, date, ip, block, top from topic where title = ? and sub = ? and top = 'O' order by id + 0 asc"), [name, sub])
     else:
-        curs.execute("select id, data, date, ip, block, top from topic where title = ? and sub = ? order by id + 0 asc", [name, sub])
+        curs.execute(db_change("select id, data, date, ip, block, top from topic where title = ? and sub = ? order by id + 0 asc"), [name, sub])
 
     data = curs.fetchall()
     if data:
@@ -33,7 +33,7 @@ def api_topic_sub_2(conn, name, sub, time):
                     t_data_f = ''
                     b_color = 'toron_color_not'
 
-                curs.execute("select who from re_admin where what = ? order by time desc limit 1", ['blind (' + name + ' - ' + sub + '#' + str(i[0]) + ')'])
+                curs.execute(db_change("select who from re_admin where what = ? order by time desc limit 1"), ['blind (' + name + ' - ' + sub + '#' + str(i[0]) + ')'])
                 who_blind = curs.fetchall()
                 if who_blind:
                     ip += ' (' + who_blind[0][0] + ' B)'
@@ -45,7 +45,7 @@ def api_topic_sub_2(conn, name, sub, time):
                     s_user = i[3]
                 else:
                     if flask.request.args.get('num', None):
-                        curs.execute("select ip from topic where title = ? and sub = ? order by id + 0 asc limit 1", [name, sub])
+                        curs.execute(db_change("select ip from topic where title = ? and sub = ? order by id + 0 asc limit 1"), [name, sub])
                         g_data = curs.fetchall()
                         if g_data:
                             s_user = g_data[0][0]
@@ -90,7 +90,7 @@ def api_topic_sub_2(conn, name, sub, time):
                 if i[4] != 'O' or (i[4] == 'O' and admin == 1):
                     t_data_f = i[1]
                 else:
-                    curs.execute("select who from re_admin where what = ? order by time desc limit 1", ['blind (' + name + ' - ' + sub + '#' + str(i[0]) + ')'])
+                    curs.execute(db_change("select who from re_admin where what = ? order by time desc limit 1"), ['blind (' + name + ' - ' + sub + '#' + str(i[0]) + ')'])
                     who_blind = curs.fetchall()
                     if who_blind:
                         t_data_f = '[[user:' + who_blind[0][0] + ']] block'

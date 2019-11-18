@@ -5,7 +5,7 @@ def user_info_2(conn):
 
     ip = ip_check()
 
-    curs.execute('select name from alarm where name = ? limit 1', [ip_check()])
+    curs.execute(db_change('select name from alarm where name = ? limit 1'), [ip_check()])
     if curs.fetchall():
         plus2 = '<li><a href="/alarm">' + load_lang('alarm') + ' (O)</a></li>'
     else:
@@ -26,7 +26,7 @@ def user_info_2(conn):
         '''
         plus3 = ''
 
-        curs.execute("select data from other where name = 'email_have'")
+        curs.execute(db_change("select data from other where name = 'email_have'"))
         test = curs.fetchall()
         if test and test[0][0] != '':
             plus += '<li><a href="/pass_find">' + load_lang('password_search') + '</a></li>'

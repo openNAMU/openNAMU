@@ -17,11 +17,11 @@ def view_xref_2(conn, name):
     if re.search('#', name):
         name = re.sub('#', '\\\\#', name)
     
-    curs.execute("" + \
+    curs.execute(db_change("" + \
         "select link, type from back " + \
         "where (title = ? and not type = 'cat' and not type = 'no') or (title like ? and type = 'redirect')" + \
         "order by link asc limit ?, '50'" + \
-    "", [
+    ""), [
         name,
         name + '#s-%',
         str(sql_num)
@@ -33,7 +33,7 @@ def view_xref_2(conn, name):
         if data[1]:                
             div += ' (' + data[1] + ')'
         
-        curs.execute("select title from back where title = ? and type = 'include'", [data[0]])
+        curs.execute(db_change("select title from back where title = ? and type = 'include'"), [data[0]])
         db_data = curs.fetchall()
         if db_data:
             div += ' <a id="inside" href="/xref/' + url_pas(data[0]) + '">(' + load_lang('backlink') + ')</a>'

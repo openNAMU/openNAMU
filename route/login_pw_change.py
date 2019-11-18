@@ -15,7 +15,7 @@ def login_pw_change_2(conn):
             if flask.request.form.get('pw2', None) != flask.request.form.get('pw3', None):
                 return re_error('/error/20')
 
-            curs.execute("select pw, encode from user where id = ?", [flask.session['id']])
+            curs.execute(db_change("select pw, encode from user where id = ?"), [flask.session['id']])
             user = curs.fetchall()
             if not user:
                 return re_error('/error/2')
@@ -31,7 +31,7 @@ def login_pw_change_2(conn):
 
             hashed = pw_encode(flask.request.form.get('pw2', None))
                 
-            curs.execute("update user set pw = ? where id = ?", [hashed, ip])
+            curs.execute(db_change("update user set pw = ? where id = ?"), [hashed, ip])
 
             return redirect('/user')
     else:

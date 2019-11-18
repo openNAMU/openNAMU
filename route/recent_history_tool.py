@@ -34,10 +34,10 @@ def recent_history_tool_2(conn, name):
         '''
 
     if admin_check(6) == 1:
-        curs.execute('''
+        curs.execute(db_change('''
             select title from history
             where title = ? and id = ? and hide = 'O'
-        ''', [name, num])
+        '''), [name, num])
         hide = curs.fetchall()
         data += '''
             <li>

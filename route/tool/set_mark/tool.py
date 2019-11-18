@@ -6,6 +6,12 @@ import hashlib
 
 def get_time():
     return str(datetime.datetime.today().strftime("%Y-%m-%d %H:%M:%S"))
+
+def db_change(data):
+    # data = data.replace('%', '%%')
+    # data = data.replace('?', '%s')
+
+    return data
     
 def ip_check(d_type = 0):
     if d_type == 0:

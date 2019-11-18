@@ -10,10 +10,10 @@ def api_search_2(conn, name):
     if num > 1000:
         num = 1
 
-    curs.execute("" + \
+    curs.execute(db_change("" + \
         "select distinct title, case when title like ? then 'title' else 'data' " + \
         "end from data where title like ? or data like ? order by case " + \
-        "when title like ? then 1 else 2 end limit ?",
+        "when title like ? then 1 else 2 end limit ?"),
         ['%' + name + '%', '%' + name + '%', '%' + name + '%', '%' + name + '%', str(num)]
     )
     all_list = curs.fetchall()

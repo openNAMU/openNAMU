@@ -9,7 +9,7 @@ def server_indexing_2(conn):
     if flask.request.method == 'POST':
         admin_check(None, 'indexing')
 
-        curs.execute("select name from sqlite_master where type = 'index'")
+        curs.execute(db_change("select name from sqlite_master where type = 'index'"))
         data = curs.fetchall()
         if data:
             for delete_index in data:
@@ -18,13 +18,13 @@ def server_indexing_2(conn):
                 sql = 'drop index if exists ' + delete_index[0]
                 
                 try:
-                    curs.execute(sql)
+                    curs.execute(db_change(sql))
                 except:
                     pass
         else:
-            curs.execute("select name from sqlite_master where type in ('table', 'view') and name not like 'sqlite_%' union all select name from sqlite_temp_master where type in ('table', 'view') order by 1;")
+            curs.execute(db_change("select name from sqlite_master where type in ('table', 'view') and name not like 'sqlite_%' union all select name from sqlite_temp_master where type in ('table', 'view') order by 1;"))
             for table in curs.fetchall():            
-                curs.execute('select sql from sqlite_master where name = ?', [table[0]])
+                curs.execute(db_change('select sql from sqlite_master where name = ?'), [table[0]])
                 cul = curs.fetchall()
                 
                 r_cul = re.findall('(?:([^ (]*) text)', str(cul[0]))
@@ -34,7 +34,7 @@ def server_indexing_2(conn):
 
                     sql = 'create index index_' + table[0] + '_' + n_cul + ' on ' + table[0] + '(' + n_cul + ')'
                     try:
-                        curs.execute(sql)
+                        curs.execute(db_change(sql))
                     except:
                         pass
 
@@ -42,7 +42,7 @@ def server_indexing_2(conn):
         
         return redirect()  
     else:
-        curs.execute("select name from sqlite_master where type = 'index'")
+        curs.execute(db_change("select name from sqlite_master where type = 'index'"))
         data = curs.fetchall()
         if data:
             b_data = load_lang('delete')

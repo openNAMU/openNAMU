@@ -8,7 +8,7 @@ def search_goto_2(conn, name):
     else:
         data = name
 
-    curs.execute("select title from data where title = ?", [data])
+    curs.execute(db_change("select title from data where title = ?"), [data])
     t_data = curs.fetchall()
     if t_data:
         return redirect('/w/' + url_pas(data))

@@ -6,11 +6,11 @@ def give_history_hidden_2(conn, name):
     num = number_check(flask.request.args.get('num', '1'))
 
     if admin_check(6, 'history_hidden (' + name + '#' + num + ')') == 1:
-        curs.execute("select title from history where title = ? and id = ? and hide = 'O'", [name, num])
+        curs.execute(db_change("select title from history where title = ? and id = ? and hide = 'O'"), [name, num])
         if curs.fetchall():
-            curs.execute("update history set hide = '' where title = ? and id = ?", [name, num])
+            curs.execute(db_change("update history set hide = '' where title = ? and id = ?"), [name, num])
         else:
-            curs.execute("update history set hide = 'O' where title = ? and id = ?", [name, num])
+            curs.execute(db_change("update history set hide = 'O' where title = ? and id = ?"), [name, num])
             
         conn.commit()
     

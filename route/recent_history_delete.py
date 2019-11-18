@@ -11,7 +11,7 @@ def recent_history_delete_2(conn, name):
     if flask.request.method == 'POST':
         admin_check(None, 'history delete r' + num)
 
-        curs.execute("delete from history where id = ? and title = ?", [num, name])
+        curs.execute(db_change("delete from history where id = ? and title = ?"), [num, name])
         conn.commit()
 
         return redirect('/history/' + url_pas(name))

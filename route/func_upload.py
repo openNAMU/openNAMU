@@ -34,11 +34,11 @@ def func_upload_2(conn):
 
         e_data = sha224(piece[0]) + piece[1]
 
-        curs.execute("select title from data where title = ?", ['file:' + name])
+        curs.execute(db_change("select title from data where title = ?"), ['file:' + name])
         if curs.fetchall():
             return re_error('/error/16')
 
-        curs.execute("select html from html_filter where kind = 'file'")
+        curs.execute(db_change("select html from html_filter where kind = 'file'"))
         db_data = curs.fetchall()
         for i in db_data:
             t_re = re.compile(i[0])
@@ -73,8 +73,8 @@ def func_upload_2(conn):
 
         file_d = '[[file:' + name + ']][br][br]{{{[[file:' + name + ']]}}}[br][br]' + lice
         
-        curs.execute("insert into data (title, data) values (?, ?)", ['file:' + name, file_d])
-        curs.execute("insert into acl (title, decu, dis, why, view) values (?, 'admin', '', '', '')", ['file:' + name])
+        curs.execute(db_change("insert into data (title, data) values (?, ?)"), ['file:' + name, file_d])
+        curs.execute(db_change("insert into acl (title, decu, dis, why, view) values (?, 'admin', '', '', '')"), ['file:' + name])
 
         render_set(
             title = name,
@@ -100,7 +100,7 @@ def func_upload_2(conn):
             <option value="direct_input">''' + load_lang('direct_input') + '''</option>
         '''
 
-        curs.execute("select html from html_filter where kind = 'image_license'")
+        curs.execute(db_change("select html from html_filter where kind = 'image_license'"))
         db_data = curs.fetchall()
         for i in db_data:
             license_list += '''

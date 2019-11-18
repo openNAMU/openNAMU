@@ -25,9 +25,9 @@ def recent_discuss_2(conn):
             '''
     
     if m_sub == 0:
-        curs.execute("select title, sub, date from rd where not stop = 'O' order by date desc limit 50")
+        curs.execute(db_change("select title, sub, date from rd where not stop = 'O' order by date desc limit 50"))
     else:
-        curs.execute("select title, sub, date from rd where stop = 'O' order by date desc limit 50")
+        curs.execute(db_change("select title, sub, date from rd where stop = 'O' order by date desc limit 50"))
         
     for data in curs.fetchall():
         title = html.escape(data[0])

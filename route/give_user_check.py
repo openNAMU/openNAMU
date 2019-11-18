@@ -3,7 +3,7 @@ from .tool.func import *
 def give_user_check_2(conn, name):
     curs = conn.cursor()
 
-    curs.execute("select acl from user where id = ? or id = ?", [name, flask.request.args.get('plus', '-')])
+    curs.execute(db_change("select acl from user where id = ? or id = ?"), [name, flask.request.args.get('plus', '-')])
     user = curs.fetchall()
     if user and user[0][0] != 'user':
         if admin_check() != 1:
@@ -23,21 +23,21 @@ def give_user_check_2(conn, name):
     
         if ip_or_user(name) == 1:
             if ip_or_user(flask.request.args.get('plus', None)) == 1:
-                curs.execute("select name, ip, ua, today from ua_d where ip = ? or ip = ? order by today desc limit ?, '50'", [name, flask.request.args.get('plus', None), sql_num])
+                curs.execute(db_change("select name, ip, ua, today from ua_d where ip = ? or ip = ? order by today desc limit ?, '50'"), [name, flask.request.args.get('plus', None), sql_num])
             else:
-                curs.execute("select name, ip, ua, today from ua_d where ip = ? or name = ? order by today desc limit ?, '50'", [name, flask.request.args.get('plus', None), sql_num])
+                curs.execute(db_change("select name, ip, ua, today from ua_d where ip = ? or name = ? order by today desc limit ?, '50'"), [name, flask.request.args.get('plus', None), sql_num])
         else:
             if ip_or_user(flask.request.args.get('plus', None)) == 1:
-                curs.execute("select name, ip, ua, today from ua_d where name = ? or ip = ? order by today desc limit ?, '50'", [name, flask.request.args.get('plus', None), sql_num])
+                curs.execute(db_change("select name, ip, ua, today from ua_d where name = ? or ip = ? order by today desc limit ?, '50'"), [name, flask.request.args.get('plus', None), sql_num])
             else:
-                curs.execute("select name, ip, ua, today from ua_d where name = ? or name = ? order by today desc limit ?, '50'", [name, flask.request.args.get('plus', None), sql_num])
+                curs.execute(db_change("select name, ip, ua, today from ua_d where name = ? or name = ? order by today desc limit ?, '50'"), [name, flask.request.args.get('plus', None), sql_num])
     else:
         end_check = 0
         
         if ip_or_user(name) == 1:
-            curs.execute("select name, ip, ua, today from ua_d where ip = ? order by today desc limit ?, '50'", [name, sql_num])
+            curs.execute(db_change("select name, ip, ua, today from ua_d where ip = ? order by today desc limit ?, '50'"), [name, sql_num])
         else:
-            curs.execute("select name, ip, ua, today from ua_d where name = ? order by today desc limit ?, '50'", [name, sql_num])
+            curs.execute(db_change("select name, ip, ua, today from ua_d where name = ? order by today desc limit ?, '50'"), [name, sql_num])
     
     record = curs.fetchall()
     if record:

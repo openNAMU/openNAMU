@@ -18,21 +18,21 @@ def setting_adsense_2(conn):
             ))
         
         if adsense_enabled == 'on':
-            curs.execute('update other set data = "True" where name = "adsense"')
+            curs.execute(db_change('update other set data = "True" where name = "adsense"'))
         else:
-            curs.execute('update other set data = "False" where name = "adsense"')
+            curs.execute(db_change('update other set data = "False" where name = "adsense"'))
         
-        curs.execute('update other set data = ? where name = "adsense_code"', [adsense_code])
+        curs.execute(db_change('update other set data = ? where name = "adsense_code"'), [adsense_code])
         conn.commit()
         
         return redirect('/adsense_setting')
 
     body_content = ''
 
-    curs.execute('select data from other where name = "adsense"')
+    curs.execute(db_change('select data from other where name = "adsense"'))
     adsense_enabled = curs.fetchall()[0][0]
 
-    curs.execute('select data from other where name = "adsense_code"')
+    curs.execute(db_change('select data from other where name = "adsense_code"'))
     adsense_code = curs.fetchall()[0][0]
 
     template = '''
