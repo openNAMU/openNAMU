@@ -1,6 +1,8 @@
 from .set_mark.namu import namu
 from .set_mark.markdown import markdown
 
+from .set_mark.tool import *
+
 import re
 import html
 import sqlite3
@@ -36,12 +38,12 @@ def send_parser(data):
     
 def plusing(data):
     for data_in in data:
-        curs.execute("select title from back where title = ? and link = ? and type = ?", [data_in[1], data_in[0], data_in[2]])
+        curs.execute(db_change("select title from back where title = ? and link = ? and type = ?"), [data_in[1], data_in[0], data_in[2]])
         if not curs.fetchall():
-            curs.execute("insert into back (title, link, type) values (?, ?, ?)", [data_in[1], data_in[0], data_in[2]])
+            curs.execute(db_change("insert into back (title, link, type) values (?, ?, ?)"), [data_in[1], data_in[0], data_in[2]])
 
 def namumark(title, data, num, include):
-    curs.execute('select data from other where name = "markup"')
+    curs.execute(db_change('select data from other where name = "markup"'))
     rep_data = curs.fetchall()
     if rep_data[0][0] == 'namumark':
         data = namu(conn, data, title, num, include)

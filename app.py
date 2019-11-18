@@ -164,11 +164,14 @@ create_data['all_data'] = [
     'oauth_conn'
 ]
 for i in create_data['all_data']:
-    curs.execute('create table if not exists ' + i + '(test longtext)')
+    try:
+        curs.execute(db_change('select test from ' + i + ' limit 1'))
+    except:
+        curs.execute(db_change('create table ' + i + '(test longtext)'))
 
 if setup_tool == 0:
     try:
-        curs.execute('select data from other where name = "ver"')
+        curs.execute(db_change('select data from other where name = "ver"'))
         ver_set_data = curs.fetchall()
         if not ver_set_data:
             setup_tool = 1
@@ -205,17 +208,17 @@ if setup_tool != 0:
     for create_table in create_data['all_data']:
         for create in create_data[create_table]:
             try:
-                curs.execute('select ' + create + ' from ' + create_table + ' limit 1')
+                curs.execute(db_change('select ' + create + ' from ' + create_table + ' limit 1'))
             except:
-                curs.execute("alter table " + create_table + " add " + create + " longtext default ''")
+                curs.execute(db_change("alter table " + create_table + " add " + create + " longtext default ''"))
 
     update()
 
 # Init
-curs.execute('select name from alist where acl = "owner"')
+curs.execute(db_change('select name from alist where acl = "owner"'))
 if not curs.fetchall():
-    curs.execute('delete from alist where name = "owner"')
-    curs.execute('insert into alist (name, acl) values ("owner", "owner")')
+    curs.execute(db_change('delete from alist where name = "owner"'))
+    curs.execute(db_change('insert into alist (name, acl) values ("owner", "owner")'))
 
 if not os.path.exists(app_var['path_data_image']):
     os.makedirs(app_var['path_data_image'])
@@ -230,12 +233,12 @@ server_set_key = ['host', 'port', 'language', 'markup', 'encode']
 server_set = {}
 
 for i in range(len(server_set_key)):
-    curs.execute('select data from other where name = ?', [server_set_key[i]])
+    curs.execute(db_change('select data from other where name = ?'), [server_set_key[i]])
     server_set_val = curs.fetchall()
     if not server_set_val:
         server_set_val = server_init.init(server_set_key[i])
         
-        curs.execute('insert into other (name, data) values (?, ?)', [server_set_key[i], server_set_val])
+        curs.execute(db_change('insert into other (name, data) values (?, ?)'), [server_set_key[i], server_set_val])
         conn.commit()
     else:
         server_set_val = server_set_val[0][0]
@@ -244,23 +247,23 @@ for i in range(len(server_set_key)):
     
     server_set[server_set_key[i]] = server_set_val
 
-curs.execute('select data from other where name = "key"')
+curs.execute(db_change('select data from other where name = "key"'))
 rep_data = curs.fetchall()
 if not rep_data:
     rep_key = ''.join(random.choice("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ") for i in range(16))
     if rep_key:
-        curs.execute('insert into other (name, data) values ("key", ?)', [rep_key])
+        curs.execute(db_change('insert into other (name, data) values ("key", ?)'), [rep_key])
 else:
     rep_key = rep_data[0][0]
 
-curs.execute('select data from other where name = "adsense"')
+curs.execute(db_change('select data from other where name = "adsense"'))
 adsense_result = curs.fetchall()
 if not adsense_result:
-    curs.execute('insert into other (name, data) values ("adsense", "False")')
-    curs.execute('insert into other (name, data) values ("adsense_code", "")')
+    curs.execute(db_change('insert into other (name, data) values ("adsense", "False")'))
+    curs.execute(db_change('insert into other (name, data) values ("adsense_code", "")'))
 
-curs.execute('delete from other where name = "ver"')
-curs.execute('insert into other (name, data) values ("ver", ?)', [c_ver])
+curs.execute(db_change('delete from other where name = "ver"'))
+curs.execute(db_change('insert into other (name, data) values ("ver", ?)'), [c_ver])
 
 def back_up():
     print('----')
@@ -274,7 +277,7 @@ def back_up():
     threading.Timer(60 * 60 * back_time, back_up).start()
 
 try:
-    curs.execute('select data from other where name = "back_up"')
+    curs.execute(db_change('select data from other where name = "back_up"'))
     back_up_time = curs.fetchall()
     
     back_time = int(back_up_time[0][0])
@@ -292,24 +295,24 @@ else:
 conn.commit()
 
 def count_all_title():
-    curs.execute("select count(title) from data")
+    curs.execute(db_change("select count(title) from data"))
     count_data = curs.fetchall()
     if count_data:
         count_data = count_data[0][0]
     else:
         count_data = 0
 
-    curs.execute('delete from other where name = "count_all_title"')
-    curs.execute('insert into other (name, data) values ("count_all_title", ?)', [str(count_data)])
+    curs.execute(db_change('delete from other where name = "count_all_title"'))
+    curs.execute(db_change('insert into other (name, data) values ("count_all_title", ?)'), [str(count_data)])
 
     conn.commit()
 
     threading.Timer(60 * 60 * 24, count_all_title).start()
 
-curs.execute('select data from other where name = "count_all_title"')
+curs.execute(db_change('select data from other where name = "count_all_title"'))
 all_title = curs.fetchall()
 if not all_title:
-    curs.execute('insert into other (name, data) values ("count_all_title", "0")')
+    curs.execute(db_change('insert into other (name, data) values ("count_all_title", "0")'))
 
 count_all_title()  
 

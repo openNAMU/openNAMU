@@ -3,7 +3,7 @@ from .tool.func import *
 def topic_admin_2(conn, name, sub, num):
     curs = conn.cursor()
 
-    curs.execute("select block, ip, date from topic where title = ? and sub = ? and id = ?", [name, sub, str(num)])
+    curs.execute(db_change("select block, ip, date from topic where title = ? and sub = ? and id = ?"), [name, sub, str(num)])
     data = curs.fetchall()
     if not data:
         return redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub))
@@ -24,10 +24,10 @@ def topic_admin_2(conn, name, sub, num):
     '''
 
     if admin_check(3) == 1:
-        curs.execute("select id from topic where title = ? and sub = ? and id = ? and top = 'O'", [name, sub, str(num)])
+        curs.execute(db_change("select id from topic where title = ? and sub = ? and id = ? and top = 'O'"), [name, sub, str(num)])
         top_topic_d = curs.fetchall()
 
-        curs.execute("select end from ban where block = ?", [data[0][1]])
+        curs.execute(db_change("select end from ban where block = ?"), [data[0][1]])
         user_ban_d = curs.fetchall()
         
         ban += '''

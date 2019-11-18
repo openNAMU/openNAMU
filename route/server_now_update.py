@@ -9,7 +9,7 @@ def server_now_update_2(conn, r_ver):
     if flask.request.method == 'POST':
         admin_check(None, 'update')
 
-        curs.execute('select data from other where name = "update"')
+        curs.execute(db_change('select data from other where name = "update"'))
         up_data = curs.fetchall()
         if up_data:
             up_data = up_data[0][0]

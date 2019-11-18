@@ -5,7 +5,7 @@ def list_not_close_topic_2(conn):
 
     div = '<ul>'
     
-    curs.execute('select title, sub from rd where stop != "O" order by date desc')
+    curs.execute(db_change('select title, sub from rd where stop != "O" order by date desc'))
     n_list = curs.fetchall()
     for data in n_list:
         div += '<li><a href="/topic/' + url_pas(data[0]) + '/sub/' + url_pas(data[1]) + '">' + html.escape(data[0]) + ' (' + data[1] + ')</a></li>'

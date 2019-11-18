@@ -13,7 +13,7 @@ def edit_delete_2(conn, name, app_var):
         else:
             captcha_post('', 0)
 
-        curs.execute("select data from data where title = ?", [name])
+        curs.execute(db_change("select data from data where title = ?"), [name])
         data = curs.fetchall()
         if data:
             today = get_time()
@@ -29,12 +29,12 @@ def edit_delete_2(conn, name, app_var):
                 'delete'
             )
             
-            curs.execute("select title, link from back where title = ? and not type = 'cat' and not type = 'no'", [name])
+            curs.execute(db_change("select title, link from back where title = ? and not type = 'cat' and not type = 'no'"), [name])
             for data in curs.fetchall():
-                curs.execute("insert into back (title, link, type) values (?, ?, 'no')", [data[0], data[1]])
+                curs.execute(db_change("insert into back (title, link, type) values (?, ?, 'no')"), [data[0], data[1]])
             
-            curs.execute("delete from back where link = ?", [name])
-            curs.execute("delete from data where title = ?", [name])
+            curs.execute(db_change("delete from back where link = ?"), [name])
+            curs.execute(db_change("delete from data where title = ?"), [name])
             conn.commit()
 
         file_check = re.search('^file:(.+)\.(.+)$', name)
@@ -47,7 +47,7 @@ def edit_delete_2(conn, name, app_var):
             
         return redirect('/w/' + url_pas(name))
     else:
-        curs.execute("select title from data where title = ?", [name])
+        curs.execute(db_change("select title from data where title = ?"), [name])
         if not curs.fetchall():
             return redirect('/w/' + url_pas(name))
 

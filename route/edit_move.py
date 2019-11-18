@@ -12,20 +12,20 @@ def edit_move_2(conn, name):
         else:
             captcha_post('', 0)
 
-        curs.execute("select title from history where title = ?", [flask.request.form.get('title', None)])
+        curs.execute(db_change("select title from history where title = ?"), [flask.request.form.get('title', None)])
         if curs.fetchall():
             if admin_check(None, 'merge documents') == 1:
-                curs.execute("select data from data where title = ?", [flask.request.form.get('title', None)])
+                curs.execute(db_change("select data from data where title = ?"), [flask.request.form.get('title', None)])
                 data = curs.fetchall()
                 if data:            
-                    curs.execute("delete from data where title = ?", [flask.request.form.get('title', None)])
-                    curs.execute("delete from back where link = ?", [flask.request.form.get('title', None)])
+                    curs.execute(db_change("delete from data where title = ?"), [flask.request.form.get('title', None)])
+                    curs.execute(db_change("delete from back where link = ?"), [flask.request.form.get('title', None)])
                 
-                curs.execute("select data from data where title = ?", [name])
+                curs.execute(db_change("select data from data where title = ?"), [name])
                 data = curs.fetchall()
                 if data:            
-                    curs.execute("update data set title = ? where title = ?", [flask.request.form.get('title', None), name])
-                    curs.execute("update back set link = ? where link = ?", [flask.request.form.get('title', None), name])
+                    curs.execute(db_change("update data set title = ? where title = ?"), [flask.request.form.get('title', None), name])
+                    curs.execute(db_change("update back set link = ? where link = ?"), [flask.request.form.get('title', None), name])
                     
                     data_in = data[0][0]
                 else:
@@ -41,18 +41,18 @@ def edit_move_2(conn, name):
                     'marge <a>' + name + '</a> - <a>' + flask.request.form.get('title', 'test') + '</a> move'
                 )
 
-                curs.execute("update back set type = 'no' where title = ? and not type = 'cat' and not type = 'no'", [name])
-                curs.execute("delete from back where title = ? and not type = 'cat' and type = 'no'", [flask.request.form.get('title', None)])
+                curs.execute(db_change("update back set type = 'no' where title = ? and not type = 'cat' and not type = 'no'"), [name])
+                curs.execute(db_change("delete from back where title = ? and not type = 'cat' and type = 'no'"), [flask.request.form.get('title', None)])
 
-                curs.execute("select id from history where title = ? order by id + 0 desc limit 1", [flask.request.form.get('title', None)])
+                curs.execute(db_change("select id from history where title = ? order by id + 0 desc limit 1"), [flask.request.form.get('title', None)])
                 data = curs.fetchall()
                 
                 num = data[0][0]
 
-                curs.execute("select id from history where title = ? order by id + 0 asc", [name])
+                curs.execute(db_change("select id from history where title = ? order by id + 0 asc"), [name])
                 data = curs.fetchall()
                 for move in data:
-                    curs.execute("update history set title = ?, id = ? where title = ? and id = ?", [flask.request.form.get('title', None), str(int(num) + int(move[0])), name, move[0]])
+                    curs.execute(db_change("update history set title = ?, id = ? where title = ? and id = ?"), [flask.request.form.get('title', None), str(int(num) + int(move[0])), name, move[0]])
 
                 conn.commit()
 
@@ -60,11 +60,11 @@ def edit_move_2(conn, name):
             else:
                 return re_error('/error/19')
         else:
-            curs.execute("select data from data where title = ?", [name])
+            curs.execute(db_change("select data from data where title = ?"), [name])
             data = curs.fetchall()
             if data:            
-                curs.execute("update data set title = ? where title = ?", [flask.request.form.get('title', None), name])
-                curs.execute("update back set link = ? where link = ?", [flask.request.form.get('title', None), name])
+                curs.execute(db_change("update data set title = ? where title = ?"), [flask.request.form.get('title', None), name])
+                curs.execute(db_change("update back set link = ? where link = ?"), [flask.request.form.get('title', None), name])
                 
                 data_in = data[0][0]
             else:
@@ -80,10 +80,10 @@ def edit_move_2(conn, name):
                 '<a>' + name + '</a> - <a>' + flask.request.form.get('title', 'test') + '</a> move'
             )
             
-            curs.execute("update back set type = 'no' where title = ? and not type = 'cat' and not type = 'no'", [name])
-            curs.execute("delete from back where title = ? and not type = 'cat' and type = 'no'", [flask.request.form.get('title', None)])
+            curs.execute(db_change("update back set type = 'no' where title = ? and not type = 'cat' and not type = 'no'"), [name])
+            curs.execute(db_change("delete from back where title = ? and not type = 'cat' and type = 'no'"), [flask.request.form.get('title', None)])
 
-            curs.execute("update history set title = ? where title = ?", [flask.request.form.get('title', None), name])
+            curs.execute(db_change("update history set title = ? where title = ?"), [flask.request.form.get('title', None), name])
             conn.commit()
 
             return redirect('/w/' + url_pas(flask.request.form.get('title', None)))

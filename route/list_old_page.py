@@ -11,7 +11,7 @@ def list_old_page_2(conn):
 
     div = '<ul>'
     
-    curs.execute('' + \
+    curs.execute(db_change('' + \
         'select title, date from history h ' + \
         "where title not like 'user:%' and title not like 'category:%' and title not like 'file:%' and " + \
         "exists (select title from data where title = h.title) " + \
@@ -19,7 +19,7 @@ def list_old_page_2(conn):
         'group by title ' + \
         'order by date asc ' + \
         'limit ?, "50"' + \
-    '', [str(sql_num)])
+    ''), [str(sql_num)])
     n_list = curs.fetchall()
     for data in n_list:
         div += '<li><a href="/w/' + url_pas(data[0]) + '">' + html.escape(data[0]) + '</a> (' + re.sub(' .*$', '', data[1]) + ')</li>'

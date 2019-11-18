@@ -6,7 +6,7 @@ def list_give_2(conn):
     list_data = '<ul>'
     back = ''
 
-    curs.execute("select distinct name from alist order by name asc")
+    curs.execute(db_change("select distinct name from alist order by name asc"))
     for data in curs.fetchall():                      
         if back != data[0]:
             back = data[0]

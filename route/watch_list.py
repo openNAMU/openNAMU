@@ -9,10 +9,10 @@ def watch_list_2(conn):
     if ip_or_user(ip) != 0:
         return redirect('/login')
 
-    curs.execute("delete from scan where user = ? and title = ''", [ip])
+    curs.execute(db_change("delete from scan where user = ? and title = ''"), [ip])
     conn.commit()
 
-    curs.execute("select title from scan where user = ?", [ip])
+    curs.execute(db_change("select title from scan where user = ?"), [ip])
     data = curs.fetchall()
     for data_list in data:
         div += '<li><a href="/w/' + url_pas(data_list[0]) + '">' + data_list[0] + '</a> <a href="/watch_list/' + url_pas(data_list[0]) + '">(' + load_lang('delete') + ')</a></li>'

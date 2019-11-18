@@ -431,7 +431,7 @@ def namu(conn, data, title, main_num, include_num):
 
             backlink += [[title, include_link, 'include']]
 
-            curs.execute("select title from data where title = ?", [include_data])
+            curs.execute(tool.db_change("select title from data where title = ?"), [include_data])
             if curs.fetchall():
                 data = include_re.sub('<div id="include_' + str(i) + '"></div>', data, 1)
 
@@ -616,7 +616,7 @@ def namu(conn, data, title, main_num, include_num):
 
     pagecount_re = re.compile('\[pagecount\]', re.I)
 
-    curs.execute('select data from other where name = "count_all_title"')
+    curs.execute(tool.db_change('select data from other where name = "count_all_title"'))
     all_title = curs.fetchall()
 
     data = pagecount_re.sub(all_title[0][0], data)
@@ -840,7 +840,7 @@ def namu(conn, data, title, main_num, include_num):
                     file_src = '/image/' + tool.sha224(file_name) + '.' + file_end
                     file_alt = 'file:' + file_name + '.' + file_end
 
-                    curs.execute("select title from data where title = ?", [file_alt])
+                    curs.execute(tool.db_change("select title from data where title = ?"), [file_alt])
                     exist = curs.fetchall()
                 
                 if exist:
@@ -877,7 +877,7 @@ def namu(conn, data, title, main_num, include_num):
                 inter_data = re.search('^inter:((?:(?!:).)+):((?:(?!\]\]|\|).)+)', main_link)
                 inter_data = inter_data.groups()
 
-                curs.execute('select link, icon from inter where title = ?', [inter_data[0]])
+                curs.execute(tool.db_change('select link, icon from inter where title = ?'), [inter_data[0]])
                 inter = curs.fetchall()
                 if inter:
                     if inter[0][1] != '':
@@ -926,7 +926,7 @@ def namu(conn, data, title, main_num, include_num):
                 if not re.search('^\|', main_link):
                     if main_link != title:
                         if main_link != '':
-                            curs.execute("select title from data where title = ?", [main_link])
+                            curs.execute(tool.db_change("select title from data where title = ?"), [main_link])
                             if not curs.fetchall():
                                 link_id = 'id="not_thing"'
 

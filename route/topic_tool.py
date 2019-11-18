@@ -5,7 +5,7 @@ def topic_tool_2(conn, name, sub):
 
     data = ''
 
-    curs.execute("select stop, agree from rd where title = ? and sub = ?", [name, sub])
+    curs.execute(db_change("select stop, agree from rd where title = ? and sub = ?"), [name, sub])
     close_data = curs.fetchall()
     if close_data:
         if close_data[0][0] == 'S':

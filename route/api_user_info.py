@@ -26,7 +26,7 @@ def api_user_info_2(conn, name):
             </table>
         '''
         
-        curs.execute("select acl from user where id = ?", [name])
+        curs.execute(db_change("select acl from user where id = ?"), [name])
         data = curs.fetchall()
         if data:
             if data[0][0] != 'user':
@@ -45,7 +45,7 @@ def api_user_info_2(conn, name):
             else:
                 match = '-'
 
-            curs.execute("select end, login, band from ban where block = ? or block = ?", [name, match])
+            curs.execute(db_change("select end, login, band from ban where block = ? or block = ?"), [name, match])
             block_data = curs.fetchall()
             if block_data:
                 if block_data[0][0] != '':

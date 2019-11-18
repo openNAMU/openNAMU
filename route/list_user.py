@@ -13,11 +13,11 @@ def list_user_2(conn):
 
     admin_one = admin_check(1)
     
-    curs.execute("select id, date from user order by date desc limit ?, '50'", [str(sql_num)])
+    curs.execute(db_change("select id, date from user order by date desc limit ?, '50'"), [str(sql_num)])
     user_list = curs.fetchall()
     for data in user_list:
         if admin_one == 1:
-            curs.execute("select block from ban where block = ?", [data[0]])
+            curs.execute(db_change("select block from ban where block = ?"), [data[0]])
             if curs.fetchall():
                 ban_button = ' <a href="/ban/' + url_pas(data[0]) + '">(' + load_lang('ban_release') + ')</a>'
             else:

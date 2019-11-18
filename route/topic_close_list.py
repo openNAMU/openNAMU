@@ -9,7 +9,7 @@ def topic_close_list_2(conn, name, tool):
         t_num = ''
         
         while 1:
-            curs.execute("select title from topic where title = ? and sub = ? limit 1", [name, flask.request.form.get('topic', None) + t_num])
+            curs.execute(db_change("select title from topic where title = ? and sub = ? limit 1"), [name, flask.request.form.get('topic', None) + t_num])
             if curs.fetchall():
                 if t_num == '':
                     t_num = ' 2'
@@ -24,15 +24,15 @@ def topic_close_list_2(conn, name, tool):
         menu = [['topic/' + url_pas(name), load_lang('return')]]
         
         if tool == 'close':
-            curs.execute("select sub from rd where title = ? and stop = 'O' order by sub asc", [name])
+            curs.execute(db_change("select sub from rd where title = ? and stop = 'O' order by sub asc"), [name])
             
             sub = load_lang('closed_discussion')
         elif tool == 'agree':
-            curs.execute("select sub from rd where title = ? and agree = 'O' order by sub asc", [name])
+            curs.execute(db_change("select sub from rd where title = ? and agree = 'O' order by sub asc"), [name])
             
             sub = load_lang('agreed_discussion')
         else:
-            curs.execute("select sub from rd where title = ? order by date desc", [name])
+            curs.execute(db_change("select sub from rd where title = ? order by date desc"), [name])
             
             sub = load_lang('discussion_list')
             
@@ -50,17 +50,17 @@ def topic_close_list_2(conn, name, tool):
         for data in curs.fetchall():
             t_num += 1
             
-            curs.execute("select data, date, ip, block from topic where title = ? and sub = ? and id = '1'", [name, data[0]])
+            curs.execute(db_change("select data, date, ip, block from topic where title = ? and sub = ? and id = '1'"), [name, data[0]])
             if curs.fetchall():                
                 it_p = 0
                 
                 if sub == load_lang('discussion_list'):
-                    curs.execute("select title from rd where title = ? and sub = ? and stop = 'O' order by sub asc", [name, data[0]])
+                    curs.execute(db_change("select title from rd where title = ? and sub = ? and stop = 'O' order by sub asc"), [name, data[0]])
                     if curs.fetchall():
                         it_p = 1
                 
                 if it_p != 1:
-                    curs.execute("select id from topic where title = ? and sub = ? order by date desc limit 1", [name, data[0]])
+                    curs.execute(db_change("select id from topic where title = ? and sub = ? order by date desc limit 1"), [name, data[0]])
                     t_data = curs.fetchall()
                 
                     div += '''
