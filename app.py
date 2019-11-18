@@ -8,7 +8,7 @@ for i_data in os.listdir("route"):
 
         exec("from route." + f_src + " import *")
 
-version_list = json.loads(open('version.json', encoding='utf-8').read())
+version_list = json.loads(open('version.json').read())
 
 r_ver = version_list['master']['r_ver']
 c_ver = version_list['master']['c_ver']
@@ -19,7 +19,7 @@ print('DB set version : ' + c_ver)
 print('Skin set version : ' + s_ver)
 print('----')
 
-app_var = json.loads(open('data/app_var.json', encoding='utf-8').read())
+app_var = json.loads(open('data/app_var.json').read())
 
 # DB
 while 1:
@@ -30,6 +30,8 @@ while 1:
                 os.remove('data/set.json')
             except:
                 print('Please delete set.json')
+                print('----')
+                raise
         else:
             break
     except:
@@ -42,10 +44,10 @@ while 1:
             break
         else:        
             new_json = ['', '']
+            normal_db_type = ['sqlite', 'mysql']
 
             print('DB type (sqlite, mysql) : ', end = '')
             new_json[0] = str(input())
-            normal_db_type = ['sqlite', 'mysql']
             if new_json[0] == '' or not new_json[0] in normal_db_type:
                 new_json[0] = 'sqlite'
 
