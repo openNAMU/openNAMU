@@ -18,8 +18,8 @@ def list_old_page_2(conn):
         "and not exists (select title from back where link = h.title and type = 'redirect') " + \
         'group by title ' + \
         'order by date asc ' + \
-        'limit ?, "50"' + \
-    ''), [str(sql_num)])
+        'limit ?, 50' + \
+    ''), [sql_num])
     n_list = curs.fetchall()
     for data in n_list:
         div += '<li><a href="/w/' + url_pas(data[0]) + '">' + html.escape(data[0]) + '</a> (' + re.sub(' .*$', '', data[1]) + ')</li>'

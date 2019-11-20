@@ -1,15 +1,22 @@
-import flask
 import urllib.parse
 import datetime
-import re
 import hashlib
+import flask
+import re
 
 def get_time():
     return str(datetime.datetime.today().strftime("%Y-%m-%d %H:%M:%S"))
 
+def db_data_get(data):
+    global set_data
+
+    set_data = data
+
 def db_change(data):
-    # data = data.replace('%', '%%')
-    # data = data.replace('?', '%s')
+    if set_data == 'mysql':
+        data = data.replace('random()', 'rand()')
+        data = data.replace('%', '%%')
+        data = data.replace('?', '%s')
 
     return data
     

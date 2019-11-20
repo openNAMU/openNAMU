@@ -20,11 +20,11 @@ def view_xref_2(conn, name):
     curs.execute(db_change("" + \
         "select link, type from back " + \
         "where (title = ? and not type = 'cat' and not type = 'no') or (title like ? and type = 'redirect')" + \
-        "order by link asc limit ?, '50'" + \
+        "order by link asc limit ?, 50" + \
     ""), [
         name,
         name + '#s-%',
-        str(sql_num)
+        sql_num
     ])
     data_list = curs.fetchall()
     for data in data_list:

@@ -44,15 +44,15 @@ def recent_changes_2(conn, name, tool):
                         'select id, title, date, ip, send, leng from history ' + \
                         'where send like ? or send like ? ' + \
                         'order by id + 0 desc ' + \
-                        "limit ?, '50'" + \
-                    ''), ['%(<a>' + name +'</a>%', '%<a>' + name + '</a> move)', str(sql_num)])
+                        "limit ?, 50" + \
+                    ''), ['%(<a>' + name +'</a>%', '%<a>' + name + '</a> move)', sql_num])
                 else:
                     curs.execute(db_change('' + \
                         'select id, title, date, ip, send, leng from history ' + \
                         'where title = ? ' + \
                         'order by id + 0 desc ' + \
-                        "limit ?, '50'" + \
-                    ''), [name, str(sql_num)])
+                        "limit ?, 50" + \
+                    ''), [name, sql_num])
             else:
                 div +=  '''
                         <td id="main_table_width">''' + load_lang('document_name') + '''</td>
@@ -63,7 +63,10 @@ def recent_changes_2(conn, name, tool):
 
                 div = '<a href="/topic_record/' + url_pas(name) + '">(' + load_lang('discussion') + ')</a><hr class=\"main_hr\">' + div
                 
-                curs.execute(db_change("select id, title, date, ip, send, leng from history where ip = ? order by date desc limit ?, '50'"), [name, str(sql_num)])
+                curs.execute(db_change('' + \
+                    'select id, title, date, ip, send, leng from history ' + \
+                    "where ip = ? order by date desc limit ?, 50" + \
+                ''), [name, sql_num])
         else:
             num = int(number_check(flask.request.args.get('num', '1')))
             if num * 50 > 0:
@@ -87,7 +90,7 @@ def recent_changes_2(conn, name, tool):
                 "where " + ('' if set_user == 'user' else 'not ') + "title like 'user:%' " + \
                 'order by date desc ' + \
                 'limit ?, 50' + \
-            ''), [str(sql_num)])
+            ''), [sql_num])
 
         data_list = curs.fetchall()
         for data in data_list:    
