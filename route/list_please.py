@@ -11,7 +11,7 @@ def list_please_2(conn):
         
     div = '<ul>'
     
-    curs.execute(db_change("select distinct title from back where type = 'no' order by title asc limit ?, '50'"), [str(sql_num)])
+    curs.execute(db_change("select distinct title from back where type = 'no' order by title asc limit ?, 50"), [sql_num])
     data_list = curs.fetchall()
     for data in data_list:
         div += '<li><a id="not_thing" href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a></li>'   

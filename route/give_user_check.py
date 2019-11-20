@@ -20,24 +20,24 @@ def give_user_check_2(conn, name):
     
     if flask.request.args.get('plus', None):
         end_check = 1
-    
-        if ip_or_user(name) == 1:
-            if ip_or_user(flask.request.args.get('plus', None)) == 1:
-                curs.execute(db_change("select name, ip, ua, today from ua_d where ip = ? or ip = ? order by today desc limit ?, '50'"), [name, flask.request.args.get('plus', None), sql_num])
-            else:
-                curs.execute(db_change("select name, ip, ua, today from ua_d where ip = ? or name = ? order by today desc limit ?, '50'"), [name, flask.request.args.get('plus', None), sql_num])
-        else:
-            if ip_or_user(flask.request.args.get('plus', None)) == 1:
-                curs.execute(db_change("select name, ip, ua, today from ua_d where name = ? or ip = ? order by today desc limit ?, '50'"), [name, flask.request.args.get('plus', None), sql_num])
-            else:
-                curs.execute(db_change("select name, ip, ua, today from ua_d where name = ? or name = ? order by today desc limit ?, '50'"), [name, flask.request.args.get('plus', None), sql_num])
+
+        curs.execute(db_change("" + \
+                "select name, ip, ua, today from ua_d " + \
+                "where " + ('ip' if ip_or_user(name) == 1 else 'name') + " = ? or " + \
+                ('ip' if ip_or_user(flask.request.args.get('plus', None)) == 1 else 'name') + " = ? " + \
+                "order by today desc limit ?, 50" + \
+            ""), [
+            name, 
+            flask.request.args.get('plus', None), 
+            sql_num
+        ])
     else:
         end_check = 0
         
-        if ip_or_user(name) == 1:
-            curs.execute(db_change("select name, ip, ua, today from ua_d where ip = ? order by today desc limit ?, '50'"), [name, sql_num])
-        else:
-            curs.execute(db_change("select name, ip, ua, today from ua_d where name = ? order by today desc limit ?, '50'"), [name, sql_num])
+        curs.execute(db_change("" + \
+            "select name, ip, ua, today from ua_d " + \
+            "where " + ('ip' if ip_or_user(name) == 1 else 'name') + " = ? order by today desc limit ?, 50" + \
+        ""), [name, sql_num])
     
     record = curs.fetchall()
     if record:

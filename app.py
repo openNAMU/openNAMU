@@ -75,11 +75,8 @@ while 1:
         
 print('DB name : ' + set_data['db'])
 db_name = set_data['db']
-            
-if os.path.exists(db_name + '.db'):
-    setup_tool = 0
-else:
-    setup_tool = 1
+
+db_data_get(set_data['db_type'])
 
 if set_data['db_type'] == 'mysql':
     try:
@@ -104,17 +101,44 @@ if set_data['db_type'] == 'mysql':
                 
         set_data_mysql = json.loads(open('data/mysql.json').read())
 
-    conn = pymysql.connect(
-        host = 'localhost', 
-        user = set_data_mysql['user'], 
-        password = set_data_mysql['password'],
-        db = db_name, 
-        charset = 'utf8mb4'
-    )
+    try:
+        conn = pymysql.connect(
+            host = 'localhost', 
+            user = set_data_mysql['user'], 
+            password = set_data_mysql['password'],
+            db = db_name, 
+            charset = 'utf8mb4'
+        )
+    except:
+        conn = pymysql.connect(
+            host = 'localhost', 
+            user = set_data_mysql['user'], 
+            password = set_data_mysql['password'],
+            db = db_name, 
+            charset = 'utf8mb4'
+        )
+        curs = conn.cursor()
+
+        curs.execute(db_change('create database ? default character set utf8mb4;'), [db_name])
+        conn.close()
+
+        conn = pymysql.connect(
+            host = 'localhost', 
+            user = set_data_mysql['user'], 
+            password = set_data_mysql['password'],
+            db = db_name, 
+            charset = 'utf8mb4'
+        )
+
     curs = conn.cursor()
 else:
     conn = sqlite3.connect(db_name + '.db', check_same_thread = False)
     curs = conn.cursor()
+            
+if os.path.exists(db_name + '.db'):
+    setup_tool = 0
+else:
+    setup_tool = 1
 
 load_conn(conn)
 

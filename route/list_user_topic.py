@@ -21,7 +21,7 @@ def list_user_topic_2(conn, name):
                     </tr>
             '''
     
-    curs.execute(db_change("select title, id, sub, ip, date from topic where ip = ? order by date desc limit ?, '50'"), [name, str(sql_num)])
+    curs.execute(db_change("select title, id, sub, ip, date from topic where ip = ? order by date desc limit ?, 50"), [name, sql_num])
     data_list = curs.fetchall()
     for data in data_list:
         title = html.escape(data[0])

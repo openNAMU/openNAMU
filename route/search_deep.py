@@ -36,8 +36,8 @@ def search_deep_2(conn, name):
     curs.execute(db_change("" + \
         "select distinct title, case when title like ? then 'title' else 'data' " + \
         "end from data where title like ? or data like ? order by case " + \
-        "when title like ? then 1 else 2 end limit ?, '50'"),
-        ['%' + name + '%', '%' + name + '%', '%' + name + '%', '%' + name + '%', str(sql_num)]
+        "when title like ? then 1 else 2 end limit ?, 50"),
+        ['%' + name + '%', '%' + name + '%', '%' + name + '%', '%' + name + '%', sql_num]
     )
     all_list = curs.fetchall()
     if all_list:

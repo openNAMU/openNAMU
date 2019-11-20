@@ -14,7 +14,7 @@ def api_search_2(conn, name):
         "select distinct title, case when title like ? then 'title' else 'data' " + \
         "end from data where title like ? or data like ? order by case " + \
         "when title like ? then 1 else 2 end limit ?"),
-        ['%' + name + '%', '%' + name + '%', '%' + name + '%', '%' + name + '%', str(num)]
+        ['%' + name + '%', '%' + name + '%', '%' + name + '%', '%' + name + '%', num]
     )
     all_list = curs.fetchall()
     if all_list:

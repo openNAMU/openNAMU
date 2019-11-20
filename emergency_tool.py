@@ -1,28 +1,117 @@
 from route.tool.func import *
-from route.tool.mark import load_conn2, namumark
 
-try:
-    set_data = json.loads(open('data/set.json').read())
-except:
-    if os.getenv('NAMU_DB') != None:
-        set_data = { "db" : os.getenv('NAMU_DB') }
-    else:
-        print('DB name (data) : ', end = '')
-        
-        new_json = str(input())
-        if new_json == '':
-            new_json = 'data'
-            
-        with open('data/set.json', 'w') as f:
-            f.write('{ "db" : "' + new_json + '" }')
-            
+while 1:
+    try:
         set_data = json.loads(open('data/set.json').read())
+        if not 'db_type' in set_data:
+            try:
+                os.remove('data/set.json')
+            except:
+                print('Please delete set.json')
+                print('----')
+                raise
+        else:
+            break
+    except:
+        if os.getenv('NAMU_DB') != None or os.getenv('NAMU_DB_TYPE') != None:
+            set_data = { 
+                "db" : os.getenv('NAMU_DB') if os.getenv('NAMU_DB') else 'data', 
+                "db_type" : os.getenv('NAMU_DB_TYPE') if os.getenv('NAMU_DB_TYPE') else 'sqlite'
+            }
+
+            break
+        else:        
+            new_json = ['', '']
+            normal_db_type = ['sqlite', 'mysql']
+
+            print('DB type (sqlite, mysql) : ', end = '')
+            new_json[0] = str(input())
+            if new_json[0] == '' or not new_json[0] in normal_db_type:
+                new_json[0] = 'sqlite'
+
+            all_src = []
+            for i_data in os.listdir("."):
+                f_src = re.search("(.+)\.db$", i_data)
+                if f_src:
+                    all_src += [f_src.groups()[0]]
+
+            if all_src != []:
+                print('DB name (' + ', '.join(all_src) + ') : ', end = '')
+            else:
+                print('DB name (data) : ', end = '')
+
+            new_json[1] = str(input())
+            if new_json[1] == '':
+                new_json[1] = 'data'
+                
+            with open('data/set.json', 'w') as f:
+                f.write('{ "db" : "' + new_json[1] + '", "db_type" : "' + new_json[0] + '" }')
+                
+            set_data = json.loads(open('data/set.json').read())
+            
+            break
         
 print('DB name : ' + set_data['db'])
 db_name = set_data['db']
 
-conn = sqlite3.connect(db_name + '.db', check_same_thread = False)
-curs = conn.cursor()
+db_data_get(set_data['db_type'])
+
+if set_data['db_type'] == 'mysql':
+    try:
+        set_data_mysql = json.loads(open('data/mysql.json').read())
+    except:
+        new_json = ['', '']
+
+        while 1:
+            print('DB user id : ', end = '')
+            new_json[0] = str(input())
+            if new_json[0] != '':
+                break
+
+        while 1:
+            print('DB password : ', end = '')
+            new_json[1] = str(input())
+            if new_json[1] != '':
+                break
+
+        with open('data/mysql.json', 'w') as f:
+            f.write('{ "user" : "' + new_json[0] + '", "password" : "' + new_json[1] + '" }')
+                
+        set_data_mysql = json.loads(open('data/mysql.json').read())
+
+    try:
+        conn = pymysql.connect(
+            host = 'localhost', 
+            user = set_data_mysql['user'], 
+            password = set_data_mysql['password'],
+            db = db_name, 
+            charset = 'utf8mb4'
+        )
+    except:
+        conn = pymysql.connect(
+            host = 'localhost', 
+            user = set_data_mysql['user'], 
+            password = set_data_mysql['password'],
+            db = db_name, 
+            charset = 'utf8mb4'
+        )
+        curs = conn.cursor()
+
+        curs.execute(db_change('create database ? default character set utf8mb4;'), [db_name])
+        conn.close()
+
+        conn = pymysql.connect(
+            host = 'localhost', 
+            user = set_data_mysql['user'], 
+            password = set_data_mysql['password'],
+            db = db_name, 
+            charset = 'utf8mb4'
+        )
+
+    curs = conn.cursor()
+else:
+    conn = sqlite3.connect(db_name + '.db', check_same_thread = False)
+    curs = conn.cursor()
 
 load_conn(conn)
 
@@ -37,6 +126,7 @@ print('7. Change password')
 print('8. Reset version')
 print('9. Delete set.json')
 print('10. Change name')
+print('11. Delete mysql.json')
 
 print('----')
 print('Select : ', end = '')
@@ -135,7 +225,7 @@ elif what_i_do == '9':
         os.remove('data/set.json')
     except:
         pass
-else:
+elif what_i_do == '10':
     print('----')
     print('User name : ', end = '')
     user_name = input()
@@ -145,6 +235,11 @@ else:
     new_name = input()
 
     curs.execute(db_change("update user set id = ? where id = ?"), [new_name, user_name])
+else:
+    try:
+        os.remove('data/mysql.json')
+    except:
+        pass
 
 conn.commit()
 
