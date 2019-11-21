@@ -681,7 +681,7 @@ def main_views(name = None):
 
 @app.route('/<data>')
 def main_file(data = None):
-    return main_file_2(conn, data)
+    return main_file_2(conn, data) if re.search('\.txt$', data) else main_error_404_2(conn)
 
 # End
 @app.errorhandler(404)
