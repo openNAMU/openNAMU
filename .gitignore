@@ -2,6 +2,7 @@ __pycache__
 /app_session
 data/set.json
 data/mysql.json
+404.html
 .vscode
 
 *.db
