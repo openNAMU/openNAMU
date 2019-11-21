@@ -381,6 +381,9 @@ def next_fix(link, num, page, end = 50):
     return list_data
 
 def other2(data):
+    for _ in range(0, 3 - len(data)):
+        data += ['']
+
     req_list = ''
     
     css_filter = {
@@ -407,7 +410,7 @@ def other2(data):
         else:
             req_list += '<script src="/views/main_css/js/' + i_data + '?ver=1"></script>'
 
-    data += ['', '''
+    data = data[0:2] + ['', '''
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css">
         <link   rel="stylesheet"
                 href="https://cdn.jsdelivr.net/npm/katex@0.10.1/dist/katex.min.css"
@@ -417,7 +420,9 @@ def other2(data):
                 integrity="sha384-2BKqo+exmr9su6dir+qCw08N2ZKRucY4PrGQPPWU1A7FtlCGjmEGFqXCv5nyM5Ij"
                 crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
-    ''' + req_list]
+    ''' + req_list] + data[2:]
+
+    print(data[2:])
 
     return data
 

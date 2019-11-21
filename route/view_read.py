@@ -6,6 +6,7 @@ def view_read_2(conn, name):
     sub = ''
     acl = ''
     div = ''
+    ip = ip_check()
 
     num = flask.request.args.get('num', None)
     if num:
@@ -199,9 +200,18 @@ def view_read_2(conn, name):
             <div id="get_user_info"></div>
             <script>load_user_info("''' + user_name + '''");</script>
         ''' + div
+
+    if ip_or_user(ip) == 0:
+        curs.execute(db_change("select title from scan where user = ? and title = ?"), [ip, name])
+        if curs.fetchall():
+            watch_list = 2
+        else:
+            watch_list = 1
+    else:
+        watch_list = 0
         
     return easy_minify(flask.render_template(skin_check(), 
-        imp = [flask.request.args.get('show', name), wiki_set(), custom(), other2([sub + acl, r_date])],
+        imp = [flask.request.args.get('show', name), wiki_set(), custom(), other2([sub + acl, r_date, watch_list])],
         data = div,
         menu = menu
     )), response_data
