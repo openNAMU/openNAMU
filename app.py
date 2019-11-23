@@ -74,6 +74,7 @@ while 1:
             break
         
 print('DB name : ' + set_data['db'])
+print('DB type : ' + set_data['db_type'])
 db_name = set_data['db']
 
 db_data_get(set_data['db_type'])
@@ -101,36 +102,20 @@ if set_data['db_type'] == 'mysql':
                 
         set_data_mysql = json.loads(open('data/mysql.json').read())
 
-    try:
-        conn = pymysql.connect(
-            host = 'localhost', 
-            user = set_data_mysql['user'], 
-            password = set_data_mysql['password'],
-            db = db_name, 
-            charset = 'utf8mb4'
-        )
-    except:
-        conn = pymysql.connect(
-            host = 'localhost', 
-            user = set_data_mysql['user'], 
-            password = set_data_mysql['password'],
-            db = db_name, 
-            charset = 'utf8mb4'
-        )
-        curs = conn.cursor()
-
-        curs.execute(db_change('create database ? default character set utf8mb4;'), [db_name])
-        conn.close()
-
-        conn = pymysql.connect(
-            host = 'localhost', 
-            user = set_data_mysql['user'], 
-            password = set_data_mysql['password'],
-            db = db_name, 
-            charset = 'utf8mb4'
-        )
-
+    conn = pymysql.connect(
+        host = 'localhost', 
+        user = set_data_mysql['user'], 
+        password = set_data_mysql['password'],
+        charset = 'utf8mb4'
+    )
     curs = conn.cursor()
+
+    try:
+        curs.execute(db_change('create database ? default character set utf8mb4;')%pymysql.escape_string(db_name))
+    except:
+        pass
+
+    curs.execute(db_change('use ?')%pymysql.escape_string(db_name))
 else:
     conn = sqlite3.connect(db_name + '.db', check_same_thread = False)
     curs = conn.cursor()
@@ -315,6 +300,17 @@ if back_time != 0:
     back_up()
 else:
     print('Back up state : Turn off')
+
+if set_data['db_type'] == 'mysql':
+    def mysql_dont_off():
+        try:
+            urllib.request.urlopen('http://localhost:' + str(server_set['port']) + '/')
+        except:
+            pass
+
+        threading.Timer(60 * 60 * 6, mysql_dont_off).start()
+
+    mysql_dont_off()
 
 conn.commit()
 

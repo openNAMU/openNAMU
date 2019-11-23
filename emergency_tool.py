@@ -1,5 +1,6 @@
 from route.tool.func import *
 
+# DB
 while 1:
     try:
         set_data = json.loads(open('data/set.json').read())
@@ -79,42 +80,27 @@ if set_data['db_type'] == 'mysql':
                 
         set_data_mysql = json.loads(open('data/mysql.json').read())
 
-    try:
-        conn = pymysql.connect(
-            host = 'localhost', 
-            user = set_data_mysql['user'], 
-            password = set_data_mysql['password'],
-            db = db_name, 
-            charset = 'utf8mb4'
-        )
-    except:
-        conn = pymysql.connect(
-            host = 'localhost', 
-            user = set_data_mysql['user'], 
-            password = set_data_mysql['password'],
-            db = db_name, 
-            charset = 'utf8mb4'
-        )
-        curs = conn.cursor()
-
-        curs.execute(db_change('create database ? default character set utf8mb4;'), [db_name])
-        conn.close()
-
-        conn = pymysql.connect(
-            host = 'localhost', 
-            user = set_data_mysql['user'], 
-            password = set_data_mysql['password'],
-            db = db_name, 
-            charset = 'utf8mb4'
-        )
-
+    conn = pymysql.connect(
+        host = 'localhost', 
+        user = set_data_mysql['user'], 
+        password = set_data_mysql['password'],
+        charset = 'utf8mb4'
+    )
     curs = conn.cursor()
+
+    try:
+        curs.execute(db_change('create database ? default character set utf8mb4;')%pymysql.escape_string(db_name))
+    except:
+        pass
+
+    curs.execute(db_change('use ?')%pymysql.escape_string(db_name))
 else:
     conn = sqlite3.connect(db_name + '.db', check_same_thread = False)
     curs = conn.cursor()
 
 load_conn(conn)
 
+# Main
 print('----')
 print('1. Backlink reset')
 print('2. reCAPTCHA delete')
