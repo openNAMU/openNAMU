@@ -602,7 +602,7 @@ def namu(conn, data, title, main_num, include_num):
     anchor_re = re.compile("\[anchor\((?P<in>(?:(?!\)\]).)+)\)\]", re.I)
     data = anchor_re.sub('<span id="\g<in>"></span>', data)
 
-    ruby_re = re.compile("\[ruby\((?P<in>(?:(?!,).)+)\, ?ruby=(?P<out>(?:(?!\)\]|,).)+)(?:\, ?color=(?P<under>(?:(?!\)\]).)+))?\)\]", re.I)
+    ruby_re = re.compile("\[ruby\((?P<in>(?:(?!,).)+)\, ?ruby=(?P<out>(?:(?!\)\]|,).)+)(?:\, ?color=(?P<under>(?:(?!\)\]|,).)+)(?:, ?(?:(?:(?!\)\]).)+))?)?\)\]", re.I)
     data = ruby_re.sub('<ruby>\g<in><rp>(</rp><rt style="color: \g<under>">\g<out></rt><rp>)</rp></ruby>', data)
 
     now_time = tool.get_time()
