@@ -422,8 +422,6 @@ def other2(data):
         <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
     ''' + req_list] + data[2:]
 
-    print(data[2:])
-
     return data
 
 def cut_100(data):
