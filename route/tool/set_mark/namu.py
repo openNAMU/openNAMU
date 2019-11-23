@@ -453,10 +453,6 @@ def namu(conn, data, title, main_num, include_num):
             break
 
     data = re.sub('\r\n', '\n', data)
-
-    t_data = middle_parser(data, t_data[1][0], t_data[1][1], t_data[1][2], include_num)
-    data = t_data[0]
-
     data = re.sub('&amp;', '&', data)
 
     data = re.sub('\n( +)\|\|', '\n||', data)
