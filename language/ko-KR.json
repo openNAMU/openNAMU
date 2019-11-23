@@ -299,5 +299,7 @@
     "icon": "아이콘",
     "topic_setting" : "토론 설정",
     "old_page" : "오래된 문서",
-    "skin_set" : "스킨 설정"
+    "skin_set" : "스킨 설정",
+    "edit_help" : "편집창 문구",
+    "defalut_edit_help" : "이곳에 내용을 써주세요"
 }

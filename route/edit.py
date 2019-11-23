@@ -111,13 +111,20 @@ def edit_2(conn, name):
         else:
             b_text = ''
 
+        curs.execute(db_change('select data from other where name = "edit_help"'))
+        sql_d = curs.fetchall()
+        if sql_d and sql_d[0][0] != '':
+            p_text = sql_d[0][0]
+        else:
+            p_text = load_lang('defalut_edit_help')
+
         return easy_minify(flask.render_template(skin_check(), 
             imp = [name, wiki_set(), custom(), other2([' (' + load_lang('edit') + ')', 0])],
             data =  get_name + '''
                 <form method="post">
                     <script>do_stop_exit();</script>
                     ''' + edit_button() + '''
-                    <textarea rows="25" id="content" name="content">''' + html.escape(re.sub('\n$', '', data)) + '''</textarea>
+                    <textarea rows="25" id="content" placeholder="''' + p_text + '''" name="content">''' + html.escape(re.sub('\n$', '', data)) + '''</textarea>
                     <textarea id="origin" name="otent">''' + html.escape(re.sub('\n$', '', data_old)) + '''</textarea>
                     <hr class=\"main_hr\">
                     <input placeholder="''' + load_lang('why') + '''" name="send" type="text">
