@@ -8,7 +8,7 @@ def api_user_info_2(conn, name):
         plus_t = []
 
         plus_d = '''
-            <table>
+            <table class="user_info_table">
                 <tbody>
                     <tr>
                         <td>''' + load_lang('user_name') + '''</td>
