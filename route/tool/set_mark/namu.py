@@ -297,11 +297,11 @@ def middle_parser(data, fol_num, syntax_num, folding_num, include_num):
                                                     else:
                                                         middle_search = re.search('^#!html', middle_data[0])
                                                         if middle_search:
-                                                            middle_list += ['div_2']
+                                                            middle_list += ['span']
                                                             
                                                             html_number += 1
                                                         
-                                                            data = middle_re.sub('<div id="' + include_num + 'render_contect_' + str(html_number) + '">', data, 1)
+                                                            data = middle_re.sub('<span id="' + include_num + 'render_contect_' + str(html_number) + '">', data, 1)
                                                         else:
                                                             middle_list += ['span']
 
