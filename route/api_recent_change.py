@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def api_search_2(conn, name):
+def api_recent_change_2(conn):
     curs = conn.cursor()
 
     num = int(number_check(flask.request.args.get('num', '10')))
@@ -14,14 +14,14 @@ def api_search_2(conn, name):
     if page * num > 0:
         page = page * num - num
     else:
-        page = 0      
+        page = 0   
 
-    curs.execute(db_change("" + \
-        "select distinct title, case when title like ? then 'title' else 'data' " + \
-        "end from data where title like ? or data like ? order by case " + \
-        "when title like ? then 1 else 2 end limit ?, ?"),
-        ['%' + name + '%', '%' + name + '%', '%' + name + '%', '%' + name + '%', page, num]
-    )
+    curs.execute(db_change('' + \
+        'select id, title, date, ip, send, leng from history ' + \
+        "where not title like 'user:%' " + \
+        'order by date desc ' + \
+        'limit ?, ?' + \
+    ''), [page, num])
     all_list = curs.fetchall()
     if all_list:
         return flask.jsonify(all_list)
