@@ -22,6 +22,7 @@ def main_other_2(conn):
                 <li><a href="/block_log">''' + load_lang('recent_ban') + '''</a></li>
                 <li><a href="/user_log">''' + load_lang('member_list') + '''</a></li>
                 <li><a href="/admin_log">''' + load_lang('authority_use_list') + '''</a></li>
+                <li><a href="/old_page">''' + load_lang('old_page') + '''</a></li>
             </ul>
             <br>
             <h2>''' + load_lang('other') + '''</h2>

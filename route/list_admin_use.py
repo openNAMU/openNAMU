@@ -15,11 +15,11 @@ def list_admin_use_2(conn):
         list_data = '<ul>'
 
         if flask.request.args.get('search', 'normal') == 'normal':
-            curs.execute("select who, what, time from re_admin order by time desc limit ?, '50'", [str(sql_num)])
+            curs.execute(db_change("select who, what, time from re_admin order by time desc limit ?, 50"), [sql_num])
         else:
-            curs.execute("select who, what, time from re_admin where what like ? order by time desc limit ?, '50'", [
+            curs.execute(db_change("select who, what, time from re_admin where what like ? order by time desc limit ?, 50"), [
                 flask.request.args.get('search', 'normal') + "%",
-                str(sql_num)
+                sql_num
             ])
 
         get_list = curs.fetchall()

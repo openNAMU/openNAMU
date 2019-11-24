@@ -12,7 +12,7 @@ def user_tool_2(conn, name):
     '''
             
     if admin_check(1) == 1:
-        curs.execute("select block from ban where block = ?", [name])
+        curs.execute(db_change("select block from ban where block = ?"), [name])
         if curs.fetchall():
             ban_name = load_lang('ban_release')
         else:

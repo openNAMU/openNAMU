@@ -36,6 +36,10 @@ function topic_main_load(name, sub, s_num) {
 
                     if(markup === 'markdown') {
                         render_markdown();
+                    } else {
+                        for(var key in t_data) {
+                            render_html('topic_' + String(key) + '-');
+                        }
                     }
                 }
             }

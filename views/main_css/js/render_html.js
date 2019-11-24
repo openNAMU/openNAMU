@@ -5,18 +5,18 @@ function render_html(name = '') {
         if(document.getElementById(name + 'render_contect_' + String(num))) {
             data = document.getElementById(name + 'render_contect_' + String(num)).innerHTML;
 
-            t_data = ['b', 'i', 's', 'del']
+            var t_data = ['b', 'i', 's', 'del']
             for(var key in t_data) {
                 var patt = new RegExp('&lt;' + t_data[key] + '&gt;((?:(?!&lt;\/' + t_data[key] + '&gt;).)*)&lt;\/' + t_data[key] + '&gt;', 'ig');
                 data = data.replace(patt, '<' + t_data[key] + '>$1</' + t_data[key] + '>');
             }
             
-            src_list = {
+            var src_list = {
                 'www.youtube.com' : '1',
                 'www.google.com' : '1'
             }
-            data = data.replace(/&lt;iframe( (?:(?:(?!&gt;).)+))&gt;&lt;\/iframe&gt;/g, function(full, in_data) {
-                src_data = in_data.match(/ src=['"]https:\/\/([^/'"]+)(?:[^'"]+)['"](?: |$)/);
+            data = data.replace(/&lt;iframe( (?:(?:(?!&gt;).)+))&gt;&lt;\/iframe&gt;/ig, function(full, in_data) {
+                var src_data = in_data.match(/ src=['"]https:\/\/([^/'"]+)(?:[^'"]+)['"](?: |$)/);
                 if(src_data) {
                     if(src_list[src_data[1]]) {
                         return '<iframe' + in_data + '></iframe>';
@@ -24,6 +24,18 @@ function render_html(name = '') {
                         return full;
                     }
                 }
+            });
+
+            t_data = ['div', 'span']
+            for(var key in t_data) {
+                patt = new RegExp('&lt;' + t_data[key] + ' style=["\']((?:(?!["\']).)+)["\']&gt;((?:(?!&lt;\/' + t_data[key] + '&gt;).)*)&lt;\/' + t_data[key] + '&gt;', 'ig');
+                data = data.replace(patt, function(full, in_data, in_data_2) {
+                    return '<' + t_data[key] + ' style="' + in_data.replace(/position/ig, '') + '">' + in_data_2 + '</' + t_data[key] + '>'
+                });
+            }
+
+            data = data.replace(/&lt;a href=["\']((?:(?!["\']).)+)["\']&gt;((?:(?!&lt;\/a&gt;).)*)&lt;\/a&gt;/ig, function(full, in_data, in_data_2) {
+                return '<a id="out_link" href="' + in_data.replace(/^javascript/ig, '') + '">' + in_data_2 + '</a>'
             });
             
             document.getElementById(name + 'render_contect_' + String(num)).innerHTML = data;

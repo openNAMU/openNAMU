@@ -22,7 +22,7 @@ def edit_2(conn, name):
         today = get_time()
         content = savemark(flask.request.form.get('content', ''))
         
-        curs.execute("select data from data where title = ?", [name])
+        curs.execute(db_change("select data from data where title = ?"), [name])
         old = curs.fetchall()
         if old:
             leng = leng_check(len(flask.request.form.get('otent', '')), len(content))
@@ -30,15 +30,15 @@ def edit_2(conn, name):
             if flask.request.args.get('section', None):
                 content = old[0][0].replace(flask.request.form.get('otent', ''), content)
                 
-            curs.execute("update data set data = ? where title = ?", [content, name])
+            curs.execute(db_change("update data set data = ? where title = ?"), [content, name])
         else:
             leng = '+' + str(len(content))
             
-            curs.execute("insert into data (title, data) values (?, ?)", [name, content])
+            curs.execute(db_change("insert into data (title, data) values (?, ?)"), [name, content])
 
-        curs.execute("select user from scan where title = ?", [name])
+        curs.execute(db_change("select user from scan where title = ?"), [name])
         for _ in curs.fetchall():
-            curs.execute("insert into alarm (name, data, date) values (?, ?, ?)", [ip, ip + ' - <a href="/w/' + url_pas(name) + '">' + name + '</a> (Edit)', today])
+            curs.execute(db_change("insert into alarm (name, data, date) values (?, ?, ?)"), [ip, ip + ' - <a href="/w/' + url_pas(name) + '">' + name + '</a> (Edit)', today])
 
         history_plus(
             name,
@@ -49,8 +49,8 @@ def edit_2(conn, name):
             leng
         )
         
-        curs.execute("delete from back where link = ?", [name])
-        curs.execute("delete from back where title = ? and type = 'no'", [name])
+        curs.execute(db_change("delete from back where link = ?"), [name])
+        curs.execute(db_change("delete from back where title = ? and type = 'no'"), [name])
         
         render_set(
             title = name,
@@ -62,7 +62,7 @@ def edit_2(conn, name):
         
         return redirect('/w/' + url_pas(name))
     else:            
-        curs.execute("select data from data where title = ?", [name])
+        curs.execute(db_change("select data from data where title = ?"), [name])
         new = curs.fetchall()
         if new:
             if flask.request.args.get('section', None):
@@ -98,31 +98,39 @@ def edit_2(conn, name):
             get_name = ''
             
         if flask.request.args.get('plus', None):
-            curs.execute("select data from data where title = ?", [flask.request.args.get('plus', 'test')])
+            curs.execute(db_change("select data from data where title = ?"), [flask.request.args.get('plus', 'test')])
             get_data = curs.fetchall()
             if get_data:
                 data = get_data[0][0]
                 get_name = ''
 
-        curs.execute('select data from other where name = "edit_bottom_text"')
+        curs.execute(db_change('select data from other where name = "edit_bottom_text"'))
         sql_d = curs.fetchall()
         if sql_d and sql_d[0][0] != '':
             b_text = '<hr class=\"main_hr\">' + sql_d[0][0]
         else:
             b_text = ''
 
+        curs.execute(db_change('select data from other where name = "edit_help"'))
+        sql_d = curs.fetchall()
+        if sql_d and sql_d[0][0] != '':
+            p_text = sql_d[0][0]
+        else:
+            p_text = load_lang('defalut_edit_help')
+
         return easy_minify(flask.render_template(skin_check(), 
             imp = [name, wiki_set(), custom(), other2([' (' + load_lang('edit') + ')', 0])],
             data =  get_name + '''
                 <form method="post">
+                    <script>do_stop_exit();</script>
                     ''' + edit_button() + '''
-                    <textarea id="content" rows="25" id="content" name="content">''' + html.escape(re.sub('\n$', '', data)) + '''</textarea>
-                    <textarea style="display: none;" name="otent">''' + html.escape(re.sub('\n$', '', data_old)) + '''</textarea>
+                    <textarea rows="25" id="content" placeholder="''' + p_text + '''" name="content">''' + html.escape(re.sub('\n$', '', data)) + '''</textarea>
+                    <textarea id="origin" name="otent">''' + html.escape(re.sub('\n$', '', data_old)) + '''</textarea>
                     <hr class=\"main_hr\">
                     <input placeholder="''' + load_lang('why') + '''" name="send" type="text">
                     <hr class=\"main_hr\">
                     ''' + captcha_get() + ip_warring() + '''
-                    <button id="save" type="submit">''' + load_lang('save') + '''</button>
+                    <button id="save" type="submit" onclick="go_save_zone = 1;">''' + load_lang('save') + '''</button>
                     <button id="preview" type="button" onclick="load_preview(\'''' + url_pas(name) + '\')">' + load_lang('preview') + '''</button>
                 </form>
                 ''' + b_text + '''

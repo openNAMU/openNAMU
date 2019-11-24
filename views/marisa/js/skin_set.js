@@ -63,7 +63,7 @@ function main_load() {
         cookies.match(regex_data('invert')) &&
         cookies.match(regex_data('invert'))[1] === '1'
     ) {
-        head_data.innerHTML += '<link rel="stylesheet" href="/views/marisa/css/dark.css?ver=1">';
+        head_data.innerHTML += '<link rel="stylesheet" href="/views/marisa/css/dark.css?ver=2">';
     }
 }
 
@@ -81,7 +81,6 @@ function skin_set() {
                 "default" : "Default",
                 "change_to_normal" : "Change to normal text",
                 "delete" : "Delete",
-                "skin_setting" : "Skin settings",
                 "include_link" : "Using include link",
                 "save" : "Save",
                 "strike" : "Strike",
@@ -92,7 +91,6 @@ function skin_set() {
                 "default" : "기본값",
                 "change_to_normal" : "일반 텍스트로 변경",
                 "delete" : "삭제",
-                "skin_setting" : "스킨 설정",
                 "include_link" : "틀 링크 사용",
                 "save" : "저장",
                 "strike" : "취소선",
@@ -111,11 +109,8 @@ function skin_set() {
         if(!language in set_language) {
             language = "en-US";
         }
-
-        document.getElementById("main_top").innerHTML = '<h1>' + set_language[language]['skin_setting'] + '</h1>';
-        document.title = document.title.replace(/.*(\- .*)$/, set_language[language]['skin_setting'] + " $1");
         
-        data = document.getElementById("main_data");
+        data = document.getElementById("main_skin_set");
         set_data = {};
 
         if(cookies.match(regex_data('del_strike'))) {

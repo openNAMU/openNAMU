@@ -30,14 +30,14 @@ def give_acl_2(conn, name):
                 check_ok = 'disabled'
 
     if flask.request.method == 'POST':
-        curs.execute("select title from acl where title = ?", [name])
+        curs.execute(db_change("select title from acl where title = ?"), [name])
         if curs.fetchall():
-            curs.execute("update acl set decu = ? where title = ?", [flask.request.form.get('decu', ''), name])
-            curs.execute("update acl set dis = ? where title = ?", [flask.request.form.get('dis', ''), name])
-            curs.execute("update acl set why = ? where title = ?", [flask.request.form.get('why', ''), name])
-            curs.execute("update acl set view = ? where title = ?", [flask.request.form.get('view', ''), name])
+            curs.execute(db_change("update acl set decu = ? where title = ?"), [flask.request.form.get('decu', ''), name])
+            curs.execute(db_change("update acl set dis = ? where title = ?"), [flask.request.form.get('dis', ''), name])
+            curs.execute(db_change("update acl set why = ? where title = ?"), [flask.request.form.get('why', ''), name])
+            curs.execute(db_change("update acl set view = ? where title = ?"), [flask.request.form.get('view', ''), name])
         else:
-            curs.execute("insert into acl (title, decu, dis, why, view) values (?, ?, ?, ?, ?)", [
+            curs.execute(db_change("insert into acl (title, decu, dis, why, view) values (?, ?, ?, ?, ?)"), [
                 name, 
                 flask.request.form.get('decu', ''), 
                 flask.request.form.get('dis', ''), 
@@ -45,9 +45,9 @@ def give_acl_2(conn, name):
                 flask.request.form.get('view', '')
             ])
         
-        curs.execute("select title from acl where title = ? and decu = '' and dis = '' and view = ''", [name])
+        curs.execute(db_change("select title from acl where title = ? and decu = '' and dis = '' and view = ''"), [name])
         if curs.fetchall():
-            curs.execute("delete from acl where title = ?", [name])
+            curs.execute(db_change("delete from acl where title = ?"), [name])
             
         all_d = ''
         for i in ['decu', 'dis', 'view']:
@@ -73,7 +73,7 @@ def give_acl_2(conn, name):
         else:
             acl_list = ['', 'user', 'admin', 'owner', '50_edit', 'email']
         
-        curs.execute("select decu from acl where title = ?", [name])
+        curs.execute(db_change("select decu from acl where title = ?"), [name])
         acl_data = curs.fetchall()
         for data_list in acl_list:
             if acl_data and acl_data[0][0] == data_list:
@@ -88,7 +88,7 @@ def give_acl_2(conn, name):
         if not re.search('^user:', name):
             data += '<hr class=\"main_hr\"><h2>' + load_lang('discussion_acl') + '</h2><hr class=\"main_hr\"><select name="dis" ' + check_ok + '>'
         
-            curs.execute("select dis, why, view from acl where title = ?", [name])
+            curs.execute(db_change("select dis, why, view from acl where title = ?"), [name])
             acl_data = curs.fetchall()
             for data_list in acl_list:
                 if acl_data and acl_data[0][0] == data_list:

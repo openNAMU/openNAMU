@@ -72,7 +72,7 @@ def setting_2(conn, num):
         
         if flask.request.method == 'POST':
             for i in i_list:
-                curs.execute("update other set data = ? where name = ?", [
+                curs.execute(db_change("update other set data = ? where name = ?"), [
                     flask.request.form.get(i_list[i], n_list[i]), 
                     i_list[i]]
                 )
@@ -86,12 +86,12 @@ def setting_2(conn, num):
             d_list = []
             
             for i in i_list:
-                curs.execute('select data from other where name = ?', [i_list[i]])
+                curs.execute(db_change('select data from other where name = ?'), [i_list[i]])
                 sql_d = curs.fetchall()
                 if sql_d:
                     d_list += [sql_d[0][0]]
                 else:
-                    curs.execute('insert into other (name, data) values (?, ?)', [i_list[i], n_list[i]])
+                    curs.execute(db_change('insert into other (name, data) values (?, ?)'), [i_list[i], n_list[i]])
                     
                     d_list += [n_list[i]]
 
@@ -225,11 +225,12 @@ def setting_2(conn, num):
             'password_search_text',
             'reset_user_text',
             'error_401',
-            'error_404'
+            'error_404',
+            'edit_help'
         ]
         if flask.request.method == 'POST':
             for i in i_list:
-                curs.execute("update other set data = ? where name = ?", [
+                curs.execute(db_change("update other set data = ? where name = ?"), [
                     flask.request.form.get(i, ''), 
                     i
                 ])
@@ -243,12 +244,12 @@ def setting_2(conn, num):
             d_list = []
             
             for i in i_list:
-                curs.execute('select data from other where name = ?', [i])
+                curs.execute(db_change('select data from other where name = ?'), [i])
                 sql_d = curs.fetchall()
                 if sql_d:
                     d_list += [sql_d[0][0]]
                 else:
-                    curs.execute('insert into other (name, data) values (?, ?)', [i, ''])
+                    curs.execute(db_change('insert into other (name, data) values (?, ?)'), [i, ''])
                     
                     d_list += ['']
 
@@ -302,6 +303,10 @@ def setting_2(conn, num):
                         <hr class=\"main_hr\">
                         <input name="''' + i_list[10] + '''" value="''' + html.escape(d_list[10]) + '''">
                         <hr class=\"main_hr\">
+                        <span>''' + load_lang('edit_help') + '''</span>
+                        <hr class=\"main_hr\">
+                        <input name="''' + i_list[11] + '''" value="''' + html.escape(d_list[11]) + '''">
+                        <hr class=\"main_hr\">
                         <button id="save" type="submit">''' + load_lang('save') + '''</button>
                     </form>
                 ''',
@@ -325,15 +330,15 @@ def setting_2(conn, num):
                 else:
                     coverage = flask.request.args.get('skin', '')
                 
-            curs.execute("select name from other where name = ? and coverage = ?", [info_d, coverage])
+            curs.execute(db_change("select name from other where name = ? and coverage = ?"), [info_d, coverage])
             if curs.fetchall():
-                curs.execute("update other set data = ? where name = ? and coverage = ?", [
+                curs.execute(db_change("update other set data = ? where name = ? and coverage = ?"), [
                     flask.request.form.get('content', ''),
                     info_d,
                     coverage
                 ])
             else:
-                curs.execute("insert into other (name, data, coverage) values (?, ?, ?)", [info_d, flask.request.form.get('content', ''), coverage])
+                curs.execute(db_change("insert into other (name, data, coverage) values (?, ?, ?)"), [info_d, flask.request.form.get('content', ''), coverage])
             
             conn.commit()
 
@@ -342,15 +347,15 @@ def setting_2(conn, num):
             return redirect('/setting/' + end_r + '?skin=' + flask.request.args.get('skin', ''))
         else:
             if num == 4:
-                curs.execute("select data from other where name = 'body'")
+                curs.execute(db_change("select data from other where name = 'body'"))
                 title = '_body'
                 start = ''
             elif num == 7:
-                curs.execute("select data from other where name = 'bottom_body'")
+                curs.execute(db_change("select data from other where name = 'bottom_body'"))
                 title = '_bottom_body'
                 start = ''
             else:
-                curs.execute("select data from other where name = 'head' and coverage = ?", [flask.request.args.get('skin', '')])
+                curs.execute(db_change("select data from other where name = 'head' and coverage = ?"), [flask.request.args.get('skin', '')])
                 title = '_head'
                 start = '<a href="?">(' + load_lang('all') + ')</a> ' + \
                 ' '.join(['<a href="?skin=' + i + '">(' + i + ')</a>' for i in load_skin('', 1)]) + \
@@ -380,11 +385,11 @@ def setting_2(conn, num):
             ))
     elif num == 5:
         if flask.request.method == 'POST':
-            curs.execute("select name from other where name = 'robot'")
+            curs.execute(db_change("select name from other where name = 'robot'"))
             if curs.fetchall():
-                curs.execute("update other set data = ? where name = 'robot'", [flask.request.form.get('content', '')])
+                curs.execute(db_change("update other set data = ? where name = 'robot'"), [flask.request.form.get('content', '')])
             else:
-                curs.execute("insert into other (name, data) values ('robot', ?)", [flask.request.form.get('content', '')])
+                curs.execute(db_change("insert into other (name, data) values ('robot', ?)"), [flask.request.form.get('content', '')])
             
             conn.commit()
             
@@ -396,7 +401,21 @@ def setting_2(conn, num):
 
             return redirect('/setting/4')
         else:
-            curs.execute("select data from other where name = 'robot'")
+            if not os.path.exists('robots.txt'):
+                curs.execute(db_change('select data from other where name = "robot"'))
+                robot_test = curs.fetchall()
+                if robot_test:
+                    fw_test = open('./robots.txt', 'w')
+                    fw_test.write(re.sub('\r\n', '\n', robot_test[0][0]))
+                    fw_test.close()
+                else:
+                    fw_test = open('./robots.txt', 'w')
+                    fw_test.write('User-agent: *\nDisallow: /\nAllow: /$\nAllow: /w/')
+                    fw_test.close()
+
+                    curs.execute(db_change('insert into other (name, data) values ("robot", "User-agent: *\nDisallow: /\nAllow: /$\nAllow: /w/")'))
+
+            curs.execute(db_change("select data from other where name = 'robot'"))
             robot = curs.fetchall()
             if robot:
                 data = robot[0][0]
@@ -413,7 +432,7 @@ def setting_2(conn, num):
             return easy_minify(flask.render_template(skin_check(), 
                 imp = ['robots.txt', wiki_set(), custom(), other2([0, 0])],
                 data = '''
-                    <a href="/robots.txt">(view)</a>
+                    <a href="/robots.txt">(''' + load_lang('view') + ''')</a>
                     <hr class=\"main_hr\">
                     <form method="post">
                         <textarea rows="25" name="content">''' + html.escape(data) + '''</textarea>
@@ -438,7 +457,7 @@ def setting_2(conn, num):
                 else:
                     into_data = flask.request.form.get(data, '')
 
-                curs.execute("update other set data = ? where name = ?", [into_data, data])
+                curs.execute(db_change("update other set data = ? where name = ?"), [into_data, data])
 
             conn.commit()
             
@@ -451,12 +470,12 @@ def setting_2(conn, num):
             x = 0
             
             for i in i_list:
-                curs.execute('select data from other where name = ?', [i])
+                curs.execute(db_change('select data from other where name = ?'), [i])
                 sql_d = curs.fetchall()
                 if sql_d:
                     d_list += [sql_d[0][0]]
                 else:
-                    curs.execute('insert into other (name, data) values (?, ?)', [i, ''])
+                    curs.execute(db_change('insert into other (name, data) values (?, ?)'), [i, ''])
                     
                     d_list += ['']
 

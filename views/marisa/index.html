@@ -4,18 +4,17 @@
         <meta charset="utf-8">
         <title>{{imp[0]}} - {{imp[1][0]}}</title>
         {{imp[3][3]|safe}}
-        <link rel="stylesheet" href="/views/marisa/css/main.css?ver=3">
+        <link rel="stylesheet" href="/views/marisa/css/main.css?ver=5">
         <script src="/views/marisa/js/search.js?ver=1"></script>
         <script src="/views/marisa/js/skin_set.js?ver=2"></script>
         <script src="/views/marisa/js/main.js?ver=1"></script>
         <script>window.onload = function () { search_do(); skin_set(); }</script>
         <script src="https://code.iconify.design/1/1.0.3/iconify.min.js"></script>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Noto+Sans+KR&display=swap">
         <link rel="shortcut icon" href="/views/main_css/file/favicon.ico?ver=1">
         {{imp[1][5]|safe}}
         {{imp[2][3]|safe}}
         <meta name="title" content="{{imp[0]}} - {{imp[1][0]}}">
-        <meta name="keywords" content="{{imp[1][0]}}">
+        <meta name="keywords" content="{{imp[0]}}">
         <meta name="description" content="{{data|cut_100}}">
         <meta name="viewport" content="width=device-width, initial-scale=1">
     </head>
@@ -29,18 +28,18 @@
                     <div id="top_tool" class="not_mobile">
                         <div id="top_tool_cel">
                             <a href="javascript:void(0);" onclick="opening('recent_cel');">
-                                <span class="iconify" data-icon="octicon:clock" data-inline="true"></span>
+                                <span class="iconify" data-icon="ic:baseline-access-time" data-inline="true"></span>
                                 {{'recent'|load_lang}}
-                                <span class="iconify" data-icon="octicon:chevron-down" data-inline="true"></span>
+                                <span class="iconify" data-icon="ic:baseline-arrow-drop-down" data-inline="true"></span>
                             </a>
                             <div id="recent_cel" class="cel_in_cel" style="display: none;">
                                 <a href="/recent_changes">
-                                    <span class="iconify" data-icon="octicon:sync" data-inline="true"></span>
+                                    <span class="iconify" data-icon="ic:baseline-autorenew" data-inline="true"></span>
                                     {{'edit'|load_lang}}
                                 </a>
                                 <hr>
                                 <a href="/recent_discuss">
-                                    <span class="iconify" data-icon="octicon:comment" data-inline="true"></span>
+                                    <span class="iconify" data-icon="ic:baseline-add-comment" data-inline="true"></span>
                                     {{'discussion'|load_lang}}
                                 </a>
                             </div>
@@ -48,23 +47,23 @@
                          
                         <div id="top_tool_cel">
                             <a href="javascript:void(0);" onclick="opening('other_cel');">
-                                <span class="iconify" data-icon="octicon:package" data-inline="true"></span>
+                                <span class="iconify" data-icon="ic:baseline-archive" data-inline="true"></span>
                                 {{'other'|load_lang}}
-                                <span class="iconify" data-icon="octicon:chevron-down" data-inline="true"></span>
+                                <span class="iconify" data-icon="ic:baseline-arrow-drop-down" data-inline="true"></span>
                             </a>
                             <div id="other_cel" class="cel_in_cel" style="display: none;">
                                 <a href="/random">
-                                    <span class="iconify" data-icon="octicon:repo-push" data-inline="true"></span>
+                                    <span class="iconify" data-icon="ic:baseline-shuffle" data-inline="true"></span>
                                     {{'random'|load_lang}}
                                 </a>
                                 <hr>
                                 <a href="/other">
-                                    <span class="iconify" data-icon="octicon:tools" data-inline="true"></span>
+                                    <span class="iconify" data-icon="ic:baseline-build" data-inline="true"></span>
                                     {{'tool'|load_lang}}
                                 </a>
                                 <hr>
                                 <a href="/skin_set">
-                                    <span class="iconify" data-icon="octicon:settings" data-inline="true"></span>
+                                    <span class="iconify" data-icon="ic:baseline-settings" data-inline="true"></span>
                                     {{'skin_setting'|load_lang}}
                                 </a>
                             </div>
@@ -74,12 +73,12 @@
                             <a href="/user">
                                 {% if imp[2][2] == 1 %}
                                     {% if imp[2][8] != '0' %}
-                                        <span class="iconify" data-icon="octicon:megaphone" data-inline="true"></span>
+                                        <span class="iconify" data-icon="ic:baseline-add-alert" data-inline="true"></span>
                                     {% else %}
-                                        <span class="iconify" data-icon="octicon:person" data-inline="true"></span>
+                                        <span class="iconify" data-icon="ic:baseline-person-add" data-inline="true"></span>
                                     {% endif %}
                                 {% else %}
-                                    <span class="iconify" data-icon="octicon:x" data-inline="true"></span>
+                                    <span class="iconify" data-icon="ic:baseline-person" data-inline="true"></span>
                                 {% endif %}
                                 {{imp[2][5]}}
                             </a>
@@ -89,18 +88,18 @@
                             <input id="search_input" name="search" placeholder="{{'search'|load_lang}}" autocomplete="off" type="search">
                             |
                             <button type="submit" formaction="/goto">
-                                <span class="iconify" data-icon="octicon:clippy" data-inline="true"></span>
+                                <span class="iconify" data-icon="ic:round-find-in-page" data-inline="true"></span>
                             </button>
                             |
                             <button type="submit" formaction="/search">
-                                <span class="iconify" data-icon="octicon:search" data-inline="true"></span>
+                                <span class="iconify" data-icon="ic:baseline-search" data-inline="true"></span>
                             </button>
                             <div id="pre_search" style="display: none;"></div>
                         </form>
                     </div>
                     <div id="top_tool_mobile" class="is_mobile">
                         <a href="javascript:void(0);" onclick="opening('mobile_menu');">
-                            <span class="iconify" data-icon="octicon:repo-push" data-inline="true"></span> {{'tool'|load_lang}}
+                            <span class="iconify" data-icon="ic:baseline-reorder" data-inline="true"></span> {{'tool'|load_lang}}
                         </a>
                     </div>
                 </div>
@@ -111,15 +110,15 @@
                         <input id="mobile_search_input" name="search" placeholder="{{'search'|load_lang}}" autocomplete="off" type="search">
                         <br>
                         <button id="mobile_button_first" type="submit" formaction="/goto">
-                            <span class="iconify" data-icon="octicon:clippy" data-inline="true"></span>
+                            <span class="iconify" data-icon="ic:round-find-in-page" data-inline="true"></span>
                         </button>
                         |
                         <button type="submit" formaction="/search">
-                            <span class="iconify" data-icon="octicon:search" data-inline="true"></span>
+                            <span class="iconify" data-icon="ic:baseline-search" data-inline="true"></span>
                         </button>
                         |
                         <a href="javascript:void(0);" onclick="opening('mobile_menu');">
-                            <span class="iconify" data-icon="octicon:repo-pull" data-inline="true"></span>
+                            <span class="iconify" data-icon="ic:baseline-reorder" data-inline="true"></span>
                         </a>
                     </form>
                     <h2>{{'recent'|load_lang}}</h2>
@@ -152,7 +151,7 @@
                         </div>
                     {% endif %}
                     <h1 id="title">
-                        {{imp[0]}}
+                        {{imp[0]|change_space}}
                         {% if imp[3][0] != 0 %}
                             <sub>{{imp[3][0]}}</sub>
                         {% endif %}
@@ -195,17 +194,17 @@
         <div id="nav_bar">
             <div id="go_top">
                 <a href="#top">
-                    <span class="iconify" data-icon="octicon:arrow-up" data-inline="true"></span>
+                    <span class="iconify" data-icon="ic:baseline-arrow-upward" data-inline="true"></span>
                 </a>                  
             </div>
             <div id="go_bottom">
                 <a href="#bottom">
-                    <span class="iconify" data-icon="octicon:arrow-down" data-inline="true"></span>
+                    <span class="iconify" data-icon="ic:baseline-arrow-downward" data-inline="true"></span>
                 </a>
             </div>
             <div id="go_toc">
                 <a href="#toc">
-                    <span class="iconify" data-icon="octicon:list-unordered" data-inline="true"></span>
+                    <span class="iconify" data-icon="ic:baseline-list" data-inline="true"></span>
                 </a>
             </div>                                    
         </div>

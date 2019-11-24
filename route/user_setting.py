@@ -15,17 +15,17 @@ def user_setting_2(conn, server_init):
 
             for auto_data in auto_list:
                 if flask.request.form.get(auto_data, '') != '':
-                    curs.execute('select data from user_set where name = ? and id = ?', [auto_data, ip])
+                    curs.execute(db_change('select data from user_set where name = ? and id = ?'), [auto_data, ip])
                     if curs.fetchall():
-                        curs.execute("update user_set set data = ? where name = ? and id = ?", [flask.request.form.get(auto_data, ''), auto_data, ip])
+                        curs.execute(db_change("update user_set set data = ? where name = ? and id = ?"), [flask.request.form.get(auto_data, ''), auto_data, ip])
                     else:
-                        curs.execute("insert into user_set (name, id, data) values (?, ?, ?)", [auto_data, ip, flask.request.form.get(auto_data, '')])
+                        curs.execute(db_change("insert into user_set (name, id, data) values (?, ?, ?)"), [auto_data, ip, flask.request.form.get(auto_data, '')])
 
             conn.commit()
             
             return redirect('/change')
         else:        
-            curs.execute('select data from user_set where name = "email" and id = ?', [ip])
+            curs.execute(db_change('select data from user_set where name = "email" and id = ?'), [ip])
             data = curs.fetchall()
             if data:
                 email = data[0][0]
@@ -35,10 +35,10 @@ def user_setting_2(conn, server_init):
             div2 = load_skin()
             div3 = ''
 
-            curs.execute('select data from user_set where name = "lang" and id = ?', [flask.session['id']])
+            curs.execute(db_change('select data from user_set where name = "lang" and id = ?'), [flask.session['id']])
             data = curs.fetchall()
             if not data:
-                curs.execute('select data from other where name = "language"')
+                curs.execute(db_change('select data from other where name = "language"'))
                 data = curs.fetchall()
                 if not data:
                     data = [['en-US']]
@@ -52,7 +52,7 @@ def user_setting_2(conn, server_init):
             oauth_provider = load_oauth('_README')['support']
             oauth_content = '<ul>'
             for i in range(len(oauth_provider)):
-                curs.execute('select name, picture from oauth_conn where wiki_id = ? and provider = ?', [flask.session['id'], oauth_provider[i]])
+                curs.execute(db_change('select name, picture from oauth_conn where wiki_id = ? and provider = ?'), [flask.session['id'], oauth_provider[i]])
                 oauth_data = curs.fetchall()
                 if len(oauth_data) == 1:
                     oauth_content += '<li>{}</li>'.format(oauth_provider[i].capitalize() + ' : <img src="{}" width="17px" height="17px"> {}'.format(oauth_data[0][1], oauth_data[0][0]))
