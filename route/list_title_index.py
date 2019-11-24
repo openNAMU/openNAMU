@@ -17,7 +17,7 @@ def list_title_index_2(conn):
 
     data = '<a href="/title_index?num=250">(250)</a> <a href="/title_index?num=500">(500)</a> <a href="/title_index?num=1000">(1000)</a>'
 
-    curs.execute("select title from data order by title asc limit ?, ?", [str(sql_num), str(num)])
+    curs.execute(db_change("select title from data order by title asc limit ?, ?"), [sql_num, num])
     title_list = curs.fetchall()
     if title_list:
         data += '<hr class=\"main_hr\"><ul>'
@@ -29,10 +29,10 @@ def list_title_index_2(conn):
     if page == 1:
         count_end = []
 
-        curs.execute('select data from other where name = "count_all_title"')
+        curs.execute(db_change('select data from other where name = "count_all_title"'))
         all_title = curs.fetchall()
         if int(all_title[0][0]) < 50000:
-            curs.execute("select count(title) from data")
+            curs.execute(db_change("select count(title) from data"))
             count = curs.fetchall()
             if count:
                 count_end += [count[0][0]]
@@ -41,7 +41,7 @@ def list_title_index_2(conn):
 
             sql_list = ['category:', 'user:', 'file:']
             for sql in sql_list:
-                curs.execute("select count(title) from data where title like ?", [sql + '%'])
+                curs.execute(db_change("select count(title) from data where title like ?"), [sql + '%'])
                 count = curs.fetchall()
                 if count:
                     count_end += [count[0][0]]

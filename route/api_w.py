@@ -4,7 +4,7 @@ def api_w_2(conn, name):
     curs = conn.cursor()
 
     if flask.request.args.get('exist', None):
-        curs.execute("select title from data where title = ?", [name])
+        curs.execute(db_change("select title from data where title = ?"), [name])
         if curs.fetchall():
             return flask.jsonify({ "exist" : "1" })
         else:
@@ -16,7 +16,7 @@ def api_w_2(conn, name):
                 
                 return flask.jsonify({ "title" : name, "data" : g_data[0], "js_data" : g_data[1] })
             else:
-                curs.execute("select data from data where title = ?", [name])
+                curs.execute(db_change("select data from data where title = ?"), [name])
                 data = curs.fetchall()
                 if data:
                     if flask.request.args.get('include', 'include_1'):

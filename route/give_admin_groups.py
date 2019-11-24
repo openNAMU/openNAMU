@@ -7,28 +7,28 @@ def give_admin_groups_2(conn, name):
         if admin_check(None, 'admin_plus (' + name + ')') != 1:
             return re_error('/error/3')
 
-        curs.execute("delete from alist where name = ?", [name])
+        curs.execute(db_change("delete from alist where name = ?"), [name])
         
         if flask.request.form.get('ban', 0) != 0:
-            curs.execute("insert into alist (name, acl) values (?, 'ban')", [name])
+            curs.execute(db_change("insert into alist (name, acl) values (?, 'ban')"), [name])
 
         if flask.request.form.get('toron', 0) != 0:
-            curs.execute("insert into alist (name, acl) values (?, 'toron')", [name])
+            curs.execute(db_change("insert into alist (name, acl) values (?, 'toron')"), [name])
             
         if flask.request.form.get('check', 0) != 0:
-            curs.execute("insert into alist (name, acl) values (?, 'check')", [name])
+            curs.execute(db_change("insert into alist (name, acl) values (?, 'check')"), [name])
 
         if flask.request.form.get('acl', 0) != 0:
-            curs.execute("insert into alist (name, acl) values (?, 'acl')", [name])
+            curs.execute(db_change("insert into alist (name, acl) values (?, 'acl')"), [name])
 
         if flask.request.form.get('hidel', 0) != 0:
-            curs.execute("insert into alist (name, acl) values (?, 'hidel')", [name])
+            curs.execute(db_change("insert into alist (name, acl) values (?, 'hidel')"), [name])
 
         if flask.request.form.get('give', 0) != 0:
-            curs.execute("insert into alist (name, acl) values (?, 'give')", [name])
+            curs.execute(db_change("insert into alist (name, acl) values (?, 'give')"), [name])
 
         if flask.request.form.get('owner', 0) != 0:
-            curs.execute("insert into alist (name, acl) values (?, 'owner')", [name])
+            curs.execute(db_change("insert into alist (name, acl) values (?, 'owner')"), [name])
             
         conn.commit()
         
@@ -38,7 +38,7 @@ def give_admin_groups_2(conn, name):
         
         exist_list = ['', '', '', '', '', '', '', '']
 
-        curs.execute('select acl from alist where name = ?', [name])
+        curs.execute(db_change('select acl from alist where name = ?'), [name])
         acl_list = curs.fetchall()    
         for go in acl_list:
             if go[0] == 'ban':

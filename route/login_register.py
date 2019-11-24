@@ -11,7 +11,7 @@ def login_register_2(conn):
         return redirect('/user')
 
     if not admin_check() == 1:
-        curs.execute('select data from other where name = "reg"')
+        curs.execute(db_change('select data from other where name = "reg"'))
         set_d = curs.fetchall()
         if set_d and set_d[0][0] == 'on':
             return re_error('/ban')
@@ -22,13 +22,16 @@ def login_register_2(conn):
         else:
             captcha_post('', 0)
 
+        if flask.request.form.get('id', None) == '' or flask.request.form.get('pw', None) == '':
+            return redirect('/register')
+
         if flask.request.form.get('pw', None) != flask.request.form.get('pw2', None):
             return re_error('/error/20')
 
         if re.search('(?:[^A-Za-zㄱ-힣0-9 ])', flask.request.form.get('id', None)):
             return re_error('/error/8')
             
-        curs.execute('select html from html_filter where kind = "name"')
+        curs.execute(db_change('select html from html_filter where kind = "name"'))
         set_d = curs.fetchall()
         for i in set_d:
             check_r = re.compile(i[0], re.I)
@@ -38,13 +41,13 @@ def login_register_2(conn):
         if len(flask.request.form.get('id', None)) > 32:
             return re_error('/error/7')
 
-        curs.execute("select id from user where id = ?", [flask.request.form.get('id', None)])
+        curs.execute(db_change("select id from user where id = ?"), [flask.request.form.get('id', None)])
         if curs.fetchall():
             return re_error('/error/6')
 
         hashed = pw_encode(flask.request.form.get('pw', None))
         
-        curs.execute('select data from other where name = "email_have"')
+        curs.execute(db_change('select data from other where name = "email_have"'))
         sql_data = curs.fetchall()
         if sql_data and sql_data[0][0] != '':
             flask.session['c_id'] = flask.request.form.get('id', None)
@@ -53,23 +56,23 @@ def login_register_2(conn):
 
             return redirect('/need_email')
         else:
-            curs.execute('select data from other where name = "encode"')
+            curs.execute(db_change('select data from other where name = "encode"'))
             db_data = curs.fetchall()
 
-            curs.execute("select id from user limit 1")
+            curs.execute(db_change("select id from user limit 1"))
             if not curs.fetchall():
-                curs.execute("insert into user (id, pw, acl, date, encode) values (?, ?, 'owner', ?, ?)", [flask.request.form.get('id', None), hashed, get_time(), db_data[0][0]])
+                curs.execute(db_change("insert into user (id, pw, acl, date, encode) values (?, ?, 'owner', ?, ?)"), [flask.request.form.get('id', None), hashed, get_time(), db_data[0][0]])
 
                 first = 1
             else:
-                curs.execute("insert into user (id, pw, acl, date, encode) values (?, ?, 'user', ?, ?)", [flask.request.form.get('id', None), hashed, get_time(), db_data[0][0]])
+                curs.execute(db_change("insert into user (id, pw, acl, date, encode) values (?, ?, 'user', ?, ?)"), [flask.request.form.get('id', None), hashed, get_time(), db_data[0][0]])
 
                 first = 0
 
             ip = ip_check()
             agent = flask.request.headers.get('User-Agent')
 
-            curs.execute("insert into ua_d (name, ip, ua, today, sub) values (?, ?, ?, ?, '')", [flask.request.form.get('id', None), ip, agent, get_time()])  
+            curs.execute(db_change("insert into ua_d (name, ip, ua, today, sub) values (?, ?, ?, ?, '')"), [flask.request.form.get('id', None), ip, agent, get_time()])  
 
             flask.session['state'] = 1
             flask.session['id'] = flask.request.form.get('id', None)
@@ -84,7 +87,7 @@ def login_register_2(conn):
     else:        
         contract = ''
         
-        curs.execute('select data from other where name = "contract"')
+        curs.execute(db_change('select data from other where name = "contract"'))
         data = curs.fetchall()
         if data and data[0][0] != '':
             contract = data[0][0] + '<hr class=\"main_hr\">'

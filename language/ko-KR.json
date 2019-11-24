@@ -56,6 +56,7 @@
     "connect": "연결",
     "edit_record": "편집 기록",
     "preview": "미리보기",
+    "view" : "보기",
     "no_login_error": "비로그인 상태입니다.",
     "upload": "업로드",
     "user_name": "사용자 이름",
@@ -296,5 +297,9 @@
     "last_edit_time": "최근 수정 시각",
     "link": "링크",
     "icon": "아이콘",
-    "topic_setting" : "토론 설정"
+    "topic_setting" : "토론 설정",
+    "old_page" : "오래된 문서",
+    "skin_set" : "스킨 설정",
+    "edit_help" : "편집창 문구",
+    "defalut_edit_help" : "이곳에 내용을 써주세요"
 }

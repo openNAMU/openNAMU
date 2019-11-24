@@ -40,19 +40,19 @@ def recent_changes_2(conn, name, tool):
                 # 기본적인 move만 구현
                 tool_select = flask.request.args.get('tool', None)
                 if tool_select and tool_select == 'move':
-                    curs.execute('' + \
+                    curs.execute(db_change('' + \
                         'select id, title, date, ip, send, leng from history ' + \
                         'where send like ? or send like ? ' + \
                         'order by id + 0 desc ' + \
-                        "limit ?, '50'" + \
-                    '', ['%(<a>' + name +'</a>%', '%<a>' + name + '</a> move)', str(sql_num)])
+                        "limit ?, 50" + \
+                    ''), ['%(<a>' + name +'</a>%', '%<a>' + name + '</a> move)', sql_num])
                 else:
-                    curs.execute('' + \
+                    curs.execute(db_change('' + \
                         'select id, title, date, ip, send, leng from history ' + \
                         'where title = ? ' + \
                         'order by id + 0 desc ' + \
-                        "limit ?, '50'" + \
-                    '', [name, str(sql_num)])
+                        "limit ?, 50" + \
+                    ''), [name, sql_num])
             else:
                 div +=  '''
                         <td id="main_table_width">''' + load_lang('document_name') + '''</td>
@@ -63,7 +63,10 @@ def recent_changes_2(conn, name, tool):
 
                 div = '<a href="/topic_record/' + url_pas(name) + '">(' + load_lang('discussion') + ')</a><hr class=\"main_hr\">' + div
                 
-                curs.execute("select id, title, date, ip, send, leng from history where ip = ? order by date desc limit ?, '50'", [name, str(sql_num)])
+                curs.execute(db_change('' + \
+                    'select id, title, date, ip, send, leng from history ' + \
+                    "where ip = ? order by date desc limit ?, 50" + \
+                ''), [name, sql_num])
         else:
             num = int(number_check(flask.request.args.get('num', '1')))
             if num * 50 > 0:
@@ -82,12 +85,12 @@ def recent_changes_2(conn, name, tool):
             if set_user == 'normal':
                 div = '<a href="?set=user">(' + load_lang('user_document') + ')</a>' + div
 
-            curs.execute('' + \
+            curs.execute(db_change('' + \
                 'select id, title, date, ip, send, leng from history ' + \
                 "where " + ('' if set_user == 'user' else 'not ') + "title like 'user:%' " + \
                 'order by date desc ' + \
                 'limit ?, 50' + \
-            '', [str(sql_num)])
+            ''), [sql_num])
 
         data_list = curs.fetchall()
         for data in data_list:    
@@ -114,10 +117,10 @@ def recent_changes_2(conn, name, tool):
             style = ['', '']
             date = data[2]
 
-            curs.execute('''
+            curs.execute(db_change('''
                 select title from history
                 where title = ? and id = ? and hide = 'O'
-            ''', [data[1], data[0]])
+            '''), [data[1], data[0]])
             hide = curs.fetchall()
             
             if six_admin == 1:
@@ -187,7 +190,7 @@ def recent_changes_2(conn, name, tool):
                 
                 div += next_fix('/history/' + url_pas(name) + '?num=', num, data_list)
             else:
-                curs.execute("select end from ban where block = ?", [name])
+                curs.execute(db_change("select end from ban where block = ?"), [name])
                 if curs.fetchall():
                     sub += ' (' + load_lang('blocked') + ')'
 

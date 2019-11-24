@@ -5,7 +5,7 @@ def list_admin_2(conn):
 
     div = '<ul>'
     
-    curs.execute("select id, acl, date from user where not acl = 'user' order by date desc")
+    curs.execute(db_change("select id, acl, date from user where not acl = 'user' order by date desc"))
     for data in curs.fetchall():
         name = ip_pas(data[0]) + ' <a href="/admin_plus/' + url_pas(data[1]) + '">(' + data[1] + ')</a>'
         

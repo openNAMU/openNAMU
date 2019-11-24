@@ -1,11 +1,24 @@
-import flask
 import urllib.parse
 import datetime
-import re
 import hashlib
+import flask
+import re
 
 def get_time():
     return str(datetime.datetime.today().strftime("%Y-%m-%d %H:%M:%S"))
+
+def db_data_get(data):
+    global set_data
+
+    set_data = data
+
+def db_change(data):
+    if set_data == 'mysql':
+        data = data.replace('random()', 'rand()')
+        data = data.replace('%', '%%')
+        data = data.replace('?', '%s')
+
+    return data
     
 def ip_check(d_type = 0):
     if d_type == 0:
@@ -38,13 +51,15 @@ def link_fix(main_link):
     main_link = re.sub('^파일:', 'file:', main_link)
     main_link = re.sub('^분류:', 'category:', main_link)
 
-    other_link = re.search('(#.+)$', main_link)
+    other_link = re.search('[^\\\\](#.+)$', main_link)
     if other_link:
         other_link = other_link.groups()[0]
 
         main_link = re.sub('(#.+)$', '', main_link)
     else:
         other_link = ''
+
+    main_link = re.sub('\\\\#', '%23', main_link)
         
     return [main_link, other_link]
 

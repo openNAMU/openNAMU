@@ -43,6 +43,9 @@ def init(key):
     if env_dict[key] != None:
         return env_dict[key]
     else:
+        if key == 'markup':
+            return server_set_var[key]['default']
+
         while 1:
             if server_set_var[key]['require'] == 'select':
                 list_ = '[' + ', '.join(server_set_var[key]['list']) + ']'

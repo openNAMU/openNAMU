@@ -8,7 +8,7 @@ for i_data in os.listdir("route"):
 
         exec("from route." + f_src + " import *")
 
-version_list = json.loads(open('version.json', encoding='utf-8').read())
+version_list = json.loads(open('version.json').read())
 
 r_ver = version_list['master']['r_ver']
 c_ver = version_list['master']['c_ver']
@@ -19,36 +19,111 @@ print('DB set version : ' + c_ver)
 print('Skin set version : ' + s_ver)
 print('----')
 
-app_var = json.loads(open('data/app_var.json', encoding='utf-8').read())
+app_var = json.loads(open('data/app_var.json').read())
 
 # DB
-try:
-    set_data = json.loads(open('data/set.json').read())
-except:
-    if os.getenv('NAMU_DB') != None:
-        set_data = { "db" : os.getenv('NAMU_DB') }
-    else:
-        print('DB name (data) : ', end = '')
-        
-        new_json = str(input())
-        if new_json == '':
-            new_json = 'data'
-            
-        with open('data/set.json', 'w') as f:
-            f.write('{ "db" : "' + new_json + '" }')
-            
+while 1:
+    try:
         set_data = json.loads(open('data/set.json').read())
+        if not 'db_type' in set_data:
+            try:
+                os.remove('data/set.json')
+            except:
+                print('Please delete set.json')
+                print('----')
+                raise
+        else:
+            break
+    except:
+        if os.getenv('NAMU_DB') != None or os.getenv('NAMU_DB_TYPE') != None:
+            set_data = { 
+                "db" : os.getenv('NAMU_DB') if os.getenv('NAMU_DB') else 'data', 
+                "db_type" : os.getenv('NAMU_DB_TYPE') if os.getenv('NAMU_DB_TYPE') else 'sqlite'
+            }
+
+            break
+        else:        
+            new_json = ['', '']
+            normal_db_type = ['sqlite', 'mysql']
+
+            print('DB type (sqlite, mysql) : ', end = '')
+            new_json[0] = str(input())
+            if new_json[0] == '' or not new_json[0] in normal_db_type:
+                new_json[0] = 'sqlite'
+
+            all_src = []
+            for i_data in os.listdir("."):
+                f_src = re.search("(.+)\.db$", i_data)
+                if f_src:
+                    all_src += [f_src.groups()[0]]
+
+            if all_src != []:
+                print('DB name (' + ', '.join(all_src) + ') : ', end = '')
+            else:
+                print('DB name (data) : ', end = '')
+
+            new_json[1] = str(input())
+            if new_json[1] == '':
+                new_json[1] = 'data'
+                
+            with open('data/set.json', 'w') as f:
+                f.write('{ "db" : "' + new_json[1] + '", "db_type" : "' + new_json[0] + '" }')
+                
+            set_data = json.loads(open('data/set.json').read())
+            
+            break
         
 print('DB name : ' + set_data['db'])
+print('DB type : ' + set_data['db_type'])
 db_name = set_data['db']
+
+db_data_get(set_data['db_type'])
+
+if set_data['db_type'] == 'mysql':
+    try:
+        set_data_mysql = json.loads(open('data/mysql.json').read())
+    except:
+        new_json = ['', '']
+
+        while 1:
+            print('DB user id : ', end = '')
+            new_json[0] = str(input())
+            if new_json[0] != '':
+                break
+
+        while 1:
+            print('DB password : ', end = '')
+            new_json[1] = str(input())
+            if new_json[1] != '':
+                break
+
+        with open('data/mysql.json', 'w') as f:
+            f.write('{ "user" : "' + new_json[0] + '", "password" : "' + new_json[1] + '" }')
+                
+        set_data_mysql = json.loads(open('data/mysql.json').read())
+
+    conn = pymysql.connect(
+        host = 'localhost', 
+        user = set_data_mysql['user'], 
+        password = set_data_mysql['password'],
+        charset = 'utf8mb4'
+    )
+    curs = conn.cursor()
+
+    try:
+        curs.execute(db_change('create database ? default character set utf8mb4;')%pymysql.escape_string(db_name))
+    except:
+        pass
+
+    curs.execute(db_change('use ?')%pymysql.escape_string(db_name))
+else:
+    conn = sqlite3.connect(db_name + '.db', check_same_thread = False)
+    curs = conn.cursor()
             
 if os.path.exists(db_name + '.db'):
     setup_tool = 0
 else:
     setup_tool = 1
-
-conn = sqlite3.connect(db_name + '.db', check_same_thread = False)
-curs = conn.cursor()
 
 load_conn(conn)
 
@@ -68,6 +143,7 @@ class EverythingConverter(werkzeug.routing.PathConverter):
 app.jinja_env.filters['md5_replace'] = md5_replace
 app.jinja_env.filters['load_lang'] = load_lang
 app.jinja_env.filters['cut_100'] = cut_100
+app.jinja_env.filters['change_space'] = change_space
 
 app.url_map.converters['everything'] = EverythingConverter
 
@@ -97,11 +173,14 @@ create_data['all_data'] = [
     'oauth_conn'
 ]
 for i in create_data['all_data']:
-    curs.execute('create table if not exists ' + i + '(test longtext)')
+    try:
+        curs.execute(db_change('select test from ' + i + ' limit 1'))
+    except:
+        curs.execute(db_change('create table ' + i + '(test longtext)'))
 
 if setup_tool == 0:
     try:
-        curs.execute('select data from other where name = "ver"')
+        curs.execute(db_change('select data from other where name = "ver"'))
         ver_set_data = curs.fetchall()
         if not ver_set_data:
             setup_tool = 1
@@ -138,17 +217,17 @@ if setup_tool != 0:
     for create_table in create_data['all_data']:
         for create in create_data[create_table]:
             try:
-                curs.execute('select ' + create + ' from ' + create_table + ' limit 1')
+                curs.execute(db_change('select ' + create + ' from ' + create_table + ' limit 1'))
             except:
-                curs.execute("alter table " + create_table + " add " + create + " longtext default ''")
+                curs.execute(db_change("alter table " + create_table + " add " + create + " longtext default ''"))
 
     update()
 
 # Init
-curs.execute('select name from alist where acl = "owner"')
+curs.execute(db_change('select name from alist where acl = "owner"'))
 if not curs.fetchall():
-    curs.execute('delete from alist where name = "owner"')
-    curs.execute('insert into alist (name, acl) values ("owner", "owner")')
+    curs.execute(db_change('delete from alist where name = "owner"'))
+    curs.execute(db_change('insert into alist (name, acl) values ("owner", "owner")'))
 
 if not os.path.exists(app_var['path_data_image']):
     os.makedirs(app_var['path_data_image'])
@@ -163,12 +242,12 @@ server_set_key = ['host', 'port', 'language', 'markup', 'encode']
 server_set = {}
 
 for i in range(len(server_set_key)):
-    curs.execute('select data from other where name = ?', [server_set_key[i]])
+    curs.execute(db_change('select data from other where name = ?'), [server_set_key[i]])
     server_set_val = curs.fetchall()
     if not server_set_val:
         server_set_val = server_init.init(server_set_key[i])
         
-        curs.execute('insert into other (name, data) values (?, ?)', [server_set_key[i], server_set_val])
+        curs.execute(db_change('insert into other (name, data) values (?, ?)'), [server_set_key[i], server_set_val])
         conn.commit()
     else:
         server_set_val = server_set_val[0][0]
@@ -177,43 +256,23 @@ for i in range(len(server_set_key)):
     
     server_set[server_set_key[i]] = server_set_val
 
-try:
-    if not os.path.exists('robots.txt'):
-        curs.execute('select data from other where name = "robot"')
-        robot_test = curs.fetchall()
-        if robot_test:
-            fw_test = open('./robots.txt', 'w')
-            fw_test.write(re.sub('\r\n', '\n', robot_test[0][0]))
-            fw_test.close()
-        else:
-            fw_test = open('./robots.txt', 'w')
-            fw_test.write('User-agent: *\nDisallow: /\nAllow: /$\nAllow: /w/')
-            fw_test.close()
-
-            curs.execute('insert into other (name, data) values ("robot", "User-agent: *\nDisallow: /\nAllow: /$\nAllow: /w/")')
-        
-        print('----')
-        print('Engine made robots.txt')
-except:
-    pass
-
-curs.execute('select data from other where name = "key"')
+curs.execute(db_change('select data from other where name = "key"'))
 rep_data = curs.fetchall()
 if not rep_data:
     rep_key = ''.join(random.choice("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ") for i in range(16))
     if rep_key:
-        curs.execute('insert into other (name, data) values ("key", ?)', [rep_key])
+        curs.execute(db_change('insert into other (name, data) values ("key", ?)'), [rep_key])
 else:
     rep_key = rep_data[0][0]
 
-curs.execute('select data from other where name = "adsense"')
+curs.execute(db_change('select data from other where name = "adsense"'))
 adsense_result = curs.fetchall()
 if not adsense_result:
-    curs.execute('insert into other (name, data) values ("adsense", "False")')
-    curs.execute('insert into other (name, data) values ("adsense_code", "")')
+    curs.execute(db_change('insert into other (name, data) values ("adsense", "False")'))
+    curs.execute(db_change('insert into other (name, data) values ("adsense_code", "")'))
 
-curs.execute('delete from other where name = "ver"')
-curs.execute('insert into other (name, data) values ("ver", ?)', [c_ver])
+curs.execute(db_change('delete from other where name = "ver"'))
+curs.execute(db_change('insert into other (name, data) values ("ver", ?)'), [c_ver])
 
 def back_up():
     print('----')
@@ -227,7 +286,7 @@ def back_up():
     threading.Timer(60 * 60 * back_time, back_up).start()
 
 try:
-    curs.execute('select data from other where name = "back_up"')
+    curs.execute(db_change('select data from other where name = "back_up"'))
     back_up_time = curs.fetchall()
     
     back_time = int(back_up_time[0][0])
@@ -242,27 +301,38 @@ if back_time != 0:
 else:
     print('Back up state : Turn off')
 
+if set_data['db_type'] == 'mysql':
+    def mysql_dont_off():
+        try:
+            urllib.request.urlopen('http://localhost:' + str(server_set['port']) + '/')
+        except:
+            pass
+
+        threading.Timer(60 * 60 * 6, mysql_dont_off).start()
+
+    mysql_dont_off()
+
 conn.commit()
 
 def count_all_title():
-    curs.execute("select count(title) from data")
+    curs.execute(db_change("select count(title) from data"))
     count_data = curs.fetchall()
     if count_data:
         count_data = count_data[0][0]
     else:
         count_data = 0
 
-    curs.execute('delete from other where name = "count_all_title"')
-    curs.execute('insert into other (name, data) values ("count_all_title", ?)', [str(count_data)])
+    curs.execute(db_change('delete from other where name = "count_all_title"'))
+    curs.execute(db_change('insert into other (name, data) values ("count_all_title", ?)'), [str(count_data)])
 
     conn.commit()
 
     threading.Timer(60 * 60 * 24, count_all_title).start()
 
-curs.execute('select data from other where name = "count_all_title"')
+curs.execute(db_change('select data from other where name = "count_all_title"'))
 all_title = curs.fetchall()
 if not all_title:
-    curs.execute('insert into other (name, data) values ("count_all_title", "0")')
+    curs.execute(db_change('insert into other (name, data) values ("count_all_title", "0")'))
 
 count_all_title()  
 
@@ -296,6 +366,10 @@ def setting(num = 0):
 @app.route('/not_close_topic')
 def list_not_close_topic():
     return list_not_close_topic_2(conn)
+
+@app.route('/old_page')
+def list_old_page():
+    return list_old_page_2(conn)
 
 @app.route('/acl_list')
 def list_acl():
@@ -591,6 +665,10 @@ def api_topic_sub(name = '', sub = '', time = ''):
 @app.route('/api/search/<name>')
 def api_search(name = ''):
     return api_search_2(conn, name)
+
+@app.route('/api/recent_changes')
+def api_recent_change():
+    return api_recent_change_2(conn)
     
 # File
 @app.route('/views/easter_egg.html')
@@ -603,7 +681,7 @@ def main_views(name = None):
 
 @app.route('/<data>')
 def main_file(data = None):
-    return main_file_2(conn, data)
+    return main_file_2(conn, data) if re.search('\.txt$', data) else main_error_404_2(conn)
 
 # End
 @app.errorhandler(404)

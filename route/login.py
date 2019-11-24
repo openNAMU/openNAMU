@@ -18,7 +18,7 @@ def login_2(conn):
             
         agent = flask.request.headers.get('User-Agent')
 
-        curs.execute("select pw, encode from user where id = ?", [flask.request.form.get('id', None)])
+        curs.execute(db_change("select pw, encode from user where id = ?"), [flask.request.form.get('id', None)])
         user = curs.fetchall()
         if not user:
             return re_error('/error/2')
@@ -35,14 +35,14 @@ def login_2(conn):
         flask.session['state'] = 1
         flask.session['id'] = flask.request.form.get('id', None)
         
-        curs.execute("select css from custom where user = ?", [flask.request.form.get('id', None)])
+        curs.execute(db_change("select css from custom where user = ?"), [flask.request.form.get('id', None)])
         css_data = curs.fetchall()
         if css_data:
             flask.session['head'] = css_data[0][0]
         else:
             flask.session['head'] = ''
 
-        curs.execute("insert into ua_d (name, ip, ua, today, sub) values (?, ?, ?, ?, '')", [flask.request.form.get('id', None), ip_check(1), agent, get_time()])
+        curs.execute(db_change("insert into ua_d (name, ip, ua, today, sub) values (?, ?, ?, ?, '')"), [flask.request.form.get('id', None), ip_check(1), agent, get_time()])
 
         conn.commit()
         
