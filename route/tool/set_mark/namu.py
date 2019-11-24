@@ -581,11 +581,13 @@ def namu(conn, data, title, main_num, include_num):
                     break
 
             all_stack = re.sub('^0\.', '', all_stack)
+            new_toc_data = re.sub('=*$', '', toc[1])
+            new_toc_data = re.sub(' +$', '', new_toc_data)
+            new_toc_data = re.sub('^# ?(?P<in>[^#]+) ?#$', '\g<in>', new_toc_data)
             
-            data = re.sub('\n(={1,6}) ?((?:(?!\n).)+) ?\n', '\n<h' + toc_number + ' id="s-' + re.sub('\.$', '', all_stack) + '"><a href="#toc">' + all_stack + '</a> ' + re.sub('=*$', '', toc[1]) + ' <span style="font-size: 12px"><a href="/edit/' + tool.url_pas(title) + '?section=' + str(edit_number) + '">(Edit)</a></span></h' + toc_number + '>\n', data, 1)
+            data = re.sub('\n(={1,6}) ?((?:(?!\n).)+) ?\n', '\n<h' + toc_number + ' id="s-' + re.sub('\.$', '', all_stack) + '"><a href="#toc">' + all_stack + '</a> ' + new_toc_data + ' <span style="font-size: 12px"><a href="/edit/' + tool.url_pas(title) + '?section=' + str(edit_number) + '">(Edit)</a></span></h' + toc_number + '>\n', data, 1)
 
-            toc_main_data = toc[1]
-            toc_main_data = re.sub('=*$', '', toc_main_data)
+            toc_main_data = new_toc_data
             toc_main_data = re.sub('\[\*((?:(?! |\]).)*)(?: ((?:(?!(\[\*(?:(?:(?!\]).)+)\]|\])).)+))?\]', '', toc_main_data)
             toc_main_data = re.sub('<span id="math_[0-9]"><\/span>', '(Math)', toc_main_data)
             
