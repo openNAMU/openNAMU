@@ -32,5 +32,18 @@ function search_do() {
     }
 
     var before = '';
+    save_data = 'pre_search';
+    open = 1;
+    setTimeout(function() { open = 0; }, 100);
     setInterval(search_load, 1000);
+}
+
+function view_search() {
+    var data = document.getElementById("pre_search").innerHTML;
+    if(data !== '') {
+        document.getElementById("pre_search").style.display = 'block';
+    }
+
+    open = 1;
+    setTimeout(function() { open = 0; }, 100);
 }
