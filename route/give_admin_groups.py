@@ -63,7 +63,7 @@ def give_admin_groups_2(conn, name):
 
         acl_name_list = ['ban', 'nothing', 'toron', 'check', 'acl', 'hidel', 'give', 'owner']
         for i in range(0, 8):
-            if i != 2:
+            if i != 1:
                 data += '<li><input type="checkbox" ''' + state +  ' name="' + acl_name_list[i] + '" ' + exist_list[i] + '> ' + acl_name_list[i] + '</li>'
 
         data += '</ul>'
