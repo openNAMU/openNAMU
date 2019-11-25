@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def main_manager_2(conn, num, r_ver):
+def main_manager_2(conn, num, r_ver, db_type):
     curs = conn.cursor()
     
     title_list = {
@@ -50,7 +50,7 @@ def main_manager_2(conn, num, r_ver):
                     <br>
                     <h2>''' + load_lang('server') + '''</h2>
                     <ul>
-                        <li><a href="/indexing">''' + load_lang('indexing') + '''</a></li>
+                        ''' + (('<li><a href="/indexing">' + load_lang('indexing') + '</a></li>') if db_type == 'sqlite' else '') + '''
                         <li><a href="/restart">''' + load_lang('wiki_restart') + '''</a></li>
                         <li><a href="/update">''' + load_lang('update') + '''</a></li>
                         <li><a href="/oauth_setting">''' + load_lang('oauth_setting') + '''</a></li>
