@@ -6,12 +6,19 @@ def api_version_2(conn, r_ver, c_ver):
     n_ver = ''
     data = None
 
+    curs.execute(db_change('select data from other where name = "update"'))
+    up_data = curs.fetchall()
+    if up_data:
+        up_data = up_data[0][0]
+    else:
+        up_data = 'stable'
+
     data = urllib.request.urlopen('https://raw.githubusercontent.com/2du/openNAMU/master/version.json')
     if data and data.getcode() == 200:
         try:
             json_data = json.loads(data.read().decode())
-            if 'master' in json_data:
-                n_ver = json_data['master']['r_ver']
+            if up_data in json_data:
+                n_ver = json_data[up_data]['r_ver']
         except:
             pass
         
