@@ -180,16 +180,6 @@ def view_read_2(conn, name):
         adsense_code = adsense_code.format(curs.fetchall()[0][0])
     else:
         adsense_code = adsense_code.format('')
-
-    curs.execute(db_change("select data from other where name = 'body'"))
-    body = curs.fetchall()
-    if body:
-        div = body[0][0] + '<hr class=\"main_hr\">' + div
-        
-    curs.execute(db_change("select data from other where name = 'bottom_body'"))
-    body = curs.fetchall()
-    if body:
-        div += '<hr class=\"main_hr\">' + body[0][0]
     
     div = adsense_code + '<div>' + div + '</div>'
 
@@ -200,6 +190,16 @@ def view_read_2(conn, name):
             <div id="get_user_info"></div>
             <script>load_user_info("''' + user_name + '''");</script>
         ''' + div
+
+    curs.execute(db_change("select data from other where name = 'body'"))
+    body = curs.fetchall()
+    if body:
+        div = body[0][0] + '<hr class=\"main_hr\">' + div
+        
+    curs.execute(db_change("select data from other where name = 'bottom_body'"))
+    body = curs.fetchall()
+    if body:
+        div += '<hr class=\"main_hr\">' + body[0][0]
 
     if ip_or_user(ip) == 0:
         curs.execute(db_change("select title from scan where user = ? and title = ?"), [ip, name])

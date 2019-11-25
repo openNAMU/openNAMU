@@ -53,7 +53,7 @@ li {
     position: relative;
     top: 0;
     left: 0;
-    height: 20px;
+    height: auto;
 }
 
 #main {
@@ -292,32 +292,6 @@ div#pre_search a {
     margin-top: 10px;
 }
 
-#top_tool_mobile {
-    float: right;
-}
-
-#mobile_menu {
-    width: 200px;
-    height: 100%;
-    position: fixed;
-    top: 0;
-    right: 0;
-    background: white;
-    border-left: 2px solid gainsboro;
-    z-index: 1;
-    overflow-y: scroll;
-}
-
-#mobile_menu button {
-    color: dodgerblue;
-}
-
-#mobile_menu_main {
-    width: 90%;
-    margin: auto;
-    margin-top: 5%;
-}
-
 #toc {
     max-width: 300px;
 }
@@ -429,4 +403,28 @@ div#last_edit {
 
 #mobile_search_input {
     border-radius: 10px;
+}
+
+#top_menu_groups {
+    display: inline-block;
+}
+
+@media (max-width: 600px) {
+    #top_tool {
+        float: none;
+        display: inline;
+    }
+
+    #top_menu_groups {
+        margin-left: 20px;
+    }
+
+    #search {
+        margin-top: 10px;
+        width: 100%;
+    }
+
+    #search_input {
+        width: calc(100% - 60px);
+    }
 }

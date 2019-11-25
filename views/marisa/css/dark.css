@@ -3,7 +3,7 @@ html, #main {
     color: white;
 }
 
-.cel_in_cel, #background, div#pre_search, #toc, #cate, #redirect, #mobile_menu {
+.cel_in_cel, #background, div#pre_search, #toc, #cate, #redirect {
     background: #1f2023;
     border-color: #1f2023;
 }

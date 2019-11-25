@@ -4,10 +4,10 @@
         <meta charset="utf-8">
         <title>{{imp[0]}} - {{imp[1][0]}}</title>
         {{imp[3][3]|safe}}
-        <link rel="stylesheet" href="/views/marisa/css/main.css?ver=5">
-        <script src="/views/marisa/js/search.js?ver=1"></script>
+        <link rel="stylesheet" href="/views/marisa/css/main.css?ver=6">
+        <script src="/views/marisa/js/search.js?ver=2"></script>
         <script src="/views/marisa/js/skin_set.js?ver=2"></script>
-        <script src="/views/marisa/js/main.js?ver=1"></script>
+        <script src="/views/marisa/js/main.js?ver=2"></script>
         <script>window.onload = function () { search_do(); skin_set(); }</script>
         <script src="https://code.iconify.design/1/1.0.3/iconify.min.js"></script>
         <link rel="shortcut icon" href="/views/main_css/file/favicon.ico?ver=1">
@@ -25,67 +25,76 @@
                     <div id="logo">
                         <a href="/">{{imp[1][4]|safe}}</a>
                     </div>
-                    <div id="top_tool" class="not_mobile">
-                        <div id="top_tool_cel">
-                            <a href="javascript:void(0);" onclick="opening('recent_cel');">
-                                <span class="iconify" data-icon="ic:baseline-access-time" data-inline="true"></span>
-                                {{'recent'|load_lang}}
-                                <span class="iconify" data-icon="ic:baseline-arrow-drop-down" data-inline="true"></span>
-                            </a>
-                            <div id="recent_cel" class="cel_in_cel" style="display: none;">
-                                <a href="/recent_changes">
-                                    <span class="iconify" data-icon="ic:baseline-autorenew" data-inline="true"></span>
-                                    {{'edit'|load_lang}}
+                    <div id="top_tool">
+                        <div id="top_menu_groups">
+                            <div id="top_tool_cel">
+                                <a href="javascript:void(0);" onclick="opening('recent_cel');">
+                                    <span class="iconify" data-icon="ic:baseline-access-time" data-inline="true"></span>
+                                    <span class="not_mobile">{{'recent'|load_lang}}</span>
+                                    <span class="iconify" data-icon="ic:baseline-arrow-drop-down" data-inline="true"></span>
                                 </a>
-                                <hr>
-                                <a href="/recent_discuss">
-                                    <span class="iconify" data-icon="ic:baseline-add-comment" data-inline="true"></span>
-                                    {{'discussion'|load_lang}}
-                                </a>
+                                <div id="recent_cel" class="cel_in_cel" style="display: none;">
+                                    <a href="/recent_changes">
+                                        <span class="iconify" data-icon="ic:baseline-autorenew" data-inline="true"></span>
+                                        {{'edit'|load_lang}}
+                                    </a>
+                                    <hr>
+                                    <a href="/recent_discuss">
+                                        <span class="iconify" data-icon="ic:baseline-add-comment" data-inline="true"></span>
+                                        {{'discussion'|load_lang}}
+                                    </a>
+                                </div>
                             </div>
-                        </div>
-                         
-                        <div id="top_tool_cel">
-                            <a href="javascript:void(0);" onclick="opening('other_cel');">
-                                <span class="iconify" data-icon="ic:baseline-archive" data-inline="true"></span>
-                                {{'other'|load_lang}}
-                                <span class="iconify" data-icon="ic:baseline-arrow-drop-down" data-inline="true"></span>
-                            </a>
-                            <div id="other_cel" class="cel_in_cel" style="display: none;">
-                                <a href="/random">
-                                    <span class="iconify" data-icon="ic:baseline-shuffle" data-inline="true"></span>
-                                    {{'random'|load_lang}}
+                             
+                            <div id="top_tool_cel">
+                                <a href="javascript:void(0);" onclick="opening('other_cel');">
+                                    <span class="iconify" data-icon="ic:baseline-archive" data-inline="true"></span>
+                                    <span class="not_mobile">{{'other'|load_lang}}</span>
+                                    <span class="iconify" data-icon="ic:baseline-arrow-drop-down" data-inline="true"></span>
                                 </a>
-                                <hr>
-                                <a href="/other">
-                                    <span class="iconify" data-icon="ic:baseline-build" data-inline="true"></span>
-                                    {{'tool'|load_lang}}
-                                </a>
-                                <hr>
-                                <a href="/skin_set">
-                                    <span class="iconify" data-icon="ic:baseline-settings" data-inline="true"></span>
-                                    {{'skin_setting'|load_lang}}
-                                </a>
-                            </div>
-                        </div>
-                         
-                        <div id="top_tool_cel">
-                            <a href="/user">
-                                {% if imp[2][2] == 1 %}
-                                    {% if imp[2][8] != '0' %}
-                                        <span class="iconify" data-icon="ic:baseline-add-alert" data-inline="true"></span>
-                                    {% else %}
-                                        <span class="iconify" data-icon="ic:baseline-person-add" data-inline="true"></span>
+                                <div id="other_cel" class="cel_in_cel" style="display: none;">
+                                    <a href="/random">
+                                        <span class="iconify" data-icon="ic:baseline-shuffle" data-inline="true"></span>
+                                        {{'random'|load_lang}}
+                                    </a>
+                                    <hr>
+                                    <a href="/other">
+                                        <span class="iconify" data-icon="ic:baseline-build" data-inline="true"></span>
+                                        {{'tool'|load_lang}}
+                                    </a>
+                                    {% if imp[2][9] != '0' %}
+                                        <hr>
+                                        <a href="/manager">
+                                            <span class="iconify" data-icon="ic:baseline-how-to-reg" data-inline="true"></span>
+                                            {{'admin'|load_lang}}
+                                        </a>
                                     {% endif %}
-                                {% else %}
-                                    <span class="iconify" data-icon="ic:baseline-person" data-inline="true"></span>
-                                {% endif %}
-                                {{imp[2][5]}}
-                            </a>
+                                    <hr>
+                                    <a href="/skin_set">
+                                        <span class="iconify" data-icon="ic:baseline-settings" data-inline="true"></span>
+                                        {{'skin_setting'|load_lang}}
+                                    </a>
+                                </div>
+                            </div>
+                             
+                            <div id="top_tool_cel">
+                                <a href="/user">
+                                    {% if imp[2][2] == 1 %}
+                                        {% if imp[2][8] != '0' %}
+                                            <span class="iconify" data-icon="ic:baseline-add-alert" data-inline="true"></span>
+                                        {% else %}
+                                            <span class="iconify" data-icon="ic:baseline-person-add" data-inline="true"></span>
+                                        {% endif %}
+                                    {% else %}
+                                        <span class="iconify" data-icon="ic:baseline-person" data-inline="true"></span>
+                                    {% endif %}
+                                    <span class="not_mobile">{{imp[2][5]}}</span>
+                                </a>
+                            </div>
                         </div>
                          
                         <form method="post" action="/search" id="search" role="search">
-                            <input id="search_input" name="search" placeholder="{{'search'|load_lang}}" autocomplete="off" type="search">
+                            <input id="search_input" name="search" onclick="view_search();" placeholder="{{'search'|load_lang}}" autocomplete="off" type="search">
                             |
                             <button type="submit" formaction="/goto">
                                 <span class="iconify" data-icon="ic:round-find-in-page" data-inline="true"></span>
@@ -97,39 +106,6 @@
                             <div id="pre_search" style="display: none;"></div>
                         </form>
                     </div>
-                    <div id="top_tool_mobile" class="is_mobile">
-                        <a href="javascript:void(0);" onclick="opening('mobile_menu');">
-                            <span class="iconify" data-icon="ic:baseline-reorder" data-inline="true"></span> {{'tool'|load_lang}}
-                        </a>
-                    </div>
-                </div>
-            </div>
-            <div id="mobile_menu" class="is_mobile" style="display: none;">
-                <div id="mobile_menu_main">
-                    <form method="post" action="/search" id="mobile_search" role="search">
-                        <input id="mobile_search_input" name="search" placeholder="{{'search'|load_lang}}" autocomplete="off" type="search">
-                        <br>
-                        <button id="mobile_button_first" type="submit" formaction="/goto">
-                            <span class="iconify" data-icon="ic:round-find-in-page" data-inline="true"></span>
-                        </button>
-                        |
-                        <button type="submit" formaction="/search">
-                            <span class="iconify" data-icon="ic:baseline-search" data-inline="true"></span>
-                        </button>
-                        |
-                        <a href="javascript:void(0);" onclick="opening('mobile_menu');">
-                            <span class="iconify" data-icon="ic:baseline-reorder" data-inline="true"></span>
-                        </a>
-                    </form>
-                    <h2>{{'recent'|load_lang}}</h2>
-                    <li><a href="/recent_changes">{{'edit'|load_lang}}</a></li>
-                    <li><a href="/recent_discuss">{{'discussion'|load_lang}}</a></li>
-                    <h2>{{'other'|load_lang}}</h2>
-                    <li><a href="/random">{{'random'|load_lang}}</a></li>
-                    <li><a href="/other">{{'tool'|load_lang}}</a></li>
-                    <li><a href="/skin_set">{{'skin_setting'|load_lang}}</a></li>
-                    <h2>{{'user'|load_lang}}</h2>
-                    <li><a href="/user">{{imp[2][5]}}</a></li>
                 </div>
             </div>
             <div id="main">
