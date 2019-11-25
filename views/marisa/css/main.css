@@ -292,32 +292,6 @@ div#pre_search a {
     margin-top: 10px;
 }
 
-#top_tool_mobile {
-    float: right;
-}
-
-#mobile_menu {
-    width: 200px;
-    height: 100%;
-    position: fixed;
-    top: 0;
-    right: 0;
-    background: white;
-    border-left: 2px solid gainsboro;
-    z-index: 1;
-    overflow-y: scroll;
-}
-
-#mobile_menu button {
-    color: dodgerblue;
-}
-
-#mobile_menu_main {
-    width: 90%;
-    margin: auto;
-    margin-top: 5%;
-}
-
 #toc {
     max-width: 300px;
 }
