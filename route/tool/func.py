@@ -606,7 +606,7 @@ def ip_pas(raw_ip):
         curs.execute(db_change("select data from other where name = 'ip_view'"))
         data = curs.fetchall()
         if data and data[0][0] != '':
-            ip = re.sub('((?:(?!\.).)+)$', 'xxx', raw_ip)
+            ip = re.sub('((?:(?!\.).)+)\.((?:(?!\.).)+)$', '*.*', raw_ip)
 
             if not admin_check(1):
                 hide = 1
