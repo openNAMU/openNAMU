@@ -10,13 +10,9 @@ for i_data in os.listdir("route"):
 
 version_list = json.loads(open('version.json').read())
 
-r_ver = version_list['master']['r_ver']
-c_ver = version_list['master']['c_ver']
-s_ver = version_list['master']['s_ver']
-
-print('Version : ' + r_ver)
-print('DB set version : ' + c_ver)
-print('Skin set version : ' + s_ver)
+print('Version : ' + version_list['master']['r_ver'])
+print('DB set version : ' + version_list['master']['c_ver'])
+print('Skin set version : ' + version_list['master']['s_ver'])
 print('----')
 
 app_var = json.loads(open('data/app_var.json').read())
@@ -184,7 +180,7 @@ if setup_tool == 0:
         if not ver_set_data:
             setup_tool = 1
         else:
-            if c_ver > ver_set_data[0][0]:
+            if version_list['master']['c_ver'] > ver_set_data[0][0]:
                 setup_tool = 1
     except:
         setup_tool = 1
@@ -271,7 +267,7 @@ if not adsense_result:
     curs.execute(db_change('insert into other (name, data) values ("adsense_code", "")'))
 
 curs.execute(db_change('delete from other where name = "ver"'))
-curs.execute(db_change('insert into other (name, data) values ("ver", ?)'), [c_ver])
+curs.execute(db_change('insert into other (name, data) values ("ver", ?)'), [version_list['master']['c_ver']])
 
 def back_up():
     print('----')
@@ -408,7 +404,7 @@ def server_restart():
 
 @app.route('/update', methods=['GET', 'POST'])
 def server_now_update():
-    return server_now_update_2(conn, r_ver)
+    return server_now_update_2(conn, version_list['master']['r_ver'])
 
 @app.route('/oauth_setting', methods=['GET', 'POST'])
 def setting_oauth():
@@ -476,7 +472,7 @@ def main_other():
 @app.route('/manager', methods=['POST', 'GET'])
 @app.route('/manager/<int:num>', methods=['POST', 'GET'])
 def main_manager(num = 1):
-    return main_manager_2(conn, num, r_ver, set_data['db_type'])
+    return main_manager_2(conn, num, version_list['master']['r_ver'], set_data['db_type'])
         
 @app.route('/title_index')
 def list_title_index():
@@ -642,7 +638,7 @@ def api_raw(name = ''):
 
 @app.route('/api/version')
 def api_version():
-    return api_version_2(conn, r_ver, c_ver)
+    return api_version_2(conn, version_list['master']['r_ver'], version_list['master']['c_ver'])
 
 @app.route('/api/skin_info')
 @app.route('/api/skin_info/<name>')
