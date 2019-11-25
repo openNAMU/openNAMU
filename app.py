@@ -75,7 +75,6 @@ while 1:
         
 print('DB name : ' + set_data['db'])
 print('DB type : ' + set_data['db_type'])
-db_name = set_data['db']
 
 db_data_get(set_data['db_type'])
 
@@ -111,16 +110,16 @@ if set_data['db_type'] == 'mysql':
     curs = conn.cursor()
 
     try:
-        curs.execute(db_change('create database ? default character set utf8mb4;')%pymysql.escape_string(db_name))
+        curs.execute(db_change('create database ? default character set utf8mb4;')%pymysql.escape_string(set_data['db']))
     except:
         pass
 
-    curs.execute(db_change('use ?')%pymysql.escape_string(db_name))
+    curs.execute(db_change('use ?')%pymysql.escape_string(set_data['db']))
 else:
-    conn = sqlite3.connect(db_name + '.db', check_same_thread = False)
+    conn = sqlite3.connect(set_data['db'] + '.db', check_same_thread = False)
     curs = conn.cursor()
             
-if os.path.exists(db_name + '.db'):
+if os.path.exists(set_data['db'] + '.db'):
     setup_tool = 0
 else:
     setup_tool = 1
@@ -277,7 +276,7 @@ curs.execute(db_change('insert into other (name, data) values ("ver", ?)'), [c_v
 def back_up():
     print('----')
     try:
-        shutil.copyfile(db_name + '.db', 'back_' + db_name + '.db')
+        shutil.copyfile(set_data['db'] + '.db', 'back_' + set_data['db'] + '.db')
         
         print('Back up : OK')
     except:
@@ -401,7 +400,7 @@ def list_give():
 
 @app.route('/indexing', methods=['POST', 'GET'])
 def server_indexing():
-    return server_indexing_2(conn)       
+    return server_indexing_2(conn, set_data['db_type'])       
 
 @app.route('/restart', methods=['POST', 'GET'])
 def server_restart():
@@ -477,7 +476,7 @@ def main_other():
 @app.route('/manager', methods=['POST', 'GET'])
 @app.route('/manager/<int:num>', methods=['POST', 'GET'])
 def main_manager(num = 1):
-    return main_manager_2(conn, num, r_ver)
+    return main_manager_2(conn, num, r_ver, set_data['db_type'])
         
 @app.route('/title_index')
 def list_title_index():
