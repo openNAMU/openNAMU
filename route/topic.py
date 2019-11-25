@@ -63,7 +63,11 @@ def topic_2(conn, name, sub):
             curs.execute(db_change("select ip from topic where title = ? and sub = ? and id = ?"), [name, sub, rd_data])
             ip_data = curs.fetchall()
             if ip_data and ip_or_user(ip_data[0][0]) == 0:
-                curs.execute(db_change('insert into alarm (name, data, date) values (?, ?, ?)'), [ip_data[0][0], ip + ' | <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '#' + str(num) + '">' + name + ' | ' + sub + ' | #' + str(num) + '</a>', today])
+                curs.execute(db_change('insert into alarm (name, data, date) values (?, ?, ?)'), [
+                    ip_data[0][0], 
+                    ip + ' | <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '#' + str(num) + '">' + name + ' | ' + sub + ' | #' + str(num) + '</a>', 
+                    today
+                ])
             
         data = re.sub("(?P<in>#(?:[0-9]+))", '[[\g<in>]]', data)
 
