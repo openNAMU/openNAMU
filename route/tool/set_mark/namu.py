@@ -157,7 +157,16 @@ def table_start(data):
                     
                     number = return_table[6]
                     
-                    table = re.sub('^((?:\|\|)+)((?:&lt;(?:(?:(?!&gt;).)+)&gt;)*)\n*', '\n<table ' + return_table[5] + ' ' + return_table[0] + '><tbody><tr ' + return_table[1] + '><td ' + return_table[2] + ' ' + return_table[3] + ' ' + return_table[4] + '>', table, 1)
+                    table = re.sub(
+                        '^((?:\|\|)+)((?:&lt;(?:(?:(?!&gt;).)+)&gt;)*)\n*', 
+                        '\n' + \
+                            '<table ' + return_table[5] + ' ' + return_table[0] + '>' + \
+                                '<tbody>' + \
+                                    '<tr ' + return_table[1] + '>' + \
+                                        '<td ' + return_table[2] + ' ' + return_table[3] + ' ' + return_table[4] + '>', 
+                        table, 
+                        1
+                    )
                 else:
                     break
                     
@@ -170,7 +179,12 @@ def table_start(data):
                     
                     return_table = table_parser(row_table[1], row_table[2], row_table[0], number)
                     
-                    table = re.sub('\|\|\n((?:\|\|)+)((?:&lt;(?:(?:(?!&gt;).)+)&gt;)*)\n*', '</td></tr><tr ' + return_table[1] + '><td ' + return_table[2] + ' ' + return_table[3] + ' ' + return_table[4] + '>', table, 1)
+                    table = re.sub(
+                        '\|\|\n((?:\|\|)+)((?:&lt;(?:(?:(?!&gt;).)+)&gt;)*)\n*', 
+                        '</td></tr><tr ' + return_table[1] + '><td ' + return_table[2] + ' ' + return_table[3] + ' ' + return_table[4] + '>', 
+                        table, 
+                        1
+                    )
                 else:
                     break
 
@@ -181,7 +195,12 @@ def table_start(data):
                     
                     return_table = table_parser(cel_table[1], re.sub('\n', ' ', cel_table[2]), cel_table[0], number)
                     
-                    table = re.sub('((?:\|\|)+)((?:&lt;(?:(?:(?!&gt;).)+)&gt;)*)\n*', '</td><td ' + return_table[2] + ' ' + return_table[3] + ' ' + return_table[4] + '>', table, 1)
+                    table = re.sub(
+                        '((?:\|\|)+)((?:&lt;(?:(?:(?!&gt;).)+)&gt;)*)\n*', 
+                        '</td><td ' + return_table[2] + ' ' + return_table[3] + ' ' + return_table[4] + '>', 
+                        table, 
+                        1
+                    )
                 else:
                     break
 
@@ -290,10 +309,22 @@ def middle_parser(data, fol_num, syntax_num, folding_num, include_num):
                                                         if folding_num == 0:
                                                             folding_num = 1
                                                         
-                                                        data = re.sub('{{{#!folding ?((?:(?!\n).)*)\n?', '<div>' + str(folding_data[0]) + ' <div style="display: inline-block;"><a href="javascript:void(0);" onclick="do_open_folding(' + str(fol_num) + ', \'' + include_num + '\', this);">[+]</a></div_2><div id="' + include_num + 'folding_' + str(fol_num) + '" style="display: none;"><div id="wiki_div" style="">', data, 1)
+                                                        data = re.sub(
+                                                            '{{{#!folding ?((?:(?!\n).)*)\n?', '' + \
+                                                            '<div>' + \
+                                                                str(folding_data[0]) + ' ' + \
+                                                                '<div style="display: inline-block;">' + \
+                                                                    '<a href="javascript:void(0);" onclick="do_open_folding(\'' + include_num + 'folding_' + str(fol_num) + '\', this);">' + \
+                                                                        '[+]' + \
+                                                                    '</a>' + \
+                                                                '</div_2>' + \
+                                                                '<div id="' + include_num + 'folding_' + str(fol_num) + '" style="display: none;">' + \
+                                                                    '<div id="wiki_div" style="">', 
+                                                            data, 
+                                                            1
+                                                        )
                                                         
                                                         fol_num += 1
-
                                                     else:
                                                         middle_search = re.search('^#!html', middle_data[0])
                                                         if middle_search:
@@ -384,7 +415,12 @@ def middle_parser(data, fol_num, syntax_num, folding_num, include_num):
 
             end_data += [['syntax_' + str(num), syntax_data[1], 'normal']]
 
-            data = re.sub('<code class="((?:(?!").)+)">((?:(?:(?:(?!<\/code>|<span id="syntax_)).)+\n*)+)<\/code>', '<code class="' + syntax_data[0] + '"><span id="syntax_' + str(num) + '"></span></code>', data, 1)
+            data = re.sub(
+                '<code class="((?:(?!").)+)">((?:(?:(?:(?!<\/code>|<span id="syntax_)).)+\n*)+)<\/code>', 
+                '<code class="' + syntax_data[0] + '"><span id="syntax_' + str(num) + '"></span></code>', 
+                data, 
+                1
+            )
         else:
             break
 
@@ -545,6 +581,8 @@ def namu(conn, data, title, main_num, include_num):
             data = re.sub('\n(?P<in>={1,6}) ?(?P<out>(?:(?!=).)+) ?={1,6}\n', '\n[toc]\n\g<in> \g<out> \g<in>\n', data, 1)
     else:
         data = no_toc_re.sub('', data)
+
+    data = '<div class="all_in_data" id="in_data_0">' + data
         
     toc_full = 0
     toc_top_stack = 6
@@ -581,22 +619,54 @@ def namu(conn, data, title, main_num, include_num):
                     break
 
             all_stack = re.sub('^0\.', '', all_stack)
+            all_stack = re.sub('\.$', '', all_stack)
+
             new_toc_data = re.sub('=*$', '', toc[1])
             new_toc_data = re.sub(' +$', '', new_toc_data)
-            new_toc_data = re.sub('^# ?(?P<in>[^#]+) ?#$', '\g<in>', new_toc_data)
+            if re.search('^# ?(?P<in>[^#]+) ?#$', new_toc_data):
+                fol_head = '+'
+                
+                new_toc_data = re.sub('^# ?(?P<in>[^#]+) ?#$', '\g<in>', new_toc_data)
+            else:
+                fol_head = '-'
             
-            data = re.sub('\n(={1,6}) ?((?:(?!\n).)+) ?\n', '\n<h' + toc_number + ' id="s-' + re.sub('\.$', '', all_stack) + '"><a href="#toc">' + all_stack + '</a> ' + new_toc_data + ' <span style="font-size: 12px"><a href="/edit/' + tool.url_pas(title) + '?section=' + str(edit_number) + '">(Edit)</a></span></h' + toc_number + '>\n', data, 1)
+            data = re.sub(
+                '\n(={1,6}) ?((?:(?!\n).)+) ?\n', 
+                '\n' + \
+                '</div>'
+                '<h' + toc_number + ' id="s-' + all_stack + '">' + \
+                    '<a href="#toc">' + all_stack + '.</a> ' + new_toc_data + ' ' + \
+                    '<span style="font-size: 12px">' + \
+                        '<a href="/edit/' + tool.url_pas(title) + '?section=' + str(edit_number) + '">(Edit)</a>' + \
+                        ' ' + \
+                        '<a href="javascript:void(0);" onclick="do_open_folding(\'in_data_' + all_stack + '\', this);">' + \
+                            '[' + fol_head + ']' + \
+                        '</a>' + \
+                    '</span>' + \
+                '</h' + toc_number + '>' + \
+                '<div class="all_in_data"' + (' style="display: none;"' if fol_head == '+' else '') + ' id="in_data_' + all_stack + '">' + \
+                    '\n',
+                data, 
+                1
+            )
+
+            plus_data += '<script>'
 
             toc_main_data = new_toc_data
             toc_main_data = re.sub('\[\*((?:(?! |\]).)*)(?: ((?:(?!(\[\*(?:(?:(?!\]).)+)\]|\])).)+))?\]', '', toc_main_data)
             toc_main_data = re.sub('<span id="math_[0-9]"><\/span>', '(Math)', toc_main_data)
             
-            toc_data += '<span style="margin-left: ' + str((toc_full - toc_top_stack) * 10) + 'px;"><a href="#s-' + re.sub('\.$', '', all_stack) + '">' + all_stack + '</a> ' + toc_main_data + '</span>\n'
+            toc_data += '' + \
+                '<span style="margin-left: ' + str((toc_full - toc_top_stack) * 10) + 'px;">' + \
+                    '<a href="#s-' + all_stack + '">' + all_stack + '</a> ' + toc_main_data + \
+                '</span>' + \
+                '\n' + \
+            ''
         else:
             break
 
     toc_data += '</div>'
-    
+    data += '</div>'
     data = toc_re.sub(toc_data, data)
 
     data = tool.savemark(data)
@@ -1120,7 +1190,7 @@ def namu(conn, data, title, main_num, include_num):
     data = re.sub('<\/td_1>', '</td>', data)
     data = re.sub('<\/ul>\n', '</ul>', data)
     
-    data = re.sub('(?P<in><\/h[0-9]>)(\n)+', '\g<in>', data)
+    data = re.sub('(?P<in><div class="all_in_data"(?:(?:(?!id=).)+)? id="in_data_([^"]+)">)(\n)+', '\g<in>', data)
     data = re.sub('\n\n<ul>', '\n<ul>', data)
     data = re.sub('<\/ul>\n\n', '</ul>', data)
     data = re.sub('^(\n)+', '', data)
