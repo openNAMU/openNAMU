@@ -387,7 +387,7 @@ def other2(data):
     req_list = ''
     
     css_filter = {
-        'main.css' : '2'
+        'main.css' : '3'
     }
     for i_data in os.listdir(os.path.join("views", "main_css", "css")):
         if i_data in css_filter:
@@ -402,7 +402,7 @@ def other2(data):
         'topic_main_load.js' : '2',
         'topic_plus_load.js' : '2',
         'do_stop_exit.js' : '2',
-        'do_open_folding.js' : '2',
+        'do_open_folding.js' : '3',
         'shotcuts_set.js' : '2'
     }
     for i_data in os.listdir(os.path.join("views", "main_css", "js")):
