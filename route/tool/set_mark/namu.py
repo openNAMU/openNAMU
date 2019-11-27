@@ -650,8 +650,6 @@ def namu(conn, data, title, main_num, include_num):
                 1
             )
 
-            plus_data += '<script>'
-
             toc_main_data = new_toc_data
             toc_main_data = re.sub('\[\*((?:(?! |\]).)*)(?: ((?:(?!(\[\*(?:(?:(?!\]).)+)\]|\])).)+))?\]', '', toc_main_data)
             toc_main_data = re.sub('<span id="math_[0-9]"><\/span>', '(Math)', toc_main_data)
@@ -666,7 +664,6 @@ def namu(conn, data, title, main_num, include_num):
             break
 
     toc_data += '</div>'
-    data += '</div>'
     data = toc_re.sub(toc_data, data)
 
     data = tool.savemark(data)
@@ -1026,7 +1023,7 @@ def namu(conn, data, title, main_num, include_num):
     footnote_dict = {}
     footnote_re = {}
     
-    footdata_all = '<hr><ul id="footnote_data">'
+    footdata_all = '</div><hr><ul id="footnote_data">'
     
     re_footnote = re.compile('(?:\[\*((?:(?! |\]).)*)(?: ((?:(?!(?:\[\*|\])).)+))?\]|(\[(?:각주|footnote)\]))')
     while 1:
@@ -1127,8 +1124,8 @@ def namu(conn, data, title, main_num, include_num):
         ''
 
     footdata_all += '</ul>'
-    if footdata_all == '<hr><ul id="footnote_data"></ul>':
-        footdata_all = ''
+    if footdata_all == '</div><hr><ul id="footnote_data"></ul>':
+        footdata_all = '</div>'
 
     data = re.sub('\n$', footdata_all, data + '\n', 1)
 
