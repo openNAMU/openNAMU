@@ -350,20 +350,31 @@ def setting_2(conn, num):
                 curs.execute(db_change("select data from other where name = 'body'"))
                 title = '_body'
                 start = ''
+                plus = '''
+                    <button id="preview" type="button" onclick="load_raw_preview(\'content\', \'see_preview\')">''' + load_lang('preview') + '''</button>
+                    <hr class=\"main_hr\">
+                    <div id="see_preview"></div>
+                '''
             elif num == 7:
                 curs.execute(db_change("select data from other where name = 'bottom_body'"))
                 title = '_bottom_body'
                 start = ''
+                plus = '''
+                    <button id="preview" type="button" onclick="load_raw_preview(\'content\', \'see_preview\')">''' + load_lang('preview') + '''</button>
+                    <hr class=\"main_hr\">
+                    <div id="see_preview"></div>
+                '''
             else:
                 curs.execute(db_change("select data from other where name = 'head' and coverage = ?"), [flask.request.args.get('skin', '')])
                 title = '_head'
-                start = '<a href="?">(' + load_lang('all') + ')</a> ' + \
-                ' '.join(['<a href="?skin=' + i + '">(' + i + ')</a>' for i in load_skin('', 1)]) + \
-                '''
+                start = '' + \
+                    '<a href="?">(' + load_lang('all') + ')</a> ' + \
+                    ' '.join(['<a href="?skin=' + i + '">(' + i + ')</a>' for i in load_skin('', 1)]) + '''
                     <hr class=\"main_hr\">
                     <span>&lt;style&gt;CSS&lt;/style&gt;<br>&lt;script&gt;JS&lt;/script&gt;</span>
                     <hr class=\"main_hr\">
                 '''
+                plus = ''
                 
             head = curs.fetchall()
             if head:
@@ -371,14 +382,20 @@ def setting_2(conn, num):
             else:
                 data = ''
 
+            if flask.request.args.get('skin', '') != '':
+                sub_plus = ' (' + flask.request.args.get('skin', '') + ')'
+            else:
+                sub_plus = ''
+
             return easy_minify(flask.render_template(skin_check(), 
-                imp = [load_lang(data = 'main' + title, safe = 1), wiki_set(), custom(), other2([0, 0])],
+                imp = [load_lang(data = 'main' + title, safe = 1), wiki_set(), custom(), other2([' (HTML)' + sub_plus, 0])],
                 data = '''
                     <form method="post">
                         ''' + start + '''
-                        <textarea rows="25" name="content">''' + html.escape(data) + '''</textarea>
+                        <textarea rows="25" name="content" id="content">''' + html.escape(data) + '''</textarea>
                         <hr class=\"main_hr\">
                         <button id="save" type="submit">''' + load_lang('save') + '''</button>
+                        ''' + plus + '''
                     </form>
                 ''',
                 menu = [['setting', load_lang('return')]]
