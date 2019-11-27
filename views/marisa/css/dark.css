@@ -43,3 +43,7 @@ textarea, input, button, select {
 #toron_color_blue {
     background: #314c56;
 }
+
+pre#syntax {
+    background: black;
+}
