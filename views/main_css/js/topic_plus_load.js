@@ -4,10 +4,15 @@ function topic_plus_load(name, sub, num) {
         var p_data = document.getElementById("plus_topic");
         var n_data = '';
         var n_num = 1;
+        var url_2 = "/api/markup";
 
         var xhr = new XMLHttpRequest();
         xhr.open("GET", url, true);
         xhr.send(null);
+
+        var xhr_2 = new XMLHttpRequest();
+        xhr_2.open("GET", url_2, true);
+        xhr_2.send(null);
 
         xhr.onreadystatechange = function() {
             if(this.readyState === 4 && this.status === 200 && this.responseText !== '{}\n') {                

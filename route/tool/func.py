@@ -400,7 +400,7 @@ def other2(data):
         'render_html.js' : '3',
         'do_open_foot.js' : '4',
         'topic_main_load.js' : '2',
-        'topic_plus_load.js' : '2',
+        'topic_plus_load.js' : '3',
         'do_stop_exit.js' : '2',
         'do_open_folding.js' : '3',
         'shotcuts_set.js' : '2'
