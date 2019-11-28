@@ -54,12 +54,14 @@ def api_topic_sub_2(conn, name, sub, time):
                     
                 if flask.request.args.get('top', None):
                     t_color = 'toron_color_red'
-                elif i[3] == s_user:
+                elif i[3] == s_user and i[5] != '1':
                     t_color = 'toron_color_green'
                 elif i[5] == '1':
                     t_color = 'toron_color_blue'
                 else:
                     t_color = 'toron_color'
+
+                print(i[5])
 
                 if admin == 1 or b_color != 'toron_color_not':
                     ip += ' <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/admin/' + i[0] + '">(' + load_lang('discussion_tool') + ')</a>'

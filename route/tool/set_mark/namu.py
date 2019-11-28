@@ -1023,7 +1023,9 @@ def namu(conn, data, title, main_num, include_num):
     footnote_dict = {}
     footnote_re = {}
     
-    footdata_all = '</div><hr><ul id="footnote_data">'
+    footdata_all = '<hr><ul id="footnote_data">'
+
+    print(data)
     
     re_footnote = re.compile('(?:\[\*((?:(?! |\]).)*)(?: ((?:(?!(?:\[\*|\])).)+))?\]|(\[(?:각주|footnote)\]))')
     while 1:
@@ -1103,6 +1105,7 @@ def namu(conn, data, title, main_num, include_num):
         else:
             break
 
+    print(data)
     data = re.sub('\n+$', '', data)
 
     footnote_all.sort()
@@ -1124,6 +1127,7 @@ def namu(conn, data, title, main_num, include_num):
         ''
 
     footdata_all += '</ul>'
+    footdata_all = '</div>' + footdata_all
     if footdata_all == '</div><hr><ul id="footnote_data"></ul>':
         footdata_all = '</div>'
 
