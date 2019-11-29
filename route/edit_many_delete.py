@@ -49,6 +49,9 @@ def edit_many_delete_2(conn, app_var):
             data = '''
                 <form method="post">
                     <textarea rows="25" placeholder="''' + load_lang('many_delete_help') + '''" name="content"></textarea>
+                    <hr class=\"main_hr\">
+                    <input placeholder="''' + load_lang('why') + '''" name="send" type="text">
+                    <hr class=\"main_hr\">
                     <button type="submit">''' + load_lang('delete') + '''</button>
                 </form>
             ''',
