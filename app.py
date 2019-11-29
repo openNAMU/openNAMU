@@ -459,7 +459,11 @@ def edit(name = None):
         
 @app.route('/delete/<everything:name>', methods=['POST', 'GET'])
 def edit_delete(name = None):
-    return edit_delete_2(conn, name, app_var)        
+    return edit_delete_2(conn, name, app_var)  
+
+@app.route('/many_delete', methods=['POST', 'GET'])
+def edit_many_delete(name = None):
+    return edit_many_delete_2(conn, app_var)     
             
 @app.route('/move/<everything:name>', methods=['POST', 'GET'])
 def edit_move(name = None):
