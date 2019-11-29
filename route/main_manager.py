@@ -36,6 +36,7 @@ def main_manager_2(conn, num, r_ver, db_type):
                     <h2>''' + load_lang('owner') + '''</h2>
                     <ul>
                         <li><a href="/give_log">''' + load_lang('admin_group_list') + '''</a></li>
+                        <li><a href="/many_delete">''' + load_lang('many_delete') + '''</a></li>
                         <li><a href="/setting">''' + load_lang('setting') + '''</a></li>
                     </ul>
                     <h3>''' + load_lang('filter') + '''</h3>

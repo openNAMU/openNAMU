@@ -668,8 +668,7 @@ def namu(conn, data, title, main_num, include_num):
 
     data = tool.savemark(data)
     
-    anchor_re = re.compile("\[anchor\((?P<in>(?:(?!\)\]).)+)\)\]", re.I)
-    data = anchor_re.sub('<span id="\g<in>"></span>', data)
+    data = re.sub(r"\[anchor\((?P<in>(?:(?!\)\]).)+)\)\]", '<span id="\g<in>"></span>', data, flags = re.I)
 
     ruby_all = re.findall(r"\[ruby\(((?:(?:(?!\)\]).)+))\)\]", data, flags = re.I)
     for i in ruby_all:
@@ -702,17 +701,13 @@ def namu(conn, data, title, main_num, include_num):
 
         data = re.sub(r"\[ruby\(((?:(?:(?!\)\]).)+))\)\]", ruby_data, data, 1, flags = re.I)
 
-    now_time = tool.get_time()
-
-    date_re = re.compile('\[date\]', re.I)
-    data = date_re.sub(now_time, data)
-
-    pagecount_re = re.compile('\[pagecount\]', re.I)
 
     curs.execute(tool.db_change('select data from other where name = "count_all_title"'))
     all_title = curs.fetchall()
+    data = re.sub(r'\[pagecount\]', all_title[0][0], data, flags = re.I)
 
-    data = pagecount_re.sub(all_title[0][0], data)
+    now_time = tool.get_time()
+    data = re.sub(r'\[date\]', now_time, data, flags = re.I)
     
     time_data = re.search('^([0-9]{4}-[0-9]{2}-[0-9]{2})', now_time)
     time = time_data.groups()
