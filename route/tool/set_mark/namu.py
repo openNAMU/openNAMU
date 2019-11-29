@@ -671,8 +671,36 @@ def namu(conn, data, title, main_num, include_num):
     anchor_re = re.compile("\[anchor\((?P<in>(?:(?!\)\]).)+)\)\]", re.I)
     data = anchor_re.sub('<span id="\g<in>"></span>', data)
 
-    ruby_re = re.compile("\[ruby\((?P<in>(?:(?!,).)+)\, ?ruby=(?P<out>(?:(?!\)\]|,).)+)(?:\, ?color=(?P<under>(?:(?!\)\]|,).)+)(?:, ?(?:(?:(?!\)\]).)+))?)?\)\]", re.I)
-    data = ruby_re.sub('<ruby>\g<in><rp>(</rp><rt style="color: \g<under>">\g<out></rt><rp>)</rp></ruby>', data)
+    ruby_all = re.findall(r"\[ruby\(((?:(?:(?!\)\]).)+))\)\]", data, flags = re.I)
+    for i in ruby_all:
+        ruby_code = re.search(r'^([^,]+)', i)
+        if ruby_code:
+            ruby_code = ruby_code.groups()[0]
+        else:
+            ruby_code = 'Test'
+
+        ruby_top = re.search(r'ruby=([^,]+)', i, flags = re.I)
+        if ruby_top:
+            ruby_top = ruby_top.groups()[0]
+        else:
+            ruby_top = 'Test'
+
+        ruby_color = re.search(r'color=([^,]+)', i, flags = re.I)
+        if ruby_color:
+            ruby_color = 'color: ' + ruby_color.groups()[0] + ';'
+        else:
+            ruby_color = ''
+
+        ruby_data = '' + \
+            '<ruby>' + \
+                ruby_code \
+                + '<rp>(</rp>' + \
+                '<rt style="' + ruby_color + '">' + ruby_top + '</rt>' + \
+                '<rp>)</rp>' + \
+            '</ruby>' + \
+        ''
+
+        data = re.sub(r"\[ruby\(((?:(?:(?!\)\]).)+))\)\]", ruby_data, data, 1, flags = re.I)
 
     now_time = tool.get_time()
 
@@ -769,7 +797,7 @@ def namu(conn, data, title, main_num, include_num):
             else:
                 video_src = 'https://embed.nicovideo.jp/watch/' + video_code
                 
-            data = video_re.sub('<iframe width="' + video_width + '" height="' + video_height + '" src="' + video_src + video_start + '" allowfullscreen frameborder="0"></iframe>', data, 1)
+            data = video_re.sub('<iframe style="width: ' + video_width + '; height: ' + video_height + ';" src="' + video_src + video_start + '" allowfullscreen></iframe>', data, 1)
         else:
             break
 
