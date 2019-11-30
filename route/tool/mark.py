@@ -42,7 +42,7 @@ def plusing(data):
         if not curs.fetchall():
             curs.execute(db_change("insert into back (title, link, type) values (?, ?, ?)"), [data_in[1], data_in[0], data_in[2]])
 
-def namumark(title, data, num, include):
+def render_do(title, data, num, include):
     curs.execute(db_change('select data from other where name = "markup"'))
     rep_data = curs.fetchall()
     if rep_data[0][0] == 'namumark':

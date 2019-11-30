@@ -141,7 +141,7 @@ def render_set(title = '', data = '', num = 0, s_data = 0, include = None):
         return data
     else:
         if data != None:
-            return namumark(title, data, num, include)
+            return render_do(title, data, num, include)
         else:
             return 'HTTP Request 404'
 
