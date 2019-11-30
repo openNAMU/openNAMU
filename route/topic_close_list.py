@@ -69,7 +69,7 @@ def topic_close_list_2(conn, name, tool):
                         <div id="topic_back_pre_''' + str(t_num) + '''"></div>
                         <script>
                             topic_list_load("''' + name + '''", "''' + data[0] + '''", "1", "topic_pre_''' + str(t_num) + '''");
-                            if("''' + str(t_num) + '''" !== "1") {
+                            if("''' + str(t_data[0][0]) + '''" !== "1") {
                                 topic_list_load("''' + name + '''", "''' + data[0] + '''", "''' + t_data[0][0] + '''", "topic_back_pre_''' + str(t_num) + '''");
                             }
                         </script>
