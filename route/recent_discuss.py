@@ -30,10 +30,17 @@ def recent_discuss_2(conn):
         curs.execute(db_change("select title, sub, date from rd where stop = 'O' order by date desc limit 50"))
         
     for data in curs.fetchall():
+        curs.execute(db_change("select code from topic where id = '1' and title = ? and sub = ?"), [data[0], data[1]])
+        get_code = curs.fetchall()
+        if get_code and get_code[0][0] != '':
+            get_code = get_code[0][0]
+        else:
+            get_code = '1'
+
         title = html.escape(data[0])
         sub = html.escape(data[1])
 
-        div += '<tr><td><a href="/topic/' + url_pas(data[0]) + '/sub/' + url_pas(data[1]) + '">' + title + '</a> (' + sub + ')</td><td>' + data[2] + '</td></tr>'
+        div += '<tr><td><a href="/thread/' + get_code + '">' + title + '</a> (' + sub + ')</td><td>' + data[2] + '</td></tr>'
     
     div += '</tbody></table>'
             

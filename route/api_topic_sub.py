@@ -1,7 +1,11 @@
 from .tool.func import *
 
-def api_topic_sub_2(conn, name, sub, time):
+def api_topic_sub_2(conn, topic_num):
     curs = conn.cursor()
+
+    topic_change_data = topic_change(topic_num)
+    name = topic_change_data[0]
+    sub = topic_change_data[1]
 
     if flask.request.args.get('num', None):
         curs.execute(db_change("select id, data, date, ip, block, top from topic where title = ? and sub = ? and id + 0 = ? + 0 order by id + 0 asc"), [
@@ -62,26 +66,26 @@ def api_topic_sub_2(conn, name, sub, time):
                     t_color = 'toron_color'
 
                 if admin == 1 or b_color != 'toron_color_not':
-                    ip += ' <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/admin/' + i[0] + '">(' + load_lang('discussion_tool') + ')</a>'
+                    ip += ' <a href="/thread/' + str(topic_num) + '/admin/' + i[0] + '">(' + load_lang('discussion_tool') + ')</a>'
                     
                 if t_data_f == '':
                     t_data_f = '[br]'
             
-                all_data = '''
-                    <table id="toron">
-                        <tbody>
-                            <tr>
-                                <td id="''' + t_color + '''">
-                                    <a href="javascript:void(0);" id="''' + i[0] + '">#' + i[0] + '</a> ' + ip + ' <span style="float: right;">' + i[2] + '''</span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td id="''' + b_color + '">' + render_set(data = t_data_f, include = 'topic_' + i[0]) + '''</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <hr class="main_hr">
-                '''
+                all_data = '' + \
+                    '<table id="toron">' + \
+                        '<tbody>' + \
+                            '<tr>' + \
+                               '<td id="' + t_color + '">' + \
+                                    '<a href="javascript:void(0);" id="' + i[0] + '">#' + i[0] + '</a> ' + ip + ' <span style="float: right;">' + i[2] + '</span>' + \
+                                '</td>' + \
+                            '</tr>' + \
+                            '<tr>' + \
+                                '<td id="' + b_color + '">' + render_set(data = t_data_f, include = 'topic_' + i[0]) + '</td>' + \
+                            '</tr>' + \
+                        '</tbody>' + \
+                    '</table>' + \
+                    '<hr class="main_hr">' + \
+                ''
                 
                 json_data[i[0]] = {
                     "data" : all_data

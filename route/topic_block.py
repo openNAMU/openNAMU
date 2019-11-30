@@ -1,7 +1,11 @@
 from .tool.func import *
 
-def topic_block_2(conn, name, sub, num):
+def topic_block_2(conn, topic_num, num):
     curs = conn.cursor()
+
+    topic_change_data = topic_change(topic_num)
+    name = topic_change_data[0]
+    sub = topic_change_data[1]
 
     if admin_check(3, 'blind (' + name + ' - ' + sub + '#' + str(num) + ')') != 1:
         return re_error('/error/3')
@@ -18,4 +22,4 @@ def topic_block_2(conn, name, sub, num):
         
         conn.commit()
         
-    return redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '#' + str(num))
+    return redirect('/thread/' + str(topic_num) + '#' + str(num))

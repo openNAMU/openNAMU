@@ -1,10 +1,15 @@
 from .tool.func import *
 
-def view_raw_2(conn, name, sub_title, num):
+def view_raw_2(conn, name, topic_num, num):
     curs = conn.cursor()
 
     if acl_check(name, 'render') == 1:
         return re_error('/ban')
+
+    if topic_num:
+        topic_change_data = topic_change(topic_num)
+        name = topic_change_data[0]
+        sub_title = topic_change_data[1]
     
     v_name = name
     sub = ' (' + load_lang('raw') + ')'

@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def topic_stop_2(conn, name, sub):
+def topic_stop_2(conn, topic_num):
     curs = conn.cursor()
 
     if admin_check(3) != 1:
@@ -8,6 +8,10 @@ def topic_stop_2(conn, name, sub):
 
     ip = ip_check()
     time = get_time()
+
+    topic_change_data = topic_change(topic_num)
+    name = topic_change_data[0]
+    sub = topic_change_data[1]
 
     if flask.request.method == 'POST':
         curs.execute(db_change("select id from topic where title = ? and sub = ? order by id + 0 desc limit 1"), [name, sub])
@@ -42,7 +46,7 @@ def topic_stop_2(conn, name, sub):
 
             rd_plus(name, sub, time)
 
-        return redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub))    
+        return redirect('/thread/' + str(topic_num))    
     else:
         stop_d_list = ''
         agree_check = ''
