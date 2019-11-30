@@ -426,7 +426,7 @@ def middle_parser(data, fol_num, syntax_num, folding_num, include_num):
 
     return [data, [fol_num, syntax_num, folding_num]]
 
-def namu(conn, data, title, main_num, include_num):
+def namumark(conn, data, title, main_num, include_num):
     curs = conn.cursor()
 
     global plus_data

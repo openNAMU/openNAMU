@@ -1,4 +1,4 @@
-from .set_mark.namu import namu
+from .set_mark.namumark import namumark
 from .set_mark.markdown import markdown
 
 from .set_mark.tool import *
@@ -46,7 +46,7 @@ def namumark(title, data, num, include):
     curs.execute(db_change('select data from other where name = "markup"'))
     rep_data = curs.fetchall()
     if rep_data[0][0] == 'namumark':
-        data = namu(conn, data, title, num, include)
+        data = namumark(conn, data, title, num, include)
     elif rep_data[0][0] == 'markdown':
         data = markdown(conn, data, title, num)
     elif rep_data[0][0] == 'raw':
