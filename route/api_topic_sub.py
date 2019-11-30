@@ -61,8 +61,6 @@ def api_topic_sub_2(conn, name, sub, time):
                 else:
                     t_color = 'toron_color'
 
-                print(i[5])
-
                 if admin == 1 or b_color != 'toron_color_not':
                     ip += ' <a href="/topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/admin/' + i[0] + '">(' + load_lang('discussion_tool') + ')</a>'
                     
