@@ -44,3 +44,4 @@ blockquote { background-image: url(/views/acme/img/quote.png); background-positi
 .foot_in { overflow-y: scroll; height: calc(100% - 20px); }
 #origin { display: none; }
 .all_in_data { display: block; width: 100%; }
+#content { height: 100px; }

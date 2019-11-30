@@ -193,7 +193,7 @@ if setup_tool != 0:
     create_data['user'] = ['id', 'pw', 'acl', 'date', 'encode']
     create_data['user_set'] = ['name', 'id', 'data']
     create_data['ban'] = ['block', 'end', 'why', 'band', 'login']
-    create_data['topic'] = ['id', 'title', 'sub', 'data', 'date', 'ip', 'block', 'top']
+    create_data['topic'] = ['id', 'title', 'sub', 'data', 'date', 'ip', 'block', 'top', 'code']
     create_data['rb'] = ['block', 'end', 'today', 'blocker', 'why', 'band']
     create_data['back'] = ['title', 'link', 'type']
     create_data['custom'] = ['user', 'css']
@@ -445,9 +445,9 @@ def search_deep(name = 'test'):
     return search_deep_2(conn, name)
          
 @app.route('/raw/<everything:name>')
-@app.route('/topic/<everything:name>/sub/<sub_title>/raw/<int:num>')
-def view_raw(name = None, sub_title = None, num = None):
-    return view_raw_2(conn, name, sub_title, num)
+@app.route('/thread/<int:topic_num>/raw/<int:num>')
+def view_raw(name = None, topic_num = None, num = None):
+    return view_raw_2(conn, name, topic_num, num)
         
 @app.route('/revert/<everything:name>', methods=['POST', 'GET'])
 def edit_revert(name = None):
@@ -482,34 +482,33 @@ def main_manager(num = 1):
 def list_title_index():
     return list_title_index_2(conn)
                 
-@app.route('/topic/<everything:name>/sub/<sub>/b/<int:num>')
-def topic_block(name = None, sub = None, num = 1):
-    return topic_block_2(conn, name, sub, num)
+@app.route('/thread/<int:topic_num>/b/<int:num>')
+def topic_block(topic_num = 1, num = 1):
+    return topic_block_2(conn, topic_num, num)
         
-@app.route('/topic/<everything:name>/sub/<sub>/notice/<int:num>')
-def topic_top(name = None, sub = None, num = 1):
-    return topic_top_2(conn, name, sub, num)
+@app.route('/thread/<int:topic_num>/notice/<int:num>')
+def topic_top(topic_num = 1, num = 1):
+    return topic_top_2(conn, topic_num, num)
                 
-@app.route('/topic/<everything:name>/sub/<sub>/setting', methods=['POST', 'GET'])
-def topic_stop(name = None, sub = None):
-    return topic_stop_2(conn, name, sub)
+@app.route('/thread/<int:topic_num>/setting', methods=['POST', 'GET'])
+def topic_stop(topic_num = 1):
+    return topic_stop_2(conn, topic_num)
 
-@app.route('/topic/<everything:name>/sub/<sub>/tool')
-def topic_tool(name = None, sub = None):
-    return topic_tool_2(conn, name, sub)
+@app.route('/thread/<int:topic_num>/tool')
+def topic_tool(topic_num = 1):
+    return topic_tool_2(conn, topic_num)
 
-@app.route('/topic/<everything:name>/sub/<sub>/admin/<int:num>')
-def topic_admin(name = None, sub = None, num = 1):
-    return topic_admin_2(conn, name, sub, num)
+@app.route('/thread/<int:topic_num>/admin/<int:num>')
+def topic_admin(topic_num = 1, num = 1):
+    return topic_admin_2(conn, topic_num, num)
 
-@app.route('/topic/<everything:name>/sub/<sub>', methods=['POST', 'GET'])
-def topic(name = None, sub = None):
-    return topic_2(conn, name, sub)
+@app.route('/thread/<int:topic_num>', methods=['POST', 'GET'])
+def topic(topic_num = 1):
+    return topic_2(conn, topic_num)
         
 @app.route('/topic/<everything:name>', methods=['POST', 'GET'])
-@app.route('/topic/<everything:name>/<regex("close|agree"):tool>', methods=['GET'])
-def topic_close_list(name = None, tool = None):
-    return topic_close_list_2(conn, name, tool)
+def topic_close_list(name = 'test'):
+    return topic_close_list_2(conn, name)
 
 @app.route('/tool/<name>')
 def user_tool(name = None):
@@ -657,9 +656,9 @@ def api_markup():
 def api_user_info(name = ''):
     return api_user_info_2(conn, name)
 
-@app.route('/api/topic/<everything:name>/sub/<sub>')
-def api_topic_sub(name = '', sub = '', time = ''):
-    return api_topic_sub_2(conn, name, sub, time)
+@app.route('/api/thread/<topic_num>')
+def api_topic_sub(name = '', topic_num = 1):
+    return api_topic_sub_2(conn, topic_num)
 
 @app.route('/api/search/<name>')
 def api_search(name = ''):

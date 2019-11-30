@@ -1,6 +1,6 @@
-function topic_plus_load(name, sub, num) {
+function topic_plus_load(topic_num, num) {
     var test = setInterval(function() {
-        var url = "/api/topic/" + encodeURI(name) + "/sub/" + encodeURI(sub) + "?num=" + num + "&render=1";
+        var url = "/api/thread/" + String(topic_num) + "?num=" + num + "&render=1";
         var p_data = document.getElementById("plus_topic");
         var n_data = '';
         var n_num = 1;
@@ -49,7 +49,7 @@ function topic_plus_load(name, sub, num) {
                     }
                 }
 
-                topic_plus_load(name, sub, String(Number(num) + 1));
+                topic_plus_load(topic_num, String(Number(num) + 1));
                 clearInterval(test);
             }
         }

@@ -1,9 +1,9 @@
-function topic_main_load(name, sub, s_num) {
+function topic_main_load(topic_num, s_num) {
     var o_data = document.getElementById('main_topic');
     if(s_num) {
-        var url = "/api/topic/" + name + "/sub/" + sub + "?render=1&num=" + s_num;
+        var url = "/api/thread/" + String(topic_num) + "?render=1&num=" + s_num;
     } else {
-        var url = "/api/topic/" + name + "/sub/" + sub + "?render=1";
+        var url = "/api/thread/" + String(topic_num) + "?render=1";
     }
     var url_2 = "/api/markup";
     var n_data = "";
@@ -27,7 +27,7 @@ function topic_main_load(name, sub, s_num) {
             
             o_data.innerHTML = n_data;
             if(!s_num) {
-                topic_plus_load(name, sub, String(Number(num) + 1));
+                topic_plus_load(topic_num, String(Number(num) + 1));
             }
 
             xhr_2.onreadystatechange = function() {

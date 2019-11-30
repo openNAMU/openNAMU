@@ -160,19 +160,30 @@ def captcha_get():
     return data
 
 def update():
-    #v3.1.2
+    #v3.1.5
     try:
-        curs.execute(db_change('select title, dec from acl where dec != ""'))
+        num = 1
+        curs.execute(db_change('select title, sub from topic where id = "1" order by date asc'))
         db_data = curs.fetchall()
         for i in db_data:
-            curs.execute(db_change("update acl set decu = ? where title = ?"), [i[1], i[0]])
+            curs.execute(db_change("update topic set code = ? where title = ? and sub = ? and id = '1'"), [str(num), i[0], i[1]])
+            num += 1
 
-        print('Fix table acl column dec to decu')
+        print('----')
+        print('Add topic code')
         print('----')
     except:
         pass
 
     conn.commit()
+
+def topic_change(num):
+    curs.execute(db_change('select title, sub from topic where id = "1" and code = ?'), [str(num)])
+    db_data = curs.fetchall()
+    if db_data:
+        return [db_data[0][0], db_data[0][1]]
+    else:
+        return ['Test', 'Test']
 
 def pw_encode(data, data2 = '', type_d = ''):
     if type_d == '':
@@ -387,7 +398,7 @@ def other2(data):
     req_list = ''
     
     css_filter = {
-        'main.css' : '3'
+        'main.css' : '4'
     }
     for i_data in os.listdir(os.path.join("views", "main_css", "css")):
         if i_data in css_filter:
@@ -399,8 +410,10 @@ def other2(data):
         'load_include.js' : '2',
         'render_html.js' : '3',
         'do_open_foot.js' : '4',
-        'topic_main_load.js' : '2',
-        'topic_plus_load.js' : '3',
+        'topic_main_load.js' : '3',
+        'topic_plus_load.js' : '4',
+        'topic_top_load.js' : '2',
+        'topic_list_load.js' : '2',
         'do_stop_exit.js' : '2',
         'do_open_folding.js' : '3',
         'shotcuts_set.js' : '2'

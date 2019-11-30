@@ -1,9 +1,13 @@
 from .tool.func import *
 
-def topic_tool_2(conn, name, sub):
+def topic_tool_2(conn, topic_num):
     curs = conn.cursor()
 
     data = ''
+
+    topic_change_data = topic_change(topic_num)
+    name = topic_change_data[0]
+    sub = topic_change_data[1]
 
     curs.execute(db_change("select stop, agree from rd where title = ? and sub = ?"), [name, sub])
     close_data = curs.fetchall()
@@ -21,7 +25,7 @@ def topic_tool_2(conn, name, sub):
         data = '''
             <h2>''' + load_lang('admin_tool') + '''</h2>
             <ul>
-                <li><a href="/topic/''' + url_pas(name) + '/sub/' + url_pas(sub) + '''/setting">''' + load_lang('topic_setting') + '''</a></li>
+                <li><a href="/thread/''' + str(topic_num) + '/setting">' + load_lang('topic_setting') + '''</a></li>
             </ul>
         '''
     data += '''
