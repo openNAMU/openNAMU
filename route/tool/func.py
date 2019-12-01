@@ -155,7 +155,7 @@ def captcha_get():
             curs.execute(db_change('select data from other where name = "sec_re"'))
             sec_re = curs.fetchall()
             if sec_re and sec_re[0][0] != '':
-                data += recaptcha[0][0] + '<hr class=\"main_hr\">'
+                data += '<script src="https://www.google.com/recaptcha/api.js" async defer></script>' + recaptcha[0][0] + '<hr class=\"main_hr\">'
 
     return data
 
