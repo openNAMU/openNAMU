@@ -505,9 +505,10 @@ def setting_2(conn, num):
                 data = '''
                     <form method="post">
                         <h2><a href="https://www.google.com/recaptcha/admin">recaptcha</a></h2>
+                        <hr class=\"main_hr\">
                         <span>''' + load_lang('recaptcha') + ''' (HTML)</span>
                         <hr class=\"main_hr\">
-                        <input name="recaptcha" value="''' + html.escape(d_list[0]) + '''">
+                        <input name="recaptcha" placeholder='&lt;div class="g-recaptcha" data-sitekey="your_site_key"&gt;&lt;/div&gt;' value="''' + html.escape(d_list[0]) + '''">
                         <hr class=\"main_hr\">
                         <span>''' + load_lang('recaptcha') + ' (' + load_lang('secret_key') + ''')</span>
                         <hr class=\"main_hr\">
