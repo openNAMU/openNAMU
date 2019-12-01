@@ -4,7 +4,7 @@ def view_read_2(conn, name):
     curs = conn.cursor()
 
     sub = ''
-    acl = ''
+    acl = 0
     div = ''
     ip = ip_check()
 
@@ -22,7 +22,6 @@ def view_read_2(conn, name):
 
     curs.execute(db_change("select sub from rd where title = ? and not stop = 'O' order by date desc"), [name])
     if curs.fetchall():
-        sub += ' (' + load_lang('discussion') + ')'
         topic = 1
     else:
         topic = 0
@@ -86,7 +85,7 @@ def view_read_2(conn, name):
     curs.execute(db_change("select decu from acl where title = ?"), [name])
     data = curs.fetchall()
     if data:
-        acl += ' (' + load_lang('acl') + ')'
+        acl = 1
             
     if flask.request.args.get('from', None) and else_data:
         else_data = re.sub('^\r\n', '', else_data)
@@ -137,7 +136,7 @@ def view_read_2(conn, name):
     if num:
         menu = [['history/' + url_pas(name), load_lang('history')]]
         sub = ' (r' + str(num) + ')'
-        acl = ''
+        acl = 0
         r_date = 0
     else:
         if response_data == 404:
@@ -145,7 +144,7 @@ def view_read_2(conn, name):
         else:
             menu = [['edit/' + url_pas(name), load_lang('edit')]]
 
-        menu += [['topic/' + url_pas(name), load_lang('discussion'), topic], ['history/' + url_pas(name), load_lang('history')], ['xref/' + url_pas(name), load_lang('backlink')], ['acl/' + url_pas(name), load_lang('acl')]]
+        menu += [['topic/' + url_pas(name), load_lang('discussion'), topic], ['history/' + url_pas(name), load_lang('history')], ['xref/' + url_pas(name), load_lang('backlink')], ['acl/' + url_pas(name), load_lang('acl'), acl]]
 
         if flask.request.args.get('from', None):
             menu += [['w/' + url_pas(name), load_lang('pass')]]
@@ -211,7 +210,7 @@ def view_read_2(conn, name):
         watch_list = 0
         
     return easy_minify(flask.render_template(skin_check(), 
-        imp = [flask.request.args.get('show', name), wiki_set(), custom(), other2([sub + acl, r_date, watch_list])],
+        imp = [flask.request.args.get('show', name), wiki_set(), custom(), other2([sub, r_date, watch_list])],
         data = div,
         menu = menu
     )), response_data
