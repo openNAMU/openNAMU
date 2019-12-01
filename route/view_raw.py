@@ -6,6 +6,7 @@ def view_raw_2(conn, name, topic_num, num):
     if acl_check(name, 'render') == 1:
         return re_error('/ban')
 
+    sub_title = None
     if topic_num:
         topic_change_data = topic_change(topic_num)
         name = topic_change_data[0]
