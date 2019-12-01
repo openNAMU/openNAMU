@@ -758,14 +758,18 @@ def namumark(conn, data, title, main_num, include_num):
             width = re.search(', ?width=((?:(?!,).)+)', video[1])
             if width:
                 video_width = width.groups()[0]
+                if re.search('^[0-9]+$', video_width):
+                    video_width += 'px'
             else:
-                video_width = '560'
+                video_width = '560px'
             
             height = re.search(', ?height=((?:(?!,).)+)', video[1])
             if height:
                 video_height = height.groups()[0]
+                if re.search('^[0-9]+$', video_height):
+                    video_height += 'px'                
             else:
-                video_height = '315'
+                video_height = '315px'
 
             code = re.search('^((?:(?!,).)+)', video[1])
             if code:

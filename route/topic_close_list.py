@@ -39,7 +39,7 @@ def topic_close_list_2(conn, name):
             <form style="''' + display + '" method="post" action="/thread/' + topic_num + '''">
                 <input placeholder="''' + load_lang('discussion_name') + '''" name="title">
                 <hr class=\"main_hr\">
-                <textarea id="content" placeholder="''' + load_lang('content') + '''" name="content"></textarea>
+                <textarea rows="10" id="content" placeholder="''' + load_lang('content') + '''" name="content"></textarea>
                 <hr class=\"main_hr\">
                 ''' + captcha_get() + (ip_warring() if display == '' else '') + '''
                 <input style="display: none;" name="topic" value="''' + name + '''">
