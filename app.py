@@ -215,6 +215,11 @@ if setup_tool != 0:
                 curs.execute(db_change('select ' + create + ' from ' + create_table + ' limit 1'))
             except:
                 curs.execute(db_change("alter table " + create_table + " add " + create + " longtext default ''"))
+                
+            try:    
+                curs.execute(db_change('create index index_' + create_table + '_' + create + ' on ' + create_table + '(' + create + ')'))
+            except:
+                pass
 
     update()
 
@@ -329,7 +334,7 @@ all_title = curs.fetchall()
 if not all_title:
     curs.execute(db_change('insert into other (name, data) values ("count_all_title", "0")'))
 
-count_all_title()  
+# count_all_title()  
 
 # Func
 @app.route('/del_alarm')
@@ -393,10 +398,6 @@ def list_admin_use():
 @app.route('/give_log')
 def list_give():
     return list_give_2(conn)
-
-@app.route('/indexing', methods=['POST', 'GET'])
-def server_indexing():
-    return server_indexing_2(conn, set_data['db_type'])       
 
 @app.route('/restart', methods=['POST', 'GET'])
 def server_restart():
@@ -476,7 +477,7 @@ def main_other():
 @app.route('/manager', methods=['POST', 'GET'])
 @app.route('/manager/<int:num>', methods=['POST', 'GET'])
 def main_manager(num = 1):
-    return main_manager_2(conn, num, version_list['master']['r_ver'], set_data['db_type'])
+    return main_manager_2(conn, num, version_list['master']['r_ver'])
         
 @app.route('/title_index')
 def list_title_index():

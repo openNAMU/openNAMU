@@ -53,7 +53,7 @@ while 1:
             break
         
 print('DB name : ' + set_data['db'])
-db_name = set_data['db']
+print('DB type : ' + set_data['db_type'])
 
 db_data_get(set_data['db_type'])
 
@@ -89,13 +89,13 @@ if set_data['db_type'] == 'mysql':
     curs = conn.cursor()
 
     try:
-        curs.execute(db_change('create database ? default character set utf8mb4;')%pymysql.escape_string(db_name))
+        curs.execute(db_change('create database ? default character set utf8mb4;')%pymysql.escape_string(set_data['db']))
     except:
         pass
 
-    curs.execute(db_change('use ?')%pymysql.escape_string(db_name))
+    curs.execute(db_change('use ?')%pymysql.escape_string(set_data['db']))
 else:
-    conn = sqlite3.connect(db_name + '.db', check_same_thread = False)
+    conn = sqlite3.connect(set_data['db'] + '.db', check_same_thread = False)
     curs = conn.cursor()
 
 load_conn(conn)
