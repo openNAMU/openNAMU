@@ -274,32 +274,33 @@ if not adsense_result:
 curs.execute(db_change('delete from other where name = "ver"'))
 curs.execute(db_change('insert into other (name, data) values ("ver", ?)'), [version_list['master']['c_ver']])
 
-def back_up():
-    print('----')
+if set_data['db_type'] == 'sqlite':
+    def back_up():
+        print('----')
+        try:
+            shutil.copyfile(set_data['db'] + '.db', 'back_' + set_data['db'] + '.db')
+            
+            print('Back up : OK')
+        except:
+            print('Back up : Error')
+
+        threading.Timer(60 * 60 * back_time, back_up).start()
+
     try:
-        shutil.copyfile(set_data['db'] + '.db', 'back_' + set_data['db'] + '.db')
+        curs.execute(db_change('select data from other where name = "back_up"'))
+        back_up_time = curs.fetchall()
         
-        print('Back up : OK')
+        back_time = int(back_up_time[0][0])
     except:
-        print('Back up : Error')
-
-    threading.Timer(60 * 60 * back_time, back_up).start()
-
-try:
-    curs.execute(db_change('select data from other where name = "back_up"'))
-    back_up_time = curs.fetchall()
-    
-    back_time = int(back_up_time[0][0])
-except:
-    back_time = 0
-    
-print('----')
-if back_time != 0:
-    print('Back up state : ' + str(back_time) + ' hours')
-    
-    back_up()
-else:
-    print('Back up state : Turn off')
+        back_time = 0
+        
+    print('----')
+    if back_time != 0:
+        print('Back up state : ' + str(back_time) + ' hours')
+        
+        back_up()
+    else:
+        print('Back up state : Turn off')
 
 if set_data['db_type'] == 'mysql':
     def mysql_dont_off():
@@ -311,8 +312,6 @@ if set_data['db_type'] == 'mysql':
         threading.Timer(60 * 60 * 6, mysql_dont_off).start()
 
     mysql_dont_off()
-
-conn.commit()
 
 def count_all_title():
     curs.execute(db_change("select count(title) from data"))
@@ -335,6 +334,8 @@ if not all_title:
     curs.execute(db_change('insert into other (name, data) values ("count_all_title", "0")'))
 
 count_all_title()  
+
+conn.commit()
 
 # Func
 @app.route('/del_alarm')
