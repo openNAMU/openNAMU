@@ -334,7 +334,7 @@ all_title = curs.fetchall()
 if not all_title:
     curs.execute(db_change('insert into other (name, data) values ("count_all_title", "0")'))
 
-# count_all_title()  
+count_all_title()  
 
 # Func
 @app.route('/del_alarm')
