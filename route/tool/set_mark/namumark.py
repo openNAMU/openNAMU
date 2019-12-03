@@ -469,7 +469,9 @@ def namumark(conn, data, title, main_num, include_num):
 
             curs.execute(tool.db_change("select title from data where title = ?"), [include_data])
             if curs.fetchall():
-                data = include_re.sub('<div id="include_' + str(i) + '"></div>', data, 1)
+                data = include_re.sub('' + \
+                    '<a id="include_link" href="/w/' + tool.url_pas(include_link) + '">[' + include_link + ']</a><div id="include_' + str(i) + '"></div>' + \
+                '', data, 1)
 
                 include_plus_data = []
                 while 1:
@@ -484,7 +486,7 @@ def namumark(conn, data, title, main_num, include_num):
 
                 plus_data += '<script>load_include("' + include_link + '", "include_' + str(i) + '", ' + str(include_plus_data) + ');</script>'
             else:
-                data = include_re.sub('<a id="not_thing" href="/w/' + tool.url_pas(include_link) + '">' + include_link + '</a>', data, 1)
+                data = include_re.sub('<a id="not_thing" href="/w/' + tool.url_pas(include_link) + '">[' + include_link + ']</a>', data, 1)
         else:
             break
 
@@ -572,7 +574,7 @@ def namumark(conn, data, title, main_num, include_num):
         
         backlink += [[title, main_link + other_link, 'redirect']]
         
-        data = redirect_re.sub('\n<ul><li>' + title + ' - <a href="' + tool.url_pas(main_link) + other_link + '">' + main_link + other_link + '</a></li></ul>\n', data, 1)
+        data = redirect_re.sub('<script>window.location.href = "/w/' + tool.url_pas(main_link) + other_link + '?from=' + tool.url_pas(title) + '";</script>', data, 1)
 
     no_toc_re = re.compile('\[(?:목차|toc)\((?:no)\)\]\n', re.I)
     toc_re = re.compile('\[(?:목차|toc)\]', re.I)

@@ -41,7 +41,11 @@ def edit_2(conn, name):
 
         curs.execute(db_change("select user from scan where title = ?"), [name])
         for _ in curs.fetchall():
-            curs.execute(db_change("insert into alarm (name, data, date) values (?, ?, ?)"), [ip, ip + ' - <a href="/w/' + url_pas(name) + '">' + name + '</a> (Edit)', today])
+            curs.execute(db_change("insert into alarm (name, data, date) values (?, ?, ?)"), [
+                ip, 
+                ip + ' | <a href="/w/' + url_pas(name) + '">' + name + '</a> | Edit', 
+                today
+            ])
 
         history_plus(
             name,
