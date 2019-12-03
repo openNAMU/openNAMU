@@ -36,6 +36,9 @@ def edit_2(conn, name):
             
             curs.execute(db_change("insert into data (title, data) values (?, ?)"), [name, content])
 
+            curs.execute(db_change('select data from other where name = "count_all_title"'))
+            curs.execute(db_change("update other set data = ? where name = 'count_all_title'"), [str(int(curs.fetchall()[0][0]) + 1)])
+
         curs.execute(db_change("select user from scan where title = ?"), [name])
         for _ in curs.fetchall():
             curs.execute(db_change("insert into alarm (name, data, date) values (?, ?, ?)"), [ip, ip + ' - <a href="/w/' + url_pas(name) + '">' + name + '</a> (Edit)', today])

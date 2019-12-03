@@ -113,6 +113,7 @@ print('8. Reset version')
 print('9. Delete set.json')
 print('10. Change name')
 print('11. Delete mysql.json')
+print('12. All title count reset')
 
 print('----')
 print('Select : ', end = '')
@@ -221,11 +222,21 @@ elif what_i_do == '10':
     new_name = input()
 
     curs.execute(db_change("update user set id = ? where id = ?"), [new_name, user_name])
-else:
+elif what_i_do == '11':
     try:
         os.remove('data/mysql.json')
     except:
         pass
+else:
+    curs.execute(db_change("select count(title) from data"))
+    count_data = curs.fetchall()
+    if count_data:
+        count_data = count_data[0][0]
+    else:
+        count_data = 0
+
+    curs.execute(db_change('delete from other where name = "count_all_title"'))
+    curs.execute(db_change('insert into other (name, data) values ("count_all_title", ?)'), [str(count_data)])
 
 conn.commit()
 

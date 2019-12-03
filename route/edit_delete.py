@@ -44,6 +44,9 @@ def edit_delete_2(conn, name, app_var):
                 app_var['path_data_image'],
                 hashlib.sha224(bytes(file_check[0], 'utf-8')).hexdigest() + '.' + file_check[1]
             ))
+
+        curs.execute(db_change('select data from other where name = "count_all_title"'))
+        curs.execute(db_change("update other set data = ? where name = 'count_all_title'"), [str(int(curs.fetchall()[0][0]) - 1)])
             
         return redirect('/w/' + url_pas(name))
     else:

@@ -313,27 +313,9 @@ if set_data['db_type'] == 'mysql':
 
     mysql_dont_off()
 
-def count_all_title():
-    curs.execute(db_change("select count(title) from data"))
-    count_data = curs.fetchall()
-    if count_data:
-        count_data = count_data[0][0]
-    else:
-        count_data = 0
-
-    curs.execute(db_change('delete from other where name = "count_all_title"'))
-    curs.execute(db_change('insert into other (name, data) values ("count_all_title", ?)'), [str(count_data)])
-
-    conn.commit()
-
-    threading.Timer(60 * 60 * 24, count_all_title).start()
-
 curs.execute(db_change('select data from other where name = "count_all_title"'))
-all_title = curs.fetchall()
-if not all_title:
+if not curs.fetchall():
     curs.execute(db_change('insert into other (name, data) values ("count_all_title", "0")'))
-
-count_all_title()  
 
 conn.commit()
 
@@ -681,7 +663,7 @@ def main_views(name = None):
 
 @app.route('/<data>')
 def main_file(data = None):
-    return main_file_2(conn, data) if re.search('\.txt$', data) else main_error_404_2(conn)
+    return main_file_2(conn, data)
 
 # End
 @app.errorhandler(404)
