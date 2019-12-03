@@ -517,14 +517,14 @@ def diff(seqm):
 
     for opcode, a0, a1, b0, b1 in seqm.get_opcodes():
         if opcode == 'equal':
-            output += [seqm.a[a0:a1]]
+            output += [html.escape(seqm.a[a0:a1])]
         elif opcode == 'insert':
-            output += ["<span style='background:#CFC;'>" + seqm.b[b0:b1] + "</span>"]
+            output += ["<span style='background:#CFC;'>" + html.escape(seqm.b[b0:b1]) + "</span>"]
         elif opcode == 'delete':
-            output += ["<span style='background:#FDD;'>" + seqm.a[a0:a1] + "</span>"]
+            output += ["<span style='background:#FDD;'>" + html.escape(seqm.a[a0:a1]) + "</span>"]
         elif opcode == 'replace':
-            output += ["<span style='background:#FDD;'>" + seqm.a[a0:a1] + "</span>"]
-            output += ["<span style='background:#CFC;'>" + seqm.b[b0:b1] + "</span>"]
+            output += ["<span style='background:#FDD;'>" + html.escape(seqm.a[a0:a1]) + "</span>"]
+            output += ["<span style='background:#CFC;'>" + html.escape(seqm.b[b0:b1]) + "</span>"]
 
     end = ''.join(output)
     end = end.replace('\r\n', '\n')

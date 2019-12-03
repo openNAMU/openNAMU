@@ -19,18 +19,15 @@ def view_diff_data_2(conn, name):
         curs.execute(db_change("select data from history where id = ? and title = ?"), [second, name])
         second_raw_data = curs.fetchall()
         if second_raw_data:
-            first_data = html.escape(first_raw_data[0][0])            
-            second_data = html.escape(second_raw_data[0][0])
-
             if first == second:
-                result = '-'
+                result = ''
             else:            
-                diff_data = difflib.SequenceMatcher(None, first_data, second_data)
-                result = re.sub('\r', '', diff(diff_data))
+                diff_data = difflib.SequenceMatcher(None, first_raw_data[0][0], second_raw_data[0][0])
+                result = '<pre>' + diff(diff_data) + '</pre>'
             
             return easy_minify(flask.render_template(skin_check(), 
                 imp = [name, wiki_set(), custom(), other2([' (' + load_lang('compare') + ')', 0])],
-                data = '<pre>' + result + '</pre>',
+                data = result,
                 menu = [['history/' + url_pas(name), load_lang('return')]]
             ))
 
