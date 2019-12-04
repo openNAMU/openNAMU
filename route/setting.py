@@ -416,7 +416,7 @@ def setting_2(conn, num):
             
             admin_check(None, 'edit_set')
 
-            return redirect('/setting/4')
+            return redirect('/setting/5')
         else:
             if not os.path.exists('robots.txt'):
                 curs.execute(db_change('select data from other where name = "robot"'))
