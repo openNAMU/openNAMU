@@ -15,7 +15,7 @@ def api_search_2(conn, name):
         page = page * num - num
     else:
         page = 0   
-           
+
     curs.execute(db_change('select data from other where name = "count_all_title"'))
     if int(curs.fetchall()[0][0]) < 10000:
         curs.execute(db_change("" + \
@@ -25,9 +25,7 @@ def api_search_2(conn, name):
             ['%' + name + '%', '%' + name + '%', '%' + name + '%', '%' + name + '%', page, num]
         )
     else:
-        curs.execute(db_change("" + \
-            "select title from data where title like ? order by case " + \
-            "when title like ? limit ?, 50"),
+        curs.execute(db_change("select title from data where title like ? order by title limit ?, 50"),
             ['%' + name + '%', sql_num]
         )
     all_list = curs.fetchall()
