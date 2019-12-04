@@ -653,9 +653,6 @@ def api_recent_change():
     return api_recent_change_2(conn)
     
 # File
-@app.route('/views/easter_egg.html')
-def main_easter_egg():
-    return main_easter_egg_2(conn)
 
 @app.route('/views/<everything:name>')
 def main_views(name = None):

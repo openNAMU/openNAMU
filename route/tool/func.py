@@ -714,7 +714,7 @@ def custom():
 def load_skin(data = '', set_n = 0):
     div2 = ''
     div3 = []
-    system_file = ['main_css', 'easter_egg.html']
+    system_file = ['main_css']
 
     if data == '':
         ip = ip_check()
