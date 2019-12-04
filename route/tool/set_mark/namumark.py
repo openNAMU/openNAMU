@@ -574,7 +574,17 @@ def namumark(conn, data, title, main_num, include_num):
         
         backlink += [[title, main_link + other_link, 'redirect']]
         
-        data = redirect_re.sub('<script>window.location.href = "/w/' + tool.url_pas(main_link) + other_link + '?from=' + tool.url_pas(title) + '";</script>', data, 1)
+        data = redirect_re.sub(
+            '\n' + \
+                '<ul>' + \
+                    '<li>' + \
+                        '<a href="' + tool.url_pas(main_link) + other_link + '">' + main_link + other_link + '</a>' + \
+                    '</li>' + \
+                '</ul>' + \
+            '\n', 
+            data, 
+            1
+        )
 
     no_toc_re = re.compile('\[(?:목차|toc)\((?:no)\)\]\n', re.I)
     toc_re = re.compile('\[(?:목차|toc)\]', re.I)
