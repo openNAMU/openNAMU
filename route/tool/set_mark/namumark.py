@@ -833,7 +833,7 @@ def namumark(conn, data, title, main_num, include_num):
             break
 
     data = re.sub('(?P<in>\n +\* ?(?:(?:(?!\|\|).)+))\|\|', '\g<in>\n ||', data)
-    data = re.sub('(?P<in><div id="folding_(?:[0-9]+)" style="display: none;"><div style="">)(?P<out> )?\* ', '\g<in>\n\g<out>* ', data)
+    data = re.sub('(?P<in><div id="folding_(?:[0-9]+)" style="display: none;"><div style="">|<blockquote>)(?P<out> )?\* ', '\g<in>\n\g<out>* ', data)
 
     while 1:
         li = re.search('(\n(?:(?: *)\* ?(?:(?:(?!\n).)+)\n)+)', data)
