@@ -78,7 +78,7 @@ def topic_stop_2(conn, topic_num):
             agree_check = ''
 
         return easy_minify(flask.render_template(skin_check(),
-            imp = [name, wiki_set(), custom(), other2([' (' + load_lang('topic_setting') + ')', 0])],
+            imp = [load_lang('topic_setting'), wiki_set(), custom(), other2([0, 0])],
             data = '''
                 <hr class=\"main_hr\">
                 <form method="post">
@@ -93,5 +93,5 @@ def topic_stop_2(conn, topic_num):
                     <button type="submit">''' + load_lang('save') + '''</button>
                 </form>
             ''',
-            menu = [['topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool', load_lang('return')]]
+            menu = [['thread/' + str(topic_num) + '/tool', load_lang('return')]]
         ))

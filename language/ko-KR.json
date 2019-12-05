@@ -107,7 +107,7 @@
     "edit_filter_rule": "편집 필터 규칙",
     "oauth_connection": "Oauth 연결",
     "hide_ip": "IP 숨기기",
-    "topic_tool": "토론 도구",
+    "topic_tool": "토론 관리 도구",
     "user_document": "사용자 문서",
     "id": "아이디",
     "no_login_warring": "비로그인 상태입니다. 편집시 지금 접속한 IP 명의로 기록됩니다.",
@@ -306,5 +306,6 @@
     "many_delete_help" : "한 줄에 문서명 하나씩 적어주세요.",
     "content" : "내용",
     "upload_acl" : "업로드 ACL",
-    "default_view_acl" : "기본 보기 ACL"
+    "default_view_acl" : "기본 보기 ACL",
+    "topic_delete" : "토론 삭제"
 }

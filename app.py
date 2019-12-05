@@ -478,6 +478,10 @@ def topic_top(topic_num = 1, num = 1):
 def topic_stop(topic_num = 1):
     return topic_stop_2(conn, topic_num)
 
+@app.route('/thread/<int:topic_num>/delete', methods=['POST', 'GET'])
+def topic_delete(topic_num = 1):
+    return topic_delete_2(conn, topic_num)
+
 @app.route('/thread/<int:topic_num>/tool')
 def topic_tool(topic_num = 1):
     return topic_tool_2(conn, topic_num)
