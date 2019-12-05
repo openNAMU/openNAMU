@@ -6,9 +6,6 @@ def topic_delete_2(conn, topic_num):
     if admin_check(None) != 1:
         return re_error('/error/3')
 
-    ip = ip_check()
-    time = get_time()
-
     topic_change_data = topic_change(topic_num)
     name = topic_change_data[0]
     sub = topic_change_data[1]
