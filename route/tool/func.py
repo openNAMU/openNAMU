@@ -924,9 +924,6 @@ def ban_check(ip = None, tool = None):
             return 1
 
     return 0
-        
-def topic_check(name, sub):
-    return acl_check(name, 'topic', sub)
 
 def ban_insert(name, end, why, login, blocker, type_d = None):
     now_time = get_time()
