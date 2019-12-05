@@ -11,7 +11,7 @@ def topic_2(conn, topic_num):
         name = topic_change_data[0]
         sub = topic_change_data[1]
 
-    ban = topic_check(name, sub)
+    ban = acl_check(name, 'topic', sub)
     admin = admin_check(3)
 
     curs.execute(db_change("select id from topic where title = ? and sub = ? limit 1"), [name, sub])
@@ -98,7 +98,7 @@ def topic_2(conn, topic_num):
     
         curs.execute(db_change("select stop from rd where title = ? and sub = ? and stop != ''"), [name, sub])
         close_data = curs.fetchall()
-        if (close_data and admin != 1) or topic_check(name, sub) == 1:
+        if (close_data and admin != 1) or ban == 1:
             display = 'display: none;'
         else:
             display = ''

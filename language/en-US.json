@@ -224,6 +224,8 @@
                 "wiki_skin" : "Wiki[s] Skin",
                 "default_acl" : "Default edit ACL",
                 "default_discussion_acl" : "Default discussion ACL",
+                "upload_acl" : "Upload ACL",
+                "default_view_acl" : "Default document viewed ACL",
                 "no_register" : "No sign-up",
                 "hide_ip" : "Hide IP",
                 "wiki_host" : "Wiki[s] host",
