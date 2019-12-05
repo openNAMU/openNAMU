@@ -25,5 +25,5 @@ def topic_delete_2(conn, topic_num):
                     <button type="submit">''' + load_lang('start') + '''</button>
                 </form>
             ''',
-            menu = [['topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool', load_lang('return')]]
+            menu = [['thread/' + str(topic_num) + '/tool', load_lang('return')]]
         ))
