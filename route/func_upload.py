@@ -3,7 +3,7 @@ from .tool.func import *
 def func_upload_2(conn):
     curs = conn.cursor()
 
-    if ban_check() == 1:
+    if acl_check(None, 'upload') == 1:
         return re_error('/ban')
     
     if flask.request.method == 'POST':

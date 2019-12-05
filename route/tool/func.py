@@ -712,8 +712,7 @@ def custom():
     return ['', '', user_icon, user_head, email, user_name, user_admin, user_ban, user_notice, user_acl_list]
 
 def load_skin(data = '', set_n = 0):
-    div2 = ''
-    div3 = []
+    skin_return_data = ''
     system_file = ['main_css']
 
     if data == '':
@@ -725,42 +724,43 @@ def load_skin(data = '', set_n = 0):
         if not data:
             curs.execute(db_change('select data from other where name = "skin"'))
             data = curs.fetchall()
-            if not data:
+            if not data or data[0][0] == '':
                 data = [['marisa']]
 
         if set_n == 0:
             for skin_data in os.listdir(os.path.abspath('views')):
                 if not skin_data in system_file:
+                    print(data[0][0])
                     if data[0][0] == skin_data:
-                        div2 = '<option value="' + skin_data + '">' + skin_data + '</option>' + div2
+                        skin_return_data = '<option value="' + skin_data + '">' + skin_data + '</option>' + skin_return_data
                     else:
-                        div2 += '<option value="' + skin_data + '">' + skin_data + '</option>'
+                        skin_return_data += '<option value="' + skin_data + '">' + skin_data + '</option>'
         else:
-            div2 = []
+            skin_return_data = []
             for skin_data in os.listdir(os.path.abspath('views')):
                 if not skin_data in system_file:
                     if data[0][0] == skin_data:
-                        div2 = [skin_data] + div2
+                        skin_return_data = [skin_data] + skin_return_data
                     else:
-                        div2 += [skin_data]
+                        skin_return_data += [skin_data]
     else:
         if set_n == 0:
             for skin_data in os.listdir(os.path.abspath('views')):
                 if not skin_data in system_file:
                     if data == skin_data:
-                        div2 = '<option value="' + skin_data + '">' + skin_data + '</option>' + div2
+                        skin_return_data = '<option value="' + skin_data + '">' + skin_data + '</option>' + skin_return_data
                     else:
-                        div2 += '<option value="' + skin_data + '">' + skin_data + '</option>'
+                        skin_return_data += '<option value="' + skin_data + '">' + skin_data + '</option>'
         else:
-            div2 = []
+            skin_return_data = []
             for skin_data in os.listdir(os.path.abspath('views')):
                 if not skin_data in system_file:
                     if data == skin_data:
-                        div2 = [skin_data] + div2
+                        skin_return_data = [skin_data] + skin_return_data
                     else:
-                        div2 += [skin_data]
+                        skin_return_data += [skin_data]
 
-    return div2
+    return skin_return_data
 
 def acl_check(name = 'test', tool = '', sub = 'test'):
     ip = ip_check()
@@ -768,7 +768,7 @@ def acl_check(name = 'test', tool = '', sub = 'test'):
     if ban_check() == 1:
         return 1
 
-    if tool != 'topic' and tool != 'render':
+    if tool != 'topic' and tool != 'render' and name:
         acl_c = re.search("^user:((?:(?!\/).)*)", name)
         if acl_c:
             acl_n = acl_c.groups()
@@ -798,7 +798,7 @@ def acl_check(name = 'test', tool = '', sub = 'test'):
 
     if tool == '':
         end = 3
-    elif tool == 'topic':
+    elif tool == 'topic' or tool == 'render':
         end = 2
     else:
         end = 1
@@ -807,30 +807,31 @@ def acl_check(name = 'test', tool = '', sub = 'test'):
         if tool == '':
             if i == 0:
                 curs.execute(db_change("select decu from acl where title = ?"), [name])
-                acl_data = curs.fetchall()
             elif i == 1:
                 curs.execute(db_change('select data from other where name = "edit"'))
-                acl_data = curs.fetchall()
             else:
                 curs.execute(db_change("select view from acl where title = ?"), [name])
-                acl_data = curs.fetchall()
 
             num = 5
         elif tool == 'topic':
             if i == 0:
                 curs.execute(db_change("select dis from acl where title = ?"), [name])
-                acl_data = curs.fetchall()
             else:
                 curs.execute(db_change('select data from other where name = "discussion"'))
-                acl_data = curs.fetchall()
 
             num = 3
+        elif tool == 'upload':
+            curs.execute(db_change("select data from other where name = 'upload_acl'"))
+            num = 5
         else:
-            curs.execute(db_change("select view from acl where title = ?"), [name])
-            acl_data = curs.fetchall()
+            if i == 0:
+                curs.execute(db_change("select view from acl where title = ?"), [name])
+            if i == 1:
+                curs.execute(db_change("select data from other where name = 'all_view_acl'"))
 
             num = 5
 
+        acl_data = curs.fetchall()
         if acl_data and acl_data[0][0] != 'normal':
             if acl_data[0][0] == 'user':
                 if ip_or_user(ip) == 1:

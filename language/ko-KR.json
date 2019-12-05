@@ -304,5 +304,7 @@
     "defalut_edit_help" : "이곳에 내용을 써주세요",
     "many_delete" : "대량 삭제",
     "many_delete_help" : "한 줄에 문서명 하나씩 적어주세요.",
-    "content" : "내용"
+    "content" : "내용",
+    "upload_acl" : "업로드 ACL",
+    "default_view_acl" : "기본 보기 ACL"
 }

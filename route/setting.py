@@ -48,7 +48,9 @@ def setting_2(conn, num):
             13 : 'email_have', 
             14 : 'discussion', 
             15 : 'encode', 
-            16 : 'host'
+            16 : 'host',
+            17 : 'upload_acl',
+            18 : 'all_view_acl'
         }
         n_list = {
             0 : 'Wiki', 
@@ -67,7 +69,9 @@ def setting_2(conn, num):
             13 : '', 
             14 : 'normal', 
             15 : 'sha3', 
-            16 : '0.0.0.0'
+            16 : '0.0.0.0',
+            17 : '',
+            18 : ''
         }
         
         if flask.request.method == 'POST':
@@ -97,50 +101,46 @@ def setting_2(conn, num):
 
             conn.commit()
             
-            div = ''
+            acl_div = ['', '', '', '', '']
             acl_list = ['normal', 'user', 'admin', 'owner', '50_edit', 'email']
-            for i in acl_list:
-                if i == d_list[6]:
-                    div = '<option value="' + i + '">' + i + '</option>' + div
-                else:
-                    div += '<option value="' + i + '">' + i + '</option>'
-
-            div4 = ''
-            for i in acl_list:
-                if i == d_list[14]:
-                    div4 = '<option value="' + i + '">' + i + '</option>' + div4
-                else:
-                    div4 += '<option value="' + i + '">' + i + '</option>'
-
-            ch_1 = ''
-            if d_list[7]:
-                ch_1 = 'checked="checked"'
-
-            ch_2 = ''
-            if d_list[8]:
-                ch_2 = 'checked="checked"'
-            
-            ch_3 = ''
-            if d_list[13]:
-                ch_3 = 'checked="checked"'
-
-            div2 = load_skin(d_list[5])
-
-            div3 =''
-            if d_list[12] == 'stable':
-                div3 += '<option value="stable">stable</option>'
-                div3 += '<option value="master">master</option>'
-            else:
-                div3 += '<option value="master">master</option>'
-                div3 += '<option value="stable">stable</option>'
-                
-            div5 =''
             encode_data = ['sha256', 'sha3']
-            for i in encode_data:
-                if d_list[15] == i:
-                    div5 = '<option value="' + i + '">' + i + '</option>' + div5
+            for i in range(0, 5):
+                if i == 0:
+                    acl_num = 6
+                elif i == 1:
+                    acl_num = 14
+                elif i == 2:
+                    acl_num = 17
+                elif i == 4:
+                    acl_num = 18
                 else:
-                    div5 += '<option value="' + i + '">' + i + '</option>'
+                    acl_num = 15
+
+                for acl_data in (encode_data if i == 3 else acl_list):
+                    if acl_data == d_list[acl_num]:
+                        acl_div[i] = '<option value="' + acl_data + '">' + acl_data + '</option>' + acl_div[i]
+                    else:
+                        acl_div[i] += '<option value="' + acl_data + '">' + acl_data + '</option>'
+
+            check_box_div = ['', '', '']
+            for i in range(0, 3):
+                if i == 0:
+                    acl_num = 7
+                elif i == 1:
+                    acl_num = 8
+                else:
+                    acl_num = 13
+
+                if d_list[acl_num]:
+                    check_box_div[i] = 'checked="checked"'
+
+            branch_div =''
+            if d_list[12] == 'stable':
+                branch_div += '<option value="stable">stable</option>'
+                branch_div += '<option value="master">master</option>'
+            else:
+                branch_div += '<option value="master">master</option>'
+                branch_div += '<option value="stable">stable</option>'
 
             return easy_minify(flask.render_template(skin_check(), 
                 imp = [load_lang('main_setting'), wiki_set(), custom(), other2([0, 0])],
@@ -172,21 +172,29 @@ def setting_2(conn, num):
                         <hr class=\"main_hr\">
                         <span>''' + load_lang('wiki_skin') + '''</span>
                         <hr class=\"main_hr\">
-                        <select name="skin">''' + div2 + '''</select>
+                        <select name="skin">''' + load_skin(d_list[5]) + '''</select>
                         <hr class=\"main_hr\">
                         <span>''' + load_lang('default_acl') + '</span> <a href="/acl/TEST">(' + load_lang('reference') + ''')</a>
                         <hr class=\"main_hr\">
-                        <select name="edit">''' + div + '''</select>
+                        <select name="edit">''' + acl_div[0] + '''</select>
                         <hr class=\"main_hr\">
                         <span>''' + load_lang('default_discussion_acl') + '''</span>
                         <hr class=\"main_hr\">
-                        <select name="discussion">''' + div4 + '''</select>
+                        <select name="discussion">''' + acl_div[1] + '''</select>
                         <hr class=\"main_hr\">
-                        <input type="checkbox" name="reg" ''' + ch_1 + '''> ''' + load_lang('no_register') + '''
+                        <span>''' + load_lang('upload_acl') + '''</span>
                         <hr class=\"main_hr\">
-                        <input type="checkbox" name="ip_view" ''' + ch_2 + '''> ''' + load_lang('hide_ip') + '''
+                        <select name="upload_acl">''' + acl_div[2] + '''</select>
                         <hr class=\"main_hr\">
-                        <input type="checkbox" name="email_have" ''' + ch_3 + '''> ''' + load_lang('email_required') + ' <a href="/setting/6">{' + load_lang('google_imap_required') + '''}</a>
+                        <span>''' + load_lang('default_view_acl') + '''</span>
+                        <hr class=\"main_hr\">
+                        <select name="all_view_acl">''' + acl_div[4] + '''</select>
+                        <hr class=\"main_hr\">
+                        <input type="checkbox" name="reg" ''' + check_box_div[0] + '''> ''' + load_lang('no_register') + '''
+                        <hr class=\"main_hr\">
+                        <input type="checkbox" name="ip_view" ''' + check_box_div[1] + '''> ''' + load_lang('hide_ip') + '''
+                        <hr class=\"main_hr\">
+                        <input type="checkbox" name="email_have" ''' + check_box_div[2] + '''> ''' + load_lang('email_required') + ' <a href="/setting/6">{' + load_lang('google_imap_required') + '''}</a>
                         <hr class=\"main_hr\">
                         <span>''' + load_lang('wiki_host') + '''</span>
                         <hr class=\"main_hr\">
@@ -202,11 +210,11 @@ def setting_2(conn, num):
                         <hr class=\"main_hr\">
                         <span>''' + load_lang('update_branch') + '''</span>
                         <hr class=\"main_hr\">
-                        <select name="update">''' + div3 + '''</select>
+                        <select name="update">''' + branch_div + '''</select>
                         <hr class=\"main_hr\">
                         <span>''' + load_lang('encryption_method') + '''</span>
                         <hr class=\"main_hr\">
-                        <select name="encode">''' + div5 + '''</select>
+                        <select name="encode">''' + acl_div[3] + '''</select>
                         <hr class=\"main_hr\">
                         <button id="save" type="submit">''' + load_lang('save') + '''</button>
                     </form>
