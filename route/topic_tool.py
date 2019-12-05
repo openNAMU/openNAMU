@@ -35,9 +35,21 @@ def topic_tool_2(conn, topic_num):
             <li>''' + load_lang('topic_state') + ''' : ''' + t_state + '' + (' (Agree)' if close_data and (close_data[0][1] == 'O') else '') + '''</li>
         </ul>
     '''
+    
+    if admin_check(None) == 1:
+        data += '''
+            <h2>''' + load_lang('owner') + '''</h2>
+            <ul>
+                <li>
+                    <a href="/thread/''' + str(topic_num) + '''/delete">
+                        ''' + load_lang('topic_delete') + '''
+                    </a>
+                </li>
+            </ul>
+        '''
 
     return easy_minify(flask.render_template(skin_check(), 
-        imp = [name, wiki_set(), custom(), other2([' (' + load_lang('topic_tool') + ')', 0])],
+        imp = [load_lang('topic_tool'), wiki_set(), custom(), other2([0, 0])],
         data = data,
-        menu = [['topic/' + url_pas(name) + '/sub/' + url_pas(sub), load_lang('return')]]
+        menu = [['thread/' + str(topic_num), load_lang('return')]]
     ))
