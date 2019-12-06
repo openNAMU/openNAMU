@@ -442,8 +442,21 @@ def namumark(conn, data, title, main_num, include_num):
     
     data = re.sub('<math>(?P<in>(?:(?!<\/math>).)+)<\/math>', '[math(\g<in>)]', data)
     data = html.escape(data)
-
     data = re.sub('\r\n', '\n', data)
+
+    num = 0
+    while 1:
+        one_nowiki = re.search('(?:\\\\)(.)', data)
+        if one_nowiki:
+            one_nowiki = one_nowiki.groups()
+
+            num += 1
+
+            end_data += [['one_nowiki_' + str(num), one_nowiki[0], 'normal']]
+
+            data = re.sub('(?:\\\\)(.)', '<span id="one_nowiki_' + str(num) + '"></span>', data, 1)
+        else:
+            break
 
     t_data = middle_parser(data, 0, 0, 0, include_num)
     data = t_data[0]
@@ -536,23 +549,8 @@ def namumark(conn, data, title, main_num, include_num):
             '''
         else:
             break
-            
-    num = 0
-    while 1:
-        one_nowiki = re.search('(?:\\\\)(.)', data)
-        if one_nowiki:
-            one_nowiki = one_nowiki.groups()
-
-            num += 1
-
-            end_data += [['one_nowiki_' + str(num), one_nowiki[0], 'normal']]
-
-            data = re.sub('(?:\\\\)(.)', '<span id="one_nowiki_' + str(num) + '"></span>', data, 1)
-        else:
-            break
 
     data += '\n'
-
     data = data.replace('\\', '&#92;')
 
     data = re.sub('&#x27;&#x27;&#x27;(?P<in>((?!&#x27;&#x27;&#x27;).)+)&#x27;&#x27;&#x27;', '<b>\g<in></b>', data)
@@ -680,23 +678,23 @@ def namumark(conn, data, title, main_num, include_num):
 
     data = tool.savemark(data)
     
-    data = re.sub(r"\[anchor\((?P<in>(?:(?!\)\]).)+)\)\]", '<span id="\g<in>"></span>', data, flags = re.I)
+    data = re.sub("\[anchor\((?P<in>(?:(?!\)\]).)+)\)\]", '<span id="\g<in>"></span>', data, flags = re.I)
 
-    ruby_all = re.findall(r"\[ruby\(((?:(?:(?!\)\]).)+))\)\]", data, flags = re.I)
+    ruby_all = re.findall("\[ruby\(((?:(?:(?!\)\]).)+))\)\]", data, flags = re.I)
     for i in ruby_all:
-        ruby_code = re.search(r'^([^,]+)', i)
+        ruby_code = re.search('^([^,]+)', i)
         if ruby_code:
             ruby_code = ruby_code.groups()[0]
         else:
             ruby_code = 'Test'
 
-        ruby_top = re.search(r'ruby=([^,]+)', i, flags = re.I)
+        ruby_top = re.search('ruby=([^,]+)', i, flags = re.I)
         if ruby_top:
             ruby_top = ruby_top.groups()[0]
         else:
             ruby_top = 'Test'
 
-        ruby_color = re.search(r'color=([^,]+)', i, flags = re.I)
+        ruby_color = re.search('color=([^,]+)', i, flags = re.I)
         if ruby_color:
             ruby_color = 'color: ' + ruby_color.groups()[0] + ';'
         else:
@@ -711,15 +709,15 @@ def namumark(conn, data, title, main_num, include_num):
             '</ruby>' + \
         ''
 
-        data = re.sub(r"\[ruby\(((?:(?:(?!\)\]).)+))\)\]", ruby_data, data, 1, flags = re.I)
+        data = re.sub("\[ruby\(((?:(?:(?!\)\]).)+))\)\]", ruby_data, data, 1, flags = re.I)
 
 
     curs.execute(tool.db_change('select data from other where name = "count_all_title"'))
     all_title = curs.fetchall()
-    data = re.sub(r'\[pagecount\]', all_title[0][0], data, flags = re.I)
+    data = re.sub('\[pagecount\]', all_title[0][0], data, flags = re.I)
 
     now_time = tool.get_time()
-    data = re.sub(r'\[date\]', now_time, data, flags = re.I)
+    data = re.sub('\[date\]', now_time, data, flags = re.I)
     
     time_data = re.search('^([0-9]{4}-[0-9]{2}-[0-9]{2})', now_time)
     time = time_data.groups()
@@ -1040,12 +1038,12 @@ def namumark(conn, data, title, main_num, include_num):
                         
                             backlink += [[title, main_link, '']]
                             
-                            data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<a ' + link_id + ' href="/w/' + tool.url_pas(main_link) + other_link + '">' + see_link + '</a>', data, 1)
+                            data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<a ' + link_id + ' title="' + see_link + other_link + '" href="/w/' + tool.url_pas(main_link) + other_link + '">' + see_link + '</a>', data, 1)
                         else:
-                            data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<a href="' + other_link + '">' + see_link + '</a>', data, 1)
+                            data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<a title="' + see_link + '" href="' + other_link + '">' + see_link + '</a>', data, 1)
                     else:
                         if re.search('^#', other_link):
-                            data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<a href="' + other_link + '">' + other_link + '</a>', data, 1)
+                            data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<a title="' + other_link + '" href="' + other_link + '">' + other_link + '</a>', data, 1)
                         else:
                             data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<b>' + see_link + '</b>', data, 1)
                 else:
