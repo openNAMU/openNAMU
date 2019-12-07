@@ -1217,7 +1217,7 @@ def namumark(conn, data, title, main_num, include_num):
             data = data.replace(tool.url_pas('<span id="' + end_data[i][0] + '"></span>'), tool.url_pas(end_data[i][1]))
         else:
             if re.search('\n', end_data[i][1]):
-                data = re.sub('<span id="' + end_data[i][0] + '"><\/span>\n?', '\n<pre>' + re.sub('^\n', '', end_data[i][1]) + '</pre>', data, 1)
+                data = data.replace('<span id="' + end_data[i][0] + '"></span>', '\n<pre>' + re.sub('^\n', '', end_data[i][1]) + '</pre>')
             else:
                 data = data.replace('<span id="' + end_data[i][0] + '"></span>', '<code>' + end_data[i][1] + '</code>')
 
@@ -1253,8 +1253,8 @@ def namumark(conn, data, title, main_num, include_num):
             i += 1
     
     data = re.sub('<\/td_1>', '</td>', data)
-    data = re.sub('<\/ul>\n', '</ul>', data)
-    
+    data = re.sub('<\/ul>\n?', '</ul>', data)
+    data = re.sub('<\/pre>\n?', '</pre>', data)
     data = re.sub('(?P<in><div class="all_in_data"(?:(?:(?!id=).)+)? id="in_data_([^"]+)">)(\n)+', '\g<in>', data)
     data = re.sub('\n\n<ul>', '\n<ul>', data)
     data = re.sub('<\/ul>\n\n', '</ul>', data)
@@ -1262,12 +1262,11 @@ def namumark(conn, data, title, main_num, include_num):
     data = re.sub('(\n)+<hr><ul id="footnote_data">', '<hr><ul id="footnote_data">', data)
     data = re.sub('(?P<in><td(((?!>).)*)>)\n', '\g<in>', data)
     data = re.sub('(\n)?<hr>(\n)?', '<hr>', data)
-
     data = re.sub('<\/ul>\n\n<ul>', '</ul>\n<ul>', data)
     data = re.sub('<\/ul>\n<ul>', '</ul><ul>', data)
     data = re.sub('\n<\/ul>', '</ul>', data)
-
     data = re.sub('\n', '<br>', data)
+
     if include_num == '':
         plus_data = '<script>render_html();</script>' + plus_data
     else:
