@@ -6,7 +6,8 @@ import re
 
 def table_parser(data, cel_data, start_data, num = 0):
     table_class = 'class="'
-    all_table = 'style="'
+    div_style = 'style="'
+    all_table = 'style="width: 100%;'
     cel_style = 'style="'
     row_style = 'style="'
     row = ''
@@ -15,9 +16,9 @@ def table_parser(data, cel_data, start_data, num = 0):
     table_width = re.search("&lt;table ?width=((?:(?!&gt;).)*)&gt;", data)
     if table_width:
         if re.search('^[0-9]+$', table_width.groups()[0]):
-            all_table += 'width: ' + table_width.groups()[0] + 'px;'
+            div_style += 'width: ' + table_width.groups()[0] + 'px;'
         else:
-            all_table += 'width: ' + table_width.groups()[0] + ';'
+            div_style += 'width: ' + table_width.groups()[0] + ';'
     
     table_height = re.search("&lt;table ?height=((?:(?!&gt;).)*)&gt;", data)
     if table_height:
@@ -136,12 +137,13 @@ def table_parser(data, cel_data, start_data, num = 0):
     if text_class:
         table_class += text_class.groups()[0]
         
+    div_style += '"'
     all_table += '"'
     cel_style += '"'
     row_style += '"'
     table_class += '"'
 
-    return [all_table, row_style, cel_style, row, cel, table_class, num]
+    return [all_table, row_style, cel_style, row, cel, table_class, num, div_style]
     
 def table_start(data):
     while 1:
@@ -152,25 +154,25 @@ def table_start(data):
                 all_table = re.search('^((?:\|\|)+)((?:&lt;(?:(?:(?!&gt;).)+)&gt;)*)\n*((?:(?!\|\|).\n*)*)', table)
                 if all_table:
                     all_table = all_table.groups()
-                    
+
                     return_table = table_parser(all_table[1], all_table[2], all_table[0])
-                    
                     number = return_table[6]
                     
                     table = re.sub(
                         '^((?:\|\|)+)((?:&lt;(?:(?:(?!&gt;).)+)&gt;)*)\n*', 
                         '\n' + \
-                            '<table ' + return_table[5] + ' ' + return_table[0] + '>' + \
-                                '<tbody>' + \
-                                    '<tr ' + return_table[1] + '>' + \
-                                        '<td ' + return_table[2] + ' ' + return_table[3] + ' ' + return_table[4] + '>', 
+                            '<div class="table_safe" ' + return_table[7] + '>' + \
+                                '<table ' + return_table[5] + ' ' + return_table[0] + '>' + \
+                                    '<tbody>' + \
+                                        '<tr ' + return_table[1] + '>' + \
+                                            '<td ' + return_table[2] + ' ' + return_table[3] + ' ' + return_table[4] + '>', 
                         table, 
                         1
                     )
                 else:
                     break
                     
-            table = re.sub('\|\|\n?$', '</td></tr></tbody></table>', table)
+            table = re.sub('\|\|\n?$', '</td></tr></tbody></table></div>', table)
 
             while 1:
                 row_table = re.search('\|\|\n((?:\|\|)+)((?:&lt;(?:(?:(?!&gt;).)+)&gt;)*)\n*((?:(?!\|\||<\/td>).\n*)*)', table)
@@ -263,7 +265,7 @@ def middle_parser(data, fol_num, syntax_num, folding_num, include_num):
                             
                             data = middle_re.sub('<span style="font-size: ' + font_size + '%;">', data, 1)
                         elif re.search('^#!wiki', middle_data[0]):
-                            middle_data_2 = re.search('{{{#!wiki(?: style=(?:&quot;|&#x27;)((?:(?!&quot;|&#x27;).)*)(?:&quot;|&#x27;))?\n?', data)
+                            middle_data_2 = re.search('{{{#!wiki(?: style=(?:&quot;|&#x27;)((?:(?!&quot;|&#x27;).)*)(?:&quot;|&#x27;))?(?:[^\n]+)\n?', data)
                             if middle_data_2:
                                 middle_data_2 = middle_data_2.groups()
                             else:
@@ -272,7 +274,7 @@ def middle_parser(data, fol_num, syntax_num, folding_num, include_num):
                             middle_list += ['div_1']
                             
                             data = re.sub(
-                                '{{{#!wiki(?: style=(?:&quot;|&#x27;)((?:(?!&quot;|&#x27;).)*)(?:&quot;|&#x27;))?\n?',
+                                '{{{#!wiki(?: style=(?:&quot;|&#x27;)((?:(?!&quot;|&#x27;).)*)(?:&quot;|&#x27;))?(?:[^\n]+)\n?',
                                 '<div id="wiki_div" style="' + str(middle_data_2[0] if middle_data_2[0] else '') + '">', 
                                 data, 
                                 1
