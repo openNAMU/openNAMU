@@ -1067,7 +1067,7 @@ def namumark(conn, data, title, main_num, include_num):
                         else:
                             data = re.sub(
                                 '\[\[((?:(?!\[\[|\]\]).)+)\]\]', 
-                                '<a title="' + see_link + '" href="' + other_link + '">' + see_link + '</a>', 
+                                '<a title="' + other_link + '" href="' + other_link + '">' + see_link + '</a>', 
                                 data, 
                                 1
                             )
