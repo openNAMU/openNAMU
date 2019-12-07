@@ -231,112 +231,110 @@ def middle_parser(data, fol_num, syntax_num, folding_num, include_num):
                     data = re.sub('(?:{{{((?:(?! |{{{|}}}|&lt;).)*)(?P<in> ?)|(}}}))', '&#123;&#123;&#123;' + middle_data[0] + '\g<in>', data, 1)
                 else:
                     if re.search('^(#|@|\+|\-)', middle_data[0]) and not re.search('^(#|@|\+|\-){2}|(#|@|\+|\-)\\\\', middle_data[0]):
-                        middle_search = re.search('^(#(?:[0-9a-f-A-F]{3}){1,2})', middle_data[0])
-                        if middle_search:                            
+                        if re.search('^(#(?:[0-9a-f-A-F]{3}){1,2})', middle_data[0]):                            
+                            middle_search = re.search('^(#(?:[0-9a-f-A-F]{3}){1,2})', middle_data[0])
                             middle_list += ['span']
                             
                             data = middle_re.sub('<span style="color: ' + middle_search.groups()[0] + ';">', data, 1)
-                        else:
+                        elif re.search('^(?:#(\w+))', middle_data[0]):
                             middle_search = re.search('^(?:#(\w+))', middle_data[0])
-                            if middle_search:
-                                middle_list += ['span']
+                            middle_list += ['span']
+                            
+                            data = middle_re.sub('<span style="color: ' + middle_search.groups()[0] + ';">', data, 1)
+                        elif re.search('^(?:@((?:[0-9a-f-A-F]{3}){1,2}))', middle_data[0]):
+                            middle_search = re.search('^(?:@((?:[0-9a-f-A-F]{3}){1,2}))', middle_data[0])
+                            middle_list += ['span']
                                 
-                                data = middle_re.sub('<span style="color: ' + middle_search.groups()[0] + ';">', data, 1)
+                            data = middle_re.sub('<span style="background: #' + middle_search.groups()[0] + ';">', data, 1)
+                        elif re.search('^(?:@(\w+))', middle_data[0]):
+                            middle_search = re.search('^(?:@(\w+))', middle_data[0])
+                            middle_list += ['span']
+                            
+                            data = middle_re.sub('<span style="background: ' + middle_search.groups()[0] + ';">', data, 1)
+                        elif re.search('^(\+|-)([1-5])', middle_data[0]):
+                            middle_search = re.search('^(\+|-)([1-5])', middle_data[0])
+                            middle_search = middle_search.groups()
+                            if middle_search[0] == '+':
+                                font_size = str(int(middle_search[1]) * 20 + 100)
                             else:
-                                middle_search = re.search('^(?:@((?:[0-9a-f-A-F]{3}){1,2}))', middle_data[0])
-                                if middle_search:
-                                    middle_list += ['span']
-                                    
-                                    data = middle_re.sub('<span style="background: #' + middle_search.groups()[0] + ';">', data, 1)
-                                else:
-                                    middle_search = re.search('^(?:@(\w+))', middle_data[0])
-                                    if middle_search:
-                                        middle_list += ['span']
-                                        
-                                        data = middle_re.sub('<span style="background: ' + middle_search.groups()[0] + ';">', data, 1)
-                                    else:
-                                        middle_search = re.search('^(\+|-)([1-5])', middle_data[0])
-                                        if middle_search:
-                                            middle_search = middle_search.groups()
-                                            if middle_search[0] == '+':
-                                                font_size = str(int(middle_search[1]) * 20 + 100)
-                                            else:
-                                                font_size = str(100 - int(middle_search[1]) * 10)
+                                font_size = str(100 - int(middle_search[1]) * 10)
 
-                                            middle_list += ['span']
-                                            
-                                            data = middle_re.sub('<span style="font-size: ' + font_size + '%;">', data, 1)
-                                        else:
-                                            middle_search = re.search('^#!wiki', middle_data[0])
-                                            if middle_search:
-                                                middle_data_2 = re.search('{{{#!wiki(?: style=(?:&quot;|&#x27;)((?:(?!&quot;|&#x27;).)*)(?:&quot;|&#x27;))?\n?', data)
-                                                if middle_data_2:
-                                                    middle_data_2 = middle_data_2.groups()
-                                                else:
-                                                    middle_data_2 = ['']
+                            middle_list += ['span']
+                            
+                            data = middle_re.sub('<span style="font-size: ' + font_size + '%;">', data, 1)
+                        elif re.search('^#!wiki', middle_data[0]):
+                            middle_data_2 = re.search('{{{#!wiki(?: style=(?:&quot;|&#x27;)((?:(?!&quot;|&#x27;).)*)(?:&quot;|&#x27;))?\n?', data)
+                            if middle_data_2:
+                                middle_data_2 = middle_data_2.groups()
+                            else:
+                                middle_data_2 = ['']
 
-                                                middle_list += ['div_1']
-                                                
-                                                data = re.sub('{{{#!wiki(?: style=(?:&quot;|&#x27;)((?:(?!&quot;|&#x27;).)*)(?:&quot;|&#x27;))?\n?', '<div id="wiki_div" style="' + str(middle_data_2[0] if middle_data_2[0] else '') + '">', data, 1)
-                                            else:
-                                                middle_search = re.search('^#!syntax', middle_data[0])
-                                                if middle_search:                                                
-                                                    middle_data_2 = re.search('{{{#!syntax ((?:(?!\n).)+)\n?', data)
-                                                    if middle_data_2:
-                                                        middle_data_2 = middle_data_2.groups()
-                                                    else:
-                                                        middle_data_2 = ['python']
+                            middle_list += ['div_1']
+                            
+                            data = re.sub(
+                                '{{{#!wiki(?: style=(?:&quot;|&#x27;)((?:(?!&quot;|&#x27;).)*)(?:&quot;|&#x27;))?\n?',
+                                '<div id="wiki_div" style="' + str(middle_data_2[0] if middle_data_2[0] else '') + '">', 
+                                data, 
+                                1
+                            )
+                        elif re.search('^#!syntax', middle_data[0]):                                         
+                            middle_data_2 = re.search('{{{#!syntax ((?:(?!\n).)+)\n?', data)
+                            if middle_data_2:
+                                middle_data_2 = middle_data_2.groups()
+                            else:
+                                middle_data_2 = ['python']
 
-                                                    if syntax_num == 0:
-                                                        plus_data += '<script>hljs.initHighlightingOnLoad();</script>'
+                            if syntax_num == 0:
+                                plus_data += '<script>hljs.initHighlightingOnLoad();</script>'
 
-                                                        syntax_num = 1
+                                syntax_num = 1
 
-                                                    middle_list += ['pre']
-                                                    
-                                                    data = re.sub('{{{#!syntax ?((?:(?!\n).)*)\n?', '<pre id="syntax"><code class="' + middle_data_2[0] + '">', data, 1)
-                                                else:
-                                                    middle_search = re.search('^#!folding', middle_data[0])
-                                                    if middle_search:
-                                                        middle_list += ['2div']
-                                                        
-                                                        folding_data = re.search('{{{#!folding ?((?:(?!\n).)*)\n?', data)
-                                                        if folding_data:
-                                                            folding_data = folding_data.groups()
-                                                        else:
-                                                            folding_data = ['Test']
+                            middle_list += ['pre']
+                            
+                            data = re.sub(
+                                '{{{#!syntax ?((?:(?!\n).)*)\n?', 
+                                '<pre id="syntax"><code class="' + middle_data_2[0] + '">', 
+                                data, 
+                                1
+                            )
+                        elif re.search('^#!folding', middle_data[0]):
+                            middle_list += ['2div']
+                            
+                            folding_data = re.search('{{{#!folding ?((?:(?!\n).)*)\n?', data)
+                            if folding_data:
+                                folding_data = folding_data.groups()
+                            else:
+                                folding_data = ['Test']
 
-                                                        if folding_num == 0:
-                                                            folding_num = 1
-                                                        
-                                                        data = re.sub(
-                                                            '{{{#!folding ?((?:(?!\n).)*)\n?', '' + \
-                                                            '<div>' + \
-                                                                str(folding_data[0]) + ' ' + \
-                                                                '<div style="display: inline-block;">' + \
-                                                                    '<a href="javascript:void(0);" onclick="do_open_folding(\'' + include_num + 'folding_' + str(fol_num) + '\', this);">' + \
-                                                                        '[+]' + \
-                                                                    '</a>' + \
-                                                                '</div_2>' + \
-                                                                '<div id="' + include_num + 'folding_' + str(fol_num) + '" style="display: none;">' + \
-                                                                    '<div id="wiki_div" style="">', 
-                                                            data, 
-                                                            1
-                                                        )
-                                                        
-                                                        fol_num += 1
-                                                    else:
-                                                        middle_search = re.search('^#!html', middle_data[0])
-                                                        if middle_search:
-                                                            middle_list += ['span']
-                                                            
-                                                            html_number += 1
-                                                        
-                                                            data = middle_re.sub('<span id="' + include_num + 'render_contect_' + str(html_number) + '">', data, 1)
-                                                        else:
-                                                            middle_list += ['span']
+                            if folding_num == 0:
+                                folding_num = 1
+                            
+                            data = re.sub(
+                                '{{{#!folding ?((?:(?!\n).)*)\n?', '' + \
+                                '<div>' + \
+                                    str(folding_data[0]) + ' ' + \
+                                    '<div style="display: inline-block;">' + \
+                                        '<a href="javascript:void(0);" onclick="do_open_folding(\'' + include_num + 'folding_' + str(fol_num) + '\', this);">' + \
+                                            '[+]' + \
+                                        '</a>' + \
+                                    '</div_2>' + \
+                                    '<div id="' + include_num + 'folding_' + str(fol_num) + '" style="display: none;">' + \
+                                        '<div id="wiki_div" style="">', 
+                                data, 
+                                1
+                            )
+                                
+                            fol_num += 1
+                        elif re.search('^#!html', middle_data[0]):
+                            middle_list += ['span']
+                            
+                            html_number += 1
+                        
+                            data = middle_re.sub('<span id="' + include_num + 'render_contect_' + str(html_number) + '">', data, 1)
+                        else:
+                            middle_list += ['span']
 
-                                                            data = middle_re.sub('<span>', data, 1)
+                            data = middle_re.sub('<span>', data, 1)
                     else:
                         middle_list += ['code']
                         
@@ -401,7 +399,12 @@ def middle_parser(data, fol_num, syntax_num, folding_num, include_num):
 
             end_data += [['nowiki_' + str(num), nowiki_data[0], 'code']]
 
-            data = re.sub('<code>((?:(?:(?!<\/code>).)*\n*)*)<\/code>', '<span id="nowiki_' + str(num) + '"></span>', data, 1)
+            data = re.sub(
+                '<code>((?:(?:(?!<\/code>).)*\n*)*)<\/code>', 
+                '<span id="nowiki_' + str(num) + '"></span>', 
+                data, 
+                1
+            )
         else:
             break
 
