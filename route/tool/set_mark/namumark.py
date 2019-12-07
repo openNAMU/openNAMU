@@ -7,7 +7,7 @@ import re
 def table_parser(data, cel_data, start_data, num = 0):
     table_class = 'class="'
     div_style = 'style="'
-    all_table = 'style="width: 100%;'
+    all_table = 'style="'
     cel_style = 'style="'
     row_style = 'style="'
     row = ''
@@ -19,6 +19,8 @@ def table_parser(data, cel_data, start_data, num = 0):
             div_style += 'width: ' + table_width.groups()[0] + 'px;'
         else:
             div_style += 'width: ' + table_width.groups()[0] + ';'
+
+        all_table += 'width: 100%;'
     
     table_height = re.search("&lt;table ?height=((?:(?!&gt;).)*)&gt;", data)
     if table_height:
