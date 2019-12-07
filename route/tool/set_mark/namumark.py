@@ -1217,7 +1217,7 @@ def namumark(conn, data, title, main_num, include_num):
             data = data.replace(tool.url_pas('<span id="' + end_data[i][0] + '"></span>'), tool.url_pas(end_data[i][1]))
         else:
             if re.search('\n', end_data[i][1]):
-                data = data.replace('<span id="' + end_data[i][0] + '"></span>\n', '\n<pre>' + re.sub('^\n', '', end_data[i][1]) + '</pre>')
+                data = re.sub('<span id="' + end_data[i][0] + '"><\/span>\n?', '\n<pre>' + re.sub('^\n', '', end_data[i][1]) + '</pre>', data, 1)
             else:
                 data = data.replace('<span id="' + end_data[i][0] + '"></span>', '<code>' + end_data[i][1] + '</code>')
 
