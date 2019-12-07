@@ -51,11 +51,11 @@ def link_fix(main_link):
     main_link = re.sub('^파일:', 'file:', main_link)
     main_link = re.sub('^분류:', 'category:', main_link)
 
-    other_link = re.search('[^\\\\]?(#.+)$', main_link)
+    other_link = re.search('[^\\\\]?(#[^#]+)$', main_link)
     if other_link:
         other_link = other_link.groups()[0]
 
-        main_link = re.sub('(#.+)$', '', main_link)
+        main_link = re.sub('(#[^#]+)$', '', main_link)
     else:
         other_link = ''
 
