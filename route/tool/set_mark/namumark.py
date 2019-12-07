@@ -957,7 +957,12 @@ def namumark(conn, data, title, main_num, include_num):
                         1
                     )
                 else:
-                    data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<a id="not_thing" href="/upload?name=' + tool.url_pas(file_name) + '">' + file_alt + '</a>', data, 1)
+                    data = re.sub(
+                        '\[\[((?:(?!\[\[|\]\]).)+)\]\]', 
+                        '<a id="not_thing" href="/upload?name=' + tool.url_pas(file_name) + '">' + file_alt + '</a>', 
+                        data, 
+                        1
+                    )
             elif category_re.search(main_link):
                 main_link = category_re.sub('category:', main_link)
                 
@@ -1038,12 +1043,30 @@ def namumark(conn, data, title, main_num, include_num):
                         
                             backlink += [[title, main_link, '']]
                             
-                            data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<a ' + link_id + ' title="' + see_link + other_link + '" href="/w/' + tool.url_pas(main_link) + other_link + '">' + see_link + '</a>', data, 1)
+                            data = re.sub(
+                                '\[\[((?:(?!\[\[|\]\]).)+)\]\]', 
+                                '<a ' + link_id + ' ' + \
+                                    'title="' + main_link + other_link + '" ' + \
+                                    'href="/w/' + tool.url_pas(main_link) + other_link + '"' + \
+                                '>' + see_link + '</a>', 
+                                data, 
+                                1
+                            )
                         else:
-                            data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<a title="' + see_link + '" href="' + other_link + '">' + see_link + '</a>', data, 1)
+                            data = re.sub(
+                                '\[\[((?:(?!\[\[|\]\]).)+)\]\]', 
+                                '<a title="' + see_link + '" href="' + other_link + '">' + see_link + '</a>', 
+                                data, 
+                                1
+                            )
                     else:
                         if re.search('^#', other_link):
-                            data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<a title="' + other_link + '" href="' + other_link + '">' + other_link + '</a>', data, 1)
+                            data = re.sub(
+                                '\[\[((?:(?!\[\[|\]\]).)+)\]\]', 
+                                '<a title="' + other_link + '" href="' + other_link + '">' + other_link + '</a>', 
+                                data, 
+                                1
+                            )
                         else:
                             data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<b>' + see_link + '</b>', data, 1)
                 else:
