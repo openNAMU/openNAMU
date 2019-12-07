@@ -30,7 +30,6 @@ def main_manager_2(conn, num, r_ver):
                         <li><a href="/manager/3">''' + load_lang('check_user') + '''</a></li>
                         <li><a href="/ban">''' + load_lang('ban') + '''</a></li>
                         <li><a href="/manager/5">''' + load_lang('authorize') + '''</a></li>
-                        <li><a href="/edit_filter">''' + load_lang('edit_filter_list') + '''</a></li>
                     </ul>
                     <br>
                     <h2>''' + load_lang('owner') + '''</h2>
@@ -41,6 +40,7 @@ def main_manager_2(conn, num, r_ver):
                     </ul>
                     <h3>''' + load_lang('filter') + '''</h3>
                     <ul>
+                        <li><a href="/edit_filter">''' + load_lang('edit_filter_list') + '''</a></li>
                         <li><a href="/inter_wiki">''' + load_lang('interwiki_list') + '''</a></li>
                         <li><a href="/edit_top">''' + load_lang('edit_tool_list') + '''</a></li>
                         <li><a href="/image_license">''' + load_lang('image_license_list') + '''</a></li>
