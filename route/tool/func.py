@@ -398,7 +398,7 @@ def other2(data):
     req_list = ''
     
     css_filter = {
-        'main.css' : '6'
+        'main.css' : '7'
     }
     for i_data in os.listdir(os.path.join("views", "main_css", "css")):
         if i_data in css_filter:
