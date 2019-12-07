@@ -267,7 +267,7 @@ def middle_parser(data, fol_num, syntax_num, folding_num, include_num):
                             
                             data = middle_re.sub('<span style="font-size: ' + font_size + '%;">', data, 1)
                         elif re.search('^#!wiki', middle_data[0]):
-                            middle_data_2 = re.search('{{{#!wiki(?: style=(?:&quot;|&#x27;)((?:(?!&quot;|&#x27;).)*)(?:&quot;|&#x27;))?(?:[^\n]+)\n?', data)
+                            middle_data_2 = re.search('{{{#!wiki(?: style=(?:&quot;|&#x27;)((?:(?!&quot;|&#x27;).)*)(?:&quot;|&#x27;))?(?: *)\n?', data)
                             if middle_data_2:
                                 middle_data_2 = middle_data_2.groups()
                             else:
@@ -276,7 +276,7 @@ def middle_parser(data, fol_num, syntax_num, folding_num, include_num):
                             middle_list += ['div_1']
                             
                             data = re.sub(
-                                '{{{#!wiki(?: style=(?:&quot;|&#x27;)((?:(?!&quot;|&#x27;).)*)(?:&quot;|&#x27;))?(?:[^\n]+)\n?',
+                                '{{{#!wiki(?: style=(?:&quot;|&#x27;)((?:(?!&quot;|&#x27;).)*)(?:&quot;|&#x27;))?(?: *)\n?',
                                 '<div id="wiki_div" style="' + str(middle_data_2[0] if middle_data_2[0] else '') + '">', 
                                 data, 
                                 1
