@@ -298,7 +298,7 @@ def middle_parser(data, fol_num, syntax_num, folding_num, include_num):
                             data = re.sub(
                                 '{{{#!syntax ?((?:(?!\n).)*)\n?', 
                                 '<pre id="syntax"><code class="' + middle_data_2[0] + '">', 
-                                data, 
+                                data,
                                 1
                             )
                         elif re.search('^#!folding', middle_data[0]):
@@ -1217,7 +1217,7 @@ def namumark(conn, data, title, main_num, include_num):
             data = data.replace(tool.url_pas('<span id="' + end_data[i][0] + '"></span>'), tool.url_pas(end_data[i][1]))
         else:
             if re.search('\n', end_data[i][1]):
-                data = data.replace('<span id="' + end_data[i][0] + '"></span>', '\n<pre>' + re.sub('^\n', '', end_data[i][1]) + '</pre>')
+                data = data.replace('<span id="' + end_data[i][0] + '"></span>\n', '\n<pre>' + re.sub('^\n', '', end_data[i][1]) + '</pre>')
             else:
                 data = data.replace('<span id="' + end_data[i][0] + '"></span>', '<code>' + end_data[i][1] + '</code>')
 
