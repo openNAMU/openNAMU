@@ -709,7 +709,19 @@ def custom():
     else:
         user_notice = '0'
 
-    return ['', '', user_icon, user_head, email, user_name, user_admin, user_ban, user_notice, user_acl_list]
+    return [
+        '', 
+        '', 
+        user_icon, 
+        user_head, 
+        email, 
+        user_name, 
+        user_admin, 
+        user_ban, 
+        user_notice, 
+        user_acl_list,
+        ip
+    ]
 
 def load_skin(data = '', set_n = 0):
     skin_return_data = ''
