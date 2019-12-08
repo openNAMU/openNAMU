@@ -37,19 +37,18 @@ def recent_changes_2(conn, name, tool):
                     <td id="main_table_width">''' + load_lang('time') + '''</td></tr>
                 '''
                 
-                # 기본적인 move만 구현
                 tool_select = flask.request.args.get('tool', None)
                 if tool_select and tool_select == 'move':
                     curs.execute(db_change('' + \
                         'select id, title, date, ip, send, leng from history ' + \
-                        'where send like ? or send like ? ' + \
+                        'where (send like ? or send like ?) and type = "" ' + \
                         'order by id + 0 desc ' + \
                         "limit ?, 50" + \
                     ''), ['%(<a>' + name +'</a>%', '%<a>' + name + '</a> move)', sql_num])
                 else:
                     curs.execute(db_change('' + \
                         'select id, title, date, ip, send, leng from history ' + \
-                        'where title = ? ' + \
+                        'where title = ? and type = "" ' + \
                         'order by id + 0 desc ' + \
                         "limit ?, 50" + \
                     ''), [name, sql_num])
@@ -65,7 +64,7 @@ def recent_changes_2(conn, name, tool):
                 
                 curs.execute(db_change('' + \
                     'select id, title, date, ip, send, leng from history ' + \
-                    "where ip = ? order by date desc limit ?, 50" + \
+                    "where ip = ? and type = "" order by date desc limit ?, 50" + \
                 ''), [name, sql_num])
         else:
             num = int(number_check(flask.request.args.get('num', '1')))
@@ -81,16 +80,24 @@ def recent_changes_2(conn, name, tool):
                 </tr>
             '''
 
-            set_user = flask.request.args.get('set', 'normal')
-            if set_user == 'normal':
-                div = '<a href="?set=user">(' + load_lang('user_document') + ')</a>' + div
+            set_type = flask.request.args.get('set', 'normal')
+            if set_type == 'normal':
+                div = '<a href="?set=user">(' + load_lang('user_document') + ')</a> <a href="?set=req">(' + load_lang('edit_req') + ')</a>' + div
 
-            curs.execute(db_change('' + \
-                'select id, title, date, ip, send, leng from history ' + \
-                "where " + ('' if set_user == 'user' else 'not ') + "title like 'user:%' " + \
-                'order by date desc ' + \
-                'limit ?, 50' + \
-            ''), [sql_num])
+            if set_type == 'req':
+                curs.execute(db_change('' + \
+                    'select id, title, date, ip, send, leng from history ' + \
+                    "where type = 'req' " + \
+                    'order by date desc ' + \
+                    'limit ?, 50' + \
+                ''), [sql_num])
+            else:
+                curs.execute(db_change('' + \
+                    'select id, title, date, ip, send, leng from history ' + \
+                    "where " + ('' if set_type == 'user' else 'not ') + "title like 'user:%' and type = '' " + \
+                    'order by date desc ' + \
+                    'limit ?, 50' + \
+                ''), [sql_num])
 
         data_list = curs.fetchall()
         for data in data_list:    
@@ -147,8 +154,11 @@ def recent_changes_2(conn, name, tool):
             if tool == 'history':
                 title = '<a href="/w/' + url_pas(name) + '?num=' + data[0] + '">r' + data[0] + '</a> '
             else:
-                title = '<a href="/w/' + url_pas(data[1]) + '">' + html.escape(data[1]) + '</a> '
-                title += '<a href="/history/' + url_pas(data[1]) + '">(r' + data[0] + ')</a> '
+                if set_type == 'req':
+                    title = '<a href="/edit_req/' + url_pas(data[1]) + '?r=' + data[0] + '">' + html.escape(data[1]) + ' (r' + data[0] + ')</a> '
+                else:
+                    title = '<a href="/w/' + url_pas(data[1]) + '">' + html.escape(data[1]) + '</a> '
+                    title += '<a href="/history/' + url_pas(data[1]) + '">(r' + data[0] + ')</a> '
 
             div +=  '''
                 <tr ''' + style[0] + '''>
@@ -183,29 +193,19 @@ def recent_changes_2(conn, name, tool):
                     <hr class=\"main_hr\">
                 ''' + div
                 title = name
-                
                 sub += ' (' + load_lang('history') + ')'
-                
                 menu = [['w/' + url_pas(name), load_lang('document')], ['raw/' + url_pas(name), load_lang('raw')]]
-                
                 div += next_fix('/history/' + url_pas(name) + '?num=', num, data_list)
             else:
-                curs.execute(db_change("select end from ban where block = ?"), [name])
-                if curs.fetchall():
-                    sub += ' (' + load_lang('blocked') + ')'
-
                 title = load_lang('edit_record')
-                
                 menu = [['other', load_lang('other')], ['user', load_lang('user')], ['count/' + url_pas(name), load_lang('count')]]
-                
                 div += next_fix('/record/' + url_pas(name) + '?num=', num, data_list)
         else:
             menu = 0
             title = load_lang('recent_change')
-                
             div += next_fix('/recent_changes?num=', num, data_list)
 
-            if set_user == 'user':
+            if set_type == 'user':
                 sub = ' (' + load_lang('user') + ')'
                 menu = [['recent_changes', load_lang('return')]]
         
