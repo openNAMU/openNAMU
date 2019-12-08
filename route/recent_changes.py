@@ -208,6 +208,9 @@ def recent_changes_2(conn, name, tool):
             if set_type == 'user':
                 sub = ' (' + load_lang('user') + ')'
                 menu = [['recent_changes', load_lang('return')]]
+            elif set_type == 'req':
+                sub = ' (' + load_lang('edit_req') + ')'
+                menu = [['recent_changes', load_lang('return')]]
         
         if sub == '':
             sub = 0
