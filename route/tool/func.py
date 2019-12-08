@@ -978,9 +978,17 @@ def rd_plus(title, sub, date):
 
     conn.commit()
 
-def history_plus(title, data, date, ip, send, leng, t_check = ''):
-    curs.execute(db_change("select id from history where title = ? order by id + 0 desc limit 1"), [title])
+def history_plus(title, data, date, ip, send, leng, t_check = '', d_type = ''):
+    curs.execute(db_change("select id from history where title = ? and type = '' order by id + 0 desc limit 1"), [title])
     id_data = curs.fetchall()
+    id_data = str(int(id_data[0][0]) + 1) if id_data else '1'
+
+    curs.execute(db_change("select title from history where title = ? and id = ? and type = 'req'"), [name, id_data])
+    if curs.fetchall():
+        curs.execute(db_change("update history set type = 'req_close' where title = ? and id = ? and type = 'req'"), [
+            name,
+            id_data
+        ])
 
     send = re.sub('\(|\)|<|>', '', send)
 
@@ -990,14 +998,15 @@ def history_plus(title, data, date, ip, send, leng, t_check = ''):
     if t_check != '':
         send += ' (' + t_check + ')'
 
-    curs.execute(db_change("insert into history (id, title, data, date, ip, send, leng, hide) values (?, ?, ?, ?, ?, ?, ?, '')"), [
-        str(int(id_data[0][0]) + 1) if id_data else '1',
+    curs.execute(db_change("insert into history (id, title, data, date, ip, send, leng, hide, type) values (?, ?, ?, ?, ?, ?, ?, '', ?)"), [
+        id_data,
         title,
         data,
         date,
         ip,
         send,
-        leng
+        leng,
+        d_type
     ])
 
 def leng_check(first, second):

@@ -165,7 +165,7 @@ create_data['all_data'] = [
     'acl', 
     'inter', 
     'html_filter',
-    'oauth_conn'
+    'oauth_conn',
 ]
 for i in create_data['all_data']:
     try:
@@ -437,9 +437,9 @@ def view_raw(name = None, topic_num = None, num = None):
 def edit_revert(name = None):
     return edit_revert_2(conn, name)
 
-@app.route('/edit/<everything:name>', methods=['POST', 'GET'])
-def edit(name = None):
-    return edit_2(conn, name)
+@app.route('/<regex("edit|edit_req"):tool>/<everything:name>', methods=['POST', 'GET'])
+def edit(tool = 'edit', name = None):
+    return edit_2(conn, tool, name)
         
 @app.route('/delete/<everything:name>', methods=['POST', 'GET'])
 def edit_delete(name = None):

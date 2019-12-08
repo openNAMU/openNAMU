@@ -184,6 +184,8 @@
         "old_page" : "Old decument(s)",
         "skin_set" : "Skin setting(s)",
         "many_delete" : "Bulk delete",
+        "edit_req" : "Edit Request",
+        "edit_req_check" : "Check Edit Request",
         "_comment_2.1_" : "Filter",
             "_comment_2.1.1_" : "List",
                 "interwiki_list" : "Interwiki(s) list",

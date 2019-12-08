@@ -307,5 +307,7 @@
     "content" : "내용",
     "upload_acl" : "업로드 ACL",
     "default_view_acl" : "기본 보기 ACL",
-    "topic_delete" : "토론 삭제"
+    "topic_delete" : "토론 삭제",
+    "edit_req" : "편집 요청",
+    "edit_req_check" : "편집 요청 검사"
 }
