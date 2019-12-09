@@ -120,9 +120,6 @@ print('Select : ', end = '')
 what_i_do = input()
 
 if what_i_do == '1':
-    def parser(data):
-        namumark(data[0], data[1], 1)
-
     curs.execute(db_change("delete from back"))
     conn.commit()
 
@@ -132,13 +129,7 @@ if what_i_do == '1':
 
     for test in data:
         num += 1
-
-        t = threading.Thread(target = parser, args = [test])
-        t.start()
-        t.join()
-
-        if num % 10 == 0:
-            print(num)
+        render_do(test[0], test[1], 1, None)
 elif what_i_do == '2':
     curs.execute(db_change("delete from other where name = 'recaptcha'"))
     curs.execute(db_change("delete from other where name = 'sec_re'"))
