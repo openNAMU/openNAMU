@@ -129,6 +129,9 @@ if what_i_do == '1':
 
     for test in data:
         num += 1
+        if num % 100 == 0:
+            print(num)
+            
         render_do(test[0], test[1], 1, None)
 elif what_i_do == '2':
     curs.execute(db_change("delete from other where name = 'recaptcha'"))
