@@ -64,7 +64,7 @@ def recent_changes_2(conn, name, tool):
                 
                 curs.execute(db_change('' + \
                     'select id, title, date, ip, send, leng from history ' + \
-                    "where ip = ? and type = "" order by date desc limit ?, 50" + \
+                    "where ip = ? and type = '' order by date desc limit ?, 50" + \
                 ''), [name, sql_num])
         else:
             num = int(number_check(flask.request.args.get('num', '1')))
@@ -154,7 +154,7 @@ def recent_changes_2(conn, name, tool):
             if tool == 'history':
                 title = '<a href="/w/' + url_pas(name) + '?num=' + data[0] + '">r' + data[0] + '</a> '
             else:
-                if set_type == 'req':
+                if not name and set_type == 'req':
                     title = '<a href="/edit_req/' + url_pas(data[1]) + '?r=' + data[0] + '">' + html.escape(data[1]) + ' (r' + data[0] + ')</a> '
                 else:
                     title = '<a href="/w/' + url_pas(data[1]) + '">' + html.escape(data[1]) + '</a> '

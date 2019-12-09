@@ -995,12 +995,13 @@ def history_plus(title, data, date, ip, send, leng, t_check = '', d_type = ''):
     id_data = curs.fetchall()
     id_data = str(int(id_data[0][0]) + 1) if id_data else '1'
 
-    curs.execute(db_change("select title from history where title = ? and id = ? and type = 'req'"), [name, id_data])
-    if curs.fetchall():
-        curs.execute(db_change("update history set type = 'req_close' where title = ? and id = ? and type = 'req'"), [
-            name,
-            id_data
-        ])
+    if d_type != 'req':
+        curs.execute(db_change("select title from history where title = ? and id = ? and type = 'req'"), [title, id_data])
+        if curs.fetchall():
+            curs.execute(db_change("update history set type = 'req_close' where title = ? and id = ? and type = 'req'"), [
+                name,
+                id_data
+            ])
 
     send = re.sub('\(|\)|<|>', '', send)
 
