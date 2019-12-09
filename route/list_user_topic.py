@@ -36,7 +36,8 @@ def list_user_topic_2(conn, name):
         else:
             ban = ''
             
-        div += '<tr><td><a href="/topic/' + url_pas(data[0]) + '/sub/' + url_pas(data[2]) + '#' + data[1] + '">' + title + '#' + data[1] + '</a> (' + sub + ')</td>'
+        curs.execute(db_change("select code from topic where id = '1' and title = ? and sub = ?"), [title, sub])
+        div += '<tr><td><a href="/thread/' + url_pas(curs.fetchall()[0][0]) + '#' + data[1] + '">' + title + '#' + data[1] + '</a> (' + sub + ')</td>'
         div += '<td>' + ip_pas(data[3]) + ban + '</td><td>' + data[4] + '</td></tr>'
 
     div += '</tbody></table>'
