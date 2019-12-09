@@ -77,7 +77,7 @@ def func_upload_2(conn):
         curs.execute(db_change("insert into acl (title, decu, dis, why, view) values (?, 'admin', '', '', '')"), ['file:' + name])
 
         render_set(
-            title = name,
+            title = 'file:' + name,
             data = file_d,
             num = 1
         )

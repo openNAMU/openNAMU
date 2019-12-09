@@ -946,7 +946,8 @@ def namumark(conn, data, title, main_num, include_num):
                         file_name = file_data[0]
                         file_end = file_data[1]
 
-                        backlink += [[title, main_link, 'file']]
+                        if main_link != title:
+                            backlink += [[title, main_link, 'file']]
                     else:
                         file_name = 'TEST'
                         file_end = 'jpg'
@@ -987,11 +988,16 @@ def namumark(conn, data, title, main_num, include_num):
                     link_id = ''
 
                 backlink += [[title, main_link, 'cat']]
-
                 category += '<a ' + link_id + ' href="' + tool.url_pas(main_link) + '">' + category_re.sub('', see_link) + '</a> | '
+                
                 data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '', data, 1)
             elif re.search('^wiki:', main_link):
-                data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '<a id="inside" href="/' + tool.url_pas(re.sub('^wiki:', '', main_link)) + '">' + see_link + '</a>', data, 1)
+                data = re.sub(
+                    '\[\[((?:(?!\[\[|\]\]).)+)\]\]', 
+                    '<a id="inside" href="/' + tool.url_pas(re.sub('^wiki:', '', main_link)) + '">' + see_link + '</a>', 
+                    data, 
+                    1
+                )
             elif re.search('^inter:((?:(?!:).)+):', main_link):
                 inter_data = re.search('^inter:((?:(?!:).)+):((?:(?!\]\]|\|).)+)', main_link)
                 inter_data = inter_data.groups()
