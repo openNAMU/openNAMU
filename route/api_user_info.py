@@ -51,8 +51,8 @@ def api_user_info_2(conn, name):
             curs.execute(db_change("select login, block, end, why from ban where band = 'regex'"))
             for test_r in curs.fetchall():
                 if re.compile(test_r[1]).search(name):
-                    plus_t[1] += load_lang('type') + ' : ' + load_lang('regex') + '<br>'
-                    plus_t[1] += load_lang('period') + ' : ' + (test_r[2] if test_r[2] != '' else load_lang('limitless'))
+                    plus_t[1] += load_lang('type') + ' : ' + load_lang('regex')
+                    plus_t[1] += '<br>' + load_lang('period') + ' : ' + (test_r[2] if test_r[2] != '' else load_lang('limitless'))
                     plus_t[1] += ('<br>' + load_lang('login_able') if test_r[0] == 'O' else '')
                     plus_t[1] += ('<br>' + load_lang('why') + ' : ' + test_r[3] if test_r[3] != '' else '')
                     regex_ban = 1
@@ -61,9 +61,9 @@ def api_user_info_2(conn, name):
                 curs.execute(db_change("select end, login, band, why from ban where block = ? or block = ?"), [name, match])
                 block_data = curs.fetchall()
                 if block_data:
-                    plus_t[1] += load_lang('type') + ' : ' + load_lang('normal') + '<br>'
-                    plus_t[1] += load_lang('period') + ' : ' + (block_data[0][0] if block_data[0][0] != '' else load_lang('limitless'))
-                    plus_t[1] += ('<br>' + load_lang('login_able') if block_data[0][1] != '' else '')
+                    plus_t[1] += load_lang('type') + ' : ' + (load_lang('band_blocked') if block_data[0][2] == 'O' else load_lang('normal'))
+                    plus_t[1] += (' (' + load_lang('login_able') + ')' if block_data[0][1] != '' else '')
+                    plus_t[1] += '<br>' + load_lang('period') + ' : ' + (block_data[0][0] if block_data[0][0] != '' else load_lang('limitless'))
                     plus_t[1] += ('<br>' + load_lang('band_blocked') if block_data[0][2] == 'O' else '')
                     plus_t[1] += ('<br>' + load_lang('why') + ' : ' + block_data[0][3] if block_data[0][3] != '' else '')
 
