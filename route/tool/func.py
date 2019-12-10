@@ -742,7 +742,6 @@ def load_skin(data = '', set_n = 0):
         if set_n == 0:
             for skin_data in os.listdir(os.path.abspath('views')):
                 if not skin_data in system_file:
-                    print(data[0][0])
                     if data[0][0] == skin_data:
                         skin_return_data = '<option value="' + skin_data + '">' + skin_data + '</option>' + skin_return_data
                     else:
@@ -1064,58 +1063,14 @@ def re_error(data):
     conn.commit()
     
     if data == '/ban':
-        ip = ip_check()
-
-        end = '<li>' + load_lang('why') + ' : ' + load_lang('authority_error') + '</li>'
-
         if ban_check() == 1:
-            end = '<li>' + load_lang('state') + ' : ' + load_lang('ban') + '</li>'
-            ok_sign = 1
-
-            band = re.search("^([0-9]{1,3}\.[0-9]{1,3})", ip)
-            if band:
-                band_it = band.groups()[0]
-            else:
-                band_it = '-'
-
-            curs.execute(db_change("delete from ban where (end < ? and end like '2%')"), [get_time()])
-            conn.commit()
-
-            curs.execute(db_change("select login, block, end from ban where ((end > ? and end like '2%') or end = '') and band = 'regex'"), [get_time()])
-            regex_d = curs.fetchall()
-            for test_r in regex_d:
-                g_regex = re.compile(test_r[1])
-                if g_regex.search(ip):
-                    end += '<li>' + load_lang('type') + ' : regex ban</li>'
-                    end += '<li>' + load_lang('end') + ' : ' + (test_r[2] if test_r[2] != '' else load_lang('limitless')) + '</li>'
-                    if test_r[0] == 'O':
-                        end += '<li>' + load_lang('login_able') + ' (' + load_lang('not_sure') + ')</li>'
-
-                    end += '<hr class=\"main_hr\">'
-            
-            curs.execute(db_change("select login, end from ban where ((end > ? and end like '2%') or end = '') and block = ?"), [get_time(), band_it])
-            band_d = curs.fetchall()
-            if band_d:
-                end += '<li>' + load_lang('type') + ' : band ban</li>'
-                end += '<li>' + load_lang('end') + ' : ' + (band_d[0][1] if band_d[0][1] != '' else load_lang('limitless')) + '</li>'
-                if band_d[0][0] == 'O':
-                    end += '<li>' + load_lang('login_able') + ' (' + load_lang('not_sure') + ')</li>'
-
-                end += '<hr class=\"main_hr\">'
-
-            curs.execute(db_change("select login, end from ban where ((end > ? and end like '2%') or end = '') and block = ?"), [get_time(), ip])
-            ban_d = curs.fetchall()
-            if ban_d:
-                end += '<li>' + load_lang('type') + ' : ban</li>'
-                end += '<li>' + load_lang('end') + ' : ' + (ban_d[0][1] if ban_d[0][1] != '' else load_lang('limitless')) + '</li>'
-                if ban_d[0][0] == 'O':
-                    end += '<li>' + load_lang('login_able') + ' (' + load_lang('not_sure') + ')</li>'
-
-                end += '<hr class=\"main_hr\">'
+            end = '<div id="get_user_info"></div><script>load_user_info("' + ip_check() + '");</script>'
+        else:
+            end = load_lang('authority_error')
 
         return easy_minify(flask.render_template(skin_check(), 
             imp = [load_lang('error'), wiki_set(1), custom(), other2([0, 0])],
-            data = '<h2>' + load_lang('error') + '</h2><ul>' + end + '</ul>',
+            data = '<h2>' + load_lang('error') + '</h2>' + end,
             menu = 0
         ))
     else:
