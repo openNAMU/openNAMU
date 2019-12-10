@@ -138,7 +138,6 @@ class EverythingConverter(werkzeug.routing.PathConverter):
 app.jinja_env.filters['md5_replace'] = md5_replace
 app.jinja_env.filters['load_lang'] = load_lang
 app.jinja_env.filters['cut_100'] = cut_100
-app.jinja_env.filters['change_space'] = change_space
 
 app.url_map.converters['everything'] = EverythingConverter
 
