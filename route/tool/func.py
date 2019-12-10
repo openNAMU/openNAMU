@@ -398,7 +398,7 @@ def other2(data):
     req_list = ''
     
     css_filter = {
-        'main.css' : '7'
+        'main.css' : '8'
     }
     for i_data in os.listdir(os.path.join("views", "main_css", "css")):
         if i_data in css_filter:
@@ -446,9 +446,6 @@ def cut_100(data):
     data = re.sub(' {2,}', ' ', data)
 
     return data[0:100] + '...'
-
-def change_space(data):
-    return re.sub(' ', ' ', data)
 
 def wiki_set(num = 1):
     if num == 1:
