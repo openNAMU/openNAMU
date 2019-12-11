@@ -410,9 +410,9 @@ def other2(data):
         'load_include.js' : '2',
         'render_html.js' : '3',
         'do_open_foot.js' : '4',
-        'topic_main_load.js' : '3',
-        'topic_plus_load.js' : '4',
-        'topic_top_load.js' : '2',
+        'topic_main_load.js' : '5',
+        'topic_plus_load.js' : '5',
+        'topic_top_load.js' : '5',
         'topic_list_load.js' : '2',
         'do_stop_exit.js' : '2',
         'do_open_folding.js' : '3',
@@ -653,50 +653,33 @@ def custom():
     ip = ip_check()
     if ip_or_user(ip) == 0:
         user_icon = 1
-    else:
-        user_icon = 0
-
-    if user_icon != 0:
+        user_name = ip
+        
         curs.execute(db_change('select data from user_set where name = "email" and id = ?'), [ip])
         data = curs.fetchall()
         if data:
             email = data[0][0]
         else:
             email = ''
-    else:
-        email = ''
 
-    if user_icon != 0:
-        user_name = ip
-    else:
-        user_name = load_lang('user')
-        
-    if admin_check('all') == 1:
-        user_admin = '1'
+        if admin_check('all') == 1:
+            user_admin = '1'
+            user_acl_list = []
 
-        curs.execute(db_change("select acl from user where id = ?"), [ip])
-        user_acl = curs.fetchall()
+            curs.execute(db_change("select acl from user where id = ?"), [ip])
+            curs.execute(db_change('select acl from alist where name = ?'), [curs.fetchall()[0][0]])
+            user_acl = curs.fetchall()
+            for i in user_acl:
+                user_acl_list += [i[0]]
 
-        user_acl_list = []
-        curs.execute(db_change('select acl from alist where name = ?'), [user_acl[0][0]])
-        user_acl = curs.fetchall()
-        for i in user_acl:
-            user_acl_list += [i[0]]
-
-        if user_acl != []:
-            user_acl_list = user_acl_list
+            if user_acl != []:
+                user_acl_list = user_acl_list
+            else:
+                user_acl_list = '0'
         else:
+            user_admin = '0'
             user_acl_list = '0'
-    else:
-        user_admin = '0'
-        user_acl_list = '0'
-        
-    if ban_check() == 1:
-        user_ban = '1'
-    else:
-        user_ban = '0'
 
-    if user_icon == 1:
         curs.execute(db_change("select count(name) from alarm where name = ?"), [ip])
         count = curs.fetchall()
         if count:
@@ -704,7 +687,18 @@ def custom():
         else:
             user_notice = '0'
     else:
+        user_icon = 0
+        user_name = load_lang('user')
+        email = ''
+        user_admin = '0'
+        user_acl_list = '0'
         user_notice = '0'
+
+    curs.execute(db_change("select title from rd where title = ? and stop = ''"), ['user:' + ip])
+    if curs.fetchall():
+        user_topic = '1'
+    else:
+        user_topic = '0'
 
     return [
         '', 
@@ -714,10 +708,11 @@ def custom():
         email, 
         user_name, 
         user_admin, 
-        user_ban, 
+        str(ban_check()), 
         user_notice, 
         user_acl_list,
-        ip
+        ip,
+        user_topic
     ]
 
 def load_skin(data = '', set_n = 0):
