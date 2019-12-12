@@ -36,7 +36,7 @@ def recent_changes_2(conn, name, tool):
                     <td id="main_table_width">''' + load_lang('time') + '''</td>
                 '''
                 
-                tool_select = flask.request.args.get('tool', '')
+                tool_select = flask.request.args.get('tool', 'normal')
                 if tool_select == 'move':
                     plus_sql = 'where (send like ? or send like ?) and type = "" '
                     plus_list = ['%(<a>' + name +'</a>%', '%<a>' + name + '</a> move)', sql_num]    
@@ -207,7 +207,7 @@ def recent_changes_2(conn, name, tool):
         else:
             menu = 0
             title = load_lang('recent_change')
-            div += next_fix('/recent_changes?tool=' + tool_select + '&num=', num, data_list)
+            div += next_fix('/recent_changes?set=' + set_type + '&num=', num, data_list)
 
             if set_type == 'user':
                 sub = ' (' + load_lang('user') + ')'
