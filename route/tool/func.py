@@ -888,6 +888,9 @@ def ban_check(ip = None, tool = None):
     if not ip:
         ip = ip_check()
 
+    if admin_check(None, None, ip) == 1:
+        return 0
+
     band = re.search("^([0-9]{1,3}\.[0-9]{1,3})", ip)
     if band:
         band_it = band.groups()[0]
