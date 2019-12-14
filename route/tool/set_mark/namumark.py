@@ -444,7 +444,7 @@ def namumark(conn, data, title, main_num, include_num):
     backlink = []
     end_data = []
     
-    include_num = include_num + '-' if include_num else ''
+    include_num = include_num + '_' if include_num else ''
     
     data = re.sub('<math>(?P<in>(?:(?!<\/math>).)+)<\/math>', '[math(\g<in>)]', data)
 
@@ -1277,10 +1277,7 @@ def namumark(conn, data, title, main_num, include_num):
     data = re.sub('<\/ul>\n<ul>', '</ul><ul>', data)
     data = re.sub('\n<\/ul>', '</ul>', data)
     data = re.sub('\n', '<br>', data)
-
-    if include_num == '':
-        plus_data = '<script>render_html();</script>' + plus_data
-    else:
-        plus_data = '<script>render_html(\'' + include_num + '\');</script>' + plus_data
+        
+    plus_data = '<script>render_html("' + include_num + 'render_contect");</script>' + plus_data
 
     return [data, plus_data, backlink]
