@@ -40,6 +40,9 @@ def edit_2(conn, tool, name):
         else:
             captcha_post('', 0)
 
+        if slow_edit_check() == 1:
+            return re_error('/error/24')
+
         today = get_time()
         if tool == 'edit_req' and get_ver:
             content = old[0][0]

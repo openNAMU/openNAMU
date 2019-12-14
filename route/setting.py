@@ -50,7 +50,8 @@ def setting_2(conn, num):
             15 : 'encode', 
             16 : 'host',
             17 : 'upload_acl',
-            18 : 'all_view_acl'
+            18 : 'all_view_acl',
+            19 : 'slow_edit'
         }
         n_list = {
             0 : 'Wiki', 
@@ -71,7 +72,8 @@ def setting_2(conn, num):
             15 : 'sha3', 
             16 : '0.0.0.0',
             17 : '',
-            18 : ''
+            18 : '',
+            19 : '0'
         }
         
         if flask.request.method == 'POST':
@@ -162,11 +164,11 @@ def setting_2(conn, num):
                         <hr class=\"main_hr\">
                         <input type="text" name="license" value="''' + html.escape(d_list[3]) + '''">
                         <hr class=\"main_hr\">
-                        <span>''' + load_lang('max_file_size') + ''' [MB]</span>
+                        <span>''' + load_lang('max_file_size') + ''' (MB)</span>
                         <hr class=\"main_hr\">
                         <input type="text" name="upload" value="''' + html.escape(d_list[4]) + '''">
                         <hr class=\"main_hr\">
-                        <span>''' + load_lang('backup_interval') + ' [' + load_lang('hour') + '''] (off : 0) {restart}</span>
+                        <span>''' + load_lang('backup_interval') + ' (' + load_lang('hour') + ' | ' + load_lang('off') + ' : 0 | ' + load_lang('sqlite_only') + ' | ' + load_lang('restart_required') + ''')</span>
                         <hr class=\"main_hr\">
                         <input type="text" name="back_up" value="''' + html.escape(d_list[9]) + '''">
                         <hr class=\"main_hr\">
@@ -194,7 +196,7 @@ def setting_2(conn, num):
                         <hr class=\"main_hr\">
                         <input type="checkbox" name="ip_view" ''' + check_box_div[1] + '''> ''' + load_lang('hide_ip') + '''
                         <hr class=\"main_hr\">
-                        <input type="checkbox" name="email_have" ''' + check_box_div[2] + '''> ''' + load_lang('email_required') + ' <a href="/setting/6">{' + load_lang('google_imap_required') + '''}</a>
+                        <input type="checkbox" name="email_have" ''' + check_box_div[2] + '''> ''' + load_lang('email_required') + ' <a href="/setting/6">(' + load_lang('google_imap_required') + ''')</a>
                         <hr class=\"main_hr\">
                         <span>''' + load_lang('wiki_host') + '''</span>
                         <hr class=\"main_hr\">
@@ -215,6 +217,10 @@ def setting_2(conn, num):
                         <span>''' + load_lang('encryption_method') + '''</span>
                         <hr class=\"main_hr\">
                         <select name="encode">''' + acl_div[3] + '''</select>
+                        <hr class=\"main_hr\">
+                        <span>''' + load_lang('slow_edit') + ' (' + load_lang('second') + ' | ' + load_lang('off') + ''' : 0)</span>
+                        <hr class=\"main_hr\">
+                        <input name="''' + i_list[19] + '''" value="''' + html.escape(d_list[19]) + '''">
                         <hr class=\"main_hr\">
                         <button id="save" type="submit">''' + load_lang('save') + '''</button>
                     </form>
@@ -512,17 +518,16 @@ def setting_2(conn, num):
                 imp = ['Google', wiki_set(), custom(), other2([0, 0])],
                 data = '''
                     <form method="post">
-                        <h2><a href="https://www.google.com/recaptcha/admin">recaptcha</a></h2>
+                        <h2><a href="https://www.google.com/recaptcha/admin">''' + load_lang('recaptcha') + '''</a></h2>
+                        <span>HTML</span>
                         <hr class=\"main_hr\">
-                        <span>''' + load_lang('recaptcha') + ''' (HTML)</span>
+                        <input name="recaptcha" placeholder='&lt;div class="g-recaptcha" data-sitekey="''' + load_lang('public_key') + '''"&gt;&lt;/div&gt;' value="''' + html.escape(d_list[0]) + '''">
                         <hr class=\"main_hr\">
-                        <input name="recaptcha" placeholder='&lt;div class="g-recaptcha" data-sitekey="your_site_key"&gt;&lt;/div&gt;' value="''' + html.escape(d_list[0]) + '''">
-                        <hr class=\"main_hr\">
-                        <span>''' + load_lang('recaptcha') + ' (' + load_lang('secret_key') + ''')</span>
+                        <span>''' + load_lang('secret_key') + '''</span>
                         <hr class=\"main_hr\">
                         <input name="sec_re" value="''' + html.escape(d_list[1]) + '''">
                         <hr class=\"main_hr\">
-                        <h2><a href="https://support.google.com/mail/answer/7126229">''' + load_lang('google_imap') + '</a> {' + load_lang('restart_required') + '''}</h1>
+                        <h2><a href="https://support.google.com/mail/answer/7126229">''' + load_lang('google_imap') + '</a> (' + load_lang('restart_required') + ''')</h1>
                         <span>''' + load_lang('google_email') + '''</span>
                         <hr class=\"main_hr\">
                         <input name="g_email" value="''' + html.escape(d_list[2]) + '''">

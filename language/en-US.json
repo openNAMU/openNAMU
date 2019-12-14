@@ -16,6 +16,7 @@
         "skin" : "Skin",
         "save" : "Save",
         "secret_key" : "Secret key",
+        "public_key" : "Public key",
         "host" : "Host",
         "port" : "Port",
         "restart" : "Restart",
@@ -95,6 +96,7 @@
         "icon" : "Icon",
         "view" : "View",
         "content" : "Content",
+        "off" : "Off",
         "_comment_1.1_" : "Time",
             "second" : "Second(s)",
             "hour" : "Hour(s)",
@@ -236,6 +238,7 @@
                 "email_required" : "Email required",
                 "google_imap_required" : "Google IMAP setting required",
                 "update_branch" : "Branch to import updates",
+                "slow_edit" : "Continuous edit limit",
             "_comment_2.2.3_" : "Text",
                 "register_text" : "Terms of sign-up",
                 "non_login_alert" : "Non-login alert",
@@ -306,6 +309,7 @@
         "defalut_edit_help" : "Describe it here",
         "markup_enabled" : "Markup enabled",
         "many_delete_help" : "Please write down the document name one by one on the line.",
+        "sqlite_only" : "SQLite only",
         "_comment_3.1_" : "Error",
             "update_error" : "Auto update is not support.",
             "inter_error" : "Internal error.",
@@ -331,5 +335,6 @@
             "topic_long_error" : "The discussion name must not exceed 256 characters.",
             "email_error" : "No one has this email.",
             "regex_error" : "There is an error in the regular expression.",
-            "decument_404_error" : "This document does not exist."
+            "decument_404_error" : "This document does not exist.",
+            "fast_edit_error" : "Editing speed is too fast. Limit (Second(s)) : "
 }

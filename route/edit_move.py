@@ -12,6 +12,9 @@ def edit_move_2(conn, name):
         else:
             captcha_post('', 0)
 
+        if slow_edit_check() == 1:
+            return re_error('/error/24')
+
         curs.execute(db_change("select title from history where title = ?"), [flask.request.form.get('title', None)])
         if curs.fetchall():
             if admin_check(None, 'merge documents') == 1:

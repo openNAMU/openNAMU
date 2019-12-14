@@ -765,6 +765,23 @@ def load_skin(data = '', set_n = 0):
 
     return skin_return_data
 
+def slow_edit_check():
+    curs.execute(db_change("select data from other where name = 'slow_edit'"))
+    slow_edit = curs.fetchall()
+    if slow_edit and slow_edit != '0' and admin_check(5) != 1:
+        slow_edit = slow_edit[0][0]
+
+        curs.execute(db_change("select date from history where ip = ? order by date desc limit 1"), [ip_check()])
+        last_edit_data = curs.fetchall()
+        if last_edit_data:
+            last_edit_data = int(re.sub(' |:|-', '', last_edit_data[0][0]))
+            now_edit_data = int((datetime.datetime.now() - datetime.timedelta(seconds = int(slow_edit))).strftime("%Y%m%d%H%M%S"))
+
+            if last_edit_data > now_edit_data:
+                return 1
+
+    return 0
+
 def acl_check(name = 'test', tool = '', sub = 'test'):
     ip = ip_check()
     
@@ -993,7 +1010,7 @@ def history_plus(title, data, date, ip, send, leng, t_check = '', d_type = ''):
         curs.execute(db_change("select title from history where title = ? and id = ? and type = 'req'"), [title, id_data])
         if curs.fetchall():
             curs.execute(db_change("update history set type = 'req_close' where title = ? and id = ? and type = 'req'"), [
-                name,
+                title,
                 id_data
             ])
 
@@ -1116,6 +1133,10 @@ def re_error(data):
                 data = load_lang('file_name_error')
             elif num == 23:
                 data = load_lang('regex_error')
+            elif num == 24:
+                curs.execute(db_change("select data from other where name = 'slow_edit'"))
+                slow_data = curs.fetchall()
+                data = load_lang('fast_edit_error') + slow_data[0][0]
             else:
                 data = '???'
 

@@ -17,6 +17,9 @@ def edit_revert_2(conn, name):
             return re_error('/error/13')
         else:
             captcha_post('', 0)
+
+        if slow_edit_check() == 1:
+            return re_error('/error/24')
     
         curs.execute(db_change("select data from history where title = ? and id = ?"), [name, str(num)])
         data = curs.fetchall()
