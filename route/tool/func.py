@@ -396,33 +396,21 @@ def other2(data):
         data += ['']
 
     req_list = ''
+    main_css_ver = 1
     
-    css_filter = {
-        'main.css' : '8'
-    }
-    for i_data in os.listdir(os.path.join("views", "main_css", "css")):
-        if i_data in css_filter:
-            req_list += '<link rel="stylesheet" href="/views/main_css/css/' + i_data + '?ver=' + css_filter[i_data] + '">'
-        else:
-            req_list += '<link rel="stylesheet" href="/views/main_css/css/' + i_data + '?ver=1">'
-    
-    js_filter = {
-        'load_include.js' : '2',
-        'render_html.js' : '4',
-        'do_open_foot.js' : '4',
-        'topic_main_load.js' : '5',
-        'topic_plus_load.js' : '5',
-        'topic_top_load.js' : '5',
-        'topic_list_load.js' : '2',
-        'do_stop_exit.js' : '2',
-        'do_open_folding.js' : '3',
-        'shotcuts_set.js' : '2'
-    }
-    for i_data in os.listdir(os.path.join("views", "main_css", "js")):
-        if i_data in js_filter:
-            req_list += '<script src="/views/main_css/js/' + i_data + '?ver=' + js_filter[i_data] + '"></script>'
-        else:
-            req_list += '<script src="/views/main_css/js/' + i_data + '?ver=1"></script>'
+    if not 'main_css_load' in flask.session or not 'main_css_ver' in flask.session or flask.session['main_css_ver'] != main_css_ver:
+        for i_data in os.listdir(os.path.join("views", "main_css", "css")):
+            file_date = str(int(os.path.getmtime(os.path.join("views", "main_css", "css", i_data))))
+            req_list += '<link rel="stylesheet" href="/views/main_css/css/' + i_data + '?ver=' + file_date + '">'
+        
+        for i_data in os.listdir(os.path.join("views", "main_css", "js")):
+            file_date = str(int(os.path.getmtime(os.path.join("views", "main_css", "js", i_data))))
+            req_list += '<script src="/views/main_css/js/' + i_data + '?ver=' + file_date + '"></script>'
+
+        flask.session['main_css_load'] = req_list
+        flask.session['main_css_ver'] = main_css_ver
+    else:
+        req_list = flask.session['main_css_load']
 
     data = data[0:2] + ['', '''
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css">
