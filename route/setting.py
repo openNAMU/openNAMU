@@ -15,10 +15,10 @@ def setting_2(conn, num):
             'robots.txt',
             'Google',
             load_lang('main_bottom_body'),
+            load_lang('main_acl_setting')
         ]
         
         x = 0
-        
         li_data = ''
         
         for li in li_list:
@@ -38,7 +38,6 @@ def setting_2(conn, num):
             3 : 'license', 
             4 : 'upload', 
             5 : 'skin', 
-            6 : 'edit', 
             7 : 'reg', 
             8 : 'ip_view', 
             9 : 'back_up', 
@@ -46,11 +45,8 @@ def setting_2(conn, num):
             11 : 'key', 
             12 : 'update', 
             13 : 'email_have', 
-            14 : 'discussion', 
             15 : 'encode', 
             16 : 'host',
-            17 : 'upload_acl',
-            18 : 'all_view_acl',
             19 : 'slow_edit'
         }
         n_list = {
@@ -59,20 +55,16 @@ def setting_2(conn, num):
             2 : 'FrontPage', 
             3 : 'CC 0', 
             4 : '2', 
-            5 : '', 
-            6 : 'normal', 
+            5 : '',  
             7 : '', 
             8 : '', 
             9 : '0', 
             10 : '3000', 
             11 : 'test', 
             12 : 'stable', 
-            13 : '', 
-            14 : 'normal', 
+            13 : '',  
             15 : 'sha3', 
             16 : '0.0.0.0',
-            17 : '',
-            18 : '',
             19 : '0'
         }
         
@@ -80,8 +72,8 @@ def setting_2(conn, num):
             for i in i_list:
                 curs.execute(db_change("update other set data = ? where name = ?"), [
                     flask.request.form.get(i_list[i], n_list[i]), 
-                    i_list[i]]
-                )
+                    i_list[i]
+                ])
 
             conn.commit()
 
@@ -89,40 +81,27 @@ def setting_2(conn, num):
 
             return redirect('/setting/1')
         else:
-            d_list = []
+            d_list = {}
             
             for i in i_list:
                 curs.execute(db_change('select data from other where name = ?'), [i_list[i]])
                 sql_d = curs.fetchall()
                 if sql_d:
-                    d_list += [sql_d[0][0]]
+                    d_list[i] = sql_d[0][0]
                 else:
                     curs.execute(db_change('insert into other (name, data) values (?, ?)'), [i_list[i], n_list[i]])
                     
-                    d_list += [n_list[i]]
+                    d_list[i] = n_list[i]
 
             conn.commit()
             
-            acl_div = ['', '', '', '', '']
-            acl_list = ['normal', 'user', 'admin', 'owner', '50_edit', 'email']
+            acl_div = ['']
             encode_data = ['sha256', 'sha3']
-            for i in range(0, 5):
-                if i == 0:
-                    acl_num = 6
-                elif i == 1:
-                    acl_num = 14
-                elif i == 2:
-                    acl_num = 17
-                elif i == 4:
-                    acl_num = 18
+            for acl_data in encode_data:
+                if acl_data == d_list[15]:
+                    acl_div[0] = '<option value="' + acl_data + '">' + acl_data + '</option>' + acl_div[0]
                 else:
-                    acl_num = 15
-
-                for acl_data in (encode_data if i == 3 else acl_list):
-                    if acl_data == d_list[acl_num]:
-                        acl_div[i] = '<option value="' + acl_data + '">' + acl_data + '</option>' + acl_div[i]
-                    else:
-                        acl_div[i] += '<option value="' + acl_data + '">' + acl_data + '</option>'
+                    acl_div[0] += '<option value="' + acl_data + '">' + acl_data + '</option>'
 
             check_box_div = ['', '', '']
             for i in range(0, 3):
@@ -168,29 +147,13 @@ def setting_2(conn, num):
                         <hr class=\"main_hr\">
                         <input type="text" name="upload" value="''' + html.escape(d_list[4]) + '''">
                         <hr class=\"main_hr\">
-                        <span>''' + load_lang('backup_interval') + ' (' + load_lang('hour') + ' | ' + load_lang('off') + ' : 0 | ' + load_lang('sqlite_only') + ' | ' + load_lang('restart_required') + ''')</span>
+                        <span>''' + load_lang('backup_interval') + ' (' + load_lang('hour') + ') (' + load_lang('off') + ' : 0) (' + load_lang('sqlite_only') + ') (' + load_lang('restart_required') + ''')</span>
                         <hr class=\"main_hr\">
                         <input type="text" name="back_up" value="''' + html.escape(d_list[9]) + '''">
                         <hr class=\"main_hr\">
                         <span>''' + load_lang('wiki_skin') + '''</span>
                         <hr class=\"main_hr\">
                         <select name="skin">''' + load_skin(d_list[5]) + '''</select>
-                        <hr class=\"main_hr\">
-                        <span>''' + load_lang('default_acl') + '</span> <a href="/acl/TEST">(' + load_lang('reference') + ''')</a>
-                        <hr class=\"main_hr\">
-                        <select name="edit">''' + acl_div[0] + '''</select>
-                        <hr class=\"main_hr\">
-                        <span>''' + load_lang('default_discussion_acl') + '''</span>
-                        <hr class=\"main_hr\">
-                        <select name="discussion">''' + acl_div[1] + '''</select>
-                        <hr class=\"main_hr\">
-                        <span>''' + load_lang('upload_acl') + '''</span>
-                        <hr class=\"main_hr\">
-                        <select name="upload_acl">''' + acl_div[2] + '''</select>
-                        <hr class=\"main_hr\">
-                        <span>''' + load_lang('default_view_acl') + '''</span>
-                        <hr class=\"main_hr\">
-                        <select name="all_view_acl">''' + acl_div[4] + '''</select>
                         <hr class=\"main_hr\">
                         <input type="checkbox" name="reg" ''' + check_box_div[0] + '''> ''' + load_lang('no_register') + '''
                         <hr class=\"main_hr\">
@@ -216,9 +179,9 @@ def setting_2(conn, num):
                         <hr class=\"main_hr\">
                         <span>''' + load_lang('encryption_method') + '''</span>
                         <hr class=\"main_hr\">
-                        <select name="encode">''' + acl_div[3] + '''</select>
+                        <select name="encode">''' + acl_div[0] + '''</select>
                         <hr class=\"main_hr\">
-                        <span>''' + load_lang('slow_edit') + ' (' + load_lang('second') + ' | ' + load_lang('off') + ''' : 0)</span>
+                        <span>''' + load_lang('slow_edit') + ' (' + load_lang('second') + ') (' + load_lang('off') + ''' : 0)</span>
                         <hr class=\"main_hr\">
                         <input name="''' + i_list[19] + '''" value="''' + html.escape(d_list[19]) + '''">
                         <hr class=\"main_hr\">
@@ -535,6 +498,90 @@ def setting_2(conn, num):
                         <span><a href="https://security.google.com/settings/security/apppasswords">''' + load_lang('google_app_password') + '''</a></span>
                         <hr class=\"main_hr\">
                         <input type="password" name="g_pass" value="''' + html.escape(d_list[3]) + '''">
+                        <hr class=\"main_hr\">
+                        <button id="save" type="submit">''' + load_lang('save') + '''</button>
+                    </form>
+                ''',
+                menu = [['setting', load_lang('return')]]
+            ))
+    elif num == 8:
+        i_list = {
+            6 : 'edit', 
+            14 : 'discussion', 
+            17 : 'upload_acl',
+            18 : 'all_view_acl'
+        }
+        n_list = {
+            6 : 'normal', 
+            14 : 'normal', 
+            17 : 'normal',
+            18 : 'normal'
+        }
+        
+        if flask.request.method == 'POST':
+            for i in i_list:
+                curs.execute(db_change("update other set data = ? where name = ?"), [
+                    flask.request.form.get(i_list[i], n_list[i]), 
+                    i_list[i]
+                ])
+
+            conn.commit()
+
+            admin_check(None, 'edit_set')
+
+            return redirect('/setting/8')
+        else:
+            d_list = {}
+            
+            for i in i_list:
+                curs.execute(db_change('select data from other where name = ?'), [i_list[i]])
+                sql_d = curs.fetchall()
+                if sql_d:
+                    d_list[i] = sql_d[0][0]
+                else:
+                    curs.execute(db_change('insert into other (name, data) values (?, ?)'), [i_list[i], n_list[i]])
+                    
+                    d_list[i] = n_list[i]
+
+            conn.commit()
+            
+            acl_div = ['', '', '', '']
+            acl_list = ['normal', 'user', 'admin', 'owner', '50_edit', 'email']
+            for i in range(0, 4):
+                if i == 0:
+                    acl_num = 6
+                elif i == 1:
+                    acl_num = 14
+                elif i == 2:
+                    acl_num = 17
+                else:
+                    acl_num = 18
+
+                for acl_data in acl_list:
+                    if acl_data == d_list[acl_num]:
+                        acl_div[i] = '<option value="' + acl_data + '">' + acl_data + '</option>' + acl_div[i]
+                    else:
+                        acl_div[i] += '<option value="' + acl_data + '">' + acl_data + '</option>'
+
+            return easy_minify(flask.render_template(skin_check(), 
+                imp = [load_lang('main_acl_setting'), wiki_set(), custom(), other2([0, 0])],
+                data = '''
+                    <form method="post">
+                        <span>''' + load_lang('default_acl') + '</span> <a href="/acl/TEST">(' + load_lang('reference') + ''')</a>
+                        <hr class=\"main_hr\">
+                        <select name="edit">''' + acl_div[0] + '''</select>
+                        <hr class=\"main_hr\">
+                        <span>''' + load_lang('default_discussion_acl') + '''</span>
+                        <hr class=\"main_hr\">
+                        <select name="discussion">''' + acl_div[1] + '''</select>
+                        <hr class=\"main_hr\">
+                        <span>''' + load_lang('upload_acl') + '''</span>
+                        <hr class=\"main_hr\">
+                        <select name="upload_acl">''' + acl_div[2] + '''</select>
+                        <hr class=\"main_hr\">
+                        <span>''' + load_lang('default_view_acl') + '''</span>
+                        <hr class=\"main_hr\">
+                        <select name="all_view_acl">''' + acl_div[3] + '''</select>
                         <hr class=\"main_hr\">
                         <button id="save" type="submit">''' + load_lang('save') + '''</button>
                     </form>
