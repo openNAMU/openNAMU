@@ -830,6 +830,11 @@ def acl_check(name = 'test', tool = '', sub = 'test'):
             num = 3
         elif tool == 'upload':
             curs.execute(db_change("select data from other where name = 'upload_acl'"))
+            
+            num = 5
+        elif tool == 'edit_req':
+            curs.execute(db_change("select data from other where name = 'edit_req_acl'"))
+            
             num = 5
         else:
             if i == 0:

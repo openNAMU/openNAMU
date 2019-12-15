@@ -4,17 +4,16 @@ def edit_2(conn, tool, name):
     curs = conn.cursor()
 
     ip = ip_check()
-    ban = acl_check(name)
     get_ver = flask.request.args.get('r', None)
     if get_ver:
         section = None
     else:
         section = flask.request.args.get('section', None)
 
-    if ban == 1:
+    if acl_check(name) == 1:
         if tool == 'edit':
             return redirect('/edit_req/' + url_pas(name))
-        elif tool == 'edit_req' and (re.search('^user:', name) or ban_check() == 1 or get_ver):
+        elif tool == 'edit_req' and (acl_check(name, 'edit_req') == 1 or re.search('^user:', name) or ban_check() == 1 or get_ver):
             return re_error('/ban')
     else:
         if tool == 'edit_req':
