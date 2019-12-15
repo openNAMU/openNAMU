@@ -506,16 +506,18 @@ def setting_2(conn, num):
             ))
     elif num == 8:
         i_list = {
-            6 : 'edit', 
-            14 : 'discussion', 
-            17 : 'upload_acl',
-            18 : 'all_view_acl'
+            1 : 'edit', 
+            2 : 'discussion', 
+            3 : 'upload_acl',
+            4 : 'all_view_acl',
+            5 : 'edit_req_acl'
         }
         n_list = {
-            6 : 'normal', 
-            14 : 'normal', 
-            17 : 'normal',
-            18 : 'normal'
+            1 : 'normal', 
+            2 : 'normal', 
+            3 : 'normal',
+            4 : 'normal',
+            5 : 'normal'
         }
         
         if flask.request.method == 'POST':
@@ -545,20 +547,11 @@ def setting_2(conn, num):
 
             conn.commit()
             
-            acl_div = ['', '', '', '']
+            acl_div = ['', '', '', '', '']
             acl_list = ['normal', 'user', 'admin', 'owner', '50_edit', 'email']
-            for i in range(0, 4):
-                if i == 0:
-                    acl_num = 6
-                elif i == 1:
-                    acl_num = 14
-                elif i == 2:
-                    acl_num = 17
-                else:
-                    acl_num = 18
-
+            for i in range(0, 5):
                 for acl_data in acl_list:
-                    if acl_data == d_list[acl_num]:
+                    if acl_data == d_list[i + 1]:
                         acl_div[i] = '<option value="' + acl_data + '">' + acl_data + '</option>' + acl_div[i]
                     else:
                         acl_div[i] += '<option value="' + acl_data + '">' + acl_data + '</option>'
@@ -567,11 +560,11 @@ def setting_2(conn, num):
                 imp = [load_lang('main_acl_setting'), wiki_set(), custom(), other2([0, 0])],
                 data = '''
                     <form method="post">
-                        <span>''' + load_lang('default_acl') + '</span> <a href="/acl/TEST">(' + load_lang('reference') + ''')</a>
+                        <span>''' + load_lang('document_acl') + '</span> <a href="/acl/TEST">(' + load_lang('reference') + ''')</a>
                         <hr class=\"main_hr\">
                         <select name="edit">''' + acl_div[0] + '''</select>
                         <hr class=\"main_hr\">
-                        <span>''' + load_lang('default_discussion_acl') + '''</span>
+                        <span>''' + load_lang('discussion_acl') + '''</span>
                         <hr class=\"main_hr\">
                         <select name="discussion">''' + acl_div[1] + '''</select>
                         <hr class=\"main_hr\">
@@ -579,9 +572,13 @@ def setting_2(conn, num):
                         <hr class=\"main_hr\">
                         <select name="upload_acl">''' + acl_div[2] + '''</select>
                         <hr class=\"main_hr\">
-                        <span>''' + load_lang('default_view_acl') + '''</span>
+                        <span>''' + load_lang('view_acl') + '''</span>
                         <hr class=\"main_hr\">
                         <select name="all_view_acl">''' + acl_div[3] + '''</select>
+                        <hr class=\"main_hr\">
+                        <span>''' + load_lang('edit_req_acl') + '''</span>
+                        <hr class=\"main_hr\">
+                        <select name="edit_req_acl">''' + acl_div[4] + '''</select>
                         <hr class=\"main_hr\">
                         <button id="save" type="submit">''' + load_lang('save') + '''</button>
                     </form>
