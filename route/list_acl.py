@@ -3,15 +3,7 @@ from .tool.func import *
 def list_acl_2(conn):
     curs = conn.cursor()
     
-    div = '''
-        <table id="main_table_set">
-            <tbody>
-                <tr>
-                    <td id="main_table_width_quarter">''' + load_lang('document_name') + '''</td>
-                    <td id="main_table_width_quarter">''' + load_lang('document_acl') + '''</td>
-                    <td id="main_table_width_quarter">''' + load_lang('discussion_acl') + '''</td>
-                    <td id="main_table_width_quarter">''' + load_lang('view_acl') + '''</td>
-    '''
+    div = '<ul>'
     
     curs.execute(db_change("select title, decu, dis, view, why from acl where decu != '' or dis != '' or view != '' order by title desc"))
     list_data = curs.fetchall()
@@ -28,21 +20,24 @@ def list_acl_2(conn):
                 else:
                     acl += [data[i]]
 
-            div +=  '''
-                <tr>
-                    <td>
-                        <a href="/w/''' + url_pas(data[0]) + '">' + data[0] + '''</a>
-                    </td>
-                    <td>''' + acl[0] + '''</td>
-                    <td>''' + acl[1] + '''</td>
-                    <td>''' + acl[2] + '''</td>
-                </tr>
-            '''
+            curs.execute(db_change("select time from re_admin where what like ? order by time desc limit 1"), ['acl (' + data[0] + ')%'])
+            time_data = curs.fetchall()
+            if time_data:
+                time_data = ' | ' + time_data[0][0]
+            else:
+                time_data = ''
+
+            div += '' + \
+                '<li>' + \
+                    '<a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a> | ' + \
+                    load_lang('document_acl') + ' : ' + acl[0] + ' | ' + \
+                    load_lang('discussion_acl') + ' : ' + acl[1] + ' | ' + \
+                    load_lang('view_acl') + ' : ' + acl[2] + \
+                    time_data + \
+                '</li>' + \
+            ''
         
-    div +=  '''
-            </tbody>
-        </table>
-    '''
+    div += '</ul>'
     
     return easy_minify(flask.render_template(skin_check(), 
         imp = [load_lang('acl_document_list'), wiki_set(), custom(), other2([0, 0])],
