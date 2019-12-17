@@ -1,37 +1,16 @@
 from .tool.func import *
 
-def edit_2(conn, tool, name):
+def edit_2(conn, name):
     curs = conn.cursor()
 
     ip = ip_check()
-    get_ver = flask.request.args.get('r', None)
-    if get_ver:
-        section = None
-    else:
-        section = flask.request.args.get('section', None)
+    section = flask.request.args.get('section', None)
+
+    curs.execute(db_change("select data from data where title = ?"), [name])
+    old = curs.fetchall()
 
     if acl_check(name) == 1:
-        if tool == 'edit':
-            return redirect('/edit_req/' + url_pas(name))
-        elif tool == 'edit_req' and (acl_check(name, 'edit_req') == 1 or re.search('^user:', name) or ban_check() == 1 or get_ver):
-            return re_error('/ban')
-    else:
-        if tool == 'edit_req':
-            if not get_ver:
-                return redirect('/edit/' + url_pas(name))
-            else:
-                get_ver = int(number_check(get_ver))
-        
-    if not get_ver:
-        curs.execute(db_change("select data from data where title = ?"), [name])
-        old = curs.fetchall()
-        if tool == 'edit_req' and not old:
-            return redirect('/w/' + url_pas(name))
-    else:
-        curs.execute(db_change("select data, send, ip, date from history where title = ? and id = ? and type = 'req'"), [name, str(get_ver)])
-        old = curs.fetchall()
-        if not old:
-            return redirect('/w/' + url_pas(name))
+        return redirect('/edit_req/' + url_pas(name))
     
     if flask.request.method == 'POST':
         if captcha_post(flask.request.form.get('g-recaptcha-response', '')) == 1:
@@ -43,16 +22,13 @@ def edit_2(conn, tool, name):
             return re_error('/error/24')
 
         today = get_time()
-        if tool == 'edit_req' and get_ver:
-            content = old[0][0]
-        else:
-            content = flask.request.form.get('content', '')
+        content = flask.request.form.get('content', '')
 
-            if flask.request.form.get('otent', '') == content:
-                return redirect('/w/' + url_pas(name))
-            
-            if edit_filter_do(content) == 1:
-                return re_error('/error/21')
+        if flask.request.form.get('otent', '') == content:
+            return redirect('/w/' + url_pas(name))
+        
+        if edit_filter_do(content) == 1:
+            return re_error('/error/21')
 
         content = savemark(content)
         
@@ -64,67 +40,46 @@ def edit_2(conn, tool, name):
         else:
             leng = '+' + str(len(content))
 
-        if tool == 'edit' or (tool == 'edit_req' and get_ver):
-            if old:
-                curs.execute(db_change("update data set data = ? where title = ?"), [content, name])
-            else:
-                curs.execute(db_change("insert into data (title, data) values (?, ?)"), [name, content])
-
-                curs.execute(db_change('select data from other where name = "count_all_title"'))
-                curs.execute(db_change("update other set data = ? where name = 'count_all_title'"), [str(int(curs.fetchall()[0][0]) + 1)])
-
-            curs.execute(db_change("select user from scan where title = ?"), [name])
-            for scan_user in curs.fetchall():
-                curs.execute(db_change("insert into alarm (name, data, date) values (?, ?, ?)"), [
-                    scan_user[0],
-                    ip + ' | <a href="/w/' + url_pas(name) + '">' + name + '</a> | Edit', 
-                    today
-                ])
-
-            if tool == 'edit_req':
-                curs.execute(db_change("update history set type = '', send = ? where title = ? and id = ? and ip = ? and date = ? and type = 'req'"), [
-                    old[0][1] + ' (' + ip + ' pass)', 
-                    name,
-                    str(get_ver),
-                    old[0][2],
-                    old[0][3]
-                ])
-            else:
-                history_plus(
-                    name,
-                    content,
-                    today,
-                    ip,
-                    flask.request.form.get('send', ''),
-                    leng
-                )
-            
-            curs.execute(db_change("delete from back where link = ?"), [name])
-            curs.execute(db_change("delete from back where title = ? and type = 'no'"), [name])
-            
-            render_set(
-                title = name,
-                data = content,
-                num = 1
-            )
+        if old:
+            curs.execute(db_change("update data set data = ? where title = ?"), [content, name])
         else:
-            history_plus(
-                name,
-                content,
-                today,
-                ip,
-                flask.request.form.get('send', ''),
-                leng,
-                '',
-                'req'
-            )
+            curs.execute(db_change("insert into data (title, data) values (?, ?)"), [name, content])
+
+            curs.execute(db_change('select data from other where name = "count_all_title"'))
+            curs.execute(db_change("update other set data = ? where name = 'count_all_title'"), [str(int(curs.fetchall()[0][0]) + 1)])
+
+        curs.execute(db_change("select user from scan where title = ?"), [name])
+        for scan_user in curs.fetchall():
+            curs.execute(db_change("insert into alarm (name, data, date) values (?, ?, ?)"), [
+                scan_user[0],
+                ip + ' | <a href="/w/' + url_pas(name) + '">' + name + '</a> | Edit', 
+                today
+            ])
+                
+        history_plus(
+            name,
+            content,
+            today,
+            ip,
+            flask.request.form.get('send', ''),
+            leng
+        )
+        
+        curs.execute(db_change("delete from back where link = ?"), [name])
+        curs.execute(db_change("delete from back where title = ? and type = 'no'"), [name])
+        
+        render_set(
+            title = name,
+            data = content,
+            num = 1
+        )
         
         conn.commit()
         
         return redirect('/w/' + url_pas(name))
     else:            
         if old:
-            if section and tool == 'edit':
+            if section:
                 data = re.sub('\n(?P<in>={1,6})', '<br>\g<in>', html.escape('\n' + re.sub('\r\n', '\n', old[0][0]) + '\n'))
                 i = 0
 
@@ -149,28 +104,21 @@ def edit_2(conn, tool, name):
         data_old = data
         get_name = ''
 
-        if tool == 'edit':
-            if not section:
-                get_name =  '''
-                    <a href="/manager/15?plus=''' + url_pas(name) + '">(' + load_lang('load') + ')</a> <a href="/edit_filter">(' + load_lang('edit_filter_rule') + ''')</a>
-                    <hr class=\"main_hr\">
-                '''
-                
-            if flask.request.args.get('plus', None):
-                curs.execute(db_change("select data from data where title = ?"), [flask.request.args.get('plus', 'test')])
-                get_data = curs.fetchall()
-                if get_data:
-                    data = get_data[0][0]
+        if not section:
+            get_name =  '''
+                <a href="/manager/15?plus=''' + url_pas(name) + '">(' + load_lang('load') + ')</a> <a href="/edit_filter">(' + load_lang('edit_filter_rule') + ''')</a>
+                <hr class=\"main_hr\">
+            '''
+            
+        if flask.request.args.get('plus', None):
+            curs.execute(db_change("select data from data where title = ?"), [flask.request.args.get('plus', 'test')])
+            get_data = curs.fetchall()
+            if get_data:
+                data = get_data[0][0]
 
-            save_button = load_lang('save')
-            menu_plus = [['delete/' + url_pas(name), load_lang('delete')], ['move/' + url_pas(name), load_lang('move')]]
-            sub = load_lang('edit')
-            disable = ''
-        else:
-            save_button = load_lang('edit_req') if not get_ver else load_lang('edit_req_check') 
-            menu_plus = [[]]
-            sub = load_lang('edit_req')
-            disable = '' if not get_ver else 'disabled'
+        save_button = load_lang('save')
+        menu_plus = [['delete/' + url_pas(name), load_lang('delete')], ['move/' + url_pas(name), load_lang('move')]]
+        sub = load_lang('edit')
 
         curs.execute(db_change('select data from other where name = "edit_bottom_text"'))
         sql_d = curs.fetchall()
@@ -192,10 +140,10 @@ def edit_2(conn, tool, name):
                 <form method="post">
                     <script>do_stop_exit();</script>
                     ''' + edit_button() + '''
-                    <textarea rows="25" ''' + disable + ''' id="content" placeholder="''' + p_text + '''" name="content">''' + html.escape(re.sub('\n$', '', data)) + '''</textarea>
+                    <textarea rows="25" id="content" placeholder="''' + p_text + '''" name="content">''' + html.escape(re.sub('\n$', '', data)) + '''</textarea>
                     <textarea id="origin" name="otent">''' + html.escape(re.sub('\n$', '', data_old)) + '''</textarea>
                     <hr class=\"main_hr\">
-                    <input ''' + disable + ''' placeholder="''' + load_lang('why') + '''" name="send" type="text">
+                    <input placeholder="''' + load_lang('why') + '''" name="send" type="text">
                     <hr class=\"main_hr\">
                     ''' + captcha_get() + ip_warring() + '''
                     <button id="save" type="submit" onclick="go_save_zone = 1;">''' + save_button + '''</button>

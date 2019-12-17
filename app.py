@@ -436,9 +436,13 @@ def view_raw(name = None, topic_num = None, num = None):
 def edit_revert(name = None):
     return edit_revert_2(conn, name)
 
-@app.route('/<regex("edit|edit_req"):tool>/<everything:name>', methods=['POST', 'GET'])
-def edit(tool = 'edit', name = None):
-    return edit_2(conn, tool, name)
+@app.route('/edit/<everything:name>', methods=['POST', 'GET'])
+def edit(name = 'Test'):
+    return edit_2(conn, name)
+
+@app.route('/edit_req/<everything:name>', methods=['POST', 'GET'])
+def edit_req(name = 'Test'):
+    return edit_req_2(conn, name)
         
 @app.route('/delete/<everything:name>', methods=['POST', 'GET'])
 def edit_delete(name = None):
