@@ -336,7 +336,7 @@ def inter_wiki_del(tools = None, name = None):
     return inter_wiki_del_2(conn, tools, name)
 
 @app.route('/<regex("plus_(?:inter_wiki|edit_top|image_license|(?:edit|email|file|name)_filter)"):tools>', methods=['POST', 'GET'])
-@app.route('/<regex("plus_edit_filter"):tools>/<name>', methods=['POST', 'GET'])
+@app.route('/<regex("plus_(?:inter_wiki|edit_top|image_license|(?:edit|email|file|name|edit)_filter)"):tools>/<name>', methods=['POST', 'GET'])
 def inter_wiki_plus(tools = None, name = None):
     return inter_wiki_plus_2(conn, tools, name)
 
