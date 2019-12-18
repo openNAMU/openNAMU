@@ -87,6 +87,7 @@ def inter_wiki_2(conn, tools):
                     div += ' : ' + data[1]
 
             if admin == 1:
+                div += ' <a href="/' + plus_link + '/' + url_pas(data[0]) + '">(' + load_lang('edit') + ')</a>'
                 div += ' <a href="/' + del_link + '/' + url_pas(data[0]) + '">(' + load_lang('delete') + ')</a>'
 
             div += '</li>'
@@ -102,5 +103,5 @@ def inter_wiki_2(conn, tools):
     return easy_minify(flask.render_template(skin_check(), 
         imp = [title, wiki_set(), custom(), other2([0, 0])],
         data = div,
-        menu = [['other', load_lang('return')]]
+        menu = [['manager/1', load_lang('return')]]
     ))
