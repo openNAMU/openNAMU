@@ -39,7 +39,7 @@ def login_need_email_2(conn, tool):
                 flask.session['c_pw'] = ''
             
             if 'c_id' in flask.session:
-                main_email = ['naver.com', 'gmail.com', 'daum.net', 'hanmail.net', 'hanmail2.net']
+                main_email = ['naver.com', 'gmail.com', 'daum.net', 'kakao.com']
                 data = re.search('@([^@]+)$', flask.request.form.get('email', ''))
                 if data:
                     data = data.groups()[0]
