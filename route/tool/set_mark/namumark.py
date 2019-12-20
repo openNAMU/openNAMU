@@ -678,7 +678,7 @@ def namumark(conn, data, title, main_num, include_num):
             
             toc_data += '' + \
                 '<span style="margin-left: ' + str((toc_full - toc_top_stack) * 10) + 'px;">' + \
-                    '<a href="#s-' + all_stack + '">' + all_stack + '</a> ' + toc_main_data + \
+                    '<a href="#s-' + all_stack + '">' + all_stack + '.</a> ' + toc_main_data + \
                 '</span>' + \
                 '\n' + \
             ''
