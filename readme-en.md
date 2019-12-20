@@ -54,10 +54,10 @@ You can clone this repository by entering the following command at the terminal 
 
 # Contribute
 openNAMU may have some untested bugs. Your use of openNAMU and bug discovery will help develop openNAMU.
-[Create Issues](https://github.com/2du/openNAMU/issues/new)
+[[Create Issues]](https://github.com/2du/openNAMU/issues/new)
 
-openNAMU is open source project. Add new features and request pull requests. 
-[Create Pull Requests](https://github.com/2du/openNAMU/compare)
+openNAMU is a complete open source project. Add new features and create pull requests. 
+[[Create Pull Requests]](https://github.com/2du/openNAMU/compare)
 
 # Lisence
 openNAMU is protected by [BSD 3-Clause License](./LICNESE). Please refer to the documentation for details.
