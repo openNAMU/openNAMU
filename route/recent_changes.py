@@ -195,7 +195,10 @@ def recent_changes_2(conn, name, tool):
                         <hr class=\"main_hr\">
                     ''' + div
 
-                    menu = [['w/' + url_pas(name), load_lang('document')], ['raw/' + url_pas(name), load_lang('raw')]]
+                    menu = [['w/' + url_pas(name), load_lang('return')]]
+
+                    if admin_check() == 1:
+                        menu += [['add_history/' + url_pas(name), load_lang('add_history')]]
                 else:
                     menu = [['history/' + url_pas(name), load_lang('return')]]
 

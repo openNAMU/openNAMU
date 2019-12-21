@@ -369,6 +369,10 @@ def list_admin():
 def give_history_hidden(name = None):
     return give_history_hidden_2(conn, name)
 
+@app.route('/add_history/<everything:name>', methods=['POST', 'GET'])
+def give_history_add(name = None):
+    return give_history_add_2(conn, name)
+
 @app.route('/user_log')
 def list_user():
     return list_user_2(conn)
