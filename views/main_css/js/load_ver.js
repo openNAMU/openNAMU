@@ -2,7 +2,7 @@ function load_ver() {
     var n_ver = document.getElementById('ver_send');
 
     var url = "/api/version";
-    
+
     var xhr = new XMLHttpRequest();
     xhr.open("GET", url, true);
     xhr.send(null);

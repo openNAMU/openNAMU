@@ -2,26 +2,26 @@ from .tool.func import *
 
 def main_manager_2(conn, num, r_ver):
     curs = conn.cursor()
-    
+
     title_list = {
-        0 : [load_lang('document_name'), 'acl'], 
-        1 : [0, 'check'], 
+        0 : [load_lang('document_name'), 'acl'],
+        1 : [0, 'check'],
         2 : [load_lang('file_name'), 'plus_file_filter'],
-        3 : [0, 'admin'], 
-        4 : [0, 'record'], 
-        5 : [0, 'topic_record'], 
-        6 : [load_lang('name'), 'admin_plus'], 
-        7 : [load_lang('name'), 'plus_edit_filter'], 
-        8 : [load_lang('document_name'), 'search'], 
-        9 : [0, 'block_user'], 
-        10 : [0, 'block_admin'], 
-        11 : [load_lang('document_name'), 'watch_list'], 
-        12 : [load_lang('compare_target'), 'check'], 
+        3 : [0, 'admin'],
+        4 : [0, 'record'],
+        5 : [0, 'topic_record'],
+        6 : [load_lang('name'), 'admin_plus'],
+        7 : [load_lang('name'), 'plus_edit_filter'],
+        8 : [load_lang('document_name'), 'search'],
+        9 : [0, 'block_user'],
+        10 : [0, 'block_admin'],
+        11 : [load_lang('document_name'), 'watch_list'],
+        12 : [load_lang('compare_target'), 'check'],
         13 : [load_lang('document_name'), 'edit']
     }
-    
+
     if num == 1:
-        return easy_minify(flask.render_template(skin_check(), 
+        return easy_minify(flask.render_template(skin_check(),
             imp = [load_lang('admin_tool'), wiki_set(), custom(), other2([0, 0])],
             data =  '''
                     <h2>''' + load_lang('admin') + '''</h2>
@@ -79,7 +79,7 @@ def main_manager_2(conn, num, r_ver):
             else:
                 placeholder = title_list[(num - 2)][0]
 
-            return easy_minify(flask.render_template(skin_check(), 
+            return easy_minify(flask.render_template(skin_check(),
                 imp = ['Redirect', wiki_set(), custom(), other2([0, 0])],
                 data =  '''
                         <form method="post">

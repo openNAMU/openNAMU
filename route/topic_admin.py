@@ -33,7 +33,7 @@ def topic_admin_2(conn, topic_num, num):
 
         curs.execute(db_change("select end from ban where block = ?"), [data[0][1]])
         user_ban_d = curs.fetchall()
-        
+
         ban += '''
             <br>
             <h2>''' + load_lang('admin_tool') + '''</h2>
@@ -56,7 +56,7 @@ def topic_admin_2(conn, topic_num, num):
             </ul>
         '''
 
-    return easy_minify(flask.render_template(skin_check(), 
+    return easy_minify(flask.render_template(skin_check(),
         imp = [load_lang('discussion_tool'), wiki_set(), custom(), other2([' (#' + str(num) + ')', 0])],
         data = ban,
         menu = [['thread/' + str(topic_num) + '#' + str(num), load_lang('return')]]

@@ -28,7 +28,7 @@ def api_user_info_2(conn, name):
                 </tbody>
             </table>
         '''
-        
+
         curs.execute(db_change("select acl from user where id = ?"), [name])
         data = curs.fetchall()
         if data:

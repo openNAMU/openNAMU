@@ -20,7 +20,7 @@ def edit_revert_2(conn, name):
 
         if slow_edit_check() == 1:
             return re_error('/error/24')
-    
+
         curs.execute(db_change("select data from history where title = ? and id = ?"), [name, str(num)])
         data = curs.fetchall()
         if data:
@@ -29,8 +29,8 @@ def edit_revert_2(conn, name):
 
         curs.execute(db_change("delete from back where link = ?"), [name])
         conn.commit()
-        
-        if data:                                
+
+        if data:
             curs.execute(db_change("select data from data where title = ?"), [name])
             data_old = curs.fetchall()
             if data_old:
@@ -39,13 +39,13 @@ def edit_revert_2(conn, name):
             else:
                 leng = '+' + str(len(data[0][0]))
                 curs.execute(db_change("insert into data (title, data) values (?, ?)"), [name, data[0][0]])
-                
+
             history_plus(
-                name, 
-                data[0][0], 
-                get_time(), 
-                ip_check(), 
-                flask.request.form.get('send', ''), 
+                name,
+                data[0][0],
+                get_time(),
+                ip_check(),
+                flask.request.form.get('send', ''),
                 leng,
                 'r' + str(num) + ''
             )
@@ -55,16 +55,16 @@ def edit_revert_2(conn, name):
                 data = data[0][0],
                 num = 1
             )
-            
+
             conn.commit()
-            
+
         return redirect('/w/' + url_pas(name))
     else:
         curs.execute(db_change("select title from history where title = ? and id = ?"), [name, str(num)])
         if not curs.fetchall():
             return redirect('/w/' + url_pas(name))
 
-        return easy_minify(flask.render_template(skin_check(), 
+        return easy_minify(flask.render_template(skin_check(),
             imp = [name, wiki_set(), custom(), other2([' (' + load_lang('revert') + ')', 0])],
             data =  '''
                     <form method="post">

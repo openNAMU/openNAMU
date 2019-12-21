@@ -22,7 +22,7 @@ def user_count_edit_2(conn, name):
     else:
         t_data = 0
 
-    return easy_minify(flask.render_template(skin_check(), 
+    return easy_minify(flask.render_template(skin_check(),
         imp = [load_lang('count'), wiki_set(), custom(), other2([0, 0])],
         data =  '''
                 <ul>

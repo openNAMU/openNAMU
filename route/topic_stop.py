@@ -24,7 +24,7 @@ def topic_stop_2(conn, topic_num):
             curs.execute(db_change("update rd set stop = ?, agree = ? where title = ? and sub = ?"), [
                 stop_d,
                 agree_d,
-                name, 
+                name,
                 sub
             ])
 
@@ -36,17 +36,17 @@ def topic_stop_2(conn, topic_num):
                 t_state = 'Normal'
 
             curs.execute(db_change("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, ?, ?, ?, '', '1')"), [
-                str(int(topic_check[0][0]) + 1), 
-                name, 
-                sub, 
-                t_state + (' (Agree)' if agree_d != '' else '') + (('[br][br]Why : ' + why_d) if why_d else ''), 
-                time, 
+                str(int(topic_check[0][0]) + 1),
+                name,
+                sub,
+                t_state + (' (Agree)' if agree_d != '' else '') + (('[br][br]Why : ' + why_d) if why_d else ''),
+                time,
                 ip
             ])
 
             rd_plus(name, sub, time)
 
-        return redirect('/thread/' + str(topic_num))    
+        return redirect('/thread/' + str(topic_num))
     else:
         stop_d_list = ''
         agree_check = ''

@@ -17,5 +17,5 @@ function do_open_foot(name, num = 0) {
         }
     }
 
-    
+
 }

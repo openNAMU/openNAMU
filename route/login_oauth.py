@@ -32,15 +32,15 @@ def login_oauth_2(conn, platform, func):
 
     if func == 'init':
         if oauth_data['client_id'] == '' or oauth_data['client_secret'] == '':
-            return easy_minify(flask.render_template(skin_check(), 
-                imp = [load_lang('error'), wiki_set(), custom(), other2([0, 0])], 
-                data = load_lang('oauth_disabled'), 
+            return easy_minify(flask.render_template(skin_check(),
+                imp = [load_lang('error'), wiki_set(), custom(), other2([0, 0])],
+                data = load_lang('oauth_disabled'),
                 menu = [['user', load_lang('return')]]
             ))
         elif publish_url == 'https://':
-            return easy_minify(flask.render_template(skin_check(), 
-                imp = [load_lang('error'), wiki_set(), custom(), other2([0, 0])], 
-                data = load_lang('oauth_setting_not_found'), 
+            return easy_minify(flask.render_template(skin_check(),
+                imp = [load_lang('error'), wiki_set(), custom(), other2([0, 0])],
+                data = load_lang('oauth_setting_not_found'),
                 menu = [['user', load_lang('return')]]
             ))
 
@@ -58,24 +58,24 @@ def login_oauth_2(conn, platform, func):
 
         if platform == 'discord':
             return redirect(api_url['redirect'] + '?client_id={}&redirect_uri={}&response_type=code&scope=identify'.format(
-                data['client_id'], 
+                data['client_id'],
                 data['redirect_uri']
             ))
         elif platform == 'naver':
             return redirect(api_url['redirect'] + '?response_type=code&client_id={}&redirect_uri={}&state={}'.format(
-                data['client_id'], 
-                data['redirect_uri'], 
+                data['client_id'],
+                data['redirect_uri'],
                 data['state']
             ))
         elif platform == 'facebook':
             return redirect(api_url['redirect'] + '?client_id={}&redirect_uri={}&state={}'.format(
-                data['client_id'], 
-                data['redirect_uri'], 
+                data['client_id'],
+                data['redirect_uri'],
                 data['state']
             ))
         elif platform == 'kakao':
             return redirect(api_url['redirect'] + '?client_id={}&redirect_uri={}&response_type=code'.format(
-                data['client_id'], 
+                data['client_id'],
                 data['redirect_uri']
             ))
 
@@ -122,15 +122,15 @@ def login_oauth_2(conn, platform, func):
             profile_result =  urllib.request.urlopen(profile_exchange).read().decode('utf-8')
             profile_result_json = json.loads(profile_result)
             stand_json = {
-                'id'        : profile_result_json['id'], 
+                'id'        : profile_result_json['id'],
                 'name'      : profile_result_json['username'] + '#' + profile_result_json['discriminator'],
                 'picture'   : profile_result_json['avatar']
             }
         elif platform == 'naver':
             token_access = api_url['token'] + '?grant_type=authorization_code&client_id={}&client_secret={}&code={}&state={}'.format(
-                data['client_id'], 
-                data['client_secret'], 
-                code, 
+                data['client_id'],
+                data['client_secret'],
+                code,
                 state
             )
             token_result = urllib.request.urlopen(token_access).read().decode('utf-8')
@@ -151,9 +151,9 @@ def login_oauth_2(conn, platform, func):
             }
         elif platform == 'facebook':
             token_access = api_url['token'] + '?client_id={}&redirect_uri={}&client_secret={}&code={}'.format(
-                data['client_id'], 
-                data['redirect_uri'], 
-                data['client_secret'], 
+                data['client_id'],
+                data['redirect_uri'],
+                data['client_secret'],
                 code
             )
             token_result = urllib.request.urlopen(token_access).read().decode('utf-8')
@@ -164,8 +164,8 @@ def login_oauth_2(conn, platform, func):
             profile_result_json = json.loads(profile_result)
 
             stand_json = {
-                'id': profile_result_json['id'], 
-                'name': profile_result_json['name'], 
+                'id': profile_result_json['id'],
+                'name': profile_result_json['name'],
                 'picture': profile_result_json['picture']['data']['url']
             }
         elif platform == 'kakao':
@@ -199,26 +199,26 @@ def login_oauth_2(conn, platform, func):
             profile_result =  urllib.request.urlopen(profile_exchange).read().decode('utf-8')
             profile_result_json = json.loads(profile_result)
             stand_json = {
-                'id'        : profile_result_json['id'], 
+                'id'        : profile_result_json['id'],
                 'name'      : profile_result_json['properties']['nickname'],
                 'picture'   : profile_result_json['properties']['profile_image']
             }
-        
+
         if flask.session['referrer'][0:6] == 'change':
             curs.execute(db_change('select * from oauth_conn where wiki_id = ? and provider = ?'), [flask.session['id'], platform])
             oauth_result = curs.fetchall()
             if len(oauth_result) == 0:
                 curs.execute(db_change('insert into oauth_conn (provider, wiki_id, sns_id, name, picture) values(?, ?, ?, ?, ?)'), [
-                    platform, 
-                    flask.session['id'], 
-                    stand_json['id'], 
-                    stand_json['name'], 
+                    platform,
+                    flask.session['id'],
+                    stand_json['id'],
+                    stand_json['name'],
                     stand_json['picture']
                 ])
             else:
                 curs.execute(db_change('update oauth_conn set name = ? picture = ? where wiki_id = ?'), [
-                    stand_json['name'], 
-                    stand_json['picture'], 
+                    stand_json['name'],
+                    stand_json['picture'],
                     flask.session['id']
                 ])
 
@@ -231,5 +231,5 @@ def login_oauth_2(conn, platform, func):
             else:
                 flask.session['state'] = 1
                 flask.session['id'] = curs_result[0][2]
-        
+
         return redirect(flask.session['refer'])

@@ -14,7 +14,7 @@ def api_search_2(conn, name):
     if page * num > 0:
         page = page * num - num
     else:
-        page = 0   
+        page = 0
 
     curs.execute(db_change('select data from other where name = "count_all_title"'))
     if int(curs.fetchall()[0][0]) < 10000:

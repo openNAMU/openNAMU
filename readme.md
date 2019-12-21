@@ -38,7 +38,7 @@
 
 ### 포함된 외부 프로젝트
  * Quotes icon - [Dave Gandy](http://www.flaticon.com/free-icon/quote-left_25672)
- * Syntax highlighting - [highlightjs](https://highlightjs.org/) 
+ * Syntax highlighting - [highlightjs](https://highlightjs.org/)
  * Numerical expression - [MathJax](https://www.mathjax.org/)
  * Handling Keyboard Shortcuts [shortcut.js](http://www.openjs.com/scripts/events/keyboard_shortcuts/)
 

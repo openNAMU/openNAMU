@@ -3,7 +3,7 @@ function topic_top_load(topic_num) {
     var url = "/api/thread/" + String(topic_num) + "?top=1&render=1";
     var n_data = "";
     var num = 1;
-    
+
     var xhr = new XMLHttpRequest();
     xhr.open("GET", url, true);
     xhr.send(null);
@@ -15,10 +15,10 @@ function topic_top_load(topic_num) {
                 n_data += t_data[key]['data'];
                 num = key;
             }
-            
+
             o_data.innerHTML = n_data;
             topic_main_load(topic_num, null);
         }
     }
-    
+
 }

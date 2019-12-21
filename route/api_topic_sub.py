@@ -9,8 +9,8 @@ def api_topic_sub_2(conn, topic_num):
 
     if flask.request.args.get('num', None):
         curs.execute(db_change("select id, data, date, ip, block, top from topic where title = ? and sub = ? and id + 0 = ? + 0 order by id + 0 asc"), [
-            name, 
-            sub, 
+            name,
+            sub,
             flask.request.args.get('num', '')
         ])
     elif flask.request.args.get('top', None):
@@ -22,7 +22,7 @@ def api_topic_sub_2(conn, topic_num):
     if data:
         json_data = {}
         admin = admin_check(3)
-                    
+
         for i in data:
             ip = ip_pas(i[3])
 
@@ -55,7 +55,7 @@ def api_topic_sub_2(conn, topic_num):
                             s_user = g_data[0][0]
                         else:
                             s_user = ''
-                    
+
                 if flask.request.args.get('top', None):
                     t_color = 'toron_color_red'
                 elif i[3] == s_user and i[5] != '1':
@@ -67,10 +67,10 @@ def api_topic_sub_2(conn, topic_num):
 
                 if admin == 1 or b_color != 'toron_color_not':
                     ip += ' <a href="/thread/' + str(topic_num) + '/admin/' + i[0] + '">(' + load_lang('discussion_tool') + ')</a>'
-                    
+
                 if t_data_f == '':
                     t_data_f = '[br]'
-            
+
                 all_data = '' + \
                     '<table id="toron">' + \
                         '<tbody>' + \
@@ -86,7 +86,7 @@ def api_topic_sub_2(conn, topic_num):
                     '</table>' + \
                     '<hr class="main_hr">' + \
                 ''
-                
+
                 json_data[i[0]] = {
                     "data" : all_data
                 }

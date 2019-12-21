@@ -5,7 +5,7 @@ def main_file_2(conn, data):
     curs = conn.cursor()
 
     if data == 'easter_egg.html':
-        return easy_minify(flask.render_template(skin_check(), 
+        return easy_minify(flask.render_template(skin_check(),
             imp = ['easter_egg.html', wiki_set(), custom(), other2([0, 0])],
             data = open('./views/main_css/file/easter_egg.html', 'r').read(),
             menu = 0

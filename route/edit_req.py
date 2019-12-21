@@ -18,7 +18,7 @@ def edit_req_2(conn, name):
             return redirect('/edit/' + url_pas(name))
         else:
             get_ver = int(number_check(get_ver))
-        
+
     if not get_ver:
         curs.execute(db_change("select data from data where title = ?"), [name])
         old = curs.fetchall()
@@ -29,7 +29,7 @@ def edit_req_2(conn, name):
         old = curs.fetchall()
         if not old:
             return redirect('/w/' + url_pas(name))
-    
+
     if flask.request.method == 'POST':
         if captcha_post(flask.request.form.get('g-recaptcha-response', '')) == 1:
             return re_error('/error/13')
@@ -47,15 +47,15 @@ def edit_req_2(conn, name):
 
             if flask.request.form.get('otent', '') == content:
                 return redirect('/w/' + url_pas(name))
-            
+
             if edit_filter_do(content) == 1:
                 return re_error('/error/21')
 
         content = savemark(content)
-        
+
         if old:
             leng = leng_check(len(flask.request.form.get('otent', '')), len(content))
-            
+
             if section:
                 content = old[0][0].replace(flask.request.form.get('otent', ''), content)
         else:
@@ -74,21 +74,21 @@ def edit_req_2(conn, name):
             for scan_user in curs.fetchall():
                 curs.execute(db_change("insert into alarm (name, data, date) values (?, ?, ?)"), [
                     scan_user[0],
-                    ip + ' | <a href="/w/' + url_pas(name) + '">' + name + '</a> | Edit', 
+                    ip + ' | <a href="/w/' + url_pas(name) + '">' + name + '</a> | Edit',
                     today
                 ])
 
             curs.execute(db_change("update history set type = '', send = ? where title = ? and id = ? and ip = ? and date = ? and type = 'req'"), [
-                old[0][1] + ' (' + ip + ' pass)', 
+                old[0][1] + ' (' + ip + ' pass)',
                 name,
                 str(get_ver),
                 old[0][2],
                 old[0][3]
             ])
-            
+
             curs.execute(db_change("delete from back where link = ?"), [name])
             curs.execute(db_change("delete from back where title = ? and type = 'no'"), [name])
-            
+
             render_set(
                 title = name,
                 data = content,
@@ -105,23 +105,23 @@ def edit_req_2(conn, name):
                 '',
                 'req'
             )
-        
+
         conn.commit()
-        
+
         if get_ver:
             return redirect('/w/' + url_pas(name))
         else:
             return redirect('/recent_changes?set=req')
-    else:            
+    else:
         if old:
             data = old[0][0]
         else:
             data = ''
-            
+
         data_old = data
         get_name = ''
 
-        save_button = load_lang('edit_req') if not get_ver else load_lang('edit_req_check') 
+        save_button = load_lang('edit_req') if not get_ver else load_lang('edit_req_check')
         menu_plus = [[]]
         sub = load_lang('edit_req')
         disable = '' if not get_ver else 'disabled'
@@ -140,7 +140,7 @@ def edit_req_2(conn, name):
         else:
             p_text = load_lang('defalut_edit_help')
 
-        return easy_minify(flask.render_template(skin_check(), 
+        return easy_minify(flask.render_template(skin_check(),
             imp = [name, wiki_set(), custom(), other2([' (' + sub + ')', 0])],
             data =  get_name + '''
                 <form method="post">

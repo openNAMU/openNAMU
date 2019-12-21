@@ -2,7 +2,7 @@ from .tool.func import *
 
 def login_pw_change_2(conn):
     curs = conn.cursor()
-    
+
     if ban_check() == 1:
         return re_error('/ban')
 
@@ -19,9 +19,9 @@ def login_pw_change_2(conn):
             user = curs.fetchall()
             if not user:
                 return re_error('/error/2')
-               
+
             pw_check_d = pw_check(
-                flask.request.form.get('pw4', ''), 
+                flask.request.form.get('pw4', ''),
                 user[0][0],
                 user[0][1],
                 ip
@@ -30,12 +30,12 @@ def login_pw_change_2(conn):
                 return re_error('/error/10')
 
             hashed = pw_encode(flask.request.form.get('pw2', None))
-                
+
             curs.execute(db_change("update user set pw = ? where id = ?"), [hashed, ip])
 
             return redirect('/user')
     else:
-        return easy_minify(flask.render_template(skin_check(), 
+        return easy_minify(flask.render_template(skin_check(),
             imp = [load_lang('password_change'), wiki_set(), custom(), other2([0, 0])],
             data = '''
                 <form method="post">

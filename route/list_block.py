@@ -8,7 +8,7 @@ def list_block_2(conn, name, tool):
         sql_num = num * 50 - 50
     else:
         sql_num = 0
-    
+
     div = '''
         <table id="main_table_set">
             <tbody>
@@ -18,19 +18,19 @@ def list_block_2(conn, name, tool):
                     <td id="main_table_width">''' + load_lang('period') + '''</td>
                 </tr>
     '''
-    
+
     data_list = ''
 
     curs.execute(db_change("delete from ban where (end < ? and end like '2%')"), [get_time()])
     conn.commit()
-    
-    if not name:        
+
+    if not name:
         if flask.request.args.get('type', '') == 'ongoing':
             sub = ' (' + load_lang('in_progress') + ')'
             menu = [['block_log', load_lang('normal')]]
 
             curs.execute(db_change("select why, block, '', end, '', band from ban where ((end > ? and end like '2%') or end = '') order by end desc limit ?, 50"), [
-                get_time(), 
+                get_time(),
                 sql_num
             ])
         else:
@@ -41,18 +41,18 @@ def list_block_2(conn, name, tool):
                 <a href="/manager/11">(''' + load_lang('blocked') + ''')</a> <a href="/manager/12">(''' + load_lang('admin') + ''')</a> <a href="?type=ongoing">(''' + load_lang('in_progress') + ''')</a>
                 <hr class=\"main_hr\">
             ''' + div
-            
+
             curs.execute(db_change("select why, block, blocker, end, today, band from rb order by today desc limit ?, 50"), [sql_num])
     else:
         menu = [['block_log', load_lang('normal')]]
-        
+
         if tool == 'block_user':
             sub = ' (' + load_lang('blocked') + ')'
-            
+
             curs.execute(db_change("select why, block, blocker, end, today, band from rb where block = ? order by today desc limit ?, 50"), [name, sql_num])
         else:
             sub = ' (' + load_lang('admin') + ')'
-            
+
             curs.execute(db_change("select why, block, blocker, end, today, band from rb where blocker = ? order by today desc limit ?, 50"), [name, sql_num])
 
     if data_list == '':
@@ -62,7 +62,7 @@ def list_block_2(conn, name, tool):
         why = html.escape(data[0])
         if why == '':
             why = '<br>'
-        
+
         if data[5] == 'O':
             ip = data[1] + ' (' + load_lang('range') + ')'
         elif data[5] == 'regex':
@@ -88,7 +88,7 @@ def list_block_2(conn, name, tool):
             start = ''
         else:
             start = load_lang('start') + ' : ' + data[4]
-            
+
         div += '''
             <tr>
                 <td>''' + ip + '''</td>
@@ -105,13 +105,13 @@ def list_block_2(conn, name, tool):
         '''
 
     div += '</tbody></table>'
-    
+
     if not name:
         div += next_fix('/block_log?num=', num, data_list)
     else:
         div += next_fix('/' + url_pas(tool) + '/' + url_pas(name) + '?num=', num, data_list)
-                
-    return easy_minify(flask.render_template(skin_check(), 
+
+    return easy_minify(flask.render_template(skin_check(),
         imp = [load_lang('recent_ban'), wiki_set(), custom(), other2([sub, 0])],
         data = div,
         menu = menu

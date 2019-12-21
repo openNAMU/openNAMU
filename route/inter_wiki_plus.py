@@ -2,18 +2,18 @@ from .tool.func import *
 
 def inter_wiki_plus_2(conn, tools, name):
     curs = conn.cursor()
-    
+
     if flask.request.method == 'POST':
         if tools == 'plus_inter_wiki':
             if name:
                 curs.execute(db_change("delete from inter where title = ?"), [name])
-                
+
             curs.execute(db_change('insert into inter (title, link, icon) values (?, ?, ?)'), [
-                flask.request.form.get('title', 'test'), 
+                flask.request.form.get('title', 'test'),
                 flask.request.form.get('link', 'test'),
                 flask.request.form.get('icon', '')
             ])
-            
+
             admin_check(None, 'inter_wiki_plus')
         elif tools == 'plus_edit_filter':
             if admin_check(1, 'edit_filter edit') != 1:
@@ -29,12 +29,12 @@ def inter_wiki_plus_2(conn, tools, name):
 
                 curs.execute(db_change("delete from filter where name = ?"), [name])
                 curs.execute(db_change("insert into filter (name, regex, sub) values (?, ?, ?)"), [
-                    name, 
-                    flask.request.form.get('content', 'test'), 
+                    name,
+                    flask.request.form.get('content', 'test'),
                     end
                 ])
             except:
-                return re_error('/error/23')                
+                return re_error('/error/23')
         else:
             plus_d = ''
 
@@ -42,34 +42,34 @@ def inter_wiki_plus_2(conn, tools, name):
                 try:
                     re.compile(flask.request.form.get('title', 'test'))
                 except:
-                    return re_error('/error/23') 
+                    return re_error('/error/23')
 
                 admin_check(None, 'name_filter edit')
-                
+
                 type_d = 'name'
             elif tools == 'plus_file_filter':
                 try:
                     re.compile(flask.request.form.get('title', 'test'))
                 except:
-                    return re_error('/error/23') 
-                
+                    return re_error('/error/23')
+
                 admin_check(None, 'file_filter edit')
-                
+
                 type_d = 'file'
             elif tools == 'plus_email_filter':
                 admin_check(None, 'email_filter edit')
-                
+
                 type_d = 'email'
             elif tools == 'plus_image_license':
                 admin_check(None, 'image_license edit')
-                
+
                 type_d = 'image_license'
             else:
                 admin_check(None, 'edit_top edit')
-                
+
                 type_d = 'edit_top'
                 plus_d = flask.request.form.get('markup', 'test')
-            
+
             if name:
                 curs.execute(db_change("delete from html_filter where html = ? and kind = ?"), [
                     name,
@@ -77,13 +77,13 @@ def inter_wiki_plus_2(conn, tools, name):
                 ])
 
             curs.execute(db_change('insert into html_filter (html, kind, plus) values (?, ?, ?)'), [
-                flask.request.form.get('title', 'test'), 
-                type_d, 
+                flask.request.form.get('title', 'test'),
+                type_d,
                 plus_d
             ])
-        
+
         conn.commit()
-    
+
         return redirect('/' + re.sub('^plus_', '', tools))
     else:
         if admin_check(1) != 1:
@@ -121,7 +121,7 @@ def inter_wiki_plus_2(conn, tools, name):
             exist = curs.fetchall()
             if exist:
                 textarea = exist[0][0]
-                
+
                 if exist[0][1] == 'X':
                     time_check = 'checked="checked"'
                     time_data = ''
@@ -147,7 +147,7 @@ def inter_wiki_plus_2(conn, tools, name):
 
             title = load_lang('edit_filter_add')
             form_data = '''
-                <script>function insert_v(name, data) { document.getElementById(name).value = data; }</script>''' + insert_data + '''                
+                <script>function insert_v(name, data) { document.getElementById(name).value = data; }</script>''' + insert_data + '''
                 <hr class=\"main_hr\">
                 <input placeholder="''' + load_lang('second') + '''" id="second" name="second" type="text" value="''' + html.escape(time_data) + '''">
                 <hr class=\"main_hr\">
@@ -203,7 +203,7 @@ def inter_wiki_plus_2(conn, tools, name):
                 <input value="''' + value + '''" type="text" name="markup">
             '''
 
-        return easy_minify(flask.render_template(skin_check(), 
+        return easy_minify(flask.render_template(skin_check(),
             imp = [title, wiki_set(), custom(), other2([0, 0])],
             data =  '''
                     <form method="post">

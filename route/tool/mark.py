@@ -20,9 +20,9 @@ def load_conn2(data):
 def send_parser(data):
     if not re.search('^<br>$', data):
         data = html.escape(data)
-        
+
         javascript = re.compile('javascript:', re.I)
-        
+
         data = javascript.sub('', data)
 
         while 1:
@@ -33,9 +33,9 @@ def send_parser(data):
                 data = re.sub('&lt;a(?: (?:(?:(?!&gt;).)*))?&gt;(?P<in>(?:(?!&lt;).)*)&lt;\/a&gt;', '<a href="/w/' + urllib.parse.quote(re_data).replace('/','%2F') + '">' + re_data + '</a>', data, 1)
             else:
                 break
-        
+
     return data
-    
+
 def plusing(data):
     for data_in in data:
         curs.execute(db_change("select title from back where title = ? and link = ? and type = ?"), [data_in[1], data_in[0], data_in[2]])
@@ -55,7 +55,7 @@ def render_do(title, data, num, include):
         data = ['', '', []]
 
     if num == 1:
-        data_num = len(data[2]) 
+        data_num = len(data[2])
         data_in_num = int(data_num / multiprocessing.cpu_count())
         data_in = []
 
@@ -69,9 +69,9 @@ def render_do(title, data, num, include):
             thread_start = threading.Thread(target = plusing, args = [data_in_for])
             thread_start.start()
             thread_start.join()
-        
+
         conn.commit()
-        
+
     if num == 2:
         return [data[0], data[1]]
     else:

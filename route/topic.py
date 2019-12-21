@@ -18,7 +18,7 @@ def topic_2(conn, topic_num):
     topic_exist = curs.fetchall()
     if not topic_exist and len(sub) > 256:
         return re_error('/error/11')
-    
+
     if flask.request.method == 'POST':
         if captcha_post(flask.request.form.get('g-recaptcha-response', '')) == 1:
             return re_error('/error/13')
@@ -27,10 +27,10 @@ def topic_2(conn, topic_num):
 
         ip = ip_check()
         today = get_time()
-        
+
         if ban == 1:
             return re_error('/ban')
-        
+
         curs.execute(db_change("select id from topic where title = ? and sub = ? order by id + 0 desc limit 1"), [name, sub])
         old_num = curs.fetchall()
         if old_num:
@@ -59,43 +59,43 @@ def topic_2(conn, topic_num):
 
             if y_check == 1:
                 curs.execute(db_change('insert into alarm (name, data, date) values (?, ?, ?)'), [
-                    match.groups()[0], 
-                    ip + ' | <a href="/thread/' + str(topic_num) + '#' + str(num) + '">' + name + ' | ' + sub + ' | #' + str(num) + '</a>', 
+                    match.groups()[0],
+                    ip + ' | <a href="/thread/' + str(topic_num) + '#' + str(num) + '">' + name + ' | ' + sub + ' | #' + str(num) + '</a>',
                     today
                 ])
-        
+
         cate_re = re.compile('\[\[((?:분류|category):(?:(?:(?!\]\]).)*))\]\]', re.I)
         data = cate_re.sub('[br]', flask.request.form.get('content', 'Test'))
-        
+
         for rd_data in re.findall("(?:#([0-9]+))", data):
             curs.execute(db_change("select ip from topic where title = ? and sub = ? and id = ?"), [name, sub, rd_data])
             ip_data = curs.fetchall()
             if ip_data and ip_or_user(ip_data[0][0]) == 0:
                 curs.execute(db_change('insert into alarm (name, data, date) values (?, ?, ?)'), [
-                    ip_data[0][0], 
-                    ip + ' | <a href="/thread/' + str(topic_num) + '#' + str(num) + '">' + name + ' | ' + sub + ' | #' + str(num) + '</a>', 
+                    ip_data[0][0],
+                    ip + ' | <a href="/thread/' + str(topic_num) + '#' + str(num) + '">' + name + ' | ' + sub + ' | #' + str(num) + '</a>',
                     today
                 ])
-            
+
         data = re.sub("(?P<in>#(?:[0-9]+))", '[[\g<in>]]', data)
         data = savemark(data)
 
         rd_plus(name, sub, today)
         curs.execute(db_change("insert into topic (id, title, sub, data, date, ip, block, top, code) values (?, ?, ?, ?, ?, ?, '', '', ?)"), [
-            str(num), 
-            name, 
-            sub, 
-            data, 
-            today, 
+            str(num),
+            name,
+            sub,
+            data,
+            today,
             ip,
             str(topic_num) if num == 1 else ''
         ])
         conn.commit()
-        
+
         return redirect('/thread/' + str(topic_num))
     else:
         data = ''
-    
+
         curs.execute(db_change("select stop from rd where title = ? and sub = ? and stop != ''"), [name, sub])
         close_data = curs.fetchall()
         if (close_data and admin != 1) or ban == 1:
@@ -123,7 +123,7 @@ def topic_2(conn, topic_num):
             <div id="see_preview"></div>
         '''
 
-        return easy_minify(flask.render_template(skin_check(), 
+        return easy_minify(flask.render_template(skin_check(),
             imp = [name, wiki_set(), custom(), other2([' (' + load_lang('discussion') + ')', 0])],
             data = '''
                 <h2 id="topic_top_title">''' + sub + '''</h2>
