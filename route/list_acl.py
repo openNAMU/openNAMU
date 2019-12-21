@@ -2,9 +2,9 @@ from .tool.func import *
 
 def list_acl_2(conn):
     curs = conn.cursor()
-    
+
     div = '<ul>'
-    
+
     curs.execute(db_change("select title, decu, dis, view, why from acl where decu != '' or dis != '' or view != '' order by title desc"))
     list_data = curs.fetchall()
     for data in list_data:
@@ -36,10 +36,10 @@ def list_acl_2(conn):
                     time_data + \
                 '</li>' + \
             ''
-        
+
     div += '</ul>'
-    
-    return easy_minify(flask.render_template(skin_check(), 
+
+    return easy_minify(flask.render_template(skin_check(),
         imp = [load_lang('acl_document_list'), wiki_set(), custom(), other2([0, 0])],
         data = div,
         menu = [['other', load_lang('return')]]

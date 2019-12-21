@@ -2,7 +2,7 @@ from .tool.func import *
 
 def main_skin_set_2(conn):
     curs = conn.cursor()
-    
+
     data = flask.make_response(re_error('/error/5'))
 
     curs.execute(db_change("select data from other where name = 'language'"))

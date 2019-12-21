@@ -9,8 +9,8 @@ def alarm_2(conn):
     else:
         sql_num = 0
 
-    data = '<ul>'    
-    
+    data = '<ul>'
+
     curs.execute(db_change("select data, date from alarm where name = ? order by date desc limit ?, 50"), [ip_check(), sql_num])
     data_list = curs.fetchall()
     if data_list:
@@ -18,10 +18,10 @@ def alarm_2(conn):
 
         for data_one in data_list:
             data += '<li>' + data_one[0] + ' (' + data_one[1] + ')</li>'
-    
+
     data += '</ul>' + next_fix('/alarm?num=', num, data_list)
 
-    return easy_minify(flask.render_template(skin_check(), 
+    return easy_minify(flask.render_template(skin_check(),
         imp = [load_lang('notice'), wiki_set(), custom(), other2([0, 0])],
         data = data,
         menu = [['user', load_lang('return')]]

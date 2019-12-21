@@ -3,7 +3,7 @@ function topic_list_load(topic_num, s_num, where) {
     var url = "/api/thread/" + String(topic_num) + "?render=1&num=" + String(s_num);
     var n_data = "";
     var num = 1;
-    
+
     var xhr = new XMLHttpRequest();
     xhr.open("GET", url, true);
     xhr.send(null);
@@ -15,9 +15,9 @@ function topic_list_load(topic_num, s_num, where) {
                 n_data += t_data[key]['data'];
                 num = key;
             }
-            
+
             o_data.innerHTML = n_data;
         }
     }
-    
+
 }

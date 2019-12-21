@@ -2,7 +2,7 @@ function load_include(title, name, p_data) {
     var o_data = document.getElementById(name);
 
     var url = "/api/w/" + encodeURI(title) + "?include=" + name;
-    
+
     var xhr = new XMLHttpRequest();
     xhr.open("GET", url, true);
     xhr.send(null);
@@ -11,7 +11,7 @@ function load_include(title, name, p_data) {
         if(this.readyState === 4 && this.status === 200) {
             var o_p_data = JSON.parse(this.responseText);
             var g_data = o_p_data['data'];
-            
+
             for(key in p_data) {
                 try {
                     var patt = new RegExp('@' + p_data[key][0] + '@', 'g');

@@ -9,7 +9,7 @@ def recent_history_tool_2(conn, name):
         <h2>''' + load_lang('tool') + '''</h2>
         <ul>
             <li>
-                <a href="/raw/''' + url_pas(name) + '?num=' + num + '">' + load_lang('raw') + '''</a> 
+                <a href="/raw/''' + url_pas(name) + '?num=' + num + '">' + load_lang('raw') + '''</a>
             </li>
     '''
 
@@ -55,8 +55,8 @@ def recent_history_tool_2(conn, name):
     data += '''
         </ul>
     '''
-                
-    return easy_minify(flask.render_template(skin_check(), 
+
+    return easy_minify(flask.render_template(skin_check(),
         imp = [name, wiki_set(), custom(), other2(['(r' + num + ')', 0])],
         data = data,
         menu = [['history/' + url_pas(name), load_lang('return')]]

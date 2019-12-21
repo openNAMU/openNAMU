@@ -16,7 +16,7 @@ def recent_history_delete_2(conn, name):
 
         return redirect('/history/' + url_pas(name))
     else:
-        return easy_minify(flask.render_template(skin_check(), 
+        return easy_minify(flask.render_template(skin_check(),
             imp = [name, wiki_set(), custom(), other2(['(r' + num + ')', 0])],
             data = '''
                 <form method="post">

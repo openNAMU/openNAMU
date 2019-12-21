@@ -2,7 +2,7 @@ from .tool.func import *
 
 def inter_wiki_2(conn, tools):
     curs = conn.cursor()
-    
+
     div = ''
     admin = admin_check()
 
@@ -54,14 +54,14 @@ def inter_wiki_2(conn, tools):
         title = load_lang('file_filter_list')
         div = ''
 
-        curs.execute(db_change("select html from html_filter where kind = 'file'"))  
+        curs.execute(db_change("select html from html_filter where kind = 'file'"))
     elif tools == 'image_license':
         del_link = 'del_image_license'
         plus_link = 'plus_image_license'
         title = load_lang('image_license_list')
         div = ''
 
-        curs.execute(db_change("select html from html_filter where kind = 'image_license'"))  
+        curs.execute(db_change("select html from html_filter where kind = 'image_license'"))
     else:
         del_link = 'del_edit_top'
         plus_link = 'plus_edit_top'
@@ -99,7 +99,7 @@ def inter_wiki_2(conn, tools):
         if admin == 1:
             div += '<a href="/' + plus_link + '">(' + load_lang('add') + ')</a>'
 
-    return easy_minify(flask.render_template(skin_check(), 
+    return easy_minify(flask.render_template(skin_check(),
         imp = [title, wiki_set(), custom(), other2([0, 0])],
         data = div,
         menu = [['manager/1', load_lang('return')]]

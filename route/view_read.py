@@ -17,7 +17,7 @@ def view_read_2(conn, name):
             r_db = curs.fetchall()
             if r_db:
                 r_data = link_fix(r_db[0][0])
-            
+
                 return redirect('/w/' + r_data[0] + '?from=' + name + r_data[1])
 
     curs.execute(db_change("select sub from rd where title = ? and not stop = 'O' order by date desc"), [name])
@@ -27,27 +27,27 @@ def view_read_2(conn, name):
         topic = 0
 
     curs.execute(db_change("select link from back where title = ? and type = 'cat' order by link asc"), [name])
-                
+
     curs.execute(db_change("select title from data where title like ?"), ['%' + name + '/%'])
     if curs.fetchall():
         down = 1
     else:
         down = 0
-        
+
     m = re.search("^(.*)\/(.*)$", name)
     if m:
         uppage = m.groups()[0]
     else:
         uppage = 0
-        
-    if re.search('^category:', name):        
+
+    if re.search('^category:', name):
         curs.execute(db_change("select link from back where title = ? and type = 'cat' order by link asc"), [name])
         back = curs.fetchall()
         if back:
             div = '<br><h2 id="cate_normal">' + load_lang('category') + '</h2><ul>'
             u_div = ''
 
-            for data in back:    
+            for data in back:
                 if re.search('^category:', data[0]):
                     u_div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a></li>'
                 else:
@@ -55,14 +55,14 @@ def view_read_2(conn, name):
                     db_data = curs.fetchall()
                     if db_data:
                         div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a> <a id="inside" href="/xref/' + url_pas(data[0]) + '">(' + load_lang('backlink') + ')</a></li>'
-                    else: 
+                    else:
                         div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a></li>'
 
             div += '</ul>'
-            
+
             if div == '<br><h2 id="cate_normal">' + load_lang('category') + '</h2><ul></ul>':
                 div = ''
-            
+
             if u_div != '':
                 div += '<br><h2 id="cate_under">' + load_lang('under_category') + '</h2><ul>' + u_div + '</ul>'
 
@@ -75,7 +75,7 @@ def view_read_2(conn, name):
         curs.execute(db_change("select title, data from history where title = ? and id = ?"), [name, str(num)])
     else:
         curs.execute(db_change("select title, data from data where title = ?"), [name])
-    
+
     data = curs.fetchall()
     if data:
         else_data = data[0][1]
@@ -86,11 +86,11 @@ def view_read_2(conn, name):
     data = curs.fetchall()
     if data:
         acl = 1
-            
+
     if flask.request.args.get('from', None) and else_data:
         else_data = re.sub('^\r\n', '', else_data)
         else_data = re.sub('\r\n$', '', else_data)
-            
+
     end_data = render_set(
         title = name,
         data = else_data
@@ -98,7 +98,7 @@ def view_read_2(conn, name):
 
     if end_data == 'HTTP Request 401.3':
         response_data = 401
-        
+
         curs.execute(db_change('select data from other where name = "error_401"'))
         sql_d = curs.fetchall()
         if sql_d and sql_d[0][0] != '':
@@ -107,14 +107,14 @@ def view_read_2(conn, name):
             end_data = '<h2>' + load_lang('error') + '</h2><ul><li>' + load_lang('authority_error') + '</li></ul>'
     elif end_data == 'HTTP Request 404':
         response_data = 404
-        
+
         curs.execute(db_change('select data from other where name = "error_404"'))
         sql_d = curs.fetchall()
         if sql_d and sql_d[0][0] != '':
             end_data = '<h2>' + load_lang('error') + '</h2><ul><li>' + sql_d[0][0] + '</li></ul>'
         else:
             end_data = '<h2>' + load_lang('error') + '</h2><ul><li>' + load_lang('decument_404_error') + '</li></ul>'
-            
+
         curs.execute(db_change('select ip, date, leng, send from history where title = ? order by id desc limit 3'), [name])
         sql_d = curs.fetchall()
         if sql_d:
@@ -126,13 +126,13 @@ def view_read_2(conn, name):
                     leng = '<span style="color:red;">(' + i[2] + ')</span>'
                 else:
                     leng = '<span style="color:gray;">(' + i[2] + ')</span>'
-            
+
                 end_data += '<li>' + i[1] + ' | ' + ip_pas(i[0]) + ' | ' + leng + (' | ' + i[3] if i[3] != '' else '') + '</li>'
-                
+
             end_data += '<li><a href="/history/' + url_pas(name) + '">(...)</a></li></ul>'
     else:
         response_data = 200
-    
+
     if num:
         menu = [['history/' + url_pas(name), load_lang('history')]]
         sub = ' (r' + str(num) + ')'
@@ -160,7 +160,7 @@ def view_read_2(conn, name):
 
         if down:
             menu += [['down/' + url_pas(name), load_lang('sub')]]
-    
+
         curs.execute(db_change("select date from history where title = ? order by date desc limit 1"), [name])
         date = curs.fetchall()
         if date:
@@ -169,7 +169,7 @@ def view_read_2(conn, name):
             r_date = 0
 
     div = end_data + div
-            
+
     adsense_code = '<div align="center" style="display: block; margin-bottom: 10px;">{}</div>'
 
     curs.execute(db_change("select data from other where name = 'adsense'"))
@@ -179,7 +179,7 @@ def view_read_2(conn, name):
         adsense_code = adsense_code.format(curs.fetchall()[0][0])
     else:
         adsense_code = adsense_code.format('')
-    
+
     div = adsense_code + '<div>' + div + '</div>'
 
     match = re.search("^user:([^/]*)", name)
@@ -194,7 +194,7 @@ def view_read_2(conn, name):
     body = curs.fetchall()
     if body:
         div = body[0][0] + '<hr class=\"main_hr\">' + div
-        
+
     curs.execute(db_change("select data from other where name = 'bottom_body'"))
     body = curs.fetchall()
     if body:
@@ -208,8 +208,8 @@ def view_read_2(conn, name):
             watch_list = 1
     else:
         watch_list = 0
-        
-    return easy_minify(flask.render_template(skin_check(), 
+
+    return easy_minify(flask.render_template(skin_check(),
         imp = [flask.request.args.get('show', name), wiki_set(), custom(), other2([sub, r_date, watch_list])],
         data = div,
         menu = menu

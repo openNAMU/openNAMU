@@ -5,7 +5,7 @@ def setting_adsense_2(conn):
 
     if admin_check(None, 'adsense setting') != 1:
         return re_error('/error/3')
-    
+
     if flask.request.method == 'POST':
         try:
             adsense_enabled = flask.request.form.get('adsense_enabled')
@@ -16,15 +16,15 @@ def setting_adsense_2(conn):
                 data = '<h2>ie_no_data_required</h2>' + load_lang('ie_no_data_required'),
                 menu = [['other', load_lang('return')]]
             ))
-        
+
         if adsense_enabled == 'on':
             curs.execute(db_change('update other set data = "True" where name = "adsense"'))
         else:
             curs.execute(db_change('update other set data = "False" where name = "adsense"'))
-        
+
         curs.execute(db_change('update other set data = ? where name = "adsense_code"'), [adsense_code])
         conn.commit()
-        
+
         return redirect('/adsense_setting')
 
     body_content = ''
@@ -51,7 +51,7 @@ def setting_adsense_2(conn):
             <button type="submit" value="publish">{}</button>
         </form>
     '''
-    
+
     body_content += template.format(
         'checked' if adsense_enabled == 'True' else '',
         load_lang('adsense_enable'),

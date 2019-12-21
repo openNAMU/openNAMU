@@ -6,7 +6,7 @@ def topic_top_2(conn, topic_num, num):
     topic_change_data = topic_change(topic_num)
     name = topic_change_data[0]
     sub = topic_change_data[1]
-    
+
     if admin_check(3, 'notice (' + name + ' - ' + sub + '#' + str(num) + ')') != 1:
         return re_error('/error/3')
 
@@ -19,9 +19,9 @@ def topic_top_2(conn, topic_num, num):
                 curs.execute(db_change("update topic set top = '' where title = ? and sub = ? and id = ?"), [name, sub, str(num)])
             else:
                 curs.execute(db_change("update topic set top = 'O' where title = ? and sub = ? and id = ?"), [name, sub, str(num)])
-        
+
         rd_plus(name, sub, get_time())
 
         conn.commit()
 
-    return redirect('/thread/' + str(topic_num) + '#' + str(num))        
+    return redirect('/thread/' + str(topic_num) + '#' + str(num))

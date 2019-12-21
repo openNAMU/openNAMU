@@ -17,9 +17,9 @@ def topic_block_2(conn, topic_num, num):
             curs.execute(db_change("update topic set block = '' where title = ? and sub = ? and id = ?"), [name, sub, str(num)])
         else:
             curs.execute(db_change("update topic set block = 'O' where title = ? and sub = ? and id = ?"), [name, sub, str(num)])
-        
+
         rd_plus(name, sub, get_time())
-        
+
         conn.commit()
-        
+
     return redirect('/thread/' + str(topic_num) + '#' + str(num))

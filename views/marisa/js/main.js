@@ -10,7 +10,7 @@ function opening(data) {
         var element = document.getElementById(data);
         var element_2 = document.getElementById('recent_cel');
     }
-    
+
     if(element.style.display == 'none') {
         element.style.display = 'block';
         element_2.style.display = 'none';

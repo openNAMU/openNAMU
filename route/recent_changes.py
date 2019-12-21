@@ -9,7 +9,7 @@ def recent_changes_2(conn, name, tool):
             '?first=' + flask.request.form.get('b', '1') +
             '&second=' + flask.request.form.get('a', '1')
         )
-    else:        
+    else:
         ban = ''
         select = ''
         sub = ''
@@ -19,12 +19,12 @@ def recent_changes_2(conn, name, tool):
                 <tbody>
                     <tr>
         '''
-        
+
         num = int(number_check(flask.request.args.get('num', '1')))
         if num * 50 > 0:
             sql_num = num * 50 - 50
         else:
-            sql_num = 0   
+            sql_num = 0
 
         if name:
             if tool == 'history':
@@ -35,19 +35,19 @@ def recent_changes_2(conn, name, tool):
                     <td id="main_table_width">''' + load_lang('editor') + '''</td>
                     <td id="main_table_width">''' + load_lang('time') + '''</td>
                 '''
-                
+
                 tool_select = flask.request.args.get('tool', 'normal')
                 if tool_select == 'move':
                     plus_sql = 'where (send like ? or send like ?) and type = "" '
-                    plus_list = ['%(<a>' + name +'</a>%', '%<a>' + name + '</a> move)', sql_num]    
+                    plus_list = ['%(<a>' + name +'</a>%', '%<a>' + name + '</a> move)', sql_num]
                     sub += ' (' + load_lang('move') + ')'
                 elif tool_select == 'delete':
                     plus_sql = 'where (send like "%(delete)") and title = ? and type = "" '
-                    plus_list = [name, sql_num]    
-                    sub += ' (' + load_lang('revert') + ')'
+                    plus_list = [name, sql_num]
+                    sub += ' (' + load_lang('delete') + ')'
                 elif tool_select == 'revert':
                     plus_sql = 'where (send like ?) and title = ? and type = "" '
-                    plus_list = ['%(r%)', name, sql_num]    
+                    plus_list = ['%(r%)', name, sql_num]
                     sub += ' (' + load_lang('revert') + ')'
                 else:
                     plus_sql = 'where title = ? and type = "" '
@@ -67,7 +67,7 @@ def recent_changes_2(conn, name, tool):
                 '''
 
                 div = '<a href="/topic_record/' + url_pas(name) + '">(' + load_lang('discussion') + ')</a><hr class=\"main_hr\">' + div
-                
+
                 curs.execute(db_change('' + \
                     'select id, title, date, ip, send, leng from history ' + \
                     "where ip = ? and type = '' order by date desc limit ?, 50" + \
@@ -104,27 +104,27 @@ def recent_changes_2(conn, name, tool):
         div += '</tr>'
 
         data_list = curs.fetchall()
-        for data in data_list:    
-            select += '<option value="' + data[0] + '">' + data[0] + '</option>'     
+        for data in data_list:
+            select += '<option value="' + data[0] + '">' + data[0] + '</option>'
             send = '<br>'
-            
+
             if data[4]:
                 if not re.search("^(?: *)$", data[4]):
                     send = data[4]
-            
+
             if re.search("\+", data[5]):
                 leng = '<span style="color:green;">(' + data[5] + ')</span>'
             elif re.search("\-", data[5]):
                 leng = '<span style="color:red;">(' + data[5] + ')</span>'
             else:
                 leng = '<span style="color:gray;">(' + data[5] + ')</span>'
-                
+
             ip = ip_pas(data[3])
             if tool == 'history':
                 m_tool = '<a href="/history_tool/' + url_pas(data[1]) + '?num=' + data[0] + '&type=history">(' + load_lang('tool') + ')</a>'
             else:
                 m_tool = '<a href="/history_tool/' + url_pas(data[1]) + '?num=' + data[0] + '">(' + load_lang('tool') + ')</a>'
-            
+
             style = ['', '']
             date = data[2]
 
@@ -133,12 +133,12 @@ def recent_changes_2(conn, name, tool):
                 where title = ? and id = ? and hide = 'O'
             '''), [data[1], data[0]])
             hide = curs.fetchall()
-            
+
             if admin_check(6) == 1:
-                if hide:                    
+                if hide:
                     style[0] = 'id="toron_color_grey"'
                     style[1] = 'id="toron_color_grey"'
-                    
+
                     send += ' (' + load_lang('hide') + ')'
             elif not hide:
                 pass
@@ -179,7 +179,7 @@ def recent_changes_2(conn, name, tool):
 
         if name:
             if tool == 'history':
-                if not tool_select:
+                if tool_select == 'normal':
                     div = '' + \
                         '<a href="?tool=move">(' + load_lang('move') + ')</a> ' + \
                         '<a href="?tool=delete">(' + load_lang('delete') + ')</a> ' + \
@@ -187,17 +187,18 @@ def recent_changes_2(conn, name, tool):
                         '<hr class="main_hr">' + div + \
                     ''
 
+                    div = '''
+                        <form method="post">
+                            <select name="a">''' + select + '''</select> <select name="b">''' + select + '''</select>
+                            <button type="submit">''' + load_lang('compare') + '''</button>
+                        </form>
+                        <hr class=\"main_hr\">
+                    ''' + div
+
                     menu = [['w/' + url_pas(name), load_lang('document')], ['raw/' + url_pas(name), load_lang('raw')]]
                 else:
                     menu = [['history/' + url_pas(name), load_lang('return')]]
 
-                div = '''
-                    <form method="post">
-                        <select name="a">''' + select + '''</select> <select name="b">''' + select + '''</select>
-                        <button type="submit">''' + load_lang('compare') + '''</button>
-                    </form>
-                    <hr class=\"main_hr\">
-                ''' + div
                 title = name
                 div += next_fix('/history/' + url_pas(name) + '?tool=' + tool_select + '&num=', num, data_list)
             else:
@@ -215,11 +216,11 @@ def recent_changes_2(conn, name, tool):
             elif set_type == 'req':
                 sub = ' (' + load_lang('edit_req') + ')'
                 menu = [['recent_changes', load_lang('return')]]
-        
+
         if sub == '':
             sub = 0
-                
-        return easy_minify(flask.render_template(skin_check(), 
+
+        return easy_minify(flask.render_template(skin_check(),
             imp = [title, wiki_set(), custom(), other2([sub, 0])],
             data = div,
             menu = menu

@@ -19,7 +19,7 @@ def db_change(data):
         data = data.replace('?', '%s')
 
     return data
-    
+
 def ip_check(d_type = 0):
     if d_type == 0:
         if flask.session and ('state' and 'id') in flask.session:
@@ -27,7 +27,7 @@ def ip_check(d_type = 0):
         else:
             try:
                 ip = flask.request.environ.get('HTTP_X_REAL_IP', flask.request.environ.get('HTTP_X_FORWARDED_FOR', flask.request.remote_addr))
-                
+
                 if ip == '::1' or ip == '127.0.0.1':
                     ip = flask.request.environ.get('HTTP_X_FORWARDED_FOR', flask.request.remote_addr)
             except:
@@ -35,14 +35,14 @@ def ip_check(d_type = 0):
     else:
         try:
             ip = flask.request.environ.get('HTTP_X_REAL_IP', flask.request.environ.get('HTTP_X_FORWARDED_FOR', flask.request.remote_addr))
-            
+
             if ip == '::1' or ip == '127.0.0.1':
                 ip = flask.request.environ.get('HTTP_X_FORWARDED_FOR', flask.request.remote_addr)
         except:
             ip = '-'
-            
+
     return str(ip)
-    
+
 def link_fix(main_link):
     if re.search('^:', main_link):
         main_link = re.sub('^:', '', main_link)
@@ -60,18 +60,18 @@ def link_fix(main_link):
         other_link = ''
 
     main_link = re.sub('\\\\#', '%23', main_link)
-        
+
     return [main_link, other_link]
 
 def savemark(data):
     data = re.sub("\[date\(now\)\]", get_time(), data)
-    
+
     ip = ip_check()
     if not re.search("\.", ip):
         name = '[[user:' + ip + '|' + ip + ']]'
     else:
         name = ip
-        
+
     data = re.sub("\[name\]", name, data)
 
     return data

@@ -8,7 +8,7 @@ function topic_main_load(topic_num, s_num) {
     var url_2 = "/api/markup";
     var n_data = "";
     var num = 1;
-    
+
     var xhr = new XMLHttpRequest();
     xhr.open("GET", url, true);
     xhr.send(null);
@@ -24,7 +24,7 @@ function topic_main_load(topic_num, s_num) {
                 n_data += t_data[key]['data'];
                 num = key;
             }
-            
+
             o_data.innerHTML = n_data;
             if(!s_num) {
                 topic_plus_load(topic_num, String(Number(num) + 1));
@@ -45,5 +45,5 @@ function topic_main_load(topic_num, s_num) {
             }
         }
     }
-    
+
 }

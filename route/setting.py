@@ -17,61 +17,61 @@ def setting_2(conn, num):
             load_lang('main_bottom_body'),
             load_lang('main_acl_setting')
         ]
-        
+
         x = 0
         li_data = ''
-        
+
         for li in li_list:
             x += 1
             li_data += '<li><a href="/setting/' + str(x) + '">' + li + '</a></li>'
 
-        return easy_minify(flask.render_template(skin_check(), 
+        return easy_minify(flask.render_template(skin_check(),
             imp = [load_lang('setting'), wiki_set(), custom(), other2([0, 0])],
             data = '<h2>' + load_lang('list') + '</h2><ul>' + li_data + '</ul>',
             menu = [['manager', load_lang('return')]]
         ))
     elif num == 1:
         i_list = {
-            0 : 'name', 
-            1 : 'logo', 
-            2 : 'frontpage', 
-            3 : 'license', 
-            4 : 'upload', 
-            5 : 'skin', 
-            7 : 'reg', 
-            8 : 'ip_view', 
-            9 : 'back_up', 
-            10 : 'port', 
-            11 : 'key', 
-            12 : 'update', 
-            13 : 'email_have', 
-            15 : 'encode', 
+            0 : 'name',
+            1 : 'logo',
+            2 : 'frontpage',
+            3 : 'license',
+            4 : 'upload',
+            5 : 'skin',
+            7 : 'reg',
+            8 : 'ip_view',
+            9 : 'back_up',
+            10 : 'port',
+            11 : 'key',
+            12 : 'update',
+            13 : 'email_have',
+            15 : 'encode',
             16 : 'host',
             19 : 'slow_edit'
         }
         n_list = {
-            0 : 'Wiki', 
-            1 : '', 
-            2 : 'FrontPage', 
-            3 : 'CC 0', 
-            4 : '2', 
-            5 : '',  
-            7 : '', 
-            8 : '', 
-            9 : '0', 
-            10 : '3000', 
-            11 : 'test', 
-            12 : 'stable', 
-            13 : '',  
-            15 : 'sha3', 
+            0 : 'Wiki',
+            1 : '',
+            2 : 'FrontPage',
+            3 : 'CC 0',
+            4 : '2',
+            5 : '',
+            7 : '',
+            8 : '',
+            9 : '0',
+            10 : '3000',
+            11 : 'test',
+            12 : 'stable',
+            13 : '',
+            15 : 'sha3',
             16 : '0.0.0.0',
             19 : '0'
         }
-        
+
         if flask.request.method == 'POST':
             for i in i_list:
                 curs.execute(db_change("update other set data = ? where name = ?"), [
-                    flask.request.form.get(i_list[i], n_list[i]), 
+                    flask.request.form.get(i_list[i], n_list[i]),
                     i_list[i]
                 ])
 
@@ -82,7 +82,7 @@ def setting_2(conn, num):
             return redirect('/setting/1')
         else:
             d_list = {}
-            
+
             for i in i_list:
                 curs.execute(db_change('select data from other where name = ?'), [i_list[i]])
                 sql_d = curs.fetchall()
@@ -90,11 +90,11 @@ def setting_2(conn, num):
                     d_list[i] = sql_d[0][0]
                 else:
                     curs.execute(db_change('insert into other (name, data) values (?, ?)'), [i_list[i], n_list[i]])
-                    
+
                     d_list[i] = n_list[i]
 
             conn.commit()
-            
+
             acl_div = ['']
             encode_data = ['sha256', 'sha3']
             for acl_data in encode_data:
@@ -123,7 +123,7 @@ def setting_2(conn, num):
                 branch_div += '<option value="master">master</option>'
                 branch_div += '<option value="stable">stable</option>'
 
-            return easy_minify(flask.render_template(skin_check(), 
+            return easy_minify(flask.render_template(skin_check(),
                 imp = [load_lang('main_setting'), wiki_set(), custom(), other2([0, 0])],
                 data = '''
                     <form method="post">
@@ -192,8 +192,8 @@ def setting_2(conn, num):
             ))
     elif num == 2:
         i_list = [
-            'contract', 
-            'no_login_warring', 
+            'contract',
+            'no_login_warring',
             'edit_bottom_text',
             'check_key_text',
             'email_title',
@@ -208,18 +208,18 @@ def setting_2(conn, num):
         if flask.request.method == 'POST':
             for i in i_list:
                 curs.execute(db_change("update other set data = ? where name = ?"), [
-                    flask.request.form.get(i, ''), 
+                    flask.request.form.get(i, ''),
                     i
                 ])
 
             conn.commit()
-            
+
             admin_check(None, 'edit_set')
 
             return redirect('/setting/2')
         else:
             d_list = []
-            
+
             for i in i_list:
                 curs.execute(db_change('select data from other where name = ?'), [i])
                 sql_d = curs.fetchall()
@@ -227,12 +227,12 @@ def setting_2(conn, num):
                     d_list += [sql_d[0][0]]
                 else:
                     curs.execute(db_change('insert into other (name, data) values (?, ?)'), [i, ''])
-                    
+
                     d_list += ['']
 
             conn.commit()
 
-            return easy_minify(flask.render_template(skin_check(), 
+            return easy_minify(flask.render_template(skin_check(),
                 imp = [load_lang('text_setting'), wiki_set(), custom(), other2([0, 0])],
                 data = '''
                     <form method="post">
@@ -306,7 +306,7 @@ def setting_2(conn, num):
                     coverage = ''
                 else:
                     coverage = flask.request.args.get('skin', '')
-                
+
             curs.execute(db_change("select name from other where name = ? and coverage = ?"), [info_d, coverage])
             if curs.fetchall():
                 curs.execute(db_change("update other set data = ? where name = ? and coverage = ?"), [
@@ -316,7 +316,7 @@ def setting_2(conn, num):
                 ])
             else:
                 curs.execute(db_change("insert into other (name, data, coverage) values (?, ?, ?)"), [info_d, flask.request.form.get('content', ''), coverage])
-            
+
             conn.commit()
 
             admin_check(None, 'edit_set')
@@ -352,7 +352,7 @@ def setting_2(conn, num):
                     <hr class=\"main_hr\">
                 '''
                 plus = ''
-                
+
             head = curs.fetchall()
             if head:
                 data = head[0][0]
@@ -364,7 +364,7 @@ def setting_2(conn, num):
             else:
                 sub_plus = ''
 
-            return easy_minify(flask.render_template(skin_check(), 
+            return easy_minify(flask.render_template(skin_check(),
                 imp = [load_lang(data = 'main' + title, safe = 1), wiki_set(), custom(), other2([' (HTML)' + sub_plus, 0])],
                 data = '''
                     <form method="post">
@@ -384,13 +384,13 @@ def setting_2(conn, num):
                 curs.execute(db_change("update other set data = ? where name = 'robot'"), [flask.request.form.get('content', '')])
             else:
                 curs.execute(db_change("insert into other (name, data) values ('robot', ?)"), [flask.request.form.get('content', '')])
-            
+
             conn.commit()
-            
+
             fw = open('./robots.txt', 'w')
             fw.write(re.sub('\r\n', '\n', flask.request.form.get('content', '')))
             fw.close()
-            
+
             admin_check(None, 'edit_set')
 
             return redirect('/setting/5')
@@ -423,7 +423,7 @@ def setting_2(conn, num):
             if not data or data == '':
                 data = ''.join(lines)
 
-            return easy_minify(flask.render_template(skin_check(), 
+            return easy_minify(flask.render_template(skin_check(),
                 imp = ['robots.txt', wiki_set(), custom(), other2([0, 0])],
                 data = '''
                     <a href="/robots.txt">(''' + load_lang('view') + ''')</a>
@@ -438,9 +438,9 @@ def setting_2(conn, num):
             ))
     elif num == 6:
         i_list = [
-            'recaptcha', 
-            'sec_re', 
-            'g_email', 
+            'recaptcha',
+            'sec_re',
+            'g_email',
             'g_pass'
         ]
 
@@ -454,15 +454,15 @@ def setting_2(conn, num):
                 curs.execute(db_change("update other set data = ? where name = ?"), [into_data, data])
 
             conn.commit()
-            
+
             admin_check(None, 'edit_set')
 
             return redirect('/setting/6')
         else:
             d_list = []
-            
+
             x = 0
-            
+
             for i in i_list:
                 curs.execute(db_change('select data from other where name = ?'), [i])
                 sql_d = curs.fetchall()
@@ -470,14 +470,14 @@ def setting_2(conn, num):
                     d_list += [sql_d[0][0]]
                 else:
                     curs.execute(db_change('insert into other (name, data) values (?, ?)'), [i, ''])
-                    
+
                     d_list += ['']
 
                 x += 1
 
             conn.commit()
 
-            return easy_minify(flask.render_template(skin_check(), 
+            return easy_minify(flask.render_template(skin_check(),
                 imp = ['Google', wiki_set(), custom(), other2([0, 0])],
                 data = '''
                     <form method="post">
@@ -506,24 +506,24 @@ def setting_2(conn, num):
             ))
     elif num == 8:
         i_list = {
-            1 : 'edit', 
-            2 : 'discussion', 
+            1 : 'edit',
+            2 : 'discussion',
             3 : 'upload_acl',
             4 : 'all_view_acl',
             5 : 'edit_req_acl'
         }
         n_list = {
-            1 : 'normal', 
-            2 : 'normal', 
+            1 : 'normal',
+            2 : 'normal',
             3 : 'normal',
             4 : 'normal',
             5 : 'normal'
         }
-        
+
         if flask.request.method == 'POST':
             for i in i_list:
                 curs.execute(db_change("update other set data = ? where name = ?"), [
-                    flask.request.form.get(i_list[i], n_list[i]), 
+                    flask.request.form.get(i_list[i], n_list[i]),
                     i_list[i]
                 ])
 
@@ -534,7 +534,7 @@ def setting_2(conn, num):
             return redirect('/setting/8')
         else:
             d_list = {}
-            
+
             for i in i_list:
                 curs.execute(db_change('select data from other where name = ?'), [i_list[i]])
                 sql_d = curs.fetchall()
@@ -542,11 +542,11 @@ def setting_2(conn, num):
                     d_list[i] = sql_d[0][0]
                 else:
                     curs.execute(db_change('insert into other (name, data) values (?, ?)'), [i_list[i], n_list[i]])
-                    
+
                     d_list[i] = n_list[i]
 
             conn.commit()
-            
+
             acl_div = ['', '', '', '', '']
             acl_list = ['normal', 'user', 'admin', 'owner', '50_edit', 'email']
             for i in range(0, 5):
@@ -556,7 +556,7 @@ def setting_2(conn, num):
                     else:
                         acl_div[i] += '<option value="' + acl_data + '">' + acl_data + '</option>'
 
-            return easy_minify(flask.render_template(skin_check(), 
+            return easy_minify(flask.render_template(skin_check(),
                 imp = [load_lang('main_acl_setting'), wiki_set(), custom(), other2([0, 0])],
                 data = '''
                     <form method="post">
