@@ -8,6 +8,8 @@ def give_history_add_2(conn, name):
         return re_error('/ban')
 
     if flask.request.method == 'POST':
+        admin_check(None, 'history_add (' + name + ')')
+
         today = get_time()
         content = flask.request.form.get('content', '')
         content = savemark(content)
