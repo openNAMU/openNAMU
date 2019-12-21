@@ -313,5 +313,6 @@
     "public_key": "공개키",
     "fast_edit_error": "편집 속도가 너무 빠릅니다. 제한 (초) : ",
     "main_acl_setting": "기본 ACL 설정",
-    "edit_req_acl": "편집 요청 ACL"
+    "edit_req_acl": "편집 요청 ACL",
+    "history_add" : "역사 추가"
 }

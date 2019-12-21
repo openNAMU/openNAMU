@@ -11,7 +11,7 @@ def edit_2(conn, name):
 
     if acl_check(name) == 1:
         return redirect('/edit_req/' + url_pas(name))
-
+    
     if flask.request.method == 'POST':
         if captcha_post(flask.request.form.get('g-recaptcha-response', '')) == 1:
             return re_error('/error/13')
@@ -26,15 +26,15 @@ def edit_2(conn, name):
 
         if flask.request.form.get('otent', '') == content:
             return redirect('/w/' + url_pas(name))
-
+        
         if edit_filter_do(content) == 1:
             return re_error('/error/21')
 
         content = savemark(content)
-
+        
         if old:
             leng = leng_check(len(flask.request.form.get('otent', '')), len(content))
-
+            
             if section:
                 content = old[0][0].replace(flask.request.form.get('otent', ''), content)
         else:
@@ -52,10 +52,10 @@ def edit_2(conn, name):
         for scan_user in curs.fetchall():
             curs.execute(db_change("insert into alarm (name, data, date) values (?, ?, ?)"), [
                 scan_user[0],
-                ip + ' | <a href="/w/' + url_pas(name) + '">' + name + '</a> | Edit',
+                ip + ' | <a href="/w/' + url_pas(name) + '">' + name + '</a> | Edit', 
                 today
             ])
-
+                
         history_plus(
             name,
             content,
@@ -64,20 +64,20 @@ def edit_2(conn, name):
             flask.request.form.get('send', ''),
             leng
         )
-
+        
         curs.execute(db_change("delete from back where link = ?"), [name])
         curs.execute(db_change("delete from back where title = ? and type = 'no'"), [name])
-
+        
         render_set(
             title = name,
             data = content,
             num = 1
         )
-
+        
         conn.commit()
-
+        
         return redirect('/w/' + url_pas(name))
-    else:
+    else:            
         if old:
             if section:
                 data = re.sub('\n(?P<in>={1,6})', '<br>\g<in>', html.escape('\n' + re.sub('\r\n', '\n', old[0][0]) + '\n'))
@@ -88,7 +88,7 @@ def edit_2(conn, name):
                     if g_data:
                         if int(section) - 1 == i:
                             data = html.unescape(re.sub('<br>(?P<in>={1,6})', '\n\g<in>', g_data.groups()[0]))
-
+                            
                             break
                         else:
                             data = re.sub('((?:<br>)(?:(?:(?!\n|<br>).)+)(?:\n*(?:(?:(?!<br>).)+\n*)+)?)', '\n', data, 1)
@@ -100,7 +100,7 @@ def edit_2(conn, name):
                 data = old[0][0]
         else:
             data = ''
-
+            
         data_old = data
         get_name = ''
 
@@ -109,7 +109,7 @@ def edit_2(conn, name):
                 <a href="/manager/15?plus=''' + url_pas(name) + '">(' + load_lang('load') + ')</a> <a href="/edit_filter">(' + load_lang('edit_filter_rule') + ''')</a>
                 <hr class=\"main_hr\">
             '''
-
+            
         if flask.request.args.get('plus', None):
             curs.execute(db_change("select data from data where title = ?"), [flask.request.args.get('plus', 'test')])
             get_data = curs.fetchall()
@@ -134,7 +134,7 @@ def edit_2(conn, name):
         else:
             p_text = load_lang('defalut_edit_help')
 
-        return easy_minify(flask.render_template(skin_check(),
+        return easy_minify(flask.render_template(skin_check(), 
             imp = [name, wiki_set(), custom(), other2([' (' + sub + ')', 0])],
             data =  get_name + '''
                 <form method="post">
