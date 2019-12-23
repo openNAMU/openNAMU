@@ -598,7 +598,7 @@ def admin_check(num = None, what = None, name = ''):
 
     return 0
 
-def ip_pas(raw_ip):
+def ip_pas(raw_ip, type_d = 0):
     hide = 0
 
     if ip_or_user(raw_ip) != 0:
@@ -612,20 +612,22 @@ def ip_pas(raw_ip):
         else:
             ip = raw_ip
     else:
-        curs.execute(db_change("select title from data where title = ?"), ['user:' + raw_ip])
-        if curs.fetchall():
-            ip = '<a href="/w/' + url_pas('user:' + raw_ip) + '">' + raw_ip + '</a>'
-        else:
-            ip = '<a id="not_thing" href="/w/' + url_pas('user:' + raw_ip) + '">' + raw_ip + '</a>'
+        if type_d == 0:
+            curs.execute(db_change("select title from data where title = ?"), ['user:' + raw_ip])
+            if curs.fetchall():
+                ip = '<a href="/w/' + url_pas('user:' + raw_ip) + '">' + raw_ip + '</a>'
+            else:
+                ip = '<a id="not_thing" href="/w/' + url_pas('user:' + raw_ip) + '">' + raw_ip + '</a>'
 
-        if admin_check('all', None, raw_ip) == 1:
-            ip = '<b>' + ip + '</b>'
+            if admin_check('all', None, raw_ip) == 1:
+                ip = '<b>' + ip + '</b>'
 
-    if ban_check(raw_ip) == 1:
-        ip = '<s>' + ip + '</s>'
+    if type_d == 0:
+        if ban_check(raw_ip) == 1:
+            ip = '<s>' + ip + '</s>'
 
-    if hide == 0:
-        ip += ' <a href="/tool/' + url_pas(raw_ip) + '">(' + load_lang('tool') + ')</a>'
+        if hide == 0:
+            ip += ' <a href="/tool/' + url_pas(raw_ip) + '">(' + load_lang('tool') + ')</a>'
 
     return ip
 

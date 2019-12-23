@@ -424,3 +424,7 @@ div#last_edit {
         width: calc(100% - 60px);
     }
 }
+
+#titlt_a {
+    color: initial;
+}
