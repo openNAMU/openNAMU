@@ -104,7 +104,7 @@ def api_topic_sub_2(conn, topic_num):
                 json_data[i[0]] = {
                     "data" : t_data_f,
                     "date" : i[2],
-                    "ip" : i[3],
+                    "ip" : ip_pas(i[3], 1),
                     "block" : i[4],
                 }
 
