@@ -37,7 +37,9 @@ def api_topic_sub_2(conn, topic_num):
                     t_data_f = ''
                     b_color = 'toron_color_not'
 
-                curs.execute(db_change("select who from re_admin where what = ? order by time desc limit 1"), ['blind (' + name + ' - ' + sub + '#' + str(i[0]) + ')'])
+                curs.execute(db_change("select who from re_admin where what = ? order by time desc limit 1"), [
+                    'blind (' + name + ' - ' + sub + '#' + str(i[0]) + ')'
+                ])
                 who_blind = curs.fetchall()
                 if who_blind:
                     ip += ' (' + who_blind[0][0] + ' B)'
@@ -94,7 +96,9 @@ def api_topic_sub_2(conn, topic_num):
                 if i[4] != 'O' or (i[4] == 'O' and admin == 1):
                     t_data_f = i[1]
                 else:
-                    curs.execute(db_change("select who from re_admin where what = ? order by time desc limit 1"), ['blind (' + name + ' - ' + sub + '#' + str(i[0]) + ')'])
+                    curs.execute(db_change("select who from re_admin where what = ? order by time desc limit 1"), [
+                        'blind (' + name + ' - ' + sub + '#' + str(i[0]) + ')'
+                    ])
                     who_blind = curs.fetchall()
                     if who_blind:
                         t_data_f = '[[user:' + who_blind[0][0] + ']] block'

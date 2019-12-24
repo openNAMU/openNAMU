@@ -21,25 +21,15 @@ def db_change(data):
     return data
 
 def ip_check(d_type = 0):
-    if d_type == 0:
-        if flask.session and ('state' and 'id') in flask.session:
-            ip = flask.session['id']
-        else:
-            try:
-                ip = flask.request.environ.get('HTTP_X_REAL_IP', flask.request.environ.get('HTTP_X_FORWARDED_FOR', flask.request.remote_addr))
+    ip = ''
+    if d_type == 0 and (flask.session and ('state' and 'id') in flask.session):
+        ip = flask.session['id']
+    
+    if ip == '':
+        ip = flask.request.environ.get('HTTP_X_REAL_IP', flask.request.environ.get('HTTP_X_FORWARDED_FOR', flask.request.remote_addr))
 
-                if ip == '::1' or ip == '127.0.0.1':
-                    ip = flask.request.environ.get('HTTP_X_FORWARDED_FOR', flask.request.remote_addr)
-            except:
-                ip = '-'
-    else:
-        try:
-            ip = flask.request.environ.get('HTTP_X_REAL_IP', flask.request.environ.get('HTTP_X_FORWARDED_FOR', flask.request.remote_addr))
-
-            if ip == '::1' or ip == '127.0.0.1':
-                ip = flask.request.environ.get('HTTP_X_FORWARDED_FOR', flask.request.remote_addr)
-        except:
-            ip = '-'
+        if ip == '::1' or ip == '127.0.0.1':
+            ip = flask.request.environ.get('HTTP_X_FORWARDED_FOR', flask.request.remote_addr)
 
     return str(ip)
 
