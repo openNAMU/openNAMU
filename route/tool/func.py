@@ -605,7 +605,10 @@ def ip_pas(raw_ip, type_d = 0):
         curs.execute(db_change("select data from other where name = 'ip_view'"))
         data = curs.fetchall()
         if data and data[0][0] != '':
-            ip = re.sub('((?:(?!\.).)+)\.((?:(?!\.).)+)$', '*.*', raw_ip)
+            if re.search('\.', raw_ip):
+                ip = re.sub('\.([^.]*)\.([^.]*)$', '.*.*', raw_ip)
+            else:
+                ip = re.sub(':([^:]*):([^:]*)$', ':*:*', raw_ip)
 
             if not admin_check(1):
                 hide = 1
@@ -621,6 +624,8 @@ def ip_pas(raw_ip, type_d = 0):
 
             if admin_check('all', None, raw_ip) == 1:
                 ip = '<b>' + ip + '</b>'
+        else:
+            ip = raw_ip
 
     if type_d == 0:
         if ban_check(raw_ip) == 1:
