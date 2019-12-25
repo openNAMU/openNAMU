@@ -83,7 +83,7 @@
     "not_sure": "확실하지 않음",
     "file_name_error": "파일 이름에는 알파벳, 한글, 공백, 밑줄 및 빼기 기호만 사용할 수 있습니다.",
     "pass": "넘기기",
-    "recaptcha_error": "'로봇이 아닙니다'를 눌러 reCAPTCHA를 통과하세요.",
+    "recaptcha_error": "'로봇이 아닙니다'를 통해 reCAPTCHA를 통과하세요.",
     "file_capacity_error": "최대 파일 크기 (MB) :",
     "setting": "설정",
     "end": "끝",
