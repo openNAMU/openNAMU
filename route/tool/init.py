@@ -29,7 +29,7 @@ server_set_var = {
         'display' : 'Markup',
         'require' : 'select',
         'default' : 'namumark',
-        'list' : ['namumark', 'markdown', 'raw']
+        'list' : ['namumark', 'markdown', 'raw', 'js_namumark']
     },
     'encode' : {
         'display' : 'Encryption method',
@@ -43,9 +43,6 @@ def init(key):
     if env_dict[key] != None:
         return env_dict[key]
     else:
-        if key == 'markup':
-            return server_set_var[key]['default']
-
         while 1:
             if server_set_var[key]['require'] == 'select':
                 list_ = '[' + ', '.join(server_set_var[key]['list']) + ']'
