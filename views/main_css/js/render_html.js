@@ -1,7 +1,7 @@
 function render_html(name = '') {
     var num = 0;
     while(1) {
-        num += 1
+        num += 1;
 
         if(document.getElementById(name + '_' + String(num))) {
             data = document.getElementById(name + '_' + String(num)).innerHTML;
