@@ -533,7 +533,7 @@ def namumark(conn, data, title, main_num, include_num):
 
                 plus_data += '<script>load_include("' + include_link + '", "include_' + str(i) + '", ' + str(include_plus_data) + ');</script>'
             else:
-                data = include_re.sub('<a id="not_thing" href="/w/' + tool.url_pas(include_link) + '">[' + include_link + ']</a>', data, 1)
+                data = include_re.sub('<a class="not_thing" href="/w/' + tool.url_pas(include_link) + '">[' + include_link + ']</a>', data, 1)
         else:
             break
 
@@ -972,7 +972,7 @@ def namumark(conn, data, title, main_num, include_num):
                 else:
                     data = re.sub(
                         '\[\[((?:(?!\[\[|\]\]).)+)\]\]',
-                        '<a id="not_thing" href="/upload?name=' + tool.url_pas(file_name) + '">' + file_alt + '</a>',
+                        '<a class="not_thing" href="/upload?name=' + tool.url_pas(file_name) + '">' + file_alt + '</a>',
                         data,
                         1
                     )
@@ -1053,7 +1053,7 @@ def namumark(conn, data, title, main_num, include_num):
                         if main_link != '':
                             curs.execute(tool.db_change("select title from data where title = ?"), [main_link])
                             if not curs.fetchall():
-                                link_id = 'id="not_thing"'
+                                link_id = 'class="not_thing"'
 
                                 backlink += [[title, main_link, 'no']]
                             else:

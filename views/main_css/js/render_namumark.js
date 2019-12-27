@@ -12,6 +12,29 @@ function render_namumark(target) {
         '';
     }
 
+    function get_link_state(link_list, i) {
+        if(link_list[i]) {
+            get_link_state(link_list, i + 1);
+            
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", "/api/w/" + encodeURI(link_list[i][0]) + "?exist=1", true);
+            xhr.send(null);
+            
+            xhr.onreadystatechange = function() {
+                if(this.readyState === 4 && this.status === 200) {
+                    console.log(JSON.parse(this.responseText)['exist']);
+                    if(JSON.parse(this.responseText)['exist'] !== '1') {
+                        document.getElementById(link_list[i][1]).className = "not_thing";
+                    } else {
+                        document.getElementById(link_list[i][1]).className = "";
+                    }
+                } else {
+                    document.getElementById(link_list[i][1]).className = "not_thing";
+                }
+            }
+        }
+    }
+
     var data = '\n' + document.getElementById(target).innerHTML + '\n';
     var nowiki_list = [];
 
@@ -163,6 +186,29 @@ function render_namumark(target) {
     data = data.replace(/\^\^((?:(?!\^\^).)+)\^\^/g, '<sup>$1</sup>');
     data = data.replace(/,,((?:(?!,,).)+),,/g, '<sub>$1</sub>');
 
+    data = data.replace(/\n( {1,})\* ([^\n]+)/g, function(all, margin_data, in_data) {
+        return '<li style="margin-left: ' + String(margin_data.length * 20) + 'px;">' + in_data + '</li>'
+    });
+
+    data = data.replace(/\n( {1,})/g, function(all, margin_data) {
+        return '\n<span style="margin-left: ' + String(margin_data.length * 10) + 'px"></span>'
+    });
+
+    var link_list = [];
+    var link_num = 0;
+    data = data.replace(/\[\[((?:(?!]]).)+)]]/g, function(all, in_data) {
+        if(in_data.match(/^(?:[^|]+)\|(?:.+)$/)) {
+            return in_data.replace(/^([^|]+)\|([^|]+)$/, function(all, front_data, back_name) {
+                link_list.push([front_data, 'link_' + String(link_num)]);
+                link_num += 1;
+
+                return '<a id="link_' + String(link_num - 1) + '" href="/w/' + encodeURI(front_data) + '">' + back_name + '</a>'; 
+            });   
+        } else {
+            
+        }
+    });
+
     data = data.replace(/\[([^(\]]+)\(((?:(?!\)]).)+)\)]/g, function(all, name, in_data) {
         if(name.match(/^youtube|kakaotv|nicovideo$/i)) {
             var video_code = in_data.match(/^([^,]+)/);
@@ -294,7 +340,8 @@ function render_namumark(target) {
 
     var ref_num = 0;
     var ref_data = '<hr><ul id="footnote_data">';
-    data = data.replace(/(?:\[\* ([^\]]+)\]|\[(?:각주|footnote)])/g, function(all, in_data) {
+    var name_ref_data = {};
+    data = data.replace(/(?:\[\*([^ ]*)(?: ([^\]]+))?\]|\[(?:각주|footnote)])/g, function(all, name_data, in_data) {
         if(all.match(/^\[(?:각주|footnote)]$/i)) {
             var new_ref_data = ref_data;
             ref_data = '<hr><ul id="footnote_data">';
@@ -302,23 +349,53 @@ function render_namumark(target) {
             return new_ref_data + '</ul>';
         } else {
             ref_num += 1;
-            ref_data += '' +
-                '<li>' +
-                    '(' + String(ref_num) + ') ' + in_data +
-                '</li>' +
-            ''
+            if(name_data) {
+                if(in_data) {
+                    name_ref_data[name_data] = in_data;
 
-            return '' +
+                    ref_data += '' +
+                        '<li>' +
+                            '<a id="fn-' + name_data + '" href="#rfn-' + String(ref_num) + '">(' + name_data + ')</a> ' + in_data + ''
+                        '</li>' +
+                    ''    
+                } else {
+                    ref_data += '' +
+                        '<li>' +
+                            '<a href="#rfn-' + String(ref_num) + '">(' + name_data + ')</a>' +
+                        '</li>' +
+                    ''
+                }
+            } else {
+                ref_data += '' +
+                    '<li>' +
+                        '<a id="fn-' + String(ref_num) + '" href="#rfn-' + String(ref_num) + '">(' + String(ref_num) + ')</a> ' + in_data + ''
+                    '</li>' +
+                ''
+            }
+
+            if(name_data) {
+                return '' +
+                    '<sup>' +
+                        '<a href="#fn-' + name_data + '" id="rfn-' + String(ref_num) + '" title="' + name_ref_data[name_data].replace(/<([^>]*)>/g, '') + '">' +
+                            '(' + name_data + ')' +
+                        '</a>' +
+                    '</sup>' +
+                '';
+            } else {
+                return '' +
                 '<sup>' +
-                    '<a href="#" title="' + in_data.replace(/<([^>]*)>/g, '') + '">' +
+                    '<a href="#fn-' + String(ref_num) + '" id="rfn-' + String(ref_num) + '" title="' + in_data.replace(/<([^>]*)>/g, '') + '">' +
                         '(' + String(ref_num) + ')' +
                     '</a>' +
                 '</sup>' +
             '';
+            }
         }
     });
 
-    data += ref_data;
+    if(ref_data !== '<hr><ul id="footnote_data">') {
+        data += ref_data + '</ul>';
+    }
 
     i = 0;
     while(1) {
@@ -342,7 +419,6 @@ function render_namumark(target) {
     var i = 0;
     while(1) {
         if(math_list[i]) {
-            console.log(i);
             try {
                 katex.render(math_list[i][1], document.getElementById(math_list[i][0]));
             } catch {
@@ -357,5 +433,6 @@ function render_namumark(target) {
         }
     }
 
+    get_link_state(link_list, 0);
     render_html("html_render_contect");    
 }
