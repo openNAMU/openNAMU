@@ -620,7 +620,7 @@ def ip_pas(raw_ip, type_d = 0):
             if curs.fetchall():
                 ip = '<a href="/w/' + url_pas('user:' + raw_ip) + '">' + raw_ip + '</a>'
             else:
-                ip = '<a id="not_thing" href="/w/' + url_pas('user:' + raw_ip) + '">' + raw_ip + '</a>'
+                ip = '<a class="not_thing" href="/w/' + url_pas('user:' + raw_ip) + '">' + raw_ip + '</a>'
 
             if admin_check('all', None, raw_ip) == 1:
                 ip = '<b>' + ip + '</b>'

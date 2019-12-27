@@ -21,7 +21,7 @@ def search_deep_2(conn, name):
     if curs.fetchall():
         link_id = ''
     else:
-        link_id = 'id="not_thing"'
+        link_id = 'class="not_thing"'
 
     div =   '''
             <ul>
