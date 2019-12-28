@@ -12,25 +12,20 @@ function render_namumark(target) {
         '';
     }
 
-    function get_link_state(link_list, i) {
-        if(link_list[i]) {
-            get_link_state(link_list, i + 1);
-            
-            var xhr = new XMLHttpRequest();
-            xhr.open("GET", "/api/w/" + encodeURI(link_list[i][0]) + "?exist=1", true);
-            xhr.send(null);
-            
-            xhr.onreadystatechange = function() {
-                if(this.readyState === 4 && this.status === 200) {
-                    console.log(JSON.parse(this.responseText)['exist']);
-                    if(JSON.parse(this.responseText)['exist'] !== '1') {
-                        document.getElementById(link_list[i][1]).className = "not_thing";
-                    } else {
-                        document.getElementById(link_list[i][1]).className = "";
-                    }
+    function get_link_state(link_data) {            
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "/api/w/" + encodeURI(link_data[0]) + "?exist=1", true);
+        xhr.send(null);
+        
+        xhr.onreadystatechange = function() {
+            if(this.readyState === 4 && this.status === 200) {
+                if(JSON.parse(this.responseText)['exist'] !== '1') {
+                    document.getElementById(link_data[1]).className = "not_thing";
                 } else {
-                    document.getElementById(link_list[i][1]).className = "not_thing";
+                    document.getElementById(link_data[1]).className = "";
                 }
+            } else {
+                document.getElementById(link_data[1]).className = "not_thing";
             }
         }
     }
@@ -352,7 +347,6 @@ function render_namumark(target) {
         }
     });
 
-    console.log(data);
     var ref_num = 0;
     var ref_data = '<hr><ul id="footnote_data">';
     var name_ref_data = {};
@@ -364,7 +358,6 @@ function render_namumark(target) {
             return new_ref_data + '</ul>';
         } else {
             ref_num += 1;
-            console.log(name_data);
             if(name_data) {
                 if(in_data) {
                     name_ref_data[name_data] = in_data;
@@ -449,6 +442,15 @@ function render_namumark(target) {
         }
     }
 
-    get_link_state(link_list, 0);
+    var i = 0;
+    while(1) {
+        if(link_list[i]) {
+            get_link_state(link_list[i]);
+
+            i += 1;
+        } else {
+            break;
+        }
+    }
     render_html("html_render_contect");    
 }
