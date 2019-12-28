@@ -44,7 +44,7 @@ function render_namumark(target) {
     var html_number = 0;
     data = data.replace(/(?:{{{(?:((?:(?! |{{{|}}}|&lt;).)*) ?)|(}}}))/g, function(all, in_data) {
         if(all === '}}}') {
-            if(mid_list === []) {
+            if(!mid_list[mid_num]) {
                 return all;
             } else {
                 if(mid_stack > 0) {
@@ -172,8 +172,10 @@ function render_namumark(target) {
     var math_list = [];
     var math_num = 0;
     data = data.replace(/\[math\(((?:(?!\)]).)+)\)]/ig, function(all, in_data) {
+        var math_data = in_data.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, "\"").replace(/&#039;/g, "'");
+
         math_num += 1;
-        math_list.push(['math_' + String(math_num), in_data]);
+        math_list.push(['math_' + String(math_num), math_data]);
 
         return '<span id="math_' + String(math_num) + '"></span>';
     });
@@ -196,6 +198,7 @@ function render_namumark(target) {
 
     var link_list = [];
     var link_num = 0;
+    var category = '<div id="cate_all"><hr><div id="cate">Category : '
     data = data.replace(/\[\[((?:(?!]]).)+)]]/g, function(all, in_data) {
         if(in_data.match(/^(?:[^|]+)\|(?:.+)$/)) {
             return in_data.replace(/^([^|]+)\|([^|]+)$/, function(all, front_data, back_name) {
@@ -205,7 +208,18 @@ function render_namumark(target) {
                 return '<a id="link_' + String(link_num - 1) + '" href="/w/' + encodeURI(front_data) + '">' + back_name + '</a>'; 
             });   
         } else {
-            
+            if(in_data.match(/^(?:category|분류):/i)) {
+                category += '<a href="' + encodeURI(in_data) + '">' + in_data + '</a> | ';
+
+                return '';
+            } else if(in_data.match(/^(?:file|파일):/i)) {
+
+            } else {
+                link_list.push([in_data, 'link_' + String(link_num)]);
+                link_num += 1;
+
+                return '<a id="link_' + String(link_num - 1) + '" href="/w/' + encodeURI(in_data) + '">' + in_data + '</a>'; 
+            }
         }
     });
 
@@ -338,10 +352,11 @@ function render_namumark(target) {
         }
     });
 
+    console.log(data);
     var ref_num = 0;
     var ref_data = '<hr><ul id="footnote_data">';
     var name_ref_data = {};
-    data = data.replace(/(?:\[\*([^ ]*)(?: ([^\]]+))?\]|\[(?:각주|footnote)])/g, function(all, name_data, in_data) {
+    data = data.replace(/(?:\[\*([^ \]]*)(?: ([^\]]+))?\]|\[(?:각주|footnote)])/g, function(all, name_data, in_data) {
         if(all.match(/^\[(?:각주|footnote)]$/i)) {
             var new_ref_data = ref_data;
             ref_data = '<hr><ul id="footnote_data">';
@@ -349,6 +364,7 @@ function render_namumark(target) {
             return new_ref_data + '</ul>';
         } else {
             ref_num += 1;
+            console.log(name_data);
             if(name_data) {
                 if(in_data) {
                     name_ref_data[name_data] = in_data;
