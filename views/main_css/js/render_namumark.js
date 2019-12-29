@@ -14,24 +14,23 @@ function render_namumark(target) {
 
     function get_link_state(link_data) {            
         var xhr = new XMLHttpRequest();
-        xhr.open("GET", "/api/w/" + encodeURI(link_data[0]) + "?exist=1", true);
+        xhr.open("GET", "/api/w/" + encodeURIComponent(link_data[0]) + "?exist=1", true);
         xhr.send(null);
         
         xhr.onreadystatechange = function() {
             if(this.readyState === 4 && this.status === 200) {
                 if(JSON.parse(this.responseText)['exist'] !== '1') {
-                    document.getElementById(link_data[1]).className = "not_thing";
+                    document.getElementsByClassName(link_data[1])[0].id = "not_thing";
                 } else {
-                    document.getElementById(link_data[1]).className = "";
+                    document.getElementsByClassName(link_data[1])[0].id = "";
                 }
             } else {
-                document.getElementById(link_data[1]).className = "not_thing";
+                document.getElementsByClassName(link_data[1])[0].id = "not_thing";
             }
         }
     }
 
     var data = '\n' + document.getElementById(target).innerHTML + '\n';
-    var nowiki_list = [];
 
     var mid_num = 0;
     var mid_stack = 0;
@@ -39,29 +38,31 @@ function render_namumark(target) {
     var html_number = 0;
     data = data.replace(/(?:{{{(?:((?:(?! |{{{|}}}|&lt;).)*) ?)|(}}}))/g, function(all, in_data) {
         if(all === '}}}') {
-            if(!mid_list[mid_num]) {
+            if(mid_stack > 0) {
+                mid_stack -= 1;
+            }
+
+            if(mid_stack > 0) {
                 return all;
             } else {
-                if(mid_stack > 0) {
-                    mid_stack -= 1;
+                if(mid_num > 0) {
+                    mid_num -= 1;
                 }
 
-                if(mid_stack > 0) {
-                    return all;
+                if(!mid_list[mid_num]) {
+                    var return_data = '';
+                } else if(mid_list[mid_num] === 'pre') {
+                    var return_data = '</code></pre>';
                 } else {
-                    if(mid_num > 0) {
-                        mid_num -= 1;
-                    }
+                    var return_data = '</' + mid_list[mid_num] + '>';
+                }
 
-                    if(mid_list[mid_num] === 'pre') {
-                        var return_data = '</code></pre>';
-                    } else {
-                        var return_data = '</' + mid_list[mid_num] + '>';
-                    }
-
+                if(return_data !== '') {
                     mid_list.splice(mid_num, 1);
 
                     return return_data;
+                } else {
+                    return all;
                 }
             }
         } else {
@@ -157,9 +158,10 @@ function render_namumark(target) {
     });
 
     var nowiki_num = 0;
+    var nowiki_list = {};
     data = data.replace(/<code>((?:(?!<\/code>).)+)<\/code>/gm, function(all, in_data) {
         nowiki_num += 1;
-        nowiki_list.push(['nowiki_' + String(nowiki_num), in_data]);
+        nowiki_list['nowiki_' + String(nowiki_num)] = in_data;
 
         return '<span id="nowiki_' + String(nowiki_num) + '"></span>';
     });
@@ -200,20 +202,22 @@ function render_namumark(target) {
                 link_list.push([front_data, 'link_' + String(link_num)]);
                 link_num += 1;
 
-                return '<a id="link_' + String(link_num - 1) + '" href="/w/' + encodeURI(front_data) + '">' + back_name + '</a>'; 
+                return '<a class="link_' + String(link_num - 1) + '" href="/w/' + encodeURIComponent(front_data) + '">' + back_name + '</a>'; 
             });   
         } else {
             if(in_data.match(/^(?:category|분류):/i)) {
-                category += '<a href="' + encodeURI(in_data) + '">' + in_data + '</a> | ';
+                category += '<a href="' + encodeURIComponent(in_data) + '">' + in_data + '</a> | ';
 
                 return '';
             } else if(in_data.match(/^(?:file|파일):/i)) {
 
+            } else if(in_data.match(/^http(?:s)?:\/\//i)) {
+                return '<a id="link_' + String(link_num - 1) + '" href="/w/' + encodeURIComponent(in_data) + '">' + in_data + '</a>'; 
             } else {
                 link_list.push([in_data, 'link_' + String(link_num)]);
                 link_num += 1;
 
-                return '<a id="link_' + String(link_num - 1) + '" href="/w/' + encodeURI(in_data) + '">' + in_data + '</a>'; 
+                return '<a class="link_' + String(link_num - 1) + '" href="/w/' + encodeURIComponent(in_data) + '">' + in_data + '</a>'; 
             }
         }
     });
@@ -406,10 +410,10 @@ function render_namumark(target) {
         data += ref_data + '</ul>';
     }
 
-    i = 0;
+    i = 1;
     while(1) {
-        if(nowiki_list[i]) {
-            data = data.replace('<span id="' + nowiki_list[i][0] + '"></span>', '<code>' + nowiki_list[i][1] + '</code>');
+        if(nowiki_list['nowiki_' + String(i)]) {
+            data = data.replace('<span id="nowiki_' + String(i) + '"></span>', '<code>' + nowiki_list['nowiki_' + String(i)] + '</code>');
 
             i += 1;
         } else {
