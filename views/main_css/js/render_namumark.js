@@ -30,6 +30,15 @@ function render_namumark(target) {
         }
     }
 
+    function divi_link(link_data) {
+        link_part = link_data.match(/^([^|]+)\|(.+)$/);
+        if(link_part) {
+            return [link_part[2], link_part[1]]
+        } else {
+            return [link_data, link_data]
+        }
+    }
+
     var data = '\n' + document.getElementById(target).innerHTML + '\n';
 
     var mid_num = 0;
@@ -197,28 +206,29 @@ function render_namumark(target) {
     var link_num = 0;
     var category = '<div id="cate_all"><hr><div id="cate">Category : '
     data = data.replace(/\[\[((?:(?!]]).)+)]]/g, function(all, in_data) {
-        if(in_data.match(/^(?:[^|]+)\|(?:.+)$/)) {
-            return in_data.replace(/^([^|]+)\|([^|]+)$/, function(all, front_data, back_name) {
-                link_list.push([front_data, 'link_' + String(link_num)]);
-                link_num += 1;
+        if(in_data.match(/^(?:category|분류):/i)) {
+            category += '<a href="' + encodeURIComponent(in_data) + '">' + in_data + '</a> | ';
 
-                return '<a class="link_' + String(link_num - 1) + '" href="/w/' + encodeURIComponent(front_data) + '">' + back_name + '</a>'; 
-            });   
+            return '';
+        } else if(in_data.match(/^(?:file|파일):/i)) {
+
+        } else if(in_data.match(/^http(?:s)?:\/\//i)) {
+            var link_part = divi_link(in_data);
+            
+            var front_data = link_part[0];
+            var back_data = link_part[1];
+
+            return '<a id="out_link" href="' + back_data + '">' + front_data + '</a>'; 
         } else {
-            if(in_data.match(/^(?:category|분류):/i)) {
-                category += '<a href="' + encodeURIComponent(in_data) + '">' + in_data + '</a> | ';
+            var link_part = divi_link(in_data);
+            
+            var front_data = link_part[0];
+            var back_data = link_part[1];
 
-                return '';
-            } else if(in_data.match(/^(?:file|파일):/i)) {
+            link_list.push([back_data, 'link_' + String(link_num)]);
+            link_num += 1;
 
-            } else if(in_data.match(/^http(?:s)?:\/\//i)) {
-                return '<a id="link_' + String(link_num - 1) + '" href="/w/' + encodeURIComponent(in_data) + '">' + in_data + '</a>'; 
-            } else {
-                link_list.push([in_data, 'link_' + String(link_num)]);
-                link_num += 1;
-
-                return '<a class="link_' + String(link_num - 1) + '" href="/w/' + encodeURIComponent(in_data) + '">' + in_data + '</a>'; 
-            }
+            return '<a class="link_' + String(link_num - 1) + '" href="/w/' + encodeURIComponent(back_data) + '">' + front_data + '</a>'; 
         }
     });
 
