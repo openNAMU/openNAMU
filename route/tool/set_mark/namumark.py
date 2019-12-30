@@ -952,7 +952,7 @@ def namumark(conn, data, title, main_num, include_num):
                         file_name = 'TEST'
                         file_end = 'jpg'
 
-                    file_src = '/image/' + tool.sha224(file_name) + '.' + file_end
+                    file_src = '/image/' + tool.sha224_replace(file_name) + '.' + file_end
                     file_alt = 'file:' + file_name + '.' + file_end
 
                     curs.execute(tool.db_change("select title from data where title = ?"), [file_alt])

@@ -69,7 +69,7 @@ def savemark(data):
 def url_pas(data):
     return urllib.parse.quote(data).replace('/','%2F')
 
-def sha224(data):
+def sha224_replace(data):
     return hashlib.sha224(bytes(data, 'utf-8')).hexdigest()
 
 def md5_replace(data):
