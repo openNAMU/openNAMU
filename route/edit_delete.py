@@ -45,7 +45,7 @@ def edit_delete_2(conn, name, app_var):
             file_check = file_check.groups()
             os.remove(os.path.join(
                 app_var['path_data_image'],
-                hashlib.sha224(bytes(file_check[0], 'utf-8')).hexdigest() + '.' + file_check[1]
+                sha224_replace(file_check[0], 'utf-8') + '.' + file_check[1]
             ))
 
         curs.execute(db_change('select data from other where name = "count_all_title"'))

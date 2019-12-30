@@ -663,6 +663,10 @@ def api_search(name = ''):
 def api_recent_change():
     return api_recent_change_2(conn)
 
+@app.route('/api/sha224/<everything:name>')
+def api_sha224(name = 'test'):
+    return api_sha224_2(conn, name)
+
 # File
 @app.route('/views/<everything:name>')
 def main_views(name = None):

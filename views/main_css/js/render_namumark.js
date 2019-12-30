@@ -30,8 +30,52 @@ function render_namumark(target) {
         }
     }
 
+    function get_file_state(file_data) {            
+        var file_part = file_data[0].match(/^([^.]+)\.(.+)$/);
+        if(file_part) {
+            var file_name = file_part[1];
+            var file_type = '.' + file_part[2];
+        } else {
+            var file_name = file_data;
+            var file_type = '';
+        }
+
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "/api/sha224/" + encodeURIComponent(file_name), true);
+        xhr.send(null);
+        
+        xhr.onreadystatechange = function() {
+            if(this.readyState === 4 && this.status === 200) {
+                var xhr = new XMLHttpRequest();
+                xhr.open("GET", "/api/w/file:" + encodeURIComponent(file_data[0]) + "?exist=1", true);
+                xhr.send(null);
+
+                var img_src = JSON.parse(this.responseText)['data'];
+                
+                xhr.onreadystatechange = function() {
+                    if(this.readyState === 4 && this.status === 200) {
+                        if(JSON.parse(this.responseText)['exist'] !== '1') {
+                            document.getElementById(file_data[1]).innerHTML = '' +
+                                '<a href="/upload?name=' + encodeURIComponent(file_data[0]) + '" id="not_thing">' + file_data[0] + '</a>' +
+                            '';
+                        } else {
+                            document.getElementById(file_data[1]).innerHTML = '' +
+                                '<img src="/image/' + img_src + file_type + '">' +
+                            '';
+                        }
+                    } else {
+                        console.log(file_data[1]);
+                        document.getElementById(file_data[1]).innerHTML = '' +
+                            '<a href="/upload?name=' + encodeURIComponent(file_data[0]) + '" id="not_thing">' + file_data[0] + '</a>' +
+                        '';
+                    }
+                }
+            }
+        }
+    }
+
     function divi_link(link_data) {
-        link_part = link_data.match(/^([^|]+)\|(.+)$/);
+        var link_part = link_data.match(/^([^|]+)\|(.+)$/);
         if(link_part) {
             return [link_part[2], link_part[1]]
         } else {
@@ -203,7 +247,9 @@ function render_namumark(target) {
     });
 
     var link_list = [];
+    var file_list = [];
     var link_num = 0;
+    var file_num = 0;
     var category = '<div id="cate_all"><hr><div id="cate">Category : '
     data = data.replace(/\[\[((?:(?!]]).)+)]]/g, function(all, in_data) {
         if(in_data.match(/^(?:category|분류):/i)) {
@@ -211,7 +257,10 @@ function render_namumark(target) {
 
             return '';
         } else if(in_data.match(/^(?:file|파일):/i)) {
-
+            file_list.push([in_data.replace(/^(?:file|파일):/i, ''), 'file_' + String(file_num)]);
+            file_num += 1;
+            
+            return '<span id="file_' + String(file_num - 1) + '"></span>';
         } else if(in_data.match(/^http(?:s)?:\/\//i)) {
             var link_part = divi_link(in_data);
             
@@ -420,7 +469,7 @@ function render_namumark(target) {
         data += ref_data + '</ul>';
     }
 
-    i = 1;
+    var i = 1;
     while(1) {
         if(nowiki_list['nowiki_' + String(i)]) {
             data = data.replace('<span id="nowiki_' + String(i) + '"></span>', '<code>' + nowiki_list['nowiki_' + String(i)] + '</code>');
@@ -439,7 +488,7 @@ function render_namumark(target) {
 
     document.getElementById(target).innerHTML = data;
 
-    var i = 0;
+    i = 0;
     while(1) {
         if(math_list[i]) {
             try {
@@ -456,7 +505,7 @@ function render_namumark(target) {
         }
     }
 
-    var i = 0;
+    i = 0;
     while(1) {
         if(link_list[i]) {
             get_link_state(link_list[i]);
@@ -466,5 +515,17 @@ function render_namumark(target) {
             break;
         }
     }
+
+    i = 0;
+    while(1) {
+        if(file_list[i]) {
+            get_file_state(file_list[i]);
+
+            i += 1;
+        } else {
+            break;
+        }
+    }
+
     render_html("html_render_contect");    
 }

@@ -32,7 +32,7 @@ def func_upload_2(conn):
         if re.search('[^ㄱ-힣0-9a-zA-Z_\- ]', piece[0]):
             return re_error('/error/22')
 
-        e_data = sha224(piece[0]) + piece[1]
+        e_data = sha224_replace(piece[0]) + piece[1]
 
         curs.execute(db_change("select title from data where title = ?"), ['file:' + name])
         if curs.fetchall():
