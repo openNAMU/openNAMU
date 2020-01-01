@@ -10,7 +10,7 @@ def list_old_page_2(conn):
         sql_num = 0
 
     curs.execute(db_change('select data from other where name = "count_all_title"'))
-    if int(curs.fetchall()[0][0]) < 30000:
+    if int(curs.fetchall()[0][0]) > 30000:
         return re_error('/error/25')
 
     div = '<ul>'
