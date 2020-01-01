@@ -115,31 +115,12 @@ else:
     conn = sqlite3.connect(set_data['db'] + '.db', check_same_thread = False)
     curs = conn.cursor()
 
+load_conn(conn)
+
 if os.path.exists(set_data['db'] + '.db'):
     setup_tool = 0
 else:
     setup_tool = 1
-
-load_conn(conn)
-
-logging.basicConfig(level = logging.ERROR)
-
-app = flask.Flask(__name__, template_folder = './')
-app.config['JSON_AS_ASCII'] = False
-
-flask_reggie.Reggie(app)
-
-compress = flask_compress.Compress()
-compress.init_app(app)
-
-class EverythingConverter(werkzeug.routing.PathConverter):
-    regex = '.*?'
-
-app.jinja_env.filters['md5_replace'] = md5_replace
-app.jinja_env.filters['load_lang'] = load_lang
-app.jinja_env.filters['cut_100'] = cut_100
-
-app.url_map.converters['everything'] = EverythingConverter
 
 create_data = {}
 create_data['all_data'] = [
@@ -226,6 +207,25 @@ if setup_tool != 0:
     update()
 
 # Init
+logging.basicConfig(level = logging.ERROR)
+
+app = flask.Flask(__name__, template_folder = './')
+app.config['JSON_AS_ASCII'] = False
+
+flask_reggie.Reggie(app)
+
+compress = flask_compress.Compress()
+compress.init_app(app)
+
+class EverythingConverter(werkzeug.routing.PathConverter):
+    regex = '.*?'
+
+app.jinja_env.filters['md5_replace'] = md5_replace
+app.jinja_env.filters['load_lang'] = load_lang
+app.jinja_env.filters['cut_100'] = cut_100
+
+app.url_map.converters['everything'] = EverythingConverter
+
 curs.execute(db_change('select name from alist where acl = "owner"'))
 if not curs.fetchall():
     curs.execute(db_change('delete from alist where name = "owner"'))

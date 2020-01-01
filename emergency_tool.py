@@ -1,5 +1,7 @@
 from route.tool.func import *
 
+version_list = json.loads(open('version.json').read())
+
 # DB
 while 1:
     try:
@@ -99,6 +101,95 @@ else:
     curs = conn.cursor()
 
 load_conn(conn)
+
+if os.path.exists(set_data['db'] + '.db'):
+    setup_tool = 0
+else:
+    setup_tool = 1
+
+create_data = {}
+create_data['all_data'] = [
+    'data',
+    'cache_data',
+    'history',
+    'rd',
+    'user',
+    'user_set',
+    'ban',
+    'topic',
+    'rb',
+    'back',
+    'custom',
+    'other',
+    'alist',
+    're_admin',
+    'alarm',
+    'ua_d',
+    'filter',
+    'scan',
+    'acl',
+    'inter',
+    'html_filter',
+    'oauth_conn',
+]
+for i in create_data['all_data']:
+    try:
+        curs.execute(db_change('select test from ' + i + ' limit 1'))
+    except:
+        try:
+            curs.execute(db_change('create table ' + i + '(test longtext)'))
+        except:
+            curs.execute(db_change("alter table " + i + " add test longtext default ''"))
+
+if setup_tool == 0:
+    try:
+        curs.execute(db_change('select data from other where name = "ver"'))
+        ver_set_data = curs.fetchall()
+        if not ver_set_data:
+            setup_tool = 1
+        else:
+            if version_list['master']['c_ver'] > ver_set_data[0][0]:
+                setup_tool = 1
+    except:
+        setup_tool = 1
+
+if setup_tool != 0:
+    create_data['data'] = ['title', 'data']
+    create_data['cache_data'] = ['title', 'data']
+    create_data['history'] = ['id', 'title', 'data', 'date', 'ip', 'send', 'leng', 'hide', 'type']
+    create_data['rd'] = ['title', 'sub', 'date', 'band', 'stop', 'agree']
+    create_data['user'] = ['id', 'pw', 'acl', 'date', 'encode']
+    create_data['user_set'] = ['name', 'id', 'data']
+    create_data['ban'] = ['block', 'end', 'why', 'band', 'login']
+    create_data['topic'] = ['id', 'title', 'sub', 'data', 'date', 'ip', 'block', 'top', 'code']
+    create_data['rb'] = ['block', 'end', 'today', 'blocker', 'why', 'band']
+    create_data['back'] = ['title', 'link', 'type']
+    create_data['custom'] = ['user', 'css']
+    create_data['other'] = ['name', 'data', 'coverage']
+    create_data['alist'] = ['name', 'acl']
+    create_data['re_admin'] = ['who', 'what', 'time']
+    create_data['alarm'] = ['name', 'data', 'date']
+    create_data['ua_d'] = ['name', 'ip', 'ua', 'today', 'sub']
+    create_data['filter'] = ['name', 'regex', 'sub']
+    create_data['scan'] = ['user', 'title']
+    create_data['acl'] = ['title', 'decu', 'dis', 'view', 'why']
+    create_data['inter'] = ['title', 'link', 'icon']
+    create_data['html_filter'] = ['html', 'kind', 'plus']
+    create_data['oauth_conn'] = ['provider', 'wiki_id', 'sns_id', 'name', 'picture']
+
+    for create_table in create_data['all_data']:
+        for create in create_data[create_table]:
+            try:
+                curs.execute(db_change('select ' + create + ' from ' + create_table + ' limit 1'))
+            except:
+                curs.execute(db_change("alter table " + create_table + " add " + create + " longtext default ''"))
+
+            try:
+                curs.execute(db_change('create index index_' + create_table + '_' + create + ' on ' + create_table + '(' + create + ')'))
+            except:
+                pass
+
+    update()
 
 # Main
 print('----')
