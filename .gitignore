@@ -1,15 +1,18 @@
 __pycache__
 /app_session
+
 data/set.json
 data/mysql.json
-404.html
+
+images
 .vscode
 
 *.db
 *.db-journal
 
-images
 robots.txt
+custom.py
+404.html
 
 views/liberty
 views/buma

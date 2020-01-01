@@ -321,6 +321,11 @@ if not curs.fetchall():
 
 conn.commit()
 
+if os.path.exists('custom.py'):
+    from custom import custom_run
+
+    custom_run(conn, app)
+
 # Func
 @app.route('/del_alarm')
 def alarm_del():
