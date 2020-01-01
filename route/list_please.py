@@ -9,6 +9,10 @@ def list_please_2(conn):
     else:
         sql_num = 0
 
+    curs.execute(db_change('select data from other where name = "count_all_title"'))
+    if int(curs.fetchall()[0][0]) < 30000:
+        return re_error('/error/25')
+
     div = '<ul>'
 
     curs.execute(db_change("select distinct title from back where type = 'no' order by title asc limit ?, 50"), [sql_num])
