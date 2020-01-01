@@ -28,10 +28,6 @@ button {
     border-radius: 10px;
 }
 
-code {
-    background: gainsboro;
-}
-
 td {
     border: 1px solid gainsboro;
 }
@@ -427,4 +423,8 @@ div#last_edit {
     #search_input {
         width: calc(100% - 60px);
     }
+}
+
+#titlt_a {
+    color: initial;
 }

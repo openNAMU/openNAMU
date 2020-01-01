@@ -15,8 +15,8 @@ def login_register_2(conn):
         set_d = curs.fetchall()
         if set_d and set_d[0][0] == 'on':
             return re_error('/ban')
-    
-    if flask.request.method == 'POST': 
+
+    if flask.request.method == 'POST':
         if captcha_post(flask.request.form.get('g-recaptcha-response', '')) == 1:
             return re_error('/error/13')
         else:
@@ -30,7 +30,7 @@ def login_register_2(conn):
 
         if re.search('(?:[^A-Za-zㄱ-힣0-9 ])', flask.request.form.get('id', None)):
             return re_error('/error/8')
-            
+
         curs.execute(db_change('select html from html_filter where kind = "name"'))
         set_d = curs.fetchall()
         for i in set_d:
@@ -46,7 +46,7 @@ def login_register_2(conn):
             return re_error('/error/6')
 
         hashed = pw_encode(flask.request.form.get('pw', None))
-        
+
         curs.execute(db_change('select data from other where name = "email_have"'))
         sql_data = curs.fetchall()
         if sql_data and sql_data[0][0] != '':
@@ -72,29 +72,29 @@ def login_register_2(conn):
             ip = ip_check()
             agent = flask.request.headers.get('User-Agent')
 
-            curs.execute(db_change("insert into ua_d (name, ip, ua, today, sub) values (?, ?, ?, ?, '')"), [flask.request.form.get('id', None), ip, agent, get_time()])  
+            curs.execute(db_change("insert into ua_d (name, ip, ua, today, sub) values (?, ?, ?, ?, '')"), [flask.request.form.get('id', None), ip, agent, get_time()])
 
             flask.session['state'] = 1
             flask.session['id'] = flask.request.form.get('id', None)
             flask.session['head'] = ''
-                  
+
             conn.commit()
-            
+
             if first == 0:
                 return redirect('/change')
             else:
                 return redirect('/setting')
-    else:        
+    else:
         contract = ''
-        
+
         curs.execute(db_change('select data from other where name = "contract"'))
         data = curs.fetchall()
         if data and data[0][0] != '':
             contract = data[0][0] + '<hr class=\"main_hr\">'
-        
+
         http_warring = '<hr class=\"main_hr\"><span>' + load_lang('http_warring') + '</span>'
 
-        return easy_minify(flask.render_template(skin_check(),    
+        return easy_minify(flask.render_template(skin_check(),
             imp = [load_lang('register'), wiki_set(), custom(), other2([0, 0])],
             data =  '''
                     <form method="post">

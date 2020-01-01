@@ -43,13 +43,13 @@ def server_now_update_2(conn, r_ver):
             else:
                 print('Update error')
 
-        return easy_minify(flask.render_template(skin_check(), 
+        return easy_minify(flask.render_template(skin_check(),
             imp = [load_lang('update'), wiki_set(), custom(), other2([0, 0])],
             data = load_lang("update_error") + ' <a href="https://github.com/2DU/opennamu">(Github)</a>',
             menu = [['manager/1', load_lang('return')]]
         ))
     else:
-        return easy_minify(flask.render_template(skin_check(), 
+        return easy_minify(flask.render_template(skin_check(),
             imp = [load_lang('update'), wiki_set(), custom(), other2([0, 0])],
             data = load_lang('update_warring') + '''
                 <hr class=\"main_hr\">

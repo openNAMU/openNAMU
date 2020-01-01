@@ -1,0 +1,14 @@
+<div id="easter_egg"></div>
+<script>
+    var random_num = String(Math.floor(Math.random() * 3));
+    var random_code = '';
+    if(random_num === '2') {
+        random_code = 'Fsppuynb440';
+    } else if(random_num === '1') {
+        random_code = 'DbTIoBK9Wvo';
+    } else {
+        random_code = 'nytZOF0hp_c'
+    }
+
+    document.getElementById('easter_egg').innerHTML = '<iframe style="width: 560px; height: 315px;" src="https://www.youtube.com/embed/' + random_code + '" allowfullscreen></iframe>';
+</script>

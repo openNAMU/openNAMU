@@ -15,7 +15,7 @@ def give_user_ban_2(conn, name):
 
     if ban_check(ip = ip_check(), tool = 'login') == 1:
         return re_error('/ban')
-                
+
     if flask.request.method == 'POST':
         name = name if name else flask.request.form.get('name', 'test')
 
@@ -36,15 +36,15 @@ def give_user_ban_2(conn, name):
             type_d = None
 
         ban_insert(
-            name, 
-            end, 
-            flask.request.form.get('why', ''), 
-            flask.request.form.get('login', ''), 
+            name,
+            end,
+            flask.request.form.get('why', ''),
+            flask.request.form.get('login', ''),
             ip_check(),
             type_d
         )
 
-        return redirect('/block_log')     
+        return redirect('/block_log')
     else:
         if admin_check(1) != 1:
             return re_error('/error/3')
@@ -60,7 +60,7 @@ def give_user_ban_2(conn, name):
                 data = '<ul><li>' + load_lang('limitless') + '</li>'
             else:
                 data = '<ul><li>' + load_lang('period') + ' : ' + end[0][0] + '</li>'
-                
+
             curs.execute(db_change("select block from ban where block = ? and login = 'O'"), [name])
             if curs.fetchall():
                 data += '<li>' + load_lang('login_able') + '</li>'
@@ -72,14 +72,14 @@ def give_user_ban_2(conn, name):
         else:
             if name:
                 main_name = name
-                
+
                 if name and re.search("^([0-9]{1,3}\.[0-9]{1,3})$", name):
                     b_now = load_lang('band_ban')
                 else:
                     b_now = load_lang('ban')
 
                 now = ' (' + b_now + ')'
-                    
+
                 if name and ip_or_user(name) == 1:
                     plus = '<input type="checkbox" name="login"> ' + load_lang('login_able') + '<hr class=\"main_hr\">'
                 else:
@@ -94,7 +94,7 @@ def give_user_ban_2(conn, name):
                 plus = '<input type="checkbox" name="login"> ' + load_lang('login_able') + '<hr class=\"main_hr\">'
                 now = 0
                 b_now = load_lang('ban')
-                
+
             time_data = [
                 ['86400', load_lang('1_day')],
                 ['432000‬', load_lang('5_day')],
@@ -108,7 +108,7 @@ def give_user_ban_2(conn, name):
                 insert_data += '<a href="javascript:insert_v(\'second\', \'' + i[0] + '\')">(' + i[1] + ')</a> '
 
             data = name + '''
-                <script>function insert_v(name, data) { document.getElementById(name).value = data; }</script>''' + insert_data + '''                
+                <script>function insert_v(name, data) { document.getElementById(name).value = data; }</script>''' + insert_data + '''
                 <hr class=\"main_hr\">
                 <input placeholder="''' + load_lang('ban_period') + ''' (''' + load_lang('second') + ''')" name="second" id="second" type="text">
                 <hr class=\"main_hr\">
@@ -117,7 +117,7 @@ def give_user_ban_2(conn, name):
                 <hr class=\"main_hr\">
             ''' + plus
 
-        return easy_minify(flask.render_template(skin_check(), 
+        return easy_minify(flask.render_template(skin_check(),
             imp = [main_name, wiki_set(), custom(), other2([now, 0])],
             data = '''
                 <form method="post">

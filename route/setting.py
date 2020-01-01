@@ -15,67 +15,65 @@ def setting_2(conn, num):
             'robots.txt',
             'Google',
             load_lang('main_bottom_body'),
+            load_lang('main_acl_setting')
         ]
-        
+
         x = 0
-        
         li_data = ''
-        
+
         for li in li_list:
             x += 1
             li_data += '<li><a href="/setting/' + str(x) + '">' + li + '</a></li>'
 
-        return easy_minify(flask.render_template(skin_check(), 
+        return easy_minify(flask.render_template(skin_check(),
             imp = [load_lang('setting'), wiki_set(), custom(), other2([0, 0])],
             data = '<h2>' + load_lang('list') + '</h2><ul>' + li_data + '</ul>',
             menu = [['manager', load_lang('return')]]
         ))
     elif num == 1:
         i_list = {
-            0 : 'name', 
-            1 : 'logo', 
-            2 : 'frontpage', 
-            3 : 'license', 
-            4 : 'upload', 
-            5 : 'skin', 
-            6 : 'edit', 
-            7 : 'reg', 
-            8 : 'ip_view', 
-            9 : 'back_up', 
-            10 : 'port', 
-            11 : 'key', 
-            12 : 'update', 
-            13 : 'email_have', 
-            14 : 'discussion', 
-            15 : 'encode', 
-            16 : 'host'
+            0 : 'name',
+            1 : 'logo',
+            2 : 'frontpage',
+            3 : 'license',
+            4 : 'upload',
+            5 : 'skin',
+            7 : 'reg',
+            8 : 'ip_view',
+            9 : 'back_up',
+            10 : 'port',
+            11 : 'key',
+            12 : 'update',
+            13 : 'email_have',
+            15 : 'encode',
+            16 : 'host',
+            19 : 'slow_edit'
         }
         n_list = {
-            0 : 'Wiki', 
-            1 : '', 
-            2 : 'FrontPage', 
-            3 : 'CC 0', 
-            4 : '2', 
-            5 : '', 
-            6 : 'normal', 
-            7 : '', 
-            8 : '', 
-            9 : '0', 
-            10 : '3000', 
-            11 : 'test', 
-            12 : 'stable', 
-            13 : '', 
-            14 : 'normal', 
-            15 : 'sha3', 
-            16 : '0.0.0.0'
+            0 : 'Wiki',
+            1 : '',
+            2 : 'FrontPage',
+            3 : 'CC 0',
+            4 : '2',
+            5 : '',
+            7 : '',
+            8 : '',
+            9 : '0',
+            10 : '3000',
+            11 : 'test',
+            12 : 'stable',
+            13 : '',
+            15 : 'sha3',
+            16 : '0.0.0.0',
+            19 : '0'
         }
-        
+
         if flask.request.method == 'POST':
             for i in i_list:
                 curs.execute(db_change("update other set data = ? where name = ?"), [
-                    flask.request.form.get(i_list[i], n_list[i]), 
-                    i_list[i]]
-                )
+                    flask.request.form.get(i_list[i], n_list[i]),
+                    i_list[i]
+                ])
 
             conn.commit()
 
@@ -83,66 +81,49 @@ def setting_2(conn, num):
 
             return redirect('/setting/1')
         else:
-            d_list = []
-            
+            d_list = {}
+
             for i in i_list:
                 curs.execute(db_change('select data from other where name = ?'), [i_list[i]])
                 sql_d = curs.fetchall()
                 if sql_d:
-                    d_list += [sql_d[0][0]]
+                    d_list[i] = sql_d[0][0]
                 else:
                     curs.execute(db_change('insert into other (name, data) values (?, ?)'), [i_list[i], n_list[i]])
-                    
-                    d_list += [n_list[i]]
+
+                    d_list[i] = n_list[i]
 
             conn.commit()
-            
-            div = ''
-            acl_list = ['normal', 'user', 'admin', 'owner', '50_edit', 'email']
-            for i in acl_list:
-                if i == d_list[6]:
-                    div = '<option value="' + i + '">' + i + '</option>' + div
-                else:
-                    div += '<option value="' + i + '">' + i + '</option>'
 
-            div4 = ''
-            for i in acl_list:
-                if i == d_list[14]:
-                    div4 = '<option value="' + i + '">' + i + '</option>' + div4
-                else:
-                    div4 += '<option value="' + i + '">' + i + '</option>'
-
-            ch_1 = ''
-            if d_list[7]:
-                ch_1 = 'checked="checked"'
-
-            ch_2 = ''
-            if d_list[8]:
-                ch_2 = 'checked="checked"'
-            
-            ch_3 = ''
-            if d_list[13]:
-                ch_3 = 'checked="checked"'
-
-            div2 = load_skin(d_list[5])
-
-            div3 =''
-            if d_list[12] == 'stable':
-                div3 += '<option value="stable">stable</option>'
-                div3 += '<option value="master">master</option>'
-            else:
-                div3 += '<option value="master">master</option>'
-                div3 += '<option value="stable">stable</option>'
-                
-            div5 =''
+            acl_div = ['']
             encode_data = ['sha256', 'sha3']
-            for i in encode_data:
-                if d_list[15] == i:
-                    div5 = '<option value="' + i + '">' + i + '</option>' + div5
+            for acl_data in encode_data:
+                if acl_data == d_list[15]:
+                    acl_div[0] = '<option value="' + acl_data + '">' + acl_data + '</option>' + acl_div[0]
                 else:
-                    div5 += '<option value="' + i + '">' + i + '</option>'
+                    acl_div[0] += '<option value="' + acl_data + '">' + acl_data + '</option>'
 
-            return easy_minify(flask.render_template(skin_check(), 
+            check_box_div = ['', '', '']
+            for i in range(0, 3):
+                if i == 0:
+                    acl_num = 7
+                elif i == 1:
+                    acl_num = 8
+                else:
+                    acl_num = 13
+
+                if d_list[acl_num]:
+                    check_box_div[i] = 'checked="checked"'
+
+            branch_div =''
+            if d_list[12] == 'stable':
+                branch_div += '<option value="stable">stable</option>'
+                branch_div += '<option value="master">master</option>'
+            else:
+                branch_div += '<option value="master">master</option>'
+                branch_div += '<option value="stable">stable</option>'
+
+            return easy_minify(flask.render_template(skin_check(),
                 imp = [load_lang('main_setting'), wiki_set(), custom(), other2([0, 0])],
                 data = '''
                     <form method="post">
@@ -162,31 +143,23 @@ def setting_2(conn, num):
                         <hr class=\"main_hr\">
                         <input type="text" name="license" value="''' + html.escape(d_list[3]) + '''">
                         <hr class=\"main_hr\">
-                        <span>''' + load_lang('max_file_size') + ''' [MB]</span>
+                        <span>''' + load_lang('max_file_size') + ''' (MB)</span>
                         <hr class=\"main_hr\">
                         <input type="text" name="upload" value="''' + html.escape(d_list[4]) + '''">
                         <hr class=\"main_hr\">
-                        <span>''' + load_lang('backup_interval') + ' [' + load_lang('hour') + '''] (off : 0) {restart}</span>
+                        <span>''' + load_lang('backup_interval') + ' (' + load_lang('hour') + ') (' + load_lang('off') + ' : 0) (' + load_lang('sqlite_only') + ') (' + load_lang('restart_required') + ''')</span>
                         <hr class=\"main_hr\">
                         <input type="text" name="back_up" value="''' + html.escape(d_list[9]) + '''">
                         <hr class=\"main_hr\">
                         <span>''' + load_lang('wiki_skin') + '''</span>
                         <hr class=\"main_hr\">
-                        <select name="skin">''' + div2 + '''</select>
+                        <select name="skin">''' + load_skin(d_list[5]) + '''</select>
                         <hr class=\"main_hr\">
-                        <span>''' + load_lang('default_acl') + '</span> <a href="/acl/TEST">(' + load_lang('reference') + ''')</a>
+                        <input type="checkbox" name="reg" ''' + check_box_div[0] + '''> ''' + load_lang('no_register') + '''
                         <hr class=\"main_hr\">
-                        <select name="edit">''' + div + '''</select>
+                        <input type="checkbox" name="ip_view" ''' + check_box_div[1] + '''> ''' + load_lang('hide_ip') + '''
                         <hr class=\"main_hr\">
-                        <span>''' + load_lang('default_discussion_acl') + '''</span>
-                        <hr class=\"main_hr\">
-                        <select name="discussion">''' + div4 + '''</select>
-                        <hr class=\"main_hr\">
-                        <input type="checkbox" name="reg" ''' + ch_1 + '''> ''' + load_lang('no_register') + '''
-                        <hr class=\"main_hr\">
-                        <input type="checkbox" name="ip_view" ''' + ch_2 + '''> ''' + load_lang('hide_ip') + '''
-                        <hr class=\"main_hr\">
-                        <input type="checkbox" name="email_have" ''' + ch_3 + '''> ''' + load_lang('email_required') + ' <a href="/setting/6">{' + load_lang('google_imap_required') + '''}</a>
+                        <input type="checkbox" name="email_have" ''' + check_box_div[2] + '''> ''' + load_lang('email_required') + ' <a href="/setting/6">(' + load_lang('google_imap_required') + ''')</a>
                         <hr class=\"main_hr\">
                         <span>''' + load_lang('wiki_host') + '''</span>
                         <hr class=\"main_hr\">
@@ -202,11 +175,15 @@ def setting_2(conn, num):
                         <hr class=\"main_hr\">
                         <span>''' + load_lang('update_branch') + '''</span>
                         <hr class=\"main_hr\">
-                        <select name="update">''' + div3 + '''</select>
+                        <select name="update">''' + branch_div + '''</select>
                         <hr class=\"main_hr\">
                         <span>''' + load_lang('encryption_method') + '''</span>
                         <hr class=\"main_hr\">
-                        <select name="encode">''' + div5 + '''</select>
+                        <select name="encode">''' + acl_div[0] + '''</select>
+                        <hr class=\"main_hr\">
+                        <span>''' + load_lang('slow_edit') + ' (' + load_lang('second') + ') (' + load_lang('off') + ''' : 0)</span>
+                        <hr class=\"main_hr\">
+                        <input name="''' + i_list[19] + '''" value="''' + html.escape(d_list[19]) + '''">
                         <hr class=\"main_hr\">
                         <button id="save" type="submit">''' + load_lang('save') + '''</button>
                     </form>
@@ -215,8 +192,8 @@ def setting_2(conn, num):
             ))
     elif num == 2:
         i_list = [
-            'contract', 
-            'no_login_warring', 
+            'contract',
+            'no_login_warring',
             'edit_bottom_text',
             'check_key_text',
             'email_title',
@@ -231,18 +208,18 @@ def setting_2(conn, num):
         if flask.request.method == 'POST':
             for i in i_list:
                 curs.execute(db_change("update other set data = ? where name = ?"), [
-                    flask.request.form.get(i, ''), 
+                    flask.request.form.get(i, ''),
                     i
                 ])
 
             conn.commit()
-            
+
             admin_check(None, 'edit_set')
 
             return redirect('/setting/2')
         else:
             d_list = []
-            
+
             for i in i_list:
                 curs.execute(db_change('select data from other where name = ?'), [i])
                 sql_d = curs.fetchall()
@@ -250,12 +227,12 @@ def setting_2(conn, num):
                     d_list += [sql_d[0][0]]
                 else:
                     curs.execute(db_change('insert into other (name, data) values (?, ?)'), [i, ''])
-                    
+
                     d_list += ['']
 
             conn.commit()
 
-            return easy_minify(flask.render_template(skin_check(), 
+            return easy_minify(flask.render_template(skin_check(),
                 imp = [load_lang('text_setting'), wiki_set(), custom(), other2([0, 0])],
                 data = '''
                     <form method="post">
@@ -329,7 +306,7 @@ def setting_2(conn, num):
                     coverage = ''
                 else:
                     coverage = flask.request.args.get('skin', '')
-                
+
             curs.execute(db_change("select name from other where name = ? and coverage = ?"), [info_d, coverage])
             if curs.fetchall():
                 curs.execute(db_change("update other set data = ? where name = ? and coverage = ?"), [
@@ -339,7 +316,7 @@ def setting_2(conn, num):
                 ])
             else:
                 curs.execute(db_change("insert into other (name, data, coverage) values (?, ?, ?)"), [info_d, flask.request.form.get('content', ''), coverage])
-            
+
             conn.commit()
 
             admin_check(None, 'edit_set')
@@ -350,35 +327,52 @@ def setting_2(conn, num):
                 curs.execute(db_change("select data from other where name = 'body'"))
                 title = '_body'
                 start = ''
+                plus = '''
+                    <button id="preview" type="button" onclick="load_raw_preview(\'content\', \'see_preview\')">''' + load_lang('preview') + '''</button>
+                    <hr class=\"main_hr\">
+                    <div id="see_preview"></div>
+                '''
             elif num == 7:
                 curs.execute(db_change("select data from other where name = 'bottom_body'"))
                 title = '_bottom_body'
                 start = ''
+                plus = '''
+                    <button id="preview" type="button" onclick="load_raw_preview(\'content\', \'see_preview\')">''' + load_lang('preview') + '''</button>
+                    <hr class=\"main_hr\">
+                    <div id="see_preview"></div>
+                '''
             else:
                 curs.execute(db_change("select data from other where name = 'head' and coverage = ?"), [flask.request.args.get('skin', '')])
                 title = '_head'
-                start = '<a href="?">(' + load_lang('all') + ')</a> ' + \
-                ' '.join(['<a href="?skin=' + i + '">(' + i + ')</a>' for i in load_skin('', 1)]) + \
-                '''
+                start = '' + \
+                    '<a href="?">(' + load_lang('all') + ')</a> ' + \
+                    ' '.join(['<a href="?skin=' + i + '">(' + i + ')</a>' for i in load_skin('', 1)]) + '''
                     <hr class=\"main_hr\">
                     <span>&lt;style&gt;CSS&lt;/style&gt;<br>&lt;script&gt;JS&lt;/script&gt;</span>
                     <hr class=\"main_hr\">
                 '''
-                
+                plus = ''
+
             head = curs.fetchall()
             if head:
                 data = head[0][0]
             else:
                 data = ''
 
-            return easy_minify(flask.render_template(skin_check(), 
-                imp = [load_lang(data = 'main' + title, safe = 1), wiki_set(), custom(), other2([0, 0])],
+            if flask.request.args.get('skin', '') != '':
+                sub_plus = ' (' + flask.request.args.get('skin', '') + ')'
+            else:
+                sub_plus = ''
+
+            return easy_minify(flask.render_template(skin_check(),
+                imp = [load_lang(data = 'main' + title, safe = 1), wiki_set(), custom(), other2([' (HTML)' + sub_plus, 0])],
                 data = '''
                     <form method="post">
                         ''' + start + '''
-                        <textarea rows="25" name="content">''' + html.escape(data) + '''</textarea>
+                        <textarea rows="25" name="content" id="content">''' + html.escape(data) + '''</textarea>
                         <hr class=\"main_hr\">
                         <button id="save" type="submit">''' + load_lang('save') + '''</button>
+                        ''' + plus + '''
                     </form>
                 ''',
                 menu = [['setting', load_lang('return')]]
@@ -390,16 +384,16 @@ def setting_2(conn, num):
                 curs.execute(db_change("update other set data = ? where name = 'robot'"), [flask.request.form.get('content', '')])
             else:
                 curs.execute(db_change("insert into other (name, data) values ('robot', ?)"), [flask.request.form.get('content', '')])
-            
+
             conn.commit()
-            
+
             fw = open('./robots.txt', 'w')
             fw.write(re.sub('\r\n', '\n', flask.request.form.get('content', '')))
             fw.close()
-            
+
             admin_check(None, 'edit_set')
 
-            return redirect('/setting/4')
+            return redirect('/setting/5')
         else:
             if not os.path.exists('robots.txt'):
                 curs.execute(db_change('select data from other where name = "robot"'))
@@ -429,7 +423,7 @@ def setting_2(conn, num):
             if not data or data == '':
                 data = ''.join(lines)
 
-            return easy_minify(flask.render_template(skin_check(), 
+            return easy_minify(flask.render_template(skin_check(),
                 imp = ['robots.txt', wiki_set(), custom(), other2([0, 0])],
                 data = '''
                     <a href="/robots.txt">(''' + load_lang('view') + ''')</a>
@@ -444,9 +438,9 @@ def setting_2(conn, num):
             ))
     elif num == 6:
         i_list = [
-            'recaptcha', 
-            'sec_re', 
-            'g_email', 
+            'recaptcha',
+            'sec_re',
+            'g_email',
             'g_pass'
         ]
 
@@ -460,15 +454,15 @@ def setting_2(conn, num):
                 curs.execute(db_change("update other set data = ? where name = ?"), [into_data, data])
 
             conn.commit()
-            
+
             admin_check(None, 'edit_set')
 
             return redirect('/setting/6')
         else:
             d_list = []
-            
+
             x = 0
-            
+
             for i in i_list:
                 curs.execute(db_change('select data from other where name = ?'), [i])
                 sql_d = curs.fetchall()
@@ -476,27 +470,27 @@ def setting_2(conn, num):
                     d_list += [sql_d[0][0]]
                 else:
                     curs.execute(db_change('insert into other (name, data) values (?, ?)'), [i, ''])
-                    
+
                     d_list += ['']
 
                 x += 1
 
             conn.commit()
 
-            return easy_minify(flask.render_template(skin_check(), 
+            return easy_minify(flask.render_template(skin_check(),
                 imp = ['Google', wiki_set(), custom(), other2([0, 0])],
                 data = '''
                     <form method="post">
-                        <h2><a href="https://www.google.com/recaptcha/admin">recaptcha</a></h2>
-                        <span>''' + load_lang('recaptcha') + ''' (HTML)</span>
+                        <h2><a href="https://www.google.com/recaptcha/admin">''' + load_lang('recaptcha') + '''</a></h2>
+                        <span>HTML</span>
                         <hr class=\"main_hr\">
-                        <input name="recaptcha" value="''' + html.escape(d_list[0]) + '''">
+                        <input name="recaptcha" placeholder='&lt;div class="g-recaptcha" data-sitekey="''' + load_lang('public_key') + '''"&gt;&lt;/div&gt;' value="''' + html.escape(d_list[0]) + '''">
                         <hr class=\"main_hr\">
-                        <span>''' + load_lang('recaptcha') + ' (' + load_lang('secret_key') + ''')</span>
+                        <span>''' + load_lang('secret_key') + '''</span>
                         <hr class=\"main_hr\">
                         <input name="sec_re" value="''' + html.escape(d_list[1]) + '''">
                         <hr class=\"main_hr\">
-                        <h2><a href="https://support.google.com/mail/answer/7126229">''' + load_lang('google_imap') + '</a> {' + load_lang('restart_required') + '''}</h1>
+                        <h2><a href="https://support.google.com/mail/answer/7126229">''' + load_lang('google_imap') + '</a> (' + load_lang('restart_required') + ''')</h1>
                         <span>''' + load_lang('google_email') + '''</span>
                         <hr class=\"main_hr\">
                         <input name="g_email" value="''' + html.escape(d_list[2]) + '''">
@@ -504,6 +498,87 @@ def setting_2(conn, num):
                         <span><a href="https://security.google.com/settings/security/apppasswords">''' + load_lang('google_app_password') + '''</a></span>
                         <hr class=\"main_hr\">
                         <input type="password" name="g_pass" value="''' + html.escape(d_list[3]) + '''">
+                        <hr class=\"main_hr\">
+                        <button id="save" type="submit">''' + load_lang('save') + '''</button>
+                    </form>
+                ''',
+                menu = [['setting', load_lang('return')]]
+            ))
+    elif num == 8:
+        i_list = {
+            1 : 'edit',
+            2 : 'discussion',
+            3 : 'upload_acl',
+            4 : 'all_view_acl',
+            5 : 'edit_req_acl'
+        }
+        n_list = {
+            1 : 'normal',
+            2 : 'normal',
+            3 : 'normal',
+            4 : 'normal',
+            5 : 'normal'
+        }
+
+        if flask.request.method == 'POST':
+            for i in i_list:
+                curs.execute(db_change("update other set data = ? where name = ?"), [
+                    flask.request.form.get(i_list[i], n_list[i]),
+                    i_list[i]
+                ])
+
+            conn.commit()
+
+            admin_check(None, 'edit_set')
+
+            return redirect('/setting/8')
+        else:
+            d_list = {}
+
+            for i in i_list:
+                curs.execute(db_change('select data from other where name = ?'), [i_list[i]])
+                sql_d = curs.fetchall()
+                if sql_d:
+                    d_list[i] = sql_d[0][0]
+                else:
+                    curs.execute(db_change('insert into other (name, data) values (?, ?)'), [i_list[i], n_list[i]])
+
+                    d_list[i] = n_list[i]
+
+            conn.commit()
+
+            acl_div = ['', '', '', '', '']
+            acl_list = ['normal', 'user', 'admin', 'owner', '50_edit', 'email']
+            for i in range(0, 5):
+                for acl_data in acl_list:
+                    if acl_data == d_list[i + 1]:
+                        acl_div[i] = '<option value="' + acl_data + '">' + acl_data + '</option>' + acl_div[i]
+                    else:
+                        acl_div[i] += '<option value="' + acl_data + '">' + acl_data + '</option>'
+
+            return easy_minify(flask.render_template(skin_check(),
+                imp = [load_lang('main_acl_setting'), wiki_set(), custom(), other2([0, 0])],
+                data = '''
+                    <form method="post">
+                        <span>''' + load_lang('document_acl') + '</span> <a href="/acl/TEST">(' + load_lang('reference') + ''')</a>
+                        <hr class=\"main_hr\">
+                        <select name="edit">''' + acl_div[0] + '''</select>
+                        <hr class=\"main_hr\">
+                        <span>''' + load_lang('discussion_acl') + '''</span>
+                        <hr class=\"main_hr\">
+                        <select name="discussion">''' + acl_div[1] + '''</select>
+                        <hr class=\"main_hr\">
+                        <span>''' + load_lang('upload_acl') + '''</span>
+                        <hr class=\"main_hr\">
+                        <select name="upload_acl">''' + acl_div[2] + '''</select>
+                        <hr class=\"main_hr\">
+                        <span>''' + load_lang('view_acl') + '''</span>
+                        <hr class=\"main_hr\">
+                        <select name="all_view_acl">''' + acl_div[3] + '''</select>
+                        <hr class=\"main_hr\">
+                        <span>''' + load_lang('edit_req_acl') + '''</span>
+                        <hr class=\"main_hr\">
+                        <select name="edit_req_acl">''' + acl_div[4] + '''</select>
                         <hr class=\"main_hr\">
                         <button id="save" type="submit">''' + load_lang('save') + '''</button>
                     </form>

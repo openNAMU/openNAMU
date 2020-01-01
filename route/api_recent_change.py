@@ -14,7 +14,7 @@ def api_recent_change_2(conn):
     if page * num > 0:
         page = page * num - num
     else:
-        page = 0   
+        page = 0
 
     curs.execute(db_change('' + \
         'select id, title, date, ip, send, leng from history ' + \

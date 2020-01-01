@@ -2,7 +2,7 @@ from .tool.func import *
 
 def inter_wiki_2(conn, tools):
     curs = conn.cursor()
-    
+
     div = ''
     admin = admin_check()
 
@@ -17,15 +17,14 @@ def inter_wiki_2(conn, tools):
         del_link = 'del_email_filter'
         plus_link = 'plus_email_filter'
         title = load_lang('email_filter_list')
-        div =   '''
-                <ul>
-                    <li>gmail.com</li>
-                    <li>naver.com</li>
-                    <li>daum.net</li>
-                    <li>hanmail.net</li>
-                    <li>hanmail2.net</li>
-                </ul>
-                '''
+        div = '''
+            <ul>
+                <li>gmail.com</li>
+                <li>naver.com</li>
+                <li>daum.net</li>
+                <li>kakao.com</li>
+            </ul>
+        '''
 
         curs.execute(db_change("select html from html_filter where kind = 'email'"))
     elif tools == 'name_filter':
@@ -55,14 +54,14 @@ def inter_wiki_2(conn, tools):
         title = load_lang('file_filter_list')
         div = ''
 
-        curs.execute(db_change("select html from html_filter where kind = 'file'"))  
+        curs.execute(db_change("select html from html_filter where kind = 'file'"))
     elif tools == 'image_license':
         del_link = 'del_image_license'
         plus_link = 'plus_image_license'
         title = load_lang('image_license_list')
         div = ''
 
-        curs.execute(db_change("select html from html_filter where kind = 'image_license'"))  
+        curs.execute(db_change("select html from html_filter where kind = 'image_license'"))
     else:
         del_link = 'del_edit_top'
         plus_link = 'plus_edit_top'
@@ -87,6 +86,7 @@ def inter_wiki_2(conn, tools):
                     div += ' : ' + data[1]
 
             if admin == 1:
+                div += ' <a href="/' + plus_link + '/' + url_pas(data[0]) + '">(' + load_lang('edit') + ')</a>'
                 div += ' <a href="/' + del_link + '/' + url_pas(data[0]) + '">(' + load_lang('delete') + ')</a>'
 
             div += '</li>'
@@ -99,8 +99,8 @@ def inter_wiki_2(conn, tools):
         if admin == 1:
             div += '<a href="/' + plus_link + '">(' + load_lang('add') + ')</a>'
 
-    return easy_minify(flask.render_template(skin_check(), 
+    return easy_minify(flask.render_template(skin_check(),
         imp = [title, wiki_set(), custom(), other2([0, 0])],
         data = div,
-        menu = [['other', load_lang('return')]]
+        menu = [['manager/1', load_lang('return')]]
     ))

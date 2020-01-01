@@ -10,7 +10,7 @@ def setting_oauth_2(conn):
         try:
             facebook_client_id = flask.request.form['facebook_client_id']
             facebook_client_secret = flask.request.form['facebook_client_secret']
-            
+
             naver_client_id = flask.request.form['naver_client_id']
             naver_client_secret = flask.request.form['naver_client_secret']
         except:
@@ -42,7 +42,7 @@ def setting_oauth_2(conn):
                     }
                 }
             ''')
-        
+
         return flask.redirect('/oauth_setting')
 
     oauth_supported = load_oauth('_README')['support']
@@ -56,7 +56,7 @@ def setting_oauth_2(conn):
                     target_box.checked = true;
                 } else {
                     target_box.checked = false;
-                } 
+                }
             }
         </script>
     '''
@@ -81,18 +81,18 @@ def setting_oauth_2(conn):
             '''.format(
                 oauth_supported[i],
                 load_target,
-                oauth_supported[i], 
-                load_target, 
-                oauth_supported[i], 
-                load_target, 
-                oauth_supported[i], 
-                load_target, 
+                oauth_supported[i],
+                load_target,
+                oauth_supported[i],
+                load_target,
+                oauth_supported[i],
+                load_target,
                 oauth_data['client_{}'.format(load_target)]
             )
-    
+
     body_content += '<button id="save" type="submit">' + load_lang('save') + '</button></form>'
     body_content += '<script>' + init_js + '</script>'
-    
+
     return easy_minify(flask.render_template(skin_check(),
         imp = [load_lang('oauth_setting'), wiki_set(), custom(), other2([0, 0])],
         data = body_content,

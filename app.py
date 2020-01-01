@@ -32,13 +32,13 @@ while 1:
             break
     except:
         if os.getenv('NAMU_DB') != None or os.getenv('NAMU_DB_TYPE') != None:
-            set_data = { 
-                "db" : os.getenv('NAMU_DB') if os.getenv('NAMU_DB') else 'data', 
+            set_data = {
+                "db" : os.getenv('NAMU_DB') if os.getenv('NAMU_DB') else 'data',
                 "db_type" : os.getenv('NAMU_DB_TYPE') if os.getenv('NAMU_DB_TYPE') else 'sqlite'
             }
 
             break
-        else:        
+        else:
             new_json = ['', '']
             normal_db_type = ['sqlite', 'mysql']
 
@@ -61,14 +61,14 @@ while 1:
             new_json[1] = str(input())
             if new_json[1] == '':
                 new_json[1] = 'data'
-                
+
             with open('data/set.json', 'w') as f:
                 f.write('{ "db" : "' + new_json[1] + '", "db_type" : "' + new_json[0] + '" }')
-                
+
             set_data = json.loads(open('data/set.json').read())
-            
+
             break
-        
+
 print('DB name : ' + set_data['db'])
 print('DB type : ' + set_data['db_type'])
 
@@ -94,12 +94,12 @@ if set_data['db_type'] == 'mysql':
 
         with open('data/mysql.json', 'w') as f:
             f.write('{ "user" : "' + new_json[0] + '", "password" : "' + new_json[1] + '" }')
-                
+
         set_data_mysql = json.loads(open('data/mysql.json').read())
 
     conn = pymysql.connect(
-        host = 'localhost', 
-        user = set_data_mysql['user'], 
+        host = 'localhost',
+        user = set_data_mysql['user'],
         password = set_data_mysql['password'],
         charset = 'utf8mb4'
     )
@@ -114,7 +114,7 @@ if set_data['db_type'] == 'mysql':
 else:
     conn = sqlite3.connect(set_data['db'] + '.db', check_same_thread = False)
     curs = conn.cursor()
-            
+
 if os.path.exists(set_data['db'] + '.db'):
     setup_tool = 0
 else:
@@ -138,34 +138,33 @@ class EverythingConverter(werkzeug.routing.PathConverter):
 app.jinja_env.filters['md5_replace'] = md5_replace
 app.jinja_env.filters['load_lang'] = load_lang
 app.jinja_env.filters['cut_100'] = cut_100
-app.jinja_env.filters['change_space'] = change_space
 
 app.url_map.converters['everything'] = EverythingConverter
 
 create_data = {}
 create_data['all_data'] = [
-    'data', 
-    'cache_data', 
-    'history', 
-    'rd', 
+    'data',
+    'cache_data',
+    'history',
+    'rd',
     'user',
     'user_set',
-    'ban', 
-    'topic', 
-    'rb', 
-    'back', 
-    'custom', 
-    'other', 
-    'alist', 
-    're_admin', 
-    'alarm', 
-    'ua_d', 
-    'filter', 
-    'scan', 
-    'acl', 
-    'inter', 
+    'ban',
+    'topic',
+    'rb',
+    'back',
+    'custom',
+    'other',
+    'alist',
+    're_admin',
+    'alarm',
+    'ua_d',
+    'filter',
+    'scan',
+    'acl',
+    'inter',
     'html_filter',
-    'oauth_conn'
+    'oauth_conn',
 ]
 for i in create_data['all_data']:
     try:
@@ -193,7 +192,7 @@ if setup_tool != 0:
     create_data['user'] = ['id', 'pw', 'acl', 'date', 'encode']
     create_data['user_set'] = ['name', 'id', 'data']
     create_data['ban'] = ['block', 'end', 'why', 'band', 'login']
-    create_data['topic'] = ['id', 'title', 'sub', 'data', 'date', 'ip', 'block', 'top']
+    create_data['topic'] = ['id', 'title', 'sub', 'data', 'date', 'ip', 'block', 'top', 'code']
     create_data['rb'] = ['block', 'end', 'today', 'blocker', 'why', 'band']
     create_data['back'] = ['title', 'link', 'type']
     create_data['custom'] = ['user', 'css']
@@ -216,6 +215,11 @@ if setup_tool != 0:
             except:
                 curs.execute(db_change("alter table " + create_table + " add " + create + " longtext default ''"))
 
+            try:
+                curs.execute(db_change('create index index_' + create_table + '_' + create + ' on ' + create_table + '(' + create + ')'))
+            except:
+                pass
+
     update()
 
 # Init
@@ -226,7 +230,7 @@ if not curs.fetchall():
 
 if not os.path.exists(app_var['path_data_image']):
     os.makedirs(app_var['path_data_image'])
-    
+
 if not os.path.exists('views'):
     os.makedirs('views')
 
@@ -241,14 +245,14 @@ for i in range(len(server_set_key)):
     server_set_val = curs.fetchall()
     if not server_set_val:
         server_set_val = server_init.init(server_set_key[i])
-        
+
         curs.execute(db_change('insert into other (name, data) values (?, ?)'), [server_set_key[i], server_set_val])
         conn.commit()
     else:
         server_set_val = server_set_val[0][0]
-    
+
     print(dislay_set_key[i] + ' : ' + server_set_val)
-    
+
     server_set[server_set_key[i]] = server_set_val
 
 curs.execute(db_change('select data from other where name = "key"'))
@@ -269,32 +273,33 @@ if not adsense_result:
 curs.execute(db_change('delete from other where name = "ver"'))
 curs.execute(db_change('insert into other (name, data) values ("ver", ?)'), [version_list['master']['c_ver']])
 
-def back_up():
-    print('----')
+if set_data['db_type'] == 'sqlite':
+    def back_up():
+        print('----')
+        try:
+            shutil.copyfile(set_data['db'] + '.db', 'back_' + set_data['db'] + '.db')
+
+            print('Back up : OK')
+        except:
+            print('Back up : Error')
+
+        threading.Timer(60 * 60 * back_time, back_up).start()
+
     try:
-        shutil.copyfile(set_data['db'] + '.db', 'back_' + set_data['db'] + '.db')
-        
-        print('Back up : OK')
+        curs.execute(db_change('select data from other where name = "back_up"'))
+        back_up_time = curs.fetchall()
+
+        back_time = int(back_up_time[0][0])
     except:
-        print('Back up : Error')
+        back_time = 0
 
-    threading.Timer(60 * 60 * back_time, back_up).start()
+    print('----')
+    if back_time != 0:
+        print('Back up state : ' + str(back_time) + ' hours')
 
-try:
-    curs.execute(db_change('select data from other where name = "back_up"'))
-    back_up_time = curs.fetchall()
-    
-    back_time = int(back_up_time[0][0])
-except:
-    back_time = 0
-    
-print('----')
-if back_time != 0:
-    print('Back up state : ' + str(back_time) + ' hours')
-    
-    back_up()
-else:
-    print('Back up state : Turn off')
+        back_up()
+    else:
+        print('Back up state : Turn off')
 
 if set_data['db_type'] == 'mysql':
     def mysql_dont_off():
@@ -307,29 +312,11 @@ if set_data['db_type'] == 'mysql':
 
     mysql_dont_off()
 
-conn.commit()
-
-def count_all_title():
-    curs.execute(db_change("select count(title) from data"))
-    count_data = curs.fetchall()
-    if count_data:
-        count_data = count_data[0][0]
-    else:
-        count_data = 0
-
-    curs.execute(db_change('delete from other where name = "count_all_title"'))
-    curs.execute(db_change('insert into other (name, data) values ("count_all_title", ?)'), [str(count_data)])
-
-    conn.commit()
-
-    threading.Timer(60 * 60 * 24, count_all_title).start()
-
 curs.execute(db_change('select data from other where name = "count_all_title"'))
-all_title = curs.fetchall()
-if not all_title:
+if not curs.fetchall():
     curs.execute(db_change('insert into other (name, data) values ("count_all_title", "0")'))
 
-count_all_title()  
+conn.commit()
 
 # Func
 @app.route('/del_alarm')
@@ -349,7 +336,7 @@ def inter_wiki_del(tools = None, name = None):
     return inter_wiki_del_2(conn, tools, name)
 
 @app.route('/<regex("plus_(?:inter_wiki|edit_top|image_license|(?:edit|email|file|name)_filter)"):tools>', methods=['POST', 'GET'])
-@app.route('/<regex("plus_edit_filter"):tools>/<name>', methods=['POST', 'GET'])
+@app.route('/<regex("plus_(?:inter_wiki|edit_top|image_license|(?:edit|email|file|name|edit)_filter)"):tools>/<name>', methods=['POST', 'GET'])
 def inter_wiki_plus(tools = None, name = None):
     return inter_wiki_plus_2(conn, tools, name)
 
@@ -373,15 +360,19 @@ def list_acl():
 @app.route('/admin_plus/<name>', methods=['POST', 'GET'])
 def give_admin_groups(name = None):
     return give_admin_groups_2(conn, name)
-        
+
 @app.route('/admin_list')
 def list_admin():
     return list_admin_2(conn)
-        
+
 @app.route('/hidden/<everything:name>')
 def give_history_hidden(name = None):
     return give_history_hidden_2(conn, name)
-        
+
+@app.route('/add_history/<everything:name>', methods=['POST', 'GET'])
+def give_history_add(name = None):
+    return give_history_add_2(conn, name)
+
 @app.route('/user_log')
 def list_user():
     return list_user_2(conn)
@@ -393,10 +384,6 @@ def list_admin_use():
 @app.route('/give_log')
 def list_give():
     return list_give_2(conn)
-
-@app.route('/indexing', methods=['POST', 'GET'])
-def server_indexing():
-    return server_indexing_2(conn, set_data['db_type'])       
 
 @app.route('/restart', methods=['POST', 'GET'])
 def server_restart():
@@ -413,7 +400,7 @@ def setting_oauth():
 @app.route('/adsense_setting', methods=['GET', 'POST'])
 def setting_adsense():
     return setting_adsense_2(conn)
-        
+
 @app.route('/xref/<everything:name>')
 def view_xref(name = None):
     return view_xref_2(conn, name)
@@ -421,7 +408,7 @@ def view_xref(name = None):
 @app.route('/please')
 def list_please():
     return list_please_2(conn)
-        
+
 @app.route('/recent_discuss')
 def recent_discuss():
     return recent_discuss_2(conn)
@@ -430,7 +417,7 @@ def recent_discuss():
 @app.route('/<regex("block_user|block_admin"):tool>/<name>')
 def list_block(name = None, tool = None):
     return list_block_2(conn, name, tool)
-            
+
 @app.route('/search', methods=['POST'])
 def search():
     return search_2(conn)
@@ -443,24 +430,32 @@ def search_goto(name = 'test'):
 @app.route('/search/<everything:name>')
 def search_deep(name = 'test'):
     return search_deep_2(conn, name)
-         
+
 @app.route('/raw/<everything:name>')
-@app.route('/topic/<everything:name>/sub/<sub_title>/raw/<int:num>')
-def view_raw(name = None, sub_title = None, num = None):
-    return view_raw_2(conn, name, sub_title, num)
-        
+@app.route('/thread/<int:topic_num>/raw/<int:num>')
+def view_raw(name = None, topic_num = None, num = None):
+    return view_raw_2(conn, name, topic_num, num)
+
 @app.route('/revert/<everything:name>', methods=['POST', 'GET'])
 def edit_revert(name = None):
     return edit_revert_2(conn, name)
 
 @app.route('/edit/<everything:name>', methods=['POST', 'GET'])
-def edit(name = None):
+def edit(name = 'Test'):
     return edit_2(conn, name)
-        
+
+@app.route('/edit_req/<everything:name>', methods=['POST', 'GET'])
+def edit_req(name = 'Test'):
+    return edit_req_2(conn, name)
+
 @app.route('/delete/<everything:name>', methods=['POST', 'GET'])
 def edit_delete(name = None):
-    return edit_delete_2(conn, name, app_var)        
-            
+    return edit_delete_2(conn, name, app_var)
+
+@app.route('/many_delete', methods=['POST', 'GET'])
+def edit_many_delete(name = None):
+    return edit_many_delete_2(conn, app_var)
+
 @app.route('/move/<everything:name>', methods=['POST', 'GET'])
 def edit_move(name = None):
     return edit_move_2(conn, name)
@@ -468,49 +463,52 @@ def edit_move(name = None):
 @app.route('/other')
 def main_other():
     return main_other_2(conn)
-    
+
 @app.route('/manager', methods=['POST', 'GET'])
 @app.route('/manager/<int:num>', methods=['POST', 'GET'])
 def main_manager(num = 1):
-    return main_manager_2(conn, num, version_list['master']['r_ver'], set_data['db_type'])
-        
+    return main_manager_2(conn, num, version_list['master']['r_ver'])
+
 @app.route('/title_index')
 def list_title_index():
     return list_title_index_2(conn)
-                
-@app.route('/topic/<everything:name>/sub/<sub>/b/<int:num>')
-def topic_block(name = None, sub = None, num = 1):
-    return topic_block_2(conn, name, sub, num)
-        
-@app.route('/topic/<everything:name>/sub/<sub>/notice/<int:num>')
-def topic_top(name = None, sub = None, num = 1):
-    return topic_top_2(conn, name, sub, num)
-                
-@app.route('/topic/<everything:name>/sub/<sub>/setting', methods=['POST', 'GET'])
-def topic_stop(name = None, sub = None):
-    return topic_stop_2(conn, name, sub)
 
-@app.route('/topic/<everything:name>/sub/<sub>/tool')
-def topic_tool(name = None, sub = None):
-    return topic_tool_2(conn, name, sub)
+@app.route('/thread/<int:topic_num>/b/<int:num>')
+def topic_block(topic_num = 1, num = 1):
+    return topic_block_2(conn, topic_num, num)
 
-@app.route('/topic/<everything:name>/sub/<sub>/admin/<int:num>')
-def topic_admin(name = None, sub = None, num = 1):
-    return topic_admin_2(conn, name, sub, num)
+@app.route('/thread/<int:topic_num>/notice/<int:num>')
+def topic_top(topic_num = 1, num = 1):
+    return topic_top_2(conn, topic_num, num)
 
-@app.route('/topic/<everything:name>/sub/<sub>', methods=['POST', 'GET'])
-def topic(name = None, sub = None):
-    return topic_2(conn, name, sub)
-        
+@app.route('/thread/<int:topic_num>/setting', methods=['POST', 'GET'])
+def topic_stop(topic_num = 1):
+    return topic_stop_2(conn, topic_num)
+
+@app.route('/thread/<int:topic_num>/delete', methods=['POST', 'GET'])
+def topic_delete(topic_num = 1):
+    return topic_delete_2(conn, topic_num)
+
+@app.route('/thread/<int:topic_num>/tool')
+def topic_tool(topic_num = 1):
+    return topic_tool_2(conn, topic_num)
+
+@app.route('/thread/<int:topic_num>/admin/<int:num>')
+def topic_admin(topic_num = 1, num = 1):
+    return topic_admin_2(conn, topic_num, num)
+
+@app.route('/thread/<int:topic_num>', methods=['POST', 'GET'])
+def topic(topic_num = 1):
+    return topic_2(conn, topic_num)
+
 @app.route('/topic/<everything:name>', methods=['POST', 'GET'])
-@app.route('/topic/<everything:name>/<regex("close|agree"):tool>', methods=['GET'])
-def topic_close_list(name = None, tool = None):
-    return topic_close_list_2(conn, name, tool)
+def topic_close_list(name = 'test'):
+    return topic_close_list_2(conn, name)
 
 @app.route('/tool/<name>')
 def user_tool(name = None):
     return user_tool_2(conn, name)
-            
+
 @app.route('/login', methods=['POST', 'GET'])
 def login():
     return login_2(conn)
@@ -518,11 +516,11 @@ def login():
 @app.route('/oauth/<regex("discord|naver|facebook|kakao"):platform>/<regex("init|callback"):func>', methods=['GET', 'POST'])
 def login_oauth(platform = None, func = None):
     return login_oauth_2(conn, platform, func)
-                
+
 @app.route('/change', methods=['POST', 'GET'])
 def user_setting():
     return user_setting_2(conn, server_init)
-    
+
 @app.route('/pw_change', methods=['POST', 'GET'])
 def login_pw_change():
     return login_pw_change_2(conn)
@@ -530,7 +528,7 @@ def login_pw_change():
 @app.route('/check/<name>')
 def give_user_check(name = None):
     return give_user_check_2(conn, name)
-                
+
 @app.route('/register', methods=['POST', 'GET'])
 def login_register():
     return login_register_2(conn)
@@ -542,31 +540,31 @@ def login_need_email(tool = 'pass_find'):
 @app.route('/<regex("check_key|check_pass_key|email_replace"):tool>', methods=['POST', 'GET'])
 def login_check_key(tool = 'check_pass_key'):
     return login_check_key_2(conn, tool)
-           
+
 @app.route('/logout')
 def login_logout():
     return login_logout_2(conn)
-    
+
 @app.route('/ban', methods=['POST', 'GET'])
 @app.route('/ban/<name>', methods=['POST', 'GET'])
 def give_user_ban(name = None):
-    return give_user_ban_2(conn, name)         
-                
+    return give_user_ban_2(conn, name)
+
 @app.route('/acl/<everything:name>', methods=['POST', 'GET'])
 def give_acl(name = None):
     return give_acl_2(conn, name)
-            
+
 @app.route('/admin/<name>', methods=['POST', 'GET'])
 def give_admin(name = None):
     return give_admin_2(conn, name)
-    
+
 @app.route('/diff/<everything:name>')
 def view_diff_data(name = None):
     return view_diff_data_2(conn, name)
-        
+
 @app.route('/down/<everything:name>')
 def view_down(name = None):
-    return view_down_2(conn, name)   
+    return view_down_2(conn, name)
 
 @app.route('/w/<everything:name>')
 def view_read(name = None):
@@ -585,7 +583,7 @@ def recent_changes(name = None, tool = 'record'):
 @app.route('/history_tool/<everything:name>')
 def recent_history_tool(name = None):
     return recent_history_tool_2(conn, name)
-    
+
 @app.route('/history_delete/<everything:name>', methods=['POST', 'GET'])
 def recent_history_delete(name = None):
     return recent_history_delete_2(conn, name)
@@ -593,7 +591,7 @@ def recent_history_delete(name = None):
 @app.route('/upload', methods=['GET', 'POST'])
 def func_upload():
     return func_upload_2(conn)
-        
+
 @app.route('/user')
 def user_info():
     return user_info_2(conn)
@@ -614,7 +612,7 @@ def user_custom_head_view():
 @app.route('/count/<name>')
 def user_count_edit(name = None):
     return user_count_edit_2(conn, name)
-        
+
 @app.route('/random')
 def func_title_random():
     return func_title_random_2(conn)
@@ -626,12 +624,12 @@ def main_image_view(name = None):
 @app.route('/skin_set')
 def main_skin_set():
     return main_skin_set_2(conn)
-    
+
 # API
 @app.route('/api/w/<everything:name>', methods=['POST', 'GET'])
 def api_w(name = ''):
     return api_w_2(conn, name)
-    
+
 @app.route('/api/raw/<everything:name>')
 def api_raw(name = ''):
     return api_raw_2(conn, name)
@@ -653,9 +651,9 @@ def api_markup():
 def api_user_info(name = ''):
     return api_user_info_2(conn, name)
 
-@app.route('/api/topic/<everything:name>/sub/<sub>')
-def api_topic_sub(name = '', sub = '', time = ''):
-    return api_topic_sub_2(conn, name, sub, time)
+@app.route('/api/thread/<topic_num>')
+def api_topic_sub(name = '', topic_num = 1):
+    return api_topic_sub_2(conn, topic_num)
 
 @app.route('/api/search/<name>')
 def api_search(name = ''):
@@ -664,25 +662,25 @@ def api_search(name = ''):
 @app.route('/api/recent_changes')
 def api_recent_change():
     return api_recent_change_2(conn)
-    
-# File
-@app.route('/views/easter_egg.html')
-def main_easter_egg():
-    return main_easter_egg_2(conn)
 
+@app.route('/api/sha224/<everything:name>')
+def api_sha224(name = 'test'):
+    return api_sha224_2(conn, name)
+
+# File
 @app.route('/views/<everything:name>')
 def main_views(name = None):
     return main_views_2(conn, name)
 
 @app.route('/<data>')
 def main_file(data = None):
-    return main_file_2(conn, data) if re.search('\.txt$', data) else main_error_404_2(conn)
+    return main_file_2(conn, data)
 
 # End
 @app.errorhandler(404)
 def main_error_404(e):
     return main_error_404_2(conn)
-    
+
 app.secret_key = rep_key
 app.wsgi_app = werkzeug.debug.DebuggedApplication(app.wsgi_app, True)
 app.debug = True
@@ -690,5 +688,5 @@ app.debug = True
 if __name__ == "__main__":
     http_server = tornado.httpserver.HTTPServer(tornado.wsgi.WSGIContainer(app))
     http_server.listen(server_set['port'], address = server_set['host'])
-    
+
     tornado.ioloop.IOLoop.instance().start()

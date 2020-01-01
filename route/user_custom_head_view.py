@@ -12,7 +12,7 @@ def user_custom_head_view_2(conn):
                 curs.execute(db_change("update custom set css = ? where user = ?"), [flask.request.form.get('content', None), ip + ' (head)'])
             else:
                 curs.execute(db_change("insert into custom (user, css) values (?, ?)"), [ip + ' (head)', flask.request.form.get('content', None)])
-            
+
             conn.commit()
 
         flask.session['head'] = flask.request.form.get('content', None)
@@ -30,7 +30,7 @@ def user_custom_head_view_2(conn):
                 data = ''
         else:
             start = '<span>' + load_lang('user_head_warring') + '</span><hr class=\"main_hr\">'
-            
+
             if 'head' in flask.session:
                 data = flask.session['head']
             else:
@@ -38,7 +38,7 @@ def user_custom_head_view_2(conn):
 
         start += '<span>&lt;style&gt;CSS&lt;/style&gt;<br>&lt;script&gt;JS&lt;/script&gt;</span><hr class=\"main_hr\">'
 
-        return easy_minify(flask.render_template(skin_check(), 
+        return easy_minify(flask.render_template(skin_check(),
             imp = [load_lang(data = 'user_head', safe = 1), wiki_set(), custom(), other2([0, 0])],
             data =  start + '''
                     <form method="post">

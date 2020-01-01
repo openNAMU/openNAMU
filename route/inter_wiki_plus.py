@@ -2,15 +2,18 @@ from .tool.func import *
 
 def inter_wiki_plus_2(conn, tools, name):
     curs = conn.cursor()
-    
+
     if flask.request.method == 'POST':
         if tools == 'plus_inter_wiki':
+            if name:
+                curs.execute(db_change("delete from inter where title = ?"), [name])
+
             curs.execute(db_change('insert into inter (title, link, icon) values (?, ?, ?)'), [
-                flask.request.form.get('title', None), 
-                flask.request.form.get('link', None),
-                flask.request.form.get('icon', None)
+                flask.request.form.get('title', 'test'),
+                flask.request.form.get('link', 'test'),
+                flask.request.form.get('icon', '')
             ])
-            
+
             admin_check(None, 'inter_wiki_plus')
         elif tools == 'plus_edit_filter':
             if admin_check(1, 'edit_filter edit') != 1:
@@ -24,13 +27,14 @@ def inter_wiki_plus_2(conn, tools, name):
             try:
                 re.compile(flask.request.form.get('content', 'test'))
 
-                curs.execute(db_change("select name from filter where name = ?"), [name])
-                if curs.fetchall():
-                    curs.execute(db_change("update filter set regex = ?, sub = ? where name = ?"), [flask.request.form.get('content', 'test'), end, name])
-                else:
-                    curs.execute(db_change("insert into filter (name, regex, sub) values (?, ?, ?)"), [name, flask.request.form.get('content', 'test'), end])
+                curs.execute(db_change("delete from filter where name = ?"), [name])
+                curs.execute(db_change("insert into filter (name, regex, sub) values (?, ?, ?)"), [
+                    name,
+                    flask.request.form.get('content', 'test'),
+                    end
+                ])
             except:
-                return re_error('/error/23')                
+                return re_error('/error/23')
         else:
             plus_d = ''
 
@@ -38,38 +42,48 @@ def inter_wiki_plus_2(conn, tools, name):
                 try:
                     re.compile(flask.request.form.get('title', 'test'))
                 except:
-                    return re_error('/error/23') 
+                    return re_error('/error/23')
 
                 admin_check(None, 'name_filter edit')
-                
+
                 type_d = 'name'
             elif tools == 'plus_file_filter':
                 try:
                     re.compile(flask.request.form.get('title', 'test'))
                 except:
-                    return re_error('/error/23') 
-                
+                    return re_error('/error/23')
+
                 admin_check(None, 'file_filter edit')
-                
+
                 type_d = 'file'
             elif tools == 'plus_email_filter':
                 admin_check(None, 'email_filter edit')
-                
+
                 type_d = 'email'
             elif tools == 'plus_image_license':
                 admin_check(None, 'image_license edit')
-                
+
                 type_d = 'image_license'
             else:
                 admin_check(None, 'edit_top edit')
-                
+
                 type_d = 'edit_top'
                 plus_d = flask.request.form.get('markup', 'test')
-            
-            curs.execute(db_change('insert into html_filter (html, kind, plus) values (?, ?, ?)'), [flask.request.form.get('title', 'test'), type_d, plus_d])
-        
+
+            if name:
+                curs.execute(db_change("delete from html_filter where html = ? and kind = ?"), [
+                    name,
+                    type_d
+                ])
+
+            curs.execute(db_change('insert into html_filter (html, kind, plus) values (?, ?, ?)'), [
+                flask.request.form.get('title', 'test'),
+                type_d,
+                plus_d
+            ])
+
         conn.commit()
-    
+
         return redirect('/' + re.sub('^plus_', '', tools))
     else:
         if admin_check(1) != 1:
@@ -78,20 +92,36 @@ def inter_wiki_plus_2(conn, tools, name):
             stat = ''
 
         if tools == 'plus_inter_wiki':
+            if name:
+                curs.execute(db_change("select title, link, icon from inter where title = ?"), [name])
+                exist = curs.fetchall()
+                if exist:
+                    value = exist[0]
+                else:
+                    value = ['', '', '']
+            else:
+                value = ['', '', '']
+
             title = load_lang('interwiki_add')
             form_data = '''
-                <input placeholder="''' + load_lang('name') + '''" type="text" name="title">
+                ''' + load_lang('name') + '''
                 <hr class=\"main_hr\">
-                <input placeholder="''' + load_lang('link') + '''" type="text" name="link">
+                <input value="''' + value[0] + '''" type="text" name="title">
                 <hr class=\"main_hr\">
-                <input placeholder="''' + load_lang('icon') + ''' (HTML)" type="text" name="icon">
+                ''' + load_lang('link') + '''
+                <hr class=\"main_hr\">
+                <input value="''' + value[1] + '''" type="text" name="link">
+                <hr class=\"main_hr\">
+                ''' + load_lang('icon') + ''' (HTML)
+                <hr class=\"main_hr\">
+                <input value="''' + value[2] + '''" type="text" name="icon">
             '''
         elif tools == 'plus_edit_filter':
             curs.execute(db_change("select regex, sub from filter where name = ?"), [name])
             exist = curs.fetchall()
             if exist:
                 textarea = exist[0][0]
-                
+
                 if exist[0][1] == 'X':
                     time_check = 'checked="checked"'
                     time_data = ''
@@ -117,7 +147,7 @@ def inter_wiki_plus_2(conn, tools, name):
 
             title = load_lang('edit_filter_add')
             form_data = '''
-                <script>function insert_v(name, data) { document.getElementById(name).value = data; }</script>''' + insert_data + '''                
+                <script>function insert_v(name, data) { document.getElementById(name).value = data; }</script>''' + insert_data + '''
                 <hr class=\"main_hr\">
                 <input placeholder="''' + load_lang('second') + '''" id="second" name="second" type="text" value="''' + html.escape(time_data) + '''">
                 <hr class=\"main_hr\">
@@ -125,25 +155,55 @@ def inter_wiki_plus_2(conn, tools, name):
             '''
         elif tools == 'plus_name_filter':
             title = load_lang('id_filter_add')
-            form_data = '<input placeholder="' + load_lang('regex') + '" type="text" name="title">'
+            form_data = '' + \
+                load_lang('regex') + \
+                '<hr class=\"main_hr\">' + \
+                '<input value="' + (name if name else '') + '" type="text" name="title">' + \
+            ''
         elif tools == 'plus_file_filter':
             title = load_lang('file_filter_add')
-            form_data = '<input placeholder="' + load_lang('regex') + '" type="text" name="title">'
+            form_data = '' + \
+                load_lang('regex') + \
+                '<hr class=\"main_hr\">' + \
+                '<input value="' + (name if name else '') + '" type="text" name="title">' + \
+            ''
         elif tools == 'plus_email_filter':
             title = load_lang('email_filter_add')
-            form_data = '<input placeholder="' + load_lang('email') + '" type="text" name="title">'
+            form_data = '' + \
+                load_lang('email') + \
+                '<hr class=\"main_hr\">' + \
+                '<input value="' + (name if name else '') + '" type="text" name="title">' + \
+            ''
         elif tools == 'plus_image_license':
             title = load_lang('image_license_add')
-            form_data = '<input placeholder="' + load_lang('license') + '" type="text" name="title">'
+            form_data = '' + \
+                load_lang('license') + \
+                '<hr class=\"main_hr\">' + \
+                '<input value="' + (name if name else '') + '" type="text" name="title">' + \
+            ''
         else:
             title = load_lang('edit_tool_add')
+            if name:
+                curs.execute(db_change("select plus from html_filter where html = ? and kind = 'edit_top'"), [name])
+                exist = curs.fetchall()
+                if exist:
+                    value = exist[0][0]
+                else:
+                    value = ''
+            else:
+                value = ''
+
             form_data = '''
-                <input placeholder="''' + load_lang('title') + '''" type="text" name="title">
+                ''' + load_lang('title') + '''
                 <hr class=\"main_hr\">
-                <input placeholder="''' + load_lang('markup') + '''" type="text" name="markup">
+                <input value="''' + (name if name else '') + '''" type="text" name="title">
+                <hr class=\"main_hr\">
+                ''' + load_lang('markup') + '''
+                <hr class=\"main_hr\">
+                <input value="''' + value + '''" type="text" name="markup">
             '''
 
-        return easy_minify(flask.render_template(skin_check(), 
+        return easy_minify(flask.render_template(skin_check(),
             imp = [title, wiki_set(), custom(), other2([0, 0])],
             data =  '''
                     <form method="post">

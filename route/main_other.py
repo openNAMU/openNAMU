@@ -2,8 +2,8 @@ from .tool.func import *
 
 def main_other_2(conn):
     curs = conn.cursor()
-    
-    return easy_minify(flask.render_template(skin_check(), 
+
+    return easy_minify(flask.render_template(skin_check(),
         imp = [load_lang('other_tool'), wiki_set(), custom(), other2([0, 0])],
         data = '''
             <h2>''' + load_lang('record') + '''</h2>

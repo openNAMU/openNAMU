@@ -18,7 +18,7 @@
 ## 시작하기
 오픈나무는 파이썬 환경에서 동작하는 파이썬 애플리케이션으로, 파이썬 환경을 필요로 합니다.
 
-쉬운 오픈나무 설치를 위해 오픈나무 가이드를 따로 생성해두었으며, [이곳](https://github.com/2du/openNAMU/wiki/%EC%84%A4%EC%B9%98%EB%B2%95)에서 확인하실 수 있습니다.
+쉬운 오픈나무 설치를 위해 오픈나무 가이드를 따로 생성해두었으며, [이곳](https://github.com/openNAMU/openNAMU-Guide)에서 확인하실 수 있습니다.
 
 ## 클론
 아래 명령을 터미널(명령 프롬프트)에 입력하여 본 리포지토리를 클론할 수 있습니다.
@@ -38,7 +38,7 @@
 
 ### 포함된 외부 프로젝트
  * Quotes icon - [Dave Gandy](http://www.flaticon.com/free-icon/quote-left_25672)
- * Syntax highlighting - [highlightjs](https://highlightjs.org/) 
+ * Syntax highlighting - [highlightjs](https://highlightjs.org/)
  * Numerical expression - [MathJax](https://www.mathjax.org/)
  * Handling Keyboard Shortcuts [shortcut.js](http://www.openjs.com/scripts/events/keyboard_shortcuts/)
 
@@ -53,3 +53,4 @@
 
 ## 기타
  * 첫 가입자에게 소유자 권한이 부여됩니다.
+ * [테스트 서버](http://namu.ml)

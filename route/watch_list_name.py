@@ -2,7 +2,7 @@ from .tool.func import *
 
 def watch_list_name_2(conn, name):
     curs = conn.cursor()
-    
+
     ip = ip_check()
     if ip_or_user(ip) != 0:
         return redirect('/login')
@@ -17,7 +17,7 @@ def watch_list_name_2(conn, name):
         curs.execute(db_change("delete from scan where user = ? and title = ?"), [ip, name])
     else:
         curs.execute(db_change("insert into scan (user, title) values (?, ?)"), [ip, name])
-    
+
     conn.commit()
 
     return redirect('/watch_list')

@@ -7,7 +7,7 @@ function load_preview(name) {
 
     var url = "/api/w/" + name;
     var url_2 = "/api/markup";
-    
+
     var xhr = new XMLHttpRequest();
     xhr.open("POST", url, true);
     xhr.send(s_data);

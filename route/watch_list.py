@@ -4,7 +4,7 @@ def watch_list_2(conn):
     curs = conn.cursor()
 
     div = 'Limit : 10<hr class=\"main_hr\">'
-    ip = ip_check()    
+    ip = ip_check()
 
     if ip_or_user(ip) != 0:
         return redirect('/login')
@@ -22,7 +22,7 @@ def watch_list_2(conn):
 
     div += '<a href="/manager/13">(' + load_lang('add') + ')</a>'
 
-    return easy_minify(flask.render_template(skin_check(), 
+    return easy_minify(flask.render_template(skin_check(),
         imp = [load_lang('watchlist'), wiki_set(), custom(), other2([0, 0])],
         data = div,
         menu = [['manager', load_lang('return')]]

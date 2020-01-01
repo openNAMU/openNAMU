@@ -63,7 +63,7 @@ function main_load() {
         cookies.match(regex_data('invert')) &&
         cookies.match(regex_data('invert'))[1] === '1'
     ) {
-        head_data.innerHTML += '<link rel="stylesheet" href="/views/marisa/css/dark.css?ver=2">';
+        head_data.innerHTML += '<link rel="stylesheet" href="/views/marisa/css/dark.css?ver=4">';
     }
 }
 
@@ -109,7 +109,7 @@ function skin_set() {
         if(!language in set_language) {
             language = "en-US";
         }
-        
+
         data = document.getElementById("main_skin_set");
         set_data = {};
 
@@ -168,7 +168,7 @@ function skin_set() {
                 <option value="delete">' + set_language[language]['delete'] + '</option> \
             ';
         }
-        
+
         if(
             cookies.match(regex_data('include_link')) &&
             cookies.match(regex_data('include_link'))[1] === '1'

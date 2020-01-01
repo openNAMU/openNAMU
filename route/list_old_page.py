@@ -9,8 +9,12 @@ def list_old_page_2(conn):
     else:
         sql_num = 0
 
+    curs.execute(db_change('select data from other where name = "count_all_title"'))
+    if int(curs.fetchall()[0][0]) < 30000:
+        return re_error('/error/25')
+
     div = '<ul>'
-    
+
     curs.execute(db_change('' + \
         'select title, date from history h ' + \
         "where title not like 'user:%' and title not like 'category:%' and title not like 'file:%' and " + \
@@ -23,10 +27,10 @@ def list_old_page_2(conn):
     n_list = curs.fetchall()
     for data in n_list:
         div += '<li><a href="/w/' + url_pas(data[0]) + '">' + html.escape(data[0]) + '</a> (' + re.sub(' .*$', '', data[1]) + ')</li>'
-    
+
     div += '</ul>' + next_fix('/old_page?num=', num, n_list)
 
-    return easy_minify(flask.render_template(skin_check(), 
+    return easy_minify(flask.render_template(skin_check(),
         imp = [load_lang('old_page'), wiki_set(), custom(), other2([0, 0])],
         data = div,
         menu = [['other', load_lang('return')]]

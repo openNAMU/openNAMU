@@ -21,7 +21,7 @@ def api_version_2(conn, r_ver, c_ver):
                 n_ver = json_data[up_data]['r_ver']
         except:
             pass
-        
+
     json_data = { "version" : r_ver, "db_version" : c_ver, "lastest_version" : n_ver  }
 
     return flask.jsonify(json_data)

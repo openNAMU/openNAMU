@@ -4,11 +4,11 @@ function search_do() {
         if(before !== data && data !== '') {
             before = data;
             var url = "/api/search/" + encodeURI(data);
-        
+
             var xhr = new XMLHttpRequest();
             xhr.open("GET", url, true);
             xhr.send(null);
-            
+
             xhr.onreadystatechange = function() {
                 if(this.readyState === 4 && this.status === 200) {
                     document.getElementById("pre_search").style.display = 'block';

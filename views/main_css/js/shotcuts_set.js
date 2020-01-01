@@ -12,7 +12,7 @@ var check = setInterval(function() {
                 window.location.href = element[1];
             }, {
                 'disable_in_input' : true
-            }); 
+            });
         });
 
         all_list_2 = [
@@ -21,10 +21,10 @@ var check = setInterval(function() {
             ['E', '/edit'],
         ];
 
-        all_list_2.forEach(function(element) {    
+        all_list_2.forEach(function(element) {
             shortcut.add(element[0], function() {
                 href_d = window.location.href.split("/");
-                if(href_d[4]) { 
+                if(href_d[4]) {
                     window.location.href = element[1] + '/' + href_d[4];
                 }
             }, {

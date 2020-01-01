@@ -2,19 +2,19 @@ from .tool.func import *
 
 def give_admin_groups_2(conn, name):
     curs = conn.cursor()
-    
+
     if flask.request.method == 'POST':
         if admin_check(None, 'admin_plus (' + name + ')') != 1:
             return re_error('/error/3')
 
         curs.execute(db_change("delete from alist where name = ?"), [name])
-        
+
         if flask.request.form.get('ban', 0) != 0:
             curs.execute(db_change("insert into alist (name, acl) values (?, 'ban')"), [name])
 
         if flask.request.form.get('toron', 0) != 0:
             curs.execute(db_change("insert into alist (name, acl) values (?, 'toron')"), [name])
-            
+
         if flask.request.form.get('check', 0) != 0:
             curs.execute(db_change("insert into alist (name, acl) values (?, 'check')"), [name])
 
@@ -29,17 +29,17 @@ def give_admin_groups_2(conn, name):
 
         if flask.request.form.get('owner', 0) != 0:
             curs.execute(db_change("insert into alist (name, acl) values (?, 'owner')"), [name])
-            
+
         conn.commit()
-        
+
         return redirect('/admin_plus/' + url_pas(name))
-    else:        
+    else:
         data = '<ul>'
-        
+
         exist_list = ['', '', '', '', '', '', '', '']
 
         curs.execute(db_change('select acl from alist where name = ?'), [name])
-        acl_list = curs.fetchall()    
+        acl_list = curs.fetchall()
         for go in acl_list:
             if go[0] == 'ban':
                 exist_list[0] = 'checked="checked"'
@@ -68,7 +68,7 @@ def give_admin_groups_2(conn, name):
 
         data += '</ul>'
 
-        return easy_minify(flask.render_template(skin_check(), 
+        return easy_minify(flask.render_template(skin_check(),
             imp = [name, wiki_set(), custom(), other2(['(' + load_lang('admin_group') + ')', 0])],
             data =  '''
                 <form method="post">
