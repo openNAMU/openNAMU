@@ -170,7 +170,10 @@ for i in create_data['all_data']:
     try:
         curs.execute(db_change('select test from ' + i + ' limit 1'))
     except:
-        curs.execute(db_change('create table ' + i + '(test longtext)'))
+        try:
+            curs.execute(db_change('create table ' + i + '(test longtext)'))
+        except:
+            curs.execute(db_change("alter table " + i + " add test longtext default ''"))
 
 if setup_tool == 0:
     try:
