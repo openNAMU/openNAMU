@@ -12,31 +12,34 @@ def edit_move_2(conn, name):
         else:
             captcha_post('', 0)
 
+        if slow_edit_check() == 1:
+            return re_error('/error/24')
+
         curs.execute(db_change("select title from history where title = ?"), [flask.request.form.get('title', None)])
         if curs.fetchall():
             if admin_check(None, 'merge documents') == 1:
                 curs.execute(db_change("select data from data where title = ?"), [flask.request.form.get('title', None)])
                 data = curs.fetchall()
-                if data:            
+                if data:
                     curs.execute(db_change("delete from data where title = ?"), [flask.request.form.get('title', None)])
                     curs.execute(db_change("delete from back where link = ?"), [flask.request.form.get('title', None)])
-                
+
                 curs.execute(db_change("select data from data where title = ?"), [name])
                 data = curs.fetchall()
-                if data:            
+                if data:
                     curs.execute(db_change("update data set title = ? where title = ?"), [flask.request.form.get('title', None), name])
                     curs.execute(db_change("update back set link = ? where link = ?"), [flask.request.form.get('title', None), name])
-                    
+
                     data_in = data[0][0]
                 else:
                     data_in = ''
 
                 history_plus(
-                    name, 
-                    data_in, 
-                    get_time(), 
-                    ip_check(), 
-                    flask.request.form.get('send', ''), 
+                    name,
+                    data_in,
+                    get_time(),
+                    ip_check(),
+                    flask.request.form.get('send', ''),
                     '0',
                     'marge <a>' + name + '</a> - <a>' + flask.request.form.get('title', 'test') + '</a> move'
                 )
@@ -46,7 +49,7 @@ def edit_move_2(conn, name):
 
                 curs.execute(db_change("select id from history where title = ? order by id + 0 desc limit 1"), [flask.request.form.get('title', None)])
                 data = curs.fetchall()
-                
+
                 num = data[0][0]
 
                 curs.execute(db_change("select id from history where title = ? order by id + 0 asc"), [name])
@@ -62,24 +65,24 @@ def edit_move_2(conn, name):
         else:
             curs.execute(db_change("select data from data where title = ?"), [name])
             data = curs.fetchall()
-            if data:            
+            if data:
                 curs.execute(db_change("update data set title = ? where title = ?"), [flask.request.form.get('title', None), name])
                 curs.execute(db_change("update back set link = ? where link = ?"), [flask.request.form.get('title', None), name])
-                
+
                 data_in = data[0][0]
             else:
                 data_in = ''
-                
+
             history_plus(
-                name, 
-                data_in, 
-                get_time(), 
-                ip_check(), 
-                flask.request.form.get('send', ''), 
+                name,
+                data_in,
+                get_time(),
+                ip_check(),
+                flask.request.form.get('send', ''),
                 '0',
                 '<a>' + name + '</a> - <a>' + flask.request.form.get('title', 'test') + '</a> move'
             )
-            
+
             curs.execute(db_change("update back set type = 'no' where title = ? and not type = 'cat' and not type = 'no'"), [name])
             curs.execute(db_change("delete from back where title = ? and not type = 'cat' and type = 'no'"), [flask.request.form.get('title', None)])
 
@@ -87,8 +90,8 @@ def edit_move_2(conn, name):
             conn.commit()
 
             return redirect('/w/' + url_pas(flask.request.form.get('title', None)))
-    else:            
-        return easy_minify(flask.render_template(skin_check(), 
+    else:
+        return easy_minify(flask.render_template(skin_check(),
             imp = [name, wiki_set(), custom(), other2([' (' + load_lang('move') + ')', 0])],
             data =  '''
                     <form method="post">

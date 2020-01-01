@@ -1,12 +1,16 @@
 from .tool.func import *
 
-def topic_admin_2(conn, name, sub, num):
+def topic_admin_2(conn, topic_num, num):
     curs = conn.cursor()
+
+    topic_change_data = topic_change(topic_num)
+    name = topic_change_data[0]
+    sub = topic_change_data[1]
 
     curs.execute(db_change("select block, ip, date from topic where title = ? and sub = ? and id = ?"), [name, sub, str(num)])
     data = curs.fetchall()
     if not data:
-        return redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub))
+        return redirect('/thread/' + str(topic_num))
 
     ban = '''
         <h2>''' + load_lang('state') + '''</h2>
@@ -18,7 +22,7 @@ def topic_admin_2(conn, name, sub, num):
         <h2>''' + load_lang('other_tool') + '''</h2>
         <ul>
             <li>
-                <a href="/topic/''' + url_pas(name) + '/sub/' + url_pas(sub) + '/raw/' + str(num) + '''">''' + load_lang('raw') + '''</a>
+                <a href="/thread/''' + str(topic_num) + '/raw/' + str(num) + '''">''' + load_lang('raw') + '''</a>
             </li>
         </ul>
     '''
@@ -29,7 +33,7 @@ def topic_admin_2(conn, name, sub, num):
 
         curs.execute(db_change("select end from ban where block = ?"), [data[0][1]])
         user_ban_d = curs.fetchall()
-        
+
         ban += '''
             <br>
             <h2>''' + load_lang('admin_tool') + '''</h2>
@@ -40,20 +44,20 @@ def topic_admin_2(conn, name, sub, num):
                     </a>
                 </li>
                 <li>
-                    <a href="/topic/''' + url_pas(name) + '/sub/' + url_pas(sub) + '/b/' + str(num) + '''">
+                    <a href="/thread/''' + str(topic_num) + '/b/' + str(num) + '''">
                         ''' + (load_lang('hide_release') if data[0][0] == 'O' else load_lang('hide')) + '''
                     </a>
                 </li>
                 <li>
-                    <a href="/topic/''' + url_pas(name) + '/sub/' + url_pas(sub) + '/notice/' + str(num) + '''">
+                    <a href="/thread/''' + str(topic_num) + '/notice/' + str(num) + '''">
                         ''' + (load_lang('pinned_release') if top_topic_d else load_lang('pinned')) + '''
                     </a>
                 </li>
             </ul>
         '''
 
-    return easy_minify(flask.render_template(skin_check(), 
+    return easy_minify(flask.render_template(skin_check(),
         imp = [load_lang('discussion_tool'), wiki_set(), custom(), other2([' (#' + str(num) + ')', 0])],
         data = ban,
-        menu = [['topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '#' + str(num), load_lang('return')]]
+        menu = [['thread/' + str(topic_num) + '#' + str(num), load_lang('return')]]
     ))

@@ -4,7 +4,7 @@ def give_admin_2(conn, name):
     curs = conn.cursor()
 
     owner = admin_check()
-    
+
     curs.execute(db_change("select acl from user where id = ?"), [name])
     user = curs.fetchall()
     if not user:
@@ -31,16 +31,16 @@ def give_admin_2(conn, name):
             curs.execute(db_change("update user set acl = 'user' where id = ?"), [name])
         else:
             curs.execute(db_change("update user set acl = ? where id = ?"), [flask.request.form.get('select', None), name])
-        
+
         conn.commit()
-        
-        return redirect('/admin/' + url_pas(name))            
+
+        return redirect('/admin/' + url_pas(name))
     else:
         if admin_check(7) != 1:
-            return re_error('/error/3')            
+            return re_error('/error/3')
 
         div = '<option value="X">X</option>'
-        
+
         curs.execute(db_change('select distinct name from alist order by name asc'))
         for data in curs.fetchall():
             if user[0][0] == data[0]:
@@ -52,8 +52,8 @@ def give_admin_2(conn, name):
                         div += '<option value="' + data[0] + '">' + data[0] + '</option>'
                 else:
                     div += '<option value="' + data[0] + '">' + data[0] + '</option>'
-        
-        return easy_minify(flask.render_template(skin_check(), 
+
+        return easy_minify(flask.render_template(skin_check(),
             imp = [name, wiki_set(), custom(), other2([' (' + load_lang('authorize') + ')', 0])],
             data =  '''
                     <form method="post">

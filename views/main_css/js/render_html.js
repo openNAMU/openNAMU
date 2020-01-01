@@ -1,16 +1,17 @@
 function render_html(name = '') {
     var num = 0;
     while(1) {
-        num += 1
-        if(document.getElementById(name + 'render_contect_' + String(num))) {
-            data = document.getElementById(name + 'render_contect_' + String(num)).innerHTML;
+        num += 1;
 
-            var t_data = ['b', 'i', 's', 'del']
+        if(document.getElementById(name + '_' + String(num))) {
+            data = document.getElementById(name + '_' + String(num)).innerHTML;
+
+            var t_data = ['b', 'i', 's', 'del', 'strong', 'bold', 'em', 'sub', 'sup']
             for(var key in t_data) {
                 var patt = new RegExp('&lt;' + t_data[key] + '&gt;((?:(?!&lt;\/' + t_data[key] + '&gt;).)*)&lt;\/' + t_data[key] + '&gt;', 'ig');
                 data = data.replace(patt, '<' + t_data[key] + '>$1</' + t_data[key] + '>');
             }
-            
+
             var src_list = {
                 'www.youtube.com' : '1',
                 'www.google.com' : '1'
@@ -37,8 +38,8 @@ function render_html(name = '') {
             data = data.replace(/&lt;a href=["\']((?:(?!["\']).)+)["\']&gt;((?:(?!&lt;\/a&gt;).)*)&lt;\/a&gt;/ig, function(full, in_data, in_data_2) {
                 return '<a id="out_link" href="' + in_data.replace(/^javascript/ig, '') + '">' + in_data_2 + '</a>'
             });
-            
-            document.getElementById(name + 'render_contect_' + String(num)).innerHTML = data;
+
+            document.getElementById(name + '_' + String(num)).innerHTML = data;
         } else {
             break;
         }

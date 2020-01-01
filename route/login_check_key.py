@@ -24,7 +24,7 @@ def login_check_key_2(conn, tool):
                 else:
                     b_text = ''
 
-                return easy_minify(flask.render_template(skin_check(),    
+                return easy_minify(flask.render_template(skin_check(),
                     imp = [load_lang('reset_user_ok'), wiki_set(), custom(), other2([0, 0])],
                     data = b_text + load_lang('id') + ' : ' + d_id + '<br>' + load_lang('password') + ' : ' + pw,
                     menu = [['user', load_lang('return')]]
@@ -33,56 +33,56 @@ def login_check_key_2(conn, tool):
                 return redirect('/pass_find')
         else:
             ip = ip_check()
-            
+
             if 'c_id' in flask.session and flask.session['c_key'] == flask.request.form.get('key', None):
                 curs.execute(db_change('select data from other where name = "encode"'))
                 db_data = curs.fetchall()
-                
+
                 if tool == 'check_key':
                     curs.execute(db_change("select id from user limit 1"))
                     if not curs.fetchall():
                         curs.execute(db_change("insert into user (id, pw, acl, date, encode) values (?, ?, 'owner', ?, ?)"), [
-                            flask.session['c_id'], 
-                            flask.session['c_pw'], 
-                            get_time(), 
+                            flask.session['c_id'],
+                            flask.session['c_pw'],
+                            get_time(),
                             db_data[0][0]
                         ])
-    
+
                         first = 1
                     else:
                         curs.execute(db_change("insert into user (id, pw, acl, date, encode) values (?, ?, 'user', ?, ?)"), [
-                            flask.session['c_id'], 
-                            flask.session['c_pw'], 
-                            get_time(), 
+                            flask.session['c_id'],
+                            flask.session['c_pw'],
+                            get_time(),
                             db_data[0][0]
                         ])
-    
+
                         first = 0
-    
+
                     agent = flask.request.headers.get('User-Agent')
-    
+
                     curs.execute(db_change("insert into user_set (name, id, data) values ('email', ?, ?)"), [
-                        flask.session['c_id'], 
+                        flask.session['c_id'],
                         flask.session['c_email']
                     ])
                     curs.execute(db_change("insert into ua_d (name, ip, ua, today, sub) values (?, ?, ?, ?, '')"), [
-                        flask.session['c_id'], 
-                        ip, 
-                        agent, 
+                        flask.session['c_id'],
+                        ip,
+                        agent,
                         get_time()
                     ])
-    
+
                     flask.session['state'] = 1
                     flask.session['id'] = flask.session['c_id']
                     flask.session['head'] = ''
-                            
+
                     conn.commit()
                 else:
                     curs.execute(db_change('delete from user_set where name = "email" and id = ?'), [ip])
                     curs.execute(db_change('insert into user_set (name, id, data) values ("email", ?, ?)'), [ip, flask.session['c_email']])
-                    
+
                     first = 0
-                          
+
                 flask.session.pop('c_id', None)
                 flask.session.pop('c_pw', None)
                 flask.session.pop('c_key', None)
@@ -107,7 +107,7 @@ def login_check_key_2(conn, tool):
         else:
             b_text = ''
 
-        return easy_minify(flask.render_template(skin_check(),    
+        return easy_minify(flask.render_template(skin_check(),
             imp = [load_lang('check_key'), wiki_set(), custom(), other2([0, 0])],
             data =  '''
                 <form method="post">

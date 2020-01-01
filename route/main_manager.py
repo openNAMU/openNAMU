@@ -1,27 +1,27 @@
 from .tool.func import *
 
-def main_manager_2(conn, num, r_ver, db_type):
+def main_manager_2(conn, num, r_ver):
     curs = conn.cursor()
-    
+
     title_list = {
-        0 : [load_lang('document_name'), 'acl'], 
-        1 : [0, 'check'], 
+        0 : [load_lang('document_name'), 'acl'],
+        1 : [0, 'check'],
         2 : [load_lang('file_name'), 'plus_file_filter'],
-        3 : [0, 'admin'], 
-        4 : [0, 'record'], 
-        5 : [0, 'topic_record'], 
-        6 : [load_lang('name'), 'admin_plus'], 
-        7 : [load_lang('name'), 'plus_edit_filter'], 
-        8 : [load_lang('document_name'), 'search'], 
-        9 : [0, 'block_user'], 
-        10 : [0, 'block_admin'], 
-        11 : [load_lang('document_name'), 'watch_list'], 
-        12 : [load_lang('compare_target'), 'check'], 
+        3 : [0, 'admin'],
+        4 : [0, 'record'],
+        5 : [0, 'topic_record'],
+        6 : [load_lang('name'), 'admin_plus'],
+        7 : [load_lang('name'), 'plus_edit_filter'],
+        8 : [load_lang('document_name'), 'search'],
+        9 : [0, 'block_user'],
+        10 : [0, 'block_admin'],
+        11 : [load_lang('document_name'), 'watch_list'],
+        12 : [load_lang('compare_target'), 'check'],
         13 : [load_lang('document_name'), 'edit']
     }
-    
+
     if num == 1:
-        return easy_minify(flask.render_template(skin_check(), 
+        return easy_minify(flask.render_template(skin_check(),
             imp = [load_lang('admin_tool'), wiki_set(), custom(), other2([0, 0])],
             data =  '''
                     <h2>''' + load_lang('admin') + '''</h2>
@@ -30,16 +30,17 @@ def main_manager_2(conn, num, r_ver, db_type):
                         <li><a href="/manager/3">''' + load_lang('check_user') + '''</a></li>
                         <li><a href="/ban">''' + load_lang('ban') + '''</a></li>
                         <li><a href="/manager/5">''' + load_lang('authorize') + '''</a></li>
-                        <li><a href="/edit_filter">''' + load_lang('edit_filter_list') + '''</a></li>
                     </ul>
                     <br>
                     <h2>''' + load_lang('owner') + '''</h2>
                     <ul>
                         <li><a href="/give_log">''' + load_lang('admin_group_list') + '''</a></li>
+                        <li><a href="/many_delete">''' + load_lang('many_delete') + '''</a></li>
                         <li><a href="/setting">''' + load_lang('setting') + '''</a></li>
                     </ul>
                     <h3>''' + load_lang('filter') + '''</h3>
                     <ul>
+                        <li><a href="/edit_filter">''' + load_lang('edit_filter_list') + '''</a></li>
                         <li><a href="/inter_wiki">''' + load_lang('interwiki_list') + '''</a></li>
                         <li><a href="/edit_top">''' + load_lang('edit_tool_list') + '''</a></li>
                         <li><a href="/image_license">''' + load_lang('image_license_list') + '''</a></li>
@@ -50,7 +51,6 @@ def main_manager_2(conn, num, r_ver, db_type):
                     <br>
                     <h2>''' + load_lang('server') + '''</h2>
                     <ul>
-                        ''' + (('<li><a href="/indexing">' + load_lang('indexing') + '</a></li>') if db_type == 'sqlite' else '') + '''
                         <li><a href="/restart">''' + load_lang('wiki_restart') + '''</a></li>
                         <li><a href="/update">''' + load_lang('update') + '''</a></li>
                         <li><a href="/oauth_setting">''' + load_lang('oauth_setting') + '''</a></li>
@@ -79,7 +79,7 @@ def main_manager_2(conn, num, r_ver, db_type):
             else:
                 placeholder = title_list[(num - 2)][0]
 
-            return easy_minify(flask.render_template(skin_check(), 
+            return easy_minify(flask.render_template(skin_check(),
                 imp = ['Redirect', wiki_set(), custom(), other2([0, 0])],
                 data =  '''
                         <form method="post">

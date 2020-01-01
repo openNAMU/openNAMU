@@ -2,7 +2,7 @@ from .tool.func import *
 
 def main_views_2(conn, name):
     curs = conn.cursor()
-    
+
     if re.search('\/', name):
         m = re.search('^(.*)\/(.*)$', name)
         if m:

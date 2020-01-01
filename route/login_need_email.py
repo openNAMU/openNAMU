@@ -28,7 +28,7 @@ def login_need_email_2(conn, tool):
                     i_text = 'Key : ' + flask.session['c_key']
 
                 send_email(flask.request.form.get('email', ''), t_text, i_text)
-                
+
                 return redirect('/check_pass_key')
             else:
                 return re_error('/error/12')
@@ -37,9 +37,9 @@ def login_need_email_2(conn, tool):
                 flask.session['c_key'] = ''.join(random.choice("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ") for i in range(16))
                 flask.session['c_id'] = ip_check()
                 flask.session['c_pw'] = ''
-            
+
             if 'c_id' in flask.session:
-                main_email = ['naver.com', 'gmail.com', 'daum.net', 'hanmail.net', 'hanmail2.net']
+                main_email = ['naver.com', 'gmail.com', 'daum.net', 'kakao.com']
                 data = re.search('@([^@]+)$', flask.request.form.get('email', ''))
                 if data:
                     data = data.groups()[0]
@@ -51,7 +51,7 @@ def login_need_email_2(conn, tool):
                             flask.session.pop('c_id', None)
                             flask.session.pop('c_pw', None)
                             flask.session.pop('c_key', None)
-                            
+
                             # user 대신 오류 화면 보여주게 수정 필요
                             return redirect('/user')
                         else:
@@ -71,14 +71,14 @@ def login_need_email_2(conn, tool):
 
                             send_email(flask.request.form.get('email', ''), t_text, i_text)
                             flask.session['c_email'] = flask.request.form.get('email', '')
-                  
+
                             if tool == 'email_change':
                                 return redirect('/email_replace')
                             else:
                                 return redirect('/check_key')
                     else:
                         return redirect('/email_filter')
-            
+
             return redirect('/user')
     else:
         if tool == 'pass_find':
@@ -89,7 +89,7 @@ def login_need_email_2(conn, tool):
             else:
                 b_text = ''
 
-            return easy_minify(flask.render_template(skin_check(),    
+            return easy_minify(flask.render_template(skin_check(),
                 imp = [load_lang('password_search'), wiki_set(), custom(), other2([0, 0])],
                 data =  b_text + '''
                         <form method="post">
@@ -110,7 +110,7 @@ def login_need_email_2(conn, tool):
             else:
                 b_text = ''
 
-            return easy_minify(flask.render_template(skin_check(),    
+            return easy_minify(flask.render_template(skin_check(),
                 imp = [load_lang('email'), wiki_set(), custom(), other2([0, 0])],
                 data =  '''
                         <a href="/email_filter">(''' + load_lang('email_filter_list') + ''')</a>

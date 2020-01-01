@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def topic_stop_2(conn, name, sub):
+def topic_stop_2(conn, topic_num):
     curs = conn.cursor()
 
     if admin_check(3) != 1:
@@ -8,6 +8,10 @@ def topic_stop_2(conn, name, sub):
 
     ip = ip_check()
     time = get_time()
+
+    topic_change_data = topic_change(topic_num)
+    name = topic_change_data[0]
+    sub = topic_change_data[1]
 
     if flask.request.method == 'POST':
         curs.execute(db_change("select id from topic where title = ? and sub = ? order by id + 0 desc limit 1"), [name, sub])
@@ -20,7 +24,7 @@ def topic_stop_2(conn, name, sub):
             curs.execute(db_change("update rd set stop = ?, agree = ? where title = ? and sub = ?"), [
                 stop_d,
                 agree_d,
-                name, 
+                name,
                 sub
             ])
 
@@ -32,17 +36,17 @@ def topic_stop_2(conn, name, sub):
                 t_state = 'Normal'
 
             curs.execute(db_change("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, ?, ?, ?, '', '1')"), [
-                str(int(topic_check[0][0]) + 1), 
-                name, 
-                sub, 
-                t_state + (' (Agree)' if agree_d != '' else '') + (('[br][br]Why : ' + why_d) if why_d else ''), 
-                time, 
+                str(int(topic_check[0][0]) + 1),
+                name,
+                sub,
+                t_state + (' (Agree)' if agree_d != '' else '') + (('[br][br]Why : ' + why_d) if why_d else ''),
+                time,
                 ip
             ])
 
             rd_plus(name, sub, time)
 
-        return redirect('/topic/' + url_pas(name) + '/sub/' + url_pas(sub))    
+        return redirect('/thread/' + str(topic_num))
     else:
         stop_d_list = ''
         agree_check = ''
@@ -74,7 +78,7 @@ def topic_stop_2(conn, name, sub):
             agree_check = ''
 
         return easy_minify(flask.render_template(skin_check(),
-            imp = [name, wiki_set(), custom(), other2([' (' + load_lang('topic_setting') + ')', 0])],
+            imp = [load_lang('topic_setting'), wiki_set(), custom(), other2([0, 0])],
             data = '''
                 <hr class=\"main_hr\">
                 <form method="post">
@@ -89,5 +93,5 @@ def topic_stop_2(conn, name, sub):
                     <button type="submit">''' + load_lang('save') + '''</button>
                 </form>
             ''',
-            menu = [['topic/' + url_pas(name) + '/sub/' + url_pas(sub) + '/tool', load_lang('return')]]
+            menu = [['thread/' + str(topic_num) + '/tool', load_lang('return')]]
         ))

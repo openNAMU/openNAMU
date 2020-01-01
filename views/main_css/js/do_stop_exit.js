@@ -6,7 +6,7 @@ function do_stop_exit() {
         data = document.getElementById('content').value;
         origin = document.getElementById('origin').value;
         if(data !== origin && go_save_zone != 1) {
-            return ''; 
+            return '';
         }
     }
 }

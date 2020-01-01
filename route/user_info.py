@@ -5,13 +5,14 @@ def user_info_2(conn):
 
     ip = ip_check()
 
-    curs.execute(db_change('select name from alarm where name = ? limit 1'), [ip_check()])
-    if curs.fetchall():
-        plus2 = '<li><a href="/alarm">' + load_lang('alarm') + ' (O)</a></li>'
+    curs.execute(db_change("select count(name) from alarm where name = ?"), [ip])
+    count = curs.fetchall()
+    if count:
+        plus2 = '<li><a href="/alarm">' + load_lang('alarm') + ' (' + str(count[0][0]) + ')</a></li>'
     else:
-        plus2 = '<li><a href="/alarm">' + load_lang('alarm') + '</a></li>'
+        plus2 = '<li><a href="/alarm">' + load_lang('alarm') + ' (0)</a></li>'
 
-    if ip_or_user(ip) == 0:  
+    if ip_or_user(ip) == 0:
         plus = '''
             <li><a href="/logout">''' + load_lang('logout') + '''</a></li>
             <li><a href="/change">''' + load_lang('user_setting') + '''</a></li>
@@ -19,7 +20,7 @@ def user_info_2(conn):
 
         plus2 += '<li><a href="/watch_list">' + load_lang('watchlist') + '</a></li>'
         plus3 = '<li><a href="/acl/user:' + url_pas(ip) + '">' + load_lang('user_document_acl') + '</a></li>'
-    else:        
+    else:
         plus = '''
             <li><a href="/login">''' + load_lang('login') + '''</a></li>
             <li><a href="/register">''' + load_lang('register') + '''</a></li>
@@ -31,7 +32,7 @@ def user_info_2(conn):
         if test and test[0][0] != '':
             plus += '<li><a href="/pass_find">' + load_lang('password_search') + '</a></li>'
 
-    return easy_minify(flask.render_template(skin_check(), 
+    return easy_minify(flask.render_template(skin_check(),
         imp = [load_lang('user_tool'), wiki_set(), custom(), other2([0, 0])],
         data = '''
             <h2>''' + load_lang('state') + '''</h2>

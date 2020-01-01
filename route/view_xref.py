@@ -2,7 +2,7 @@ from .tool.func import *
 
 def view_xref_2(conn, name):
     curs = conn.cursor()
-    
+
     if acl_check(name, 'render') == 1:
         return re_error('/ban')
 
@@ -11,12 +11,12 @@ def view_xref_2(conn, name):
         sql_num = num * 50 - 50
     else:
         sql_num = 0
-        
+
     div = '<ul>'
 
     if re.search('#', name):
         name = re.sub('#', '\\\\#', name)
-    
+
     curs.execute(db_change("" + \
         "select link, type from back " + \
         "where (title = ? and not type = 'cat' and not type = 'no') or (title like ? and type = 'redirect')" + \
@@ -29,20 +29,20 @@ def view_xref_2(conn, name):
     data_list = curs.fetchall()
     for data in data_list:
         div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a>'
-        
-        if data[1]:                
+
+        if data[1]:
             div += ' (' + data[1] + ')'
-        
+
         curs.execute(db_change("select title from back where title = ? and type = 'include'"), [data[0]])
         db_data = curs.fetchall()
         if db_data:
             div += ' <a id="inside" href="/xref/' + url_pas(data[0]) + '">(' + load_lang('backlink') + ')</a>'
 
         div += '</li>'
-      
+
     div += '</ul>' + next_fix('/xref/' + url_pas(name) + '?num=', num, data_list)
-    
-    return easy_minify(flask.render_template(skin_check(), 
+
+    return easy_minify(flask.render_template(skin_check(),
         imp = [name, wiki_set(), custom(), other2([' (' + load_lang('backlink') + ')', 0])],
         data = div,
         menu = [['w/' + url_pas(name), load_lang('return')]]

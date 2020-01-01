@@ -1,9 +1,9 @@
-function topic_top_load(name, sub) {
+function topic_top_load(topic_num) {
     var o_data = document.getElementById('top_topic');
-    var url = "/api/topic/" + encodeURI(name) + "/sub/" + encodeURI(sub) + "?top=1&render=1";
+    var url = "/api/thread/" + String(topic_num) + "?top=1&render=1";
     var n_data = "";
     var num = 1;
-    
+
     var xhr = new XMLHttpRequest();
     xhr.open("GET", url, true);
     xhr.send(null);
@@ -15,10 +15,10 @@ function topic_top_load(name, sub) {
                 n_data += t_data[key]['data'];
                 num = key;
             }
-            
+
             o_data.innerHTML = n_data;
-            topic_main_load(name, sub, null);
+            topic_main_load(topic_num, null);
         }
     }
-    
+
 }

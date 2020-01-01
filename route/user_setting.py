@@ -10,7 +10,7 @@ def user_setting_2(conn, server_init):
         return re_error('/ban')
 
     if ip_or_user(ip) == 0:
-        if flask.request.method == 'POST':    
+        if flask.request.method == 'POST':
             auto_list = ['email', 'skin', 'lang']
 
             for auto_data in auto_list:
@@ -22,9 +22,9 @@ def user_setting_2(conn, server_init):
                         curs.execute(db_change("insert into user_set (name, id, data) values (?, ?, ?)"), [auto_data, ip, flask.request.form.get(auto_data, '')])
 
             conn.commit()
-            
+
             return redirect('/change')
-        else:        
+        else:
             curs.execute(db_change('select data from user_set where name = "email" and id = ?'), [ip])
             data = curs.fetchall()
             if data:
@@ -58,12 +58,12 @@ def user_setting_2(conn, server_init):
                     oauth_content += '<li>{}</li>'.format(oauth_provider[i].capitalize() + ' : <img src="{}" width="17px" height="17px"> {}'.format(oauth_data[0][1], oauth_data[0][0]))
                 else:
                     oauth_content += '<li>{}</li>'.format(oauth_provider[i].capitalize() + ' <a href="/oauth/{}/init">({})</a>'.format(oauth_provider[i], load_lang('connect')))
-            
+
             oauth_content += '</ul>'
 
             http_warring = '<hr class=\"main_hr\"><span>' + load_lang('http_warring') + '</span>'
 
-            return easy_minify(flask.render_template(skin_check(),    
+            return easy_minify(flask.render_template(skin_check(),
                 imp = [load_lang('user_setting'), wiki_set(), custom(), other2([0, 0])],
                 data = '''
                     <form method="post">
