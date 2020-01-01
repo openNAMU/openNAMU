@@ -19,7 +19,7 @@ function topic_main_load(topic_num, s_num) {
 
     xhr.onreadystatechange = function() {
         if(xhr.readyState === 4 && xhr.status === 200) {
-            t_data = JSON.parse(xhr.responseText);
+            var t_data = JSON.parse(xhr.responseText);
             for(var key in t_data) {
                 n_data += t_data[key]['data'];
                 num = key;
@@ -32,7 +32,7 @@ function topic_main_load(topic_num, s_num) {
 
             xhr_2.onreadystatechange = function() {
                 if(xhr_2.readyState === 4 && xhr_2.status === 200) {
-                    markup = JSON.parse(xhr_2.responseText)['markup'];
+                    var markup = JSON.parse(xhr_2.responseText)['markup'];
 
                     if(markup === 'markdown') {
                         render_markdown();
