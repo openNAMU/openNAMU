@@ -17,7 +17,7 @@ def api_search_2(conn, name):
         page = 0
 
     curs.execute(db_change('select data from other where name = "count_all_title"'))
-    if int(curs.fetchall()[0][0]) < 10000:
+    if int(curs.fetchall()[0][0]) < 30000:
         curs.execute(db_change("" + \
             "select distinct title, case when title like ? then 'title' else 'data' " + \
             "end from data where title like ? or data like ? order by case " + \

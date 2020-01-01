@@ -328,7 +328,7 @@
             "file_extension_error" : "Only JPG, GIF, JPEG, PNG, WEBP is allowed.",
             "edit_record_error" : "Edit reason can not be more than 500 characters.",
             "same_file_error" : "A file with the same name exists.",
-            "file_capacity_error" : "Maximum file capacity (MB) :",
+            "file_capacity_error" : "Maximum file capacity (MB) : ",
             "decument_exist_error" : "The document with that title already exists.",
             "password_diffrent_error" : "Reconfirm password and input password are different.",
             "edit_filter_error" : "Censored by edit filter.",
@@ -337,5 +337,6 @@
             "email_error" : "No one has this email.",
             "regex_error" : "There is an error in the regular expression.",
             "decument_404_error" : "This document does not exist.",
-            "fast_edit_error" : "You can edit another document after this period(Second(s)): "
+            "fast_edit_error" : "You can edit another document after this period (Second(s)) : ",
+            "too_many_dec_error" : "This feature is not supported because there are too many documents."
 }

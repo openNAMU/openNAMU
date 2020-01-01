@@ -1122,7 +1122,7 @@ def re_error(data):
             elif num == 16:
                 data = load_lang('same_file_error')
             elif num == 17:
-                data = load_lang('file_capacity_error') + ' ' + wiki_set(3)
+                data = load_lang('file_capacity_error') + wiki_set(3)
             elif num == 19:
                 data = load_lang('decument_exist_error')
             elif num == 20:
@@ -1137,6 +1137,8 @@ def re_error(data):
                 curs.execute(db_change("select data from other where name = 'slow_edit'"))
                 slow_data = curs.fetchall()
                 data = load_lang('fast_edit_error') + slow_data[0][0]
+            elif num == 25:
+                data = load_lang('too_many_dec_error')
             else:
                 data = '???'
 
