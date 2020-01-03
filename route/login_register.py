@@ -83,7 +83,7 @@ def login_register_2(conn):
             else:
                 if requires_approval:
                     application_token = ''.join(random.choice("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ") for i in range(60))
-                    curs.execute(db_change("insert into user_application (id, pw, date, encode, question, answer, token, ip, ua) values (?, ?, ?, ?, ?, ?, ?, ?, ?)"), [flask.request.form.get('id', None), hashed, get_time(), db_data[0][0], approval_question, flask.request.form.get('approval_question_answer', None), application_token, ip_check(), flask.request.headers.get('User-Agent')])
+                    curs.execute(db_change("insert into user_application (id, pw, date, encode, question, answer, token, ip, ua, email) values (?, ?, ?, ?, ?, ?, ?, ?, ?, '')"), [flask.request.form.get('id', None), hashed, get_time(), db_data[0][0], approval_question, flask.request.form.get('approval_question_answer', None), application_token, ip_check(), flask.request.headers.get('User-Agent')])
                     conn.commit()
                     return redirect('/application_submitted')
                 else:

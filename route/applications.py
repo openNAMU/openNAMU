@@ -55,7 +55,7 @@ def applications_2(conn):
             div += load_lang('no_applications_now')
     else:
         if flask.request.form.get('approve', '') != '':
-            curs.execute(db_change('select id, pw, date, encode, question, answer, ip, ua from user_application where token = ?'), [flask.request.form.get('approve', '')])
+            curs.execute(db_change('select id, pw, date, encode, question, answer, ip, ua, email from user_application where token = ?'), [flask.request.form.get('approve', '')])
             application = curs.fetchall()
             if not application:
                 return re_error('/error/26')
@@ -70,6 +70,8 @@ def applications_2(conn):
             curs.execute(db_change("insert into user_set (name, id, data) values ('approval_question', ?, ?)"), [application[0], application[4]])
             curs.execute(db_change("insert into user_set (name, id, data) values ('approval_question_answer', ?, ?)"), [application[0], application[5]])
             curs.execute(db_change("insert into ua_d (name, ip, ua, today, sub) values (?, ?, ?, ?, '')"), [application[0], application[6], application[7], application[2]])
+            if application[8] and application[8] != '':
+                curs.execute(db_change("insert into user_set (name, id, data) values ('email', ?, ?)"), [application[0], application[8]])
             curs.execute(db_change('delete from user_application where token = ?'), [flask.request.form.get('approve', '')])
  
 
