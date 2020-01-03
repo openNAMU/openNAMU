@@ -25,6 +25,8 @@ def setting_2(conn, num):
             x += 1
             li_data += '<li><a href="/setting/' + str(x) + '">' + li + '</a></li>'
 
+        li_data += '<li><a href="/applications">' + load_lang('application_list') + '</a></li>'
+
         return easy_minify(flask.render_template(skin_check(),
             imp = [load_lang('setting'), wiki_set(), custom(), other2([0, 0])],
             data = '<h2>' + load_lang('list') + '</h2><ul>' + li_data + '</ul>',
@@ -47,7 +49,9 @@ def setting_2(conn, num):
             13 : 'email_have',
             15 : 'encode',
             16 : 'host',
-            19 : 'slow_edit'
+            19 : 'slow_edit',
+            20 : 'requires_approval',
+            21 : 'approval_question'
         }
         n_list = {
             0 : 'Wiki',
@@ -65,7 +69,9 @@ def setting_2(conn, num):
             13 : '',
             15 : 'sha3',
             16 : '0.0.0.0',
-            19 : '0'
+            19 : '0',
+            20 : '',
+            21 : ''
         }
 
         if flask.request.method == 'POST':
@@ -103,14 +109,16 @@ def setting_2(conn, num):
                 else:
                     acl_div[0] += '<option value="' + acl_data + '">' + acl_data + '</option>'
 
-            check_box_div = ['', '', '']
-            for i in range(0, 3):
+            check_box_div = ['', '', '', '']
+            for i in range(0, 4):
                 if i == 0:
                     acl_num = 7
                 elif i == 1:
                     acl_num = 8
-                else:
+                elif i == 2:
                     acl_num = 13
+                else:
+                    acl_num = 20
 
                 if d_list[acl_num]:
                     check_box_div[i] = 'checked="checked"'
@@ -161,6 +169,8 @@ def setting_2(conn, num):
                         <hr class=\"main_hr\">
                         <input type="checkbox" name="email_have" ''' + check_box_div[2] + '''> ''' + load_lang('email_required') + ' <a href="/setting/6">(' + load_lang('google_imap_required') + ''')</a>
                         <hr class=\"main_hr\">
+                        <input type="checkbox" name="requires_approval" ''' + check_box_div[3] + '''> ''' + load_lang('requires_approval') + '''
+                        <hr class=\"main_hr\">
                         <span>''' + load_lang('wiki_host') + '''</span>
                         <hr class=\"main_hr\">
                         <input type="text" name="host" value="''' + html.escape(d_list[16]) + '''">
@@ -184,6 +194,12 @@ def setting_2(conn, num):
                         <span>''' + load_lang('slow_edit') + ' (' + load_lang('second') + ') (' + load_lang('off') + ''' : 0)</span>
                         <hr class=\"main_hr\">
                         <input name="''' + i_list[19] + '''" value="''' + html.escape(d_list[19]) + '''">
+                        <hr class=\"main_hr\">
+                        <span>''' + load_lang('approval_question') + '''</span>
+                        <hr class=\"main_hr\">
+                        <input name="''' + i_list[21] + '''" value="''' + html.escape(d_list[21]) + '''">
+                        <hr class=\"main_hr\">
+                        <span>''' + load_lang('approval_question_visible_only_when_approval_on') + '''
                         <hr class=\"main_hr\">
                         <button id="save" type="submit">''' + load_lang('save') + '''</button>
                     </form>
