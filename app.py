@@ -635,6 +635,14 @@ def main_image_view(name = None):
 def main_skin_set():
     return main_skin_set_2(conn)
 
+@app.route('/application_submitted')
+def application_submitted():
+    return application_submitted_2(conn)
+
+@app.route('/applications', methods = ['POST', 'GET'])
+def applications():
+    return applications_2(conn)
+
 # API
 @app.route('/api/w/<everything:name>', methods=['POST', 'GET'])
 def api_w(name = ''):
@@ -686,13 +694,6 @@ def main_views(name = None):
 def main_file(data = None):
     return main_file_2(conn, data)
 
-@app.route('/application_submitted')
-def application_submitted():
-    return application_submitted_2(conn)
-
-@app.route('/applications', methods = ['POST', 'GET'])
-def applications():
-    return applications_2(conn)
 # End
 @app.errorhandler(404)
 def main_error_404(e):
