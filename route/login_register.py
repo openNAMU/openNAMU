@@ -77,14 +77,32 @@ def login_register_2(conn):
 
             curs.execute(db_change("select id from user limit 1"))
             if not curs.fetchall():
-                curs.execute(db_change("insert into user (id, pw, acl, date, encode) values (?, ?, 'owner', ?, ?)"), [flask.request.form.get('id', None), hashed, get_time(), db_data[0][0]])
+                curs.execute(db_change("insert into user (id, pw, acl, date, encode) values (?, ?, 'owner', ?, ?)"), [
+                    flask.request.form.get('id', None), 
+                    hashed, 
+                    get_time(), 
+                    db_data[0][0]
+                ])
 
                 first = 1
             else:
                 if requires_approval:
                     application_token = ''.join(random.choice("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ") for i in range(60))
-                    curs.execute(db_change("insert into user_application (id, pw, date, encode, question, answer, token, ip, ua, email) values (?, ?, ?, ?, ?, ?, ?, ?, ?, '')"), [flask.request.form.get('id', None), hashed, get_time(), db_data[0][0], approval_question, flask.request.form.get('approval_question_answer', None), application_token, ip_check(), flask.request.headers.get('User-Agent')])
+                    curs.execute(db_change(
+                        "insert into user_application (id, pw, date, encode, question, answer, token, ip, ua, email) values (?, ?, ?, ?, ?, ?, ?, ?, ?, '')"
+                    ), [
+                        flask.request.form.get('id', None), 
+                        hashed, 
+                        get_time(), 
+                        db_data[0][0], 
+                        approval_question, 
+                        flask.request.form.get('approval_question_answer', None), 
+                        application_token, 
+                        ip_check(), 
+                        flask.request.headers.get('User-Agent')
+                    ])
                     conn.commit()
+                    
                     return redirect('/application_submitted')
                 else:
                     curs.execute(db_change("insert into user (id, pw, acl, date, encode) values (?, ?, 'user', ?, ?)"), [flask.request.form.get('id', None), hashed, get_time(), db_data[0][0]])
@@ -115,8 +133,6 @@ def login_register_2(conn):
             contract = data[0][0] + '<hr class=\"main_hr\">'
 
         http_warring = '<hr class=\"main_hr\"><span>' + load_lang('http_warring') + '</span>'
-
-        
         approval_question = ''
         
         curs.execute(db_change('select data from other where name = "requires_approval"'))
@@ -126,29 +142,30 @@ def login_register_2(conn):
             curs.execute(db_change('select data from other where name = "approval_question"'))
             data = curs.fetchall()
             if data and data[0][0] != '':
-                approval_question = '''<hr class=\"main_hr\">
-                <span>''' + load_lang('approval_question') + ' : ' + data[0][0] + '''<span>
-                <hr class=\"main_hr\">
-                <input placeholder="''' + load_lang('approval_question') + '''" name="approval_question_answer" type="text">
-                <hr class=\"main_hr\">
+                approval_question = '''
+                    <hr class=\"main_hr\">
+                    <span>''' + load_lang('approval_question') + ' : ' + data[0][0] + '''<span>
+                    <hr class=\"main_hr\">
+                    <input placeholder="''' + load_lang('approval_question') + '''" name="approval_question_answer" type="text">
+                    <hr class=\"main_hr\">
                 '''
 
         return easy_minify(flask.render_template(skin_check(),
             imp = [load_lang('register'), wiki_set(), custom(), other2([0, 0])],
-            data =  '''
-                    <form method="post">
-                        ''' + contract + '''
-                        <input placeholder="''' + load_lang('id') + '''" name="id" type="text">
-                        <hr class=\"main_hr\">
-                        <input placeholder="''' + load_lang('password') + '''" name="pw" type="password">
-                        <hr class=\"main_hr\">
-                        <input placeholder="''' + load_lang('password_confirm') + '''" name="pw2" type="password">
-                        <hr class=\"main_hr\">
-                        ''' + approval_question + '''
-                        ''' + captcha_get() + '''
-                        <button type="submit">''' + load_lang('save') + '''</button>
-                        ''' + http_warring + '''
-                    </form>
-                    ''',
+            data = '''
+                <form method="post">
+                    ''' + contract + '''
+                    <input placeholder="''' + load_lang('id') + '''" name="id" type="text">
+                    <hr class=\"main_hr\">
+                    <input placeholder="''' + load_lang('password') + '''" name="pw" type="password">
+                    <hr class=\"main_hr\">
+                    <input placeholder="''' + load_lang('password_confirm') + '''" name="pw2" type="password">
+                    <hr class=\"main_hr\">
+                    ''' + approval_question + '''
+                    ''' + captcha_get() + '''
+                    <button type="submit">''' + load_lang('save') + '''</button>
+                    ''' + http_warring + '''
+                </form>
+            ''',
             menu = [['user', load_lang('return')]]
         ))

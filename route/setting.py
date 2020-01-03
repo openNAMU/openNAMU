@@ -25,8 +25,6 @@ def setting_2(conn, num):
             x += 1
             li_data += '<li><a href="/setting/' + str(x) + '">' + li + '</a></li>'
 
-        li_data += '<li><a href="/applications">' + load_lang('application_list') + '</a></li>'
-
         return easy_minify(flask.render_template(skin_check(),
             imp = [load_lang('setting'), wiki_set(), custom(), other2([0, 0])],
             data = '<h2>' + load_lang('list') + '</h2><ul>' + li_data + '</ul>',
@@ -51,7 +49,6 @@ def setting_2(conn, num):
             16 : 'host',
             19 : 'slow_edit',
             20 : 'requires_approval',
-            21 : 'approval_question'
         }
         n_list = {
             0 : 'Wiki',
@@ -70,8 +67,7 @@ def setting_2(conn, num):
             15 : 'sha3',
             16 : '0.0.0.0',
             19 : '0',
-            20 : '',
-            21 : ''
+            20 : ''
         }
 
         if flask.request.method == 'POST':
@@ -195,12 +191,6 @@ def setting_2(conn, num):
                         <hr class=\"main_hr\">
                         <input name="''' + i_list[19] + '''" value="''' + html.escape(d_list[19]) + '''">
                         <hr class=\"main_hr\">
-                        <span>''' + load_lang('approval_question') + '''</span>
-                        <hr class=\"main_hr\">
-                        <input name="''' + i_list[21] + '''" value="''' + html.escape(d_list[21]) + '''">
-                        <hr class=\"main_hr\">
-                        <span>''' + load_lang('approval_question_visible_only_when_approval_on') + '''
-                        <hr class=\"main_hr\">
                         <button id="save" type="submit">''' + load_lang('save') + '''</button>
                     </form>
                 ''',
@@ -219,7 +209,8 @@ def setting_2(conn, num):
             'reset_user_text',
             'error_401',
             'error_404',
-            'edit_help'
+            'edit_help',
+            'approval_question'
         ]
         if flask.request.method == 'POST':
             for i in i_list:
@@ -300,7 +291,15 @@ def setting_2(conn, num):
                         <hr class=\"main_hr\">
                         <input name="''' + i_list[11] + '''" value="''' + html.escape(d_list[11]) + '''">
                         <hr class=\"main_hr\">
+                        <span>''' + load_lang('approval_question') + '''</span> <a href="#rfn-1" id="fn-1">(1)</a>
+                        <hr class=\"main_hr\">
+                        <input name="''' + i_list[12] + '''" value="''' + html.escape(d_list[12]) + '''">
+                        <hr class=\"main_hr\">
                         <button id="save" type="submit">''' + load_lang('save') + '''</button>
+                        <hr>
+                        <ul>
+                            <li><a href="#fn-1" id="rfn-1">(1)</a> <span>''' + load_lang('approval_question_visible_only_when_approval_on') + '''</span></li>
+                        </ul>
                     </form>
                 ''',
                 menu = [['setting', load_lang('return')]]

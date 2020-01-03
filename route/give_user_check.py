@@ -18,24 +18,28 @@ def give_user_check_2(conn, name):
     else:
         sql_num = 0
 
-    approval_question_div = ''
     if ip_or_user(name) == 0:
         curs.execute(db_change("select data from user_set where name = \"approval_question\" and id = ?"), [name])
         approval_question = curs.fetchall()
         if approval_question and approval_question[0][0]:
-            approval_question = approval_question[0][0]
-            approval_question_div = '''<table>
-            <thead>
-            <tr><td colspan="2">회원가입 질문</td></tr>
-            </thead>
-            <tbody>
-            <tr><td>질문</td><td>''' + approval_question + '''
-            '''
             curs.execute(db_change("select data from user_set where name = \"approval_question_answer\" and id = ?"), [name])
             approval_question_answer = curs.fetchall()
             if approval_question_answer and approval_question_answer[0]:
-                approval_question_div += '<tr><td>답변</td><td>' + approval_question_answer[0][0] + '</td></tr>'
-            approval_question_div += '</tbody></table><br>'
+                div = '''
+                    <table id="main_table_set">
+                        <tbody>
+                            <tr>
+                                <td>Q</td>
+                                <td>''' + approval_question[0][0] + '''</td>
+                                <td>A</td>
+                                <td>''' + approval_question_answer[0][0] + '''</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <hr class=\"main_hr\">
+                '''
+    else:
+        div = ''
 
     if flask.request.args.get('plus', None):
         end_check = 1
@@ -61,19 +65,19 @@ def give_user_check_2(conn, name):
     record = curs.fetchall()
     if record:
         if not flask.request.args.get('plus', None):
-            div = '<a href="/manager/14?plus=' + url_pas(name) + '">(' + load_lang('compare') + ')</a><hr class=\"main_hr\">'
+            div = '<a href="/manager/14?plus=' + url_pas(name) + '">(' + load_lang('compare') + ')</a><hr class=\"main_hr\">' + div
         else:
-            div = '<a href="/check/' + url_pas(name) + '">(' + name + ')</a> <a href="/check/' + url_pas(flask.request.args.get('plus', None)) + '">(' + flask.request.args.get('plus', None) + ')</a><hr class=\"main_hr\">'
+            div = '<a href="/check/' + url_pas(name) + '">(' + name + ')</a> <a href="/check/' + url_pas(flask.request.args.get('plus', None)) + '">(' + flask.request.args.get('plus', None) + ')</a><hr class=\"main_hr\">' + div
 
-        div +=  approval_question_div + '''
-                <table id="main_table_set">
-                    <tbody>
-                        <tr>
-                            <td id="main_table_width">''' + load_lang('name') + '''</td>
-                            <td id="main_table_width">ip</td>
-                            <td id="main_table_width">''' + load_lang('time') + '''</td>
-                        </tr>
-                '''
+        div += '''
+            <table id="main_table_set">
+                <tbody>
+                    <tr>
+                        <td id="main_table_width">''' + load_lang('name') + '''</td>
+                        <td id="main_table_width">ip</td>
+                        <td id="main_table_width">''' + load_lang('time') + '''</td>
+                    </tr>
+        '''
 
         for data in record:
             if data[2]:
