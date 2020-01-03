@@ -15,42 +15,51 @@ def applications_2(conn):
         div += '<p>' + load_lang('approval_requirement_disabled') + '</p>'
 
     if flask.request.method == 'GET':
-        curs.execute(db_change('select id, date, question, answer, token from user_application'))
+        curs.execute(db_change('select id, date, question, answer, token, email from user_application'))
         db_data = curs.fetchall()
         
         if db_data:
-            div += '''
-                <form method=\"post\">
-                    <table id=\"main_table_set\">
-                        <tbody>
-                            <tr>
-                                <td>''' + load_lang('id') + '''</td>
-                                <td>''' + load_lang('application_time') + '''</td>
-                                <td>''' + load_lang('approval_question') + '''</td>
-                                <td>''' + load_lang('answer') + '''</td>
-                                <td>''' + load_lang('approve_or_decline') + '''</td>
-                            </tr>
-            '''
+            div += '<p>총 ' + str(len(db_data)) + ' 개의 가입신청이 있습니다.</p><br>'
             for application in db_data:
                 question = application[2]
                 answer = application[3]
-                if not question or question == '':
-                    question = '(질문 없음)'
-                if not answer or answer == '':
-                    answer = '(대답 없음)'
+                email = application[5]
+                if not question:
+                    question = ''
+                if not answer:
+                    answer = ''
+                if not email:
+                    email = ''
                 div += '''
-                    <tr>
-                        <td>''' + application[0] + '''</td>
-                        <td>''' + application[1] + '''</td>
-                        <td>''' + question + '''</td>
-                        <td>''' + answer + '''</td>
-                        <td>
-                            <button type=\"submit\" name=\"approve\" value=\"''' + application[4] + '''\">''' + load_lang('approve') + '''</button>
-                            <button type=\"submit\" name=\"decline\" value=\"''' + application[4] + '''\">''' + load_lang('decline') + '''</button>
-                        </td>
-                    </tr>
+                    <form method=\"post\">
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <td>''' + load_lang('id') + '''</td><td>''' + application[0] + '''</td>
+                                </tr>
+                                <tr>
+                                    <td>''' + load_lang('application_time') + '''</td><td>''' + application[1] + '''</td>
+                                </tr>
+                                <tr>
+                                    <td>''' + load_lang('approval_question') + '''</td><td>''' + question + '''</td>
+                                </tr>
+                                <tr>
+                                    <td>''' + load_lang('answer') + '''</td><td>''' + html.escape(answer) + '''</td>
+                                </tr>
+                                <tr>
+                                    <td>''' + load_lang('email') + '''</td><td>''' + html.escape(email) + '''</td>
+                                </tr>
+                                <tr>
+                                    <td colspan=\"2\" style=\"text-align: center;\">
+                                        <button type=\"submit\" name=\"approve\" value=\"''' + application[4] + '''\">''' + load_lang('approve') + '''</button>
+                                        <button type=\"submit\" name=\"decline\" value=\"''' + application[4] + '''\">''' + load_lang('decline') + '''</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </form>
+                    <br>
                 '''
-            div += '</tbody></table></form>'
         else:
             div += load_lang('no_applications_now')
     else:
