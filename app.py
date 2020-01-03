@@ -146,6 +146,7 @@ create_data['all_data'] = [
     'inter',
     'html_filter',
     'oauth_conn',
+    'user_application'
 ]
 for i in create_data['all_data']:
     try:
@@ -175,6 +176,7 @@ if setup_tool != 0:
     create_data['rd'] = ['title', 'sub', 'date', 'band', 'stop', 'agree']
     create_data['user'] = ['id', 'pw', 'acl', 'date', 'encode']
     create_data['user_set'] = ['name', 'id', 'data']
+    create_data['user_application'] = ['id', 'pw', 'date', 'encode', 'question', 'answer', 'ip', 'ua', 'token']
     create_data['ban'] = ['block', 'end', 'why', 'band', 'login']
     create_data['topic'] = ['id', 'title', 'sub', 'data', 'date', 'ip', 'block', 'top', 'code']
     create_data['rb'] = ['block', 'end', 'today', 'blocker', 'why', 'band']
@@ -684,6 +686,13 @@ def main_views(name = None):
 def main_file(data = None):
     return main_file_2(conn, data)
 
+@app.route('/application_submitted')
+def application_submitted():
+    return application_submitted_2(conn)
+
+@app.route('/applications', methods = ['POST', 'GET'])
+def applications():
+    return applications_2(conn)
 # End
 @app.errorhandler(404)
 def main_error_404(e):
