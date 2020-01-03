@@ -17,9 +17,9 @@ def applications_2(conn):
     if flask.request.method == 'GET':
         curs.execute(db_change('select id, date, question, answer, token, email from user_application'))
         db_data = curs.fetchall()
-        
         if db_data:
-            div += '<p>총 ' + str(len(db_data)) + ' 개의 가입신청이 있습니다.</p><br>'
+            div += '<p>' + load_lang('all_register_num') + ' : ' + str(len(db_data)) + '</p><br>'
+
             for application in db_data:
                 question = application[2]
                 answer = application[3]
@@ -75,10 +75,20 @@ def applications_2(conn):
             if curs.fetchall():
                 return re_error('/error/6')
             
-            curs.execute(db_change("insert into user (id, pw, acl, date, encode) values (?, ?, 'user', ?, ?)"), [application[0], application[1], application[2], application[3]])
+            curs.execute(db_change("insert into user (id, pw, acl, date, encode) values (?, ?, 'user', ?, ?)"), [
+                application[0], 
+                application[1], 
+                application[2], 
+                application[3]
+            ])
             curs.execute(db_change("insert into user_set (name, id, data) values ('approval_question', ?, ?)"), [application[0], application[4]])
             curs.execute(db_change("insert into user_set (name, id, data) values ('approval_question_answer', ?, ?)"), [application[0], application[5]])
-            curs.execute(db_change("insert into ua_d (name, ip, ua, today, sub) values (?, ?, ?, ?, '')"), [application[0], application[6], application[7], application[2]])
+            curs.execute(db_change("insert into ua_d (name, ip, ua, today, sub) values (?, ?, ?, ?, '')"), [
+                application[0], 
+                application[6], 
+                application[7], 
+                application[2]
+            ])
             if application[8] and application[8] != '':
                 curs.execute(db_change("insert into user_set (name, id, data) values ('email', ?, ?)"), [application[0], application[8]])
             curs.execute(db_change('delete from user_application where token = ?'), [flask.request.form.get('approve', '')])
@@ -88,6 +98,7 @@ def applications_2(conn):
         elif flask.request.form.get('decline', '') != '':
             curs.execute(db_change('delete from user_application where token = ?'), [flask.request.form.get('decline', '')])
             conn.commit()
+
         return redirect('/applications')
 
     return easy_minify(flask.render_template(skin_check(),

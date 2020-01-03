@@ -54,7 +54,9 @@ def login_check_key_2(conn, tool):
                         requires_approval = curs.fetchall()
                         if requires_approval and requires_approval[0][0] == 'on':
                             application_token = ''.join(random.choice("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ") for i in range(60))
-                            curs.execute(db_change("insert into user_application (id, pw, date, encode, question, answer, token, ip, ua, email) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"), [
+                            curs.execute(db_change(
+                                "insert into user_application (id, pw, date, encode, question, answer, token, ip, ua, email) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+                            ), [
                                 flask.session['c_id'],
                                 flask.session['c_pw'],
                                 get_time(),
