@@ -50,12 +50,38 @@ def login_check_key_2(conn, tool):
 
                         first = 1
                     else:
-                        curs.execute(db_change("insert into user (id, pw, acl, date, encode) values (?, ?, 'user', ?, ?)"), [
-                            flask.session['c_id'],
-                            flask.session['c_pw'],
-                            get_time(),
-                            db_data[0][0]
-                        ])
+                        curs.execute(db_change('select data from other where name = "requires_approval"'))
+                        requires_approval = curs.fetchall()
+                        if requires_approval and requires_approval[0][0] == 'on':
+                            application_token = ''.join(random.choice("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ") for i in range(60))
+                            curs.execute(db_change("insert into user_application (id, pw, date, encode, question, answer, token, ip, ua) values (?, ?, ?, ?, ?, ?, ?, ?, ?)"), [
+                                flask.session['c_id'],
+                                flask.session['c_pw'],
+                                get_time(),
+                                db_data[0][0],
+                                flask.session['c_question'],
+                                flask.session['c_ans'],
+                                application_token,
+                                ip,
+                                flask.request.headers.get('User-Agent')
+                            ])
+                            conn.commit()
+
+                            flask.session.pop('c_id', None)
+                            flask.session.pop('c_pw', None)
+                            flask.session.pop('c_key', None)
+                            flask.session.pop('c_email', None)
+                            flask.session.pop('c_question', None)
+                            flask.session.pop('c_ans', None)
+
+                            return redirect('/application_submitted')
+                        else:
+                            curs.execute(db_change("insert into user (id, pw, acl, date, encode) values (?, ?, 'user', ?, ?)"), [
+                                flask.session['c_id'],
+                                flask.session['c_pw'],
+                                get_time(),
+                                db_data[0][0]
+                            ])
 
                         first = 0
 
