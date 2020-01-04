@@ -321,6 +321,11 @@ curs.execute(db_change('select data from other where name = "count_all_title"'))
 if not curs.fetchall():
     curs.execute(db_change('insert into other (name, data) values ("count_all_title", "0")'))
 
+curs.execute(db_change("select html from html_filter where kind = 'email'"))
+if not curs.fetchall():
+    for i in ['naver.com', 'gmail.com', 'daum.net', 'kakao.com']:
+        curs.execute(db_change("insert into html_filter (html, kind) values (?, 'email')"), [i])
+
 conn.commit()
 
 if os.path.exists('custom.py'):
