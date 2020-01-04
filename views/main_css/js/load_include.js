@@ -16,6 +16,9 @@ function load_include(title, name, p_data) {
                 try {
                     var patt = new RegExp('@' + p_data[key][0] + '@', 'g');
                     g_data = g_data.replace(patt, p_data[key][1]);
+
+                    patt = new RegExp(encodeURIComponent('@' + p_data[key][0] + '@', 'g'));
+                    g_data = g_data.replace(patt, encodeURIComponent(p_data[key][1]));
                 } catch(e) {
                     console.log(e);
                 }
