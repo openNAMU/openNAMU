@@ -1,7 +1,11 @@
 function load_include(title, name, p_data) {
     var o_data = document.getElementById(name);
 
-    var url = "/api/w/" + encodeURI(title) + "?include=" + name;
+    var change = '';
+    for(key in p_data) {
+        change += '@' + p_data[key][0].replace('&', '<amp>') + '@,' + p_data[key][1].replace(',', '<comma>').replace('&', '<amp>') + ''
+    }
+    var url = "/api/w/" + encodeURI(title) + "?include=" + name + "&change=" + change;
 
     var xhr = new XMLHttpRequest();
     xhr.open("GET", url, true);
@@ -11,18 +15,6 @@ function load_include(title, name, p_data) {
         if(this.readyState === 4 && this.status === 200) {
             var o_p_data = JSON.parse(this.responseText);
             var g_data = o_p_data['data'];
-
-            for(key in p_data) {
-                try {
-                    var patt = new RegExp('@' + p_data[key][0] + '@', 'g');
-                    g_data = g_data.replace(patt, p_data[key][1]);
-
-                    patt = new RegExp(encodeURIComponent('@' + p_data[key][0] + '@', 'g'));
-                    g_data = g_data.replace(patt, encodeURIComponent(p_data[key][1]));
-                } catch(e) {
-                    console.log(e);
-                }
-            }
 
             o_data.innerHTML = g_data;
 

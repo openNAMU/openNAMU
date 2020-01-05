@@ -33,26 +33,6 @@ def ip_check(d_type = 0):
 
     return str(ip)
 
-def link_fix(main_link):
-    if re.search('^:', main_link):
-        main_link = re.sub('^:', '', main_link)
-
-    main_link = re.sub('^사용자:', 'user:', main_link)
-    main_link = re.sub('^파일:', 'file:', main_link)
-    main_link = re.sub('^분류:', 'category:', main_link)
-
-    other_link = re.search('[^\\\\]?(#[^#]+)$', main_link)
-    if other_link:
-        other_link = other_link.groups()[0]
-
-        main_link = re.sub('(#[^#]+)$', '', main_link)
-    else:
-        other_link = ''
-
-    main_link = re.sub('\\\\#', '%23', main_link)
-
-    return [main_link, other_link]
-
 def savemark(data):
     data = re.sub("\[date\(now\)\]", get_time(), data)
 

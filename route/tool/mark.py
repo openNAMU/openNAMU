@@ -1,4 +1,4 @@
-from .set_mark.namumark import namumark
+from .set_mark.namumark import namumark, link_fix
 from .set_mark.markdown import markdown
 
 from .set_mark.tool import *
