@@ -54,9 +54,9 @@ def table_parser(data, cel_data, start_data, num = 0):
     table_align = re.search("&lt;table ?align=((?:(?!&gt;).)*)&gt;", data)
     if table_align:
         if table_align.groups()[0] == 'right':
-            all_table += 'float: right;'
+            div_style += 'float: right;'
         elif table_align.groups()[0] == 'center':
-            all_table += 'margin: auto;'
+            div_style += 'margin: auto;'
 
     table_text_align = re.search("&lt;table ?textalign=((?:(?!&gt;).)*)&gt;", data)
     if table_text_align:
@@ -90,35 +90,35 @@ def table_parser(data, cel_data, start_data, num = 0):
 
     # <>
 
-    row_bgcolor = re.search("&lt;rowbgcolor=(#(?:[0-9a-f-A-F]{3}){1,2}|\w+)&gt;", data)
+    row_bgcolor = re.search("&lt;rowbgcolor=(#(?:[0-9a-f-A-F]{3}){1,2}|\w+)(?:,(#(?:[0-9a-f-A-F]{3}){1,2}|\w+))?&gt;", data)
     if row_bgcolor:
         row_style += 'background: ' + row_bgcolor.groups()[0] + ';'
 
-    row_bgcolor = re.search("&lt;rowcolor=(#(?:[0-9a-f-A-F]{3}){1,2}|\w+)&gt;", data)
+    row_bgcolor = re.search("&lt;rowcolor=(#(?:[0-9a-f-A-F]{3}){1,2}|\w+)(?:,(#(?:[0-9a-f-A-F]{3}){1,2}|\w+))?&gt;", data)
     if row_bgcolor:
         row_style += 'color: ' + row_bgcolor.groups()[0] + ';'
 
     # row
 
-    table_border = re.search("&lt;table ?bordercolor=(#(?:[0-9a-f-A-F]{3}){1,2}|\w+)&gt;", data)
+    table_border = re.search("&lt;table ?bordercolor=(#(?:[0-9a-f-A-F]{3}){1,2}|\w+)(?:,(#(?:[0-9a-f-A-F]{3}){1,2}|\w+))?&gt;", data)
     if table_border:
         all_table += 'border: ' + table_border.groups()[0] + ' 2px solid;'
 
-    table_bgcolor = re.search("&lt;table ?bgcolor=(#(?:[0-9a-f-A-F]{3}){1,2}|\w+)&gt;", data)
+    table_bgcolor = re.search("&lt;table ?bgcolor=(#(?:[0-9a-f-A-F]{3}){1,2}|\w+)(?:,(#(?:[0-9a-f-A-F]{3}){1,2}|\w+))?&gt;", data)
     if table_bgcolor:
         all_table += 'background: ' + table_bgcolor.groups()[0] + ';'
 
-    table_bgcolor = re.search("&lt;table ?color=(#(?:[0-9a-f-A-F]{3}){1,2}|\w+)&gt;", data)
+    table_bgcolor = re.search("&lt;table ?color=(#(?:[0-9a-f-A-F]{3}){1,2}|\w+)(?:,(#(?:[0-9a-f-A-F]{3}){1,2}|\w+))?&gt;", data)
     if table_bgcolor:
         all_table += 'color: ' + table_bgcolor.groups()[0] + ';'
 
     # all
 
-    bgcolor = re.search("&lt;(?:bgcolor=)?(#(?:[0-9a-f-A-F]{3}){1,2}|\w+)&gt;", data)
+    bgcolor = re.search("&lt;(?:bgcolor=)?(#(?:[0-9a-f-A-F]{3}){1,2}|\w+)(?:,(#(?:[0-9a-f-A-F]{3}){1,2}|\w+))?&gt;", data)
     if bgcolor:
         cel_style += 'background: ' + bgcolor.groups()[0] + ';'
 
-    bgcolor = re.search("&lt;color=(#(?:[0-9a-f-A-F]{3}){1,2}|\w+)&gt;", data)
+    bgcolor = re.search("&lt;color=(#(?:[0-9a-f-A-F]{3}){1,2}|\w+)(?:,(#(?:[0-9a-f-A-F]{3}){1,2}|\w+))?&gt;", data)
     if bgcolor:
         cel_style += 'color: ' + bgcolor.groups()[0] + ';'
 
