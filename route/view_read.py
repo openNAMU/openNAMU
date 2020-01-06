@@ -18,7 +18,7 @@ def view_read_2(conn, name):
             if r_db:
                 r_data = link_fix(r_db[0][0])
 
-                return redirect('/w/' + r_data[0] + '?from=' + name + r_data[1])
+                return redirect('/w/' + url_pas(r_data[0]) + '?from=' + name + r_data[1])
 
     curs.execute(db_change("select sub from rd where title = ? and not stop = 'O' order by date desc"), [name])
     if curs.fetchall():
