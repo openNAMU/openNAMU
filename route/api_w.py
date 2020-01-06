@@ -26,7 +26,7 @@ def api_w_2(conn, name):
                         json_data = include_re.sub('', data[0][0])
                         json_data = category_re.sub('', json_data)
 
-                        get_all_change = re.findall('(@(?:[^@]*)@),([^,]*)(,|$)', flask.request.args.get('change', ''))
+                        get_all_change = re.findall('(@(?:[^@]*)@),([^,]*),', flask.request.args.get('change', ''))
                         for i in get_all_change:
                             json_data = json_data.replace(
                                 i[0].replace('<amp>', '&'), 
