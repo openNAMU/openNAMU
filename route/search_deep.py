@@ -23,15 +23,16 @@ def search_deep_2(conn, name):
     else:
         link_id = 'id="not_thing"'
 
-    div =   '''
-            <ul>
-                <li>
-                    <a ''' + link_id + ' href="/w/' + url_pas(name) + '">' + name + '''</a>
-                </li>
-            </ul>
-            <hr class=\"main_hr\">
-            <ul>
-            '''
+    div = '''
+        <ul>
+            <li>
+                <a ''' + link_id + ' href="/w/' + url_pas(name) + '">' + html.escape(name) + '''</a>
+            </li>
+        </ul>
+        <hr class=\"main_hr\">
+        <ul>
+    '''
+
     curs.execute(db_change('select data from other where name = "count_all_title"'))
     if int(curs.fetchall()[0][0]) < 30000:
         curs.execute(db_change("" + \
