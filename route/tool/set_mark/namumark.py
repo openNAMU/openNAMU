@@ -56,7 +56,7 @@ def table_parser(data, cel_data, start_data, num = 0):
         if table_align.groups()[0] == 'right':
             div_style += 'float: right;'
         elif table_align.groups()[0] == 'center':
-            div_style += 'margin: auto;'
+            all_table += 'margin: auto;'
 
     table_text_align = re.search("&lt;table ?textalign=((?:(?!&gt;).)*)&gt;", data)
     if table_text_align:
