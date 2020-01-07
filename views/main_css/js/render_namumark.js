@@ -92,6 +92,8 @@ function render_namumark(target) {
     }
 
     var data = '\n' + document.getElementById(target).innerHTML + '\n';
+    var title = window.location.pathname.replace(/^\/w\//, '');
+    console.log(title);
 
     var mid_num = 0;
     var mid_stack = 0;
@@ -394,9 +396,11 @@ function render_namumark(target) {
 
     var toc_array = [0, 0, 0, 0, 0, 0];
     var before_data = 0;
+    var edit_number = 0;
     var toc_data = '<div id="toc"><span id="toc_title">TOC</span>\n\n'
     data = data.replace(/\n(={1,6}) ?([^\n]+) (?:={1,6})/g, function(all, num, in_data) {
         num = num.length;
+        edit_number += 1;
         
         if(before_data > num) {
             var i = num;
@@ -425,7 +429,15 @@ function render_namumark(target) {
             '\n' + 
         '';
 
-        return '\n<h' + num + ' id="s-' + toc_num.replace(/\.$/, '') + '"><a href="#toc">' + toc_num + '</a> ' + in_data + '</h' + num + '>';
+        return '' +
+            '\n' +
+            '<h' + num + ' id="s-' + toc_num.replace(/\.$/, '') + '">' +
+                '<a href="#toc">' + toc_num + '</a> ' + in_data +
+                '<span style="font-size: 12px">' +
+                    '<a href="/edit/' + title + '?section=' + String(edit_number) + '">(Edit)</a>' +
+                '</span>' +
+            '</h' + num + '>' +
+        '';
     });
 
     toc_data += '</div>';
@@ -446,57 +458,63 @@ function render_namumark(target) {
     var ref_num = 0;
     var ref_data = '<hr><ul id="footnote_data">';
     var name_ref_data = {};
-    data = data.replace(/(?:\[\*([^ \]]*)(?: ([^\]]+))?\]|\[(?:각주|footnote)])/g, function(all, name_data, in_data) {
-        if(all.match(/^\[(?:각주|footnote)]$/i)) {
-            var new_ref_data = ref_data;
-            ref_data = '<hr><ul id="footnote_data">';
-            
-            return new_ref_data + '</ul>';
-        } else {
-            ref_num += 1;
-            if(name_data) {
-                if(in_data) {
-                    name_ref_data[name_data] = in_data;
-
-                    ref_data += '' +
-                        '<li>' +
-                            '<a id="fn-' + name_data + '" href="#rfn-' + String(ref_num) + '">(' + name_data + ')</a> ' + in_data + ''
-                        '</li>' +
-                    ''    
+    while(1) {
+        if(data.match(/(?:\[\*([^ \]]*)(?: ((?:(?!\[\*|\]).)+))?\]|\[(?:각주|footnote)])/)) {
+            data = data.replace(/(?:\[\*([^ \]]*)(?: ((?:(?!\[\*|\]).)+))?\]|\[(?:각주|footnote)])/, function(all, name_data, in_data) {
+                if(all.match(/^\[(?:각주|footnote)]$/i)) {
+                    var new_ref_data = ref_data;
+                    ref_data = '<hr><ul id="footnote_data">';
+                    
+                    return new_ref_data + '</ul>';
                 } else {
-                    ref_data += '' +
-                        '<li>' +
-                            '<a href="#rfn-' + String(ref_num) + '">(' + name_data + ')</a>' +
-                        '</li>' +
-                    ''
-                }
-            } else {
-                ref_data += '' +
-                    '<li>' +
-                        '<a id="fn-' + String(ref_num) + '" href="#rfn-' + String(ref_num) + '">(' + String(ref_num) + ')</a> ' + in_data + ''
-                    '</li>' +
-                ''
-            }
+                    ref_num += 1;
+                    if(name_data) {
+                        if(in_data) {
+                            name_ref_data[name_data] = in_data;
 
-            if(name_data) {
-                return '' +
-                    '<sup>' +
-                        '<a href="#fn-' + name_data + '" id="rfn-' + String(ref_num) + '" title="' + name_ref_data[name_data].replace(/<([^>]*)>/g, '') + '">' +
-                            '(' + name_data + ')' +
-                        '</a>' +
-                    '</sup>' +
-                '';
-            } else {
-                return '' +
-                '<sup>' +
-                    '<a href="#fn-' + String(ref_num) + '" id="rfn-' + String(ref_num) + '" title="' + in_data.replace(/<([^>]*)>/g, '') + '">' +
-                        '(' + String(ref_num) + ')' +
-                    '</a>' +
-                '</sup>' +
-            '';
-            }
+                            ref_data += '' +
+                                '<li>' +
+                                    '<a id="fn-' + name_data + '" href="#rfn-' + String(ref_num) + '">(' + name_data + ')</a> ' + in_data + ''
+                                '</li>' +
+                            ''    
+                        } else {
+                            ref_data += '' +
+                                '<li>' +
+                                    '<a href="#rfn-' + String(ref_num) + '">(' + name_data + ')</a>' +
+                                '</li>' +
+                            ''
+                        }
+                    } else {
+                        ref_data += '' +
+                            '<li>' +
+                                '<a id="fn-' + String(ref_num) + '" href="#rfn-' + String(ref_num) + '">(' + String(ref_num) + ')</a> ' + in_data + ''
+                            '</li>' +
+                        ''
+                    }
+
+                    if(name_data) {
+                        return '' +
+                            '<sup>' +
+                                '<a href="#fn-' + name_data + '" id="rfn-' + String(ref_num) + '" title="' + name_ref_data[name_data].replace(/<([^>]*)>/g, '') + '">' +
+                                    '(' + name_data + ')' +
+                                '</a>' +
+                            '</sup>' +
+                        '';
+                    } else {
+                        return '' +
+                        '<sup>' +
+                            '<a href="#fn-' + String(ref_num) + '" id="rfn-' + String(ref_num) + '" title="' + in_data.replace(/<([^>]*)>/g, '') + '">' +
+                                '(' + String(ref_num) + ')' +
+                            '</a>' +
+                        '</sup>' +
+                    '';
+                    }
+                }
+            });
+        } else {
+            break;
         }
-    });
+    }
 
     if(ref_data !== '<hr><ul id="footnote_data">') {
         data += ref_data + '</ul>';
