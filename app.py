@@ -29,6 +29,9 @@ while 1:
                 print('----')
                 raise
         else:
+            print('DB name : ' + set_data['db'])
+            print('DB type : ' + set_data['db_type'])
+
             break
     except:
         if os.getenv('NAMU_DB') != None or os.getenv('NAMU_DB_TYPE') != None:
@@ -37,12 +40,15 @@ while 1:
                 "db_type" : os.getenv('NAMU_DB_TYPE') if os.getenv('NAMU_DB_TYPE') else 'sqlite'
             }
 
+            print('DB name : ' + set_data['db'])
+            print('DB type : ' + set_data['db_type'])
+
             break
         else:
             new_json = ['', '']
             normal_db_type = ['sqlite', 'mysql']
 
-            print('DB type (sqlite, mysql) : ', end = '')
+            print('DB type (sqlite) [sqlite, mysql] : ', end = '')
             new_json[0] = str(input())
             if new_json[0] == '' or not new_json[0] in normal_db_type:
                 new_json[0] = 'sqlite'
@@ -53,8 +59,8 @@ while 1:
                 if f_src:
                     all_src += [f_src.groups()[0]]
 
-            if all_src != []:
-                print('DB name (' + ', '.join(all_src) + ') : ', end = '')
+            if all_src != [] and new_json[0] != 'mysql':
+                print('DB name (data) [' + ', '.join(all_src) + '] : ', end = '')
             else:
                 print('DB name (data) : ', end = '')
 
@@ -68,9 +74,6 @@ while 1:
             set_data = json.loads(open('data/set.json').read())
 
             break
-
-print('DB name : ' + set_data['db'])
-print('DB type : ' + set_data['db_type'])
 
 db_data_get(set_data['db_type'])
 
@@ -117,11 +120,6 @@ else:
 
 load_conn(conn)
 
-if os.path.exists(set_data['db'] + '.db'):
-    setup_tool = 0
-else:
-    setup_tool = 1
-
 create_data = {}
 create_data['all_data'] = [
     'data',
@@ -157,17 +155,16 @@ for i in create_data['all_data']:
         except:
             curs.execute(db_change("alter table " + i + " add test longtext default ''"))
 
-if setup_tool == 0:
-    try:
-        curs.execute(db_change('select data from other where name = "ver"'))
-        ver_set_data = curs.fetchall()
-        if not ver_set_data:
-            setup_tool = 1
-        else:
-            if version_list['master']['c_ver'] > ver_set_data[0][0]:
-                setup_tool = 1
-    except:
+try:
+    curs.execute(db_change('select data from other where name = "ver"'))
+    ver_set_data = curs.fetchall()
+    if not ver_set_data:
         setup_tool = 1
+    else:
+        if version_list['master']['c_ver'] > ver_set_data[0][0]:
+            setup_tool = 1
+except:
+    setup_tool = 1
 
 if setup_tool != 0:
     create_data['data'] = ['title', 'data']
