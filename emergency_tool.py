@@ -140,13 +140,14 @@ for i in create_data['all_data']:
         except:
             curs.execute(db_change("alter table " + i + " add test longtext default ''"))
 
+setup_tool = 0
 try:
     curs.execute(db_change('select data from other where name = "ver"'))
     ver_set_data = curs.fetchall()
     if not ver_set_data:
         setup_tool = 1
     else:
-        if version_list['master']['c_ver'] > ver_set_data[0][0]:
+        if int(version_list['master']['c_ver']) > int(ver_set_data[0][0]):
             setup_tool = 1
 except:
     setup_tool = 1
