@@ -18,14 +18,23 @@ function render_namumark(target) {
         xhr.send(null);
         
         xhr.onreadystatechange = function() {
-            if(this.readyState === 4 && this.status === 200) {
-                if(JSON.parse(this.responseText)['exist'] !== '1') {
-                    document.getElementsByClassName(link_data[1])[0].id = "not_thing";
+            var i = 0;
+            while(1) {
+                if(document.getElementsByClassName(link_data[1])[i]) {
+                    if(this.readyState === 4 && this.status === 200) {
+                        if(JSON.parse(this.responseText)['exist'] !== '1') {
+                            document.getElementsByClassName(link_data[1])[i].id = "not_thing";
+                        } else {
+                            document.getElementsByClassName(link_data[1])[i].id = "";
+                        }
+                    } else {
+                        document.getElementsByClassName(link_data[1])[i].id = "not_thing";
+                    }
+
+                    i += 1;
                 } else {
-                    document.getElementsByClassName(link_data[1])[0].id = "";
+                    break;
                 }
-            } else {
-                document.getElementsByClassName(link_data[1])[0].id = "not_thing";
             }
         }
     }
@@ -64,7 +73,6 @@ function render_namumark(target) {
                             '';
                         }
                     } else {
-                        console.log(file_data[1]);
                         document.getElementById(file_data[1]).innerHTML = '' +
                             '<a href="/upload?name=' + encodeURIComponent(file_data[0]) + '" id="not_thing">' + file_data[0] + '</a>' +
                         '';
@@ -212,7 +220,7 @@ function render_namumark(target) {
 
     var nowiki_num = 0;
     var nowiki_list = {};
-    data = data.replace(/<code>((?:(?!<\/code>).)+)<\/code>/gm, function(all, in_data) {
+    data = data.replace(/<code>(\n*((?:(?!<\/code>).)+\n*)+)<\/code>/g, function(all, in_data) {
         nowiki_num += 1;
         nowiki_list['nowiki_' + String(nowiki_num)] = in_data;
 
@@ -250,36 +258,61 @@ function render_namumark(target) {
     var file_list = [];
     var link_num = 0;
     var file_num = 0;
-    var category = '<div id="cate_all"><hr><div id="cate">Category : '
-    data = data.replace(/\[\[((?:(?!]]).)+)]]/g, function(all, in_data) {
-        if(in_data.match(/^(?:category|분류):/i)) {
-            category += '<a href="' + encodeURIComponent(in_data) + '">' + in_data + '</a> | ';
+    var category = ''
+    while(1) {
+        if(data.match(/\[\[((?:(?!\[\[|]]).)+)]]/)) {
+            data = data.replace(/\[\[((?:(?!\[\[|]]).)+)]]/, function(all, in_data) {
+                if(in_data.match(/^(?:category|분류):/i)) {
+                    var back_data = in_data.replace(/^(?:category|분류):/i, '');
+                    var front_data = back_data;
+                    back_data = 'category:' + back_data.replace(/#blur$/, '');
+                    
+                    if(front_data.match(/#blur$/)) {
+                        front_data = '#blur';
+                    }
 
-            return '';
-        } else if(in_data.match(/^(?:file|파일):/i)) {
-            file_list.push([in_data.replace(/^(?:file|파일):/i, ''), 'file_' + String(file_num)]);
-            file_num += 1;
-            
-            return '<span id="file_' + String(file_num - 1) + '"></span>';
-        } else if(in_data.match(/^http(?:s)?:\/\//i)) {
-            var link_part = divi_link(in_data);
-            
-            var front_data = link_part[0];
-            var back_data = link_part[1];
+                    link_list.push([back_data, 'link_' + String(link_num)]);
+                    link_num += 1;
 
-            return '<a id="out_link" href="' + back_data + '">' + front_data + '</a>'; 
+                    if(category === '') {
+                        category += '<div id="cate_all"><hr><div id="cate">Category : '
+                    }
+
+                    category += '<a class="link_' + String(link_num - 1) + '" href="' + encodeURIComponent(back_data) + '">' + front_data + '</a> | ';
+
+                    return '';
+                } else if(in_data.match(/^(?:file|파일):/i)) {
+                    file_list.push([in_data.replace(/^(?:file|파일):/i, ''), 'file_' + String(file_num)]);
+                    file_num += 1;
+                    
+                    return '<span id="file_' + String(file_num - 1) + '"></span>';
+                } else if(in_data.match(/^http(?:s)?:\/\//i)) {
+                    var link_part = divi_link(in_data);
+                    
+                    var front_data = link_part[0];
+                    var back_data = link_part[1];
+
+                    return '<a id="out_link" href="' + back_data + '">' + front_data + '</a>'; 
+                } else {
+                    var link_part = divi_link(in_data);
+                    
+                    var front_data = link_part[0];
+                    var back_data = link_part[1];
+
+                    link_list.push([back_data, 'link_' + String(link_num)]);
+                    link_num += 1;
+
+                    return '<a class="link_' + String(link_num - 1) + '" href="/w/' + encodeURIComponent(back_data) + '">' + front_data + '</a>'; 
+                }
+            });
         } else {
-            var link_part = divi_link(in_data);
-            
-            var front_data = link_part[0];
-            var back_data = link_part[1];
-
-            link_list.push([back_data, 'link_' + String(link_num)]);
-            link_num += 1;
-
-            return '<a class="link_' + String(link_num - 1) + '" href="/w/' + encodeURIComponent(back_data) + '">' + front_data + '</a>'; 
+            break;
         }
-    });
+    }
+
+    if(category !== '') {
+        category = category.replace(/ \| $/, '') + '</div></div>'
+    }
 
     data = data.replace(/\[([^(\]]+)\(((?:(?!\)]).)+)\)]/g, function(all, name, in_data) {
         if(name.match(/^youtube|kakaotv|nicovideo$/i)) {
@@ -401,7 +434,7 @@ function render_namumark(target) {
     data = data.replace(/\[([^\]]+)\]/g, function(all, name) {
         if(name.match(/^br$/i)) {
             return '\n'
-        } else if(name.match(/^목차$/i)) {
+        } else if(name.match(/^목차|tableofcontents$/i)) {
             return toc_data;
         } else if(name.match(/^date|datetime$/i)) {
             return get_today();
@@ -485,6 +518,7 @@ function render_namumark(target) {
     data = data.replace(/\n/g, '<br>');
 
     data = data.replace(/&amp;/g, '&');
+    data += category;
 
     document.getElementById(target).innerHTML = data;
 

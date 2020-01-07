@@ -45,4 +45,4 @@ blockquote { background-image: url(/views/acme/img/quote.png); background-positi
 #origin { display: none; }
 .all_in_data { display: block; width: 100%; }
 .table_safe { max-width: 100%; }
-.change_space { white-space: pre; }
+.change_space { white-space: pre-line; }
