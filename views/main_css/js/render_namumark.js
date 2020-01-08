@@ -91,6 +91,228 @@ function render_namumark(target) {
         }
     }
 
+    function table_analysis(main_data, cel_data, start_cel, num = 0) {
+        var table_class = 'class="'
+        
+        var div_style = 'style="'
+        var table_style = 'style="'
+        var cel_style = 'style="'
+        var row_style = 'style="'
+        
+        var row = ''
+        var cel = ''
+
+        var table_state_get = main_data.match(/&lt;table ?width=((?:(?!&gt;).)*)&gt;/);
+        if(table_state_get) {
+            if(main_data.match('^[0-9]+$', table_state_get[1])) {
+                div_style += 'width: ' + table_state_get[1] + 'px;';
+            } else {
+                div_style += 'width: ' + table_state_get[1] + ';';
+            }
+
+            table_style += 'width: 100%;';
+        }
+
+        table_state_get = main_data.match(/&lt;table ?height=((?:(?!&gt;).)*)&gt;/);
+        if(table_state_get) {
+            if(main_data.match(/^[0-9]+$/, table_state_get[1])) {
+                table_style += 'height: ' + table_state_get[1] + 'px;';
+            } else {
+                table_style += 'height: ' + table_state_get[1] + ';';
+            }
+        }
+
+        table_state_get = main_data.match(/&lt;table ?align=((?:(?!&gt;).)*)&gt;/);
+        if(table_state_get) {
+            if(table_state_get[1] == 'right') {
+                div_style += 'float: right;';
+            } else if(table_state_get[1] == 'center') {
+                table_style += 'margin: auto;';
+            }
+        }
+
+        table_state_get = main_data.match(/&lt;table ?textalign=((?:(?!&gt;).)*)&gt;/);
+        if(table_state_get) {
+            num = 1
+
+            if(table_state_get[1] == 'right') {
+                table_style += 'text-align: right;';
+            } else if(table_state_get[1] == 'center') {
+                table_style += 'text-align: center;';
+            }
+        }
+
+        table_state_get = main_data.match(/&lt;row ?textalign=((?:(?!&gt;).)*)&gt;/);
+        if(table_state_get) {
+            if(table_state_get[1] == 'right') {
+                row_style += 'text-align: right;';
+            } else if(table_state_get[1] == 'center') {
+                row_style += 'text-align: center;';
+            } else {
+                row_style += 'text-align: left;';
+            }
+        }
+
+        table_state_get = main_data.match(/&lt;-((?:(?!&gt;).)*)&gt;/);
+        if(table_state_get) {
+            cel = 'colspan="' + table_state_get[1] + '"';
+        } else {
+            cel = 'colspan="' + String(Math.round(start_cel.length / 2)) + '"';
+        }
+
+        table_state_get = main_data.match(/&lt;\|((?:(?!&gt;).)*)&gt;/);
+        if(table_state_get) {
+            row = 'rowspan="' + table_state_get[1] + '"';
+        }
+
+        table_state_get = main_data.match(/&lt;rowbgcolor=(#(?:[0-9a-f-A-F]{3}){1,2}|\w+)(?:,(#(?:[0-9a-f-A-F]{3}){1,2}|\w+))?&gt;/);
+        if(table_state_get) {
+            row_style += 'background: ' + table_state_get[1] + ';';
+        }
+
+        table_state_get = main_data.match(/&lt;rowcolor=(#(?:[0-9a-f-A-F]{3}){1,2}|\w+)(?:,(#(?:[0-9a-f-A-F]{3}){1,2}|\w+))?&gt;/);
+        if(table_state_get) {
+            row_style += 'color: ' + table_state_get[1] + ';';
+        }
+
+        table_state_get = main_data.match(/&lt;table ?bordercolor=(#(?:[0-9a-f-A-F]{3}){1,2}|\w+)(?:,(#(?:[0-9a-f-A-F]{3}){1,2}|\w+))?&gt;/);
+        if(table_state_get) {
+            table_style += 'border: ' + table_state_get[1] + ' 2px solid;';
+        }
+
+        table_state_get = main_data.match(/&lt;table ?bgcolor=(#(?:[0-9a-f-A-F]{3}){1,2}|\w+)(?:,(#(?:[0-9a-f-A-F]{3}){1,2}|\w+))?&gt;/);
+        if(table_state_get) {
+            table_style += 'background: ' + table_state_get[1] + ';';
+        }
+
+        table_state_get = main_data.match(/&lt;table ?color=(#(?:[0-9a-f-A-F]{3}){1,2}|\w+)(?:,(#(?:[0-9a-f-A-F]{3}){1,2}|\w+))?&gt;/);
+        if(table_state_get) {
+            table_style += 'color: ' + table_state_get[1] + ';';
+        }
+
+        table_state_get = main_data.match(/&lt;(?:bgcolor=)?(#(?:[0-9a-f-A-F]{3}){1,2}|\w+)(?:,(#(?:[0-9a-f-A-F]{3}){1,2}|\w+))?&gt;/);
+        if(table_state_get) {
+            cel_style += 'background: ' + table_state_get[1] + ';';
+        }
+
+        table_state_get = main_data.match(/&lt;color=(#(?:[0-9a-f-A-F]{3}){1,2}|\w+)(?:,(#(?:[0-9a-f-A-F]{3}){1,2}|\w+))?&gt;/);
+        if(table_state_get) {
+            cel_style += 'color: ' + table_state_get[1] + ';';
+        }
+
+        table_state_get = main_data.match(/&lt;width=((?:(?!&gt;).)*)&gt;/);
+        if(table_state_get) {
+            if(table_state_get[1].match(/^[0-9]+$/)) {
+                cel_style += 'width: ' + table_state_get[1] + 'px;';
+            } else {
+                cel_style += 'width: ' + table_state_get[1] + ';';
+            }
+        }
+
+        table_state_get = main_data.match(/&lt;height=((?:(?!&gt;).)*)&gt;/);
+        if(table_state_get) {
+            if(table_state_get[1].match(/^[0-9]+$/)) {
+                cel_style += 'height: ' + table_state_get[1] + 'px;';
+            } else {
+                cel_style += 'height: ' + table_state_get[1] + ';';
+            }
+        }
+
+        var text_right = main_data.match(/&lt;\)&gt;/);
+        var text_center = main_data.match(/&lt;:&gt;/);
+        var text_left = main_data.match(/&lt;\(&gt;/);
+        if(text_right) {
+            cel_style += 'text-align: right;';
+        } else if(text_center) {
+            cel_style += 'text-align: center;';
+        } else if(text_left) {
+            cel_style += 'text-align: left;';
+        } else if(num == 0) {
+            if(cel_data.match(/^ /) && cel_data.match(/ $/)) {
+                cel_style += 'text-align: center;';
+            } else if(cel_data.match(/^ /)) {
+                cel_style += 'text-align: right;';
+            } else if(cel_data.match(/ $/)) {
+                cel_style += 'text-align: left;';
+            }
+        }
+
+        table_state_get = main_data.match(/&lt;table ?class=((?:(?!&gt;).)+)&gt;/);
+        if(table_state_get) {
+            table_class += table_state_get[1];
+        }
+
+        div_style += '"';
+        table_style += '"';
+        cel_style += '"';
+        row_style += '"';
+
+        table_class += '"';
+
+        return [table_style, row_style, cel_style, row, cel, table_class, num, div_style]
+    }
+
+    function table_render(data) {
+        var table_num = 0;
+        while(1) {
+            var table_data = data.match(/\n((?:(?:(?:(?:\|\|)+(?:(?:(?!\|\|).(?:\n)*)*))+)\|\|(?:\n)?)+)/);
+            if(table_data) {
+                table_data = table_data[1];
+                
+                var get_table_data = table_data.match(/^((?:\|\|)+)((?:&lt;(?:(?:(?!&gt;).)+)&gt;)*)\n*((?:(?!\|\|).\n*)*)/);
+                if(get_table_data) {
+                    table_return_data = table_analysis(get_table_data[2], get_table_data[3], get_table_data[1]);
+                    table_num = table_return_data[6];
+    
+                    table_data = table_data.replace(
+                        /^((?:\|\|)+)((?:&lt;(?:(?:(?!&gt;).)+)&gt;)*)\n*/,
+                        '\n' + 
+                        '<div class="table_safe" ' + table_return_data[7] + '>' + 
+                            '<table ' + table_return_data[5] + ' ' + table_return_data[0] + '>' + 
+                                '<tr ' + table_return_data[1] + '>' + 
+                                    '<td ' + table_return_data[2] + ' ' + table_return_data[3] + ' ' + table_return_data[4] + '>'
+                    );
+                }
+    
+                table_data = table_data.replace(/\|\|\n?$/, '</td></tr></table></div>');
+    
+                while(1) {
+                    get_table_data = table_data.match(/\|\|\n((?:\|\|)+)((?:&lt;(?:(?:(?!&gt;).)+)&gt;)*)\n*((?:(?!\|\||<\/td>).\n*)*)/);
+                    if(get_table_data) {
+                        table_return_data = table_analysis(get_table_data[2], get_table_data[3], get_table_data[1], table_num);
+    
+                        table_data = table_data.replace(
+                            /\|\|\n((?:\|\|)+)((?:&lt;(?:(?:(?!&gt;).)+)&gt;)*)\n*/,
+                            '</td></tr><tr ' + table_return_data[1] + '><td ' + table_return_data[2] + ' ' + table_return_data[3] + ' ' + table_return_data[4] + '>'
+                        );
+                    } else {
+                        break;
+                    }
+                }
+    
+                while(1) {
+                    get_table_data = table_data.match(/((?:\|\|)+)((?:&lt;(?:(?:(?!&gt;).)+)&gt;)*)\n*((?:(?:(?!\|\||<\/td>).)|\n)*\n*)/);
+                    if(get_table_data) {
+                        table_return_data = table_analysis(get_table_data[2], get_table_data[3].replace('\n', ' '), get_table_data[1], table_num);
+    
+                        table_data = table_data.replace(
+                            /((?:\|\|)+)((?:&lt;(?:(?:(?!&gt;).)+)&gt;)*)\n*/,
+                            '</td><td ' + table_return_data[2] + ' ' + table_return_data[3] + ' ' + table_return_data[4] + '>'
+                        );
+                    } else {
+                        break;
+                    }
+                }
+    
+                data = data.replace(/\n((?:(?:(?:(?:\|\|)+(?:(?:(?!\|\|).(?:\n)*)*))+)\|\|(?:\n)?)+)/, table_data);
+            } else {
+                break;
+            }
+        }
+
+        return data;
+    }
+
     var data = '\n' + document.getElementById(target).innerHTML + '\n';
     var title = window.location.pathname.replace(/^\/w\//, '');
     console.log(title);
@@ -116,6 +338,8 @@ function render_namumark(target) {
                     var return_data = '';
                 } else if(mid_list[mid_num] === 'pre') {
                     var return_data = '</code></pre>';
+                } else if(mid_list[mid_num] === 'div_2') {
+                    var return_data = '</div_1></div>';
                 } else {
                     var return_data = '</' + mid_list[mid_num] + '>';
                 }
@@ -165,12 +389,12 @@ function render_namumark(target) {
 
                         return '<span style="font-size: ' + font_size_data + '%;">'
                     } else if(in_data.match(/#!wiki/i)) {
-                        mid_list.push('div');
+                        mid_list.push('div_1');
 
                         if(data.match(/{{{#!wiki style=((?:(?!\n).)+) *\n/i)) {
                             return '<div id="wiki_div_before">';
                         } else {
-                            return '<div id="wiki_div">'
+                            return '<div id="wiki_div" style="">'
                         }
                     } else if(in_data.match(/#!syntax/i)) {
                         mid_list.push('pre');
@@ -178,9 +402,9 @@ function render_namumark(target) {
                         
                         return '<pre><code id="syntax_before">';
                     } else if(in_data.match(/#!folding/i)) {
-                        mid_list.push('div');
+                        mid_list.push('div_2');
                         
-                        return '<div id="folding_before">';
+                        return '<div id="folding_before"><div id="wiki_div" style="">';
                     } else if(in_data.match(/#!html/i)) {
                         mid_list.push('span');
                         html_number += 1;
@@ -208,8 +432,8 @@ function render_namumark(target) {
 
     data = data.replace(/<\/div> *\n/ig, '</div>');
 
-    data = data.replace(/<div id="folding_before">((?:(?!\n).)+) *\n/ig, function(all, in_data) {
-        return in_data + ' [+]<div id="folding">';
+    data = data.replace(/<div id="folding_before"><div id="wiki_div" style="">((?:(?!\n).)+) *\n/ig, function(all, in_data) {
+        return in_data + ' [+]<div id="folding"><div id="wiki_div" style="">';
     });
     
     data = data.replace(/<pre><code id="syntax_before">((?:(?!\n).)+) *\n/ig, function(all, in_data) {
@@ -217,7 +441,7 @@ function render_namumark(target) {
     });
 
     data = data.replace(/<div id="wiki_div_before">style=((?:(?!\n).)+) *\n/ig, function(all, in_data) {
-        return '<div style=' + in_data.replace(/&quot;/g, "\"").replace(/&#039;/g, "'") + ' id="wiki_div">';
+        return '<div id="wiki_div" style=' + in_data.replace(/&quot;/g, "\"").replace(/&#039;/g, "'") + '>';
     });
 
     var nowiki_num = 0;
@@ -240,6 +464,37 @@ function render_namumark(target) {
         return '<span id="math_' + String(math_num) + '"></span>';
     });
 
+    console.log(data);
+
+    data = data.replace('\r\n', '\n');
+    data = data.replace('&amp;', '&');
+
+    data = data.replace(/\n(?: +)\|\|/, '\n||');
+    data = data.replace(/\|\|(?: +)\n/, '||\n');
+
+    data = data.replace(/\n##(?:(?:(?!\n).)+)/, '');
+    data = data.replace('<div id="wiki_div" style="">\n', '<div id="wiki_div" style="">');
+
+    while(1) {
+        wiki_table_data = data.match(/<div id="wiki_div" ((?:(?!>).)+)>((?:(?!<div id="wiki_div"|<\/div_1>).\n*)+)<\/div_1>/i);
+        if(wiki_table_data) {
+            if(wiki_table_data[2].match(/\|\|/)) {
+                var end_table_render = table_render('\n' + wiki_table_data[2] + '\n').replace(/^\n/, '').replace(/\n$/, '');
+            } else {
+                var end_table_render = wiki_table_data[2];
+            }
+
+            data = data.replace(
+                /<div id="wiki_div" ((?:(?!>).)+)>((?:(?!<div id="wiki_div"|<\/div_1>).\n*)+)<\/div_1>/i, 
+                '<div ' + wiki_table_data[1] + '>' + end_table_render + '</div>'
+            );
+        } else {
+            break;
+        }
+    }
+    console.log(data);
+    data = data.replace(/<\/td>/g, '</td_1>');
+
     data = data.replace(/~~((?:(?!~~).)+)~~/g, '<s>$1</s>');
     data = data.replace(/--((?:(?!--).)+)--/g, '<s>$1</s>');
     data = data.replace(/__((?:(?!__).)+)__/g, '<u>$1</u>');
@@ -251,10 +506,14 @@ function render_namumark(target) {
     data = data.replace(/\n( {1,})\* ([^\n]+)/g, function(all, margin_data, in_data) {
         return '<li style="margin-left: ' + String(margin_data.length * 20) + 'px;">' + in_data + '</li>'
     });
+    data = data.replace('||<li', '||\n<li');
 
     data = data.replace(/\n( {1,})/g, function(all, margin_data) {
         return '\n<span style="margin-left: ' + String(margin_data.length * 10) + 'px"></span>'
     });
+
+    console.log(data);
+    data = table_render(data);
 
     var link_list = [];
     var file_list = [];
@@ -394,6 +653,25 @@ function render_namumark(target) {
         }
     });
 
+    while(1) {
+        if(data.match(/(\n(?:&gt; ?(?:[^\n]+)?\n?)+)/)) {
+            data = data.replace(/(\n(?:&gt; ?(?:[^\n]+)?\n?)+)/, function(all, in_data) {
+                var new_in_data = in_data;
+                new_in_data = new_in_data.replace(/^\n&gt; ?/, '');
+                new_in_data = new_in_data.replace(/\n&gt; ?/g, '\n');
+                new_in_data = new_in_data.replace(/\n$/, '');
+
+                return '\n<blockquote>' + new_in_data + '</blockquote>\n';
+            });
+        } else {
+            break;
+        }
+    }
+
+    data = data.replace(/\n-{4,9}\n/g, function() {
+        return '<hr>';
+    });
+
     var toc_array = [0, 0, 0, 0, 0, 0];
     var before_data = 0;
     var edit_number = 0;
@@ -531,6 +809,8 @@ function render_namumark(target) {
         }
     }
 
+    data = data.replace(/<\/td_1>/g, '</td>');
+
     data = data.replace(/^(\n| )+/g, '');
     data = data.replace(/(\n| )+$/g, '');
     data = data.replace(/\n/g, '<br>');
@@ -580,4 +860,7 @@ function render_namumark(target) {
     }
 
     render_html("html_render_contect");    
+
+    // v0.0.5
+    // 어느 정도 이제 돌아가는 수준까진 옴
 }
