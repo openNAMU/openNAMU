@@ -293,7 +293,7 @@ function render_namumark(target) {
                 while(1) {
                     get_table_data = table_data.match(/((?:\|\|)+)((?:&lt;(?:(?:(?!&gt;).)+)&gt;)*)\n*((?:(?:(?!\|\||<\/td>).)|\n)*\n*)/);
                     if(get_table_data) {
-                        table_return_data = table_analysis(get_table_data[2], get_table_data[3].replace('\n', ' '), get_table_data[1], table_num);
+                        table_return_data = table_analysis(get_table_data[2], get_table_data[3].replace(/\n/g, ' '), get_table_data[1], table_num);
     
                         table_data = table_data.replace(
                             /((?:\|\|)+)((?:&lt;(?:(?:(?!&gt;).)+)&gt;)*)\n*/,
@@ -315,7 +315,17 @@ function render_namumark(target) {
 
     var data = '\n' + document.getElementById(target).innerHTML + '\n';
     var title = window.location.pathname.replace(/^\/w\//, '');
-    console.log(title);
+
+    var math_list = [];
+    var math_num = 0;
+    data = data.replace(/\[math\(((?:(?!\)]).)+)\)]/ig, function(all, in_data) {
+        var math_data = in_data.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, "\"").replace(/&#039;/g, "'");
+
+        math_num += 1;
+        math_list.push(['math_' + String(math_num), math_data]);
+
+        return '<span id="math_' + String(math_num) + '"></span>';
+    });
 
     var mid_num = 0;
     var mid_stack = 0;
@@ -391,11 +401,7 @@ function render_namumark(target) {
                     } else if(in_data.match(/#!wiki/i)) {
                         mid_list.push('div_1');
 
-                        if(data.match(/{{{#!wiki style=((?:(?!\n).)+) *\n/i)) {
-                            return '<div id="wiki_div_before">';
-                        } else {
-                            return '<div id="wiki_div" style="">'
-                        }
+                        return '<div id="wiki_div_before">';
                     } else if(in_data.match(/#!syntax/i)) {
                         mid_list.push('pre');
                         mid_stack += 1;
@@ -426,10 +432,6 @@ function render_namumark(target) {
         }
     });
 
-    console.log(mid_stack);
-    console.log(mid_num);
-    console.log(mid_list);
-
     data = data.replace(/<\/div> *\n/ig, '</div>');
 
     data = data.replace(/<div id="folding_before"><div id="wiki_div" style="">((?:(?!\n).)+) *\n/ig, function(all, in_data) {
@@ -440,8 +442,15 @@ function render_namumark(target) {
         return '<pre><code>';
     });
 
-    data = data.replace(/<div id="wiki_div_before">style=((?:(?!\n).)+) *\n/ig, function(all, in_data) {
-        return '<div id="wiki_div" style=' + in_data.replace(/&quot;/g, "\"").replace(/&#039;/g, "'") + '>';
+    console.log(data);
+    console.log('----')
+
+    data = data.replace(/<div id="wiki_div_before">(?:style=([^\n]+) *)?\n/ig, function(all, in_data) {
+        if(in_data) {
+            return '<div id="wiki_div" style=' + in_data.replace(/&quot;/g, "\"").replace(/'/g, "\"") + '>';
+        } else {
+            return '<div id="wiki_div" style="">';
+        }
     });
 
     var nowiki_num = 0;
@@ -453,32 +462,25 @@ function render_namumark(target) {
         return '<span id="nowiki_' + String(nowiki_num) + '"></span>';
     });
 
-    var math_list = [];
-    var math_num = 0;
-    data = data.replace(/\[math\(((?:(?!\)]).)+)\)]/ig, function(all, in_data) {
-        var math_data = in_data.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, "\"").replace(/&#039;/g, "'");
+    data = data.replace(/\r\n/g, '\n');
+    data = data.replace(/&amp;/g, '&');
 
-        math_num += 1;
-        math_list.push(['math_' + String(math_num), math_data]);
+    data = data.replace(/\n(?: +)\|\|/g, '\n||');
+    data = data.replace(/\|\|(?: +)\n/g, '||\n');
 
-        return '<span id="math_' + String(math_num) + '"></span>';
-    });
+    data = data.replace(/\n##(?:(?:(?!\n).)+)/g, '');
+    data = data.replace(/<div id="wiki_div" style="">\n/g, '<div id="wiki_div" style="">');
+    data = data.replace(/<div id="wiki_div" style=""> +/g, '<div id="wiki_div" style="">');
 
     console.log(data);
-
-    data = data.replace('\r\n', '\n');
-    data = data.replace('&amp;', '&');
-
-    data = data.replace(/\n(?: +)\|\|/, '\n||');
-    data = data.replace(/\|\|(?: +)\n/, '||\n');
-
-    data = data.replace(/\n##(?:(?:(?!\n).)+)/, '');
-    data = data.replace('<div id="wiki_div" style="">\n', '<div id="wiki_div" style="">');
+    console.log('----')
 
     while(1) {
         wiki_table_data = data.match(/<div id="wiki_div" ((?:(?!>).)+)>((?:(?!<div id="wiki_div"|<\/div_1>).\n*)+)<\/div_1>/i);
         if(wiki_table_data) {
             if(wiki_table_data[2].match(/\|\|/)) {
+                console.log('1')
+                console.log(wiki_table_data[2]);
                 var end_table_render = table_render('\n' + wiki_table_data[2] + '\n').replace(/^\n/, '').replace(/\n$/, '');
             } else {
                 var end_table_render = wiki_table_data[2];
@@ -492,7 +494,7 @@ function render_namumark(target) {
             break;
         }
     }
-    console.log(data);
+ 
     data = data.replace(/<\/td>/g, '</td_1>');
 
     data = data.replace(/~~((?:(?!~~).)+)~~/g, '<s>$1</s>');
@@ -503,10 +505,86 @@ function render_namumark(target) {
     data = data.replace(/\^\^((?:(?!\^\^).)+)\^\^/g, '<sup>$1</sup>');
     data = data.replace(/,,((?:(?!,,).)+),,/g, '<sub>$1</sub>');
 
+    var toc_array = [0, 0, 0, 0, 0, 0];
+    var before_data = 0;
+    var edit_number = 0;
+    var toc_data = '<div id="toc"><span id="toc_title">TOC</span>\n\n'
+    data = data.replace(/\n(={1,6}) ?([^\n]+) (?:={1,6})/g, function(all, num, in_data) {
+        num = num.length;
+        edit_number += 1;
+        
+        if(before_data > num) {
+            var i = num;
+            while(1) {
+                if(i == 6) {
+                    break;
+                }
+
+                toc_array[i] = 0;
+                i += 1;
+            }
+        }
+
+        before_data = num;
+        toc_array[num - 1] += 1;
+        num = String(num);
+        var toc_num = (toc_array.join('.') + '.').replace(/0\./g, '');
+        if(!toc_num.match(/\./)) {
+            toc_num += '0.';
+        }
+
+        toc_data += '' + 
+            '<span style="margin-left: ' + String(10 * (toc_num.length / 2) - 10) + 'px;">' + 
+                '<a href="#s-' + toc_num.replace(/\.$/, '') + '">' + toc_num + '</a> ' + in_data + 
+            '</span>' +
+            '\n' + 
+        '';
+
+        return '' +
+            '\n' +
+            '<h' + num + ' id="s-' + toc_num.replace(/\.$/, '') + '">' +
+                '<a href="#toc">' + toc_num + '</a> ' + in_data +
+                '<span style="font-size: 12px">' +
+                    '<a href="/edit/' + title + '?section=' + String(edit_number) + '">(Edit)</a>' +
+                '</span>' +
+            '</h' + num + '>' +
+        '';
+    });
+
+    toc_data += '</div>';
+    data = data.replace(/<\/h([0-9])>\n/g, '</h$1>');
+
+    while(1) {
+        if(data.match(/(\n(?:&gt; ?(?:[^\n]+)?\n?)+)/)) {
+            data = data.replace(/(\n(?:&gt; ?(?:[^\n]+)?\n?)+)/, function(all, in_data) {
+                var new_in_data = in_data;
+                new_in_data = new_in_data.replace(/^\n&gt; ?/, '');
+                new_in_data = new_in_data.replace(/\n&gt; ?/g, '\n');
+                new_in_data = new_in_data.replace(/\n$/, '');
+
+                return '\n<blockquote>' + new_in_data + '</blockquote>\n';
+            });
+        } else {
+            break;
+        }
+    }
+
+    while(1) {
+        if(data.match(/\n-{4,9}\n/)) {
+            data = data.replace(/\n-{4,9}\n/, function() {
+                return '\n<hr>\n';
+            });
+        } else {
+            break;
+        }
+    }
+
+    data = data.replace(/(\n +\* ?(?:(?:(?!\|\|).)+))\|\|/g, '$1\n ||');
+
     data = data.replace(/\n( {1,})\* ([^\n]+)/g, function(all, margin_data, in_data) {
         return '<li style="margin-left: ' + String(margin_data.length * 20) + 'px;">' + in_data + '</li>'
     });
-    data = data.replace('||<li', '||\n<li');
+    data = data.replace(/\|\|<li/g, '||\n<li');
 
     data = data.replace(/\n( {1,})/g, function(all, margin_data) {
         return '\n<span style="margin-left: ' + String(margin_data.length * 10) + 'px"></span>'
@@ -653,74 +731,6 @@ function render_namumark(target) {
         }
     });
 
-    while(1) {
-        if(data.match(/(\n(?:&gt; ?(?:[^\n]+)?\n?)+)/)) {
-            data = data.replace(/(\n(?:&gt; ?(?:[^\n]+)?\n?)+)/, function(all, in_data) {
-                var new_in_data = in_data;
-                new_in_data = new_in_data.replace(/^\n&gt; ?/, '');
-                new_in_data = new_in_data.replace(/\n&gt; ?/g, '\n');
-                new_in_data = new_in_data.replace(/\n$/, '');
-
-                return '\n<blockquote>' + new_in_data + '</blockquote>\n';
-            });
-        } else {
-            break;
-        }
-    }
-
-    data = data.replace(/\n-{4,9}\n/g, function() {
-        return '<hr>';
-    });
-
-    var toc_array = [0, 0, 0, 0, 0, 0];
-    var before_data = 0;
-    var edit_number = 0;
-    var toc_data = '<div id="toc"><span id="toc_title">TOC</span>\n\n'
-    data = data.replace(/\n(={1,6}) ?([^\n]+) (?:={1,6})/g, function(all, num, in_data) {
-        num = num.length;
-        edit_number += 1;
-        
-        if(before_data > num) {
-            var i = num;
-            while(1) {
-                if(i == 6) {
-                    break;
-                }
-
-                toc_array[i] = 0;
-                i += 1;
-            }
-        }
-
-        before_data = num;
-        toc_array[num - 1] += 1;
-        num = String(num);
-        var toc_num = (toc_array.join('.') + '.').replace(/0\./g, '');
-        if(!toc_num.match(/\./)) {
-            toc_num += '0.';
-        }
-
-        toc_data += '' + 
-            '<span style="margin-left: ' + String(10 * (toc_num.length / 2) - 10) + 'px;">' + 
-                '<a href="#s-' + toc_num.replace(/\.$/, '') + '">' + toc_num + '</a> ' + in_data + 
-            '</span>' +
-            '\n' + 
-        '';
-
-        return '' +
-            '\n' +
-            '<h' + num + ' id="s-' + toc_num.replace(/\.$/, '') + '">' +
-                '<a href="#toc">' + toc_num + '</a> ' + in_data +
-                '<span style="font-size: 12px">' +
-                    '<a href="/edit/' + title + '?section=' + String(edit_number) + '">(Edit)</a>' +
-                '</span>' +
-            '</h' + num + '>' +
-        '';
-    });
-
-    toc_data += '</div>';
-    data = data.replace(/<\/h([0-9])>\n/g, '</h$1>');
-
     data = data.replace(/\[([^\]]+)\]/g, function(all, name) {
         if(name.match(/^br$/i)) {
             return '\n'
@@ -861,6 +871,6 @@ function render_namumark(target) {
 
     render_html("html_render_contect");    
 
-    // v0.0.5
-    // 어느 정도 이제 돌아가는 수준까진 옴
+    // v0.0.6
+    // 어느 정도 괜찮은 수준까진 옴
 }
