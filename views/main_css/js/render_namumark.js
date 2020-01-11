@@ -327,131 +327,131 @@ function render_namumark(target) {
         return '<span id="math_' + String(math_num) + '"></span>';
     });
 
+    var i = 0;
     var mid_num = 0;
     var mid_stack = 0;
     var mid_list = [];
-    var html_number = 0;
-    data = data.replace(/(?:{{{(?:((?:(?! |{{{|}}}|&lt;).)*) ?)|(}}}))/g, function(all, in_data) {
-        if(all === '}}}') {
-            if(mid_stack > 0) {
-                mid_stack -= 1;
-            }
+    var html_num = 0;
+    var fol_num = 0;
+    var mid_regex = /(?:{{{(?:((?:(?! |{{{|}}}|&lt;).)*) ?)|(}}}))/;
+    var all_mid_data = data.match(new RegExp(mid_regex.source, 'g'));
+    // 이거 손 봐야함
+    while(1) {
+        if(all_mid_data[i]) {
+            i += 1;
 
-            if(mid_stack > 0) {
-                return all;
-            } else {
-                if(mid_num > 0) {
-                    mid_num -= 1;
+            if(all_mid_data[i][0] === '}}}') {
+                if(mid_stack > 0) {
+                    mid_stack -= 1;
                 }
 
-                if(!mid_list[mid_num]) {
-                    var return_data = '';
-                } else if(mid_list[mid_num] === 'pre') {
-                    var return_data = '</code></pre>';
-                } else if(mid_list[mid_num] === 'div_2') {
-                    var return_data = '</div_1></div>';
+                if(mid_stack > 0) {
+                    data.replace(mid_regex, all_mid_data[i][0]);
                 } else {
-                    var return_data = '</' + mid_list[mid_num] + '>';
+                    if(mid_num > 0) {
+                        mid_num -= 1;
+                    }
+
+                    if(!mid_list[mid_num]) {
+                        var return_data = '';
+                    } else if(mid_list[mid_num] === 'pre') {
+                        var return_data = '</code></pre>';
+                    } else if(mid_list[mid_num] === 'div_2') {
+                        var return_data = '</div_1></div>';
+                    } else {
+                        var return_data = '</' + mid_list[mid_num] + '>';
+                    }
+
+                    if(return_data !== '') {
+                        mid_list.splice(mid_num, 1);
+
+                        data.replace(mid_regex, return_data);
+                    } else {
+                        data.replace(mid_regex, all_mid_data[i][0]);
+                    }
                 }
-
-                if(return_data !== '') {
-                    mid_list.splice(mid_num, 1);
-
-                    return return_data;
-                } else {
-                    return all;
-                }
-            }
-        } else {
-            if(mid_stack > 0) {
-                mid_stack += 1;
-
-                return all;
             } else {
-                mid_num += 1;
+                if(mid_stack > 0) {
+                    mid_stack += 1;
 
-                if(in_data.match(/^(#|@|\+|\-)/) && !in_data.match(/^(#|@|\+|\-){2}|(#|@|\+|\-)\\\\/)) {                    
-                    if(in_data.match(/^((#|@)([0-9a-f-A-F]{3}){1,2})/)) {
-                        mid_list.push('span');
+                    data.replace(mid_regex, all_mid_data[i][0]);
+                } else {
+                    mid_num += 1;
 
-                        if(in_data.match(/^#/)) {
-                            return '<span style="color: ' + in_data + ';">';
+                    if(in_data.match(/^(#|@|\+|\-)/) && !in_data.match(/^(#|@|\+|\-){2}|(#|@|\+|\-)\\\\/)) {                    
+                        if(in_data.match(/^((#|@)([0-9a-f-A-F]{3}){1,2})/)) {
+                            mid_list.push('span');
+
+                            if(in_data.match(/^#/)) {
+                                data.replace(mid_regex, '<span style="color: ' + in_data + ';">');
+                            } else {
+                                data.replace(mid_regex, '<span style="background: ' + in_data + ';">');
+                            }
+                        } else if(in_data.match(/^((#|@)(\w+))/)) {
+                            mid_list.push('span');
+
+                            if(in_data.match(/^#/)) {
+                                data.replace(mid_regex, '<span style="color: ' + in_data.replace(/^#/, '') + ';">');
+                            } else {
+                                data.replace(mid_regex, '<span style="background: ' + in_data.replace(/^@/, '') + ';">');
+                            }
+                        } else if(in_data.match(/^(\+|-)([1-5])/)) {
+                            mid_list.push('span');
+
+                            var font_size_data = in_data.match(/^(\+|-)([1-5])/);
+                            if(font_size_data[1] == '+') {
+                                font_size_data = String(Number(font_size_data[2]) * 20 + 100);
+                            } else {
+                                font_size_data = String(100 - Number(font_size_data[2]) * 10);
+                            }
+
+                            data.replace(mid_regex, '<span style="font-size: ' + font_size_data + '%;">');
+                        } else if(in_data.match(/#!wiki/i)) {
+                            mid_list.push('div_1');
+
+                            data.replace(mid_regex, '<div id="wiki_div_before">');
+                        } else if(in_data.match(/#!syntax/i)) {
+                            mid_list.push('pre');
+                            mid_stack += 1;
+                            
+                            data.replace(mid_regex, '<pre><code id="syntax_before">');
+                        } else if(in_data.match(/#!folding/i)) {
+                            mid_list.push('div_2');
+                            
+                            ata.replace(mid_regex, '' +
+                                '<div style="display: inline-block;">' + 
+                                    '<a href="javascript:void(0);" onclick="do_open_folding(\'folding_' + String(fol_num) + '\', this);">' +
+                                        '[+]' +
+                                    '</a>' +
+                                '</div>' +
+                                '<div id="folding_' + String(fol_num) + '" style="display: none;">' +
+                                    '<div id="wiki_div" style="">' +
+                            '');
+                        } else if(in_data.match(/#!html/i)) {
+                            mid_list.push('span');
+                            html_num += 1;
+
+                            data.replace(mid_regex, '<span id="html_render_contect_' + String(html_num) + '">');
                         } else {
-                            return '<span style="background: ' + in_data + ';">';
+                            mid_list.push('code');
+                            mid_stack += 1;
+        
+                            data.replace(mid_regex, '<code>' + in_data);
                         }
-                    } else if(in_data.match(/^((#|@)(\w+))/)) {
-                        mid_list.push('span');
-
-                        if(in_data.match(/^#/)) {
-                            return '<span style="color: ' + in_data.replace(/^#/, '') + ';">';
-                        } else {
-                            return '<span style="background: ' + in_data.replace(/^@/, '') + ';">';
-                        }
-                    } else if(in_data.match(/^(\+|-)([1-5])/)) {
-                        mid_list.push('span');
-
-                        var font_size_data = in_data.match(/^(\+|-)([1-5])/);
-                        if(font_size_data[1] == '+') {
-                            font_size_data = String(Number(font_size_data[2]) * 20 + 100);
-                        } else {
-                            font_size_data = String(100 - Number(font_size_data[2]) * 10);
-                        }
-
-                        return '<span style="font-size: ' + font_size_data + '%;">'
-                    } else if(in_data.match(/#!wiki/i)) {
-                        mid_list.push('div_1');
-
-                        return '<div id="wiki_div_before">';
-                    } else if(in_data.match(/#!syntax/i)) {
-                        mid_list.push('pre');
-                        mid_stack += 1;
-                        
-                        return '<pre><code id="syntax_before">';
-                    } else if(in_data.match(/#!folding/i)) {
-                        mid_list.push('div_2');
-                        
-                        return '<div id="folding_before"><div id="wiki_div" style="">';
-                    } else if(in_data.match(/#!html/i)) {
-                        mid_list.push('span');
-                        html_number += 1;
-
-                        return '<span id="html_render_contect_' + String(html_number) + '">';
                     } else {
                         mid_list.push('code');
                         mid_stack += 1;
-    
-                        return '<code>' + in_data;
-                    }
-                } else {
-                    mid_list.push('code');
-                    mid_stack += 1;
 
-                    return '<code>' + in_data;
+                        data.replace(mid_regex, '<code>' + in_data);
+                    }
                 }
             }
+        } else {
+            break;
         }
-    });
+    }
 
     data = data.replace(/<\/div> *\n/ig, '</div>');
-
-    data = data.replace(/<div id="folding_before"><div id="wiki_div" style="">((?:(?!\n).)+) *\n/ig, function(all, in_data) {
-        return in_data + ' [+]<div id="folding"><div id="wiki_div" style="">';
-    });
-    
-    data = data.replace(/<pre><code id="syntax_before">((?:(?!\n).)+) *\n/ig, function(all, in_data) {
-        return '<pre><code>';
-    });
-
-    console.log(data);
-    console.log('----')
-
-    data = data.replace(/<div id="wiki_div_before">(?:style=([^\n]+) *)?\n/ig, function(all, in_data) {
-        if(in_data) {
-            return '<div id="wiki_div" style=' + in_data.replace(/&quot;/g, "\"").replace(/'/g, "\"") + '>';
-        } else {
-            return '<div id="wiki_div" style="">';
-        }
-    });
 
     var nowiki_num = 0;
     var nowiki_list = {};
