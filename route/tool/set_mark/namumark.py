@@ -748,7 +748,6 @@ def namumark(conn, data, title, main_num, include_num):
 
         data = re.sub("\[ruby\(((?:(?:(?!\)\]).)+))\)\]", ruby_data, data, 1, flags = re.I)
 
-
     curs.execute(tool.db_change('select data from other where name = "count_all_title"'))
     all_title = curs.fetchall()
     data = re.sub('\[pagecount\]', all_title[0][0], data, flags = re.I)
