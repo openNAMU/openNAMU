@@ -186,6 +186,8 @@
         "edit_req_check" : "Check edit request",
         "history_add" : "Add history",
         "all_register_num" : "The number of application forms",
+        "replace_move" : "Reversing documents",
+        "merge_move" : "Merging documents",
         "_comment_2.1_" : "Filter",
             "_comment_2.1.1_" : "List",
                 "interwiki_list" : "Interwiki(s) list",

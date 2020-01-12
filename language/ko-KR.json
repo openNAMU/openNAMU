@@ -330,5 +330,7 @@
     "no_applications_now" : "회원가입 신청이 없습니다.",
     "application_not_found" : "존재하지 않는 회원가입 신청입니다.",
     "approval_requirement_disabled": "현재 가입시 승인필요 설정이 비활성화되어있습니다. 필요시 설정에서 활성화할 수 있습니다.",
-    "all_register_num" : "모든 가입 신청자의 수"
+    "all_register_num" : "모든 가입 신청자의 수",
+    "replace_move" : "문서 바꾸기",
+    "merge_move" : "문서 병합"
 }
