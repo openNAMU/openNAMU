@@ -108,6 +108,8 @@ def edit_move_2(conn, name):
 
                     curs.execute(db_change("update history set title = ? where title = ?"), [title_name[1], title_name[0]])
                     conn.commit()
+
+                return redirect('/w/' + url_pas(move_title))
             else:
                 return re_error('/error/19')
         else:
