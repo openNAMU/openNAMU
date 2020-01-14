@@ -590,14 +590,6 @@ def namumark(conn, data, title, main_num, include_num):
     data += '\n'
     data = data.replace('\\', '&#92;')
 
-    data = re.sub('&#x27;&#x27;&#x27;(?P<in>((?!&#x27;&#x27;&#x27;).)+)&#x27;&#x27;&#x27;', '<b>\g<in></b>', data)
-    data = re.sub('&#x27;&#x27;(?P<in>((?!&#x27;&#x27;).)+)&#x27;&#x27;', '<i>\g<in></i>', data)
-    data = re.sub('~~(?P<in>(?:(?!~~).)+)~~', '<s>\g<in></s>', data)
-    data = re.sub('--(?P<in>(?:(?!--).)+)--', '<s>\g<in></s>', data)
-    data = re.sub('__(?P<in>(?:(?!__).)+)__', '<u>\g<in></u>', data)
-    data = re.sub('\^\^(?P<in>(?:(?!\^\^).)+)\^\^', '<sup>\g<in></sup>', data)
-    data = re.sub(',,(?P<in>(?:(?!,,).)+),,', '<sub>\g<in></sub>', data)
-
     redirect_re = re.compile('\n#(?:redirect|넘겨주기) ((?:(?!\n).)+)\n', re.I)
     redirect = redirect_re.search(data)
     if redirect:
@@ -1234,6 +1226,14 @@ def namumark(conn, data, title, main_num, include_num):
         footdata_all = '</div>'
 
     data = re.sub('\n$', footdata_all, data + '\n', 1)
+
+    data = re.sub('&#x27;&#x27;&#x27;(?P<in>((?!&#x27;&#x27;&#x27;).)+)&#x27;&#x27;&#x27;', '<b>\g<in></b>', data)
+    data = re.sub('&#x27;&#x27;(?P<in>((?!&#x27;&#x27;).)+)&#x27;&#x27;', '<i>\g<in></i>', data)
+    data = re.sub('~~(?P<in>(?:(?!~~).)+)~~', '<s>\g<in></s>', data)
+    data = re.sub('--(?P<in>(?:(?!--).)+)--', '<s>\g<in></s>', data)
+    data = re.sub('__(?P<in>(?:(?!__).)+)__', '<u>\g<in></u>', data)
+    data = re.sub('\^\^(?P<in>(?:(?!\^\^).)+)\^\^', '<sup>\g<in></sup>', data)
+    data = re.sub(',,(?P<in>(?:(?!,,).)+),,', '<sub>\g<in></sub>', data)
 
     category += '</div></div>'
     category = re.sub(' \| <\/div><\/div>$', '</div></div>', category)
