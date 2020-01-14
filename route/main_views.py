@@ -16,4 +16,10 @@ def main_views_2(conn, name):
         plus = ''
         rename = name
 
-    return flask.send_from_directory('./views' + plus, rename)
+    mime_type = re.search('\.([^\.]+)$', rename).groups()[0]
+    if mime_type:
+        mime_type = 'text/' + mime_type
+    else:
+        mime_type = 'text/plain'
+
+    return flask.send_from_directory('./views' + plus, rename, mimetype = mime_type)
