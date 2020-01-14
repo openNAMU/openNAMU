@@ -333,20 +333,24 @@ function render_namumark(target) {
     var mid_list = [];
     var html_num = 0;
     var fol_num = 0;
-    var mid_regex = /(?:{{{(?:((?:(?! |{{{|}}}|&lt;).)*) ?)|(}}}))/;
-    var all_mid_data = data.match(new RegExp(mid_regex.source, 'g'));
+    var mid_regex = /(?:{{{(?:((?:(?! |{{{|}}}|&lt;).)*) ?)|(?:}}}))/;
     // 이거 손 봐야함
     while(1) {
-        if(all_mid_data[i]) {
+        var all_mid_data = data.match(mid_regex);
+        console.log(all_mid_data);
+        if(all_mid_data) {
+            var all = all_mid_data[0];
+            var in_data = all_mid_data[1];
+
             i += 1;
 
-            if(all_mid_data[i][0] === '}}}') {
+            if(all === '}}}') {
                 if(mid_stack > 0) {
                     mid_stack -= 1;
                 }
 
                 if(mid_stack > 0) {
-                    data.replace(mid_regex, all_mid_data[i][0]);
+                    data = data.replace(mid_regex, '</mid>');
                 } else {
                     if(mid_num > 0) {
                         mid_num -= 1;
@@ -365,16 +369,16 @@ function render_namumark(target) {
                     if(return_data !== '') {
                         mid_list.splice(mid_num, 1);
 
-                        data.replace(mid_regex, return_data);
+                        data = data.replace(mid_regex, return_data);
                     } else {
-                        data.replace(mid_regex, all_mid_data[i][0]);
+                        data = data.replace(mid_regex, '</mid>');
                     }
                 }
             } else {
                 if(mid_stack > 0) {
                     mid_stack += 1;
 
-                    data.replace(mid_regex, all_mid_data[i][0]);
+                    data = data.replace(mid_regex, all.replace('{{{', '<mid>'));
                 } else {
                     mid_num += 1;
 
@@ -383,17 +387,17 @@ function render_namumark(target) {
                             mid_list.push('span');
 
                             if(in_data.match(/^#/)) {
-                                data.replace(mid_regex, '<span style="color: ' + in_data + ';">');
+                                data = data.replace(mid_regex, '<span style="color: ' + in_data + ';">');
                             } else {
-                                data.replace(mid_regex, '<span style="background: ' + in_data + ';">');
+                                data = data.replace(mid_regex, '<span style="background: ' + in_data + ';">');
                             }
                         } else if(in_data.match(/^((#|@)(\w+))/)) {
                             mid_list.push('span');
 
                             if(in_data.match(/^#/)) {
-                                data.replace(mid_regex, '<span style="color: ' + in_data.replace(/^#/, '') + ';">');
+                                data = data.replace(mid_regex, '<span style="color: ' + in_data.replace(/^#/, '') + ';">');
                             } else {
-                                data.replace(mid_regex, '<span style="background: ' + in_data.replace(/^@/, '') + ';">');
+                                data = data.replace(mid_regex, '<span style="background: ' + in_data.replace(/^@/, '') + ';">');
                             }
                         } else if(in_data.match(/^(\+|-)([1-5])/)) {
                             mid_list.push('span');
@@ -405,20 +409,20 @@ function render_namumark(target) {
                                 font_size_data = String(100 - Number(font_size_data[2]) * 10);
                             }
 
-                            data.replace(mid_regex, '<span style="font-size: ' + font_size_data + '%;">');
+                            data = data.replace(mid_regex, '<span style="font-size: ' + font_size_data + '%;">');
                         } else if(in_data.match(/#!wiki/i)) {
                             mid_list.push('div_1');
 
-                            data.replace(mid_regex, '<div id="wiki_div_before">');
+                            data = data.replace(mid_regex, '<div id="wiki_div_before">');
                         } else if(in_data.match(/#!syntax/i)) {
                             mid_list.push('pre');
                             mid_stack += 1;
                             
-                            data.replace(mid_regex, '<pre><code id="syntax_before">');
+                            data = data.replace(mid_regex, '<pre><code id="syntax_before">');
                         } else if(in_data.match(/#!folding/i)) {
                             mid_list.push('div_2');
                             
-                            ata.replace(mid_regex, '' +
+                            data.replace(mid_regex, '' +
                                 '<div style="display: inline-block;">' + 
                                     '<a href="javascript:void(0);" onclick="do_open_folding(\'folding_' + String(fol_num) + '\', this);">' +
                                         '[+]' +
@@ -431,18 +435,18 @@ function render_namumark(target) {
                             mid_list.push('span');
                             html_num += 1;
 
-                            data.replace(mid_regex, '<span id="html_render_contect_' + String(html_num) + '">');
+                            data = data.replace(mid_regex, '<span id="html_render_contect_' + String(html_num) + '">');
                         } else {
                             mid_list.push('code');
                             mid_stack += 1;
         
-                            data.replace(mid_regex, '<code>' + in_data);
+                            data = data.replace(mid_regex, '<code>' + in_data);
                         }
                     } else {
                         mid_list.push('code');
                         mid_stack += 1;
 
-                        data.replace(mid_regex, '<code>' + in_data);
+                        data = data.replace(mid_regex, '<code>' + in_data);
                     }
                 }
             }
@@ -869,6 +873,7 @@ function render_namumark(target) {
         }
     }
 
+    hljs.initHighlightingOnLoad();
     render_html("html_render_contect");    
 
     // v0.0.6
