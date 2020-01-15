@@ -18,7 +18,10 @@ def main_views_2(conn, name):
 
     mime_type = re.search('\.([^\.]+)$', rename).groups()[0]
     if mime_type:
-        mime_type = 'text/' + mime_type
+        if mime_type in ['.jpeg', '.jpg', '.gif', '.png', '.webp', '.JPEG', '.JPG', '.GIF', '.PNG', '.WEBP']:
+            mime_type = 'image/' + mime_type
+        else:
+            mime_type = 'text/' + mime_type
     else:
         mime_type = 'text/plain'
 
