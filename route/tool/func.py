@@ -60,7 +60,7 @@ for i in range(0, 2):
             print(e)
             raise
 
-app_var = json.loads(open('data/app_var.json', encoding='utf-8').read())
+app_var = json.loads(open('data/app_var.json').read())
 
 def load_conn(data):
     global conn
@@ -275,7 +275,7 @@ def load_lang(data, num = 2, safe = 0):
         curs.execute(db_change("select data from other where name = 'language'"))
         rep_data = curs.fetchall()
 
-        json_data = open(os.path.join('language', rep_data[0][0] + '.json'), 'rt', encoding='utf-8').read()
+        json_data = open(os.path.join('language', rep_data[0][0] + '.json'), 'rt').read()
         lang = json.loads(json_data)
 
         if data in lang:
@@ -290,7 +290,7 @@ def load_lang(data, num = 2, safe = 0):
         rep_data = curs.fetchall()
         if rep_data:
             try:
-                json_data = open(os.path.join('language', rep_data[0][0] + '.json'), 'rt', encoding='utf-8').read()
+                json_data = open(os.path.join('language', rep_data[0][0] + '.json'), 'rt').read()
                 lang = json.loads(json_data)
             except:
                 return load_lang(data, 1, safe)
@@ -306,15 +306,43 @@ def load_lang(data, num = 2, safe = 0):
             return load_lang(data, 1, safe)
 
 def load_oauth(provider):
+    oauth_supported = ["discord", "facebook", "naver", "kakao"]
     if(provider == '_README'):
-        return { "support" : ["discord", "facebook", "naver", "kakao"] }
+        return { "support" : oauth_supported }
     else:
-        oauth = json.loads(open(app_var['path_oauth_setting'], encoding='utf-8').read())
+        try:
+            oauth = json.loads(open(app_var['path_oauth_setting']).read())
+        except:
+            return_json_data = '{ "publish_url" : "", '
+
+            for i in range(len(oauth_supported)):
+                return_json_data += '"' + oauth_supported[i] + '" : { '
+                for j in range(2):
+                    if j == 0:
+                        load_target = 'id'
+                    elif j == 1:
+                        load_target = 'secret'
+
+                    return_json_data += '"client_' + load_target  + '" : ""' + (',' if j == 0 else '')
+
+                return_json_data += ' }'
+
+                try:
+                    _ = oauth_supported[i + 1]
+
+                    return_json_data += ', '
+                except:
+                    return_json_data += ' }'
+
+            with open(app_var['path_oauth_setting'], 'w', encoding='utf-8') as f:
+                f.write(return_json_data)
+
+            oauth = json.loads(open(app_var['path_oauth_setting']).read())
 
         return oauth[provider]
 
 def update_oauth(provider, target, content):
-    oauth = json.loads(open(app_var['path_oauth_setting'], encoding='utf-8').read())
+    oauth = json.loads(open(app_var['path_oauth_setting']).read())
     oauth[provider][target] = content
 
     with open(app_var['path_oauth_setting'], 'w') as f:

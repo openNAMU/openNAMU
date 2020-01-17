@@ -609,10 +609,10 @@ def setting_2(conn, num):
 
         if flask.request.method == 'POST':
             admin_check(None, 'oauth setting')
-            return_json_data = '{ "publish_url" : "' + flask.request.form.get('publish_url_box', '') + ', '
+            return_json_data = '{ "publish_url" : "' + flask.request.form.get('publish_url_box', '') + '", '
 
             for i in range(len(oauth_supported)):
-                return_json_data += '"discord" : { '
+                return_json_data += '"' + oauth_supported[i] + '" : { '
                 for j in range(2):
                     if j == 0:
                         load_target = 'id'
@@ -629,7 +629,7 @@ def setting_2(conn, num):
 
                     return_json_data += ', '
                 except:
-                    pas
+                    return_json_data += ' }'
 
             with open(app_var['path_oauth_setting'], 'w', encoding='utf-8') as f:
                 f.write(return_json_data)
