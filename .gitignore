@@ -3,6 +3,7 @@ __pycache__
 
 data/set.json
 data/mysql.json
+data/oauthsettings.json
 
 images
 .vscode
