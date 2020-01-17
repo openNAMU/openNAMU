@@ -406,10 +406,6 @@ def server_restart():
 def server_now_update():
     return server_now_update_2(conn, version_list['master']['r_ver'])
 
-@app.route('/oauth_setting', methods=['GET', 'POST'])
-def setting_oauth():
-    return setting_oauth_2(conn)
-
 @app.route('/adsense_setting', methods=['GET', 'POST'])
 def setting_adsense():
     return setting_adsense_2(conn)

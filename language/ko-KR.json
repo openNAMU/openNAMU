@@ -332,5 +332,6 @@
     "approval_requirement_disabled": "현재 가입시 승인필요 설정이 비활성화되어있습니다. 필요시 설정에서 활성화할 수 있습니다.",
     "all_register_num" : "모든 가입 신청자의 수",
     "replace_move" : "문서 바꾸기",
-    "merge_move" : "문서 병합"
+    "merge_move" : "문서 병합",
+    "oauth_explain" : "OAuth 로그인 기능을 사용하려면 'publish_url' 값을 HTTPS 프로토콜을 포함한 도메인 주소로 설정하고, 실제로 HTTPS 연결을 지원해야 합니다."
 }
