@@ -15,7 +15,8 @@ def setting_2(conn, num):
             'robots.txt',
             'Google',
             load_lang('main_bottom_body'),
-            load_lang('main_acl_setting')
+            load_lang('main_acl_setting'),
+            load_lang('oauth_setting')
         ]
 
         x = 0
@@ -134,59 +135,59 @@ def setting_2(conn, num):
                         <span>''' + load_lang('wiki_name') + '''</span>
                         <hr class=\"main_hr\">
                         <input type="text" name="name" value="''' + html.escape(d_list[0]) + '''">
-                        <hr class=\"main_hr\">
+                        <hr>
                         <span>''' + load_lang('wiki_logo') + ''' (HTML)</span>
                         <hr class=\"main_hr\">
                         <input type="text" name="logo" value="''' + html.escape(d_list[1]) + '''">
-                        <hr class=\"main_hr\">
+                        <hr>
                         <span>''' + load_lang('main_page') + '''</span>
                         <hr class=\"main_hr\">
                         <input type="text" name="frontpage" value="''' + html.escape(d_list[2]) + '''">
-                        <hr class=\"main_hr\">
+                        <hr>
                         <span>''' + load_lang('bottom_text') + ''' (HTML)</span>
                         <hr class=\"main_hr\">
                         <input type="text" name="license" value="''' + html.escape(d_list[3]) + '''">
-                        <hr class=\"main_hr\">
+                        <hr>
                         <span>''' + load_lang('max_file_size') + ''' (MB)</span>
                         <hr class=\"main_hr\">
                         <input type="text" name="upload" value="''' + html.escape(d_list[4]) + '''">
-                        <hr class=\"main_hr\">
+                        <hr>
                         <span>''' + load_lang('backup_interval') + ' (' + load_lang('hour') + ') (' + load_lang('off') + ' : 0) (' + load_lang('sqlite_only') + ') (' + load_lang('restart_required') + ''')</span>
                         <hr class=\"main_hr\">
                         <input type="text" name="back_up" value="''' + html.escape(d_list[9]) + '''">
-                        <hr class=\"main_hr\">
+                        <hr>
                         <span>''' + load_lang('wiki_skin') + '''</span>
                         <hr class=\"main_hr\">
                         <select name="skin">''' + load_skin(d_list[5]) + '''</select>
-                        <hr class=\"main_hr\">
+                        <hr>
                         <input type="checkbox" name="reg" ''' + check_box_div[0] + '''> ''' + load_lang('no_register') + '''
-                        <hr class=\"main_hr\">
+                        <hr>
                         <input type="checkbox" name="ip_view" ''' + check_box_div[1] + '''> ''' + load_lang('hide_ip') + '''
-                        <hr class=\"main_hr\">
+                        <hr>
                         <input type="checkbox" name="email_have" ''' + check_box_div[2] + '''> ''' + load_lang('email_required') + ' <a href="/setting/6">(' + load_lang('google_imap_required') + ''')</a>
-                        <hr class=\"main_hr\">
+                        <hr>
                         <input type="checkbox" name="requires_approval" ''' + check_box_div[3] + '''> ''' + load_lang('requires_approval') + '''
-                        <hr class=\"main_hr\">
+                        <hr>
                         <span>''' + load_lang('wiki_host') + '''</span>
                         <hr class=\"main_hr\">
                         <input type="text" name="host" value="''' + html.escape(d_list[16]) + '''">
-                        <hr class=\"main_hr\">
+                        <hr>
                         <span>''' + load_lang('wiki_port') + '''</span>
                         <hr class=\"main_hr\">
                         <input type="text" name="port" value="''' + html.escape(d_list[10]) + '''">
-                        <hr class=\"main_hr\">
+                        <hr>
                         <span>''' + load_lang('wiki_secret_key') + '''</span>
                         <hr class=\"main_hr\">
                         <input type="password" name="key" value="''' + html.escape(d_list[11]) + '''">
-                        <hr class=\"main_hr\">
+                        <hr>
                         <span>''' + load_lang('update_branch') + '''</span>
                         <hr class=\"main_hr\">
                         <select name="update">''' + branch_div + '''</select>
-                        <hr class=\"main_hr\">
+                        <hr>
                         <span>''' + load_lang('encryption_method') + '''</span>
                         <hr class=\"main_hr\">
                         <select name="encode">''' + acl_div[0] + '''</select>
-                        <hr class=\"main_hr\">
+                        <hr>
                         <span>''' + load_lang('slow_edit') + ' (' + load_lang('second') + ') (' + load_lang('off') + ''' : 0)</span>
                         <hr class=\"main_hr\">
                         <input name="''' + i_list[19] + '''" value="''' + html.escape(d_list[19]) + '''">
@@ -246,51 +247,51 @@ def setting_2(conn, num):
                         <span>''' + load_lang('register_text') + ''' (HTML)</span>
                         <hr class=\"main_hr\">
                         <input name="''' + i_list[0] + '''" value="''' + html.escape(d_list[0]) + '''">
-                        <hr class=\"main_hr\">
+                        <hr>
                         <span>''' + load_lang('non_login_alert') + ''' (HTML)</span>
                         <hr class=\"main_hr\">
                         <input name="''' + i_list[1] + '''" value="''' + html.escape(d_list[1]) + '''">
-                        <hr class=\"main_hr\">
+                        <hr>
                         <span>''' + load_lang('edit_bottom_text') + ''' (HTML)</span>
                         <hr class=\"main_hr\">
                         <input name="''' + i_list[2] + '''" value="''' + html.escape(d_list[2]) + '''">
-                        <hr class=\"main_hr\">
+                        <hr>
                         <span>''' + load_lang('check_key_text') + ''' (HTML)</span>
                         <hr class=\"main_hr\">
                         <input name="''' + i_list[3] + '''" value="''' + html.escape(d_list[3]) + '''">
-                        <hr class=\"main_hr\">
+                        <hr>
                         <span>''' + load_lang('email_title') + '''</span>
                         <hr class=\"main_hr\">
                         <input name="''' + i_list[4] + '''" value="''' + html.escape(d_list[4]) + '''">
-                        <hr class=\"main_hr\">
+                        <hr>
                         <span>''' + load_lang('email_text') + '''</span>
                         <hr class=\"main_hr\">
                         <input name="''' + i_list[5] + '''" value="''' + html.escape(d_list[5]) + '''">
-                        <hr class=\"main_hr\">
+                        <hr>
                         <span>''' + load_lang('email_insert_text') + '''</span>
                         <hr class=\"main_hr\">
                         <input name="''' + i_list[6] + '''" value="''' + html.escape(d_list[6]) + '''">
-                        <hr class=\"main_hr\">
+                        <hr>
                         <span>''' + load_lang('password_search_text') + '''</span>
                         <hr class=\"main_hr\">
                         <input name="''' + i_list[7] + '''" value="''' + html.escape(d_list[7]) + '''">
-                        <hr class=\"main_hr\">
+                        <hr>
                         <span>''' + load_lang('reset_user_text') + '''</span>
                         <hr class=\"main_hr\">
                         <input name="''' + i_list[8] + '''" value="''' + html.escape(d_list[8]) + '''">
-                        <hr class=\"main_hr\">
+                        <hr>
                         <span>''' + load_lang('error_401') + '''</span>
                         <hr class=\"main_hr\">
                         <input name="''' + i_list[9] + '''" value="''' + html.escape(d_list[9]) + '''">
-                        <hr class=\"main_hr\">
+                        <hr>
                         <span>''' + load_lang('error_404') + '''</span>
                         <hr class=\"main_hr\">
                         <input name="''' + i_list[10] + '''" value="''' + html.escape(d_list[10]) + '''">
-                        <hr class=\"main_hr\">
+                        <hr>
                         <span>''' + load_lang('edit_help') + '''</span>
                         <hr class=\"main_hr\">
                         <input name="''' + i_list[11] + '''" value="''' + html.escape(d_list[11]) + '''">
-                        <hr class=\"main_hr\">
+                        <hr>
                         <span>''' + load_lang('approval_question') + '''</span> <a href="#rfn-1" id="fn-1">(1)</a>
                         <hr class=\"main_hr\">
                         <input name="''' + i_list[12] + '''" value="''' + html.escape(d_list[12]) + '''">
@@ -500,7 +501,7 @@ def setting_2(conn, num):
                         <span>HTML</span>
                         <hr class=\"main_hr\">
                         <input name="recaptcha" placeholder='&lt;div class="g-recaptcha" data-sitekey="''' + load_lang('public_key') + '''"&gt;&lt;/div&gt;' value="''' + html.escape(d_list[0]) + '''">
-                        <hr class=\"main_hr\">
+                        <hr>
                         <span>''' + load_lang('secret_key') + '''</span>
                         <hr class=\"main_hr\">
                         <input name="sec_re" value="''' + html.escape(d_list[1]) + '''">
@@ -509,7 +510,7 @@ def setting_2(conn, num):
                         <span>''' + load_lang('google_email') + '''</span>
                         <hr class=\"main_hr\">
                         <input name="g_email" value="''' + html.escape(d_list[2]) + '''">
-                        <hr class=\"main_hr\">
+                        <hr>
                         <span><a href="https://security.google.com/settings/security/apppasswords">''' + load_lang('google_app_password') + '''</a></span>
                         <hr class=\"main_hr\">
                         <input type="password" name="g_pass" value="''' + html.escape(d_list[3]) + '''">
@@ -578,19 +579,19 @@ def setting_2(conn, num):
                         <span>''' + load_lang('document_acl') + '</span> <a href="/acl/TEST">(' + load_lang('reference') + ''')</a>
                         <hr class=\"main_hr\">
                         <select name="edit">''' + acl_div[0] + '''</select>
-                        <hr class=\"main_hr\">
+                        <hr>
                         <span>''' + load_lang('discussion_acl') + '''</span>
                         <hr class=\"main_hr\">
                         <select name="discussion">''' + acl_div[1] + '''</select>
-                        <hr class=\"main_hr\">
+                        <hr>
                         <span>''' + load_lang('upload_acl') + '''</span>
                         <hr class=\"main_hr\">
                         <select name="upload_acl">''' + acl_div[2] + '''</select>
-                        <hr class=\"main_hr\">
+                        <hr>
                         <span>''' + load_lang('view_acl') + '''</span>
                         <hr class=\"main_hr\">
                         <select name="all_view_acl">''' + acl_div[3] + '''</select>
-                        <hr class=\"main_hr\">
+                        <hr>
                         <span>''' + load_lang('edit_req_acl') + '''</span>
                         <hr class=\"main_hr\">
                         <select name="edit_req_acl">''' + acl_div[4] + '''</select>
@@ -599,6 +600,90 @@ def setting_2(conn, num):
                     </form>
                 ''',
                 menu = [['setting', load_lang('return')]]
+            ))
+    elif num == 9:
+        oauth_supported = load_oauth('_README')['support']
+
+        if admin_check() != 1:
+            return re_error('/error/3')
+
+        if flask.request.method == 'POST':
+            admin_check(None, 'oauth setting')
+            return_json_data = '{ "publish_url" : "' + flask.request.form.get('publish_url_box', '') + ', '
+
+            for i in range(len(oauth_supported)):
+                return_json_data += '"discord" : { '
+                for j in range(2):
+                    if j == 0:
+                        load_target = 'id'
+                    elif j == 1:
+                        load_target = 'secret'
+
+                    target_data = flask.request.form.get(oauth_supported[i] + '_client_' + load_target, '')
+                    return_json_data += '"client_' + load_target  + '" : "' + target_data + '"' + (',' if j == 0 else '')
+
+                return_json_data += ' }'
+
+                try:
+                    _ = oauth_supported[i + 1]
+
+                    return_json_data += ', '
+                except:
+                    pas
+
+            with open(app_var['path_oauth_setting'], 'w', encoding='utf-8') as f:
+                f.write(return_json_data)
+
+            return redirect('/oauth_setting')
+        else:
+            body_content = load_lang('oauth_explain') + '<hr>'
+            body_content += '''
+                <input placeholder="publish_url" id="publish_url_box" name="publish_url_box">
+                <hr>
+                <script>
+                    function check_value (target) {
+                        target_box = document.getElementById(target.id + "_box");
+                        if (target.value !== "") {
+                            target_box.checked = true;
+                        } else {
+                            target_box.checked = false;
+                        }
+                    }
+                </script>
+            '''
+
+            init_js = ''
+            body_content += '<form method="post">'
+
+            for i in range(len(oauth_supported)):
+                oauth_data = load_oauth(oauth_supported[i])
+
+                for j in range(2):
+                    if j == 0:
+                        load_target = 'id'
+                    elif j == 1:
+                        load_target = 'secret'
+
+                    init_js += 'check_value(document.getElementById("' + oauth_supported[i] + '_client_' + load_target + '"));'
+                    body_content += '''
+                        <input id="''' + oauth_supported[i] + '''_client_''' + load_target + '''_box" type="checkbox" disabled>
+                        <input  placeholder="''' + oauth_supported[i] + '''_client_''' + load_target + '''" 
+                                id="''' + oauth_supported[i] + '''_client_''' + load_target + '''" 
+                                name="''' + oauth_supported[i] + '''_client_''' + load_target + '''" 
+                                value="''' + oauth_data['client_' + load_target] + '''" 
+                                type="text" 
+                                onChange="check_value(this)" 
+                                style="width: 80%;">
+                        ''' + ('<hr>' if j == 1 else '<hr class=\"main_hr\">') + '''
+                    '''
+
+            body_content += '<button id="save" type="submit">' + load_lang('save') + '</button></form>'
+            body_content += '<script>' + init_js + '</script>'
+
+            return easy_minify(flask.render_template(skin_check(),
+                imp = [load_lang('oauth_setting'), wiki_set(), custom(), other2([0, 0])],
+                data = body_content,
+                menu = [['other', load_lang('return')]]
             ))
     else:
         return redirect()

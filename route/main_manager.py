@@ -54,7 +54,6 @@ def main_manager_2(conn, num, r_ver):
                     <ul>
                         <li><a href="/restart">''' + load_lang('wiki_restart') + '''</a></li>
                         <li><a href="/update">''' + load_lang('update') + '''</a></li>
-                        <li><a href="/oauth_setting">''' + load_lang('oauth_setting') + '''</a></li>
                         <li><a href="/adsense_setting">''' + load_lang('adsense_setting') + '''</a></li>
                     </ul>
                     <br>

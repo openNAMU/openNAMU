@@ -306,9 +306,12 @@ def load_lang(data, num = 2, safe = 0):
             return load_lang(data, 1, safe)
 
 def load_oauth(provider):
-    oauth = json.loads(open(app_var['path_oauth_setting'], encoding='utf-8').read())
+    if(provider == '_README'):
+        return { "support" : ["discord", "facebook", "naver", "kakao"] }
+    else:
+        oauth = json.loads(open(app_var['path_oauth_setting'], encoding='utf-8').read())
 
-    return oauth[provider]
+        return oauth[provider]
 
 def update_oauth(provider, target, content):
     oauth = json.loads(open(app_var['path_oauth_setting'], encoding='utf-8').read())

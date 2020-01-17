@@ -62,19 +62,13 @@ function render_namumark(target) {
                 var img_src = JSON.parse(this.responseText)['data'];
                 
                 xhr.onreadystatechange = function() {
-                    if(this.readyState === 4 && this.status === 200) {
-                        if(JSON.parse(this.responseText)['exist'] !== '1') {
-                            document.getElementById(file_data[1]).innerHTML = '' +
-                                '<a href="/upload?name=' + encodeURIComponent(file_data[0]) + '" id="not_thing">' + file_data[0] + '</a>' +
-                            '';
-                        } else {
-                            document.getElementById(file_data[1]).innerHTML = '' +
-                                '<img src="/image/' + img_src + file_type + '">' +
-                            '';
-                        }
+                    if(this.readyState === 4 && this.status === 200 && JSON.parse(this.responseText)['exist'] === '1') {
+                        document.getElementById(file_data[1]).innerHTML = '' +
+                            '<img style="' + file_data[2] + '" src="/image/' + img_src + file_type + '">' +
+                        '';
                     } else {
                         document.getElementById(file_data[1]).innerHTML = '' +
-                            '<a href="/upload?name=' + encodeURIComponent(file_data[0]) + '" id="not_thing">' + file_data[0] + '</a>' +
+                            '<a href="/upload?name=' + encodeURIComponent(file_name) + '" id="not_thing">' + file_data[0] + '</a>' +
                         '';
                     }
                 }
@@ -327,22 +321,17 @@ function render_namumark(target) {
         return '<span id="math_' + String(math_num) + '"></span>';
     });
 
-    var i = 0;
     var mid_num = 0;
     var mid_stack = 0;
     var mid_list = [];
     var html_num = 0;
     var fol_num = 0;
     var mid_regex = /(?:{{{(?:((?:(?! |{{{|}}}|&lt;).)*) ?)|(?:}}}))/;
-    // 이거 손 봐야함
     while(1) {
         var all_mid_data = data.match(mid_regex);
-        console.log(all_mid_data);
         if(all_mid_data) {
             var all = all_mid_data[0];
             var in_data = all_mid_data[1];
-
-            i += 1;
 
             if(all === '}}}') {
                 if(mid_stack > 0) {
@@ -413,16 +402,45 @@ function render_namumark(target) {
                         } else if(in_data.match(/#!wiki/i)) {
                             mid_list.push('div_1');
 
-                            data = data.replace(mid_regex, '<div id="wiki_div_before">');
+
+                            var div_style_data = data.match(/{{{#!wiki(?: style=([^\n]+))?\n?/i);
+                            if(!div_style_data[1]) {
+                                div_style_data = '';
+                            } else {
+                                div_style_data = div_style_data[1];
+                                console.log(div_style_data);
+
+                                div_style_data = div_style_data.replace(/('|")/g, '');
+                                div_style_data = div_style_data.replace(/position/ig, '');
+                            }
+
+                            data = data.replace(/{{{#!wiki(?: style=([^\n]+))?\n?/i, '<div id="wiki_div" style="' + div_style_data + '">');
                         } else if(in_data.match(/#!syntax/i)) {
                             mid_list.push('pre');
                             mid_stack += 1;
+
+                            var syntax_data = data.match(/{{{#!syntax(?: ([^\n]+))?\n?/i);
+                            if(!syntax_data[1]) {
+                                syntax_data = 'python';
+                            } else {
+                                syntax_data = syntax_data[1];
+                            }
                             
-                            data = data.replace(mid_regex, '<pre><code id="syntax_before">');
+                            data = data.replace(/{{{#!syntax(?: ([^\n]+))?\n?/i, '<pre id="syntax"><code class="' + syntax_data + '">');
                         } else if(in_data.match(/#!folding/i)) {
                             mid_list.push('div_2');
+
+                            var fol_data = data.match(/{{{#!folding(?: ([^\n]+))?\n?/i);
+                            if(!fol_data[1]) {
+                                fol_data = 'TEST';
+                            } else {
+                                fol_data = fol_data[1];
+                            }
                             
-                            data.replace(mid_regex, '' +
+                            fol_num += 1;
+                            
+                            data = data.replace(/{{{#!folding( ([^\n]+))?\n?/i, '' +
+                                fol_data +
                                 '<div style="display: inline-block;">' + 
                                     '<a href="javascript:void(0);" onclick="do_open_folding(\'folding_' + String(fol_num) + '\', this);">' +
                                         '[+]' +
@@ -455,15 +473,21 @@ function render_namumark(target) {
         }
     }
 
+    data = data.replace(/<mid>/g, '{{{');
+    data = data.replace(/<\/mid>/g, '}}}');
     data = data.replace(/<\/div> *\n/ig, '</div>');
 
     var nowiki_num = 0;
     var nowiki_list = {};
-    data = data.replace(/<code>(\n*((?:(?!<\/code>).)+\n*)+)<\/code>/g, function(all, in_data) {
+    data = data.replace(/<code( (?:class="(?:[^"]+)"))?>(\n*((?:(?!<\/code>).)+\n*)+)<\/code>/g, function(all, class_data, in_data) {
         nowiki_num += 1;
         nowiki_list['nowiki_' + String(nowiki_num)] = in_data;
 
-        return '<span id="nowiki_' + String(nowiki_num) + '"></span>';
+        if(class_data) {
+            return '<code' + class_data + '><span id="nowiki_' + String(nowiki_num) + '"></span></code>';
+        } else {
+            return '<span id="nowiki_' + String(nowiki_num) + '"></span>';
+        }
     });
 
     data = data.replace(/\r\n/g, '\n');
@@ -473,26 +497,19 @@ function render_namumark(target) {
     data = data.replace(/\|\|(?: +)\n/g, '||\n');
 
     data = data.replace(/\n##(?:(?:(?!\n).)+)/g, '');
-    data = data.replace(/<div id="wiki_div" style="">\n/g, '<div id="wiki_div" style="">');
-    data = data.replace(/<div id="wiki_div" style=""> +/g, '<div id="wiki_div" style="">');
-
-    console.log(data);
-    console.log('----')
 
     while(1) {
-        wiki_table_data = data.match(/<div id="wiki_div" ((?:(?!>).)+)>((?:(?!<div id="wiki_div"|<\/div_1>).\n*)+)<\/div_1>/i);
+        wiki_table_data = data.match(/<div id="wiki_div"( (?:[^>]*))>((?:(?:\n| )*)(?:(?!<div id="wiki_div"|<\/div_1>).\n*)+)<\/div_1>/i);
         if(wiki_table_data) {
             if(wiki_table_data[2].match(/\|\|/)) {
-                console.log('1')
-                console.log(wiki_table_data[2]);
                 var end_table_render = table_render('\n' + wiki_table_data[2] + '\n').replace(/^\n/, '').replace(/\n$/, '');
             } else {
                 var end_table_render = wiki_table_data[2];
             }
 
             data = data.replace(
-                /<div id="wiki_div" ((?:(?!>).)+)>((?:(?!<div id="wiki_div"|<\/div_1>).\n*)+)<\/div_1>/i, 
-                '<div ' + wiki_table_data[1] + '>' + end_table_render + '</div>'
+                /<div id="wiki_div"( (?:[^>]*))>((?:(?:\n| )*)(?:(?!<div id="wiki_div"|<\/div_1>).\n*)+)<\/div_1>/i, 
+                '<div' + wiki_table_data[1] + '>' + end_table_render + '</div>'
             );
         } else {
             break;
@@ -594,7 +611,6 @@ function render_namumark(target) {
         return '\n<span style="margin-left: ' + String(margin_data.length * 10) + 'px"></span>'
     });
 
-    console.log(data);
     data = table_render(data);
 
     var link_list = [];
@@ -625,7 +641,26 @@ function render_namumark(target) {
 
                     return '';
                 } else if(in_data.match(/^(?:file|파일):/i)) {
-                    file_list.push([in_data.replace(/^(?:file|파일):/i, ''), 'file_' + String(file_num)]);
+                    if(in_data.match(/\|/)) {
+                        var file_name = in_data.replace(/^(?:file|파일):/i, '');
+                        file_name = file_name.match(/^([^|]+)/)[1];
+                    } else {
+                        var file_name = in_data.replace(/^(?:file|파일):/i, '');
+                    }
+
+                    var file_style = '';
+                    
+                    var file_state = in_data.match(/\|width=([^|]+)/);
+                    if(file_state) {
+                        file_style += 'width:' + file_state[1];
+                    }
+
+                    file_state = in_data.match(/\|height=([^|]+)/);
+                    if(file_state) {
+                        file_style += 'height:' + file_state[1];
+                    }
+
+                    file_list.push([file_name, 'file_' + String(file_num), file_style]);
                     file_num += 1;
                     
                     return '<span id="file_' + String(file_num - 1) + '"></span>';
@@ -637,7 +672,7 @@ function render_namumark(target) {
 
                     return '<a id="out_link" href="' + back_data + '">' + front_data + '</a>'; 
                 } else {
-                    var link_part = divi_link(in_data);
+                    var link_part = divi_link(in_data.replace(/^:/, ''));
                     
                     var front_data = link_part[0];
                     var back_data = link_part[1];
@@ -873,9 +908,10 @@ function render_namumark(target) {
         }
     }
 
+    console.log('render end')
     hljs.initHighlightingOnLoad();
     render_html("html_render_contect");    
 
-    // v0.0.6
-    // 어느 정도 괜찮은 수준까진 옴
+    // v0.0.8
+    // 완성 직전
 }
