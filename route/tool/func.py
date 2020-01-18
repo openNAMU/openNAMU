@@ -427,16 +427,14 @@ def other2(data):
         data += ['']
 
     req_list = ''
-    main_css_ver = 6
+    main_css_ver = 10
 
     if not 'main_css_load' in flask.session or not 'main_css_ver' in flask.session or flask.session['main_css_ver'] != main_css_ver:
         for i_data in os.listdir(os.path.join("views", "main_css", "css")):
-            file_date = str(int(os.path.getmtime(os.path.join("views", "main_css", "css", i_data))))
-            req_list += '<link rel="stylesheet" href="/views/main_css/css/' + i_data + '?ver=' + file_date + '">'
+            req_list += '<link rel="stylesheet" href="/views/main_css/css/' + i_data + '?ver=' + str(main_css_ver) + '">'
 
         for i_data in os.listdir(os.path.join("views", "main_css", "js")):
-            file_date = str(int(os.path.getmtime(os.path.join("views", "main_css", "js", i_data))))
-            req_list += '<script src="/views/main_css/js/' + i_data + '?ver=' + file_date + '"></script>'
+            req_list += '<script src="/views/main_css/js/' + i_data + '?ver=' + str(main_css_ver) + '"></script>'
 
         flask.session['main_css_load'] = req_list
         flask.session['main_css_ver'] = main_css_ver

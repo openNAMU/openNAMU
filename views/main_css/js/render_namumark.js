@@ -783,11 +783,15 @@ function render_namumark(target) {
     });
 
     var ref_num = 0;
-    var ref_data = '<hr><ul id="footnote_data">';
+    var ref_data = '';
     var name_ref_data = {};
     while(1) {
         if(data.match(/(?:\[\*([^ \]]*)(?: ((?:(?!\[\*|\]).)+))?\]|\[(?:각주|footnote)])/)) {
             data = data.replace(/(?:\[\*([^ \]]*)(?: ((?:(?!\[\*|\]).)+))?\]|\[(?:각주|footnote)])/, function(all, name_data, in_data) {
+                if(ref_num === 0) {
+                    ref_data += '<hr><ul id="footnote_data">';
+                }
+
                 if(all.match(/^\[(?:각주|footnote)]$/i)) {
                     var new_ref_data = ref_data;
                     ref_data = '<hr><ul id="footnote_data">';
@@ -795,47 +799,51 @@ function render_namumark(target) {
                     return new_ref_data + '</ul>';
                 } else {
                     ref_num += 1;
+                    var fn_num = String(ref_num);
+
                     if(name_data) {
                         if(in_data) {
-                            name_ref_data[name_data] = in_data;
-
-                            ref_data += '' +
-                                '<li>' +
-                                    '<a id="fn-' + name_data + '" href="#rfn-' + String(ref_num) + '">(' + name_data + ')</a> ' + in_data + ''
-                                '</li>' +
-                            ''    
+                            var fn_data = in_data;
+                            var fn_name = name_data;
+                            name_ref_data[name_data] = fn_data;
                         } else {
-                            ref_data += '' +
-                                '<li>' +
-                                    '<a href="#rfn-' + String(ref_num) + '">(' + name_data + ')</a>' +
-                                '</li>' +
-                            ''
+                            var fn_name = name_data;
+                            if(name_ref_data[name_data]) {
+                                var fn_data = name_ref_data[name_data];
+                            } else {
+                                var fn_data = '';
+                            }
                         }
                     } else {
-                        ref_data += '' +
-                            '<li>' +
-                                '<a id="fn-' + String(ref_num) + '" href="#rfn-' + String(ref_num) + '">(' + String(ref_num) + ')</a> ' + in_data + ''
-                            '</li>' +
-                        ''
+                        var fn_name = fn_num;
+                        var fn_data = in_data;
                     }
 
+                    ref_data += '' +
+                        '<li>' +
+                            '<a id="cfn-' + fn_num + '" ' +
+                                'href="#rfn-' + fn_num + '" ' +
+                                'onclick="do_open_foot(\'fn-' + fn_num + '\', 1);">' +
+                                '(' + fn_name + ')' +
+                            '</a> ' + fn_data +
+                        '</li>' +
+                    ''
+
                     if(name_data) {
-                        return '' +
-                            '<sup>' +
-                                '<a href="#fn-' + name_data + '" id="rfn-' + String(ref_num) + '" title="' + name_ref_data[name_data].replace(/<([^>]*)>/g, '') + '">' +
-                                    '(' + name_data + ')' +
-                                '</a>' +
-                            '</sup>' +
-                        '';
+                        fn_name = name_data;
                     } else {
-                        return '' +
+                        fn_name = fn_num;
+                    }
+
+                    return '' +
                         '<sup>' +
-                            '<a href="#fn-' + String(ref_num) + '" id="rfn-' + String(ref_num) + '" title="' + in_data.replace(/<([^>]*)>/g, '') + '">' +
-                                '(' + String(ref_num) + ')' +
+                            '<a href="#fn-' + fn_num + '" ' +
+                                'id="rfn-' + fn_num + '" ' +
+                                'onclick="do_open_foot(\'fn-' + fn_num + '\');">' +
+                                '(' + fn_name + ')' +
                             '</a>' +
                         '</sup>' +
                     '';
-                    }
                 }
             });
         } else {
@@ -843,7 +851,7 @@ function render_namumark(target) {
         }
     }
 
-    if(ref_data !== '<hr><ul id="footnote_data">') {
+    if(ref_data !== '') {
         data += ref_data + '</ul>';
     }
 
