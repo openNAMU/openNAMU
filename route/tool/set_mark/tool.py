@@ -9,7 +9,6 @@ def get_time():
 
 def db_data_get(data):
     global set_data
-
     set_data = data
 
 def db_change(data):
@@ -26,10 +25,13 @@ def ip_check(d_type = 0):
         ip = flask.session['id']
     
     if ip == '':
-        ip = flask.request.environ.get('HTTP_X_REAL_IP', flask.request.environ.get('HTTP_X_FORWARDED_FOR', flask.request.remote_addr))
+        try:
+            ip = flask.request.environ.get('HTTP_X_REAL_IP', flask.request.environ.get('HTTP_X_FORWARDED_FOR', flask.request.remote_addr))
 
-        if ip == '::1' or ip == '127.0.0.1':
-            ip = flask.request.environ.get('HTTP_X_FORWARDED_FOR', flask.request.remote_addr)
+            if ip == '::1' or ip == '127.0.0.1':
+                ip = flask.request.environ.get('HTTP_X_FORWARDED_FOR', flask.request.remote_addr)
+        except:
+            ip = 'error:ip'
 
     return str(ip)
 
