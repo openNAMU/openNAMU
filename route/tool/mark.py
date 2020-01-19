@@ -37,11 +37,15 @@ def send_parser(data):
 
     return data
 
-def plusing(data_in):
+async def plusing(data_in):
     try:
         curs.execute(db_change("insert into back (title, link, type) values (?, ?, ?)"), [data_in[1], data_in[0], data_in[2]])
     except:
         pass
+
+async def main_async(data):
+    run_all = [asyncio.ensure_future(plusing(data_in)) for data_in in data]
+    await asyncio.gather(*run_all)
 
 def render_do(title, data, num, include):
     curs.execute(db_change('select data from other where name = "markup"'))
@@ -62,9 +66,9 @@ def render_do(title, data, num, include):
         data = ['', '', []]
 
     if num == 1:
-        for data_in in data[2]:
-            plusing(data_in)
-
+        loop = asyncio.new_event_loop()
+        loop.run_until_complete(main_async(data[2]))
+        loop.close()
         conn.commit()
 
     if num == 2:
