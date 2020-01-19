@@ -215,11 +215,15 @@ print('Select : ', end = '')
 what_i_do = input()
 
 if what_i_do == '1':
-    curs.execute(db_change("delete from back"))
-    conn.commit()
+    print('----')
+    print('All delete (Y) [Y, N] : ', end = '')
+    go_num = input()
+    if not go_num == 'N':
+        curs.execute(db_change("delete from back"))
+        conn.commit()
 
     print('----')
-    print('Num (100) : ', end = '')
+    print('Count (100) : ', end = '')
     try:
         go_num = int(input())
     except:
