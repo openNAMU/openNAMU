@@ -756,12 +756,15 @@ def namumark(conn, data, title, main_num, include_num):
         if age_data:
             age = age_data.groups()[0]
 
-            old = datetime.datetime.strptime(time[0], '%Y-%m-%d')
-            will = datetime.datetime.strptime(age, '%Y-%m-%d')
+            try:
+                old = datetime.datetime.strptime(time[0], '%Y-%m-%d')
+                will = datetime.datetime.strptime(age, '%Y-%m-%d')
 
-            e_data = old - will
+                e_data = old - will
 
-            data = age_re.sub(str(int(e_data.days / 365)), data, 1)
+                data = age_re.sub(str(int(e_data.days / 365)), data, 1)
+            except:
+                data = age_re.sub('age-error', data, 1)
         else:
             break
 
@@ -771,17 +774,20 @@ def namumark(conn, data, title, main_num, include_num):
         if dday_data:
             dday = dday_data.groups()[0]
 
-            old = datetime.datetime.strptime(time[0], '%Y-%m-%d')
-            will = datetime.datetime.strptime(dday, '%Y-%m-%d')
+            try:
+                old = datetime.datetime.strptime(time[0], '%Y-%m-%d')
+                will = datetime.datetime.strptime(dday, '%Y-%m-%d')
 
-            e_data = old - will
+                e_data = old - will
 
-            if re.search('^-', str(e_data.days)):
-                e_day = str(e_data.days)
-            else:
-                e_day = '+' + str(e_data.days)
+                if re.search('^-', str(e_data.days)):
+                    e_day = str(e_data.days)
+                else:
+                    e_day = '+' + str(e_data.days)
 
-            data = dday_re.sub(e_day, data, 1)
+                data = dday_re.sub(e_day, data, 1)
+            except:
+                data = dday_re.sub('dday-error', data, 1)
         else:
             break
 
