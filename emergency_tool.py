@@ -218,14 +218,21 @@ if what_i_do == '1':
     curs.execute(db_change("delete from back"))
     conn.commit()
 
+    print('----')
+    print('Num (100) : ', end = '')
+    try:
+        go_num = int(input())
+    except:
+        go_num = 100
+
     num = 0
     while 1:
         curs.execute(db_change("select title, data from data d where not exists (select title from back where link = d.title) limit 1"))
         data = curs.fetchall()
         if data:
             num += 1
-            if num % 100 == 0:
-                print(num)
+            if num % go_num == 0:
+                print(str(num) + ' : ' + data[0][0])
 
             render_do(data[0][0], data[0][1], 1, None)
         else:

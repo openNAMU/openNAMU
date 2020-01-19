@@ -432,7 +432,7 @@ def middle_parser(data, fol_num, syntax_num, folding_num, include_num):
 
     num = 0
     while 1:
-        syntax_data = re.search('<code class="((?:(?!").)+)">((?:(?:(?:(?!<\/code>|<span id="syntax_)).)+\n*)+)<\/code>', data)
+        syntax_data = re.search('<code class="((?:(?!").)+)">((?:(?:(?:(?!<\/code>)).)+\n*)+)<\/code>', data)
         if syntax_data:
             syntax_data = syntax_data.groups()
 
@@ -441,8 +441,8 @@ def middle_parser(data, fol_num, syntax_num, folding_num, include_num):
             end_data['syntax_' + str(num)] = [syntax_data[1], 'normal']
 
             data = re.sub(
-                '<code class="((?:(?!").)+)">((?:(?:(?:(?!<\/code>|<span id="syntax_)).)+\n*)+)<\/code>',
-                '<code class="' + syntax_data[0] + '"><span id="syntax_' + str(num) + '"></span></code>',
+                '<code class="((?:(?!").)+)">((?:(?:(?:(?!<\/code>)).)+\n*)+)<\/code>',
+                '<code class="' + syntax_data[0] + '" id="syntax_' + str(num) + '"></code>',
                 data,
                 1
             )
