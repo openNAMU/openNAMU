@@ -6,8 +6,9 @@ from .set_mark.tool import *
 import re
 import html
 import sqlite3
-import urllib.parse
+import asyncio
 import threading
+import urllib.parse
 import multiprocessing
 
 def load_conn2(data):
@@ -36,11 +37,11 @@ def send_parser(data):
 
     return data
 
-def plusing(data):
-    for data_in in data:
-        curs.execute(db_change("select title from back where title = ? and link = ? and type = ?"), [data_in[1], data_in[0], data_in[2]])
-        if not curs.fetchall():
-            curs.execute(db_change("insert into back (title, link, type) values (?, ?, ?)"), [data_in[1], data_in[0], data_in[2]])
+def plusing(data_in):
+    try:
+        curs.execute(db_change("insert into back (title, link, type) values (?, ?, ?)"), [data_in[1], data_in[0], data_in[2]])
+    except:
+        pass
 
 def render_do(title, data, num, include):
     curs.execute(db_change('select data from other where name = "markup"'))
@@ -61,20 +62,8 @@ def render_do(title, data, num, include):
         data = ['', '', []]
 
     if num == 1:
-        data_num = len(data[2])
-        data_in_num = int(data_num / multiprocessing.cpu_count())
-        data_in = []
-
-        for i in range(multiprocessing.cpu_count()):
-            if i != multiprocessing.cpu_count() - 1:
-                data_in += [data[2][data_in_num * i:data_in_num * (i + 1)]]
-            else:
-                data_in += [data[2][data_in_num * i:]]
-
-        for data_in_for in data_in:
-            thread_start = threading.Thread(target = plusing, args = [data_in_for])
-            thread_start.start()
-            thread_start.join()
+        for data_in in data[2]:
+            plusing(data_in)
 
         conn.commit()
 

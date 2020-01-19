@@ -206,6 +206,10 @@ if setup_tool != 0:
 
     update()
 
+curs.execute(db_change('delete from other where name = "ver"'))
+curs.execute(db_change('insert into other (name, data) values ("ver", ?)'), [version_list['master']['c_ver']])
+conn.commit()
+
 # Init
 logging.basicConfig(level = logging.ERROR)
 
@@ -272,9 +276,6 @@ adsense_result = curs.fetchall()
 if not adsense_result:
     curs.execute(db_change('insert into other (name, data) values ("adsense", "False")'))
     curs.execute(db_change('insert into other (name, data) values ("adsense_code", "")'))
-
-curs.execute(db_change('delete from other where name = "ver"'))
-curs.execute(db_change('insert into other (name, data) values ("ver", ?)'), [version_list['master']['c_ver']])
 
 if set_data['db_type'] == 'sqlite':
     def back_up():

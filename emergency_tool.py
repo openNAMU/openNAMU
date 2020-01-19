@@ -191,6 +191,10 @@ if setup_tool != 0:
 
     update()
 
+curs.execute(db_change('delete from other where name = "ver"'))
+curs.execute(db_change('insert into other (name, data) values ("ver", ?)'), [version_list['master']['c_ver']])
+conn.commit()
+
 # Main
 print('----')
 print('1. Backlink reset')
@@ -214,16 +218,18 @@ if what_i_do == '1':
     curs.execute(db_change("delete from back"))
     conn.commit()
 
-    curs.execute(db_change("select title, data from data"))
-    data = curs.fetchall()
     num = 0
+    while 1:
+        curs.execute(db_change("select title, data from data d where not exists (select title from back where link = d.title) limit 1"))
+        data = curs.fetchall()
+        if data:
+            num += 1
+            if num % 100 == 0:
+                print(num)
 
-    for test in data:
-        num += 1
-        if num % 100 == 0:
-            print(num)
-
-        render_do(test[0], test[1], 1, None)
+            render_do(data[0][0], data[0][1], 1, None)
+        else:
+            break
 elif what_i_do == '2':
     curs.execute(db_change("delete from other where name = 'recaptcha'"))
     curs.execute(db_change("delete from other where name = 'sec_re'"))
