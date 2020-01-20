@@ -84,11 +84,14 @@ def table_parser(data, cel_data, start_data, num = 0):
     else:
         cel = 'colspan="' + str(round(len(start_data) / 2)) + '"'
 
-    table_row = re.search("&lt;(^|v)?\|((?:(?!&gt;).)*)&gt;", data)
+    table_row = re.search("&lt;(\^|v)?\|((?:(?!&gt;).)*)&gt;", data)
     if table_row:
         table_row = table_row.groups()
         if table_row[0]:
-            
+            if table_row[0] == '^':
+                cel_style += 'vertical-align: top;'
+            elif table_row[0] == 'v':
+                cel_style += 'vertical-align: bottom;'
 
         row = 'rowspan="' + table_row[1] + '"'
 
