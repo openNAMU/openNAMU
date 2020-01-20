@@ -84,9 +84,13 @@ def table_parser(data, cel_data, start_data, num = 0):
     else:
         cel = 'colspan="' + str(round(len(start_data) / 2)) + '"'
 
-    table_row = re.search("&lt;\|((?:(?!&gt;).)*)&gt;", data)
+    table_row = re.search("&lt;(^|v)?\|((?:(?!&gt;).)*)&gt;", data)
     if table_row:
-        row = 'rowspan="' + table_row.groups()[0] + '"'
+        table_row = table_row.groups()
+        if table_row[0]:
+            
+
+        row = 'rowspan="' + table_row[1] + '"'
 
     # <>
 
