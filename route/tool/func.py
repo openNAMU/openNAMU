@@ -456,13 +456,20 @@ def other2(data):
     return data
 
 def cut_100(data):
-    data = re.sub('<(((?!>).)*)>', ' ', data)
-    data = re.sub('\n', ' ', data)
-    data = re.sub('^ +', '', data)
-    data = re.sub(' +$', '', data)
-    data = re.sub(' {2,}', ' ', data)
+    if re.search('^\/w\/', flask.request.path):
+        data = re.sub('<script>((\n*(((?!<\/script>).)+)\n*)+)<\/script>', '', data)
+        data = re.sub('<hr class="main_hr">((\n*((.+)\n*))+)$', '', data)
+        data = re.sub('<div id="cate_all">((\n*((.+)\n*))+)$', '', data)        
 
-    return data[0:100] + '...'
+        data = re.sub('<(((?!>).)*)>', ' ', data)
+        data = re.sub('\n', ' ', data)
+        data = re.sub('^ +', '', data)
+        data = re.sub(' +$', '', data)
+        data = re.sub(' {2,}', ' ', data)
+    
+        return data[0:100] + '...'
+    else:
+        return ''
 
 def wiki_set(num = 1):
     if num == 1:
