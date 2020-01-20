@@ -921,5 +921,6 @@ function render_namumark(target) {
     render_html("html_render_contect");    
 
     // v0.0.8
-    // 완성 직전
+    // 나무위키 새로 생긴 문법 반영 필요
+    // code 버그 확인 필요
 }
