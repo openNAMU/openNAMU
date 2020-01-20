@@ -38,6 +38,12 @@ def send_parser(data):
     return data
 
 def render_do(title, data, num, include):
+    if num == 3:
+        num = 1
+        back_num = 3
+    else:
+        back_num = num
+
     curs.execute(db_change('select data from other where name = "markup"'))
     rep_data = curs.fetchall()
     if rep_data[0][0] == 'namumark':
@@ -67,7 +73,8 @@ def render_do(title, data, num, include):
 
                 curs.execute(db_change("delete from back where title = ? and type = 'no'"), [title])
 
-        conn.commit()
+        if back_num != 3:
+            conn.commit()
 
     if num == 2:
         return [data[0], data[1]]
