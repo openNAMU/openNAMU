@@ -230,17 +230,20 @@ if what_i_do == '1':
         go_num = 100
 
     num = 0
-    while 1:
-        curs.execute(db_change("select title, data from data d where not exists (select title from back where link = d.title) limit 1"))
-        data = curs.fetchall()
-        if data:
-            num += 1
-            if num % go_num == 0:
-                print(str(num) + ' : ' + data[0][0])
 
-            render_do(data[0][0], data[0][1], 1, None)
-        else:
-            break
+    curs.execute(db_change("select title from data d where not exists (select title from back where link = d.title)"))
+    title = curs.fetchall()
+    for name in title:
+        num += 1
+        if num % go_num == 0:
+            print(str(num) + ' : ' + name[0])
+
+        if num % 100 == 0:
+            conn.commit()
+
+        curs.execute(db_change("select data from data where title = ?"), [name[0]])
+        data = curs.fetchall()
+        render_do(name[0], data[0][0], 3, None)
 elif what_i_do == '2':
     curs.execute(db_change("delete from other where name = 'recaptcha'"))
     curs.execute(db_change("delete from other where name = 'sec_re'"))
