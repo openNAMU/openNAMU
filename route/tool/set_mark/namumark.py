@@ -1058,7 +1058,7 @@ def namumark(conn, data, title, main_num, include_num):
                         )
                 else:
                     data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', 'Not exist', data, 1)
-            elif re.search('^\/', main_link):
+            elif re.search('^(\/(?:.+))$', main_link):
                 under_title = re.search('^(\/(?:.+))$', main_link)
                 under_title = under_title.groups()[0]
 
