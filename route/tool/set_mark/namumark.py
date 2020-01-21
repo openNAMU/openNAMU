@@ -1221,14 +1221,14 @@ def namumark(conn, data, title, main_num, include_num):
         if footdata[2] == 0:
             footdata_in = ''
         else:
-            footdata_in = footdata[2]
+            footdata_in = str(footdata[2])
 
         footdata_all += '' + \
             '<li>' + \
                 '<a href="#' + include_num + 'rfn-' + str(footdata[0]) + '" ' + \
                     'id="' + include_num + 'cfn-' + str(footdata[0]) + '" ' + \
                     'onclick="do_open_foot(\'' + include_num + 'fn-' + str(footdata[0]) + '\', 1);">' + \
-                    '(' + footdata[1] + ')' + \
+                    '(' + str(footdata[1]) + ')' + \
                 '</a> <span id="' + include_num + 'fn-' + str(footdata[0]) + '">' + footdata_in + '</span>' + \
             '</li>' + \
         ''
