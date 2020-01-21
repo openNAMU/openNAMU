@@ -1,3 +1,4 @@
+import time
 from route.tool.func import *
 
 version_list = json.loads(open('version.json').read())
@@ -231,8 +232,17 @@ if what_i_do == '1':
 
     num = 0
 
+    print('----')
+    print('Load...')
+
     curs.execute(db_change("select title from data d where not exists (select title from back where link = d.title)"))
     title = curs.fetchall()
+
+    print('----')
+    print('Rest : ' + str(len(title)))
+    time.sleep(1)
+    print('----')
+
     for name in title:
         num += 1
         if num % go_num == 0:
