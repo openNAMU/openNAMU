@@ -163,9 +163,15 @@ def setting_2(conn, num):
                         <input type="checkbox" name="reg" ''' + check_box_div[0] + '''> ''' + load_lang('no_register') + '''
                         <hr>
                         <input type="checkbox" name="ip_view" ''' + check_box_div[1] + '''> ''' + load_lang('hide_ip') + '''
+<<<<<<< HEAD
                         <hr>
                         <input type="checkbox" name="email_have" ''' + check_box_div[2] + '''> ''' + load_lang('email_required') + ' <a href="/setting/6">(' + load_lang('google_imap_required') + ''')</a>
                         <hr>
+=======
+                        <hr class=\"main_hr\">
+                        <input type="checkbox" name="email_have" ''' + check_box_div[2] + '''> ''' + load_lang('email_required') + ' <a href="/setting/6">(' + load_lang('smtp_setting_required') + ''')</a>
+                        <hr class=\"main_hr\">
+>>>>>>> 2347c8d... Make smtp server configuarable
                         <input type="checkbox" name="requires_approval" ''' + check_box_div[3] + '''> ''' + load_lang('requires_approval') + '''
                         <hr>
                         <span>''' + load_lang('wiki_host') + '''</span>
@@ -456,16 +462,16 @@ def setting_2(conn, num):
         i_list = [
             'recaptcha',
             'sec_re',
-            'g_email',
-            'g_pass'
+            'smtp_server',
+            'smtp_port',
+            'smtp_security',
+            'smtp_email',
+            'smtp_pass'
         ]
 
         if flask.request.method == 'POST':
             for data in i_list:
-                if data == 'g_email':
-                    into_data = re.sub('@.*$', '', flask.request.form.get(data, ''))
-                else:
-                    into_data = flask.request.form.get(data, '')
+                into_data = flask.request.form.get(data, '')
 
                 curs.execute(db_change("update other set data = ? where name = ?"), [into_data, data])
 
@@ -493,6 +499,10 @@ def setting_2(conn, num):
 
             conn.commit()
 
+            security_radios = ''
+            for i in ['tls', 'starttls', 'plain']:
+                security_radios += '<input name="smtp_security" type="radio" value="' + i + '" ' + ('checked' if d_list[4] == i else '') + '>' + i + '<hr class="main_hr">'
+
             return easy_minify(flask.render_template(skin_check(),
                 imp = ['Google', wiki_set(), custom(), other2([0, 0])],
                 data = '''
@@ -506,14 +516,32 @@ def setting_2(conn, num):
                         <hr class=\"main_hr\">
                         <input name="sec_re" value="''' + html.escape(d_list[1]) + '''">
                         <hr class=\"main_hr\">
-                        <h2><a href="https://support.google.com/mail/answer/7126229">''' + load_lang('google_imap') + '</a> (' + load_lang('restart_required') + ''')</h1>
-                        <span>''' + load_lang('google_email') + '''</span>
+                        <h2>''' + load_lang('smtp_setting') + ' (' + load_lang('restart_required') + ''')</h1>
+                        <span>''' + load_lang('smtp_server') + '''</span>
                         <hr class=\"main_hr\">
+                        <input name="smtp_server" value="''' + html.escape(d_list[2]) + '''">
+                        <hr class=\"main_hr\">
+                        <span>''' + load_lang('smtp_port') + '''</span>
+                        <hr class=\"main_hr\">
+                        <input name="smtp_port" value="''' + html.escape(d_list[3]) + '''">
+                        <hr class=\"main_hr\">
+                        <span>''' + load_lang('smtp_security') + '''</span>
+                        <hr class=\"main_hr\">'''
+                        + security_radios +
+                        '''<hr class=\"main_hr\">
+                        <span>''' + load_lang('smtp_username') + '''</span>
+                        <hr class=\"main_hr\">
+<<<<<<< HEAD
                         <input name="g_email" value="''' + html.escape(d_list[2]) + '''">
                         <hr>
                         <span><a href="https://security.google.com/settings/security/apppasswords">''' + load_lang('google_app_password') + '''</a></span>
+=======
+                        <input name="smtp_email" value="''' + html.escape(d_list[5]) + '''">
                         <hr class=\"main_hr\">
-                        <input type="password" name="g_pass" value="''' + html.escape(d_list[3]) + '''">
+                        <span>''' + load_lang('smtp_password') + '''</span>
+>>>>>>> 2347c8d... Make smtp server configuarable
+                        <hr class=\"main_hr\">
+                        <input type="password" name="smtp_pass" value="''' + html.escape(d_list[6]) + '''">
                         <hr class=\"main_hr\">
                         <button id="save" type="submit">''' + load_lang('save') + '''</button>
                     </form>
