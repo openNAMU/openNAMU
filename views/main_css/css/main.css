@@ -9,7 +9,7 @@ a { text-decoration: none; }
 #not_thing { color: red; }
 #inside, #out_link, #open { color: green; }
 #out_link::before { background: green; color: white; content: "E"; }
-input[type="checkbox"] { width: auto; }
+input[type="checkbox"], input[type="radio"] { width: auto; }
 .popup { position: fixed; bottom: 0; padding: 10px; left: 0; background: lightgray; width: 100%; }
 #list { padding: 10px; }
 #toron { width: 100%; }
