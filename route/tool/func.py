@@ -72,25 +72,46 @@ def load_conn(data):
     load_conn2(data)
 
 def send_email(who, title, data):
-    smtp = smtplib.SMTP_SSL('smtp.gmail.com', 465)
-
     try:
-        curs.execute(db_change('select name, data from other where name = "g_email" or name = "g_pass"'))
+        curs.execute(db_change('select name, data from other where name = "smtp_email" or name = "smtp_pass" or name = "smtp_server" or name = "smtp_port" or name = "smtp_security"'))
         rep_data = curs.fetchall()
-        if rep_data:
-            g_email = ''
-            g_pass = ''
-            for i in rep_data:
-                if i[0] == 'g_email':
-                    g_email = i[1]
-                else:
-                    g_pass = i[1]
 
-            smtp.login(g_email, g_pass)
+        smtp_email = ''
+        smtp_pass = ''
+        smtp_server = ''
+        smtp_security = ''
+        smtp_port = ''
+        smtp = ''
+
+        if rep_data:
+            smtp_email = ''
+            smtp_pass = ''
+            for i in rep_data:
+                if i[0] == 'smtp_email':
+                    smtp_email = i[1]
+                elif i[0] == 'smtp_pass':
+                    smtp_pass = i[1]
+                elif i[0] == 'smtp_server':
+                    smtp_server = i[1]
+                elif i[0] == 'smtp_security':
+                    smtp_security = i[1]
+                elif i[0] == 'smtp_port':
+                    smtp_port = i[1]
+            
+            smtp_port = int(smtp_port)
+            if smtp_security == 'plain':
+                smtp = smtplib.SMTP(smtp_server, smtp_port)
+            elif smtp_security == 'starttls':
+                smtp = smtplib.SMTP(smtp_server, smtp_port)
+                smtp.starttls()
+            else: #if smtp_security == 'tls':
+                smtp = smtplib.SMTP_SSL(smtp_server, smtp_port)
+            
+            smtp.login(smtp_email, smtp_pass)
 
         msg = email.mime.text.MIMEText(data)
         msg['Subject'] = title
-        smtp.sendmail(g_email, who, msg.as_string())
+        smtp.sendmail(smtp_email, who, msg.as_string())
 
         smtp.quit()
     except:
