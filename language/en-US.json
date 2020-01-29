@@ -311,7 +311,7 @@
             "decline": "Decline",
             "approve_or_decline": "Approve or reject",
             "no_applications_now" : "There are no applications.",
-            "approval_requirement_disabled": "Approval requirement is disabled now. You can enable this freture on settings",
+            "approval_requirement_disabled": "Approval requirement is disabled now. You can enable this feature on settings",
     "_comment_3_" : "Long",
         "application_submitted": "Applicatied successfully for registration",
         "waiting_for_approval": "Application for registration has been made successfully. Please wait for approval by administrators.",
