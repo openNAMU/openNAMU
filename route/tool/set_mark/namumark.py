@@ -241,14 +241,17 @@ def table_start(data):
 
     return data
 
-def middle_parser(data, fol_num, syntax_num, folding_num, include_num):
+def middle_parser(data, include_num):
     global end_data
     global plus_data
 
     middle_stack = 0
     middle_list = []
-    middle_number = 0
-    html_number = 0
+    middle_num = 0
+
+    html_num = 0
+    syntax_num = 0
+    folding_num = 0
 
     middle_re = re.compile('(?:{{{((?:(?:(?! |{{{|}}}|&lt;).)*) ?)|(}}}))')
     middle_all_data = middle_re.findall(data)
@@ -335,31 +338,28 @@ def middle_parser(data, fol_num, syntax_num, folding_num, include_num):
                         else:
                             folding_data = ['Test']
 
-                        if folding_num == 0:
-                            folding_num = 1
-
                         data = re.sub(
                             '{{{#!folding ?((?:(?!\n).)*)\n?', '' + \
                             '<div>' + \
                                 str(folding_data[0]) + ' ' + \
                                 '<div style="display: inline-block;">' + \
-                                    '<a href="javascript:void(0);" onclick="do_open_folding(\'' + include_num + 'folding_' + str(fol_num) + '\', this);">' + \
+                                    '<a href="javascript:void(0);" onclick="do_open_folding(\'' + include_num + 'folding_' + str(folding_num) + '\', this);">' + \
                                         '[+]' + \
                                     '</a>' + \
                                 '</div_2>' + \
-                                '<div id="' + include_num + 'folding_' + str(fol_num) + '" style="display: none;">' + \
+                                '<div id="' + include_num + 'folding_' + str(folding_num) + '" style="display: none;">' + \
                                     '<div id="wiki_div" style="">',
                             data,
                             1
                         )
 
-                        fol_num += 1
+                        folding_num += 1
                     elif re.search('^#!html', middle_data[0]):
                         middle_list += ['span']
 
-                        html_number += 1
+                        html_num += 1
 
-                        data = middle_re.sub('<span id="' + include_num + 'render_contect_' + str(html_number) + '">', data, 1)
+                        data = middle_re.sub('<span id="' + include_num + 'render_contect_' + str(html_num) + '">', data, 1)
                     else:
                         middle_list += ['span']
 
@@ -371,7 +371,7 @@ def middle_parser(data, fol_num, syntax_num, folding_num, include_num):
 
                     data = middle_re.sub('<code>' + middle_data[0].replace('\\', '\\\\'), data, 1)
 
-                middle_number += 1
+                middle_num += 1
         else:
             if middle_list == []:
                 data = middle_re.sub('&#125;&#125;&#125;', data, 1)
@@ -382,17 +382,17 @@ def middle_parser(data, fol_num, syntax_num, folding_num, include_num):
                 if middle_stack > 0:
                     data = middle_re.sub('&#125;&#125;&#125;', data, 1)
                 else:
-                    if middle_number > 0:
-                        middle_number -= 1
+                    if middle_num > 0:
+                        middle_num -= 1
 
-                    if middle_list[middle_number] == '2div':
+                    if middle_list[middle_num] == '2div':
                         data = middle_re.sub('</div_1></div_2></div_2>', data, 1)
-                    elif middle_list[middle_number] == 'pre':
+                    elif middle_list[middle_num] == 'pre':
                         data = middle_re.sub('</code></pre>', data, 1)
                     else:
-                        data = middle_re.sub('</' + middle_list[middle_number] + '>', data, 1)
+                        data = middle_re.sub('</' + middle_list[middle_num] + '>', data, 1)
 
-                    del(middle_list[middle_number])
+                    del(middle_list[middle_num])
 
     while 1:
         if middle_stack == 0:
@@ -407,17 +407,17 @@ def middle_parser(data, fol_num, syntax_num, folding_num, include_num):
                 if middle_stack > 0:
                     data += '&#125;&#125;&#125;'
                 else:
-                    if middle_number > 0:
-                        middle_number -= 1
+                    if middle_num > 0:
+                        middle_num -= 1
 
-                    if middle_list[middle_number] == '2div':
+                    if middle_list[middle_num] == '2div':
                         data += '</div_1></div_2></div_2>'
-                    elif middle_list[middle_number] == 'pre':
+                    elif middle_list[middle_num] == 'pre':
                         data += '</code></pre>'
                     else:
-                        data += '</' + middle_list[middle_number] + '>'
+                        data += '</' + middle_list[middle_num] + '>'
 
-                    del(middle_list[middle_number])
+                    del(middle_list[middle_num])
 
     num = 0
     while 1:
@@ -456,7 +456,7 @@ def middle_parser(data, fol_num, syntax_num, folding_num, include_num):
         else:
             break
 
-    return [data, [fol_num, syntax_num, folding_num]]
+    return data
 
 def namumark(conn, data, title, main_num, include_num):
     curs = conn.cursor()
@@ -465,7 +465,7 @@ def namumark(conn, data, title, main_num, include_num):
     global end_data
 
     data = '\n' + data + '\n'
-    plus_data = ''
+    plus_data = '<script>get_link_state(); get_file_state();</script>'
 
     backlink = []
     end_data = {}
@@ -504,7 +504,9 @@ def namumark(conn, data, title, main_num, include_num):
             break
 
     data = re.sub('\\\\{', '<break_middle>', data)
-    data = middle_parser(data, 0, 0, 0, include_num)[0]
+    
+    data = middle_parser(data, include_num)
+
     data = re.sub('<break_middle>', '\\{', data)
 
     num = 0
@@ -847,7 +849,11 @@ def namumark(conn, data, title, main_num, include_num):
             else:
                 video_src = 'https://embed.nicovideo.jp/watch/' + video_code
 
-            data = video_re.sub('<iframe style="width: ' + video_width + '; height: ' + video_height + ';" src="' + video_src + video_start + '" allowfullscreen></iframe>', data, 1)
+            data = video_re.sub(
+                '<iframe style="width: ' + video_width + '; height: ' + video_height + ';" src="' + video_src + video_start + '" allowfullscreen></iframe>', 
+                data, 
+                1
+            )
         else:
             break
 
@@ -911,7 +917,7 @@ def namumark(conn, data, title, main_num, include_num):
 
     data = table_start(data)
 
-    category = '<div id="cate_all"><hr><div id="cate">Category : '
+    category = ''
     category_re = re.compile('^(?:category|분류):', re.I)
     while 1:
         link = re.search('\[\[((?:(?!\[\[|\]\]).)+)\]\]', data)
@@ -987,25 +993,21 @@ def namumark(conn, data, title, main_num, include_num):
                     curs.execute(tool.db_change("select title from data where title = ?"), [file_alt])
                     exist = curs.fetchall()
 
-                if exist:
-                    data = re.sub(
-                        '\[\[((?:(?!\[\[|\]\]).)+)\]\]',
-                        '<span style="' + file_align + '">' + \
-                            '<span style="' + file_color + '">' + \
-                                '<img style="' + file_style + '" alt="' + file_alt + '" src="' + file_src + '">' + \
-                            '</span>' + \
-                        '</span>',
-                        data,
-                        1
-                    )
-                else:
-                    data = re.sub(
-                        '\[\[((?:(?!\[\[|\]\]).)+)\]\]',
-                        '<a id="not_thing" href="/upload?name=' + tool.url_pas(file_name) + '">' + file_alt + '</a>',
-                        data,
-                        1
-                    )
+                data = re.sub(
+                    '\[\[((?:(?!\[\[|\]\]).)+)\]\]',
+                    '<span style="' + file_align + '">' + \
+                        '<span style="' + file_color + '">' + \
+                            '<img class="file_finder_1" style="' + file_style + '" alt="' + file_alt + '" src="' + file_src + '">' + \
+                            '<a class="file_finder_2" id="not_thing" href="/upload?name=' + tool.url_pas(file_name) + '">' + file_alt + '</a>' + \
+                        '</span>' + \
+                    '</span>',
+                    data,
+                    1
+                )
             elif category_re.search(main_link):
+                if category == '':
+                    category += '<div id="cate_all"><hr><div id="cate">Category : '
+
                 main_link = category_re.sub('category:', main_link)
 
                 curs.execute(tool.db_change("select title from data where title = ?"), [main_link])
@@ -1014,13 +1016,9 @@ def namumark(conn, data, title, main_num, include_num):
                     link_id = 'id="inside"'
 
                     main_link = re.sub('#blur', '', main_link)
-                elif not curs.fetchall():
-                    link_id = 'id="not_thing"'
-                else:
-                    link_id = ''
 
                 backlink += [[title, main_link, 'cat']]
-                category += '<a ' + link_id + ' href="' + tool.url_pas(main_link) + '">' + category_re.sub('', see_link) + '</a> | '
+                category += '<a class="link_finder" href="' + tool.url_pas(main_link) + '">' + category_re.sub('', see_link) + '</a> | '
 
                 data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '', data, 1)
             elif re.search('^wiki:', main_link):
@@ -1083,19 +1081,15 @@ def namumark(conn, data, title, main_num, include_num):
                 if not re.search('^\|', main_link):
                     if main_link != title:
                         if main_link != '':
+                            backlink += [[title, main_link, '']]
+
                             curs.execute(tool.db_change("select title from data where title = ?"), [main_link])
                             if not curs.fetchall():
-                                link_id = 'id="not_thing"'
-
                                 backlink += [[title, main_link, 'no']]
-                            else:
-                                link_id = ''
-
-                            backlink += [[title, main_link, '']]
 
                             data = re.sub(
                                 '\[\[((?:(?!\[\[|\]\]).)+)\]\]',
-                                '<a ' + link_id + ' ' + \
+                                '<a class="link_finder" ' + \
                                     'title="' + main_link + other_link + '" ' + \
                                     'href="/w/' + tool.url_pas(main_link) + other_link + '"' + \
                                 '>' + see_link + '</a>',
@@ -1248,11 +1242,8 @@ def namumark(conn, data, title, main_num, include_num):
     data = re.sub('\^\^(?P<in>(?:(?!\^\^).)+)\^\^', '<sup>\g<in></sup>', data)
     data = re.sub(',,(?P<in>(?:(?!,,).)+),,', '<sub>\g<in></sub>', data)
 
-    category += '</div></div>'
-    category = re.sub(' \| <\/div><\/div>$', '</div></div>', category)
-
-    if category == '<div id="cate_all"><hr><div id="cate">Category : </div></div>':
-        category = ''
+    if category != '':
+        category = re.sub(' \| $', '', category) + '</div></div>'
 
     data += category
 
