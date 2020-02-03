@@ -465,12 +465,11 @@ def namumark(conn, data, title, main_num, include_num):
     global end_data
 
     data = '\n' + data + '\n'
-    plus_data = '<script>get_link_state(); get_file_state();</script>'
+    include_num = include_num + '_' if include_num else ''
+    plus_data = '<script>get_link_state("' + include_num + '"); get_file_state("' + include_num + '");</script>'
 
     backlink = []
     end_data = {}
-
-    include_num = include_num + '_' if include_num else ''
 
     data = re.sub('<math>(?P<in>(?:(?!<\/math>).)+)<\/math>', '[math(\g<in>)]', data)
 
@@ -997,8 +996,8 @@ def namumark(conn, data, title, main_num, include_num):
                     '\[\[((?:(?!\[\[|\]\]).)+)\]\]',
                     '<span style="' + file_align + '">' + \
                         '<span style="' + file_color + '">' + \
-                            '<img class="file_finder_1" style="' + file_style + '" alt="' + file_alt + '" src="' + file_src + '">' + \
-                            '<a class="file_finder_2" id="not_thing" href="/upload?name=' + tool.url_pas(file_name) + '">' + file_alt + '</a>' + \
+                            '<img class="' + include_num + 'file_finder_1" style="' + file_style + '" alt="' + file_alt + '" src="' + file_src + '">' + \
+                            '<a class="' + include_num + 'file_finder_2" id="not_thing" href="/upload?name=' + tool.url_pas(file_name) + '">' + file_alt + '</a>' + \
                         '</span>' + \
                     '</span>',
                     data,
@@ -1018,7 +1017,7 @@ def namumark(conn, data, title, main_num, include_num):
                     main_link = re.sub('#blur', '', main_link)
 
                 backlink += [[title, main_link, 'cat']]
-                category += '<a class="link_finder" href="' + tool.url_pas(main_link) + '">' + category_re.sub('', see_link) + '</a> | '
+                category += '<a class="' + include_num + 'link_finder" href="' + tool.url_pas(main_link) + '">' + category_re.sub('', see_link) + '</a> | '
 
                 data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '', data, 1)
             elif re.search('^wiki:', main_link):
@@ -1089,7 +1088,7 @@ def namumark(conn, data, title, main_num, include_num):
 
                             data = re.sub(
                                 '\[\[((?:(?!\[\[|\]\]).)+)\]\]',
-                                '<a class="link_finder" ' + \
+                                '<a class="' + include_num + 'link_finder" ' + \
                                     'title="' + main_link + other_link + '" ' + \
                                     'href="/w/' + tool.url_pas(main_link) + other_link + '"' + \
                                 '>' + see_link + '</a>',
