@@ -1,7 +1,4 @@
 function get_link_state(data, i = 0) { 
-    console.log(i);
-    console.log(data + 'link_finder');
-    console.log(document.getElementsByClassName(data + 'link_finder')[i]);
     if(document.getElementsByClassName(data + 'link_finder')[i]) {
         var link_data = document.getElementsByClassName(data + 'link_finder')[i];
 
