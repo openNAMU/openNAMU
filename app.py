@@ -685,6 +685,10 @@ def api_recent_change():
 def api_sha224(name = 'test'):
     return api_sha224_2(conn, name)
 
+@app.route('/api/image/<name>')
+def api_image_view(name = ''):
+    return api_image_view_2(conn, name, app_var)
+
 # File
 @app.route('/views/<everything:name>')
 def main_views(name = None):

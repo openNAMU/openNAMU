@@ -48,14 +48,6 @@ def render_do(title, data, num, include):
     rep_data = curs.fetchall()
     if rep_data[0][0] == 'namumark':
         data = namumark(conn, data, title, num, include)
-    elif rep_data[0][0] == 'js_namumark':
-        data = [
-            '<div id="render_contect">' + html.escape(data) + '</div>',
-            '<script>render_namumark("render_contect")</script>',
-            []
-        ]
-    elif rep_data[0][0] == 'markdown':
-        data = markdown(conn, data, title, num)
     elif rep_data[0][0] == 'raw':
         data = [data, '', []]
     else:
