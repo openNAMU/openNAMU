@@ -17,12 +17,17 @@ function topic_plus_load(topic_num, num) {
         xhr.onreadystatechange = function() {
             if(this.readyState === 4 && this.status === 200 && this.responseText !== '{}\n') {
                 var t_data = JSON.parse(this.responseText);
+                var t_plus_data = '';
+
                 for(key in t_data) {
                     n_data += t_data[key]['data'];
                     n_num = key;
+
+                    t_plus_data += t_data[key]['plus_data'].replace(/<script>/g, '').replace(/<\/script>/g, '');
                 }
 
                 p_data.innerHTML += n_data;
+                eval(t_plus_data);
 
                 // https://programmingsummaries.tistory.com/379
                 var options = {
@@ -34,20 +39,6 @@ function topic_plus_load(topic_num, num) {
                 setTimeout(function () {
                     notification.close();
                 }, 5000);
-
-                xhr_2.onreadystatechange = function() {
-                    if(xhr_2.readyState === 4 && xhr_2.status === 200) {
-                        markup = JSON.parse(xhr_2.responseText)['markup'];
-
-                        if(markup === 'markdown') {
-                            render_markdown();
-                        } else {
-                            for(var key in t_data) {
-                                render_html('topic_' + String(key) + '-');
-                            }
-                        }
-                    }
-                }
 
                 topic_plus_load(topic_num, String(Number(num) + 1));
                 clearInterval(test);

@@ -73,6 +73,10 @@ def api_topic_sub_2(conn, topic_num):
                 if t_data_f == '':
                     t_data_f = '[br]'
 
+                t_data_f = render_set(data = t_data_f, num = 2, include = 'topic_' + i[0])
+                t_plus_data = t_data_f[1]
+                t_data_f = t_data_f[0]
+
                 all_data = '' + \
                     '<table id="toron">' + \
                         '<tbody>' + \
@@ -82,7 +86,7 @@ def api_topic_sub_2(conn, topic_num):
                                 '</td>' + \
                             '</tr>' + \
                             '<tr>' + \
-                                '<td id="' + b_color + '">' + render_set(data = t_data_f, include = 'topic_' + i[0]) + '</td>' + \
+                                '<td id="' + b_color + '">' + t_data_f + '</td>' + \
                             '</tr>' + \
                         '</tbody>' + \
                     '</table>' + \
@@ -90,7 +94,8 @@ def api_topic_sub_2(conn, topic_num):
                 ''
 
                 json_data[i[0]] = {
-                    "data" : all_data
+                    "data" : all_data,
+                    "plus_data" : t_plus_data
                 }
             else:
                 if i[4] != 'O' or (i[4] == 'O' and admin == 1):

@@ -20,30 +20,21 @@ function topic_main_load(topic_num, s_num) {
     xhr.onreadystatechange = function() {
         if(xhr.readyState === 4 && xhr.status === 200) {
             var t_data = JSON.parse(xhr.responseText);
+            var t_plus_data = '';
+
             for(var key in t_data) {
                 n_data += t_data[key]['data'];
                 num = key;
+
+                t_plus_data += t_data[key]['plus_data'].replace(/<script>/g, '').replace(/<\/script>/g, '');
             }
 
             o_data.innerHTML = n_data;
+            eval(t_plus_data);
+
             if(!s_num) {
                 topic_plus_load(topic_num, String(Number(num) + 1));
             }
-
-            xhr_2.onreadystatechange = function() {
-                if(xhr_2.readyState === 4 && xhr_2.status === 200) {
-                    var markup = JSON.parse(xhr_2.responseText)['markup'];
-
-                    if(markup === 'markdown') {
-                        render_markdown();
-                    } else {
-                        for(var key in t_data) {
-                            render_html('topic_' + String(key) + '-');
-                        }
-                    }
-                }
-            }
         }
     }
-
 }
