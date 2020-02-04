@@ -989,20 +989,29 @@ def namumark(conn, data, title, main_num, include_num):
                     file_src = '/image/' + tool.sha224_replace(file_name) + '.' + file_end
                     file_alt = 'file:' + file_name + '.' + file_end
 
-                    curs.execute(tool.db_change("select title from data where title = ?"), [file_alt])
-                    exist = curs.fetchall()
-
-                data = re.sub(
-                    '\[\[((?:(?!\[\[|\]\]).)+)\]\]',
-                    '<span style="' + file_align + '">' + \
-                        '<span style="' + file_color + '">' + \
-                            '<img class="' + include_num + 'file_finder_1" style="' + file_style + '" alt="' + file_alt + '" src="' + file_src + '">' + \
-                            '<a class="' + include_num + 'file_finder_2" id="not_thing" href="/upload?name=' + tool.url_pas(file_name) + '">' + file_alt + '</a>' + \
-                        '</span>' + \
-                    '</span>',
-                    data,
-                    1
-                )
+                if exist:
+                    data = re.sub(
+                        '\[\[((?:(?!\[\[|\]\]).)+)\]\]',
+                        '<span style="' + file_align + '">' + \
+                            '<span style="' + file_color + '">' + \
+                                '<img style="' + file_style + '" alt="' + file_alt + '" src="' + file_src + '">' + \
+                            '</span>' + \
+                        '</span>',
+                        data,
+                        1
+                    )
+                else:
+                    data = re.sub(
+                        '\[\[((?:(?!\[\[|\]\]).)+)\]\]',
+                        '<span style="' + file_align + '">' + \
+                            '<span style="' + file_color + '">' + \
+                                '<img class="' + include_num + 'file_finder_1" style="' + file_style + '" alt="' + file_alt + '" src="' + file_src + '">' + \
+                                '<a class="' + include_num + 'file_finder_2" id="not_thing" href="/upload?name=' + tool.url_pas(file_name) + '">' + file_alt + '</a>' + \
+                            '</span>' + \
+                        '</span>',
+                        data,
+                        1
+                    )
             elif category_re.search(main_link):
                 if category == '':
                     category += '<div id="cate_all"><hr><div id="cate">Category : '
