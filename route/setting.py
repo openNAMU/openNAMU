@@ -161,7 +161,7 @@ def setting_2(conn, num):
                         <select name="skin">''' + load_skin(d_list[5]) + '''</select>
                         <hr>
                         <input type="checkbox" name="reg" ''' + check_box_div[0] + '''> ''' + load_lang('no_register') + '''
-                        <hr>
+                        <hr class=\"main_hr\">
                         <input type="checkbox" name="ip_view" ''' + check_box_div[1] + '''> ''' + load_lang('hide_ip') + '''
                         <hr class=\"main_hr\">
                         <input type="checkbox" name="email_have" ''' + check_box_div[2] + '''> ''' + load_lang('email_required') + ' <a href="/setting/6">(' + load_lang('smtp_setting_required') + ''')</a>

@@ -72,29 +72,40 @@ def view_read_2(conn, name):
         if curs.fetchall() and admin_check(6) != 1:
             return redirect('/history/' + url_pas(name))
 
-        curs.execute(db_change("select title, data from history where title = ? and id = ?"), [name, str(num)])
+        curs.execute(db_change("select data from history where title = ? and id = ?"), [name, str(num)])
     else:
-        curs.execute(db_change("select title, data from data where title = ?"), [name])
+        curs.execute(db_change("select data from cache_data where title = ?"), [name])
+        cache_data = curs.fetchall()
+        if not cache_data or cache_data[0][0] == 'HTTP Request 404':
+            curs.execute(db_change("select data from data where title = ?"), [name])
+            cache_data = None
 
-    data = curs.fetchall()
-    if data:
-        else_data = data[0][1]
+    if cache_data:
+        end_data = cache_data[0][0]
     else:
-        else_data = None
+        data = curs.fetchall()
+        print(data)
+        if data:
+            else_data = data[0][0]
+        else:
+            else_data = None
 
-    curs.execute(db_change("select decu from acl where title = ?"), [name])
-    data = curs.fetchall()
-    if data:
-        acl = 1
+        curs.execute(db_change("select decu from acl where title = ?"), [name])
+        data = curs.fetchall()
+        if data:
+            acl = 1
 
-    if flask.request.args.get('from', None) and else_data:
-        else_data = re.sub('^\r\n', '', else_data)
-        else_data = re.sub('\r\n$', '', else_data)
+        if flask.request.args.get('from', None) and else_data:
+            else_data = re.sub('^\r\n', '', else_data)
+            else_data = re.sub('\r\n$', '', else_data)
 
-    end_data = render_set(
-        title = name,
-        data = else_data
-    )
+        end_data = render_set(
+            title = name,
+            data = else_data
+        )
+
+        curs.execute(db_change("delete from cache_data where title = ?"), [name])
+        curs.execute(db_change("insert into cache_data (title, data) values (?, ?)"), [name, end_data])
 
     if end_data == 'HTTP Request 401.3':
         response_data = 401
