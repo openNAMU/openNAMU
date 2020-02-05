@@ -84,7 +84,6 @@ def view_read_2(conn, name):
         end_data = cache_data[0][0]
     else:
         data = curs.fetchall()
-        print(data)
         if data:
             else_data = data[0][0]
         else:
