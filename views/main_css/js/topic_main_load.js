@@ -31,7 +31,10 @@ function topic_main_load(topic_num, s_num) {
 
             o_data.innerHTML = n_data;
             eval(t_plus_data);
-
+            if(window.location.search === "?where=bottom") {
+                document.getElementById(num).focus();
+            }
+            
             if(!s_num) {
                 topic_plus_load(topic_num, String(Number(num) + 1));
             }
