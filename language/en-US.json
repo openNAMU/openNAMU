@@ -233,11 +233,7 @@
                 "wiki_port" : "Wiki port number",
                 "wiki_secret_key" : "Wiki secret key",
                 "email_required" : "Email required",
-<<<<<<< HEAD
-                "google_imap_required" : "Google IMAP configuration required",
-=======
                 "smtp_setting_required" : "Email SMTP setting required",
->>>>>>> 2347c8d... Make smtp server configuarable
                 "update_branch" : "Branch to import updates",
                 "slow_edit" : "Continuous edit limit",
                 "requires_approval" : "Requires approval for register",
@@ -257,18 +253,12 @@
                 "edit_help" : "Editing textarea phrase",
             "_comment_2.2.4_" : "Google",
                 "recaptcha" : "reCAPTCHA",
-<<<<<<< HEAD
-                "google_imap" : "Google IMAP",
-                "google_email" : "Google email address",
-                "google_app_password" : "Google APP password",
-=======
                 "smtp_setting" : "Email SMTP setting",
                 "smtp_server" : "SMTP Server address",
                 "smtp_security": "SMTP Connection security",
                 "smtp_port" : "SMTP Server port",
                 "smtp_username" : "SMTP Username",
                 "smtp_password" : "SMTP Password",
->>>>>>> 2347c8d... Make smtp server configuarable
         "_comment_2.3_" : "List",
             "open_discussion_list" : "Open discussion(s) list",
             "discussion_list" : "Discussion(s) list",

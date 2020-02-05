@@ -163,15 +163,9 @@ def setting_2(conn, num):
                         <input type="checkbox" name="reg" ''' + check_box_div[0] + '''> ''' + load_lang('no_register') + '''
                         <hr>
                         <input type="checkbox" name="ip_view" ''' + check_box_div[1] + '''> ''' + load_lang('hide_ip') + '''
-<<<<<<< HEAD
-                        <hr>
-                        <input type="checkbox" name="email_have" ''' + check_box_div[2] + '''> ''' + load_lang('email_required') + ' <a href="/setting/6">(' + load_lang('google_imap_required') + ''')</a>
-                        <hr>
-=======
                         <hr class=\"main_hr\">
                         <input type="checkbox" name="email_have" ''' + check_box_div[2] + '''> ''' + load_lang('email_required') + ' <a href="/setting/6">(' + load_lang('smtp_setting_required') + ''')</a>
                         <hr class=\"main_hr\">
->>>>>>> 2347c8d... Make smtp server configuarable
                         <input type="checkbox" name="requires_approval" ''' + check_box_div[3] + '''> ''' + load_lang('requires_approval') + '''
                         <hr>
                         <span>''' + load_lang('wiki_host') + '''</span>
@@ -531,15 +525,9 @@ def setting_2(conn, num):
                         '''<hr class=\"main_hr\">
                         <span>''' + load_lang('smtp_username') + '''</span>
                         <hr class=\"main_hr\">
-<<<<<<< HEAD
-                        <input name="g_email" value="''' + html.escape(d_list[2]) + '''">
-                        <hr>
-                        <span><a href="https://security.google.com/settings/security/apppasswords">''' + load_lang('google_app_password') + '''</a></span>
-=======
                         <input name="smtp_email" value="''' + html.escape(d_list[5]) + '''">
                         <hr class=\"main_hr\">
                         <span>''' + load_lang('smtp_password') + '''</span>
->>>>>>> 2347c8d... Make smtp server configuarable
                         <hr class=\"main_hr\">
                         <input type="password" name="smtp_pass" value="''' + html.escape(d_list[6]) + '''">
                         <hr class=\"main_hr\">

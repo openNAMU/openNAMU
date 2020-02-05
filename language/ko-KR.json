@@ -186,11 +186,7 @@
     "wiki_logo": "위키 로고",
     "smtp_setting_required": "이메일 SMTP 설정 필요",
     "adsense_setting": "애드센스 설정",
-<<<<<<< HEAD
-    "google_email": "Google 이메일 주소",
-=======
     "smtp_username": "SMTP 아이디",
->>>>>>> 2347c8d... Make smtp server configuarable
     "previous": "이전",
     "name_or_ip_or_regex": "사용자 이름 혹은 IP 주소 혹은 정규표현식",
     "editor": "편집자",

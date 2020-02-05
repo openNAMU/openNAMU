@@ -448,7 +448,7 @@ def other2(data):
         data += ['']
 
     req_list = ''
-    main_css_ver = 12
+    main_css_ver = 13
 
     if not 'main_css_load' in flask.session or not 'main_css_ver' in flask.session or flask.session['main_css_ver'] != main_css_ver:
         for i_data in os.listdir(os.path.join("views", "main_css", "css")):
