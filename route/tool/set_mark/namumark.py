@@ -988,6 +988,7 @@ def namumark(conn, data, title, main_num, include_num):
 
                     file_src = '/image/' + tool.sha224_replace(file_name) + '.' + file_end
                     file_alt = 'file:' + file_name + '.' + file_end
+                    exist = None
 
                 if exist:
                     data = re.sub(
