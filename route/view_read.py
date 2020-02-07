@@ -67,6 +67,7 @@ def view_read_2(conn, name):
                 div += '<br><h2 id="cate_under">' + load_lang('under_category') + '</h2><ul>' + u_div + '</ul>'
 
 
+    cache_data = None
     if num:
         curs.execute(db_change("select title from history where title = ? and id = ? and hide = 'O'"), [name, str(num)])
         if curs.fetchall() and admin_check(6) != 1:
