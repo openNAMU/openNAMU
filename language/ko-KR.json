@@ -250,7 +250,7 @@
     "waiting_for_approval": "회원가입 신청이 정상적으로 접수됐습니다. 관리자의 승인을 기다려주세요.",
     "ie_no_data_required": "이 기능을 수행하기 위해 필요한 데이터가 제공되지 않았습니다.",
     "port": "포트",
-    "reload": "새로고침",
+    "reload": "갱신",
     "indexing": "DB 인덱싱",
     "topic_state": "토론 상태",
     "watchlist": "주시 목록",

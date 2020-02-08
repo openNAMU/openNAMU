@@ -75,11 +75,15 @@ def view_read_2(conn, name):
 
         curs.execute(db_change("select data from history where title = ? and id = ?"), [name, str(num)])
     else:
-        curs.execute(db_change("select data from cache_data where title = ?"), [name])
-        cache_data = curs.fetchall()
-        if not cache_data or cache_data[0][0] == 'HTTP Request 404':
+        if not flask.request.args.get('reload', None):
+            curs.execute(db_change("select data from cache_data where title = ?"), [name])
+            cache_data = curs.fetchall()
+            if not cache_data or cache_data[0][0] == 'HTTP Request 404':
+                curs.execute(db_change("select data from data where title = ?"), [name])
+                
+                cache_data = None
+        else:
             curs.execute(db_change("select data from data where title = ?"), [name])
-            cache_data = None
 
     if cache_data:
         end_data = cache_data[0][0]
@@ -155,7 +159,13 @@ def view_read_2(conn, name):
         else:
             menu = [['edit/' + url_pas(name), load_lang('edit')]]
 
-        menu += [['topic/' + url_pas(name), load_lang('discussion'), topic], ['history/' + url_pas(name), load_lang('history')], ['xref/' + url_pas(name), load_lang('backlink')], ['acl/' + url_pas(name), load_lang('acl'), acl]]
+        menu += [
+            ['topic/' + url_pas(name), load_lang('discussion'), topic], 
+            ['history/' + url_pas(name), load_lang('history')], 
+            ['xref/' + url_pas(name), load_lang('backlink')], 
+            ['acl/' + url_pas(name), load_lang('acl'), acl],
+            ['w/' + url_pas(name) + '?reload=true', load_lang('reload')]
+        ]
 
         if flask.request.args.get('from', None):
             menu += [['w/' + url_pas(name), load_lang('pass')]]
