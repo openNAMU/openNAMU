@@ -176,30 +176,32 @@ def table_parser(data, cel_data, start_data, num = 0):
 
 def table_start(data):
     while 1:
-        table = re.search('\n((?:(?:(?:(?:\|\|)+(?:(?:(?!\|\|).(?:\n)*)*))+)\|\|(?:\n)?)+)', data)
+        table = re.search('\n((?:(?:(?:(?:\|\||\|[^|]+\|)+(?:(?:(?!\|\|).\n*)*))+)\|\|(?:\n)?)+)', data)
         if table:
             table = table.groups()[0]
-            while 1:
-                all_table = re.search('^((?:\|\|)+)((?:&lt;(?:(?:(?!&gt;).)+)&gt;)*)\n*((?:(?!\|\|).\n*)*)', table)
-                if all_table:
-                    all_table = all_table.groups()
 
-                    return_table = table_parser(all_table[1], all_table[2], all_table[0])
-                    number = return_table[6]
+            all_table = re.search('^((?:\|\||\|[^|]+\|)+)((?:&lt;(?:(?:(?!&gt;).)+)&gt;)*)\n*((?:(?!\|\|).\n*)*)', table)
+            if all_table:
+                all_table = all_table.groups()
 
-                    table = re.sub(
-                        '^((?:\|\|)+)((?:&lt;(?:(?:(?!&gt;).)+)&gt;)*)\n*',
-                        '\n' + \
-                            '<div class="table_safe" ' + return_table[7] + '>' + \
-                                '<table ' + return_table[5] + ' ' + return_table[0] + '>' + \
-                                    '<tbody>' + \
-                                        '<tr ' + return_table[1] + '>' + \
-                                            '<td ' + return_table[2] + ' ' + return_table[3] + ' ' + return_table[4] + '>',
-                        table,
-                        1
-                    )
-                else:
-                    break
+                return_table = table_parser(all_table[1], all_table[2], re.sub('^\|([^|]+)\|', '||', all_table[0]))
+                number = return_table[6]
+
+                table_caption = re.search('^\|([^|]+)\|', table)
+                table_caption = '<caption>' + table_caption.groups()[0] + '</caption>' if table_caption else ''
+
+                table = re.sub(
+                    '^((?:\|\||\|[^|]+\|)+)((?:&lt;(?:(?:(?!&gt;).)+)&gt;)*)\n*',
+                    '\n' + \
+                        '<div class="table_safe" ' + return_table[7] + '>' + \
+                            '<table ' + return_table[5] + ' ' + return_table[0] + '>' + \
+                                table_caption + \
+                                '<tbody>' + \
+                                    '<tr ' + return_table[1] + '>' + \
+                                        '<td ' + return_table[2] + ' ' + return_table[3] + ' ' + return_table[4] + '>',
+                    table,
+                    1
+                )
 
             table = re.sub('\|\|\n?$', '</td></tr></tbody></table></div>', table)
 
@@ -235,7 +237,7 @@ def table_start(data):
                 else:
                     break
 
-            data = re.sub('\n((?:(?:(?:(?:\|\|)+(?:(?:(?!\|\|).(?:\n)*)*))+)\|\|(?:\n)?)+)', table, data, 1)
+            data = re.sub('\n((?:(?:(?:(?:\|\||\|[^|]+\|)+(?:(?:(?!\|\|).\n*)*))+)\|\|(?:\n)?)+)', table, data, 1)
         else:
             break
 
