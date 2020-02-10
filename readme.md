@@ -53,4 +53,4 @@
 
 ## 기타
  * 첫 가입자에게 소유자 권한이 부여됩니다.
- * [테스트 서버](http://namu.ml)
+ * [테스트 서버](http://2du.pythonanywhere.com)
