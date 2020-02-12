@@ -31,130 +31,9 @@ def table_parser(data, cel_data, start_data, num = 0):
     cel_style = 'style="'
     row_style = 'style="'
     row = ''
-    cel = ''
+    cel = 'colspan="' + str(round(len(start_data) / 2)) + '"'
 
-    table_width = re.search("&lt;table ?width=((?:(?!&gt;).)*)&gt;", data)
-    if table_width:
-        if re.search('^[0-9]+$', table_width.groups()[0]):
-            div_style += 'width: ' + table_width.groups()[0] + 'px;'
-        else:
-            div_style += 'width: ' + table_width.groups()[0] + ';'
-
-        all_table += 'width: 100%;'
-
-    table_height = re.search("&lt;table ?height=((?:(?!&gt;).)*)&gt;", data)
-    if table_height:
-        if re.search('^[0-9]+$', table_height.groups()[0]):
-            all_table += 'height: ' + table_height.groups()[0] + 'px;'
-        else:
-            all_table += 'height: ' + table_height.groups()[0] + ';'
-
-    # width, height
-
-    table_align = re.search("&lt;table ?align=((?:(?!&gt;).)*)&gt;", data)
-    if table_align:
-        if table_align.groups()[0] == 'right':
-            div_style += 'float: right;'
-        elif table_align.groups()[0] == 'center':
-            all_table += 'margin: auto;'
-
-    table_text_align = re.search("&lt;table ?textalign=((?:(?!&gt;).)*)&gt;", data)
-    if table_text_align:
-        num = 1
-
-        if table_text_align.groups()[0] == 'right':
-            all_table += 'text-align: right;'
-        elif table_text_align.groups()[0] == 'center':
-            all_table += 'text-align: center;'
-
-    row_table_align = re.search("&lt;row ?textalign=((?:(?!&gt;).)*)&gt;", data)
-    if row_table_align:
-        if row_table_align.groups()[0] == 'right':
-            row_style += 'text-align: right;'
-        elif row_table_align.groups()[0] == 'center':
-            row_style += 'text-align: center;'
-        else:
-            row_style += 'text-align: left;'
-
-    # align
-
-    table_cel = re.search("&lt;-((?:(?!&gt;).)*)&gt;", data)
-    if table_cel:
-        cel = 'colspan="' + table_cel.groups()[0] + '"'
-    else:
-        cel = 'colspan="' + str(round(len(start_data) / 2)) + '"'
-
-    table_row = re.search("&lt;(\^|v)?\|((?:(?!&gt;).)*)&gt;", data)
-    if table_row:
-        table_row = table_row.groups()
-        if table_row[0]:
-            if table_row[0] == '^':
-                cel_style += 'vertical-align: top;'
-            elif table_row[0] == 'v':
-                cel_style += 'vertical-align: bottom;'
-
-        row = 'rowspan="' + table_row[1] + '"'
-
-    # <>
-
-    row_bgcolor = re.search("&lt;rowbgcolor=(#(?:[0-9a-f-A-F]{3}){1,2}|\w+)(?:,(#(?:[0-9a-f-A-F]{3}){1,2}|\w+))?&gt;", data)
-    if row_bgcolor:
-        row_style += 'background: ' + row_bgcolor.groups()[0] + ';'
-
-    row_bgcolor = re.search("&lt;rowcolor=(#(?:[0-9a-f-A-F]{3}){1,2}|\w+)(?:,(#(?:[0-9a-f-A-F]{3}){1,2}|\w+))?&gt;", data)
-    if row_bgcolor:
-        row_style += 'color: ' + row_bgcolor.groups()[0] + ';'
-
-    # row
-
-    table_border = re.search("&lt;table ?bordercolor=(#(?:[0-9a-f-A-F]{3}){1,2}|\w+)(?:,(#(?:[0-9a-f-A-F]{3}){1,2}|\w+))?&gt;", data)
-    if table_border:
-        all_table += 'border: ' + table_border.groups()[0] + ' 2px solid;'
-
-    table_bgcolor = re.search("&lt;table ?bgcolor=(#(?:[0-9a-f-A-F]{3}){1,2}|\w+)(?:,(#(?:[0-9a-f-A-F]{3}){1,2}|\w+))?&gt;", data)
-    if table_bgcolor:
-        all_table += 'background: ' + table_bgcolor.groups()[0] + ';'
-
-    table_bgcolor = re.search("&lt;table ?color=(#(?:[0-9a-f-A-F]{3}){1,2}|\w+)(?:,(#(?:[0-9a-f-A-F]{3}){1,2}|\w+))?&gt;", data)
-    if table_bgcolor:
-        all_table += 'color: ' + table_bgcolor.groups()[0] + ';'
-
-    # all
-
-    bgcolor = re.search("&lt;(?:bgcolor=)?(#(?:[0-9a-f-A-F]{3}){1,2}|\w+)(?:,(#(?:[0-9a-f-A-F]{3}){1,2}|\w+))?&gt;", data)
-    if bgcolor:
-        cel_style += 'background: ' + bgcolor.groups()[0] + ';'
-
-    bgcolor = re.search("&lt;color=(#(?:[0-9a-f-A-F]{3}){1,2}|\w+)(?:,(#(?:[0-9a-f-A-F]{3}){1,2}|\w+))?&gt;", data)
-    if bgcolor:
-        cel_style += 'color: ' + bgcolor.groups()[0] + ';'
-
-    cel_width = re.search("&lt;width=((?:(?!&gt;).)*)&gt;", data)
-    if cel_width:
-        if re.search('^[0-9]+$', cel_width.groups()[0]):
-            cel_style += 'width: ' + cel_width.groups()[0] + 'px;'
-        else:
-            cel_style += 'width: ' + cel_width.groups()[0] + ';'
-
-    cel_height = re.search("&lt;height=((?:(?!&gt;).)*)&gt;", data)
-    if cel_height:
-        if re.search('^[0-9]+$', cel_height.groups()[0]):
-            cel_style += 'height: ' + cel_height.groups()[0] + 'px;'
-        else:
-            cel_style += 'height: ' + cel_height.groups()[0] + ';'
-
-    # cel
-
-    text_right = re.search("&lt;\)&gt;", data)
-    text_center = re.search("&lt;:&gt;", data)
-    text_left = re.search("&lt;\(&gt;",  data)
-    if text_right:
-        cel_style += 'text-align: right;'
-    elif text_center:
-        cel_style += 'text-align: center;'
-    elif text_left:
-        cel_style += 'text-align: left;'
-    elif num == 0:
+    if num == 0:
         if re.search('^ ', cel_data) and re.search(' $', cel_data):
             cel_style += 'text-align: center;'
         elif re.search('^ ', cel_data):
@@ -162,9 +41,80 @@ def table_parser(data, cel_data, start_data, num = 0):
         elif re.search(' $', cel_data):
             cel_style += 'text-align: left;'
 
-    text_class = re.search("&lt;table ?class=((?:(?!&gt;).)+)&gt;", data)
-    if text_class:
-        table_class += text_class.groups()[0]
+    table_state = re.findall('&lt;((?:(?!&gt;).)+)&gt;', data)
+    for in_state in table_state:
+        if re.search("^table ?width=([^=]+)$", in_state):
+            table_data = re.sub('^table ?width=', '', in_state)
+            div_style += 'width: ' + ((table_data + 'px') if re.search('^[0-9]+$', table_data) else table_data) + ';'
+            all_table += 'width: 100%;'
+        elif re.search("^table ?height=([^=]+)$", in_state):
+            table_data = re.sub('^table ?height=', '', in_state)
+            div_style += 'height: ' + ((table_data + 'px') if re.search('^[0-9]+$', table_data) else table_data) + ';'
+        elif re.search("^table ?align=([^=]+)$", in_state):
+            table_data = re.sub('^table ?align=', '', in_state)
+            if table_data == 'right':
+                div_style += 'float: right;'
+            elif table_data == 'center':
+                all_table += 'margin: auto;'
+        elif re.search("^table ?textalign=([^=]+)$", in_state):
+            num = 1
+            table_data = re.sub('^table ?textalign=', '', in_state)
+            if table_data == 'right':
+                all_table += 'text-align: right;'
+            elif table_data == 'center':
+                all_table += 'text-align: center;'
+        elif re.search("^row ?textalign=([^=]+)$", in_state):
+            table_data = re.sub('^row ?textalign=', '', in_state)
+            if table_data == 'right':
+                row_style += 'text-align: right;'
+            elif table_data == 'center':
+                row_style += 'text-align: center;'
+            else:
+                row_style += 'text-align: left;'
+        elif re.search('^-([0-9]+)$', in_state):
+            cel = 'colspan="' + re.sub('^-', '', in_state) + '"'
+        elif re.search("^(\^|v)?\|([^|]+)$", in_state):
+            if re.search('^\^', in_state):
+                cel_style += 'vertical-align: top;'
+            elif re.search('^v', in_state):
+                cel_style += 'vertical-align: bottom;'
+
+            row = 'rowspan="' + re.sub('^(\^|v)?\|', '', in_state) + '"'
+        elif re.search("^row ?bgcolor=([^=]+)$", in_state):
+            table_data = re.sub('^row ?bgcolor=', '', in_state)
+            row_style += 'background: ' + re.sub(',([^,]*)', '', table_data) if re.search(',', table_data) else table_data + ';'
+        elif re.search("^row ?color=([^=]+)$", in_state):
+            table_data = re.sub('^row ?color=', '', in_state)
+            row_style += 'color: ' + re.sub(',([^,]*)', '', table_data) if re.search(',', table_data) else table_data + ';'
+        elif re.search("^table ?bordercolor=([^=]+)$", in_state):
+            table_data = re.sub('^table ?bordercolor=', '', in_state)
+            all_table += 'border: ' + re.sub(',([^,]*)', '', table_data) if re.search(',', table_data) else table_data + ' 2px solid;'
+        elif re.search("^table ?bgcolor=([^=]+)$", in_state):
+            table_data = re.sub('^table ?bgcolor=', '', in_state)
+            all_table += 'background: ' + re.sub(',([^,]*)', '', table_data) if re.search(',', table_data) else table_data + ';'
+        elif re.search("^table ?color=([^=]+)$", in_state):
+            table_data = re.sub('^table ?color=', '', in_state)
+            all_table += 'color: ' + re.sub(',([^,]*)', '', table_data) if re.search(',', table_data) else table_data + ';'
+        elif re.search("^(bgcolor=([^=]+)|#(?:[0-9a-f-A-F]{3}){1,2}|\w+)$", in_state):
+            cel_style += 'background: ' + re.sub('^bgcolor=', '', in_state) + ';'
+        elif re.search("^color=([^=]+)$", in_state):
+            table_data = re.sub('^color=', '', in_state)
+            cel_style += 'color: ' + re.sub(',([^,]*)', '', table_data) if re.search(',', table_data) else table_data + ';'
+        elif re.search("^width=([^=]+)$", in_state):
+            table_data = re.sub('^width=', '', in_state)
+            cel_style += 'width: ' + ((table_data + 'px') if re.search('^[0-9]+$', table_data) else table_data) + ';'
+        elif re.search("^height=([^=]+)$", in_state):
+            table_data = re.sub('^height=', '', in_state)
+            cel_style += 'height: ' + ((table_data + 'px') if re.search('^[0-9]+$', table_data) else table_data) + ';'
+        elif re.search('^\(|:|\)$', in_state):
+            if in_state == '(':
+                cel_style += 'text-align: right;'
+            elif in_state == ':':
+                cel_style += 'text-align: center;'
+            else:
+                cel_style += 'text-align: left;'
+        elif re.search("^table ?class=([^=]+)$", in_state):
+            table_class += re.sub("^table ?class=", '', in_state)
 
     div_style += '"'
     all_table += '"'
