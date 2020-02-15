@@ -180,8 +180,10 @@ def captcha_get():
 
     return data
 
-def update():
-    #v3.1.5
+def update(ver_num):
+    print('----')
+    # 업데이트 하위 호환 유지 함수
+    # v3.1.5
     try:
         num = 1
         curs.execute(db_change('select title, sub from topic where id = "1" order by date asc'))
@@ -191,13 +193,29 @@ def update():
                 curs.execute(db_change("update topic set code = ? where title = ? and sub = ? and id = '1'"), [str(num), i[0], i[1]])
                 num += 1
 
-            print('----')
             print('Add topic code')
-            print('----')
     except:
         pass
 
+    if ver_num < 3160027:
+        print('Add init set')
+        set_init()
+
     conn.commit()
+    print('Update pass')
+    print('----')
+
+def set_init():
+    # 초기값 설정 함수    
+    curs.execute(db_change("select html from html_filter where kind = 'email'"))
+    if not curs.fetchall():
+        for i in ['naver.com', 'gmail.com', 'daum.net', 'kakao.com']:
+            curs.execute(db_change("insert into html_filter (html, kind) values (?, 'email')"), [i])
+
+    curs.execute(db_change('select data from other where name = "smtp_server" or name = "smtp_port" or name = "smtp_security"'))
+    if not curs.fetchall():
+        for i in [['smtp_server', 'imap.google.com'], ['smtp_port', '587'], ['smtp_security', 'tls']]:
+            curs.execute(db_change("insert into other (name, data) values (?, ?)"), [i[0], i[1]])
 
 def topic_change(num):
     curs.execute(db_change('select title, sub from topic where id = "1" and code = ?'), [str(num)])

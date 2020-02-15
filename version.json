@@ -1,7 +1,7 @@
 {
     "master" : {
-        "r_ver" : "v3.1.6-master-26",
-        "c_ver" : "400009",
+        "r_ver" : "v3.1.6-master-27",
+        "c_ver" : "3160027",
         "s_ver" : "7"
     }, "stable" : {
         "r_ver" : "v3.1.5-stable-03",

@@ -160,12 +160,12 @@ try:
     curs.execute(db_change('select data from other where name = "ver"'))
     ver_set_data = curs.fetchall()
     if not ver_set_data:
-        setup_tool = 1
+        setup_tool = 2
     else:
         if int(version_list['master']['c_ver']) > int(ver_set_data[0][0]):
             setup_tool = 1
 except:
-    setup_tool = 1
+    setup_tool = 2
 
 if setup_tool != 0:
     create_data['data'] = ['title', 'data']
@@ -204,7 +204,10 @@ if setup_tool != 0:
             except:
                 pass
 
-    update()
+    if setup_tool == 1:
+        update(int(ver_set_data[0][0]))
+    else:
+        set_init()
 
 curs.execute(db_change('delete from other where name = "ver"'))
 curs.execute(db_change('insert into other (name, data) values ("ver", ?)'), [version_list['master']['c_ver']])
@@ -316,19 +319,10 @@ if set_data['db_type'] == 'mysql':
 
     mysql_dont_off()
 
+
 curs.execute(db_change('select data from other where name = "count_all_title"'))
 if not curs.fetchall():
     curs.execute(db_change('insert into other (name, data) values ("count_all_title", "0")'))
-
-curs.execute(db_change("select html from html_filter where kind = 'email'"))
-if not curs.fetchall():
-    for i in ['naver.com', 'gmail.com', 'daum.net', 'kakao.com']:
-        curs.execute(db_change("insert into html_filter (html, kind) values (?, 'email')"), [i])
-
-curs.execute(db_change('select data from other where name = "smtp_server" or name = "smtp_port" or name = "smtp_security"'))
-if not curs.fetchall():
-    for i in [['smtp_server', 'imap.google.com'], ['smtp_port', '587'], ['smtp_security', 'tls']]:
-        curs.execute(db_change("insert into other (name, data) values (?, ?)"), [i[0], i[1]])
 
 conn.commit()
 
