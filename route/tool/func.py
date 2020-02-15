@@ -4,6 +4,7 @@ import platform
 
 for i in range(0, 2):
     try:
+        from diff_match_patch import diff_match_patch
         import werkzeug.routing
         import werkzeug.debug
         import flask_compress
@@ -19,7 +20,6 @@ for i in range(0, 2):
         import smtplib
         import bcrypt
         import zipfile
-        import difflib
         import shutil
         import threading
         import logging
@@ -104,7 +104,7 @@ def send_email(who, title, data):
             elif smtp_security == 'starttls':
                 smtp = smtplib.SMTP(smtp_server, smtp_port)
                 smtp.starttls()
-            else: #if smtp_security == 'tls':
+            else: # if smtp_security == 'tls':
                 smtp = smtplib.SMTP_SSL(smtp_server, smtp_port)
             
             smtp.login(smtp_email, smtp_pass)
@@ -186,13 +186,14 @@ def update():
         num = 1
         curs.execute(db_change('select title, sub from topic where id = "1" order by date asc'))
         db_data = curs.fetchall()
-        for i in db_data:
-            curs.execute(db_change("update topic set code = ? where title = ? and sub = ? and id = '1'"), [str(num), i[0], i[1]])
-            num += 1
+        if db_data:
+            for i in db_data:
+                curs.execute(db_change("update topic set code = ? where title = ? and sub = ? and id = '1'"), [str(num), i[0], i[1]])
+                num += 1
 
-        print('----')
-        print('Add topic code')
-        print('----')
+            print('----')
+            print('Add topic code')
+            print('----')
     except:
         pass
 
@@ -553,55 +554,6 @@ def wiki_set(num = 1):
         return db_data[0][0]
     else:
         return var_data
-
-def diff(seqm):
-    output = []
-
-    for opcode, a0, a1, b0, b1 in seqm.get_opcodes():
-        if opcode == 'equal':
-            output += [html.escape(seqm.a[a0:a1])]
-        elif opcode == 'insert':
-            output += ["<span style='background:#CFC;'>" + html.escape(seqm.b[b0:b1]) + "</span>"]
-        elif opcode == 'delete':
-            output += ["<span style='background:#FDD;'>" + html.escape(seqm.a[a0:a1]) + "</span>"]
-        elif opcode == 'replace':
-            output += ["<span style='background:#FDD;'>" + html.escape(seqm.a[a0:a1]) + "</span>"]
-            output += ["<span style='background:#CFC;'>" + html.escape(seqm.b[b0:b1]) + "</span>"]
-
-    end = ''.join(output)
-    end = end.replace('\r\n', '\n')
-    sub = ''
-
-    if not re.search('\n$', end):
-        end += '\n'
-
-    num = 0
-    left = 1
-    while 1:
-        data = re.search('((?:(?!\n).)*)\n', end)
-        if data:
-            data = data.groups()[0]
-
-            left += 1
-            if re.search('<span style=\'(?:(?:(?!\').)+)\'>', data):
-                num += 1
-                if re.search('<\/span>', data):
-                    num -= 1
-
-                sub += str(left) + ' : ' + re.sub('(?P<in>(?:(?!\n).)*)\n', '\g<in>', data, 1) + '<br>'
-            else:
-                if re.search('<\/span>', data):
-                    num -= 1
-                    sub += str(left) + ' : ' + re.sub('(?P<in>(?:(?!\n).)*)\n', '\g<in>', data, 1) + '<br>'
-                else:
-                    if num > 0:
-                        sub += str(left) + ' : ' + re.sub('(?P<in>.*)\n', '\g<in>', data, 1) + '<br>'
-
-            end = re.sub('((?:(?!\n).)*)\n', '', end, 1)
-        else:
-            break
-
-    return sub
 
 def admin_check(num = None, what = None, name = ''):
     if name == '':
