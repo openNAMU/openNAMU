@@ -4,4 +4,5 @@ flask
 flask-Reggie
 flask-compress
 pymysql
+diff_match_patch
 pysha3; python_version < "3.6"
