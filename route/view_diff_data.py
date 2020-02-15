@@ -30,7 +30,10 @@ def view_diff_data_2(conn, name):
 
                 re_data = re.findall('((?:(?!&para;<br>).)*)(?:&para;<br>|$)', diff_data)
                 for re_in_data in re_data:
-                    if re.search('(<\/ins>|<\/del>)', re_in_data):
+                    if re.search('(<ins |<del )', re_in_data) and re.search('(<\/ins>|<\/del>)', re_in_data):
+                        re_data[i - 2] = str(i) + ' : ' + re_data[i - 2] + '\n'
+                        include_ins = 0
+                    elif re.search('(<\/ins>|<\/del>)', re_in_data):
                         re_data[i - 2] = str(i) + ' : ' + re_data[i - 2] + '\n'
                         include_ins = 0
                     elif re.search('(<ins |<del )', re_in_data) or include_ins == 1:
