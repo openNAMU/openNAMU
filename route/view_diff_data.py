@@ -21,9 +21,28 @@ def view_diff_data_2(conn, name):
         if second_raw_data:
             if first == second:
                 result = ''
+            elif first_raw_data == second_raw_data:
+                result = ''
             else:
-                diff_data = difflib.SequenceMatcher(None, first_raw_data[0][0], second_raw_data[0][0])
-                result = '<pre>' + diff(diff_data) + '</pre>'
+                i = 2
+                include_ins = 0
+                diff_data = '1 : ' + diff_match_patch().diff_prettyHtml(diff_match_patch().diff_main(first_raw_data[0][0], second_raw_data[0][0]))
+
+                re_data = re.findall('((?:(?!&para;<br>).)*)(?:&para;<br>|$)', diff_data)
+                for re_in_data in re_data:
+                    if re.search('(<\/ins>|<\/del>)', re_in_data):
+                        re_data[i - 2] = str(i) + ' : ' + re_data[i - 2] + '\n'
+                        include_ins = 0
+                    elif re.search('(<ins |<del )', re_in_data) or include_ins == 1:
+                        re_data[i - 2] = str(i) + ' : ' + re_data[i - 2] + '\n'
+                        include_ins = 1
+                    else:
+                        re_data[i - 2] = ''
+                        include_ins = 0
+
+                    i += 1
+                    
+                result = '<pre>' + ''.join(re_data) + '</pre>'
 
             return easy_minify(flask.render_template(skin_check(),
                 imp = [name, wiki_set(), custom(), other2([' (' + load_lang('compare') + ')', 0])],
