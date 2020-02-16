@@ -58,16 +58,22 @@ function load_include(title, name, p_data) {
 
     xhr.onreadystatechange = function() {
         if(this.readyState === 4 && this.status === 200) {
-            var o_p_data = JSON.parse(this.responseText);
-            var g_data = o_p_data['data'];
+            if(this.responseText === "{}\n") {
+                o_data.innerHTML = "";
 
-            o_data.innerHTML = g_data;
+                document.getElementsByClassName(name)[0].id = "not_thing";
+            } else {
+                var o_p_data = JSON.parse(this.responseText);
+                var g_data = o_p_data['data'];
 
-            js_data = o_p_data['js_data'];
-            js_data = js_data.replace(/<script>/g, '');
-            js_data = js_data.replace(/<\/script>/g, '\n');
+                o_data.innerHTML = g_data;
 
-            eval(js_data)
+                js_data = o_p_data['js_data'];
+                js_data = js_data.replace(/<script>/g, '');
+                js_data = js_data.replace(/<\/script>/g, '\n');
+
+                eval(js_data);
+            }
         }
     }
 }
