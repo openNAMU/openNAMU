@@ -455,9 +455,7 @@ def namumark(conn, data, title, main_num, include_num):
             break
 
     data = re.sub('\\\\{', '<break_middle>', data)
-    
     data = middle_parser(data, include_num)
-
     data = re.sub('<break_middle>', '\\{', data)
 
     num = 0
@@ -490,35 +488,31 @@ def namumark(conn, data, title, main_num, include_num):
                 include_data = 'Test'
 
             include_link = include_data
-
             backlink += [[title, include_link, 'include']]
 
-            curs.execute(tool.db_change("select title from data where title = ?"), [include_data])
-            if curs.fetchall():
-                data = include_re.sub('' + \
-                    '<a id="include_link" href="/w/' + tool.url_pas(include_link) + '">[' + include_link + ']</a><div id="include_' + str(i) + '"></div>' + \
-                '', data, 1)
+            data = include_re.sub('' + \
+                '<a id="include_link" class="include_' + str(i) + '" href="/w/' + tool.url_pas(include_link) + '">[' + include_link + ']</a>' + \
+                '<div id="include_' + str(i) + '"></div>' + \
+            '', data, 1)
 
-                include_plus_data = []
-                while 1:
-                    include_plus = re.search(', ?((?:(?!=).)+)=((?:(?!,).)+)', include)
-                    if include_plus:
-                        include_plus = include_plus.groups()
+            include_plus_data = []
+            while 1:
+                include_plus = re.search(', ?((?:(?!=).)+)=((?:(?!,).)+)', include)
+                if include_plus:
+                    include_plus = include_plus.groups()
 
-                        include_data_set = include_plus[1]
-                        find_data = re.findall('<span id="(one_nowiki_[0-9]+)">', include_data_set)
-                        for j in find_data:
-                            include_data_set = include_data_set.replace('<span id="' + j + '"></span>', end_data[j][0])
+                    include_data_set = include_plus[1]
+                    find_data = re.findall('<span id="(one_nowiki_[0-9]+)">', include_data_set)
+                    for j in find_data:
+                        include_data_set = include_data_set.replace('<span id="' + j + '"></span>', end_data[j][0])
 
-                        include_plus_data += [[include_plus[0], include_data_set]]
+                    include_plus_data += [[include_plus[0], include_data_set]]
 
-                        include = re.sub(', ?((?:(?!=).)+)=((?:(?!,).)+)', '', include, 1)
-                    else:
-                        break
+                    include = re.sub(', ?((?:(?!=).)+)=((?:(?!,).)+)', '', include, 1)
+                else:
+                    break
 
-                plus_data += '<script>load_include("' + include_link + '", "include_' + str(i) + '", ' + str(include_plus_data) + ');</script>'
-            else:
-                data = include_re.sub('<a id="not_thing" href="/w/' + tool.url_pas(include_link) + '">[' + include_link + ']</a>', data, 1)
+            plus_data += '<script>load_include("' + include_link + '", "include_' + str(i) + '", ' + str(include_plus_data) + ');</script>'
         else:
             break
 
