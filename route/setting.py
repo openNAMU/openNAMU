@@ -55,7 +55,7 @@ def setting_2(conn, num):
             0 : 'Wiki',
             1 : '',
             2 : 'FrontPage',
-            3 : 'CC 0',
+            3 : 'ARR',
             4 : '2',
             5 : '',
             7 : '',
