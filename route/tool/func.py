@@ -530,7 +530,7 @@ def wiki_set(num = 1):
         if db_data and db_data[0][0] != '':
             data_list += [db_data[0][0]]
         else:
-            data_list += ['CC 0']
+            data_list += ['ARR']
 
         data_list += ['', '']
 
