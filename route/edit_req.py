@@ -57,7 +57,10 @@ def edit_req_2(conn, name):
             leng = leng_check(len(flask.request.form.get('otent', '')), len(content))
 
             if section:
-                content = old[0][0].replace(flask.request.form.get('otent', ''), content)
+                content = old[0][0].replace(
+                    flask.request.form.get('otent', '').replace('\r\n', '\n'), 
+                    content.replace('\r\n', '\n')
+                )
         else:
             leng = '+' + str(len(content))
 
