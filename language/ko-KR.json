@@ -8,7 +8,7 @@
     "compare_target": "비교 대상 이름",
     "email_title": "이메일 제목",
     "acl_required": "ACL 필요",
-    "blocked": "차단됨",
+    "blocked": "차단자",
     "authorization_authority": "권한 부여 권한",
     "open_discussion": "열린 토론",
     "move_history": "이동 기록",
@@ -336,5 +336,9 @@
     "all_register_num" : "모든 가입 신청자의 수",
     "replace_move" : "문서 바꾸기",
     "merge_move" : "문서 병합",
-    "oauth_explain" : "OAuth 로그인 기능을 사용하려면 'publish_url' 값을 HTTPS 프로토콜을 포함한 도메인 주소로 설정하고, 실제로 HTTPS 연결을 지원해야 합니다."
+    "oauth_explain" : "OAuth 로그인 기능을 사용하려면 'publish_url' 값을 HTTPS 프로토콜을 포함한 도메인 주소로 설정하고, 실제로 HTTPS 연결을 지원해야 합니다.",
+    "add_admin_group" : "관리자 그룹 추가",
+    "add_watchlist" : "주시 문서 추가",
+    "blocked_user" : "차단된 사용자",
+    "blocked_admin" : "차단한 관리자"
 }

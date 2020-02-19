@@ -4,20 +4,20 @@ def main_manager_2(conn, num, r_ver):
     curs = conn.cursor()
 
     title_list = {
-        0 : [load_lang('document_name'), 'acl'],
-        1 : [0, 'check'],
-        2 : [load_lang('file_name'), 'plus_file_filter'],
-        3 : [0, 'admin'],
-        4 : [0, 'record'],
-        5 : [0, 'topic_record'],
-        6 : [load_lang('name'), 'admin_plus'],
-        7 : [load_lang('name'), 'plus_edit_filter'],
-        8 : [load_lang('document_name'), 'search'],
-        9 : [0, 'block_user'],
-        10 : [0, 'block_admin'],
-        11 : [load_lang('document_name'), 'watch_list'],
-        12 : [load_lang('compare_target'), 'check'],
-        13 : [load_lang('document_name'), 'edit']
+        0 : [load_lang('document_name'), 'acl', load_lang('acl')],
+        1 : [0, 'check', load_lang('check')],
+        2 : [load_lang('file_name'), 'plus_file_filter', load_lang('file_filter_add')],
+        3 : [0, 'admin', load_lang('authorize')],
+        4 : [0, 'record', load_lang('edit_record')],
+        5 : [0, 'topic_record', load_lang('discussion_record')],
+        6 : [load_lang('name'), 'admin_plus', load_lang('add_admin_group')],
+        7 : [load_lang('name'), 'plus_edit_filter', load_lang('edit_filter_add')],
+        8 : [load_lang('document_name'), 'search', load_lang('search')],
+        9 : [0, 'block_user', load_lang('blocked_user')],
+        10 : [0, 'block_admin', load_lang('blocked_admin')],
+        11 : [load_lang('document_name'), 'watch_list', load_lang('add_watchlist')],
+        12 : [load_lang('compare_target'), 'check', load_lang('compare_target')],
+        13 : [load_lang('document_name'), 'edit', load_lang('edit')]
     }
 
     if num == 1:
@@ -80,7 +80,7 @@ def main_manager_2(conn, num, r_ver):
                 placeholder = title_list[(num - 2)][0]
 
             return easy_minify(flask.render_template(skin_check(),
-                imp = ['Redirect', wiki_set(), custom(), other2([0, 0])],
+                imp = [title_list[(num - 2)][2], wiki_set(), custom(), other2([0, 0])],
                 data =  '''
                         <form method="post">
                             <input placeholder="''' + placeholder + '''" name="name" type="text">
