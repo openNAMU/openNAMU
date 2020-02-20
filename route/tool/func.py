@@ -60,7 +60,7 @@ for i in range(0, 2):
             print(e)
             raise
 
-app_var = json.loads(open('data/app_var.json').read())
+app_var = json.loads(open('data/app_var.json', encoding='utf8').read())
 
 def load_conn(data):
     global conn
@@ -121,7 +121,7 @@ def send_email(who, title, data):
 def last_change(data):
     json_address = re.sub("(((?!\.|\/).)+)\.html$", "set.json", skin_check())
     try:
-        json_data = json.loads(open(json_address).read())
+        json_data = json.loads(open(json_address, encoding='utf8').read())
     except:
         json_data = 0
 
@@ -318,7 +318,7 @@ def load_lang(data, num = 2, safe = 0):
         curs.execute(db_change("select data from other where name = 'language'"))
         rep_data = curs.fetchall()
 
-        json_data = open(os.path.join('language', rep_data[0][0] + '.json'), 'rt').read()
+        json_data = open(os.path.join('language', rep_data[0][0] + '.json'), encoding='utf8').read()
         lang = json.loads(json_data)
 
         if data in lang:
@@ -333,7 +333,7 @@ def load_lang(data, num = 2, safe = 0):
         rep_data = curs.fetchall()
         if rep_data:
             try:
-                json_data = open(os.path.join('language', rep_data[0][0] + '.json'), 'rt').read()
+                json_data = open(os.path.join('language', rep_data[0][0] + '.json'), encoding='utf8').read()
                 lang = json.loads(json_data)
             except:
                 return load_lang(data, 1, safe)
@@ -354,7 +354,7 @@ def load_oauth(provider):
         return { "support" : oauth_supported }
     else:
         try:
-            oauth = json.loads(open(app_var['path_oauth_setting']).read())
+            oauth = json.loads(open(app_var['path_oauth_setting'], encoding='utf8').read())
         except:
             return_json_data = '{ "publish_url" : "", '
 
@@ -380,16 +380,16 @@ def load_oauth(provider):
             with open(app_var['path_oauth_setting'], 'w', encoding='utf-8') as f:
                 f.write(return_json_data)
 
-            oauth = json.loads(open(app_var['path_oauth_setting']).read())
+            oauth = json.loads(open(app_var['path_oauth_setting'], encoding='utf8').read())
 
         return oauth[provider]
 
 def update_oauth(provider, target, content):
-    oauth = json.loads(open(app_var['path_oauth_setting']).read())
+    oauth = json.loads(open(app_var['path_oauth_setting'], encoding='utf8').read())
     oauth[provider][target] = content
 
-    with open(app_var['path_oauth_setting'], 'w') as f:
-        f.write(json.dumps(oauth, sort_keys=True, indent=4))
+    with open(app_var['path_oauth_setting'], 'w', encoding='utf8') as f:
+        f.write(json.dumps(oauth, sort_keys = True, indent = 4))
 
     return 'Done'
 

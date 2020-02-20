@@ -11,7 +11,7 @@ def api_skin_info_2(conn, name):
     if not flask.request.args.get('all', None):
         json_address = re.sub("(((?!\.|\/).)+)\.html$", "info.json", name)
         try:
-            json_data = json.loads(open(json_address).read())
+            json_data = json.loads(open(json_address, encoding='utf8').read())
         except:
             json_data = None
 
@@ -30,7 +30,7 @@ def api_skin_info_2(conn, name):
         for i in load_skin(skin_check(1), 1):
             json_address = re.sub("(((?!\.|\/).)+)\.html$", "info.json", './views/' + i + '/index.html')
             try:
-                json_data = json.loads(open(json_address).read())
+                json_data = json.loads(open(json_address, encoding='utf8').read())
             except:
                 json_data = None
 

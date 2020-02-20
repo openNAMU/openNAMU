@@ -403,7 +403,7 @@ def setting_2(conn, num):
 
             conn.commit()
 
-            fw = open('./robots.txt', 'w')
+            fw = open('./robots.txt', 'w', encoding='utf8')
             fw.write(re.sub('\r\n', '\n', flask.request.form.get('content', '')))
             fw.close()
 
@@ -415,11 +415,11 @@ def setting_2(conn, num):
                 curs.execute(db_change('select data from other where name = "robot"'))
                 robot_test = curs.fetchall()
                 if robot_test:
-                    fw_test = open('./robots.txt', 'w')
+                    fw_test = open('./robots.txt', 'w', encoding='utf8')
                     fw_test.write(re.sub('\r\n', '\n', robot_test[0][0]))
                     fw_test.close()
                 else:
-                    fw_test = open('./robots.txt', 'w')
+                    fw_test = open('./robots.txt', 'w', encoding='utf8')
                     fw_test.write('User-agent: *\nDisallow: /\nAllow: /$\nAllow: /w/')
                     fw_test.close()
 
@@ -432,7 +432,7 @@ def setting_2(conn, num):
             else:
                 data = ''
 
-            f = open('./robots.txt', 'r')
+            f = open('./robots.txt', encoding='utf8')
             lines = f.readlines()
             f.close()
 
@@ -647,7 +647,7 @@ def setting_2(conn, num):
                 except:
                     return_json_data += ' }'
 
-            with open(app_var['path_oauth_setting'], 'w', encoding='utf-8') as f:
+            with open(app_var['path_oauth_setting'], 'w', encoding='utf8') as f:
                 f.write(return_json_data)
 
             return redirect('/oauth_setting')
