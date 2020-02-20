@@ -707,7 +707,21 @@ app.wsgi_app = werkzeug.debug.DebuggedApplication(app.wsgi_app, True)
 app.debug = True
 
 if __name__ == "__main__":
-    http_server = tornado.httpserver.HTTPServer(tornado.wsgi.WSGIContainer(app))
-    http_server.listen(server_set['port'], address = server_set['host'])
+    try:
+        http_server = tornado.httpserver.HTTPServer(tornado.wsgi.WSGIContainer(app))
+        http_server.listen(server_set['port'], address = server_set['host'])
 
-    tornado.ioloop.IOLoop.instance().start()
+        tornado.ioloop.IOLoop.instance().start()
+    except Exception as e:
+        if sys.platform == 'win32':
+            try:
+                asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+                tornado.ioloop.IOLoop.instance().start()
+            except Exception as e:
+                print('----')
+                print(e)
+                raise
+        else:
+            print('----')
+            print(e)
+            raise
