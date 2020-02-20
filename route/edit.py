@@ -36,7 +36,7 @@ def edit_2(conn, name):
             leng = leng_check(len(flask.request.form.get('otent', '')), len(content))
             
             if section:
-                content = old[0][0].replace(
+                content = old[0][0].replace('\r\n', '\n').replace(
                     flask.request.form.get('otent', '').replace('\r\n', '\n'), 
                     content.replace('\r\n', '\n')
                 )
@@ -83,7 +83,11 @@ def edit_2(conn, name):
     else:            
         if old:
             if section:
-                data = re.sub('\n(?P<in>={1,6})', '<br>\g<in>', html.escape('\n' + re.sub('\r\n', '\n', old[0][0]) + '\n'))
+                data = re.sub(
+                    '\n(?P<in>={1,6})', 
+                    '<br>\g<in>', 
+                    html.escape('\n' + old[0][0].replace('\r\n', '\n') + '\n')
+                )
                 i = 0
 
                 while 1:
@@ -100,7 +104,7 @@ def edit_2(conn, name):
                     else:
                         break
             else:
-                data = old[0][0]
+                data = old[0][0].replace('\r\n', '\n')
         else:
             data = ''
             
