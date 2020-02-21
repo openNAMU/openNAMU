@@ -86,7 +86,9 @@ def api_topic_sub_2(conn, topic_num):
                                 '</td>' + \
                             '</tr>' + \
                             '<tr>' + \
-                                '<td id="' + b_color + '">' + t_data_f + '</td>' + \
+                                '<td id="' + b_color + '">' + \
+                                    '<div id="topic_scroll">' + t_data_f + '</div>' + \
+                                '</td>' + \
                             '</tr>' + \
                         '</tbody>' + \
                     '</table>' + \
