@@ -23,7 +23,7 @@ def login_register_2(conn):
             captcha_post('', 0)
 
         if flask.request.form.get('id', None) == '' or flask.request.form.get('pw', None) == '':
-            return redirect('/register')
+            return re_error('/error/27')
 
         if flask.request.form.get('pw', None) != flask.request.form.get('pw2', None):
             return re_error('/error/20')
