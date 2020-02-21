@@ -340,5 +340,6 @@
     "add_admin_group" : "관리자 그룹 추가",
     "add_watchlist" : "주시 문서 추가",
     "blocked_user" : "차단된 사용자",
-    "blocked_admin" : "차단한 관리자"
+    "blocked_admin" : "차단한 관리자",
+    "invalid_password_error" : "비밀번호가 없습니다."
 }
