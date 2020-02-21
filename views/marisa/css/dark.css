@@ -47,3 +47,7 @@ textarea, input, button, select {
 pre#syntax {
     background: black;
 }
+
+a#titlt_a {
+    color: white;
+}
