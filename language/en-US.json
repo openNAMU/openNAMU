@@ -364,5 +364,6 @@
             "decument_404_error" : "This document does not exist.",
             "fast_edit_error" : "You can edit another document after this period (Second(s)) : ",
             "too_many_dec_error" : "This feature is not supported because there are too many documents.",
-            "application_not_found" : "Application not found"
+            "application_not_found" : "Application not found",
+            "invalid_password_error" : "The Password is invalid."
 }
