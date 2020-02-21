@@ -1173,6 +1173,8 @@ def re_error(data):
                 data = load_lang('too_many_dec_error')
             elif num == 26:
                 data = load_lang('application_not_found')
+            elif num == 27:
+                data = load_lang("invalid_password_error")
             else:
                 data = '???'
 
