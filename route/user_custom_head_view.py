@@ -17,7 +17,7 @@ def user_custom_head_view_2(conn):
 
         flask.session['head'] = flask.request.form.get('content', None)
 
-        return redirect('/user')
+        return redirect('/custom_head')
     else:
         if ip_or_user(ip) == 0:
             start = ''
