@@ -1047,12 +1047,8 @@ def history_plus(title, data, date, ip, send, leng, t_check = '', d_type = ''):
             ])
 
     send = re.sub('\(|\)|<|>', '', send)
-
-    if len(send) > 128:
-        send = send[:128]
-
-    if t_check != '':
-        send += ' (' + t_check + ')'
+    send = send[:128] if len(send) > 128 else send
+    send = send + ' (' + t_check + ')' if t_check != '' else send
 
     curs.execute(db_change("insert into history (id, title, data, date, ip, send, leng, hide, type) values (?, ?, ?, ?, ?, ?, ?, '', ?)"), [
         id_data,
