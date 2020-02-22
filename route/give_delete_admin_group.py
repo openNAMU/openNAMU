@@ -4,6 +4,17 @@ def delete_admin_group_2(conn, name):
     if admin_check(None) != 1:
         return re_error('/error/3')
     
-    curs.execute(db_change("delete from alist where name = ?"), [name])
+    if flask.request.method == 'POST':
+        curs.execute(db_change("delete from alist where name = ?"), [name])
+
+        return redirect('/give_log')
     
-    return redirect('/give_log')
+    return easy_minify(flask.render_template(skin_check(),
+        imp = [load_lang("delete_admin_group"), wiki_set(), custom(), other2(['(' + name + ')', 0])],
+        data = '''
+            <form method=post>
+                <button type=submit>''' + load_lang('start') + '''</button>
+            </form>
+        ''',
+        menu = [['give_log', load_lang('return')]]
+    ))  
