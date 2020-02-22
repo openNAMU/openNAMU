@@ -169,7 +169,7 @@ except:
 
 if setup_tool != 0:
     create_data['data'] = ['title', 'data']
-    create_data['cache_data'] = ['title', 'data']
+    create_data['cache_data'] = ['title', 'data', 'id']
     create_data['history'] = ['id', 'title', 'data', 'date', 'ip', 'send', 'leng', 'hide', 'type']
     create_data['rd'] = ['title', 'sub', 'date', 'band', 'stop', 'agree']
     create_data['user'] = ['id', 'pw', 'acl', 'date', 'encode']

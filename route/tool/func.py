@@ -1032,8 +1032,6 @@ def rd_plus(title, sub, date):
     conn.commit()
 
 def history_plus(title, data, date, ip, send, leng, t_check = '', d_type = ''):
-    curs.execute(db_change("delete from cache_data where title = ?"), [title])
-
     curs.execute(db_change("select id from history where title = ? and type = '' order by id + 0 desc limit 1"), [title])
     id_data = curs.fetchall()
     id_data = str(int(id_data[0][0]) + 1) if id_data else '1'
