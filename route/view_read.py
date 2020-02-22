@@ -75,13 +75,13 @@ def view_read_2(conn, name):
 
         curs.execute(db_change("select data from history where title = ? and id = ?"), [name, str(num)])
     else:
-        if not flask.request.args.get('reload', None):
-            curs.execute(db_change("select data from cache_data where title = ?"), [name])
+        curs.execute(db_change("select id from history where title = ? order by id + 0 desc limit 1"), [name])
+        last_history_num = curs.fetchall()
+        if last_history_num and not flask.request.args.get('reload', None):
+            curs.execute(db_change("select data from cache_data where title = ? and id = ?"), [name, last_history_num[0][0]])
             cache_data = curs.fetchall()
-            if not cache_data or cache_data[0][0] == 'HTTP Request 404':
+            if not cache_data:
                 curs.execute(db_change("select data from data where title = ?"), [name])
-                
-                cache_data = None
         else:
             curs.execute(db_change("select data from data where title = ?"), [name])
 
@@ -108,8 +108,10 @@ def view_read_2(conn, name):
             data = else_data
         )
 
-        curs.execute(db_change("delete from cache_data where title = ?"), [name])
-        curs.execute(db_change("insert into cache_data (title, data) values (?, ?)"), [name, end_data])
+        if not num:
+            curs.execute(db_change("delete from cache_data where title = ?"), [name])
+            if last_history_num:
+                curs.execute(db_change("insert into cache_data (title, data, id) values (?, ?, ?)"), [name, end_data, last_history_num[0][0]])
 
     if end_data == 'HTTP Request 401.3':
         response_data = 401
