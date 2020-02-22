@@ -470,7 +470,7 @@ def other2(data):
         data += ['']
 
     req_list = ''
-    main_css_ver = 17
+    main_css_ver = 18
 
     if not 'main_css_load' in flask.session or not 'main_css_ver' in flask.session or flask.session['main_css_ver'] != main_css_ver:
         for i_data in os.listdir(os.path.join("views", "main_css", "css")):
@@ -485,7 +485,7 @@ def other2(data):
         req_list = flask.session['main_css_load']
 
     data = data[0:2] + ['', '''
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css">
+        <link   rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css">
         <link   rel="stylesheet"
                 href="https://cdn.jsdelivr.net/npm/katex@0.10.1/dist/katex.min.css"
                 integrity="sha384-dbVIfZGuN1Yq7/1Ocstc1lUEm+AT+/rCkibIcC/OmWo5f0EA48Vf8CytHzGrSwbQ"
