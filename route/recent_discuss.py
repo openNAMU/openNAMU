@@ -40,7 +40,7 @@ def recent_discuss_2(conn):
         title = html.escape(data[0])
         sub = html.escape(data[1])
 
-        div += '<tr><td><a href="/thread/' + get_code + '">' + title + '</a> (' + sub + ')</td><td>' + data[2] + '</td></tr>'
+        div += '<tr><td><a href="/thread/' + get_code + '">' + sub + '</a> (' + title + ')</td><td>' + data[2] + '</td></tr>'
 
     div += '</tbody></table>'
 
