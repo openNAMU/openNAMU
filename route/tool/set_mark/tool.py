@@ -41,7 +41,7 @@ def savemark(data):
     data = re.sub("\[date\(now\)\]", get_time(), data)
 
     ip = ip_check()
-    if not re.search("\.", ip):
+    if not re.search("\.|:", ip):
         name = '[[user:' + ip + '|' + ip + ']]'
     else:
         name = ip
