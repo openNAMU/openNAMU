@@ -11,7 +11,7 @@ def list_give_2(conn):
         if back != data[0]:
             back = data[0]
 
-        list_data += '<li><a href="/admin_plus/' + url_pas(data[0]) + '">' + data[0] + '</a></li>'
+        list_data += '<li><a href="/admin_plus/' + url_pas(data[0]) + '">' + data[0] + '</a> <a href="/delete_admin_group/' + url_pas(data[0]) + '">[삭제]</a></li>'
 
     list_data += '</ul><hr class=\"main_hr\"><a href="/manager/8">(' + load_lang('add') + ')</a>'
 
