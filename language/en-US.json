@@ -184,6 +184,7 @@
         "many_delete" : "Bulk delete",
         "edit_req" : "Edit request",
         "edit_req_check" : "Check edit request",
+        "accept_edit_request" : "Accept edit request",
         "history_add" : "Add history",
         "all_register_num" : "The number of application forms",
         "replace_move" : "Reversing documents",
