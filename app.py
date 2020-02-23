@@ -235,7 +235,6 @@ app.url_map.converters['everything'] = EverythingConverter
 
 curs.execute(db_change('select name from alist where acl = "owner"'))
 if not curs.fetchall():
-    curs.execute(db_change('delete from alist where name = "owner"'))
     curs.execute(db_change('insert into alist (name, acl) values ("owner", "owner")'))
 
 if not os.path.exists(app_var['path_data_image']):
