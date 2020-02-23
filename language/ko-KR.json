@@ -1,4 +1,5 @@
 {
+    "delete_admin_group": "관리자 그룹 삭제",
     "document_name": "문서명",
     "non_login_alert": "비로그인 알림",
     "hide": "숨김",
@@ -305,7 +306,7 @@
     "skin_set": "스킨 설정",
     "edit_help": "편집 창 문구",
     "defalut_edit_help": "이곳에 내용을 입력해주세요.",
-    "many_delete": "대량 삭제",
+    "many_delete": "문서 대량 삭제",
     "many_delete_help": "한 줄에 문서명을 한 개씩 적어주세요.",
     "content": "내용",
     "upload_acl": "파일 업로드 ACL",
@@ -341,5 +342,6 @@
     "add_watchlist" : "주시 문서 추가",
     "blocked_user" : "차단된 사용자",
     "blocked_admin" : "차단한 관리자",
-    "invalid_password_error" : "비밀번호 또는 아이디가 없습니다."
+    "invalid_password_error" : "비밀번호 또는 아이디가 없습니다.",
+    "accept_edit_request": "편집 요청 승인"
 }
