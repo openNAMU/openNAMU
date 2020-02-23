@@ -12,7 +12,7 @@ def list_give_2(conn):
             back = data[0]
             
         if admin_check(None) == 1:
-            delGroupLnk = ' <a href="/delete_admin_group/' + url_pas(data[0]) + '">[' + load_lang("delete") + ']</a>'
+            delGroupLnk = ' <a href="/delete_admin_group/' + url_pas(data[0]) + '">(' + load_lang("delete") + ')</a>'
         else:
             delGroupLnk = ""
 
