@@ -374,6 +374,10 @@ def list_acl():
 def give_admin_groups(name = None):
     return give_admin_groups_2(conn, name)
 
+@app.route('/delete_admin_group/<name>', methods=['POST', 'GET'])
+def delete_admin_group(name = None):
+    return delete_admin_group_2(conn, name)
+
 @app.route('/admin_list')
 def list_admin():
     return list_admin_2(conn)
