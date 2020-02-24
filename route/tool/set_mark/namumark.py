@@ -269,7 +269,7 @@ def middle_parser(data, include_num):
                             middle_data_2 = ['python']
 
                         if syntax_num == 0:
-                            plus_data += '<script>hljs.initHighlightingOnLoad();</script>'
+                            plus_data += 'hljs.initHighlightingOnLoad();\n'
 
                             syntax_num = 1
 
@@ -418,7 +418,7 @@ def namumark(conn, data, title, main_num, include_num):
 
     data = '\n' + data + '\n'
     include_num = include_num + '_' if include_num else ''
-    plus_data = '<script>get_link_state("' + include_num + '"); get_file_state("' + include_num + '");</script>'
+    plus_data = 'get_link_state("' + include_num + '");\nget_file_state("' + include_num + '");\n'
 
     backlink = []
     end_data = {}
@@ -440,16 +440,14 @@ def namumark(conn, data, title, main_num, include_num):
             data = math_re.sub('<span id="math_' + str(first) + '"></span>', data, 1)
 
             plus_data += '''
-                <script>
-                    try {
-                        katex.render(
-                            "''' + html.unescape(math).replace('\\', '\\\\').replace('"', '\\"') + '''",
-                            document.getElementById("math_''' + str(first) + '''")
-                        );
-                    } catch {
-                        document.getElementById("math_''' + str(first) + '''").innerHTML = '<span style="color: red;">''' + math.replace('\\', '\\\\') + '''</span>';
-                    }
-                </script>
+                try {
+                    katex.render(
+                        "''' + html.unescape(math).replace('\\', '\\\\').replace('"', '\\"') + '''",
+                        document.getElementById("math_''' + str(first) + '''")
+                    );
+                } catch {
+                    document.getElementById("math_''' + str(first) + '''").innerHTML = '<span style="color: red;">''' + math.replace('\\', '\\\\') + '''</span>';
+                }\n
             '''
         else:
             break
@@ -512,7 +510,7 @@ def namumark(conn, data, title, main_num, include_num):
                 else:
                     break
 
-            plus_data += '<script>load_include("' + include_link + '", "include_' + str(i) + '", ' + str(include_plus_data) + ');</script>'
+            plus_data += 'load_include("' + include_link + '", "include_' + str(i) + '", ' + str(include_plus_data) + ');\n'
         else:
             break
 
@@ -973,7 +971,7 @@ def namumark(conn, data, title, main_num, include_num):
                     main_link = re.sub('#blur', '', main_link)
 
                 backlink += [[title, main_link, 'cat']]
-                category += '<a class="' + include_num + 'link_finder" href="' + tool.url_pas(main_link) + '">' + category_re.sub('', see_link) + '</a> | '
+                category += '<a class="' + include_num + 'link_finder" href="/w/' + tool.url_pas(main_link) + '">' + category_re.sub('', see_link) + '</a> | '
 
                 data = re.sub('\[\[((?:(?!\[\[|\]\]).)+)\]\]', '', data, 1)
             elif re.search('^wiki:', main_link):
@@ -1244,6 +1242,6 @@ def namumark(conn, data, title, main_num, include_num):
     data = re.sub('\n<\/ul>', '</ul>', data)
     data = re.sub('\n', '<br>', data)
 
-    plus_data = '<script>render_html("' + include_num + 'render_contect");</script>' + plus_data
+    plus_data = 'render_html("' + include_num + 'render_contect");\n' + plus_data
 
     return [data, plus_data, backlink]
