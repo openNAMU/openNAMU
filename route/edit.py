@@ -36,7 +36,10 @@ def edit_2(conn, name):
             leng = leng_check(len(flask.request.form.get('otent', '')), len(content))
             
             if section:
-                content = old[0][0].replace(flask.request.form.get('otent', ''), content)
+                content = old[0][0].replace('\r\n', '\n').replace(
+                    flask.request.form.get('otent', '').replace('\r\n', '\n'), 
+                    content.replace('\r\n', '\n')
+                )
         else:
             leng = '+' + str(len(content))
 
@@ -80,7 +83,11 @@ def edit_2(conn, name):
     else:            
         if old:
             if section:
-                data = re.sub('\n(?P<in>={1,6})', '<br>\g<in>', html.escape('\n' + re.sub('\r\n', '\n', old[0][0]) + '\n'))
+                data = re.sub(
+                    '\n(?P<in>={1,6})', 
+                    '<br>\g<in>', 
+                    html.escape('\n' + old[0][0].replace('\r\n', '\n') + '\n')
+                )
                 i = 0
 
                 while 1:
@@ -97,7 +104,7 @@ def edit_2(conn, name):
                     else:
                         break
             else:
-                data = old[0][0]
+                data = old[0][0].replace('\r\n', '\n')
         else:
             data = ''
             
@@ -105,7 +112,7 @@ def edit_2(conn, name):
         get_name = ''
 
         if not section:
-            get_name =  '''
+            get_name = '''
                 <a href="/manager/15?plus=''' + url_pas(name) + '">(' + load_lang('load') + ')</a> <a href="/edit_filter">(' + load_lang('edit_filter_rule') + ''')</a>
                 <hr class=\"main_hr\">
             '''

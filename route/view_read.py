@@ -18,7 +18,7 @@ def view_read_2(conn, name):
             if r_db:
                 r_data = link_fix(r_db[0][0])
 
-                return redirect('/w/' + r_data[0] + '?from=' + name + r_data[1])
+                return redirect('/w/' + url_pas(r_data[0]) + '?from=' + name + r_data[1])
 
     curs.execute(db_change("select sub from rd where title = ? and not stop = 'O' order by date desc"), [name])
     if curs.fetchall():
@@ -67,34 +67,51 @@ def view_read_2(conn, name):
                 div += '<br><h2 id="cate_under">' + load_lang('under_category') + '</h2><ul>' + u_div + '</ul>'
 
 
+    cache_data = None
     if num:
         curs.execute(db_change("select title from history where title = ? and id = ? and hide = 'O'"), [name, str(num)])
         if curs.fetchall() and admin_check(6) != 1:
             return redirect('/history/' + url_pas(name))
 
-        curs.execute(db_change("select title, data from history where title = ? and id = ?"), [name, str(num)])
+        curs.execute(db_change("select data from history where title = ? and id = ?"), [name, str(num)])
     else:
-        curs.execute(db_change("select title, data from data where title = ?"), [name])
+        curs.execute(db_change("select id from history where title = ? order by id + 0 desc limit 1"), [name])
+        last_history_num = curs.fetchall()
+        if last_history_num and not flask.request.args.get('reload', None):
+            curs.execute(db_change("select data from cache_data where title = ? and id = ?"), [name, last_history_num[0][0]])
+            cache_data = curs.fetchall()
+            if not cache_data:
+                curs.execute(db_change("select data from data where title = ?"), [name])
+        else:
+            curs.execute(db_change("select data from data where title = ?"), [name])
 
-    data = curs.fetchall()
-    if data:
-        else_data = data[0][1]
+    if cache_data:
+        end_data = cache_data[0][0]
     else:
-        else_data = None
+        data = curs.fetchall()
+        if data:
+            else_data = data[0][0]
+        else:
+            else_data = None
 
-    curs.execute(db_change("select decu from acl where title = ?"), [name])
-    data = curs.fetchall()
-    if data:
-        acl = 1
+        curs.execute(db_change("select decu from acl where title = ?"), [name])
+        data = curs.fetchall()
+        if data:
+            acl = 1
 
-    if flask.request.args.get('from', None) and else_data:
-        else_data = re.sub('^\r\n', '', else_data)
-        else_data = re.sub('\r\n$', '', else_data)
+        if flask.request.args.get('from', None) and else_data:
+            else_data = re.sub('^\r\n', '', else_data)
+            else_data = re.sub('\r\n$', '', else_data)
 
-    end_data = render_set(
-        title = name,
-        data = else_data
-    )
+        end_data = render_set(
+            title = name,
+            data = else_data
+        )
+
+        if not num:
+            curs.execute(db_change("delete from cache_data where title = ?"), [name])
+            if last_history_num:
+                curs.execute(db_change("insert into cache_data (title, data, id) values (?, ?, ?)"), [name, end_data, last_history_num[0][0]])
 
     if end_data == 'HTTP Request 401.3':
         response_data = 401
@@ -144,7 +161,13 @@ def view_read_2(conn, name):
         else:
             menu = [['edit/' + url_pas(name), load_lang('edit')]]
 
-        menu += [['topic/' + url_pas(name), load_lang('discussion'), topic], ['history/' + url_pas(name), load_lang('history')], ['xref/' + url_pas(name), load_lang('backlink')], ['acl/' + url_pas(name), load_lang('acl'), acl]]
+        menu += [
+            ['topic/' + url_pas(name), load_lang('discussion'), topic], 
+            ['history/' + url_pas(name), load_lang('history')], 
+            ['xref/' + url_pas(name), load_lang('backlink')], 
+            ['acl/' + url_pas(name), load_lang('acl'), acl],
+            ['w/' + url_pas(name) + '?reload=true', load_lang('reload')]
+        ]
 
         if flask.request.args.get('from', None):
             menu += [['w/' + url_pas(name), load_lang('pass')]]

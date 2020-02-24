@@ -10,8 +10,13 @@ def list_give_2(conn):
     for data in curs.fetchall():
         if back != data[0]:
             back = data[0]
+            
+        if admin_check(None) == 1:
+            delGroupLnk = ' <a href="/delete_admin_group/' + url_pas(data[0]) + '">(' + load_lang("delete") + ')</a>'
+        else:
+            delGroupLnk = ""
 
-        list_data += '<li><a href="/admin_plus/' + url_pas(data[0]) + '">' + data[0] + '</a></li>'
+        list_data += '<li><a href="/admin_plus/' + url_pas(data[0]) + '">' + data[0] + '</a>' + delGroupLnk + '</li>'
 
     list_data += '</ul><hr class=\"main_hr\"><a href="/manager/8">(' + load_lang('add') + ')</a>'
 

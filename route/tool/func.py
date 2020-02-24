@@ -4,6 +4,7 @@ import platform
 
 for i in range(0, 2):
     try:
+        from diff_match_patch import diff_match_patch
         import werkzeug.routing
         import werkzeug.debug
         import flask_compress
@@ -19,7 +20,6 @@ for i in range(0, 2):
         import smtplib
         import bcrypt
         import zipfile
-        import difflib
         import shutil
         import threading
         import logging
@@ -60,7 +60,7 @@ for i in range(0, 2):
             print(e)
             raise
 
-app_var = json.loads(open('data/app_var.json', encoding='utf-8').read())
+app_var = json.loads(open('data/app_var.json', encoding='utf8').read())
 
 def load_conn(data):
     global conn
@@ -72,25 +72,46 @@ def load_conn(data):
     load_conn2(data)
 
 def send_email(who, title, data):
-    smtp = smtplib.SMTP_SSL('smtp.gmail.com', 465)
-
     try:
-        curs.execute(db_change('select name, data from other where name = "g_email" or name = "g_pass"'))
+        curs.execute(db_change('select name, data from other where name = "smtp_email" or name = "smtp_pass" or name = "smtp_server" or name = "smtp_port" or name = "smtp_security"'))
         rep_data = curs.fetchall()
-        if rep_data:
-            g_email = ''
-            g_pass = ''
-            for i in rep_data:
-                if i[0] == 'g_email':
-                    g_email = i[1]
-                else:
-                    g_pass = i[1]
 
-            smtp.login(g_email, g_pass)
+        smtp_email = ''
+        smtp_pass = ''
+        smtp_server = ''
+        smtp_security = ''
+        smtp_port = ''
+        smtp = ''
+
+        if rep_data:
+            smtp_email = ''
+            smtp_pass = ''
+            for i in rep_data:
+                if i[0] == 'smtp_email':
+                    smtp_email = i[1]
+                elif i[0] == 'smtp_pass':
+                    smtp_pass = i[1]
+                elif i[0] == 'smtp_server':
+                    smtp_server = i[1]
+                elif i[0] == 'smtp_security':
+                    smtp_security = i[1]
+                elif i[0] == 'smtp_port':
+                    smtp_port = i[1]
+            
+            smtp_port = int(smtp_port)
+            if smtp_security == 'plain':
+                smtp = smtplib.SMTP(smtp_server, smtp_port)
+            elif smtp_security == 'starttls':
+                smtp = smtplib.SMTP(smtp_server, smtp_port)
+                smtp.starttls()
+            else: # if smtp_security == 'tls':
+                smtp = smtplib.SMTP_SSL(smtp_server, smtp_port)
+            
+            smtp.login(smtp_email, smtp_pass)
 
         msg = email.mime.text.MIMEText(data)
         msg['Subject'] = title
-        smtp.sendmail(g_email, who, msg.as_string())
+        smtp.sendmail(smtp_email, who, msg.as_string())
 
         smtp.quit()
     except:
@@ -100,7 +121,7 @@ def send_email(who, title, data):
 def last_change(data):
     json_address = re.sub("(((?!\.|\/).)+)\.html$", "set.json", skin_check())
     try:
-        json_data = json.loads(open(json_address).read())
+        json_data = json.loads(open(json_address, encoding='utf8').read())
     except:
         json_data = 0
 
@@ -159,23 +180,45 @@ def captcha_get():
 
     return data
 
-def update():
-    #v3.1.5
+def update(ver_num):
+    print('----')
+    # 업데이트 하위 호환 유지 함수
+    # v3.1.5
     try:
         num = 1
         curs.execute(db_change('select title, sub from topic where id = "1" order by date asc'))
         db_data = curs.fetchall()
-        for i in db_data:
-            curs.execute(db_change("update topic set code = ? where title = ? and sub = ? and id = '1'"), [str(num), i[0], i[1]])
-            num += 1
+        if db_data:
+            for i in db_data:
+                curs.execute(db_change("update topic set code = ? where title = ? and sub = ? and id = '1'"), [str(num), i[0], i[1]])
+                num += 1
 
-        print('----')
-        print('Add topic code')
-        print('----')
+            print('Add topic code')
     except:
         pass
 
+    if ver_num < 3160027:
+        print('Add init set')
+        set_init()
+
+    if ver_num < 3160028:
+        curs.execute(db_change('delete from cache_data'))
+
     conn.commit()
+    print('Update pass')
+    print('----')
+
+def set_init():
+    # 초기값 설정 함수    
+    curs.execute(db_change("select html from html_filter where kind = 'email'"))
+    if not curs.fetchall():
+        for i in ['naver.com', 'gmail.com', 'daum.net', 'kakao.com']:
+            curs.execute(db_change("insert into html_filter (html, kind) values (?, 'email')"), [i])
+
+    curs.execute(db_change('select data from other where name = "smtp_server" or name = "smtp_port" or name = "smtp_security"'))
+    if not curs.fetchall():
+        for i in [['smtp_server', 'imap.google.com'], ['smtp_port', '587'], ['smtp_security', 'tls']]:
+            curs.execute(db_change("insert into other (name, data) values (?, ?)"), [i[0], i[1]])
 
 def topic_change(num):
     curs.execute(db_change('select title, sub from topic where id = "1" and code = ?'), [str(num)])
@@ -275,7 +318,7 @@ def load_lang(data, num = 2, safe = 0):
         curs.execute(db_change("select data from other where name = 'language'"))
         rep_data = curs.fetchall()
 
-        json_data = open(os.path.join('language', rep_data[0][0] + '.json'), 'rt', encoding='utf-8').read()
+        json_data = open(os.path.join('language', rep_data[0][0] + '.json'), encoding='utf8').read()
         lang = json.loads(json_data)
 
         if data in lang:
@@ -290,7 +333,7 @@ def load_lang(data, num = 2, safe = 0):
         rep_data = curs.fetchall()
         if rep_data:
             try:
-                json_data = open(os.path.join('language', rep_data[0][0] + '.json'), 'rt', encoding='utf-8').read()
+                json_data = open(os.path.join('language', rep_data[0][0] + '.json'), encoding='utf8').read()
                 lang = json.loads(json_data)
             except:
                 return load_lang(data, 1, safe)
@@ -306,16 +349,47 @@ def load_lang(data, num = 2, safe = 0):
             return load_lang(data, 1, safe)
 
 def load_oauth(provider):
-    oauth = json.loads(open(app_var['path_oauth_setting'], encoding='utf-8').read())
+    oauth_supported = ["discord", "facebook", "naver", "kakao"]
+    if(provider == '_README'):
+        return { "support" : oauth_supported }
+    else:
+        try:
+            oauth = json.loads(open(app_var['path_oauth_setting'], encoding='utf8').read())
+        except:
+            return_json_data = '{ "publish_url" : "", '
 
-    return oauth[provider]
+            for i in range(len(oauth_supported)):
+                return_json_data += '"' + oauth_supported[i] + '" : { '
+                for j in range(2):
+                    if j == 0:
+                        load_target = 'id'
+                    elif j == 1:
+                        load_target = 'secret'
+
+                    return_json_data += '"client_' + load_target  + '" : ""' + (',' if j == 0 else '')
+
+                return_json_data += ' }'
+
+                try:
+                    _ = oauth_supported[i + 1]
+
+                    return_json_data += ', '
+                except:
+                    return_json_data += ' }'
+
+            with open(app_var['path_oauth_setting'], 'w', encoding='utf-8') as f:
+                f.write(return_json_data)
+
+            oauth = json.loads(open(app_var['path_oauth_setting'], encoding='utf8').read())
+
+        return oauth[provider]
 
 def update_oauth(provider, target, content):
-    oauth = json.loads(open(app_var['path_oauth_setting'], encoding='utf-8').read())
+    oauth = json.loads(open(app_var['path_oauth_setting'], encoding='utf8').read())
     oauth[provider][target] = content
 
-    with open(app_var['path_oauth_setting'], 'w') as f:
-        f.write(json.dumps(oauth, sort_keys=True, indent=4))
+    with open(app_var['path_oauth_setting'], 'w', encoding='utf8') as f:
+        f.write(json.dumps(oauth, sort_keys = True, indent = 4))
 
     return 'Done'
 
@@ -396,16 +470,14 @@ def other2(data):
         data += ['']
 
     req_list = ''
-    main_css_ver = 2
+    main_css_ver = 19
 
     if not 'main_css_load' in flask.session or not 'main_css_ver' in flask.session or flask.session['main_css_ver'] != main_css_ver:
         for i_data in os.listdir(os.path.join("views", "main_css", "css")):
-            file_date = str(int(os.path.getmtime(os.path.join("views", "main_css", "css", i_data))))
-            req_list += '<link rel="stylesheet" href="/views/main_css/css/' + i_data + '?ver=' + file_date + '">'
+            req_list += '<link rel="stylesheet" href="/views/main_css/css/' + i_data + '?ver=' + str(main_css_ver) + '">'
 
         for i_data in os.listdir(os.path.join("views", "main_css", "js")):
-            file_date = str(int(os.path.getmtime(os.path.join("views", "main_css", "js", i_data))))
-            req_list += '<script src="/views/main_css/js/' + i_data + '?ver=' + file_date + '"></script>'
+            req_list += '<script src="/views/main_css/js/' + i_data + '?ver=' + str(main_css_ver) + '"></script>'
 
         flask.session['main_css_load'] = req_list
         flask.session['main_css_ver'] = main_css_ver
@@ -413,7 +485,7 @@ def other2(data):
         req_list = flask.session['main_css_load']
 
     data = data[0:2] + ['', '''
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css">
+        <link   rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css">
         <link   rel="stylesheet"
                 href="https://cdn.jsdelivr.net/npm/katex@0.10.1/dist/katex.min.css"
                 integrity="sha384-dbVIfZGuN1Yq7/1Ocstc1lUEm+AT+/rCkibIcC/OmWo5f0EA48Vf8CytHzGrSwbQ"
@@ -427,13 +499,20 @@ def other2(data):
     return data
 
 def cut_100(data):
-    data = re.sub('<(((?!>).)*)>', ' ', data)
-    data = re.sub('\n', ' ', data)
-    data = re.sub('^ +', '', data)
-    data = re.sub(' +$', '', data)
-    data = re.sub(' {2,}', ' ', data)
+    if re.search('^\/w\/', flask.request.path):
+        data = re.sub('<script>((\n*(((?!<\/script>).)+)\n*)+)<\/script>', '', data)
+        data = re.sub('<hr class="main_hr">((\n*((.+)\n*))+)$', '', data)
+        data = re.sub('<div id="cate_all">((\n*((.+)\n*))+)$', '', data)        
 
-    return data[0:100] + '...'
+        data = re.sub('<(((?!>).)*)>', ' ', data)
+        data = re.sub('\n', ' ', data)
+        data = re.sub('^ +', '', data)
+        data = re.sub(' +$', '', data)
+        data = re.sub(' {2,}', ' ', data)
+    
+        return data[0:100] + '...'
+    else:
+        return ''
 
 def wiki_set(num = 1):
     if num == 1:
@@ -451,7 +530,7 @@ def wiki_set(num = 1):
         if db_data and db_data[0][0] != '':
             data_list += [db_data[0][0]]
         else:
-            data_list += ['CC 0']
+            data_list += ['ARR']
 
         data_list += ['', '']
 
@@ -496,55 +575,6 @@ def wiki_set(num = 1):
         return db_data[0][0]
     else:
         return var_data
-
-def diff(seqm):
-    output = []
-
-    for opcode, a0, a1, b0, b1 in seqm.get_opcodes():
-        if opcode == 'equal':
-            output += [html.escape(seqm.a[a0:a1])]
-        elif opcode == 'insert':
-            output += ["<span style='background:#CFC;'>" + html.escape(seqm.b[b0:b1]) + "</span>"]
-        elif opcode == 'delete':
-            output += ["<span style='background:#FDD;'>" + html.escape(seqm.a[a0:a1]) + "</span>"]
-        elif opcode == 'replace':
-            output += ["<span style='background:#FDD;'>" + html.escape(seqm.a[a0:a1]) + "</span>"]
-            output += ["<span style='background:#CFC;'>" + html.escape(seqm.b[b0:b1]) + "</span>"]
-
-    end = ''.join(output)
-    end = end.replace('\r\n', '\n')
-    sub = ''
-
-    if not re.search('\n$', end):
-        end += '\n'
-
-    num = 0
-    left = 1
-    while 1:
-        data = re.search('((?:(?!\n).)*)\n', end)
-        if data:
-            data = data.groups()[0]
-
-            left += 1
-            if re.search('<span style=\'(?:(?:(?!\').)+)\'>', data):
-                num += 1
-                if re.search('<\/span>', data):
-                    num -= 1
-
-                sub += str(left) + ' : ' + re.sub('(?P<in>(?:(?!\n).)*)\n', '\g<in>', data, 1) + '<br>'
-            else:
-                if re.search('<\/span>', data):
-                    num -= 1
-                    sub += str(left) + ' : ' + re.sub('(?P<in>(?:(?!\n).)*)\n', '\g<in>', data, 1) + '<br>'
-                else:
-                    if num > 0:
-                        sub += str(left) + ' : ' + re.sub('(?P<in>.*)\n', '\g<in>', data, 1) + '<br>'
-
-            end = re.sub('((?:(?!\n).)*)\n', '', end, 1)
-        else:
-            break
-
-    return sub
 
 def admin_check(num = None, what = None, name = ''):
     if name == '':
@@ -1015,12 +1045,8 @@ def history_plus(title, data, date, ip, send, leng, t_check = '', d_type = ''):
             ])
 
     send = re.sub('\(|\)|<|>', '', send)
-
-    if len(send) > 128:
-        send = send[:128]
-
-    if t_check != '':
-        send += ' (' + t_check + ')'
+    send = send[:128] if len(send) > 128 else send
+    send = send + ' (' + t_check + ')' if t_check != '' else send
 
     curs.execute(db_change("insert into history (id, title, data, date, ip, send, leng, hide, type) values (?, ?, ?, ?, ?, ?, ?, '', ?)"), [
         id_data,
@@ -1139,6 +1165,10 @@ def re_error(data):
                 data = load_lang('fast_edit_error') + slow_data[0][0]
             elif num == 25:
                 data = load_lang('too_many_dec_error')
+            elif num == 26:
+                data = load_lang('application_not_found')
+            elif num == 27:
+                data = load_lang("invalid_password_error")
             else:
                 data = '???'
 

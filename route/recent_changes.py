@@ -198,7 +198,7 @@ def recent_changes_2(conn, name, tool):
                     menu = [['w/' + url_pas(name), load_lang('return')]]
 
                     if admin_check() == 1:
-                        menu += [['add_history/' + url_pas(name), load_lang('add_history')]]
+                        menu += [['add_history/' + url_pas(name), load_lang('history_add')]]
                 else:
                     menu = [['history/' + url_pas(name), load_lang('return')]]
 

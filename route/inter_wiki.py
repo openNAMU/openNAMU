@@ -17,14 +17,7 @@ def inter_wiki_2(conn, tools):
         del_link = 'del_email_filter'
         plus_link = 'plus_email_filter'
         title = load_lang('email_filter_list')
-        div = '''
-            <ul>
-                <li>gmail.com</li>
-                <li>naver.com</li>
-                <li>daum.net</li>
-                <li>kakao.com</li>
-            </ul>
-        '''
+        div = ''
 
         curs.execute(db_change("select html from html_filter where kind = 'email'"))
     elif tools == 'name_filter':

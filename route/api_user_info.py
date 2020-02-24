@@ -33,7 +33,11 @@ def api_user_info_2(conn, name):
         data = curs.fetchall()
         if data:
             if data[0][0] != 'user':
-                plus_t += [data[0][0]]
+                curs.execute(db_change("select name from alist where name = ?"), [data[0][0]])
+                if curs.fetchall():
+                    plus_t += [data[0][0]]
+                else:
+                    plus_t += [load_lang('member')]
             else:
                 plus_t += [load_lang('member')]
         else:

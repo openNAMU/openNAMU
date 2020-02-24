@@ -1,11 +1,11 @@
 import re
 import json
 
-o_json = json.loads(open('en-US.json', encoding='utf-8').read())
+o_json = json.loads(open('en-US.json', encoding='utf8').read())
 
 print('n_name : ', end = '')
 n_name = input()
-n_json = json.loads(open(n_name + '.json', encoding='utf-8').read())
+n_json = json.loads(open(n_name + '.json', encoding='utf8').read())
 
 print()
 for i in list(n_json):
@@ -25,6 +25,6 @@ for i in list(o_json):
 
 n_data = json.dumps(n_json, indent = 4, ensure_ascii = False)
 
-f = open(n_name + '.json', "w", encoding='utf-8')
+f = open(n_name + '.json', "w", encoding='utf8')
 f.write(n_data)
 f.close()

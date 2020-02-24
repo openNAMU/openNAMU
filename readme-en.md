@@ -79,4 +79,4 @@ openNAMU is protected by [BSD 3-Clause License](./LICNESE). Please refer to the 
 
 # Etc.
  * Owner rights are granted to the first registor.
- * [Test Server](http://namu.ml)
+ * [Test Server](http://2du.pythonanywhere.com)

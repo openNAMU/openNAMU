@@ -92,7 +92,7 @@ def topic_2(conn, topic_num):
         ])
         conn.commit()
 
-        return redirect('/thread/' + str(topic_num))
+        return redirect('/thread/' + str(topic_num) + '?where=bottom')
     else:
         data = ''
 

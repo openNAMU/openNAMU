@@ -9,7 +9,7 @@ a { text-decoration: none; }
 #not_thing { color: red; }
 #inside, #out_link, #open { color: green; }
 #out_link::before { background: green; color: white; content: "E"; }
-input[type="checkbox"] { width: auto; }
+input[type="checkbox"], input[type="radio"] { width: auto; }
 .popup { position: fixed; bottom: 0; padding: 10px; left: 0; background: lightgray; width: 100%; }
 #list { padding: 10px; }
 #toron { width: 100%; }
@@ -45,4 +45,6 @@ blockquote { background-image: url(/views/acme/img/quote.png); background-positi
 #origin { display: none; }
 .all_in_data { display: block; width: 100%; }
 .table_safe { max-width: 100%; }
-.change_space { white-space: pre; }
+.change_space { white-space: pre-line; }
+div#topic_scroll { max-height: 500px; overflow: scroll; -ms-overflow-style: none; scrollbar-width: none; }
+div#topic_scroll::-webkit-scrollbar { display: none; }
