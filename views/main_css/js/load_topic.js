@@ -14,7 +14,7 @@ function topic_list_load(topic_num, s_num, where) {
             
             for(key in t_data) {
                 n_data += t_data[key]['data'];
-                t_plus_data += t_data[key]['plus_data'].replace(/<script>/g, '').replace(/<\/script>/g, '');
+                t_plus_data += t_data[key]['plus_data'];
             }
 
             o_data.innerHTML = n_data;
@@ -43,7 +43,7 @@ function topic_plus_load(topic_num, num) {
                     n_data += t_data[key]['data'];
                     n_num = key;
 
-                    t_plus_data += t_data[key]['plus_data'].replace(/<script>/g, '').replace(/<\/script>/g, '');
+                    t_plus_data += t_data[key]['plus_data'];
                 }
 
                 p_data.innerHTML += n_data;
@@ -90,7 +90,7 @@ function topic_main_load(topic_num, s_num) {
                 n_data += t_data[key]['data'];
                 num = key;
 
-                t_plus_data += t_data[key]['plus_data'].replace(/<script>/g, '').replace(/<\/script>/g, '');
+                t_plus_data += t_data[key]['plus_data'];
             }
 
             o_data.innerHTML = n_data;
@@ -125,7 +125,7 @@ function topic_top_load(topic_num) {
                 n_data += t_data[key]['data'];
                 num = key;
 
-                t_plus_data += t_data[key]['plus_data'].replace(/<script>/g, '').replace(/<\/script>/g, '');
+                t_plus_data += t_data[key]['plus_data'];
             }
 
             o_data.innerHTML = n_data;

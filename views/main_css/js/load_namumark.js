@@ -64,15 +64,11 @@ function load_include(title, name, p_data) {
                 document.getElementsByClassName(name)[0].id = "not_thing";
             } else {
                 var o_p_data = JSON.parse(this.responseText);
+                
                 var g_data = o_p_data['data'];
-
                 o_data.innerHTML = g_data;
 
-                js_data = o_p_data['js_data'];
-                js_data = js_data.replace(/<script>/g, '');
-                js_data = js_data.replace(/<\/script>/g, '\n');
-
-                eval(js_data);
+                eval(o_p_data['js_data']);
             }
         }
     }
