@@ -57,7 +57,10 @@ def edit_req_2(conn, name):
             leng = leng_check(len(flask.request.form.get('otent', '')), len(content))
 
             if section:
-                content = old[0][0].replace(flask.request.form.get('otent', ''), content)
+                content = old[0][0].replace(
+                    flask.request.form.get('otent', '').replace('\r\n', '\n'), 
+                    content.replace('\r\n', '\n')
+                )
         else:
             leng = '+' + str(len(content))
 
@@ -121,7 +124,7 @@ def edit_req_2(conn, name):
         data_old = data
         get_name = ''
 
-        save_button = load_lang('edit_req') if not get_ver else load_lang('edit_req_check')
+        save_button = load_lang('edit_req') if not get_ver else load_lang('accept_edit_request')
         menu_plus = [[]]
         sub = load_lang('edit_req')
         disable = '' if not get_ver else 'disabled'

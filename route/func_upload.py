@@ -48,20 +48,16 @@ def func_upload_2(conn):
         ip = ip_check()
 
         if flask.request.form.get('f_lice_sel', 'direct_input') == 'direct_input':
-            if flask.request.form.get('f_lice', None):
-                lice = flask.request.form.get('f_lice', None)
+            lice = flask.request.form.get('f_lice', None) + '[br][br]'
+            if ip_or_user(ip) != 0:
+                lice += ip
             else:
-                if ip_or_user(ip) != 0:
-                    lice = ip
-                else:
-                    lice = '[[user:' + ip + ']]'
+                lice += '[[user:' + ip + ']]'
 
             lice += '[[category:direct_input]]'
         else:
             lice = flask.request.form.get('f_lice_sel', None)
-            if flask.request.form.get('f_lice', None):
-                lice += ' : '  + flask.request.form.get('f_lice', None)
-
+            lice += '[br][br]'  + flask.request.form.get('f_lice', None)
             lice += '[[category:' + re.sub('\]', '_', flask.request.form.get('f_lice_sel', None)) + ']]'
 
         if os.path.exists(os.path.join(app_var['path_data_image'], e_data)):
@@ -109,7 +105,7 @@ def func_upload_2(conn):
 
         return easy_minify(flask.render_template(skin_check(),
             imp = [load_lang('upload'), wiki_set(), custom(), other2([0, 0])],
-            data =  '''
+            data = '''
                 <a href="/file_filter">(''' + load_lang('file_filter_list') + ''')</a>
                 <hr class=\"main_hr\">
                 ''' + load_lang('max_file_size') + ''' : ''' + wiki_set(3) + '''MB
@@ -117,13 +113,13 @@ def func_upload_2(conn):
                 <form method="post" enctype="multipart/form-data" accept-charset="utf8">
                     <input type="file" name="f_data">
                     <hr class=\"main_hr\">
-                    <input placeholder="''' + load_lang('file_name') + '''" name="f_name" type="text" value="''' + flask.request.args.get('name', '') + '''">
+                    <input placeholder="''' + load_lang('file_name') + '''" name="f_name" value="''' + flask.request.args.get('name', '') + '''">
                     <hr class=\"main_hr\">
                     <select name="f_lice_sel">
                         ''' + license_list + '''
                     </select>
                     <hr class=\"main_hr\">
-                    <input placeholder="''' + load_lang('license') + '''" name="f_lice" type="text">
+                    <textarea rows="10" placeholder="''' + load_lang('other') + '''" name="f_lice"></textarea>
                     <hr class=\"main_hr\">
                     ''' + captcha_get() + '''
                     <button id="save" type="submit">''' + load_lang('save') + '''</button>

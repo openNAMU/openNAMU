@@ -43,10 +43,12 @@ def edit_delete_2(conn, name, app_var):
         file_check = re.search('^file:(.+)\.(.+)$', name)
         if file_check:
             file_check = file_check.groups()
-            os.remove(os.path.join(
-                app_var['path_data_image'],
-                sha224_replace(file_check[0], 'utf-8') + '.' + file_check[1]
-            ))
+            file_directory = os.path.join(
+                app_var['path_data_image'], 
+                sha224_replace(file_check[0]) + '.' + file_check[1]
+            )
+            if os.path.exists(file_directory):
+                os.remove(file_directory)
 
         curs.execute(db_change('select data from other where name = "count_all_title"'))
         curs.execute(db_change("update other set data = ? where name = 'count_all_title'"), [str(int(curs.fetchall()[0][0]) - 1)])

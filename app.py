@@ -29,6 +29,9 @@ while 1:
                 print('----')
                 raise
         else:
+            print('DB name : ' + set_data['db'])
+            print('DB type : ' + set_data['db_type'])
+
             break
     except:
         if os.getenv('NAMU_DB') != None or os.getenv('NAMU_DB_TYPE') != None:
@@ -37,12 +40,15 @@ while 1:
                 "db_type" : os.getenv('NAMU_DB_TYPE') if os.getenv('NAMU_DB_TYPE') else 'sqlite'
             }
 
+            print('DB name : ' + set_data['db'])
+            print('DB type : ' + set_data['db_type'])
+
             break
         else:
             new_json = ['', '']
             normal_db_type = ['sqlite', 'mysql']
 
-            print('DB type (sqlite, mysql) : ', end = '')
+            print('DB type (sqlite) [sqlite, mysql] : ', end = '')
             new_json[0] = str(input())
             if new_json[0] == '' or not new_json[0] in normal_db_type:
                 new_json[0] = 'sqlite'
@@ -53,8 +59,8 @@ while 1:
                 if f_src:
                     all_src += [f_src.groups()[0]]
 
-            if all_src != []:
-                print('DB name (' + ', '.join(all_src) + ') : ', end = '')
+            if all_src != [] and new_json[0] != 'mysql':
+                print('DB name (data) [' + ', '.join(all_src) + '] : ', end = '')
             else:
                 print('DB name (data) : ', end = '')
 
@@ -68,9 +74,6 @@ while 1:
             set_data = json.loads(open('data/set.json').read())
 
             break
-
-print('DB name : ' + set_data['db'])
-print('DB type : ' + set_data['db_type'])
 
 db_data_get(set_data['db_type'])
 
@@ -115,31 +118,7 @@ else:
     conn = sqlite3.connect(set_data['db'] + '.db', check_same_thread = False)
     curs = conn.cursor()
 
-if os.path.exists(set_data['db'] + '.db'):
-    setup_tool = 0
-else:
-    setup_tool = 1
-
 load_conn(conn)
-
-logging.basicConfig(level = logging.ERROR)
-
-app = flask.Flask(__name__, template_folder = './')
-app.config['JSON_AS_ASCII'] = False
-
-flask_reggie.Reggie(app)
-
-compress = flask_compress.Compress()
-compress.init_app(app)
-
-class EverythingConverter(werkzeug.routing.PathConverter):
-    regex = '.*?'
-
-app.jinja_env.filters['md5_replace'] = md5_replace
-app.jinja_env.filters['load_lang'] = load_lang
-app.jinja_env.filters['cut_100'] = cut_100
-
-app.url_map.converters['everything'] = EverythingConverter
 
 create_data = {}
 create_data['all_data'] = [
@@ -165,6 +144,7 @@ create_data['all_data'] = [
     'inter',
     'html_filter',
     'oauth_conn',
+    'user_application'
 ]
 for i in create_data['all_data']:
     try:
@@ -175,25 +155,26 @@ for i in create_data['all_data']:
         except:
             curs.execute(db_change("alter table " + i + " add test longtext default ''"))
 
-if setup_tool == 0:
-    try:
-        curs.execute(db_change('select data from other where name = "ver"'))
-        ver_set_data = curs.fetchall()
-        if not ver_set_data:
+setup_tool = 0
+try:
+    curs.execute(db_change('select data from other where name = "ver"'))
+    ver_set_data = curs.fetchall()
+    if not ver_set_data:
+        setup_tool = 2
+    else:
+        if int(version_list['master']['c_ver']) > int(ver_set_data[0][0]):
             setup_tool = 1
-        else:
-            if version_list['master']['c_ver'] > ver_set_data[0][0]:
-                setup_tool = 1
-    except:
-        setup_tool = 1
+except:
+    setup_tool = 2
 
 if setup_tool != 0:
     create_data['data'] = ['title', 'data']
-    create_data['cache_data'] = ['title', 'data']
+    create_data['cache_data'] = ['title', 'data', 'id']
     create_data['history'] = ['id', 'title', 'data', 'date', 'ip', 'send', 'leng', 'hide', 'type']
     create_data['rd'] = ['title', 'sub', 'date', 'band', 'stop', 'agree']
     create_data['user'] = ['id', 'pw', 'acl', 'date', 'encode']
     create_data['user_set'] = ['name', 'id', 'data']
+    create_data['user_application'] = ['id', 'pw', 'date', 'encode', 'question', 'answer', 'ip', 'ua', 'token', 'email']
     create_data['ban'] = ['block', 'end', 'why', 'band', 'login']
     create_data['topic'] = ['id', 'title', 'sub', 'data', 'date', 'ip', 'block', 'top', 'code']
     create_data['rb'] = ['block', 'end', 'today', 'blocker', 'why', 'band']
@@ -223,12 +204,37 @@ if setup_tool != 0:
             except:
                 pass
 
-    update()
+    if setup_tool == 1:
+        update(int(ver_set_data[0][0]))
+    else:
+        set_init()
+
+curs.execute(db_change('delete from other where name = "ver"'))
+curs.execute(db_change('insert into other (name, data) values ("ver", ?)'), [version_list['master']['c_ver']])
+conn.commit()
 
 # Init
+logging.basicConfig(level = logging.ERROR)
+
+app = flask.Flask(__name__, template_folder = './')
+app.config['JSON_AS_ASCII'] = False
+
+flask_reggie.Reggie(app)
+
+compress = flask_compress.Compress()
+compress.init_app(app)
+
+class EverythingConverter(werkzeug.routing.PathConverter):
+    regex = '.*?'
+
+app.jinja_env.filters['md5_replace'] = md5_replace
+app.jinja_env.filters['load_lang'] = load_lang
+app.jinja_env.filters['cut_100'] = cut_100
+
+app.url_map.converters['everything'] = EverythingConverter
+
 curs.execute(db_change('select name from alist where acl = "owner"'))
 if not curs.fetchall():
-    curs.execute(db_change('delete from alist where name = "owner"'))
     curs.execute(db_change('insert into alist (name, acl) values ("owner", "owner")'))
 
 if not os.path.exists(app_var['path_data_image']):
@@ -273,9 +279,6 @@ if not adsense_result:
     curs.execute(db_change('insert into other (name, data) values ("adsense", "False")'))
     curs.execute(db_change('insert into other (name, data) values ("adsense_code", "")'))
 
-curs.execute(db_change('delete from other where name = "ver"'))
-curs.execute(db_change('insert into other (name, data) values ("ver", ?)'), [version_list['master']['c_ver']])
-
 if set_data['db_type'] == 'sqlite':
     def back_up():
         print('----')
@@ -315,11 +318,17 @@ if set_data['db_type'] == 'mysql':
 
     mysql_dont_off()
 
+
 curs.execute(db_change('select data from other where name = "count_all_title"'))
 if not curs.fetchall():
     curs.execute(db_change('insert into other (name, data) values ("count_all_title", "0")'))
 
 conn.commit()
+
+if os.path.exists('custom.py'):
+    from custom import custom_run
+
+    custom_run(conn, app)
 
 # Func
 @app.route('/del_alarm')
@@ -364,6 +373,10 @@ def list_acl():
 def give_admin_groups(name = None):
     return give_admin_groups_2(conn, name)
 
+@app.route('/delete_admin_group/<name>', methods=['POST', 'GET'])
+def delete_admin_group(name = None):
+    return delete_admin_group_2(conn, name)
+
 @app.route('/admin_list')
 def list_admin():
     return list_admin_2(conn)
@@ -395,10 +408,6 @@ def server_restart():
 @app.route('/update', methods=['GET', 'POST'])
 def server_now_update():
     return server_now_update_2(conn, version_list['master']['r_ver'])
-
-@app.route('/oauth_setting', methods=['GET', 'POST'])
-def setting_oauth():
-    return setting_oauth_2(conn)
 
 @app.route('/adsense_setting', methods=['GET', 'POST'])
 def setting_adsense():
@@ -628,6 +637,14 @@ def main_image_view(name = None):
 def main_skin_set():
     return main_skin_set_2(conn)
 
+@app.route('/application_submitted')
+def application_submitted():
+    return application_submitted_2(conn)
+
+@app.route('/applications', methods = ['POST', 'GET'])
+def applications():
+    return applications_2(conn)
+
 # API
 @app.route('/api/w/<everything:name>', methods=['POST', 'GET'])
 def api_w(name = ''):
@@ -670,6 +687,10 @@ def api_recent_change():
 def api_sha224(name = 'test'):
     return api_sha224_2(conn, name)
 
+@app.route('/api/image/<name>')
+def api_image_view(name = ''):
+    return api_image_view_2(conn, name, app_var)
+
 # File
 @app.route('/views/<everything:name>')
 def main_views(name = None):
@@ -689,7 +710,21 @@ app.wsgi_app = werkzeug.debug.DebuggedApplication(app.wsgi_app, True)
 app.debug = True
 
 if __name__ == "__main__":
-    http_server = tornado.httpserver.HTTPServer(tornado.wsgi.WSGIContainer(app))
-    http_server.listen(server_set['port'], address = server_set['host'])
+    try:
+        http_server = tornado.httpserver.HTTPServer(tornado.wsgi.WSGIContainer(app))
+        http_server.listen(server_set['port'], address = server_set['host'])
 
-    tornado.ioloop.IOLoop.instance().start()
+        tornado.ioloop.IOLoop.instance().start()
+    except Exception as e:
+        if sys.platform == 'win32':
+            try:
+                asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+                tornado.ioloop.IOLoop.instance().start()
+            except Exception as e:
+                print('----')
+                print(e)
+                raise
+        else:
+            print('----')
+            print(e)
+            raise

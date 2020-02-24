@@ -24,7 +24,14 @@ def api_w_2(conn, name):
                         category_re = re.compile('\[\[(?:(?:category|분류):(?:(?!\[\[|\]\]).)+)\]\]', re.I)
 
                         json_data = include_re.sub('', data[0][0])
-                        json_data = category_re.sub('', json_data, )
+                        json_data = category_re.sub('', json_data)
+
+                        get_all_change = re.findall('(@(?:[^@]*)@),([^,]*),', flask.request.args.get('change', ''))
+                        for i in get_all_change:
+                            json_data = json_data.replace(
+                                i[0].replace('<amp>', '&'), 
+                                i[1].replace('<amp>', '&').replace('<comma>', ',')
+                            )
 
                         g_data = render_set(title = name, data = json_data, num = 2, include = flask.request.args.get('include', 'include_1'))
                     else:

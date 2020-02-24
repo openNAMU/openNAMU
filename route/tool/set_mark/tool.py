@@ -9,7 +9,6 @@ def get_time():
 
 def db_data_get(data):
     global set_data
-
     set_data = data
 
 def db_change(data):
@@ -26,38 +25,23 @@ def ip_check(d_type = 0):
         ip = flask.session['id']
     
     if ip == '':
-        ip = flask.request.environ.get('HTTP_X_REAL_IP', flask.request.environ.get('HTTP_X_FORWARDED_FOR', flask.request.remote_addr))
+        try:
+            ip = flask.request.environ.get('HTTP_X_REAL_IP', flask.request.environ.get('HTTP_X_FORWARDED_FOR', flask.request.remote_addr))
+            ip = ip[0] if type(ip) == type([]) else ip
 
-        if ip == '::1' or ip == '127.0.0.1':
-            ip = flask.request.environ.get('HTTP_X_FORWARDED_FOR', flask.request.remote_addr)
+            if ip == '::1' or ip == '127.0.0.1':
+                ip = flask.request.environ.get('HTTP_X_FORWARDED_FOR', flask.request.remote_addr)
+                ip = ip[0] if type(ip) == type([]) else ip
+        except:
+            ip = 'error:ip'
 
     return str(ip)
-
-def link_fix(main_link):
-    if re.search('^:', main_link):
-        main_link = re.sub('^:', '', main_link)
-
-    main_link = re.sub('^사용자:', 'user:', main_link)
-    main_link = re.sub('^파일:', 'file:', main_link)
-    main_link = re.sub('^분류:', 'category:', main_link)
-
-    other_link = re.search('[^\\\\]?(#[^#]+)$', main_link)
-    if other_link:
-        other_link = other_link.groups()[0]
-
-        main_link = re.sub('(#[^#]+)$', '', main_link)
-    else:
-        other_link = ''
-
-    main_link = re.sub('\\\\#', '%23', main_link)
-
-    return [main_link, other_link]
 
 def savemark(data):
     data = re.sub("\[date\(now\)\]", get_time(), data)
 
     ip = ip_check()
-    if not re.search("\.", ip):
+    if not re.search("\.|:", ip):
         name = '[[user:' + ip + '|' + ip + ']]'
     else:
         name = ip

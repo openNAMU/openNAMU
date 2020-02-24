@@ -1,9 +1,12 @@
+import time
 from route.tool.func import *
+
+version_list = json.loads(open('version.json', encoding='utf8').read())
 
 # DB
 while 1:
     try:
-        set_data = json.loads(open('data/set.json').read())
+        set_data = json.loads(open('data/set.json', encoding='utf8').read())
         if not 'db_type' in set_data:
             try:
                 os.remove('data/set.json')
@@ -12,6 +15,9 @@ while 1:
                 print('----')
                 raise
         else:
+            print('DB name : ' + set_data['db'])
+            print('DB type : ' + set_data['db_type'])
+
             break
     except:
         if os.getenv('NAMU_DB') != None or os.getenv('NAMU_DB_TYPE') != None:
@@ -20,12 +26,15 @@ while 1:
                 "db_type" : os.getenv('NAMU_DB_TYPE') if os.getenv('NAMU_DB_TYPE') else 'sqlite'
             }
 
+            print('DB name : ' + set_data['db'])
+            print('DB type : ' + set_data['db_type'])
+
             break
         else:
             new_json = ['', '']
             normal_db_type = ['sqlite', 'mysql']
 
-            print('DB type (sqlite, mysql) : ', end = '')
+            print('DB type (sqlite) [sqlite, mysql] : ', end = '')
             new_json[0] = str(input())
             if new_json[0] == '' or not new_json[0] in normal_db_type:
                 new_json[0] = 'sqlite'
@@ -36,8 +45,8 @@ while 1:
                 if f_src:
                     all_src += [f_src.groups()[0]]
 
-            if all_src != []:
-                print('DB name (' + ', '.join(all_src) + ') : ', end = '')
+            if all_src != [] and new_json[0] != 'mysql':
+                print('DB name (data) [' + ', '.join(all_src) + '] : ', end = '')
             else:
                 print('DB name (data) : ', end = '')
 
@@ -45,21 +54,18 @@ while 1:
             if new_json[1] == '':
                 new_json[1] = 'data'
 
-            with open('data/set.json', 'w') as f:
+            with open('data/set.json', 'w', encoding='utf8') as f:
                 f.write('{ "db" : "' + new_json[1] + '", "db_type" : "' + new_json[0] + '" }')
 
-            set_data = json.loads(open('data/set.json').read())
+            set_data = json.loads(open('data/set.json', encoding='utf8').read())
 
             break
-
-print('DB name : ' + set_data['db'])
-print('DB type : ' + set_data['db_type'])
 
 db_data_get(set_data['db_type'])
 
 if set_data['db_type'] == 'mysql':
     try:
-        set_data_mysql = json.loads(open('data/mysql.json').read())
+        set_data_mysql = json.loads(open('data/mysql.json', encoding='utf8').read())
     except:
         new_json = ['', '']
 
@@ -75,10 +81,10 @@ if set_data['db_type'] == 'mysql':
             if new_json[1] != '':
                 break
 
-        with open('data/mysql.json', 'w') as f:
+        with open('data/mysql.json', 'w', encoding='utf8') as f:
             f.write('{ "user" : "' + new_json[0] + '", "password" : "' + new_json[1] + '" }')
 
-        set_data_mysql = json.loads(open('data/mysql.json').read())
+        set_data_mysql = json.loads(open('data/mysql.json', encoding='utf8').read())
 
     conn = pymysql.connect(
         host = 'localhost',
@@ -100,6 +106,96 @@ else:
 
 load_conn(conn)
 
+create_data = {}
+create_data['all_data'] = [
+    'data',
+    'cache_data',
+    'history',
+    'rd',
+    'user',
+    'user_set',
+    'ban',
+    'topic',
+    'rb',
+    'back',
+    'custom',
+    'other',
+    'alist',
+    're_admin',
+    'alarm',
+    'ua_d',
+    'filter',
+    'scan',
+    'acl',
+    'inter',
+    'html_filter',
+    'oauth_conn',
+    'user_application'
+]
+for i in create_data['all_data']:
+    try:
+        curs.execute(db_change('select test from ' + i + ' limit 1'))
+    except:
+        try:
+            curs.execute(db_change('create table ' + i + '(test longtext)'))
+        except:
+            curs.execute(db_change("alter table " + i + " add test longtext default ''"))
+
+setup_tool = 0
+try:
+    curs.execute(db_change('select data from other where name = "ver"'))
+    ver_set_data = curs.fetchall()
+    if not ver_set_data:
+        setup_tool = 1
+    else:
+        if int(version_list['master']['c_ver']) > int(ver_set_data[0][0]):
+            setup_tool = 1
+except:
+    setup_tool = 1
+
+if setup_tool != 0:
+    create_data['data'] = ['title', 'data']
+    create_data['cache_data'] = ['title', 'data']
+    create_data['history'] = ['id', 'title', 'data', 'date', 'ip', 'send', 'leng', 'hide', 'type']
+    create_data['rd'] = ['title', 'sub', 'date', 'band', 'stop', 'agree']
+    create_data['user'] = ['id', 'pw', 'acl', 'date', 'encode']
+    create_data['user_set'] = ['name', 'id', 'data']
+    create_data['user_application'] = ['id', 'pw', 'date', 'encode', 'question', 'answer', 'ip', 'ua', 'token', 'email']
+    create_data['ban'] = ['block', 'end', 'why', 'band', 'login']
+    create_data['topic'] = ['id', 'title', 'sub', 'data', 'date', 'ip', 'block', 'top', 'code']
+    create_data['rb'] = ['block', 'end', 'today', 'blocker', 'why', 'band']
+    create_data['back'] = ['title', 'link', 'type']
+    create_data['custom'] = ['user', 'css']
+    create_data['other'] = ['name', 'data', 'coverage']
+    create_data['alist'] = ['name', 'acl']
+    create_data['re_admin'] = ['who', 'what', 'time']
+    create_data['alarm'] = ['name', 'data', 'date']
+    create_data['ua_d'] = ['name', 'ip', 'ua', 'today', 'sub']
+    create_data['filter'] = ['name', 'regex', 'sub']
+    create_data['scan'] = ['user', 'title']
+    create_data['acl'] = ['title', 'decu', 'dis', 'view', 'why']
+    create_data['inter'] = ['title', 'link', 'icon']
+    create_data['html_filter'] = ['html', 'kind', 'plus']
+    create_data['oauth_conn'] = ['provider', 'wiki_id', 'sns_id', 'name', 'picture']
+
+    for create_table in create_data['all_data']:
+        for create in create_data[create_table]:
+            try:
+                curs.execute(db_change('select ' + create + ' from ' + create_table + ' limit 1'))
+            except:
+                curs.execute(db_change("alter table " + create_table + " add " + create + " longtext default ''"))
+
+            try:
+                curs.execute(db_change('create index index_' + create_table + '_' + create + ' on ' + create_table + '(' + create + ')'))
+            except:
+                pass
+
+    update()
+
+curs.execute(db_change('delete from other where name = "ver"'))
+curs.execute(db_change('insert into other (name, data) values ("ver", ?)'), [version_list['master']['c_ver']])
+conn.commit()
+
 # Main
 print('----')
 print('1. Backlink reset')
@@ -120,19 +216,44 @@ print('Select : ', end = '')
 what_i_do = input()
 
 if what_i_do == '1':
-    curs.execute(db_change("delete from back"))
-    conn.commit()
+    print('----')
+    print('All delete (Y) [Y, N] : ', end = '')
+    go_num = input()
+    if not go_num == 'N':
+        curs.execute(db_change("delete from back"))
+        conn.commit()
 
-    curs.execute(db_change("select title, data from data"))
-    data = curs.fetchall()
+    print('----')
+    print('Count (100) : ', end = '')
+    try:
+        go_num = int(input())
+    except:
+        go_num = 100
+
     num = 0
 
-    for test in data:
-        num += 1
-        if num % 100 == 0:
-            print(num)
+    print('----')
+    print('Load...')
 
-        render_do(test[0], test[1], 1, None)
+    curs.execute(db_change("select title from data d where not exists (select title from back where link = d.title)"))
+    title = curs.fetchall()
+
+    print('----')
+    print('Rest : ' + str(len(title)))
+    time.sleep(1)
+    print('----')
+
+    for name in title:
+        num += 1
+        if num % go_num == 0:
+            print(str(num) + ' : ' + name[0])
+
+        if num % 100 == 0:
+            conn.commit()
+
+        curs.execute(db_change("select data from data where title = ?"), [name[0]])
+        data = curs.fetchall()
+        render_do(name[0], data[0][0], 3, None)
 elif what_i_do == '2':
     curs.execute(db_change("delete from other where name = 'recaptcha'"))
     curs.execute(db_change("delete from other where name = 'sec_re'"))

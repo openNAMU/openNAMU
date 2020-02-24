@@ -19,14 +19,8 @@ function load_preview(name) {
     xhr.onreadystatechange = function() {
         if(xhr.readyState === 4 && xhr.status === 200) {
             var o_p_data = JSON.parse(xhr.responseText);
-
             p_data.innerHTML = o_p_data['data'];
-
-            js_data = o_p_data['js_data'];
-            js_data = js_data.replace(/<script>/g, '');
-            js_data = js_data.replace(/<\/script>/g, '\n');
-
-            eval(js_data)
+            eval(o_p_data['js_data'])
         }
     }
 }
