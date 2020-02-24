@@ -70,4 +70,4 @@ def render_do(title, data, num, include):
     if num == 2:
         return [data[0], data[1]]
     else:
-        return data[0] + data[1]
+        return data[0] + '<script>' + data[1] + '</script>'
