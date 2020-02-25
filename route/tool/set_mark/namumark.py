@@ -82,24 +82,24 @@ def table_parser(data, cel_data, start_data, num = 0):
             row = 'rowspan="' + re.sub('^(\^|v)?\|', '', in_state) + '"'
         elif re.search("^row ?bgcolor=([^=]+)$", in_state):
             table_data = re.sub('^row ?bgcolor=', '', in_state)
-            row_style += 'background: ' + re.sub(',([^,]*)', '', table_data) if re.search(',', table_data) else table_data + ';'
+            row_style += 'background: ' + (re.sub(',([^,]*)', '', table_data) if re.search(',', table_data) else table_data) + ';'
         elif re.search("^row ?color=([^=]+)$", in_state):
             table_data = re.sub('^row ?color=', '', in_state)
-            row_style += 'color: ' + re.sub(',([^,]*)', '', table_data) if re.search(',', table_data) else table_data + ';'
+            row_style += 'color: ' + (re.sub(',([^,]*)', '', table_data) if re.search(',', table_data) else table_data) + ';'
         elif re.search("^table ?bordercolor=([^=]+)$", in_state):
             table_data = re.sub('^table ?bordercolor=', '', in_state)
-            all_table += 'border: ' + re.sub(',([^,]*)', '', table_data) if re.search(',', table_data) else table_data + ' 2px solid;'
+            all_table += 'border: ' + (re.sub(',([^,]*)', '', table_data) if re.search(',', table_data) else table_data) + ' 2px solid;'
         elif re.search("^table ?bgcolor=([^=]+)$", in_state):
             table_data = re.sub('^table ?bgcolor=', '', in_state)
-            all_table += 'background: ' + re.sub(',([^,]*)', '', table_data) if re.search(',', table_data) else table_data + ';'
+            all_table += 'background: ' + (re.sub(',([^,]*)', '', table_data) if re.search(',', table_data) else table_data) + ';'
         elif re.search("^table ?color=([^=]+)$", in_state):
             table_data = re.sub('^table ?color=', '', in_state)
-            all_table += 'color: ' + re.sub(',([^,]*)', '', table_data) if re.search(',', table_data) else table_data + ';'
+            all_table += 'color: ' + (re.sub(',([^,]*)', '', table_data) if re.search(',', table_data) else table_data) + ';'
         elif re.search("^(bgcolor=([^=]+)|#(?:[0-9a-f-A-F]{3}){1,2}|\w+)$", in_state):
             cel_style += 'background: ' + re.sub('^bgcolor=', '', in_state) + ';'
         elif re.search("^color=([^=]+)$", in_state):
             table_data = re.sub('^color=', '', in_state)
-            cel_style += 'color: ' + re.sub(',([^,]*)', '', table_data) if re.search(',', table_data) else table_data + ';'
+            cel_style += 'color: ' + (re.sub(',([^,]*)', '', table_data) if re.search(',', table_data) else table_data) + ';'
         elif re.search("^width=([^=]+)$", in_state):
             table_data = re.sub('^width=', '', in_state)
             cel_style += 'width: ' + ((table_data + 'px') if re.search('^[0-9]+$', table_data) else table_data) + ';'
