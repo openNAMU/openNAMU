@@ -10,7 +10,7 @@ def watch_list_name_2(conn, name):
     curs.execute(db_change("select count(title) from scan where user = ?"), [ip])
     count = curs.fetchall()
     if count and count[0][0] > 9:
-        return redirect('/watch_list')
+        return re_error('/error/28')
 
     curs.execute(db_change("select title from scan where user = ? and title = ?"), [ip, name])
     if curs.fetchall():

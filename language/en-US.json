@@ -338,6 +338,7 @@
         "sqlite_only" : "SQLite only",
         "approval_question_visible_only_when_approval_on" : "Approval questions are visible only when approval requirement is on",
         "oauth_explain" : "To use the OAuth login feature, you must set the 'publish_url' value to a domain address that includes the HTTPS protocol, and actually support HTTPS connections.",
+        "msg_whatchlist_lmt": "You can add as many as",
         "_comment_3.1_" : "Error",
             "update_error" : "Auto update is not supported.",
             "inter_error" : "Internal error.",
@@ -367,5 +368,6 @@
             "fast_edit_error" : "You can edit another document after this period (Second(s)) : ",
             "too_many_dec_error" : "This feature is not supported because there are too many documents.",
             "application_not_found" : "Application not found",
-            "invalid_password_error" : "The Password or ID is invalid."
+            "invalid_password_error" : "The Password or ID is invalid.",
+            "watchlist_overflow_error": "You cannot add more than ten documents."
 }
