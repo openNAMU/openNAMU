@@ -18,6 +18,7 @@ def give_user_check_2(conn, name):
     else:
         sql_num = 0
 
+    div = ''
     if ip_or_user(name) == 0:
         curs.execute(db_change("select data from user_set where name = \"approval_question\" and id = ?"), [name])
         approval_question = curs.fetchall()
@@ -38,8 +39,6 @@ def give_user_check_2(conn, name):
                     </table>
                     <hr class=\"main_hr\">
                 '''
-    else:
-        div = ''
 
     if flask.request.args.get('plus', None):
         end_check = 1
@@ -65,7 +64,7 @@ def give_user_check_2(conn, name):
     record = curs.fetchall()
     if record:
         if not flask.request.args.get('plus', None):
-            div = '<a href="/manager/14?plus=' + url_pas(name) + '">(' + load_lang('compare') + ')</a><hr class=\"main_hr\">'
+            div = '<a href="/manager/14?plus=' + url_pas(name) + '">(' + load_lang('compare') + ')</a><hr class=\"main_hr\">' + div
         else:
             div = '<a href="/check/' + url_pas(name) + '">(' + name + ')</a> <a href="/check/' + url_pas(flask.request.args.get('plus', None)) + '">(' + flask.request.args.get('plus', None) + ')</a><hr class=\"main_hr\">' + div
 
