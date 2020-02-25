@@ -883,6 +883,9 @@ def acl_check(name = 'test', tool = '', sub = 'test'):
 
         acl_data = curs.fetchall()
         if acl_data and acl_data[0][0] != 'normal':
+            if acl_data[0][0] == 'all':
+                return 1
+
             if acl_data[0][0] == 'user':
                 if ip_or_user(ip) == 1:
                     return 1
