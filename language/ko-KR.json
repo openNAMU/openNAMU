@@ -343,5 +343,6 @@
     "blocked_user" : "차단된 사용자",
     "blocked_admin" : "차단한 관리자",
     "invalid_password_error" : "비밀번호 또는 아이디가 없습니다.",
-    "accept_edit_request": "편집 요청 승인"
+    "accept_edit_request": "편집 요청 승인",
+    "msg_whatchlist_lmt": "다음 개수만큼 추가할 수 있습니다"
 }
