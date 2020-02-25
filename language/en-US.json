@@ -97,6 +97,7 @@
         "view" : "View",
         "content" : "Content",
         "off" : "Off",
+        "unset" : "Unset",
         "delete_admin_group": "Delete admin group",
         "_comment_1.1_" : "Time",
             "second" : "Second(s)",
