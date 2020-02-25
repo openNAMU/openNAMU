@@ -813,7 +813,7 @@ def acl_check(name = 'test', tool = '', sub = 'test'):
     if ban_check() == 1:
         return 1
 
-    if tool != 'topic' and tool != 'render' and name:
+    if tool == '' and tool != 'render' and name:
         acl_c = re.search("^user:((?:(?!\/).)*)", name)
         if acl_c:
             acl_n = acl_c.groups()
