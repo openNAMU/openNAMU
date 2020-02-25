@@ -3,7 +3,7 @@ from .tool.func import *
 def watch_list_2(conn):
     curs = conn.cursor()
 
-    div = 'Limit : 10<hr class=\"main_hr\">'
+    div = load_lang("msg_whatchlist_lmt") + ': 10 <hr class=\"main_hr\">'
     ip = ip_check()
 
     if ip_or_user(ip) != 0:
