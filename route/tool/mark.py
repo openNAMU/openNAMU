@@ -56,13 +56,8 @@ def render_do(title, data, num, include):
         if data[2] == []:
             curs.execute(db_change("insert into back (title, link, type) values ('test', ?, 'nothing')"), [title])
         else:
-            for data_in in data[2]:
-                try:
-                    curs.execute(db_change("insert into back (title, link, type) values (?, ?, ?)"), [data_in[1], data_in[0], data_in[2]])
-                except:
-                    pass
-
-                curs.execute(db_change("delete from back where title = ? and type = 'no'"), [title])
+            curs.executemany(db_change("insert into back (link, title, type) values (?, ?, ?)"), data[2])
+            curs.execute(db_change("delete from back where title = ? and type = 'no'"), [title])
 
         if back_num != 3:
             conn.commit()
