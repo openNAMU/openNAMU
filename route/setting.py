@@ -202,6 +202,7 @@ def setting_2(conn, num):
             'contract',
             'no_login_warring',
             'edit_bottom_text',
+            'copyright_checkbox_text',
             'check_key_text',
             'email_title',
             'email_text',
@@ -210,8 +211,8 @@ def setting_2(conn, num):
             'reset_user_text',
             'error_401',
             'error_404',
-            'edit_help',
-            'approval_question'
+            'approval_question',
+            'edit_help'
         ]
         if flask.request.method == 'POST':
             for i in i_list:
@@ -255,44 +256,48 @@ def setting_2(conn, num):
                         <span>''' + load_lang('edit_bottom_text') + ''' (HTML)</span>
                         <hr class=\"main_hr\">
                         <input name="''' + i_list[2] + '''" value="''' + html.escape(d_list[2]) + '''">
-                        <hr>
-                        <span>''' + load_lang('check_key_text') + ''' (HTML)</span>
+                        <hr class=\"main_hr\">
+                        <span>''' + load_lang('copyright_checkbox_text') + ''' (HTML)</span>
                         <hr class=\"main_hr\">
                         <input name="''' + i_list[3] + '''" value="''' + html.escape(d_list[3]) + '''">
-                        <hr>
-                        <span>''' + load_lang('email_title') + '''</span>
+                        <hr class=\"main_hr\">
+                        <span>''' + load_lang('check_key_text') + ''' (HTML)</span>
                         <hr class=\"main_hr\">
                         <input name="''' + i_list[4] + '''" value="''' + html.escape(d_list[4]) + '''">
-                        <hr>
-                        <span>''' + load_lang('email_text') + '''</span>
+                        <hr class=\"main_hr\">
+                        <span>''' + load_lang('email_title') + '''</span>
                         <hr class=\"main_hr\">
                         <input name="''' + i_list[5] + '''" value="''' + html.escape(d_list[5]) + '''">
-                        <hr>
-                        <span>''' + load_lang('email_insert_text') + '''</span>
+                        <hr class=\"main_hr\">
+                        <span>''' + load_lang('email_text') + '''</span>
                         <hr class=\"main_hr\">
                         <input name="''' + i_list[6] + '''" value="''' + html.escape(d_list[6]) + '''">
-                        <hr>
-                        <span>''' + load_lang('password_search_text') + '''</span>
+                        <hr class=\"main_hr\">
+                        <span>''' + load_lang('email_insert_text') + '''</span>
                         <hr class=\"main_hr\">
                         <input name="''' + i_list[7] + '''" value="''' + html.escape(d_list[7]) + '''">
-                        <hr>
-                        <span>''' + load_lang('reset_user_text') + '''</span>
+                        <hr class=\"main_hr\">
+                        <span>''' + load_lang('password_search_text') + '''</span>
                         <hr class=\"main_hr\">
                         <input name="''' + i_list[8] + '''" value="''' + html.escape(d_list[8]) + '''">
-                        <hr>
-                        <span>''' + load_lang('error_401') + '''</span>
+                        <hr class=\"main_hr\">
+                        <span>''' + load_lang('reset_user_text') + '''</span>
                         <hr class=\"main_hr\">
                         <input name="''' + i_list[9] + '''" value="''' + html.escape(d_list[9]) + '''">
-                        <hr>
-                        <span>''' + load_lang('error_404') + '''</span>
+                        <hr class=\"main_hr\">
+                        <span>''' + load_lang('error_401') + '''</span>
                         <hr class=\"main_hr\">
                         <input name="''' + i_list[10] + '''" value="''' + html.escape(d_list[10]) + '''">
-                        <hr>
-                        <span>''' + load_lang('edit_help') + '''</span>
+                        <hr class=\"main_hr\">
+                        <span>''' + load_lang('error_404') + '''</span>
                         <hr class=\"main_hr\">
                         <input name="''' + i_list[11] + '''" value="''' + html.escape(d_list[11]) + '''">
                         <hr>
                         <span>''' + load_lang('approval_question') + '''</span> <a href="#rfn-1" id="fn-1">(1)</a>
+                        <hr class=\"main_hr\">
+                        <input name="''' + i_list[12] + '''" value="''' + html.escape(d_list[12]) + '''">
+                        <hr class=\"main_hr\">
+                        <span>''' + load_lang('edit_help') + '''</span>
                         <hr class=\"main_hr\">
                         <input name="''' + i_list[12] + '''" value="''' + html.escape(d_list[12]) + '''">
                         <hr class=\"main_hr\">
