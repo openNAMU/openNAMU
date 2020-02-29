@@ -1174,6 +1174,8 @@ def re_error(data):
                 data = load_lang("invalid_password_error")
             elif num == 28:
                 data = load_lang('watchlist_overflow_error')
+            elif num == 29:
+                data = load_lang('copyright_disagreed')
             else:
                 data = '???'
 
