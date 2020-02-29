@@ -289,23 +289,20 @@ def pw_check(data, data2, type_d = 'no', id_d = ''):
 
 def captcha_post(re_data, num = 1):
     if num == 1:
-        if ip_or_user() != 0 and captcha_get() != '':
-            curs.execute(db_change('select data from other where name = "sec_re"'))
-            sec_re = curs.fetchall()
-            if sec_re and sec_re[0][0] != '':
-                try:
-                    data = urllib.request.urlopen('https://www.google.com/recaptcha/api/siteverify?secret=' + sec_re[0][0] + '&response=' + re_data)
-                except:
-                    pass
+        curs.execute(db_change('select data from other where name = "sec_re"'))
+        sec_re = curs.fetchall()
+        if sec_re and sec_re[0][0] != '' and ip_or_user() != 0 and captcha_get() != '':
+            try:
+                data = urllib.request.urlopen('https://www.google.com/recaptcha/api/siteverify?secret=' + sec_re[0][0] + '&response=' + re_data)
+            except:
+                pass
 
-                if data and data.getcode() == 200:
-                    json_data = json.loads(data.read().decode(data.headers.get_content_charset()))
-                    if json_data['success'] == True:
-                        return 0
-                    else:
-                        return 1
-                else:
+            if data and data.getcode() == 200:
+                json_data = json.loads(data.read().decode(data.headers.get_content_charset()))
+                if json_data['success'] == True:
                     return 0
+                else:
+                    return 1
             else:
                 return 0
         else:
