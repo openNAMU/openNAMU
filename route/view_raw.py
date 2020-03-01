@@ -39,7 +39,10 @@ def view_raw_2(conn, name, topic_num, num):
         v_name = load_lang('discussion_raw')
         sub = ' (#' + str(num) + ')'
 
-        menu = [['topic/' + url_pas(name) + '/sub/' + url_pas(sub_title) + '#' + str(num), load_lang('discussion')], ['topic/' + url_pas(name) + '/sub/' + url_pas(sub_title) + '/admin/' + str(num), load_lang('return')]]
+        menu = [
+            ['topic/' + url_pas(name) + '/sub/' + url_pas(sub_title) + '#' + str(num), load_lang('discussion')], 
+            ['topic/' + url_pas(name) + '/sub/' + url_pas(sub_title) + '/admin/' + str(num), load_lang('return')]
+        ]
     else:
         curs.execute(db_change("select data from data where title = ?"), [name])
 
