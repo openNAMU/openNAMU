@@ -51,6 +51,11 @@ def edit_req_2(conn, name):
             if edit_filter_do(content) == 1:
                 return re_error('/error/21')
 
+        curs.execute(db_change('select data from other where name = "copyright_checkbox_text"'))
+        copyright_checkbox_text_d = curs.fetchall()
+        if copyright_checkbox_text_d and copyright_checkbox_text_d[0][0] != '' and flask.request.form.get('copyright_agreement', '') != 'yes':
+            return re_error('/error/29')
+
         content = savemark(content)
 
         if old:
@@ -135,6 +140,12 @@ def edit_req_2(conn, name):
             b_text = '<hr class=\"main_hr\">' + sql_d[0][0]
         else:
             b_text = ''
+            
+        cccb_text = ''
+        curs.execute(db_change('select data from other where name = "copyright_checkbox_text"'))
+        sql_d = curs.fetchall()
+        if sql_d and sql_d[0][0] != '':
+            cccb_text = '<hr class=\"wmain_hr\"><input type="checkbox" name="copyright_agreement" value="yes">' + sql_d[0][0] + '<hr class=\"main_hr\">'
 
         curs.execute(db_change('select data from other where name = "edit_help"'))
         sql_d = curs.fetchall()
@@ -154,7 +165,7 @@ def edit_req_2(conn, name):
                     <hr class=\"main_hr\">
                     <input ''' + disable + ''' placeholder="''' + load_lang('why') + '''" name="send" type="text">
                     <hr class=\"main_hr\">
-                    ''' + captcha_get() + ip_warring() + '''
+                    ''' + captcha_get() + ip_warring() + cccb_text + '''
                     <button id="save" type="submit" onclick="go_save_zone = 1;">''' + save_button + '''</button>
                     <button id="preview" type="button" onclick="load_preview(\'''' + url_pas(name) + '\')">' + load_lang('preview') + '''</button>
                 </form>
