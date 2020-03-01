@@ -201,7 +201,7 @@ def update(ver_num):
         print('Add init set')
         set_init()
 
-    if ver_num < 3160400:
+    if ver_num < 3160500:
         curs.execute(db_change('delete from cache_data'))
 
     conn.commit()
