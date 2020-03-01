@@ -201,7 +201,7 @@ def update(ver_num):
         print('Add init set')
         set_init()
 
-    if ver_num < 3160400:
+    if ver_num < 3160500:
         curs.execute(db_change('delete from cache_data'))
 
     conn.commit()
@@ -289,23 +289,20 @@ def pw_check(data, data2, type_d = 'no', id_d = ''):
 
 def captcha_post(re_data, num = 1):
     if num == 1:
-        if ip_or_user() != 0 and captcha_get() != '':
-            curs.execute(db_change('select data from other where name = "sec_re"'))
-            sec_re = curs.fetchall()
-            if sec_re and sec_re[0][0] != '':
-                try:
-                    data = urllib.request.urlopen('https://www.google.com/recaptcha/api/siteverify?secret=' + sec_re[0][0] + '&response=' + re_data)
-                except:
-                    pass
+        curs.execute(db_change('select data from other where name = "sec_re"'))
+        sec_re = curs.fetchall()
+        if sec_re and sec_re[0][0] != '' and ip_or_user() != 0 and captcha_get() != '':
+            try:
+                data = urllib.request.urlopen('https://www.google.com/recaptcha/api/siteverify?secret=' + sec_re[0][0] + '&response=' + re_data)
+            except:
+                pass
 
-                if data and data.getcode() == 200:
-                    json_data = json.loads(data.read().decode(data.headers.get_content_charset()))
-                    if json_data['success'] == True:
-                        return 0
-                    else:
-                        return 1
-                else:
+            if data and data.getcode() == 200:
+                json_data = json.loads(data.read().decode(data.headers.get_content_charset()))
+                if json_data['success'] == True:
                     return 0
+                else:
+                    return 1
             else:
                 return 0
         else:
@@ -813,7 +810,7 @@ def acl_check(name = 'test', tool = '', sub = 'test'):
     if ban_check() == 1:
         return 1
 
-    if tool != 'topic' and tool != 'render' and name:
+    if tool == '' and tool != 'render' and name:
         acl_c = re.search("^user:((?:(?!\/).)*)", name)
         if acl_c:
             acl_n = acl_c.groups()
@@ -883,6 +880,9 @@ def acl_check(name = 'test', tool = '', sub = 'test'):
 
         acl_data = curs.fetchall()
         if acl_data and acl_data[0][0] != 'normal':
+            if acl_data[0][0] == 'all':
+                return 1
+
             if acl_data[0][0] == 'user':
                 if ip_or_user(ip) == 1:
                     return 1
@@ -1171,6 +1171,8 @@ def re_error(data):
                 data = load_lang("invalid_password_error")
             elif num == 28:
                 data = load_lang('watchlist_overflow_error')
+            elif num == 29:
+                data = load_lang('copyright_disagreed')
             else:
                 data = '???'
 

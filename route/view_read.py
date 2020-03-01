@@ -85,7 +85,7 @@ def view_read_2(conn, name):
         else:
             curs.execute(db_change("select data from data where title = ?"), [name])
 
-    if cache_data:
+    if cache_data and acl_check(name, 'render') != 1:
         end_data = cache_data[0][0]
     else:
         data = curs.fetchall()
@@ -108,7 +108,7 @@ def view_read_2(conn, name):
             data = else_data
         )
 
-        if not num:
+        if not num and acl_check(name, 'render') != 1:
             curs.execute(db_change("delete from cache_data where title = ?"), [name])
             if last_history_num:
                 curs.execute(db_change("insert into cache_data (title, data, id) values (?, ?, ?)"), [name, end_data, last_history_num[0][0]])

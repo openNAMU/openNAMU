@@ -173,6 +173,7 @@
     "restart": "재시작",
     "oauth_setting": "OAuth 설정",
     "edit_bottom_text": "편집창 하단 문구",
+    "copyright_checkbox_text": "저작권 동의 문구(체크박스 형태)",
     "authority": "권한",
     "document": "문서",
     "decument_exist_error": "이동하려는 문서에 이미 문서가 존재합니다.",
@@ -345,5 +346,8 @@
     "invalid_password_error" : "비밀번호 또는 아이디가 없습니다.",
     "accept_edit_request": "편집 요청 승인",
     "msg_whatchlist_lmt": "다음 개수만큼 추가할 수 있습니다",
-    "watchlist_overflow_error": "추가 한도를 초과했으므로 더 이상 추가할 수 없습니다. 필요없는 항목을 삭재하십시오."
+    "watchlist_overflow_error": "추가 한도를 초과했으므로 더 이상 추가할 수 없습니다. 필요없는 항목을 삭재하십시오.",
+    "unset" : "미설정",
+    "copyright_disagreed" : "저작권 동의문구에 체크하여야 합니다."
+
 }

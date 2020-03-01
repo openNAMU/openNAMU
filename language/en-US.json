@@ -97,6 +97,7 @@
         "view" : "View",
         "content" : "Content",
         "off" : "Off",
+        "unset" : "Unset",
         "delete_admin_group": "Delete admin group",
         "_comment_1.1_" : "Time",
             "second" : "Second(s)",
@@ -248,6 +249,7 @@
                 "register_text" : "Terms of sign-up",
                 "non_login_alert" : "Non-login alert",
                 "edit_bottom_text" : "Editing textarea bottom notice",
+                "copyright_checkbox_text" : "Copyright Agreenment text as checkbox",
                 "check_key_text" : "Check authentication key notice",
                 "email_title" : "Email subject",
                 "email_text" : "Email content",
@@ -369,5 +371,6 @@
             "too_many_dec_error" : "This feature is not supported because there are too many documents.",
             "application_not_found" : "Application not found",
             "invalid_password_error" : "The Password or ID is invalid.",
-            "watchlist_overflow_error": "You cannot add more than ten documents."
+            "watchlist_overflow_error": "You cannot add more than ten documents.",
+            "copyright_disagreed" : "You have to agree copyright noticement to contribute"
 }
