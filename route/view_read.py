@@ -44,10 +44,12 @@ def view_read_2(conn, name):
         curs.execute(db_change("select link from back where title = ? and type = 'cat' order by link asc"), [name])
         back = curs.fetchall()
         if back:
-            div = '<br><h2 id="cate_normal">' + load_lang('category') + '</h2><ul>'
             u_div = ''
 
             for data in back:
+                if div == '':
+                    div = '<br><h2 id="cate_normal">' + load_lang('category_title') + '</h2><ul>'
+
                 if re.search('^category:', data[0]):
                     u_div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a></li>'
                 else:
@@ -58,10 +60,8 @@ def view_read_2(conn, name):
                     else:
                         div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a></li>'
 
-            div += '</ul>'
-
-            if div == '<br><h2 id="cate_normal">' + load_lang('category') + '</h2><ul></ul>':
-                div = ''
+            if div != '':
+                div += '</ul>'
 
             if u_div != '':
                 div += '<br><h2 id="cate_under">' + load_lang('under_category') + '</h2><ul>' + u_div + '</ul>'
