@@ -64,6 +64,10 @@ def inter_wiki_plus_2(conn, tools, name):
                 admin_check(None, 'image_license edit')
 
                 type_d = 'image_license'
+            elif tools == 'plus_extension_filter':
+                admin_check(None, 'extension_filter edit')
+
+                type_d = 'extension'
             else:
                 admin_check(None, 'edit_top edit')
 
@@ -178,6 +182,13 @@ def inter_wiki_plus_2(conn, tools, name):
             title = load_lang('image_license_add')
             form_data = '' + \
                 load_lang('license') + \
+                '<hr class=\"main_hr\">' + \
+                '<input value="' + (name if name else '') + '" type="text" name="title">' + \
+            ''
+        elif tools == 'plus_extension_filter':
+            title = load_lang('extension_filter_add')
+            form_data = '' + \
+                load_lang('extension') + \
                 '<hr class=\"main_hr\">' + \
                 '<input value="' + (name if name else '') + '" type="text" name="title">' + \
             ''

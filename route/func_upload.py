@@ -20,7 +20,10 @@ def func_upload_2(conn):
             return re_error('/error/17')
 
         value = os.path.splitext(data.filename)[1]
-        if not value in ['.jpeg', '.jpg', '.gif', '.png', '.webp', '.JPEG', '.JPG', '.GIF', '.PNG', '.WEBP']:
+        
+        curs.execute(db_change("select html from html_filter where kind = 'extension'"))
+        extension = [i[0].lower() for i in curs.fetchall()]
+        if not re.sub('^\.', '', value).lower() in extension:
             return re_error('/error/14')
 
         if flask.request.form.get('f_name', None):
@@ -61,6 +64,7 @@ def func_upload_2(conn):
             lice += '[[category:' + re.sub('\]', '_', flask.request.form.get('f_lice_sel', None)) + ']]'
 
         if os.path.exists(os.path.join(app_var['path_data_image'], e_data)):
+
             os.remove(os.path.join(app_var['path_data_image'], e_data))
 
             data.save(os.path.join(app_var['path_data_image'], e_data))

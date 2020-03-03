@@ -24,11 +24,11 @@ def user_count_edit_2(conn, name):
 
     return easy_minify(flask.render_template(skin_check(),
         imp = [load_lang('count'), wiki_set(), custom(), other2([0, 0])],
-        data =  '''
-                <ul>
-                    <li><a href="/record/''' + url_pas(that) + '''">''' + load_lang('edit_record') + '''</a> : ''' + str(data) + '''</li>
-                    <li><a href="/topic_record/''' + url_pas(that) + '''">''' + load_lang('discussion_record') + '''</a> : ''' + str(t_data) + '''</a></li>
-                </ul>
-                ''',
+        data = '''
+            <ul>
+                <li><a href="/record/''' + url_pas(that) + '''">''' + load_lang('edit_record') + '''</a> : ''' + str(data) + '''</li>
+                <li><a href="/topic_record/''' + url_pas(that) + '''">''' + load_lang('discussion_record') + '''</a> : ''' + str(t_data) + '''</a></li>
+            </ul>
+        ''',
         menu = [['user', load_lang('return')]]
     ))
