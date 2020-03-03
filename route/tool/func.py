@@ -193,7 +193,8 @@ def update(ver_num):
                 curs.execute(db_change("update topic set code = ? where title = ? and sub = ? and id = '1'"), [str(num), i[0], i[1]])
                 num += 1
 
-            print('Add topic code')
+            if num != 1:
+                print('Add topic code')
     except:
         pass
 
@@ -203,6 +204,12 @@ def update(ver_num):
 
     if ver_num < 3160500:
         curs.execute(db_change('delete from cache_data'))
+
+    if ver_num < 3170002:
+        curs.execute(db_change("select html from html_filter where kind = 'extension'"))
+        if not curs.fetchall():
+            for i in ['jpg', 'jpeg', 'png', 'gif', 'webp']:
+                curs.execute(db_change("insert into html_filter (html, kind) values (?, 'extension')"), [i])
 
     conn.commit()
     print('Update pass')
@@ -214,6 +221,11 @@ def set_init():
     if not curs.fetchall():
         for i in ['naver.com', 'gmail.com', 'daum.net', 'kakao.com']:
             curs.execute(db_change("insert into html_filter (html, kind) values (?, 'email')"), [i])
+
+    curs.execute(db_change("select html from html_filter where kind = 'extension'"))
+    if not curs.fetchall():
+        for i in ['jpg', 'jpeg', 'png', 'gif', 'webp']:
+            curs.execute(db_change("insert into html_filter (html, kind) values (?, 'extension')"), [i])
 
     curs.execute(db_change('select data from other where name = "smtp_server" or name = "smtp_port" or name = "smtp_security"'))
     if not curs.fetchall():
@@ -1130,7 +1142,7 @@ def re_error(data):
             elif num == 7:
                 data = load_lang('long_id_error')
             elif num == 8:
-                data = load_lang('id_char_error') + ' <a href="/name_filter">(' + load_lang('id') + ' ' + load_lang('filter') + ')</a>'
+                data = load_lang('id_char_error') + ' <a href="/name_filter">(' + load_lang('id_filter_list') + ')</a>'
             elif num == 9:
                 data = load_lang('file_exist_error')
             elif num == 10:
@@ -1142,7 +1154,7 @@ def re_error(data):
             elif num == 13:
                 data = load_lang('recaptcha_error')
             elif num == 14:
-                data = load_lang('file_extension_error')
+                data = load_lang('file_extension_error') + ' <a href="/extension_filter">(' + load_lang('extension_filter_list') + ')</a>'
             elif num == 15:
                 data = load_lang('edit_record_error')
             elif num == 16:

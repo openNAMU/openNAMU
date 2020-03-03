@@ -48,6 +48,7 @@ def main_manager_2(conn, num, r_ver):
                         <li><a href="/email_filter">''' + load_lang('email_filter_list') + '''</a></li>
                         <li><a href="/name_filter">''' + load_lang('id_filter_list') + '''</a></li>
                         <li><a href="/file_filter">''' + load_lang('file_filter_list') + '''</a></li>
+                        <li><a href="/extension_filter">''' + load_lang('extension_filter_list') + '''</a></li>
                     </ul>
                     <br>
                     <h2>''' + load_lang('server') + '''</h2>

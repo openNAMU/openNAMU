@@ -146,7 +146,7 @@
     "pinned": "고정",
     "edit_filter_add": "편집 필터 추가",
     "ban_authority": "차단 권한",
-    "file_extension_error": "오직 JPG, GIF, JPEG, PNG, WEBP 형식의 파일만 업로드할 수 있습니다.",
+    "file_extension_error": "지정된 확장자의 파일만 업로드 할 수 있습니다.",
     "host": "호스트",
     "email_text": "이메일 내용",
     "recent": "최근",
@@ -349,5 +349,8 @@
     "watchlist_overflow_error": "추가 한도를 초과했으므로 더 이상 추가할 수 없습니다. 필요없는 항목을 삭재하십시오.",
     "unset" : "미설정",
     "copyright_disagreed" : "저작권 동의문구에 체크하여야 합니다.",
-    "category_title" : "이 분류 아래 문서들"
+    "category_title" : "이 분류 아래 문서들",
+    "extension_filter_list" : "확장자 필터 목록",
+    "extension_filter_add" : "확장자 필터 추가",
+    "extension" : "확장자"
 }

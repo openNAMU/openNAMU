@@ -55,6 +55,13 @@ def inter_wiki_2(conn, tools):
         div = ''
 
         curs.execute(db_change("select html from html_filter where kind = 'image_license'"))
+    elif tools == 'extension_filter':
+        del_link = 'del_extension_filter'
+        plus_link = 'plus_extension_filter'
+        title = load_lang('extension_filter_list')
+        div = ''
+
+        curs.execute(db_change("select html from html_filter where kind = 'extension'"))
     else:
         del_link = 'del_edit_top'
         plus_link = 'plus_edit_top'

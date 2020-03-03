@@ -16,6 +16,8 @@ def inter_wiki_del_2(conn, tools, name):
             curs.execute(db_change("delete from html_filter where html = ? and kind = 'email'"), [name])
         elif tools == 'del_image_license':
             curs.execute(db_change("delete from html_filter where html = ? and kind = 'image_license'"), [name])
+        elif tools == 'del_extension_filter':
+            curs.execute(db_change("delete from html_filter where html = ? and kind = 'extension'"), [name])
         else:
             curs.execute(db_change("delete from html_filter where html = ? and kind = 'edit_top'"), [name])
 

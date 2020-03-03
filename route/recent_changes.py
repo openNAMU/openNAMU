@@ -161,7 +161,7 @@ def recent_changes_2(conn, name, tool):
                     title = '<a href="/w/' + url_pas(data[1]) + '">' + html.escape(data[1]) + '</a> '
                     title += '<a href="/history/' + url_pas(data[1]) + '">(r' + data[0] + ')</a> '
 
-            div +=  '''
+            div += '''
                 <tr ''' + style[0] + '''>
                     <td>''' + title + m_tool + ' ' + leng + '''</td>
                     <td>''' + ip + ban + '''</td>
@@ -172,7 +172,7 @@ def recent_changes_2(conn, name, tool):
                 </tr>
             '''
 
-        div +=  '''
+        div += '''
                 </tbody>
             </table>
         '''
