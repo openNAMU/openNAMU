@@ -30,7 +30,12 @@ def send_parser(data):
             if re_data:
                 re_data = re_data.groups()[0]
 
-                data = re.sub('&lt;a(?: (?:(?:(?!&gt;).)*))?&gt;(?P<in>(?:(?!&lt;).)*)&lt;\/a&gt;', '<a href="/w/' + urllib.parse.quote(re_data).replace('/','%2F') + '">' + re_data + '</a>', data, 1)
+                data = re.sub(
+                    '&lt;a(?: (?:(?:(?!&gt;).)*))?&gt;(?P<in>(?:(?!&lt;).)*)&lt;\/a&gt;', 
+                    '<a href="/w/' + urllib.parse.quote(re_data).replace('/','%2F') + '">' + re_data + '</a>', 
+                    data, 
+                    1
+                )
             else:
                 break
 
