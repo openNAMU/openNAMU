@@ -892,7 +892,6 @@ def acl_check(name = 'test', tool = '', sub = 'test'):
             num = 5
 
         acl_data = curs.fetchall()
-        print(acl_data, name)
         if ((not acl_data and i == (end - 1)) or (acl_data and acl_data[0][0] != 'ban')) and get_ban == 1 and tool != 'render':
             return 1
         elif acl_data and acl_data[0][0] != 'normal':
