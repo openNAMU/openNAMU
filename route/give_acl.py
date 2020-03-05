@@ -71,7 +71,7 @@ def give_acl_2(conn, name):
         if re.search('^user:', name):
             acl_list = ['', 'user', 'all']
         else:
-            acl_list = ['', 'all', 'user', 'admin', 'owner', '50_edit', 'email']
+            acl_list = ['', 'all', 'user', 'admin', 'owner', '50_edit', 'email', 'ban']
 
         curs.execute(db_change("select decu from acl where title = ?"), [name])
         acl_data = curs.fetchall()
@@ -121,6 +121,7 @@ def give_acl_2(conn, name):
                     <li>all : ''' + load_lang('all_acl') + '''</li>
                     <li>email : ''' + load_lang('email_acl') + '''</li>
                     <li>owner : ''' + load_lang('owner_acl') + '''</li>
+                    <li>ban : ''' + load_lang('ban_acl') + '''</li>
                 </ul>
             '''
 
