@@ -818,14 +818,15 @@ def slow_edit_check():
 
 def acl_check(name = 'test', tool = '', sub = 'test'):
     ip = ip_check()
+    get_ban = ban_check()
 
-    if ban_check() == 1:
-        return 1
-
-    if tool == '' and tool != 'render' and name:
+    if tool == '' and name:
         acl_c = re.search("^user:((?:(?!\/).)*)", name)
         if acl_c:
             acl_n = acl_c.groups()
+
+            if get_ban == 1:
+                return 1
 
             if admin_check(5) == 1:
                 return 0
@@ -891,9 +892,12 @@ def acl_check(name = 'test', tool = '', sub = 'test'):
             num = 5
 
         acl_data = curs.fetchall()
-        if acl_data and acl_data[0][0] != 'normal':
-            if acl_data[0][0] == 'all':
-                return 1
+        print(acl_data, name)
+        if ((not acl_data and i == (end - 1)) or (acl_data and acl_data[0][0] != 'ban')) and get_ban == 1 and tool != 'render':
+            return 1
+        elif acl_data and acl_data[0][0] != 'normal':
+            if acl_data[0][0] == 'all' or acl_data[0][0] == 'ban':
+                return 0
 
             if acl_data[0][0] == 'user':
                 if ip_or_user(ip) == 1:

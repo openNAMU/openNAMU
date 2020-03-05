@@ -352,5 +352,6 @@
     "category_title" : "이 분류 아래 문서들",
     "extension_filter_list" : "확장자 필터 목록",
     "extension_filter_add" : "확장자 필터 추가",
-    "extension" : "확장자"
+    "extension" : "확장자",
+    "ban_acl" : "차단된 사용자 포함"
 }
