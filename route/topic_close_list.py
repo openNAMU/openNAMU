@@ -21,7 +21,7 @@ def topic_close_list_2(conn, name):
         sub = load_lang('discussion_list')
         menu = [['w/' + url_pas(name), load_lang('document')]]
 
-        if acl_check(name, 'topic', sub) == 1:
+        if acl_check(None, 'topic', topic_num) == 1:
             display = 'display: none;'
         else:
             display = ''
@@ -62,12 +62,12 @@ def topic_close_list_2(conn, name):
             it_p = 0
 
             if tool == '':
-                curs.execute(db_change("select title from rd where title = ? and sub = ? and stop = 'O' order by sub asc"), [name, data[0]])
+                curs.execute(db_change("select title from rd where code = ? and stop != '' order by sub asc"), [first_topic[0][0]])
                 if curs.fetchall():
                     it_p = 1
 
             if it_p != 1:
-                curs.execute(db_change("select id from topic where title = ? and sub = ? order by date desc limit 1"), [name, data[0]])
+                curs.execute(db_change("select id from topic where code = ? order by date desc limit 1"), [first_topic[0][0]])
                 t_data = curs.fetchall()
 
                 div += '''
