@@ -211,6 +211,13 @@ def update(ver_num):
             for i in ['jpg', 'jpeg', 'png', 'gif', 'webp']:
                 curs.execute(db_change("insert into html_filter (html, kind) values (?, 'extension')"), [i])
 
+    if ver_num < 3170400:
+        curs.execute(db_change("select title, sub, code from topic where id = '1'"))
+        change_topic = curs.fetchall()
+        for i in change_topic:
+            curs.execute(db_change("update topic set code = ? where title = ? and sub = ?"), [i[2], i[0], i[1]])
+            curs.execute(db_change("update rd set code = ? where title = ? and sub = ?"), [i[2], i[0], i[1]])
+
     conn.commit()
     print('Update pass')
     print('----')
@@ -231,14 +238,6 @@ def set_init():
     if not curs.fetchall():
         for i in [['smtp_server', 'imap.google.com'], ['smtp_port', '587'], ['smtp_security', 'tls']]:
             curs.execute(db_change("insert into other (name, data) values (?, ?)"), [i[0], i[1]])
-
-def topic_change(num):
-    curs.execute(db_change('select title, sub from topic where id = "1" and code = ?'), [str(num)])
-    db_data = curs.fetchall()
-    if db_data:
-        return [db_data[0][0], db_data[0][1]]
-    else:
-        return ['Test', 'Test']
 
 def pw_encode(data, data2 = '', type_d = ''):
     if type_d == '':
@@ -816,7 +815,7 @@ def slow_edit_check():
 
     return 0
 
-def acl_check(name = 'test', tool = '', sub = 'test'):
+def acl_check(name = 'test', tool = '', topic_num = 'test'):
     ip = ip_check()
     get_ban = ban_check()
 
@@ -939,9 +938,9 @@ def acl_check(name = 'test', tool = '', sub = 'test'):
                     return 1
 
         if tool == 'topic':
-            curs.execute(db_change("select title from rd where title = ? and sub = ? and not stop = ''"), [name, sub])
+            curs.execute(db_change("select title from rd where code = ? and stop != ''"), [topic_num])
             if curs.fetchall():
-                if admin_check(3, 'topic (' + name + ')') != 1:
+                if admin_check(3, 'topic (code ' + topic_num + ')') != 1:
                     return 1
 
     return 0
@@ -1032,17 +1031,30 @@ def ban_insert(name, end, why, login, blocker, type_d = None):
         else:
             r_time = ''
 
-        curs.execute(db_change("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, ?)"), [name, r_time, now_time, blocker, why, band])
-        curs.execute(db_change("insert into ban (block, end, why, band, login) values (?, ?, ?, ?, ?)"), [name, r_time, why, band, login])
+        curs.execute(db_change("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, ?)"), [
+            name, 
+            r_time, 
+            now_time, 
+            blocker, 
+            why, 
+            band
+        ])
+        curs.execute(db_change("insert into ban (block, end, why, band, login) values (?, ?, ?, ?, ?)"), [
+            name, 
+            r_time, 
+            why, 
+            band, 
+            login
+        ])
 
     conn.commit()
 
-def rd_plus(title, sub, date):
-    curs.execute(db_change("select title from rd where title = ? and sub = ?"), [title, sub])
+def rd_plus(topic_num, date):
+    curs.execute(db_change("select code from rd where code = ?"), [topic_num])
     if curs.fetchall():
-        curs.execute(db_change("update rd set date = ? where title = ? and sub = ?"), [date, title, sub])
+        curs.execute(db_change("update rd set date = ? where code = ?"), [date, topic_num])
     else:
-        curs.execute(db_change("insert into rd (title, sub, date) values (?, ?, ?)"), [title, sub, date])
+        curs.execute(db_change("insert into rd (code, date) values (?, ?, ?)"), [topic_num, date])
 
     conn.commit()
 

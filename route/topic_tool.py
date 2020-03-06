@@ -4,12 +4,9 @@ def topic_tool_2(conn, topic_num):
     curs = conn.cursor()
 
     data = ''
+    topic_num = str(topic_num)
 
-    topic_change_data = topic_change(topic_num)
-    name = topic_change_data[0]
-    sub = topic_change_data[1]
-
-    curs.execute(db_change("select stop, agree from rd where title = ? and sub = ?"), [name, sub])
+    curs.execute(db_change("select stop, agree from rd where code = ?"), [topic_num])
     close_data = curs.fetchall()
     if close_data:
         if close_data[0][0] == 'S':
@@ -25,7 +22,7 @@ def topic_tool_2(conn, topic_num):
         data = '''
             <h2>''' + load_lang('admin_tool') + '''</h2>
             <ul>
-                <li><a href="/thread/''' + str(topic_num) + '/setting">' + load_lang('topic_setting') + '''</a></li>
+                <li><a href="/thread/''' + topic_num + '/setting">' + load_lang('topic_setting') + '''</a></li>
             </ul>
         '''
     data += '''
@@ -41,7 +38,7 @@ def topic_tool_2(conn, topic_num):
             <h2>''' + load_lang('owner') + '''</h2>
             <ul>
                 <li>
-                    <a href="/thread/''' + str(topic_num) + '''/delete">
+                    <a href="/thread/''' + topic_num + '''/delete">
                         ''' + load_lang('topic_delete') + '''
                     </a>
                 </li>
@@ -51,5 +48,5 @@ def topic_tool_2(conn, topic_num):
     return easy_minify(flask.render_template(skin_check(),
         imp = [load_lang('topic_tool'), wiki_set(), custom(), other2([0, 0])],
         data = data,
-        menu = [['thread/' + str(topic_num), load_lang('return')]]
+        menu = [['thread/' + topic_num, load_lang('return')]]
     ))

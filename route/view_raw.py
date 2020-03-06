@@ -6,13 +6,11 @@ def view_raw_2(conn, name, topic_num, num):
     if acl_check(name, 'render') == 1:
         return re_error('/ban')
 
-    sub_title = None
     if topic_num:
-        topic_change_data = topic_change(topic_num)
-        name = topic_change_data[0]
-        sub_title = topic_change_data[1]
+        topic_num = str(topic_num)
 
     v_name = name
+    num = str(num)
     sub = ' (' + load_lang('raw') + ')'
 
     if not num:
@@ -20,28 +18,28 @@ def view_raw_2(conn, name, topic_num, num):
         if num:
             num = int(number_check(num))
 
-    if not sub_title and num:
-        curs.execute(db_change("select title from history where title = ? and id = ? and hide = 'O'"), [name, str(num)])
+    if not topic_num and num:
+        curs.execute(db_change("select title from history where title = ? and id = ? and hide = 'O'"), [name, num])
         if curs.fetchall() and admin_check(6) != 1:
             return re_error('/error/3')
 
-        curs.execute(db_change("select data from history where title = ? and id = ?"), [name, str(num)])
+        curs.execute(db_change("select data from history where title = ? and id = ?"), [name, num])
 
-        sub += ' (r' + str(num) + ')'
+        sub += ' (r' + num + ')'
 
         menu = [['history/' + url_pas(name), load_lang('history')]]
-    elif sub_title:
+    elif topic_num:
         if admin_check(6) != 1:
-            curs.execute(db_change("select data from topic where id = ? and title = ? and sub = ? and block = ''"), [str(num), name, sub_title])
+            curs.execute(db_change("select data from topic where id = ? and code = ? and block = ''"), [num, topic_num])
         else:
-            curs.execute(db_change("select data from topic where id = ? and title = ? and sub = ?"), [str(num), name, sub_title])
+            curs.execute(db_change("select data from topic where id = ? and code = ?"), [num, topic_num])
 
         v_name = load_lang('discussion_raw')
-        sub = ' (#' + str(num) + ')'
+        sub = ' (#' + num + ')'
 
         menu = [
-            ['topic/' + url_pas(name) + '/sub/' + url_pas(sub_title) + '#' + str(num), load_lang('discussion')], 
-            ['topic/' + url_pas(name) + '/sub/' + url_pas(sub_title) + '/admin/' + str(num), load_lang('return')]
+            ['thread/' + topic_num + '#' + num, load_lang('discussion')], 
+            ['thread/' + topic_num + '/admin/' + num, load_lang('return')]
         ]
     else:
         curs.execute(db_change("select data from data where title = ?"), [name])
