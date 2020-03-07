@@ -183,20 +183,6 @@ def captcha_get():
 def update(ver_num):
     print('----')
     # 업데이트 하위 호환 유지 함수
-    # v3.1.5
-    try:
-        num = 1
-        curs.execute(db_change('select title, sub from topic where id = "1" order by date asc'))
-        db_data = curs.fetchall()
-        if db_data:
-            for i in db_data:
-                curs.execute(db_change("update topic set code = ? where title = ? and sub = ? and id = '1'"), [str(num), i[0], i[1]])
-                num += 1
-
-            if num != 1:
-                print('Add topic code')
-    except:
-        pass
 
     if ver_num < 3160027:
         print('Add init set')

@@ -10,7 +10,14 @@ def topic_stop_2(conn, topic_num):
     time = get_time()
     topic_num = str(topic_num)
 
+    curs.execute(db_change("select stop, agree from rd where code = ?"), [topic_num])
+    rd_d = curs.fetchall()
+    if not rd_d:
+        return redirect('/')
+
     if flask.request.method == 'POST':
+        admin_check(3, 'change_topic_set (code ' + topic_num + ')')
+
         curs.execute(db_change("select id from topic where code = ? order by id + 0 desc limit 1"), [topic_num])
         topic_check = curs.fetchall()
         if topic_check:
@@ -51,8 +58,6 @@ def topic_stop_2(conn, topic_num):
             ['', 'Normal']
         ]
 
-        curs.execute(db_change("select stop, agree from rd where code = ? limit 1"), [topic_num])
-        rd_d = curs.fetchall()
         for i in for_list:
             if rd_d and rd_d[0][0] == i[0]:
                 stop_d_list = '<option value="' + i[0] + '">' + i[1] + '</option>' + stop_d_list
@@ -64,7 +69,6 @@ def topic_stop_2(conn, topic_num):
         return easy_minify(flask.render_template(skin_check(),
             imp = [load_lang('topic_setting'), wiki_set(), custom(), other2([0, 0])],
             data = '''
-                <hr class=\"main_hr\">
                 <form method="post">
                     <select name="stop_d">
                         ''' + stop_d_list + '''

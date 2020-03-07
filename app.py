@@ -171,12 +171,12 @@ if setup_tool != 0:
     create_data['data'] = ['title', 'data']
     create_data['cache_data'] = ['title', 'data', 'id']
     create_data['history'] = ['id', 'title', 'data', 'date', 'ip', 'send', 'leng', 'hide', 'type']
-    create_data['rd'] = ['code', 'date', 'band', 'stop', 'agree']
+    create_data['rd'] = ['title', 'sub', 'code', 'date', 'band', 'stop', 'agree']
     create_data['user'] = ['id', 'pw', 'acl', 'date', 'encode']
     create_data['user_set'] = ['name', 'id', 'data']
     create_data['user_application'] = ['id', 'pw', 'date', 'encode', 'question', 'answer', 'ip', 'ua', 'token', 'email']
     create_data['ban'] = ['block', 'end', 'why', 'band', 'login']
-    create_data['topic'] = ['id', 'title', 'sub', 'data', 'date', 'ip', 'block', 'top', 'code']
+    create_data['topic'] = ['id', 'data', 'date', 'ip', 'block', 'top', 'code']
     create_data['rb'] = ['block', 'end', 'today', 'blocker', 'why', 'band']
     create_data['back'] = ['title', 'link', 'type']
     create_data['custom'] = ['user', 'css']
@@ -504,6 +504,10 @@ def topic_delete(topic_num = 1):
 @app.route('/thread/<int:topic_num>/tool')
 def topic_tool(topic_num = 1):
     return topic_tool_2(conn, topic_num)
+
+@app.route('/thread/<int:topic_num>/change', methods=['POST', 'GET'])
+def topic_change(topic_num = 1):
+    return topic_change_2(conn, topic_num)
 
 @app.route('/thread/<int:topic_num>/admin/<int:num>')
 def topic_admin(topic_num = 1, num = 1):
