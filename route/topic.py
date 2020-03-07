@@ -3,7 +3,6 @@ from .tool.func import *
 def topic_2(conn, topic_num):
     curs = conn.cursor()
 
-    ban = acl_check(None, 'topic', topic_num)
     admin = admin_check(3)
     topic_num = str(topic_num)
 
@@ -18,6 +17,8 @@ def topic_2(conn, topic_num):
             name = name[0][0]
         else:
             return redirect('/')
+
+    ban = acl_check(name, 'topic', topic_num)
 
     if flask.request.method == 'POST':
         if captcha_post(flask.request.form.get('g-recaptcha-response', '')) == 1:
