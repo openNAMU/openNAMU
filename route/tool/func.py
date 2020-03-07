@@ -854,7 +854,7 @@ def acl_check(name = 'test', tool = '', topic_num = 'test'):
         end = 3
     elif tool == 'topic' or tool == 'render':
         if not name:
-            curs.execute(db_change("select title from topic where code = ? and id = '1'"), [topic_num])
+            curs.execute(db_change("select title from rd where code = ?"), [topic_num])
             topic_data = curs.fetchall()
             if topic_data:
                 name = topic_data[0][0]
@@ -1057,12 +1057,12 @@ def ban_insert(name, end, why, login, blocker, type_d = None):
 
     conn.commit()
 
-def rd_plus(topic_num, date):
+def rd_plus(topic_num, date, name = None, sub = None):
     curs.execute(db_change("select code from rd where code = ?"), [topic_num])
     if curs.fetchall():
         curs.execute(db_change("update rd set date = ? where code = ?"), [date, topic_num])
     else:
-        curs.execute(db_change("insert into rd (code, date) values (?, ?, ?)"), [topic_num, date])
+        curs.execute(db_change("insert into rd (title, sub, code, date) values (?, ?, ?, ?)"), [name, sub, topic_num, date])
 
     conn.commit()
 
