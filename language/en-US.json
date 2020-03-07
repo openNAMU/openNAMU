@@ -198,6 +198,7 @@
         "blocked_admin" : "Blocked administrator",
         "category_title" : "Documents under this category",
         "ban_acl" : "Include blocked users",
+        "topic_name_change" : "Change discussion name",
         "_comment_2.1_" : "Filter",
             "_comment_2.1.1_" : "List",
                 "interwiki_list" : "Interwiki(s) list",
