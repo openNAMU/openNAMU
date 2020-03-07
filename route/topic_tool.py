@@ -42,6 +42,11 @@ def topic_tool_2(conn, topic_num):
                         ''' + load_lang('topic_delete') + '''
                     </a>
                 </li>
+                <li>
+                    <a href="/thread/''' + topic_num + '''/change">
+                        ''' + load_lang('topic_name_change') + '''
+                    </a>
+                </li>
             </ul>
         '''
 
