@@ -21,7 +21,7 @@ def topic_close_list_2(conn, name):
         sub = load_lang('discussion_list')
         menu = [['w/' + url_pas(name), load_lang('document')]]
 
-        if acl_check(None, 'topic', topic_num) == 1:
+        if acl_check(name, 'topic', None) == 1:
             display = 'display: none;'
         else:
             display = ''

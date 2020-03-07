@@ -853,6 +853,14 @@ def acl_check(name = 'test', tool = '', topic_num = 'test'):
     if tool == '':
         end = 3
     elif tool == 'topic' or tool == 'render':
+        if not name:
+            curs.execute(db_change("select title from topic where code = ? and id = '1'"), [topic_num])
+            topic_data = curs.fetchall()
+            if topic_data:
+                name = topic_data[0][0]
+            else:
+                name = 'test'
+
         end = 2
     else:
         end = 1
@@ -937,7 +945,7 @@ def acl_check(name = 'test', tool = '', topic_num = 'test'):
                 if admin_check() != 1:
                     return 1
 
-        if tool == 'topic':
+        if tool == 'topic' and topic_num:
             curs.execute(db_change("select title from rd where code = ? and stop != ''"), [topic_num])
             if curs.fetchall():
                 if admin_check(3, 'topic (code ' + topic_num + ')') != 1:
