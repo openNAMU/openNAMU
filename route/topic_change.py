@@ -43,7 +43,7 @@ def topic_change_2(conn, topic_num):
         return redirect('/thread/' + topic_num)
     else:
         return easy_minify(flask.render_template(skin_check(),
-            imp = [load_lang('topic_setting'), wiki_set(), custom(), other2([0, 0])],
+            imp = [load_lang('topic_name_change'), wiki_set(), custom(), other2([0, 0])],
             data = '''
                 <form method="post">
                     ''' + load_lang('document_name') + '''
