@@ -45,32 +45,21 @@ def topic_stop_2(conn, topic_num):
     else:
         stop_d_list = ''
         agree_check = ''
+        for_list = [
+            ['O', 'Close'],
+            ['S', 'Stop'],
+            ['', 'Normal']
+        ]
 
         curs.execute(db_change("select stop, agree from rd where code = ? limit 1"), [topic_num])
         rd_d = curs.fetchall()
-        if rd_d[0][0] == 'O':
-            stop_d_list += '''
-                <option value="O">Close</option>
-                <option value="">Normal</option>
-                <option value="S">Stop</option>
-            '''
-        elif rd_d[0][0] == 'S':
-            stop_d_list += '''
-                <option value="S">Stop</option>
-                <option value="">Normal</option>
-                <option value="O">Close</option>
-            '''
-        else:
-            stop_d_list += '''
-                <option value="">Normal</option>
-                <option value="S">Stop</option>
-                <option value="O">Close</option>
-            '''
+        for i in for_list:
+            if rd_d and rd_d[0][0] == i[0]:
+                stop_d_list = '<option value="' + i[0] + '">' + i[1] + '</option>' + stop_d_list
+            else:
+                stop_d_list += '<option value="' + i[0] + '">' + i[1] + '</option>'
 
-        if rd_d[0][1] == 'O':
-            agree_check = 'checked="checked"'
-        else:
-            agree_check = ''
+        agree_check = 'checked="checked"' if rd_d[0][1] == 'O' else ''
 
         return easy_minify(flask.render_template(skin_check(),
             imp = [load_lang('topic_setting'), wiki_set(), custom(), other2([0, 0])],

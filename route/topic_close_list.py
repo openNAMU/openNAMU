@@ -10,11 +10,11 @@ def topic_close_list_2(conn, name):
     menu = [['topic/' + url_pas(name), load_lang('return')]]
 
     if tool == 'close':
-        curs.execute(db_change("select sub from rd where title = ? and stop = 'O' order by sub asc"), [name])
+        curs.execute(db_change("select code, sub from rd where title = ? and stop = 'O' order by sub asc"), [name])
 
         sub = load_lang('closed_discussion')
     elif tool == 'agree':
-        curs.execute(db_change("select sub from rd where title = ? and agree = 'O' order by sub asc"), [name])
+        curs.execute(db_change("select code, sub from rd where title = ? and agree = 'O' order by sub asc"), [name])
 
         sub = load_lang('agreed_discussion')
     else:
@@ -50,37 +50,27 @@ def topic_close_list_2(conn, name):
             <div id="see_preview"></div>
         '''
 
-        curs.execute(db_change("select sub from rd where title = ? order by date desc"), [name])
+        curs.execute(db_change("select code, sub from rd where title = ? and stop != 'O' order by date desc"), [name])
 
     t_num = 0
     for data in curs.fetchall():
         t_num += 1
+        t_str_num = str(t_num)
 
-        curs.execute(db_change("select code from topic where title = ? and sub = ? and id = '1'"), [name, data[0]])
-        first_topic = curs.fetchall()
-        if first_topic:
-            it_p = 0
+        curs.execute(db_change("select id from topic where code = ? order by date desc limit 1"), [data[0]])
+        t_data = curs.fetchall()
 
-            if tool == '':
-                curs.execute(db_change("select title from rd where code = ? and stop != '' order by sub asc"), [first_topic[0][0]])
-                if curs.fetchall():
-                    it_p = 1
-
-            if it_p != 1:
-                curs.execute(db_change("select id from topic where code = ? order by date desc limit 1"), [first_topic[0][0]])
-                t_data = curs.fetchall()
-
-                div += '''
-                    <h2><a href="/thread/''' + first_topic[0][0] + '">' + str(t_num) + '. ' + data[0] + '''</a></h2>
-                    <div id="topic_pre_''' + str(t_num) + '''"></div>
-                    <div id="topic_back_pre_''' + str(t_num) + '''"></div>
-                    <script>
-                        topic_list_load(''' + first_topic[0][0] + ', 1, "topic_pre_' + str(t_num) + '''");
-                        if(''' + str(t_data[0][0]) + ''' !== 1) {
-                            topic_list_load(''' + first_topic[0][0] + ', ' + t_data[0][0] + ', "topic_back_pre_' + str(t_num) + '''");
-                        }
-                    </script>
-                '''
+        div += '''
+            <h2><a href="/thread/''' + data[0] + '">' + t_str_num + '. ' + data[1] + '''</a></h2>
+            <div id="topic_pre_''' + t_str_num + '''"></div>
+            <div id="topic_back_pre_''' + t_str_num + '''"></div>
+            <script>
+                topic_list_load(''' + data[0] + ', 1, "topic_pre_' + t_str_num + '''");
+                if(''' + t_data[0][0] + ''' !== 1) {
+                    topic_list_load(''' + data[0] + ', ' + t_data[0][0] + ', "topic_back_pre_' + t_str_num + '''");
+                }
+            </script>
+        '''
 
     if div == '':
         plus = re.sub('^<br>', '', plus)

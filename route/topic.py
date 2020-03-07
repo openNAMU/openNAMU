@@ -10,7 +10,7 @@ def topic_2(conn, topic_num):
         name = flask.request.form.get('topic', 'test')
         sub = flask.request.form.get('title', 'test')
     else:
-        curs.execute(db_change("select title, sub from topic where code = ? and id = '1'"), [topic_num])
+        curs.execute(db_change("select title, sub from rd where code = ?"), [topic_num])
         name = curs.fetchall()
         if name:
             sub = name[0][1]
@@ -83,11 +83,9 @@ def topic_2(conn, topic_num):
         data = re.sub("(?P<in>#(?:[0-9]+))", '[[\g<in>]]', data)
         data = savemark(data)
 
-        rd_plus(topic_num, today)
-        curs.execute(db_change("insert into topic (id, title, sub, data, date, ip, code) values (?, ?, ?, ?, ?, ?, ?)"), [
+        rd_plus(topic_num, today, name, sub)
+        curs.execute(db_change("insert into topic (id, data, date, ip, code) values (?, ?, ?, ?, ?)"), [
             num,
-            name if num == 1 else '',
-            sub if num == 1 else '',
             data,
             today,
             ip,
