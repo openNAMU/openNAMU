@@ -585,19 +585,23 @@ def setting_2(conn, num):
             conn.commit()
 
             acl_div = ['', '', '', '', '']
-            acl_list = ['normal', 'user', 'admin', 'owner', '50_edit', 'email']
+            acl_list = get_acl_list()
             for i in range(0, 5):
-                for acl_data in acl_list:
-                    if acl_data == d_list[i + 1]:
-                        acl_div[i] = '<option value="' + acl_data + '">' + acl_data + '</option>' + acl_div[i]
+                for data_list in acl_list:
+                    if data_list == d_list[i + 1]:
+                        check = 'selected="selected"'
                     else:
-                        acl_div[i] += '<option value="' + acl_data + '">' + acl_data + '</option>'
+                        check = ''
+                    
+                    acl_div[i] += '<option value="' + data_list + '" ' + check + '>' + (data_list if data_list != '' else 'normal') + '</option>'
 
             return easy_minify(flask.render_template(skin_check(),
                 imp = [load_lang('main_acl_setting'), wiki_set(), custom(), other2([0, 0])],
                 data = '''
                     <form method="post">
-                        <span>''' + load_lang('document_acl') + '</span> <a href="/acl/TEST">(' + load_lang('reference') + ''')</a>
+                        <a href="/acl/TEST#exp">(''' + load_lang('reference') + ''')</a>
+                        <hr>
+                        <span>''' + load_lang('document_acl') + '''</span> 
                         <hr class=\"main_hr\">
                         <select name="edit">''' + acl_div[0] + '''</select>
                         <hr>

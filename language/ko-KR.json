@@ -3,7 +3,7 @@
     "document_name": "문서명",
     "non_login_alert": "비로그인 알림",
     "hide": "숨김",
-    "discussion_acl": "토론 ACL",
+    "discussion_acl": "토론들 ACL",
     "ongoing": "진행 중",
     "user_tool": "사용자 도구",
     "compare_target": "비교 대상 이름",
@@ -354,5 +354,7 @@
     "extension_filter_add": "확장자 필터 추가",
     "extension": "확장자",
     "ban_acl": "차단된 사용자 포함",
-    "topic_name_change": "토론 제목 변경"
+    "topic_name_change": "토론 제목 변경",
+    "topic_acl_setting" : "토론 ACL 설정",
+    "topic_acl" : "토론 ACL"
 }

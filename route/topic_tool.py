@@ -10,19 +10,23 @@ def topic_tool_2(conn, topic_num):
     close_data = curs.fetchall()
     if close_data:
         if close_data[0][0] == 'S':
-            t_state = 'Stop'
+            t_state = 'stop'
         elif close_data[0][0] == 'O':
-            t_state = 'Close'
+            t_state = 'close'
         else:
-            t_state = 'Normal'
+            t_state = 'normal'
     else:
-        t_state = 'Normal'
+        t_state = 'normal'
+
+    curs.execute(db_change("select acl from rd where code = ?"), [topic_num])
+    topic_acl_get = curs.fetchall()
 
     if admin_check(3) == 1:
         data = '''
             <h2>''' + load_lang('admin_tool') + '''</h2>
             <ul>
                 <li><a href="/thread/''' + topic_num + '/setting">' + load_lang('topic_setting') + '''</a></li>
+                <li><a href="/thread/''' + topic_num + '/acl">' + load_lang('topic_acl_setting') + '''</a></li>
             </ul>
         '''
     data += '''
@@ -30,6 +34,7 @@ def topic_tool_2(conn, topic_num):
         <ul>
             <li><a id="reload" href="javascript:void(0);" onclick="req_alarm();">''' + load_lang('use_push_alarm') + '''</a></li>
             <li>''' + load_lang('topic_state') + ''' : ''' + t_state + '' + (' (Agree)' if close_data and (close_data[0][1] == 'O') else '') + '''</li>
+            <li>''' + load_lang('topic_acl') + ''' : <a href="/acl/TEST#exp">''' + ('normal' if not topic_acl_get or (topic_acl_get[0][0] == '') else topic_acl_get[0][0]) + '''</a></li>
         </ul>
     '''
 
