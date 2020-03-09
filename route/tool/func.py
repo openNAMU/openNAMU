@@ -847,7 +847,7 @@ def acl_check(name = 'test', tool = '', topic_num = 'test'):
             else:
                 name = 'test'
 
-        end = 2
+        end = 3
     else:
         end = 1
 
@@ -862,7 +862,9 @@ def acl_check(name = 'test', tool = '', topic_num = 'test'):
 
             num = 5
         elif tool == 'topic':
-            if i == 0:
+            if i == 0 and topic_num:
+                curs.execute(db_change("select acl from rd where code = ?"), [topic_num])
+            elif i == 1:
                 curs.execute(db_change("select dis from acl where title = ?"), [name])
             else:
                 curs.execute(db_change('select data from other where name = "discussion"'))
@@ -1117,6 +1119,14 @@ def edit_filter_do(data):
 
 def redirect(data = '/'):
     return flask.redirect(data)
+
+def get_acl_list(type_d = None):
+    acl_data = ['', 'all', 'user', 'admin', 'owner', '50_edit', 'email', 'ban']
+    if type_d:
+        if type_d == 'user':
+            acl_data = ['', 'user', 'all']
+
+    return acl_data
 
 def re_error(data):
     conn.commit()
