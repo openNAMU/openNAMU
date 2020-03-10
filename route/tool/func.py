@@ -801,11 +801,11 @@ def slow_edit_check():
 
     return 0
 
-def acl_check(name = 'test', tool = '', topic_num = 'test'):
+def acl_check(name = 'test', tool = '', topic_num = '1'):
     ip = ip_check()
     get_ban = ban_check()
+    
     acl_c = re.search("^user:((?:(?!\/).)*)", name)
-
     if tool == '' and name and acl_c:
         acl_n = acl_c.groups()
 
@@ -887,9 +887,12 @@ def acl_check(name = 'test', tool = '', topic_num = 'test'):
             num = 5
 
         acl_data = curs.fetchall()
-        if ((not acl_data and i == (end - 1)) or (acl_data and acl_data[0][0] != 'ban')) and get_ban == 1 and tool != 'render':
+        if (not acl_data and i == (end - 1)) and get_ban == 1 and tool != 'render':
             return 1
-        elif acl_data and acl_data[0][0] != 'normal':
+        elif acl_data and acl_data[0][0] != 'normal' and acl_data[0][0] != '':
+            if acl_data[0][0] != 'ban' and get_ban == 1 and tool != 'render':
+                return 1
+
             if acl_data[0][0] == 'all' or acl_data[0][0] == 'ban':
                 return 0
             elif acl_data[0][0] == 'user':
@@ -920,11 +923,20 @@ def acl_check(name = 'test', tool = '', topic_num = 'test'):
             elif acl_data[0][0] == 'owner':
                 if admin_check() == 1:
                     return 0
-
-        if tool == 'topic' and topic_num:
-            curs.execute(db_change("select title from rd where code = ? and stop != ''"), [topic_num])
-            if curs.fetchall() and admin_check(3, 'topic (code ' + topic_num + ')') == 1:
-                return 0
+        else:
+            if i == (end - 1):
+                if tool == 'topic':
+                    if topic_num:
+                        curs.execute(db_change("select title from rd where code = ? and stop != ''"), [topic_num])
+                        if curs.fetchall():
+                            if admin_check(3, 'topic (code ' + topic_num + ')') == 1:
+                                return 0
+                        else:
+                            return 0
+                    else:
+                        return 0
+                else:
+                    return 0
 
     return 1
 

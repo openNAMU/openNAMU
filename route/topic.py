@@ -97,9 +97,7 @@ def topic_2(conn, topic_num):
     else:
         data = ''
 
-        curs.execute(db_change("select stop from rd where code = ? and stop != ''"), [topic_num])
-        close_data = curs.fetchall()
-        if (close_data and admin != 1) or ban == 1:
+        if ban == 1:
             display = 'display: none;'
         else:
             display = ''
