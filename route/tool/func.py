@@ -804,37 +804,31 @@ def slow_edit_check():
 def acl_check(name = 'test', tool = '', topic_num = 'test'):
     ip = ip_check()
     get_ban = ban_check()
+    acl_c = re.search("^user:((?:(?!\/).)*)", name)
 
-    if tool == '' and name:
-        acl_c = re.search("^user:((?:(?!\/).)*)", name)
-        if acl_c:
-            acl_n = acl_c.groups()
+    if tool == '' and name and acl_c:
+        acl_n = acl_c.groups()
 
-            if get_ban == 1:
-                return 1
-
-            if admin_check(5) == 1:
-                return 0
-
-            curs.execute(db_change("select decu from acl where title = ?"), ['user:' + acl_n[0]])
-            acl_data = curs.fetchall()
-            if acl_data:
-                if acl_data[0][0] == 'all':
-                    return 0
-
-                if acl_data[0][0] == 'user' and not re.search("(\.|:)", ip):
-                    return 0
-
-                if ip != acl_n[0] or re.search("(\.|:)", ip):
-                    return 1
-
-            if ip == acl_n[0] and not re.search("(\.|:)", ip) and not re.search("(\.|:)", acl_n[0]):
-                return 0
-            else:
-                return 1
-
-        if re.search("^file:", name) and admin_check(None, 'file edit (' + name + ')') != 1:
+        if get_ban == 1:
             return 1
+
+        if admin_check(5) == 1:
+            return 0
+
+        curs.execute(db_change("select decu from acl where title = ?"), ['user:' + acl_n[0]])
+        acl_data = curs.fetchall()
+        if acl_data:
+            if acl_data[0][0] == 'all':
+                return 0
+            elif acl_data[0][0] == 'user' and not ip_or_user(ip) == 1:
+                return 0
+            elif ip == acl_n[0] and not ip_or_user(ip) == 1:
+                return 0
+        else:
+            if ip == acl_n[0] and not ip_or_user(ip) == 1 and not ip_or_user(acl_n[0]) == 1:
+                return 0
+
+        return 1
 
     if tool == '' or tool == 'edit_req':
         if acl_check(name, 'render') == 1:
@@ -898,54 +892,41 @@ def acl_check(name = 'test', tool = '', topic_num = 'test'):
         elif acl_data and acl_data[0][0] != 'normal':
             if acl_data[0][0] == 'all' or acl_data[0][0] == 'ban':
                 return 0
-
-            if acl_data[0][0] == 'user':
-                if ip_or_user(ip) == 1:
-                    return 1
-
-            if acl_data[0][0] == 'admin':
-                if ip_or_user(ip) == 1:
-                    return 1
-
-                if admin_check(num) != 1:
-                    return 1
-
-            if acl_data[0][0] == '50_edit':
-                if ip_or_user(ip) == 1:
-                    return 1
-
-                if admin_check(num) != 1:
-                    curs.execute(db_change("select count(title) from history where ip = ?"), [ip])
-                    count = curs.fetchall()
-                    if count:
-                        count = count[0][0]
+            elif acl_data[0][0] == 'user':
+                if ip_or_user(ip) != 1:
+                    return 0
+            elif acl_data[0][0] == 'admin':
+                if ip_or_user(ip) != 1:
+                    if admin_check(num) == 1:
+                        return 0
+            elif acl_data[0][0] == '50_edit':
+                if ip_or_user(ip) != 1:
+                    if admin_check(num) == 1:
+                        return 0
                     else:
-                        count = 0
-
-                    if count < 50:
-                        return 1
-
-            if acl_data[0][0] == 'email':
-                if ip_or_user(ip) == 1:
-                    return 1
-
-                if admin_check(num) != 1:
-                    curs.execute(db_change("select data from user_set where id = ? and name = 'email'"), [ip])
-                    email = curs.fetchall()
-                    if not email:
-                        return 1
-
-            if acl_data[0][0] == 'owner':
-                if admin_check() != 1:
-                    return 1
+                        curs.execute(db_change("select count(title) from history where ip = ?"), [ip])
+                        count = curs.fetchall()
+                        count = count[0][0] if count else 0
+                        if count >= 50:
+                            return 0
+            elif acl_data[0][0] == 'email':
+                if ip_or_user(ip) != 1:
+                    if admin_check(num) == 1:
+                        return 0
+                    else:
+                        curs.execute(db_change("select data from user_set where id = ? and name = 'email'"), [ip])
+                        if curs.fetchall():
+                            return 0
+            elif acl_data[0][0] == 'owner':
+                if admin_check() == 1:
+                    return 0
 
         if tool == 'topic' and topic_num:
             curs.execute(db_change("select title from rd where code = ? and stop != ''"), [topic_num])
-            if curs.fetchall():
-                if admin_check(3, 'topic (code ' + topic_num + ')') != 1:
-                    return 1
+            if curs.fetchall() and admin_check(3, 'topic (code ' + topic_num + ')') == 1:
+                return 0
 
-    return 0
+    return 1
 
 def ban_check(ip = None, tool = None):
     if not ip:
