@@ -836,9 +836,13 @@ def acl_check(name = 'test', tool = '', topic_num = 'test'):
         if re.search("^file:", name) and admin_check(None, 'file edit (' + name + ')') != 1:
             return 1
 
+    if tool == '' or tool == 'edit_req':
+        if acl_check(name, 'render') == 1:
+            return 1
+    
     if tool == '':
         end = 3
-    elif tool == 'topic' or tool == 'render':
+    elif tool == 'topic':
         if not name:
             curs.execute(db_change("select title from rd where code = ?"), [topic_num])
             topic_data = curs.fetchall()
@@ -847,6 +851,8 @@ def acl_check(name = 'test', tool = '', topic_num = 'test'):
             else:
                 name = 'test'
 
+        end = 3
+    elif tool == 'render':
         end = 3
     else:
         end = 1
