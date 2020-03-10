@@ -33,7 +33,7 @@ def topic_tool_2(conn, topic_num):
         <h2>''' + load_lang('tool') + '''</h2>
         <ul>
             <li><a id="reload" href="javascript:void(0);" onclick="req_alarm();">''' + load_lang('use_push_alarm') + '''</a></li>
-            <li>''' + load_lang('topic_state') + ''' : ''' + t_state + '' + (' (Agree)' if close_data and (close_data[0][1] == 'O') else '') + '''</li>
+            <li>''' + load_lang('topic_state') + ''' : ''' + t_state + '' + (' (agree)' if close_data and (close_data[0][1] == 'O') else '') + '''</li>
             <li>''' + load_lang('topic_acl') + ''' : <a href="/acl/TEST#exp">''' + ('normal' if not topic_acl_get or (topic_acl_get[0][0] == '') else topic_acl_get[0][0]) + '''</a></li>
         </ul>
     '''
