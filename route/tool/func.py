@@ -847,7 +847,7 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
 
         end = 3
     elif tool == 'render':
-        end = 3
+        end = 2
     else:
         end = 1
 
@@ -923,6 +923,8 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
             elif acl_data[0][0] == 'owner':
                 if admin_check() == 1:
                     return 0
+
+            return 1
         else:
             if i == (end - 1):
                 if tool == 'topic':
