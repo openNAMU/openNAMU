@@ -188,9 +188,6 @@ def update(ver_num):
         print('Add init set')
         set_init()
 
-    if ver_num < 3160500:
-        curs.execute(db_change('delete from cache_data'))
-
     if ver_num < 3170002:
         curs.execute(db_change("select html from html_filter where kind = 'extension'"))
         if not curs.fetchall():
@@ -203,6 +200,9 @@ def update(ver_num):
         for i in change_topic:
             curs.execute(db_change("update topic set code = ? where title = ? and sub = ?"), [i[2], i[0], i[1]])
             curs.execute(db_change("update rd set code = ? where title = ? and sub = ?"), [i[2], i[0], i[1]])
+
+    if ver_num < 3171100:
+        curs.execute(db_change('delete from cache_data'))
 
     conn.commit()
     print('Update pass')
