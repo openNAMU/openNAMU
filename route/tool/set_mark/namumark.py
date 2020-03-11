@@ -210,7 +210,7 @@ def table_start(data):
                         '<td ' + cel_plus[2] + ' ' + cel_plus[3] + ' ' + cel_plus[4] + '>' + \
                             cel_data
 
-            table_end += '</td></tr></table>'
+            table_end += '</td></tr></table></div>'
 
             data = re.sub('\n((?:(?:(?:(?:\|\||\|[^|]+\|)+(?:(?:(?!\|\|).\n*)*))+)\|\|(?:\n)?)+)', table_end, data, 1)
         else:
