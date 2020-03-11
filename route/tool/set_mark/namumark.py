@@ -141,10 +141,11 @@ def table_parser(data, cel_data, cel_num, start_data, num = 0, cel_color = {}):
     return [all_table, row_style, cel_style, row, cel, table_class, num, div_style, cel_color]
 
 def table_start(data):
-    cel_num = 0
-    table_num = 0
-    table_end = ''
     while 1:
+        cel_num = 0
+        table_num = 0
+        table_end = ''
+        
         table = re.search('\n((?:(?:(?:(?:\|\||\|[^|]+\|)+(?:(?:(?!\|\|).\n*)*))+)\|\|(?:\n)?)+)', data)
         if table:
             table = '\n' + table.groups()[0]
