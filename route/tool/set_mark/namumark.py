@@ -24,7 +24,7 @@ def link_fix(main_link):
 
     return [main_link, other_link]
 
-def table_parser(data, cel_data, start_data, num = 0):
+def table_parser(data, cel_data, cel_num, start_data, num = 0, cel_color = {}):
     table_class = 'class="'
     div_style = 'style="'
     all_table = 'style="'
@@ -32,6 +32,11 @@ def table_parser(data, cel_data, start_data, num = 0):
     row_style = 'style="'
     row = ''
     cel = 'colspan="' + str(round(len(start_data) / 2)) + '"'
+
+    if not cel_num in cel_color:
+        cel_color[cel_num] = ''
+
+    cel_style += cel_color[cel_num]
 
     if num == 0:
         if re.search('^ ', cel_data) and re.search(' $', cel_data):
@@ -95,8 +100,19 @@ def table_parser(data, cel_data, start_data, num = 0):
         elif re.search("^table ?color=([^=]+)$", in_state):
             table_data = re.sub('^table ?color=', '', in_state)
             all_table += 'color: ' + (re.sub(',([^,]*)', '', table_data) if re.search(',', table_data) else table_data) + ';'
+        elif re.search("^col ?bgcolor=([^=]+)$", in_state):
+            table_data = re.sub('^col ?bgcolor=', '', in_state)
+            table_data = (re.sub(',([^,]*)', '', table_data) if re.search(',', table_data) else table_data)
+            cel_color[cel_num] += 'background: ' + table_data + ';'
+            cel_style += 'background: ' + table_data + ';'
+        elif re.search("^col ?color=([^=]+)$", in_state):
+            table_data = re.sub('^col ?color=', '', in_state)
+            table_data = (re.sub(',([^,]*)', '', table_data) if re.search(',', table_data) else table_data)
+            cel_color[cel_num] += 'color: ' + table_data + ';'
+            cel_style += 'color: ' + table_data + ';'
         elif re.search("^(bgcolor=([^=]+)|#(?:[0-9a-f-A-F]{3}){1,2}|\w+)$", in_state):
-            cel_style += 'background: ' + re.sub('^bgcolor=', '', in_state) + ';'
+            table_data = re.sub('^bgcolor=', '', in_state)
+            cel_style += 'background: ' + (re.sub(',([^,]*)', '', table_data) if re.search(',', table_data) else table_data) + ';'
         elif re.search("^color=([^=]+)$", in_state):
             table_data = re.sub('^color=', '', in_state)
             cel_style += 'color: ' + (re.sub(',([^,]*)', '', table_data) if re.search(',', table_data) else table_data) + ';'
@@ -122,72 +138,81 @@ def table_parser(data, cel_data, start_data, num = 0):
     row_style += '"'
     table_class += '"'
 
-    return [all_table, row_style, cel_style, row, cel, table_class, num, div_style]
+    return [all_table, row_style, cel_style, row, cel, table_class, num, div_style, cel_color]
 
 def table_start(data):
+    cel_num = 0
+    table_num = 0
+    table_end = ''
     while 1:
         table = re.search('\n((?:(?:(?:(?:\|\||\|[^|]+\|)+(?:(?:(?!\|\|).\n*)*))+)\|\|(?:\n)?)+)', data)
         if table:
-            table = table.groups()[0]
+            table = '\n' + table.groups()[0]
+            table_cel = re.findall('(\n(?:(?:\|\|)+)|\|\|\n(?:(?:\|\|)+)|(?:(?:\|\|)+))((?:(?:(?!\n|\|\|).)+\n*)+)', table)
+            for i in table_cel:
+                cel_plus = re.search('^((?:&lt;(?:(?:(?!&gt;).)*)&gt;)+)', i[1])
+                cel_plus = cel_plus.groups()[0] if cel_plus else ''
+                cel_data = re.sub('^((?:&lt;(?:(?:(?!&gt;).)*)&gt;)+)', '', i[1])
 
-            all_table = re.search('^((?:\|\||\|[^|]+\|)+)((?:&lt;(?:(?:(?!&gt;).)+)&gt;)*)\n*((?:(?!\|\|).\n*)*)', table)
-            if all_table:
-                all_table = all_table.groups()
+                if re.search('^\n', i[0]):
+                    cel_num = 1
 
-                return_table = table_parser(all_table[1], all_table[2], re.sub('^\|([^|]+)\|', '||', all_table[0]))
-                number = return_table[6]
-
-                table_caption = re.search('^\|([^|]+)\|', table)
-                table_caption = '<caption>' + table_caption.groups()[0] + '</caption>' if table_caption else ''
-
-                table = re.sub(
-                    '^((?:\|\||\|[^|]+\|)+)((?:&lt;(?:(?:(?!&gt;).)+)&gt;)*)\n*',
-                    '\n' + \
-                        '<div class="table_safe" ' + return_table[7] + '>' + \
-                            '<table ' + return_table[5] + ' ' + return_table[0] + '>' + \
-                                table_caption + \
-                                '<tbody>' + \
-                                    '<tr ' + return_table[1] + '>' + \
-                                        '<td ' + return_table[2] + ' ' + return_table[3] + ' ' + return_table[4] + '>',
-                    table,
-                    1
-                )
-
-            table = re.sub('\|\|\n?$', '</td></tr></tbody></table></div>', table)
-
-            while 1:
-                row_table = re.search('\|\|\n((?:\|\|)+)((?:&lt;(?:(?:(?!&gt;).)+)&gt;)*)\n*((?:(?!\|\||<\/td>).\n*)*)', table)
-                if row_table:
-                    row_table = row_table.groups()
-
-                    return_table = table_parser(row_table[1], row_table[2], row_table[0], number)
-
-                    table = re.sub(
-                        '\|\|\n((?:\|\|)+)((?:&lt;(?:(?:(?!&gt;).)+)&gt;)*)\n*',
-                        '</td></tr><tr ' + return_table[1] + '><td ' + return_table[2] + ' ' + return_table[3] + ' ' + return_table[4] + '>',
-                        table,
-                        1
+                    cel_plus = table_parser(
+                        cel_plus, 
+                        cel_data,
+                        cel_num,
+                        re.sub('^\n', '', i[0])
                     )
-                else:
-                    break
+                    cel_color = cel_plus[8]
+                    table_num = cel_plus[6]
 
-            while 1:
-                cel_table = re.search('((?:\|\|)+)((?:&lt;(?:(?:(?!&gt;).)+)&gt;)*)\n*((?:(?:(?!\|\||<\/td>).)|\n)*\n*)', table)
-                if cel_table:
-                    cel_table = cel_table.groups()
+                    table_end += '' + \
+                        '<div class="table_safe" ' + cel_plus[7] + '>' + \
+                            '<table ' + cel_plus[5] + ' ' + cel_plus[0] + '>' + \
+                                '<tr ' + cel_plus[1] + '>' + \
+                                    '<td ' + cel_plus[2] + ' ' + cel_plus[3] + ' ' + cel_plus[4] + '>' + \
+                                        cel_data
+                                        
+                elif re.search('\n', i[0]):
+                    cel_num = 1
 
-                    return_table = table_parser(cel_table[1], re.sub('\n', ' ', cel_table[2]), cel_table[0], number)
-
-                    table = re.sub(
-                        '((?:\|\|)+)((?:&lt;(?:(?:(?!&gt;).)+)&gt;)*)\n*',
-                        '</td><td ' + return_table[2] + ' ' + return_table[3] + ' ' + return_table[4] + '>',
-                        table,
-                        1
+                    cel_plus = table_parser(
+                        cel_plus, 
+                        cel_data,
+                        cel_num,
+                        re.sub('^\|\|\n', '', i[0]),
+                        table_num,
+                        cel_color
                     )
-                else:
-                    break
+                    cel_color = cel_plus[8]
 
-            data = re.sub('\n((?:(?:(?:(?:\|\||\|[^|]+\|)+(?:(?:(?!\|\|).\n*)*))+)\|\|(?:\n)?)+)', table, data, 1)
+                    table_end += '' + \
+                            '</td>' + \
+                        '</tr>' + \
+                        '<tr ' + cel_plus[1] + '>' + \
+                            '<td ' + cel_plus[2] + ' ' + cel_plus[3] + ' ' + cel_plus[4] + '>' + \
+                                cel_data
+                else:
+                    cel_num += 1
+
+                    cel_plus = table_parser(
+                        cel_plus, 
+                        cel_data,
+                        cel_num,
+                        re.sub('^\|\|\n', '', i[0]),
+                        table_num,
+                        cel_color
+                    )
+                    cel_color = cel_plus[8]
+
+                    table_end += '' + \
+                        '</td>' + \
+                        '<td ' + cel_plus[2] + ' ' + cel_plus[3] + ' ' + cel_plus[4] + '>' + \
+                            cel_data
+
+            table_end += '</td></tr></table>'
+
+            data = re.sub('\n((?:(?:(?:(?:\|\||\|[^|]+\|)+(?:(?:(?!\|\|).\n*)*))+)\|\|(?:\n)?)+)', table_end, data, 1)
         else:
             break
 
