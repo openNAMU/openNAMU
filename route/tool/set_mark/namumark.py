@@ -145,7 +145,7 @@ def table_start(data):
         cel_num = 0
         table_num = 0
         table_end = ''
-        
+
         table = re.search('\n((?:(?:(?:(?:\|\||\|[^|]+\|)+(?:(?:(?!\|\|).\n*)*))+)\|\|(?:\n)?)+)', data)
         if table:
             table = '\n' + table.groups()[0]
@@ -872,6 +872,7 @@ def namumark(conn, data, title, main_num, include_num):
             break
 
     data = re.sub('<\/ul>\n \|\|', '</ul>||', data)
+    data = re.sub('\|\|</blockquote>', '</blockquote>||', data)
 
     while 1:
         indent = re.search('\n( +)', data)
