@@ -201,7 +201,7 @@ def update(ver_num):
             curs.execute(db_change("update topic set code = ? where title = ? and sub = ?"), [i[2], i[0], i[1]])
             curs.execute(db_change("update rd set code = ? where title = ? and sub = ?"), [i[2], i[0], i[1]])
 
-    if ver_num < 3171100:
+    if ver_num < 3171200:
         curs.execute(db_change('delete from cache_data'))
 
     conn.commit()
