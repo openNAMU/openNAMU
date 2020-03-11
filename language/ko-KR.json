@@ -46,7 +46,7 @@
     "state": "상태",
     "authorize": "권한 부여",
     "check_user": "사용자 검사",
-    "email_acl": "이메일 인증을  사용자만",
+    "email_acl": "이메일 인증을 받은 사용자만",
     "email_error": "해당 이메일을 가진 사용자가 존재하지 않습니다.",
     "version": "버전",
     "open": "열기",
