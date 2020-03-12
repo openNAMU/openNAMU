@@ -43,7 +43,7 @@ def edit_move_2(conn, name):
                     ip_check(),
                     flask.request.form.get('send', ''),
                     '0',
-                    'marge <a>' + name + '</a> - <a>' + move_title + '</a> move'
+                    'merge <a>' + name + '</a> - <a>' + move_title + '</a> move'
                 )
 
                 curs.execute(db_change("update back set type = 'no' where title = ? and not type = 'cat' and not type = 'no'"), [name])
