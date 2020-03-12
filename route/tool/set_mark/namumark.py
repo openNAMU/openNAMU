@@ -43,8 +43,6 @@ def table_parser(data, cel_data, cel_num, start_data, num = 0, cel_color = {}):
     row = ''
     cel = 'colspan="' + str(round(len(start_data) / 2)) + '"'
 
-    print(cel_color)
-
     if not cel_num in cel_color:
         cel_color[cel_num] = ''
 
