@@ -9,14 +9,14 @@ def view_raw_2(conn, name, topic_num, num):
     if topic_num:
         topic_num = str(topic_num)
 
-    v_name = name
-    num = str(num)
-    sub = ' (' + load_lang('raw') + ')'
-
     if not num:
         num = flask.request.args.get('num', None)
         if num:
             num = int(number_check(num))
+
+    v_name = name
+    num = str(num)
+    sub = ' (' + load_lang('raw') + ')'
 
     if not topic_num and num:
         curs.execute(db_change("select title from history where title = ? and id = ? and hide = 'O'"), [name, num])
