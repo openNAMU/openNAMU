@@ -226,7 +226,7 @@ def table_start(data):
 
             table_end += '</td></tr></table></div>'
 
-            data = re.sub('\n((?:(?:(?:(?:\|\||\|[^|]+\|)+(?:(?:(?!\|\|).\n*)*))+)\|\|(?:\n)?)+)', table_end, data, 1)
+            data = re.sub('\n((?:(?:(?:(?:\|\||\|[^|]+\|)+(?:(?:(?!\|\|).\n*)*))+)\|\|(?:\n)?)+)', table_end + '\n', data, 1)
         else:
             break
 
