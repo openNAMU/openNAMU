@@ -5,7 +5,7 @@ import html
 import re
 
 def nowiki_js(data):
-    return re.sub('^\n', '', data.replace('\\', '\\\\').replace('"', '\\"')).replace('\n', '<br>"')
+    return re.sub('^\n', '', data.replace('\\', '\\\\').replace('"', '\\"')).replace('\n', '<br>')
 
 def link_fix(main_link):
     global end_data
