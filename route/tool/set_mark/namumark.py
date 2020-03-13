@@ -369,13 +369,13 @@ def middle_parser(data, include_num):
                 middle_num += 1
         else:
             if middle_list == []:
-                data = middle_re.sub('&#125;&#125;&#125;', data, 1)
+                data = middle_re.sub('}}}', data, 1)
             else:
                 if middle_stack > 0:
                     middle_stack -= 1
 
                 if middle_stack > 0:
-                    data = middle_re.sub('&#125;&#125;&#125;', data, 1)
+                    data = middle_re.sub('}}}', data, 1)
                 else:
                     if middle_num > 0:
                         middle_num -= 1
@@ -394,13 +394,13 @@ def middle_parser(data, include_num):
             break
         else:
             if middle_list == []:
-                data += '&#125;&#125;&#125;'
+                data += '}}}'
             else:
                 if middle_stack > 0:
                     middle_stack -= 1
 
                 if middle_stack > 0:
-                    data += '&#125;&#125;&#125;'
+                    data += '}}}'
                 else:
                     if middle_num > 0:
                         middle_num -= 1
