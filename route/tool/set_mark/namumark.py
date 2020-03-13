@@ -4,6 +4,9 @@ import datetime
 import html
 import re
 
+def nowiki_js(data):
+    return re.sub('^\n', '', data.replace('\\', '\\\\').replace('"', '\\"')).replace('\n', '<br>"')
+
 def link_fix(main_link):
     global end_data
 
@@ -418,7 +421,7 @@ def middle_parser(data, include_num):
 
             nowiki_num += 1
             end_data['nowiki_' + str(nowiki_num)] = nowiki_data[0]
-            plus_data += 'document.getElementById("nowiki_' + str(nowiki_num) + '").innerHTML = "' + nowiki_data[0].replace('\\', '\\\\').replace('"', '\\"') + '";\n'
+            plus_data += 'document.getElementById("nowiki_' + str(nowiki_num) + '").innerHTML = "' + nowiki_js(nowiki_data[0]) + '";\n'
 
             data = re.sub(
                 '<code>((?:(?:(?!<\/code>).)*\n*)*)<\/code>',
@@ -436,7 +439,7 @@ def middle_parser(data, include_num):
 
             nowiki_num += 1
             end_data['nowiki_' + str(nowiki_num)] = syntax_data[1]
-            plus_data += 'document.getElementById("nowiki_' + str(nowiki_num) + '").innerHTML = "' + syntax_data[1].replace('\\', '\\\\').replace('"', '\\"') + '";\n'
+            plus_data += 'document.getElementById("nowiki_' + str(nowiki_num) + '").innerHTML = "' + nowiki_js(syntax_data[1]) + '";\n'
 
             data = re.sub(
                 '<code class="((?:(?!"|>|<).)+)">((?:\n*(?:(?:(?!<\/code>|<span id="syntax_).)+)\n*)+)<\/code>',
@@ -482,7 +485,7 @@ def namumark(conn, data, title, main_num, include_num):
             plus_data += '''
                 try {
                     katex.render(
-                        "''' + html.unescape(math).replace('\\', '\\\\').replace('"', '\\"') + '''",
+                        "''' + nowiki_js(html.unescape(math)) + '''",
                         document.getElementById("math_''' + str(first) + '''")
                     );
                 } catch {
@@ -504,7 +507,7 @@ def namumark(conn, data, title, main_num, include_num):
 
             nowiki_num += 1
             end_data['nowiki_' + str(nowiki_num)] = one_nowiki[0]
-            plus_data += 'document.getElementById("nowiki_' + str(nowiki_num) + '").innerHTML = "' + one_nowiki[0].replace('\\', '\\\\').replace('"', '\\"') + '";\n'
+            plus_data += 'document.getElementById("nowiki_' + str(nowiki_num) + '").innerHTML = "' + nowiki_js(one_nowiki[0]) + '";\n'
 
             data = re.sub('(?:\\\\)(.)', '<span id="nowiki_' + str(nowiki_num) + '"></span>', data, 1)
         else:
