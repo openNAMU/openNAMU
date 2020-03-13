@@ -430,7 +430,7 @@ def middle_parser(data, include_num):
             break
 
     while 1:
-        syntax_data = re.search('<code class="((?:(?!"|>|<).)+)">((?:\n*(?:(?:(?!<\/code>|<span id="syntax_).)+)\n*)+)<\/code>', data)
+        syntax_data = re.search('<code class="((?:(?!"|>|<).)+)">((?:\n*(?:(?:(?!<\/code>|<span id="nowiki_).)+)\n*)+)<\/code>', data)
         if syntax_data:
             syntax_data = syntax_data.groups()
 
