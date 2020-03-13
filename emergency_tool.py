@@ -210,6 +210,7 @@ print('9. Delete set.json')
 print('10. Change name')
 print('11. Delete mysql.json')
 print('12. All title count reset')
+print('13. Cache data reset')
 
 print('----')
 print('Select : ', end = '')
@@ -342,7 +343,7 @@ elif what_i_do == '11':
         os.remove('data/mysql.json')
     except:
         pass
-else:
+elif what_i_do == '12':
     curs.execute(db_change("select count(title) from data"))
     count_data = curs.fetchall()
     if count_data:
@@ -352,6 +353,8 @@ else:
 
     curs.execute(db_change('delete from other where name = "count_all_title"'))
     curs.execute(db_change('insert into other (name, data) values ("count_all_title", ?)'), [str(count_data)])
+else:
+    curs.execute(db_change('delete from cache_data'))
 
 conn.commit()
 
