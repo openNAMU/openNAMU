@@ -258,7 +258,7 @@ def middle_parser(data, include_num):
             if middle_stack > 0:
                 middle_stack += 1
 
-                data = re.sub('(?:{{{((?:(?! |{{{|}}}|&lt;).)*)(?P<in> ?)|(}}}))', '&#123;&#123;&#123;' + middle_data[0] + '\g<in>', data, 1)
+                data = re.sub('(?:{{{((?:(?! |{{{|}}}|&lt;).)*)(?P<in> ?)|(}}}))', '<middle_start>' + middle_data[0] + '\g<in>', data, 1)
             else:
                 if re.search('^(#|@|\+|\-)', middle_data[0]) and not re.search('^(#|@|\+|\-){2}|(#|@|\+|\-)\\\\', middle_data[0]):
                     if re.search('^(#(?:[0-9a-f-A-F]{3}){1,2})', middle_data[0]):
@@ -372,13 +372,13 @@ def middle_parser(data, include_num):
                 middle_num += 1
         else:
             if middle_list == []:
-                data = middle_re.sub('}}}', data, 1)
+                data = middle_re.sub('<middle_end>', data, 1)
             else:
                 if middle_stack > 0:
                     middle_stack -= 1
 
                 if middle_stack > 0:
-                    data = middle_re.sub('}}}', data, 1)
+                    data = middle_re.sub('<middle_end>', data, 1)
                 else:
                     if middle_num > 0:
                         middle_num -= 1
@@ -397,13 +397,13 @@ def middle_parser(data, include_num):
             break
         else:
             if middle_list == []:
-                data += '}}}'
+                data += '<middle_end>'
             else:
                 if middle_stack > 0:
                     middle_stack -= 1
 
                 if middle_stack > 0:
-                    data += '}}}'
+                    data += '<middle_end>'
                 else:
                     if middle_num > 0:
                         middle_num -= 1
@@ -416,6 +416,8 @@ def middle_parser(data, include_num):
                         data += '</' + middle_list[middle_num] + '>'
 
                     del(middle_list[middle_num])
+
+    data = data.replace('<middle_start>', '{{{').replace('<middle_end>', '}}}')
 
     while 1:
         nowiki_data = re.search('<code>((?:(?:(?!<\/code>).)*\n*)*)<\/code>', data)
