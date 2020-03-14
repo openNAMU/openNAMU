@@ -10,6 +10,8 @@ def nowiki_js(data):
 def link_fix(main_link):
     global end_data
 
+    main_link = main_link.replace('&#x27;', "'")
+    
     if re.search('^:', main_link):
         main_link = re.sub('^:', '', main_link)
 
@@ -25,6 +27,7 @@ def link_fix(main_link):
     else:
         other_link = ''
 
+    main_link = main_link.replace("'", "&#x27;")
     main_link = re.sub('\\\\#', '%23', main_link)
 
     find_data = re.findall('<span id="(nowiki_[0-9]+)">', main_link)
@@ -1087,7 +1090,7 @@ def namumark(conn, data, title, main_num, include_num):
                             data = re.sub(
                                 '\[\[((?:(?!\[\[|\]\]|<\/td>).)+)\]\]',
                                 '<a class="' + include_num + 'link_finder" ' + \
-                                    'title="' + main_link + other_link + '" ' + \
+                                    'title="' + html.escape(main_link) + other_link + '" ' + \
                                     'href="/w/' + tool.url_pas(main_link) + other_link + '"' + \
                                 '>' + see_link + '</a>',
                                 data,
