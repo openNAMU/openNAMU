@@ -485,7 +485,7 @@ def namumark(conn, data, title, main_num, include_num):
             math = math.groups()[0]
             math = math.replace('{', '<math_mid_1>')
             math = math.replace('}', '<math_mid_2>')
-            math = math.replace('\g', '<get_g>')
+            math = math.replace('\\', '<math_slash>')
 
             data = math_re.sub('<math>' + math + '</math>', data, 1)
         else:
@@ -494,9 +494,6 @@ def namumark(conn, data, title, main_num, include_num):
     data = data.replace('\\{', '<break_middle>')
     data = middle_parser(data, include_num)
     data = data.replace('<break_middle>', '\\{')
-    data = data.replace('<math_mid_1>', '{')
-    data = data.replace('<math_mid_2>', '}')
-    data = data.replace('<get_g>', '\g')
 
     # JS 버그 뜨는 거 수정 해야함
     first = 0
@@ -505,6 +502,9 @@ def namumark(conn, data, title, main_num, include_num):
         math = math_re.search(data)
         if math:
             math = math.groups()[0]
+            math = math.replace('<math_mid_1>', '{')
+            math = math.replace('<math_mid_2>', '}')
+            math = math.replace('<math_slash>', '\\')
 
             first += 1
             data = math_re.sub('<span id="math_' + str(first) + '"></span>', data, 1)
