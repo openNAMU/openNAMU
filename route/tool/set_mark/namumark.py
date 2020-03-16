@@ -5,12 +5,12 @@ import html
 import re
 
 def nowiki_js(data):
-    return re.sub('^\n', '', data.replace('\\', '\\\\').replace('"', '\\"')).replace('\n', '<br>')
+    return re.sub('^\n', '', data.replace('\\', '\\\\').replace('"', '\\"').replace('\r', '')).replace('\n', '<br>')
 
 def link_fix(main_link):
     global end_data
 
-    main_link = main_link.replace('&#x27;', "'")
+    main_link = main_link.replace('&#x27;', "<link_comma>")
     
     if re.search('^:', main_link):
         main_link = re.sub('^:', '', main_link)
@@ -27,7 +27,7 @@ def link_fix(main_link):
     else:
         other_link = ''
 
-    main_link = main_link.replace("'", "&#x27;")
+    main_link = main_link.replace("<link_comma>", "&#x27;")
     main_link = re.sub('\\\\#', '%23', main_link)
 
     find_data = re.findall('<span id="(nowiki_[0-9]+)">', main_link)
@@ -165,7 +165,7 @@ def table_start(data):
 
         table = re.search('\n((?:(?:(?:(?:\|\||\|[^|]+\|)+(?:(?:(?!\|\|).\n*)*))+)\|\|(?:\n)?)+)', data)
         if table:
-            table = '\n' + table.groups()[0]
+            table = '\n' + re.sub('(\|\|)+\n', '||\n', table.groups()[0])
             table_cel = re.findall('(\n(?:(?:\|\|)+)|\|\|\n(?:(?:\|\|)+)|(?:(?:\|\|)+))((?:(?:(?!\n|\|\|).)+\n*)+)', table)
             for i in table_cel:
                 cel_plus = re.search('^((?:&lt;(?:(?:(?!&gt;).)*)&gt;)+)', i[1])
@@ -417,7 +417,8 @@ def middle_parser(data, include_num):
 
                     del(middle_list[middle_num])
 
-    data = data.replace('<middle_start>', '{{{').replace('<middle_end>', '}}}')
+    data = data.replace('<middle_start>', '{{{')
+    data = data.replace('<middle_end>', '}}}')
 
     while 1:
         nowiki_data = re.search('<code>((?:(?:(?!<\/code>).)*\n*)*)<\/code>', data)
@@ -477,8 +478,29 @@ def namumark(conn, data, title, main_num, include_num):
     data = html.escape(data)
     data = re.sub('\r\n', '\n', data)
 
-    first = 0
     math_re = re.compile('\[math\(((?:(?!\)\]).)+)\)\]', re.I)
+    while 1:
+        math = math_re.search(data)
+        if math:
+            math = math.groups()[0]
+            math = math.replace('{', '<math_mid_1>')
+            math = math.replace('}', '<math_mid_2>')
+            math = math.replace('\g', '<get_g>')
+
+            data = math_re.sub('<math>' + math + '</math>', data, 1)
+        else:
+            break
+
+    data = data.replace('\\{', '<break_middle>')
+    data = middle_parser(data, include_num)
+    data = data.replace('<break_middle>', '\\{')
+    data = data.replace('<math_mid_1>', '{')
+    data = data.replace('<math_mid_2>', '}')
+    data = data.replace('<get_g>', '\g')
+
+    # JS 버그 뜨는 거 수정 해야함
+    first = 0
+    math_re = re.compile('<math>((?:(?!<\/math>).)+)<\/math>', re.I)
     while 1:
         math = math_re.search(data)
         if math:
@@ -487,22 +509,18 @@ def namumark(conn, data, title, main_num, include_num):
             first += 1
             data = math_re.sub('<span id="math_' + str(first) + '"></span>', data, 1)
 
-            plus_data += '''
-                try {
-                    katex.render(
-                        "''' + nowiki_js(html.unescape(math)) + '''",
-                        document.getElementById("math_''' + str(first) + '''")
-                    );
-                } catch {
-                    document.getElementById("math_''' + str(first) + '''").innerHTML = '<span style="color: red;">''' + math.replace('\\', '\\\\') + '''</span>';
-                }\n
-            '''
+            plus_data += '' + \
+                'try {' + \
+                    'katex.render(' + \
+                        '"' + nowiki_js(html.unescape(math)) + '",' + \
+                        'document.getElementById(\"math_' + str(first) + '\")' + \
+                    ');' + \
+                '} catch {' + \
+                    'document.getElementById(\"math_' + str(first) + '\").innerHTML = "<span style=\'color: red;\'>' + nowiki_js(math) + '</span>";' + \
+                '}\n' + \
+            ''
         else:
             break
-
-    data = re.sub('\\\\{', '<break_middle>', data)
-    data = middle_parser(data, include_num)
-    data = re.sub('<break_middle>', '\\{', data)
 
     num = 0
     while 1:
@@ -596,7 +614,7 @@ def namumark(conn, data, title, main_num, include_num):
         redirect = redirect.groups()[0]
 
         return_link = link_fix(redirect)
-        main_link = return_link[0]
+        main_link = html.unescape(return_link[0])
         other_link = return_link[1]
 
         backlink += [[title, main_link + other_link, 'redirect']]
