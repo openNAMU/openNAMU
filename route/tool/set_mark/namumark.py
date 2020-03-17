@@ -232,7 +232,7 @@ def table_start(data):
 
             table_end += '</td></tr></table></div>'
 
-            data = re.sub('\n((?:(?:(?:(?:\|\||\|[^|]+\|)+(?:(?:(?!\|\|).\n*)*))+)\|\|(?:\n)?)+)', table_end + '\n', data, 1)
+            data = re.sub('\n((?:(?:(?:(?:\|\||\|[^|]+\|)+(?:(?:(?!\|\|).\n*)*))+)\|\|(?:\n)?)+)', '\n' + table_end + '\n', data, 1)
         else:
             break
 
@@ -495,7 +495,6 @@ def namumark(conn, data, title, main_num, include_num):
     data = middle_parser(data, include_num)
     data = data.replace('<break_middle>', '\\{')
 
-    # JS 버그 뜨는 거 수정 해야함
     first = 0
     math_re = re.compile('<math>((?:(?!<\/math>).)+)<\/math>', re.I)
     while 1:
