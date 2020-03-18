@@ -805,8 +805,12 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
     ip = ip_check()
     get_ban = ban_check()
     
-    acl_c = re.search("^user:((?:(?!\/).)*)", name)
-    if tool == '' and name and acl_c:
+    if name:
+        acl_c = re.search("^user:((?:(?!\/).)*)", name)
+    else:
+        acl_c = None
+
+    if tool == '' and acl_c:
         acl_n = acl_c.groups()
 
         if get_ban == 1:

@@ -12,85 +12,93 @@ def func_upload_2(conn):
         else:
             captcha_post('', 0)
 
-        data = flask.request.files.get('f_data', None)
-        if not data:
+        file_data = flask.request.files.getlist("f_data[]", None)
+        if not file_data:
             return re_error('/error/9')
 
-        if int(wiki_set(3)) * 1024 * 1024 < flask.request.content_length:
-            return re_error('/error/17')
-
-        value = os.path.splitext(data.filename)[1]
-        
-        curs.execute(db_change("select html from html_filter where kind = 'extension'"))
-        extension = [i[0].lower() for i in curs.fetchall()]
-        if not re.sub('^\.', '', value).lower() in extension:
-            return re_error('/error/14')
-
-        if flask.request.form.get('f_name', None):
-            name = flask.request.form.get('f_name', None) + value
+        if len(file_data) == 1:
+            file_num = None
         else:
-            name = data.filename
+            file_num = 1
 
-        piece = os.path.splitext(name)
-        if re.search('[^ㄱ-힣0-9a-zA-Z_\- ]', piece[0]):
-            return re_error('/error/22')
+        for data in file_data:
+            if int(wiki_set(3)) * 1024 * 1024 < flask.request.content_length:
+                return re_error('/error/17')
 
-        e_data = sha224_replace(piece[0]) + piece[1]
+            value = os.path.splitext(data.filename)[1]
+            
+            curs.execute(db_change("select html from html_filter where kind = 'extension'"))
+            extension = [i[0].lower() for i in curs.fetchall()]
+            if not re.sub('^\.', '', value).lower() in extension:
+                return re_error('/error/14')
 
-        curs.execute(db_change("select title from data where title = ?"), ['file:' + name])
-        if curs.fetchall():
-            return re_error('/error/16')
-
-        curs.execute(db_change("select html from html_filter where kind = 'file'"))
-        db_data = curs.fetchall()
-        for i in db_data:
-            t_re = re.compile(i[0])
-            if t_re.search(name):
-                return redirect('/file_filter')
-
-        ip = ip_check()
-
-        if flask.request.form.get('f_lice_sel', 'direct_input') == 'direct_input':
-            lice = flask.request.form.get('f_lice', None) + '[br][br]'
-            if ip_or_user(ip) != 0:
-                lice += ip
+            if flask.request.form.get('f_name', None):
+                name = flask.request.form.get('f_name', None) + (' ' + str(file_num) if file_num else '') + value
             else:
-                lice += '[[user:' + ip + ']]'
+                name = data.filename
 
-            lice += '[[category:direct_input]]'
-        else:
-            lice = flask.request.form.get('f_lice_sel', None)
-            lice += '[br][br]'  + flask.request.form.get('f_lice', None)
-            lice += '[[category:' + re.sub('\]', '_', flask.request.form.get('f_lice_sel', None)) + ']]'
+            piece = os.path.splitext(name)
+            if re.search('[^ㄱ-힣0-9a-zA-Z_\- ]', piece[0]):
+                return re_error('/error/22')
 
-        if os.path.exists(os.path.join(app_var['path_data_image'], e_data)):
+            e_data = sha224_replace(piece[0]) + piece[1]
 
-            os.remove(os.path.join(app_var['path_data_image'], e_data))
+            curs.execute(db_change("select title from data where title = ?"), ['file:' + name])
+            if curs.fetchall():
+                return re_error('/error/16')
 
-            data.save(os.path.join(app_var['path_data_image'], e_data))
-        else:
-            data.save(os.path.join(app_var['path_data_image'], e_data))
+            curs.execute(db_change("select html from html_filter where kind = 'file'"))
+            db_data = curs.fetchall()
+            for i in db_data:
+                t_re = re.compile(i[0])
+                if t_re.search(name):
+                    return redirect('/file_filter')
 
-        file_d = '[[file:' + name + ']][br][br]{{{[[file:' + name + ']]}}}[br][br]' + lice
+            ip = ip_check()
 
-        curs.execute(db_change("insert into data (title, data) values (?, ?)"), ['file:' + name, file_d])
-        curs.execute(db_change("insert into acl (title, decu, dis, why, view) values (?, 'admin', '', '', '')"), ['file:' + name])
+            if flask.request.form.get('f_lice_sel', 'direct_input') == 'direct_input':
+                lice = flask.request.form.get('f_lice', '') + '[br][br]'
+                if ip_or_user(ip) != 0:
+                    lice += ip
+                else:
+                    lice += '[[user:' + ip + ']]'
 
-        render_set(
-            title = 'file:' + name,
-            data = file_d,
-            num = 1
-        )
+                lice += '[[category:direct_input]]'
+            else:
+                lice = flask.request.form.get('f_lice_sel', '')
+                lice += '[br][br]'  + flask.request.form.get('f_lice', '')
+                lice += '[[category:' + re.sub('\]', '_', flask.request.form.get('f_lice_sel', '')) + ']]'
 
-        history_plus(
-            'file:' + name,
-            file_d,
-            get_time(),
-            ip,
-            ip,
-            '0',
-            'upload'
-        )
+            if os.path.exists(os.path.join(app_var['path_data_image'], e_data)):
+
+                os.remove(os.path.join(app_var['path_data_image'], e_data))
+
+                data.save(os.path.join(app_var['path_data_image'], e_data))
+            else:
+                data.save(os.path.join(app_var['path_data_image'], e_data))
+
+            file_d = '[[file:' + name + ']][br][br]{{{[[file:' + name + ']]}}}[br][br]' + lice
+
+            curs.execute(db_change("insert into data (title, data) values (?, ?)"), ['file:' + name, file_d])
+            curs.execute(db_change("insert into acl (title, decu, dis, why, view) values (?, 'admin', '', '', '')"), ['file:' + name])
+
+            render_set(
+                title = 'file:' + name,
+                data = file_d,
+                num = 1
+            )
+
+            history_plus(
+                'file:' + name,
+                file_d,
+                get_time(),
+                ip,
+                ip,
+                '0',
+                'upload'
+            )
+
+            file_num += 1
 
         conn.commit()
 
@@ -115,7 +123,7 @@ def func_upload_2(conn):
                 ''' + load_lang('max_file_size') + ''' : ''' + wiki_set(3) + '''MB
                 <hr class=\"main_hr\">
                 <form method="post" enctype="multipart/form-data" accept-charset="utf8">
-                    <input type="file" name="f_data">
+                    <input multiple="multiple" type="file" name="f_data[]">
                     <hr class=\"main_hr\">
                     <input placeholder="''' + load_lang('file_name') + '''" name="f_name" value="''' + flask.request.args.get('name', '') + '''">
                     <hr class=\"main_hr\">
