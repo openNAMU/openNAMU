@@ -129,7 +129,11 @@ def edit_2(conn, name):
                 data = get_data[0][0]
 
         save_button = load_lang('save')
-        menu_plus = [['delete/' + url_pas(name), load_lang('delete')], ['move/' + url_pas(name), load_lang('move')]]
+        menu_plus = [
+            ['delete/' + url_pas(name), load_lang('delete')], 
+            ['move/' + url_pas(name), load_lang('move')], 
+            ['upload', load_lang('upload')]
+        ]
         sub = load_lang('edit')
 
         curs.execute(db_change('select data from other where name = "edit_bottom_text"'))
