@@ -310,7 +310,7 @@ if set_data['db_type'] == 'sqlite':
 if set_data['db_type'] == 'mysql':
     def mysql_dont_off():
         try:
-            urllib.request.urlopen('http://localhost:' + str(server_set['port']) + '/')
+            urllib.request.urlopen('http://localhost:' + server_set['port'] + '/')
         except:
             pass
 
@@ -325,7 +325,7 @@ if not curs.fetchall():
 
 conn.commit()
 
-print('Now running... http://localhost:3000')
+print('Now running... http://localhost:' + server_set['port'])
 
 if os.path.exists('custom.py'):
     from custom import custom_run
@@ -722,7 +722,7 @@ app.debug = True
 if __name__ == "__main__":
     try:
         http_server = tornado.httpserver.HTTPServer(tornado.wsgi.WSGIContainer(app))
-        http_server.listen(server_set['port'], address = server_set['host'])
+        http_server.listen(int(server_set['port']), address = server_set['host'])
 
         tornado.ioloop.IOLoop.instance().start()
     except Exception as e:
