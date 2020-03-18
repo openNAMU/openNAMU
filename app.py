@@ -325,6 +325,8 @@ if not curs.fetchall():
 
 conn.commit()
 
+print('Now running... http://localhost:3000')
+
 if os.path.exists('custom.py'):
     from custom import custom_run
 
