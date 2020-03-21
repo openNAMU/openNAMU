@@ -166,20 +166,6 @@ def render_set(title = '', data = '', num = 0, s_data = 0, include = None):
         else:
             return 'HTTP Request 404'
 
-def captcha_get():
-    data = ''
-
-    if ip_or_user() != 0:
-        curs.execute(db_change('select data from other where name = "recaptcha"'))
-        recaptcha = curs.fetchall()
-        if recaptcha and recaptcha[0][0] != '':
-            curs.execute(db_change('select data from other where name = "sec_re"'))
-            sec_re = curs.fetchall()
-            if sec_re and sec_re[0][0] != '':
-                data += '<script src="https://www.google.com/recaptcha/api.js" async defer></script>' + recaptcha[0][0] + '<hr class=\"main_hr\">'
-
-    return data
-
 def update(ver_num):
     print('----')
     # 업데이트 하위 호환 유지 함수
@@ -203,6 +189,17 @@ def update(ver_num):
 
     if ver_num < 3171600:
         curs.execute(db_change('delete from cache_data'))
+
+    if ver_num < 3171800:
+        curs.execute(db_change("select data from other where name = 'recaptcha'"))
+        change_rec = curs.fetchall()
+        if change_rec and change_rec[0][0] != '':
+            new_rec = re.search('data-sitekey="([^"]+)"', change_rec[0][0])
+            if new_rec:
+                curs.execute(db_change("update other set data = ? where name = 'recaptcha'"), [new_rec.groups()[0]])
+            else:
+                curs.execute(db_change("update other set data = '' where name = 'recaptcha'"))
+                curs.execute(db_change("update other set data = '' where name = 'sec_re'"))
 
     conn.commit()
     print('Update pass')
@@ -283,6 +280,37 @@ def pw_check(data, data2, type_d = 'no', id_d = ''):
         curs.execute(db_change("update user set pw = ?, encode = ? where id = ?"), [pw_encode(data), db_data[0][0], id_d])
 
     return re_data
+
+def captcha_get():
+    data = ''
+
+    if ip_or_user() != 0:
+        curs.execute(db_change('select data from other where name = "recaptcha"'))
+        recaptcha = curs.fetchall()
+        if recaptcha and recaptcha[0][0] != '':
+            curs.execute(db_change('select data from other where name = "sec_re"'))
+            sec_re = curs.fetchall()
+            if sec_re and sec_re[0][0] != '':
+                curs.execute(db_change('select data from other where name = "recaptcha_ver"'))
+                if not curs.fetchall() or curs.fetchall()[0][0] == '':
+                    data += '' + \
+                        '<script src="https://www.google.com/recaptcha/api.js" async defer></script>' + \
+                        '<div class="g-recaptcha" data-sitekey="' + recaptcha[0][0] + '"></div>' + \
+                        '<hr class=\"main_hr\">' + \
+                    ''
+                else:
+                    data += '' + \
+                        '<input type="hidden" id="g-recaptcha" name="g-recaptcha">' + \
+                        '<script type="text/javascript">' + \
+                            'grecaptcha.ready(function() {' + \
+                                'grecaptcha.execute(\'' + recaptcha[0][0] + '\', {action: \'homepage\'}).then(function(token) {' + \
+                                    'document.getElementById(\'g-recaptcha\').value = token;' + \
+                                '});' + \
+                            '});' + \
+                        '</script>' + \
+                    ''
+
+    return data
 
 def captcha_post(re_data, num = 1):
     if num == 1:
