@@ -465,7 +465,8 @@ def setting_2(conn, num):
             'smtp_port',
             'smtp_security',
             'smtp_email',
-            'smtp_pass'
+            'smtp_pass',
+            'recaptcha_ver'
         ]
 
         if flask.request.method == 'POST':
@@ -502,18 +503,28 @@ def setting_2(conn, num):
             for i in ['tls', 'starttls', 'plain']:
                 security_radios += '<input name="smtp_security" type="radio" value="' + i + '" ' + ('checked' if d_list[4] == i else '') + '>' + i + '<hr class="main_hr">'
 
+            re_ver = ''
+            if d_list[7] == '':
+                re_ver += '<option value="">v2</option><option value="v3">v3</option>'
+            else:
+                re_ver += '<option value="v3">v3</option><option value="">v2</option>'
+
             return easy_minify(flask.render_template(skin_check(),
                 imp = ['Google', wiki_set(), custom(), other2([0, 0])],
                 data = '''
                     <form method="post">
                         <h2><a href="https://www.google.com/recaptcha/admin">''' + load_lang('recaptcha') + '''</a></h2>
-                        <span>HTML</span>
+                        <span>''' + load_lang('public_key') + '''</span>
                         <hr class=\"main_hr\">
-                        <input name="recaptcha" placeholder='&lt;div class="g-recaptcha" data-sitekey="''' + load_lang('public_key') + '''"&gt;&lt;/div&gt;' value="''' + html.escape(d_list[0]) + '''">
-                        <hr>
+                        <input name="recaptcha" value="''' + html.escape(d_list[0]) + '''">
+                        <hr class=\"main_hr\">
                         <span>''' + load_lang('secret_key') + '''</span>
                         <hr class=\"main_hr\">
                         <input name="sec_re" value="''' + html.escape(d_list[1]) + '''">
+                        <hr class=\"main_hr\">
+                        <select>
+                            ''' + re_ver + '''
+                        </select>
                         <hr class=\"main_hr\">
                         <h2>''' + load_lang('smtp_setting') + ' (' + load_lang('restart_required') + ''')</h1>
                         <span>''' + load_lang('smtp_server') + '''</span>
