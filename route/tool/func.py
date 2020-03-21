@@ -292,7 +292,8 @@ def captcha_get():
             sec_re = curs.fetchall()
             if sec_re and sec_re[0][0] != '':
                 curs.execute(db_change('select data from other where name = "recaptcha_ver"'))
-                if not curs.fetchall() or curs.fetchall()[0][0] == '':
+                rec_ver = curs.fetchall()
+                if not rec_ver or rec_ver == '':
                     data += '' + \
                         '<script src="https://www.google.com/recaptcha/api.js" async defer></script>' + \
                         '<div class="g-recaptcha" data-sitekey="' + recaptcha[0][0] + '"></div>' + \
