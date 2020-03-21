@@ -301,6 +301,7 @@ def captcha_get():
                     ''
                 else:
                     data += '' + \
+                        '<script src="https://www.google.com/recaptcha/api.js?render=' + recaptcha[0][0] + '"></script>' + \
                         '<input type="hidden" id="g-recaptcha" name="g-recaptcha">' + \
                         '<script type="text/javascript">' + \
                             'grecaptcha.ready(function() {' + \
