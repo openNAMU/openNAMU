@@ -522,7 +522,7 @@ def setting_2(conn, num):
                         <hr class=\"main_hr\">
                         <input name="sec_re" value="''' + html.escape(d_list[1]) + '''">
                         <hr class=\"main_hr\">
-                        <select>
+                        <select name="recaptcha_ver">
                             ''' + re_ver + '''
                         </select>
                         <hr class=\"main_hr\">
