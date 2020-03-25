@@ -740,11 +740,12 @@ def namumark(conn, data, title, main_num, include_num):
     time_data = re.search('^([0-9]{4}-[0-9]{2}-[0-9]{2})', now_time)
     time = time_data.groups()[0]
     
-    macro_re = re.compile('\[([^(]+)\(((?:(?!\)]).)+)\)\]')
+    macro_re = re.compile('\[([^[(]+)\(((?:(?!\)]).)+)\)\]')
     macro_data = macro_re.findall(data)
     for i in macro_data:
         macro_name = i[0].lower()
         if macro_name == 'youtube' or macro_name == 'kakaotv' or macro_name == 'nicovideo':
+            print(macro_name)
             width = re.search(', ?width=((?:(?!,).)+)', i[1])
             if width:
                 video_width = width.groups()[0]
@@ -769,7 +770,7 @@ def namumark(conn, data, title, main_num, include_num):
 
             video_start = ''
 
-            if i[0] == 'youtube':
+            if macro_name == 'youtube':
                 start = re.search(', ?(start=(?:(?!,).)+)', i[1])
                 if start:
                     video_start = '?' + start.groups()[0]
@@ -778,7 +779,7 @@ def namumark(conn, data, title, main_num, include_num):
                 video_code = re.sub('^https:\/\/youtu\.be\/', '', video_code)
 
                 video_src = 'https://www.youtube.com/embed/' + video_code
-            elif i[0] == 'kakaotv':
+            elif macro_name == 'kakaotv':
                 video_code = re.sub('^https:\/\/tv\.kakao\.com\/channel\/9262\/cliplink\/', '', video_code)
                 video_code = re.sub('^http:\/\/tv\.kakao\.com\/v\/', '', video_code)
 
@@ -791,9 +792,9 @@ def namumark(conn, data, title, main_num, include_num):
                 data, 
                 1
             )
-        elif i[0] == 'anchor':
+        elif macro_name == 'anchor':
             data = macro_re.sub('<span id="' + i[1] + '"></span>', data, 1)
-        elif i[0] == 'ruby':
+        elif macro_name == 'ruby':
             ruby_code = re.search('^([^,]+)', i[1])
             if ruby_code:
                 ruby_code = ruby_code.groups()[0]
@@ -822,14 +823,14 @@ def namumark(conn, data, title, main_num, include_num):
             ''
 
             data = macro_re.sub(ruby_data, data, 1)
-        elif i[0] == 'age' or i[0] == 'dday':
+        elif macro_name == 'age' or macro_name == 'dday':
             try:
                 old = datetime.datetime.strptime(time, '%Y-%m-%d')
                 will = datetime.datetime.strptime(i[1], '%Y-%m-%d')
 
                 e_data = old - will
 
-                if i[0] == 'age':
+                if macro_name == 'age':
                     data = macro_re.sub(str(int(e_data.days / 365)), data, 1)
                 else:
                     if re.search('^-', str(e_data.days)):
