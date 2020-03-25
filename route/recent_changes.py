@@ -38,15 +38,15 @@ def recent_changes_2(conn, name, tool):
 
                 tool_select = flask.request.args.get('tool', 'normal')
                 if tool_select == 'move':
-                    plus_sql = 'where (send like ? or send like ?) and type = "" '
+                    plus_sql = 'where send >= '' and send like ? or send like ? and type = "" '
                     plus_list = ['%(<a>' + name +'</a>%', '%<a>' + name + '</a> move)', sql_num]
                     sub += ' (' + load_lang('move') + ')'
                 elif tool_select == 'delete':
-                    plus_sql = 'where (send like "%(delete)") and title = ? and type = "" '
+                    plus_sql = 'where send like "%(delete)" and title = ? and type = "" '
                     plus_list = [name, sql_num]
                     sub += ' (' + load_lang('delete') + ')'
                 elif tool_select == 'revert':
-                    plus_sql = 'where (send like ?) and title = ? and type = "" '
+                    plus_sql = 'where send >= '' and send like ? and title = ? and type = "" '
                     plus_list = ['%(r%)', name, sql_num]
                     sub += ' (' + load_lang('revert') + ')'
                 else:
