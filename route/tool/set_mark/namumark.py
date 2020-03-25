@@ -165,7 +165,18 @@ def table_start(data):
 
         table = re.search('\n((?:(?:(?:(?:\|\||\|[^|]+\|)+(?:(?:(?!\|\|).\n*)*))+)\|\|(?:\n)?)+)', data)
         if table:
-            table = '\n' + re.sub('(\|\|)+\n', '||\n', table.groups()[0])
+            table = re.sub('(\|\|)+\n', '||\n', table.groups()[0])
+            
+            table_caption = re.search('^\|([^|]+)\|', table)
+            if table_caption:
+                table_caption = '<caption>' + table_caption.groups()[0] + '</caption>'
+                
+                table = re.sub('^\|([^|]+)\|', '||', table)
+            else:
+                table_caption = ''
+            
+            table = '\n' + table
+            
             table_cel = re.findall('(\n(?:(?:\|\|)+)|\|\|\n(?:(?:\|\|)+)|(?:(?:\|\|)+))((?:(?:(?!\n|\|\|).)+\n*)+)', table)
             for i in table_cel:
                 cel_plus = re.search('^((?:&lt;(?:(?:(?!&gt;).)*)&gt;)+)', i[1])
