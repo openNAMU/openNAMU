@@ -200,6 +200,7 @@ def table_start(data):
                     table_end += '' + \
                         '<div class="table_safe" ' + cel_plus[7] + '>' + \
                             '<table ' + cel_plus[5] + ' ' + cel_plus[0] + '>' + \
+                                table_caption + \
                                 '<tr ' + cel_plus[1] + '>' + \
                                     '<td ' + cel_plus[2] + ' ' + cel_plus[3] + ' ' + cel_plus[4] + '>' + \
                                         cel_data
@@ -732,102 +733,19 @@ def namumark(conn, data, title, main_num, include_num):
 
     toc_data += '</div>'
     data = toc_re.sub(toc_data, data)
-
+    
     data = tool.savemark(data)
-
-    data = re.sub("\[anchor\((?P<in>(?:(?!\)\]).)+)\)\]", '<span id="\g<in>"></span>', data, flags = re.I)
-
-    ruby_all = re.findall("\[ruby\(((?:(?:(?!\)\]).)+))\)\]", data, flags = re.I)
-    for i in ruby_all:
-        ruby_code = re.search('^([^,]+)', i)
-        if ruby_code:
-            ruby_code = ruby_code.groups()[0]
-        else:
-            ruby_code = 'Test'
-
-        ruby_top = re.search('ruby=([^,]+)', i, flags = re.I)
-        if ruby_top:
-            ruby_top = ruby_top.groups()[0]
-        else:
-            ruby_top = 'Test'
-
-        ruby_color = re.search('color=([^,]+)', i, flags = re.I)
-        if ruby_color:
-            ruby_color = 'color: ' + ruby_color.groups()[0] + ';'
-        else:
-            ruby_color = ''
-
-        ruby_data = '' + \
-            '<ruby>' + \
-                ruby_code \
-                + '<rp>(</rp>' + \
-                '<rt style="' + ruby_color + '">' + ruby_top + '</rt>' + \
-                '<rp>)</rp>' + \
-            '</ruby>' + \
-        ''
-
-        data = re.sub("\[ruby\(((?:(?:(?!\)\]).)+))\)\]", ruby_data, data, 1, flags = re.I)
-
-    curs.execute(tool.db_change('select data from other where name = "count_all_title"'))
-    all_title = curs.fetchall()
-    data = re.sub('\[pagecount\]', all_title[0][0], data, flags = re.I)
-
+    
     now_time = tool.get_time()
-    data = re.sub('\[date\]', now_time, data, flags = re.I)
-
     time_data = re.search('^([0-9]{4}-[0-9]{2}-[0-9]{2})', now_time)
-    time = time_data.groups()
-
-    age_re = re.compile('\[age\(([0-9]{4}-[0-9]{2}-[0-9]{2})\)\]', re.I)
-    while 1:
-        age_data = age_re.search(data)
-        if age_data:
-            age = age_data.groups()[0]
-
-            try:
-                old = datetime.datetime.strptime(time[0], '%Y-%m-%d')
-                will = datetime.datetime.strptime(age, '%Y-%m-%d')
-
-                e_data = old - will
-
-                data = age_re.sub(str(int(e_data.days / 365)), data, 1)
-            except:
-                data = age_re.sub('age-error', data, 1)
-        else:
-            break
-
-    dday_re = re.compile('\[dday\(([0-9]{4}-[0-9]{2}-[0-9]{2})\)\]', re.I)
-    while 1:
-        dday_data = dday_re.search(data)
-        if dday_data:
-            dday = dday_data.groups()[0]
-
-            try:
-                old = datetime.datetime.strptime(time[0], '%Y-%m-%d')
-                will = datetime.datetime.strptime(dday, '%Y-%m-%d')
-
-                e_data = old - will
-
-                if re.search('^-', str(e_data.days)):
-                    e_day = str(e_data.days)
-                else:
-                    e_day = '+' + str(e_data.days)
-
-                data = dday_re.sub(e_day, data, 1)
-            except:
-                data = dday_re.sub('dday-error', data, 1)
-        else:
-            break
-
-    video_re = re.compile('\[(youtube|kakaotv|nicovideo)\(((?:(?!\)\]).)+)\)\]', re.I)
-    youtube_re = re.compile('youtube', re.I)
-    kakaotv_re = re.compile('kakaotv', re.I)
-    while 1:
-        video = video_re.search(data)
-        if video:
-            video = video.groups()
-
-            width = re.search(', ?width=((?:(?!,).)+)', video[1])
+    time = time_data.groups()[0]
+    
+    macro_re = re.compile('\[([^(]+)\(((?:(?!\)]).)+)\)\]')
+    macro_data = macro_re.findall(data)
+    for i in macro_data:
+        macro_name = i[0].lower()
+        if macro_name == 'youtube' or macro_name == 'kakaotv' or macro_name == 'nicovideo':
+            width = re.search(', ?width=((?:(?!,).)+)', i[1])
             if width:
                 video_width = width.groups()[0]
                 if re.search('^[0-9]+$', video_width):
@@ -835,7 +753,7 @@ def namumark(conn, data, title, main_num, include_num):
             else:
                 video_width = '560px'
 
-            height = re.search(', ?height=((?:(?!,).)+)', video[1])
+            height = re.search(', ?height=((?:(?!,).)+)', i[1])
             if height:
                 video_height = height.groups()[0]
                 if re.search('^[0-9]+$', video_height):
@@ -843,7 +761,7 @@ def namumark(conn, data, title, main_num, include_num):
             else:
                 video_height = '315px'
 
-            code = re.search('^((?:(?!,).)+)', video[1])
+            code = re.search('^((?:(?!,).)+)', i[1])
             if code:
                 video_code = code.groups()[0]
             else:
@@ -851,8 +769,8 @@ def namumark(conn, data, title, main_num, include_num):
 
             video_start = ''
 
-            if youtube_re.search(video[0]):
-                start = re.search(', ?(start=(?:(?!,).)+)', video[1])
+            if i[0] == 'youtube':
+                start = re.search(', ?(start=(?:(?!,).)+)', i[1])
                 if start:
                     video_start = '?' + start.groups()[0]
 
@@ -860,7 +778,7 @@ def namumark(conn, data, title, main_num, include_num):
                 video_code = re.sub('^https:\/\/youtu\.be\/', '', video_code)
 
                 video_src = 'https://www.youtube.com/embed/' + video_code
-            elif kakaotv_re.search(video[0]):
+            elif i[0] == 'kakaotv':
                 video_code = re.sub('^https:\/\/tv\.kakao\.com\/channel\/9262\/cliplink\/', '', video_code)
                 video_code = re.sub('^http:\/\/tv\.kakao\.com\/v\/', '', video_code)
 
@@ -868,13 +786,71 @@ def namumark(conn, data, title, main_num, include_num):
             else:
                 video_src = 'https://embed.nicovideo.jp/watch/' + video_code
 
-            data = video_re.sub(
+            data = macro_re.sub(
                 '<iframe style="width: ' + video_width + '; height: ' + video_height + ';" src="' + video_src + video_start + '" allowfullscreen></iframe>', 
                 data, 
                 1
             )
+        elif i[0] == 'anchor':
+            data = macro_re.sub('<span id="' + i[1] + '"></span>', data, 1)
+        elif i[0] == 'ruby':
+            ruby_code = re.search('^([^,]+)', i[1])
+            if ruby_code:
+                ruby_code = ruby_code.groups()[0]
+            else:
+                ruby_code = 'Test'
+
+            ruby_top = re.search('ruby=([^,]+)', i[1], flags = re.I)
+            if ruby_top:
+                ruby_top = ruby_top.groups()[0]
+            else:
+                ruby_top = 'Test'
+
+            ruby_color = re.search('color=([^,]+)', i[1], flags = re.I)
+            if ruby_color:
+                ruby_color = 'color: ' + ruby_color.groups()[0] + ';'
+            else:
+                ruby_color = ''
+
+            ruby_data = '' + \
+                '<ruby>' + \
+                    ruby_code \
+                    + '<rp>(</rp>' + \
+                    '<rt style="' + ruby_color + '">' + ruby_top + '</rt>' + \
+                    '<rp>)</rp>' + \
+                '</ruby>' + \
+            ''
+
+            data = macro_re.sub(ruby_data, data, 1)
+        elif i[0] == 'age' or i[0] == 'dday':
+            try:
+                old = datetime.datetime.strptime(time, '%Y-%m-%d')
+                will = datetime.datetime.strptime(i[1], '%Y-%m-%d')
+
+                e_data = old - will
+
+                if i[0] == 'age':
+                    data = macro_re.sub(str(int(e_data.days / 365)), data, 1)
+                else:
+                    if re.search('^-', str(e_data.days)):
+                        e_day = str(e_data.days)
+                    else:
+                        e_day = '+' + str(e_data.days)
+
+                    data = macro_re.sub(e_day, data, 1)
+            except:
+                data = macro_re.sub('age-dday-error', data, 1)
         else:
-            break
+            data = macro_re.sub('<macro_start>' + i[0] + '<macro_middle>' + i[1] + '<macro_end>', data, 1)
+            
+    data = data.replace('<macro_start>', '[')
+    data = data.replace('<macro_middle>', '(')
+    data = data.replace('<macro_end>', ')]')
+
+    curs.execute(tool.db_change('select data from other where name = "count_all_title"'))
+    all_title = curs.fetchall()
+    data = re.sub('\[pagecount\]', all_title[0][0], data, flags = re.I)
+    data = re.sub('\[date\]', now_time, data, flags = re.I)
 
     while 1:
         block = re.search('(\n(?:&gt; ?(?:(?:(?!\n).)+)?\n)+)', data)
