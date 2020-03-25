@@ -745,7 +745,6 @@ def namumark(conn, data, title, main_num, include_num):
     for i in macro_data:
         macro_name = i[0].lower()
         if macro_name == 'youtube' or macro_name == 'kakaotv' or macro_name == 'nicovideo':
-            print(macro_name)
             width = re.search(', ?width=((?:(?!,).)+)', i[1])
             if width:
                 video_width = width.groups()[0]
