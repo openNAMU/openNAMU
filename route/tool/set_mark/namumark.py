@@ -787,7 +787,7 @@ def namumark(conn, data, title, main_num, include_num):
                 video_src = 'https://embed.nicovideo.jp/watch/' + video_code
 
             data = macro_re.sub(
-                '<iframe style="width: ' + video_width + '; height: ' + video_height + ';" src="' + video_src + video_start + '" allowfullscreen></iframe>', 
+                '<iframe style="width: ' + video_width + '; height: ' + video_height + ';" src="' + video_src + video_start + '" frameborder="0" allowfullscreen></iframe>', 
                 data, 
                 1
             )
