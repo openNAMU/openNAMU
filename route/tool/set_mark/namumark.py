@@ -609,7 +609,12 @@ def namumark(conn, data, title, main_num, include_num):
             else:
                 end_parser = wiki_table_data[1]
 
-            data = re.sub('<div id="wiki_div" ((?:(?!>).)+)>((?:(?!<div id="wiki_div"|<\/div_1>).\n*)+)<\/div_1>', '<div ' + wiki_table_data[0] + '>' + end_parser + '</div_2>', data, 1)
+            data = re.sub(
+                '<div id="wiki_div" ((?:(?!>).)+)>((?:(?!<div id="wiki_div"|<\/div_1>).\n*)+)<\/div_1>',
+                '<div ' + wiki_table_data[0] + '>' + end_parser + '</div_2>', 
+                data, 
+                1
+            )
         else:
             break
 
@@ -847,9 +852,10 @@ def namumark(conn, data, title, main_num, include_num):
     data = data.replace('<macro_middle>', '(')
     data = data.replace('<macro_end>', ')]')
 
-    curs.execute(tool.db_change('select data from other where name = "count_all_title"'))
-    all_title = curs.fetchall()
-    data = re.sub('\[pagecount\]', all_title[0][0], data, flags = re.I)
+    if re.search('\[pagecount\]', data, flags = re.I):
+        plus_data += 'page_count();\n'
+        data = re.sub('\[pagecount\]', '<span class="all_page_count"></span>', data, flags = re.I)
+
     data = re.sub('\[date\]', now_time, data, flags = re.I)
 
     while 1:
