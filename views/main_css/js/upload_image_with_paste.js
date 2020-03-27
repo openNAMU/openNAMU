@@ -22,6 +22,7 @@ function pasteListener(e) {
       if (items[i].type.indexOf("image") !== -1) {
         const file = items[i].getAsFile();
         const customName = prompt("파일 이름을 설정해주세요. (확장자는 생략)");
+        if (!customName) return alert("취소되었습니다.")
         const customFile = new File([file], customName + ".png", { type: file.type });
         formData.append("f_data[]", customFile);
         haveImageInClipboard = true;
@@ -40,10 +41,8 @@ function pasteListener(e) {
         if (res.status === 200 || res.status === 201) {
           const url = res.url;
           alert(
-            `이미지 복붙 업로드 성공. 다음 텍스트로 본문에 삽입할 수 있습니다 : [[${url.replace(
-              /.*\/w\/file/,
-              "file"
-            )}]]`
+            `이미지 복붙 업로드 성공. 아래 텍스트로 본문에 삽입할 수 있습니다.
+[[${decodeURIComponent(url.replace(/.*\/w\/file/, "file"))}]]`
           );
         } else {
           console.error("[ERROR] PasteUpload Fail :", res.statusText);
