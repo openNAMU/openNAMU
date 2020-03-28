@@ -94,11 +94,6 @@ def view_read_2(conn, name):
         else:
             else_data = None
 
-        curs.execute(db_change("select decu from acl where title = ?"), [name])
-        data = curs.fetchall()
-        if data:
-            acl = 1
-
         if flask.request.args.get('from', None) and else_data:
             else_data = re.sub('^\r\n', '', else_data)
             else_data = re.sub('\r\n$', '', else_data)
@@ -112,6 +107,11 @@ def view_read_2(conn, name):
             curs.execute(db_change("delete from cache_data where title = ?"), [name])
             if last_history_num:
                 curs.execute(db_change("insert into cache_data (title, data, id) values (?, ?, ?)"), [name, end_data, last_history_num[0][0]])
+                
+    curs.execute(db_change("select decu from acl where title = ?"), [name])
+    data = curs.fetchall()
+    if data:
+        acl = 1
 
     if end_data == 'HTTP Request 401.3':
         response_data = 401
