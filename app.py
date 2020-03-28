@@ -84,7 +84,7 @@ if set_data['db_type'] == 'mysql':
         new_json = ['', '']
 
         while 1:
-            print('DB user id : ', end = '')
+            print('DB user ID : ', end = '')
             new_json[0] = str(input())
             if new_json[0] != '':
                 break
