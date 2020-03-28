@@ -166,7 +166,7 @@ def render_set(title = '', data = '', num = 0, s_data = 0, include = None):
         else:
             return 'HTTP Request 404'
 
-def update(ver_num):
+def update(ver_num, set_data):
     print('----')
     # 업데이트 하위 호환 유지 함수
 
@@ -200,10 +200,15 @@ def update(ver_num):
             else:
                 curs.execute(db_change("update other set data = '' where name = 'recaptcha'"))
                 curs.execute(db_change("update other set data = '' where name = 'sec_re'"))
+    
+    if ver_num < 3172800 and set_data['db_type'] == 'mysql':
+        get_data_mysql = json.loads(open('data/mysql.json').read())
+        
+        with open('data/mysql.json', 'w') as f:
+            f.write('{ "user" : "' + get_data_mysql['user'] + '", "password" : "' + get_data_mysql['password'] + '", "host" : "localhost" }')
 
     conn.commit()
     print('Update pass')
-    print('----')
 
 def set_init():
     # 초기값 설정 함수    

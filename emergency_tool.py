@@ -1,9 +1,16 @@
 import time
 from route.tool.func import *
 
-version_list = json.loads(open('version.json', encoding='utf8').read())
 
 # DB
+version_list = json.loads(open('version.json', encoding='utf8').read())
+app_var = json.loads(open('data/app_var.json', encoding='utf8').read())
+
+print('Version : ' + version_list['master']['r_ver'])
+print('DB set version : ' + version_list['master']['c_ver'])
+print('Skin set version : ' + version_list['master']['s_ver'])
+print('----')
+
 while 1:
     try:
         set_data = json.loads(open('data/set.json', encoding='utf8').read())
@@ -70,7 +77,7 @@ if set_data['db_type'] == 'mysql':
         new_json = ['', '']
 
         while 1:
-            print('DB user id : ', end = '')
+            print('DB user ID : ', end = '')
             new_json[0] = str(input())
             if new_json[0] != '':
                 break
@@ -80,14 +87,19 @@ if set_data['db_type'] == 'mysql':
             new_json[1] = str(input())
             if new_json[1] != '':
                 break
+                
+        print('DB host (localhost) : ', end = '')
+        new_json[2] = str(input())
+        if new_json[2] == '':
+            new_json[2] == 'localhost'
 
         with open('data/mysql.json', 'w', encoding='utf8') as f:
-            f.write('{ "user" : "' + new_json[0] + '", "password" : "' + new_json[1] + '" }')
+            f.write('{ "user" : "' + new_json[0] + '", "password" : "' + new_json[1] + '", "host" : "' + new_json[2] + '" }')
 
         set_data_mysql = json.loads(open('data/mysql.json', encoding='utf8').read())
 
     conn = pymysql.connect(
-        host = 'localhost',
+        host = set_data_mysql['host'] if 'host' in set_data_mysql else 'localhost',
         user = set_data_mysql['user'],
         password = set_data_mysql['password'],
         charset = 'utf8mb4'
@@ -146,23 +158,23 @@ try:
     curs.execute(db_change('select data from other where name = "ver"'))
     ver_set_data = curs.fetchall()
     if not ver_set_data:
-        setup_tool = 1
+        setup_tool = 2
     else:
         if int(version_list['master']['c_ver']) > int(ver_set_data[0][0]):
             setup_tool = 1
 except:
-    setup_tool = 1
+    setup_tool = 2
 
 if setup_tool != 0:
     create_data['data'] = ['title', 'data']
-    create_data['cache_data'] = ['title', 'data']
+    create_data['cache_data'] = ['title', 'data', 'id']
     create_data['history'] = ['id', 'title', 'data', 'date', 'ip', 'send', 'leng', 'hide', 'type']
-    create_data['rd'] = ['title', 'sub', 'date', 'band', 'stop', 'agree']
+    create_data['rd'] = ['title', 'sub', 'code', 'date', 'band', 'stop', 'agree', 'acl']
     create_data['user'] = ['id', 'pw', 'acl', 'date', 'encode']
     create_data['user_set'] = ['name', 'id', 'data']
     create_data['user_application'] = ['id', 'pw', 'date', 'encode', 'question', 'answer', 'ip', 'ua', 'token', 'email']
     create_data['ban'] = ['block', 'end', 'why', 'band', 'login']
-    create_data['topic'] = ['id', 'title', 'sub', 'data', 'date', 'ip', 'block', 'top', 'code']
+    create_data['topic'] = ['id', 'data', 'date', 'ip', 'block', 'top', 'code']
     create_data['rb'] = ['block', 'end', 'today', 'blocker', 'why', 'band']
     create_data['back'] = ['title', 'link', 'type']
     create_data['custom'] = ['user', 'css']
@@ -190,7 +202,10 @@ if setup_tool != 0:
             except:
                 pass
 
-    update()
+    if setup_tool == 1:
+        update(int(ver_set_data[0][0]), set_data)
+    else:
+        set_init()
 
 curs.execute(db_change('delete from other where name = "ver"'))
 curs.execute(db_change('insert into other (name, data) values ("ver", ?)'), [version_list['master']['c_ver']])
@@ -205,7 +220,7 @@ print('4. Change host')
 print('5. Change port')
 print('6. Change skin')
 print('7. Change password')
-print('8. Reset version')
+print('8. Change version')
 print('9. Delete set.json')
 print('10. Change name')
 print('11. Delete mysql.json')
@@ -322,7 +337,14 @@ elif what_i_do == '7':
 
     curs.execute(db_change("update user set pw = ? where id = ?"), [hashed, user_name])
 elif what_i_do == '8':
-    curs.execute(db_change("update other set data = '00000' where name = 'ver'"))
+    print('----')
+    print('Insert version (0000000) : ', end = '')
+    new_ver = input()
+    
+    if new_ver == '':
+        new_ver == '0000000'
+
+    curs.execute(db_change("update other set data = ? where name = 'ver'"), [new_ver])
 elif what_i_do == '9':
     try:
         os.remove('data/set.json')
