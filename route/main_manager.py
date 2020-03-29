@@ -17,7 +17,7 @@ def main_manager_2(conn, num, r_ver):
         10 : [0, 'block_admin', load_lang('blocked_admin')],
         11 : [load_lang('document_name'), 'watch_list', load_lang('add_watchlist')],
         12 : [load_lang('compare_target'), 'check', load_lang('compare_target')],
-        13 : [load_lang('document_name'), 'edit', load_lang('edit')]
+        13 : [load_lang('document_name'), 'edit', load_lang('load')]
     }
 
     if num == 1:
