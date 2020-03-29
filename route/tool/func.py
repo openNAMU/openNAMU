@@ -499,7 +499,7 @@ def other2(data):
         data += ['']
 
     req_list = ''
-    main_css_ver = 20
+    main_css_ver = 21
 
     if not 'main_css_load' in flask.session or not 'main_css_ver' in flask.session or flask.session['main_css_ver'] != main_css_ver:
         for i_data in os.listdir(os.path.join("views", "main_css", "css")):
@@ -523,7 +523,7 @@ def other2(data):
                 integrity="sha384-2BKqo+exmr9su6dir+qCw08N2ZKRucY4PrGQPPWU1A7FtlCGjmEGFqXCv5nyM5Ij"
                 crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
-    ''' + req_list] + data[2:]
+    ''' + req_list + '<script>main_css_skin_load();</script>'] + data[2:]
 
     return data
 
@@ -1183,81 +1183,86 @@ def re_error(data):
             menu = 0
         ))
     else:
-        error_data = re.search('\/error\/([0-9]+)', data)
-        if error_data:
-            num = int(error_data.groups()[0])
-            if num == 1:
-                data = load_lang('no_login_error')
-            elif num == 2:
-                data = load_lang('no_exist_user_error')
-            elif num == 3:
-                data = load_lang('authority_error')
-            elif num == 4:
-                data = load_lang('no_admin_block_error')
-            elif num == 5:
-                data = load_lang('skin_error')
-            elif num == 6:
-                data = load_lang('same_id_exist_error')
-            elif num == 7:
-                data = load_lang('long_id_error')
-            elif num == 8:
-                data = load_lang('id_char_error') + ' <a href="/name_filter">(' + load_lang('id_filter_list') + ')</a>'
-            elif num == 9:
-                data = load_lang('file_exist_error')
-            elif num == 10:
-                data = load_lang('password_error')
-            elif num == 11:
-                data = load_lang('topic_long_error')
-            elif num == 12:
-                data = load_lang('email_error')
-            elif num == 13:
-                data = load_lang('recaptcha_error')
-            elif num == 14:
-                data = load_lang('file_extension_error') + ' <a href="/extension_filter">(' + load_lang('extension_filter_list') + ')</a>'
-            elif num == 15:
-                data = load_lang('edit_record_error')
-            elif num == 16:
-                data = load_lang('same_file_error')
-            elif num == 17:
-                data = load_lang('file_capacity_error') + wiki_set(3)
-            elif num == 19:
-                data = load_lang('decument_exist_error')
-            elif num == 20:
-                data = load_lang('password_diffrent_error')
-            elif num == 21:
-                data = load_lang('edit_filter_error')
-            elif num == 22:
-                data = load_lang('file_name_error')
-            elif num == 23:
-                data = load_lang('regex_error')
-            elif num == 24:
-                curs.execute(db_change("select data from other where name = 'slow_edit'"))
-                slow_data = curs.fetchall()
-                data = load_lang('fast_edit_error') + slow_data[0][0]
-            elif num == 25:
-                data = load_lang('too_many_dec_error')
-            elif num == 26:
-                data = load_lang('application_not_found')
-            elif num == 27:
-                data = load_lang("invalid_password_error")
-            elif num == 28:
-                data = load_lang('watchlist_overflow_error')
-            elif num == 29:
-                data = load_lang('copyright_disagreed')
-            else:
-                data = '???'
-
-            if num == 5:
-                return easy_minify(flask.render_template(skin_check(),
-                    imp = [load_lang('skin_set'), wiki_set(1), custom(), other2([0, 0])],
-                    data = '<div id="main_skin_set"><h2>' + load_lang('error') + '</h2><ul><li>' + data + '</li></ul></div>',
-                    menu = 0
-                ))
-            else:
-                return easy_minify(flask.render_template(skin_check(),
-                    imp = [load_lang('error'), wiki_set(1), custom(), other2([0, 0])],
-                    data = '<h2>' + load_lang('error') + '</h2><ul><li>' + data + '</li></ul>',
-                    menu = 0
-                )), 401
+        num = int(number_check(data.replace('/error/', '')))
+        if num == 1:
+            data = load_lang('no_login_error')
+        elif num == 2:
+            data = load_lang('no_exist_user_error')
+        elif num == 3:
+            data = load_lang('authority_error')
+        elif num == 4:
+            data = load_lang('no_admin_block_error')
+        elif num == 5:
+            data = load_lang('skin_error')
+        elif num == 6:
+            data = load_lang('same_id_exist_error')
+        elif num == 7:
+            data = load_lang('long_id_error')
+        elif num == 8:
+            data = load_lang('id_char_error') + ' <a href="/name_filter">(' + load_lang('id_filter_list') + ')</a>'
+        elif num == 9:
+            data = load_lang('file_exist_error')
+        elif num == 10:
+            data = load_lang('password_error')
+        elif num == 11:
+            data = load_lang('topic_long_error')
+        elif num == 12:
+            data = load_lang('email_error')
+        elif num == 13:
+            data = load_lang('recaptcha_error')
+        elif num == 14:
+            data = load_lang('file_extension_error') + ' <a href="/extension_filter">(' + load_lang('extension_filter_list') + ')</a>'
+        elif num == 15:
+            data = load_lang('edit_record_error')
+        elif num == 16:
+            data = load_lang('same_file_error')
+        elif num == 17:
+            data = load_lang('file_capacity_error') + wiki_set(3)
+        elif num == 19:
+            data = load_lang('decument_exist_error')
+        elif num == 20:
+            data = load_lang('password_diffrent_error')
+        elif num == 21:
+            data = load_lang('edit_filter_error')
+        elif num == 22:
+            data = load_lang('file_name_error')
+        elif num == 23:
+            data = load_lang('regex_error')
+        elif num == 24:
+            curs.execute(db_change("select data from other where name = 'slow_edit'"))
+            slow_data = curs.fetchall()
+            data = load_lang('fast_edit_error') + slow_data[0][0]
+        elif num == 25:
+            data = load_lang('too_many_dec_error')
+        elif num == 26:
+            data = load_lang('application_not_found')
+        elif num == 27:
+            data = load_lang("invalid_password_error")
+        elif num == 28:
+            data = load_lang('watchlist_overflow_error')
+        elif num == 29:
+            data = load_lang('copyright_disagreed')
         else:
-            return redirect('/')
+            data = '???'
+
+        if num == 5:
+            get_url = flask.request.path
+        
+            return easy_minify(flask.render_template(skin_check(),
+                imp = [(load_lang('skin_set') if get_url != '/main_skin_set' else load_lang('main_skin_set')), wiki_set(1), custom(), other2([0, 0])],
+                data = '' + \
+                    '<div id="main_skin_set">' + \
+                        '<h2>' + load_lang('error') + '</h2>' + \
+                        '<ul>' + \
+                            '<li>' + data + '</li>' + \
+                        '</ul>' + \
+                    '</div>' + \
+                    ('<script>window.onload = function () { main_css_skin_set(); }</script>' if get_url == '/main_skin_set' else ''),
+                menu = ([['main_skin_set', load_lang('main_skin_set')]] if get_url != '/main_skin_set' else [['skin_set', load_lang('skin_set')]])
+            ))
+        else:
+            return easy_minify(flask.render_template(skin_check(),
+                imp = [load_lang('error'), wiki_set(1), custom(), other2([0, 0])],
+                data = '<h2>' + load_lang('error') + '</h2><ul><li>' + data + '</li></ul>',
+                menu = 0
+            )), 401

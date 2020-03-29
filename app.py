@@ -648,6 +648,7 @@ def main_image_view(name = None):
     return main_image_view_2(conn, name, app_var)
 
 @app.route('/skin_set')
+@app.route('/main_skin_set')
 def main_skin_set():
     return main_skin_set_2(conn)
 

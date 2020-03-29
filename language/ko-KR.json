@@ -356,5 +356,6 @@
     "ban_acl": "차단된 사용자 포함",
     "topic_name_change": "토론 제목 변경",
     "topic_acl_setting" : "토론 ACL 설정",
-    "topic_acl" : "토론 ACL"
+    "topic_acl" : "토론 ACL",
+    "main_skin_set" : "기본 스킨 설정"
 }
