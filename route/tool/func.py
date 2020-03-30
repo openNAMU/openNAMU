@@ -490,7 +490,7 @@ def skin_check(set_n = 0):
                 curs.execute(db_change("select pw from user where id = ?"), [username])
                 shusrpw = curs.fetchall()[0][0]
 
-                if pwhash == sha3(sha3(sha3(sha224(sha224(sha3(sha224(sha3(shusrpw + sha3(usrtkn))))))))):
+                if pwhash == sha224(shusrpw + sha224(usrtkn)):
                     curs.execute(db_change("select id from user where id = ?"), [username])
                     flask.session['state'] = 1
                     flask.session['id'] = curs.fetchall()[0][0]
