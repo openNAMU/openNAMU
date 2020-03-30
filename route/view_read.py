@@ -137,7 +137,6 @@ def view_read_2(conn, name):
             'where title = ? and hide != "O" and type = "" order by id desc limit 3' + \
         ''), [name])
         sql_d = curs.fetchall()
-        print(sql_d)
         if sql_d:
             end_data += '<h2>' + load_lang('history') + '</h2><ul>'
             for i in sql_d:
