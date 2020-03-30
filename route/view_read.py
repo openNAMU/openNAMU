@@ -216,12 +216,12 @@ def view_read_2(conn, name):
     curs.execute(db_change("select data from other where name = 'body'"))
     body = curs.fetchall()
     if body:
-        div = '<div id="top_body_news">' + body[0][0] + '<hr class=\"main_hr\"></div>' + div
+        div = body[0][0] + div
 
     curs.execute(db_change("select data from other where name = 'bottom_body'"))
     body = curs.fetchall()
     if body:
-        div += '<div id="bottom_body_news"><hr class=\"main_hr\">' + body[0][0] + '</div>'
+        div += body[0][0]
 
     if ip_or_user(ip) == 0:
         curs.execute(db_change("select title from scan where user = ? and title = ?"), [ip, name])
