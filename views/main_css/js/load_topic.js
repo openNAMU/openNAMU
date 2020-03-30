@@ -49,12 +49,6 @@ function topic_plus_load(topic_num, num) {
                 p_data.innerHTML += n_data;
                 eval(t_plus_data);
 
-                // https://programmingsummaries.tistory.com/379
-                var notification = new Notification("openNAMU", { body: '#' + n_num });
-                setTimeout(function () {
-                    notification.close();
-                }, 5000);
-
                 topic_plus_load(topic_num, String(Number(num) + 1));
                 clearInterval(test);
             }
