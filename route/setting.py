@@ -293,7 +293,7 @@ def setting_2(conn, num):
                         <hr class=\"main_hr\">
                         <input name="''' + i_list[11] + '''" value="''' + html.escape(d_list[11]) + '''">
                         <hr>
-                        <span>''' + load_lang('approval_question') + '''</span> <a href="#rfn-1" id="fn-1">(1)</a>
+                        <span>''' + load_lang('approval_question') + '''</span><sup><a href="#rfn-1" id="fn-1">(1)</a></sup>
                         <hr class=\"main_hr\">
                         <input name="''' + i_list[12] + '''" value="''' + html.escape(d_list[12]) + '''">
                         <hr class=\"main_hr\">
