@@ -8,19 +8,18 @@ for i_data in os.listdir("route"):
 
         exec("from route." + f_src + " import *")
 
-version_list = json.loads(open('version.json').read())
+# DB
+version_list = json.loads(open('version.json', encoding='utf8').read())
+app_var = json.loads(open('data/app_var.json', encoding='utf8').read())
 
 print('Version : ' + version_list['master']['r_ver'])
 print('DB set version : ' + version_list['master']['c_ver'])
 print('Skin set version : ' + version_list['master']['s_ver'])
 print('----')
 
-app_var = json.loads(open('data/app_var.json').read())
-
-# DB
 while 1:
     try:
-        set_data = json.loads(open('data/set.json').read())
+        set_data = json.loads(open('data/set.json', encoding='utf8').read())
         if not 'db_type' in set_data:
             try:
                 os.remove('data/set.json')
@@ -68,10 +67,10 @@ while 1:
             if new_json[1] == '':
                 new_json[1] = 'data'
 
-            with open('data/set.json', 'w') as f:
+            with open('data/set.json', 'w', encoding='utf8') as f:
                 f.write('{ "db" : "' + new_json[1] + '", "db_type" : "' + new_json[0] + '" }')
 
-            set_data = json.loads(open('data/set.json').read())
+            set_data = json.loads(open('data/set.json', encoding='utf8').read())
 
             break
 
@@ -79,12 +78,12 @@ db_data_get(set_data['db_type'])
 
 if set_data['db_type'] == 'mysql':
     try:
-        set_data_mysql = json.loads(open('data/mysql.json').read())
+        set_data_mysql = json.loads(open('data/mysql.json', encoding='utf8').read())
     except:
         new_json = ['', '']
 
         while 1:
-            print('DB user id : ', end = '')
+            print('DB user ID : ', end = '')
             new_json[0] = str(input())
             if new_json[0] != '':
                 break
@@ -94,14 +93,19 @@ if set_data['db_type'] == 'mysql':
             new_json[1] = str(input())
             if new_json[1] != '':
                 break
+                
+        print('DB host (localhost) : ', end = '')
+        new_json[2] = str(input())
+        if new_json[2] == '':
+            new_json[2] == 'localhost'
 
-        with open('data/mysql.json', 'w') as f:
-            f.write('{ "user" : "' + new_json[0] + '", "password" : "' + new_json[1] + '" }')
+        with open('data/mysql.json', 'w', encoding='utf8') as f:
+            f.write('{ "user" : "' + new_json[0] + '", "password" : "' + new_json[1] + '", "host" : "' + new_json[2] + '" }')
 
-        set_data_mysql = json.loads(open('data/mysql.json').read())
+        set_data_mysql = json.loads(open('data/mysql.json', encoding='utf8').read())
 
     conn = pymysql.connect(
-        host = 'localhost',
+        host = set_data_mysql['host'] if 'host' in set_data_mysql else 'localhost',
         user = set_data_mysql['user'],
         password = set_data_mysql['password'],
         charset = 'utf8mb4'
@@ -171,12 +175,12 @@ if setup_tool != 0:
     create_data['data'] = ['title', 'data']
     create_data['cache_data'] = ['title', 'data', 'id']
     create_data['history'] = ['id', 'title', 'data', 'date', 'ip', 'send', 'leng', 'hide', 'type']
-    create_data['rd'] = ['title', 'sub', 'date', 'band', 'stop', 'agree']
+    create_data['rd'] = ['title', 'sub', 'code', 'date', 'band', 'stop', 'agree', 'acl']
     create_data['user'] = ['id', 'pw', 'acl', 'date', 'encode']
     create_data['user_set'] = ['name', 'id', 'data']
     create_data['user_application'] = ['id', 'pw', 'date', 'encode', 'question', 'answer', 'ip', 'ua', 'token', 'email']
     create_data['ban'] = ['block', 'end', 'why', 'band', 'login']
-    create_data['topic'] = ['id', 'title', 'sub', 'data', 'date', 'ip', 'block', 'top', 'code']
+    create_data['topic'] = ['id', 'data', 'date', 'ip', 'block', 'top', 'code']
     create_data['rb'] = ['block', 'end', 'today', 'blocker', 'why', 'band']
     create_data['back'] = ['title', 'link', 'type']
     create_data['custom'] = ['user', 'css']
@@ -205,7 +209,7 @@ if setup_tool != 0:
                 pass
 
     if setup_tool == 1:
-        update(int(ver_set_data[0][0]))
+        update(int(ver_set_data[0][0]), set_data)
     else:
         set_init()
 
@@ -310,7 +314,7 @@ if set_data['db_type'] == 'sqlite':
 if set_data['db_type'] == 'mysql':
     def mysql_dont_off():
         try:
-            urllib.request.urlopen('http://localhost:' + str(server_set['port']) + '/')
+            urllib.request.urlopen('http://localhost:' + server_set['port'] + '/')
         except:
             pass
 
@@ -324,6 +328,8 @@ if not curs.fetchall():
     curs.execute(db_change('insert into other (name, data) values ("count_all_title", "0")'))
 
 conn.commit()
+
+print('Now running... http://localhost:' + server_set['port'])
 
 if os.path.exists('custom.py'):
     from custom import custom_run
@@ -339,16 +345,16 @@ def alarm_del():
 def alarm():
     return alarm_2(conn)
 
-@app.route('/<regex("inter_wiki|edit_top|image_license|(?:edit|email|file|name)_filter"):tools>')
+@app.route('/<regex("inter_wiki|edit_top|image_license|(?:edit|email|file|name|extension)_filter"):tools>')
 def inter_wiki(tools = None):
     return inter_wiki_2(conn, tools)
 
-@app.route('/<regex("del_(?:inter_wiki|edit_top|image_license|(?:edit|email|file|name)_filter)"):tools>/<name>')
+@app.route('/<regex("del_(?:inter_wiki|edit_top|image_license|(?:edit|email|file|name|extension)_filter)"):tools>/<name>')
 def inter_wiki_del(tools = None, name = None):
     return inter_wiki_del_2(conn, tools, name)
 
-@app.route('/<regex("plus_(?:inter_wiki|edit_top|image_license|(?:edit|email|file|name)_filter)"):tools>', methods=['POST', 'GET'])
-@app.route('/<regex("plus_(?:inter_wiki|edit_top|image_license|(?:edit|email|file|name|edit)_filter)"):tools>/<name>', methods=['POST', 'GET'])
+@app.route('/<regex("plus_(?:inter_wiki|edit_top|image_license|(?:edit|email|file|name|extension)_filter)"):tools>', methods=['POST', 'GET'])
+@app.route('/<regex("plus_(?:inter_wiki|edit_top|image_license|(?:edit|email|file|name|extension)_filter)"):tools>/<name>', methods=['POST', 'GET'])
 def inter_wiki_plus(tools = None, name = None):
     return inter_wiki_plus_2(conn, tools, name)
 
@@ -497,6 +503,10 @@ def topic_top(topic_num = 1, num = 1):
 def topic_stop(topic_num = 1):
     return topic_stop_2(conn, topic_num)
 
+@app.route('/thread/<int:topic_num>/acl', methods=['POST', 'GET'])
+def topic_acl(topic_num = 1):
+    return topic_acl_2(conn, topic_num)
+
 @app.route('/thread/<int:topic_num>/delete', methods=['POST', 'GET'])
 def topic_delete(topic_num = 1):
     return topic_delete_2(conn, topic_num)
@@ -504,6 +514,10 @@ def topic_delete(topic_num = 1):
 @app.route('/thread/<int:topic_num>/tool')
 def topic_tool(topic_num = 1):
     return topic_tool_2(conn, topic_num)
+
+@app.route('/thread/<int:topic_num>/change', methods=['POST', 'GET'])
+def topic_change(topic_num = 1):
+    return topic_change_2(conn, topic_num)
 
 @app.route('/thread/<int:topic_num>/admin/<int:num>')
 def topic_admin(topic_num = 1, num = 1):
@@ -634,6 +648,7 @@ def main_image_view(name = None):
     return main_image_view_2(conn, name, app_var)
 
 @app.route('/skin_set')
+@app.route('/main_skin_set')
 def main_skin_set():
     return main_skin_set_2(conn)
 
@@ -687,6 +702,10 @@ def api_recent_change():
 def api_sha224(name = 'test'):
     return api_sha224_2(conn, name)
 
+@app.route('/api/title_index')
+def api_title_index():
+    return api_title_index_2(conn)
+
 @app.route('/api/image/<name>')
 def api_image_view(name = ''):
     return api_image_view_2(conn, name, app_var)
@@ -712,7 +731,7 @@ app.debug = True
 if __name__ == "__main__":
     try:
         http_server = tornado.httpserver.HTTPServer(tornado.wsgi.WSGIContainer(app))
-        http_server.listen(server_set['port'], address = server_set['host'])
+        http_server.listen(int(server_set['port']), address = server_set['host'])
 
         tornado.ioloop.IOLoop.instance().start()
     except Exception as e:

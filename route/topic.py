@@ -3,24 +3,25 @@ from .tool.func import *
 def topic_2(conn, topic_num):
     curs = conn.cursor()
 
+    admin = admin_check(3)
+    topic_num = str(topic_num)
+
     if flask.request.method == 'POST':
         name = flask.request.form.get('topic', 'test')
         sub = flask.request.form.get('title', 'test')
     else:
-        topic_change_data = topic_change(topic_num)
-        name = topic_change_data[0]
-        sub = topic_change_data[1]
+        curs.execute(db_change("select title, sub from rd where code = ?"), [topic_num])
+        name = curs.fetchall()
+        if name:
+            sub = name[0][1]
+            name = name[0][0]
+        else:
+            return redirect('/')
 
-    ban = acl_check(name, 'topic', sub)
-    admin = admin_check(3)
-
-    curs.execute(db_change("select id from topic where title = ? and sub = ? limit 1"), [name, sub])
-    topic_exist = curs.fetchall()
-    if not topic_exist and len(sub) > 256:
-        return re_error('/error/11')
+    ban = acl_check(name, 'topic', topic_num)
 
     if flask.request.method == 'POST':
-        if captcha_post(flask.request.form.get('g-recaptcha-response', '')) == 1:
+        if captcha_post(flask.request.form.get('g-recaptcha-response', flask.request.form.get('g-recaptcha', ''))) == 1:
             return re_error('/error/13')
         else:
             captcha_post('', 0)
@@ -31,12 +32,14 @@ def topic_2(conn, topic_num):
         if ban == 1:
             return re_error('/ban')
 
-        curs.execute(db_change("select id from topic where title = ? and sub = ? order by id + 0 desc limit 1"), [name, sub])
+        curs.execute(db_change("select id from topic where code = ? order by id + 0 desc limit 1"), [topic_num])
         old_num = curs.fetchall()
         if old_num:
             num = int(old_num[0][0]) + 1
         else:
             num = 1
+
+        num = str(num)
 
         match = re.search('^user:([^/]+)', name)
         if match:
@@ -60,7 +63,7 @@ def topic_2(conn, topic_num):
             if y_check == 1:
                 curs.execute(db_change('insert into alarm (name, data, date) values (?, ?, ?)'), [
                     match.groups()[0],
-                    ip + ' | <a href="/thread/' + str(topic_num) + '#' + str(num) + '">' + name + ' | ' + sub + ' | #' + str(num) + '</a>',
+                    ip + ' | <a href="/thread/' + topic_num + '#' + num + '">' + name + ' | ' + sub + ' | #' + num + '</a>',
                     today
                 ])
 
@@ -68,37 +71,33 @@ def topic_2(conn, topic_num):
         data = cate_re.sub('[br]', flask.request.form.get('content', 'Test'))
 
         for rd_data in re.findall("(?:#([0-9]+))", data):
-            curs.execute(db_change("select ip from topic where title = ? and sub = ? and id = ?"), [name, sub, rd_data])
+            curs.execute(db_change("select ip from topic where code = ? and id = ?"), [topic_num, rd_data])
             ip_data = curs.fetchall()
             if ip_data and ip_or_user(ip_data[0][0]) == 0:
                 curs.execute(db_change('insert into alarm (name, data, date) values (?, ?, ?)'), [
                     ip_data[0][0],
-                    ip + ' | <a href="/thread/' + str(topic_num) + '#' + str(num) + '">' + name + ' | ' + sub + ' | #' + str(num) + '</a>',
+                    ip + ' | <a href="/thread/' + topic_num + '#' + num + '">' + name + ' | ' + sub + ' | #' + num + '</a>',
                     today
                 ])
 
         data = re.sub("(?P<in>#(?:[0-9]+))", '[[\g<in>]]', data)
         data = savemark(data)
 
-        rd_plus(name, sub, today)
-        curs.execute(db_change("insert into topic (id, title, sub, data, date, ip, block, top, code) values (?, ?, ?, ?, ?, ?, '', '', ?)"), [
-            str(num),
-            name,
-            sub,
+        rd_plus(topic_num, today, name, sub)
+        curs.execute(db_change("insert into topic (id, data, date, ip, code) values (?, ?, ?, ?, ?)"), [
+            num,
             data,
             today,
             ip,
-            str(topic_num) if num == 1 else ''
+            topic_num
         ])
         conn.commit()
 
-        return redirect('/thread/' + str(topic_num) + '?where=bottom')
+        return redirect('/thread/' + topic_num + '?where=bottom')
     else:
         data = ''
 
-        curs.execute(db_change("select stop from rd where title = ? and sub = ? and stop != ''"), [name, sub])
-        close_data = curs.fetchall()
-        if (close_data and admin != 1) or ban == 1:
+        if ban == 1:
             display = 'display: none;'
         else:
             display = ''
@@ -107,8 +106,8 @@ def topic_2(conn, topic_num):
             <div id="top_topic"></div>
             <div id="main_topic"></div>
             <div id="plus_topic"></div>
-            <script>topic_top_load("''' + str(topic_num) + '''");</script>
-            <a href="/thread/''' + str(topic_num) + '/tool">(' + load_lang('topic_tool') + ''')</a>
+            <script>topic_top_load("''' + topic_num + '''");</script>
+            <a href="/thread/''' + topic_num + '/tool">(' + load_lang('topic_tool') + ''')</a>
             <hr class=\"main_hr\">
             <form style="''' + display + '''" method="post">
                 <textarea rows="10" id="content" placeholder="''' + load_lang('content') + '''" name="content"></textarea>
@@ -117,7 +116,7 @@ def topic_2(conn, topic_num):
                 <input style="display: none;" name="topic" value="''' + name + '''">
                 <input style="display: none;" name="title" value="''' + sub + '''">
                 <button type="submit">''' + load_lang('send') + '''</button>
-                <button id="preview" type="button" onclick="load_preview(\'''' + url_pas(name) + '\')">' + load_lang('preview') + '''</button>
+                <button id="preview" type="button" onclick="load_preview(\'\')">''' + load_lang('preview') + '''</button>
             </form>
             <hr class=\"main_hr\">
             <div id="see_preview"></div>

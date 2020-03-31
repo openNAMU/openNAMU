@@ -17,7 +17,7 @@ def login_register_2(conn):
             return re_error('/ban')
 
     if flask.request.method == 'POST':
-        if captcha_post(flask.request.form.get('g-recaptcha-response', '')) == 1:
+        if captcha_post(flask.request.form.get('g-recaptcha-response', flask.request.form.get('g-recaptcha', ''))) == 1:
             return re_error('/error/13')
         else:
             captcha_post('', 0)

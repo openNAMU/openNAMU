@@ -8,24 +8,27 @@ def topic_stop_2(conn, topic_num):
 
     ip = ip_check()
     time = get_time()
+    topic_num = str(topic_num)
 
-    topic_change_data = topic_change(topic_num)
-    name = topic_change_data[0]
-    sub = topic_change_data[1]
+    curs.execute(db_change("select stop, agree from rd where code = ?"), [topic_num])
+    rd_d = curs.fetchall()
+    if not rd_d:
+        return redirect('/')
 
     if flask.request.method == 'POST':
-        curs.execute(db_change("select id from topic where title = ? and sub = ? order by id + 0 desc limit 1"), [name, sub])
+        admin_check(3, 'change_topic_set (code ' + topic_num + ')')
+
+        curs.execute(db_change("select id from topic where code = ? order by id + 0 desc limit 1"), [topic_num])
         topic_check = curs.fetchall()
         if topic_check:
             stop_d = flask.request.form.get('stop_d', '')
             why_d = flask.request.form.get('why', '')
             agree_d = flask.request.form.get('agree', '')
 
-            curs.execute(db_change("update rd set stop = ?, agree = ? where title = ? and sub = ?"), [
+            curs.execute(db_change("update rd set stop = ?, agree = ? where code = ?"), [
                 stop_d,
                 agree_d,
-                name,
-                sub
+                topic_num
             ])
 
             if stop_d == 'S':
@@ -35,52 +38,37 @@ def topic_stop_2(conn, topic_num):
             else:
                 t_state = 'Normal'
 
-            curs.execute(db_change("insert into topic (id, title, sub, data, date, ip, block, top) values (?, ?, ?, ?, ?, ?, '', '1')"), [
+            curs.execute(db_change("insert into topic (id, data, date, ip, top, code) values (?, ?, ?, ?, '1', ?)"), [
                 str(int(topic_check[0][0]) + 1),
-                name,
-                sub,
                 t_state + (' (Agree)' if agree_d != '' else '') + (('[br][br]Why : ' + why_d) if why_d else ''),
                 time,
-                ip
+                ip,
+                topic_num
             ])
 
-            rd_plus(name, sub, time)
+            rd_plus(topic_num, time)
 
-        return redirect('/thread/' + str(topic_num))
+        return redirect('/thread/' + topic_num)
     else:
         stop_d_list = ''
         agree_check = ''
+        for_list = [
+            ['O', 'Close'],
+            ['S', 'Stop'],
+            ['', 'Normal']
+        ]
 
-        curs.execute(db_change("select stop, agree from rd where title = ? and sub = ? limit 1"), [name, sub])
-        rd_d = curs.fetchall()
-        if rd_d[0][0] == 'O':
-            stop_d_list += '''
-                <option value="O">Close</option>
-                <option value="">Normal</option>
-                <option value="S">Stop</option>
-            '''
-        elif rd_d[0][0] == 'S':
-            stop_d_list += '''
-                <option value="S">Stop</option>
-                <option value="">Normal</option>
-                <option value="O">Close</option>
-            '''
-        else:
-            stop_d_list += '''
-                <option value="">Normal</option>
-                <option value="S">Stop</option>
-                <option value="O">Close</option>
-            '''
+        for i in for_list:
+            if rd_d and rd_d[0][0] == i[0]:
+                stop_d_list = '<option value="' + i[0] + '">' + i[1] + '</option>' + stop_d_list
+            else:
+                stop_d_list += '<option value="' + i[0] + '">' + i[1] + '</option>'
 
-        if rd_d[0][1] == 'O':
-            agree_check = 'checked="checked"'
-        else:
-            agree_check = ''
+        agree_check = 'checked="checked"' if rd_d[0][1] == 'O' else ''
 
         return easy_minify(flask.render_template(skin_check(),
             imp = [load_lang('topic_setting'), wiki_set(), custom(), other2([0, 0])],
             data = '''
-                <hr class=\"main_hr\">
                 <form method="post">
                     <select name="stop_d">
                         ''' + stop_d_list + '''
@@ -93,5 +81,5 @@ def topic_stop_2(conn, topic_num):
                     <button type="submit">''' + load_lang('save') + '''</button>
                 </form>
             ''',
-            menu = [['thread/' + str(topic_num) + '/tool', load_lang('return')]]
+            menu = [['thread/' + topic_num + '/tool', load_lang('return')]]
         ))

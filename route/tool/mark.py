@@ -21,18 +21,13 @@ def send_parser(data):
     if not re.search('^<br>$', data):
         data = html.escape(data)
 
-        javascript = re.compile('javascript:', re.I)
+        data = re.sub('javascript:', '', data, flags = re.I)
+        data = data.replace('&lt;br&gt;', '')
 
-        data = javascript.sub('', data)
-
-        while 1:
-            re_data = re.search('&lt;a(?: (?:(?:(?!&gt;).)*))?&gt;(?P<in>(?:(?!&lt;).)*)&lt;\/a&gt;', data)
-            if re_data:
-                re_data = re_data.groups()[0]
-
-                data = re.sub('&lt;a(?: (?:(?:(?!&gt;).)*))?&gt;(?P<in>(?:(?!&lt;).)*)&lt;\/a&gt;', '<a href="/w/' + urllib.parse.quote(re_data).replace('/','%2F') + '">' + re_data + '</a>', data, 1)
-            else:
-                break
+    link_re = re.compile('&lt;a(?: (?:(?:(?!&gt;).)*))?&gt;(?P<in>(?:(?!&lt;).)*)&lt;\/a&gt;')
+    link_data = link_re.findall(data)
+    for i in link_data:
+        data = link_re.sub('<a href="/w/' + urllib.parse.quote(i).replace('/','%2F') + '">' + i + '</a>', data, 1)
 
     return data
 

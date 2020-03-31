@@ -73,3 +73,27 @@ function load_include(title, name, p_data) {
         }
     }
 }
+
+function page_count() {
+    var n_ver = document.getElementsByClassName('all_page_count');
+
+    var url = "/api/title_index";
+
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", url, true);
+    xhr.send(null);
+
+    xhr.onreadystatechange = function() {
+        if(this.readyState === 4 && this.status === 200) {
+            var i = 0;
+            while(1) {
+                if(n_ver[i]) {
+                    n_ver[i].innerHTML = JSON.parse(this.responseText)['count'];
+                    i += 1;
+                } else {
+                    break;
+                }
+            }
+        }
+    }
+}

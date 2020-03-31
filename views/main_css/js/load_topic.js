@@ -49,22 +49,11 @@ function topic_plus_load(topic_num, num) {
                 p_data.innerHTML += n_data;
                 eval(t_plus_data);
 
-                // https://programmingsummaries.tistory.com/379
-                var options = {
-                    body: '#' + n_num
-                }
-
-                var notification = new Notification("openNAMU", options);
-
-                setTimeout(function () {
-                    notification.close();
-                }, 5000);
-
                 topic_plus_load(topic_num, String(Number(num) + 1));
                 clearInterval(test);
             }
         }
-    }, 2000);
+    }, 5000);
 }
 
 function topic_main_load(topic_num, s_num) {
@@ -82,8 +71,8 @@ function topic_main_load(topic_num, s_num) {
     xhr.send(null);
 
     xhr.onreadystatechange = function() {
-        if(xhr.readyState === 4 && xhr.status === 200) {
-            var t_data = JSON.parse(xhr.responseText);
+        if(this.readyState === 4 && this.status === 200) {
+            var t_data = JSON.parse(this.responseText);
             var t_plus_data = '';
 
             for(var key in t_data) {

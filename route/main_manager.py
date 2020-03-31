@@ -17,7 +17,7 @@ def main_manager_2(conn, num, r_ver):
         10 : [0, 'block_admin', load_lang('blocked_admin')],
         11 : [load_lang('document_name'), 'watch_list', load_lang('add_watchlist')],
         12 : [load_lang('compare_target'), 'check', load_lang('compare_target')],
-        13 : [load_lang('document_name'), 'edit', load_lang('edit')]
+        13 : [load_lang('document_name'), 'edit', load_lang('load')]
     }
 
     if num == 1:
@@ -37,6 +37,7 @@ def main_manager_2(conn, num, r_ver):
                         <li><a href="/give_log">''' + load_lang('admin_group_list') + '''</a></li>
                         <li><a href="/many_delete">''' + load_lang('many_delete') + '''</a></li>
                         <li><a href="/applications">''' + load_lang('application_list') + '''</a></li>
+                        <li><a href="/adsense_setting">''' + load_lang('adsense_setting') + '''</a></li>
                         <li><a href="/setting">''' + load_lang('setting') + '''</a></li>
                     </ul>
                     <h3>''' + load_lang('filter') + '''</h3>
@@ -48,13 +49,13 @@ def main_manager_2(conn, num, r_ver):
                         <li><a href="/email_filter">''' + load_lang('email_filter_list') + '''</a></li>
                         <li><a href="/name_filter">''' + load_lang('id_filter_list') + '''</a></li>
                         <li><a href="/file_filter">''' + load_lang('file_filter_list') + '''</a></li>
+                        <li><a href="/extension_filter">''' + load_lang('extension_filter_list') + '''</a></li>
                     </ul>
                     <br>
                     <h2>''' + load_lang('server') + '''</h2>
                     <ul>
                         <li><a href="/restart">''' + load_lang('wiki_restart') + '''</a></li>
                         <li><a href="/update">''' + load_lang('update') + '''</a></li>
-                        <li><a href="/adsense_setting">''' + load_lang('adsense_setting') + '''</a></li>
                     </ul>
                     <br>
                     <h2>''' + load_lang('version') + '''</h2>
