@@ -58,8 +58,8 @@ def login_2(conn):
 
             #create table token ( username text default '', key text default '' )
             #일부러 update로 안 함
-            curs.execute("delete from token where username = ?", [flask.request.form.get('id', '')])
-            curs.execute("insert into token (username, key) values (?, ?)", [flask.request.form.get('id', ''), rndtkn])
+            curs.execute(db_change("delete from token where username = ?"), [flask.request.form.get('id', '')])
+            curs.execute(db_change("insert into token (username, key) values (?, ?)"), [flask.request.form.get('id', ''), rndtkn])
 
             res.set_cookie("autologin_token", value=sha224(pw_encode(flask.request.form.get('pw', '')) + sha224(rndtkn)), expires = expdt, secure = True, httponly = True)
             res.set_cookie("autologin_username", value=flask.request.form.get('id', ''), expires = expdt, secure = True, httponly = True)
