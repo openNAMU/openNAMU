@@ -42,6 +42,10 @@
  * Numerical expression - [MathJax](https://www.mathjax.org/)
  * Handling Keyboard Shortcuts [shortcut.js](http://www.openjs.com/scripts/events/keyboard_shortcuts/)
 
+## 지원 문법
+ * 나무마크 (NamuMark)
+ * 마크다운 (Markdown) (예정)
+
 ## 기여자 목록
  * [참고](https://github.com/2DU/openNAMU/graphs/contributors)
 
