@@ -11,7 +11,7 @@ def edit_req_2(conn, name):
         section = flask.request.args.get('section', None)
 
     if acl_check(name) == 1:
-        if acl_check(name, 'edit_req') == 1 or re.search('^user:', name) or ban_check() == 1 or get_ver:
+        if acl_check(name, 'edit_req') == 1 or re.search('^user:', name) or get_ver:
             return re_error('/ban')
     else:
         if not get_ver:
@@ -23,7 +23,7 @@ def edit_req_2(conn, name):
         curs.execute(db_change("select data from data where title = ?"), [name])
         old = curs.fetchall()
         if not old:
-            return redirect('/w/' + url_pas(name))
+            return redirect('/ban')
     else:
         curs.execute(db_change("select data, send, ip, date from history where title = ? and id = ? and type = 'req'"), [name, str(get_ver)])
         old = curs.fetchall()
