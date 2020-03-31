@@ -28,7 +28,7 @@ def view_read_2(conn, name):
 
     curs.execute(db_change("select link from back where title = ? and type = 'cat' order by link asc"), [name])
 
-    curs.execute(db_change("select title from data where title like ?"), ['%' + name + '/%'])
+    curs.execute(db_change("select title from data where title >= '' and title like ?"), ['%' + name + '/%'])
     if curs.fetchall():
         down = 1
     else:
@@ -44,10 +44,12 @@ def view_read_2(conn, name):
         curs.execute(db_change("select link from back where title = ? and type = 'cat' order by link asc"), [name])
         back = curs.fetchall()
         if back:
-            div = '<br><h2 id="cate_normal">' + load_lang('category') + '</h2><ul>'
             u_div = ''
 
             for data in back:
+                if div == '':
+                    div = '<br><h2 id="cate_normal">' + load_lang('category_title') + '</h2><ul>'
+
                 if re.search('^category:', data[0]):
                     u_div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a></li>'
                 else:
@@ -58,10 +60,8 @@ def view_read_2(conn, name):
                     else:
                         div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a></li>'
 
-            div += '</ul>'
-
-            if div == '<br><h2 id="cate_normal">' + load_lang('category') + '</h2><ul></ul>':
-                div = ''
+            if div != '':
+                div += '</ul>'
 
             if u_div != '':
                 div += '<br><h2 id="cate_under">' + load_lang('under_category') + '</h2><ul>' + u_div + '</ul>'
@@ -94,11 +94,6 @@ def view_read_2(conn, name):
         else:
             else_data = None
 
-        curs.execute(db_change("select decu from acl where title = ?"), [name])
-        data = curs.fetchall()
-        if data:
-            acl = 1
-
         if flask.request.args.get('from', None) and else_data:
             else_data = re.sub('^\r\n', '', else_data)
             else_data = re.sub('\r\n$', '', else_data)
@@ -112,6 +107,11 @@ def view_read_2(conn, name):
             curs.execute(db_change("delete from cache_data where title = ?"), [name])
             if last_history_num:
                 curs.execute(db_change("insert into cache_data (title, data, id) values (?, ?, ?)"), [name, end_data, last_history_num[0][0]])
+                
+    curs.execute(db_change("select decu from acl where title = ?"), [name])
+    data = curs.fetchall()
+    if data:
+        acl = 1
 
     if end_data == 'HTTP Request 401.3':
         response_data = 401
@@ -132,7 +132,10 @@ def view_read_2(conn, name):
         else:
             end_data = '<h2>' + load_lang('error') + '</h2><ul><li>' + load_lang('decument_404_error') + '</li></ul>'
 
-        curs.execute(db_change('select ip, date, leng, send from history where title = ? order by id desc limit 3'), [name])
+        curs.execute(db_change('' + \
+            'select ip, date, leng, send, id from history ' + \
+            'where title = ? and hide != "O" and type = "" order by id desc limit 3' + \
+        ''), [name])
         sql_d = curs.fetchall()
         if sql_d:
             end_data += '<h2>' + load_lang('history') + '</h2><ul>'
@@ -144,7 +147,7 @@ def view_read_2(conn, name):
                 else:
                     leng = '<span style="color:gray;">(' + i[2] + ')</span>'
 
-                end_data += '<li>' + i[1] + ' | ' + ip_pas(i[0]) + ' | ' + leng + (' | ' + i[3] if i[3] != '' else '') + '</li>'
+                end_data += '<li>' + i[1] + ' | r' + i[4] + ' | ' + ip_pas(i[0]) + ' | ' + leng + (' | ' + i[3] if i[3] != '' else '') + '</li>'
 
             end_data += '<li><a href="/history/' + url_pas(name) + '">(...)</a></li></ul>'
     else:
@@ -193,15 +196,12 @@ def view_read_2(conn, name):
 
     div = end_data + div
 
-    adsense_code = '<div align="center" style="display: block; margin-bottom: 10px;">{}</div>'
-
     curs.execute(db_change("select data from other where name = 'adsense'"))
-    adsense_enabled = curs.fetchall()[0][0]
-    if adsense_enabled == 'True':
+    if curs.fetchall()[0][0] == 'True':
         curs.execute(db_change("select data from other where name = 'adsense_code'"))
-        adsense_code = adsense_code.format(curs.fetchall()[0][0])
+        adsense_code = '<div align="center" style="display: block;">' + curs.fetchall()[0][0] + '</div><hr class=\"main_hr\">'
     else:
-        adsense_code = adsense_code.format('')
+        adsense_code = ''
 
     div = adsense_code + '<div>' + div + '</div>'
 
@@ -216,12 +216,12 @@ def view_read_2(conn, name):
     curs.execute(db_change("select data from other where name = 'body'"))
     body = curs.fetchall()
     if body:
-        div = body[0][0] + '<hr class=\"main_hr\">' + div
+        div = body[0][0] + div
 
     curs.execute(db_change("select data from other where name = 'bottom_body'"))
     body = curs.fetchall()
     if body:
-        div += '<hr class=\"main_hr\">' + body[0][0]
+        div += body[0][0]
 
     if ip_or_user(ip) == 0:
         curs.execute(db_change("select title from scan where user = ? and title = ?"), [ip, name])

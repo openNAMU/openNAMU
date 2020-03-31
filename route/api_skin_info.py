@@ -48,7 +48,11 @@ def api_skin_info_2(conn, name):
                     get_num = 0
 
                 if get_num == 1:
-                    get_data = urllib.request.urlopen(info_link)
+                    try:
+                        get_data = urllib.request.urlopen(info_link)
+                    except:
+                        get_data = None
+
                     if get_data and get_data.getcode() == 200:
                         try:
                             get_data = json.loads(get_data.read().decode())

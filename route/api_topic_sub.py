@@ -3,20 +3,17 @@ from .tool.func import *
 def api_topic_sub_2(conn, topic_num):
     curs = conn.cursor()
 
-    topic_change_data = topic_change(topic_num)
-    name = topic_change_data[0]
-    sub = topic_change_data[1]
+    topic_num = str(topic_num)
 
     if flask.request.args.get('num', None):
-        curs.execute(db_change("select id, data, date, ip, block, top from topic where title = ? and sub = ? and id + 0 = ? + 0 order by id + 0 asc"), [
-            name,
-            sub,
+        curs.execute(db_change("select id, data, date, ip, block, top from topic where code = ? and id + 0 = ? + 0 order by id + 0 asc"), [
+            topic_num,
             flask.request.args.get('num', '')
         ])
     elif flask.request.args.get('top', None):
-        curs.execute(db_change("select id, data, date, ip, block, top from topic where title = ? and sub = ? and top = 'O' order by id + 0 asc"), [name, sub])
+        curs.execute(db_change("select id, data, date, ip, block, top from topic where code = ? and top = 'O' order by id + 0 asc"), [topic_num])
     else:
-        curs.execute(db_change("select id, data, date, ip, block, top from topic where title = ? and sub = ? order by id + 0 asc"), [name, sub])
+        curs.execute(db_change("select id, data, date, ip, block, top from topic where code = ? order by id + 0 asc"), [topic_num])
 
     data = curs.fetchall()
     if data:
@@ -37,21 +34,14 @@ def api_topic_sub_2(conn, topic_num):
                     t_data_f = ''
                     b_color = 'toron_color_not'
 
-                curs.execute(db_change("select who from re_admin where what = ? order by time desc limit 1"), [
-                    'blind (' + name + ' - ' + sub + '#' + str(i[0]) + ')'
-                ])
-                who_blind = curs.fetchall()
-                if who_blind:
-                    ip += ' (' + who_blind[0][0] + ' B)'
-                else:
-                    ip += ' (B)'
+                ip += ' (B)'
 
             if flask.request.args.get('render', None):
                 if i[0] == '1':
                     s_user = i[3]
                 else:
                     if flask.request.args.get('num', None):
-                        curs.execute(db_change("select ip from topic where title = ? and sub = ? order by id + 0 asc limit 1"), [name, sub])
+                        curs.execute(db_change("select ip from topic where code = ? order by id + 0 asc limit 1"), [topic_num])
                         g_data = curs.fetchall()
                         if g_data:
                             s_user = g_data[0][0]
@@ -68,7 +58,7 @@ def api_topic_sub_2(conn, topic_num):
                     t_color = 'toron_color'
 
                 if admin == 1 or b_color != 'toron_color_not':
-                    ip += ' <a href="/thread/' + str(topic_num) + '/admin/' + i[0] + '">(' + load_lang('discussion_tool') + ')</a>'
+                    ip += ' <a href="/thread/' + topic_num + '/admin/' + i[0] + '">(' + load_lang('discussion_tool') + ')</a>'
 
                 if t_data_f == '':
                     t_data_f = '[br]'

@@ -38,15 +38,15 @@ def recent_changes_2(conn, name, tool):
 
                 tool_select = flask.request.args.get('tool', 'normal')
                 if tool_select == 'move':
-                    plus_sql = 'where (send like ? or send like ?) and type = "" '
+                    plus_sql = 'where send >= "" and (send like ? or send like ?) and type = "" '
                     plus_list = ['%(<a>' + name +'</a>%', '%<a>' + name + '</a> move)', sql_num]
                     sub += ' (' + load_lang('move') + ')'
                 elif tool_select == 'delete':
-                    plus_sql = 'where (send like "%(delete)") and title = ? and type = "" '
+                    plus_sql = 'where send like "%(delete)" and title = ? and type = "" '
                     plus_list = [name, sql_num]
                     sub += ' (' + load_lang('delete') + ')'
                 elif tool_select == 'revert':
-                    plus_sql = 'where (send like ?) and title = ? and type = "" '
+                    plus_sql = 'where send >= "" and send like ? and title = ? and type = "" '
                     plus_list = ['%(r%)', name, sql_num]
                     sub += ' (' + load_lang('revert') + ')'
                 else:
@@ -54,7 +54,7 @@ def recent_changes_2(conn, name, tool):
                     plus_list = [name, sql_num]
 
                 curs.execute(db_change('' + \
-                    'select id, title, date, ip, send, leng from history ' + \
+                    'select id, title, date, ip, send, leng, hide from history ' + \
                     plus_sql + \
                     'order by id + 0 desc ' + \
                     "limit ?, 50" + \
@@ -69,7 +69,7 @@ def recent_changes_2(conn, name, tool):
                 div = '<a href="/topic_record/' + url_pas(name) + '">(' + load_lang('discussion') + ')</a><hr class=\"main_hr\">' + div
 
                 curs.execute(db_change('' + \
-                    'select id, title, date, ip, send, leng from history ' + \
+                    'select id, title, date, ip, send, leng, hide from history ' + \
                     "where ip = ? and type = '' order by date desc limit ?, 50" + \
                 ''), [name, sql_num])
         else:
@@ -95,7 +95,7 @@ def recent_changes_2(conn, name, tool):
                 plus_sql = "where not title like 'user:%' and type = '' "
 
             curs.execute(db_change('' + \
-                'select id, title, date, ip, send, leng from history ' + \
+                'select id, title, date, ip, send, leng, hide from history ' + \
                 plus_sql + \
                 'order by date desc ' + \
                 'limit ?, 50' + \
@@ -128,29 +128,22 @@ def recent_changes_2(conn, name, tool):
             style = ['', '']
             date = data[2]
 
-            curs.execute(db_change('''
-                select title from history
-                where title = ? and id = ? and hide = 'O'
-            '''), [data[1], data[0]])
-            hide = curs.fetchall()
-
-            if admin_check(6) == 1:
-                if hide:
+            print(data)
+            if data[6] == 'O':
+                if admin_check(6) == 1:
                     style[0] = 'id="toron_color_grey"'
                     style[1] = 'id="toron_color_grey"'
 
                     send += ' (' + load_lang('hide') + ')'
-            elif not hide:
-                pass
-            else:
-                ip = ''
-                ban = ''
-                date = ''
+                else:
+                    ip = ''
+                    ban = ''
+                    date = ''
 
-                send = '(' + load_lang('hide') + ')'
+                    send = '(' + load_lang('hide') + ')'
 
-                style[0] = 'style="display: none;"'
-                style[1] = 'id="toron_color_grey"'
+                    style[0] = 'style="display: none;"'
+                    style[1] = 'id="toron_color_grey"'
 
             if tool == 'history':
                 title = '<a href="/w/' + url_pas(name) + '?num=' + data[0] + '">r' + data[0] + '</a> '
@@ -161,7 +154,7 @@ def recent_changes_2(conn, name, tool):
                     title = '<a href="/w/' + url_pas(data[1]) + '">' + html.escape(data[1]) + '</a> '
                     title += '<a href="/history/' + url_pas(data[1]) + '">(r' + data[0] + ')</a> '
 
-            div +=  '''
+            div += '''
                 <tr ''' + style[0] + '''>
                     <td>''' + title + m_tool + ' ' + leng + '''</td>
                     <td>''' + ip + ban + '''</td>
@@ -172,7 +165,7 @@ def recent_changes_2(conn, name, tool):
                 </tr>
             '''
 
-        div +=  '''
+        div += '''
                 </tbody>
             </table>
         '''

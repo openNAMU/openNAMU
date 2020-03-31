@@ -13,7 +13,11 @@ def api_version_2(conn, r_ver, c_ver):
     else:
         up_data = 'stable'
 
-    data = urllib.request.urlopen('https://raw.githubusercontent.com/2du/openNAMU/master/version.json')
+    try:
+        data = urllib.request.urlopen('https://raw.githubusercontent.com/2du/openNAMU/master/version.json')
+    except:
+        data = None
+
     if data and data.getcode() == 200:
         try:
             json_data = json.loads(data.read().decode())

@@ -8,7 +8,7 @@ def edit_many_delete_2(conn, app_var):
         return re_error('/ban')
 
     if flask.request.method == 'POST':
-        all_title = re.findall(r'([^\n]+)\n', flask.request.form.get('content', '').replace('\r\n', '\n') + '\n')
+        all_title = re.findall('([^\n]+)\n', flask.request.form.get('content', '').replace('\r\n', '\n') + '\n')
         for name in all_title:
             curs.execute(db_change("select data from data where title = ?"), [name])
             data = curs.fetchall()

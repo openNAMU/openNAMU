@@ -293,7 +293,7 @@ def setting_2(conn, num):
                         <hr class=\"main_hr\">
                         <input name="''' + i_list[11] + '''" value="''' + html.escape(d_list[11]) + '''">
                         <hr>
-                        <span>''' + load_lang('approval_question') + '''</span> <a href="#rfn-1" id="fn-1">(1)</a>
+                        <span>''' + load_lang('approval_question') + '''</span><sup><a href="#rfn-1" id="fn-1">(1)</a></sup>
                         <hr class=\"main_hr\">
                         <input name="''' + i_list[12] + '''" value="''' + html.escape(d_list[12]) + '''">
                         <hr class=\"main_hr\">
@@ -465,7 +465,8 @@ def setting_2(conn, num):
             'smtp_port',
             'smtp_security',
             'smtp_email',
-            'smtp_pass'
+            'smtp_pass',
+            'recaptcha_ver'
         ]
 
         if flask.request.method == 'POST':
@@ -502,18 +503,28 @@ def setting_2(conn, num):
             for i in ['tls', 'starttls', 'plain']:
                 security_radios += '<input name="smtp_security" type="radio" value="' + i + '" ' + ('checked' if d_list[4] == i else '') + '>' + i + '<hr class="main_hr">'
 
+            re_ver = ''
+            if d_list[7] == '':
+                re_ver += '<option value="">v2</option><option value="v3">v3</option>'
+            else:
+                re_ver += '<option value="v3">v3</option><option value="">v2</option>'
+
             return easy_minify(flask.render_template(skin_check(),
                 imp = ['Google', wiki_set(), custom(), other2([0, 0])],
                 data = '''
                     <form method="post">
                         <h2><a href="https://www.google.com/recaptcha/admin">''' + load_lang('recaptcha') + '''</a></h2>
-                        <span>HTML</span>
+                        <span>''' + load_lang('public_key') + '''</span>
                         <hr class=\"main_hr\">
-                        <input name="recaptcha" placeholder='&lt;div class="g-recaptcha" data-sitekey="''' + load_lang('public_key') + '''"&gt;&lt;/div&gt;' value="''' + html.escape(d_list[0]) + '''">
-                        <hr>
+                        <input name="recaptcha" value="''' + html.escape(d_list[0]) + '''">
+                        <hr class=\"main_hr\">
                         <span>''' + load_lang('secret_key') + '''</span>
                         <hr class=\"main_hr\">
                         <input name="sec_re" value="''' + html.escape(d_list[1]) + '''">
+                        <hr class=\"main_hr\">
+                        <select name="recaptcha_ver">
+                            ''' + re_ver + '''
+                        </select>
                         <hr class=\"main_hr\">
                         <h2>''' + load_lang('smtp_setting') + ' (' + load_lang('restart_required') + ''')</h1>
                         <span>''' + load_lang('smtp_server') + '''</span>
@@ -585,19 +596,23 @@ def setting_2(conn, num):
             conn.commit()
 
             acl_div = ['', '', '', '', '']
-            acl_list = ['normal', 'user', 'admin', 'owner', '50_edit', 'email']
+            acl_list = get_acl_list()
             for i in range(0, 5):
-                for acl_data in acl_list:
-                    if acl_data == d_list[i + 1]:
-                        acl_div[i] = '<option value="' + acl_data + '">' + acl_data + '</option>' + acl_div[i]
+                for data_list in acl_list:
+                    if data_list == d_list[i + 1]:
+                        check = 'selected="selected"'
                     else:
-                        acl_div[i] += '<option value="' + acl_data + '">' + acl_data + '</option>'
+                        check = ''
+                    
+                    acl_div[i] += '<option value="' + data_list + '" ' + check + '>' + (data_list if data_list != '' else 'normal') + '</option>'
 
             return easy_minify(flask.render_template(skin_check(),
                 imp = [load_lang('main_acl_setting'), wiki_set(), custom(), other2([0, 0])],
                 data = '''
                     <form method="post">
-                        <span>''' + load_lang('document_acl') + '</span> <a href="/acl/TEST">(' + load_lang('reference') + ''')</a>
+                        <a href="/acl/TEST#exp">(''' + load_lang('reference') + ''')</a>
+                        <hr>
+                        <span>''' + load_lang('document_acl') + '''</span> 
                         <hr class=\"main_hr\">
                         <select name="edit">''' + acl_div[0] + '''</select>
                         <hr>
