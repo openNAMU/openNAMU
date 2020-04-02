@@ -128,7 +128,6 @@ def recent_changes_2(conn, name, tool):
             style = ['', '']
             date = data[2]
 
-            print(data)
             if data[6] == 'O':
                 if admin_check(6) == 1:
                     style[0] = 'id="toron_color_grey"'

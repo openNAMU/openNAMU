@@ -573,18 +573,12 @@ def wiki_set(num = 1):
         curs.execute(db_change("select data from other where name = 'head' and coverage = ?"), [skin_check(1)])
         db_data = curs.fetchall()
         if db_data and db_data[0][0] != '':
-            if len(re.findall('<', db_data[0][0])) % 2 != 1:
-                data_list += [db_data[0][0]]
-            else:
-                data_list += ['']
+            data_list += [db_data[0][0]]
         else:
             curs.execute(db_change("select data from other where name = 'head' and coverage = ''"))
             db_data = curs.fetchall()
             if db_data and db_data[0][0] != '':
-                if len(re.findall('<', db_data[0][0])) % 2 != 1:
-                    data_list += [db_data[0][0]]
-                else:
-                    data_list += ['']
+                data_list += [db_data[0][0]]
             else:
                 data_list += ['']
 
