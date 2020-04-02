@@ -187,9 +187,6 @@ def update(ver_num, set_data):
             curs.execute(db_change("update topic set code = ? where title = ? and sub = ?"), [i[2], i[0], i[1]])
             curs.execute(db_change("update rd set code = ? where title = ? and sub = ?"), [i[2], i[0], i[1]])
 
-    if ver_num < 3171600:
-        curs.execute(db_change('delete from cache_data'))
-
     if ver_num < 3171800:
         curs.execute(db_change("select data from other where name = 'recaptcha'"))
         change_rec = curs.fetchall()
@@ -206,6 +203,9 @@ def update(ver_num, set_data):
         
         with open('data/mysql.json', 'w') as f:
             f.write('{ "user" : "' + get_data_mysql['user'] + '", "password" : "' + get_data_mysql['password'] + '", "host" : "localhost" }')
+            
+    if ver_num < 3180200:
+        curs.execute(db_change('delete from cache_data'))
 
     conn.commit()
     print('Update pass')
