@@ -5,7 +5,15 @@ import html
 import re
 
 def nowiki_js(data):
-    return re.sub('^\n', '', data.replace('\\', '\\\\').replace('"', '\\"').replace('\r', '')).replace('\n', '<br>')
+    data = data.replace('\\', '\\\\')
+    data = data.replace('"', '\\"')
+    data = data.replace('\r', '')
+    
+    data = re.sub('^\n', '', data)
+
+    data = data.replace('\n', '<br>')
+
+    return data
 
 def link_fix(main_link):
     global end_data
@@ -1021,16 +1029,16 @@ def namumark(conn, data, title, main_num, include_num):
                     category += '<div id="cate_all"><hr><div id="cate">Category : '
 
                 main_link = category_re.sub('category:', main_link)
+                link_id = ''
 
                 curs.execute(tool.db_change("select title from data where title = ?"), [main_link])
                 if re.search('#blur', main_link):
-                    see_link = 'Hidden'
-                    link_id = 'id="inside"'
-
-                    main_link = re.sub('#blur', '', main_link)
+                    link_id = ' hidden_link'
+                    main_link = main_link.replace('#blur', '')
+                    see_link = see_link.replace('#blur', '')
 
                 backlink += [[title, main_link, 'cat']]
-                category += '<a class="' + include_num + 'link_finder" href="/w/' + tool.url_pas(main_link) + '">' + category_re.sub('', see_link) + '</a> | '
+                category += '<a class="' + include_num + 'link_finder' + link_id + '" href="/w/' + tool.url_pas(main_link) + '">' + category_re.sub('', see_link) + '</a> | '
 
                 data = re.sub('\[\[((?:(?!\[\[|\]\]|<\/td>).)+)\]\]', '', data, 1)
             elif re.search('^wiki:', main_link):

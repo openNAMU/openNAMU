@@ -48,3 +48,5 @@ blockquote { background-image: url(/views/acme/img/quote.png); background-positi
 .change_space { white-space: pre-line; }
 div#topic_scroll { max-height: 500px; overflow: scroll; -ms-overflow-style: none; scrollbar-width: none; }
 div#topic_scroll::-webkit-scrollbar { display: none; }
+.hidden_link { filter: blur(3px); }
+.hidden_link:hover { filter: none; }
