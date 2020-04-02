@@ -13,7 +13,7 @@ def topic_delete_2(conn, topic_num):
         curs.execute(db_change("delete from rd where code = ?"), [topic_num])
         conn.commit()
 
-        return redirect('/topic/' + url_pas(name))
+        return redirect('/')
     else:
         return easy_minify(flask.render_template(skin_check(),
             imp = [load_lang('topic_delete'), wiki_set(), custom(), other2([0, 0])],
