@@ -362,7 +362,7 @@ def middle_parser(data, include_num):
                                 str(folding_data[0]) + ' ' + \
                                 '<div style="display: inline-block;">' + \
                                     '<a href="javascript:void(0);" onclick="do_open_folding(\'' + include_num + 'folding_' + str(folding_num) + '\', this);">' + \
-                                        '[+]' + \
+                                        '(+)' + \
                                     '</a>' + \
                                 '</div_2>' + \
                                 '<div id="' + include_num + 'folding_' + str(folding_num) + '" style="display: none;">' + \
@@ -721,7 +721,7 @@ def namumark(conn, data, title, main_num, include_num):
                         '<a href="/edit/' + tool.url_pas(title) + '?section=' + str(edit_number) + '">(Edit)</a>' + \
                         ' ' + \
                         '<a href="javascript:void(0);" onclick="do_open_folding(\'in_data_' + all_stack + '\', this);">' + \
-                            '[' + fol_head + ']' + \
+                            '(' + fol_head + ')' + \
                         '</a>' + \
                     '</span>' + \
                 '</h' + toc_number + '>' + \
