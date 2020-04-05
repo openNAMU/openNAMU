@@ -1,6 +1,8 @@
 function get_link_state(data, i = 0) { 
     if(document.getElementsByClassName(data + 'link_finder')[i]) {
         var link_data = document.getElementsByClassName(data + 'link_finder')[i];
+        
+        get_link_state(data, i + 1);
 
         var xhr = new XMLHttpRequest();
         xhr.open("GET", link_data.href.replace('/w/', '/api/w/').replace(/#([^#]*)/, '') + "?exist=1", true);
@@ -13,8 +15,6 @@ function get_link_state(data, i = 0) {
                 } else {
                     document.getElementsByClassName(data + 'link_finder')[i].id = "";
                 }
-
-                get_link_state(data, i + 1);
             }
         }
     }
@@ -23,6 +23,8 @@ function get_link_state(data, i = 0) {
 function get_file_state(data, i = 0) {       
     if(document.getElementsByClassName(data + 'file_finder_1')[i]) {
         var file_data = document.getElementsByClassName(data + 'file_finder_1')[i];
+        
+        get_file_state(data, i + 1);
 
         var xhr = new XMLHttpRequest();
         xhr.open("GET", file_data.src.replace('/image/', '/api/image/'), true);
@@ -35,8 +37,6 @@ function get_file_state(data, i = 0) {
                 } else {
                     document.getElementsByClassName(data + 'file_finder_2')[i].innerHTML = "";
                 }
-            
-                get_file_state(data, i + 1);
             }
         }
     }
