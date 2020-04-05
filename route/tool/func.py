@@ -187,9 +187,6 @@ def update(ver_num, set_data):
             curs.execute(db_change("update topic set code = ? where title = ? and sub = ?"), [i[2], i[0], i[1]])
             curs.execute(db_change("update rd set code = ? where title = ? and sub = ?"), [i[2], i[0], i[1]])
 
-    if ver_num < 3171600:
-        curs.execute(db_change('delete from cache_data'))
-
     if ver_num < 3171800:
         curs.execute(db_change("select data from other where name = 'recaptcha'"))
         change_rec = curs.fetchall()
@@ -206,6 +203,9 @@ def update(ver_num, set_data):
         
         with open('data/mysql.json', 'w') as f:
             f.write('{ "user" : "' + get_data_mysql['user'] + '", "password" : "' + get_data_mysql['password'] + '", "host" : "localhost" }')
+            
+    if ver_num < 3180200:
+        curs.execute(db_change('delete from cache_data'))
 
     conn.commit()
     print('Update pass')
@@ -298,7 +298,7 @@ def captcha_get():
             if sec_re and sec_re[0][0] != '':
                 curs.execute(db_change('select data from other where name = "recaptcha_ver"'))
                 rec_ver = curs.fetchall()
-                if not rec_ver or rec_ver == '':
+                if not rec_ver or rec_ver[0][0] == '':
                     data += '' + \
                         '<script src="https://www.google.com/recaptcha/api.js" async defer></script>' + \
                         '<div class="g-recaptcha" data-sitekey="' + recaptcha[0][0] + '"></div>' + \
@@ -499,7 +499,7 @@ def other2(data):
         data += ['']
 
     req_list = ''
-    main_css_ver = 22
+    main_css_ver = 25
 
     if not 'main_css_load' in flask.session or not 'main_css_ver' in flask.session or flask.session['main_css_ver'] != main_css_ver:
         for i_data in os.listdir(os.path.join("views", "main_css", "css")):
@@ -570,23 +570,19 @@ def wiki_set(num = 1):
         else:
             data_list += [data_list[0]]
 
+        head_data = ''
+
+        curs.execute(db_change("select data from other where name = 'head' and coverage = ''"))
+        db_data = curs.fetchall()
+        if db_data and db_data[0][0] != '':
+            head_data += db_data[0][0]
+
         curs.execute(db_change("select data from other where name = 'head' and coverage = ?"), [skin_check(1)])
         db_data = curs.fetchall()
         if db_data and db_data[0][0] != '':
-            if len(re.findall('<', db_data[0][0])) % 2 != 1:
-                data_list += [db_data[0][0]]
-            else:
-                data_list += ['']
-        else:
-            curs.execute(db_change("select data from other where name = 'head' and coverage = ''"))
-            db_data = curs.fetchall()
-            if db_data and db_data[0][0] != '':
-                if len(re.findall('<', db_data[0][0])) % 2 != 1:
-                    data_list += [db_data[0][0]]
-                else:
-                    data_list += ['']
-            else:
-                data_list += ['']
+            head_data += db_data[0][0]
+            
+        data_list += [head_data]
 
         return data_list
 

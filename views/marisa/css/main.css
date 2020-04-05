@@ -25,7 +25,6 @@ button {
     border: 2px solid gainsboro;
     background: white;
     cursor: pointer;
-    border-radius: 10px;
 }
 
 td {
@@ -207,7 +206,7 @@ h6 {
 #top_tool {
     float: right;
     color: white;
-    margin-top: -5px;
+    margin-top: -8px;
 }
 
 .cel_in_cel {
@@ -216,7 +215,6 @@ h6 {
     position: absolute;
     background: white;
     margin-top: 10px;
-    border-radius: 10px;
 }
 
 #top_tool_cel {
@@ -235,7 +233,6 @@ h6 {
 #search_input {
     width: 220px;
     height: 35px;
-    border-radius: 17.5px;
     padding-left: 10px;
     background-color: gray;
     border: solid 1px gray;
@@ -263,7 +260,6 @@ div#pre_search {
     color: black;
     margin-top: 5px;
     background: white;
-    border-radius: 10px;
     position: absolute;
 }
 
@@ -307,21 +303,17 @@ a {
 #syntax {
     background: #f0f0f0;
     padding: 5px;
-    border-radius: 10px;
 }
 
 pre, #toc, #cate, #redirect {
     border: 2px solid gainsboro;
-    border-radius: 10px;
 }
 
 textarea, input {
     border: 2px solid gainsboro;
     font-family: '나눔고딕', 'Nanum Gothic', 'Noto Sans KR', 'Malgun Gothic', '맑은 고딕', sans-serif;
-    border-radius: inherit;
     padding: 5px;
     margin-left: -5px;
-    border-radius: 10px;
 }
 
 #syntax code {
@@ -348,6 +340,7 @@ textarea, input {
 }
 
 #nav_bar {
+    z-index: 100;
     font-size: 24px;
     position: fixed;
     bottom: 0;
@@ -355,7 +348,6 @@ textarea, input {
     border: 2px solid #4a4a4a;
     background: #4a4a4a;
     text-align: center;
-    border-radius: 10px 0px 0px 0px;
 }
 
 #nav_bar a {
@@ -398,7 +390,6 @@ div#last_edit {
 }
 
 #mobile_search_input {
-    border-radius: 10px;
 }
 
 #top_menu_groups {
@@ -427,4 +418,8 @@ div#last_edit {
 
 #titlt_a {
     color: initial;
+}
+
+button#save {
+    background: #c6ffc6;
 }
