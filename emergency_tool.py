@@ -118,99 +118,6 @@ else:
 
 load_conn(conn)
 
-create_data = {}
-create_data['all_data'] = [
-    'data',
-    'cache_data',
-    'history',
-    'rd',
-    'user',
-    'user_set',
-    'ban',
-    'topic',
-    'rb',
-    'back',
-    'custom',
-    'other',
-    'alist',
-    're_admin',
-    'alarm',
-    'ua_d',
-    'filter',
-    'scan',
-    'acl',
-    'inter',
-    'html_filter',
-    'oauth_conn',
-    'user_application'
-]
-for i in create_data['all_data']:
-    try:
-        curs.execute(db_change('select test from ' + i + ' limit 1'))
-    except:
-        try:
-            curs.execute(db_change('create table ' + i + '(test longtext)'))
-        except:
-            curs.execute(db_change("alter table " + i + " add test longtext default ''"))
-
-setup_tool = 0
-try:
-    curs.execute(db_change('select data from other where name = "ver"'))
-    ver_set_data = curs.fetchall()
-    if not ver_set_data:
-        setup_tool = 2
-    else:
-        if int(version_list['master']['c_ver']) > int(ver_set_data[0][0]):
-            setup_tool = 1
-except:
-    setup_tool = 2
-
-if setup_tool != 0:
-    create_data['data'] = ['title', 'data']
-    create_data['cache_data'] = ['title', 'data', 'id']
-    create_data['history'] = ['id', 'title', 'data', 'date', 'ip', 'send', 'leng', 'hide', 'type']
-    create_data['rd'] = ['title', 'sub', 'code', 'date', 'band', 'stop', 'agree', 'acl']
-    create_data['user'] = ['id', 'pw', 'acl', 'date', 'encode']
-    create_data['user_set'] = ['name', 'id', 'data']
-    create_data['user_application'] = ['id', 'pw', 'date', 'encode', 'question', 'answer', 'ip', 'ua', 'token', 'email']
-    create_data['ban'] = ['block', 'end', 'why', 'band', 'login']
-    create_data['topic'] = ['id', 'data', 'date', 'ip', 'block', 'top', 'code']
-    create_data['rb'] = ['block', 'end', 'today', 'blocker', 'why', 'band']
-    create_data['back'] = ['title', 'link', 'type']
-    create_data['custom'] = ['user', 'css']
-    create_data['other'] = ['name', 'data', 'coverage']
-    create_data['alist'] = ['name', 'acl']
-    create_data['re_admin'] = ['who', 'what', 'time']
-    create_data['alarm'] = ['name', 'data', 'date']
-    create_data['ua_d'] = ['name', 'ip', 'ua', 'today', 'sub']
-    create_data['filter'] = ['name', 'regex', 'sub']
-    create_data['scan'] = ['user', 'title']
-    create_data['acl'] = ['title', 'decu', 'dis', 'view', 'why']
-    create_data['inter'] = ['title', 'link', 'icon']
-    create_data['html_filter'] = ['html', 'kind', 'plus']
-    create_data['oauth_conn'] = ['provider', 'wiki_id', 'sns_id', 'name', 'picture']
-
-    for create_table in create_data['all_data']:
-        for create in create_data[create_table]:
-            try:
-                curs.execute(db_change('select ' + create + ' from ' + create_table + ' limit 1'))
-            except:
-                curs.execute(db_change("alter table " + create_table + " add " + create + " longtext default ''"))
-
-            try:
-                curs.execute(db_change('create index index_' + create_table + '_' + create + ' on ' + create_table + '(' + create + ')'))
-            except:
-                pass
-
-    if setup_tool == 1:
-        update(int(ver_set_data[0][0]), set_data)
-    else:
-        set_init()
-
-curs.execute(db_change('delete from other where name = "ver"'))
-curs.execute(db_change('insert into other (name, data) values ("ver", ?)'), [version_list['master']['c_ver']])
-conn.commit()
-
 # Main
 print('----')
 print('1. Backlink reset')
@@ -226,6 +133,7 @@ print('10. Change name')
 print('11. Delete mysql.json')
 print('12. All title count reset')
 print('13. Cache data reset')
+print('14. Delete Main <HEAD>')
 
 print('----')
 print('Select : ', end = '')
@@ -375,8 +283,10 @@ elif what_i_do == '12':
 
     curs.execute(db_change('delete from other where name = "count_all_title"'))
     curs.execute(db_change('insert into other (name, data) values ("count_all_title", ?)'), [str(count_data)])
-else:
+elif what_i_do == '13':
     curs.execute(db_change('delete from cache_data'))
+else:
+    curs.execute(db_change('delete from other where name = "head"'))
 
 conn.commit()
 

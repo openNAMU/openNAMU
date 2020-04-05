@@ -51,3 +51,12 @@ pre#syntax {
 a#titlt_a {
     color: white;
 }
+
+button#save {
+    background: #083808;
+}
+
+blockquote {
+    background: black;
+    border-left: 5px solid #eee;
+}

@@ -5,7 +5,15 @@ import html
 import re
 
 def nowiki_js(data):
-    return re.sub('^\n', '', data.replace('\\', '\\\\').replace('"', '\\"').replace('\r', '')).replace('\n', '<br>')
+    data = data.replace('\\', '\\\\')
+    data = data.replace('"', '\\"')
+    data = data.replace('\r', '')
+    
+    data = re.sub('^\n', '', data)
+
+    data = data.replace('\n', '<br>')
+
+    return data
 
 def link_fix(main_link):
     global end_data
@@ -354,7 +362,7 @@ def middle_parser(data, include_num):
                                 str(folding_data[0]) + ' ' + \
                                 '<div style="display: inline-block;">' + \
                                     '<a href="javascript:void(0);" onclick="do_open_folding(\'' + include_num + 'folding_' + str(folding_num) + '\', this);">' + \
-                                        '[+]' + \
+                                        '(+)' + \
                                     '</a>' + \
                                 '</div_2>' + \
                                 '<div id="' + include_num + 'folding_' + str(folding_num) + '" style="display: none;">' + \
@@ -713,7 +721,7 @@ def namumark(conn, data, title, main_num, include_num):
                         '<a href="/edit/' + tool.url_pas(title) + '?section=' + str(edit_number) + '">(Edit)</a>' + \
                         ' ' + \
                         '<a href="javascript:void(0);" onclick="do_open_folding(\'in_data_' + all_stack + '\', this);">' + \
-                            '[' + fol_head + ']' + \
+                            '(' + fol_head + ')' + \
                         '</a>' + \
                     '</span>' + \
                 '</h' + toc_number + '>' + \
@@ -1021,16 +1029,16 @@ def namumark(conn, data, title, main_num, include_num):
                     category += '<div id="cate_all"><hr><div id="cate">Category : '
 
                 main_link = category_re.sub('category:', main_link)
+                link_id = ''
 
                 curs.execute(tool.db_change("select title from data where title = ?"), [main_link])
                 if re.search('#blur', main_link):
-                    see_link = 'Hidden'
-                    link_id = 'id="inside"'
-
-                    main_link = re.sub('#blur', '', main_link)
+                    link_id = ' hidden_link'
+                    main_link = main_link.replace('#blur', '')
+                    see_link = see_link.replace('#blur', '')
 
                 backlink += [[title, main_link, 'cat']]
-                category += '<a class="' + include_num + 'link_finder" href="/w/' + tool.url_pas(main_link) + '">' + category_re.sub('', see_link) + '</a> | '
+                category += '<a class="' + include_num + 'link_finder' + link_id + '" href="/w/' + tool.url_pas(main_link) + '">' + category_re.sub('', see_link) + '</a> | '
 
                 data = re.sub('\[\[((?:(?!\[\[|\]\]|<\/td>).)+)\]\]', '', data, 1)
             elif re.search('^wiki:', main_link):
