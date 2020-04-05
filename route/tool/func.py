@@ -298,7 +298,13 @@ def captcha_get():
             if sec_re and sec_re[0][0] != '':
                 curs.execute(db_change('select data from other where name = "recaptcha_ver"'))
                 rec_ver = curs.fetchall()
-                if rec_ver and rec_ver == 'v3':
+                if not rec_ver or rec_ver[0][0] == '':
+                    data += '' + \
+                        '<script src="https://www.google.com/recaptcha/api.js" async defer></script>' + \
+                        '<div class="g-recaptcha" data-sitekey="' + recaptcha[0][0] + '"></div>' + \
+                        '<hr class=\"main_hr\">' + \
+                    ''
+                else:
                     data += '' + \
                         '<script src="https://www.google.com/recaptcha/api.js?render=' + recaptcha[0][0] + '"></script>' + \
                         '<input type="hidden" id="g-recaptcha" name="g-recaptcha">' + \
@@ -309,12 +315,6 @@ def captcha_get():
                                 '});' + \
                             '});' + \
                         '</script>' + \
-                    ''
-                else:
-                    data += '' + \
-                        '<script src="https://www.google.com/recaptcha/api.js" async defer></script>' + \
-                        '<div class="g-recaptcha" data-sitekey="' + recaptcha[0][0] + '"></div>' + \
-                        '<hr class=\"main_hr\">' + \
                     ''
 
     return data
