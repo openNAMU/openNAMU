@@ -1253,7 +1253,7 @@ def re_error(data):
                             '<li>' + data + '</li>' + \
                         '</ul>' + \
                     '</div>' + \
-                    ('<script>window.onload = function () { main_css_skin_set(); }</script>' if get_url == '/main_skin_set' else ''),
+                    ('<script>window.addEventListener(\'DOMContentLoaded\', function() { main_css_skin_set(); });</script>' if get_url == '/main_skin_set' else ''),
                 menu = ([['main_skin_set', load_lang('main_skin_set')]] if get_url != '/main_skin_set' else [['skin_set', load_lang('skin_set')]])
             ))
         else:
