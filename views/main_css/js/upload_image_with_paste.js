@@ -4,11 +4,11 @@ function togglePasteUploaderSwtich() {
   if (pasteUploadSwitch) {
     const textarea = document.querySelector("textarea");
     if (textarea) textarea.addEventListener("paste", pasteListener);
-    alert("이미지 복붙 업로드 활성화");
+    alert("이미지 복사-붙여넣기 방식 업로드가 활성화되었습니다.");
   } else {
     const textarea = document.querySelector("textarea");
     if (textarea) textarea.removeEventListener("paste", pasteListener);
-    alert("이미지 복붙 업로드 비활성화");
+    alert("이미지 복사-붙여넣기 방식 업로드가 비활성화되었습니다.");
   }
 }
 
@@ -41,17 +41,17 @@ function pasteListener(e) {
         if (res.status === 200 || res.status === 201) {
           const url = res.url;
           alert(
-            `이미지 복붙 업로드 성공. 아래 텍스트로 본문에 삽입할 수 있습니다.
+            `클립보드의 이미지를 성공적으로 업로드했습니다. 아래 텍스트로 본문에 삽입할 수 있습니다.
 [[${decodeURIComponent(url.replace(/.*\/w\/file/, "file"))}]]`
           );
         } else {
           console.error("[ERROR] PasteUpload Fail :", res.statusText);
-          alert("이미지 복붙 업로드에 실패했습니다. 파일명 중복일 수 있습니다.");
+          alert("클립보드의 이미지를 업로드하는데 실패했습니다. 파일 이름 중복일 수 있습니다.");
         }
       })
       .catch((err) => {
         console.error("[ERROR] PasteUpload Fail :", JSON.stringify(err), err);
-        alert("이미지 복붙 업로드에 실패했습니다. 파일명 중복일 수 있습니다.");
+        alert("클립보드의 이미지를 업로드하는데 실패했습니다. 파일 이름 중복일 수 있습니다.");
       });
   }
 }
