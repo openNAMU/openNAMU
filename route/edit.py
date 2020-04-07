@@ -160,6 +160,8 @@ def edit_2(conn, name):
             imp = [name, wiki_set(), custom(), other2([' (' + sub + ')', 0])],
             data =  get_name + '''
                 <form method="post">
+                    <label for="pasteUploadToggle">이미지 복붙해서 첨부하기 &nbsp;</label>
+                    <input type="checkbox" name="pasteUploadToggle" onClick="togglePasteUploaderSwtich()" />
                     <script>do_stop_exit();</script>
                     ''' + edit_button() + '''
                     <textarea rows="25" id="content" placeholder="''' + p_text + '''" name="content">''' + html.escape(re.sub('\n$', '', data)) + '''</textarea>
