@@ -1,6 +1,4 @@
-function main_css_get_post() {
-    var cookies = document.cookie;
-    
+function main_css_get_post() {    
     var check = document.getElementById('strike');
     if(check.value === 'normal') {
         document.cookie = 'main_css_del_strike=0;';
@@ -36,36 +34,34 @@ function main_css_get_post() {
     history.go(0);
 }
 
-function main_css_skin_load() {
-    var cookies = document.cookie;
-    
+function main_css_skin_load() {    
     var head_data = document.querySelector('head');
-    if(cookies.match(main_css_regex_data('main_css_del_strike'))) {
-        if(cookies.match(main_css_regex_data('main_css_del_strike'))[1] === '1') {
+    if(document.cookie.match(main_css_regex_data('main_css_del_strike'))) {
+        if(document.cookie.match(main_css_regex_data('main_css_del_strike'))[1] === '1') {
             head_data.innerHTML += '<style>s { text-decoration: none; } s:hover { background-color: transparent; }</style>';
-        } else if(cookies.match(main_css_regex_data('main_css_del_strike'))[1] === '2') {
+        } else if(document.cookie.match(main_css_regex_data('main_css_del_strike'))[1] === '2') {
             head_data.innerHTML += '<style>s { display: none; }</style>';
         }
     }
 
-    if(cookies.match(main_css_regex_data('main_css_del_bold'))) {
-        if(cookies.match(main_css_regex_data('main_css_del_bold'))[1] === '1') {
+    if(document.cookie.match(main_css_regex_data('main_css_del_bold'))) {
+        if(document.cookie.match(main_css_regex_data('main_css_del_bold'))[1] === '1') {
             head_data.innerHTML += '<style>b { font-weight: normal; }</style>';
-        } else if(cookies.match(main_css_regex_data('main_css_del_bold'))[1] === '2') {
+        } else if(document.cookie.match(main_css_regex_data('main_css_del_bold'))[1] === '2') {
             head_data.innerHTML += '<style>b { display: none; }</style>';
         }
     }
 
     if(
-        cookies.match(main_css_regex_data('main_css_include_link')) &&
-        cookies.match(main_css_regex_data('main_css_include_link'))[1] === '1'
+        document.cookie.match(main_css_regex_data('main_css_include_link')) &&
+        document.cookie.match(main_css_regex_data('main_css_include_link'))[1] === '1'
     ) {
         head_data.innerHTML += '<style>#include_link { display: inline; }</style>';
     }
 
     if(
-        cookies.match(main_css_regex_data('main_css_category_set')) &&
-        cookies.match(main_css_regex_data('main_css_category_set'))[1] === '1'
+        document.cookie.match(main_css_regex_data('main_css_category_set')) &&
+        document.cookie.match(main_css_regex_data('main_css_category_set'))[1] === '1'
     ) {
         var get_category = document.getElementById('cate_all');
         if(get_category) {
@@ -84,9 +80,7 @@ function main_css_regex_data(data) {
     return new RegExp('(?:^|; )' + data + '=([^;]*)');
 }
 
-function main_css_skin_set() {
-    var cookies = document.cookie;
-    
+function main_css_skin_set() {    
     if(window.location.pathname === '/main_skin_set') {
         var set_language = {
             "en-US" : {
@@ -116,8 +110,8 @@ function main_css_skin_set() {
             }
         }
 
-        var language = cookies.match(main_css_regex_data('language'))[1];
-        var user_language = cookies.match(main_css_regex_data('user_language'))[1];
+        var language = document.cookie.match(main_css_regex_data('language'))[1];
+        var user_language = document.cookie.match(main_css_regex_data('user_language'))[1];
         if(user_language in set_language) {
             language = user_language;
         }
@@ -139,8 +133,8 @@ function main_css_skin_set() {
         while(1) {
             if(strike_list[i]) {
                 if(
-                    cookies.match(main_css_regex_data('main_css_del_strike')) && 
-                    cookies.match(main_css_regex_data('main_css_del_strike'))[1] === strike_list[i][0]
+                    document.cookie.match(main_css_regex_data('main_css_del_strike')) && 
+                    document.cookie.match(main_css_regex_data('main_css_del_strike'))[1] === strike_list[i][0]
                 ) {
                     set_data["strike"] = '<option value="' + strike_list[i][1] + '">' + strike_list[i][2] + '</option>' + set_data["strike"];
                 } else {
@@ -163,8 +157,8 @@ function main_css_skin_set() {
         while(1) {
             if(bold_list[i]) {
                 if(
-                    cookies.match(main_css_regex_data('main_css_del_bold')) && 
-                    cookies.match(main_css_regex_data('main_css_del_bold'))[1] === bold_list[i][0]
+                    document.cookie.match(main_css_regex_data('main_css_del_bold')) && 
+                    document.cookie.match(main_css_regex_data('main_css_del_bold'))[1] === bold_list[i][0]
                 ) {
                     set_data["bold"] = '<option value="' + bold_list[i][1] + '">' + bold_list[i][2] + '</option>' + set_data["bold"];
                 } else {
@@ -178,8 +172,8 @@ function main_css_skin_set() {
         }
 
         if(
-            cookies.match(main_css_regex_data('main_css_include_link')) &&
-            cookies.match(main_css_regex_data('main_css_include_link'))[1] === '1'
+            document.cookie.match(main_css_regex_data('main_css_include_link')) &&
+            document.cookie.match(main_css_regex_data('main_css_include_link'))[1] === '1'
         ) {
             set_data["include"] = "checked";
         }
@@ -193,8 +187,8 @@ function main_css_skin_set() {
         while(1) {
             if(category_list[i]) {
                 if(
-                    cookies.match(main_css_regex_data('main_css_category_set')) && 
-                    cookies.match(main_css_regex_data('main_css_category_set'))[1] === category_list[i][0]
+                    document.cookie.match(main_css_regex_data('main_css_category_set')) && 
+                    document.cookie.match(main_css_regex_data('main_css_category_set'))[1] === category_list[i][0]
                 ) {
                     set_data["category"] = '<option value="' + category_list[i][1] + '">' + category_list[i][2] + '</option>' + set_data["category"];
                 } else {

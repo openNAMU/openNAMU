@@ -22,7 +22,7 @@ server_set_var = {
     'language' : {
         'display' : 'Language',
         'require' : 'select',
-        'default' : 'en-US',
+        'default' : 'ko-KR',
         'list' : ['ko-KR', 'en-US']
     },
     'markup' : {
