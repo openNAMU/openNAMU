@@ -375,6 +375,10 @@ def list_old_page():
 def list_acl():
     return list_acl_2(conn)
 
+@app.route('/image_file_list')
+def list_image_file():
+    return list_image_file_2(conn)
+
 @app.route('/admin_plus/<name>', methods=['POST', 'GET'])
 def give_admin_groups(name = None):
     return give_admin_groups_2(conn, name)

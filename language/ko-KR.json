@@ -266,7 +266,7 @@
     "destruction": "취소",
     "count": "기여 횟수",
     "main_head": "메인 <HEAD>",
-    "recent_ban": "최근 차단",
+    "recent_ban": "차단 기록",
     "smtp_password": "SMTP Password",
     "id_filter_list": "ID 필터 목록",
     "other": "기타",
@@ -357,5 +357,6 @@
     "topic_name_change": "토론 제목 변경",
     "topic_acl_setting" : "토론 ACL 설정",
     "topic_acl" : "토론 ACL",
-    "main_skin_set" : "기본 스킨 설정"
+    "main_skin_set" : "기본 스킨 설정",
+    "image_file_list" : "이미지 파일 목록"
 }
