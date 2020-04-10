@@ -48,9 +48,9 @@ def render_do(title, data, num, include):
     curs.execute(db_change('select data from other where name = "markup"'))
     rep_data = curs.fetchall()
     if rep_data[0][0] == 'namumark':
-        data = namumark(conn, data, title, num, include)
+        data = namumark(conn, data, title, include)
     elif rep_data[0][0] == 'custom':
-        data = custom_mark(conn, data, title, num, include)
+        data = custom_mark(conn, data, title, include)
     elif rep_data[0][0] == 'raw':
         data = [data, '', []]
     else:

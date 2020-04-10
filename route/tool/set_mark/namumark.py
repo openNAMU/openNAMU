@@ -478,7 +478,7 @@ def middle_parser(data, include_num):
 
     return data
 
-def namumark(conn, data, title, main_num, include_num):
+def namumark(conn, data, title, include_num):
     curs = conn.cursor()
 
     global plus_data
