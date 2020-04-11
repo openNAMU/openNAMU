@@ -22,9 +22,10 @@ def edit_2(conn, name):
             return re_error('/error/24')
 
         today = get_time()
-        content = flask.request.form.get('content', '')
+        content = flask.request.form.get('content', '').replace('\r\n', '\n')
+        o_content = flask.request.form.get('otent', '').replace('\r\n', '\n')
 
-        if flask.request.form.get('otent', '') == content:
+        if o_content == content:
             return redirect('/w/' + url_pas(name))
         
         if edit_filter_do(content) == 1:
@@ -38,13 +39,10 @@ def edit_2(conn, name):
         content = savemark(content)
         
         if old:
-            leng = leng_check(len(flask.request.form.get('otent', '')), len(content))
+            leng = leng_check(len(o_content), len(content))
             
             if section:
-                content = old[0][0].replace('\r\n', '\n').replace(
-                    flask.request.form.get('otent', '').replace('\r\n', '\n'), 
-                    content.replace('\r\n', '\n')
-                )
+                content = old[0][0].replace('\r\n', '\n').replace(o_content, content)
         else:
             leng = '+' + str(len(content))
 
@@ -88,17 +86,18 @@ def edit_2(conn, name):
     else:            
         if old:
             if section:
+                section = int(number_check(section))
                 data = re.sub(
                     '\n(?P<in>={1,6})', 
                     '<br>\g<in>', 
                     html.escape('\n' + old[0][0].replace('\r\n', '\n') + '\n')
                 )
-                i = 0
+                i = 1
 
                 while 1:
                     g_data = re.search('((?:<br>)(?:(?:(?!\n|<br>).)+)(?:\n*(?:(?:(?!<br>).)+\n*)+)?)', data)
                     if g_data:
-                        if int(section) - 1 == i:
+                        if section == i:
                             data = html.unescape(re.sub('<br>(?P<in>={1,6})', '\n\g<in>', g_data.groups()[0]))
                             
                             break
