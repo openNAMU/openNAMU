@@ -59,13 +59,13 @@ def edit_2(conn, name):
 
                 run_count = run_count_section(section, content)
 
-                o_data = html.escape('\n' + o_data)
-                o_data = re.sub('\n(?P<in>={1,6})', '<br>\g<in>', o_data)
-                o_data = re.sub('<br>((?:(?:(?!<br>).)*\n*)*)', run_count, o_data)
-                o_data = re.sub('^\n', '', o_data)
-                o_data = html.unescape(o_data)
+                c_data = html.escape('\n' + c_data)
+                c_data = re.sub('\n(?P<in>={1,6})', '<br>\g<in>', c_data)
+                c_data = re.sub('<br>((?:(?:(?!<br>).)*\n*)*)', run_count, c_data)
+                c_data = re.sub('^\n', '', c_data)
+                c_data = html.unescape(c_data)
 
-                content = o_data
+                content = c_data
 
             leng = leng_check(len(o_data), len(content))
         else:
