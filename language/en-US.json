@@ -324,6 +324,7 @@
                 "user_document_acl" : "User document ACL",
                 "upload_acl" : "Upload ACL",
                 "edit_req_acl" : "Edit request ACL",
+                "many_upload_acl" : "Upload multiple files ACL",
         "_comment_2.7_" : "Application list",
             "application_list": "Application list",
             "application_time": "Application time",
