@@ -44,25 +44,25 @@ def topic_2(conn, topic_num):
         match = re.search('^user:([^/]+)', name)
         if match:
             y_check = 0
-            if ip_or_user(match.groups()[0]) == 1:
-                curs.execute(db_change("select ip from history where ip = ? limit 1"), [match.groups()[0]])
+            if ip_or_user(match.group(1)) == 1:
+                curs.execute(db_change("select ip from history where ip = ? limit 1"), [match.group(1)])
                 u_data = curs.fetchall()
                 if u_data:
                     y_check = 1
                 else:
-                    curs.execute(db_change("select ip from topic where ip = ? limit 1"), [match.groups()[0]])
+                    curs.execute(db_change("select ip from topic where ip = ? limit 1"), [match.group(1)])
                     u_data = curs.fetchall()
                     if u_data:
                         y_check = 1
             else:
-                curs.execute(db_change("select id from user where id = ?"), [match.groups()[0]])
+                curs.execute(db_change("select id from user where id = ?"), [match.group(1)])
                 u_data = curs.fetchall()
                 if u_data:
                     y_check = 1
 
             if y_check == 1:
                 curs.execute(db_change('insert into alarm (name, data, date) values (?, ?, ?)'), [
-                    match.groups()[0],
+                    match.group(1),
                     ip + ' | <a href="/thread/' + topic_num + '#' + num + '">' + name + ' | ' + sub + ' | #' + num + '</a>',
                     today
                 ])

@@ -16,7 +16,7 @@ def main_views_2(conn, name):
         plus = ''
         rename = name
 
-    mime_type = re.search('\.([^\.]+)$', rename).groups()[0]
+    mime_type = re.search('\.([^\.]+)$', rename).group(1)
     if mime_type:
         if mime_type in ['.jpeg', '.jpg', '.gif', '.png', '.webp', '.JPEG', '.JPG', '.GIF', '.PNG', '.WEBP']:
             mime_type = 'image/' + mime_type

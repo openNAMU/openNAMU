@@ -5,6 +5,8 @@ def edit_2(conn, name):
 
     ip = ip_check()
     section = flask.request.args.get('section', None)
+    if section:
+        section = int(number_check(section))
 
     curs.execute(db_change("select data from data where title = ?"), [name])
     old = curs.fetchall()
@@ -42,7 +44,28 @@ def edit_2(conn, name):
             o_data = old[0][0].replace('\r\n', '\n')
 
             if section:
-                content = o_data.replace(o_content, content)
+                class run_count_section:
+                    def __init__(self, key, change):
+                        self.counter = key
+                        self.change = change
+
+                    def __call__(self, match):
+                        self.counter -= 1
+
+                        if self.counter == 0:
+                            return '\n' + self.change
+                        else:
+                            return '\n' + match[1]
+
+                run_count = run_count_section(section, content)
+
+                o_data = html.escape('\n' + o_data)
+                o_data = re.sub('\n(?P<in>={1,6})', '<br>\g<in>', o_data)
+                o_data = re.sub('<br>((?:(?:(?!<br>).)*\n*)*)', run_count, o_data)
+                o_data = re.sub('^\n', '', o_data)
+                o_data = html.unescape(o_data)
+
+                content = o_data
 
             leng = leng_check(len(o_data), len(content))
         else:
@@ -85,29 +108,16 @@ def edit_2(conn, name):
         conn.commit()
         
         return redirect('/w/' + url_pas(name))
-    else:            
+    else:
         if old:
             if section:
-                section = number_check(section)
-                data = html.escape('\n' + old[0][0].replace('\r\n', '\n') + '\n')
+                data = html.escape('\n' + old[0][0].replace('\r\n', '\n'))
                 
-                i = 1
-                while 1:
-                    if re.search('\n(?P<in>={1,6})', data):
-                        data = re.sub(
-                            '\n(?P<in>={1,6})', 
-                            '<br><' + str(i) + '>\g<in>', 
-                            data,
-                            1
-                        )
+                data = re.sub('\n(?P<in>={1,6})', '<br>\g<in>', data)
 
-                        i += 1
-                    else:
-                        break
-
-                section_data = re.search('<br><' + str(section) + '>((?:(?:(?!<br>).)*\n*)*)', data)
-                if section_data:
-                    data = section_data.groups()[0]
+                section_data = re.findall('<br>((?:(?:(?!<br>).)*\n*)*)', data)
+                if len(section_data) >= section:
+                    data = section_data[section - 1]
                 else:
                     return redirect('/edit/' + url_pas(name))
             else:

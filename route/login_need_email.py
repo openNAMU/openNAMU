@@ -41,7 +41,7 @@ def login_need_email_2(conn, tool):
             if 'c_id' in flask.session:
                 data = re.search('@([^@]+)$', flask.request.form.get('email', ''))
                 if data:
-                    data = data.groups()[0]
+                    data = data.group(1)
 
                     curs.execute(db_change("select html from html_filter where html = ? and kind = 'email'"), [data])
                     if curs.fetchall():

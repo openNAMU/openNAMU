@@ -193,7 +193,7 @@ def update(ver_num, set_data):
         if change_rec and change_rec[0][0] != '':
             new_rec = re.search('data-sitekey="([^"]+)"', change_rec[0][0])
             if new_rec:
-                curs.execute(db_change("update other set data = ? where name = 'recaptcha'"), [new_rec.groups()[0]])
+                curs.execute(db_change("update other set data = ? where name = 'recaptcha'"), [new_rec.group(1)])
             else:
                 curs.execute(db_change("update other set data = '' where name = 'recaptcha'"))
                 curs.execute(db_change("update other set data = '' where name = 'sec_re'"))
@@ -990,7 +990,7 @@ def ban_check(ip = None, tool = None):
 
     band = re.search("^([0-9]{1,3}\.[0-9]{1,3})", ip)
     if band:
-        band_it = band.groups()[0]
+        band_it = band.group(1)
     else:
         band_it = '-'
 
