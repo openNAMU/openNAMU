@@ -16,7 +16,7 @@ def give_acl_2(conn, name):
         if check_data and ip_or_user(ip) != 0:
             return redirect('/login')
 
-        if user_data.groups()[0] != ip_check():
+        if user_data.group(1) != ip_check():
             if admin_check(5) != 1:
                 if check_data:
                     return re_error('/error/3')

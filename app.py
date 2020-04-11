@@ -4,7 +4,7 @@ import re
 for i_data in os.listdir("route"):
     f_src = re.search("(.+)\.py$", i_data)
     if f_src:
-        f_src = f_src.groups()[0]
+        f_src = f_src.group(1)
 
         exec("from route." + f_src + " import *")
 
@@ -56,7 +56,7 @@ while 1:
             for i_data in os.listdir("."):
                 f_src = re.search("(.+)\.db$", i_data)
                 if f_src:
-                    all_src += [f_src.groups()[0]]
+                    all_src += [f_src.group(1)]
 
             if all_src != [] and new_json[0] != 'mysql':
                 print('DB name (data) [' + ', '.join(all_src) + '] : ', end = '')
