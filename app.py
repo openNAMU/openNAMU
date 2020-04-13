@@ -44,7 +44,7 @@ while 1:
 
             break
         else:
-            new_json = ['', '', '']
+            new_json = ['', '']
             normal_db_type = ['sqlite', 'mysql']
 
             print('DB type (sqlite) [sqlite, mysql] : ', end = '')
@@ -80,7 +80,7 @@ if set_data['db_type'] == 'mysql':
     try:
         set_data_mysql = json.loads(open('data/mysql.json', encoding='utf8').read())
     except:
-        new_json = ['','','']
+        new_json = ['', '', '']
 
         while 1:
             print('DB user ID : ', end = '')
