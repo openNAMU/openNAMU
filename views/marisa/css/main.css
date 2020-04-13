@@ -1,9 +1,12 @@
+@import url(https://fonts.googleapis.com/earlyaccess/nanumgothic.css);
+
 body {
     max-width: 100%;
     word-break: break-all;
     word-wrap: break-word;
     margin: 0;
-    font-family: '나눔고딕', 'Nanum Gothic', 'Noto Sans KR', 'Malgun Gothic', '맑은 고딕', sans-serif;
+    font-family: "나눔고딕", "Nanum Gothic", sans-serif;
+    font-size: 14px;
 }
 
 ul {
@@ -22,7 +25,7 @@ hr {
 
 button {
     padding: 10px;
-    border: 2px solid gainsboro;
+    border: 1px solid gainsboro;
     background: white;
     cursor: pointer;
 }
@@ -42,7 +45,7 @@ li {
 #top {
     width: 100%;
     background: #4a4a4a;
-    padding: 20px;
+    padding: 15px;
     padding-right: 0;
     padding-left: 0;
     position: relative;
@@ -206,11 +209,11 @@ h6 {
 #top_tool {
     float: right;
     color: white;
-    margin-top: -8px;
+    margin-top: -9px;
 }
 
 .cel_in_cel {
-    border: 2px solid gainsboro;
+    border: 1px solid gainsboro;
     padding: 10px;
     position: absolute;
     background: white;
@@ -255,7 +258,7 @@ h6 {
 
 div#pre_search {
     padding: 10px;
-    border: 2px solid #4a4a4a;
+    border: 1px solid #4a4a4a;
     width: 200px;
     color: black;
     margin-top: 5px;
@@ -306,11 +309,11 @@ a {
 }
 
 pre, #toc, #cate, #redirect {
-    border: 2px solid gainsboro;
+    border: 1px solid gainsboro;
 }
 
 textarea, input {
-    border: 2px solid gainsboro;
+    border: 1px solid gainsboro;
     font-family: '나눔고딕', 'Nanum Gothic', 'Noto Sans KR', 'Malgun Gothic', '맑은 고딕', sans-serif;
     padding: 5px;
     margin-left: -5px;
@@ -345,7 +348,7 @@ textarea, input {
     position: fixed;
     bottom: 0;
     right: 0;
-    border: 2px solid #4a4a4a;
+    border: 1px solid #4a4a4a;
     background: #4a4a4a;
     text-align: center;
 }
@@ -358,7 +361,7 @@ blockquote {
     padding: 1em calc(2em + 25px) 1em 1em;
     margin: 1em 0em 0em;
     background: #eeeeee;
-    border: 2px dashed #ccc;
+    border: 1px dashed #ccc;
     border-left: 5px solid black;
 }
 
@@ -387,9 +390,6 @@ div#last_edit {
 
 #topic_color {
     color: limegreen;
-}
-
-#mobile_search_input {
 }
 
 #top_menu_groups {
@@ -422,4 +422,8 @@ div#last_edit {
 
 button#save {
     background: #c6ffc6;
+}
+
+div#top_tool_cel a:hover, #logo a:hover, #search button:hover, div#nav_bar a:hover {
+    color: #aaa;
 }

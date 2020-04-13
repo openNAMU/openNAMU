@@ -4,7 +4,7 @@ import re
 for i_data in os.listdir("route"):
     f_src = re.search("(.+)\.py$", i_data)
     if f_src:
-        f_src = f_src.groups()[0]
+        f_src = f_src.group(1)
 
         exec("from route." + f_src + " import *")
 
@@ -56,7 +56,7 @@ while 1:
             for i_data in os.listdir("."):
                 f_src = re.search("(.+)\.db$", i_data)
                 if f_src:
-                    all_src += [f_src.groups()[0]]
+                    all_src += [f_src.group(1)]
 
             if all_src != [] and new_json[0] != 'mysql':
                 print('DB name (data) [' + ', '.join(all_src) + '] : ', end = '')
@@ -80,7 +80,7 @@ if set_data['db_type'] == 'mysql':
     try:
         set_data_mysql = json.loads(open('data/mysql.json', encoding='utf8').read())
     except:
-        new_json = ['', '']
+        new_json = ['', '', '']
 
         while 1:
             print('DB user ID : ', end = '')
@@ -374,6 +374,10 @@ def list_old_page():
 @app.route('/acl_list')
 def list_acl():
     return list_acl_2(conn)
+
+@app.route('/image_file_list')
+def list_image_file():
+    return list_image_file_2(conn)
 
 @app.route('/admin_plus/<name>', methods=['POST', 'GET'])
 def give_admin_groups(name = None):

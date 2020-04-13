@@ -49,7 +49,7 @@ def api_user_info_2(conn, name):
             plus_t += [load_lang('blocked') + '<br>']
 
             match = re.search("^([0-9]{1,3}\.[0-9]{1,3})", name)
-            match = match.groups()[0] if match else '-'
+            match = match.group(1) if match else '-'
             regex_ban = 0
 
             curs.execute(db_change("select login, block, end, why from ban where band = 'regex'"))

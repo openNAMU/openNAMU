@@ -5,6 +5,8 @@ def edit_2(conn, name):
 
     ip = ip_check()
     section = flask.request.args.get('section', None)
+    if section:
+        section = int(number_check(section))
 
     curs.execute(db_change("select data from data where title = ?"), [name])
     old = curs.fetchall()
@@ -22,9 +24,10 @@ def edit_2(conn, name):
             return re_error('/error/24')
 
         today = get_time()
-        content = flask.request.form.get('content', '')
+        content = flask.request.form.get('content', '').replace('\r\n', '\n')
+        o_content = flask.request.form.get('o_content', '').replace('\r\n', '\n')
 
-        if flask.request.form.get('otent', '') == content:
+        if o_content == content:
             return redirect('/w/' + url_pas(name))
         
         if edit_filter_do(content) == 1:
@@ -37,14 +40,34 @@ def edit_2(conn, name):
 
         content = savemark(content)
         
-        if old:
-            leng = leng_check(len(flask.request.form.get('otent', '')), len(content))
-            
+        if old:  
+            o_data = old[0][0].replace('\r\n', '\n')
+
             if section:
-                content = old[0][0].replace('\r\n', '\n').replace(
-                    flask.request.form.get('otent', '').replace('\r\n', '\n'), 
-                    content.replace('\r\n', '\n')
-                )
+                class run_count_section:
+                    def __init__(self, key, change):
+                        self.counter = key
+                        self.change = change
+
+                    def __call__(self, match):
+                        self.counter -= 1
+
+                        if self.counter == 0:
+                            return '\n' + self.change
+                        else:
+                            return '\n' + match[1]
+
+                run_count = run_count_section(section, content)
+
+                c_data = html.escape('\n' + o_data)
+                c_data = re.sub('\n(?P<in>={1,6})', '<br>\g<in>', c_data)
+                c_data = re.sub('<br>((?:(?:(?!<br>).)*\n*)*)', run_count, c_data)
+                c_data = re.sub('^\n', '', c_data)
+                c_data = html.unescape(c_data)
+
+                content = c_data
+
+            leng = leng_check(len(o_data), len(content))
         else:
             leng = '+' + str(len(content))
 
@@ -85,42 +108,36 @@ def edit_2(conn, name):
         conn.commit()
         
         return redirect('/w/' + url_pas(name))
-    else:            
+    else:
         if old:
             if section:
-                data = re.sub(
-                    '\n(?P<in>={1,6})', 
-                    '<br>\g<in>', 
-                    html.escape('\n' + old[0][0].replace('\r\n', '\n') + '\n')
-                )
-                i = 0
+                data = html.escape('\n' + old[0][0].replace('\r\n', '\n'))
+                
+                data = re.sub('\n(?P<in>={1,6})', '<br>\g<in>', data)
 
-                while 1:
-                    g_data = re.search('((?:<br>)(?:(?:(?!\n|<br>).)+)(?:\n*(?:(?:(?!<br>).)+\n*)+)?)', data)
-                    if g_data:
-                        if int(section) - 1 == i:
-                            data = html.unescape(re.sub('<br>(?P<in>={1,6})', '\n\g<in>', g_data.groups()[0]))
-                            
-                            break
-                        else:
-                            data = re.sub('((?:<br>)(?:(?:(?!\n|<br>).)+)(?:\n*(?:(?:(?!<br>).)+\n*)+)?)', '\n', data, 1)
-
-                        i += 1
-                    else:
-                        break
+                section_data = re.findall('<br>((?:(?:(?!<br>).)*\n*)*)', data)
+                if len(section_data) >= section:
+                    data = section_data[section - 1]
+                else:
+                    return redirect('/edit/' + url_pas(name))
             else:
                 data = old[0][0].replace('\r\n', '\n')
         else:
             data = ''
-            
-        data_old = data
-        get_name = ''
 
-        if not section:
-            get_name = '''
-                <a href="/manager/15?plus=''' + url_pas(name) + '">(' + load_lang('load') + ')</a> <a href="/edit_filter">(' + load_lang('edit_filter_rule') + ''')</a>
-                <hr class=\"main_hr\">
-            '''
+        data_old = data
+
+        if section:
+            get_name = '' + \
+                '<a href="/edit_filter">(' + load_lang('edit_filter_rule') + ')</a>' + \
+                '<hr class=\"main_hr\">' + \
+            ''
+        else:
+            get_name = '' + \
+                '<a href="/manager/15?plus=' + url_pas(name) + '">(' + load_lang('load') + ')</a> ' + \
+                '<a href="/edit_filter">(' + load_lang('edit_filter_rule') + ')</a>' + \
+                '<hr class=\"main_hr\">' + \
+            ''
             
         if flask.request.args.get('plus', None):
             curs.execute(db_change("select data from data where title = ?"), [flask.request.args.get('plus', 'test')])
@@ -143,11 +160,16 @@ def edit_2(conn, name):
         else:
             b_text = ''
         
-        cccb_text = ''
         curs.execute(db_change('select data from other where name = "copyright_checkbox_text"'))
         sql_d = curs.fetchall()
         if sql_d and sql_d[0][0] != '':
-            cccb_text = '<hr class=\"wmain_hr\"><input type="checkbox" name="copyright_agreement" value="yes">' + sql_d[0][0] + '<hr class=\"main_hr\">'
+            cccb_text = '' + \
+                '<hr class=\"main_hr\">' + \
+                '<input type="checkbox" name="copyright_agreement" value="yes"> ' + sql_d[0][0] + \
+                '<hr class=\"main_hr\">' + \
+            ''
+        else:
+            cccb_text = ''
 
         curs.execute(db_change('select data from other where name = "edit_help"'))
         sql_d = curs.fetchall()
@@ -156,14 +178,17 @@ def edit_2(conn, name):
         else:
             p_text = load_lang('defalut_edit_help')
 
+        data = re.sub('\n$', '', data)
+        data_old = re.sub('\n$', '', data_old)
+
         return easy_minify(flask.render_template(skin_check(), 
             imp = [name, wiki_set(), custom(), other2([' (' + sub + ')', 0])],
             data =  get_name + '''
                 <form method="post">
                     <script>do_stop_exit();</script>
                     ''' + edit_button() + '''
-                    <textarea rows="25" id="content" placeholder="''' + p_text + '''" name="content">''' + html.escape(re.sub('\n$', '', data)) + '''</textarea>
-                    <textarea id="origin" name="otent">''' + html.escape(re.sub('\n$', '', data_old)) + '''</textarea>
+                    <textarea id="content" placeholder="''' + p_text + '''" name="content">''' + html.escape(data) + '''</textarea>
+                    <textarea id="origin" name="o_content">''' + html.escape(data_old) + '''</textarea>
                     <hr class=\"main_hr\">
                     <input placeholder="''' + load_lang('why') + '''" name="send" type="text">
                     <hr class=\"main_hr\">

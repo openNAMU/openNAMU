@@ -14,7 +14,7 @@ def setting_adsense_2(conn):
             return easy_minify(flask.render_template(skin_check(),
                 imp = [load_lang('inter_error'), wiki_set(), custom(), other2([0, 0])],
                 data = '<h2>ie_no_data_required</h2>' + load_lang('ie_no_data_required'),
-                menu = [['other', load_lang('return')]]
+                menu = [['setting', load_lang('return')]]
             ))
 
         if adsense_enabled == 'on':
@@ -62,5 +62,5 @@ def setting_adsense_2(conn):
     return easy_minify(flask.render_template(skin_check(),
         imp = [load_lang('adsense_setting'), wiki_set(), custom(), other2([0, 0])],
         data = body_content,
-        menu = [['other', load_lang('return')]]
+        menu = [['setting', load_lang('return')]]
     ))

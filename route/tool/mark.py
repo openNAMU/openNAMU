@@ -3,12 +3,19 @@ from .set_mark.namumark import namumark, link_fix
 from .set_mark.tool import *
 
 import re
+import os
 import html
 import sqlite3
 import asyncio
 import threading
 import urllib.parse
 import multiprocessing
+
+if os.path.exists('route/tool/set_mark/custom.py'):
+    from .set_mark.custom import custom_mark
+else:
+    def custom_mark(conn, data, title, num, include):
+        return [data, '', []]
 
 def load_conn2(data):
     global conn
@@ -41,7 +48,9 @@ def render_do(title, data, num, include):
     curs.execute(db_change('select data from other where name = "markup"'))
     rep_data = curs.fetchall()
     if rep_data[0][0] == 'namumark':
-        data = namumark(conn, data, title, num, include)
+        data = namumark(conn, data, title, include)
+    elif rep_data[0][0] == 'custom':
+        data = custom_mark(conn, data, title, include)
     elif rep_data[0][0] == 'raw':
         data = [data, '', []]
     else:

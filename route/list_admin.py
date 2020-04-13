@@ -10,7 +10,7 @@ def list_admin_2(conn):
         name = ip_pas(data[0]) + ' <a href="/admin_plus/' + url_pas(data[1]) + '">(' + data[1] + ')</a>'
 
         if data[2] != '':
-            name += '(' + data[2] + ')'
+            name += ' (' + data[2] + ')'
 
         div += '<li>' + name + '</li>'
 
