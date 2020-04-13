@@ -36,7 +36,7 @@ def view_read_2(conn, name):
 
     m = re.search("^(.*)\/(.*)$", name)
     if m:
-        uppage = m.groups()[0]
+        uppage = m.group(1)
     else:
         uppage = 0
 
@@ -207,7 +207,7 @@ def view_read_2(conn, name):
 
     match = re.search("^user:([^/]*)", name)
     if match:
-        user_name = match.groups()[0]
+        user_name = match.group(1)
         div = '''
             <div id="get_user_info"></div>
             <script>load_user_info("''' + user_name + '''");</script>

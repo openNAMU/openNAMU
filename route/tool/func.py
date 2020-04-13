@@ -193,7 +193,7 @@ def update(ver_num, set_data):
         if change_rec and change_rec[0][0] != '':
             new_rec = re.search('data-sitekey="([^"]+)"', change_rec[0][0])
             if new_rec:
-                curs.execute(db_change("update other set data = ? where name = 'recaptcha'"), [new_rec.groups()[0]])
+                curs.execute(db_change("update other set data = ? where name = 'recaptcha'"), [new_rec.group(1)])
             else:
                 curs.execute(db_change("update other set data = '' where name = 'recaptcha'"))
                 curs.execute(db_change("update other set data = '' where name = 'sec_re'"))
@@ -499,7 +499,7 @@ def other2(data):
         data += ['']
 
     req_list = ''
-    main_css_ver = 25
+    main_css_ver = 29
 
     if not 'main_css_load' in flask.session or not 'main_css_ver' in flask.session or flask.session['main_css_ver'] != main_css_ver:
         for i_data in os.listdir(os.path.join("views", "main_css", "css")):
@@ -909,6 +909,10 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
             curs.execute(db_change("select data from other where name = 'upload_acl'"))
 
             num = 5
+        elif tool == 'many_upload':
+            curs.execute(db_change("select data from other where name = 'many_upload_acl'"))
+
+            num = 5
         elif tool == 'edit_req':
             curs.execute(db_change("select data from other where name = 'edit_req_acl'"))
 
@@ -986,7 +990,7 @@ def ban_check(ip = None, tool = None):
 
     band = re.search("^([0-9]{1,3}\.[0-9]{1,3})", ip)
     if band:
-        band_it = band.groups()[0]
+        band_it = band.group(1)
     else:
         band_it = '-'
 
@@ -1253,7 +1257,7 @@ def re_error(data):
                             '<li>' + data + '</li>' + \
                         '</ul>' + \
                     '</div>' + \
-                    ('<script>window.onload = function () { main_css_skin_set(); }</script>' if get_url == '/main_skin_set' else ''),
+                    ('<script>window.addEventListener(\'DOMContentLoaded\', function() { main_css_skin_set(); });</script>' if get_url == '/main_skin_set' else ''),
                 menu = ([['main_skin_set', load_lang('main_skin_set')]] if get_url != '/main_skin_set' else [['skin_set', load_lang('skin_set')]])
             ))
         else:

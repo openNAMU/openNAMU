@@ -26,6 +26,8 @@ def setting_2(conn, num):
             x += 1
             li_data += '<li><a href="/setting/' + str(x) + '">' + li + '</a></li>'
 
+        li_data += '<li><a href="/adsense_setting">'+ load_lang('adsense_setting') + '</a></li>'
+
         return easy_minify(flask.render_template(skin_check(),
             imp = [load_lang('setting'), wiki_set(), custom(), other2([0, 0])],
             data = '<h2>' + load_lang('list') + '</h2><ul>' + li_data + '</ul>',
@@ -558,20 +560,14 @@ def setting_2(conn, num):
             2 : 'discussion',
             3 : 'upload_acl',
             4 : 'all_view_acl',
-            5 : 'edit_req_acl'
-        }
-        n_list = {
-            1 : 'normal',
-            2 : 'normal',
-            3 : 'normal',
-            4 : 'normal',
-            5 : 'normal'
+            5 : 'edit_req_acl',
+            6 : 'many_upload_acl'
         }
 
         if flask.request.method == 'POST':
             for i in i_list:
                 curs.execute(db_change("update other set data = ? where name = ?"), [
-                    flask.request.form.get(i_list[i], n_list[i]),
+                    flask.request.form.get(i_list[i], 'normal'),
                     i_list[i]
                 ])
 
@@ -589,15 +585,18 @@ def setting_2(conn, num):
                 if sql_d:
                     d_list[i] = sql_d[0][0]
                 else:
-                    curs.execute(db_change('insert into other (name, data) values (?, ?)'), [i_list[i], n_list[i]])
+                    curs.execute(db_change('insert into other (name, data) values (?, ?)'), [i_list[i], 'normal'])
 
-                    d_list[i] = n_list[i]
+                    d_list[i] = 'normal'
 
             conn.commit()
 
-            acl_div = ['', '', '', '', '']
+            acl_div = []
+            for i in range(0, len(i_list)):
+                acl_div += ['']
+
             acl_list = get_acl_list()
-            for i in range(0, 5):
+            for i in range(0, len(i_list)):
                 for data_list in acl_list:
                     if data_list == d_list[i + 1]:
                         check = 'selected="selected"'
@@ -631,7 +630,11 @@ def setting_2(conn, num):
                         <span>''' + load_lang('edit_req_acl') + '''</span>
                         <hr class=\"main_hr\">
                         <select name="edit_req_acl">''' + acl_div[4] + '''</select>
+                        <hr>
+                        <span>''' + load_lang('many_upload_acl') + '''</span>
                         <hr class=\"main_hr\">
+                        <select name="many_upload_acl">''' + acl_div[5] + '''</select>
+                        <hr>
                         <button id="save" type="submit">''' + load_lang('save') + '''</button>
                     </form>
                 ''',

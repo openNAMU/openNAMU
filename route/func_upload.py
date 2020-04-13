@@ -19,6 +19,9 @@ def func_upload_2(conn):
         if len(file_data) == 1:
             file_num = None
         else:
+            if acl_check(None, 'many_upload') == 1:
+                return re_error('/ban')
+
             file_num = 1
 
         for data in file_data:

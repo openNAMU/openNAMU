@@ -22,14 +22,14 @@ server_set_var = {
     'language' : {
         'display' : 'Language',
         'require' : 'select',
-        'default' : 'en-US',
+        'default' : 'ko-KR',
         'list' : ['ko-KR', 'en-US']
     },
     'markup' : {
         'display' : 'Markup',
         'require' : 'select',
         'default' : 'namumark',
-        'list' : ['namumark', 'raw']
+        'list' : ['namumark', 'custom', 'raw']
     },
     'encode' : {
         'display' : 'Encryption method',
@@ -43,9 +43,6 @@ def init(key):
     if env_dict[key] != None:
         return env_dict[key]
     else:
-        if key == 'markup':
-            return server_set_var[key]['default']
-
         while 1:
             if server_set_var[key]['require'] == 'select':
                 list_ = '[' + ', '.join(server_set_var[key]['list']) + ']'

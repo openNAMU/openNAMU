@@ -29,7 +29,7 @@ def link_fix(main_link):
 
     other_link = re.search('[^\\\\]?(#[^#]+)$', main_link)
     if other_link:
-        other_link = other_link.groups()[0]
+        other_link = other_link.group(1)
 
         main_link = re.sub('(#[^#]+)$', '', main_link)
     else:
@@ -173,11 +173,11 @@ def table_start(data):
 
         table = re.search('\n((?:(?:(?:(?:\|\||\|[^|]+\|)+(?:(?:(?!\|\|).\n*)*))+)\|\|(?:\n)?)+)', data)
         if table:
-            table = re.sub('(\|\|)+\n', '||\n', table.groups()[0])
+            table = re.sub('(\|\|)+\n', '||\n', table.group(1))
             
             table_caption = re.search('^\|([^|]+)\|', table)
             if table_caption:
-                table_caption = '<caption>' + table_caption.groups()[0] + '</caption>'
+                table_caption = '<caption>' + table_caption.group(1) + '</caption>'
                 
                 table = re.sub('^\|([^|]+)\|', '||', table)
             else:
@@ -188,7 +188,7 @@ def table_start(data):
             table_cel = re.findall('(\n(?:(?:\|\|)+)|\|\|\n(?:(?:\|\|)+)|(?:(?:\|\|)+))((?:(?:(?!\n|\|\|).)+\n*)+)', table)
             for i in table_cel:
                 cel_plus = re.search('^((?:&lt;(?:(?:(?!&gt;).)*)&gt;)+)', i[1])
-                cel_plus = cel_plus.groups()[0] if cel_plus else ''
+                cel_plus = cel_plus.group(1) if cel_plus else ''
                 cel_data = re.sub('^((?:&lt;(?:(?:(?!&gt;).)*)&gt;)+)', '', i[1])
 
                 if re.search('^\n', i[0]):
@@ -285,22 +285,22 @@ def middle_parser(data, include_num):
                         middle_search = re.search('^(#(?:[0-9a-f-A-F]{3}){1,2})', middle_data[0])
                         middle_list += ['span']
 
-                        data = middle_re.sub('<span style="color: ' + middle_search.groups()[0] + ';">', data, 1)
+                        data = middle_re.sub('<span style="color: ' + middle_search.group(1) + ';">', data, 1)
                     elif re.search('^(?:#(\w+))', middle_data[0]):
                         middle_search = re.search('^(?:#(\w+))', middle_data[0])
                         middle_list += ['span']
 
-                        data = middle_re.sub('<span style="color: ' + middle_search.groups()[0] + ';">', data, 1)
+                        data = middle_re.sub('<span style="color: ' + middle_search.group(1) + ';">', data, 1)
                     elif re.search('^(?:@((?:[0-9a-f-A-F]{3}){1,2}))', middle_data[0]):
                         middle_search = re.search('^(?:@((?:[0-9a-f-A-F]{3}){1,2}))', middle_data[0])
                         middle_list += ['span']
 
-                        data = middle_re.sub('<span style="background: #' + middle_search.groups()[0] + ';">', data, 1)
+                        data = middle_re.sub('<span style="background: #' + middle_search.group(1) + ';">', data, 1)
                     elif re.search('^(?:@(\w+))', middle_data[0]):
                         middle_search = re.search('^(?:@(\w+))', middle_data[0])
                         middle_list += ['span']
 
-                        data = middle_re.sub('<span style="background: ' + middle_search.groups()[0] + ';">', data, 1)
+                        data = middle_re.sub('<span style="background: ' + middle_search.group(1) + ';">', data, 1)
                     elif re.search('^(\+|-)([1-5])', middle_data[0]):
                         middle_search = re.search('^(\+|-)([1-5])', middle_data[0])
                         middle_search = middle_search.groups()
@@ -478,7 +478,7 @@ def middle_parser(data, include_num):
 
     return data
 
-def namumark(conn, data, title, main_num, include_num):
+def namumark(conn, data, title, include_num):
     curs = conn.cursor()
 
     global plus_data
@@ -502,7 +502,7 @@ def namumark(conn, data, title, main_num, include_num):
     while 1:
         math = math_re.search(data)
         if math:
-            math = math.groups()[0]
+            math = math.group(1)
             math = math.replace('{', '<math_mid_1>')
             math = math.replace('}', '<math_mid_2>')
             math = math.replace('\\', '<math_slash>')
@@ -520,7 +520,7 @@ def namumark(conn, data, title, main_num, include_num):
     while 1:
         math = math_re.search(data)
         if math:
-            math = math.groups()[0]
+            math = math.group(1)
             math = math.replace('<math_mid_1>', '{')
             math = math.replace('<math_mid_2>', '}')
             math = math.replace('<math_slash>', '\\')
@@ -562,11 +562,11 @@ def namumark(conn, data, title, main_num, include_num):
 
         include = include_re.search(data)
         if include:
-            include = include.groups()[0]
+            include = include.group(1)
 
             include_data = re.search('^((?:(?!,).)+)', include)
             if include_data:
-                include_data = include_data.groups()[0]
+                include_data = include_data.group(1)
             else:
                 include_data = 'Test'
 
@@ -635,7 +635,7 @@ def namumark(conn, data, title, main_num, include_num):
     redirect_re = re.compile('\n#(?:redirect|넘겨주기) ((?:(?!\n).)+)\n', re.I)
     redirect = redirect_re.search(data)
     if redirect:
-        redirect = redirect.groups()[0]
+        redirect = redirect.group(1)
 
         return_link = link_fix(redirect)
         main_link = html.unescape(return_link[0])
@@ -751,7 +751,7 @@ def namumark(conn, data, title, main_num, include_num):
     
     now_time = tool.get_time()
     time_data = re.search('^([0-9]{4}-[0-9]{2}-[0-9]{2})', now_time)
-    time = time_data.groups()[0]
+    time = time_data.group(1)
     
     macro_re = re.compile('\[([^[(]+)\(((?:(?!\)]).)+)\)\]')
     macro_data = macro_re.findall(data)
@@ -760,7 +760,7 @@ def namumark(conn, data, title, main_num, include_num):
         if macro_name == 'youtube' or macro_name == 'kakaotv' or macro_name == 'nicovideo':
             width = re.search(', ?width=((?:(?!,).)+)', i[1])
             if width:
-                video_width = width.groups()[0]
+                video_width = width.group(1)
                 if re.search('^[0-9]+$', video_width):
                     video_width += 'px'
             else:
@@ -768,7 +768,7 @@ def namumark(conn, data, title, main_num, include_num):
 
             height = re.search(', ?height=((?:(?!,).)+)', i[1])
             if height:
-                video_height = height.groups()[0]
+                video_height = height.group(1)
                 if re.search('^[0-9]+$', video_height):
                     video_height += 'px'
             else:
@@ -776,7 +776,7 @@ def namumark(conn, data, title, main_num, include_num):
 
             code = re.search('^((?:(?!,).)+)', i[1])
             if code:
-                video_code = code.groups()[0]
+                video_code = code.group(1)
             else:
                 video_code = ''
 
@@ -785,7 +785,7 @@ def namumark(conn, data, title, main_num, include_num):
             if macro_name == 'youtube':
                 start = re.search(', ?(start=(?:(?!,).)+)', i[1])
                 if start:
-                    video_start = '?' + start.groups()[0]
+                    video_start = '?' + start.group(1)
 
                 video_code = re.sub('^https:\/\/www\.youtube\.com\/watch\?v=', '', video_code)
                 video_code = re.sub('^https:\/\/youtu\.be\/', '', video_code)
@@ -809,19 +809,19 @@ def namumark(conn, data, title, main_num, include_num):
         elif macro_name == 'ruby':
             ruby_code = re.search('^([^,]+)', i[1])
             if ruby_code:
-                ruby_code = ruby_code.groups()[0]
+                ruby_code = ruby_code.group(1)
             else:
                 ruby_code = 'Test'
 
             ruby_top = re.search('ruby=([^,]+)', i[1], flags = re.I)
             if ruby_top:
-                ruby_top = ruby_top.groups()[0]
+                ruby_top = ruby_top.group(1)
             else:
                 ruby_top = 'Test'
 
             ruby_color = re.search('color=([^,]+)', i[1], flags = re.I)
             if ruby_color:
-                ruby_color = 'color: ' + ruby_color.groups()[0] + ';'
+                ruby_color = 'color: ' + ruby_color.group(1) + ';'
             else:
                 ruby_color = ''
 
@@ -869,7 +869,7 @@ def namumark(conn, data, title, main_num, include_num):
     while 1:
         block = re.search('(\n(?:&gt; ?(?:(?:(?!\n).)+)?\n)+)', data)
         if block:
-            block = block.groups()[0]
+            block = block.group(1)
 
             block = re.sub('^\n&gt; ?', '', block)
             block = re.sub('\n&gt; ?', '\n', block)
@@ -892,7 +892,7 @@ def namumark(conn, data, title, main_num, include_num):
     while 1:
         li = re.search('(\n(?:(?: *)\* ?(?:(?:(?!\n).)+)\n)+)', data)
         if li:
-            li = li.groups()[0]
+            li = li.group(1)
             while 1:
                 sub_li = re.search('\n(?:( *)\* ?((?:(?!\n).)+))', li)
                 if sub_li:
@@ -917,7 +917,7 @@ def namumark(conn, data, title, main_num, include_num):
     while 1:
         indent = re.search('\n( +)', data)
         if indent:
-            indent = len(indent.groups()[0])
+            indent = len(indent.group(1))
 
             margin = '<span style="margin-left: 20px;"></span>' * indent
 
@@ -932,7 +932,7 @@ def namumark(conn, data, title, main_num, include_num):
     while 1:
         link = re.search('\[\[((?:(?!\[\[|\]\]|<\/td>).)+)\]\]', data)
         if link:
-            link = link.groups()[0]
+            link = link.group(1)
 
             link_split = re.search('((?:(?!\|).)+)(?:\|((?:(?!\|).)+))', link)
             if link_split:
@@ -949,7 +949,7 @@ def namumark(conn, data, title, main_num, include_num):
 
                 file_width = re.search('width=((?:(?!&).)+)', see_link)
                 if file_width:
-                    file_width = file_width.groups()[0]
+                    file_width = file_width.group(1)
                     if re.search('px$', file_width):
                         file_style += 'width: ' + file_width + ';'
                     else:
@@ -957,7 +957,7 @@ def namumark(conn, data, title, main_num, include_num):
 
                 file_height = re.search('height=((?:(?!&).)+)', see_link)
                 if file_height:
-                    file_height = file_height.groups()[0]
+                    file_height = file_height.group(1)
                     if re.search('px$', file_height):
                         file_style += 'height: ' + file_height + ';'
                     else:
@@ -965,7 +965,7 @@ def namumark(conn, data, title, main_num, include_num):
 
                 file_align = re.search('align=((?:(?!&).)+)', see_link)
                 if file_align:
-                    file_align = file_align.groups()[0]
+                    file_align = file_align.group(1)
                     if file_align == 'center':
                         file_align = 'display: block; text-align: center;'
                     else:
@@ -975,7 +975,7 @@ def namumark(conn, data, title, main_num, include_num):
 
                 file_color = re.search('bgcolor=((?:(?!&).)+)', see_link)
                 if file_color:
-                    file_color = 'background: ' + file_color.groups()[0] + '; display: inline-block;'
+                    file_color = 'background: ' + file_color.group(1) + '; display: inline-block;'
                 else:
                     file_color = ''
 
@@ -1078,7 +1078,7 @@ def namumark(conn, data, title, main_num, include_num):
                     data = re.sub('\[\[((?:(?!\[\[|\]\]|<\/td>).)+)\]\]', 'Not exist', data, 1)
             elif re.search('^(\/(?:.+))$', main_link):
                 under_title = re.search('^(\/(?:.+))$', main_link)
-                under_title = under_title.groups()[0]
+                under_title = under_title.group(1)
 
                 if see_link != main_link:
                     data = re.sub('\[\[((?:(?!\[\[|\]\]|<\/td>).)+)\]\]', '[[' + title + under_title + '|' + see_link + ']]', data, 1)

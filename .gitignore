@@ -5,6 +5,8 @@ data/set.json
 data/mysql.json
 data/oauthsettings.json
 
+route/tool/set_mark/custom.py
+
 images
 .vscode
 
@@ -21,3 +23,5 @@ views/before_namu
 views/acme
 views/sl_open
 views/nitori
+
+.DS_Store

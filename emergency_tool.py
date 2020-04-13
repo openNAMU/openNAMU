@@ -50,7 +50,7 @@ while 1:
             for i_data in os.listdir("."):
                 f_src = re.search("(.+)\.db$", i_data)
                 if f_src:
-                    all_src += [f_src.groups()[0]]
+                    all_src += [f_src.group(1)]
 
             if all_src != [] and new_json[0] != 'mysql':
                 print('DB name (data) [' + ', '.join(all_src) + '] : ', end = '')
@@ -74,7 +74,7 @@ if set_data['db_type'] == 'mysql':
     try:
         set_data_mysql = json.loads(open('data/mysql.json', encoding='utf8').read())
     except:
-        new_json = ['', '']
+        new_json = ['', '', '']
 
         while 1:
             print('DB user ID : ', end = '')
