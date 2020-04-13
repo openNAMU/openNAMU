@@ -1,12 +1,15 @@
-var go_save_zone = 0;
-
-function do_stop_exit() {
-    window.onbeforeunload = function() {
-        console.log(go_save_zone);
-        data = document.getElementById('content').value;
-        origin = document.getElementById('origin').value;
-        if(data !== origin && go_save_zone != 1) {
-            return '';
+window.addEventListener('DOMContentLoaded', function() {
+    if(window.location.pathname.match(/^\/edit\//i)) {
+        window.onbeforeunload = function() {
+            data = document.getElementById('content').value;
+            origin = document.getElementById('origin').value;
+            if(data !== origin) {
+                return '';
+            }
         }
     }
+});
+
+function save_stop_exit() {
+    window.onbeforeunload = function () { }
 }
