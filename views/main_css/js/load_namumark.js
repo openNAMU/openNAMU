@@ -97,3 +97,11 @@ function page_count() {
         }
     }
 }
+
+function not_from_exist() {
+    window.addEventListener('DOMContentLoaded', function() {
+        if(document.getElementById('go_redirect_link')) {
+            window.location.href = document.getElementById('go_redirect_link').href + '?from=' + location.pathname.replace(/^\/w\//, '');
+        }
+    });
+}

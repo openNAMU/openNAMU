@@ -447,7 +447,12 @@ def middle_parser(data, include_num):
 
             nowiki_num += 1
             end_data['nowiki_' + str(nowiki_num)] = nowiki_data[0]
-            plus_data += 'document.getElementById("nowiki_' + str(nowiki_num) + '").innerHTML = "' + nowiki_js(nowiki_data[0]) + '";\n'
+            plus_data += '' + \
+                'if(document.getElementById("nowiki_' + str(nowiki_num) + '")) { ' + \
+                    'document.getElementById("nowiki_' + str(nowiki_num) + '").innerHTML = "' + nowiki_js(nowiki_data[0]) + '"; ' + \
+                '}' + \
+                '\n' + \
+            ''
 
             data = re.sub(
                 '<code>((?:(?:(?!<\/code>).)*\n*)*)<\/code>',
@@ -465,7 +470,12 @@ def middle_parser(data, include_num):
 
             nowiki_num += 1
             end_data['nowiki_' + str(nowiki_num)] = syntax_data[1]
-            plus_data += 'document.getElementById("nowiki_' + str(nowiki_num) + '").innerHTML = "' + nowiki_js(syntax_data[1]) + '";\n'
+            plus_data += '' + \
+                'if(document.getElementById("nowiki_' + str(nowiki_num) + '")) { ' + \
+                    'document.getElementById("nowiki_' + str(nowiki_num) + '").innerHTML = "' + nowiki_js(syntax_data[1]) + '"; ' + \
+                '}' + \
+                '\n' + \
+            ''
 
             data = re.sub(
                 '<code class="((?:(?!"|>|<).)+)">((?:\n*(?:(?:(?!<\/code>|<span id="syntax_).)+)\n*)+)<\/code>',
@@ -549,7 +559,12 @@ def namumark(conn, data, title, include_num):
 
             nowiki_num += 1
             end_data['nowiki_' + str(nowiki_num)] = one_nowiki[0]
-            plus_data += 'document.getElementById("nowiki_' + str(nowiki_num) + '").innerHTML = "' + nowiki_js(one_nowiki[0]) + '";\n'
+            plus_data += '' + \
+                'if(document.getElementById("nowiki_' + str(nowiki_num) + '")) { ' + \
+                    'document.getElementById("nowiki_' + str(nowiki_num) + '").innerHTML = "' + nowiki_js(one_nowiki[0]) + '"; ' + \
+                '}' + \
+                '\n' + \
+            ''
 
             data = re.sub('(?:\\\\)(.)', '<span id="nowiki_' + str(nowiki_num) + '"></span>', data, 1)
         else:
@@ -641,13 +656,13 @@ def namumark(conn, data, title, include_num):
         main_link = html.unescape(return_link[0])
         other_link = return_link[1]
 
-        backlink += [[title, main_link + other_link, 'redirect']]
+        backlink += [[title, main_link, 'redirect']]
 
         data = redirect_re.sub(
             '\n' + \
                 '<ul>' + \
                     '<li>' + \
-                        '<a href="' + tool.url_pas(main_link) + other_link + '">' + main_link + other_link + '</a>' + \
+                        '<a id="go_redirect_link" href="/w/' + tool.url_pas(main_link) + other_link + '">' + main_link + other_link + '</a>' + \
                     '</li>' + \
                 '</ul>' + \
             '\n',

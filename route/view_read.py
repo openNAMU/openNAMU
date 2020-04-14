@@ -7,18 +7,14 @@ def view_read_2(conn, name):
     acl = 0
     div = ''
     ip = ip_check()
+    run_redirect = ''
 
     num = flask.request.args.get('num', None)
     if num:
         num = int(number_check(num))
     else:
         if not flask.request.args.get('from', None):
-            curs.execute(db_change("select title from back where link = ? and type = 'redirect'"), [name])
-            r_db = curs.fetchall()
-            if r_db:
-                r_data = link_fix(r_db[0][0])
-
-                return redirect('/w/' + url_pas(r_data[0]) + '?from=' + name + r_data[1])
+            run_redirect = '<script>not_from_exist();</script>'
 
     curs.execute(db_change("select sub from rd where title = ? and not stop = 'O' order by date desc"), [name])
     if curs.fetchall():
@@ -231,6 +227,8 @@ def view_read_2(conn, name):
             watch_list = 1
     else:
         watch_list = 0
+
+    div += run_redirect
 
     return easy_minify(flask.render_template(skin_check(),
         imp = [flask.request.args.get('show', name), wiki_set(), custom(), other2([sub, r_date, watch_list])],

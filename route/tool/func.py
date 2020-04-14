@@ -204,7 +204,7 @@ def update(ver_num, set_data):
         with open('data/mysql.json', 'w') as f:
             f.write('{ "user" : "' + get_data_mysql['user'] + '", "password" : "' + get_data_mysql['password'] + '", "host" : "localhost" }')
             
-    if ver_num < 3180200:
+    if ver_num < 3182000:
         curs.execute(db_change('delete from cache_data'))
 
     conn.commit()
@@ -499,7 +499,7 @@ def other2(data):
         data += ['']
 
     req_list = ''
-    main_css_ver = 30
+    main_css_ver = 31
 
     if not 'main_css_load' in flask.session or not 'main_css_ver' in flask.session or flask.session['main_css_ver'] != main_css_ver:
         for i_data in os.listdir(os.path.join("views", "main_css", "css")):
