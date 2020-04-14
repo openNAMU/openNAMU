@@ -202,6 +202,8 @@
         "topic_acl" : "Discussion ACL",
         "delete_admin_group": "Delete admin group",
         "main_skin_set" : "Main skin setting(s)",
+        "reset_backlink" : "Reset backlink",
+        "link_in_this" : "Links in this document",
         "_comment_2.1_" : "Filter",
             "_comment_2.1.1_" : "List",
                 "interwiki_list" : "Interwiki(s) list",
