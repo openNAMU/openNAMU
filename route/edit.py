@@ -185,7 +185,6 @@ def edit_2(conn, name):
             imp = [name, wiki_set(), custom(), other2([' (' + sub + ')', 0])],
             data =  get_name + '''
                 <form method="post">
-                    <script>do_stop_exit();</script>
                     ''' + edit_button() + '''
                     <textarea id="content" placeholder="''' + p_text + '''" name="content">''' + html.escape(data) + '''</textarea>
                     <textarea id="origin" name="o_content">''' + html.escape(data_old) + '''</textarea>
@@ -193,7 +192,7 @@ def edit_2(conn, name):
                     <input placeholder="''' + load_lang('why') + '''" name="send" type="text">
                     <hr class=\"main_hr\">
                     ''' + captcha_get() + ip_warring() + cccb_text + '''
-                    <button id="save" type="submit" onclick="go_save_zone = 1;">''' + save_button + '''</button>
+                    <button id="save" type="submit" onclick="save_stop_exit();">''' + save_button + '''</button>
                     <button id="preview" type="button" onclick="load_preview(\'''' + url_pas(name) + '\')">' + load_lang('preview') + '''</button>
                 </form>
                 ''' + b_text + '''
