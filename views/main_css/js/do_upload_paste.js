@@ -1,4 +1,3 @@
-/*
 window.addEventListener('DOMContentLoaded', function() {
     if(window.location.pathname.match(/^\/edit\//i)) {
         const textarea = document.querySelector("textarea");
@@ -56,4 +55,3 @@ function pasteListener(e) {
         });
     }
 }
-*/
