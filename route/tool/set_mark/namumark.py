@@ -506,7 +506,7 @@ def namumark(conn, data, title, include_num):
     data = re.sub('<math>(?P<in>(?:(?!<\/math>).)+)<\/math>', '[math(\g<in>)]', data)
 
     data = html.escape(data)
-    data = re.sub('\r\n', '\n', data)
+    data = data.replace('\r\n', '\n')
 
     math_re = re.compile('\[math\(((?:(?!\)\]).)+)\)\]', re.I)
     while 1:
