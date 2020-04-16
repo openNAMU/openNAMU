@@ -427,3 +427,12 @@ button#save {
 div#top_tool_cel a:hover, #logo a:hover, #search button:hover, div#nav_bar a:hover {
     color: #aaa;
 }
+
+div#main {
+    border-left: 1px solid #aaa;
+    border-right: 1px solid #aaa;
+}
+
+#bottom {   
+    border-top: 1px solid #aaa;   
+}
