@@ -186,7 +186,7 @@ def edit_2(conn, name):
             data =  get_name + '''
                 <form method="post">
                     ''' + edit_button() + '''
-                    <textarea id="content" placeholder="''' + p_text + '''" name="content">''' + html.escape(data) + '''</textarea>
+                    <textarea id="content" class="content" placeholder="''' + p_text + '''" name="content">''' + html.escape(data) + '''</textarea>
                     <textarea id="origin" name="o_content">''' + html.escape(data_old) + '''</textarea>
                     <hr class=\"main_hr\">
                     <input placeholder="''' + load_lang('why') + '''" name="send" type="text">
