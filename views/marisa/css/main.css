@@ -25,7 +25,7 @@ hr {
 
 button {
     padding: 10px;
-    border: 1px solid gainsboro;
+    border: 1px solid #aaa;
     background: white;
     cursor: pointer;
 }
@@ -213,7 +213,7 @@ h6 {
 }
 
 .cel_in_cel {
-    border: 1px solid gainsboro;
+    border: 1px solid #aaa;
     padding: 10px;
     position: absolute;
     background: white;
@@ -309,11 +309,11 @@ a {
 }
 
 pre, #toc, #cate, #redirect {
-    border: 1px solid gainsboro;
+    border: 1px solid #aaa;
 }
 
 textarea, input {
-    border: 1px solid gainsboro;
+    border: 1px solid #aaa;
     font-family: '나눔고딕', 'Nanum Gothic', 'Noto Sans KR', 'Malgun Gothic', '맑은 고딕', sans-serif;
     padding: 5px;
     margin-left: -5px;
