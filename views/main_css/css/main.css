@@ -36,7 +36,7 @@ hr.main_hr { border: none; margin-top: 8px; margin-bottom: 8px; }
 #include_link { display: none; }
 .foot_plus { background: white; border: 5px solid gainsboro; padding: 5px; width: 300px; height: 300px; position: fixed; top: calc(50% - 150px); right: calc(50% - 150px); display: none; z-index: 100; }
 #toc_title { font-size: 18px; }
-blockquote { background-image: url(/views/acme/img/quote.png); background-position: calc(100% - 10px) 10px; background-repeat: no-repeat; background-size: 25px; }
+blockquote { background-image: url(/views/main_css/file/quote.png); background-position: calc(100% - 10px) 10px; background-repeat: no-repeat; background-size: 25px; }
 #admin_log_search { width: 100px; }
 @media (max-width: 768px) { table { min-width: 100%; } .table_safe { min-width: 100%; }}
 @media (max-width: 400px) { .foot_plus { width: 80%; right: calc(100% - 92%); }}
@@ -51,3 +51,4 @@ div#topic_scroll::-webkit-scrollbar { display: none; }
 .hidden_link { filter: blur(3px); }
 .hidden_link:hover { filter: none; }
 #content { height: 500px; }
+#topic_content { height: 200; }
