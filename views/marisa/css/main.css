@@ -1,11 +1,9 @@
-@import url(https://fonts.googleapis.com/earlyaccess/nanumgothic.css);
-
 body {
     max-width: 100%;
     word-break: break-all;
     word-wrap: break-word;
     margin: 0;
-    font-family: "나눔고딕", "Nanum Gothic", sans-serif;
+    font-family: 'Apple SD Gothic', '맑은고딕', 'Nanum Gothic', 'Noto Sans KR', sans-serif;
     font-size: 14px;
 }
 
@@ -314,7 +312,6 @@ pre, #toc, #cate, #redirect {
 
 textarea, input {
     border: 1px solid #aaa;
-    font-family: '나눔고딕', 'Nanum Gothic', 'Noto Sans KR', 'Malgun Gothic', '맑은 고딕', sans-serif;
     padding: 5px;
     margin-left: -5px;
 }

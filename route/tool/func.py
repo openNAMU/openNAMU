@@ -18,7 +18,6 @@ for i in range(0, 2):
         import pymysql
         import hashlib
         import smtplib
-        import bcrypt
         import zipfile
         import shutil
         import threading
@@ -236,18 +235,11 @@ def pw_encode(data, data2 = '', type_d = ''):
 
     if type_d == 'sha256':
         return hashlib.sha256(bytes(data, 'utf-8')).hexdigest()
-    elif type_d == 'sha3':
+    else:
         if sys.version_info < (3, 6):
             return sha3.sha3_256(bytes(data, 'utf-8')).hexdigest()
         else:
             return hashlib.sha3_256(bytes(data, 'utf-8')).hexdigest()
-    else:
-        if data2 != '':
-            salt_data = bytes(data2, 'utf-8')
-        else:
-            salt_data = bcrypt.gensalt(11)
-
-        return bcrypt.hashpw(bytes(data, 'utf-8'), salt_data).decode()
 
 def pw_check(data, data2, type_d = 'no', id_d = ''):
     curs.execute(db_change('select data from other where name = "encode"'))
@@ -255,31 +247,16 @@ def pw_check(data, data2, type_d = 'no', id_d = ''):
 
     if type_d != 'no':
         if type_d == '':
-            set_data = 'bcrypt'
+            set_data = 'sha3'
         else:
             set_data = type_d
     else:
         set_data = db_data[0][0]
 
-    while 1:
-        if set_data in ['sha256', 'sha3']:
-            data3 = pw_encode(data = data, type_d = set_data)
-            if data3 == data2:
-                re_data = 1
-            else:
-                re_data = 0
-
-            break
-        else:
-            try:
-                if pw_encode(data, data2, 'bcrypt') == data2:
-                    re_data = 1
-                else:
-                    re_data = 0
-
-                break
-            except:
-                set_data = db_data[0][0]
+    if pw_encode(data = data, type_d = set_data) == data2:
+        re_data = 1
+    else:
+        re_data = 0
 
     if db_data[0][0] != set_data and re_data == 1 and id_d != '':
         curs.execute(db_change("update user set pw = ?, encode = ? where id = ?"), [pw_encode(data), db_data[0][0], id_d])
