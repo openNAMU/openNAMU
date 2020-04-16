@@ -50,5 +50,5 @@ div#topic_scroll { max-height: 500px; overflow: scroll; -ms-overflow-style: none
 div#topic_scroll::-webkit-scrollbar { display: none; }
 .hidden_link { filter: blur(3px); }
 .hidden_link:hover { filter: none; }
-#content { height: 500px; }
-#topic_content { height: 200px; }
+.content { height: 500px; }
+.topic_content { height: 200px; }
