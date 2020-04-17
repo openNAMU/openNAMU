@@ -83,7 +83,7 @@ li {
 
 @media (min-width: 780px) and (max-width: 1350px) {
     #main {
-        width: 90%;
+        width: calc(100% - 45px);
     }
 
     #top_main {
