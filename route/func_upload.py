@@ -106,7 +106,8 @@ def func_upload_2(conn):
                 'upload'
             )
 
-            if file_num: file_num += 1
+            if file_num:
+                file_num += 1
 
         conn.commit()
 
