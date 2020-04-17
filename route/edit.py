@@ -60,9 +60,9 @@ def edit_2(conn, name):
                 run_count = run_count_section(section, content)
 
                 c_data = html.escape('\n' + o_data)
-                c_data = re.sub('\n(?P<in>={1,6})', '<br>\g<in>', c_data)
-                c_data = re.sub('<br>((?:(?:(?!<br>).)*\n*)*)', run_count, c_data)
-                c_data = re.sub('^\n', '', c_data)
+                c_data = re.sub(r'\n(?P<in>={1,6})', '<br>\g<in>', c_data)
+                c_data = re.sub(r'<br>((?:(?:(?!<br>).)*\n*)*)', run_count, c_data)
+                c_data = re.sub(r'^\n', '', c_data)
                 c_data = html.unescape(c_data)
 
                 content = c_data
@@ -113,9 +113,9 @@ def edit_2(conn, name):
             if section:
                 data = html.escape('\n' + old[0][0].replace('\r\n', '\n'))
                 
-                data = re.sub('\n(?P<in>={1,6})', '<br>\g<in>', data)
+                data = re.sub(r'\n(?P<in>={1,6})', '<br>\g<in>', data)
 
-                section_data = re.findall('<br>((?:(?:(?!<br>).)*\n*)*)', data)
+                section_data = re.findall(r'<br>((?:(?:(?!<br>).)*\n*)*)', data)
                 if len(section_data) >= section:
                     data = section_data[section - 1]
                 else:
@@ -178,8 +178,8 @@ def edit_2(conn, name):
         else:
             p_text = load_lang('defalut_edit_help')
 
-        data = re.sub('\n$', '', data)
-        data_old = re.sub('\n$', '', data_old)
+        data = re.sub(r'\n$', '', data)
+        data_old = re.sub(r'\n$', '', data_old)
 
         return easy_minify(flask.render_template(skin_check(), 
             imp = [name, wiki_set(), custom(), other2([' (' + sub + ')', 0])],

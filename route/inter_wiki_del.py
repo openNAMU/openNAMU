@@ -23,6 +23,6 @@ def inter_wiki_del_2(conn, tools, name):
 
         conn.commit()
 
-        return redirect('/' + re.sub('^del_', '', tools))
+        return redirect('/' + re.sub(r'^del_', '', tools))
     else:
         return re_error('/error/3')

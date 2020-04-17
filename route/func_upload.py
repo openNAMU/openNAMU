@@ -32,7 +32,7 @@ def func_upload_2(conn):
             
             curs.execute(db_change("select html from html_filter where kind = 'extension'"))
             extension = [i[0].lower() for i in curs.fetchall()]
-            if not re.sub('^\.', '', value).lower() in extension:
+            if not re.sub(r'^\.', '', value).lower() in extension:
                 return re_error('/error/14')
 
             if flask.request.form.get('f_name', None):
@@ -41,7 +41,7 @@ def func_upload_2(conn):
                 name = data.filename
 
             piece = os.path.splitext(name)
-            if re.search('[^ㄱ-힣0-9a-zA-Z_\- ]', piece[0]):
+            if re.search(r'[^ㄱ-힣0-9a-zA-Z_\- ]', piece[0]):
                 return re_error('/error/22')
 
             e_data = sha224_replace(piece[0]) + piece[1]
@@ -70,7 +70,7 @@ def func_upload_2(conn):
             else:
                 lice = flask.request.form.get('f_lice_sel', '')
                 lice += '[br][br]'  + flask.request.form.get('f_lice', '')
-                lice += '[[category:' + re.sub('\]', '_', flask.request.form.get('f_lice_sel', '')) + ']]'
+                lice += '[[category:' + re.sub(r'\]', '_', flask.request.form.get('f_lice_sel', '')) + ']]'
 
             if os.path.exists(os.path.join(app_var['path_data_image'], e_data)):
 

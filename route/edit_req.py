@@ -11,7 +11,7 @@ def edit_req_2(conn, name):
         section = flask.request.args.get('section', None)
 
     if acl_check(name) == 1:
-        if acl_check(name, 'edit_req') == 1 or re.search('^user:', name) or get_ver:
+        if acl_check(name, 'edit_req') == 1 or re.search(r'^user:', name) or get_ver:
             return re_error('/ban')
     else:
         if not get_ver:

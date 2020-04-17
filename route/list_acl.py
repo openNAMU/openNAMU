@@ -8,7 +8,7 @@ def list_acl_2(conn):
     curs.execute(db_change("select title, why from acl where decu != '' or dis != '' or view != '' order by title desc"))
     list_data = curs.fetchall()
     for data in list_data:
-        if not re.search('^user:', data[0]) and not re.search('^file:', data[0]):
+        if not re.search(r'^user:', data[0]) and not re.search(r'^file:', data[0]):
             curs.execute(db_change("select time from re_admin where what like ? order by time desc limit 1"), ['acl (' + data[0] + ')%'])
             time_data = curs.fetchall()
             if time_data:

@@ -26,13 +26,13 @@ def load_conn2(data):
     curs = conn.cursor()
 
 def send_parser(data):
-    if not re.search('^<br>$', data):
+    if not re.search(r'^<br>$', data):
         data = html.escape(data)
 
-        data = re.sub('javascript:', '', data, flags = re.I)
+        data = re.sub(r'javascript:', '', data, flags = re.I)
         data = data.replace('&lt;br&gt;', '')
 
-    link_re = re.compile('&lt;a(?: (?:(?:(?!&gt;).)*))?&gt;(?P<in>(?:(?!&lt;).)*)&lt;\/a&gt;')
+    link_re = re.compile(r'&lt;a(?: (?:(?:(?!&gt;).)*))?&gt;(?P<in>(?:(?!&lt;).)*)&lt;\/a&gt;')
     link_data = link_re.findall(data)
     for i in link_data:
         data = link_re.sub('<a href="/w/' + urllib.parse.quote(i).replace('/','%2F') + '">' + i + '</a>', data, 1)
