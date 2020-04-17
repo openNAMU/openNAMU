@@ -48,7 +48,7 @@ def api_user_info_2(conn, name):
         else:
             plus_t += [load_lang('blocked') + '<br>']
 
-            match = re.search("^([0-9]{1,3}\.[0-9]{1,3})", name)
+            match = re.search(r"^([0-9]{1,3}\.[0-9]{1,3})", name)
             match = match.group(1) if match else '-'
             regex_ban = 0
 

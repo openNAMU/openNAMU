@@ -73,7 +73,7 @@ def give_user_ban_2(conn, name):
             if name:
                 main_name = name
 
-                if name and re.search("^([0-9]{1,3}\.[0-9]{1,3})$", name):
+                if name and re.search(r"^([0-9]{1,3}\.[0-9]{1,3})$", name):
                     b_now = load_lang('band_ban')
                 else:
                     b_now = load_lang('ban')

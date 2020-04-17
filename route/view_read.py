@@ -30,7 +30,7 @@ def view_read_2(conn, name):
     else:
         down = 0
 
-    m = re.search("^(.*)\/(.*)$", name)
+    m = re.search(r"^(.*)\/(.*)$", name)
     if m:
         uppage = m.group(1)
     else:
@@ -136,9 +136,9 @@ def view_read_2(conn, name):
         if sql_d:
             end_data += '<h2>' + load_lang('history') + '</h2><ul>'
             for i in sql_d:
-                if re.search("\+", i[2]):
+                if re.search(r"\+", i[2]):
                     leng = '<span style="color:green;">(' + i[2] + ')</span>'
-                elif re.search("\-", i[2]):
+                elif re.search(r"\-", i[2]):
                     leng = '<span style="color:red;">(' + i[2] + ')</span>'
                 else:
                     leng = '<span style="color:gray;">(' + i[2] + ')</span>'
@@ -201,7 +201,7 @@ def view_read_2(conn, name):
 
     div = adsense_code + '<div>' + div + '</div>'
 
-    match = re.search("^user:([^/]*)", name)
+    match = re.search(r"^user:([^/]*)", name)
     if match:
         user_name = match.group(1)
         div = '''

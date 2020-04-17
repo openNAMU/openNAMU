@@ -48,7 +48,7 @@ while 1:
 
             all_src = []
             for i_data in os.listdir("."):
-                f_src = re.search("(.+)\.db$", i_data)
+                f_src = re.search(r"(.+)\.db$", i_data)
                 if f_src:
                     all_src += [f_src.group(1)]
 
@@ -186,7 +186,7 @@ elif what_i_do == '3':
     print('IP or Name : ', end = '')
     user_data = input()
 
-    if re.search("^([0-9]{1,3}\.[0-9]{1,3})$", user_data):
+    if re.search(r"^([0-9]{1,3}\.[0-9]{1,3})$", user_data):
         band = 'O'
     else:
         band = ''

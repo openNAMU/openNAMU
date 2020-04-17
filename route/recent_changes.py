@@ -109,12 +109,12 @@ def recent_changes_2(conn, name, tool):
             send = '<br>'
 
             if data[4]:
-                if not re.search("^(?: *)$", data[4]):
+                if not re.search(r"^(?: *)$", data[4]):
                     send = data[4]
 
-            if re.search("\+", data[5]):
+            if re.search(r"\+", data[5]):
                 leng = '<span style="color:green;">(' + data[5] + ')</span>'
-            elif re.search("\-", data[5]):
+            elif re.search(r"\-", data[5]):
                 leng = '<span style="color:red;">(' + data[5] + ')</span>'
             else:
                 leng = '<span style="color:gray;">(' + data[5] + ')</span>'
