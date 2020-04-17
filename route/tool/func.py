@@ -190,7 +190,7 @@ def update(ver_num, set_data):
         curs.execute(db_change("select data from other where name = 'recaptcha'"))
         change_rec = curs.fetchall()
         if change_rec and change_rec[0][0] != '':
-            new_rec = re.search('data-sitekey="([^"]+)"', change_rec[0][0])
+            new_rec = re.search(r'data-sitekey="([^"]+)"', change_rec[0][0])
             if new_rec:
                 curs.execute(db_change("update other set data = ? where name = 'recaptcha'"), [new_rec.group(1)])
             else:
@@ -403,7 +403,7 @@ def ip_or_user(data = ''):
     if data == '':
         data = ip_check()
 
-    if re.search('(\.|:)', data):
+    if re.search(r'(\.|:)', data):
         return 1
     else:
         return 0
@@ -505,16 +505,16 @@ def other2(data):
     return data
 
 def cut_100(data):
-    if re.search('^\/w\/', flask.request.path):
-        data = re.sub('<script>((\n*(((?!<\/script>).)+)\n*)+)<\/script>', '', data)
-        data = re.sub('<hr class="main_hr">((\n*((.+)\n*))+)$', '', data)
-        data = re.sub('<div id="cate_all">((\n*((.+)\n*))+)$', '', data)        
+    if re.search(r'^\/w\/', flask.request.path):
+        data = re.sub(r'<script>((\n*(((?!<\/script>).)+)\n*)+)<\/script>', '', data)
+        data = re.sub(r'<hr class="main_hr">((\n*((.+)\n*))+)$', '', data)
+        data = re.sub(r'<div id="cate_all">((\n*((.+)\n*))+)$', '', data)        
 
-        data = re.sub('<(((?!>).)*)>', ' ', data)
-        data = re.sub('\n', ' ', data)
-        data = re.sub('^ +', '', data)
-        data = re.sub(' +$', '', data)
-        data = re.sub(' {2,}', ' ', data)
+        data = re.sub(r'<(((?!>).)*)>', ' ', data)
+        data = re.sub(r'\n', ' ', data)
+        data = re.sub(r'^ +', '', data)
+        data = re.sub(r' +$', '', data)
+        data = re.sub(r' {2,}', ' ', data)
     
         return data[0:100] + '...'
     else:
@@ -637,10 +637,10 @@ def ip_pas(raw_ip, type_d = 0):
         curs.execute(db_change("select data from other where name = 'ip_view'"))
         data = curs.fetchall()
         if data and data[0][0] != '':
-            if re.search('\.', raw_ip):
-                ip = re.sub('\.([^.]*)\.([^.]*)$', '.*.*', raw_ip)
+            if re.search(r'\.', raw_ip):
+                ip = re.sub(r'\.([^.]*)\.([^.]*)$', '.*.*', raw_ip)
             else:
-                ip = re.sub(':([^:]*):([^:]*)$', ':*:*', raw_ip)
+                ip = re.sub(r':([^:]*):([^:]*)$', ':*:*', raw_ip)
 
             if not admin_check(1):
                 hide = 1
@@ -1084,7 +1084,7 @@ def history_plus(title, data, date, ip, send, leng, t_check = '', d_type = ''):
                 id_data
             ])
 
-    send = re.sub('\(|\)|<|>', '', send)
+    send = re.sub(r'\(|\)|<|>', '', send)
     send = send[:128] if len(send) > 128 else send
     send = send + ' (' + t_check + ')' if t_check != '' else send
 

@@ -11,7 +11,7 @@ def give_acl_2(conn, name):
     else:
         check_data = None
 
-    user_data = re.search('^user:(.+)$', name)
+    user_data = re.search(r'^user:(.+)$', name)
     if user_data:
         if check_data and ip_or_user(ip) != 0:
             return redirect('/login')
@@ -68,7 +68,7 @@ def give_acl_2(conn, name):
     else:
         data = '<h2>' + load_lang('document_acl') + '</h2><hr class=\"main_hr\"><select name="decu" ' + check_ok + '>'
 
-        if re.search('^user:', name):
+        if re.search(r'^user:', name):
             acl_list = get_acl_list('user')
         else:
             acl_list = get_acl_list()
@@ -85,7 +85,7 @@ def give_acl_2(conn, name):
 
         data += '</select>'
 
-        if not re.search('^user:', name):
+        if not re.search(r'^user:', name):
             data += '<hr class=\"main_hr\"><h2>' + load_lang('discussion_acl') + '</h2><hr class=\"main_hr\"><select name="dis" ' + check_ok + '>'
 
             curs.execute(db_change("select dis, why, view from acl where title = ?"), [name])

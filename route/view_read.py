@@ -36,7 +36,7 @@ def view_read_2(conn, name):
     else:
         uppage = 0
 
-    if re.search('^category:', name):
+    if re.search(r'^category:', name):
         curs.execute(db_change("select link from back where title = ? and type = 'cat' order by link asc"), [name])
         back = curs.fetchall()
         if back:
@@ -46,7 +46,7 @@ def view_read_2(conn, name):
                 if div == '':
                     div = '<br><h2 id="cate_normal">' + load_lang('category_title') + '</h2><ul>'
 
-                if re.search('^category:', data[0]):
+                if re.search(r'^category:', data[0]):
                     u_div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a></li>'
                 else:
                     curs.execute(db_change("select title from back where title = ? and type = 'include'"), [data[0]])
@@ -91,8 +91,8 @@ def view_read_2(conn, name):
             else_data = None
 
         if flask.request.args.get('from', None) and else_data:
-            else_data = re.sub('^\r\n', '', else_data)
-            else_data = re.sub('\r\n$', '', else_data)
+            else_data = re.sub(r'^\r\n', '', else_data)
+            else_data = re.sub(r'\r\n$', '', else_data)
 
         end_data = render_set(
             title = name,

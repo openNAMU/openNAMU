@@ -41,7 +41,7 @@ def topic_2(conn, topic_num):
 
         num = str(num)
 
-        match = re.search('^user:([^/]+)', name)
+        match = re.search(r'^user:([^/]+)', name)
         if match:
             y_check = 0
             if ip_or_user(match.group(1)) == 1:
@@ -67,7 +67,7 @@ def topic_2(conn, topic_num):
                     today
                 ])
 
-        cate_re = re.compile('\[\[((?:분류|category):(?:(?:(?!\]\]).)*))\]\]', re.I)
+        cate_re = re.compile(r'\[\[((?:분류|category):(?:(?:(?!\]\]).)*))\]\]', re.I)
         data = cate_re.sub('[br]', flask.request.form.get('content', 'Test'))
 
         for rd_data in re.findall("(?:#([0-9]+))", data):

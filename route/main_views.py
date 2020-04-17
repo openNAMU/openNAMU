@@ -3,8 +3,8 @@ from .tool.func import *
 def main_views_2(conn, name):
     curs = conn.cursor()
 
-    if re.search('\/', name):
-        m = re.search('^(.*)\/(.*)$', name)
+    if re.search(r'\/', name):
+        m = re.search(r'^(.*)\/(.*)$', name)
         if m:
             n = m.groups()
             plus = '/' + n[0]
@@ -16,7 +16,7 @@ def main_views_2(conn, name):
         plus = ''
         rename = name
 
-    mime_type = re.search('\.([^\.]+)$', rename).group(1)
+    mime_type = re.search(r'\.([^\.]+)$', rename).group(1)
     if mime_type:
         if mime_type in ['.jpeg', '.jpg', '.gif', '.png', '.webp', '.JPEG', '.JPG', '.GIF', '.PNG', '.WEBP']:
             mime_type = 'image/' + mime_type
