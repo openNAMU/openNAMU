@@ -56,8 +56,6 @@ def edit_req_2(conn, name):
         if copyright_checkbox_text_d and copyright_checkbox_text_d[0][0] != '' and flask.request.form.get('copyright_agreement', '') != 'yes':
             return re_error('/error/29')
 
-        content = savemark(content)
-
         if old:
             leng = leng_check(len(flask.request.form.get('otent', '')), len(content))
 

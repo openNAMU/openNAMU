@@ -765,8 +765,6 @@ def namumark(conn, data, title, include_num):
     toc_data += '</div>'
     data = toc_re.sub(toc_data, data)
     
-    data = tool.savemark(data)
-    
     now_time = tool.get_time()
     time_data = re.search(r'^([0-9]{4}-[0-9]{2}-[0-9]{2})', now_time)
     time = time_data.group(1)

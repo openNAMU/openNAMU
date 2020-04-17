@@ -37,8 +37,6 @@ def edit_2(conn, name):
         copyright_checkbox_text_d = curs.fetchall()
         if copyright_checkbox_text_d and copyright_checkbox_text_d[0][0] != '' and flask.request.form.get('copyright_agreement', '') != 'yes':
             return re_error('/error/29')
-
-        content = savemark(content)
         
         if old:  
             o_data = old[0][0].replace('\r\n', '\n')
