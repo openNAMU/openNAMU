@@ -12,7 +12,6 @@ def give_history_add_2(conn, name):
 
         today = get_time()
         content = flask.request.form.get('content', '')
-        content = savemark(content)
         leng = '+' + str(len(content))
 
         history_plus(

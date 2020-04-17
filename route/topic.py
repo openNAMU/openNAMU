@@ -81,7 +81,6 @@ def topic_2(conn, topic_num):
                 ])
 
         data = re.sub(r"(?P<in>#(?:[0-9]+))", '[[\g<in>]]', data)
-        data = savemark(data)
 
         rd_plus(topic_num, today, name, sub)
         curs.execute(db_change("insert into topic (id, data, date, ip, code) values (?, ?, ?, ?, ?)"), [

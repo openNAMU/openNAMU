@@ -37,16 +37,6 @@ def ip_check(d_type = 0):
 
     return str(ip)
 
-def savemark(data):
-    data = re.sub(r"\[date\(now\)\]", get_time(), data)
-
-    ip = ip_check()
-    name = '[[user:' + ip + '|' + ip + ']]' if not re.search(r"\.|:", ip) else ip
-
-    data = re.sub(r"\[name\]", name, data)
-
-    return data
-
 def url_pas(data):
     return urllib.parse.quote(data).replace('/','%2F')
 

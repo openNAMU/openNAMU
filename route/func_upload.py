@@ -57,30 +57,35 @@ def func_upload_2(conn):
                 if t_re.search(name):
                     return redirect('/file_filter')
 
-            ip = ip_check()
-
-            if flask.request.form.get('f_lice_sel', 'direct_input') == 'direct_input':
-                lice = flask.request.form.get('f_lice', '') + '[br][br]'
-                if ip_or_user(ip) != 0:
-                    lice += ip
-                else:
-                    lice += '[[user:' + ip + ']]'
-
-                lice += '[[category:direct_input]]'
-            else:
-                lice = flask.request.form.get('f_lice_sel', '')
-                lice += '[br][br]'  + flask.request.form.get('f_lice', '')
-                lice += '[[category:' + re.sub(r'\]', '_', flask.request.form.get('f_lice_sel', '')) + ']]'
-
             if os.path.exists(os.path.join(app_var['path_data_image'], e_data)):
-
                 os.remove(os.path.join(app_var['path_data_image'], e_data))
 
                 data.save(os.path.join(app_var['path_data_image'], e_data))
             else:
                 data.save(os.path.join(app_var['path_data_image'], e_data))
 
-            file_d = '[[file:' + name + ']][br][br]{{{[[file:' + name + ']]}}}[br][br]' + lice
+            ip = ip_check()
+            g_lice = g_lice
+
+            curs.execute(db_change("select data from other where name = 'markup'"))
+            db_data = curs.fetchall()
+            if db_data and db_data[0][0] == 'namumark':
+                if flask.request.form.get('f_lice_sel', 'direct_input') == 'direct_input':
+                    lice = g_lice + '[br][br]'
+                    if ip_or_user(ip) != 0:
+                        lice += ip
+                    else:
+                        lice += '[[user:' + ip + ']]'
+
+                    lice += '[[category:direct_input]]'
+                else:
+                    lice = flask.request.form.get('f_lice_sel', '')
+                    lice += '[br][br]'  + g_lice
+                    lice += '[[category:' + re.sub(r'\]', '_', flask.request.form.get('f_lice_sel', '')) + ']]'
+
+                file_d = '[[file:' + name + ']][br][br]{{{[[file:' + name + ']]}}}[br][br]' + lice
+            else:
+                file_d = name + ' | /image/' + e_data + ((' | ' + g_lice) if g_lice != '' else '') + ' | ' + ip
 
             curs.execute(db_change("insert into data (title, data) values (?, ?)"), ['file:' + name, file_d])
             curs.execute(db_change("insert into acl (title, decu, dis, why, view) values (?, 'admin', '', '', '')"), ['file:' + name])
