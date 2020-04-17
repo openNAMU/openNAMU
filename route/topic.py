@@ -70,7 +70,7 @@ def topic_2(conn, topic_num):
         cate_re = re.compile(r'\[\[((?:분류|category):(?:(?:(?!\]\]).)*))\]\]', re.I)
         data = cate_re.sub('[br]', flask.request.form.get('content', 'Test'))
 
-        for rd_data in re.findall("(?:#([0-9]+))", data):
+        for rd_data in re.findall(r"(?:#([0-9]+))", data):
             curs.execute(db_change("select ip from topic where code = ? and id = ?"), [topic_num, rd_data])
             ip_data = curs.fetchall()
             if ip_data and ip_or_user(ip_data[0][0]) == 0:
@@ -80,7 +80,7 @@ def topic_2(conn, topic_num):
                     today
                 ])
 
-        data = re.sub("(?P<in>#(?:[0-9]+))", '[[\g<in>]]', data)
+        data = re.sub(r"(?P<in>#(?:[0-9]+))", '[[\g<in>]]', data)
         data = savemark(data)
 
         rd_plus(topic_num, today, name, sub)

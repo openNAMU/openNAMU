@@ -38,12 +38,12 @@ def ip_check(d_type = 0):
     return str(ip)
 
 def savemark(data):
-    data = re.sub("\[date\(now\)\]", get_time(), data)
+    data = re.sub(r"\[date\(now\)\]", get_time(), data)
 
     ip = ip_check()
-    name = '[[user:' + ip + '|' + ip + ']]' if not re.search("\.|:", ip) else ip
+    name = '[[user:' + ip + '|' + ip + ']]' if not re.search(r"\.|:", ip) else ip
 
-    data = re.sub("\[name\]", name, data)
+    data = re.sub(r"\[name\]", name, data)
 
     return data
 

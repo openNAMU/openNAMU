@@ -118,7 +118,7 @@ def send_email(who, title, data):
         print('Error : Email send error')
 
 def last_change(data):
-    json_address = re.sub("(((?!\.|\/).)+)\.html$", "set.json", skin_check())
+    json_address = re.sub(r"(((?!\.|\/).)+)\.html$", "set.json", skin_check())
     try:
         json_data = json.loads(open(json_address, encoding='utf8').read())
     except:
@@ -814,7 +814,7 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
     get_ban = ban_check()
     
     if name:
-        acl_c = re.search("^user:((?:(?!\/).)*)", name)
+        acl_c = re.search(r"^user:((?:(?!\/).)*)", name)
     else:
         acl_c = None
 
@@ -965,7 +965,7 @@ def ban_check(ip = None, tool = None):
     if admin_check(None, None, ip) == 1:
         return 0
 
-    band = re.search("^([0-9]{1,3}\.[0-9]{1,3})", ip)
+    band = re.search(r"^([0-9]{1,3}\.[0-9]{1,3})", ip)
     if band:
         band_it = band.group(1)
     else:
@@ -1011,7 +1011,7 @@ def ban_insert(name, end, why, login, blocker, type_d = None):
     if type_d:
         band = type_d
     else:
-        if re.search("^([0-9]{1,3}\.[0-9]{1,3})$", name):
+        if re.search(r"^([0-9]{1,3}\.[0-9]{1,3})$", name):
             band = 'O'
         else:
             band = ''

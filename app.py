@@ -2,7 +2,7 @@ import os
 import re
 
 for i_data in os.listdir("route"):
-    f_src = re.search("(.+)\.py$", i_data)
+    f_src = re.search(r"(.+)\.py$", i_data)
     if f_src:
         f_src = f_src.group(1)
 
@@ -54,7 +54,7 @@ while 1:
 
             all_src = []
             for i_data in os.listdir("."):
-                f_src = re.search("(.+)\.db$", i_data)
+                f_src = re.search(r"(.+)\.db$", i_data)
                 if f_src:
                     all_src += [f_src.group(1)]
 
