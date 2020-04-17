@@ -831,33 +831,31 @@ def tool_acl_check(tool = None):
             if ip_or_user(ip) == 1:
                 return 1
 
-            if admin_check(num) != 1:
+            if admin_check(1) != 1:
                 return 1
 
         if acl_data[0][0] == '50_edit':
             if ip_or_user(ip) == 1:
                 return 1
 
-            if admin_check(num) != 1:
-                curs.execute(db_change("select count(title) from history where ip = ?"), [ip])
-                count = curs.fetchall()
-                if count:
-                    count = count[0][0]
-                else:
-                    count = 0
+            curs.execute(db_change("select count(title) from history where ip = ?"), [ip])
+            count = curs.fetchall()
+            if count:
+                count = count[0][0]
+            else:
+                count = 0
 
-                if count < 50:
-                    return 1
+            if count < 50:
+                return 1
 
         if acl_data[0][0] == 'email':
             if ip_or_user(ip) == 1:
                 return 1
 
-            if admin_check(num) != 1:
-                curs.execute(db_change("select data from user_set where id = ? and name = 'email'"), [ip])
-                email = curs.fetchall()
-                if not email:
-                    return 1
+            curs.execute(db_change("select data from user_set where id = ? and name = 'email'"), [ip])
+            email = curs.fetchall()
+            if not email:
+                return 1
 
         if acl_data[0][0] == 'owner':
             if admin_check() != 1:

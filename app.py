@@ -642,6 +642,10 @@ def watch_list_name(name = None):
 def user_custom_head_view():
     return user_custom_head_view_2(conn)
 
+@app.route('/tool_acl', methods=['GET', 'POST'])
+def tool_acl():
+    return tool_acl_2(conn)
+
 @app.route('/count')
 @app.route('/count/<name>')
 def user_count_edit(name = None):
