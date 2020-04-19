@@ -190,7 +190,7 @@ if setup_tool != 0:
     create_data['alarm'] = ['name', 'data', 'date']
     create_data['ua_d'] = ['name', 'ip', 'ua', 'today', 'sub']
     create_data['filter'] = ['name', 'regex', 'sub']
-    create_data['scan'] = ['user', 'title']
+    create_data['scan'] = ['user', 'title', 'type']
     create_data['acl'] = ['title', 'decu', 'dis', 'view', 'why']
     create_data['inter'] = ['title', 'link', 'icon']
     create_data['html_filter'] = ['html', 'kind', 'plus']
@@ -628,13 +628,13 @@ def func_upload():
 def user_info():
     return user_info_2(conn)
 
-@app.route('/watch_list')
-def watch_list():
-    return watch_list_2(conn)
+@app.route('/<regex("watch_list|star_doc"):tool>')
+def watch_list(tool = 'star_doc'):
+    return watch_list_2(conn, tool)
 
-@app.route('/watch_list/<everything:name>')
-def watch_list_name(name = None):
-    return watch_list_name_2(conn, name)
+@app.route('/<regex("watch_list|star_doc"):tool>/<everything:name>')
+def watch_list_name(tool = 'star_doc', name = 'Test'):
+    return watch_list_name_2(conn, tool, name)
 
 @app.route('/custom_head', methods=['GET', 'POST'])
 def user_custom_head_view():
