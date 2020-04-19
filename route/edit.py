@@ -115,7 +115,7 @@ def edit_2(conn, name):
 
                 section_data = re.findall(r'<br>((?:(?:(?!<br>).)*\n*)*)', data)
                 if len(section_data) >= section:
-                    data = section_data[section - 1]
+                    data = html.unescape(section_data[section - 1])
                 else:
                     return redirect('/edit/' + url_pas(name))
             else:
