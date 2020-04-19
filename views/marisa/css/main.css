@@ -311,6 +311,7 @@ pre, #toc, #cate, #redirect {
 }
 
 textarea, input {
+    font-family: 'Apple SD Gothic', '맑은고딕', 'Nanum Gothic', 'Noto Sans KR', sans-serif;
     border: 1px solid #aaa;
     padding: 5px;
     margin-left: -5px;

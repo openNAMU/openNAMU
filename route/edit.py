@@ -77,7 +77,7 @@ def edit_2(conn, name):
             curs.execute(db_change('select data from other where name = "count_all_title"'))
             curs.execute(db_change("update other set data = ? where name = 'count_all_title'"), [str(int(curs.fetchall()[0][0]) + 1)])
 
-        curs.execute(db_change("select user from scan where title = ?"), [name])
+        curs.execute(db_change("select user from scan where title = ? and type = ''"), [name])
         for scan_user in curs.fetchall():
             curs.execute(db_change("insert into alarm (name, data, date) values (?, ?, ?)"), [
                 scan_user[0],
@@ -115,7 +115,7 @@ def edit_2(conn, name):
 
                 section_data = re.findall(r'<br>((?:(?:(?!<br>).)*\n*)*)', data)
                 if len(section_data) >= section:
-                    data = section_data[section - 1]
+                    data = html.unescape(section_data[section - 1])
                 else:
                     return redirect('/edit/' + url_pas(name))
             else:

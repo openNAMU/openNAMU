@@ -19,6 +19,7 @@ def user_info_2(conn):
         '''
 
         plus2 += '<li><a href="/watch_list">' + load_lang('watchlist') + '</a></li>'
+        plus2 += '<li><a href="/star_doc">' + load_lang('star_doc') + '</a></li>'
         plus3 = '<li><a href="/acl/user:' + url_pas(ip) + '">' + load_lang('user_document_acl') + '</a></li>'
     else:
         plus = '''

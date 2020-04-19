@@ -81,21 +81,32 @@ def recent_changes_2(conn, name, tool):
                 <td id="main_table_width">''' + load_lang('editor') + '''</td>
                 <td id="main_table_width">''' + load_lang('time') + '''</td>
             '''
-
+            sub = ''
             set_type = flask.request.args.get('set', 'normal')
-            if set_type == 'normal':
-                div = '' + \
-                    '<a href="?set=user">(' + load_lang('user_document') + ')</a> ' + \
-                    '<a href="?set=req">(' + load_lang('edit_req') + ')</a>' + \
-                    '<hr class="main_hr">' + div + \
-                ''
+
+            if set_type == 'move':
+                plus_sql = 'where send >= "" and send like "%</a> move)" and '
+                sub += ' (' + load_lang('move') + ')'
+            elif set_type == 'delete':
+                plus_sql = 'where send like "%(delete)" and '
+                sub += ' (' + load_lang('delete') + ')'
+            elif set_type == 'revert':
+                plus_sql = 'where send >= "" and send like "%(r%)" and '
+                sub += ' (' + load_lang('revert') + ')'
+            else:
+                plus_sql = 'where '
 
             if set_type == 'req':
-                plus_sql = "where type = 'req' "
-            elif set_type == 'user':
-                plus_sql = "where title like 'user:%' and type = '' "
+                plus_sql = 'where type = "req" '
+                sub += ' (' + load_lang('edit_req') + ')'
             else:
-                plus_sql = "where not title like 'user:%' and type = '' "
+                plus_sql += 'type = "" '
+            
+            if set_type == 'user':
+                plus_sql = 'where title like "user:%" '
+                sub += ' (' + load_lang('user') + ')'
+            else:
+                plus_sql += 'and not title like "user:%" '
 
             curs.execute(db_change('' + \
                 'select id, title, date, ip, send, leng, hide from history ' + \
@@ -204,16 +215,21 @@ def recent_changes_2(conn, name, tool):
                 menu = [['other', load_lang('other')], ['user', load_lang('user')], ['count/' + url_pas(name), load_lang('count')]]
                 div += next_fix('/record/' + url_pas(name) + '?num=', num, data_list)
         else:
-            menu = 0
+            if set_type == 'normal':
+                div = '' + \
+                    '<a href="?set=user">(' + load_lang('user_document') + ')</a> ' + \
+                    '<a href="?set=req">(' + load_lang('edit_req') + ')</a> ' + \
+                    '<a href="?set=move">(' + load_lang('move') + ')</a> ' + \
+                    '<a href="?set=delete">(' + load_lang('delete') + ')</a> ' + \
+                    '<a href="?set=revert">(' + load_lang('revert') + ')</a>' + \
+                    '<hr class="main_hr">' + div + \
+                ''
+                menu = 0
+            else:
+                menu = [['recent_changes', load_lang('return')]]
+
             title = load_lang('recent_change')
             div += next_fix('/recent_changes?set=' + set_type + '&num=', num, data_list)
-
-            if set_type == 'user':
-                sub = ' (' + load_lang('user') + ')'
-                menu = [['recent_changes', load_lang('return')]]
-            elif set_type == 'req':
-                sub = ' (' + load_lang('edit_req') + ')'
-                menu = [['recent_changes', load_lang('return')]]
 
         if sub == '':
             sub = 0

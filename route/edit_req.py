@@ -76,7 +76,7 @@ def edit_req_2(conn, name):
                 curs.execute(db_change('select data from other where name = "count_all_title"'))
                 curs.execute(db_change("update other set data = ? where name = 'count_all_title'"), [str(int(curs.fetchall()[0][0]) + 1)])
 
-            curs.execute(db_change("select user from scan where title = ?"), [name])
+            curs.execute(db_change("select user from scan where title = ? and type = ''"), [name])
             for scan_user in curs.fetchall():
                 curs.execute(db_change("insert into alarm (name, data, date) values (?, ?, ?)"), [
                     scan_user[0],
@@ -128,7 +128,6 @@ def edit_req_2(conn, name):
         get_name = ''
 
         save_button = load_lang('edit_req') if not get_ver else load_lang('accept_edit_request')
-        menu_plus = [[]]
         sub = load_lang('edit_req')
         disable = '' if not get_ver else 'disabled'
 
@@ -171,5 +170,5 @@ def edit_req_2(conn, name):
                 <hr class=\"main_hr\">
                 <div id="see_preview"></div>
             ''',
-            menu = [['w/' + url_pas(name), load_lang('return')]] + menu_plus
+            menu = [['w/' + url_pas(name), load_lang('return')]]
         ))
