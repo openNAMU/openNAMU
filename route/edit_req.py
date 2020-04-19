@@ -128,7 +128,6 @@ def edit_req_2(conn, name):
         get_name = ''
 
         save_button = load_lang('edit_req') if not get_ver else load_lang('accept_edit_request')
-        menu_plus = [[]]
         sub = load_lang('edit_req')
         disable = '' if not get_ver else 'disabled'
 
@@ -171,5 +170,5 @@ def edit_req_2(conn, name):
                 <hr class=\"main_hr\">
                 <div id="see_preview"></div>
             ''',
-            menu = [['w/' + url_pas(name), load_lang('return')]] + menu_plus
+            menu = [['w/' + url_pas(name), load_lang('return')]]
         ))
