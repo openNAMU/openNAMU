@@ -349,6 +349,7 @@ textarea, input {
     border: 1px solid #4a4a4a;
     background: #4a4a4a;
     text-align: center;
+    height: 45px;
 }
 
 #nav_bar a {
