@@ -14,6 +14,7 @@ for i in range(0, 2):
         import tornado.wsgi
         import urllib.request
         import email.mime.text
+        import flask_minify
         import sqlite3
         import pymysql
         import hashlib
@@ -72,7 +73,10 @@ def load_conn(data):
 
 def send_email(who, title, data):
     try:
-        curs.execute(db_change('select name, data from other where name = "smtp_email" or name = "smtp_pass" or name = "smtp_server" or name = "smtp_port" or name = "smtp_security"'))
+        curs.execute(db_change('' + \
+            'select name, data from other ' + \
+            'where name = "smtp_email" or name = "smtp_pass" or name = "smtp_server" or name = "smtp_port" or name = "smtp_security"' + \
+        ''))
         rep_data = curs.fetchall()
 
         smtp_email = ''

@@ -2,6 +2,7 @@ tornado
 flask
 flask-Reggie
 flask-compress
+flask-minify
 requests
 pymysql
 diff-match-patch
