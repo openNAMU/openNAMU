@@ -212,19 +212,17 @@ def recent_changes_2(conn, name, tool):
                 menu = [['other', load_lang('other')], ['user', load_lang('user')], ['count/' + url_pas(name), load_lang('count')]]
                 div += next_fix('/record/' + url_pas(name) + '?num=', num, data_list)
         else:
-            if set_type == 'normal':
-                div = '' + \
-                    '<a href="?set=user">(' + load_lang('user_document') + ')</a> ' + \
-                    '<a href="?set=req">(' + load_lang('edit_req') + ')</a> ' + \
-                    '<a href="?set=move">(' + load_lang('move') + ')</a> ' + \
-                    '<a href="?set=delete">(' + load_lang('delete') + ')</a> ' + \
-                    '<a href="?set=revert">(' + load_lang('revert') + ')</a>' + \
-                    '<hr class="main_hr">' + div + \
-                ''
-                menu = 0
-            else:
-                menu = [['recent_changes', load_lang('return')]]
+            div = '' + \
+                '<a href="?set=normal">(' + load_lang('normal') + ')</a> ' + \
+                '<a href="?set=user">(' + load_lang('user_document') + ')</a> ' + \
+                '<a href="?set=req">(' + load_lang('edit_req') + ')</a> ' + \
+                '<a href="?set=move">(' + load_lang('move') + ')</a> ' + \
+                '<a href="?set=delete">(' + load_lang('delete') + ')</a> ' + \
+                '<a href="?set=revert">(' + load_lang('revert') + ')</a>' + \
+                '<hr class="main_hr">' + div + \
+            ''
 
+            menu = 0
             title = load_lang('recent_change')
             div += next_fix('/recent_changes?set=' + set_type + '&num=', num, data_list)
 
