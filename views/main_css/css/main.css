@@ -1,7 +1,8 @@
+body, html, video, table, div, iframe, input, textarea, img, hr, blockquote, pre { max-width: 100%;}
 textarea { width: 100%; }
-input { width: 100%; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box; }
+input { width: 100%; box-sizing: border-box; }
 #last { margin-top: 30px; }
-#toc { border: 1px solid; padding: 20px; width: fit-content; width: -moz-fit-content; clear: both; margin-top: 10px; }
+#toc { border: 1px solid; padding: 20px; width: fit-content; clear: both; margin-top: 10px; }
 #toc-name { font-size: 18px; }
 table { border-collapse: collapse; }
 td { border: 1px solid; padding: 5px; }
@@ -10,7 +11,6 @@ a { text-decoration: none; }
 #inside, #out_link, #open { color: green; }
 #out_link::before { background: green; color: white; content: "E"; }
 input[type="checkbox"], input[type="radio"] { width: auto; }
-.popup { position: fixed; bottom: 0; padding: 10px; left: 0; background: lightgray; width: 100%; }
 #list { padding: 10px; }
 #toron { width: 100%; }
 #toron_color_green { background: lightgreen; }
@@ -32,22 +32,18 @@ s:hover, strike:hover, del:hover { color: gray; background-color: gainsboro; tex
 #main_table_width_quarter { width: 25%; }
 #redirect { border: 1px solid; padding: 10px; }
 body { word-break: break-all; overflow: auto; }
-hr.main_hr { border: none; margin-top: 8px; margin-bottom: 8px; }
+.main_hr { border: none; margin-top: 8px; margin-bottom: 8px; }
 #include_link { display: none; }
-.foot_plus { background: white; border: 5px solid gainsboro; padding: 5px; width: 300px; height: 300px; position: fixed; top: calc(50% - 150px); right: calc(50% - 150px); display: none; z-index: 100; }
 #toc_title { font-size: 18px; }
 blockquote { background-image: url(/views/main_css/file/quote.png); background-position: calc(100% - 10px) 10px; background-repeat: no-repeat; background-size: 25px; }
 #admin_log_search { width: 100px; }
 @media (max-width: 768px) { table { min-width: 100%; } .table_safe { min-width: 100%; }}
-@media (max-width: 400px) { .foot_plus { width: 80%; right: calc(100% - 92%); }}
-@media (max-height: 400px) { .foot_plus { height: 80%; top: calc(100% - 92%); }}
-.foot_in { overflow-y: scroll; height: calc(100% - 20px); }
 #origin { display: none; }
 .all_in_data { display: block; width: 100%; white-space: pre-wrap; }
 .table_safe { max-width: 100%; }
 .change_space { white-space: pre-line; }
-div#topic_scroll { max-height: 500px; overflow: scroll; -ms-overflow-style: none; scrollbar-width: none; }
-div#topic_scroll::-webkit-scrollbar { display: none; }
+#topic_scroll { max-height: 500px; overflow: scroll; -ms-overflow-style: none; scrollbar-width: none; }
+#topic_scroll::-webkit-scrollbar { display: none; }
 .hidden_link { filter: blur(3px); }
 .hidden_link:hover { filter: none; }
 .content { height: 500px; }
