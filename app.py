@@ -224,8 +224,8 @@ app = flask.Flask(__name__, template_folder = './')
 app.config['JSON_AS_ASCII'] = False
 
 flask_reggie.Reggie(app)
-flask_compress.Compress().init_app(app)
-flask_minify.minify(app = app, html = False, js = True, cssless = True)
+# flask_compress.Compress().init_app(app)
+# flask_minify.minify(app = app, html = False, js = True, cssless = True)
 
 class EverythingConverter(werkzeug.routing.PathConverter):
     regex = '.*?'
