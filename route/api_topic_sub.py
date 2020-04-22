@@ -27,14 +27,13 @@ def api_topic_sub_2(conn, topic_num):
                 t_data_f = i[1]
                 b_color = 'toron_color'
             else:
-                if admin == 1:
-                    t_data_f = i[1]
-                    b_color = 'toron_color_grey'
-                else:
-                    t_data_f = ''
-                    b_color = 'toron_color_not'
+                t_data_f = ''
+                b_color = 'toron_color_not'
 
-                ip += ' (B)'
+                ip += ' <a href="/admin_log?search=blind%20(code%20' + topic_num + '#' + i[0] + '">(B)</a>'
+
+                if admin == 1:
+                    ip += ' <a href="/thread/' + topic_num + '/raw/' + i[0] + '">(R)</a>'
 
             if flask.request.args.get('render', None):
                 if i[0] == '1':
