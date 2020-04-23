@@ -1,11 +1,13 @@
 function get_link_state(data, i = 0) { 
     if(document.getElementsByClassName(data + 'link_finder')[i]) {
-        var link_data = document.getElementsByClassName(data + 'link_finder')[i];
-        
         get_link_state(data, i + 1);
 
         var xhr = new XMLHttpRequest();
-        xhr.open("GET", link_data.href.replace('/w/', '/api/w/').replace(/#([^#]*)/, '') + "?exist=1", true);
+        xhr.open(
+            "GET", 
+            document.getElementsByClassName(data + 'link_finder')[i].href.replace('/w/', '/api/w/').replace(/#([^#]*)/, '') + "?exist=1", 
+            true
+        );
         xhr.send(null);
 
         xhr.onreadystatechange = function() {
@@ -21,13 +23,15 @@ function get_link_state(data, i = 0) {
 }
 
 function get_file_state(data, i = 0) {       
-    if(document.getElementsByClassName(data + 'file_finder_1')[i]) {
-        var file_data = document.getElementsByClassName(data + 'file_finder_1')[i];
-        
+    if(document.getElementsByClassName(data + 'file_finder_1')[i]) {        
         get_file_state(data, i + 1);
 
         var xhr = new XMLHttpRequest();
-        xhr.open("GET", file_data.src.replace('/image/', '/api/image/'), true);
+        xhr.open(
+            "GET", 
+            document.getElementsByClassName(data + 'file_finder_1')[i].src.replace('/image/', '/api/image/'), 
+            true
+        );
         xhr.send(null);
         
         xhr.onreadystatechange = function() {
@@ -43,8 +47,6 @@ function get_file_state(data, i = 0) {
 }
 
 function load_include(title, name, p_data) {
-    var o_data = document.getElementById(name);
-
     var change = '';
     for(key in p_data) {
         change += '@' + p_data[key][0].replace('&', '<amp>') + '@,' + p_data[key][1].replace(',', '<comma>').replace('&', '<amp>') + ','
@@ -59,15 +61,11 @@ function load_include(title, name, p_data) {
     xhr.onreadystatechange = function() {
         if(this.readyState === 4 && this.status === 200) {
             if(this.responseText === "{}\n") {
-                o_data.innerHTML = "";
-
+                document.getElementById(name).innerHTML = "";
                 document.getElementsByClassName(name)[0].id = "not_thing";
             } else {
                 var o_p_data = JSON.parse(this.responseText);
-                
-                var g_data = o_p_data['data'];
-                o_data.innerHTML = g_data;
-
+                document.getElementById(name).innerHTML = o_p_data['data'];
                 eval(o_p_data['js_data']);
             }
         }
@@ -75,8 +73,6 @@ function load_include(title, name, p_data) {
 }
 
 function page_count() {
-    var n_ver = document.getElementsByClassName('all_page_count');
-
     var url = "/api/title_index";
 
     var xhr = new XMLHttpRequest();
@@ -87,8 +83,8 @@ function page_count() {
         if(this.readyState === 4 && this.status === 200) {
             var i = 0;
             while(1) {
-                if(n_ver[i]) {
-                    n_ver[i].innerHTML = JSON.parse(this.responseText)['count'];
+                if(document.getElementsByClassName('all_page_count')[i]) {
+                    document.getElementsByClassName('all_page_count')[i].innerHTML = JSON.parse(this.responseText)['count'];
                     i += 1;
                 } else {
                     break;
