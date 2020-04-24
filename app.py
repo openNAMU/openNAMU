@@ -244,6 +244,7 @@ if not os.path.exists(app_var['path_data_image']):
 if not os.path.exists('views'):
     os.makedirs('views')
 
+print('----')
 import route.tool.init as server_init
 
 dislay_set_key = ['Host', 'Port', 'Language', 'Markup', 'Encryption method']

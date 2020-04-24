@@ -186,19 +186,15 @@ elif what_i_do == '3':
     print('IP or Name : ', end = '')
     user_data = input()
 
-    if re.search(r"^([0-9]{1,3}\.[0-9]{1,3})$", user_data):
-        band = 'O'
-    else:
-        band = ''
+    curs.execute(db_change("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, ?)"),
+        [user_data,
+        'release',
+        get_time(),
+        'tool:emergency',
+        '',
+        ''
+    ])
 
-        curs.execute(db_change("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, ?)"),
-            [user_data,
-            'release',
-            get_time(),
-            'tool:emergency',
-            '',
-            band
-        ])
     curs.execute(db_change("delete from ban where block = ?"), [user_data])
 elif what_i_do == '4':
     print('----')
