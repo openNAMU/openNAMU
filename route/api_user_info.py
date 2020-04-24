@@ -47,9 +47,6 @@ def api_user_info_2(conn, name):
             plus_t += [load_lang('normal')]
         else:
             plus_t += [load_lang('blocked') + '<br>']
-
-            match = re.search(r"^([0-9]{1,3}\.[0-9]{1,3})", name)
-            match = match.group(1) if match else '-'
             regex_ban = 0
 
             curs.execute(db_change("select login, block, end, why from ban where band = 'regex'"))
@@ -62,7 +59,7 @@ def api_user_info_2(conn, name):
                     regex_ban = 1
 
             if regex_ban == 0:
-                curs.execute(db_change("select end, login, band, why from ban where block = ? or block = ?"), [name, match])
+                curs.execute(db_change("select end, login, band, why from ban where block = ?"), [name])
                 block_data = curs.fetchall()
                 if block_data:
                     plus_t[1] += load_lang('type') + ' : ' + (load_lang('band_blocked') if block_data[0][2] == 'O' else load_lang('normal'))

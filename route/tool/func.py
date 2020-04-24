@@ -210,7 +210,25 @@ def update(ver_num, set_data):
     if ver_num < 3182000:
         curs.execute(db_change('delete from cache_data'))
 
+    if ver_num < 3183603:
+        curs.execute(db_change("select block from ban where band = 'O'"))
+        change_band = curs.fetchall()
+        for i in change_band:
+            curs.execute(db_change("update ban set block = ?, band = 'regex' where block = ? and band = 'O'"), [
+                '^' + i[0].replace('.', '\\.'),
+                i[0]
+            ])
+
+        curs.execute(db_change("select block from rb where band = 'O'"))
+        change_band = curs.fetchall()
+        for i in change_band:
+            curs.execute(db_change("update rb set block = ?, band = 'regex' where block = ? and band = 'O'"), [
+                '^' + i[0].replace('.', '\\.'),
+                i[0]
+            ])
+
     conn.commit()
+
     print('Update pass')
 
 def set_init():
@@ -970,12 +988,6 @@ def ban_check(ip = None, tool = None):
     if admin_check(None, None, ip) == 1:
         return 0
 
-    band = re.search(r"^([0-9]{1,3}\.[0-9]{1,3})", ip)
-    if band:
-        band_it = band.group(1)
-    else:
-        band_it = '-'
-
     curs.execute(db_change("delete from ban where (end < ? and end like '2%')"), [get_time()])
     conn.commit()
 
@@ -989,15 +1001,6 @@ def ban_check(ip = None, tool = None):
                     return 1
             else:
                 return 1
-
-    curs.execute(db_change("select login from ban where ((end > ? and end like '2%') or end = '') and block = ? and band = 'O'"), [get_time(), band_it])
-    band_d = curs.fetchall()
-    if band_d:
-        if tool and tool == 'login':
-            if band_d[0][0] != 'O':
-                return 1
-        else:
-            return 1
 
     curs.execute(db_change("select login from ban where ((end > ? and end like '2%') or end = '') and block = ? and band = ''"), [get_time(), ip])
     ban_d = curs.fetchall()
@@ -1016,10 +1019,7 @@ def ban_insert(name, end, why, login, blocker, type_d = None):
     if type_d:
         band = type_d
     else:
-        if re.search(r"^([0-9]{1,3}\.[0-9]{1,3})$", name):
-            band = 'O'
-        else:
-            band = ''
+        band = ''
 
     curs.execute(db_change("delete from ban where (end < ? and end like '2%')"), [get_time()])
 
