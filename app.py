@@ -309,17 +309,15 @@ if set_data['db_type'] == 'sqlite':
     else:
         print('Back up state : Turn off')
 
-if set_data['db_type'] == 'mysql':
-    def mysql_dont_off():
-        try:
-            urllib.request.urlopen('http://localhost:' + server_set['port'] + '/')
-        except:
-            pass
+def mysql_dont_off():
+    try:
+        urllib.request.urlopen('http://localhost:' + server_set['port'] + '/')
+    except:
+        pass
 
-        threading.Timer(60 * 60 * 6, mysql_dont_off).start()
+    threading.Timer(60 * 60 * 6, mysql_dont_off).start()
 
-    mysql_dont_off()
-
+mysql_dont_off()
 
 curs.execute(db_change('select data from other where name = "count_all_title"'))
 if not curs.fetchall():
