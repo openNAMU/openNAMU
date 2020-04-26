@@ -66,6 +66,17 @@ def api_topic_sub_2(conn, topic_num):
                 t_plus_data = t_data_f[1]
                 t_data_f = t_data_f[0]
 
+                t_data_f = re.sub(
+                    r'&lt;topic_a&gt;((?:(?!&lt;\/topic_a&gt;).)+)&lt;\/topic_a&gt;', 
+                    '<a href="\g<1>">\g<1></a>', 
+                    t_data_f
+                )
+                t_data_f = re.sub(
+                    r'&lt;topic_call&gt;@((?:(?!&lt;\/topic_call&gt;).)+)&lt;\/topic_call&gt;', 
+                    '<a href="/w/user:\g<1>">@\g<1></a>', 
+                    t_data_f
+                )
+
                 all_data = '' + \
                     '<table id="toron">' + \
                         '<tbody>' + \

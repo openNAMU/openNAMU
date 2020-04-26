@@ -70,7 +70,7 @@ def topic_2(conn, topic_num):
         cate_re = re.compile(r'\[\[((?:분류|category):(?:(?:(?!\]\]).)*))\]\]', re.I)
         data = cate_re.sub('[br]', flask.request.form.get('content', 'Test'))
 
-        for rd_data in re.findall(r"(?:#([0-9]+))", data):
+        for rd_data in re.findall(r"(?: |^)(#(?:[0-9]+))(?: |$)", data):
             curs.execute(db_change("select ip from topic where code = ? and id = ?"), [topic_num, rd_data])
             ip_data = curs.fetchall()
             if ip_data and ip_or_user(ip_data[0][0]) == 0:
@@ -80,7 +80,23 @@ def topic_2(conn, topic_num):
                     today
                 ])
 
-        data = re.sub(r"(?P<in>#(?:[0-9]+))", '[[\g<in>]]', data)
+        for rd_data in re.findall(r"(?: |^)@((?:[^ ]+))(?: |$)", data):
+            curs.execute(db_change("select ip from history where ip = ? limit 1"), [rd_data])
+            ip_data = curs.fetchall()
+            if not ip_data:
+                curs.execute(db_change("select ip from topic where ip = ? limit 1"), [rd_data])
+                ip_data = curs.fetchall()
+
+            print(ip_data)
+            if ip_data and ip_or_user(ip_data[0][0]) == 0:
+                curs.execute(db_change('insert into alarm (name, data, date) values (?, ?, ?)'), [
+                    ip_data[0][0],
+                    ip + ' | <a href="/thread/' + topic_num + '#' + num + '">' + name + ' | ' + sub + ' | #' + num + '</a>',
+                    today
+                ])
+
+        data = re.sub(r"( |^)(#(?:[0-9]+))( |$)", '\g<1><topic_a>\g<2></topic_a>\g<3>', data)
+        data = re.sub(r"( |^)(@(?:[^ ]+))( |$)", '\g<1><topic_call>\g<2></topic_call>\g<3>', data)
 
         rd_plus(topic_num, today, name, sub)
         curs.execute(db_change("insert into topic (id, data, date, ip, code) values (?, ?, ?, ?, ?)"), [
@@ -92,7 +108,7 @@ def topic_2(conn, topic_num):
         ])
         conn.commit()
 
-        return redirect('/thread/' + topic_num + '?where=bottom')
+        return redirect('/thread/' + topic_num + '#' + num)
     else:
         data = ''
 
@@ -114,7 +130,7 @@ def topic_2(conn, topic_num):
                 ''' + captcha_get() + (ip_warring() if display == '' else '') + '''
                 <input style="display: none;" name="topic" value="''' + name + '''">
                 <input style="display: none;" name="title" value="''' + sub + '''">
-                <button type="submit">''' + load_lang('send') + '''</button>
+                <button id="save" type="submit">''' + load_lang('send') + '''</button>
                 <button id="preview" type="button" onclick="load_preview(\'\')">''' + load_lang('preview') + '''</button>
             </form>
             <hr class=\"main_hr\">

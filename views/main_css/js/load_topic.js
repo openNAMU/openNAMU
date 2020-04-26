@@ -81,8 +81,9 @@ function topic_main_load(topic_num, s_num) {
 
             document.getElementById('main_topic').innerHTML = n_data;
             eval(t_plus_data);
-            if(window.location.search === "?where=bottom") {
-                document.getElementById(num).focus();
+
+            if(window.location.hash) {
+                document.getElementById(window.location.hash.replace(/^#/, '')).focus();
             }
             
             if(!s_num) {
