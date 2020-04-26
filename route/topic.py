@@ -87,7 +87,6 @@ def topic_2(conn, topic_num):
                 curs.execute(db_change("select ip from topic where ip = ? limit 1"), [rd_data])
                 ip_data = curs.fetchall()
 
-            print(ip_data)
             if ip_data and ip_or_user(ip_data[0][0]) == 0:
                 curs.execute(db_change('insert into alarm (name, data, date) values (?, ?, ?)'), [
                     ip_data[0][0],
