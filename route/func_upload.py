@@ -65,7 +65,7 @@ def func_upload_2(conn):
                 data.save(os.path.join(app_var['path_data_image'], e_data))
 
             ip = ip_check()
-            g_lice = g_lice
+            g_lice = flask.request.form.get('f_lice', '')
 
             curs.execute(db_change("select data from other where name = 'markup'"))
             db_data = curs.fetchall()

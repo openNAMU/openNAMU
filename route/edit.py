@@ -183,6 +183,7 @@ def edit_2(conn, name):
             imp = [name, wiki_set(), custom(), other2([' (' + sub + ')', 0])],
             data =  get_name + '''
                 <form method="post">
+                    <script>do_paste_image();</script>
                     ''' + edit_button() + '''
                     <textarea id="content" class="content" placeholder="''' + p_text + '''" name="content">''' + html.escape(data) + '''</textarea>
                     <textarea id="origin" name="o_content">''' + html.escape(data_old) + '''</textarea>

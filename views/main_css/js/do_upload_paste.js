@@ -1,11 +1,16 @@
-window.addEventListener('DOMContentLoaded', function() {
-    if(window.location.pathname.match(/^\/edit\//i)) {
-        const textarea = document.querySelector("textarea");
-        if (textarea) {
-            textarea.addEventListener("paste", pasteListener);
+function do_paste_image() {
+    window.addEventListener('DOMContentLoaded', function() {
+        if(
+            document.cookie.match(main_css_regex_data('main_css_image_paste')) &&
+            document.cookie.match(main_css_regex_data('main_css_image_paste'))[1] === '1'
+        ) {
+            const textarea = document.querySelector("textarea");
+            if (textarea) {
+                textarea.addEventListener("paste", pasteListener);
+            }
         }
-    }
-});
+    });
+}
 
 function pasteListener(e) {
     // find file
@@ -42,7 +47,7 @@ function pasteListener(e) {
             if (res.status === 200 || res.status === 201) {
                 const url = res.url;
                 alert(
-                    '클립보드의 이미지를 성공적으로 업로드했습니다. 아래 텍스트로 본문에 삽입할 수 있습니다.' +
+                    '클립보드의 이미지를 성공적으로 업로드했습니다. 아래 텍스트로 본문에 삽입할 수 있습니다. ' +
                     '[[' + decodeURIComponent(url.replace(/.*\/w\/file/, "file")) + ']]'
                 );
             } else {

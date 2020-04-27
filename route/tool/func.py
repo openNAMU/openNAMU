@@ -206,9 +206,6 @@ def update(ver_num, set_data):
         
         with open('data/mysql.json', 'w') as f:
             f.write('{ "user" : "' + get_data_mysql['user'] + '", "password" : "' + get_data_mysql['password'] + '", "host" : "localhost" }')
-            
-    if ver_num < 3182000:
-        curs.execute(db_change('delete from cache_data'))
 
     if ver_num < 3183603:
         curs.execute(db_change("select block from ban where band = 'O'"))
@@ -226,6 +223,9 @@ def update(ver_num, set_data):
                 '^' + i[0].replace('.', '\\.'),
                 i[0]
             ])
+            
+    if ver_num < 3183800:
+        curs.execute(db_change('delete from cache_data'))
 
     conn.commit()
 
@@ -498,7 +498,7 @@ def other2(data):
         data += ['']
 
     req_list = ''
-    main_css_ver = 38
+    main_css_ver = 39
 
     if not 'main_css_load' in flask.session or not 'main_css_ver' in flask.session or flask.session['main_css_ver'] != main_css_ver:
         for i_data in os.listdir(os.path.join("views", "main_css", "css")):
@@ -1236,7 +1236,7 @@ def re_error(data):
                     '<div id="main_skin_set">' + \
                         '<h2>' + load_lang('error') + '</h2>' + \
                         '<ul>' + \
-                            '<li>' + data + '</li>' + \
+                            '<li>' + data + ' <a href="/main_skin_set">(' + load_lang('main_skin_set') + ')</a></li>' + \
                         '</ul>' + \
                     '</div>' + \
                     ('<script>window.addEventListener(\'DOMContentLoaded\', function() { main_css_skin_set(); });</script>' if get_url == '/main_skin_set' else ''),

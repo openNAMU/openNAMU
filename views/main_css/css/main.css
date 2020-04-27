@@ -48,3 +48,4 @@ blockquote { background-image: url(/views/main_css/file/quote.png); background-p
 .hidden_link:hover { filter: none; }
 .content { height: 500px; }
 .topic_content { height: 200px; }
+.spead_footnote { background-color: #efefef; color: #555; border: 1px solid #cecece; }
