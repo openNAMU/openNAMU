@@ -592,7 +592,7 @@ def namumark(conn, data, title, include_num):
             backlink += [[title, include_link, 'include']]
 
             data = include_re.sub('' + \
-                '<a id="include_link" class="include_' + str(i) + '" href="/w/' + tool.url_pas(include_link) + '">[' + include_link + ']</a>' + \
+                '<a id="include_link" class="include_' + str(i) + '" href="/w/' + tool.url_pas(include_link) + '">(' + include_link + ')</a>' + \
                 '<div id="include_' + str(i) + '"></div>' + \
             '', data, 1)
 
@@ -1181,9 +1181,8 @@ def namumark(conn, data, title, include_num):
 
                     footdata_all += '' + \
                         '<li>' + \
-                            '<a href="#' + include_num + 'rfn-' + str(footdata[0]) + '" ' + \
-                                'id="' + include_num + 'cfn-' + str(footdata[0]) + '" ' + \
-                                'onclick="do_open_foot(\'' + include_num + 'fn-' + str(footdata[0]) + '\', 1);">' + \
+                            '<a href="javascript:do_open_foot(\'' + include_num + 'fn-' + str(footdata[0]) + '\', 1);" ' + \
+                                'id="' + include_num + 'cfn-' + str(footdata[0]) + '">' + \
                                 '(' + footdata[1] + ')' + \
                             '</a> <span id="' + include_num + 'fn-' + str(footdata[0]) + '">' + footdata_in + '</span>' + \
                         '</li>' + \
@@ -1207,12 +1206,11 @@ def namumark(conn, data, title, include_num):
 
                         data = re_footnote.sub('' + \
                             '<sup>' + \
-                                '<a href="#' + include_num + 'fn-' + footshort + '" ' + \
-                                    'id="' + include_num + 'rfn-' + footshort + '" ' + \
-                                    'onclick="do_open_foot(\'' + include_num + 'fn-' + footshort + '\');">' + \
+                                '<a href="javascript:do_open_foot(\'' + include_num + 'fn-' + footshort + '\', 0);" ' + \
+                                    'id="' + include_num + 'rfn-' + footshort + '">' + \
                                     '(' + footnote_name + ')' + \
                                 '</a>' + \
-                            '</sup>' + \
+                            '</sup><span id="' + include_num + 'dfn-' + footshort + '"></span>' + \
                         '', data, 1)
                     else:
                         data = re_footnote.sub('<sup><a href="javascript:void(0);">(' + footnote_name + ')</a></sup>', data, 1)
@@ -1233,12 +1231,11 @@ def namumark(conn, data, title, include_num):
 
                     data = re_footnote.sub('' + \
                         '<sup>' + \
-                            '<a href="#' + include_num + 'fn-' + str(footnote_number) + '" ' + \
-                                'id="' + include_num + 'rfn-' + str(footnote_number) + '" ' + \
-                                'onclick="do_open_foot(\'' + include_num + 'fn-' + str(footnote_number) + '\');">' + \
+                            '<a href="javascript:do_open_foot(\'' + include_num + 'fn-' + str(footnote_number) + '\', 0);" ' + \
+                                'id="' + include_num + 'rfn-' + str(footnote_number) + '">' + \
                                 '(' + footnote_name + ')' + \
                             '</a>' + \
-                        '</sup>' + \
+                        '</sup><span id="' + include_num + 'dfn-' + str(footnote_number) + '"></span>' + \
                     '', data, 1)
         else:
             break
@@ -1255,9 +1252,8 @@ def namumark(conn, data, title, include_num):
 
         footdata_all += '' + \
             '<li>' + \
-                '<a href="#' + include_num + 'rfn-' + str(footdata[0]) + '" ' + \
-                    'id="' + include_num + 'cfn-' + str(footdata[0]) + '" ' + \
-                    'onclick="do_open_foot(\'' + include_num + 'fn-' + str(footdata[0]) + '\', 1);">' + \
+                '<a href="javascript:do_open_foot(\'' + include_num + 'fn-' + str(footdata[0]) + '\', 1);" ' + \
+                    'id="' + include_num + 'cfn-' + str(footdata[0]) + '">' + \
                     '(' + str(footdata[1]) + ')' + \
                 '</a> <span id="' + include_num + 'fn-' + str(footdata[0]) + '">' + footdata_in + '</span>' + \
             '</li>' + \
