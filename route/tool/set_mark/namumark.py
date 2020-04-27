@@ -769,7 +769,7 @@ def namumark(conn, data, title, include_num):
     time_data = re.search(r'^([0-9]{4}-[0-9]{2}-[0-9]{2})', now_time)
     time = time_data.group(1)
     
-    macro_re = re.compile(r'\[([^[(]+)\(((?:(?!\)]).)+)\)\]')
+    macro_re = re.compile(r'\[([^[(]+)\(((?:(?!\[|\)]).)+)\)\]')
     macro_data = macro_re.findall(data)
     for i in macro_data:
         macro_name = i[0].lower()
