@@ -1,11 +1,12 @@
 function get_link_state(data, i = 0) { 
-    if(document.getElementsByClassName(data + 'link_finder')[i]) {
+    var get_class = document.getElementsByClassName(data + 'link_finder')[i];
+    if(get_class) {
         get_link_state(data, i + 1);
 
         var xhr = new XMLHttpRequest();
         xhr.open(
             "GET", 
-            document.getElementsByClassName(data + 'link_finder')[i].href.replace('/w/', '/api/w/').replace(/#([^#]*)/, '') + "?exist=1", 
+            get_class.href.replace('/w/', '/api/w/').replace(/#([^#]*)/, '') + "?exist=1", 
             true
         );
         xhr.send(null);
@@ -23,23 +24,63 @@ function get_link_state(data, i = 0) {
 }
 
 function get_file_state(data, i = 0) {       
-    if(document.getElementsByClassName(data + 'file_finder_1')[i]) {        
+    var get_class = document.getElementsByClassName(data + 'file_finder')[i];
+    if(get_class) {        
         get_file_state(data, i + 1);
-
-        var xhr = new XMLHttpRequest();
-        xhr.open(
-            "GET", 
-            document.getElementsByClassName(data + 'file_finder_1')[i].src.replace('/image/', '/api/image/'), 
-            true
-        );
-        xhr.send(null);
-        
-        xhr.onreadystatechange = function() {
-            if(this.readyState === 4 && this.status === 200) {
-                if(JSON.parse(this.responseText)['exist'] !== '1') {
-                    document.getElementsByClassName(data + 'file_finder_1')[i].style = "display: none;";
-                } else {
-                    document.getElementsByClassName(data + 'file_finder_2')[i].innerHTML = "";
+    
+        if(get_class.getAttribute('under_href') === 'out_link') {
+            if(
+                document.cookie.match(main_css_regex_data('main_css_image_set')) &&
+                document.cookie.match(main_css_regex_data('main_css_image_set'))[1] === '0'
+            ) {
+                document.getElementsByClassName(data + 'file_finder')[i].innerHTML = '' +
+                    '<img   style="' + get_class.getAttribute('under_style') + '" ' + 
+                            'alt="' + get_class.getAttribute('under_alt') + '" ' + 
+                            'src="' + get_class.getAttribute('under_src') + '">' +
+                '';
+            } else {
+                document.getElementsByClassName(data + 'file_finder')[i].innerHTML = '' +
+                    '<a href="' + get_class.getAttribute('under_src') + '">(' +
+                        get_class.getAttribute('under_src') +
+                    ')</a>' +
+                '';
+            }
+        } else {
+            var xhr = new XMLHttpRequest();
+            xhr.open(
+                "GET", 
+                get_class.getAttribute('under_src').replace('/image/', '/api/image/'), 
+                true
+            );
+            xhr.send(null);
+            
+            xhr.onreadystatechange = function() {
+                if(this.readyState === 4 && this.status === 200) {
+                    if(JSON.parse(this.responseText)['exist'] !== '1') {
+                        document.getElementsByClassName(data + 'file_finder')[i].innerHTML = '' +
+                            '<a href="' + get_class.getAttribute('under_href') + '" ' + 
+                                'id="not_thing">' +
+                                get_class.getAttribute('under_alt') +
+                            '</a>' +
+                        '';
+                    } else {
+                        if(
+                            document.cookie.match(main_css_regex_data('main_css_image_set')) &&
+                            document.cookie.match(main_css_regex_data('main_css_image_set'))[1] === '0'
+                        ) {
+                            document.getElementsByClassName(data + 'file_finder')[i].innerHTML = '' +
+                                '<img   style="' + get_class.getAttribute('under_style') + '" ' + 
+                                        'alt="' + get_class.getAttribute('under_alt') + '" ' + 
+                                        'src="' + get_class.getAttribute('under_src') + '">' +
+                            '';
+                        } else {
+                            document.getElementsByClassName(data + 'file_finder')[i].innerHTML = '' +
+                                '<a href="' + get_class.getAttribute('under_src') + '">(' +
+                                    get_class.getAttribute('under_alt') +
+                                ')</a>' +
+                            '';
+                        }
+                    }
                 }
             }
         }
@@ -100,4 +141,51 @@ function not_from_exist() {
             window.location.href = document.getElementById('go_redirect_link').href + '?from=' + location.pathname.replace(/^\/w\//, '');
         }
     });
+}
+
+function do_open_folding(data, element) {
+    var fol = document.getElementById(data);
+    if(fol.style.display === '' || (fol.style.display === 'inline-block' || fol.style.display === 'block')) {
+        document.getElementById(data).style.display = 'none';
+        element.innerHTML = '(+)'
+    } else {
+        document.getElementById(data).style.display = 'block';
+        element.innerHTML = '(-)'
+    }
+}
+
+function do_open_foot(name, num = 0) {
+    var found_include = name.match(/^(include_(?:[0-9]+)\-)/);
+    if(found_include) {
+        var include_name = name.replace(/^(?:include_(?:[0-9]+)\-)/, '');
+        var front_data = found_include[1];
+    } else {
+        var include_name = name;
+        var front_data = '';
+    }
+
+    if(
+        document.cookie.match(main_css_regex_data('main_css_footnote_set')) &&
+        document.cookie.match(main_css_regex_data('main_css_footnote_set'))[1] === '1'
+    ) {
+        if(num === 1) {
+            document.getElementById(front_data + 'r' + include_name).focus();
+        } else {
+            var get_data = document.getElementById(front_data + include_name).innerHTML;
+            var org_data = document.getElementById(front_data + 'd' + include_name).innerHTML;
+            if(org_data === '') {
+                document.getElementById(front_data + 'd' + include_name).innerHTML = '' +
+                    '<a href="#' + front_data + 'c' + include_name + '">(Go)</a> ' + get_data +
+                '';
+                document.getElementById(front_data + 'd' + include_name).className = 'spead_footnote';
+            } else {
+                document.getElementById(front_data + 'd' + include_name).innerHTML = '';
+                document.getElementById(front_data + 'd' + include_name).className = '';
+            }
+        }
+    } else {
+        document.getElementById(front_data + 'r' + include_name).style.color = 'red';
+        document.getElementById(front_data + 'c' + include_name).style.color = (num === 1 ? 'inherit' : 'red');
+        document.getElementById(front_data + (num === 1 ? 'r' : 'c') + include_name).focus();
+    }
 }

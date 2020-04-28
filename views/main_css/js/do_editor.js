@@ -1,5 +1,39 @@
+function do_insert_data(name, data) {
+    // https://stackoverflow.com/questions/11076975/insert-text-into-textarea-at-cursor-position-javascript
+    if(document.selection) {
+        document.getElementById(name).focus();
+
+        var sel = document.selection.createRange();
+        sel.text = data;
+    } else if(document.getElementById(name).selectionStart || document.getElementById(name).selectionStart == '0') {
+        var startPos = document.getElementById(name).selectionStart;
+        var endPos = document.getElementById(name).selectionEnd;
+        var myPos = document.getElementById(name).value;
+
+        document.getElementById(name).value = myPos.substring(0, startPos) + data + myPos.substring(endPos, myPos.length);
+    } else {
+        document.getElementById(name).value += data;
+    }
+}
+
+function do_not_out() {
+    window.onbeforeunload = function() {
+        data = document.getElementById('content').value;
+        origin = document.getElementById('origin').value;
+        if(data !== origin) {
+            return '';
+        }
+    }
+}
+
+function save_stop_exit() {
+    window.onbeforeunload = function () { }
+}
+
 function do_paste_image() {
     window.addEventListener('DOMContentLoaded', function() {
+        do_not_out();
+
         if(
             document.cookie.match(main_css_regex_data('main_css_image_paste')) &&
             document.cookie.match(main_css_regex_data('main_css_image_paste'))[1] === '1'

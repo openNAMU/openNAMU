@@ -944,9 +944,10 @@ def namumark(conn, data, title, include_num):
     data = table_start(data)
 
     category = ''
+    link_re = re.compile('\[\[((?:(?!\[\[|\]\]|<\/td>).)+)\]\]')
     category_re = re.compile(r'^(?:category|분류):', re.I)
     while 1:
-        link = re.search(r'\[\[((?:(?!\[\[|\]\]|<\/td>).)+)\]\]', data)
+        link = link_re.search(data)
         if link:
             link = link.group(1)
 
@@ -1017,29 +1018,19 @@ def namumark(conn, data, title, include_num):
                     file_alt = 'file:' + file_name + '.' + file_end
                     exist = None
 
-                if exist:
-                    data = re.sub(
-                        '\[\[((?:(?!\[\[|\]\]|<\/td>).)+)\]\]',
-                        '<span style="' + file_align + '">' + \
-                            '<span style="' + file_color + '">' + \
-                                '<img style="' + file_style + '" alt="' + file_alt + '" src="' + file_src + '">' + \
-                            '</span>' + \
-                        '</span>',
-                        data,
-                        1
-                    )
-                else:
-                    data = re.sub(
-                        '\[\[((?:(?!\[\[|\]\]|<\/td>).)+)\]\]',
-                        '<span style="' + file_align + '">' + \
-                            '<span style="' + file_color + '">' + \
-                                '<img class="' + include_num + 'file_finder_1" style="' + file_style + '" alt="' + file_alt + '" src="' + file_src + '">' + \
-                                '<a class="' + include_num + 'file_finder_2" id="not_thing" href="/upload?name=' + tool.url_pas(file_name) + '">' + file_alt + '</a>' + \
-                            '</span>' + \
-                        '</span>',
-                        data,
-                        1
-                    )
+                data = link_re.sub(
+                    '<span style="' + file_align + '">' + \
+                        '<span  style="' + file_color + '"' + \
+                                'class="' + include_num + 'file_finder" ' + \
+                                'under_style="' + file_style + '" ' + \
+                                'under_alt="' + file_alt + '" ' + \
+                                'under_src="' + file_src + '" ' + \
+                                'under_href="' + ("out_link" if exist else '/upload?name=' + tool.url_pas(file_name)) + '">' + \
+                        '</span>' + \
+                    '</span>',
+                    data,
+                    1
+                )
             elif category_re.search(main_link):
                 if category == '':
                     category += '<div id="cate_all"><hr><div id="cate">Category : '
@@ -1056,7 +1047,7 @@ def namumark(conn, data, title, include_num):
                 backlink += [[title, main_link, 'cat']]
                 category += '<a class="' + include_num + 'link_finder' + link_id + '" href="/w/' + tool.url_pas(main_link) + '">' + category_re.sub('', see_link) + '</a> | '
 
-                data = re.sub(r'\[\[((?:(?!\[\[|\]\]|<\/td>).)+)\]\]', '', data, 1)
+                data = link_re.sub('', data, 1)
             elif re.search(r'^wiki:', main_link):
                 data = re.sub(
                     '\[\[((?:(?!\[\[|\]\]|<\/td>).)+)\]\]',
@@ -1091,17 +1082,17 @@ def namumark(conn, data, title, include_num):
                             1
                         )
                 else:
-                    data = re.sub(r'\[\[((?:(?!\[\[|\]\]|<\/td>).)+)\]\]', 'Not exist', data, 1)
+                    data = link_re.sub('Not exist', data, 1)
             elif re.search(r'^(\/(?:.+))$', main_link):
                 under_title = re.search(r'^(\/(?:.+))$', main_link)
                 under_title = under_title.group(1)
 
                 if see_link != main_link:
-                    data = re.sub(r'\[\[((?:(?!\[\[|\]\]|<\/td>).)+)\]\]', '[[' + title + under_title + '|' + see_link + ']]', data, 1)
+                    data = link_re.sub('[[' + title + under_title + '|' + see_link + ']]', data, 1)
                 else:
-                    data = re.sub(r'\[\[((?:(?!\[\[|\]\]|<\/td>).)+)\]\]', '[[' + title + under_title + ']]', data, 1)
+                    data = link_re.sub('[[' + title + under_title + ']]', data, 1)
             elif re.search(r'^http(s)?:\/\/', main_link):
-                data = re.sub(r'\[\[((?:(?!\[\[|\]\]|<\/td>).)+)\]\]', '<a id="out_link" rel="nofollow" href="' + main_link + '">' + see_link + '</a>', data, 1)
+                data = link_re.sub('<a id="out_link" rel="nofollow" href="' + main_link + '">' + see_link + '</a>', data, 1)
             else:
                 return_link = link_fix(main_link)
                 main_link = html.unescape(return_link[0])
@@ -1148,9 +1139,9 @@ def namumark(conn, data, title, include_num):
                                 1
                             )
                         else:
-                            data = re.sub(r'\[\[((?:(?!\[\[|\]\]|<\/td>).)+)\]\]', '<b>' + see_link + '</b>', data, 1)
+                            data = link_re.sub('<b>' + see_link + '</b>', data, 1)
                 else:
-                    data = re.sub(r'\[\[((?:(?!\[\[|\]\]|<\/td>).)+)\]\]', '&#91;&#91;' + link + '&#93;&#93;', data, 1)
+                    data = link_re.sub('&#91;&#91;' + link + '&#93;&#93;', data, 1)
         else:
             break
 

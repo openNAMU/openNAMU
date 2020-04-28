@@ -42,6 +42,13 @@ function main_css_get_post() {
         document.cookie = 'main_css_footnote_set=0;';
     }
 
+    check = document.getElementById('image');
+    if(check.value === 'click') {
+        document.cookie = 'main_css_image_set=1;';
+    } else {
+        document.cookie = 'main_css_image_set=0;';
+    }
+
     check = document.getElementById('image_paste');
     if(check.checked) {
         document.cookie = 'main_css_image_paste=1;';
@@ -108,7 +115,10 @@ function main_css_skin_set() {
             "where_category" : "Set category location",
             "bottom" : "Bottom",
             "top" : "Top",
-            "set_footnote" : "Set footnote"
+            "set_footnote" : "Set footnote",
+            "renderer" : "Renderer",
+            "spread" : "Spread",
+            "set_image" : "Set image"
         }, "ko-KR" : {
             "default" : "기본값",
             "change_to_normal" : "일반 텍스트로 변경",
@@ -121,7 +131,10 @@ function main_css_skin_set() {
             "where_category" : "분류 위치 설정",
             "bottom" : "아래",
             "top" : "위",
-            "set_footnote" : "각주 설정"
+            "set_footnote" : "각주 설정",
+            "renderer" : "렌더러",
+            "spread" : "펼치기",
+            "set_image" : "이미지 설정"
         }
     }
 
@@ -215,7 +228,7 @@ function main_css_skin_set() {
 
     var footnote_list = [
         ['0', 'normal', set_language[language]['default']],
-        ['1', 'spread', 'spread (beta)']
+        ['1', 'spread', set_language[language]['spread']]
     ];
     set_data["footnote"] = '';
     i = 0;
@@ -232,8 +245,27 @@ function main_css_skin_set() {
         i += 1;
     }
 
+    var image_list = [
+        ['0', 'normal', set_language[language]['default']],
+        ['1', 'click', 'click (beta)']
+    ];
+    set_data["image"] = '';
+    i = 0;
+    while(image_list[i]) {
+        if(
+            document.cookie.match(main_css_regex_data('main_css_image_set')) && 
+            document.cookie.match(main_css_regex_data('main_css_image_set'))[1] === image_list[i][0]
+        ) {
+            set_data["image"] = '<option value="' + image_list[i][1] + '">' + image_list[i][2] + '</option>' + set_data["image"];
+        } else {
+            set_data["image"] += '<option value="' + image_list[i][1] + '">' + image_list[i][2] + '</option>';
+        }
+
+        i += 1;
+    }
+
     document.getElementById("main_skin_set").innerHTML = ' \
-        <h2>1. renderer</h2> \
+        <h2>1. ' + set_language[language]['renderer'] + '</h2> \
         <h3>1.1. ' + set_language[language]['strike'] + '</h3> \
         <select id="strike" name="strike"> \
             ' + set_data["strike"] + ' \
@@ -250,10 +282,14 @@ function main_css_skin_set() {
         <select id="footnote" name="footnote"> \
             ' + set_data["footnote"] + ' \
         </select> \
-        <h3>1.4. ' + set_language[language]['other'] + '</h3> \
+        <h3>1.5. ' + set_language[language]['set_image'] + '</h3> \
+        <select id="image" name="image"> \
+            ' + set_data["image"] + ' \
+        </select> \
+        <h3>1.6. ' + set_language[language]['other'] + '</h3> \
         <input ' + set_data["include"] + ' type="checkbox" id="include" name="include" value="include"> ' + set_language[language]['include_link'] + ' \
         <hr class="main_hr"> \
-        <input ' + set_data["image_paste"] + ' type="checkbox" id="image_paste" name="image_paste" value="image_paste"> image_paste (beta) \
+        <input ' + set_data["image_paste"] + ' type="checkbox" id="image_paste" name="image_paste" value="image_paste"> 클립보드 이미지 업로드 (ko-KR) \
         <hr class="main_hr"> \
         <button onclick="main_css_get_post();">' + set_language[language]['save'] + '</button> \
     ';
