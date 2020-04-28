@@ -224,7 +224,7 @@ def update(ver_num, set_data):
                 i[0]
             ])
             
-    if ver_num < 3183800:
+    if ver_num < 3183900:
         curs.execute(db_change('delete from cache_data'))
 
     conn.commit()
@@ -498,7 +498,7 @@ def other2(data):
         data += ['']
 
     req_list = ''
-    main_css_ver = 39
+    main_css_ver = 40
 
     if not 'main_css_load' in flask.session or not 'main_css_ver' in flask.session or flask.session['main_css_ver'] != main_css_ver:
         for i_data in os.listdir(os.path.join("views", "main_css", "css")):
