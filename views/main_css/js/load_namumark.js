@@ -138,7 +138,15 @@ function page_count() {
 function not_from_exist() {
     window.addEventListener('DOMContentLoaded', function() {
         if(document.getElementById('go_redirect_link')) {
-            window.location.href = document.getElementById('go_redirect_link').href + '?from=' + location.pathname.replace(/^\/w\//, '');
+            var r_link = document.getElementById('go_redirect_link').href;
+            if(r_link.match(/#([^#]+)$/)) {
+                var s_link = '#' + r_link.match(/#([^#]+)$/)[1];
+                r_link = r_link.replace(/#([^#]+)$/, '');
+            } else {
+                var s_link = '';
+            }
+
+            window.location.href = r_link + '?from=' + location.pathname.replace(/^\/w\//, '') + s_link;
         }
     });
 }
