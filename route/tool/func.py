@@ -7,14 +7,12 @@ for i in range(0, 2):
         from diff_match_patch import diff_match_patch
         import werkzeug.routing
         import werkzeug.debug
-        import flask_compress
         import flask_reggie
         import tornado.ioloop
         import tornado.httpserver
         import tornado.wsgi
         import urllib.request
         import email.mime.text
-        import flask_minify
         import sqlite3
         import pymysql
         import hashlib
