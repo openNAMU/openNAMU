@@ -31,18 +31,18 @@ function get_file_state(data, i = 0) {
         if(get_class.getAttribute('under_href') === 'out_link') {
             if(
                 document.cookie.match(main_css_regex_data('main_css_image_set')) &&
-                document.cookie.match(main_css_regex_data('main_css_image_set'))[1] === '0'
+                document.cookie.match(main_css_regex_data('main_css_image_set'))[1] === '1'
             ) {
-                document.getElementsByClassName(data + 'file_finder')[i].innerHTML = '' +
-                    '<img   style="' + get_class.getAttribute('under_style') + '" ' + 
-                            'alt="' + get_class.getAttribute('under_alt') + '" ' + 
-                            'src="' + get_class.getAttribute('under_src') + '">' +
-                '';
-            } else {
                 document.getElementsByClassName(data + 'file_finder')[i].innerHTML = '' +
                     '<a href="' + get_class.getAttribute('under_src') + '">(' +
                         get_class.getAttribute('under_src') +
                     ')</a>' +
+                '';
+            } else {
+                document.getElementsByClassName(data + 'file_finder')[i].innerHTML = '' +
+                    '<img   style="' + get_class.getAttribute('under_style') + '" ' + 
+                            'alt="' + get_class.getAttribute('under_alt') + '" ' + 
+                            'src="' + get_class.getAttribute('under_src') + '">' +
                 '';
             }
         } else {
@@ -66,18 +66,18 @@ function get_file_state(data, i = 0) {
                     } else {
                         if(
                             document.cookie.match(main_css_regex_data('main_css_image_set')) &&
-                            document.cookie.match(main_css_regex_data('main_css_image_set'))[1] === '0'
+                            document.cookie.match(main_css_regex_data('main_css_image_set'))[1] === '1'
                         ) {
-                            document.getElementsByClassName(data + 'file_finder')[i].innerHTML = '' +
-                                '<img   style="' + get_class.getAttribute('under_style') + '" ' + 
-                                        'alt="' + get_class.getAttribute('under_alt') + '" ' + 
-                                        'src="' + get_class.getAttribute('under_src') + '">' +
-                            '';
-                        } else {
                             document.getElementsByClassName(data + 'file_finder')[i].innerHTML = '' +
                                 '<a href="' + get_class.getAttribute('under_src') + '">(' +
                                     get_class.getAttribute('under_alt') +
                                 ')</a>' +
+                            '';
+                        } else {
+                            document.getElementsByClassName(data + 'file_finder')[i].innerHTML = '' +
+                                '<img   style="' + get_class.getAttribute('under_style') + '" ' + 
+                                        'alt="' + get_class.getAttribute('under_alt') + '" ' + 
+                                        'src="' + get_class.getAttribute('under_src') + '">' +
                             '';
                         }
                     }
