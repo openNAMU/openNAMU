@@ -258,10 +258,11 @@ def table_start(data):
 
     return data
 
-def middle_parser(data, include_num):
+def middle_parser(data):
     global end_data
     global plus_data
     global nowiki_num
+    global include_name
 
     middle_stack = 0
     middle_list = []
@@ -361,11 +362,11 @@ def middle_parser(data, include_num):
                             '<div>' + \
                                 str(folding_data[0]) + ' ' + \
                                 '<div style="display: inline-block;">' + \
-                                    '<a href="javascript:void(0);" onclick="do_open_folding(\'' + include_num + 'folding_' + str(folding_num) + '\', this);">' + \
+                                    '<a href="javascript:void(0);" onclick="do_open_folding(\'' + include_name + 'folding_' + str(folding_num) + '\', this);">' + \
                                         '(+)' + \
                                     '</a>' + \
                                 '</div_2>' + \
-                                '<div id="' + include_num + 'folding_' + str(folding_num) + '" style="display: none;">' + \
+                                '<div id="' + include_name + 'folding_' + str(folding_num) + '" style="display: none;">' + \
                                     '<div id="wiki_div" style="">',
                             data,
                             1
@@ -377,7 +378,7 @@ def middle_parser(data, include_num):
 
                         html_num += 1
 
-                        data = middle_re.sub('<span id="' + include_num + 'render_contect_' + str(html_num) + '">', data, 1)
+                        data = middle_re.sub('<span id="' + include_name + 'render_contect_' + str(html_num) + '">', data, 1)
                     else:
                         middle_list += ['span']
 
@@ -446,17 +447,17 @@ def middle_parser(data, include_num):
             nowiki_data = nowiki_data.groups()
 
             nowiki_num += 1
-            end_data['nowiki_' + str(nowiki_num)] = nowiki_data[0]
+            end_data[include_name + 'nowiki_' + str(nowiki_num)] = nowiki_data[0]
             plus_data += '' + \
-                'if(document.getElementById("nowiki_' + str(nowiki_num) + '")) { ' + \
-                    'document.getElementById("nowiki_' + str(nowiki_num) + '").innerHTML = "' + nowiki_js(nowiki_data[0]) + '"; ' + \
+                'if(document.getElementById("' + include_name + 'nowiki_' + str(nowiki_num) + '")) { ' + \
+                    'document.getElementById("' + include_name + 'nowiki_' + str(nowiki_num) + '").innerHTML = "' + nowiki_js(nowiki_data[0]) + '"; ' + \
                 '}' + \
                 '\n' + \
             ''
 
             data = re.sub(
                 '<code>((?:(?:(?!<\/code>).)*\n*)*)<\/code>',
-                '<span id="nowiki_' + str(nowiki_num) + '"></span>',
+                '<span id="' + include_name + 'nowiki_' + str(nowiki_num) + '"></span>',
                 data,
                 1
             )
@@ -469,17 +470,17 @@ def middle_parser(data, include_num):
             syntax_data = syntax_data.groups()
 
             nowiki_num += 1
-            end_data['nowiki_' + str(nowiki_num)] = syntax_data[1]
+            end_data[include_name + 'nowiki_' + str(nowiki_num)] = syntax_data[1]
             plus_data += '' + \
-                'if(document.getElementById("nowiki_' + str(nowiki_num) + '")) { ' + \
-                    'document.getElementById("nowiki_' + str(nowiki_num) + '").innerHTML = "' + nowiki_js(syntax_data[1]) + '"; ' + \
+                'if(document.getElementById("' + include_name + 'nowiki_' + str(nowiki_num) + '")) { ' + \
+                    'document.getElementById("' + include_name + 'nowiki_' + str(nowiki_num) + '").innerHTML = "' + nowiki_js(syntax_data[1]) + '"; ' + \
                 '}' + \
                 '\n' + \
             ''
 
             data = re.sub(
                 '<code class="((?:(?!"|>|<).)+)">((?:\n*(?:(?:(?!<\/code>|<span id="syntax_).)+)\n*)+)<\/code>',
-                '<code class="' + syntax_data[0] + '"><span id="nowiki_' + str(nowiki_num) + '"></span></code>',
+                '<code class="' + syntax_data[0] + '"><span id="' + include_name + 'nowiki_' + str(nowiki_num) + '"></span></code>',
                 data,
                 1
             )
@@ -494,13 +495,14 @@ def namumark(conn, data, title, include_num):
     global plus_data
     global end_data
     global nowiki_num
+    global include_name
 
     nowiki_num = 0
     data = '\n' + data + '\n'
-    include_num = include_num + '_' if include_num else ''
+    include_name = include_num + '_' if include_num else ''
     plus_data = '' + \
-        'get_link_state("' + include_num + '");\n' + \
-        'get_file_state("' + include_num + '");\n' + \
+        'get_link_state("' + include_name + '");\n' + \
+        'get_file_state("' + include_name + '");\n' + \
     ''
 
     backlink = []
@@ -525,7 +527,7 @@ def namumark(conn, data, title, include_num):
             break
 
     data = data.replace('\\{', '<break_middle>')
-    data = middle_parser(data, include_num)
+    data = middle_parser(data)
     data = data.replace('<break_middle>', '\\{')
 
     first = 0
@@ -545,10 +547,10 @@ def namumark(conn, data, title, include_num):
                 'try {' + \
                     'katex.render(' + \
                         '"' + nowiki_js(html.unescape(math)) + '",' + \
-                        'document.getElementById(\"math_' + str(first) + '\")' + \
+                        'document.getElementById(\"' + include_name + 'math_' + str(first) + '\")' + \
                     ');' + \
                 '} catch {' + \
-                    'document.getElementById(\"math_' + str(first) + '\").innerHTML = "<span style=\'color: red;\'>' + nowiki_js(math) + '</span>";' + \
+                    'document.getElementById(\"' + include_name + 'math_' + str(first) + '\").innerHTML = "<span style=\'color: red;\'>' + nowiki_js(math) + '</span>";' + \
                 '}\n' + \
             ''
         else:
@@ -561,15 +563,15 @@ def namumark(conn, data, title, include_num):
             one_nowiki = one_nowiki.groups()
 
             nowiki_num += 1
-            end_data['nowiki_' + str(nowiki_num)] = one_nowiki[0]
+            end_data[include_name + 'nowiki_' + str(nowiki_num)] = one_nowiki[0]
             plus_data += '' + \
-                'if(document.getElementById("nowiki_' + str(nowiki_num) + '")) { ' + \
-                    'document.getElementById("nowiki_' + str(nowiki_num) + '").innerHTML = "' + nowiki_js(one_nowiki[0]) + '"; ' + \
+                'if(document.getElementById("' + include_name + 'nowiki_' + str(nowiki_num) + '")) { ' + \
+                    'document.getElementById("' + include_name + 'nowiki_' + str(nowiki_num) + '").innerHTML = "' + nowiki_js(one_nowiki[0]) + '"; ' + \
                 '}' + \
                 '\n' + \
             ''
 
-            data = re.sub(r'(?:\\\\)(.)', '<span id="nowiki_' + str(nowiki_num) + '"></span>', data, 1)
+            data = re.sub(r'(?:\\\\)(.)', '<span id="' + include_name + 'nowiki_' + str(nowiki_num) + '"></span>', data, 1)
         else:
             break
 
@@ -592,8 +594,8 @@ def namumark(conn, data, title, include_num):
             backlink += [[title, include_link, 'include']]
 
             data = include_re.sub('' + \
-                '<a id="include_link" class="include_' + str(i) + '" href="/w/' + tool.url_pas(include_link) + '">(' + include_link + ')</a>' + \
-                '<div id="include_' + str(i) + '"></div>' + \
+                '<a id="' + include_name + 'include_link" class="include_' + str(i) + '" href="/w/' + tool.url_pas(include_link) + '">(' + include_link + ')</a>' + \
+                '<div id="' + include_name + 'include_' + str(i) + '"></div>' + \
             '', data, 1)
 
             include_plus_data = []
@@ -613,7 +615,7 @@ def namumark(conn, data, title, include_num):
                 else:
                     break
 
-            plus_data += 'load_include("' + include_link + '", "include_' + str(i) + '", ' + str(include_plus_data) + ');\n'
+            plus_data += 'load_include("' + include_link + '", "' + include_name + 'include_' + str(i) + '", ' + str(include_plus_data) + ');\n'
         else:
             break
 
@@ -1021,7 +1023,7 @@ def namumark(conn, data, title, include_num):
                 data = link_re.sub(
                     '<span style="' + file_align + '">' + \
                         '<span  style="' + file_color + '"' + \
-                                'class="' + include_num + 'file_finder" ' + \
+                                'class="' + include_name + 'file_finder" ' + \
                                 'under_style="' + file_style + '" ' + \
                                 'under_alt="' + file_alt + '" ' + \
                                 'under_src="' + file_src + '" ' + \
@@ -1045,7 +1047,7 @@ def namumark(conn, data, title, include_num):
                     see_link = see_link.replace('#blur', '')
 
                 backlink += [[title, main_link, 'cat']]
-                category += '<a class="' + include_num + 'link_finder' + link_id + '" href="/w/' + tool.url_pas(main_link) + '">' + category_re.sub('', see_link) + '</a> | '
+                category += '<a class="' + include_name + 'link_finder' + link_id + '" href="/w/' + tool.url_pas(main_link) + '">' + category_re.sub('', see_link) + '</a> | '
 
                 data = link_re.sub('', data, 1)
             elif re.search(r'^wiki:', main_link):
@@ -1116,7 +1118,7 @@ def namumark(conn, data, title, include_num):
 
                             data = re.sub(
                                 '\[\[((?:(?!\[\[|\]\]|<\/td>).)+)\]\]',
-                                '<a class="' + include_num + 'link_finder" ' + \
+                                '<a class="' + include_name + 'link_finder" ' + \
                                     'title="' + html.escape(main_link) + other_link + '" ' + \
                                     'href="/w/' + tool.url_pas(main_link) + other_link + '"' + \
                                 '>' + see_link + '</a>',
@@ -1172,10 +1174,10 @@ def namumark(conn, data, title, include_num):
 
                     footdata_all += '' + \
                         '<li>' + \
-                            '<a href="javascript:do_open_foot(\'' + include_num + 'fn-' + str(footdata[0]) + '\', 1);" ' + \
-                                'id="' + include_num + 'cfn-' + str(footdata[0]) + '">' + \
+                            '<a href="javascript:do_open_foot(\'' + include_name + 'fn-' + str(footdata[0]) + '\', 1);" ' + \
+                                'id="' + include_name + 'cfn-' + str(footdata[0]) + '">' + \
                                 '(' + footdata[1] + ')' + \
-                            '</a> <span id="' + include_num + 'fn-' + str(footdata[0]) + '">' + footdata_in + '</span>' + \
+                            '</a> <span id="' + include_name + 'fn-' + str(footdata[0]) + '">' + footdata_in + '</span>' + \
                         '</li>' + \
                     ''
 
@@ -1197,11 +1199,11 @@ def namumark(conn, data, title, include_num):
 
                         data = re_footnote.sub('' + \
                             '<sup>' + \
-                                '<a href="javascript:do_open_foot(\'' + include_num + 'fn-' + footshort + '\', 0);" ' + \
-                                    'id="' + include_num + 'rfn-' + footshort + '">' + \
+                                '<a href="javascript:do_open_foot(\'' + include_name + 'fn-' + footshort + '\', 0);" ' + \
+                                    'id="' + include_name + 'rfn-' + footshort + '">' + \
                                     '(' + footnote_name + ')' + \
                                 '</a>' + \
-                            '</sup><span id="' + include_num + 'dfn-' + footshort + '"></span>' + \
+                            '</sup><span id="' + include_name + 'dfn-' + footshort + '"></span>' + \
                         '', data, 1)
                     else:
                         data = re_footnote.sub('<sup><a href="javascript:void(0);">(' + footnote_name + ')</a></sup>', data, 1)
@@ -1222,11 +1224,11 @@ def namumark(conn, data, title, include_num):
 
                     data = re_footnote.sub('' + \
                         '<sup>' + \
-                            '<a href="javascript:do_open_foot(\'' + include_num + 'fn-' + str(footnote_number) + '\', 0);" ' + \
-                                'id="' + include_num + 'rfn-' + str(footnote_number) + '">' + \
+                            '<a href="javascript:do_open_foot(\'' + include_name + 'fn-' + str(footnote_number) + '\', 0);" ' + \
+                                'id="' + include_name + 'rfn-' + str(footnote_number) + '">' + \
                                 '(' + footnote_name + ')' + \
                             '</a>' + \
-                        '</sup><span id="' + include_num + 'dfn-' + str(footnote_number) + '"></span>' + \
+                        '</sup><span id="' + include_name + 'dfn-' + str(footnote_number) + '"></span>' + \
                     '', data, 1)
         else:
             break
@@ -1243,10 +1245,10 @@ def namumark(conn, data, title, include_num):
 
         footdata_all += '' + \
             '<li>' + \
-                '<a href="javascript:do_open_foot(\'' + include_num + 'fn-' + str(footdata[0]) + '\', 1);" ' + \
-                    'id="' + include_num + 'cfn-' + str(footdata[0]) + '">' + \
+                '<a href="javascript:do_open_foot(\'' + include_name + 'fn-' + str(footdata[0]) + '\', 1);" ' + \
+                    'id="' + include_name + 'cfn-' + str(footdata[0]) + '">' + \
                     '(' + str(footdata[1]) + ')' + \
-                '</a> <span id="' + include_num + 'fn-' + str(footdata[0]) + '">' + footdata_in + '</span>' + \
+                '</a> <span id="' + include_name + 'fn-' + str(footdata[0]) + '">' + footdata_in + '</span>' + \
             '</li>' + \
         ''
 
@@ -1285,6 +1287,6 @@ def namumark(conn, data, title, include_num):
     data = re.sub(r'\n<\/ul>', '</ul>', data)
     data = re.sub(r'\n', '<br>', data)
 
-    plus_data = 'render_html("' + include_num + 'render_contect");\n' + plus_data
+    plus_data = 'render_html("' + include_name + 'render_contect");\n' + plus_data
 
     return [data, plus_data, backlink]
