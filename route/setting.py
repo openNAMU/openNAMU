@@ -3,7 +3,7 @@ from .tool.func import *
 def setting_2(conn, num):
     curs = conn.cursor()
 
-    if num != 0 and admin_check() != 1:
+    if not (num == 0 or num == 8) and admin_check() != 1:
         return re_error('/ban')
 
     if num == 0:
@@ -565,19 +565,25 @@ def setting_2(conn, num):
         }
 
         if flask.request.method == 'POST':
-            for i in i_list:
-                curs.execute(db_change("update other set data = ? where name = ?"), [
-                    flask.request.form.get(i_list[i], 'normal'),
-                    i_list[i]
-                ])
+            if admin_check(None, 'edit_set') != 1:
+                return re_error('/ban')
+            else:
+                for i in i_list:
+                    curs.execute(db_change("update other set data = ? where name = ?"), [
+                        flask.request.form.get(i_list[i], 'normal'),
+                        i_list[i]
+                    ])
 
-            conn.commit()
+                conn.commit()
 
-            admin_check(None, 'edit_set')
-
-            return redirect('/setting/8')
+                return redirect('/setting/8')
         else:
             d_list = {}
+
+            if admin_check() != 1:
+                disable = 'disabled'
+            else:
+                disable = ''
 
             for i in i_list:
                 curs.execute(db_change('select data from other where name = ?'), [i_list[i]])
@@ -613,27 +619,27 @@ def setting_2(conn, num):
                         <hr>
                         <span>''' + load_lang('document_acl') + '''</span> 
                         <hr class=\"main_hr\">
-                        <select name="edit">''' + acl_div[0] + '''</select>
+                        <select ''' + disable + ''' name="edit">''' + acl_div[0] + '''</select>
                         <hr>
                         <span>''' + load_lang('discussion_acl') + '''</span>
                         <hr class=\"main_hr\">
-                        <select name="discussion">''' + acl_div[1] + '''</select>
+                        <select ''' + disable + ''' name="discussion">''' + acl_div[1] + '''</select>
                         <hr>
                         <span>''' + load_lang('upload_acl') + '''</span>
                         <hr class=\"main_hr\">
-                        <select name="upload_acl">''' + acl_div[2] + '''</select>
+                        <select ''' + disable + ''' name="upload_acl">''' + acl_div[2] + '''</select>
                         <hr>
                         <span>''' + load_lang('view_acl') + '''</span>
                         <hr class=\"main_hr\">
-                        <select name="all_view_acl">''' + acl_div[3] + '''</select>
+                        <select ''' + disable + ''' name="all_view_acl">''' + acl_div[3] + '''</select>
                         <hr>
                         <span>''' + load_lang('edit_req_acl') + '''</span>
                         <hr class=\"main_hr\">
-                        <select name="edit_req_acl">''' + acl_div[4] + '''</select>
+                        <select ''' + disable + ''' name="edit_req_acl">''' + acl_div[4] + '''</select>
                         <hr>
                         <span>''' + load_lang('many_upload_acl') + '''</span>
                         <hr class=\"main_hr\">
-                        <select name="many_upload_acl">''' + acl_div[5] + '''</select>
+                        <select ''' + disable + ''' name="many_upload_acl">''' + acl_div[5] + '''</select>
                         <hr>
                         <button id="save" type="submit">''' + load_lang('save') + '''</button>
                     </form>

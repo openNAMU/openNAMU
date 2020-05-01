@@ -135,6 +135,7 @@ def give_acl_2(conn, name):
             imp = [name, wiki_set(), custom(), other2([' (' + load_lang('acl') + ')', 0])],
             data =  '''
                 <form method="post">
+                    <a href="/setting/8">(''' + load_lang('main_acl_setting') + ''')</a>
                     ''' + data + '''
                     <hr class=\"main_hr\">
                     <button type="submit" ''' + check_ok + '''>''' + load_lang('save') + '''</button>
