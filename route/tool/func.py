@@ -496,7 +496,7 @@ def other2(data):
         data += ['']
 
     req_list = ''
-    main_css_ver = 42
+    main_css_ver = 43
 
     if not 'main_css_load' in flask.session or not 'main_css_ver' in flask.session or flask.session['main_css_ver'] != main_css_ver:
         for i_data in os.listdir(os.path.join("views", "main_css", "css")):
@@ -1161,7 +1161,7 @@ def re_error(data):
             imp = [load_lang('error'), wiki_set(1), custom(), other2([0, 0])],
             data = '<h2>' + load_lang('error') + '</h2>' + end,
             menu = 0
-        ))
+        )), 401
     else:
         num = int(number_check(data.replace('/error/', '')))
         if num == 1:
@@ -1245,4 +1245,4 @@ def re_error(data):
                 imp = [load_lang('error'), wiki_set(1), custom(), other2([0, 0])],
                 data = '<h2>' + load_lang('error') + '</h2><ul><li>' + data + '</li></ul>',
                 menu = 0
-            )), 401
+            )), 400

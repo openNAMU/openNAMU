@@ -86,11 +86,17 @@ function pasteListener(e) {
                 );
             } else {
                 console.error("[ERROR] PasteUpload Fail :", res.statusText);
-                alert("클립보드의 이미지를 업로드하는데 실패했습니다. 파일 이름 중복일 수 있습니다.");
+                if(res.status === 400) {
+                    alert("클립보드의 이미지를 업로드하는데 실패했습니다. 파일 이름 중복일 수 있습니다.");
+                } else if(res.status === 401) {
+                    alert("클립보드의 이미지를 업로드하는데 실패했습니다. 권한 부족일 수 있습니다.");    
+                } else {
+                    alert("클립보드의 이미지를 업로드하는데 실패했습니다.");        
+                }
             }
         }).catch((err) => {
             console.error("[ERROR] PasteUpload Fail :", JSON.stringify(err), err);
-            alert("클립보드의 이미지를 업로드하는데 실패했습니다. 파일 이름 중복일 수 있습니다.");
+            alert("클립보드의 이미지를 업로드하는데 실패했습니다. 서버가 응답하지 않습니다.");
         });
     }
 }
