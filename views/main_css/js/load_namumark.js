@@ -1,8 +1,6 @@
 function get_link_state(data, i = 0) { 
     var get_class = document.getElementsByClassName(data + 'link_finder')[i];
     if(get_class) {
-        get_link_state(data, i + 1);
-
         var xhr = new XMLHttpRequest();
         xhr.open(
             "GET", 
@@ -20,14 +18,14 @@ function get_link_state(data, i = 0) {
                 }
             }
         }
+
+        get_link_state(data, i + 1);
     }
 }
 
 function get_file_state(data, i = 0) {       
     var get_class = document.getElementsByClassName(data + 'file_finder')[i];
-    if(get_class) {        
-        get_file_state(data, i + 1);
-    
+    if(get_class) {            
         if(get_class.getAttribute('under_href') === 'out_link') {
             if(
                 document.cookie.match(main_css_regex_data('main_css_image_set')) &&
@@ -84,6 +82,8 @@ function get_file_state(data, i = 0) {
                 }
             }
         }
+
+        get_file_state(data, i + 1);
     }
 }
 
@@ -106,7 +106,9 @@ function load_include(title, name, p_data) {
                 document.getElementsByClassName(name)[0].id = "not_thing";
             } else {
                 var o_p_data = JSON.parse(this.responseText);
+                
                 document.getElementById(name).innerHTML = o_p_data['data'];
+                
                 eval(o_p_data['js_data']);
             }
         }
@@ -123,13 +125,10 @@ function page_count() {
     xhr.onreadystatechange = function() {
         if(this.readyState === 4 && this.status === 200) {
             var i = 0;
-            while(1) {
-                if(document.getElementsByClassName('all_page_count')[i]) {
-                    document.getElementsByClassName('all_page_count')[i].innerHTML = JSON.parse(this.responseText)['count'];
-                    i += 1;
-                } else {
-                    break;
-                }
+            while(document.getElementsByClassName('all_page_count')[i]) {
+                document.getElementsByClassName('all_page_count')[i].innerHTML = JSON.parse(this.responseText)['count'];
+                
+                i += 1;
             }
         }
     }
