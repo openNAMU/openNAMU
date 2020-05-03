@@ -127,13 +127,19 @@ def give_acl_2(conn, name):
 
             if check_ok == '':
                 if acl_data:
-                    data += '<hr class=\"main_hr\"><input value="' + html.escape(acl_data[0][1]) + '" placeholder="' + load_lang('why') + '" name="why" type="text" ' + check_ok + '>'
+                    data += '' + \
+                        '<hr class=\"main_hr\">' + \
+                        '<input value="' + html.escape(acl_data[0][1]) + '" placeholder="' + load_lang('why') + '" name="why" type="text" ' + check_ok + '>' + \
+                    ''
                 else:
-                    data += '<hr class=\"main_hr\"><input placeholder="' + load_lang('why') + '" name="why" type="text" ' + check_ok + '>'
+                    data += '' + \
+                        '<hr class=\"main_hr\">' + \
+                        '<input placeholder="' + load_lang('why') + '" name="why" type="text" ' + check_ok + '>' + \
+                    ''
 
         return easy_minify(flask.render_template(skin_check(),
             imp = [name, wiki_set(), custom(), other2([' (' + load_lang('acl') + ')', 0])],
-            data =  '''
+            data = '''
                 <form method="post">
                     <a href="/setting/8">(''' + load_lang('main_acl_setting') + ''')</a>
                     ''' + data + '''

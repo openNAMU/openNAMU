@@ -601,7 +601,7 @@ def view_read(name = None):
     return view_read_2(conn, name)
 
 @app.route('/topic_record/<name>')
-def list_user_topic(name = None):
+def list_user_topic(name = 'test'):
     return list_user_topic_2(conn, name)
 
 @app.route('/recent_changes')
