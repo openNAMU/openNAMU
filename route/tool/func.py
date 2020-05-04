@@ -546,6 +546,7 @@ def cut_100(data):
 def wiki_set(num = 1):
     if num == 1:
         data_list = []
+        skin_name = skin_check(1)
 
         curs.execute(db_change('select data from other where name = ?'), ['name'])
         db_data = curs.fetchall()
@@ -563,12 +564,16 @@ def wiki_set(num = 1):
 
         data_list += ['', '']
 
-        curs.execute(db_change('select data from other where name = "logo"'))
+        curs.execute(db_change('select data from other where name = "logo" and coverage = ?'), [skin_name])
         db_data = curs.fetchall()
         if db_data and db_data[0][0] != '':
             data_list += [db_data[0][0]]
         else:
-            data_list += [data_list[0]]
+            curs.execute(db_change('select data from other where name = "logo" and coverage = ""'))
+            if db_data and db_data[0][0] != '':
+                data_list += [db_data[0][0]]
+            else:
+                data_list += [data_list[0]]
 
         head_data = ''
 
@@ -577,7 +582,7 @@ def wiki_set(num = 1):
         if db_data and db_data[0][0] != '':
             head_data += db_data[0][0]
 
-        curs.execute(db_change("select data from other where name = 'head' and coverage = ?"), [skin_check(1)])
+        curs.execute(db_change("select data from other where name = 'head' and coverage = ?"), [skin_name])
         db_data = curs.fetchall()
         if db_data and db_data[0][0] != '':
             head_data += db_data[0][0]
