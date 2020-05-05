@@ -570,6 +570,7 @@ def wiki_set(num = 1):
             data_list += [db_data[0][0]]
         else:
             curs.execute(db_change('select data from other where name = "logo" and coverage = ""'))
+            db_data = curs.fetchall()
             if db_data and db_data[0][0] != '':
                 data_list += [db_data[0][0]]
             else:
