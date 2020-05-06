@@ -765,7 +765,7 @@ def setting_2(conn, num):
                 end_data += '' + \
                     '<span>' + load_lang('wiki_logo') + ' ' + ('(' + skin_list[i] + ')' if skin_list[i] != 0 else '') + ' (HTML)' + \
                     '<hr class="main_hr">' + \
-                    '<input name="' + (skin_list[i] if skin_list[i] != 0 else 'main_css') + '" value="' + d_list[i] + '">' + \
+                    '<input name="' + (skin_list[i] if skin_list[i] != 0 else 'main_css') + '" value="' + html.escape(d_list[i]) + '">' + \
                     '<hr class="main_hr">' + \
                 ''
             
