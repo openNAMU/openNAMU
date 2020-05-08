@@ -389,7 +389,7 @@ def setting_2(conn, num):
                 data = '''
                     <form method="post">
                         ''' + start + '''
-                        <textarea rows="25" name="content" id="content">''' + html.escape(data) + '''</textarea>
+                        <textarea rows="25" placeholder="''' + load_lang('enter_html') + '''" name="content" id="content">''' + html.escape(data) + '''</textarea>
                         <hr class="main_hr">
                         <button id="save" type="submit">''' + load_lang('save') + '''</button>
                         ''' + plus + '''

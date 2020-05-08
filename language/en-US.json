@@ -356,6 +356,7 @@
         "approval_question_visible_only_when_approval_on" : "Approval questions are visible only when approval requirement is on",
         "oauth_explain" : "To use the OAuth login feature, you must set the 'publish_url' value to a domain address that includes the HTTPS protocol, and actually support HTTPS connections.",
         "msg_whatchlist_lmt": "You can add as many as",
+        "enter_html" : "Please enter HTML",
         "_comment_3.1_" : "Error",
             "update_error" : "Auto update is not supported.",
             "inter_error" : "Internal error.",
