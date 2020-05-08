@@ -357,6 +357,7 @@
         "oauth_explain" : "To use the OAuth login feature, you must set the 'publish_url' value to a domain address that includes the HTTPS protocol, and actually support HTTPS connections.",
         "msg_whatchlist_lmt": "You can add as many as",
         "enter_html" : "Please enter HTML",
+        "exp_edit_conflict" : "Editing conflict occurred",
         "_comment_3.1_" : "Error",
             "update_error" : "Auto update is not supported.",
             "inter_error" : "Internal error.",

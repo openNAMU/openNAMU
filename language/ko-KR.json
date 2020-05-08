@@ -364,5 +364,6 @@
     "link_in_this" : "이 문서의 링크",
     "star_doc" : "관심 문서",
     "add_star_doc" : "관심 문서 추가",
-    "enter_html" : "HTML을 입력하세요."
+    "enter_html" : "HTML을 입력하세요.",
+    "exp_edit_conflict" : "편집 충돌 발생"
 }

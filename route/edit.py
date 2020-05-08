@@ -11,7 +11,15 @@ def edit_2(conn, name):
     if acl_check(name) == 1:
         return re_error('/ban')
     
+    edit_repeat = 0
     if flask.request.method == 'POST':
+        edit_repeat = 1
+        curs.execute(db_change("select id from history where title = ? order by id + 0 desc"), [name])
+        old = curs.fetchall()
+        if old and flask.request.form.get('ver', '') != old[0][0]:
+            edit_repeat = 2
+    
+    if edit_repeat == 1:
         if captcha_post(flask.request.form.get('g-recaptcha-response', flask.request.form.get('g-recaptcha', ''))) == 1:
             return re_error('/error/13')
         else:
@@ -65,12 +73,11 @@ def edit_2(conn, name):
                 content = c_data
 
             leng = leng_check(len(o_data), len(content))
+            
+            curs.execute(db_change("update data set data = ? where title = ?"), [content, name])
         else:
             leng = '+' + str(len(content))
 
-        if old:
-            curs.execute(db_change("update data set data = ? where title = ?"), [content, name])
-        else:
             curs.execute(db_change("insert into data (title, data) values (?, ?)"), [name, content])
 
             curs.execute(db_change('select data from other where name = "count_all_title"'))
@@ -106,7 +113,7 @@ def edit_2(conn, name):
         
         return redirect('/w/' + url_pas(name))
     else:
-        curs.execute(db_change("select data from data where title = ?"), [name])
+        curs.execute(db_change("select data, id from history where title = ? order by id + 0 desc"), [name])
         old = curs.fetchall()
         if old:
             if section:
@@ -124,6 +131,21 @@ def edit_2(conn, name):
             data = ''
             
         data_old = data
+        if edit_repeat == 2:
+            data = flask.request.form.get('content', '')
+        
+            warring_edit = load_lang('exp_edit_conflict') + ' '
+
+            if flask.request.form.get('ver', '0') == '0':
+                warring_edit += '<a href="/raw/' + url_pas(name) + '">(r' + old[0][1] + ')</a>'
+            else:
+                warring_edit += '' + \
+                    '<a href="/diff/' + url_pas(name) + '?first=' + flask.request.form.get('ver', '1') + '&second=' + old[0][1] + '">(r' + old[0][1] + ')</a>' + \
+                ''
+
+            warring_edit += '<hr class="main_hr">'
+        else:
+            warring_edit = ''
 
         get_name = ''
         if not section and not flask.request.args.get('plus', None):
@@ -133,7 +155,7 @@ def edit_2(conn, name):
             
         get_name += '' + \
             '<a href="/edit_filter">(' + load_lang('edit_filter_rule') + ')</a>' + \
-            '<hr class=\"main_hr\">' + \
+            '<hr class="main_hr">' + \
         ''
             
         if flask.request.args.get('plus', None):
@@ -152,15 +174,15 @@ def edit_2(conn, name):
 
         curs.execute(db_change('select data from other where name = "edit_bottom_text"'))
         sql_d = curs.fetchall()
-        b_text = ('<hr class=\"main_hr\">' + sql_d[0][0]) if sql_d and sql_d[0][0] != '' else ''
+        b_text = ('<hr class="main_hr">' + sql_d[0][0]) if sql_d and sql_d[0][0] != '' else ''
         
         curs.execute(db_change('select data from other where name = "copyright_checkbox_text"'))
         sql_d = curs.fetchall()
         if sql_d and sql_d[0][0] != '':
             cccb_text = '' + \
-                '<hr class=\"main_hr\">' + \
+                '<hr class="main_hr">' + \
                 '<input type="checkbox" name="copyright_agreement" value="yes"> ' + sql_d[0][0] + \
-                '<hr class=\"main_hr\">' + \
+                '<hr class="main_hr">' + \
             ''
         else:
             cccb_text = ''
@@ -180,19 +202,20 @@ def edit_2(conn, name):
                         do_paste_image();
                         do_not_out();
                     </script>
-                    <div class="get_is_recently"></div>
                     ''' + edit_button() + '''
+                    ''' + warring_edit + '''
                     <textarea id="content" class="content" placeholder="''' + p_text + '''" name="content">''' + html.escape(data) + '''</textarea>
                     <textarea id="origin" name="o_content">''' + html.escape(data_old) + '''</textarea>
-                    <hr class=\"main_hr\">
+                    <hr class="main_hr">
                     <input placeholder="''' + load_lang('why') + '''" name="send" type="text">
-                    <hr class=\"main_hr\">
+                    <input id="origin" name="ver" value="''' + (old[0][1] if old else '0') + '''">
+                    <hr class="main_hr">
                     ''' + captcha_get() + ip_warring() + cccb_text + '''
                     <button id="save" type="submit" onclick="save_stop_exit();">''' + save_button + '''</button>
                     <button id="preview" type="button" onclick="load_preview(\'''' + url_pas(name) + '\')">' + load_lang('preview') + '''</button>
                 </form>
                 ''' + b_text + '''
-                <hr class=\"main_hr\">
+                <hr class="main_hr">
                 <div id="see_preview"></div>
             ''',
             menu = [['w/' + url_pas(name), load_lang('return')]] + menu_plus
