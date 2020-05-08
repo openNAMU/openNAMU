@@ -559,7 +559,6 @@ def setting_2(conn, num):
             2 : 'discussion',
             3 : 'upload_acl',
             4 : 'all_view_acl',
-            5 : 'edit_req_acl',
             6 : 'many_upload_acl'
         }
 
@@ -631,10 +630,6 @@ def setting_2(conn, num):
                         <span>''' + load_lang('view_acl') + '''</span>
                         <hr class="main_hr">
                         <select ''' + disable + ''' name="all_view_acl">''' + acl_div[3] + '''</select>
-                        <hr class="main_hr">
-                        <span>''' + load_lang('edit_req_acl') + '''</span>
-                        <hr class="main_hr">
-                        <select ''' + disable + ''' name="edit_req_acl">''' + acl_div[4] + '''</select>
                         <hr class="main_hr">
                         <span>''' + load_lang('many_upload_acl') + '''</span>
                         <hr class="main_hr">

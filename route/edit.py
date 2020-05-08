@@ -8,11 +8,8 @@ def edit_2(conn, name):
     if section:
         section = int(number_check(section))
 
-    curs.execute(db_change("select data from data where title = ?"), [name])
-    old = curs.fetchall()
-
     if acl_check(name) == 1:
-        return redirect('/edit_req/' + url_pas(name))
+        return re_error('/ban')
     
     if flask.request.method == 'POST':
         if captcha_post(flask.request.form.get('g-recaptcha-response', flask.request.form.get('g-recaptcha', ''))) == 1:
@@ -38,6 +35,8 @@ def edit_2(conn, name):
         if copyright_checkbox_text_d and copyright_checkbox_text_d[0][0] != '' and flask.request.form.get('copyright_agreement', '') != 'yes':
             return re_error('/error/29')
         
+        curs.execute(db_change("select data from data where title = ?"), [name])
+        old = curs.fetchall()
         if old:  
             o_data = old[0][0].replace('\r\n', '\n')
 
@@ -51,7 +50,7 @@ def edit_2(conn, name):
                         self.counter -= 1
 
                         if self.counter == 0:
-                            return '\n' + self.change
+                            return '\n' + self.change + '\n'
                         else:
                             return '\n' + match[1]
 
@@ -107,10 +106,11 @@ def edit_2(conn, name):
         
         return redirect('/w/' + url_pas(name))
     else:
+        curs.execute(db_change("select data from data where title = ?"), [name])
+        old = curs.fetchall()
         if old:
             if section:
                 data = html.escape('\n' + old[0][0].replace('\r\n', '\n'))
-                
                 data = re.sub(r'\n(?P<in>={1,6})', '<br>\g<in>', data)
 
                 section_data = re.findall(r'<br>((?:(?:(?!<br>).)*\n*)*)', data)
@@ -122,20 +122,19 @@ def edit_2(conn, name):
                 data = old[0][0].replace('\r\n', '\n')
         else:
             data = ''
-
+            
         data_old = data
 
-        if section:
-            get_name = '' + \
-                '<a href="/edit_filter">(' + load_lang('edit_filter_rule') + ')</a>' + \
-                '<hr class=\"main_hr\">' + \
-            ''
-        else:
-            get_name = '' + \
+        get_name = ''
+        if not section and not flask.request.args.get('plus', None):
+            get_name += '' + \
                 '<a href="/manager/15?plus=' + url_pas(name) + '">(' + load_lang('load') + ')</a> ' + \
-                '<a href="/edit_filter">(' + load_lang('edit_filter_rule') + ')</a>' + \
-                '<hr class=\"main_hr\">' + \
             ''
+            
+        get_name += '' + \
+            '<a href="/edit_filter">(' + load_lang('edit_filter_rule') + ')</a>' + \
+            '<hr class=\"main_hr\">' + \
+        ''
             
         if flask.request.args.get('plus', None):
             curs.execute(db_change("select data from data where title = ?"), [flask.request.args.get('plus', 'test')])
@@ -153,10 +152,7 @@ def edit_2(conn, name):
 
         curs.execute(db_change('select data from other where name = "edit_bottom_text"'))
         sql_d = curs.fetchall()
-        if sql_d and sql_d[0][0] != '':
-            b_text = '<hr class=\"main_hr\">' + sql_d[0][0]
-        else:
-            b_text = ''
+        b_text = ('<hr class=\"main_hr\">' + sql_d[0][0]) if sql_d and sql_d[0][0] != '' else ''
         
         curs.execute(db_change('select data from other where name = "copyright_checkbox_text"'))
         sql_d = curs.fetchall()
@@ -171,19 +167,20 @@ def edit_2(conn, name):
 
         curs.execute(db_change('select data from other where name = "edit_help"'))
         sql_d = curs.fetchall()
-        if sql_d and sql_d[0][0] != '':
-            p_text = sql_d[0][0]
-        else:
-            p_text = load_lang('defalut_edit_help')
+        p_text = sql_d[0][0] if sql_d and sql_d[0][0] != '' else load_lang('defalut_edit_help')
 
-        data = re.sub(r'\n$', '', data)
-        data_old = re.sub(r'\n$', '', data_old)
+        data = re.sub(r'\n+$', '', data)
+        data_old = re.sub(r'\n+$', '', data_old)
 
         return easy_minify(flask.render_template(skin_check(), 
             imp = [name, wiki_set(), custom(), other2([' (' + sub + ')', 0])],
             data =  get_name + '''
                 <form method="post">
-                    <script>do_paste_image();</script>
+                    <script>
+                        do_paste_image();
+                        do_not_out();
+                    </script>
+                    <div class="get_is_recently"></div>
                     ''' + edit_button() + '''
                     <textarea id="content" class="content" placeholder="''' + p_text + '''" name="content">''' + html.escape(data) + '''</textarea>
                     <textarea id="origin" name="o_content">''' + html.escape(data_old) + '''</textarea>

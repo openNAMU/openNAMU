@@ -93,11 +93,7 @@ def recent_changes_2(conn, name, tool):
             else:
                 plus_sql = 'where '
 
-            if set_type == 'req':
-                plus_sql = 'where type = "req" '
-                sub += ' (' + load_lang('edit_req') + ')'
-            else:
-                plus_sql += 'type = "" '
+            plus_sql += 'type = "" '
             
             if set_type == 'user':
                 plus_sql = 'where title like "user:%" '
@@ -158,11 +154,8 @@ def recent_changes_2(conn, name, tool):
             if tool == 'history':
                 title = '<a href="/w/' + url_pas(name) + '?num=' + data[0] + '">r' + data[0] + '</a> '
             else:
-                if not name and set_type == 'req':
-                    title = '<a href="/edit_req/' + url_pas(data[1]) + '?r=' + data[0] + '">' + html.escape(data[1]) + ' (r' + data[0] + ')</a> '
-                else:
-                    title = '<a href="/w/' + url_pas(data[1]) + '">' + html.escape(data[1]) + '</a> '
-                    title += '<a href="/history/' + url_pas(data[1]) + '">(r' + data[0] + ')</a> '
+                title = '<a href="/w/' + url_pas(data[1]) + '">' + html.escape(data[1]) + '</a> '
+                title += '<a href="/history/' + url_pas(data[1]) + '">(r' + data[0] + ')</a> '
 
             div += '''
                 <tr ''' + style[0] + '''>
@@ -215,7 +208,6 @@ def recent_changes_2(conn, name, tool):
             div = '' + \
                 '<a href="?set=normal">(' + load_lang('normal') + ')</a> ' + \
                 '<a href="?set=user">(' + load_lang('user_document') + ')</a> ' + \
-                '<a href="?set=req">(' + load_lang('edit_req') + ')</a> ' + \
                 '<a href="?set=move">(' + load_lang('move') + ')</a> ' + \
                 '<a href="?set=delete">(' + load_lang('delete') + ')</a> ' + \
                 '<a href="?set=revert">(' + load_lang('revert') + ')</a>' + \

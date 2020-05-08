@@ -871,9 +871,8 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
 
         return 1
 
-    if tool == '' or tool == 'edit_req':
-        if acl_check(name, 'render') == 1:
-            return 1
+    if tool == '' and acl_check(name, 'render') == 1:
+        return 1
     
     if tool == '':
         end = 3
@@ -917,10 +916,6 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
             num = 5
         elif tool == 'many_upload':
             curs.execute(db_change("select data from other where name = 'many_upload_acl'"))
-
-            num = 5
-        elif tool == 'edit_req':
-            curs.execute(db_change("select data from other where name = 'edit_req_acl'"))
 
             num = 5
         else:
