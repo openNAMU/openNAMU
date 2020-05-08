@@ -462,10 +462,6 @@ def edit_revert(name = None):
 def edit(name = 'Test'):
     return edit_2(conn, name)
 
-@app.route('/edit_req/<everything:name>', methods=['POST', 'GET'])
-def edit_req(name = 'Test'):
-    return edit_req_2(conn, name)
-
 @app.route('/backlink_reset/<everything:name>')
 def edit_backlink_reset(name = 'Test'):
     return edit_backlink_reset_2(conn, name)

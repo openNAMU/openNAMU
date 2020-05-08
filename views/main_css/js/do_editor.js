@@ -17,23 +17,23 @@ function do_insert_data(name, data) {
 }
 
 function do_not_out() {
-    window.onbeforeunload = function() {
-        data = document.getElementById('content').value;
-        origin = document.getElementById('origin').value;
-        if(data !== origin) {
-            return '';
+    window.addEventListener('DOMContentLoaded', function() {
+        window.onbeforeunload = function() {
+            data = document.getElementById('content').value;
+            origin = document.getElementById('origin').value;
+            if(data !== origin) {
+                return '';
+            }
         }
-    }
+    });
 }
 
 function save_stop_exit() {
-    window.onbeforeunload = function () { }
+    window.onbeforeunload = function () {}
 }
 
 function do_paste_image() {
     window.addEventListener('DOMContentLoaded', function() {
-        do_not_out();
-
         if(
             document.cookie.match(main_css_regex_data('main_css_image_paste')) &&
             document.cookie.match(main_css_regex_data('main_css_image_paste'))[1] === '1'
