@@ -27,8 +27,6 @@ def setting_2(conn, num):
             x += 1
             li_data += '<li><a href="/setting/' + str(x) + '">' + li + '</a></li>'
 
-        li_data += '<li><a href="/adsense_setting">'+ load_lang('adsense_setting') + '</a></li>'
-
         return easy_minify(flask.render_template(skin_check(),
             imp = [load_lang('setting'), wiki_set(), custom(), other2([0, 0])],
             data = '<h2>' + load_lang('list') + '</h2><ul>' + li_data + '</ul>',
