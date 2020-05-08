@@ -275,12 +275,6 @@ if not rep_data:
 else:
     rep_key = rep_data[0][0]
 
-curs.execute(db_change('select data from other where name = "adsense"'))
-adsense_result = curs.fetchall()
-if not adsense_result:
-    curs.execute(db_change('insert into other (name, data) values ("adsense", "False")'))
-    curs.execute(db_change('insert into other (name, data) values ("adsense_code", "")'))
-
 if set_data['db_type'] == 'sqlite':
     def back_up():
         print('----')
@@ -414,10 +408,6 @@ def server_restart():
 @app.route('/update', methods=['GET', 'POST'])
 def server_now_update():
     return server_now_update_2(conn, version_list['master']['r_ver'])
-
-@app.route('/adsense_setting', methods=['GET', 'POST'])
-def setting_adsense():
-    return setting_adsense_2(conn)
 
 @app.route('/xref/<everything:name>')
 def view_xref(name = None):

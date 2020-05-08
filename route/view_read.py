@@ -192,15 +192,6 @@ def view_read_2(conn, name):
 
     div = end_data + div
 
-    curs.execute(db_change("select data from other where name = 'adsense'"))
-    if curs.fetchall()[0][0] == 'True':
-        curs.execute(db_change("select data from other where name = 'adsense_code'"))
-        adsense_code = '<div align="center" style="display: block;">' + curs.fetchall()[0][0] + '</div><hr class=\"main_hr\">'
-    else:
-        adsense_code = ''
-
-    div = adsense_code + '<div>' + div + '</div>'
-
     match = re.search(r"^user:([^/]*)", name)
     if match:
         user_name = match.group(1)
