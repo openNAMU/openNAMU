@@ -278,8 +278,19 @@ else:
 if set_data['db_type'] == 'sqlite':
     def back_up():
         print('----')
+
+        curs.execute(db_change('select data from other where name = "backup_where"'))
+        back_up_where = curs.fetchall()
+        if back_up_where and back_up_where[0][0] != '':
+            back_up_where = back_up_where[0][0]
+        else:
+            back_up_where = 'back_' + set_data['db'] + '.db'
+        
         try:
-            shutil.copyfile(set_data['db'] + '.db', 'back_' + set_data['db'] + '.db')
+            shutil.copyfile(
+                set_data['db'] + '.db', 
+                back_up_where
+            )
 
             print('Back up : OK')
         except:
@@ -351,7 +362,7 @@ def inter_wiki_plus(tools = None, name = None):
 @app.route('/setting')
 @app.route('/setting/<int:num>', methods=['POST', 'GET'])
 def setting(num = 0):
-    return setting_2(conn, num)
+    return setting_2(conn, num, set_data['db_type'])
 
 @app.route('/not_close_topic')
 def list_not_close_topic():

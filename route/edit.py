@@ -189,7 +189,7 @@ def edit_2(conn, name):
 
         curs.execute(db_change('select data from other where name = "edit_help"'))
         sql_d = curs.fetchall()
-        p_text = sql_d[0][0] if sql_d and sql_d[0][0] != '' else load_lang('defalut_edit_help')
+        p_text = sql_d[0][0] if sql_d and sql_d[0][0] != '' else load_lang('default_edit_help')
 
         data = re.sub(r'\n+$', '', data)
         data_old = re.sub(r'\n+$', '', data_old)

@@ -39,7 +39,7 @@ def give_history_add_2(conn, name):
         if sql_d and sql_d[0][0] != '':
             p_text = sql_d[0][0]
         else:
-            p_text = load_lang('defalut_edit_help')
+            p_text = load_lang('default_edit_help')
 
         return easy_minify(flask.render_template(skin_check(),
             imp = [load_lang('history_add'), wiki_set(), custom(), other2([' (' + name + ')', 0])],
