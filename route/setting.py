@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def setting_2(conn, num):
+def setting_2(conn, num, db_set):
     curs = conn.cursor()
 
     if not (num == 0 or num == 8) and admin_check() != 1:
@@ -51,6 +51,7 @@ def setting_2(conn, num):
             16 : 'host',
             19 : 'slow_edit',
             20 : 'requires_approval',
+            21 : 'backup_where'
         }
         n_list = {
             0 : 'Wiki',
@@ -69,7 +70,8 @@ def setting_2(conn, num):
             15 : 'sha3',
             16 : '0.0.0.0',
             19 : '0',
-            20 : ''
+            20 : '',
+            21 : ''
         }
 
         if flask.request.method == 'POST':
@@ -129,6 +131,11 @@ def setting_2(conn, num):
                 branch_div += '<option value="master">master</option>'
                 branch_div += '<option value="stable">stable</option>'
 
+            if db_set != 'sqlite':
+                sqlite_only = 'style="display:none;"'
+            else:
+                sqlite_only = ''
+
             return easy_minify(flask.render_template(skin_check(),
                 imp = [load_lang('main_setting'), wiki_set(), custom(), other2([0, 0])],
                 data = '''
@@ -151,10 +158,16 @@ def setting_2(conn, num):
                         <hr class="main_hr">
                         <input name="upload" value="''' + html.escape(d_list[4]) + '''">
                         <hr class="main_hr">
-                        <span>''' + load_lang('backup_interval') + ' (' + load_lang('hour') + ') (' + load_lang('off') + ' : 0) (' + load_lang('sqlite_only') + ') (' + load_lang('restart_required') + ''')</span>
-                        <hr class="main_hr">
-                        <input name="back_up" value="''' + html.escape(d_list[9]) + '''">
-                        <hr class="main_hr">
+                        <span ''' + sqlite_only + '''>
+                            <span>''' + load_lang('backup_interval') + ' (' + load_lang('hour') + ') (' + load_lang('off') + ' : 0) (' + load_lang('restart_required') + ''')</span>
+                            <hr class="main_hr">
+                            <input name="back_up" value="''' + html.escape(d_list[9]) + '''">
+                            <hr class="main_hr">
+                            <span>''' + load_lang('backup_where') + ' (' + load_lang('empty') + ' : ' + load_lang('default') + ') (' + load_lang('restart_required') + ''') (EX : ./data/backup.db)</span>
+                            <hr class="main_hr">
+                            <input name="backup_where" value="''' + html.escape(d_list[21]) + '''">
+                            <hr class="main_hr">
+                        </span>
                         <span>''' + load_lang('wiki_skin') + '''</span>
                         <hr class="main_hr">
                         <select name="skin">''' + load_skin(d_list[5]) + '''</select>
