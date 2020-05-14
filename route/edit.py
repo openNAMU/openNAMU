@@ -1,5 +1,18 @@
 from .tool.func import *
 
+class run_count_section:
+    def __init__(self, key, change):
+        self.counter = key
+        self.change = change
+
+    def __call__(self, match):
+        self.counter -= 1
+
+        if self.counter == 0:
+            return '\n' + self.change + '\n'
+        else:
+            return '\n' + match[1]
+
 def edit_2(conn, name):
     curs = conn.cursor()
 
@@ -49,19 +62,6 @@ def edit_2(conn, name):
             o_data = old[0][0].replace('\r\n', '\n')
 
             if section:
-                class run_count_section:
-                    def __init__(self, key, change):
-                        self.counter = key
-                        self.change = change
-
-                    def __call__(self, match):
-                        self.counter -= 1
-
-                        if self.counter == 0:
-                            return '\n' + self.change + '\n'
-                        else:
-                            return '\n' + match[1]
-
                 run_count = run_count_section(section, content)
 
                 c_data = html.escape('\n' + o_data)
