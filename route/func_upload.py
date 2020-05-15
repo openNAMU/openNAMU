@@ -16,7 +16,12 @@ def func_upload_2(conn):
         if not file_data:
             return re_error('/error/9')
 
-        if len(file_data) == 1:
+        file_len = len(file_data)
+
+        if int(wiki_set(3)) * 1024 * 1024 * file_len < flask.request.content_length:
+            return re_error('/error/17')
+
+        if file_len == 1:    
             file_num = None
         else:
             if acl_check(None, 'many_upload') == 1:
@@ -25,9 +30,6 @@ def func_upload_2(conn):
             file_num = 1
 
         for data in file_data:
-            if int(wiki_set(3)) * 1024 * 1024 < flask.request.content_length:
-                return re_error('/error/17')
-
             value = os.path.splitext(data.filename)[1]
             
             curs.execute(db_change("select html from html_filter where kind = 'extension'"))
@@ -59,7 +61,6 @@ def func_upload_2(conn):
 
             if os.path.exists(os.path.join(app_var['path_data_image'], e_data)):
                 os.remove(os.path.join(app_var['path_data_image'], e_data))
-
                 data.save(os.path.join(app_var['path_data_image'], e_data))
             else:
                 data.save(os.path.join(app_var['path_data_image'], e_data))
