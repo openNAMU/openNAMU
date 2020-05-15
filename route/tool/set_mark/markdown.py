@@ -67,5 +67,7 @@ def markdown(conn, data, title, include_num):
     data = re.sub(r'\*\*((?:(?!\*\*).)+)\*\*', '<b>\1</b>', data)
     data = re.sub(r'__((?:(?!__).)+)__', '<i>\1</i>', data)
 
+    data = re.sub('^\n', '', data)
+    data = re.sub('\n', '<br>', data)
     
     return [data, plus_data, backlink]
