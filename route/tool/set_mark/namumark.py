@@ -165,10 +165,14 @@ def table_parser(data, cel_data, cel_num, start_data, num = 0, cel_color = {}):
     return [all_table, row_style, cel_style, row, cel, table_class, num, div_style, cel_color]
 
 def table_start(data):
+    data = re.sub(r'\n( +)\|\|', '\n||', data)
+    data = re.sub(r'\|\|( +)\n', '||\n', data)
+    data = re.sub(r'(\|\|)+\n', '||\n', data)
+
     while 1:
         cel_num = 0
         table_num = 0
-        table_end = '<div class="table_safe"><table>'
+        table_end = ''
         cel_color = {}
 
         table = re.search(r'\n((?:(?:(?:(?:\|\||\|[^|]+\|)+(?:(?:(?!\|\|).\n*)*))+)\|\|(?:\n)?)+)', data)
@@ -185,7 +189,7 @@ def table_start(data):
             
             table = '\n' + table
             
-            table_cel = re.findall(r'(\n(?:(?:\|\|)+)|[^\n]\|\|\n(?:(?:\|\|)+)|(?:(?:\|\|)+))((?:(?:(?!\n|\|\|).)+\n*)+)', table)
+            table_cel = re.findall(r'(\n(?:(?:\|\|)+)|\|\|\n(?:(?:\|\|)+)|(?:(?:\|\|)+))((?:(?:(?!\n|\|\|).)+\n*)+)', table)
             for i in table_cel:
                 cel_plus = re.search(r'^((?:&lt;(?:(?:(?!&gt;).)*)&gt;)+)', i[1])
                 cel_plus = cel_plus.group(1) if cel_plus else ''
@@ -205,7 +209,7 @@ def table_start(data):
                     cel_color = cel_plus[8]
                     table_num = cel_plus[6]
 
-                    table_end = '' + \
+                    table_end += '' + \
                         '<div class="table_safe" ' + cel_plus[7] + '>' + \
                             '<table ' + cel_plus[5] + ' ' + cel_plus[0] + '>' + \
                                 table_caption + \
@@ -621,9 +625,6 @@ def namumark(conn, data, title, include_num):
 
     data = re.sub(r'\r\n', '\n', data)
     data = re.sub(r'&amp;', '&', data)
-
-    data = re.sub(r'\n( +)\|\|', '\n||', data)
-    data = re.sub(r'\|\|( +)\n', '||\n', data)
 
     data = re.sub(r'\n##(((?!\n).)+)', '', data)
     data = re.sub(r'<div id="wiki_div" style="">\n', '<div id="wiki_div" style="">', data)
