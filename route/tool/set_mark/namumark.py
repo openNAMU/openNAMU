@@ -168,7 +168,7 @@ def table_start(data):
     while 1:
         cel_num = 0
         table_num = 0
-        table_end = ''
+        table_end = '<div class="table_safe"><table>'
         cel_color = {}
 
         table = re.search(r'\n((?:(?:(?:(?:\|\||\|[^|]+\|)+(?:(?:(?!\|\|).\n*)*))+)\|\|(?:\n)?)+)', data)
@@ -185,7 +185,7 @@ def table_start(data):
             
             table = '\n' + table
             
-            table_cel = re.findall(r'(\n(?:(?:\|\|)+)|\|\|\n(?:(?:\|\|)+)|(?:(?:\|\|)+))((?:(?:(?!\n|\|\|).)+\n*)+)', table)
+            table_cel = re.findall(r'(\n(?:(?:\|\|)+)|[^\n]\|\|\n(?:(?:\|\|)+)|(?:(?:\|\|)+))((?:(?:(?!\n|\|\|).)+\n*)+)', table)
             for i in table_cel:
                 cel_plus = re.search(r'^((?:&lt;(?:(?:(?!&gt;).)*)&gt;)+)', i[1])
                 cel_plus = cel_plus.group(1) if cel_plus else ''
@@ -205,7 +205,7 @@ def table_start(data):
                     cel_color = cel_plus[8]
                     table_num = cel_plus[6]
 
-                    table_end += '' + \
+                    table_end = '' + \
                         '<div class="table_safe" ' + cel_plus[7] + '>' + \
                             '<table ' + cel_plus[5] + ' ' + cel_plus[0] + '>' + \
                                 table_caption + \
