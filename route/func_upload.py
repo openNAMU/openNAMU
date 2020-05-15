@@ -70,24 +70,21 @@ def func_upload_2(conn):
             curs.execute(db_change("select data from other where name = 'markup'"))
             db_data = curs.fetchall()
             if db_data and db_data[0][0] == 'namumark':
-                if flask.request.form.get('f_lice_sel', 'direct_input') == 'direct_input':
-                    lice = '\n||' + g_lice + '||\n'
-                    if ip_or_user(ip) != 0:
-                        lice += '||' + ip + '||\n'
-                    else:
-                        lice += '||[[user:' + ip + ']]||\n'
-
-                    lice += '[[category:direct_input]]'
-                else:
-                    lice = '\n||' + flask.request.form.get('f_lice_sel', '') + '||\n'
-                    lice += '||'  + g_lice + '||\n'
-                    lice += '[[category:' + re.sub(r'\]', '_', flask.request.form.get('f_lice_sel', '')) + ']]'
-
-                file_d = '[[file:' + name + ']]\n{{{[[file:' + name + ']]}}}\n' + lice
+                file_d = '' + \
+                    '[[file:' + name + ']]\n' + \
+                    '{{{[[file:' + name + ']]}}}\n\n' + \
+                    (g_lice + '\n' if g_lice != '' else '') + \
+                    flask.request.form.get('f_lice_sel', 'direct_input') + '\n' + \
+                    (ip if ip_or_user(ip) != 0 else '[[user:' + ip + ']]') + '\n' + \
+                    '[[category:' + re.sub(r'\]', '_', flask.request.form.get('f_lice_sel', '')) + ']]' + \
+                ''
             else:
-                file_d = name + ' | /image/' + e_data + ((' | ' + g_lice) if g_lice != '' else '') + ' | ' + ip
-                
-            print([lice])
+                file_d = '' + \
+                    '/image/' + e_data + '\n\n' + \
+                    (g_lice + '\n' if g_lice != '' else '') + \
+                    flask.request.form.get('f_lice_sel', 'direct_input') + '\n' + \
+                    ip + \
+                ''
 
             curs.execute(db_change("insert into data (title, data) values (?, ?)"), ['file:' + name, file_d])
             curs.execute(db_change("insert into acl (title, decu, dis, why, view) values (?, 'admin', '', '', '')"), ['file:' + name])
