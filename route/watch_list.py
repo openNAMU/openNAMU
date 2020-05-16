@@ -42,7 +42,7 @@ def watch_list_2(conn, tool):
             '<li>' + \
                 '<a href="/w/' + url_pas(data_list[0]) + '">' + data_list[0] + '</a> ' + \
                 plus + \
-                '<a href="/watch_list/' + url_pas(data_list[0]) + '">(' + load_lang('delete') + ')</a>' + \
+                '<a href="/' + ('star_doc' if tool == 'star_doc' else 'watch_list') + '/' + url_pas(data_list[0]) + '">(' + load_lang('delete') + ')</a>' + \
             '</li>' + \
         ''
 
@@ -54,5 +54,5 @@ def watch_list_2(conn, tool):
     return easy_minify(flask.render_template(skin_check(),
         imp = [title_name, wiki_set(), custom(), other2([0, 0])],
         data = div,
-        menu = [['manager', load_lang('return')]]
+        menu = [['user', load_lang('return')]]
     ))
