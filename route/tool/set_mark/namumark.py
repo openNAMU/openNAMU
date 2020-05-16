@@ -27,7 +27,7 @@ def link_fix(main_link):
     main_link = re.sub(r'^파일:', 'file:', main_link)
     main_link = re.sub(r'^분류:', 'category:', main_link)
 
-    other_link = re.search(r'[^\\\\]?(#[^#]+)$', main_link)
+    other_link = re.search(r'[^\\]?(#[^#]+)$', main_link)
     if other_link:
         other_link = other_link.group(1)
 
@@ -36,7 +36,7 @@ def link_fix(main_link):
         other_link = ''
 
     main_link = main_link.replace("<link_comma>", "&#x27;")
-    main_link = re.sub(r'\\\\#', '%23', main_link)
+    main_link = re.sub(r'\\#', '%23', main_link)
 
     find_data = re.findall(r'<span id="(nowiki_[0-9]+)">', main_link)
     for i in find_data:
@@ -285,7 +285,7 @@ def middle_parser(data):
 
                 data = re.sub(r'(?:{{{((?:(?! |{{{|}}}|&lt;).)*)(?P<in> ?)|(}}}))', '<middle_start>' + middle_data[0] + '\g<in>', data, 1)
             else:
-                if re.search(r'^(#|@|\+|\-)', middle_data[0]) and not re.search(r'^(#|@|\+|\-){2}|(#|@|\+|\-)\\\\', middle_data[0]):
+                if re.search(r'^(#|@|\+|\-)', middle_data[0]) and not re.search(r'^(#|@|\+|\-){2}|(#|@|\+|\-)\\', middle_data[0]):
                     if re.search(r'^(#(?:[0-9a-f-A-F]{3}){1,2})', middle_data[0]):
                         middle_search = re.search(r'^(#(?:[0-9a-f-A-F]{3}){1,2})', middle_data[0])
                         middle_list += ['span']
@@ -562,7 +562,7 @@ def namumark(conn, data, title, include_num):
 
     num = 0
     while 1:
-        one_nowiki = re.search(r'(?:\\\\)(.)', data)
+        one_nowiki = re.search(r'(?:\\)(.)', data)
         if one_nowiki:
             one_nowiki = one_nowiki.groups()
 
@@ -575,7 +575,7 @@ def namumark(conn, data, title, include_num):
                 '\n' + \
             ''
 
-            data = re.sub(r'(?:\\\\)(.)', '<span id="' + include_name + 'nowiki_' + str(nowiki_num) + '"></span>', data, 1)
+            data = re.sub(r'(?:\\)(.)', '<span id="' + include_name + 'nowiki_' + str(nowiki_num) + '"></span>', data, 1)
         else:
             break
 
