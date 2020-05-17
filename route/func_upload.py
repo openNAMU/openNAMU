@@ -67,6 +67,7 @@ def func_upload_2(conn):
 
             ip = ip_check()
             g_lice = flask.request.form.get('f_lice', '')
+            file_size = os.stat(os.path.join(app_var['path_data_image'], e_data)).st_size
 
             curs.execute(db_change("select data from other where name = 'markup'"))
             db_data = curs.fetchall()
@@ -77,6 +78,7 @@ def func_upload_2(conn):
                     (g_lice + '\n' if g_lice != '' else '') + \
                     flask.request.form.get('f_lice_sel', 'direct_input') + '\n' + \
                     (ip if ip_or_user(ip) != 0 else '[[user:' + ip + ']]') + '\n' + \
+                    str(file_size) + ' Byte\n' + \
                     '[[category:' + re.sub(r'\]', '_', flask.request.form.get('f_lice_sel', '')) + ']]' + \
                 ''
             else:
@@ -85,6 +87,7 @@ def func_upload_2(conn):
                     (g_lice + '\n' if g_lice != '' else '') + \
                     flask.request.form.get('f_lice_sel', 'direct_input') + '\n' + \
                     ip + \
+                    str(file_size) + ' Byte\n' + \
                 ''
 
             curs.execute(db_change("insert into data (title, data) values (?, ?)"), ['file:' + name, file_d])

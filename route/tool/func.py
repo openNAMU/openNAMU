@@ -496,7 +496,7 @@ def other2(data):
         data += ['']
 
     req_list = ''
-    main_css_ver = 45
+    main_css_ver = 46
 
     if  not 'main_css_load' in flask.session or \
         not 'main_css_ver' in flask.session or \
