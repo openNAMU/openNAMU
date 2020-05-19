@@ -14,7 +14,7 @@ input[type="checkbox"], input[type="radio"] { width: auto; }
 #list { padding: 10px; }
 #toron { width: 100%; }
 #toron_color_green { background: #99ffcd; }
-#toron_color_blue { background: #c4eff7; }
+#toron_color_blue { background: #ffcbf9; }
 #toron_color_red { background: #fecabf; }
 #toron_color_grey { background: gainsboro; }
 #toron_color_not { display: none; }
