@@ -78,21 +78,28 @@ def recent_changes_2(conn, name, tool):
                 <td id="main_table_width">''' + load_lang('editor') + '''</td>
                 <td id="main_table_width">''' + load_lang('time') + '''</td>
             '''
-
+            sub = ''
             set_type = flask.request.args.get('set', 'normal')
-            if set_type == 'normal':
-                div = '' + \
-                    '<a href="?set=user">(' + load_lang('user_document') + ')</a> ' + \
-                    '<a href="?set=req">(' + load_lang('edit_req') + ')</a>' + \
-                    '<hr class="main_hr">' + div + \
-                ''
 
-            if set_type == 'req':
-                plus_sql = "where type = 'req' "
-            elif set_type == 'user':
-                plus_sql = "where title like 'user:%' and type = '' "
+            if set_type == 'move':
+                plus_sql = 'where send >= "" and send like "%</a> move)" and '
+                sub += ' (' + load_lang('move') + ')'
+            elif set_type == 'delete':
+                plus_sql = 'where send like "%(delete)" and '
+                sub += ' (' + load_lang('delete') + ')'
+            elif set_type == 'revert':
+                plus_sql = 'where send >= "" and send like "%(r%)" and '
+                sub += ' (' + load_lang('revert') + ')'
             else:
-                plus_sql = "where not title like 'user:%' and type = '' "
+                plus_sql = 'where '
+
+            plus_sql += 'type = "" '
+            
+            if set_type == 'user':
+                plus_sql = 'where title like "user:%" '
+                sub += ' (' + load_lang('user') + ')'
+            else:
+                plus_sql += 'and not title like "user:%" '
 
             curs.execute(db_change('' + \
                 'select id, title, date, ip, send, leng, hide from history ' + \
@@ -109,12 +116,12 @@ def recent_changes_2(conn, name, tool):
             send = '<br>'
 
             if data[4]:
-                if not re.search("^(?: *)$", data[4]):
+                if not re.search(r"^(?: *)$", data[4]):
                     send = data[4]
 
-            if re.search("\+", data[5]):
+            if re.search(r"\+", data[5]):
                 leng = '<span style="color:green;">(' + data[5] + ')</span>'
-            elif re.search("\-", data[5]):
+            elif re.search(r"\-", data[5]):
                 leng = '<span style="color:red;">(' + data[5] + ')</span>'
             else:
                 leng = '<span style="color:gray;">(' + data[5] + ')</span>'
@@ -147,11 +154,8 @@ def recent_changes_2(conn, name, tool):
             if tool == 'history':
                 title = '<a href="/w/' + url_pas(name) + '?num=' + data[0] + '">r' + data[0] + '</a> '
             else:
-                if not name and set_type == 'req':
-                    title = '<a href="/edit_req/' + url_pas(data[1]) + '?r=' + data[0] + '">' + html.escape(data[1]) + ' (r' + data[0] + ')</a> '
-                else:
-                    title = '<a href="/w/' + url_pas(data[1]) + '">' + html.escape(data[1]) + '</a> '
-                    title += '<a href="/history/' + url_pas(data[1]) + '">(r' + data[0] + ')</a> '
+                title = '<a href="/w/' + url_pas(data[1]) + '">' + html.escape(data[1]) + '</a> '
+                title += '<a href="/history/' + url_pas(data[1]) + '">(r' + data[0] + ')</a> '
 
             div += '''
                 <tr ''' + style[0] + '''>
@@ -201,16 +205,18 @@ def recent_changes_2(conn, name, tool):
                 menu = [['other', load_lang('other')], ['user', load_lang('user')], ['count/' + url_pas(name), load_lang('count')]]
                 div += next_fix('/record/' + url_pas(name) + '?num=', num, data_list)
         else:
+            div = '' + \
+                '<a href="?set=normal">(' + load_lang('normal') + ')</a> ' + \
+                '<a href="?set=user">(' + load_lang('user_document') + ')</a> ' + \
+                '<a href="?set=move">(' + load_lang('move') + ')</a> ' + \
+                '<a href="?set=delete">(' + load_lang('delete') + ')</a> ' + \
+                '<a href="?set=revert">(' + load_lang('revert') + ')</a>' + \
+                '<hr class="main_hr">' + div + \
+            ''
+
             menu = 0
             title = load_lang('recent_change')
             div += next_fix('/recent_changes?set=' + set_type + '&num=', num, data_list)
-
-            if set_type == 'user':
-                sub = ' (' + load_lang('user') + ')'
-                menu = [['recent_changes', load_lang('return')]]
-            elif set_type == 'req':
-                sub = ' (' + load_lang('edit_req') + ')'
-                menu = [['recent_changes', load_lang('return')]]
 
         if sub == '':
             sub = 0

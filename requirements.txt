@@ -1,8 +1,6 @@
 tornado
-bcrypt
 flask
 flask-Reggie
-flask-compress
 requests
 pymysql
 diff-match-patch

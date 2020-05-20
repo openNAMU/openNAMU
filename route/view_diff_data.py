@@ -33,19 +33,19 @@ def view_diff_data_2(conn, name):
                 diff_data = diff_match_patch().diff_prettyHtml(diff_match_patch().diff_main(first_raw_data, second_raw_data))
                 end_data = ''
 
-                re_data = re.findall('(?:(?:(?:(?!&para;<br>).)*)(?:&para;<br>)|(?:(?:(?!&para;<br>).)+)$)', diff_data)
+                re_data = re.findall(r'(?:(?:(?:(?!&para;<br>).)*)(?:&para;<br>)|(?:(?:(?!&para;<br>).)+)$)', diff_data)
                 for re_in_data in re_data:
-                    re_in_data = re.sub('&para;<br>$', '', re_in_data)
-                    if re.search('<ins (((?!<\/ins>).)+)<\/ins>', re_in_data):
+                    re_in_data = re.sub(r'&para;<br>$', '', re_in_data)
+                    if re.search(r'<ins (((?!<\/ins>).)+)<\/ins>', re_in_data):
                         end_data += str(i) + ' : ' + re_in_data + '\n'
                         include_ins = 0
-                    elif re.search('(<ins |<del )', re_in_data) and re.search('(<\/ins>|<\/del>)', re_in_data):
+                    elif re.search(r'(<ins |<del )', re_in_data) and re.search(r'(<\/ins>|<\/del>)', re_in_data):
                         end_data += str(i) + ' : ' + re_in_data + '\n'
                         include_ins = 1
-                    elif re.search('(<\/ins>|<\/del>)', re_in_data):
+                    elif re.search(r'(<\/ins>|<\/del>)', re_in_data):
                         end_data += str(i) + ' : ' + re_in_data + '\n'
                         include_ins = 0
-                    elif re.search('(<ins |<del )', re_in_data) or include_ins == 1:
+                    elif re.search(r'(<ins |<del )', re_in_data) or include_ins == 1:
                         end_data += str(i) + ' : ' + re_in_data + '\n'
                         include_ins = 1
                     else:

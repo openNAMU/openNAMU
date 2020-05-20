@@ -88,7 +88,7 @@ def inter_wiki_plus_2(conn, tools, name):
 
         conn.commit()
 
-        return redirect('/' + re.sub('^plus_', '', tools))
+        return redirect('/' + re.sub(r'^plus_', '', tools))
     else:
         if admin_check(1) != 1:
             stat = 'disabled'

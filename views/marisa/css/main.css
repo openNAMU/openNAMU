@@ -1,11 +1,9 @@
-@import url(https://fonts.googleapis.com/earlyaccess/nanumgothic.css);
-
 body {
     max-width: 100%;
     word-break: break-all;
     word-wrap: break-word;
     margin: 0;
-    font-family: "나눔고딕", "Nanum Gothic", sans-serif;
+    font-family: 'Apple SD Gothic', '맑은고딕', 'Nanum Gothic', 'Noto Sans KR', sans-serif;
     font-size: 14px;
 }
 
@@ -25,7 +23,7 @@ hr {
 
 button {
     padding: 10px;
-    border: 1px solid gainsboro;
+    border: 1px solid #aaa;
     background: white;
     cursor: pointer;
 }
@@ -85,7 +83,7 @@ li {
 
 @media (min-width: 780px) and (max-width: 1350px) {
     #main {
-        width: 90%;
+        width: calc(100% - 45px);
     }
 
     #top_main {
@@ -213,7 +211,7 @@ h6 {
 }
 
 .cel_in_cel {
-    border: 1px solid gainsboro;
+    border: 1px solid #aaa;
     padding: 10px;
     position: absolute;
     background: white;
@@ -309,12 +307,12 @@ a {
 }
 
 pre, #toc, #cate, #redirect {
-    border: 1px solid gainsboro;
+    border: 1px solid #aaa;
 }
 
 textarea, input {
-    border: 1px solid gainsboro;
-    font-family: '나눔고딕', 'Nanum Gothic', 'Noto Sans KR', 'Malgun Gothic', '맑은 고딕', sans-serif;
+    font-family: 'Apple SD Gothic', '맑은고딕', 'Nanum Gothic', 'Noto Sans KR', sans-serif;
+    border: 1px solid #aaa;
     padding: 5px;
     margin-left: -5px;
 }
@@ -351,6 +349,7 @@ textarea, input {
     border: 1px solid #4a4a4a;
     background: #4a4a4a;
     text-align: center;
+    height: 45px;
 }
 
 #nav_bar a {
@@ -426,4 +425,13 @@ button#save {
 
 div#top_tool_cel a:hover, #logo a:hover, #search button:hover, div#nav_bar a:hover {
     color: #aaa;
+}
+
+div#main {
+    border-left: 1px solid #aaa;
+    border-right: 1px solid #aaa;
+}
+
+#bottom {   
+    border-top: 1px solid #aaa;   
 }

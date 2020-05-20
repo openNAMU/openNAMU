@@ -10,11 +10,11 @@ def main_file_2(conn, data):
             data = open('./views/main_css/file/easter_egg.html', encoding='utf8').read(),
             menu = 0
         ))
-    elif re.search('\.txt$', data, flags = re.I) or data == 'sitemap.xml':
+    elif re.search(r'\.txt$', data, flags = re.I) or data == 'sitemap.xml':
         if data == 'robots.txt' and not os.path.exists('robots.txt'):
             return flask.Response('User-agent: *\nDisallow: /\nAllow: /$\nAllow: /w/', mimetype = 'text/plain')
         elif os.path.exists(data):
-            if re.search('\.txt$', data, flags = re.I):
+            if re.search(r'\.txt$', data, flags = re.I):
                 return flask.send_from_directory('./', data, mimetype = 'text/plain')
             else:
                 return flask.send_from_directory('./', data, mimetype = 'text/xml')

@@ -7,7 +7,6 @@ for i in range(0, 2):
         from diff_match_patch import diff_match_patch
         import werkzeug.routing
         import werkzeug.debug
-        import flask_compress
         import flask_reggie
         import tornado.ioloop
         import tornado.httpserver
@@ -18,7 +17,6 @@ for i in range(0, 2):
         import pymysql
         import hashlib
         import smtplib
-        import bcrypt
         import zipfile
         import shutil
         import threading
@@ -73,7 +71,10 @@ def load_conn(data):
 
 def send_email(who, title, data):
     try:
-        curs.execute(db_change('select name, data from other where name = "smtp_email" or name = "smtp_pass" or name = "smtp_server" or name = "smtp_port" or name = "smtp_security"'))
+        curs.execute(db_change('' + \
+            'select name, data from other ' + \
+            'where name = "smtp_email" or name = "smtp_pass" or name = "smtp_server" or name = "smtp_port" or name = "smtp_security"' + \
+        ''))
         rep_data = curs.fetchall()
 
         smtp_email = ''
@@ -119,7 +120,7 @@ def send_email(who, title, data):
         print('Error : Email send error')
 
 def last_change(data):
-    json_address = re.sub("(((?!\.|\/).)+)\.html$", "set.json", skin_check())
+    json_address = re.sub(r"(((?!\.|\/).)+)\.html$", "set.json", skin_check())
     try:
         json_data = json.loads(open(json_address, encoding='utf8').read())
     except:
@@ -191,7 +192,7 @@ def update(ver_num, set_data):
         curs.execute(db_change("select data from other where name = 'recaptcha'"))
         change_rec = curs.fetchall()
         if change_rec and change_rec[0][0] != '':
-            new_rec = re.search('data-sitekey="([^"]+)"', change_rec[0][0])
+            new_rec = re.search(r'data-sitekey="([^"]+)"', change_rec[0][0])
             if new_rec:
                 curs.execute(db_change("update other set data = ? where name = 'recaptcha'"), [new_rec.group(1)])
             else:
@@ -203,11 +204,29 @@ def update(ver_num, set_data):
         
         with open('data/mysql.json', 'w') as f:
             f.write('{ "user" : "' + get_data_mysql['user'] + '", "password" : "' + get_data_mysql['password'] + '", "host" : "localhost" }')
+
+    if ver_num < 3183603:
+        curs.execute(db_change("select block from ban where band = 'O'"))
+        change_band = curs.fetchall()
+        for i in change_band:
+            curs.execute(db_change("update ban set block = ?, band = 'regex' where block = ? and band = 'O'"), [
+                '^' + i[0].replace('.', '\\.'),
+                i[0]
+            ])
+
+        curs.execute(db_change("select block from rb where band = 'O'"))
+        change_band = curs.fetchall()
+        for i in change_band:
+            curs.execute(db_change("update rb set block = ?, band = 'regex' where block = ? and band = 'O'"), [
+                '^' + i[0].replace('.', '\\.'),
+                i[0]
+            ])
             
-    if ver_num < 3180200:
+    if ver_num < 3184400:
         curs.execute(db_change('delete from cache_data'))
 
     conn.commit()
+
     print('Update pass')
 
 def set_init():
@@ -236,18 +255,11 @@ def pw_encode(data, data2 = '', type_d = ''):
 
     if type_d == 'sha256':
         return hashlib.sha256(bytes(data, 'utf-8')).hexdigest()
-    elif type_d == 'sha3':
+    else:
         if sys.version_info < (3, 6):
             return sha3.sha3_256(bytes(data, 'utf-8')).hexdigest()
         else:
             return hashlib.sha3_256(bytes(data, 'utf-8')).hexdigest()
-    else:
-        if data2 != '':
-            salt_data = bytes(data2, 'utf-8')
-        else:
-            salt_data = bcrypt.gensalt(11)
-
-        return bcrypt.hashpw(bytes(data, 'utf-8'), salt_data).decode()
 
 def pw_check(data, data2, type_d = 'no', id_d = ''):
     curs.execute(db_change('select data from other where name = "encode"'))
@@ -255,31 +267,16 @@ def pw_check(data, data2, type_d = 'no', id_d = ''):
 
     if type_d != 'no':
         if type_d == '':
-            set_data = 'bcrypt'
+            set_data = 'sha3'
         else:
             set_data = type_d
     else:
         set_data = db_data[0][0]
 
-    while 1:
-        if set_data in ['sha256', 'sha3']:
-            data3 = pw_encode(data = data, type_d = set_data)
-            if data3 == data2:
-                re_data = 1
-            else:
-                re_data = 0
-
-            break
-        else:
-            try:
-                if pw_encode(data, data2, 'bcrypt') == data2:
-                    re_data = 1
-                else:
-                    re_data = 0
-
-                break
-            except:
-                set_data = db_data[0][0]
+    if pw_encode(data = data, type_d = set_data) == data2:
+        re_data = 1
+    else:
+        re_data = 0
 
     if db_data[0][0] != set_data and re_data == 1 and id_d != '':
         curs.execute(db_change("update user set pw = ?, encode = ? where id = ?"), [pw_encode(data), db_data[0][0], id_d])
@@ -426,7 +423,7 @@ def ip_or_user(data = ''):
     if data == '':
         data = ip_check()
 
-    if re.search('(\.|:)', data):
+    if re.search(r'(\.|:)', data):
         return 1
     else:
         return 0
@@ -499,9 +496,11 @@ def other2(data):
         data += ['']
 
     req_list = ''
-    main_css_ver = 30
+    main_css_ver = 47
 
-    if not 'main_css_load' in flask.session or not 'main_css_ver' in flask.session or flask.session['main_css_ver'] != main_css_ver:
+    if  not 'main_css_load' in flask.session or \
+        not 'main_css_ver' in flask.session or \
+        flask.session['main_css_ver'] != main_css_ver:
         for i_data in os.listdir(os.path.join("views", "main_css", "css")):
             req_list += '<link rel="stylesheet" href="/views/main_css/css/' + i_data + '?ver=' + str(main_css_ver) + '">'
 
@@ -514,7 +513,8 @@ def other2(data):
         req_list = flask.session['main_css_load']
 
     data = data[0:2] + ['', '''
-        <link   rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css">
+        <link   rel="stylesheet"
+                href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/styles/default.min.css">
         <link   rel="stylesheet"
                 href="https://cdn.jsdelivr.net/npm/katex@0.10.1/dist/katex.min.css"
                 integrity="sha384-dbVIfZGuN1Yq7/1Ocstc1lUEm+AT+/rCkibIcC/OmWo5f0EA48Vf8CytHzGrSwbQ"
@@ -522,22 +522,22 @@ def other2(data):
         <script src="https://cdn.jsdelivr.net/npm/katex@0.10.1/dist/katex.min.js"
                 integrity="sha384-2BKqo+exmr9su6dir+qCw08N2ZKRucY4PrGQPPWU1A7FtlCGjmEGFqXCv5nyM5Ij"
                 crossorigin="anonymous"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
-    ''' + req_list + '<script>main_css_skin_load();</script>'] + data[2:]
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/highlight.min.js"></script>
+    ''' + req_list + '<script>window.addEventListener(\'DOMContentLoaded\', function() { main_css_skin_load(); });</script>'] + data[2:]
 
     return data
 
 def cut_100(data):
-    if re.search('^\/w\/', flask.request.path):
-        data = re.sub('<script>((\n*(((?!<\/script>).)+)\n*)+)<\/script>', '', data)
-        data = re.sub('<hr class="main_hr">((\n*((.+)\n*))+)$', '', data)
-        data = re.sub('<div id="cate_all">((\n*((.+)\n*))+)$', '', data)        
+    if re.search(r'^\/w\/', flask.request.path):
+        data = re.sub(r'<script>((\n*(((?!<\/script>).)+)\n*)+)<\/script>', '', data)
+        data = re.sub(r'<hr class="main_hr">((\n*((.+)\n*))+)$', '', data)
+        data = re.sub(r'<div id="cate_all">((\n*((.+)\n*))+)$', '', data)        
 
-        data = re.sub('<(((?!>).)*)>', ' ', data)
-        data = re.sub('\n', ' ', data)
-        data = re.sub('^ +', '', data)
-        data = re.sub(' +$', '', data)
-        data = re.sub(' {2,}', ' ', data)
+        data = re.sub(r'<(((?!>).)*)>', ' ', data)
+        data = re.sub(r'\n', ' ', data)
+        data = re.sub(r'^ +', '', data)
+        data = re.sub(r' +$', '', data)
+        data = re.sub(r' {2,}', ' ', data)
     
         return data[0:100] + '...'
     else:
@@ -546,6 +546,7 @@ def cut_100(data):
 def wiki_set(num = 1):
     if num == 1:
         data_list = []
+        skin_name = skin_check(1)
 
         curs.execute(db_change('select data from other where name = ?'), ['name'])
         db_data = curs.fetchall()
@@ -563,12 +564,17 @@ def wiki_set(num = 1):
 
         data_list += ['', '']
 
-        curs.execute(db_change('select data from other where name = "logo"'))
+        curs.execute(db_change('select data from other where name = "logo" and coverage = ?'), [skin_name])
         db_data = curs.fetchall()
         if db_data and db_data[0][0] != '':
             data_list += [db_data[0][0]]
         else:
-            data_list += [data_list[0]]
+            curs.execute(db_change('select data from other where name = "logo" and coverage = ""'))
+            db_data = curs.fetchall()
+            if db_data and db_data[0][0] != '':
+                data_list += [db_data[0][0]]
+            else:
+                data_list += [data_list[0]]
 
         head_data = ''
 
@@ -577,7 +583,7 @@ def wiki_set(num = 1):
         if db_data and db_data[0][0] != '':
             head_data += db_data[0][0]
 
-        curs.execute(db_change("select data from other where name = 'head' and coverage = ?"), [skin_check(1)])
+        curs.execute(db_change("select data from other where name = 'head' and coverage = ?"), [skin_name])
         db_data = curs.fetchall()
         if db_data and db_data[0][0] != '':
             head_data += db_data[0][0]
@@ -660,10 +666,10 @@ def ip_pas(raw_ip, type_d = 0):
         curs.execute(db_change("select data from other where name = 'ip_view'"))
         data = curs.fetchall()
         if data and data[0][0] != '':
-            if re.search('\.', raw_ip):
-                ip = re.sub('\.([^.]*)\.([^.]*)$', '.*.*', raw_ip)
+            if re.search(r'\.', raw_ip):
+                ip = re.sub(r'\.([^.]*)\.([^.]*)$', '.*.*', raw_ip)
             else:
-                ip = re.sub(':([^:]*):([^:]*)$', ':*:*', raw_ip)
+                ip = re.sub(r':([^:]*):([^:]*)$', ':*:*', raw_ip)
 
             if not admin_check(1):
                 hide = 1
@@ -837,7 +843,7 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
     get_ban = ban_check()
     
     if name:
-        acl_c = re.search("^user:((?:(?!\/).)*)", name)
+        acl_c = re.search(r"^user:((?:(?!\/).)*)", name)
     else:
         acl_c = None
 
@@ -865,9 +871,8 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
 
         return 1
 
-    if tool == '' or tool == 'edit_req':
-        if acl_check(name, 'render') == 1:
-            return 1
+    if tool == '' and acl_check(name, 'render') == 1:
+        return 1
     
     if tool == '':
         end = 3
@@ -911,10 +916,6 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
             num = 5
         elif tool == 'many_upload':
             curs.execute(db_change("select data from other where name = 'many_upload_acl'"))
-
-            num = 5
-        elif tool == 'edit_req':
-            curs.execute(db_change("select data from other where name = 'edit_req_acl'"))
 
             num = 5
         else:
@@ -988,12 +989,6 @@ def ban_check(ip = None, tool = None):
     if admin_check(None, None, ip) == 1:
         return 0
 
-    band = re.search("^([0-9]{1,3}\.[0-9]{1,3})", ip)
-    if band:
-        band_it = band.group(1)
-    else:
-        band_it = '-'
-
     curs.execute(db_change("delete from ban where (end < ? and end like '2%')"), [get_time()])
     conn.commit()
 
@@ -1007,15 +1002,6 @@ def ban_check(ip = None, tool = None):
                     return 1
             else:
                 return 1
-
-    curs.execute(db_change("select login from ban where ((end > ? and end like '2%') or end = '') and block = ? and band = 'O'"), [get_time(), band_it])
-    band_d = curs.fetchall()
-    if band_d:
-        if tool and tool == 'login':
-            if band_d[0][0] != 'O':
-                return 1
-        else:
-            return 1
 
     curs.execute(db_change("select login from ban where ((end > ? and end like '2%') or end = '') and block = ? and band = ''"), [get_time(), ip])
     ban_d = curs.fetchall()
@@ -1034,10 +1020,7 @@ def ban_insert(name, end, why, login, blocker, type_d = None):
     if type_d:
         band = type_d
     else:
-        if re.search("^([0-9]{1,3}\.[0-9]{1,3})$", name):
-            band = 'O'
-        else:
-            band = ''
+        band = ''
 
     curs.execute(db_change("delete from ban where (end < ? and end like '2%')"), [get_time()])
 
@@ -1107,7 +1090,7 @@ def history_plus(title, data, date, ip, send, leng, t_check = '', d_type = ''):
                 id_data
             ])
 
-    send = re.sub('\(|\)|<|>', '', send)
+    send = re.sub(r'\(|\)|<|>', '', send)
     send = send[:128] if len(send) > 128 else send
     send = send + ' (' + t_check + ')' if t_check != '' else send
 
@@ -1181,7 +1164,7 @@ def re_error(data):
             imp = [load_lang('error'), wiki_set(1), custom(), other2([0, 0])],
             data = '<h2>' + load_lang('error') + '</h2>' + end,
             menu = 0
-        ))
+        )), 401
     else:
         num = int(number_check(data.replace('/error/', '')))
         if num == 1:
@@ -1254,7 +1237,7 @@ def re_error(data):
                     '<div id="main_skin_set">' + \
                         '<h2>' + load_lang('error') + '</h2>' + \
                         '<ul>' + \
-                            '<li>' + data + '</li>' + \
+                            '<li>' + data + ' <a href="/main_skin_set">(' + load_lang('main_skin_set') + ')</a></li>' + \
                         '</ul>' + \
                     '</div>' + \
                     ('<script>window.addEventListener(\'DOMContentLoaded\', function() { main_css_skin_set(); });</script>' if get_url == '/main_skin_set' else ''),
@@ -1265,4 +1248,4 @@ def re_error(data):
                 imp = [load_lang('error'), wiki_set(1), custom(), other2([0, 0])],
                 data = '<h2>' + load_lang('error') + '</h2><ul><li>' + data + '</li></ul>',
                 menu = 0
-            )), 401
+            )), 400

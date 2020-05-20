@@ -28,7 +28,7 @@ def login_register_2(conn):
         if flask.request.form.get('pw', None) != flask.request.form.get('pw2', None):
             return re_error('/error/20')
 
-        if re.search('(?:[^A-Za-zㄱ-힣0-9 ])', flask.request.form.get('id', None)):
+        if re.search(r'(?:[^A-Za-zㄱ-힣0-9 ])', flask.request.form.get('id', None)):
             return re_error('/error/8')
 
         curs.execute(db_change('select html from html_filter where kind = "name"'))

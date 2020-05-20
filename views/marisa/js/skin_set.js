@@ -47,7 +47,6 @@ function skin_set() {
             language = "en-US";
         }
 
-        var data = document.getElementById("main_skin_set");
         var set_data = {};
 
         if(
@@ -57,7 +56,7 @@ function skin_set() {
             set_data["invert"] = "checked";
         }
 
-        data.innerHTML = ' \
+        document.getElementById("main_skin_set").innerHTML = ' \
             <input ' + set_data["invert"] + ' type="checkbox" id="invert" name="invert" value="invert"> ' + set_language[language]['darkmode'] + ' \
             <hr class="main_hr"> \
             <button onclick="get_post();">' + set_language[language]['save'] + '</button> \

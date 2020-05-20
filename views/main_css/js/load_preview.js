@@ -1,9 +1,6 @@
 function load_preview(name) {
-    var o_data = document.getElementById('content');
-    var p_data = document.getElementById('see_preview');
-
     var s_data = new FormData();
-    s_data.append('data', o_data.value);
+    s_data.append('data', document.getElementById('content').value);
 
     var url = "/api/w/" + name;
     var url_2 = "/api/markup";
@@ -19,8 +16,12 @@ function load_preview(name) {
     xhr.onreadystatechange = function() {
         if(xhr.readyState === 4 && xhr.status === 200) {
             var o_p_data = JSON.parse(xhr.responseText);
-            p_data.innerHTML = o_p_data['data'];
+            document.getElementById('see_preview').innerHTML = o_p_data['data'];
             eval(o_p_data['js_data'])
         }
     }
+}
+
+function load_raw_preview(name_1, name_2) {
+    document.getElementById(name_2).innerHTML = document.getElementById(name_1).value;
 }

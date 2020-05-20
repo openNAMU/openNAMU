@@ -12,20 +12,32 @@ def view_xref_2(conn, name):
     else:
         sql_num = 0
 
-    div = '<ul>'
+    if flask.request.args.get('change', '1') == '1':
+        div = '<a href="?change=2">(' + load_lang('link_in_this') + ')</a><hr class="main_hr">'
+    else:
+        div = '<a href="?change=1">(' + load_lang('normal') + ')</a><hr class="main_hr">'
 
-    if re.search('#', name):
-        name = re.sub('#', '\\\\#', name)
+    div += '<ul>'
 
-    curs.execute(db_change("" + \
-        "select link, type from back " + \
-        "where (title = ? and not type = 'cat' and not type = 'no') or (title like ? and type = 'redirect')" + \
-        "order by link asc limit ?, 50" + \
-    ""), [
-        name,
-        name + '#s-%',
-        sql_num
-    ])
+    if flask.request.args.get('change', '1') == '1':
+        curs.execute(db_change("" + \
+            "select distinct link, type from back " + \
+            "where title = ? and not type = 'cat' and not type = 'no'" + \
+            "order by link asc limit ?, 50" + \
+        ""), [
+            name,
+            sql_num
+        ])
+    else:
+        curs.execute(db_change("" + \
+            "select distinct title, type from back " + \
+            "where link = ? and not type = 'cat' and not type = 'no'" + \
+            "order by link asc limit ?, 50" + \
+        ""), [
+            name,
+            sql_num
+        ])
+
     data_list = curs.fetchall()
     for data in data_list:
         div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a>'
@@ -45,5 +57,5 @@ def view_xref_2(conn, name):
     return easy_minify(flask.render_template(skin_check(),
         imp = [name, wiki_set(), custom(), other2([' (' + load_lang('backlink') + ')', 0])],
         data = div,
-        menu = [['w/' + url_pas(name), load_lang('return')]]
+        menu = [['w/' + url_pas(name), load_lang('return')], ['backlink_reset/' + url_pas(name), load_lang('reset_backlink')]]
     ))

@@ -79,7 +79,7 @@ def list_block_2(conn, name, tool):
 
         if data[2] == '':
             admin = ''
-        elif re.search('^tool:', data[2]):
+        elif re.search(r'^tool:', data[2]):
             admin = data[2]
         else:
             admin = ip_pas(data[2])
