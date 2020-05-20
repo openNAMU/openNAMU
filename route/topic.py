@@ -21,6 +21,9 @@ def topic_2(conn, topic_num):
     ban = acl_check(name, 'topic', topic_num)
 
     if flask.request.method == 'POST':
+        if flask.request.form.get('content', 'Test') == '':
+            return redirect('/thread/' + topic_num)
+
         if captcha_post(flask.request.form.get('g-recaptcha-response', flask.request.form.get('g-recaptcha', ''))) == 1:
             return re_error('/error/13')
         else:
@@ -41,7 +44,7 @@ def topic_2(conn, topic_num):
 
         num = str(num)
 
-        match = re.search('^user:([^/]+)', name)
+        match = re.search(r'^user:([^/]+)', name)
         if match:
             y_check = 0
             if ip_or_user(match.group(1)) == 1:
@@ -67,10 +70,10 @@ def topic_2(conn, topic_num):
                     today
                 ])
 
-        cate_re = re.compile('\[\[((?:분류|category):(?:(?:(?!\]\]).)*))\]\]', re.I)
-        data = cate_re.sub('[br]', flask.request.form.get('content', 'Test'))
+        cate_re = re.compile(r'\[\[((?:분류|category):(?:(?:(?!\]\]).)*))\]\]', re.I)
+        data = cate_re.sub('[br]', flask.request.form.get('content', 'Test').replace('\r', ''))
 
-        for rd_data in re.findall("(?:#([0-9]+))", data):
+        for rd_data in re.findall(r"(?: |\n|^)(#(?:[0-9]+))(?: |\n|$)", data):
             curs.execute(db_change("select ip from topic where code = ? and id = ?"), [topic_num, rd_data])
             ip_data = curs.fetchall()
             if ip_data and ip_or_user(ip_data[0][0]) == 0:
@@ -80,8 +83,22 @@ def topic_2(conn, topic_num):
                     today
                 ])
 
-        data = re.sub("(?P<in>#(?:[0-9]+))", '[[\g<in>]]', data)
-        data = savemark(data)
+        for rd_data in re.findall(r"(?: |\n|^)@((?:[^ ]+))(?: |\n|$)", data):
+            curs.execute(db_change("select ip from history where ip = ? limit 1"), [rd_data])
+            ip_data = curs.fetchall()
+            if not ip_data:
+                curs.execute(db_change("select ip from topic where ip = ? limit 1"), [rd_data])
+                ip_data = curs.fetchall()
+
+            if ip_data and ip_or_user(ip_data[0][0]) == 0:
+                curs.execute(db_change('insert into alarm (name, data, date) values (?, ?, ?)'), [
+                    ip_data[0][0],
+                    ip + ' | <a href="/thread/' + topic_num + '#' + num + '">' + name + ' | ' + sub + ' | #' + num + '</a>',
+                    today
+                ])
+
+        data = re.sub(r"( |\n|^)(#(?:[0-9]+))( |\n|$)", '\g<1><topic_a>\g<2></topic_a>\g<3>', data)
+        data = re.sub(r"( |\n|^)(@(?:[^ ]+))( |\n|$)", '\g<1><topic_call>\g<2></topic_call>\g<3>', data)
 
         rd_plus(topic_num, today, name, sub)
         curs.execute(db_change("insert into topic (id, data, date, ip, code) values (?, ?, ?, ?, ?)"), [
@@ -93,7 +110,7 @@ def topic_2(conn, topic_num):
         ])
         conn.commit()
 
-        return redirect('/thread/' + topic_num + '?where=bottom')
+        return redirect('/thread/' + topic_num + '#' + num)
     else:
         data = ''
 
@@ -110,12 +127,12 @@ def topic_2(conn, topic_num):
             <a href="/thread/''' + topic_num + '/tool">(' + load_lang('topic_tool') + ''')</a>
             <hr class=\"main_hr\">
             <form style="''' + display + '''" method="post">
-                <textarea rows="10" id="content" placeholder="''' + load_lang('content') + '''" name="content"></textarea>
+                <textarea id="content" class="topic_content" placeholder="''' + load_lang('content') + '''" name="content"></textarea>
                 <hr class=\"main_hr\">
                 ''' + captcha_get() + (ip_warring() if display == '' else '') + '''
                 <input style="display: none;" name="topic" value="''' + name + '''">
                 <input style="display: none;" name="title" value="''' + sub + '''">
-                <button type="submit">''' + load_lang('send') + '''</button>
+                <button id="save" type="submit">''' + load_lang('send') + '''</button>
                 <button id="preview" type="button" onclick="load_preview(\'\')">''' + load_lang('preview') + '''</button>
             </form>
             <hr class=\"main_hr\">

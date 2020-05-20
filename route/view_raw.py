@@ -12,10 +12,11 @@ def view_raw_2(conn, name, topic_num, num):
     if not num:
         num = flask.request.args.get('num', None)
         if num:
-            num = int(number_check(num))
+            num = number_check(num)
+    else:
+        num = str(num)
 
     v_name = name
-    num = str(num)
     sub = ' (' + load_lang('raw') + ')'
 
     if not topic_num and num:

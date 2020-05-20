@@ -2,7 +2,7 @@ import os
 import re
 
 for i_data in os.listdir("route"):
-    f_src = re.search("(.+)\.py$", i_data)
+    f_src = re.search(r"(.+)\.py$", i_data)
     if f_src:
         f_src = f_src.group(1)
 
@@ -54,7 +54,7 @@ while 1:
 
             all_src = []
             for i_data in os.listdir("."):
-                f_src = re.search("(.+)\.db$", i_data)
+                f_src = re.search(r"(.+)\.db$", i_data)
                 if f_src:
                     all_src += [f_src.group(1)]
 
@@ -190,7 +190,7 @@ if setup_tool != 0:
     create_data['alarm'] = ['name', 'data', 'date']
     create_data['ua_d'] = ['name', 'ip', 'ua', 'today', 'sub']
     create_data['filter'] = ['name', 'regex', 'sub']
-    create_data['scan'] = ['user', 'title']
+    create_data['scan'] = ['user', 'title', 'type']
     create_data['acl'] = ['title', 'decu', 'dis', 'view', 'why']
     create_data['inter'] = ['title', 'link', 'icon']
     create_data['html_filter'] = ['html', 'kind', 'plus']
@@ -225,9 +225,6 @@ app.config['JSON_AS_ASCII'] = False
 
 flask_reggie.Reggie(app)
 
-compress = flask_compress.Compress()
-compress.init_app(app)
-
 class EverythingConverter(werkzeug.routing.PathConverter):
     regex = '.*?'
 
@@ -247,6 +244,7 @@ if not os.path.exists(app_var['path_data_image']):
 if not os.path.exists('views'):
     os.makedirs('views')
 
+print('----')
 import route.tool.init as server_init
 
 dislay_set_key = ['Host', 'Port', 'Language', 'Markup', 'Encryption method']
@@ -277,17 +275,22 @@ if not rep_data:
 else:
     rep_key = rep_data[0][0]
 
-curs.execute(db_change('select data from other where name = "adsense"'))
-adsense_result = curs.fetchall()
-if not adsense_result:
-    curs.execute(db_change('insert into other (name, data) values ("adsense", "False")'))
-    curs.execute(db_change('insert into other (name, data) values ("adsense_code", "")'))
-
 if set_data['db_type'] == 'sqlite':
     def back_up():
         print('----')
+
+        curs.execute(db_change('select data from other where name = "backup_where"'))
+        back_up_where = curs.fetchall()
+        if back_up_where and back_up_where[0][0] != '':
+            back_up_where = back_up_where[0][0]
+        else:
+            back_up_where = 'back_' + set_data['db'] + '.db'
+        
         try:
-            shutil.copyfile(set_data['db'] + '.db', 'back_' + set_data['db'] + '.db')
+            shutil.copyfile(
+                set_data['db'] + '.db', 
+                back_up_where
+            )
 
             print('Back up : OK')
         except:
@@ -311,17 +314,15 @@ if set_data['db_type'] == 'sqlite':
     else:
         print('Back up state : Turn off')
 
-if set_data['db_type'] == 'mysql':
-    def mysql_dont_off():
-        try:
-            urllib.request.urlopen('http://localhost:' + server_set['port'] + '/')
-        except:
-            pass
+def mysql_dont_off():
+    try:
+        urllib.request.urlopen('http://localhost:' + server_set['port'] + '/')
+    except:
+        pass
 
-        threading.Timer(60 * 60 * 6, mysql_dont_off).start()
+    threading.Timer(60 * 60 * 6, mysql_dont_off).start()
 
-    mysql_dont_off()
-
+mysql_dont_off()
 
 curs.execute(db_change('select data from other where name = "count_all_title"'))
 if not curs.fetchall():
@@ -361,7 +362,7 @@ def inter_wiki_plus(tools = None, name = None):
 @app.route('/setting')
 @app.route('/setting/<int:num>', methods=['POST', 'GET'])
 def setting(num = 0):
-    return setting_2(conn, num)
+    return setting_2(conn, num, set_data['db_type'])
 
 @app.route('/not_close_topic')
 def list_not_close_topic():
@@ -419,10 +420,6 @@ def server_restart():
 def server_now_update():
     return server_now_update_2(conn, version_list['master']['r_ver'])
 
-@app.route('/adsense_setting', methods=['GET', 'POST'])
-def setting_adsense():
-    return setting_adsense_2(conn)
-
 @app.route('/xref/<everything:name>')
 def view_xref(name = None):
     return view_xref_2(conn, name)
@@ -466,9 +463,9 @@ def edit_revert(name = None):
 def edit(name = 'Test'):
     return edit_2(conn, name)
 
-@app.route('/edit_req/<everything:name>', methods=['POST', 'GET'])
-def edit_req(name = 'Test'):
-    return edit_req_2(conn, name)
+@app.route('/backlink_reset/<everything:name>')
+def edit_backlink_reset(name = 'Test'):
+    return edit_backlink_reset_2(conn, name)
 
 @app.route('/delete/<everything:name>', methods=['POST', 'GET'])
 def edit_delete(name = None):
@@ -601,7 +598,7 @@ def view_read(name = None):
     return view_read_2(conn, name)
 
 @app.route('/topic_record/<name>')
-def list_user_topic(name = None):
+def list_user_topic(name = 'test'):
     return list_user_topic_2(conn, name)
 
 @app.route('/recent_changes')
@@ -626,13 +623,13 @@ def func_upload():
 def user_info():
     return user_info_2(conn)
 
-@app.route('/watch_list')
-def watch_list():
-    return watch_list_2(conn)
+@app.route('/<regex("watch_list|star_doc"):tool>')
+def watch_list(tool = 'star_doc'):
+    return watch_list_2(conn, tool)
 
-@app.route('/watch_list/<everything:name>')
-def watch_list_name(name = None):
-    return watch_list_name_2(conn, name)
+@app.route('/<regex("watch_list|star_doc"):tool>/<everything:name>')
+def watch_list_name(tool = 'star_doc', name = 'Test'):
+    return watch_list_name_2(conn, tool, name)
 
 @app.route('/custom_head', methods=['GET', 'POST'])
 def user_custom_head_view():

@@ -27,14 +27,13 @@ def api_topic_sub_2(conn, topic_num):
                 t_data_f = i[1]
                 b_color = 'toron_color'
             else:
-                if admin == 1:
-                    t_data_f = i[1]
-                    b_color = 'toron_color_grey'
-                else:
-                    t_data_f = ''
-                    b_color = 'toron_color_not'
+                t_data_f = ''
+                b_color = 'toron_color_not'
 
-                ip += ' (B)'
+                ip += ' <a href="/admin_log?search=blind%20(code%20' + topic_num + '#' + i[0] + '">(B)</a>'
+
+                if admin == 1:
+                    ip += ' <a href="/thread/' + topic_num + '/raw/' + i[0] + '">(R)</a>'
 
             if flask.request.args.get('render', None):
                 if i[0] == '1':
@@ -66,6 +65,17 @@ def api_topic_sub_2(conn, topic_num):
                 t_data_f = render_set(data = t_data_f, num = 2, include = 'topic_' + i[0])
                 t_plus_data = t_data_f[1]
                 t_data_f = t_data_f[0]
+
+                t_data_f = re.sub(
+                    r'&lt;topic_a&gt;((?:(?!&lt;\/topic_a&gt;).)+)&lt;\/topic_a&gt;', 
+                    '<a href="\g<1>">\g<1></a>', 
+                    t_data_f
+                )
+                t_data_f = re.sub(
+                    r'&lt;topic_call&gt;@((?:(?!&lt;\/topic_call&gt;).)+)&lt;\/topic_call&gt;', 
+                    '<a href="/w/user:\g<1>">@\g<1></a>', 
+                    t_data_f
+                )
 
                 all_data = '' + \
                     '<table id="toron">' + \

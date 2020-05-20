@@ -95,7 +95,7 @@ function render_html(name = '') {
                             height_data = '';
                         }
 
-                        return '<' + t_data[key] + ' src="' + src_data + '" width="' + width_data + '" height="' + height_data + '">' + in_data_2 + '</' + t_data[key] + '>';
+                        return '<' + t_data[key] + ' controls src="' + src_data + '" width="' + width_data + '" height="' + height_data + '">' + in_data_2 + '</' + t_data[key] + '>';
                     }
                 });
             }

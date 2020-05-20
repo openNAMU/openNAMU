@@ -26,7 +26,7 @@ def list_old_page_2(conn):
     ''), [sql_num])
     n_list = curs.fetchall()
     for data in n_list:
-        div += '<li><a href="/w/' + url_pas(data[0]) + '">' + html.escape(data[0]) + '</a> (' + re.sub(' .*$', '', data[1]) + ')</li>'
+        div += '<li><a href="/w/' + url_pas(data[0]) + '">' + html.escape(data[0]) + '</a> (' + re.sub(r' .*$', '', data[1]) + ')</li>'
 
     div += '</ul>' + next_fix('/old_page?num=', num, n_list)
 

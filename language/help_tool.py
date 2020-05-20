@@ -13,7 +13,7 @@ for i in list(n_json):
         del n_json[i]
 
 for i in list(o_json):
-    if not re.search('^_', i[0]):
+    if not re.search(r'^_', i[0]):
         if not i in n_json:
             print('o_title : ' + i)
             print('o_text : ' + o_json[i])

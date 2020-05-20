@@ -40,7 +40,7 @@ def edit_delete_2(conn, name, app_var):
             curs.execute(db_change("delete from data where title = ?"), [name])
             conn.commit()
 
-        file_check = re.search('^file:(.+)\.(.+)$', name)
+        file_check = re.search(r'^file:(.+)\.(.+)$', name)
         if file_check:
             file_check = file_check.groups()
             file_directory = os.path.join(

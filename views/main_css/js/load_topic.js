@@ -1,5 +1,4 @@
 function topic_list_load(topic_num, s_num, where) {
-    var o_data = document.getElementById(where);
     var url = "/api/thread/" + String(topic_num) + "?render=1&num=" + String(s_num);
     var n_data = "";
 
@@ -17,7 +16,7 @@ function topic_list_load(topic_num, s_num, where) {
                 t_plus_data += t_data[key]['plus_data'];
             }
 
-            o_data.innerHTML = n_data;
+            document.getElementById(where).innerHTML = n_data;
             eval(t_plus_data);
         }
     }
@@ -26,7 +25,6 @@ function topic_list_load(topic_num, s_num, where) {
 function topic_plus_load(topic_num, num) {
     var test = setInterval(function() {
         var url = "/api/thread/" + String(topic_num) + "?num=" + num + "&render=1";
-        var p_data = document.getElementById("plus_topic");
         var n_data = '';
         var n_num = 1;
 
@@ -46,7 +44,7 @@ function topic_plus_load(topic_num, num) {
                     t_plus_data += t_data[key]['plus_data'];
                 }
 
-                p_data.innerHTML += n_data;
+                document.getElementById("plus_topic").innerHTML += n_data;
                 eval(t_plus_data);
 
                 topic_plus_load(topic_num, String(Number(num) + 1));
@@ -57,7 +55,6 @@ function topic_plus_load(topic_num, num) {
 }
 
 function topic_main_load(topic_num, s_num) {
-    var o_data = document.getElementById('main_topic');
     if(s_num) {
         var url = "/api/thread/" + String(topic_num) + "?render=1&num=" + s_num;
     } else {
@@ -82,10 +79,11 @@ function topic_main_load(topic_num, s_num) {
                 t_plus_data += t_data[key]['plus_data'];
             }
 
-            o_data.innerHTML = n_data;
+            document.getElementById('main_topic').innerHTML = n_data;
             eval(t_plus_data);
-            if(window.location.search === "?where=bottom") {
-                document.getElementById(num).focus();
+
+            if(window.location.hash) {
+                document.getElementById(window.location.hash.replace(/^#/, '')).focus();
             }
             
             if(!s_num) {
@@ -96,7 +94,6 @@ function topic_main_load(topic_num, s_num) {
 }
 
 function topic_top_load(topic_num) {
-    var o_data = document.getElementById('top_topic');
     var url = "/api/thread/" + String(topic_num) + "?top=1&render=1";
     var n_data = "";
     var num = 1;
@@ -117,7 +114,7 @@ function topic_top_load(topic_num) {
                 t_plus_data += t_data[key]['plus_data'];
             }
 
-            o_data.innerHTML = n_data;
+            document.getElementById('top_topic').innerHTML = n_data;
             eval(t_plus_data);
 
             topic_main_load(topic_num, null);

@@ -23,14 +23,12 @@ function opening(data) {
 }
 
 document.onclick = function(event) {
-    var element = document.getElementById(save_data);
-
     for(var node = event.target; node != document.body; node = node.parentNode) {
         if(save_data !== '' && open == 0) {
             if(node.id === save_data) {
                 break;
             } else {
-                element.style.display = 'none';
+                document.getElementById(save_data).style.display = 'none';
             }
         }
     }
