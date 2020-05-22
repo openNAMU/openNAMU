@@ -20,22 +20,22 @@ def api_topic_sub_2(conn, topic_num):
         json_data = {}
         admin = admin_check(3)
 
-        for i in data:
-            ip = ip_pas(i[3])
+        if flask.request.args.get('render', None):
+            for i in data:
+                ip = ip_pas(i[3])
 
-            if i[4] != 'O':
-                t_data_f = i[1]
-                b_color = 'toron_color'
-            else:
-                t_data_f = ''
-                b_color = 'toron_color_not'
+                if i[4] != 'O':
+                    t_data_f = i[1]
+                    b_color = 'toron_color'
+                else:
+                    t_data_f = ''
+                    b_color = 'toron_color_not'
 
-                ip += ' <a href="/admin_log?search=blind%20(code%20' + topic_num + '#' + i[0] + '">(B)</a>'
+                    ip += ' <a href="/admin_log?search=blind%20(code%20' + topic_num + '#' + i[0] + '">(B)</a>'
 
-                if admin == 1:
-                    ip += ' <a href="/thread/' + topic_num + '/raw/' + i[0] + '">(R)</a>'
+                    if admin == 1:
+                        ip += ' <a href="/thread/' + topic_num + '/raw/' + i[0] + '">(R)</a>'
 
-            if flask.request.args.get('render', None):
                 if i[0] == '1':
                     s_user = i[3]
                 else:
@@ -99,7 +99,8 @@ def api_topic_sub_2(conn, topic_num):
                     "data" : all_data,
                     "plus_data" : t_plus_data
                 }
-            else:
+        else:
+            for i in data:
                 if i[4] != 'O' or (i[4] == 'O' and admin == 1):
                     t_data_f = i[1]
                 else:
