@@ -19,9 +19,6 @@ def give_user_ban_2(conn, name):
     if flask.request.method == 'POST':
         name = name if name else flask.request.form.get('name', 'test')
 
-        if admin_check(1, 'ban' + ((' (' + name + ')') if name else '')) != 1:
-            return re_error('/error/3')
-
         end = flask.request.form.get('second', '0')
         end = end if end else '0'
 
@@ -34,6 +31,9 @@ def give_user_ban_2(conn, name):
                 return re_error('/error/23')
         else:
             type_d = None
+
+        if admin_check(1, 'ban' + (' ' + type_d if type_d else '') + ' (' + name + ')') != 1:
+            return re_error('/error/3')
 
         ban_insert(
             name,
@@ -49,7 +49,7 @@ def give_user_ban_2(conn, name):
         if admin_check(1) != 1:
             return re_error('/error/3')
 
-        curs.execute(db_change("select end, why from ban where block = ?"), [name])
+        curs.execute(db_change("select end, why from rb where block = ? and ongoing = '1'"), [name])
         end = curs.fetchall()
         if end:
             main_name = name
@@ -61,37 +61,32 @@ def give_user_ban_2(conn, name):
             else:
                 data = '<ul><li>' + load_lang('period') + ' : ' + end[0][0] + '</li>'
 
-            curs.execute(db_change("select block from ban where block = ? and login = 'O'"), [name])
+            curs.execute(db_change("select block from rb where block = ? and login = 'O' and ongoing = '1'"), [name])
             if curs.fetchall():
                 data += '<li>' + load_lang('login_able') + '</li>'
 
             if end[0][1] != '':
-                data += '<li>' + load_lang('why') + ' : ' + end[0][1] + '</li></ul><hr class=\"main_hr\">'
+                data += '<li>' + load_lang('why') + ' : ' + end[0][1] + '</li></ul><hr class="main_hr">'
             else:
-                data += '</ul><hr class=\"main_hr\">'
+                data += '</ul><hr class="main_hr">'
         else:
             if name:
                 main_name = name
-
-                if name and re.search(r"^([0-9]{1,3}\.[0-9]{1,3})$", name):
-                    b_now = load_lang('band_ban')
-                else:
-                    b_now = load_lang('ban')
-
+                b_now = load_lang('ban')
                 now = ' (' + b_now + ')'
 
                 if name and ip_or_user(name) == 1:
-                    plus = '<input type="checkbox" name="login"> ' + load_lang('login_able') + '<hr class=\"main_hr\">'
+                    plus = '<input type="checkbox" name="login"> ' + load_lang('login_able') + '<hr class="main_hr">'
                 else:
                     plus = ''
 
-                name += '<hr class=\"main_hr\">'
+                name += '<hr class="main_hr">'
                 regex = ''
             else:
                 main_name = load_lang('ban')
-                name = '<input placeholder="' + load_lang('name_or_ip_or_regex') + '" name="name" type="text"><hr class=\"main_hr\">'
-                regex = '<input type="checkbox" name="regex"> ' + load_lang('regex') + '<hr class=\"main_hr\">'
-                plus = '<input type="checkbox" name="login"> ' + load_lang('login_able') + '<hr class=\"main_hr\">'
+                name = '<input placeholder="' + load_lang('name_or_ip_or_regex') + '" name="name" type="text"><hr class="main_hr">'
+                regex = '<input type="checkbox" name="regex"> ' + load_lang('regex') + '<hr class="main_hr">'
+                plus = '<input type="checkbox" name="login"> ' + load_lang('login_able') + '<hr class="main_hr">'
                 now = 0
                 b_now = load_lang('ban')
 
@@ -109,12 +104,12 @@ def give_user_ban_2(conn, name):
 
             data = name + '''
                 <script>function insert_v(name, data) { document.getElementById(name).value = data; }</script>''' + insert_data + '''
-                <hr class=\"main_hr\">
+                <hr class="main_hr">
                 <input placeholder="''' + load_lang('ban_period') + ''' (''' + load_lang('second') + ''')" name="second" id="second" type="text">
-                <hr class=\"main_hr\">
+                <hr class="main_hr">
                 ''' + regex + '''
                 <input placeholder="''' + load_lang('why') + '''" name="why" type="text">
-                <hr class=\"main_hr\">
+                <hr class="main_hr">
             ''' + plus
 
         return easy_minify(flask.render_template(skin_check(),

@@ -132,7 +132,6 @@ create_data['all_data'] = [
     'rd',
     'user',
     'user_set',
-    'ban',
     'topic',
     'rb',
     'back',
@@ -179,9 +178,8 @@ if setup_tool != 0:
     create_data['user'] = ['id', 'pw', 'acl', 'date', 'encode']
     create_data['user_set'] = ['name', 'id', 'data']
     create_data['user_application'] = ['id', 'pw', 'date', 'encode', 'question', 'answer', 'ip', 'ua', 'token', 'email']
-    create_data['ban'] = ['block', 'end', 'why', 'band', 'login']
     create_data['topic'] = ['id', 'data', 'date', 'ip', 'block', 'top', 'code']
-    create_data['rb'] = ['block', 'end', 'today', 'blocker', 'why', 'band']
+    create_data['rb'] = ['block', 'end', 'today', 'blocker', 'why', 'band', 'login', 'ongoing']
     create_data['back'] = ['title', 'link', 'type']
     create_data['custom'] = ['user', 'css']
     create_data['other'] = ['name', 'data', 'coverage']

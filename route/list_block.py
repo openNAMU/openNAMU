@@ -21,7 +21,7 @@ def list_block_2(conn, name, tool):
 
     data_list = ''
 
-    curs.execute(db_change("delete from ban where (end < ? and end like '2%')"), [get_time()])
+    curs.execute(db_change("update rb set ongoing = '' where end < ? and end != '' and ongoing = '1'"), [get_time()])
     conn.commit()
 
     if not name:
@@ -29,7 +29,11 @@ def list_block_2(conn, name, tool):
             sub = ' (' + load_lang('in_progress') + ')'
             menu = [['block_log', load_lang('normal')]]
 
-            curs.execute(db_change("select why, block, '', end, '', band from ban where ((end > ? and end like '2%') or end = '') order by end desc limit ?, 50"), [
+            curs.execute(db_change("" + \
+                "select why, block, '', end, '', band from rb " + \
+                "where ((end > ? and end like '2%') or end = '') and ongoing = '1' " + \
+                "order by end desc limit ?, 50"
+            ), [
                 get_time(),
                 sql_num
             ])
@@ -37,10 +41,12 @@ def list_block_2(conn, name, tool):
             sub = 0
             menu = 0
 
-            div = '''
-                <a href="/manager/11">(''' + load_lang('blocked') + ''')</a> <a href="/manager/12">(''' + load_lang('admin') + ''')</a> <a href="?type=ongoing">(''' + load_lang('in_progress') + ''')</a>
-                <hr class=\"main_hr\">
-            ''' + div
+            div = '' + \
+                '<a href="/manager/11">(' + load_lang('blocked') + ')</a> ' + \
+                '<a href="/manager/12">(' + load_lang('admin') + ')</a> ' + \
+                '<a href="?type=ongoing">(' + load_lang('in_progress') + ')</a>' + \
+                '<hr class="main_hr">' + \
+            '' + div
 
             curs.execute(db_change("select why, block, blocker, end, today, band from rb order by today desc limit ?, 50"), [sql_num])
     else:
@@ -84,11 +90,7 @@ def list_block_2(conn, name, tool):
         else:
             admin = ip_pas(data[2])
 
-        if data[4] == '':
-            start = ''
-        else:
-            start = load_lang('start') + ' : ' + data[4]
-
+        start = load_lang('start') + ' : ' + (data[4] if data[4] != '' else '0')
         div += '''
             <tr>
                 <td>''' + ip + '''</td>
