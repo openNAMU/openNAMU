@@ -7,7 +7,7 @@ def api_user_info_2(conn, name):
         plus_d = ''
         plus_t = []
 
-        curs.execute(db_change("delete from ban where (end < ? and end like '2%')"), [get_time()])
+        curs.execute(db_change("update rb set ongoing = '' where end < ? and end != '' and ongoing = '1'"), [get_time()])
         conn.commit()
 
         plus_d = '''
@@ -49,7 +49,7 @@ def api_user_info_2(conn, name):
             plus_t += [load_lang('blocked') + '<br>']
             regex_ban = 0
 
-            curs.execute(db_change("select login, block, end, why from ban where band = 'regex'"))
+            curs.execute(db_change("select login, block, end, why from rb where band = 'regex' and ongoing = '1'"))
             for test_r in curs.fetchall():
                 if re.compile(test_r[1]).search(name):
                     plus_t[1] += load_lang('type') + ' : ' + load_lang('regex')
@@ -59,7 +59,7 @@ def api_user_info_2(conn, name):
                     regex_ban = 1
 
             if regex_ban == 0:
-                curs.execute(db_change("select end, login, band, why from ban where block = ?"), [name])
+                curs.execute(db_change("select end, login, band, why from rb where block = ? and ongoing = '1'"), [name])
                 block_data = curs.fetchall()
                 if block_data:
                     plus_t[1] += load_lang('type') + ' : ' + (load_lang('band_blocked') if block_data[0][2] == 'O' else load_lang('normal'))

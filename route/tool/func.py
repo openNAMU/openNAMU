@@ -183,8 +183,7 @@ def update(ver_num, set_data):
 
     if ver_num < 3170400:
         curs.execute(db_change("select title, sub, code from topic where id = '1'"))
-        change_topic = curs.fetchall()
-        for i in change_topic:
+        for i in curs.fetchall():
             curs.execute(db_change("update topic set code = ? where title = ? and sub = ?"), [i[2], i[0], i[1]])
             curs.execute(db_change("update rd set code = ? where title = ? and sub = ?"), [i[2], i[0], i[1]])
 
@@ -207,16 +206,14 @@ def update(ver_num, set_data):
 
     if ver_num < 3183603:
         curs.execute(db_change("select block from ban where band = 'O'"))
-        change_band = curs.fetchall()
-        for i in change_band:
+        for i in curs.fetchall():
             curs.execute(db_change("update ban set block = ?, band = 'regex' where block = ? and band = 'O'"), [
                 '^' + i[0].replace('.', '\\.'),
                 i[0]
             ])
 
         curs.execute(db_change("select block from rb where band = 'O'"))
-        change_band = curs.fetchall()
-        for i in change_band:
+        for i in curs.fetchall():
             curs.execute(db_change("update rb set block = ?, band = 'regex' where block = ? and band = 'O'"), [
                 '^' + i[0].replace('.', '\\.'),
                 i[0]
@@ -224,6 +221,22 @@ def update(ver_num, set_data):
             
     if ver_num < 3184400:
         curs.execute(db_change('delete from cache_data'))
+
+    # set 1
+    if ver_num < 3190201:
+        today_time = get_time()
+
+        curs.execute(db_change("select block, end, why, band, login from ban"))
+        for i in curs.fetchall():
+            curs.execute(db_change("insert into rb (block, end, today, why, band, login, ongoing) values (?, ?, ?, ?, ?, ?, ?)"), [
+                i[0],
+                i[1],
+                today_time,
+                i[2],
+                i[3],
+                i[4],
+                '1'
+            ])
 
     conn.commit()
 
@@ -989,10 +1002,13 @@ def ban_check(ip = None, tool = None):
     if admin_check(None, None, ip) == 1:
         return 0
 
-    curs.execute(db_change("delete from ban where (end < ? and end like '2%')"), [get_time()])
+    curs.execute(db_change("update rb set ongoing = '' where end < ? and end != '' and ongoing = '1'"), [get_time()])
     conn.commit()
 
-    curs.execute(db_change("select login, block from ban where ((end > ? and end like '2%') or end = '') and band = 'regex'"), [get_time()])
+    curs.execute(db_change("" + \
+        "select login, block from rb " + \
+        "where ((end > ? and end != '') or end = '') and band = 'regex' and ongoing = '1'" + \
+    ""), [get_time()])
     regex_d = curs.fetchall()
     for test_r in regex_d:
         g_regex = re.compile(test_r[1])
@@ -1003,7 +1019,10 @@ def ban_check(ip = None, tool = None):
             else:
                 return 1
 
-    curs.execute(db_change("select login from ban where ((end > ? and end like '2%') or end = '') and block = ? and band = ''"), [get_time(), ip])
+    curs.execute(db_change("" + \
+        "select login from rb " + \
+        "where ((end > ? and end != '') or end = '') and block = ? and band = '' and ongoing = '1'" + \
+    ""), [get_time(), ip])
     ban_d = curs.fetchall()
     if ban_d:
         if tool and tool == 'login':
@@ -1022,9 +1041,11 @@ def ban_insert(name, end, why, login, blocker, type_d = None):
     else:
         band = ''
 
-    curs.execute(db_change("delete from ban where (end < ? and end like '2%')"), [get_time()])
+    curs.execute(db_change("update rb set ongoing = '' where end < ? and end != '' and ongoing = '1'"), [now_time])
 
-    curs.execute(db_change("select block from ban where ((end > ? and end like '2%') or end = '') and block = ? and band = ?"), [get_time(), name, band])
+    curs.execute(db_change("" + \
+        "select block from rb where ((end > ? and end != '') or end = '') and block = ? and band = ? and ongoing = '1'" + \
+    ""), [now_time, name, band])
     if curs.fetchall():
         curs.execute(db_change("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, ?)"), [
             name,
@@ -1034,7 +1055,7 @@ def ban_insert(name, end, why, login, blocker, type_d = None):
             '',
             band
         ])
-        curs.execute(db_change("delete from ban where block = ? and band = ?"), [name, band])
+        curs.execute(db_change("update rb set ongoing = '' where block = ? and band = ? and ongoing = '1'"), [name, band])
     else:
         if login != '':
             login = 'O'
@@ -1050,20 +1071,13 @@ def ban_insert(name, end, why, login, blocker, type_d = None):
         else:
             r_time = ''
 
-        curs.execute(db_change("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, ?)"), [
+        curs.execute(db_change("insert into rb (block, end, today, blocker, why, band, ongoing) values (?, ?, ?, ?, ?, ?, '1')"), [
             name, 
             r_time, 
             now_time, 
             blocker, 
             why, 
             band
-        ])
-        curs.execute(db_change("insert into ban (block, end, why, band, login) values (?, ?, ?, ?, ?)"), [
-            name, 
-            r_time, 
-            why, 
-            band, 
-            login
         ])
 
     conn.commit()

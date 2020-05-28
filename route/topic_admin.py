@@ -30,7 +30,7 @@ def topic_admin_2(conn, topic_num, num):
         curs.execute(db_change("select id from topic where code = ? and id = ? and top = 'O'"), [topic_num, num])
         top_topic_d = curs.fetchall()
 
-        curs.execute(db_change("select end from ban where block = ?"), [data[0][1]])
+        curs.execute(db_change("select end from rb where block = ? and ongoing = '1'"), [data[0][1]])
         user_ban_d = curs.fetchall()
 
         ban += '''

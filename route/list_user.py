@@ -17,7 +17,7 @@ def list_user_2(conn):
     user_list = curs.fetchall()
     for data in user_list:
         if admin_one == 1:
-            curs.execute(db_change("select block from ban where block = ?"), [data[0]])
+            curs.execute(db_change("select block from rb where block = ? and ongoing = '1'"), [data[0]])
             if curs.fetchall():
                 ban_button = ' <a href="/ban/' + url_pas(data[0]) + '">(' + load_lang('ban_release') + ')</a>'
             else:

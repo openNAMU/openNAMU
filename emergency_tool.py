@@ -195,7 +195,7 @@ elif what_i_do == '3':
         ''
     ])
 
-    curs.execute(db_change("delete from ban where block = ?"), [user_data])
+    curs.execute(db_change("update rb set ongoing = '' where block = ?"), [user_data])
 elif what_i_do == '4':
     print('----')
     print('Host : ', end = '')
