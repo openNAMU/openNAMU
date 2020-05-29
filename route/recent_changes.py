@@ -111,6 +111,7 @@ def recent_changes_2(conn, name, tool):
         div += '</tr>'
 
         data_list = curs.fetchall()
+        all_ip = ip_pas([i[3] for i in data_list])
         for data in data_list:
             select += '<option value="' + data[0] + '">' + data[0] + '</option>'
             send = '<br>'
@@ -126,7 +127,7 @@ def recent_changes_2(conn, name, tool):
             else:
                 leng = '<span style="color:gray;">(' + data[5] + ')</span>'
 
-            ip = ip_pas(data[3])
+            ip = all_ip[data[3]]
             if tool == 'history':
                 m_tool = '<a href="/history_tool/' + url_pas(data[1]) + '?num=' + data[0] + '&type=history">(' + load_lang('tool') + ')</a>'
             else:
