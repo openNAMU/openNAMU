@@ -21,8 +21,9 @@ def api_topic_sub_2(conn, topic_num):
         admin = admin_check(3)
 
         if flask.request.args.get('render', None):
+            all_ip = ip_pas([i[3] for i in data])
             for i in data:
-                ip = ip_pas(i[3])
+                ip = all_ip[i[3]]
 
                 if i[4] != 'O':
                     t_data_f = i[1]
