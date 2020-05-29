@@ -675,41 +675,53 @@ def admin_check(num = None, what = None, name = ''):
 
 def ip_pas(raw_ip, type_d = 0):
     hide = 0
+    end_ip = {}
 
-    if ip_or_user(raw_ip) != 0:
-        curs.execute(db_change("select data from other where name = 'ip_view'"))
-        data = curs.fetchall()
-        if data and data[0][0] != '':
-            if re.search(r'\.', raw_ip):
-                ip = re.sub(r'\.([^.]*)\.([^.]*)$', '.*.*', raw_ip)
-            else:
-                ip = re.sub(r':([^:]*):([^:]*)$', ':*:*', raw_ip)
-
-            if not admin_check(1):
-                hide = 1
-        else:
-            ip = raw_ip
+    if type(raw_ip) != type([]):
+        get_ip = [raw_ip]
+        return_ip = 1
     else:
-        if type_d == 0:
-            curs.execute(db_change("select title from data where title = ?"), ['user:' + raw_ip])
-            if curs.fetchall():
-                ip = '<a href="/w/' + url_pas('user:' + raw_ip) + '">' + raw_ip + '</a>'
+        get_ip = raw_ip
+        return_ip = 0
+
+    for raw_ip in get_ip:
+        if not raw_ip in end_ip:
+            if ip_or_user(raw_ip) != 0:
+                curs.execute(db_change("select data from other where name = 'ip_view'"))
+                data = curs.fetchall()
+                if data and data[0][0] != '':
+                    if re.search(r'\.', raw_ip):
+                        ip = re.sub(r'\.([^.]*)\.([^.]*)$', '.*.*', raw_ip)
+                    else:
+                        ip = re.sub(r':([^:]*):([^:]*)$', ':*:*', raw_ip)
+
+                    if not admin_check(1):
+                        hide = 1
+                else:
+                    ip = raw_ip
             else:
-                ip = '<a id="not_thing" href="/w/' + url_pas('user:' + raw_ip) + '">' + raw_ip + '</a>'
+                if type_d == 0:
+                    curs.execute(db_change("select title from data where title = ?"), ['user:' + raw_ip])
+                    if curs.fetchall():
+                        ip = '<a href="/w/' + url_pas('user:' + raw_ip) + '">' + raw_ip + '</a>'
+                    else:
+                        ip = '<a id="not_thing" href="/w/' + url_pas('user:' + raw_ip) + '">' + raw_ip + '</a>'
 
-            if admin_check('all', None, raw_ip) == 1:
-                ip = '<b>' + ip + '</b>'
-        else:
-            ip = raw_ip
+                    if admin_check('all', None, raw_ip) == 1:
+                        ip = '<b>' + ip + '</b>'
+                else:
+                    ip = raw_ip
 
-    if type_d == 0:
-        if ban_check(raw_ip) == 1:
-            ip = '<s>' + ip + '</s>'
+            if type_d == 0:
+                if ban_check(raw_ip) == 1:
+                    ip = '<s>' + ip + '</s>'
 
-        if hide == 0:
-            ip += ' <a href="/tool/' + url_pas(raw_ip) + '">(' + load_lang('tool') + ')</a>'
+                if hide == 0:
+                    ip += ' <a href="/tool/' + url_pas(raw_ip) + '">(' + load_lang('tool') + ')</a>'
+        
+            end_ip[raw_ip] = ip
 
-    return ip
+    return ip if return_ip == 1 else end_ip
 
 def custom():
     if 'head' in flask.session:
