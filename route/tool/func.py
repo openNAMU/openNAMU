@@ -17,6 +17,7 @@ for i in range(0, 2):
         import pymysql
         import hashlib
         import smtplib
+        import asyncio
         import zipfile
         import shutil
         import threading
