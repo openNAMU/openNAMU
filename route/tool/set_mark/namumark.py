@@ -327,13 +327,13 @@ def middle_parser(data):
                         middle_list += ['div_1']
 
                         data = re.sub(
-                            '{{{#!wiki(?: style=(?:&quot;|&#x27;)((?:(?!&quot;|&#x27;).)*)(?:&quot;|&#x27;))?(?: *)\n?',
+                            r'{{{#!wiki(?: style=(?:&quot;|&#x27;)((?:(?!&quot;|&#x27;).)*)(?:&quot;|&#x27;))?(?: *)\n?',
                             '<div id="wiki_div" style="' + str(middle_data_2[0] if middle_data_2[0] else '') + '">',
                             data,
                             1
                         )
                     elif re.search(r'^#!syntax', middle_data[0]):
-                        middle_data_2 = re.search(r'{{{#!syntax ((?:(?!\n).)+)\n?', data)
+                        middle_data_2 = re.search(r'{{{#!syntax ((?:(?!\n|{{{).)+)\n?', data)
                         if middle_data_2:
                             middle_data_2 = middle_data_2.groups()
                         else:
@@ -347,7 +347,7 @@ def middle_parser(data):
                         middle_list += ['pre']
 
                         data = re.sub(
-                            '{{{#!syntax ?((?:(?!\n).)*)\n?',
+                            r'{{{#!syntax ?((?:(?!\n|{{{).)*)\n?',
                             '<pre id="syntax"><code class="' + middle_data_2[0] + '">',
                             data,
                             1
@@ -362,7 +362,7 @@ def middle_parser(data):
                             folding_data = ['Test']
 
                         data = re.sub(
-                            '{{{#!folding ?((?:(?!\n).)*)\n?', '' + \
+                            r'{{{#!folding ?((?:(?!\n).)*)\n?', '' + \
                             '<div>' + \
                                 str(folding_data[0]) + ' ' + \
                                 '<div style="display: inline-block;">' + \
@@ -469,7 +469,10 @@ def middle_parser(data):
             break
 
     while 1:
-        syntax_data = re.search(r'<code class="((?:(?!"|>|<).)+)">((?:\n*(?:(?:(?!<\/code>|<span id="nowiki_).)+)\n*)+)<\/code>', data)
+        syntax_data = re.search(
+            r'<code class="((?:(?!"|>|<).)+)">((?:\n*(?:(?:(?!<\/code>|<span id="(?:(?:(?!nowiki_).)*)nowiki_).)+)\n*)+)<\/code>', 
+            data
+        )
         if syntax_data:
             syntax_data = syntax_data.groups()
 
@@ -483,7 +486,7 @@ def middle_parser(data):
             ''
 
             data = re.sub(
-                '<code class="((?:(?!"|>|<).)+)">((?:\n*(?:(?:(?!<\/code>|<span id="syntax_).)+)\n*)+)<\/code>',
+                r'<code class="((?:(?!"|>|<).)+)">((?:\n*(?:(?:(?!<\/code>|<span id="(?:(?:(?!nowiki_).)*)nowiki_).)+)\n*)+)<\/code>', 
                 '<code class="' + syntax_data[0] + '"><span id="' + include_name + 'nowiki_' + str(nowiki_num) + '"></span></code>',
                 data,
                 1
