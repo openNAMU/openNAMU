@@ -24,7 +24,7 @@ def view_read_2(conn, name):
 
     curs.execute(db_change("select link from back where title = ? and type = 'cat' order by link asc"), [name])
 
-    curs.execute(db_change("select title from data where title >= '' and title like ?"), ['%' + name + '/%'])
+    curs.execute(db_change("select title from data where title like ?"), ['%' + name + '/%'])
     if curs.fetchall():
         down = 1
     else:
