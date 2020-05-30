@@ -20,13 +20,13 @@ def api_search_2(conn, name):
     if int(curs.fetchall()[0][0]) < 30000:
         curs.execute(db_change("" + \
             "select distinct title, case " + \
-            "when title >= '' and title like ? then 'title' else 'data' end from data " + \
-            "where title >= '' and (title like ? or data like ?) order by case " + \
-            "when title >= '' and title like ? then 1 else 2 end limit ?, ?"),
+            "when title like ? then 'title' else 'data' end from data " + \
+            "where (title like ? or data like ?) order by case " + \
+            "when title like ? then 1 else 2 end limit ?, ?"),
             ['%' + name + '%', '%' + name + '%', '%' + name + '%', '%' + name + '%', page, num]
         )
     else:
-        curs.execute(db_change("select title from data where title >= '' and title like ? order by title limit ?, ?"),
+        curs.execute(db_change("select title from data where title like ? order by title limit ?, ?"),
             ['%' + name + '%', page, num]
         )
     all_list = curs.fetchall()

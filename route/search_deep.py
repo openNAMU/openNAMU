@@ -37,9 +37,9 @@ def search_deep_2(conn, name):
     if int(curs.fetchall()[0][0]) < 30000:
         curs.execute(db_change("" + \
             "select distinct title, case " + \
-            "when title >= '' and title like ? then 'title' else 'data' end from data " + \
-            "where title >= '' and (title like ? or data like ?) order by case " + \
-            "when title >= '' and title like ? then 1 else 2 end limit ?, 50"),
+            "when title like ? then 'title' else 'data' end from data " + \
+            "where (title like ? or data like ?) order by case " + \
+            "when title like ? then 1 else 2 end limit ?, 50"),
             ['%' + name + '%', '%' + name + '%', '%' + name + '%', '%' + name + '%', sql_num]
         )
         all_list = curs.fetchall()
@@ -54,7 +54,7 @@ def search_deep_2(conn, name):
 
                 div_plus += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a> (' + data[1] + ')</li>'
     else:
-        curs.execute(db_change("select title from data where title >= '' and title like ? order by title limit ?, 50"),
+        curs.execute(db_change("select title from data where title like ? order by title limit ?, 50"),
             ['%' + name + '%', sql_num]
         )
         all_list = curs.fetchall()
