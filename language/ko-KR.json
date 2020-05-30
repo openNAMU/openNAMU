@@ -367,5 +367,6 @@
     "enter_html" : "HTML을 입력하세요.",
     "exp_edit_conflict" : "편집 충돌 발생",
     "backup_where" : "백업 위치",
-    "empty" : "빈칸"
+    "empty" : "빈칸",
+    "email_send_error" : "이메일 전송이 실패했습니다."
 }
