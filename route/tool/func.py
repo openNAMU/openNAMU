@@ -257,7 +257,7 @@ def set_init():
 
     curs.execute(db_change('select data from other where name = "smtp_server" or name = "smtp_port" or name = "smtp_security"'))
     if not curs.fetchall():
-        for i in [['smtp_server', 'imap.google.com'], ['smtp_port', '587'], ['smtp_security', 'tls']]:
+        for i in [['smtp_server', 'smtp.gmail.com'], ['smtp_port', '587'], ['smtp_security', 'tls']]:
             curs.execute(db_change("insert into other (name, data) values (?, ?)"), [i[0], i[1]])
 
 def pw_encode(data, data2 = '', type_d = ''):
