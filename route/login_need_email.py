@@ -27,7 +27,8 @@ def login_need_email_2(conn, tool):
                 else:
                     i_text = 'Key : ' + flask.session['c_key']
 
-                send_email(flask.request.form.get('email', ''), t_text, i_text)
+                if send_email(flask.request.form.get('email', ''), t_text, i_text) == 0:
+                    return re_error('/error/18')
 
                 return redirect('/check_pass_key')
             else:
@@ -68,7 +69,9 @@ def login_need_email_2(conn, tool):
                             else:
                                 i_text = 'Key : ' + flask.session['c_key']
 
-                            send_email(flask.request.form.get('email', ''), t_text, i_text)
+                            if send_email(flask.request.form.get('email', ''), t_text, i_text) == 0:
+                                return re_error('/error/18')
+
                             flask.session['c_email'] = flask.request.form.get('email', '')
 
                             if tool == 'email_change':

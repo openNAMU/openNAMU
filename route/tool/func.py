@@ -116,10 +116,14 @@ def send_email(who, title, data):
         smtp.sendmail(smtp_email, who, msg.as_string())
 
         smtp.quit()
+
+        return 1
     except Exception as e:
         print('----')
         print('Error : Email send error')
         print(e)
+
+        return 0
 
 def last_change(data):
     json_address = re.sub(r"(((?!\.|\/).)+)\.html$", "set.json", skin_check())
@@ -1229,6 +1233,8 @@ def re_error(data):
             data = load_lang('same_file_error')
         elif num == 17:
             data = load_lang('file_capacity_error') + wiki_set(3)
+        elif num == 18:
+            data = load_lang('email_send_error')
         elif num == 19:
             data = load_lang('decument_exist_error')
         elif num == 20:
