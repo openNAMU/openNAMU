@@ -110,6 +110,8 @@ def send_email(who, title, data):
                 smtp = smtplib.SMTP_SSL(smtp_server, smtp_port)
             
             smtp.login(smtp_email, smtp_pass)
+        else:
+            raise
 
         msg = email.mime.text.MIMEText(data)
         msg['Subject'] = title
