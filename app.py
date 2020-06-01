@@ -201,11 +201,6 @@ if setup_tool != 0:
             except:
                 curs.execute(db_change("alter table " + create_table + " add " + create + " longtext default ''"))
 
-            try:
-                curs.execute(db_change('create index index_' + create_table + '_' + create + ' on ' + create_table + '(' + create + ')'))
-            except:
-                pass
-
     if setup_tool == 1:
         update(int(ver_set_data[0][0]), set_data)
     else:
