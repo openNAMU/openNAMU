@@ -952,6 +952,7 @@ def namumark(conn, data, title, include_num):
     category = ''
     link_re = re.compile('\[\[((?:(?!\[\[|\]\]|<\/td>).)+)\]\]')
     category_re = re.compile(r'^(?:category|분류):', re.I)
+    e_link_id = 0
     while 1:
         link = link_re.search(data)
         if link:
@@ -1098,7 +1099,14 @@ def namumark(conn, data, title, include_num):
                 else:
                     data = link_re.sub('[[' + title + under_title + ']]', data, 1)
             elif re.search(r'^http(s)?:\/\/', main_link):
-                data = link_re.sub('<a id="out_link" rel="nofollow" href="' + main_link + '">' + see_link + '</a>', data, 1)
+                str_e_link_id = str(e_link_id)
+                data = link_re.sub('<a id="out_link" class="out_link_' + str_e_link_id + '" rel="nofollow" href="">' + see_link + '</a>', data, 1)
+
+                plus_data += "document.getElementsByClassName('out_link_" + str_e_link_id + "')[0].href = '" + main_link.replace('\'', '\\\'') + "';\n"
+                if see_link == main_link:
+                    plus_data += "document.getElementsByClassName('out_link_" + str_e_link_id + "')[0].innerHTML = '" + main_link.replace('\'', '\\\'') + "';\n"
+
+                e_link_id += 1
             else:
                 return_link = link_fix(main_link)
                 main_link = html.unescape(return_link[0])
