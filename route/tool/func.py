@@ -769,7 +769,7 @@ def custom():
             user_admin = '0'
             user_acl_list = '0'
 
-        curs.execute(db_change("select count(name) from alarm where name = ?"), [ip])
+        curs.execute(db_change("select count(*) from alarm where name = ?"), [ip])
         count = curs.fetchall()
         if count:
             user_notice = str(count[0][0])
@@ -980,7 +980,7 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
                     if admin_check(num) == 1:
                         return 0
                     else:
-                        curs.execute(db_change("select count(title) from history where ip = ?"), [ip])
+                        curs.execute(db_change("select count(*) from history where ip = ?"), [ip])
                         count = curs.fetchall()
                         count = count[0][0] if count else 0
                         if count >= 50:
