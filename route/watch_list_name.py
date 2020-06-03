@@ -8,7 +8,7 @@ def watch_list_name_2(conn, tool, name):
         return redirect('/login')
 
     if tool == 'watch_list':
-        curs.execute(db_change("select count(title) from scan where user = ?"), [ip])
+        curs.execute(db_change("select count(*) from scan where user = ?"), [ip])
         count = curs.fetchall()
         if count and count[0][0] > 9:
             return re_error('/error/28')

@@ -270,7 +270,7 @@ elif what_i_do == '11':
     except:
         pass
 elif what_i_do == '12':
-    curs.execute(db_change("select count(title) from data"))
+    curs.execute(db_change("select count(*) from data"))
     count_data = curs.fetchall()
     if count_data:
         count_data = count_data[0][0]
