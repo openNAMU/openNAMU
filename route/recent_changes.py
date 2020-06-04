@@ -103,7 +103,9 @@ def recent_changes_2(conn, name, tool):
 
             curs.execute(db_change('' + \
                 'select id, title, date, ip, send, leng, hide from history ' + \
-                plus_sql + 'and date in (select date from history order by date desc limit ?, 50) order by date desc' + \
+                plus_sql + \
+                'order by date desc ' + \
+                'limit ?, 50' + \
             ''), [sql_num])
 
         div += '</tr>'
