@@ -512,6 +512,7 @@ def namumark(conn, data, title, include_num):
     backlink = []
     end_data = {}
 
+    data = re.sub(r'@([^=@]+)=(?P<in>[^=@]+)@', '\g<in>', data)
     data = re.sub(r'<math>(?P<in>(?:(?!<\/math>).)+)<\/math>', '[math(\g<in>)]', data)
 
     data = html.escape(data)
