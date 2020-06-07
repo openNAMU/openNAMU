@@ -112,11 +112,7 @@ def recent_changes_2(conn, name, tool):
                 data_list = []
                 curs.execute(db_change('select id, title from rc order by date desc'))
                 for i in curs.fetchall():
-                    curs.execute(db_change('' + \
-                        'select id, title, date, ip, send, leng, hide from history ' + \
-                        'where id = ? and title = ? ' + \
-                        'order by date desc' + \
-                    ''), i)
+                    curs.execute(db_change('select id, title, date, ip, send, leng, hide from history where id = ? and title = ?'), i)
                     data_list += curs.fetchall()
 
         div += '</tr>'

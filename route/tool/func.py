@@ -1135,12 +1135,16 @@ def history_plus(title, data, date, ip, send, leng, t_check = '', d_type = ''):
     send = send[:128] if len(send) > 128 else send
     send = send + ' (' + t_check + ')' if t_check != '' else send
 
-    curs.execute(db_change('delete from rc order by date asc limit 1'))
-    curs.execute(db_change("insert into rc (id, title, date, type) values (?, ?, ?, 'normal')"), [
-        id_data,
-        title,
-        date
-    ])
+    if not re.search('^user:', title):
+        curs.execute(db_change("select count(*) from rc where type = 'normal'"))
+        if curs.fetchall()[0][0] > 49:
+            curs.execute(db_change('delete from rc order by date asc limit 1'))
+        
+        curs.execute(db_change("insert into rc (id, title, date, type) values (?, ?, ?, 'normal')"), [
+            id_data,
+            title,
+            date
+        ])
 
     curs.execute(db_change("insert into history (id, title, data, date, ip, send, leng, hide, type) values (?, ?, ?, ?, ?, ?, ?, '', ?)"), [
         id_data,

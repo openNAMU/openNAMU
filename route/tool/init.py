@@ -66,3 +66,5 @@ def init(key):
                     return server_set_val
             else:
                 return server_set_var[key]['default']
+
+        print('----')
