@@ -246,6 +246,21 @@ def update(ver_num, set_data):
                 '1'
             ])
 
+    if ver_num < 3191301:
+        curs.execute(db_change('' + \
+            'select id, title, date from history ' + \
+            'where not title like "user:%" ' + \
+            'order by date desc ' + \
+            'limit 50' + \
+        ''))
+        data_list = curs.fetchall()
+        for get_data in data_list:
+            curs.execute(db_change("insert into rc (id, title, date, type) values (?, ?, ?, 'normal')"), [
+                get_data[0], 
+                get_data[1],
+                get_data[2]
+            ])
+
     conn.commit()
 
     print('Update pass')
@@ -1116,17 +1131,16 @@ def history_plus(title, data, date, ip, send, leng, t_check = '', d_type = ''):
     id_data = curs.fetchall()
     id_data = str(int(id_data[0][0]) + 1) if id_data else '1'
 
-    if d_type != 'req':
-        curs.execute(db_change("select title from history where title = ? and id = ? and type = 'req'"), [title, id_data])
-        if curs.fetchall():
-            curs.execute(db_change("update history set type = 'req_close' where title = ? and id = ? and type = 'req'"), [
-                title,
-                id_data
-            ])
-
     send = re.sub(r'\(|\)|<|>', '', send)
     send = send[:128] if len(send) > 128 else send
     send = send + ' (' + t_check + ')' if t_check != '' else send
+
+    curs.execute(db_change('delete from rc order by date asc limit 1'))
+    curs.execute(db_change("insert into rc (id, title, date, type) values (?, ?, ?, 'normal')"), [
+        id_data,
+        title,
+        date
+    ])
 
     curs.execute(db_change("insert into history (id, title, data, date, ip, send, leng, hide, type) values (?, ?, ?, ?, ?, ?, ?, '', ?)"), [
         id_data,
