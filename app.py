@@ -277,7 +277,6 @@ if set_data['db_type'] == 'sqlite':
     except:
         back_time = 0
 
-    print('----')
     if back_time != 0:
         print('Back up state : ' + str(back_time) + ' hours')
 
