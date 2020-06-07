@@ -235,6 +235,8 @@ for i in range(len(server_set_key)):
 
     server_set[server_set_key[i]] = server_set_val
 
+print('----')
+
 curs.execute(db_change('select data from other where name = "key"'))
 rep_data = curs.fetchall()
 if not rep_data:
