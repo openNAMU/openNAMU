@@ -9,12 +9,9 @@ def api_recent_change_2(conn):
     data_list = []
     curs.execute(db_change('select id, title from rc order by date desc'))
     for i in curs.fetchall():
-        curs.execute(db_change('' + \
-            'select id, title, date, ip, send, leng, hide from history ' + \
-            'where id = ? and title = ? ' + \
-            'order by date desc' + \
-        ''), i)
+        curs.execute(db_change('select id, title, date, ip, send, leng, hide from history where id = ? and title = ?'), i)
         data_list += curs.fetchall()
+        
     if data_list:
         return flask.jsonify(data_list)
     else:
