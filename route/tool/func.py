@@ -1138,7 +1138,13 @@ def history_plus(title, data, date, ip, send, leng, t_check = '', d_type = ''):
     if not re.search('^user:', title):
         curs.execute(db_change("select count(*) from rc where type = 'normal'"))
         if curs.fetchall()[0][0] > 49:
-            curs.execute(db_change('delete from rc order by date asc limit 1'))
+            curs.execute(db_change("select id, title from rc where type = 'normal' order by date asc limit 1"))
+            rc_data = curs.fetchall()
+            if rc_data:
+                curs.execute(db_change('delete from rc where id = ? and title = ? and type = "normal"'), [
+                    rc_data[0][0],
+                    rc_data[0][1]
+                ])
         
         curs.execute(db_change("insert into rc (id, title, date, type) values (?, ?, ?, 'normal')"), [
             id_data,
