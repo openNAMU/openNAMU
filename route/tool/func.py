@@ -226,9 +226,6 @@ def update(ver_num, set_data):
                 '^' + i[0].replace('.', '\\.'),
                 i[0]
             ])
-            
-    if ver_num < 3184400:
-        curs.execute(db_change('delete from cache_data'))
 
     # set 1
     if ver_num < 3190201:
@@ -260,6 +257,9 @@ def update(ver_num, set_data):
                 get_data[1],
                 get_data[2]
             ])
+
+    if ver_num < 3191700:
+        curs.execute(db_change('delete from cache_data'))
 
     conn.commit()
 
