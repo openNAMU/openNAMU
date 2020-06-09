@@ -1075,15 +1075,22 @@ def namumark(conn, data, title, include_num):
 
                     inter_view = inter[0][1] if inter[0][1] != '' else (inter_data[0] + ':')
 
-                    data = link_re.sub('<a id="inside" name="set_link_' + str_e_link_id + '" href="">' + inter_view + see_link + '</a>', data, 1)
+                    data = link_re.sub('' + \
+                        '<a id="inside" ' + \
+                            'name="' + include_name + 'set_link_' + str_e_link_id + '" ' + \
+                            'href="">' + inter_view + see_link + '</a>' + \
+                        '', 
+                        data, 
+                        1
+                    )
                     plus_data += "" + \
-                        "document.getElementsByName('set_link_" + str_e_link_id + "')[0].href = '" + \
+                        "document.getElementsByName('" + include_name + "set_link_" + str_e_link_id + "')[0].href = '" + \
                             (inter[0][0] + tool.url_pas(main_link) + other_link).replace('\'', '\\\'') + "';" + \
                         "\n" + \
                     ""
                     if inter_same == 1:
                         plus_data += "" + \
-                            "document.getElementsByName('set_link_" + str_e_link_id + "')[0].innerHTML = '" + \
+                            "document.getElementsByName('" + include_name + "set_link_" + str_e_link_id + "')[0].innerHTML = '" + \
                                 (inter_view + main_link + other_link).replace('\'', '\\\'') + "';" + \
                             "\n" + \
                         ""
@@ -1098,16 +1105,24 @@ def namumark(conn, data, title, include_num):
                 else:
                     data = link_re.sub('[[' + title + under_title + ']]', data, 1)
             elif re.search(r'^http(s)?:\/\/', main_link):
-                data = link_re.sub('<a id="out_link" name="set_link_' + str_e_link_id + '" rel="nofollow" href="">' + see_link + '</a>', data, 1)
+                data = link_re.sub('' + \
+                    '<a id="out_link" ' + \
+                        'name="' + include_name + 'set_link_' + str_e_link_id + '" ' + \
+                        'rel="nofollow" ' + \
+                        'href="">' + see_link + '</a>' + \
+                    '', 
+                    data, 
+                    1
+                )
 
                 plus_data += "" + \
-                    "document.getElementsByName('set_link_" + str_e_link_id + "')[0].href = '" + \
+                    "document.getElementsByName('" + include_name + "set_link_" + str_e_link_id + "')[0].href = '" + \
                         main_link.replace('\'', '\\\'') + "';" + \
                     "\n" + \
                 ""
                 if inter_same == 1:
                     plus_data += "" + \
-                        "document.getElementsByName('set_link_" + str_e_link_id + "')[0].innerHTML = '" + \
+                        "document.getElementsByName('" + include_name + "set_link_" + str_e_link_id + "')[0].innerHTML = '" + \
                             main_link.replace('\'', '\\\'') + "';" + \
                         "\n" + \
                     ""
@@ -1132,21 +1147,29 @@ def namumark(conn, data, title, include_num):
                     if not curs.fetchall():
                         backlink += [[title, main_link, 'no']]
 
-                    data = link_re.sub('<a class="' + include_name + 'link_finder" name="set_link_' + str_e_link_id + '" title="" href="">' + see_link + '</a>', data, 1)
+                    data = link_re.sub('' + \
+                        '<a class="' + include_name + 'link_finder" ' + \
+                            'name="' + include_name + 'set_link_' + str_e_link_id + '" ' + \
+                            'title="" ' + \
+                            'href="">' + see_link + '</a>' + \
+                        '', 
+                        data,
+                        1
+                    )
 
                     plus_data += "" + \
-                        "document.getElementsByName('set_link_" + str_e_link_id + "')[0].href = '" + \
+                        "document.getElementsByName('" + include_name + "set_link_" + str_e_link_id + "')[0].href = '" + \
                             ('/w/' + tool.url_pas(main_link) + other_link).replace('\'', '\\\'') + "';" + \
                         "\n" + \
                     ""
                     plus_data += "" + \
-                        "document.getElementsByName('set_link_" + str_e_link_id + "')[0].title = '" + \
+                        "document.getElementsByName('" + include_name + "set_link_" + str_e_link_id + "')[0].title = '" + \
                             (html.escape(main_link) + other_link).replace('\'', '\\\'') + "';" + \
                         "\n" + \
                     ""
                     if inter_same == 1:
                         plus_data += "" + \
-                            "document.getElementsByName('set_link_" + str_e_link_id + "')[0].innerHTML = '" + \
+                            "document.getElementsByName('" + include_name + "set_link_" + str_e_link_id + "')[0].innerHTML = '" + \
                                 (html.escape(main_link) + other_link).replace('\'', '\\\'') + "';" + \
                             "\n" + \
                         ""
