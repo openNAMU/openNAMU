@@ -1216,7 +1216,7 @@ def re_error(data):
         if ban_check() == 1:
             end = '<div id="get_user_info"></div><script>load_user_info("' + ip_check() + '");</script>'
         else:
-            end = load_lang('authority_error')
+            end = '<ul><li>' + load_lang('authority_error') + '</li></ul>'
 
         return easy_minify(flask.render_template(skin_check(),
             imp = [load_lang('error'), wiki_set(1), custom(), other2([0, 0])],
