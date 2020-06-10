@@ -17,6 +17,10 @@ def api_sitemap_2(conn):
             '</urlset>' + \
         ''
 
+        f = open("sitemap.xml", 'w')
+        f.write(data)
+        f.close()
+
         return flask.Response(data, mimetype = 'text/xml')
     else:
         return re_error('/ban')
