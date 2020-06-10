@@ -24,48 +24,49 @@ def main_manager_2(conn, num, r_ver):
     if num == 1:
         return easy_minify(flask.render_template(skin_check(),
             imp = [load_lang('admin_tool'), wiki_set(), custom(), other2([0, 0])],
-            data =  '''
-                    <h2>''' + load_lang('admin') + '''</h2>
-                    <ul>
-                        <li><a href="/manager/2">''' + load_lang('acl_change') + '''</a></li>
-                        <li><a href="/manager/3">''' + load_lang('check_user') + '''</a></li>
-                        <li><a href="/ban">''' + load_lang('ban') + '''</a></li>
-                        <li><a href="/manager/5">''' + load_lang('authorize') + '''</a></li>
-                    </ul>
-                    <br>
-                    <h2>''' + load_lang('owner') + '''</h2>
-                    <ul>
-                        <li><a href="/give_log">''' + load_lang('admin_group_list') + '''</a></li>
-                        <li><a href="/many_delete">''' + load_lang('many_delete') + '''</a></li>
-                        <li><a href="/applications">''' + load_lang('application_list') + '''</a></li>
-                        <li><a href="/setting">''' + load_lang('setting') + '''</a></li>
-                    </ul>
-                    <h3>''' + load_lang('filter') + '''</h3>
-                    <ul>
-                        <li><a href="/edit_filter">''' + load_lang('edit_filter_list') + '''</a></li>
-                        <li><a href="/inter_wiki">''' + load_lang('interwiki_list') + '''</a></li>
-                        <li><a href="/edit_top">''' + load_lang('edit_tool_list') + '''</a></li>
-                        <li><a href="/image_license">''' + load_lang('image_license_list') + '''</a></li>
-                        <li><a href="/email_filter">''' + load_lang('email_filter_list') + '''</a></li>
-                        <li><a href="/name_filter">''' + load_lang('id_filter_list') + '''</a></li>
-                        <li><a href="/file_filter">''' + load_lang('file_filter_list') + '''</a></li>
-                        <li><a href="/extension_filter">''' + load_lang('extension_filter_list') + '''</a></li>
-                    </ul>
-                    <br>
-                    <h2>''' + load_lang('server') + '''</h2>
-                    <ul>
-                        <li><a href="/restart">''' + load_lang('wiki_restart') + '''</a></li>
-                        <li><a href="/update">''' + load_lang('update') + '''</a></li>
-                    </ul>
-                    <br>
-                    <h2>''' + load_lang('version') + '''</h2>
-                    <ul>
-                        <li><a href="/api/skin_info?all=true">''' + load_lang('skin_info') + '''</a></li>
-                        <li>''' + load_lang('version') + ' : ' + r_ver + '''</li>
-                        <li id="ver_send" style="display: none;">''' + load_lang('lastest') + ''' : </li>
-                    </ul>
-                    <script>load_ver();</script>
-                    ''',
+            data = '''
+                <h2>''' + load_lang('admin') + '''</h2>
+                <ul>
+                    <li><a href="/manager/2">''' + load_lang('acl_change') + '''</a></li>
+                    <li><a href="/manager/3">''' + load_lang('check_user') + '''</a></li>
+                    <li><a href="/ban">''' + load_lang('ban') + '''</a></li>
+                    <li><a href="/manager/5">''' + load_lang('authorize') + '''</a></li>
+                </ul>
+                <br>
+                <h2>''' + load_lang('owner') + '''</h2>
+                <ul>
+                    <li><a href="/give_log">''' + load_lang('admin_group_list') + '''</a></li>
+                    <li><a href="/many_delete">''' + load_lang('many_delete') + '''</a></li>
+                    <li><a href="/applications">''' + load_lang('application_list') + '''</a></li>
+                    <li><a href="/api/sitemap.xml">''' + load_lang('get_sitemap') + '''</a></li>
+                    <li><a href="/setting">''' + load_lang('setting') + '''</a></li>
+                </ul>
+                <h3>''' + load_lang('filter') + '''</h3>
+                <ul>
+                    <li><a href="/edit_filter">''' + load_lang('edit_filter_list') + '''</a></li>
+                    <li><a href="/inter_wiki">''' + load_lang('interwiki_list') + '''</a></li>
+                    <li><a href="/edit_top">''' + load_lang('edit_tool_list') + '''</a></li>
+                    <li><a href="/image_license">''' + load_lang('image_license_list') + '''</a></li>
+                    <li><a href="/email_filter">''' + load_lang('email_filter_list') + '''</a></li>
+                    <li><a href="/name_filter">''' + load_lang('id_filter_list') + '''</a></li>
+                    <li><a href="/file_filter">''' + load_lang('file_filter_list') + '''</a></li>
+                    <li><a href="/extension_filter">''' + load_lang('extension_filter_list') + '''</a></li>
+                </ul>
+                <br>
+                <h2>''' + load_lang('server') + '''</h2>
+                <ul>
+                    <li><a href="/restart">''' + load_lang('wiki_restart') + '''</a></li>
+                    <li><a href="/update">''' + load_lang('update') + '''</a></li>
+                </ul>
+                <br>
+                <h2>''' + load_lang('version') + '''</h2>
+                <ul>
+                    <li><a href="/api/skin_info?all=true">''' + load_lang('skin_info') + '''</a></li>
+                    <li>''' + load_lang('version') + ' : ' + r_ver + '''</li>
+                    <li id="ver_send" style="display: none;">''' + load_lang('lastest') + ''' : </li>
+                </ul>
+                <script>load_ver();</script>
+            ''',
             menu = [['other', load_lang('return')]]
         ))
     elif not num - 1 > len(title_list):
@@ -82,13 +83,13 @@ def main_manager_2(conn, num, r_ver):
 
             return easy_minify(flask.render_template(skin_check(),
                 imp = [title_list[(num - 2)][2], wiki_set(), custom(), other2([0, 0])],
-                data =  '''
-                        <form method="post">
-                            <input placeholder="''' + placeholder + '''" name="name" type="text">
-                            <hr class=\"main_hr\">
-                            <button type="submit">''' + load_lang('go') + '''</button>
-                        </form>
-                        ''',
+                data = '''
+                    <form method="post">
+                        <input placeholder="''' + placeholder + '''" name="name" type="text">
+                        <hr class=\"main_hr\">
+                        <button type="submit">''' + load_lang('go') + '''</button>
+                    </form>
+                ''',
                 menu = [['manager', load_lang('return')]]
             ))
     else:

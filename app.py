@@ -681,6 +681,10 @@ def api_title_index():
 def api_image_view(name = ''):
     return api_image_view_2(conn, name, app_var)
 
+@app.route('/api/sitemap.xml')
+def api_sitemap():
+    return api_sitemap_2(conn)
+
 # File
 @app.route('/views/<everything:name>')
 def main_views(name = None):
