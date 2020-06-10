@@ -369,5 +369,5 @@
     "backup_where" : "백업 위치",
     "empty" : "빈칸",
     "email_send_error" : "이메일 전송이 실패했습니다.",
-    "get_sitemap" : "sitemap.xml 만들기"
+    "get_sitemap" : "sitemap.xml 만들거나 갱신하기"
 }

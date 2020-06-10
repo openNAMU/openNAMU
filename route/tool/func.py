@@ -1273,8 +1273,7 @@ def re_error(data):
             data = load_lang('regex_error')
         elif num == 24:
             curs.execute(db_change("select data from other where name = 'slow_edit'"))
-            slow_data = curs.fetchall()
-            data = load_lang('fast_edit_error') + slow_data[0][0]
+            data = load_lang('fast_edit_error') + curs.fetchall()[0][0]
         elif num == 25:
             data = load_lang('too_many_dec_error')
         elif num == 26:
