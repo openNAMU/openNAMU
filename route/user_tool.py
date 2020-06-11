@@ -27,7 +27,7 @@ def user_tool_2(conn, name):
         '''
 
     return easy_minify(flask.render_template(skin_check(),
-        imp = [name, wiki_set(), custom(), other2([' (' + load_lang('tool') + ')', 0])],
+        imp = [name, wiki_set(), custom(), other2(['(' + load_lang('tool') + ')', 0])],
         data = data,
         menu = 0
     ))

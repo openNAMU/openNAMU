@@ -195,7 +195,7 @@ def edit_2(conn, name):
         data_old = re.sub(r'\n+$', '', data_old)
 
         return easy_minify(flask.render_template(skin_check(), 
-            imp = [name, wiki_set(), custom(), other2([' (' + sub + ')', 0])],
+            imp = [name, wiki_set(), custom(), other2(['(' + sub + ')', 0])],
             data =  get_name + '''
                 <form method="post">
                     <script>
