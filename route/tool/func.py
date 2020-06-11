@@ -223,7 +223,7 @@ def update(ver_num, set_data):
                 i[0]
             ])
             
-    if ver_num < 3184400:
+    if ver_num < 3184500:
         curs.execute(db_change('delete from cache_data'))
 
     conn.commit()
