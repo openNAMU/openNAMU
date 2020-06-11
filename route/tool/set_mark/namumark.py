@@ -415,32 +415,29 @@ def middle_parser(data):
                     else:
                         data = middle_re.sub('</' + middle_list[middle_num] + '>', data, 1)
 
-                    del(middle_list[middle_num])
+                    del middle_list[middle_num]
 
     while 1:
-        if middle_stack == 0:
+        if middle_list == []:
             break
         else:
-            if middle_list == []:
+            if middle_stack > 0:
+                middle_stack -= 1
+
+            if middle_stack > 0:
                 data += '<middle_end>'
             else:
-                if middle_stack > 0:
-                    middle_stack -= 1
+                if middle_num > 0:
+                    middle_num -= 1
 
-                if middle_stack > 0:
-                    data += '<middle_end>'
+                if middle_list[middle_num] == '2div':
+                    data += '</div_1></div_2></div_2>'
+                elif middle_list[middle_num] == 'pre':
+                    data += '</code></pre>'
                 else:
-                    if middle_num > 0:
-                        middle_num -= 1
+                    data += '</' + middle_list[middle_num] + '>'
 
-                    if middle_list[middle_num] == '2div':
-                        data += '</div_1></div_2></div_2>'
-                    elif middle_list[middle_num] == 'pre':
-                        data += '</code></pre>'
-                    else:
-                        data += '</' + middle_list[middle_num] + '>'
-
-                    del(middle_list[middle_num])
+                del middle_list[middle_num]
 
     data = data.replace('<middle_start>', '{{{')
     data = data.replace('<middle_end>', '}}}')
@@ -460,7 +457,7 @@ def middle_parser(data):
             ''
 
             data = re.sub(
-                '<code>((?:(?:(?!<\/code>).)*\n*)*)<\/code>',
+                r'<code>((?:(?:(?!<\/code>).)*\n*)*)<\/code>',
                 '<span id="' + include_name + 'nowiki_' + str(nowiki_num) + '"></span>',
                 data,
                 1
@@ -468,9 +465,10 @@ def middle_parser(data):
         else:
             break
 
+    print(data)
     while 1:
         syntax_data = re.search(
-            r'<code class="((?:(?!"|>|<).)+)">((?:\n*(?:(?:(?!<\/code>|<span id="(?:(?:(?!nowiki_).)*)nowiki_).)+)\n*)+)<\/code>', 
+            r'<code class="([^"\'>]+)">((?:\n*(?:(?:(?!<\/code>|<span ).)+)\n*)+)<\/code>', 
             data
         )
         if syntax_data:
@@ -486,7 +484,7 @@ def middle_parser(data):
             ''
 
             data = re.sub(
-                r'<code class="((?:(?!"|>|<).)+)">((?:\n*(?:(?:(?!<\/code>|<span id="(?:(?:(?!nowiki_).)*)nowiki_).)+)\n*)+)<\/code>', 
+                r'<code class="([^"\'>]+)">((?:\n*(?:(?:(?!<\/code>|<span ).)+)\n*)+)<\/code>', 
                 '<code class="' + syntax_data[0] + '"><span id="' + include_name + 'nowiki_' + str(nowiki_num) + '"></span></code>',
                 data,
                 1
