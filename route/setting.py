@@ -398,7 +398,7 @@ def setting_2(conn, num, db_set):
                 sub_plus = ''
 
             return easy_minify(flask.render_template(skin_check(),
-                imp = [load_lang(data = 'main' + title, safe = 1), wiki_set(), custom(), other2([' (HTML)' + sub_plus, 0])],
+                imp = [load_lang(data = 'main' + title, safe = 1), wiki_set(), custom(), other2(['(HTML)' + sub_plus, 0])],
                 data = '''
                     <form method="post">
                         ''' + start + '''

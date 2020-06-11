@@ -42,7 +42,7 @@ def give_history_add_2(conn, name):
             p_text = load_lang('default_edit_help')
 
         return easy_minify(flask.render_template(skin_check(),
-            imp = [load_lang('history_add'), wiki_set(), custom(), other2([' (' + name + ')', 0])],
+            imp = [load_lang('history_add'), wiki_set(), custom(), other2(['(' + name + ')', 0])],
             data = '''
                 <form method="post">
                     <script>do_stop_exit();</script>

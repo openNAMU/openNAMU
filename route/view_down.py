@@ -12,7 +12,7 @@ def view_down_2(conn, name):
     div += '</ul>'
 
     return easy_minify(flask.render_template(skin_check(),
-        imp = [name, wiki_set(), custom(), other2([' (' + load_lang('sub') + ')', 0])],
+        imp = [name, wiki_set(), custom(), other2(['(' + load_lang('sub') + ')', 0])],
         data = div,
         menu = [['w/' + url_pas(name), load_lang('return')]]
     ))
