@@ -415,32 +415,29 @@ def middle_parser(data):
                     else:
                         data = middle_re.sub('</' + middle_list[middle_num] + '>', data, 1)
 
-                    del(middle_list[middle_num])
+                    del middle_list[middle_num]
 
     while 1:
-        if middle_stack == 0:
+        if middle_list == []:
             break
         else:
-            if middle_list == []:
+            if middle_stack > 0:
+                middle_stack -= 1
+
+            if middle_stack > 0:
                 data += '<middle_end>'
             else:
-                if middle_stack > 0:
-                    middle_stack -= 1
+                if middle_num > 0:
+                    middle_num -= 1
 
-                if middle_stack > 0:
-                    data += '<middle_end>'
+                if middle_list[middle_num] == '2div':
+                    data += '</div_1></div_2></div_2>'
+                elif middle_list[middle_num] == 'pre':
+                    data += '</code></pre>'
                 else:
-                    if middle_num > 0:
-                        middle_num -= 1
+                    data += '</' + middle_list[middle_num] + '>'
 
-                    if middle_list[middle_num] == '2div':
-                        data += '</div_1></div_2></div_2>'
-                    elif middle_list[middle_num] == 'pre':
-                        data += '</code></pre>'
-                    else:
-                        data += '</' + middle_list[middle_num] + '>'
-
-                    del(middle_list[middle_num])
+                del middle_list[middle_num]
 
     data = data.replace('<middle_start>', '{{{')
     data = data.replace('<middle_end>', '}}}')
@@ -460,7 +457,7 @@ def middle_parser(data):
             ''
 
             data = re.sub(
-                '<code>((?:(?:(?!<\/code>).)*\n*)*)<\/code>',
+                r'<code>((?:(?:(?!<\/code>).)*\n*)*)<\/code>',
                 '<span id="' + include_name + 'nowiki_' + str(nowiki_num) + '"></span>',
                 data,
                 1
@@ -470,7 +467,7 @@ def middle_parser(data):
 
     while 1:
         syntax_data = re.search(
-            r'<code class="((?:(?!"|>|<).)+)">((?:\n*(?:(?:(?!<\/code>|<span id="(?:(?:(?!nowiki_).)*)nowiki_).)+)\n*)+)<\/code>', 
+            r'<code class="([^"\'>]+)">((?:(?:(?:(?!<\/code>|<span ).)*)\n*)+)<\/code>', 
             data
         )
         if syntax_data:
@@ -486,7 +483,7 @@ def middle_parser(data):
             ''
 
             data = re.sub(
-                r'<code class="((?:(?!"|>|<).)+)">((?:\n*(?:(?:(?!<\/code>|<span id="(?:(?:(?!nowiki_).)*)nowiki_).)+)\n*)+)<\/code>', 
+                r'<code class="([^"\'>]+)">((?:(?:(?:(?!<\/code>|<span ).)*)\n*)+)<\/code>', 
                 '<code class="' + syntax_data[0] + '"><span id="' + include_name + 'nowiki_' + str(nowiki_num) + '"></span></code>',
                 data,
                 1
@@ -507,14 +504,12 @@ def namumark(conn, data, title, include_num):
     nowiki_num = 0
     data = '\n' + data + '\n'
     include_name = include_num + '_' if include_num else ''
-    plus_data = '' + \
-        'get_link_state("' + include_name + '");\n' + \
-        'get_file_state("' + include_name + '");\n' + \
-    ''
+    plus_data = ''
 
     backlink = []
     end_data = {}
 
+    data = re.sub(r'@([^=@]+)=(?P<in>[^=@]+)@', '\g<in>', data)
     data = re.sub(r'<math>(?P<in>(?:(?!<\/math>).)+)<\/math>', '[math(\g<in>)]', data)
 
     data = html.escape(data)
@@ -952,10 +947,13 @@ def namumark(conn, data, title, include_num):
     category = ''
     link_re = re.compile('\[\[((?:(?!\[\[|\]\]|<\/td>).)+)\]\]')
     category_re = re.compile(r'^(?:category|분류):', re.I)
+    e_link_id = 0
     while 1:
         link = link_re.search(data)
         if link:
             link = link.group(1)
+            str_e_link_id = str(e_link_id)
+            e_link_id += 1
 
             link_split = re.search(r'((?:(?!\|).)+)(?:\|((?:(?!\|).)+))', link)
             if link_split:
@@ -963,9 +961,11 @@ def namumark(conn, data, title, include_num):
 
                 main_link = link_split[0]
                 see_link = link_split[1]
+                inter_same = 0
             else:
                 main_link = link
                 see_link = link
+                inter_same = 1
 
             if re.search(r'^((?:file|파일)|(?:out|외부)):', main_link):
                 file_style = ''
@@ -1026,7 +1026,7 @@ def namumark(conn, data, title, include_num):
 
                 data = link_re.sub(
                     '<span style="' + file_align + '">' + \
-                        '<span  style="' + file_color + '"' + \
+                        '<span  style="' + file_color + '" ' + \
                                 'class="' + include_name + 'file_finder" ' + \
                                 'under_style="' + file_style + '" ' + \
                                 'under_alt="' + file_alt + '" ' + \
@@ -1051,44 +1051,48 @@ def namumark(conn, data, title, include_num):
                     see_link = see_link.replace('#blur', '')
 
                 backlink += [[title, main_link, 'cat']]
-                category += '<a class="' + include_name + 'link_finder' + link_id + '" href="/w/' + tool.url_pas(main_link) + '">' + category_re.sub('', see_link) + '</a> | '
+                category += '' + \
+                    '<a class="' + include_name + 'link_finder' + link_id + '" ' + \
+                        'href="/w/' + tool.url_pas(main_link) + '">' + \
+                        category_re.sub('', see_link) + \
+                    '</a> | ' + \
+                ''
 
                 data = link_re.sub('', data, 1)
-            elif re.search(r'^wiki:', main_link):
-                data = re.sub(
-                    '\[\[((?:(?!\[\[|\]\]|<\/td>).)+)\]\]',
-                    '<a id="inside" href="/' + tool.url_pas(re.sub('^wiki:', '', main_link)) + '">' + see_link + '</a>',
-                    data,
-                    1
-                )
             elif re.search(r'^inter:((?:(?!:).)+):', main_link):
-                inter_data = re.search(r'^inter:((?:(?!:).)+):((?:(?!\]\]|\|).)+)', main_link)
+                inter_data = re.search(r'^inter:((?:(?!:).)+):((?:(?!\]\]).)+)', main_link)
                 inter_data = inter_data.groups()
 
                 curs.execute(tool.db_change('select link, icon from inter where title = ?'), [inter_data[0]])
                 inter = curs.fetchall()
                 if inter:
-                    if inter[0][1] != '':
-                        inter_view = inter[0][1]
-                    else:
-                        inter_view = inter_data[0] + ':'
+                    return_link = link_fix(inter_data[1])
+                    main_link = html.unescape(return_link[0])
+                    other_link = return_link[1]
 
-                    if see_link != main_link:
-                        data = re.sub(
-                            '\[\[((?:(?!\[\[|\]\]|<\/td>).)+)\]\]',
-                            '<a id="inside" href="' + inter[0][0] + inter_data[1] + '">' + inter_view + see_link + '</a>',
-                            data,
-                            1
-                        )
-                    else:
-                        data = re.sub(
-                            '\[\[((?:(?!\[\[|\]\]|<\/td>).)+)\]\]',
-                            '<a id="inside" href="' + inter[0][0] + inter_data[1] + '">' + inter_view + inter_data[1] + '</a>',
-                            data,
-                            1
-                        )
+                    inter_view = inter[0][1] if inter[0][1] != '' else (inter_data[0] + ':')
+
+                    data = link_re.sub('' + \
+                        '<a id="inside" ' + \
+                            'name="' + include_name + 'set_link_' + str_e_link_id + '" ' + \
+                            'href="">' + inter_view + see_link + '</a>' + \
+                        '', 
+                        data, 
+                        1
+                    )
+                    plus_data += "" + \
+                        "document.getElementsByName('" + include_name + "set_link_" + str_e_link_id + "')[0].href = '" + \
+                            (inter[0][0] + tool.url_pas(main_link) + other_link).replace('\'', '\\\'') + "';" + \
+                        "\n" + \
+                    ""
+                    if inter_same == 1:
+                        plus_data += "" + \
+                            "document.getElementsByName('" + include_name + "set_link_" + str_e_link_id + "')[0].innerHTML = '" + \
+                                (inter_view + main_link + other_link).replace('\'', '\\\'') + "';" + \
+                            "\n" + \
+                        ""
                 else:
-                    data = link_re.sub('Not exist', data, 1)
+                    data = link_re.sub('', data, 1)
             elif re.search(r'^(\/(?:.+))$', main_link):
                 under_title = re.search(r'^(\/(?:.+))$', main_link)
                 under_title = under_title.group(1)
@@ -1098,7 +1102,29 @@ def namumark(conn, data, title, include_num):
                 else:
                     data = link_re.sub('[[' + title + under_title + ']]', data, 1)
             elif re.search(r'^http(s)?:\/\/', main_link):
-                data = link_re.sub('<a id="out_link" rel="nofollow" href="' + main_link + '">' + see_link + '</a>', data, 1)
+                data = link_re.sub('' + \
+                    '<a id="out_link" ' + \
+                        'name="' + include_name + 'set_link_' + str_e_link_id + '" ' + \
+                        'rel="nofollow" ' + \
+                        'href="">' + see_link + '</a>' + \
+                    '', 
+                    data, 
+                    1
+                )
+
+                plus_data += "" + \
+                    "document.getElementsByName('" + include_name + "set_link_" + str_e_link_id + "')[0].href = '" + \
+                        main_link.replace('\'', '\\\'') + "';" + \
+                    "\n" + \
+                ""
+                if inter_same == 1:
+                    plus_data += "" + \
+                        "document.getElementsByName('" + include_name + "set_link_" + str_e_link_id + "')[0].innerHTML = '" + \
+                            main_link.replace('\'', '\\\'') + "';" + \
+                        "\n" + \
+                    ""
+
+                
             else:
                 return_link = link_fix(main_link)
                 main_link = html.unescape(return_link[0])
@@ -1111,43 +1137,48 @@ def namumark(conn, data, title, include_num):
                 elif re.search(r'^\.\.\/', main_link):
                     main_link = re.sub(r'^\.\.\/', re.sub(r'(?P<in>.+)\/.*$', '\g<in>', title), main_link)
 
-                if not re.search(r'^\|', main_link):
-                    if main_link != title:
-                        if main_link != '':
-                            backlink += [[title, main_link, '']]
+                if main_link != title or main_link != '':
+                    backlink += [[title, main_link, '']]
 
-                            curs.execute(tool.db_change("select title from data where title = ?"), [main_link])
-                            if not curs.fetchall():
-                                backlink += [[title, main_link, 'no']]
+                    curs.execute(tool.db_change("select title from data where title = ?"), [main_link])
+                    if not curs.fetchall():
+                        backlink += [[title, main_link, 'no']]
 
-                            data = re.sub(
-                                '\[\[((?:(?!\[\[|\]\]|<\/td>).)+)\]\]',
-                                '<a class="' + include_name + 'link_finder" ' + \
-                                    'title="' + html.escape(main_link) + other_link + '" ' + \
-                                    'href="/w/' + tool.url_pas(main_link) + other_link + '"' + \
-                                '>' + see_link + '</a>',
-                                data,
-                                1
-                            )
-                        else:
-                            data = re.sub(
-                                '\[\[((?:(?!\[\[|\]\]|<\/td>).)+)\]\]',
-                                '<a title="' + other_link + '" href="' + other_link + '">' + see_link + '</a>',
-                                data,
-                                1
-                            )
-                    else:
-                        if re.search(r'^#', other_link):
-                            data = re.sub(
-                                '\[\[((?:(?!\[\[|\]\]|<\/td>).)+)\]\]',
-                                '<a title="' + other_link + '" href="' + other_link + '">' + other_link + '</a>',
-                                data,
-                                1
-                            )
-                        else:
-                            data = link_re.sub('<b>' + see_link + '</b>', data, 1)
+                    data = link_re.sub('' + \
+                        '<a class="' + include_name + 'link_finder" ' + \
+                            'name="' + include_name + 'set_link_' + str_e_link_id + '" ' + \
+                            'title="" ' + \
+                            'href="">' + see_link + '</a>' + \
+                        '', 
+                        data,
+                        1
+                    )
+
+                    plus_data += "" + \
+                        "document.getElementsByName('" + include_name + "set_link_" + str_e_link_id + "')[0].href = '" + \
+                            ('/w/' + tool.url_pas(main_link) + other_link).replace('\'', '\\\'') + "';" + \
+                        "\n" + \
+                    ""
+                    plus_data += "" + \
+                        "document.getElementsByName('" + include_name + "set_link_" + str_e_link_id + "')[0].title = '" + \
+                            (html.escape(main_link) + other_link).replace('\'', '\\\'') + "';" + \
+                        "\n" + \
+                    ""
+                    if inter_same == 1:
+                        plus_data += "" + \
+                            "document.getElementsByName('" + include_name + "set_link_" + str_e_link_id + "')[0].innerHTML = '" + \
+                                (html.escape(main_link) + other_link).replace('\'', '\\\'') + "';" + \
+                            "\n" + \
+                        ""
                 else:
-                    data = link_re.sub('&#91;&#91;' + link + '&#93;&#93;', data, 1)
+                    if re.search(r'^#', other_link):
+                        data = link_re.sub(
+                            '<a title="' + other_link + '" href="' + other_link + '">' + other_link + '</a>',
+                            data,
+                            1
+                        )
+                    else:
+                        data = link_re.sub('<b>' + see_link + '</b>', data, 1)
         else:
             break
 
@@ -1291,6 +1322,10 @@ def namumark(conn, data, title, include_num):
     data = re.sub(r'\n<\/ul>', '</ul>', data)
     data = re.sub(r'\n', '<br>', data)
 
+    plus_data += '' + \
+        'get_link_state("' + include_name + '");\n' + \
+        'get_file_state("' + include_name + '");\n' + \
+    ''
     plus_data = 'render_html("' + include_name + 'render_contect");\n' + plus_data
 
     return [data, plus_data, backlink]
