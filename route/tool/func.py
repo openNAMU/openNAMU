@@ -1284,6 +1284,12 @@ def re_error(data):
             data = load_lang('watchlist_overflow_error')
         elif num == 29:
             data = load_lang('copyright_disagreed')
+        elif num == 30:
+            data = load_lang('ie_wrong_callback')
+        elif num == 31:
+            data = load_lang('oauth_disabled')
+        elif num == 32:
+            data = load_lang('oauth_setting_not_found')
         else:
             data = '???'
 
