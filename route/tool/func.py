@@ -36,15 +36,8 @@ for i in range(0, 2):
         if i == 0:
             print(e)
             print('----')
-            if platform.system() == 'Linux':
-                ok = os.system('python3 -m pip install --user -r requirements.txt')
-                if ok == 0:
-                    print('----')
-                    os.execl(sys.executable, sys.executable, *sys.argv)
-                else:
-                    raise
-            elif platform.system() == 'Windows':
-                ok = os.system('python -m pip install --user -r requirements.txt')
+            if platform.system() == 'Linux' or platform.system() == 'Windows':
+                ok = os.system('python' + ('3' if platform.system() != 'Windows' else '') + ' -m pip install --user -r requirements.txt')
                 if ok == 0:
                     print('----')
                     os.execl(sys.executable, sys.executable, *sys.argv)
