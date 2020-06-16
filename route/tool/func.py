@@ -552,7 +552,7 @@ def other2(data):
                 integrity="sha384-2BKqo+exmr9su6dir+qCw08N2ZKRucY4PrGQPPWU1A7FtlCGjmEGFqXCv5nyM5Ij"
                 crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/highlight.min.js"></script>
-    ''' + req_list + '<script>window.addEventListener(\'DOMContentLoaded\', function() { main_css_skin_load(); });</script>'] + data[2:]
+    ''' + req_list] + data[2:]
 
     return data
 
@@ -1298,7 +1298,7 @@ def re_error(data):
                             '<li>' + data + ' <a href="/main_skin_set">(' + load_lang('main_skin_set') + ')</a></li>' + \
                         '</ul>' + \
                     '</div>' + \
-                    ('<script>window.addEventListener(\'DOMContentLoaded\', function() { main_css_skin_set(); });</script>' if get_url == '/main_skin_set' else ''),
+                    ('<script>main_css_skin_set();</script>' if get_url == '/main_skin_set' else ''),
                 menu = ([['main_skin_set', load_lang('main_skin_set')]] if get_url != '/main_skin_set' else [['skin_set', load_lang('skin_set')]])
             ))
         else:
