@@ -10,7 +10,7 @@ def main_file_2(conn, data):
             data = open('./views/main_css/file/easter_egg.html', encoding='utf8').read(),
             menu = 0
         ))
-    elif re.search(r'\.txt$', data, flags = re.I) or data == 'sitemap.xml':
+    elif re.search(r'\.(txt|xml)$', data, flags = re.I):
         if data == 'robots.txt' and not os.path.exists('robots.txt'):
             return flask.Response('User-agent: *\nDisallow: /\nAllow: /$\nAllow: /w/', mimetype = 'text/plain')
         elif os.path.exists(data):
