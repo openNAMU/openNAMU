@@ -17,7 +17,7 @@ def api_sitemap_2(conn):
         other_count = len_all_data % 30000
 
         for i in range(count + 1):
-            data += '<sitemap><loc>sitemap_' + str(i) + '.xml</loc></sitemap>\n'
+            data += '<sitemap><loc>' + flask.request.host_url + 'sitemap_' + str(i) + '.xml</loc></sitemap>\n'
 
         data += '' + \
             '</sitemapindex>' + \
