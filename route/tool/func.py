@@ -40,7 +40,7 @@ for i in range(0, 2):
                 ok = os.system('python' + ('3' if platform.system() != 'Windows' else '') + ' -m pip install --user -r requirements.txt')
                 if ok == 0:
                     print('----')
-                    os.execl(sys.executable, sys.executable, *sys.argv)
+                    os.execl(sys.executable, '"' + sys.executable + '"', *sys.argv)
                 else:
                     raise
             else:
