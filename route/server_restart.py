@@ -12,7 +12,7 @@ def server_restart_2(conn):
         print('----')
         print('Restart')
 
-        os.execl(sys.executable, sys.executable, *sys.argv)
+        os.execl(sys.executable, '"' + sys.executable + '"', *sys.argv)
     else:
         return easy_minify(flask.render_template(skin_check(),
             imp = [load_lang('wiki_restart'), wiki_set(), custom(), other2([0, 0])],
