@@ -552,6 +552,7 @@ def other2(data):
                 integrity="sha384-2BKqo+exmr9su6dir+qCw08N2ZKRucY4PrGQPPWU1A7FtlCGjmEGFqXCv5nyM5Ij"
                 crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/highlight.min.js"></script>
+        <script>window.addEventListener('DOMContentLoaded', function() { main_css_skin_load(); });</script>
     ''' + req_list] + data[2:]
 
     return data
