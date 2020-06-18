@@ -394,5 +394,6 @@
             "invalid_password_error" : "The Password or ID is invalid.",
             "watchlist_overflow_error": "You cannot add more than ten documents.",
             "copyright_disagreed" : "You have to agree copyright noticement to contribute",
-            "email_send_error" : "Email transfer failed."
+            "email_send_error" : "Email transfer failed.",
+            "restart_fail_error" : "Restart failed. Please use manual restart."
 }
