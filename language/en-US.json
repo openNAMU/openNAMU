@@ -29,7 +29,6 @@
         "discussion" : "Discussion",
         "backlink" : "Backlink",
         "link" : "Link",
-        "submit" : "Submit"
         "closed" : "Closed",
         "reload" : "Reload",
         "send" : "Send",
@@ -101,9 +100,6 @@
         "off" : "Off",
         "unset" : "Unset",
         "extension" : "Extension",
-        "edit_log" : "Edit Log",
-        "username" : "Username",
-        "changes" : "Amount of changes",
         "_comment_1.1_" : "Time",
             "second" : "Second(s)",
             "hour" : "Hour(s)",
