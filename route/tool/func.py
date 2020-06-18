@@ -40,8 +40,16 @@ for i in range(0, 2):
                 ok = os.system('python' + ('3' if platform.system() != 'Windows' else '') + ' -m pip install --user -r requirements.txt')
                 if ok == 0:
                     print('----')
-                    os.execl(sys.executable, '"' + sys.executable + '"', *sys.argv)
+                    try:
+                        os.execl(sys.executable, sys.executable, *sys.argv)
+                    except:
+                        try:
+                            os.execl(sys.executable, '"' + sys.executable + '"', *sys.argv)
+                        except:
+                            print('Error : restart failed')
+                            raise
                 else:
+                    print('Error : library install failed')
                     raise
             else:
                 print('----')
@@ -115,7 +123,7 @@ def send_email(who, title, data):
         return 1
     except Exception as e:
         print('----')
-        print('Error : Email send error')
+        print('Error : email send error')
         print(e)
 
         return 0
@@ -1284,6 +1292,10 @@ def re_error(data):
             data = load_lang('oauth_disabled')
         elif num == 32:
             data = load_lang('oauth_setting_not_found')
+        elif num == 33:
+            data = load_lang('restart_fail_error')
+        elif num == 34:
+            data = load_lang("update_error") + ' <a href="https://github.com/2DU/opennamu">(Github)</a>'
         else:
             data = '???'
 

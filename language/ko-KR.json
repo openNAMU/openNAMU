@@ -370,5 +370,6 @@
     "empty" : "빈칸",
     "email_send_error" : "이메일 전송이 실패했습니다.",
     "get_sitemap" : "sitemap.xml 만들거나 갱신하기",
-    "same_ip_exist" : "동일한 아이피가 존재합니다."
+    "same_ip_exist" : "동일한 아이피가 존재합니다.",
+    "restart_fail_error" : "재시작이 실패했습니다. 수동 재시작을 이용해주세요."
 }
