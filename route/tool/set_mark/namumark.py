@@ -84,6 +84,7 @@ def table_parser(data, cel_data, cel_num, start_data, num = 0, cel_color = {}):
             if table_data == 'right':
                 div_style += 'float: right;'
             elif table_data == 'center':
+                div_style += 'margin: auto;'
                 all_table += 'margin: auto;'
         elif re.search(r"^table ?textalign=([^=]+)$", in_state):
             num = 1
@@ -260,7 +261,7 @@ def table_start(data):
         else:
             break
 
-    return data
+    return data.replace('||', '<no_table>')
 
 def middle_parser(data):
     global end_data
@@ -1307,20 +1308,21 @@ def namumark(conn, data, title, include_num):
 
     data += category
 
-    data = re.sub(r'<\/td_1>', '</td>', data)
+    data = data.replace('<no_table>', '||')
+    data = data.replace('</td_1>', '</td>')
     data = re.sub(r'<\/ul>\n?', '</ul>', data)
     data = re.sub(r'<\/pre>\n?', '</pre>', data)
     data = re.sub(r'(?P<in><div class="all_in_data"(?:(?:(?!id=).)+)? id="in_data_([^"]+)">)(\n)+', '\g<in>', data)
-    data = re.sub(r'\n\n<ul>', '\n<ul>', data)
-    data = re.sub(r'<\/ul>\n\n', '</ul>', data)
+    data = data.replace('\n\n<ul>', '\n<ul>')
+    data = data.replace('</ul>\n\n', '</ul>')
     data = re.sub(r'^(\n)+', '', data)
     data = re.sub(r'(\n)+<hr><ul id="footnote_data">', '<hr><ul id="footnote_data">', data)
     data = re.sub(r'(?P<in><td(((?!>).)*)>)\n', '\g<in>', data)
     data = re.sub(r'(\n)?<hr>(\n)?', '<hr>', data)
-    data = re.sub(r'<\/ul>\n\n<ul>', '</ul>\n<ul>', data)
-    data = re.sub(r'<\/ul>\n<ul>', '</ul><ul>', data)
-    data = re.sub(r'\n<\/ul>', '</ul>', data)
-    data = re.sub(r'\n', '<br>', data)
+    data = data.replace('</ul>\n\n<ul>', '</ul>\n<ul>')
+    data = data.replace('</ul>\n<ul>', '</ul><ul>')
+    data = data.replace('\n</ul>', '</ul>')
+    data = data.replace('\n', '<br>')
 
     plus_data += '' + \
         'get_link_state("' + include_name + '");\n' + \
