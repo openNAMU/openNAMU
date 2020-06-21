@@ -119,7 +119,7 @@ if set_data['db_type'] == 'mysql':
 
     curs.execute(db_change('use ?')%pymysql.escape_string(set_data['db']))
 else:
-    conn = sqlite3.connect(set_data['db'] + '.db', check_same_thread = False)
+    conn = sqlite3.connect(set_data['db'] + '.db')
     curs = conn.cursor()
 
 load_conn(conn)
