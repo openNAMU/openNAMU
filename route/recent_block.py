@@ -1,13 +1,10 @@
 from .tool.func import *
 
-def list_block_2(conn, name, tool):
+def recent_block_2(conn, name, tool):
     curs = conn.cursor()
 
     num = int(number_check(flask.request.args.get('num', '1')))
-    if num * 50 > 0:
-        sql_num = num * 50 - 50
-    else:
-        sql_num = 0
+    sql_num = (num * 50 - 50) if num * 50 > 0 else 0
 
     div = '''
         <table id="main_table_set">
@@ -64,17 +61,16 @@ def list_block_2(conn, name, tool):
     if data_list == '':
         data_list = curs.fetchall()
 
+    all_ip = ip_pas([i[1] for i in data_list] + [i[2] for i in data_list])
     for data in data_list:
-        why = html.escape(data[0])
-        if why == '':
-            why = '<br>'
+        why = '<br>' if data[0] == '' else html.escape(data[0])
 
         if data[5] == 'O':
             ip = data[1] + ' (' + load_lang('range') + ')'
         elif data[5] == 'regex':
             ip = data[1] + ' (' + load_lang('regex') + ')'
         else:
-            ip = ip_pas(data[1])
+            ip = all_ip[data[1]]
 
         if data[3] == '':
             end = load_lang('limitless')
@@ -88,7 +84,7 @@ def list_block_2(conn, name, tool):
         elif re.search(r'^tool:', data[2]):
             admin = data[2]
         else:
-            admin = ip_pas(data[2])
+            admin = all_ip[data[2]]
 
         start = load_lang('start') + ' : ' + (data[4] if data[4] != '' else '0')
         div += '''
@@ -107,11 +103,7 @@ def list_block_2(conn, name, tool):
         '''
 
     div += '</tbody></table>'
-
-    if not name:
-        div += next_fix('/block_log?num=', num, data_list)
-    else:
-        div += next_fix('/' + url_pas(tool) + '/' + url_pas(name) + '?num=', num, data_list)
+    div += next_fix('/block_log?num=', num, data_list) if not name else next_fix('/' + url_pas(tool) + '/' + url_pas(name) + '?num=', num, data_list)
 
     return easy_minify(flask.render_template(skin_check(),
         imp = [load_lang('recent_ban'), wiki_set(), custom(), other2([sub, 0])],
