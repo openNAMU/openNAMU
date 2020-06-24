@@ -404,8 +404,8 @@ def recent_discuss():
 
 @app.route('/block_log')
 @app.route('/<regex("block_user|block_admin"):tool>/<name>')
-def list_block(name = None, tool = None):
-    return list_block_2(conn, name, tool)
+def recent_block(name = None, tool = None):
+    return recent_block_2(conn, name, tool)
 
 @app.route('/search', methods=['POST'])
 def search():

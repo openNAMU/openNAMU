@@ -520,11 +520,20 @@ def next_fix(link, num, page, end = 50):
 
     if num == 1:
         if len(page) == end:
-            list_data += '<hr class=\"main_hr\"><a href="' + link + str(num + 1) + '">(' + load_lang('next') + ')</a>'
+            list_data += '' + \
+                '<hr class="main_hr">' + \
+                '<a href="' + link + str(num + 1) + '">(' + load_lang('next') + ')</a>' + \
+            ''
     elif len(page) != end:
-        list_data += '<hr class=\"main_hr\"><a href="' + link + str(num - 1) + '">(' + load_lang('previous') + ')</a>'
+        list_data += '' + \
+            '<hr class="main_hr">' + \
+            '<a href="' + link + str(num - 1) + '">(' + load_lang('previous') + ')</a>' + \
+        ''
     else:
-        list_data += '<hr class=\"main_hr\"><a href="' + link + str(num - 1) + '">(' + load_lang('previous') + ')</a> <a href="' + link + str(num + 1) + '">(' + load_lang('next') + ')</a>'
+        list_data += '' + \
+            '<hr class="main_hr">' + \
+            '<a href="' + link + str(num - 1) + '">(' + load_lang('previous') + ')</a> <a href="' + link + str(num + 1) + '">(' + load_lang('next') + ')</a>' + \
+        ''
 
     return list_data
 
@@ -762,11 +771,8 @@ def custom():
         user_name = ip
 
         curs.execute(db_change('select data from user_set where name = "email" and id = ?'), [ip])
-        data = curs.fetchall()
-        if data:
-            email = data[0][0]
-        else:
-            email = ''
+        email = curs.fetchall()
+        email = email[0][0] if email else ''
 
         if admin_check('all') == 1:
             user_admin = '1'
@@ -801,10 +807,7 @@ def custom():
         user_notice = '0'
 
     curs.execute(db_change("select title from rd where title = ? and stop = ''"), ['user:' + ip])
-    if curs.fetchall():
-        user_topic = '1'
-    else:
-        user_topic = '0'
+    user_topic = '1' if curs.fetchall() else '0'
 
     return [
         '',
