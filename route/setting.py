@@ -51,7 +51,8 @@ def setting_2(conn, num, db_set):
             16 : 'host',
             19 : 'slow_edit',
             20 : 'requires_approval',
-            21 : 'backup_where'
+            21 : 'backup_where',
+            22 : 'domain'
         }
         n_list = {
             0 : 'Wiki',
@@ -71,7 +72,8 @@ def setting_2(conn, num, db_set):
             16 : '0.0.0.0',
             19 : '0',
             20 : '',
-            21 : ''
+            21 : '',
+            22 : flask.request.host_url
         }
 
         if flask.request.method == 'POST':
@@ -203,6 +205,10 @@ def setting_2(conn, num, db_set):
                         <span>''' + load_lang('slow_edit') + ' (' + load_lang('second') + ') (' + load_lang('off') + ''' : 0)</span>
                         <hr class="main_hr">
                         <input name="''' + i_list[19] + '''" value="''' + html.escape(d_list[19]) + '''">
+                        <hr class="main_hr">
+                        <span>''' + load_lang('domain') + '''</span> (EX : http://2du.pythonanywhere.com/)
+                        <hr class="main_hr">
+                        <input name="''' + i_list[22] + '''" value="''' + html.escape(d_list[22]) + '''">
                         <hr class="main_hr">
                         <button id="save" type="submit">''' + load_lang('save') + '''</button>
                     </form>

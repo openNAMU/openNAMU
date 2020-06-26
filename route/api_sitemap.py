@@ -12,12 +12,16 @@ def api_sitemap_2(conn):
         curs.execute(db_change("select title from data"))
         all_data = curs.fetchall()
 
+        curs.execute(db_change("select data from other where name = 'domain'"))
+        domain = curs.fetchall()
+        domain = domain[0][0] if domain and domain[0][0] != '' else flask.request.host_url
+
         len_all_data = len(all_data)
         count = int(len_all_data / 30000)
         other_count = len_all_data % 30000
 
         for i in range(count + 1):
-            data += '<sitemap><loc>' + flask.request.host_url + 'sitemap_' + str(i) + '.xml</loc></sitemap>\n'
+            data += '<sitemap><loc>' + domain + 'sitemap_' + str(i) + '.xml</loc></sitemap>\n'
 
         data += '' + \
             '</sitemapindex>' + \
@@ -36,10 +40,10 @@ def api_sitemap_2(conn):
 
             if count == i:
                 for x in all_data[30000 * i:]:
-                    data += '<url><loc>' + flask.request.host_url + 'w/' + url_pas(x[0]) + '</loc></url>\n'
+                    data += '<url><loc>' + domain + 'w/' + url_pas(x[0]) + '</loc></url>\n'
             else:
                 for x in all_data[30000 * i:30000 * (i + 1)]:
-                    data += '<url><loc>' + flask.request.host_url + 'w/' + url_pas(x[0]) + '</loc></url>\n'
+                    data += '<url><loc>' + domain + 'w/' + url_pas(x[0]) + '</loc></url>\n'
 
             data += '' + \
                 '</urlset>' + \
