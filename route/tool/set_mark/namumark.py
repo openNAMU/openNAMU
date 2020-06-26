@@ -15,7 +15,7 @@ def nowiki_js(data):
 
     return data
 
-def link_fix(main_link):
+def link_fix(main_link, no_change = 0):
     global end_data
 
     main_link = main_link.replace('&#x27;', "<link_comma>")
@@ -23,9 +23,10 @@ def link_fix(main_link):
     if re.search(r'^:', main_link):
         main_link = re.sub(r'^:', '', main_link)
 
-    main_link = re.sub(r'^사용자:', 'user:', main_link)
-    main_link = re.sub(r'^파일:', 'file:', main_link)
-    main_link = re.sub(r'^분류:', 'category:', main_link)
+    if no_change == 0:
+        main_link = re.sub(r'^사용자:', 'user:', main_link)
+        main_link = re.sub(r'^파일:', 'file:', main_link)
+        main_link = re.sub(r'^분류:', 'category:', main_link)
 
     other_link = re.search(r'[^\\]?(#[^#]+)$', main_link)
     if other_link:
@@ -1067,7 +1068,7 @@ def namumark(conn, data, title, include_num):
                 curs.execute(tool.db_change('select link, icon from inter where title = ?'), [inter_data[0]])
                 inter = curs.fetchall()
                 if inter:
-                    return_link = link_fix(inter_data[1])
+                    return_link = link_fix(inter_data[1], 1)
                     main_link = html.unescape(return_link[0])
                     other_link = return_link[1]
 
