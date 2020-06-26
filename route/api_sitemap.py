@@ -3,7 +3,7 @@ from .tool.func import *
 def api_sitemap_2(conn):
     curs = conn.cursor()
 
-    if admin_check() == 1:
+    if admin_check(None, 'make sitemap') == 1:
         data = '' + \
             '<?xml version="1.0" encoding="UTF-8"?>\n' + \
             '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + \
