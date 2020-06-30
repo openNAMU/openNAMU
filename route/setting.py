@@ -317,7 +317,7 @@ def setting_2(conn, num, db_set):
                         <hr class="main_hr">
                         <span>''' + load_lang('edit_help') + '''</span>
                         <hr class="main_hr">
-                        <input name="''' + i_list[12] + '''" value="''' + html.escape(d_list[12]) + '''">
+                        <input name="''' + i_list[13] + '''" value="''' + html.escape(d_list[13]) + '''">
                         <hr class="main_hr">
                         <button id="save" type="submit">''' + load_lang('save') + '''</button>
                         <hr class="main_hr">
