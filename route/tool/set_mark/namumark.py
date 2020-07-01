@@ -879,12 +879,6 @@ def namumark(conn, data, title, include_num):
     data = data.replace('<macro_middle>', '(')
     data = data.replace('<macro_end>', ')]')
 
-    if re.search(r'\[pagecount\]', data, flags = re.I):
-        plus_data += 'page_count();\n'
-        data = re.sub(r'\[pagecount\]', '<span class="all_page_count"></span>', data, flags = re.I)
-
-    data = re.sub(r'\[date\]', now_time, data, flags = re.I)
-
     while 1:
         block = re.search(r'(\n(?:&gt; ?(?:(?:(?!\n).)+)?\n)+)', data)
         if block:
@@ -1184,8 +1178,13 @@ def namumark(conn, data, title, include_num):
         else:
             break
 
-    br_re = re.compile(r'\[br\]', re.I)
-    data = br_re.sub('<br>', data)
+    if re.search(r'\[pagecount\]', data, flags = re.I):
+        plus_data += 'page_count();\n'
+        data = re.sub(r'\[pagecount\]', '<span class="all_page_count"></span>', data, flags = re.I)
+
+    data = re.sub(r'\[date\]', now_time, data, flags = re.I)
+    data = re.sub(r'\[clearfix\]', '<div style="clear:both"></div>', data, flags = re.I)
+    data = re.sub(r'\[br\]', '<br>', data, flags = re.I)
 
     footnote_number = 0
 
