@@ -16,8 +16,6 @@ def recent_block_2(conn, name, tool):
                 </tr>
     '''
 
-    data_list = ''
-
     curs.execute(db_change("update rb set ongoing = '' where end < ? and end != '' and ongoing = '1'"), [get_time()])
     conn.commit()
 
@@ -27,7 +25,7 @@ def recent_block_2(conn, name, tool):
             menu = [['block_log', load_lang('normal')]]
 
             curs.execute(db_change("" + \
-                "select why, block, '', end, '', band from rb " + \
+                "select why, block, blocker, end, today, band from rb " + \
                 "where ((end > ? and end like '2%') or end = '') and ongoing = '1' " + \
                 "order by end desc limit ?, 50"
             ), [
@@ -52,15 +50,19 @@ def recent_block_2(conn, name, tool):
         if tool == 'block_user':
             sub = ' (' + load_lang('blocked') + ')'
 
-            curs.execute(db_change("select why, block, blocker, end, today, band from rb where block = ? order by today desc limit ?, 50"), [name, sql_num])
+            curs.execute(db_change("select why, block, blocker, end, today, band from rb where block = ? order by today desc limit ?, 50"), [
+                name, 
+                sql_num
+            ])
         else:
             sub = ' (' + load_lang('admin') + ')'
 
-            curs.execute(db_change("select why, block, blocker, end, today, band from rb where blocker = ? order by today desc limit ?, 50"), [name, sql_num])
+            curs.execute(db_change("select why, block, blocker, end, today, band from rb where blocker = ? order by today desc limit ?, 50"), [
+                name, 
+                sql_num
+            ])
 
-    if data_list == '':
-        data_list = curs.fetchall()
-
+    data_list = curs.fetchall()
     all_ip = ip_pas([i[1] for i in data_list] + [i[2] for i in data_list])
     for data in data_list:
         why = '<br>' if data[0] == '' else html.escape(data[0])
@@ -68,7 +70,6 @@ def recent_block_2(conn, name, tool):
         if data[5] == 'O':
             ip = data[1] + ' (' + load_lang('range') + ')'
         elif data[5] == 'regex':
-            ip = data[1] + ' (' + load_lang('regex') + ')'
         else:
             ip = all_ip[data[1]]
 
