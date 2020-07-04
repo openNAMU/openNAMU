@@ -3,15 +3,17 @@ from .tool.func import *
 def give_user_ban_2(conn, name):
     curs = conn.cursor()
 
-    if name and ip_or_user(name) == 0:
-        curs.execute(db_change("select acl from user where id = ?"), [name])
-        user = curs.fetchall()
-        if not user:
-            return re_error('/error/2')
+    band = flask.request.args.get('type', '')
+    if band == '':
+        if name and ip_or_user(name) == 0:
+            curs.execute(db_change("select acl from user where id = ?"), [name])
+            user = curs.fetchall()
+            if not user:
+                return re_error('/error/2')
 
-        if user and user[0][0] != 'user':
-            if admin_check() != 1:
-                return re_error('/error/4')
+            if user and user[0][0] != 'user':
+                if admin_check() != 1:
+                    return re_error('/error/4')
 
     if ban_check(ip = ip_check(), tool = 'login') == 1:
         return re_error('/ban')
@@ -21,9 +23,10 @@ def give_user_ban_2(conn, name):
 
         end = flask.request.form.get('second', '0')
         end = end if end else '0'
+        regex_get = flask.request.form.get('regex', None)
 
-        if flask.request.form.get('regex', None):
-            type_d = 'regex'
+        if regex_get or band != '':
+            type_d = 'regex' if regex_get else band
 
             try:
                 re.compile(name)
@@ -49,7 +52,7 @@ def give_user_ban_2(conn, name):
         if admin_check(1) != 1:
             return re_error('/error/3')
 
-        curs.execute(db_change("select end, why from rb where block = ? and ongoing = '1'"), [name])
+        curs.execute(db_change("select end, why from rb where block = ? and ongoing = '1' and band = ?"), [name, band])
         end = curs.fetchall()
         if end:
             main_name = name
@@ -70,6 +73,9 @@ def give_user_ban_2(conn, name):
             else:
                 data += '</ul><hr class="main_hr">'
         else:
+            if band != '':
+                return redirect('/ban')
+
             if name:
                 main_name = name
                 b_now = load_lang('ban')
