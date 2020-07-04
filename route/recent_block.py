@@ -70,6 +70,7 @@ def recent_block_2(conn, name, tool):
         if data[5] == 'O':
             ip = data[1] + ' (' + load_lang('range') + ')'
         elif data[5] == 'regex':
+            ip = data[1] + ' (' + load_lang('regex') + ')'
         else:
             ip = all_ip[data[1]]
 
