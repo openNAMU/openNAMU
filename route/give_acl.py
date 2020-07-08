@@ -122,6 +122,7 @@ def give_acl_2(conn, name):
                     <li>email : ''' + load_lang('email_acl') + '''</li>
                     <li>owner : ''' + load_lang('owner_acl') + '''</li>
                     <li>ban : ''' + load_lang('ban_acl') + '''</li>
+                    <li>before : ''' + load_lang('before_acl') + '''</li>
                 </ul>
             '''
 
