@@ -134,6 +134,7 @@ print('11. Delete mysql.json')
 print('12. All title count reset')
 print('13. Cache data reset')
 print('14. Delete Main <HEAD>')
+print('15. Give owner')
 
 print('----')
 print('Select : ', end = '')
@@ -281,8 +282,14 @@ elif what_i_do == '12':
     curs.execute(db_change('insert into other (name, data) values ("count_all_title", ?)'), [str(count_data)])
 elif what_i_do == '13':
     curs.execute(db_change('delete from cache_data'))
-else:
+elif what_i_do == '14':
     curs.execute(db_change('delete from other where name = "head"'))
+else:
+    print('----')
+    print('User name : ', end = '')
+    user_name = input()
+
+    curs.execute(db_change("update user set acl = 'owner' where id = ?"), [user_name])
 
 conn.commit()
 

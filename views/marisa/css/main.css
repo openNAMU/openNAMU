@@ -97,7 +97,7 @@ li {
 }
 
 
-@media (min-width: 1180px) and (max-width: 1590px) {
+@media (min-width: 1180px) and (max-width: 2000px) {
     #main, #top_main, #bottom_main {
         width: 1000px;
     }
@@ -107,7 +107,7 @@ li {
     }
 }
 
-@media (min-width: 1590px) {
+@media (min-width: 2000px) {
     #main, #top_main, #bottom_main {
         width: 55%;
     }
