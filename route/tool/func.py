@@ -1005,6 +1005,14 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
                         count = count[0][0] if count else 0
                         if count >= 50:
                             return 0
+            elif acl_data[0][0] == 'before':
+                if ip_or_user(ip) != 1:
+                    if admin_check(num) == 1:
+                        return 0
+                
+                curs.execute(db_change("select ip from history where title = ? and ip = ?"), [name, ip])
+                if curs.fetchall():
+                    return 0
             elif acl_data[0][0] == 'email':
                 if ip_or_user(ip) != 1:
                     if admin_check(num) == 1:
@@ -1207,7 +1215,7 @@ def redirect(data = '/'):
     return flask.redirect(data)
 
 def get_acl_list(type_d = None):
-    acl_data = ['', 'all', 'user', 'admin', 'owner', '50_edit', 'email', 'ban']
+    acl_data = ['', 'all', 'user', 'admin', 'owner', '50_edit', 'email', 'ban', 'before']
     if type_d:
         if type_d == 'user':
             acl_data = ['', 'user', 'all']
