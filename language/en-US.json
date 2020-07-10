@@ -326,6 +326,7 @@
             "owner_acl" : "Owner only",
             "before_acl" : "Only those who have edited this document before",
             "ban_acl" : "Include blocked users",
+            "30_day_acl" : "Only members 30 days after register",
             "_comment_2.6_1_" : "Set",
                 "document_acl" : "Document ACL",
                 "discussion_acl" : "Discussion(s) ACL",
