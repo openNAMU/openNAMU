@@ -1013,6 +1013,19 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
                 curs.execute(db_change("select ip from history where title = ? and ip = ?"), [name, ip])
                 if curs.fetchall():
                     return 0
+            elif acl_data[0][0] == '30_day':
+                if ip_or_user(ip) != 1:
+                    if admin_check(num) == 1:
+                        return 0
+                    else:
+                        curs.execute(db_change("select date from user where id = ?"), [ip])
+                        user_date = curs.fetchall()[0][0]
+                        
+                        time_1 = datetime.datetime.strptime(user_date, '%Y-%m-%d %H:%M:%S') + datetime.timedelta(days = 30)
+                        time_2 = datetime.datetime.strptime(get_time(), '%Y-%m-%d %H:%M:%S')
+                        
+                        if time_2 > time_1:
+                            return 0
             elif acl_data[0][0] == 'email':
                 if ip_or_user(ip) != 1:
                     if admin_check(num) == 1:
@@ -1214,13 +1227,11 @@ def edit_filter_do(data):
 def redirect(data = '/'):
     return flask.redirect(data)
 
-def get_acl_list(type_d = None):
-    acl_data = ['', 'all', 'user', 'admin', 'owner', '50_edit', 'email', 'ban', 'before']
-    if type_d:
-        if type_d == 'user':
-            acl_data = ['', 'user', 'all']
-
-    return acl_data
+def get_acl_list(type_d = 'normal'):
+    if type_d == 'user':
+        return ['', 'user', 'all']
+    else:
+        return ['', 'all', 'user', 'admin', 'owner', '50_edit', 'email', 'ban', 'before', '30_day']
 
 def re_error(data):
     conn.commit()
