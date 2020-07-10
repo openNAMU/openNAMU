@@ -372,5 +372,6 @@
     "get_sitemap" : "sitemap.xml 만들거나 갱신하기",
     "same_ip_exist" : "동일한 아이피가 존재합니다.",
     "restart_fail_error" : "재시작이 실패했습니다. 수동 재시작을 이용해주세요.",
-    "domain" : "도메인"
+    "domain" : "도메인",
+    "before_acl" : "이 문서를 이전에 편집한 적 있는 사람만"
 }
