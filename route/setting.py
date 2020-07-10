@@ -265,59 +265,59 @@ def setting_2(conn, num, db_set):
                     <form method="post">
                         <span>''' + load_lang('register_text') + ''' (HTML)</span>
                         <hr class="main_hr">
-                        <textarea rows="3" name="''' + i_list[0] + '''" value="''' + html.escape(d_list[0]) + '''"></textarea>
+                        <textarea rows="3" name="''' + i_list[0] + '''">''' + html.escape(d_list[0]) + '''</textarea>
                         <hr class="main_hr">
                         <span>''' + load_lang('non_login_alert') + ''' (HTML)</span>
                         <hr class="main_hr">
-                        <textarea rows="3" name="''' + i_list[1] + '''" value="''' + html.escape(d_list[1]) + '''"></textarea>
+                        <textarea rows="3" name="''' + i_list[1] + '''">''' + html.escape(d_list[1]) + '''</textarea>
                         <hr class="main_hr">
                         <span>''' + load_lang('edit_bottom_text') + ''' (HTML)</span>
                         <hr class="main_hr">
-                        <textarea rows="3" name="''' + i_list[2] + '''" value="''' + html.escape(d_list[2]) + '''"></textarea>
+                        <textarea rows="3" name="''' + i_list[2] + '''">''' + html.escape(d_list[2]) + '''</textarea>
                         <hr class="main_hr">
                         <span>''' + load_lang('copyright_checkbox_text') + ''' (HTML)</span>
                         <hr class="main_hr">
-                        <textarea rows="3" name="''' + i_list[3] + '''" value="''' + html.escape(d_list[3]) + '''"></textarea>
+                        <textarea rows="3" name="''' + i_list[3] + '''">''' + html.escape(d_list[3]) + '''</textarea>
                         <hr class="main_hr">
                         <span>''' + load_lang('check_key_text') + ''' (HTML)</span>
                         <hr class="main_hr">
-                        <textarea rows="3" name="''' + i_list[4] + '''" value="''' + html.escape(d_list[4]) + '''"></textarea>
+                        <textarea rows="3" name="''' + i_list[4] + '''">''' + html.escape(d_list[4]) + '''</textarea>
                         <hr class="main_hr">
                         <span>''' + load_lang('email_title') + '''</span>
                         <hr class="main_hr">
-                        <textarea rows="3" name="''' + i_list[5] + '''" value="''' + html.escape(d_list[5]) + '''"></textarea>
+                        <textarea rows="3" name="''' + i_list[5] + '''">''' + html.escape(d_list[5]) + '''</textarea>
                         <hr class="main_hr">
                         <span>''' + load_lang('email_text') + '''</span>
                         <hr class="main_hr">
-                        <textarea rows="3" name="''' + i_list[6] + '''" value="''' + html.escape(d_list[6]) + '''"></textarea>
+                        <textarea rows="3" name="''' + i_list[6] + '''">''' + html.escape(d_list[6]) + '''</textarea>
                         <hr class="main_hr">
                         <span>''' + load_lang('email_insert_text') + '''</span>
                         <hr class="main_hr">
-                        <textarea rows="3" name="''' + i_list[7] + '''" value="''' + html.escape(d_list[7]) + '''"></textarea>
+                        <textarea rows="3" name="''' + i_list[7] + '''">''' + html.escape(d_list[7]) + '''</textarea>
                         <hr class="main_hr">
                         <span>''' + load_lang('password_search_text') + '''</span>
                         <hr class="main_hr">
-                        <textarea rows="3" name="''' + i_list[8] + '''" value="''' + html.escape(d_list[8]) + '''"></textarea>
+                        <textarea rows="3" name="''' + i_list[8] + '''">''' + html.escape(d_list[8]) + '''</textarea>
                         <hr class="main_hr">
                         <span>''' + load_lang('reset_user_text') + '''</span>
                         <hr class="main_hr">
-                        <textarea rows="3" name="''' + i_list[9] + '''" value="''' + html.escape(d_list[9]) + '''"></textarea>
+                        <textarea rows="3" name="''' + i_list[9] + '''">''' + html.escape(d_list[9]) + '''</textarea>
                         <hr class="main_hr">
                         <span>''' + load_lang('error_401') + '''</span>
                         <hr class="main_hr">
-                        <textarea rows="3" name="''' + i_list[10] + '''" value="''' + html.escape(d_list[10]) + '''"></textarea>
+                        <textarea rows="3" name="''' + i_list[10] + '''">''' + html.escape(d_list[10]) + '''</textarea>
                         <hr class="main_hr">
                         <span>''' + load_lang('error_404') + '''</span>
                         <hr class="main_hr">
-                        <textarea rows="3" name="''' + i_list[11] + '''" value="''' + html.escape(d_list[11]) + '''"></textarea>
+                        <textarea rows="3" name="''' + i_list[11] + '''">''' + html.escape(d_list[11]) + '''</textarea>
                         <hr class="main_hr">
                         <span>''' + load_lang('approval_question') + '''</span><sup><a href="#rfn-1" id="fn-1">(1)</a></sup>
                         <hr class="main_hr">
-                        <textarea rows="3" name="''' + i_list[12] + '''" value="''' + html.escape(d_list[12]) + '''"></textarea>
+                        <textarea rows="3" name="''' + i_list[12] + '''">''' + html.escape(d_list[12]) + '''</textarea>
                         <hr class="main_hr">
                         <span>''' + load_lang('edit_help') + '''</span>
                         <hr class="main_hr">
-                        <textarea rows="3" name="''' + i_list[13] + '''" value="''' + html.escape(d_list[13]) + '''"></textarea>
+                        <textarea rows="3" name="''' + i_list[13] + '''">''' + html.escape(d_list[13]) + '''</textarea>
                         <hr class="main_hr">
                         <button id="save" type="submit">''' + load_lang('save') + '''</button>
                         <hr class="main_hr">
