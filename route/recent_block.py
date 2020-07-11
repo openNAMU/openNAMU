@@ -19,14 +19,33 @@ def recent_block_2(conn, name, tool):
     curs.execute(db_change("update rb set ongoing = '' where end < ? and end != '' and ongoing = '1'"), [get_time()])
     conn.commit()
 
+    get_type = flask.request.args.get('type', '')
+    sub_type = flask.request.args.get('s_type', '')
     if not name:
-        if flask.request.args.get('type', '') == 'ongoing':
+        if get_type == 'ongoing':
             sub = ' (' + load_lang('in_progress') + ')'
-            menu = [['block_log', load_lang('normal')]]
+           
+            if sub_type == '':
+                div = '' + \
+                    '<a href="?type=ongoing&s_type=regex">(' + load_lang('regex') + ')</a> ' + \
+                    '<a href="?type=ongoing&s_type=normal">(' + load_lang('normal') + ')</a>' + \
+                    '<hr class="main_hr">' + \
+                '' + div
+                menu = [['block_log', load_lang('return')]]
+                plus_sql = ''
+            else:
+                menu = [['block_log?type=ongoing', load_lang('return')]]
+                
+                if sub_type == 'regex':
+                    sub += ' (' + load_lang('regex') + ')'
+                    plus_sql = 'and band = \'regex\' '
+                else:
+                    sub += ' (' + load_lang('normal') + ')'
+                    plus_sql = 'and band = \'\''
 
             curs.execute(db_change("" + \
                 "select why, block, blocker, end, today, band, ongoing from rb " + \
-                "where ((end > ? and end like '2%') or end = '') and ongoing = '1' " + \
+                "where ((end > ? and end like '2%') or end = '') and ongoing = '1' " + plus_sql + \
                 "order by end desc limit ?, 50" + \
             ""), [
                 get_time(),
