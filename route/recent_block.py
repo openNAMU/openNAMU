@@ -41,7 +41,7 @@ def recent_block_2(conn, name, tool):
                     plus_sql = 'and band = \'regex\' '
                 else:
                     sub += ' (' + load_lang('normal') + ')'
-                    plus_sql = 'and band = \'\''
+                    plus_sql = 'and band = \'\' '
 
             curs.execute(db_change("" + \
                 "select why, block, blocker, end, today, band, ongoing from rb " + \
