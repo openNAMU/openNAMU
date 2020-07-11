@@ -58,6 +58,7 @@ def give_user_ban_2(conn, name):
             main_name = name
             b_now = load_lang('release')
             now = '(' + b_now + ')'
+            action = 'action="/ban/' + url_pas(name) + ('?type=' + band if band != '' else '') + '"'
 
             if end[0][0] == '':
                 data = '<ul><li>' + load_lang('limitless') + '</li>'
@@ -73,29 +74,14 @@ def give_user_ban_2(conn, name):
             else:
                 data += '</ul><hr class="main_hr">'
         else:
-            if band != '':
-                return redirect('/ban')
-
-            if name:
-                main_name = name
-                b_now = load_lang('ban')
-                now = ' (' + b_now + ')'
-
-                if name and ip_or_user(name) == 1:
-                    plus = '<input type="checkbox" name="login"> ' + load_lang('login_able') + '<hr class="main_hr">'
-                else:
-                    plus = ''
-
-                name += '<hr class="main_hr">'
-                regex = ''
-            else:
-                main_name = load_lang('ban')
-                name = '<input placeholder="' + load_lang('name_or_ip_or_regex') + '" name="name" type="text"><hr class="main_hr">'
-                regex = '<input type="checkbox" name="regex"> ' + load_lang('regex') + '<hr class="main_hr">'
-                plus = '<input type="checkbox" name="login"> ' + load_lang('login_able') + '<hr class="main_hr">'
-                now = 0
-                b_now = load_lang('ban')
-
+            main_name = load_lang('ban')
+            n_name = '<input placeholder="' + load_lang('name_or_ip_or_regex') + '" value="' + (name if name else '') + '" name="name" type="text"><hr class="main_hr">'
+            regex = '<input type="checkbox" name="regex" ' + ('checked' if band == 'regex' else '') + '> ' + load_lang('regex') + '<hr class="main_hr">'
+            plus = '<input type="checkbox" name="login"> ' + load_lang('login_able') + '<hr class="main_hr">'
+            now = 0
+            b_now = load_lang('ban')
+            action = 'action="/ban"'
+            
             time_data = [
                 ['86400', load_lang('1_day')],
                 ['432000‬', load_lang('5_day')],
@@ -108,12 +94,12 @@ def give_user_ban_2(conn, name):
             for i in time_data:
                 insert_data += '<a href="javascript:insert_v(\'second\', \'' + i[0] + '\')">(' + i[1] + ')</a> '
 
-            data = name + '''
+            data = n_name + '''
+                ''' + regex + '''
                 <script>function insert_v(name, data) { document.getElementById(name).value = data; }</script>''' + insert_data + '''
                 <hr class="main_hr">
                 <input placeholder="''' + load_lang('ban_period') + ''' (''' + load_lang('second') + ''')" name="second" id="second" type="text">
                 <hr class="main_hr">
-                ''' + regex + '''
                 <input placeholder="''' + load_lang('why') + '''" name="why" type="text">
                 <hr class="main_hr">
             ''' + plus
@@ -121,7 +107,7 @@ def give_user_ban_2(conn, name):
         return easy_minify(flask.render_template(skin_check(),
             imp = [main_name, wiki_set(), custom(), other2([now, 0])],
             data = '''
-                <form method="post">
+                <form method="post" ''' + action + '''>
                     ''' + data + '''
                     <button type="submit">''' + b_now + '''</button>
                 </form>
