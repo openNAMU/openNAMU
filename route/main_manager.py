@@ -18,7 +18,8 @@ def main_manager_2(conn, num, r_ver):
         11 : [load_lang('document_name'), 'watch_list', load_lang('add_watchlist')],
         12 : [load_lang('compare_target'), 'check', load_lang('compare_target')],
         13 : [load_lang('document_name'), 'edit', load_lang('load')],
-        14 : [load_lang('document_name'), 'star_doc', load_lang('add_star_doc')]
+        14 : [load_lang('document_name'), 'star_doc', load_lang('add_star_doc')],
+        15 : [load_lang('name_or_ip_or_regex'), 'ban', load_lang('release')]
     }
 
     if num == 1:
@@ -30,6 +31,7 @@ def main_manager_2(conn, num, r_ver):
                     <li><a href="/manager/2">''' + load_lang('acl_change') + '''</a></li>
                     <li><a href="/manager/3">''' + load_lang('check_user') + '''</a></li>
                     <li><a href="/ban">''' + load_lang('ban') + '''</a></li>
+                    <li><a href="/manager/17">''' + load_lang('release') + '''</a></li>
                     <li><a href="/manager/5">''' + load_lang('authorize') + '''</a></li>
                 </ul>
                 <br>
@@ -72,14 +74,22 @@ def main_manager_2(conn, num, r_ver):
     elif not num - 1 > len(title_list):
         if flask.request.method == 'POST':
             if flask.request.args.get('plus', None):
-                return redirect('/' + title_list[(num - 2)][1] + '/' + url_pas(flask.request.args.get('plus', None)) + '?plus=' + flask.request.form.get('name', None))
+                return redirect(
+                    '/' + title_list[(num - 2)][1] + '/' + url_pas(flask.request.args.get('plus', 'test')) + '?plus=' + flask.request.form.get('name', 'test')
+                )
+            elif flask.request.form.get('regex', None):
+                return redirect('/' + title_list[(num - 2)][1] + '/' + url_pas(flask.request.form.get('name', 'test')) + '?type=regex')
             else:
-                return redirect('/' + title_list[(num - 2)][1] + '/' + url_pas(flask.request.form.get('name', None)))
+                return redirect('/' + title_list[(num - 2)][1] + '/' + url_pas(flask.request.form.get('name', 'test')))
         else:
             if title_list[(num - 2)][0] == 0:
                 placeholder = load_lang('user_name')
             else:
                 placeholder = title_list[(num - 2)][0]
+
+            plus = ''
+            if num - 2 == 15:
+                plus = '<input type="checkbox" name="regex"> ' + load_lang('regex') + '<hr class="main_hr">'
 
             return easy_minify(flask.render_template(skin_check(),
                 imp = [title_list[(num - 2)][2], wiki_set(), custom(), other2([0, 0])],
@@ -87,6 +97,7 @@ def main_manager_2(conn, num, r_ver):
                     <form method="post">
                         <input placeholder="''' + placeholder + '''" name="name" type="text">
                         <hr class=\"main_hr\">
+                        ''' + plus + '''
                         <button type="submit">''' + load_lang('go') + '''</button>
                     </form>
                 ''',
