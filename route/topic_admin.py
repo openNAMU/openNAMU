@@ -39,7 +39,7 @@ def topic_admin_2(conn, topic_num, num):
             <ul>
                 <li>
                     <a href="/ban/''' + url_pas(data[0][1]) + '''">
-                        ''' + (load_lang('ban_release') if user_ban_d else load_lang('ban')) + '''
+                        ''' + (load_lang('release') if user_ban_d else load_lang('ban')) + '''
                     </a>
                 </li>
                 <li>
