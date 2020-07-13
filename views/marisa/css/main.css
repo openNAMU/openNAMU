@@ -79,7 +79,6 @@ li {
 #tool {
     float: right;
     border: none;
-    margin-top: -95px;
 }
 
 @media (min-width: 780px) and (max-width: 1180px) {

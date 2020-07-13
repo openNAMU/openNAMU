@@ -8,7 +8,7 @@
             <title>{{imp[0]}} - {{imp[1][0]}}</title>
         {% endif %}
         {{imp[3][3]|safe}}
-        <link rel="stylesheet" href="/views/marisa/css/main.css?ver=15">
+        <link rel="stylesheet" href="/views/marisa/css/main.css?ver=16">
         <script src="/views/marisa/js/skin_set.js?ver=4"></script>
         <script src="/views/marisa/js/main.js?ver=3"></script>
         <script>main_load(); window.addEventListener('DOMContentLoaded', function() { skin_set(); });</script>
@@ -117,6 +117,22 @@
             </div>
             <div id="main">
                 <div id="main_top">
+                    {% if menu != 0 %}
+                        <div id="tool" class="not_mobile">
+                            {% for sub_d in menu %}
+                                <div id="tool_cel">
+                                    {% if sub_d|length > 2 and sub_d[2] == 1 %}
+                                        <a class="menu-item" href="/{{sub_d[0]}}" id="topic_color">{{sub_d[1]}}</a>
+                                    {% else %}
+                                        <a class="menu-item" href="/{{sub_d[0]}}">{{sub_d[1]}}</a>
+                                    {% endif %}
+                                </div>
+                                {% if menu[loop.index] %}
+                                    |
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
                     <h1 id="title">
                         <a id="titlt_a" href="#"><span class="change_space">{{imp[0]}}</span></a>
                         {% if imp[3][0] != 0 %}
@@ -129,7 +145,7 @@
                         {% endif %}
                     </div>
                     {% if menu != 0 %}
-                        <div id="tool">
+                        <div id="tool" class="is_mobile">
                             {% for sub_d in menu %}
                                 <div id="tool_cel">
                                     {% if sub_d|length > 2 and sub_d[2] == 1 %}
