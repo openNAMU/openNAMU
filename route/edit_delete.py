@@ -60,7 +60,7 @@ def edit_delete_2(conn, name, app_var):
             return redirect('/w/' + url_pas(name))
 
         return easy_minify(flask.render_template(skin_check(),
-            imp = [name, wiki_set(), custom(), other2([' (' + load_lang('delete') + ')', 0])],
+            imp = [name, wiki_set(), custom(), other2(['(' + load_lang('delete') + ')', 0])],
             data =  '''
                     <form method="post">
                         ''' + ip_warring() + '''

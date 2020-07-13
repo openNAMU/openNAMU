@@ -113,7 +113,7 @@ if set_data['db_type'] == 'mysql':
 
     curs.execute(db_change('use ?')%pymysql.escape_string(set_data['db']))
 else:
-    conn = sqlite3.connect(set_data['db'] + '.db', check_same_thread = False)
+    conn = sqlite3.connect(set_data['db'] + '.db')
     curs = conn.cursor()
 
 load_conn(conn)
@@ -134,6 +134,7 @@ print('11. Delete mysql.json')
 print('12. All title count reset')
 print('13. Cache data reset')
 print('14. Delete Main <HEAD>')
+print('15. Give owner')
 
 print('----')
 print('Select : ', end = '')
@@ -195,7 +196,7 @@ elif what_i_do == '3':
         ''
     ])
 
-    curs.execute(db_change("delete from ban where block = ?"), [user_data])
+    curs.execute(db_change("update rb set ongoing = '' where block = ?"), [user_data])
 elif what_i_do == '4':
     print('----')
     print('Host : ', end = '')
@@ -270,7 +271,7 @@ elif what_i_do == '11':
     except:
         pass
 elif what_i_do == '12':
-    curs.execute(db_change("select count(title) from data"))
+    curs.execute(db_change("select count(*) from data"))
     count_data = curs.fetchall()
     if count_data:
         count_data = count_data[0][0]
@@ -281,8 +282,14 @@ elif what_i_do == '12':
     curs.execute(db_change('insert into other (name, data) values ("count_all_title", ?)'), [str(count_data)])
 elif what_i_do == '13':
     curs.execute(db_change('delete from cache_data'))
-else:
+elif what_i_do == '14':
     curs.execute(db_change('delete from other where name = "head"'))
+else:
+    print('----')
+    print('User name : ', end = '')
+    user_name = input()
+
+    curs.execute(db_change("update user set acl = 'owner' where id = ?"), [user_name])
 
 conn.commit()
 

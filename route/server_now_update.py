@@ -29,7 +29,7 @@ def server_now_update_2(conn, r_ver):
             if (ok[0] and ok[1] and ok[2] and ok[3]) == 0:
                 return redirect('/restart')
             else:
-                print('Update error')
+                print('Error : update failed')
         elif platform.system() == 'Windows':
             os.system('rd /s /q route')
             urllib.request.urlretrieve('https://github.com/2DU/opennamu/archive/' + up_data + '.zip', 'update.zip')
@@ -41,13 +41,9 @@ def server_now_update_2(conn, r_ver):
 
                 return redirect('/restart')
             else:
-                print('Update error')
+                print('Error : update failed')
 
-        return easy_minify(flask.render_template(skin_check(),
-            imp = [load_lang('update'), wiki_set(), custom(), other2([0, 0])],
-            data = load_lang("update_error") + ' <a href="https://github.com/2DU/opennamu">(Github)</a>',
-            menu = [['manager/1', load_lang('return')]]
-        ))
+        return re_error('/error/34')
     else:
         return easy_minify(flask.render_template(skin_check(),
             imp = [load_lang('update'), wiki_set(), custom(), other2([0, 0])],

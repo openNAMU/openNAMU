@@ -81,16 +81,12 @@ li {
     border: none;
 }
 
-@media (min-width: 780px) and (max-width: 1350px) {
+@media (min-width: 780px) and (max-width: 1180px) {
     #main {
         width: calc(100% - 45px);
     }
 
-    #top_main {
-        width: 90%;
-    }
-
-    #bottom_main {
+    #top_main, #bottom_main {
         width: 90%;
     }
 
@@ -100,34 +96,18 @@ li {
 }
 
 
-@media (min-width: 1350px) and (max-width: 1590px) {
-    #main {
-        width: 70%;
+@media (min-width: 1180px) and (max-width: 2000px) {
+    #main, #top_main, #bottom_main {
+        width: 1000px;
     }
-
-    #top_main {
-        width: 70%;
-    }
-
-    #bottom_main {
-        width: 70%;
-    }
-
+    
     .is_mobile {
         display: none;
     }
 }
 
-@media (min-width: 1590px) {
-    #main {
-        width: 55%;
-    }
-
-    #top_main {
-        width: 55%;
-    }
-
-    #bottom_main {
+@media (min-width: 2000px) {
+    #main, #top_main, #bottom_main {
         width: 55%;
     }
 
@@ -143,11 +123,7 @@ li {
         border-right: none;
     }
 
-    #top_main {
-        width: 90%;
-    }
-
-    #bottom_main {
+    #top_main, #bottom_main {
         width: 90%;
     }
 
@@ -158,6 +134,7 @@ li {
     #tool {
         float: none;
         width: 90%;
+        margin-top: 0px;
         margin-bottom: 10px;
     }
 }
@@ -359,7 +336,7 @@ textarea, input {
 blockquote {
     padding: 1em calc(2em + 25px) 1em 1em;
     margin: 1em 0em 0em;
-    background: #eeeeee;
+    background-color: #eeeeee;
     border: 1px dashed #ccc;
     border-left: 5px solid black;
 }

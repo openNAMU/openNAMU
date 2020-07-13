@@ -9,8 +9,8 @@ for i_data in os.listdir("route"):
         exec("from route." + f_src + " import *")
 
 # DB
-version_list = json.loads(open('version.json', encoding='utf8').read())
-app_var = json.loads(open('data/app_var.json', encoding='utf8').read())
+version_list = json.loads(open('version.json', encoding = 'utf8').read())
+app_var = json.loads(open('data/app_var.json', encoding = 'utf8').read())
 
 print('Version : ' + version_list['master']['r_ver'])
 print('DB set version : ' + version_list['master']['c_ver'])
@@ -19,7 +19,7 @@ print('----')
 
 while 1:
     try:
-        set_data = json.loads(open('data/set.json', encoding='utf8').read())
+        set_data = json.loads(open('data/set.json', encoding = 'utf8').read())
         if not 'db_type' in set_data:
             try:
                 os.remove('data/set.json')
@@ -67,10 +67,10 @@ while 1:
             if new_json[1] == '':
                 new_json[1] = 'data'
 
-            with open('data/set.json', 'w', encoding='utf8') as f:
+            with open('data/set.json', 'w', encoding = 'utf8') as f:
                 f.write('{ "db" : "' + new_json[1] + '", "db_type" : "' + new_json[0] + '" }')
 
-            set_data = json.loads(open('data/set.json', encoding='utf8').read())
+            set_data = json.loads(open('data/set.json', encoding = 'utf8').read())
 
             break
 
@@ -78,7 +78,7 @@ db_data_get(set_data['db_type'])
 
 if set_data['db_type'] == 'mysql':
     try:
-        set_data_mysql = json.loads(open('data/mysql.json', encoding='utf8').read())
+        set_data_mysql = json.loads(open('data/mysql.json', encoding = 'utf8').read())
     except:
         new_json = ['', '', '']
 
@@ -99,10 +99,10 @@ if set_data['db_type'] == 'mysql':
         if new_json[2] == '':
             new_json[2] == 'localhost'
 
-        with open('data/mysql.json', 'w', encoding='utf8') as f:
+        with open('data/mysql.json', 'w', encoding = 'utf8') as f:
             f.write('{ "user" : "' + new_json[0] + '", "password" : "' + new_json[1] + '", "host" : "' + new_json[2] + '" }')
 
-        set_data_mysql = json.loads(open('data/mysql.json', encoding='utf8').read())
+        set_data_mysql = json.loads(open('data/mysql.json', encoding = 'utf8').read())
 
     conn = pymysql.connect(
         host = set_data_mysql['host'] if 'host' in set_data_mysql else 'localhost',
@@ -119,38 +119,36 @@ if set_data['db_type'] == 'mysql':
 
     curs.execute(db_change('use ?')%pymysql.escape_string(set_data['db']))
 else:
-    conn = sqlite3.connect(set_data['db'] + '.db', check_same_thread = False)
+    conn = sqlite3.connect(set_data['db'] + '.db')
     curs = conn.cursor()
 
 load_conn(conn)
 
 create_data = {}
-create_data['all_data'] = [
-    'data',
-    'cache_data',
-    'history',
-    'rd',
-    'user',
-    'user_set',
-    'ban',
-    'topic',
-    'rb',
-    'back',
-    'custom',
-    'other',
-    'alist',
-    're_admin',
-    'alarm',
-    'ua_d',
-    'filter',
-    'scan',
-    'acl',
-    'inter',
-    'html_filter',
-    'oauth_conn',
-    'user_application'
-]
-for i in create_data['all_data']:
+create_data['data'] = ['title', 'data']
+create_data['cache_data'] = ['title', 'data', 'id']
+create_data['history'] = ['id', 'title', 'data', 'date', 'ip', 'send', 'leng', 'hide', 'type']
+create_data['rc'] = ['id', 'title', 'date', 'type']
+create_data['rd'] = ['title', 'sub', 'code', 'date', 'band', 'stop', 'agree', 'acl']
+create_data['user'] = ['id', 'pw', 'acl', 'date', 'encode']
+create_data['user_set'] = ['name', 'id', 'data']
+create_data['user_application'] = ['id', 'pw', 'date', 'encode', 'question', 'answer', 'ip', 'ua', 'token', 'email']
+create_data['topic'] = ['id', 'data', 'date', 'ip', 'block', 'top', 'code']
+create_data['rb'] = ['block', 'end', 'today', 'blocker', 'why', 'band', 'login', 'ongoing']
+create_data['back'] = ['title', 'link', 'type']
+create_data['custom'] = ['user', 'css']
+create_data['other'] = ['name', 'data', 'coverage']
+create_data['alist'] = ['name', 'acl']
+create_data['re_admin'] = ['who', 'what', 'time']
+create_data['alarm'] = ['name', 'data', 'date']
+create_data['ua_d'] = ['name', 'ip', 'ua', 'today', 'sub']
+create_data['filter'] = ['name', 'regex', 'sub']
+create_data['scan'] = ['user', 'title', 'type']
+create_data['acl'] = ['title', 'decu', 'dis', 'view', 'why']
+create_data['inter'] = ['title', 'link', 'icon']
+create_data['html_filter'] = ['html', 'kind', 'plus']
+create_data['oauth_conn'] = ['provider', 'wiki_id', 'sns_id', 'name', 'picture']
+for i in create_data:
     try:
         curs.execute(db_change('select test from ' + i + ' limit 1'))
     except:
@@ -172,41 +170,12 @@ except:
     setup_tool = 2
 
 if setup_tool != 0:
-    create_data['data'] = ['title', 'data']
-    create_data['cache_data'] = ['title', 'data', 'id']
-    create_data['history'] = ['id', 'title', 'data', 'date', 'ip', 'send', 'leng', 'hide', 'type']
-    create_data['rd'] = ['title', 'sub', 'code', 'date', 'band', 'stop', 'agree', 'acl']
-    create_data['user'] = ['id', 'pw', 'acl', 'date', 'encode']
-    create_data['user_set'] = ['name', 'id', 'data']
-    create_data['user_application'] = ['id', 'pw', 'date', 'encode', 'question', 'answer', 'ip', 'ua', 'token', 'email']
-    create_data['ban'] = ['block', 'end', 'why', 'band', 'login']
-    create_data['topic'] = ['id', 'data', 'date', 'ip', 'block', 'top', 'code']
-    create_data['rb'] = ['block', 'end', 'today', 'blocker', 'why', 'band']
-    create_data['back'] = ['title', 'link', 'type']
-    create_data['custom'] = ['user', 'css']
-    create_data['other'] = ['name', 'data', 'coverage']
-    create_data['alist'] = ['name', 'acl']
-    create_data['re_admin'] = ['who', 'what', 'time']
-    create_data['alarm'] = ['name', 'data', 'date']
-    create_data['ua_d'] = ['name', 'ip', 'ua', 'today', 'sub']
-    create_data['filter'] = ['name', 'regex', 'sub']
-    create_data['scan'] = ['user', 'title', 'type']
-    create_data['acl'] = ['title', 'decu', 'dis', 'view', 'why']
-    create_data['inter'] = ['title', 'link', 'icon']
-    create_data['html_filter'] = ['html', 'kind', 'plus']
-    create_data['oauth_conn'] = ['provider', 'wiki_id', 'sns_id', 'name', 'picture']
-
-    for create_table in create_data['all_data']:
+    for create_table in create_data:
         for create in create_data[create_table]:
             try:
                 curs.execute(db_change('select ' + create + ' from ' + create_table + ' limit 1'))
             except:
                 curs.execute(db_change("alter table " + create_table + " add " + create + " longtext default ''"))
-
-            try:
-                curs.execute(db_change('create index index_' + create_table + '_' + create + ' on ' + create_table + '(' + create + ')'))
-            except:
-                pass
 
     if setup_tool == 1:
         update(int(ver_set_data[0][0]), set_data)
@@ -266,6 +235,8 @@ for i in range(len(server_set_key)):
 
     server_set[server_set_key[i]] = server_set_val
 
+print('----')
+
 curs.execute(db_change('select data from other where name = "key"'))
 rep_data = curs.fetchall()
 if not rep_data:
@@ -306,7 +277,6 @@ if set_data['db_type'] == 'sqlite':
     except:
         back_time = 0
 
-    print('----')
     if back_time != 0:
         print('Back up state : ' + str(back_time) + ' hours')
 
@@ -434,8 +404,8 @@ def recent_discuss():
 
 @app.route('/block_log')
 @app.route('/<regex("block_user|block_admin"):tool>/<name>')
-def list_block(name = None, tool = None):
-    return list_block_2(conn, name, tool)
+def recent_block(name = None, tool = None):
+    return recent_block_2(conn, name, tool)
 
 @app.route('/search', methods=['POST'])
 def search():
@@ -710,6 +680,10 @@ def api_title_index():
 @app.route('/api/image/<name>')
 def api_image_view(name = ''):
     return api_image_view_2(conn, name, app_var)
+
+@app.route('/api/sitemap.xml')
+def api_sitemap():
+    return api_sitemap_2(conn)
 
 # File
 @app.route('/views/<everything:name>')

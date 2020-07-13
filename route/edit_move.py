@@ -57,6 +57,12 @@ def edit_move_2(conn, name):
                 curs.execute(db_change("select id from history where title = ? order by id + 0 asc"), [name])
                 data = curs.fetchall()
                 for move in data:
+                    curs.execute(db_change("update rc set title = ?, id = ? where title = ? and id = ?"), [
+                        move_title, 
+                        str(int(num) + int(move[0])), 
+                        name, 
+                        move[0]
+                    ])
                     curs.execute(db_change("update history set title = ?, id = ? where title = ? and id = ?"), [
                         move_title, 
                         str(int(num) + int(move[0])), 
@@ -80,6 +86,7 @@ def edit_move_2(conn, name):
                             curs.execute(db_change("update back set link = ? where link = ?"), ['test ' + str(i), name])
 
                         curs.execute(db_change("update history set title = ? where title = ?"), ['test ' + str(i), name])
+                        curs.execute(db_change("update rc set title = ? where title = ?"), ['test ' + str(i), name])
 
                         break
                     else:
@@ -107,6 +114,7 @@ def edit_move_2(conn, name):
                     )
 
                     curs.execute(db_change("update history set title = ? where title = ?"), [title_name[1], title_name[0]])
+                    curs.execute(db_change("update rc set title = ? where title = ?"), [title_name[1], title_name[0]])
                     conn.commit()
 
                 return redirect('/w/' + url_pas(move_title))
@@ -137,12 +145,13 @@ def edit_move_2(conn, name):
             curs.execute(db_change("delete from back where title = ? and not type = 'cat' and type = 'no'"), [move_title])
 
             curs.execute(db_change("update history set title = ? where title = ?"), [move_title, name])
+            curs.execute(db_change("update rc set title = ? where title = ?"), [move_title, name])
             conn.commit()
 
             return redirect('/w/' + url_pas(move_title))
     else:
         return easy_minify(flask.render_template(skin_check(),
-            imp = [name, wiki_set(), custom(), other2([' (' + load_lang('move') + ')', 0])],
+            imp = [name, wiki_set(), custom(), other2(['(' + load_lang('move') + ')', 0])],
             data = '''
                 <form method="post">
                     ''' + ip_warring() + '''

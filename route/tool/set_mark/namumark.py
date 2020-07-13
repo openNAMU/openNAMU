@@ -15,7 +15,7 @@ def nowiki_js(data):
 
     return data
 
-def link_fix(main_link):
+def link_fix(main_link, no_change = 0):
     global end_data
 
     main_link = main_link.replace('&#x27;', "<link_comma>")
@@ -23,9 +23,10 @@ def link_fix(main_link):
     if re.search(r'^:', main_link):
         main_link = re.sub(r'^:', '', main_link)
 
-    main_link = re.sub(r'^사용자:', 'user:', main_link)
-    main_link = re.sub(r'^파일:', 'file:', main_link)
-    main_link = re.sub(r'^분류:', 'category:', main_link)
+    if no_change == 0:
+        main_link = re.sub(r'^사용자:', 'user:', main_link)
+        main_link = re.sub(r'^파일:', 'file:', main_link)
+        main_link = re.sub(r'^분류:', 'category:', main_link)
 
     other_link = re.search(r'[^\\]?(#[^#]+)$', main_link)
     if other_link:
@@ -84,6 +85,7 @@ def table_parser(data, cel_data, cel_num, start_data, num = 0, cel_color = {}):
             if table_data == 'right':
                 div_style += 'float: right;'
             elif table_data == 'center':
+                div_style += 'margin: auto;'
                 all_table += 'margin: auto;'
         elif re.search(r"^table ?textalign=([^=]+)$", in_state):
             num = 1
@@ -260,7 +262,7 @@ def table_start(data):
         else:
             break
 
-    return data
+    return data.replace('||', '<no_table>')
 
 def middle_parser(data):
     global end_data
@@ -877,12 +879,6 @@ def namumark(conn, data, title, include_num):
     data = data.replace('<macro_middle>', '(')
     data = data.replace('<macro_end>', ')]')
 
-    if re.search(r'\[pagecount\]', data, flags = re.I):
-        plus_data += 'page_count();\n'
-        data = re.sub(r'\[pagecount\]', '<span class="all_page_count"></span>', data, flags = re.I)
-
-    data = re.sub(r'\[date\]', now_time, data, flags = re.I)
-
     while 1:
         block = re.search(r'(\n(?:&gt; ?(?:(?:(?!\n).)+)?\n)+)', data)
         if block:
@@ -1066,7 +1062,7 @@ def namumark(conn, data, title, include_num):
                 curs.execute(tool.db_change('select link, icon from inter where title = ?'), [inter_data[0]])
                 inter = curs.fetchall()
                 if inter:
-                    return_link = link_fix(inter_data[1])
+                    return_link = link_fix(inter_data[1], 1)
                     main_link = html.unescape(return_link[0])
                     other_link = return_link[1]
 
@@ -1182,8 +1178,13 @@ def namumark(conn, data, title, include_num):
         else:
             break
 
-    br_re = re.compile(r'\[br\]', re.I)
-    data = br_re.sub('<br>', data)
+    if re.search(r'\[pagecount\]', data, flags = re.I):
+        plus_data += 'page_count();\n'
+        data = re.sub(r'\[pagecount\]', '<span class="all_page_count"></span>', data, flags = re.I)
+
+    data = re.sub(r'\[date\]', now_time, data, flags = re.I)
+    data = re.sub(r'\[clearfix\]', '<div style="clear:both"></div>', data, flags = re.I)
+    data = re.sub(r'\[br\]', '<br>', data, flags = re.I)
 
     footnote_number = 0
 
@@ -1307,20 +1308,21 @@ def namumark(conn, data, title, include_num):
 
     data += category
 
-    data = re.sub(r'<\/td_1>', '</td>', data)
+    data = data.replace('<no_table>', '||')
+    data = data.replace('</td_1>', '</td>')
     data = re.sub(r'<\/ul>\n?', '</ul>', data)
     data = re.sub(r'<\/pre>\n?', '</pre>', data)
     data = re.sub(r'(?P<in><div class="all_in_data"(?:(?:(?!id=).)+)? id="in_data_([^"]+)">)(\n)+', '\g<in>', data)
-    data = re.sub(r'\n\n<ul>', '\n<ul>', data)
-    data = re.sub(r'<\/ul>\n\n', '</ul>', data)
+    data = data.replace('\n\n<ul>', '\n<ul>')
+    data = data.replace('</ul>\n\n', '</ul>')
     data = re.sub(r'^(\n)+', '', data)
     data = re.sub(r'(\n)+<hr><ul id="footnote_data">', '<hr><ul id="footnote_data">', data)
     data = re.sub(r'(?P<in><td(((?!>).)*)>)\n', '\g<in>', data)
     data = re.sub(r'(\n)?<hr>(\n)?', '<hr>', data)
-    data = re.sub(r'<\/ul>\n\n<ul>', '</ul>\n<ul>', data)
-    data = re.sub(r'<\/ul>\n<ul>', '</ul><ul>', data)
-    data = re.sub(r'\n<\/ul>', '</ul>', data)
-    data = re.sub(r'\n', '<br>', data)
+    data = data.replace('</ul>\n\n<ul>', '</ul>\n<ul>')
+    data = data.replace('</ul>\n<ul>', '</ul><ul>')
+    data = data.replace('\n</ul>', '</ul>')
+    data = data.replace('\n', '<br>')
 
     plus_data += '' + \
         'get_link_state("' + include_name + '");\n' + \

@@ -2,7 +2,7 @@ body, html, video, table, div, iframe, input, textarea, img, hr, blockquote, pre
 textarea { width: 100%; }
 input { width: 100%; box-sizing: border-box; }
 #last { margin-top: 30px; }
-#toc { border: 1px solid; padding: 20px; width: fit-content; clear: both; margin-top: 10px; }
+#toc { border: 1px solid; padding: 20px; width: fit-content; width: -moz-fit-content; clear: both; margin-top: 10px; }
 #toc-name { font-size: 18px; }
 table { border-collapse: collapse; }
 td { border: 1px solid; padding: 5px; }

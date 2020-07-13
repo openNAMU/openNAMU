@@ -5,7 +5,7 @@ def user_info_2(conn):
 
     ip = ip_check()
 
-    curs.execute(db_change("select count(name) from alarm where name = ?"), [ip])
+    curs.execute(db_change("select count(*) from alarm where name = ?"), [ip])
     count = curs.fetchall()
     if count and count[0][0] != 0:
         plus2 = '<li><a id="not_thing" href="/alarm">' + load_lang('alarm') + ' (' + str(count[0][0]) + ')</a></li>'

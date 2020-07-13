@@ -30,7 +30,7 @@ def topic_admin_2(conn, topic_num, num):
         curs.execute(db_change("select id from topic where code = ? and id = ? and top = 'O'"), [topic_num, num])
         top_topic_d = curs.fetchall()
 
-        curs.execute(db_change("select end from ban where block = ?"), [data[0][1]])
+        curs.execute(db_change("select end from rb where block = ? and ongoing = '1'"), [data[0][1]])
         user_ban_d = curs.fetchall()
 
         ban += '''
@@ -39,7 +39,7 @@ def topic_admin_2(conn, topic_num, num):
             <ul>
                 <li>
                     <a href="/ban/''' + url_pas(data[0][1]) + '''">
-                        ''' + (load_lang('ban_release') if user_ban_d else load_lang('ban')) + '''
+                        ''' + (load_lang('release') if user_ban_d else load_lang('ban')) + '''
                     </a>
                 </li>
                 <li>
@@ -56,7 +56,7 @@ def topic_admin_2(conn, topic_num, num):
         '''
 
     return easy_minify(flask.render_template(skin_check(),
-        imp = [load_lang('discussion_tool'), wiki_set(), custom(), other2([' (#' + num + ')', 0])],
+        imp = [load_lang('discussion_tool'), wiki_set(), custom(), other2(['(#' + num + ')', 0])],
         data = ban,
         menu = [['thread/' + topic_num + '#' + num, load_lang('return')]]
     ))

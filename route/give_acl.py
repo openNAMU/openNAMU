@@ -66,7 +66,11 @@ def give_acl_2(conn, name):
 
         return redirect('/acl/' + url_pas(name))
     else:
-        data = '<h2>' + load_lang('document_acl') + '</h2><hr class=\"main_hr\"><select name="decu" ' + check_ok + '>'
+        data = '' + \
+            '<h2>' + load_lang('document_acl') + '</h2>' + \
+            '<hr class="main_hr">' + \
+            '<select name="decu" ' + check_ok + '>' + \
+        ''
 
         if re.search(r'^user:', name):
             acl_list = get_acl_list('user')
@@ -86,7 +90,12 @@ def give_acl_2(conn, name):
         data += '</select>'
 
         if not re.search(r'^user:', name):
-            data += '<hr class=\"main_hr\"><h2>' + load_lang('discussion_acl') + '</h2><hr class=\"main_hr\"><select name="dis" ' + check_ok + '>'
+            data += '' + \
+                '<hr class="main_hr">' + \
+                '<h2>' + load_lang('discussion_acl') + '</h2>' + \
+                '<hr class="main_hr">' + \
+                '<select name="dis" ' + check_ok + '>' + \
+            ''
 
             curs.execute(db_change("select dis, why, view from acl where title = ?"), [name])
             acl_data = curs.fetchall()
@@ -100,7 +109,12 @@ def give_acl_2(conn, name):
 
             data += '</select>'
 
-            data += '<hr class=\"main_hr\"><h2>' + load_lang('view_acl') + '</h2><hr class=\"main_hr\"><select name="view" ' + check_ok + '>'
+            data += '' + \
+                '<hr class="main_hr">' + \
+                '<h2>' + load_lang('view_acl') + '</h2>' + \
+                '<hr class="main_hr">' + \
+                '<select name="view" ' + check_ok + '>' + \
+            ''
             for data_list in acl_list:
                 if acl_data and acl_data[0][2] == data_list:
                     check = 'selected="selected"'
@@ -111,7 +125,7 @@ def give_acl_2(conn, name):
 
             data += '''
                 </select>
-                <hr class=\"main_hr\">
+                <hr class="main_hr">
                 <h2 id="exp">''' + load_lang('explanation') + '''</h2>
                 <ul>
                     <li>normal : ''' + load_lang('unset') + '''</li>
@@ -122,28 +136,30 @@ def give_acl_2(conn, name):
                     <li>email : ''' + load_lang('email_acl') + '''</li>
                     <li>owner : ''' + load_lang('owner_acl') + '''</li>
                     <li>ban : ''' + load_lang('ban_acl') + '''</li>
+                    <li>before : ''' + load_lang('before_acl') + '''</li>
+                    <li>30_day : ''' + load_lang('30_day_acl') + '''</li>
                 </ul>
             '''
 
             if check_ok == '':
                 if acl_data:
                     data += '' + \
-                        '<hr class=\"main_hr\">' + \
+                        '<hr class="main_hr">' + \
                         '<input value="' + html.escape(acl_data[0][1]) + '" placeholder="' + load_lang('why') + '" name="why" type="text" ' + check_ok + '>' + \
                     ''
                 else:
                     data += '' + \
-                        '<hr class=\"main_hr\">' + \
+                        '<hr class="main_hr">' + \
                         '<input placeholder="' + load_lang('why') + '" name="why" type="text" ' + check_ok + '>' + \
                     ''
 
         return easy_minify(flask.render_template(skin_check(),
-            imp = [name, wiki_set(), custom(), other2([' (' + load_lang('acl') + ')', 0])],
+            imp = [name, wiki_set(), custom(), other2(['(' + load_lang('acl') + ')', 0])],
             data = '''
                 <form method="post">
                     <a href="/setting/8">(''' + load_lang('main_acl_setting') + ''')</a>
                     ''' + data + '''
-                    <hr class=\"main_hr\">
+                    <hr class="main_hr">
                     <button type="submit" ''' + check_ok + '''>''' + load_lang('save') + '''</button>
                 </form>
             ''',

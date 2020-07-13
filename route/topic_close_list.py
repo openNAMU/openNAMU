@@ -76,7 +76,7 @@ def topic_close_list_2(conn, name):
         plus = re.sub(r'^<br>', '', plus)
 
     return easy_minify(flask.render_template(skin_check(),
-        imp = [name, wiki_set(), custom(), other2([' (' + sub + ')', 0])],
+        imp = [name, wiki_set(), custom(), other2(['(' + sub + ')', 0])],
         data = div + plus,
         menu = menu
     ))

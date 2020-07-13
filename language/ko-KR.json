@@ -26,7 +26,6 @@
     "close": "닫기",
     "closed": "닫힘",
     "start": "시작",
-    "ban_release": "차단 해제",
     "encryption_method": "비밀번호 암호화 방식",
     "why": "사유",
     "user_check_authority": "사용자 검사 권한",
@@ -367,5 +366,12 @@
     "enter_html" : "HTML을 입력하세요.",
     "exp_edit_conflict" : "편집 충돌 발생",
     "backup_where" : "백업 위치",
-    "empty" : "빈칸"
+    "empty" : "빈칸",
+    "email_send_error" : "이메일 전송이 실패했습니다.",
+    "get_sitemap" : "sitemap.xml 만들거나 갱신하기",
+    "same_ip_exist" : "동일한 아이피가 존재합니다.",
+    "restart_fail_error" : "재시작이 실패했습니다. 수동 재시작을 이용해주세요.",
+    "domain" : "도메인",
+    "before_acl" : "이 문서를 이전에 편집한 적 있는 사람만",
+    "30_day_acl" : "가입 후 30일이 지난 가입자만"
 }

@@ -13,12 +13,11 @@ def give_user_check_2(conn, name):
         return re_error('/error/3')
 
     num = int(number_check(flask.request.args.get('num', '1')))
-    if num * 50 > 0:
-        sql_num = num * 50 - 50
-    else:
-        sql_num = 0
-
+    sql_num = (num * 50 - 50) if num * 50 > 0 else 0
+    
     div = ''
+    plus_id = flask.request.args.get('plus', None)
+
     if ip_or_user(name) == 0:
         curs.execute(db_change("select data from user_set where name = \"approval_question\" and id = ?"), [name])
         approval_question = curs.fetchall()
@@ -26,7 +25,7 @@ def give_user_check_2(conn, name):
             curs.execute(db_change("select data from user_set where name = \"approval_question_answer\" and id = ?"), [name])
             approval_question_answer = curs.fetchall()
             if approval_question_answer and approval_question_answer[0]:
-                div = '''
+                div += '''
                     <table id="main_table_set">
                         <tbody>
                             <tr>
@@ -37,75 +36,106 @@ def give_user_check_2(conn, name):
                             </tr>
                         </tbody>
                     </table>
-                    <hr class=\"main_hr\">
+                    <hr class="main_hr">
                 '''
 
-    if flask.request.args.get('plus', None):
-        end_check = 1
-
-        curs.execute(db_change("" + \
-                "select name, ip, ua, today from ua_d " + \
-                "where " + ('ip' if ip_or_user(name) == 1 else 'name') + " = ? or " + \
-                ('ip' if ip_or_user(flask.request.args.get('plus', None)) == 1 else 'name') + " = ? " + \
-                "order by today desc limit ?, 50" + \
-            ""), [
-            name,
-            flask.request.args.get('plus', None),
-            sql_num
-        ])
+    if plus_id:
+        plus = "or " + ('ip' if ip_or_user(plus_id) == 1 else 'name') + " = ? "
+        set_list = [name, plus_id, sql_num]
+        
+        if num == 1:
+            curs.execute(db_change("" + \
+                "select distinct ip from ua_d " + \
+                "where " + ('ip' if ip_or_user(name) == 1 else 'name') + " = ? or " + ('ip' if ip_or_user(plus_id) == 1 else 'name') + " = ? "
+            ""), [name, plus_id])
+            all_ip_count = len(curs.fetchall())
+            
+            curs.execute(db_change("" + \
+                "select distinct ip from ua_d " + \
+                "where " + ('ip' if ip_or_user(name) == 1 else 'name') + " = ?" + \
+            ""), [name])
+            a_ip_count = len(curs.fetchall())
+            
+            curs.execute(db_change("" + \
+                "select distinct ip from ua_d " + \
+                "where " + ('ip' if ip_or_user(plus_id) == 1 else 'name') + " = ? "
+            ""), [plus_id])
+            b_ip_count = len(curs.fetchall())
+            
+            if a_ip_count + b_ip_count != all_ip_count:
+                div += load_lang('same_ip_exist') + '<hr class="main_hr">'    
     else:
-        end_check = 0
+        plus = ''
+        set_list = [name, sql_num]
 
-        curs.execute(db_change("" + \
-            "select name, ip, ua, today from ua_d " + \
-            "where " + ('ip' if ip_or_user(name) == 1 else 'name') + " = ? order by today desc limit ?, 50" + \
-        ""), [name, sql_num])
+    curs.execute(db_change("" + \
+        "select name, ip, ua, today from ua_d " + \
+        "where " + ('ip' if ip_or_user(name) == 1 else 'name') + " = ? " + \
+        plus + \
+        "order by today desc limit ?, 50" + \
+    ""), set_list)
 
     record = curs.fetchall()
     if record:
-        if not flask.request.args.get('plus', None):
-            div = '<a href="/manager/14?plus=' + url_pas(name) + '">(' + load_lang('compare') + ')</a><hr class=\"main_hr\">' + div
+        if not plus_id:
+            div = '' + \
+                '<a href="/manager/14?plus=' + url_pas(name) + '">(' + load_lang('compare') + ')</a>' + \
+                '<hr class="main_hr">' + \
+            '' + div
         else:
-            div = '<a href="/check/' + url_pas(name) + '">(' + name + ')</a> <a href="/check/' + url_pas(flask.request.args.get('plus', None)) + '">(' + flask.request.args.get('plus', None) + ')</a><hr class=\"main_hr\">' + div
+            div = '' + \
+                '<a href="/check/' + url_pas(name) + '">(' + name + ')</a> ' + \
+                '<a href="/check/' + url_pas(plus_id) + '">(' + plus_id + ')</a>' + \
+                '<hr class="main_hr">' + \
+            '' + div
 
         div += '''
             <table id="main_table_set">
                 <tbody>
                     <tr>
                         <td id="main_table_width">''' + load_lang('name') + '''</td>
-                        <td id="main_table_width">ip</td>
+                        <td id="main_table_width">''' + load_lang('ip') + '''</td>
                         <td id="main_table_width">''' + load_lang('time') + '''</td>
                     </tr>
         '''
 
+        set_n = 0
         for data in record:
             if data[2]:
-                ua = data[2]
+                if len(data[2]) > 300:
+                    ua = '' + \
+                        '<a href="javascript:void();" onclick="document.getElementById(\'check_' + str(set_n) + '\').style.display=\'block\';">(300+)</a>' + \
+                        '<div id="check_' + str(set_n) + '" style="display:none;">' + html.escape(data[2]) + '</div>' + \
+                    ''
+                    set_n += 1
+                else:
+                    ua = html.escape(data[2])
             else:
                 ua = '<br>'
 
-            div +=  '''
-                    <tr>
-                        <td>''' + ip_pas(data[0]) + '''</td>
-                        <td>''' + ip_pas(data[1]) + '''</td>
-                        <td>''' + data[3] + '''</td>
-                    </tr>
-                    <tr>
-                        <td colspan="3">''' + ua + '''</td>
-                    </tr>
-                    '''
+            div += '''
+                <tr>
+                    <td>''' + ip_pas(data[0]) + '''</td>
+                    <td>''' + ip_pas(data[1]) + '''</td>
+                    <td>''' + data[3] + '''</td>
+                </tr>
+                <tr>
+                    <td colspan="3">''' + ua + '''</td>
+                </tr>
+            '''
 
-        div +=  '''
-                    </tbody>
-                </table>
-                '''
+        div += '''
+                </tbody>
+            </table>
+        '''
     else:
         return re_error('/error/2')
 
-    if end_check == 1:
-        div += next_fix('/check/' + url_pas(name) + '?plus=' + flask.request.args.get('plus', None) + '&num=', num, record)
-    else:
-        div += next_fix('/check/' + url_pas(name) + '?num=', num, record)
+    div += next_fix(
+        '/check/' + url_pas(name) + ('?plus=' + plus_id if plus_id else '') + '&num=', 
+        num, 
+        record
+    )
 
     return easy_minify(flask.render_template(skin_check(),
         imp = [load_lang('check'), wiki_set(), custom(), other2([0, 0])],

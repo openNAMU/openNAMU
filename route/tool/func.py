@@ -36,19 +36,20 @@ for i in range(0, 2):
         if i == 0:
             print(e)
             print('----')
-            if platform.system() == 'Linux':
-                ok = os.system('python3 -m pip install --user -r requirements.txt')
+            if platform.system() == 'Linux' or platform.system() == 'Windows':
+                ok = os.system('python' + ('3' if platform.system() != 'Windows' else '') + ' -m pip install --user -r requirements.txt')
                 if ok == 0:
                     print('----')
-                    os.execl(sys.executable, sys.executable, *sys.argv)
+                    try:
+                        os.execl(sys.executable, sys.executable, *sys.argv)
+                    except:
+                        try:
+                            os.execl(sys.executable, '"' + sys.executable + '"', *sys.argv)
+                        except:
+                            print('Error : restart failed')
+                            raise
                 else:
-                    raise
-            elif platform.system() == 'Windows':
-                ok = os.system('python -m pip install --user -r requirements.txt')
-                if ok == 0:
-                    print('----')
-                    os.execl(sys.executable, sys.executable, *sys.argv)
-                else:
+                    print('Error : library install failed')
                     raise
             else:
                 print('----')
@@ -110,15 +111,22 @@ def send_email(who, title, data):
                 smtp = smtplib.SMTP_SSL(smtp_server, smtp_port)
             
             smtp.login(smtp_email, smtp_pass)
+        else:
+            raise
 
         msg = email.mime.text.MIMEText(data)
         msg['Subject'] = title
         smtp.sendmail(smtp_email, who, msg.as_string())
 
         smtp.quit()
-    except:
+
+        return 1
+    except Exception as e:
         print('----')
-        print('Error : Email send error')
+        print('Error : email send error')
+        print(e)
+
+        return 0
 
 def last_change(data):
     json_address = re.sub(r"(((?!\.|\/).)+)\.html$", "set.json", skin_check())
@@ -184,8 +192,7 @@ def update(ver_num, set_data):
 
     if ver_num < 3170400:
         curs.execute(db_change("select title, sub, code from topic where id = '1'"))
-        change_topic = curs.fetchall()
-        for i in change_topic:
+        for i in curs.fetchall():
             curs.execute(db_change("update topic set code = ? where title = ? and sub = ?"), [i[2], i[0], i[1]])
             curs.execute(db_change("update rd set code = ? where title = ? and sub = ?"), [i[2], i[0], i[1]])
 
@@ -208,22 +215,51 @@ def update(ver_num, set_data):
 
     if ver_num < 3183603:
         curs.execute(db_change("select block from ban where band = 'O'"))
-        change_band = curs.fetchall()
-        for i in change_band:
+        for i in curs.fetchall():
             curs.execute(db_change("update ban set block = ?, band = 'regex' where block = ? and band = 'O'"), [
                 '^' + i[0].replace('.', '\\.'),
                 i[0]
             ])
 
         curs.execute(db_change("select block from rb where band = 'O'"))
-        change_band = curs.fetchall()
-        for i in change_band:
+        for i in curs.fetchall():
             curs.execute(db_change("update rb set block = ?, band = 'regex' where block = ? and band = 'O'"), [
                 '^' + i[0].replace('.', '\\.'),
                 i[0]
             ])
-            
-    if ver_num < 3184500:
+
+    # set 1
+    if ver_num < 3190201:
+        today_time = get_time()
+
+        curs.execute(db_change("select block, end, why, band, login from ban"))
+        for i in curs.fetchall():
+            curs.execute(db_change("insert into rb (block, end, today, why, band, login, ongoing) values (?, ?, ?, ?, ?, ?, ?)"), [
+                i[0],
+                i[1],
+                today_time,
+                i[2],
+                i[3],
+                i[4],
+                '1'
+            ])
+
+    if ver_num < 3191301:
+        curs.execute(db_change('' + \
+            'select id, title, date from history ' + \
+            'where not title like "user:%" ' + \
+            'order by date desc ' + \
+            'limit 50' + \
+        ''))
+        data_list = curs.fetchall()
+        for get_data in data_list:
+            curs.execute(db_change("insert into rc (id, title, date, type) values (?, ?, ?, 'normal')"), [
+                get_data[0], 
+                get_data[1],
+                get_data[2]
+            ])
+
+    if ver_num < 3193200:
         curs.execute(db_change('delete from cache_data'))
 
     conn.commit()
@@ -244,7 +280,7 @@ def set_init():
 
     curs.execute(db_change('select data from other where name = "smtp_server" or name = "smtp_port" or name = "smtp_security"'))
     if not curs.fetchall():
-        for i in [['smtp_server', 'imap.google.com'], ['smtp_port', '587'], ['smtp_security', 'tls']]:
+        for i in [['smtp_server', 'smtp.gmail.com'], ['smtp_port', '587'], ['smtp_security', 'starttls']]:
             curs.execute(db_change("insert into other (name, data) values (?, ?)"), [i[0], i[1]])
 
 def pw_encode(data, data2 = '', type_d = ''):
@@ -484,11 +520,20 @@ def next_fix(link, num, page, end = 50):
 
     if num == 1:
         if len(page) == end:
-            list_data += '<hr class=\"main_hr\"><a href="' + link + str(num + 1) + '">(' + load_lang('next') + ')</a>'
+            list_data += '' + \
+                '<hr class="main_hr">' + \
+                '<a href="' + link + str(num + 1) + '">(' + load_lang('next') + ')</a>' + \
+            ''
     elif len(page) != end:
-        list_data += '<hr class=\"main_hr\"><a href="' + link + str(num - 1) + '">(' + load_lang('previous') + ')</a>'
+        list_data += '' + \
+            '<hr class="main_hr">' + \
+            '<a href="' + link + str(num - 1) + '">(' + load_lang('previous') + ')</a>' + \
+        ''
     else:
-        list_data += '<hr class=\"main_hr\"><a href="' + link + str(num - 1) + '">(' + load_lang('previous') + ')</a> <a href="' + link + str(num + 1) + '">(' + load_lang('next') + ')</a>'
+        list_data += '' + \
+            '<hr class="main_hr">' + \
+            '<a href="' + link + str(num - 1) + '">(' + load_lang('previous') + ')</a> <a href="' + link + str(num + 1) + '">(' + load_lang('next') + ')</a>' + \
+        ''
 
     return list_data
 
@@ -497,7 +542,7 @@ def other2(data):
         data += ['']
 
     req_list = ''
-    main_css_ver = 47
+    main_css_ver = 48
 
     if  not 'main_css_load' in flask.session or \
         not 'main_css_ver' in flask.session or \
@@ -524,7 +569,8 @@ def other2(data):
                 integrity="sha384-2BKqo+exmr9su6dir+qCw08N2ZKRucY4PrGQPPWU1A7FtlCGjmEGFqXCv5nyM5Ij"
                 crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/highlight.min.js"></script>
-    ''' + req_list + '<script>window.addEventListener(\'DOMContentLoaded\', function() { main_css_skin_load(); });</script>'] + data[2:]
+        <script>window.addEventListener('DOMContentLoaded', function() { main_css_skin_load(); });</script>
+    ''' + req_list] + data[2:]
 
     return data
 
@@ -662,41 +708,53 @@ def admin_check(num = None, what = None, name = ''):
 
 def ip_pas(raw_ip, type_d = 0):
     hide = 0
+    end_ip = {}
 
-    if ip_or_user(raw_ip) != 0:
-        curs.execute(db_change("select data from other where name = 'ip_view'"))
-        data = curs.fetchall()
-        if data and data[0][0] != '':
-            if re.search(r'\.', raw_ip):
-                ip = re.sub(r'\.([^.]*)\.([^.]*)$', '.*.*', raw_ip)
-            else:
-                ip = re.sub(r':([^:]*):([^:]*)$', ':*:*', raw_ip)
-
-            if not admin_check(1):
-                hide = 1
-        else:
-            ip = raw_ip
+    if type(raw_ip) != type([]):
+        get_ip = [raw_ip]
+        return_ip = 1
     else:
-        if type_d == 0:
-            curs.execute(db_change("select title from data where title = ?"), ['user:' + raw_ip])
-            if curs.fetchall():
-                ip = '<a href="/w/' + url_pas('user:' + raw_ip) + '">' + raw_ip + '</a>'
+        get_ip = raw_ip
+        return_ip = 0
+
+    for raw_ip in get_ip:
+        if not raw_ip in end_ip:
+            if ip_or_user(raw_ip) != 0:
+                curs.execute(db_change("select data from other where name = 'ip_view'"))
+                data = curs.fetchall()
+                if data and data[0][0] != '':
+                    if re.search(r'\.', raw_ip):
+                        ip = re.sub(r'\.([^.]*)\.([^.]*)$', '.*.*', raw_ip)
+                    else:
+                        ip = re.sub(r':([^:]*):([^:]*)$', ':*:*', raw_ip)
+
+                    if not admin_check(1):
+                        hide = 1
+                else:
+                    ip = raw_ip
             else:
-                ip = '<a id="not_thing" href="/w/' + url_pas('user:' + raw_ip) + '">' + raw_ip + '</a>'
+                if type_d == 0:
+                    curs.execute(db_change("select title from data where title = ?"), ['user:' + raw_ip])
+                    if curs.fetchall():
+                        ip = '<a href="/w/' + url_pas('user:' + raw_ip) + '">' + raw_ip + '</a>'
+                    else:
+                        ip = '<a id="not_thing" href="/w/' + url_pas('user:' + raw_ip) + '">' + raw_ip + '</a>'
 
-            if admin_check('all', None, raw_ip) == 1:
-                ip = '<b>' + ip + '</b>'
-        else:
-            ip = raw_ip
+                    if admin_check('all', None, raw_ip) == 1:
+                        ip = '<b>' + ip + '</b>'
+                else:
+                    ip = raw_ip
 
-    if type_d == 0:
-        if ban_check(raw_ip) == 1:
-            ip = '<s>' + ip + '</s>'
+            if type_d == 0:
+                if ban_check(raw_ip) == 1:
+                    ip = '<s>' + ip + '</s>'
 
-        if hide == 0:
-            ip += ' <a href="/tool/' + url_pas(raw_ip) + '">(' + load_lang('tool') + ')</a>'
+                if hide == 0:
+                    ip += ' <a href="/tool/' + url_pas(raw_ip) + '">(' + load_lang('tool') + ')</a>'
+        
+            end_ip[raw_ip] = ip
 
-    return ip
+    return ip if return_ip == 1 else end_ip
 
 def custom():
     if 'head' in flask.session:
@@ -713,11 +771,8 @@ def custom():
         user_name = ip
 
         curs.execute(db_change('select data from user_set where name = "email" and id = ?'), [ip])
-        data = curs.fetchall()
-        if data:
-            email = data[0][0]
-        else:
-            email = ''
+        email = curs.fetchall()
+        email = email[0][0] if email else ''
 
         if admin_check('all') == 1:
             user_admin = '1'
@@ -737,7 +792,7 @@ def custom():
             user_admin = '0'
             user_acl_list = '0'
 
-        curs.execute(db_change("select count(name) from alarm where name = ?"), [ip])
+        curs.execute(db_change("select count(*) from alarm where name = ?"), [ip])
         count = curs.fetchall()
         if count:
             user_notice = str(count[0][0])
@@ -752,10 +807,7 @@ def custom():
         user_notice = '0'
 
     curs.execute(db_change("select title from rd where title = ? and stop = ''"), ['user:' + ip])
-    if curs.fetchall():
-        user_topic = '1'
-    else:
-        user_topic = '0'
+    user_topic = '1' if curs.fetchall() else '0'
 
     return [
         '',
@@ -948,10 +1000,31 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
                     if admin_check(num) == 1:
                         return 0
                     else:
-                        curs.execute(db_change("select count(title) from history where ip = ?"), [ip])
+                        curs.execute(db_change("select count(*) from history where ip = ?"), [ip])
                         count = curs.fetchall()
                         count = count[0][0] if count else 0
                         if count >= 50:
+                            return 0
+            elif acl_data[0][0] == 'before':
+                if ip_or_user(ip) != 1:
+                    if admin_check(num) == 1:
+                        return 0
+                
+                curs.execute(db_change("select ip from history where title = ? and ip = ?"), [name, ip])
+                if curs.fetchall():
+                    return 0
+            elif acl_data[0][0] == '30_day':
+                if ip_or_user(ip) != 1:
+                    if admin_check(num) == 1:
+                        return 0
+                    else:
+                        curs.execute(db_change("select date from user where id = ?"), [ip])
+                        user_date = curs.fetchall()[0][0]
+                        
+                        time_1 = datetime.datetime.strptime(user_date, '%Y-%m-%d %H:%M:%S') + datetime.timedelta(days = 30)
+                        time_2 = datetime.datetime.strptime(get_time(), '%Y-%m-%d %H:%M:%S')
+                        
+                        if time_2 > time_1:
                             return 0
             elif acl_data[0][0] == 'email':
                 if ip_or_user(ip) != 1:
@@ -990,10 +1063,13 @@ def ban_check(ip = None, tool = None):
     if admin_check(None, None, ip) == 1:
         return 0
 
-    curs.execute(db_change("delete from ban where (end < ? and end like '2%')"), [get_time()])
+    curs.execute(db_change("update rb set ongoing = '' where end < ? and end != '' and ongoing = '1'"), [get_time()])
     conn.commit()
 
-    curs.execute(db_change("select login, block from ban where ((end > ? and end like '2%') or end = '') and band = 'regex'"), [get_time()])
+    curs.execute(db_change("" + \
+        "select login, block from rb " + \
+        "where ((end > ? and end != '') or end = '') and band = 'regex' and ongoing = '1'" + \
+    ""), [get_time()])
     regex_d = curs.fetchall()
     for test_r in regex_d:
         g_regex = re.compile(test_r[1])
@@ -1004,7 +1080,10 @@ def ban_check(ip = None, tool = None):
             else:
                 return 1
 
-    curs.execute(db_change("select login from ban where ((end > ? and end like '2%') or end = '') and block = ? and band = ''"), [get_time(), ip])
+    curs.execute(db_change("" + \
+        "select login from rb " + \
+        "where ((end > ? and end != '') or end = '') and block = ? and band = '' and ongoing = '1'" + \
+    ""), [get_time(), ip])
     ban_d = curs.fetchall()
     if ban_d:
         if tool and tool == 'login':
@@ -1023,9 +1102,11 @@ def ban_insert(name, end, why, login, blocker, type_d = None):
     else:
         band = ''
 
-    curs.execute(db_change("delete from ban where (end < ? and end like '2%')"), [get_time()])
+    curs.execute(db_change("update rb set ongoing = '' where end < ? and end != '' and ongoing = '1'"), [now_time])
 
-    curs.execute(db_change("select block from ban where ((end > ? and end like '2%') or end = '') and block = ? and band = ?"), [get_time(), name, band])
+    curs.execute(db_change("" + \
+        "select block from rb where ((end > ? and end != '') or end = '') and block = ? and band = ? and ongoing = '1'" + \
+    ""), [now_time, name, band])
     if curs.fetchall():
         curs.execute(db_change("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, ?)"), [
             name,
@@ -1035,7 +1116,7 @@ def ban_insert(name, end, why, login, blocker, type_d = None):
             '',
             band
         ])
-        curs.execute(db_change("delete from ban where block = ? and band = ?"), [name, band])
+        curs.execute(db_change("update rb set ongoing = '' where block = ? and band = ? and ongoing = '1'"), [name, band])
     else:
         if login != '':
             login = 'O'
@@ -1051,20 +1132,13 @@ def ban_insert(name, end, why, login, blocker, type_d = None):
         else:
             r_time = ''
 
-        curs.execute(db_change("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, ?)"), [
+        curs.execute(db_change("insert into rb (block, end, today, blocker, why, band, ongoing) values (?, ?, ?, ?, ?, ?, '1')"), [
             name, 
             r_time, 
             now_time, 
             blocker, 
             why, 
             band
-        ])
-        curs.execute(db_change("insert into ban (block, end, why, band, login) values (?, ?, ?, ?, ?)"), [
-            name, 
-            r_time, 
-            why, 
-            band, 
-            login
         ])
 
     conn.commit()
@@ -1083,17 +1157,26 @@ def history_plus(title, data, date, ip, send, leng, t_check = '', d_type = ''):
     id_data = curs.fetchall()
     id_data = str(int(id_data[0][0]) + 1) if id_data else '1'
 
-    if d_type != 'req':
-        curs.execute(db_change("select title from history where title = ? and id = ? and type = 'req'"), [title, id_data])
-        if curs.fetchall():
-            curs.execute(db_change("update history set type = 'req_close' where title = ? and id = ? and type = 'req'"), [
-                title,
-                id_data
-            ])
-
     send = re.sub(r'\(|\)|<|>', '', send)
     send = send[:128] if len(send) > 128 else send
     send = send + ' (' + t_check + ')' if t_check != '' else send
+
+    if not re.search('^user:', title):
+        curs.execute(db_change("select count(*) from rc where type = 'normal'"))
+        if curs.fetchall()[0][0] > 49:
+            curs.execute(db_change("select id, title from rc where type = 'normal' order by date asc limit 1"))
+            rc_data = curs.fetchall()
+            if rc_data:
+                curs.execute(db_change('delete from rc where id = ? and title = ? and type = "normal"'), [
+                    rc_data[0][0],
+                    rc_data[0][1]
+                ])
+        
+        curs.execute(db_change("insert into rc (id, title, date, type) values (?, ?, ?, 'normal')"), [
+            id_data,
+            title,
+            date
+        ])
 
     curs.execute(db_change("insert into history (id, title, data, date, ip, send, leng, hide, type) values (?, ?, ?, ?, ?, ?, ?, '', ?)"), [
         id_data,
@@ -1144,13 +1227,11 @@ def edit_filter_do(data):
 def redirect(data = '/'):
     return flask.redirect(data)
 
-def get_acl_list(type_d = None):
-    acl_data = ['', 'all', 'user', 'admin', 'owner', '50_edit', 'email', 'ban']
-    if type_d:
-        if type_d == 'user':
-            acl_data = ['', 'user', 'all']
-
-    return acl_data
+def get_acl_list(type_d = 'normal'):
+    if type_d == 'user':
+        return ['', 'user', 'all']
+    else:
+        return ['', 'all', 'user', 'admin', 'owner', '50_edit', 'email', 'ban', 'before', '30_day']
 
 def re_error(data):
     conn.commit()
@@ -1159,7 +1240,7 @@ def re_error(data):
         if ban_check() == 1:
             end = '<div id="get_user_info"></div><script>load_user_info("' + ip_check() + '");</script>'
         else:
-            end = load_lang('authority_error')
+            end = '<ul><li>' + load_lang('authority_error') + '</li></ul>'
 
         return easy_minify(flask.render_template(skin_check(),
             imp = [load_lang('error'), wiki_set(1), custom(), other2([0, 0])],
@@ -1202,6 +1283,8 @@ def re_error(data):
             data = load_lang('same_file_error')
         elif num == 17:
             data = load_lang('file_capacity_error') + wiki_set(3)
+        elif num == 18:
+            data = load_lang('email_send_error')
         elif num == 19:
             data = load_lang('decument_exist_error')
         elif num == 20:
@@ -1214,8 +1297,7 @@ def re_error(data):
             data = load_lang('regex_error')
         elif num == 24:
             curs.execute(db_change("select data from other where name = 'slow_edit'"))
-            slow_data = curs.fetchall()
-            data = load_lang('fast_edit_error') + slow_data[0][0]
+            data = load_lang('fast_edit_error') + curs.fetchall()[0][0]
         elif num == 25:
             data = load_lang('too_many_dec_error')
         elif num == 26:
@@ -1226,6 +1308,16 @@ def re_error(data):
             data = load_lang('watchlist_overflow_error')
         elif num == 29:
             data = load_lang('copyright_disagreed')
+        elif num == 30:
+            data = load_lang('ie_wrong_callback')
+        elif num == 31:
+            data = load_lang('oauth_disabled')
+        elif num == 32:
+            data = load_lang('oauth_setting_not_found')
+        elif num == 33:
+            data = load_lang('restart_fail_error')
+        elif num == 34:
+            data = load_lang("update_error") + ' <a href="https://github.com/2DU/opennamu">(Github)</a>'
         else:
             data = '???'
 
@@ -1241,7 +1333,7 @@ def re_error(data):
                             '<li>' + data + ' <a href="/main_skin_set">(' + load_lang('main_skin_set') + ')</a></li>' + \
                         '</ul>' + \
                     '</div>' + \
-                    ('<script>window.addEventListener(\'DOMContentLoaded\', function() { main_css_skin_set(); });</script>' if get_url == '/main_skin_set' else ''),
+                    ('<script>main_css_skin_set();</script>' if get_url == '/main_skin_set' else ''),
                 menu = ([['main_skin_set', load_lang('main_skin_set')]] if get_url != '/main_skin_set' else [['skin_set', load_lang('skin_set')]])
             ))
         else:

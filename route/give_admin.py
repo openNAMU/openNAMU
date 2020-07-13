@@ -54,7 +54,7 @@ def give_admin_2(conn, name):
                     div += '<option value="' + data[0] + '">' + data[0] + '</option>'
 
         return easy_minify(flask.render_template(skin_check(),
-            imp = [name, wiki_set(), custom(), other2([' (' + load_lang('authorize') + ')', 0])],
+            imp = [name, wiki_set(), custom(), other2(['(' + load_lang('authorize') + ')', 0])],
             data =  '''
                     <form method="post">
                         <select name="select">''' + div + '''</select>

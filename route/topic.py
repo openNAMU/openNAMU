@@ -140,9 +140,9 @@ def topic_2(conn, topic_num):
         '''
 
         return easy_minify(flask.render_template(skin_check(),
-            imp = [name, wiki_set(), custom(), other2([' (' + load_lang('discussion') + ')', 0])],
+            imp = [name, wiki_set(), custom(), other2(['(' + load_lang('discussion') + ')', 0])],
             data = '''
-                <h2 id="topic_top_title">''' + sub + '''</h2>
+                <h2 id="topic_top_title">''' + html.escape(sub) + '''</h2>
                 ''' + data,
             menu = [['topic/' + url_pas(name), load_lang('list')]]
         ))

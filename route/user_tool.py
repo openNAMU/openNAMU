@@ -12,9 +12,9 @@ def user_tool_2(conn, name):
     '''
 
     if admin_check(1) == 1:
-        curs.execute(db_change("select block from ban where block = ?"), [name])
+        curs.execute(db_change("select block from rb where block = ? and ongoing = '1'"), [name])
         if curs.fetchall():
-            ban_name = load_lang('ban_release')
+            ban_name = load_lang('release')
         else:
             ban_name = load_lang('ban')
 
@@ -27,7 +27,7 @@ def user_tool_2(conn, name):
         '''
 
     return easy_minify(flask.render_template(skin_check(),
-        imp = [name, wiki_set(), custom(), other2([' (' + load_lang('tool') + ')', 0])],
+        imp = [name, wiki_set(), custom(), other2(['(' + load_lang('tool') + ')', 0])],
         data = data,
         menu = 0
     ))

@@ -32,17 +32,9 @@ def login_oauth_2(conn, platform, func):
 
     if func == 'init':
         if oauth_data['client_id'] == '' or oauth_data['client_secret'] == '':
-            return easy_minify(flask.render_template(skin_check(),
-                imp = [load_lang('error'), wiki_set(), custom(), other2([0, 0])],
-                data = load_lang('oauth_disabled'),
-                menu = [['user', load_lang('return')]]
-            ))
+            return re_error('/error/31')
         elif publish_url == 'https://':
-            return easy_minify(flask.render_template(skin_check(),
-                imp = [load_lang('error'), wiki_set(), custom(), other2([0, 0])],
-                data = load_lang('oauth_setting_not_found'),
-                menu = [['user', load_lang('return')]]
-            ))
+            return re_error('/error/32')
 
         referrer_re = re.compile(r'(?P<host>^(https?):\/\/([^\/]+))\/(?P<refer>[^\/?]+)')
         if flask.request.referrer != None:
@@ -84,11 +76,7 @@ def login_oauth_2(conn, platform, func):
         state = flask.request.args.get('state')
 
         if code == None:
-            return easy_minify(flask.render_template(skin_check(),
-                imp = [load_lang('inter_error'), wiki_set(), custom(), other2([0, 0])],
-                data = '<h2>ie_wrong_callback</h2>' + load_lang('ie_wrong_callback'),
-                menu = [['user', load_lang('return')]]
-            ))
+            return re_error('/error/30')
 
         if platform == 'discord':
             data = {
