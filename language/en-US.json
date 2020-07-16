@@ -207,6 +207,7 @@
         "star_doc" : "Document(s) of interest",
         "add_star_doc" : "Add document(s) of interest",
         "get_sitemap" : "Create or renewal sitemap.xml",
+        "simple_check" : "Simple check",
         "_comment_2.1_" : "Filter",
             "_comment_2.1.1_" : "List",
                 "interwiki_list" : "Interwiki(s) list",
