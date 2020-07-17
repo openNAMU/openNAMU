@@ -1119,8 +1119,6 @@ def namumark(conn, data, title, include_num):
                             main_link.replace('\'', '\\\'') + "';" + \
                         "\n" + \
                     ""
-
-                
             else:
                 return_link = link_fix(main_link)
                 main_link = html.unescape(return_link[0])
@@ -1133,7 +1131,7 @@ def namumark(conn, data, title, include_num):
                 elif re.search(r'^\.\.\/', main_link):
                     main_link = re.sub(r'^\.\.\/', re.sub(r'(?P<in>.+)\/.*$', '\g<in>', title), main_link)
 
-                if main_link != title or main_link != '':
+                if main_link != title and main_link != '':
                     backlink += [[title, main_link, '']]
 
                     curs.execute(tool.db_change("select title from data where title = ?"), [main_link])
