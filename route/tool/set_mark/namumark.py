@@ -363,14 +363,24 @@ def middle_parser(data):
                         else:
                             folding_data = ['Test']
 
+                        plus_data += '' + \
+                            'if(document.getElementById("get_' + include_name + 'folding_' + str(folding_num) + '")) { ' + \
+                                'document.getElementById("get_' + include_name + 'folding_' + str(folding_num) + '").innerHTML = ' + \
+                                    '"' + nowiki_js(folding_data[0]) + '"; ' + \
+                                '' + \
+                            '}' + \
+                            '\n' + \
+                        ''
                         data = re.sub(
                             r'{{{#!folding ?((?:(?!\n).)*)\n?', '' + \
                             '<div>' + \
-                                str(folding_data[0]) + ' ' + \
                                 '<div style="display: inline-block;">' + \
-                                    '<a href="javascript:void(0);" onclick="do_open_folding(\'' + include_name + 'folding_' + str(folding_num) + '\', this);">' + \
-                                        '(+)' + \
-                                    '</a>' + \
+                                    '<b>' + \
+                                        '<a href="javascript:void(0);" ' + \
+                                            'onclick="do_open_folding(\'' + include_name + 'folding_' + str(folding_num) + '\', this);" ' + \
+                                            'id="get_' + include_name + 'folding_' + str(folding_num) + '">' + \
+                                        '</a>' + \
+                                    '</b>' + \
                                 '</div_2>' + \
                                 '<div id="' + include_name + 'folding_' + str(folding_num) + '" style="display: none;">' + \
                                     '<div id="wiki_div" style="">',
