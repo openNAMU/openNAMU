@@ -259,7 +259,7 @@ def update(ver_num, set_data):
                 get_data[2]
             ])
 
-    if ver_num < 3200100:
+    if ver_num < 3200500:
         curs.execute(db_change('delete from cache_data'))
 
     conn.commit()
@@ -542,7 +542,7 @@ def other2(data):
         data += ['']
 
     req_list = ''
-    main_css_ver = 48
+    main_css_ver = 49
 
     if  not 'main_css_load' in flask.session or \
         not 'main_css_ver' in flask.session or \
