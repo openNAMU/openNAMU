@@ -10,7 +10,6 @@ for i_data in os.listdir("route"):
 
 # DB
 version_list = json.loads(open('version.json', encoding = 'utf8').read())
-app_var = json.loads(open('data/app_var.json', encoding = 'utf8').read())
 
 print('Version : ' + version_list['master']['r_ver'])
 print('DB set version : ' + version_list['master']['c_ver'])
@@ -206,6 +205,14 @@ app.url_map.converters['everything'] = EverythingConverter
 curs.execute(db_change('select name from alist where acl = "owner"'))
 if not curs.fetchall():
     curs.execute(db_change('insert into alist (name, acl) values ("owner", "owner")'))
+
+curs.execute(db_change('select name from other where name = "image_where"'))
+app_var = curs.fetchall()
+if not app_var:
+    curs.execute(db_change('insert into other (name, data) values ("image_where", "data/images")'))
+    app_var = { 'path_data_image' : 'data/images' }
+else:
+    app_var = { 'path_data_image' : app_var[0][0] }
 
 if not os.path.exists(app_var['path_data_image']):
     os.makedirs(app_var['path_data_image'])
@@ -509,10 +516,6 @@ def user_tool(name = None):
 @app.route('/login', methods=['POST', 'GET'])
 def login():
     return login_2(conn)
-
-@app.route('/oauth/<regex("discord|naver|facebook|kakao"):platform>/<regex("init|callback"):func>', methods=['GET', 'POST'])
-def login_oauth(platform = None, func = None):
-    return login_oauth_2(conn, platform, func)
 
 @app.route('/change', methods=['POST', 'GET'])
 def user_setting():

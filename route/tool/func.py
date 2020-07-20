@@ -60,7 +60,7 @@ for i in range(0, 2):
             print(e)
             raise
 
-app_var = json.loads(open('data/app_var.json', encoding='utf8').read())
+global_lang = {}
 
 def load_conn(data):
     global conn
@@ -377,84 +377,46 @@ def captcha_post(re_data, num = 1):
         pass
 
 def load_lang(data, num = 2, safe = 0):
+    global global_lang
+
     if num == 1:
         curs.execute(db_change("select data from other where name = 'language'"))
         rep_data = curs.fetchall()
+        if rep_data:
+            try:
+                if not rep_data[0][0] in global_lang:
+                    lang = json.loads(open(os.path.join('language', rep_data[0][0] + '.json'), encoding='utf8').read())
+                    global_lang[rep_data[0][0]] = lang
+                else:
+                    lang = global_lang[rep_data[0][0]]
+            except:
+                return html.escape(data + ' (' + rep_data[0][0] + ')')
 
-        json_data = open(os.path.join('language', rep_data[0][0] + '.json'), encoding='utf8').read()
-        lang = json.loads(json_data)
-
-        if data in lang:
-            if safe == 1:
-                return lang[data]
+            if data in lang:
+                return lang[data] if safe == 1 else html.escape(lang[data])
             else:
-                return html.escape(lang[data])
+                return html.escape(data + ' (' + rep_data[0][0] + ')')
         else:
-            return html.escape(data + ' (M)')
+            return html.escape(data + ' (' + rep_data[0][0] + ')')
     else:
         curs.execute(db_change('select data from user_set where name = "lang" and id = ?'), [ip_check()])
         rep_data = curs.fetchall()
-        if rep_data:
+        if rep_data and rep_data != '' and rep_data != 'default':
             try:
-                json_data = open(os.path.join('language', rep_data[0][0] + '.json'), encoding='utf8').read()
-                lang = json.loads(json_data)
+                if not rep_data[0][0] in global_lang:
+                    lang = json.loads(open(os.path.join('language', rep_data[0][0] + '.json'), encoding='utf8').read())
+                    global_lang[rep_data[0][0]] = lang
+                else:
+                    lang = global_lang[rep_data[0][0]]
             except:
                 return load_lang(data, 1, safe)
 
             if data in lang:
-                if safe == 1:
-                    return lang[data]
-                else:
-                    return html.escape(lang[data])
+                return lang[data] if safe == 1 else html.escape(lang[data])
             else:
                 return load_lang(data, 1, safe)
         else:
             return load_lang(data, 1, safe)
-
-def load_oauth(provider):
-    oauth_supported = ["discord", "facebook", "naver", "kakao"]
-    if(provider == '_README'):
-        return { "support" : oauth_supported }
-    else:
-        try:
-            oauth = json.loads(open(app_var['path_oauth_setting'], encoding='utf8').read())
-        except:
-            return_json_data = '{ "publish_url" : "", '
-
-            for i in range(len(oauth_supported)):
-                return_json_data += '"' + oauth_supported[i] + '" : { '
-                for j in range(2):
-                    if j == 0:
-                        load_target = 'id'
-                    elif j == 1:
-                        load_target = 'secret'
-
-                    return_json_data += '"client_' + load_target  + '" : ""' + (',' if j == 0 else '')
-
-                return_json_data += ' }'
-
-                try:
-                    _ = oauth_supported[i + 1]
-
-                    return_json_data += ', '
-                except:
-                    return_json_data += ' }'
-
-            with open(app_var['path_oauth_setting'], 'w', encoding='utf-8') as f:
-                f.write(return_json_data)
-
-            oauth = json.loads(open(app_var['path_oauth_setting'], encoding='utf8').read())
-
-        return oauth[provider]
-
-def update_oauth(provider, target, content):
-    oauth = json.loads(open(app_var['path_oauth_setting'], encoding='utf8').read())
-    oauth[provider][target] = content
-
-    with open(app_var['path_oauth_setting'], 'w', encoding='utf8') as f:
-        f.write(json.dumps(oauth, sort_keys = True, indent = 4))
-
-    return 'Done'
 
 def ip_or_user(data = ''):
     if data == '':
@@ -496,24 +458,21 @@ def ip_warring():
     return text_data
 
 def skin_check(set_n = 0):
-    skin = 'marisa'
-
-    curs.execute(db_change('select data from other where name = "skin"'))
-    skin_exist = curs.fetchall()
-    if skin_exist and skin_exist[0][0] != '':
-        if os.path.exists(os.path.abspath('./views/' + skin_exist[0][0] + '/index.html')) == 1:
-            skin = skin_exist[0][0]
+    skin_list = load_skin('marisa')
 
     curs.execute(db_change('select data from user_set where name = "skin" and id = ?'), [ip_check()])
     skin_exist = curs.fetchall()
-    if skin_exist and skin_exist[0][0] != '':
-        if os.path.exists(os.path.abspath('./views/' + skin_exist[0][0] + '/index.html')) == 1:
-            skin = skin_exist[0][0]
-
-    if set_n == 0:
-        return './views/' + skin + '/index.html'
+    if skin_exist and skin_exist[0][0] != '' and skin_exist[0][0] in skin_list:
+        skin = skin_exist[0][0]
     else:
-        return skin
+        curs.execute(db_change('select data from other where name = "skin"'))
+        skin_exist = curs.fetchall()
+        if skin_exist and skin_exist[0][0] != '' and skin_exist[0][0] in skin_list:
+            skin = skin_exist[0][0]
+        else:
+            skin = skin_list[0][0]
+
+    return './views/' + skin + '/index.html' if set_n == 0 else skin
 
 def next_fix(link, num, page, end = 50):
     list_data = ''
@@ -824,53 +783,46 @@ def custom():
         user_topic
     ]
 
-def load_skin(data = '', set_n = 0):
-    skin_return_data = ''
+def load_skin(data = '', set_n = 0, default = 0):
+    # data -> 가장 앞에 있을 스킨 이름
+    # set_n == 0 -> 스트링으로 반환
+    # set_n == 1 -> 리스트로 반환
+    # default == 0 -> 디폴트 미포함
+    # default == 1 -> 디폴트 포함
+
+    skin_return_data = '' if set_n == 0 else []
     system_file = ['main_css']
+    skin_list_get = os.listdir(os.path.abspath('views'))
+
+    if default == 1:
+        skin_list_get += ['default']
 
     if data == '':
-        ip = ip_check()
-
-        curs.execute(db_change('select data from user_set where name = "skin" and id = ?'), [ip])
+        curs.execute(db_change('select data from user_set where name = "skin" and id = ?'), [ip_check()])
         data = curs.fetchall()
-
         if not data:
             curs.execute(db_change('select data from other where name = "skin"'))
             data = curs.fetchall()
             if not data or data[0][0] == '':
-                data = [['marisa']]
-
-        if set_n == 0:
-            for skin_data in os.listdir(os.path.abspath('views')):
-                if not skin_data in system_file:
-                    if data[0][0] == skin_data:
-                        skin_return_data = '<option value="' + skin_data + '">' + skin_data + '</option>' + skin_return_data
-                    else:
-                        skin_return_data += '<option value="' + skin_data + '">' + skin_data + '</option>'
-        else:
-            skin_return_data = []
-            for skin_data in os.listdir(os.path.abspath('views')):
-                if not skin_data in system_file:
-                    if data[0][0] == skin_data:
-                        skin_return_data = [skin_data] + skin_return_data
-                    else:
-                        skin_return_data += [skin_data]
+                if default == 1:
+                    data = [['default']]
+                else:
+                    data = [['marisa']]
     else:
-        if set_n == 0:
-            for skin_data in os.listdir(os.path.abspath('views')):
-                if not skin_data in system_file:
-                    if data == skin_data:
-                        skin_return_data = '<option value="' + skin_data + '">' + skin_data + '</option>' + skin_return_data
-                    else:
-                        skin_return_data += '<option value="' + skin_data + '">' + skin_data + '</option>'
-        else:
-            skin_return_data = []
-            for skin_data in os.listdir(os.path.abspath('views')):
-                if not skin_data in system_file:
-                    if data == skin_data:
-                        skin_return_data = [skin_data] + skin_return_data
-                    else:
-                        skin_return_data += [skin_data]
+        data = [[data]]
+
+    for skin_data in skin_list_get:
+        if not skin_data in system_file:
+            if data[0][0] == skin_data:
+                if set_n == 0:
+                    skin_return_data = '<option value="' + skin_data + '">' + skin_data + '</option>' + skin_return_data
+                else:
+                    skin_return_data = [skin_data] + skin_return_data
+            else:
+                if set_n == 0:
+                    skin_return_data += '<option value="' + skin_data + '">' + skin_data + '</option>'
+                else:
+                    skin_return_data += [skin_data]                    
 
     return skin_return_data
 
@@ -1310,10 +1262,6 @@ def re_error(data):
             data = load_lang('copyright_disagreed')
         elif num == 30:
             data = load_lang('ie_wrong_callback')
-        elif num == 31:
-            data = load_lang('oauth_disabled')
-        elif num == 32:
-            data = load_lang('oauth_setting_not_found')
         elif num == 33:
             data = load_lang('restart_fail_error')
         elif num == 34:

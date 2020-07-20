@@ -16,7 +16,6 @@ def setting_2(conn, num, db_set):
             'Google',
             load_lang('main_bottom_body'),
             load_lang('main_acl_setting'),
-            load_lang('oauth_setting'),
             load_lang('wiki_logo')
         ]
 
@@ -656,90 +655,6 @@ def setting_2(conn, num, db_set):
                 menu = [['setting', load_lang('return')]]
             ))
     elif num == 9:
-        oauth_supported = load_oauth('_README')['support']
-
-        if admin_check() != 1:
-            return re_error('/error/3')
-
-        if flask.request.method == 'POST':
-            admin_check(None, 'oauth setting')
-            return_json_data = '{ "publish_url" : "' + flask.request.form.get('publish_url_box', '') + '", '
-
-            for i in range(len(oauth_supported)):
-                return_json_data += '"' + oauth_supported[i] + '" : { '
-                for j in range(2):
-                    if j == 0:
-                        load_target = 'id'
-                    elif j == 1:
-                        load_target = 'secret'
-
-                    target_data = flask.request.form.get(oauth_supported[i] + '_client_' + load_target, '')
-                    return_json_data += '"client_' + load_target  + '" : "' + target_data + '"' + (',' if j == 0 else '')
-
-                return_json_data += ' }'
-
-                try:
-                    _ = oauth_supported[i + 1]
-
-                    return_json_data += ', '
-                except:
-                    return_json_data += ' }'
-
-            with open(app_var['path_oauth_setting'], 'w', encoding='utf8') as f:
-                f.write(return_json_data)
-
-            return redirect('/oauth_setting')
-        else:
-            body_content = load_lang('oauth_explain') + '<hr class="main_hr">'
-            body_content += '''
-                <input placeholder="publish_url" id="publish_url_box" name="publish_url_box">
-                <hr class="main_hr">
-                <script>
-                    function check_value (target) {
-                        target_box = document.getElementById(target.id + "_box");
-                        if (target.value !== "") {
-                            target_box.checked = true;
-                        } else {
-                            target_box.checked = false;
-                        }
-                    }
-                </script>
-            '''
-
-            init_js = ''
-            body_content += '<form method="post">'
-
-            for i in range(len(oauth_supported)):
-                oauth_data = load_oauth(oauth_supported[i])
-
-                for j in range(2):
-                    if j == 0:
-                        load_target = 'id'
-                    elif j == 1:
-                        load_target = 'secret'
-
-                    init_js += 'check_value(document.getElementById("' + oauth_supported[i] + '_client_' + load_target + '"));'
-                    body_content += '''
-                        <input id="''' + oauth_supported[i] + '''_client_''' + load_target + '''_box" type="checkbox" disabled>
-                        <input  placeholder="''' + oauth_supported[i] + '''_client_''' + load_target + '''" 
-                                id="''' + oauth_supported[i] + '''_client_''' + load_target + '''" 
-                                name="''' + oauth_supported[i] + '''_client_''' + load_target + '''" 
-                                value="''' + oauth_data['client_' + load_target] + '''" 
-                                
-                                onChange="check_value(this)" 
-                                style="width: 80%;">
-                        ''' + ('<hr class="main_hr">' if j == 1 else '<hr class="main_hr">') + '''
-                    '''
-
-            body_content += '<button id="save" type="submit">' + load_lang('save') + '</button></form>'
-            body_content += '<script>' + init_js + '</script>'
-
-            return easy_minify(flask.render_template(skin_check(),
-                imp = [load_lang('oauth_setting'), wiki_set(), custom(), other2([0, 0])],
-                data = body_content,
-                menu = [['other', load_lang('return')]]
-            ))
-    elif num == 10:
         skin_list = [0] + load_skin('', 1)
         i_list = []
         for i in skin_list:
