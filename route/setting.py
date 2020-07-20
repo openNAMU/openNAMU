@@ -35,7 +35,6 @@ def setting_2(conn, num, db_set):
     elif num == 1:
         i_list = {
             0 : 'name',
-            1 : 'logo',
             2 : 'frontpage',
             3 : 'license',
             4 : 'upload',
@@ -56,7 +55,6 @@ def setting_2(conn, num, db_set):
         }
         n_list = {
             0 : 'Wiki',
-            1 : '',
             2 : 'FrontPage',
             3 : 'ARR',
             4 : '2',
