@@ -4,7 +4,6 @@ from route.tool.func import *
 
 # DB
 version_list = json.loads(open('version.json', encoding='utf8').read())
-app_var = json.loads(open('data/app_var.json', encoding='utf8').read())
 
 print('Version : ' + version_list['master']['r_ver'])
 print('DB set version : ' + version_list['master']['c_ver'])

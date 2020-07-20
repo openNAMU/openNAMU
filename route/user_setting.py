@@ -3,7 +3,7 @@ from .tool.func import *
 def user_setting_2(conn, server_init):
     curs = conn.cursor()
 
-    support_language = server_init.server_set_var['language']['list']
+    support_language = ['default'] + server_init.server_set_var['language']['list']
     ip = ip_check()
 
     if ban_check() == 1:
@@ -32,16 +32,13 @@ def user_setting_2(conn, server_init):
             else:
                 email = '-'
 
-            div2 = load_skin()
+            div2 = load_skin('', 0, 1)
             div3 = ''
 
-            curs.execute(db_change('select data from user_set where name = "lang" and id = ?'), [flask.session['id']])
+            curs.execute(db_change('select data from user_set where name = "lang" and id = ?'), [ip_check()])
             data = curs.fetchall()
             if not data:
-                curs.execute(db_change('select data from other where name = "language"'))
-                data = curs.fetchall()
-                if not data:
-                    data = [['en-US']]
+                data = [['default']]
 
             for lang_data in support_language:
                 if data and data[0][0] == lang_data:
@@ -49,41 +46,26 @@ def user_setting_2(conn, server_init):
                 else:
                     div3 += '<option value="' + lang_data + '">' + lang_data + '</option>'
 
-            oauth_provider = load_oauth('_README')['support']
-            oauth_content = '<ul>'
-            for i in range(len(oauth_provider)):
-                curs.execute(db_change('select name, picture from oauth_conn where wiki_id = ? and provider = ?'), [flask.session['id'], oauth_provider[i]])
-                oauth_data = curs.fetchall()
-                if len(oauth_data) == 1:
-                    oauth_content += '<li>{}</li>'.format(oauth_provider[i].capitalize() + ' : <img src="{}" width="17px" height="17px"> {}'.format(oauth_data[0][1], oauth_data[0][0]))
-                else:
-                    oauth_content += '<li>{}</li>'.format(oauth_provider[i].capitalize() + ' <a href="/oauth/{}/init">({})</a>'.format(oauth_provider[i], load_lang('connect')))
-
-            oauth_content += '</ul>'
-
-            http_warring = '<hr class=\"main_hr\"><span>' + load_lang('http_warring') + '</span>'
+            http_warring = '<hr class="main_hr"><span>' + load_lang('http_warring') + '</span>'
 
             return easy_minify(flask.render_template(skin_check(),
                 imp = [load_lang('user_setting'), wiki_set(), custom(), other2([0, 0])],
                 data = '''
                     <form method="post">
                         <span>''' + load_lang('id') + ''' : ''' + ip + '''</span>
-                        <hr class=\"main_hr\">
+                        <hr class="main_hr">
                         <a href="/pw_change">(''' + load_lang('password_change') + ''')</a>
-                        <hr class=\"main_hr\">
+                        <hr class="main_hr">
                         <span>''' + load_lang('email') + ''' : ''' + email + '''</span> <a href="/email_change">(''' + load_lang('email_change') + ''')</a>
-                        <hr class=\"main_hr\">
+                        <hr class="main_hr">
                         <span>''' + load_lang('skin') + '''</span>
-                        <hr class=\"main_hr\">
+                        <hr class="main_hr">
                         <select name="skin">''' + div2 + '''</select>
-                        <hr class=\"main_hr\">
+                        <hr class="main_hr">
                         <span>''' + load_lang('language') + '''</span>
-                        <hr class=\"main_hr\">
+                        <hr class="main_hr">
                         <select name="lang">''' + div3 + '''</select>
-                        <hr class=\"main_hr\">
-                        <span>''' + load_lang('oauth_connection') + '''</span>
-                        ''' + oauth_content + '''
-                        <hr class=\"main_hr\">
+                        <hr class="main_hr">
                         <button type="submit">''' + load_lang('save') + '''</button>
                         ''' + http_warring + '''
                     </form>
