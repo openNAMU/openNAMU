@@ -61,6 +61,7 @@ for i in range(0, 2):
             raise
 
 global_lang = {}
+req_list = ''
 
 def load_conn(data):
     global conn
@@ -497,25 +498,16 @@ def next_fix(link, num, page, end = 50):
     return list_data
 
 def other2(data):
-    for _ in range(0, 3 - len(data)):
-        data += ['']
+    global req_list
+    main_css_ver = '49'
+    data += ['' for _ in range(0, 3 - len(data))]
 
-    req_list = ''
-    main_css_ver = 49
-
-    if  not 'main_css_load' in flask.session or \
-        not 'main_css_ver' in flask.session or \
-        flask.session['main_css_ver'] != main_css_ver:
+    if req_list == '':
         for i_data in os.listdir(os.path.join("views", "main_css", "css")):
-            req_list += '<link rel="stylesheet" href="/views/main_css/css/' + i_data + '?ver=' + str(main_css_ver) + '">'
+            req_list += '<link rel="stylesheet" href="/views/main_css/css/' + i_data + '?ver=' + main_css_ver + '">'
 
         for i_data in os.listdir(os.path.join("views", "main_css", "js")):
-            req_list += '<script src="/views/main_css/js/' + i_data + '?ver=' + str(main_css_ver) + '"></script>'
-
-        flask.session['main_css_load'] = req_list
-        flask.session['main_css_ver'] = main_css_ver
-    else:
-        req_list = flask.session['main_css_load']
+            req_list += '<script src="/views/main_css/js/' + i_data + '?ver=' + main_css_ver + '"></script>'
 
     data = data[0:2] + ['', '''
         <link   rel="stylesheet"
