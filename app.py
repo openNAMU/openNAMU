@@ -206,7 +206,7 @@ curs.execute(db_change('select name from alist where acl = "owner"'))
 if not curs.fetchall():
     curs.execute(db_change('insert into alist (name, acl) values ("owner", "owner")'))
 
-curs.execute(db_change('select name from other where name = "image_where"'))
+curs.execute(db_change('select data from other where name = "image_where"'))
 app_var = curs.fetchall()
 if not app_var:
     curs.execute(db_change('insert into other (name, data) values ("image_where", "data/images")'))
