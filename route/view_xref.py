@@ -22,7 +22,7 @@ def view_xref_2(conn, name):
     if flask.request.args.get('change', '1') == '1':
         curs.execute(db_change("" + \
             "select distinct link, type from back " + \
-            "where title = ? and not type = 'cat' and not type = 'no'" + \
+            "where title = ? and not type = 'cat' and not type = 'no' and not type = 'nothing'" + \
             "order by link asc limit ?, 50" + \
         ""), [
             name,
@@ -31,7 +31,7 @@ def view_xref_2(conn, name):
     else:
         curs.execute(db_change("" + \
             "select distinct title, type from back " + \
-            "where link = ? and not type = 'cat' and not type = 'no'" + \
+            "where link = ? and not type = 'cat' and not type = 'no' and not type = 'nothing'" + \
             "order by link asc limit ?, 50" + \
         ""), [
             name,
