@@ -73,90 +73,108 @@ def table_parser(data, cel_data, cel_num, start_data, num = 0, cel_color = {}):
 
     table_state = re.findall(r'&lt;((?:(?!&gt;).)+)&gt;', data)
     for in_state in table_state:
-        if re.search(r"^table ?width=([^=]+)$", in_state):
-            table_data = re.sub(r'^table ?width=', '', in_state)
+        table_state_data = re.search(r'^([^=]+)=([^=]+)$', in_state)
+        if not table_state_data:
+            if re.search(r'^(#(?:[0-9a-f-A-F]{3}){1,2}|\w+)$', in_state):
+                table_state_data = ['bgcolor', in_state]
+            else:
+                table_state_data = re.search(r'([^0-9]+)([0-9]+)$', in_state)
+                if table_state_data:
+                    table_state_data = table_state_data.groups()
+                else:
+                    table_state_data = [in_state, '']
+        else:
+            table_state_data = table_state_data.groups()
+            table_state_data = [
+                table_state_data[0].replace(' ', ''),
+                re.sub(r',([^,]+)$', '', table_state_data[1])
+            ]
+
+        if table_state_data[0] == 'tablewidth':
+            table_data = table_state_data[1]
             div_style += 'width: ' + ((table_data + 'px') if re.search(r'^[0-9]+$', table_data) else table_data) + ';'
             all_table += 'width: 100%;'
-        elif re.search(r"^table ?height=([^=]+)$", in_state):
-            table_data = re.sub(r'^table ?height=', '', in_state)
+        elif table_state_data[0] == 'tableheight':
+            table_data = table_state_data[1]
             div_style += 'height: ' + ((table_data + 'px') if re.search(r'^[0-9]+$', table_data) else table_data) + ';'
-        elif re.search(r"^table ?align=([^=]+)$", in_state):
-            table_data = re.sub(r'^table ?align=', '', in_state)
+        elif table_state_data[0] == 'tablealign':
+            table_data = table_state_data[1]
             if table_data == 'right':
                 div_style += 'float: right;'
             elif table_data == 'center':
                 div_style += 'margin: auto;'
                 all_table += 'margin: auto;'
-        elif re.search(r"^table ?textalign=([^=]+)$", in_state):
+        elif table_state_data[0] == 'tabletextalign':
             num = 1
-            table_data = re.sub(r'^table ?textalign=', '', in_state)
+            table_data = table_state_data[1]
             if table_data == 'right':
                 all_table += 'text-align: right;'
             elif table_data == 'center':
                 all_table += 'text-align: center;'
-        elif re.search(r"^row ?textalign=([^=]+)$", in_state):
-            table_data = re.sub(r'^row ?textalign=', '', in_state)
+        elif table_state_data[0] == 'rowtextalign':
+            table_data = table_state_data[1]
             if table_data == 'right':
                 row_style += 'text-align: right;'
             elif table_data == 'center':
                 row_style += 'text-align: center;'
             else:
                 row_style += 'text-align: left;'
-        elif re.search(r'^-([0-9]+)$', in_state):
-            cel = 'colspan="' + re.sub(r'^-', '', in_state) + '"'
-        elif re.search(r"^(\^|v)?\|([^|]+)$", in_state):
-            if re.search(r'^\^', in_state):
+        elif table_state_data[0] == '-':
+            cel = 'colspan="' + table_state_data[1] + '"'
+        elif table_state_data[0] == '^|' and table_state_data[0] == 'v|' and table_state_data[0] == '|':
+            if table_state_data[0][0] == '^':
                 cel_style += 'vertical-align: top;'
-            elif re.search(r'^v', in_state):
+            elif table_state_data[0][0] == 'v':
                 cel_style += 'vertical-align: bottom;'
 
-            row = 'rowspan="' + re.sub(r'^(\^|v)?\|', '', in_state) + '"'
-        elif re.search(r"^row ?bgcolor=([^=]+)$", in_state):
-            table_data = re.sub(r'^row ?bgcolor=', '', in_state)
-            row_style += 'background: ' + (re.sub(',([^,]*)', '', table_data) if re.search(r',', table_data) else table_data) + ';'
-        elif re.search(r"^row ?color=([^=]+)$", in_state):
-            table_data = re.sub(r'^row ?color=', '', in_state)
-            row_style += 'color: ' + (re.sub(',([^,]*)', '', table_data) if re.search(r',', table_data) else table_data) + ';'
-        elif re.search(r"^table ?bordercolor=([^=]+)$", in_state):
-            table_data = re.sub(r'^table ?bordercolor=', '', in_state)
-            all_table += 'border: ' + (re.sub(',([^,]*)', '', table_data) if re.search(r',', table_data) else table_data) + ' 2px solid;'
-        elif re.search(r"^table ?bgcolor=([^=]+)$", in_state):
-            table_data = re.sub(r'^table ?bgcolor=', '', in_state)
-            all_table += 'background: ' + (re.sub(',([^,]*)', '', table_data) if re.search(r',', table_data) else table_data) + ';'
-        elif re.search(r"^table ?color=([^=]+)$", in_state):
-            table_data = re.sub(r'^table ?color=', '', in_state)
-            all_table += 'color: ' + (re.sub(',([^,]*)', '', table_data) if re.search(r',', table_data) else table_data) + ';'
-        elif re.search(r"^col ?bgcolor=([^=]+)$", in_state):
-            table_data = re.sub(r'^col ?bgcolor=', '', in_state)
-            table_data = (re.sub(',([^,]*)', '', table_data) if re.search(r',', table_data) else table_data)
+            row = 'rowspan="' + table_state_data[1] + '"'
+        elif table_state_data[0] == 'rowbgcolor':
+            table_data = table_state_data[1]
+            row_style += 'background: ' + table_data + ';'
+        elif table_state_data[0] == 'rowcolor':
+            table_data = table_state_data[1]
+            row_style += 'color: ' + table_data + ';'
+        elif table_state_data[0] == 'tablebordercolor':
+            table_data = table_state_data[1]
+            all_table += 'border: ' + table_data + ' 2px solid;'
+        elif table_state_data[0] == 'tablebgcolor':
+            table_data = table_state_data[1]
+            all_table += 'background: ' + table_data + ';'
+        elif table_state_data[0] == 'tablecolor':
+            table_data = table_state_data[1]
+            all_table += 'color: ' + table_data + ';'
+        elif table_state_data[0] == 'colbgcolor':
+            table_data = table_state_data[1]
+            table_data = table_data
             cel_color[cel_num] += 'background: ' + table_data + ';'
             cel_style += 'background: ' + table_data + ';'
-        elif re.search(r"^col ?color=([^=]+)$", in_state):
-            table_data = re.sub(r'^col ?color=', '', in_state)
-            table_data = (re.sub(',([^,]*)', '', table_data) if re.search(r',', table_data) else table_data)
+        elif table_state_data[0] == 'colcolor':
+            table_data = table_state_data[1]
+            table_data = table_data
             cel_color[cel_num] += 'color: ' + table_data + ';'
             cel_style += 'color: ' + table_data + ';'
-        elif re.search(r"^(bgcolor=([^=]+)|#(?:[0-9a-f-A-F]{3}){1,2}|\w+)$", in_state):
-            table_data = re.sub(r'^bgcolor=', '', in_state)
-            cel_style += 'background: ' + (re.sub(',([^,]*)', '', table_data) if re.search(r',', table_data) else table_data) + ';'
-        elif re.search(r"^color=([^=]+)$", in_state):
-            table_data = re.sub(r'^color=', '', in_state)
-            cel_style += 'color: ' + (re.sub(',([^,]*)', '', table_data) if re.search(r',', table_data) else table_data) + ';'
-        elif re.search(r"^width=([^=]+)$", in_state):
-            table_data = re.sub(r'^width=', '', in_state)
+        elif table_state_data[0] == 'bgcolor':
+            table_data = table_state_data[1]
+            cel_style += 'background: ' + table_data + ';'
+        elif table_state_data[0] == 'color':
+            table_data = table_state_data[1]
+            cel_style += 'color: ' + table_data + ';'
+        elif table_state_data[0] == 'width':
+            table_data = table_state_data[1]
             cel_style += 'width: ' + ((table_data + 'px') if re.search(r'^[0-9]+$', table_data) else table_data) + ';'
-        elif re.search(r"^height=([^=]+)$", in_state):
-            table_data = re.sub(r'^height=', '', in_state)
+        elif table_state_data[0] == 'height':
+            table_data = table_state_data[1]
             cel_style += 'height: ' + ((table_data + 'px') if re.search(r'^[0-9]+$', table_data) else table_data) + ';'
-        elif re.search(r'^\(|:|\)$', in_state):
+        elif table_state_data[0] == '(' and table_state_data[0] == ':' and table_state_data[0] == ')':
             if in_state == '(':
                 cel_style += 'text-align: right;'
             elif in_state == ':':
                 cel_style += 'text-align: center;'
             else:
                 cel_style += 'text-align: left;'
-        elif re.search(r"^table ?class=([^=]+)$", in_state):
-            table_class += re.sub(r"^table ?class=", '', in_state)
+        elif table_state_data[0] == 'tableclass':
+            table_data = table_state_data[1]
+            table_class += table_data
 
     div_style += '"'
     all_table += '"'
@@ -256,7 +274,12 @@ def table_start(data):
                         '<td ' + cel_plus[2] + ' ' + cel_plus[3] + ' ' + cel_plus[4] + '>' + \
                             cel_data
 
-            table_end += '</td></tr></table></div>'
+            table_end += '' + \
+                            '</td>' + \
+                        '</tr>' + \
+                    '</table>' + \
+                '</div>' + \
+            ''
 
             data = re.sub(r'\n((?:(?:(?:(?:\|\||\|[^|]+\|)+(?:(?:(?!\|\|).\n*)*))+)\|\|(?:\n)?)+)', '\n' + table_end + '\n', data, 1)
         else:

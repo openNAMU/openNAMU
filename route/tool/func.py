@@ -459,7 +459,7 @@ def ip_warring():
     return text_data
 
 def skin_check(set_n = 0):
-    skin_list = load_skin('marisa')
+    skin_list = load_skin('marisa', 1)
 
     curs.execute(db_change('select data from user_set where name = "skin" and id = ?'), [ip_check()])
     skin_exist = curs.fetchall()
@@ -471,7 +471,7 @@ def skin_check(set_n = 0):
         if skin_exist and skin_exist[0][0] != '' and skin_exist[0][0] in skin_list:
             skin = skin_exist[0][0]
         else:
-            skin = skin_list[0][0]
+            skin = skin_list[0]
 
     return './views/' + skin + '/index.html' if set_n == 0 else skin
 
