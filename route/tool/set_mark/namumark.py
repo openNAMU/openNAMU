@@ -121,7 +121,7 @@ def table_parser(data, cel_data, cel_num, start_data, num = 0, cel_color = {}):
                 row_style += 'text-align: left;'
         elif table_state_data[0] == '-':
             cel = 'colspan="' + table_state_data[1] + '"'
-        elif table_state_data[0] == '^|' and table_state_data[0] == 'v|' and table_state_data[0] == '|':
+        elif table_state_data[0] == '^|' or table_state_data[0] == 'v|' or table_state_data[0] == '|':
             if table_state_data[0][0] == '^':
                 cel_style += 'vertical-align: top;'
             elif table_state_data[0][0] == 'v':
@@ -165,10 +165,10 @@ def table_parser(data, cel_data, cel_num, start_data, num = 0, cel_color = {}):
         elif table_state_data[0] == 'height':
             table_data = table_state_data[1]
             cel_style += 'height: ' + ((table_data + 'px') if re.search(r'^[0-9]+$', table_data) else table_data) + ';'
-        elif table_state_data[0] == '(' and table_state_data[0] == ':' and table_state_data[0] == ')':
-            if in_state == '(':
+        elif table_state_data[0] == '(' or table_state_data[0] == ':' or table_state_data[0] == ')':
+            if table_state_data[0] == '(':
                 cel_style += 'text-align: right;'
-            elif in_state == ':':
+            elif table_state_data[0] == ':':
                 cel_style += 'text-align: center;'
             else:
                 cel_style += 'text-align: left;'
