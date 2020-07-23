@@ -590,7 +590,7 @@ def recent_history_delete(name = None):
 
 @app.route('/upload', methods=['GET', 'POST'])
 def func_upload():
-    return func_upload_2(conn)
+    return func_upload_2(conn, app_var)
 
 @app.route('/user')
 def user_info():
