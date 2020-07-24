@@ -150,12 +150,21 @@ function not_from_exist() {
     });
 }
 
-function do_open_folding(data, element) {
+function do_open_folding(data, element = '') {
     var fol = document.getElementById(data);
     if(fol.style.display === '' || (fol.style.display === 'inline-block' || fol.style.display === 'block')) {
         document.getElementById(data).style.display = 'none';
     } else {
         document.getElementById(data).style.display = 'block';
+    }
+    
+    if(element != '') {
+        var fol_data = element.innerHTML;
+        if(fol_data != '(-)') {
+            element.innerHTML = '(-)';
+        } else {
+            element.innerHTML = '(+)';
+        }
     }
 }
 
