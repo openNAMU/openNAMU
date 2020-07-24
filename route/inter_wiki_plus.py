@@ -110,16 +110,16 @@ def inter_wiki_plus_2(conn, tools, name):
             title = load_lang('interwiki_add')
             form_data = '''
                 ''' + load_lang('name') + '''
-                <hr class=\"main_hr\">
-                <input value="''' + value[0] + '''" type="text" name="title">
-                <hr class=\"main_hr\">
+                <hr class="main_hr">
+                <input value="''' + html.escape(value[0]) + '''" type="text" name="title">
+                <hr class="main_hr">
                 ''' + load_lang('link') + '''
-                <hr class=\"main_hr\">
-                <input value="''' + value[1] + '''" type="text" name="link">
-                <hr class=\"main_hr\">
+                <hr class="main_hr">
+                <input value="''' + html.escape(value[1]) + '''" type="text" name="link">
+                <hr class="main_hr">
                 ''' + load_lang('icon') + ''' (HTML)
-                <hr class=\"main_hr\">
-                <input value="''' + value[2] + '''" type="text" name="icon">
+                <hr class="main_hr">
+                <input value="''' + html.escape(value[2]) + '''" type="text" name="icon">
             '''
         elif tools == 'plus_edit_filter':
             curs.execute(db_change("select regex, sub from filter where name = ?"), [name])
@@ -154,45 +154,45 @@ def inter_wiki_plus_2(conn, tools, name):
             title = load_lang('edit_filter_add')
             form_data = '''
                 <script>function insert_v(name, data) { document.getElementById(name).value = data; }</script>''' + insert_data + '''
-                <hr class=\"main_hr\">
+                <hr class="main_hr">
                 <input ''' + stat + ''' placeholder="''' + load_lang('second') + '''" id="second" name="second" type="text" value="''' + html.escape(time_data) + '''">
-                <hr class=\"main_hr\">
+                <hr class="main_hr">
                 <input ''' + stat + ''' placeholder="''' + load_lang('regex') + '''" name="content" value="''' + html.escape(textarea) + '''" type="text">
             '''
         elif tools == 'plus_name_filter':
             title = load_lang('id_filter_add')
             form_data = '' + \
                 load_lang('regex') + \
-                '<hr class=\"main_hr\">' + \
-                '<input value="' + (name if name else '') + '" type="text" name="title">' + \
+                '<hr class="main_hr">' + \
+                '<input value="' + html.escape(name if name else '') + '" type="text" name="title">' + \
             ''
         elif tools == 'plus_file_filter':
             title = load_lang('file_filter_add')
             form_data = '' + \
                 load_lang('regex') + \
-                '<hr class=\"main_hr\">' + \
-                '<input value="' + (name if name else '') + '" type="text" name="title">' + \
+                '<hr class="main_hr">' + \
+                '<input value="' + html.escape(name if name else '') + '" type="text" name="title">' + \
             ''
         elif tools == 'plus_email_filter':
             title = load_lang('email_filter_add')
             form_data = '' + \
                 load_lang('email') + \
-                '<hr class=\"main_hr\">' + \
-                '<input value="' + (name if name else '') + '" type="text" name="title">' + \
+                '<hr class="main_hr">' + \
+                '<input value="' + html.escape(name if name else '') + '" type="text" name="title">' + \
             ''
         elif tools == 'plus_image_license':
             title = load_lang('image_license_add')
             form_data = '' + \
                 load_lang('license') + \
-                '<hr class=\"main_hr\">' + \
-                '<input value="' + (name if name else '') + '" type="text" name="title">' + \
+                '<hr class="main_hr">' + \
+                '<input value="' + html.escape(name if name else '') + '" type="text" name="title">' + \
             ''
         elif tools == 'plus_extension_filter':
             title = load_lang('extension_filter_add')
             form_data = '' + \
                 load_lang('extension') + \
-                '<hr class=\"main_hr\">' + \
-                '<input value="' + (name if name else '') + '" type="text" name="title">' + \
+                '<hr class="main_hr">' + \
+                '<input value="' + html.escape(name if name else '') + '" type="text" name="title">' + \
             ''
         else:
             title = load_lang('edit_tool_add')
@@ -208,12 +208,12 @@ def inter_wiki_plus_2(conn, tools, name):
 
             form_data = '''
                 ''' + load_lang('title') + '''
-                <hr class=\"main_hr\">
-                <input value="''' + (name if name else '') + '''" type="text" name="title">
-                <hr class=\"main_hr\">
+                <hr class="main_hr">
+                <input value="''' + html.escape(name if name else '') + '''" type="text" name="title">
+                <hr class="main_hr">
                 ''' + load_lang('markup') + '''
-                <hr class=\"main_hr\">
-                <input value="''' + value + '''" type="text" name="markup">
+                <hr class="main_hr">
+                <input value="''' + html.escape(value) + '''" type="text" name="markup">
             '''
 
         return easy_minify(flask.render_template(skin_check(),
@@ -221,7 +221,7 @@ def inter_wiki_plus_2(conn, tools, name):
             data =  '''
                     <form method="post">
                         ''' + form_data + '''
-                        <hr class=\"main_hr\">
+                        <hr class="main_hr">
                         <button ''' + stat + ''' type="submit">''' + load_lang('add') + '''</button>
                     </form>
                     ''',

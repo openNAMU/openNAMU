@@ -1,11 +1,11 @@
 {
     "master" : {
-        "r_ver" : "v3.2.0-stable-08",
-        "c_ver" : "3200500",
+        "r_ver" : "v3.2.0-stable-09",
+        "c_ver" : "3200900",
         "s_ver" : "9"
     }, "stable" : {
-        "r_ver" : "v3.2.0-stable-08",
-        "c_ver" : "3200500",
+        "r_ver" : "v3.2.0-stable-09",
+        "c_ver" : "3200900",
         "s_ver" : "9"
     }
 }

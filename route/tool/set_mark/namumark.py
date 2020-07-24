@@ -400,7 +400,7 @@ def middle_parser(data):
                                 '<div style="display: inline-block;">' + \
                                     '<b>' + \
                                         '<a href="javascript:void(0);" ' + \
-                                            'onclick="do_open_folding(\'' + include_name + 'folding_' + str(folding_num) + '\', this);" ' + \
+                                            'onclick="do_open_folding(\'' + include_name + 'folding_' + str(folding_num) + '\');" ' + \
                                             'id="get_' + include_name + 'folding_' + str(folding_num) + '">' + \
                                         '</a>' + \
                                     '</b>' + \
