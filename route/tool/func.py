@@ -981,6 +981,9 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
             elif acl_data[0][0] == 'owner':
                 if admin_check() == 1:
                     return 0
+            elif acl_data[0][0] == 'ban_admin':
+                if admin_check(1) == 1 or ban_check() == 1:
+                    return 0
 
             return 1
         else:
@@ -1175,7 +1178,7 @@ def get_acl_list(type_d = 'normal'):
     if type_d == 'user':
         return ['', 'user', 'all']
     else:
-        return ['', 'all', 'user', 'admin', 'owner', '50_edit', 'email', 'ban', 'before', '30_day']
+        return ['', 'all', 'user', 'admin', 'owner', '50_edit', 'email', 'ban', 'before', '30_day', 'ban_admin']
 
 def re_error(data):
     conn.commit()
