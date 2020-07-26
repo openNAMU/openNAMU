@@ -353,6 +353,7 @@
     "extension_filter_add": "확장자 필터 추가",
     "extension": "확장자",
     "ban_acl": "차단된 사용자 포함",
+    "ban_admin_acl": "차단된 사용자 및 관리자",
     "topic_name_change": "토론 제목 변경",
     "topic_acl_setting" : "토론 ACL 설정",
     "topic_acl" : "토론 ACL",
