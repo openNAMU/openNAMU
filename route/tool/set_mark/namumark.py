@@ -1200,7 +1200,7 @@ def namumark(conn, data, title, include_num):
                 else:
                     if re.search(r'^#', other_link):
                         data = link_re.sub(
-                            '<a title="' + other_link + '" href="' + other_link + '">' + other_link + '</a>',
+                            '<a title="' + other_link + '" href="' + other_link + '">' + (other_link if see_link == other_link else see_link) + '</a>',
                             data,
                             1
                         )
