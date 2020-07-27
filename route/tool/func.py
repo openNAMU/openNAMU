@@ -166,8 +166,11 @@ def last_change(data):
 def easy_minify(data, tool = None):
     return last_change(data)
 
-def render_set(title = '', data = '', num = 0, s_data = 0, include = None):
-    if acl_check(title, 'render') == 1:
+def render_set(title = '', data = '', num = 0, s_data = 0, include = None, acl = None):
+    if not acl:
+        acl = acl_check(title, 'render')
+
+    if acl == 1:
         return 'HTTP Request 401.3'
     elif s_data == 1:
         return data
@@ -871,18 +874,13 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
     if tool == '' and acl_check(name, 'render') == 1:
         return 1
     
-    if tool == '':
+    if tool == '' and tool == 'topic':
         end = 3
-    elif tool == 'topic':
-        if not name:
+
+        if tool == 'topic' and not name:
             curs.execute(db_change("select title from rd where code = ?"), [topic_num])
             topic_data = curs.fetchall()
-            if topic_data:
-                name = topic_data[0][0]
-            else:
-                name = 'test'
-
-        end = 3
+            name = topic_data[0][0] if topic_data else 'test'
     elif tool == 'render':
         end = 2
     else:
@@ -988,13 +986,10 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
             return 1
         else:
             if i == (end - 1):
-                if tool == 'topic':
-                    if topic_num:
-                        curs.execute(db_change("select title from rd where code = ? and stop != ''"), [topic_num])
-                        if curs.fetchall():
-                            if admin_check(3, 'topic (code ' + topic_num + ')') == 1:
-                                return 0
-                        else:
+                if tool == 'topic' and topic_num:
+                    curs.execute(db_change("select title from rd where code = ? and stop != ''"), [topic_num])
+                    if curs.fetchall():
+                        if admin_check(3, 'topic (code ' + topic_num + ')') == 1:
                             return 0
                     else:
                         return 0
