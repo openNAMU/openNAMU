@@ -41,6 +41,7 @@ def main_manager_2(conn, num, r_ver):
                     <li><a href="/many_delete">''' + load_lang('many_delete') + '''</a></li>
                     <li><a href="/applications">''' + load_lang('application_list') + '''</a></li>
                     <li><a href="/api/sitemap.xml">''' + load_lang('get_sitemap') + '''</a></li>
+                    <li><a href="/register">''' + load_lang('add_user') + '''</a></li>
                     <li><a href="/setting">''' + load_lang('setting') + '''</a></li>
                 </ul>
                 <h3>''' + load_lang('filter') + '''</h3>

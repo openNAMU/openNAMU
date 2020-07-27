@@ -446,7 +446,7 @@ def edit_button():
     if admin_check() == 1:
         data += (' ' if data != '' else '') + '<a href="/edit_top">(' + load_lang('add') + ')</a>'
 
-    return data + '<hr class=\"main_hr\">'
+    return data + '<hr class="main_hr">'
 
 def ip_warring():
     if ip_or_user() != 0:
