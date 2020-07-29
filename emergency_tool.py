@@ -164,6 +164,7 @@ if what_i_do == '1':
 
     print('----')
     print('Rest : ' + str(len(title)))
+    print('Start : ' + title[0][0])
     time.sleep(1)
     print('----')
 

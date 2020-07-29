@@ -4,7 +4,6 @@ def view_read_2(conn, name):
     curs = conn.cursor()
 
     sub = ''
-    acl = 0
     div = ''
     ip = ip_check()
     run_redirect = ''
@@ -103,11 +102,6 @@ def view_read_2(conn, name):
             curs.execute(db_change("delete from cache_data where title = ?"), [name])
             if last_history_num:
                 curs.execute(db_change("insert into cache_data (title, data, id) values (?, ?, ?)"), [name, end_data, last_history_num[0][0]])
-                
-    curs.execute(db_change("select decu from acl where title = ?"), [name])
-    data = curs.fetchall()
-    if data:
-        acl = 1
 
     if end_data == 'HTTP Request 401.3':
         response_data = 401
@@ -155,11 +149,10 @@ def view_read_2(conn, name):
         acl = 0
         r_date = 0
     else:
-        if response_data == 404:
-            menu = [['edit/' + url_pas(name), load_lang('create')]]
-        else:
-            menu = [['edit/' + url_pas(name), load_lang('edit')]]
-
+        curs.execute(db_change("select decu from acl where title = ?"), [name])
+        acl = 1 if curs.fetchall() else 0
+        menu_acl = 1 if acl_check(name) == 1 else 0
+        menu = [['edit/' + url_pas(name), load_lang('create'), menu_acl]] if response_data == 404 else [['edit/' + url_pas(name), load_lang('edit'), menu_acl]]
         menu += [
             ['topic/' + url_pas(name), load_lang('discussion'), topic], 
             ['history/' + url_pas(name), load_lang('history')], 
@@ -184,11 +177,8 @@ def view_read_2(conn, name):
             menu += [['down/' + url_pas(name), load_lang('sub')]]
 
         curs.execute(db_change("select date from history where title = ? order by date desc limit 1"), [name])
-        date = curs.fetchall()
-        if date:
-            r_date = date[0][0]
-        else:
-            r_date = 0
+        r_date = curs.fetchall()
+        r_date = r_date[0][0] if r_date else 0
 
     div = end_data + div
 
@@ -202,20 +192,15 @@ def view_read_2(conn, name):
 
     curs.execute(db_change("select data from other where name = 'body'"))
     body = curs.fetchall()
-    if body:
-        div = body[0][0] + div
+    div = (body[0][0] + div) if body else div
 
     curs.execute(db_change("select data from other where name = 'bottom_body'"))
     body = curs.fetchall()
-    if body:
-        div += body[0][0]
+    div += body[0][0] if body else ''
 
     if ip_or_user(ip) == 0:
         curs.execute(db_change("select title from scan where user = ? and title = ?"), [ip, name])
-        if curs.fetchall():
-            watch_list = 2
-        else:
-            watch_list = 1
+        watch_list = 2 if curs.fetchall() else 1
     else:
         watch_list = 0
 

@@ -7,10 +7,11 @@ def login_register_2(conn):
         return re_error('/ban')
 
     ip = ip_check()
-    if ip_or_user(ip) == 0:
+    admin = admin_check()
+    if admin != 1 and ip_or_user(ip) == 0:
         return redirect('/user')
 
-    if not admin_check() == 1:
+    if admin != 1:
         curs.execute(db_change('select data from other where name = "reg"'))
         set_d = curs.fetchall()
         if set_d and set_d[0][0] == 'on':
@@ -50,6 +51,7 @@ def login_register_2(conn):
         curs.execute(db_change('select data from other where name = "requires_approval"'))
         requires_approval = curs.fetchall()
         requires_approval = requires_approval and requires_approval[0][0] == 'on'
+        requires_approval = None if admin == 1 else requires_approval
 
         approval_question = ''
         if requires_approval:
@@ -62,7 +64,7 @@ def login_register_2(conn):
 
         curs.execute(db_change('select data from other where name = "email_have"'))
         sql_data = curs.fetchall()
-        if sql_data and sql_data[0][0] != '':
+        if sql_data and sql_data[0][0] != '' and admin != 1:
             flask.session['c_id'] = flask.request.form.get('id', None)
             flask.session['c_pw'] = hashed
             flask.session['c_key'] = ''.join(random.choice("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ") for i in range(16))
@@ -138,6 +140,7 @@ def login_register_2(conn):
         curs.execute(db_change('select data from other where name = "requires_approval"'))
         requires_approval = curs.fetchall()
         requires_approval = requires_approval and requires_approval[0][0] == 'on'
+        requires_approval = None if admin == 1 else requires_approval
         if requires_approval:
             curs.execute(db_change('select data from other where name = "approval_question"'))
             data = curs.fetchall()
