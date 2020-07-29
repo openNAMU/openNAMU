@@ -871,17 +871,17 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
 
         return 1
 
-    if tool == '' and acl_check(name, 'render') == 1:
-        return 1
-    
-    if tool == '' and tool == 'topic':
-        end = 3
-
-        if tool == 'topic' and not name:
+    if tool == 'topic':
+        if not name:
             curs.execute(db_change("select title from rd where code = ?"), [topic_num])
-            topic_data = curs.fetchall()
-            name = topic_data[0][0] if topic_data else 'test'
-    elif tool == 'render':
+            name = curs.fetchall()
+            name = name[0][0] if name else 'test'
+        
+        end = 3
+    elif tool == 'render' or tool == '':
+        if tool == '' and acl_check(name, 'render') == 1:
+            return 1
+
         end = 2
     else:
         end = 1
@@ -890,10 +890,8 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
         if tool == '':
             if i == 0:
                 curs.execute(db_change("select decu from acl where title = ?"), [name])
-            elif i == 1:
-                curs.execute(db_change('select data from other where name = "edit"'))
             else:
-                curs.execute(db_change("select view from acl where title = ?"), [name])
+                curs.execute(db_change('select data from other where name = "edit"'))
 
             num = 5
         elif tool == 'topic':
@@ -914,9 +912,10 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
 
             num = 5
         else:
+            # tool == 'render'
             if i == 0:
                 curs.execute(db_change("select view from acl where title = ?"), [name])
-            if i == 1:
+            else:
                 curs.execute(db_change("select data from other where name = 'all_view_acl'"))
 
             num = 5
