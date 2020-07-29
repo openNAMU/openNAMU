@@ -375,5 +375,6 @@
     "domain" : "도메인",
     "before_acl" : "이 문서를 이전에 편집한 적 있는 사람만",
     "30_day_acl" : "가입 후 30일이 지난 가입자만",
-    "simple_check" : "간편 검사"
+    "simple_check" : "간편 검사",
+    "add_user" : "계정 추가"
 }
