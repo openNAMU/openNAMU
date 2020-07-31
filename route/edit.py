@@ -19,7 +19,12 @@ def edit_2(conn, name):
     ip = ip_check()
     section = flask.request.args.get('section', None)
     if section:
-        section = int(number_check(section))
+        curs.execute(db_change("select data from other where name = 'markup'"))
+        markup = curs.fetchall()
+        if markup[0][0] == 'namumark':
+            section = int(number_check(section))
+        else:
+            return redirect('/edit/' + url_pas(name))
 
     if acl_check(name) == 1:
         return re_error('/ban')
