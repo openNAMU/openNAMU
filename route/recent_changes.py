@@ -13,7 +13,8 @@ def recent_changes_2(conn, name, tool):
         ban = ''
         select = ''
         sub = ''
-
+        admin_6 = admin_check(6)
+        admin = admin_check()
         div = '''
             <table id="main_table_set">
                 <tbody>
@@ -143,7 +144,7 @@ def recent_changes_2(conn, name, tool):
             date = data[2]
 
             if data[6] == 'O':
-                if admin_check(6) == 1:
+                if admin == 1:
                     style[0] = 'id="toron_color_grey"'
                     style[1] = 'id="toron_color_grey"'
 
@@ -200,7 +201,7 @@ def recent_changes_2(conn, name, tool):
 
                     menu = [['w/' + url_pas(name), load_lang('return')]]
 
-                    if admin_check() == 1:
+                    if admin == 1:
                         menu += [['add_history/' + url_pas(name), load_lang('history_add')]]
                 else:
                     menu = [['history/' + url_pas(name), load_lang('return')]]
