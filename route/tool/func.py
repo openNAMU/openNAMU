@@ -340,7 +340,7 @@ def captcha_get():
                     data += '' + \
                         '<script src="https://www.google.com/recaptcha/api.js" async defer></script>' + \
                         '<div class="g-recaptcha" data-sitekey="' + recaptcha[0][0] + '"></div>' + \
-                        '<hr class=\"main_hr\">' + \
+                        '<hr class="main_hr">' + \
                     ''
                 else:
                     data += '' + \
@@ -453,9 +453,15 @@ def ip_warring():
         curs.execute(db_change('select data from other where name = "no_login_warring"'))
         data = curs.fetchall()
         if data and data[0][0] != '':
-            text_data = '<span>' + data[0][0] + '</span><hr class=\"main_hr\">'
+            text_data = '' + \
+                '<span>' + data[0][0] + '</span>' + \
+                '<hr class="main_hr">' + \
+            ''
         else:
-            text_data = '<span>' + load_lang('no_login_warring') + '</span><hr class=\"main_hr\">'
+            text_data = '' + \
+                '<span>' + load_lang('no_login_warring') + '</span>' + \
+                '<hr class="main_hr">' + \
+            ''
     else:
         text_data = ''
 
