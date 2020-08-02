@@ -146,7 +146,8 @@ create_data['scan'] = ['user', 'title', 'type']
 create_data['acl'] = ['title', 'decu', 'dis', 'view', 'why']
 create_data['inter'] = ['title', 'link', 'icon']
 create_data['html_filter'] = ['html', 'kind', 'plus']
-create_data['oauth_conn'] = ['provider', 'wiki_id', 'sns_id', 'name', 'picture']
+create_data['vote'] = ['name', 'id', 'subject', 'data', 'user', 'type', 'acl']
+# create_data['oauth_conn'] = ['provider', 'wiki_id', 'sns_id', 'name', 'picture']
 for i in create_data:
     try:
         curs.execute(db_change('select test from ' + i + ' limit 1'))
@@ -633,6 +634,26 @@ def application_submitted():
 @app.route('/applications', methods = ['POST', 'GET'])
 def applications():
     return applications_2(conn)
+
+@app.route('/vote/<num>', methods=['POST', 'GET'])
+def vote_select(num = '1'):
+    return vote_select_2(conn, num)
+
+@app.route('/end_vote/<num>')
+def vote_end(num = '1'):
+    return vote_end_2(conn, num)
+
+@app.route('/close_vote/<num>')
+def vote_close(num = '1'):
+    return vote_close_2(conn, num)
+
+@app.route('/vote')
+def vote():
+    return vote_2(conn)
+
+@app.route('/add_vote', methods=['POST', 'GET'])
+def vote_add():
+    return vote_add_2(conn)
 
 # API
 @app.route('/api/w/<everything:name>', methods=['POST', 'GET'])

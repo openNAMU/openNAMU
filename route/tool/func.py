@@ -884,7 +884,7 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
             name = name[0][0] if name else 'test'
         
         end = 3
-    elif tool == 'render' or tool == '':
+    elif tool == 'render' or tool == '' or tool == 'vote':
         if tool == '' and acl_check(name, 'render') == 1:
             return 1
 
@@ -917,6 +917,11 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
             curs.execute(db_change("select data from other where name = 'many_upload_acl'"))
 
             num = 5
+        elif tool == 'vote':
+            if i == 0:
+                curs.execute(db_change('select acl from vote where id = ? and user = ""'), [topic_num])
+            else:
+                curs.execute(db_change('select data from other where name = "vote_acl"'))
         else:
             # tool == 'render'
             if i == 0:
