@@ -14,6 +14,8 @@ def main_other_2(conn):
             <br>
             <h2>''' + load_lang('list') + '''</h2>
             <ul>
+                <li><a href="/recent_changes">''' + load_lang('recent_change') + '''</a></li>
+                <li><a href="/recent_discuss">''' + load_lang('recent_discussion') + '''</a></li>
                 <li><a href="/admin_list">''' + load_lang('admin_list') + '''</a></li>
                 <li><a href="/not_close_topic">''' + load_lang('open_discussion_list') + '''</a></li>
                 <li><a href="/title_index">''' + load_lang('all_document_list') + '''</a></li>

@@ -37,18 +37,23 @@
                             <div id="top_tool_cel">
                                 <a href="javascript:void(0);" onclick="opening('recent_cel');">
                                     <span class="iconify" data-icon="ic:baseline-access-time" data-inline="true"></span>
-                                    <span class="not_mobile">{{'recent'|load_lang}}</span>
+                                    <span class="not_mobile">{{'list'|load_lang}}</span>
                                     <span class="iconify" data-icon="ic:baseline-arrow-drop-down" data-inline="true"></span>
                                 </a>
                                 <div id="recent_cel" class="cel_in_cel" style="display: none;">
                                     <a href="/recent_changes">
                                         <span class="iconify" data-icon="ic:baseline-autorenew" data-inline="true"></span>
-                                        {{'edit'|load_lang}}
+                                        {{'recent_change'|load_lang}}
                                     </a>
                                     <hr>
                                     <a href="/recent_discuss">
                                         <span class="iconify" data-icon="ic:baseline-add-comment" data-inline="true"></span>
-                                        {{'discussion'|load_lang}}
+                                        {{'recent_discussion'|load_lang}}
+                                    </a>
+                                    <hr>
+                                    <a href="/vote">
+                                        <span class="iconify" data-icon="ic:baseline-how-to-vote" data-inline="true"></span>
+                                        {{'vote_list'|load_lang}}
                                     </a>
                                 </div>
                             </div>
@@ -56,7 +61,7 @@
                             <div id="top_tool_cel">
                                 <a href="javascript:void(0);" onclick="opening('other_cel');">
                                     <span class="iconify" data-icon="ic:baseline-archive" data-inline="true"></span>
-                                    <span class="not_mobile">{{'other'|load_lang}}</span>
+                                    <span class="not_mobile">{{'tool'|load_lang}}</span>
                                     <span class="iconify" data-icon="ic:baseline-arrow-drop-down" data-inline="true"></span>
                                 </a>
                                 <div id="other_cel" class="cel_in_cel" style="display: none;">
@@ -67,15 +72,20 @@
                                     <hr>
                                     <a href="/other">
                                         <span class="iconify" data-icon="ic:baseline-build" data-inline="true"></span>
-                                        {{'tool'|load_lang}}
+                                        {{'other_tool'|load_lang}}
                                     </a>
                                     {% if imp[2][9] != '0' %}
                                         <hr>
                                         <a href="/manager">
                                             <span class="iconify" data-icon="ic:baseline-how-to-reg" data-inline="true"></span>
-                                            {{'admin'|load_lang}}
+                                            {{'admin_tool'|load_lang}}
                                         </a>
                                     {% endif %}
+                                    <hr>
+                                    <a href="/upload">
+                                        <span class="iconify" data-icon="ic:baseline-cloud-upload" data-inline="true"></span>
+                                        {{'upload'|load_lang}}
+                                    </a>
                                     <hr>
                                     <a href="/skin_set">
                                         <span class="iconify" data-icon="ic:baseline-settings" data-inline="true"></span>
