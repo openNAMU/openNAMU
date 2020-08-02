@@ -24,6 +24,7 @@ def main_other_2(conn):
                 <li><a href="/admin_log">''' + load_lang('authority_use_list') + '''</a></li>
                 <li><a href="/old_page">''' + load_lang('old_page') + '''</a></li>
                 <li><a href="/image_file_list">''' + load_lang('image_file_list') + '''</a></li>
+                <li><a href="/vote">''' + load_lang('vote_list') + '''</a></li>
             </ul>
             <br>
             <h2>''' + load_lang('other') + '''</h2>

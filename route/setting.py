@@ -573,7 +573,8 @@ def setting_2(conn, num, db_set):
             2 : 'discussion',
             3 : 'upload_acl',
             4 : 'all_view_acl',
-            5 : 'many_upload_acl'
+            5 : 'many_upload_acl',
+            6 : 'vote_acl'
         }
 
         if flask.request.method == 'POST':
@@ -648,6 +649,10 @@ def setting_2(conn, num, db_set):
                         <span>''' + load_lang('many_upload_acl') + '''</span>
                         <hr class="main_hr">
                         <select ''' + disable + ''' name="many_upload_acl">''' + acl_div[4] + '''</select>
+                        <hr class="main_hr">
+                        <span>''' + load_lang('vote_acl') + '''</span>
+                        <hr class="main_hr">
+                        <select ''' + disable + ''' name="vote_acl">''' + acl_div[5] + '''</select>
                         <hr class="main_hr">
                         <button id="save" type="submit">''' + load_lang('save') + '''</button>
                     </form>
