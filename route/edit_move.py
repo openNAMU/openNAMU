@@ -7,6 +7,10 @@ def edit_move_2(conn, name):
         return re_error('/ban')
 
     if flask.request.method == 'POST':
+        move_title = flask.request.form.get('title', 'test')
+        if acl_check(move_title) == 1:
+            return re_error('/ban')
+
         if captcha_post(flask.request.form.get('g-recaptcha-response', flask.request.form.get('g-recaptcha', ''))) == 1:
             return re_error('/error/13')
         else:
@@ -14,8 +18,6 @@ def edit_move_2(conn, name):
 
         if slow_edit_check() == 1:
             return re_error('/error/24')
-
-        move_title = flask.request.form.get('title', 'test')
 
         curs.execute(db_change("select title from history where title = ?"), [move_title])
         if curs.fetchall():
