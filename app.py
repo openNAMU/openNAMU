@@ -118,7 +118,7 @@ if set_data['db_type'] == 'mysql':
 
     curs.execute(db_change('use ?')%pymysql.escape_string(set_data['db']))
 else:
-    conn = sqlite3.connect(set_data['db'] + '.db', check_same_thread = False)
+    conn = sqlite3.connect(set_data['db'] + '.db')
     curs = conn.cursor()
 
 load_conn(conn)
@@ -727,9 +727,11 @@ app.secret_key = rep_key
 app.wsgi_app = werkzeug.debug.DebuggedApplication(app.wsgi_app, True)
 app.debug = True
 
-server = WSGIServer((server_set['host'], int(server_set['port'])), PathInfoDispatcher({'/' : app}))
 if __name__ == "__main__":
-    try:
-        server.start()
-    except KeyboardInterrupt:
-        server.stop()
+    if sys.platform == 'win32' and sys.version_info[0:2] >= (3, 8):
+        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+
+    http_server = tornado.httpserver.HTTPServer(tornado.wsgi.WSGIContainer(app))
+    http_server.listen(int(server_set['port']), address = server_set['host'])
+
+    tornado.ioloop.IOLoop.instance().start()
