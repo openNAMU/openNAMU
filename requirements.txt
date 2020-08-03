@@ -1,4 +1,4 @@
-tornado
+cherrypy
 flask
 flask-Reggie
 requests
