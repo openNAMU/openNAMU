@@ -8,9 +8,11 @@ for i in range(0, 2):
         import werkzeug.routing
         import werkzeug.debug
         import flask_reggie
-        import tornado.ioloop
-        import tornado.httpserver
-        import tornado.wsgi
+        try:
+            from cheroot.wsgi import Server as WSGIServer, PathInfoDispatcher
+        except ImportError:
+            from cherrypy.wsgiserver import CherryPyWSGIServer as WSGIServer, WSGIPathInfoDispatcher as PathInfoDispatcher
+            
         import urllib.request
         import email.mime.text
         import sqlite3
