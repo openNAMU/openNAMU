@@ -727,7 +727,7 @@ app.secret_key = rep_key
 app.wsgi_app = werkzeug.debug.DebuggedApplication(app.wsgi_app, True)
 app.debug = True
 
-server = WSGIServer(('0.0.0.0', 3000), PathInfoDispatcher({'/' : app}))
+server = WSGIServer((server_set['host'], int(server_set['port'])), PathInfoDispatcher({'/' : app}))
 if __name__ == "__main__":
     try:
         server.start()
