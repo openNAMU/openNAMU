@@ -811,15 +811,17 @@ def load_skin(data = '', set_n = 0, default = 0):
         data = [[data]]
 
     for skin_data in skin_list_get:
+        see_data = skin_data if skin_data != 'default' else load_lang('default')
+
         if not skin_data in system_file:
             if data[0][0] == skin_data:
                 if set_n == 0:
-                    skin_return_data = '<option value="' + skin_data + '">' + skin_data + '</option>' + skin_return_data
+                    skin_return_data = '<option value="' + skin_data + '">' + see_data + '</option>' + skin_return_data
                 else:
                     skin_return_data = [skin_data] + skin_return_data
             else:
                 if set_n == 0:
-                    skin_return_data += '<option value="' + skin_data + '">' + skin_data + '</option>'
+                    skin_return_data += '<option value="' + skin_data + '">' + see_data + '</option>'
                 else:
                     skin_return_data += [skin_data]                    
 

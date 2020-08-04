@@ -41,12 +41,17 @@ def user_setting_2(conn, server_init):
                 data = [['default']]
 
             for lang_data in support_language:
+                see_data = lang_data if lang_data != 'default' else load_lang('default')
+                
                 if data and data[0][0] == lang_data:
-                    div3 = '<option value="' + lang_data + '">' + lang_data + '</option>' + div3
+                    div3 = '<option value="' + lang_data + '">' + see_data + '</option>' + div3
                 else:
-                    div3 += '<option value="' + lang_data + '">' + lang_data + '</option>'
+                    div3 += '<option value="' + lang_data + '">' + see_data + '</option>'
 
-            http_warring = '<hr class="main_hr"><span>' + load_lang('http_warring') + '</span>'
+            http_warring = '' + \
+                '<hr class="main_hr">' + \
+                '<span>' + load_lang('http_warring') + '</span>' + \
+            ''
 
             return easy_minify(flask.render_template(skin_check(),
                 imp = [load_lang('user_setting'), wiki_set(), custom(), other2([0, 0])],
