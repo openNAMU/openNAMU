@@ -727,6 +727,11 @@ app.secret_key = rep_key
 app.wsgi_app = werkzeug.debug.DebuggedApplication(app.wsgi_app, True)
 app.debug = True
 
-httpd = wsgiref.simple_server.make_server(server_set['host'], int(server_set['port']), app)
+# https://stackoverflow.com/questions/31433682/control-wsgiref-simple-server-log
+class NoLoggingWSGIRequestHandler(wsgiref.simple_server.WSGIRequestHandler):
+    def log_message(self, format, *args):
+        pass
+
+httpd = wsgiref.simple_server.make_server(server_set['host'], int(server_set['port']), app, handler_class = NoLoggingWSGIRequestHandler)
 if __name__ == "__main__":
     httpd.serve_forever()
