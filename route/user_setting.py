@@ -67,9 +67,9 @@ def user_setting_2(conn, server_init):
             fa_data = curs.fetchall()
             fa_data = 'checked' if fa_data and fa_data[0][0] != '' else ''
 
-            curs.execute(db_change('select data from user_set where name = "2fa" and id = ?'), [ip])
+            curs.execute(db_change('select data from user_set where name = "2fa_pw" and id = ?'), [ip])
             fa_data_pw = curs.fetchall()
-            fa_data_pw = load_lang('2fa_password_change') if fa_data else load_lang('2fa_password')
+            fa_data_pw = load_lang('2fa_password_change') if fa_data_pw else load_lang('2fa_password')
             
             http_warring = '' + \
                 '<hr class="main_hr">' + \
