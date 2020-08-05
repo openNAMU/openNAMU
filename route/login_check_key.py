@@ -3,6 +3,7 @@ from .tool.func import *
 def login_check_key_2(conn, tool):
     curs = conn.cursor()
 
+    # 난잡한 코드 정리 필요
     if flask.request.method == 'POST':
         if tool == 'check_pass_key':
             if 'c_id' in flask.session and flask.session['c_key'] == flask.request.form.get('key', None):
@@ -101,7 +102,6 @@ def login_check_key_2(conn, tool):
                         get_time()
                     ])
 
-                    flask.session['state'] = 1
                     flask.session['id'] = flask.session['c_id']
                     flask.session['head'] = ''
 

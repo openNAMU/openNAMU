@@ -11,15 +11,25 @@ def user_setting_2(conn, server_init):
 
     if ip_or_user(ip) == 0:
         if flask.request.method == 'POST':
-            auto_list = ['email', 'skin', 'lang']
+            auto_list = ['skin', 'lang', '2fa', '2fa_pw', '2fa_pw_encode']
+            pass_list = ['2fa', '2fa_pw_encode']
 
             for auto_data in auto_list:
-                if flask.request.form.get(auto_data, '') != '':
-                    curs.execute(db_change('select data from user_set where name = ? and id = ?'), [auto_data, ip])
-                    if curs.fetchall():
-                        curs.execute(db_change("update user_set set data = ? where name = ? and id = ?"), [flask.request.form.get(auto_data, ''), auto_data, ip])
-                    else:
-                        curs.execute(db_change("insert into user_set (name, id, data) values (?, ?, ?)"), [auto_data, ip, flask.request.form.get(auto_data, '')])
+                if auto_data in pass_list or flask.request.form.get(auto_data, '') != '':
+                    if auto_data != '2fa_pw_encode' or flask.request.form.get('2fa_pw', '') != '':
+                        if auto_data == '2fa_pw':
+                            get_data = pw_encode(flask.request.form.get(auto_data, ''))
+                        elif auto_data == '2fa_pw_encode':
+                            curs.execute(db_change("select encode from user where id = ?"), [ip])
+                            get_data = curs.fetchall()[0][0]
+                        else:
+                            get_data = flask.request.form.get(auto_data, '')
+                        
+                        curs.execute(db_change('select data from user_set where name = ? and id = ?'), [auto_data, ip])
+                        if curs.fetchall():
+                            curs.execute(db_change("update user_set set data = ? where name = ? and id = ?"), [get_data, auto_data, ip])
+                        else:
+                            curs.execute(db_change("insert into user_set (name, id, data) values (?, ?, ?)"), [auto_data, ip, get_data])
 
             conn.commit()
 
@@ -48,6 +58,14 @@ def user_setting_2(conn, server_init):
                 else:
                     div3 += '<option value="' + lang_data + '">' + see_data + '</option>'
 
+            curs.execute(db_change('select data from user_set where name = "2fa" and id = ?'), [ip])
+            fa_data = curs.fetchall()
+            fa_data = 'checked' if fa_data and fa_data[0][0] != '' else ''
+
+            curs.execute(db_change('select data from user_set where name = "2fa" and id = ?'), [ip])
+            fa_data_pw = curs.fetchall()
+            fa_data_pw = load_lang('2fa_password_change') if fa_data else load_lang('2fa_password')
+            
             http_warring = '' + \
                 '<hr class="main_hr">' + \
                 '<span>' + load_lang('http_warring') + '</span>' + \
@@ -57,12 +75,12 @@ def user_setting_2(conn, server_init):
                 imp = [load_lang('user_setting'), wiki_set(), custom(), other2([0, 0])],
                 data = '''
                     <form method="post">
-                        <span>''' + load_lang('id') + ''' : ''' + ip + '''</span>
+                        <span>''' + load_lang('id') + ''' : ''' + ip_pas(ip) + '''</span>
                         <hr class="main_hr">
                         <a href="/pw_change">(''' + load_lang('password_change') + ''')</a>
                         <hr class="main_hr">
                         <span>''' + load_lang('email') + ''' : ''' + email + '''</span> <a href="/email_change">(''' + load_lang('email_change') + ''')</a>
-                        <hr class="main_hr">
+                        <h2>''' + load_lang('main') + '''</h2>
                         <span>''' + load_lang('skin') + '''</span>
                         <hr class="main_hr">
                         <select name="skin">''' + div2 + '''</select>
@@ -70,6 +88,10 @@ def user_setting_2(conn, server_init):
                         <span>''' + load_lang('language') + '''</span>
                         <hr class="main_hr">
                         <select name="lang">''' + div3 + '''</select>
+                        <h2>''' + load_lang('2fa') + '''</h2>
+                        <input type="checkbox" name="2fa" value="on" ''' + fa_data + '''> ''' + load_lang('on') + '''
+                        <hr class="main_hr">
+                        <input type="password" name="2fa_pw" placeholder="''' + fa_data_pw + '''">
                         <hr class="main_hr">
                         <button type="submit">''' + load_lang('save') + '''</button>
                         ''' + http_warring + '''
