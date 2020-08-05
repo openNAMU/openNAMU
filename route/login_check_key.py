@@ -21,9 +21,13 @@ def login_check_key_2(conn, tool):
                 curs.execute(db_change('select data from other where name = "reset_user_text"'))
                 sql_d = curs.fetchall()
                 if sql_d and sql_d[0][0] != '':
-                    b_text = sql_d[0][0] + '<hr class=\"main_hr\">'
+                    b_text = sql_d[0][0] + '<hr class="main_hr">'
                 else:
                     b_text = ''
+
+                curs.execute(db_change('select data from user_set where name = "2fa" and id = ?'), [d_id])
+                if curs.fetchall():
+                    curs.execute(db_change("update user_set set data = '' where name = '2fa' and id = ?"), [d_id])
 
                 return easy_minify(flask.render_template(skin_check(),
                     imp = [load_lang('reset_user_ok'), wiki_set(), custom(), other2([0, 0])],
