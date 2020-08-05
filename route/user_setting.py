@@ -11,25 +11,30 @@ def user_setting_2(conn, server_init):
 
     if ip_or_user(ip) == 0:
         if flask.request.method == 'POST':
-            auto_list = ['skin', 'lang', '2fa', '2fa_pw', '2fa_pw_encode']
-            pass_list = ['2fa', '2fa_pw_encode']
+            pass_list = ['2fa']
+            auto_list = ['skin', 'lang'] + pass_list + ['2fa_pw', '2fa_pw_encode']
 
             for auto_data in auto_list:
-                if auto_data in pass_list or flask.request.form.get(auto_data, '') != '':
-                    if auto_data != '2fa_pw_encode' or flask.request.form.get('2fa_pw', '') != '':
-                        if auto_data == '2fa_pw':
-                            get_data = pw_encode(flask.request.form.get(auto_data, ''))
-                        elif auto_data == '2fa_pw_encode':
-                            curs.execute(db_change("select encode from user where id = ?"), [ip])
-                            get_data = curs.fetchall()[0][0]
-                        else:
-                            get_data = flask.request.form.get(auto_data, '')
-                        
-                        curs.execute(db_change('select data from user_set where name = ? and id = ?'), [auto_data, ip])
-                        if curs.fetchall():
-                            curs.execute(db_change("update user_set set data = ? where name = ? and id = ?"), [get_data, auto_data, ip])
-                        else:
-                            curs.execute(db_change("insert into user_set (name, id, data) values (?, ?, ?)"), [auto_data, ip, get_data])
+                if auto_data == '2fa_pw':
+                    if flask.request.form.get('2fa_pw', '') != '':
+                        get_data = pw_encode(flask.request.form.get(auto_data, ''))
+                    else:
+                        get_data = ''
+                elif auto_data == '2fa_pw_encode':
+                    if flask.request.form.get('2fa_pw', '') != '':
+                        curs.execute(db_change("select encode from user where id = ?"), [ip])
+                        get_data = curs.fetchall()[0][0]
+                    else:
+                        get_data = ''
+                else:
+                    get_data = flask.request.form.get(auto_data, '')
+
+                if auto_data in pass_list or get_data != '':
+                    curs.execute(db_change('select data from user_set where name = ? and id = ?'), [auto_data, ip])
+                    if curs.fetchall():
+                        curs.execute(db_change("update user_set set data = ? where name = ? and id = ?"), [get_data, auto_data, ip])
+                    else:
+                        curs.execute(db_change("insert into user_set (name, id, data) values (?, ?, ?)"), [auto_data, ip, get_data])
 
             conn.commit()
 
