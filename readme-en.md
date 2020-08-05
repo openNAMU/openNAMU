@@ -1,6 +1,5 @@
-﻿[(en-US)](./readme-en.md) | [(ko-KR)](./readme-en.md)
-openNAMU
-====
+﻿[(en-US)](./readme-en.md) | [(ko-KR)](./readme.md)
+# openNAMU
 [![Up to Python 3.5](https://img.shields.io/badge/python->=%203.5-blue.svg)](https://python.org)
 [![LICENSE](https://img.shields.io/badge/license-BSD%203--Clause-lightgrey.svg)](./LICENSE)
 
