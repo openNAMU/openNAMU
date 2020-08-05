@@ -116,7 +116,6 @@ def login_register_2(conn):
 
             curs.execute(db_change("insert into ua_d (name, ip, ua, today, sub) values (?, ?, ?, ?, '')"), [flask.request.form.get('id', None), ip, agent, get_time()])
 
-            flask.session['state'] = 1
             flask.session['id'] = flask.request.form.get('id', None)
             flask.session['head'] = ''
 

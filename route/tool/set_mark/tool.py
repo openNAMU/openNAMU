@@ -21,7 +21,7 @@ def db_change(data):
 
 def ip_check(d_type = 0):
     ip = ''
-    if d_type == 0 and (flask.session and ('state' and 'id') in flask.session):
+    if d_type == 0 and (flask.session and 'id' in flask.session):
         ip = flask.session['id']
     
     if ip == '':

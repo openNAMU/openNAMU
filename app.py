@@ -514,6 +514,10 @@ def topic_close_list(name = 'test'):
 def user_tool(name = None):
     return user_tool_2(conn, name)
 
+@app.route('/2fa_login', methods=['POST', 'GET'])
+def login_2fa():
+    return login_2fa_2(conn)
+
 @app.route('/login', methods=['POST', 'GET'])
 def login():
     return login_2(conn)
