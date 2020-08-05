@@ -8,10 +8,11 @@
 오픈나무는 파이썬 기반의 위키 엔진입니다. 파이썬과 그 의존성 모듈만 설치하면 사용할 수 있으며, 코드를 직접 수정하여 좀 더 주제에 특화된 위키를 만들 수 있습니다.
 
 ### 목차
+ * [시작하기](#시작하기)
  * [클론](#클론)
  * [기여](#기여)
  * [라이선스](#라이선스)
- * [기여자 목록](#기여자-목록)
+ * [지원 문법](#지원-문법)
  * [기타](#기타)
 
 ## 시작하기
@@ -21,10 +22,7 @@
 
 ## 클론
 아래 명령을 터미널(명령 프롬프트)에 입력하여 본 리포지토리를 클론할 수 있습니다.
-### 일반
  * `git clone -b stable https://github.com/2du/openNAMU.git`
-
-### 개발판
  * `git clone -b master https://github.com/2du/openNAMU.git`
 
 ## 기여
@@ -41,11 +39,7 @@
  * Numerical expression - [MathJax](https://www.mathjax.org/)
  * Handling Keyboard Shortcuts [shortcut.js](http://www.openjs.com/scripts/events/keyboard_shortcuts/)
 
-## 지원 문법
- * 나무마크 (NamuMark)
- * 마크다운 (Markdown) (예정)
-
-## 기여자 목록
+### 기여자 목록
  * [참고](https://github.com/2DU/openNAMU/graphs/contributors)
 
 ### 도움을 주신 분들
@@ -53,6 +47,10 @@
  * Basix
  * Efrit
  * 기타 채팅방 사람들
+
+## 지원 문법
+ * 나무마크 (NamuMark)
+ * 마크다운 (Markdown) (예정)
 
 ## 기타
  * 첫 가입자에게 소유자 권한이 부여됩니다.
