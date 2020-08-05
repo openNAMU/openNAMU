@@ -1104,16 +1104,21 @@ def rd_plus(topic_num, date, name = None, sub = None):
 
     conn.commit()
 
-def history_plus(title, data, date, ip, send, leng, t_check = '', d_type = ''):
-    curs.execute(db_change("select id from history where title = ? and type = '' order by id + 0 desc limit 1"), [title])
-    id_data = curs.fetchall()
-    id_data = str(int(id_data[0][0]) + 1) if id_data else '1'
+def history_plus(title, data, date, ip, send, leng, t_check = '', d_type = '', mode = ''):
+    if mode == 'add':
+        curs.execute(db_change("select id from history where title = ? and type = '' order by id + 0 asc limit 1"), [title])
+        id_data = curs.fetchall()
+        id_data = str(int(id_data[0][0]) - 1) if id_data else '0'
+    else:
+        curs.execute(db_change("select id from history where title = ? and type = '' order by id + 0 desc limit 1"), [title])
+        id_data = curs.fetchall()
+        id_data = str(int(id_data[0][0]) + 1) if id_data else '1'
 
     send = re.sub(r'\(|\)|<|>', '', send)
     send = send[:128] if len(send) > 128 else send
     send = send + ' (' + t_check + ')' if t_check != '' else send
 
-    if not re.search('^user:', title):
+    if not re.search('^user:', title) and mode != 'add':
         curs.execute(db_change("select count(*) from rc where type = 'normal'"))
         if curs.fetchall()[0][0] > 49:
             curs.execute(db_change("select id, title from rc where type = 'normal' order by date asc limit 1"))
