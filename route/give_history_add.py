@@ -20,7 +20,8 @@ def give_history_add_2(conn, name):
             today,
             'Add:' + flask.request.form.get('get_ip', ''),
             flask.request.form.get('send', ''),
-            leng
+            leng,
+            mode = 'add'
         )
 
         conn.commit()
