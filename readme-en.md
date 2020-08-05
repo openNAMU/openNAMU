@@ -15,7 +15,7 @@ openNAMU is a Python-based wiki engine. You can use openNAMU by installing Pytho
  * [Authors](#authors)
  * [Etc.](#etc)
 
-# Getting Started
+## Getting Started
 openNAMU is based upon Python, and it requires a Python environment.
 
 ### Download Releases
