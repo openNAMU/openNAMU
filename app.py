@@ -622,7 +622,7 @@ def user_count_edit(name = None):
 def func_title_random():
     return func_title_random_2(conn)
 
-@app.route('/image/<name>')
+@app.route('/image/<everything:name>')
 def main_image_view(name = None):
     return main_image_view_2(conn, name, app_var)
 
@@ -705,7 +705,7 @@ def api_sha224(name = 'test'):
 def api_title_index():
     return api_title_index_2(conn)
 
-@app.route('/api/image/<name>')
+@app.route('/api/image/<everything:name>')
 def api_image_view(name = ''):
     return api_image_view_2(conn, name, app_var)
 
