@@ -1031,10 +1031,16 @@ def namumark(conn, data, title, include_num):
                 else:
                     file_color = ''
 
+                file_alt = re.search(r'alt=((?:(?!&).)+)', see_link)
+                if file_alt:
+                    file_alt = file_alt.group(1)
+                else:
+                    file_alt = ''
+
                 if re.search(r'^(?:out|외부):', main_link):
                     file_src = re.sub(r'^(?:out|외부):', '', main_link)
 
-                    file_alt = main_link
+                    file_alt = main_link if file_alt == '' else file_alt
                     exist = 'Yes'
                 else:
                     file_data = re.search(r'^(?:file|파일):((?:(?!\.).)+)\.(.+)$', main_link)
@@ -1050,7 +1056,7 @@ def namumark(conn, data, title, include_num):
                         file_end = 'jpg'
 
                     file_src = '/image/' + tool.sha224_replace(file_name) + '.' + file_end
-                    file_alt = 'file:' + file_name + '.' + file_end
+                    file_alt = ('file:' + file_name + '.' + file_end) if file_alt == '' else file_alt
                     exist = None
 
                 data = link_re.sub(
