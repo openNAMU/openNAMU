@@ -5,9 +5,9 @@ from route.tool.func import *
 # DB
 version_list = json.loads(open('version.json', encoding='utf8').read())
 
-print('Version : ' + version_list['master']['r_ver'])
-print('DB set version : ' + version_list['master']['c_ver'])
-print('Skin set version : ' + version_list['master']['s_ver'])
+print('Version : ' + version_list['lastest']['r_ver'])
+print('DB set version : ' + version_list['lastest']['c_ver'])
+print('Skin set version : ' + version_list['lastest']['s_ver'])
 print('----')
 
 while 1:

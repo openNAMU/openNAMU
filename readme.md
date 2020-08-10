@@ -3,7 +3,7 @@
 [![Python 3.5 이상](https://img.shields.io/badge/python->=%203.5-blue.svg)](https://python.org)
 [![라이선스](https://img.shields.io/badge/license-BSD%203--Clause-lightgrey.svg)](./LICENSE)
 
-![](https://raw.githubusercontent.com/2du/openNAMU/master/.github/logo.png)
+![](https://raw.githubusercontent.com/2du/openNAMU/beta/.github/logo.png)
 
 오픈나무는 파이썬 기반의 위키 엔진입니다. 파이썬과 그 의존성 모듈만 설치하면 사용할 수 있으며, 코드를 직접 수정하여 좀 더 주제에 특화된 위키를 만들 수 있습니다.
 
@@ -23,7 +23,8 @@
 ## 클론
 아래 명령을 터미널(명령 프롬프트)에 입력하여 본 리포지토리를 클론할 수 있습니다.
  * `git clone -b stable https://github.com/2du/openNAMU.git`
- * `git clone -b master https://github.com/2du/openNAMU.git`
+ * `git clone -b beta https://github.com/2du/openNAMU.git`
+ * `git clone -b dev https://github.com/2du/openNAMU.git`
 
 ## 기여
 오픈나무에는 검증되지 않은 몇가지 버그가 존재할 수 있습니다. 당신의 오픈나무 사용과 버그 발견은 오픈나무의 발전을 돕습니다. [(이슈 생성하기)](https://github.com/2du/openNAMU/issues/new)
