@@ -261,7 +261,7 @@ def update(ver_num, set_data):
                 get_data[2]
             ])
 
-    if ver_num < 3200900:
+    if ver_num < 3202100:
         curs.execute(db_change('delete from cache_data'))
 
     conn.commit()
@@ -506,7 +506,7 @@ def next_fix(link, num, page, end = 50):
 
 def other2(data):
     global req_list
-    main_css_ver = '50'
+    main_css_ver = '51'
     data += ['' for _ in range(0, 3 - len(data))]
 
     if req_list == '':

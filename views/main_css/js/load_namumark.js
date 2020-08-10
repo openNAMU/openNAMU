@@ -134,22 +134,6 @@ function page_count() {
     }
 }
 
-function not_from_exist() {
-    window.addEventListener('DOMContentLoaded', function() {
-        if(document.getElementById('go_redirect_link')) {
-            var r_link = document.getElementById('go_redirect_link').href;
-            if(r_link.match(/#([^#]+)$/)) {
-                var s_link = '#' + r_link.match(/#([^#]+)$/)[1];
-                r_link = r_link.replace(/#([^#]+)$/, '');
-            } else {
-                var s_link = '';
-            }
-
-            window.location.href = r_link + '?from=' + location.pathname.replace(/^\/w\//, '') + s_link;
-        }
-    });
-}
-
 function do_open_folding(data, element = '') {
     var fol = document.getElementById(data);
     if(fol.style.display === '' || (fol.style.display === 'inline-block' || fol.style.display === 'block')) {
