@@ -53,7 +53,7 @@ def server_now_update_2(conn, r_ver):
                     <li>''' + load_lang('version') + ' : ' + r_ver + '''</li>
                     <li id="ver_send" style="display: none;">''' + load_lang('lastest') + ''' : </li>
                 </ul>
-                <a href="https://github.com/2du/openNAMU">(Master)</a> <a href="https://github.com/2du/openNAMU/tree/stable">(Stable)</a>
+                <a href="https://github.com/2du/openNAMU">(Beta)</a> <a href="https://github.com/2du/openNAMU/tree/stable">(Stable)</a>
                 <hr class=\"main_hr\">
                 <form method="post">
                     <button type="submit">''' + load_lang('update') + '''</button>

@@ -125,9 +125,9 @@ def setting_2(conn, num, db_set):
             branch_div =''
             if d_list[12] == 'stable':
                 branch_div += '<option value="stable">stable</option>'
-                branch_div += '<option value="master">master</option>'
+                branch_div += '<option value="beta">beta</option>'
             else:
-                branch_div += '<option value="master">master</option>'
+                branch_div += '<option value="beta">beta</option>'
                 branch_div += '<option value="stable">stable</option>'
 
             if db_set != 'sqlite':
