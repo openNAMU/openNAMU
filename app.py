@@ -11,9 +11,9 @@ for i_data in os.listdir("route"):
 # DB
 version_list = json.loads(open('version.json', encoding = 'utf8').read())
 
-print('Version : ' + version_list['lastest']['r_ver'])
-print('DB set version : ' + version_list['lastest']['c_ver'])
-print('Skin set version : ' + version_list['lastest']['s_ver'])
+print('Version : ' + version_list['beta']['r_ver'])
+print('DB set version : ' + version_list['beta']['c_ver'])
+print('Skin set version : ' + version_list['beta']['s_ver'])
 print('----')
 
 while 1:
@@ -164,7 +164,7 @@ try:
     if not ver_set_data:
         setup_tool = 2
     else:
-        if int(version_list['lastest']['c_ver']) > int(ver_set_data[0][0]):
+        if int(version_list['beta']['c_ver']) > int(ver_set_data[0][0]):
             setup_tool = 1
 except:
     setup_tool = 2
@@ -183,7 +183,7 @@ if setup_tool != 0:
         set_init()
 
 curs.execute(db_change('delete from other where name = "ver"'))
-curs.execute(db_change('insert into other (name, data) values ("ver", ?)'), [version_list['lastest']['c_ver']])
+curs.execute(db_change('insert into other (name, data) values ("ver", ?)'), [version_list['beta']['c_ver']])
 conn.commit()
 
 # Init
@@ -396,7 +396,7 @@ def server_restart():
 
 @app.route('/update', methods=['GET', 'POST'])
 def server_now_update():
-    return server_now_update_2(conn, version_list['lastest']['r_ver'])
+    return server_now_update_2(conn, version_list['beta']['r_ver'])
 
 @app.route('/xref/<everything:name>')
 def view_xref(name = None):
@@ -464,7 +464,7 @@ def main_other():
 @app.route('/manager', methods=['POST', 'GET'])
 @app.route('/manager/<int:num>', methods=['POST', 'GET'])
 def main_manager(num = 1):
-    return main_manager_2(conn, num, version_list['lastest']['r_ver'])
+    return main_manager_2(conn, num, version_list['beta']['r_ver'])
 
 @app.route('/title_index')
 def list_title_index():
@@ -670,7 +670,7 @@ def api_raw(name = ''):
 
 @app.route('/api/version')
 def api_version():
-    return api_version_2(conn, version_list['lastest']['r_ver'], version_list['lastest']['c_ver'])
+    return api_version_2(conn, version_list['beta']['r_ver'], version_list['beta']['c_ver'])
 
 @app.route('/api/skin_info')
 @app.route('/api/skin_info/<name>')
