@@ -23,10 +23,11 @@ class head_render:
         self.head_level[head_len_num] += 1
         for i in range(head_len_num + 1, 6):
             self.head_level[i] = 0
-        toc_num_str = str(self.toc_num)
+            
         self.toc_num += 1
-        head_level_str = ('.'.join([str(i) for i in self.head_level]) + '.').replace('0.', '')
-        head_level_str_2 = re.sub(r'\.$', '', head_level_str)
+        toc_num_str = str(self.toc_num)
+        head_level_str_2 = '.'.join([str(i) for i in self.head_level if i != 0])
+        head_level_str = head_level_str_2 + '.'
 
         self.toc_data += '<a href="#s-' + head_level_str_2 + '">' + head_level_str + '</a> ' + head_data + '<br>'
         return '<h' + head_len + ' id="s-' + head_level_str_2 + '"><a href="#toc">' + head_level_str + '</a> ' + head_data + '</h' + head_len + '>'
