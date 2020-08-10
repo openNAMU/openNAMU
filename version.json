@@ -1,6 +1,6 @@
 {
-    "master" : {
-        "r_ver" : "v3.2.0-master-22 (v3.2.0-dev-202008010-03)",
+    "lastest" : {
+        "r_ver" : "v3.2.0-beta-23 (v3.2.0-dev-202008010-03)",
         "c_ver" : "3202200",
         "s_ver" : "9"
     }, "stable" : {
