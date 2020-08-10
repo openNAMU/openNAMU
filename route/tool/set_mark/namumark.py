@@ -755,7 +755,7 @@ def namumark(conn, data, title, include_num):
             toc_main_data = re.sub(r'<span id="math_[0-9]"><\/span>', '(Math)', toc_main_data)
 
             toc_data += '' + \
-                '<span style="margin-left:' + str(len(re.findall(r'\.', toc_level_str)) * 10) + '">' + \
+                '<span style="margin-left:' + str(len(re.findall(r'\.', toc_level_str)) * 10) + 'px;">' + \
                     '<a href="#s-' + toc_level_str + '">' + toc_level_str + '.</a> ' + toc_main_data + \
                 '</span>' + \
                 '<br>' + \
