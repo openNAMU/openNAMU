@@ -37,7 +37,7 @@ def link_fix(main_link, no_change = 0):
         other_link = ''
 
     main_link = main_link.replace("<link_comma>", "&#x27;")
-    main_link = re.sub(r'\\#', '%23', main_link)
+    main_link = main_link.replace('\\#', '%23')
 
     find_data = re.findall(r'<span id="(nowiki_[0-9]+)">', main_link)
     for i in find_data:
