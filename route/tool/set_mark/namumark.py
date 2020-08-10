@@ -868,7 +868,7 @@ def namumark(conn, data, title, include_num):
     data = data.replace('<macro_middle>', '(')
     data = data.replace('<macro_end>', ')]')
 
-    blockquote_re = re.compile(r'(\n(?:&gt; ?(?:[^\n]+)\n)+)')
+    blockquote_re = re.compile(r'(\n(?:&gt; ?(?:[^\n]*)\n)+)')
     while 1:
         blockquote = blockquote_re.search(data)
         if blockquote:
@@ -890,14 +890,14 @@ def namumark(conn, data, title, include_num):
     data = re.sub(r'(?P<in>\n +\* ?(?:(?:(?!\|\|).)+))\|\|', '\g<in>\n ||', data)
     data = re.sub(r'(?P<in><div id="folding_(?:[0-9]+)" style="display: none;"><div style="">|<blockquote>)(?P<out> )?\* ', '\g<in>\n\g<out>* ', data)
 
-    li_re = re.compile(r'(\n(?:(?: +)\* (?:[^\n]+)\n)+)')
+    li_re = re.compile(r'(\n(?:(?: *)\* (?:[^\n]+)\n)+)')
     while 1:
         li_data = li_re.search(data)
         if li_data:
             li_data = li_data.group(1)
             li_end_data = ''
 
-            sub_li = re.findall(r'( +)\* ([^\n]+)\n', li_data)
+            sub_li = re.findall(r'( *)\* ([^\n]+)\n', li_data)
             for i in sub_li:
                 li_end_data += '<li style="margin-left: ' + str(20 if len(i[0]) == 0 else (len(i[0]) * 20)) + 'px;">' + i[1] + '</li>'
 
