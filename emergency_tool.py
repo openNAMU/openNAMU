@@ -134,6 +134,7 @@ print('12. All title count reset')
 print('13. Cache data reset')
 print('14. Delete Main <HEAD>')
 print('15. Give owner')
+print('16. Delete 2FA password')
 
 print('----')
 print('Select : ', end = '')
@@ -284,12 +285,20 @@ elif what_i_do == '13':
     curs.execute(db_change('delete from cache_data'))
 elif what_i_do == '14':
     curs.execute(db_change('delete from other where name = "head"'))
-else:
+elif what_i_do == '15':
     print('----')
     print('User name : ', end = '')
     user_name = input()
 
     curs.execute(db_change("update user set acl = 'owner' where id = ?"), [user_name])
+else:
+    print('----')
+    print('User name : ', end = '')
+    user_name = input()
+
+    curs.execute(db_change('select data from user_set where name = "2fa" and id = ?'), [user_name])
+    if curs.fetchall():
+        curs.execute(db_change("update user_set set data = '' where name = '2fa' and id = ?"), [user_name])
 
 conn.commit()
 

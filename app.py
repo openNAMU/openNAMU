@@ -514,6 +514,10 @@ def topic_close_list(name = 'test'):
 def user_tool(name = None):
     return user_tool_2(conn, name)
 
+@app.route('/2fa_login', methods=['POST', 'GET'])
+def login_2fa():
+    return login_2fa_2(conn)
+
 @app.route('/login', methods=['POST', 'GET'])
 def login():
     return login_2(conn)
@@ -618,7 +622,7 @@ def user_count_edit(name = None):
 def func_title_random():
     return func_title_random_2(conn)
 
-@app.route('/image/<name>')
+@app.route('/image/<everything:name>')
 def main_image_view(name = None):
     return main_image_view_2(conn, name, app_var)
 
@@ -701,7 +705,7 @@ def api_sha224(name = 'test'):
 def api_title_index():
     return api_title_index_2(conn)
 
-@app.route('/api/image/<name>')
+@app.route('/api/image/<everything:name>')
 def api_image_view(name = ''):
     return api_image_view_2(conn, name, app_var)
 
@@ -727,11 +731,11 @@ app.secret_key = rep_key
 app.wsgi_app = werkzeug.debug.DebuggedApplication(app.wsgi_app, True)
 app.debug = True
 
+# https://stackoverflow.com/questions/31433682/control-wsgiref-simple-server-log
+class NoLoggingWSGIRequestHandler(wsgiref.simple_server.WSGIRequestHandler):
+    def log_message(self, format, *args):
+        pass
+
+httpd = wsgiref.simple_server.make_server(server_set['host'], int(server_set['port']), app, handler_class = NoLoggingWSGIRequestHandler)
 if __name__ == "__main__":
-    if sys.platform == 'win32' and sys.version_info[0:2] >= (3, 8):
-        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
-
-    http_server = tornado.httpserver.HTTPServer(tornado.wsgi.WSGIContainer(app))
-    http_server.listen(int(server_set['port']), address = server_set['host'])
-
-    tornado.ioloop.IOLoop.instance().start()
+    httpd.serve_forever()

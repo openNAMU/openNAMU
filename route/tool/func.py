@@ -8,9 +8,7 @@ for i in range(0, 2):
         import werkzeug.routing
         import werkzeug.debug
         import flask_reggie
-        import tornado.ioloop
-        import tornado.httpserver
-        import tornado.wsgi
+        import wsgiref.simple_server
         import urllib.request
         import email.mime.text
         import sqlite3
@@ -263,7 +261,7 @@ def update(ver_num, set_data):
                 get_data[2]
             ])
 
-    if ver_num < 3200900:
+    if ver_num < 3202100:
         curs.execute(db_change('delete from cache_data'))
 
     conn.commit()
@@ -508,7 +506,7 @@ def next_fix(link, num, page, end = 50):
 
 def other2(data):
     global req_list
-    main_css_ver = '50'
+    main_css_ver = '51'
     data += ['' for _ in range(0, 3 - len(data))]
 
     if req_list == '':
@@ -813,15 +811,17 @@ def load_skin(data = '', set_n = 0, default = 0):
         data = [[data]]
 
     for skin_data in skin_list_get:
+        see_data = skin_data if skin_data != 'default' else load_lang('default')
+
         if not skin_data in system_file:
             if data[0][0] == skin_data:
                 if set_n == 0:
-                    skin_return_data = '<option value="' + skin_data + '">' + skin_data + '</option>' + skin_return_data
+                    skin_return_data = '<option value="' + skin_data + '">' + see_data + '</option>' + skin_return_data
                 else:
                     skin_return_data = [skin_data] + skin_return_data
             else:
                 if set_n == 0:
-                    skin_return_data += '<option value="' + skin_data + '">' + skin_data + '</option>'
+                    skin_return_data += '<option value="' + skin_data + '">' + see_data + '</option>'
                 else:
                     skin_return_data += [skin_data]                    
 
@@ -1104,16 +1104,21 @@ def rd_plus(topic_num, date, name = None, sub = None):
 
     conn.commit()
 
-def history_plus(title, data, date, ip, send, leng, t_check = '', d_type = ''):
-    curs.execute(db_change("select id from history where title = ? and type = '' order by id + 0 desc limit 1"), [title])
-    id_data = curs.fetchall()
-    id_data = str(int(id_data[0][0]) + 1) if id_data else '1'
+def history_plus(title, data, date, ip, send, leng, t_check = '', d_type = '', mode = ''):
+    if mode == 'add':
+        curs.execute(db_change("select id from history where title = ? and type = '' order by id + 0 asc limit 1"), [title])
+        id_data = curs.fetchall()
+        id_data = str(int(id_data[0][0]) - 1) if id_data else '0'
+    else:
+        curs.execute(db_change("select id from history where title = ? and type = '' order by id + 0 desc limit 1"), [title])
+        id_data = curs.fetchall()
+        id_data = str(int(id_data[0][0]) + 1) if id_data else '1'
 
     send = re.sub(r'\(|\)|<|>', '', send)
     send = send[:128] if len(send) > 128 else send
     send = send + ' (' + t_check + ')' if t_check != '' else send
 
-    if not re.search('^user:', title):
+    if not re.search('^user:', title) and mode != 'add':
         curs.execute(db_change("select count(*) from rc where type = 'normal'"))
         if curs.fetchall()[0][0] > 49:
             curs.execute(db_change("select id, title from rc where type = 'normal' order by date asc limit 1"))

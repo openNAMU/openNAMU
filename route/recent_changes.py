@@ -163,7 +163,10 @@ def recent_changes_2(conn, name, tool):
                 title = '<a href="/w/' + url_pas(name) + '?num=' + data[0] + '">r' + data[0] + '</a> '
             else:
                 title = '<a href="/w/' + url_pas(data[1]) + '">' + html.escape(data[1]) + '</a> '
-                title += '<a href="/history/' + url_pas(data[1]) + '">(r' + data[0] + ')</a> '
+                if int(data[0]) < 2:
+                    title += '<a href="/history/' + url_pas(data[1]) + '">(r' + data[0] + ')</a> '
+                else:
+                    title += '<a href="/diff/' + url_pas(data[1]) + '?first=' + str(int(data[0]) - 1) + '&second=' + data[0] + '">(r' + data[0] + ')</a> '
 
             div += '''
                 <tr ''' + style[0] + '''>
