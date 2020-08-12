@@ -537,6 +537,7 @@ def namumark(conn, data, title, include_num):
     nowiki_num = 0
     data = '\n' + data + '\n'
     include_name = include_num + '_' if include_num else ''
+    now_time = tool.get_time().split()[0]
     plus_data = ''
 
     backlink = []
@@ -850,7 +851,7 @@ def namumark(conn, data, title, include_num):
             data = macro_re.sub(ruby_data, data, 1)
         elif macro_name == 'age' or macro_name == 'dday':
             try:
-                old = datetime.datetime.strptime(time, '%Y-%m-%d')
+                old = datetime.datetime.strptime(now_time, '%Y-%m-%d')
                 will = datetime.datetime.strptime(i[1], '%Y-%m-%d')
 
                 e_data = old - will
@@ -1163,7 +1164,7 @@ def namumark(conn, data, title, include_num):
         plus_data += 'page_count();\n'
         data = re.sub(r'\[pagecount\]', '<span class="all_page_count"></span>', data, flags = re.I)
 
-    data = re.sub(r'\[date\]', tool.get_time().split()[0], data, flags = re.I)
+    data = re.sub(r'\[date\]', now_time, data, flags = re.I)
     data = re.sub(r'\[clearfix\]', '<div style="clear:both"></div>', data, flags = re.I)
     data = re.sub(r'\[br\]', '<br>', data, flags = re.I)
 
