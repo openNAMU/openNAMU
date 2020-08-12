@@ -20,11 +20,7 @@ def api_w_2(conn, name):
                 data = curs.fetchall()
                 if data:
                     if flask.request.args.get('include', 'include_1'):
-                        include_re = re.compile(r'\[include\(((?:(?!\)\]).)+)\)\]', re.I)
-                        category_re = re.compile(r'\[\[(?:(?:category|분류):(?:(?!\[\[|\]\]).)+)\]\]', re.I)
-
-                        json_data = include_re.sub('', data[0][0])
-                        json_data = category_re.sub('', json_data)
+                        json_data = data[0][0]
 
                         get_all_change_1 = [('@' + i[0] + '@', i[1]) for i in re.findall(r'@([^=]+)=([^@]+)@', json_data)]
                         json_data = re.sub(r'@(?P<in>[^=]+)=([^@]+)@', '@\g<in>@', json_data)
