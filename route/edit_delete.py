@@ -61,14 +61,14 @@ def edit_delete_2(conn, name, app_var):
 
         return easy_minify(flask.render_template(skin_check(),
             imp = [name, wiki_set(), custom(), other2(['(' + load_lang('delete') + ')', 0])],
-            data =  '''
-                    <form method="post">
-                        ''' + ip_warring() + '''
-                        <input placeholder="''' + load_lang('why') + '''" name="send" type="text">
-                        <hr class=\"main_hr\">
-                        ''' + captcha_get() + '''
-                        <button type="submit">''' + load_lang('delete') + '''</button>
-                    </form>
-                    ''',
+            data = '''
+                <form method="post">
+                    ''' + ip_warring() + '''
+                    <input placeholder="''' + load_lang('why') + '''" name="send" type="text">
+                    <hr class=\"main_hr\">
+                    ''' + captcha_get() + '''
+                    <button type="submit">''' + load_lang('delete') + '''</button>
+                </form>
+            ''',
             menu = [['w/' + url_pas(name), load_lang('return')]]
         ))     
