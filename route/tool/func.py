@@ -11,6 +11,7 @@ for i in range(0, 2):
         import wsgiref.simple_server
         import urllib.request
         import email.mime.text
+        import requests
         import sqlite3
         import pymysql
         import hashlib
