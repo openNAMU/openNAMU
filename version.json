@@ -1,11 +1,11 @@
 {
     "beta" : {
-        "r_ver" : "v3.2.0-beta-23 (v3.2.0-dev-202008010-03)",
-        "c_ver" : "3202200",
+        "r_ver" : "v3.2.0-master-24 (Lastest master version)",
+        "c_ver" : "3202400",
         "s_ver" : "9"
     }, "master" : {
-        "r_ver" : "v3.2.0-beta-23 (v3.2.0-master-22)",
-        "c_ver" : "3202200",
+        "r_ver" : "v3.2.0-master-24 (Lastest master version)",
+        "c_ver" : "3202400",
         "s_ver" : "9"
     }, "stable" : {
         "r_ver" : "v3.2.0-stable-11",

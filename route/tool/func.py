@@ -264,6 +264,12 @@ def update(ver_num, set_data):
     if ver_num < 3202200:
         curs.execute(db_change('delete from cache_data'))
 
+    if ver_num < 3202400:
+        curs.execute(db_change("select data from other where name = 'update'"))
+        get_data = curs.fetchall()
+        if get_data and get_data[0][0] == 'master':
+            curs.execute(db_change("update other set data = 'beta' where name = 'update'"), [])
+
     conn.commit()
 
     print('Update pass')
