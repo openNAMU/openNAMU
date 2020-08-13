@@ -6,6 +6,7 @@ def api_version_2(conn, r_ver, c_ver):
     n_ver = ''
     data = None
 
+    # master 빌드에 master을 beta로 수정하는 코드 넣어야함
     curs.execute(db_change('select data from other where name = "update"'))
     up_data = curs.fetchall()
     up_data = up_data[0][0] if up_data else 'stable'

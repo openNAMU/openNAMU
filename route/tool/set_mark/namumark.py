@@ -909,7 +909,7 @@ def namumark(conn, data, title, include_num):
             for i in sub_li:
                 li_end_data += '<li style="margin-left: ' + str(20 if len(i[0]) == 0 else (len(i[0]) * 20)) + 'px;">' + i[1] + '</li>'
 
-            data = li_re.sub('\n<ul>' + li_end_data + '</ul>\n', data, 1)
+            data = li_re.sub('\n\n<ul>' + li_end_data + '</ul>\n', data, 1)
         else:
             break
 
